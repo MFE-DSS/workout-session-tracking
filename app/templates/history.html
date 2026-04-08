@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Historique</h1>
+{% if sessions|length == 0 %}
+  <p class="empty">
+    Aucune séance enregistrée pour l'instant. Commence par
+    <a href="{{ url_for('library') }}">choisir un template</a>.
+  </p>
+{% else %}
+  <ul class="session-list">
+    {% for s in sessions %}
+      <li class="session-card">
+        <div class="session-card__row">
+          <span class="session-card__name">{{ s.template_name_snapshot }}</span>
+          <span class="session-card__date">
+            {{ s.started_at.strftime('%a %d/%m %H:%M') }}
+          </span>
+        </div>
+        {% if s.ended_at is none %}
+          <div class="session-card__status session-card__status--open">en cours</div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}

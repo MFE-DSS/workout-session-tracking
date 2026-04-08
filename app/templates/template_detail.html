@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<a class="back" href="{{ url_for('library') }}">← Bibliothèque</a>
+<h1 class="h1">{{ template.name }}</h1>
+<p class="lede">{{ template.focus }}</p>
+{% if template.cardio_note %}
+  <p class="cardio">Cardio : {{ template.cardio_note }}</p>
+{% endif %}
+{% if template.suggested_label %}
+  <p class="hint"><em>Suggestion de placement : {{ template.suggested_label }}</em></p>
+{% endif %}
+
+{% if template.exercises|length == 0 %}
+  <p class="empty">Séance cardio / activité basse intensité. Aucun exercice de musculation prescrit.</p>
+{% else %}
+  <ol class="exercise-list">
+    {% for ex in template.exercises %}
+      <li class="exercise">
+        <div class="exercise__head">
+          <span class="exercise__code">{{ ex.code }}</span>
+          <span class="exercise__name">{{ ex.name }}</span>
+        </div>
+        <div class="exercise__scheme">{{ ex.set_scheme }}</div>
+        {% if ex.notes %}
+          <p class="exercise__notes">{{ ex.notes }}</p>
+        {% endif %}
+        <ul class="sets">
+          {% for rt in ex.rep_targets %}
+            <li class="sets__item">
+              <span class="sets__idx">#{{ rt.set_index }}</span>
+              <span class="sets__range">{{ rt.min_reps }}–{{ rt.max_reps }}</span>
+              {% if rt.technique %}
+                <span class="sets__tag">{{ rt.technique }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ol>
+{% endif %}
+{% endblock %}

@@ -1,8 +1,12 @@
-"""Idempotent seed for the reference training split.
+"""Idempotent seed of the workout template library.
 
-Reads `data/reference_split.json`, upserts the `ReferenceDoc` row keyed by
-`version`, and rebuilds the catalog if (and only if) the version changes.
-Safe to call on every boot.
+Reads `data/reference_split.json`, upserts `ReferenceDoc` by
+`version`, and rebuilds the template catalog ONLY when the
+version changes. Safe to call on every boot.
+
+Rebuilds are safe for history: `session_exercises` snapshot the
+`exercise_code_snapshot` / `exercise_name_snapshot` fields at log
+time, and the FKs to the catalog are `ON DELETE SET NULL`.
 """
 from __future__ import annotations
 
@@ -13,7 +17,12 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.config import BASE_DIR
-from app.models.catalog import Exercise, ReferenceDoc, RepRange, SplitDay
+from app.models.catalog import (
+    ReferenceDoc,
+    RepTarget,
+    TemplateExercise,
+    WorkoutTemplate,
+)
 
 REFERENCE_PATH = BASE_DIR / "data" / "reference_split.json"
 
@@ -24,9 +33,10 @@ def load_reference_payload(path: Path = REFERENCE_PATH) -> dict:
 
 
 def seed_reference_split(db: Session, payload: dict | None = None) -> bool:
-    """Seed the catalog from the reference JSON.
+    """Seed the template library from the reference JSON.
 
-    Returns True if a (re)seed happened, False if it was a no-op.
+    Returns True if a (re)seed happened, False if the version was
+    already present.
     """
     payload = payload or load_reference_payload()
     version = payload["version"]
@@ -38,41 +48,38 @@ def seed_reference_split(db: Session, payload: dict | None = None) -> bool:
     if existing is not None:
         return False
 
-    # New version: wipe the prescribed catalog and rebuild. We deliberately do
-    # NOT touch workout_sessions / set_logs: those reference exercises by id,
-    # so keep in mind that any catalog rebuild after Sprint 1 will need a
-    # remap strategy (tracked in Risks / Next Sprint).
-    db.execute(delete(RepRange))
-    db.execute(delete(Exercise))
-    db.execute(delete(SplitDay))
+    db.execute(delete(RepTarget))
+    db.execute(delete(TemplateExercise))
+    db.execute(delete(WorkoutTemplate))
 
-    for day in payload["split_days"]:
-        split_day = SplitDay(
-            weekday=day["weekday"],
-            name=day["name"],
-            kind=day["kind"],
-            focus=day.get("focus", ""),
-            cardio_note=day.get("cardio_note"),
+    for tpl in payload["templates"]:
+        template = WorkoutTemplate(
+            slug=tpl["slug"],
+            name=tpl["name"],
+            kind=tpl["kind"],
+            focus=tpl.get("focus", ""),
+            cardio_note=tpl.get("cardio_note"),
+            suggested_label=tpl.get("suggested_label"),
         )
-        for ex in day.get("exercises", []):
-            exercise = Exercise(
+        for ex in tpl.get("exercises", []):
+            exercise = TemplateExercise(
                 position=ex["position"],
                 code=ex["code"],
                 name=ex["name"],
                 set_scheme=ex["set_scheme"],
                 notes=ex.get("notes"),
             )
-            for idx, rr in enumerate(ex.get("rep_ranges", []), start=1):
-                exercise.rep_ranges.append(
-                    RepRange(
+            for idx, rt in enumerate(ex.get("rep_targets", []), start=1):
+                exercise.rep_targets.append(
+                    RepTarget(
                         set_index=idx,
-                        min_reps=rr["min_reps"],
-                        max_reps=rr["max_reps"],
-                        technique=rr.get("technique"),
+                        min_reps=rt["min_reps"],
+                        max_reps=rt["max_reps"],
+                        technique=rt.get("technique"),
                     )
                 )
-            split_day.exercises.append(exercise)
-        db.add(split_day)
+            template.exercises.append(exercise)
+        db.add(template)
 
     db.add(ReferenceDoc(version=version, title=title))
     db.commit()

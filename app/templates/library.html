@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Bibliothèque</h1>
+<p class="lede">Chaque template est une séance-type que tu peux choisir librement.</p>
+
+<ul class="template-list">
+  {% for tpl in templates %}
+    <li class="template-card template-card--{{ tpl.kind }}">
+      <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
+        <div class="template-card__row">
+          <span class="template-card__name">{{ tpl.name }}</span>
+          <span class="template-card__kind">{{ tpl.kind|upper }}</span>
+        </div>
+        <div class="template-card__focus">{{ tpl.focus }}</div>
+        {% if tpl.suggested_label %}
+          <div class="template-card__hint">Suggestion : {{ tpl.suggested_label }}</div>
+        {% endif %}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

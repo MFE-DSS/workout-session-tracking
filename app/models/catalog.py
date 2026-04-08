@@ -1,9 +1,14 @@
-"""Reference catalog models.
+"""Workout template library.
 
-These tables describe the *prescribed* training split (what the coach wrote
-in the reference document). They are seeded once and are read-only from the
-user's point of view. The actual per-date session logs live in
-`app/models/session.py`.
+A `WorkoutTemplate` is a *type of workout* the user can pick
+(push A, pull B, legs, LISS cardio, ...). It has no structural
+coupling to any day of the week. The weekday of a real session
+is derived from `WorkoutSession.started_at`, never from the
+catalog.
+
+A template can carry a `suggested_label` (e.g. "usually day 1"),
+but this is a non-structural memory aid only — never branch
+application logic on it.
 """
 from __future__ import annotations
 
@@ -24,55 +29,42 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
-class SplitDay(Base):
-    """A day of the weekly split (Lundi, Mardi, ...).
+class WorkoutTemplate(Base):
+    """A pickable workout template (strength or cardio)."""
 
-    `kind` is one of:
-      - "training"  -> a muscle-group training day with exercises
-      - "rest_abs"  -> rest day with abs + LISS cardio
-
-    `weekday` is ISO weekday 1..7 (Lundi=1, Dimanche=7).
-    """
-
-    __tablename__ = "split_days"
+    __tablename__ = "workout_templates"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    weekday: Mapped[int] = mapped_column(Integer, nullable=False, unique=True)
-    name: Mapped[str] = mapped_column(String(64), nullable=False)
-    kind: Mapped[str] = mapped_column(String(16), nullable=False, default="training")
+    slug: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False, default="strength")
     focus: Mapped[str] = mapped_column(String(128), nullable=False, default="")
     cardio_note: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    exercises: Mapped[list["Exercise"]] = relationship(
-        back_populates="split_day",
+    # Non-structural hint only. NEVER branch logic on this field.
+    suggested_label: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
+
+    exercises: Mapped[list["TemplateExercise"]] = relationship(
+        back_populates="template",
         cascade="all, delete-orphan",
-        order_by="Exercise.position",
+        order_by="TemplateExercise.position",
     )
 
     def __repr__(self) -> str:  # pragma: no cover
-        return f"<SplitDay {self.weekday} {self.name} ({self.kind})>"
+        return f"<WorkoutTemplate slug={self.slug} kind={self.kind}>"
 
 
-class Exercise(Base):
-    """A prescribed exercise slot inside a training day.
+class TemplateExercise(Base):
+    """A prescribed exercise slot inside a template."""
 
-    `code` mirrors the source document (E1, E2, ...). The source sometimes
-    reuses E6 or skips E5; we preserve the code as a label but use `position`
-    as the stable ordering.
-
-    `set_scheme` is a text representation of the rep ranges exactly as the
-    coach wrote them ("6-10, 6-10, 10-15", "2x 12-15", ...). This is the
-    human-facing reference. Machine-readable ranges live in `rep_ranges`.
-    """
-
-    __tablename__ = "exercises"
+    __tablename__ = "template_exercises"
     __table_args__ = (
-        UniqueConstraint("split_day_id", "position", name="uq_exercise_day_position"),
+        UniqueConstraint("template_id", "position", name="uq_template_exercise_position"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    split_day_id: Mapped[int] = mapped_column(
-        ForeignKey("split_days.id", ondelete="CASCADE"), nullable=False
+    template_id: Mapped[int] = mapped_column(
+        ForeignKey("workout_templates.id", ondelete="CASCADE"), nullable=False
     )
     position: Mapped[int] = mapped_column(Integer, nullable=False)
     code: Mapped[str] = mapped_column(String(8), nullable=False)
@@ -80,49 +72,36 @@ class Exercise(Base):
     set_scheme: Mapped[str] = mapped_column(String(255), nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    split_day: Mapped[SplitDay] = relationship(back_populates="exercises")
-    rep_ranges: Mapped[list["RepRange"]] = relationship(
+    template: Mapped[WorkoutTemplate] = relationship(back_populates="exercises")
+    rep_targets: Mapped[list["RepTarget"]] = relationship(
         back_populates="exercise",
         cascade="all, delete-orphan",
-        order_by="RepRange.set_index",
+        order_by="RepTarget.set_index",
     )
 
-    def __repr__(self) -> str:  # pragma: no cover
-        return f"<Exercise {self.code} {self.name!r}>"
 
+class RepTarget(Base):
+    """A prescribed rep range for one working set of a template exercise."""
 
-class RepRange(Base):
-    """A single working set's prescribed rep range.
-
-    A 3-set exercise with scheme "6-10, 6-10, 10-15" produces 3 RepRange rows
-    (set_index 1..3). A "2x 12-15" exercise produces 2 rows with identical
-    min/max. This representation is what Sprint 1+ uses for progression and
-    surcharge-progressive checks.
-    """
-
-    __tablename__ = "rep_ranges"
+    __tablename__ = "rep_targets"
     __table_args__ = (
-        UniqueConstraint("exercise_id", "set_index", name="uq_reprange_exercise_set"),
+        UniqueConstraint("template_exercise_id", "set_index", name="uq_rep_target_set"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    exercise_id: Mapped[int] = mapped_column(
-        ForeignKey("exercises.id", ondelete="CASCADE"), nullable=False
+    template_exercise_id: Mapped[int] = mapped_column(
+        ForeignKey("template_exercises.id", ondelete="CASCADE"), nullable=False
     )
     set_index: Mapped[int] = mapped_column(Integer, nullable=False)
     min_reps: Mapped[int] = mapped_column(Integer, nullable=False)
     max_reps: Mapped[int] = mapped_column(Integer, nullable=False)
     technique: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
 
-    exercise: Mapped[Exercise] = relationship(back_populates="rep_ranges")
+    exercise: Mapped[TemplateExercise] = relationship(back_populates="rep_targets")
 
 
 class ReferenceDoc(Base):
-    """Stores the version of the seeded reference document.
-
-    Lets us detect when the source spec changes and trigger a re-seed. The
-    hash/version comes from `data/reference_split.json`.
-    """
+    """Tracks which version of the catalog JSON is currently seeded."""
 
     __tablename__ = "reference_docs"
 

@@ -1,26 +1,27 @@
 {
-  "version": "2026-04-08.v1",
-  "title": "ENTRAÎNEMENT SPLIT",
+  "version": "2026-04-08.v2",
+  "title": "Workout template library",
   "global_notes": [
-    "30 min d'escalier après l'entraînement",
-    "Phase excentrique fluide 2-3s, concentrique explosive mais contrôlée.",
-    "Repos inter-séries 90-150s sauf indication contraire.",
-    "Surcharge progressive: charge OU reps, sans sacrifier l'exécution."
+    "30 min d'escalier après chaque séance de musculation",
+    "Phase excentrique fluide 2-3s, concentrique explosive mais contrôlée",
+    "Repos inter-séries 90-150s sauf indication contraire",
+    "Surcharge progressive: charge OU reps, sans sacrifier l'exécution"
   ],
-  "split_days": [
+  "templates": [
     {
-      "weekday": 1,
-      "name": "Lundi",
-      "kind": "training",
+      "slug": "push-a",
+      "name": "Push A",
+      "kind": "strength",
       "focus": "Pectoral, Delts, Triceps",
-      "cardio_note": "10 miles de pas",
+      "cardio_note": "10 miles de pas après la séance",
+      "suggested_label": "Souvent placée en début de semaine",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
           "name": "Butterfly pec",
           "set_scheme": "2x 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -30,7 +31,7 @@
           "code": "E2",
           "name": "Incline Smith Chest Press",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -41,7 +42,7 @@
           "code": "E3",
           "name": "Neutral Grip Seated Shoulder Press",
           "set_scheme": "6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -51,7 +52,7 @@
           "code": "E4",
           "name": "Presse pectorale machine",
           "set_scheme": "2x 12-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
           ]
@@ -61,7 +62,7 @@
           "code": "E5",
           "name": "Dips pectoraux (buste penché)",
           "set_scheme": "2x 12-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
           ]
@@ -71,8 +72,8 @@
           "code": "E6",
           "name": "Élévations latérales debout",
           "set_scheme": "2x 30-40 (rest-pause 10-15s)",
-          "notes": "Utiliser la charge que vous utiliseriez pour 15-20 reps et enchaîner en rest-pause (10-15s) jusqu'à 40 reps.",
-          "rep_ranges": [
+          "notes": "Charge habituelle 15-20RM, rest-pause 10-15s jusqu'à atteindre 40 reps",
+          "rep_targets": [
             {"min_reps": 30, "max_reps": 40, "technique": "RP"},
             {"min_reps": 30, "max_reps": 40, "technique": "RP"}
           ]
@@ -82,7 +83,7 @@
           "code": "E7",
           "name": "Triceps extension câbles croisés",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -93,7 +94,7 @@
           "code": "E8",
           "name": "Extensions triceps au-dessus de la tête, câbles croisés",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -102,18 +103,19 @@
       ]
     },
     {
-      "weekday": 2,
-      "name": "Mardi",
-      "kind": "training",
+      "slug": "pull-a",
+      "name": "Pull A",
+      "kind": "strength",
       "focus": "Dos, Delts arrière",
-      "cardio_note": "10 miles de pas",
+      "cardio_note": "10 miles de pas après la séance",
+      "suggested_label": "Souvent après Push A",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
           "name": "Tirage vertical à un bras (poulie haute ou machine)",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -124,7 +126,7 @@
           "code": "E2",
           "name": "Rowing en pronation haut du dos, support poitrine assis (prise large)",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -135,7 +137,7 @@
           "code": "E3",
           "name": "Rowing bas machine",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -146,7 +148,7 @@
           "code": "E4",
           "name": "Tirage horizontal",
           "set_scheme": "6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -156,8 +158,8 @@
           "code": "E6",
           "name": "Écarté arrière d'épaule",
           "set_scheme": "3x 12-15",
-          "notes": "Code source E6 (E5 non listé dans le document).",
-          "rep_ranges": [
+          "notes": "Code source E6 (E5 non listé dans le document original)",
+          "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
@@ -166,26 +168,19 @@
       ]
     },
     {
-      "weekday": 3,
-      "name": "Mercredi",
-      "kind": "rest_abs",
-      "focus": "Repos / Abdos",
-      "cardio_note": "30 min à jeun LISS à 120-130 bpm + abdos",
-      "exercises": []
-    },
-    {
-      "weekday": 4,
-      "name": "Jeudi",
-      "kind": "training",
+      "slug": "push-b",
+      "name": "Push B",
+      "kind": "strength",
       "focus": "Pectoraux, Deltoïdes",
-      "cardio_note": "10 miles de pas",
+      "cardio_note": "10 miles de pas après la séance",
+      "suggested_label": "Milieu de semaine typique",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
           "name": "Écarté pec aux câbles",
           "set_scheme": "2x 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -195,7 +190,7 @@
           "code": "E2",
           "name": "Développé couché haltères",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -206,8 +201,8 @@
           "code": "E6",
           "name": "Presse à épaules Smith Machine",
           "set_scheme": "6-10, 6-10, 10-15",
-          "notes": "Code source E6 (ordre préservé du document original).",
-          "rep_ranges": [
+          "notes": "Code source E6 (ordre préservé du document original)",
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -218,7 +213,7 @@
           "code": "E3",
           "name": "Développé incliné Smith",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -229,7 +224,7 @@
           "code": "E4",
           "name": "Dips pectoraux",
           "set_scheme": "3x 12-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
@@ -240,7 +235,7 @@
           "code": "E5",
           "name": "Élévations latérales assis",
           "set_scheme": "10-15, 6-10, 15-20",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 15, "max_reps": 20}
@@ -251,8 +246,8 @@
           "code": "E6",
           "name": "Tirage front",
           "set_scheme": "2x 12-15",
-          "notes": "Code source E6 (E6 apparaît deux fois dans le document original).",
-          "rep_ranges": [
+          "notes": "Code source E6 (E6 apparaît deux fois dans le document original)",
+          "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
           ]
@@ -260,18 +255,19 @@
       ]
     },
     {
-      "weekday": 5,
-      "name": "Vendredi",
-      "kind": "training",
+      "slug": "pull-b",
+      "name": "Pull B",
+      "kind": "strength",
       "focus": "Dos, Bras",
-      "cardio_note": "10 miles de pas",
+      "cardio_note": "10 miles de pas après la séance",
+      "suggested_label": "Deuxième moitié de semaine",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
           "name": "Rowing latéral assis à un bras",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -282,7 +278,7 @@
           "code": "E2",
           "name": "Tirage nuque / tirage vertical prise large",
           "set_scheme": "2x 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -292,7 +288,7 @@
           "code": "E3",
           "name": "Seated row prise large",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -303,7 +299,7 @@
           "code": "E4",
           "name": "Triceps extension au câble",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -314,7 +310,7 @@
           "code": "E5",
           "name": "Skull crushers haltères",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -325,7 +321,7 @@
           "code": "E6",
           "name": "Extension de barre au-dessus de la tête, câble penché",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -336,7 +332,7 @@
           "code": "E7",
           "name": "Biceps curls unilatéraux, banc penché",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -347,7 +343,7 @@
           "code": "E8",
           "name": "Biceps curls EZ-bar debout",
           "set_scheme": "6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -355,18 +351,19 @@
       ]
     },
     {
-      "weekday": 6,
-      "name": "Samedi",
-      "kind": "training",
+      "slug": "legs",
+      "name": "Legs",
+      "kind": "strength",
       "focus": "Jambes",
-      "cardio_note": "10 miles de pas",
+      "cardio_note": "10 miles de pas après la séance",
+      "suggested_label": "Souvent en fin de semaine",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
           "name": "Relevés des mollets debout",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -377,7 +374,7 @@
           "code": "E2",
           "name": "Leg curls assis",
           "set_scheme": "6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -387,7 +384,7 @@
           "code": "E3",
           "name": "Leg curls allongé",
           "set_scheme": "6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -397,7 +394,7 @@
           "code": "E4",
           "name": "Adduction assise",
           "set_scheme": "6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -407,7 +404,7 @@
           "code": "E5",
           "name": "Leg extensions assises",
           "set_scheme": "8-12, 15-20",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 8, "max_reps": 12},
             {"min_reps": 15, "max_reps": 20}
           ]
@@ -417,7 +414,7 @@
           "code": "E6",
           "name": "Hack Squat",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -428,7 +425,7 @@
           "code": "E7",
           "name": "Leg press",
           "set_scheme": "6-10, 6-10, 10-15",
-          "rep_ranges": [
+          "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 10, "max_reps": 15}
@@ -437,11 +434,12 @@
       ]
     },
     {
-      "weekday": 7,
-      "name": "Dimanche",
-      "kind": "rest_abs",
-      "focus": "Repos / Abdos",
-      "cardio_note": "30 min à jeun LISS à 120-130 bpm + abdos",
+      "slug": "liss-abs",
+      "name": "LISS cardio + abdos",
+      "kind": "cardio",
+      "focus": "Cardio bas régime + abdos",
+      "cardio_note": "30 min à jeun LISS à 120-130 bpm",
+      "suggested_label": "À caler entre les séances de musculation",
       "exercises": []
     }
   ]

@@ -1,23 +1,34 @@
-"""Per-date workout session logs.
+"""Real logged sessions + normalized feedback.
 
-Sprint 0 only ships the *table shapes* so migrations are stable from day 1;
-the UI for actually creating/editing sessions arrives in Sprint 1. Keeping
-the schema present now avoids a destructive migration later and lets tests
-cover the relations immediately.
+Design rules enforced at the schema level:
+
+1. A `WorkoutSession` is anchored to an absolute timestamp
+   (`started_at`). The weekday is DERIVED from that timestamp,
+   never stored structurally.
+
+2. Every session snapshots enough of the catalog state
+   (`template_slug_snapshot`, `exercise_code_snapshot`,
+   `exercise_name_snapshot`) so that historical logs survive a
+   template library rewrite. The FKs to the catalog are nullable
+   with `ON DELETE SET NULL`: the catalog is free to evolve, the
+   history stays intact.
+
+3. Feedback is normalized via string / int enums defined in
+   `app.enums`. Free-text notes exist but are optional and short
+   (they do not feed analytics).
 """
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import (
-    Date,
     DateTime,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
-    Text,
     UniqueConstraint,
     func,
 )
@@ -27,48 +38,108 @@ from app.database import Base
 
 
 class WorkoutSession(Base):
-    """One logged workout on a given calendar date."""
+    """One real workout, identified by its start timestamp."""
 
     __tablename__ = "workout_sessions"
     __table_args__ = (
-        UniqueConstraint("session_date", name="uq_session_date"),
+        Index("ix_workout_sessions_started_at", "started_at"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    session_date: Mapped[date] = mapped_column(Date, nullable=False)
-    split_day_id: Mapped[int] = mapped_column(
-        ForeignKey("split_days.id", ondelete="RESTRICT"), nullable=False
+
+    # FK to the catalog. Nullable + SET NULL so the catalog can be
+    # rewritten without orphaning history.
+    template_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("workout_templates.id", ondelete="SET NULL"), nullable=True
     )
+    # Denormalized snapshots captured at session creation time.
+    template_slug_snapshot: Mapped[str] = mapped_column(String(64), nullable=False)
+    template_name_snapshot: Mapped[str] = mapped_column(String(128), nullable=False)
+
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    ended_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    # Normalized session-level feedback (see app.enums)
+    concentration: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    global_state: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+
     bodyweight_kg: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    free_note: Mapped[Optional[str]] = mapped_column(String(280), nullable=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    set_logs: Mapped[list["SetLog"]] = relationship(
+    session_exercises: Mapped[list["SessionExercise"]] = relationship(
         back_populates="session",
         cascade="all, delete-orphan",
-        order_by="SetLog.id",
+        order_by="SessionExercise.position",
     )
 
+    @property
+    def weekday_iso(self) -> int:
+        """ISO weekday (1=Mon..7=Sun) derived from `started_at`."""
+        return self.started_at.isoweekday()
 
-class SetLog(Base):
-    """One working set actually performed during a session."""
 
-    __tablename__ = "set_logs"
+class SessionExercise(Base):
+    """One exercise as it was actually performed inside a session."""
+
+    __tablename__ = "session_exercises"
+    __table_args__ = (
+        UniqueConstraint("session_id", "position", name="uq_session_exercise_position"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     session_id: Mapped[int] = mapped_column(
         ForeignKey("workout_sessions.id", ondelete="CASCADE"), nullable=False
     )
-    exercise_id: Mapped[int] = mapped_column(
-        ForeignKey("exercises.id", ondelete="RESTRICT"), nullable=False
+    template_exercise_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("template_exercises.id", ondelete="SET NULL"), nullable=True
+    )
+    # Denormalized snapshots so analytics keep working after a reseed.
+    exercise_code_snapshot: Mapped[str] = mapped_column(String(16), nullable=False)
+    exercise_name_snapshot: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    # Normalized per-exercise feedback
+    success_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 100|80|50
+    muscle_sensation: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    free_note: Mapped[Optional[str]] = mapped_column(String(140), nullable=True)
+
+    session: Mapped[WorkoutSession] = relationship(back_populates="session_exercises")
+    set_logs: Mapped[list["SetLog"]] = relationship(
+        back_populates="session_exercise",
+        cascade="all, delete-orphan",
+        order_by="SetLog.set_index",
+    )
+
+
+class SetLog(Base):
+    """One working set actually performed."""
+
+    __tablename__ = "set_logs"
+    __table_args__ = (
+        UniqueConstraint("session_exercise_id", "set_index", name="uq_set_log_index"),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    session_exercise_id: Mapped[int] = mapped_column(
+        ForeignKey("session_exercises.id", ondelete="CASCADE"), nullable=False
     )
     set_index: Mapped[int] = mapped_column(Integer, nullable=False)
+
     weight_kg: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     reps: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     technique: Mapped[Optional[str]] = mapped_column(String(8), nullable=True)
-    quality: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
-    session: Mapped[WorkoutSession] = relationship(back_populates="set_logs")
+    # Normalized per-set feedback
+    execution_quality: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    reps_target: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+
+    short_note: Mapped[Optional[str]] = mapped_column(String(140), nullable=True)
+
+    session_exercise: Mapped[SessionExercise] = relationship(back_populates="set_logs")

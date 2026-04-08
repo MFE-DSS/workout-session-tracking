@@ -16,28 +16,17 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
     monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_path}")
     monkeypatch.setenv("APP_ENV", "test")
 
-    # Reset cached settings + module-level engine so the new DATABASE_URL sticks.
-    # We must reload every module that captured the previous `Base` / engine at
-    # import time, in the right order, so models re-register on the new Base.
-    import importlib
+    # Reset module-level engine + Base so the new DATABASE_URL sticks.
+    # Any `app.*` module that captured the old engine or Base at import
+    # time must be dropped so the re-imports pick up the new ones. We
+    # purge the whole `app` namespace to avoid fragile hand-maintained
+    # module lists.
     import sys
 
-    for mod_name in [
-        "app.routers.pages",
-        "app.routers.health",
-        "app.services.seed",
-        "app.models.session",
-        "app.models.catalog",
-        "app.models",
-        "app.database",
-        "app.config",
-        "app.main",
-    ]:
+    for mod_name in [m for m in list(sys.modules) if m == "app" or m.startswith("app.")]:
         sys.modules.pop(mod_name, None)
 
-    from app import config  # noqa: F401
-
-    from app import main as main_mod
+    from app import main as main_mod  # noqa: E402
 
     with TestClient(main_mod.app) as c:
         yield c

@@ -17,12 +17,11 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="topbar__brand" href="{{ url_for('index') }}">Split</a>
-      <nav class="topbar__nav" aria-label="Jours">
-        {% set labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'] %}
-        {% for i in range(1, 8) %}
-          <a class="chip" href="/jours/{{ i }}">{{ labels[i - 1] }}</a>
-        {% endfor %}
+      <a class="topbar__brand" href="{{ url_for('home') }}">Workout</a>
+      <nav class="topbar__nav" aria-label="Navigation">
+        <a class="topbar__link" href="{{ url_for('home') }}">Accueil</a>
+        <a class="topbar__link" href="{{ url_for('library') }}">Bibliothèque</a>
+        <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
       </nav>
     </header>
     <main class="container">

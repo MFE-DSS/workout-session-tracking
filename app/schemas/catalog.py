@@ -1,4 +1,4 @@
-"""Pydantic schemas mirroring the reference catalog for the /api layer."""
+"""Pydantic DTOs mirroring the template catalog."""
 from __future__ import annotations
 
 from typing import Optional
@@ -6,7 +6,7 @@ from typing import Optional
 from pydantic import BaseModel, ConfigDict
 
 
-class RepRangeOut(BaseModel):
+class RepTargetOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     set_index: int
     min_reps: int
@@ -14,7 +14,7 @@ class RepRangeOut(BaseModel):
     technique: Optional[str] = None
 
 
-class ExerciseOut(BaseModel):
+class TemplateExerciseOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
     position: int
@@ -22,15 +22,16 @@ class ExerciseOut(BaseModel):
     name: str
     set_scheme: str
     notes: Optional[str] = None
-    rep_ranges: list[RepRangeOut] = []
+    rep_targets: list[RepTargetOut] = []
 
 
-class SplitDayOut(BaseModel):
+class WorkoutTemplateOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: int
-    weekday: int
+    slug: str
     name: str
     kind: str
     focus: str
     cardio_note: Optional[str] = None
-    exercises: list[ExerciseOut] = []
+    suggested_label: Optional[str] = None
+    exercises: list[TemplateExerciseOut] = []

@@ -6,12 +6,25 @@ URL points at sqlite.
 """
 from __future__ import annotations
 
+import sqlite3
 from collections.abc import Iterator
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
 from app.config import get_settings
+
+
+# Ensure SQLite enforces ON DELETE SET NULL / CASCADE. Without this
+# PRAGMA, FKs are parsed but never enforced on SQLite, which silently
+# breaks the snapshot-based resilience strategy in `models/session.py`.
+@event.listens_for(Engine, "connect")
+def _enable_sqlite_foreign_keys(dbapi_connection, connection_record):  # pragma: no cover
+    if isinstance(dbapi_connection, sqlite3.Connection):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
 _settings = get_settings()
 
