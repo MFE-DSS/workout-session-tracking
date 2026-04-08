@@ -1,14 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="h1">Historique</h1>
+
+<nav class="filter-bar" aria-label="Filtrer par statut">
+  {% for choice in status_choices %}
+    <a
+      class="filter-bar__item {% if status_filter == choice %}is-active{% endif %}"
+      href="{{ url_for('history') }}?status={{ choice }}"
+    >
+      {% if choice == 'all' %}Tout{% elif choice == 'in_progress' %}En cours{% else %}Terminées{% endif %}
+    </a>
+  {% endfor %}
+</nav>
+
 {% if sessions|length == 0 %}
   <p class="empty">
-    Aucune séance enregistrée pour l'instant. Commence par
+    Aucune séance dans ce filtre. Commence par
     <a href="{{ url_for('library') }}">choisir un template</a>.
   </p>
 {% else %}
   <ul class="session-list">
     {% for s in sessions %}
+      {% set stats = session_stats[s.id] %}
       <li>
         <a class="session-card" href="{{ url_for('session_detail', session_id=s.id) }}">
           <div class="session-card__row">
@@ -21,6 +34,11 @@
             <span class="badge badge--{{ s.status }}">
               {% if s.status == 'in_progress' %}en cours{% else %}terminée{% endif %}
             </span>
+            {% if stats.total > 0 %}
+              <span class="badge badge--neutral">
+                {{ stats.done }}/{{ stats.total }} exos
+              </span>
+            {% endif %}
             {% if s.concentration %}
               <span class="badge badge--neutral">concentration: {{ s.concentration }}</span>
             {% endif %}

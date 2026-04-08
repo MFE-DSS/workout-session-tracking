@@ -122,3 +122,69 @@ the routes.
   rebuilds them.
 - `seed_method_rules()` is unconditional (8 rows, no inbound FK).
 - Both run on every app boot from the lifespan.
+
+## Alembic workflow (Sprint 2)
+
+The repo now uses Alembic for schema evolution. The baseline
+migration in `migrations/versions/` captures the full schema as
+of the end of Sprint 1.
+
+### Dev workflow
+
+```bash
+# Apply every pending migration to the local DB
+alembic upgrade head
+
+# Show the currently applied revision
+alembic current
+
+# Generate a new revision after editing SQLAlchemy models
+alembic revision --autogenerate -m "add xxx column"
+
+# Review the generated file, edit if needed, then apply
+alembic upgrade head
+```
+
+The Alembic config (`alembic.ini`) does **not** hardcode a DB
+URL. The URL is injected at runtime by `migrations/env.py` from
+`app.config.get_settings()`, so one `DATABASE_URL` env var drives
+both the app and the migrations.
+
+### Dev boot coexistence
+
+`app/database.py::init_db()` still calls `Base.metadata.create_all()`
+on lifespan to make fresh clones work out of the box. On an empty
+database this creates every table. On an existing Alembic-managed
+database it is a no-op (create_all skips tables that already
+exist).
+
+The recommended flow for a new environment is:
+
+```bash
+rm -rf var/workout.db            # or start on a fresh server
+alembic upgrade head             # Alembic manages the schema
+uvicorn app.main:app --reload    # lifespan seeds catalog + rules
+```
+
+### SQLite notes
+
+- `render_as_batch=True` is enabled in `env.py` for SQLite
+  engines, so Alembic rewrites ALTER TABLE operations using the
+  copy-and-rename dance (the only way to drop/modify a column
+  on SQLite).
+- Alembic's `alembic_version` bookkeeping table coexists with the
+  app tables without interfering.
+
+### PostgreSQL migration path (future)
+
+Switching to PostgreSQL later is a one-env-var change:
+
+```bash
+DATABASE_URL=postgresql+psycopg://user:pwd@host/workout
+alembic upgrade head
+```
+
+All migrations were written with portable SQLAlchemy operations;
+the `compare_type=True` setting in `env.py` means type changes
+(e.g. `String(16)` -> `String(32)`) will be picked up by
+autogenerate rather than silently ignored.

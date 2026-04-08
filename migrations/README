@@ -1,0 +1,12 @@
+Alembic migration tree for Workout Session Tracking.
+
+See docs/ARCHITECTURE.md for the full workflow. Short version:
+
+  alembic current                   # show applied revision
+  alembic upgrade head              # apply pending migrations
+  alembic revision --autogenerate -m "msg"   # generate a new revision
+
+The sqlalchemy.url is NOT hardcoded in alembic.ini — it is
+injected by migrations/env.py from app.config.get_settings(),
+so the same DATABASE_URL env var drives both runtime and
+migrations.

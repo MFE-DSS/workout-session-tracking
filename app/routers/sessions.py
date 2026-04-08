@@ -44,6 +44,7 @@ from app.services.form_parsing import (
     to_int,
 )
 from app.services.session_builder import instantiate_session
+from app.services.stats import last_time_by_exercise_code
 from app.templating import templates
 
 router = APIRouter(tags=["sessions"])
@@ -147,6 +148,10 @@ def session_detail(
         select(MethodRule).order_by(MethodRule.position).limit(3)
     ).scalars().all()
 
+    last_time = last_time_by_exercise_code(
+        db, session, datetime.now(timezone.utc)
+    )
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -156,6 +161,7 @@ def session_detail(
             "weekday_label": WEEKDAY_LABELS[session.weekday_iso],
             "stats": stats,
             "rules": rules,
+            "last_time": last_time,
         },
     )
 

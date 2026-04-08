@@ -97,6 +97,24 @@
       <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
     {% endif %}
 
+    {% set lt = last_time.get(se.exercise_code_snapshot) %}
+    <div class="last-time {% if not lt %}last-time--empty{% endif %}">
+      {% if lt and lt.has_data %}
+        <span class="last-time__label">Dernière fois</span>
+        <span class="last-time__when">{{ lt.relative }}</span>
+        <span class="last-time__values">
+          {{ lt.weights_str }} kg · {{ lt.reps_str }} reps
+        </span>
+      {% elif lt %}
+        <span class="last-time__label">Dernière fois</span>
+        <span class="last-time__when">{{ lt.relative }}</span>
+        <span class="last-time__values">aucune donnée saisie</span>
+      {% else %}
+        <span class="last-time__label">Dernière fois</span>
+        <span class="last-time__values">Aucune séance précédente</span>
+      {% endif %}
+    </div>
+
     {% if se.set_logs|length > 0 %}
       <ul class="set-list">
         {% for sl in se.set_logs %}

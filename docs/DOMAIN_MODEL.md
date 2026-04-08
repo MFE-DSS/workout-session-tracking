@@ -100,3 +100,32 @@ See `app/enums.py` for the single source of truth.
 | muscle_sensation  | strong, partial, weak                     |
 | execution_quality | clean, acceptable, degraded               |
 | reps_target       | target_hit, target_near, target_missed    |
+
+## Read-side helpers (Sprint 2)
+
+- `app/services/stats.py::last_time_by_exercise_code(db, session, now)`
+  returns a dict keyed by `exercise_code_snapshot` pointing at a
+  compact summary of the previous session of the same template.
+  One SQL query fetches every prior SessionExercise of the same
+  template; Python keeps the first hit per code (thanks to the
+  ORDER BY started_at DESC).
+
+- `app/services/kpis.py::compute_global_kpis(db)` returns a
+  `GlobalKPIs` dataclass with the rolling 30-day indicators
+  (see docs/PRODUCT_SPEC.md for the aggregation rules).
+
+- `app/services/kpis.py::compute_template_kpis(db)` groups
+  completed sessions by `template_slug_snapshot` so history
+  survives catalog rewrites.
+
+## Schema evolution — Alembic (Sprint 2)
+
+Starting Sprint 2 the schema is managed by Alembic. The baseline
+migration in `migrations/versions/` captures the state of all
+tables at the end of Sprint 1. Future changes must ship a
+migration via `alembic revision --autogenerate -m "message"`
+plus manual review before commit.
+
+SQLite compatibility: `env.py` enables `render_as_batch=True`
+for SQLite engines, which makes Alembic rewrite ALTER TABLE
+operations using the copy-and-rename dance that SQLite needs.

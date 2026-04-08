@@ -12,8 +12,9 @@ prêt pour analytics.
 
 - [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md) — product rules
 - [`docs/DOMAIN_MODEL.md`](docs/DOMAIN_MODEL.md) — data model
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — tech overview
-- [`docs/SPRINT_01_REPORT.md`](docs/SPRINT_01_REPORT.md) — latest sprint report
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — tech overview + Alembic workflow
+- [`docs/SPRINT_01_REPORT.md`](docs/SPRINT_01_REPORT.md) — Sprint 1 report
+- [`docs/SPRINT_02_REPORT.md`](docs/SPRINT_02_REPORT.md) — Sprint 2 report
 - [`deploy/README.md`](deploy/README.md) — OVH deployment guide
 
 ## Règles produit (non négociables)
@@ -144,9 +145,22 @@ les remplir au tap — aucune création de ligne côté client.
    - une **carte par exercice** avec ses sets (warmup + work),
      ses sélecteurs normalisés et son propre bouton *Enregistrer*
    - chaque carte est sauvegardée indépendamment
-4. **Historique** liste les sessions passées avec statut et feedback
-5. **Règles** : 8 cartes méthode consultables au gym, également
+   - un bloc "Dernière fois" par carte (Sprint 2)
+4. **Historique** liste les sessions passées avec filtre
+   (Tout / En cours / Terminées) et badges (Sprint 2)
+5. **Progression** : KPI cards (30 jours) + par-template (Sprint 2)
+6. **Règles** : 8 cartes méthode consultables au gym, également
    rappelées en dépliable inline sur la page séance
+
+## Alembic (Sprint 2)
+
+```bash
+alembic upgrade head              # apply pending migrations
+alembic current                   # show current revision
+alembic revision --autogenerate -m "add xxx"
+```
+
+Details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#alembic-workflow-sprint-2).
 
 ## Déploiement OVH
 

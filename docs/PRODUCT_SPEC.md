@@ -71,12 +71,74 @@ Configurable through `app.services.session_builder.instantiate_session(warmup_se
 - **Bibliothèque**
 - **Règles**
 
+## Completed-session rule (V1)
+
+- A completed session (`status == "completed"`) **does not** appear
+  in the home "Reprendre" tile. Only `in_progress` sessions do.
+- It **does** stay visible in the history, and its detail page
+  stays accessible.
+- Its detail page stays **fully editable** in V1. The only visual
+  difference is the status badge ("Terminée") and the replacement
+  of the "Terminer la séance" button with a secondary "Rouvrir".
+- Rationale: keeping the same form for both states avoids a
+  parallel read-only template and the drift that would bring.
+  If the user notices a mistake after ending a session, they can
+  fix it in place.
+
+## Last time rule (Sprint 2)
+
+Each exercise card shows a compact "Dernière fois" block. The
+identity used for the lookup is
+`(template_slug_snapshot, exercise_code_snapshot)`:
+
+- the current session is **strictly** excluded from its own lookup
+- only **work** sets (never warmups) contribute
+- only **completed** work sets with at least one of weight/reps
+  populated are summarised
+- the format chosen is **Option B**:
+  `Dernière fois · il y a 5 j · 60 / 62.5 / 55 kg · 10 / 8 / 12 reps`
+- empty states are rendered explicitly:
+  - no prior session of the same template → "Aucune séance précédente"
+  - prior session exists but had no completed work data →
+    "aucune donnée saisie"
+
+## KPI rules (Sprint 2)
+
+- **sessions_this_week**: count of `workout_sessions.started_at >=`
+  start of current ISO week (Monday 00:00 UTC). All statuses.
+- **sessions_last_30**: count over a rolling 30-day window. All
+  statuses.
+- **completed_last_30**: same window, `status == "completed"` only.
+- **avg_success_score_30d**: AVG of `SessionExercise.success_score`
+  where the column IS NOT NULL, restricted to `completed`
+  sessions started in the 30-day window.
+- **completion_rate_30d**: ratio of `SetLog.completed=True` to
+  total `SetLog` rows where `SetLog.kind == "work"`, restricted
+  to `completed` sessions started in the 30-day window. Warmup
+  rows never enter the numerator or the denominator.
+- **In-progress sessions are excluded** from long-term averages
+  and rates (they would otherwise drag metrics down with
+  untouched rows). They are still counted in `sessions_this_week`
+  and `sessions_last_30`.
+- **NULL success_scores are excluded** from the average, not
+  treated as zero.
+
+## Invalid enum rule (V1)
+
+Any POST value that is not in the whitelisted vocabulary for its
+field is silently coerced to `NULL`. No 400 is returned. No
+invalid value is ever persisted. This is acceptable in V1 because
+the SSR UI only emits whitelisted values; invalid POSTs can only
+come from direct curl/debug use and do not need a user-visible
+error.
+
 ## Explicit non-goals (V1)
 
 - Multi-user / auth (single user on a private VPS)
-- Alembic migrations (schema evolves via wipe during V1; Alembic
-  will be mandatory before the first real prod log)
 - PWA offline
 - Native apps
-- Analytics dashboards (scaffolded in /progress, real widgets in V2+)
+- Dashboards with charts (V1 ships KPI cards only — Chart.js is
+  out of scope)
 - Cardio-specific fields (duration, HR zones)
+- Auto-computed reps_target (server-side defaulting from reps vs
+  rep target range); V1 keeps the field user-controlled
