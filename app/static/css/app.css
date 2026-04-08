@@ -920,6 +920,133 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: 0;
 }
 
+/* ---------- Sprint 5: active session banner ---------- */
+.active-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-top, 0) * 0);
+  background: var(--ok);
+  color: #06230f;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid #0000003d;
+  position: sticky;
+  top: 0;
+  z-index: 6;
+}
+.active-banner__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #06230f;
+  flex-shrink: 0;
+}
+.active-banner__label {
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  opacity: 0.8;
+}
+.active-banner__name { font-weight: 800; }
+.active-banner__cta {
+  margin-left: auto;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* ---------- Sprint 5: exercise jump bar ---------- */
+.ex-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 16px;
+  padding: 10px;
+  background: var(--bg-elev);
+  border-radius: var(--radius);
+}
+.ex-jump__item {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--bg-elev-2);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-dim);
+  min-height: 32px;
+  font-variant-numeric: tabular-nums;
+}
+.ex-jump__item--partial {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.ex-jump__item--done {
+  background: var(--ok);
+  color: #06230f;
+}
+.ex-jump__item--feedback {
+  background: var(--bg-elev-2);
+  color: var(--fg);
+  font-style: italic;
+}
+.ex-jump__code { color: inherit; }
+.ex-jump__prog { opacity: 0.75; }
+
+/* ---------- Sprint 5: exercise card done state ---------- */
+.exercise-card--done {
+  border-left-color: var(--ok);
+}
+.exercise-card--done .exercise-card__progress {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+/* ---------- Sprint 5: warmup vs work group titles ---------- */
+.set-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-dim);
+  margin: 12px 0 6px;
+}
+.set-group-title--work { color: var(--accent); }
+
+/* ---------- Sprint 5: export landing page ---------- */
+.export-card { border-left: 4px solid var(--accent); }
+.export-stats {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+.export-stats li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg-elev-2);
+  border-radius: 8px;
+  font-size: 13px;
+}
+.export-stats span { color: var(--fg-dim); }
+.export-stats b { font-variant-numeric: tabular-nums; font-weight: 700; }
+.export-card__hint {
+  margin: 0 0 12px;
+  color: var(--fg-dim);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* ---------- Footer ---------- */
 .foot {
   text-align: center;

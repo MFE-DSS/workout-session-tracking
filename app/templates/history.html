@@ -15,8 +15,15 @@
 
 {% if sessions|length == 0 %}
   <p class="empty">
-    Aucune séance dans ce filtre. Commence par
-    <a href="{{ url_for('library') }}">choisir un template</a>.
+    {% if status_filter == 'in_progress' %}
+      Aucune séance en cours.
+      <a href="{{ url_for('library') }}">Démarrer une séance</a>.
+    {% elif status_filter == 'completed' %}
+      Aucune séance terminée pour l'instant.
+    {% else %}
+      Aucune séance enregistrée. Commence par
+      <a href="{{ url_for('library') }}">choisir un template</a>.
+    {% endif %}
   </p>
 {% else %}
   <ul class="session-list">

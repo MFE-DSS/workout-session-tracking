@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Export</h1>
+<p class="lede">
+  Sauvegarde locale du journal complet. Deux formats, sans
+  authentification : à protéger via nginx basic_auth en prod.
+</p>
+
+<div class="card export-card">
+  <h2 class="card__title">Résumé du journal</h2>
+  <ul class="export-stats">
+    <li>
+      <span>Sessions totales</span>
+      <b>{{ total_sessions }}</b>
+    </li>
+    <li>
+      <span>Sessions terminées</span>
+      <b>{{ completed_sessions }}</b>
+    </li>
+    <li>
+      <span>Work sets complétés</span>
+      <b>{{ work_sets_done }}</b>
+    </li>
+    <li>
+      <span>Première session</span>
+      <b>{{ first_started.strftime('%d/%m/%Y') if first_started else '—' }}</b>
+    </li>
+    <li>
+      <span>Dernière session</span>
+      <b>{{ last_started.strftime('%d/%m/%Y') if last_started else '—' }}</b>
+    </li>
+    <li>
+      <span>Schema version</span>
+      <b>{{ schema_version }}</b>
+    </li>
+  </ul>
+</div>
+
+<div class="card export-card">
+  <h2 class="card__title">Télécharger</h2>
+  <p class="export-card__hint">
+    Le JSON conserve toute la structure (sessions → exercices → sets).
+    Le CSV est plat (une ligne par set), prêt à ouvrir dans un tableur.
+  </p>
+  <div class="card__actions">
+    <a class="btn btn--primary btn--wide" href="{{ url_for('export_sessions_json') }}">
+      Télécharger JSON
+    </a>
+  </div>
+  <div class="card__actions" style="margin-top: 8px;">
+    <a class="btn btn--wide" href="{{ url_for('export_sessions_csv') }}">
+      Télécharger CSV
+    </a>
+  </div>
+</div>
+
+<p class="kpi-note">
+  Pour la sauvegarde quotidienne automatique sur le VPS, voir
+  <code>deploy/README.md</code> section <em>Sauvegardes</em>
+  (snapshot SQLite + dump JSON via cron).
+</p>
+{% endblock %}

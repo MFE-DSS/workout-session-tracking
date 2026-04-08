@@ -25,6 +25,17 @@
         <a class="topbar__link" href="{{ url_for('rules_page') }}">Règles</a>
       </nav>
     </header>
+    {% if active_session %}
+      <a
+        class="active-banner"
+        href="{{ url_for('session_detail', session_id=active_session.id) }}"
+      >
+        <span class="active-banner__dot" aria-hidden="true"></span>
+        <span class="active-banner__label">Séance en cours</span>
+        <span class="active-banner__name">{{ active_session.template_name_snapshot }}</span>
+        <span class="active-banner__cta">Reprendre →</span>
+      </a>
+    {% endif %}
     <main class="container">
       {% block content %}{% endblock %}
     </main>

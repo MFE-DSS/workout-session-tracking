@@ -25,6 +25,25 @@
   {% endif %}
 </header>
 
+{# -------- Exercise jump bar (Sprint 5) ---------- #}
+{% if session.session_exercises|length > 0 %}
+  <nav class="ex-jump" aria-label="Aller à un exercice">
+    {% for se in session.session_exercises %}
+      {% set d, t = stats.per_exercise[se.id] %}
+      <a
+        class="ex-jump__item {% if t > 0 and d == t %}ex-jump__item--done{% elif d > 0 %}ex-jump__item--partial{% endif %}"
+        href="#exercise-{{ se.id }}"
+      >
+        <span class="ex-jump__code">{{ se.exercise_code_snapshot }}</span>
+        <span class="ex-jump__prog">{{ d }}/{{ t }}</span>
+      </a>
+    {% endfor %}
+    <a class="ex-jump__item ex-jump__item--feedback" href="#session-feedback">
+      <span class="ex-jump__code">FB</span>
+    </a>
+  </nav>
+{% endif %}
+
 {# -------- Session-level feedback (dedicated form) ---------- #}
 <form
   method="post"
@@ -92,7 +111,7 @@
   <form
     method="post"
     action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
-    class="card exercise-card"
+    class="card exercise-card {% if total > 0 and done == total %}exercise-card--done{% endif %}"
     id="exercise-{{ se.id }}"
   >
     <header class="exercise-card__head">
@@ -158,13 +177,59 @@
     {% endif %}
 
     {% if se.set_logs|length > 0 %}
+      {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
+      {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
+
+      {% if warmup_sets|length > 0 %}
+        <h4 class="set-group-title">Warmup</h4>
+      {% endif %}
       <ul class="set-list">
-        {% for sl in se.set_logs %}
-          <li class="set-row set-row--{{ sl.kind }}">
+        {% for sl in warmup_sets %}
+          <li class="set-row set-row--warmup">
             <div class="set-row__label">
-              <span class="set-row__kind">
-                {% if sl.kind == 'warmup' %}Warmup{% else %}Work{% endif %}
-              </span>
+              <span class="set-row__kind">Warmup</span>
+              <span class="set-row__idx">#{{ sl.set_index }}</span>
+              {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+            </div>
+
+            <div class="set-row__inputs">
+              <input
+                type="number"
+                step="0.5"
+                inputmode="decimal"
+                name="set_{{ sl.id }}_weight_kg"
+                placeholder="kg"
+                value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+              />
+              <input
+                type="number"
+                inputmode="numeric"
+                name="set_{{ sl.id }}_reps"
+                placeholder="reps"
+                value="{{ sl.reps if sl.reps is not none else '' }}"
+              />
+              <label class="set-row__done">
+                <input
+                  type="checkbox"
+                  name="set_{{ sl.id }}_completed"
+                  value="1"
+                  {% if sl.completed %}checked{% endif %}
+                />
+                <span>Fait</span>
+              </label>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+
+      {% if work_sets|length > 0 %}
+        <h4 class="set-group-title set-group-title--work">Work</h4>
+      {% endif %}
+      <ul class="set-list">
+        {% for sl in work_sets %}
+          <li class="set-row set-row--work">
+            <div class="set-row__label">
+              <span class="set-row__kind">Work</span>
               <span class="set-row__idx">#{{ sl.set_index }}</span>
               {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
             </div>
@@ -196,24 +261,22 @@
               </label>
             </div>
 
-            {% if sl.kind == 'work' %}
-              <div class="set-row__mini">
-                <span class="set-row__mini-label">Exécution</span>
-                {{ segmented(
-                  "set_" ~ sl.id ~ "_execution_quality",
-                  [("clean", "clean"), ("acceptable", "accept."), ("degraded", "degrad.")],
-                  sl.execution_quality
-                ) }}
-              </div>
-              <div class="set-row__mini">
-                <span class="set-row__mini-label">Target reps</span>
-                {{ segmented(
-                  "set_" ~ sl.id ~ "_reps_target",
-                  [("target_hit", "hit"), ("target_near", "near"), ("target_missed", "missed")],
-                  sl.reps_target
-                ) }}
-              </div>
-            {% endif %}
+            <div class="set-row__mini">
+              <span class="set-row__mini-label">Exécution</span>
+              {{ segmented(
+                "set_" ~ sl.id ~ "_execution_quality",
+                [("clean", "clean"), ("acceptable", "accept."), ("degraded", "degrad.")],
+                sl.execution_quality
+              ) }}
+            </div>
+            <div class="set-row__mini">
+              <span class="set-row__mini-label">Target reps</span>
+              {{ segmented(
+                "set_" ~ sl.id ~ "_reps_target",
+                [("target_hit", "hit"), ("target_near", "near"), ("target_missed", "missed")],
+                sl.reps_target
+              ) }}
+            </div>
           </li>
         {% endfor %}
       </ul>

@@ -4,15 +4,12 @@ The session logging flow lives in `app.routers.sessions`.
 """
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
-from app.enums import SessionStatus
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
 from app.services.kpis import (
@@ -20,6 +17,7 @@ from app.services.kpis import (
     compute_recent_exercise_activity,
     compute_template_kpis,
 )
+from app.services.session_state import latest_open_session
 from app.services.time_format import format_duration_short, session_duration
 from app.templating import templates
 
@@ -39,18 +37,11 @@ def _load_templates(db: Session) -> list[WorkoutTemplate]:
     return list(db.execute(stmt).scalars().all())
 
 
-def _latest_open_session(db: Session) -> WorkoutSession | None:
-    return db.execute(
-        select(WorkoutSession)
-        .where(WorkoutSession.status == SessionStatus.IN_PROGRESS)
-        .order_by(WorkoutSession.started_at.desc())
-        .limit(1)
-    ).scalar_one_or_none()
-
-
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
-    open_session = _latest_open_session(db)
+    # Home shows its own Reprendre tile — the header banner would
+    # be redundant here, so we intentionally do NOT pass active_session.
+    open_session = latest_open_session(db)
     open_since: str | None = None
     if open_session is not None:
         open_since = format_duration_short(
@@ -73,7 +64,11 @@ def library(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "library.html",
-        {"page_title": "Bibliothèque", "templates": all_templates},
+        {
+            "page_title": "Bibliothèque",
+            "templates": all_templates,
+            "active_session": latest_open_session(db),
+        },
     )
 
 
@@ -96,7 +91,11 @@ def template_detail(
     return templates.TemplateResponse(
         request,
         "template_detail.html",
-        {"page_title": tpl.name, "template": tpl},
+        {
+            "page_title": tpl.name,
+            "template": tpl,
+            "active_session": latest_open_session(db),
+        },
     )
 
 
@@ -172,6 +171,7 @@ def history(
             "durations": durations,
             "status_filter": status,
             "status_choices": _HISTORY_STATUS_CHOICES,
+            "active_session": latest_open_session(db),
         },
     )
 
@@ -189,5 +189,6 @@ def progress(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
             "kpis": global_kpis,
             "template_kpis": template_kpis,
             "recent_activity": recent_activity,
+            "active_session": latest_open_session(db),
         },
     )

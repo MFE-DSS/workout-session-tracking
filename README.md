@@ -17,6 +17,7 @@ prêt pour analytics.
 - [`docs/SPRINT_02_REPORT.md`](docs/SPRINT_02_REPORT.md) — Sprint 2 report
 - [`docs/SPRINT_03_REPORT.md`](docs/SPRINT_03_REPORT.md) — Sprint 3 report
 - [`docs/SPRINT_04_REPORT.md`](docs/SPRINT_04_REPORT.md) — Sprint 4 report
+- [`docs/SPRINT_05_REPORT.md`](docs/SPRINT_05_REPORT.md) — Sprint 5 report
 - [`deploy/README.md`](deploy/README.md) — OVH deployment + backup guide
 
 ## Règles produit (non négociables)
@@ -164,15 +165,26 @@ alembic revision --autogenerate -m "add xxx"
 
 Details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#alembic-workflow-sprint-2).
 
-## Export / backup (Sprint 3)
+## Export / backup
+
+Trois URLs:
+- **`/export`** — petite page de résumé + boutons de téléchargement
+- **`/export/sessions.json`** — JSON versionné par `schema_version`
+- **`/export/sessions.csv`** — CSV plat (une ligne par set), prêt pour Excel/Pandas
 
 ```bash
+# JSON
 curl -sfL http://localhost:8000/export/sessions.json \
   -o workout-journal-$(date +%F).json
+
+# CSV
+curl -sfL http://localhost:8000/export/sessions.csv \
+  -o workout-journal-$(date +%F).csv
 ```
 
-Full backup workflow (SQLite `.backup` + JSON export + cron) is
-documented in [`deploy/README.md`](deploy/README.md#7-sauvegardes).
+Workflow complet (snapshot SQLite + dump JSON + dump CSV via
+cron, restauration, migration PostgreSQL) :
+[`deploy/README.md`](deploy/README.md#7-sauvegardes).
 
 ## Déploiement OVH
 

@@ -24,8 +24,10 @@ app/
   routers/
     health.py        /healthz
     pages.py         Catalog navigation (/, /library, /history, /progress)
-    sessions.py      Logging flow (POST /sessions, GET/POST /sessions/{id}, /rules)
-    export.py        GET /export/sessions.json (Sprint 3)
+    sessions.py      Logging flow (POST /sessions, GET/POST /sessions/{id},
+                     /rules, /exercise-history/{slug}/{code})
+    export.py        /export landing + /export/sessions.json
+                     + /export/sessions.csv (Sprint 5)
   schemas/
     catalog.py       Pydantic DTOs for read APIs (future-proofing)
   services/
@@ -38,6 +40,8 @@ app/
     delta.py             Pure compute_delta + format_delta (Sprint 4)
     exercise_history.py  get_exercise_history() with row-wise deltas (Sprint 4)
     time_format.py       format_duration_short (Sprint 4)
+    session_state.py     latest_open_session (Sprint 5, shared by pages
+                         and sessions routers for the active banner)
   templates/
     base.html          Layout (topbar, manifest, safe-area)
     _macros.html       Jinja macros (segmented control, field group)

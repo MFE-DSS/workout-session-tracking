@@ -78,22 +78,38 @@ ultérieur si nécessaire.
 
 ## 6. Mise à jour de l'application
 
+Workflow recommandé après un `git pull` :
+
 ```bash
 sudo -u workout bash -c '
   cd /srv/workout &&
   git pull &&
   .venv/bin/pip install -r requirements.txt &&
+  .venv/bin/python -m scripts.check_alembic_drift &&
   .venv/bin/alembic upgrade head &&
   .venv/bin/python -m scripts.seed_db
 ' && sudo systemctl restart workout
 ```
 
-L'étape `alembic upgrade head` est obligatoire après chaque `git pull`
-si une nouvelle migration a été ajoutée. Commandes utiles :
+Étapes en détail :
+
+1. `git pull` : récupère le code.
+2. `pip install -r requirements.txt` : aligne les dépendances.
+3. `scripts.check_alembic_drift` (Sprint 4) : vérifie qu'aucun
+   modèle ORM n'a divergé du dernier `alembic head` sans qu'une
+   migration ait été générée. Sort en code 1 si drift, dans ce
+   cas STOP : il manque une révision Alembic à committer.
+4. `alembic upgrade head` : applique les migrations en attente.
+   C'est l'étape officielle de migration depuis Sprint 2.
+5. `scripts.seed_db` : reseed idempotent du catalogue + règles.
+6. `systemctl restart workout` : recharge l'app.
+
+Commandes utiles :
 
 ```bash
-.venv/bin/alembic current          # révision actuelle
-.venv/bin/alembic history          # historique
+.venv/bin/alembic current               # révision actuelle
+.venv/bin/alembic history                # historique
+.venv/bin/python -m scripts.check_alembic_drift   # garde-fou drift
 ```
 
 ## 7. Sauvegardes
@@ -111,17 +127,26 @@ Crontab de l'utilisateur `workout` (`crontab -e -u workout`) :
 Les 14 derniers snapshots sont conservés. Le `.backup` est atomique
 et safe pendant que l'app tourne.
 
-### 7.2 Export JSON logique (Sprint 3)
+### 7.2 Export logique (Sprint 3 + Sprint 5)
 
-L'app expose `GET /export/sessions.json` qui renvoie tout le journal
-(sessions + exercises + sets) en JSON stable, versionné par
-`schema_version`.
+Trois URLs disponibles :
 
-Dump local (depuis le VPS) :
+| URL                          | Format     | Usage                                         |
+|------------------------------|------------|-----------------------------------------------|
+| `GET /export`                | HTML       | Page de résumé + boutons de téléchargement.   |
+| `GET /export/sessions.json`  | JSON       | Payload complet versionné (`schema_version`). |
+| `GET /export/sessions.csv`   | CSV        | Une ligne par set, prêt à ouvrir dans Excel.  |
+
+Dump local (depuis le VPS, loopback) :
 
 ```bash
+# JSON
 sudo -u workout curl -sfL http://127.0.0.1:8000/export/sessions.json \
-  -o /srv/workout/var/workout-journal-$(date +%F).json
+  -o /srv/workout/var/journal-$(date +%F).json
+
+# CSV
+sudo -u workout curl -sfL http://127.0.0.1:8000/export/sessions.csv \
+  -o /srv/workout/var/journal-$(date +%F).csv
 ```
 
 Derrière nginx+basic_auth, en passant le user:pass :
@@ -131,16 +156,21 @@ curl -sfL -u moi:<pwd> https://workout.example.com/export/sessions.json \
   -o workout-journal-$(date +%F).json
 ```
 
-Ajouter à la crontab si on veut un export quotidien :
+Crontab quotidienne (utilisateur `workout`) :
 
 ```
 15 3 * * * curl -sfL http://127.0.0.1:8000/export/sessions.json -o /srv/workout/var/journal-$(date +\%F).json
+20 3 * * * curl -sfL http://127.0.0.1:8000/export/sessions.csv -o /srv/workout/var/journal-$(date +\%F).csv
 ```
 
 L'export JSON est plus stable que la copie de fichier SQLite
-(indépendant du moteur, relisible sans outil SQL). Préférer le
-`.backup` pour la restauration rapide et l'export JSON pour
-l'archivage long terme.
+(indépendant du moteur, relisible sans outil SQL). Le CSV est
+meilleur pour les outils tiers (Excel, Numbers, Pandas).
+
+Choix recommandé :
+- **`.backup` SQLite** pour la restauration rapide en place.
+- **JSON** pour l'archivage long terme (round-trip futur).
+- **CSV** pour l'analyse ad hoc dans un tableur.
 
 ## 8. Migration future vers PostgreSQL
 

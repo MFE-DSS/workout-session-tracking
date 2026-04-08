@@ -207,16 +207,62 @@ the SSR UI only emits whitelisted values; invalid POSTs can only
 come from direct curl/debug use and do not need a user-visible
 error.
 
-## Export rule (Sprint 3)
+## Export rules
 
-`GET /export/sessions.json` returns every persisted session in
-a single JSON payload with a `schema_version`. No auth
-(single-user V1), no filtering, no selective export. Sorted
-oldest-first so the file is append-friendly. Documented in
-`deploy/README.md` and wired into the backup crontab examples.
+### `GET /export/sessions.json` (Sprint 3)
+Returns every persisted session in a single JSON payload with a
+`schema_version`. No auth (single-user V1), no filtering. Sorted
+oldest-first so the file is append-friendly. The export is
+intentionally not a round-trip import format for V1.
 
-The export is intentionally not a round-trip import format for
-V1. It covers the backup and offline-analysis use cases.
+### `GET /export/sessions.csv` (Sprint 5)
+Flat one-row-per-set CSV view of every session. Drops into a
+spreadsheet without transformation. Sessions with zero exercises
+(cardio) emit one row with empty exercise/set fields so they
+still appear when filtering by template. Sessions with exercises
+emit one row per `SetLog`, warmups before work, in `set_index`
+order. Same denormalised parent columns on every row.
+
+### `GET /export` (Sprint 5)
+Small landing page that shows totals (sessions, completed,
+work_sets_done, first/last date, schema version) and offers
+download buttons for both formats. No filter, no granular UI.
+
+Both formats share the same backup workflow documented in
+`deploy/README.md` (SQLite `.backup` for rapid restore + JSON
+or CSV dump for long-term archive).
+
+## Mobile polish rules (Sprint 5)
+
+The session detail page is the main daily-use surface. Sprint 5
+locks in four small refinements:
+
+1. **Exercise jump bar** at the top of the page: one chip per
+   exercise card, showing `code` and `done/total` work sets.
+   Coloured by state (`accent` = partial, `ok` = done). A final
+   `FB` chip jumps to `#session-feedback`.
+2. **Exercise card done state**: `exercise-card--done` class is
+   applied when every work set in the card is `completed=True`
+   (and there is at least one). Visual: green left border, green
+   progress count.
+3. **Warmup / work sub-headers**: each exercise card now groups
+   its warmup rows under a `Warmup` heading and its work rows
+   under a `Work` heading.
+4. **After-save next-exercise redirect**: `POST
+   /sessions/{id}/exercises/{se_id}` redirects to the next
+   exercise's anchor (by `position`). When there is no next
+   exercise, it lands on `#session-feedback`. This means the
+   user just keeps tapping "Enregistrer" and walks down the
+   session.
+
+## Active session banner (Sprint 5)
+
+When an `in_progress` session exists, every page outside `/`
+and `/sessions/{id}` shows a small green banner at the top
+that links back to that session. The home page does NOT show
+the banner because it already has its own larger Reprendre
+tile. The session detail page does NOT show it because the
+user is already there.
 
 ## Explicit non-goals (V1)
 

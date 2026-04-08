@@ -47,6 +47,7 @@ from app.services.form_parsing import (
 )
 from app.services.progression_hint import compute_progression_hint
 from app.services.session_builder import instantiate_session
+from app.services.session_state import latest_open_session
 from app.services.stats import (
     last_time_by_exercise_code,
     summarise_current_exercise,
@@ -308,10 +309,25 @@ async def update_exercise_card(
             sl.reps_target = enum_str(form.get(p + "reps_target"), _REPS_TARGET)
 
     db.commit()
-    return RedirectResponse(
-        url=f"/sessions/{session_id}#exercise-{session_exercise_id}",
-        status_code=303,
-    )
+
+    # Sprint 5 daily-use shortcut: after saving an exercise card,
+    # send the user to the NEXT exercise's anchor instead of back to
+    # the same one. When there is no next exercise, drop them on the
+    # session-feedback form so they can finish the session.
+    next_se = db.execute(
+        select(SessionExercise)
+        .where(
+            SessionExercise.session_id == session_id,
+            SessionExercise.position > se.position,
+        )
+        .order_by(SessionExercise.position.asc())
+        .limit(1)
+    ).scalar_one_or_none()
+    if next_se is not None:
+        target = f"/sessions/{session_id}#exercise-{next_se.id}"
+    else:
+        target = f"/sessions/{session_id}#session-feedback"
+    return RedirectResponse(url=target, status_code=303)
 
 
 # ----------------------------------------------------------------------
@@ -327,7 +343,11 @@ def rules_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     return templates.TemplateResponse(
         request,
         "rules.html",
-        {"page_title": "Règles", "rules": rules},
+        {
+            "page_title": "Règles",
+            "rules": rules,
+            "active_session": latest_open_session(db),
+        },
     )
 
 
@@ -380,5 +400,6 @@ def exercise_history_detail(
             "display_template_name": display_template_name or template_slug,
             "display_exercise_name": display_exercise_name or exercise_code,
             "entries": entries,
+            "active_session": latest_open_session(db),
         },
     )
