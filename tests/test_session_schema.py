@@ -22,6 +22,7 @@ def test_can_log_a_session_with_normalized_feedback(client):
         SessionConcentration,
         SessionGlobalState,
         SetExecutionQuality,
+        SetKind,
         SetRepsTarget,
         Technique,
     )
@@ -54,12 +55,14 @@ def test_can_log_a_session_with_normalized_feedback(client):
             muscle_sensation=MuscleSensation.STRONG,
         )
         sl = SetLog(
+            kind=SetKind.WORK,
             set_index=1,
             weight_kg=60.0,
             reps=10,
             technique=Technique.RP,
             execution_quality=SetExecutionQuality.CLEAN,
             reps_target=SetRepsTarget.TARGET_HIT,
+            completed=True,
         )
         se.set_logs.append(sl)
         session.session_exercises.append(se)
@@ -81,6 +84,8 @@ def test_can_log_a_session_with_normalized_feedback(client):
         assert "Butterfly" in se_loaded.exercise_name_snapshot
 
         [sl_loaded] = se_loaded.set_logs
+        assert sl_loaded.kind == "work"
+        assert sl_loaded.completed is True
         assert sl_loaded.execution_quality == "clean"
         assert sl_loaded.reps_target == "target_hit"
         assert sl_loaded.technique == "RP"

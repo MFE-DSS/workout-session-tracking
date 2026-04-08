@@ -25,6 +25,18 @@ class Technique(StrEnum):
     DS = "DS"  # Drop set
 
 
+class SetKind(StrEnum):
+    """Whether a logged set is a feeder/warmup set or a real work set.
+
+    V1 uses a uniform model: every logged set carries this field, so
+    warmup and work sets share the same table and UI rows. Only work
+    sets feed progression KPIs; warmups are kept for completeness.
+    """
+
+    WARMUP = "warmup"
+    WORK = "work"
+
+
 # ---------------------------------------------------------------------------
 # Session-level feedback
 # ---------------------------------------------------------------------------

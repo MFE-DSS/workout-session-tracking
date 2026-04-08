@@ -78,9 +78,9 @@ WorkoutTemplate (slug, name, kind, focus, suggested_label*)
 WorkoutSession (started_at, template_id?, template_*_snapshot,
                 concentration, global_state, bodyweight_kg, free_note)
   └── SessionExercise (template_exercise_id?, *_snapshot, position,
-                       success_score, muscle_sensation)
-        └── SetLog (set_index, weight_kg, reps, technique,
-                    execution_quality, reps_target, short_note)
+                       success_score, muscle_sensation, free_note)
+        └── SetLog (kind, set_index, weight_kg, reps, technique,
+                    execution_quality, reps_target, completed)
 ```
 
 `*_snapshot` : colonnes denormalisées. Les FK vers le catalogue sont
@@ -90,20 +90,41 @@ sans casser l'historique.
 `suggested_label` : hint textuel non structurel (jamais utilisé par
 la logique applicative).
 
-## Feedback normalisé
+## Niveaux de saisie figés (V1)
 
-| Niveau    | Champ             | Valeurs                                    |
-|-----------|-------------------|--------------------------------------------|
-| Session   | concentration     | high, medium, low                          |
-| Session   | global_state      | good, flat, fatigued                       |
-| Exercice  | success_score     | 100, 80, 50                                |
-| Exercice  | muscle_sensation  | strong, partial, weak                      |
-| Set       | execution_quality | clean, acceptable, degraded                |
-| Set       | reps_target       | target_hit, target_near, target_missed     |
-| Set       | technique         | RP (rest-pause), DS (drop set), null       |
+**Session**
+- `concentration` (high / medium / low)
+- `global_state` (good / flat / fatigued)
+- `bodyweight_kg` (float optionnel)
+- `free_note` (optionnelle, courte, ≤ 280 car.)
 
-Les champs `free_note` / `short_note` existent mais restent optionnels
-et secondaires. Ils ne nourrissent pas les KPI.
+**Exercice**
+- `success_score` (100 / 80 / 50)
+- `muscle_sensation` (strong / partial / weak)
+- `free_note` (optionnelle, courte, ≤ 140 car.)
+
+**Set**
+- `weight_kg`
+- `reps`
+- `execution_quality` (clean / acceptable / degraded)
+- `reps_target` (target_hit / target_near / target_missed)
+- `technique` (RP / DS / null)
+- `completed` (bool)
+
+## Warmup vs work sets (V1, uniforme)
+
+Chaque `SetLog` porte un champ `kind` ∈ `{warmup, work}`. Les set
+indexes sont numérotés séparément : warmup 1..N, work 1..M. Pas de
+table dédiée, pas de logique spéciale.
+
+À la création d'une session via `app/services/session_builder.py`,
+le service pré-instancie pour chaque exercice du template :
+- `N` lignes warmup vides (`N=2` par défaut, surchargeable)
+- autant de lignes work qu'il y a de `RepTarget` prescrits
+- toutes les lignes ont `completed=False` et des champs vides
+
+La page séance n'a donc qu'à itérer sur des lignes existantes et
+les remplir au tap — aucune création de ligne côté client.
 
 ## Déploiement OVH
 

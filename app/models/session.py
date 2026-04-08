@@ -23,6 +23,7 @@ from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     Float,
     ForeignKey,
@@ -119,17 +120,26 @@ class SessionExercise(Base):
 
 
 class SetLog(Base):
-    """One working set actually performed."""
+    """One logged set, warmup or work, actually attempted.
+
+    V1 design choice: warmup and work sets live in the same table
+    and are distinguished only by `kind`. Set indexes are scoped per
+    (session_exercise, kind), so warmups number 1..N independently
+    of work sets, matching how a coach writes a notebook.
+    """
 
     __tablename__ = "set_logs"
     __table_args__ = (
-        UniqueConstraint("session_exercise_id", "set_index", name="uq_set_log_index"),
+        UniqueConstraint(
+            "session_exercise_id", "kind", "set_index", name="uq_set_log_kind_index"
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     session_exercise_id: Mapped[int] = mapped_column(
         ForeignKey("session_exercises.id", ondelete="CASCADE"), nullable=False
     )
+    kind: Mapped[str] = mapped_column(String(8), nullable=False, default="work")
     set_index: Mapped[int] = mapped_column(Integer, nullable=False)
 
     weight_kg: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -140,6 +150,10 @@ class SetLog(Base):
     execution_quality: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     reps_target: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
 
-    short_note: Mapped[Optional[str]] = mapped_column(String(140), nullable=True)
+    # Explicit "done" flag: distinguishes "not yet attempted" (the row
+    # was pre-rendered by the session builder but the user didn't touch
+    # it) from "performed" (the user ticked it off, even if weight/reps
+    # were not entered).
+    completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
 
     session_exercise: Mapped[SessionExercise] = relationship(back_populates="set_logs")
