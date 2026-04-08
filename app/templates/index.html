@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Semaine</h1>
+<ul class="day-list">
+  {% for day in days %}
+    <li class="day-card day-card--{{ day.kind }}">
+      <a class="day-card__link" href="/jours/{{ day.weekday }}">
+        <div class="day-card__row">
+          <span class="day-card__name">{{ day.name }}</span>
+          <span class="day-card__kind">
+            {% if day.kind == 'training' %}TRAIN{% else %}REST{% endif %}
+          </span>
+        </div>
+        <div class="day-card__focus">{{ day.focus }}</div>
+        {% if day.cardio_note %}
+          <div class="day-card__cardio">{{ day.cardio_note }}</div>
+        {% endif %}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,43 @@
+# /etc/nginx/sites-available/workout
+# Remplacez workout.example.com par votre vrai domaine.
+# HTTPS = Let's Encrypt (certbot --nginx -d workout.example.com)
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name workout.example.com;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name workout.example.com;
+
+    ssl_certificate     /etc/letsencrypt/live/workout.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/workout.example.com/privkey.pem;
+
+    # Mobile-friendly defaults
+    client_max_body_size 2m;
+    gzip on;
+    gzip_types text/css application/javascript application/json image/svg+xml;
+
+    # Static assets served directly by nginx
+    location /static/ {
+        alias /srv/workout/app/static/;
+        access_log off;
+        expires 7d;
+        add_header Cache-Control "public, max-age=604800, immutable";
+    }
+
+    # Everything else -> uvicorn
+    location / {
+        proxy_pass         http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header   Host              $host;
+        proxy_set_header   X-Real-IP         $remote_addr;
+        proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header   X-Forwarded-Proto $scheme;
+        proxy_read_timeout 30s;
+    }
+}

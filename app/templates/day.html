@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<a class="back" href="{{ url_for('index') }}">← Semaine</a>
+<h1 class="h1">{{ day.name }}</h1>
+<p class="lede">{{ day.focus }}</p>
+{% if day.cardio_note %}
+  <p class="cardio">Cardio : {{ day.cardio_note }}</p>
+{% endif %}
+
+{% if day.exercises|length == 0 %}
+  <p class="empty">Repos ou abdos. Aucun exercice prescrit.</p>
+{% else %}
+  <ol class="exercise-list">
+    {% for ex in day.exercises %}
+      <li class="exercise">
+        <div class="exercise__head">
+          <span class="exercise__code">{{ ex.code }}</span>
+          <span class="exercise__name">{{ ex.name }}</span>
+        </div>
+        <div class="exercise__scheme">{{ ex.set_scheme }}</div>
+        {% if ex.notes %}
+          <p class="exercise__notes">{{ ex.notes }}</p>
+        {% endif %}
+        <ul class="sets">
+          {% for rr in ex.rep_ranges %}
+            <li class="sets__item">
+              <span class="sets__idx">#{{ rr.set_index }}</span>
+              <span class="sets__range">{{ rr.min_reps }}–{{ rr.max_reps }}</span>
+              {% if rr.technique %}
+                <span class="sets__tag">{{ rr.technique }}</span>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ol>
+{% endif %}
+{% endblock %}

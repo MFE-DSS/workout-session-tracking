@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f1115" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="{{ url_for('static', path='manifest.webmanifest') }}" />
+    <link rel="icon" href="{{ url_for('static', path='icons/favicon.svg') }}" type="image/svg+xml" />
+    <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}" />
+    <title>{{ page_title }} · Workout</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="topbar__brand" href="{{ url_for('index') }}">Split</a>
+      <nav class="topbar__nav" aria-label="Jours">
+        {% set labels = ['L', 'M', 'M', 'J', 'V', 'S', 'D'] %}
+        {% for i in range(1, 8) %}
+          <a class="chip" href="/jours/{{ i }}">{{ labels[i - 1] }}</a>
+        {% endfor %}
+      </nav>
+    </header>
+    <main class="container">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="foot">
+      <small>V1 · FastAPI SSR · SQLite · mobile-first</small>
+    </footer>
+  </body>
+</html>

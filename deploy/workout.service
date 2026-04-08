@@ -1,0 +1,28 @@
+[Unit]
+Description=Workout Session Tracking (FastAPI / uvicorn)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=workout
+Group=workout
+WorkingDirectory=/srv/workout
+EnvironmentFile=/srv/workout/.env
+ExecStart=/srv/workout/.venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 \
+    --port 8000 \
+    --proxy-headers \
+    --forwarded-allow-ips="127.0.0.1"
+Restart=on-failure
+RestartSec=3
+
+# Hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/workout/var
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
