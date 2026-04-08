@@ -61,6 +61,9 @@ class WorkoutSession(Base):
     ended_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
+    status: Mapped[str] = mapped_column(
+        String(16), nullable=False, default="in_progress"
+    )
 
     # Normalized session-level feedback (see app.enums)
     concentration: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
@@ -112,6 +115,16 @@ class SessionExercise(Base):
     free_note: Mapped[Optional[str]] = mapped_column(String(140), nullable=True)
 
     session: Mapped[WorkoutSession] = relationship(back_populates="session_exercises")
+
+    # Optional link back to the catalog. Nullable because a reseed may have
+    # detached it (ON DELETE SET NULL). The session page uses this, when
+    # present, to render the prescribed set scheme. Never relied on for
+    # identity — snapshots above are the source of truth.
+    template_exercise = relationship(
+        "TemplateExercise",
+        lazy="select",
+    )
+
     set_logs: Mapped[list["SetLog"]] = relationship(
         back_populates="session_exercise",
         cascade="all, delete-orphan",

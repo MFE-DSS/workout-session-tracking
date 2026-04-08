@@ -111,3 +111,20 @@ class ReferenceDoc(Base):
     seeded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class MethodRule(Base):
+    """Static method reminder cards shown on /rules and inline in the
+    session detail page (method reminder area).
+
+    Seeded from `data/method_rules.json`. Not versioned independently —
+    any change reseeds the table in place.
+    """
+
+    __tablename__ = "method_rules"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    slug: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    title: Mapped[str] = mapped_column(String(128), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)

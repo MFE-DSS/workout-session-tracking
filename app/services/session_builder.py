@@ -21,7 +21,7 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 
-from app.enums import SetKind
+from app.enums import SessionStatus, SetKind
 from app.models.catalog import WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
 
@@ -50,6 +50,7 @@ def instantiate_session(
         template_slug_snapshot=template.slug,
         template_name_snapshot=template.name,
         started_at=started_at,
+        status=SessionStatus.IN_PROGRESS,
     )
 
     for te in template.exercises:

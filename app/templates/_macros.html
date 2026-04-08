@@ -1,0 +1,43 @@
+{#
+  Jinja macros for mobile-first form controls.
+  Kept deliberately small — each macro = one reusable unit.
+#}
+
+{#
+  segmented: a radio group styled as a segmented control
+  - name: input name (must be unique per form)
+  - options: list of (value, label) tuples, or list of strings
+  - selected: current value (any type; compared as str)
+#}
+{% macro segmented(name, options, selected) %}
+  <div class="segmented" role="radiogroup">
+    {% for opt in options %}
+      {% if opt is iterable and opt is not string %}
+        {% set value = opt[0] %}
+        {% set label = opt[1] %}
+      {% else %}
+        {% set value = opt %}
+        {% set label = opt %}
+      {% endif %}
+      <label class="segmented__option">
+        <input
+          type="radio"
+          name="{{ name }}"
+          value="{{ value }}"
+          {% if selected is not none and (selected|string) == (value|string) %}checked{% endif %}
+        />
+        <span>{{ label }}</span>
+      </label>
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{#
+  field_group: labelled wrapper for inputs/textareas.
+#}
+{% macro field_group(label, for_id=None) %}
+  <label class="field" {% if for_id %}for="{{ for_id }}"{% endif %}>
+    <span class="field__label">{{ label }}</span>
+    {{ caller() }}
+  </label>
+{% endmacro %}

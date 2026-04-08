@@ -1,8 +1,6 @@
-"""Server-side rendered pages.
+"""Navigation + catalog pages (home, library, history, progress).
 
-Sprint 0.5 scope: home with action tiles, template library (list
-and detail), plus empty-state stubs for /history and /progress.
-Real session logging comes in Sprint 1.
+The session logging flow lives in `app.routers.sessions`.
 """
 from __future__ import annotations
 
@@ -12,6 +10,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
+from app.enums import SessionStatus
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import WorkoutSession
 from app.templating import templates
@@ -32,16 +31,18 @@ def _load_templates(db: Session) -> list[WorkoutTemplate]:
     return list(db.execute(stmt).scalars().all())
 
 
-@router.get("/", response_class=HTMLResponse)
-def home(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
-    # Detect an in-progress session (started but not ended)
-    open_session = db.execute(
+def _latest_open_session(db: Session) -> WorkoutSession | None:
+    return db.execute(
         select(WorkoutSession)
-        .where(WorkoutSession.ended_at.is_(None))
+        .where(WorkoutSession.status == SessionStatus.IN_PROGRESS)
         .order_by(WorkoutSession.started_at.desc())
         .limit(1)
     ).scalar_one_or_none()
 
+
+@router.get("/", response_class=HTMLResponse)
+def home(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+    open_session = _latest_open_session(db)
     return templates.TemplateResponse(
         request,
         "index.html",

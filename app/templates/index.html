@@ -4,10 +4,10 @@
 <p class="lede">Choisis une action pour démarrer.</p>
 
 {% if open_session %}
-  <a class="tile tile--resume" href="{{ url_for('history') }}">
+  <a class="tile tile--resume" href="{{ url_for('session_detail', session_id=open_session.id) }}">
     <div class="tile__label">Reprendre</div>
     <div class="tile__hint">
-      Session en cours · {{ open_session.template_name_snapshot }} ·
+      {{ open_session.template_name_snapshot }} ·
       démarrée le {{ open_session.started_at.strftime('%d/%m %H:%M') }}
     </div>
   </a>
@@ -29,6 +29,10 @@
   <a class="tile" href="{{ url_for('library') }}">
     <div class="tile__label">Bibliothèque</div>
     <div class="tile__hint">Tous les templates disponibles</div>
+  </a>
+  <a class="tile" href="{{ url_for('rules_page') }}">
+    <div class="tile__label">Règles</div>
+    <div class="tile__hint">Méthode et rappels techniques</div>
   </a>
 </div>
 {% endblock %}

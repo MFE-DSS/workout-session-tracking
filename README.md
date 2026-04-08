@@ -8,6 +8,14 @@ prêt pour analytics.
 - **Cible** : téléphone, utilisation au gym, interaction pouce.
 - **Évolution** : PWA complète, migration PostgreSQL.
 
+## Docs
+
+- [`docs/PRODUCT_SPEC.md`](docs/PRODUCT_SPEC.md) — product rules
+- [`docs/DOMAIN_MODEL.md`](docs/DOMAIN_MODEL.md) — data model
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — tech overview
+- [`docs/SPRINT_01_REPORT.md`](docs/SPRINT_01_REPORT.md) — latest sprint report
+- [`deploy/README.md`](deploy/README.md) — OVH deployment guide
+
 ## Règles produit (non négociables)
 
 1. **L'utilisateur choisit librement un template de séance** dans la
@@ -125,6 +133,20 @@ le service pré-instancie pour chaque exercice du template :
 
 La page séance n'a donc qu'à itérer sur des lignes existantes et
 les remplir au tap — aucune création de ligne côté client.
+
+## Flux de saisie (Sprint 1)
+
+1. **Accueil** → tuile *Nouvelle séance*
+2. **Bibliothèque** → bouton *Démarrer {template}* = `POST /sessions`
+3. **Session detail** (`/sessions/{id}`) avec :
+   - petit formulaire session-level au-dessus (concentration,
+     global_state, bodyweight, note, *Enregistrer* / *Terminer*)
+   - une **carte par exercice** avec ses sets (warmup + work),
+     ses sélecteurs normalisés et son propre bouton *Enregistrer*
+   - chaque carte est sauvegardée indépendamment
+4. **Historique** liste les sessions passées avec statut et feedback
+5. **Règles** : 8 cartes méthode consultables au gym, également
+   rappelées en dépliable inline sur la page séance
 
 ## Déploiement OVH
 

@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+{% from "_macros.html" import segmented, field_group %}
+{% block content %}
+
+<a class="back" href="{{ url_for('home') }}">← Accueil</a>
+
+<header class="session-header">
+  <h1 class="h1">{{ session.template_name_snapshot }}</h1>
+  <div class="session-header__meta">
+    <span>{{ weekday_label }}</span>
+    <span>{{ session.started_at.strftime('%d/%m %H:%M') }}</span>
+    <span class="badge badge--{{ session.status }}">
+      {% if session.status == 'in_progress' %}En cours{% else %}Terminée{% endif %}
+    </span>
+  </div>
+  <div class="session-header__progress">
+    {{ stats.done }} / {{ stats.total }} work sets
+  </div>
+</header>
+
+{# -------- Session-level feedback (dedicated form) ---------- #}
+<form
+  method="post"
+  action="{{ url_for('update_session', session_id=session.id) }}"
+  class="card session-feedback"
+  id="session-feedback"
+>
+  <h2 class="card__title">Feedback session</h2>
+
+  <div class="field-block">
+    <span class="field__label">Concentration</span>
+    {{ segmented(
+      "concentration",
+      [("high", "High"), ("medium", "Medium"), ("low", "Low")],
+      session.concentration
+    ) }}
+  </div>
+
+  <div class="field-block">
+    <span class="field__label">Global state</span>
+    {{ segmented(
+      "global_state",
+      [("good", "Good"), ("flat", "Flat"), ("fatigued", "Fatigued")],
+      session.global_state
+    ) }}
+  </div>
+
+  {% call field_group("Poids du corps (kg)") %}
+    <input
+      type="number"
+      step="0.1"
+      inputmode="decimal"
+      name="bodyweight_kg"
+      placeholder="kg"
+      value="{{ session.bodyweight_kg if session.bodyweight_kg is not none else '' }}"
+    />
+  {% endcall %}
+
+  {% call field_group("Note (optionnel)") %}
+    <textarea
+      name="free_note"
+      maxlength="280"
+      rows="2"
+      placeholder="Ressenti général, incidents, focus du jour..."
+    >{{ session.free_note or '' }}</textarea>
+  {% endcall %}
+
+  <div class="card__actions">
+    <button type="submit" class="btn btn--primary">Enregistrer</button>
+    {% if session.status == 'in_progress' %}
+      <button type="submit" name="action" value="end" class="btn btn--end">
+        Terminer la séance
+      </button>
+    {% else %}
+      <button type="submit" name="action" value="reopen" class="btn btn--ghost">
+        Rouvrir
+      </button>
+    {% endif %}
+  </div>
+</form>
+
+{# -------- Exercise cards (one form per card) --------------- #}
+{% for se in session.session_exercises %}
+  {% set done, total = stats.per_exercise[se.id] %}
+  <form
+    method="post"
+    action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
+    class="card exercise-card"
+    id="exercise-{{ se.id }}"
+  >
+    <header class="exercise-card__head">
+      <span class="exercise-card__code">{{ se.exercise_code_snapshot }}</span>
+      <span class="exercise-card__name">{{ se.exercise_name_snapshot }}</span>
+      <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
+    </header>
+    {% if se.template_exercise and se.template_exercise.set_scheme %}
+      <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
+    {% endif %}
+
+    {% if se.set_logs|length > 0 %}
+      <ul class="set-list">
+        {% for sl in se.set_logs %}
+          <li class="set-row set-row--{{ sl.kind }}">
+            <div class="set-row__label">
+              <span class="set-row__kind">
+                {% if sl.kind == 'warmup' %}Warmup{% else %}Work{% endif %}
+              </span>
+              <span class="set-row__idx">#{{ sl.set_index }}</span>
+              {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+            </div>
+
+            <div class="set-row__inputs">
+              <input
+                type="number"
+                step="0.5"
+                inputmode="decimal"
+                name="set_{{ sl.id }}_weight_kg"
+                placeholder="kg"
+                value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+              />
+              <input
+                type="number"
+                inputmode="numeric"
+                name="set_{{ sl.id }}_reps"
+                placeholder="reps"
+                value="{{ sl.reps if sl.reps is not none else '' }}"
+              />
+              <label class="set-row__done">
+                <input
+                  type="checkbox"
+                  name="set_{{ sl.id }}_completed"
+                  value="1"
+                  {% if sl.completed %}checked{% endif %}
+                />
+                <span>Fait</span>
+              </label>
+            </div>
+
+            {% if sl.kind == 'work' %}
+              <div class="set-row__mini">
+                <span class="set-row__mini-label">Exécution</span>
+                {{ segmented(
+                  "set_" ~ sl.id ~ "_execution_quality",
+                  [("clean", "clean"), ("acceptable", "accept."), ("degraded", "degrad.")],
+                  sl.execution_quality
+                ) }}
+              </div>
+              <div class="set-row__mini">
+                <span class="set-row__mini-label">Target reps</span>
+                {{ segmented(
+                  "set_" ~ sl.id ~ "_reps_target",
+                  [("target_hit", "hit"), ("target_near", "near"), ("target_missed", "missed")],
+                  sl.reps_target
+                ) }}
+              </div>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="empty">Pas de série pour cet exercice.</p>
+    {% endif %}
+
+    <h3 class="card__subtitle">Feedback exercice</h3>
+
+    <div class="field-block">
+      <span class="field__label">Score</span>
+      {{ segmented("success_score", [100, 80, 50], se.success_score) }}
+    </div>
+
+    <div class="field-block">
+      <span class="field__label">Muscle cible</span>
+      {{ segmented(
+        "muscle_sensation",
+        [("strong", "Strong"), ("partial", "Partial"), ("weak", "Weak")],
+        se.muscle_sensation
+      ) }}
+    </div>
+
+    {% call field_group("Note (optionnel)") %}
+      <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
+    {% endcall %}
+
+    <div class="card__actions">
+      <button type="submit" class="btn btn--primary">
+        Enregistrer {{ se.exercise_code_snapshot }}
+      </button>
+    </div>
+  </form>
+{% endfor %}
+
+{% if rules %}
+<aside class="card method-reminder">
+  <h2 class="card__title">Rappel méthode</h2>
+  {% for rule in rules %}
+    <details class="rule">
+      <summary>{{ rule.title }}</summary>
+      <p class="rule__body">{{ rule.body }}</p>
+    </details>
+  {% endfor %}
+  <p class="method-reminder__more">
+    <a href="{{ url_for('rules_page') }}">Voir toutes les règles →</a>
+  </p>
+</aside>
+{% endif %}
+
+{% endblock %}

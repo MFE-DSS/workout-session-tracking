@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="h1">Bibliothèque</h1>
-<p class="lede">Chaque template est une séance-type que tu peux choisir librement.</p>
+<p class="lede">Choisis un template pour démarrer une séance.</p>
 
 <ul class="template-list">
   {% for tpl in templates %}
@@ -12,10 +12,23 @@
           <span class="template-card__kind">{{ tpl.kind|upper }}</span>
         </div>
         <div class="template-card__focus">{{ tpl.focus }}</div>
+        {% if tpl.cardio_note %}
+          <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
+        {% endif %}
         {% if tpl.suggested_label %}
           <div class="template-card__hint">Suggestion : {{ tpl.suggested_label }}</div>
         {% endif %}
       </a>
+      <form
+        method="post"
+        action="{{ url_for('create_session') }}"
+        class="template-card__start"
+      >
+        <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
+        <button type="submit" class="btn btn--primary btn--wide">
+          Démarrer {{ tpl.name }}
+        </button>
+      </form>
     </li>
   {% endfor %}
 </ul>

@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from app.config import BASE_DIR
 from app.models.catalog import (
+    MethodRule,
     ReferenceDoc,
     RepTarget,
     TemplateExercise,
@@ -25,9 +26,15 @@ from app.models.catalog import (
 )
 
 REFERENCE_PATH = BASE_DIR / "data" / "reference_split.json"
+METHOD_RULES_PATH = BASE_DIR / "data" / "method_rules.json"
 
 
 def load_reference_payload(path: Path = REFERENCE_PATH) -> dict:
+    with path.open("r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def load_method_rules_payload(path: Path = METHOD_RULES_PATH) -> dict:
     with path.open("r", encoding="utf-8") as fh:
         return json.load(fh)
 
@@ -84,3 +91,29 @@ def seed_reference_split(db: Session, payload: dict | None = None) -> bool:
     db.add(ReferenceDoc(version=version, title=title))
     db.commit()
     return True
+
+
+def seed_method_rules(db: Session, payload: dict | None = None) -> int:
+    """Seed / re-seed the method_rules table.
+
+    Method rules are small static cards (8 in V1), cheap to rewrite on
+    every boot. We simply wipe and reinsert — no version tracking needed,
+    the table has no inbound FKs.
+
+    Returns the number of rules inserted.
+    """
+    payload = payload or load_method_rules_payload()
+    db.execute(delete(MethodRule))
+    count = 0
+    for rule in payload["rules"]:
+        db.add(
+            MethodRule(
+                slug=rule["slug"],
+                position=rule["position"],
+                title=rule["title"],
+                body=rule["body"],
+            )
+        )
+        count += 1
+    db.commit()
+    return count

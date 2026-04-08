@@ -18,6 +18,18 @@ class TemplateKind(StrEnum):
     CARDIO = "cardio"
 
 
+class SessionStatus(StrEnum):
+    """Lifecycle status of a WorkoutSession.
+
+    Only two states in V1:
+    - in_progress : started, ended_at is NULL
+    - completed   : user hit "Terminer", ended_at is set
+    """
+
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+
+
 class Technique(StrEnum):
     """Intensity technique applied on a working set."""
 

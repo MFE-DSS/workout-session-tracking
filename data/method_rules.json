@@ -1,0 +1,52 @@
+{
+  "rules": [
+    {
+      "slug": "carnet-progression",
+      "position": 1,
+      "title": "Carnet d'entraînement et surcharge progressive",
+      "body": "La surcharge progressive est l'objectif fondamental. Chaque séance doit montrer une augmentation, soit de la charge, soit du nombre de répétitions. Consignez chaque séance avant l'entraînement. La progression ne se traduit pas toujours par plus de charge ou plus de reps : parfois, une meilleure qualité de contraction suffit. L'exécution impeccable passe avant tout."
+    },
+    {
+      "slug": "plages-repetitions",
+      "position": 2,
+      "title": "Plages de répétitions",
+      "body": "Atteindre l'échec mécanique à un moment de la plage indiquée. Exemple 8-12 : viser l'échec à 8 reps d'abord, puis progresser jusqu'à réaliser 12 reps propres avec la même charge. Ce n'est qu'à ce moment qu'on augmente la charge de l'exercice."
+    },
+    {
+      "slug": "series-approche",
+      "position": 3,
+      "title": "Séries d'approche (feeder sets)",
+      "body": "1 à 2 séries d'approche par mouvement. Réduire le volume progressivement à l'approche des séries de travail. Les dernières séries d'approche peuvent ne comporter que 2-3 reps, voire moins. Le but est de préparer le système nerveux sans gaspiller d'énergie."
+    },
+    {
+      "slug": "tempo",
+      "position": 4,
+      "title": "Tempo",
+      "body": "Phase excentrique fluide de 2-3 secondes. Phase concentrique explosive mais contrôlée. Maintenir le temps sous tension (TUT) tout au long du mouvement. Un tempo spécifique peut être indiqué au cas par cas sur un exercice particulier."
+    },
+    {
+      "slug": "temps-repos",
+      "position": 5,
+      "title": "Temps de repos",
+      "body": "Entre 90 et 150 secondes entre les séries de travail pour maintenir des performances élevées. Si vous avez besoin de plus, c'est un point à signaler."
+    },
+    {
+      "slug": "legende-technique",
+      "position": 6,
+      "title": "Légende technique (RP / DS)",
+      "body": "RP = Rest-Pause (nombre de rest-pauses indiqué, ex RPx2). DS = Drop Set (nombre de chutes indiqué, ex DSx2)."
+    },
+    {
+      "slug": "rest-pause",
+      "position": 7,
+      "title": "Séries Rest-Pause",
+      "body": "Une fois le premier point d'échec atteint, se reposer 10 secondes (reposer la barre si besoin), puis reprendre la série et aller de nouveau à l'échec. L'exécution doit rester irréprochable tout au long de la série."
+    },
+    {
+      "slug": "drop-sets",
+      "position": 8,
+      "title": "Drop Sets",
+      "body": "Une fois l'échec atteint, réduire la charge de 30 %, puis repartir immédiatement jusqu'à l'échec à nouveau."
+    }
+  ]
+}

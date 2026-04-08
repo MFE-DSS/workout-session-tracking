@@ -13,8 +13,8 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import BASE_DIR, get_settings
 from app.database import SessionLocal, init_db
-from app.routers import health, pages
-from app.services.seed import seed_reference_split
+from app.routers import health, pages, sessions
+from app.services.seed import seed_method_rules, seed_reference_split
 
 
 @asynccontextmanager
@@ -22,6 +22,7 @@ async def lifespan(app: FastAPI):
     init_db()
     with SessionLocal() as db:
         seed_reference_split(db)
+        seed_method_rules(db)
     yield
 
 
@@ -43,6 +44,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health.router)
     app.include_router(pages.router)
+    app.include_router(sessions.router)
 
     return app
 

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Règles</h1>
+<p class="lede">Rappels méthode à consulter au gym.</p>
+
+<div class="rule-list">
+  {% for rule in rules %}
+    <article class="card rule-card" id="rule-{{ rule.slug }}">
+      <h2 class="card__title">{{ rule.title }}</h2>
+      <p class="rule__body">{{ rule.body }}</p>
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}
