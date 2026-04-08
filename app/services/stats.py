@@ -76,12 +76,14 @@ def _summarise_prior(prior: SessionExercise, now: datetime) -> dict:
     return {
         "relative": _relative_when(now, prior.session.started_at),
         "started_at": prior.session.started_at,
+        "session_id": prior.session.id,
         "has_data": has_data,
         "weights_str": " / ".join(_fmt_weight(sl.weight_kg) for sl in done) if has_data else "",
         "reps_str": " / ".join(_fmt_reps(sl.reps) for sl in done) if has_data else "",
         "n_work_sets": len(work),
         "n_done": len(done),
         "first_set": first_set,
+        "success_score": prior.success_score,
     }
 
 

@@ -39,6 +39,12 @@
                 {{ stats.done }}/{{ stats.total }} exos
               </span>
             {% endif %}
+            {% if durations[s.id] %}
+              <span class="badge badge--neutral">
+                {% if s.status == 'in_progress' %}depuis{% else %}durée{% endif %}
+                {{ durations[s.id] }}
+              </span>
+            {% endif %}
             {% if s.concentration %}
               <span class="badge badge--neutral">concentration: {{ s.concentration }}</span>
             {% endif %}

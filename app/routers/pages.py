@@ -20,6 +20,7 @@ from app.services.kpis import (
     compute_recent_exercise_activity,
     compute_template_kpis,
 )
+from app.services.time_format import format_duration_short, session_duration
 from app.templating import templates
 
 router = APIRouter(tags=["pages"])
@@ -50,10 +51,19 @@ def _latest_open_session(db: Session) -> WorkoutSession | None:
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     open_session = _latest_open_session(db)
+    open_since: str | None = None
+    if open_session is not None:
+        open_since = format_duration_short(
+            session_duration(open_session.started_at, end=None)
+        )
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"page_title": "Accueil", "open_session": open_session},
+        {
+            "page_title": "Accueil",
+            "open_session": open_session,
+            "open_since": open_since,
+        },
     )
 
 
@@ -145,6 +155,13 @@ def history(
                     done += 1
             session_stats[s.id] = {"total": total, "done": done}
 
+    # Per-session duration string (unused for empty history list).
+    durations: dict[int, str] = {}
+    for s in sessions:
+        durations[s.id] = format_duration_short(
+            session_duration(s.started_at, end=s.ended_at)
+        )
+
     return templates.TemplateResponse(
         request,
         "history.html",
@@ -152,6 +169,7 @@ def history(
             "page_title": "Historique",
             "sessions": sessions,
             "session_stats": session_stats,
+            "durations": durations,
             "status_filter": status,
             "status_choices": _HISTORY_STATUS_CHOICES,
         },

@@ -16,6 +16,7 @@ prêt pour analytics.
 - [`docs/SPRINT_01_REPORT.md`](docs/SPRINT_01_REPORT.md) — Sprint 1 report
 - [`docs/SPRINT_02_REPORT.md`](docs/SPRINT_02_REPORT.md) — Sprint 2 report
 - [`docs/SPRINT_03_REPORT.md`](docs/SPRINT_03_REPORT.md) — Sprint 3 report
+- [`docs/SPRINT_04_REPORT.md`](docs/SPRINT_04_REPORT.md) — Sprint 4 report
 - [`deploy/README.md`](deploy/README.md) — OVH deployment + backup guide
 
 ## Règles produit (non négociables)

@@ -5,10 +5,11 @@
 
 {% if open_session %}
   <a class="tile tile--resume" href="{{ url_for('session_detail', session_id=open_session.id) }}">
-    <div class="tile__label">Reprendre</div>
+    <div class="tile__label">Reprendre · en cours</div>
     <div class="tile__hint">
       {{ open_session.template_name_snapshot }} ·
       démarrée le {{ open_session.started_at.strftime('%d/%m %H:%M') }}
+      {% if open_since %}· depuis {{ open_since }}{% endif %}
     </div>
   </a>
 {% endif %}

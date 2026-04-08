@@ -63,22 +63,27 @@
 {% else %}
   <ul class="activity-list">
     {% for a in recent_activity %}
-      <li class="activity-row">
-        <div class="activity-row__head">
-          <span class="activity-row__code">{{ a.exercise_code }}</span>
-          <span class="activity-row__name">{{ a.exercise_name }}</span>
-          <span class="activity-row__count">{{ a.n_sessions_30d }}×</span>
-        </div>
-        <div class="activity-row__meta">
-          <span class="activity-row__template">{{ a.template_name }}</span>
-          <span>· {{ a.last_done_at.strftime('%d/%m') }}</span>
-          {% if a.last_weights_str %}
-            <span>· {{ a.last_weights_str }} kg</span>
-          {% endif %}
-          {% if a.last_reps_str %}
-            <span>· {{ a.last_reps_str }} reps</span>
-          {% endif %}
-        </div>
+      <li>
+        <a
+          class="activity-row"
+          href="{{ url_for('exercise_history_detail', template_slug=a.template_slug, exercise_code=a.exercise_code) }}"
+        >
+          <div class="activity-row__head">
+            <span class="activity-row__code">{{ a.exercise_code }}</span>
+            <span class="activity-row__name">{{ a.exercise_name }}</span>
+            <span class="activity-row__count">{{ a.n_sessions_30d }}×</span>
+          </div>
+          <div class="activity-row__meta">
+            <span class="activity-row__template">{{ a.template_name }}</span>
+            <span>· {{ a.last_done_at.strftime('%d/%m') }}</span>
+            {% if a.last_weights_str %}
+              <span>· {{ a.last_weights_str }} kg</span>
+            {% endif %}
+            {% if a.last_reps_str %}
+              <span>· {{ a.last_reps_str }} reps</span>
+            {% endif %}
+          </div>
+        </a>
       </li>
     {% endfor %}
   </ul>

@@ -28,9 +28,15 @@ from app.models import session as _session  # noqa: E402, F401
 
 config = context.config
 
-# Inject the DATABASE_URL from app settings at runtime.
-settings = get_settings()
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Inject the DATABASE_URL from app settings at runtime — but only if
+# the caller (typically the alembic CLI) has NOT already set one. This
+# lets tests and scripts pass a transient DB URL via
+# `Config.set_main_option("sqlalchemy.url", ...)` before invoking
+# `command.upgrade(...)`, without having to touch environment
+# variables.
+if not config.get_main_option("sqlalchemy.url"):
+    settings = get_settings()
+    config.set_main_option("sqlalchemy.url", settings.database_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)

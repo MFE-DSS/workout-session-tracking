@@ -101,7 +101,7 @@ See `app/enums.py` for the single source of truth.
 | execution_quality | clean, acceptable, degraded               |
 | reps_target       | target_hit, target_near, target_missed    |
 
-## Read-side helpers (Sprint 2 + 3)
+## Read-side helpers (Sprint 2 + 3 + 4)
 
 - `app/services/stats.py::last_time_by_exercise_code(db, session, now)`
   returns a dict keyed by `exercise_code_snapshot` pointing at a
@@ -134,6 +134,36 @@ See `app/enums.py` for the single source of truth.
   completed sessions in the last 30 days and the weights/reps
   of the most recent completed work sets. Feeds the
   "Activité récente par exercice" section on /progress.
+
+- `app/services/delta.py::compute_delta(...)` and `format_delta(d)`
+  are pure functions that turn two triplets (weight, reps, score)
+  into a compact delta string. See docs/PRODUCT_SPEC.md for the
+  rule. Used by the session detail page and the exercise history
+  detail page.
+
+- `app/services/exercise_history.py::get_exercise_history(db,
+  template_slug, exercise_code)` returns a list of
+  `ExerciseHistoryEntry` (newest first) for one identity, with
+  deltas precomputed against the next-older row.
+
+- `app/services/time_format.py::format_duration_short(delta)`
+  renders a timedelta as `"{m} min"` or `"{h} h {mm}"`. Used by
+  the home Reprendre tile and by the history rows.
+
+## Alembic drift guard (Sprint 4)
+
+`tests/test_alembic_drift.py` applies `alembic upgrade head` to a
+temporary SQLite file, then calls `alembic.autogenerate.compare_metadata`
+against `Base.metadata`. Any diff fails the test. This catches
+the case where a model is edited without a follow-up
+`alembic revision --autogenerate`.
+
+For manual runs (pre-commit, git hook):
+`python -m scripts.check_alembic_drift`.
+
+`migrations/env.py` was hardened to respect a pre-set
+`sqlalchemy.url` on the Alembic `Config`, so the test can inject
+its own temp URL without touching environment variables.
 
 ## Schema evolution — Alembic (Sprint 2)
 

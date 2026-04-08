@@ -96,7 +96,11 @@
     id="exercise-{{ se.id }}"
   >
     <header class="exercise-card__head">
-      <span class="exercise-card__code">{{ se.exercise_code_snapshot }}</span>
+      <a
+        class="exercise-card__code exercise-card__code--link"
+        href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
+        title="Historique {{ se.exercise_code_snapshot }}"
+      >{{ se.exercise_code_snapshot }}</a>
       <span class="exercise-card__name">{{ se.exercise_name_snapshot }}</span>
       <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
     </header>
@@ -136,6 +140,14 @@
         <span class="last-time__values">Aucune séance précédente</span>
       {% endif %}
     </div>
+
+    {% set delta_label = deltas.get(se.exercise_code_snapshot) %}
+    {% if delta_label %}
+      <div class="delta">
+        <span class="delta__label">Delta</span>
+        <span class="delta__text">{{ delta_label }}</span>
+      </div>
+    {% endif %}
 
     {% set hint = hints.get(se.exercise_code_snapshot) %}
     {% if hint %}

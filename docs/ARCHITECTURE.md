@@ -35,6 +35,9 @@ app/
     stats.py             last_time_by_exercise_code, summarise_current_exercise
     progression_hint.py  Pure deterministic hint rule (Sprint 3)
     kpis.py              GlobalKPIs + TemplateKPI + RecentExerciseActivity
+    delta.py             Pure compute_delta + format_delta (Sprint 4)
+    exercise_history.py  get_exercise_history() with row-wise deltas (Sprint 4)
+    time_format.py       format_duration_short (Sprint 4)
   templates/
     base.html          Layout (topbar, manifest, safe-area)
     _macros.html       Jinja macros (segmented control, field group)
@@ -192,3 +195,23 @@ All migrations were written with portable SQLAlchemy operations;
 the `compare_type=True` setting in `env.py` means type changes
 (e.g. `String(16)` -> `String(32)`) will be picked up by
 autogenerate rather than silently ignored.
+
+### Drift guard (Sprint 4)
+
+A forgotten autogenerate is the single most common Alembic
+failure mode. We prevent it with two paths:
+
+1. **Pytest test** — `tests/test_alembic_drift.py` runs the full
+   migration chain on a throwaway SQLite file, then uses
+   `alembic.autogenerate.compare_metadata` to diff the resulting
+   schema against `Base.metadata`. A non-empty diff fails the
+   test with a human-readable error.
+
+2. **Manual script** — `python -m scripts.check_alembic_drift`
+   does exactly the same thing, exits 0 on clean state, 1 on
+   drift, printing the diff. Suitable for a pre-commit hook.
+
+`migrations/env.py` was updated to skip the DATABASE_URL injection
+if the Alembic `Config` already has a `sqlalchemy.url` set. This
+is what lets the test inject a temp SQLite URL without touching
+environment variables.

@@ -35,6 +35,8 @@ from app.enums import (
 )
 from app.models.catalog import MethodRule, TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, WorkoutSession
+from app.services.delta import compute_delta, format_delta
+from app.services.exercise_history import get_exercise_history
 from app.services.form_parsing import (
     checkbox,
     clean_str,
@@ -181,6 +183,37 @@ def session_detail(
         se.id: summarise_current_exercise(se) for se in session.session_exercises
     }
 
+    # Delta vs the prior occurrence's first completed work set.
+    # Only rendered when the CURRENT exercise has a first completed
+    # work set AND the prior session had one too.
+    delta_labels: dict[str, str | None] = {}
+    for se in session.session_exercises:
+        code = se.exercise_code_snapshot
+        # Current first completed work set
+        curr_work = sorted(
+            (sl for sl in se.set_logs if sl.kind == "work"),
+            key=lambda s: s.set_index,
+        )
+        curr_done = [
+            sl for sl in curr_work
+            if sl.completed and (sl.weight_kg is not None or sl.reps is not None)
+        ]
+        curr_w = curr_done[0].weight_kg if curr_done else None
+        curr_r = curr_done[0].reps if curr_done else None
+
+        prior = last_time.get(code)
+        prior_w, prior_r, prior_score = None, None, None
+        if prior and prior.get("first_set"):
+            prior_w = prior["first_set"].get("weight_kg")
+            prior_r = prior["first_set"].get("reps")
+            prior_score = prior.get("success_score")
+
+        delta = compute_delta(
+            curr_w, curr_r, se.success_score,
+            prior_w, prior_r, prior_score,
+        )
+        delta_labels[code] = format_delta(delta)
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -193,6 +226,7 @@ def session_detail(
             "last_time": last_time,
             "hints": hints,
             "exercise_summaries": exercise_summaries,
+            "deltas": delta_labels,
         },
     )
 
@@ -294,4 +328,57 @@ def rules_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
         request,
         "rules.html",
         {"page_title": "Règles", "rules": rules},
+    )
+
+
+# ----------------------------------------------------------------------
+# Exercise history detail (Sprint 4)
+# ----------------------------------------------------------------------
+
+
+@router.get(
+    "/exercise-history/{template_slug}/{exercise_code}",
+    response_class=HTMLResponse,
+)
+def exercise_history_detail(
+    template_slug: str,
+    exercise_code: str,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> HTMLResponse:
+    entries = get_exercise_history(db, template_slug, exercise_code)
+
+    # Use the exercise_name snapshot of the most recent entry so the
+    # header reads naturally. Fall back to the raw slug/code if the
+    # identity has no history yet.
+    display_exercise_name: str | None = None
+    display_template_name: str | None = None
+    if entries:
+        # Fetch the SessionExercise row of the most recent entry to
+        # get the snapshotted names. One extra SELECT, cheap.
+        row = db.execute(
+            select(WorkoutSession, SessionExercise)
+            .join(SessionExercise, SessionExercise.session_id == WorkoutSession.id)
+            .where(
+                WorkoutSession.template_slug_snapshot == template_slug,
+                SessionExercise.exercise_code_snapshot == exercise_code,
+            )
+            .order_by(WorkoutSession.started_at.desc())
+            .limit(1)
+        ).first()
+        if row is not None:
+            display_template_name = row[0].template_name_snapshot
+            display_exercise_name = row[1].exercise_name_snapshot
+
+    return templates.TemplateResponse(
+        request,
+        "exercise_history.html",
+        {
+            "page_title": f"{exercise_code} · {display_exercise_name or exercise_code}",
+            "template_slug": template_slug,
+            "exercise_code": exercise_code,
+            "display_template_name": display_template_name or template_slug,
+            "display_exercise_name": display_exercise_name or exercise_code,
+            "entries": entries,
+        },
     )

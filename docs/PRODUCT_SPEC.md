@@ -92,6 +92,49 @@ Configurable through `app.services.session_builder.instantiate_session(warmup_se
   The header gets a one-liner note "Séance terminée — éditable
   via Rouvrir".
 
+## Exercise history identity rule (Sprint 4)
+
+The "history of one exercise" groups SessionExercise rows by the
+pair `(template_slug_snapshot, exercise_code_snapshot)`. This is
+the SAME identity key that "Dernière fois" and the progression
+hint already use, kept on purpose for coherence.
+
+- No merging across templates. `E2` on Push A and `E2` on Pull B
+  are two distinct identities.
+- No merging by exercise name. If two templates spell the same
+  name differently, they stay separate.
+- The page at `GET /exercise-history/{template_slug}/{exercise_code}`
+  lists every occurrence (both `in_progress` and `completed`),
+  newest first, with a status badge so the two can be told apart.
+
+## Delta rule (Sprint 4)
+
+On the exercise history detail page, each row is compared to the
+immediately NEXT-OLDER row in the same list. On the session detail
+page, each exercise card's current first completed work set is
+compared to the prior session's first completed work set (the
+same one surfaced by "Dernière fois").
+
+**Inputs** for each side:
+- `weight_kg` of the first completed work set
+- `reps` of the first completed work set
+- `success_score` of the exercise card
+
+**Output**: a `Delta` with three optional pieces, or None.
+
+- `weight_delta = current - prior` if both weights are not None
+- `reps_delta = current - prior` if both reps are not None
+- `score_trend = "up" | "flat" | "down"` if both scores are not None
+- delta is None if all three pieces are None (nothing to compare)
+
+**Display format**: comma-joined with " · ".
+- `+2.5 kg · +2 reps · score en hausse`
+- `= kg · = reps · score stable`
+- `-5 kg · -2 reps · score en baisse`
+- Missing pieces are simply omitted
+
+Round weights: `2.0` renders as `+2 kg`, not `+2.0 kg`.
+
 ## Progression hint rule (Sprint 3)
 
 Each exercise card may show a short "Repère" block below the

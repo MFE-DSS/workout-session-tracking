@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+
+<a class="back" href="{{ url_for('progress') }}">← Progression</a>
+
+<header class="session-header">
+  <h1 class="h1">
+    <span class="exercise-card__code">{{ exercise_code }}</span>
+    {{ display_exercise_name }}
+  </h1>
+  <div class="session-header__meta">
+    <span>{{ display_template_name }}</span>
+    <span>{{ entries|length }} occurrence{% if entries|length > 1 %}s{% endif %}</span>
+  </div>
+  <p class="lede">
+    Historique de cet exercice, du plus récent au plus ancien.
+    Le delta compare chaque ligne au premier work set complété de l'occurrence précédente.
+  </p>
+</header>
+
+{% if entries|length == 0 %}
+  <p class="empty">
+    Aucune séance pour cet exercice dans ce template.
+    Commence par <a href="{{ url_for('library') }}">démarrer une séance</a>.
+  </p>
+{% else %}
+  <ul class="history-list">
+    {% for e in entries %}
+      <li class="history-row">
+        <a
+          class="history-row__link"
+          href="{{ url_for('session_detail', session_id=e.session_id) }}"
+        >
+          <div class="history-row__head">
+            <span class="history-row__date">
+              {{ e.started_at.strftime('%a %d/%m %H:%M') }}
+            </span>
+            <span class="badge badge--{{ e.status }}">
+              {% if e.status == 'in_progress' %}en cours{% else %}terminée{% endif %}
+            </span>
+          </div>
+
+          {% if e.weights_str %}
+            <div class="history-row__values">
+              {{ e.weights_str }} kg · {{ e.reps_str }} reps
+            </div>
+          {% else %}
+            <div class="history-row__values history-row__values--empty">
+              aucun work set complété
+            </div>
+          {% endif %}
+
+          <div class="history-row__meta">
+            {% if e.success_score is not none %}
+              <span class="badge badge--neutral">score {{ e.success_score }}</span>
+            {% endif %}
+            {% if e.muscle_sensation %}
+              <span class="badge badge--neutral">{{ e.muscle_sensation }}</span>
+            {% endif %}
+            {% if e.delta_label %}
+              <span class="badge badge--delta">{{ e.delta_label }}</span>
+            {% endif %}
+          </div>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% endblock %}
