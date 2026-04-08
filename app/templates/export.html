@@ -54,9 +54,40 @@
   </div>
 </div>
 
+<div class="card export-card">
+  <h2 class="card__title">Sauvegarde planifiée</h2>
+  {% if last_backup %}
+    <ul class="export-stats">
+      <li>
+        <span>Dernier fichier</span>
+        <b>{{ last_backup.name }}</b>
+      </li>
+      <li>
+        <span>Modifié</span>
+        <b>{{ last_backup.modified_at.strftime('%d/%m %H:%M') }}</b>
+      </li>
+      <li>
+        <span>Taille</span>
+        <b>{{ last_backup.size_bytes }} octets</b>
+      </li>
+    </ul>
+    <p class="export-card__hint" style="margin-top: 10px;">
+      Dossier : <code>{{ backup_dir }}</code>
+    </p>
+  {% else %}
+    <p class="export-card__hint">
+      Aucune sauvegarde locale détectée dans
+      <code>{{ backup_dir }}</code>.
+      Voir <code>deploy/README.md</code> section
+      <em>Sauvegardes planifiées</em> pour activer le job nightly
+      (systemd timer ou cron).
+    </p>
+  {% endif %}
+</div>
+
 <p class="kpi-note">
-  Pour la sauvegarde quotidienne automatique sur le VPS, voir
-  <code>deploy/README.md</code> section <em>Sauvegardes</em>
-  (snapshot SQLite + dump JSON via cron).
+  Pour la procédure complète (snapshot SQLite, dumps JSON/CSV
+  cron, restauration), voir
+  <code>deploy/README.md</code>.
 </p>
 {% endblock %}

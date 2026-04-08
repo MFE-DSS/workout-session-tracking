@@ -42,6 +42,11 @@ app/
     time_format.py       format_duration_short (Sprint 4)
     session_state.py     latest_open_session (Sprint 5, shared by pages
                          and sessions routers for the active banner)
+    export_builder.py    build_json_payload + build_csv_text (Sprint 6)
+                         used by both /export routes AND
+                         scripts/backup_sessions.py
+    backup_inspector.py  latest_backup_info / list_backups (Sprint 6)
+                         used by /export landing page
   templates/
     base.html          Layout (topbar, manifest, safe-area)
     _macros.html       Jinja macros (segmented control, field group)
@@ -199,6 +204,36 @@ All migrations were written with portable SQLAlchemy operations;
 the `compare_type=True` setting in `env.py` means type changes
 (e.g. `String(16)` -> `String(32)`) will be picked up by
 autogenerate rather than silently ignored.
+
+### Backup workflow (Sprint 6)
+
+The backup story has three layers:
+
+1. **SQLite `.backup`** — atomic file snapshot, restoration in
+   place. Cron'd from the `workout` user.
+2. **JSON dump** — full nested journal payload, written by
+   `scripts/backup_sessions.py` using `app.services.export_builder`.
+   The standalone script never touches HTTP.
+3. **CSV dump** — flat one-row-per-set view, also produced by
+   the script via the same builder.
+
+Both #2 and #3 land in `BACKUP_DIR` (env var, defaults to
+`<repo>/var/backups`). Files are named `sessions-YYYYMMDD_HHMM.json`
+and `sessions-YYYYMMDD_HHMM.csv`. The script prunes anything
+older than `BACKUP_RETENTION_DAYS` (default 30, set to 0 to
+disable).
+
+Two scheduling options ship in `deploy/`:
+
+- `workout-backup.service` + `workout-backup.timer` (systemd,
+  recommended)
+- A cron one-liner (documented in `deploy/README.md` section 7.2)
+
+The `/export` landing page calls `latest_backup_info(BACKUP_DIR)`
+on every request and shows the most recent file's name, size,
+and modified-at timestamp — a sanity signal that the cron is
+alive without leaving the app. When no file is found, an empty
+state explains how to enable the timer.
 
 ### Drift guard (Sprint 4)
 

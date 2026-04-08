@@ -1,0 +1,20 @@
+[Unit]
+Description=Workout journal nightly backup (JSON + CSV)
+# Tolerate the app being down during backup — the script reads
+# the SQLite file directly via SQLAlchemy, no HTTP roundtrip.
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=workout
+Group=workout
+WorkingDirectory=/srv/workout
+EnvironmentFile=/srv/workout/.env
+ExecStart=/srv/workout/.venv/bin/python -m scripts.backup_sessions
+
+# Hardening matches the workout.service defaults.
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/workout/var
+ProtectHome=true
+PrivateTmp=true

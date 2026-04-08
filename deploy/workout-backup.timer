@@ -1,0 +1,16 @@
+[Unit]
+Description=Run workout-backup.service nightly at 03:30 UTC
+
+[Timer]
+# Once a day at 03:30 UTC. Adjust to local time if you prefer.
+OnCalendar=*-*-* 03:30:00
+# If the machine was off at 03:30, run the backup as soon as it
+# comes up. The script is idempotent w.r.t. the journal: each run
+# writes a fresh timestamped pair of files.
+Persistent=true
+
+# Spread out a bit to avoid colliding with other 03:30 cron jobs.
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

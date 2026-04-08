@@ -26,6 +26,14 @@ class Settings(BaseSettings):
     # SQLAlchemy URL. Default = SQLite file under ./var/
     database_url: str = Field(default=f"sqlite:///{BASE_DIR / 'var' / 'workout.db'}")
 
+    # Where the nightly backup script writes JSON / CSV dumps. Used by
+    # both `scripts/backup_sessions.py` and the /export landing page
+    # (which displays the latest local backup file as a sanity signal).
+    backup_dir: str = Field(default=str(BASE_DIR / "var" / "backups"))
+    # Files older than this in `backup_dir` are pruned by the backup
+    # script. 0 = keep everything.
+    backup_retention_days: int = Field(default=30)
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
