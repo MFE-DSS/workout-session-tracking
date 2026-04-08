@@ -2,6 +2,8 @@
 {% from "_macros.html" import segmented, field_group %}
 {% block content %}
 
+<div class="session-page {% if session.status == 'completed' %}session-page--completed{% endif %}">
+
 <a class="back" href="{{ url_for('home') }}">← Accueil</a>
 
 <header class="session-header">
@@ -16,6 +18,11 @@
   <div class="session-header__progress">
     {{ stats.done }} / {{ stats.total }} work sets
   </div>
+  {% if session.status == 'completed' %}
+    <div class="session-header__note">
+      Séance terminée — éditable via <em>Rouvrir</em>.
+    </div>
+  {% endif %}
 </header>
 
 {# -------- Session-level feedback (dedicated form) ---------- #}
@@ -97,6 +104,21 @@
       <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
     {% endif %}
 
+    {% set summary = exercise_summaries.get(se.id) %}
+    {% if session.status == 'completed' and summary %}
+      <div class="done-summary">
+        <span class="done-summary__count">
+          Work : {{ summary.work_done }}/{{ summary.work_total }}
+        </span>
+        <span class="done-summary__values">
+          {{ summary.weights_str }} kg · {{ summary.reps_str }} reps
+        </span>
+        {% if summary.success_score is not none %}
+          <span class="done-summary__score">score {{ summary.success_score }}</span>
+        {% endif %}
+      </div>
+    {% endif %}
+
     {% set lt = last_time.get(se.exercise_code_snapshot) %}
     <div class="last-time {% if not lt %}last-time--empty{% endif %}">
       {% if lt and lt.has_data %}
@@ -114,6 +136,14 @@
         <span class="last-time__values">Aucune séance précédente</span>
       {% endif %}
     </div>
+
+    {% set hint = hints.get(se.exercise_code_snapshot) %}
+    {% if hint %}
+      <div class="hint">
+        <span class="hint__label">Repère</span>
+        <span class="hint__text">{{ hint }}</span>
+      </div>
+    {% endif %}
 
     {% if se.set_logs|length > 0 %}
       <ul class="set-list">
@@ -222,4 +252,5 @@
 </aside>
 {% endif %}
 
+</div>
 {% endblock %}

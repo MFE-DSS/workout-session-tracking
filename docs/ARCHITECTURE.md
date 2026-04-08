@@ -25,12 +25,16 @@ app/
     health.py        /healthz
     pages.py         Catalog navigation (/, /library, /history, /progress)
     sessions.py      Logging flow (POST /sessions, GET/POST /sessions/{id}, /rules)
+    export.py        GET /export/sessions.json (Sprint 3)
   schemas/
     catalog.py       Pydantic DTOs for read APIs (future-proofing)
   services/
-    seed.py          Idempotent seed of catalog + method rules
-    session_builder.py  Build a session tree from a template
-    form_parsing.py     Typed form field helpers (empty→None, enum whitelist)
+    seed.py              Idempotent seed of catalog + method rules
+    session_builder.py   Build a session tree from a template
+    form_parsing.py      Typed form field helpers (empty→None, enum whitelist)
+    stats.py             last_time_by_exercise_code, summarise_current_exercise
+    progression_hint.py  Pure deterministic hint rule (Sprint 3)
+    kpis.py              GlobalKPIs + TemplateKPI + RecentExerciseActivity
   templates/
     base.html          Layout (topbar, manifest, safe-area)
     _macros.html       Jinja macros (segmented control, field group)

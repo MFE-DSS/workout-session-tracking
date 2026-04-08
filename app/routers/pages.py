@@ -15,7 +15,11 @@ from app.database import get_db
 from app.enums import SessionStatus
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
-from app.services.kpis import compute_global_kpis, compute_template_kpis
+from app.services.kpis import (
+    compute_global_kpis,
+    compute_recent_exercise_activity,
+    compute_template_kpis,
+)
 from app.templating import templates
 
 router = APIRouter(tags=["pages"])
@@ -158,6 +162,7 @@ def history(
 def progress(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     global_kpis = compute_global_kpis(db)
     template_kpis = compute_template_kpis(db)
+    recent_activity = compute_recent_exercise_activity(db, limit=10)
     return templates.TemplateResponse(
         request,
         "progress.html",
@@ -165,5 +170,6 @@ def progress(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
             "page_title": "Progression",
             "kpis": global_kpis,
             "template_kpis": template_kpis,
+            "recent_activity": recent_activity,
         },
     )

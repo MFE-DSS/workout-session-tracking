@@ -15,7 +15,8 @@ prêt pour analytics.
 - [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — tech overview + Alembic workflow
 - [`docs/SPRINT_01_REPORT.md`](docs/SPRINT_01_REPORT.md) — Sprint 1 report
 - [`docs/SPRINT_02_REPORT.md`](docs/SPRINT_02_REPORT.md) — Sprint 2 report
-- [`deploy/README.md`](deploy/README.md) — OVH deployment guide
+- [`docs/SPRINT_03_REPORT.md`](docs/SPRINT_03_REPORT.md) — Sprint 3 report
+- [`deploy/README.md`](deploy/README.md) — OVH deployment + backup guide
 
 ## Règles produit (non négociables)
 
@@ -161,6 +162,16 @@ alembic revision --autogenerate -m "add xxx"
 ```
 
 Details in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md#alembic-workflow-sprint-2).
+
+## Export / backup (Sprint 3)
+
+```bash
+curl -sfL http://localhost:8000/export/sessions.json \
+  -o workout-journal-$(date +%F).json
+```
+
+Full backup workflow (SQLite `.backup` + JSON export + cron) is
+documented in [`deploy/README.md`](deploy/README.md#7-sauvegardes).
 
 ## Déploiement OVH
 

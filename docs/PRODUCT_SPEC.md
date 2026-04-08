@@ -84,6 +84,38 @@ Configurable through `app.services.session_builder.instantiate_session(warmup_se
   parallel read-only template and the drift that would bring.
   If the user notices a mistake after ending a session, they can
   fix it in place.
+- **Readability (Sprint 3)**: a completed session adds
+  `session-page--completed` on the main container. Each
+  exercise card shows a compact `done-summary` strip at the
+  top ("Work : 3/3 · 60 / 62.5 / 55 kg · 10 / 8 / 12 reps ·
+  score 80") and the editable inputs are slightly dimmed.
+  The header gets a one-liner note "Séance terminée — éditable
+  via Rouvrir".
+
+## Progression hint rule (Sprint 3)
+
+Each exercise card may show a short "Repère" block below the
+"Dernière fois" block. The hint is secondary: it never replaces
+the user's judgement, it never claims certainty, it contains no
+AI-sounding language. It is a mechanical reference point.
+
+**Inputs** (both required — otherwise no hint is shown):
+- `target_min` and `target_max` of the *current* exercise's
+  first rep target (via `SessionExercise.template_exercise`)
+- `prior_reps` and `prior_weight_kg` of the *prior* session's
+  first completed work set (via `last_time_by_exercise_code`)
+
+**Rule**:
+- If any input is missing -> no hint (empty)
+- If `prior_reps >= target_max` -> "tenter d'augmenter la
+  charge sur le premier set"
+- If `prior_reps < target_min` -> "consolider la charge
+  actuelle"
+- Otherwise (prior hit the range but not the top) ->
+  "viser {target_max} reps avant d'augmenter la charge"
+
+The rule is implemented in `app/services/progression_hint.py`
+and unit-tested.
 
 ## Last time rule (Sprint 2)
 
@@ -132,6 +164,17 @@ the SSR UI only emits whitelisted values; invalid POSTs can only
 come from direct curl/debug use and do not need a user-visible
 error.
 
+## Export rule (Sprint 3)
+
+`GET /export/sessions.json` returns every persisted session in
+a single JSON payload with a `schema_version`. No auth
+(single-user V1), no filtering, no selective export. Sorted
+oldest-first so the file is append-friendly. Documented in
+`deploy/README.md` and wired into the backup crontab examples.
+
+The export is intentionally not a round-trip import format for
+V1. It covers the backup and offline-analysis use cases.
+
 ## Explicit non-goals (V1)
 
 - Multi-user / auth (single user on a private VPS)
@@ -142,3 +185,7 @@ error.
 - Cardio-specific fields (duration, HR zones)
 - Auto-computed reps_target (server-side defaulting from reps vs
   rep target range); V1 keeps the field user-controlled
+- Import endpoint for the export (Sprint 3 only ships export;
+  reverse direction is YAGNI until we actually need it)
+- Smart coaching. The progression hint is a deterministic
+  mechanical rule; V1 does not claim anything beyond that.

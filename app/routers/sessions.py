@@ -43,8 +43,12 @@ from app.services.form_parsing import (
     to_float,
     to_int,
 )
+from app.services.progression_hint import compute_progression_hint
 from app.services.session_builder import instantiate_session
-from app.services.stats import last_time_by_exercise_code
+from app.services.stats import (
+    last_time_by_exercise_code,
+    summarise_current_exercise,
+)
 from app.templating import templates
 
 router = APIRouter(tags=["sessions"])
@@ -152,6 +156,31 @@ def session_detail(
         db, session, datetime.now(timezone.utc)
     )
 
+    # Progression hint per exercise card: based strictly on the first
+    # rep target of the current template_exercise and the first
+    # completed work set of the prior session.
+    hints: dict[str, str | None] = {}
+    for se in session.session_exercises:
+        code = se.exercise_code_snapshot
+        prior = last_time.get(code)
+        tgt_min, tgt_max = None, None
+        te = se.template_exercise
+        if te and te.rep_targets:
+            first_rt = sorted(te.rep_targets, key=lambda r: r.set_index)[0]
+            tgt_min, tgt_max = first_rt.min_reps, first_rt.max_reps
+        prior_w, prior_r = None, None
+        if prior and prior.get("first_set"):
+            prior_w = prior["first_set"].get("weight_kg")
+            prior_r = prior["first_set"].get("reps")
+        hints[code] = compute_progression_hint(tgt_min, tgt_max, prior_w, prior_r)
+
+    # Per-exercise compact summary used by the completed-session
+    # readability block (still computed even when in_progress, the
+    # template decides whether to render it).
+    exercise_summaries: dict[int, dict | None] = {
+        se.id: summarise_current_exercise(se) for se in session.session_exercises
+    }
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -162,6 +191,8 @@ def session_detail(
             "stats": stats,
             "rules": rules,
             "last_time": last_time,
+            "hints": hints,
+            "exercise_summaries": exercise_summaries,
         },
     )
 

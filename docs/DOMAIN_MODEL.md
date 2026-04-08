@@ -101,14 +101,24 @@ See `app/enums.py` for the single source of truth.
 | execution_quality | clean, acceptable, degraded               |
 | reps_target       | target_hit, target_near, target_missed    |
 
-## Read-side helpers (Sprint 2)
+## Read-side helpers (Sprint 2 + 3)
 
 - `app/services/stats.py::last_time_by_exercise_code(db, session, now)`
   returns a dict keyed by `exercise_code_snapshot` pointing at a
   compact summary of the previous session of the same template.
   One SQL query fetches every prior SessionExercise of the same
-  template; Python keeps the first hit per code (thanks to the
-  ORDER BY started_at DESC).
+  template; Python keeps the first hit per code. Each entry
+  includes a `first_set: {weight_kg, reps}` field used by the
+  progression hint.
+
+- `app/services/stats.py::summarise_current_exercise(se)` returns
+  a compact `{work_done, work_total, weights_str, reps_str,
+  success_score, muscle_sensation}` dict for completed-session
+  rendering. None if the exercise has no completed work set.
+
+- `app/services/progression_hint.py::compute_progression_hint(...)`
+  is a pure function: deterministic rule, easily unit-tested.
+  See docs/PRODUCT_SPEC.md for the rule text.
 
 - `app/services/kpis.py::compute_global_kpis(db)` returns a
   `GlobalKPIs` dataclass with the rolling 30-day indicators
@@ -117,6 +127,13 @@ See `app/enums.py` for the single source of truth.
 - `app/services/kpis.py::compute_template_kpis(db)` groups
   completed sessions by `template_slug_snapshot` so history
   survives catalog rewrites.
+
+- `app/services/kpis.py::compute_recent_exercise_activity(db, limit)`
+  returns a list of `RecentExerciseActivity` rows (one per
+  (template_slug, exercise_code) pair) with the number of
+  completed sessions in the last 30 days and the weights/reps
+  of the most recent completed work sets. Feeds the
+  "Activité récente par exercice" section on /progress.
 
 ## Schema evolution — Alembic (Sprint 2)
 

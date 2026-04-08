@@ -12,7 +12,7 @@ view can match it against each SessionExercise on the page in O(1).
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional  # noqa: F401  (used below)
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload, selectinload
@@ -68,6 +68,11 @@ def _summarise_prior(prior: SessionExercise, now: datetime) -> dict:
     done = [sl for sl in work if sl.completed and (sl.weight_kg is not None or sl.reps is not None)]
 
     has_data = len(done) > 0
+    first_set = None
+    if has_data:
+        sl = done[0]
+        first_set = {"weight_kg": sl.weight_kg, "reps": sl.reps}
+
     return {
         "relative": _relative_when(now, prior.session.started_at),
         "started_at": prior.session.started_at,
@@ -76,6 +81,31 @@ def _summarise_prior(prior: SessionExercise, now: datetime) -> dict:
         "reps_str": " / ".join(_fmt_reps(sl.reps) for sl in done) if has_data else "",
         "n_work_sets": len(work),
         "n_done": len(done),
+        "first_set": first_set,
+    }
+
+
+def summarise_current_exercise(se: SessionExercise) -> Optional[dict]:
+    """Compact summary of what was actually performed on a
+    SessionExercise. Used by the completed-session readability block.
+
+    Returns None if no work set has been marked completed — nothing
+    to show for an untouched exercise.
+    """
+    work = sorted(
+        (sl for sl in se.set_logs if sl.kind == "work"),
+        key=lambda s: s.set_index,
+    )
+    done = [sl for sl in work if sl.completed]
+    if not done:
+        return None
+    return {
+        "work_done": len(done),
+        "work_total": len(work),
+        "weights_str": " / ".join(_fmt_weight(sl.weight_kg) for sl in done),
+        "reps_str": " / ".join(_fmt_reps(sl.reps) for sl in done),
+        "success_score": se.success_score,
+        "muscle_sensation": se.muscle_sensation,
     }
 
 

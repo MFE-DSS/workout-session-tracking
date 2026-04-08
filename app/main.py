@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.config import BASE_DIR, get_settings
 from app.database import SessionLocal, init_db
-from app.routers import health, pages, sessions
+from app.routers import export, health, pages, sessions
 from app.services.seed import seed_method_rules, seed_reference_split
 
 
@@ -45,6 +45,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(pages.router)
     app.include_router(sessions.router)
+    app.include_router(export.router)
 
     return app
 

@@ -142,6 +142,133 @@ class TemplateKPI:
     avg_success_score: Optional[float]
 
 
+@dataclass
+class RecentExerciseActivity:
+    template_slug: str
+    template_name: str
+    exercise_code: str
+    exercise_name: str
+    n_sessions_30d: int
+    last_done_at: datetime
+    last_weights_str: str
+    last_reps_str: str
+
+
+def _fmt_weight(w: Optional[float]) -> str:
+    if w is None:
+        return "—"
+    if w == int(w):
+        return str(int(w))
+    return f"{w:g}"
+
+
+def compute_recent_exercise_activity(
+    db: Session,
+    *,
+    limit: int = 10,
+    now: Optional[datetime] = None,
+) -> list[RecentExerciseActivity]:
+    """Last N exercise codes (across all templates) with completed
+    work sets in the trailing 30 days, most recent first.
+
+    Intentionally compact: one row per
+    (template_slug_snapshot, exercise_code_snapshot), summarising the
+    most recent completed work sets. Feeds the /progress "Activité
+    récente par exercice" section.
+
+    Rules:
+      - only `completed` sessions enter the aggregate
+      - only `work` sets are summarised (warmups ignored)
+      - only completed work sets contribute to the weight/reps strings
+      - window = 30 days back from `now`
+    """
+    from app.models.session import SessionExercise, SetLog
+
+    now = now or datetime.now(timezone.utc)
+    window_start = now - timedelta(days=30)
+
+    # Fetch all SessionExercise rows of completed sessions in the
+    # window, eager-load their parent session and their set_logs.
+    stmt = (
+        select(SessionExercise)
+        .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.started_at >= window_start)
+        .order_by(WorkoutSession.started_at.desc())
+    )
+    rows = db.execute(stmt).scalars().all()
+    # Eager-load parent + set_logs in separate queries to avoid
+    # an explosion of cartesian products.
+    if rows:
+        ids = [r.id for r in rows]
+        set_rows = db.execute(
+            select(SetLog).where(SetLog.session_exercise_id.in_(ids))
+        ).scalars().all()
+        by_se: dict[int, list] = {}
+        for sl in set_rows:
+            by_se.setdefault(sl.session_exercise_id, []).append(sl)
+        sess_ids = {r.session_id for r in rows}
+        sess_rows = db.execute(
+            select(WorkoutSession).where(WorkoutSession.id.in_(sess_ids))
+        ).scalars().all()
+        by_sid = {s.id: s for s in sess_rows}
+    else:
+        by_se = {}
+        by_sid = {}
+
+    # Group by (template_slug, code); keep the most recent hit.
+    grouped: dict[tuple[str, str], dict] = {}
+    for se in rows:
+        parent = by_sid.get(se.session_id)
+        if parent is None:
+            continue
+        key = (parent.template_slug_snapshot, se.exercise_code_snapshot)
+        entry = grouped.setdefault(
+            key,
+            {
+                "template_name": parent.template_name_snapshot,
+                "exercise_name": se.exercise_name_snapshot,
+                "n": 0,
+                "last_done_at": parent.started_at,
+                "last_se": se,
+            },
+        )
+        entry["n"] += 1
+        if parent.started_at > entry["last_done_at"]:
+            entry["last_done_at"] = parent.started_at
+            entry["last_se"] = se
+
+    def _build(key, entry) -> RecentExerciseActivity:
+        slug, code = key
+        last_se = entry["last_se"]
+        done_work = sorted(
+            (
+                sl
+                for sl in by_se.get(last_se.id, [])
+                if sl.kind == "work" and sl.completed
+            ),
+            key=lambda s: s.set_index,
+        )
+        weights_str = " / ".join(_fmt_weight(sl.weight_kg) for sl in done_work)
+        reps_str = " / ".join(
+            ("—" if sl.reps is None else str(sl.reps)) for sl in done_work
+        )
+        return RecentExerciseActivity(
+            template_slug=slug,
+            template_name=entry["template_name"],
+            exercise_code=code,
+            exercise_name=entry["exercise_name"],
+            n_sessions_30d=entry["n"],
+            last_done_at=entry["last_done_at"],
+            last_weights_str=weights_str,
+            last_reps_str=reps_str,
+        )
+
+    out = [_build(k, v) for k, v in grouped.items()]
+    out.sort(key=lambda a: a.last_done_at, reverse=True)
+    return out[:limit]
+
+
 def compute_template_kpis(db: Session) -> list[TemplateKPI]:
     """Per-template summary: number of completed sessions, when the
     last one happened, and the average success score across all its

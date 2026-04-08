@@ -56,6 +56,34 @@
   </ul>
 {% endif %}
 
+<h2 class="card__title" style="margin-top: 22px;">Activité récente par exercice</h2>
+
+{% if recent_activity|length == 0 %}
+  <p class="empty">Aucune activité sur les 30 derniers jours.</p>
+{% else %}
+  <ul class="activity-list">
+    {% for a in recent_activity %}
+      <li class="activity-row">
+        <div class="activity-row__head">
+          <span class="activity-row__code">{{ a.exercise_code }}</span>
+          <span class="activity-row__name">{{ a.exercise_name }}</span>
+          <span class="activity-row__count">{{ a.n_sessions_30d }}×</span>
+        </div>
+        <div class="activity-row__meta">
+          <span class="activity-row__template">{{ a.template_name }}</span>
+          <span>· {{ a.last_done_at.strftime('%d/%m') }}</span>
+          {% if a.last_weights_str %}
+            <span>· {{ a.last_weights_str }} kg</span>
+          {% endif %}
+          {% if a.last_reps_str %}
+            <span>· {{ a.last_reps_str }} reps</span>
+          {% endif %}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 <p class="kpi-note">
   Seules les <strong>sessions terminées</strong> entrent dans les moyennes et
   taux ; les sessions en cours ne polluent pas les métriques. Les warmup
