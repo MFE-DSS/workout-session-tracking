@@ -25,6 +25,7 @@ prêt pour analytics.
 - [`deploy/README.md`](deploy/README.md) — OVH deployment + backup + restore guide
 - [`deploy/DEPLOY_OVH.md`](deploy/DEPLOY_OVH.md) — step-by-step first deploy on OVH VPS
 - [`deploy/CHECKLISTS.md`](deploy/CHECKLISTS.md) — tickable first-deploy / update / verify / restore checklists
+- [`docs/SECURITY_REVIEW_01_REPORT.md`](docs/SECURITY_REVIEW_01_REPORT.md) — security review + GO verdict
 
 ## Règles produit (non négociables)
 

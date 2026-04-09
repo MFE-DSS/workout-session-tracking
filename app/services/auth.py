@@ -49,7 +49,7 @@ def create_session_cookie(response: Response, user_id: int) -> None:
         value=token,
         max_age=SESSION_MAX_AGE,
         httponly=True,
-        samesite="lax",
+        samesite="strict",
         secure=is_prod,
         path="/",
     )

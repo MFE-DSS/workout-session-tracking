@@ -135,7 +135,40 @@ sudo nginx -t && sudo systemctl reload nginx
 - toutes les routes `/sessions/*`
 - `/history`, `/progress`, `/exercise-history/*`
 
-### 5.4 Alternative : IP allowlist
+### 5.4 Rate limiting (recommandé)
+
+Ajouter dans le bloc `http {}` de `/etc/nginx/nginx.conf` :
+
+```nginx
+limit_req_zone $binary_remote_addr zone=auth:10m rate=5r/m;
+```
+
+Puis dans le vhost, avant le `location / { ... }` :
+
+```nginx
+location = /login {
+    limit_req zone=auth burst=10 nodelay;
+    proxy_pass http://127.0.0.1:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+location = /register {
+    limit_req zone=auth burst=5 nodelay;
+    proxy_pass http://127.0.0.1:8000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+Résultat : 5 tentatives par minute par IP sur `/login` et
+`/register`. Burst autorisé pour un usage normal. Protection
+anti-brute-force sans toucher au code applicatif.
+
+### 5.5 Alternative : IP allowlist
 
 Si vous avez une IP fixe (VPN, box ADSL static), vous pouvez
 remplacer `auth_basic` par :

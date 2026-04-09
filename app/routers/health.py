@@ -63,7 +63,8 @@ def healthz_strict(db: Session = Depends(get_db)) -> JSONResponse:
     backup_dir_path = Path(settings.backup_dir)
     backup_dir_check: dict[str, Any] = {
         "exists": backup_dir_path.is_dir(),
-        "path": str(backup_dir_path),
+        # Intentionally omit the absolute path from the public
+        # endpoint to avoid leaking filesystem structure.
     }
 
     # 3. Latest backup presence + verifier

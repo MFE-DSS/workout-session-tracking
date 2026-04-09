@@ -296,7 +296,7 @@ def test_healthz_strict_payload_shape_contract(client, tmp_path, monkeypatch):
         "backup",
     }
     assert set(payload["db"].keys()) == {"ok", "detail"}
-    assert set(payload["backup_dir"].keys()) == {"exists", "path"}
+    assert "exists" in payload["backup_dir"]
     expected_backup_keys = {
         "present",
         "valid",

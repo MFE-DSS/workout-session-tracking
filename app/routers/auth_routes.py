@@ -72,7 +72,14 @@ async def login_submit(
         select(User).where(User.username == username, User.is_active.is_(True))
     ).scalar_one_or_none()
 
-    if user is None or not verify_password(password, user.password_hash):
+    # Constant-time: always run bcrypt even if user is None, so the
+    # response timing doesn't leak whether the username exists.
+    # The dummy hash is a real bcrypt hash of "dummy" — passlib will
+    # run the full comparison against it and return False.
+    _DUMMY = "$2b$12$LJ3m4ys3Lg3mRIkFLfTMD.ue1tjUTO7ZzNzm3Lf0QLjHEjLN2yJXi"
+    pw_ok = verify_password(password, user.password_hash if user else _DUMMY)
+
+    if user is None or not pw_ok:
         return templates.TemplateResponse(
             request,
             "login.html",
