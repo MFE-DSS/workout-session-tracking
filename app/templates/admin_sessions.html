@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Gestion des séances</h1>
+<p class="lede">
+  Supprimer les séances de test, exclure des KPI les séances incomplètes.
+</p>
+
+{% if rows|length == 0 %}
+  <p class="empty">Aucune séance enregistrée.</p>
+{% else %}
+  <ul class="admin-list">
+    {% for row in rows %}
+      {% set s = row.session %}
+      <li class="admin-row {% if s.excluded_from_stats %}admin-row--excluded{% endif %}">
+        <a class="admin-row__link" href="{{ url_for('session_detail', session_id=s.id) }}">
+          <div class="admin-row__head">
+            <span class="admin-row__name">{{ s.template_name_snapshot }}</span>
+            <span class="admin-row__date">{{ s.started_at.strftime('%d/%m %H:%M') }}</span>
+          </div>
+          <div class="admin-row__meta">
+            <span class="badge badge--{{ s.status }}">
+              {% if s.status == 'in_progress' %}en cours{% else %}terminée{% endif %}
+            </span>
+            <span class="badge badge--neutral">{{ row.done_exercises }}/{{ row.total_exercises }} exos</span>
+            <span class="badge badge--neutral">{{ row.duration }}</span>
+            {% if row.quality is not none %}
+              <span class="badge badge--neutral">qualité {{ row.quality }}</span>
+            {% endif %}
+            {% if s.bodyweight_kg %}
+              <span class="badge badge--neutral">{{ s.bodyweight_kg }} kg</span>
+            {% endif %}
+            {% if s.excluded_from_stats %}
+              <span class="badge badge--excluded">exclu des KPI</span>
+            {% endif %}
+          </div>
+        </a>
+        <div class="admin-row__actions">
+          <form method="post" action="{{ url_for('toggle_exclude', session_id=s.id) }}">
+            <button type="submit" class="btn btn--ghost btn--sm">
+              {% if s.excluded_from_stats %}Inclure{% else %}Exclure{% endif %}
+            </button>
+          </form>
+          <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}"
+                onsubmit="return confirm('Supprimer définitivement cette séance ?');">
+            <button type="submit" class="btn btn--ghost btn--sm btn--danger">Supprimer</button>
+          </form>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+{% endblock %}

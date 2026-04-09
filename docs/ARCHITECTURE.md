@@ -28,6 +28,7 @@ app/
                      /rules, /exercise-history/{slug}/{code})
     export.py        /export landing + /export/sessions.json
                      + /export/sessions.csv (Sprint 5)
+    admin.py         /admin/sessions management + delete + exclude (Sprint 8)
   schemas/
     catalog.py       Pydantic DTOs for read APIs (future-proofing)
   services/
@@ -48,6 +49,8 @@ app/
     backup_inspector.py  latest_backup_info / list_backups (Sprint 6)
                          used by /export landing page
     backup_verifier.py   verify_latest_backup() (Sprint 7)
+    quality_score.py     compute_session_quality() (Sprint 8)
+    timeline.py          SVG timeline builders (Sprint 8)
                          pure-Python integrity check of the latest
                          JSON dump; used by /healthz/strict,
                          /export, and scripts/verify_backup.py

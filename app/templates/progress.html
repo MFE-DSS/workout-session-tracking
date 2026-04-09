@@ -89,6 +89,16 @@
   </ul>
 {% endif %}
 
+{% if quality_svg %}
+  <h2 class="card__title" style="margin-top: 22px;">Qualité de séance dans le temps</h2>
+  <div class="timeline-chart">{{ quality_svg|safe }}</div>
+{% endif %}
+
+{% if bodyweight_svg %}
+  <h2 class="card__title" style="margin-top: 22px;">Poids corporel dans le temps</h2>
+  <div class="timeline-chart">{{ bodyweight_svg|safe }}</div>
+{% endif %}
+
 <p class="kpi-note">
   Seules les <strong>sessions terminées</strong> entrent dans les moyennes et
   taux ; les sessions en cours ne polluent pas les métriques. Les warmup

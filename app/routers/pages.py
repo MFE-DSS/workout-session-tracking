@@ -17,8 +17,14 @@ from app.services.kpis import (
     compute_recent_exercise_activity,
     compute_template_kpis,
 )
+from app.services.quality_score import compute_session_quality
 from app.services.session_state import latest_open_session
 from app.services.time_format import format_duration_short, session_duration
+from app.services.timeline import (
+    TimelinePoint,
+    build_bodyweight_timeline_svg,
+    build_quality_timeline_svg,
+)
 from app.templating import templates
 
 router = APIRouter(tags=["pages"])
@@ -181,6 +187,40 @@ def progress(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
     global_kpis = compute_global_kpis(db)
     template_kpis = compute_template_kpis(db)
     recent_activity = compute_recent_exercise_activity(db, limit=10)
+
+    # Sprint 8: build quality + bodyweight timeline SVGs from
+    # completed non-excluded sessions, oldest first.
+    timeline_stmt = (
+        select(WorkoutSession)
+        .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
+        .order_by(WorkoutSession.started_at.asc())
+        .options(
+            selectinload(WorkoutSession.session_exercises)
+            .selectinload(SessionExercise.set_logs)
+        )
+    )
+    eligible = list(db.execute(timeline_stmt).scalars().all())
+
+    quality_points = [
+        TimelinePoint(
+            label=s.started_at.strftime("%d/%m"),
+            value=compute_session_quality(s),
+        )
+        for s in eligible
+    ]
+    bw_points = [
+        TimelinePoint(
+            label=s.started_at.strftime("%d/%m"),
+            value=s.bodyweight_kg,
+        )
+        for s in eligible
+        if s.bodyweight_kg is not None
+    ]
+
+    quality_svg = build_quality_timeline_svg(quality_points)
+    bodyweight_svg = build_bodyweight_timeline_svg(bw_points)
+
     return templates.TemplateResponse(
         request,
         "progress.html",
@@ -189,6 +229,8 @@ def progress(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
             "kpis": global_kpis,
             "template_kpis": template_kpis,
             "recent_activity": recent_activity,
+            "quality_svg": quality_svg,
+            "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db),
         },
     )

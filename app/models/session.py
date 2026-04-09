@@ -65,6 +65,14 @@ class WorkoutSession(Base):
         String(16), nullable=False, default="in_progress"
     )
 
+    # Sprint 8: soft-exclude from KPI aggregation and timelines.
+    # Lets the user hide test / empty / junk sessions from the
+    # quality score, the timeline graphs, and the /progress page,
+    # without deleting the raw data.
+    excluded_from_stats: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+
     # Normalized session-level feedback (see app.enums)
     concentration: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     global_state: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)

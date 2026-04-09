@@ -31,6 +31,7 @@ workout_sessions
   started_at DATETIME NOT NULL (INDEX)
   ended_at DATETIME NULL
   status VARCHAR(16) NOT NULL       ← in_progress | completed
+  excluded_from_stats BOOL NOT NULL ← default False (Sprint 8)
   concentration, global_state       ← normalized enums, nullable
   bodyweight_kg FLOAT NULL
   free_note VARCHAR(280) NULL

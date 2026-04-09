@@ -207,6 +207,67 @@ the SSR UI only emits whitelisted values; invalid POSTs can only
 come from direct curl/debug use and do not need a user-visible
 error.
 
+## Session quality score (Sprint 8)
+
+A deterministic integer score on /100, computed from four
+components with explicit weights:
+
+| Component                     | Max   | Source                              |
+|-------------------------------|-------|-------------------------------------|
+| Work set completion rate      | 40 pts| `completed work sets / total work sets * 40` |
+| Average exercise success score| 40 pts| `avg(non-null success_scores) / 100 * 40` |
+| Concentration                 | 10 pts| high=10, medium=6, low=3, null=0   |
+| Global state                  | 10 pts| good=10, flat=6, fatigued=3, null=0 |
+
+Total = sum of the four components, clamped to 0..100, rounded.
+
+The formula is intentionally mechanical. A perfect session (every
+work set done, every exercise scored 100, concentration high,
+state good) gets exactly 100. An empty session gets 0.
+
+Implemented in `app/services/quality_score.py::compute_session_quality`.
+Pure function, no DB queries, fully unit-tested.
+
+## Session management and exclusion (Sprint 8)
+
+`GET /admin/sessions` is a management list with quality scores,
+durations, exercise completion, and two actions per session:
+
+- **Exclure / Inclure** — toggles `excluded_from_stats` (bool
+  column on `workout_sessions`, defaults to False). Excluded
+  sessions are dimmed in the admin list, excluded from ALL KPI
+  aggregations and timelines, but remain accessible and editable
+  via their detail page. The toggle is reversible.
+- **Supprimer** — hard delete with confirmation (JS `confirm()`).
+  Cascades to `session_exercises` and `set_logs`. Irreversible.
+
+KPI inclusion rule (Sprint 8 addendum):
+- ALL existing KPI queries now also filter on
+  `excluded_from_stats IS FALSE` alongside `status == "completed"`.
+- The quality and bodyweight timelines on `/progress` only include
+  completed, non-excluded sessions.
+- `sessions_this_week` and `sessions_last_30` still count ALL
+  sessions regardless of exclusion (they answer "am I using the
+  app?", not "how good are my sessions?").
+
+## Timelines (Sprint 8)
+
+Two server-rendered inline SVG charts on `/progress`:
+
+1. **Qualité de séance** — X = session date, Y = quality score
+   (0..100, fixed axis). Accent colour.
+2. **Poids corporel** — X = session date, Y = bodyweight_kg
+   (auto-ranged with 2 kg padding). Green colour.
+
+Inclusion rules:
+- Only `completed` sessions.
+- Only `excluded_from_stats IS FALSE` sessions.
+- Null `bodyweight_kg` rows are skipped for the bodyweight chart.
+- If fewer than 1 data point, the chart is not rendered.
+
+No JavaScript. No Chart.js. The SVGs are built in Python by
+`app/services/timeline.py` and injected via `{{ svg|safe }}`.
+
 ## Export rules
 
 ### `GET /export/sessions.json` (Sprint 3)

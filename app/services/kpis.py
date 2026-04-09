@@ -61,7 +61,8 @@ def compute_global_kpis(
 
     completed_total = db.execute(
         select(func.count(WorkoutSession.id)).where(
-            WorkoutSession.status == "completed"
+            WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False)
         )
     ).scalar_one() or 0
 
@@ -81,6 +82,7 @@ def compute_global_kpis(
         select(func.count(WorkoutSession.id))
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
     # Average success score: 30d window, completed sessions only,
@@ -90,6 +92,7 @@ def compute_global_kpis(
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(SessionExercise.success_score.is_not(None))
     ).scalar()
 
@@ -102,6 +105,7 @@ def compute_global_kpis(
         .where(SetLog.kind == "work")
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
     work_sets_done = db.execute(
@@ -112,6 +116,7 @@ def compute_global_kpis(
         .where(SetLog.completed.is_(True))
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
     completion_rate = (
@@ -193,6 +198,7 @@ def compute_recent_exercise_activity(
         select(SessionExercise)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(WorkoutSession.started_at >= window_start)
         .order_by(WorkoutSession.started_at.desc())
     )
@@ -287,6 +293,7 @@ def compute_template_kpis(db: Session) -> list[TemplateKPI]:
             SessionExercise, SessionExercise.session_id == WorkoutSession.id
         )
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
         .group_by(
             WorkoutSession.template_slug_snapshot,
             WorkoutSession.template_name_snapshot,
