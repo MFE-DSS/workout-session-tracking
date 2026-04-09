@@ -27,12 +27,14 @@ from app.config import get_settings
 from app.database import get_db
 from app.models.session import SetLog, WorkoutSession
 from app.services.backup_inspector import latest_backup_info
+from app.services.backup_verifier import verify_latest_backup
 from app.services.export_builder import (
     SCHEMA_VERSION,
     build_csv_text,
     build_json_payload,
 )
 from app.services.session_state import latest_open_session
+from app.services.time_format import relative_hours_ago
 from app.templating import templates
 
 router = APIRouter(tags=["export"])
@@ -68,6 +70,16 @@ def export_landing(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
     settings = get_settings()
     last_backup = latest_backup_info(settings.backup_dir)
 
+    # Sprint 7: run the verifier inline so the user sees the
+    # integrity state next to the backup file info. Cheap
+    # (one file read + one COUNT query).
+    verification = None
+    backup_age_label = None
+    if last_backup is not None:
+        now = datetime.now(timezone.utc)
+        verification = verify_latest_backup(settings.backup_dir, db=db, now=now)
+        backup_age_label = relative_hours_ago(now, last_backup.modified_at)
+
     return templates.TemplateResponse(
         request,
         "export.html",
@@ -81,6 +93,8 @@ def export_landing(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
             "schema_version": SCHEMA_VERSION,
             "last_backup": last_backup,
             "backup_dir": settings.backup_dir,
+            "backup_age_label": backup_age_label,
+            "verification": verification,
             "active_session": latest_open_session(db),
         },
     )

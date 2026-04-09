@@ -19,7 +19,9 @@ prêt pour analytics.
 - [`docs/SPRINT_04_REPORT.md`](docs/SPRINT_04_REPORT.md) — Sprint 4 report
 - [`docs/SPRINT_05_REPORT.md`](docs/SPRINT_05_REPORT.md) — Sprint 5 report
 - [`docs/SPRINT_06_REPORT.md`](docs/SPRINT_06_REPORT.md) — Sprint 6 report
+- [`docs/SPRINT_07_REPORT.md`](docs/SPRINT_07_REPORT.md) — Sprint 7 report
 - [`deploy/README.md`](deploy/README.md) — OVH deployment + backup + restore guide
+- [`deploy/CHECKLISTS.md`](deploy/CHECKLISTS.md) — tickable first-deploy / update / verify / restore checklists
 
 ## Règles produit (non négociables)
 
@@ -189,6 +191,19 @@ python -m scripts.list_backups
 Sur le VPS, le timer systemd `workout-backup.timer` lance le
 script chaque nuit à 03:30 UTC, avec rétention 30 jours par
 défaut.
+
+Vérification d'intégrité + health stricte (Sprint 7) :
+
+```bash
+# CLI : valide le dernier dump JSON, exit 0/1
+python -m scripts.verify_backup
+
+# Signal opérateur : DB + backup présent/valide
+curl -sfL http://localhost:8000/healthz/strict | python -m json.tool
+```
+
+Le timer `workout-backup-verify.timer` lance `verify_backup`
+chaque nuit à 04:00 UTC (30 min après la sauvegarde).
 
 Restauration : trois scénarios documentés (rollback SQLite,
 nouvelle machine, analyse spreadsheet) dans

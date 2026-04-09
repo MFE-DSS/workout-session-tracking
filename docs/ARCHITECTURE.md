@@ -39,7 +39,7 @@ app/
     kpis.py              GlobalKPIs + TemplateKPI + RecentExerciseActivity
     delta.py             Pure compute_delta + format_delta (Sprint 4)
     exercise_history.py  get_exercise_history() with row-wise deltas (Sprint 4)
-    time_format.py       format_duration_short (Sprint 4)
+    time_format.py       format_duration_short, relative_hours_ago
     session_state.py     latest_open_session (Sprint 5, shared by pages
                          and sessions routers for the active banner)
     export_builder.py    build_json_payload + build_csv_text (Sprint 6)
@@ -47,6 +47,10 @@ app/
                          scripts/backup_sessions.py
     backup_inspector.py  latest_backup_info / list_backups (Sprint 6)
                          used by /export landing page
+    backup_verifier.py   verify_latest_backup() (Sprint 7)
+                         pure-Python integrity check of the latest
+                         JSON dump; used by /healthz/strict,
+                         /export, and scripts/verify_backup.py
   templates/
     base.html          Layout (topbar, manifest, safe-area)
     _macros.html       Jinja macros (segmented control, field group)
@@ -234,6 +238,38 @@ on every request and shows the most recent file's name, size,
 and modified-at timestamp — a sanity signal that the cron is
 alive without leaving the app. When no file is found, an empty
 state explains how to enable the timer.
+
+### Strict health + backup verifier (Sprint 7)
+
+Two complementary paths close the minimal V1 ops loop:
+
+1. **`app/services/backup_verifier.py`** — pure function
+   `verify_latest_backup(backup_dir, db=None)` returning a
+   `BackupVerification` dataclass. Checks: file present,
+   parseable JSON, schema_version == 1, count/sessions
+   consistency, informational live-DB count comparison.
+   Reused from the web routes, the strict health endpoint,
+   and the CLI script.
+
+2. **`GET /healthz/strict`** — JSON endpoint alongside the
+   public `/healthz`. Returns 200 / "ok" when DB is reachable
+   AND (either no backup is present OR the latest backup
+   passes verification); 503 / "degraded" otherwise. Shape is
+   locked by a contract test so monitoring scripts can rely
+   on it.
+
+3. **`scripts/verify_backup.py`** — CLI entry point for cron /
+   systemd. Exits 0 / 1 + prints a one-line summary +
+   per-field block.
+
+4. **`deploy/workout-backup-verify.{service,timer}`** —
+   systemd oneshot + daily 04:00 UTC timer (runs 30 minutes
+   after the backup). Recommended companion to the Sprint 6
+   backup timer.
+
+The `/export` landing page also inlines the verifier result as
+an **"Intégrité : OK / FAIL"** badge with any errors listed.
+The call is cheap (one file read + one COUNT query).
 
 ### Drift guard (Sprint 4)
 

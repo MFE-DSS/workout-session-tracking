@@ -1,0 +1,13 @@
+[Unit]
+Description=Run workout-backup-verify.service nightly at 04:00 UTC
+# Runs 30 minutes after workout-backup.timer so the freshest
+# dump is always the one being verified.
+
+[Timer]
+OnCalendar=*-*-* 04:00:00
+# If the machine was off at 04:00, catch up on next boot.
+Persistent=true
+RandomizedDelaySec=120
+
+[Install]
+WantedBy=timers.target

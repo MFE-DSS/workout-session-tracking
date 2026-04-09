@@ -64,13 +64,45 @@
       </li>
       <li>
         <span>Modifié</span>
-        <b>{{ last_backup.modified_at.strftime('%d/%m %H:%M') }}</b>
+        <b>{{ last_backup.modified_at.strftime('%d/%m %H:%M') }}{% if backup_age_label %} · {{ backup_age_label }}{% endif %}</b>
       </li>
       <li>
         <span>Taille</span>
         <b>{{ last_backup.size_bytes }} octets</b>
       </li>
+      {% if verification %}
+        <li>
+          <span>Intégrité</span>
+          {% if verification.ok %}
+            <b class="integrity-ok">OK</b>
+          {% else %}
+            <b class="integrity-fail">FAIL</b>
+          {% endif %}
+        </li>
+        {% if verification.schema_version is not none %}
+          <li>
+            <span>schema_version</span>
+            <b>{{ verification.schema_version }}</b>
+          </li>
+        {% endif %}
+        {% if verification.exported_count is not none %}
+          <li>
+            <span>Sessions exportées</span>
+            <b>{{ verification.exported_count }}{% if verification.live_session_count is not none %} / {{ verification.live_session_count }} live{% endif %}</b>
+          </li>
+        {% endif %}
+      {% endif %}
     </ul>
+    {% if verification and verification.errors %}
+      <div class="integrity-errors">
+        <b>Erreurs détectées :</b>
+        <ul>
+          {% for err in verification.errors %}
+            <li>{{ err }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
     <p class="export-card__hint" style="margin-top: 10px;">
       Dossier : <code>{{ backup_dir }}</code>
     </p>

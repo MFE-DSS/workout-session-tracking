@@ -4,6 +4,11 @@ Cible : VPS OVH existant, Ubuntu/Debian récent, accès HTTPS depuis le
 téléphone. Le service tourne comme un process `uvicorn` unique derrière
 nginx.
 
+> **Besoin d'une procédure cochable ?** Voir
+> [`deploy/CHECKLISTS.md`](CHECKLISTS.md) — checklists
+> premier déploiement / mise à jour / vérification / restauration,
+> chaque étape avec commande exacte et sortie attendue.
+
 ## 1. Provisioning (une fois)
 
 ```bash
@@ -255,14 +260,92 @@ au démarrage suivant.
 
 ### 7.3 Vérification à la volée
 
-L'utilisateur dispose de deux signaux :
+L'utilisateur dispose de trois signaux, du plus léger au plus
+complet :
 
 1. La page `/export` montre le **dernier fichier de backup
-   détecté** dans `BACKUP_DIR` (nom, taille, modifié-le). Si
-   aucun fichier n'est trouvé, un message explicite invite à
-   activer le timer.
+   détecté** dans `BACKUP_DIR` (nom, taille, âge relatif,
+   schema_version, compte exporté vs live). Un badge
+   **Intégrité : OK / FAIL** apparaît quand un fichier existe.
+   Les erreurs éventuelles sont listées inline.
 2. La commande `python -m scripts.list_backups` liste tous
    les fichiers du dossier, du plus ancien au plus récent.
+3. La commande `python -m scripts.verify_backup` ouvre le
+   dernier dump JSON, valide son schema_version, son count et
+   la cohérence du tableau `sessions`. Exit 0 si OK, 1 sinon.
+   Suitable pour cron ou un `ExecCondition` systemd.
+
+### 7.4 Vérification planifiée (Sprint 7)
+
+Un second timer lance le verifier tous les jours à 04:00 UTC,
+30 minutes après la sauvegarde, pour attraper un dump corrompu
+avant qu'il ne parte à la rétention.
+
+```bash
+sudo cp /srv/workout/deploy/workout-backup-verify.service /etc/systemd/system/
+sudo cp /srv/workout/deploy/workout-backup-verify.timer   /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now workout-backup-verify.timer
+sudo systemctl list-timers | grep workout-backup-verify
+```
+
+Inspecter la dernière sortie :
+
+```bash
+sudo journalctl -u workout-backup-verify.service -n 30
+systemctl show workout-backup-verify.service --property=ExecMainStatus
+```
+
+`ExecMainStatus=0` = backup valide. Tout autre code = action.
+
+### 7.5 Health stricte (Sprint 7)
+
+Deux endpoints complémentaires :
+
+| Endpoint              | Usage                                    |
+|-----------------------|------------------------------------------|
+| `GET /healthz`        | Sonde publique cheap (SELECT 1).         |
+| `GET /healthz/strict` | Signal opérateur: DB + backup_dir +      |
+|                       | présence / intégrité du dernier backup.  |
+
+```bash
+curl -sfL http://127.0.0.1:8000/healthz/strict | python -m json.tool
+```
+
+Codes de retour :
+
+- `200` + `"status": "ok"` — DB en vie, et (soit aucun backup
+  détecté = déploiement frais, soit un backup présent et
+  valide).
+- `503` + `"status": "degraded"` — DB en panne OU un backup
+  est présent mais corrompu. Le JSON de réponse détaille quel
+  check a échoué et liste les erreurs.
+
+Payload (champs stables pour un script de monitoring) :
+
+```json
+{
+  "status": "ok" | "degraded",
+  "checked_at": "2026-04-08T04:03:12+00:00",
+  "db":        { "ok": true, "detail": "select 1 ok" },
+  "backup_dir":{ "exists": true, "path": "/srv/workout/var/backups" },
+  "backup": {
+    "present": true,
+    "valid":   true,
+    "file":    "sessions-20260408_0330.json",
+    "age_seconds":        8400.0,
+    "schema_version":     1,
+    "exported_count":     12,
+    "live_session_count": 12,
+    "errors": []
+  }
+}
+```
+
+Les deux endpoints restent publics (pas derrière basic_auth)
+pour rester consommables par les sondes externes. L'opérateur
+peut les passer sous auth s'il préfère — rien dans les payloads
+n'expose de secrets ni de données de séance.
 
 ## 8. Restauration
 

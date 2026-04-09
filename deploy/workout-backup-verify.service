@@ -1,0 +1,21 @@
+[Unit]
+Description=Workout journal nightly backup integrity check
+# Runs after the backup has had time to complete (03:30 + ~120s jitter).
+After=network-online.target
+# Best effort: fail-fast email / alert wiring is out of scope in V1.
+# The exit code (0 = OK, 1 = FAIL) is what the operator greps.
+
+[Service]
+Type=oneshot
+User=workout
+Group=workout
+WorkingDirectory=/srv/workout
+EnvironmentFile=/srv/workout/.env
+ExecStart=/srv/workout/.venv/bin/python -m scripts.verify_backup
+
+# Hardening matches the workout.service defaults.
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/srv/workout/var
+ProtectHome=true
+PrivateTmp=true

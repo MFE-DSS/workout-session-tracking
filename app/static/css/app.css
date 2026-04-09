@@ -1046,6 +1046,37 @@ a { color: inherit; text-decoration: none; }
   font-size: 13px;
   line-height: 1.5;
 }
+.integrity-ok {
+  color: var(--ok);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+.integrity-fail {
+  color: var(--accent);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+.integrity-errors {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  border-left: 3px solid var(--accent);
+  color: var(--fg);
+  font-size: 12px;
+}
+.integrity-errors b {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11px;
+}
+.integrity-errors ul {
+  margin: 0;
+  padding-left: 18px;
+}
 
 /* ---------- Footer ---------- */
 .foot {

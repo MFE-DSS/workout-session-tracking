@@ -47,3 +47,30 @@ def format_duration_short(delta: timedelta) -> str:
     if hours == 0:
         return f"{minutes} min"
     return f"{hours} h {minutes:02d}"
+
+
+def relative_hours_ago(now: datetime, then: datetime) -> str:
+    """Compact 'how long ago' label down to the minute.
+
+    Used by /export and /healthz/strict to surface backup file age
+    in plain French. Sub-minute deltas show as "à l'instant", to
+    avoid noisy sub-second strings on freshly-written files.
+    """
+    if then.tzinfo is None and now.tzinfo is not None:
+        then = then.replace(tzinfo=now.tzinfo)
+    elif now.tzinfo is None and then.tzinfo is not None:
+        now = now.replace(tzinfo=then.tzinfo)
+
+    delta_sec = max((now - then).total_seconds(), 0.0)
+    if delta_sec < 60:
+        return "à l'instant"
+    if delta_sec < 3600:
+        return f"il y a {int(delta_sec // 60)} min"
+    if delta_sec < 86400:
+        return f"il y a {int(delta_sec // 3600)} h"
+    days = int(delta_sec // 86400)
+    if days == 1:
+        return "hier"
+    if days < 30:
+        return f"il y a {days} j"
+    return f"il y a {days // 30} mois"
