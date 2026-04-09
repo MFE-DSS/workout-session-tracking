@@ -15,7 +15,7 @@ from fastapi.staticfiles import StaticFiles
 from app.config import BASE_DIR, get_settings
 from app.database import SessionLocal, init_db
 from app.deps import _redirect_to_login
-from app.routers import admin, auth_routes, export, health, pages, sessions
+from app.routers import admin, auth_routes, export, health, leaderboard, pages, sessions
 from app.services.seed import seed_method_rules, seed_reference_split
 
 
@@ -55,6 +55,7 @@ def create_app() -> FastAPI:
     app.include_router(sessions.router)
     app.include_router(export.router)
     app.include_router(admin.router)
+    app.include_router(leaderboard.router)
 
     return app
 

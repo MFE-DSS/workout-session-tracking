@@ -207,6 +207,36 @@ the SSR UI only emits whitelisted values; invalid POSTs can only
 come from direct curl/debug use and do not need a user-visible
 error.
 
+## Leaderboard (Sprint LEADERBOARD_01)
+
+A private, authenticated leaderboard that ranks all active users
+by their cumulative workout performance.
+
+**Visibility**: authenticated users only. The leaderboard shows
+aggregated user-level data (username, total points, session
+count, average). No private session details are exposed.
+
+**Score rule per eligible session**:
+
+  `session_points = session_quality_score × (completed_work_sets / total_work_sets)`
+
+This rewards both quality AND completion. A 100-quality session
+with only 50% of work sets done earns 50 points, not 100.
+
+**Eligible sessions**: status == "completed", excluded_from_stats
+== False, total_work_sets > 0.
+
+**Per user**: `total_points = sum(session_points)`,
+`counted_sessions = count(eligible)`,
+`avg_points = total_points / counted_sessions`.
+
+**Ordering**: total_points DESC, then username ASC for ties
+(deterministic alphabetical tiebreaker).
+
+**Privacy**: the leaderboard page shows only usernames and
+aggregated scores. No session IDs, no template names, no exercise
+data of other users are ever rendered on the leaderboard page.
+
 ## Session quality score (Sprint 8)
 
 A deterministic integer score on /100, computed from four

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Leaderboard</h1>
+<p class="lede">
+  Classement basé sur la qualité et la complétion des séances terminées.
+</p>
+
+{% if entries|length == 0 %}
+  <p class="empty">
+    Aucune séance terminée pour l'instant. Le classement apparaît
+    quand des séances sont loggées.
+  </p>
+{% else %}
+  <ol class="leaderboard">
+    {% for e in entries %}
+      <li class="lb-row {% if e.username == current_username %}lb-row--self{% endif %}">
+        <span class="lb-row__rank">#{{ e.rank }}</span>
+        <span class="lb-row__name">{{ e.username }}</span>
+        <span class="lb-row__points">{{ e.total_points }} pts</span>
+        <span class="lb-row__meta">
+          {{ e.counted_sessions }} séance{% if e.counted_sessions > 1 %}s{% endif %}
+          {% if e.avg_points is not none %}· moy. {{ e.avg_points }}{% endif %}
+        </span>
+      </li>
+    {% endfor %}
+  </ol>
+{% endif %}
+
+<p class="kpi-note">
+  Score par séance = qualité × taux de complétion des work sets.
+  Seules les séances terminées et non exclues comptent.
+  Les données privées des autres utilisateurs ne sont jamais exposées.
+</p>
+{% endblock %}
