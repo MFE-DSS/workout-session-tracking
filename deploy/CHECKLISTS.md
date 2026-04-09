@@ -243,3 +243,106 @@ BEFORE enabling `workout.service`. Run the drift check and
 
 Open `sessions-YYYYMMDD_HHMM.csv` in Excel / Numbers / Pandas.
 This is a read-only view, not a restore.
+
+---
+
+## 5. Restore drill (periodic confidence check)
+
+This is NOT an emergency procedure — it's a periodic drill you
+run to prove your backups are actually restorable. Do it once
+after the first deploy, then once a month, or whenever the
+backup pipeline changes.
+
+### 5.1 Prep: create a throwaway DB
+
+```bash
+export DRILL_DB="/tmp/workout-drill-$(date +%s).db"
+export DATABASE_URL="sqlite:///${DRILL_DB}"
+export BACKUP_DIR=/srv/workout/var/backups
+
+# Apply the schema to the empty file
+cd /srv/workout
+.venv/bin/alembic upgrade head
+```
+**Expected:** `Running upgrade  -> <rev>, initial baseline`.
+The drill DB is now empty with the right schema.
+
+### 5.2 Restore the latest JSON backup
+
+```bash
+.venv/bin/python -m scripts.restore_latest_backup
+```
+**Expected:**
+- stdout starts with `restore: source file = sessions-YYYYMMDD_HHMM.json`
+- stdout ends with `restore: OK — restored N sessions, M exercises, P sets`
+- stdout has a `verify:` line showing the first session's
+  template name + started_at
+- exit code 0
+
+If it FAILS:
+- `restore: FAIL — no JSON backup found` → the backup cron
+  never ran. Fix `workout-backup.timer`.
+- `restore: FAIL — cannot read JSON` → the file is corrupt.
+  Run `python -m scripts.verify_backup` for the full diagnosis.
+- `restore: FAIL — schema_version is X, expected 1` → the
+  backup was produced by a different code version. Compare the
+  git history of `app/services/export_builder.py`.
+- `restore: FAIL — target DB is not empty` → you're pointing
+  at the live DB instead of the drill DB. Double-check
+  `$DATABASE_URL`.
+
+### 5.3 Verify restored data
+
+```bash
+.venv/bin/python -m scripts.verify_backup
+```
+**Expected:** `[OK ]` with matching exported count and live count.
+
+```bash
+.venv/bin/python -c "
+from app.database import SessionLocal
+from sqlalchemy import select, func
+from app.models.session import WorkoutSession
+with SessionLocal() as db:
+    n = db.execute(select(func.count(WorkoutSession.id))).scalar_one()
+    print(f'{n} sessions in drill DB')
+"
+```
+**Expected:** the same count that `restore_latest_backup` printed.
+
+### 5.4 Spot-check one session
+
+```bash
+.venv/bin/python -c "
+from app.database import SessionLocal
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+from app.models.session import WorkoutSession, SessionExercise
+with SessionLocal() as db:
+    s = db.execute(
+        select(WorkoutSession)
+        .options(selectinload(WorkoutSession.session_exercises).selectinload(SessionExercise.set_logs))
+        .limit(1)
+    ).scalar_one()
+    print(f'{s.template_name_snapshot} · started {s.started_at} · {len(s.session_exercises)} exercises')
+    for se in s.session_exercises[:3]:
+        work = [sl for sl in se.set_logs if sl.kind == \"work\" and sl.completed]
+        print(f'  {se.exercise_code_snapshot} {se.exercise_name_snapshot}: {len(work)} work sets done')
+"
+```
+**Expected:** readable output with real template names, exercise
+codes, and set counts. If the output is empty or garbled, the
+backup is structurally broken.
+
+### 5.5 Cleanup
+
+```bash
+rm -f "${DRILL_DB}"
+unset DRILL_DB DATABASE_URL BACKUP_DIR
+```
+
+### 5.6 Done
+
+If 5.2 + 5.3 + 5.4 all show sensible data: **the backup is
+proven restorable**. Log the date somewhere. Next drill in 30
+days.
