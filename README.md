@@ -21,6 +21,7 @@ prêt pour analytics.
 - [`docs/SPRINT_06_REPORT.md`](docs/SPRINT_06_REPORT.md) — Sprint 6 report
 - [`docs/SPRINT_07_REPORT.md`](docs/SPRINT_07_REPORT.md) — Sprint 7 report
 - [`deploy/README.md`](deploy/README.md) — OVH deployment + backup + restore guide
+- [`deploy/DEPLOY_OVH.md`](deploy/DEPLOY_OVH.md) — step-by-step first deploy on OVH VPS
 - [`deploy/CHECKLISTS.md`](deploy/CHECKLISTS.md) — tickable first-deploy / update / verify / restore checklists
 
 ## Règles produit (non négociables)
