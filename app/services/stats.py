@@ -135,6 +135,7 @@ def last_time_by_exercise_code(
         .where(
             WorkoutSession.id != current_session.id,
             WorkoutSession.template_slug_snapshot == current_session.template_slug_snapshot,
+            WorkoutSession.user_id == current_session.user_id,
         )
         .options(
             selectinload(SessionExercise.set_logs),

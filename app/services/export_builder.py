@@ -76,9 +76,10 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
     }
 
 
-def _all_sessions(db: Session) -> list[WorkoutSession]:
+def _all_sessions(db: Session, *, user_id: int | None = None) -> list[WorkoutSession]:
     stmt = (
         select(WorkoutSession)
+        .where(WorkoutSession.user_id == user_id if user_id is not None else True)
         .order_by(WorkoutSession.started_at.asc())
         .options(
             selectinload(WorkoutSession.session_exercises)
@@ -88,14 +89,14 @@ def _all_sessions(db: Session) -> list[WorkoutSession]:
     return list(db.execute(stmt).scalars().all())
 
 
-def build_json_payload(db: Session) -> dict[str, Any]:
+def build_json_payload(db: Session, *, user_id: int | None = None) -> dict[str, Any]:
     """Build the full JSON export as a Python dict.
 
     The HTTP route hands this dict to `JSONResponse`. The backup
     script writes it to disk via `json.dump`. Identical bytes for
     a given DB state.
     """
-    sessions = _all_sessions(db)
+    sessions = _all_sessions(db, user_id=user_id)
     return {
         "schema_version": SCHEMA_VERSION,
         "exported_at": datetime.now(timezone.utc).isoformat(),
@@ -146,9 +147,9 @@ def _opt(value: Any) -> str:
     return str(value)
 
 
-def build_csv_text(db: Session) -> str:
+def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
     """Build the full CSV export as a single text blob."""
-    sessions = _all_sessions(db)
+    sessions = _all_sessions(db, user_id=user_id)
     buf = StringIO()
     writer = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
     writer.writerow(CSV_HEADERS)

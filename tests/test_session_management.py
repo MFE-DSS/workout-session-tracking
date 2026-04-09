@@ -1,5 +1,6 @@
 """Sprint 8: session management, quality score, timelines."""
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 import re
 from datetime import datetime, timedelta, timezone
@@ -58,7 +59,7 @@ def test_quality_score_perfect_session(client):
     from app.models.session import WorkoutSession, SessionExercise, SetLog
 
     s = WorkoutSession(
-        template_slug_snapshot="x", template_name_snapshot="X",
+        template_slug_snapshot="x", template_name_snapshot="X", user_id=get_test_user_id(),
         started_at=datetime.now(timezone.utc), status="completed",
         concentration="high", global_state="good",
     )
@@ -80,7 +81,7 @@ def test_quality_score_zero_when_nothing_filled(client):
     from app.models.session import WorkoutSession
 
     s = WorkoutSession(
-        template_slug_snapshot="x", template_name_snapshot="X",
+        template_slug_snapshot="x", template_name_snapshot="X", user_id=get_test_user_id(),
         started_at=datetime.now(timezone.utc), status="completed",
     )
     s.session_exercises = []
@@ -93,7 +94,7 @@ def test_quality_score_partial(client):
     from app.models.session import WorkoutSession, SessionExercise, SetLog
 
     s = WorkoutSession(
-        template_slug_snapshot="x", template_name_snapshot="X",
+        template_slug_snapshot="x", template_name_snapshot="X", user_id=get_test_user_id(),
         started_at=datetime.now(timezone.utc), status="completed",
         concentration="medium", global_state="flat",
     )

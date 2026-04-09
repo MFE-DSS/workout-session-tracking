@@ -1,5 +1,6 @@
 """Tests for the JSON export endpoint."""
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 import json
 import re
@@ -113,7 +114,7 @@ def test_export_is_sorted_oldest_first(client):
             db.add(
                 WorkoutSession(
                     template_slug_snapshot="push-a",
-                    template_name_snapshot=name,
+                    template_name_snapshot=name, user_id=get_test_user_id(),
                     started_at=datetime.now(timezone.utc) - timedelta(days=days_ago),
                     status="completed",
                 )

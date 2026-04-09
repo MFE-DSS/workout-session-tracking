@@ -8,6 +8,7 @@ Validates that:
   rewrite.
 """
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 from datetime import datetime, timezone
 
@@ -39,7 +40,7 @@ def test_can_log_a_session_with_normalized_feedback(client):
         session = WorkoutSession(
             template_id=tpl.id,
             template_slug_snapshot=tpl.slug,
-            template_name_snapshot=tpl.name,
+            template_name_snapshot=tpl.name, user_id=get_test_user_id(),
             started_at=datetime(2026, 1, 5, 18, 30, tzinfo=timezone.utc),
             concentration=SessionConcentration.HIGH,
             global_state=SessionGlobalState.GOOD,
@@ -112,7 +113,7 @@ def test_catalog_rewrite_does_not_orphan_history(client):
         session = WorkoutSession(
             template_id=tpl.id,
             template_slug_snapshot=tpl.slug,
-            template_name_snapshot=tpl.name,
+            template_name_snapshot=tpl.name, user_id=get_test_user_id(),
             started_at=datetime(2026, 2, 14, 9, 0, tzinfo=tz.utc),
         )
         db.add(session)

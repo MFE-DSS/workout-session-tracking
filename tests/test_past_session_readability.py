@@ -1,5 +1,6 @@
 """Sprint 3 readability improvements on past sessions + /progress."""
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 import re
 
@@ -86,7 +87,7 @@ def test_progress_exercise_activity_shows_completed_exercises(client):
     with SessionLocal() as db:
         s = WorkoutSession(
             template_slug_snapshot="push-a",
-            template_name_snapshot="Push A",
+            template_name_snapshot="Push A", user_id=get_test_user_id(),
             started_at=datetime.now(timezone.utc) - timedelta(days=2),
             status="completed",
         )
@@ -123,7 +124,7 @@ def test_progress_exercise_activity_ignores_in_progress_sessions(client):
     with SessionLocal() as db:
         s = WorkoutSession(
             template_slug_snapshot="legs",
-            template_name_snapshot="Legs",
+            template_name_snapshot="Legs", user_id=get_test_user_id(),
             started_at=datetime.now(timezone.utc),
             status="in_progress",  # should NOT surface
         )

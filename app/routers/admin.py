@@ -16,6 +16,7 @@ from app.database import get_db
 from app.deps import require_user
 from app.models.user import User
 from app.models.session import SessionExercise, WorkoutSession
+from app.services.ownership import get_owned_session_or_404
 from app.services.quality_score import compute_session_quality
 from app.services.session_state import latest_open_session
 from app.services.time_format import format_duration_short, session_duration
@@ -28,6 +29,7 @@ router = APIRouter(tags=["admin"])
 def admin_sessions(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     stmt = (
         select(WorkoutSession)
+        .where(WorkoutSession.user_id == user.id)
         .order_by(WorkoutSession.started_at.desc())
         .options(
             selectinload(WorkoutSession.session_exercises)
@@ -59,16 +61,14 @@ def admin_sessions(request: Request, db: Session = Depends(get_db), user: User =
         {
             "page_title": "Gestion des séances",
             "rows": rows,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )
 
 
 @router.post("/admin/sessions/{session_id}/delete")
 def delete_session(session_id: int, db: Session = Depends(get_db), user: User = Depends(require_user)) -> RedirectResponse:
-    session = db.get(WorkoutSession, session_id)
-    if session is None:
-        raise HTTPException(status_code=404)
+    session = get_owned_session_or_404(db, session_id, user.id)
     db.delete(session)
     db.commit()
     return RedirectResponse(url="/admin/sessions", status_code=303)
@@ -76,9 +76,7 @@ def delete_session(session_id: int, db: Session = Depends(get_db), user: User = 
 
 @router.post("/admin/sessions/{session_id}/exclude")
 def toggle_exclude(session_id: int, db: Session = Depends(get_db), user: User = Depends(require_user)) -> RedirectResponse:
-    session = db.get(WorkoutSession, session_id)
-    if session is None:
-        raise HTTPException(status_code=404)
+    session = get_owned_session_or_404(db, session_id, user.id)
     session.excluded_from_stats = not session.excluded_from_stats
     db.commit()
     return RedirectResponse(url="/admin/sessions", status_code=303)

@@ -49,7 +49,7 @@ def _load_templates(db: Session) -> list[WorkoutTemplate]:
 def home(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     # Home shows its own Reprendre tile — the header banner would
     # be redundant here, so we intentionally do NOT pass active_session.
-    open_session = latest_open_session(db)
+    open_session = latest_open_session(db, user.id)
     open_since: str | None = None
     if open_session is not None:
         open_since = format_duration_short(
@@ -75,7 +75,7 @@ def library(request: Request, db: Session = Depends(get_db), user: User = Depend
         {
             "page_title": "Bibliothèque",
             "templates": all_templates,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )
 
@@ -102,7 +102,7 @@ def template_detail(
         {
             "page_title": tpl.name,
             "template": tpl,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )
 
@@ -121,6 +121,7 @@ def history(
 
     stmt = (
         select(WorkoutSession)
+        .where(WorkoutSession.user_id == user.id)
         .order_by(WorkoutSession.started_at.desc())
         .limit(100)
     )
@@ -180,21 +181,22 @@ def history(
             "durations": durations,
             "status_filter": status,
             "status_choices": _HISTORY_STATUS_CHOICES,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )
 
 
 @router.get("/progress", response_class=HTMLResponse)
 def progress(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
-    global_kpis = compute_global_kpis(db)
-    template_kpis = compute_template_kpis(db)
-    recent_activity = compute_recent_exercise_activity(db, limit=10)
+    global_kpis = compute_global_kpis(db, user_id=user.id)
+    template_kpis = compute_template_kpis(db, user_id=user.id)
+    recent_activity = compute_recent_exercise_activity(db, limit=10, user_id=user.id)
 
     # Sprint 8: build quality + bodyweight timeline SVGs from
     # completed non-excluded sessions, oldest first.
     timeline_stmt = (
         select(WorkoutSession)
+        .where(WorkoutSession.user_id == user.id)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .order_by(WorkoutSession.started_at.asc())
@@ -234,6 +236,6 @@ def progress(request: Request, db: Session = Depends(get_db), user: User = Depen
             "recent_activity": recent_activity,
             "quality_svg": quality_svg,
             "bodyweight_svg": bodyweight_svg,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )

@@ -27,7 +27,7 @@ from app.config import get_settings
 from app.database import get_db
 from app.deps import require_user
 from app.models.user import User
-from app.models.session import SetLog, WorkoutSession
+from app.models.session import SessionExercise, SetLog, WorkoutSession
 from app.services.backup_inspector import latest_backup_info
 from app.services.backup_verifier import verify_latest_backup
 from app.services.export_builder import (
@@ -45,26 +45,30 @@ router = APIRouter(tags=["export"])
 @router.get("/export", response_class=HTMLResponse)
 def export_landing(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     """Small page summarising the journal + links to both formats."""
+    _uf = WorkoutSession.user_id == user.id
     total_sessions = db.execute(
-        select(func.count(WorkoutSession.id))
+        select(func.count(WorkoutSession.id)).where(_uf)
     ).scalar_one() or 0
     completed_sessions = db.execute(
-        select(func.count(WorkoutSession.id)).where(
+        select(func.count(WorkoutSession.id)).where(_uf).where(
             WorkoutSession.status == "completed"
         )
     ).scalar_one() or 0
     work_sets_done = db.execute(
         select(func.count(SetLog.id))
+        .join(SessionExercise, SessionExercise.id == SetLog.session_exercise_id)
+        .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(_uf)
         .where(SetLog.kind == "work")
         .where(SetLog.completed.is_(True))
     ).scalar_one() or 0
     first_started = db.execute(
-        select(WorkoutSession.started_at)
+        select(WorkoutSession.started_at).where(_uf)
         .order_by(WorkoutSession.started_at.asc())
         .limit(1)
     ).scalar_one_or_none()
     last_started = db.execute(
-        select(WorkoutSession.started_at)
+        select(WorkoutSession.started_at).where(_uf)
         .order_by(WorkoutSession.started_at.desc())
         .limit(1)
     ).scalar_one_or_none()
@@ -97,14 +101,14 @@ def export_landing(request: Request, db: Session = Depends(get_db), user: User =
             "backup_dir": settings.backup_dir,
             "backup_age_label": backup_age_label,
             "verification": verification,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )
 
 
 @router.get("/export/sessions.json")
 def export_sessions_json(db: Session = Depends(get_db), user: User = Depends(require_user)) -> JSONResponse:
-    payload = build_json_payload(db)
+    payload = build_json_payload(db, user_id=user.id)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
     filename = f"workout-export-{stamp}.json"
     return JSONResponse(
@@ -118,7 +122,7 @@ def export_sessions_json(db: Session = Depends(get_db), user: User = Depends(req
 
 @router.get("/export/sessions.csv")
 def export_sessions_csv(db: Session = Depends(get_db), user: User = Depends(require_user)) -> Response:
-    body = build_csv_text(db)
+    body = build_csv_text(db, user_id=user.id)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
     filename = f"workout-export-{stamp}.csv"
     return Response(

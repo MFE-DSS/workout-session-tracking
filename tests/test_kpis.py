@@ -1,5 +1,6 @@
 """Tests for the progress KPI aggregation rules."""
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 from datetime import datetime, timedelta, timezone
 
@@ -22,7 +23,7 @@ def _mk_session(
     with SessionLocal() as db:
         s = WorkoutSession(
             template_slug_snapshot=template_slug,
-            template_name_snapshot=template_name,
+            template_name_snapshot=template_name, user_id=get_test_user_id(),
             started_at=started_at or datetime.now(timezone.utc),
             status=status,
         )

@@ -33,6 +33,8 @@ def instantiate_session(
     template: WorkoutTemplate,
     started_at: datetime,
     warmup_sets: int = DEFAULT_WARMUP_SETS,
+    *,
+    user_id: int | None = None,
 ) -> WorkoutSession:
     """Build (but do not commit) a WorkoutSession pre-seeded with
     warmup + work rows for every exercise of the template.
@@ -51,6 +53,7 @@ def instantiate_session(
         template_name_snapshot=template.name,
         started_at=started_at,
         status=SessionStatus.IN_PROGRESS,
+        user_id=user_id,
     )
 
     for te in template.exercises:

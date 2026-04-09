@@ -39,6 +39,7 @@ from app.models.session import SessionExercise, WorkoutSession
 from app.models.user import User
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
+from app.services.ownership import get_owned_session_or_404
 from app.services.form_parsing import (
     checkbox,
     clean_str,
@@ -90,7 +91,7 @@ def create_session(
     if tpl is None:
         raise HTTPException(status_code=404, detail="Unknown template")
 
-    session = instantiate_session(db, tpl, datetime.now(timezone.utc))
+    session = instantiate_session(db, tpl, datetime.now(timezone.utc), user_id=user.id)
     db.commit()
     db.refresh(session)
     return RedirectResponse(
@@ -103,10 +104,10 @@ def create_session(
 # ----------------------------------------------------------------------
 
 
-def _load_session(db: Session, session_id: int) -> WorkoutSession | None:
+def _load_session(db: Session, session_id: int, user_id: int) -> WorkoutSession | None:
     stmt = (
         select(WorkoutSession)
-        .where(WorkoutSession.id == session_id)
+        .where(WorkoutSession.id == session_id, WorkoutSession.user_id == user_id)
         .options(
             selectinload(WorkoutSession.session_exercises)
             .selectinload(SessionExercise.set_logs),
@@ -148,7 +149,7 @@ WEEKDAY_LABELS = {
 def session_detail(
     session_id: int, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
 ) -> HTMLResponse:
-    session = _load_session(db, session_id)
+    session = _load_session(db, session_id, user.id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
@@ -243,9 +244,7 @@ def session_detail(
 async def update_session(
     session_id: int, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
 ) -> RedirectResponse:
-    session = db.get(WorkoutSession, session_id)
-    if session is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+    session = get_owned_session_or_404(db, session_id, user.id)
 
     form = await request.form()
 
@@ -279,6 +278,8 @@ async def update_exercise_card(
     request: Request,
     db: Session = Depends(get_db), user: User = Depends(require_user),
 ) -> RedirectResponse:
+    # Verify the parent session belongs to this user first.
+    get_owned_session_or_404(db, session_id, user.id)
     stmt = (
         select(SessionExercise)
         .where(
@@ -348,7 +349,7 @@ def rules_page(request: Request, db: Session = Depends(get_db), user: User = Dep
         {
             "page_title": "Règles",
             "rules": rules,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )
 
@@ -368,7 +369,7 @@ def exercise_history_detail(
     request: Request,
     db: Session = Depends(get_db), user: User = Depends(require_user),
 ) -> HTMLResponse:
-    entries = get_exercise_history(db, template_slug, exercise_code)
+    entries = get_exercise_history(db, template_slug, exercise_code, user_id=user.id)
 
     # Use the exercise_name snapshot of the most recent entry so the
     # header reads naturally. Fall back to the raw slug/code if the
@@ -402,6 +403,6 @@ def exercise_history_detail(
             "display_template_name": display_template_name or template_slug,
             "display_exercise_name": display_exercise_name or exercise_code,
             "entries": entries,
-            "active_session": latest_open_session(db),
+            "active_session": latest_open_session(db, user.id),
         },
     )

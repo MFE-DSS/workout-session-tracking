@@ -5,6 +5,7 @@ exercise the pure function and verify the hint surfaces on the
 session detail page at the right moment.
 """
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 import re
 from datetime import datetime, timedelta, timezone
@@ -77,7 +78,7 @@ def _seed_prior_push_a_e2(
     with SessionLocal() as db:
         s = WorkoutSession(
             template_slug_snapshot="push-a",
-            template_name_snapshot="Push A",
+            template_name_snapshot="Push A", user_id=get_test_user_id(),
             started_at=datetime.now(timezone.utc) - timedelta(days=3),
             status="completed",
         )

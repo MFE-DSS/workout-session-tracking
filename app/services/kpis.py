@@ -49,60 +49,60 @@ def _start_of_iso_week(now: datetime) -> datetime:
 
 
 def compute_global_kpis(
-    db: Session, now: Optional[datetime] = None
+    db: Session, now: Optional[datetime] = None, *, user_id: int | None = None
 ) -> GlobalKPIs:
     now = now or datetime.now(timezone.utc)
+    _uf = (WorkoutSession.user_id == user_id) if user_id is not None else True
     week_start = _start_of_iso_week(now)
     window_start = now - timedelta(days=30)
 
     total_sessions = db.execute(
-        select(func.count(WorkoutSession.id))
+        select(func.count(WorkoutSession.id)).where(_uf)
     ).scalar_one() or 0
 
     completed_total = db.execute(
-        select(func.count(WorkoutSession.id)).where(
-            WorkoutSession.status == "completed")
-        .where(WorkoutSession.excluded_from_stats.is_(False)
-        )
+        select(func.count(WorkoutSession.id))
+        .where(_uf)
+        .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
     sessions_this_week = db.execute(
         select(func.count(WorkoutSession.id)).where(
-            WorkoutSession.started_at >= week_start
+            WorkoutSession.started_at >= week_start).where(_uf
         )
     ).scalar_one() or 0
 
     sessions_last_30 = db.execute(
         select(func.count(WorkoutSession.id)).where(
-            WorkoutSession.started_at >= window_start
+            WorkoutSession.started_at >= window_start).where(_uf
         )
     ).scalar_one() or 0
 
     completed_last_30 = db.execute(
         select(func.count(WorkoutSession.id))
+        .where(_uf)
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
-    # Average success score: 30d window, completed sessions only,
-    # NULL success_scores excluded by the WHERE clause.
     avg_success_score = db.execute(
         select(func.avg(SessionExercise.success_score))
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(_uf)
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(SessionExercise.success_score.is_not(None))
     ).scalar()
 
-    # Work set completion rate: 30d window, completed sessions only,
-    # warmups never counted.
     work_sets_total = db.execute(
         select(func.count(SetLog.id))
         .join(SessionExercise, SessionExercise.id == SetLog.session_exercise_id)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
         .where(SetLog.kind == "work")
+        .where(_uf)
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
@@ -114,6 +114,7 @@ def compute_global_kpis(
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
         .where(SetLog.kind == "work")
         .where(SetLog.completed.is_(True))
+        .where(_uf)
         .where(WorkoutSession.started_at >= window_start)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
@@ -172,6 +173,7 @@ def compute_recent_exercise_activity(
     *,
     limit: int = 10,
     now: Optional[datetime] = None,
+    user_id: int | None = None,
 ) -> list[RecentExerciseActivity]:
     """Last N exercise codes (across all templates) with completed
     work sets in the trailing 30 days, most recent first.
@@ -190,13 +192,13 @@ def compute_recent_exercise_activity(
     from app.models.session import SessionExercise, SetLog
 
     now = now or datetime.now(timezone.utc)
+    _uf = (WorkoutSession.user_id == user_id) if user_id is not None else True
     window_start = now - timedelta(days=30)
 
-    # Fetch all SessionExercise rows of completed sessions in the
-    # window, eager-load their parent session and their set_logs.
     stmt = (
         select(SessionExercise)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(_uf)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(WorkoutSession.started_at >= window_start)
@@ -275,7 +277,7 @@ def compute_recent_exercise_activity(
     return out[:limit]
 
 
-def compute_template_kpis(db: Session) -> list[TemplateKPI]:
+def compute_template_kpis(db: Session, *, user_id: int | None = None) -> list[TemplateKPI]:
     """Per-template summary: number of completed sessions, when the
     last one happened, and the average success score across all its
     logged exercises. Keyed on `template_slug_snapshot` so reseeded
@@ -292,6 +294,7 @@ def compute_template_kpis(db: Session) -> list[TemplateKPI]:
         .outerjoin(
             SessionExercise, SessionExercise.session_id == WorkoutSession.id
         )
+        .where(WorkoutSession.user_id == user_id if user_id is not None else True)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .group_by(

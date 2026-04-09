@@ -1,6 +1,7 @@
 """Sprint 4 integration tests for the exercise history detail page
 and the delta surface on session detail."""
 from __future__ import annotations
+from tests.helpers import get_test_user_id
 
 import re
 from datetime import datetime, timedelta, timezone
@@ -30,7 +31,7 @@ def _manual_session(
         s = WorkoutSession(
             template_id=None,
             template_slug_snapshot=template_slug,
-            template_name_snapshot=template_name,
+            template_name_snapshot=template_name, user_id=get_test_user_id(),
             started_at=started_at or datetime.now(timezone.utc),
             status=status,
         )

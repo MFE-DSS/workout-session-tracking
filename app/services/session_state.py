@@ -20,11 +20,17 @@ from app.enums import SessionStatus
 from app.models.session import WorkoutSession
 
 
-def latest_open_session(db: Session) -> Optional[WorkoutSession]:
-    """Return the most recently-started `in_progress` session, or None."""
-    return db.execute(
+def latest_open_session(db: Session, user_id: int | None = None) -> Optional[WorkoutSession]:
+    """Return the most recently-started `in_progress` session, or None.
+
+    When `user_id` is given (V2), scope to that user. When None (V1
+    backward compat / scripts), return the global latest."""
+    stmt = (
         select(WorkoutSession)
         .where(WorkoutSession.status == SessionStatus.IN_PROGRESS)
         .order_by(WorkoutSession.started_at.desc())
         .limit(1)
-    ).scalar_one_or_none()
+    )
+    if user_id is not None:
+        stmt = stmt.where(WorkoutSession.user_id == user_id)
+    return db.execute(stmt).scalar_one_or_none()

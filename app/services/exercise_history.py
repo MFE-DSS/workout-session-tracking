@@ -87,6 +87,8 @@ def get_exercise_history(
     db: Session,
     template_slug: str,
     exercise_code: str,
+    *,
+    user_id: int | None = None,
 ) -> list[ExerciseHistoryEntry]:
     """Return the history entries (newest first) for a given
     exercise identity, with deltas precomputed row-by-row."""
@@ -96,6 +98,7 @@ def get_exercise_history(
         .where(
             WorkoutSession.template_slug_snapshot == template_slug,
             SessionExercise.exercise_code_snapshot == exercise_code,
+            WorkoutSession.user_id == user_id if user_id is not None else True,
         )
         .options(
             selectinload(SessionExercise.set_logs),
