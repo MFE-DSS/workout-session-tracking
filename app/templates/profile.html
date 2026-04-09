@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="h1">Profil</h1>
+
+<div class="card">
+  <ul class="export-stats">
+    <li>
+      <span>Utilisateur</span>
+      <b>{{ user.username }}</b>
+    </li>
+    <li>
+      <span>Inscrit le</span>
+      <b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b>
+    </li>
+    <li>
+      <span>Statut</span>
+      <b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b>
+    </li>
+    <li>
+      <span>Sessions totales</span>
+      <b>{{ session_count }}</b>
+    </li>
+    <li>
+      <span>Sessions terminées</span>
+      <b>{{ completed_count }}</b>
+    </li>
+  </ul>
+</div>
+
+<div class="card__actions" style="margin-top: 16px;">
+  <a class="btn btn--primary" href="{{ url_for('password_change_page') }}">
+    Changer le mot de passe
+  </a>
+</div>
+{% endblock %}
