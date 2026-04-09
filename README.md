@@ -20,6 +20,7 @@ prêt pour analytics.
 - [`docs/SPRINT_05_REPORT.md`](docs/SPRINT_05_REPORT.md) — Sprint 5 report
 - [`docs/SPRINT_06_REPORT.md`](docs/SPRINT_06_REPORT.md) — Sprint 6 report
 - [`docs/SPRINT_07_REPORT.md`](docs/SPRINT_07_REPORT.md) — Sprint 7 report
+- [`docs/V1_ACCEPTANCE_CHECKLIST.md`](docs/V1_ACCEPTANCE_CHECKLIST.md) — checklist finale V1
 - [`deploy/README.md`](deploy/README.md) — OVH deployment + backup + restore guide
 - [`deploy/DEPLOY_OVH.md`](deploy/DEPLOY_OVH.md) — step-by-step first deploy on OVH VPS
 - [`deploy/CHECKLISTS.md`](deploy/CHECKLISTS.md) — tickable first-deploy / update / verify / restore checklists
@@ -43,16 +44,44 @@ python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
-python -m scripts.seed_db
-uvicorn app.main:app --reload
-# → http://localhost:8000
+alembic upgrade head                    # schema
+uvicorn app.main:app --reload           # http://localhost:8000
 ```
+
+### VSCode
+
+Ouvrir le repo dans VSCode. Le fichier `.vscode/launch.json`
+fournit 4 configurations :
+
+| Nom              | Ce que ça fait                              |
+|------------------|---------------------------------------------|
+| **Run app**      | `uvicorn --reload` sur 127.0.0.1:8000       |
+| **Run app (LAN)**| `uvicorn --reload` sur 0.0.0.0:8000 (phone) |
+| **Debug app**    | Uvicorn sous le debugger VSCode (breakpoints)|
+| **Run tests**    | `pytest -q`                                 |
+
+Sélectionner l'interpréteur `.venv/bin/python` :
+`Ctrl+Shift+P` → "Python: Select Interpreter" → `.venv`.
+
+### Tester depuis le téléphone (même Wi-Fi)
+
+```bash
+# IP locale de la machine
+ip addr show | grep 'inet ' | grep -v 127.0.0.1
+
+# Lancer sur toutes les interfaces
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Ouvrir `http://<IP_LOCALE>:8000` sur le téléphone.
+
+> `0.0.0.0` expose l'app sur le réseau local. Acceptable en
+> Wi-Fi domestique. Revenir à `127.0.0.1` après le test.
 
 ## Tests
 
 ```bash
-pip install pytest httpx
-pytest -q                # 12 passed
+pytest -q                                # 176+ passed
 ```
 
 ## Structure
