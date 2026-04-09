@@ -48,6 +48,12 @@ class WorkoutSession(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    # Owner. Nullable for backward compat with V1 single-user sessions.
+    # V2 routes enforce that every new session has a user_id.
+    user_id: Mapped[Optional[int]] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+
     # FK to the catalog. Nullable + SET NULL so the catalog can be
     # rewritten without orphaning history.
     template_id: Mapped[Optional[int]] = mapped_column(

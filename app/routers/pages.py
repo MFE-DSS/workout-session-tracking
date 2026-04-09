@@ -10,8 +10,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
+from app.deps import require_user
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
+from app.models.user import User
 from app.services.kpis import (
     compute_global_kpis,
     compute_recent_exercise_activity,
@@ -44,7 +46,7 @@ def _load_templates(db: Session) -> list[WorkoutTemplate]:
 
 
 @router.get("/", response_class=HTMLResponse)
-def home(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def home(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     # Home shows its own Reprendre tile — the header banner would
     # be redundant here, so we intentionally do NOT pass active_session.
     open_session = latest_open_session(db)
@@ -65,7 +67,7 @@ def home(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
 
 
 @router.get("/library", response_class=HTMLResponse)
-def library(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def library(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     all_templates = _load_templates(db)
     return templates.TemplateResponse(
         request,
@@ -80,7 +82,7 @@ def library(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
 
 @router.get("/library/{slug}", response_class=HTMLResponse)
 def template_detail(
-    slug: str, request: Request, db: Session = Depends(get_db)
+    slug: str, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
 ) -> HTMLResponse:
     stmt = (
         select(WorkoutTemplate)
@@ -113,6 +115,7 @@ def history(
     request: Request,
     status: str = Query("all"),
     db: Session = Depends(get_db),
+    user: User = Depends(require_user),
 ) -> HTMLResponse:
     status = status if status in _HISTORY_STATUS_CHOICES else "all"
 
@@ -183,7 +186,7 @@ def history(
 
 
 @router.get("/progress", response_class=HTMLResponse)
-def progress(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def progress(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     global_kpis = compute_global_kpis(db)
     template_kpis = compute_template_kpis(db)
     recent_activity = compute_recent_exercise_activity(db, limit=10)

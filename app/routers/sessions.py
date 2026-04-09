@@ -24,6 +24,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
+from app.deps import require_user
 from app.enums import (
     ExerciseSuccessScore,
     MuscleSensation,
@@ -35,6 +36,7 @@ from app.enums import (
 )
 from app.models.catalog import MethodRule, TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, WorkoutSession
+from app.models.user import User
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
 from app.services.form_parsing import (
@@ -74,7 +76,7 @@ _SUCCESS_SCORE = {int(e) for e in ExerciseSuccessScore}
 @router.post("/sessions")
 def create_session(
     template_slug: str = Form(...),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db), user: User = Depends(require_user),
 ) -> RedirectResponse:
     tpl = db.execute(
         select(WorkoutTemplate)
@@ -144,7 +146,7 @@ WEEKDAY_LABELS = {
 
 @router.get("/sessions/{session_id}", response_class=HTMLResponse)
 def session_detail(
-    session_id: int, request: Request, db: Session = Depends(get_db)
+    session_id: int, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
 ) -> HTMLResponse:
     session = _load_session(db, session_id)
     if session is None:
@@ -239,7 +241,7 @@ def session_detail(
 
 @router.post("/sessions/{session_id}")
 async def update_session(
-    session_id: int, request: Request, db: Session = Depends(get_db)
+    session_id: int, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
 ) -> RedirectResponse:
     session = db.get(WorkoutSession, session_id)
     if session is None:
@@ -275,7 +277,7 @@ async def update_exercise_card(
     session_id: int,
     session_exercise_id: int,
     request: Request,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db), user: User = Depends(require_user),
 ) -> RedirectResponse:
     stmt = (
         select(SessionExercise)
@@ -336,7 +338,7 @@ async def update_exercise_card(
 
 
 @router.get("/rules", response_class=HTMLResponse)
-def rules_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def rules_page(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     rules = db.execute(
         select(MethodRule).order_by(MethodRule.position)
     ).scalars().all()
@@ -364,7 +366,7 @@ def exercise_history_detail(
     template_slug: str,
     exercise_code: str,
     request: Request,
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db), user: User = Depends(require_user),
 ) -> HTMLResponse:
     entries = get_exercise_history(db, template_slug, exercise_code)
 

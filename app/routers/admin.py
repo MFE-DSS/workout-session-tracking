@@ -13,6 +13,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.database import get_db
+from app.deps import require_user
+from app.models.user import User
 from app.models.session import SessionExercise, WorkoutSession
 from app.services.quality_score import compute_session_quality
 from app.services.session_state import latest_open_session
@@ -23,7 +25,7 @@ router = APIRouter(tags=["admin"])
 
 
 @router.get("/admin/sessions", response_class=HTMLResponse)
-def admin_sessions(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def admin_sessions(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     stmt = (
         select(WorkoutSession)
         .order_by(WorkoutSession.started_at.desc())
@@ -63,7 +65,7 @@ def admin_sessions(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
 
 
 @router.post("/admin/sessions/{session_id}/delete")
-def delete_session(session_id: int, db: Session = Depends(get_db)) -> RedirectResponse:
+def delete_session(session_id: int, db: Session = Depends(get_db), user: User = Depends(require_user)) -> RedirectResponse:
     session = db.get(WorkoutSession, session_id)
     if session is None:
         raise HTTPException(status_code=404)
@@ -73,7 +75,7 @@ def delete_session(session_id: int, db: Session = Depends(get_db)) -> RedirectRe
 
 
 @router.post("/admin/sessions/{session_id}/exclude")
-def toggle_exclude(session_id: int, db: Session = Depends(get_db)) -> RedirectResponse:
+def toggle_exclude(session_id: int, db: Session = Depends(get_db), user: User = Depends(require_user)) -> RedirectResponse:
     session = db.get(WorkoutSession, session_id)
     if session is None:
         raise HTTPException(status_code=404)

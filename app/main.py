@@ -9,11 +9,13 @@ from __future__ import annotations
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import BASE_DIR, get_settings
 from app.database import SessionLocal, init_db
-from app.routers import admin, export, health, pages, sessions
+from app.deps import _redirect_to_login
+from app.routers import admin, auth_routes, export, health, pages, sessions
 from app.services.seed import seed_method_rules, seed_reference_split
 
 
@@ -42,7 +44,13 @@ def create_app() -> FastAPI:
         name="static",
     )
 
+    # Global exception handler: redirect to /login when auth is missing.
+    @app.exception_handler(_redirect_to_login)
+    async def _handle_redirect_to_login(request, exc):
+        return RedirectResponse(url="/login", status_code=303)
+
     app.include_router(health.router)
+    app.include_router(auth_routes.router)
     app.include_router(pages.router)
     app.include_router(sessions.router)
     app.include_router(export.router)

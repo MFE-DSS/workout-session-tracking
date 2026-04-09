@@ -25,6 +25,8 @@ from sqlalchemy.orm import Session
 
 from app.config import get_settings
 from app.database import get_db
+from app.deps import require_user
+from app.models.user import User
 from app.models.session import SetLog, WorkoutSession
 from app.services.backup_inspector import latest_backup_info
 from app.services.backup_verifier import verify_latest_backup
@@ -41,7 +43,7 @@ router = APIRouter(tags=["export"])
 
 
 @router.get("/export", response_class=HTMLResponse)
-def export_landing(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def export_landing(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
     """Small page summarising the journal + links to both formats."""
     total_sessions = db.execute(
         select(func.count(WorkoutSession.id))
@@ -101,7 +103,7 @@ def export_landing(request: Request, db: Session = Depends(get_db)) -> HTMLRespo
 
 
 @router.get("/export/sessions.json")
-def export_sessions_json(db: Session = Depends(get_db)) -> JSONResponse:
+def export_sessions_json(db: Session = Depends(get_db), user: User = Depends(require_user)) -> JSONResponse:
     payload = build_json_payload(db)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
     filename = f"workout-export-{stamp}.json"
@@ -115,7 +117,7 @@ def export_sessions_json(db: Session = Depends(get_db)) -> JSONResponse:
 
 
 @router.get("/export/sessions.csv")
-def export_sessions_csv(db: Session = Depends(get_db)) -> Response:
+def export_sessions_csv(db: Session = Depends(get_db), user: User = Depends(require_user)) -> Response:
     body = build_csv_text(db)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M")
     filename = f"workout-export-{stamp}.csv"

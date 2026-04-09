@@ -23,6 +23,9 @@
         <a class="topbar__link" href="{{ url_for('library') }}">Biblio</a>
         <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
         <a class="topbar__link" href="{{ url_for('rules_page') }}">Règles</a>
+        <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
+          <button type="submit" class="topbar__link" style="background:none;border:none;cursor:pointer;font:inherit;color:inherit;">Logout</button>
+        </form>
       </nav>
     </header>
     {% if active_session %}
