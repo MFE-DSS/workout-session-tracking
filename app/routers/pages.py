@@ -4,16 +4,14 @@ The session logging flow lives in `app.routers.sessions`.
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import selectinload
 
-from app.database import get_db
-from app.deps import require_user
+from app.deps import CurrentUser, DbSession
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
-from app.models.user import User
 from app.services.kpis import (
     compute_global_kpis,
     compute_recent_exercise_activity,
@@ -32,7 +30,7 @@ from app.templating import templates
 router = APIRouter(tags=["pages"])
 
 
-def _load_templates(db: Session) -> list[WorkoutTemplate]:
+def _load_templates(db) -> list[WorkoutTemplate]:
     stmt = (
         select(WorkoutTemplate)
         .options(
@@ -46,7 +44,7 @@ def _load_templates(db: Session) -> list[WorkoutTemplate]:
 
 
 @router.get("/", response_class=HTMLResponse)
-def home(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
+def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     # Home shows its own Reprendre tile — the header banner would
     # be redundant here, so we intentionally do NOT pass active_session.
     open_session = latest_open_session(db, user.id)
@@ -67,13 +65,13 @@ def home(request: Request, db: Session = Depends(get_db), user: User = Depends(r
 
 
 @router.get("/library", response_class=HTMLResponse)
-def library(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
+def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     all_templates = _load_templates(db)
     return templates.TemplateResponse(
         request,
         "library.html",
         {
-            "page_title": "Bibliothèque",
+            "page_title": "Programmes de séance",
             "templates": all_templates,
             "active_session": latest_open_session(db, user.id),
         },
@@ -82,7 +80,7 @@ def library(request: Request, db: Session = Depends(get_db), user: User = Depend
 
 @router.get("/library/{slug}", response_class=HTMLResponse)
 def template_detail(
-    slug: str, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
+    slug: str, request: Request, db: DbSession, user: CurrentUser
 ) -> HTMLResponse:
     stmt = (
         select(WorkoutTemplate)
@@ -113,9 +111,9 @@ _HISTORY_STATUS_CHOICES = ("all", "in_progress", "completed")
 @router.get("/history", response_class=HTMLResponse)
 def history(
     request: Request,
+    db: DbSession,
+    user: CurrentUser,
     status: str = Query("all"),
-    db: Session = Depends(get_db),
-    user: User = Depends(require_user),
 ) -> HTMLResponse:
     status = status if status in _HISTORY_STATUS_CHOICES else "all"
 
@@ -187,7 +185,7 @@ def history(
 
 
 @router.get("/progress", response_class=HTMLResponse)
-def progress(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
+def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     global_kpis = compute_global_kpis(db, user_id=user.id)
     template_kpis = compute_template_kpis(db, user_id=user.id)
     recent_activity = compute_recent_exercise_activity(db, limit=10, user_id=user.id)

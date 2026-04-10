@@ -26,26 +26,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
-from sqlalchemy.orm import Session
 
 from app.config import get_settings
-from app.database import get_db
+from app.deps import DbSession
 from app.services.backup_verifier import verify_latest_backup
 
 router = APIRouter(tags=["health"])
 
 
 @router.get("/healthz")
-def healthz(db: Session = Depends(get_db)) -> dict:
+def healthz(db: DbSession) -> dict:
     db.execute(text("SELECT 1"))
     return {"status": "ok"}
 
 
 @router.get("/healthz/strict")
-def healthz_strict(db: Session = Depends(get_db)) -> JSONResponse:
+def healthz_strict(db: DbSession) -> JSONResponse:
     """Operator-facing health: db + backup_dir + latest backup."""
     settings = get_settings()
     now = datetime.now(timezone.utc)

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="h1">Bibliothèque</h1>
-<p class="lede">Choisis un template pour démarrer une séance.</p>
+<h1 class="h1">Programmes de séance</h1>
+<p class="lede">Choisis un programme pour démarrer.</p>
 
 <ul class="template-list">
   {% for tpl in templates %}
@@ -12,11 +12,11 @@
           <span class="template-card__kind">{{ tpl.kind|upper }}</span>
         </div>
         <div class="template-card__focus">{{ tpl.focus }}</div>
-        {% if tpl.cardio_note %}
+        {% if tpl.kind == 'cardio' and tpl.cardio_note %}
           <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
         {% endif %}
         {% if tpl.suggested_label %}
-          <div class="template-card__hint">Suggestion : {{ tpl.suggested_label }}</div>
+          <div class="template-card__hint">{{ tpl.suggested_label }}</div>
         {% endif %}
       </a>
       <form

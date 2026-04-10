@@ -7,14 +7,12 @@ Sprint 8 adds:
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload
+from sqlalchemy.orm import selectinload
 
-from app.database import get_db
-from app.deps import require_user
-from app.models.user import User
+from app.deps import CurrentUser, DbSession
 from app.models.session import SessionExercise, WorkoutSession
 from app.services.ownership import get_owned_session_or_404
 from app.services.quality_score import compute_session_quality
@@ -26,7 +24,7 @@ router = APIRouter(tags=["admin"])
 
 
 @router.get("/admin/sessions", response_class=HTMLResponse)
-def admin_sessions(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
+def admin_sessions(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     stmt = (
         select(WorkoutSession)
         .where(WorkoutSession.user_id == user.id)
@@ -67,7 +65,7 @@ def admin_sessions(request: Request, db: Session = Depends(get_db), user: User =
 
 
 @router.post("/admin/sessions/{session_id}/delete")
-def delete_session(session_id: int, db: Session = Depends(get_db), user: User = Depends(require_user)) -> RedirectResponse:
+def delete_session(session_id: int, db: DbSession, user: CurrentUser) -> RedirectResponse:
     session = get_owned_session_or_404(db, session_id, user.id)
     db.delete(session)
     db.commit()
@@ -75,7 +73,7 @@ def delete_session(session_id: int, db: Session = Depends(get_db), user: User = 
 
 
 @router.post("/admin/sessions/{session_id}/exclude")
-def toggle_exclude(session_id: int, db: Session = Depends(get_db), user: User = Depends(require_user)) -> RedirectResponse:
+def toggle_exclude(session_id: int, db: DbSession, user: CurrentUser) -> RedirectResponse:
     session = get_owned_session_or_404(db, session_id, user.id)
     session.excluded_from_stats = not session.excluded_from_stats
     db.commit()

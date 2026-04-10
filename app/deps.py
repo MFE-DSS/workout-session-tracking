@@ -4,20 +4,28 @@ The main one is `require_user`: a dependency that reads the
 session cookie, looks up the user, and either returns the User
 object or redirects to /login. Every private route takes this
 dependency.
+
+Type aliases (`DbSession`, `CurrentUser`) are provided so that
+routers can use `Annotated` without repeating the `Depends()`
+boilerplate.
 """
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import Depends, Request
-from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.user import User
 from app.services.auth import get_current_user
 
+# Reusable Annotated alias — import in routers.
+DbSession = Annotated[Session, Depends(get_db)]
+
 
 async def require_user(
-    request: Request, db: Session = Depends(get_db)
+    request: Request, db: DbSession,
 ) -> User:
     """Dependency that returns the authenticated User or redirects
     to /login. Used by all private routes."""
@@ -25,6 +33,10 @@ async def require_user(
     if user is None:
         raise _redirect_to_login()
     return user
+
+
+# Defined after require_user so the reference resolves at import time.
+CurrentUser = Annotated[User, Depends(require_user)]
 
 
 class _redirect_to_login(Exception):

@@ -5,13 +5,13 @@ Private: /logout, /profile, /profile/password
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Form, Request
+from typing import Annotated
+
+from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
 
-from app.database import get_db
-from app.deps import require_user
+from app.deps import CurrentUser, DbSession
 from app.models.session import WorkoutSession
 from app.models.user import User
 from app.services.auth import (
@@ -44,7 +44,7 @@ def public_landing(request: Request) -> HTMLResponse:
 @router.get("/login", response_class=HTMLResponse)
 def login_page(
     request: Request,
-    db: Session = Depends(get_db),
+    db: DbSession,
     success: str | None = None,
 ) -> HTMLResponse:
     user = get_current_user(request, db)
@@ -64,9 +64,9 @@ def login_page(
 @router.post("/login", response_model=None)
 async def login_submit(
     request: Request,
-    username: str = Form(...),
-    password: str = Form(...),
-    db: Session = Depends(get_db),
+    username: Annotated[str, Form()],
+    password: Annotated[str, Form()],
+    db: DbSession,
 ):
     user = db.execute(
         select(User).where(User.username == username, User.is_active.is_(True))
@@ -105,7 +105,7 @@ def logout(request: Request) -> RedirectResponse:
 
 
 @router.get("/register", response_class=HTMLResponse)
-def register_page(request: Request, db: Session = Depends(get_db)) -> HTMLResponse:
+def register_page(request: Request, db: DbSession) -> HTMLResponse:
     user = get_current_user(request, db)
     if user is not None:
         return RedirectResponse(url="/", status_code=303)
@@ -118,10 +118,10 @@ def register_page(request: Request, db: Session = Depends(get_db)) -> HTMLRespon
 @router.post("/register", response_model=None)
 async def register_submit(
     request: Request,
-    username: str = Form(...),
-    password: str = Form(...),
-    password_confirm: str = Form(...),
-    db: Session = Depends(get_db),
+    username: Annotated[str, Form()],
+    password: Annotated[str, Form()],
+    password_confirm: Annotated[str, Form()],
+    db: DbSession,
 ):
     error = None
     if len(username.strip()) < MIN_USERNAME_LENGTH:
@@ -165,8 +165,8 @@ async def register_submit(
 @router.get("/profile", response_class=HTMLResponse)
 def profile_page(
     request: Request,
-    db: Session = Depends(get_db),
-    user: User = Depends(require_user),
+    db: DbSession,
+    user: CurrentUser,
 ) -> HTMLResponse:
     session_count = db.execute(
         select(func.count(WorkoutSession.id))
@@ -197,7 +197,7 @@ def profile_page(
 @router.get("/profile/password", response_class=HTMLResponse)
 def password_change_page(
     request: Request,
-    user: User = Depends(require_user),
+    user: CurrentUser,
 ) -> HTMLResponse:
     return templates.TemplateResponse(
         request, "password_change.html",
@@ -208,11 +208,11 @@ def password_change_page(
 @router.post("/profile/password", response_model=None)
 async def password_change_submit(
     request: Request,
-    current_password: str = Form(...),
-    new_password: str = Form(...),
-    new_password_confirm: str = Form(...),
-    db: Session = Depends(get_db),
-    user: User = Depends(require_user),
+    current_password: Annotated[str, Form()],
+    new_password: Annotated[str, Form()],
+    new_password_confirm: Annotated[str, Form()],
+    db: DbSession,
+    user: CurrentUser,
 ):
     error = None
     if not verify_password(current_password, user.password_hash):

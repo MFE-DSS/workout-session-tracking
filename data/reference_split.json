@@ -1,6 +1,6 @@
 {
   "version": "2026-04-08.v2",
-  "title": "Workout template library",
+  "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
     "Phase excentrique fluide 2-3s, concentrique explosive mais contrôlée",
@@ -13,8 +13,7 @@
       "name": "Push A",
       "kind": "strength",
       "focus": "Pectoral, Delts, Triceps",
-      "cardio_note": "10 miles de pas après la séance",
-      "suggested_label": "Souvent placée en début de semaine",
+      "suggested_label": "Faire 10 min de cardio léger en fin de séance.",
       "exercises": [
         {
           "position": 1,
@@ -107,8 +106,7 @@
       "name": "Pull A",
       "kind": "strength",
       "focus": "Dos, Delts arrière",
-      "cardio_note": "10 miles de pas après la séance",
-      "suggested_label": "Souvent après Push A",
+      "suggested_label": "Faire 10 000 pas sur la journée.",
       "exercises": [
         {
           "position": 1,
@@ -172,8 +170,7 @@
       "name": "Push B",
       "kind": "strength",
       "focus": "Pectoraux, Deltoïdes",
-      "cardio_note": "10 miles de pas après la séance",
-      "suggested_label": "Milieu de semaine typique",
+      "suggested_label": "Faire 10 min de marche rapide ou vélo après la séance.",
       "exercises": [
         {
           "position": 1,
@@ -259,8 +256,7 @@
       "name": "Pull B",
       "kind": "strength",
       "focus": "Dos, Bras",
-      "cardio_note": "10 miles de pas après la séance",
-      "suggested_label": "Deuxième moitié de semaine",
+      "suggested_label": "Faire 10 000 pas sur la journée.",
       "exercises": [
         {
           "position": 1,
@@ -355,8 +351,7 @@
       "name": "Legs",
       "kind": "strength",
       "focus": "Jambes",
-      "cardio_note": "10 miles de pas après la séance",
-      "suggested_label": "Souvent en fin de semaine",
+      "suggested_label": "Faire 10 min de marche après la séance.",
       "exercises": [
         {
           "position": 1,

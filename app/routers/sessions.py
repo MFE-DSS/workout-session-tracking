@@ -18,13 +18,14 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request
+from typing import Annotated
+
+from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.database import get_db
-from app.deps import require_user
+from app.deps import CurrentUser, DbSession
 from app.enums import (
     ExerciseSuccessScore,
     MuscleSensation,
@@ -36,7 +37,6 @@ from app.enums import (
 )
 from app.models.catalog import MethodRule, TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, WorkoutSession
-from app.models.user import User
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
 from app.services.ownership import get_owned_session_or_404
@@ -76,8 +76,8 @@ _SUCCESS_SCORE = {int(e) for e in ExerciseSuccessScore}
 
 @router.post("/sessions")
 def create_session(
-    template_slug: str = Form(...),
-    db: Session = Depends(get_db), user: User = Depends(require_user),
+    template_slug: Annotated[str, Form()],
+    db: DbSession, user: CurrentUser,
 ) -> RedirectResponse:
     tpl = db.execute(
         select(WorkoutTemplate)
@@ -147,7 +147,7 @@ WEEKDAY_LABELS = {
 
 @router.get("/sessions/{session_id}", response_class=HTMLResponse)
 def session_detail(
-    session_id: int, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
+    session_id: int, request: Request, db: DbSession, user: CurrentUser
 ) -> HTMLResponse:
     session = _load_session(db, session_id, user.id)
     if session is None:
@@ -242,7 +242,7 @@ def session_detail(
 
 @router.post("/sessions/{session_id}")
 async def update_session(
-    session_id: int, request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)
+    session_id: int, request: Request, db: DbSession, user: CurrentUser
 ) -> RedirectResponse:
     session = get_owned_session_or_404(db, session_id, user.id)
 
@@ -276,7 +276,7 @@ async def update_exercise_card(
     session_id: int,
     session_exercise_id: int,
     request: Request,
-    db: Session = Depends(get_db), user: User = Depends(require_user),
+    db: DbSession, user: CurrentUser,
 ) -> RedirectResponse:
     # Verify the parent session belongs to this user first.
     get_owned_session_or_404(db, session_id, user.id)
@@ -339,7 +339,7 @@ async def update_exercise_card(
 
 
 @router.get("/rules", response_class=HTMLResponse)
-def rules_page(request: Request, db: Session = Depends(get_db), user: User = Depends(require_user)) -> HTMLResponse:
+def rules_page(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     rules = db.execute(
         select(MethodRule).order_by(MethodRule.position)
     ).scalars().all()
@@ -367,7 +367,7 @@ def exercise_history_detail(
     template_slug: str,
     exercise_code: str,
     request: Request,
-    db: Session = Depends(get_db), user: User = Depends(require_user),
+    db: DbSession, user: CurrentUser,
 ) -> HTMLResponse:
     entries = get_exercise_history(db, template_slug, exercise_code, user_id=user.id)
 

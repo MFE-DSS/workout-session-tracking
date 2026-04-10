@@ -10,7 +10,7 @@ def test_home_renders_action_tiles(client):
     r = client.get("/")
     assert r.status_code == 200
     body = r.text
-    for label in ["Nouvelle séance", "Historique", "Progression", "Bibliothèque"]:
+    for label in ["Nouvelle séance", "Historique", "Progression", "Programmes de séance"]:
         assert label in body
 
 
@@ -73,3 +73,26 @@ def test_progress_stub_renders(client):
     r = client.get("/progress")
     assert r.status_code == 200
     assert "Progression" in r.text
+
+
+# ---------------------------------------------------------------------------
+# Vocabulary: "Programmes de séance", no stale "Bibliothèque" / "template"
+# ---------------------------------------------------------------------------
+
+
+def test_library_page_uses_programmes_vocabulary(client):
+    r = client.get("/library")
+    body = r.text
+    assert "Programmes de séance" in body
+    assert "Bibliothèque" not in body
+    assert "Choisis un programme pour démarrer" in body
+
+
+def test_strength_template_hides_cardio_note(client):
+    """Strength templates must not display cardio_note in their detail page."""
+    r = client.get("/library/push-a")
+    body = r.text
+    # The old "10 miles de pas" or any "Cardio :" prefix must be gone
+    assert "Cardio :" not in body
+    # But the suggestion label should still be present
+    assert "cardio léger" in body.lower() or "10 000 pas" in body

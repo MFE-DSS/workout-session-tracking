@@ -68,7 +68,7 @@ Configurable through `app.services.session_builder.instantiate_session(warmup_se
 - **Nouvelle séance** — goes to /library
 - **Historique**
 - **Progression** (placeholder for V2)
-- **Bibliothèque**
+- **Programmes de séance**
 - **Règles**
 
 ## Completed-session rule (V1)
