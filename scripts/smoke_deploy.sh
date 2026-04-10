@@ -27,75 +27,75 @@ check() {
     fi
 }
 
+# Wait for the server to be ready (max 5 seconds).
+echo "=== Waiting for server at ${BASE_URL} ==="
+for i in 1 2 3 4 5; do
+    if curl -sf "${BASE_URL}/healthz" >/dev/null 2>&1; then
+        echo "  Server ready after ${i}s"
+        break
+    fi
+    if [ "$i" -eq 5 ]; then
+        echo "  FAIL  Server not reachable after 5s"
+        exit 1
+    fi
+    sleep 1
+done
+
+echo ""
 echo "=== Smoke deploy: ${BASE_URL} ==="
 echo ""
 
-# 1. Liveness probe
+# --- Public routes (expect 200) ---
+
 check "GET /healthz returns 200" \
     curl -sf "${BASE_URL}/healthz"
 
-# 2. Strict health
 check "GET /healthz/strict returns 200" \
     curl -sf "${BASE_URL}/healthz/strict"
 
-# 3. Home page renders
-check "GET / returns 200" \
-    curl -sf "${BASE_URL}/"
+check "GET /welcome returns 200" \
+    curl -sf "${BASE_URL}/welcome"
 
-# 4. Library page renders
-check "GET /library returns 200" \
-    curl -sf "${BASE_URL}/library"
+check "GET /login returns 200" \
+    curl -sf "${BASE_URL}/login"
 
-# 5. Rules page renders
-check "GET /rules returns 200" \
-    curl -sf "${BASE_URL}/rules"
+check "GET /register returns 200" \
+    curl -sf "${BASE_URL}/register"
 
-# 6. History page renders
-check "GET /history returns 200" \
-    curl -sf "${BASE_URL}/history"
+# --- Private routes (expect 303 redirect to /login) ---
 
-# 7. Progress page renders
-check "GET /progress returns 200" \
-    curl -sf "${BASE_URL}/progress"
+check_auth_redirect() {
+    local label="$1"
+    local path="$2"
+    local code
+    code=$(curl -s -o /dev/null -w '%{http_code}' "${BASE_URL}${path}" 2>/dev/null || echo "000")
+    if [ "$code" = "303" ]; then
+        echo "  PASS  $label"
+    else
+        echo "  FAIL  $label (got $code, expected 303)"
+        FAILS=$((FAILS + 1))
+    fi
+}
 
-# 8. Export landing page renders
-check "GET /export returns 200" \
-    curl -sf "${BASE_URL}/export"
+check_auth_redirect "GET / requires auth" "/"
+check_auth_redirect "GET /library requires auth" "/library"
+check_auth_redirect "GET /rules requires auth" "/rules"
+check_auth_redirect "GET /history requires auth" "/history"
+check_auth_redirect "GET /progress requires auth" "/progress"
+check_auth_redirect "GET /export requires auth" "/export"
+check_auth_redirect "GET /export/sessions.json requires auth" "/export/sessions.json"
+check_auth_redirect "GET /export/sessions.csv requires auth" "/export/sessions.csv"
 
-# 9. JSON export downloadable
-check "GET /export/sessions.json returns 200" \
-    curl -sf "${BASE_URL}/export/sessions.json"
+# --- Offline checks ---
 
-# 10. CSV export downloadable
-check "GET /export/sessions.csv returns 200" \
-    curl -sf "${BASE_URL}/export/sessions.csv"
-
-# 11. Create a session (POST /sessions with push-a)
-LOCATION=$(curl -sf -o /dev/null -w '%{redirect_url}' \
-    -d "template_slug=push-a" "${BASE_URL}/sessions" 2>/dev/null || true)
-if [ -n "$LOCATION" ]; then
-    echo "  PASS  POST /sessions creates and redirects to ${LOCATION}"
-else
-    echo "  FAIL  POST /sessions did not redirect"
-    FAILS=$((FAILS + 1))
-fi
-
-# 12. Session detail renders (if we got a location)
-if [ -n "$LOCATION" ]; then
-    check "GET session detail returns 200" \
-        curl -sf "${LOCATION}"
-fi
-
-# 13. Manual backup run
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
 check "backup_sessions.py runs successfully" \
     "${REPO_DIR}/.venv/bin/python" -m scripts.backup_sessions
 
-# 14. Backup verify
 check "verify_backup.py returns OK" \
     "${REPO_DIR}/.venv/bin/python" -m scripts.verify_backup
 
-# 15. Alembic drift guard
 check "check_alembic_drift returns OK" \
     "${REPO_DIR}/.venv/bin/python" -m scripts.check_alembic_drift
 
