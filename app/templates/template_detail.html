@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <a class="back" href="{{ url_for('library') }}">← Programmes</a>
-<h1 class="h1">{{ template.name }}</h1>
+<h1 class="page-title">{{ template.name }}</h1>
 <p class="lede">{{ template.focus }}</p>
 {% if template.kind == 'cardio' and template.cardio_note %}
   <p class="cardio">Cardio : {{ template.cardio_note }}</p>
