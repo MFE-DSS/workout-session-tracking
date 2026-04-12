@@ -26,6 +26,9 @@ class User(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
+    # Email (optional, for password reset)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
+
     # Physical profile (optional, decoupled from session flow)
     height_cm: Mapped[int | None] = mapped_column(Integer, nullable=True)
     weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)

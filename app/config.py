@@ -34,6 +34,18 @@ class Settings(BaseSettings):
     # script. 0 = keep everything.
     backup_retention_days: int = Field(default=30)
 
+    # SMTP for password reset emails. Leave smtp_host empty to disable.
+    smtp_host: str = Field(default="")
+    smtp_port: int = Field(default=587)
+    smtp_user: str = Field(default="")
+    smtp_password: str = Field(default="")
+    smtp_from: str = Field(default="")
+    smtp_use_tls: bool = Field(default=True)
+
+    @property
+    def smtp_enabled(self) -> bool:
+        return bool(self.smtp_host and self.smtp_from)
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
