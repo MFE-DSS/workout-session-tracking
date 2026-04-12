@@ -151,3 +151,98 @@ def test_behavioral_state_dataclass():
     )
     assert state.readiness_score == 72.0
     assert state.streak_days == 3
+
+
+from datetime import datetime, timezone, timedelta
+from tests.helpers import get_test_user_id
+
+
+def _add_completed_session(user_id, *, concentration="high", global_state="good",
+                           success_score=100, n_work=2, n_done=2, started_at=None):
+    """Insert a completed session with controlled inputs."""
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession, SessionExercise, SetLog
+
+    with SessionLocal() as db:
+        s = WorkoutSession(
+            user_id=user_id,
+            template_slug_snapshot="push-a",
+            template_name_snapshot="Push A",
+            started_at=started_at or datetime.now(timezone.utc),
+            status="completed",
+            concentration=concentration,
+            global_state=global_state,
+        )
+        se = SessionExercise(
+            exercise_code_snapshot="E1",
+            exercise_name_snapshot="Ex",
+            position=1,
+            success_score=success_score,
+        )
+        for i in range(1, n_work + 1):
+            se.set_logs.append(SetLog(
+                kind="work", set_index=i,
+                completed=(i <= n_done),
+                weight_kg=60.0, reps=10,
+            ))
+        s.session_exercises.append(se)
+        db.add(s)
+        db.commit()
+        return s.id
+
+
+def test_compute_behavioral_state_no_sessions(client):
+    from app.database import SessionLocal
+    from app.services.behavioral import compute_behavioral_state
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        state = compute_behavioral_state(db, uid)
+
+    assert state.performance_score == 0.0
+    assert state.consistency_score == 0.0
+    assert state.fatigue_score == 50.0
+    assert state.streak_days == 0
+    assert state.trend_direction == "stable"
+    assert state.readiness_score > 0
+    assert len(state.recommendation) > 0
+
+
+def test_compute_behavioral_state_with_sessions(client):
+    from app.database import SessionLocal
+    from app.services.behavioral import compute_behavioral_state
+
+    uid = get_test_user_id()
+    now = datetime.now(timezone.utc)
+
+    for i in range(3):
+        _add_completed_session(
+            uid, concentration="high", global_state="good",
+            started_at=now - timedelta(days=i),
+        )
+
+    with SessionLocal() as db:
+        state = compute_behavioral_state(db, uid)
+
+    assert state.performance_score > 0
+    assert state.consistency_score > 0
+    assert state.fatigue_score < 50
+    assert state.streak_days >= 3
+    assert state.readiness_score > 50
+
+
+def test_compute_behavioral_state_streak_breaks(client):
+    from app.database import SessionLocal
+    from app.services.behavioral import compute_behavioral_state
+
+    uid = get_test_user_id()
+    now = datetime.now(timezone.utc)
+
+    _add_completed_session(uid, started_at=now)
+    _add_completed_session(uid, started_at=now - timedelta(days=1))
+    _add_completed_session(uid, started_at=now - timedelta(days=3))
+
+    with SessionLocal() as db:
+        state = compute_behavioral_state(db, uid)
+
+    assert state.streak_days == 2
