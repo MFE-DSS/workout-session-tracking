@@ -1,88 +1,95 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="h1">Profil</h1>
+<h1 class="page-title">Profil</h1>
 
-<div class="card">
-  <ul class="export-stats">
-    <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
-    <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
-    <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
-    <li><span>Sessions totales</span><b>{{ session_count }}</b></li>
-    <li><span>Sessions terminées</span><b>{{ completed_count }}</b></li>
-  </ul>
-</div>
-
-<section class="card" style="margin-top: var(--space);">
-  <h2 class="card__title">Mes 30 derniers jours</h2>
-  <div class="board-kpis">
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ sessions_30d_count }}</span>
-      <span class="board-kpi__label">séances</span>
+<div class="cockpit-grid">
+  <div class="cockpit-main">
+    <div class="card">
+      <h2 class="card__title">Identité</h2>
+      <ul class="stats-list">
+        <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
+        <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
+        <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
+        <li><span>Sessions totales</span><b>{{ session_count }}</b></li>
+        <li><span>Sessions terminées</span><b>{{ completed_count }}</b></li>
+      </ul>
     </div>
-    <div class="board-kpi">
-      <span class="board-kpi__value trend-indicator trend-indicator--{{ trend }}">{{ trend_label }}</span>
-      <span class="board-kpi__label">tendance</span>
+
+    <div class="card">
+      <h2 class="card__title">Mes 30 derniers jours</h2>
+      <div class="kpi-row">
+        <div class="kpi">
+          <span class="kpi__value">{{ sessions_30d_count }}</span>
+          <span class="kpi__label">séances</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__value trend-indicator trend-indicator--{{ trend }}">{{ trend_label }}</span>
+          <span class="kpi__label">tendance</span>
+        </div>
+      </div>
+      <div class="kpi-row" style="margin-top:var(--space-sm);">
+        <div class="kpi">
+          <span class="kpi__value">{{ "%.0f"|format(behavioral.fatigue_score) }}</span>
+          <span class="kpi__label">fatigue</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__value">{{ "%.0f"|format(behavioral.consistency_score) }}</span>
+          <span class="kpi__label">régularité</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__value">{{ behavioral.streak_days }}</span>
+          <span class="kpi__label">jours de série</span>
+        </div>
+      </div>
+      {% if quality_svg %}
+        <div class="timeline-chart">{{ quality_svg|safe }}</div>
+      {% else %}
+        <p class="text-dim" style="font-size:13px;margin:var(--space-sm) 0;">Pas encore de données</p>
+      {% endif %}
     </div>
   </div>
-  <div class="board-kpis" style="margin-top: 8px;">
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ "%.0f"|format(behavioral.fatigue_score) }}</span>
-      <span class="board-kpi__label">fatigue</span>
+
+  <div class="cockpit-side">
+    <div class="card">
+      <h2 class="card__title">Profil physique</h2>
+      <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
+        <div class="body-profile__field">
+          <label for="height_cm">Taille (cm)</label>
+          <input type="number" id="height_cm" name="height_cm"
+                 value="{{ user.height_cm or '' }}" min="100" max="250" placeholder="175">
+        </div>
+        <div class="body-profile__field">
+          <label for="weight_kg">Poids (kg)</label>
+          <input type="number" id="weight_kg" name="weight_kg" step="0.1"
+                 value="{{ user.weight_kg or '' }}" min="30" max="300" placeholder="70">
+        </div>
+        <div class="body-profile__field">
+          <label for="resting_hr">FC repos (bpm)</label>
+          <input type="number" id="resting_hr" name="resting_hr"
+                 value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
+        </div>
+        <div class="body-profile__field">
+          <label for="waist_cm">Tour de taille (cm)</label>
+          <input type="number" id="waist_cm" name="waist_cm" step="0.1"
+                 value="{{ user.waist_cm or '' }}" min="40" max="200" placeholder="80">
+        </div>
+        <div class="body-profile__field">
+          <label for="bp_systolic">Tension systolique</label>
+          <input type="number" id="bp_systolic" name="bp_systolic"
+                 value="{{ user.bp_systolic or '' }}" min="60" max="250" placeholder="120">
+        </div>
+        <div class="body-profile__field">
+          <label for="bp_diastolic">Tension diastolique</label>
+          <input type="number" id="bp_diastolic" name="bp_diastolic"
+                 value="{{ user.bp_diastolic or '' }}" min="30" max="150" placeholder="80">
+        </div>
+        <button type="submit" class="btn btn--primary">Enregistrer</button>
+      </form>
     </div>
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ "%.0f"|format(behavioral.consistency_score) }}</span>
-      <span class="board-kpi__label">régularité</span>
-    </div>
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ behavioral.streak_days }}</span>
-      <span class="board-kpi__label">jours de série</span>
+
+    <div class="card__actions" style="margin-top:var(--space-md);">
+      <a class="btn" href="{{ url_for('password_change_page') }}">Changer le mot de passe</a>
     </div>
   </div>
-  {% if quality_svg %}
-    <div class="timeline-chart">{{ quality_svg|safe }}</div>
-  {% else %}
-    <p class="board-progress__empty">Pas encore de données</p>
-  {% endif %}
-</section>
-
-<section class="card" style="margin-top: var(--space);">
-  <h2 class="card__title">Profil physique</h2>
-  <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
-    <div class="body-profile__field">
-      <label for="height_cm">Taille (cm)</label>
-      <input type="number" id="height_cm" name="height_cm"
-             value="{{ user.height_cm or '' }}" min="100" max="250" placeholder="175">
-    </div>
-    <div class="body-profile__field">
-      <label for="weight_kg">Poids (kg)</label>
-      <input type="number" id="weight_kg" name="weight_kg" step="0.1"
-             value="{{ user.weight_kg or '' }}" min="30" max="300" placeholder="70">
-    </div>
-    <div class="body-profile__field">
-      <label for="resting_hr">FC repos (bpm)</label>
-      <input type="number" id="resting_hr" name="resting_hr"
-             value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
-    </div>
-    <div class="body-profile__field">
-      <label for="waist_cm">Tour de taille (cm)</label>
-      <input type="number" id="waist_cm" name="waist_cm" step="0.1"
-             value="{{ user.waist_cm or '' }}" min="40" max="200" placeholder="80">
-    </div>
-    <div class="body-profile__field">
-      <label for="bp_systolic">Tension systolique</label>
-      <input type="number" id="bp_systolic" name="bp_systolic"
-             value="{{ user.bp_systolic or '' }}" min="60" max="250" placeholder="120">
-    </div>
-    <div class="body-profile__field">
-      <label for="bp_diastolic">Tension diastolique</label>
-      <input type="number" id="bp_diastolic" name="bp_diastolic"
-             value="{{ user.bp_diastolic or '' }}" min="30" max="150" placeholder="80">
-    </div>
-    <button type="submit" class="btn btn--primary">Enregistrer</button>
-  </form>
-</section>
-
-<div class="card__actions" style="margin-top: var(--space);">
-  <a class="btn" href="{{ url_for('password_change_page') }}">Changer le mot de passe</a>
 </div>
 {% endblock %}
