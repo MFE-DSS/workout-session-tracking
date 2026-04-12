@@ -1195,6 +1195,157 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
 }
 
+/* ---------- Board progress ---------- */
+.board-progress {
+  background: var(--bg-elev);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-bottom: var(--space-lg);
+}
+.board-progress__title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--fg-dim);
+  margin: 0 0 12px;
+}
+.board-progress__empty {
+  color: var(--fg-dim);
+  font-size: 13px;
+  margin: 8px 0;
+}
+.board-progress__link {
+  display: block;
+  text-align: right;
+  font-size: 13px;
+  color: var(--accent);
+  margin-top: 8px;
+}
+.board-kpis {
+  display: flex;
+  gap: var(--space);
+  margin-bottom: 10px;
+}
+.board-kpi {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.board-kpi__value {
+  font-size: 22px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.board-kpi__label {
+  font-size: 11px;
+  color: var(--fg-dim);
+  text-align: center;
+}
+.sparkline-container {
+  margin: 8px 0;
+}
+
+/* ---------- Grade badges ---------- */
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--bg);
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.grade-badge--a { background: var(--ok); }
+.grade-badge--b { background: var(--accent); }
+.grade-badge--c { background: #888; }
+
+/* ---------- Tooltip (CSS-only, accessible) ---------- */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+}
+.tooltip-content {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elev-2);
+  color: var(--fg);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 10;
+}
+.tooltip-wrapper:hover .tooltip-content,
+.tooltip-wrapper:focus-within .tooltip-content {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Body profile form ---------- */
+.body-profile {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.body-profile__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.body-profile__field label {
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+.body-profile__field input {
+  background: var(--bg-elev-2);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--fg);
+  font-size: 15px;
+  width: 100%;
+}
+.body-profile__field input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.body-profile .btn {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+}
+
+/* ---------- Trend indicator ---------- */
+.trend-indicator { font-size: 14px; font-weight: 700; }
+.trend-indicator--up { color: var(--ok); }
+.trend-indicator--down { color: var(--accent); }
+.trend-indicator--stable { color: var(--fg-dim); }
+
+/* ---------- Card title ---------- */
+.card__title {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--fg-dim);
+  margin: 0 0 12px;
+}
+
 /* ---------- Footer ---------- */
 .foot {
   text-align: center;
