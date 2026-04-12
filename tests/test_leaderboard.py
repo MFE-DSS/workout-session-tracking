@@ -238,3 +238,40 @@ def test_topbar_has_leaderboard_link(client):
     body = client.get("/").text
     assert "/leaderboard" in body
     assert "Board" in body
+
+
+def test_leaderboard_entry_has_grade_fields(client):
+    """LeaderboardEntry should include grade and last_session_score."""
+    from app.database import SessionLocal
+    from app.services.leaderboard import compute_leaderboard
+
+    uid = get_test_user_id()
+    _add_session(uid, quality_inputs={
+        "concentration": "high", "global_state": "good", "success_score": 100,
+    }, n_work=4, n_done=4)
+
+    with SessionLocal() as db:
+        entries = compute_leaderboard(db)
+    me = next(e for e in entries if e.username == "testuser")
+    assert hasattr(me, "grade")
+    assert me.grade in ("A", "B", "C")
+    assert hasattr(me, "last_session_score")
+    assert me.last_session_score is not None
+    assert hasattr(me, "grade_label")
+    assert len(me.grade_label) > 0
+
+
+def test_leaderboard_grade_c_for_low_volume(client):
+    """One weak session should yield grade C."""
+    from app.database import SessionLocal
+    from app.services.leaderboard import compute_leaderboard
+
+    uid = get_test_user_id()
+    _add_session(uid, quality_inputs={
+        "concentration": "low", "global_state": "fatigued", "success_score": 50,
+    }, n_work=2, n_done=1)
+
+    with SessionLocal() as db:
+        entries = compute_leaderboard(db)
+    me = next(e for e in entries if e.username == "testuser")
+    assert me.grade == "C"
