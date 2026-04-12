@@ -5,7 +5,7 @@
 <div class="cockpit-grid">
   <div class="cockpit-main">
     <div class="card">
-      <h2 class="card__title">Identité</h2>
+      <h2 class="card__title">Identite</h2>
       <ul class="stats-list">
         <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
         <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
@@ -51,7 +51,26 @@
 
   <div class="cockpit-side">
     <div class="card">
-      <h2 class="card__title">Profil physique</h2>
+      <h2 class="card__title">Nouvelle mesure</h2>
+      <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
+        <div class="body-profile__field" style="grid-column:1/-1;">
+          <label for="measured_at">Date</label>
+          <input type="date" id="measured_at" name="measured_at">
+        </div>
+        {% for field in measurement_fields %}
+        <div class="body-profile__field">
+          <label for="{{ field }}">{{ measurement_labels[field] }}</label>
+          <input type="number" id="{{ field }}" name="{{ field }}" step="0.1"
+                 value="{{ latest_values.get(field, '') }}"
+                 placeholder="—">
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn--primary">Enregistrer la mesure</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="card__title">Données de référence</h2>
       <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
         <div class="body-profile__field">
           <label for="height_cm">Taille (cm)</label>
@@ -59,31 +78,21 @@
                  value="{{ user.height_cm or '' }}" min="100" max="250" placeholder="175">
         </div>
         <div class="body-profile__field">
-          <label for="weight_kg">Poids (kg)</label>
-          <input type="number" id="weight_kg" name="weight_kg" step="0.1"
-                 value="{{ user.weight_kg or '' }}" min="30" max="300" placeholder="70">
-        </div>
-        <div class="body-profile__field">
           <label for="resting_hr">FC repos (bpm)</label>
           <input type="number" id="resting_hr" name="resting_hr"
                  value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
         </div>
         <div class="body-profile__field">
-          <label for="waist_cm">Tour de taille (cm)</label>
-          <input type="number" id="waist_cm" name="waist_cm" step="0.1"
-                 value="{{ user.waist_cm or '' }}" min="40" max="200" placeholder="80">
-        </div>
-        <div class="body-profile__field">
-          <label for="bp_systolic">Tension systolique</label>
+          <label for="bp_systolic">Tension sys.</label>
           <input type="number" id="bp_systolic" name="bp_systolic"
                  value="{{ user.bp_systolic or '' }}" min="60" max="250" placeholder="120">
         </div>
         <div class="body-profile__field">
-          <label for="bp_diastolic">Tension diastolique</label>
+          <label for="bp_diastolic">Tension dia.</label>
           <input type="number" id="bp_diastolic" name="bp_diastolic"
                  value="{{ user.bp_diastolic or '' }}" min="30" max="150" placeholder="80">
         </div>
-        <button type="submit" class="btn btn--primary">Enregistrer</button>
+        <button type="submit" class="btn btn--ghost">Enregistrer</button>
       </form>
     </div>
 
@@ -92,4 +101,22 @@
     </div>
   </div>
 </div>
+
+<section style="margin-top:var(--space-lg);">
+  <h2 class="section-header">Évolution corporelle</h2>
+  <div class="measurement-grid">
+    {% for field in measurement_fields %}
+    <div class="card">
+      {% if measurement_charts[field] %}
+        <div class="timeline-chart">{{ measurement_charts[field]|safe }}</div>
+      {% else %}
+        <p class="text-dim" style="font-size:13px;">{{ measurement_labels[field] }} — pas encore de données</p>
+      {% endif %}
+      {% if related_templates[field] %}
+        <p class="measurement-grid__related">Programmes associés : {{ related_templates[field]|join(', ') }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
 {% endblock %}

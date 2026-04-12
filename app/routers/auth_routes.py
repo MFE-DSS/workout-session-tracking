@@ -232,8 +232,46 @@ def profile_page(
         trend_label = "\u2192 stable"
 
     from app.services.behavioral import compute_behavioral_state
+    from app.services.measurements import (
+        MEASUREMENT_FIELDS,
+        MEASUREMENT_LABELS,
+        find_related_templates,
+        get_latest_measurement,
+        get_measurement_series,
+    )
+    from app.services.timeline import build_measurement_timeline_svg
+    from app.models.catalog import WorkoutTemplate
 
     behavioral = compute_behavioral_state(db, user.id)
+
+    # Body measurements
+    latest_measurement = get_latest_measurement(db, user.id)
+    latest_values: dict[str, str] = {}
+    if latest_measurement:
+        for field in MEASUREMENT_FIELDS:
+            val = getattr(latest_measurement, field, None)
+            latest_values[field] = str(val) if val is not None else ""
+
+    # Build per-field SVG charts
+    measurement_charts: dict[str, str] = {}
+    for field in MEASUREMENT_FIELDS:
+        series = get_measurement_series(db, user.id, field)
+        points = [
+            TimelinePoint(label=dt.strftime("%d/%m"), value=val)
+            for dt, val in series
+        ]
+        measurement_charts[field] = build_measurement_timeline_svg(
+            points, title=MEASUREMENT_LABELS[field]
+        )
+
+    # Related templates per field
+    all_templates = list(db.execute(
+        select(WorkoutTemplate).order_by(WorkoutTemplate.slug)
+    ).scalars().all())
+    related_templates: dict[str, list[str]] = {
+        field: find_related_templates(field, all_templates)
+        for field in MEASUREMENT_FIELDS
+    }
 
     return templates.TemplateResponse(
         request, "profile.html",
@@ -247,6 +285,11 @@ def profile_page(
             "trend": trend,
             "trend_label": trend_label,
             "behavioral": behavioral,
+            "latest_values": latest_values,
+            "measurement_charts": measurement_charts,
+            "measurement_labels": MEASUREMENT_LABELS,
+            "measurement_fields": MEASUREMENT_FIELDS,
+            "related_templates": related_templates,
             "active_session": latest_open_session(db, user.id),
         },
     )
@@ -256,9 +299,7 @@ def profile_page(
 async def profile_body_submit(
     request: Request,
     height_cm: Annotated[str, Form()] = "",
-    weight_kg: Annotated[str, Form()] = "",
     resting_hr: Annotated[str, Form()] = "",
-    waist_cm: Annotated[str, Form()] = "",
     bp_systolic: Annotated[str, Form()] = "",
     bp_diastolic: Annotated[str, Form()] = "",
     db: DbSession = None,
@@ -277,6 +318,41 @@ async def profile_body_submit(
             return None
         return n
 
+    user.height_cm = _int_or_none(height_cm, 100, 250)
+    user.resting_hr = _int_or_none(resting_hr, 30, 220)
+    user.bp_systolic = _int_or_none(bp_systolic, 60, 250)
+    user.bp_diastolic = _int_or_none(bp_diastolic, 30, 150)
+    db.commit()
+
+    return RedirectResponse(url="/profile", status_code=303)
+
+
+@router.post("/profile/measurements", response_model=None)
+async def profile_measurements_submit(
+    request: Request,
+    measured_at: Annotated[str, Form()] = "",
+    weight_kg: Annotated[str, Form()] = "",
+    chest_cm: Annotated[str, Form()] = "",
+    arm_cm: Annotated[str, Form()] = "",
+    waist_cm: Annotated[str, Form()] = "",
+    thigh_cm: Annotated[str, Form()] = "",
+    calf_cm: Annotated[str, Form()] = "",
+    db: DbSession = None,
+    user: CurrentUser = None,
+):
+    """Save a body measurement entry."""
+    from app.models.measurement import BodyMeasurement
+
+    # Parse date — fallback to now if empty/invalid
+    dt = datetime.now(timezone.utc)
+    if measured_at.strip():
+        try:
+            dt = datetime.strptime(measured_at.strip(), "%Y-%m-%d").replace(
+                tzinfo=timezone.utc
+            )
+        except ValueError:
+            pass
+
     def _float_or_none(v: str, lo: float, hi: float) -> float | None:
         v = v.strip()
         if not v:
@@ -289,12 +365,17 @@ async def profile_body_submit(
             return None
         return n
 
-    user.height_cm = _int_or_none(height_cm, 100, 250)
-    user.weight_kg = _float_or_none(weight_kg, 30.0, 300.0)
-    user.resting_hr = _int_or_none(resting_hr, 30, 220)
-    user.waist_cm = _float_or_none(waist_cm, 40.0, 200.0)
-    user.bp_systolic = _int_or_none(bp_systolic, 60, 250)
-    user.bp_diastolic = _int_or_none(bp_diastolic, 30, 150)
+    m = BodyMeasurement(
+        user_id=user.id,
+        measured_at=dt,
+        weight_kg=_float_or_none(weight_kg, 30.0, 300.0),
+        chest_cm=_float_or_none(chest_cm, 10.0, 200.0),
+        arm_cm=_float_or_none(arm_cm, 10.0, 200.0),
+        waist_cm=_float_or_none(waist_cm, 10.0, 200.0),
+        thigh_cm=_float_or_none(thigh_cm, 10.0, 200.0),
+        calf_cm=_float_or_none(calf_cm, 10.0, 200.0),
+    )
+    db.add(m)
     db.commit()
 
     return RedirectResponse(url="/profile", status_code=303)

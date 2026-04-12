@@ -1409,6 +1409,22 @@ input, button, textarea, select {
   margin-top: 4px;
 }
 
+/* ---------- Measurement grid ---------- */
+.measurement-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+.measurement-grid .card {
+  padding: var(--space-sm) var(--space-md);
+}
+.measurement-grid__related {
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-top: var(--space-xs);
+}
+
 /* ---- Trend Indicator ---- */
 
 .trend-indicator { font-size: 14px; font-weight: 700; }
@@ -1518,4 +1534,6 @@ code {
   .template-list { grid-template-columns: 1fr 1fr; }
 
   .topbar__nav { gap: 20px; }
+
+  .measurement-grid { grid-template-columns: 1fr 1fr; }
 }
