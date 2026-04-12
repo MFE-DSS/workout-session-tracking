@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(shellcheck /Users/martinfeldmann/workout-session-tracking/scripts/deploy_prod.sh)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(python -m pytest tests/test_alembic_drift.py tests/test_kpis.py tests/test_leaderboard.py tests/test_behavioral.py tests/test_session_flow.py -v --tb=short)",
+      "Bash(pytest --tb=short -q)",
+      "Bash(git commit:*)",
+      "Bash(pytest tests/test_auth.py tests/test_register_profile.py -v)",
+      "Bash(python -m pytest --tb=short -q)",
+      "Bash(python -m pytest tests/test_library.py::test_home_renders_action_tiles -v)"
+    ]
+  }
+}
