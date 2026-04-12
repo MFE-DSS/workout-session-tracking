@@ -367,6 +367,7 @@ def profile_page(
     from app.services.measurements import (
         MEASUREMENT_FIELDS,
         MEASUREMENT_LABELS,
+        MEASUREMENT_UNITS,
         find_related_templates,
         get_latest_measurement,
         get_measurement_series,
@@ -393,7 +394,8 @@ def profile_page(
             for dt, val in series
         ]
         measurement_charts[field] = build_measurement_timeline_svg(
-            points, title=MEASUREMENT_LABELS[field]
+            points, title=MEASUREMENT_LABELS[field],
+            unit=MEASUREMENT_UNITS.get(field, ""),
         )
 
     # Related templates per field

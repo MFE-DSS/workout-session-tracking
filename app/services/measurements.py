@@ -33,6 +33,15 @@ MEASUREMENT_LABELS: dict[str, str] = {
     "calf_cm": "Mollets (cm)",
 }
 
+MEASUREMENT_UNITS: dict[str, str] = {
+    "weight_kg": " kg",
+    "chest_cm": " cm",
+    "arm_cm": " cm",
+    "waist_cm": " cm",
+    "thigh_cm": " cm",
+    "calf_cm": " cm",
+}
+
 MEASUREMENT_FIELDS = list(MEASUREMENT_LABELS.keys())
 
 

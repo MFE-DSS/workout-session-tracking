@@ -278,6 +278,30 @@ input, button, textarea, select {
   overflow: hidden;
 }
 
+/* ---- Interactive SVG chart points ---- */
+.chart--interactive .chart-point__label {
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+.chart--interactive .chart-point__dot {
+  transition: r 0.15s, filter 0.15s;
+}
+.chart--interactive .chart-point:hover .chart-point__label {
+  opacity: 1;
+}
+.chart--interactive .chart-point:hover .chart-point__dot {
+  r: 7;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+/* Touch: focus-within for mobile tap */
+.chart--interactive .chart-point:focus-within .chart-point__label {
+  opacity: 1;
+}
+.chart--interactive .chart-point:focus-within .chart-point__dot {
+  r: 7;
+}
+
 /* ---- Badge ---- */
 
 .badge {
