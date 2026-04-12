@@ -7,7 +7,7 @@
 <a class="back" href="{{ url_for('home') }}">← Accueil</a>
 
 <header class="session-header">
-  <h1 class="h1">{{ session.template_name_snapshot }}</h1>
+  <h1 class="page-title">{{ session.template_name_snapshot }}</h1>
   <div class="session-header__meta">
     <span>{{ weekday_label }}</span>
     <span>{{ session.started_at.strftime('%d/%m %H:%M') }}</span>
