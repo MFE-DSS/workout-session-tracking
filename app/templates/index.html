@@ -1,7 +1,30 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="h1">Accueil</h1>
-<p class="lede">Choisis une action pour démarrer.</p>
+
+<section class="board-progress">
+  <h2 class="board-progress__title">Ma progression</h2>
+  <div class="board-kpis">
+    <div class="board-kpi">
+      <span class="board-kpi__value">{{ kpis.sessions_this_week }}</span>
+      <span class="board-kpi__label">cette sem.</span>
+    </div>
+    <div class="board-kpi">
+      <span class="board-kpi__value">{{ "%.0f"|format(kpis.avg_success_score_30d) if kpis.avg_success_score_30d is not none else "—" }}</span>
+      <span class="board-kpi__label">score moy.</span>
+    </div>
+    <div class="board-kpi">
+      <span class="board-kpi__value">{% if kpis.completion_rate_30d is not none %}{{ "%.0f"|format(kpis.completion_rate_30d * 100) }}%{% else %}—{% endif %}</span>
+      <span class="board-kpi__label">complétion 30j</span>
+    </div>
+  </div>
+  {% if sparkline_svg %}
+    <div class="sparkline-container">{{ sparkline_svg|safe }}</div>
+  {% else %}
+    <p class="board-progress__empty">Pas encore de données</p>
+  {% endif %}
+  <a class="board-progress__link" href="{{ url_for('progress') }}">Voir analyse complète &rarr;</a>
+</section>
 
 {% if open_session %}
   <a class="tile tile--resume" href="{{ url_for('session_detail', session_id=open_session.id) }}">

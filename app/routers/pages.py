@@ -45,14 +45,54 @@ def _load_templates(db) -> list[WorkoutTemplate]:
 
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
-    # Home shows its own Reprendre tile — the header banner would
-    # be redundant here, so we intentionally do NOT pass active_session.
+    from datetime import datetime, timedelta, timezone
+
+    from app.services.performance import compute_composite_score
+    from app.services.timeline import build_sparkline_svg
+
     open_session = latest_open_session(db, user.id)
     open_since: str | None = None
     if open_session is not None:
         open_since = format_duration_short(
             session_duration(open_session.started_at, end=None)
         )
+
+    # Board KPIs
+    global_kpis = compute_global_kpis(db, user_id=user.id)
+
+    # Sparkline: composite scores for last 14 days
+    window_start = datetime.now(timezone.utc) - timedelta(days=14)
+    sparkline_stmt = (
+        select(WorkoutSession)
+        .where(WorkoutSession.user_id == user.id)
+        .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
+        .where(WorkoutSession.started_at >= window_start)
+        .order_by(WorkoutSession.started_at.asc())
+        .options(
+            selectinload(WorkoutSession.session_exercises)
+            .selectinload(SessionExercise.set_logs)
+        )
+    )
+    recent_sessions = list(db.execute(sparkline_stmt).scalars().all())
+
+    sparkline_points = []
+    for s in recent_sessions:
+        quality = compute_session_quality(s)
+        total_work = sum(
+            1 for se in s.session_exercises
+            for sl in se.set_logs if sl.kind == "work"
+        )
+        done_work = sum(
+            1 for se in s.session_exercises
+            for sl in se.set_logs if sl.kind == "work" and sl.completed
+        )
+        cr = done_work / total_work if total_work > 0 else 0.0
+        composite = compute_composite_score(quality, cr)
+        sparkline_points.append((composite,))
+
+    sparkline_svg = build_sparkline_svg(sparkline_points)
+
     return templates.TemplateResponse(
         request,
         "index.html",
@@ -60,6 +100,8 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "page_title": "Accueil",
             "open_session": open_session,
             "open_since": open_since,
+            "kpis": global_kpis,
+            "sparkline_svg": sparkline_svg,
         },
     )
 
