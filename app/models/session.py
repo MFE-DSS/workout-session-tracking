@@ -44,6 +44,13 @@ class WorkoutSession(Base):
     __tablename__ = "workout_sessions"
     __table_args__ = (
         Index("ix_workout_sessions_started_at", "started_at"),
+        # Covers: KPIs, leaderboard, behavioral engine, timeline,
+        # progress — every query that filters eligible sessions for
+        # a user and orders by date.
+        Index(
+            "ix_ws_user_status_excl_started",
+            "user_id", "status", "excluded_from_stats", "started_at",
+        ),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -108,6 +115,11 @@ class SessionExercise(Base):
     __tablename__ = "session_exercises"
     __table_args__ = (
         UniqueConstraint("session_id", "position", name="uq_session_exercise_position"),
+        # Covers join from WorkoutSession → SessionExercise in KPI
+        # and quality score queries. The unique constraint already
+        # indexes (session_id, position), but a bare session_id index
+        # is more efficient for the join pattern.
+        Index("ix_session_exercises_session_id", "session_id"),
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -159,6 +171,13 @@ class SetLog(Base):
     __table_args__ = (
         UniqueConstraint(
             "session_exercise_id", "kind", "set_index", name="uq_set_log_kind_index"
+        ),
+        # Covers: work set completion counts in KPIs and quality score.
+        # Filters on (kind='work', completed=True) are the hottest
+        # SetLog access pattern.
+        Index(
+            "ix_set_logs_exercise_kind_completed",
+            "session_exercise_id", "kind", "completed",
         ),
     )
 
