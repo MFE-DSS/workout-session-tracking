@@ -28,7 +28,7 @@ MEASUREMENT_LABELS: dict[str, str] = {
     "weight_kg": "Poids (kg)",
     "chest_cm": "Poitrine (cm)",
     "arm_cm": "Bras (cm)",
-    "waist_cm": "Taille (cm)",
+    "waist_cm": "Tour de taille (cm)",
     "thigh_cm": "Cuisses (cm)",
     "calf_cm": "Mollets (cm)",
 }
