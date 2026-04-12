@@ -60,6 +60,9 @@
             {% endif %}
           </div>
         </a>
+        <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}" style="margin-top:var(--space-xs);">
+          <button type="submit" class="btn btn--ghost btn--sm" onclick="return confirm('Supprimer cette séance ?')">Supprimer</button>
+        </form>
       </li>
     {% endfor %}
   </ul>
