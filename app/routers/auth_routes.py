@@ -478,20 +478,24 @@ async def profile_body_submit(
 async def profile_measurements_submit(
     request: Request,
     measured_at: Annotated[str, Form()] = "",
-    weight_kg: Annotated[str, Form()] = "",
     chest_cm: Annotated[str, Form()] = "",
     arm_cm: Annotated[str, Form()] = "",
-    waist_cm: Annotated[str, Form()] = "",
     thigh_cm: Annotated[str, Form()] = "",
-    calf_cm: Annotated[str, Form()] = "",
     db: DbSession = None,
     user: CurrentUser = None,
 ):
-    """Save a body measurement entry."""
+    """Save a body measurement entry.
+
+    Data quality rules:
+    - Date in the future → capped to today
+    - All fields empty → no insert (skip)
+    - Same date already exists → update existing row (upsert)
+    """
     from app.models.measurement import BodyMeasurement
 
-    # Parse date — fallback to now if empty/invalid
-    dt = datetime.now(timezone.utc)
+    # Parse date — fallback to today if empty/invalid
+    now = datetime.now(timezone.utc)
+    dt = now
     if measured_at.strip():
         try:
             dt = datetime.strptime(measured_at.strip(), "%Y-%m-%d").replace(
@@ -499,6 +503,10 @@ async def profile_measurements_submit(
             )
         except ValueError:
             pass
+
+    # Cap future dates to today
+    if dt.date() > now.date():
+        dt = now
 
     def _float_or_none(v: str, lo: float, hi: float) -> float | None:
         v = v.strip()
@@ -512,17 +520,43 @@ async def profile_measurements_submit(
             return None
         return n
 
-    m = BodyMeasurement(
-        user_id=user.id,
-        measured_at=dt,
-        weight_kg=_float_or_none(weight_kg, 30.0, 300.0),
-        chest_cm=_float_or_none(chest_cm, 10.0, 200.0),
-        arm_cm=_float_or_none(arm_cm, 10.0, 200.0),
-        waist_cm=_float_or_none(waist_cm, 10.0, 200.0),
-        thigh_cm=_float_or_none(thigh_cm, 10.0, 200.0),
-        calf_cm=_float_or_none(calf_cm, 10.0, 200.0),
-    )
-    db.add(m)
+    chest = _float_or_none(chest_cm, 10.0, 200.0)
+    arm = _float_or_none(arm_cm, 10.0, 200.0)
+    thigh = _float_or_none(thigh_cm, 10.0, 200.0)
+
+    # Skip if all measurement fields are empty
+    if chest is None and arm is None and thigh is None:
+        return RedirectResponse(url="/profile", status_code=303)
+
+    # Upsert: if a measurement exists for same date, update it
+    day_start = dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    day_end = day_start + timedelta(days=1)
+    existing = db.execute(
+        select(BodyMeasurement)
+        .where(BodyMeasurement.user_id == user.id)
+        .where(BodyMeasurement.measured_at >= day_start)
+        .where(BodyMeasurement.measured_at < day_end)
+        .limit(1)
+    ).scalar_one_or_none()
+
+    if existing:
+        # Update only non-null submitted values (don't erase existing data)
+        if chest is not None:
+            existing.chest_cm = chest
+        if arm is not None:
+            existing.arm_cm = arm
+        if thigh is not None:
+            existing.thigh_cm = thigh
+    else:
+        m = BodyMeasurement(
+            user_id=user.id,
+            measured_at=dt,
+            chest_cm=chest,
+            arm_cm=arm,
+            thigh_cm=thigh,
+        )
+        db.add(m)
+
     db.commit()
 
     return RedirectResponse(url="/profile", status_code=303)
