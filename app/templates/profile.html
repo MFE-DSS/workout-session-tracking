@@ -24,6 +24,20 @@
       <span class="board-kpi__label">tendance</span>
     </div>
   </div>
+  <div class="board-kpis" style="margin-top: 8px;">
+    <div class="board-kpi">
+      <span class="board-kpi__value">{{ "%.0f"|format(behavioral.fatigue_score) }}</span>
+      <span class="board-kpi__label">fatigue</span>
+    </div>
+    <div class="board-kpi">
+      <span class="board-kpi__value">{{ "%.0f"|format(behavioral.consistency_score) }}</span>
+      <span class="board-kpi__label">régularité</span>
+    </div>
+    <div class="board-kpi">
+      <span class="board-kpi__value">{{ behavioral.streak_days }}</span>
+      <span class="board-kpi__label">jours de série</span>
+    </div>
+  </div>
   {% if quality_svg %}
     <div class="timeline-chart">{{ quality_svg|safe }}</div>
   {% else %}

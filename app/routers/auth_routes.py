@@ -231,6 +231,10 @@ def profile_page(
         trend = "stable"
         trend_label = "\u2192 stable"
 
+    from app.services.behavioral import compute_behavioral_state
+
+    behavioral = compute_behavioral_state(db, user.id)
+
     return templates.TemplateResponse(
         request, "profile.html",
         {
@@ -242,6 +246,7 @@ def profile_page(
             "sessions_30d_count": sessions_30d_count,
             "trend": trend,
             "trend_label": trend_label,
+            "behavioral": behavioral,
             "active_session": latest_open_session(db, user.id),
         },
     )
