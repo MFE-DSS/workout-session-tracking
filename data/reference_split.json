@@ -256,7 +256,7 @@
       "name": "Pull B",
       "kind": "strength",
       "focus": "Dos, Bras",
-      "suggested_label": "Faire 10 000 pas sur la journée.",
+      "suggested_label": "Cardio léger avant ou après selon ton énergie.",
       "exercises": [
         {
           "position": 1,
@@ -434,7 +434,7 @@
       "kind": "cardio",
       "focus": "Cardio bas régime + abdos",
       "cardio_note": "30 min à jeun LISS à 120-130 bpm",
-      "suggested_label": "À caler entre les séances de musculation",
+      "suggested_label": "Séance idéale entre deux séances de musculation.",
       "exercises": []
     }
   ]
