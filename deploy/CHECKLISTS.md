@@ -146,7 +146,26 @@ verify `/healthz/strict` still reports `"status":"ok"`.
 
 ## 2. Update
 
-Use every time you `git pull`:
+### 2.1 Automated (recommended)
+
+```bash
+sudo bash /srv/workout/scripts/deploy_prod.sh
+```
+
+The script handles: SQLite backup, git pull, pip install, drift
+check, alembic migrate, seed, restart, and health verification.
+It aborts on any error and prints rollback hints.
+
+To deploy a specific branch:
+```bash
+sudo DEPLOY_BRANCH=release/v2 bash /srv/workout/scripts/deploy_prod.sh
+```
+
+**Expected:** green "Deploy successful" banner with commit SHA.
+
+### 2.2 Manual (fallback)
+
+Use if the deploy script is not available or needs debugging:
 
 ```bash
 sudo -u workout bash -c '
