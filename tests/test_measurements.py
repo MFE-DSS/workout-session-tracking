@@ -122,3 +122,26 @@ def test_get_measurement_series(client):
     assert len(series) == 3
     assert series[0][1] == 73.0
     assert series[2][1] == 75.0
+
+
+from app.services.timeline import build_measurement_timeline_svg, TimelinePoint
+
+
+def test_measurement_timeline_returns_svg():
+    points = [
+        TimelinePoint(label="01/04", value=95.0),
+        TimelinePoint(label="08/04", value=97.0),
+        TimelinePoint(label="12/04", value=100.0),
+    ]
+    svg = build_measurement_timeline_svg(points, title="Poitrine (cm)")
+    assert "<svg" in svg
+    assert "Poitrine (cm)" in svg
+
+
+def test_measurement_timeline_empty_returns_empty():
+    assert build_measurement_timeline_svg([], title="Test") == ""
+
+
+def test_measurement_timeline_one_point_returns_empty():
+    points = [TimelinePoint(label="01/04", value=95.0)]
+    assert build_measurement_timeline_svg(points, title="Test") == ""

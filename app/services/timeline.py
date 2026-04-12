@@ -216,3 +216,27 @@ def build_sparkline_svg(
         f'stroke-linejoin="round" stroke-linecap="round"/>'
         f'</svg>'
     )
+
+
+def build_measurement_timeline_svg(
+    points: list[TimelinePoint],
+    *,
+    title: str = "",
+) -> str:
+    """Measurement evolution timeline: auto-ranged Y axis.
+
+    Returns empty string if fewer than 2 data points.
+    """
+    if len(points) < 2:
+        return ""
+    vals = [p.value for p in points]
+    lo = min(vals) - 2
+    hi = max(vals) + 2
+    return _build_svg(
+        points,
+        y_min=lo,
+        y_max=hi,
+        color="#f25f3a",
+        title=title,
+        height=140,
+    )
