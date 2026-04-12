@@ -93,6 +93,10 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
 
     sparkline_svg = build_sparkline_svg(sparkline_points)
 
+    from app.services.behavioral import compute_behavioral_state
+
+    behavioral = compute_behavioral_state(db, user.id)
+
     return templates.TemplateResponse(
         request,
         "index.html",
@@ -102,6 +106,7 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "open_since": open_since,
             "kpis": global_kpis,
             "sparkline_svg": sparkline_svg,
+            "behavioral": behavioral,
         },
     )
 
