@@ -24,6 +24,7 @@ from app.database import Base  # noqa: E402
 
 # Side-effect import so `Base.metadata` knows about every model.
 from app.models import catalog as _catalog  # noqa: E402, F401
+from app.models import measurement as _measurement  # noqa: E402, F401
 from app.models import session as _session  # noqa: E402, F401
 
 config = context.config
