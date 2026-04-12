@@ -82,3 +82,24 @@ def get_current_user(request: Request, db: Session) -> Optional[User]:
         select(User).where(User.id == user_id, User.is_active.is_(True))
     ).scalar_one_or_none()
     return user
+
+
+RESET_TOKEN_MAX_AGE = 3600  # 1 hour
+
+
+def create_reset_token(user_id: int) -> str:
+    """Create a signed, time-limited token for password reset."""
+    return _serializer().dumps({"user_id": user_id, "purpose": "reset"})
+
+
+def verify_reset_token(token: str, max_age: int = RESET_TOKEN_MAX_AGE) -> int | None:
+    """Verify a reset token. Returns user_id if valid, None otherwise."""
+    if max_age <= 0:
+        return None
+    try:
+        payload = _serializer().loads(token, max_age=max_age)
+        if payload.get("purpose") != "reset":
+            return None
+        return payload.get("user_id")
+    except (BadSignature, Exception):
+        return None
