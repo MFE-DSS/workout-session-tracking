@@ -2,39 +2,35 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, viewport-fit=cover"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0f1115" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="{{ url_for('static', path='manifest.webmanifest') }}" />
     <link rel="icon" href="{{ url_for('static', path='icons/favicon.svg') }}" type="image/svg+xml" />
     <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}" />
-    <title>{{ page_title }} · Workout</title>
+    <title>{{ page_title }} · SPIGNOS</title>
   </head>
   <body>
     <header class="topbar">
-      <a class="topbar__brand" href="{{ url_for('home') }}">Workout</a>
+      <a class="topbar__brand" href="{{ url_for('home') }}">SPIGNOS</a>
       <nav class="topbar__nav" aria-label="Navigation">
         <a class="topbar__link" href="{{ url_for('home') }}">Accueil</a>
         <a class="topbar__link" href="{{ url_for('library') }}">Programme</a>
         <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
-        <a class="topbar__link" href="{{ url_for('rules_page') }}">Règles</a>
         <a class="topbar__link" href="{{ url_for('leaderboard_page') }}">Board</a>
         <a class="topbar__link" href="{{ url_for('profile_page') }}">Profil</a>
         <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
-          <button type="submit" class="topbar__link" style="background:none;border:none;cursor:pointer;font:inherit;color:inherit;">Logout</button>
+          <button type="submit" class="topbar__link topbar__link--btn">Logout</button>
         </form>
       </nav>
     </header>
     {% if active_session %}
-      <a
-        class="active-banner"
-        href="{{ url_for('session_detail', session_id=active_session.id) }}"
-      >
+      <a class="active-banner" href="{{ url_for('session_detail', session_id=active_session.id) }}">
         <span class="active-banner__dot" aria-hidden="true"></span>
         <span class="active-banner__label">Séance en cours</span>
         <span class="active-banner__name">{{ active_session.template_name_snapshot }}</span>
@@ -45,7 +41,7 @@
       {% block content %}{% endblock %}
     </main>
     <footer class="foot">
-      <small>V1 · FastAPI SSR · SQLite · mobile-first</small>
+      <small>SPIGNOS · FastAPI SSR · v1</small>
     </footer>
   </body>
 </html>
