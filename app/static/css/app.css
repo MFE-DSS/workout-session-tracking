@@ -1246,6 +1246,12 @@ a { color: inherit; text-decoration: none; }
 .sparkline-container {
   margin: 8px 0;
 }
+.board-progress__reco {
+  font-size: 13px;
+  color: var(--fg-dim);
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
 
 /* ---------- Grade badges ---------- */
 .grade-badge {
