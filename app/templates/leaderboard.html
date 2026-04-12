@@ -15,7 +15,16 @@
     {% for e in entries %}
       <li class="lb-row {% if e.username == current_username %}lb-row--self{% endif %}">
         <span class="lb-row__rank">#{{ e.rank }}</span>
-        <span class="lb-row__name">{{ e.username }}</span>
+        <span class="lb-row__name">
+          {{ e.username }}
+          <span class="tooltip-wrapper" tabindex="0">
+            <span class="grade-badge grade-badge--{{ e.grade|lower }}">{{ e.grade }}</span>
+            <span class="tooltip-content">
+              Dernière session : {{ e.last_session_score if e.last_session_score is not none else "—" }}/100<br>
+              Note : {{ e.grade }} — {{ e.grade_label }}
+            </span>
+          </span>
+        </span>
         <span class="lb-row__points">{{ e.total_points }} pts</span>
         <span class="lb-row__meta">
           {{ e.counted_sessions }} séance{% if e.counted_sessions > 1 %}s{% endif %}
