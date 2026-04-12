@@ -63,3 +63,28 @@ def test_performance_snapshot_dataclass():
     )
     assert snap.score == 88.0
     assert snap.grade == "A"
+
+
+from app.services.timeline import build_sparkline_svg
+
+
+def test_sparkline_returns_none_with_insufficient_data():
+    assert build_sparkline_svg([]) is None
+    assert build_sparkline_svg([(80.0,)]) is None
+
+
+def test_sparkline_returns_svg_with_enough_data():
+    points = [(70.0,), (75.0,), (80.0,)]
+    svg = build_sparkline_svg(points)
+    assert svg is not None
+    assert "<svg" in svg
+    assert "polyline" in svg
+    assert "#f25f3a" in svg
+
+
+def test_sparkline_is_compact():
+    """Sparkline has no axis labels, no title, compact height."""
+    points = [(60.0,), (70.0,), (80.0,), (90.0,)]
+    svg = build_sparkline_svg(points)
+    assert "viewBox" in svg
+    assert svg.count("<text") == 0

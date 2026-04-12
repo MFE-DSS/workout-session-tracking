@@ -15,8 +15,6 @@ Mobile-first: default width 100%, viewBox-based, responsive.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
-
 
 @dataclass
 class TimelinePoint:
@@ -171,4 +169,50 @@ def build_bodyweight_timeline_svg(
         y_max=hi,
         color="#2ecc71",
         title="Poids corporel (kg)",
+    )
+
+
+def build_sparkline_svg(
+    scores: list[tuple[float, ...]],
+    *,
+    width: int = 200,
+    height: int = 40,
+    color: str = "#f25f3a",
+) -> str | None:
+    """Build a compact sparkline SVG (no axes, no labels).
+
+    Input: list of tuples where first element is the score value.
+    Returns None if fewer than 2 data points.
+    """
+    if len(scores) < 2:
+        return None
+
+    values = [s[0] for s in scores]
+    v_min = min(values)
+    v_max = max(values)
+    v_range = v_max - v_min if v_max != v_min else 1.0
+
+    pad = 4
+    chart_w = width - 2 * pad
+    chart_h = height - 2 * pad
+    n = len(values)
+
+    def x_pos(i: int) -> float:
+        return pad + (i / (n - 1)) * chart_w
+
+    def y_pos(v: float) -> float:
+        ratio = (v - v_min) / v_range
+        return pad + chart_h * (1 - ratio)
+
+    coords = " ".join(f"{x_pos(i):.1f},{y_pos(v):.1f}" for i, v in enumerate(values))
+
+    return (
+        f'<svg viewBox="0 0 {width} {height}" '
+        f'xmlns="http://www.w3.org/2000/svg" '
+        f'style="width:100%;max-width:{width}px;height:auto;" '
+        f'role="img" aria-label="Sparkline de progression">'
+        f'<polyline points="{coords}" fill="none" '
+        f'stroke="{color}" stroke-width="2" '
+        f'stroke-linejoin="round" stroke-linecap="round"/>'
+        f'</svg>'
     )
