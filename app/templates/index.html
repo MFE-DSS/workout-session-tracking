@@ -1,35 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="h1">Accueil</h1>
-
-<section class="board-progress">
-  <h2 class="board-progress__title">Ma progression</h2>
-  <div class="board-kpis">
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ kpis.sessions_this_week }}</span>
-      <span class="board-kpi__label">cette sem.</span>
-    </div>
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ "%.0f"|format(kpis.avg_success_score_30d) if kpis.avg_success_score_30d is not none else "—" }}</span>
-      <span class="board-kpi__label">score moy.</span>
-    </div>
-    <div class="board-kpi">
-      <span class="board-kpi__value">{% if kpis.completion_rate_30d is not none %}{{ "%.0f"|format(kpis.completion_rate_30d * 100) }}%{% else %}—{% endif %}</span>
-      <span class="board-kpi__label">complétion 30j</span>
-    </div>
-    <div class="board-kpi">
-      <span class="board-kpi__value">{{ "%.0f"|format(behavioral.readiness_score) }}</span>
-      <span class="board-kpi__label">disponibilité</span>
-    </div>
-  </div>
-  {% if sparkline_svg %}
-    <div class="sparkline-container">{{ sparkline_svg|safe }}</div>
-  {% else %}
-    <p class="board-progress__empty">Pas encore de données</p>
-  {% endif %}
-  <p class="board-progress__reco">{{ behavioral.recommendation }}</p>
-  <a class="board-progress__link" href="{{ url_for('progress') }}">Voir analyse complète &rarr;</a>
-</section>
+<h1 class="page-title">Accueil</h1>
 
 {% if open_session %}
   <a class="tile tile--resume" href="{{ url_for('session_detail', session_id=open_session.id) }}">
@@ -42,30 +13,67 @@
   </a>
 {% endif %}
 
-<div class="tile-grid">
-  <a class="tile tile--primary" href="{{ url_for('library') }}">
-    <div class="tile__label">Nouvelle séance</div>
-    <div class="tile__hint">Choisir un programme et démarrer</div>
-  </a>
-  <a class="tile" href="{{ url_for('history') }}">
-    <div class="tile__label">Historique</div>
-    <div class="tile__hint">Sessions passées et feedback</div>
-  </a>
-  <a class="tile" href="{{ url_for('progress') }}">
-    <div class="tile__label">Progression</div>
-    <div class="tile__hint">KPI, surcharge, tendances</div>
-  </a>
-  <a class="tile" href="{{ url_for('library') }}">
-    <div class="tile__label">Programmes de séance</div>
-    <div class="tile__hint">Tous les programmes disponibles</div>
-  </a>
-  <a class="tile" href="{{ url_for('rules_page') }}">
-    <div class="tile__label">Règles</div>
-    <div class="tile__hint">Méthode et rappels techniques</div>
-  </a>
-  <a class="tile" href="{{ url_for('admin_sessions') }}">
-    <div class="tile__label">Gestion</div>
-    <div class="tile__hint">Gérer, exclure, supprimer des séances</div>
-  </a>
+<div class="cockpit-grid">
+  <div class="cockpit-main">
+    <div class="insight">
+      <div class="kpi kpi--accent">
+        <span class="kpi__value">{{ "%.0f"|format(behavioral.readiness_score) }}</span>
+        <span class="kpi__label">disponibilité</span>
+      </div>
+      <p class="insight__reco">{{ behavioral.recommendation }}</p>
+    </div>
+
+    <div class="card">
+      <div class="kpi-row">
+        <div class="kpi">
+          <span class="kpi__value">{{ kpis.sessions_this_week }}</span>
+          <span class="kpi__label">cette sem.</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__value">{{ "%.0f"|format(kpis.avg_success_score_30d) if kpis.avg_success_score_30d is not none else "—" }}</span>
+          <span class="kpi__label">score moy.</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi__value">{% if kpis.completion_rate_30d is not none %}{{ "%.0f"|format(kpis.completion_rate_30d * 100) }}%{% else %}—{% endif %}</span>
+          <span class="kpi__label">complétion 30j</span>
+        </div>
+      </div>
+      {% if sparkline_svg %}
+        <div class="sparkline-wrap">{{ sparkline_svg|safe }}</div>
+      {% else %}
+        <p class="text-dim" style="font-size:13px;margin:var(--space-sm) 0;">Pas encore de données</p>
+      {% endif %}
+      <a class="text-muted" href="{{ url_for('progress') }}" style="display:block;text-align:right;font-size:13px;margin-top:var(--space-sm);">Voir analyse complète →</a>
+    </div>
+  </div>
+
+  <div class="cockpit-side">
+    <div class="tile-grid">
+      <a class="tile tile--primary" href="{{ url_for('library') }}">
+        <div class="tile__label">Nouvelle séance</div>
+        <div class="tile__hint">Choisir un programme</div>
+      </a>
+      <a class="tile" href="{{ url_for('history') }}">
+        <div class="tile__label">Historique</div>
+        <div class="tile__hint">Sessions passées</div>
+      </a>
+      <a class="tile" href="{{ url_for('progress') }}">
+        <div class="tile__label">Progression</div>
+        <div class="tile__hint">KPI et tendances</div>
+      </a>
+      <a class="tile" href="{{ url_for('library') }}">
+        <div class="tile__label">Programmes</div>
+        <div class="tile__hint">Tous les programmes</div>
+      </a>
+      <a class="tile" href="{{ url_for('rules_page') }}">
+        <div class="tile__label">Règles</div>
+        <div class="tile__hint">Rappels techniques</div>
+      </a>
+      <a class="tile" href="{{ url_for('admin_sessions') }}">
+        <div class="tile__label">Gestion</div>
+        <div class="tile__hint">Gérer les séances</div>
+      </a>
+    </div>
+  </div>
 </div>
 {% endblock %}

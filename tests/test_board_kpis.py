@@ -3,9 +3,9 @@ from __future__ import annotations
 
 
 def test_home_shows_kpi_section(client):
-    """Home page should show the 'Ma progression' section."""
+    """Home page should show the cockpit KPI section with analysis link."""
     body = client.get("/").text
-    assert "Ma progression" in body
+    assert "cockpit-grid" in body
     assert "Voir analyse" in body
 
 
