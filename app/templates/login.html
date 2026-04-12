@@ -8,38 +8,41 @@
     <title>Connexion · Workout</title>
   </head>
   <body>
-    <main class="container" style="padding-top: 60px; max-width: 400px;">
-      <h1 class="h1" style="text-align: center;">Connexion</h1>
+    <main class="container" style="padding-top: 60px;">
+      <div class="auth-container">
+        <h1 class="page-title">Connexion</h1>
 
-      {% if error %}
-        <div class="integrity-errors" style="margin-bottom: 16px;">
-          <b>{{ error }}</b>
-        </div>
-      {% endif %}
+        {% if error %}
+          <div class="integrity-errors">
+            <b>{{ error }}</b>
+          </div>
+        {% endif %}
 
-      <form method="post" action="{{ url_for('login_submit') }}" class="card">
-        <label class="field">
-          <span class="field__label">Nom d'utilisateur</span>
-          <input type="text" name="username" required autofocus autocomplete="username" />
-        </label>
-        <label class="field">
-          <span class="field__label">Mot de passe</span>
-          <input type="password" name="password" required autocomplete="current-password" />
-        </label>
-        <div class="card__actions" style="margin-top: 16px;">
-          <button type="submit" class="btn btn--primary btn--wide">Se connecter</button>
-        </div>
-      </form>
-      <p style="text-align: center; margin-top: 16px;">
-        <a href="{{ url_for('register_page') }}" style="color: var(--fg-dim); font-size: 13px;">
-          Pas encore de compte ? S'inscrire
-        </a>
-      </p>
-      <p style="text-align: center; margin-top: 8px;">
-        <a href="{{ url_for('public_landing') }}" style="color: var(--fg-dim); font-size: 12px;">
-          ← Retour
-        </a>
-      </p>
+        <form method="post" action="{{ url_for('login_submit') }}" class="card">
+          <label class="field">
+            <span class="field__label">Nom d'utilisateur</span>
+            <input type="text" name="username" required autofocus autocomplete="username" />
+          </label>
+          <label class="field">
+            <span class="field__label">Mot de passe</span>
+            <input type="password" name="password" required autocomplete="current-password" />
+          </label>
+          <div class="card__actions" style="margin-top: 16px;">
+            <button type="submit" class="btn btn--primary btn--wide">Se connecter</button>
+          </div>
+        </form>
+
+        <p style="text-align: center; margin-top: 16px;">
+          <a href="{{ url_for('register_page') }}" style="color: var(--fg-dim); font-size: 13px;">
+            Pas encore de compte ? S'inscrire
+          </a>
+        </p>
+        <p style="text-align: center; margin-top: 8px;">
+          <a href="{{ url_for('public_landing') }}" style="color: var(--fg-dim); font-size: 12px;">
+            ← Retour
+          </a>
+        </p>
+      </div>
     </main>
   </body>
 </html>
