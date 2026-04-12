@@ -10,6 +10,7 @@
         <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
         <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
         <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
+        <li><span>Email</span><b>{{ user.email or "—" }}</b></li>
         <li><span>Sessions totales</span><b>{{ session_count }}</b></li>
         <li><span>Sessions terminées</span><b>{{ completed_count }}</b></li>
       </ul>
@@ -72,6 +73,11 @@
     <div class="card">
       <h2 class="card__title">Données de référence</h2>
       <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
+        <div class="body-profile__field" style="grid-column:1/-1;">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email"
+                 value="{{ user.email or '' }}" placeholder="optionnel">
+        </div>
         <div class="body-profile__field">
           <label for="height_cm">Taille (cm)</label>
           <input type="number" id="height_cm" name="height_cm"

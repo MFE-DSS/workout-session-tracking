@@ -46,7 +46,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # everything else from external origins.
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "style-src 'self' 'unsafe-inline'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data:; "
             "frame-ancestors 'none'"
         )

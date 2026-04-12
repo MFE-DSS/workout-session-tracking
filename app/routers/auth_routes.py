@@ -21,11 +21,15 @@ from app.services.session_state import latest_open_session
 from app.services.timeline import TimelinePoint, build_quality_timeline_svg
 from app.services.auth import (
     clear_session_cookie,
+    create_reset_token,
     create_session_cookie,
     get_current_user,
     hash_password,
     verify_password,
+    verify_reset_token,
 )
+from app.services.email import send_email
+from app.config import get_settings
 from app.templating import templates
 
 router = APIRouter(tags=["auth"])
@@ -105,6 +109,120 @@ def logout(request: Request) -> RedirectResponse:
 
 
 # ---------------------------------------------------------------------------
+# Password reset (public)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/forgot-password", response_class=HTMLResponse)
+def forgot_password_page(request: Request) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request, "forgot_password.html",
+        {"page_title": "Mot de passe oublié", "error": None, "success": False},
+    )
+
+
+@router.post("/forgot-password", response_class=HTMLResponse)
+async def forgot_password_submit(
+    request: Request,
+    email: Annotated[str, Form()],
+    db: DbSession,
+) -> HTMLResponse:
+    email_clean = email.strip().lower()
+    if email_clean:
+        user = db.execute(
+            select(User).where(User.email == email_clean)
+        ).scalar_one_or_none()
+        if user is not None:
+            token = create_reset_token(user.id)
+            settings = get_settings()
+            reset_url = f"{settings.app_base_url}/reset/{token}"
+            send_email(
+                to=user.email,
+                subject="SPIGNOS \u2014 R\u00e9initialisation de mot de passe",
+                body=(
+                    f"Bonjour,\n\n"
+                    f"Une demande de r\u00e9initialisation de mot de passe a \u00e9t\u00e9 faite "
+                    f"pour votre compte SPIGNOS.\n\n"
+                    f"Cliquez sur ce lien pour choisir un nouveau mot de passe "
+                    f"(valide 1 heure) :\n{reset_url}\n\n"
+                    f"Si vous n'avez pas fait cette demande, ignorez cet email.\n\n"
+                    f"\u2014 SPIGNOS"
+                ),
+            )
+    return templates.TemplateResponse(
+        request, "forgot_password.html",
+        {"page_title": "Mot de passe oublié", "error": None, "success": True},
+    )
+
+
+@router.get("/reset/{token}", response_class=HTMLResponse)
+def reset_password_page(token: str, request: Request) -> HTMLResponse:
+    user_id = verify_reset_token(token)
+    return templates.TemplateResponse(
+        request, "reset_password.html",
+        {
+            "page_title": "R\u00e9initialiser le mot de passe",
+            "token": token,
+            "valid": user_id is not None,
+            "error": None,
+        },
+    )
+
+
+@router.post("/reset/{token}", response_model=None)
+async def reset_password_submit(
+    token: str,
+    request: Request,
+    new_password: Annotated[str, Form()],
+    new_password_confirm: Annotated[str, Form()],
+    db: DbSession,
+):
+    user_id = verify_reset_token(token)
+    if user_id is None:
+        return templates.TemplateResponse(
+            request, "reset_password.html",
+            {
+                "page_title": "R\u00e9initialiser le mot de passe",
+                "token": token, "valid": False,
+                "error": "Ce lien a expir\u00e9 ou est invalide.",
+            },
+            status_code=400,
+        )
+
+    error = None
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        error = f"Le mot de passe doit faire au moins {MIN_PASSWORD_LENGTH} caract\u00e8res."
+    elif new_password != new_password_confirm:
+        error = "Les mots de passe ne correspondent pas."
+
+    if error:
+        return templates.TemplateResponse(
+            request, "reset_password.html",
+            {
+                "page_title": "R\u00e9initialiser le mot de passe",
+                "token": token, "valid": True, "error": error,
+            },
+            status_code=400,
+        )
+
+    user = db.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
+    if user is None:
+        return templates.TemplateResponse(
+            request, "reset_password.html",
+            {
+                "page_title": "R\u00e9initialiser le mot de passe",
+                "token": token, "valid": False,
+                "error": "Utilisateur introuvable.",
+            },
+            status_code=400,
+        )
+
+    user.password_hash = hash_password(new_password)
+    db.commit()
+    return RedirectResponse(url="/login?success=password_reset", status_code=303)
+
+
+# ---------------------------------------------------------------------------
 # Registration (public)
 # ---------------------------------------------------------------------------
 
@@ -126,7 +244,8 @@ async def register_submit(
     username: Annotated[str, Form()],
     password: Annotated[str, Form()],
     password_confirm: Annotated[str, Form()],
-    db: DbSession,
+    email: Annotated[str, Form()] = "",
+    db: DbSession = None,
 ):
     error = None
     if len(username.strip()) < MIN_USERNAME_LENGTH:
@@ -142,6 +261,18 @@ async def register_submit(
         if existing is not None:
             error = "Ce nom d'utilisateur est déjà pris."
 
+    # Email validation (only if provided)
+    email_clean = email.strip().lower() if email.strip() else None
+    if error is None and email_clean:
+        if "@" not in email_clean or "." not in email_clean.split("@")[-1]:
+            error = "Adresse email invalide."
+        else:
+            email_exists = db.execute(
+                select(User).where(User.email == email_clean)
+            ).scalar_one_or_none()
+            if email_exists is not None:
+                error = "Cet email est déjà associé à un compte."
+
     if error:
         return templates.TemplateResponse(
             request, "register.html",
@@ -152,6 +283,7 @@ async def register_submit(
     user = User(
         username=username.strip(),
         password_hash=hash_password(password),
+        email=email_clean,
     )
     db.add(user)
     db.commit()
@@ -298,6 +430,7 @@ def profile_page(
 @router.post("/profile/body", response_model=None)
 async def profile_body_submit(
     request: Request,
+    email: Annotated[str, Form()] = "",
     height_cm: Annotated[str, Form()] = "",
     resting_hr: Annotated[str, Form()] = "",
     bp_systolic: Annotated[str, Form()] = "",
@@ -322,6 +455,18 @@ async def profile_body_submit(
     user.resting_hr = _int_or_none(resting_hr, 30, 220)
     user.bp_systolic = _int_or_none(bp_systolic, 60, 250)
     user.bp_diastolic = _int_or_none(bp_diastolic, 30, 150)
+
+    email_clean = email.strip().lower() if email.strip() else None
+    if email_clean:
+        if "@" in email_clean and "." in email_clean.split("@")[-1]:
+            existing = db.execute(
+                select(User).where(User.email == email_clean, User.id != user.id)
+            ).scalar_one_or_none()
+            if existing is None:
+                user.email = email_clean
+    elif not email.strip():
+        user.email = None
+
     db.commit()
 
     return RedirectResponse(url="/profile", status_code=303)

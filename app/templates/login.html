@@ -18,6 +18,14 @@
           </div>
         {% endif %}
 
+        {% if success == "password_reset" %}
+          <div class="card" style="border-left: 3px solid var(--ok);">
+            <p style="font-size: 14px; color: var(--fg-muted);">
+              Mot de passe réinitialisé. Connecte-toi avec ton nouveau mot de passe.
+            </p>
+          </div>
+        {% endif %}
+
         <form method="post" action="{{ url_for('login_submit') }}" class="card">
           <label class="field">
             <span class="field__label">Nom d'utilisateur</span>
@@ -31,6 +39,12 @@
             <button type="submit" class="btn btn--primary btn--wide">Se connecter</button>
           </div>
         </form>
+
+        <p style="text-align: center; margin-top: 12px;">
+          <a href="{{ url_for('forgot_password_page') }}" style="color: var(--fg-dim); font-size: 13px;">
+            Mot de passe oublié ?
+          </a>
+        </p>
 
         <p style="text-align: center; margin-top: 16px;">
           <a href="{{ url_for('register_page') }}" style="color: var(--fg-dim); font-size: 13px;">
