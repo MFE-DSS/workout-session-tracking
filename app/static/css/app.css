@@ -1556,6 +1556,69 @@ code {
 
 .rule-list { display: grid; gap: var(--space-sm); }
 
+/* ---------- Physique dashboard ---------- */
+.global-score {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 700;
+  margin-right: var(--space-sm);
+}
+.radar-wrap {
+  max-width: 320px;
+  margin: var(--space-md) auto;
+}
+.zone-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+.zone-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xs);
+}
+.zone-card__label {
+  font-size: 13px;
+  font-weight: 600;
+}
+.zone-confidence {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.zone-confidence--élevée { background: var(--ok); }
+.zone-confidence--moyenne { background: var(--warn); }
+.zone-confidence--faible { background: var(--fg-dim); }
+.zone-bar {
+  height: 6px;
+  background: var(--surface-2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: var(--space-xs);
+}
+.zone-bar__fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+.zone-card__score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+.zone-meta {
+  font-size: 12px;
+  color: var(--fg-muted);
+  line-height: 1.4;
+}
+
 /* ---- Desktop Breakpoint ---- */
 
 @media (min-width: 768px) {

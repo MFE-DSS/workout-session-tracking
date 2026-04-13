@@ -300,3 +300,27 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "active_session": latest_open_session(db, user.id),
         },
     )
+
+
+@router.get("/physique", response_class=HTMLResponse)
+def physique(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    window: int = Query(30),
+) -> HTMLResponse:
+    from app.services.muscle_scoring import compute_physique_dashboard
+
+    window = window if window in (30, 60, 90) else 30
+    dashboard = compute_physique_dashboard(db, user.id, window_days=window)
+
+    return templates.TemplateResponse(
+        request,
+        "physique.html",
+        {
+            "page_title": "Physique",
+            "dashboard": dashboard,
+            "window": window,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )

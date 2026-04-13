@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Physique</h1>
+
+<div class="cockpit-grid">
+  <div class="cockpit-main">
+    <div class="card" style="text-align:center;">
+      <span class="global-score">{{ "%.0f"|format(dashboard.global_score) }}</span>
+      <span class="grade-badge grade-badge--{{ dashboard.global_grade|lower }}">{{ dashboard.global_grade }}</span>
+      <div class="radar-wrap">{{ dashboard.radar_svg|safe }}</div>
+    </div>
+
+    <nav class="filter-bar" style="margin-top:var(--space-md);">
+      <a class="filter-bar__item {% if window == 30 %}is-active{% endif %}"
+         href="{{ url_for('physique') }}?window=30">30j</a>
+      <a class="filter-bar__item {% if window == 60 %}is-active{% endif %}"
+         href="{{ url_for('physique') }}?window=60">60j</a>
+      <a class="filter-bar__item {% if window == 90 %}is-active{% endif %}"
+         href="{{ url_for('physique') }}?window=90">90j</a>
+    </nav>
+  </div>
+
+  <div class="cockpit-side">
+    <h2 class="section-header">Détail par zone</h2>
+    {% for z in dashboard.zone_scores %}
+    <div class="zone-card">
+      <div class="zone-card__header">
+        <span class="zone-card__label">{{ z.label }}</span>
+        <span class="zone-confidence zone-confidence--{{ z.confidence }}"
+              title="Confiance : {{ z.confidence }}"></span>
+      </div>
+      <div class="zone-bar">
+        <div class="zone-bar__fill" style="width:{{ z.score|round|int }}%"></div>
+      </div>
+      <div class="zone-card__score">
+        <span class="text-mono">{{ "%.0f"|format(z.score) }}/100</span>
+        <span class="trend-indicator trend-indicator--{{ z.trend }}">
+          {% if z.trend == 'up' %}↑{% elif z.trend == 'down' %}↓{% else %}→{% endif %}
+        </span>
+      </div>
+      <div class="zone-meta">
+        {{ z.hard_sets }} hard sets · {{ z.session_count }} séance{% if z.session_count != 1 %}s{% endif %}
+      </div>
+      {% if z.top_exercises %}
+        <div class="zone-meta" style="color:var(--fg-dim);">{{ z.top_exercises|join(', ') }}</div>
+      {% endif %}
+      {% if z.measurement_trend %}
+        <div class="zone-meta">{{ z.measurement_label }}: {{ z.measurement_trend }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
