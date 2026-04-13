@@ -12,8 +12,10 @@ def test_profile_measurement_submit(client):
     r = client.post("/profile/measurements", data={
         "measured_at": "2026-04-12",
         "chest_cm": "100",
-        "arm_cm": "36",
-        "thigh_cm": "",
+        "arm_cm_left": "36",
+        "arm_cm_right": "37",
+        "thigh_cm_left": "",
+        "thigh_cm_right": "",
     }, follow_redirects=False)
     assert r.status_code == 303
 
@@ -29,8 +31,10 @@ def test_profile_measurement_submit(client):
             select(BodyMeasurement).where(BodyMeasurement.user_id == uid)
         ).scalar_one()
         assert m.chest_cm == 100.0
-        assert m.arm_cm == 36.0
-        assert m.thigh_cm is None
+        assert m.arm_cm_left == 36.0
+        assert m.arm_cm_right == 37.0
+        assert m.thigh_cm_left is None
+        assert m.thigh_cm_right is None
 
 
 def test_profile_measurement_upsert_same_day(client):
@@ -39,16 +43,20 @@ def test_profile_measurement_upsert_same_day(client):
     client.post("/profile/measurements", data={
         "measured_at": "2026-04-10",
         "chest_cm": "95",
-        "arm_cm": "",
-        "thigh_cm": "",
+        "arm_cm_left": "",
+        "arm_cm_right": "",
+        "thigh_cm_left": "",
+        "thigh_cm_right": "",
     }, follow_redirects=False)
 
     # Second submit same date — should update, not create new row
     client.post("/profile/measurements", data={
         "measured_at": "2026-04-10",
         "chest_cm": "96",
-        "arm_cm": "35",
-        "thigh_cm": "",
+        "arm_cm_left": "35",
+        "arm_cm_right": "",
+        "thigh_cm_left": "",
+        "thigh_cm_right": "",
     }, follow_redirects=False)
 
     from app.database import SessionLocal
@@ -70,7 +78,7 @@ def test_profile_measurement_upsert_same_day(client):
         # Only 1 row for that date, not 2
         assert len(rows) == 1
         assert rows[0].chest_cm == 96.0  # updated
-        assert rows[0].arm_cm == 35.0    # added
+        assert rows[0].arm_cm_left == 35.0  # added
 
 
 def test_profile_measurement_skip_when_all_empty(client):
@@ -90,8 +98,10 @@ def test_profile_measurement_skip_when_all_empty(client):
     client.post("/profile/measurements", data={
         "measured_at": "2026-04-11",
         "chest_cm": "",
-        "arm_cm": "",
-        "thigh_cm": "",
+        "arm_cm_left": "",
+        "arm_cm_right": "",
+        "thigh_cm_left": "",
+        "thigh_cm_right": "",
     }, follow_redirects=False)
 
     with SessionLocal() as db:
@@ -108,8 +118,10 @@ def test_profile_measurement_future_date_capped(client):
     client.post("/profile/measurements", data={
         "measured_at": "2030-01-01",
         "chest_cm": "99",
-        "arm_cm": "",
-        "thigh_cm": "",
+        "arm_cm_left": "",
+        "arm_cm_right": "",
+        "thigh_cm_left": "",
+        "thigh_cm_right": "",
     }, follow_redirects=False)
 
     from app.database import SessionLocal

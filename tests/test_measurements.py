@@ -2,10 +2,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from types import SimpleNamespace
 
 from app.services.measurements import (
     MEASUREMENT_LABELS,
     MEASUREMENT_MUSCLE_MAP,
+    compute_arm_avg,
+    compute_thigh_avg,
+    compute_zone_measurement,
     find_related_templates,
     get_latest_measurement,
     get_measurement_series,
@@ -15,7 +19,11 @@ from tests.helpers import get_test_user_id
 
 def test_muscle_map_has_all_fields():
     assert set(MEASUREMENT_MUSCLE_MAP.keys()) == {
-        "weight_kg", "chest_cm", "arm_cm", "waist_cm", "thigh_cm",
+        "weight_kg", "chest_cm",
+        "arm_cm_left", "arm_cm_right",
+        "waist_cm",
+        "thigh_cm_left", "thigh_cm_right",
+        "hip_cm", "neck_cm", "calf_cm",
     }
 
 
@@ -59,7 +67,7 @@ def test_find_related_templates_thigh():
         FakeTemplate("Push A", "Pectoral, Delts"),
         FakeTemplate("Legs", "Jambes"),
     ]
-    result = find_related_templates("thigh_cm", templates)
+    result = find_related_templates("thigh_cm_left", templates)
     assert result == ["Legs"]
 
 
@@ -123,6 +131,77 @@ def test_get_measurement_series(client):
     assert series[0][1] == 73.0
     assert series[2][1] == 75.0
 
+
+def test_get_measurement_series_unknown_field(client):
+    """Requesting a field that doesn't exist on the model returns empty list."""
+    from app.database import SessionLocal
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        series = get_measurement_series(db, uid, "nonexistent_field")
+    assert series == []
+
+
+# ---------------------------------------------------------------------------
+# compute_arm_avg / compute_thigh_avg / compute_zone_measurement
+# ---------------------------------------------------------------------------
+
+def test_compute_arm_avg_both():
+    m = SimpleNamespace(arm_cm_left=35.0, arm_cm_right=37.0)
+    assert compute_arm_avg(m) == 36.0
+
+
+def test_compute_arm_avg_left_only():
+    m = SimpleNamespace(arm_cm_left=35.0, arm_cm_right=None)
+    assert compute_arm_avg(m) == 35.0
+
+
+def test_compute_arm_avg_right_only():
+    m = SimpleNamespace(arm_cm_left=None, arm_cm_right=37.0)
+    assert compute_arm_avg(m) == 37.0
+
+
+def test_compute_arm_avg_none():
+    m = SimpleNamespace(arm_cm_left=None, arm_cm_right=None)
+    assert compute_arm_avg(m) is None
+
+
+def test_compute_thigh_avg_both():
+    m = SimpleNamespace(thigh_cm_left=55.0, thigh_cm_right=57.0)
+    assert compute_thigh_avg(m) == 56.0
+
+
+def test_compute_thigh_avg_none():
+    m = SimpleNamespace(thigh_cm_left=None, thigh_cm_right=None)
+    assert compute_thigh_avg(m) is None
+
+
+def test_compute_zone_measurement_direct():
+    m = SimpleNamespace(chest_cm=100.0, waist_cm=80.0)
+    assert compute_zone_measurement(m, "pecs") == 100.0
+    assert compute_zone_measurement(m, "core") == 80.0
+
+
+def test_compute_zone_measurement_lateralized():
+    m = SimpleNamespace(
+        arm_cm_left=35.0, arm_cm_right=37.0,
+        thigh_cm_left=55.0, thigh_cm_right=57.0,
+    )
+    assert compute_zone_measurement(m, "biceps") == 36.0
+    assert compute_zone_measurement(m, "triceps") == 36.0
+    assert compute_zone_measurement(m, "quads") == 56.0
+    assert compute_zone_measurement(m, "posterior") == 56.0
+
+
+def test_compute_zone_measurement_unknown():
+    m = SimpleNamespace()
+    assert compute_zone_measurement(m, "calves") is None
+    assert compute_zone_measurement(m, "lats") is None
+
+
+# ---------------------------------------------------------------------------
+# Timeline tests (existing)
+# ---------------------------------------------------------------------------
 
 from app.services.timeline import build_measurement_timeline_svg, TimelinePoint
 

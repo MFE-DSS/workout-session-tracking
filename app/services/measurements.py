@@ -3,6 +3,9 @@
 Provides time-series storage for body measurements and a static
 mapping from measurement fields to muscle groups, used to display
 related workout templates alongside evolution graphs.
+
+Lateralized fields (arm, thigh) are stored as left/right pairs.
+Helper functions compute averages for the physique dashboard.
 """
 from __future__ import annotations
 
@@ -18,29 +21,93 @@ from app.models.measurement import BodyMeasurement
 MEASUREMENT_MUSCLE_MAP: dict[str, list[str]] = {
     "weight_kg": [],
     "chest_cm": ["pectoral", "pectoraux", "pecs"],
-    "arm_cm": ["biceps", "triceps", "bras"],
+    "arm_cm_left": ["biceps", "triceps", "bras"],
+    "arm_cm_right": ["biceps", "triceps", "bras"],
     "waist_cm": ["abdos", "abs", "cardio"],
-    "thigh_cm": ["jambes", "quadriceps", "cuisses"],
+    "thigh_cm_left": ["jambes", "quadriceps", "cuisses"],
+    "thigh_cm_right": ["jambes", "quadriceps", "cuisses"],
+    "hip_cm": [],
+    "neck_cm": [],
+    "calf_cm": ["mollets"],
 }
 
 MEASUREMENT_LABELS: dict[str, str] = {
     "weight_kg": "Poids (kg)",
     "chest_cm": "Tour de poitrine (cm)",
-    "arm_cm": "Tour de bras (cm)",
+    "arm_cm_left": "Bras gauche (cm)",
+    "arm_cm_right": "Bras droit (cm)",
     "waist_cm": "Tour de taille (cm)",
-    "thigh_cm": "Tour de cuisses (cm)",
+    "thigh_cm_left": "Cuisse gauche (cm)",
+    "thigh_cm_right": "Cuisse droite (cm)",
+    "hip_cm": "Tour de hanches (cm)",
+    "neck_cm": "Tour de cou (cm)",
+    "calf_cm": "Tour de mollet (cm)",
 }
 
 MEASUREMENT_UNITS: dict[str, str] = {
     "weight_kg": " kg",
     "chest_cm": " cm",
-    "arm_cm": " cm",
+    "arm_cm_left": " cm",
+    "arm_cm_right": " cm",
     "waist_cm": " cm",
-    "thigh_cm": " cm",
+    "thigh_cm_left": " cm",
+    "thigh_cm_right": " cm",
+    "hip_cm": " cm",
+    "neck_cm": " cm",
+    "calf_cm": " cm",
 }
 
 MEASUREMENT_FIELDS = list(MEASUREMENT_LABELS.keys())
 
+
+# ---------------------------------------------------------------------------
+# Lateralized average helpers
+# ---------------------------------------------------------------------------
+
+def compute_arm_avg(m) -> float | None:
+    """Average of left/right arm. Single side if only one. None if neither."""
+    left = getattr(m, "arm_cm_left", None)
+    right = getattr(m, "arm_cm_right", None)
+    if left is not None and right is not None:
+        return (left + right) / 2
+    return left or right
+
+
+def compute_thigh_avg(m) -> float | None:
+    """Average of left/right thigh. Single side if only one. None if neither."""
+    left = getattr(m, "thigh_cm_left", None)
+    right = getattr(m, "thigh_cm_right", None)
+    if left is not None and right is not None:
+        return (left + right) / 2
+    return left or right
+
+
+# ---------------------------------------------------------------------------
+# Zone measurement resolver
+# ---------------------------------------------------------------------------
+
+_ZONE_DIRECT = {"pecs": "chest_cm", "core": "waist_cm"}
+_ZONE_LATERALIZED = {
+    "biceps": "arm",
+    "triceps": "arm",
+    "quads": "thigh",
+    "posterior": "thigh",
+}
+
+
+def compute_zone_measurement(m, zone: str) -> float | None:
+    """Resolve a zone to the relevant measurement value on a BodyMeasurement row."""
+    if zone in _ZONE_DIRECT:
+        return getattr(m, _ZONE_DIRECT[zone], None)
+    if zone in _ZONE_LATERALIZED:
+        limb = _ZONE_LATERALIZED[zone]
+        return compute_arm_avg(m) if limb == "arm" else compute_thigh_avg(m)
+    return None
+
+
+# ---------------------------------------------------------------------------
+# CRUD helpers
+# ---------------------------------------------------------------------------
 
 def find_related_templates(field_name: str, templates: list) -> list[str]:
     """Find catalog templates whose focus matches a measurement's muscle group."""
@@ -71,7 +138,9 @@ def get_measurement_series(
     db: Session, user_id: int, field: str, limit: int = 20
 ) -> list[tuple[datetime, float]]:
     """Return (measured_at, value) pairs for one field, non-null only, ASC."""
-    col = getattr(BodyMeasurement, field)
+    col = getattr(BodyMeasurement, field, None)
+    if col is None:
+        return []
     rows = db.execute(
         select(BodyMeasurement.measured_at, col)
         .where(BodyMeasurement.user_id == user_id)

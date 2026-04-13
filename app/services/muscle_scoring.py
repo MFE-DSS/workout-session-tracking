@@ -160,27 +160,34 @@ def _score_anthropo(
     db: Session, user_id: int, zone: str, window_start: datetime
 ) -> tuple[float | None, str | None]:
     """Score anthropometry for a zone. Returns (score, trend_label) or (None, None)."""
+    from app.services.measurements import compute_zone_measurement
+
     field_name = ZONE_MEASUREMENT.get(zone)
     if not field_name:
         return None, None
 
-    col = getattr(BodyMeasurement, field_name)
+    # Get all measurements in window
     rows = db.execute(
-        select(BodyMeasurement.measured_at, col)
+        select(BodyMeasurement)
         .where(BodyMeasurement.user_id == user_id)
-        .where(col.is_not(None))
         .where(BodyMeasurement.measured_at >= window_start)
         .order_by(BodyMeasurement.measured_at.asc())
-    ).all()
+    ).scalars().all()
 
-    if len(rows) < 2:
+    # Compute zone value for each measurement
+    values = []
+    for m in rows:
+        val = compute_zone_measurement(m, zone)
+        if val is not None:
+            values.append((m.measured_at, val))
+
+    if len(values) < 2:
         return None, None
 
-    first_val = rows[0][1]
-    last_val = rows[-1][1]
+    first_val = values[0][1]
+    last_val = values[-1][1]
     diff = last_val - first_val
 
-    # For waist_cm (core zone), decrease is positive
     is_inverse = zone == "core"
     if is_inverse:
         diff = -diff
@@ -189,7 +196,6 @@ def _score_anthropo(
         return 50.0, f"{diff:+.1f} cm"
 
     pct_change = diff / first_val * 100
-
     if pct_change <= -2:
         score = 30.0
     elif pct_change <= 0.5:
@@ -200,9 +206,7 @@ def _score_anthropo(
         score = 90.0
 
     sign = "+" if diff > 0 else ""
-    unit = " kg" if field_name == "weight_kg" else " cm"
-    label = f"{sign}{diff:.1f}{unit}"
-
+    label = f"{sign}{diff:.1f} cm"
     return score, label
 
 
@@ -298,8 +302,15 @@ def compute_physique_dashboard(
 
         # Measurement label
         meas_field = ZONE_MEASUREMENT.get(zone)
-        from app.services.measurements import MEASUREMENT_LABELS
-        meas_label = MEASUREMENT_LABELS.get(meas_field) if meas_field else None
+        meas_label = None
+        if meas_field:
+            _ZONE_DISPLAY_LABELS = {
+                "chest_cm": "Tour de poitrine",
+                "arm_avg": "Tour de bras (moy.)",
+                "thigh_avg": "Tour de cuisses (moy.)",
+                "waist_cm": "Tour de taille",
+            }
+            meas_label = _ZONE_DISPLAY_LABELS.get(meas_field)
 
         zone_scores.append(ZoneScore(
             zone=zone,

@@ -477,12 +477,6 @@ async def profile_body_submit(
 @router.post("/profile/measurements", response_model=None)
 async def profile_measurements_submit(
     request: Request,
-    measured_at: Annotated[str, Form()] = "",
-    weight_kg: Annotated[str, Form()] = "",
-    chest_cm: Annotated[str, Form()] = "",
-    arm_cm: Annotated[str, Form()] = "",
-    waist_cm: Annotated[str, Form()] = "",
-    thigh_cm: Annotated[str, Form()] = "",
     db: DbSession = None,
     user: CurrentUser = None,
 ):
@@ -494,13 +488,17 @@ async def profile_measurements_submit(
     - Same date already exists → update existing row (upsert)
     """
     from app.models.measurement import BodyMeasurement
+    from app.services.measurements import MEASUREMENT_FIELDS
+
+    form = await request.form()
 
     # Parse date — fallback to today if empty/invalid
     now = datetime.now(timezone.utc)
     dt = now
-    if measured_at.strip():
+    measured_at = (form.get("measured_at") or "").strip()
+    if measured_at:
         try:
-            dt = datetime.strptime(measured_at.strip(), "%Y-%m-%d").replace(
+            dt = datetime.strptime(measured_at, "%Y-%m-%d").replace(
                 tzinfo=timezone.utc
             )
         except ValueError:
@@ -522,14 +520,20 @@ async def profile_measurements_submit(
             return None
         return n
 
-    weight = _float_or_none(weight_kg, 30.0, 300.0)
-    chest = _float_or_none(chest_cm, 10.0, 200.0)
-    arm = _float_or_none(arm_cm, 10.0, 200.0)
-    waist = _float_or_none(waist_cm, 10.0, 200.0)
-    thigh = _float_or_none(thigh_cm, 10.0, 200.0)
+    # Parse all measurement fields dynamically
+    _RANGES: dict[str, tuple[float, float]] = {
+        "weight_kg": (30.0, 300.0),
+    }
+    _DEFAULT_RANGE = (10.0, 200.0)
+
+    parsed: dict[str, float | None] = {}
+    for field in MEASUREMENT_FIELDS:
+        raw = form.get(field, "")
+        lo, hi = _RANGES.get(field, _DEFAULT_RANGE)
+        parsed[field] = _float_or_none(raw, lo, hi)
 
     # Skip if all measurement fields are empty
-    if weight is None and chest is None and arm is None and waist is None and thigh is None:
+    if all(v is None for v in parsed.values()):
         return RedirectResponse(url="/profile", status_code=303)
 
     # Upsert: if a measurement exists for same date, update it
@@ -545,25 +549,14 @@ async def profile_measurements_submit(
 
     if existing:
         # Update only non-null submitted values (don't erase existing data)
-        if weight is not None:
-            existing.weight_kg = weight
-        if chest is not None:
-            existing.chest_cm = chest
-        if arm is not None:
-            existing.arm_cm = arm
-        if waist is not None:
-            existing.waist_cm = waist
-        if thigh is not None:
-            existing.thigh_cm = thigh
+        for field, val in parsed.items():
+            if val is not None:
+                setattr(existing, field, val)
     else:
         m = BodyMeasurement(
             user_id=user.id,
             measured_at=dt,
-            weight_kg=weight,
-            chest_cm=chest,
-            arm_cm=arm,
-            waist_cm=waist,
-            thigh_cm=thigh,
+            **{k: v for k, v in parsed.items()},
         )
         db.add(m)
 
