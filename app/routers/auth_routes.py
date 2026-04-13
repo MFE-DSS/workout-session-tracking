@@ -478,6 +478,7 @@ async def profile_body_submit(
 async def profile_measurements_submit(
     request: Request,
     measured_at: Annotated[str, Form()] = "",
+    weight_kg: Annotated[str, Form()] = "",
     chest_cm: Annotated[str, Form()] = "",
     arm_cm: Annotated[str, Form()] = "",
     thigh_cm: Annotated[str, Form()] = "",
@@ -520,12 +521,13 @@ async def profile_measurements_submit(
             return None
         return n
 
+    weight = _float_or_none(weight_kg, 30.0, 300.0)
     chest = _float_or_none(chest_cm, 10.0, 200.0)
     arm = _float_or_none(arm_cm, 10.0, 200.0)
     thigh = _float_or_none(thigh_cm, 10.0, 200.0)
 
     # Skip if all measurement fields are empty
-    if chest is None and arm is None and thigh is None:
+    if weight is None and chest is None and arm is None and thigh is None:
         return RedirectResponse(url="/profile", status_code=303)
 
     # Upsert: if a measurement exists for same date, update it
@@ -541,6 +543,8 @@ async def profile_measurements_submit(
 
     if existing:
         # Update only non-null submitted values (don't erase existing data)
+        if weight is not None:
+            existing.weight_kg = weight
         if chest is not None:
             existing.chest_cm = chest
         if arm is not None:
@@ -551,6 +555,7 @@ async def profile_measurements_submit(
         m = BodyMeasurement(
             user_id=user.id,
             measured_at=dt,
+            weight_kg=weight,
             chest_cm=chest,
             arm_cm=arm,
             thigh_cm=thigh,

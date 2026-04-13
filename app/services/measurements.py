@@ -16,18 +16,21 @@ from app.models.measurement import BodyMeasurement
 
 
 MEASUREMENT_MUSCLE_MAP: dict[str, list[str]] = {
+    "weight_kg": [],
     "chest_cm": ["pectoral", "pectoraux", "pecs"],
     "arm_cm": ["biceps", "triceps", "bras"],
     "thigh_cm": ["jambes", "quadriceps", "cuisses"],
 }
 
 MEASUREMENT_LABELS: dict[str, str] = {
+    "weight_kg": "Poids (kg)",
     "chest_cm": "Tour de poitrine (cm)",
     "arm_cm": "Tour de bras (cm)",
     "thigh_cm": "Tour de cuisses (cm)",
 }
 
 MEASUREMENT_UNITS: dict[str, str] = {
+    "weight_kg": " kg",
     "chest_cm": " cm",
     "arm_cm": " cm",
     "thigh_cm": " cm",
