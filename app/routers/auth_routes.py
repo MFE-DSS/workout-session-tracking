@@ -609,3 +609,72 @@ async def password_change_submit(
         request, "password_change.html",
         {"page_title": "Changer le mot de passe", "error": None, "success": True},
     )
+
+
+# ---------------------------------------------------------------------------
+# Contact (private)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/contact", response_class=HTMLResponse)
+def contact_page(request: Request, user: CurrentUser) -> HTMLResponse:
+    return templates.TemplateResponse(
+        request, "contact.html",
+        {"page_title": "Contact", "error": None, "success": False},
+    )
+
+
+@router.post("/contact", response_model=None)
+async def contact_submit(
+    request: Request,
+    subject: Annotated[str, Form()],
+    message: Annotated[str, Form()],
+    user: CurrentUser,
+):
+    """Send a contact message to the site administrator."""
+    subject_clean = subject.strip()
+    message_clean = message.strip()
+
+    if not subject_clean or not message_clean:
+        return templates.TemplateResponse(
+            request, "contact.html",
+            {"page_title": "Contact", "error": "Sujet et message requis.", "success": False},
+            status_code=400,
+        )
+
+    # Rate limit: cap message length
+    if len(message_clean) > 2000:
+        message_clean = message_clean[:2000]
+
+    from app.config import get_settings
+    settings = get_settings()
+    admin_email = settings.smtp_from  # same as the noreply address
+
+    body = (
+        f"Message de : {user.username}"
+        f"{(' <' + user.email + '>') if user.email else ''}\n"
+        f"---\n\n"
+        f"{message_clean}\n"
+    )
+
+    sent = send_email(
+        to=admin_email,
+        subject=f"[SPIGNOS Contact] {subject_clean}",
+        body=body,
+    )
+
+    if not sent:
+        return templates.TemplateResponse(
+            request, "contact.html",
+            {
+                "page_title": "Contact",
+                "error": "Impossible d'envoyer le message. Réessaie plus tard.",
+                "success": False,
+            },
+            status_code=500,
+        )
+
+    return templates.TemplateResponse(
+        request, "contact.html",
+        {"page_title": "Contact", "error": None, "success": True},
+    )

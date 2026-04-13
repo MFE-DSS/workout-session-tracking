@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-container">
+  <h1 class="page-title">Contact</h1>
+
+  {% if success %}
+    <div class="card" style="border-left: 3px solid var(--ok);">
+      <p style="font-size: 14px; color: var(--fg-muted);">
+        Message envoyé. Merci pour ton retour.
+      </p>
+    </div>
+  {% else %}
+    {% if error %}
+      <div class="integrity-errors"><b>{{ error }}</b></div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('contact_submit') }}" class="card">
+      <label class="field">
+        <span class="field__label">Sujet</span>
+        <input type="text" name="subject" required autofocus placeholder="Bug, suggestion, question..." />
+      </label>
+      <label class="field">
+        <span class="field__label">Message</span>
+        <textarea name="message" rows="6" required placeholder="Décris ton problème ou ta suggestion..."></textarea>
+      </label>
+      <div class="card__actions" style="margin-top: 16px;">
+        <button type="submit" class="btn btn--primary btn--wide">Envoyer</button>
+      </div>
+    </form>
+  {% endif %}
+
+  <p style="text-align: center; margin-top: 16px;">
+    <a href="{{ url_for('home') }}" style="color: var(--fg-dim); font-size: 13px;">
+      ← Retour à l'accueil
+    </a>
+  </p>
+</div>
+{% endblock %}
