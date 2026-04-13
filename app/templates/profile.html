@@ -53,6 +53,10 @@
   <div class="cockpit-side">
     <div class="card">
       <h2 class="card__title">Nouvelle mesure</h2>
+      <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);">
+        Mesurer le matin, à jeun, mêmes conditions. Tape à plat, muscle relâché.
+        Entrer les deux côtés même si similaires. Fréquence idéale : 1x/semaine.
+      </p>
       <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
           <label for="measured_at">Date</label>
