@@ -286,7 +286,10 @@ async def update_exercise_card(
             SessionExercise.id == session_exercise_id,
             SessionExercise.session_id == session_id,
         )
-        .options(selectinload(SessionExercise.set_logs))
+        .options(
+            selectinload(SessionExercise.set_logs),
+            selectinload(SessionExercise.template_exercise),
+        )
     )
     se = db.execute(stmt).scalar_one_or_none()
     if se is None:
@@ -295,7 +298,6 @@ async def update_exercise_card(
     form = await request.form()
 
     # Exercise-level feedback
-    se.success_score = enum_int(form.get("success_score"), _SUCCESS_SCORE)
     se.muscle_sensation = enum_str(form.get("muscle_sensation"), _MUSCLE_SENSATION)
     se.free_note = clean_str(form.get("free_note"), max_length=140)
 
@@ -305,11 +307,10 @@ async def update_exercise_card(
         sl.weight_kg = to_float(form.get(p + "weight_kg"))
         sl.reps = to_int(form.get(p + "reps"))
         sl.completed = checkbox(form.get(p + "completed"))
-        if sl.kind == "work":
-            sl.execution_quality = enum_str(
-                form.get(p + "execution_quality"), _EXECUTION_QUALITY
-            )
-            sl.reps_target = enum_str(form.get(p + "reps_target"), _REPS_TARGET)
+
+    # Derive success_score from set data (Sb_01)
+    from app.services.feedback import compute_success_score
+    se.success_score = compute_success_score(se, se.template_exercise)
 
     db.commit()
 

@@ -261,22 +261,6 @@
               </label>
             </div>
 
-            <div class="set-row__mini">
-              <span class="set-row__mini-label">Exécution</span>
-              {{ segmented(
-                "set_" ~ sl.id ~ "_execution_quality",
-                [("clean", "clean"), ("acceptable", "accept."), ("degraded", "degrad.")],
-                sl.execution_quality
-              ) }}
-            </div>
-            <div class="set-row__mini">
-              <span class="set-row__mini-label">Target reps</span>
-              {{ segmented(
-                "set_" ~ sl.id ~ "_reps_target",
-                [("target_hit", "hit"), ("target_near", "near"), ("target_missed", "missed")],
-                sl.reps_target
-              ) }}
-            </div>
           </li>
         {% endfor %}
       </ul>
@@ -286,19 +270,16 @@
 
     <h3 class="card__subtitle">Feedback exercice</h3>
 
-    <div class="field-block">
-      <span class="field__label">Score</span>
-      {{ segmented("success_score", [100, 80, 50], se.success_score) }}
-    </div>
-
-    <div class="field-block">
-      <span class="field__label">Muscle cible</span>
+    <details class="field-block field-block--optional">
+      <summary class="field__label" style="cursor:pointer;font-size:13px;color:var(--fg-dim);">
+        Sensation musculaire (optionnel)
+      </summary>
       {{ segmented(
         "muscle_sensation",
         [("strong", "Strong"), ("partial", "Partial"), ("weak", "Weak")],
         se.muscle_sensation
       ) }}
-    </div>
+    </details>
 
     {% call field_group("Note (optionnel)") %}
       <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
