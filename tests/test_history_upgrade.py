@@ -20,27 +20,27 @@ def test_history_shows_exercise_counts(client):
 
 def test_history_status_filter_in_progress(client):
     sid1 = _start(client, "push-a")
-    sid2 = _start(client, "legs")
+    sid2 = _start(client, "legs-a")
     # Complete one of them
     client.post(f"/sessions/{sid1}", data={"action": "end"}, follow_redirects=False)
 
     # The "active session banner" added in Sprint 5 may surface the
-    # in-progress template name (Legs) in the page header even when
+    # in-progress template name in the page header even when
     # the filter excludes it. We assert against the session-card list
     # specifically by looking at the session-card__name marker.
-    def _in_list(html: str, name: str) -> bool:
-        return f'session-card__name">{name}' in html
+    def _in_list(html: str, name_prefix: str) -> bool:
+        return f'session-card__name">{name_prefix}' in html
 
     r_all = client.get("/history?status=all").text
-    assert _in_list(r_all, "Push A") and _in_list(r_all, "Legs")
+    assert _in_list(r_all, "Push A") and _in_list(r_all, "Legs A")
 
     r_open = client.get("/history?status=in_progress").text
-    assert _in_list(r_open, "Legs")
+    assert _in_list(r_open, "Legs A")
     assert not _in_list(r_open, "Push A")
 
     r_done = client.get("/history?status=completed").text
     assert _in_list(r_done, "Push A")
-    assert not _in_list(r_done, "Legs")
+    assert not _in_list(r_done, "Legs A")
 
 
 def test_history_filter_bar_highlights_active_choice(client):

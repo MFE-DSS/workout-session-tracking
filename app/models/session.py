@@ -37,6 +37,11 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
+# Ensure catalog models are loaded so that string-based relationship
+# references (e.g. "TemplateExercise") resolve correctly even when
+# this module is imported in isolation after an app module purge.
+import app.models.catalog  # noqa: F401
+
 
 class WorkoutSession(Base):
     """One real workout, identified by its start timestamp."""

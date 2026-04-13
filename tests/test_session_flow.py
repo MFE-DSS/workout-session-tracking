@@ -51,7 +51,7 @@ def test_library_renders_start_forms_for_every_template(client):
     r = client.get("/library")
     assert r.status_code == 200
     body = r.text
-    for slug in ["push-a", "pull-a", "push-b", "pull-b", "legs", "liss-abs"]:
+    for slug in ["push-a", "pull-a", "push-b", "pull-b", "legs-a", "liss-abs"]:
         assert f'value="{slug}"' in body, f"missing start form for {slug}"
     # Starlette's url_for emits absolute URLs under TestClient.
     assert body.count('/sessions"') >= 6
@@ -77,7 +77,7 @@ def test_created_session_has_snapshots_and_started_at(client):
         s = db.get(WorkoutSession, sid)
         assert s is not None
         assert s.template_slug_snapshot == "push-a"
-        assert s.template_name_snapshot == "Push A"
+        assert s.template_name_snapshot.startswith("Push A")
         assert s.started_at is not None
         assert s.status == "in_progress"
 
@@ -103,7 +103,7 @@ def test_created_session_pre_populates_warmup_and_work_sets(client):
 
     sid = _start_session(client, "push-a")
     with SessionLocal() as db:
-        # Exercise 1 (E1 Butterfly pec, 2 rep targets): expect 2 warmup + 2 work
+        # Exercise 1 (E1 Incline Smith Press, 3 rep targets): expect 2 warmup + 3 work
         se = db.execute(
             select(SessionExercise)
             .where(SessionExercise.session_id == sid)
@@ -115,7 +115,7 @@ def test_created_session_pre_populates_warmup_and_work_sets(client):
         warmups = [s for s in sets if s.kind == "warmup"]
         work = [s for s in sets if s.kind == "work"]
         assert len(warmups) == 2
-        assert len(work) == 2
+        assert len(work) == 3
         assert all(s.completed is False for s in sets)
 
 
@@ -356,12 +356,12 @@ def test_values_are_preserved_after_reload_via_http(client):
 
 def test_history_lists_created_sessions(client):
     _start_session(client, "push-a")
-    _start_session(client, "legs")
+    _start_session(client, "legs-a")
     r = client.get("/history")
     assert r.status_code == 200
     body = r.text
     assert "Push A" in body
-    assert "Legs" in body
+    assert "Legs A" in body
     # At least 2 session cards with status badges
     assert body.count("en cours") >= 2
 

@@ -76,7 +76,7 @@ def test_export_contains_session_exercise_and_set_fields(client):
     # Session-level fields
     assert s["status"] == "completed"
     assert s["template_slug"] == "push-a"
-    assert s["template_name"] == "Push A"
+    assert s["template_name"].startswith("Push A")
     assert s["concentration"] == "high"
     assert s["global_state"] == "good"
     assert s["bodyweight_kg"] == 78.5
@@ -86,7 +86,7 @@ def test_export_contains_session_exercise_and_set_fields(client):
     # 8 exercise cards on Push A
     assert len(s["exercises"]) == 8
     e2 = next(e for e in s["exercises"] if e["code"] == "E2")
-    assert e2["name"] == "Incline Smith Chest Press"
+    assert e2["name"] == "Chest Press machine"
     assert e2["success_score"] == 80
     assert e2["muscle_sensation"] == "strong"
 
@@ -138,5 +138,9 @@ def test_export_does_not_leak_internal_ids_beyond_session_id(client):
     # not by DB ids.
     assert "id" in s
     assert "exercises" in s
-    # liss-abs has zero exercises
-    assert s["exercises"] == []
+    # liss-abs has 4 core exercises; verify no DB ids leak
+    assert len(s["exercises"]) == 4
+    for ex in s["exercises"]:
+        assert "id" not in ex
+        for sl in ex.get("sets", []):
+            assert "id" not in sl

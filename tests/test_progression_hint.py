@@ -67,11 +67,11 @@ def _new_session(client, slug: str = "push-a") -> int:
     return int(re.match(r"/sessions/(\d+)", r.headers["location"]).group(1))
 
 
-def _seed_prior_push_a_e2(
+def _seed_prior_push_a_e1(
     first_weight: float, first_reps: int, completed: bool = True
 ) -> None:
-    """Inject a prior completed Push A session with E2 first work set
-    matching the given weight/reps. E2 rep_target is 6-10."""
+    """Inject a prior completed Push A session with E1 first work set
+    matching the given weight/reps. E1 rep_target is 6-10."""
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog, WorkoutSession
 
@@ -83,9 +83,9 @@ def _seed_prior_push_a_e2(
             status="completed",
         )
         se = SessionExercise(
-            exercise_code_snapshot="E2",
-            exercise_name_snapshot="Incline Smith Chest Press",
-            position=2,
+            exercise_code_snapshot="E1",
+            exercise_name_snapshot="Incline Smith Press",
+            position=1,
         )
         se.set_logs.append(
             SetLog(
@@ -111,7 +111,7 @@ def test_session_detail_shows_no_hint_when_no_prior(client):
 
 
 def test_session_detail_shows_increase_hint_on_top_of_range(client):
-    _seed_prior_push_a_e2(first_weight=60.0, first_reps=10)
+    _seed_prior_push_a_e1(first_weight=60.0, first_reps=10)
     sid = _new_session(client, "push-a")
     r = client.get(f"/sessions/{sid}")
     body = r.text
@@ -120,7 +120,7 @@ def test_session_detail_shows_increase_hint_on_top_of_range(client):
 
 
 def test_session_detail_shows_consolidate_hint_below_range(client):
-    _seed_prior_push_a_e2(first_weight=60.0, first_reps=5)
+    _seed_prior_push_a_e1(first_weight=60.0, first_reps=5)
     sid = _new_session(client, "push-a")
     r = client.get(f"/sessions/{sid}")
     body = r.text
@@ -128,7 +128,7 @@ def test_session_detail_shows_consolidate_hint_below_range(client):
 
 
 def test_session_detail_shows_aim_hint_inside_range(client):
-    _seed_prior_push_a_e2(first_weight=60.0, first_reps=8)
+    _seed_prior_push_a_e1(first_weight=60.0, first_reps=8)
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
     assert "viser 10 reps avant d&#39;augmenter la charge" in body

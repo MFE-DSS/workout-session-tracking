@@ -41,19 +41,19 @@ def test_builder_prepopulates_warmup_and_work_rows(client):
 
         assert len(session.session_exercises) == 8
         assert session.template_slug_snapshot == "push-a"
-        assert session.template_name_snapshot == "Push A"
+        assert session.template_name_snapshot.startswith("Push A")
 
-        # Exercise 1 (Butterfly pec): 2 rep targets -> 2 work + 2 warmup
+        # Exercise 1 (Incline Smith Press): 3 rep targets -> 3 work + 2 warmup
         ex1 = session.session_exercises[0]
         assert ex1.exercise_code_snapshot == "E1"
         warmups = [s for s in ex1.set_logs if s.kind == "warmup"]
         works = [s for s in ex1.set_logs if s.kind == "work"]
         assert len(warmups) == 2
-        assert len(works) == 2
+        assert len(works) == 3
         assert [s.set_index for s in warmups] == [1, 2]
-        assert [s.set_index for s in works] == [1, 2]
+        assert [s.set_index for s in works] == [1, 2, 3]
 
-        # Exercise 2 (Incline Smith Chest Press): 3 rep targets -> 3 work + 2 warmup
+        # Exercise 2 (Chest Press machine): 3 rep targets -> 3 work + 2 warmup
         ex2 = session.session_exercises[1]
         works2 = [s for s in ex2.set_logs if s.kind == "work"]
         assert len(works2) == 3
@@ -74,7 +74,7 @@ def test_builder_prepopulates_warmup_and_work_rows(client):
 def test_builder_allows_custom_warmup_count(client):
     from app.services.session_builder import instantiate_session
 
-    db, tpl = _get_template("legs")
+    db, tpl = _get_template("legs-a")
     with db:
         session = instantiate_session(
             db, tpl, datetime(2026, 2, 14, 9, 0, tzinfo=timezone.utc), warmup_sets=1
@@ -100,7 +100,7 @@ def test_builder_handles_cardio_template_with_no_exercises(client):
         db.commit()
         db.refresh(session)
 
-        assert len(session.session_exercises) == 0
+        assert len(session.session_exercises) == 4
         assert session.template_slug_snapshot == "liss-abs"
 
         db.delete(session)

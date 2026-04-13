@@ -121,12 +121,12 @@ def test_history_does_not_show_other_user_sessions(client):
 
 def test_export_json_does_not_contain_other_user_data(client):
     _create_other_user_session()
-    _start(client, "legs")
+    _start(client, "legs-a")
 
     payload = client.get("/export/sessions.json").json()
     # Only the Legs session (ours) should be exported
     slugs = [s["template_slug"] for s in payload["sessions"]]
-    assert "legs" in slugs
+    assert "legs-a" in slugs
     # The 'other' user's push-a should NOT be here
     for s in payload["sessions"]:
         assert s["template_slug"] != "push-a" or s.get("id") != _create_other_user_session()
@@ -134,7 +134,7 @@ def test_export_json_does_not_contain_other_user_data(client):
 
 def test_export_csv_is_scoped_to_current_user(client):
     _create_other_user_session()
-    _start(client, "legs")
+    _start(client, "legs-a")
 
     csv_text = client.get("/export/sessions.csv").text
     lines = csv_text.strip().split("\n")
@@ -143,7 +143,7 @@ def test_export_csv_is_scoped_to_current_user(client):
     # All data rows should reference 'legs' template (ours), not 'push-a' from other
     for line in lines[1:]:
         # The template_slug column is the 5th (index 4)
-        assert "legs" in line
+        assert "legs-a" in line
 
 
 def test_progress_kpis_are_scoped(client):
@@ -157,11 +157,11 @@ def test_progress_kpis_are_scoped(client):
 
 def test_admin_sessions_only_shows_own(client):
     _create_other_user_session()
-    _start(client, "legs")
+    _start(client, "legs-a")
 
     body = client.get("/admin/sessions").text
     # Only one session card (our Legs), not the other's Push A
-    assert body.count('admin-row__name">Legs') == 1
+    assert body.count('admin-row__name">Legs A') == 1
     assert 'admin-row__name">Push A' not in body
 
 
