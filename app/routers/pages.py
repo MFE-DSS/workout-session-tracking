@@ -338,6 +338,30 @@ def physique(
     )
 
 
+@router.get("/dashboard", response_class=HTMLResponse)
+def dashboard(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    window: int = Query(30),
+) -> HTMLResponse:
+    from app.services.dashboard import compute_dashboard
+
+    window = window if window in (30, 60, 90) else 30
+    result = compute_dashboard(db, user.id, window_days=window)
+
+    return templates.TemplateResponse(
+        request,
+        "dashboard.html",
+        {
+            "page_title": "Body Engineering",
+            "result": result,
+            "window": window,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
 @router.get("/readiness/history", response_class=HTMLResponse)
 def readiness_history(
     request: Request, db: DbSession, user: CurrentUser
