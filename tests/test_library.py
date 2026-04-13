@@ -55,7 +55,7 @@ def test_liss_template_is_cardio(client):
     body = r.text
     assert "LISS" in body
     assert "120-130" in body
-    assert "Aucun exercice" in body  # empty exercise list
+    assert "Roulette abdominale" in body
 
 
 def test_unknown_template_returns_404(client):

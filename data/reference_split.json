@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-08.v2",
+  "version": "2026-04-13.v3",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -153,10 +153,9 @@
         },
         {
           "position": 5,
-          "code": "E6",
+          "code": "E5",
           "name": "Écarté arrière d'épaule",
           "set_scheme": "3x 12-15",
-          "notes": "Code source E6 (E5 non listé dans le document original)",
           "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15},
@@ -195,10 +194,9 @@
         },
         {
           "position": 3,
-          "code": "E6",
+          "code": "E3",
           "name": "Presse à épaules Smith Machine",
           "set_scheme": "6-10, 6-10, 10-15",
-          "notes": "Code source E6 (ordre préservé du document original)",
           "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
@@ -207,7 +205,7 @@
         },
         {
           "position": 4,
-          "code": "E3",
+          "code": "E4",
           "name": "Développé incliné Smith",
           "set_scheme": "6-10, 6-10, 10-15",
           "rep_targets": [
@@ -218,7 +216,7 @@
         },
         {
           "position": 5,
-          "code": "E4",
+          "code": "E5",
           "name": "Dips pectoraux",
           "set_scheme": "3x 12-15",
           "rep_targets": [
@@ -229,7 +227,7 @@
         },
         {
           "position": 6,
-          "code": "E5",
+          "code": "E6",
           "name": "Élévations latérales assis",
           "set_scheme": "10-15, 6-10, 15-20",
           "rep_targets": [
@@ -240,10 +238,9 @@
         },
         {
           "position": 7,
-          "code": "E6",
+          "code": "E7",
           "name": "Tirage front",
           "set_scheme": "2x 12-15",
-          "notes": "Code source E6 (E6 apparaît deux fois dans le document original)",
           "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
@@ -255,7 +252,7 @@
       "slug": "pull-b",
       "name": "Pull B",
       "kind": "strength",
-      "focus": "Dos, Bras",
+      "focus": "Dos, Biceps, Triceps",
       "suggested_label": "Cardio léger avant ou après selon ton énergie.",
       "exercises": [
         {
@@ -435,7 +432,20 @@
       "focus": "Cardio bas régime + abdos",
       "cardio_note": "30 min à jeun LISS à 120-130 bpm",
       "suggested_label": "Séance idéale entre deux séances de musculation.",
-      "exercises": []
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Roulette abdominale (ab wheel rollout)",
+          "set_scheme": "3x 10-15",
+          "notes": "Genoux au sol pour débuter, extension complète si possible. Contrôle la phase excentrique.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        }
+      ]
     }
   ]
 }
