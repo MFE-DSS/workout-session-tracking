@@ -15,7 +15,8 @@ Before building more analytics (S2+), we need to:
 1. **S0** — Stabilize the exercise catalog as a reliable foundation for analytics
 2. **S1** — Add lateralized body metrics + daily readiness tracking
 
-These two sprints form a single design unit because S1's migration depends on S0's catalog being clean.
+These two sprints form a single **design** unit because S1's migration depends on S0's catalog being clean.
+However, they are **separate delivery units**: two merges, two sprint reports, independent rollback possible on S1 without reopening S0.
 
 ## Decisions Log
 
@@ -23,8 +24,13 @@ These two sprints form a single design unit because S1's migration depends on S0
 |----------|--------|-----------|
 | Body measurement lateralization | Option B — full migration to left/right + hip/neck | Clean foundation now, avoid tech debt later |
 | Readiness scale | 1-5 integers, 5=best always | Matches existing segmented controls, good granularity for trend detection |
-| UX placement | Readiness widget on Home, body metrics in Profile | Readiness = daily ritual (Home), metrics = weekly measurement (Profile) |
+| UX placement | Readiness widget on Home, body metrics in Profile (S1) | Readiness = daily ritual (Home), metrics = weekly measurement (Profile for now) |
 | Execution order | Sequential: S0 fully complete before S1 starts | Stable catalog before touching data models |
+| Delivery separation | Two independent merges, two sprint reports | Rollback S1 without reopening S0 catalog work |
+| Focus field role | Editorial/UI only, NOT analytical truth | Analytics uses exercise→zone mapping, not focus text |
+| Lateralized measurements | left/right = source of truth, avg = derived view only | Preserves raw data for future asymmetry/correlation work (S2+) |
+| Readiness date model | `recorded_on` DATE + UNIQUE(user_id, recorded_on) | Avoids timezone/midnight ambiguity vs extracting date from datetime |
+| Body metrics UX roadmap | Profile is S1 compromise; dedicated `/body` route planned post-S1 | Profile works for MVP, but body metrics deserve their own progression space |
 
 ---
 
@@ -40,8 +46,8 @@ Reads `data/reference_split.json` and produces a structured report. Checks:
 2. **Code uniqueness per template** — no duplicate E-codes within a single template.
 3. **Position sequentiality** — positions form 1, 2, 3... with no gaps.
 4. **Rep target coherence** — min_reps <= max_reps, technique in {null, "RP", "DS"}.
-5. **Focus vs actual exercises** — each muscle zone mentioned in `focus` must have at least 1 exercise classifiable to that zone via `muscle_mapping.classify_exercise()`.
-6. **Exercise classifiability** — flag any exercise returning `("unknown", [])` from the classifier.
+5. **Focus vs actual exercises** — each muscle zone mentioned in `focus` should have at least 1 exercise classifiable to that zone via `muscle_mapping.classify_exercise()`. This is a **warning**, not a hard error — focus is editorial, mapping is analytical. The check ensures they don't drift too far apart.
+6. **Exercise classifiability** — flag any exercise returning `("unknown", [])` from the classifier. This IS a hard error — every loggable exercise must be classifiable for analytics.
 7. **Slug uniqueness** — no duplicate slugs across all templates.
 
 **Output:** JSON report + human-readable markdown at `docs/strategy/SPIGNOS_CATALOG_QA_REPORT.md`.
@@ -81,6 +87,7 @@ Contents:
 - **Versioning convention:** `YYYY-MM-DD.vN` — bump on every change
 - **Modification workflow:** edit JSON -> bump version -> run `scripts/catalog_qa.py` -> verify report clean -> commit -> seed will auto-update on next deploy
 - **Seed mechanism:** `app/services/seed.py` is idempotent, keyed on version string. New version = full re-seed of catalog tables
+- **Focus field role:** the `focus` field is **editorial** — it serves the UI (library display, template cards) and human readability. It is NOT the analytical truth. The analytical truth is `muscle_mapping.classify_exercise()` which maps exercise names to muscle zones. The focus field and the mapping should be directionally aligned, but the mapping is what drives scores, dashboards, and analytics. Do not encode scoring logic into the focus text.
 - **Analytics impact policy:** scoring uses exercise names captured at session creation time (immutable snapshots in `session_exercises.name_snapshot`). Changing catalog focus/mapping affects future scores only, never historical data
 - **Known structural decisions:** documents the 3 intentional anomalies listed above
 
@@ -174,16 +181,17 @@ SQLite requires `batch_alter_table` for column operations (consistent with exist
 readiness_entries
 ├── id                INTEGER PK
 ├── user_id           INTEGER FK -> users.id (CASCADE)
-├── recorded_at       DATETIME(tz) NOT NULL
-├── sleep_quality     INTEGER NOT NULL  -- 1-5, 5=excellent
-├── fatigue_level     INTEGER NOT NULL  -- 1-5, 5=very fresh
-├── soreness_level    INTEGER NOT NULL  -- 1-5, 5=no soreness
-├── stress_level      INTEGER NOT NULL  -- 1-5, 5=very relaxed
-├── motivation_level  INTEGER NOT NULL  -- 1-5, 5=very motivated
+├── recorded_on       DATE NOT NULL        -- calendar day, no timezone ambiguity
+├── sleep_quality     INTEGER NOT NULL      -- 1-5, 5=excellent
+├── fatigue_level     INTEGER NOT NULL      -- 1-5, 5=very fresh
+├── soreness_level    INTEGER NOT NULL      -- 1-5, 5=no soreness
+├── stress_level      INTEGER NOT NULL      -- 1-5, 5=very relaxed
+├── motivation_level  INTEGER NOT NULL      -- 1-5, 5=very motivated
 ├── resting_hr        INTEGER nullable
 ├── note              TEXT nullable
 ├── created_at        DATETIME(tz) server_default=now()
-└── INDEX(user_id, recorded_at)
+├── UNIQUE(user_id, recorded_on)            -- one entry per user per day, DB-enforced
+└── INDEX(user_id, recorded_on)
 ```
 
 **Scale semantics (uniform: 5 = always best):**
@@ -196,7 +204,7 @@ readiness_entries
 | 4 | Bon | En forme | Leger | Detendu | Bonne |
 | 5 | Excellent | Tres frais | Aucune douleur | Tres detendu | Tres motive |
 
-**Constraint:** one entry per user per calendar day (upsert semantics on recorded_at date).
+**Constraint:** one entry per user per calendar day, enforced by UNIQUE(user_id, recorded_on) at the DB level. Uses DATE type (not DATETIME) to eliminate timezone/midnight-crossing ambiguity. Upsert semantics on INSERT OR REPLACE.
 
 ### S1.3 — Updated Model: BodyMeasurement
 
@@ -235,6 +243,8 @@ body_measurements
 | posterior | `thigh_cm` | computed via `compute_zone_measurement()` |
 | core | `waist_cm` | `waist_cm` (unchanged) |
 
+**Source of truth doctrine:** `arm_cm_left`, `arm_cm_right`, `thigh_cm_left`, `thigh_cm_right` are the **source of truth**. The averaged values used by the physique dashboard are **derived views** for backward compatibility only. All future features (asymmetry detection in S2+, photo/measurement correlation in S5+) must work from the raw lateralized columns, never from the averages.
+
 **Implementation approach:** ZONE_MEASUREMENT values change from direct column names to zone keys. A new function `compute_zone_measurement(measurement, zone)` in `app/services/measurements.py` handles the resolution:
 - For zones mapped to a single column (pecs->chest_cm, core->waist_cm): return that column's value directly
 - For zones mapped to lateralized columns (biceps/triceps->arm, quads/posterior->thigh): compute average of left/right if both present, return single side if only one, None if neither
@@ -258,13 +268,14 @@ Added to `app/routers/pages.py` home route:
 - **If no entry today:** compact inline form with 5 segmented controls (reuse `_macros.html` segmented_control pattern) + optional resting_hr number input + optional note textarea + submit button
 - **If entry exists:** summary card showing 5 values as colored badges + resting_hr if present + "Modifier" link
 - Visual style: consistent with existing KPI cards (dark theme, mobile-first)
+- **Hard constraint:** the readiness widget must stay compact and never push the session action (open session tile / start workout) below the fold on mobile. The Home page's primary job remains "start or resume a workout". Readiness is secondary. The widget should be collapsible or very short (single row of badges when filled).
 
 #### Readiness POST (`POST /readiness`)
 
 **New file:** `app/routers/readiness.py`
 - Validates: all 5 fields required, each 1-5
 - Validates: resting_hr optional, if present must be 30-200
-- Upserts entry for today (recorded_at = today's date)
+- Upserts entry for today (recorded_on = date.today(), DB UNIQUE constraint handles conflict)
 - Redirects to `/` on success
 
 #### Readiness History (`GET /readiness/history`)
@@ -283,6 +294,8 @@ Added to `app/routers/pages.py` home route:
 - New fields: `hip_cm`, `neck_cm`
 - Visual grouping: "Bras gauche / Bras droit" on same row (responsive: stack on very small screens)
 
+**UX roadmap note:** Profile is the S1 compromise for body metrics. Post-S1, body metrics deserve a dedicated `/body` route with its own progression space (trend charts, measurement history, protocol tips). This is consistent with how Hevy and MacroFactor treat body measurements as a first-class feature, not a profile sub-form.
+
 **Modified `app/routers/pages.py`** profile route:
 - Handle new field names in form parsing
 - Pass updated fields to template
@@ -291,9 +304,9 @@ Added to `app/routers/pages.py` home route:
 
 #### New: `app/services/readiness.py`
 
-- `save_readiness(db, user_id, data: dict) -> ReadinessEntry` — upsert by user+date
-- `get_today_readiness(db, user_id) -> ReadinessEntry | None`
-- `get_readiness_history(db, user_id, days: int = 30) -> list[ReadinessEntry]`
+- `save_readiness(db, user_id, data: dict) -> ReadinessEntry` — upsert by UNIQUE(user_id, recorded_on). Uses `date.today()` for recorded_on.
+- `get_today_readiness(db, user_id) -> ReadinessEntry | None` — queries by recorded_on = date.today()
+- `get_readiness_history(db, user_id, days: int = 30) -> list[ReadinessEntry]` — ordered by recorded_on DESC
 
 #### Modified: `app/services/measurements.py`
 
@@ -349,6 +362,27 @@ Added to `app/routers/pages.py` home route:
 | `docs/strategy/SPIGNOS_BODY_METRICS_READINESS_SPEC.md` | **New** |
 | `docs/SPRINT_S1_REPORT.md` | **New** |
 
+### S1.8 — Measurement Protocol (UI help text)
+
+A brief in-app guidance (tooltip or help section in Profile measurement form) covering:
+- **When:** same time of day (morning, fasted preferred), same conditions
+- **Frequency:** weekly at most for circumference, daily OK for weight
+- **How:** relaxed muscle, tape flat against skin, same landmarks each time
+- **Partial entries are OK:** missing fields don't generate false signals — better to skip than guess
+- **Lateralized:** measure both sides even if similar; differences become useful in S2+
+
+This is NOT a full protocol document — it's 5-6 lines of help text in the measurement form. A more detailed protocol doc (`docs/strategy/SPIGNOS_MEASUREMENT_PROTOCOL.md`) can follow in S2 if needed.
+
+### S1.9 — Signal Confidence Policy (foundational rules)
+
+Even though S1 does not compute composite scores, these rules must be established now to prevent garbage analytics in S2:
+- **No trend displayed** for a dimension with fewer than 3 data points
+- **No muscle zone score** if fewer than 2 relevant sessions in the scoring window
+- **No readiness trend** if fewer than 5 entries in the last 30 days
+- **Partial measurement entries** degrade gracefully: zones without measurement data fall back to training-only scoring (already handled by muscle_scoring.py's weight split: 60% performance + 40% exposure when no anthropometry)
+
+These rules are documented in the spec and enforced in the service layer. They don't need UI yet — just backend guards that return None/insufficient instead of a misleading number.
+
 ### S1 Risks
 
 | Risk | Mitigation |
@@ -372,11 +406,17 @@ Added to `app/routers/pages.py` home route:
 
 ---
 
-## DO NOT BUILD (deferred)
+## PLANNED POST-S1 (near-term, not in scope)
+
+- Dedicated `/body` route with measurement trends and progression charts
+- Detailed measurement protocol document (`docs/strategy/SPIGNOS_MEASUREMENT_PROTOCOL.md`)
+- Readiness → session correlation (does readiness predict session quality?)
+
+## DO NOT BUILD (deferred to S2+)
 
 - Composite readiness score (S2)
-- Readiness → session correlation analytics (S2)
 - Asymmetry detection/alerting from left/right differences (S2+)
 - Any AI/ML on readiness data
 - Photo-based morphology (S5+)
 - Social features (S3+)
+- Body fat estimation from measurements (neck/waist/hip formulas exist but are too imprecise to ship without proper confidence framing)
