@@ -117,3 +117,119 @@ def test_classify_hip_thrust():
 def test_classify_shoulder_press():
     zone, _ = classify_exercise("Machine shoulder press")
     assert zone == "delt_lat"
+
+
+# ---------------------------------------------------------------------------
+# Scoring service + radar SVG tests
+# ---------------------------------------------------------------------------
+from datetime import datetime, timedelta, timezone
+from tests.helpers import get_test_user_id
+
+
+def _add_session_with_sets(client, user_id, exercise_name, sets_data, days_ago=0):
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession, SessionExercise, SetLog
+
+    now = datetime.now(timezone.utc)
+    with SessionLocal() as db:
+        s = WorkoutSession(
+            user_id=user_id,
+            template_slug_snapshot="test",
+            template_name_snapshot="Test",
+            started_at=now - timedelta(days=days_ago),
+            status="completed",
+        )
+        se = SessionExercise(
+            exercise_code_snapshot="E1",
+            exercise_name_snapshot=exercise_name,
+            position=1,
+        )
+        for i, (weight, reps) in enumerate(sets_data, 1):
+            se.set_logs.append(SetLog(
+                kind="work", set_index=i, completed=True,
+                weight_kg=weight, reps=reps,
+            ))
+        s.session_exercises.append(se)
+        db.add(s)
+        db.commit()
+
+
+def test_compute_dashboard_empty(client):
+    from app.database import SessionLocal
+    from app.services.muscle_scoring import compute_physique_dashboard
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        dash = compute_physique_dashboard(db, uid)
+
+    assert dash.global_score >= 0
+    assert len(dash.zone_scores) == 11
+    assert len(dash.radar_axes) == 6
+    assert dash.radar_svg
+    for z in dash.zone_scores:
+        assert z.confidence == "faible"
+
+
+def test_compute_dashboard_with_data(client):
+    from app.database import SessionLocal
+    from app.services.muscle_scoring import compute_physique_dashboard
+
+    uid = get_test_user_id()
+    for d in [28, 21, 14, 7, 3, 1]:
+        _add_session_with_sets(client, uid, "Chest Press machine",
+                               [(60, 10), (60, 10), (60, 10)], days_ago=d)
+
+    with SessionLocal() as db:
+        dash = compute_physique_dashboard(db, uid)
+
+    pecs = next(z for z in dash.zone_scores if z.zone == "pecs")
+    assert pecs.score > 0
+    assert pecs.hard_sets > 0
+    assert len(pecs.top_exercises) > 0
+
+
+def test_radar_axes_aggregate_zones(client):
+    from app.database import SessionLocal
+    from app.services.muscle_scoring import compute_physique_dashboard
+
+    uid = get_test_user_id()
+    for d in [14, 7, 1]:
+        _add_session_with_sets(client, uid, "Curl incliné haltères",
+                               [(15, 12), (15, 12)], days_ago=d)
+        _add_session_with_sets(client, uid, "Triceps pushdown",
+                               [(30, 12), (30, 12)], days_ago=d)
+
+    with SessionLocal() as db:
+        dash = compute_physique_dashboard(db, uid)
+
+    arms = next(a for a in dash.radar_axes if a.axis == "arms")
+    assert arms.score > 0
+
+
+from app.services.radar import build_radar_svg
+from app.services.muscle_scoring import RadarAxis
+
+
+def test_radar_svg_renders():
+    axes = [
+        RadarAxis(axis="pecs", label="Pectoraux", score=80, confidence="élevée"),
+        RadarAxis(axis="shoulders", label="Épaules", score=60, confidence="moyenne"),
+        RadarAxis(axis="back_width", label="Dos largeur", score=70, confidence="élevée"),
+        RadarAxis(axis="back_thickness", label="Dos épaisseur", score=50, confidence="faible"),
+        RadarAxis(axis="arms", label="Bras", score=65, confidence="moyenne"),
+        RadarAxis(axis="lower", label="Bas du corps", score=55, confidence="faible"),
+    ]
+    svg = build_radar_svg(axes)
+    assert "<svg" in svg
+    assert "polygon" in svg
+    assert "Pectoraux" in svg
+    assert "viewBox" in svg
+
+
+def test_radar_svg_zero_scores():
+    axes = [
+        RadarAxis(axis=f"a{i}", label=f"L{i}", score=0, confidence="faible")
+        for i in range(6)
+    ]
+    svg = build_radar_svg(axes)
+    assert "<svg" in svg
