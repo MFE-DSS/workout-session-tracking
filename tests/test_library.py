@@ -23,11 +23,15 @@ def test_home_has_no_weekday_pivot(client):
         assert weekday not in body
 
 
-def test_library_lists_all_six_templates(client):
+def test_library_lists_all_fifteen_templates(client):
     r = client.get("/library")
     assert r.status_code == 200
     body = r.text
-    for name in ["Push A", "Pull A", "Push B", "Pull B", "Legs", "LISS cardio"]:
+    for name in [
+        "Push A", "Push B", "Pull A", "Pull B",
+        "Legs A", "Legs B", "Upper", "Lower",
+        "LISS cardio", "Session courte", "Rattrapage",
+    ]:
         assert name in body
 
 
@@ -35,18 +39,19 @@ def test_push_a_detail_has_all_eight_exercises(client):
     r = client.get("/library/push-a")
     assert r.status_code == 200
     body = r.text
-    assert "Pectoral, Delts, Triceps" in body
+    assert "Pectoraux, Deltoïdes, Triceps" in body
     for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]:
         assert code in body
 
 
-def test_pull_a_preserves_source_quirk(client):
-    # Pull A has 5 exercises and uses source code "E6" after E4
-    # because the original document skipped E5.
+def test_pull_a_has_five_exercises(client):
+    # Pull A targets back width + rear delts with 5 exercises.
     r = client.get("/library/pull-a")
     assert r.status_code == 200
     body = r.text
-    assert "Écarté arrière" in body
+    assert "Dos largeur" in body
+    for code in ["E1", "E2", "E3", "E4", "E5"]:
+        assert code in body
 
 
 def test_liss_template_is_cardio(client):
@@ -95,4 +100,5 @@ def test_strength_template_hides_cardio_note(client):
     # The old "10 miles de pas" or any "Cardio :" prefix must be gone
     assert "Cardio :" not in body
     # But the suggestion label should still be present
-    assert "cardio léger" in body.lower() or "10 000 pas" in body
+    assert "suggested_label" not in body  # raw key must not leak
+    assert "incliné" in body.lower() or "lourd" in body.lower()

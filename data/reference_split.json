@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-13.v3",
+  "version": "2026-04-13.v4",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -10,173 +10,121 @@
   "templates": [
     {
       "slug": "push-a",
-      "name": "Push A",
+      "name": "Push A — Pecs épaisseur + Delts + Triceps",
       "kind": "strength",
-      "focus": "Pectoral, Delts, Triceps",
-      "suggested_label": "Faire 10 min de cardio léger en fin de séance.",
+      "focus": "Pectoraux, Deltoïdes, Triceps",
+      "suggested_label": "Commencer lourd sur l'incliné, finir en isolation triceps.",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
-          "name": "Butterfly pec",
-          "set_scheme": "2x 10-15",
+          "name": "Incline Smith Press",
+          "set_scheme": "3x 6-10",
+          "notes": "Banc incliné 30°, descente contrôlée sur le haut des pecs.",
           "rep_targets": [
-            {"min_reps": 10, "max_reps": 15},
-            {"min_reps": 10, "max_reps": 15}
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
           ]
         },
         {
           "position": 2,
           "code": "E2",
-          "name": "Incline Smith Chest Press",
-          "set_scheme": "6-10, 6-10, 10-15",
+          "name": "Chest Press machine",
+          "set_scheme": "3x 8-12",
           "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
           ]
         },
         {
           "position": 3,
           "code": "E3",
-          "name": "Neutral Grip Seated Shoulder Press",
-          "set_scheme": "6-10, 10-15",
+          "name": "Dips pectoraux (buste penché)",
+          "set_scheme": "3x 8-12",
+          "notes": "Pencher le buste en avant pour cibler les pectoraux.",
           "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
           ]
         },
         {
           "position": 4,
           "code": "E4",
-          "name": "Presse pectorale machine",
-          "set_scheme": "2x 12-15",
+          "name": "Neutral Grip Shoulder Press machine",
+          "set_scheme": "3x 8-12",
           "rep_targets": [
-            {"min_reps": 12, "max_reps": 15},
-            {"min_reps": 12, "max_reps": 15}
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
           ]
         },
         {
           "position": 5,
           "code": "E5",
-          "name": "Dips pectoraux (buste penché)",
-          "set_scheme": "2x 12-15",
+          "name": "Élévations latérales câble (derrière le dos)",
+          "set_scheme": "4x 12-20 (RP)",
+          "notes": "Rest-pause: repos 10-15s entre mini-séries jusqu'à atteindre la cible.",
           "rep_targets": [
-            {"min_reps": 12, "max_reps": 15},
-            {"min_reps": 12, "max_reps": 15}
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"}
           ]
         },
         {
           "position": 6,
           "code": "E6",
-          "name": "Élévations latérales debout",
-          "set_scheme": "2x 30-40 (rest-pause 10-15s)",
-          "notes": "Charge habituelle 15-20RM, rest-pause 10-15s jusqu'à atteindre 40 reps",
-          "rep_targets": [
-            {"min_reps": 30, "max_reps": 40, "technique": "RP"},
-            {"min_reps": 30, "max_reps": 40, "technique": "RP"}
-          ]
-        },
-        {
-          "position": 7,
-          "code": "E7",
-          "name": "Triceps extension câbles croisés",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 8,
-          "code": "E8",
-          "name": "Extensions triceps au-dessus de la tête, câbles croisés",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "pull-a",
-      "name": "Pull A",
-      "kind": "strength",
-      "focus": "Dos, Delts arrière",
-      "suggested_label": "Faire 10 000 pas sur la journée.",
-      "exercises": [
-        {
-          "position": 1,
-          "code": "E1",
-          "name": "Tirage vertical à un bras (poulie haute ou machine)",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 2,
-          "code": "E2",
-          "name": "Rowing en pronation haut du dos, support poitrine assis (prise large)",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 3,
-          "code": "E3",
-          "name": "Rowing bas machine",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 4,
-          "code": "E4",
-          "name": "Tirage horizontal",
-          "set_scheme": "6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 5,
-          "code": "E5",
-          "name": "Écarté arrière d'épaule",
+          "name": "Écarté arrière d'épaule câble",
           "set_scheme": "3x 12-15",
           "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15},
             {"min_reps": 12, "max_reps": 15}
           ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Triceps extension poulie haute (corde)",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 8,
+          "code": "E8",
+          "name": "Extension triceps overhead câble",
+          "set_scheme": "3x 10-15",
+          "notes": "Étirer le long chef du triceps en position haute.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
         }
       ]
     },
     {
       "slug": "push-b",
-      "name": "Push B",
+      "name": "Push B — Pecs largeur/stretch + Delts latéraux + Triceps",
       "kind": "strength",
-      "focus": "Pectoraux, Deltoïdes",
-      "suggested_label": "Faire 10 min de marche rapide ou vélo après la séance.",
+      "focus": "Pectoraux, Deltoïdes latéraux, Triceps",
+      "suggested_label": "Accent sur l'étirement pectoral et le volume latéral.",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
-          "name": "Écarté pec aux câbles",
-          "set_scheme": "2x 10-15",
+          "name": "Écarté pec aux câbles (incliné bas→haut)",
+          "set_scheme": "3x 10-15",
+          "notes": "Câbles bas, mouvement convergent vers le haut pour le faisceau claviculaire.",
           "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
           ]
@@ -185,39 +133,290 @@
           "position": 2,
           "code": "E2",
           "name": "Développé couché haltères",
-          "set_scheme": "6-10, 6-10, 10-15",
+          "set_scheme": "3x 6-10",
+          "notes": "Descendre profond pour maximiser l'étirement pectoral.",
           "rep_targets": [
             {"min_reps": 6, "max_reps": 10},
             {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
+            {"min_reps": 6, "max_reps": 10}
           ]
         },
         {
           "position": 3,
           "code": "E3",
-          "name": "Presse à épaules Smith Machine",
-          "set_scheme": "6-10, 6-10, 10-15",
+          "name": "Butterfly pec machine",
+          "set_scheme": "3x 10-15",
           "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
           ]
         },
         {
           "position": 4,
           "code": "E4",
-          "name": "Développé incliné Smith",
-          "set_scheme": "6-10, 6-10, 10-15",
+          "name": "Élévations latérales haltères assis",
+          "set_scheme": "4x 12-20",
+          "notes": "Rester assis pour limiter la triche et isoler le deltoïde latéral.",
           "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20}
           ]
         },
         {
           "position": 5,
           "code": "E5",
-          "name": "Dips pectoraux",
+          "name": "Tirage front câble (prise large)",
+          "set_scheme": "3x 12-15",
+          "notes": "Tirer vers le menton, coudes hauts, cibler les deltoïdes latéraux.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Face pull câble (corde)",
+          "set_scheme": "3x 12-15",
+          "notes": "Rotation externe en fin de mouvement pour la santé de l'épaule.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Triceps pushdown barre",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "pull-a",
+      "name": "Pull A — Dos largeur + Delts postérieurs",
+      "kind": "strength",
+      "focus": "Dos largeur, Deltoïdes postérieurs",
+      "suggested_label": "Focus sur les tirages verticaux pour élargir le dos.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Tirage poulie haute prise neutre",
+          "set_scheme": "3x 6-10",
+          "notes": "Prise neutre serrée, tirer vers le sternum, squeeze les omoplates.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Tirage vertical unilatéral câble",
+          "set_scheme": "3x 8-12",
+          "notes": "Un bras à la fois pour corriger les déséquilibres.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Pullover câble (bras tendus, poulie haute)",
+          "set_scheme": "3x 10-15",
+          "notes": "Garder les bras quasi tendus, sentir l'étirement du grand dorsal.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Rear delt fly machine (pec deck inversé)",
+          "set_scheme": "3x 12-15",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Face pull câble",
+          "set_scheme": "3x 12-15",
+          "notes": "Rotation externe en fin de mouvement.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "pull-b",
+      "name": "Pull B — Dos épaisseur + Biceps",
+      "kind": "strength",
+      "focus": "Dos épaisseur, Biceps",
+      "suggested_label": "Rowings lourds puis isolation biceps en fin de séance.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Rowing machine chest-supported",
+          "set_scheme": "3x 6-10",
+          "notes": "Support poitrine pour isoler le dos sans compensation lombaire.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Rowing câble assis prise neutre",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Rowing haltère un bras (banc)",
+          "set_scheme": "3x 8-12",
+          "notes": "Main et genou sur le banc, dos parallèle au sol.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Shrugs haltères",
+          "set_scheme": "3x 12-15",
+          "notes": "Monter les épaules vers les oreilles, maintenir 1s en haut.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Curl incliné haltères (banc 45°)",
+          "set_scheme": "3x 8-12",
+          "notes": "Banc à 45°, laisser les bras pendre pour maximiser l'étirement du biceps.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Curl poulie basse (barre)",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Curl marteau haltères",
+          "set_scheme": "2x 10-12",
+          "notes": "Prise neutre pour cibler le brachial et le brachio-radial.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "legs-a",
+      "name": "Legs A — Quad dominant",
+      "kind": "strength",
+      "focus": "Quadriceps, Adducteurs, Mollets",
+      "suggested_label": "Commencer par le hack squat lourd, finir avec les mollets.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Hack Squat machine",
+          "set_scheme": "3x 6-10",
+          "notes": "Pieds bas et serrés pour maximiser le travail des quadriceps.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Leg Press (pieds bas, serrés)",
+          "set_scheme": "3x 8-12",
+          "notes": "Pieds bas sur la plateforme pour cibler les quadriceps.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Leg extensions assises",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Leg curls assis",
+          "set_scheme": "3x 10-12",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Adduction assise",
           "set_scheme": "3x 12-15",
           "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
@@ -228,18 +427,594 @@
         {
           "position": 6,
           "code": "E6",
-          "name": "Élévations latérales assis",
-          "set_scheme": "10-15, 6-10, 15-20",
+          "name": "Relevés mollets debout machine",
+          "set_scheme": "4x 12-20",
+          "notes": "Étirement complet en bas, contraction maximale en haut, pause 1s.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20}
+          ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Roulette abdominale",
+          "set_scheme": "3x 10-15",
+          "notes": "Genoux au sol, extension complète si possible.",
           "rep_targets": [
             {"min_reps": 10, "max_reps": 15},
-            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "legs-b",
+      "name": "Legs B — Postérieur dominant",
+      "kind": "strength",
+      "focus": "Ischio-jambiers, Fessiers, Mollets",
+      "suggested_label": "Accent sur la chaîne postérieure, RDL en premier.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Romanian Deadlift haltères",
+          "set_scheme": "3x 8-12",
+          "notes": "Haltères le long des cuisses, charnière de hanche, sentir l'étirement des ischios.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Leg curls allongé",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Leg Press (pieds hauts, écartés)",
+          "set_scheme": "3x 10-12",
+          "notes": "Pieds hauts et écartés sur la plateforme pour cibler les fessiers et ischios.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Hip thrust Smith machine",
+          "set_scheme": "3x 8-12",
+          "notes": "Dos contre le banc, pousser les hanches vers le plafond, squeeze en haut.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Leg extensions assises",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Mollets assis machine",
+          "set_scheme": "4x 15-20",
+          "notes": "Pause 1s en position étirée, contraction complète.",
+          "rep_targets": [
+            {"min_reps": 15, "max_reps": 20},
+            {"min_reps": 15, "max_reps": 20},
+            {"min_reps": 15, "max_reps": 20},
             {"min_reps": 15, "max_reps": 20}
           ]
         },
         {
           "position": 7,
           "code": "E7",
-          "name": "Tirage front",
+          "name": "Crunch câble à genoux",
+          "set_scheme": "3x 12-15",
+          "notes": "Fléchir le tronc, pas les hanches. Contrôler la descente.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "upper-pecs-delts",
+      "name": "Upper — Biais pecs + épaules",
+      "kind": "strength",
+      "focus": "Pectoraux, Deltoïdes",
+      "suggested_label": "Session haut du corps avec accent pecs et épaules.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Développé incliné haltères 30°",
+          "set_scheme": "3x 6-10",
+          "notes": "Banc à 30°, ne pas monter plus haut pour garder l'accent pectoral.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Chest Press machine",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Cable cross-over (bas→haut)",
+          "set_scheme": "3x 10-15",
+          "notes": "Câbles bas, croiser les mains en haut du mouvement.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Machine shoulder press",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Élévations latérales câble",
+          "set_scheme": "4x 12-20 (RP)",
+          "notes": "Rest-pause: repos 10-15s entre mini-séries.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Rear delt fly machine",
+          "set_scheme": "3x 12-15",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Triceps pushdown corde",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "upper-back-arms",
+      "name": "Upper — Biais dos + bras",
+      "kind": "strength",
+      "focus": "Dos, Biceps, Triceps",
+      "suggested_label": "Session haut du corps avec accent dos et bras.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Tirage poulie haute prise large",
+          "set_scheme": "3x 6-10",
+          "notes": "Prise pronation large, tirer vers le sternum.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Rowing machine chest-supported",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Rowing câble assis prise serrée",
+          "set_scheme": "3x 10-12",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Curl incliné haltères",
+          "set_scheme": "3x 8-12",
+          "notes": "Banc à 45°, laisser les bras pendre pour l'étirement.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Curl EZ-bar debout",
+          "set_scheme": "3x 10-12",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Extension overhead câble (corde)",
+          "set_scheme": "3x 10-15",
+          "notes": "Étirer le long chef du triceps.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Triceps pushdown barre",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "lower-quad-bias",
+      "name": "Lower — Accent quadriceps",
+      "kind": "strength",
+      "focus": "Quadriceps, Mollets",
+      "suggested_label": "Accent sur les quads avec pieds avancés au Smith.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Squat Smith machine (pieds avancés)",
+          "set_scheme": "3x 6-10",
+          "notes": "Pieds avancés devant la barre pour cibler les quadriceps.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Leg Press (pieds bas)",
+          "set_scheme": "3x 8-12",
+          "notes": "Pieds bas sur la plateforme pour maximiser le travail des quadriceps.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Leg extensions assises",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Leg curls assis",
+          "set_scheme": "3x 10-12",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Relevés mollets debout",
+          "set_scheme": "4x 12-20",
+          "notes": "Étirement complet en bas, contraction maximale en haut.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Roulette abdominale",
+          "set_scheme": "3x 10-15",
+          "notes": "Genoux au sol, extension complète si possible.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "lower-posterior-bias",
+      "name": "Lower — Accent chaîne postérieure",
+      "kind": "strength",
+      "focus": "Ischio-jambiers, Fessiers, Mollets",
+      "suggested_label": "Accent sur ischios et fessiers, RDL en premier.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Romanian Deadlift haltères",
+          "set_scheme": "3x 8-12",
+          "notes": "Charnière de hanche, étirer les ischios en contrôlant la descente.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Leg curls allongé",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Hip thrust Smith",
+          "set_scheme": "3x 8-12",
+          "notes": "Dos contre le banc, squeeze maximal des fessiers en haut.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Leg extensions assises",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Mollets assis machine",
+          "set_scheme": "4x 15-20",
+          "notes": "Pause 1s en position étirée.",
+          "rep_targets": [
+            {"min_reps": 15, "max_reps": 20},
+            {"min_reps": 15, "max_reps": 20},
+            {"min_reps": 15, "max_reps": 20},
+            {"min_reps": 15, "max_reps": 20}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Crunch câble à genoux",
+          "set_scheme": "3x 12-15",
+          "notes": "Fléchir le tronc, pas les hanches.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "liss-abs",
+      "name": "LISS cardio + abdos",
+      "kind": "cardio",
+      "focus": "Cardio bas régime + Core",
+      "cardio_note": "20-30 min LISS (vélo ou marche inclinée) à 120-130 bpm",
+      "suggested_label": "Séance idéale entre deux séances de musculation.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Roulette abdominale (ab wheel rollout)",
+          "set_scheme": "3x 10-15",
+          "notes": "Genoux au sol pour débuter, extension complète si possible.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Crunch câble à genoux",
+          "set_scheme": "3x 12-15",
+          "notes": "Fléchir le tronc, contrôler la descente.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Relevé de jambes suspendu",
+          "set_scheme": "3x 10-15",
+          "notes": "Contrôler le balancement, monter les genoux au-dessus des hanches.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Pallof press câble",
+          "set_scheme": "3x 12-15",
+          "notes": "Anti-rotation: résister à la traction du câble, bras tendus devant soi.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "short-upper",
+      "name": "Session courte — Full upper 45 min",
+      "kind": "strength",
+      "focus": "Pectoraux, Dos, Épaules, Bras",
+      "suggested_label": "Session express quand le temps est limité.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Chest Press machine",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Tirage poulie haute prise neutre",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Machine shoulder press",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Élévations latérales câble",
+          "set_scheme": "3x 12-20",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20},
+            {"min_reps": 12, "max_reps": 20}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Curl poulie basse",
+          "set_scheme": "2x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Triceps pushdown corde",
+          "set_scheme": "2x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Face pull câble",
           "set_scheme": "2x 12-15",
           "rep_targets": [
             {"min_reps": 12, "max_reps": 15},
@@ -249,200 +1024,252 @@
       ]
     },
     {
-      "slug": "pull-b",
-      "name": "Pull B",
+      "slug": "catch-up-shoulders",
+      "name": "Rattrapage épaules",
       "kind": "strength",
-      "focus": "Dos, Biceps, Triceps",
-      "suggested_label": "Cardio léger avant ou après selon ton énergie.",
+      "focus": "Deltoïdes latéraux, Deltoïdes postérieurs",
+      "suggested_label": "Session dédiée pour rattraper les épaules.",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
-          "name": "Rowing latéral assis à un bras",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 2,
-          "code": "E2",
-          "name": "Tirage nuque / tirage vertical prise large",
-          "set_scheme": "2x 10-15",
-          "rep_targets": [
-            {"min_reps": 10, "max_reps": 15},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 3,
-          "code": "E3",
-          "name": "Seated row prise large",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 4,
-          "code": "E4",
-          "name": "Triceps extension au câble",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 5,
-          "code": "E5",
-          "name": "Skull crushers haltères",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 6,
-          "code": "E6",
-          "name": "Extension de barre au-dessus de la tête, câble penché",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 7,
-          "code": "E7",
-          "name": "Biceps curls unilatéraux, banc penché",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 8,
-          "code": "E8",
-          "name": "Biceps curls EZ-bar debout",
-          "set_scheme": "6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        }
-      ]
-    },
-    {
-      "slug": "legs",
-      "name": "Legs",
-      "kind": "strength",
-      "focus": "Jambes",
-      "suggested_label": "Faire 10 min de marche après la séance.",
-      "exercises": [
-        {
-          "position": 1,
-          "code": "E1",
-          "name": "Relevés des mollets debout",
-          "set_scheme": "6-10, 6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 2,
-          "code": "E2",
-          "name": "Leg curls assis",
-          "set_scheme": "6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 3,
-          "code": "E3",
-          "name": "Leg curls allongé",
-          "set_scheme": "6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 4,
-          "code": "E4",
-          "name": "Adduction assise",
-          "set_scheme": "6-10, 10-15",
-          "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
-          ]
-        },
-        {
-          "position": 5,
-          "code": "E5",
-          "name": "Leg extensions assises",
-          "set_scheme": "8-12, 15-20",
+          "name": "Machine shoulder press",
+          "set_scheme": "3x 8-12",
           "rep_targets": [
             {"min_reps": 8, "max_reps": 12},
-            {"min_reps": 15, "max_reps": 20}
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Élévations latérales câble (derrière le dos)",
+          "set_scheme": "4x 12-20 (RP)",
+          "notes": "Rest-pause: repos 10-15s entre mini-séries.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"},
+            {"min_reps": 12, "max_reps": 20, "technique": "RP"}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Élévations latérales haltères assis",
+          "set_scheme": "3x 12-15",
+          "notes": "Rester assis pour isoler le deltoïde latéral.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Tirage front câble (prise large)",
+          "set_scheme": "3x 12-15",
+          "notes": "Tirer vers le menton, coudes hauts.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Rear delt fly machine",
+          "set_scheme": "3x 12-15",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
           ]
         },
         {
           "position": 6,
           "code": "E6",
-          "name": "Hack Squat",
-          "set_scheme": "6-10, 6-10, 10-15",
+          "name": "Face pull câble",
+          "set_scheme": "3x 12-15",
+          "notes": "Rotation externe en fin de mouvement.",
           "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "catch-up-arms",
+      "name": "Rattrapage bras",
+      "kind": "strength",
+      "focus": "Biceps, Triceps",
+      "suggested_label": "Alterner biceps et triceps pour maximiser le pump.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Curl incliné haltères (banc 45°)",
+          "set_scheme": "3x 8-12",
+          "notes": "Banc à 45°, bras pendants pour maximiser l'étirement du biceps.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Curl EZ-bar debout",
+          "set_scheme": "3x 8-12",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Curl marteau câble (corde)",
+          "set_scheme": "3x 10-15",
+          "notes": "Prise neutre pour cibler le brachial.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Extension overhead câble (corde)",
+          "set_scheme": "3x 8-12",
+          "notes": "Étirer le long chef du triceps en position haute.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Skull crushers EZ-bar",
+          "set_scheme": "3x 8-12",
+          "notes": "Descendre la barre vers le front, coudes fixes.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Triceps pushdown barre",
+          "set_scheme": "3x 10-15",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 15},
+            {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
           ]
         },
         {
           "position": 7,
           "code": "E7",
-          "name": "Leg press",
-          "set_scheme": "6-10, 6-10, 10-15",
+          "name": "Kickback câble",
+          "set_scheme": "2x 12-15",
+          "notes": "Bras parallèle au sol, extension complète.",
           "rep_targets": [
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 6, "max_reps": 10},
-            {"min_reps": 10, "max_reps": 15}
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
           ]
         }
       ]
     },
     {
-      "slug": "liss-abs",
-      "name": "LISS cardio + abdos",
-      "kind": "cardio",
-      "focus": "Cardio bas régime + abdos",
-      "cardio_note": "30 min à jeun LISS à 120-130 bpm",
-      "suggested_label": "Séance idéale entre deux séances de musculation.",
+      "slug": "catch-up-back-width",
+      "name": "Rattrapage dos largeur",
+      "kind": "strength",
+      "focus": "Grand dorsal, largeur du dos",
+      "suggested_label": "Session dédiée à l'élargissement du dos.",
       "exercises": [
         {
           "position": 1,
           "code": "E1",
-          "name": "Roulette abdominale (ab wheel rollout)",
+          "name": "Tirage poulie haute prise neutre",
+          "set_scheme": "3x 6-10",
+          "notes": "Prise neutre serrée, tirer vers le sternum.",
+          "rep_targets": [
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10},
+            {"min_reps": 6, "max_reps": 10}
+          ]
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Tirage poulie haute prise large",
+          "set_scheme": "3x 8-12",
+          "notes": "Prise pronation large pour maximiser la largeur.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Tirage vertical unilatéral câble",
+          "set_scheme": "3x 10-12",
+          "notes": "Un bras à la fois pour corriger les déséquilibres.",
+          "rep_targets": [
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12},
+            {"min_reps": 10, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Pullover câble (bras tendus)",
           "set_scheme": "3x 10-15",
-          "notes": "Genoux au sol pour débuter, extension complète si possible. Contrôle la phase excentrique.",
+          "notes": "Garder les bras quasi tendus, sentir l'étirement du grand dorsal.",
           "rep_targets": [
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15},
             {"min_reps": 10, "max_reps": 15}
+          ]
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Rowing câble assis prise large",
+          "set_scheme": "3x 8-12",
+          "notes": "Prise large pronation, tirer les coudes vers l'arrière.",
+          "rep_targets": [
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12},
+            {"min_reps": 8, "max_reps": 12}
+          ]
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Straight-arm pulldown câble",
+          "set_scheme": "3x 12-15",
+          "notes": "Bras tendus, tirer la barre vers les cuisses en contractant les dorsaux.",
+          "rep_targets": [
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15},
+            {"min_reps": 12, "max_reps": 15}
           ]
         }
       ]
