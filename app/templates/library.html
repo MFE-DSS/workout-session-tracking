@@ -18,17 +18,16 @@
         {% if tpl.suggested_label %}
           <div class="template-card__hint">{{ tpl.suggested_label }}</div>
         {% endif %}
+        <form
+          method="post"
+          action="{{ url_for('create_session') }}"
+          class="template-card__start"
+          onclick="event.stopPropagation();"
+        >
+          <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
+          <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
+        </form>
       </a>
-      <form
-        method="post"
-        action="{{ url_for('create_session') }}"
-        class="template-card__start"
-      >
-        <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
-        <button type="submit" class="btn btn--primary btn--wide">
-          Démarrer {{ tpl.name }}
-        </button>
-      </form>
     </li>
   {% endfor %}
 </ul>
