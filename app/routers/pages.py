@@ -105,6 +105,14 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
 
     behavioral = compute_behavioral_state(db, user.id)
 
+    from app.services.readiness import (
+        get_today_readiness,
+        READINESS_LABELS,
+        READINESS_FIELD_LABELS,
+        SCALE_FIELDS,
+    )
+    readiness_today = get_today_readiness(db, user.id)
+
     return templates.TemplateResponse(
         request,
         "index.html",
@@ -115,6 +123,10 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "kpis": global_kpis,
             "sparkline_svg": sparkline_svg,
             "behavioral": behavioral,
+            "readiness_today": readiness_today,
+            "readiness_labels": READINESS_LABELS,
+            "readiness_field_labels": READINESS_FIELD_LABELS,
+            "readiness_scale_fields": SCALE_FIELDS,
         },
     )
 
@@ -322,5 +334,29 @@ def physique(
             "dashboard": dashboard,
             "window": window,
             "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+@router.get("/readiness/history", response_class=HTMLResponse)
+def readiness_history(
+    request: Request, db: DbSession, user: CurrentUser
+) -> HTMLResponse:
+    from app.services.readiness import (
+        get_readiness_history,
+        READINESS_LABELS,
+        READINESS_FIELD_LABELS,
+        SCALE_FIELDS,
+    )
+    entries = get_readiness_history(db, user.id, days=90)
+    return templates.TemplateResponse(
+        request,
+        "readiness_history.html",
+        {
+            "page_title": "Historique Readiness",
+            "entries": entries,
+            "readiness_labels": READINESS_LABELS,
+            "readiness_field_labels": READINESS_FIELD_LABELS,
+            "readiness_scale_fields": SCALE_FIELDS,
         },
     )

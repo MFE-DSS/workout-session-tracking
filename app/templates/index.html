@@ -13,6 +13,54 @@
   </a>
 {% endif %}
 
+{% if readiness_today %}
+<div class="card readiness-widget" style="margin-bottom:var(--space-md);">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);flex-wrap:wrap;">
+    <span class="card__title" style="margin:0;font-size:14px;">Readiness</span>
+    {% for field in readiness_scale_fields %}
+      {% set val = readiness_today[field] %}
+      <span class="badge badge--{% if val >= 4 %}good{% elif val >= 3 %}neutral{% else %}warn{% endif %}"
+            title="{{ readiness_field_labels[field] }}: {{ readiness_labels[field][val] }}">
+        {{ readiness_field_labels[field][:3] }} {{ val }}
+      </span>
+    {% endfor %}
+    {% if readiness_today.resting_hr %}
+      <span class="badge" title="FC repos">{{ readiness_today.resting_hr }} bpm</span>
+    {% endif %}
+    <a href="/readiness/history" class="text-muted" style="font-size:12px;">Historique →</a>
+  </div>
+</div>
+{% else %}
+<div class="card readiness-widget" style="margin-bottom:var(--space-md);">
+  <details>
+    <summary class="card__title" style="cursor:pointer;font-size:14px;margin:0;">
+      Readiness du jour
+    </summary>
+    <form method="post" action="/readiness" style="margin-top:var(--space-sm);">
+      {% for field in readiness_scale_fields %}
+      <div style="margin-bottom:var(--space-xs);">
+        <label style="font-size:13px;display:block;margin-bottom:2px;">{{ readiness_field_labels[field] }}</label>
+        <div class="segmented">
+          {% for val in [1, 2, 3, 4, 5] %}
+          <label class="segmented__option">
+            <input type="radio" name="{{ field }}" value="{{ val }}" {% if val == 3 %}checked{% endif %}>
+            <span title="{{ readiness_labels[field][val] }}">{{ val }}</span>
+          </label>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+      <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-sm);">
+        <input type="number" name="resting_hr" placeholder="FC repos (bpm)" min="30" max="200"
+               style="flex:1;max-width:150px;">
+        <input type="text" name="note" placeholder="Note (optionnel)" style="flex:2;">
+      </div>
+      <button type="submit" class="btn btn--ghost" style="margin-top:var(--space-sm);width:100%;">Enregistrer</button>
+    </form>
+  </details>
+</div>
+{% endif %}
+
 <div class="cockpit-grid">
   <div class="cockpit-main">
     <div class="insight">

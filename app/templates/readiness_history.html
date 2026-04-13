@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Historique Readiness</h1>
+
+{% if not entries %}
+  <p class="text-dim">Aucune entrée pour les 90 derniers jours.</p>
+{% else %}
+  <div class="card-list">
+    {% for entry in entries %}
+    <div class="card" style="margin-bottom:var(--space-sm);">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-xs);">
+        <b style="font-size:14px;">{{ entry.recorded_on.strftime('%d/%m/%Y') }}</b>
+        {% for field in readiness_scale_fields %}
+          {% set val = entry[field] %}
+          <span class="badge badge--{% if val >= 4 %}good{% elif val >= 3 %}neutral{% else %}warn{% endif %}"
+                title="{{ readiness_field_labels[field] }}: {{ readiness_labels[field][val] }}">
+            {{ readiness_field_labels[field][:3] }} {{ val }}
+          </span>
+        {% endfor %}
+        {% if entry.resting_hr %}
+          <span class="badge">{{ entry.resting_hr }} bpm</span>
+        {% endif %}
+      </div>
+      {% if entry.note %}
+        <p class="text-dim" style="font-size:13px;margin-top:var(--space-xs);">{{ entry.note }}</p>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<a class="btn btn--ghost" href="/" style="margin-top:var(--space-md);display:inline-block;">← Retour</a>
+{% endblock %}
