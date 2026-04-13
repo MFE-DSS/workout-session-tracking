@@ -62,13 +62,11 @@ def test_jump_bar_marks_completed_exercise_as_done(client):
     sid = _start(client, "push-a")
     se_id, work_ids = _e2_ids(sid)
     # Fill ALL work sets of E2
-    data = {"success_score": "100", "muscle_sensation": "strong"}
+    data = {"muscle_sensation": "strong"}
     for i, wid in enumerate(work_ids, start=1):
         data[f"set_{wid}_weight_kg"] = str(60 + i)
         data[f"set_{wid}_reps"] = "10"
         data[f"set_{wid}_completed"] = "1"
-        data[f"set_{wid}_execution_quality"] = "clean"
-        data[f"set_{wid}_reps_target"] = "target_hit"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
 
     body = client.get(f"/sessions/{sid}").text
@@ -92,13 +90,11 @@ def test_jump_bar_marks_completed_exercise_as_done(client):
 def test_exercise_card_gets_done_class_when_all_work_sets_completed(client):
     sid = _start(client, "push-a")
     se_id, work_ids = _e2_ids(sid)
-    data = {"success_score": "100", "muscle_sensation": "strong"}
+    data = {"muscle_sensation": "strong"}
     for i, wid in enumerate(work_ids, start=1):
         data[f"set_{wid}_weight_kg"] = str(60 + i)
         data[f"set_{wid}_reps"] = "10"
         data[f"set_{wid}_completed"] = "1"
-        data[f"set_{wid}_execution_quality"] = "clean"
-        data[f"set_{wid}_reps_target"] = "target_hit"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
 
     body = client.get(f"/sessions/{sid}").text
@@ -119,7 +115,6 @@ def test_exercise_card_done_class_absent_when_partial(client):
     client.post(
         f"/sessions/{sid}/exercises/{se_id}",
         data={
-            "success_score": "80",
             f"set_{wid}_weight_kg": "60",
             f"set_{wid}_reps": "10",
             f"set_{wid}_completed": "1",
@@ -145,7 +140,7 @@ def test_save_exercise_card_redirects_to_next_exercise(client):
     se_id, _ = _e2_ids(sid)  # E2 -> next is E3
     r = client.post(
         f"/sessions/{sid}/exercises/{se_id}",
-        data={"success_score": "80"},
+        data={},
         follow_redirects=False,
     )
     assert r.status_code == 303
@@ -174,7 +169,7 @@ def test_save_last_exercise_card_redirects_to_session_feedback(client):
 
     r = client.post(
         f"/sessions/{sid}/exercises/{last_id}",
-        data={"success_score": "100"},
+        data={},
         follow_redirects=False,
     )
     assert r.status_code == 303

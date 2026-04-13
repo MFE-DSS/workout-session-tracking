@@ -119,15 +119,12 @@ def test_current_session_is_excluded_from_its_own_last_time(client):
 
     # Fill E1 work sets with completed values
     data = {
-        "success_score": "100",
         "muscle_sensation": "strong",
     }
     for idx, set_id in enumerate(work_ids, start=1):
         data[f"set_{set_id}_weight_kg"] = str(50 + idx)
         data[f"set_{set_id}_reps"] = "10"
         data[f"set_{set_id}_completed"] = "1"
-        data[f"set_{set_id}_execution_quality"] = "clean"
-        data[f"set_{set_id}_reps_target"] = "target_hit"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
 
     r = client.get(f"/sessions/{sid}")

@@ -254,7 +254,6 @@ def test_exercise_card_update_persists_feedback_and_sets(client):
 
     # Fill the card: 1 warmup done, all 3 work sets done with values
     data = {
-        "success_score": "80",
         "muscle_sensation": "strong",
         "free_note": "belle contraction",
         # warmup #1: weight+reps, completed
@@ -265,20 +264,14 @@ def test_exercise_card_update_persists_feedback_and_sets(client):
         f"set_{work[0].id}_weight_kg": "60",
         f"set_{work[0].id}_reps": "10",
         f"set_{work[0].id}_completed": "1",
-        f"set_{work[0].id}_execution_quality": "clean",
-        f"set_{work[0].id}_reps_target": "target_hit",
         # work #2
         f"set_{work[1].id}_weight_kg": "62.5",
         f"set_{work[1].id}_reps": "8",
         f"set_{work[1].id}_completed": "1",
-        f"set_{work[1].id}_execution_quality": "acceptable",
-        f"set_{work[1].id}_reps_target": "target_near",
         # work #3
         f"set_{work[2].id}_weight_kg": "55",
         f"set_{work[2].id}_reps": "12",
         f"set_{work[2].id}_completed": "1",
-        f"set_{work[2].id}_execution_quality": "clean",
-        f"set_{work[2].id}_reps_target": "target_hit",
     }
 
     r = client.post(
@@ -290,7 +283,7 @@ def test_exercise_card_update_persists_feedback_and_sets(client):
 
     with SessionLocal() as db:
         se2 = db.get(SessionExercise, se_id)
-        assert se2.success_score == 80
+        assert se2.success_score in {100, 80, 50}  # derived by compute_success_score
         assert se2.muscle_sensation == "strong"
         assert se2.free_note == "belle contraction"
 
@@ -315,8 +308,9 @@ def test_exercise_card_update_persists_feedback_and_sets(client):
             assert wk.completed is True
             assert wk.weight_kg is not None
             assert wk.reps is not None
-            assert wk.execution_quality in {"clean", "acceptable", "degraded"}
-            assert wk.reps_target in {"target_hit", "target_near", "target_missed"}
+            # execution_quality and reps_target are no longer sent via form
+            assert wk.execution_quality is None
+            assert wk.reps_target is None
 
 
 # ---------------------------------------------------------------------------

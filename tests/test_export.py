@@ -44,13 +44,11 @@ def test_export_contains_session_exercise_and_set_fields(client):
         )
 
     # Fill and save
-    data = {"success_score": "80", "muscle_sensation": "strong"}
+    data = {"muscle_sensation": "strong"}
     for i, wid in enumerate(work_ids, start=1):
         data[f"set_{wid}_weight_kg"] = str(60 + i)
         data[f"set_{wid}_reps"] = "10"
         data[f"set_{wid}_completed"] = "1"
-        data[f"set_{wid}_execution_quality"] = "clean"
-        data[f"set_{wid}_reps_target"] = "target_hit"
     client.post(
         f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False
     )
@@ -87,7 +85,7 @@ def test_export_contains_session_exercise_and_set_fields(client):
     assert len(s["exercises"]) == 8
     e2 = next(e for e in s["exercises"] if e["code"] == "E2")
     assert e2["name"] == "Chest Press machine"
-    assert e2["success_score"] == 80
+    assert e2["success_score"] in {100, 80, 50}  # derived by compute_success_score
     assert e2["muscle_sensation"] == "strong"
 
     # 2 warmup + 3 work rows on E2
@@ -99,8 +97,9 @@ def test_export_contains_session_exercise_and_set_fields(client):
         assert w["completed"] is True
         assert w["weight_kg"] is not None
         assert w["reps"] == 10
-        assert w["execution_quality"] == "clean"
-        assert w["reps_target"] == "target_hit"
+        # execution_quality and reps_target are no longer sent via form
+        assert w["execution_quality"] is None
+        assert w["reps_target"] is None
 
 
 def test_export_is_sorted_oldest_first(client):

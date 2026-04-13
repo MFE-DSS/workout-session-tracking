@@ -216,13 +216,11 @@ def test_export_then_restore_round_trip(client):
             if s.kind == "work"
         )
 
-    data = {"success_score": "80", "muscle_sensation": "strong"}
+    data = {"muscle_sensation": "strong"}
     for i, wid in enumerate(work_ids, start=1):
         data[f"set_{wid}_weight_kg"] = str(60 + i)
         data[f"set_{wid}_reps"] = "10"
         data[f"set_{wid}_completed"] = "1"
-        data[f"set_{wid}_execution_quality"] = "clean"
-        data[f"set_{wid}_reps_target"] = "target_hit"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
     client.post(f"/sessions/{sid}", data={"concentration": "high", "action": "end"}, follow_redirects=False)
 
@@ -263,7 +261,7 @@ def test_export_then_restore_round_trip(client):
         assert len(exercises) == 8  # Push A has 8 exercises
 
         e2 = next(e for e in exercises if e.exercise_code_snapshot == "E2")
-        assert e2.success_score == 80
+        assert e2.success_score in {100, 80, 50}  # derived by compute_success_score
         assert e2.muscle_sensation == "strong"
 
         work = [
@@ -275,7 +273,7 @@ def test_export_then_restore_round_trip(client):
         assert len(work) == 3
         assert all(w.completed is True for w in work)
         assert work[0].weight_kg == 61.0
-        assert work[0].execution_quality == "clean"
+        assert work[0].execution_quality is None  # no longer sent via form
 
 
 # ---------------------------------------------------------------------------

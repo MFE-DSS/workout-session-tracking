@@ -193,30 +193,27 @@ def test_session_detail_shows_delta_when_prior_exists(client):
             .where(SessionExercise.exercise_code_snapshot == "E2")
         ).scalar_one()
         se_id = se.id
-        work_id = [
+        work_ids = sorted([
             s.id for s in db.execute(
                 select(SetLog).where(SetLog.session_exercise_id == se_id)
             ).scalars().all()
             if s.kind == "work"
-        ][0]
-    # Fill current with 62.5 kg x 10
+        ])
+    # Fill ALL work sets with 62.5 kg x 12 so derived score hits 100
+    data = {"muscle_sensation": "strong"}
+    for wid in work_ids:
+        data[f"set_{wid}_weight_kg"] = "62.5"
+        data[f"set_{wid}_reps"] = "12"
+        data[f"set_{wid}_completed"] = "1"
     client.post(
         f"/sessions/{sid}/exercises/{se_id}",
-        data={
-            "success_score": "100",
-            "muscle_sensation": "strong",
-            f"set_{work_id}_weight_kg": "62.5",
-            f"set_{work_id}_reps": "10",
-            f"set_{work_id}_completed": "1",
-            f"set_{work_id}_execution_quality": "clean",
-            f"set_{work_id}_reps_target": "target_hit",
-        },
+        data=data,
         follow_redirects=False,
     )
     body = client.get(f"/sessions/{sid}").text
     assert "Delta" in body
     assert "+2.5 kg" in body
-    assert "+2 reps" in body
+    assert "+4 reps" in body
     assert "score en hausse" in body
 
 

@@ -37,13 +37,11 @@ def _fill_e2_and_complete(client, sid: int) -> None:
             if s.kind == "work"
         )
 
-    data = {"success_score": "80", "muscle_sensation": "strong"}
+    data = {"muscle_sensation": "strong"}
     for i, wid in enumerate(work_ids, start=1):
         data[f"set_{wid}_weight_kg"] = str(60 + i)
         data[f"set_{wid}_reps"] = "10"
         data[f"set_{wid}_completed"] = "1"
-        data[f"set_{wid}_execution_quality"] = "clean"
-        data[f"set_{wid}_reps_target"] = "target_hit"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
     _complete(client, sid)
 
