@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Créer une squad</h1>
+
+{% if error %}
+  <p style="color:var(--c-danger, #e74c3c); margin-bottom:1rem;">{{ error }}</p>
+{% endif %}
+
+<form method="post" action="{{ url_for('squad_create_post') }}" class="card" style="max-width:28rem;">
+  <div class="field">
+    <label class="field__label" for="name">Nom de la squad</label>
+    <input type="text" id="name" name="name" required maxlength="64" class="field__input" />
+  </div>
+  <button type="submit" class="btn btn--primary" style="margin-top:1rem;">Créer</button>
+</form>
+
+<p style="margin-top:1.5rem;">
+  <a class="btn btn--ghost" href="{{ url_for('squads_list') }}">← Retour</a>
+</p>
+{% endblock %}

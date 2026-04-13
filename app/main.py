@@ -18,7 +18,7 @@ from starlette.responses import Response as StarletteResponse
 from app.config import BASE_DIR, get_settings
 from app.database import SessionLocal, init_db
 from app.deps import _redirect_to_login
-from app.routers import admin, auth_routes, export, health, leaderboard, pages, readiness, sessions
+from app.routers import admin, auth_routes, export, health, leaderboard, pages, readiness, sessions, squads
 from app.services.seed import seed_method_rules, seed_reference_split
 
 
@@ -85,6 +85,7 @@ def create_app() -> FastAPI:
     app.include_router(admin.router)
     app.include_router(leaderboard.router)
     app.include_router(readiness.router)
+    app.include_router(squads.router)
 
     return app
 
