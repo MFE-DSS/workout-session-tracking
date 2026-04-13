@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-13.v5",
+  "version": "2026-04-13.v6",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -622,7 +622,7 @@
       "slug": "legs-a",
       "name": "Legs A — Quad dominant",
       "kind": "strength",
-      "focus": "Quadriceps, Adducteurs, Mollets",
+      "focus": "Quadriceps, Adducteurs, Mollets, Core",
       "suggested_label": "Commencer par le hack squat lourd, finir avec les mollets.",
       "exercises": [
         {
@@ -781,7 +781,7 @@
       "slug": "legs-b",
       "name": "Legs B — Postérieur dominant",
       "kind": "strength",
-      "focus": "Ischio-jambiers, Fessiers, Mollets",
+      "focus": "Ischio-jambiers, Fessiers, Mollets, Core",
       "suggested_label": "Accent sur la chaîne postérieure, RDL en premier.",
       "exercises": [
         {
@@ -1257,7 +1257,7 @@
       "slug": "lower-quad-bias",
       "name": "Lower — Accent quadriceps",
       "kind": "strength",
-      "focus": "Quadriceps, Mollets",
+      "focus": "Quadriceps, Mollets, Core",
       "suggested_label": "Accent sur les quads avec pieds avancés au Smith.",
       "exercises": [
         {
@@ -1396,7 +1396,7 @@
       "slug": "lower-posterior-bias",
       "name": "Lower — Accent chaîne postérieure",
       "kind": "strength",
-      "focus": "Ischio-jambiers, Fessiers, Mollets",
+      "focus": "Ischio-jambiers, Fessiers, Mollets, Core",
       "suggested_label": "Accent sur ischios et fessiers, RDL en premier.",
       "exercises": [
         {
@@ -1535,7 +1535,7 @@
       "slug": "liss-abs",
       "name": "LISS cardio + abdos",
       "kind": "cardio",
-      "focus": "Cardio bas régime + Core",
+      "focus": "Core / Abdos",
       "cardio_note": "20-30 min LISS (vélo ou marche inclinée) à 120-130 bpm",
       "suggested_label": "Séance idéale entre deux séances de musculation.",
       "exercises": [
