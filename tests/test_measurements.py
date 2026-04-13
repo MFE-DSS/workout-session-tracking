@@ -15,7 +15,7 @@ from tests.helpers import get_test_user_id
 
 def test_muscle_map_has_all_fields():
     assert set(MEASUREMENT_MUSCLE_MAP.keys()) == {
-        "weight_kg", "chest_cm", "arm_cm", "thigh_cm",
+        "weight_kg", "chest_cm", "arm_cm", "waist_cm", "thigh_cm",
     }
 
 
