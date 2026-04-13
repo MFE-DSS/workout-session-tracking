@@ -44,6 +44,208 @@
   </nav>
 {% endif %}
 
+{# -------- Exercise cards (one <details> per card) --------------- #}
+{% for se in session.session_exercises %}
+  {% set done, total = stats.per_exercise[se.id] %}
+  {% set is_active = (active_exercise_id == se.id) %}
+  {% set summary = exercise_summaries.get(se.id) %}
+  <details
+    class="card exercise-card {% if total > 0 and done == total %}exercise-card--done{% endif %}"
+    id="exercise-{{ se.id }}"
+    {% if is_active %}open{% endif %}
+  >
+    <summary class="exercise-card__compact">
+      <span class="exercise-card__code">{{ se.exercise_code_snapshot }}</span>
+      <span class="exercise-card__name">{{ se.exercise_name_snapshot }}</span>
+      <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
+      {% if done > 0 and summary %}
+        <span class="exercise-card__recap">{{ summary.weights_str }} kg · {{ summary.reps_str }} reps</span>
+      {% endif %}
+    </summary>
+
+    <form
+      method="post"
+      action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
+      class="exercise-card__form"
+    >
+      <div class="exercise-card__head-expanded">
+        <a
+          href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
+          class="exercise-card__code--link"
+          style="font-size:12px;color:var(--fg-dim);"
+        >Voir historique {{ se.exercise_code_snapshot }} →</a>
+      </div>
+
+      {% if se.template_exercise and se.template_exercise.set_scheme %}
+        <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
+      {% endif %}
+
+      {% if session.status == 'completed' and summary %}
+        <div class="done-summary">
+          <span class="done-summary__count">
+            Work : {{ summary.work_done }}/{{ summary.work_total }}
+          </span>
+          <span class="done-summary__values">
+            {{ summary.weights_str }} kg · {{ summary.reps_str }} reps
+          </span>
+          {% if summary.success_score is not none %}
+            <span class="done-summary__score">score {{ summary.success_score }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% set lt = last_time.get(se.exercise_code_snapshot) %}
+      <div class="last-time {% if not lt %}last-time--empty{% endif %}">
+        {% if lt and lt.has_data %}
+          <span class="last-time__label">Dernière fois</span>
+          <span class="last-time__when">{{ lt.relative }}</span>
+          <span class="last-time__values">
+            {{ lt.weights_str }} kg · {{ lt.reps_str }} reps
+          </span>
+        {% elif lt %}
+          <span class="last-time__label">Dernière fois</span>
+          <span class="last-time__when">{{ lt.relative }}</span>
+          <span class="last-time__values">aucune donnée saisie</span>
+        {% else %}
+          <span class="last-time__label">Dernière fois</span>
+          <span class="last-time__values">Aucune séance précédente</span>
+        {% endif %}
+      </div>
+
+      {% set delta_label = deltas.get(se.exercise_code_snapshot) %}
+      {% if delta_label %}
+        <div class="delta">
+          <span class="delta__label">Delta</span>
+          <span class="delta__text">{{ delta_label }}</span>
+        </div>
+      {% endif %}
+
+      {% set hint = hints.get(se.exercise_code_snapshot) %}
+      {% if hint %}
+        <div class="hint">
+          <span class="hint__label">Repère</span>
+          <span class="hint__text">{{ hint }}</span>
+        </div>
+      {% endif %}
+
+      {% if se.set_logs|length > 0 %}
+        {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
+        {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
+
+        {% if warmup_sets|length > 0 %}
+          <h4 class="set-group-title">Warmup</h4>
+        {% endif %}
+        <ul class="set-list">
+          {% for sl in warmup_sets %}
+            <li class="set-row set-row--warmup">
+              <div class="set-row__label">
+                <span class="set-row__kind">Warmup</span>
+                <span class="set-row__idx">#{{ sl.set_index }}</span>
+                {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+              </div>
+
+              <div class="set-row__inputs">
+                <input
+                  type="number"
+                  step="0.5"
+                  inputmode="decimal"
+                  name="set_{{ sl.id }}_weight_kg"
+                  placeholder="kg"
+                  value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+                />
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  name="set_{{ sl.id }}_reps"
+                  placeholder="reps"
+                  value="{{ sl.reps if sl.reps is not none else '' }}"
+                />
+                <label class="set-row__done">
+                  <input
+                    type="checkbox"
+                    name="set_{{ sl.id }}_completed"
+                    value="1"
+                    {% if sl.completed %}checked{% endif %}
+                  />
+                  <span>Fait</span>
+                </label>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+
+        {% if work_sets|length > 0 %}
+          <h4 class="set-group-title set-group-title--work">Work</h4>
+        {% endif %}
+        <ul class="set-list">
+          {% for sl in work_sets %}
+            <li class="set-row set-row--work">
+              <div class="set-row__label">
+                <span class="set-row__kind">Work</span>
+                <span class="set-row__idx">#{{ sl.set_index }}</span>
+                {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+              </div>
+
+              <div class="set-row__inputs">
+                <input
+                  type="number"
+                  step="0.5"
+                  inputmode="decimal"
+                  name="set_{{ sl.id }}_weight_kg"
+                  placeholder="kg"
+                  value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+                />
+                <input
+                  type="number"
+                  inputmode="numeric"
+                  name="set_{{ sl.id }}_reps"
+                  placeholder="reps"
+                  value="{{ sl.reps if sl.reps is not none else '' }}"
+                />
+                <label class="set-row__done">
+                  <input
+                    type="checkbox"
+                    name="set_{{ sl.id }}_completed"
+                    value="1"
+                    {% if sl.completed %}checked{% endif %}
+                  />
+                  <span>Fait</span>
+                </label>
+              </div>
+
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">Pas de série pour cet exercice.</p>
+      {% endif %}
+
+      <h3 class="card__subtitle">Feedback exercice</h3>
+
+      <details class="field-block field-block--optional">
+        <summary class="field__label" style="cursor:pointer;font-size:13px;color:var(--fg-dim);">
+          Sensation musculaire (optionnel)
+        </summary>
+        {{ segmented(
+          "muscle_sensation",
+          [("strong", "Strong"), ("partial", "Partial"), ("weak", "Weak")],
+          se.muscle_sensation
+        ) }}
+      </details>
+
+      {% call field_group("Note (optionnel)") %}
+        <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
+      {% endcall %}
+
+      <div class="card__actions">
+        <button type="submit" class="btn btn--primary">
+          Enregistrer {{ se.exercise_code_snapshot }}
+        </button>
+      </div>
+    </form>
+  </details>
+{% endfor %}
+
 {# -------- Session-level feedback (dedicated form) ---------- #}
 <form
   method="post"
@@ -104,194 +306,6 @@
     {% endif %}
   </div>
 </form>
-
-{# -------- Exercise cards (one form per card) --------------- #}
-{% for se in session.session_exercises %}
-  {% set done, total = stats.per_exercise[se.id] %}
-  <form
-    method="post"
-    action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
-    class="card exercise-card {% if total > 0 and done == total %}exercise-card--done{% endif %}"
-    id="exercise-{{ se.id }}"
-  >
-    <header class="exercise-card__head">
-      <a
-        class="exercise-card__code exercise-card__code--link"
-        href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
-        title="Historique {{ se.exercise_code_snapshot }}"
-      >{{ se.exercise_code_snapshot }}</a>
-      <span class="exercise-card__name">{{ se.exercise_name_snapshot }}</span>
-      <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
-    </header>
-    {% if se.template_exercise and se.template_exercise.set_scheme %}
-      <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
-    {% endif %}
-
-    {% set summary = exercise_summaries.get(se.id) %}
-    {% if session.status == 'completed' and summary %}
-      <div class="done-summary">
-        <span class="done-summary__count">
-          Work : {{ summary.work_done }}/{{ summary.work_total }}
-        </span>
-        <span class="done-summary__values">
-          {{ summary.weights_str }} kg · {{ summary.reps_str }} reps
-        </span>
-        {% if summary.success_score is not none %}
-          <span class="done-summary__score">score {{ summary.success_score }}</span>
-        {% endif %}
-      </div>
-    {% endif %}
-
-    {% set lt = last_time.get(se.exercise_code_snapshot) %}
-    <div class="last-time {% if not lt %}last-time--empty{% endif %}">
-      {% if lt and lt.has_data %}
-        <span class="last-time__label">Dernière fois</span>
-        <span class="last-time__when">{{ lt.relative }}</span>
-        <span class="last-time__values">
-          {{ lt.weights_str }} kg · {{ lt.reps_str }} reps
-        </span>
-      {% elif lt %}
-        <span class="last-time__label">Dernière fois</span>
-        <span class="last-time__when">{{ lt.relative }}</span>
-        <span class="last-time__values">aucune donnée saisie</span>
-      {% else %}
-        <span class="last-time__label">Dernière fois</span>
-        <span class="last-time__values">Aucune séance précédente</span>
-      {% endif %}
-    </div>
-
-    {% set delta_label = deltas.get(se.exercise_code_snapshot) %}
-    {% if delta_label %}
-      <div class="delta">
-        <span class="delta__label">Delta</span>
-        <span class="delta__text">{{ delta_label }}</span>
-      </div>
-    {% endif %}
-
-    {% set hint = hints.get(se.exercise_code_snapshot) %}
-    {% if hint %}
-      <div class="hint">
-        <span class="hint__label">Repère</span>
-        <span class="hint__text">{{ hint }}</span>
-      </div>
-    {% endif %}
-
-    {% if se.set_logs|length > 0 %}
-      {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
-      {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
-
-      {% if warmup_sets|length > 0 %}
-        <h4 class="set-group-title">Warmup</h4>
-      {% endif %}
-      <ul class="set-list">
-        {% for sl in warmup_sets %}
-          <li class="set-row set-row--warmup">
-            <div class="set-row__label">
-              <span class="set-row__kind">Warmup</span>
-              <span class="set-row__idx">#{{ sl.set_index }}</span>
-              {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-            </div>
-
-            <div class="set-row__inputs">
-              <input
-                type="number"
-                step="0.5"
-                inputmode="decimal"
-                name="set_{{ sl.id }}_weight_kg"
-                placeholder="kg"
-                value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-              />
-              <input
-                type="number"
-                inputmode="numeric"
-                name="set_{{ sl.id }}_reps"
-                placeholder="reps"
-                value="{{ sl.reps if sl.reps is not none else '' }}"
-              />
-              <label class="set-row__done">
-                <input
-                  type="checkbox"
-                  name="set_{{ sl.id }}_completed"
-                  value="1"
-                  {% if sl.completed %}checked{% endif %}
-                />
-                <span>Fait</span>
-              </label>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-
-      {% if work_sets|length > 0 %}
-        <h4 class="set-group-title set-group-title--work">Work</h4>
-      {% endif %}
-      <ul class="set-list">
-        {% for sl in work_sets %}
-          <li class="set-row set-row--work">
-            <div class="set-row__label">
-              <span class="set-row__kind">Work</span>
-              <span class="set-row__idx">#{{ sl.set_index }}</span>
-              {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-            </div>
-
-            <div class="set-row__inputs">
-              <input
-                type="number"
-                step="0.5"
-                inputmode="decimal"
-                name="set_{{ sl.id }}_weight_kg"
-                placeholder="kg"
-                value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-              />
-              <input
-                type="number"
-                inputmode="numeric"
-                name="set_{{ sl.id }}_reps"
-                placeholder="reps"
-                value="{{ sl.reps if sl.reps is not none else '' }}"
-              />
-              <label class="set-row__done">
-                <input
-                  type="checkbox"
-                  name="set_{{ sl.id }}_completed"
-                  value="1"
-                  {% if sl.completed %}checked{% endif %}
-                />
-                <span>Fait</span>
-              </label>
-            </div>
-
-          </li>
-        {% endfor %}
-      </ul>
-    {% else %}
-      <p class="empty">Pas de série pour cet exercice.</p>
-    {% endif %}
-
-    <h3 class="card__subtitle">Feedback exercice</h3>
-
-    <details class="field-block field-block--optional">
-      <summary class="field__label" style="cursor:pointer;font-size:13px;color:var(--fg-dim);">
-        Sensation musculaire (optionnel)
-      </summary>
-      {{ segmented(
-        "muscle_sensation",
-        [("strong", "Strong"), ("partial", "Partial"), ("weak", "Weak")],
-        se.muscle_sensation
-      ) }}
-    </details>
-
-    {% call field_group("Note (optionnel)") %}
-      <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
-    {% endcall %}
-
-    <div class="card__actions">
-      <button type="submit" class="btn btn--primary">
-        Enregistrer {{ se.exercise_code_snapshot }}
-      </button>
-    </div>
-  </form>
-{% endfor %}
 
 {% if rules %}
 <aside class="card method-reminder">

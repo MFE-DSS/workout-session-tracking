@@ -1639,3 +1639,66 @@ code {
 
   .measurement-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* --- Sb_02: Exercise card accordion --- */
+
+details.exercise-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-md);
+  background: var(--surface);
+}
+
+details.exercise-card[open] {
+  border-color: var(--accent);
+}
+
+.exercise-card__compact {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  list-style: none;
+  font-size: 14px;
+}
+
+.exercise-card__compact::-webkit-details-marker {
+  display: none;
+}
+
+.exercise-card__compact::marker {
+  display: none;
+  content: "";
+}
+
+.exercise-card__recap {
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin-left: auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 50%;
+}
+
+.exercise-card__form {
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.exercise-card__head-expanded {
+  margin-bottom: var(--space-sm);
+}
+
+.exercise-card__head-expanded a {
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+details.exercise-card--done .exercise-card__compact {
+  color: var(--fg-muted);
+}
+
+details.exercise-card--done .exercise-card__compact .exercise-card__code {
+  color: var(--ok);
+}

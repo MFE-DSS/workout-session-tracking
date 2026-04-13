@@ -218,6 +218,23 @@ def session_detail(
         )
         delta_labels[code] = format_delta(delta)
 
+    # Determine which exercise card to expand (Sb_02 accordion)
+    active_exercise_id = None
+    active_param = request.query_params.get("active")
+    if active_param:
+        try:
+            active_exercise_id = int(active_param)
+        except (ValueError, TypeError):
+            pass
+
+    if active_exercise_id is None:
+        # Default: first non-complete exercise
+        for se in session.session_exercises:
+            done, total = stats["per_exercise"][se.id]
+            if total == 0 or done < total:
+                active_exercise_id = se.id
+                break
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -231,6 +248,7 @@ def session_detail(
             "hints": hints,
             "exercise_summaries": exercise_summaries,
             "deltas": delta_labels,
+            "active_exercise_id": active_exercise_id,
         },
     )
 
@@ -328,7 +346,7 @@ async def update_exercise_card(
         .limit(1)
     ).scalar_one_or_none()
     if next_se is not None:
-        target = f"/sessions/{session_id}#exercise-{next_se.id}"
+        target = f"/sessions/{session_id}?active={next_se.id}#exercise-{next_se.id}"
     else:
         target = f"/sessions/{session_id}#session-feedback"
     return RedirectResponse(url=target, status_code=303)
