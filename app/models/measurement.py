@@ -3,6 +3,10 @@
 Each row is one measurement session — the user fills in whichever
 fields they measured that day. All measurement fields are nullable
 to allow partial entries.
+
+Lateralized fields (arm, thigh) store left/right independently.
+The averaged values used by the physique dashboard are derived views,
+not stored columns.
 """
 from __future__ import annotations
 
@@ -29,9 +33,13 @@ class BodyMeasurement(Base):
     )
     weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)
     chest_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
-    arm_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    arm_cm_left: Mapped[float | None] = mapped_column(Float, nullable=True)
+    arm_cm_right: Mapped[float | None] = mapped_column(Float, nullable=True)
     waist_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
-    thigh_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    thigh_cm_left: Mapped[float | None] = mapped_column(Float, nullable=True)
+    thigh_cm_right: Mapped[float | None] = mapped_column(Float, nullable=True)
+    hip_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    neck_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     calf_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
