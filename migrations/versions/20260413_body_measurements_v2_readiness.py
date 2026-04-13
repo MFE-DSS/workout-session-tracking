@@ -35,11 +35,6 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('user_id', 'recorded_on', name='uq_readiness_user_day'),
     )
-    op.create_index(
-        'ix_readiness_entries_user_date',
-        'readiness_entries',
-        ['user_id', 'recorded_on'],
-    )
 
     # -- 2. Lateralize body_measurements: arm_cm → left/right, thigh_cm → left/right --
     #    Also add hip_cm and neck_cm.
@@ -84,5 +79,4 @@ def downgrade() -> None:
         batch_op.drop_column('arm_cm_right')
         batch_op.drop_column('arm_cm_left')
 
-    op.drop_index('ix_readiness_entries_user_date', table_name='readiness_entries')
     op.drop_table('readiness_entries')
