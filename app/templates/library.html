@@ -3,32 +3,39 @@
 <h1 class="page-title">Programmes de séance</h1>
 <p class="lede">Choisis un programme pour démarrer.</p>
 
-<ul class="template-list">
-  {% for tpl in templates %}
-    <li class="template-card template-card--{{ tpl.kind }}">
-      <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
-        <div class="template-card__row">
-          <span class="template-card__name">{{ tpl.name }}</span>
-          <span class="template-card__kind">{{ tpl.kind|upper }}</span>
-        </div>
-        <div class="template-card__focus">{{ tpl.focus }}</div>
-        {% if tpl.kind == 'cardio' and tpl.cardio_note %}
-          <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
-        {% endif %}
-        {% if tpl.suggested_label %}
-          <div class="template-card__hint">{{ tpl.suggested_label }}</div>
-        {% endif %}
-        <form
-          method="post"
-          action="{{ url_for('create_session') }}"
-          class="template-card__start"
-          onclick="event.stopPropagation();"
-        >
-          <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
-          <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
-        </form>
-      </a>
-    </li>
-  {% endfor %}
-</ul>
+{% for section_key, section_label in sections %}
+  {% if section_key in grouped %}
+  <section style="margin-bottom: var(--space-xl);">
+    <h2 class="section-header">{{ section_label }}</h2>
+    <ul class="template-list">
+      {% for tpl in grouped[section_key] %}
+        <li class="template-card template-card--{{ tpl.kind }}">
+          <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
+            <div class="template-card__row">
+              <span class="template-card__name">{{ tpl.name }}</span>
+              <span class="template-card__kind">{{ tpl.kind|upper }}</span>
+            </div>
+            <div class="template-card__focus">{{ tpl.focus }}</div>
+            {% if tpl.kind == 'cardio' and tpl.cardio_note %}
+              <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
+            {% endif %}
+            {% if tpl.suggested_label %}
+              <div class="template-card__hint">{{ tpl.suggested_label }}</div>
+            {% endif %}
+            <form
+              method="post"
+              action="{{ url_for('create_session') }}"
+              class="template-card__start"
+              onclick="event.stopPropagation();"
+            >
+              <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
+              <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
+            </form>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+{% endfor %}
 {% endblock %}

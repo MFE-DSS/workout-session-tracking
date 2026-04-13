@@ -44,6 +44,13 @@ class WorkoutTemplate(Base):
     # Non-structural hint only. NEVER branch logic on this field.
     suggested_label: Mapped[Optional[str]] = mapped_column(String(128), nullable=True)
 
+    # Catalog hierarchy: controls grouping and ordering in /library.
+    # Values: "core", "utility", "specialization", "archived"
+    catalog_section: Mapped[str] = mapped_column(
+        String(32), nullable=False, default="core"
+    )
+    display_order: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
     exercises: Mapped[list["TemplateExercise"]] = relationship(
         back_populates="template",
         cascade="all, delete-orphan",

@@ -23,16 +23,26 @@ def test_home_has_no_weekday_pivot(client):
         assert weekday not in body
 
 
-def test_library_lists_all_fifteen_templates(client):
+def test_library_shows_catalog_sections(client):
     r = client.get("/library")
     assert r.status_code == 200
     body = r.text
-    for name in [
-        "Push A", "Push B", "Pull A", "Pull B",
-        "Legs A", "Legs B", "Upper", "Lower",
-        "LISS cardio", "Session courte", "Rattrapage",
-    ]:
+    # Sections headings visible
+    assert "Programmes principaux" in body
+    assert "Modules utilitaires" in body
+    # Core templates visible
+    for name in ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B"]:
         assert name in body
+    # Utility templates visible
+    assert "Session courte" in body
+    assert "LISS cardio" in body
+    # Specialization visible
+    assert "Rattrapage" in body
+    # Archived templates NOT visible
+    assert "Accent quadriceps" not in body
+    assert "Accent chaîne postérieure" not in body
+    assert "Biais pecs" not in body
+    assert "Biais dos" not in body
 
 
 def test_push_a_detail_has_all_eight_exercises(client):

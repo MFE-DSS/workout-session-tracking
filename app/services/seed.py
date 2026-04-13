@@ -67,6 +67,8 @@ def seed_reference_split(db: Session, payload: dict | None = None) -> bool:
             focus=tpl.get("focus", ""),
             cardio_note=tpl.get("cardio_note"),
             suggested_label=tpl.get("suggested_label"),
+            catalog_section=tpl.get("catalog_section", "core"),
+            display_order=tpl.get("display_order", 0),
         )
         for ex in tpl.get("exercises", []):
             exercise = TemplateExercise(

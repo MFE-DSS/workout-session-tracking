@@ -38,9 +38,17 @@ def _load_templates(db) -> list[WorkoutTemplate]:
                 TemplateExercise.rep_targets
             )
         )
-        .order_by(WorkoutTemplate.kind, WorkoutTemplate.slug)
+        .order_by(WorkoutTemplate.display_order, WorkoutTemplate.slug)
     )
     return list(db.execute(stmt).scalars().all())
+
+
+# Catalog section labels for the library page.
+CATALOG_SECTIONS = [
+    ("core", "Programmes principaux"),
+    ("utility", "Modules utilitaires"),
+    ("specialization", "Modules de spécialisation"),
+]
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -114,12 +122,20 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
 @router.get("/library", response_class=HTMLResponse)
 def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     all_templates = _load_templates(db)
+    # Group templates by catalog_section for display
+    grouped: dict[str, list] = {}
+    for tpl in all_templates:
+        section = getattr(tpl, "catalog_section", "core")
+        if section == "archived":
+            continue  # Hidden from catalog
+        grouped.setdefault(section, []).append(tpl)
     return templates.TemplateResponse(
         request,
         "library.html",
         {
             "page_title": "Programmes de séance",
-            "templates": all_templates,
+            "sections": CATALOG_SECTIONS,
+            "grouped": grouped,
             "active_session": latest_open_session(db, user.id),
         },
     )
