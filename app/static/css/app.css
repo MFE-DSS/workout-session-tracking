@@ -7,9 +7,10 @@
   --border: #232834;
   --fg: #e8ecf1;
   --fg-muted: #9aa3ad;
-  --fg-dim: #5a6270;
+  --fg-dim: #6e7785;
   --accent: #f25f3a;
   --accent-soft: #f25f3a1a;
+  --accent-muted: #d4715a;
   --ok: #2ecc71;
   --ok-soft: #2ecc711a;
   --warn: #f4a261;
@@ -112,6 +113,46 @@ input, button, textarea, select {
   padding: 0;
 }
 
+/* ---- Topbar mobile hamburger ---- */
+.topbar__toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--fg-muted);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 8px;
+  list-style: none;
+}
+.topbar__toggle::-webkit-details-marker { display: none; }
+
+@media (max-width: 768px) {
+  .topbar__nav { display: none; }
+  .topbar__toggle { display: block; }
+  .topbar__menu[open] .topbar__nav {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-md);
+    gap: var(--space-md);
+    z-index: 10;
+  }
+  .topbar__menu[open] .topbar__nav a,
+  .topbar__menu[open] .topbar__nav button {
+    font-size: 16px;
+    padding: var(--space-sm) 0;
+  }
+}
+@media (min-width: 769px) {
+  .topbar__menu > .topbar__nav { display: flex; }
+  .topbar__toggle { display: none; }
+}
+
 /* ---- Active Banner ---- */
 
 .active-banner {
@@ -183,6 +224,18 @@ input, button, textarea, select {
 .text-dim   { color: var(--fg-dim); }
 .text-mono  { font-family: var(--font-mono); }
 
+/* ---- Spacing Utilities ---- */
+.mt-xs { margin-top: var(--space-xs); }
+.mt-sm { margin-top: var(--space-sm); }
+.mt-md { margin-top: var(--space-md); }
+.mt-lg { margin-top: var(--space-lg); }
+.mb-xs { margin-bottom: var(--space-xs); }
+.mb-sm { margin-bottom: var(--space-sm); }
+.mb-md { margin-bottom: var(--space-md); }
+.mb-lg { margin-bottom: var(--space-lg); }
+.gap-sm { gap: var(--space-sm); }
+.gap-md { gap: var(--space-md); }
+
 /* ---- Card ---- */
 
 .card {
@@ -216,6 +269,10 @@ input, button, textarea, select {
   gap: var(--space-sm);
   flex-wrap: wrap;
 }
+
+.card--signal { border-left: 3px solid var(--accent); }
+.card--metric { padding: var(--space-sm) var(--space-md); }
+.card--evidence { background: var(--bg); border-color: var(--border); }
 
 /* ---- KPI ---- */
 
@@ -323,6 +380,30 @@ input, button, textarea, select {
 .badge--excluded { background: var(--surface-2); color: var(--fg-dim); }
 .badge--delta { background: var(--surface-2); color: var(--fg); }
 
+/* ---- Chips ---- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+.chip--confidence-high { color: var(--ok); background: var(--ok-soft); }
+.chip--confidence-medium { color: var(--warn); background: rgba(244, 162, 97, 0.1); }
+.chip--confidence-low { color: var(--fg-dim); background: var(--surface-2); }
+.chip--insufficient {
+  color: var(--fg-dim);
+  background: transparent;
+  border: 1px dashed var(--border);
+}
+.chip--private {
+  color: var(--fg-dim);
+  background: var(--surface-2);
+}
+.chip--private::before { content: "🔒 "; font-size: 10px; }
+
 /* ---- Grade Badge ---- */
 
 .grade-badge {
@@ -400,7 +481,7 @@ input, button, textarea, select {
 .btn:hover { border-color: var(--fg-dim); }
 
 .btn--primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-.btn--primary:hover { opacity: 0.9; }
+.btn--primary:hover { background: var(--accent-muted); border-color: var(--accent-muted); opacity: 1; }
 
 .btn--ghost { background: transparent; border-color: var(--border); }
 

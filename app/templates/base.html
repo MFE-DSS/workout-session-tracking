@@ -18,19 +18,22 @@
   <body>
     <header class="topbar">
       <a class="topbar__brand" href="{{ url_for('home') }}">SPIGNOS</a>
-      <nav class="topbar__nav" aria-label="Navigation">
-        <a class="topbar__link" href="{{ url_for('home') }}">Accueil</a>
-        <a class="topbar__link" href="{{ url_for('library') }}">Programme</a>
-        <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
-        <a class="topbar__link" href="{{ url_for('physique') }}">Physique</a>
-        <a class="topbar__link" href="{{ url_for('dashboard') }}">Dashboard</a>
-        <a class="topbar__link" href="{{ url_for('squads_list') }}">Squads</a>
-        <a class="topbar__link" href="{{ url_for('leaderboard_page') }}">Board</a>
-        <a class="topbar__link" href="{{ url_for('profile_page') }}">Profil</a>
-        <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
-          <button type="submit" class="topbar__link topbar__link--btn">Logout</button>
-        </form>
-      </nav>
+      <details class="topbar__menu">
+        <summary class="topbar__toggle" aria-label="Menu">☰</summary>
+        <nav class="topbar__nav" aria-label="Navigation">
+          <a class="topbar__link" href="{{ url_for('home') }}">Accueil</a>
+          <a class="topbar__link" href="{{ url_for('library') }}">Programmes</a>
+          <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
+          <a class="topbar__link" href="{{ url_for('physique') }}">Physique</a>
+          <a class="topbar__link" href="{{ url_for('dashboard') }}">Synthèse</a>
+          <a class="topbar__link" href="{{ url_for('leaderboard_page') }}">Classement</a>
+          <a class="topbar__link" href="{{ url_for('squads_list') }}">Squads</a>
+          <a class="topbar__link" href="{{ url_for('profile_page') }}">Profil</a>
+          <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
+            <button type="submit" class="topbar__link topbar__link--btn">Déconnexion</button>
+          </form>
+        </nav>
+      </details>
     </header>
     {% if active_session %}
       <a class="active-banner" href="{{ url_for('session_detail', session_id=active_session.id) }}">
@@ -44,7 +47,7 @@
       {% block content %}{% endblock %}
     </main>
     <footer class="foot">
-      <small>SPIGNOS · FastAPI SSR · v1</small>
+      <small>SPIGNOS</small>
       <a href="{{ url_for('contact_page') }}" class="foot__contact">Contact</a>
     </footer>
   </body>
