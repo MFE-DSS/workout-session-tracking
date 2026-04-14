@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Science</h1>
+<p class="lede">Comprendre pourquoi noter change la progression, et comment SPIGNOS materialise cette discipline.</p>
+
+<!-- SECTION 1 — PRATIQUE -->
+<section class="science-section" id="section-journal">
+  <h2 class="section-header">Pourquoi noter change la progression</h2>
+  <div class="card">
+    <p>La memoire subjective est un mauvais outil de progression. Elle surestime les bonnes seances, oublie les stagnations, et fabrique des souvenirs qui arrangent le moment.</p>
+    <p>Un carnet la remplace. La surcharge progressive suppose que tu saches ce que tu as fait la derniere fois. C'est tout. Sans trace, tu ne peux pas comparer. Sans comparaison, tu ne peux pas ajuster la charge, les reps, la frequence.</p>
+    <p>L'auto-illusion — croire qu'on progresse quand on stagne — est la premiere cause de stagnation reelle. Noter l'elimine. Pas par discipline morale, par lucidite.</p>
+    <p>Quand tu notes, ta seance devient une donnee. Quand ta seance devient une donnee, tu peux l'ameliorer.</p>
+  </div>
+</section>
+
+<!-- SECTION 2 — PRINCIPES : methode -->
+<section class="science-section" id="section-method">
+  <h2 class="section-header">Methode d'entrainement</h2>
+  {% for rule in rules %}
+  <article class="card rule-card" id="rule-{{ rule.slug }}">
+    <h3 class="card__title">{{ rule.title }}</h3>
+    <p class="rule__body">{{ rule.body }}</p>
+  </article>
+  {% endfor %}
+</section>
+
+<!-- SECTION 3 — PRINCIPES : cardio -->
+<section class="science-section" id="section-cardio">
+  <h2 class="section-header">Place du cardio</h2>
+  <div class="card">
+    <p>Le LISS (Low Intensity Steady State) n'est pas un outil de perte de gras magique. C'est un outil de discipline cardio-vasculaire et de recuperation active.</p>
+    <p>Dans un programme muscu, il a trois fonctions :</p>
+    <ul>
+      <li>Maintenir une base cardio sans tirer sur la recuperation musculaire.</li>
+      <li>Servir de seance "entre deux" qui preserve la regularite les jours ou tu n'as pas le temps pour du lourd.</li>
+      <li>Ameliorer la tolerance au volume — la capacite a enchainer les seances sans craquer.</li>
+    </ul>
+    <p>SPIGNOS capture le cardio avec : duree, BPM moyen (si tu le mesures), machine utilisee. Les calories affichees par la machine peuvent etre notees, mais elles sont une donnee machine indicative, pas une verite metabolique.</p>
+    <p class="text-dim" style="font-size:12px;">SPIGNOS stocke des donnees cardio operatoires, pas des verites physiologiques absolues.</p>
+  </div>
+</section>
+
+<!-- SECTION 4 — MATERIALISATION -->
+<section class="science-section" id="section-manual">
+  <h2 class="section-header">Comment SPIGNOS materialise ces concepts</h2>
+
+  <div class="card">
+    <h3 class="card__title">Programmes et seances</h3>
+    <p>Les programmes (Push A, Pull B, Legs A...) sont des modeles figes. Chaque version du catalogue a un numero. Quand tu demarres une seance, SPIGNOS en fait une copie vivante que tu remplis. Meme si le programme change plus tard, ta seance reste telle qu'elle a ete logguee.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="card__title">Exercices et series</h3>
+    <p>Chaque exercice a des series d'echauffement (1 ou 2) et des series de travail. Tu entres pour chaque serie : poids, reps, coche "fait". Pas de case obligatoire en plus. <a href="#rule-plages-repetitions">Voir plages de reps</a>.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="card__title">Score derive</h3>
+    <p>Le score d'un exercice est calcule automatiquement a partir des reps vs la plage prescrite, et du nombre de series completees. Tu n'as pas a poser un ressenti arbitraire — le chiffre vient de ce que tu as fait. La sensation musculaire, optionnelle, reste une note subjective.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="card__title">Historique</h3>
+    <p>Chaque seance est conservee telle qu'elle a ete logguee. Tu peux la revoir, comparer a la meme seance passee, voir les deltas (charge, reps) pour un meme exercice.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="card__title">Synthese et physique</h3>
+    <p>La page <b>Synthese</b> calcule 5 axes (regularite, progression, evolution corporelle, recuperation, equilibre musculaire) avec un niveau de confiance par axe. Si les donnees sont insuffisantes, l'axe est grise. Tu ne vois jamais un score qu'on ne peut pas calculer honnetement.</p>
+    <p>La page <b>Physique</b> montre l'equilibre de developpement par zone musculaire, base sur le volume d'entrainement et les mesures corporelles si saisies.</p>
+  </div>
+
+  <div class="card">
+    <h3 class="card__title">Ce qui reste prive</h3>
+    <p>Tes mesures corporelles, ta readiness, tes notes, tes poids par serie : strictement privees. Meme dans une squad (groupe prive), seule l'activite agregee est partagee — jamais les details.</p>
+  </div>
+</section>
+
+<!-- SECTION 5 — ARCHITECTURE -->
+<section class="science-section" id="section-diagram">
+  <h2 class="section-header">Architecture du produit</h2>
+  <figure class="science-diagram">
+    {% include "_partials/science_diagram.svg" %}
+    <figcaption class="text-dim" style="font-size:12px;text-align:center;margin-top:var(--space-sm);">
+      Les donnees alimentent un cockpit personnel unique. Les zones en pointille sont privees.
+    </figcaption>
+  </figure>
+</section>
+{% endblock %}

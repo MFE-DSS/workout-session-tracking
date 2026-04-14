@@ -386,20 +386,26 @@ async def update_exercise_card(
 # ----------------------------------------------------------------------
 
 
-@router.get("/rules", response_class=HTMLResponse)
-def rules_page(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
+@router.get("/science", response_class=HTMLResponse, name="science_page")
+def science_page(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     rules = db.execute(
         select(MethodRule).order_by(MethodRule.position)
     ).scalars().all()
     return templates.TemplateResponse(
         request,
-        "rules.html",
+        "science.html",
         {
-            "page_title": "Règles",
+            "page_title": "Science",
             "rules": rules,
             "active_session": latest_open_session(db, user.id),
         },
     )
+
+
+@router.get("/rules", name="rules_page")
+def rules_redirect() -> RedirectResponse:
+    """Legacy URL — /rules redirects 301 to /science."""
+    return RedirectResponse(url="/science", status_code=301)
 
 
 # ----------------------------------------------------------------------
