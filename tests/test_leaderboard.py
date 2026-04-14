@@ -74,7 +74,7 @@ def test_leaderboard_requires_auth(client):
 
 def test_leaderboard_renders_empty_state(client):
     body = client.get("/leaderboard").text
-    assert "Leaderboard" in body
+    assert "Classement" in body
     # testuser exists but has no completed sessions
     assert "testuser" in body
 
@@ -237,7 +237,7 @@ def test_leaderboard_does_not_expose_session_details(client):
 def test_topbar_has_leaderboard_link(client):
     body = client.get("/").text
     assert "/leaderboard" in body
-    assert "Board" in body
+    assert "Classement" in body
 
 
 def test_leaderboard_entry_has_grade_fields(client):

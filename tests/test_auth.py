@@ -143,5 +143,5 @@ def test_user_exists_in_db(client):
 def test_welcome_page_renders(client):
     r = client.get("/welcome")
     assert r.status_code == 200
-    assert "Workout Session Tracking" in r.text
+    assert "SPIGNOS" in r.text
     assert "Connexion" in r.text

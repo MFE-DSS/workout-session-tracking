@@ -6,7 +6,7 @@ def test_dashboard_renders(client):
     """GET /dashboard returns 200 with page title."""
     r = client.get("/dashboard")
     assert r.status_code == 200
-    assert "Body Engineering" in r.text
+    assert "Synthèse" in r.text
 
 
 def test_dashboard_window_param(client):
@@ -36,4 +36,4 @@ def test_dashboard_nav_link_present(client):
     """Dashboard link appears in the navbar."""
     r = client.get("/dashboard")
     assert r.status_code == 200
-    assert "Dashboard" in r.text
+    assert "Synthèse" in r.text

@@ -241,5 +241,5 @@ def test_session_detail_has_warmup_and_work_subheaders(client):
     # Both group titles must show up at least once per card
     assert "set-group-title" in body
     # Warmup subheading appears for every exercise (8 cards)
-    assert body.count(">Warmup</h4>") >= 8
-    assert body.count(">Work</h4>") >= 8
+    assert body.count(">Échauffement</h4>") >= 8
+    assert body.count(">Travail</h4>") >= 8

@@ -88,10 +88,10 @@ def test_export_contains_session_exercise_and_set_fields(client):
     assert e2["success_score"] in {100, 80, 50}  # derived by compute_success_score
     assert e2["muscle_sensation"] == "strong"
 
-    # 2 warmup + 3 work rows on E2
+    # 1 warmup + 3 work rows on E2 (only the first exercise gets 2 warmups)
     warmups = [x for x in e2["sets"] if x["kind"] == "warmup"]
     works = [x for x in e2["sets"] if x["kind"] == "work"]
-    assert len(warmups) == 2
+    assert len(warmups) == 1
     assert len(works) == 3
     for w in works:
         assert w["completed"] is True
