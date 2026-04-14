@@ -187,6 +187,15 @@ def session_detail(
         se.id: summarise_current_exercise(se) for se in session.session_exercises
     }
 
+    from app.services.substitution import get_substitutes, can_substitute
+    substitution_data: dict[int, dict] = {}
+    for se in session.session_exercises:
+        subs = get_substitutes(se.template_exercise)
+        substitution_data[se.id] = {
+            "substitutes": subs,
+            "can_substitute": can_substitute(se),
+        }
+
     # Delta vs the prior occurrence's first completed work set.
     # Only rendered when the CURRENT exercise has a first completed
     # work set AND the prior session had one too.
@@ -249,6 +258,7 @@ def session_detail(
             "exercise_summaries": exercise_summaries,
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
+            "substitution_data": substitution_data,
         },
     )
 
@@ -318,6 +328,14 @@ async def update_exercise_card(
     # Exercise-level feedback
     se.muscle_sensation = enum_str(form.get("muscle_sensation"), _MUSCLE_SENSATION)
     se.free_note = clean_str(form.get("free_note"), max_length=140)
+
+    # Substitution (Sb_03) — only if no work set is completed yet
+    from app.services.substitution import can_substitute
+    sub_name = clean_str(form.get("substituted_name"), max_length=255)
+    if sub_name and can_substitute(se):
+        se.substituted_name = sub_name
+    elif not sub_name and can_substitute(se):
+        se.substituted_name = None
 
     # Per-set values — the form encodes them as set_{id}_{field}
     for sl in se.set_logs:

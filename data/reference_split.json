@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-13.v6",
+  "version": "2026-04-14.v7",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -21,6 +21,7 @@
           "name": "Incline Smith Press",
           "set_scheme": "3x 6-10",
           "notes": "Banc incliné 30°, descente contrôlée sur le haut des pecs.",
+          "substitutes": ["Développé incliné haltères 30°"],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -41,6 +42,7 @@
           "code": "E2",
           "name": "Chest Press machine",
           "set_scheme": "3x 8-12",
+          "substitutes": ["Développé couché haltères", "Dips pectoraux (buste penché)"],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -82,6 +84,7 @@
           "code": "E4",
           "name": "Neutral Grip Shoulder Press machine",
           "set_scheme": "3x 8-12",
+          "substitutes": ["Machine shoulder press"],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -225,6 +228,7 @@
           "name": "Développé couché haltères",
           "set_scheme": "3x 6-10",
           "notes": "Descendre profond pour maximiser l'étirement pectoral.",
+          "substitutes": ["Chest Press machine", "Incline Smith Press"],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -426,6 +430,7 @@
           "code": "E4",
           "name": "Rear delt fly machine (pec deck inversé)",
           "set_scheme": "3x 12-15",
+          "substitutes": ["Écarté arrière d'épaule câble", "Face pull câble"],
           "rep_targets": [
             {
               "min_reps": 12,
@@ -479,6 +484,7 @@
           "name": "Rowing machine chest-supported",
           "set_scheme": "3x 6-10",
           "notes": "Support poitrine pour isoler le dos sans compensation lombaire.",
+          "substitutes": ["Rowing haltère un bras (banc)", "Rowing câble assis prise neutre"],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -631,6 +637,7 @@
           "name": "Hack Squat machine",
           "set_scheme": "3x 6-10",
           "notes": "Pieds bas et serrés pour maximiser le travail des quadriceps.",
+          "substitutes": ["Squat Smith machine (pieds avancés)", "Leg Press (pieds bas, serrés)"],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -652,6 +659,7 @@
           "name": "Leg Press (pieds bas, serrés)",
           "set_scheme": "3x 8-12",
           "notes": "Pieds bas sur la plateforme pour cibler les quadriceps.",
+          "substitutes": ["Hack Squat machine"],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -852,6 +860,7 @@
           "name": "Hip thrust Smith machine",
           "set_scheme": "3x 8-12",
           "notes": "Dos contre le banc, pousser les hanches vers le plafond, squeeze en haut.",
+          "substitutes": ["Hip thrust haltères"],
           "rep_targets": [
             {
               "min_reps": 8,

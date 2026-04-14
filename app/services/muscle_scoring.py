@@ -27,6 +27,7 @@ from app.services.muscle_mapping import (
     classify_exercise,
 )
 from app.services.radar import build_radar_svg
+from app.services.substitution import actual_exercise_name
 
 
 @dataclass
@@ -85,7 +86,7 @@ def _compute_tonnage_by_zone(
 
     for s in sessions:
         for se in s.session_exercises:
-            primary, secondary = classify_exercise(se.exercise_name_snapshot)
+            primary, secondary = classify_exercise(actual_exercise_name(se))
             if primary == "unknown":
                 continue
 
