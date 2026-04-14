@@ -77,6 +77,7 @@ def seed_reference_split(db: Session, payload: dict | None = None) -> bool:
                 name=ex["name"],
                 set_scheme=ex["set_scheme"],
                 notes=ex.get("notes"),
+                substitutes_json=json.dumps(ex["substitutes"]) if ex.get("substitutes") else None,
             )
             for idx, rt in enumerate(ex.get("rep_targets", []), start=1):
                 exercise.rep_targets.append(

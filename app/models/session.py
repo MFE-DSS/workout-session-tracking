@@ -144,6 +144,7 @@ class SessionExercise(Base):
     success_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)  # 100|80|50
     muscle_sensation: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     free_note: Mapped[Optional[str]] = mapped_column(String(140), nullable=True)
+    substituted_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
 
     session: Mapped[WorkoutSession] = relationship(back_populates="session_exercises")
 

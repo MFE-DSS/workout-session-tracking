@@ -78,6 +78,7 @@ class TemplateExercise(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     set_scheme: Mapped[str] = mapped_column(String(255), nullable=False)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    substitutes_json: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     template: Mapped[WorkoutTemplate] = relationship(back_populates="exercises")
     rep_targets: Mapped[list["RepTarget"]] = relationship(
