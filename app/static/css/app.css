@@ -89,12 +89,6 @@ input, button, textarea, select {
   font-size: 14px;
 }
 
-.topbar__nav {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
 .topbar__link {
   font-size: 13px;
   color: var(--fg-muted);
@@ -113,51 +107,62 @@ input, button, textarea, select {
   padding: 0;
 }
 
-/* ---- Topbar mobile hamburger ---- */
+/* ---- Topbar hamburger (unified mobile + desktop) ---- */
+.topbar__menu { position: relative; }
+
 .topbar__toggle {
-  display: none;
+  display: block;
   background: none;
   border: none;
   color: var(--fg-muted);
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 4px 10px;
   list-style: none;
+  user-select: none;
 }
 .topbar__toggle::-webkit-details-marker { display: none; }
+.topbar__toggle::marker { content: ""; display: none; }
+.topbar__toggle:hover { color: var(--fg); }
 
-@media (max-width: 768px) {
-  .topbar__nav { display: none; }
-  .topbar__toggle { display: block; }
-  .topbar__menu[open] .topbar__nav {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
-    padding: var(--space-md);
-    gap: var(--space-md);
-    z-index: 10;
-  }
-  .topbar__menu[open] .topbar__nav a,
-  .topbar__menu[open] .topbar__nav button {
-    font-size: 16px;
-    padding: var(--space-sm) 0;
-  }
+/* Nav hidden by default; shown when <details> is [open] */
+.topbar__nav { display: none; }
+
+.topbar__menu[open] .topbar__nav {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-sm);
+  gap: 2px;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
+
+.topbar__menu[open] .topbar__nav a,
+.topbar__menu[open] .topbar__nav button {
+  font-size: 14px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  display: block;
+  text-align: left;
+  width: 100%;
+}
+
+.topbar__menu[open] .topbar__nav a:hover,
+.topbar__menu[open] .topbar__nav button:hover {
+  background: var(--surface-2);
+  color: var(--fg);
+}
+
+/* On very wide screens, still constrain the dropdown */
 @media (min-width: 769px) {
-  /* Desktop: details UA style hides children when closed — override */
-  .topbar__menu > .topbar__nav {
-    display: flex !important;
-    gap: 16px;
-    align-items: center;
-  }
-  .topbar__toggle { display: none !important; }
-  /* Make sure the <details> itself doesn't add extra spacing */
-  .topbar__menu { display: contents; }
+  .topbar__menu[open] .topbar__nav { min-width: 240px; }
 }
 
 /* ---- Active Banner ---- */
@@ -1722,8 +1727,6 @@ code {
   .cockpit-side .tile-grid { grid-template-columns: 1fr 1fr; }
 
   .template-list { grid-template-columns: 1fr 1fr; }
-
-  .topbar__nav { gap: 20px; }
 
   .measurement-grid { grid-template-columns: 1fr 1fr; }
 }

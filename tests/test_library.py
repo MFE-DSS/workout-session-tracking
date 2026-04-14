@@ -10,7 +10,9 @@ def test_home_renders_action_tiles(client):
     r = client.get("/")
     assert r.status_code == 200
     body = r.text
-    for label in ["Nouvelle séance", "Historique", "Progression", "Programmes"]:
+    # Main CTA: "Démarrer une séance" (primary) or "Nouvelle séance" (when open session)
+    assert "Démarrer une séance" in body or "Nouvelle séance" in body
+    for label in ["Historique", "Progression", "Programmes"]:
         assert label in body
 
 

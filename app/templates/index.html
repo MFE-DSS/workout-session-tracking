@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Accueil</h1>
+<h1 class="page-title">Ton cockpit</h1>
 
 {% if open_session %}
   <a class="tile tile--resume" href="{{ url_for('session_detail', session_id=open_session.id) }}">
@@ -13,10 +13,20 @@
   </a>
 {% endif %}
 
+{# === CTA principal : Nouvelle séance — pleine largeur, accent === #}
+{% if not open_session %}
+<a class="tile tile--primary tile--cta-main" href="{{ url_for('launcher') }}"
+   style="display:block;padding:var(--space-lg) var(--space-md);margin-bottom:var(--space-md);text-align:center;border-left:none;border:2px solid var(--accent);">
+  <div class="tile__label" style="font-size:18px;color:var(--accent);">Démarrer une séance →</div>
+  <div class="tile__hint" style="margin-top:var(--space-xs);">Choisir un programme guidé</div>
+</a>
+{% endif %}
+
+{# === Readiness widget — pre-opened si pas encore rempli aujourd'hui === #}
 {% if readiness_today %}
 <div class="card readiness-widget" style="margin-bottom:var(--space-md);">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);flex-wrap:wrap;">
-    <span class="card__title" style="margin:0;font-size:14px;">Readiness</span>
+    <span class="card__title" style="margin:0;font-size:14px;">État du jour</span>
     {% for field in readiness_scale_fields %}
       {% set val = readiness_today[field] %}
       <span class="badge badge--{% if val >= 4 %}good{% elif val >= 3 %}neutral{% else %}warn{% endif %}"
@@ -27,15 +37,19 @@
     {% if readiness_today.resting_hr %}
       <span class="badge" title="FC repos">{{ readiness_today.resting_hr }} bpm</span>
     {% endif %}
-    <a href="/readiness/history" class="text-muted" style="font-size:12px;">Historique état →</a>
+    <a href="/readiness/history" class="text-muted" style="font-size:12px;">Historique →</a>
   </div>
 </div>
 {% else %}
-<div class="card readiness-widget" style="margin-bottom:var(--space-md);">
-  <details>
-    <summary class="card__title" style="cursor:pointer;font-size:14px;margin:0;">
-      État du jour
+<div class="card readiness-widget" style="margin-bottom:var(--space-md);border-left:3px solid var(--warn);">
+  <details open>
+    <summary style="cursor:pointer;font-size:14px;margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-sm);">
+      <span class="card__title" style="margin:0;color:var(--warn);">État du jour · à remplir</span>
+      <span class="text-dim" style="font-size:11px;font-weight:400;">30 sec · améliore la lecture de ta récupération</span>
     </summary>
+    <p class="text-dim" style="font-size:12px;margin:var(--space-sm) 0;">
+      Une fois par jour. Plus tu remplis, plus la synthèse devient fiable.
+    </p>
     <form method="post" action="/readiness" style="margin-top:var(--space-sm);">
       {% for field in readiness_scale_fields %}
       <div style="margin-bottom:var(--space-xs);">
@@ -55,7 +69,7 @@
                style="flex:1;max-width:150px;">
         <input type="text" name="note" placeholder="Note (optionnel)" style="flex:2;">
       </div>
-      <button type="submit" class="btn btn--ghost" style="margin-top:var(--space-sm);width:100%;">Enregistrer</button>
+      <button type="submit" class="btn btn--primary" style="margin-top:var(--space-sm);width:100%;">Enregistrer mon état</button>
     </form>
   </details>
 </div>
@@ -63,13 +77,25 @@
 
 <div class="cockpit-grid">
   <div class="cockpit-main">
-    <div class="insight">
-      <div class="kpi kpi--accent">
-        <span class="kpi__value">{{ "%.0f"|format(behavioral.readiness_score) }}</span>
-        <span class="kpi__label">disponibilité</span>
+    {# === Disponibilité — cliquable vers explication === #}
+    <details class="insight" style="cursor:pointer;">
+      <summary style="list-style:none;cursor:pointer;">
+        <div class="kpi kpi--accent">
+          <span class="kpi__value">{{ "%.0f"|format(behavioral.readiness_score) }}</span>
+          <span class="kpi__label">disponibilité <span class="text-dim" style="font-size:10px;">· ⓘ</span></span>
+        </div>
+        <p class="insight__reco">{{ behavioral.recommendation }}</p>
+      </summary>
+      <div class="card" style="margin-top:var(--space-sm);font-size:13px;">
+        <p><b>Disponibilité</b> est un score 0-100 calculé à partir de ta fatigue récente, ta régularité sur 14 jours, et la qualité de tes dernières séances.</p>
+        <p class="text-dim" style="font-size:12px;">
+          Formule : 50% état de fatigue · 30% régularité · 20% performance récente. Pas un score médical — un indicateur d'état.
+        </p>
+        <p style="margin-top:var(--space-sm);">
+          <a class="text-muted" href="{{ url_for('dashboard') }}">Voir la synthèse complète →</a>
+        </p>
       </div>
-      <p class="insight__reco">{{ behavioral.recommendation }}</p>
-    </div>
+    </details>
 
     <div class="card">
       <div class="kpi-row">
@@ -97,13 +123,15 @@
 
   <div class="cockpit-side">
     <div class="tile-grid">
+      {% if open_session %}
       <a class="tile tile--primary" href="{{ url_for('launcher') }}">
         <div class="tile__label">Nouvelle séance</div>
         <div class="tile__hint">Choisir un programme</div>
       </a>
+      {% endif %}
       <a class="tile" href="{{ url_for('history') }}">
         <div class="tile__label">Historique</div>
-        <div class="tile__hint">Sessions passées</div>
+        <div class="tile__hint">Séances passées</div>
       </a>
       <a class="tile" href="{{ url_for('progress') }}">
         <div class="tile__label">Progression</div>
