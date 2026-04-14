@@ -32,7 +32,7 @@
       <li>
         <a class="session-card" href="{{ url_for('session_detail', session_id=s.id) }}" style="display:block;padding:var(--space-md);border-radius:var(--radius);background:var(--surface);margin-bottom:var(--space-xs);">
           <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-sm);margin-bottom:var(--space-xs);">
-            <span style="font-weight:600;font-size:14px;">{{ s.template_name_snapshot }}</span>
+            <span class="session-card__name" style="font-weight:600;font-size:14px;">{{ s.template_name_snapshot }}</span>
             <span style="font-size:12px;color:var(--fg-dim);white-space:nowrap;">
               {{ s.started_at.strftime('%a %d/%m %H:%M') }}
             </span>

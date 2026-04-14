@@ -116,7 +116,8 @@ def test_history_does_not_show_other_user_sessions(client):
 
     body = client.get("/history").text
     # Only own session should appear (Push A from _start), not the other's
-    assert body.count('session-card__name">Push A') == 1
+    import re
+    assert len(re.findall(r'session-card__name[^>]*>Push A', body)) == 1
 
 
 def test_export_json_does_not_contain_other_user_data(client):

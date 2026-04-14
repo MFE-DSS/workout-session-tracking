@@ -29,7 +29,10 @@ def test_history_status_filter_in_progress(client):
     # the filter excludes it. We assert against the session-card list
     # specifically by looking at the session-card__name marker.
     def _in_list(html: str, name_prefix: str) -> bool:
-        return f'session-card__name">{name_prefix}' in html
+        # The session card name span has class + inline style.
+        # Check for the class marker near the name in the session list.
+        import re
+        return bool(re.search(rf'session-card__name[^>]*>{name_prefix}', html))
 
     r_all = client.get("/history?status=all").text
     assert _in_list(r_all, "Push A") and _in_list(r_all, "Legs A")
