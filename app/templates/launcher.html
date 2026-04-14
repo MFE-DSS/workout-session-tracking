@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if step == 1 %}
+  <h1 class="page-title">Nouvelle séance</h1>
+  <p class="lede">Quel type de séance aujourd'hui ?</p>
+  <div class="tile-grid">
+    {% for t in types %}
+      <a class="tile {% if loop.first %}tile--primary{% endif %}"
+         href="{{ url_for('launcher') }}?type={{ t.key }}">
+        <div class="tile__label">{{ t.label }}</div>
+      </a>
+    {% endfor %}
+  </div>
+  <p style="margin-top:var(--space-lg);">
+    <a class="text-muted" href="{{ url_for('library') }}">Voir tous les programmes →</a>
+  </p>
+
+{% elif step == 2 %}
+  <h1 class="page-title">{{ type_label }}</h1>
+  <p class="lede">Quelle zone ?</p>
+  <div class="tile-grid">
+    {% for v in variants %}
+      <a class="tile" href="{{ url_for('launcher') }}?type={{ type_key }}&amp;variant={{ v.key }}">
+        <div class="tile__label">{{ v.label }}</div>
+      </a>
+    {% endfor %}
+  </div>
+  <p style="margin-top:var(--space-md);">
+    <a class="text-muted" href="{{ url_for('launcher') }}">← Retour</a>
+  </p>
+  <p style="margin-top:var(--space-md);">
+    <a class="text-muted" href="{{ url_for('library') }}">Voir tous les programmes →</a>
+  </p>
+
+{% elif step == 3 %}
+  <h1 class="page-title">{{ type_label }}</h1>
+  <p class="lede">Choisis un programme pour démarrer.</p>
+  <ul class="template-list">
+    {% for tpl in templates_list %}
+      <li class="template-card template-card--{{ tpl.kind }}">
+        <div class="template-card__row">
+          <span class="template-card__name">{{ tpl.name }}</span>
+          <span class="template-card__kind">{{ tpl.kind|upper }}</span>
+        </div>
+        <div class="template-card__focus">{{ tpl.focus }}</div>
+        {% if tpl.kind == 'cardio' and tpl.cardio_note %}
+          <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
+        {% endif %}
+        {% if tpl.suggested_label %}
+          <div class="template-card__hint">{{ tpl.suggested_label }}</div>
+        {% endif %}
+        <form method="post" action="{{ url_for('create_session') }}" class="template-card__start">
+          <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
+          <button type="submit" class="btn btn--primary btn--sm">Démarrer</button>
+        </form>
+        <div style="margin-top:var(--space-xs);">
+          <a class="text-muted" href="{{ url_for('template_detail', slug=tpl.slug) }}" style="font-size:13px;">Détails →</a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  <p style="margin-top:var(--space-md);display:flex;gap:var(--space-md);flex-wrap:wrap;">
+    {% if type_key in ['standard', 'short'] %}
+      <a class="text-muted" href="{{ url_for('launcher') }}?type={{ type_key }}">← Autre zone</a>
+    {% endif %}
+    <a class="text-muted" href="{{ url_for('launcher') }}">← Autre type</a>
+  </p>
+  <p style="margin-top:var(--space-md);">
+    <a class="text-muted" href="{{ url_for('library') }}">Voir tous les programmes →</a>
+  </p>
+{% endif %}
+
+{% endblock %}

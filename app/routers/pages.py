@@ -17,6 +17,13 @@ from app.services.kpis import (
     compute_recent_exercise_activity,
     compute_template_kpis,
 )
+from app.services.launcher import (
+    BRANCH_TREE,
+    TYPE_LABELS,
+    get_available_types,
+    get_available_variants,
+    resolve_branch,
+)
 from app.services.quality_score import compute_session_quality
 from app.services.session_state import latest_open_session
 from app.services.time_format import format_duration_short, session_duration
@@ -127,6 +134,111 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "readiness_labels": READINESS_LABELS,
             "readiness_field_labels": READINESS_FIELD_LABELS,
             "readiness_scale_fields": SCALE_FIELDS,
+        },
+    )
+
+
+@router.get("/launcher", response_class=HTMLResponse, name="launcher")
+def launcher(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    type: str | None = Query(None),
+    variant: str | None = Query(None),
+) -> HTMLResponse:
+    active_session = latest_open_session(db, user.id)
+
+    # Step 1: no type, or invalid type → list types.
+    if type is None or type not in BRANCH_TREE:
+        types = get_available_types(db)
+        return templates.TemplateResponse(
+            request,
+            "launcher.html",
+            {
+                "page_title": "Nouvelle séance",
+                "step": 1,
+                "types": types,
+                "active_session": active_session,
+            },
+        )
+
+    type_key = type
+    type_label = TYPE_LABELS.get(type_key, type_key)
+    type_branches = BRANCH_TREE[type_key]
+
+    # Direct type (e.g., cardio): jump to step 3.
+    if variant is None and "_direct" in type_branches:
+        templates_list = resolve_branch(db, type_key, None)
+        if templates_list:
+            return templates.TemplateResponse(
+                request,
+                "launcher.html",
+                {
+                    "page_title": "Nouvelle séance",
+                    "step": 3,
+                    "type_key": type_key,
+                    "type_label": type_label,
+                    "templates_list": templates_list,
+                    "active_session": active_session,
+                },
+            )
+        # Fall through to step 1 if direct branch is empty.
+        types = get_available_types(db)
+        return templates.TemplateResponse(
+            request,
+            "launcher.html",
+            {
+                "page_title": "Nouvelle séance",
+                "step": 1,
+                "types": types,
+                "active_session": active_session,
+            },
+        )
+
+    # Step 2: type, no variant → list variants.
+    if variant is None:
+        variants = get_available_variants(db, type_key)
+        return templates.TemplateResponse(
+            request,
+            "launcher.html",
+            {
+                "page_title": "Nouvelle séance",
+                "step": 2,
+                "type_key": type_key,
+                "type_label": type_label,
+                "variants": variants,
+                "active_session": active_session,
+            },
+        )
+
+    # Step 3: type + variant → list templates.
+    templates_list = resolve_branch(db, type_key, variant)
+    if not templates_list:
+        # Invalid/empty variant → fall back to step 2.
+        variants = get_available_variants(db, type_key)
+        return templates.TemplateResponse(
+            request,
+            "launcher.html",
+            {
+                "page_title": "Nouvelle séance",
+                "step": 2,
+                "type_key": type_key,
+                "type_label": type_label,
+                "variants": variants,
+                "active_session": active_session,
+            },
+        )
+
+    return templates.TemplateResponse(
+        request,
+        "launcher.html",
+        {
+            "page_title": "Nouvelle séance",
+            "step": 3,
+            "type_key": type_key,
+            "type_label": type_label,
+            "templates_list": templates_list,
+            "active_session": active_session,
         },
     )
 
