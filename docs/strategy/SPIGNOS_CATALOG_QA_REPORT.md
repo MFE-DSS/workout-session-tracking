@@ -1,6 +1,6 @@
 # Catalog QA Report
 
-**Generated:** 2026-04-13  
+**Generated:** 2026-04-14  
 **Catalog:** `data/reference_split.json`  
 **Templates:** 15 | **Exercises:** 97  
 

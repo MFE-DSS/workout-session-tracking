@@ -1,8 +1,19 @@
-# SPIGNOS Visual Identity V2 — Private Body Engineering Cockpit
+# SPIGNOS Visual Identity V2.1 — Private Body Engineering Cockpit
 
 **Date:** 2026-04-14
+**Version:** V2.1 (corrigee suite revue prompt engineer)
 **Type:** Presentation-only refactor (zero backend/route/model changes)
 **Scope:** CSS tokens, component grammar, lexicon, micro-copy, template markup
+
+### Changelog V2 → V2.1
+
+| Correction | Source | Impact |
+|------------|--------|--------|
+| "Squads" declare comme terme produit, critere acceptance ajuste | Contradiction zero-anglais vs maintien de Squads | Lexicon + acceptance |
+| Scroll horizontal : distinguer overflow global vs rails intentionnels | Jump bar `.ex-jump` est un rail voulu | Acceptance criteria |
+| `--fg-dim` eclaircit a `#6e7785` pour passer WCAG 4.5:1 a 12-14px | Ancien `#5a6270` = 2.7:1 sur surface, insuffisant pour micro-copy | Token + politique contraste |
+| Dashboard : confiance et axes actifs deviennent co-principaux avec le score | Grade A/B/C risque "health score" si trop prominent | Component grammar + page map |
+| Accent : ajouter variante desaturee `--accent-muted` pour hover/focus | Material dark theme : eviter vibration sur surfaces sombres | Token + regles usage |
 
 ---
 
@@ -51,7 +62,7 @@
 |-------|-----|---------|--------------|-------|
 | `--fg` | `#e8ecf1` | 15.2:1 | 12.8:1 | Texte primaire, titres, valeurs |
 | `--fg-muted` | `#9aa3ad` | 6.1:1 | 5.1:1 | Labels, texte secondaire |
-| `--fg-dim` | `#5a6270` | 3.2:1 | 2.7:1 | Hints, texte tertiaire (large text only, 3:1 OK pour 18px+) |
+| `--fg-dim` | `#6e7785` | 4.7:1 | 3.9:1 | Hints, micro-copy, texte tertiaire. Eclaircit vs V2 (#5a6270→#6e7785) pour passer WCAG AA a 12-14px sur `--bg`. Sur `--surface` (3.9:1) : acceptable pour labels courts, non-critique pour la comprehension. |
 
 ### 2.3 Accent unique
 
@@ -60,11 +71,15 @@
 | Token | Hex | Usage strict |
 |-------|-----|-------------|
 | `--accent` | `#f25f3a` | CTAs primaires, bordure focus, element actif, lien d'action |
+| `--accent-muted` | `#d4715a` | Hover/focus states sur surfaces sombres. Desature pour eviter vibration (Material dark theme). |
 | `--accent-soft` | `#f25f3a1a` | Background tint pour code exercice, highlight actif |
 
 **Regles d'usage accent :**
 - OUI : boutons primaires, bordure `<details>[open]`, exercise code badge, tile CTA, lien actif
 - NON : texte long, fond de section, badge de statut, indicateur de tendance
+- HOVER/FOCUS : utiliser `--accent-muted` (pas `--accent` pur) pour eviter la vibration sur fond `--surface`
+
+**Politique saturation (Material dark theme) :** sur surfaces sombres, les couleurs saturees "vibrent" et fatiguent l'oeil. Les variantes interactives (hover, focus ring) utilisent des versions desaturees. L'accent pur est reserve aux elements statiques a forte hierarchie (bouton primaire, bordure active).
 
 ### 2.4 Intent colors (reserves aux etats)
 
@@ -77,6 +92,17 @@
 | `--info` | `#3b82f6` | Informatif, cardio, neutre contextuel |
 
 **Regle : pas de couleur sans signification.** Si un element est colore, il communique un etat.
+
+### 2.4b Politique de contraste (WCAG AA)
+
+| Regle | Seuil | Reference |
+|-------|-------|-----------|
+| Texte normal (< 18px) | ≥ 4.5:1 | SC 1.4.3 |
+| Texte large (≥ 18px ou ≥ 14px bold) | ≥ 3:1 | SC 1.4.3 |
+| Composants UI, bordures inputs | ≥ 3:1 | SC 1.4.11 |
+| Couleur jamais seul signal | Texte toujours present | SC 1.4.1 |
+
+Toute micro-copy 12-14px utilisant `--fg-dim` doit passer 4.5:1 sur la surface parente. Le token `--fg-dim` est eclaircit a `#6e7785` specifiquement pour cela.
 
 ### 2.5 Typographie
 
@@ -114,10 +140,12 @@ Echelle conservee : xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
 | Dashboard | Synthèse | Francais, plus precis que "Tableau de bord" |
 | Board | Classement | Le mot complet, en francais |
 | Logout | Déconnexion | Francais standard |
-| Squads | Squads | Conserve — terme adopte, court, sans equivalent elegant |
+| Squads | Squads | **Terme produit assume.** Court, adopte, sans equivalent FR elegant. Ilot anglais declare. |
 | Programme | Programmes | Pluriel coherent |
 
-**Nav V2 :** Accueil · Programmes · Historique · Physique · Synthèse · Classement · Squads · Profil · Déconnexion
+**Nav V2.1 :** Accueil · Programmes · Historique · Physique · Synthèse · Classement · Squads · Profil · Déconnexion
+
+**Politique linguistique :** tout est francais sauf les **termes produit declares** : "Squads" et "SPIGNOS". Ces ilots anglais sont explicitement assumes et ne constituent pas une rupture linguistique accidentelle.
 
 ### 3.2 Session page
 
@@ -198,7 +226,7 @@ Echelle conservee : xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
 |------|---------|--------------|------------|----------------|
 | `/` (Accueil) | Action + Analytics | Linear: readiness widget → insight → KPIs → sparkline → tiles | insight-block, kpi-row, segmented, tile-grid, sparkline | "État du jour", "disponibilité", "Nouvelle séance" |
 | `/sessions/{id}` | Action | Linear: header → jumpbar → accordion cards → bilan | exercise-card (details), set-row, segmented, jumpbar | "Série #1", "Échauf. #1", "Enregistrer E2" |
-| `/dashboard` | Analytics | Linear: hero score → filter → 5 axis cards → regles | metric-strip, confidence-chip, filter-bar, rules-details | "Synthèse", "Basé sur N axes", "Données insuffisantes" |
+| `/dashboard` | Analytics | Linear: hero score + confiance co-principal + axes badge → filter → 5 axis cards → regles | metric-strip, confidence-chip, axes-badge, filter-bar, rules-details | "Synthèse", "N/5 axes actifs", "Confiance : X", "Données insuffisantes" |
 | `/physique` | Analytics | Linear: radar → filter → zone grid | radar-svg, zone-card (grid), filter-bar | "Physique", "Détail par zone" |
 | `/history` | Evidence | Linear: filter → session cards | filter-bar, session-card | "Historique", "en cours", "terminée" |
 | `/progress` | Analytics | Linear: KPIs → per-template → activity → timelines | kpi-row, stats-list, timeline-svg | "Progression", "Activité récente" |
@@ -222,6 +250,31 @@ Echelle conservee : xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
 | **Signal card** | `.card.card--signal` | Alertes, insight, readiness widget | Bordure gauche accent (3px) |
 | **Metric strip** | `.card.card--metric` | Axe dashboard, zone physique | Compact padding, barre de score inline |
 | **Evidence panel** | `.card.card--evidence` | History row, readiness entry | Surface plus legere, pas de bord accent |
+
+### 5.1b Dashboard hero — anti-pseudo-science display rules
+
+Le dashboard affiche un score global, un grade, et des axes. Le risque est que cela soit percu comme un "health score". Les regles suivantes neutralisent ce risque.
+
+**Hero card V2.1 :**
+```
+┌─────────────────────────────────────────────┐
+│  72                    Confiance : moyenne   │  ← score + confiance CO-PRINCIPAUX
+│  [N/5 axes actifs]                          │  ← badge axes toujours visible
+│                                             │
+│  30j · 60j · 90j                            │
+└─────────────────────────────────────────────┘
+```
+
+**Changements vs V2 :**
+- Le **grade A/B/C** devient un chip secondaire (petit, discret), pas le signal principal. Le score numerique reste la lecture principale.
+- **"Confiance : X"** est affiche a la meme taille et au meme niveau que le score — pas en footnote.
+- **"N/5 axes actifs"** est un badge toujours present, meme quand tous les axes sont actifs (renforce la transparence).
+- Les **regles de scoring** restent en `<details>` collapsible mais avec un label plus visible : "Comment ce score est calcule".
+
+**Etat "Donnees insuffisantes" (axe inactif) :**
+- Pattern constant : `.chip--insufficient` (dashed border, `--fg-dim` text) + guidance text
+- Pas juste du texte attenue — un composant design stable et reconnaissable
+- Le meme pattern est utilise partout (dashboard, physique, readiness si < 5 entrees)
 
 ### 5.2 Status chips
 
@@ -312,8 +365,8 @@ Echelle conservee : xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
 
 ### Coherence marque
 
-- [ ] Toutes les nav labels sont en francais (zero mot anglais dans la topbar)
-- [ ] Footer ne mentionne plus la stack technique
+- [ ] Nav labels en francais sauf termes produit declares (Squads, SPIGNOS)
+- [ ] Footer ne mentionne plus la stack technique (ou info build deplacee derriere un element discret)
 - [ ] Welcome page affiche "SPIGNOS" + tagline FR
 - [ ] "Body Engineering" remplace par "Synthèse" partout
 - [ ] "Leaderboard" remplace par "Classement" partout
@@ -328,16 +381,18 @@ Echelle conservee : xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
 
 ### Mobile UX
 
-- [ ] Pas de scroll horizontal sur aucune page (viewport 375px)
+- [ ] Aucun overflow horizontal global (body) sur viewport 375px. Rails intentionnels (jump bar `.ex-jump`) autorises.
 - [ ] Topbar hamburger menu fonctionne sans JS sur mobile
 - [ ] Cibles tactiles ≥ 44px sur tous les boutons/liens
 - [ ] Zone cards physique en grille responsive (pas de bande verticale)
 
-### Lisibilite low-light
+### Lisibilite low-light + WCAG
 
 - [ ] Texte `--fg` sur `--bg` ≥ 15:1 (deja OK)
 - [ ] Texte `--fg-muted` sur `--surface` ≥ 4.5:1 (#9aa3ad sur #161a22 = 5.1:1 OK)
-- [ ] Texte `--fg-dim` utilise uniquement pour text ≥ 18px ou non-essentiel
+- [ ] `--fg-dim` eclaircit a `#6e7785` — tout texte 12-14px doit respecter ≥ 4.5:1 sur `--bg`
+- [ ] Bordures inputs et composants UI ≥ 3:1 contraste (SC 1.4.11)
+- [ ] La couleur n'est jamais le seul signal d'etat (texte toujours present avec la couleur)
 
 ### Privacy cues
 
@@ -347,10 +402,12 @@ Echelle conservee : xs(4) sm(8) md(16) lg(24) xl(32) 2xl(48).
 
 ### Dashboard non pseudo-scientifique
 
-- [ ] Score global affiche nombre d'axes actifs ("Basé sur N axes sur 5")
-- [ ] Chaque axe insuffisant affiche guidance ("Renseigner vos mesures")
-- [ ] Regles de calcul accessibles (collapsible en bas)
-- [ ] Confiance affichee par axe et globalement
+- [ ] "Confiance" et "N/5 axes actifs" sont visuellement co-principaux avec le score (meme taille/poids, pas en footnote)
+- [ ] Grade A/B/C est un chip secondaire (petit), pas le signal dominant
+- [ ] Chaque axe insuffisant utilise le pattern `.chip--insufficient` (dashed border + guidance)
+- [ ] Le pattern "insuffisant" est identique partout (dashboard, physique, readiness)
+- [ ] Regles de calcul accessibles via "Comment ce score est calculé" (collapsible, label visible)
+- [ ] Confiance affichee par axe ET globalement
 
 ### Zero inline styles
 
