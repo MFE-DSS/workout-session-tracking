@@ -1,15 +1,29 @@
-"""Squad routes: list, create, join, detail, invite, leave, delete."""
+"""Squad routes: list, create, join, detail, invite, leave, delete, challenges, compare, sharing."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
+from typing import Optional
 
-from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi import APIRouter, Form, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 
 from app.deps import CurrentUser, DbSession
+from app.models.catalog import WorkoutTemplate
+from app.models.session import WorkoutSession
 from app.models.squad import SquadInviteCode
+from app.services.challenge import (
+    ChallengeError,
+    VALID_METRICS,
+    _METRIC_LABELS,
+    compute_standings,
+    create_challenge,
+    get_challenge_or_none,
+    get_squad_challenges,
+)
+from app.services.compare import compute_comparison
 from app.services.session_state import latest_open_session
+from app.services.sharing import SharingError, get_squad_activity, recommend_template, share_session
 from app.services.squad import (
     SquadError,
     compute_squad_leaderboard,
@@ -177,6 +191,28 @@ def squad_detail(
         .limit(1)
     ).scalar_one_or_none()
 
+    # Enrichment: challenges, activity, user sessions, templates
+    activity = get_squad_activity(db, squad_id)
+    challenges = get_squad_challenges(db, squad_id)
+    user_sessions = list(
+        db.execute(
+            select(WorkoutSession)
+            .where(
+                WorkoutSession.user_id == user.id,
+                WorkoutSession.status == "completed",
+            )
+            .order_by(WorkoutSession.started_at.desc())
+            .limit(10)
+        ).scalars().all()
+    )
+    all_templates = list(
+        db.execute(
+            select(WorkoutTemplate)
+            .where(WorkoutTemplate.catalog_section != "archived")
+            .order_by(WorkoutTemplate.display_order)
+        ).scalars().all()
+    )
+
     return templates.TemplateResponse(
         request,
         "squad_detail.html",
@@ -189,6 +225,11 @@ def squad_detail(
             "latest_code": latest_code,
             "current_username": user.username,
             "active_session": latest_open_session(db, user.id),
+            "activity": activity,
+            "challenges": challenges,
+            "user_sessions": user_sessions,
+            "all_templates": all_templates,
+            "today": date.today(),
         },
     )
 
@@ -241,3 +282,245 @@ def squad_delete(
     except SquadError:
         pass
     return RedirectResponse(url=request.url_for("squads_list"), status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# Challenges
+# ---------------------------------------------------------------------------
+
+
+@router.get("/squads/{squad_id}/challenges", response_class=HTMLResponse, name="squad_challenges")
+def squad_challenges(
+    request: Request,
+    squad_id: int,
+    db: DbSession,
+    user: CurrentUser,
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    if not is_member(db, squad_id, user.id):
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    challenges = get_squad_challenges(db, squad_id)
+    membership = get_membership(db, squad_id, user.id)
+    return templates.TemplateResponse(
+        request,
+        "squad_challenges.html",
+        {
+            "page_title": f"Challenges · {squad.name}",
+            "squad": squad,
+            "challenges": challenges,
+            "membership": membership,
+            "today": date.today(),
+            "metric_labels": _METRIC_LABELS,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+@router.get("/squads/{squad_id}/challenges/create", response_class=HTMLResponse, name="squad_challenge_create")
+def squad_challenge_create_page(
+    request: Request,
+    squad_id: int,
+    db: DbSession,
+    user: CurrentUser,
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    membership = get_membership(db, squad_id, user.id)
+    if not membership or membership.role != "owner":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    return templates.TemplateResponse(
+        request,
+        "squad_challenge_create.html",
+        {
+            "page_title": f"Nouveau challenge · {squad.name}",
+            "squad": squad,
+            "metric_labels": _METRIC_LABELS,
+            "error": None,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+@router.post("/squads/{squad_id}/challenges/create", response_class=HTMLResponse, name="squad_challenge_create_post")
+def squad_challenge_create_post(
+    request: Request,
+    squad_id: int,
+    db: DbSession,
+    user: CurrentUser,
+    title: str = Form(...),
+    metric: str = Form(...),
+    starts_at: str = Form(...),
+    ends_at: str = Form(...),
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    membership = get_membership(db, squad_id, user.id)
+    if not membership or membership.role != "owner":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    try:
+        starts = date.fromisoformat(starts_at)
+        ends = date.fromisoformat(ends_at)
+    except ValueError:
+        return templates.TemplateResponse(
+            request,
+            "squad_challenge_create.html",
+            {
+                "page_title": f"Nouveau challenge · {squad.name}",
+                "squad": squad,
+                "metric_labels": _METRIC_LABELS,
+                "error": "Dates invalides.",
+                "active_session": latest_open_session(db, user.id),
+            },
+        )
+
+    try:
+        challenge = create_challenge(db, squad_id, user.id, title, metric, starts, ends)
+        return RedirectResponse(
+            url=request.url_for("squad_challenge_detail", squad_id=squad_id, challenge_id=challenge.id),
+            status_code=303,
+        )
+    except ChallengeError as exc:
+        return templates.TemplateResponse(
+            request,
+            "squad_challenge_create.html",
+            {
+                "page_title": f"Nouveau challenge · {squad.name}",
+                "squad": squad,
+                "metric_labels": _METRIC_LABELS,
+                "error": str(exc),
+                "active_session": latest_open_session(db, user.id),
+            },
+        )
+
+
+@router.get("/squads/{squad_id}/challenges/{challenge_id}", response_class=HTMLResponse, name="squad_challenge_detail")
+def squad_challenge_detail(
+    request: Request,
+    squad_id: int,
+    challenge_id: int,
+    db: DbSession,
+    user: CurrentUser,
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    if not is_member(db, squad_id, user.id):
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    challenge = get_challenge_or_none(db, challenge_id)
+    if not challenge or challenge.squad_id != squad_id:
+        raise HTTPException(status_code=404, detail="Challenge introuvable")
+
+    standings = compute_standings(db, challenge)
+    return templates.TemplateResponse(
+        request,
+        "squad_challenge_detail.html",
+        {
+            "page_title": challenge.title,
+            "squad": squad,
+            "challenge": challenge,
+            "standings": standings,
+            "metric_labels": _METRIC_LABELS,
+            "today": date.today(),
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Compare
+# ---------------------------------------------------------------------------
+
+
+@router.get("/squads/{squad_id}/compare", response_class=HTMLResponse, name="squad_compare")
+def squad_compare(
+    request: Request,
+    squad_id: int,
+    db: DbSession,
+    user: CurrentUser,
+    a: int = Query(0),
+    b: int = Query(0),
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    if not is_member(db, squad_id, user.id):
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    members = get_squad_members(db, squad_id)
+    comparison = None
+    if a and b and a != b:
+        comparison = compute_comparison(db, squad_id, a, b)
+
+    return templates.TemplateResponse(
+        request,
+        "squad_compare.html",
+        {
+            "page_title": f"Comparer · {squad.name}",
+            "squad": squad,
+            "members": members,
+            "comparison": comparison,
+            "selected_a": a,
+            "selected_b": b,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Sharing
+# ---------------------------------------------------------------------------
+
+
+@router.post("/squads/{squad_id}/recommend", name="squad_recommend")
+def squad_recommend(
+    request: Request,
+    squad_id: int,
+    db: DbSession,
+    user: CurrentUser,
+    template_slug: str = Form(...),
+    template_name: str = Form(...),
+    note: str = Form(""),
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    if not is_member(db, squad_id, user.id):
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    recommend_template(db, squad_id, user.id, template_slug, template_name, note or None)
+    return RedirectResponse(
+        url=request.url_for("squad_detail", squad_id=squad_id),
+        status_code=303,
+    )
+
+
+@router.post("/squads/{squad_id}/share-session", name="squad_share_session")
+def squad_share_session(
+    request: Request,
+    squad_id: int,
+    db: DbSession,
+    user: CurrentUser,
+    session_id: int = Form(...),
+):
+    squad = get_squad_or_none(db, squad_id)
+    if not squad:
+        raise HTTPException(status_code=404, detail="Squad introuvable")
+    if not is_member(db, squad_id, user.id):
+        raise HTTPException(status_code=403, detail="Accès refusé")
+
+    try:
+        share_session(db, squad_id, user.id, session_id)
+    except SharingError:
+        pass
+    return RedirectResponse(
+        url=request.url_for("squad_detail", squad_id=squad_id),
+        status_code=303,
+    )

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Challenges &middot; {{ squad.name }}</h1>
+
+{% if membership and membership.role == 'owner' %}
+  <p>
+    <a class="btn btn--primary" href="{{ url_for('squad_challenge_create', squad_id=squad.id) }}">Nouveau challenge</a>
+  </p>
+{% endif %}
+
+{% if challenges|length == 0 %}
+  <p class="text-dim">Aucun challenge pour le moment.</p>
+{% else %}
+  <div style="overflow-x:auto;">
+    <table class="stats-list" style="width:100%;">
+      <thead>
+        <tr>
+          <th>Titre</th>
+          <th>Metrique</th>
+          <th>Debut</th>
+          <th>Fin</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in challenges %}
+          <tr>
+            <td><a href="{{ url_for('squad_challenge_detail', squad_id=squad.id, challenge_id=c.id) }}">{{ c.title }}</a></td>
+            <td>{{ metric_labels.get(c.metric, c.metric) }}</td>
+            <td>{{ c.starts_at.strftime('%d/%m/%Y') }}</td>
+            <td>{{ c.ends_at.strftime('%d/%m/%Y') }}</td>
+            <td>
+              {% if c.ends_at < today %}
+                <span class="badge">termine</span>
+              {% else %}
+                <span class="badge" style="background:var(--c-success, #2ecc71); color:#fff;">actif</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+<p style="margin-top:1.5rem;">
+  <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour a la squad</a>
+</p>
+{% endblock %}

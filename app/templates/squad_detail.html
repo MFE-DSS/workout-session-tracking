@@ -35,6 +35,100 @@
         </table>
       </div>
     {% endif %}
+    <!-- Challenges section -->
+    <h2 style="margin-top:2rem;">Challenges</h2>
+    {% if challenges|length == 0 %}
+      <p class="text-dim">Aucun challenge actif.</p>
+    {% else %}
+      <ul class="stats-list">
+        {% for c in challenges %}
+          {% if c.ends_at >= today %}
+            <li>
+              <a href="{{ url_for('squad_challenge_detail', squad_id=squad.id, challenge_id=c.id) }}">{{ c.title }}</a>
+              <span class="badge" style="background:var(--c-success, #2ecc71); color:#fff;">actif</span>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+    <p>
+      <a class="btn btn--ghost" href="{{ url_for('squad_challenges', squad_id=squad.id) }}">Voir tous</a>
+      {% if membership and membership.role == 'owner' %}
+        <a class="btn btn--primary" href="{{ url_for('squad_challenge_create', squad_id=squad.id) }}">Nouveau</a>
+      {% endif %}
+    </p>
+
+    <!-- Compare link -->
+    <p style="margin-top:1rem;">
+      <a class="btn btn--ghost" href="{{ url_for('squad_compare', squad_id=squad.id) }}">Comparer deux membres</a>
+    </p>
+
+    <!-- Activity feed -->
+    <h2 style="margin-top:2rem;">Activite</h2>
+    {% if activity|length == 0 %}
+      <p class="text-dim">Aucune activite recente.</p>
+    {% else %}
+      <ul class="stats-list">
+        {% for item in activity %}
+          {% if item.type == 'recommendation' %}
+            <li>
+              <strong>{{ item.username }}</strong> recommande <em>{{ item.template_name }}</em>
+              {% if item.note %}<br><span class="text-dim">{{ item.note }}</span>{% endif %}
+            </li>
+          {% elif item.type == 'shared_session' %}
+            <li>
+              <strong>{{ item.username }}</strong> a partage une seance du {{ item.created_at.strftime('%d/%m') }}
+              {% if item.exercises %}
+                <ul>
+                  {% for ex in item.exercises %}
+                    <li class="text-dim">{{ ex.name }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    <!-- Recommend form -->
+    <h2 style="margin-top:2rem;">Recommander un template</h2>
+    <form method="post" action="{{ url_for('squad_recommend', squad_id=squad.id) }}" class="card" style="max-width:24rem;">
+      <div style="margin-bottom:.75rem;">
+        <label for="rec-template"><strong>Template</strong></label><br>
+        <select id="rec-template" name="template_slug" required style="width:100%;"
+                onchange="this.form.template_name.value=this.options[this.selectedIndex].text">
+          <option value="">--</option>
+          {% for t in all_templates %}
+            <option value="{{ t.slug }}">{{ t.name }}</option>
+          {% endfor %}
+        </select>
+        <input type="hidden" name="template_name" value="">
+      </div>
+      <div style="margin-bottom:.75rem;">
+        <label for="rec-note"><strong>Note (optionnel)</strong></label><br>
+        <input type="text" id="rec-note" name="note" style="width:100%;">
+      </div>
+      <button type="submit" class="btn btn--primary">Recommander</button>
+    </form>
+
+    <!-- Share session form -->
+    <h2 style="margin-top:2rem;">Partager une seance</h2>
+    {% if user_sessions|length == 0 %}
+      <p class="text-dim">Aucune seance terminee a partager.</p>
+    {% else %}
+      <form method="post" action="{{ url_for('squad_share_session', squad_id=squad.id) }}" class="card" style="max-width:24rem;">
+        <div style="margin-bottom:.75rem;">
+          <label for="share-session"><strong>Seance</strong></label><br>
+          <select id="share-session" name="session_id" required style="width:100%;">
+            {% for s in user_sessions %}
+              <option value="{{ s.id }}">{{ s.template_name_snapshot }} - {{ s.started_at.strftime('%d/%m/%Y') }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn--primary">Partager</button>
+      </form>
+    {% endif %}
   </section>
 
   <aside class="cockpit-side">

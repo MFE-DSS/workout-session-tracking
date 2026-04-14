@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Comparer &middot; {{ squad.name }}</h1>
+
+<form method="get" action="{{ url_for('squad_compare', squad_id=squad.id) }}" class="card" style="max-width:32rem;">
+  <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:end;">
+    <div style="flex:1; min-width:8rem;">
+      <label for="a"><strong>Membre A</strong></label><br>
+      <select id="a" name="a" required style="width:100%;">
+        <option value="0">--</option>
+        {% for m in members %}
+          <option value="{{ m.user_id }}" {% if selected_a == m.user_id %}selected{% endif %}>{{ m.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:1; min-width:8rem;">
+      <label for="b"><strong>Membre B</strong></label><br>
+      <select id="b" name="b" required style="width:100%;">
+        <option value="0">--</option>
+        {% for m in members %}
+          <option value="{{ m.user_id }}" {% if selected_b == m.user_id %}selected{% endif %}>{{ m.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <button type="submit" class="btn btn--primary">Comparer</button>
+    </div>
+  </div>
+</form>
+
+{% if comparison %}
+  <div style="overflow-x:auto; margin-top:1.5rem;">
+    <table class="stats-list" style="width:100%;">
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{ comparison.a.username if comparison.a else '?' }}</th>
+          <th>{{ comparison.b.username if comparison.b else '?' }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if comparison.a and comparison.b %}
+          <tr><td>Score</td><td>{{ comparison.a.total_points }} pts</td><td>{{ comparison.b.total_points }} pts</td></tr>
+          <tr><td>Moyenne</td><td>{{ comparison.a.avg_points }}</td><td>{{ comparison.b.avg_points }}</td></tr>
+          <tr><td>Grade</td><td><span class="grade-badge grade-badge--{{ comparison.a.grade|lower }}">{{ comparison.a.grade }}</span> {{ comparison.a.grade_label }}</td><td><span class="grade-badge grade-badge--{{ comparison.b.grade|lower }}">{{ comparison.b.grade }}</span> {{ comparison.b.grade_label }}</td></tr>
+          <tr><td>Seances</td><td>{{ comparison.a.session_count }}</td><td>{{ comparison.b.session_count }}</td></tr>
+          <tr><td>Streak</td><td>{{ comparison.a.streak }}j</td><td>{{ comparison.b.streak }}j</td></tr>
+          <tr><td>Derniere seance</td><td>{{ comparison.a.last_session_date or '-' }}</td><td>{{ comparison.b.last_session_date or '-' }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="text-dim">Donnees indisponibles pour un ou les deux membres.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+
+<p style="margin-top:1.5rem;">
+  <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour a la squad</a>
+</p>
+{% endblock %}
