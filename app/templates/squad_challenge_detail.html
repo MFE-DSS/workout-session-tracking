@@ -3,18 +3,18 @@
 <h1 class="page-title">{{ challenge.title }}</h1>
 
 <p>
-  <strong>Metrique :</strong> {{ metric_labels.get(challenge.metric, challenge.metric) }} &middot;
+  <strong>Métrique :</strong> {{ metric_labels.get(challenge.metric, challenge.metric) }} &middot;
   <strong>Du</strong> {{ challenge.starts_at.strftime('%d/%m/%Y') }}
   <strong>au</strong> {{ challenge.ends_at.strftime('%d/%m/%Y') }} &middot;
   {% if challenge.ends_at < today %}
-    <span class="badge">termine</span>
+    <span class="badge">Terminé</span>
   {% else %}
-    <span class="badge" style="background:var(--c-success, #2ecc71); color:#fff;">actif</span>
+    <span class="badge" style="background:var(--ok); color:#fff;">actif</span>
   {% endif %}
 </p>
 
 {% if standings|length == 0 %}
-  <p class="text-dim">Aucune donnee pour ce challenge.</p>
+  <p class="text-dim">Aucune donnée pour ce challenge.</p>
 {% else %}
   <div style="overflow-x:auto;">
     <table class="stats-list" style="width:100%;">

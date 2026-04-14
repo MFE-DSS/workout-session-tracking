@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Body Engineering</h1>
+<h1 class="page-title">Synthèse</h1>
 
 {# ── Hero card ── #}
 <div class="card" style="text-align:center; margin-bottom:var(--space-lg);">
   {% if result.global_score is not none %}
     <span class="global-score">{{ "%.0f"|format(result.global_score) }}</span>
-    <span class="grade-badge grade-badge--{{ result.global_grade|lower }}">{{ result.global_grade }}</span>
+    <span class="grade-badge grade-badge--{{ result.global_grade|lower }} chip">{{ result.global_grade }}</span>
     <div style="margin-top:var(--space-sm); color:var(--fg-dim);">
       Confiance : {{ result.global_confidence }}
     </div>
@@ -65,13 +65,13 @@
 {# ── Quick links ── #}
 <div style="margin-top:var(--space-lg); display:flex; gap:var(--space-md); flex-wrap:wrap;">
   <a class="btn btn--secondary" href="{{ url_for('physique') }}">Physique</a>
-  <a class="btn btn--secondary" href="{{ url_for('readiness_history') }}">Readiness</a>
+  <a class="btn btn--secondary" href="{{ url_for('readiness_history') }}">Voir historique état</a>
   <a class="btn btn--secondary" href="{{ url_for('progress') }}">Progression</a>
 </div>
 
 {# ── Scoring rules ── #}
 <details style="margin-top:var(--space-lg);">
-  <summary style="cursor:pointer; font-weight:600;">Règles de scoring</summary>
+  <summary style="cursor:pointer; font-weight:600;">Comment ce score est calculé</summary>
   <div style="margin-top:var(--space-sm); color:var(--fg-dim); line-height:1.6;">
     <p><strong>Régularité</strong> — Fréquence de séances vs objectif de 4×/semaine.</p>
     <p><strong>Progression</strong> — Évolution du tonnage sur les zones actives.</p>

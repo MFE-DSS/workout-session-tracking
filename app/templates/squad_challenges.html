@@ -16,8 +16,8 @@
       <thead>
         <tr>
           <th>Titre</th>
-          <th>Metrique</th>
-          <th>Debut</th>
+          <th>Métrique</th>
+          <th>Début</th>
           <th>Fin</th>
           <th>Statut</th>
         </tr>
@@ -31,9 +31,9 @@
             <td>{{ c.ends_at.strftime('%d/%m/%Y') }}</td>
             <td>
               {% if c.ends_at < today %}
-                <span class="badge">termine</span>
+                <span class="badge">Terminé</span>
               {% else %}
-                <span class="badge" style="background:var(--c-success, #2ecc71); color:#fff;">actif</span>
+                <span class="badge" style="background:var(--ok); color:#fff;">actif</span>
               {% endif %}
             </td>
           </tr>
@@ -44,6 +44,6 @@
 {% endif %}
 
 <p style="margin-top:1.5rem;">
-  <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour a la squad</a>
+  <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour à la squad</a>
 </p>
 {% endblock %}

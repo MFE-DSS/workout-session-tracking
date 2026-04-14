@@ -43,11 +43,11 @@
           <tr><td>Score</td><td>{{ comparison.a.total_points }} pts</td><td>{{ comparison.b.total_points }} pts</td></tr>
           <tr><td>Moyenne</td><td>{{ comparison.a.avg_points }}</td><td>{{ comparison.b.avg_points }}</td></tr>
           <tr><td>Grade</td><td><span class="grade-badge grade-badge--{{ comparison.a.grade|lower }}">{{ comparison.a.grade }}</span> {{ comparison.a.grade_label }}</td><td><span class="grade-badge grade-badge--{{ comparison.b.grade|lower }}">{{ comparison.b.grade }}</span> {{ comparison.b.grade_label }}</td></tr>
-          <tr><td>Seances</td><td>{{ comparison.a.session_count }}</td><td>{{ comparison.b.session_count }}</td></tr>
+          <tr><td>Séances</td><td>{{ comparison.a.session_count }}</td><td>{{ comparison.b.session_count }}</td></tr>
           <tr><td>Streak</td><td>{{ comparison.a.streak }}j</td><td>{{ comparison.b.streak }}j</td></tr>
-          <tr><td>Derniere seance</td><td>{{ comparison.a.last_session_date or '-' }}</td><td>{{ comparison.b.last_session_date or '-' }}</td></tr>
+          <tr><td>Dernière séance</td><td>{{ comparison.a.last_session_date or '-' }}</td><td>{{ comparison.b.last_session_date or '-' }}</td></tr>
         {% else %}
-          <tr><td colspan="3" class="text-dim">Donnees indisponibles pour un ou les deux membres.</td></tr>
+          <tr><td colspan="3" class="text-dim">Données indisponibles pour un ou les deux membres.</td></tr>
         {% endif %}
       </tbody>
     </table>
@@ -55,6 +55,6 @@
 {% endif %}
 
 <p style="margin-top:1.5rem;">
-  <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour a la squad</a>
+  <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour à la squad</a>
 </p>
 {% endblock %}

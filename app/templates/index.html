@@ -27,14 +27,14 @@
     {% if readiness_today.resting_hr %}
       <span class="badge" title="FC repos">{{ readiness_today.resting_hr }} bpm</span>
     {% endif %}
-    <a href="/readiness/history" class="text-muted" style="font-size:12px;">Historique →</a>
+    <a href="/readiness/history" class="text-muted" style="font-size:12px;">Historique état →</a>
   </div>
 </div>
 {% else %}
 <div class="card readiness-widget" style="margin-bottom:var(--space-md);">
   <details>
     <summary class="card__title" style="cursor:pointer;font-size:14px;margin:0;">
-      Readiness du jour
+      État du jour
     </summary>
     <form method="post" action="/readiness" style="margin-top:var(--space-sm);">
       {% for field in readiness_scale_fields %}

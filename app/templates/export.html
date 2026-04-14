@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Export</h1>
+<h1 class="page-title">Sauvegarde</h1>
 <p class="lede">
-  Sauvegarde locale du journal complet. Deux formats, sans
-  authentification : à protéger via nginx basic_auth en prod.
+  Sauvegarde locale du journal complet en deux formats.
 </p>
 
 <div class="card export-card">
@@ -108,18 +107,13 @@
     </p>
   {% else %}
     <p class="export-card__hint">
-      Aucune sauvegarde locale détectée dans
-      <code>{{ backup_dir }}</code>.
-      Voir <code>deploy/README.md</code> section
-      <em>Sauvegardes planifiées</em> pour activer le job nightly
-      (systemd timer ou cron).
+      Aucune sauvegarde locale détectée.
     </p>
   {% endif %}
 </div>
 
 <p class="kpi-note">
-  Pour la procédure complète (snapshot SQLite, dumps JSON/CSV
-  cron, restauration), voir
-  <code>deploy/README.md</code>.
+  Les sauvegardes sont stockées localement. Téléchargez régulièrement
+  une copie pour archivage.
 </p>
 {% endblock %}

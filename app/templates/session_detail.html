@@ -161,13 +161,13 @@
         {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
 
         {% if warmup_sets|length > 0 %}
-          <h4 class="set-group-title">Warmup</h4>
+          <h4 class="set-group-title">Échauffement</h4>
         {% endif %}
         <ul class="set-list">
           {% for sl in warmup_sets %}
             <li class="set-row set-row--warmup">
               <div class="set-row__label">
-                <span class="set-row__kind">Warmup</span>
+                <span class="set-row__kind">Échauf.</span>
                 <span class="set-row__idx">#{{ sl.set_index }}</span>
                 {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
               </div>
@@ -203,13 +203,13 @@
         </ul>
 
         {% if work_sets|length > 0 %}
-          <h4 class="set-group-title set-group-title--work">Work</h4>
+          <h4 class="set-group-title set-group-title--work">Travail</h4>
         {% endif %}
         <ul class="set-list">
           {% for sl in work_sets %}
             <li class="set-row set-row--work">
               <div class="set-row__label">
-                <span class="set-row__kind">Work</span>
+                <span class="set-row__kind">Série</span>
                 <span class="set-row__idx">#{{ sl.set_index }}</span>
                 {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
               </div>
@@ -248,7 +248,7 @@
         <p class="empty">Pas de série pour cet exercice.</p>
       {% endif %}
 
-      <h3 class="card__subtitle">Feedback exercice</h3>
+      <h3 class="card__subtitle">Ressenti exercice</h3>
 
       <details class="field-block field-block--optional">
         <summary class="field__label" style="cursor:pointer;font-size:13px;color:var(--fg-dim);">
@@ -256,7 +256,7 @@
         </summary>
         {{ segmented(
           "muscle_sensation",
-          [("strong", "Strong"), ("partial", "Partial"), ("weak", "Weak")],
+          [("strong", "Fort"), ("partial", "Partiel"), ("weak", "Faible")],
           se.muscle_sensation
         ) }}
       </details>
