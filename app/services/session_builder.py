@@ -56,7 +56,7 @@ def instantiate_session(
         user_id=user_id,
     )
 
-    for te in template.exercises:
+    for idx, te in enumerate(template.exercises):
         se = SessionExercise(
             template_exercise_id=te.id,
             exercise_code_snapshot=te.code,
@@ -64,8 +64,9 @@ def instantiate_session(
             position=te.position,
         )
 
-        # Warmup rows: uniform count across exercises, empty values.
-        for i in range(1, warmup_sets + 1):
+        # Warmup rows: 2 for the first exercise, 1 for the rest.
+        n_warmup = warmup_sets if idx == 0 else max(1, warmup_sets - 1)
+        for i in range(1, n_warmup + 1):
             se.set_logs.append(
                 SetLog(kind=SetKind.WARMUP, set_index=i, completed=False)
             )

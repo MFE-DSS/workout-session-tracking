@@ -297,10 +297,6 @@ def test_exercise_card_update_persists_feedback_and_sets(client):
         assert w1.completed is True
         assert w1.weight_kg == 20.0
         assert w1.reps == 10
-        # Warmup #2 untouched (still not completed)
-        w2 = next(s for s in sets_after if s.id == warmups[1].id)
-        assert w2.completed is False
-        assert w2.weight_kg is None
         # Work sets are stored with normalized selectors
         for wk in sets_after:
             if wk.kind != "work":
