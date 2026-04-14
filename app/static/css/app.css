@@ -1790,3 +1790,26 @@ details.exercise-card--done .exercise-card__compact {
 details.exercise-card--done .exercise-card__compact .exercise-card__code {
   color: var(--ok);
 }
+
+/* ---- Science page ---- */
+.science-section {
+  margin-bottom: var(--space-xl);
+}
+
+.science-section > .card + .card {
+  margin-top: var(--space-sm);
+}
+
+.science-diagram {
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.science-diagram svg {
+  display: block;
+  margin: 0 auto;
+}

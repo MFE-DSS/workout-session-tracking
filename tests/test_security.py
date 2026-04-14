@@ -80,7 +80,7 @@ def test_all_private_routes_reject_anonymous_after_hardening(client):
     client.post("/logout", follow_redirects=False)
     client.cookies.clear()
     private_routes = [
-        "/", "/library", "/history", "/progress", "/rules",
+        "/", "/library", "/history", "/progress", "/science",
         "/export", "/admin/sessions", "/leaderboard", "/profile",
         "/profile/password",
     ]

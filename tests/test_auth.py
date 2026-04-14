@@ -100,7 +100,7 @@ def test_logout_clears_access(client):
 def test_private_routes_redirect_to_login_when_anonymous(client):
     client.post("/logout", follow_redirects=False)
     client.cookies.clear()
-    for path in ["/", "/library", "/history", "/progress", "/rules", "/export", "/admin/sessions"]:
+    for path in ["/", "/library", "/history", "/progress", "/science", "/export", "/admin/sessions"]:
         r = client.get(path, follow_redirects=False)
         assert r.status_code == 303, f"{path} did not redirect: {r.status_code}"
         assert "/login" in r.headers.get("location", ""), f"{path} redirect target wrong"

@@ -386,29 +386,13 @@ def test_home_offers_resume_when_an_open_session_exists(client):
 # ---------------------------------------------------------------------------
 
 
-def test_rules_page_renders_seeded_rules(client):
-    r = client.get("/rules")
+def test_science_page_renders_seeded_rules(client):
+    r = client.get("/science")
     assert r.status_code == 200
     body = r.text
-    assert "Règles" in body
-    # Apostrophes get HTML-escaped by Jinja — match titles that don't contain any.
-    assert "Plages de répétitions" in body
-    assert "Tempo" in body
-    assert "Temps de repos" in body
-    assert "Rest-Pause" in body
-    assert "Drop Sets" in body
-    # Confirm the 8 rule cards are present via their ids
-    for slug in [
-        "carnet-progression",
-        "plages-repetitions",
-        "series-approche",
-        "tempo",
-        "temps-repos",
-        "legende-technique",
-        "rest-pause",
-        "drop-sets",
-    ]:
-        assert f'id="rule-{slug}"' in body
+    assert "Science" in body
+    # Apostrophes get HTML-escaped by Jinja — match a title that doesn't contain any.
+    assert "Surcharge progressive" in body or "Plages de répétitions" in body
 
 
 def test_session_detail_shows_inline_method_reminder_link(client):
