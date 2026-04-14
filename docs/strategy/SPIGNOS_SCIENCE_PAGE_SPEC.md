@@ -2,7 +2,15 @@
 
 **Date:** 2026-04-14
 **Type:** Product + editorial + information architecture
-**Status:** Draft pending validation
+**Status:** Validated pending build
+
+## Arbitrages verrouilles (pre-build)
+
+| # | Decision | Impact |
+|---|----------|--------|
+| 4 | **La page Science reste un manuel d'usage structure, PAS un manifeste de marque.** | Zero rhetorique marketing. Pas de mission statement. Pas d'histoire produit. |
+| 5 | **Diagramme architecture = SVG SSR statique.** Pas de Mermaid, pas d'interaction hover en V1. | Coherent SSR/no-JS, aligne avec le radar et les timelines existants. |
+| 6 | **Ordre editorial obligatoire : pratique → principes → architecture.** | (1) pourquoi noter, (2) comment lire les concepts, (3) comment SPIGNOS les materialise, (4) comment les modules s'articulent. |
 
 ---
 
@@ -98,13 +106,12 @@ Transformer `/rules` en `/science` — une page qui couvre 4 roles :
 
 ## 5. Architecture editoriale
 
-### Hierarchie
+### Hierarchie (verrouillee : pratique → principes → architecture)
 
 ```
 /science (page)
-├── Section 1: Pourquoi noter change la progression
-├── Section 2: Comment fonctionne SPIGNOS (manuel produit)
-├── Section 3: Methode d'entrainement
+├── Section 1 — PRATIQUE : Pourquoi noter change la progression
+├── Section 2 — PRINCIPES : Methode d'entrainement (concepts)
 │   ├── Plages de repetitions
 │   ├── Series d'approche
 │   ├── Tempo
@@ -112,10 +119,19 @@ Transformer `/rules` en `/science` — une page qui couvre 4 roles :
 │   ├── Legende technique
 │   ├── Rest-Pause
 │   └── Drop Sets
-├── Section 4: Place du cardio (LISS)
-├── Section 5: Visuel d'architecture modules (diagramme)
-└── Footer de page (brievete, pas de CTA marketing)
+├── Section 3 — PRINCIPES : Place du cardio (LISS)
+├── Section 4 — MATERIALISATION : Comment SPIGNOS materialise ces concepts
+│   ├── Templates et seances
+│   ├── Exercices et series
+│   ├── Score derive
+│   ├── Historique
+│   ├── Synthese et physique
+│   └── Ce qui reste prive
+├── Section 5 — ARCHITECTURE : Visuel modules (SVG SSR statique)
+└── Footer sobre (pas de CTA marketing)
 ```
+
+**Logique du flow** : on part de la pratique (pourquoi noter), on explique les principes generaux (reps, tempo, repos, cardio), puis on montre comment l'app les materialise (manuel produit), enfin on termine sur le schema d'architecture. Ne pas inverser cet ordre.
 
 ### Section 1 — Pourquoi noter change la progression
 
@@ -130,7 +146,7 @@ Transformer `/rules` en `/science` — une page qui couvre 4 roles :
 
 **Pattern rhetorique :** pas de "tu dois". Plutot "quand tu notes, X se passe". Factuel.
 
-### Section 2 — Comment fonctionne SPIGNOS
+### Section 4 — Comment SPIGNOS materialise ces concepts (manuel produit)
 
 **Longueur cible :** 300-400 mots. Structuree avec sous-titres.
 
@@ -168,7 +184,7 @@ La page **Physique** (`/physique`) montre l'equilibre de developpement par zone 
 
 Tes mesures, ta readiness, tes notes, tes poids par serie : strictement privees. Meme dans une squad (groupe prive), seule l'activite agregee est partagee — jamais les details.
 
-### Section 3 — Methode d'entrainement
+### Section 2 — Methode d'entrainement (principes)
 
 **Reprise integrale des 8 method_rules existants.** Aucune reecriture — ils sont bons.
 
@@ -184,7 +200,7 @@ Reorganisation :
 
 **Nouveaute :** chaque rule-card affiche un **ancre deep-link** (`#rule-carnet-progression`) pour pouvoir pointer depuis d'autres pages de l'app vers un rappel precis.
 
-### Section 4 — Place du cardio (LISS)
+### Section 3 — Place du cardio (LISS)
 
 **Longueur cible :** 150-200 mots.
 
@@ -379,19 +395,15 @@ Une ligne sous le diagramme, factuelle : "Les donnees alimentent un cockpit pers
 {% block content %}
 <h1 class="page-title">Science</h1>
 
+<!-- 1. PRATIQUE -->
 <section class="science-section" id="section-journal">
   <h2 class="section-header">Pourquoi noter change la progression</h2>
   <!-- 150-200 mots -->
 </section>
 
-<section class="science-section" id="section-manual">
-  <h2 class="section-header">Comment fonctionne SPIGNOS</h2>
-  <!-- 7 sous-sections 2.1-2.7 -->
-</section>
-
+<!-- 2. PRINCIPES : methode -->
 <section class="science-section" id="section-method">
   <h2 class="section-header">Methode d'entrainement</h2>
-  <!-- loop sur rules -->
   {% for rule in rules %}
   <article class="card rule-card" id="rule-{{ rule.slug }}">
     <h3 class="card__title">{{ rule.title }}</h3>
@@ -400,14 +412,22 @@ Une ligne sous le diagramme, factuelle : "Les donnees alimentent un cockpit pers
   {% endfor %}
 </section>
 
+<!-- 3. PRINCIPES : cardio -->
 <section class="science-section" id="section-cardio">
   <h2 class="section-header">Place du cardio</h2>
   <!-- 150-200 mots -->
 </section>
 
+<!-- 4. MATERIALISATION -->
+<section class="science-section" id="section-manual">
+  <h2 class="section-header">Comment SPIGNOS materialise ces concepts</h2>
+  <!-- 6 sous-sections -->
+</section>
+
+<!-- 5. ARCHITECTURE -->
 <section class="science-section" id="section-diagram">
   <h2 class="section-header">Architecture du produit</h2>
-  <figure class="science-diagram"><!-- SVG --></figure>
+  <figure class="science-diagram"><!-- SVG SSR statique --></figure>
 </section>
 {% endblock %}
 ```

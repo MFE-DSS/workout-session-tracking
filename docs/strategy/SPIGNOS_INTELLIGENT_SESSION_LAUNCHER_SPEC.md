@@ -2,7 +2,15 @@
 
 **Date:** 2026-04-14
 **Type:** Product + UX spec, ancree sur repo reel (reference_split.json v2026-04-14.v7)
-**Status:** Draft pending validation
+**Status:** Validated pending build
+
+## Arbitrages verrouilles (pre-build)
+
+| # | Decision | Impact |
+|---|----------|--------|
+| 1 | **Launcher V1 ne montre JAMAIS de branches vides.** | Dynamic branch resolution depuis reference_split.json. Si `BRANCH_TO_SLUGS[branch] == []`, la branche n'apparait pas dans le menu parent. |
+| 2 | **Launcher V1 = catalogue existant uniquement.** | Pas d'ajout de templates `short-lower` ou `short-full-body` avant observation usage reel. |
+| 3 | **reference_split.json (v7 courant) = seule source de verite catalogue.** | Les anciens resumes markdown/txt sont informatifs, pas normatifs. Le build doit lire le JSON courant, pas un snapshot. |
 
 ---
 
@@ -109,15 +117,17 @@ Etape 2 : "Quelle zone ?"
     └── Dos largeur                 → propose catch-up-back-width
 ```
 
-**Si "Seance courte" :**
+**Si "Seance courte" (V1 — catalogue-aware) :**
 
 ```
 Etape 2 : "Quoi de court ?"
 ├── Full upper court                → propose short-upper
-├── [Full lower court]              → GAP catalogue — voir section 7
-├── [Full body court]               → GAP catalogue — voir section 7
-└── Specialisation courte           → propose specialization (meme templates que haut)
+└── Specialisation courte           → propose catch-up-shoulders, catch-up-arms, catch-up-back-width
 ```
+
+**Branches dynamiques :** si `short-lower` ou `short-full-body` sont ajoutes au catalogue plus tard, ils apparaissent automatiquement dans l'etape 2. Le code ne liste que les branches dont `BRANCH_TO_SLUGS` retourne au moins 1 slug existant dans le catalogue courant.
+
+**Regle ferme :** pas de branche affichee avec message "aucun template disponible". Si la branche est vide, elle n'existe pas pour l'utilisateur.
 
 **Si "Cardio" :**
 
@@ -171,9 +181,13 @@ La nav topbar conserve "Programmes" tel quel. Le changement se situe uniquement 
 | Standard | Rattrapage / Bras | catch-up-arms | `/launcher?type=standard&zone=catch-arms` |
 | Standard | Rattrapage / Dos | catch-up-back-width | `/launcher?type=standard&zone=catch-back` |
 | Courte | Full upper | short-upper | `/launcher?type=short&variant=upper` |
-| Courte | Full lower | [**VIDE en V1**] | Voir section 7 |
-| Courte | Full body | [**VIDE en V1**] | Voir section 7 |
 | Courte | Specialisation | catch-up-* | `/launcher?type=short&variant=spec` |
+
+**Branches NON affichees en V1** (parce que BRANCH_TO_SLUGS est vide) :
+- `type=short&variant=lower` — pas de template short-lower existant
+- `type=short&variant=full` — pas de template short-full-body existant
+
+Ces branches seront ajoutees automatiquement si les templates correspondants sont seedees dans le catalogue.
 | Cardio | — | liss-abs | `/launcher?type=cardio` |
 
 Le filtrage est deterministe : chaque branche route vers une liste fixe de slugs. Le service est un simple dict `BRANCH_TO_SLUGS` dans `app/services/launcher.py`.
@@ -203,13 +217,16 @@ Le filtrage est deterministe : chaque branche route vers une liste fixe de slugs
 | Full body court | "J'ai 30 min, je veux toucher tout" | **A ajouter en Sprint catalogue (post-V1)** — un template `short-full-body` ~6 exercices composes. |
 | Cardio pur sans abdos | "Je veux juste du LISS ce soir" | **A evaluer** — soit rendre `liss-abs` flexible (cf. Spec Cardio separee), soit ajouter `liss-only`. |
 
-### Recommandation explicite
+### Recommandation explicite (verrouillee)
 
-**V1 — Launcher sur catalogue existant (pas d'evolution catalogue requise).**
+**V1 — Launcher strict sur catalogue existant. Branches vides interdites.**
 
-Les branches "Courte / Full lower" et "Courte / Full body" affichent en V1 un message `Aucun template disponible pour cette option. Voir tous les programmes →` avec le fallback vers `/library`. Ces branches sont **deja prevues dans le decision tree** mais vide de contenu.
+- Les branches dont `BRANCH_TO_SLUGS` retourne une liste vide **ne sont pas affichees** a l'utilisateur.
+- Le code filtre a l'execution : chaque menu d'etape 2 itere sur les branches definies, et garde uniquement celles qui ont au moins 1 slug existant dans le catalogue courant.
+- Si un template est retire du catalogue (archived), la branche concernee disparait automatiquement.
+- Si un template est ajoute (ex: `short-lower` en V2), la branche correspondante apparait sans changement de code launcher.
 
-**Argument :** livrer le launcher avec les 11 templates existants est immediatement utile. Ajouter `short-lower` et `short-full-body` est un sprint catalogue separe (editorial + programmation) qui ne doit pas bloquer le launcher UX.
+**Argument :** promettre une branche qui finit sur un message d'erreur ou un fallback library est une rupture de contrat UX. Mieux vaut 2 options solides que 4 options dont 2 en panne. Livrer sur 11 templates existants est immediatement utile.
 
 **V2 (post-launcher) — Sprint catalogue :**
 - Ajouter `short-lower` (utility, display_order 12)
@@ -301,7 +318,8 @@ Le launcher redirige vers le template detail existant ou affiche une carte qui a
 - [ ] Le bouton "Demarrer" sur chaque template filtre mene au meme POST /sessions qu'aujourd'hui
 - [ ] Un lien "Voir tous les programmes →" est present a chaque etape, pointant vers `/library`
 - [ ] La nav topbar conserve "Programmes" accessible directement
-- [ ] Les branches sans template disponible (short-lower, short-full-body en V1) affichent un message explicite et un lien `/library`
+- [ ] Les branches sans template disponible **ne sont pas affichees du tout** (pas de message d'erreur, pas de fallback visible)
+- [ ] Le service launcher lit dynamiquement reference_split.json au boot (via le seed) et resout les slugs a l'execution
 
 ### UX
 
