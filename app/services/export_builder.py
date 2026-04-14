@@ -54,6 +54,7 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
                 "success_score": se.success_score,
                 "muscle_sensation": se.muscle_sensation,
                 "free_note": se.free_note,
+                "substituted_name": se.substituted_name,
                 "sets": [
                     {
                         "kind": sl.kind,
@@ -127,6 +128,7 @@ CSV_HEADERS = [
     "success_score",
     "muscle_sensation",
     "exercise_free_note",
+    "substituted_name",
     "set_kind",
     "set_index",
     "weight_kg",
@@ -178,6 +180,7 @@ def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
                 _opt(se.success_score),
                 _opt(se.muscle_sensation),
                 _opt(se.free_note),
+                _opt(se.substituted_name),
             ]
             for sl in sorted(
                 se.set_logs,

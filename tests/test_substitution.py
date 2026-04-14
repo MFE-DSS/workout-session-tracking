@@ -61,3 +61,41 @@ def test_can_substitute_warmup_only_does_not_lock():
     sl2 = MagicMock(); sl2.kind = "work"; sl2.completed = False
     se.set_logs = [sl1, sl2]
     assert can_substitute(se) is True
+
+
+def test_substitution_select_appears_for_new_session(client):
+    """Exercise with substitutes shows select in the page."""
+    r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
+    sid = r.headers["location"].split("/")[-1]
+    r2 = client.get(f"/sessions/{sid}")
+    assert r2.status_code == 200
+    # push-a E2 has substitutes — check for the select or "prescrit" text
+    assert "prescrit" in r2.text or "Substituer" in r2.text
+
+
+def test_substitution_persists_after_save(client):
+    """Submitting substituted_name stores it."""
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise
+    from sqlalchemy import select
+
+    r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
+    sid = int(r.headers["location"].split("/")[-1])
+
+    with SessionLocal() as db:
+        se = db.execute(
+            select(SessionExercise)
+            .where(SessionExercise.session_id == sid)
+            .where(SessionExercise.exercise_code_snapshot == "E2")
+        ).scalar_one()
+        se_id = se.id
+
+    client.post(
+        f"/sessions/{sid}/exercises/{se_id}",
+        data={"substituted_name": "Développé couché haltères"},
+        follow_redirects=False,
+    )
+
+    with SessionLocal() as db:
+        se = db.get(SessionExercise, se_id)
+        assert se.substituted_name == "Développé couché haltères"

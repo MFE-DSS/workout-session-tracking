@@ -251,6 +251,21 @@ def check_focus_vs_exercises(templates: list[dict]) -> list[dict]:
     return warnings
 
 
+def check_substitute_classifiability(templates: list[dict]) -> list[str]:
+    """Every substitute name must be classifiable."""
+    from app.services.muscle_mapping import classify_exercise
+    warnings = []
+    for tpl in templates:
+        for ex in tpl.get("exercises", []):
+            for sub in ex.get("substitutes", []):
+                primary, _ = classify_exercise(sub)
+                if primary == "unknown":
+                    warnings.append(
+                        f"[{tpl['slug']}] {ex['code']}: substitute '{sub}' is unclassifiable"
+                    )
+    return warnings
+
+
 # ---------------------------------------------------------------------------
 # Report generation
 # ---------------------------------------------------------------------------
@@ -324,6 +339,8 @@ def main() -> int:
     errors += check_slug_uniqueness(templates)
     errors += check_exercise_classifiability(templates)
     warnings += check_focus_vs_exercises(templates)
+    all_sub_warnings = check_substitute_classifiability(templates)
+    warnings += [{"check": "substitute_classifiability", "severity": "warning", "message": w} for w in all_sub_warnings]
 
     summary = {
         "catalog": str(DATA_FILE.relative_to(PROJECT_ROOT)),
