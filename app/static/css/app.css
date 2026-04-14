@@ -149,8 +149,15 @@ input, button, textarea, select {
   }
 }
 @media (min-width: 769px) {
-  .topbar__menu > .topbar__nav { display: flex; }
-  .topbar__toggle { display: none; }
+  /* Desktop: details UA style hides children when closed — override */
+  .topbar__menu > .topbar__nav {
+    display: flex !important;
+    gap: 16px;
+    align-items: center;
+  }
+  .topbar__toggle { display: none !important; }
+  /* Make sure the <details> itself doesn't add extra spacing */
+  .topbar__menu { display: contents; }
 }
 
 /* ---- Active Banner ---- */
