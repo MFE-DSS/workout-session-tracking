@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Progression</h1>
-<p class="lede">KPI simples calculés à partir de tes sessions terminées.</p>
+<p class="lede">KPI · sessions terminées.</p>
 
 <div class="kpi-grid">
   <div class="kpi-card">
@@ -108,8 +108,6 @@
 {% endif %}
 
 <p class="kpi-note">
-  Seules les <strong>sessions terminées</strong> entrent dans les moyennes et
-  taux ; les sessions en cours ne polluent pas les métriques. Les warmup
-  sets ne comptent jamais pour le taux de complétion.
+  Sessions terminées uniquement · warmup sets exclus du taux de complétion.
 </p>
 {% endblock %}

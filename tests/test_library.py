@@ -102,7 +102,7 @@ def test_library_page_uses_programmes_vocabulary(client):
     body = r.text
     assert "Programmes de séance" in body
     assert "Bibliothèque" not in body
-    assert "Choisis un programme pour démarrer" in body
+    assert "Catalogue complet" in body
 
 
 def test_strength_template_hides_cardio_note(client):

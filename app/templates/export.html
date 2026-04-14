@@ -1,9 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Sauvegarde</h1>
-<p class="lede">
-  Sauvegarde locale du journal complet en deux formats.
-</p>
+<p class="lede">Journal complet · JSON ou CSV.</p>
 
 <div class="card export-card">
   <h2 class="card__title">Résumé du journal</h2>
@@ -38,8 +36,8 @@
 <div class="card export-card">
   <h2 class="card__title">Télécharger</h2>
   <p class="export-card__hint">
-    Le JSON conserve toute la structure (sessions → exercices → sets).
-    Le CSV est plat (une ligne par set), prêt à ouvrir dans un tableur.
+    JSON : structure complète (sessions → exercices → sets).
+    CSV : plat, une ligne par set.
   </p>
   <div class="card__actions">
     <a class="btn btn--primary btn--wide" href="{{ url_for('export_sessions_json') }}">
@@ -113,7 +111,6 @@
 </div>
 
 <p class="kpi-note">
-  Les sauvegardes sont stockées localement. Téléchargez régulièrement
-  une copie pour archivage.
+  Stockage local · télécharge régulièrement pour archiver.
 </p>
 {% endblock %}

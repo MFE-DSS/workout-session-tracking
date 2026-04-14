@@ -214,6 +214,7 @@ input, button, textarea, select {
   font-weight: 600;
   color: var(--fg);
   margin: 24px 0 8px;
+  text-align: center;
 }
 
 .section-header {
@@ -230,6 +231,7 @@ input, button, textarea, select {
   color: var(--fg-muted);
   margin: 0 0 var(--space-md);
   font-size: 14px;
+  text-align: center;
 }
 
 .text-muted { color: var(--fg-muted); }

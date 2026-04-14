@@ -3,7 +3,7 @@
 
 {% if step == 1 %}
   <h1 class="page-title">Nouvelle séance</h1>
-  <p class="lede">Quel type de séance aujourd'hui ?</p>
+  <p class="lede">Type de séance ?</p>
   <div class="tile-grid">
     {% for t in types %}
       <a class="tile {% if loop.first %}tile--primary{% endif %}"
@@ -35,7 +35,7 @@
 
 {% elif step == 3 %}
   <h1 class="page-title">{{ type_label }}</h1>
-  <p class="lede">Choisis un programme pour démarrer.</p>
+  <p class="lede">Choisis un programme.</p>
   <ul class="template-list">
     {% for tpl in templates_list %}
       <li class="template-card template-card--{{ tpl.kind }}">

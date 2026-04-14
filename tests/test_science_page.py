@@ -40,7 +40,7 @@ def test_science_page_has_cardio_section(client):
     body = r.text
     assert "Place du cardio" in body
     assert "LISS" in body
-    assert "donnees cardio operatoires" in body
+    assert "Pas de pseudo-science" in body
 
 
 def test_science_page_has_materialisation_section(client):

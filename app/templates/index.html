@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Ton cockpit</h1>
+<h1 class="page-title" style="letter-spacing: 0.06em;">Cockpit</h1>
 
 {% if open_session %}
   <a class="tile tile--resume" href="{{ url_for('session_detail', session_id=open_session.id) }}">
@@ -18,7 +18,7 @@
 <a class="tile tile--primary tile--cta-main" href="{{ url_for('launcher') }}"
    style="display:block;padding:var(--space-lg) var(--space-md);margin-bottom:var(--space-md);text-align:center;border-left:none;border:2px solid var(--accent);">
   <div class="tile__label" style="font-size:18px;color:var(--accent);">Démarrer une séance →</div>
-  <div class="tile__hint" style="margin-top:var(--space-xs);">Choisir un programme guidé</div>
+  <div class="tile__hint" style="margin-top:var(--space-xs);">Flux guidé</div>
 </a>
 {% endif %}
 
@@ -45,10 +45,10 @@
   <details open>
     <summary style="cursor:pointer;font-size:14px;margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-sm);">
       <span class="card__title" style="margin:0;color:var(--warn);">État du jour · à remplir</span>
-      <span class="text-dim" style="font-size:11px;font-weight:400;">30 sec · améliore la lecture de ta récupération</span>
+      <span class="text-dim" style="font-size:11px;font-weight:400;">30 sec</span>
     </summary>
     <p class="text-dim" style="font-size:12px;margin:var(--space-sm) 0;">
-      Une fois par jour. Plus tu remplis, plus la synthèse devient fiable.
+      1×/jour. Alimente la synthèse.
     </p>
     <form method="post" action="/readiness" style="margin-top:var(--space-sm);">
       {% for field in readiness_scale_fields %}
@@ -87,12 +87,12 @@
         <p class="insight__reco">{{ behavioral.recommendation }}</p>
       </summary>
       <div class="card" style="margin-top:var(--space-sm);font-size:13px;">
-        <p><b>Disponibilité</b> est un score 0-100 calculé à partir de ta fatigue récente, ta régularité sur 14 jours, et la qualité de tes dernières séances.</p>
+        <p><b>Disponibilité</b> — score 0-100 · état de la semaine.</p>
         <p class="text-dim" style="font-size:12px;">
-          Formule : 50% état de fatigue · 30% régularité · 20% performance récente. Pas un score médical — un indicateur d'état.
+          50% fatigue · 30% régularité · 20% perf récente.
         </p>
         <p style="margin-top:var(--space-sm);">
-          <a class="text-muted" href="{{ url_for('dashboard') }}">Voir la synthèse complète →</a>
+          <a class="text-muted" href="{{ url_for('dashboard') }}">Synthèse complète →</a>
         </p>
       </div>
     </details>
