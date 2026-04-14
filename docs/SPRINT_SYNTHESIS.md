@@ -110,6 +110,212 @@ Private by default, deterministic scoring, no AI/ML.
 
 ---
 
+## Design System & Visual Identity
+
+### Philosophy
+
+SPIGNOS follows an "Engineered, structured, calm, precise" design language. Dark theme only. No decorative elements. Information density is controlled — every pixel earns its place. The aesthetic targets a user who trains seriously and wants a cockpit, not an app that congratulates them for showing up.
+
+### Color Palette
+
+| Token | Hex | Role |
+|-------|-----|------|
+| `--bg` | `#0f1115` | Page background — near-black |
+| `--surface` | `#161a22` | Card/component background |
+| `--surface-2` | `#1e222c` | Input fields, nested surfaces |
+| `--border` | `#232834` | Subtle borders, separators |
+| `--fg` | `#e8ecf1` | Primary text — off-white |
+| `--fg-muted` | `#9aa3ad` | Secondary text, labels |
+| `--fg-dim` | `#5a6270` | Tertiary text, hints |
+| `--accent` | `#f25f3a` | Primary action color — warm orange |
+| `--accent-soft` | `#f25f3a1a` | Accent background tint (10% opacity) |
+| `--ok` | `#2ecc71` | Success, completed, positive |
+| `--ok-soft` | `#2ecc711a` | Success background tint |
+| `--warn` | `#f4a261` | Warning, caution |
+| `--danger` | `#e74c3c` | Destructive actions, errors |
+| `--info` | `#3b82f6` | Informational, cardio type |
+
+### Typography
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--font` | `'Inter', system-ui, sans-serif` | All UI text |
+| `--font-mono` | `'JetBrains Mono', 'SF Mono', monospace` | Scores, stats, badges, tabular data |
+| Base font size | `14px` | Body text |
+| Page title | `18px / 600` | H1 pages |
+| Section header | `13px / 600 / uppercase / 0.5px tracking` | Section labels |
+| KPI value | `24px / 700 / mono / tabular-nums` | Key numbers |
+| Badge | `11px / 600 / mono` | Status pills |
+
+### Spacing Scale
+
+| Token | Value |
+|-------|-------|
+| `--space-xs` | 4px |
+| `--space-sm` | 8px |
+| `--space-md` | 16px |
+| `--space-lg` | 24px |
+| `--space-xl` | 32px |
+| `--space-2xl` | 48px |
+
+### Border Radius
+
+| Token | Value | Usage |
+|-------|-------|-------|
+| `--radius` | 8px | Cards, tiles, containers |
+| `--radius-sm` | 4px | Buttons, inputs, badges, segmented controls |
+
+### Layout
+
+| Component | Behavior |
+|-----------|----------|
+| `.container` | `max-width: 640px`, centered, `padding: 16px` sides + `96px` bottom (safe area for mobile nav) |
+| `.cockpit-grid` | Single column on mobile (no CSS grid on mobile). On desktop, used with `.cockpit-main` + `.cockpit-side` for 2-column layouts (physique radar + zones, profile form + charts). |
+| `.tile-grid` | 2-column grid for home page quick-action tiles |
+
+### Component Library
+
+| Component | CSS Class | Visual |
+|-----------|-----------|--------|
+| **Card** | `.card` | Dark surface (`--surface`), `1px --border`, `8px radius`, `16px padding` |
+| **Badge** | `.badge` | Mono font, 11px, pill shape. Variants: `--completed` (green), `--in_progress` (orange), `--neutral` (grey) |
+| **Grade badge** | `.grade-badge` | Circular 22px, bold letter. `--a` green, `--b` orange, `--c` grey |
+| **Button** | `.btn` | 14px, 500 weight, `4px radius`. Variants: `--primary` (accent bg), `--ghost` (transparent), `--end` (green, "Terminer"), `--danger` (red), `--sm` (compact) |
+| **Segmented control** | `.segmented` | Horizontal radio group in `--surface-2` container. Selected option: `--surface` bg, 600 weight. Used for all 3-option feedback (concentration, sensation, etc.) |
+| **KPI block** | `.kpi` | Centered column: large mono value + small uppercase label |
+| **Insight block** | `.insight` | Left accent border (3px), 32px value, recommendation text below |
+| **Zone card** | `.zone-card` | Compact card with label + score bar + meta. Post-S4: responsive grid layout |
+| **Zone bar** | `.zone-bar` | Thin progress bar (4px height), fill proportional to score |
+| **Tile** | `.tile` | Home page action block, 80px min-height. `--primary` has accent left border. `--resume` has green left border |
+| **Jump bar** | `.ex-jump` | Horizontal scroll nav for exercise cards. Items: code + progress count. States: `--done` (green), `--partial` (orange), `--feedback` (final item) |
+| **Exercise card** | `details.exercise-card` | `<details>` accordion. Compact `<summary>` (code + name + progress + recap). Open: accent border. Done: muted colors, green code |
+| **Active banner** | `.active-banner` | Sticky bar below topbar with pulsing green dot, session name, "Reprendre →" CTA |
+| **Topbar** | `.topbar` | Sticky, `--bg` background, bottom border. Brand + horizontal nav links |
+| **Filter bar** | `.filter-bar` | Horizontal tabs (30j/60j/90j or status filters). Active item gets `is-active` class |
+| **Stats list** | `.stats-list` | Key-value rows with bottom borders, used in profile and export |
+| **Template card** | `.template-card` | Library cards with accent left border (blue for cardio). Name + focus + hint |
+
+### Interactive Patterns
+
+| Pattern | Mechanism | JS |
+|---------|-----------|-----|
+| **Accordion exercise cards** | `<details open>` server-side via `?active=` query param | Zero |
+| **Readiness widget** | `<details>` collapsed form on Home, badges when filled | Zero |
+| **Muscle sensation** | `<details>` collapsed optional section in exercise card | Zero |
+| **Substitution picker** | `<details>` with segmented radios, collapsed "Machine indisponible ?" | Zero |
+| **Scoring rules** | `<details>` collapsible on dashboard page | Zero |
+| **SVG radar chart** | Server-rendered SVG, interactive hover/focus via CSS | CSS only (`:hover`, `:focus-within` for data point labels) |
+| **SVG timelines** | Server-rendered SVG (bodyweight, quality, measurements) | CSS only |
+
+### Mobile Considerations
+
+| Aspect | Implementation |
+|--------|---------------|
+| Viewport | `viewport-fit=cover`, safe area padding via `env(safe-area-inset-top)` |
+| PWA | Manifest + theme-color + apple-mobile-web-app meta tags |
+| Touch targets | Buttons min 44px implied by padding. Segmented options have 6px+8px padding |
+| Input types | `inputmode="decimal"` for weight, `inputmode="numeric"` for reps. Number step=0.5 for weight |
+| Font smoothing | `-webkit-font-smoothing: antialiased` |
+| Container | 640px max-width, 96px bottom padding for thumb-reachable bottom actions |
+
+### Page Layout Map
+
+```
+┌─────────────────────────────────────────────┐
+│ TOPBAR (sticky)                             │
+│ SPIGNOS    Accueil Programme Historique ...  │
+├─────────────────────────────────────────────┤
+│ ACTIVE BANNER (if session open)             │
+│ ● Séance en cours · Push A · Reprendre →    │
+├─────────────────────────────────────────────┤
+│                                             │
+│ CONTAINER (640px max, centered)             │
+│                                             │
+│   PAGE TITLE                                │
+│                                             │
+│   CONTENT (varies by page)                  │
+│                                             │
+│     Home: insight → KPIs → sparkline → tiles│
+│     Session: jumpbar → <details> cards → FB │
+│     Dashboard: hero score → 5 axis cards    │
+│     Physique: radar SVG → zone grid         │
+│     Squad: leaderboard → challenges →       │
+│            activity → compare → sharing     │
+│                                             │
+├─────────────────────────────────────────────┤
+│ FOOTER                                      │
+│ SPIGNOS · FastAPI SSR · v1    Contact       │
+└─────────────────────────────────────────────┘
+```
+
+### Session Page Flow (post Sb_01 + Sb_02 + Sb_03)
+
+```
+┌─ Session Header ────────────────────────────┐
+│ Push A — Pecs épaisseur + Delts + Triceps   │
+│ Mardi · 14/04 07:24 · [En cours]           │
+│ 3 / 25 work sets                            │
+└─────────────────────────────────────────────┘
+
+┌─ Jump Bar (horizontal scroll) ──────────────┐
+│ [E1 3/3] [E2 0/3] [E3 0/3] ... [FB]       │
+└─────────────────────────────────────────────┘
+
+┌─ E1 Incline Smith Press ──────── 3/3 ──────┐
+│  60/62.5/65 kg · 10/8/8 reps              │ ← compact (collapsed)
+└─────────────────────────────────────────────┘
+
+┌─ E2 Chest Press machine ──────── 0/3 ──────┐  ← OPEN (active)
+│                                             │
+│  Voir historique E2 →                       │
+│  3× 8-12                                   │
+│                                             │
+│  [Machine indisponible ? Substituer →]      │  ← collapsed <details>
+│    ○ Chest Press machine                    │
+│    ○ Développé couché haltères              │
+│    ○ Dips pectoraux                         │
+│                                             │
+│  Dernière fois · il y a 5j                  │
+│  60/60/60 kg · 10/10/10 reps               │
+│  Delta · +2.5 kg · = reps                  │
+│  Repère · viser 12 reps avant d'augmenter  │
+│                                             │
+│  WARMUP                                     │
+│  [Warmup #1]  kg [___] reps [___] □ Fait   │
+│                                             │
+│  WORK                                       │
+│  [Work #1]    kg [___] reps [___] □ Fait   │
+│  [Work #2]    kg [___] reps [___] □ Fait   │
+│  [Work #3]    kg [___] reps [___] □ Fait   │
+│                                             │
+│  [Sensation musculaire (optionnel)]         │  ← collapsed
+│  [Note (optionnel)]                         │
+│                                             │
+│  [████ Enregistrer E2 ████]                │
+└─────────────────────────────────────────────┘
+
+┌─ E3 ... ──────────────────────── 0/3 ──────┐ ← compact
+└─────────────────────────────────────────────┘
+... (E4-E8 compact) ...
+
+┌─ Bilan de la séance ───────────────────────┐
+│  Concentration mentale                      │
+│  Étais-tu focalisé sur tes mouvements ?    │
+│  [Focalisé] [Correct] [Distrait]           │
+│                                             │
+│  Énergie générale                           │
+│  Comment te sentais-tu ?                    │
+│  [En forme] [Moyen] [Fatigué]             │
+│                                             │
+│  Poids du corps (optionnel) [___] kg       │
+│  Note (optionnel) [________________]       │
+│                                             │
+│  [Enregistrer]  [Terminer la séance]       │
+└─────────────────────────────────────────────┘
+```
+
+---
+
 ## Documentation Produced
 
 ### Specs (in `docs/strategy/`)
