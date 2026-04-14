@@ -252,14 +252,19 @@ def test_deleted_sessions_not_in_timelines(client):
 
 
 # ---------------------------------------------------------------------------
-# Home has the Gestion tile
+# History page has management actions (merged from old Gestion tile)
 # ---------------------------------------------------------------------------
 
 
-def test_home_has_gestion_tile(client):
-    body = client.get("/").text
-    assert "Gestion" in body
-    assert "/admin/sessions" in body
+def test_history_has_management_actions(client):
+    """After merging Gestion into Historique, each session has
+    exclude/delete actions in a collapsible <details> block."""
+    # Create a session to have something in history
+    client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
+    body = client.get("/history").text
+    assert "Gérer cette séance" in body
+    assert "Exclure des KPI" in body or "Inclure dans KPI" in body
+    assert "Supprimer" in body
 
 
 # ---------------------------------------------------------------------------

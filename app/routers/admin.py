@@ -77,8 +77,12 @@ def delete_session(session_id: int, request: Request, db: DbSession, user: Curre
 
 
 @router.post("/admin/sessions/{session_id}/exclude")
-def toggle_exclude(session_id: int, db: DbSession, user: CurrentUser) -> RedirectResponse:
+def toggle_exclude(session_id: int, request: Request, db: DbSession, user: CurrentUser) -> RedirectResponse:
     session = get_owned_session_or_404(db, session_id, user.id)
     session.excluded_from_stats = not session.excluded_from_stats
     db.commit()
+    # Redirect back to referring page (history or admin)
+    referer = request.headers.get("referer", "")
+    if "/history" in referer:
+        return RedirectResponse(url="/history", status_code=303)
     return RedirectResponse(url="/admin/sessions", status_code=303)

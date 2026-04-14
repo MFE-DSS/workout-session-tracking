@@ -29,8 +29,8 @@
   <ul class="session-list">
     {% for s in sessions %}
       {% set stats = session_stats[s.id] %}
-      <li>
-        <a class="session-card" href="{{ url_for('session_detail', session_id=s.id) }}" style="display:block;padding:var(--space-md);border-radius:var(--radius);background:var(--surface);margin-bottom:var(--space-xs);">
+      <li class="history-item {% if s.excluded_from_stats %}history-item--excluded{% endif %}">
+        <a class="session-card" href="{{ url_for('session_detail', session_id=s.id) }}" style="display:block;padding:var(--space-md);border-radius:var(--radius);background:var(--surface);">
           <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-sm);margin-bottom:var(--space-xs);">
             <span class="session-card__name" style="font-weight:600;font-size:14px;">{{ s.template_name_snapshot }}</span>
             <span style="font-size:12px;color:var(--fg-dim);white-space:nowrap;">
@@ -50,8 +50,26 @@
                 {{ durations[s.id] }}
               </span>
             {% endif %}
+            {% if s.excluded_from_stats %}
+              <span class="badge badge--excluded">exclu des KPI</span>
+            {% endif %}
           </div>
         </a>
+        <details class="history-item__actions" style="margin-top:var(--space-xs);margin-bottom:var(--space-sm);">
+          <summary style="cursor:pointer;font-size:12px;color:var(--fg-dim);padding:var(--space-xs) 0;">Gérer cette séance</summary>
+          <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-xs);flex-wrap:wrap;">
+            <form method="post" action="{{ url_for('toggle_exclude', session_id=s.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn--ghost btn--sm">
+                {% if s.excluded_from_stats %}Inclure dans KPI{% else %}Exclure des KPI{% endif %}
+              </button>
+            </form>
+            <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}"
+                  onsubmit="return confirm('Supprimer définitivement cette séance ?');"
+                  style="display:inline;">
+              <button type="submit" class="btn btn--ghost btn--sm btn--danger">Supprimer</button>
+            </form>
+          </div>
+        </details>
       </li>
     {% endfor %}
   </ul>
