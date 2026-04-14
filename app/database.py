@@ -59,6 +59,6 @@ def get_db() -> Iterator[Session]:
 def init_db() -> None:
     """Create all tables. Replaced by Alembic once we have migrations."""
     # Import side effect: register models with Base.metadata
-    from app.models import catalog, measurement, readiness, session, squad  # noqa: F401
+    from app.models import catalog, challenge, measurement, readiness, session, sharing, squad  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
