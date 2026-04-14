@@ -175,6 +175,10 @@ def test_each_template_has_exercises(templates: list[dict]) -> None:
     for tmpl in templates:
         slug = tmpl.get("slug", "?")
         exercises = tmpl.get("exercises", [])
+        # Cardio templates MAY have empty exercises (pure cardio session,
+        # e.g. liss-only). Non-cardio templates still must have >=1.
+        if tmpl.get("kind") == "cardio":
+            continue
         assert len(exercises) >= 1, (
             f"Template '{slug}' has no exercises"
         )

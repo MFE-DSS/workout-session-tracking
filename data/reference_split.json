@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-14.v7",
+  "version": "2026-04-14.v8",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -1539,6 +1539,17 @@
       ],
       "catalog_section": "archived",
       "display_order": 33
+    },
+    {
+      "slug": "liss-only",
+      "name": "LISS cardio pur",
+      "kind": "cardio",
+      "focus": "Cardio faible intensite",
+      "cardio_note": "20-30 min LISS (velo, marche inclinee, rameur) a 120-130 bpm",
+      "suggested_label": "Seance cardio sans abdos. Ideale entre deux seances muscu.",
+      "exercises": [],
+      "catalog_section": "utility",
+      "display_order": 10
     },
     {
       "slug": "liss-abs",

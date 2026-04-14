@@ -21,13 +21,15 @@ def test_resolve_branch_standard_upper_push(client):
 
 
 def test_resolve_branch_cardio(client):
+    """Cardio branch returns liss-only + liss-abs (catalog v8)."""
     from app.database import SessionLocal
     from app.services.launcher import resolve_branch
 
     with SessionLocal() as db:
-        result = resolve_branch(db, "cardio", None)
-    slugs = [t.slug for t in result]
-    assert slugs == ["liss-abs"]
+        templates = resolve_branch(db, "cardio", None)
+    slugs = [t.slug for t in templates]
+    assert "liss-only" in slugs
+    assert "liss-abs" in slugs
 
 
 def test_resolve_branch_empty_for_unknown_variant(client):

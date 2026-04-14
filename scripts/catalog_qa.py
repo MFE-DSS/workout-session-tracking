@@ -87,7 +87,9 @@ def check_schema(templates: list[dict]) -> list[dict]:
                 "message": f"Template missing fields: {sorted(missing_t)}",
             })
         exercises = t.get("exercises", [])
-        if not exercises:
+        # Cardio templates MAY have empty exercises (pure cardio session,
+        # e.g. liss-only). Non-cardio templates still must have >=1.
+        if not exercises and t.get("kind") != "cardio":
             errors.append({
                 "check": "schema",
                 "slug": slug,

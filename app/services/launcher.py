@@ -59,7 +59,10 @@ BRANCH_TREE: dict[str, dict[str, dict]] = {
         },
     },
     "cardio": {
-        "_direct": {"label": "LISS + abdos", "slugs": ["liss-abs"]},
+        "_direct": {
+            "label": "Cardio",
+            "slugs": ["liss-only", "liss-abs"],
+        },
     },
 }
 

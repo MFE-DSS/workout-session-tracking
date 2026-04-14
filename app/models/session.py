@@ -96,6 +96,15 @@ class WorkoutSession(Base):
     global_state: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
 
     bodyweight_kg: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+
+    # Cardio capture (Sb_cardio_capture) — relevant only for kind=cardio templates.
+    # Machine calories is explicitly an indicative machine value, NEVER a
+    # physiological truth. See SPIGNOS_SCIENCE_PAGE_SPEC.md section 3.
+    cardio_duration_min: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    cardio_bpm_avg: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    cardio_machine_calories: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    cardio_machine_type: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+
     free_note: Mapped[Optional[str]] = mapped_column(String(280), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
