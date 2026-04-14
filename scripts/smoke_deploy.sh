@@ -79,7 +79,7 @@ check_auth_redirect() {
 
 check_auth_redirect "GET / requires auth" "/"
 check_auth_redirect "GET /library requires auth" "/library"
-check_auth_redirect "GET /rules requires auth" "/rules"
+check_auth_redirect "GET /science requires auth" "/science"
 check_auth_redirect "GET /history requires auth" "/history"
 check_auth_redirect "GET /progress requires auth" "/progress"
 check_auth_redirect "GET /export requires auth" "/export"
