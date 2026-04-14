@@ -45,6 +45,10 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
         "concentration": s.concentration,
         "global_state": s.global_state,
         "bodyweight_kg": s.bodyweight_kg,
+        "cardio_duration_min": s.cardio_duration_min,
+        "cardio_bpm_avg": s.cardio_bpm_avg,
+        "cardio_machine_calories": s.cardio_machine_calories,
+        "cardio_machine_type": s.cardio_machine_type,
         "free_note": s.free_note,
         "exercises": [
             {
@@ -121,6 +125,10 @@ CSV_HEADERS = [
     "concentration",
     "global_state",
     "bodyweight_kg",
+    "cardio_duration_min",
+    "cardio_bpm_avg",
+    "cardio_machine_calories",
+    "cardio_machine_type",
     "session_free_note",
     "exercise_position",
     "exercise_code",
@@ -167,6 +175,10 @@ def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
             _opt(s.concentration),
             _opt(s.global_state),
             _opt(s.bodyweight_kg),
+            _opt(s.cardio_duration_min),
+            _opt(s.cardio_bpm_avg),
+            _opt(s.cardio_machine_calories),
+            _opt(s.cardio_machine_type),
             _opt(s.free_note),
         ]
         if not s.session_exercises:

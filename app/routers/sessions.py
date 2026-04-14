@@ -109,6 +109,7 @@ def _load_session(db: Session, session_id: int, user_id: int) -> WorkoutSession 
         select(WorkoutSession)
         .where(WorkoutSession.id == session_id, WorkoutSession.user_id == user_id)
         .options(
+            selectinload(WorkoutSession.template),  # for kind check in template
             selectinload(WorkoutSession.session_exercises)
             .selectinload(SessionExercise.set_logs),
             selectinload(WorkoutSession.session_exercises)
@@ -280,6 +281,16 @@ async def update_session(
     session.global_state = enum_str(form.get("global_state"), _GLOBAL_STATE)
     session.bodyweight_kg = to_float(form.get("bodyweight_kg"))
     session.free_note = clean_str(form.get("free_note"), max_length=280)
+
+    # Cardio capture (Sb_cardio_capture) — only meaningful for kind=cardio
+    # sessions but we parse unconditionally. Non-cardio sessions won't have
+    # these fields in the form, resulting in None.
+    session.cardio_duration_min = to_int(form.get("cardio_duration_min"))
+    session.cardio_bpm_avg = to_int(form.get("cardio_bpm_avg"))
+    session.cardio_machine_calories = to_int(form.get("cardio_machine_calories"))
+    session.cardio_machine_type = clean_str(
+        form.get("cardio_machine_type"), max_length=32
+    )
 
     if form.get("action") == "end":
         session.ended_at = datetime.now(timezone.utc)

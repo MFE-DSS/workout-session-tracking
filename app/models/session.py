@@ -117,6 +117,12 @@ class WorkoutSession(Base):
         order_by="SessionExercise.position",
     )
 
+    # Read-only navigation to the template, used by the session detail
+    # view to branch on `template.kind` (e.g. cardio vs strength).
+    template = relationship(
+        "WorkoutTemplate", lazy="select", foreign_keys=[template_id]
+    )
+
     @property
     def weekday_iso(self) -> int:
         """ISO weekday (1=Mon..7=Sun) derived from `started_at`."""

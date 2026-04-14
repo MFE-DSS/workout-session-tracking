@@ -281,6 +281,42 @@
   class="card session-feedback"
   id="session-feedback"
 >
+  {% if session.template and session.template.kind == 'cardio' %}
+  <h2 class="card__title">Cardio</h2>
+  <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);">
+    Données opératoires saisies. Elles ne sont pas une vérité physiologique.
+  </p>
+
+  {% call field_group("Durée (min)") %}
+    <input type="number" inputmode="numeric" name="cardio_duration_min"
+           min="1" max="300" placeholder="20"
+           value="{{ session.cardio_duration_min if session.cardio_duration_min is not none else '' }}" />
+  {% endcall %}
+
+  {% call field_group("BPM moyen (si mesure)") %}
+    <input type="number" inputmode="numeric" name="cardio_bpm_avg"
+           min="40" max="220" placeholder="125"
+           value="{{ session.cardio_bpm_avg if session.cardio_bpm_avg is not none else '' }}" />
+  {% endcall %}
+
+  {% call field_group("Machine") %}
+    <select name="cardio_machine_type">
+      <option value="">—</option>
+      <option value="velo"       {% if session.cardio_machine_type == 'velo' %}selected{% endif %}>Vélo</option>
+      <option value="marche"     {% if session.cardio_machine_type == 'marche' %}selected{% endif %}>Marche inclinée</option>
+      <option value="rameur"     {% if session.cardio_machine_type == 'rameur' %}selected{% endif %}>Rameur</option>
+      <option value="elliptique" {% if session.cardio_machine_type == 'elliptique' %}selected{% endif %}>Elliptique</option>
+      <option value="autre"      {% if session.cardio_machine_type == 'autre' %}selected{% endif %}>Autre</option>
+    </select>
+  {% endcall %}
+
+  {% call field_group("Calories machine (indicatif)") %}
+    <input type="number" inputmode="numeric" name="cardio_machine_calories"
+           min="0" max="5000" placeholder="— selon affichage machine"
+           value="{{ session.cardio_machine_calories if session.cardio_machine_calories is not none else '' }}" />
+  {% endcall %}
+  {% endif %}
+
   <h2 class="card__title">Bilan de la séance</h2>
   <p style="font-size:12px;color:var(--fg-dim);margin-bottom:var(--space-sm);">
     Comment s'est passée cette séance dans l'ensemble ?
