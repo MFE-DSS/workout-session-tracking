@@ -173,6 +173,63 @@ def test_done_page_shows_summary_block(client):
     assert 'name="action" value="reopen"' in body
 
 
+def _mk_completed_cardio_session(
+    *,
+    duration_min: int = 45,
+    bpm_avg: int = 132,
+    machine_calories: int = 410,
+    machine_type: str = "stairmaster",
+) -> int:
+    """Create a completed cardio WorkoutSession (inline cardio template)."""
+    from app.database import SessionLocal
+    from app.models.catalog import WorkoutTemplate
+    from app.models.session import WorkoutSession
+
+    started = datetime(2026, 4, 13, 18, 0, tzinfo=timezone.utc)
+    ended = datetime(2026, 4, 13, 18, 0 + duration_min, tzinfo=timezone.utc)
+
+    with SessionLocal() as db:
+        tpl = WorkoutTemplate(
+            slug="cardio-liss-test",
+            name="Cardio LISS — test",
+            kind="cardio",
+        )
+        db.add(tpl)
+        db.flush()
+        s = WorkoutSession(
+            user_id=get_test_user_id(),
+            template_id=tpl.id,
+            template_slug_snapshot=tpl.slug,
+            template_name_snapshot=tpl.name,
+            started_at=started,
+            ended_at=ended,
+            status="completed",
+            cardio_duration_min=duration_min,
+            cardio_bpm_avg=bpm_avg,
+            cardio_machine_calories=machine_calories,
+            cardio_machine_type=machine_type,
+        )
+        db.add(s)
+        db.commit()
+        return s.id
+
+
+def test_done_page_shows_cardio_recap_for_cardio_kind(client):
+    sid = _mk_completed_cardio_session()
+    r = client.get(f"/sessions/{sid}/done")
+    assert r.status_code == 200
+    body = r.text
+    # Cardio block rendered
+    assert "Cardio" in body
+    assert "45" in body and "min" in body.lower()
+    assert "132" in body
+    assert "bpm" in body.lower()
+    assert "410" in body
+    assert "stairmaster" in body
+    # Strength table must NOT render
+    assert "Par exercice" not in body
+
+
 def test_done_page_shows_substitution_arrow(client):
     from app.database import SessionLocal
     from app.models.session import WorkoutSession

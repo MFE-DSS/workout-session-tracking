@@ -57,28 +57,55 @@
     </ul>
   </section>
 
-  {# ─── Par exercice ─── #}
-  <section class="card session-done__exercises">
-    <h2 class="card__title">Par exercice</h2>
-    <ul class="session-done__exlist">
-      {% for ex in recap.exercises %}
-        <li class="session-done__exrow">
-          <span class="session-done__code">{{ ex.code }}</span>
-          <span class="session-done__name">
-            {% if ex.substituted_name %}
-              → {{ ex.substituted_name }}
-            {% else %}
-              {{ ex.name }}
+  {# ─── Cardio (kind=cardio uniquement) ─── #}
+  {% if recap.header.kind == 'cardio' and recap.summary.cardio %}
+    <section class="card session-done__cardio">
+      <h2 class="card__title">Cardio</h2>
+      <ul class="session-done__stats">
+        {% if recap.summary.cardio.duration_min %}
+          <li><span>Durée</span><b>{{ recap.summary.cardio.duration_min }} min</b></li>
+        {% endif %}
+        {% if recap.summary.cardio.bpm_avg %}
+          <li><span>BPM moyen</span><b>{{ recap.summary.cardio.bpm_avg }} bpm</b></li>
+        {% endif %}
+        {% if recap.summary.cardio.calories %}
+          <li>
+            <span>Calories machine</span>
+            <b>{{ recap.summary.cardio.calories }}
+              <span class="text-dim" style="font-size:11px;">(indicatif)</span></b>
+          </li>
+        {% endif %}
+        {% if recap.summary.cardio.machine_type %}
+          <li><span>Machine</span><b>{{ recap.summary.cardio.machine_type }}</b></li>
+        {% endif %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {# ─── Par exercice (kind != cardio) ─── #}
+  {% if recap.header.kind != 'cardio' %}
+    <section class="card session-done__exercises">
+      <h2 class="card__title">Par exercice</h2>
+      <ul class="session-done__exlist">
+        {% for ex in recap.exercises %}
+          <li class="session-done__exrow">
+            <span class="session-done__code">{{ ex.code }}</span>
+            <span class="session-done__name">
+              {% if ex.substituted_name %}
+                → {{ ex.substituted_name }}
+              {% else %}
+                {{ ex.name }}
+              {% endif %}
+            </span>
+            <span class="session-done__prog">{{ ex.done }}/{{ ex.total }}</span>
+            {% if ex.score is not none %}
+              <span class="session-done__score">{{ ex.score }}</span>
             {% endif %}
-          </span>
-          <span class="session-done__prog">{{ ex.done }}/{{ ex.total }}</span>
-          {% if ex.score is not none %}
-            <span class="session-done__score">{{ ex.score }}</span>
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  </section>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
 
   {# ─── CTA principaux ─── #}
   <div class="session-done__cta">
