@@ -1832,6 +1832,78 @@ details.exercise-card--done .exercise-card__compact .exercise-card__code {
   color: var(--ok);
 }
 
+/* ---- Sb_02.1: jump bar 4 states + enriched exercise footer ---- */
+
+/* future = not started, not active: explicit dim instead of implicit neutral */
+.ex-jump__item--future {
+  color: var(--fg-dim);
+}
+
+/* active = focused card. Takes precedence over done/partial/future. */
+.ex-jump__item--active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.ex-jump__item--active .ex-jump__code {
+  color: var(--accent);
+}
+
+.ex-jump__item--active .ex-jump__prog {
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* Enriched exercise footer: recap + primary CTA side by side */
+.card__actions--exercise {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border);
+}
+
+.card__actions--exercise .btn {
+  flex: 1;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+.card__actions__recap {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+
+/* Sticky CTA on the currently open card only.
+   Keeps validation reachable without scrolling to the very bottom of the form.
+   Pure CSS — no JS. Graceful fallback: if the browser ignores sticky
+   inside <details>, the enriched footer remains perfectly usable. */
+details.exercise-card[open] .card__actions--exercise {
+  position: sticky;
+  bottom: var(--space-sm);
+  background: var(--surface);
+  z-index: 2;
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  margin-left: calc(-1 * var(--space-xs));
+  margin-right: calc(-1 * var(--space-xs));
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+}
+
+/* Hide recap on very narrow screens to avoid wrapping the button label */
+@media (max-width: 360px) {
+  .card__actions__recap {
+    display: none;
+  }
+}
+
 /* ---- Science page ---- */
 .science-section {
   margin-bottom: var(--space-xl);

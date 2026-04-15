@@ -25,14 +25,16 @@
   {% endif %}
 </header>
 
-{# -------- Exercise jump bar (Sprint 5) ---------- #}
+{# -------- Exercise jump bar (Sb_02.1: 4 states) ---------- #}
 {% if session.session_exercises|length > 0 %}
   <nav class="ex-jump" aria-label="Aller à un exercice">
     {% for se in session.session_exercises %}
       {% set d, t = stats.per_exercise[se.id] %}
+      {% set state = jump_states[se.id] %}
       <a
-        class="ex-jump__item {% if t > 0 and d == t %}ex-jump__item--done{% elif d > 0 %}ex-jump__item--partial{% endif %}"
+        class="ex-jump__item ex-jump__item--{{ state }}"
         href="#exercise-{{ se.id }}"
+        aria-current="{% if state == 'active' %}step{% else %}false{% endif %}"
       >
         <span class="ex-jump__code">{{ se.exercise_code_snapshot }}</span>
         <span class="ex-jump__prog">{{ d }}/{{ t }}</span>
@@ -265,9 +267,23 @@
         <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
       {% endcall %}
 
-      <div class="card__actions">
+      {# Sb_02.1: enriched footer with recap + contextual CTA. #}
+      {% set next_code = next_code_by_exercise.get(se.id) %}
+      {% set is_last = next_code is none %}
+      {% set work_total = se.set_logs | selectattr('kind', 'equalto', 'work') | list | length %}
+      {% set work_done = se.set_logs | selectattr('kind', 'equalto', 'work') | selectattr('completed') | list | length %}
+      <div class="card__actions card__actions--exercise">
+        <span class="card__actions__recap" aria-hidden="true">
+          Work : {{ work_done }}/{{ work_total }}
+        </span>
         <button type="submit" class="btn btn--primary">
-          Enregistrer {{ se.exercise_code_snapshot }}
+          {% if is_last %}
+            Enregistrer et terminer
+          {% elif next_code %}
+            Enregistrer et passer à {{ next_code }}
+          {% else %}
+            Enregistrer
+          {% endif %}
         </button>
       </div>
     </form>
