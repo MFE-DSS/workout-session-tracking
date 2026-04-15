@@ -149,3 +149,41 @@ def test_get_session_in_progress_renders_normally(client):
     assert r.status_code == 200
     # Editable = session-feedback form visible on the page
     assert "session-feedback" in r.text
+
+
+def test_done_page_shows_summary_block(client):
+    sid = _mk_completed_session()
+    r = client.get(f"/sessions/{sid}/done")
+    assert r.status_code == 200
+    body = r.text
+    # Summary: factory creates 1 exo × 3 sets with 2/3 completed.
+    assert "Work sets" in body
+    assert "2 / 3" in body
+    assert "79,4" in body or "79.4" in body  # bodyweight
+    # Per-exercise line
+    assert "E1" in body
+    assert "Incline Smith Press" in body
+    assert "2/3" in body
+    # CTAs
+    assert 'href="/dashboard"' in body or "Synthèse" in body
+    assert 'href="/history"' in body or "Historique" in body
+    # Reopen form (discreet)
+    assert "Rouvrir" in body
+    assert f"/sessions/{sid}" in body
+    assert 'name="action" value="reopen"' in body
+
+
+def test_done_page_shows_substitution_arrow(client):
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+
+    sid = _mk_completed_session()
+    with SessionLocal() as db:
+        session = db.get(WorkoutSession, sid)
+        session.session_exercises[0].substituted_name = "Développé couché haltères"
+        db.commit()
+
+    r = client.get(f"/sessions/{sid}/done")
+    assert r.status_code == 200
+    assert "Développé couché haltères" in r.text
+    assert "→" in r.text

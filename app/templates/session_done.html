@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="session-done">
-  <header class="session-done__header">
+
+  {# ─── Header ─── #}
+  <header class="session-done__header card">
     <div class="session-done__badge">✓ Séance terminée</div>
-    <h1 class="page-title">{{ recap.header.template_name }}</h1>
+    <h1 class="page-title session-done__title">{{ recap.header.template_name }}</h1>
     <div class="session-done__meta text-dim">
       {{ recap.header.started_at.strftime('%a %d/%m %H:%M') }}
       {% if recap.header.ended_at %}
@@ -14,5 +16,89 @@
       {% endif %}
     </div>
   </header>
+
+  {# ─── Résumé ─── #}
+  <section class="card session-done__summary">
+    <h2 class="card__title">Résumé</h2>
+    <ul class="session-done__stats">
+      <li>
+        <span>Work sets</span>
+        <b>
+          {{ recap.summary.work_sets_done }} / {{ recap.summary.work_sets_total }}
+          {% if recap.summary.completion_pct is not none %}
+            ({{ recap.summary.completion_pct }}%)
+          {% endif %}
+        </b>
+      </li>
+      {% if recap.summary.substitution_count > 0 %}
+        <li>
+          <span>Substitutions</span>
+          <b>{{ recap.summary.substitution_count }}</b>
+        </li>
+      {% endif %}
+      {% if recap.summary.bodyweight_kg %}
+        <li>
+          <span>Bodyweight</span>
+          <b>{{ "%.1f"|format(recap.summary.bodyweight_kg)|replace('.', ',') }} kg</b>
+        </li>
+      {% endif %}
+      {% if recap.summary.concentration %}
+        <li>
+          <span>Concentration</span>
+          <b>{{ recap.summary.concentration }}</b>
+        </li>
+      {% endif %}
+      {% if recap.summary.global_state %}
+        <li>
+          <span>État</span>
+          <b>{{ recap.summary.global_state }}</b>
+        </li>
+      {% endif %}
+    </ul>
+  </section>
+
+  {# ─── Par exercice ─── #}
+  <section class="card session-done__exercises">
+    <h2 class="card__title">Par exercice</h2>
+    <ul class="session-done__exlist">
+      {% for ex in recap.exercises %}
+        <li class="session-done__exrow">
+          <span class="session-done__code">{{ ex.code }}</span>
+          <span class="session-done__name">
+            {% if ex.substituted_name %}
+              → {{ ex.substituted_name }}
+            {% else %}
+              {{ ex.name }}
+            {% endif %}
+          </span>
+          <span class="session-done__prog">{{ ex.done }}/{{ ex.total }}</span>
+          {% if ex.score is not none %}
+            <span class="session-done__score">{{ ex.score }}</span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {# ─── CTA principaux ─── #}
+  <div class="session-done__cta">
+    <a class="btn btn--primary btn--wide" href="{{ url_for('dashboard') }}">
+      Voir la synthèse →
+    </a>
+    <a class="btn btn--wide" href="{{ url_for('history') }}">
+      Historique →
+    </a>
+  </div>
+
+  {# ─── Rouvrir (discret) ─── #}
+  <form method="post"
+        action="{{ url_for('update_session', session_id=session.id) }}"
+        class="session-done__reopen">
+    <input type="hidden" name="action" value="reopen">
+    <button type="submit" class="btn btn--ghost btn--sm">
+      Rouvrir pour éditer
+    </button>
+  </form>
+
 </div>
 {% endblock %}
