@@ -593,6 +593,42 @@ input, button, textarea, select {
   font-weight: 600;
 }
 
+/* Readiness scale — 1/5 endpoint labels under segmented control */
+.readiness-scale__ends {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--fg-dim);
+}
+.readiness-scale__ends span:last-child { text-align: right; }
+
+.readiness-extra {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+.readiness-extra .input:first-child { flex: 1; max-width: 150px; }
+.readiness-extra .input:last-child  { flex: 2; }
+
+/* Baseline dark input for ad-hoc form fields */
+.input {
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 14px;
+  width: 100%;
+  min-height: 40px;
+}
+.input::placeholder { color: var(--fg-dim); }
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* ---- Tiles (home page) ---- */
 
 .tile-grid {

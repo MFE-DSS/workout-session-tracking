@@ -48,12 +48,12 @@
       <span class="text-dim" style="font-size:11px;font-weight:400;">30 sec</span>
     </summary>
     <p class="text-dim" style="font-size:12px;margin:var(--space-sm) 0;">
-      1×/jour. Alimente la synthèse.
+      1×/jour · 5 = meilleur état. Alimente la synthèse.
     </p>
     <form method="post" action="/readiness" style="margin-top:var(--space-sm);">
       {% for field in readiness_scale_fields %}
-      <div style="margin-bottom:var(--space-xs);">
-        <label style="font-size:13px;display:block;margin-bottom:2px;">{{ readiness_field_labels[field] }}</label>
+      <div style="margin-bottom:var(--space-sm);">
+        <label style="font-size:13px;display:block;margin-bottom:4px;">{{ readiness_field_labels[field] }}</label>
         <div class="segmented">
           {% for val in [1, 2, 3, 4, 5] %}
           <label class="segmented__option">
@@ -62,12 +62,15 @@
           </label>
           {% endfor %}
         </div>
+        <div class="readiness-scale__ends">
+          <span>1 · {{ readiness_labels[field][1] }}</span>
+          <span>5 · {{ readiness_labels[field][5] }}</span>
+        </div>
       </div>
       {% endfor %}
-      <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-sm);">
-        <input type="number" name="resting_hr" placeholder="FC repos (bpm)" min="30" max="200"
-               style="flex:1;max-width:150px;">
-        <input type="text" name="note" placeholder="Note (optionnel)" style="flex:2;">
+      <div class="readiness-extra">
+        <input class="input" type="number" name="resting_hr" placeholder="FC repos (bpm)" min="30" max="200">
+        <input class="input" type="text" name="note" placeholder="Note (optionnel)">
       </div>
       <button type="submit" class="btn btn--primary" style="margin-top:var(--space-sm);width:100%;">Enregistrer mon état</button>
     </form>
