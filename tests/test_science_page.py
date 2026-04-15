@@ -10,7 +10,12 @@ def test_science_page_renders(client):
 
 
 def test_science_page_shows_all_method_rules(client):
-    """All 8 seeded method_rules must appear with their slug anchors."""
+    """All 7 seeded method_rules must appear with their slug anchors.
+
+    DS (Drop Set) has been removed from the legend and rules because no
+    template in the current catalog uses the DS technique. The Technique
+    enum still defines DS for future programs.
+    """
     r = client.get("/science")
     body = r.text
     assert 'id="rule-carnet-progression"' in body
@@ -20,7 +25,8 @@ def test_science_page_shows_all_method_rules(client):
     assert 'id="rule-temps-repos"' in body
     assert 'id="rule-legende-technique"' in body
     assert 'id="rule-rest-pause"' in body
-    assert 'id="rule-drop-sets"' in body
+    # DS removed — no "drop-sets" rule while no template uses DS
+    assert 'id="rule-drop-sets"' not in body
 
 
 def test_science_page_has_architecture_diagram(client):

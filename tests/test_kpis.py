@@ -242,7 +242,7 @@ def test_progress_page_renders_with_real_data(client):
     assert r.status_code == 200
     body = r.text
     # KPI card values render
-    assert "taux de complétion work sets" in body
+    assert "work sets validés" in body
     assert "Push A" in body
     # The explicit rule note is always visible
     assert "sessions terminées" in body
