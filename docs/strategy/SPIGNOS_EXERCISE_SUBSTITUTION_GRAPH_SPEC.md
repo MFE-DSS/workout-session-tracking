@@ -2,8 +2,11 @@
 
 **Sprint:** Sx_03_exercise_substitution_graph_spec
 **Date:** 2026-04-14
-**Status:** Spec approved, pending build
+**Status:** **BUILT (Sb_03)** — Option 1 (JSON-based substitution) en production
 **Prerequisites:** Sb_01 (feedback refactor), Sx_02 spec (mobile UX)
+**Analyse comparative + refinements strategiques :** voir [SPIGNOS_EXERCISE_SUBSTITUTION_GRAPH_REFINEMENTS.md](SPIGNOS_EXERCISE_SUBSTITUTION_GRAPH_REFINEMENTS.md) (Sx_03.1 — Option 1 vs Option 2, 6 triggers de migration, 3 gaps observables)
+**Canonical `Exercise` entity (Option 2) :** DEFERRED — migration conditionnee aux triggers documentes dans Sx_03.1 §5.
+**Consolidation transverse :** voir [SPIGNOS_EXERCISE_SYSTEM_CONSOLIDATION_SPEC.md](SPIGNOS_EXERCISE_SYSTEM_CONSOLIDATION_SPEC.md) (Sx_04)
 
 ---
 

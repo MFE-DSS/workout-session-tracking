@@ -2,8 +2,10 @@
 
 **Sprint:** Sx_02_mobile_exercise_entry_ux_spec
 **Date:** 2026-04-14
-**Status:** Spec approved, pending build
+**Status:** **BUILT (Sb_02)** — flow focus-exercice en production
 **Prerequisite:** Sb_01 (feedback signal refactor) — complete
+**Refinements UX :** voir [SPIGNOS_MOBILE_EXERCISE_ENTRY_UX_REFINEMENTS.md](SPIGNOS_MOBILE_EXERCISE_ENTRY_UX_REFINEMENTS.md) (Sx_02.1 — 3 gaps residuels : jump bar 4 etats, CTA contextuel, footer sticky)
+**Consolidation transverse :** voir [SPIGNOS_EXERCISE_SYSTEM_CONSOLIDATION_SPEC.md](SPIGNOS_EXERCISE_SYSTEM_CONSOLIDATION_SPEC.md) (Sx_04)
 
 ---
 

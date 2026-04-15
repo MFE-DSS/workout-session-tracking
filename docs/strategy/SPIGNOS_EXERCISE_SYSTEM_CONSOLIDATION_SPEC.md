@@ -363,4 +363,9 @@ Le systeme exercice V2 de SPIGNOS est **a maturite**. La gouvernance transverse 
 
 Les deux seuls builds residuels (Sb_02.1 recommande, Sb_03.1 optionnel) n'ajoutent aucun concept, seulement du polish UX et un signal de gouvernance.
 
-**Aucune dette structurelle.** Toute evolution future (Option 2 canonical, Sb_04 full analytics, etc.) est conditionnee a des triggers documentes, pas a une intention abstraite de "propreté".
+**Aucune dette structurelle urgente ou non cadree.** Il reste une dette potentielle de canonisation (Option 2 : entite `Exercise` canonique), mais elle est desormais :
+- documentee (Sx_03.1 §3)
+- surveillee par 6 triggers explicites (Sx_03.1 §5)
+- conditionnelle (aucune obligation de migrer tant que 0 trigger n'est atteint)
+
+Ce n'est plus une zone floue — c'est une capacite future sous surveillance. Toute evolution est conditionnee a des declencheurs documentes, pas a une intention abstraite de "propreté".

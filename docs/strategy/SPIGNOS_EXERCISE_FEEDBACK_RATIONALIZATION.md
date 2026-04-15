@@ -229,3 +229,26 @@ Aucune preference utilisateur persistee — c'est juste un `<details>` HTML nati
 - Pas de changement de consumer
 - Uniquement : 1 template + 1 CSS rule
 - Rollback trivial : retirer le `<details>` et ca revient au comportement actuel
+
+---
+
+## 13. Deviations observees dans Sb_01 (post-build audit, ajoute par Sx_04)
+
+L'audit reel du code (2026-04-14, voir Sx_04 §3.1) a revele que le build Sb_01 s'est ecarte des decisions A+B+A de cette spec sur **3 points**. Ces deviations sont documentees ici pour eviter toute reouverture de debat.
+
+| Decision Sx_01 | Build Sb_01 | Ecart | Arbitrage Sx_04 |
+|----------------|-------------|-------|-----------------|
+| Decision B : `execution_quality` + `reps_target` caches dans `<details>Feedback avance</details>` | Champs non rendus du tout dans le formulaire (pas de `<details>`) | Plus radical que la decision — suppression UI complete | **Accepte.** Gain UX superieur, signal inexploite analytiquement, colonnes DB preservees. |
+| Decision A : `success_score` saisi manuellement visible | Non rendu comme input. Affiche uniquement en lecture (recap, history) | Le champ existe en DB et dans le router mais pas en UI d'entree | **Accepte.** KPIs consommateurs degradent gracieusement avec NULL. Ne pas re-introduire le radio tant qu'aucun user ne le demande. |
+| Decision A : `muscle_sensation` visible et saisi | Wrappe dans `<details>Sensation musculaire (optionnel)</details>` | Mis en "optionnel" plutot que visible par defaut | **Accepte.** Leger ecart sans impact analytique. |
+
+**Consequence analytique a connaitre :**
+
+- `kpis.avg_success_score_30d` → souvent NULL
+- `quality_score` → max effectif ~60/100 (perd les 40 pts de success_score si NULL)
+- `delta.score_trend` → souvent None
+- `exercise_history.success_score` → None sur nouvelles sessions
+
+**Ces comportements sont TOUS deja geres par le code** (checks `is not None` dans les consumers). Aucun bug. Simplement une dynamique de signal reduit qui etait une option du design initial — devenue le comportement reel par decision build.
+
+**Ne pas re-introduire le radio `success_score` dans le formulaire sans trigger produit explicite.**
