@@ -255,6 +255,31 @@ def session_detail(
                 active_exercise_id = se.id
                 break
 
+    # Sb_02.1 — compute jump bar state + next exercise code per card.
+    # States (priority: active overrides others):
+    #   active  = this card is currently focused
+    #   done    = total > 0 and done == total
+    #   partial = 0 < done < total
+    #   future  = done == 0 (and not active)
+    jump_states: dict[int, str] = {}
+    next_code_by_exercise: dict[int, str | None] = {}
+    ordered = list(session.session_exercises)
+    for idx, se in enumerate(ordered):
+        d, t = stats["per_exercise"][se.id]
+        if se.id == active_exercise_id:
+            jump_states[se.id] = "active"
+        elif t > 0 and d == t:
+            jump_states[se.id] = "done"
+        elif d > 0:
+            jump_states[se.id] = "partial"
+        else:
+            jump_states[se.id] = "future"
+
+        if idx + 1 < len(ordered):
+            next_code_by_exercise[se.id] = ordered[idx + 1].exercise_code_snapshot
+        else:
+            next_code_by_exercise[se.id] = None
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -270,6 +295,8 @@ def session_detail(
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
             "substitution_data": substitution_data,
+            "jump_states": jump_states,
+            "next_code_by_exercise": next_code_by_exercise,
         },
     )
 
