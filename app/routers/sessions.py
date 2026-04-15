@@ -147,13 +147,22 @@ WEEKDAY_LABELS = {
 }
 
 
-@router.get("/sessions/{session_id}", response_class=HTMLResponse)
+@router.get(
+    "/sessions/{session_id}",
+    response_class=HTMLResponse,
+    response_model=None,
+)
 def session_detail(
     session_id: int, request: Request, db: DbSession, user: CurrentUser
-) -> HTMLResponse:
+) -> HTMLResponse | RedirectResponse:
     session = _load_session(db, session_id, user.id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+
+    if session.status == SessionStatus.COMPLETED:
+        return RedirectResponse(
+            url=f"/sessions/{session_id}/done", status_code=303
+        )
 
     stats = _session_stats(session)
     rules = db.execute(

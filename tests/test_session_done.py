@@ -124,3 +124,28 @@ def test_action_reopen_redirects_to_editable_session(client):
     )
     assert r.status_code == 303
     assert r.headers["location"] == f"/sessions/{sid}"
+
+
+def test_get_session_completed_redirects_to_done(client):
+    sid = _mk_completed_session()
+    r = client.get(f"/sessions/{sid}", follow_redirects=False)
+    assert r.status_code == 303
+    assert r.headers["location"] == f"/sessions/{sid}/done"
+
+
+def test_get_session_in_progress_renders_normally(client):
+    from app.database import SessionLocal
+    from app.enums import SessionStatus
+    from app.models.session import WorkoutSession
+
+    sid = _mk_completed_session()
+    with SessionLocal() as db:
+        s = db.get(WorkoutSession, sid)
+        s.status = SessionStatus.IN_PROGRESS
+        s.ended_at = None
+        db.commit()
+
+    r = client.get(f"/sessions/{sid}")
+    assert r.status_code == 200
+    # Editable = session-feedback form visible on the page
+    assert "session-feedback" in r.text

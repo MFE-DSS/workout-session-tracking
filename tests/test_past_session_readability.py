@@ -18,55 +18,14 @@ def test_in_progress_session_has_no_completed_marker(client):
     assert "Séance terminée" not in body
 
 
-def test_completed_session_has_readability_markers(client):
-    sid = _start_session(client, "push-a")
-    # End it immediately
-    client.post(
-        f"/sessions/{sid}", data={"action": "end"}, follow_redirects=False
-    )
-    body = client.get(f"/sessions/{sid}").text
-    assert "session-page--completed" in body
-    assert "Séance terminée" in body
-    # Badge shows Terminée, button becomes Rouvrir
-    assert "Terminée" in body
-    assert "Rouvrir" in body
-
-
-def test_completed_session_shows_per_card_summary_when_work_sets_filled(client):
-    from sqlalchemy import select
-
-    from app.database import SessionLocal
-    from app.models.session import SessionExercise, SetLog
-
-    sid = _start_session(client, "push-a")
-    with SessionLocal() as db:
-        se = db.execute(
-            select(SessionExercise)
-            .where(SessionExercise.session_id == sid)
-            .where(SessionExercise.exercise_code_snapshot == "E2")
-        ).scalar_one()
-        se_id = se.id
-        work_ids = [
-            s.id for s in db.execute(
-                select(SetLog)
-                .where(SetLog.session_exercise_id == se_id)
-            ).scalars().all()
-            if s.kind == "work"
-        ]
-
-    data = {"muscle_sensation": "strong"}
-    for i, wid in enumerate(sorted(work_ids), start=1):
-        data[f"set_{wid}_weight_kg"] = str(60 + i)
-        data[f"set_{wid}_reps"] = "10"
-        data[f"set_{wid}_completed"] = "1"
-    client.post(f"/sessions/{sid}/exercises/{se_id}", data=data)
-    client.post(f"/sessions/{sid}", data={"action": "end"})
-
-    body = client.get(f"/sessions/{sid}").text
-    assert "done-summary" in body
-    assert "Work : 3/3" in body
-    assert "61 / 62 / 63 kg" in body
-    assert "score 80" in body
+# NOTE (Sb_R3): the former tests
+#   - test_completed_session_has_readability_markers
+#   - test_completed_session_shows_per_card_summary_when_work_sets_filled
+# asserted against the completed-mode render of session_detail.html.
+# That rendering no longer happens: completed sessions now redirect to
+# /sessions/{id}/done (dedicated recap template). Equivalent coverage
+# lives in tests/test_session_done.py. Task 5 will strengthen the recap
+# assertions (per-exercise work set counts, weights_str).
 
 
 def test_progress_page_has_exercise_activity_section(client):
