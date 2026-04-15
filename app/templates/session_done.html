@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="session-done">
+  <header class="session-done__header">
+    <div class="session-done__badge">✓ Séance terminée</div>
+    <h1 class="page-title">{{ recap.header.template_name }}</h1>
+    <div class="session-done__meta text-dim">
+      {{ recap.header.started_at.strftime('%a %d/%m %H:%M') }}
+      {% if recap.header.ended_at %}
+        → {{ recap.header.ended_at.strftime('%H:%M') }}
+      {% endif %}
+      {% if recap.header.duration_label %}
+        · {{ recap.header.duration_label }}
+      {% endif %}
+    </div>
+  </header>
+</div>
+{% endblock %}

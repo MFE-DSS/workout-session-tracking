@@ -50,6 +50,7 @@ from app.services.form_parsing import (
 )
 from app.services.progression_hint import compute_progression_hint
 from app.services.session_builder import instantiate_session
+from app.services.session_recap import build_recap
 from app.services.session_state import latest_open_session
 from app.services.stats import (
     last_time_by_exercise_code,
@@ -260,6 +261,35 @@ def session_detail(
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
             "substitution_data": substitution_data,
+        },
+    )
+
+
+@router.get(
+    "/sessions/{session_id}/done",
+    response_class=HTMLResponse,
+    name="session_done",
+    response_model=None,
+)
+def session_done(
+    session_id: int, request: Request, db: DbSession, user: CurrentUser
+) -> HTMLResponse | RedirectResponse:
+    session = _load_session(db, session_id, user.id)
+    if session is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    if session.status != SessionStatus.COMPLETED:
+        return RedirectResponse(
+            url=f"/sessions/{session_id}", status_code=303
+        )
+
+    recap = build_recap(session)
+    return templates.TemplateResponse(
+        request,
+        "session_done.html",
+        {
+            "page_title": session.template_name_snapshot,
+            "session": session,
+            "recap": recap,
         },
     )
 
