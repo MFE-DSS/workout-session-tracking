@@ -91,3 +91,36 @@ def test_done_route_404_for_other_users_session(client):
     # reject a session belonging to another user.
     r = client.get("/sessions/999999/done")
     assert r.status_code == 404
+
+
+def test_action_end_redirects_to_done(client):
+    from app.database import SessionLocal
+    from app.enums import SessionStatus
+    from app.models.session import WorkoutSession
+
+    sid = _mk_completed_session()
+    # Downgrade to in_progress so action=end transitions it.
+    with SessionLocal() as db:
+        session = db.get(WorkoutSession, sid)
+        session.status = SessionStatus.IN_PROGRESS
+        session.ended_at = None
+        db.commit()
+
+    r = client.post(
+        f"/sessions/{sid}",
+        data={"action": "end"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    assert r.headers["location"] == f"/sessions/{sid}/done"
+
+
+def test_action_reopen_redirects_to_editable_session(client):
+    sid = _mk_completed_session()  # already status=completed
+    r = client.post(
+        f"/sessions/{sid}",
+        data={"action": "reopen"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    assert r.headers["location"] == f"/sessions/{sid}"

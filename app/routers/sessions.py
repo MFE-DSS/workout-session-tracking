@@ -322,14 +322,24 @@ async def update_session(
         form.get("cardio_machine_type"), max_length=32
     )
 
-    if form.get("action") == "end":
+    action = form.get("action")
+    if action == "end":
         session.ended_at = datetime.now(timezone.utc)
         session.status = SessionStatus.COMPLETED
-    elif form.get("action") == "reopen" and session.status == SessionStatus.COMPLETED:
+    elif action == "reopen" and session.status == SessionStatus.COMPLETED:
         session.ended_at = None
         session.status = SessionStatus.IN_PROGRESS
 
     db.commit()
+
+    if action == "end":
+        return RedirectResponse(
+            url=f"/sessions/{session_id}/done", status_code=303
+        )
+    if action == "reopen":
+        return RedirectResponse(
+            url=f"/sessions/{session_id}", status_code=303
+        )
     return RedirectResponse(
         url=f"/sessions/{session_id}#session-feedback", status_code=303
     )
