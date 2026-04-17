@@ -1,10 +1,10 @@
 {
-  "version": "2026-04-14.v8",
+  "version": "2026-04-15.v9",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
     "Phase excentrique fluide 2-3s, concentrique explosive mais contrôlée",
-    "Repos inter-séries 90-150s sauf indication contraire",
+    "Repos différencié selon l'effort : mouvements lourds multiarticulaires (hack squat, leg press, RDL, presses inclinées, rowings lourds, shoulder press) 2-3 minutes minimum ; isolation et accessoires (curls, extensions, élévations latérales, mollets) 60-90 secondes ; séries très près de l'échec ou techniques RP/DS 90-120 secondes",
     "Surcharge progressive: charge OU reps, sans sacrifier l'exécution"
   ],
   "templates": [
@@ -21,7 +21,9 @@
           "name": "Incline Smith Press",
           "set_scheme": "3x 6-10",
           "notes": "Banc incliné 30°, descente contrôlée sur le haut des pecs.",
-          "substitutes": ["Développé incliné haltères 30°"],
+          "substitutes": [
+            "Développé incliné haltères 30°"
+          ],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -42,7 +44,10 @@
           "code": "E2",
           "name": "Chest Press machine",
           "set_scheme": "3x 8-12",
-          "substitutes": ["Développé couché haltères", "Dips pectoraux (buste penché)"],
+          "substitutes": [
+            "Développé couché haltères",
+            "Dips pectoraux (buste penché)"
+          ],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -84,7 +89,9 @@
           "code": "E4",
           "name": "Neutral Grip Shoulder Press machine",
           "set_scheme": "3x 8-12",
-          "substitutes": ["Machine shoulder press"],
+          "substitutes": [
+            "Machine shoulder press"
+          ],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -228,7 +235,10 @@
           "name": "Développé couché haltères",
           "set_scheme": "3x 6-10",
           "notes": "Descendre profond pour maximiser l'étirement pectoral.",
-          "substitutes": ["Chest Press machine", "Incline Smith Press"],
+          "substitutes": [
+            "Chest Press machine",
+            "Incline Smith Press"
+          ],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -287,6 +297,10 @@
               "min_reps": 12,
               "max_reps": 20
             }
+          ],
+          "substitutes": [
+            "Élévations latérales câble",
+            "Élévations latérales machine"
           ]
         },
         {
@@ -308,6 +322,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Upright row haltères",
+            "Upright row câble"
           ]
         },
         {
@@ -329,6 +347,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Reverse fly machine",
+            "Y-raise haltère"
           ]
         },
         {
@@ -349,6 +371,10 @@
               "min_reps": 10,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Pushdown corde",
+            "Extension overhead câble (corde)"
           ]
         }
       ],
@@ -381,6 +407,10 @@
               "min_reps": 6,
               "max_reps": 10
             }
+          ],
+          "substitutes": [
+            "Traction assistée machine",
+            "Lat pulldown prise large"
           ]
         },
         {
@@ -402,6 +432,10 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Lat pulldown prise neutre",
+            "Traction assistée unilatérale"
           ]
         },
         {
@@ -423,6 +457,10 @@
               "min_reps": 10,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Pullover machine",
+            "Straight-arm pulldown câble"
           ]
         },
         {
@@ -430,7 +468,10 @@
           "code": "E4",
           "name": "Rear delt fly machine (pec deck inversé)",
           "set_scheme": "3x 12-15",
-          "substitutes": ["Écarté arrière d'épaule câble", "Face pull câble"],
+          "substitutes": [
+            "Écarté arrière d'épaule câble",
+            "Face pull câble"
+          ],
           "rep_targets": [
             {
               "min_reps": 12,
@@ -465,6 +506,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Reverse fly machine",
+            "Y-raise haltère"
           ]
         }
       ],
@@ -484,7 +529,10 @@
           "name": "Rowing machine chest-supported",
           "set_scheme": "3x 6-10",
           "notes": "Support poitrine pour isoler le dos sans compensation lombaire.",
-          "substitutes": ["Rowing haltère un bras (banc)", "Rowing câble assis prise neutre"],
+          "substitutes": [
+            "Rowing haltère un bras (banc)",
+            "Rowing câble assis prise neutre"
+          ],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -518,6 +566,10 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Rowing chest-supported",
+            "Rowing haltère un bras"
           ]
         },
         {
@@ -560,6 +612,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Shrugs barre",
+            "Shrugs câble"
           ]
         },
         {
@@ -581,6 +637,11 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Curl debout haltères",
+            "Preacher curl",
+            "Curl câble basse"
           ]
         },
         {
@@ -618,6 +679,10 @@
               "min_reps": 10,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Curl marteau câble corde",
+            "Curl prise neutre câble"
           ]
         }
       ],
@@ -637,7 +702,10 @@
           "name": "Hack Squat machine",
           "set_scheme": "3x 6-10",
           "notes": "Pieds bas et serrés pour maximiser le travail des quadriceps.",
-          "substitutes": ["Squat Smith machine (pieds avancés)", "Leg Press (pieds bas, serrés)"],
+          "substitutes": [
+            "Squat Smith machine (pieds avancés)",
+            "Leg Press (pieds bas, serrés)"
+          ],
           "rep_targets": [
             {
               "min_reps": 6,
@@ -659,7 +727,9 @@
           "name": "Leg Press (pieds bas, serrés)",
           "set_scheme": "3x 8-12",
           "notes": "Pieds bas sur la plateforme pour cibler les quadriceps.",
-          "substitutes": ["Hack Squat machine"],
+          "substitutes": [
+            "Hack Squat machine"
+          ],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -693,6 +763,11 @@
               "min_reps": 10,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Sissy squat machine",
+            "Reverse Nordic",
+            "Leg extension câble unilatéral"
           ]
         },
         {
@@ -713,6 +788,10 @@
               "min_reps": 10,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Leg curls allongé",
+            "Sliding leg curl"
           ]
         },
         {
@@ -811,6 +890,11 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Romanian Deadlift barre",
+            "Back extension 45° (bias ischios)",
+            "Good morning haltères"
           ]
         },
         {
@@ -831,6 +915,10 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Leg curls assis",
+            "Sliding leg curl"
           ]
         },
         {
@@ -860,7 +948,9 @@
           "name": "Hip thrust Smith machine",
           "set_scheme": "3x 8-12",
           "notes": "Dos contre le banc, pousser les hanches vers le plafond, squeeze en haut.",
-          "substitutes": ["Hip thrust haltères"],
+          "substitutes": [
+            "Hip thrust haltères"
+          ],
           "rep_targets": [
             {
               "min_reps": 8,
@@ -894,6 +984,11 @@
               "min_reps": 10,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Sissy squat machine",
+            "Reverse Nordic",
+            "Leg extension câble unilatéral"
           ]
         },
         {
@@ -919,6 +1014,10 @@
               "min_reps": 15,
               "max_reps": 20
             }
+          ],
+          "substitutes": [
+            "Mollets debout machine",
+            "Calf press leg press"
           ]
         },
         {
@@ -940,6 +1039,11 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Machine crunch",
+            "Hanging knee raise",
+            "Decline crunch"
           ]
         }
       ],
@@ -1599,6 +1703,11 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Machine crunch",
+            "Hanging knee raise",
+            "Decline crunch"
           ]
         },
         {
@@ -1692,6 +1801,10 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Traction assistée machine",
+            "Lat pulldown prise large"
           ]
         },
         {
@@ -1712,6 +1825,11 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Shoulder press haltères assis",
+            "Smith shoulder press",
+            "Arnold press"
           ]
         },
         {
@@ -1732,6 +1850,10 @@
               "min_reps": 12,
               "max_reps": 20
             }
+          ],
+          "substitutes": [
+            "Élévations latérales haltères",
+            "Élévations latérales machine"
           ]
         },
         {
@@ -1780,6 +1902,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Reverse fly machine",
+            "Y-raise haltère"
           ]
         }
       ],
@@ -1811,6 +1937,11 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Shoulder press haltères assis",
+            "Smith shoulder press",
+            "Arnold press"
           ]
         },
         {
@@ -1861,6 +1992,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Élévations latérales câble",
+            "Élévations latérales machine"
           ]
         },
         {
@@ -1882,6 +2017,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Upright row haltères",
+            "Upright row câble"
           ]
         },
         {
@@ -1923,6 +2062,10 @@
               "min_reps": 12,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Reverse fly machine",
+            "Y-raise haltère"
           ]
         }
       ],
@@ -1955,6 +2098,11 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Curl debout haltères",
+            "Preacher curl",
+            "Curl câble basse"
           ]
         },
         {
@@ -2038,6 +2186,10 @@
               "min_reps": 8,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Extension overhead câble (corde)",
+            "Pushdown corde"
           ]
         },
         {
@@ -2058,6 +2210,10 @@
               "min_reps": 10,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Pushdown corde",
+            "Extension overhead câble (corde)"
           ]
         },
         {
@@ -2107,6 +2263,10 @@
               "min_reps": 6,
               "max_reps": 10
             }
+          ],
+          "substitutes": [
+            "Traction assistée machine",
+            "Lat pulldown prise large"
           ]
         },
         {
@@ -2149,6 +2309,10 @@
               "min_reps": 10,
               "max_reps": 12
             }
+          ],
+          "substitutes": [
+            "Lat pulldown prise neutre",
+            "Traction assistée unilatérale"
           ]
         },
         {
@@ -2170,6 +2334,10 @@
               "min_reps": 10,
               "max_reps": 15
             }
+          ],
+          "substitutes": [
+            "Pullover machine",
+            "Straight-arm pulldown câble"
           ]
         },
         {
