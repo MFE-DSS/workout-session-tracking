@@ -47,13 +47,15 @@ def test_library_shows_catalog_sections(client):
     assert "Biais dos" not in body
 
 
-def test_push_a_detail_has_all_eight_exercises(client):
+def test_push_a_detail_has_all_seven_exercises(client):
+    # v10: Push A reduit a 7 exercices (E8 retire pour respecter cible 1h15)
     r = client.get("/library/push-a")
     assert r.status_code == 200
     body = r.text
     assert "Pectoraux, Deltoïdes, Triceps" in body
-    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]:
+    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
         assert code in body
+    assert "E8" not in body
 
 
 def test_pull_a_has_five_exercises(client):

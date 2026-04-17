@@ -258,7 +258,7 @@ def test_export_then_restore_round_trip(client):
         exercises = db.execute(
             select(SessionExercise).where(SessionExercise.session_id == s.id)
         ).scalars().all()
-        assert len(exercises) == 8  # Push A has 8 exercises
+        assert len(exercises) == 7  # Push A has 7 exercises (v10)
 
         e2 = next(e for e in exercises if e.exercise_code_snapshot == "E2")
         assert e2.success_score in {100, 80, 50}  # derived by compute_success_score

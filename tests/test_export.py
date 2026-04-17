@@ -81,8 +81,8 @@ def test_export_contains_session_exercise_and_set_fields(client):
     assert s["started_at"] is not None
     assert s["ended_at"] is not None
 
-    # 8 exercise cards on Push A
-    assert len(s["exercises"]) == 8
+    # 7 exercise cards on Push A (v10: E8 removed for 1h15 budget)
+    assert len(s["exercises"]) == 7
     e2 = next(e for e in s["exercises"] if e["code"] == "E2")
     assert e2["name"] == "Chest Press machine"
     assert e2["success_score"] in {100, 80, 50}  # derived by compute_success_score

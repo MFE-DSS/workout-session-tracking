@@ -33,13 +33,12 @@ def test_builder_prepopulates_warmup_and_work_rows(client):
 
     db, tpl = _get_template("push-a")
     with db:
-        # Push A has 8 exercises with various rep_target counts.
-        # Butterfly pec = 2 work sets, Incline Smith = 3, etc.
+        # Push A has 7 exercises (v10: E8 removed for 1h15 budget).
         session = instantiate_session(db, tpl, datetime(2026, 1, 5, 18, 0, tzinfo=timezone.utc))
         db.commit()
         db.refresh(session)
 
-        assert len(session.session_exercises) == 8
+        assert len(session.session_exercises) == 7
         assert session.template_slug_snapshot == "push-a"
         assert session.template_name_snapshot.startswith("Push A")
 

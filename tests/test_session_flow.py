@@ -89,10 +89,10 @@ def test_created_session_has_one_session_exercise_per_template_exercise(client):
     sid = _start_session(client, "push-a")
     with SessionLocal() as db:
         ses = db.query(SessionExercise).filter(SessionExercise.session_id == sid).all()
-        # Push A has 8 exercises
-        assert len(ses) == 8
+        # Push A has 7 exercises (v10: E8 removed for 1h15 budget)
+        assert len(ses) == 7
         codes = sorted(se.exercise_code_snapshot for se in ses)
-        assert codes == sorted(["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"])
+        assert codes == sorted(["E1", "E2", "E3", "E4", "E5", "E6", "E7"])
 
 
 def test_created_session_pre_populates_warmup_and_work_sets(client):
@@ -139,8 +139,8 @@ def test_session_detail_renders_full_tree(client):
     assert "Push A" in body
     # Weekday label derived from started_at
     assert any(d in body for d in ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"])
-    # All 8 exercise cards are rendered
-    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]:
+    # All 7 exercise cards are rendered (v10)
+    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
         assert code in body
     # Session feedback form present
     assert 'name="concentration"' in body

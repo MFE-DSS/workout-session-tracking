@@ -47,9 +47,9 @@ def _e2_ids(sid: int) -> tuple[int, list[int]]:
 def test_jump_bar_renders_one_item_per_exercise(client):
     sid = _start(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    # Push A has 8 exercises -> 8 jump items + 1 feedback shortcut
+    # Push A has 7 exercises (v10) -> 7 jump items + 1 feedback shortcut
     assert 'class="ex-jump"' in body
-    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"]:
+    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
         assert f'>{code}</span>' in body
     # FB shortcut to #session-feedback
     assert "#session-feedback" in body
@@ -240,6 +240,6 @@ def test_session_detail_has_warmup_and_work_subheaders(client):
     body = client.get(f"/sessions/{sid}").text
     # Both group titles must show up at least once per card
     assert "set-group-title" in body
-    # Warmup subheading appears for every exercise (8 cards)
-    assert body.count(">Échauffement</h4>") >= 8
-    assert body.count(">Travail</h4>") >= 8
+    # Warmup subheading appears for every exercise (7 cards in v10)
+    assert body.count(">Échauffement</h4>") >= 7
+    assert body.count(">Travail</h4>") >= 7

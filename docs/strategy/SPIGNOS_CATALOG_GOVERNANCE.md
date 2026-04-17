@@ -58,3 +58,34 @@ These are intentional design choices, not bugs:
 3. **Archived templates overlap with core templates** — the 4 archived
    templates are pre-PPL-split legacy. Retained for users who started
    sessions with them. Hidden from the catalog UI but still functional.
+
+## Volume Policy (v10+)
+
+Sessions are designed to fit within **~1h15 max** of gym time. With
+warmups and rest, this corresponds to roughly **~21 work sets per
+session**.
+
+When a template would exceed this budget, the catalog favors **trimming
+non-essential or duplicate exercises** rather than enriching shorter
+templates. Rationale:
+
+- A user can always **add an exercise manually** at the gym if they have
+  extra time
+- A user **cannot remove** a prescribed exercise without breaking the
+  template's coherence
+- Shorter templates respect the time constraint by default; users with
+  more time use that flexibility actively
+
+Reference benchmark for v10:
+
+| Template | Exercices | Work sets | Duree estimee |
+|----------|-----------|-----------|---------------|
+| push-a | 7 | 21 | ~74 min |
+| push-b | 7 | 22 | ~77 min |
+| pull-a | 5 | 15 | ~52 min (court par design — focus largeur) |
+| pull-b | 7 | 20 | ~70 min |
+| legs-a | 7 | 22 | ~77 min |
+| legs-b | 7 | 22 | ~77 min |
+
+Templates a 22 sets sont accepts comme borderline. Au-dela de 22 sets,
+le sprint Sb_catalog_balance applique une reduction (cf. v10).

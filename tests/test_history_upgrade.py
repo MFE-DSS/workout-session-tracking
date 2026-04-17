@@ -14,8 +14,8 @@ def test_history_shows_exercise_counts(client):
     _start(client, "push-a")
     r = client.get("/history")
     body = r.text
-    # Push A has 8 exercise cards; none are completed yet
-    assert "0/8 exos" in body
+    # Push A has 7 exercise cards (v10); none are completed yet
+    assert "0/7 exos" in body
 
 
 def test_history_status_filter_in_progress(client):

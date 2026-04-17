@@ -73,8 +73,8 @@ def test_last_time_is_absent_when_no_prior_session(client):
     r = client.get(f"/sessions/{sid}")
     assert r.status_code == 200
     body = r.text
-    # The "Aucune séance précédente" state must render for every exercise
-    assert body.count("Aucune séance précédente") >= 8
+    # The "Aucune séance précédente" state must render for every exercise (7 in v10)
+    assert body.count("Aucune séance précédente") >= 7
 
 
 def test_last_time_shows_weights_and_reps_when_prior_exists(client):
@@ -133,7 +133,7 @@ def test_current_session_is_excluded_from_its_own_last_time(client):
     # The E1 card must still show the empty "last time" state.
     # We verify by locating the E1 card's section and checking its
     # surrounding last-time block says "Aucune séance précédente".
-    assert body.count("Aucune séance précédente") >= 8  # still 8 empty blocks
+    assert body.count("Aucune séance précédente") >= 7  # still 7 empty blocks (v10)
 
 
 def test_last_time_uses_only_completed_work_sets(client):

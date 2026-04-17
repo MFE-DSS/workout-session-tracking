@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-15.v9",
+  "version": "2026-04-15.v10",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -111,14 +111,9 @@
           "position": 5,
           "code": "E5",
           "name": "Élévations latérales câble (derrière le dos)",
-          "set_scheme": "4x 12-20 (RP)",
+          "set_scheme": "3x 12-20 (RP)",
           "notes": "Rest-pause: repos 10-15s entre mini-séries jusqu'à atteindre la cible.",
           "rep_targets": [
-            {
-              "min_reps": 12,
-              "max_reps": 20,
-              "technique": "RP"
-            },
             {
               "min_reps": 12,
               "max_reps": 20,
@@ -161,27 +156,6 @@
           "code": "E7",
           "name": "Triceps extension poulie haute (corde)",
           "set_scheme": "3x 10-15",
-          "rep_targets": [
-            {
-              "min_reps": 10,
-              "max_reps": 15
-            },
-            {
-              "min_reps": 10,
-              "max_reps": 15
-            },
-            {
-              "min_reps": 10,
-              "max_reps": 15
-            }
-          ]
-        },
-        {
-          "position": 8,
-          "code": "E8",
-          "name": "Extension triceps overhead câble",
-          "set_scheme": "3x 10-15",
-          "notes": "Étirer le long chef du triceps en position haute.",
           "rep_targets": [
             {
               "min_reps": 10,
