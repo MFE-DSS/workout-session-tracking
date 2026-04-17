@@ -1,8 +1,8 @@
 # Catalog QA Report
 
-**Generated:** 2026-04-14  
+**Generated:** 2026-04-17  
 **Catalog:** `data/reference_split.json`  
-**Templates:** 16 | **Exercises:** 97  
+**Templates:** 16 | **Exercises:** 96  
 
 ## Status: PASS
 
