@@ -242,4 +242,5 @@ def test_session_detail_has_warmup_and_work_subheaders(client):
     assert "set-group-title" in body
     # Warmup subheading appears for every exercise (7 cards in v10)
     assert body.count(">Échauffement</h4>") >= 7
-    assert body.count(">Travail</h4>") >= 7
+    # "Travail" heading now includes a C05 hint span; count the heading text
+    assert body.count("Travail\n") >= 7 or body.count("Travail ") >= 7 or body.count(">Travail<") >= 7

@@ -1019,6 +1019,25 @@ input, button, textarea, select {
 
 .set-group-title--work { color: var(--fg); }
 
+/* Sb_06 C05: discrete load convention hint inside the Travail heading */
+.set-group-title__hint {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--fg-dim);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: var(--space-sm);
+  display: inline;
+}
+
+@media (max-width: 360px) {
+  .set-group-title__hint {
+    display: block;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+}
+
 .set-list {
   list-style: none;
   padding: 0;

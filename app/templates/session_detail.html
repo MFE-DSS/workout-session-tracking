@@ -208,7 +208,10 @@
         </ul>
 
         {% if work_sets|length > 0 %}
-          <h4 class="set-group-title set-group-title--work">Travail</h4>
+          <h4 class="set-group-title set-group-title--work">
+            Travail
+            <span class="set-group-title__hint">kg = comme affiché sur l'équipement</span>
+          </h4>
         {% endif %}
         <ul class="set-list">
           {% for sl in work_sets %}
