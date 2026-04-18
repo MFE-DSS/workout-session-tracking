@@ -13,7 +13,7 @@
         <a class="admin-row__link" href="{{ url_for('session_detail', session_id=s.id) }}">
           <div class="admin-row__head">
             <span class="admin-row__name">{{ s.template_name_snapshot }}</span>
-            <span class="admin-row__date">{{ s.started_at.strftime('%d/%m %H:%M') }}</span>
+            <span class="admin-row__date">{{ (s.started_at | local).strftime('%d/%m %H:%M') }}</span>
           </div>
           <div class="admin-row__meta">
             <span class="badge badge--{{ s.status }}">

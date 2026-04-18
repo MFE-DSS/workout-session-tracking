@@ -32,7 +32,7 @@
         >
           <div class="history-row__head">
             <span class="history-row__date">
-              {{ e.started_at.strftime('%a %d/%m %H:%M') }}
+              {{ (e.started_at | local).strftime('%a %d/%m %H:%M') }}
             </span>
             <span class="badge badge--{{ e.status }}">
               {% if e.status == 'in_progress' %}en cours{% else %}terminée{% endif %}

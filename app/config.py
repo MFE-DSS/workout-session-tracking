@@ -14,6 +14,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Default timezone for rendering session dates and weekday labels.
+# Storage remains UTC; only the display layer converts.
+# V2 may introduce per-user timezone preference.
+DEFAULT_TIMEZONE = "Europe/Paris"
+
 
 class Settings(BaseSettings):
     app_env: str = Field(default="dev")

@@ -7,7 +7,7 @@
     <div class="tile__label">Reprendre · en cours</div>
     <div class="tile__hint">
       {{ open_session.template_name_snapshot }} ·
-      démarrée le {{ open_session.started_at.strftime('%d/%m %H:%M') }}
+      démarrée le {{ (open_session.started_at | local).strftime('%d/%m %H:%M') }}
       {% if open_since %}· depuis {{ open_since }}{% endif %}
     </div>
   </a>

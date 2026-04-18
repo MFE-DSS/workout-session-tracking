@@ -123,7 +123,7 @@
           <label for="share-session"><strong>Séance</strong></label><br>
           <select id="share-session" name="session_id" required style="width:100%;">
             {% for s in user_sessions %}
-              <option value="{{ s.id }}">{{ s.template_name_snapshot }} - {{ s.started_at.strftime('%d/%m/%Y') }}</option>
+              <option value="{{ s.id }}">{{ s.template_name_snapshot }} - {{ (s.started_at | local).strftime('%d/%m/%Y') }}</option>
             {% endfor %}
           </select>
         </div>

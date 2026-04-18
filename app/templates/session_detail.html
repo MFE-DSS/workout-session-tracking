@@ -10,7 +10,7 @@
   <h1 class="page-title">{{ session.template_name_snapshot }}</h1>
   <div class="session-header__meta">
     <span>{{ weekday_label }}</span>
-    <span>{{ session.started_at.strftime('%d/%m %H:%M') }}</span>
+    <span>{{ (session.started_at | local).strftime('%d/%m %H:%M') }}</span>
     <span class="badge badge--{{ session.status }}">
       {% if session.status == 'in_progress' %}En cours{% else %}Terminée{% endif %}
     </span>

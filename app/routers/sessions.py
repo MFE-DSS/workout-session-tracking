@@ -56,7 +56,7 @@ from app.services.stats import (
     last_time_by_exercise_code,
     summarise_current_exercise,
 )
-from app.templating import templates
+from app.templating import local_weekday_iso, templates
 
 router = APIRouter(tags=["sessions"])
 
@@ -286,7 +286,7 @@ def session_detail(
         {
             "page_title": session.template_name_snapshot,
             "session": session,
-            "weekday_label": WEEKDAY_LABELS[session.weekday_iso],
+            "weekday_label": WEEKDAY_LABELS[local_weekday_iso(session.started_at) or session.weekday_iso],
             "stats": stats,
             "rules": rules,
             "last_time": last_time,
