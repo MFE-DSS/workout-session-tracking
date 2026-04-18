@@ -42,12 +42,13 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def _write_valid_backup(backup_dir: Path, *, count: int = 0, name: str = "sessions-20260408_0330.json") -> Path:
+    from app.services.export_builder import SCHEMA_VERSION
     backup_dir.mkdir(parents=True, exist_ok=True)
     path = backup_dir / name
     path.write_text(
         json.dumps(
             {
-                "schema_version": 1,
+                "schema_version": SCHEMA_VERSION,
                 "exported_at": "2026-04-08T03:30:00+00:00",
                 "count": count,
                 "sessions": [{} for _ in range(count)],
@@ -63,9 +64,10 @@ def test_verifier_ok_on_valid_empty_backup(client, tmp_path):
 
     backup_dir = tmp_path / "backups"
     _write_valid_backup(backup_dir, count=0)
+    from app.services.export_builder import SCHEMA_VERSION
     result = verify_latest_backup(backup_dir)
     assert result.ok is True
-    assert result.schema_version == 1
+    assert result.schema_version == SCHEMA_VERSION
     assert result.exported_count == 0
     assert result.errors == []
     assert "ok" in result.summary
@@ -154,9 +156,10 @@ def test_verifier_fails_on_count_sessions_mismatch(client, tmp_path):
 
     backup_dir = tmp_path / "backups"
     backup_dir.mkdir()
+    from app.services.export_builder import SCHEMA_VERSION
     (backup_dir / "sessions-20260408_0330.json").write_text(
         json.dumps(
-            {"schema_version": 1, "count": 5, "sessions": [{}, {}]}
+            {"schema_version": SCHEMA_VERSION, "count": 5, "sessions": [{}, {}]}
         )
     )
     result = verify_latest_backup(backup_dir)
@@ -193,8 +196,9 @@ def test_verifier_picks_json_not_csv_when_csv_is_newer(client, tmp_path):
     backup_dir.mkdir()
     json_file = backup_dir / "sessions-20260408_0330.json"
     csv_file = backup_dir / "sessions-20260408_0330.csv"
+    from app.services.export_builder import SCHEMA_VERSION
     json_file.write_text(
-        json.dumps({"schema_version": 1, "count": 0, "sessions": []})
+        json.dumps({"schema_version": SCHEMA_VERSION, "count": 0, "sessions": []})
     )
     csv_file.write_text("session_id,started_at\n")
     # Force CSV to be newer by touching it
@@ -258,7 +262,8 @@ def test_healthz_strict_ok_with_valid_backup(client, tmp_path, monkeypatch):
     assert payload["status"] == "ok"
     assert payload["backup"]["present"] is True
     assert payload["backup"]["valid"] is True
-    assert payload["backup"]["schema_version"] == 1
+    from app.services.export_builder import SCHEMA_VERSION
+    assert payload["backup"]["schema_version"] == SCHEMA_VERSION
     assert payload["backup"]["exported_count"] == 0
     assert payload["backup"]["live_session_count"] == 0
     assert payload["backup"]["errors"] == []
@@ -372,7 +377,8 @@ def test_verify_backup_script_succeeds_on_valid_backup(client, tmp_path):
     )
     assert result.returncode == 0, result.stderr
     assert "verify_backup: [OK ]" in result.stdout
-    assert "schema_version     : 1" in result.stdout
+    from app.services.export_builder import SCHEMA_VERSION
+    assert f"schema_version     : {SCHEMA_VERSION}" in result.stdout
 
 
 def test_verify_backup_script_fails_on_missing_backup(client, tmp_path):

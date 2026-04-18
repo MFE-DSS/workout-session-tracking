@@ -19,8 +19,13 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.session import SessionExercise, WorkoutSession
+from app.services.confidence import compute_confidence_score, level_for
+from app.services.quality_score import session_kind
 
-SCHEMA_VERSION = 1
+# Schema version bump at Sb_09:
+# v2 adds per-session fields ``session_kind``, ``quality_score``,
+# ``confidence_score`` and ``confidence_level`` to both JSON and CSV.
+SCHEMA_VERSION = 2
 
 
 # ---------------------------------------------------------------------------
@@ -35,6 +40,13 @@ def _iso(dt: datetime | None) -> str | None:
 def serialise_session(s: WorkoutSession) -> dict[str, Any]:
     """One session as a nested dict, ready for JSON."""
     exercises_sorted = sorted(s.session_exercises, key=lambda x: x.position)
+    # Sb_09 — kind + confidence score enrich the export schema (v2).
+    # Only meaningful for completed sessions; unfinished ones still get
+    # the fields for schema regularity (score will be low).
+    _kind = session_kind(s)
+    from app.services.quality_score import compute_session_quality
+    _quality = compute_session_quality(s) if s.status == "completed" else None
+    _confidence = compute_confidence_score(s) if s.status == "completed" else None
     return {
         "id": s.id,
         "status": s.status,
@@ -42,6 +54,10 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
         "ended_at": _iso(s.ended_at),
         "template_slug": s.template_slug_snapshot,
         "template_name": s.template_name_snapshot,
+        "session_kind": _kind,
+        "quality_score": _quality,
+        "confidence_score": _confidence,
+        "confidence_level": level_for(_confidence) if _confidence is not None else None,
         "concentration": s.concentration,
         "global_state": s.global_state,
         "bodyweight_kg": s.bodyweight_kg,
@@ -122,6 +138,10 @@ CSV_HEADERS = [
     "status",
     "template_slug",
     "template_name",
+    "session_kind",
+    "quality_score",
+    "confidence_score",
+    "confidence_level",
     "concentration",
     "global_state",
     "bodyweight_kg",
@@ -164,7 +184,12 @@ def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
     writer = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
     writer.writerow(CSV_HEADERS)
 
+    from app.services.quality_score import compute_session_quality
     for s in sessions:
+        _kind = session_kind(s)
+        _quality = compute_session_quality(s) if s.status == "completed" else None
+        _confidence = compute_confidence_score(s) if s.status == "completed" else None
+        _level = level_for(_confidence) if _confidence is not None else None
         s_cols = [
             _opt(s.id),
             _opt(s.started_at.isoformat() if s.started_at else None),
@@ -172,6 +197,10 @@ def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
             _opt(s.status),
             _opt(s.template_slug_snapshot),
             _opt(s.template_name_snapshot),
+            _opt(_kind),
+            _opt(_quality),
+            _opt(_confidence),
+            _opt(_level),
             _opt(s.concentration),
             _opt(s.global_state),
             _opt(s.bodyweight_kg),

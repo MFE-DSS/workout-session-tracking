@@ -333,10 +333,12 @@ def profile_page(
         )
     ).scalars().all()
 
+    from app.services.quality_score import session_kind as _session_kind
     quality_points = [
         TimelinePoint(
             label=s.started_at.strftime("%d/%m"),
             value=compute_session_quality(s),
+            kind=_session_kind(s),
         )
         for s in sessions_30d
     ]

@@ -22,6 +22,18 @@ from dataclasses import dataclass
 class TimelinePoint:
     label: str       # X axis label (e.g., "05/04")
     value: float     # Y axis value
+    kind: str | None = None  # "strength" | "cardio" | None (Sb_09)
+
+
+# Sb_09 — canonical palette for session-kind dispatch in timeline dots.
+KIND_COLORS: dict[str, str] = {
+    "strength": "#f25f3a",
+    "cardio": "#38b2ac",
+}
+KIND_LABELS: dict[str, str] = {
+    "strength": "musculation",
+    "cardio": "cardio",
+}
 
 
 def _compute_smart_range(values: list[float], padding_factor: float = 0.5) -> tuple[float, float]:
@@ -173,6 +185,8 @@ def _build_svg(
         cx = x_pos(i)
         cy = y_pos(p.value)
         val_txt = f"{p.value:g}{unit}"
+        # Per-point color if kind is provided and resolves in the palette.
+        dot_color = KIND_COLORS.get(p.kind, color) if p.kind else color
 
         if interactive:
             # Group with hover behavior (CSS enlarges circle + shows label)
@@ -185,7 +199,7 @@ def _build_svg(
             # Visible dot
             parts.append(
                 f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{dot_radius}" '
-                f'fill="{color}" class="chart-point__dot"/>'
+                f'fill="{dot_color}" class="chart-point__dot"/>'
             )
             # Value label (hidden by default, shown on hover via CSS)
             label_y = cy - 14
@@ -211,7 +225,7 @@ def _build_svg(
             parts.append('</g>')
         else:
             parts.append(
-                f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{dot_radius}" fill="{color}"/>'
+                f'<circle cx="{cx:.1f}" cy="{cy:.1f}" r="{dot_radius}" fill="{dot_color}"/>'
             )
 
     # X axis labels
@@ -281,10 +295,13 @@ def build_sparkline_svg(
     width: int = 200,
     height: int = 40,
     color: str = "#f25f3a",
+    kinds: list[str | None] | None = None,
 ) -> str | None:
     """Build a compact sparkline SVG (no axes, no labels).
 
-    Input: list of tuples where first element is the score value.
+    Input: list of tuples where the first element is the score value.
+    If ``kinds`` is provided (same length as ``scores``), each data point
+    gets a coloured dot based on session kind (Sb_09 dispatcher).
     Returns None if fewer than 2 data points.
     """
     if len(scores) < 2:
@@ -309,6 +326,17 @@ def build_sparkline_svg(
 
     coords = " ".join(f"{x_pos(i):.1f},{y_pos(v):.1f}" for i, v in enumerate(values))
 
+    dots = ""
+    if kinds and len(kinds) == n:
+        dot_parts: list[str] = []
+        for i, k in enumerate(kinds):
+            c = KIND_COLORS.get(k, color) if k else color
+            dot_parts.append(
+                f'<circle cx="{x_pos(i):.1f}" cy="{y_pos(values[i]):.1f}" '
+                f'r="2.5" fill="{c}"/>'
+            )
+        dots = "".join(dot_parts)
+
     return (
         f'<svg viewBox="0 0 {width} {height}" '
         f'xmlns="http://www.w3.org/2000/svg" '
@@ -317,6 +345,7 @@ def build_sparkline_svg(
         f'<polyline points="{coords}" fill="none" '
         f'stroke="{color}" stroke-width="2" '
         f'stroke-linejoin="round" stroke-linecap="round"/>'
+        f'{dots}'
         f'</svg>'
     )
 

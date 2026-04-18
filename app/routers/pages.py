@@ -91,7 +91,9 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     )
     recent_sessions = list(db.execute(sparkline_stmt).scalars().all())
 
+    from app.services.quality_score import session_kind as _session_kind
     sparkline_points = []
+    sparkline_kinds: list[str | None] = []
     for s in recent_sessions:
         quality = compute_session_quality(s)
         total_work = sum(
@@ -105,8 +107,9 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
         cr = done_work / total_work if total_work > 0 else 0.0
         composite = compute_composite_score(quality, cr)
         sparkline_points.append((composite,))
+        sparkline_kinds.append(_session_kind(s))
 
-    sparkline_svg = build_sparkline_svg(sparkline_points)
+    sparkline_svg = build_sparkline_svg(sparkline_points, kinds=sparkline_kinds)
 
     from app.services.behavioral import compute_behavioral_state
 
@@ -392,10 +395,12 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     )
     eligible = list(db.execute(timeline_stmt).scalars().all())
 
+    from app.services.quality_score import session_kind as _session_kind
     quality_points = [
         TimelinePoint(
             label=s.started_at.strftime("%d/%m"),
             value=compute_session_quality(s),
+            kind=_session_kind(s),
         )
         for s in eligible
     ]

@@ -37,6 +37,12 @@ def _session_kind(session: WorkoutSession) -> str:
     return "strength"
 
 
+# Public alias — consumers outside quality_score should not rely on a
+# private helper.
+def session_kind(session: WorkoutSession) -> str:
+    return _session_kind(session)
+
+
 # ---------------------------------------------------------------------------
 # Dispatcher
 # ---------------------------------------------------------------------------

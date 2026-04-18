@@ -116,7 +116,8 @@ def test_backup_script_writes_json_and_csv(client, tmp_path):
 
     # JSON file is real JSON with at least one session
     payload = json.loads(json_files[0].read_text())
-    assert payload["schema_version"] == 1
+    from app.services.export_builder import SCHEMA_VERSION
+    assert payload["schema_version"] == SCHEMA_VERSION
     assert payload["count"] >= 1
 
     # CSV file has the right header
@@ -210,7 +211,11 @@ def test_export_landing_shows_latest_backup_when_present(client, tmp_path, monke
     backup_dir.mkdir()
     # Plant one fake backup
     sample = backup_dir / "sessions-20260408_0330.json"
-    sample.write_text('{"schema_version": 1, "count": 0, "sessions": []}')
+    from app.services.export_builder import SCHEMA_VERSION
+    import json as _json
+    sample.write_text(_json.dumps({
+        "schema_version": SCHEMA_VERSION, "count": 0, "sessions": [],
+    }))
 
     monkeypatch.setenv("BACKUP_DIR", str(backup_dir))
     from app import config

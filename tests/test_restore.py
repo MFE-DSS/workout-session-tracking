@@ -72,8 +72,9 @@ def _minimal_payload(*, count: int = 1, sessions: list | None = None) -> dict:
             }
             for i in range(count)
         ]
+    from app.services.export_builder import SCHEMA_VERSION
     return {
-        "schema_version": 1,
+        "schema_version": SCHEMA_VERSION,
         "exported_at": "2026-04-08T03:30:00+00:00",
         "count": count,
         "sessions": sessions,

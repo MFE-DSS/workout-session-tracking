@@ -12,7 +12,8 @@ def test_export_empty_returns_valid_json_with_zero_sessions(client):
     assert "application/json" in r.headers["content-type"]
     assert "attachment" in r.headers["content-disposition"]
     payload = r.json()
-    assert payload["schema_version"] == 1
+    from app.services.export_builder import SCHEMA_VERSION
+    assert payload["schema_version"] == SCHEMA_VERSION
     assert payload["count"] == 0
     assert payload["sessions"] == []
     assert "exported_at" in payload
