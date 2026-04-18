@@ -1,0 +1,592 @@
+{
+  "version": "2026-04-15.v1",
+  "title": "Atlas machines SPIGNOS",
+  "families": [
+    {
+      "slug": "pecs-press",
+      "name": "Pectoraux — Développé",
+      "zone": "pecs",
+      "description": "Pressing horizontal ou incliné ciblant le grand pectoral. Charge modulable selon la machine.",
+      "machines": [
+        {
+          "slug": "chest-press-machine",
+          "name": "Chest Press machine",
+          "aliases": ["Presse pectorale", "Chest press"],
+          "variants": ["convergente", "indépendante", "bras fixes"],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Dos plaqué au dossier, omoplates basses et serrées",
+            "Pousser vers l'avant sans verrouiller les coudes",
+            "Contrôler la descente sur 2-3 secondes"
+          ],
+          "common_mistakes": [
+            "Charge trop lourde qui casse l'amplitude",
+            "Élévation des épaules sur la phase positive"
+          ]
+        },
+        {
+          "slug": "incline-smith-press",
+          "name": "Incline Smith Press",
+          "aliases": ["Développé incliné Smith"],
+          "variants": ["banc 30°", "banc 45°"],
+          "equipment": "smith",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Banc à 30° pour cibler le haut des pecs",
+            "Descente contrôlée jusqu'au bas des pecs",
+            "Ne pas monter trop haut (delts prennent le relais)"
+          ],
+          "common_mistakes": [
+            "Banc trop incliné (>45°) qui transfère sur les delts",
+            "Rebondir la barre sur le torse"
+          ]
+        },
+        {
+          "slug": "dumbbell-bench-press",
+          "name": "Développé couché haltères",
+          "aliases": ["DB bench press"],
+          "variants": ["plat", "incliné"],
+          "equipment": "haltere",
+          "laterality": "bilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Descendre profond pour maximiser l'étirement",
+            "Trajectoire légèrement convergente en haut",
+            "Omoplates rétractées pendant toute la série"
+          ],
+          "common_mistakes": [
+            "Coudes trop écartés (stress épaule)",
+            "Arrêt trop court sur la descente"
+          ]
+        },
+        {
+          "slug": "incline-dumbbell-press",
+          "name": "Développé incliné haltères 30°",
+          "aliases": ["Incline DB press"],
+          "variants": ["30°", "45°"],
+          "equipment": "haltere",
+          "laterality": "bilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Banc à 30° (pas plus)",
+            "Poignets alignés sur les avant-bras",
+            "Ne pas cogner les haltères en haut"
+          ],
+          "common_mistakes": [
+            "Banc trop incliné",
+            "Descendre trop vite par à-coups"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "pecs-fly",
+      "name": "Pectoraux — Fly / Écarté",
+      "zone": "pecs",
+      "description": "Mouvement d'adduction horizontale isolant le pectoral en étirement et contraction.",
+      "machines": [
+        {
+          "slug": "butterfly-machine",
+          "name": "Butterfly machine",
+          "aliases": ["Pec deck"],
+          "variants": ["bras rembourrés", "poignées"],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Dos plaqué, coudes légèrement fléchis",
+            "Resserrer jusqu'au contact central",
+            "Étirement complet en fin de course arrière"
+          ],
+          "common_mistakes": [
+            "Charge trop lourde qui force à tirer avec les épaules",
+            "Arrêter avant le contact central"
+          ]
+        },
+        {
+          "slug": "cable-crossover",
+          "name": "Cable cross-over",
+          "aliases": ["Cable fly"],
+          "variants": ["bas-haut", "haut-bas", "horizontal"],
+          "equipment": "cable",
+          "laterality": "bilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Légère flexion du buste vers l'avant",
+            "Croiser les mains en fin de contraction",
+            "Coudes légèrement fléchis et fixes"
+          ],
+          "common_mistakes": [
+            "Coudes qui fléchissent/étendent pendant la série",
+            "Mouvement principalement d'épaule au lieu de pec"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "back-vertical",
+      "name": "Dos — Tirages verticaux",
+      "zone": "lats",
+      "description": "Mouvements de traction verticale pour la largeur du dos (grand dorsal).",
+      "machines": [
+        {
+          "slug": "lat-pulldown",
+          "name": "Lat pulldown",
+          "aliases": ["Tirage poulie haute", "Tirage vertical"],
+          "variants": ["prise large pronation", "prise neutre", "prise supination"],
+          "equipment": "cable",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Tirer les coudes vers les hanches, pas la barre vers soi",
+            "Légère extension thoracique",
+            "Squeeze des omoplates en bas"
+          ],
+          "common_mistakes": [
+            "Se balancer en arrière pour tricher",
+            "Monter les épaules vers les oreilles"
+          ]
+        },
+        {
+          "slug": "assisted-pull-up",
+          "name": "Traction assistée machine",
+          "aliases": ["Assisted pull-up"],
+          "variants": ["prise pronation large", "prise neutre"],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Assistance minimale nécessaire pour compléter les reps",
+            "Étirement complet en bas",
+            "Menton au-dessus de la barre en haut"
+          ],
+          "common_mistakes": [
+            "Assistance trop élevée (dépendance)",
+            "Arrêter avant extension complète"
+          ]
+        },
+        {
+          "slug": "pullover-machine",
+          "name": "Pullover machine",
+          "aliases": ["Nautilus pullover"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Bras tendus (léger fléchissement), effort via le lat",
+            "Contrôler la course complète",
+            "Respirer en phase d'étirement"
+          ],
+          "common_mistakes": [
+            "Utiliser les triceps au lieu des lats",
+            "Arc de course trop court"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "back-horizontal",
+      "name": "Dos — Tirages horizontaux",
+      "zone": "upper_back",
+      "description": "Mouvements de rowing pour l'épaisseur du dos (rhomboïdes, trapèzes moyens).",
+      "machines": [
+        {
+          "slug": "chest-supported-row",
+          "name": "Rowing chest-supported",
+          "aliases": ["T-bar row pad", "Machine row"],
+          "variants": ["prise neutre", "prise pronation"],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Support poitrine pour isoler le dos",
+            "Tirer les coudes vers les hanches, squeeze en fin",
+            "Pas de balancement lombaire"
+          ],
+          "common_mistakes": [
+            "Charger trop et tirer avec les bras uniquement",
+            "Ne pas squeezer les omoplates"
+          ]
+        },
+        {
+          "slug": "seated-cable-row",
+          "name": "Rowing câble assis",
+          "aliases": ["Seated row"],
+          "variants": ["prise neutre", "prise large"],
+          "equipment": "cable",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Buste droit (léger renversement max 10°)",
+            "Tirer jusqu'au bas du sternum",
+            "Étirement complet entre chaque rep"
+          ],
+          "common_mistakes": [
+            "Balancer le buste pour prendre de l'élan",
+            "Monter les épaules"
+          ]
+        },
+        {
+          "slug": "one-arm-dumbbell-row",
+          "name": "Rowing haltère un bras",
+          "aliases": ["DB row"],
+          "variants": ["banc plat", "one knee"],
+          "equipment": "haltere",
+          "laterality": "unilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Dos parallèle au sol, un genou et une main sur le banc",
+            "Tirer vers la hanche, coude près du corps",
+            "Légère rotation du torse sans exagérer"
+          ],
+          "common_mistakes": [
+            "Arrondir le dos bas",
+            "Rotation excessive pour tricher"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "shoulders-press",
+      "name": "Épaules — Développé",
+      "zone": "delt_lat",
+      "description": "Pressing vertical ou légèrement incliné pour les deltoïdes.",
+      "machines": [
+        {
+          "slug": "shoulder-press-machine",
+          "name": "Shoulder press machine",
+          "aliases": ["Machine shoulder press", "Overhead press machine"],
+          "variants": ["bras indépendants", "bras solidaires"],
+          "equipment": "machine",
+          "laterality": "both",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Dossier ajusté pour coudes à hauteur des épaules",
+            "Pousser vers le haut sans verrouiller",
+            "Contrôler la descente"
+          ],
+          "common_mistakes": [
+            "Arquer le dos bas",
+            "Charger trop et perdre l'amplitude"
+          ]
+        },
+        {
+          "slug": "smith-shoulder-press",
+          "name": "Smith shoulder press",
+          "aliases": ["Smith overhead press"],
+          "variants": ["assis", "debout"],
+          "equipment": "smith",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Banc légèrement incliné (80-90°)",
+            "Barre au niveau des clavicules en bas",
+            "Poussée verticale stricte"
+          ],
+          "common_mistakes": [
+            "Descendre trop bas (stress épaule)",
+            "Verrouiller coudes en haut agressivement"
+          ]
+        },
+        {
+          "slug": "seated-dumbbell-press",
+          "name": "Shoulder press haltères assis",
+          "aliases": ["DB overhead press"],
+          "variants": ["neutre", "arnold press"],
+          "equipment": "haltere",
+          "laterality": "bilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Banc à 80-85°, dos plaqué",
+            "Pousser en ligne droite, pas en cercle",
+            "Contrôle total sur la descente"
+          ],
+          "common_mistakes": [
+            "Cogner les haltères au sommet",
+            "Inclinaison vers l'arrière du banc"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "shoulders-lateral-posterior",
+      "name": "Épaules — Latéral / Postérieur",
+      "zone": "delt_lat",
+      "description": "Élévations pour le faisceau latéral et mouvements de rear delt pour le faisceau postérieur.",
+      "machines": [
+        {
+          "slug": "lateral-raise-machine",
+          "name": "Lateral raise machine",
+          "aliases": ["Machine lateral raise"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Dos plaqué, pousser avec les deltoïdes latéraux",
+            "Ne pas monter au-dessus des épaules",
+            "Pause 1s en position haute"
+          ],
+          "common_mistakes": [
+            "Utiliser l'élan du corps",
+            "Monter trop haut (trapèze prend le relais)"
+          ]
+        },
+        {
+          "slug": "cable-lateral-raise",
+          "name": "Élévations latérales câble",
+          "aliases": ["Cable side raise"],
+          "variants": ["derrière le dos", "à côté"],
+          "equipment": "cable",
+          "laterality": "unilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Position câble derrière le dos pour full stretch",
+            "Légère flexion du coude fixée",
+            "Monter jusqu'à l'épaule, pas au-dessus"
+          ],
+          "common_mistakes": [
+            "Coude qui fléchit/étend pendant la rep",
+            "Se balancer pour compenser"
+          ]
+        },
+        {
+          "slug": "rear-delt-fly-machine",
+          "name": "Rear delt fly machine",
+          "aliases": ["Pec deck inversé", "Reverse fly machine"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Face au dossier, pousser vers l'arrière",
+            "Squeeze des omoplates en fin",
+            "Contrôler la phase négative"
+          ],
+          "common_mistakes": [
+            "Utiliser les trapèzes",
+            "Arc de course trop court"
+          ]
+        },
+        {
+          "slug": "face-pull-cable",
+          "name": "Face pull câble",
+          "aliases": ["Cable face pull"],
+          "variants": ["corde", "barre en V"],
+          "equipment": "cable",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Tirer vers le visage, coudes hauts",
+            "Rotation externe en fin (pouces vers l'arrière)",
+            "Pas de balancement"
+          ],
+          "common_mistakes": [
+            "Coudes trop bas (transfert dos large)",
+            "Pas de rotation externe"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "legs-quad-dominant",
+      "name": "Jambes — Quad dominant",
+      "zone": "quads",
+      "description": "Mouvements à dominance quadriceps : flexion de genou et poussée verticale.",
+      "machines": [
+        {
+          "slug": "hack-squat-machine",
+          "name": "Hack Squat machine",
+          "aliases": ["Hack squat"],
+          "variants": ["pieds bas serrés", "pieds hauts"],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Pieds bas et serrés pour cibler les quads",
+            "Descendre jusqu'aux cuisses parallèles min.",
+            "Pousser par les talons, dos plaqué"
+          ],
+          "common_mistakes": [
+            "Décoller les talons",
+            "Ne pas descendre suffisamment"
+          ]
+        },
+        {
+          "slug": "leg-press",
+          "name": "Leg press",
+          "aliases": ["45° leg press"],
+          "variants": ["pieds bas serrés", "pieds hauts écartés"],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Pieds bas = quads ; pieds hauts = fessiers/ischios",
+            "Descendre jusqu'à 90° au genou minimum",
+            "Ne pas verrouiller les genoux en haut"
+          ],
+          "common_mistakes": [
+            "Décoller le bassin",
+            "Verrouiller genoux agressivement"
+          ]
+        },
+        {
+          "slug": "smith-squat",
+          "name": "Squat Smith machine",
+          "aliases": ["Smith squat"],
+          "variants": ["pieds avancés", "pieds sous"],
+          "equipment": "smith",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Pieds avancés pour accent quad",
+            "Descendre contrôlée jusqu'à parallèle",
+            "Pousser par les talons"
+          ],
+          "common_mistakes": [
+            "Genoux qui rentrent (valgus)",
+            "Cambrer le dos bas"
+          ]
+        },
+        {
+          "slug": "leg-extension",
+          "name": "Leg extensions assises",
+          "aliases": ["Leg ext"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Extension complète en haut",
+            "Pause 1s contraction maximale",
+            "Descente contrôlée sur 2-3s"
+          ],
+          "common_mistakes": [
+            "Balancer le buste",
+            "Charge trop lourde qui casse l'amplitude"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "legs-posterior-calves",
+      "name": "Jambes — Postérieur et mollets",
+      "zone": "posterior",
+      "description": "Chaîne postérieure (ischios, fessiers) et mollets.",
+      "machines": [
+        {
+          "slug": "romanian-deadlift",
+          "name": "Romanian Deadlift haltères",
+          "aliases": ["RDL", "Romanian DL"],
+          "variants": ["haltères", "barre"],
+          "equipment": "haltere",
+          "laterality": "bilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Hanche en charnière, pas les genoux",
+            "Haltères le long des cuisses tout le temps",
+            "Étirement ischios maximal en bas"
+          ],
+          "common_mistakes": [
+            "Arrondir le dos bas",
+            "Plier les genoux (= squat)"
+          ]
+        },
+        {
+          "slug": "hip-thrust-smith",
+          "name": "Hip thrust Smith",
+          "aliases": ["Smith hip thrust"],
+          "variants": ["dos banc", "sol"],
+          "equipment": "smith",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Épaules sur banc, pieds à plat",
+            "Pousser les hanches vers le plafond",
+            "Squeeze des fessiers 1s en haut"
+          ],
+          "common_mistakes": [
+            "Hyperextension lombaire en haut",
+            "Ne pas squeezer les fessiers"
+          ]
+        },
+        {
+          "slug": "seated-leg-curl",
+          "name": "Leg curls assis",
+          "aliases": ["Seated leg curl"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Dos plaqué, rembourrage au-dessus des chevilles",
+            "Flexion complète jusqu'au contact",
+            "Descente contrôlée sur 2-3s"
+          ],
+          "common_mistakes": [
+            "Décoller les hanches",
+            "Amplitude partielle"
+          ]
+        },
+        {
+          "slug": "lying-leg-curl",
+          "name": "Leg curls allongé",
+          "aliases": ["Lying leg curl"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Allongé face au banc, hanches plaquées",
+            "Flexion jusqu'à contact talon-fesse",
+            "Contrôle sur toute l'amplitude"
+          ],
+          "common_mistakes": [
+            "Soulever les hanches pour tricher",
+            "Rebond en bas"
+          ]
+        },
+        {
+          "slug": "standing-calf-raise",
+          "name": "Mollets debout machine",
+          "aliases": ["Standing calf raise"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Étirement maximal en bas (pause 1s)",
+            "Contraction maximale en haut (pause 1s)",
+            "Pas de rebond"
+          ],
+          "common_mistakes": [
+            "Amplitude trop courte",
+            "Rebondir pour enchaîner"
+          ]
+        },
+        {
+          "slug": "seated-calf-raise",
+          "name": "Mollets assis machine",
+          "aliases": ["Seated calf raise"],
+          "variants": [],
+          "equipment": "machine",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Cible le soléaire (assis = genou fléchi)",
+            "Étirement et contraction complets",
+            "Pause 1s en haut"
+          ],
+          "common_mistakes": [
+            "Rebondir",
+            "Amplitude courte"
+          ]
+        }
+      ]
+    }
+  ]
+}

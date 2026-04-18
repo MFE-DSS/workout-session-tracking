@@ -199,13 +199,16 @@ def session_detail(
     }
 
     from app.services.substitution import get_substitutes, can_substitute
+    from app.services import machine_atlas
     substitution_data: dict[int, dict] = {}
+    atlas_data: dict[int, dict | None] = {}
     for se in session.session_exercises:
         subs = get_substitutes(se.template_exercise)
         substitution_data[se.id] = {
             "substitutes": subs,
             "can_substitute": can_substitute(se),
         }
+        atlas_data[se.id] = machine_atlas.get_for_template_exercise(se.template_exercise)
 
     # Delta vs the prior occurrence's first completed work set.
     # Only rendered when the CURRENT exercise has a first completed
@@ -300,6 +303,7 @@ def session_detail(
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
             "substitution_data": substitution_data,
+            "atlas_data": atlas_data,
             "jump_states": jump_states,
             "next_code_by_exercise": next_code_by_exercise,
             "prev_code_by_exercise": prev_code_by_exercise,
@@ -508,6 +512,22 @@ def science_page(request: Request, db: DbSession, user: CurrentUser) -> HTMLResp
 def rules_redirect() -> RedirectResponse:
     """Legacy URL — /rules redirects 301 to /science."""
     return RedirectResponse(url="/science", status_code=301)
+
+
+@router.get("/science/atlas", response_class=HTMLResponse, name="science_atlas")
+def science_atlas(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
+    """Catalogue des machines (atlas) consultable hors séance."""
+    from app.services import machine_atlas
+    return templates.TemplateResponse(
+        request,
+        "atlas.html",
+        {
+            "page_title": "Atlas machines",
+            "families": machine_atlas.all_families(),
+            "atlas_version": machine_atlas.atlas_version(),
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
 
 
 # ----------------------------------------------------------------------

@@ -96,31 +96,72 @@
         </div>
       {% endif %}
 
-      {# Substitution (Sb_03) #}
+      {# Machine knowledge panel (Sb_07) — execution cues + common mistakes #}
+      {% set atlas_entry = atlas_data.get(se.id) %}
+      {% if atlas_entry and atlas_entry.machine %}
+        {% set _m = atlas_entry.machine %}
+        <details class="machine-panel">
+          <summary class="machine-panel__summary">
+            <span class="machine-panel__icon" aria-hidden="true">ⓘ</span>
+            <span class="machine-panel__title">Comment bien exécuter {{ _m.name }}</span>
+          </summary>
+          <div class="machine-panel__body">
+            {% if _m.execution_cues %}
+              <div class="machine-panel__section">
+                <h5 class="machine-panel__heading">Points d'exécution</h5>
+                <ul class="machine-panel__list">
+                  {% for cue in _m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% if _m.common_mistakes %}
+              <div class="machine-panel__section">
+                <h5 class="machine-panel__heading">Erreurs fréquentes</h5>
+                <ul class="machine-panel__list machine-panel__list--warn">
+                  {% for mistake in _m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
+                </ul>
+              </div>
+            {% endif %}
+            {% if _m.load_semantics %}
+              <p class="machine-panel__meta">
+                Charge : {% if _m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté (haltère / câble unilatéral){% endif %}
+              </p>
+            {% endif %}
+          </div>
+        </details>
+      {% endif %}
+
+      {# Substitution (Sb_03 + Sb_07 drawer) #}
       {% set sub_data = substitution_data.get(se.id, {}) %}
       {% set subs = sub_data.get('substitutes', []) %}
       {% set can_sub = sub_data.get('can_substitute', False) %}
 
       {% if can_sub and subs %}
-        <details class="substitute-picker" style="margin-bottom:var(--space-sm);">
-          <summary style="font-size:12px;color:var(--fg-dim);cursor:pointer;">Machine indisponible ? Substituer →</summary>
-          <div class="segmented" style="margin-top:var(--space-xs);flex-wrap:wrap;">
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
-              <span>{{ se.exercise_name_snapshot|truncate(30) }}</span>
-            </label>
-            {% for sub in subs %}
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
-              <span>{{ sub|truncate(30) }}</span>
-            </label>
-            {% endfor %}
+        <details class="substitute-picker substitute-picker--drawer">
+          <summary class="substitute-picker__summary">
+            <span class="substitute-picker__label">Remplacer cet exercice</span>
+            <span class="substitute-picker__count">{{ subs|length }} alternative{% if subs|length > 1 %}s{% endif %}</span>
+          </summary>
+          <div class="substitute-picker__body">
+            <p class="substitute-picker__hint">Machine occupée ou indisponible ? Choisissez une alternative avant la première série travail.</p>
+            <div class="segmented segmented--stacked">
+              <label class="segmented__option">
+                <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
+                <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
+              </label>
+              {% for sub in subs %}
+              <label class="segmented__option">
+                <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
+                <span>{{ sub }}</span>
+              </label>
+              {% endfor %}
+            </div>
           </div>
         </details>
       {% elif se.substituted_name %}
-        <div class="substitute-badge" style="font-size:12px;margin-bottom:var(--space-sm);padding:var(--space-xs) var(--space-sm);background:var(--accent-soft);border-radius:var(--radius-sm);">
+        <div class="substitute-badge">
           Substitué : <b>{{ se.substituted_name }}</b>
-          <span style="color:var(--fg-dim);">(prescrit : {{ se.exercise_name_snapshot }})</span>
+          <span class="substitute-badge__prescribed">(prescrit : {{ se.exercise_name_snapshot }})</span>
         </div>
       {% endif %}
 

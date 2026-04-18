@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-15.v10",
+  "version": "2026-04-18.v11",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -37,7 +37,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "incline-smith-press",
+          "machine_family": "pecs-press"
         },
         {
           "position": 2,
@@ -61,7 +63,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "chest-press-machine",
+          "machine_family": "pecs-press"
         },
         {
           "position": 3,
@@ -82,7 +86,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 4,
@@ -105,7 +111,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "shoulder-press-machine",
+          "machine_family": "shoulders-press"
         },
         {
           "position": 5,
@@ -129,7 +137,9 @@
               "max_reps": 20,
               "technique": "RP"
             }
-          ]
+          ],
+          "machine_slug": "cable-lateral-raise",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 6,
@@ -149,7 +159,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 7,
@@ -169,7 +181,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "core",
@@ -201,7 +215,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "cable-crossover",
+          "machine_family": "pecs-fly"
         },
         {
           "position": 2,
@@ -226,7 +242,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "dumbbell-bench-press",
+          "machine_family": "pecs-press"
         },
         {
           "position": 3,
@@ -246,7 +264,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "butterfly-machine",
+          "machine_family": "pecs-fly"
         },
         {
           "position": 4,
@@ -275,7 +295,9 @@
           "substitutes": [
             "Élévations latérales câble",
             "Élévations latérales machine"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 5,
@@ -300,7 +322,9 @@
           "substitutes": [
             "Upright row haltères",
             "Upright row câble"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 6,
@@ -325,7 +349,9 @@
           "substitutes": [
             "Reverse fly machine",
             "Y-raise haltère"
-          ]
+          ],
+          "machine_slug": "face-pull-cable",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 7,
@@ -349,7 +375,9 @@
           "substitutes": [
             "Pushdown corde",
             "Extension overhead câble (corde)"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "core",
@@ -385,7 +413,9 @@
           "substitutes": [
             "Traction assistée machine",
             "Lat pulldown prise large"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 2,
@@ -410,7 +440,9 @@
           "substitutes": [
             "Lat pulldown prise neutre",
             "Traction assistée unilatérale"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 3,
@@ -435,7 +467,9 @@
           "substitutes": [
             "Pullover machine",
             "Straight-arm pulldown câble"
-          ]
+          ],
+          "machine_slug": "pullover-machine",
+          "machine_family": "back-vertical"
         },
         {
           "position": 4,
@@ -459,7 +493,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "rear-delt-fly-machine",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 5,
@@ -484,7 +520,9 @@
           "substitutes": [
             "Reverse fly machine",
             "Y-raise haltère"
-          ]
+          ],
+          "machine_slug": "face-pull-cable",
+          "machine_family": "shoulders-lateral-posterior"
         }
       ],
       "catalog_section": "core",
@@ -520,7 +558,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "chest-supported-row",
+          "machine_family": "back-horizontal"
         },
         {
           "position": 2,
@@ -544,7 +584,9 @@
           "substitutes": [
             "Rowing chest-supported",
             "Rowing haltère un bras"
-          ]
+          ],
+          "machine_slug": "seated-cable-row",
+          "machine_family": "back-horizontal"
         },
         {
           "position": 3,
@@ -565,7 +607,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "one-arm-dumbbell-row",
+          "machine_family": "back-horizontal"
         },
         {
           "position": 4,
@@ -590,7 +634,9 @@
           "substitutes": [
             "Shrugs barre",
             "Shrugs câble"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 5,
@@ -616,7 +662,9 @@
             "Curl debout haltères",
             "Preacher curl",
             "Curl câble basse"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 6,
@@ -636,7 +684,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 7,
@@ -657,7 +707,9 @@
           "substitutes": [
             "Curl marteau câble corde",
             "Curl prise neutre câble"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "core",
@@ -693,7 +745,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "hack-squat-machine",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 2,
@@ -717,7 +771,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "leg-press",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 3,
@@ -742,7 +798,9 @@
             "Sissy squat machine",
             "Reverse Nordic",
             "Leg extension câble unilatéral"
-          ]
+          ],
+          "machine_slug": "leg-extension",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 4,
@@ -766,7 +824,9 @@
           "substitutes": [
             "Leg curls allongé",
             "Sliding leg curl"
-          ]
+          ],
+          "machine_slug": "seated-leg-curl",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 5,
@@ -786,7 +846,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 6,
@@ -811,7 +873,9 @@
               "min_reps": 12,
               "max_reps": 20
             }
-          ]
+          ],
+          "machine_slug": "standing-calf-raise",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 7,
@@ -832,7 +896,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "core",
@@ -869,7 +935,9 @@
             "Romanian Deadlift barre",
             "Back extension 45° (bias ischios)",
             "Good morning haltères"
-          ]
+          ],
+          "machine_slug": "romanian-deadlift",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 2,
@@ -893,7 +961,9 @@
           "substitutes": [
             "Leg curls assis",
             "Sliding leg curl"
-          ]
+          ],
+          "machine_slug": "lying-leg-curl",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 3,
@@ -914,7 +984,9 @@
               "min_reps": 10,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "leg-press",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 4,
@@ -938,7 +1010,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "hip-thrust-smith",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 5,
@@ -963,7 +1037,9 @@
             "Sissy squat machine",
             "Reverse Nordic",
             "Leg extension câble unilatéral"
-          ]
+          ],
+          "machine_slug": "leg-extension",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 6,
@@ -992,7 +1068,9 @@
           "substitutes": [
             "Mollets debout machine",
             "Calf press leg press"
-          ]
+          ],
+          "machine_slug": "seated-calf-raise",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 7,
@@ -1018,7 +1096,9 @@
             "Machine crunch",
             "Hanging knee raise",
             "Decline crunch"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "core",
@@ -1050,7 +1130,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "incline-dumbbell-press",
+          "machine_family": "pecs-press"
         },
         {
           "position": 2,
@@ -1070,7 +1152,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "chest-press-machine",
+          "machine_family": "pecs-press"
         },
         {
           "position": 3,
@@ -1091,7 +1175,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "cable-crossover",
+          "machine_family": "pecs-fly"
         },
         {
           "position": 4,
@@ -1111,7 +1197,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "shoulder-press-machine",
+          "machine_family": "shoulders-press"
         },
         {
           "position": 5,
@@ -1140,7 +1228,9 @@
               "max_reps": 20,
               "technique": "RP"
             }
-          ]
+          ],
+          "machine_slug": "cable-lateral-raise",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 6,
@@ -1160,7 +1250,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "rear-delt-fly-machine",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 7,
@@ -1180,7 +1272,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "archived",
@@ -1212,7 +1306,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 2,
@@ -1232,7 +1328,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "chest-supported-row",
+          "machine_family": "back-horizontal"
         },
         {
           "position": 3,
@@ -1252,7 +1350,9 @@
               "min_reps": 10,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "seated-cable-row",
+          "machine_family": "back-horizontal"
         },
         {
           "position": 4,
@@ -1273,7 +1373,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 5,
@@ -1293,7 +1395,9 @@
               "min_reps": 10,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 6,
@@ -1314,7 +1418,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 7,
@@ -1334,7 +1440,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "archived",
@@ -1366,7 +1474,9 @@
               "min_reps": 6,
               "max_reps": 10
             }
-          ]
+          ],
+          "machine_slug": "smith-squat",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 2,
@@ -1387,7 +1497,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "leg-press",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 3,
@@ -1407,7 +1519,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "leg-extension",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 4,
@@ -1427,7 +1541,9 @@
               "min_reps": 10,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "seated-leg-curl",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 5,
@@ -1452,7 +1568,9 @@
               "min_reps": 12,
               "max_reps": 20
             }
-          ]
+          ],
+          "machine_slug": "standing-calf-raise",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 6,
@@ -1473,7 +1591,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "archived",
@@ -1505,7 +1625,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "romanian-deadlift",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 2,
@@ -1525,7 +1647,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "lying-leg-curl",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 3,
@@ -1546,7 +1670,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "hip-thrust-smith",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 4,
@@ -1566,7 +1692,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "leg-extension",
+          "machine_family": "legs-quad-dominant"
         },
         {
           "position": 5,
@@ -1591,7 +1719,9 @@
               "min_reps": 15,
               "max_reps": 20
             }
-          ]
+          ],
+          "machine_slug": "seated-calf-raise",
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 6,
@@ -1612,7 +1742,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "archived",
@@ -1656,7 +1788,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 2,
@@ -1682,7 +1816,9 @@
             "Machine crunch",
             "Hanging knee raise",
             "Decline crunch"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 3,
@@ -1703,7 +1839,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 4,
@@ -1724,7 +1862,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "utility",
@@ -1755,7 +1895,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "chest-press-machine",
+          "machine_family": "pecs-press"
         },
         {
           "position": 2,
@@ -1779,7 +1921,9 @@
           "substitutes": [
             "Traction assistée machine",
             "Lat pulldown prise large"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 3,
@@ -1804,7 +1948,9 @@
             "Shoulder press haltères assis",
             "Smith shoulder press",
             "Arnold press"
-          ]
+          ],
+          "machine_slug": "shoulder-press-machine",
+          "machine_family": "shoulders-press"
         },
         {
           "position": 4,
@@ -1828,7 +1974,9 @@
           "substitutes": [
             "Élévations latérales haltères",
             "Élévations latérales machine"
-          ]
+          ],
+          "machine_slug": "cable-lateral-raise",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 5,
@@ -1844,7 +1992,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 6,
@@ -1860,7 +2010,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 7,
@@ -1880,7 +2032,9 @@
           "substitutes": [
             "Reverse fly machine",
             "Y-raise haltère"
-          ]
+          ],
+          "machine_slug": "face-pull-cable",
+          "machine_family": "shoulders-lateral-posterior"
         }
       ],
       "catalog_section": "utility",
@@ -1916,7 +2070,9 @@
             "Shoulder press haltères assis",
             "Smith shoulder press",
             "Arnold press"
-          ]
+          ],
+          "machine_slug": "shoulder-press-machine",
+          "machine_family": "shoulders-press"
         },
         {
           "position": 2,
@@ -1945,7 +2101,9 @@
               "max_reps": 20,
               "technique": "RP"
             }
-          ]
+          ],
+          "machine_slug": "cable-lateral-raise",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 3,
@@ -1970,7 +2128,9 @@
           "substitutes": [
             "Élévations latérales câble",
             "Élévations latérales machine"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 4,
@@ -1995,7 +2155,9 @@
           "substitutes": [
             "Upright row haltères",
             "Upright row câble"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 5,
@@ -2015,7 +2177,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": "rear-delt-fly-machine",
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 6,
@@ -2040,7 +2204,9 @@
           "substitutes": [
             "Reverse fly machine",
             "Y-raise haltère"
-          ]
+          ],
+          "machine_slug": "face-pull-cable",
+          "machine_family": "shoulders-lateral-posterior"
         }
       ],
       "catalog_section": "specialization",
@@ -2077,7 +2243,9 @@
             "Curl debout haltères",
             "Preacher curl",
             "Curl câble basse"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 2,
@@ -2097,7 +2265,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 3,
@@ -2118,7 +2288,9 @@
               "min_reps": 10,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 4,
@@ -2139,7 +2311,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 5,
@@ -2164,7 +2338,9 @@
           "substitutes": [
             "Extension overhead câble (corde)",
             "Pushdown corde"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 6,
@@ -2188,7 +2364,9 @@
           "substitutes": [
             "Pushdown corde",
             "Extension overhead câble (corde)"
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         },
         {
           "position": 7,
@@ -2205,7 +2383,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "specialization",
@@ -2241,7 +2421,9 @@
           "substitutes": [
             "Traction assistée machine",
             "Lat pulldown prise large"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 2,
@@ -2262,7 +2444,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 3,
@@ -2287,7 +2471,9 @@
           "substitutes": [
             "Lat pulldown prise neutre",
             "Traction assistée unilatérale"
-          ]
+          ],
+          "machine_slug": "lat-pulldown",
+          "machine_family": "back-vertical"
         },
         {
           "position": 4,
@@ -2312,7 +2498,9 @@
           "substitutes": [
             "Pullover machine",
             "Straight-arm pulldown câble"
-          ]
+          ],
+          "machine_slug": "pullover-machine",
+          "machine_family": "back-vertical"
         },
         {
           "position": 5,
@@ -2333,7 +2521,9 @@
               "min_reps": 8,
               "max_reps": 12
             }
-          ]
+          ],
+          "machine_slug": "seated-cable-row",
+          "machine_family": "back-horizontal"
         },
         {
           "position": 6,
@@ -2354,7 +2544,9 @@
               "min_reps": 12,
               "max_reps": 15
             }
-          ]
+          ],
+          "machine_slug": null,
+          "machine_family": null
         }
       ],
       "catalog_section": "specialization",

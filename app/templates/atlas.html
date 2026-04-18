@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Atlas machines</h1>
+<p class="lede">Comment bien exécuter les machines qui reviennent dans SPIGNOS. Organisé par famille, lisible hors séance.</p>
+
+<nav class="atlas-toc">
+  {% for fam in families %}
+  <a class="atlas-toc__item" href="#family-{{ fam.slug }}">{{ fam.name }}</a>
+  {% endfor %}
+</nav>
+
+{% for fam in families %}
+<section class="atlas-family" id="family-{{ fam.slug }}">
+  <h2 class="section-header">{{ fam.name }}</h2>
+  {% if fam.description %}<p class="atlas-family__desc">{{ fam.description }}</p>{% endif %}
+
+  {% for m in fam.machines %}
+  <article class="card atlas-machine" id="machine-{{ m.slug }}">
+    <header class="atlas-machine__head">
+      <h3 class="atlas-machine__name">{{ m.name }}</h3>
+      <span class="atlas-machine__tag atlas-machine__tag--{{ m.equipment }}">{{ m.equipment }}</span>
+    </header>
+
+    {% if m.aliases %}
+    <p class="atlas-machine__aliases"><em>Aussi connu comme :</em> {{ m.aliases|join(', ') }}</p>
+    {% endif %}
+
+    {% if m.variants %}
+    <p class="atlas-machine__variants"><strong>Variantes :</strong> {{ m.variants|join(' · ') }}</p>
+    {% endif %}
+
+    <div class="atlas-machine__grid">
+      {% if m.execution_cues %}
+      <div class="atlas-machine__section">
+        <h4 class="atlas-machine__heading">Points d'exécution</h4>
+        <ul class="atlas-machine__list">
+          {% for cue in m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      {% if m.common_mistakes %}
+      <div class="atlas-machine__section">
+        <h4 class="atlas-machine__heading">Erreurs fréquentes</h4>
+        <ul class="atlas-machine__list atlas-machine__list--warn">
+          {% for mistake in m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+    </div>
+
+    <footer class="atlas-machine__meta">
+      Charge : {% if m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté{% endif %}
+      · Latéralité : {{ m.laterality }}
+    </footer>
+  </article>
+  {% endfor %}
+</section>
+{% endfor %}
+
+<p class="atlas-version text-dim" style="font-size:12px;text-align:center;margin-top:var(--space-lg);">
+  Atlas version {{ atlas_version }} · Additif, informatif, non prescriptif.
+</p>
+{% endblock %}

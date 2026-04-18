@@ -2038,3 +2038,173 @@ details.exercise-card[open] .card__actions--exercise {
   padding-top: var(--space-md);
   border-top: 1px solid var(--border);
 }
+
+/* ---------- Sb_07 — machine atlas panel on exercise card --------------- */
+.machine-panel {
+  margin-bottom: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft, rgba(255,255,255,0.02));
+}
+.machine-panel__summary {
+  list-style: none;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 13px;
+  color: var(--fg-dim);
+  user-select: none;
+}
+.machine-panel__summary::-webkit-details-marker { display: none; }
+.machine-panel[open] .machine-panel__summary { color: var(--fg); }
+.machine-panel__icon {
+  font-weight: 700;
+  color: var(--accent, #4a9eff);
+}
+.machine-panel__title { flex: 1; }
+.machine-panel__body {
+  padding: 0 var(--space-sm) var(--space-sm);
+  font-size: 13px;
+}
+.machine-panel__section { margin-top: var(--space-xs); }
+.machine-panel__heading {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim);
+  margin: var(--space-xs) 0;
+}
+.machine-panel__list { margin: 0; padding-left: 1.1em; }
+.machine-panel__list li { margin: 2px 0; line-height: 1.35; }
+.machine-panel__list--warn li { color: var(--warn, #e0a030); }
+.machine-panel__meta {
+  margin: var(--space-xs) 0 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-style: italic;
+}
+
+/* ---------- Sb_07 — substitution drawer refacto ----------------------- */
+.substitute-picker--drawer {
+  margin-bottom: var(--space-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft, rgba(255,255,255,0.02));
+}
+.substitute-picker__summary {
+  list-style: none;
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 13px;
+  color: var(--fg-dim);
+  user-select: none;
+}
+.substitute-picker__summary::-webkit-details-marker { display: none; }
+.substitute-picker[open] .substitute-picker__summary { color: var(--fg); }
+.substitute-picker__label { font-weight: 500; }
+.substitute-picker__count {
+  font-size: 11px;
+  padding: 1px 6px;
+  background: var(--accent-soft, rgba(74,158,255,0.15));
+  border-radius: 999px;
+  color: var(--fg-dim);
+}
+.substitute-picker__body {
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+.substitute-picker__hint {
+  font-size: 12px;
+  color: var(--fg-dim);
+  margin: 0 0 var(--space-xs);
+  line-height: 1.35;
+}
+.segmented--stacked {
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.segmented--stacked .segmented__option { flex: 1 1 100%; text-align: left; }
+.segmented--stacked .segmented__option span { text-align: left; padding: var(--space-xs) var(--space-sm); }
+.substitute-badge {
+  font-size: 12px;
+  margin-bottom: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--accent-soft, rgba(74,158,255,0.15));
+  border-radius: var(--radius-sm);
+}
+.substitute-badge__prescribed { color: var(--fg-dim); margin-left: 4px; }
+
+/* ---------- Sb_07 — /science/atlas page ------------------------------- */
+.atlas-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: var(--space-md) 0 var(--space-lg);
+}
+.atlas-toc__item {
+  font-size: 12px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--fg-dim);
+  text-decoration: none;
+}
+.atlas-toc__item:hover { color: var(--fg); border-color: var(--accent, #4a9eff); }
+
+.atlas-family { margin-bottom: var(--space-lg); }
+.atlas-family__desc {
+  color: var(--fg-dim);
+  font-size: 13px;
+  margin: 0 0 var(--space-sm);
+}
+.atlas-machine { margin-bottom: var(--space-md); }
+.atlas-machine__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.atlas-machine__name { margin: 0; font-size: 16px; }
+.atlas-machine__tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft, rgba(74,158,255,0.15));
+  color: var(--fg-dim);
+}
+.atlas-machine__aliases,
+.atlas-machine__variants { font-size: 12px; color: var(--fg-dim); margin: var(--space-xs) 0; }
+.atlas-machine__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+@media (min-width: 640px) {
+  .atlas-machine__grid { grid-template-columns: 1fr 1fr; }
+}
+.atlas-machine__heading {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim);
+  margin: 0 0 var(--space-xs);
+}
+.atlas-machine__list { margin: 0; padding-left: 1.1em; font-size: 13px; }
+.atlas-machine__list li { margin: 2px 0; line-height: 1.35; }
+.atlas-machine__list--warn li { color: var(--warn, #e0a030); }
+.atlas-machine__meta {
+  margin-top: var(--space-sm);
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-style: italic;
+  border-top: 1px dashed var(--border);
+  padding-top: var(--space-xs);
+}

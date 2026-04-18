@@ -20,6 +20,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.services.muscle_mapping import classify_exercise  # noqa: E402
+from app.services import machine_atlas  # noqa: E402
 
 DATA_FILE = PROJECT_ROOT / "data" / "reference_split.json"
 REPORT_FILE = PROJECT_ROOT / "docs" / "strategy" / "SPIGNOS_CATALOG_QA_REPORT.md"
@@ -253,6 +254,45 @@ def check_focus_vs_exercises(templates: list[dict]) -> list[dict]:
     return warnings
 
 
+def check_machine_links(templates: list[dict]) -> list[dict]:
+    """Check: if machine_slug or machine_family is set, it must resolve in the atlas."""
+    errors: list[dict] = []
+    for t in templates:
+        slug = t.get("slug", "<missing>")
+        for ex in t.get("exercises", []):
+            code = ex.get("code", "<missing>")
+            mslug = ex.get("machine_slug")
+            fslug = ex.get("machine_family")
+            if mslug is not None:
+                if machine_atlas.get_machine(mslug) is None:
+                    errors.append({
+                        "check": "machine_links",
+                        "slug": slug,
+                        "exercise": code,
+                        "message": f"machine_slug '{mslug}' not found in atlas",
+                    })
+                else:
+                    fam = machine_atlas.family_of_machine(mslug)
+                    if fslug is not None and fam is not None and fam["slug"] != fslug:
+                        errors.append({
+                            "check": "machine_links",
+                            "slug": slug,
+                            "exercise": code,
+                            "message": (
+                                f"machine_family '{fslug}' inconsistent with machine_slug "
+                                f"'{mslug}' (expected '{fam['slug']}')"
+                            ),
+                        })
+            if fslug is not None and machine_atlas.get_family(fslug) is None:
+                errors.append({
+                    "check": "machine_links",
+                    "slug": slug,
+                    "exercise": code,
+                    "message": f"machine_family '{fslug}' not found in atlas",
+                })
+    return errors
+
+
 def check_substitute_classifiability(templates: list[dict]) -> list[str]:
     """Every substitute name must be classifiable."""
     from app.services.muscle_mapping import classify_exercise
@@ -340,6 +380,7 @@ def main() -> int:
     errors += check_rep_target_coherence(templates)
     errors += check_slug_uniqueness(templates)
     errors += check_exercise_classifiability(templates)
+    errors += check_machine_links(templates)
     warnings += check_focus_vs_exercises(templates)
     all_sub_warnings = check_substitute_classifiability(templates)
     warnings += [{"check": "substitute_classifiability", "severity": "warning", "message": w} for w in all_sub_warnings]
