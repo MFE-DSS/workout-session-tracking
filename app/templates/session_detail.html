@@ -176,16 +176,19 @@
 
               <div class="set-row__inputs">
                 <input
-                  type="number"
-                  step="0.5"
+                  type="text"
                   inputmode="decimal"
+                  pattern="[0-9]*[.,]?[0-9]*"
+                  autocomplete="off"
                   name="set_{{ sl.id }}_weight_kg"
                   placeholder="kg"
                   value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
                 />
                 <input
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  pattern="[0-9]*"
+                  autocomplete="off"
                   name="set_{{ sl.id }}_reps"
                   placeholder="reps"
                   value="{{ sl.reps if sl.reps is not none else '' }}"
@@ -218,16 +221,19 @@
 
               <div class="set-row__inputs">
                 <input
-                  type="number"
-                  step="0.5"
+                  type="text"
                   inputmode="decimal"
+                  pattern="[0-9]*[.,]?[0-9]*"
+                  autocomplete="off"
                   name="set_{{ sl.id }}_weight_kg"
                   placeholder="kg"
                   value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
                 />
                 <input
-                  type="number"
+                  type="text"
                   inputmode="numeric"
+                  pattern="[0-9]*"
+                  autocomplete="off"
                   name="set_{{ sl.id }}_reps"
                   placeholder="reps"
                   value="{{ sl.reps if sl.reps is not none else '' }}"
@@ -304,14 +310,16 @@
   </p>
 
   {% call field_group("Durée (min)") %}
-    <input type="number" inputmode="numeric" name="cardio_duration_min"
-           min="1" max="300" placeholder="20"
+    <input type="text" inputmode="numeric" pattern="[0-9]*"
+           autocomplete="off" name="cardio_duration_min"
+           placeholder="20"
            value="{{ session.cardio_duration_min if session.cardio_duration_min is not none else '' }}" />
   {% endcall %}
 
   {% call field_group("BPM moyen (si mesure)") %}
-    <input type="number" inputmode="numeric" name="cardio_bpm_avg"
-           min="40" max="220" placeholder="125"
+    <input type="text" inputmode="numeric" pattern="[0-9]*"
+           autocomplete="off" name="cardio_bpm_avg"
+           placeholder="125"
            value="{{ session.cardio_bpm_avg if session.cardio_bpm_avg is not none else '' }}" />
   {% endcall %}
 
@@ -327,8 +335,9 @@
   {% endcall %}
 
   {% call field_group("Calories machine (indicatif)") %}
-    <input type="number" inputmode="numeric" name="cardio_machine_calories"
-           min="0" max="5000" placeholder="— selon affichage machine"
+    <input type="text" inputmode="numeric" pattern="[0-9]*"
+           autocomplete="off" name="cardio_machine_calories"
+           placeholder="— selon affichage machine"
            value="{{ session.cardio_machine_calories if session.cardio_machine_calories is not none else '' }}" />
   {% endcall %}
   {% endif %}
@@ -360,9 +369,10 @@
 
   {% call field_group("Poids du corps (optionnel, kg)") %}
     <input
-      type="number"
-      step="0.1"
+      type="text"
       inputmode="decimal"
+      pattern="[0-9]*[.,]?[0-9]*"
+      autocomplete="off"
       name="bodyweight_kg"
       placeholder="kg"
       value="{{ session.bodyweight_kg if session.bodyweight_kg is not none else '' }}"
