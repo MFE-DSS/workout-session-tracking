@@ -1876,7 +1876,7 @@ details.exercise-card--done .exercise-card__compact .exercise-card__code {
   opacity: 0.85;
 }
 
-/* Enriched exercise footer: recap + primary CTA side by side */
+/* Enriched exercise footer: prev-nav + recap + primary CTA */
 .card__actions--exercise {
   display: flex;
   align-items: center;
@@ -1888,9 +1888,25 @@ details.exercise-card--done .exercise-card__compact .exercise-card__code {
 }
 
 .card__actions--exercise .btn {
-  flex: 1;
   min-height: 44px;
   font-weight: 600;
+}
+
+/* Primary "next" CTA takes most of the width */
+.card__actions--exercise .btn--primary {
+  flex: 1;
+}
+
+/* Sb_05 prev navigation button: compact, discreet */
+.card__actions--exercise .btn--nav-prev {
+  flex: 0 0 auto;
+  font-weight: 500;
+  padding: 0 var(--space-sm);
+  color: var(--fg-dim);
+}
+
+.card__actions--exercise .btn--nav-prev:hover {
+  color: var(--fg);
 }
 
 .card__actions__recap {

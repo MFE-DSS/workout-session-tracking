@@ -263,6 +263,7 @@ def session_detail(
     #   future  = done == 0 (and not active)
     jump_states: dict[int, str] = {}
     next_code_by_exercise: dict[int, str | None] = {}
+    prev_code_by_exercise: dict[int, str | None] = {}
     ordered = list(session.session_exercises)
     for idx, se in enumerate(ordered):
         d, t = stats["per_exercise"][se.id]
@@ -279,6 +280,10 @@ def session_detail(
             next_code_by_exercise[se.id] = ordered[idx + 1].exercise_code_snapshot
         else:
             next_code_by_exercise[se.id] = None
+        if idx > 0:
+            prev_code_by_exercise[se.id] = ordered[idx - 1].exercise_code_snapshot
+        else:
+            prev_code_by_exercise[se.id] = None
 
     return templates.TemplateResponse(
         request,
@@ -297,6 +302,7 @@ def session_detail(
             "substitution_data": substitution_data,
             "jump_states": jump_states,
             "next_code_by_exercise": next_code_by_exercise,
+            "prev_code_by_exercise": prev_code_by_exercise,
         },
     )
 
@@ -437,10 +443,30 @@ async def update_exercise_card(
 
     db.commit()
 
-    # Sprint 5 daily-use shortcut: after saving an exercise card,
-    # send the user to the NEXT exercise's anchor instead of back to
-    # the same one. When there is no next exercise, drop them on the
-    # session-feedback form so they can finish the session.
+    # Sb_05 save-on-next + save-on-prev: the form carries an optional
+    # `nav` field indicating the target direction:
+    #   "prev" → jump to previous exercise (save happens silently first)
+    #   anything else → default = jump to next exercise (legacy behaviour)
+    nav_direction = (form.get("nav") or "next").strip().lower()
+
+    if nav_direction == "prev":
+        neighbor = db.execute(
+            select(SessionExercise)
+            .where(
+                SessionExercise.session_id == session_id,
+                SessionExercise.position < se.position,
+            )
+            .order_by(SessionExercise.position.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+        if neighbor is not None:
+            target = f"/sessions/{session_id}?active={neighbor.id}#exercise-{neighbor.id}"
+        else:
+            # Already first exercise; stay on it (reload with same anchor)
+            target = f"/sessions/{session_id}?active={se.id}#exercise-{se.id}"
+        return RedirectResponse(url=target, status_code=303)
+
+    # Default: next exercise or session feedback
     next_se = db.execute(
         select(SessionExercise)
         .where(

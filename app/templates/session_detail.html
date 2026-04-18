@@ -276,16 +276,24 @@
         <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
       {% endcall %}
 
-      {# Sb_02.1: enriched footer with recap + contextual CTA. #}
+      {# Sb_02.1 + Sb_05: enriched footer with prev/next navigation. #}
       {% set next_code = next_code_by_exercise.get(se.id) %}
+      {% set prev_code = prev_code_by_exercise.get(se.id) %}
       {% set is_last = next_code is none %}
       {% set work_total = se.set_logs | selectattr('kind', 'equalto', 'work') | list | length %}
       {% set work_done = se.set_logs | selectattr('kind', 'equalto', 'work') | selectattr('completed') | list | length %}
       <div class="card__actions card__actions--exercise">
+        {% if prev_code %}
+        <button type="submit" name="nav" value="prev"
+                class="btn btn--ghost btn--nav-prev"
+                title="Enregistrer et revenir à {{ prev_code }}">
+          ← {{ prev_code }}
+        </button>
+        {% endif %}
         <span class="card__actions__recap" aria-hidden="true">
-          Work : {{ work_done }}/{{ work_total }}
+          {{ work_done }}/{{ work_total }}
         </span>
-        <button type="submit" class="btn btn--primary">
+        <button type="submit" name="nav" value="next" class="btn btn--primary">
           {% if is_last %}
             Enregistrer et terminer
           {% elif next_code %}
