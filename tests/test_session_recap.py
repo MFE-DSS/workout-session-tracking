@@ -190,6 +190,73 @@ def test_build_recap_cardio_populates_cardio_section(client):
     assert cardio["machine_type"] == "treadmill"
 
 
+def test_build_recap_summary_includes_sb_08_blocks(client):
+    """Sb_08 extends summary with confidence_score/level, top_progression,
+    zones_touched, anomalies. All should be present even on a clean session.
+    """
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.services.session_recap import build_recap
+
+    sid = _mk_completed_session()
+    with SessionLocal() as db:
+        session = db.get(WorkoutSession, sid)
+        recap = build_recap(session)
+
+    summary = recap["summary"]
+    assert "confidence_score" in summary
+    assert 0 <= summary["confidence_score"] <= 100
+    assert summary["confidence_level"] in {"eleve", "moyen", "faible"}
+    assert "top_progression" in summary  # can be None
+    assert isinstance(summary["zones_touched"], list)
+    assert isinstance(summary["anomalies"], list)
+
+
+def test_build_recap_zones_touched_non_empty_when_classifiable(client):
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.services.session_recap import build_recap
+
+    sid = _mk_completed_session(
+        exercises=[
+            {"code": "E1", "name": "Incline Smith Press"},
+            {"code": "E2", "name": "Chest Press machine"},
+        ],
+    )
+    with SessionLocal() as db:
+        session = db.get(WorkoutSession, sid)
+        recap = build_recap(session)
+
+    zones = recap["summary"]["zones_touched"]
+    assert zones, "expected at least one classified zone"
+    first = zones[0]
+    assert {"zone", "label", "sets"} <= set(first.keys())
+    assert first["sets"] > 0
+
+
+def test_build_recap_anomalies_surface_rule_a(client):
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.services.session_recap import build_recap
+
+    sid = _mk_completed_session(
+        exercises=[{
+            "code": "E1",
+            "name": "Incline Smith Press",
+            "work_sets": [
+                {"weight_kg": 50, "reps": 10, "completed": True},
+                {"weight_kg": None, "reps": None, "completed": True},  # rule A
+            ],
+        }],
+    )
+    with SessionLocal() as db:
+        session = db.get(WorkoutSession, sid)
+        recap = build_recap(session)
+
+    codes = [a["rule_code"] for a in recap["summary"]["anomalies"]]
+    assert "A" in codes
+
+
 def test_build_recap_duration_label(client):
     from app.database import SessionLocal
     from app.models.session import WorkoutSession

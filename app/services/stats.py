@@ -84,6 +84,10 @@ def _summarise_prior(prior: SessionExercise, now: datetime) -> dict:
         "n_done": len(done),
         "first_set": first_set,
         "success_score": prior.success_score,
+        "sets": [
+            {"set_index": sl.set_index, "weight_kg": sl.weight_kg, "reps": sl.reps}
+            for sl in done
+        ],
     }
 
 

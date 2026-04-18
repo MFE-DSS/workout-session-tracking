@@ -244,3 +244,45 @@ def test_done_page_shows_substitution_arrow(client):
     assert r.status_code == 200
     assert "Développé couché haltères" in r.text
     assert "→" in r.text
+
+
+def test_done_page_shows_confidence_badge(client):
+    sid = _mk_completed_session()
+    r = client.get(f"/sessions/{sid}/done")
+    assert r.status_code == 200
+    body = r.text
+    assert "Confiance du logging" in body
+    assert "confidence-badge" in body
+
+
+def test_done_page_shows_zones_block(client):
+    """Incline Smith Press + Chest Press machine → zone pecs detected."""
+    sid = _mk_completed_session()
+    r = client.get(f"/sessions/{sid}/done")
+    assert "Zones sollicitées" in r.text
+    assert "Pectoraux" in r.text
+
+
+def test_done_page_shows_anomalies_when_present(client):
+    """Inject a completed-empty set so rule A fires and 'À vérifier' renders."""
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession, SetLog
+
+    sid = _mk_completed_session()
+    with SessionLocal() as db:
+        session = db.get(WorkoutSession, sid)
+        # Mark the third set (currently uncompleted) as completed-empty.
+        se = session.session_exercises[0]
+        work = sorted(
+            [sl for sl in se.set_logs if sl.kind == "work"],
+            key=lambda s: s.set_index,
+        )
+        work[-1].completed = True
+        work[-1].weight_kg = None
+        work[-1].reps = None
+        db.commit()
+
+    r = client.get(f"/sessions/{sid}/done")
+    body = r.text
+    assert "À vérifier" in body
+    assert "sans reps ni charge" in body

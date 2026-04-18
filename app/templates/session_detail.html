@@ -199,6 +199,21 @@
         </div>
       {% endif %}
 
+      {# Sb_08 — contextual hints on the active card only #}
+      {% if is_active %}
+        {% set sb08_hints = sb08_hints_by_exercise.get(se.id, []) %}
+        {% if sb08_hints %}
+          <div class="exercise-card__hints">
+            {% for h in sb08_hints %}
+              <p class="hint-sb08 hint-sb08--{{ h.rule_code|lower }}">
+                <span class="hint-sb08__icon" aria-hidden="true">💡</span>
+                <span>{{ h.message }}</span>
+              </p>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endif %}
+
       {% if se.set_logs|length > 0 %}
         {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
         {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
@@ -313,9 +328,10 @@
         ) }}
       </details>
 
-      {% call field_group("Note (optionnel)") %}
+      <details class="exercise-card__note" {% if se.free_note %}open{% endif %}>
+        <summary>Note exercice (optionnel)</summary>
         <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
-      {% endcall %}
+      </details>
 
       {# Sb_02.1 + Sb_05: enriched footer with prev/next navigation. #}
       {% set next_code = next_code_by_exercise.get(se.id) %}

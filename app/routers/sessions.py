@@ -200,8 +200,10 @@ def session_detail(
 
     from app.services.substitution import get_substitutes, can_substitute
     from app.services import machine_atlas
+    from app.services.hints import compute_hints as compute_sb08_hints
     substitution_data: dict[int, dict] = {}
     atlas_data: dict[int, dict | None] = {}
+    sb08_hints_by_exercise: dict[int, list[dict]] = {}
     for se in session.session_exercises:
         subs = get_substitutes(se.template_exercise)
         substitution_data[se.id] = {
@@ -209,6 +211,10 @@ def session_detail(
             "can_substitute": can_substitute(se),
         }
         atlas_data[se.id] = machine_atlas.get_for_template_exercise(se.template_exercise)
+        sb08_hints_by_exercise[se.id] = [
+            h.to_dict()
+            for h in compute_sb08_hints(se, last_time.get(se.exercise_code_snapshot))
+        ]
 
     # Delta vs the prior occurrence's first completed work set.
     # Only rendered when the CURRENT exercise has a first completed
@@ -304,6 +310,7 @@ def session_detail(
             "active_exercise_id": active_exercise_id,
             "substitution_data": substitution_data,
             "atlas_data": atlas_data,
+            "sb08_hints_by_exercise": sb08_hints_by_exercise,
             "jump_states": jump_states,
             "next_code_by_exercise": next_code_by_exercise,
             "prev_code_by_exercise": prev_code_by_exercise,
@@ -328,7 +335,20 @@ def session_done(
             url=f"/sessions/{session_id}", status_code=303
         )
 
-    recap = build_recap(session)
+    prior_summary_map = last_time_by_exercise_code(
+        db, session, datetime.now(timezone.utc)
+    )
+    prior_weight_by_code: dict[str, float | None] = {}
+    for code, prior in prior_summary_map.items():
+        fs = prior.get("first_set") if prior else None
+        prior_weight_by_code[code] = fs.get("weight_kg") if fs else None
+
+    # Attach prior summary to each SessionExercise so build_recap can compute
+    # top_progression without re-querying. Transient attribute, per-request.
+    for se in session.session_exercises:
+        se._prior_summary = prior_summary_map.get(se.exercise_code_snapshot)
+
+    recap = build_recap(session, prior_weight_by_code=prior_weight_by_code)
     return templates.TemplateResponse(
         request,
         "session_done.html",

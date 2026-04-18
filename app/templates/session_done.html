@@ -54,8 +54,66 @@
           <b>{{ recap.summary.global_state }}</b>
         </li>
       {% endif %}
+      {% if recap.summary.confidence_score is not none %}
+        <li>
+          <span>Confiance du logging</span>
+          <b class="confidence-badge confidence-badge--{{ recap.summary.confidence_level }}">
+            {{ recap.summary.confidence_level }} ({{ recap.summary.confidence_score }})
+          </b>
+        </li>
+      {% endif %}
     </ul>
   </section>
+
+  {# ─── Top progression ─── #}
+  {% if recap.summary.top_progression %}
+    {% set tp = recap.summary.top_progression %}
+    <section class="card session-done__top-progression">
+      <h2 class="card__title">Top progression</h2>
+      <p class="top-progression__line">
+        <span class="top-progression__code">{{ tp.code }}</span>
+        <span class="top-progression__name">{{ tp.name }}</span>
+        {% if tp.weight_delta is not none and tp.weight_delta > 0 %}
+          <span class="top-progression__delta">+{{ tp.weight_delta|round(1) }} kg</span>
+        {% endif %}
+        {% if tp.reps_delta is not none and tp.reps_delta > 0 %}
+          <span class="top-progression__delta">+{{ tp.reps_delta }} reps</span>
+        {% endif %}
+        {% if tp.score_trend == 'up' %}<span class="top-progression__trend">score en hausse</span>{% endif %}
+      </p>
+    </section>
+  {% endif %}
+
+  {# ─── Zones sollicitées ─── #}
+  {% if recap.summary.zones_touched %}
+    <section class="card session-done__zones">
+      <h2 class="card__title">Zones sollicitées</h2>
+      <ul class="session-done__zones-list">
+        {% for z in recap.summary.zones_touched %}
+          <li>
+            <span>{{ z.label }}</span>
+            <b>{{ z.sets }} sets</b>
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
+
+  {# ─── À vérifier (anomalies) ─── #}
+  {% if recap.summary.anomalies %}
+    <section class="card session-done__anomalies">
+      <h2 class="card__title">À vérifier</h2>
+      <ul class="session-done__anomalies-list">
+        {% for a in recap.summary.anomalies %}
+          <li>
+            <span class="anomaly__icon" aria-hidden="true">⚠</span>
+            {% if a.exercise_code %}<b>{{ a.exercise_code }}</b> · {% endif %}
+            {{ a.message }}
+          </li>
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
 
   {# ─── Cardio (kind=cardio uniquement) ─── #}
   {% if recap.header.kind == 'cardio' and recap.summary.cardio %}

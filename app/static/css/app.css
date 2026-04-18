@@ -2208,3 +2208,98 @@ details.exercise-card[open] .card__actions--exercise {
   border-top: 1px dashed var(--border);
   padding-top: var(--space-xs);
 }
+
+/* ---------- Sb_08 — /done enriched blocks + confidence ---------------- */
+.confidence-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.confidence-badge--eleve { background: var(--ok-soft, rgba(60,200,120,0.18)); color: var(--ok, #3cc878); }
+.confidence-badge--moyen { background: var(--warn-soft, rgba(224,160,48,0.18)); color: var(--warn, #e0a030); }
+.confidence-badge--faible { background: var(--danger-soft, rgba(230,80,80,0.18)); color: var(--danger, #e65050); }
+
+.session-done__top-progression .top-progression__line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: baseline;
+  margin: 0;
+}
+.top-progression__code {
+  font-weight: 700;
+  background: var(--accent-soft, rgba(74,158,255,0.15));
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+.top-progression__name { flex: 1 1 auto; }
+.top-progression__delta {
+  font-weight: 600;
+  color: var(--ok, #3cc878);
+}
+.top-progression__trend { color: var(--fg-dim); font-size: 12px; font-style: italic; }
+
+.session-done__zones-list,
+.session-done__anomalies-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.session-done__zones-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-xs) 0;
+  border-bottom: 1px dashed var(--border);
+}
+.session-done__zones-list li:last-child { border-bottom: none; }
+
+.session-done__anomalies-list li {
+  display: flex;
+  gap: var(--space-xs);
+  padding: var(--space-xs) 0;
+  line-height: 1.35;
+  font-size: 13px;
+}
+.anomaly__icon { color: var(--warn, #e0a030); font-weight: 700; flex: 0 0 auto; }
+
+/* Active card hints */
+.exercise-card__hints {
+  margin: var(--space-xs) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.exercise-card__hints .hint-sb08 {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  font-size: 12px;
+  padding: 4px var(--space-sm);
+  border-left: 3px solid var(--accent, #4a9eff);
+  background: var(--accent-soft, rgba(74,158,255,0.08));
+  border-radius: var(--radius-sm);
+  margin: 0;
+  color: var(--fg);
+}
+.hint-sb08__icon { flex: 0 0 auto; }
+
+/* Exercise note collapsed into a <details> */
+.exercise-card__note {
+  margin-top: var(--space-sm);
+}
+.exercise-card__note > summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-dim);
+  user-select: none;
+}
+.exercise-card__note > summary::-webkit-details-marker { display: none; }
+.exercise-card__note[open] > summary { color: var(--fg); }
+.exercise-card__note textarea {
+  width: 100%;
+  margin-top: var(--space-xs);
+}
