@@ -369,3 +369,46 @@ user is already there.
   reverse direction is YAGNI until we actually need it)
 - Smart coaching. The progression hint is a deterministic
   mechanical rule; V1 does not claim anything beyond that.
+
+---
+
+## Convention de saisie des charges (Sb_06)
+
+SPIGNOS applique une regle unique pour la saisie du champ `weight_kg` :
+
+**Saisir la charge telle qu'elle apparait sur l'equipement.**
+
+| Type d'equipement | Convention | Exemple |
+|-------------------|-----------|---------|
+| Halteres (bilateraux et unilateraux) | Poids d'**un seul haltere** | 2 halteres de 20 → saisir `20` |
+| Machines a bras independants | Poids d'**un cote** | Shoulder press bras independants 30/30 → saisir `30` |
+| Machines bilaterales fixes (Smith, hack squat, leg press, chest press, butterfly) | Poids **total** affiche | Hack squat chargee a 120 → saisir `120` |
+| Cables unilateraux | Poids de la pile | Curl cable un bras 12 → saisir `12` |
+| Cables bilateraux symetriques | Poids d'**un cote** | Cable cross-over 10/10 → saisir `10` |
+| Poids du corps leste | Poids **externe ajoute** seulement | Dips lestes +20 → saisir `20` ; pull-up BW pur → `0` |
+| Barre olympique libre | **Total** barre incluse | Bench press 20+40 = 60 → saisir `60` |
+
+Justification :
+- Pas de calcul mental requis (lis ce qui est affiche → saisis)
+- Coherence avec l'UX gym (charge ressentie sur un cote du mouvement)
+- Analytics stables si la meme convention est appliquee a chaque occurrence
+
+Rappel UI : chaque carte exercice affiche un petit helper discret sous
+le heading "Travail" : `"kg = comme affiche sur l'equipement"`.
+
+## Separation des regimes de scoring (Sb_06)
+
+`quality_score.compute_session_quality` dispatche desormais par
+`template.kind` :
+- **strength** : formule legacy (work completion 40 + success_score 40 +
+  concentration 10 + global_state 10)
+- **cardio** : nouvelle formule (duration 50 + intensity 20 + completion 20
+  + subjective half-weighted 10)
+
+Une seance LISS 20 min en zone cible (115-135 bpm) score desormais >= 85,
+contre ~60 precedemment. La distinction strength vs cardio evite qu'une
+seance cardio bien executee soit visuellement penalisee.
+
+Timezone : les dates de seance sont stockees en UTC et rendues en
+`Europe/Paris` par defaut via le filtre Jinja `local`. Une preference
+utilisateur pourra etre introduite en V2.
