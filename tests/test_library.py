@@ -58,14 +58,17 @@ def test_push_a_detail_has_all_seven_exercises(client):
     assert "E8" not in body
 
 
-def test_pull_a_has_five_exercises(client):
-    # Pull A targets back width + rear delts with 5 exercises.
+def test_pull_a_has_seven_exercises(client):
+    # Pull A targets back width + rear delts. v12 balance raised the
+    # density to 7 exercises / 20 work sets (benchmark review chantier 3).
     r = client.get("/library/pull-a")
     assert r.status_code == 200
     body = r.text
     assert "Dos largeur" in body
-    for code in ["E1", "E2", "E3", "E4", "E5"]:
+    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
         assert code in body
+    assert "Pullover machine" in body
+    assert "Straight-arm pulldown" in body
 
 
 def test_liss_template_is_cardio(client):
