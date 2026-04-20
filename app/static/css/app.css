@@ -2323,6 +2323,72 @@ details.exercise-card[open] .card__actions--exercise {
   margin-top: var(--space-xs);
 }
 
+/* ---------- Sb_11a — pre-session briefing ----------------------------- */
+
+/* Chip on the <summary> of future / partial cards. Forced to a new line
+   below the code / name / progress row via flex-basis 100%. */
+.exercise-card__chip {
+  flex-basis: 100%;
+  order: 99;
+  margin-top: 2px;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--fg-dim);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.exercise-card__chip--cardio { color: #38b2ac; }
+
+/* Peek preparing the next exercise, rendered at the bottom of the
+   active card only. Discreet by design — dashed border, soft background,
+   dim typography. */
+.card-peek {
+  margin: var(--space-sm) 0 0;
+  padding: var(--space-sm);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft, rgba(255,255,255,0.02));
+}
+.card-peek__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+.card-peek__label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+}
+.card-peek__code {
+  font-weight: 700;
+  background: var(--accent-soft, rgba(74,158,255,0.15));
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+.card-peek__name {
+  color: var(--fg);
+  font-size: 13px;
+}
+.card-peek__scheme {
+  margin: var(--space-xs) 0 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+.card-peek__cues {
+  margin: var(--space-xs) 0 0;
+  padding-left: 1.1em;
+  font-size: 12px;
+  line-height: 1.35;
+  color: var(--fg);
+}
+.card-peek__cues li { margin: 2px 0; }
+
 /* ---------- Sb_09 — timeline kind legend ------------------------------ */
 .timeline-legend {
   display: flex;

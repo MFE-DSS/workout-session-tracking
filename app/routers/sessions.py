@@ -294,6 +294,34 @@ def session_detail(
         else:
             prev_code_by_exercise[se.id] = None
 
+    # Sb_11a — chip for every future/partial card, peek preparing the next
+    # exercise at the bottom of the active card.
+    from app.services.briefing import build_chip, build_peek
+    template_kind_for_briefing = (
+        session.template.kind if session.template is not None else None
+    )
+    briefing_chips: dict[int, dict | None] = {}
+    for se in ordered:
+        if jump_states.get(se.id) in ("future", "partial"):
+            prior = last_time.get(se.exercise_code_snapshot)
+            briefing_chips[se.id] = build_chip(
+                se.template_exercise, prior, template_kind_for_briefing
+            )
+        else:
+            briefing_chips[se.id] = None
+
+    peek_for_active: dict | None = None
+    for idx, se in enumerate(ordered):
+        if se.id == active_exercise_id and idx + 1 < len(ordered):
+            next_se = ordered[idx + 1]
+            peek_for_active = build_peek(
+                next_se,
+                last_time.get(next_se.exercise_code_snapshot),
+                atlas_data.get(next_se.id),
+                template_kind_for_briefing,
+            )
+            break
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -311,6 +339,8 @@ def session_detail(
             "substitution_data": substitution_data,
             "atlas_data": atlas_data,
             "sb08_hints_by_exercise": sb08_hints_by_exercise,
+            "briefing_chips": briefing_chips,
+            "peek_for_active": peek_for_active,
             "jump_states": jump_states,
             "next_code_by_exercise": next_code_by_exercise,
             "prev_code_by_exercise": prev_code_by_exercise,

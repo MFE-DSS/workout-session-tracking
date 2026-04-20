@@ -63,6 +63,10 @@
       {% if done > 0 and summary %}
         <span class="exercise-card__recap">{{ summary.weights_str }} kg · {{ summary.reps_str }} reps</span>
       {% endif %}
+      {% set briefing_chip = briefing_chips.get(se.id) %}
+      {% if briefing_chip %}
+        <span class="exercise-card__chip exercise-card__chip--{{ briefing_chip.kind }}">{{ briefing_chip.scheme }} · {{ briefing_chip.last_time }}</span>
+      {% endif %}
     </summary>
 
     <form
@@ -332,6 +336,23 @@
         <summary>Note exercice (optionnel)</summary>
         <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
       </details>
+
+      {# Sb_11a — peek preparing the next exercise, active card only. #}
+      {% if is_active and peek_for_active %}
+        <aside class="card-peek" aria-label="Prochain exercice">
+          <header class="card-peek__head">
+            <span class="card-peek__label">Prochain</span>
+            <span class="card-peek__code">{{ peek_for_active.code }}</span>
+            <span class="card-peek__name">{{ peek_for_active.name }}</span>
+          </header>
+          <p class="card-peek__scheme">{{ peek_for_active.scheme }} · {{ peek_for_active.last_time }}</p>
+          {% if peek_for_active.cues %}
+            <ul class="card-peek__cues">
+              {% for cue in peek_for_active.cues %}<li>{{ cue }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </aside>
+      {% endif %}
 
       {# Sb_02.1 + Sb_05: enriched footer with prev/next navigation. #}
       {% set next_code = next_code_by_exercise.get(se.id) %}
