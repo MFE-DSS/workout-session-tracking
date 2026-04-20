@@ -117,6 +117,12 @@
       </div>
       {% if sparkline_svg %}
         <div class="sparkline-wrap">{{ sparkline_svg|safe }}</div>
+        {% if sparkline_has_mixed_kinds %}
+          <p class="timeline-legend timeline-legend--compact">
+            <span class="timeline-legend__dot timeline-legend__dot--strength"></span> Musculation
+            <span class="timeline-legend__dot timeline-legend__dot--cardio"></span> Cardio
+          </p>
+        {% endif %}
       {% else %}
         <p class="text-dim" style="font-size:13px;margin:var(--space-sm) 0;">Pas encore de données</p>
       {% endif %}

@@ -2304,6 +2304,25 @@ details.exercise-card[open] .card__actions--exercise {
   margin-top: var(--space-xs);
 }
 
+/* Session-level free_note — mirror of the exercise-level pattern (Sb_10 G2). */
+.session-feedback__note {
+  margin: var(--space-sm) 0;
+}
+.session-feedback__note > summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--fg-dim);
+  user-select: none;
+  padding: 4px 0;
+}
+.session-feedback__note > summary::-webkit-details-marker { display: none; }
+.session-feedback__note[open] > summary { color: var(--fg); }
+.session-feedback__note textarea {
+  width: 100%;
+  margin-top: var(--space-xs);
+}
+
 /* ---------- Sb_09 — timeline kind legend ------------------------------ */
 .timeline-legend {
   display: flex;
@@ -2324,3 +2343,9 @@ details.exercise-card[open] .card__actions--exercise {
 }
 .timeline-legend__dot--strength { background: #f25f3a; }
 .timeline-legend__dot--cardio { background: #38b2ac; }
+.timeline-legend--compact {
+  gap: var(--space-sm);
+  font-size: 11px;
+  margin-top: 4px;
+  justify-content: flex-end;
+}

@@ -447,14 +447,15 @@
     />
   {% endcall %}
 
-  {% call field_group("Note (optionnel)") %}
+  <details class="session-feedback__note" {% if session.free_note %}open{% endif %}>
+    <summary>Note séance (optionnel)</summary>
     <textarea
       name="free_note"
       maxlength="280"
       rows="2"
       placeholder="Ressenti général, incidents, focus du jour..."
     >{{ session.free_note or '' }}</textarea>
-  {% endcall %}
+  </details>
 
   <div class="card__actions">
     <button type="submit" class="btn btn--primary">Enregistrer</button>

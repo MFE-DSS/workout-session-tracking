@@ -110,6 +110,12 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
         sparkline_kinds.append(_session_kind(s))
 
     sparkline_svg = build_sparkline_svg(sparkline_points, kinds=sparkline_kinds)
+    # Sb_10 G1 — show the kind legend on the home sparkline only when
+    # the 14-day window actually mixes strength and cardio sessions,
+    # otherwise it adds noise.
+    sparkline_has_mixed_kinds = (
+        "strength" in sparkline_kinds and "cardio" in sparkline_kinds
+    )
 
     from app.services.behavioral import compute_behavioral_state
 
@@ -132,6 +138,7 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "open_since": open_since,
             "kpis": global_kpis,
             "sparkline_svg": sparkline_svg,
+            "sparkline_has_mixed_kinds": sparkline_has_mixed_kinds,
             "behavioral": behavioral,
             "readiness_today": readiness_today,
             "readiness_labels": READINESS_LABELS,
