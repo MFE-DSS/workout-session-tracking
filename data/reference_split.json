@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-18.v11",
+  "version": "2026-04-18.v12",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -523,6 +523,56 @@
           ],
           "machine_slug": "face-pull-cable",
           "machine_family": "shoulders-lateral-posterior"
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Pullover machine",
+          "set_scheme": "3x 10-15",
+          "notes": "Complément largeur. Bras tendus, effort via le grand dorsal.",
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ],
+          "substitutes": [
+            "Pullover câble (bras tendus)",
+            "Straight-arm pulldown câble"
+          ],
+          "machine_slug": "pullover-machine",
+          "machine_family": "back-vertical"
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Straight-arm pulldown câble",
+          "set_scheme": "2x 12-15",
+          "notes": "Finisher lats bras tendus. Poulie haute, coudes fixes.",
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ],
+          "substitutes": [
+            "Pullover câble (bras tendus)",
+            "Pullover machine"
+          ],
+          "machine_slug": null,
+          "machine_family": "back-vertical"
         }
       ],
       "catalog_section": "core",
