@@ -13,6 +13,7 @@
 # Environment variables:
 #   DEPLOY_BRANCH   — git branch to deploy (default: main)
 #   APP_DIR         — application root (default: /srv/workout)
+#   APP_USER        — system user owning the app + service (default: workout)
 #   SERVICE_NAME    — systemd unit name (default: workout)
 #   SKIP_BACKUP     — set to 1 to skip SQLite backup (not recommended)
 
@@ -20,6 +21,7 @@ set -euo pipefail
 
 # ─── Configuration ────────────────────────────────────────────────
 APP_DIR="${APP_DIR:-/srv/workout}"
+APP_USER="${APP_USER:-workout}"
 SERVICE_NAME="${SERVICE_NAME:-workout}"
 DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 SKIP_BACKUP="${SKIP_BACKUP:-0}"
@@ -48,8 +50,8 @@ die() {
     echo -e "Service state: $(systemctl is-active "${SERVICE_NAME}" 2>/dev/null || echo 'unknown')"
     echo ""
     echo "Rollback hints:"
-    echo "  1. If migration failed:  sudo -u workout ${ALEMBIC} downgrade -1"
-    echo "  2. If code is bad:       sudo -u workout bash -c 'cd ${APP_DIR} && git checkout HEAD~1'"
+    echo "  1. If migration failed:  sudo -u "${APP_USER}" ${ALEMBIC} downgrade -1"
+    echo "  2. If code is bad:       sudo -u "${APP_USER}" bash -c 'cd ${APP_DIR} && git checkout HEAD~1'"
     echo "  3. Restart previous:     sudo systemctl restart ${SERVICE_NAME}"
     if [ -n "${SQLITE_BACKUP:-}" ] && [ -f "${SQLITE_BACKUP}" ]; then
         echo "  4. Restore SQLite:     sudo cp '${SQLITE_BACKUP}' '${APP_DIR}/var/workout.db'"
@@ -86,7 +88,7 @@ ok "Service: ${SERVICE_NAME}"
 step "Recording pre-deploy state"
 
 cd "${APP_DIR}"
-PRE_SHA="$(sudo -u workout git rev-parse HEAD 2>/dev/null || echo 'unknown')"
+PRE_SHA="$(sudo -u "${APP_USER}" git rev-parse HEAD 2>/dev/null || echo 'unknown')"
 ok "Current commit: ${PRE_SHA:0:12}"
 
 # ─── SQLite backup ────────────────────────────────────────────────
@@ -101,9 +103,9 @@ if [ "${IS_SQLITE}" -eq 1 ] && [ "${SKIP_BACKUP}" != "1" ]; then
 
         # Use sqlite3 .backup for a consistent copy (handles WAL mode)
         if command -v sqlite3 &>/dev/null; then
-            sudo -u workout sqlite3 "${SQLITE_PATH}" ".backup '${SQLITE_BACKUP}'"
+            sudo -u "${APP_USER}" sqlite3 "${SQLITE_PATH}" ".backup '${SQLITE_BACKUP}'"
         else
-            sudo -u workout cp "${SQLITE_PATH}" "${SQLITE_BACKUP}"
+            sudo -u "${APP_USER}" cp "${SQLITE_PATH}" "${SQLITE_BACKUP}"
         fi
 
         BACKUP_SIZE="$(du -h "${SQLITE_BACKUP}" | cut -f1)"
@@ -118,19 +120,19 @@ fi
 # ─── Pull latest code ────────────────────────────────────────────
 step "Pulling latest code"
 
-sudo -u workout bash -c "
+sudo -u "${APP_USER}" bash -c "
     cd '${APP_DIR}' &&
     git fetch origin &&
     git reset --hard 'origin/${DEPLOY_BRANCH}'
 " || die "git pull failed"
 
-POST_SHA="$(sudo -u workout git -C "${APP_DIR}" rev-parse HEAD)"
+POST_SHA="$(sudo -u "${APP_USER}" git -C "${APP_DIR}" rev-parse HEAD)"
 if [ "${PRE_SHA}" = "${POST_SHA}" ]; then
     warn "No new commits (already at ${POST_SHA:0:12})"
 else
     ok "Updated: ${PRE_SHA:0:12} → ${POST_SHA:0:12}"
     # Show what changed
-    sudo -u workout git -C "${APP_DIR}" log --oneline "${PRE_SHA}..${POST_SHA}" 2>/dev/null | head -10 | while read -r line; do
+    sudo -u "${APP_USER}" git -C "${APP_DIR}" log --oneline "${PRE_SHA}..${POST_SHA}" 2>/dev/null | head -10 | while read -r line; do
         echo "    ${line}"
     done
 fi
@@ -138,15 +140,15 @@ fi
 # ─── Install dependencies ────────────────────────────────────────
 step "Installing dependencies"
 
-sudo -u workout "${PIP}" install --quiet --upgrade pip 2>/dev/null || true
-sudo -u workout "${PIP}" install --quiet -r "${APP_DIR}/requirements.txt" \
+sudo -u "${APP_USER}" "${PIP}" install --quiet --upgrade pip 2>/dev/null || true
+sudo -u "${APP_USER}" "${PIP}" install --quiet -r "${APP_DIR}/requirements.txt" \
     || die "pip install failed"
 ok "Dependencies installed"
 
 # ─── Alembic drift check ─────────────────────────────────────────
 step "Checking schema drift"
 
-sudo -u workout bash -c "
+sudo -u "${APP_USER}" bash -c "
     cd '${APP_DIR}' && '${PYTHON}' -m scripts.check_alembic_drift
 " || die "Schema drift detected — fix before deploying"
 ok "No schema drift"
@@ -154,7 +156,7 @@ ok "No schema drift"
 # ─── Run migrations ──────────────────────────────────────────────
 step "Running database migrations"
 
-MIGRATION_OUTPUT="$(sudo -u workout bash -c "
+MIGRATION_OUTPUT="$(sudo -u "${APP_USER}" bash -c "
     cd '${APP_DIR}' && '${ALEMBIC}' upgrade head 2>&1
 ")" || die "Alembic migration failed"
 
@@ -169,7 +171,7 @@ fi
 # ─── Seed catalog ────────────────────────────────────────────────
 step "Seeding reference catalog"
 
-sudo -u workout bash -c "
+sudo -u "${APP_USER}" bash -c "
     cd '${APP_DIR}' && '${PYTHON}' -m scripts.seed_db
 " || die "Seed failed"
 ok "Catalog seeded"
@@ -177,7 +179,7 @@ ok "Catalog seeded"
 # ─── Verify DB connectivity ──────────────────────────────────────
 step "Verifying database connectivity"
 
-sudo -u workout bash -c "
+sudo -u "${APP_USER}" bash -c "
     cd '${APP_DIR}' && '${PYTHON}' -c '
 from app.database import SessionLocal
 from sqlalchemy import text

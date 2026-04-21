@@ -95,6 +95,10 @@ from="140.82.112.0/20,143.55.64.0/20" ssh-ed25519 AAAA... github-actions-deploy-
 
 ### 2.4 Installer le sudoers restreint
 
+Le contenu exact dépend du couple `(APP_DIR, APP_USER)` de ton install. Voir §2.4.1 ci-dessous pour les valeurs non-défaut.
+
+**Install par défaut (user système `workout`, repo `/srv/workout`) :**
+
 ```bash
 # Sur le VPS, en root :
 sudo tee /etc/sudoers.d/spignos-deploy <<'EOF'
@@ -108,6 +112,26 @@ sudo visudo -c -f /etc/sudoers.d/spignos-deploy   # vérifie la syntaxe
 ```
 
 Effet : `deploy` ne peut **que** lancer ces deux scripts. Pas de shell root, pas de modification arbitraire du système.
+
+### 2.4.1 Layout non-défaut — `APP_DIR` / `APP_USER`
+
+Si ton install SPIGNOS n'utilise pas le chemin `/srv/workout` ni le user `workout` (par exemple une install historique sous `/opt/workout-session-tracking` avec `ubuntu` comme user de service), deux ajustements :
+
+1. **Sudoers** avec les vrais chemins et user cible :
+
+   ```bash
+   # Exemple : APP_DIR=/opt/workout-session-tracking, APP_USER=ubuntu
+   sudo tee /etc/sudoers.d/spignos-deploy <<'EOF'
+   deploy ALL=(root)   NOPASSWD: /opt/workout-session-tracking/scripts/deploy_from_github_actions.sh
+   deploy ALL=(ubuntu) NOPASSWD: /bin/bash /opt/workout-session-tracking/scripts/smoke_deploy.sh
+   EOF
+   sudo chmod 440 /etc/sudoers.d/spignos-deploy
+   sudo visudo -c -f /etc/sudoers.d/spignos-deploy
+   ```
+
+2. **Wrapper `deploy_from_github_actions.sh`** reconnaît les env vars `APP_DIR` et `APP_USER` depuis Sb_16.1. Les valeurs par défaut hardcodées au début du fichier sont `/opt/workout-session-tracking` et `ubuntu` — cohérentes avec l'install historique du projet. Si ton layout est encore autre chose, édite les 2 lignes en tête du script ou passe les vars via sudoers (non recommandé, plus opaque).
+
+`deploy_prod.sh` consomme aussi `APP_DIR` et `APP_USER` depuis Sb_16.1 via ses variables d'env. Le wrapper les propage avec `sudo --preserve-env=APP_DIR,APP_USER`.
 
 ### 2.5 Vérifier que `/srv/workout/scripts/deploy_from_github_actions.sh` est exécutable
 

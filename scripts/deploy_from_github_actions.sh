@@ -32,8 +32,12 @@ if [[ ! "$SHA" =~ ^[0-9a-f]{7,40}$ ]]; then
   exit 2
 fi
 
-APP_DIR="/srv/workout"
-APP_USER="workout"
+# These two values match the real VPS layout. Override via env vars if
+# your install differs. They're also exported so deploy_prod.sh, which
+# accepts APP_DIR and APP_USER as env vars since Sb_16.1, picks them up.
+APP_DIR="${APP_DIR:-/opt/workout-session-tracking}"
+APP_USER="${APP_USER:-ubuntu}"
+export APP_DIR APP_USER
 
 if [[ ! -d "$APP_DIR/.git" ]]; then
   echo "[deploy] FATAL: $APP_DIR is not a git checkout" >&2
@@ -53,6 +57,7 @@ echo "[deploy] step 2/3 — git reset --hard $SHA"
 sudo -u "$APP_USER" git reset --hard "$SHA"
 
 echo "[deploy] step 3/3 — running scripts/deploy_prod.sh"
-sudo -u "$APP_USER" bash "$APP_DIR/scripts/deploy_prod.sh"
+sudo -u "$APP_USER" --preserve-env=APP_DIR,APP_USER \
+    bash "$APP_DIR/scripts/deploy_prod.sh"
 
 echo "[deploy] OK — $SHA is live on $APP_DIR"
