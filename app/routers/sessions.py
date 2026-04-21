@@ -75,10 +75,18 @@ _SUCCESS_SCORE = {int(e) for e in ExerciseSuccessScore}
 # ----------------------------------------------------------------------
 
 
+# Sb_13 — whitelist for `creation_source`. Values outside are silently
+# stored as NULL to keep the field strictly analytical.
+_CREATION_SOURCE_ALLOWED = {
+    "reco_top", "reco_alt", "launcher", "library", "replay",
+}
+
+
 @router.post("/sessions")
 def create_session(
     template_slug: Annotated[str, Form()],
     db: DbSession, user: CurrentUser,
+    creation_source: Annotated[str | None, Form()] = None,
 ) -> RedirectResponse:
     tpl = db.execute(
         select(WorkoutTemplate)
@@ -93,6 +101,10 @@ def create_session(
         raise HTTPException(status_code=404, detail="Unknown template")
 
     session = instantiate_session(db, tpl, datetime.now(timezone.utc), user_id=user.id)
+    # Sb_13 — telemetry. Silently reject values outside the whitelist so
+    # a typo never breaks session creation.
+    if creation_source in _CREATION_SOURCE_ALLOWED:
+        session.creation_source = creation_source
     db.commit()
     db.refresh(session)
     return RedirectResponse(

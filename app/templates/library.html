@@ -29,6 +29,8 @@
               onclick="event.stopPropagation();"
             >
               <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
+              {# Sb_13 telemetry: library CTA. #}
+              <input type="hidden" name="creation_source" value="library" />
               <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
             </form>
           </a>

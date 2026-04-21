@@ -15,24 +15,30 @@
 
   <form method="post" action="/sessions" class="reco-next__actions">
     <input type="hidden" name="template_slug" value="{{ top.template.slug }}">
+    {# Sb_13 telemetry: primary CTA starts with reco_top source. #}
+    <input type="hidden" name="creation_source" value="reco_top">
     <button type="submit" class="btn btn--primary btn--wide">
       Démarrer {{ top.template.name }} →
     </button>
-    {% if reco.alternatives %}
-      <details class="reco-next__alternatives">
-        <summary>Voir {{ reco.alternatives | length }} alternative{% if reco.alternatives | length > 1 %}s{% endif %}</summary>
-        <ul class="reco-next__alt-list">
-          {% for alt in reco.alternatives %}
-            <li class="reco-next__alt-item">
-              <div>
-                <a href="{{ url_for('launcher') }}?preselect={{ alt.template.slug }}" class="reco-next__alt-name">{{ alt.template.name }}</a>
-                <p class="reco-next__alt-phrase">{{ alt.phrase }}</p>
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      </details>
-    {% endif %}
   </form>
+  {% if reco.alternatives %}
+    <details class="reco-next__alternatives">
+      <summary>Voir {{ reco.alternatives | length }} alternative{% if reco.alternatives | length > 1 %}s{% endif %}</summary>
+      <ul class="reco-next__alt-list">
+        {% for alt in reco.alternatives %}
+          <li class="reco-next__alt-item">
+            {# Sb_13 telemetry: alternative uses its own inline POST form
+               so the creation_source lands as reco_alt at session time. #}
+            <form method="post" action="/sessions" class="reco-next__alt-form">
+              <input type="hidden" name="template_slug" value="{{ alt.template.slug }}">
+              <input type="hidden" name="creation_source" value="reco_alt">
+              <button type="submit" class="reco-next__alt-name">{{ alt.template.name }}</button>
+              <p class="reco-next__alt-phrase">{{ alt.phrase }}</p>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </details>
+  {% endif %}
 </section>
 {% endif %}
