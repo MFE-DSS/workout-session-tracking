@@ -1,0 +1,111 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Ref to deploy (branch or full SHA). Default: main."
+        required: true
+        default: "main"
+      skip_smoke:
+        description: "Skip smoke_deploy.sh (emergency only — leaves prod unvalidated)."
+        required: false
+        type: boolean
+        default: false
+
+# contents: write is required to push the deploy/prod/<tag> back to origin.
+# We grant nothing else — no issues, no PRs, no packages.
+permissions:
+  contents: write
+
+# Serialize deploys. Two dispatches in flight wait for each other; they
+# do not cancel. In-flight prod deploys are never cancelled mid-run.
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: SSH deploy on OVH VPS
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout requested ref
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          # Fetch full history so we can resolve the ref to a full SHA
+          # and push the deploy tag back to origin.
+          fetch-depth: 0
+
+      - name: Resolve full SHA
+        id: sha
+        run: |
+          FULL_SHA="$(git rev-parse HEAD)"
+          SHORT_SHA="$(git rev-parse --short=7 HEAD)"
+          echo "full=$FULL_SHA"   >> "$GITHUB_OUTPUT"
+          echo "short=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "Deploying $FULL_SHA ($SHORT_SHA)"
+
+      - name: Configure SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$SSH_KEY"         > ~/.ssh/id_deploy
+          printf '%s\n' "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
+
+      - name: Run deploy_from_github_actions.sh on VPS
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
+          FULL_SHA: ${{ steps.sha.outputs.full }}
+        run: |
+          ssh \
+            -i ~/.ssh/id_deploy \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "sudo /srv/workout/scripts/deploy_from_github_actions.sh $FULL_SHA"
+
+      - name: Run smoke_deploy.sh on VPS
+        if: ${{ inputs.skip_smoke == false }}
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
+        run: |
+          ssh \
+            -i ~/.ssh/id_deploy \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            -o StrictHostKeyChecking=yes \
+            -o BatchMode=yes \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "sudo -u workout bash /srv/workout/scripts/smoke_deploy.sh"
+
+      - name: Tag successful deploy
+        if: ${{ success() }}
+        env:
+          FULL_SHA: ${{ steps.sha.outputs.full }}
+          SHORT_SHA: ${{ steps.sha.outputs.short }}
+        run: |
+          TAG="deploy/prod/$(date -u +%Y-%m-%d-%H%M)-${SHORT_SHA}"
+          echo "Tagging $TAG → $FULL_SHA"
+          git config user.email "deploy-bot@github-actions"
+          git config user.name  "deploy-bot"
+          git tag -a "$TAG" -m "Deployed $FULL_SHA to production via Actions" "$FULL_SHA"
+          git push origin "$TAG"
+          echo "::notice title=Deploy tagged::$TAG"
+
+      - name: Report failure
+        if: ${{ failure() }}
+        env:
+          FULL_SHA: ${{ steps.sha.outputs.full }}
+        run: |
+          echo "::error title=Deploy failed::SHA $FULL_SHA — VPS left in partial state, investigate via SSH."
+          echo "Rollback: re-run this workflow with ref=<previous-sha>."
+          exit 1
