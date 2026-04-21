@@ -37,7 +37,12 @@ fi
 # accepts APP_DIR and APP_USER as env vars since Sb_16.1, picks them up.
 APP_DIR="${APP_DIR:-/opt/workout-session-tracking}"
 APP_USER="${APP_USER:-ubuntu}"
-export APP_DIR APP_USER
+# The wrapper has just done git fetch + reset --hard <SHA>, so the repo
+# is already at the target SHA. Tell deploy_prod.sh to skip its own pull
+# step — it would otherwise try to reset to origin/${DEPLOY_BRANCH}, which
+# may or may not exist on this clone and is redundant with our reset.
+SKIP_GIT_PULL=1
+export APP_DIR APP_USER SKIP_GIT_PULL
 
 if [[ ! -d "$APP_DIR/.git" ]]; then
   echo "[deploy] FATAL: $APP_DIR is not a git checkout" >&2
@@ -57,7 +62,7 @@ echo "[deploy] step 2/3 — git reset --hard $SHA"
 sudo -u "$APP_USER" git reset --hard "$SHA"
 
 echo "[deploy] step 3/3 — running scripts/deploy_prod.sh"
-sudo -u "$APP_USER" --preserve-env=APP_DIR,APP_USER \
+sudo -u "$APP_USER" --preserve-env=APP_DIR,APP_USER,SKIP_GIT_PULL \
     bash "$APP_DIR/scripts/deploy_prod.sh"
 
 echo "[deploy] OK — $SHA is live on $APP_DIR"

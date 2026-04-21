@@ -25,6 +25,7 @@ APP_USER="${APP_USER:-workout}"
 SERVICE_NAME="${SERVICE_NAME:-workout}"
 DEPLOY_BRANCH="${DEPLOY_BRANCH:-main}"
 SKIP_BACKUP="${SKIP_BACKUP:-0}"
+SKIP_GIT_PULL="${SKIP_GIT_PULL:-0}"
 VENV="${APP_DIR}/.venv"
 PIP="${VENV}/bin/pip"
 PYTHON="${VENV}/bin/python"
@@ -118,23 +119,32 @@ elif [ "${SKIP_BACKUP}" = "1" ]; then
 fi
 
 # ─── Pull latest code ────────────────────────────────────────────
-step "Pulling latest code"
-
-sudo -u "${APP_USER}" bash -c "
-    cd '${APP_DIR}' &&
-    git fetch origin &&
-    git reset --hard 'origin/${DEPLOY_BRANCH}'
-" || die "git pull failed"
-
-POST_SHA="$(sudo -u "${APP_USER}" git -C "${APP_DIR}" rev-parse HEAD)"
-if [ "${PRE_SHA}" = "${POST_SHA}" ]; then
-    warn "No new commits (already at ${POST_SHA:0:12})"
+# When the CI/CD wrapper invokes this script, it has already checked out
+# the exact target SHA, so we skip the pull entirely. Operators running
+# the script manually keep the legacy pull-from-DEPLOY_BRANCH behaviour.
+if [ "${SKIP_GIT_PULL}" = "1" ]; then
+    step "Pulling latest code (skipped — caller already placed repo at target SHA)"
+    POST_SHA="${PRE_SHA}"
+    ok "Using SHA: ${POST_SHA:0:12}"
 else
-    ok "Updated: ${PRE_SHA:0:12} → ${POST_SHA:0:12}"
-    # Show what changed
-    sudo -u "${APP_USER}" git -C "${APP_DIR}" log --oneline "${PRE_SHA}..${POST_SHA}" 2>/dev/null | head -10 | while read -r line; do
-        echo "    ${line}"
-    done
+    step "Pulling latest code"
+
+    sudo -u "${APP_USER}" bash -c "
+        cd '${APP_DIR}' &&
+        git fetch origin &&
+        git reset --hard 'origin/${DEPLOY_BRANCH}'
+    " || die "git pull failed"
+
+    POST_SHA="$(sudo -u "${APP_USER}" git -C "${APP_DIR}" rev-parse HEAD)"
+    if [ "${PRE_SHA}" = "${POST_SHA}" ]; then
+        warn "No new commits (already at ${POST_SHA:0:12})"
+    else
+        ok "Updated: ${PRE_SHA:0:12} → ${POST_SHA:0:12}"
+        # Show what changed
+        sudo -u "${APP_USER}" git -C "${APP_DIR}" log --oneline "${PRE_SHA}..${POST_SHA}" 2>/dev/null | head -10 | while read -r line; do
+            echo "    ${line}"
+        done
+    fi
 fi
 
 # ─── Install dependencies ────────────────────────────────────────
