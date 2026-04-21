@@ -45,6 +45,24 @@ echo ""
 echo "=== Smoke deploy: ${BASE_URL} ==="
 echo ""
 
+# --- Offline backup refresh (runs first so /healthz/strict sees a
+#     fresh JSON dump in /var/backups, otherwise it would return 503
+#     "degraded — check backups" on a VPS where the systemd backup
+#     timer has not produced a dump yet — Sb_16.5). ---
+
+REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+# `python -m scripts.xxx` needs the CWD to be the repo root so
+# the `scripts/` package is importable. Pipeline SSH invocations
+# land in the remote home dir (e.g. /home/deploy), so we force cd.
+cd "${REPO_DIR}"
+
+check "backup_sessions.py runs successfully" \
+    "${REPO_DIR}/.venv/bin/python" -m scripts.backup_sessions
+
+check "verify_backup.py returns OK" \
+    "${REPO_DIR}/.venv/bin/python" -m scripts.verify_backup
+
 # --- Public routes (expect 200) ---
 
 check "GET /healthz returns 200" \
@@ -86,15 +104,7 @@ check_auth_redirect "GET /export requires auth" "/export"
 check_auth_redirect "GET /export/sessions.json requires auth" "/export/sessions.json"
 check_auth_redirect "GET /export/sessions.csv requires auth" "/export/sessions.csv"
 
-# --- Offline checks ---
-
-REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-
-check "backup_sessions.py runs successfully" \
-    "${REPO_DIR}/.venv/bin/python" -m scripts.backup_sessions
-
-check "verify_backup.py returns OK" \
-    "${REPO_DIR}/.venv/bin/python" -m scripts.verify_backup
+# --- Offline schema drift (unrelated to backups, kept at the end). ---
 
 check "check_alembic_drift returns OK" \
     "${REPO_DIR}/.venv/bin/python" -m scripts.check_alembic_drift
