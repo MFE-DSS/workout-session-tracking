@@ -2389,6 +2389,73 @@ details.exercise-card[open] .card__actions--exercise {
 }
 .card-peek__cues li { margin: 2px 0; }
 
+/* ---------- Sb_12 — next-session recommendation block ----------------- */
+.reco-next {
+  margin-bottom: var(--space-md);
+  border-left: 3px solid var(--accent, #4a9eff);
+}
+.reco-next__kicker {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+}
+.reco-next__title {
+  margin: var(--space-xs) 0 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.reco-next__focus {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+.reco-next__phrase {
+  margin: var(--space-sm) 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--fg);
+}
+.reco-next__actions {
+  margin-top: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+.reco-next__alternatives > summary {
+  list-style: none;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-dim);
+  padding: var(--space-xs) 0;
+  user-select: none;
+  text-align: center;
+}
+.reco-next__alternatives > summary::-webkit-details-marker { display: none; }
+.reco-next__alternatives[open] > summary { color: var(--fg); }
+.reco-next__alt-list {
+  list-style: none;
+  margin: var(--space-xs) 0 0;
+  padding: 0;
+}
+.reco-next__alt-item {
+  padding: var(--space-xs) 0;
+  border-top: 1px dashed var(--border);
+}
+.reco-next__alt-item:first-child { border-top: none; }
+.reco-next__alt-name {
+  font-weight: 600;
+  color: var(--fg);
+  text-decoration: none;
+}
+.reco-next__alt-name:hover { color: var(--accent, #4a9eff); }
+.reco-next__alt-phrase {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+  line-height: 1.35;
+}
+
 /* ---------- Sb_09 — timeline kind legend ------------------------------ */
 .timeline-legend {
   display: flex;

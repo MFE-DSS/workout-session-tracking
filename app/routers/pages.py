@@ -58,6 +58,23 @@ CATALOG_SECTIONS = [
 ]
 
 
+def _build_reco_context(db, user_id: int, open_session) -> dict | None:
+    """Sb_12 — wrap the recommendation service for the home/launcher contexts.
+
+    Returns None when a session is already open (the partial hides itself
+    anyway, but short-circuiting saves a query).
+    """
+    if open_session is not None:
+        return None
+    try:
+        from app.services.recommendation import recommend_next_session
+        return recommend_next_session(db, user_id)
+    except Exception:
+        # Recommendation is a non-critical signal — never break the home
+        # or launcher because of it.
+        return None
+
+
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     from datetime import datetime, timedelta, timezone
@@ -139,6 +156,7 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "kpis": global_kpis,
             "sparkline_svg": sparkline_svg,
             "sparkline_has_mixed_kinds": sparkline_has_mixed_kinds,
+            "reco": _build_reco_context(db, user.id, open_session),
             "behavioral": behavioral,
             "readiness_today": readiness_today,
             "readiness_labels": READINESS_LABELS,
@@ -169,6 +187,7 @@ def launcher(
                 "step": 1,
                 "types": types,
                 "active_session": active_session,
+                "reco": _build_reco_context(db, user.id, active_session),
             },
         )
 

@@ -13,6 +13,11 @@
   </a>
 {% endif %}
 
+{# Sb_12 — Prochaine séance suggérée (au-dessus du CTA) #}
+{% if not open_session %}
+  {% include "_partials/next_session_reco.html" %}
+{% endif %}
+
 {# === CTA principal : Nouvelle séance — pleine largeur, accent === #}
 {% if not open_session %}
 <a class="tile tile--primary tile--cta-main" href="{{ url_for('launcher') }}"
