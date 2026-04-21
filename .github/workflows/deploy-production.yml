@@ -71,7 +71,7 @@ jobs:
             -o StrictHostKeyChecking=yes \
             -o BatchMode=yes \
             "$DEPLOY_USER@$DEPLOY_HOST" \
-            "sudo /srv/workout/scripts/deploy_from_github_actions.sh $FULL_SHA"
+            "sudo /opt/workout-session-tracking/scripts/deploy_from_github_actions.sh $FULL_SHA"
 
       - name: Run smoke_deploy.sh on VPS
         if: ${{ inputs.skip_smoke == false }}
@@ -85,7 +85,7 @@ jobs:
             -o StrictHostKeyChecking=yes \
             -o BatchMode=yes \
             "$DEPLOY_USER@$DEPLOY_HOST" \
-            "sudo -u workout bash /srv/workout/scripts/smoke_deploy.sh"
+            "sudo -u ubuntu bash /opt/workout-session-tracking/scripts/smoke_deploy.sh"
 
       - name: Tag successful deploy
         if: ${{ success() }}
