@@ -61,8 +61,11 @@ sudo -u "$APP_USER" git fetch --prune --tags origin
 echo "[deploy] step 2/3 — git reset --hard $SHA"
 sudo -u "$APP_USER" git reset --hard "$SHA"
 
-echo "[deploy] step 3/3 — running scripts/deploy_prod.sh"
-sudo -u "$APP_USER" --preserve-env=APP_DIR,APP_USER,SKIP_GIT_PULL \
-    bash "$APP_DIR/scripts/deploy_prod.sh"
+echo "[deploy] step 3/3 — running scripts/deploy_prod.sh (as root — needs systemctl)"
+# deploy_prod.sh is designed to run as root: it uses sudo -u "$APP_USER"
+# internally for git / pip / alembic, and calls systemctl restart directly
+# (which requires root privileges). APP_DIR / APP_USER / SKIP_GIT_PULL are
+# already exported above so the child process inherits them.
+bash "$APP_DIR/scripts/deploy_prod.sh"
 
 echo "[deploy] OK — $SHA is live on $APP_DIR"
