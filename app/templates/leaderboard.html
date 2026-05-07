@@ -15,12 +15,18 @@
       <li class="lb-row {% if e.username == current_username %}lb-row--self{% endif %}">
         <span class="lb-row__rank">#{{ e.rank }}</span>
         <span class="lb-row__name">
-          {{ e.username }}
+          {# Sb_19 — username cliquable vers le profil public. #}
+          <a href="{{ url_for('user_profile', username=e.username) }}" class="lb-row__name-link">{{ e.username }}</a>
           <span class="tooltip-wrapper" tabindex="0">
             <span class="grade-badge grade-badge--{{ e.grade|lower }}">{{ e.grade }}</span>
-            <span class="tooltip-content">
-              Dernière session : {{ e.last_session_score if e.last_session_score is not none else "—" }}/100<br>
-              Note : {{ e.grade }} — {{ e.grade_label }}
+            <span class="tooltip-content tooltip-content--rich">
+              <span class="tooltip-summary">
+                Dernière session : {{ e.last_session_score if e.last_session_score is not none else "—" }}/100<br>
+                Note : {{ e.grade }} — {{ e.grade_label }}
+              </span>
+              {% if e.radar_svg_mini %}
+                <span class="tooltip-radar">{{ e.radar_svg_mini|safe }}</span>
+              {% endif %}
             </span>
           </span>
         </span>

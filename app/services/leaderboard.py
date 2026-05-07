@@ -48,6 +48,9 @@ class LeaderboardEntry:
     last_session_score: Optional[int]
     grade: str
     grade_label: str
+    # Sb_19 — mini SVG radar 30j shown inside the leaderboard tooltip.
+    # None when the user has no data to plot in the window.
+    radar_svg_mini: Optional[str] = None
 
 
 def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
@@ -96,14 +99,31 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
             total_pts += session_pts
             counted += 1
 
-        raw.append((user.username, total_pts, counted, last_score))
+        raw.append((user.id, user.username, total_pts, counted, last_score))
 
-    raw.sort(key=lambda x: (-x[1], x[0]))
+    raw.sort(key=lambda x: (-x[2], x[1]))
+
+    # Sb_19 — mini radar SVG per user, generated on the leaderboard
+    # build path. Volume is small (mono-user / handful of users); if it
+    # ever gets > 50 active users we will cache or batch.
+    from app.services.muscle_scoring import compute_physique_dashboard
+    from app.services.radar import build_radar_svg
 
     entries: list[LeaderboardEntry] = []
-    for i, (username, pts, counted, last_score) in enumerate(raw, start=1):
+    for i, (uid, username, pts, counted, last_score) in enumerate(raw, start=1):
         avg = round(pts / counted, 1) if counted > 0 else None
         grade = compute_grade(avg or 0.0, counted)
+
+        radar_svg_mini: Optional[str] = None
+        if counted > 0:
+            try:
+                dash = compute_physique_dashboard(db, uid, window_days=30)
+                radar_svg_mini = build_radar_svg(
+                    dash.radar_axes, size=140, compact=True,
+                )
+            except Exception:
+                radar_svg_mini = None  # never fail the leaderboard for one user
+
         entries.append(LeaderboardEntry(
             rank=i,
             username=username,
@@ -113,5 +133,6 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
             last_session_score=last_score,
             grade=grade,
             grade_label=GRADE_LABELS.get(grade, ""),
+            radar_svg_mini=radar_svg_mini,
         ))
     return entries

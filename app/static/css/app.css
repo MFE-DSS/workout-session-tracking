@@ -474,6 +474,83 @@ input, button, textarea, select {
   pointer-events: auto;
 }
 
+/* Sb_19 — leaderboard tooltip with embedded mini radar. */
+.tooltip-content--rich {
+  white-space: normal;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  min-width: 200px;
+  max-width: 240px;
+}
+.tooltip-content--rich .tooltip-summary {
+  font-size: 12px;
+  color: var(--fg);
+}
+.tooltip-content--rich .tooltip-radar {
+  display: block;
+  margin: 0 auto;
+}
+.tooltip-content--rich .tooltip-radar svg {
+  display: block;
+  width: 140px;
+  height: 140px;
+}
+
+/* Sb_19 — public profile page. */
+.user-profile__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+.user-profile__name {
+  margin: 0;
+  font-size: 24px;
+}
+.user-profile__grade-label {
+  color: var(--fg-dim);
+  font-size: 13px;
+}
+.user-profile__meta {
+  margin: var(--space-xs) 0;
+  color: var(--fg-dim);
+  font-size: 13px;
+}
+.user-profile__data {
+  list-style: none;
+  margin: var(--space-sm) 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+.user-profile__data li {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+}
+.user-profile__data li span { color: var(--fg-dim); }
+.user-profile__data li b { font-size: 16px; color: var(--fg); }
+.user-profile__radar {
+  margin-top: var(--space-md);
+  text-align: center;
+}
+.user-profile__notice {
+  text-align: center;
+}
+
+/* Sb_19 — username link in leaderboard rows. */
+.lb-row__name-link {
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px dashed transparent;
+}
+.lb-row__name-link:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
 /* ---- Buttons ---- */
 
 .btn {

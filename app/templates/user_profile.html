@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+
+{# Sb_19 — public user profile synthesis. #}
+
+<a class="text-muted" href="{{ url_for('leaderboard_page') }}">← Retour au classement</a>
+
+<div class="card user-profile" style="margin-top:var(--space-md);">
+  <header class="user-profile__head">
+    <h1 class="user-profile__name">{{ target.username }}</h1>
+    <span class="grade-badge grade-badge--{{ grade|lower }}">{{ grade }}</span>
+    <span class="text-mono user-profile__grade-label">{{ grade_label }}</span>
+  </header>
+
+  <p class="user-profile__meta">
+    {{ sessions_count_30d }} séance{% if sessions_count_30d != 1 %}s{% endif %} sur 30 j
+    {% if last_session_score is not none %}· dernière session {{ last_session_score }}/100{% endif %}
+  </p>
+
+  {% if target.height_cm or target.weight_kg %}
+  <ul class="user-profile__data">
+    {% if target.height_cm %}
+      <li><span>Taille</span><b>{{ target.height_cm }} cm</b></li>
+    {% endif %}
+    {% if target.weight_kg %}
+      <li><span>Poids</span><b>{{ "%.1f"|format(target.weight_kg)|replace('.', ',') }} kg</b></li>
+    {% endif %}
+  </ul>
+  {% endif %}
+
+  <div class="user-profile__radar">
+    <span class="global-score">{{ "%.0f"|format(dashboard.global_score) }}</span>
+    <div class="radar-wrap">{{ dashboard.radar_svg|safe }}</div>
+  </div>
+
+  <p class="text-dim user-profile__notice" style="font-size:12px;margin-top:var(--space-sm);">
+    Profil public · activité agrégée uniquement · aucune donnée par séance
+  </p>
+</div>
+
+{% endblock %}

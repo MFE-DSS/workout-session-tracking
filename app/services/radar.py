@@ -4,14 +4,23 @@ from __future__ import annotations
 import math
 
 
-def build_radar_svg(axes: list, size: int = 300) -> str:
+def build_radar_svg(axes: list, size: int = 300, compact: bool = False) -> str:
+    """Render an SVG hexagonal radar.
+
+    Sb_19 — `compact=True` produces a small thumbnail (~120px default)
+    suitable for leaderboard tooltips: no axis labels, no per-point
+    score text, no <title> tooltips. The shape and colour of the score
+    polygon stay identical so the user reads the silhouette at a
+    glance.
+    """
     if not axes:
         return ""
 
     n = len(axes)
     cx = size / 2
     cy = size / 2
-    radius = size / 2 - 40
+    # Compact view leaves less room for outer labels — tighter padding.
+    radius = size / 2 - (10 if compact else 40)
     angle_step = 2 * math.pi / n
     start_angle = -math.pi / 2
 
@@ -56,39 +65,41 @@ def build_radar_svg(axes: list, size: int = 300) -> str:
         f'stroke="#f25f3a" stroke-width="2" stroke-linejoin="round"/>'
     )
 
-    # Interactive data points
-    for i, axis in enumerate(axes):
-        angle = start_angle + i * angle_step
-        r = radius * (axis.score / 100) if axis.score > 0 else 0
-        x, y = polar(angle, r)
-        score_txt = f"{axis.score:.0f}"
-        label_r = r + 14 if r > 20 else 22
-        lx, ly = polar(angle, label_r)
-        parts.append('<g class="chart-point">')
-        parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="14" fill="transparent" class="chart-point__hit"/>')
-        parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="#f25f3a" class="chart-point__dot"/>')
-        parts.append(
-            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="middle" dominant-baseline="middle" '
-            f'fill="#e8ecf1" font-size="11" font-weight="600" '
-            f'font-family="\'JetBrains Mono\',monospace" class="chart-point__label">{score_txt}</text>'
-        )
-        parts.append(f'<title>{axis.label}: {score_txt}/100</title>')
-        parts.append('</g>')
+    # Interactive data points (full size only — compact mode is silent)
+    if not compact:
+        for i, axis in enumerate(axes):
+            angle = start_angle + i * angle_step
+            r = radius * (axis.score / 100) if axis.score > 0 else 0
+            x, y = polar(angle, r)
+            score_txt = f"{axis.score:.0f}"
+            label_r = r + 14 if r > 20 else 22
+            lx, ly = polar(angle, label_r)
+            parts.append('<g class="chart-point">')
+            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="14" fill="transparent" class="chart-point__hit"/>')
+            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="#f25f3a" class="chart-point__dot"/>')
+            parts.append(
+                f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="middle" dominant-baseline="middle" '
+                f'fill="#e8ecf1" font-size="11" font-weight="600" '
+                f'font-family="\'JetBrains Mono\',monospace" class="chart-point__label">{score_txt}</text>'
+            )
+            parts.append(f'<title>{axis.label}: {score_txt}/100</title>')
+            parts.append('</g>')
 
-    # Axis labels outside
-    for i, axis in enumerate(axes):
-        angle = start_angle + i * angle_step
-        lx, ly = polar(angle, radius + 24)
-        if abs(lx - cx) < 5:
-            anchor = "middle"
-        elif lx < cx:
-            anchor = "end"
-        else:
-            anchor = "start"
-        parts.append(
-            f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" dominant-baseline="middle" '
-            f'fill="#9aa3ad" font-size="11" font-family="\'Inter\',system-ui,sans-serif">{axis.label}</text>'
-        )
+    # Axis labels outside (full size only)
+    if not compact:
+        for i, axis in enumerate(axes):
+            angle = start_angle + i * angle_step
+            lx, ly = polar(angle, radius + 24)
+            if abs(lx - cx) < 5:
+                anchor = "middle"
+            elif lx < cx:
+                anchor = "end"
+            else:
+                anchor = "start"
+            parts.append(
+                f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchor}" dominant-baseline="middle" '
+                f'fill="#9aa3ad" font-size="11" font-family="\'Inter\',system-ui,sans-serif">{axis.label}</text>'
+            )
 
     # Sb_dogfood_fixpack v1 (B3) — the global score is also rendered
     # above the radar in the surrounding template (e.g. physique.html
