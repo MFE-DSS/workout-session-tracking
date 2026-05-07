@@ -137,15 +137,45 @@ def get_latest_measurement(
 def get_measurement_series(
     db: Session, user_id: int, field: str, limit: int = 20
 ) -> list[tuple[datetime, float]]:
-    """Return (measured_at, value) pairs for one field, non-null only, ASC."""
+    """Return (measured_at, value) pairs for one field, non-null only, ASC.
+
+    Sb_17 — for ``field == "weight_kg"`` only, also pull the
+    ``WorkoutSession.bodyweight_kg`` saisie sur le feedback de chaque
+    séance terminée. In real usage, pre-session weighings are far more
+    frequent than the formal profile measurement form, so merging the
+    two sources gives a useful continuous timeline without forcing the
+    user to duplicate the data entry. Other measurement fields stay on
+    BodyMeasurement only.
+    """
     col = getattr(BodyMeasurement, field, None)
     if col is None:
         return []
-    rows = db.execute(
+
+    rows: list[tuple[datetime, float]] = []
+
+    measurement_rows = db.execute(
         select(BodyMeasurement.measured_at, col)
         .where(BodyMeasurement.user_id == user_id)
         .where(col.is_not(None))
-        .order_by(BodyMeasurement.measured_at.asc())
-        .limit(limit)
     ).all()
-    return [(r[0], r[1]) for r in rows]
+    rows.extend((r[0], float(r[1])) for r in measurement_rows)
+
+    if field == "weight_kg":
+        # Local import to avoid a circular dependency at module load
+        # time (measurements is imported by routers, session models
+        # already pull in measurements transitively in some paths).
+        from app.models.session import WorkoutSession
+
+        session_rows = db.execute(
+            select(WorkoutSession.started_at, WorkoutSession.bodyweight_kg)
+            .where(WorkoutSession.user_id == user_id)
+            .where(WorkoutSession.bodyweight_kg.is_not(None))
+            .where(WorkoutSession.status == "completed")
+            .where(WorkoutSession.excluded_from_stats.is_(False))
+        ).all()
+        rows.extend((r[0], float(r[1])) for r in session_rows)
+
+    rows.sort(key=lambda r: r[0])
+    if len(rows) > limit:
+        rows = rows[-limit:]
+    return rows

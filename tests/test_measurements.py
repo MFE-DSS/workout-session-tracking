@@ -132,6 +132,106 @@ def test_get_measurement_series(client):
     assert series[2][1] == 75.0
 
 
+def test_get_measurement_series_weight_merges_session_bodyweight(client):
+    """Sb_17 — pre-session bodyweight feeds the same timeline as the
+    formal weight measurement, only for the weight_kg field."""
+    from app.database import SessionLocal
+    from app.models.measurement import BodyMeasurement
+    from app.models.session import WorkoutSession
+
+    uid = get_test_user_id()
+    now = datetime.now(timezone.utc)
+
+    with SessionLocal() as db:
+        # Two formal measurements
+        db.add(BodyMeasurement(
+            user_id=uid, measured_at=now - timedelta(days=10), weight_kg=78.0,
+        ))
+        db.add(BodyMeasurement(
+            user_id=uid, measured_at=now - timedelta(days=2), weight_kg=77.5,
+        ))
+        # Two completed sessions with bodyweight, on different days
+        db.add(WorkoutSession(
+            user_id=uid,
+            template_slug_snapshot="push-a",
+            template_name_snapshot="Push A",
+            started_at=now - timedelta(days=7),
+            ended_at=now - timedelta(days=7),
+            status="completed",
+            bodyweight_kg=77.8,
+        ))
+        db.add(WorkoutSession(
+            user_id=uid,
+            template_slug_snapshot="pull-a",
+            template_name_snapshot="Pull A",
+            started_at=now - timedelta(days=4),
+            ended_at=now - timedelta(days=4),
+            status="completed",
+            bodyweight_kg=77.6,
+        ))
+        # An excluded session must NOT appear
+        db.add(WorkoutSession(
+            user_id=uid,
+            template_slug_snapshot="legs-a",
+            template_name_snapshot="Legs A",
+            started_at=now - timedelta(days=5),
+            ended_at=now - timedelta(days=5),
+            status="completed",
+            bodyweight_kg=999.0,
+            excluded_from_stats=True,
+        ))
+        db.commit()
+
+    with SessionLocal() as db:
+        series = get_measurement_series(db, uid, "weight_kg")
+
+    # 2 measurements + 2 valid sessions, sorted ASC, no excluded outlier
+    assert len(series) == 4
+    assert all(s[1] != 999.0 for s in series), "excluded session leaked"
+    # ASC order
+    dates = [s[0] for s in series]
+    assert dates == sorted(dates)
+    # Values cover both sources
+    values = [s[1] for s in series]
+    assert 78.0 in values   # measurement
+    assert 77.8 in values   # session
+    assert 77.5 in values
+    assert 77.6 in values
+
+
+def test_get_measurement_series_other_field_ignores_session_bodyweight(client):
+    """Sb_17 — only weight_kg merges. chest_cm should not be polluted by
+    WorkoutSession data."""
+    from app.database import SessionLocal
+    from app.models.measurement import BodyMeasurement
+    from app.models.session import WorkoutSession
+
+    uid = get_test_user_id()
+    now = datetime.now(timezone.utc)
+
+    with SessionLocal() as db:
+        db.add(BodyMeasurement(
+            user_id=uid, measured_at=now, chest_cm=100.0,
+        ))
+        db.add(WorkoutSession(
+            user_id=uid,
+            template_slug_snapshot="push-a",
+            template_name_snapshot="Push A",
+            started_at=now,
+            ended_at=now,
+            status="completed",
+            bodyweight_kg=80.0,
+        ))
+        db.commit()
+
+    with SessionLocal() as db:
+        series = get_measurement_series(db, uid, "chest_cm")
+
+    # Only the formal measurement, the session bodyweight is irrelevant
+    assert len(series) == 1
+    assert series[0][1] == 100.0
+
+
 def test_get_measurement_series_unknown_field(client):
     """Requesting a field that doesn't exist on the model returns empty list."""
     from app.database import SessionLocal
