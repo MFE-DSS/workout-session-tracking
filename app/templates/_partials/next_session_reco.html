@@ -32,7 +32,9 @@
             <form method="post" action="/sessions" class="reco-next__alt-form">
               <input type="hidden" name="template_slug" value="{{ alt.template.slug }}">
               <input type="hidden" name="creation_source" value="reco_alt">
-              <button type="submit" class="reco-next__alt-name">{{ alt.template.name }}</button>
+              {# Sb_dogfood_fixpack v1 (B1) — wording explicite "Démarrer …"
+                 pour aligner le contrat clic = lancement, comme le CTA du top. #}
+              <button type="submit" class="reco-next__alt-name">Démarrer {{ alt.template.name }} →</button>
               <p class="reco-next__alt-phrase">{{ alt.phrase }}</p>
             </form>
           </li>

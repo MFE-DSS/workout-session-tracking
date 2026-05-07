@@ -2302,6 +2302,19 @@ details.exercise-card[open] .card__actions--exercise {
 .exercise-card__note textarea {
   width: 100%;
   margin-top: var(--space-xs);
+  /* Sb_dogfood_fixpack v1 (B2) — explicit dark-theme styling.
+     Without this the UA default background was white, producing a
+     white-on-white textarea on the dark theme. */
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 14px;
+}
+.exercise-card__note textarea:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 /* Session-level free_note — mirror of the exercise-level pattern (Sb_10 G2). */
@@ -2321,6 +2334,17 @@ details.exercise-card[open] .card__actions--exercise {
 .session-feedback__note textarea {
   width: 100%;
   margin-top: var(--space-xs);
+  /* Sb_dogfood_fixpack v1 (B2) — same fix as exercise-card__note. */
+  background: var(--surface-2);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  font-size: 14px;
+}
+.session-feedback__note textarea:focus {
+  border-color: var(--accent);
+  outline: none;
 }
 
 /* ---------- Sb_11a — pre-session briefing ----------------------------- */

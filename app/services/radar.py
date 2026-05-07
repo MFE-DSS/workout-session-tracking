@@ -90,13 +90,11 @@ def build_radar_svg(axes: list, size: int = 300) -> str:
             f'fill="#9aa3ad" font-size="11" font-family="\'Inter\',system-ui,sans-serif">{axis.label}</text>'
         )
 
-    # Global score center
-    global_avg = sum(a.score for a in axes) / len(axes) if axes else 0
-    parts.append(
-        f'<text x="{cx:.1f}" y="{cy:.1f}" text-anchor="middle" dominant-baseline="middle" '
-        f'fill="#e8ecf1" font-size="28" font-weight="700" '
-        f'font-family="\'JetBrains Mono\',monospace">{global_avg:.0f}</text>'
-    )
+    # Sb_dogfood_fixpack v1 (B3) — the global score is also rendered
+    # above the radar in the surrounding template (e.g. physique.html
+    # via .global-score). Repeating it inside the SVG centre creates
+    # noise on the geometric origin (the "all axes at zero" point).
+    # Keep it once, above the chart, not inside.
 
     parts.append("</svg>")
     return "\n".join(parts)
