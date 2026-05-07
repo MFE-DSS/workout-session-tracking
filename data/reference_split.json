@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-18.v12",
+  "version": "2026-04-21.v13",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -593,7 +593,8 @@
           "notes": "Support poitrine pour isoler le dos sans compensation lombaire.",
           "substitutes": [
             "Rowing haltère un bras (banc)",
-            "Rowing câble assis prise neutre"
+            "Rowing câble assis prise neutre",
+            "Tirage poulie haute prise neutre"
           ],
           "rep_targets": [
             {
@@ -633,7 +634,8 @@
           ],
           "substitutes": [
             "Rowing chest-supported",
-            "Rowing haltère un bras"
+            "Rowing haltère un bras",
+            "Tirage poulie haute prise neutre"
           ],
           "machine_slug": "seated-cable-row",
           "machine_family": "back-horizontal"
@@ -659,7 +661,10 @@
             }
           ],
           "machine_slug": "one-arm-dumbbell-row",
-          "machine_family": "back-horizontal"
+          "machine_family": "back-horizontal",
+          "substitutes": [
+            "Tirage poulie haute prise neutre"
+          ]
         },
         {
           "position": 4,
@@ -898,7 +903,11 @@
             }
           ],
           "machine_slug": null,
-          "machine_family": null
+          "machine_family": null,
+          "substitutes": [
+            "Adduction debout câble",
+            "Adduction couchée machine"
+          ]
         },
         {
           "position": 6,
