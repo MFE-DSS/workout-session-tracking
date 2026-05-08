@@ -111,3 +111,65 @@ jobs:
         continue-on-error: true
         # -ll = report medium and high severity only (skip low noise V1)
         run: bandit -r app/ -ll -f screen
+
+      # Sb_20.4 — JSON reports consumed by the SonarCloud job. Both stay
+      # advisory: never fail the job, always upload, even on warnings.
+      - name: ruff JSON report (for SonarCloud)
+        if: always()
+        continue-on-error: true
+        run: ruff check . --output-format=json --output-file=ruff-report.json || true
+
+      - name: bandit JSON report (for SonarCloud)
+        if: always()
+        continue-on-error: true
+        run: bandit -r app/ -f json -o bandit-report.json || true
+
+      - name: Upload linter reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linter-reports
+          path: |
+            ruff-report.json
+            bandit-report.json
+          retention-days: 7
+          if-no-files-found: warn
+
+  sonar:
+    # Sb_20.4 — SonarCloud scan. Consumes coverage.xml from the `test`
+    # job and ruff-report.json + bandit-report.json from the `lint` job
+    # so the analysis stays consistent with what CI already ran.
+    # ADVISORY in V1: continue-on-error keeps the merge unblocked.
+    # Sb_20.5 will turn this into a required status check.
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [test, lint]
+    if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'push'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Sonar needs full history for blame / new-code detection.
+          fetch-depth: 0
+
+      - name: Download coverage report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-xml
+          path: .
+
+      - name: Download linter reports
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: linter-reports
+          path: .
+
+      - name: SonarCloud scan
+        continue-on-error: true
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

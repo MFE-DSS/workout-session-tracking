@@ -205,6 +205,43 @@ Toujours dans `Settings → Environments → production → Environment secrets 
 - ❌ Allow force pushes (désactivé).
 - ❌ Allow deletions (désactivé).
 
+### 3.4 SonarCloud — secret + Quality Gate (Sb_20.4)
+
+**Pré-requis :** projet déjà créé côté SonarCloud (`https://sonarcloud.io/organizations/mfe-dss/`).
+
+1. **Générer un token SonarCloud**
+   - SonarCloud → avatar → *My Account* → *Security* → *Generate Tokens*.
+   - Type : `User Token`. Nom : `github-actions-spignos`. Expiration : 1 an.
+   - Copier le token (visible une seule fois).
+
+2. **Stocker le token dans GitHub**
+   - Repo GitHub → *Settings* → *Secrets and variables* → *Actions* → *New repository secret*.
+   - Nom : `SONAR_TOKEN`. Valeur : le token de l'étape 1.
+   - **Pas** dans l'environment `production` — le scan tourne sur PR/push avant tout déploiement.
+
+3. **Activer l'analyse automatique côté SonarCloud**
+   - SonarCloud → projet → *Administration* → *Analysis Method* → désactiver *Automatic Analysis*.
+   - Choisir *CI-based analysis* (le scan vient de notre `ci.yml`).
+   - Sans ça, SonarCloud refusera le scan GitHub Actions avec l'erreur `automatic analysis enabled`.
+
+4. **Quality Gate (V1 advisory)**
+   - SonarCloud → *Quality Gates* → cloner *Sonar way* en `Spignos Way`.
+   - Conditions sur **New Code** uniquement (V1) :
+     - Coverage on New Code ≥ 70 %
+     - Maintainability Rating on New Code = A
+     - Reliability Rating on New Code = A
+     - Security Rating on New Code = A
+     - Security Hotspots Reviewed = 100 %
+   - Pas de seuil sur le code existant V1 — Sb_20.4 triage les 296 issues legacy avant de durcir.
+
+5. **Vérification**
+   - Pousser un commit, ouvrir l'onglet *Actions* → job `SonarCloud` doit être vert (advisory).
+   - Lien direct : `https://sonarcloud.io/project/overview?id=workout-session-tracking`.
+
+6. **Bascule en required (Sb_20.5)**
+   - Une fois le triage Sb_20.4 fini, retirer `continue-on-error: true` du step *SonarCloud scan* dans `ci.yml`.
+   - Branch protection `main` → *Require status checks* → ajouter `CI / SonarCloud`.
+
 ---
 
 ## 4. Premier déploiement — dry-run sûr
