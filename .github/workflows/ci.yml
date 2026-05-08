@@ -35,15 +35,34 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx
+          # Sb_20.1 — pytest-cov + coverage[toml] produce coverage.xml
+          # for SonarCloud. httpx is required by the FastAPI TestClient.
+          pip install pytest pytest-cov "coverage[toml]" httpx
 
-      - name: Run pytest
+      - name: Run pytest with coverage
         # test_v1_acceptance.py checks a local VSCode setup and is
-        # intentionally excluded from CI. test_deploy_artifacts.py was
-        # excluded historically because .env.production.example was
-        # missing — Sb_16 adds that file so the suite now runs it.
+        # intentionally excluded from CI. Coverage is collected over
+        # `app/` (configured in pyproject.toml [tool.coverage.run]).
+        # The XML report is consumed by SonarCloud (Sb_20.4).
         run: |
-          pytest --ignore=tests/test_v1_acceptance.py -q
+          pytest \
+            --ignore=tests/test_v1_acceptance.py \
+            --cov=app \
+            --cov-report=xml \
+            --cov-report=term \
+            -q
+
+      - name: Upload coverage artifact
+        # Kept even if pytest failed so the SonarCloud step (Sb_20.4)
+        # can still publish the partial report. Retention 7 days is
+        # sufficient for debug.
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-xml
+          path: coverage.xml
+          retention-days: 7
+          if-no-files-found: warn
 
       - name: Catalog QA
         run: python scripts/catalog_qa.py
