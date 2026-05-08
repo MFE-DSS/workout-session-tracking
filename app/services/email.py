@@ -48,7 +48,9 @@ def send_email(to: str, subject: str, body: str) -> bool:
                 if settings.smtp_user:
                     smtp.login(settings.smtp_user, settings.smtp_password)
                 smtp.send_message(msg)
-        logger.info("Email sent to %s: %s", _redact_email(to), subject)
+        # Sb_20.4 — never log `subject` verbatim: the contact form lets
+        # users set the subject string, opening CWE-117 log injection.
+        logger.info("Email sent to %s (subject_len=%d)", _redact_email(to), len(subject))
         return True
     except Exception:
         logger.exception("Failed to send email to %s", _redact_email(to))
