@@ -22,6 +22,12 @@ jobs:
     name: pytest + QA scripts
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Sb_20.4 — Le repo n'est pas installé en éditable. pytest trouve
+    # `app/` via sa config, mais `python scripts/x.py` exécute le script
+    # avec sys.path = [scripts/, ...] et perd la racine. PYTHONPATH=. le
+    # remet en place pour tous les steps QA.
+    env:
+      PYTHONPATH: .
 
     steps:
       - name: Checkout
