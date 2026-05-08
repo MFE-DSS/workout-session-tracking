@@ -25,6 +25,9 @@ dev = [
     "pytest-cov>=5.0",
     "coverage[toml]>=7.5",
     "httpx>=0.27",
+    # Sb_20.2 — linters CI (advisory, non-blocking V1).
+    "ruff>=0.5",
+    "bandit>=1.7",
 ]
 
 [tool.setuptools.packages.find]
@@ -56,3 +59,45 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
+
+# Sb_20.2 — Ruff configuration. Advisory in CI V1; will become a gate
+# once Sb_20.5 turns on the SonarCloud Quality Gate as required check.
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["migrations", "var", ".venv", "data"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes (unused imports, undefined names)
+    "W",    # pycodestyle warnings
+    "I",    # isort (import ordering)
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade (modern Python idioms)
+    "S",    # flake8-bandit (security subset via ruff)
+    "C90",  # mccabe complexity
+]
+ignore = [
+    "E501",   # line too long — formatter decides
+    "S101",   # asserts are fine (caught per-file below for tests)
+    "S104",   # binding 0.0.0.0 — uvicorn dev pattern
+    "B008",   # FastAPI Annotated[..., Form()] = pattern triggers this
+    "UP007",  # X | Y union syntax — keep Optional[X] readable
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S", "B", "C90"]      # tests use asserts, simple flow
+"scripts/*" = ["S603", "S607"]      # subprocess in CLI scripts is fine
+"migrations/*" = ["E", "F", "W", "I", "B", "UP", "S", "C90"]  # alembic-gen
+"app/__init__.py" = ["F401"]        # re-exports
+
+[tool.ruff.lint.mccabe]
+max-complexity = 15
+
+# Sb_20.2 — Bandit (security-focused SAST). Advisory in CI V1.
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", ".venv", "var", "data"]
+# B101 = assert_used (already covered by ruff S101)
+# B311 = pseudo-random — not used for crypto here
+skips = ["B101", "B311"]
