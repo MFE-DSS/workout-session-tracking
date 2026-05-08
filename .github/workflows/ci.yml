@@ -3,7 +3,9 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main]
+    # Sb_20.4 — branche par défaut du repo (pas de `main` distant ; cette
+    # branche fait office de trunk). À ajuster si on renomme un jour.
+    branches: [main, claude/sprint-reporting-fitness-app-V7Qr6]
 
 # Read-only: this workflow never touches prod, never pushes tags,
 # never deploys. Deployment lives in deploy-production.yml.
