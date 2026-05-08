@@ -2,7 +2,7 @@
 
 Index navigable de tous les sprints livrés. Chaque ligne pointe vers le rapport correspondant. Utiliser ce fichier pour retrouver rapidement « qu'est-ce qui a été fait dans Sb_X » sans parcourir 50 fichiers.
 
-**Dernière mise à jour :** 2026-05-08 — post Sb_18
+**Dernière mise à jour :** 2026-05-08 — post Sb_20.5
 
 ---
 
@@ -16,6 +16,7 @@ Index navigable de tous les sprints livrés. Chaque ligne pointe vers le rapport
 | Reco engine (Sb_11a → Sb_18) | avr.–mai 2026 | ✅ clos | Briefing, V1 reco, telemetry, V2 antagoniste |
 | CI/CD (Sx_16 → Sb_16.5) | avr. 2026 | ✅ live | Pipeline GitHub Actions → OVH VPS |
 | Dogfooding fixpacks | mai 2026 | ✅ traité | Fixpack v1, catalog v13, profile/leaderboard sprints |
+| Security & Sonar (Sx_20 → Sb_20.5) | mai 2026 | ✅ V1 advisory | Coverage, ruff/bandit, hardening fonctionnel, SonarCloud, gate |
 
 ---
 
@@ -129,6 +130,19 @@ Index navigable de tous les sprints livrés. Chaque ligne pointe vers le rapport
 
 ---
 
+## Cycle Security & Sonar (Sx_20 → Sb_20.5)
+
+| Sprint | Sujet | Lien |
+|--------|-------|------|
+| **Sx_20** | **Security hardening + SonarCloud integration spec** | [spec](strategy/SPIGNOS_SECURITY_HARDENING_AND_SONAR_INTEGRATION_SPEC_v1.md) (commit `0f5eb9f`) |
+| Sb_20.1 | Coverage infra (pytest-cov, 89.97%) | [report](SPRINT_Sb_20_1_REPORT.md) (commit `5e59062`) |
+| Sb_20.2 | Linters CI advisory (ruff + bandit) | [report](SPRINT_Sb_20_2_REPORT.md) (commit `9ef742a`) |
+| Sb_20.3 | Hardening fonctionnel (username regex, mdp ≥8, email regex, /users path) | [report](SPRINT_Sb_20_3_REPORT.md) (commit `7097022`) |
+| Sb_20.4 | SonarCloud integration (config + ci.yml job + runbook §3.4 + triage template) | [report](SPRINT_Sb_20_4_REPORT.md) + [template](SONARCLOUD_TRIAGE_TEMPLATE.md) (commit `8c9244f`) |
+| Sb_20.5 | Verrouillage CI gate + bilan avant/après | [report](SPRINT_Sb_20_5_REPORT.md) |
+
+---
+
 ## Specs strategy notables (sans build associé direct)
 
 | Sujet | Lien |
@@ -145,13 +159,15 @@ Index navigable de tous les sprints livrés. Chaque ligne pointe vers le rapport
 
 ## État branche actuel — `claude/sprint-reporting-fitness-app-V7Qr6`
 
-- **HEAD** : `eda3512` (Sb_18)
-- **Tests** : 734 passed
+- **HEAD** : `30e3a81` (Sb_20.x cycle clos + CI fixes)
+- **Tests** : 739 passed (+5 vs Sb_18 — tests Sb_20.3 hardening)
+- **Coverage** : 89.97 % (mesurée Sb_20.1)
 - **Catalog** : v13
 - **Atlas** : 8 familles / 29 machines
 - **Migrations** : head Alembic `c3d5f1e82a04`
-- **Pipeline CI/CD** : Active, dernier deploy réussi `19c9c52` (Sb_16.5, 21 avril)
-- **Branche en attente de deploy** : 8 commits non déployés (de `73ab0d0` à `eda3512` inclus)
+- **Pipeline CI/CD** : Active sur 3 jobs (test + lint advisory + sonar advisory), dernier deploy réussi `19c9c52` (Sb_16.5, 21 avril)
+- **SonarCloud** : org `mfe-dss`, scan advisory V1, Quality Gate `Spignos Way` à activer côté UI (runbook §3.4)
+- **Branche en attente de deploy** : ≥ 12 commits non déployés (de `73ab0d0` à `30e3a81` inclus)
 
 ## Comment ajouter un sprint à cet index
 
