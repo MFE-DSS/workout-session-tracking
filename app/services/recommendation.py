@@ -48,23 +48,45 @@ from app.services.substitution import actual_exercise_name
 # Calibration — tweak post-dogfooding, ideally without touching logic.
 # ---------------------------------------------------------------------------
 
-# Fenêtre principale staleness (Sx_12 §H.2)
+# Fenêtre principale staleness (Sx_12 §H.2). Conservé V2 pour lookups
+# spécialisation et autres signaux de moyen-terme.
 STALENESS_WINDOW_DAYS = 7
 
-# Fenêtre redundancy (filtre sécurité)
-REDUNDANCY_WINDOW_HOURS = 48
+# Fenêtre redundancy (filtre sécurité). V2: 24h plus strict que V1 48h
+# car l'availability_by_zone gère déjà le moyen-terme par zone.
+REDUNDANCY_WINDOW_HOURS = 24
 
-# Composants de score (Sx_12 §H.3)
-WEIGHT_STALENESS = 40
+# Composants de score V2 (Sx_18 §D.3)
+WEIGHT_AVAILABILITY = 35       # remplace WEIGHT_STALENESS V1
+WEIGHT_ANTAGONIST = 15         # nouveau V2
 WEIGHT_ALTERNATION = 20
-WEIGHT_REDUNDANCY_PENALTY = -5  # coefficient appliqué à (hard_sets_48h / 4)
+WEIGHT_REDUNDANCY_PENALTY = -5
 AFFINITY_CORE = 15
 AFFINITY_UTILITY = 10
-AFFINITY_SPECIALIZATION_OK = 20  # si justifiée
-AFFINITY_SPECIALIZATION_SKIP = -1  # sentinelle d'exclusion
+AFFINITY_SPECIALIZATION_OK = 20
+AFFINITY_SPECIALIZATION_SKIP = -1
 
-# Seuil hard_sets → staleness = 0 (saturation)
-STALENESS_SATURATION_HARD_SETS = 8
+# Sx_18 §C.1 — fenêtre cible de récupération par zone, en heures.
+# Calibré sur la littérature hypertrophie / fréquence d'entraînement
+# (Schoenfeld 2017–2023, Helms, Heaselgrave 2019, Krieger 2010).
+RECOVERY_HOURS_TARGET: dict[str, float] = {
+    "pecs":      48,
+    "lats":      48,
+    "upper_back":48,
+    "delt_lat":  36,
+    "delt_post": 36,
+    "biceps":    36,
+    "triceps":   36,
+    "calves":    36,
+    "quads":     72,   # gros volume, DOMS prolongés
+    "posterior": 72,
+    "core":      24,
+}
+
+# Sx_18 §D.2 — bonus antagoniste selon le chevauchement avec last strength
+ANTAGONIST_BONUS_PERFECT = 15  # zéro overlap → antagonisme parfait
+ANTAGONIST_BONUS_PARTIAL = 8   # 1 zone commune (ex. delts indirects)
+ANTAGONIST_BONUS_NONE = 0      # gros recouvrement
 
 # Seuil hard_sets dans la fenêtre redundancy au-delà duquel la zone est exclue
 REDUNDANCY_HARD_SETS_CUTOFF = 4
@@ -88,6 +110,14 @@ SPECIALIZATION_WINDOW_DAYS = 14
 # Seuil gap "reprise soft" — si dernière séance > ce nombre de jours, on dégrade
 SOFT_RESTART_GAP_DAYS = 14
 
+# Fenêtre pour scanner les sessions récentes pour calculer
+# hours_since_last_by_zone. 14j couvre largement le worst-case quads 72h.
+RECENT_HARD_SETS_WINDOW_DAYS = 14
+
+# Legacy V1 — gardé pour la fonction utilitaire `_staleness_from_hard_sets`
+# qui reste publique pour compat ; non utilisée dans le scoring V2.
+STALENESS_SATURATION_HARD_SETS = 8
+
 
 # ---------------------------------------------------------------------------
 # Data classes
@@ -98,9 +128,12 @@ SOFT_RESTART_GAP_DAYS = 14
 class Signals:
     """Signals précalculés et passés aux sous-composants du scoring."""
     cold_start: bool
-    staleness_by_zone: dict[str, float]
+    # Sx_18 V2 — replaces staleness_by_zone (kept as alias for tests).
+    availability_by_zone: dict[str, float]   # 0..1, granular per-zone recovery
+    hours_since_last_by_zone: dict[str, float]  # large value when never
+    last_strength_session_zones: list[str]   # primary zones of last strength
     hard_sets_by_zone_recent: dict[str, int]  # 7j
-    hard_sets_by_zone_48h: dict[str, int]
+    hard_sets_by_zone_24h: dict[str, int]
     kinds_recent: list[str]  # N dernières sessions, du plus récent au plus ancien
     days_since_last_cardio: int | None
     days_since_last_strength: int | None
@@ -242,12 +275,12 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         for zone, entries in zone_data_7d.items()
     }
 
-    # ── Hard sets par zone — fenêtre 48h (redundancy)
-    window_48h_start = now - timedelta(hours=REDUNDANCY_WINDOW_HOURS)
-    zone_data_48h = _compute_tonnage_by_zone(db, user_id, window_48h_start)
-    hard_sets_by_zone_48h = {
+    # ── Hard sets par zone — fenêtre redundancy (V2: 24h)
+    window_red_start = now - timedelta(hours=REDUNDANCY_WINDOW_HOURS)
+    zone_data_red = _compute_tonnage_by_zone(db, user_id, window_red_start)
+    hard_sets_by_zone_24h = {
         zone: sum(int(e["hard_sets"]) for e in entries)
-        for zone, entries in zone_data_48h.items()
+        for zone, entries in zone_data_red.items()
     }
 
     # ── Hard sets par zone — fenêtre 14j (spécialisation justifiée)
@@ -262,12 +295,80 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         sorted(non_zero_14d)[len(non_zero_14d) // 2] if non_zero_14d else 0.0
     )
 
-    # ── Staleness par zone (toutes zones connues)
+    # ── Sx_18 V2 — hours_since_last_by_zone et availability_by_zone
+    # On parcourt les sessions strength des 14 derniers jours pour
+    # localiser, par zone, le timestamp le plus récent où la zone a
+    # reçu au moins 1 hard set complété.
     from app.services.muscle_mapping import ZONE_LABELS
-    staleness_by_zone = {
-        zone: _staleness_from_hard_sets(hard_sets_by_zone_recent.get(zone, 0))
-        for zone in ZONE_LABELS
-    }
+
+    window_recent_start = now - timedelta(days=RECENT_HARD_SETS_WINDOW_DAYS)
+    recent_strength_stmt = (
+        select(WorkoutSession)
+        .where(
+            WorkoutSession.user_id == user_id,
+            WorkoutSession.status == "completed",
+            WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at >= window_recent_start,
+        )
+        .order_by(WorkoutSession.started_at.desc())
+        .options(
+            selectinload(WorkoutSession.template),
+            selectinload(WorkoutSession.session_exercises)
+            .selectinload(SessionExercise.set_logs),
+        )
+    )
+    recent_strength_sessions: list[WorkoutSession] = list(
+        db.execute(recent_strength_stmt).scalars().all()
+    )
+
+    # Pour chaque zone, mémoriser le started_at le plus récent ayant un
+    # hard set complété. None signifie "jamais dans la fenêtre" → la
+    # zone est totalement disponible.
+    last_hit_by_zone: dict[str, datetime | None] = {z: None for z in ZONE_LABELS}
+    last_strength_session_zones: list[str] = []
+
+    for s in recent_strength_sessions:
+        is_strength = not (s.template and s.template.kind == "cardio")
+        if not is_strength:
+            continue
+        started = _as_aware(s.started_at)
+        if started is None:
+            continue
+        # Zones de cette session
+        zones_this_session: set[str] = set()
+        for se in s.session_exercises:
+            primary, _sec = classify_exercise(actual_exercise_name(se))
+            if primary == "unknown":
+                continue
+            has_completed_work = any(
+                sl.kind == "work" and sl.completed for sl in se.set_logs
+            )
+            if not has_completed_work:
+                continue
+            zones_this_session.add(primary)
+            # Mark zone as last-hit at this session's start time, only
+            # if more recent than what we have (we iterate desc, so
+            # the first hit per zone is the most recent).
+            if last_hit_by_zone[primary] is None:
+                last_hit_by_zone[primary] = started
+        # Capture the very first strength session's zones (most recent)
+        # for the antagonist heuristic.
+        if not last_strength_session_zones and zones_this_session:
+            last_strength_session_zones = sorted(zones_this_session)
+
+    # Convert last_hit_by_zone → hours_since + availability
+    hours_since_last_by_zone: dict[str, float] = {}
+    availability_by_zone: dict[str, float] = {}
+    for zone in ZONE_LABELS:
+        last = last_hit_by_zone.get(zone)
+        if last is None:
+            hours_since_last_by_zone[zone] = 24 * 365  # "très loin" = jamais
+            availability_by_zone[zone] = 1.0
+            continue
+        delta = (now - last).total_seconds() / 3600.0
+        hours_since_last_by_zone[zone] = delta
+        target = RECOVERY_HOURS_TARGET.get(zone, 48)
+        availability_by_zone[zone] = max(0.0, min(1.0, delta / target))
 
     # ── Fatigue globale via behavioral
     from app.services.behavioral import compute_behavioral_state
@@ -281,9 +382,11 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
 
     return Signals(
         cold_start=cold_start,
-        staleness_by_zone=staleness_by_zone,
+        availability_by_zone=availability_by_zone,
+        hours_since_last_by_zone=hours_since_last_by_zone,
+        last_strength_session_zones=last_strength_session_zones,
         hard_sets_by_zone_recent=hard_sets_by_zone_recent,
-        hard_sets_by_zone_48h=hard_sets_by_zone_48h,
+        hard_sets_by_zone_24h=hard_sets_by_zone_24h,
         kinds_recent=kinds_recent,
         days_since_last_cardio=days_since_last_cardio,
         days_since_last_strength=days_since_last_strength,
@@ -313,10 +416,10 @@ def _load_templates(db: Session) -> list[WorkoutTemplate]:
     )
 
 
-def _passes_redundancy_filter(zones: list[str], hard_sets_48h: dict[str, int]) -> bool:
-    """Reject a template if any primary zone has too many hard sets in 48h."""
+def _passes_redundancy_filter(zones: list[str], hard_sets_24h: dict[str, int]) -> bool:
+    """Reject a template if any primary zone has too many hard sets in 24h."""
     for zone in zones:
-        if hard_sets_48h.get(zone, 0) > REDUNDANCY_HARD_SETS_CUTOFF * 2:
+        if hard_sets_24h.get(zone, 0) > REDUNDANCY_HARD_SETS_CUTOFF * 2:
             # saturation franche → excluded
             return False
     return True
@@ -373,33 +476,59 @@ def _movement_kind(zones: Iterable[str]) -> str | None:
     return best[1] if best else None
 
 
+def _antagonist_bonus(
+    template_zones: list[str],
+    last_session_zones: list[str],
+) -> int:
+    """Sx_18 §D.2 — score 0/8/15 selon le chevauchement avec la dernière strength.
+
+    0 zone commune → antagonisme parfait (15)
+    1 zone commune → recouvrement marginal, ex. delts (8)
+    ≥ 2 zones communes → recouvrement franc (0)
+    """
+    if not last_session_zones or not template_zones:
+        return ANTAGONIST_BONUS_NONE
+    overlap = set(template_zones) & set(last_session_zones)
+    if not overlap:
+        return ANTAGONIST_BONUS_PERFECT
+    if len(overlap) <= 1:
+        return ANTAGONIST_BONUS_PARTIAL
+    return ANTAGONIST_BONUS_NONE
+
+
 def _score_template(
     template: WorkoutTemplate, signals: Signals
 ) -> Candidate:
     zones = template_primary_zones(template)
     score = 0.0
 
-    # 1. Staleness (40 pts)
+    # 1. Availability (35 pts) — Sx_18 §D.3 remplace V1 staleness
     if zones:
-        staleness = sum(signals.staleness_by_zone.get(z, 1.0) for z in zones) / len(zones)
+        availability = sum(
+            signals.availability_by_zone.get(z, 1.0) for z in zones
+        ) / len(zones)
     else:
-        staleness = 0.5  # inconnu → neutre
-    score += WEIGHT_STALENESS * staleness
+        availability = 0.5  # inconnu → neutre
+    score += WEIGHT_AVAILABILITY * availability
 
-    # 2. Alternation (20 / 10 pts)
+    # 2. Antagonist bonus (15 pts) — Sx_18 §D.2
+    antagonist_score = _antagonist_bonus(zones, signals.last_strength_session_zones)
+    score += antagonist_score
+
+    # 3. Alternation kind (20 / 10 pts)
     last_two = signals.kinds_recent[:2]
     if last_two == ["strength", "strength"] and template.kind == "cardio":
         score += WEIGHT_ALTERNATION
     elif signals.kinds_recent and signals.kinds_recent[0] == "cardio" and template.kind == "strength":
         score += WEIGHT_ALTERNATION // 2
 
-    # 3. Redundancy penalty (dégressif si zones proches saturation)
+    # 4. Redundancy penalty (24h, dégressif si zones proches saturation)
     if zones:
-        recent_48h = max(signals.hard_sets_by_zone_48h.get(z, 0) for z in zones)
-        if recent_48h > 0:
-            score += WEIGHT_REDUNDANCY_PENALTY * (recent_48h / REDUNDANCY_HARD_SETS_CUTOFF)
+        recent_24h = max(signals.hard_sets_by_zone_24h.get(z, 0) for z in zones)
+        if recent_24h > 0:
+            score += WEIGHT_REDUNDANCY_PENALTY * (recent_24h / REDUNDANCY_HARD_SETS_CUTOFF)
 
-    # 4. Catalog affinity
+    # 5. Catalog affinity
     section = template.catalog_section or "core"
     if section == "core":
         score += AFFINITY_CORE
@@ -411,7 +540,7 @@ def _score_template(
         else:
             score = float(AFFINITY_SPECIALIZATION_SKIP)  # exclut du top
 
-    # 5. Bonus cardio absent
+    # 6. Bonus cardio absent
     if (
         template.kind == "cardio"
         and (
@@ -422,7 +551,7 @@ def _score_template(
         score += 10
 
     clamped = max(0, min(100, int(round(score))))
-    phrase = _build_phrase(template, zones, signals, staleness)
+    phrase = _build_phrase(template, zones, signals, availability, antagonist_score)
 
     return Candidate(
         template=template, primary_zones=zones, score=clamped, phrase=phrase,
@@ -450,9 +579,17 @@ def _build_phrase(
     template: WorkoutTemplate,
     zones: list[str],
     signals: Signals,
-    staleness: float,
+    availability: float,
+    antagonist_score: int = 0,
 ) -> str:
-    """Compose a ≤140 char explanation from the spec slots (Sx_12 §J)."""
+    """Compose a ≤140 char explanation from the spec slots.
+
+    Sx_18 §D.4 enriches the V1 slot set with 4 scientifically-grounded
+    slots (quads_recovery, antagonist_perfect, partial_overlap_delts,
+    optimal_ppl). Priority order is preserved: cold_start → fatigue →
+    soft_restart → cardio_absent → specialization → V2 enriched →
+    generic fallback.
+    """
     focus_fragment = template.focus or template.name
 
     # Cold start — overrides everything
@@ -491,15 +628,53 @@ def _build_phrase(
         zone_label = _zone_labels_short(zones)
         return f"{zone_label.capitalize()} sous-travaillé(e) → {template.name} recommandé."
 
-    # Strength — alternation or staleness
-    kind_ = _movement_kind(zones)
-    last_kind_mvmt: str | None = None
-    if signals.kinds_recent:
-        # Try to infer the last strength session's movement group via its template
-        # — we don't have template on recent_sessions here, use zones_recent proxy.
-        last_kind_mvmt = None  # we kept it simple: drop this enrichment for V1
+    # ── Sx_18 V2 enriched slots — based on actual recovery hours ──
+
+    # quads_recovery: legs primary on candidate, but quads/posterior
+    # still recovering since last legs session (< 72h target).
+    if zones and ("quads" in zones or "posterior" in zones):
+        leg_zones = [z for z in zones if z in {"quads", "posterior", "calves"}]
+        worst_avail = (
+            min(signals.availability_by_zone.get(z, 1.0) for z in leg_zones)
+            if leg_zones else 1.0
+        )
+        if worst_avail < 0.7:
+            hours_left = max(
+                signals.hours_since_last_by_zone.get(z, 999)
+                for z in leg_zones
+            )
+            return (
+                f"Jambes travaillées il y a {int(hours_left)}h — encore en récupération."
+            )
+
+    # antagonist_perfect: zero overlap with last strength session.
+    if antagonist_score == ANTAGONIST_BONUS_PERFECT and signals.last_strength_session_zones:
+        last_kind = _movement_kind(signals.last_strength_session_zones) or "dernière"
+        cand_kind = _movement_kind(zones) or "candidat"
+        if last_kind != cand_kind:
+            return (
+                f"Dernière séance {last_kind}, aucun chevauchement musculaire → {template.name}."
+            )
+
+    # partial_overlap_delts: 1 zone in common, often delts.
+    if antagonist_score == ANTAGONIST_BONUS_PARTIAL:
+        overlap = set(zones) & set(signals.last_strength_session_zones)
+        if overlap and any("delt" in z for z in overlap):
+            return f"Légère sollicitation delts hier, OK pour {template.name} aujourd'hui."
+
+    # optimal_ppl: when last 3 strength sessions touched all 3 of
+    # push / pull / legs and the candidate completes the rotation
+    # cleanly, mention it.
+    candidate_kind = _movement_kind(zones)
+    if candidate_kind and signals.last_strength_session_zones:
+        last_kind = _movement_kind(signals.last_strength_session_zones)
+        if last_kind and last_kind != candidate_kind and antagonist_score >= ANTAGONIST_BONUS_PARTIAL:
+            return f"Pattern {last_kind}/{candidate_kind} — récup respectée, {template.name} recommandé."
+
+    # Strength — generic V1 fallbacks
+    kind_ = candidate_kind
     if kind_ and signals.days_since_last_strength is not None:
-        if staleness >= 0.7:
+        if availability >= 0.7:
             return (
                 f"{focus_fragment} peu travaillé récemment → {template.name} recommandé."
             )
@@ -583,7 +758,7 @@ def recommend_next_session(
         if not _passes_fatigue_filter(t, signals.fatigue_score):
             continue
         zones = template_primary_zones(t)
-        if not _passes_redundancy_filter(zones, signals.hard_sets_by_zone_48h):
+        if not _passes_redundancy_filter(zones, signals.hard_sets_by_zone_24h):
             continue
         pool.append(t)
 
