@@ -27,6 +27,7 @@
               action="{{ url_for('create_session') }}"
               class="template-card__start"
               onclick="event.stopPropagation();"
+              onkeydown="event.stopPropagation();"
             >
               <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
               {# Sb_13 telemetry: library CTA. #}
