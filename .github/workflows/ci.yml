@@ -60,6 +60,17 @@ jobs:
             --cov-report=term \
             -q
 
+      - name: Prefix coverage paths with app/
+        # Sb_20.4 fix — pytest-cov with `source = ["app"]` writes filenames
+        # like `config.py` instead of `app/config.py`. SonarCloud's
+        # Cobertura sensor resolves paths against `sonar.sources=app` from
+        # the repo root and fails with "Cannot resolve 68 file paths".
+        # Adding the prefix in-place is simpler than reshaping the
+        # coverage config (which would broaden scope or break local runs).
+        if: always()
+        run: |
+          sed -i 's|filename="|filename="app/|g' coverage.xml
+
       - name: Upload coverage artifact
         # Kept even if pytest failed so the SonarCloud step (Sb_20.4)
         # can still publish the partial report. Retention 7 days is

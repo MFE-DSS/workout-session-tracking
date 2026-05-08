@@ -11,7 +11,7 @@ Business rules:
 """
 from __future__ import annotations
 
-import random
+import secrets
 import string
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -146,7 +146,10 @@ _CODE_CHARS = string.ascii_uppercase + string.digits
 
 
 def _random_code() -> str:
-    return "SPGN-" + "".join(random.choices(_CODE_CHARS, k=4))
+    # Sb_20.4 — secrets.choice instead of random.choices: invite codes
+    # are a low-stakes auth secondary factor, but predictable PRNG could
+    # let an attacker enumerate active codes.
+    return "SPGN-" + "".join(secrets.choice(_CODE_CHARS) for _ in range(4))
 
 
 def generate_invite_code(db: Session, squad_id: int, owner_id: int) -> str:
