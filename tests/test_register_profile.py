@@ -25,8 +25,8 @@ def test_register_success_creates_user_and_auto_logs_in(client):
         "/register",
         data={
             "username": "newuser",
-            "password": "newpass",
-            "password_confirm": "newpass",
+            "password": "newpass1",
+            "password_confirm": "newpass1",
         },
         follow_redirects=False,
     )
@@ -72,8 +72,8 @@ def test_register_password_mismatch_rejected(client):
         "/register",
         data={
             "username": "mismatchuser",
-            "password": "pass1",
-            "password_confirm": "pass2",
+            "password": "pass1234",
+            "password_confirm": "pass5678",
         },
         follow_redirects=False,
     )
@@ -181,8 +181,8 @@ def test_password_change_fails_mismatch(client):
         "/profile/password",
         data={
             "current_password": "testpass",
-            "new_password": "aaa1",
-            "new_password_confirm": "bbb2",
+            "new_password": "aaa11111",
+            "new_password_confirm": "bbb22222",
         },
         follow_redirects=False,
     )

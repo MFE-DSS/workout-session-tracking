@@ -1,7 +1,9 @@
 """Leaderboard + public user profile routes (Sb_19)."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Request
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException, Path, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
 
@@ -41,7 +43,14 @@ def leaderboard_page(
     "/users/{username}", response_class=HTMLResponse, name="user_profile",
 )
 def user_profile(
-    username: str,
+    # Sb_20.3 — explicit path-param validation (CWE-20). Allowlist
+    # alphanumeric + underscore + dash, length 2-64. Mirrors the
+    # registration regex in auth_routes.py. FastAPI returns 422 on
+    # mismatch, before any DB lookup.
+    username: Annotated[
+        str,
+        Path(min_length=2, max_length=64, pattern=r"^[a-zA-Z0-9_-]+$"),
+    ],
     request: Request,
     db: DbSession,
     user: CurrentUser,

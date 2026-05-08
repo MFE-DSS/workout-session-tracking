@@ -34,8 +34,24 @@ from app.templating import templates
 
 router = APIRouter(tags=["auth"])
 
-MIN_PASSWORD_LENGTH = 4
+# Sb_20.3 — hardening thresholds. Password 4 → 8 chars (OWASP basic).
+# Existing accounts unaffected — the threshold only applies to
+# registration and password-change flows.
+MIN_PASSWORD_LENGTH = 8
 MIN_USERNAME_LENGTH = 3
+MAX_USERNAME_LENGTH = 64
+
+# Sb_20.3 — username regex: alphanumeric + underscore + dash only.
+# Mirrors the path-param regex on /users/{username} so the public
+# profile route never has to deal with surprising characters.
+import re as _re
+USERNAME_REGEX = _re.compile(r"^[a-zA-Z0-9_-]+$")
+
+# Sb_20.3 — email regex (basic but strict). Replaces the prior loose
+# check `"@" in email` + dot in domain. Not RFC 5322 — production
+# email validation should ride on real send (DNS, SMTP) — but this
+# rejects obviously invalid inputs at registration time.
+EMAIL_REGEX = _re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 # ---------------------------------------------------------------------------
@@ -248,23 +264,30 @@ async def register_submit(
     db: DbSession = None,
 ):
     error = None
-    if len(username.strip()) < MIN_USERNAME_LENGTH:
+    username_clean = username.strip()
+    if len(username_clean) < MIN_USERNAME_LENGTH:
         error = f"Le nom d'utilisateur doit faire au moins {MIN_USERNAME_LENGTH} caractères."
+    elif len(username_clean) > MAX_USERNAME_LENGTH:
+        error = f"Le nom d'utilisateur dépasse {MAX_USERNAME_LENGTH} caractères."
+    elif not USERNAME_REGEX.match(username_clean):
+        # Sb_20.3 — explicit allowlist (CWE-20). Rejects unicode,
+        # punctuation, spaces — only [a-zA-Z0-9_-] survive.
+        error = "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, _ et -."
     elif len(password) < MIN_PASSWORD_LENGTH:
         error = f"Le mot de passe doit faire au moins {MIN_PASSWORD_LENGTH} caractères."
     elif password != password_confirm:
         error = "Les mots de passe ne correspondent pas."
     else:
         existing = db.execute(
-            select(User).where(User.username == username.strip())
+            select(User).where(User.username == username_clean)
         ).scalar_one_or_none()
         if existing is not None:
             error = "Ce nom d'utilisateur est déjà pris."
 
-    # Email validation (only if provided)
+    # Email validation (only if provided) — Sb_20.3 strict regex.
     email_clean = email.strip().lower() if email.strip() else None
     if error is None and email_clean:
-        if "@" not in email_clean or "." not in email_clean.split("@")[-1]:
+        if not EMAIL_REGEX.match(email_clean):
             error = "Adresse email invalide."
         else:
             email_exists = db.execute(
@@ -281,7 +304,7 @@ async def register_submit(
         )
 
     user = User(
-        username=username.strip(),
+        username=username_clean,
         password_hash=hash_password(password),
         email=email_clean,
     )
@@ -462,7 +485,8 @@ async def profile_body_submit(
 
     email_clean = email.strip().lower() if email.strip() else None
     if email_clean:
-        if "@" in email_clean and "." in email_clean.split("@")[-1]:
+        # Sb_20.3 — strict regex same as registration.
+        if EMAIL_REGEX.match(email_clean):
             existing = db.execute(
                 select(User).where(User.email == email_clean, User.id != user.id)
             ).scalar_one_or_none()
