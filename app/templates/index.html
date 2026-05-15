@@ -19,11 +19,12 @@
 {% endif %}
 
 {# === CTA principal : Nouvelle séance — pleine largeur, accent === #}
+{# Styles in .tile--cta-main (Sb_dogfood_fixpack v2 N6) — moved out of
+   inline styles so the stacking-context fix can apply. #}
 {% if not open_session %}
-<a class="tile tile--primary tile--cta-main" href="{{ url_for('launcher') }}"
-   style="display:block;padding:var(--space-lg) var(--space-md);margin-bottom:var(--space-md);text-align:center;border-left:none;border:2px solid var(--accent);">
-  <div class="tile__label" style="font-size:18px;color:var(--accent);">Démarrer une séance →</div>
-  <div class="tile__hint" style="margin-top:var(--space-xs);">Flux guidé</div>
+<a class="tile tile--primary tile--cta-main" href="{{ url_for('launcher') }}">
+  <div class="tile__label">Démarrer une séance →</div>
+  <div class="tile__hint">Flux guidé</div>
 </a>
 {% endif %}
 

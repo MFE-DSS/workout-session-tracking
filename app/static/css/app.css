@@ -737,6 +737,22 @@ input, button, textarea, select {
   line-height: 1.35;
 }
 
+/* Sb_dogfood_fixpack v2 (N6) — guarantee the home CTA tile stays
+   clickable even if a sibling above creates a stacking context that
+   leaks. Paired with .reco-next isolate above. */
+.tile--cta-main {
+  display: block;
+  padding: var(--space-lg) var(--space-md);
+  margin-bottom: var(--space-md);
+  text-align: center;
+  border: 2px solid var(--accent);
+  border-left: 2px solid var(--accent);
+  position: relative;
+  z-index: 1;
+}
+.tile--cta-main .tile__label { font-size: 18px; color: var(--accent); }
+.tile--cta-main .tile__hint { margin-top: var(--space-xs); }
+
 .tile--primary {
   border-color: var(--accent);
   border-left: 3px solid var(--accent);
@@ -2494,6 +2510,15 @@ details.exercise-card[open] .card__actions--exercise {
 .reco-next {
   margin-bottom: var(--space-md);
   border-left: 3px solid var(--accent, #4a9eff);
+  /* Sb_dogfood_fixpack v2 (N6) — establish a stacking context so the
+     <details class="reco-next__alternatives"> can never visually overlap
+     neighbours below (notably .tile--cta-main "Démarrer une séance").
+     Without this, on some mobile browsers (iOS Safari < 16, Android
+     WebView), opening the alternatives details intercepts touches on
+     the sibling CTA tile. */
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
 }
 .reco-next__kicker {
   font-size: 11px;
