@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+{% block content %}
+
+{# Sb_23 — Coach Report (10 blocs).
+   Spec §B.bis : chaque bloc DOIT afficher son tag {Mesuré, Inféré,
+   Non déductible}. Aucune appréciation esthétique, aucun pronostic
+   morphologique, aucun verdict performance max, aucune comparaison
+   inter-users. #}
+
+<div class="coach-report">
+  <header class="coach-report__head">
+    <h1 class="coach-report__title">Coach Report — @{{ report.identity.username }}</h1>
+    <p class="text-dim coach-report__date">Généré le {{ report.identity.report_date }}</p>
+    <p class="coach-report__intent">
+      Synthèse 2 min · à présenter à un coach externe ou à lire en bilan personnel.
+    </p>
+    <button type="button" class="btn btn--small" onclick="window.print()">Imprimer</button>
+  </header>
+
+  {# ---- 1. IDENTITÉ ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      1. Identité physique
+      <span class="coach-tag coach-tag--measured">Mesuré</span>
+    </h2>
+    <p class="coach-block__line">
+      {% if report.identity.height_cm %}{{ report.identity.height_cm }} cm{% else %}taille — <em>Non déductible</em>{% endif %}
+      {% if report.identity.weight_kg %} · {{ "%.1f"|format(report.identity.weight_kg)|replace('.', ',') }} kg{% endif %}
+      {% if report.identity.weight_trend_kg_90d is not none %}
+        ({% if report.identity.weight_trend_kg_90d > 0 %}+{% endif %}{{ "%.1f"|format(report.identity.weight_trend_kg_90d)|replace('.', ',') }} kg /90j <span class="coach-tag coach-tag--inferred">Inféré</span>)
+      {% endif %}
+      {% if report.identity.waist_cm %} · taille {{ "%.0f"|format(report.identity.waist_cm) }} cm{% endif %}
+      {% if report.identity.resting_hr %} · FC {{ report.identity.resting_hr }}{% endif %}
+      {% if report.identity.bp_systolic and report.identity.bp_diastolic %}
+        · TA {{ report.identity.bp_systolic }}/{{ report.identity.bp_diastolic }}
+      {% endif %}
+    </p>
+    <p class="text-dim coach-block__hint">
+      Âge : <span class="coach-tag coach-tag--not-deductible">Non déductible</span>
+      (année de naissance non saisie V1)
+    </p>
+  </section>
+
+  {# ---- 2. VOLUME + FRÉQUENCE ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      2. Volume et fréquence <span class="coach-tag coach-tag--measured">Mesuré</span>
+    </h2>
+    <ul class="coach-grid">
+      <li><span>Sessions 30j</span><b>{{ report.volume.sessions_30d }}</b></li>
+      <li><span>Sessions 90j</span><b>{{ report.volume.sessions_90d }}</b></li>
+      <li><span>Streak</span><b>{{ report.volume.streak_days }}{% if report.volume.streak_days > 0 %}j{% endif %}</b></li>
+      <li><span>Cardio /sem</span><b>{{ report.volume.cardio_minutes_per_week }}'</b></li>
+      <li><span>Sets travail /sem</span><b>{{ report.volume.work_sets_per_week }}</b></li>
+    </ul>
+  </section>
+
+  {# ---- 3. RATIO STRENGTH / CARDIO ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      3. Ratio strength / cardio <span class="coach-tag coach-tag--inferred">Inféré</span>
+    </h2>
+    {% if report.ratio.total_sessions == 0 %}
+      <p class="text-dim">Pas de séance dans la fenêtre 30j.</p>
+    {% else %}
+      <div class="coach-ratio">
+        <div class="coach-ratio__bar">
+          <div class="coach-ratio__strength" style="width: {{ report.ratio.strength_pct }}%;">
+            Strength {{ report.ratio.strength_pct }}%
+          </div>
+          <div class="coach-ratio__cardio" style="width: {{ report.ratio.cardio_pct }}%;">
+            Cardio {{ report.ratio.cardio_pct }}%
+          </div>
+        </div>
+        <p class="text-dim coach-block__hint">
+          {{ report.ratio.strength_sessions }} séance{% if report.ratio.strength_sessions != 1 %}s{% endif %} strength ·
+          {{ report.ratio.cardio_sessions }} séance{% if report.ratio.cardio_sessions != 1 %}s{% endif %} cardio
+        </p>
+      </div>
+    {% endif %}
+  </section>
+
+  {# ---- 4. RÉPARTITION PAR ZONE MUSCULAIRE ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      4. Répartition par zone musculaire <span class="coach-tag coach-tag--measured">Mesuré</span>
+    </h2>
+    {% if not report.zones.counts %}
+      <p class="text-dim">Pas assez de données.</p>
+    {% else %}
+      <p>
+        <strong>Top zones :</strong>
+        {% for key, label, n in report.zones.top_zones %}
+          {{ label }} ({{ n }}){% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+      <p>
+        <strong>Zones négligées :</strong>
+        {% for key, label, n in report.zones.neglected_zones %}
+          {{ label }} ({{ n }}){% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+    {% endif %}
+  </section>
+
+  {# ---- 5. PATTERNS MOTEURS DOMINANTS ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      5. Patterns moteurs dominants <span class="coach-tag coach-tag--inferred">Inféré</span>
+    </h2>
+    {% if not report.patterns.distribution %}
+      <p class="text-dim">Pas assez de sets enregistrés sur le périmètre catalogue Sb_22a.</p>
+    {% else %}
+      <ul class="coach-patterns">
+        {% for pat, pct in report.patterns.distribution %}
+          <li>
+            <span class="coach-patterns__name">{{ pat }}</span>
+            <span class="coach-patterns__bar"><span style="width: {{ pct }}%;"></span></span>
+            <span class="coach-patterns__pct">{{ pct }}%</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
+  {# ---- 6. DISCIPLINE DE LOGGING ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      6. Discipline de logging <span class="coach-tag coach-tag--measured">Mesuré</span>
+    </h2>
+    <ul class="coach-discipline">
+      {% set d = report.discipline %}
+      {% for label, value in [
+        ('Complétion (sessions non abandonnées)', d.completion_rate),
+        ('Avec note libre', d.with_free_note_rate),
+        ('Avec poids de corps', d.with_bodyweight_rate),
+        ('Avec sensation musculaire', d.with_sensation_rate),
+        ('Score qualité moyen', d.avg_quality_score),
+      ] %}
+        <li>
+          <span>{{ label }}</span>
+          {% if value is none %}
+            <b><span class="coach-tag coach-tag--not-deductible">—</span></b>
+          {% else %}
+            <b class="{% if value >= 80 %}pill--ok{% elif value >= 50 %}pill--mid{% else %}pill--bad{% endif %}">{{ value }}%</b>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  {# ---- 7. POINTS FORTS PROBABLES ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      7. Points forts probables <span class="coach-tag coach-tag--inferred">Inféré</span>
+    </h2>
+    {% if not inference.strong_points %}
+      <p class="text-dim">Aucun point fort identifiable sur la fenêtre 30j (volume insuffisant ou répartition trop diffuse).</p>
+    {% else %}
+      <ul class="coach-list">
+        {% for line in inference.strong_points %}
+          <li>{{ line|safe }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
+  {# ---- 8. POINTS FAIBLES PROBABLES ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      8. Points faibles probables <span class="coach-tag coach-tag--inferred">Inféré</span>
+    </h2>
+    {% if not inference.weak_points %}
+      <p class="text-dim">Aucun déséquilibre marqué détecté sur la fenêtre 30j.</p>
+    {% else %}
+      <ul class="coach-list">
+        {% for line in inference.weak_points %}
+          <li>{{ line|safe }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
+  {# ---- 9. AXES DE TRAVAIL SUGGÉRÉS ---- #}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      9. Axes de travail suggérés <span class="coach-tag coach-tag--inferred">Inféré</span>
+    </h2>
+    {% if not inference.suggested_axes %}
+      <p class="text-dim">Aucun axe d'amélioration prioritaire identifié.</p>
+    {% else %}
+      <ol class="coach-list coach-list--axes">
+        {% for line in inference.suggested_axes %}
+          <li>{{ line|safe }}</li>
+        {% endfor %}
+      </ol>
+    {% endif %}
+  </section>
+
+  {# ---- 10. GARDE-FOUS ---- #}
+  <section class="coach-block coach-block--guardrails">
+    <h2 class="coach-block__title">10. Garde-fous</h2>
+    <p class="coach-block__guardrails">
+      ⚠ Ce rapport synthétise les données saisies par l'utilisateur dans SPIGNOS.
+      Il <strong>ne remplace pas</strong> un avis médical, kinésithérapique ou
+      diététique. Les "points forts/faibles probables" sont des hypothèses
+      basées sur le volume d'entraînement et non sur des mesures de
+      performance maximale.
+    </p>
+    <ul class="coach-block__guardrails-list">
+      <li>Pas de jugement esthétique ni de pronostic morphologique.</li>
+      <li>Pas de verdict performance maximale (pas de 1RM mesuré).</li>
+      <li>Pas de comparaison vs autres utilisateurs.</li>
+      <li>VO2max / masse maigre / composition corporelle : <span class="coach-tag coach-tag--not-deductible">Non déductible</span></li>
+    </ul>
+  </section>
+
+  {% if report.last_session %}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      Annexe — Dernière séance <span class="coach-tag coach-tag--measured">Mesuré</span>
+    </h2>
+    <p>
+      {{ report.last_session.template_name }}
+      {% if report.last_session.score is not none %}· {{ report.last_session.score }}/100{% endif %}
+      ·
+      {% if report.last_session.days_ago == 0 %}aujourd'hui
+      {% elif report.last_session.days_ago == 1 %}hier
+      {% else %}il y a {{ report.last_session.days_ago }}j{% endif %}
+    </p>
+  </section>
+  {% endif %}
+</div>
+
+{% endblock %}

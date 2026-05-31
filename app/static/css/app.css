@@ -648,6 +648,167 @@ input, button, textarea, select {
 }
 .preview-portal--visible { display: block; }
 
+/* Sb_23 — Coach Report (10 blocs, page SSR + print A4). */
+.coach-report {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.coach-report__head {
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid var(--border);
+}
+.coach-report__title { margin: 0; font-size: 22px; font-weight: 700; }
+.coach-report__date { font-size: 12px; margin: 4px 0 8px; }
+.coach-report__intent { font-size: 13px; color: var(--fg-dim); margin: 0 0 var(--space-sm); }
+.coach-block {
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.coach-block__title {
+  margin: 0 0 var(--space-xs);
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.coach-block__line { margin: 0; font-size: 14px; }
+.coach-block__hint { font-size: 12px; margin: 4px 0 0; }
+.coach-block--guardrails { border-left: 3px solid var(--warn); }
+.coach-block__guardrails { font-size: 13px; line-height: 1.5; margin: 0; }
+.coach-block__guardrails-list {
+  margin: var(--space-xs) 0 0;
+  padding-left: 20px;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+/* Tags Mesuré / Inféré / Non déductible (Sb_23) — namespaced to avoid
+   collision with the legacy `.tag` selector defined elsewhere, and
+   tuned for WCAG AA contrast on both light + dark surfaces. */
+.coach-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+.coach-tag--measured {
+  background: #166534;     /* dark-green 800 */
+  color: #f0fdf4;          /* near-white — AA contrast on dark green */
+  border-color: #166534;
+}
+.coach-tag--inferred {
+  background: #92400e;     /* dark-amber 800 */
+  color: #fffbeb;          /* near-white — AA contrast on dark amber */
+  border-color: #92400e;
+}
+.coach-tag--not-deductible {
+  background: transparent;
+  color: var(--fg);
+  border: 1px dashed var(--fg-dim);
+}
+
+/* KPI grid for bloc 2 */
+.coach-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+}
+.coach-grid li {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+.coach-grid li span { color: var(--fg-dim); }
+.coach-grid li b { font-size: 16px; }
+
+/* Ratio bar bloc 3 */
+.coach-ratio__bar {
+  display: flex;
+  height: 28px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--surface-2);
+  font-size: 12px;
+  color: var(--bg);
+  font-weight: 600;
+}
+.coach-ratio__strength { background: var(--accent); display: flex; align-items: center; justify-content: center; min-width: 24px; }
+.coach-ratio__cardio { background: #f59e0b; display: flex; align-items: center; justify-content: center; min-width: 24px; }
+
+/* Patterns bloc 5 */
+.coach-patterns { list-style: none; margin: 0; padding: 0; }
+.coach-patterns li {
+  display: grid;
+  grid-template-columns: 140px 1fr 50px;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px;
+  margin: 2px 0;
+}
+.coach-patterns__name { color: var(--fg-dim); font-size: 12px; }
+.coach-patterns__bar {
+  background: var(--surface-2);
+  height: 8px;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.coach-patterns__bar > span { display: block; height: 100%; background: var(--accent); }
+.coach-patterns__pct { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Discipline bloc 6 */
+.coach-discipline { list-style: none; margin: 0; padding: 0; }
+.coach-discipline li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 13px;
+}
+.coach-discipline li:last-child { border-bottom: none; }
+.pill--ok { color: #4ade80; }
+.pill--mid { color: #f59e0b; }
+.pill--bad { color: #ef4444; }
+
+/* Lists 7/8/9 */
+.coach-list {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.coach-list li { margin-bottom: 6px; }
+.coach-list--axes { padding-left: 24px; }
+
+/* Print A4 */
+@media print {
+  .topbar, .btn, .active-session-banner, nav, footer { display: none !important; }
+  body { background: white; color: black; font-size: 11pt; }
+  .coach-report { max-width: 100%; }
+  .coach-block { background: white; border: 1px solid #ccc; break-inside: avoid; }
+  .coach-tag--measured { background: #e7f8ee; color: #166534; border-color: #166534; }
+  .coach-tag--inferred { background: #fef3c7; color: #92400e; border-color: #92400e; }
+  .coach-tag--not-deductible { color: #555; border-color: #999; }
+  .coach-block--guardrails { border-left: 2px solid #d97706; }
+  .coach-ratio__strength, .coach-ratio__cardio { color: white; }
+}
+
 /* Sb_19 — username link in leaderboard rows. */
 .lb-row__name-link {
   color: var(--fg);

@@ -320,6 +320,167 @@ def last_session_summary(db: Session, user_id: int) -> LastSession | None:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Sb_23 — discipline + ratios + multi-window primitives for Coach Report
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class DisciplineRates:
+    """All ratios are in [0, 100] (percentage). Computed on the last
+    ``days`` window of eligible completed sessions. None values mean
+    "no denominator" (no session in window)."""
+    sessions_total: int
+    completion_rate: int | None
+    with_free_note_rate: int | None
+    with_bodyweight_rate: int | None
+    with_sensation_rate: int | None
+    avg_quality_score: int | None
+
+
+def discipline_rates(db: Session, user_id: int, days: int = 30) -> DisciplineRates:
+    """Compute the 5 discipline ratios used by the Coach Report bloc 6.
+
+    Each ratio = (sessions matching the criterion / total eligible) × 100.
+
+    ``completion_rate`` counts sessions with status == "completed". The
+    denominator includes also sessions in 'in_progress' and 'abandoned'
+    states in the window to surface abandonment behaviour.
+    """
+    from app.services.quality_score import compute_session_quality
+    window_start = datetime.now(timezone.utc) - timedelta(days=days)
+    # Denominator for completion = all sessions started in window
+    all_started = db.execute(
+        select(WorkoutSession)
+        .where(
+            WorkoutSession.user_id == user_id,
+            WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at >= window_start,
+        )
+        .options(
+            selectinload(WorkoutSession.session_exercises)
+            .selectinload(SessionExercise.set_logs)
+        )
+    ).scalars().all()
+    total_started = len(all_started)
+    completed = [s for s in all_started if s.status == "completed"]
+    n_completed = len(completed)
+    if total_started == 0:
+        return DisciplineRates(0, None, None, None, None, None)
+    # Rates measured on COMPLETED sessions only (note / bodyweight /
+    # sensation are saved at end-of-session via feedback form).
+    if n_completed == 0:
+        return DisciplineRates(
+            sessions_total=total_started,
+            completion_rate=0,
+            with_free_note_rate=None,
+            with_bodyweight_rate=None,
+            with_sensation_rate=None,
+            avg_quality_score=None,
+        )
+    n_note = sum(1 for s in completed if (s.free_note or "").strip())
+    n_bw = sum(1 for s in completed if s.bodyweight_kg is not None)
+    n_sens = sum(
+        1 for s in completed
+        if any((se.muscle_sensation or "").strip() for se in s.session_exercises)
+    )
+    quality_scores = [compute_session_quality(s) for s in completed]
+    return DisciplineRates(
+        sessions_total=total_started,
+        completion_rate=round(100 * n_completed / total_started),
+        with_free_note_rate=round(100 * n_note / n_completed),
+        with_bodyweight_rate=round(100 * n_bw / n_completed),
+        with_sensation_rate=round(100 * n_sens / n_completed),
+        avg_quality_score=round(sum(quality_scores) / len(quality_scores)),
+    )
+
+
+@dataclass(frozen=True)
+class StrengthCardioRatio:
+    """Frequency-based split between strength and cardio sessions.
+
+    Spec §C.3 V1 = ratio sur fréquence, pas sur temps (plus stable)."""
+    total_sessions: int
+    strength_sessions: int
+    cardio_sessions: int
+    strength_pct: int
+    cardio_pct: int
+
+
+def strength_cardio_ratio(
+    db: Session, user_id: int, days: int = 30
+) -> StrengthCardioRatio:
+    window_start = datetime.now(timezone.utc) - timedelta(days=days)
+    sessions = db.execute(
+        select(WorkoutSession)
+        .where(
+            WorkoutSession.user_id == user_id,
+            WorkoutSession.status == "completed",
+            WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at >= window_start,
+        )
+    ).scalars().all()
+    total = len(sessions)
+    if total == 0:
+        return StrengthCardioRatio(0, 0, 0, 0, 0)
+    # Cardio = session with cardio_duration_min set, strength otherwise.
+    n_cardio = sum(1 for s in sessions if s.cardio_duration_min is not None)
+    n_strength = total - n_cardio
+    return StrengthCardioRatio(
+        total_sessions=total,
+        strength_sessions=n_strength,
+        cardio_sessions=n_cardio,
+        strength_pct=round(100 * n_strength / total),
+        cardio_pct=round(100 * n_cardio / total),
+    )
+
+
+def zone_session_counts(
+    db: Session, user_id: int, days: int = 30
+) -> dict[str, int]:
+    """Public wrapper around _zone_session_counts for the Coach Report."""
+    return _zone_session_counts(db, user_id, days)
+
+
+def pattern_distribution(
+    db: Session, user_id: int, days: int = 30
+) -> dict[str, int]:
+    """Distribution % of work sets by pattern_motor. Returns dict mapping
+    pattern → percentage (sums to 100 across registered patterns)."""
+    props = _load_properties()
+    if not props:
+        return {}
+    window_start = datetime.now(timezone.utc) - timedelta(days=days)
+    rows = db.execute(
+        select(SetLog, SessionExercise)
+        .join(SessionExercise, SetLog.session_exercise_id == SessionExercise.id)
+        .join(WorkoutSession, SessionExercise.session_id == WorkoutSession.id)
+        .where(
+            WorkoutSession.user_id == user_id,
+            WorkoutSession.cardio_duration_min.is_(None),
+            WorkoutSession.status == "completed",
+            WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at >= window_start,
+            SetLog.kind == "work",
+            SetLog.completed.is_(True),
+        )
+    ).all()
+    counts: dict[str, int] = {}
+    total = 0
+    for _sl, se in rows:
+        entry = props.get(se.substituted_name or se.exercise_name_snapshot)
+        if not entry:
+            continue
+        pm = entry.get("pattern_motor")
+        if not pm:
+            continue
+        counts[pm] = counts.get(pm, 0) + 1
+        total += 1
+    if total == 0:
+        return {}
+    return {pm: round(100 * n / total) for pm, n in counts.items()}
+
+
 @dataclass(frozen=True)
 class PreviewPayload:
     """L2 preview card — 3-4 short KPIs alongside the mini-radar.
