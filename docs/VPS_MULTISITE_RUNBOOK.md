@@ -218,10 +218,28 @@ Si "Processus écoutant sur 80/443" montre **autre chose que `nginx` host** (doc
 
 ## 8. Backlog (non urgent)
 
-- Mettre en place un monitoring externe (uptimerobot.com gratuit ou cron + curl + ntfy) qui alerte sur les 3 domaines down → recevoir une notif quand le prochain incident commence, pas quand on s'en aperçoit 1 jour après
+### Monitoring — état actuel et compléments
+
+| Site | Couverture existante | Manque |
+|---|---|---|
+| `varronotes.com` | Sentry (SDK Next.js → events vers sentry.io). Couvre erreurs runtime client + serveur Next | uptime externe pas couvert par Sentry — si le site est totalement down (nginx HS, app crashée), Sentry ne le voit pas |
+| `spignos.com` | bandit/SonarCloud côté CI uniquement | aucun monitoring runtime ni uptime externe |
+| `caracalla.co` | aucun connu | aucun monitoring runtime ni uptime externe |
+
+**Recommandation** : ajouter un **monitoring uptime externe** (ping HTTPS toutes les 5 min depuis l'extérieur) pour les 3 sites. Sentry ne le remplace pas — Sentry capture les erreurs **du runtime de l'app**, donc si l'app ne tourne plus du tout, Sentry est silencieux. L'incident du 2026-05-31 n'aurait pas été détecté par Sentry.
+
+Options pertinentes :
+- **uptimerobot.com** — gratuit jusqu'à 50 monitors, ping 5 min, notif email/Slack/Telegram. Setup 10 min total pour les 3 sites.
+- **cron + curl + ntfy.sh** — entièrement self-hosted, notif push. Plus de boulot mais zéro dépendance externe.
+
+Sentry continue à servir son rôle (capture des exceptions runtime côté varronotes) — ils sont **complémentaires**, pas alternatifs.
+
+### Autres items
+
 - Ajouter une dépendance systemd `After=docker.service` sur nginx, ou inversement, pour éviter les courses au démarrage
 - Migrer la base de configs hors `/home/ubuntu` vers `/opt` ou `/srv` (perméable aux suppressions accidentelles du compte ubuntu)
 - Documenter les rotations de logs nginx (logrotate config probablement OK par défaut, mais à vérifier)
+- Étendre Sentry à SPIGNOS (FastAPI SDK) et caracalla API si l'instrumentation runtime devient utile
 
 ## 9. Contacts / accès
 
