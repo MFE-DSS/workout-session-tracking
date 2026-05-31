@@ -168,7 +168,15 @@ step "Running database migrations"
 
 MIGRATION_OUTPUT="$(sudo -u "${APP_USER}" bash -c "
     cd '${APP_DIR}' && '${ALEMBIC}' upgrade head 2>&1
-")" || die "Alembic migration failed"
+")" || {
+    # Surface the captured stderr+stdout before dying so the GH Actions
+    # log shows the actual sqlite/alembic error message. Without this
+    # block the error is hidden inside a variable and never printed.
+    echo "─── alembic upgrade output (last 80 lines) ───"
+    echo "${MIGRATION_OUTPUT}" | tail -80
+    echo "─── end alembic output ───"
+    die "Alembic migration failed"
+}
 
 if echo "${MIGRATION_OUTPUT}" | grep -q "Running upgrade"; then
     echo "${MIGRATION_OUTPUT}" | grep "Running upgrade" | while read -r line; do
