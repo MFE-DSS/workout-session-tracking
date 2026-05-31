@@ -1,0 +1,48 @@
+{# Sb_22b — L2 preview card.
+   Spec §A.bis v2.1 — vit ici :
+   - badge grade (PAS de score numérique)
+   - mini-radar 30j silhouette (PAS de score au centre)
+   - 3-4 KPI courts (sessions/30j · streak · cardio min/sem · volume Δ)
+   Vit ailleurs et n'apparaît PAS ici : score numérique, métadonnées,
+   activité agrégée (top zone / pattern / dernière séance). #}
+<div class="profile-preview card" role="dialog" aria-label="Aperçu profil {{ target.username }}">
+  <header class="profile-preview__head">
+    <span class="profile-preview__name">@{{ target.username }}</span>
+    <span class="grade-badge grade-badge--{{ grade|lower }}">{{ grade }}</span>
+  </header>
+
+  <div class="profile-preview__radar">{{ radar_svg_mini|safe }}</div>
+
+  <ul class="profile-preview__kpi">
+    <li>
+      <span class="profile-preview__kpi-label">Sessions 30j</span>
+      <b>{{ preview.sessions_30d }}</b>
+    </li>
+    <li>
+      <span class="profile-preview__kpi-label">Streak</span>
+      <b>{{ preview.streak }}{% if preview.streak > 0 %}j{% endif %}</b>
+    </li>
+    <li>
+      <span class="profile-preview__kpi-label">Cardio /sem</span>
+      <b>{{ preview.cardio_min_per_week }}'</b>
+    </li>
+    <li>
+      <span class="profile-preview__kpi-label">Volume Δ</span>
+      <b>
+        {% if preview.volume_delta_pct is none %}
+          —
+        {% elif preview.volume_delta_pct > 0 %}
+          <span class="trend trend--up">+{{ preview.volume_delta_pct }}%</span>
+        {% elif preview.volume_delta_pct < 0 %}
+          <span class="trend trend--down">{{ preview.volume_delta_pct }}%</span>
+        {% else %}
+          0%
+        {% endif %}
+      </b>
+    </li>
+  </ul>
+
+  <a class="profile-preview__cta" href="{{ url_for('user_profile', username=target.username) }}">
+    Voir profil →
+  </a>
+</div>

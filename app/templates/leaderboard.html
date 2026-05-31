@@ -16,7 +16,9 @@
         <span class="lb-row__rank">#{{ e.rank }}</span>
         <span class="lb-row__name">
           {# Sb_19 — username cliquable vers le profil public. #}
-          <a href="{{ url_for('user_profile', username=e.username) }}" class="lb-row__name-link">{{ e.username }}</a>
+          <a href="{{ url_for('user_profile', username=e.username) }}"
+             class="lb-row__name-link"
+             data-preview-user="{{ e.username }}">{{ e.username }}</a>
           <span class="tooltip-wrapper" tabindex="0">
             <span class="grade-badge grade-badge--{{ e.grade|lower }}">{{ e.grade }}</span>
             <span class="tooltip-content tooltip-content--rich">
@@ -43,4 +45,7 @@
 <p class="kpi-note">
   Score = qualité × complétion work sets · séances terminées non exclues.
 </p>
+
+{# Sb_22b — JS preview chargé uniquement sur le classement. #}
+<script src="{{ url_for('static', path='js/preview.js') }}" defer></script>
 {% endblock %}

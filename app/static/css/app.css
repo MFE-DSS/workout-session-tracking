@@ -540,6 +540,114 @@ input, button, textarea, select {
   text-align: center;
 }
 
+/* Sb_22b v2 — L3 profile page additions. */
+.user-profile__score {
+  margin: var(--space-sm) 0 0;
+  font-size: 14px;
+  text-align: center;
+  color: var(--fg-dim);
+}
+.user-profile__score b { color: var(--fg); font-size: 18px; }
+.user-profile__kpi-row {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-sm);
+  margin: var(--space-md) 0 0;
+  padding: 0;
+}
+.user-profile__kpi-row li {
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.user-profile__kpi-row li b { font-size: 18px; color: var(--fg); }
+.user-profile__section { margin-top: var(--space-md); }
+.user-profile__section-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-dim);
+  margin: 0 0 var(--space-xs);
+}
+.user-profile__meta-line { margin: 0; font-size: 14px; color: var(--fg); }
+.user-profile__activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.user-profile__activity li { font-size: 14px; }
+.user-profile__activity-label {
+  display: inline-block;
+  min-width: 130px;
+  color: var(--fg-dim);
+  font-size: 13px;
+}
+.user-profile__last { margin: 0; font-size: 14px; }
+
+/* Sb_22b — L2 preview card (popup flottant). */
+.profile-preview {
+  width: 280px;
+  max-width: 90vw;
+  padding: var(--space-sm) var(--space-md);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.profile-preview__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+}
+.profile-preview__name {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--fg);
+}
+.profile-preview__radar {
+  text-align: center;
+  margin: var(--space-xs) 0;
+}
+.profile-preview__radar svg { max-width: 200px; height: auto; }
+.profile-preview__kpi {
+  list-style: none;
+  margin: var(--space-xs) 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  font-size: 12px;
+}
+.profile-preview__kpi li { display: flex; justify-content: space-between; }
+.profile-preview__kpi-label { color: var(--fg-dim); }
+.profile-preview__kpi b { color: var(--fg); font-size: 13px; }
+.trend--up { color: var(--good, #4ade80); }
+.trend--down { color: var(--warn, #f59e0b); }
+.profile-preview__cta {
+  display: block;
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px dashed var(--border);
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  text-align: right;
+}
+
+/* Sb_22b — preview portal (positioned absolutely by JS). */
+.preview-portal {
+  position: absolute;
+  z-index: 100;
+  display: none;
+}
+.preview-portal--visible { display: block; }
+
 /* Sb_19 — username link in leaderboard rows. */
 .lb-row__name-link {
   color: var(--fg);
