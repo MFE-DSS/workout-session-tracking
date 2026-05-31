@@ -237,7 +237,11 @@ def session_detail(
                 for level in ("N1", "N2", "N3")
             },
         }
-        atlas_data[se.id] = machine_atlas.get_for_template_exercise(se.template_exercise)
+        # Sb_22a.next2 — atlas suit le réalisé : si un substitut est
+        # choisi et présent dans l'atlas, le panel "Comment bien exécuter"
+        # et les cues du peek affichent les bonnes consignes. Sinon
+        # fallback transparent sur le prescrit.
+        atlas_data[se.id] = machine_atlas.get_for_session_exercise(se)
         sb08_hints_by_exercise[se.id] = [
             h.to_dict()
             for h in compute_sb08_hints(se, last_time.get(se.exercise_code_snapshot))

@@ -87,6 +87,57 @@ def family_of_machine(machine_slug: str | None) -> dict[str, Any] | None:
     return _load()["family_by_machine"].get(machine_slug)
 
 
+def get_machine_by_name(name: str | None) -> dict[str, Any] | None:
+    """Sb_22a.next2 — resolve an atlas machine by display name or alias.
+
+    Walks every family and matches ``machine.name`` then ``machine.aliases``
+    (case-insensitive). Used when only a substituted exercise NAME is
+    available (no ``machine_slug``), so that the execution cues panel
+    follows the actually performed exercise — not the prescribed one.
+
+    Returns the first match or ``None``.
+    """
+    if not name:
+        return None
+    needle = name.strip().lower()
+    cache = _load()
+    for machine in cache["machines_by_slug"].values():
+        if machine.get("name", "").strip().lower() == needle:
+            return machine
+        for alias in machine.get("aliases", []) or []:
+            if alias.strip().lower() == needle:
+                return machine
+    return None
+
+
+def get_for_session_exercise(session_exercise) -> dict[str, Any] | None:
+    """Sb_22a.next2 — resolve atlas entry for a SessionExercise, following
+    the actually performed exercise (the *réalisé*).
+
+    Priority order:
+      1. If ``substituted_name`` is set, try to find the matching machine
+         in the atlas by name/aliases. If found, return it (the cues panel
+         will follow the substitute).
+      2. Otherwise (or if the substitute isn't in the atlas), fall back to
+         the prescribed ``template_exercise``.
+
+    The prescribed exercise stays available elsewhere (substitute-badge in
+    the card already shows "Substitué : X (prescrit : Y)") — this function
+    only controls which execution-cue payload the rendering layer consumes.
+    """
+    if session_exercise is None:
+        return None
+    sub_name = getattr(session_exercise, "substituted_name", None)
+    if sub_name:
+        machine = get_machine_by_name(sub_name)
+        if machine is not None:
+            family = family_of_machine(machine.get("slug"))
+            return {"machine": machine, "family": family}
+    return get_for_template_exercise(
+        getattr(session_exercise, "template_exercise", None)
+    )
+
+
 def get_for_template_exercise(template_exercise) -> dict[str, Any] | None:
     """Resolve atlas entry for a TemplateExercise.
 

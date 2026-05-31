@@ -100,14 +100,22 @@
         </div>
       {% endif %}
 
-      {# Machine knowledge panel (Sb_07) — execution cues + common mistakes #}
+      {# Machine knowledge panel (Sb_07) — execution cues + common mistakes.
+         Sb_22a.next2 — quand l'utilisateur a substitué et que le substitut
+         existe dans l'atlas, le titre marque "Substitué" pour qu'il soit
+         clair que les consignes affichées correspondent au réalisé. #}
       {% set atlas_entry = atlas_data.get(se.id) %}
       {% if atlas_entry and atlas_entry.machine %}
         {% set _m = atlas_entry.machine %}
         <details class="machine-panel">
           <summary class="machine-panel__summary">
             <span class="machine-panel__icon" aria-hidden="true">ⓘ</span>
-            <span class="machine-panel__title">Comment bien exécuter {{ _m.name }}</span>
+            <span class="machine-panel__title">
+              Comment bien exécuter {{ _m.name }}
+              {% if se.substituted_name and _m.name == se.substituted_name %}
+                <em class="machine-panel__tag">(substitué)</em>
+              {% endif %}
+            </span>
           </summary>
           <div class="machine-panel__body">
             {% if _m.execution_cues %}
