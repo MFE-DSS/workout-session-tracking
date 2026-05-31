@@ -112,6 +112,15 @@ class WorkoutSession(Base):
     # | 'replay'. NULL means unknown / pre-Sb_13.
     creation_source: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
 
+    # Sb_24.1 — scoring formula version gate (Sx_24 §H, §E.2).
+    # 1 = pre-Sb_24 sessions, purely declarative formula (historic).
+    # 2 = post-Sb_24 sessions, declarative + implicit signal contribution.
+    # Existing rows are auto-set to 1 by the migration default — historic
+    # stability is guaranteed by the gating in compute_session_quality.
+    scoring_version: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="1", default=1
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -165,6 +174,19 @@ class SessionExercise(Base):
     muscle_sensation: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     free_note: Mapped[Optional[str]] = mapped_column(String(140), nullable=True)
     substituted_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    # Sb_24.1 — implicit signal label (Sx_24 §D.2).
+    # Computed and persisted at the moment the parent session transitions
+    # to status="completed". Never recomputed once set — guarantees
+    # historic stability even if the detection rules evolve later
+    # (Sb_24.next would bump scoring_version instead of recomputing).
+    # Valid values are defined by services/implicit_signal.py::ImplicitLabel
+    # (Sb_24.2). NULL means: not yet computed, or < 3 work sets, or
+    # pattern not classifiable.
+    implicit_label: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    implicit_label_computed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     session: Mapped[WorkoutSession] = relationship(back_populates="session_exercises")
 
