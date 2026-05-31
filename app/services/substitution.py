@@ -161,13 +161,19 @@ def load_cross_pattern_bridges() -> list[dict]:
 
 
 def compute_proximity(props_a: dict, props_b: dict) -> int:
-    """Score 0-100 entre deux exercices (spec §C.3).
+    """Score 0-105 entre deux exercices (spec §C.3 + Sb_22a.next).
 
     Composantes :
     * +50 zone_primary identique
     * +20 pattern_motor identique
     * +15 equipment_family identique
     * +10 chain identique (compound/isolation)
+    * +10 muscle_group identique (Sb_22a.next, ssi les 2 valeurs sont non-null)
+
+    Le bonus muscle_group ne s'applique que si AUCUNE des deux valeurs
+    n'est null/manquante. Ça évite de comparer un exo "lower" (avec
+    sous-zone) à un exo "arms" (sans sous-zone) — comparaison non
+    significative.
     """
     score = 0
     if props_a.get("zone_primary") == props_b.get("zone_primary"):
@@ -177,6 +183,9 @@ def compute_proximity(props_a: dict, props_b: dict) -> int:
     if props_a.get("equipment_family") == props_b.get("equipment_family"):
         score += 15
     if props_a.get("chain") == props_b.get("chain"):
+        score += 10
+    mg_a, mg_b = props_a.get("muscle_group"), props_b.get("muscle_group")
+    if mg_a and mg_b and mg_a == mg_b:
         score += 10
     return score
 
@@ -189,6 +198,12 @@ def _classify_suggestion(
 
     Spec §C.3 v1.1 garde-fou : si ``pattern_motor`` diffère, le résultat
     est forcément N3. Aucune promotion possible.
+
+    Sb_22a.next garde-fou : si l'origine a un ``muscle_group`` renseigné,
+    le candidat doit avoir le même pour être éligible à N1. Sans ça,
+    N2 ou N3 selon le reste. Ça empêche un faux N1 type "Leg extension
+    Équivalent à Adduction" (les deux ont zone_primary=lower mais
+    différentes sous-zones).
     """
     same_pattern = origin_props.get("pattern_motor") == candidate_props.get(
         "pattern_motor"
@@ -201,17 +216,27 @@ def _classify_suggestion(
     )
     same_chain = origin_props.get("chain") == candidate_props.get("chain")
 
+    origin_mg = origin_props.get("muscle_group")
+    cand_mg = candidate_props.get("muscle_group")
+    # Sb_22a.next : si l'origine a un muscle_group, le candidat doit
+    # matcher pour rester éligible N1. Si origine.muscle_group is None,
+    # la règle ne s'applique pas (autres zones non encore granularisées).
+    mg_blocks_n1 = bool(origin_mg) and (origin_mg != cand_mg)
+
     score = compute_proximity(origin_props, candidate_props)
 
-    # N1 strict equivalence : 4 dimensions identiques (curated OR perfect match)
-    if same_pattern and same_zone and same_equipment and same_chain:
+    # N1 strict equivalence : 4 dimensions identiques + muscle_group si applicable.
+    if same_pattern and same_zone and same_equipment and same_chain and not mg_blocks_n1:
         return "N1", BADGE_N1, None
-    # N2 close fallback : pattern identique obligatoire, proximity ≥ seuil
+    # N2 close fallback : pattern identique obligatoire, proximity ≥ seuil.
     if same_pattern and score >= PROXIMITY_THRESHOLD_N2:
         equip_bit = "même équipement" if same_equipment else "autre équipement"
         chain_bit = "" if same_chain else ", chaîne différente"
-        return "N2", BADGE_N2, f"même pattern · {equip_bit}{chain_bit}"
-    # N3 zone-only : pattern différent OR proximity < seuil
+        mg_bit = ""
+        if origin_mg and cand_mg and origin_mg != cand_mg:
+            mg_bit = f", autre groupe ({cand_mg})"
+        return "N2", BADGE_N2, f"même pattern · {equip_bit}{chain_bit}{mg_bit}"
+    # N3 zone-only : pattern différent OR proximity < seuil.
     return "N3", BADGE_N3, None
 
 

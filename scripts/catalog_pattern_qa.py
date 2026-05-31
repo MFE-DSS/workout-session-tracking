@@ -42,6 +42,16 @@ VALID_PATTERNS = {
 
 REQUIRED_FIELDS = ("pattern_motor", "zone_primary", "equipment_family", "chain")
 
+# Sb_22a.next — muscle_group enum for `lower` zone.
+# Required on `lower` only V1.1; other zones may add their own granularity later.
+VALID_LOWER_MUSCLE_GROUPS = {
+    "adductors",
+    "quadriceps",
+    "hamstrings",
+    "glutes",
+    "calves",
+}
+
 
 def _load_properties() -> dict:
     path = DATA / "exercise_properties.json"
@@ -62,6 +72,19 @@ def _validate_entry(name: str, entry: dict) -> list[str]:
             f"{name}: invalid pattern_motor '{pm}' "
             f"(allowed: {sorted(VALID_PATTERNS)})"
         )
+    # Sb_22a.next — muscle_group obligatoire pour zone_primary=lower.
+    if entry.get("zone_primary") == "lower":
+        mg = entry.get("muscle_group")
+        if not mg:
+            errors.append(
+                f"{name}: zone_primary=lower requires muscle_group "
+                f"(allowed: {sorted(VALID_LOWER_MUSCLE_GROUPS)})"
+            )
+        elif mg not in VALID_LOWER_MUSCLE_GROUPS:
+            errors.append(
+                f"{name}: invalid muscle_group '{mg}' for lower "
+                f"(allowed: {sorted(VALID_LOWER_MUSCLE_GROUPS)})"
+            )
     return errors
 
 

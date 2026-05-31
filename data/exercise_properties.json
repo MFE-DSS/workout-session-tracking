@@ -1,22 +1,25 @@
 {
-  "_version": "Sb_22a.v1",
-  "_doc": "Sb_22a — propriétés enrichies par exercice pour la substitution heuristique. Couvre exclusivement le sous-lot MVP haute valeur §C.4bis. Pas de réécriture du catalogue : ce registre est consulté en LECTURE par services/substitution.py. Tout exercice absent ici reste substituable via la liste N1 existante (substitutes_json) — l'absence n'est pas une erreur, juste hors scope V1.",
+  "_version": "Sb_22a.v1.1",
+  "_doc": "Sb_22a — propriétés enrichies par exercice pour la substitution heuristique. Couvre exclusivement le sous-lot MVP haute valeur §C.4bis. Pas de réécriture du catalogue : ce registre est consulté en LECTURE par services/substitution.py. Tout exercice absent ici reste substituable via la liste N1 existante (substitutes_json) — l'absence n'est pas une erreur, juste hors scope V1. Sb_22a.next ajoute le champ muscle_group OBLIGATOIRE pour zone_primary=lower (valeurs : adductors / quadriceps / hamstrings / glutes / calves). Pour les autres zones le champ reste optionnel (V1.1 stricte scope).",
   "exercises": {
     "Adduction assise": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "adductors",
       "equipment_family": "machine",
       "chain": "isolation"
     },
     "Adduction debout câble": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "adductors",
       "equipment_family": "cable",
       "chain": "isolation"
     },
     "Adduction couchée machine": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "adductors",
       "equipment_family": "machine",
       "chain": "isolation"
     },
@@ -147,12 +150,14 @@
     "Leg extensions assises": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "quadriceps",
       "equipment_family": "machine",
       "chain": "isolation"
     },
     "Leg extension câble unilatéral": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "quadriceps",
       "equipment_family": "cable",
       "chain": "isolation"
     },
@@ -160,24 +165,28 @@
     "Leg curls allongé": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "hamstrings",
       "equipment_family": "machine",
       "chain": "isolation"
     },
     "Leg curls assis": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "hamstrings",
       "equipment_family": "machine",
       "chain": "isolation"
     },
     "Reverse Nordic": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "quadriceps",
       "equipment_family": "bodyweight",
       "chain": "isolation"
     },
     "Sliding leg curl": {
       "pattern_motor": "isolation_lower",
       "zone_primary": "lower",
+      "muscle_group": "hamstrings",
       "equipment_family": "bodyweight",
       "chain": "isolation"
     },

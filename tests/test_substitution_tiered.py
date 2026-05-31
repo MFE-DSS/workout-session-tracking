@@ -235,3 +235,110 @@ def test_origin_never_suggests_itself():
     out = compute_suggestions(te)
     all_names = {s.name for level in out.values() for s in level}
     assert "Adduction assise" not in all_names
+
+
+# ---------------------------------------------------------------------------
+# Sb_22a.next — muscle_group sub-zone for lower zone (regression guard)
+# ---------------------------------------------------------------------------
+
+
+def test_adduction_n1_excludes_leg_extensions_and_curls():
+    """Sb_22a.next regression — Leg extension/curl must NOT appear in N1
+    of an adduction origin. They share zone_primary=lower but differ in
+    muscle_group (quadriceps/hamstrings vs adductors)."""
+    from app.services.substitution import compute_suggestions
+    te = _make_te("Adduction assise")
+    out = compute_suggestions(te)
+    n1_names = [s.name for s in out["N1"]]
+    forbidden = {
+        "Leg extensions assises",
+        "Leg extension câble unilatéral",
+        "Leg curls allongé",
+        "Leg curls assis",
+        "Reverse Nordic",
+        "Sliding leg curl",
+    }
+    for name in forbidden:
+        assert name not in n1_names, (
+            f"'{name}' must not be N1 for Adduction assise — "
+            "different muscle_group (regression Sb_22a.next)"
+        )
+
+
+def test_adduction_keeps_legitimate_adductors_in_n1():
+    """Adduction couchée machine / Adduction debout câble are real
+    adductor exercises and must remain reachable via the drawer at N1
+    (curated) regardless of equipment differences."""
+    from app.services.substitution import compute_suggestions
+    te = _make_te(
+        "Adduction assise",
+        subs=["Adduction debout câble", "Adduction couchée machine"],
+    )
+    out = compute_suggestions(te)
+    n1_names = {s.name for s in out["N1"]}
+    assert "Adduction couchée machine" in n1_names
+    assert "Adduction debout câble" in n1_names
+
+
+def test_leg_extensions_appear_in_n2_for_adduction_with_rationale():
+    """Demoted from N1 to N2 (same pattern_motor isolation_lower but
+    different muscle_group). The rationale must surface the difference."""
+    from app.services.substitution import compute_suggestions
+    te = _make_te("Adduction assise")
+    out = compute_suggestions(te)
+    n2_names = [s.name for s in out["N2"]]
+    assert "Leg extensions assises" in n2_names
+    # Find the suggestion and check rationale mentions muscle group.
+    leg_ext_sug = next(s for s in out["N2"] if s.name == "Leg extensions assises")
+    assert "groupe" in (leg_ext_sug.rationale or "").lower() or "quadriceps" in (
+        leg_ext_sug.rationale or ""
+    ).lower()
+
+
+def test_compute_proximity_muscle_group_bonus_when_both_present():
+    """Adductors vs adductors → +10. Adductors vs quadriceps → 0 bonus."""
+    from app.services.substitution import compute_proximity
+    base = {"zone_primary": "lower", "pattern_motor": "isolation_lower",
+            "equipment_family": "machine", "chain": "isolation"}
+    same_mg = {**base, "muscle_group": "adductors"}
+    diff_mg = {**base, "muscle_group": "quadriceps"}
+    a = {**same_mg}
+    assert compute_proximity(a, same_mg) == 95 + 10
+    assert compute_proximity(a, diff_mg) == 95
+
+
+def test_compute_proximity_no_muscle_group_bonus_when_one_missing():
+    """If only one side has muscle_group, no bonus (avoid spurious match
+    between exos with sub-zone data and exos without)."""
+    from app.services.substitution import compute_proximity
+    base = {"zone_primary": "lower", "pattern_motor": "isolation_lower",
+            "equipment_family": "machine", "chain": "isolation"}
+    with_mg = {**base, "muscle_group": "adductors"}
+    without = {**base}
+    assert compute_proximity(with_mg, without) == 95
+    assert compute_proximity(without, with_mg) == 95
+
+
+def test_lower_exercises_all_have_muscle_group():
+    """Sb_22a.next QA — every `lower` entry MUST carry a muscle_group."""
+    from app.services.substitution import load_exercise_properties
+    props = load_exercise_properties()
+    valid = {"adductors", "quadriceps", "hamstrings", "glutes", "calves"}
+    for name, entry in props.items():
+        if entry.get("zone_primary") != "lower":
+            continue
+        mg = entry.get("muscle_group")
+        assert mg is not None, f"{name}: lower zone requires muscle_group"
+        assert mg in valid, f"{name}: muscle_group '{mg}' not in {valid}"
+
+
+def test_non_lower_exercise_unaffected_by_muscle_group_rule():
+    """A non-lower exercise (e.g. Chest Press machine) has no muscle_group
+    set; the rule must not block N1 for its candidates."""
+    from app.services.substitution import compute_suggestions
+    # Push horizontal origin — has no muscle_group set in V1.1
+    te = _make_te("Chest Press machine")
+    out = compute_suggestions(te)
+    # Compose N1+N2+N3 — should at least surface 2 candidates (same-pattern compounds)
+    total = len(out["N1"]) + len(out["N2"]) + len(out["N3"])
+    assert total >= 2
