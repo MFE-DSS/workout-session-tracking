@@ -31,34 +31,39 @@ depends_on = None
 
 
 def upgrade() -> None:
-    with op.batch_alter_table("session_exercises") as batch_op:
-        batch_op.add_column(
-            sa.Column("implicit_label", sa.String(32), nullable=True)
-        )
-        batch_op.add_column(
-            sa.Column(
-                "implicit_label_computed_at",
-                sa.DateTime(timezone=True),
-                nullable=True,
-            )
-        )
-
-    with op.batch_alter_table("workout_sessions") as batch_op:
-        # NOT NULL DEFAULT 1 — every existing row receives 1 automatically.
-        # SQLite (production target) honors the server_default at ALTER time.
-        batch_op.add_column(
-            sa.Column(
-                "scoring_version",
-                sa.Integer(),
-                nullable=False,
-                server_default=sa.text("1"),
-            )
-        )
+    # ADD COLUMN direct — SQLite supporte ça nativement pour les colonnes
+    # NULL (sans recréation de table). `batch_alter_table` recrée la
+    # table ce qui peut échouer sur prod avec NOT NULL + server_default
+    # quand la table contient déjà des données. ADD COLUMN simple est
+    # safe et rapide.
+    op.add_column(
+        "session_exercises",
+        sa.Column("implicit_label", sa.String(32), nullable=True),
+    )
+    op.add_column(
+        "session_exercises",
+        sa.Column(
+            "implicit_label_computed_at",
+            sa.DateTime(timezone=True),
+            nullable=True,
+        ),
+    )
+    # Pour la colonne NOT NULL avec default — SQLite supporte le pattern
+    # ALTER TABLE … ADD COLUMN … NOT NULL DEFAULT N directement, sans
+    # recréation de table, dès SQLite 3.32 (Ubuntu 22.04+ : 3.37). Le
+    # DEFAULT est appliqué aux rows existantes au moment du ALTER.
+    op.add_column(
+        "workout_sessions",
+        sa.Column(
+            "scoring_version",
+            sa.Integer(),
+            nullable=False,
+            server_default="1",
+        ),
+    )
 
 
 def downgrade() -> None:
-    with op.batch_alter_table("workout_sessions") as batch_op:
-        batch_op.drop_column("scoring_version")
-    with op.batch_alter_table("session_exercises") as batch_op:
-        batch_op.drop_column("implicit_label_computed_at")
-        batch_op.drop_column("implicit_label")
+    op.drop_column("workout_sessions", "scoring_version")
+    op.drop_column("session_exercises", "implicit_label_computed_at")
+    op.drop_column("session_exercises", "implicit_label")
