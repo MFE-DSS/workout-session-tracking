@@ -1,0 +1,332 @@
+{
+  "_version": "Sb_22a.v1",
+  "_doc": "Sb_22a — propriétés enrichies par exercice pour la substitution heuristique. Couvre exclusivement le sous-lot MVP haute valeur §C.4bis. Pas de réécriture du catalogue : ce registre est consulté en LECTURE par services/substitution.py. Tout exercice absent ici reste substituable via la liste N1 existante (substitutes_json) — l'absence n'est pas une erreur, juste hors scope V1.",
+  "exercises": {
+    "Adduction assise": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Adduction debout câble": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Adduction couchée machine": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+
+    "Rowing machine chest-supported": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+    "Rowing chest-supported": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+    "Rowing câble assis prise large": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Rowing câble assis prise neutre": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Rowing câble assis prise serrée": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Rowing haltère un bras": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Rowing haltère un bras (banc)": {
+      "pattern_motor": "pull_horizontal",
+      "zone_primary": "back_thickness",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+
+    "Tirage poulie haute prise large": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Tirage poulie haute prise neutre": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Tirage vertical unilatéral câble": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Lat pulldown prise large": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Lat pulldown prise neutre": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "cable",
+      "chain": "compound"
+    },
+    "Straight-arm pulldown câble": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "back_width",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Traction assistée machine": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+    "Traction assistée unilatérale": {
+      "pattern_motor": "pull_vertical",
+      "zone_primary": "back_width",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+
+    "Machine shoulder press": {
+      "pattern_motor": "push_vertical",
+      "zone_primary": "shoulders",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+    "Neutral Grip Shoulder Press machine": {
+      "pattern_motor": "push_vertical",
+      "zone_primary": "shoulders",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+    "Shoulder press haltères assis": {
+      "pattern_motor": "push_vertical",
+      "zone_primary": "shoulders",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Smith shoulder press": {
+      "pattern_motor": "push_vertical",
+      "zone_primary": "shoulders",
+      "equipment_family": "smith",
+      "chain": "compound"
+    },
+    "Arnold press": {
+      "pattern_motor": "push_vertical",
+      "zone_primary": "shoulders",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+
+    "Leg extensions assises": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Leg extension câble unilatéral": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+
+    "Leg curls allongé": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Leg curls assis": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Reverse Nordic": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "bodyweight",
+      "chain": "isolation"
+    },
+    "Sliding leg curl": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "equipment_family": "bodyweight",
+      "chain": "isolation"
+    },
+
+    "Triceps pushdown corde": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Triceps pushdown barre": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Triceps extension poulie haute (corde)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Kickback câble": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Dips pectoraux (buste penché)": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "bodyweight",
+      "chain": "compound"
+    },
+    "Extension overhead câble (corde)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+
+    "Curl EZ-bar debout": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "barbell",
+      "chain": "isolation"
+    },
+    "Curl incliné haltères": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "dumbbell",
+      "chain": "isolation"
+    },
+    "Curl incliné haltères (banc 45°)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "dumbbell",
+      "chain": "isolation"
+    },
+    "Curl marteau haltères": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "dumbbell",
+      "chain": "isolation"
+    },
+    "Curl marteau câble (corde)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Curl marteau câble corde": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Curl poulie basse": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Curl poulie basse (barre)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Curl câble basse": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Curl debout haltères": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "dumbbell",
+      "chain": "isolation"
+    },
+    "Curl prise neutre câble": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Preacher curl": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "arms",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+
+    "Chest Press machine": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "machine",
+      "chain": "compound"
+    },
+    "Développé couché haltères": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Développé incliné haltères 30°": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Incline Smith Press": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "smith",
+      "chain": "compound"
+    },
+    "Incline Dumbbell Press": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Incline DB Press 30°": {
+      "pattern_motor": "push_horizontal",
+      "zone_primary": "pecs",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    }
+  }
+}

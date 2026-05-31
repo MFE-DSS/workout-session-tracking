@@ -135,16 +135,21 @@
         </details>
       {% endif %}
 
-      {# Substitution (Sb_03 + Sb_07 drawer) #}
+      {# Substitution (Sb_03 + Sb_07 drawer, étendu Sb_22a tiered N1/N2/N3) #}
       {% set sub_data = substitution_data.get(se.id, {}) %}
       {% set subs = sub_data.get('substitutes', []) %}
+      {% set grouped = sub_data.get('grouped', {'N1':[], 'N2':[], 'N3':[]}) %}
       {% set can_sub = sub_data.get('can_substitute', False) %}
+      {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
 
-      {% if can_sub and subs %}
+      {% if can_sub and (subs or total_grouped > 0) %}
         <details class="substitute-picker substitute-picker--drawer">
           <summary class="substitute-picker__summary">
             <span class="substitute-picker__label">Remplacer cet exercice</span>
-            <span class="substitute-picker__count">{{ subs|length }} alternative{% if subs|length > 1 %}s{% endif %}</span>
+            <span class="substitute-picker__count">
+              {% if total_grouped > 0 %}{{ total_grouped }}{% else %}{{ subs|length }}{% endif %}
+              alternative{% if (total_grouped or subs|length) > 1 %}s{% endif %}
+            </span>
           </summary>
           <div class="substitute-picker__body">
             <p class="substitute-picker__hint">Machine occupée ou indisponible ? Choisissez une alternative avant la première série travail.</p>
@@ -153,12 +158,52 @@
                 <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
                 <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
               </label>
-              {% for sub in subs %}
+              {# Sb_22a — N1 Équivalent (curé + match parfait) #}
+              {% for s in grouped.get('N1', []) %}
               <label class="segmented__option">
-                <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
-                <span>{{ sub }}</span>
+                <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                <span>
+                  {{ s.name }}
+                  <span class="sub-badge sub-badge--n1">{{ s.badge }}</span>
+                </span>
               </label>
               {% endfor %}
+              {# Sb_22a — N2 Proche (même pattern, équipement/chaîne différents) #}
+              {% for s in grouped.get('N2', []) %}
+              <label class="segmented__option">
+                <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                <span>
+                  {{ s.name }}
+                  <span class="sub-badge sub-badge--n2">{{ s.badge }}</span>
+                  {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
+                </span>
+              </label>
+              {% endfor %}
+              {# Sb_22a — N3 Élargi (zone-only ou cross-pattern bridge). Replié par défaut. #}
+              {% if grouped.get('N3', []) | length > 0 %}
+              <details class="sub-elargi">
+                <summary>Voir alternatives élargies ({{ grouped.get('N3', []) | length }})</summary>
+                {% for s in grouped.get('N3', []) %}
+                <label class="segmented__option">
+                  <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                  <span>
+                    {{ s.name }}
+                    <span class="sub-badge sub-badge--n3">{{ s.badge }}</span>
+                    {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
+                  </span>
+                </label>
+                {% endfor %}
+              </details>
+              {% endif %}
+              {# Legacy fallback — if grouped is empty but flat subs exist (out-of-scope exercises) #}
+              {% if total_grouped == 0 %}
+                {% for sub in subs %}
+                <label class="segmented__option">
+                  <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
+                  <span>{{ sub }}</span>
+                </label>
+                {% endfor %}
+              {% endif %}
             </div>
           </div>
         </details>

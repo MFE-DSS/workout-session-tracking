@@ -210,17 +210,32 @@ def session_detail(
         se.id: summarise_current_exercise(se) for se in session.session_exercises
     }
 
-    from app.services.substitution import get_substitutes, can_substitute
+    from app.services.substitution import (
+        get_substitutes,
+        can_substitute,
+        compute_suggestions,
+    )
     from app.services import machine_atlas
     from app.services.hints import compute_hints as compute_sb08_hints
     substitution_data: dict[int, dict] = {}
     atlas_data: dict[int, dict | None] = {}
     sb08_hints_by_exercise: dict[int, list[dict]] = {}
     for se in session.session_exercises:
+        # Sb_22a — keep legacy `substitutes` (flat list) for backward
+        # compatibility with the existing radio drawer, and add the
+        # grouped N1/N2/N3 payload for the new tiered UI.
         subs = get_substitutes(se.template_exercise)
+        grouped = compute_suggestions(se.template_exercise)
         substitution_data[se.id] = {
             "substitutes": subs,
             "can_substitute": can_substitute(se),
+            "grouped": {
+                level: [
+                    {"name": s.name, "badge": s.badge, "rationale": s.rationale}
+                    for s in grouped[level]
+                ]
+                for level in ("N1", "N2", "N3")
+            },
         }
         atlas_data[se.id] = machine_atlas.get_for_template_exercise(se.template_exercise)
         sb08_hints_by_exercise[se.id] = [

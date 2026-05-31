@@ -1,0 +1,42 @@
+{
+  "_version": "Sb_22a.v1",
+  "_doc": "Sb_22a — passerelles transversales haute valeur entre patterns moteurs différents. Lues par services/substitution.py pour proposer des alternatives N3 explicitement étiquetées 'Élargi · intention proche'. Chaque entrée doit citer l'intention (largeur, épaisseur, angle, équipement) sinon elle n'est pas valide.",
+  "bridges": [
+    {
+      "from_pattern": "pull_horizontal",
+      "to_pattern": "pull_vertical",
+      "intent": "Varier épaisseur (rowing) ↔ largeur (tirage vertical) ou contourner station rowing occupée.",
+      "exercises_from": [
+        "Rowing machine chest-supported",
+        "Rowing chest-supported",
+        "Rowing câble assis prise large",
+        "Rowing câble assis prise neutre",
+        "Rowing câble assis prise serrée",
+        "Rowing haltère un bras",
+        "Rowing haltère un bras (banc)"
+      ],
+      "exercises_to": [
+        "Tirage poulie haute prise neutre",
+        "Tirage poulie haute prise large",
+        "Lat pulldown prise neutre",
+        "Lat pulldown prise large"
+      ]
+    },
+    {
+      "from_pattern": "pull_vertical",
+      "to_pattern": "pull_horizontal",
+      "intent": "Varier largeur (tirage vertical) ↔ épaisseur (rowing) ou contourner station tirage occupée.",
+      "exercises_from": [
+        "Tirage poulie haute prise large",
+        "Tirage poulie haute prise neutre",
+        "Lat pulldown prise large",
+        "Lat pulldown prise neutre",
+        "Tirage vertical unilatéral câble"
+      ],
+      "exercises_to": [
+        "Rowing câble assis prise neutre",
+        "Rowing machine chest-supported"
+      ]
+    }
+  ]
+}
