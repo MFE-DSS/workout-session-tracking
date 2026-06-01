@@ -30,40 +30,60 @@ branch_labels = None
 depends_on = None
 
 
+def _column_exists(table: str, column: str) -> bool:
+    """Check if a column already exists — makes the migration idempotent.
+
+    A previous deploy attempt may have partially applied the upgrade
+    (some columns added) without advancing alembic_version (because a
+    later step failed). Retrying must not raise "duplicate column" on
+    the already-present columns. This helper turns each add_column into
+    a no-op if the column is already there.
+    """
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    existing = {col["name"] for col in inspector.get_columns(table)}
+    return column in existing
+
+
 def upgrade() -> None:
     # ADD COLUMN direct — SQLite supporte ça nativement pour les colonnes
-    # NULL (sans recréation de table). `batch_alter_table` recrée la
-    # table ce qui peut échouer sur prod avec NOT NULL + server_default
-    # quand la table contient déjà des données. ADD COLUMN simple est
-    # safe et rapide.
-    op.add_column(
-        "session_exercises",
-        sa.Column("implicit_label", sa.String(32), nullable=True),
-    )
-    op.add_column(
-        "session_exercises",
-        sa.Column(
-            "implicit_label_computed_at",
-            sa.DateTime(timezone=True),
-            nullable=True,
-        ),
-    )
+    # NULL (sans recréation de table). Idempotent : si une tentative de
+    # déploiement précédente a partiellement appliqué le ALTER, on
+    # skip silencieusement la colonne existante.
+    if not _column_exists("session_exercises", "implicit_label"):
+        op.add_column(
+            "session_exercises",
+            sa.Column("implicit_label", sa.String(32), nullable=True),
+        )
+    if not _column_exists("session_exercises", "implicit_label_computed_at"):
+        op.add_column(
+            "session_exercises",
+            sa.Column(
+                "implicit_label_computed_at",
+                sa.DateTime(timezone=True),
+                nullable=True,
+            ),
+        )
     # Pour la colonne NOT NULL avec default — SQLite supporte le pattern
     # ALTER TABLE … ADD COLUMN … NOT NULL DEFAULT N directement, sans
     # recréation de table, dès SQLite 3.32 (Ubuntu 22.04+ : 3.37). Le
     # DEFAULT est appliqué aux rows existantes au moment du ALTER.
-    op.add_column(
-        "workout_sessions",
-        sa.Column(
-            "scoring_version",
-            sa.Integer(),
-            nullable=False,
-            server_default="1",
-        ),
-    )
+    if not _column_exists("workout_sessions", "scoring_version"):
+        op.add_column(
+            "workout_sessions",
+            sa.Column(
+                "scoring_version",
+                sa.Integer(),
+                nullable=False,
+                server_default="1",
+            ),
+        )
 
 
 def downgrade() -> None:
-    op.drop_column("workout_sessions", "scoring_version")
-    op.drop_column("session_exercises", "implicit_label_computed_at")
-    op.drop_column("session_exercises", "implicit_label")
+    if _column_exists("workout_sessions", "scoring_version"):
+        op.drop_column("workout_sessions", "scoring_version")
+    if _column_exists("session_exercises", "implicit_label_computed_at"):
+        op.drop_column("session_exercises", "implicit_label_computed_at")
+    if _column_exists("session_exercises", "implicit_label"):
+        op.drop_column("session_exercises", "implicit_label")
