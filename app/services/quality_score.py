@@ -10,12 +10,22 @@ the legacy semantics unchanged.
 
 The dispatcher is transparent for consumers (leaderboard, kpis, timeline,
 behavioral engine) which read `quality_score` without knowing the formula.
+
+Sb_24.5 — Strength scoring is now also dispatched by
+``WorkoutSession.scoring_version`` (Sx_24 §H) :
+  - scoring_version=1 → V1 formula UNCHANGED (historic invariance)
+  - scoring_version=2 → V2 formula = 0.75·V1 + 0.25·implicit_avg
+
+V1 is bit-for-bit identical to what existed before Sb_24.5 — that's the
+non-negotiable contract that protects every value already shown in the
+leaderboard, the coach report, the user grade, etc.
 """
 from __future__ import annotations
 
 from typing import Optional
 
 from app.models.session import WorkoutSession
+from app.services.implicit_signal import LABEL_SCORE_CONTRIBUTION, ImplicitLabel
 
 
 # ---------------------------------------------------------------------------
@@ -49,10 +59,70 @@ def session_kind(session: WorkoutSession) -> str:
 
 
 def compute_session_quality(session: WorkoutSession) -> int:
-    """Return 0..100 quality score, dispatched by template kind."""
+    """Return 0..100 quality score, dispatched by template kind.
+
+    Sb_24.5 — Strength sessions are further dispatched by
+    ``scoring_version`` so historic V1 sessions stay bit-for-bit
+    invariant. Cardio is unaffected (no implicit signal in cardio).
+    """
     if _session_kind(session) == "cardio":
         return compute_session_quality_cardio(session)
+    # `or 1` covers the transient-instance case where SQLAlchemy hasn't
+    # applied the column default yet (model created in memory, not yet
+    # flushed). Treating None as 1 is consistent with the migration's
+    # behaviour for historic rows.
+    sv = getattr(session, "scoring_version", None) or 1
+    if sv >= 2:
+        return _compute_session_quality_strength_v2(session)
     return compute_session_quality_strength(session)
+
+
+# ---------------------------------------------------------------------------
+# Sb_24.5 — V2 strength helper (additive over V1)
+# ---------------------------------------------------------------------------
+
+W_IMPLICIT = 0.25
+W_V1 = 1.0 - W_IMPLICIT  # 0.75
+
+
+def _implicit_signal_avg(session: WorkoutSession) -> Optional[float]:
+    """Average ``LABEL_SCORE_CONTRIBUTION`` over the exercises of this
+    session that carry a non-null ``implicit_label``. Returns None if
+    no exercise in the session is labeled (Sx_24 §F.2 — "exclu du
+    calcul de moyenne" when label is None)."""
+    valid_label_values = {label.value for label in ImplicitLabel}
+    contributions: list[int] = []
+    for se in session.session_exercises:
+        label_value = getattr(se, "implicit_label", None)
+        if label_value not in valid_label_values:
+            continue
+        try:
+            label_enum = ImplicitLabel(label_value)
+        except ValueError:
+            continue
+        contributions.append(LABEL_SCORE_CONTRIBUTION[label_enum])
+    if not contributions:
+        return None
+    return sum(contributions) / len(contributions)
+
+
+def _compute_session_quality_strength_v2(session: WorkoutSession) -> int:
+    """Return 0..100 strength quality with the V2 formula.
+
+    Spec Sx_24 §F.2 :
+        V2 = W_V1 · V1 + W_IMPLICIT · implicit_avg
+
+    Both components are on the 0..100 scale, so the result is naturally
+    bounded to 0..100. If the session has no exercise carrying an
+    implicit_label (e.g. all exos have < 3 work sets), the implicit
+    average is None — we fall back to V1 unchanged.
+    """
+    v1 = compute_session_quality_strength(session)
+    implicit_avg = _implicit_signal_avg(session)
+    if implicit_avg is None:
+        return v1
+    raw = W_V1 * v1 + W_IMPLICIT * implicit_avg
+    return max(0, min(100, round(raw)))
 
 
 # ---------------------------------------------------------------------------
