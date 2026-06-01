@@ -41,7 +41,6 @@ from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
 from app.services.ownership import get_owned_session_or_404
 from app.services.form_parsing import (
-    checkbox,
     clean_str,
     enum_int,
     enum_str,
@@ -554,11 +553,18 @@ async def update_exercise_card(
         se.substituted_name = None
 
     # Per-set values — the form encodes them as set_{id}_{field}
+    # Sb_24.4 — `completed` is derived server-side from the presence of
+    # any value (weight or reps), no longer saisi via a checkbox in the
+    # UI. Spec Sx_24 §E : vide = non fait, weight or reps renseigné =
+    # fait. This change ONLY affects new POSTs. Historic rows keep
+    # their existing `completed` value untouched (no migration).
     for sl in se.set_logs:
         p = f"set_{sl.id}_"
-        sl.weight_kg = to_float(form.get(p + "weight_kg"))
-        sl.reps = to_int(form.get(p + "reps"))
-        sl.completed = checkbox(form.get(p + "completed"))
+        new_weight = to_float(form.get(p + "weight_kg"))
+        new_reps = to_int(form.get(p + "reps"))
+        sl.weight_kg = new_weight
+        sl.reps = new_reps
+        sl.completed = (new_weight is not None) or (new_reps is not None)
 
     # Derive success_score from set data (Sb_01)
     from app.services.feedback import compute_success_score

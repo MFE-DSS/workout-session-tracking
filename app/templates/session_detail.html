@@ -306,15 +306,10 @@
                   placeholder="reps"
                   value="{{ sl.reps if sl.reps is not none else '' }}"
                 />
-                <label class="set-row__done">
-                  <input
-                    type="checkbox"
-                    name="set_{{ sl.id }}_completed"
-                    value="1"
-                    {% if sl.completed %}checked{% endif %}
-                  />
-                  <span>Fait</span>
-                </label>
+                {# Sb_24.4 — checkbox "Fait" retirée. Spec Sx_24 §E :
+                   completed est dérivé côté serveur de la présence de
+                   weight ou reps. Vide = non fait, valeur saisie = fait.
+                   Économise un clic par série + ligne plus dense. #}
               </div>
             </li>
           {% endfor %}
@@ -354,15 +349,7 @@
                   placeholder="reps"
                   value="{{ sl.reps if sl.reps is not none else '' }}"
                 />
-                <label class="set-row__done">
-                  <input
-                    type="checkbox"
-                    name="set_{{ sl.id }}_completed"
-                    value="1"
-                    {% if sl.completed %}checked{% endif %}
-                  />
-                  <span>Fait</span>
-                </label>
+                {# Sb_24.4 — idem warmup, checkbox "Fait" retirée. #}
               </div>
 
             </li>
