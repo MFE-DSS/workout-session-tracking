@@ -132,6 +132,38 @@ def _load_session(db: Session, session_id: int, user_id: int) -> WorkoutSession 
     return db.execute(stmt).scalar_one_or_none()
 
 
+def _persist_implicit_labels_on_completion(session: WorkoutSession) -> None:
+    """Sb_24.3 — compute and freeze implicit signal labels at the moment
+    a session transitions to status=completed. Also bumps the session's
+    scoring_version to 2 so the new quality_score formula (Sb_24.5) is
+    used for it forever, while historic sessions keep version 1.
+
+    Contracts (Sx_24 §C, §D.2, §H) :
+      * Idempotent — labels already set are never touched
+      * No retroactive recompute — once a label is in the DB, the rule
+        engine evolving (Sb_24.next) never modifies it
+      * scoring_version is monotonically increased — never decreased
+    """
+    from app.services.implicit_signal import detect_intra_set_label
+
+    now = datetime.now(timezone.utc)
+    for se in session.session_exercises:
+        if se.implicit_label is not None:
+            # Already labeled in a previous transition — leave it alone.
+            continue
+        work_sets = sorted(
+            (sl for sl in se.set_logs if sl.kind == "work" and sl.completed),
+            key=lambda sl: sl.set_index,
+        )
+        label = detect_intra_set_label(work_sets)
+        if label is not None:
+            se.implicit_label = label.value
+            se.implicit_label_computed_at = now
+    # Bump the scoring version (never downgrade).
+    if session.scoring_version < 2:
+        session.scoring_version = 2
+
+
 def _session_stats(session: WorkoutSession) -> dict:
     """Per-exercise and global counts of completed work sets."""
     per_exercise: dict[int, tuple[int, int]] = {}
@@ -453,6 +485,12 @@ async def update_session(
     if action == "end":
         session.ended_at = datetime.now(timezone.utc)
         session.status = SessionStatus.COMPLETED
+        # Sb_24.3 — persist implicit signal labels at completion, exactly once.
+        # Idempotent: never re-touch a label that's already set, never
+        # downgrade scoring_version. Per Sx_24 §C, §D.2 the persisted
+        # label is frozen for life — Sb_24.next2 will bump scoring_version
+        # rather than recomputing.
+        _persist_implicit_labels_on_completion(session)
     elif action == "reopen" and session.status == SessionStatus.COMPLETED:
         session.ended_at = None
         session.status = SessionStatus.IN_PROGRESS
