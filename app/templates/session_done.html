@@ -146,6 +146,7 @@
       <h2 class="card__title">Par exercice</h2>
       <ul class="session-done__exlist">
         {% for ex in recap.exercises %}
+          {% set _il = implicit_by_se.get(ex.se_id) %}
           <li class="session-done__exrow">
             <span class="session-done__code">{{ ex.code }}</span>
             <span class="session-done__name">
@@ -153,6 +154,14 @@
                 → {{ ex.substituted_name }}
               {% else %}
                 {{ ex.name }}
+              {% endif %}
+              {% if _il %}
+                {# Sb_24.6 — pastille label implicite, sobre. Le tooltip
+                   donne la contribution numérique pour la transparence. #}
+                <span class="implicit-pill implicit-pill--{{ _il.label }}"
+                      title="Contribution au score V2 : {{ _il.contribution }}/100">
+                  {{ _il.label_display }}
+                </span>
               {% endif %}
             </span>
             <span class="session-done__prog">{{ ex.done }}/{{ ex.total }}</span>
@@ -162,6 +171,39 @@
           </li>
         {% endfor %}
       </ul>
+
+      {% if breakdown %}
+        {# Sb_24.6 — score ventilé (uniquement scoring_version >= 2). Affiché
+           sobre, en bas du bloc, pour expliquer comment le score final
+           se décompose. Cache si pas de label (breakdown vaut None côté
+           handler dans ce cas). #}
+        <div class="score-breakdown">
+          <h4 class="score-breakdown__title">Décomposition du score</h4>
+          <ul class="score-breakdown__list">
+            <li>
+              <span>Composante classique (V1)</span>
+              <b>{{ breakdown.v1 }}</b>
+              <span class="text-dim">× {{ breakdown.weight_v1 }}</span>
+            </li>
+            {% if breakdown.implicit_avg is not none %}
+            <li>
+              <span>Moyenne des labels implicites</span>
+              <b>{{ breakdown.implicit_avg }}</b>
+              <span class="text-dim">× {{ breakdown.weight_implicit }}</span>
+            </li>
+            {% endif %}
+            <li class="score-breakdown__final">
+              <span>Score affiché</span>
+              <b>{{ breakdown.final }}</b>
+              {% if breakdown.delta != 0 %}
+                <span class="score-breakdown__delta score-breakdown__delta--{% if breakdown.delta > 0 %}up{% else %}down{% endif %}">
+                  {% if breakdown.delta > 0 %}+{% endif %}{{ breakdown.delta }} vs V1
+                </span>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+      {% endif %}
     </section>
   {% endif %}
 

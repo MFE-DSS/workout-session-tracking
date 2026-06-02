@@ -160,6 +160,9 @@ def build_recap(
         display_name = se.substituted_name or se.exercise_name_snapshot
         exercises.append(
             {
+                # Sb_24.6 — expose se.id so the template can look up the
+                # implicit_label pastille payload (computed in the router).
+                "se_id": se.id,
                 "code": se.exercise_code_snapshot,
                 "name": se.exercise_name_snapshot,
                 "substituted_name": se.substituted_name,

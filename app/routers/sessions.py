@@ -441,6 +441,54 @@ def session_done(
         se._prior_summary = prior_summary_map.get(se.exercise_code_snapshot)
 
     recap = build_recap(session, prior_weight_by_code=prior_weight_by_code)
+
+    # Sb_24.6 — build a small per-exercise label payload for the review
+    # pastilles, and a session-level "score breakdown" when scoring_version
+    # >= 2. Both stay None for sessions that have no implicit_label at
+    # all (e.g. session courte < 3 sets partout), so the template can
+    # conditionally render.
+    from app.services.implicit_signal import LABEL_SCORE_CONTRIBUTION, ImplicitLabel
+    from app.services.quality_score import (
+        W_IMPLICIT,
+        W_V1,
+        _implicit_signal_avg,
+        compute_session_quality,
+        compute_session_quality_strength,
+    )
+
+    valid_labels = {label.value for label in ImplicitLabel}
+    implicit_by_se: dict[int, dict] = {}
+    for se in session.session_exercises:
+        label_value = getattr(se, "implicit_label", None)
+        if label_value in valid_labels:
+            label_enum = ImplicitLabel(label_value)
+            implicit_by_se[se.id] = {
+                "label": label_enum.value,
+                "label_display": _LABEL_DISPLAY.get(label_enum.value, label_enum.value),
+                "contribution": LABEL_SCORE_CONTRIBUTION[label_enum],
+            }
+
+    breakdown: dict | None = None
+    if (
+        (getattr(session, "scoring_version", 1) or 1) >= 2
+        and _session_is_strength(session)
+    ):
+        avg = _implicit_signal_avg(session)
+        # Sb_24.6 — only show the breakdown when the session actually has
+        # something to ventilate. No label → V2 falls back to V1 → no
+        # decomposition to display (it would just say "V1 → V1").
+        if avg is not None:
+            v1 = compute_session_quality_strength(session)
+            final = compute_session_quality(session)
+            breakdown = {
+                "v1": v1,
+                "implicit_avg": round(avg),
+                "weight_v1": W_V1,
+                "weight_implicit": W_IMPLICIT,
+                "final": final,
+                "delta": final - v1,
+            }
+
     return templates.TemplateResponse(
         request,
         "session_done.html",
@@ -448,8 +496,30 @@ def session_done(
             "page_title": session.template_name_snapshot,
             "session": session,
             "recap": recap,
+            "implicit_by_se": implicit_by_se,
+            "breakdown": breakdown,
         },
     )
+
+
+# Sb_24.6 — display labels for the review surface. Keep them short
+# (≤ 14 chars) so they fit in the pastille badge.
+_LABEL_DISPLAY = {
+    "trajectoire_coherente": "Cohérente",
+    "reserve_probable": "Réserve probable",
+    "pyramidal_ascendant": "Pyramide ↑",
+    "pyramidal_descendant": "Pyramide ↓",
+    "incoherent": "Incohérente",
+}
+
+
+def _session_is_strength(session) -> bool:
+    """Lazy check — avoid importing from quality_score module-level."""
+    try:
+        kind = session.template.kind if session.template else None
+    except Exception:
+        kind = None
+    return kind != "cardio"
 
 
 # ----------------------------------------------------------------------
