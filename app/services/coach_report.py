@@ -214,6 +214,95 @@ def _patterns(db: Session, user_id: int) -> PatternsBlock:
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Sb_24.7 — Implicit signals aggregated 30j (Sx_24 §G "Coach Report")
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ImplicitSignalsBlock:
+    """Agrégat des labels implicites sur la fenêtre 30j.
+
+    Spec Sx_24 §G : surface autorisée pour les labels Implicites (taggée
+    ``Inféré`` dans l'UI). Calculé uniquement sur les exercices labellés
+    de sessions terminées dans la fenêtre. ``total_labeled_exercises``
+    sert de dénominateur — si 0, le bloc affiche un message "pas assez
+    de données" plutôt que des pourcentages trompeurs.
+
+    Le tri ``distribution`` est descending pour que les labels dominants
+    apparaissent en haut dans le template.
+    """
+
+    total_labeled_exercises: int
+    # [(label_value, label_display, count, pct), ...] sorted by count desc
+    distribution: list[tuple[str, str, int, int]]
+    dominant: tuple[str, str] | None  # (label_value, label_display)
+
+
+# Display strings mirrored from routers/sessions.py — single source would
+# be ideal but for now we duplicate to avoid a circular import.
+_LABEL_DISPLAY_30D = {
+    "trajectoire_coherente": "Cohérente",
+    "reserve_probable": "Réserve probable",
+    "pyramidal_ascendant": "Pyramide ↑",
+    "pyramidal_descendant": "Pyramide ↓",
+    "incoherent": "Incohérente",
+}
+
+
+def _implicit_signals_30d(db: Session, user_id: int) -> ImplicitSignalsBlock:
+    """Aggregate implicit labels across the user's 30d completed sessions.
+
+    Privacy: caller's user_id only — never leaks data from other users.
+    Read-only.
+    """
+    from app.models.session import SessionExercise
+
+    window_start = datetime.now(timezone.utc) - timedelta(days=30)
+    rows = db.execute(
+        select(SessionExercise.implicit_label)
+        .join(WorkoutSession, SessionExercise.session_id == WorkoutSession.id)
+        .where(
+            WorkoutSession.user_id == user_id,
+            WorkoutSession.status == "completed",
+            WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at >= window_start,
+            SessionExercise.implicit_label.is_not(None),
+        )
+    ).all()
+
+    counts: dict[str, int] = {}
+    for row in rows:
+        label = row[0]
+        if label not in _LABEL_DISPLAY_30D:
+            continue
+        counts[label] = counts.get(label, 0) + 1
+
+    total = sum(counts.values())
+    if total == 0:
+        return ImplicitSignalsBlock(
+            total_labeled_exercises=0, distribution=[], dominant=None
+        )
+
+    # Sorted distribution
+    sorted_items = sorted(counts.items(), key=lambda kv: -kv[1])
+    distribution = [
+        (label, _LABEL_DISPLAY_30D[label], count, round(100 * count / total))
+        for label, count in sorted_items
+    ]
+    dominant_label = sorted_items[0][0]
+    return ImplicitSignalsBlock(
+        total_labeled_exercises=total,
+        distribution=distribution,
+        dominant=(dominant_label, _LABEL_DISPLAY_30D[dominant_label]),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Coach report — full payload
+# ---------------------------------------------------------------------------
+
+
 @dataclass(frozen=True)
 class CoachReport:
     identity: IdentityBlock
@@ -223,6 +312,8 @@ class CoachReport:
     patterns: PatternsBlock
     discipline: DisciplineRates
     last_session: LastSession | None
+    # Sb_24.7 — bloc Implicite agrégé 30j (Sx_24 §G), tagué Inféré côté UI.
+    implicit_signals: ImplicitSignalsBlock
 
 
 def build_report(db: Session, user: User) -> CoachReport:
@@ -241,4 +332,5 @@ def build_report(db: Session, user: User) -> CoachReport:
         patterns=_patterns(db, user.id),
         discipline=discipline_rates(db, user.id, 30),
         last_session=last_session_summary(db, user.id),
+        implicit_signals=_implicit_signals_30d(db, user.id),
     )

@@ -149,6 +149,37 @@
     </ul>
   </section>
 
+  {# ---- 6bis. SIGNAUX IMPLICITES 30j (Sb_24.7) ---- #}
+  {% set _is = report.implicit_signals %}
+  <section class="coach-block">
+    <h2 class="coach-block__title">
+      Signaux d'effort 30j <span class="coach-tag coach-tag--inferred">Inféré</span>
+    </h2>
+    {% if _is.total_labeled_exercises == 0 %}
+      <p class="text-dim">
+        Pas d'exercice labellé sur les 30 derniers jours.
+        Les labels sont calculés à la complétion des séances pour les
+        exercices avec au moins 3 séries de travail.
+      </p>
+    {% else %}
+      <p class="text-dim coach-block__hint">
+        Sur {{ _is.total_labeled_exercises }} exercice{% if _is.total_labeled_exercises != 1 %}s{% endif %} labellé{% if _is.total_labeled_exercises != 1 %}s{% endif %} dans la fenêtre.
+        Dominant : <b>{{ _is.dominant[1] }}</b>.
+      </p>
+      <ul class="coach-patterns">
+        {% for label_value, label_display, count, pct in _is.distribution %}
+          <li>
+            <span class="coach-patterns__name">
+              <span class="implicit-pill implicit-pill--{{ label_value }}">{{ label_display }}</span>
+            </span>
+            <span class="coach-patterns__bar"><span style="width: {{ pct }}%;"></span></span>
+            <span class="coach-patterns__pct">{{ pct }}% <span class="text-dim">({{ count }})</span></span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+
   {# ---- 7. POINTS FORTS PROBABLES ---- #}
   <section class="coach-block">
     <h2 class="coach-block__title">

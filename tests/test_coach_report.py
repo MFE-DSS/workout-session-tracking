@@ -115,6 +115,7 @@ def _fake_report(
     """Build a minimal CoachReport-shaped namespace for inference tests."""
     from app.services.coach_report import (
         CoachReport, IdentityBlock, VolumeBlock, ZonesBlock, PatternsBlock,
+        ImplicitSignalsBlock,
     )
     from app.services.profile_metrics import (
         DisciplineRates, StrengthCardioRatio,
@@ -148,6 +149,11 @@ def _fake_report(
             with_sensation_rate=60, avg_quality_score=72,
         ),
         last_session=None,
+        # Sb_24.7 — bloc Implicite vide par défaut pour les tests
+        # d'inférence (qui ne s'en servent pas).
+        implicit_signals=ImplicitSignalsBlock(
+            total_labeled_exercises=0, distribution=[], dominant=None,
+        ),
     )
 
 
