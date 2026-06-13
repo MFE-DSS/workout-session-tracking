@@ -255,6 +255,19 @@ else
     warn "/healthz/strict returned ${STRICT_CODE} (degraded — check backups)"
 fi
 
+# ─── Record deploy state (Sb_26.3) ───────────────────────────────
+# Best-effort: writes var/deploy_state.json so /healthz/strict and
+# scripts/prod_state_report.py can report the live SHA. Never fails
+# the deploy if the writer hiccups.
+step "Recording deploy state (Sb_26.3)"
+sudo -u "${APP_USER}" "${PYTHON}" "${APP_DIR}/scripts/write_deploy_state.py" \
+    --sha "${POST_SHA}" \
+    --service "${SERVICE_NAME}" \
+    --app-dir "${APP_DIR}" \
+    --health "${HTTP_CODE:-unknown}" \
+    --out "${APP_DIR}/var/deploy_state.json" \
+    || warn "write_deploy_state.py failed — continuing (observability only)"
+
 # ─── Summary ──────────────────────────────────────────────────────
 echo ""
 echo -e "${GREEN}${BOLD}═══ Deploy successful ═══${NC}"

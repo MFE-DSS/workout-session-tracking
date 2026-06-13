@@ -11,7 +11,6 @@ from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Default timezone for rendering session dates and weekday labels.
@@ -38,6 +37,24 @@ class Settings(BaseSettings):
     # Files older than this in `backup_dir` are pruned by the backup
     # script. 0 = keep everything.
     backup_retention_days: int = Field(default=30)
+
+    # Sb_26.3 — Path to the deploy state JSON written by
+    # `scripts/write_deploy_state.py` at the end of each prod deploy.
+    # Empty path or missing file is fine: /healthz/strict simply reports
+    # `deploy.present = false`. No business behaviour depends on it.
+    deploy_state_path: str = Field(default=str(BASE_DIR / "var" / "deploy_state.json"))
+
+    # Sb_26.3 — Sentry is strictly OPT-IN via SENTRY_DSN. When the env
+    # var is unset/empty, `sentry_sdk.init` is never called, so no
+    # external request is ever issued and the import is a no-op if the
+    # SDK is not installed. See docs/OBSERVABILITY_RUNBOOK.md §2.
+    sentry_dsn: str = Field(default="")
+    sentry_environment: str = Field(default="")
+    sentry_traces_sample_rate: float = Field(default=0.0)
+
+    @property
+    def sentry_enabled(self) -> bool:
+        return bool(self.sentry_dsn)
 
     # SMTP for password reset emails. Leave smtp_host empty to disable.
     smtp_host: str = Field(default="")

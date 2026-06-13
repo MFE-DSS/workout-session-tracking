@@ -293,12 +293,17 @@ def test_healthz_strict_payload_shape_contract(client, tmp_path, monkeypatch):
     _clear_settings_cache()
 
     payload = client.get("/healthz/strict").json()
+    # Sb_26.3 — `deploy` and `disk` added to the contract. Both are
+    # strictly informational (never demote status to 503); see
+    # docs/OBSERVABILITY_RUNBOOK.md §6.
     assert set(payload.keys()) == {
         "status",
         "checked_at",
         "db",
         "backup_dir",
         "backup",
+        "deploy",
+        "disk",
     }
     assert set(payload["db"].keys()) == {"ok", "detail"}
     assert "exists" in payload["backup_dir"]
@@ -313,6 +318,18 @@ def test_healthz_strict_payload_shape_contract(client, tmp_path, monkeypatch):
         "errors",
     }
     assert expected_backup_keys == set(payload["backup"].keys())
+    assert set(payload["deploy"].keys()) == {
+        "present",
+        "sha",
+        "short_sha",
+        "deployed_at",
+        "age_seconds",
+        "service",
+        "errors",
+    }
+    assert {"total_bytes", "free_bytes", "free_percent", "error"} == set(
+        payload["disk"].keys()
+    )
 
 
 # ---------------------------------------------------------------------------

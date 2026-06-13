@@ -144,33 +144,48 @@ git commit -m "feat(sb_XX_X): ..."
 
 **Pré-requis** : avoir backupé la DB (le script `deploy_prod.sh` le fait automatiquement avant chaque deploy, cf. `var/backups/workout_pre_deploy_*.db`).
 
+**Variables d'environnement** (les valeurs réelles VPS prod ⚠️ — `deploy_prod.sh` les défaute pour le dev local à `/srv/workout` + `workout`, le wrapper `deploy_from_github_actions.sh` les surcharge en prod) :
+
+```bash
+APP_DIR=/opt/workout-session-tracking
+APP_USER=ubuntu
+SERVICE_NAME=workout
+```
+
+Pour adapter à un autre VPS, exporter les 3 vars avant les commandes ci-dessous.
+
 **Étapes opérateur** :
 
 ```bash
-# Sur le VPS, dans /srv/workout :
+# Sur le VPS, dans ${APP_DIR} :
+export APP_DIR=/opt/workout-session-tracking
+export APP_USER=ubuntu
 
 # 1. Confirmer la migration à annuler
-sudo -u workout /srv/workout/.venv/bin/alembic current
-sudo -u workout /srv/workout/.venv/bin/alembic history --rev-range -3:current
+sudo -u "${APP_USER}" "${APP_DIR}/.venv/bin/alembic" current
+sudo -u "${APP_USER}" "${APP_DIR}/.venv/bin/alembic" history --rev-range -3:current
 
 # 2. Rollback d'une étape
-sudo -u workout /srv/workout/.venv/bin/alembic downgrade -1
+sudo -u "${APP_USER}" "${APP_DIR}/.venv/bin/alembic" downgrade -1
 
 # 3. Revenir au commit précédent
-sudo -u workout bash -c 'cd /srv/workout && git log --oneline -5'
-sudo -u workout bash -c 'cd /srv/workout && git checkout HEAD~1'
+sudo -u "${APP_USER}" bash -c "cd ${APP_DIR} && git log --oneline -5"
+sudo -u "${APP_USER}" bash -c "cd ${APP_DIR} && git checkout HEAD~1"
 
 # 4. Redémarrer le service
 sudo systemctl restart workout
 
-# 5. Vérifier
+# 5. Vérifier (incluant deploy_state si Sb_26.3 actif)
 curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:8000/healthz
 # Doit retourner 200
+curl -sS http://127.0.0.1:8000/healthz/strict | python3 -m json.tool
+# Sb_26.3 — vérifier que deploy.sha reflète bien le nouveau commit
 
 # 6. (Si rollback de données nécessaire — cas critique uniquement)
 sudo systemctl stop workout
-sudo cp /srv/workout/var/backups/workout_pre_deploy_<timestamp>.db /srv/workout/var/workout.db
-sudo chown workout:workout /srv/workout/var/workout.db
+sudo cp "${APP_DIR}/var/backups/workout_pre_deploy_<timestamp>.db" \
+    "${APP_DIR}/var/workout.db"
+sudo chown "${APP_USER}:${APP_USER}" "${APP_DIR}/var/workout.db"
 sudo systemctl start workout
 ```
 

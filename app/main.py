@@ -65,8 +65,31 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+def _init_sentry_if_enabled(settings) -> bool:
+    """Sb_26.3 — strictly opt-in Sentry init.
+
+    Returns True if Sentry was initialised, False otherwise. Never
+    raises: if `sentry-sdk` is not installed OR `SENTRY_DSN` is empty,
+    this is a no-op and no external request is issued.
+    """
+    if not settings.sentry_enabled:
+        return False
+    try:
+        import sentry_sdk  # type: ignore[import-not-found]
+    except ImportError:
+        return False
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.sentry_environment or settings.app_env,
+        traces_sample_rate=settings.sentry_traces_sample_rate,
+        send_default_pii=False,
+    )
+    return True
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
+    _init_sentry_if_enabled(settings)
     app = FastAPI(
         title="Workout Session Tracking",
         version="0.1.0",

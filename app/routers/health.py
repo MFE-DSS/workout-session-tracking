@@ -22,7 +22,9 @@ the leak surface is small (file names, sizes, counts).
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+import json
+import shutil
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -37,6 +39,79 @@ from app.services.backup_verifier import verify_latest_backup
 router = APIRouter(tags=["health"])
 
 
+def _read_deploy_state(path: Path, *, now: datetime) -> dict[str, Any]:
+    """Sb_26.3 — read var/deploy_state.json with full graceful degradation.
+
+    Missing file, bad JSON, weird fields all return `present=False`
+    rather than raising — observability must never break the app.
+    Never leaks secrets: only sha, timestamps, service name.
+    """
+    out: dict[str, Any] = {
+        "present": False,
+        "sha": None,
+        "short_sha": None,
+        "deployed_at": None,
+        "age_seconds": None,
+        "service": None,
+        "errors": [],
+    }
+    if not path.exists():
+        return out
+    try:
+        raw = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        out["errors"].append(f"deploy_state read error: {exc.__class__.__name__}")
+        return out
+    if not isinstance(raw, dict):
+        out["errors"].append("deploy_state must be a JSON object")
+        return out
+
+    sha = raw.get("sha")
+    out["present"] = True
+    if isinstance(sha, str):
+        out["sha"] = sha
+        out["short_sha"] = sha[:12]
+    if isinstance(raw.get("service"), str):
+        out["service"] = raw["service"]
+
+    deployed_at_raw = raw.get("deployed_at")
+    if isinstance(deployed_at_raw, str):
+        out["deployed_at"] = deployed_at_raw
+        try:
+            ts = datetime.fromisoformat(deployed_at_raw.replace("Z", "+00:00"))
+            if ts.tzinfo is None:
+                ts = ts.replace(tzinfo=UTC)
+            out["age_seconds"] = int((now - ts).total_seconds())
+        except ValueError:
+            out["errors"].append("deployed_at not parseable as ISO-8601")
+    return out
+
+
+def _disk_usage(path: Path) -> dict[str, Any]:
+    """Best-effort disk usage of the partition holding `path`.
+
+    Returns `available=None` if the call fails (eg. path missing on
+    a fresh dev install). Never raises.
+    """
+    try:
+        target = path if path.exists() else path.parent
+        usage = shutil.disk_usage(str(target))
+        free_pct = round(100 * usage.free / usage.total, 1) if usage.total else None
+        return {
+            "total_bytes": usage.total,
+            "free_bytes": usage.free,
+            "free_percent": free_pct,
+            "error": None,
+        }
+    except OSError as exc:
+        return {
+            "total_bytes": None,
+            "free_bytes": None,
+            "free_percent": None,
+            "error": exc.__class__.__name__,
+        }
+
+
 @router.get("/healthz")
 def healthz(db: DbSession) -> dict:
     db.execute(text("SELECT 1"))
@@ -47,7 +122,7 @@ def healthz(db: DbSession) -> dict:
 def healthz_strict(db: DbSession) -> JSONResponse:
     """Operator-facing health: db + backup_dir + latest backup."""
     settings = get_settings()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     # 1. DB connectivity
     db_check: dict[str, Any] = {"ok": False, "detail": ""}
@@ -93,7 +168,17 @@ def healthz_strict(db: DbSession) -> JSONResponse:
             backup_check["live_session_count"] = verification.live_session_count
             backup_check["errors"] = verification.errors
 
+    # 4. Sb_26.3 — deploy state (SHA + timestamp of last deploy).
+    #    Informational: never demotes the overall status.
+    deploy_check = _read_deploy_state(Path(settings.deploy_state_path), now=now)
+
+    # 5. Sb_26.3 — disk usage of the DB partition (informational).
+    disk_check = _disk_usage(backup_dir_path)
+
     # Overall: db must be ok, AND if a backup is present it must be valid.
+    # deploy_check and disk_check are intentionally informational only —
+    # /healthz/strict must not flap to 503 because we couldn't read a
+    # JSON file or stat a partition.
     overall_ok = db_check["ok"] and (
         not backup_check["present"] or backup_check["valid"] is True
     )
@@ -104,5 +189,7 @@ def healthz_strict(db: DbSession) -> JSONResponse:
         "db": db_check,
         "backup_dir": backup_dir_check,
         "backup": backup_check,
+        "deploy": deploy_check,
+        "disk": disk_check,
     }
     return JSONResponse(content=payload, status_code=200 if overall_ok else 503)
