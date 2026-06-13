@@ -92,6 +92,23 @@ jobs:
       - name: Alembic drift check
         run: python scripts/check_alembic_drift.py
 
+      # Sb_26.2 — Schema snapshot must match alembic head. If it diverges,
+      # the operator must run `python scripts/generate_schema_snapshot.py`
+      # and commit data/schema_snapshot.sql.
+      - name: Schema snapshot check (Sb_26.2)
+        run: python scripts/check_schema_snapshot.py
+
+      # Sb_26.2 — Static linter for dangerous migration patterns
+      # (drop_column/table, NOT NULL without server_default, raw
+      # DELETE/UPDATE). Grandfathered list in .migration-policy.json.
+      - name: Migration patterns check (Sb_26.2)
+        run: python scripts/check_migration_patterns.py
+
+      # Sb_26.2 — Rollback dry-run: alembic downgrade -1 + upgrade head
+      # on a fresh SQLite. Mirrors the prod rollback model.
+      - name: Migration roundtrip check (Sb_26.2)
+        run: python scripts/check_migration_roundtrip.py
+
   lint:
     # Sb_26.1 — ruff + bandit + actionlint + shellcheck.
     # Anciennement advisory (Sb_20.2). Maintenant en mode "budget locked"

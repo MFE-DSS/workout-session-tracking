@@ -1,0 +1,33 @@
+{
+  "_doc": "Sb_26.2 — politique de revue des migrations Alembic. Voir docs/MIGRATION_HARDENING.md §4. Toute nouvelle migration doit passer scripts/check_migration_patterns.py SAUF si elle est dans grandfathered_files (pré-Sb_26.2) OU si chaque ligne flaggée porte un marker `# migration-justify: <raison>` immédiatement au-dessus.",
+  "policy_version": 1,
+  "rules": {
+    "drop_column_in_upgrade": "fail",
+    "drop_table_in_upgrade": "fail",
+    "add_column_not_null_no_default": "fail",
+    "execute_update_in_upgrade": "warn_requires_justify",
+    "execute_delete_in_upgrade": "fail",
+    "execute_alter_in_upgrade": "warn_requires_justify",
+    "batch_alter_table_in_upgrade": "warn_requires_justify"
+  },
+  "justify_marker": "# migration-justify:",
+  "grandfathered_files": [
+    "20260408_1957_ef67ec29e3e0_initial_baseline.py",
+    "20260409_1906_b6bbb9adc05a_add_excluded_from_stats_to_workout_.py",
+    "20260409_1921_36be39e26189_add_users_table_and_user_id_on_sessions.py",
+    "20260412_add_body_measurements.py",
+    "20260412_add_email_to_users.py",
+    "20260412_add_performance_indexes.py",
+    "20260412_add_physical_profile_fields.py",
+    "20260413_add_catalog_section.py",
+    "20260413_add_squads.py",
+    "20260413_body_measurements_v2_readiness.py",
+    "20260414_0700_08f837a18a7e_add_squad_challenges_and_sharing_tables.py",
+    "20260414_add_cardio_fields.py",
+    "20260414_add_substitution.py",
+    "20260418_add_machine_atlas_links.py",
+    "20260421_add_creation_source.py",
+    "20260531_add_implicit_signal_scoring_v2.py",
+    "20260601_normalize_scoring_version.py"
+  ]
+}
