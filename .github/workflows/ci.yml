@@ -93,12 +93,11 @@ jobs:
         run: python scripts/check_alembic_drift.py
 
   lint:
-    # Sb_20.2 — ruff + bandit. ADVISORY in V1: each step has
-    # `continue-on-error: true` so warnings surface in the GitHub UI
-    # (orange step) without blocking the merge. Sb_20.5 will turn this
-    # into a hard gate via the SonarCloud Quality Gate as required
-    # status check.
-    name: ruff + bandit (advisory)
+    # Sb_26.1 — ruff + bandit + actionlint + shellcheck.
+    # Anciennement advisory (Sb_20.2). Maintenant en mode "budget locked"
+    # via `.ruff-budget.json` : la CI échoue si total > baseline. Voir
+    # docs/CI_QUALITY_BUDGET.md pour la méthodologie complète.
+    name: lint (ruff budget + bandit + actionlint + shellcheck)
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -117,22 +116,44 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff bandit
 
-      - name: ruff check
-        continue-on-error: true
-        # --output-format=github so warnings show up as PR annotations
-        run: ruff check . --output-format=github
-
-      - name: ruff format check
+      # Sb_26.1 — ruff format reste advisory en CI le temps que le
+      # cleanup soit fait (la baseline cible `ruff check` warnings, pas
+      # le formatter). Garde la visibilité mais ne bloque pas.
+      - name: ruff format check (advisory)
         continue-on-error: true
         run: ruff format --check .
 
-      - name: bandit security scan
-        continue-on-error: true
-        # -ll = report medium and high severity only (skip low noise V1)
+      # Sb_26.1 — ruff CHECK passe en REQUIRED via le budget script.
+      # Le script échoue si total > baseline_warnings (548 actuellement)
+      # OU si un fichier modifié ajoute des warnings (extension future).
+      - name: ruff budget check (required — Sb_26.1)
+        run: python scripts/check_ruff_budget.py
+
+      # Sb_26.1 — bandit -ll devient REQUIRED. Le projet a 0 Med / 0 High
+      # depuis Sb_20.2 ; on verrouille cet état.
+      - name: bandit security scan (required — Sb_26.1)
         run: bandit -r app/ -ll -f screen
 
-      # Sb_20.4 — JSON reports consumed by the SonarCloud job. Both stay
-      # advisory: never fail the job, always upload, even on warnings.
+      # Sb_26.1 — actionlint vérifie la syntaxe des workflows GitHub
+      # Actions. Required pour empêcher un workflow cassé d'arriver
+      # en main.
+      - name: actionlint (required — Sb_26.1)
+        uses: reviewdog/action-actionlint@v1
+        with:
+          fail_level: error
+          level: error
+
+      # Sb_26.1 — shellcheck vérifie nos scripts shell (deploy_prod.sh,
+      # smoke_deploy.sh, deploy_from_github_actions.sh, etc.).
+      # `-S warning` ne bloque que les niveaux warning/error, pas les info.
+      - name: shellcheck (required — Sb_26.1)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck
+          shellcheck -S warning $(find scripts -maxdepth 2 -name "*.sh" -not -path "*/\.*")
+
+      # Sb_20.4 — JSON reports consumed by the SonarCloud job. Stays
+      # advisory: never fail this step, always upload for Sonar.
       - name: ruff JSON report (for SonarCloud)
         if: always()
         continue-on-error: true

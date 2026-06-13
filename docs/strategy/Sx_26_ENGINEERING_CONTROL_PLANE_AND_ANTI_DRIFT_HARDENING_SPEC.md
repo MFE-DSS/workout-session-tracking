@@ -762,7 +762,7 @@ Explicitement hors scope de Sx_26 / Sb_26.x :
 
 | # | Question | Impact | Décision attendue avant |
 |---|---|---|---|
-| OQ-1 | Quel quota de warnings ruff toléré au passage en required ? (estimation actuelle : ~478 warnings advisory selon Sb_20.2) | Sb_26.1 | Sb_26.1 ouverture |
+| OQ-1 | ✅ **TRANCHÉE 2026-06-01** — modèle "baseline locked + no new warnings". Voir §19bis. | Sb_26.1 | (close) |
 | OQ-2 | Sentry self-hosted ou SaaS Sentry.io ? Coût mensuel acceptable ? | Sb_26.3 | Sb_26.3 ouverture |
 | OQ-3 | UptimeRobot gratuit ou alternative (Cronitor, betterstack) ? | Sb_26.3 | Sb_26.3 ouverture |
 | OQ-4 | Discord webhook personnel ou créer un canal Telegram dédié pour alerting ? | Sb_26.3 | Sb_26.3 ouverture |
@@ -772,6 +772,73 @@ Explicitement hors scope de Sx_26 / Sb_26.x :
 | OQ-8 | La rotation backups doit-elle être faite par le script de deploy ou par un cron systemd séparé ? | Sb_26.2 | Sb_26.2 ouverture |
 | OQ-9 | `/admin/deploy-history` doit-il être accessible uniquement à un user "admin" (à créer) ou par check sur `users.username == "martin"` (V1 simple) ? | Sb_26.2 | Sb_26.2 ouverture |
 | OQ-10 | Mutation testing baseline : pourcentage minimal de "killed mutants" acceptable comme target initial (60 % ? 75 % ?) ? | Sb_26.5 | Sb_26.5 ouverture |
+
+## 19bis. Amendement OQ-1 — modèle baseline locked
+
+**Date amendement :** 2026-06-01
+**Décision humaine :** OQ-1 tranchée selon les modalités suivantes.
+
+### 19bis.1 — Modèle retenu
+
+**"Baseline locked + no new warnings"** — pas de cleanup massif des warnings legacy, mais aucun nouveau warning n'est autorisé. La CI échoue si :
+- `total_ruff_warnings > B0`, OU
+- `new_ruff_warnings > 0`
+
+Réduction progressive par paliers dans les sprints futurs (dédiés `Sb_26.next.ruff-cleanup-N`).
+
+### 19bis.2 — Baseline B0
+
+| Élément | Valeur |
+|---|---|
+| **B0 fixée le 2026-06-01** | **548 warnings** (mesure réelle à l'amendement) |
+| Estimation pré-amendement (Sx_26 §19 initial) | 478 (estimation Sb_20.2, drift d'environ +70 depuis) |
+| Distribution dominante actuelle | `UP017` (147) `timezone.utc → datetime.UTC`, `I001` (145) imports, `UP045` (127) `X \| None`, `F401` (67) unused imports |
+| Auto-fixable | ~92 % (~505 sur 548) trivialement via `ruff check --fix` |
+
+**Justification du choix B0=548 plutôt que 478** : si la baseline était strictement à 478 verbatim de la consigne user initiale, la CI échouerait immédiatement (mesure réelle 548 > 478). La consigne **non-négociable** "Ne corrige pas massivement les warnings ruff legacy" prime — donc B0 = mesure réelle au jour du sprint.
+
+### 19bis.3 — Versioning de la baseline
+
+Le fichier `.ruff-budget.json` à la racine du repo porte la baseline :
+
+```json
+{
+  "baseline_warnings": 548,
+  "baseline_date": "2026-06-01",
+  "baseline_sprint": "Sb_26.1",
+  "model": "baseline_locked_no_new",
+  "policy": {
+    "fails_if_total_above_baseline": true,
+    "fails_if_new_warnings_above_zero": true,
+    "allows_total_decrease": true
+  }
+}
+```
+
+Le fichier est commit en clair et tout PR doit le maintenir cohérent. Réduire le `baseline_warnings` est un acte volontaire (Sprint cleanup) qui doit être documenté.
+
+### 19bis.4 — Backlog cleanup
+
+| Sprint | Cible | Estimation |
+|---|---|---|
+| Sb_26.next.ruff-cleanup-1 | UP017 (147 warnings) trivial auto-fix `--unsafe-fixes` désactivé | 2h |
+| Sb_26.next.ruff-cleanup-2 | I001 (145) imports formatting | 1h |
+| Sb_26.next.ruff-cleanup-3 | UP045 (127) `X \| None` modernization | 2h |
+| Sb_26.next.ruff-cleanup-4 | F401 (67) unused imports — review prudent | 3h |
+| Sb_26.next.ruff-cleanup-5 | Reste : E402, UP037, F541, E702, F841, C901 (~52 mixtes) | 2h |
+
+**Cible de palier post-cleanup** : `B0 < 50` (warnings résiduels nécessitant review humaine, pas auto-fixables).
+
+### 19bis.5 — Contrats associés
+
+| # | Contrat |
+|---|---|
+| HC-RUFF-1 | `.ruff-budget.json` est commité, jamais supprimé. |
+| HC-RUFF-2 | Toute baseline diminuée doit être actée dans le sprint correspondant (commit message explicite). |
+| HC-RUFF-3 | Toute baseline augmentée nécessite un amendement Sx_xx — pas de bump silencieux. |
+| HC-RUFF-4 | Le script de check ne se contente pas du total : il échoue aussi si un fichier modifié dans le PR introduit un warning là où il n'y en avait pas. |
+
+---
 
 ## 20. Verdict — GO ou WAIT pour build
 

@@ -51,8 +51,8 @@ die() {
     echo -e "Service state: $(systemctl is-active "${SERVICE_NAME}" 2>/dev/null || echo 'unknown')"
     echo ""
     echo "Rollback hints:"
-    echo "  1. If migration failed:  sudo -u "${APP_USER}" ${ALEMBIC} downgrade -1"
-    echo "  2. If code is bad:       sudo -u "${APP_USER}" bash -c 'cd ${APP_DIR} && git checkout HEAD~1'"
+    echo "  1. If migration failed:  sudo -u ${APP_USER} ${ALEMBIC} downgrade -1"
+    echo "  2. If code is bad:       sudo -u ${APP_USER} bash -c 'cd ${APP_DIR} && git checkout HEAD~1'"
     echo "  3. Restart previous:     sudo systemctl restart ${SERVICE_NAME}"
     if [ -n "${SQLITE_BACKUP:-}" ] && [ -f "${SQLITE_BACKUP}" ]; then
         echo "  4. Restore SQLite:     sudo cp '${SQLITE_BACKUP}' '${APP_DIR}/var/workout.db'"

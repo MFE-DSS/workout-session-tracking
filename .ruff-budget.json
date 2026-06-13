@@ -1,0 +1,25 @@
+{
+  "baseline_warnings": 548,
+  "baseline_date": "2026-06-01",
+  "baseline_sprint": "Sb_26.1",
+  "baseline_sha": "62584e3",
+  "model": "baseline_locked_no_new",
+  "policy": {
+    "fails_if_total_above_baseline": true,
+    "fails_if_new_warnings_above_zero": true,
+    "allows_total_decrease": true
+  },
+  "_doc": "Sb_26.1 — budget de warnings ruff figé. Mesuré le 2026-06-01 sur la branche claude/sprint-reporting-fitness-app-V7Qr6. Modèle : baseline locked + no new warnings. Voir docs/CI_QUALITY_BUDGET.md pour le mode opératoire et docs/strategy/Sx_26_ENGINEERING_CONTROL_PLANE_AND_ANTI_DRIFT_HARDENING_SPEC.md §19bis pour la décision OQ-1. Réduction progressive prévue via Sb_26.next.ruff-cleanup-N.",
+  "top_rules_at_baseline": {
+    "UP017": 147,
+    "I001": 145,
+    "UP045": 127,
+    "F401": 67,
+    "E402": 19,
+    "UP037": 8,
+    "F541": 8,
+    "E702": 8,
+    "F841": 5,
+    "C901": 4
+  }
+}
