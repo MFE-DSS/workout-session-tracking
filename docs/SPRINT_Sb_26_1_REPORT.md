@@ -115,12 +115,12 @@ Deux corrections mineures introduites **uniquement** pour ne pas faire échouer 
 
 ## 8. CI réelle (post-push)
 
-À renseigner après push :
+Run CI [#27478562739](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27478562739) (commit `94438ad`) — conclusion **success** :
 
-- [ ] Job `test` (pytest + QA) — vert attendu
-- [ ] Job `lint` (ruff budget + bandit + actionlint + shellcheck) — vert attendu
-- [ ] Job `sonar` (SonarCloud) — vert attendu
-- [ ] Pas de régression sur les status checks required
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les status checks required
 
 ## 9. Limites assumées et reportées
 
