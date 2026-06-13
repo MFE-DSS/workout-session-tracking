@@ -84,9 +84,22 @@ RECOVERY_HOURS_TARGET: dict[str, float] = {
 }
 
 # Sx_18 §D.2 — bonus antagoniste selon le chevauchement avec last strength
+# (gardés pour compat des explanations, mais le scoring V2.1 utilise
+# désormais le gradient ZONE_FRESHNESS ci-dessous).
 ANTAGONIST_BONUS_PERFECT = 15  # zéro overlap → antagonisme parfait
 ANTAGONIST_BONUS_PARTIAL = 8   # 1 zone commune (ex. delts indirects)
 ANTAGONIST_BONUS_NONE = 0      # gros recouvrement
+
+# Sb_24.next.reco — fenêtre courte de "fraîcheur de zones" (les N dernières
+# sessions strength). Étend l'antagonist V1 qui ne regardait que la
+# dernière séance → ne distinguait pas push-pull-push vs push-pull-legs.
+RECENT_STRENGTH_SESSIONS_LOOKBACK = 3
+# Bonus gradient : score = max(MIN, BASE − STEP × overlap_count) où
+# overlap_count = nb de zones du template qui apparaissent dans l'union
+# des zones des N dernières sessions.
+ZONE_FRESHNESS_BONUS_BASE = 15
+ZONE_FRESHNESS_BONUS_STEP = 6
+ZONE_FRESHNESS_BONUS_MIN = -6
 
 # Seuil hard_sets dans la fenêtre redundancy au-delà duquel la zone est exclue
 REDUNDANCY_HARD_SETS_CUTOFF = 4
@@ -132,6 +145,11 @@ class Signals:
     availability_by_zone: dict[str, float]   # 0..1, granular per-zone recovery
     hours_since_last_by_zone: dict[str, float]  # large value when never
     last_strength_session_zones: list[str]   # primary zones of last strength
+    # Sb_24.next.reco — Zones des N dernières sessions strength (du plus
+    # récent au plus ancien). Permet à `_zone_freshness_bonus()` de
+    # pénaliser un template qui ré-implique des zones touchées dans la
+    # fenêtre courte.
+    recent_strength_zones_by_session: list[list[str]]
     hard_sets_by_zone_recent: dict[str, int]  # 7j
     hard_sets_by_zone_24h: dict[str, int]
     kinds_recent: list[str]  # N dernières sessions, du plus récent au plus ancien
@@ -326,6 +344,10 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
     # zone est totalement disponible.
     last_hit_by_zone: dict[str, datetime | None] = {z: None for z in ZONE_LABELS}
     last_strength_session_zones: list[str] = []
+    # Sb_24.next.reco — buffer FIFO des N dernières sessions strength
+    # (du plus récent au plus ancien). On itère déjà `recent_strength_sessions`
+    # en ordre DESC, on capture juste les N premières.
+    recent_strength_zones_by_session: list[list[str]] = []
 
     for s in recent_strength_sessions:
         is_strength = not (s.template and s.template.kind == "cardio")
@@ -355,6 +377,9 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         # for the antagonist heuristic.
         if not last_strength_session_zones and zones_this_session:
             last_strength_session_zones = sorted(zones_this_session)
+        # Sb_24.next.reco — buffer N most-recent strength sessions
+        if zones_this_session and len(recent_strength_zones_by_session) < RECENT_STRENGTH_SESSIONS_LOOKBACK:
+            recent_strength_zones_by_session.append(sorted(zones_this_session))
 
     # Convert last_hit_by_zone → hours_since + availability
     hours_since_last_by_zone: dict[str, float] = {}
@@ -385,6 +410,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         availability_by_zone=availability_by_zone,
         hours_since_last_by_zone=hours_since_last_by_zone,
         last_strength_session_zones=last_strength_session_zones,
+        recent_strength_zones_by_session=recent_strength_zones_by_session,
         hard_sets_by_zone_recent=hard_sets_by_zone_recent,
         hard_sets_by_zone_24h=hard_sets_by_zone_24h,
         kinds_recent=kinds_recent,
@@ -485,6 +511,10 @@ def _antagonist_bonus(
     0 zone commune → antagonisme parfait (15)
     1 zone commune → recouvrement marginal, ex. delts (8)
     ≥ 2 zones communes → recouvrement franc (0)
+
+    Sb_24.next.reco — déprécié pour le scoring V2.1 mais conservé pour
+    les explanations (phrase de motivation de la reco). Le nouveau
+    scoring utilise ``_zone_freshness_bonus()``.
     """
     if not last_session_zones or not template_zones:
         return ANTAGONIST_BONUS_NONE
@@ -494,6 +524,35 @@ def _antagonist_bonus(
     if len(overlap) <= 1:
         return ANTAGONIST_BONUS_PARTIAL
     return ANTAGONIST_BONUS_NONE
+
+
+def _zone_freshness_bonus(
+    template_zones: list[str],
+    recent_zones_by_session: list[list[str]],
+) -> int:
+    """Sb_24.next.reco — score gradient selon le chevauchement avec
+    l'UNION des zones des N dernières sessions strength.
+
+    Remplace ``_antagonist_bonus`` dans le scoring V2.1. Distingue :
+      * push → pull → push : pecs apparaît en session N-2, overlap=2-3 zones → bonus négatif → legs gagnent
+      * push → pull → push après 5j de pause : pecs hors fenêtre courte (la fenêtre est en *nombre de sessions*, pas en jours), donc overlap est toujours détecté MAIS la composante `availability` reprend la main car les zones sont fully recovered
+      * push → pull → legs : aucune zone du template legs présente en N-1 ni N-2 → bonus max
+
+    Formule : ``max(MIN, BASE − STEP × overlap_count)``
+    Avec BASE=15, STEP=6, MIN=-6 → 0/1/2/3 zones partagées → 15/9/3/-3.
+
+    Si aucune session récente → 0 (neutre, ni bonus ni malus).
+    """
+    if not recent_zones_by_session or not template_zones:
+        return 0
+    union_recent: set[str] = set()
+    for zones in recent_zones_by_session:
+        union_recent.update(zones)
+    overlap_count = len(set(template_zones) & union_recent)
+    return max(
+        ZONE_FRESHNESS_BONUS_MIN,
+        ZONE_FRESHNESS_BONUS_BASE - ZONE_FRESHNESS_BONUS_STEP * overlap_count,
+    )
 
 
 def _score_template(
@@ -511,8 +570,13 @@ def _score_template(
         availability = 0.5  # inconnu → neutre
     score += WEIGHT_AVAILABILITY * availability
 
-    # 2. Antagonist bonus (15 pts) — Sx_18 §D.2
-    antagonist_score = _antagonist_bonus(zones, signals.last_strength_session_zones)
+    # 2. Antagonist / zone-freshness bonus
+    # Sb_24.next.reco — utilise désormais le gradient sur les N=3 dernières
+    # sessions (pas seulement la dernière). Ferme le bug push → pull →
+    # push remonté en dogfood (overlap pecs ne descend pas à zéro après 1 seule session pull).
+    antagonist_score = _zone_freshness_bonus(
+        zones, signals.recent_strength_zones_by_session
+    )
     score += antagonist_score
 
     # 3. Alternation kind (20 / 10 pts)
