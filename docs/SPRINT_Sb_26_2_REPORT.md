@@ -160,12 +160,12 @@ IDE diagnostic signalé : 2 branches identiques dans `main()` du linter de patte
 
 ## 8. CI réelle (post-push)
 
-À renseigner après push :
+Run CI [#27479515017](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27479515017) (commit `8cc8dd0`) — conclusion **success** :
 
-- [ ] Job `test` (pytest + QA + drift + **snapshot** + **patterns** + **roundtrip**) — vert attendu
-- [ ] Job `lint` (ruff budget + bandit + actionlint + shellcheck) — vert attendu
-- [ ] Job `sonar` (SonarCloud) — vert attendu
-- [ ] Pas de régression sur les status checks required Sb_26.1
+- [x] Job `pytest + QA scripts` (pytest + QA + drift + **snapshot** + **patterns** + **roundtrip**) — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les status checks required Sb_26.1
 
 ## 9. Limites assumées et reportées
 
