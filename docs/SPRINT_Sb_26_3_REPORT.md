@@ -111,12 +111,12 @@ Validation CI réelle : voir §6 (post-push).
 
 ## 6. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27480361229](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27480361229) (commit `4ffe2f3`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` (test + drift + snapshot + patterns + roundtrip) — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les status checks Sb_26.1/Sb_26.2
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les status checks Sb_26.1/Sb_26.2
 
 ## 7. Auto-fix scope
 
@@ -176,7 +176,7 @@ Validation CI réelle : voir §6 (post-push).
 | check_migration_patterns passe | ✅ |
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (total ≤ 548) | ✅ 546 ≤ 548 |
-| lint job passe (à confirmer post-push) | ⏳ |
+| lint job passe | ✅ |
 | Aucun secret commité | ✅ |
 | Sentry disabled-by-default | ✅ |
 | Alerting disabled-by-default | ✅ |
