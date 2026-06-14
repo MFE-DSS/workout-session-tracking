@@ -122,7 +122,7 @@ Run CI [#27499160260](https://github.com/MFE-DSS/workout-session-tracking/action
 - [x] Job `SonarCloud` — ✅ success
 - [x] Pas de régression sur les gates Sb_26.1/Sb_26.2/Sb_26.3
 
-**Note** : un premier run ([#27494725872](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27494725872)) a échoué sur un faux-positif gitleaks dans `deploy/DEPLOY_OVH.md` ligne 214 (`curl -sf -u moi:PASSWORD ...` — placeholder documentaire matché par la rule `curl-auth-user`). Fix commit `fe9aede` : remplacement du placeholder par `<user>:<password>` (procédure §6.3 du runbook : préférence pour rephrase sur allowlist). Documente que la gate gitleaks fait son job.
+**Note** : un premier run ([#27494725872](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27494725872)) a échoué sur un faux-positif gitleaks dans `deploy/DEPLOY_OVH.md` ligne 214 (une commande `curl -sf -u` avec un placeholder documentaire matché par la rule `curl-auth-user`). Fix commit `fe9aede` : remplacement du placeholder par une forme `<user>:<password>` non matchée. Procédure §6.3 du runbook : préférence pour rephrase sur allowlist. Documente que la gate gitleaks fait son job.
 
 ## 7. Risques identifiés
 
