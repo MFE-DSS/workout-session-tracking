@@ -186,6 +186,14 @@ jobs:
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
           GITLEAKS_ENABLE_SUMMARY: true
 
+      # Sb_26.5 — spec-driven protocol checker. Verifies that every new
+      # sprint report has a verdict marker, every new Sx_* spec has a
+      # non-goals section, and the 6 templates + SPEC_REGISTRY.md exist.
+      # No NLP — purely literal string presence. Historical files are
+      # in .spec-protocol-allowlist.json (grandfathered).
+      - name: spec protocol check (required — Sb_26.5)
+        run: python scripts/check_spec_protocol.py
+
       # Sb_26.4 — verify requirements-lock.txt is committed and parses.
       # ADVISORY for V1: a strict diff vs a fresh `pip-compile` is brittle
       # across Python versions (CI is 3.11, dev may differ). We just
