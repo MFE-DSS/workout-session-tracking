@@ -43,7 +43,7 @@
 |---|---|---|---|---|---|---|
 | Sb_27.1 | Home dashboard activation (today/last/week) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_1_REPORT.md` | 27506478583 | 0 modèle, 0 migration, 0 service core touché |
 | Sb_27.2 | Session review V1 (`/sessions/{id}/done`) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_2_REPORT.md` | 27509053460 | 5 sub-payloads + Triptyche Non déductible |
-| Sb_27.3 | Weekly training loop (enrichit `/progress`) | 🟢 | Sx_27 §14 | `SPRINT_Sb_27_3_REPORT.md` | (post-push) | OQ-1 tranchée : enrichir /progress, pas de /weekly |
+| Sb_27.3 | Weekly training loop (enrichit `/progress`) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_3_REPORT.md` | 27511608805 | OQ-1 tranchée : enrichir /progress, pas de /weekly |
 | Sb_27.4 | Recommendation explanation | 🔵 | Sx_27 §14 | — | — | OQ-4 à trancher avant |
 | Sb_27.5 | Deterministic coach narrative | 🔵 | Sx_27 §14 | — | — | OQ-2 + OQ-6 à trancher avant |
 | Sb_27.6 | UX simplification pass | 🔵 | Sx_27 §14 | — | — | OQ-3 à trancher avant |
