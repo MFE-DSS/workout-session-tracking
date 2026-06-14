@@ -14,7 +14,7 @@ anyio==4.13.0
     # via
     #   starlette
     #   watchfiles
-bcrypt==4.3.0
+bcrypt==5.0.0
     # via
     #   -r requirements.txt
     #   passlib
