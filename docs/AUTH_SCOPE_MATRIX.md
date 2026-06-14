@@ -30,7 +30,7 @@
 | `/logout` | POST | clear cookie | 👤 SELF | — | n/a |
 | `/` | GET | latest session + reco + **home coaching payload** (Sb_27.1) | 👤 SELF | `CurrentUser` + `build_home_payload(db, user)` (filtre user_id sur toutes les queries internes) | test_anonymous_cannot_access_private_routes + `test_payload_is_user_scoped` (Sb_27.1) |
 | `/history` | GET | list of `WorkoutSession` | 👤 SELF | `WorkoutSession.user_id == user.id` | test_history_does_not_show_other_users_sessions |
-| `/progress` | GET | analytics user-scoped | 👤 SELF | `CurrentUser` + service filtre | test_anonymous_cannot_access_private_routes |
+| `/progress` | GET | analytics user-scoped + **weekly training loop** (Sb_27.3) | 👤 SELF | `CurrentUser` + service filtre + `build_weekly_loop(db, user)` (filtre user_id sur toutes les queries internes) | test_anonymous_cannot_access_private_routes + `test_payload_does_not_leak_other_users_sessions` (Sb_27.3) |
 | `/dashboard` | GET | KPIs user-scoped | 👤 SELF | `CurrentUser` | idem |
 | `/physique` | GET | physique dashboard caller | 👤 SELF | `CurrentUser` | idem |
 | `/launcher` | GET | session launcher | 👤 SELF | `CurrentUser` | idem |

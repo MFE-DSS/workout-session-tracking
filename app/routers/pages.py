@@ -452,6 +452,13 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     quality_svg = build_quality_timeline_svg(quality_points)
     bodyweight_svg = build_bodyweight_timeline_svg(bw_points)
 
+    # Sb_27.3 — weekly training loop tile at the top of /progress (OQ-1
+    # tranchée : enrichir /progress, pas de nouvelle route). Composed
+    # read-only on top of existing services (anomalies, model columns).
+    from app.services.weekly_loop import build_weekly_loop
+
+    weekly = build_weekly_loop(db, user)
+
     return templates.TemplateResponse(
         request,
         "progress.html",
@@ -463,6 +470,7 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "quality_svg": quality_svg,
             "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db, user.id),
+            "weekly": weekly,
         },
     )
 

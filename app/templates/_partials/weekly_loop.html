@@ -1,0 +1,95 @@
+{# Sb_27.3 — Weekly training loop tile rendered at the top of /progress.
+
+   Receives `weekly` dict from build_weekly_loop. Each sub-section
+   degrades to an explicit fallback rather than inventing a value
+   (Sx_27 §16). Mobile-first 360×640, no horizontal scroll. #}
+
+{% if weekly %}
+<section class="weekly-loop" aria-label="Cette semaine"
+         style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-md);">
+
+  {# ── Header: count + volume signal + delta ── #}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Cette semaine
+    </div>
+    <div style="font-size:18px;font-weight:600;margin-top:4px;">
+      {{ weekly.volume_signal }}
+    </div>
+    {% if weekly.previous_week_sessions_count is not none %}
+      <div class="tile__hint" style="margin-top:4px;font-size:13px;">
+        Semaine précédente : {{ weekly.previous_week_sessions_count }}
+        {% if weekly.delta_sessions_count is not none and weekly.delta_sessions_count != 0 %}
+          <span style="opacity:0.7;">
+            ({% if weekly.delta_sessions_count > 0 %}+{% endif %}{{ weekly.delta_sessions_count }})
+          </span>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% if weekly.data_quality == "low" and weekly.data_quality_note %}
+      <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+        {{ weekly.data_quality_note }}
+      </div>
+    {% endif %}
+  </div>
+
+  {# ── Dominant templates ── #}
+  {% if weekly.dominant_templates %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Séances dominantes
+    </div>
+    <ul style="list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:4px;font-size:14px;">
+      {% for t in weekly.dominant_templates %}
+        <li><strong>{{ t.name }}</strong>
+          <span style="opacity:0.6;">· {{ t.count }}×</span></li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# ── Top anomaly ── #}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Anomalie à surveiller
+    </div>
+    {% if weekly.top_anomaly %}
+      <div style="font-size:14px;margin-top:6px;">
+        {% if weekly.top_anomaly.exercise_name %}
+          <strong>{{ weekly.top_anomaly.exercise_name }}</strong>
+          <span style="opacity:0.7;">— {{ weekly.top_anomaly.label or weekly.top_anomaly.code }}</span>
+        {% else %}
+          {{ weekly.top_anomaly.label or weekly.top_anomaly.code }}
+        {% endif %}
+        {% if weekly.top_anomaly.session_id %}
+          <div style="margin-top:6px;">
+            <a href="/sessions/{{ weekly.top_anomaly.session_id }}/done"
+               style="font-size:13px;opacity:0.8;">
+              Voir la séance →
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    {% else %}
+      <div style="font-size:13px;opacity:0.6;margin-top:6px;">
+        {{ weekly.top_anomaly_note }}
+      </div>
+    {% endif %}
+  </div>
+
+  {# ── Hint ── #}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Hint de la semaine
+    </div>
+    {% if weekly.hint %}
+      <div style="font-size:14px;margin-top:6px;">{{ weekly.hint }}</div>
+    {% else %}
+      <div style="font-size:13px;opacity:0.6;margin-top:6px;">
+        {{ weekly.hint_note }}
+      </div>
+    {% endif %}
+  </div>
+
+</section>
+{% endif %}
