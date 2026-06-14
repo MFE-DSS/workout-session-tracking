@@ -211,7 +211,8 @@ nginx). For HTTPS-level testing:
 
 ```bash
 BASE_URL=https://YOUR_DOMAIN \
-  curl -sf -u moi:PASSWORD https://YOUR_DOMAIN/healthz
+  # Replace <user> + <password> with your real basic-auth credentials.
+  curl -sf -u '<user>:<password>' https://YOUR_DOMAIN/healthz
 ```
 
 ---
