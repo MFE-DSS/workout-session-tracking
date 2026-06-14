@@ -16,8 +16,7 @@ touching this router.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
@@ -39,14 +38,13 @@ from app.models.catalog import MethodRule, TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, WorkoutSession
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
-from app.services.ownership import get_owned_session_or_404
 from app.services.form_parsing import (
     clean_str,
-    enum_int,
     enum_str,
     to_float,
     to_int,
 )
+from app.services.ownership import get_owned_session_or_404
 from app.services.progression_hint import compute_progression_hint
 from app.services.session_builder import instantiate_session
 from app.services.session_recap import build_recap
@@ -99,7 +97,7 @@ def create_session(
     if tpl is None:
         raise HTTPException(status_code=404, detail="Unknown template")
 
-    session = instantiate_session(db, tpl, datetime.now(timezone.utc), user_id=user.id)
+    session = instantiate_session(db, tpl, datetime.now(UTC), user_id=user.id)
     # Sb_13 — telemetry. Silently reject values outside the whitelist so
     # a typo never breaks session creation.
     if creation_source in _CREATION_SOURCE_ALLOWED:
@@ -145,7 +143,7 @@ def _persist_implicit_labels_on_completion(session: WorkoutSession) -> None:
     """
     from app.services.implicit_signal import detect_intra_set_label
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for se in session.session_exercises:
         if se.implicit_label is not None:
             # Already labeled in a previous transition — leave it alone.
@@ -213,7 +211,7 @@ def session_detail(
     ).scalars().all()
 
     last_time = last_time_by_exercise_code(
-        db, session, datetime.now(timezone.utc)
+        db, session, datetime.now(UTC)
     )
 
     # Progression hint per exercise card: based strictly on the first
@@ -241,13 +239,13 @@ def session_detail(
         se.id: summarise_current_exercise(se) for se in session.session_exercises
     }
 
-    from app.services.substitution import (
-        get_substitutes,
-        can_substitute,
-        compute_suggestions,
-    )
     from app.services import machine_atlas
     from app.services.hints import compute_hints as compute_sb08_hints
+    from app.services.substitution import (
+        can_substitute,
+        compute_suggestions,
+        get_substitutes,
+    )
     substitution_data: dict[int, dict] = {}
     atlas_data: dict[int, dict | None] = {}
     sb08_hints_by_exercise: dict[int, list[dict]] = {}
@@ -428,7 +426,7 @@ def session_done(
         )
 
     prior_summary_map = last_time_by_exercise_code(
-        db, session, datetime.now(timezone.utc)
+        db, session, datetime.now(UTC)
     )
     prior_weight_by_code: dict[str, float | None] = {}
     for code, prior in prior_summary_map.items():
@@ -489,6 +487,14 @@ def session_done(
                 "delta": final - v1,
             }
 
+    # Sb_27.2 — Session Review V1 payload. Composes summary, quality,
+    # implicit_signal aggregate, notable_movements (max 3, deterministic
+    # rules), and a next_hint phrase. Read-only on top of existing
+    # services. Never touches scoring/implicit_signal/quality_score.
+    from app.services.session_review import build_session_review
+
+    session_review = build_session_review(db, session)
+
     return templates.TemplateResponse(
         request,
         "session_done.html",
@@ -498,6 +504,7 @@ def session_done(
             "recap": recap,
             "implicit_by_se": implicit_by_se,
             "breakdown": breakdown,
+            "session_review": session_review,
         },
     )
 
@@ -552,7 +559,7 @@ async def update_session(
 
     action = form.get("action")
     if action == "end":
-        session.ended_at = datetime.now(timezone.utc)
+        session.ended_at = datetime.now(UTC)
         session.status = SessionStatus.COMPLETED
         # Sb_24.3 — persist implicit signal labels at completion, exactly once.
         # Idempotent: never re-touch a label that's already set, never

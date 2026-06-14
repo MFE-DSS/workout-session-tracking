@@ -1,0 +1,97 @@
+{# Sb_27.2 — Session Review V1 tile rendered at the top of /sessions/{id}/done.
+
+   Receives `session_review` dict from build_session_review. Each sub-card
+   degrades to an explicit "Non déductible" rather than inventing a value
+   (Sx_27 §16). Mobile-first 360×640, no horizontal scroll. #}
+
+{% if session_review %}
+<section class="session-review" aria-label="Session review"
+         style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-md);">
+
+  {# ── Header: quality + implicit ── #}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Récap séance
+    </div>
+
+    {% if session_review.summary and session_review.summary.available %}
+    <div style="font-size:18px;font-weight:600;margin-top:4px;">
+      {{ session_review.summary.template_name }}
+      {% if session_review.summary.duration_min is not none %}
+        <span style="opacity:0.6;font-weight:400;font-size:13px;">· {{ session_review.summary.duration_min }} min</span>
+      {% elif session_review.summary.duration_note %}
+        <span style="opacity:0.6;font-weight:400;font-size:13px;">· durée {{ session_review.summary.duration_note }}</span>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm);margin-top:8px;font-size:13px;">
+      {% if session_review.quality and session_review.quality.available %}
+        {% if session_review.quality.score is not none %}
+          <span><strong>Qualité :</strong> {{ session_review.quality.score }}</span>
+        {% elif session_review.quality.note %}
+          <span style="opacity:0.7;"><strong>Qualité :</strong> {{ session_review.quality.note }}</span>
+        {% endif %}
+      {% endif %}
+
+      {% if session_review.implicit_signal and session_review.implicit_signal.available %}
+        {% if session_review.implicit_signal.label %}
+          <span><strong>Ressenti :</strong> {{ session_review.implicit_signal.label }}
+            <span style="opacity:0.5;">({{ session_review.implicit_signal.source_ratio }})</span>
+          </span>
+        {% elif session_review.implicit_signal.note %}
+          <span style="opacity:0.7;"><strong>Ressenti :</strong> {{ session_review.implicit_signal.note }}</span>
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+
+  {# ── Notable movements ── #}
+  {% if session_review.notable_movements and session_review.notable_movements.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Mouvements remarquables
+    </div>
+    {% if session_review.notable_movements['movements'] %}
+      <ul style="list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:6px;">
+        {% for movement in session_review.notable_movements['movements'] %}
+          <li style="font-size:14px;">
+            <strong>{{ movement.exercise_name }}</strong>
+            <span style="opacity:0.7;">— {{ movement.reasons | join(' · ') }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div style="font-size:13px;opacity:0.6;margin-top:6px;">
+        {{ session_review.notable_movements.note }}
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── Next hint ── #}
+  {% if session_review.next_hint and session_review.next_hint.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Prochaine action
+    </div>
+    <div style="font-size:14px;margin-top:6px;">
+      {{ session_review.next_hint.phrase }}
+    </div>
+    <div style="display:flex;gap:var(--space-sm);margin-top:10px;flex-wrap:wrap;">
+      <a href="/"
+         class="tile tile--secondary"
+         style="padding:8px 14px;font-size:13px;text-decoration:none;">
+        Retour Accueil
+      </a>
+      <a href="{{ url_for('launcher') }}"
+         class="tile tile--secondary"
+         style="padding:8px 14px;font-size:13px;text-decoration:none;">
+        Nouvelle séance →
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+</section>
+{% endif %}

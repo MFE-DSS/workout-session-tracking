@@ -41,8 +41,8 @@
 
 | Sprint | Domaine | Statut | Spec ref | Rapport | CI run | Notes |
 |---|---|---|---|---|---|---|
-| Sb_27.1 | Home dashboard activation (today/last/week) | 🟢 | Sx_27 §14 | `SPRINT_Sb_27_1_REPORT.md` | (post-push) | 0 modèle, 0 migration, 0 service core touché |
-| Sb_27.2 | Session review V1 (`/sessions/{id}/done`) | 🔵 | Sx_27 §14 | — | — | Non bloqué par Sb_27.1 |
+| Sb_27.1 | Home dashboard activation (today/last/week) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_1_REPORT.md` | 27506478583 | 0 modèle, 0 migration, 0 service core touché |
+| Sb_27.2 | Session review V1 (`/sessions/{id}/done`) | 🟢 | Sx_27 §14 | `SPRINT_Sb_27_2_REPORT.md` | (post-push) | 5 sub-payloads + Triptyche Non déductible |
 | Sb_27.3 | Weekly training loop | 🔵 | Sx_27 §14 | — | — | OQ-1 à trancher avant |
 | Sb_27.4 | Recommendation explanation | 🔵 | Sx_27 §14 | — | — | OQ-4 à trancher avant |
 | Sb_27.5 | Deterministic coach narrative | 🔵 | Sx_27 §14 | — | — | OQ-2 + OQ-6 à trancher avant |
