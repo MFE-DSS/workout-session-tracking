@@ -27,9 +27,11 @@
 | Sb_26.2 | Migration hardening (snapshot, linter, roundtrip) | ✅ | Sx_26 §16 | `SPRINT_Sb_26_2_REPORT.md` | 27479515017 | 17 migrations grandfathered |
 | Sb_26.3 | Observability (deploy_state, healthz strict, Sentry/Discord opt-in) | ✅ | Sx_26 §16 | `SPRINT_Sb_26_3_REPORT.md` | 27480361229 | No app/services métier touché |
 | Sb_26.4 | Security baseline (rate limit, pip-audit, gitleaks, Dependabot, lockfile) | ✅ | Sx_26 §16 | `SPRINT_Sb_26_4_REPORT.md` | 27499160260 | Gitleaks bloque DEPLOY_OVH.md placeholder (fix `fe9aede`) |
-| Sb_26.5 | Spec/process discipline (templates + protocol + registry) | 🟢 | Sx_26 §16 | `SPRINT_Sb_26_5_REPORT.md` | (en cours) | Ce sprint |
-| Sb_26.6 | Performance baseline (p95 endpoints, slow query log) | 🔵 | Sx_26 §16 | — | — | Pas encore ouvert |
-| Sb_26.7 | Multi-tenant prep (read-only V1, scope auth) | 🔵 | Sx_26 §16 | — | — | Pas encore ouvert |
+| Sb_26.5 | Spec/process discipline (templates + protocol + registry) | ✅ | Sx_26 §16 | `SPRINT_Sb_26_5_REPORT.md` | 27500839234 | Gate `check_spec_protocol` required |
+| Sb_26.6 | Performance baseline (p95 endpoints, slow query log) | ✅ | Sx_26 §16 | `SPRINT_Sb_26_6_REPORT.md` | 27503005562 | Smoke 5 iter, budgets larges 30–250x |
+| Sb_26.7 | Multi-tenant prep — scope auth audit + isolation tests | ✅ | Sx_26 §16 | `SPRINT_Sb_26_7_REPORT.md` | (ce sprint) | Aucun gap d'ownership détecté |
+
+**Cycle Sx_26 clôturé le 2026-06-14.** Cf. `docs/strategy/Sx_26_CLOSURE_REPORT.md`.
 
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 

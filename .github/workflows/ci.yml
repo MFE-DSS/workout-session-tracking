@@ -202,6 +202,11 @@ jobs:
       - name: spec protocol check (required — Sb_26.5)
         run: python scripts/check_spec_protocol.py
 
+      # Sb_26.7 — verify the auth scope matrix + multi-tenant readiness
+      # docs + Sb_26.7 sprint report exist. Pure presence-check, no NLP.
+      - name: auth scope matrix presence (required — Sb_26.7)
+        run: python scripts/check_auth_scope_matrix.py
+
       # Sb_26.4 — verify requirements-lock.txt is committed and parses.
       # ADVISORY for V1: a strict diff vs a fresh `pip-compile` is brittle
       # across Python versions (CI is 3.11, dev may differ). We just
