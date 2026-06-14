@@ -56,6 +56,15 @@ class Settings(BaseSettings):
     def sentry_enabled(self) -> bool:
         return bool(self.sentry_dsn)
 
+    # Sb_26.6 — Slow query logging (strictly opt-in). When enabled,
+    # SQLAlchemy `before_cursor_execute` / `after_cursor_execute` events
+    # measure query duration and log queries above `perf_slow_query_ms`.
+    # No parameters logged (Statement only, truncated). Default disabled
+    # for safety.
+    perf_log_slow_queries_enabled: bool = Field(default=False)
+    perf_slow_query_ms: int = Field(default=250)
+    perf_request_timing_enabled: bool = Field(default=False)
+
     # Sb_26.4 — Per-IP rate limiting on sensitive public auth endpoints.
     # In-memory single-process buckets (no Redis). Tests can disable
     # via RATE_LIMIT_ENABLED=0 to avoid 429s in functional fixtures.

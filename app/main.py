@@ -45,6 +45,35 @@ async def lifespan(app: FastAPI):
     yield
 
 
+_request_timing_logger = __import__("logging").getLogger("spignos.request_timing")
+
+
+class RequestTimingMiddleware(BaseHTTPMiddleware):
+    """Sb_26.6 — opt-in request timing logger.
+
+    Off by default. When `PERF_REQUEST_TIMING_ENABLED=1`, logs method,
+    path, status and duration_ms for every request. No header added to
+    the response (avoids leaking timing publicly).
+    """
+
+    async def dispatch(
+        self, request: StarletteRequest, call_next
+    ) -> StarletteResponse:
+        if not get_settings().perf_request_timing_enabled:
+            return await call_next(request)
+        t0 = time.perf_counter()
+        response = await call_next(request)
+        dt_ms = (time.perf_counter() - t0) * 1000.0
+        _request_timing_logger.info(
+            "request %s %s -> %d in %.1fms",
+            request.method,
+            request.url.path,
+            response.status_code,
+            dt_ms,
+        )
+        return response
+
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add standard security headers to every response."""
 
@@ -183,6 +212,8 @@ def create_app() -> FastAPI:
     # Sb_26.4 — rate limit /login, /register, /forgot-password per IP.
     # Reads settings on each request so tests can toggle via env.
     app.add_middleware(RateLimitMiddleware)
+    # Sb_26.6 — opt-in request timing logger (PERF_REQUEST_TIMING_ENABLED=1)
+    app.add_middleware(RequestTimingMiddleware)
 
     app.mount(
         "/static",

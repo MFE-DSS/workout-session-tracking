@@ -1,0 +1,19 @@
+{
+  "_doc": "Sb_26.6 — performance budget V1. Volontairement large pour ne pas créer de CI flaky. Mesure cible: p95 sur N itérations via TestClient (cf. scripts/perf_baseline.py). Voir docs/performance/PERFORMANCE_BASELINE.md pour la procédure d'update.",
+  "policy_version": 1,
+  "model": "p95_below_budget",
+  "iterations_recommended": 50,
+  "smoke_iterations": 5,
+  "routes": {
+    "GET /healthz":          { "p95_ms_budget": 100,  "note": "Liveness probe — SELECT 1 + JSON" },
+    "GET /healthz/strict":   { "p95_ms_budget": 800,  "note": "Strict check: DB + backup verify + disk usage + deploy_state" },
+    "GET /welcome":          { "p95_ms_budget": 500,  "note": "Landing page non-auth" },
+    "GET /login":            { "p95_ms_budget": 500,  "note": "Login form render" },
+    "GET /register":         { "p95_ms_budget": 500,  "note": "Register form render" },
+    "GET /forgot-password":  { "p95_ms_budget": 500,  "note": "Forgot password form" },
+    "GET /":                 { "p95_ms_budget": 2500, "note": "Home: lifespan seed + session list + reco" },
+    "GET /history":          { "p95_ms_budget": 2500, "note": "History list — DB-heavy" },
+    "GET /progress":         { "p95_ms_budget": 2500, "note": "Progress dashboard — DB + analytics" },
+    "GET /dashboard":        { "p95_ms_budget": 2500, "note": "Dashboard page" }
+  }
+}

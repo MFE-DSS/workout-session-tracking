@@ -1,0 +1,119 @@
+{
+  "generated_at": "2026-06-14T14:30:41.594638+00:00",
+  "git_sha": "b59c2a4",
+  "environment": "dev",
+  "python_version": "3.14",
+  "iterations": 5,
+  "routes": [
+    {
+      "route": "/healthz",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 0.926,
+      "median_ms": 0.943,
+      "p95_ms": 1.132,
+      "max_ms": 2.412
+    },
+    {
+      "route": "/healthz/strict",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 0.781,
+      "median_ms": 0.907,
+      "p95_ms": 0.933,
+      "max_ms": 1.129
+    },
+    {
+      "route": "/welcome",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 0.654,
+      "median_ms": 0.716,
+      "p95_ms": 0.722,
+      "max_ms": 3.156
+    },
+    {
+      "route": "/login",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 303,
+      "count": 5,
+      "min_ms": 0.892,
+      "median_ms": 0.981,
+      "p95_ms": 1.036,
+      "max_ms": 1.599
+    },
+    {
+      "route": "/register",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 303,
+      "count": 5,
+      "min_ms": 0.853,
+      "median_ms": 0.861,
+      "p95_ms": 0.949,
+      "max_ms": 0.971
+    },
+    {
+      "route": "/forgot-password",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 0.92,
+      "median_ms": 0.948,
+      "p95_ms": 0.97,
+      "max_ms": 3.745
+    },
+    {
+      "route": "/",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 6.388,
+      "median_ms": 6.756,
+      "p95_ms": 8.635,
+      "max_ms": 21.326
+    },
+    {
+      "route": "/history",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 1.653,
+      "median_ms": 2.055,
+      "p95_ms": 2.699,
+      "max_ms": 6.899
+    },
+    {
+      "route": "/progress",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 3.355,
+      "median_ms": 3.727,
+      "p95_ms": 3.766,
+      "max_ms": 12.924
+    },
+    {
+      "route": "/dashboard",
+      "method": "GET",
+      "expected_status": 200,
+      "status_observed": 200,
+      "count": 5,
+      "min_ms": 2.837,
+      "median_ms": 2.999,
+      "p95_ms": 3.327,
+      "max_ms": 9.518
+    }
+  ]
+}
