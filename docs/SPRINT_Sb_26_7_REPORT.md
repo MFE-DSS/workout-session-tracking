@@ -112,12 +112,14 @@ Exécutés localement le 2026-06-14 :
 
 ## 6. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27504865167](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27504865167) (commit `145dbad`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (... + auth scope matrix)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sb_26.6
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck + ... + auth scope matrix)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sb_26.6
+
+CI verte du premier push (vs 2 tentatives nécessaires sur Sb_26.4 et Sb_26.5 à cause de gitleaks rephrase, et Sb_26.6 à cause d'un step CI mal placé). La discipline `check_spec_protocol` + `check_auth_scope_matrix` ajoutées Sb_26.5/Sb_26.7 a tenu.
 
 ## 7. Risques
 
@@ -177,7 +179,7 @@ Exécutés localement le 2026-06-14 :
 
 | Critère DoD | Statut |
 |---|---|
-| pytest passe | ✅ (sera confirmé par CI) |
+| pytest passe | ✅ 975 passed |
 | catalog_qa passe | ✅ |
 | machine_atlas_qa passe | ✅ |
 | check_alembic_drift passe | ✅ |
@@ -186,10 +188,10 @@ Exécutés localement le 2026-06-14 :
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (≤ 548) | ✅ 545 ≤ 548 |
 | pip-audit passe | ✅ clean |
-| gitleaks passe | ⏳ CI le confirmera |
+| gitleaks passe | ✅ run #27504865167 |
 | check_spec_protocol passe | ✅ |
 | check_auth_scope_matrix passe | ✅ |
-| lint job passe | ⏳ |
+| lint job passe | ✅ |
 | tests d'isolation passent | ✅ 16/16 |
 | Aucun code produit modifié | ✅ |
 | Aucune migration créée | ✅ |
