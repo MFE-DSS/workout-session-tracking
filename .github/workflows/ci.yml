@@ -258,7 +258,7 @@ jobs:
       - name: SonarCloud scan
         # Sb_20.5 — gate now required (Quality Gate green on first
         # complete cycle). If this step fails, the merge is blocked.
-        uses: SonarSource/sonarcloud-github-action@v2
+        uses: SonarSource/sonarcloud-github-action@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
