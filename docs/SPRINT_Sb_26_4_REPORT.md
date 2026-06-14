@@ -115,12 +115,14 @@ Validation CI réelle : voir §6 (post-push).
 
 ## 6. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27499160260](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27499160260) (commit `fe9aede`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck + pip-audit + gitleaks)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1/Sb_26.2/Sb_26.3
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck + pip-audit + gitleaks)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1/Sb_26.2/Sb_26.3
+
+**Note** : un premier run ([#27494725872](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27494725872)) a échoué sur un faux-positif gitleaks dans `deploy/DEPLOY_OVH.md` ligne 214 (`curl -sf -u moi:PASSWORD ...` — placeholder documentaire matché par la rule `curl-auth-user`). Fix commit `fe9aede` : remplacement du placeholder par `<user>:<password>` (procédure §6.3 du runbook : préférence pour rephrase sur allowlist). Documente que la gate gitleaks fait son job.
 
 ## 7. Risques identifiés
 
@@ -186,9 +188,9 @@ Validation CI réelle : voir §6 (post-push).
 | check_migration_patterns passe | ✅ |
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (total ≤ 548) | ✅ 546 ≤ 548 |
-| lint job passe (post-push) | ⏳ |
+| lint job passe | ✅ run #27499160260 |
 | pip-audit passe ou décision documentée | ✅ clean baseline |
-| gitleaks current tree passe ou décision documentée | ⏳ (CI le confirmera) |
+| gitleaks current tree passe ou décision documentée | ✅ après fix placeholder DEPLOY_OVH.md |
 | tests rate limiting passent | ✅ 10/10 |
 | Aucun secret commité | ✅ |
 | Aucun modèle SQLAlchemy modifié | ✅ |
