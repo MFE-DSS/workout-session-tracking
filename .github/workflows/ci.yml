@@ -109,6 +109,14 @@ jobs:
       - name: Migration roundtrip check (Sb_26.2)
         run: python scripts/check_migration_roundtrip.py
 
+      # Sb_26.6 — perf baseline smoke + budget. Lives in the `test` job
+      # because it needs the full runtime deps (FastAPI, SQLAlchemy)
+      # which the `lint` job does not install. Smoke 5 iter × 10 routes
+      # ≈ 5s. Budgets very wide (cf. .performance-budget.json) to detect
+      # gross regressions only, not jitter.
+      - name: Perf baseline smoke + budget (Sb_26.6)
+        run: python scripts/perf_baseline.py --smoke --check-budget --no-write --environment ci
+
   lint:
     # Sb_26.1 — ruff + bandit + actionlint + shellcheck.
     # Anciennement advisory (Sb_20.2). Maintenant en mode "budget locked"
@@ -185,18 +193,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
           GITLEAKS_ENABLE_SUMMARY: true
-
-      # Sb_26.6 — perf baseline smoke check + budget. Volontairement
-      # peu d'itérations (5) et budgets très larges (cf.
-      # .performance-budget.json) pour éviter le flap CI. Vérifie
-      # uniquement que (a) le script tourne, (b) le JSON est valide,
-      # (c) aucune route ne dépasse un budget gigantesque (régression
-      # énorme). Tests unitaires détaillés dans
-      # tests/test_performance_baseline.py.
-      - name: perf baseline smoke + budget (required — Sb_26.6)
-        env:
-          PYTHONPATH: .
-        run: python scripts/perf_baseline.py --smoke --check-budget --no-write --environment ci
 
       # Sb_26.5 — spec-driven protocol checker. Verifies that every new
       # sprint report has a verdict marker, every new Sx_* spec has a
