@@ -6,10 +6,13 @@ everything domain-related lives under `app/services` and `app/routers`.
 """
 from __future__ import annotations
 
+import threading
+import time
+from collections import defaultdict, deque
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
@@ -65,6 +68,84 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+# ─── Sb_26.4 — per-IP rate limiter for sensitive public auth endpoints ───
+#
+# Single-process, in-memory sliding window. Not Redis-backed by design:
+# V1 prod is a single uvicorn process behind nginx, so this is the right
+# granularity. If we ever scale horizontally, swap this for Redis at
+# the same call site without touching routes.
+#
+# Buckets are module-level so tests can reset deterministically via
+# `_rate_limit_reset_for_tests()`.
+
+_RATE_LIMIT_BUCKETS: dict[tuple[str, str], deque] = defaultdict(deque)
+_RATE_LIMIT_LOCK = threading.Lock()
+
+# (method, path) → settings attribute prefix
+_RATE_LIMIT_ROUTES: dict[tuple[str, str], str] = {
+    ("POST", "/login"): "login",
+    ("POST", "/register"): "register",
+    ("POST", "/forgot-password"): "forgot",
+}
+
+
+def _rate_limit_reset_for_tests() -> None:
+    with _RATE_LIMIT_LOCK:
+        _RATE_LIMIT_BUCKETS.clear()
+
+
+def _rate_limit_check(
+    settings, ip: str, route_key: str, *, now: float | None = None
+) -> tuple[bool, int]:
+    """Returns (allowed, retry_after_seconds).
+
+    `route_key` is one of "login", "register", "forgot" — used as the
+    settings prefix for max + window. The bucket key is (ip, route_key)
+    so endpoints don't share quota.
+    """
+    max_attempts = getattr(settings, f"rate_limit_{route_key}_max")
+    window = getattr(settings, f"rate_limit_{route_key}_window_seconds")
+    ts = now if now is not None else time.monotonic()
+    cutoff = ts - window
+    with _RATE_LIMIT_LOCK:
+        bucket = _RATE_LIMIT_BUCKETS[(ip, route_key)]
+        while bucket and bucket[0] < cutoff:
+            bucket.popleft()
+        if len(bucket) >= max_attempts:
+            retry = int(bucket[0] + window - ts) + 1
+            return False, max(1, retry)
+        bucket.append(ts)
+        return True, 0
+
+
+class RateLimitMiddleware(BaseHTTPMiddleware):
+    """Sb_26.4 — block per-IP abuse of /login, /register, /forgot-password.
+
+    Replies 429 with a sober message — never reveals whether the
+    targeted username/email exists or any other state.
+    """
+
+    async def dispatch(
+        self, request: StarletteRequest, call_next
+    ) -> StarletteResponse:
+        settings = get_settings()
+        if not settings.rate_limit_enabled:
+            return await call_next(request)
+        key = (request.method, request.url.path)
+        route_key = _RATE_LIMIT_ROUTES.get(key)
+        if route_key is None:
+            return await call_next(request)
+        client_ip = request.client.host if request.client else "unknown"
+        allowed, retry_after = _rate_limit_check(settings, client_ip, route_key)
+        if not allowed:
+            return JSONResponse(
+                status_code=429,
+                content={"detail": "Too many attempts. Please retry later."},
+                headers={"Retry-After": str(retry_after)},
+            )
+        return await call_next(request)
+
+
 def _init_sentry_if_enabled(settings) -> bool:
     """Sb_26.3 — strictly opt-in Sentry init.
 
@@ -99,6 +180,9 @@ def create_app() -> FastAPI:
     )
 
     app.add_middleware(SecurityHeadersMiddleware)
+    # Sb_26.4 — rate limit /login, /register, /forgot-password per IP.
+    # Reads settings on each request so tests can toggle via env.
+    app.add_middleware(RateLimitMiddleware)
 
     app.mount(
         "/static",

@@ -131,7 +131,7 @@ jobs:
       - name: Install linters
         run: |
           python -m pip install --upgrade pip
-          pip install ruff bandit
+          pip install ruff bandit pip-audit pip-tools
 
       # Sb_26.1 — ruff format reste advisory en CI le temps que le
       # cleanup soit fait (la baseline cible `ruff check` warnings, pas
@@ -168,6 +168,37 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y shellcheck
           shellcheck -S warning $(find scripts -maxdepth 2 -name "*.sh" -not -path "*/\.*")
+
+      # Sb_26.4 — pip-audit scans runtime deps for known CVEs.
+      # Required: the project baseline is clean as of Sb_26.4 (cf.
+      # docs/SECURITY_BASELINE.md §3). Any new vulnerability must be
+      # addressed via upgrade or explicit ignore with justification.
+      - name: pip-audit runtime dependencies (required — Sb_26.4)
+        run: pip-audit -r requirements.txt --strict
+
+      # Sb_26.4 — gitleaks scans the current tree for committed secrets.
+      # Required on PR / push. Full-history scan is documented as a
+      # one-shot manual op (cf. docs/SECURITY_BASELINE.md §6).
+      - name: gitleaks scan (required — Sb_26.4)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
+          GITLEAKS_ENABLE_SUMMARY: true
+
+      # Sb_26.4 — verify requirements-lock.txt is committed and parses.
+      # ADVISORY for V1: a strict diff vs a fresh `pip-compile` is brittle
+      # across Python versions (CI is 3.11, dev may differ). We just
+      # ensure the file exists and is a syntactically valid requirements
+      # file. Strict cross-Python freshness is in Sb_26.next backlog.
+      # See docs/SECURITY_BASELINE.md §5.
+      - name: requirements-lock.txt presence + parse (advisory — Sb_26.4)
+        continue-on-error: true
+        run: |
+          test -f requirements-lock.txt
+          # `pip install --dry-run` parses the file and resolves the
+          # graph without installing — fast and version-tolerant.
+          pip install --dry-run -r requirements-lock.txt > /dev/null
 
       # Sb_20.4 — JSON reports consumed by the SonarCloud job. Stays
       # advisory: never fail this step, always upload for Sonar.

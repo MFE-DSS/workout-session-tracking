@@ -56,6 +56,17 @@ class Settings(BaseSettings):
     def sentry_enabled(self) -> bool:
         return bool(self.sentry_dsn)
 
+    # Sb_26.4 — Per-IP rate limiting on sensitive public auth endpoints.
+    # In-memory single-process buckets (no Redis). Tests can disable
+    # via RATE_LIMIT_ENABLED=0 to avoid 429s in functional fixtures.
+    rate_limit_enabled: bool = Field(default=True)
+    rate_limit_login_max: int = Field(default=10)
+    rate_limit_login_window_seconds: int = Field(default=600)
+    rate_limit_register_max: int = Field(default=5)
+    rate_limit_register_window_seconds: int = Field(default=3600)
+    rate_limit_forgot_max: int = Field(default=5)
+    rate_limit_forgot_window_seconds: int = Field(default=3600)
+
     # SMTP for password reset emails. Leave smtp_host empty to disable.
     smtp_host: str = Field(default="")
     smtp_port: int = Field(default=587)
