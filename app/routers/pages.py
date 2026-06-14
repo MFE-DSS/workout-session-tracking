@@ -4,6 +4,8 @@ The session logging flow lives in `app.routers.sessions`.
 """
 from __future__ import annotations
 
+from datetime import UTC
+
 from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import HTMLResponse
 from sqlalchemy import select
@@ -77,7 +79,7 @@ def _build_reco_context(db, user_id: int, open_session) -> dict | None:
 
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
     from app.services.performance import compute_composite_score
     from app.services.timeline import build_sparkline_svg
@@ -93,7 +95,7 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     global_kpis = compute_global_kpis(db, user_id=user.id)
 
     # Sparkline: composite scores for last 14 days
-    window_start = datetime.now(timezone.utc) - timedelta(days=14)
+    window_start = datetime.now(UTC) - timedelta(days=14)
     sparkline_stmt = (
         select(WorkoutSession)
         .where(WorkoutSession.user_id == user.id)
@@ -139,12 +141,19 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     behavioral = compute_behavioral_state(db, user.id)
 
     from app.services.readiness import (
-        get_today_readiness,
-        READINESS_LABELS,
         READINESS_FIELD_LABELS,
+        READINESS_LABELS,
         SCALE_FIELDS,
+        get_today_readiness,
     )
     readiness_today = get_today_readiness(db, user.id)
+
+    # Sb_27.1 — coaching loop home payload. Composed read-only on top of
+    # existing services (recommendation, quality_score, session columns).
+    # Never touches scoring core or persists state.
+    from app.services.home import build_home_payload
+
+    home_payload = build_home_payload(db, user)
 
     return templates.TemplateResponse(
         request,
@@ -162,6 +171,7 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "readiness_labels": READINESS_LABELS,
             "readiness_field_labels": READINESS_FIELD_LABELS,
             "readiness_scale_fields": SCALE_FIELDS,
+            "home": home_payload,
         },
     )
 
@@ -510,10 +520,10 @@ def readiness_history(
     request: Request, db: DbSession, user: CurrentUser
 ) -> HTMLResponse:
     from app.services.readiness import (
-        get_readiness_history,
-        READINESS_LABELS,
         READINESS_FIELD_LABELS,
+        READINESS_LABELS,
         SCALE_FIELDS,
+        get_readiness_history,
     )
     entries = get_readiness_history(db, user.id, days=90)
     return templates.TemplateResponse(

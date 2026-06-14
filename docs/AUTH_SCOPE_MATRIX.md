@@ -28,7 +28,7 @@
 | `/forgot-password` | GET/POST | reset token | 🆓 PUBLIC | rate limited Sb_26.4 | tests/test_password_reset.py |
 | `/reset/{token}` | GET/POST | reset token consumption | 🆓 PUBLIC | one-shot DB token | tests/test_password_reset.py |
 | `/logout` | POST | clear cookie | 👤 SELF | — | n/a |
-| `/` | GET | latest session + reco | 👤 SELF | `CurrentUser` | test_anonymous_cannot_access_private_routes |
+| `/` | GET | latest session + reco + **home coaching payload** (Sb_27.1) | 👤 SELF | `CurrentUser` + `build_home_payload(db, user)` (filtre user_id sur toutes les queries internes) | test_anonymous_cannot_access_private_routes + `test_payload_is_user_scoped` (Sb_27.1) |
 | `/history` | GET | list of `WorkoutSession` | 👤 SELF | `WorkoutSession.user_id == user.id` | test_history_does_not_show_other_users_sessions |
 | `/progress` | GET | analytics user-scoped | 👤 SELF | `CurrentUser` + service filtre | test_anonymous_cannot_access_private_routes |
 | `/dashboard` | GET | KPIs user-scoped | 👤 SELF | `CurrentUser` | idem |

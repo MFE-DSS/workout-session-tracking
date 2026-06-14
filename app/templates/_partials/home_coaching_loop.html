@@ -1,0 +1,99 @@
+{# Sb_27.1 — Home coaching loop: Today / Last / Week.
+
+   Mobile-first 360×640: each tile is a vertical card, no horizontal
+   scroll, no nested grids. Receives `home` dict from build_home_payload.
+   Each sub-tile renders an explicit fallback when its data is missing —
+   never invents a value (Sx_27 §11.2, §16). #}
+
+{% if home %}
+<section class="coaching-loop" aria-label="Boucle de coaching"
+         style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-md);">
+
+  {# ── Today ── #}
+  {% if home.today and home.today.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Aujourd'hui
+    </div>
+    {% if home.today.kind == "in_progress" %}
+      <a href="{{ url_for('session_detail', session_id=home.today.session_id) }}"
+         style="text-decoration:none;color:inherit;">
+        <div style="font-size:18px;font-weight:600;margin-top:4px;">
+          {{ home.today.template_name }} — en cours →
+        </div>
+        <div class="tile__hint" style="margin-top:4px;">
+          {{ home.today.reason }}
+        </div>
+      </a>
+    {% elif home.today.kind == "reco" %}
+      <div style="font-size:18px;font-weight:600;margin-top:4px;">
+        {{ home.today.template_name or "Séance recommandée" }}
+      </div>
+      <div class="tile__hint" style="margin-top:4px;">
+        {{ home.today.reason }}
+      </div>
+    {% else %}
+      <div style="font-size:16px;font-weight:600;margin-top:4px;opacity:0.7;">
+        Aucune recommandation pour le moment
+      </div>
+      <div class="tile__hint" style="margin-top:4px;">
+        {{ home.today.reason }}
+      </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── Last session ── #}
+  {% if home.last_session and home.last_session.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Dernière séance
+    </div>
+    {% if home.last_session.kind == "none" %}
+      <div style="font-size:14px;margin-top:4px;opacity:0.7;">
+        {{ home.last_session.reason }}
+      </div>
+    {% else %}
+      <a href="{{ url_for('session_detail', session_id=home.last_session.session_id) }}"
+         style="text-decoration:none;color:inherit;">
+        <div style="font-size:16px;font-weight:600;margin-top:4px;">
+          {{ home.last_session.template_name }}
+          {% if home.last_session.days_ago == 0 %}
+            <span style="opacity:0.6;font-weight:400;font-size:13px;">· aujourd'hui</span>
+          {% elif home.last_session.days_ago == 1 %}
+            <span style="opacity:0.6;font-weight:400;font-size:13px;">· hier</span>
+          {% else %}
+            <span style="opacity:0.6;font-weight:400;font-size:13px;">· il y a {{ home.last_session.days_ago }} j</span>
+          {% endif %}
+        </div>
+        <div class="tile__hint" style="margin-top:6px;display:flex;gap:var(--space-sm);flex-wrap:wrap;font-size:13px;">
+          {% if home.last_session.implicit_label %}
+            <span><strong>Ressenti :</strong> {{ home.last_session.implicit_label }}</span>
+          {% elif home.last_session.implicit_label_note %}
+            <span style="opacity:0.6;"><strong>Ressenti :</strong> {{ home.last_session.implicit_label_note }}</span>
+          {% endif %}
+          {% if home.last_session.quality_score is not none %}
+            <span><strong>Qualité :</strong> {{ home.last_session.quality_score }}</span>
+          {% elif home.last_session.quality_score_note %}
+            <span style="opacity:0.6;"><strong>Qualité :</strong> {{ home.last_session.quality_score_note }}</span>
+          {% endif %}
+        </div>
+      </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {# ── This week ── #}
+  {% if home.week and home.week.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
+      Cette semaine
+    </div>
+    <div style="font-size:16px;font-weight:600;margin-top:4px;">
+      {{ home.week.signal }}
+    </div>
+  </div>
+  {% endif %}
+
+</section>
+{% endif %}

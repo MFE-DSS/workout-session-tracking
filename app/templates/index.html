@@ -13,6 +13,9 @@
   </a>
 {% endif %}
 
+{# Sb_27.1 — Coaching loop tiles (Today / Last / Week) #}
+{% include "_partials/home_coaching_loop.html" %}
+
 {# Sb_12 — Prochaine séance suggérée (au-dessus du CTA) #}
 {% if not open_session %}
   {% include "_partials/next_session_reco.html" %}

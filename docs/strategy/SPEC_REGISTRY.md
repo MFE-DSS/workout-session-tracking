@@ -33,6 +33,22 @@
 
 **Cycle Sx_26 clôturé le 2026-06-14.** Cf. `docs/strategy/Sx_26_CLOSURE_REPORT.md`.
 
+## 1bis. Cycle Sx_27 — Coaching Loop & Product Activation (actif)
+
+**Spec :** `docs/strategy/Sx_27_COACHING_LOOP_AND_PRODUCT_ACTIVATION_SPEC.md`
+**Statut spec :** ✅ VALIDATED 2026-06-14 (OQ-5 tranchée à 360×640, autres OQ différées).
+**Hard contracts :** hérités Sx_26 verbatim ; spécifique Sx_27 : la narrative ne ment jamais.
+
+| Sprint | Domaine | Statut | Spec ref | Rapport | CI run | Notes |
+|---|---|---|---|---|---|---|
+| Sb_27.1 | Home dashboard activation (today/last/week) | 🟢 | Sx_27 §14 | `SPRINT_Sb_27_1_REPORT.md` | (post-push) | 0 modèle, 0 migration, 0 service core touché |
+| Sb_27.2 | Session review V1 (`/sessions/{id}/done`) | 🔵 | Sx_27 §14 | — | — | Non bloqué par Sb_27.1 |
+| Sb_27.3 | Weekly training loop | 🔵 | Sx_27 §14 | — | — | OQ-1 à trancher avant |
+| Sb_27.4 | Recommendation explanation | 🔵 | Sx_27 §14 | — | — | OQ-4 à trancher avant |
+| Sb_27.5 | Deterministic coach narrative | 🔵 | Sx_27 §14 | — | — | OQ-2 + OQ-6 à trancher avant |
+| Sb_27.6 | UX simplification pass | 🔵 | Sx_27 §14 | — | — | OQ-3 à trancher avant |
+| Sb_27.7 | Product closure report + dogfood | 🔵 | Sx_27 §14 | — | — | Tous les lots précédents requis |
+
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
 **Spec :** `docs/strategy/SPIGNOS_IMPLICIT_SIGNAL_SCORING_SPEC_v1.md`
