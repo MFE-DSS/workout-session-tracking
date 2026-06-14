@@ -128,12 +128,14 @@ Exécutés localement le 2026-06-14 :
 
 ## 7. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27503005562](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27503005562) (commit `bd52655`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (... + perf baseline smoke + budget)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sb_26.5
+- [x] Job `pytest + QA scripts` (incl. perf baseline smoke + budget) — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sb_26.5
+
+**Note** : premier run ([#27502634198](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27502634198)) a échoué — le step perf baseline avait été placé dans le job `lint` qui n'installe pas `requirements.txt`. Fix `bd52655` : step déplacé dans le job `test` qui a tous les deps runtime. La gate reste required, comportement identique.
 
 ## 8. Risques
 
@@ -198,7 +200,7 @@ Exécutés localement le 2026-06-14 :
 
 | Critère DoD | Statut |
 |---|---|
-| pytest passe | ✅ (sera confirmé par CI) |
+| pytest passe | ✅ 959 passed |
 | catalog_qa passe | ✅ |
 | machine_atlas_qa passe | ✅ |
 | check_alembic_drift passe | ✅ |
@@ -207,9 +209,9 @@ Exécutés localement le 2026-06-14 :
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (≤ 548) | ✅ 545 ≤ 548 |
 | pip-audit passe | ✅ clean |
-| gitleaks passe | ⏳ CI le confirmera |
+| gitleaks passe | ✅ run #27503005562 |
 | check_spec_protocol passe | ✅ |
-| lint job passe | ⏳ |
+| lint job passe | ✅ |
 | tests performance passent | ✅ 14/14 |
 | Aucun code produit métier modifié | ✅ |
 | Aucune migration créée | ✅ |
