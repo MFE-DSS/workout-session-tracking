@@ -110,12 +110,14 @@ Exécutés localement le 2026-06-14 :
 
 ## 6. CI réelle (post-push)
 
-Run CI à renseigner après push (sera ajouté dans un commit de validation final).
+Run CI [#27500839234](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27500839234) (commit `cc6305a`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck + pip-audit + gitleaks + spec protocol)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sb_26.4
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck + pip-audit + gitleaks + spec protocol)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sb_26.4
+
+**Note** : premier run ([#27500515823](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27500515823)) a échoué — gitleaks a re-flag le report Sb_26.4 lui-même parce qu'il citait littéralement la chaîne du précédent faux-positif. Fix commit `cc6305a` : rephrase de la trace pour conserver l'historique sans re-déclencher la rule. Démontre que la procédure §6.3 du runbook (rephrase plutôt qu'allowlist) tient à la 2ème occurrence.
 
 ## 7. Risques
 
@@ -171,7 +173,7 @@ Run CI à renseigner après push (sera ajouté dans un commit de validation fina
 
 | Critère DoD | Statut |
 |---|---|
-| pytest passe | ✅ (sera confirmé par run CI) |
+| pytest passe | ✅ 945 passed |
 | catalog_qa passe | ✅ |
 | machine_atlas_qa passe | ✅ |
 | check_alembic_drift passe | ✅ |
@@ -180,8 +182,8 @@ Run CI à renseigner après push (sera ajouté dans un commit de validation fina
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (total ≤ 548) | ✅ 546 ≤ 548 |
 | pip-audit passe | ✅ clean |
-| gitleaks passe | ⏳ CI le confirmera |
-| lint job passe | ⏳ |
+| gitleaks passe | ✅ run #27500839234 |
+| lint job passe | ✅ |
 | tests spec protocol passent | ✅ 7/7 |
 | Aucun code produit modifié | ✅ |
 | Aucune migration créée | ✅ |
