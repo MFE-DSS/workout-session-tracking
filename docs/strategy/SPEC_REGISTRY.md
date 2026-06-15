@@ -53,6 +53,19 @@
 
 > 📖 **Pour reprendre une session, lire d'abord [`docs/strategy/ROADMAP_AND_NEXT_STEPS.md`](ROADMAP_AND_NEXT_STEPS.md)** — document de référence vivant qui contient l'état actuel, la roadmap réconciliée (ancien S0→S10 vs cycles livrés) et les prompts verbatim à utiliser pour `Sb_27.dogfood-1`, `Sx_28`, `Sx_29`.
 
+## 1ter. Cycle Sx_28 — Product Roadmap Reconciliation (SPEC ONLY UNDER OVERRIDE)
+
+**Spec :** `docs/strategy/Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`
+**Statut spec :** ✅ READY FOR HUMAN REVIEW UNDER OVERRIDE (2026-06-15).
+**Statut build :** 🔴 **BLOCKED UNTIL DOGFOOD OR EXPLICIT OVERRIDE**.
+**Override :** humain, daté 2026-06-15, dogfood annoncé ~2 jours. Voir spec §2.
+
+| Sprint | Domaine | Statut | Spec ref | Rapport | CI run | Notes |
+|---|---|---|---|---|---|---|
+| Sx_28 (spec only) | Reconciliation ancien S0→S10 ↔ repo réel + 5 options + matrice + recommandation provisoire (Option A) | ✅ spec only | Sx_28 §1-20 | `SPRINT_Sx_28_SPEC_REPORT.md` | (post-push) | DOGFOOD INPUT = PENDING ; aucun build autorisé |
+| Sb_28.dogfood-integration | mettre à jour Sx_28 §15+§20 selon dogfood reçu | 🔵 pré-requis : dogfood reçu | Sx_28 §17 | — | — | SPEC ONLY ; déclenchera la décision finale |
+| Sb_28.k (build) | TBD selon Option retenue post-dogfood | ❌ BLOCKED | — | — | — | ne peut être ouvert sans bascule §20 vers BUILD AUTHORIZED |
+
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
 **Spec :** `docs/strategy/SPIGNOS_IMPLICIT_SIGNAL_SCORING_SPEC_v1.md`
