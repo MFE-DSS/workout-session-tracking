@@ -47,7 +47,7 @@
 | Sb_27.4 | Recommendation explanation (wrapper externe) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_4_REPORT.md` | 27531258753 | OQ-4 tranchée : wrapper externe, recommendation.py NON modifié |
 | Sb_27.5 | Deterministic coach narrative (3 helpers purs) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_5_REPORT.md` | 27535088857 | OQ-2 tranchée pas de LLM ; OQ-6 tranchée "tu" informel ; garde anti-"vous" |
 | Sb_27.6 | UX simplification pass (dépréciation /dashboard, nav Synthèse → Progression) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_6_REPORT.md` | 27537795326 | OQ-3 tranchée : /dashboard → 303 → /, pas de suppression brutale |
-| Sb_27.7 | Product closure report + dogfood deferred | 🟢 | Sx_27 §14 | `SPRINT_Sb_27_7_REPORT.md` | (post-push) | Doc only ; closure report + dogfood deferred livrés |
+| Sb_27.7 | Product closure report + dogfood deferred | ✅ | Sx_27 §14 | `SPRINT_Sb_27_7_REPORT.md` | 27545919573 | Doc only ; closure report + dogfood deferred livrés |
 
 **Cycle Sx_27 technically closed le 2026-06-15** (`docs/strategy/Sx_27_CLOSURE_REPORT.md`). **Product validation pending real dogfood** (`docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`).
 
