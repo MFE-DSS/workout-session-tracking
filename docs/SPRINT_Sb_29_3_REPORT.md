@@ -120,12 +120,12 @@ Exécutés localement :
 
 ## 5. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [27573217572](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27573217572) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` (incl. perf baseline smoke) — vert attendu
-- [ ] Job `lint (... + check_spec_protocol + check_auth_scope_matrix)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sb_29.2
+- [x] Job `pytest + QA scripts` (incl. perf baseline smoke) — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sb_29.2
 
 ## 6. Métriques
 
