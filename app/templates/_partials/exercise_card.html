@@ -383,7 +383,18 @@
     {% set is_last = next_code is none %}
     {% set work_total = se.set_logs | selectattr('kind', 'equalto', 'work') | list | length %}
     {% set work_done = se.set_logs | selectattr('kind', 'equalto', 'work') | selectattr('completed') | list | length %}
-    <div class="card__actions card__actions--exercise">
+    {# Sb_29.3 — CTA wrapper avec hooks Sx_29.
+       Classes legacy conservées (card__actions, card__actions--exercise,
+       btn, btn--primary, btn--ghost, btn--nav-prev).
+       Hooks ajoutés :
+       - session-focus__cta : wrapper générique
+       - session-focus__sticky-cta : déclencheur du sticky bottom via CSS
+         scoped à .session-focus__card--active (cf. app.css Sb_29.3)
+       - session-focus__cta-primary : marqueur sur le bouton principal
+       Le sticky est purement CSS — aucune dépendance JS. Si la propriété
+       position:sticky n'est pas supportée, le CTA reste dans le flow
+       (comportement par défaut) — fallback no-JS gracieux. #}
+    <div class="card__actions card__actions--exercise session-focus__cta session-focus__sticky-cta">
       {% if prev_code %}
       <button type="submit" name="nav" value="prev"
               class="btn btn--ghost btn--nav-prev session-focus__tap-target"
@@ -394,7 +405,8 @@
       <span class="card__actions__recap" aria-hidden="true">
         {{ work_done }}/{{ work_total }}
       </span>
-      <button type="submit" name="nav" value="next" class="btn btn--primary session-focus__tap-target">
+      <button type="submit" name="nav" value="next"
+              class="btn btn--primary session-focus__tap-target session-focus__cta-primary">
         {% if is_last %}
           Enregistrer et terminer
         {% elif next_code %}

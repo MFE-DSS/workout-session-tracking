@@ -3272,3 +3272,69 @@ details.exercise-card[open] .card__actions--exercise {
 }
 
 /* prefers-reduced-motion : pas de nouvelle animation introduite ici (OQ-E). */
+
+
+/* ============================================================
+   Sb_29.3 — Sticky CTA on active exercise card
+   ------------------------------------------------------------
+   Le bouton principal "Enregistrer et passer a {next_code}" reste
+   visible en bas de viewport pendant le scroll de la carte active.
+   Aucune dependance JS : 100% CSS via position:sticky.
+
+   Contraintes:
+   - Scope strict a .session-focus__card--active (autres cards = flow)
+   - Fallback gracieux si sticky non supporte (Sb_29.3 garde l'ordre
+     DOM, le bouton reste accessible en flow naturel)
+   - Safe-area iOS supportee via env(safe-area-inset-bottom)
+   - Mobile 360x640 : pas de scroll horizontal
+   - Aucune nouvelle animation (OQ-E)
+   ============================================================ */
+
+/* Wrapper CTA : par defaut hors carte active = en flow normal. */
+.session-focus__cta {
+  /* Cosmetique discrete : on garde le layout existant. La specificite
+     CSS gere le sticky uniquement quand la carte est --active. */
+}
+
+/* Sticky CTA active : applique uniquement dans la carte active pour
+   eviter que les cartes pending/done/skipped/substituted aient un CTA
+   collant inutile. */
+.session-focus__card--active .session-focus__sticky-cta {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  /* Background opaque pour eviter que le contenu defilant en dessous
+     transparaisse. Hérite de --bg defini sur :root, fallback blanc. */
+  background: var(--bg, #fff);
+  /* Separation visuelle discrete vs contenu defilant. */
+  border-top: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  /* Padding interne pour respirer ; safe-area iOS pour iPhone notch. */
+  padding-top: 8px;
+  padding-bottom: 8px;
+  /* env() est ignore sur navigateurs anciens, fallback au padding-bottom
+     deja defini. */
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  /* Effet glassmorphism leger pour distinguer du flow (cohérent avec
+     la sticky jump bar Sb_29.2). */
+  backdrop-filter: blur(4px);
+}
+
+/* CTA primary : taille + accent visuel sans depasser le tap target
+   Sb_29.1 (44x44). */
+.session-focus__cta-primary {
+  /* Hérite de .btn.btn--primary existant. session-focus__tap-target
+     applique deja min-height/width 44px. On laisse intact le rendu
+     legacy pour ne pas casser le contraste/palette. */
+}
+
+/* Mobile 360x640 : si la carte active n'a pas assez de hauteur pour
+   profiter du sticky, on garde le comportement par defaut sans casser
+   le layout. */
+@media (max-width: 380px) {
+  .session-focus__card--active .session-focus__sticky-cta {
+    padding-top: 6px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* prefers-reduced-motion : pas d'animation introduite ici (OQ-E). */
