@@ -156,12 +156,14 @@ Exécutés localement :
 
 ## 6. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27556935311](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27556935311) (commit `546f794`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` (incl. perf baseline smoke) — vert attendu
-- [ ] Job `lint (... + check_spec_protocol + check_auth_scope_matrix)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sx_28
+- [x] Job `pytest + QA scripts` (incl. perf baseline smoke) — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck + check_spec_protocol + check_auth_scope_matrix)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sx_28
+
+CI verte **du premier push**.
 
 ## 7. Contraintes respectées (verbatim user)
 
