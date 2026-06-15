@@ -14,6 +14,7 @@
 | Sx_26 — Engineering Control Plane | ✅ clôturé 2026-06-14 (cf. `Sx_26_CLOSURE_REPORT.md`) |
 | Sx_27 — Coaching Loop & Product Activation | ✅ **technically closed** 2026-06-15 (cf. `Sx_27_CLOSURE_REPORT.md`) |
 | Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC AMENDED** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
+| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **SPEC ONLY** ouverte 2026-06-15 sous override #2 (cf. `Sx_29_MOBILE_SESSION_FOCUS_MODE_SPEC.md`) |
 | Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
 | Build authorization | ✅ **AUTHORIZED FOR OPTION A** (Sx_29 Mobile Session Focus Mode) sous override explicite 2026-06-15. Options B/C/D/E **restent bloquées** (override séparé requis) |
 | Dernier CI run vert | [#27554090915](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27554090915) |
@@ -374,8 +375,8 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
 
 **Séquence révisée :**
 
-1. **Prochaine action immédiate** : copier le prompt **`ROADMAP_AND_NEXT_STEPS.md §7.3`** (Sx_29 Mobile Session Focus Mode) → ouvrir `Sx_29` SPEC ONLY
-2. **Sx_29 doit produire sa spec d'abord** — pas de raccourci vers Sb_29.k
+1. ~~**Prochaine action immédiate** : copier le prompt §7.3 → ouvrir Sx_29 SPEC ONLY~~ **✅ FAIT 2026-06-15** : `Sx_29_MOBILE_SESSION_FOCUS_MODE_SPEC.md` livrée
+2. **Prochaine action maintenant** : relire la spec Sx_29, trancher OQ-A à OQ-E (§19), valider conditions §18, puis ouvrir `Sb_29.1` (visual skeleton)
 3. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; **React production INTERDIT** dans Sx_29 ; lab React exploratoire acceptable séparément
 4. **En parallèle (opérateur)** : viser le dogfood Sx_27. Si livré, ouvrir `Sb_28.dogfood-integration` pour vérifier qu'Option A reste pertinente. Sinon, `Sb_27.next.<fix>` à intercaler avant la suite de Sx_29.
 5. **Options B/C/D/E** : restent bloquées tant qu'aucun override séparé n'est documenté

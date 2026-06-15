@@ -65,7 +65,7 @@
 | Sx_28 (spec) | Reconciliation ancien S0→S10 ↔ repo réel + 5 options + matrice + décision Option A sous override | ✅ amendée | Sx_28 §1-20 | `SPRINT_Sx_28_SPEC_REPORT.md` + `SPRINT_Sb_28_OVERRIDE_BUILD_AUTHORIZATION_REPORT.md` | 27554090915 + (post-push) | DOGFOOD INPUT = PENDING ; build Option A autorisé sous override |
 | Sb_28.override-build-authorization | Bascule verdict Sx_28 §15+§16+§20 vers BUILD AUTHORIZED FOR OPTION A | ✅ livré | Sx_28 §15.1bis | `SPRINT_Sb_28_OVERRIDE_BUILD_AUTHORIZATION_REPORT.md` | (post-push) | Doc only ; override borné à Option A |
 | Sb_28.dogfood-integration | Mettre à jour Sx_28 §15+§20 si dogfood arrive a posteriori (peut reverser Option A) | 🔵 optionnel post-override | Sx_28 §17 | — | — | SPEC ONLY ; reste exécutable si dogfood livré plus tard |
-| **Sx_29** Mobile Session Focus Mode | **Prochain cycle autorisé** (Option A) | 🔵 à ouvrir | (à créer) | — | — | SPEC ONLY d'abord ; FastAPI SSR + Jinja2 ; React production INTERDIT |
+| **Sx_29** Mobile Session Focus Mode | **Spec ouverte SPEC ONLY** (Option A autorisée) | ✅ spec only | Sx_29 §1-20 | `SPRINT_Sx_29_SPEC_REPORT.md` | (post-push) | FastAPI SSR + Jinja2 ; React production INTERDIT ; build queue Sb_29.1-5 prévue |
 | Sx_29+ alternatives | Sx_30 (Overload) / Sx_31 (Body v2) / Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
 
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
