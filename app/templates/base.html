@@ -25,7 +25,8 @@
           <a class="topbar__link" href="{{ url_for('library') }}">Programmes</a>
           <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
           <a class="topbar__link" href="{{ url_for('physique') }}">Physique</a>
-          <a class="topbar__link" href="{{ url_for('dashboard') }}">Synthèse</a>
+          {# Sb_27.6 — OQ-3 : /dashboard déprécié, Progression (/progress) devient la surface analytique principale. #}
+          <a class="topbar__link" href="{{ url_for('progress') }}">Progression</a>
           <a class="topbar__link" href="{{ url_for('leaderboard_page') }}">Classement</a>
           <a class="topbar__link" href="{{ url_for('squads_list') }}">Squads</a>
           <a class="topbar__link" href="{{ url_for('profile_page') }}">Profil</a>

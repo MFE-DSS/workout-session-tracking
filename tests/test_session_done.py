@@ -165,7 +165,9 @@ def test_done_page_shows_summary_block(client):
     assert "Incline Smith Press" in body
     assert "2/3" in body
     # CTAs
-    assert 'href="/dashboard"' in body or "Synthèse" in body
+    # Sb_27.6 — /dashboard deprecated → no more dashboard CTA on /done.
+    # The session review now exposes its own CTAs (Retour Accueil /
+    # Nouvelle séance) plus the existing Historique link in nav.
     assert 'href="/history"' in body or "Historique" in body
     # Reopen form (discreet)
     assert "Rouvrir" in body

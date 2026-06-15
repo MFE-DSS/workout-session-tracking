@@ -7,7 +7,7 @@ from __future__ import annotations
 from datetime import UTC
 
 from fastapi import APIRouter, HTTPException, Query, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -499,28 +499,25 @@ def physique(
     )
 
 
-@router.get("/dashboard", response_class=HTMLResponse)
+@router.get("/dashboard", response_model=None)
 def dashboard(
     request: Request,
     db: DbSession,
     user: CurrentUser,
     window: int = Query(30),
-) -> HTMLResponse:
-    from app.services.dashboard import compute_dashboard
+) -> RedirectResponse:
+    """Sb_27.6 — DEPRECATED. OQ-3 tranchée verbatim user : `/dashboard`
+    n'est plus une surface principale. Redirige vers `/` (Home coaching).
 
-    window = window if window in (30, 60, 90) else 30
-    result = compute_dashboard(db, user.id, window_days=window)
+    Le template `dashboard.html` et le service `compute_dashboard` sont
+    volontairement préservés (pas de suppression brutale de code métier)
+    pour permettre une réintroduction future si nécessaire — mais aucun
+    lien n'y pointe désormais depuis la navigation.
 
-    return templates.TemplateResponse(
-        request,
-        "dashboard.html",
-        {
-            "page_title": "Body Engineering",
-            "result": result,
-            "window": window,
-            "active_session": latest_open_session(db, user.id),
-        },
-    )
+    Le paramètre `window` est ignoré pendant la redirection ; il restera
+    accepté tant que d'éventuels bookmarks externes existent.
+    """
+    return RedirectResponse(url="/", status_code=303)
 
 
 @router.get("/readiness/history", response_class=HTMLResponse)
