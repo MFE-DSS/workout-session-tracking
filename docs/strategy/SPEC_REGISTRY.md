@@ -66,7 +66,7 @@
 | Sb_28.override-build-authorization | Bascule verdict Sx_28 §15+§16+§20 vers BUILD AUTHORIZED FOR OPTION A | ✅ livré | Sx_28 §15.1bis | `SPRINT_Sb_28_OVERRIDE_BUILD_AUTHORIZATION_REPORT.md` | (post-push) | Doc only ; override borné à Option A |
 | Sb_28.dogfood-integration | Mettre à jour Sx_28 §15+§20 si dogfood arrive a posteriori (peut reverser Option A) | 🔵 optionnel post-override | Sx_28 §17 | — | — | SPEC ONLY ; reste exécutable si dogfood livré plus tard |
 | **Sx_29** Mobile Session Focus Mode | Spec + build en cours (Option A autorisée) | 🟡 en cours | Sx_29 §1-20 | `SPRINT_Sx_29_SPEC_REPORT.md` | 27559252205 | FastAPI SSR + Jinja2 ; React production INTERDIT ; build queue Sb_29.1-5 |
-| Sb_29.1 | Visual skeleton (partials + CSS hooks + 21 tests) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_1_REPORT.md` | (post-push) | session_detail.html 551 → 161 lignes ; +124 lignes CSS ; 0 service métier touché |
+| Sb_29.1 | Visual skeleton (partials + CSS hooks + 21 tests) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_1_REPORT.md` | 27562617417 | session_detail.html 551 → 161 lignes ; +124 lignes CSS ; 0 service métier touché |
 | Sb_29.2 | Active exercise navigation | 🔵 à ouvrir | Sx_29 §17 | — | — | Pré-requis : Sb_29.1 mergé + CI verte |
 | Sb_29.3 | Sticky CTA | 🔵 | Sx_29 §17 | — | — | Pré-requis : Sb_29.2 |
 | Sb_29.4 | Rest timer progressive enhancement | 🔵 | Sx_29 §17 | — | — | Pré-requis : Sb_29.3 ; livre `session_focus.js` |
