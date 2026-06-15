@@ -101,6 +101,29 @@ def _build_today(db: Session, user: User, now: datetime) -> dict[str, Any]:
     top = reco["top"]
     template = top.get("template")
     phrase = (top.get("phrase") or "").strip()
+
+    # Sb_27.4 — consume the explainer for richer multi-reason context.
+    # The explainer is a read-only wrapper on the same `reco` payload
+    # (it never re-runs recommendation.py).
+    try:
+        from app.services.recommendation_explainer import explain_recommendation
+
+        explanation = explain_recommendation(reco)
+    except Exception:
+        explanation = None
+
+    if explanation and explanation.get("available"):
+        primary_reason = explanation.get("primary_reason") or phrase
+        reasons = explanation.get("reasons") or []
+    else:
+        primary_reason = phrase
+        reasons = [phrase] if phrase else []
+
+    if not primary_reason:
+        primary_reason = "Recommandation basée sur ton historique récent."
+    if not reasons:
+        reasons = [primary_reason]
+
     payload: dict[str, Any] = {
         "available": True,
         "kind": "reco",
@@ -108,7 +131,10 @@ def _build_today(db: Session, user: User, now: datetime) -> dict[str, Any]:
         "template_name": getattr(template, "name", None) or getattr(
             template, "title", None
         ),
-        "reason": phrase if phrase else "Recommandation basée sur ton historique récent.",
+        "reason": primary_reason,
+        "reasons": reasons,
+        "confidence": (explanation or {}).get("confidence"),
+        "fallback_note": (explanation or {}).get("fallback_note"),
     }
     ctx = reco.get("context") or {}
     if ctx.get("cold_start"):

@@ -32,6 +32,19 @@
       <div class="tile__hint" style="margin-top:4px;">
         {{ home.today.reason }}
       </div>
+      {# Sb_27.4 — secondary reasons (max 3 total incl. primary) #}
+      {% if home.today.reasons and home.today.reasons | length > 1 %}
+      <ul style="list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:4px;font-size:13px;opacity:0.8;">
+        {% for r in home.today.reasons[1:] %}
+          <li>· {{ r }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% if home.today.fallback_note %}
+        <div style="font-size:12px;opacity:0.6;margin-top:6px;">
+          {{ home.today.fallback_note }}
+        </div>
+      {% endif %}
     {% else %}
       <div style="font-size:16px;font-weight:600;margin-top:4px;opacity:0.7;">
         Aucune recommandation pour le moment

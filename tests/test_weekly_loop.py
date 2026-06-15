@@ -36,13 +36,22 @@ def _seed_completed_session(
     *,
     template_name: str = "Push A",
     days_ago: float = 1,
+    started_at: datetime | None = None,
     implicit_label: str | None = None,
     excluded: bool = False,
 ):
-    """Helper: create one completed session for `user_id`."""
+    """Helper: create one completed session for `user_id`.
+
+    `started_at` takes precedence over `days_ago` when both supplied —
+    needed for tests that target an exact ISO-week position regardless
+    of the runner's current weekday.
+    """
     from app.models.session import SessionExercise, SetLog, WorkoutSession
 
-    started = datetime.now(UTC) - timedelta(days=days_ago)
+    if started_at is not None:
+        started = started_at
+    else:
+        started = datetime.now(UTC) - timedelta(days=days_ago)
     s = WorkoutSession(
         user_id=user_id,
         template_slug_snapshot=template_name.lower().replace(" ", "-"),
@@ -158,18 +167,34 @@ def test_four_sessions_triggers_volume_soutenu_hint(client):
 
 
 def test_previous_week_count_present(client):
-    """Sessions from the previous ISO week are counted separately."""
+    """Sessions from the previous ISO week are counted separately.
+
+    Anchored on an explicit ISO Monday so the test is independent of the
+    runner's current weekday.
+    """
     from app.database import SessionLocal
     from app.models.user import User
+    from app.services.weekly_loop import build_weekly_loop
+
+    # Anchor: a fixed Wednesday in 2026-W24 (Wed 2026-06-10 12:00 UTC).
+    ref = datetime(2026, 6, 10, 12, 0, tzinfo=UTC)
+    this_week_monday = ref - timedelta(days=ref.weekday())  # Mon 2026-06-08
+    last_week_tuesday = this_week_monday - timedelta(days=6)  # Tue 2026-06-02
+    last_week_wednesday = this_week_monday - timedelta(days=5)  # Wed 2026-06-03
 
     with SessionLocal() as db:
         user = db.query(User).first()
-        # 1 session this week
-        _seed_completed_session(db, user.id, days_ago=0)
-        # 2 sessions last week (need to be older than the start of this week)
-        _seed_completed_session(db, user.id, days_ago=8)
-        _seed_completed_session(db, user.id, days_ago=9)
-        payload = _build(db, user)
+        # 1 session this week (Tuesday of this week)
+        _seed_completed_session(
+            db, user.id, started_at=this_week_monday + timedelta(days=1)
+        )
+        # 2 sessions last week
+        _seed_completed_session(db, user.id, started_at=last_week_tuesday)
+        _seed_completed_session(db, user.id, started_at=last_week_wednesday)
+
+    with SessionLocal() as db:
+        user = db.query(User).first()
+        payload = build_weekly_loop(db, user, now=ref)
 
     assert payload["sessions_count"] == 1
     assert payload["previous_week_sessions_count"] == 2
