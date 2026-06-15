@@ -40,10 +40,24 @@ def build_home_payload(
     one tile never breaks the others.
     """
     ref = now or datetime.now(UTC)
+    today = _safe(_build_today, db, user, ref)
+    last_session = _safe(_build_last_session, db, user, ref)
+    week = _safe(_build_week, db, user, ref)
+
+    # Sb_27.5 — attach a deterministic narrative phrase per tile. The
+    # narrative helpers are pure (no DB, no LLM) and never raise on
+    # missing fields, so we don't need a try/except guard here.
+    try:
+        from app.services.narrative import narrate_reco
+
+        today["narrative"] = narrate_reco(today)
+    except Exception:  # noqa: BLE001, S110 — narrative is best-effort, never blocks
+        pass
+
     return {
-        "today": _safe(_build_today, db, user, ref),
-        "last_session": _safe(_build_last_session, db, user, ref),
-        "week": _safe(_build_week, db, user, ref),
+        "today": today,
+        "last_session": last_session,
+        "week": week,
     }
 
 

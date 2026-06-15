@@ -56,13 +56,22 @@ def build_session_review(
     without changing the public API.
     """
     ref = now or datetime.now(UTC)
-    return {
+    payload = {
         "summary": _safe(_build_summary, session, ref),
         "quality": _safe(_build_quality, session),
         "implicit_signal": _safe(_build_implicit_signal, session),
         "notable_movements": _safe_list(_build_notable_movements, session),
         "next_hint": _safe(_build_next_hint, session, ref),
     }
+    # Sb_27.5 — deterministic narrative one-liner. Pure function on the
+    # payload we just built, never raises on missing fields.
+    try:
+        from app.services.narrative import narrate_session_review
+
+        payload["narrative"] = narrate_session_review(payload)
+    except Exception:  # noqa: BLE001, S110 — narrative is best-effort, never blocks
+        pass
+    return payload
 
 
 def _safe(fn, *args) -> dict[str, Any]:

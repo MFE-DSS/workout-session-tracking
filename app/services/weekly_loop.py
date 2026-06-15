@@ -49,9 +49,19 @@ def build_weekly_loop(
     """
     ref = now or datetime.now(UTC)
     try:
-        return _compose(db, user, ref)
+        payload = _compose(db, user, ref)
     except Exception as exc:  # noqa: BLE001 — degrade gracefully
-        return _empty_payload(ref, error=exc.__class__.__name__)
+        payload = _empty_payload(ref, error=exc.__class__.__name__)
+
+    # Sb_27.5 — attach a deterministic narrative one-liner. Pure function,
+    # never raises on missing fields.
+    try:
+        from app.services.narrative import narrate_week
+
+        payload["narrative"] = narrate_week(payload)
+    except Exception:  # noqa: BLE001, S110 — narrative is best-effort, never blocks
+        pass
+    return payload
 
 
 def _start_of_iso_week(ref: datetime) -> datetime:

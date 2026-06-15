@@ -79,6 +79,11 @@ def _build(db, session):
 
 
 def test_payload_always_has_five_keys(client):
+    """Sb_27.2 contract: 5 core sub-payloads.
+
+    Sb_27.5 adds an optional `narrative` key on top — assert presence
+    of the 5 originals via subset, then check `narrative` is also wired.
+    """
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -86,13 +91,15 @@ def test_payload_always_has_five_keys(client):
         user = db.query(User).first()
         s = _make_session(db, user.id, exercises=[])
         payload = _build(db, s)
-    assert set(payload.keys()) == {
+    assert {
         "summary",
         "quality",
         "implicit_signal",
         "notable_movements",
         "next_hint",
-    }
+    }.issubset(payload.keys())
+    # Sb_27.5 — narrative is attached by the composer
+    assert "narrative" in payload
 
 
 # ─────────────────── summary ───────────────────

@@ -13,6 +13,12 @@
     <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
       Cette semaine
     </div>
+    {# Sb_27.5 — narrative phrase one-liner #}
+    {% if weekly.narrative and weekly.narrative.available %}
+      <div style="font-size:13px;opacity:0.85;margin-top:4px;font-style:italic;">
+        {{ weekly.narrative.phrase }}
+      </div>
+    {% endif %}
     <div style="font-size:18px;font-weight:600;margin-top:4px;">
       {{ weekly.volume_signal }}
     </div>

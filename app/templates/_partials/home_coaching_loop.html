@@ -15,6 +15,12 @@
     <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
       Aujourd'hui
     </div>
+    {# Sb_27.5 — narrative phrase one-liner #}
+    {% if home.today.narrative and home.today.narrative.available %}
+      <div style="font-size:13px;opacity:0.85;margin-top:4px;font-style:italic;">
+        {{ home.today.narrative.phrase }}
+      </div>
+    {% endif %}
     {% if home.today.kind == "in_progress" %}
       <a href="{{ url_for('session_detail', session_id=home.today.session_id) }}"
          style="text-decoration:none;color:inherit;">
