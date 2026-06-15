@@ -51,6 +51,8 @@
 
 **Cycle Sx_27 technically closed le 2026-06-15** (`docs/strategy/Sx_27_CLOSURE_REPORT.md`). **Product validation pending real dogfood** (`docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`).
 
+> 📖 **Pour reprendre une session, lire d'abord [`docs/strategy/ROADMAP_AND_NEXT_STEPS.md`](ROADMAP_AND_NEXT_STEPS.md)** — document de référence vivant qui contient l'état actuel, la roadmap réconciliée (ancien S0→S10 vs cycles livrés) et les prompts verbatim à utiliser pour `Sb_27.dogfood-1`, `Sx_28`, `Sx_29`.
+
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
 **Spec :** `docs/strategy/SPIGNOS_IMPLICIT_SIGNAL_SCORING_SPEC_v1.md`
