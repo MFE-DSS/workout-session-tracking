@@ -120,12 +120,14 @@ Exécutés localement :
 
 ## 5. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27571228735](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27571228735) (commit `c1ae9a4`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` (incl. perf baseline smoke) — vert attendu
-- [ ] Job `lint (... + check_spec_protocol + check_auth_scope_matrix)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sb_29.1
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck + check_spec_protocol + check_auth_scope_matrix)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sb_29.1
+
+CI verte **du premier push**.
 
 ## 6. Métriques
 
@@ -195,7 +197,7 @@ Exécutés localement :
 
 | Critère DoD | Statut |
 |---|---|
-| pytest passe | ✅ (CI le confirmera) |
+| pytest passe | ✅ 1120 passed (+19) |
 | catalog_qa passe | ✅ |
 | machine_atlas_qa passe | ✅ |
 | check_alembic_drift passe | ✅ |
@@ -204,7 +206,7 @@ Exécutés localement :
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (≤ 548) | ✅ 534 ≤ 548 |
 | pip-audit passe | ✅ clean |
-| gitleaks passe | ⏳ CI le confirmera |
+| gitleaks passe | ✅ run #27571228735 |
 | check_spec_protocol passe | ✅ |
 | check_auth_scope_matrix passe | ✅ |
 | perf baseline smoke passe | ✅ |
