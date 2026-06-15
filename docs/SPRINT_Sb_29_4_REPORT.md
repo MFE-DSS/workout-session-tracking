@@ -74,11 +74,16 @@ Si JS désactivé : le DOM reste avec `90s` affiché statiquement → aucune act
 
 ## 5. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [27577849433](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27577849433) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+
+Note : un premier run (27576858875) a échoué sur `check_spec_protocol.py` —
+le marker `## 10. Verdict` n'était pas dans la liste acceptée. Corrigé en
+`## 11. Verdict` (la section 10 est "DoD locale"). Aucun changement
+fonctionnel.
 
 ## 6. Métriques
 
