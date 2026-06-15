@@ -3141,3 +3141,134 @@ details.exercise-card[open] .card__actions--exercise {
     top: 48px;
   }
 }
+
+
+/* ============================================================
+   Sb_29.2 — Active Exercise Navigation (visual reinforcement)
+   ------------------------------------------------------------
+   Renforce le rendu visuel des 6 etats de carte exercice et des
+   items de jump bar pour faciliter la navigation en salle.
+
+   Contraintes :
+   - aucun JS introduit (Sb_29.2 = SSR + <details> natif + CSS)
+   - non-color cues (border, outline, shape) pour ne pas dependre
+     uniquement de la couleur (WCAG 1.4.1)
+   - mobile 360x640 preserve (pas de scroll horizontal)
+   - hooks Sx_29 coexistent avec classes legacy
+   - dark UI actuelle preservee (variables --accent, --ok, --warn,
+     --fg-dim existantes)
+
+   OQ-B mesure : ~100 lignes ajoutees ici. Cumul Sx_29 dans app.css
+   reste sous le seuil 200 lignes d'extraction session_focus.css.
+   ============================================================ */
+
+/* Active card : highlight visuel renforce sans dependre de la couleur
+   seule. Border accent epaissie + box-shadow + indicateur non-color
+   via ::before sur le summary. La carte reste ouverte par defaut via
+   Jinja (Sb_29.1) ; l'utilisateur peut toujours collapse manuellement
+   (native <details>). */
+.session-focus__card--active {
+  border: 1.5px solid var(--accent, #2563eb);
+  box-shadow: 0 1px 6px -2px var(--accent-soft, rgba(37, 99, 235, 0.18));
+  position: relative;
+}
+
+.session-focus__card--active > summary .exercise-card__code::before {
+  content: "\2022 ";
+  color: var(--accent, #2563eb);
+  font-size: 0.9em;
+  vertical-align: middle;
+}
+
+/* Etats secondaires de la carte. Discrets : la carte reste collapsed,
+   le sommaire montre l'etat via border-left + symbole non-color. */
+.session-focus__card--pending {
+  /* Neutre par defaut. */
+}
+
+.session-focus__card--partial > summary {
+  border-left: 3px solid var(--warn, #d97706);
+  padding-left: 6px;
+}
+
+.session-focus__card--done > summary {
+  border-left: 3px solid var(--ok, #16a34a);
+  padding-left: 6px;
+  opacity: 0.92;
+}
+.session-focus__card--done > summary .exercise-card__code::after {
+  content: " \2713";
+  color: var(--ok, #16a34a);
+  font-weight: 700;
+}
+
+.session-focus__card--skipped > summary {
+  border-left: 3px dashed var(--fg-dim, #6b7280);
+  padding-left: 6px;
+  opacity: 0.75;
+}
+.session-focus__card--skipped > summary .exercise-card__name {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.session-focus__card--substituted > summary {
+  border-left: 3px dotted var(--accent, #2563eb);
+  padding-left: 6px;
+}
+.session-focus__card--substituted > summary .exercise-card__name::after {
+  content: " \2194";
+  color: var(--accent, #2563eb);
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* Jump bar : completer les etats manquants (skipped, substituted) et
+   renforcer l'item actif avec un indicateur non-color. */
+.ex-jump__item--skipped {
+  border-color: var(--fg-dim, #6b7280);
+  opacity: 0.7;
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.ex-jump__item--substituted {
+  border-color: var(--accent, #2563eb);
+  border-style: dotted;
+}
+.ex-jump__item--substituted .ex-jump__code::after {
+  content: " \2194";
+  font-weight: 700;
+}
+
+/* Active jump bar item : cue non-color (bullet ::before) pour les
+   utilisateurs en niveaux de gris ou daltoniens. */
+.session-focus__sticky-jump .ex-jump__item--active::before {
+  content: "\2022";
+  margin-right: 4px;
+  font-size: 0.85em;
+  vertical-align: middle;
+}
+
+.session-focus__sticky-jump .ex-jump__item--done .ex-jump__prog::after {
+  content: " \2713";
+  font-weight: 700;
+  margin-left: 2px;
+}
+
+/* Sticky jump bar : refinements de comportement. */
+.session-focus__sticky-jump {
+  backdrop-filter: blur(4px);
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.06));
+}
+
+/* Mobile 360x640 : ne pas laisser la jump bar manger trop d'espace
+   vertical sur petit ecran. */
+@media (max-width: 380px) {
+  .session-focus__sticky-jump {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
+/* prefers-reduced-motion : pas de nouvelle animation introduite ici (OQ-E). */
