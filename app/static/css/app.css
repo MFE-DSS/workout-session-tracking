@@ -3017,3 +3017,127 @@ details.exercise-card[open] .card__actions--exercise {
   margin-top: 4px;
   justify-content: flex-end;
 }
+
+/* ============================================================
+   Sb_29.1 — Mobile Session Focus Mode (visual skeleton)
+   ------------------------------------------------------------
+   Hooks CSS minimaux préparant Sb_29.2 → Sb_29.5. Aucune
+   modification du rendu existant : ces classes coexistent avec
+   les classes legacy (session-header, ex-jump, exercise-card,
+   etc.) qui restent intactes.
+
+   No-JS friendly : tout reste fonctionnel sans JavaScript.
+   Mobile cible : 360x640.
+   OQ-B (Sx_29 §19) : inline dans app.css ; extraction
+   session_focus.css uniquement si > 200 lignes (mesure fin
+   de cycle Sx_29).
+   ============================================================ */
+
+/* Wrapper appliqué sur .session-page de session_detail.html */
+.session-focus {
+  /* Conserve le layout existant ; permet de scoper les hooks. */
+}
+
+/* Header compact session focus (sticky preparé pour Sb_29.2) */
+.session-focus__header {
+  /* Skeleton : on hérite de session-header. Le sticky behavior
+     vient via session-focus__sticky-header pour rester débrayable. */
+}
+
+.session-focus__sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  background: var(--bg, #fff);
+  /* Backdrop discret pour différencier du scroll. Fallback gracieux
+     si --bg pas défini. */
+}
+
+/* Jump bar : sticky sous le header */
+.session-focus__jump {
+  /* Hérite de .ex-jump existant. */
+}
+
+.session-focus__sticky-jump {
+  position: sticky;
+  /* top calculé par la hauteur du header sticky. Approx 64px
+     côté desktop, 56px mobile. Sb_29.2 affinera avec une variable. */
+  top: 56px;
+  z-index: 3;
+  background: var(--bg, #fff);
+}
+
+/* Carte exercice avec hooks d'état visuel (Sb_29.1 squelette,
+   différenciation visuelle complétée Sb_29.2). Le rendu actuel
+   reste piloté par .exercise-card legacy ; ces classes posent
+   les ancres CSS. */
+.session-focus__card {
+  /* Hérite de .card.exercise-card existants. */
+}
+
+/* États visuels — 6 valeurs alignées sur jump_states existants.
+   Sb_29.1 ne pose que des hooks ; Sb_29.2 ajoutera les
+   borders/couleurs. */
+.session-focus__card--pending {
+  /* État neutre par défaut. */
+}
+
+.session-focus__card--active {
+  /* Carte actuelle de la séance. Highlight visuel léger pour
+     que l'utilisateur sache où il en est. Sb_29.2 renforcera. */
+  border-color: var(--accent, #2563eb);
+}
+
+.session-focus__card--partial {
+  /* Sets partiellement loggés. */
+}
+
+.session-focus__card--done {
+  /* Tous les work sets complétés. */
+}
+
+.session-focus__card--skipped {
+  /* Marqué skip par l'utilisateur. */
+}
+
+.session-focus__card--substituted {
+  /* Exercice substitué. */
+}
+
+/* Tap targets : taille minimum 44x44px (WCAG 2.5.5) appliquée
+   à tous les boutons d'action de la séance. Sb_29.2 vérifiera
+   par tests dédiés. */
+.session-focus__tap-target {
+  min-height: 44px;
+  min-width: 44px;
+  /* Espacement interne pour assurer un clic confortable même
+     si le contenu textuel est court. */
+  padding: 10px 14px;
+  /* Centrage visuel. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Tap target sur les anchors de jump bar : conserver inline-flex
+   mais éviter de casser le layout horizontal. */
+.session-focus__jump .session-focus__tap-target {
+  /* Maintenir la grille existante de ex-jump. */
+  flex: 0 0 auto;
+}
+
+/* prefers-reduced-motion : aucun JS animation prévu dans Sb_29.1,
+   mais on prépare le respect explicite pour Sb_29.4. */
+@media (prefers-reduced-motion: reduce) {
+  .session-focus__sticky-header,
+  .session-focus__sticky-jump {
+    transition: none;
+  }
+}
+
+/* Mobile 360x640 — réduire le sticky top sur très petit écran. */
+@media (max-width: 380px) {
+  .session-focus__sticky-jump {
+    top: 48px;
+  }
+}

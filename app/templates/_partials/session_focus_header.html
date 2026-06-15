@@ -1,0 +1,29 @@
+{# Sb_29.1 — Session Focus header partial (visual skeleton).
+
+   Extrait verbatim du bloc <header class="session-header"> de
+   session_detail.html. Aucune modification fonctionnelle :
+   - mêmes données (session, weekday_label, stats)
+   - mêmes classes legacy (session-header, session-header__meta, ...)
+   - ajoute uniquement les hooks Sx_29 (session-focus__header,
+     session-focus__sticky-header) pour CSS skeleton.
+
+   No-JS fallback : aucun JS requis, <h1> + <span> + badges classiques.
+#}
+<header class="session-header session-focus__header session-focus__sticky-header">
+  <h1 class="page-title">{{ session.template_name_snapshot }}</h1>
+  <div class="session-header__meta">
+    <span>{{ weekday_label }}</span>
+    <span>{{ (session.started_at | local).strftime('%d/%m %H:%M') }}</span>
+    <span class="badge badge--{{ session.status }}">
+      {% if session.status == 'in_progress' %}En cours{% else %}Terminée{% endif %}
+    </span>
+  </div>
+  <div class="session-header__progress">
+    {{ stats.done }} / {{ stats.total }} work sets
+  </div>
+  {% if session.status == 'completed' %}
+    <div class="session-header__note">
+      Séance terminée — éditable via <em>Rouvrir</em>.
+    </div>
+  {% endif %}
+</header>

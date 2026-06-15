@@ -48,7 +48,10 @@ def test_jump_bar_renders_one_item_per_exercise(client):
     sid = _start(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
     # Push A has 7 exercises (v10) -> 7 jump items + 1 feedback shortcut
-    assert 'class="ex-jump"' in body
+    # Sb_29.1 — la nav porte désormais plusieurs classes additionnelles
+    # (session-focus__jump, session-focus__sticky-jump). On vérifie la
+    # présence de la classe sans contraindre l'ordre exact.
+    assert "ex-jump" in body
     for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
         assert f'>{code}</span>' in body
     # FB shortcut to #session-feedback
