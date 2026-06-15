@@ -45,7 +45,7 @@
 | Sb_27.2 | Session review V1 (`/sessions/{id}/done`) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_2_REPORT.md` | 27509053460 | 5 sub-payloads + Triptyche Non déductible |
 | Sb_27.3 | Weekly training loop (enrichit `/progress`) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_3_REPORT.md` | 27511608805 | OQ-1 tranchée : enrichir /progress, pas de /weekly |
 | Sb_27.4 | Recommendation explanation (wrapper externe) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_4_REPORT.md` | 27531258753 | OQ-4 tranchée : wrapper externe, recommendation.py NON modifié |
-| Sb_27.5 | Deterministic coach narrative (3 helpers purs) | 🟢 | Sx_27 §14 | `SPRINT_Sb_27_5_REPORT.md` | (post-push) | OQ-2 tranchée pas de LLM ; OQ-6 tranchée "tu" informel ; garde anti-"vous" |
+| Sb_27.5 | Deterministic coach narrative (3 helpers purs) | ✅ | Sx_27 §14 | `SPRINT_Sb_27_5_REPORT.md` | 27535088857 | OQ-2 tranchée pas de LLM ; OQ-6 tranchée "tu" informel ; garde anti-"vous" |
 | Sb_27.6 | UX simplification pass | 🔵 | Sx_27 §14 | — | — | OQ-3 à trancher avant |
 | Sb_27.7 | Product closure report + dogfood | 🔵 | Sx_27 §14 | — | — | Tous les lots précédents requis |
 

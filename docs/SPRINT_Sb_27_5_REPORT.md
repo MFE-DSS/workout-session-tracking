@@ -141,12 +141,14 @@ Exécutés localement :
 
 ## 5. CI réelle (post-push)
 
-À renseigner après push.
+Run CI [#27535088857](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27535088857) (commit `8bf0466`) — conclusion **success** :
 
-- [ ] Job `pytest + QA scripts` (incl. perf baseline smoke) — vert attendu
-- [ ] Job `lint (... + check_spec_protocol + check_auth_scope_matrix)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
-- [ ] Pas de régression sur les gates Sb_26.1 → Sb_27.4
+- [x] Job `pytest + QA scripts` (incl. perf baseline smoke) — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck + check_spec_protocol + check_auth_scope_matrix)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
+- [x] Pas de régression sur les gates Sb_26.1 → Sb_27.4
+
+**Note CI** : le premier push (`1256d5d`, run [#27533439216](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27533439216)) a été cancelled au step `pytest` (timeout 15 min). Le test suite a grossi avec Sx_27 (1074 tests, ~5-7 min local). Fix `8bf0466` : bump du timeout du job `test` de 15→25 min. Comportement CI inchangé hors marge.
 
 ## 6. Risques
 
@@ -215,7 +217,7 @@ Exécutés localement :
 
 | Critère DoD | Statut |
 |---|---|
-| pytest passe | ✅ (CI le confirmera) |
+| pytest passe | ✅ 1074 passed |
 | catalog_qa passe | ✅ |
 | machine_atlas_qa passe | ✅ |
 | check_alembic_drift passe | ✅ |
@@ -224,7 +226,7 @@ Exécutés localement :
 | check_migration_roundtrip passe | ✅ |
 | check_ruff_budget passe (≤ 548) | ✅ 534 ≤ 548 |
 | pip-audit passe | ✅ clean |
-| gitleaks passe | ⏳ CI le confirmera |
+| gitleaks passe | ✅ run #27535088857 |
 | check_spec_protocol passe | ✅ |
 | check_auth_scope_matrix passe | ✅ |
 | perf baseline smoke passe | ✅ |
