@@ -157,7 +157,7 @@ Si JS désactivé : le DOM reste avec `90s` affiché statiquement → aucune act
 | `python scripts/machine_atlas_qa.py` | ✅ PASS |
 | `pip-audit -r requirements.txt --strict` | ✅ clean |
 
-## 10. Verdict
+## 11. Verdict
 
 **✅ READY FOR Sb_29.5**
 
