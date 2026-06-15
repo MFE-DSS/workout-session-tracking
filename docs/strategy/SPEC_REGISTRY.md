@@ -53,18 +53,20 @@
 
 > 📖 **Pour reprendre une session, lire d'abord [`docs/strategy/ROADMAP_AND_NEXT_STEPS.md`](ROADMAP_AND_NEXT_STEPS.md)** — document de référence vivant qui contient l'état actuel, la roadmap réconciliée (ancien S0→S10 vs cycles livrés) et les prompts verbatim à utiliser pour `Sb_27.dogfood-1`, `Sx_28`, `Sx_29`.
 
-## 1ter. Cycle Sx_28 — Product Roadmap Reconciliation (SPEC ONLY UNDER OVERRIDE)
+## 1ter. Cycle Sx_28 — Product Roadmap Reconciliation (BUILD AUTHORIZED FOR OPTION A UNDER OVERRIDE)
 
 **Spec :** `docs/strategy/Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`
-**Statut spec :** ✅ READY FOR HUMAN REVIEW UNDER OVERRIDE (2026-06-15).
-**Statut build :** 🔴 **BLOCKED UNTIL DOGFOOD OR EXPLICIT OVERRIDE**.
-**Override :** humain, daté 2026-06-15, dogfood annoncé ~2 jours. Voir spec §2.
+**Statut spec :** ✅ AMENDED (2026-06-15 sprint `Sb_28.override-build-authorization`).
+**Statut build :** ✅ **AUTHORIZED FOR OPTION A** (Sx_29 Mobile Session Focus Mode) sous override explicite. Options B/C/D/E **restent bloquées** (override séparé requis).
+**Override :** humain, daté 2026-06-15, dogfood reste PENDING (non simulé). Voir spec §15.1bis + §16 + §20 et `SPRINT_Sb_28_OVERRIDE_BUILD_AUTHORIZATION_REPORT.md`.
 
 | Sprint | Domaine | Statut | Spec ref | Rapport | CI run | Notes |
 |---|---|---|---|---|---|---|
-| Sx_28 (spec only) | Reconciliation ancien S0→S10 ↔ repo réel + 5 options + matrice + recommandation provisoire (Option A) | ✅ spec only | Sx_28 §1-20 | `SPRINT_Sx_28_SPEC_REPORT.md` | (post-push) | DOGFOOD INPUT = PENDING ; aucun build autorisé |
-| Sb_28.dogfood-integration | mettre à jour Sx_28 §15+§20 selon dogfood reçu | 🔵 pré-requis : dogfood reçu | Sx_28 §17 | — | — | SPEC ONLY ; déclenchera la décision finale |
-| Sb_28.k (build) | TBD selon Option retenue post-dogfood | ❌ BLOCKED | — | — | — | ne peut être ouvert sans bascule §20 vers BUILD AUTHORIZED |
+| Sx_28 (spec) | Reconciliation ancien S0→S10 ↔ repo réel + 5 options + matrice + décision Option A sous override | ✅ amendée | Sx_28 §1-20 | `SPRINT_Sx_28_SPEC_REPORT.md` + `SPRINT_Sb_28_OVERRIDE_BUILD_AUTHORIZATION_REPORT.md` | 27554090915 + (post-push) | DOGFOOD INPUT = PENDING ; build Option A autorisé sous override |
+| Sb_28.override-build-authorization | Bascule verdict Sx_28 §15+§16+§20 vers BUILD AUTHORIZED FOR OPTION A | ✅ livré | Sx_28 §15.1bis | `SPRINT_Sb_28_OVERRIDE_BUILD_AUTHORIZATION_REPORT.md` | (post-push) | Doc only ; override borné à Option A |
+| Sb_28.dogfood-integration | Mettre à jour Sx_28 §15+§20 si dogfood arrive a posteriori (peut reverser Option A) | 🔵 optionnel post-override | Sx_28 §17 | — | — | SPEC ONLY ; reste exécutable si dogfood livré plus tard |
+| **Sx_29** Mobile Session Focus Mode | **Prochain cycle autorisé** (Option A) | 🔵 à ouvrir | (à créer) | — | — | SPEC ONLY d'abord ; FastAPI SSR + Jinja2 ; React production INTERDIT |
+| Sx_29+ alternatives | Sx_30 (Overload) / Sx_31 (Body v2) / Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
 
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 

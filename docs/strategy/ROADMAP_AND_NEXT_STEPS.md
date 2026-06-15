@@ -13,15 +13,27 @@
 |---|---|
 | Sx_26 — Engineering Control Plane | ✅ clôturé 2026-06-14 (cf. `Sx_26_CLOSURE_REPORT.md`) |
 | Sx_27 — Coaching Loop & Product Activation | ✅ **technically closed** 2026-06-15 (cf. `Sx_27_CLOSURE_REPORT.md`) |
-| Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC ONLY** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
-| Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) |
-| Build authorization | 🔴 **BLOCKED UNTIL DOGFOOD OR EXPLICIT OVERRIDE** (cf. Sx_28 §16/§20) |
-| Dernier CI run vert | [#27545919573](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27545919573) |
+| Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC AMENDED** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
+| Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
+| Build authorization | ✅ **AUTHORIZED FOR OPTION A** (Sx_29 Mobile Session Focus Mode) sous override explicite 2026-06-15. Options B/C/D/E **restent bloquées** (override séparé requis) |
+| Dernier CI run vert | [#27554090915](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27554090915) |
 | Tests | **1080 passed** |
 | Ruff budget | **534 ≤ 548** |
-| Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) |
+| Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
-> ⚠️ **Note human override 2026-06-15** : l'opérateur a autorisé l'ouverture de Sx_28 en SPEC ONLY sans dogfood reçu (annoncé ~2 jours). Aucun build `Sb_28.k` ne peut être ouvert tant que le dogfood n'est pas intégré (cf. Sx_28 §17). Voir Sx_28 §2 pour les limites de cet override.
+> ⚠️ **Note double override 2026-06-15** :
+> 1. Override #1 (matin) : ouverture Sx_28 en SPEC ONLY sans dogfood reçu.
+> 2. Override #2 (sprint `Sb_28.override-build-authorization`, après-midi) : bascule `BUILD AUTHORIZED FOR OPTION A` sans attendre le dogfood.
+>
+> **Le dogfood Sx_27 reste PENDING** : il n'est ni simulé, ni considéré acquis. Son arrivée future peut **reverser** Option A si elle révèle qu'une autre friction est prioritaire (cf. Sx_28 §15.2).
+>
+> **Limites strictes de l'override #2** (verbatim Sx_28 §20) :
+> - Option A uniquement (Sx_29 Mobile Session Focus Mode)
+> - Options B/C/D/E restent bloquées (override séparé requis)
+> - FastAPI SSR + Jinja2 conservé ; React production INTERDIT dans Sx_29
+> - Lab React exploratoire acceptable séparément, jamais dans le build principal Sx_29
+> - Hard contracts Sx_26/Sx_27 inchangés
+> - Sx_29 doit produire sa spec d'abord (SPEC ONLY), comme tout cycle Sx_
 
 ## 2. Protocole spec-driven — règle d'or
 
@@ -34,40 +46,39 @@ Conséquences directes :
 - **Ne PAS ouvrir un nouveau Sx_** sur la base d'hypothèses produit non vérifiées.
 - L'ancienne roadmap historique S0→S10 (cf. `SPIGNOS_EXERCISE_SYSTEM_ROADMAP.md`, daté 2026-04-14) **n'est plus la source de vérité** — elle a été partiellement absorbée par les cycles Sx_24 / Sx_26 / Sx_27 (cf. §4).
 
-## 3. Roadmap réelle (post-réconciliation + post-override 2026-06-15)
+## 3. Roadmap réelle (post-réconciliation + post-override #2 2026-06-15)
 
 ```
    ┌──────────────────────────┐
-   │  Sb_27.dogfood-1         │  ← Annoncé ~2 jours (2026-06-17)
-   │  Real Product Dogfood    │
+   │  Sb_27.dogfood-1         │  ⏳ PENDING — peut arriver et reverser
+   │  Real Product Dogfood    │     Option A si friction différente révélée
    └──────────────┬───────────┘
-                  │
-                  │ runbook + 5-7 séances + report
-                  ▼ (en parallèle)
-   ┌──────────────────────────┐
-   │  Sx_28 (LIVRÉ EN SPEC)   │  ✅ SPEC ONLY 2026-06-15 (override)
-   │  Roadmap Reconciliation  │     20 sections, 5 options, recommandation
-   │  & Next Cycle Selection  │     provisoire Option A (Focus Mode)
-   └──────────────┬───────────┘
-                  │
-                  │ Sb_28.dogfood-integration (pré-requis dogfood)
+                  │ (parallèle, non bloquant après override #2)
                   ▼
    ┌──────────────────────────┐
-   │  Sx_28 mis à jour:       │
-   │  - retirer "provisoire"  │
-   │  - trancher Option       │
-   │  - §20 → BUILD AUTHORIZED│
-   └──────────────┬───────────┘
-                  │ humain tranche
-                  ▼
-   ┌──────────────────────────┐
-   │  Sx_29 (recommandé)      │  🔴 BLOCKED tant que §20 = BLOCKED
-   │  Mobile Session Focus    │
-   │  & Logging Friction      │
+   │  Sx_28 SPEC AMENDED ✅   │  Override #1: spec only sans dogfood
+   │  + Sb_28.override-       │  Override #2: BUILD AUTHORIZED Option A
+   │    build-authorization   │  Options B/C/D/E restent BLOQUÉES
    └──────────────┬───────────┘
                   │
                   ▼
-       Sx_30+ (Overload, Body v2, PWA, Health) — pas avant.
+   ┌──────────────────────────┐
+   │  Sx_29 — Mobile Session  │  ✅ AUTORISÉ par override #2
+   │  Focus Mode / Visual     │  📋 SPEC ONLY d'abord (protocole §4)
+   │  Interaction Layer       │  🔒 FastAPI SSR + Jinja2 ; React INTERDIT
+   └──────────────┬───────────┘
+                  │
+                  ▼
+       ┌──────────────────────────────┐
+       │ 🔴 Sx_30 (Overload)          │  Override séparé requis
+       │ 🔴 Sx_31 (Body v2)           │  Override séparé requis
+       │ 🔴 Sx_32 (PWA)               │  Override séparé requis
+       │ 🔴 Sx_33+ (Health/API)       │  Override séparé requis
+       └──────────────────────────────┘
+
+       ↳ Sb_28.dogfood-integration (optionnel) :
+         si dogfood arrive a posteriori, met à jour Sx_28 §15/§20.
+         Peut reverser Option A → Option B/C/D selon signal réel.
 ```
 
 ## 4. Mapping ancienne roadmap S0→S10 vs repo réel
@@ -353,22 +364,29 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
 | « Coder direct sans spec » | Protocole §4 : `Sx_NN` ne livre jamais de code. Le code arrive dans `Sb_NN.k`. |
 | « Modifier `recommendation.py` / scoring core » | Verrouillé par les hard contracts Sx_26 + Sx_27. Wrapper externe obligatoire (pattern `recommendation_explainer.py` Sb_27.4). |
 
-## 10. Plan d'action immédiat (TL;DR) — révisé post-override 2026-06-15
+## 10. Plan d'action immédiat (TL;DR) — révisé post-override #2 2026-06-15
 
-**État au 2026-06-15 :**
-- Sx_28 SPEC ONLY livrée (override humain)
-- Dogfood Sx_27 toujours PENDING (~2 jours)
-- Aucun build autorisé
+**État au 2026-06-15 (après-midi) :**
+- Sx_28 SPEC AMENDED (override #2 → Option A AUTORISÉE)
+- Dogfood Sx_27 toujours PENDING (non simulé, peut reverser Option A si livré)
+- Build Sx_29 (Mobile Focus Mode) **AUTORISÉ**
+- Options B/C/D/E restent bloquées
 
 **Séquence révisée :**
 
-1. **Maintenant** : exécuter le dogfood (humain, 5-7 séances sur 10-14 jours OU report rapide d'ici 2 jours)
-2. **À réception du dogfood** : demander `Sb_28.dogfood-integration` — sprint SPEC ONLY qui met à jour `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md §15/§20` selon les retours réels
-3. **Décision humaine** : trancher l'Option finale dans Sx_28 §15 (retirer "provisoire"), faire passer §20 vers `BUILD AUTHORIZED FOR <Option>`
-4. **Ensuite seulement** : ouvrir le build correspondant à l'Option retenue (recommandation provisoire : `Sx_29` Mobile Focus Mode)
-5. **Itérer** post-Sx_29 vers Sx_30 (Overload), Sx_31 (Body v2), Sx_32 (PWA), Sx_33+ (Health/API)
+1. **Prochaine action immédiate** : copier le prompt **`ROADMAP_AND_NEXT_STEPS.md §7.3`** (Sx_29 Mobile Session Focus Mode) → ouvrir `Sx_29` SPEC ONLY
+2. **Sx_29 doit produire sa spec d'abord** — pas de raccourci vers Sb_29.k
+3. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; **React production INTERDIT** dans Sx_29 ; lab React exploratoire acceptable séparément
+4. **En parallèle (opérateur)** : viser le dogfood Sx_27. Si livré, ouvrir `Sb_28.dogfood-integration` pour vérifier qu'Option A reste pertinente. Sinon, `Sb_27.next.<fix>` à intercaler avant la suite de Sx_29.
+5. **Options B/C/D/E** : restent bloquées tant qu'aucun override séparé n'est documenté
+6. **Itérer** post-Sx_29 vers Sx_30 (Overload), Sx_31 (Body v2), Sx_32 (PWA), Sx_33+ (Health/API) — **chacun nécessite son propre override ou un dogfood arrivé**
 
-**Anti-pattern à éviter (post-override) :** ouvrir un `Sb_28.k` ou `Sx_29` directement sans bascule §20 de Sx_28 vers `BUILD AUTHORIZED`. La spec elle-même bloque cette tentation (§16 conditions explicites).
+**Anti-patterns à éviter (post-override #2) :**
+- Ouvrir Sx_29 directement en BUILD `Sb_29.k` sans produire la spec d'abord — **interdit**, Sx_29 doit suivre le protocole spec-driven (§4 protocole)
+- Étendre l'override à Options B/C/D/E sans documentation séparée — **interdit**, override #2 borné à Option A
+- Introduire du React production dans Sx_29 — **interdit**
+- Réouvrir OQ Sx_27 tranchées sans preuve dogfood — **interdit**
+- Considérer Sx_27 comme product-validé — **interdit**, dogfood reste PENDING
 
 **Ce document est la première chose à relire quand tu reprends une session.** Il évite de redécouvrir la position et de poser des questions déjà tranchées.
 
