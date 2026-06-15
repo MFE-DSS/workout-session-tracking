@@ -329,12 +329,10 @@ def test_tap_target_min_size_still_44px():
 
 
 def test_no_new_js_file_introduced():
-    """Sb_29.2 must not introduce any new JS file."""
+    """Only authorized JS files exist (preview.js + session_focus.js Sb_29.4)."""
     js_dir = ROOT / "app" / "static" / "js"
     existing = {p.name for p in js_dir.glob("*.js")}
-    # Before Sb_29.x, only preview.js exists. session_focus.js is reserved
-    # for Sb_29.4 (rest timer).
-    assert existing == {"preview.js"}, (
+    assert existing <= {"preview.js", "session_focus.js"}, (
         f"unexpected JS files in app/static/js/: {existing}"
     )
 

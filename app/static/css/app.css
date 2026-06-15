@@ -3338,3 +3338,67 @@ details.exercise-card[open] .card__actions--exercise {
 }
 
 /* prefers-reduced-motion : pas d'animation introduite ici (OQ-E). */
+
+
+/* ============================================================
+   Sb_29.4 — Rest timer (progressive enhancement)
+   ------------------------------------------------------------
+   Affichage statique no-JS : "Repos suggere : 90s"
+   Si JS active : countdown via session_focus.js (vanilla, aucune dep).
+   Aucune action critique ne depend de ce timer.
+   Aucune animation introduite (OQ-E).
+   Hooks DOM :
+   - .session-focus__rest-timer            : wrapper
+   - .session-focus__rest-timer__label     : libelle "Repos suggere :"
+   - .session-focus__rest-timer__countdown : cible affichage JS
+   - .session-focus__rest-timer__skip      : bouton skip non critique
+   ============================================================ */
+
+.session-focus__rest-timer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: var(--bg-elev, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+  font-size: 14px;
+  /* Mobile 360x640 : ne pas creer de scroll horizontal. */
+  flex-wrap: wrap;
+}
+
+.session-focus__rest-timer__label {
+  font-weight: 500;
+  color: var(--fg, inherit);
+}
+
+.session-focus__rest-timer__countdown {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--fg, inherit);
+  min-width: 3ch;
+}
+
+.session-focus__rest-timer__skip {
+  margin-left: auto;
+}
+
+/* Etat actif (JS started) : marqueur visuel non animal. */
+.session-focus__rest-timer--running .session-focus__rest-timer__countdown {
+  color: var(--accent, currentColor);
+}
+
+/* Etat terminé : marqueur visuel discret. */
+.session-focus__rest-timer--done {
+  opacity: 0.7;
+}
+
+@media (max-width: 380px) {
+  .session-focus__rest-timer {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+}
+
+/* prefers-reduced-motion : pas d'animation introduite ici (OQ-E). */

@@ -417,4 +417,11 @@
       </button>
     </div>
   </form>
+  {# Sb_29.4 — Rest timer (progressive enhancement) sur la carte active
+     uniquement. Outside <form> pour ne pas affecter les POST. No-JS :
+     affichage statique "Repos suggéré : 90s". JS : countdown vanilla via
+     session_focus.js. Aucune action critique ne dépend de ce timer. #}
+  {% if is_active %}
+    {% include "_partials/rest_timer.html" %}
+  {% endif %}
 </details>

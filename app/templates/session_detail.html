@@ -161,4 +161,8 @@
 {% endif %}
 
 </div>
+{# Sb_29.4 — Rest timer progressive enhancement (vanilla JS, no framework,
+   no bundler, no external dep). Charge defer pour ne pas bloquer le SSR.
+   Si JS desactive, fallback statique "Repos suggere : 90s" preserve. #}
+<script src="{{ url_for('static', path='js/session_focus.js') }}" defer></script>
 {% endblock %}

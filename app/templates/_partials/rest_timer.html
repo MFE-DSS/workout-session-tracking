@@ -1,0 +1,39 @@
+{# Sb_29.4 — Rest timer (progressive enhancement, no-JS friendly).
+
+   Contrat :
+   - Affichage statique no-JS : "Repos suggéré : 90s"
+   - Si JS activé : countdown vanilla via app/static/js/session_focus.js
+   - Bouton "Skip rest" type="button", non critique (n'envoie aucun POST)
+   - Aucune action critique ne dépend de ce timer
+   - Aucune persistance V1
+   - Aucune nouvelle route, aucun modèle, aucune migration
+   - Hooks DOM :
+     * data-rest-duration="<seconds>" : durée demandée
+     * data-start-rest="<seconds>"    : signal de démarrage (OQ-C)
+     * data-rest-skip                  : bouton skip
+     * .session-focus__rest-timer__countdown : cible affichage JS
+   - prefers-reduced-motion respecté côté JS (pas d'animation ici)
+
+   Variable optionnelle :
+   - rest_seconds (int, défaut 90)
+#}
+{% set rest_seconds = rest_seconds | default(90) %}
+<div
+  class="session-focus__rest-timer"
+  data-rest-duration="{{ rest_seconds }}"
+  data-start-rest="{{ rest_seconds }}"
+  role="status"
+  aria-live="polite"
+>
+  <span class="session-focus__rest-timer__label">Repos suggéré&nbsp;:</span>
+  <span
+    class="session-focus__rest-timer__countdown"
+    data-rest-display
+  >{{ rest_seconds }}s</span>
+  <button
+    type="button"
+    class="btn btn--ghost session-focus__rest-timer__skip session-focus__tap-target"
+    data-rest-skip
+    aria-label="Passer le repos"
+  >Skip rest</button>
+</div>

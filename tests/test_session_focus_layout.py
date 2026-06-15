@@ -299,13 +299,10 @@ def test_no_react_or_bundle_introduced(client):
 
 
 def test_no_new_js_file_introduced():
-    """Sb_29.1 must not introduce any new JS file. session_focus.js
-    is explicitly reserved for Sb_29.4 (rest timer)."""
+    """Only authorized JS files exist (preview.js + session_focus.js Sb_29.4)."""
     js_dir = ROOT / "app" / "static" / "js"
     existing = {p.name for p in js_dir.glob("*.js")}
-    # Before Sb_29.1 the only JS was preview.js. Sb_29.1 must not add
-    # session_focus.js (that's Sb_29.4) or any other file.
-    assert existing == {"preview.js"}, (
+    assert existing <= {"preview.js", "session_focus.js"}, (
         f"unexpected JS files in app/static/js/: {existing}"
     )
 

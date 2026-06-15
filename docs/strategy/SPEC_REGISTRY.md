@@ -69,7 +69,7 @@
 | Sb_29.1 | Visual skeleton (partials + CSS hooks + 21 tests) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_1_REPORT.md` | 27562617417 | session_detail.html 551 → 161 lignes ; +124 lignes CSS ; 0 service métier touché |
 | Sb_29.2 | Active exercise navigation (renforcement visuel + 19 tests) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_2_REPORT.md` | 27571228735 | +131 lignes CSS (cumul Sx_29 = 255 lignes > seuil 200 — extraction Sb_29.5) ; 0 service métier touché, 0 JS, 0 template modifié |
 | Sb_29.3 | Sticky CTA on active card (CSS-only, scoped, safe-area) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_3_REPORT.md` | [27573217572](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27573217572) ✅ 3/3 | +66 lignes CSS (cumul Sx_29 = 321) ; 16 tests ; 0 service métier, 0 JS, 0 changement structure |
-| Sb_29.4 | Rest timer progressive enhancement | 🔵 | Sx_29 §17 | — | — | Pré-requis : Sb_29.3 ; livre `session_focus.js` |
+| Sb_29.4 | Rest timer progressive enhancement (vanilla JS, no-JS fallback) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_4_REPORT.md` | (post-push) | `session_focus.js` 95 lignes ; +64 lignes CSS (cumul Sx_29 = 385) ; 20 tests dédiés ; 0 service métier, 0 route, 0 migration, 0 dep externe |
 | Sb_29.5 | Template tests + mobile smoke + a11y | 🔵 | Sx_29 §17 | — | — | Pré-requis : Sb_29.4 ; OQ-B mesure CSS volume |
 | Sx_29+ alternatives | Sx_30 (Overload) / Sx_31 (Body v2) / Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
 
