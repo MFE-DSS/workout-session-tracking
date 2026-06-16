@@ -18,8 +18,8 @@
 | Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
 | Product validation Sx_29 | ⏳ **pending real dogfood** sur device 360×640 (cf. `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`) — bloque l'ouverture automatique de Sx_30 |
 | Build authorization | ✅ **AUTHORIZED FOR OPTION A** consommée par Sx_29 closed. Options B/C/D/E **restent bloquées** ; Sx_30 ne s'ouvre PAS sans override ou dogfood Sx_29 validé |
-| Dernier CI run vert | _Sb_29.5 — à renseigner après push_ ; précédent : [27577849433](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27577849433) (Sb_29.4) |
-| Tests | **~1178 passed** post Sb_29.5 (à confirmer en CI) |
+| Dernier CI run vert | [27604565634](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27604565634) (Sb_29.5 / Sx_29 closure) — 3/3 jobs verts |
+| Tests | **1173 passed** post Sb_29.5 |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
