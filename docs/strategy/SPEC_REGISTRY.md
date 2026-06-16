@@ -70,7 +70,8 @@
 | Sb_29.2 | Active exercise navigation (renforcement visuel + 19 tests) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_2_REPORT.md` | 27571228735 | +131 lignes CSS (cumul Sx_29 = 255 lignes > seuil 200 — extraction Sb_29.5) ; 0 service métier touché, 0 JS, 0 template modifié |
 | Sb_29.3 | Sticky CTA on active card (CSS-only, scoped, safe-area) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_3_REPORT.md` | [27573217572](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27573217572) ✅ 3/3 | +66 lignes CSS (cumul Sx_29 = 321) ; 16 tests ; 0 service métier, 0 JS, 0 changement structure |
 | Sb_29.4 | Rest timer progressive enhancement (vanilla JS, no-JS fallback) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_4_REPORT.md` | [27577849433](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27577849433) ✅ 3/3 | `session_focus.js` 95 lignes ; +64 lignes CSS (cumul Sx_29 = 385) ; 20 tests dédiés ; 0 service métier, 0 route, 0 migration, 0 dep externe |
-| Sb_29.5 | Template tests + mobile smoke + a11y | 🔵 | Sx_29 §17 | — | — | Pré-requis : Sb_29.4 ; OQ-B mesure CSS volume |
+| Sb_29.5 | Template tests + mobile smoke + a11y + extraction `session_focus.css` + closure | ✅ | Sx_29 §17 | `SPRINT_Sb_29_5_REPORT.md` | (post-push) | Extraction 384 lignes CSS → `session_focus.css` (app.css revient pré-Sx_29) ; 17 tests ajoutés (9 smoke + 8 a11y) ; 0 service métier, 0 route, 0 migration, 0 dep externe |
+| **Sx_29 CLOSURE** | Technically closed — dogfood device réel pending | ✅ TECH CLOSED | `Sx_29_CLOSURE_REPORT.md` + `SESSION_FOCUS_MOBILE_AUDIT_2026-06-16.md` + `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md` | — | (Sb_29.5 CI run) | Sx_30 ne s'ouvre PAS sans override ou dogfood validé |
 | Sx_29+ alternatives | Sx_30 (Overload) / Sx_31 (Body v2) / Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
 
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2

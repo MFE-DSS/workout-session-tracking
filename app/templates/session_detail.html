@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% from "_macros.html" import segmented, field_group %}
+{# Sb_29.5 — session_focus.css extrait de app.css. Chargé APRES app.css
+   (cascade preservée pour les overrides Sx_29 sur classes legacy
+   .ex-jump / .exercise-card / .card). Ciblé page session detail
+   uniquement (pas de poids global). #}
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/session_focus.css') }}" />
+{% endblock %}
 {% block content %}
 
 <div class="session-page session-focus {% if session.status == 'completed' %}session-page--completed{% endif %}">

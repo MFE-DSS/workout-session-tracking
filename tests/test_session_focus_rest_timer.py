@@ -28,6 +28,7 @@ PARTIAL_CARD = ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
 SESSION_DETAIL = ROOT / "app" / "templates" / "session_detail.html"
 JS_FILE = ROOT / "app" / "static" / "js" / "session_focus.js"
 APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
+FOCUS_CSS = ROOT / "app" / "static" / "css" / "session_focus.css"
 
 
 # ───────── seed helpers ─────────
@@ -289,7 +290,7 @@ def test_update_exercise_card_form_action_preserved(client):
 
 
 def test_css_has_rest_timer_block():
-    css = APP_CSS.read_text(encoding="utf-8")
+    css = APP_CSS.read_text(encoding="utf-8") + "\n" + FOCUS_CSS.read_text(encoding="utf-8")
     assert ".session-focus__rest-timer" in css
     assert ".session-focus__rest-timer__countdown" in css
 

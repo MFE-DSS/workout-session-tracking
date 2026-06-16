@@ -25,6 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
+FOCUS_CSS = ROOT / "app" / "static" / "css" / "session_focus.css"
 PARTIAL = ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
 
 
@@ -64,7 +65,7 @@ def _render(client, session_id) -> str:
 
 
 def _css() -> str:
-    return APP_CSS.read_text(encoding="utf-8")
+    return APP_CSS.read_text(encoding="utf-8") + "\n" + FOCUS_CSS.read_text(encoding="utf-8")
 
 
 # ───────── CTA hook classes on the rendered HTML ─────────

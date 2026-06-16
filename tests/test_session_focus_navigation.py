@@ -22,6 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
+FOCUS_CSS = ROOT / "app" / "static" / "css" / "session_focus.css"
 
 
 # ───────── seed helpers ─────────
@@ -238,7 +239,7 @@ def test_prev_next_buttons_preserved(client):
 
 
 def _css() -> str:
-    return APP_CSS.read_text(encoding="utf-8")
+    return APP_CSS.read_text(encoding="utf-8") + "\n" + FOCUS_CSS.read_text(encoding="utf-8")
 
 
 def test_css_active_card_has_box_shadow():

@@ -14,11 +14,12 @@
 | Sx_26 — Engineering Control Plane | ✅ clôturé 2026-06-14 (cf. `Sx_26_CLOSURE_REPORT.md`) |
 | Sx_27 — Coaching Loop & Product Activation | ✅ **technically closed** 2026-06-15 (cf. `Sx_27_CLOSURE_REPORT.md`) |
 | Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC AMENDED** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
-| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **SPEC ONLY** ouverte 2026-06-15 sous override #2 (cf. `Sx_29_MOBILE_SESSION_FOCUS_MODE_SPEC.md`) |
+| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **TECHNICALLY CLOSED** 2026-06-16 (Sb_29.1 → Sb_29.5 livrés, cf. `Sx_29_CLOSURE_REPORT.md`) — dogfood device réel pending (cf. `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`) |
 | Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
-| Build authorization | ✅ **AUTHORIZED FOR OPTION A** (Sx_29 Mobile Session Focus Mode) sous override explicite 2026-06-15. Options B/C/D/E **restent bloquées** (override séparé requis) |
-| Dernier CI run vert | [#27554090915](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27554090915) |
-| Tests | **1080 passed** |
+| Product validation Sx_29 | ⏳ **pending real dogfood** sur device 360×640 (cf. `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`) — bloque l'ouverture automatique de Sx_30 |
+| Build authorization | ✅ **AUTHORIZED FOR OPTION A** consommée par Sx_29 closed. Options B/C/D/E **restent bloquées** ; Sx_30 ne s'ouvre PAS sans override ou dogfood Sx_29 validé |
+| Dernier CI run vert | _Sb_29.5 — à renseigner après push_ ; précédent : [27577849433](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27577849433) (Sb_29.4) |
+| Tests | **~1178 passed** post Sb_29.5 (à confirmer en CI) |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
@@ -375,12 +376,13 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
 
 **Séquence révisée :**
 
-1. ~~**Prochaine action immédiate** : copier le prompt §7.3 → ouvrir Sx_29 SPEC ONLY~~ **✅ FAIT 2026-06-15** : `Sx_29_MOBILE_SESSION_FOCUS_MODE_SPEC.md` livrée
-2. **Prochaine action maintenant** : relire la spec Sx_29, trancher OQ-A à OQ-E (§19), valider conditions §18, puis ouvrir `Sb_29.1` (visual skeleton)
-3. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; **React production INTERDIT** dans Sx_29 ; lab React exploratoire acceptable séparément
-4. **En parallèle (opérateur)** : viser le dogfood Sx_27. Si livré, ouvrir `Sb_28.dogfood-integration` pour vérifier qu'Option A reste pertinente. Sinon, `Sb_27.next.<fix>` à intercaler avant la suite de Sx_29.
-5. **Options B/C/D/E** : restent bloquées tant qu'aucun override séparé n'est documenté
-6. **Itérer** post-Sx_29 vers Sx_30 (Overload), Sx_31 (Body v2), Sx_32 (PWA), Sx_33+ (Health/API) — **chacun nécessite son propre override ou un dogfood arrivé**
+1. ~~**Prochaine action immédiate** : copier le prompt §7.3 → ouvrir Sx_29 SPEC ONLY~~ **✅ FAIT 2026-06-15**
+2. ~~**Prochaine action maintenant** : trancher OQ-A à OQ-E (§19) puis ouvrir `Sb_29.1`~~ **✅ FAIT 2026-06-15/16 : Sb_29.1 → Sb_29.5 livrés**
+3. **Prochaine action maintenant** : **exécuter le dogfood Sx_29 device réel** sur la base de `docs/dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`. Ce dogfood est requis avant toute ouverture de Sx_30 (sauf override utilisateur séparé)
+4. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT (Sx_29 fermé sans avoir introduit React) ; lab React exploratoire acceptable séparément
+5. **En parallèle (opérateur)** : viser AUSSI le dogfood Sx_27 toujours pending. Les deux dogfoods peuvent être exécutés indépendamment
+6. **Options B/C/D/E** : restent bloquées tant qu'aucun override séparé n'est documenté
+7. **Itérer** post-Sx_29 vers Sx_30 (Overload), Sx_31 (Body v2), Sx_32 (PWA), Sx_33+ (Health/API) — **chacun nécessite son propre override ou un dogfood Sx_29 validé**. Sx_30 ne s'ouvre PAS automatiquement
 
 **Anti-patterns à éviter (post-override #2) :**
 - Ouvrir Sx_29 directement en BUILD `Sb_29.k` sans produire la spec d'abord — **interdit**, Sx_29 doit suivre le protocole spec-driven (§4 protocole)
