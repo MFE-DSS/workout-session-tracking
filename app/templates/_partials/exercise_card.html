@@ -253,6 +253,19 @@
       {% endif %}
     {% endif %}
 
+    {# Sb_30.3 — Overload hint first render. Active card uniquement.
+       Le router skip déjà les hints silent / unknown ; le partial
+       garde l'assertion défensive `if hint and not hint.is_silent`.
+       Pas de duplication avec progression_hint legacy : ce module
+       proposera une cible chiffrée (kg/reps) en addition du repère
+       qualitatif déjà affiché plus haut. #}
+    {% if is_active %}
+      {% set hint = overload_hints.get(se.id) %}
+      {% if hint %}
+        {% include "_partials/overload_hint.html" %}
+      {% endif %}
+    {% endif %}
+
     {% if se.set_logs|length > 0 %}
       {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
       {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}

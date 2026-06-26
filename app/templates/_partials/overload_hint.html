@@ -1,0 +1,43 @@
+{# Sb_30.3 — Overload hint UI first render.
+
+   Consomme `hint` (payload produit par overload_explainer.explain_overload_hint).
+   Affiché UNIQUEMENT sur la carte active, UNIQUEMENT si `hint.is_silent`
+   est False (le contrat router skip déjà les hints silent côté Python ;
+   on garde l'assertion défensive ici).
+
+   Pas de mur de texte : intent label + cible compacte + reasons dépliable
+   via <details> natif (no-JS friendly). Mobile-first via classes
+   `overload-hint` + state modifier.
+
+   Aucun wording autoritaire ; le payload est déjà validé par tests
+   (`test_intent_label_never_authoritative`).
+
+   Variable consommée :
+   - hint (dict) : payload depuis overload_hints[se.id]
+       * state, intent_label, target_summary, reasons, engine_version, is_silent
+#}
+{% if hint and not hint.is_silent %}
+<div
+  class="overload-hint overload-hint--{{ hint.state }}"
+  data-overload-state="{{ hint.state }}"
+  data-engine-version="{{ hint.engine_version }}"
+  role="status"
+>
+  <div class="overload-hint__head">
+    <span class="overload-hint__intent">{{ hint.intent_label }}</span>
+    {% if hint.target_summary %}
+    <span class="overload-hint__target">{{ hint.target_summary }}</span>
+    {% endif %}
+  </div>
+  {% if hint.reasons %}
+  <details class="overload-hint__why">
+    <summary class="overload-hint__why-toggle">Pourquoi&nbsp;?</summary>
+    <ul class="overload-hint__reasons">
+      {% for r in hint.reasons %}
+      <li class="overload-hint__reason">{{ r }}</li>
+      {% endfor %}
+    </ul>
+  </details>
+  {% endif %}
+</div>
+{% endif %}

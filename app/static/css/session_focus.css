@@ -403,3 +403,135 @@
 }
 
 /* prefers-reduced-motion : pas d'animation introduite ici (OQ-E). */
+
+
+/* ============================================================
+   Sb_30.3 — Overload hint (Progressive Overload Engine UI V1)
+   ------------------------------------------------------------
+   Affichage sobre, compact, mobile-first. 5 etats visuels avec
+   non-color cues (border-left + icone unicode dans intent label).
+   Affiche UNIQUEMENT sur la carte active (cf. exercise_card.html
+   wrapping `{% if is_active %}`). Aucun JS requis : <details>
+   natif HTML pour replier les reasons.
+   ============================================================ */
+
+.overload-hint {
+  margin: 8px 0;
+  padding: 8px 12px;
+  background: var(--bg-elev, rgba(0, 0, 0, 0.03));
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-left: 3px solid var(--fg-dim, #6b7280);
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.overload-hint__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 12px;
+}
+
+.overload-hint__intent {
+  font-weight: 600;
+  color: var(--fg, inherit);
+}
+
+.overload-hint__target {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  color: var(--fg-dim, #6b7280);
+}
+
+.overload-hint__why {
+  margin-top: 6px;
+}
+
+.overload-hint__why-toggle {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-dim, #6b7280);
+  list-style: none;
+  /* Tap target reduit acceptable car secondary (non critique). */
+  padding: 2px 0;
+}
+
+.overload-hint__why-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.overload-hint__why-toggle::before {
+  content: "▸ ";
+  display: inline-block;
+  transition: none;
+}
+
+.overload-hint__why[open] .overload-hint__why-toggle::before {
+  content: "▾ ";
+}
+
+.overload-hint__reasons {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--fg-dim, #6b7280);
+  font-size: 12px;
+}
+
+.overload-hint__reason {
+  margin: 2px 0;
+}
+
+/* Etats visuels — non-color cues via icone unicode AVANT intent + border-left. */
+.overload-hint--progress {
+  border-left-color: var(--ok, #16a34a);
+}
+.overload-hint--progress .overload-hint__intent::before {
+  content: "↑ ";
+  font-weight: 700;
+}
+
+.overload-hint--consolidate {
+  border-left-color: var(--accent, #2563eb);
+}
+.overload-hint--consolidate .overload-hint__intent::before {
+  content: "→ ";
+  font-weight: 700;
+}
+
+.overload-hint--top-range {
+  border-left-color: var(--accent, #2563eb);
+}
+.overload-hint--top-range .overload-hint__intent::before {
+  content: "🏁 ";
+}
+
+.overload-hint--deload {
+  border-left-color: var(--warn, #d97706);
+}
+.overload-hint--deload .overload-hint__intent::before {
+  content: "↓ ";
+  font-weight: 700;
+}
+
+/* `unknown` ne devrait pas etre rendu (router skip + partial guard),
+   mais on pose un style minimal de securite si jamais. */
+.overload-hint--unknown {
+  border-left-color: var(--fg-dim, #6b7280);
+  opacity: 0.85;
+}
+.overload-hint--unknown .overload-hint__intent::before {
+  content: "? ";
+}
+
+@media (max-width: 380px) {
+  .overload-hint {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  .overload-hint__reasons {
+    font-size: 11px;
+  }
+}
+
+/* prefers-reduced-motion : pas d'animation introduite (OQ-E). */

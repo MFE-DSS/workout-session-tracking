@@ -121,6 +121,14 @@ class WorkoutSession(Base):
         Integer, nullable=False, server_default="1", default=1
     )
 
+    # Sb_30.3 — overload engine version pinned per session (Sx_30 OQ-B).
+    # Reproducibility : a session computed with engine v=N can always be
+    # rendered identically by the same engine version. Existing rows get
+    # 1 via the column DEFAULT.
+    overload_engine_version: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="1", default=1
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
