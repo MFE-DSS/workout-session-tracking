@@ -44,11 +44,11 @@ Ouvrir Sx_30 (Progressive Overload Engine) en **SPEC ONLY** sous override utilis
 
 ## 5. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28238984400](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28238984400) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu (aucun changement de code)
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success (aucun changement de code, surface inchangée)
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 6. OQ Sx_30 à trancher (rappel)
 
