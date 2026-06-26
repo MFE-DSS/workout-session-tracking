@@ -14,10 +14,10 @@
 | Sx_26 — Engineering Control Plane | ✅ clôturé 2026-06-14 (cf. `Sx_26_CLOSURE_REPORT.md`) |
 | Sx_27 — Coaching Loop & Product Activation | ✅ **technically closed** 2026-06-15 (cf. `Sx_27_CLOSURE_REPORT.md`) |
 | Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC AMENDED** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
-| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **TECHNICALLY CLOSED** 2026-06-16 (Sb_29.1 → Sb_29.5 livrés, cf. `Sx_29_CLOSURE_REPORT.md`) — dogfood device réel pending (cf. `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`) |
+| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **TECHNICALLY CLOSED + DOGFOOD ✅ PASS** 2026-06-16 (Sb_29.1 → Sb_29.5 livrés + dogfood opérateur satisfaisant) |
 | Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
-| Product validation Sx_29 | ⏳ **pending real dogfood** sur device 360×640 (cf. `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`) — bloque l'ouverture automatique de Sx_30 |
-| Build authorization | ✅ **AUTHORIZED FOR OPTION A** consommée par Sx_29 closed. Options B/C/D/E **restent bloquées** ; Sx_30 ne s'ouvre PAS sans override ou dogfood Sx_29 validé |
+| Product validation Sx_29 | ✅ **dogfood PASS** 2026-06-16 — opérateur satisfait du fonctionnement focus mode + sticky CTA + rest timer + no-JS |
+| Build authorization | ✅ **AUTHORIZED FOR OPTION B (Sx_30 Progressive Overload Engine) en SPEC ONLY** sous override utilisateur 2026-06-16 post-dogfood Sx_29. Options C/D/E restent bloquées (override séparé requis). Build Sx_30 subordonné à validation Sb_30.0. |
 | Dernier CI run vert | [27604565634](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27604565634) (Sb_29.5 / Sx_29 closure) — 3/3 jobs verts |
 | Tests | **1173 passed** post Sb_29.5 |
 | Ruff budget | **534 ≤ 548** |

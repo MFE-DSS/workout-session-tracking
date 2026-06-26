@@ -2,7 +2,8 @@
 
 **Spec source :** `docs/strategy/Sx_29_MOBILE_SESSION_FOCUS_MODE_SPEC.md`
 **Date closure :** 2026-06-16
-**Statut :** ✅ **TECHNICALLY CLOSED** — dogfood device réel PENDING
+**Statut :** ✅ **TECHNICALLY CLOSED** + ✅ **DOGFOOD PASSED** 2026-06-16
+**Verdict opérateur :** dans l'ensemble satisfait du fonctionnement des features mobile (focus mode, sticky CTA, rest timer, no-JS fallback). Pas de friction sévérité high remontée → débloque l'ouverture du prochain Sx_ sur override utilisateur.
 **Branche :** `claude/sprint-reporting-fitness-app-V7Qr6`
 
 ---
@@ -132,15 +133,17 @@ Aucun de ces modules n'a été modifié au cours de Sx_29. Vérifiable par
 
 ## 10. Recommandation
 
-**Sx_29 TECHNICALLY CLOSED.**
+**Sx_29 TECHNICALLY CLOSED + DOGFOOD ✅ PASS.**
 
-Conditions pour ouvrir Sx_30 :
-1. Dogfood Sx_29 device réel exécuté avec verdict ✅ ou ⚠️.
-2. Frictions sévérité high traitées (`Sb_29.next.polish-1` si nécessaire).
-3. Override utilisateur explicite si Sx_30 doit ouvrir avant dogfood.
+Conditions pour ouvrir Sx_30 — état actuel :
+1. ✅ Dogfood Sx_29 device réel exécuté — verdict opérateur **satisfaisant** (2026-06-16).
+2. ✅ Aucune friction sévérité high → `Sb_29.next.polish-1` non requis en blocking ; reste différé.
+3. ✅ Override utilisateur explicite reçu 2026-06-16 pour ouvrir Sx_30 SPEC ONLY.
 
-En l'absence de l'une de ces conditions, **NE PAS OUVRIR Sx_30**.
-Les options B/C/D/E restent bloquées indépendamment.
+**Sx_30 (Progressive Overload Engine) AUTORISÉ EN SPEC ONLY.**
+Build Sx_30 reste subordonné à la validation de spec (Sb_30.0).
+Options Sx_31 / Sx_32 / Sx_33+ restent bloquées (override séparé requis pour chaque).
+Dogfood Sx_27 reste indépendamment PENDING.
 
 ## 11. Pointeurs
 
