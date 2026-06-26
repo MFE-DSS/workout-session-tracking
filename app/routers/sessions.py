@@ -48,7 +48,6 @@ from app.services.overload_engine import compute_overload_hint
 from app.services.overload_explainer import explain_overload_hint
 from app.services.overload_inputs import build_overload_input_for_exercise
 from app.services.ownership import get_owned_session_or_404
-from app.services.progression_hint import compute_progression_hint
 from app.services.session_builder import instantiate_session
 from app.services.session_recap import build_recap
 from app.services.session_state import latest_open_session
@@ -217,23 +216,10 @@ def session_detail(
         db, session, datetime.now(UTC)
     )
 
-    # Progression hint per exercise card: based strictly on the first
-    # rep target of the current template_exercise and the first
-    # completed work set of the prior session.
-    hints: dict[str, str | None] = {}
-    for se in session.session_exercises:
-        code = se.exercise_code_snapshot
-        prior = last_time.get(code)
-        tgt_min, tgt_max = None, None
-        te = se.template_exercise
-        if te and te.rep_targets:
-            first_rt = sorted(te.rep_targets, key=lambda r: r.set_index)[0]
-            tgt_min, tgt_max = first_rt.min_reps, first_rt.max_reps
-        prior_w, prior_r = None, None
-        if prior and prior.get("first_set"):
-            prior_w = prior["first_set"].get("weight_kg")
-            prior_r = prior["first_set"].get("reps")
-        hints[code] = compute_progression_hint(tgt_min, tgt_max, prior_w, prior_r)
+    # Sb_30.4 — legacy "Repère" hint removed. Guidance now delivered
+    # exclusively via overload_hints (deterministic engine + numeric
+    # target + reasons, cf. Sx_30 §6). No consumers remain for the
+    # legacy `hints` dict ; the import + injection are gone.
 
     # Sb_30.2 — Progressive Overload Engine V1 injection.
     # Calcule un OverloadHint par SessionExercise et l'explain en payload
@@ -410,7 +396,6 @@ def session_detail(
             "stats": stats,
             "rules": rules,
             "last_time": last_time,
-            "hints": hints,
             "overload_hints": overload_hints,
             "exercise_summaries": exercise_summaries,
             "deltas": delta_labels,

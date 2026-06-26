@@ -388,13 +388,35 @@ def test_exercise_card_includes_overload_partial():
     assert "Sb_30.3" in src
 
 
-# ───────── pas de duplication avec progression_hint legacy ─────────
+# ───────── progression_hint legacy supprimé (Sb_30.4) ─────────
 
 
-def test_progression_hint_legacy_still_intact():
-    """Sb_30.3 ne supprime pas progression_hint.py — Sb_30.4 le fera."""
+def test_progression_hint_legacy_removed():
+    """Sb_30.4 a retiré progression_hint.py et son injection ; le hint
+    overload prend désormais entièrement le relais."""
     legacy = ROOT / "app" / "services" / "progression_hint.py"
-    assert legacy.exists()
+    assert not legacy.exists(), "progression_hint.py legacy must be removed"
+    legacy_tests = ROOT / "tests" / "test_progression_hint.py"
+    assert not legacy_tests.exists(), "tests/test_progression_hint.py must be removed"
+
+
+def test_router_no_longer_imports_progression_hint():
+    router = (ROOT / "app" / "routers" / "sessions.py").read_text(encoding="utf-8")
+    assert "progression_hint" not in router
+    assert "compute_progression_hint" not in router
+    # La clé "hints" legacy ne doit plus être injectée dans le contexte.
+    assert '"hints":' not in router
+
+
+def test_exercise_card_no_longer_renders_repere_block():
+    card = (
+        ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
+    ).read_text(encoding="utf-8")
+    assert "Repère" not in card
+    assert 'class="hint__label"' not in card
+    assert 'class="hint__text"' not in card
+    # La variable `hints` Jinja n'est plus consommée.
+    assert "hints.get(se.exercise_code_snapshot)" not in card
 
 
 # ───────── owner isolation ─────────

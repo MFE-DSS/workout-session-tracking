@@ -26,7 +26,7 @@
    - substitution_data[se.id]
    - last_time[se.exercise_code_snapshot]
    - deltas[se.exercise_code_snapshot]
-   - hints[se.exercise_code_snapshot]
+   - overload_hints[se.id]               (Sb_30.3 ; remplace `hints` legacy)
    - sb08_hints_by_exercise[se.id]
    - peek_for_active (si is_active)
    - next_code_by_exercise[se.id] / prev_code_by_exercise[se.id]
@@ -230,13 +230,9 @@
       </div>
     {% endif %}
 
-    {% set hint = hints.get(se.exercise_code_snapshot) %}
-    {% if hint %}
-      <div class="hint">
-        <span class="hint__label">Repère</span>
-        <span class="hint__text">{{ hint }}</span>
-      </div>
-    {% endif %}
+    {# Sb_30.4 — Legacy qualitative hint block removed. Primary guidance
+       now lives in the overload hint partial rendered on the active card
+       (cf. _partials/overload_hint.html). #}
 
     {# Sb_08 — contextual hints on the active card only #}
     {% if is_active %}
@@ -256,9 +252,9 @@
     {# Sb_30.3 — Overload hint first render. Active card uniquement.
        Le router skip déjà les hints silent / unknown ; le partial
        garde l'assertion défensive `if hint and not hint.is_silent`.
-       Pas de duplication avec progression_hint legacy : ce module
-       proposera une cible chiffrée (kg/reps) en addition du repère
-       qualitatif déjà affiché plus haut. #}
+       Unique source de guidance après Sb_30.4 (le bloc qualitatif
+       legacy a été retiré) : ce partial propose une cible chiffrée
+       (kg/reps) + reasons. #}
     {% if is_active %}
       {% set hint = overload_hints.get(se.id) %}
       {% if hint %}
