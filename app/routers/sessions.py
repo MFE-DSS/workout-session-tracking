@@ -44,6 +44,9 @@ from app.services.form_parsing import (
     to_float,
     to_int,
 )
+from app.services.overload_engine import compute_overload_hint
+from app.services.overload_explainer import explain_overload_hint
+from app.services.overload_inputs import build_overload_input_for_exercise
 from app.services.ownership import get_owned_session_or_404
 from app.services.progression_hint import compute_progression_hint
 from app.services.session_builder import instantiate_session
@@ -232,6 +235,21 @@ def session_detail(
             prior_r = prior["first_set"].get("reps")
         hints[code] = compute_progression_hint(tgt_min, tgt_max, prior_w, prior_r)
 
+    # Sb_30.2 — Progressive Overload Engine V1 injection.
+    # Calcule un OverloadHint par SessionExercise et l'explain en payload
+    # template (dict). Ne consomme pas encore exercise_card.html (Sb_30.3+).
+    # Si l'input est None (target manquante), on rend l'hint silencieux.
+    overload_hints: dict[int, dict] = {}
+    for se in session.session_exercises:
+        ov_input = build_overload_input_for_exercise(db, session, se)
+        if ov_input is None:
+            continue
+        hint = compute_overload_hint(ov_input)
+        explained = explain_overload_hint(hint)
+        if explained["is_silent"]:
+            continue
+        overload_hints[se.id] = explained
+
     # Per-exercise compact summary used by the completed-session
     # readability block (still computed even when in_progress, the
     # template decides whether to render it).
@@ -393,6 +411,7 @@ def session_detail(
             "rules": rules,
             "last_time": last_time,
             "hints": hints,
+            "overload_hints": overload_hints,
             "exercise_summaries": exercise_summaries,
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
