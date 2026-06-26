@@ -72,6 +72,13 @@
 | Sb_29.4 | Rest timer progressive enhancement (vanilla JS, no-JS fallback) | ✅ | Sx_29 §17 | `SPRINT_Sb_29_4_REPORT.md` | [27577849433](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27577849433) ✅ 3/3 | `session_focus.js` 95 lignes ; +64 lignes CSS (cumul Sx_29 = 385) ; 20 tests dédiés ; 0 service métier, 0 route, 0 migration, 0 dep externe |
 | Sb_29.5 | Template tests + mobile smoke + a11y + extraction `session_focus.css` + closure | ✅ | Sx_29 §17 | `SPRINT_Sb_29_5_REPORT.md` | [27604565634](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27604565634) ✅ 3/3 | Extraction 384 lignes CSS → `session_focus.css` (app.css revient pré-Sx_29) ; 17 tests ajoutés (9 smoke + 8 a11y) ; 0 service métier, 0 route, 0 migration, 0 dep externe |
 | **Sx_29 CLOSURE** | Technically closed + Dogfood ✅ PASS 2026-06-16 | ✅ TECH CLOSED + DOGFOOD PASS | `Sx_29_CLOSURE_REPORT.md` + `SESSION_FOCUS_MOBILE_AUDIT_2026-06-16.md` + `dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md` | — | [27604565634](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27604565634) ✅ | Verdict opérateur satisfaisant. Sx_30 autorisé en SPEC ONLY ; build Sx_30 subordonné à Sb_30.0 review. Sx_31/32/33+ restent bloqués (override séparé). |
+| **Sx_30** Progressive Overload Engine | SPEC ONLY ouvert sous override #3 (post-dogfood Sx_29) | 🟡 SPEC ONLY | Sx_30 §1-20 | `Sx_30_PROGRESSIVE_OVERLOAD_ENGINE_SPEC.md` | (Sb_30.0 CI) | FastAPI SSR + Jinja2 ; pas de React ; build queue Sb_30.1-5 à valider ; OQ-A→OQ-E à trancher |
+| Sb_30.0 | Spec review + sprint report spec (SPEC ONLY) | ✅ | Sx_30 §17 | `SPRINT_Sb_30_0_REPORT.md` | (post-push) | Aucun code touché en app/ ; 0 service, 0 migration, 0 template, 0 test |
+| Sb_30.1 | overload_engine.py v1 + tests unitaires | 🔵 spec-pending | Sx_30 §14 | — | — | Pré-requis : Sb_30.0 accepté + override #3 BUILD AUTHORIZED |
+| Sb_30.2 | overload_explainer.py + injection router | 🔵 spec-pending | Sx_30 §14 | — | — | Pré-requis : Sb_30.1 |
+| Sb_30.3 | Migration + template overload_hint.html + CSS | 🔵 spec-pending | Sx_30 §14 | — | — | Pré-requis : Sb_30.2 |
+| Sb_30.4 | Remplacement legacy progression_hint.py | 🔵 spec-pending | Sx_30 §14 | — | — | Pré-requis : Sb_30.3 |
+| Sb_30.5 | A11y + tests + closure Sx_30 | 🔵 spec-pending | Sx_30 §14 | — | — | Pré-requis : Sb_30.4 |
 | Sx_29+ alternatives | Sx_30 (Overload) / Sx_31 (Body v2) / Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
 
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2

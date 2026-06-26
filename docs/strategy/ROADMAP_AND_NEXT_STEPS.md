@@ -378,7 +378,9 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
 
 1. ~~**Prochaine action immédiate** : copier le prompt §7.3 → ouvrir Sx_29 SPEC ONLY~~ **✅ FAIT 2026-06-15**
 2. ~~**Prochaine action maintenant** : trancher OQ-A à OQ-E (§19) puis ouvrir `Sb_29.1`~~ **✅ FAIT 2026-06-15/16 : Sb_29.1 → Sb_29.5 livrés**
-3. **Prochaine action maintenant** : **exécuter le dogfood Sx_29 device réel** sur la base de `docs/dogfood/DOGFOOD_Sx_29_FOCUS_MODE_TEMPLATE.md`. Ce dogfood est requis avant toute ouverture de Sx_30 (sauf override utilisateur séparé)
+3. ~~**Prochaine action maintenant** : exécuter le dogfood Sx_29 device réel~~ **✅ FAIT 2026-06-16 : verdict opérateur satisfaisant**
+4. ~~Ouvrir Sx_30 SPEC ONLY~~ **✅ FAIT 2026-06-16 : `Sx_30_PROGRESSIVE_OVERLOAD_ENGINE_SPEC.md` livrée, Sb_30.0 livré**
+5. **Prochaine action maintenant** : revue utilisateur OQ-A→OQ-E de Sx_30 (§18), validation build queue (§14), bascule explicite `BUILD AUTHORIZED FOR Sx_30` (override #3) AVANT de commencer `Sb_30.1`
 4. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT (Sx_29 fermé sans avoir introduit React) ; lab React exploratoire acceptable séparément
 5. **En parallèle (opérateur)** : viser AUSSI le dogfood Sx_27 toujours pending. Les deux dogfoods peuvent être exécutés indépendamment
 6. **Options B/C/D/E** : restent bloquées tant qu'aucun override séparé n'est documenté
