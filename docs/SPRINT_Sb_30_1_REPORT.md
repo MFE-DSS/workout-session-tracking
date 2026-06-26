@@ -60,11 +60,11 @@ Incréments :
 
 ## 5. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28241678098](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28241678098) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 6. Métriques
 
