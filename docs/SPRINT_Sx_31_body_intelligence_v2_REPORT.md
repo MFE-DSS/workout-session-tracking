@@ -154,11 +154,11 @@ Spec acceptée ssi l'opérateur valide (cf. spec §M) :
 
 ## 11. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28300352085](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28300352085) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu (aucun changement de code)
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 12. OQ à trancher avant Sb_31.1 (rappel)
 
