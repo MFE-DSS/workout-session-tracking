@@ -1,37 +1,59 @@
-{# Sb_30.3 — Overload hint UI first render.
+{# Sb_30.3 / Sb_30.5 — Overload hint UI.
 
    Consomme `hint` (payload produit par overload_explainer.explain_overload_hint).
    Affiché UNIQUEMENT sur la carte active, UNIQUEMENT si `hint.is_silent`
    est False (le contrat router skip déjà les hints silent côté Python ;
    on garde l'assertion défensive ici).
 
-   Pas de mur de texte : intent label + cible compacte + reasons dépliable
-   via <details> natif (no-JS friendly). Mobile-first via classes
-   `overload-hint` + state modifier.
-
-   Aucun wording autoritaire ; le payload est déjà validé par tests
-   (`test_intent_label_never_authoritative`).
+   Sb_30.5 a11y consolidation :
+   - aria-labelledby="<id>__intent" sur le wrapper pour qu'un lecteur
+     d'écran lise d'abord l'intention (ex. "Tenter d'augmenter la
+     charge") avant les détails.
+   - id unique par card (`overload-hint-<se.id>__intent`) → permet
+     plusieurs hints sur la page sans collision (multi-session detail).
+   - <details>/<summary> natifs HTML pour la navigation clavier
+     (Tab focus, Space/Enter pour ouvrir, géré par le browser).
+   - aria-controls/aria-expanded gérés nativement par <details>.
+   - decorative ::before icônes restent CSS-only (le contenu CSS est
+     parfois lu par AT mais le texte intent_label porte déjà toute la
+     sémantique — l'icône est de la pure surcouche scanabilité).
+   - target_summary balisé <strong> pour souligner la cible chiffrée
+     (sémantique HTML forte, sans verbe autoritaire).
+   - summary "Pourquoi ?" complété par aria-label="Voir les raisons
+     de la suggestion" pour les utilisateurs de lecteurs d'écran
+     (qui voient "Pourquoi" hors contexte sinon).
+   - Liste <ul>/<li> sémantique pour les reasons (déjà OK Sb_30.3).
 
    Variable consommée :
    - hint (dict) : payload depuis overload_hints[se.id]
        * state, intent_label, target_summary, reasons, engine_version, is_silent
+   - se (loop var depuis exercise_card.html) : utilisé pour générer des
+     IDs uniques aria (aria-labelledby pointe sur l'intent de chaque card).
 #}
 {% if hint and not hint.is_silent %}
+{% set hint_id = "overload-hint-" ~ se.id %}
 <div
   class="overload-hint overload-hint--{{ hint.state }}"
   data-overload-state="{{ hint.state }}"
   data-engine-version="{{ hint.engine_version }}"
   role="status"
+  aria-labelledby="{{ hint_id }}__intent"
 >
   <div class="overload-hint__head">
-    <span class="overload-hint__intent">{{ hint.intent_label }}</span>
+    <span
+      id="{{ hint_id }}__intent"
+      class="overload-hint__intent"
+    >{{ hint.intent_label }}</span>
     {% if hint.target_summary %}
-    <span class="overload-hint__target">{{ hint.target_summary }}</span>
+    <strong class="overload-hint__target">{{ hint.target_summary }}</strong>
     {% endif %}
   </div>
   {% if hint.reasons %}
   <details class="overload-hint__why">
-    <summary class="overload-hint__why-toggle">Pourquoi&nbsp;?</summary>
+    <summary
+      class="overload-hint__why-toggle"
+      aria-label="Voir les raisons de la suggestion"
+    >Pourquoi&nbsp;?</summary>
     <ul class="overload-hint__reasons">
       {% for r in hint.reasons %}
       <li class="overload-hint__reason">{{ r }}</li>

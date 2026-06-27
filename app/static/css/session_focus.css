@@ -453,8 +453,18 @@
   font-size: 12px;
   color: var(--fg-dim, #6b7280);
   list-style: none;
-  /* Tap target reduit acceptable car secondary (non critique). */
-  padding: 2px 0;
+  /* Sb_30.5 — tap target ergonomique sur mobile (secondary action,
+     pas obligatoire 44x44 mais > 24px confortable). */
+  padding: 6px 4px;
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Sb_30.5 — focus visible pour clavier (la valeur outline du browser
+   reste, on ajoute juste un offset pour qu'elle ne soit pas collée). */
+.overload-hint__why-toggle:focus-visible {
+  outline-offset: 2px;
 }
 
 .overload-hint__why-toggle::-webkit-details-marker {

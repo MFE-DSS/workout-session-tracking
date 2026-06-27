@@ -14,12 +14,14 @@
 | Sx_26 — Engineering Control Plane | ✅ clôturé 2026-06-14 (cf. `Sx_26_CLOSURE_REPORT.md`) |
 | Sx_27 — Coaching Loop & Product Activation | ✅ **technically closed** 2026-06-15 (cf. `Sx_27_CLOSURE_REPORT.md`) |
 | Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC AMENDED** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
-| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **TECHNICALLY CLOSED + DOGFOOD ✅ PASS** 2026-06-16 (Sb_29.1 → Sb_29.5 livrés + dogfood opérateur satisfaisant) |
+| Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **TECHNICALLY CLOSED + DOGFOOD ✅ PASS** 2026-06-16 |
+| Sx_30 — Progressive Overload Engine | ✅ **TECHNICALLY CLOSED** 2026-06-27 (Sb_30.0 → Sb_30.5 livrés, cf. `Sx_30_CLOSURE_REPORT.md`) — dogfood device réel pending (cf. `dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_TEMPLATE.md`) |
 | Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
-| Product validation Sx_29 | ✅ **dogfood PASS** 2026-06-16 — opérateur satisfait du fonctionnement focus mode + sticky CTA + rest timer + no-JS |
-| Build authorization | ✅ **AUTHORIZED FOR OPTION B (Sx_30 Progressive Overload Engine) en SPEC ONLY** sous override utilisateur 2026-06-16 post-dogfood Sx_29. Options C/D/E restent bloquées (override séparé requis). Build Sx_30 subordonné à validation Sb_30.0. |
-| Dernier CI run vert | [27604565634](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/27604565634) (Sb_29.5 / Sx_29 closure) — 3/3 jobs verts |
-| Tests | **1173 passed** post Sb_29.5 |
+| Product validation Sx_29 | ✅ **dogfood PASS** 2026-06-16 |
+| Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — bloque ouverture automatique de Sx_31/32/33+ |
+| Build authorization | ✅ Option B (Sx_30) **consommée** par Sx_30 closed 2026-06-27. Aucune nouvelle option autorisée : Sx_31/32/33+ restent bloquées (override séparé requis pour chacune). OQ-E placeholder candidat à `Sb_30.next.placeholder` sous override séparé. |
+| Dernier CI run vert | _Sb_30.5 — à renseigner après push_ ; précédent : [28250584691](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28250584691) (Sb_30.4) |
+| Tests | **~1272 passed** post Sb_30.5 (à confirmer en CI) |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
@@ -380,11 +382,12 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
 2. ~~**Prochaine action maintenant** : trancher OQ-A à OQ-E (§19) puis ouvrir `Sb_29.1`~~ **✅ FAIT 2026-06-15/16 : Sb_29.1 → Sb_29.5 livrés**
 3. ~~**Prochaine action maintenant** : exécuter le dogfood Sx_29 device réel~~ **✅ FAIT 2026-06-16 : verdict opérateur satisfaisant**
 4. ~~Ouvrir Sx_30 SPEC ONLY~~ **✅ FAIT 2026-06-16 : `Sx_30_PROGRESSIVE_OVERLOAD_ENGINE_SPEC.md` livrée, Sb_30.0 livré**
-5. **Prochaine action maintenant** : revue utilisateur OQ-A→OQ-E de Sx_30 (§18), validation build queue (§14), bascule explicite `BUILD AUTHORIZED FOR Sx_30` (override #3) AVANT de commencer `Sb_30.1`
-4. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT (Sx_29 fermé sans avoir introduit React) ; lab React exploratoire acceptable séparément
-5. **En parallèle (opérateur)** : viser AUSSI le dogfood Sx_27 toujours pending. Les deux dogfoods peuvent être exécutés indépendamment
-6. **Options B/C/D/E** : restent bloquées tant qu'aucun override séparé n'est documenté
-7. **Itérer** post-Sx_29 vers Sx_30 (Overload), Sx_31 (Body v2), Sx_32 (PWA), Sx_33+ (Health/API) — **chacun nécessite son propre override ou un dogfood Sx_29 validé**. Sx_30 ne s'ouvre PAS automatiquement
+5. ~~**Prochaine action maintenant** : revue OQ-A→OQ-E de Sx_30, validation build queue, bascule explicite `BUILD AUTHORIZED FOR Sx_30`~~ **✅ FAIT 2026-06-16/27 : Sb_30.1 → Sb_30.5 livrés, Sx_30 TECHNICALLY CLOSED**
+6. **Prochaine action maintenant** : **exécuter le dogfood Sx_30 device réel** sur la base de `docs/dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_TEMPLATE.md` (≥ 4 séances réelles sur ≥ 2 semaines). Sans dogfood Sx_30 validé, Sx_31/32/33+ restent bloqués
+7. **Option intermédiaire** : `Sb_30.next.placeholder` (OQ-E) sous override séparé — placeholder cible dans les inputs poids/reps. Recommandé avant ouverture d'un nouveau Sx_ pour clore l'UX overload
+8. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT ; lab React exploratoire acceptable séparément
+9. **En parallèle (opérateur)** : viser AUSSI le dogfood Sx_27 toujours pending. Les trois dogfoods (Sx_27, Sx_29, Sx_30) sont indépendants
+10. **Options Sx_31/32/33+** : restent bloquées tant qu'aucun override séparé n'est documenté
 
 **Anti-patterns à éviter (post-override #2) :**
 - Ouvrir Sx_29 directement en BUILD `Sb_29.k` sans produire la spec d'abord — **interdit**, Sx_29 doit suivre le protocole spec-driven (§4 protocole)
