@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{% if edit_id %}Éditer la mesure{% else %}Nouvelle mesure{% endif %}</h1>
+<p class="text-dim" style="font-size:13px;">
+  Tous les champs sont optionnels (entrées partielles tolérées). Mesure
+  dans les mêmes conditions à chaque fois. Données non médicales.
+</p>
+
+{% if error %}
+  <div class="card" style="margin-top:var(--space-sm);border-color:var(--danger,#a33);">
+    <b style="color:var(--danger,#e66);font-size:13px;">{{ error }}</b>
+  </div>
+{% endif %}
+
+<form method="post" action="{{ action_url }}" class="card" style="margin-top:var(--space-md);">
+  <div class="grid" style="display:grid;grid-template-columns:1fr;gap:var(--space-sm);">
+    {% for f in fields %}
+    <label style="display:flex;flex-direction:column;gap:2px;font-size:13px;">
+      <span>{{ f.label }}</span>
+      <input
+        type="number" step="0.1" inputmode="decimal"
+        name="{{ f.key }}"
+        value="{{ values.get(f.key, '') }}"
+        min="{{ f.min }}" max="{{ f.max }}"
+        placeholder="{{ f.min|int }}–{{ f.max|int }}"
+        class="input"
+        style="font-size:16px;padding:8px;width:100%;box-sizing:border-box;"
+      />
+    </label>
+    {% endfor %}
+  </div>
+  <div class="card__actions" style="margin-top:var(--space-md);">
+    <button type="submit" class="btn btn--primary btn--wide">Enregistrer</button>
+  </div>
+</form>
+
+<a class="btn btn--ghost" href="{{ url_for('body_overview') }}" style="margin-top:var(--space-md);display:inline-block;">← Annuler</a>
+{% endblock %}

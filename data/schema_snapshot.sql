@@ -22,8 +22,11 @@ CREATE INDEX ix_workout_sessions_user_id ON workout_sessions (user_id);
 -- index: ix_ws_user_status_excl_started
 CREATE INDEX ix_ws_user_status_excl_started ON workout_sessions (user_id, status, excluded_from_stats, started_at);
 
+-- table: body_consents
+CREATE TABLE body_consents ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, consent_type VARCHAR(64) NOT NULL, granted BOOLEAN NOT NULL, consent_version INTEGER NOT NULL, granted_at DATETIME, withdrawn_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_body_consent_user_type UNIQUE (user_id, consent_type), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
+
 -- table: body_measurements
-CREATE TABLE "body_measurements" ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, measured_at DATETIME NOT NULL, weight_kg FLOAT, chest_cm FLOAT, waist_cm FLOAT, calf_cm FLOAT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, arm_cm_left FLOAT, arm_cm_right FLOAT, thigh_cm_left FLOAT, thigh_cm_right FLOAT, hip_cm FLOAT, neck_cm FLOAT, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
+CREATE TABLE "body_measurements" ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, measured_at DATETIME NOT NULL, weight_kg FLOAT, chest_cm FLOAT, waist_cm FLOAT, calf_cm FLOAT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, arm_cm_left FLOAT, arm_cm_right FLOAT, thigh_cm_left FLOAT, thigh_cm_right FLOAT, hip_cm FLOAT, neck_cm FLOAT, shoulder_width_cm FLOAT, calf_cm_left FLOAT, calf_cm_right FLOAT, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
 
 -- table: method_rules
 CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, position INTEGER NOT NULL, title VARCHAR(128) NOT NULL, body TEXT NOT NULL, PRIMARY KEY (id), UNIQUE (slug) );
