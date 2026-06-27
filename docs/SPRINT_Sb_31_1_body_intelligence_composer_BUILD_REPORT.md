@@ -234,11 +234,13 @@ Tests Sx_30 (122) + Sx_29 (76) + Sx_27 + Sx_26 + reste → confirmé en CI post-
 
 ## 9. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28302706112](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28302706112) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+Note : un premier run [28302661277](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28302661277) sur le commit `0016f7f` (Sb_31.1 strict) a été cancelled par un push concurrent `e681040` (merge PR #15 — Manual Body Profile MVP du track parallèle Body Signal Model). Le run final couvre `e681040` qui contient `0016f7f` + le merge — Sb_31.1 est validé en CI.
+
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 10. Métriques
 
