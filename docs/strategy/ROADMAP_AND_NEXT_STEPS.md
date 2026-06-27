@@ -20,8 +20,8 @@
 | Product validation Sx_29 | ✅ **dogfood PASS** 2026-06-16 |
 | Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — bloque ouverture automatique de Sx_31/32/33+ |
 | Build authorization | ✅ Option B (Sx_30) **consommée** par Sx_30 closed 2026-06-27. Aucune nouvelle option autorisée : Sx_31/32/33+ restent bloquées (override séparé requis pour chacune). OQ-E placeholder candidat à `Sb_30.next.placeholder` sous override séparé. |
-| Dernier CI run vert | _Sb_30.5 — à renseigner après push_ ; précédent : [28250584691](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28250584691) (Sb_30.4) |
-| Tests | **~1272 passed** post Sb_30.5 (à confirmer en CI) |
+| Dernier CI run vert | [28288760013](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28288760013) (Sb_30.5 / Sx_30 closure) — 3/3 jobs verts |
+| Tests | **1273 passed** post Sb_30.5 |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
