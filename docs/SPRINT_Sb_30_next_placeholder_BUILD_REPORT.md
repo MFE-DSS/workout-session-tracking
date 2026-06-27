@@ -185,11 +185,11 @@ Injecté dans le contexte template comme clé séparée : `"overload_placeholder
 
 ## 9. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28297660877](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28297660877) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 10. Métriques
 
