@@ -27,6 +27,7 @@
    - last_time[se.exercise_code_snapshot]
    - deltas[se.exercise_code_snapshot]
    - overload_hints[se.id]               (Sb_30.3 ; remplace `hints` legacy)
+   - overload_placeholders[se.id]        (Sb_30.next.placeholder ; light input hints)
    - sb08_hints_by_exercise[se.id]
    - peek_for_active (si is_active)
    - next_code_by_exercise[se.id] / prev_code_by_exercise[se.id]
@@ -313,7 +314,14 @@
       {% endif %}
       <ul class="set-list">
         {% for sl in work_sets %}
-          <li class="set-row set-row--work">
+          {# Sb_30.next.placeholder — placeholders contextuels uniquement
+             sur le PREMIER work set de la carte ACTIVE, et uniquement si
+             un OverloadHint chiffré existe (le router skip déjà silent
+             /unknown via is_silent). Aucune injection en value=. #}
+          {% set _ph = overload_placeholders.get(se.id) if is_active and loop.first else None %}
+          {% set _ph_w = _ph.weight if _ph and _ph.weight else 'kg' %}
+          {% set _ph_r = _ph.reps if _ph and _ph.reps else 'reps' %}
+          <li class="set-row set-row--work{% if _ph %} set-row--has-overload-placeholder{% endif %}">
             <div class="set-row__label">
               <span class="set-row__kind">Série</span>
               <span class="set-row__idx">#{{ sl.set_index }}</span>
@@ -327,7 +335,7 @@
                 pattern="[0-9]*[.,]?[0-9]*"
                 autocomplete="off"
                 name="set_{{ sl.id }}_weight_kg"
-                placeholder="kg"
+                placeholder="{{ _ph_w }}"
                 value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
               />
               <input
@@ -336,7 +344,7 @@
                 pattern="[0-9]*"
                 autocomplete="off"
                 name="set_{{ sl.id }}_reps"
-                placeholder="reps"
+                placeholder="{{ _ph_r }}"
                 value="{{ sl.reps if sl.reps is not none else '' }}"
               />
               {# Sb_24.4 — idem warmup, checkbox "Fait" retirée. #}

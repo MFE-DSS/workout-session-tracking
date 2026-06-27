@@ -44,7 +44,7 @@ from app.services.form_parsing import (
     to_float,
     to_int,
 )
-from app.services.overload_engine import compute_overload_hint
+from app.services.overload_engine import OverloadHint, compute_overload_hint
 from app.services.overload_explainer import explain_overload_hint
 from app.services.overload_inputs import build_overload_input_for_exercise
 from app.services.ownership import get_owned_session_or_404
@@ -179,6 +179,35 @@ def _session_stats(session: WorkoutSession) -> dict:
     }
 
 
+def _build_overload_placeholder(hint: OverloadHint) -> dict | None:
+    """Sb_30.next.placeholder — derive a light placeholder dict from a raw
+    :class:`OverloadHint`. Returns ``None`` if no numeric target is
+    available (state ``unknown`` is already filtered upstream via
+    ``is_silent``, but we keep a defensive None-check).
+
+    Format :
+      - ``weight`` : ``"≈ 102.5"`` (kg unit reste affichée à côté du champ
+        par le label existant ; on garde le placeholder court).
+      - ``reps``   : ``"≈ 6-10"`` ou ``"≈ 6"`` (deload : range collapsée).
+
+    Le préfixe ``≈`` indique explicitement "suggestion", jamais "valeur".
+    Aucun verbe ; aucune injection en ``value=``.
+    """
+    if hint.target_weight_kg is None:
+        return None
+    weight = f"≈ {hint.target_weight_kg:g}"
+    if hint.target_reps_min is None and hint.target_reps_max is None:
+        reps = None
+    elif hint.target_reps_min == hint.target_reps_max:
+        reps = f"≈ {hint.target_reps_min}"
+    elif hint.target_reps_min is None or hint.target_reps_max is None:
+        v = hint.target_reps_min if hint.target_reps_min is not None else hint.target_reps_max
+        reps = f"≈ {v}"
+    else:
+        reps = f"≈ {hint.target_reps_min}-{hint.target_reps_max}"
+    return {"weight": weight, "reps": reps}
+
+
 WEEKDAY_LABELS = {
     1: "Lundi",
     2: "Mardi",
@@ -226,6 +255,13 @@ def session_detail(
     # template (dict). Ne consomme pas encore exercise_card.html (Sb_30.3+).
     # Si l'input est None (target manquante), on rend l'hint silencieux.
     overload_hints: dict[int, dict] = {}
+    # Sb_30.next.placeholder — light placeholder hints for the first work
+    # set inputs of the active card. Built from the raw OverloadHint
+    # (engine output), kept disjoint from `overload_hints` so the template
+    # can render the visible hint and the input placeholder independently.
+    # We never inject a `value=` here — only `placeholder=` (no pre-fill,
+    # cf. règle produit).
+    overload_placeholders: dict[int, dict] = {}
     for se in session.session_exercises:
         ov_input = build_overload_input_for_exercise(db, session, se)
         if ov_input is None:
@@ -235,6 +271,9 @@ def session_detail(
         if explained["is_silent"]:
             continue
         overload_hints[se.id] = explained
+        ph = _build_overload_placeholder(hint)
+        if ph is not None:
+            overload_placeholders[se.id] = ph
 
     # Per-exercise compact summary used by the completed-session
     # readability block (still computed even when in_progress, the
@@ -397,6 +436,7 @@ def session_detail(
             "rules": rules,
             "last_time": last_time,
             "overload_hints": overload_hints,
+            "overload_placeholders": overload_placeholders,
             "exercise_summaries": exercise_summaries,
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
