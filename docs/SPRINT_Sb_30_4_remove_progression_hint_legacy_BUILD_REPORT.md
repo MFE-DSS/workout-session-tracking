@@ -162,11 +162,13 @@ Aucun vide fonctionnel : l'overload hint occupe désormais seul le rôle de guid
 
 ## 10. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28250584691](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28250584691) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+Note : un premier run [28250143722](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28250143722) sur le commit `a20e3ab` (cherry-pick Sb_30.4 strict) a été **cancelled** par un push concurrent `3fb8faa` (merge PR #13 — Body Intelligence brainstorming spec, hors scope Sb_30.4). Le run final couvre `3fb8faa` qui contient l'intégralité de `a20e3ab` + le merge — Sb_30.4 est donc bien validé en CI dans son contexte de branche canonique.
+
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 11. Verdict
 
