@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, func
+from sqlalchemy import DateTime, Float, ForeignKey, Index, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -41,6 +41,13 @@ class BodyMeasurement(Base):
     hip_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     neck_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     calf_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # Sb_Body_01 — additive columns (ADD COLUMN ONLY). The legacy single
+    # ``calf_cm`` above is preserved for back-compat; new lateralized
+    # entries write calf_cm_left/right (lateralized = source of truth,
+    # cf. docs/strategy/SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md §2).
+    shoulder_width_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
+    calf_cm_left: Mapped[float | None] = mapped_column(Float, nullable=True)
+    calf_cm_right: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

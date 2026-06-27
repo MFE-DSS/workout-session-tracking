@@ -24,6 +24,7 @@ from app.deps import _redirect_to_login
 from app.routers import (
     admin,
     auth_routes,
+    body,
     coach_report,
     export,
     health,
@@ -236,6 +237,10 @@ def create_app() -> FastAPI:
     app.include_router(readiness.router)
     app.include_router(squads.router)
     app.include_router(coach_report.router)
+    # Sb_Body_01 — Manual Body Profile. Routes self-gate on
+    # BODY_ASSESSMENT_ENABLED (404 when off), so mounting is inert in prod
+    # until the flag is explicitly enabled.
+    app.include_router(body.router)
 
     return app
 

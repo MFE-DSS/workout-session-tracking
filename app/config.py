@@ -76,6 +76,15 @@ class Settings(BaseSettings):
     rate_limit_forgot_max: int = Field(default=5)
     rate_limit_forgot_window_seconds: int = Field(default=3600)
 
+    # Sb_Body_01 — Manual Body Profile MVP gate. Strictly opt-in.
+    # When False (default), every /body route returns 404, no model is
+    # exercised at runtime, and there is zero production impact. Photo
+    # capture and external providers (MediaPipe/Bodygram) are NOT part of
+    # this flag and are not implemented in this sprint — their own flags
+    # (BODY_PHOTO_CAPTURE_ENABLED / BODY_PROVIDER_BODYGRAM_ENABLED) arrive
+    # in later lots. See docs/strategy/SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md.
+    body_assessment_enabled: bool = Field(default=False)
+
     # SMTP for password reset emails. Leave smtp_host empty to disable.
     smtp_host: str = Field(default="")
     smtp_port: int = Field(default=587)

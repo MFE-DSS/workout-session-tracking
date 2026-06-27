@@ -85,6 +85,21 @@
 | Sb_31.1 | `body_intelligence.py` composeur pur + 38 tests | ✅ | Sx_31 §N.2 | `SPRINT_Sb_31_1_body_intelligence_composer_BUILD_REPORT.md` | (post-push) | 415 lignes service ; 0 router/template/migration/CSS/JS ; 0 service métier core touché ; OQ-C (seuils figés) + OQ-D (BMI derived) + OQ-E (overload not_available_v1) implémentées |
 | Sx_29+ alternatives | Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
 
+## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
+
+**Specs :** `docs/strategy/SPIGNOS_BODY_SIGNAL_MODEL_BRAINSTORMING.md`, `SPIGNOS_BODY_INTELLIGENCE_ROADMAP.md`, `SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md`, `SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC.md`, `SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md`.
+**Hard contracts spécifiques :** non médical, non discriminatoire, « morphotype » jamais vérité primaire ; privacy-by-design (consentement granulaire, hard-delete, minimisation) ; providers (MediaPipe/Bodygram) derrière interfaces, flags OFF par défaut ; **une seule migration Body en vol** ; ADD COLUMN ONLY.
+
+| Sprint | Domaine | Statut | Spec ref | Rapport | CI run | Notes |
+|---|---|---|---|---|---|---|
+| Sx Body 00 (spec) | Brainstorming + roadmap (taxonomie 6 états, 30 Q&A, 5 lots) | ✅ mergé | — | PR #13 | (squash `3fb8faa`) | Docs only ; admin merge inutile (UNSTABLE) |
+| Sx Body 01 (spec) | Signal model + privacy/consent + build spec Sb Body 01 (7 états, mesures MVP, ratios, versionnement) | ✅ mergé | — | PR #14 | (squash `662ed49`) | Docs only ; admin override (SonarCloud skip docs-only) |
+| Sb Body 01 | Manual Body Profile MVP sous flag `BODY_ASSESSMENT_ENABLED` (mesures manuelles, consentement, hard-delete, export, ratios à la volée, 1 migration additive) | 🟡 build | `SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md` | `SPRINT_Sb_Body_01_manual_profile_BUILD_REPORT.md` | (PR draft) | Migration `7i0f5d1e2g43` (3 colonnes additives + `body_consents`) ; 0 provider / 0 photo / 0 MediaPipe / 0 Bodygram ; mode séance intact ; 10 tests dédiés |
+| Sb Body 02 | MediaPipe Capture Quality | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé ; flag séparé |
+| Sb Body 03 | Bodygram Integration | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé + consent provider |
+| Sb Body 04 | Archetype Engine | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé |
+| Sb Body 05 | Link to Training Engine | ⏳ | roadmap | — | — | Pré-requis : Sb Body 04 |
+
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
 **Spec :** `docs/strategy/SPIGNOS_IMPLICIT_SIGNAL_SCORING_SPEC_v1.md`

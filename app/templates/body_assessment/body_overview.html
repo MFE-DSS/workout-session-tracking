@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Profil corporel</h1>
+<p class="text-dim" style="font-size:13px;">
+  Guidance esthétique non médicale. Mesures manuelles uniquement —
+  aucune photo, aucun service externe.
+</p>
+
+{% if not consented %}
+  <div class="card" style="margin-top:var(--space-md);">
+    <h2 class="card__title">Consentement requis</h2>
+    <p class="text-dim" style="font-size:13px;">
+      Pour saisir et traiter tes mensurations (finalité : priorités
+      d'entraînement et équilibre visuel), un consentement explicite est
+      nécessaire. Tu peux le retirer à tout moment et supprimer tes données.
+    </p>
+    <form method="post" action="{{ url_for('body_consent') }}" class="card__actions">
+      <input type="hidden" name="action" value="grant" />
+      <button type="submit" class="btn btn--primary btn--wide">Je consens</button>
+    </form>
+  </div>
+{% else %}
+  <div style="display:flex;gap:var(--space-xs);flex-wrap:wrap;margin-top:var(--space-md);">
+    <a class="btn btn--primary" href="{{ url_for('body_measurement_new') }}">+ Nouvelle mesure</a>
+    <a class="btn btn--ghost" href="{{ url_for('body_export') }}">Exporter (JSON)</a>
+    <form method="post" action="{{ url_for('body_consent') }}" style="display:inline;">
+      <input type="hidden" name="action" value="withdraw" />
+      <button type="submit" class="btn btn--ghost btn--sm btn--danger">Retirer le consentement</button>
+    </form>
+  </div>
+
+  {% if latest %}
+    <div class="card" style="margin-top:var(--space-md);">
+      <h2 class="card__title">Ratios (calculés à la volée)</h2>
+      <p class="text-dim" style="font-size:12px;">
+        Signaux dérivés, recalculables, non médicaux. Un ratio non
+        calculable s'affiche « — » (jamais de valeur inventée).
+      </p>
+      <div class="card-list" style="margin-top:var(--space-sm);">
+        {% for r in ratios %}
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-xs);padding:var(--space-xs) 0;border-bottom:1px solid var(--border,#222);">
+          <span>
+            <b style="font-size:14px;">{{ r.label }}</b>
+            {% if r.is_proxy %}<span class="badge badge--warn" title="Valeur de repli">proxy</span>{% endif %}
+            <br /><span class="text-dim" style="font-size:12px;">{{ r.interpretation }}</span>
+          </span>
+          <span class="text-mono" style="font-size:15px;">
+            {% if r.available %}{{ '%.2f'|format(r.value) }}{% else %}—{% endif %}
+          </span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <p class="text-dim" style="margin-top:var(--space-md);">
+      Aucune mesure encore. Ajoute une première mesure pour voir tes ratios.
+    </p>
+  {% endif %}
+
+  <h2 class="page-title" style="font-size:16px;margin-top:var(--space-lg);">Historique</h2>
+  {% if measurements %}
+    <div class="card-list">
+      {% for m in measurements %}
+      <div class="card" style="margin-bottom:var(--space-sm);">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--space-xs);">
+          <b style="font-size:14px;">{{ m.measured_at | local }}</b>
+          <span style="display:flex;gap:var(--space-xs);">
+            <a class="btn btn--ghost btn--sm" href="{{ url_for('body_measurement_edit', measurement_id=m.id) }}">Éditer</a>
+            <form method="post" action="{{ url_for('body_measurement_delete', measurement_id=m.id) }}" style="display:inline;">
+              <button type="submit" class="btn btn--ghost btn--sm btn--danger">Supprimer</button>
+            </form>
+          </span>
+        </div>
+        <div class="text-mono text-dim" style="font-size:12px;margin-top:var(--space-xs);">
+          {% for f in fields %}{% set v = m[f.key] %}{% if v is not none %}{{ f.label }}: {{ '%g'|format(v) }} · {% endif %}{% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endif %}
+
+<a class="btn btn--ghost" href="/" style="margin-top:var(--space-md);display:inline-block;">← Retour</a>
+{% endblock %}
