@@ -20,6 +20,10 @@
   padding: 8px 12px 24px;
   font-size: 14px;
   line-height: 1.4;
+  /* Sb_31.4 — safety mobile : pas de scroll horizontal sur 360px. */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .body-intelligence__header {
@@ -246,6 +250,31 @@
   }
   .bi-block__title {
     font-size: 14px;
+  }
+  /* Sb_31.4 — empêche les valeurs longues (dates, mesures) de pousser
+     la 2e colonne hors du viewport sur 360px. */
+  .bi-block__kv {
+    grid-template-columns: 1fr;
+    gap: 2px 0;
+  }
+  .bi-block__kv dd {
+    text-align: left;
+    margin-bottom: 4px;
+  }
+}
+
+/* ───── Mobile minimal (≤ 360px) — cible spec mobile Sx_29 ───── */
+@media (max-width: 360px) {
+  .body-intelligence__bullets,
+  .bi-block__list {
+    padding-left: 16px;
+  }
+  .bi-block {
+    padding: 10px;
+  }
+  /* Long classification badge ne doit pas casser le layout du head. */
+  .bi-block__head {
+    gap: 4px 8px;
   }
 }
 

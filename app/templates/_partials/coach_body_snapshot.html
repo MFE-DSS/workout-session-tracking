@@ -67,8 +67,12 @@
   {% endif %}
 
   <p class="coach-block__line body-snapshot__cta">
-    <a class="link" href="{{ url_for('body_intelligence') }}">
-      Voir le détail →
+    <a
+      class="link"
+      href="{{ url_for('body_intelligence') }}"
+      aria-label="Voir le détail de la lecture corporelle Body Intelligence"
+    >
+      Voir le détail <span aria-hidden="true">→</span>
     </a>
     <small class="text-dim">
       Moteur Body Intelligence v{{ body_snapshot.engine_version }}.
