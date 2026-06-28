@@ -16,21 +16,29 @@ from app.deps import CurrentUser, DbSession
 from app.services import body_profile as bp
 from app.templating import templates
 
-router = APIRouter(tags=["body"])
-
 
 def require_body_enabled() -> None:
-    """404 when the Body Assessment feature flag is off."""
+    """404 when the Body Assessment feature flag is off.
+
+    Declared as a ROUTER-LEVEL dependency (below) so the flag gate runs
+    BEFORE the auth dependency on every ``/body*`` route. Result with the
+    flag OFF: anonymous requests get 404 (feature hidden) rather than a
+    303 login redirect — the feature is fully invisible. With the flag ON,
+    auth/consent/ownership behave exactly as before.
+    """
     if not get_settings().body_assessment_enabled:
         raise HTTPException(status_code=404)
 
 
-BodyGate = Annotated[None, Depends(require_body_enabled)]
+# Router-level dependency: evaluated before the endpoints' own dependencies
+# (e.g. CurrentUser), so the flag 404 wins over the auth 303 for anonymous
+# requests when the feature is off.
+router = APIRouter(tags=["body"], dependencies=[Depends(require_body_enabled)])
 
 
 @router.get("/body", response_class=HTMLResponse, name="body_overview")
 def body_overview(
-    request: Request, db: DbSession, user: CurrentUser, _: BodyGate = None
+    request: Request, db: DbSession, user: CurrentUser
 ) -> HTMLResponse:
     consented = bp.has_active_consent(db, user.id)
     measurements = bp.list_measurements(db, user.id) if consented else []
@@ -57,7 +65,6 @@ def body_consent(
     db: DbSession,
     user: CurrentUser,
     action: Annotated[str, Form()] = "",
-    _: BodyGate = None,
 ):
     bp.set_consent(db, user.id, granted=(action == "grant"))
     return RedirectResponse(url="/body", status_code=303)
@@ -69,7 +76,7 @@ def body_consent(
     name="body_measurement_new",
 )
 def measurement_new(
-    request: Request, db: DbSession, user: CurrentUser, _: BodyGate = None
+    request: Request, db: DbSession, user: CurrentUser
 ) -> HTMLResponse:
     if not bp.has_active_consent(db, user.id):
         return RedirectResponse(url="/body", status_code=303)
@@ -78,7 +85,7 @@ def measurement_new(
 
 @router.post("/body/measurements", response_model=None, name="body_measurement_create")
 async def measurement_create(
-    request: Request, db: DbSession, user: CurrentUser, _: BodyGate = None
+    request: Request, db: DbSession, user: CurrentUser
 ):
     if not bp.has_active_consent(db, user.id):
         # Consent gate: no consent -> no write.
@@ -105,7 +112,6 @@ def measurement_edit(
     measurement_id: int,
     db: DbSession,
     user: CurrentUser,
-    _: BodyGate = None,
 ) -> HTMLResponse:
     m = bp.get_owned_measurement(db, user.id, measurement_id)
     if m is None:
@@ -129,7 +135,6 @@ async def measurement_update(
     measurement_id: int,
     db: DbSession,
     user: CurrentUser,
-    _: BodyGate = None,
 ):
     m = bp.get_owned_measurement(db, user.id, measurement_id)
     if m is None:
@@ -156,7 +161,6 @@ def measurement_delete(
     measurement_id: int,
     db: DbSession,
     user: CurrentUser,
-    _: BodyGate = None,
 ):
     m = bp.get_owned_measurement(db, user.id, measurement_id)
     if m is None:
@@ -166,7 +170,7 @@ def measurement_delete(
 
 
 @router.get("/body/export.json", response_model=None, name="body_export")
-def body_export(db: DbSession, user: CurrentUser, _: BodyGate = None) -> JSONResponse:
+def body_export(db: DbSession, user: CurrentUser) -> JSONResponse:
     payload = bp.build_body_export(db, user.id)
     return JSONResponse(
         content=payload,
