@@ -1,0 +1,160 @@
+{# Sb_31.2 — Body Intelligence block partial.
+
+   Variable : block (BodyIntelligenceBlock) :
+     * key, title, classification, available, content (dict scalaire)
+
+   La classification est rendue visible (label sobre) sur chaque bloc :
+     measured       → « Mesuré »
+     derived        → « Dérivé »
+     inferred       → « Inféré »
+     not_deductible → « Hors de portée »
+
+   Aucune logique métier ici. Le template lit `content` comme un dict
+   et affiche les paires clé/valeur connues par bloc. #}
+
+{% set _labels = {
+  "measured": "Mesuré",
+  "derived": "Dérivé",
+  "inferred": "Inféré",
+  "not_deductible": "Hors de portée"
+} %}
+
+<article
+  class="bi-block bi-block--{{ block.key }} bi-block--{{ block.classification }}{% if not block.available %} bi-block--unavailable{% endif %}"
+  data-block-key="{{ block.key }}"
+  data-block-classification="{{ block.classification }}"
+  data-block-available="{{ 'true' if block.available else 'false' }}"
+>
+  <header class="bi-block__head">
+    <h2 class="bi-block__title">{{ block.title }}</h2>
+    <span
+      class="bi-block__classification bi-block__classification--{{ block.classification }}"
+      aria-label="Niveau : {{ _labels[block.classification] }}"
+    >{{ _labels[block.classification] }}</span>
+  </header>
+
+  {% if not block.available %}
+  <p class="bi-block__empty">Données insuffisantes pour ce bloc.</p>
+  {% else %}
+    {% if block.key == "training_consistency" %}
+      <dl class="bi-block__kv">
+        <dt>Séances 7&nbsp;jours</dt><dd>{{ block.content.sessions_7d or 0 }}</dd>
+        <dt>Séances 30&nbsp;jours</dt><dd>{{ block.content.sessions_30d or 0 }}</dd>
+        <dt>Séances 90&nbsp;jours</dt><dd>{{ block.content.sessions_90d or 0 }}</dd>
+        {% if block.content.work_sets_per_week_30d is not none %}
+        <dt>Sets travail / semaine</dt><dd>{{ block.content.work_sets_per_week_30d }}</dd>
+        {% endif %}
+        {% if block.content.cardio_minutes_per_week_30d is not none %}
+        <dt>Cardio min / semaine</dt><dd>{{ block.content.cardio_minutes_per_week_30d }}</dd>
+        {% endif %}
+        {% if block.content.strength_volume_delta_pct_30d is not none %}
+        <dt>Volume strength Δ 30j</dt>
+        <dd>{{ "%+.0f"|format(block.content.strength_volume_delta_pct_30d) }} %</dd>
+        {% endif %}
+      </dl>
+
+    {% elif block.key == "body_metrics" %}
+      <dl class="bi-block__kv">
+        {% if block.content.height_cm %}
+        <dt>Taille</dt><dd>{{ block.content.height_cm }} cm</dd>
+        {% endif %}
+        {% if block.content.weight_kg is not none %}
+        <dt>Poids</dt>
+        <dd>
+          {{ block.content.weight_kg }} kg
+          {% if block.content.weight_measured_at_iso %}
+          <small class="bi-block__sub">(mesure&nbsp;: {{ block.content.weight_measured_at_iso[:10] }})</small>
+          {% endif %}
+        </dd>
+        {% endif %}
+        {% if block.content.waist_cm is not none %}
+        <dt>Tour de taille</dt><dd>{{ block.content.waist_cm }} cm</dd>
+        {% endif %}
+        {% if block.content.weight_trend_90d_kg is not none %}
+        <dt>Tendance poids 90j</dt>
+        <dd>{{ "%+.1f"|format(block.content.weight_trend_90d_kg) }} kg</dd>
+        {% endif %}
+        {% if block.content.bmi is not none %}
+        <dt>IMC <small class="bi-block__sub">({{ _labels[block.content.bmi_classification] | default("Dérivé") }})</small></dt>
+        <dd>
+          {{ block.content.bmi }}
+          <small class="bi-block__sub">{{ block.content.bmi_disclaimer }}</small>
+        </dd>
+        {% endif %}
+      </dl>
+
+    {% elif block.key == "muscle_zone_balance" %}
+      {% if block.content.top_zones %}
+      <p class="bi-block__lead">Top zones sollicitées sur 30 jours&nbsp;:</p>
+      <ul class="bi-block__list">
+        {% for z, n in block.content.top_zones %}
+        <li><strong>{{ z }}</strong> — {{ n }} séance(s)</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+      {% if block.content.bottom_zones %}
+      <p class="bi-block__lead">Zones moins représentées&nbsp;:</p>
+      <ul class="bi-block__list">
+        {% for z, n in block.content.bottom_zones %}
+        <li><strong>{{ z }}</strong> — {{ n }} séance(s)</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+    {% elif block.key == "push_pull_legs_balance" %}
+      <dl class="bi-block__kv">
+        {% if block.content.push_pull_ratio is not none %}
+        <dt>Ratio push / pull</dt>
+        <dd>
+          {{ block.content.push_pull_ratio }}
+          {% if block.content.push_pull_imbalanced %}
+          <small class="bi-block__sub">— semble déséquilibré (à confirmer)</small>
+          {% endif %}
+        </dd>
+        {% endif %}
+        {% if block.content.upper_lower_ratio is not none %}
+        <dt>Ratio haut / bas</dt>
+        <dd>
+          {{ block.content.upper_lower_ratio }}
+          {% if block.content.upper_lower_imbalanced %}
+          <small class="bi-block__sub">— semble déséquilibré (à confirmer)</small>
+          {% endif %}
+        </dd>
+        {% endif %}
+      </dl>
+
+    {% elif block.key == "quality_and_confidence" %}
+      <dl class="bi-block__kv">
+        {% if block.content.quality_score_avg_30d is not none %}
+        <dt>Quality score moyen 30j</dt>
+        <dd>{{ block.content.quality_score_avg_30d }} / 100 ({{ block.content.quality_score_n }} séance{{ "s" if block.content.quality_score_n > 1 else "" }})</dd>
+        {% endif %}
+        {% if block.content.confidence_score_avg is not none %}
+        <dt>Confidence score moyen</dt>
+        <dd>{{ block.content.confidence_score_avg }} / 100</dd>
+        {% endif %}
+      </dl>
+
+    {% elif block.key == "implicit_signal_summary" %}
+      {% if block.content.implicit_labels_30d %}
+      <p class="bi-block__lead">Distribution des labels implicites sur 30 jours&nbsp;:</p>
+      <ul class="bi-block__list">
+        {% for label, n in block.content.implicit_labels_30d.items() %}
+        <li><strong>{{ label }}</strong> — {{ n }} exercice(s)</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+    {% elif block.key == "unavailable_or_limits" %}
+      <ul class="bi-block__list bi-block__list--limits">
+        {% for lim in block.content.limits %}
+        <li>{{ lim }}</li>
+        {% endfor %}
+      </ul>
+      <p class="bi-block__sub">
+        Overload compliance&nbsp;: {{ block.content.overload_compliance_status }}
+        — différé à un prochain sprint.
+      </p>
+    {% endif %}
+  {% endif %}
+</article>

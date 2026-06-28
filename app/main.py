@@ -25,6 +25,7 @@ from app.routers import (
     admin,
     auth_routes,
     body,
+    body_intelligence,
     coach_report,
     export,
     health,
@@ -241,6 +242,10 @@ def create_app() -> FastAPI:
     # BODY_ASSESSMENT_ENABLED (404 when off), so mounting is inert in prod
     # until the flag is explicitly enabled.
     app.include_router(body.router)
+    # Sb_31.2 — Body Intelligence v2 (route /body/intelligence). Track
+    # distinct du Body Manual Profile ci-dessus ; aucune dépendance
+    # croisée.
+    app.include_router(body_intelligence.router)
 
     return app
 

@@ -1,0 +1,18 @@
+{# Sb_31.2 — Body Intelligence priority partial.
+   Variable : p (BodyIntelligencePriority) :
+     * key, severity ("info"/"watch"), message, reason
+   Pas de logique métier ici. #}
+<article
+  class="bi-priority bi-priority--{{ p.severity }} bi-priority--{{ p.key }}"
+  data-priority-key="{{ p.key }}"
+  data-priority-severity="{{ p.severity }}"
+  role="status"
+>
+  <p class="bi-priority__message">{{ p.message }}</p>
+  <details class="bi-priority__why">
+    <summary class="bi-priority__why-toggle" aria-label="Voir la raison">
+      Pourquoi&nbsp;?
+    </summary>
+    <p class="bi-priority__reason">{{ p.reason }}</p>
+  </details>
+</article>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{# Sb_31.2 — Body Intelligence v2 SSR view.
+
+   Le template ne fait AUCUNE logique métier : il affiche uniquement les
+   champs déjà calculés par le composeur Sb_31.1. Aucune ré-implémentation
+   d'arbre de priorité, aucune interprétation body, aucune duplication
+   de seuils.
+
+   Variables :
+   - snapshot (BodyIntelligenceSnapshot) :
+       * engine_version, status, headline
+       * bullets (tuple[str])
+       * blocks (tuple[BodyIntelligenceBlock])
+       * priorities (tuple[BodyIntelligencePriority])
+       * limits (tuple[str])
+#}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', path='css/body_intelligence.css') }}" />
+{% endblock %}
+
+{% block content %}
+<section
+  class="body-intelligence body-intelligence--{{ snapshot.status }}"
+  data-status="{{ snapshot.status }}"
+  data-engine-version="{{ snapshot.engine_version }}"
+  aria-labelledby="body-intelligence-headline"
+>
+  <header class="body-intelligence__header">
+    <h1 id="body-intelligence-headline" class="body-intelligence__headline">
+      {{ snapshot.headline }}
+    </h1>
+    {% if snapshot.bullets %}
+    <ul class="body-intelligence__bullets" aria-label="Repères rapides">
+      {% for b in snapshot.bullets %}
+      <li class="body-intelligence__bullet">{{ b }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </header>
+
+  {% if snapshot.priorities %}
+  <section
+    class="body-intelligence__priorities"
+    aria-label="Priorités suggérées"
+  >
+    {% for p in snapshot.priorities %}
+      {% include "_partials/body_intelligence_priority.html" %}
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <section
+    class="body-intelligence__blocks"
+    aria-label="Blocs de lecture corporelle"
+  >
+    {% for block in snapshot.blocks %}
+      {% include "_partials/body_intelligence_block.html" %}
+    {% endfor %}
+  </section>
+
+  <footer class="body-intelligence__footer">
+    <p class="body-intelligence__version">
+      Moteur Body Intelligence v{{ snapshot.engine_version }}.
+    </p>
+  </footer>
+</section>
+{% endblock %}
