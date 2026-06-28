@@ -59,6 +59,38 @@ def body_client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
         pass
 
 
+def _anon_client(monkeypatch: pytest.MonkeyPatch, *, flag_on: bool) -> TestClient:
+    """Build an UN-authenticated TestClient with the Body flag on/off.
+
+    No login is performed, so requests are anonymous — used to assert the
+    flag gate fires before the auth layer (Sb_Body_01.1)."""
+    tmp_dir = tempfile.mkdtemp(prefix="workout-body-anon-")
+    db_path = Path(tmp_dir) / "test.db"
+    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db_path}")
+    monkeypatch.setenv("APP_ENV", "test")
+    monkeypatch.setenv("APP_SECRET_KEY", "test-secret-key-for-signing")
+    if flag_on:
+        monkeypatch.setenv("BODY_ASSESSMENT_ENABLED", "1")
+    else:
+        monkeypatch.delenv("BODY_ASSESSMENT_ENABLED", raising=False)
+    _fresh_app_modules()
+    from app import main as main_mod  # noqa: E402
+
+    return TestClient(main_mod.app)
+
+
+@pytest.fixture()
+def anon_client_flag_off(monkeypatch: pytest.MonkeyPatch) -> TestClient:
+    with _anon_client(monkeypatch, flag_on=False) as c:
+        yield c
+
+
+@pytest.fixture()
+def anon_client_flag_on(monkeypatch: pytest.MonkeyPatch) -> TestClient:
+    with _anon_client(monkeypatch, flag_on=True) as c:
+        yield c
+
+
 def _current_user_id() -> int:
     from sqlalchemy import select
 
@@ -94,10 +126,55 @@ def _count_measurements(user_id: int | None = None) -> int:
 
 
 def test_feature_flag_off_returns_404(client: TestClient) -> None:
+    # Authenticated + flag OFF → 404 on every /body route.
     for path in ("/body", "/body/measurements/new", "/body/export.json"):
         assert client.get(path).status_code == 404
     assert client.post("/body/measurements", data={"waist_cm": "80"}).status_code == 404
     assert client.post("/body/consent", data={"action": "grant"}).status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Sb_Body_01.1 — flag gate must run BEFORE auth: anonymous + flag OFF → 404
+# (not a 303 login redirect), so the feature is fully invisible.
+# ---------------------------------------------------------------------------
+
+
+def test_flag_off_anonymous_all_body_routes_404(anon_client_flag_off: TestClient) -> None:
+    c = anon_client_flag_off
+    for path in ("/body", "/body/export.json", "/body/measurements/new"):
+        assert c.get(path, follow_redirects=False).status_code == 404, path
+    assert c.post(
+        "/body/consent", data={"action": "grant"}, follow_redirects=False
+    ).status_code == 404
+    assert c.post(
+        "/body/measurements", data={"waist_cm": "80"}, follow_redirects=False
+    ).status_code == 404
+    # parametrized measurement routes too
+    assert c.get(
+        "/body/measurements/1/edit", follow_redirects=False
+    ).status_code == 404
+    assert c.post(
+        "/body/measurements/1/delete", follow_redirects=False
+    ).status_code == 404
+
+
+def test_flag_on_anonymous_redirects_to_login(anon_client_flag_on: TestClient) -> None:
+    # Flag ON: the feature exists; the auth layer redirects anonymous to
+    # /login (existing behavior preserved — NOT a 404).
+    r = anon_client_flag_on.get("/body", follow_redirects=False)
+    assert r.status_code == 303
+    assert "/login" in r.headers.get("location", "")
+    assert anon_client_flag_on.get(
+        "/body/export.json", follow_redirects=False
+    ).status_code == 303
+
+
+def test_flag_off_does_not_affect_other_routes(anon_client_flag_off: TestClient) -> None:
+    # Non-/body routes keep their behavior with the Body flag OFF.
+    assert anon_client_flag_off.get("/login").status_code == 200
+    for path in ("/history", "/progress", "/physique"):
+        r = anon_client_flag_off.get(path, follow_redirects=False)
+        assert r.status_code == 303 and "/login" in r.headers.get("location", ""), path
 
 
 # ---------------------------------------------------------------------------
