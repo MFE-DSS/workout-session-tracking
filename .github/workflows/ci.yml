@@ -129,6 +129,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Sb_CI_01 — full history required for gitleaks-action in
+          # pull_request context. The action diff-scans the PR commit
+          # range (HEAD^..HEAD); a shallow clone lacks the parent commit,
+          # so the internal git-range command fails ("no leaks found in
+          # partial scan" + non-zero exit) — a tooling false failure, not
+          # a secret. Mirrors the sonar job, which already uses depth 0.
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
