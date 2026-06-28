@@ -146,11 +146,13 @@ Strictement depuis `BodyIntelligenceSnapshot` :
 
 ## 9. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28319392397](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28319392397) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+Note : un premier run [28319244872](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28319244872) sur `4b06a5e` (Sb_31.3 strict) a été cancelled par un push concurrent `78ee3d4` (merge PR #16 — CI hardening gitleaks). Le run final couvre `78ee3d4` qui contient `4b06a5e` + le merge — Sb_31.3 validé en CI dans son contexte de branche canonique.
+
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 10. Métriques
 
