@@ -22,8 +22,8 @@
 | Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — track indépendant |
 | Product validation Sx_31 | ⏳ **pending real dogfood** sur ≥ 2 semaines / ≥ 4 consultations `/body/intelligence` + ≥ 2 `/coach-report` — bloque ouverture automatique de Sx_32/33+ |
 | Build authorization | ✅ Override #4 (Sx_31 Body Intelligence v2) **consommée** par Sx_31 closed 2026-06-28. Aucune nouvelle option autorisée : Sx_32/33+ restent bloquées (override séparé requis pour chacune). Sprints `Sb_31.next.*` (home-card / profile-link / overload-compliance) candidats discrétionnaires post-dogfood. |
-| Dernier CI run vert | [28321554285](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28321554285) (Sb_31.4) — Sb_31.5 doc à valider post-push |
-| Tests | **1419 passed** post Sb_31.4 |
+| Dernier CI run vert | [28322377053](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28322377053) (Sb_31.5 / Sx_31 closure) — 3/3 jobs verts |
+| Tests | **1419 passed** post Sx_31 closure |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 

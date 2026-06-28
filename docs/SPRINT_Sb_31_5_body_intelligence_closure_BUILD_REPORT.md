@@ -144,11 +144,11 @@ Aucune dette bloquante.
 
 ## 10. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28322377053](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28322377053) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu (doc only, surface tests inchangée)
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success (doc only, surface tests inchangée)
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success
 
 ## 11. Verdict
 
