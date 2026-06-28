@@ -1,0 +1,78 @@
+{# Sb_31.3 — Snapshot Body Intelligence inséré dans /coach-report.
+
+   Variable : body_snapshot (BodyIntelligenceSnapshot) :
+     * status ("ok" / "partial_data" / "insufficient_data")
+     * headline
+     * bullets (tuple[str])
+     * priorities (tuple[BodyIntelligencePriority])  — cap 3 côté composeur
+     * engine_version (int)
+     * limits (tuple[str])
+
+   Le partial ne fait AUCUNE logique métier : il lit uniquement le
+   snapshot déjà calculé en amont par le composer Sb_31.1 via la
+   couche I/O Sb_31.2. Aucun seuil dupliqué, aucune interprétation
+   body, aucun verdict esthétique.
+
+   Différent volontairement de la page /body/intelligence : version
+   compacte, sans rendu des 7 blocs. Lien "Voir le détail" renvoie vers
+   la surface canonique. #}
+
+{% if body_snapshot %}
+<section
+  class="coach-block coach-block--body-snapshot body-snapshot body-snapshot--{{ body_snapshot.status }}"
+  data-body-snapshot-status="{{ body_snapshot.status }}"
+  data-body-snapshot-engine-version="{{ body_snapshot.engine_version }}"
+  aria-labelledby="coach-body-snapshot-title"
+>
+  <h2 id="coach-body-snapshot-title" class="coach-block__title">
+    1bis. Snapshot Body Intelligence
+    {% if body_snapshot.status == "insufficient_data" %}
+      <span class="coach-tag coach-tag--inferred">Données partielles</span>
+    {% elif body_snapshot.status == "partial_data" %}
+      <span class="coach-tag coach-tag--inferred">Partiel</span>
+    {% else %}
+      <span class="coach-tag coach-tag--measured">Sur les séances loggées</span>
+    {% endif %}
+  </h2>
+
+  <p class="coach-block__line body-snapshot__headline">
+    {{ body_snapshot.headline }}
+  </p>
+
+  {% if body_snapshot.bullets %}
+  <ul class="body-snapshot__bullets">
+    {% for b in body_snapshot.bullets[:3] %}
+    <li class="body-snapshot__bullet">{{ b }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if body_snapshot.priorities %}
+  <ul class="body-snapshot__priorities" aria-label="Priorités suggérées">
+    {% for p in body_snapshot.priorities[:3] %}
+    <li
+      class="body-snapshot__priority body-snapshot__priority--{{ p.severity }} body-snapshot__priority--{{ p.key }}"
+      data-priority-key="{{ p.key }}"
+    >
+      <span class="body-snapshot__priority-message">{{ p.message }}</span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if body_snapshot.status == "insufficient_data" %}
+  <p class="coach-block__line body-snapshot__note text-dim">
+    À confirmer avec plus de séances.
+  </p>
+  {% endif %}
+
+  <p class="coach-block__line body-snapshot__cta">
+    <a class="link" href="{{ url_for('body_intelligence') }}">
+      Voir le détail →
+    </a>
+    <small class="text-dim">
+      Moteur Body Intelligence v{{ body_snapshot.engine_version }}.
+    </small>
+  </p>
+</section>
+{% endif %}
