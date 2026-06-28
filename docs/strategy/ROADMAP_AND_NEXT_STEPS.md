@@ -16,12 +16,14 @@
 | Sx_28 — Product Roadmap Reconciliation | ✅ **SPEC AMENDED** sous override humain 2026-06-15 (cf. `Sx_28_PRODUCT_ROADMAP_RECONCILIATION_SPEC.md`) |
 | Sx_29 — Mobile Session Focus Mode & Visual Interaction Layer | ✅ **TECHNICALLY CLOSED + DOGFOOD ✅ PASS** 2026-06-16 |
 | Sx_30 — Progressive Overload Engine | ✅ **TECHNICALLY CLOSED** 2026-06-27 (Sb_30.0 → Sb_30.5 livrés, cf. `Sx_30_CLOSURE_REPORT.md`) — dogfood device réel pending (cf. `dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_TEMPLATE.md`) |
+| Sx_31 — Body Intelligence v2 | ✅ **TECHNICALLY CLOSED** 2026-06-28 (Sx_31 spec + Sb_31.1 → Sb_31.5 livrés, cf. `Sx_31_CLOSURE_REPORT.md`) — dogfood device réel pending (cf. `dogfood/DOGFOOD_Sx_31_BODY_INTELLIGENCE_TEMPLATE.md`) |
 | Product validation Sx_27 | ⏳ **pending real dogfood** (cf. `docs/dogfood/DOGFOOD_Sx_27_DEFERRED.md`) — non simulé, peut reverser Option A si livré plus tard |
 | Product validation Sx_29 | ✅ **dogfood PASS** 2026-06-16 |
-| Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — bloque ouverture automatique de Sx_31/32/33+ |
-| Build authorization | ✅ Option B (Sx_30) **consommée** par Sx_30 closed 2026-06-27. Aucune nouvelle option autorisée : Sx_31/32/33+ restent bloquées (override séparé requis pour chacune). OQ-E placeholder candidat à `Sb_30.next.placeholder` sous override séparé. |
-| Dernier CI run vert | [28288760013](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28288760013) (Sb_30.5 / Sx_30 closure) — 3/3 jobs verts |
-| Tests | **1273 passed** post Sb_30.5 |
+| Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — track indépendant |
+| Product validation Sx_31 | ⏳ **pending real dogfood** sur ≥ 2 semaines / ≥ 4 consultations `/body/intelligence` + ≥ 2 `/coach-report` — bloque ouverture automatique de Sx_32/33+ |
+| Build authorization | ✅ Override #4 (Sx_31 Body Intelligence v2) **consommée** par Sx_31 closed 2026-06-28. Aucune nouvelle option autorisée : Sx_32/33+ restent bloquées (override séparé requis pour chacune). Sprints `Sb_31.next.*` (home-card / profile-link / overload-compliance) candidats discrétionnaires post-dogfood. |
+| Dernier CI run vert | [28321554285](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28321554285) (Sb_31.4) — Sb_31.5 doc à valider post-push |
+| Tests | **1419 passed** post Sb_31.4 |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
@@ -383,11 +385,22 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
 3. ~~**Prochaine action maintenant** : exécuter le dogfood Sx_29 device réel~~ **✅ FAIT 2026-06-16 : verdict opérateur satisfaisant**
 4. ~~Ouvrir Sx_30 SPEC ONLY~~ **✅ FAIT 2026-06-16 : `Sx_30_PROGRESSIVE_OVERLOAD_ENGINE_SPEC.md` livrée, Sb_30.0 livré**
 5. ~~**Prochaine action maintenant** : revue OQ-A→OQ-E de Sx_30, validation build queue, bascule explicite `BUILD AUTHORIZED FOR Sx_30`~~ **✅ FAIT 2026-06-16/27 : Sb_30.1 → Sb_30.5 livrés, Sx_30 TECHNICALLY CLOSED**
-6. **Prochaine action maintenant** : **exécuter le dogfood Sx_30 device réel** sur la base de `docs/dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_TEMPLATE.md` (≥ 4 séances réelles sur ≥ 2 semaines). Sans dogfood Sx_30 validé, Sx_31/32/33+ restent bloqués
-7. **Option intermédiaire** : `Sb_30.next.placeholder` (OQ-E) sous override séparé — placeholder cible dans les inputs poids/reps. Recommandé avant ouverture d'un nouveau Sx_ pour clore l'UX overload
-8. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT ; lab React exploratoire acceptable séparément
-9. **En parallèle (opérateur)** : viser AUSSI le dogfood Sx_27 toujours pending. Les trois dogfoods (Sx_27, Sx_29, Sx_30) sont indépendants
-10. **Options Sx_31/32/33+** : restent bloquées tant qu'aucun override séparé n'est documenté
+6. ~~**Prochaine action maintenant** : exécuter le dogfood Sx_30 device réel~~ — track indépendant, toujours pending
+7. ~~**Option intermédiaire** : `Sb_30.next.placeholder` (OQ-E)~~ **✅ LIVRÉ 2026-06-27**
+8. ~~Ouvrir Sx_31 SPEC ONLY~~ **✅ FAIT 2026-06-27 : `SPIGNOS_BODY_INTELLIGENCE_V2_SPEC.md` livrée**
+9. ~~Sb_31.1 → Sb_31.5 : composer + route + snapshot + a11y + closure~~ **✅ FAIT 2026-06-27/28 : Sx_31 TECHNICALLY CLOSED**
+10. **Prochaine action maintenant** : **exécuter les dogfoods en parallèle** :
+    - Sx_31 Body Intelligence v2 sur ≥ 2 semaines (≥ 4 consultations `/body/intelligence` + ≥ 2 `/coach-report`) — cf. `docs/dogfood/DOGFOOD_Sx_31_BODY_INTELLIGENCE_TEMPLATE.md`
+    - Sx_30 Progressive Overload Engine — toujours pending
+    - Sx_27 Coaching Loop — toujours pending
+    Les trois dogfoods sont indépendants.
+11. **Options intermédiaires** discrétionnaires sous override séparé :
+    - `Sb_31.next.profile-link` (lien `/profile → /body/intelligence`, OQ-G)
+    - `Sb_31.next.home-card` (carte home mini-summary, OQ-F)
+    - `Sb_31.next.overload-compliance` (agrégation 30j des hints Sx_30)
+12. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT
+13. **Track parallèle Body Signal Model** (`SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md`, photos/scans) reste indépendant de Sx_31
+14. **Options Sx_32/33+** : restent bloquées tant qu'aucun override séparé n'est documenté ou qu'aucun dogfood Sx_31 PASS n'est livré
 
 **Anti-patterns à éviter (post-override #2) :**
 - Ouvrir Sx_29 directement en BUILD `Sb_29.k` sans produire la spec d'abord — **interdit**, Sx_29 doit suivre le protocole spec-driven (§4 protocole)
