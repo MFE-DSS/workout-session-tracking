@@ -44,8 +44,12 @@
   {# ---- 1bis. Sb_31.3 — Snapshot Body Intelligence (synthèse v2)
        Pipeline canonique : build_body_intelligence_input →
        compute_body_intelligence (Sb_31.1). Le router orchestre,
-       le composeur décide, le partial affiche. #}
+       le composeur décide, le partial affiche.
+       Sb_31.X — rendu uniquement si body_snapshot est présent
+       (None quand BODY_INTELLIGENCE_ENABLED est OFF). #}
+  {% if body_snapshot %}
   {% include "_partials/coach_body_snapshot.html" %}
+  {% endif %}
 
   {# ---- 2. VOLUME + FRÉQUENCE ---- #}
   <section class="coach-block">

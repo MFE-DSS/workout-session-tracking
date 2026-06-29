@@ -9,6 +9,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 
+from app.config import get_settings
 from app.deps import CurrentUser, DbSession
 from app.services.body_intelligence import compute_body_intelligence
 from app.services.body_intelligence_inputs import build_body_intelligence_input
@@ -35,11 +36,14 @@ def coach_report_page(
     report = build_report(db, user)
     inference = build_inference(report)
     # Sb_31.3 — Snapshot Body Intelligence (v2) injecté via la pipeline
-    # canonique Sx_31. Le service `coach_report.py` n'est PAS modifié :
-    # le router orchestre uniquement input → composer → contexte template.
-    body_snapshot = compute_body_intelligence(
-        build_body_intelligence_input(db, user)
-    )
+    # canonique Sx_31. Sb_31.X — gardé derrière BODY_INTELLIGENCE_ENABLED :
+    # quand le flag est OFF, on ne calcule rien et le template n'affiche
+    # aucun bloc Body Intelligence (body_snapshot reste None).
+    body_snapshot = None
+    if get_settings().body_intelligence_enabled:
+        body_snapshot = compute_body_intelligence(
+            build_body_intelligence_input(db, user)
+        )
     return templates.TemplateResponse(
         request,
         "coach_report.html",

@@ -450,6 +450,8 @@ def profile_page(
             "measurement_fields": MEASUREMENT_FIELDS,
             "related_templates": related_templates,
             "active_session": latest_open_session(db, user.id),
+            # Sb_31.X — gate the Body Intelligence v2 discovery link.
+            "body_intelligence_enabled": get_settings().body_intelligence_enabled,
         },
     )
 
