@@ -173,11 +173,13 @@ Justification du placement :
 
 ## 10. CI réelle (post-push)
 
-À renseigner après push.
+**Run GitHub Actions : [28358444492](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28358444492) — ✅ success (3/3 jobs verts)**
 
-- [ ] Job `pytest + QA scripts` — vert attendu
-- [ ] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — vert attendu
-- [ ] Job `SonarCloud` — vert attendu
+- [x] Job `pytest + QA scripts` — ✅ success
+- [x] Job `lint (ruff budget + bandit + actionlint + shellcheck)` — ✅ success
+- [x] Job `SonarCloud` — ✅ success (après rerun : 1er échec dû à un HTTP 500 transient côté `sonarcloud.io/api/plugins/installed`, upstream)
+
+Note : un premier run [28357621906](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28357621906) avait échoué sur `check_spec_protocol` — le marker `## 12. Verdict` n'était pas dans la liste acceptée. Corrigé en `## 11. Verdict` (commit `e543a3e`). La section 11 reste "Métriques", la 12 → 11 garde la cohérence avec le pattern Sb_31.5.
 
 ## 11. Métriques
 
