@@ -21,7 +21,7 @@
 | Product validation Sx_29 | ✅ **dogfood PASS** 2026-06-16 |
 | Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — track indépendant |
 | Product validation Sx_31 | ⏳ **pending real dogfood** sur ≥ 2 semaines / ≥ 4 consultations `/body/intelligence` + ≥ 2 `/coach-report` — bloque ouverture automatique de Sx_32/33+ |
-| Build authorization | ✅ Override #4 (Sx_31 Body Intelligence v2) **consommée** par Sx_31 closed 2026-06-28. Aucune nouvelle option autorisée : Sx_32/33+ restent bloquées (override séparé requis pour chacune). Sprints `Sb_31.next.*` (home-card / profile-link / overload-compliance) candidats discrétionnaires post-dogfood. |
+| Build authorization | ✅ Override #4 (Sx_31 Body Intelligence v2) **consommée** par Sx_31 closed 2026-06-28. `Sb_31.next.profile-link` (OQ-G) livré 2026-06-29 sous override séparé. Aucune nouvelle option de cycle autorisée : Sx_32/33+ restent bloquées (override séparé requis pour chacune). Sprints `Sb_31.next.home-card` / `Sb_31.next.overload-compliance` candidats discrétionnaires post-dogfood. |
 | Dernier CI run vert | [28322377053](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28322377053) (Sb_31.5 / Sx_31 closure) — 3/3 jobs verts |
 | Tests | **1419 passed** post Sx_31 closure |
 | Ruff budget | **534 ≤ 548** |
@@ -395,7 +395,7 @@ Justification : le produit vient de recevoir une couche coaching complète. Il f
     - Sx_27 Coaching Loop — toujours pending
     Les trois dogfoods sont indépendants.
 11. **Options intermédiaires** discrétionnaires sous override séparé :
-    - `Sb_31.next.profile-link` (lien `/profile → /body/intelligence`, OQ-G)
+    - ~~`Sb_31.next.profile-link` (lien `/profile → /body/intelligence`, OQ-G)~~ **✅ LIVRÉ 2026-06-29**
     - `Sb_31.next.home-card` (carte home mini-summary, OQ-F)
     - `Sb_31.next.overload-compliance` (agrégation 30j des hints Sx_30)
 12. **Stack contrainte** : FastAPI SSR + Jinja2 conservé ; React production INTERDIT
