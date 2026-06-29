@@ -193,7 +193,7 @@ Justification du placement :
 | Services métier core mutés | 0 |
 | Ruff total | 529 ≤ 548 (inchangé) |
 
-## 12. Verdict
+## 11. Verdict
 
 **✅ Sb_31.next.profile-link livré.**
 
