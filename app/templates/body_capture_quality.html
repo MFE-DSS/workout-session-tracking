@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{# Sb_Body_02.1 — Capture Quality shell.
+
+   Shell strictement statique : aucun <script>, aucune référence
+   MediaPipe, aucun CDN, aucun <form>, aucun <input type="file">.
+   Page placeholder informant que la capture n'est pas disponible
+   dans ce lot. Wording neutre, anti-jugement corporel.
+#}
+
+{% block content %}
+<section
+  class="card body-capture-quality body-capture-quality--shell"
+  aria-labelledby="body-capture-quality-title"
+>
+  <h1 id="body-capture-quality-title" class="card__title">
+    Qualité de capture
+  </h1>
+
+  <p class="body-capture-quality__intro">
+    Cette étape vérifiera le cadrage et la qualité de capture avant une
+    analyse future.
+  </p>
+
+  <ul class="body-capture-quality__states text-dim">
+    <li>Caméra non activée dans ce lot.</li>
+    <li>Aucune image envoyée.</li>
+    <li>Aucune image stockée.</li>
+    <li>Aucun landmark stocké.</li>
+    <li>Aucun diagnostic médical.</li>
+    <li>Aucun score corporel.</li>
+  </ul>
+
+  <p
+    class="body-capture-quality__cta text-dim"
+    aria-disabled="true"
+    role="status"
+  >
+    Caméra non disponible dans cette version. Disponible dans un prochain lot.
+  </p>
+</section>
+{% endblock %}

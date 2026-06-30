@@ -94,6 +94,15 @@ class Settings(BaseSettings):
     # production surface until explicitly enabled.
     body_intelligence_enabled: bool = Field(default=False)
 
+    # Sb_Body_02.1 — Capture Quality shell gate. SEPARATE from
+    # body_assessment_enabled AND body_intelligence_enabled on purpose:
+    # this flag governs the future client-side MediaPipe capture-quality
+    # surface (cf. SPIGNOS_BODY_CAPTURE_QUALITY_SPEC.md). When False
+    # (default): /body/capture-quality* → 404 (before auth) and no link
+    # is exposed anywhere in the app. Zero production surface, zero
+    # camera, zero MediaPipe, zero JS, zero storage in this lot.
+    body_capture_quality_enabled: bool = Field(default=False)
+
     # SMTP for password reset emails. Leave smtp_host empty to disable.
     smtp_host: str = Field(default="")
     smtp_port: int = Field(default=587)
