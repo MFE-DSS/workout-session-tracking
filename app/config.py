@@ -85,6 +85,15 @@ class Settings(BaseSettings):
     # in later lots. See docs/strategy/SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md.
     body_assessment_enabled: bool = Field(default=False)
 
+    # Sb_31.X — Body Intelligence v2 gate. SEPARATE from
+    # body_assessment_enabled on purpose: the Manual Body Profile (/body)
+    # must be activatable WITHOUT exposing Body Intelligence v2
+    # (/body/intelligence + the /coach-report snapshot). When False
+    # (default): /body/intelligence* → 404 (before auth), and /coach-report
+    # neither computes nor renders the Body Intelligence snapshot. Zero
+    # production surface until explicitly enabled.
+    body_intelligence_enabled: bool = Field(default=False)
+
     # SMTP for password reset emails. Leave smtp_host empty to disable.
     smtp_host: str = Field(default="")
     smtp_port: int = Field(default=587)

@@ -24,6 +24,16 @@ import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _enable_body_intelligence_v2(monkeypatch):
+    """Sb_31.X — Body Intelligence v2 is now flag-gated (default OFF).
+    These tests exercise the ON behavior, so enable the flag before the
+    `client` fixture builds the app."""
+    monkeypatch.setenv("BODY_INTELLIGENCE_ENABLED", "1")
+
 ROOT = Path(__file__).resolve().parent.parent
 PARTIAL = ROOT / "app" / "templates" / "_partials" / "coach_body_snapshot.html"
 COACH_TEMPLATE = ROOT / "app" / "templates" / "coach_report.html"

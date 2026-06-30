@@ -19,15 +19,35 @@ Aucune logique métier ici. Aucune API JSON publique exposée.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
+from app.config import get_settings
 from app.deps import CurrentUser, DbSession
 from app.services.body_intelligence import compute_body_intelligence
 from app.services.body_intelligence_inputs import build_body_intelligence_input
 from app.templating import templates
 
-router = APIRouter(tags=["body_intelligence"])
+
+def require_body_intelligence_enabled() -> None:
+    """404 when the Body Intelligence v2 feature flag is off.
+
+    Declared as a ROUTER-LEVEL dependency (below) so the flag gate runs
+    BEFORE the auth dependency: with the flag OFF, anonymous AND
+    authenticated requests get 404 — the surface is fully invisible.
+    Mirrors the Manual Body Profile gate (Sb_Body_01.1).
+    """
+    if not get_settings().body_intelligence_enabled:
+        raise HTTPException(status_code=404)
+
+
+# Router-level dependency: evaluated before the endpoints' own
+# dependencies (e.g. CurrentUser), so the flag 404 wins over the auth 303
+# for anonymous requests when Body Intelligence v2 is off.
+router = APIRouter(
+    tags=["body_intelligence"],
+    dependencies=[Depends(require_body_intelligence_enabled)],
+)
 
 
 @router.get(
