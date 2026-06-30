@@ -102,7 +102,8 @@
 | Sx Body 00 (spec) | Brainstorming + roadmap (taxonomie 6 états, 30 Q&A, 5 lots) | ✅ mergé | — | PR #13 | (squash `3fb8faa`) | Docs only ; admin merge inutile (UNSTABLE) |
 | Sx Body 01 (spec) | Signal model + privacy/consent + build spec Sb Body 01 (7 états, mesures MVP, ratios, versionnement) | ✅ mergé | — | PR #14 | (squash `662ed49`) | Docs only ; admin override (SonarCloud skip docs-only) |
 | Sb Body 01 | Manual Body Profile MVP sous flag `BODY_ASSESSMENT_ENABLED` (mesures manuelles, consentement, hard-delete, export, ratios à la volée, 1 migration additive) | 🟡 build | `SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md` | `SPRINT_Sb_Body_01_manual_profile_BUILD_REPORT.md` | (PR draft) | Migration `7i0f5d1e2g43` (3 colonnes additives + `body_consents`) ; 0 provider / 0 photo / 0 MediaPipe / 0 Bodygram ; mode séance intact ; 10 tests dédiés |
-| Sb Body 02 | MediaPipe Capture Quality | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé ; flag séparé |
+| Sx Body 02 (spec) | MediaPipe Capture Quality spec — client-side only, vendored (pas de CDN), flag dédié `BODY_CAPTURE_QUALITY_ENABLED`, 0 persistance image/vidéo/landmark, build plan 02.1→02.R | 🟡 spec | `SPIGNOS_BODY_CAPTURE_QUALITY_SPEC.md` | `SPRINT_Sx_Body_02_capture_quality_SPEC_REPORT.md` | (PR draft) | Docs only ; recherche docs officielles MediaPipe Pose Landmarker ; 0 code / 0 dépendance / 0 MediaPipe installé |
+| Sb Body 02 | MediaPipe Capture Quality (build) | ⏳ | `SPIGNOS_BODY_CAPTURE_QUALITY_SPEC.md` | — | — | Pré-requis : Sx Body 02 verrouillée ; flag `BODY_CAPTURE_QUALITY_ENABLED` distinct ; build queue Sb Body 02.1→02.R |
 | Sb Body 03 | Bodygram Integration | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé + consent provider |
 | Sb Body 04 | Archetype Engine | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé |
 | Sb Body 05 | Link to Training Engine | ⏳ | roadmap | — | — | Pré-requis : Sb Body 04 |
