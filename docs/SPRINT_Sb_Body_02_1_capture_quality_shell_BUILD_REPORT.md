@@ -120,7 +120,7 @@ Pose le shell applicatif de la future capture-quality Body : un flag dédié `BO
 | Ruff budget | ✅ 529 ≤ 548 (inchangé) |
 | Spec protocol | ✅ |
 
-## 10. Verdict
+## Verdict
 
 **✅ Shell Sb_Body_02.1 livré. PR draft prête, non mergée, non déployée.**
 
