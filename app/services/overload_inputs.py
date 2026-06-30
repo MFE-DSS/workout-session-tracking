@@ -86,21 +86,46 @@ def _first_completed_work_set(se: SessionExercise) -> SetLog | None:
     return None
 
 
+# Sb_30.bugfix.history-identity-guard — facteur d'écart aberrant accepté
+# au sein d'une fenêtre d'historique cohérente (même template, même code,
+# même politique de substitution). Au-delà, la donnée est jugée
+# contaminée par un bug amont et l'input est rejeté (silent).
+_IMPLAUSIBLE_WEIGHT_RATIO = 3.0
+
+
 def _history_signals_for_code(
     db: Session,
     user_id: int,
     exercise_code: str,
     exclude_session_id: int,
+    template_slug_snapshot: str,
+    *,
+    current_is_substituted: bool,
+    current_substituted_name: str | None = None,
     n: int = HISTORY_N,
 ) -> tuple[HistoricalSetSignal, ...]:
     """Lit les N dernières WorkoutSessions COMPLETED pour ``user_id``
-    contenant un :class:`SessionExercise` ayant ``exercise_code_snapshot``
-    == ``exercise_code`` (snapshot-based, résiste aux substitutions/renames).
+    contenant un :class:`SessionExercise` aligné avec l'identité historique
+    de l'exercice courant.
 
-    Ordonne du plus récent au plus ancien. Chaque entrée porte le premier
-    work set complété de l'exercice + la quality_score normalisée [0..1]
-    de la session + un ``fatigue_signal`` boolean dérivé de
-    ``WorkoutSession.global_state`` (== ``"fatigued"``).
+    Sb_30.bugfix.history-identity-guard — V2 de l'identité :
+
+    1. **Même template** (``template_slug_snapshot``) : sinon collision
+       inter-template (deux exercices différents partagent le même
+       ``exercise_code_snapshot``, ex. ``E2`` = Élévations latérales câble
+       sur ``catch-up-shoulders`` mais Rowing câble assis sur ``pull-b``).
+       Cette règle aligne l'overload sur :func:`last_time_by_exercise_code`.
+    2. **Même politique de substitution** :
+       - si la séance courante est prescrite (``substituted_name is None``),
+         on ne consomme QUE les historiques prescrits (``substituted_name``
+         IS NULL côté DB) — éviter de mélanger les charges du prescrit et
+         d'une substitution passée.
+       - si la séance courante est substituée et que ``current_substituted_name``
+         est fourni, on ne consomme que les historiques avec le **même**
+         ``substituted_name`` (match strict). Sinon (cas V1 conservateur),
+         l'appelant aura déjà retourné ``None`` en amont.
+
+    Snapshot-based : résiste aux renames de template. Pas d'effet de bord.
     """
     sessions = db.execute(
         select(WorkoutSession)
@@ -108,6 +133,9 @@ def _history_signals_for_code(
             WorkoutSession.user_id == user_id,
             WorkoutSession.status == SessionStatus.COMPLETED,
             WorkoutSession.id != exclude_session_id,
+            # Sb_30.bugfix — alignement avec last_time_by_exercise_code
+            # (cf. ``app/services/stats.py``).
+            WorkoutSession.template_slug_snapshot == template_slug_snapshot,
         )
         .order_by(WorkoutSession.started_at.desc())
         .limit(50)
@@ -122,6 +150,11 @@ def _history_signals_for_code(
                 se
                 for se in s.session_exercises
                 if se.exercise_code_snapshot == exercise_code
+                and _matches_substitution_policy(
+                    se,
+                    current_is_substituted=current_is_substituted,
+                    current_substituted_name=current_substituted_name,
+                )
             ),
             None,
         )
@@ -149,7 +182,50 @@ def _history_signals_for_code(
                 fatigue_signal=fatigue,
             )
         )
+    # Sb_30.bugfix.history-identity-guard — défense en profondeur : si
+    # malgré les filtres une cohorte historique présente un écart > 3×
+    # entre min et max non-nul, on considère la donnée corrompue et on
+    # rejette l'input pour ne pas laisser passer un hint trompeur.
+    if not _history_weight_is_plausible(signals):
+        return tuple()
     return tuple(signals)
+
+
+def _matches_substitution_policy(
+    past_se: SessionExercise,
+    *,
+    current_is_substituted: bool,
+    current_substituted_name: str | None,
+) -> bool:
+    """Renvoie ``True`` si ``past_se`` peut entrer dans l'historique
+    overload de la séance courante au regard de la politique de
+    substitution V2.
+    """
+    past_sub = (past_se.substituted_name or "").strip() or None
+    if not current_is_substituted:
+        # Prescrit : on ne consomme QUE le prescrit passé.
+        return past_sub is None
+    # Substitué courant : on exige le même substituted_name exact.
+    if current_substituted_name is None:
+        return False
+    return past_sub == current_substituted_name.strip()
+
+
+def _history_weight_is_plausible(signals: list[HistoricalSetSignal]) -> bool:
+    """Garde-fou d'écart aberrant. Sb_30.bugfix.history-identity-guard.
+
+    Si la fenêtre historique contient ≥ 2 entrées et que le ratio
+    max/min des poids non-nuls dépasse :data:`_IMPLAUSIBLE_WEIGHT_RATIO`,
+    on considère la donnée comme contaminée (typiquement un mélange
+    inter-template ou inter-substitution qui aurait dû être filtré).
+    """
+    weights = [s.weight_kg for s in signals if s.weight_kg and s.weight_kg > 0]
+    if len(weights) < 2:
+        return True
+    lo, hi = min(weights), max(weights)
+    if lo <= 0:
+        return True
+    return (hi / lo) <= _IMPLAUSIBLE_WEIGHT_RATIO
 
 
 def build_overload_input_for_exercise(
@@ -173,11 +249,34 @@ def build_overload_input_for_exercise(
         se.substituted_name or se.exercise_name_snapshot,
         getattr(te, "machine_slug", None),
     )
+
+    # Sb_30.bugfix.history-identity-guard — politique de substitution V1.
+    # Si la séance courante est substituée, on n'a pas (encore) de chemin
+    # sûr pour produire un overload sans risquer le mélange prescrit ↔
+    # substitut. V1 conservateur : retourner ``None`` → l'explainer marque
+    # le hint silent et l'UI ne propose AUCUNE cible chiffrée.
+    current_substituted_name = (se.substituted_name or "").strip() or None
+    current_is_substituted = current_substituted_name is not None
+    if current_is_substituted:
+        # V1 : pas d'historique fiable pour les substituts. La régression
+        # inverse (laisser passer la cible du prescrit sur un substitut)
+        # est jugée plus dangereuse que de simplement masquer le hint.
+        return None
+
+    template_slug = (session.template_slug_snapshot or "").strip()
+    if not template_slug:
+        # Sans identité de template, on ne peut pas garantir l'absence
+        # de collision inter-template ; on reste silencieux.
+        return None
+
     history = _history_signals_for_code(
         db,
         user_id=session.user_id,
         exercise_code=se.exercise_code_snapshot,
         exclude_session_id=session.id,
+        template_slug_snapshot=template_slug,
+        current_is_substituted=current_is_substituted,
+        current_substituted_name=current_substituted_name,
     )
     return OverloadInput(
         exercise_category=category,
