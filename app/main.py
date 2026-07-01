@@ -25,6 +25,7 @@ from app.routers import (
     admin,
     auth_routes,
     body,
+    body_capture,
     body_intelligence,
     coach_report,
     export,
@@ -246,6 +247,11 @@ def create_app() -> FastAPI:
     # distinct du Body Manual Profile ci-dessus ; aucune dépendance
     # croisée.
     app.include_router(body_intelligence.router)
+    # Sb_Body_02.1 — Capture Quality shell (route /body/capture-quality).
+    # Router-level gate on BODY_CAPTURE_QUALITY_ENABLED (404 when off,
+    # before auth). Flag distinct des deux autres tracks Body. Shell
+    # uniquement : aucun JS, aucune caméra, aucun stockage.
+    app.include_router(body_capture.router)
 
     return app
 
