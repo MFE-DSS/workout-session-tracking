@@ -2,7 +2,8 @@
 
 **Spec source :** `docs/strategy/Sx_30_PROGRESSIVE_OVERLOAD_ENGINE_SPEC.md`
 **Date closure :** 2026-06-27
-**Statut :** ✅ **TECHNICALLY CLOSED** — dogfood device réel PENDING.
+**Statut :** ✅ **TECHNICALLY CLOSED + DOGFOOD ✅ PASS 2026-07-01**.
+**Verdict dogfood opérateur :** engine v1 fonctionnel et cohérent, aucun hint chiffré absurde, bug de contamination inter-template (corrigé par `10732e9`) non reproduit. Aucun bugfix supplémentaire requis. `Sb_30.next.substitution-history` reste différé. Cf. `docs/dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_REPORT.md`.
 **Branche :** `claude/sprint-reporting-fitness-app-V7Qr6`
 
 ---
