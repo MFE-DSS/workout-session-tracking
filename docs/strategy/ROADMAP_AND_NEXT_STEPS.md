@@ -22,8 +22,11 @@
 | Product validation Sx_30 | ⏳ **pending real dogfood** sur ≥ 2 semaines d'usage réel — track indépendant |
 | Product validation Sx_31 | ⏳ **pending real dogfood** sur ≥ 2 semaines / ≥ 4 consultations `/body/intelligence` + ≥ 2 `/coach-report` — bloque ouverture automatique de Sx_32/33+ |
 | Build authorization | ✅ Override #4 (Sx_31 Body Intelligence v2) **consommée** par Sx_31 closed 2026-06-28. `Sb_31.next.profile-link` (OQ-G) livré 2026-06-29 sous override séparé. Aucune nouvelle option de cycle autorisée : Sx_32/33+ restent bloquées (override séparé requis pour chacune). Sprints `Sb_31.next.home-card` / `Sb_31.next.overload-compliance` candidats discrétionnaires post-dogfood. |
-| Dernier CI run vert | [28322377053](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28322377053) (Sb_31.5 / Sx_31 closure) — 3/3 jobs verts |
-| Tests | **1419 passed** post Sx_31 closure |
+| Dernier CI run vert | [28454376953](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28454376953) (PR #21 Sb_Body_02.1 Capture Quality Shell) — 3/3 jobs verts |
+| Tests | 122 tests critiques (Sx_30 bugfix + Sx_31 body + shell 02.1) verts localement sur HEAD `1e4cd4c` |
+| Dogfood Sx_30 | ✅ PASS 2026-07-01 (`docs/dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_REPORT.md`) — engine v1 validé, bug identity guard non reproduit |
+| Prod stabilization gate | 🟡 EN COURS — `docs/OPS_PROD_STABILIZATION_PROFILE_BODY_COACH_REPORT.md`. Code side ✅ prêt sur SHA `1e4cd4c`. **Déploiement + smoke tests prod à jouer par opérateur.** |
+| UI renovation | 🚫 BLOQUÉ tant que le gate ci-dessus n'a pas conclu PROD STABLE. |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 
