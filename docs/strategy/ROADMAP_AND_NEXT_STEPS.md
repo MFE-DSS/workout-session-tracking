@@ -25,8 +25,9 @@
 | Dernier CI run vert | [28454376953](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28454376953) (PR #21 Sb_Body_02.1 Capture Quality Shell) — 3/3 jobs verts |
 | Tests | 122 tests critiques (Sx_30 bugfix + Sx_31 body + shell 02.1) verts localement sur HEAD `1e4cd4c` |
 | Dogfood Sx_30 | ✅ PASS 2026-07-01 (`docs/dogfood/DOGFOOD_Sx_30_OVERLOAD_ENGINE_REPORT.md`) — engine v1 validé, bug identity guard non reproduit |
-| Prod stabilization gate | 🟡 EN COURS — `docs/OPS_PROD_STABILIZATION_PROFILE_BODY_COACH_REPORT.md`. Code side ✅ prêt sur SHA `1e4cd4c`. **Déploiement + smoke tests prod à jouer par opérateur.** |
-| UI renovation | 🚫 BLOQUÉ tant que le gate ci-dessus n'a pas conclu PROD STABLE. |
+| Prod stabilization gate | ✅ **SIGNÉ** 2026-07-02 — verdict `PROD STRUCTURALLY STABLE FOR UI RENOVATION` (`docs/OPS_PROD_STABILIZATION_PROFILE_BODY_COACH_REPORT.md` §10, commit `ddd476b`). SHA `1e4cd4c` live via run [28527679621](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28527679621), tag `deploy/prod/2026-07-01-1511-1e4cd4c`. `BODY_INTELLIGENCE_ENABLED=true` en prod. Smoke structurel externe vert (S1-S5 + S8 + S9). |
+| Mini-gate `PROD_DOGFOOD_57KG_LIVE_CHECK` | ⏳ **pending** — DB prod initialement vide au signage, test live-data différé après premières séances réelles. Ne bloque pas UI renovation. Annexe D du rapport OPS. |
+| UI renovation | 🔓 **DÉBLOQUÉE avec caveat** — cycle `Sx_UI` ouvert en SPEC PENDING (cf. `docs/strategy/UI_TRANSFORMATION_ROADMAP.md` + `SPEC_REGISTRY.md §1quinquies`). Prochaine étape docs-only : `Sx_UI_01_brand_foundation_spec`. Rebrand cible **Auren** documenté, aucun renommage code avant `Sx_UI_10`. Mini-gate 57 kg à jouer en parallèle après données réelles. |
 | Ruff budget | **534 ≤ 548** |
 | Architecture | FastAPI SSR + Jinja2 + SQLite (inchangée) — **React production INTERDIT dans Sx_29** |
 

@@ -109,6 +109,39 @@
 | Sb Body 04 | Archetype Engine | ⏳ | roadmap | — | — | Pré-requis : Sb Body 01 mergé |
 | Sb Body 05 | Link to Training Engine | ⏳ | roadmap | — | — | Pré-requis : Sb Body 04 |
 
+## 1quinquies. Cycle Sx_UI — Auren Visual & Product Transformation (SPEC PENDING)
+
+**Roadmap :** `docs/strategy/UI_TRANSFORMATION_ROADMAP.md`
+**Brainstorm sources :** `docs/strategy/brainstorm/UI_TRANSFORMATION_BRAINSTORM_V1_normalized.md`, `..._V2_normalized.md`
+**Rebrand :** Spignos → **Auren** (documented direction only, no code touched)
+**Statut :** ⚪ 11 specs à écrire ; ordre strict Sx_UI_01 → Sx_UI_11 (avec Sx_UI_11 baseline avant Sx_UI_04)
+**Unlocked by :** `PROD STRUCTURALLY STABLE FOR UI RENOVATION` (`docs/OPS_PROD_STABILIZATION_PROFILE_BODY_COACH_REPORT.md` §10, verdict signé 2026-07-02, commit `ddd476b`)
+**Caveat :** `PROD_DOGFOOD_57KG_LIVE_CHECK` reste pending (dette prod critique parallèle, ne bloque pas le cycle UI)
+**Hard contracts :**
+- aucune spec Sx_UI ne modifie la logique métier (scoring, substitution, coach_report, body_intelligence, overload_engine, recommendation, implicit_signal, quality_score, body_tracking)
+- SSR FastAPI + Jinja conservé
+- no-JS fallback préservé
+- pas de React, pas de SPA, pas de bundler applicatif
+- WCAG 2.2 tap targets 44×44 conservés et étendus au shell global
+- un accent visuel unique (amendement Sx_UI_02bis requis pour tout ajout)
+- rebrand Spignos → Auren exécuté uniquement à `Sx_UI_10`
+
+| Sprint | Domaine | Statut | Précondition | Peut modifier code ? |
+|---|---|---|---|---|
+| Sx_UI_01 | Brand Foundation (nom Auren, tone, principes, dispo juridique) | ⚪ à écrire | Gate OPS ✅ | Non (docs) |
+| Sx_UI_02 | Design Tokens (palettes, typo, tokens CSS) | ⚪ | Sx_UI_01 | Non (docs) |
+| Sx_UI_03 | App Shell + Navigation (chrome ≤ 4 entrées) | ⚪ | Sx_UI_02 | Non (docs) |
+| Sx_UI_04 | Session Focus Reskin | ⚪ | Sx_UI_03 + Sx_UI_11 baseline | Oui (surface) |
+| Sx_UI_05 | Today / Readiness Home | ⚪ | Sx_UI_04 | Oui (surface) |
+| Sx_UI_06 | Exercise Intelligence Presentation | ⚪ | Sx_UI_05 | Oui (surface) |
+| Sx_UI_07 | History & Progress | ⚪ | Sx_UI_06 | Oui (surface) |
+| Sx_UI_08 | Portability & Installability (PWA mature) | ⚪ | Sx_UI_07 | Oui (manifest + SW minimal) |
+| Sx_UI_09 | Accessibility & Motion | ⚪ | parallèle possible dès Sx_UI_04 | Oui (surface + attributs) |
+| Sx_UI_10 | Rebrand Migration Spignos → Auren (scope infra + code) | ⚪ | Sx_UI_04 minimum validé | Oui (infra + code) |
+| Sx_UI_11 | Screenshot Regression (baseline + continu) | ⚪ | avant Sx_UI_04 pour baseline, puis parallèle continu | Oui (tests/CI) |
+
+**No implementation authorized yet.** Aucun sprint `Sb_UI_NN.k` ouvert. Prochain step docs-only : `Sx_UI_01_brand_foundation_spec`.
+
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
 **Spec :** `docs/strategy/SPIGNOS_IMPLICIT_SIGNAL_SCORING_SPEC_v1.md`
