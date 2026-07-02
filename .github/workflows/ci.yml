@@ -6,6 +6,12 @@ on:
     # Sb_20.4 — branche par défaut du repo (pas de `main` distant ; cette
     # branche fait office de trunk). À ajuster si on renomme un jour.
     branches: [main, claude/sprint-reporting-fitness-app-V7Qr6]
+    # Sb_OPS.ci-path-filter — skip CI on docs-only pushes. Un push dont
+    # TOUS les fichiers sont sous docs/ ne déclenche pas ce workflow ; il
+    # suffit qu'un seul fichier hors docs/ change pour que la CI joue.
+    # Trigger `pull_request` NON affecté : toute PR déclenche CI complète.
+    paths-ignore:
+      - 'docs/**'
 
 # Read-only: this workflow never touches prod, never pushes tags,
 # never deploys. Deployment lives in deploy-production.yml.

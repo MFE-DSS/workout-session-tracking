@@ -142,6 +142,14 @@
 
 **Build remains blocked.** Aucun sprint `Sb_UI_NN.k` d'implémentation autorisé. `Sx_UI_02` reste blocked tant que `Sx_UI_01` n'a pas été validé par human review. Après validation Sx_UI_01, prochain step docs-only : `Sx_UI_02_DESIGN_TOKENS_SPEC` SPEC ONLY.
 
+## 1sexies. Sprints OPS hors-cycle (infra CI, tooling, cost control)
+
+Sprints infra chirurgicaux ne relevant d'aucun cycle produit `Sx_`. Chaque sprint est indépendant, docs + fichier infra ciblé, aucun impact code applicatif.
+
+| Sprint | Domaine | Statut | Rapport | Motivation |
+|---|---|---|---|---|
+| Sb_OPS.ci-path-filter | Ajout `paths-ignore: ['docs/**']` sur trigger `push` de `.github/workflows/ci.yml`. PR trigger non affecté. `deploy-production.yml` non affecté. | 🟢 **DELIVERED — pending human review** 2026-07-02 | [`SPRINT_Sb_OPS_ci_path_filter_BUILD_REPORT.md`](../SPRINT_Sb_OPS_ci_path_filter_BUILD_REPORT.md) | Réduction facture GitHub Actions sur cycles docs-only (économie projetée ~90 % sur les 10 specs Sx_UI docs-only restantes). |
+
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
 **Spec :** `docs/strategy/SPIGNOS_IMPLICIT_SIGNAL_SCORING_SPEC_v1.md`
