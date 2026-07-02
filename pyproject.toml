@@ -30,6 +30,15 @@ dev = [
     "bandit>=1.7",
 ]
 
+# Sb_UI_11.1 — Visual baseline tooling (Playwright).
+# Installed on demand: `pip install -e '.[baseline]'` then
+# `python -m playwright install chromium`. Never installed in CI V1 — CI
+# only validates matrix + CLI logic without launching a browser.
+# See docs/strategy/Sx_UI_11_SCREENSHOT_REGRESSION_BASELINE_SPEC.md §4.
+baseline = [
+    "playwright>=1.40",
+]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["app*"]

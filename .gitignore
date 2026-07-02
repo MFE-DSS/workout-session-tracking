@@ -34,3 +34,10 @@ htmlcov/
 # Build
 build/
 dist/
+
+# Sb_UI_11.1 — Visual baseline outputs (never committed).
+# Also covered by existing rules: `.env.*` (line 8) and `/var/` (line 16)
+# already ignore `.env.baseline` and `var/visual-baseline/` respectively.
+# Explicit additions for clarity + non-covered paths:
+baseline/
+test-results/visual-baseline/
