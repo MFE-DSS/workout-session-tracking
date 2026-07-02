@@ -33,6 +33,7 @@ Prérequis navigateur (à exécuter localement, jamais en CI V1) :
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -114,13 +115,71 @@ def _print_env_status(strict_p0: bool) -> bool:
     return all_set
 
 
-def _resolve_route(route_template: str) -> str:
-    """Remplace les placeholders `${AUREN_BASELINE_*}` par leur valeur env.
+def _load_runtime_file(path: str | None) -> dict | None:
+    """Load runtime.json produced by scripts/visual_baseline_runtime.py.
 
-    Les valeurs ne sont jamais loggées. Si absente, retourne le template
-    inchangé — la capture réelle échouera, la dry-run signalera l'entrée.
+    Returns None if `path` is falsy. Raises SystemExit(5) with a clear
+    error if the file is missing or unreadable. The runtime file must
+    NEVER contain credentials — we assert that here as a defense-in-depth.
+    """
+    if not path:
+        return None
+    p = Path(path)
+    if not p.is_file():
+        print(
+            f"ERROR: --runtime-file not found: {p}. Run "
+            "`python scripts/visual_baseline_runtime.py prepare` first.",
+            file=sys.stderr,
+        )
+        raise SystemExit(5)
+    try:
+        data = json.loads(p.read_text())
+    except json.JSONDecodeError as exc:
+        print(f"ERROR: --runtime-file is not valid JSON: {exc}", file=sys.stderr)
+        raise SystemExit(6) from exc
+    for banned in ("password", "cookie", "session_token", "secret", "token"):
+        if banned in data:
+            print(
+                f"ERROR: --runtime-file contains banned key {banned!r} — "
+                "this file must never carry secrets.",
+                file=sys.stderr,
+            )
+            raise SystemExit(7)
+    return data
+
+
+def _resolve_route(
+    route_template: str, runtime: dict | None = None
+) -> str:
+    """Remplace les placeholders `${AUREN_BASELINE_*}` par leur valeur.
+
+    Résolution :
+    1. Si un `runtime` est fourni, ses IDs `sessions.active.id` et
+       `sessions.done.id` sont utilisés en priorité.
+    2. Sinon fallback sur les variables d'environnement `AUREN_BASELINE_*`
+       (compatibilité Sb_UI_11.1).
+
+    Les valeurs ne sont jamais loggées.
     """
     resolved = route_template
+
+    # Runtime file has priority (Sb_UI_11.2).
+    if runtime is not None:
+        sessions = runtime.get("sessions", {})
+        runtime_map = {
+            "AUREN_BASELINE_ACTIVE_SESSION_ID": (
+                sessions.get("active", {}).get("id")
+            ),
+            "AUREN_BASELINE_DONE_SESSION_ID": (
+                sessions.get("done", {}).get("id")
+            ),
+        }
+        for name, value in runtime_map.items():
+            placeholder = f"${{{name}}}"
+            if placeholder in resolved and value is not None:
+                resolved = resolved.replace(placeholder, str(value))
+
+    # Env-var fallback (Sb_UI_11.1 compat).
     for name in (
         *REQUIRED_ENV_VARS_FOR_ACTIVE_SESSION,
         *REQUIRED_ENV_VARS_FOR_DONE_SESSION,
@@ -134,22 +193,38 @@ def _resolve_route(route_template: str) -> str:
     return resolved
 
 
-def _plan_summary(plan: CapturePlan) -> str:
+def _resolve_state_file(
+    cli_state_file: str | None, runtime: dict | None
+) -> str | None:
+    """Prefer explicit --state-file. Fallback to runtime.state_file."""
+    if cli_state_file:
+        return cli_state_file
+    if runtime is not None:
+        val = runtime.get("state_file")
+        if val:
+            return str(val)
+    return None
+
+
+def _plan_summary(plan: CapturePlan, runtime: dict | None = None) -> str:
     """Résumé texte pour dry-run — jamais de secret ni valeur env."""
     entry = plan.entry
+    resolved = _resolve_route(entry.route, runtime=runtime)
     return (
         f"  [{entry.priority}] {entry.slug}/{plan.viewport} "
         f"({plan.width}×{plan.height}) → {plan.output_path} "
         f"| auth={entry.auth_required} | fixture={entry.data_fixture} "
-        f"| route_template={entry.route}"
+        f"| route={resolved}"
     )
 
 
-def _dry_run(plans: list[CapturePlan]) -> int:
+def _dry_run(plans: list[CapturePlan], runtime: dict | None = None) -> int:
     """Liste les captures sans lancer de navigateur ni écrire aucun fichier."""
     print(f"Dry-run: {len(plans)} capture(s) planned.")
+    if runtime is not None:
+        print("Runtime source: runtime.json")
     for plan in plans:
-        print(_plan_summary(plan))
+        print(_plan_summary(plan, runtime=runtime))
     return 0
 
 
@@ -157,38 +232,46 @@ def _capture_real(
     plans: list[CapturePlan],
     base_url: str,
     state_file: str | None,
+    runtime: dict | None = None,
 ) -> int:
     """Lance Playwright et capture les screenshots.
 
     Import Playwright uniquement ici — jamais au chargement du module.
+
+    Auth : `state_file` (Playwright storage_state) est utilisé pour les
+    entrées `auth_required=True`. Les entrées anonymes (`login`,
+    `register`) sont capturées SANS state_file pour capturer le vrai
+    empty state public.
     """
     try:
         from playwright.sync_api import sync_playwright  # type: ignore[import-not-found]
     except ImportError:
         print(
-            "ERROR: playwright not installed. Run `pip install playwright` "
+            "ERROR: playwright not installed. Run `pip install -e '.[baseline]'` "
             "and `python -m playwright install chromium`.",
             file=sys.stderr,
         )
         return 3
 
     print(f"Capturing {len(plans)} screenshot(s) against {base_url} ...")
+    if runtime is not None:
+        print("Runtime source: runtime.json")
     ok = 0
     failed = 0
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         try:
-            context_kwargs: dict[str, object] = {}
-            if state_file:
-                context_kwargs["storage_state"] = state_file
             for plan in plans:
-                context = browser.new_context(
-                    viewport={"width": plan.width, "height": plan.height},
-                    **context_kwargs,
-                )
+                context_kwargs: dict[str, object] = {
+                    "viewport": {"width": plan.width, "height": plan.height},
+                }
+                # Auth state only for authenticated entries.
+                if plan.entry.auth_required and state_file:
+                    context_kwargs["storage_state"] = state_file
+                context = browser.new_context(**context_kwargs)
                 page = context.new_page()
                 try:
-                    route = _resolve_route(plan.entry.route)
+                    route = _resolve_route(plan.entry.route, runtime=runtime)
                     url = base_url.rstrip("/") + route
                     page.goto(url, wait_until="networkidle", timeout=15000)
                     output_dir = Path(plan.output_path).parent
@@ -249,12 +332,22 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
         "--state-file",
         default=None,
         help="Optional Playwright storage_state JSON path (auth cookies). "
-        "Never contains raw password. See Sx_UI_11 §6.",
+        "Never contains raw password. See Sx_UI_11 §6. "
+        "If omitted, --runtime-file's state_file is used.",
+    )
+    parser.add_argument(
+        "--runtime-file",
+        default=None,
+        help="Path to runtime.json produced by "
+        "scripts/visual_baseline_runtime.py. Resolves session IDs and "
+        "state_file. Preferred over env vars (Sb_UI_11.2).",
     )
     parser.add_argument(
         "--strict-p0",
         action="store_true",
-        help="Fail if required env vars for session active/done are missing.",
+        help="Fail if required env vars for session active/done are missing. "
+        "Ignored when --runtime-file is provided (runtime file supplies "
+        "the IDs).",
     )
     return parser.parse_args(argv)
 
@@ -262,10 +355,15 @@ def parse_args(argv: Sequence[str]) -> argparse.Namespace:
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv if argv is not None else sys.argv[1:])
 
+    runtime = _load_runtime_file(args.runtime_file)
+
+    # env status is still printed for transparency, but strict_p0 is
+    # relaxed when runtime supplies the IDs.
     all_env_ok = _print_env_status(strict_p0=args.strict_p0)
-    if args.strict_p0 and not all_env_ok:
+    if args.strict_p0 and runtime is None and not all_env_ok:
         print(
-            "\nERROR: --strict-p0 requires all AUREN_BASELINE_* env vars to be set.",
+            "\nERROR: --strict-p0 requires either --runtime-file "
+            "or all AUREN_BASELINE_* env vars to be set.",
             file=sys.stderr,
         )
         return 4
@@ -282,9 +380,15 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.dry_run:
-        return _dry_run(plans)
+        return _dry_run(plans, runtime=runtime)
 
-    return _capture_real(plans, base_url=args.base_url, state_file=args.state_file)
+    state_file = _resolve_state_file(args.state_file, runtime)
+    return _capture_real(
+        plans,
+        base_url=args.base_url,
+        state_file=state_file,
+        runtime=runtime,
+    )
 
 
 if __name__ == "__main__":
