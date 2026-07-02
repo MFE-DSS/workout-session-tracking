@@ -130,15 +130,15 @@
 |---|---|---|---|---|---|
 | Sx_UI_01 | Brand Foundation (nom Auren, tone, principes, dispo juridique) | 🟢 **SPEC delivered — pending human review** 2026-07-02 | Gate OPS ✅ | Non (docs) | [`SPRINT_Sx_UI_01_REPORT.md`](../SPRINT_Sx_UI_01_REPORT.md) + [`Sx_UI_01_BRAND_FOUNDATION_SPEC.md`](Sx_UI_01_BRAND_FOUNDATION_SPEC.md) |
 | Sx_UI_02 | Design Tokens (palettes teal chirurgical désaturé + bleu minéral fallback, typo, tokens candidats) | ✅ **SPEC ACCEPTED — human reviewed** 2026-07-02 | Sx_UI_01 validé implicite par override opérateur (OQ-B tranché) | Non (docs) | [`SPRINT_Sx_UI_02_REPORT.md`](../SPRINT_Sx_UI_02_REPORT.md) + [`SPRINT_Sx_UI_02_HUMAN_REVIEW_REPORT.md`](../SPRINT_Sx_UI_02_HUMAN_REVIEW_REPORT.md) + [`Sx_UI_02_DESIGN_TOKENS_SPEC.md`](Sx_UI_02_DESIGN_TOKENS_SPEC.md) |
-| Sx_UI_03 | App Shell + Navigation (bottom nav 4 = Séance/Programmes/Progression/Profil, Coach contextualisé, Squads/Classement dans Profil, rail desktop) | 🟢 **SPEC delivered — pending human review** 2026-07-02 | Sx_UI_02 accepted ✅ | Non (docs) | [`SPRINT_Sx_UI_03_REPORT.md`](../SPRINT_Sx_UI_03_REPORT.md) + [`Sx_UI_03_APP_SHELL_NAVIGATION_SPEC.md`](Sx_UI_03_APP_SHELL_NAVIGATION_SPEC.md) |
-| Sx_UI_04 | Session Focus Reskin — **premier sprint code visuel autorisé** | 🚫 **BLOCKED** — requires Sx_UI_03 accepted + Sx_UI_11 baseline available + OQ résiduelles Sx_UI_02 tranchées | Sx_UI_03 accepté + **Sx_UI_11 baseline required first** | Oui (surface) | — |
+| Sx_UI_03 | App Shell + Navigation (bottom nav 4 = Séance/Programmes/Progression/Profil, Coach contextualisé, Squads/Classement dans Profil, rail desktop) | ✅ **SPEC ACCEPTED — human reviewed** 2026-07-02 | Sx_UI_02 accepted ✅ | Non (docs) | [`SPRINT_Sx_UI_03_REPORT.md`](../SPRINT_Sx_UI_03_REPORT.md) + [`SPRINT_Sx_UI_03_HUMAN_REVIEW_REPORT.md`](../SPRINT_Sx_UI_03_HUMAN_REVIEW_REPORT.md) + [`Sx_UI_03_APP_SHELL_NAVIGATION_SPEC.md`](Sx_UI_03_APP_SHELL_NAVIGATION_SPEC.md) |
+| Sx_UI_04 | Session Focus Reskin — **premier sprint code visuel autorisé, non-autorisé maintenant** | 🚫 **BLOCKED** — requires Sx_UI_11 baseline available + OQ résiduelles Sx_UI_02 tranchées (OQ-H hex, OQ-I sans, OQ-J mono, OQ-K scale, OQ-M naming) + OQ-R Progression sub-nav | Sx_UI_11 baseline **required first** | Oui (surface) | — |
 | Sx_UI_05 | Today / Readiness Home | ⚪ | Sx_UI_04 | Oui (surface) | — |
 | Sx_UI_06 | Exercise Intelligence Presentation | ⚪ | Sx_UI_05 | Oui (surface) | — |
 | Sx_UI_07 | History & Progress | ⚪ | Sx_UI_06 | Oui (surface) | — |
 | Sx_UI_08 | Portability & Installability (PWA mature) | ⚪ | Sx_UI_07 | Oui (manifest + SW minimal) | — |
 | Sx_UI_09 | Accessibility & Motion | ⚪ | parallèle possible dès Sx_UI_04 | Oui (surface + attributs) | — |
 | Sx_UI_10 | Rebrand Migration Spignos → Auren (scope infra + code) | ⚪ | Sx_UI_04 minimum validé + OQ-A verdict favorable | Oui (infra + code) | — |
-| Sx_UI_11 | Screenshot Regression (baseline + continu) — **required before first visual build (Sx_UI_04)** | ⚪ candidat prochaine ouverture SPEC ONLY | avant Sx_UI_04 pour baseline, puis parallèle continu | Oui (tests/CI) | — |
+| Sx_UI_11 | Screenshot Regression (baseline + continu) — **required before first visual build (Sx_UI_04)** | 🟡 **READY TO OPEN — SPEC ONLY** (prochaine action) | avant Sx_UI_04 pour baseline, puis parallèle continu | Oui (tests/CI) | — |
 
 **Build remains blocked.** Aucun sprint `Sb_UI_NN.k` d'implémentation autorisé. `Sx_UI_02` reste blocked tant que `Sx_UI_01` n'a pas été validé par human review. Après validation Sx_UI_01, prochain step docs-only : `Sx_UI_02_DESIGN_TOKENS_SPEC` SPEC ONLY.
 
