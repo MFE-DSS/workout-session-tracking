@@ -129,8 +129,8 @@
 | Sprint | Domaine | Statut | Précondition | Peut modifier code ? | Rapport |
 |---|---|---|---|---|---|
 | Sx_UI_01 | Brand Foundation (nom Auren, tone, principes, dispo juridique) | 🟢 **SPEC delivered — pending human review** 2026-07-02 | Gate OPS ✅ | Non (docs) | [`SPRINT_Sx_UI_01_REPORT.md`](../SPRINT_Sx_UI_01_REPORT.md) + [`Sx_UI_01_BRAND_FOUNDATION_SPEC.md`](Sx_UI_01_BRAND_FOUNDATION_SPEC.md) |
-| Sx_UI_02 | Design Tokens (palettes teal chirurgical désaturé + bleu minéral fallback, typo, tokens candidats) | 🟢 **SPEC delivered — pending human review** 2026-07-02 | Sx_UI_01 validé implicite par override opérateur (OQ-B tranché) | Non (docs) | [`SPRINT_Sx_UI_02_REPORT.md`](../SPRINT_Sx_UI_02_REPORT.md) + [`Sx_UI_02_DESIGN_TOKENS_SPEC.md`](Sx_UI_02_DESIGN_TOKENS_SPEC.md) |
-| Sx_UI_03 | App Shell + Navigation (chrome ≤ 4 entrées) | 🚫 **BLOCKED until Sx_UI_02 accepted** | Sx_UI_02 validé humain | Non (docs) | — |
+| Sx_UI_02 | Design Tokens (palettes teal chirurgical désaturé + bleu minéral fallback, typo, tokens candidats) | ✅ **SPEC ACCEPTED — human reviewed** 2026-07-02 | Sx_UI_01 validé implicite par override opérateur (OQ-B tranché) | Non (docs) | [`SPRINT_Sx_UI_02_REPORT.md`](../SPRINT_Sx_UI_02_REPORT.md) + [`SPRINT_Sx_UI_02_HUMAN_REVIEW_REPORT.md`](../SPRINT_Sx_UI_02_HUMAN_REVIEW_REPORT.md) + [`Sx_UI_02_DESIGN_TOKENS_SPEC.md`](Sx_UI_02_DESIGN_TOKENS_SPEC.md) |
+| Sx_UI_03 | App Shell + Navigation (chrome ≤ 4 entrées, décisions OQ-C/D/E) | 🟡 **READY TO OPEN — SPEC ONLY** | Sx_UI_02 accepted ✅ | Non (docs) | — |
 | Sx_UI_04 | Session Focus Reskin | ⚪ | Sx_UI_03 + Sx_UI_11 baseline | Oui (surface) | — |
 | Sx_UI_05 | Today / Readiness Home | ⚪ | Sx_UI_04 | Oui (surface) | — |
 | Sx_UI_06 | Exercise Intelligence Presentation | ⚪ | Sx_UI_05 | Oui (surface) | — |
