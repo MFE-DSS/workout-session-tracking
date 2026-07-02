@@ -126,21 +126,21 @@
 - un accent visuel unique (amendement Sx_UI_02bis requis pour tout ajout)
 - rebrand Spignos → Auren exécuté uniquement à `Sx_UI_10`
 
-| Sprint | Domaine | Statut | Précondition | Peut modifier code ? |
-|---|---|---|---|---|
-| Sx_UI_01 | Brand Foundation (nom Auren, tone, principes, dispo juridique) | ⚪ à écrire | Gate OPS ✅ | Non (docs) |
-| Sx_UI_02 | Design Tokens (palettes, typo, tokens CSS) | ⚪ | Sx_UI_01 | Non (docs) |
-| Sx_UI_03 | App Shell + Navigation (chrome ≤ 4 entrées) | ⚪ | Sx_UI_02 | Non (docs) |
-| Sx_UI_04 | Session Focus Reskin | ⚪ | Sx_UI_03 + Sx_UI_11 baseline | Oui (surface) |
-| Sx_UI_05 | Today / Readiness Home | ⚪ | Sx_UI_04 | Oui (surface) |
-| Sx_UI_06 | Exercise Intelligence Presentation | ⚪ | Sx_UI_05 | Oui (surface) |
-| Sx_UI_07 | History & Progress | ⚪ | Sx_UI_06 | Oui (surface) |
-| Sx_UI_08 | Portability & Installability (PWA mature) | ⚪ | Sx_UI_07 | Oui (manifest + SW minimal) |
-| Sx_UI_09 | Accessibility & Motion | ⚪ | parallèle possible dès Sx_UI_04 | Oui (surface + attributs) |
-| Sx_UI_10 | Rebrand Migration Spignos → Auren (scope infra + code) | ⚪ | Sx_UI_04 minimum validé | Oui (infra + code) |
-| Sx_UI_11 | Screenshot Regression (baseline + continu) | ⚪ | avant Sx_UI_04 pour baseline, puis parallèle continu | Oui (tests/CI) |
+| Sprint | Domaine | Statut | Précondition | Peut modifier code ? | Rapport |
+|---|---|---|---|---|---|
+| Sx_UI_01 | Brand Foundation (nom Auren, tone, principes, dispo juridique) | 🟢 **SPEC delivered — pending human review** 2026-07-02 | Gate OPS ✅ | Non (docs) | [`SPRINT_Sx_UI_01_REPORT.md`](../SPRINT_Sx_UI_01_REPORT.md) + [`Sx_UI_01_BRAND_FOUNDATION_SPEC.md`](Sx_UI_01_BRAND_FOUNDATION_SPEC.md) |
+| Sx_UI_02 | Design Tokens (palettes, typo, tokens CSS) | 🚫 **BLOCKED until Sx_UI_01 accepted** | Sx_UI_01 validé humain | Non (docs) | — |
+| Sx_UI_03 | App Shell + Navigation (chrome ≤ 4 entrées) | ⚪ | Sx_UI_02 | Non (docs) | — |
+| Sx_UI_04 | Session Focus Reskin | ⚪ | Sx_UI_03 + Sx_UI_11 baseline | Oui (surface) | — |
+| Sx_UI_05 | Today / Readiness Home | ⚪ | Sx_UI_04 | Oui (surface) | — |
+| Sx_UI_06 | Exercise Intelligence Presentation | ⚪ | Sx_UI_05 | Oui (surface) | — |
+| Sx_UI_07 | History & Progress | ⚪ | Sx_UI_06 | Oui (surface) | — |
+| Sx_UI_08 | Portability & Installability (PWA mature) | ⚪ | Sx_UI_07 | Oui (manifest + SW minimal) | — |
+| Sx_UI_09 | Accessibility & Motion | ⚪ | parallèle possible dès Sx_UI_04 | Oui (surface + attributs) | — |
+| Sx_UI_10 | Rebrand Migration Spignos → Auren (scope infra + code) | ⚪ | Sx_UI_04 minimum validé + OQ-A verdict favorable | Oui (infra + code) | — |
+| Sx_UI_11 | Screenshot Regression (baseline + continu) | ⚪ | avant Sx_UI_04 pour baseline, puis parallèle continu | Oui (tests/CI) | — |
 
-**No implementation authorized yet.** Aucun sprint `Sb_UI_NN.k` ouvert. Prochain step docs-only : `Sx_UI_01_brand_foundation_spec`.
+**Build remains blocked.** Aucun sprint `Sb_UI_NN.k` d'implémentation autorisé. `Sx_UI_02` reste blocked tant que `Sx_UI_01` n'a pas été validé par human review. Après validation Sx_UI_01, prochain step docs-only : `Sx_UI_02_DESIGN_TOKENS_SPEC` SPEC ONLY.
 
 ## 2. Cycle Sx_24 — Implicit Signal Scoring v2
 
