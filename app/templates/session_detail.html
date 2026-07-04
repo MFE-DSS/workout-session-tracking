@@ -11,12 +11,13 @@
 
 <div class="session-page session-focus {% if session.status == 'completed' %}session-page--completed{% endif %}">
 
-<a class="back" href="{{ url_for('home') }}">← Accueil</a>
-
-{# Sb_29.1 — session focus header extracted into a partial. #}
+{# Sb_UI_04.2 — le lien retour "← Accueil" est désormais intégré au
+   header partial pour éviter un anchor flottant hors du sticky header
+   et supprimer un doublon potentiel. Voir _partials/session_focus_header.html. #}
 {% include "_partials/session_focus_header.html" %}
 
-{# -------- Exercise jump bar (Sb_02.1: 4 states ; Sb_29.1 sticky hook) ---------- #}
+{# -------- Exercise jump bar (Sb_02.1: 4 states ; Sb_29.1 sticky hook ;
+   Sb_UI_04.2: aria-current="location" + non-color cues via CSS pseudo). ---------- #}
 {% if session.session_exercises|length > 0 %}
   <nav class="ex-jump session-focus__jump session-focus__sticky-jump"
        aria-label="Aller à un exercice">
@@ -26,14 +27,16 @@
       <a
         class="ex-jump__item ex-jump__item--{{ state }} session-focus__tap-target"
         href="#exercise-{{ se.id }}"
-        aria-current="{% if state == 'active' %}step{% else %}false{% endif %}"
+        {% if state == 'active' %}aria-current="location"{% endif %}
+        aria-label="Exercice {{ se.exercise_code_snapshot }}, {{ d }} sur {{ t }} séries loggées, état {{ state }}"
       >
         <span class="ex-jump__code">{{ se.exercise_code_snapshot }}</span>
         <span class="ex-jump__prog">{{ d }}/{{ t }}</span>
       </a>
     {% endfor %}
     <a class="ex-jump__item ex-jump__item--feedback session-focus__tap-target"
-       href="#session-feedback">
+       href="#session-feedback"
+       aria-label="Aller au feedback de séance">
       <span class="ex-jump__code">FB</span>
     </a>
   </nav>

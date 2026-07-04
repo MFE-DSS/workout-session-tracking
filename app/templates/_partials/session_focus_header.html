@@ -1,29 +1,69 @@
-{# Sb_29.1 — Session Focus header partial (visual skeleton).
+{# Sb_UI_04.2 — Session Focus header (Auren structure).
 
-   Extrait verbatim du bloc <header class="session-header"> de
-   session_detail.html. Aucune modification fonctionnelle :
+   Refonte structurelle. Aucune modification fonctionnelle :
    - mêmes données (session, weekday_label, stats)
-   - mêmes classes legacy (session-header, session-header__meta, ...)
-   - ajoute uniquement les hooks Sx_29 (session-focus__header,
-     session-focus__sticky-header) pour CSS skeleton.
+   - même badge status
+   - même note completed conditionnelle
+   - le lien retour "← Accueil" est intégré au header (déplacé depuis
+     session_detail.html) pour éviter un anchor orphelin flottant et
+     supprimer un doublon potentiel
 
-   No-JS fallback : aucun JS requis, <h1> + <span> + badges classiques.
+   Classes legacy conservées :
+   - .session-header (compat app.css)
+   - .page-title
+   - .session-header__meta
+   - .session-header__progress
+   - .session-header__note
+   - .badge / .badge--{{ session.status }}
+   - .back
+
+   Wrappers Auren ajoutés (Sb_UI_04.2) :
+   - .session-focus__header-main            wrapper interne
+   - .session-focus__header-kicker          ligne "back + weekday · date"
+   - .session-focus__header-title-row       ligne titre + badge
+   - .session-focus__header-meta            meta compacte
+   - .session-focus__header-progress        progression mono/tabular
+   - .session-focus__header-note            note completed non intrusive
+
+   No-JS fallback : aucun JS requis, structure statique.
 #}
 <header class="session-header session-focus__header session-focus__sticky-header">
-  <h1 class="page-title">{{ session.template_name_snapshot }}</h1>
-  <div class="session-header__meta">
-    <span>{{ weekday_label }}</span>
-    <span>{{ (session.started_at | local).strftime('%d/%m %H:%M') }}</span>
-    <span class="badge badge--{{ session.status }}">
-      {% if session.status == 'in_progress' %}En cours{% else %}Terminée{% endif %}
-    </span>
-  </div>
-  <div class="session-header__progress">
-    {{ stats.done }} / {{ stats.total }} work sets
-  </div>
-  {% if session.status == 'completed' %}
-    <div class="session-header__note">
-      Séance terminée — éditable via <em>Rouvrir</em>.
+  <div class="session-focus__header-main">
+
+    {# Kicker : lien retour discret + weekday + date. Le lien retour est
+       inline avec la meta pour éviter un anchor flottant hors du sticky
+       header. #}
+    <div class="session-focus__header-kicker session-header__meta">
+      <a class="back" href="{{ url_for('home') }}" aria-label="Retour à l'accueil">← Accueil</a>
+      <span class="session-focus__header-meta">
+        <span>{{ weekday_label }}</span>
+        <span aria-hidden="true">·</span>
+        <span>{{ (session.started_at | local).strftime('%d/%m %H:%M') }}</span>
+      </span>
     </div>
-  {% endif %}
+
+    {# Ligne principale : titre H1 24px + badge status calme. Truncate
+       ellipsis via CSS pour titres longs sur mobile 360×640. #}
+    <div class="session-focus__header-title-row">
+      <h1 class="page-title">{{ session.template_name_snapshot }}</h1>
+      <span class="badge badge--{{ session.status }}" aria-label="Statut de la séance">
+        {% if session.status == 'in_progress' %}En cours{% else %}Terminée{% endif %}
+      </span>
+    </div>
+
+    {# Progression work sets — mono/tabular via CSS scoped focus mode.
+       Classe legacy conservée pour compat CSS existante. #}
+    <div class="session-focus__header-progress session-header__progress">
+      <span class="session-focus__header-progress-value">{{ stats.done }} / {{ stats.total }}</span>
+      <span class="session-focus__header-progress-label">work sets</span>
+    </div>
+
+    {% if session.status == 'completed' %}
+      {# Note completed — non intrusive, calme, style dédié. #}
+      <div class="session-focus__header-note session-header__note">
+        Séance terminée — éditable via <em>Rouvrir</em>.
+      </div>
+    {% endif %}
+
+  </div>
 </header>

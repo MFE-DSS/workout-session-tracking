@@ -2,7 +2,7 @@
 
 Re-asserts a11y contracts established across Sb_29.1 → Sb_29.4 :
 - Tap targets 44x44 (WCAG 2.5.5)
-- aria-current="step" on active jump bar item
+- aria-current="location" on active jump bar item (Sb_UI_04.2 : replaces "step")
 - aria-live="polite" on rest timer
 - skip rest button = type="button" (non critical, non-submitting)
 - primary CTAs are type="submit" (form-based POST)
@@ -97,11 +97,12 @@ def test_aria_current_step_on_active_jump_item(client):
         session_id = session.id
 
     body = _render(client, session_id)
+    # Sb_UI_04.2 — aria-current="location" (was "step" pre-Sb_UI_04.2).
     pattern = re.compile(
-        r'<a\b[^>]*\bex-jump__item--active\b[^>]*\baria-current="step"',
+        r'<a\b[^>]*\bex-jump__item--active\b[^>]*\baria-current="location"',
         re.IGNORECASE,
     )
-    assert pattern.search(body), "active jump item missing aria-current=step"
+    assert pattern.search(body), "active jump item missing aria-current=location"
 
 
 def test_rest_timer_has_aria_live_polite(client):

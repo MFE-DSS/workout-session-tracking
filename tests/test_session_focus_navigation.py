@@ -4,7 +4,10 @@ Verifies the reinforcement of visual navigation between exercises:
 * exactly one exercise card is `<details open>` by default (the active one)
 * non-active cards are collapsed by default
 * jump bar contains one item per session_exercise
-* jump bar item for the active exercise carries aria-current="step"
+* jump bar item for the active exercise carries aria-current="location"
+  (Sb_UI_04.2 : replaces earlier aria-current="step" ; only the active
+  item carries the attribute — non-active items have no aria-current at
+  all instead of aria-current="false")
 * every jump bar item has an href="#exercise-{id}" anchor
 * the 6 UI state classes exist in app.css for both cards and jump items
 * prev/next nav buttons are still wired (`name="nav"` values present)
@@ -174,8 +177,14 @@ def test_jump_bar_contains_one_item_per_exercise(client):
         )
 
 
-def test_jump_bar_active_item_carries_aria_current_step(client):
-    """The active exercise's jump bar item must have aria-current="step"."""
+def test_jump_bar_active_item_carries_aria_current_location(client):
+    """The active exercise's jump bar item must have aria-current="location".
+
+    Sb_UI_04.2 — Auren nav semantics: only the active item carries the
+    attribute. Non-active items intentionally have NO aria-current at
+    all (rather than aria-current="false"), which matches WAI-ARIA
+    guidance for jump navigation between page regions/anchors.
+    """
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -185,15 +194,24 @@ def test_jump_bar_active_item_carries_aria_current_step(client):
         session_id = session.id
 
     body = _render(client, session_id)
-    # Look for an <a ...> item with aria-current="step" inside the jump nav.
-    # The simplest check: at least one element with both ex-jump__item--active
-    # and aria-current="step".
+    # Look for an <a ...> item with aria-current="location" inside the jump nav.
     pattern = re.compile(
-        r'<a\b[^>]*\bex-jump__item--active\b[^>]*\baria-current="step"',
+        r'<a\b[^>]*\bex-jump__item--active\b[^>]*\baria-current="location"',
         re.IGNORECASE,
     )
     assert pattern.search(body) is not None, (
-        "active jump bar item missing aria-current=\"step\""
+        "active jump bar item missing aria-current=\"location\""
+    )
+
+    # Non-active jump bar items must NOT carry aria-current at all
+    # (no aria-current="false" or similar leftover from earlier Sx_29).
+    non_active_pattern = re.compile(
+        r'<a\b[^>]*\bex-jump__item--(?:pending|done|partial|skipped|substituted)\b'
+        r'[^>]*\baria-current=',
+        re.IGNORECASE,
+    )
+    assert non_active_pattern.search(body) is None, (
+        "non-active jump bar items must not carry aria-current"
     )
 
 

@@ -761,3 +761,262 @@
 }
 
 /* prefers-reduced-motion : pas d'animation introduite (OQ-E). */
+
+
+/* ============================================================
+   Sb_UI_04.2 — Header & Jump Bar Structure (Auren)
+   ------------------------------------------------------------
+   Renforcement structurel : header plus compact (cible ≤ 88px mobile),
+   H1 24px + meta 13px muted + progression mono/tabular. Jump bar :
+   active item avec aria-current="location" + non-color cues via
+   ::before pseudo pour chaque état (active/done/partial/pending/
+   skipped/substituted), tap targets 44×44 confirmés, snap horizontal
+   préservé.
+
+   Aucun nouveau token introduit — réutilisation stricte des tokens
+   Sb_UI_04.1 scopés .session-focus.
+   ============================================================ */
+
+/* ---- Header structure Auren ---- */
+
+/* Wrapper interne : conteneur flex column compact. Padding géré ici
+   pour maîtriser la hauteur totale (cible ≤ 88px hors note completed). */
+.session-focus .session-focus__header-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+}
+
+/* Kicker : ligne "retour · weekday · date" tout en meta muted */
+.session-focus .session-focus__header-kicker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-body-sm);
+  line-height: 1.2;
+  margin: 0;
+}
+
+/* Retour "← Accueil" discret dans le kicker. Legacy .back peut définir
+   des styles génériques dans app.css ; on override localement pour la
+   surface focus mode uniquement. */
+.session-focus .session-focus__header-kicker .back {
+  color: var(--color-fg-muted);
+  text-decoration: none;
+  font-weight: var(--font-weight-medium);
+}
+.session-focus .session-focus__header-kicker .back:hover {
+  color: var(--color-fg-default);
+}
+
+/* Meta inline (weekday · date) */
+.session-focus .session-focus__header-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+/* Ligne titre : H1 + badge status. flex avec gap, truncate ellipsis
+   sur le titre pour éviter le overflow sur mobile 360×640. */
+.session-focus .session-focus__header-title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.session-focus .session-focus__header-title-row .page-title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* Rappel token : 24px bold sans (défini en Sb_UI_04.1). */
+}
+
+/* Badge status calme, non-alarmant */
+.session-focus .session-focus__header-title-row .badge {
+  flex: 0 0 auto;
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-medium);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  line-height: 1.4;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+/* in_progress : accent teal weak (non alarmant) */
+.session-focus .badge.badge--in_progress {
+  background: var(--color-accent-weak);
+  color: var(--color-accent-strong);
+  border-color: var(--color-accent-weak);
+}
+
+/* completed : neutre / muted */
+.session-focus .badge.badge--completed {
+  background: var(--color-surface-alt);
+  color: var(--color-fg-muted);
+  border-color: var(--color-border-subtle);
+}
+
+/* Progression work sets — mono/tabular, valeur mise en avant */
+.session-focus .session-focus__header-progress {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.session-focus .session-focus__header-progress-value {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  color: var(--color-fg-strong);
+}
+
+.session-focus .session-focus__header-progress-label {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-muted);
+}
+
+/* Note completed non intrusive */
+.session-focus .session-focus__header-note {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-muted);
+  padding-top: var(--space-1);
+  border-top: 1px dashed var(--color-border-subtle);
+}
+
+.session-focus .session-focus__header-note em {
+  font-style: normal;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-default);
+}
+
+/* Mobile compact : réduire encore le padding et espacer moins */
+@media (max-width: 380px) {
+  .session-focus .session-focus__header-main {
+    padding: 6px var(--space-3);
+    gap: 2px;
+  }
+  .session-focus .session-focus__header-title-row .page-title {
+    font-size: 20px;
+  }
+  .session-focus .session-focus__header-kicker,
+  .session-focus .session-focus__header-meta {
+    font-size: 12px;
+  }
+}
+
+
+/* ---- Jump bar Auren : non-color cues + états ---- */
+
+/* Chaque item de la jump bar reste un flex column (code + progression).
+   On garantit le tap target 44×44 via min-height/min-width (déjà géré
+   par .session-focus__tap-target) mais on peaufine le padding interne. */
+.session-focus .session-focus__sticky-jump .ex-jump__item {
+  position: relative;
+  padding: 6px var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-fg-default);
+  text-decoration: none;
+  transition: background-color var(--motion-duration-fast) var(--motion-easing-standard);
+}
+
+/* Hover neutre pour laisser la couleur d'état s'exprimer */
+.session-focus .session-focus__sticky-jump .ex-jump__item:hover {
+  background: var(--color-surface-alt);
+}
+
+.session-focus .session-focus__sticky-jump .ex-jump__code {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-strong);
+}
+
+.session-focus .session-focus__sticky-jump .ex-jump__prog {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  color: var(--color-fg-muted);
+}
+
+/* Non-color cues via pseudo ::before positionné en haut à droite du
+   item, aria-hidden implicite (les pseudo-elements ne sont pas exposés
+   au AT). Chaque état a son glyph unicode sobre. */
+.session-focus .session-focus__sticky-jump .ex-jump__item::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 10px;
+  line-height: 1;
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
+}
+
+/* active : bullet plein teal (redondant vec la couleur mais lisible
+   en niveaux de gris ou daltoniens) */
+.session-focus .session-focus__sticky-jump .ex-jump__item--active {
+  background: var(--color-accent-weak);
+  color: var(--color-accent-strong);
+}
+.session-focus .session-focus__sticky-jump .ex-jump__item--active::before {
+  content: "●";
+  color: var(--color-accent-strong);
+}
+.session-focus .session-focus__sticky-jump .ex-jump__item--active .ex-jump__code {
+  color: var(--color-accent-strong);
+}
+
+/* done : check unicode */
+.session-focus .session-focus__sticky-jump .ex-jump__item--done::before {
+  content: "✓";
+  color: var(--color-success);
+}
+
+/* partial : demi-cercle */
+.session-focus .session-focus__sticky-jump .ex-jump__item--partial::before {
+  content: "◐";
+  color: var(--color-warning);
+}
+
+/* pending : cercle vide */
+.session-focus .session-focus__sticky-jump .ex-jump__item--pending::before {
+  content: "○";
+  color: var(--color-fg-muted);
+}
+
+/* skipped : tiret */
+.session-focus .session-focus__sticky-jump .ex-jump__item--skipped::before {
+  content: "–";
+  color: var(--color-fg-muted);
+}
+
+/* substituted : double flèche */
+.session-focus .session-focus__sticky-jump .ex-jump__item--substituted::before {
+  content: "↔";
+  color: var(--color-signal);
+}
+
+/* feedback item : pas de cue d'état, mais distinguable typographiquement */
+.session-focus .session-focus__sticky-jump .ex-jump__item--feedback {
+  background: var(--color-surface-alt);
+  border: 1px dashed var(--color-border-subtle);
+}
+
+/* aria-current="location" : renforcement typo pour lecteurs d'écran
+   qui exposent l'attribut, sans casser le rendu visuel. */
+.session-focus .session-focus__sticky-jump [aria-current="location"] {
+  font-weight: var(--font-weight-medium);
+}
+
+/* Focus visible ring déjà défini universellement Sb_UI_04.1 — pas de
+   surcharge nécessaire ici. */
