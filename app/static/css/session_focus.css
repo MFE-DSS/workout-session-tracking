@@ -17,7 +17,206 @@
    legacy (.ex-jump, .exercise-card, .card).
 
    Aucune modification fonctionnelle. Voir docs/SPRINT_Sb_29_5_REPORT.md.
+   ============================================================
+
+   Sb_UI_04.1 (Sx_UI cycle Auren) — Clinical Lab + Quiet Instrument
+   foundation appliquee au Focus Mode. Tokens Auren scoped a
+   .session-focus, avec override local des variables legacy
+   (--accent, --ok, --warn, --fg-dim, --bg, --border) heritees
+   d'app.css. Additive uniquement : aucun selecteur legacy
+   supprime, aucun template modifie, aucun JS modifie.
+
+   OQ tranchees dans ce sprint :
+   - OQ-H hex accent : #0F8A85 (teal chirurgical desature)
+   - OQ-I sans stack : system stack V1 (Inter + fallbacks systeme)
+   - OQ-J mono stack : system stack V1 (SF Mono + fallbacks systeme)
+   - OQ-K type sizes : fixes V1 (pas de clamp() complexe)
+   - OQ-M naming    : custom CSS variables --color-*, --space-*,
+                      --radius-*, --shadow-*, --font-*, --motion-*,
+                      --z-* scopees a .session-focus
+   Cf. docs/strategy/Sx_UI_02_DESIGN_TOKENS_SPEC.md
+   Cf. docs/strategy/Sx_UI_04_SESSION_FOCUS_RESKIN_SPEC.md
    ============================================================ */
+
+/* ============================================================
+   Sb_UI_04.1 — Auren scoped tokens on .session-focus
+   ------------------------------------------------------------
+   Tokens locaux au Focus Mode. Aucune fuite globale : toute
+   valeur declaree ici est consommee uniquement sous
+   .session-focus (specificite garantie par le wrapper Jinja
+   session_detail.html).
+
+   Strategie : additive. Les variables legacy heritees d'app.css
+   (--accent, --ok, --warn, --fg-dim, --bg, --border) sont
+   REDEFINIES localement pour pointer vers la palette Auren.
+   Les selecteurs Sx_29 utilisant var(--accent, #2563eb) obtiennent
+   ainsi automatiquement la valeur Auren --color-accent, sans
+   toucher app.css ni le DOM.
+   ============================================================ */
+
+.session-focus {
+  /* --- Surfaces (Clinical Lab) --- */
+  --color-bg-base:       #FFFFFF;
+  --color-bg-elevated:   #FAFBFC;
+  --color-surface:       #FFFFFF;
+  --color-surface-alt:   #F5F7F9;
+  --color-surface-sunken:#F0F3F5;
+
+  /* --- Foreground --- */
+  --color-fg-strong:     #0F1419;
+  --color-fg-default:    #1F2933;
+  --color-fg-muted:      #52606D;
+  --color-fg-subtle:     #7B8794;
+
+  /* --- Borders --- */
+  --color-border-subtle: #E4E7EB;
+  --color-border-default:#CBD2D9;
+  --color-border-strong: #3E4C59;
+
+  /* --- Accent teal chirurgical desature (OQ-H) --- */
+  --color-accent-strong: #0B7A75;
+  --color-accent:        #0F8A85;
+  --color-accent-weak:   #D4EDEB;
+  --color-accent-hover:  #095E5A;
+  --color-accent-focus-ring: rgba(15, 138, 133, 0.4);
+  --color-on-accent:     #FFFFFF;
+
+  /* --- Signal bleu mineral (info secondaire) --- */
+  --color-signal:        #2A7896;
+  --color-signal-weak:   #DCE9F1;
+
+  /* --- Etats semantiques (parcimonieux) --- */
+  --color-success:       #12894A;
+  --color-success-weak:  #D3EFE0;
+  --color-warning:       #B36B00;
+  --color-warning-weak:  #FBEBD4;
+  --color-danger:        #B02929;
+  --color-danger-weak:   #FAD9D9;
+
+  /* --- Spacing 4px-based --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+
+  /* --- Radius --- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* --- Shadows minimales --- */
+  --shadow-sm: 0 1px 2px rgba(15, 20, 25, 0.08);
+  --shadow-md: 0 6px 16px rgba(15, 20, 25, 0.10);
+
+  /* --- Typographie (stacks systeme, V1 : pas de web font) --- */
+  --font-family-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family-mono: "SF Mono", ui-monospace, "Roboto Mono", Menlo, Consolas, monospace;
+  --font-weight-regular: 400;
+  --font-weight-medium:  500;
+  --font-weight-bold:    700;
+  --font-size-body:      15px;
+  --font-size-body-sm:   13px;
+  --font-size-heading-2: 24px;
+  --font-size-metric-lg: 40px;
+
+  /* --- Motion --- */
+  --motion-duration-fast: 120ms;
+  --motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* --- Z-index --- */
+  --z-raised: 10;
+  --z-sticky: 100;
+
+  /* --- Bridge : redefinition locale des variables legacy heritees
+     d'app.css pour que les selecteurs Sx_29 utilisant
+     var(--accent, #2563eb) obtiennent la palette Auren sans
+     modification du CSS existant. --- */
+  --accent:      var(--color-accent);
+  --accent-soft: var(--color-accent-focus-ring);
+  --ok:          var(--color-success);
+  --warn:        var(--color-warning);
+  --fg-dim:      var(--color-fg-muted);
+  --bg:          var(--color-bg-base);
+  --border:      var(--color-border-subtle);
+}
+
+/* Fond global de la page focus mode. Additive : ne s'applique
+   qu'a la page qui porte le wrapper .session-focus. */
+.session-focus {
+  background: var(--color-bg-base);
+  color: var(--color-fg-default);
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-body);
+}
+
+/* Metriques et champs numeriques : tabular mono pour alignement
+   vertical parfait dans les listes de series (Sx_UI_04 §10). */
+.session-focus .session-header__progress,
+.session-focus .exercise-card__progress,
+.session-focus .exercise-card__recap,
+.session-focus .exercise-card__code,
+.session-focus .ex-jump__code,
+.session-focus .ex-jump__prog,
+.session-focus .session-focus__rest-timer__countdown {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Titres compacts */
+.session-focus .page-title {
+  font-family: var(--font-family-sans);
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-heading-2);
+  color: var(--color-fg-strong);
+  line-height: 1.15;
+}
+
+/* Meta info discrete */
+.session-focus .session-header__meta {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-body-sm);
+}
+
+/* Focus visible universel dans la surface focus mode : outline
+   teal 2px (WCAG 2.4.7). Additive : les selecteurs existants ne
+   sont pas touches, seule la styling du :focus-visible est
+   normalisee. */
+.session-focus a:focus-visible,
+.session-focus button:focus-visible,
+.session-focus [role="button"]:focus-visible,
+.session-focus input:focus-visible,
+.session-focus select:focus-visible,
+.session-focus textarea:focus-visible,
+.session-focus summary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Inputs weight_kg / reps : lisibilite mono, min-height 44px
+   (WCAG 2.5.5), font-size 16px minimum (anti-zoom iOS). */
+.session-focus input[type="number"],
+.session-focus input[name$="_weight_kg"],
+.session-focus input[name$="_reps"] {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+  min-height: 44px;
+  background: var(--color-surface-sunken);
+  color: var(--color-fg-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.session-focus input[type="number"]:focus,
+.session-focus input[name$="_weight_kg"]:focus,
+.session-focus input[name$="_reps"]:focus {
+  border-color: var(--color-accent);
+  outline: 2px solid var(--color-accent-focus-ring);
+  outline-offset: 2px;
+}
 
 /* ============================================================
    Sb_29.1 — Mobile Session Focus Mode (visual skeleton)
@@ -48,8 +247,10 @@
 .session-focus__sticky-header {
   position: sticky;
   top: 0;
-  z-index: 4;
-  background: var(--bg, #fff);
+  z-index: var(--z-raised, 10);
+  background: var(--color-bg-base, var(--bg, #fff));
+  border-bottom: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-sm);
   /* Backdrop discret pour différencier du scroll. Fallback gracieux
      si --bg pas défini. */
 }
@@ -64,8 +265,8 @@
   /* top calculé par la hauteur du header sticky. Approx 64px
      côté desktop, 56px mobile. Sb_29.2 affinera avec une variable. */
   top: 56px;
-  z-index: 3;
-  background: var(--bg, #fff);
+  z-index: var(--z-raised, 10);
+  background: var(--color-bg-base, var(--bg, #fff));
 }
 
 /* Carte exercice avec hooks d'état visuel (Sb_29.1 squelette,
@@ -169,58 +370,66 @@
    Jinja (Sb_29.1) ; l'utilisateur peut toujours collapse manuellement
    (native <details>). */
 .session-focus__card--active {
-  border: 1.5px solid var(--accent, #2563eb);
-  box-shadow: 0 1px 6px -2px var(--accent-soft, rgba(37, 99, 235, 0.18));
+  border: 1px solid var(--color-border-default);
+  border-left: 4px solid var(--color-accent);
+  box-shadow: var(--shadow-sm);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   position: relative;
 }
 
 .session-focus__card--active > summary .exercise-card__code::before {
   content: "\2022 ";
-  color: var(--accent, #2563eb);
+  color: var(--color-accent);
   font-size: 0.9em;
   vertical-align: middle;
 }
 
 /* Etats secondaires de la carte. Discrets : la carte reste collapsed,
-   le sommaire montre l'etat via border-left + symbole non-color. */
+   le sommaire montre l'etat via border-left + symbole non-color.
+   Sb_UI_04.1 : tokens Auren scoped, cards en surface-alt pour
+   distinguer le pending du surface plein. */
 .session-focus__card--pending {
-  /* Neutre par defaut. */
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
 }
 
 .session-focus__card--partial > summary {
-  border-left: 3px solid var(--warn, #d97706);
-  padding-left: 6px;
+  border-left: 3px solid var(--color-warning);
+  padding-left: var(--space-2);
 }
 
 .session-focus__card--done > summary {
-  border-left: 3px solid var(--ok, #16a34a);
-  padding-left: 6px;
+  border-left: 3px solid var(--color-success);
+  padding-left: var(--space-2);
   opacity: 0.92;
 }
 .session-focus__card--done > summary .exercise-card__code::after {
   content: " \2713";
-  color: var(--ok, #16a34a);
-  font-weight: 700;
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
 }
 
 .session-focus__card--skipped > summary {
-  border-left: 3px dashed var(--fg-dim, #6b7280);
-  padding-left: 6px;
+  border-left: 3px dashed var(--color-fg-muted);
+  padding-left: var(--space-2);
   opacity: 0.75;
 }
 .session-focus__card--skipped > summary .exercise-card__name {
   text-decoration: line-through;
   text-decoration-thickness: 1px;
+  color: var(--color-fg-muted);
 }
 
 .session-focus__card--substituted > summary {
-  border-left: 3px dotted var(--accent, #2563eb);
-  padding-left: 6px;
+  border-left: 3px dotted var(--color-signal);
+  padding-left: var(--space-2);
 }
 .session-focus__card--substituted > summary .exercise-card__name::after {
   content: " \2194";
-  color: var(--accent, #2563eb);
-  font-weight: 700;
+  color: var(--color-signal);
+  font-weight: var(--font-weight-bold);
   margin-left: 2px;
 }
 
@@ -257,10 +466,12 @@
   margin-left: 2px;
 }
 
-/* Sticky jump bar : refinements de comportement. */
+/* Sticky jump bar : refinements de comportement.
+   Sb_UI_04.1 : backdrop-filter conserve (Sx_29 §9 permet un usage
+   ponctuel pour sticky), border en color-border-subtle Auren. */
 .session-focus__sticky-jump {
   backdrop-filter: blur(4px);
-  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.06));
+  border-bottom: 1px solid var(--color-border-subtle, var(--border, rgba(0, 0, 0, 0.06)));
 }
 
 /* Mobile 360x640 : ne pas laisser la jump bar manger trop d'espace
@@ -303,18 +514,19 @@
 .session-focus__card--active .session-focus__sticky-cta {
   position: sticky;
   bottom: 0;
-  z-index: 2;
+  z-index: var(--z-sticky, 100);
   /* Background opaque pour eviter que le contenu defilant en dessous
      transparaisse. Hérite de --bg defini sur :root, fallback blanc. */
-  background: var(--bg, #fff);
+  background: var(--color-bg-base, var(--bg, #fff));
   /* Separation visuelle discrete vs contenu defilant. */
-  border-top: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-top: 1px solid var(--color-border-subtle, var(--border, rgba(0, 0, 0, 0.08)));
+  box-shadow: var(--shadow-sm);
   /* Padding interne pour respirer ; safe-area iOS pour iPhone notch. */
-  padding-top: 8px;
-  padding-bottom: 8px;
+  padding-top: var(--space-2);
+  padding-bottom: var(--space-2);
   /* env() est ignore sur navigateurs anciens, fallback au padding-bottom
      deja defini. */
-  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(var(--space-2) + env(safe-area-inset-bottom, 0px));
   /* Effet glassmorphism leger pour distinguer du flow (cohérent avec
      la sticky jump bar Sb_29.2). */
   backdrop-filter: blur(4px);
@@ -358,26 +570,27 @@
 .session-focus__rest-timer {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  padding: 8px 12px;
-  background: var(--bg-elev, rgba(0, 0, 0, 0.03));
-  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
-  border-radius: 8px;
-  font-size: 14px;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-alt, var(--bg-elev, rgba(0, 0, 0, 0.03)));
+  border: 1px solid var(--color-border-subtle, var(--border, rgba(0, 0, 0, 0.08)));
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body-sm);
   /* Mobile 360x640 : ne pas creer de scroll horizontal. */
   flex-wrap: wrap;
 }
 
 .session-focus__rest-timer__label {
-  font-weight: 500;
-  color: var(--fg, inherit);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-muted, var(--fg, inherit));
 }
 
 .session-focus__rest-timer__countdown {
+  font-family: var(--font-family-mono);
   font-variant-numeric: tabular-nums;
-  font-weight: 600;
-  color: var(--fg, inherit);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-strong, var(--fg, inherit));
   min-width: 3ch;
 }
 
@@ -387,7 +600,7 @@
 
 /* Etat actif (JS started) : marqueur visuel non animal. */
 .session-focus__rest-timer--running .session-focus__rest-timer__countdown {
-  color: var(--accent, currentColor);
+  color: var(--color-accent, var(--accent, currentColor));
 }
 
 /* Etat terminé : marqueur visuel discret. */
@@ -397,8 +610,8 @@
 
 @media (max-width: 380px) {
   .session-focus__rest-timer {
-    padding: 6px 10px;
-    font-size: 13px;
+    padding: 6px var(--space-2);
+    font-size: var(--font-size-body-sm);
   }
 }
 
@@ -416,13 +629,13 @@
    ============================================================ */
 
 .overload-hint {
-  margin: 8px 0;
-  padding: 8px 12px;
-  background: var(--bg-elev, rgba(0, 0, 0, 0.03));
-  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
-  border-left: 3px solid var(--fg-dim, #6b7280);
-  border-radius: 6px;
-  font-size: 14px;
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-alt, var(--bg-elev, rgba(0, 0, 0, 0.03)));
+  border: 1px solid var(--color-border-subtle, var(--border, rgba(0, 0, 0, 0.08)));
+  border-left: 3px solid var(--color-fg-muted, var(--fg-dim, #6b7280));
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body-sm);
   line-height: 1.4;
 }
 
@@ -434,14 +647,15 @@
 }
 
 .overload-hint__intent {
-  font-weight: 600;
-  color: var(--fg, inherit);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-default, var(--fg, inherit));
 }
 
 .overload-hint__target {
+  font-family: var(--font-family-mono);
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
-  color: var(--fg-dim, #6b7280);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-muted, var(--fg-dim, #6b7280));
 }
 
 .overload-hint__why {
@@ -492,42 +706,44 @@
   margin: 2px 0;
 }
 
-/* Etats visuels — non-color cues via icone unicode AVANT intent + border-left. */
+/* Etats visuels — non-color cues via icone unicode AVANT intent + border-left.
+   Sb_UI_04.1 : tokens Auren avec fallback vers valeurs legacy si
+   surface hors focus mode. */
 .overload-hint--progress {
-  border-left-color: var(--ok, #16a34a);
+  border-left-color: var(--color-success, var(--ok, #16a34a));
 }
 .overload-hint--progress .overload-hint__intent::before {
   content: "↑ ";
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .overload-hint--consolidate {
-  border-left-color: var(--accent, #2563eb);
+  border-left-color: var(--color-accent, var(--accent, #2563eb));
 }
 .overload-hint--consolidate .overload-hint__intent::before {
   content: "→ ";
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .overload-hint--top-range {
-  border-left-color: var(--accent, #2563eb);
+  border-left-color: var(--color-accent, var(--accent, #2563eb));
 }
 .overload-hint--top-range .overload-hint__intent::before {
   content: "🏁 ";
 }
 
 .overload-hint--deload {
-  border-left-color: var(--warn, #d97706);
+  border-left-color: var(--color-warning, var(--warn, #d97706));
 }
 .overload-hint--deload .overload-hint__intent::before {
   content: "↓ ";
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 /* `unknown` ne devrait pas etre rendu (router skip + partial guard),
    mais on pose un style minimal de securite si jamais. */
 .overload-hint--unknown {
-  border-left-color: var(--fg-dim, #6b7280);
+  border-left-color: var(--color-fg-muted, var(--fg-dim, #6b7280));
   opacity: 0.85;
 }
 .overload-hint--unknown .overload-hint__intent::before {
