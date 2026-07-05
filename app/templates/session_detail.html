@@ -16,37 +16,80 @@
    et supprimer un doublon potentiel. Voir _partials/session_focus_header.html. #}
 {% include "_partials/session_focus_header.html" %}
 
-{# -------- Exercise jump bar (Sb_02.1: 4 states ; Sb_29.1 sticky hook ;
-   Sb_UI_04.2: aria-current="location" + non-color cues via CSS pseudo). ---------- #}
+{# -------- Sb_UI_04.3 — Active Exercise Cockpit ------------------
+   Recast Focused Exercise Flow (Sx_UI_04 §18/§20) : la perception
+   de "longue liste verticale d'exercices" est remplacée par un
+   cockpit centré sur l'exercice actif. La jump bar dense devient un
+   mini-stepper compressé secondaire (OQ-B). Les autres exercices ne
+   disparaissent JAMAIS du DOM (anchors #exercise-{{ se.id }} + no-JS
+   fallback préservés, OQ-E : réouverture d'un exercice passé
+   autorisée via l'ancre). L'exercice actif domine visuellement via
+   CSS scoped (.session-focus__card--active) ; les non-actifs sont
+   compactés en surface secondaire. Aucun JS ajouté, aucun carousel :
+   cockpit SSR/CSS pur. #}
 {% if session.session_exercises|length > 0 %}
-  <nav class="ex-jump session-focus__jump session-focus__sticky-jump"
+<div class="session-focus__cockpit">
+
+  {# -------- Orientation cockpit (Sx_UI_04 §18.A) --------
+     Compteur exercice courant / total + restants. Données déjà
+     calculées côté router (jump_states, stats) — aucune logique
+     backend ajoutée. #}
+  {% set _ex_total = session.session_exercises|length %}
+  {% set _ex_counts = namespace(done=0, position=0) %}
+  {% for se in session.session_exercises %}
+    {% if jump_states[se.id] == 'done' %}{% set _ex_counts.done = _ex_counts.done + 1 %}{% endif %}
+    {% if jump_states[se.id] == 'active' %}{% set _ex_counts.position = loop.index %}{% endif %}
+  {% endfor %}
+  {% set _ex_remaining = _ex_total - _ex_counts.done %}
+  <div class="session-focus__orientation" aria-label="Progression des exercices">
+    <span class="session-focus__orientation-position">
+      <span class="session-focus__orientation-current">{{ _ex_counts.position if _ex_counts.position else 1 }}</span>
+      <span class="session-focus__orientation-sep" aria-hidden="true">/</span>
+      <span class="session-focus__orientation-total">{{ _ex_total }}</span>
+    </span>
+    <span class="session-focus__orientation-meta">
+      <span class="session-focus__orientation-label">exercice</span>
+      <span class="session-focus__orientation-remaining">{{ _ex_remaining }} restant{{ 's' if _ex_remaining > 1 else '' }}</span>
+    </span>
+  </div>
+
+  {# -------- Mini-stepper (Sx_UI_04 §18.A, OQ-A/OQ-B) --------
+     Remplace la jump bar dense. Compressé, cliquable, ancres
+     conservées, aria-current="location" UNIQUEMENT sur l'actif,
+     non-actifs sans aria-current. Non-color cues via CSS pseudo
+     hérités des états. Scroll horizontal snap préservé. #}
+  <nav class="ex-jump session-focus__stepper session-focus__sticky-jump"
        aria-label="Aller à un exercice">
     {% for se in session.session_exercises %}
       {% set d, t = stats.per_exercise[se.id] %}
       {% set state = jump_states[se.id] %}
       <a
-        class="ex-jump__item ex-jump__item--{{ state }} session-focus__tap-target"
+        class="ex-jump__item session-focus__stepper-item ex-jump__item--{{ state }} session-focus__tap-target"
         href="#exercise-{{ se.id }}"
         {% if state == 'active' %}aria-current="location"{% endif %}
         aria-label="Exercice {{ se.exercise_code_snapshot }}, {{ d }} sur {{ t }} séries loggées, état {{ state }}"
       >
-        <span class="ex-jump__code">{{ se.exercise_code_snapshot }}</span>
-        <span class="ex-jump__prog">{{ d }}/{{ t }}</span>
+        <span class="ex-jump__code session-focus__stepper-code">{{ se.exercise_code_snapshot }}</span>
+        <span class="ex-jump__prog session-focus__stepper-prog">{{ d }}/{{ t }}</span>
       </a>
     {% endfor %}
-    <a class="ex-jump__item ex-jump__item--feedback session-focus__tap-target"
+    <a class="ex-jump__item session-focus__stepper-item ex-jump__item--feedback session-focus__tap-target"
        href="#session-feedback"
        aria-label="Aller au feedback de séance">
-      <span class="ex-jump__code">FB</span>
+      <span class="ex-jump__code session-focus__stepper-code">FB</span>
     </a>
   </nav>
-{% endif %}
 
-{# -------- Exercise cards (one <details> per card) --------------- #}
-{# Sb_29.1 — Exercise card rendering extracted into a partial. #}
-{% for se in session.session_exercises %}
-  {% include "_partials/exercise_card.html" %}
-{% endfor %}
+  {# -------- Exercise cards (one <details> per card) --------------
+     Sb_29.1 : rendering extrait en partial. Sb_UI_04.3 : la carte
+     active est promue en hero cockpit via CSS ; les non-actives
+     sont compactées mais restent dans le DOM (anchors + no-JS). #}
+  {% for se in session.session_exercises %}
+    {% include "_partials/exercise_card.html" %}
+  {% endfor %}
+
+</div>
+{% endif %}
 
 {# -------- Session-level feedback (dedicated form) ---------- #}
 <form

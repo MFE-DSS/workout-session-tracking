@@ -68,6 +68,92 @@
       >Voir historique {{ se.exercise_code_snapshot }} →</a>
     </div>
 
+    {# ============================================================
+       Sb_UI_04.3 — Active Exercise Cockpit hero (Sx_UI_04 §18)
+       ------------------------------------------------------------
+       Rendu UNIQUEMENT sur la carte active. Premier jalon du Live
+       Exercise Expert Model + du Body Representation System (§23).
+       Surfaces : exercise intent (§18.B) · worked area panel (§18.C
+       / §23) · technical cues shell (§18.D). Toutes les données
+       proviennent du contexte déjà calculé côté router (atlas_data,
+       se.template_exercise) — AUCUNE logique backend ajoutée, aucun
+       modèle, aucune migration, aucun mapping fragile inventé.
+       Fallbacks conservateurs si la donnée n'existe pas. Pas de
+       claim médical : "zone ciblée" / "estimée", jamais diagnostic.
+       ============================================================ #}
+    {% if is_active %}
+      {% set _atlas = atlas_data.get(se.id) %}
+      {% set _family = _atlas.family if _atlas else None %}
+      {% set _machine = _atlas.machine if _atlas else None %}
+
+      <div class="session-focus__cockpit-hero">
+
+        {# --- Exercise intent (§18.B) : pourquoi cet exercice, rôle
+           dans la séance. Phrase courte. Si un set_scheme existe on
+           l'expose comme rôle prescrit ; sinon formulation neutre et
+           conservatrice (jamais de justification biomécanique
+           inventée). --- #}
+        <div class="session-focus__intent">
+          <span class="session-focus__intent-label">Intention</span>
+          <p class="session-focus__intent-text">
+            {% if _family and _family.name %}
+              Bloc <b>{{ _family.name }}</b> — exercice actif de la séance.
+            {% else %}
+              Exercice actif de la séance — reste concentré sur l'exécution.
+            {% endif %}
+          </p>
+        </div>
+
+        {# --- Worked Area Panel (§18.C / §23) : zone principale +
+           assistants + stabilisation. Source réelle = atlas family
+           (zone déjà présente dans data/machine_atlas.json). Fallback
+           conservateur "à qualifier" si aucune donnée fiable. Aucune
+           activation réelle prétendue : formulation "zone ciblée
+           estimée". --- #}
+        <div class="session-focus__worked-area" aria-label="Zone travaillée estimée">
+          <span class="session-focus__worked-area-title">Zone travaillée</span>
+          <ul class="session-focus__worked-area-list">
+            <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
+              <span class="session-focus__worked-area-role">Principale</span>
+              <span class="session-focus__worked-area-value">
+                {% if _family and _family.name %}{{ _family.name }}{% else %}Zone principale à qualifier{% endif %}
+              </span>
+            </li>
+            <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
+              <span class="session-focus__worked-area-role">Assistants</span>
+              <span class="session-focus__worked-area-value">Assistants à qualifier</span>
+            </li>
+            <li class="session-focus__worked-area-row session-focus__worked-area-row--stabilizer">
+              <span class="session-focus__worked-area-role">Stabilisation</span>
+              <span class="session-focus__worked-area-value">Stabilisation à qualifier</span>
+            </li>
+          </ul>
+          <p class="session-focus__worked-area-note">
+            Zones ciblées estimées — repère d'entraînement, pas une mesure physiologique.
+          </p>
+        </div>
+
+        {# --- Technical cues shell (§18.D) : max 3 cues visibles.
+           Source réelle = atlas machine.execution_cues. Fallback
+           sobre si absent (pas de cue inventé). --- #}
+        <div class="session-focus__cues">
+          <span class="session-focus__cues-title">Cues techniques</span>
+          {% if _machine and _machine.execution_cues %}
+            <ol class="session-focus__cues-list">
+              {% for cue in _machine.execution_cues[:3] %}
+                <li class="session-focus__cues-item">{{ cue }}</li>
+              {% endfor %}
+            </ol>
+          {% else %}
+            <p class="session-focus__cues-empty">
+              Exécution contrôlée, amplitude complète, tempo maîtrisé.
+            </p>
+          {% endif %}
+        </div>
+
+      </div>
+    {% endif %}
+
     {% if se.template_exercise and se.template_exercise.set_scheme %}
       <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
     {% endif %}
@@ -375,15 +461,29 @@
       <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
     </details>
 
-    {# Sb_11a — peek preparing the next exercise, active card only. #}
+    {# Sb_11a — peek preparing the next exercise, active card only.
+       Sb_UI_04.3 (§18.G / OQ-F) — promu en surface "Up next" du
+       cockpit : nom + rôle court + zone principale (issue de l'atlas
+       du prochain exercice si disponible). Pas de charge complète
+       dans l'up-next (OQ-F). Reste secondaire visuellement (styling
+       scoped). Classes legacy card-peek conservées pour compat CSS. #}
     {% if is_active and peek_for_active %}
-      <aside class="card-peek" aria-label="Prochain exercice">
-        <header class="card-peek__head">
-          <span class="card-peek__label">Prochain</span>
-          <span class="card-peek__code">{{ peek_for_active.code }}</span>
-          <span class="card-peek__name">{{ peek_for_active.name }}</span>
+      {% set _next_se = None %}
+      {% for _se2 in session.session_exercises %}
+        {% if _se2.exercise_code_snapshot == peek_for_active.code %}{% set _next_se = _se2 %}{% endif %}
+      {% endfor %}
+      {% set _next_atlas = atlas_data.get(_next_se.id) if _next_se else None %}
+      {% set _next_zone = _next_atlas.family.name if _next_atlas and _next_atlas.family else None %}
+      <aside class="card-peek session-focus__up-next" aria-label="Prochain exercice">
+        <header class="card-peek__head session-focus__up-next-head">
+          <span class="card-peek__label session-focus__up-next-label">Up next</span>
+          <span class="card-peek__code session-focus__up-next-code">{{ peek_for_active.code }}</span>
+          <span class="card-peek__name session-focus__up-next-name">{{ peek_for_active.name }}</span>
         </header>
-        <p class="card-peek__scheme">{{ peek_for_active.scheme }} · {{ peek_for_active.last_time }}</p>
+        <p class="card-peek__scheme session-focus__up-next-role">
+          {{ peek_for_active.scheme }}
+          {% if _next_zone %}<span class="session-focus__up-next-zone"> · {{ _next_zone }}</span>{% endif %}
+        </p>
         {% if peek_for_active.cues %}
           <ul class="card-peek__cues">
             {% for cue in peek_for_active.cues %}<li>{{ cue }}</li>{% endfor %}

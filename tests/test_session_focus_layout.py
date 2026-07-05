@@ -130,6 +130,9 @@ def test_focus_header_hook_present(client):
 
 
 def test_focus_jump_bar_hook_present(client):
+    """Sb_UI_04.3 — the dense jump bar became a compressed mini-stepper
+    (OQ-B). The sticky hook is preserved; the nav marker migrated from
+    session-focus__jump to session-focus__stepper."""
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -139,7 +142,7 @@ def test_focus_jump_bar_hook_present(client):
         session_id = session.id
 
     body = client.get(f"/sessions/{session_id}").text
-    assert "session-focus__jump" in body
+    assert "session-focus__stepper" in body
     assert "session-focus__sticky-jump" in body
 
 

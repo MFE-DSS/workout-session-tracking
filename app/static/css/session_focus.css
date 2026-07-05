@@ -1020,3 +1020,295 @@
 
 /* Focus visible ring déjà défini universellement Sb_UI_04.1 — pas de
    surcharge nécessaire ici. */
+
+/* ============================================================
+   Sb_UI_04.3 — Active Exercise Cockpit Shell
+   ------------------------------------------------------------
+   Recast Focused Exercise Flow (Sx_UI_04 §18/§20). Bascule de la
+   perception "longue liste verticale" vers un cockpit centré sur
+   l'exercice actif. Additive : aucun sélecteur legacy supprimé,
+   aucun template macro modifié, aucun JS. Scoped .session-focus.
+   Mobile-first 360×640, WCAG 44×44, focus visible et
+   prefers-reduced-motion préservés (hérités Sb_UI_04.1).
+   ============================================================ */
+
+.session-focus__cockpit {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* -------- Orientation (§18.A) : compteur exercice courant / total
+   + restants. Chiffre courant en mono large (instrumental). -------- */
+.session-focus__orientation {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-1);
+}
+.session-focus__orientation-position {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.session-focus__orientation-current {
+  font-size: 28px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-strong);
+  line-height: 1;
+}
+.session-focus__orientation-sep {
+  font-size: 20px;
+  color: var(--color-fg-subtle);
+}
+.session-focus__orientation-total {
+  font-size: 20px;
+  color: var(--color-fg-muted);
+}
+.session-focus__orientation-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.session-focus__orientation-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-fg-subtle);
+}
+.session-focus__orientation-remaining {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-muted);
+  font-weight: var(--font-weight-medium);
+}
+
+/* -------- Mini-stepper (§18.A, OQ-A/OQ-B) : la jump bar dense
+   devient une bande compressée de chips. C'est le levier principal
+   qui casse la perception "barre de navigation large". Scroll
+   horizontal snap, tap 44×44, non-color cues hérités. -------- */
+.session-focus__stepper {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--space-1) 0;
+  scrollbar-width: thin;
+}
+.session-focus__stepper-item {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border-subtle);
+  text-decoration: none;
+  color: var(--color-fg-muted);
+}
+.session-focus__stepper-code {
+  font-size: 12px;
+  font-weight: var(--font-weight-medium);
+  line-height: 1.1;
+}
+.session-focus__stepper-prog {
+  font-size: 10px;
+  color: var(--color-fg-subtle);
+  line-height: 1.1;
+}
+/* actif : chip mise en avant, teal weak + code teal-strong. Non-color
+   cue déjà porté par ex-jump__item--active::before (hérité). */
+.session-focus__stepper .ex-jump__item--active {
+  background: var(--color-accent-weak);
+  border-color: var(--color-accent);
+}
+.session-focus__stepper .ex-jump__item--active .session-focus__stepper-code {
+  color: var(--color-accent-strong);
+  font-weight: var(--font-weight-bold);
+}
+
+/* ============================================================
+   Sb_UI_04.3 — Active card = hero cockpit dominant
+   ------------------------------------------------------------
+   La carte active domine visuellement : surface élevée, bordure
+   accent, ombre. Les cartes non-actives (déjà collapsed car
+   <details> sans open) sont réduites à un index secondaire sobre,
+   afin qu'elles ne ressemblent plus à une liste ouverte. Elles
+   restent dans le DOM (anchors + no-JS) — OQ-E réouverture via
+   l'ancre / le stepper préservée.
+   ============================================================ */
+
+/* Carte active : hero élevé. */
+.session-focus__cockpit .session-focus__card--active {
+  border: 1px solid var(--color-accent);
+  border-left-width: 3px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-2);
+}
+
+/* Cartes non-actives : index secondaire compact. Pas d'ombre, fond
+   légèrement en retrait, summary discret. Elles se lisent comme des
+   entrées d'un sommaire, pas comme des sections ouvertes. */
+.session-focus__cockpit .session-focus__card:not(.session-focus__card--active) {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  box-shadow: none;
+  opacity: 0.92;
+}
+.session-focus__cockpit .session-focus__card:not(.session-focus__card--active) > summary {
+  padding: var(--space-2) var(--space-3);
+}
+
+/* -------- Cockpit hero interne (§18) : intent + worked area + cues.
+   Bloc dense mais lisible, sous le head de la carte active. -------- */
+.session-focus__cockpit-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+}
+
+/* Exercise intent (§18.B) */
+.session-focus__intent-label,
+.session-focus__worked-area-title,
+.session-focus__cues-title,
+.session-focus__up-next-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-fg-subtle);
+  margin-bottom: var(--space-1);
+}
+.session-focus__intent-text {
+  margin: 0;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-default);
+  line-height: 1.4;
+}
+
+/* Worked Area Panel (§18.C / §23) */
+.session-focus__worked-area-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.session-focus__worked-area-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--font-size-body-sm);
+}
+.session-focus__worked-area-role {
+  flex: 0 0 84px;
+  color: var(--color-fg-muted);
+  font-size: 12px;
+}
+/* non-color cue : puce carrée par rôle, intensité dégressive. */
+.session-focus__worked-area-role::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: var(--space-1);
+  border-radius: 2px;
+  vertical-align: middle;
+  background: var(--color-border-default);
+}
+.session-focus__worked-area-row--primary .session-focus__worked-area-role::before {
+  background: var(--color-accent);
+}
+.session-focus__worked-area-row--secondary .session-focus__worked-area-role::before {
+  background: var(--color-accent-weak);
+  border: 1px solid var(--color-accent);
+}
+.session-focus__worked-area-row--stabilizer .session-focus__worked-area-role::before {
+  background: transparent;
+  border: 1px solid var(--color-border-default);
+}
+.session-focus__worked-area-value {
+  color: var(--color-fg-strong);
+  font-weight: var(--font-weight-medium);
+}
+.session-focus__worked-area-note {
+  margin: var(--space-1) 0 0;
+  font-size: 11px;
+  color: var(--color-fg-subtle);
+  line-height: 1.35;
+}
+
+/* Technical cues shell (§18.D) : max 3, mono compteur. */
+.session-focus__cues-list {
+  margin: 0;
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.session-focus__cues-item {
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-default);
+  line-height: 1.35;
+}
+.session-focus__cues-empty {
+  margin: 0;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-muted);
+  font-style: italic;
+}
+
+/* -------- Up next (§18.G / OQ-F) : nom + rôle + zone principale.
+   Secondaire visuellement, ancré bas de carte active. -------- */
+.session-focus__up-next {
+  border: 1px dashed var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  padding: var(--space-2) var(--space-3);
+}
+.session-focus__up-next-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.session-focus__up-next-code {
+  font-family: var(--font-family-mono);
+  font-size: 12px;
+  color: var(--color-accent-strong);
+}
+.session-focus__up-next-name {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-strong);
+  font-size: var(--font-size-body-sm);
+}
+.session-focus__up-next-role {
+  margin: var(--space-1) 0 0;
+  font-size: 12px;
+  color: var(--color-fg-muted);
+}
+.session-focus__up-next-zone {
+  color: var(--color-fg-subtle);
+}
+
+/* Mobile-first 360×640 : compacter l'orientation et le hero. */
+@media (max-width: 380px) {
+  .session-focus__orientation-current { font-size: 24px; }
+  .session-focus__cockpit-hero { padding: var(--space-2); }
+  .session-focus__worked-area-role { flex-basis: 72px; }
+}
