@@ -478,6 +478,15 @@ def test_rendered_placeholders_are_not_authoritative(client):
 def test_template_uses_overload_placeholders_dict():
     src = CARD.read_text(encoding="utf-8")
     assert "overload_placeholders" in src
-    assert "is_active and loop.first" in src, (
-        "placeholder must only fire on the active card AND first work set"
+    # Sb_UI_04.4 — the placeholder now attaches to the ACTIVE SET (first
+    # uncompleted work set of the active card) instead of always the first
+    # work set. Intent preserved: placeholder fires on exactly one set of
+    # the active card, driven by the console active-set derivation
+    # (_is_active_set), never on every row.
+    assert "_is_active_set" in src, (
+        "placeholder must be gated on the active-set derivation "
+        "(Sb_UI_04.4 console: first uncompleted work set of active card)"
+    )
+    assert "overload_placeholders.get(se.id) if _is_active_set" in src, (
+        "placeholder must only fire on the active set of the active card"
     )

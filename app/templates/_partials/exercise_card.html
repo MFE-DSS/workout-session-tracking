@@ -342,10 +342,18 @@
        Unique source de guidance après Sb_30.4 (le bloc qualitatif
        legacy a été retiré) : ce partial propose une cible chiffrée
        (kg/reps) + reasons. #}
+    {# Sb_UI_04.4 — Progression guidance : le hint overload existant est
+       présenté dans une section "Guidance" scoped (§18.E / §22). AUCUNE
+       modification du contenu métier ni du partial overload_hint.html :
+       seul un wrapper de présentation est ajouté, non impératif. La
+       provenance (engine_version) reste exposée par le partial inclus. #}
     {% if is_active %}
       {% set hint = overload_hints.get(se.id) %}
       {% if hint %}
-        {% include "_partials/overload_hint.html" %}
+        <div class="session-focus__guidance" aria-label="Guidance de progression">
+          <span class="session-focus__guidance-label">Guidance de progression</span>
+          {% include "_partials/overload_hint.html" %}
+        </div>
       {% endif %}
     {% endif %}
 
@@ -392,53 +400,118 @@
         {% endfor %}
       </ul>
 
+      {# ============================================================
+         Sb_UI_04.4 — Set Logging Console (Sx_UI_04 §18.E / §22)
+         ------------------------------------------------------------
+         Transforme la liste de séries "travail" en console
+         d'exécution guidée. AUCUN changement de contrat : mêmes
+         inputs (name=set_{id}_weight_kg / _reps), même form POST,
+         completed toujours dérivé serveur (présence de valeur).
+         L'état par set (completed / active / upcoming) est une
+         DÉRIVATION DE PRÉSENTATION à partir de sl.completed — aucune
+         logique métier, aucun recalcul. Le "set actif" = premier
+         work set non complété. Additive : classes legacy set-list /
+         set-row / set-row__inputs conservées.
+         ============================================================ #}
       {% if work_sets|length > 0 %}
-        <h4 class="set-group-title set-group-title--work">
-          Travail
-          <span class="set-group-title__hint">kg = comme affiché sur l'équipement</span>
-        </h4>
-      {% endif %}
-      <ul class="set-list">
-        {% for sl in work_sets %}
-          {# Sb_30.next.placeholder — placeholders contextuels uniquement
-             sur le PREMIER work set de la carte ACTIVE, et uniquement si
-             un OverloadHint chiffré existe (le router skip déjà silent
-             /unknown via is_silent). Aucune injection en value=. #}
-          {% set _ph = overload_placeholders.get(se.id) if is_active and loop.first else None %}
-          {% set _ph_w = _ph.weight if _ph and _ph.weight else 'kg' %}
-          {% set _ph_r = _ph.reps if _ph and _ph.reps else 'reps' %}
-          <li class="set-row set-row--work{% if _ph %} set-row--has-overload-placeholder{% endif %}">
-            <div class="set-row__label">
-              <span class="set-row__kind">Série</span>
-              <span class="set-row__idx">#{{ sl.set_index }}</span>
-              {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-            </div>
-
-            <div class="set-row__inputs">
-              <input
-                type="text"
-                inputmode="decimal"
-                pattern="[0-9]*[.,]?[0-9]*"
-                autocomplete="off"
-                name="set_{{ sl.id }}_weight_kg"
-                placeholder="{{ _ph_w }}"
-                value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-              />
-              <input
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                autocomplete="off"
-                name="set_{{ sl.id }}_reps"
-                placeholder="{{ _ph_r }}"
-                value="{{ sl.reps if sl.reps is not none else '' }}"
-              />
-              {# Sb_24.4 — idem warmup, checkbox "Fait" retirée. #}
-            </div>
-
-          </li>
+        {% set _work_total = work_sets|length %}
+        {% set _work_done = work_sets|selectattr('completed')|list|length %}
+        {% set _active_ns = namespace(idx=None) %}
+        {% for _ws in work_sets %}
+          {% if _active_ns.idx is none and not _ws.completed %}{% set _active_ns.idx = loop.index0 %}{% endif %}
         {% endfor %}
-      </ul>
+
+        <div class="session-focus__console{% if not is_active %} session-focus__console--compact{% endif %}">
+
+          {# Console header : progression set courant / total. #}
+          <div class="session-focus__console-head">
+            <h4 class="set-group-title set-group-title--work session-focus__console-title">
+              Console — séries travail
+              <span class="set-group-title__hint">kg = comme affiché sur l'équipement</span>
+            </h4>
+            <span class="session-focus__console-progress" aria-label="Séries travail complétées">
+              <span class="session-focus__console-progress-value">{{ _work_done }} / {{ _work_total }}</span>
+              <span class="session-focus__console-progress-label">séries</span>
+            </span>
+          </div>
+
+          {# Reference + target surfaces (active card only). Données
+             déjà présentes dans le contexte (last_time / overload
+             placeholder). Fallback sobre si absentes — jamais
+             culpabilisant, jamais inventé. #}
+          {% if is_active %}
+            {% set _ref = last_time.get(se.exercise_code_snapshot) %}
+            {% set _tgt = overload_placeholders.get(se.id) %}
+            <div class="session-focus__console-refs">
+              <div class="session-focus__console-ref session-focus__console-ref--prev">
+                <span class="session-focus__console-ref-label">Référence précédente</span>
+                {% if _ref and _ref.has_data %}
+                  <span class="session-focus__console-ref-value">{{ _ref.weights_str }} kg · {{ _ref.reps_str }} reps</span>
+                {% else %}
+                  <span class="session-focus__console-ref-value session-focus__console-ref-value--empty">Non disponible</span>
+                {% endif %}
+              </div>
+              <div class="session-focus__console-ref session-focus__console-ref--target">
+                <span class="session-focus__console-ref-label">Cible</span>
+                {% if _tgt and (_tgt.weight or _tgt.reps) %}
+                  <span class="session-focus__console-ref-value">{{ _tgt.weight or '—' }} kg · {{ _tgt.reps or '—' }} reps</span>
+                {% elif se.template_exercise and se.template_exercise.set_scheme %}
+                  <span class="session-focus__console-ref-value">{{ se.template_exercise.set_scheme }}</span>
+                {% else %}
+                  <span class="session-focus__console-ref-value session-focus__console-ref-value--empty">Objectif à qualifier</span>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+
+          <ul class="set-list session-focus__console-list">
+            {% for sl in work_sets %}
+              {# État de présentation dérivé (aucun recalcul métier). #}
+              {% set _is_done = sl.completed %}
+              {% set _is_active_set = (is_active and loop.index0 == _active_ns.idx) %}
+              {% set _set_state = 'completed' if _is_done else ('active' if _is_active_set else 'upcoming') %}
+              {# Sb_30.next.placeholder — placeholders contextuels uniquement
+                 sur le set ACTIF de la carte ACTIVE, et uniquement si un
+                 OverloadHint chiffré existe. Aucune injection en value=. #}
+              {% set _ph = overload_placeholders.get(se.id) if _is_active_set else None %}
+              {% set _ph_w = _ph.weight if _ph and _ph.weight else 'kg' %}
+              {% set _ph_r = _ph.reps if _ph and _ph.reps else 'reps' %}
+              <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ _set_state }}{% if _ph %} set-row--has-overload-placeholder{% endif %}">
+                <div class="set-row__label session-focus__console-row-label">
+                  <span class="set-row__kind">Série</span>
+                  <span class="set-row__idx">#{{ sl.set_index }}</span>
+                  {% if _is_done %}<span class="session-focus__console-check" aria-label="Série validée">✓</span>{% endif %}
+                  {% if _is_active_set %}<span class="session-focus__console-badge" aria-label="Série active">actif</span>{% endif %}
+                  {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+                </div>
+
+                <div class="set-row__inputs">
+                  <input
+                    type="text"
+                    inputmode="decimal"
+                    pattern="[0-9]*[.,]?[0-9]*"
+                    autocomplete="off"
+                    name="set_{{ sl.id }}_weight_kg"
+                    placeholder="{{ _ph_w }}"
+                    value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+                  />
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    autocomplete="off"
+                    name="set_{{ sl.id }}_reps"
+                    placeholder="{{ _ph_r }}"
+                    value="{{ sl.reps if sl.reps is not none else '' }}"
+                  />
+                  {# Sb_24.4 — completed dérivé serveur de la présence
+                     de weight/reps. Aucune checkbox. #}
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
     {% else %}
       <p class="empty">Pas de série pour cet exercice.</p>
     {% endif %}

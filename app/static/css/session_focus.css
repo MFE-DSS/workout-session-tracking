@@ -1312,3 +1312,170 @@
   .session-focus__cockpit-hero { padding: var(--space-2); }
   .session-focus__worked-area-role { flex-basis: 72px; }
 }
+
+/* ============================================================
+   Sb_UI_04.4 — Set Logging Console + Progression Guidance
+   ------------------------------------------------------------
+   Transforme la saisie des séries d'un formulaire de lignes en
+   console d'exécution : set actif dominant, sets complétés en
+   ledger compact, sets à venir secondaires. Additive, scoped
+   .session-focus, aucun input renommé. Mobile-first 360×640.
+   ============================================================ */
+
+.session-focus__console {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-2) 0;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+/* Console des cartes non-actives : plus discrète (index secondaire). */
+.session-focus__console--compact {
+  padding: var(--space-2);
+  background: var(--color-bg-elevated);
+}
+
+/* -------- Console header : titre + progression séries. -------- */
+.session-focus__console-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.session-focus__console-title {
+  margin: 0;
+}
+.session-focus__console-progress {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+}
+.session-focus__console-progress-value {
+  font-size: var(--font-size-body-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-accent-strong);
+}
+.session-focus__console-progress-label {
+  font-size: 11px;
+  color: var(--color-fg-subtle);
+}
+
+/* -------- Reference + target surfaces (§18.E). -------- */
+.session-focus__console-refs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.session-focus__console-ref {
+  flex: 1 1 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+}
+.session-focus__console-ref-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-fg-subtle);
+}
+.session-focus__console-ref-value {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-strong);
+}
+.session-focus__console-ref--target .session-focus__console-ref-value {
+  color: var(--color-accent-strong);
+}
+.session-focus__console-ref-value--empty {
+  font-family: var(--font-family-sans);
+  color: var(--color-fg-subtle);
+  font-style: italic;
+}
+
+/* -------- Console list : rows par état. -------- */
+.session-focus__console-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* Set actif : dominant. Fond teal weak, bordure accent, inputs
+   plus grands, padding généreux. C'est le centre opérationnel. */
+.session-focus__console-row--active {
+  background: var(--color-accent-weak);
+  border: 1px solid var(--color-accent);
+  border-left-width: 3px;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+}
+.session-focus__console-row--active .set-row__inputs input {
+  border-color: var(--color-accent);
+  background: var(--color-surface);
+}
+
+/* Set complété : ledger compact, muté, check visible. Non dominant. */
+.session-focus__console-row--completed {
+  opacity: 0.82;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+}
+.session-focus__console-check {
+  color: var(--color-success);
+  font-weight: var(--font-weight-bold);
+  margin-left: var(--space-1);
+}
+
+/* Set à venir : secondaire, discret. */
+.session-focus__console-row--upcoming {
+  opacity: 0.7;
+  padding: var(--space-1) var(--space-2);
+}
+
+/* Badge "actif" sur le label du set courant. */
+.session-focus__console-badge {
+  margin-left: var(--space-1);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-medium);
+}
+
+/* -------- Progression guidance : présentation du hint overload.
+   Wrapper non impératif ; le contenu métier (overload_hint.html)
+   est inchangé. -------- */
+.session-focus__guidance {
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: 3px solid var(--color-signal);
+  background: var(--color-signal-weak);
+  border-radius: var(--radius-sm);
+}
+.session-focus__guidance-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-fg-muted);
+  margin-bottom: var(--space-1);
+}
+
+/* Mobile 360×640 : refs empilées, console padding réduit. */
+@media (max-width: 380px) {
+  .session-focus__console { padding: var(--space-2); }
+  .session-focus__console-refs { flex-direction: column; }
+}
