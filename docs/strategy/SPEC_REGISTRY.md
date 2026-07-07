@@ -90,7 +90,16 @@
 | Sb_31.5 | Closure docs + dogfood template (DOC only) | ✅ | Sx_31 §N.2 | `SPRINT_Sb_31_5_body_intelligence_closure_BUILD_REPORT.md` | [28322377053](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28322377053) ✅ 3/3 | Doc only ; 0 code applicatif modifié ; closure + dogfood template livrés |
 | **Sx_31 CLOSURE** | Technically closed — dogfood device réel pending | ✅ TECH CLOSED | `Sx_31_CLOSURE_REPORT.md` + `dogfood/DOGFOOD_Sx_31_BODY_INTELLIGENCE_TEMPLATE.md` | — | [28322377053](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28322377053) ✅ | 6/7 OQ implémentées (OQ-G livrée via Sb_31.next.profile-link 2026-06-29 ; OQ-F home-card reste différée). Sx_32/33+ restent bloqués. |
 | Sb_31.next.profile-link | Lien /profile → /body/intelligence (OQ-G) — 17 tests | ✅ | Sx_31 §N.1 | `SPRINT_Sb_31_next_profile_link_BUILD_REPORT.md` | [28358444492](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/28358444492) ✅ 3/3 | Template +13 l (carte standalone "Lecture corporelle") ; 0 CSS / 0 JS / 0 migration / 0 service métier core muté ; aucune duplication contenu Body Intelligence |
-| Sx_29+ alternatives | Sx_32 (PWA) / Sx_33+ (Health/API) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque |
+| Sx_29+ alternatives | PWA / Health/API (numéros à réattribuer) | ❌ BLOQUÉS | — | — | — | Override séparé requis pour chaque. **NB : `Sx_32` réassigné au cycle Deep Feature Refactor (Muscle/BodyZone), cf. §1septies.** |
+
+## 1septies. Cycle Sx_32 — Deep Feature/Object Refactor (backend métier, SPEC PENDING)
+
+**Contexte :** après les cycles UI (Sx_UI) qui ont transformé l'interface en verrouillant le métier, l'opérateur ouvre la refonte profonde des features/objets. Premier axe choisi : **modèle Muscle/BodyZone formel** (le plus fondamental selon l'audit backend 2026-07-07 — débloque Worked Area UI + coach report + body intelligence). **Override cycle métier requise pour tout build.**
+
+| Sprint | Domaine | Statut | Rapport | Notes |
+|---|---|---|---|---|
+| Sx_32 (spec) | Cadrage refonte : dette muscle/zone heuristique (`muscle_mapping.py`, 11 zones hardcodées + substring match) → modèle relationnel `BodyZone`/`Muscle`/`ExerciseMuscleMapping` + contrat `body_map_descriptor` (débloque Sx_UI_04 §23). Invariance historique = contrainte #1. Découpage Sb_32.1→.4 review-gated, migrations additive-only. 7 OQ. Backlog des autres axes Tier 1 documenté (readiness agg, identité exercice, substitution first-class). | 🟢 **SPEC delivered — pending human review** 2026-07-07 | [`Sx_32_MUSCLE_BODYZONE_MODEL_SPEC.md`](Sx_32_MUSCLE_BODYZONE_MODEL_SPEC.md) + [`SPRINT_Sx_32_REPORT.md`](../SPRINT_Sx_32_REPORT.md) | Docs-only, aucun code/migration. Audit backend read-only en source. Build bloqué (spec + OQ + override cycle). |
+| Sb_32.1 → .4 | BodyZone/Muscle backfill → ExerciseMuscleMapping → body_map_descriptor → migration consommateurs | ⏸️ BLOCKED | — | Chaque sous-sprint prouve la non-régression (classify old=new) avant le suivant. |
 
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 
