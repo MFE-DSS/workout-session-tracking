@@ -1,0 +1,158 @@
+/* ============================================================
+   home.css — Sb_UI_05.1 Today / Readiness Home (Hero Decision Surface)
+   ============================================================
+
+   Sx_UI_05 §8/§17 — le Home devient une surface de décision
+   quotidienne. Ce fichier est chargé APRES app.css (cascade
+   préservée) et scoped à .today-home. Il n'altère PAS le reste de
+   l'app ni les blocs legacy du dashboard (conservés, dé-priorisés
+   sous le hero).
+
+   Grammaire visuelle Auren (Clinical Instrument) appliquée au HERO :
+   surface claire, teal chirurgical, faible chrome, mono metrics.
+   Les surfaces secondaires (dashboard existant) restent stylées par
+   app.css — le hero domine, le reste est calme en dessous.
+
+   No-JS : structure statique. Mobile-first 360×640. WCAG 44×44.
+   ============================================================ */
+
+.today-home {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* -------- Hero Decision Surface -------- */
+.today-home__hero {
+  --home-accent: #0F8A85;
+  --home-accent-strong: #0B7A75;
+  --home-accent-weak: #D4EDEB;
+  --home-on-accent: #FFFFFF;
+  --home-surface: #FFFFFF;
+  --home-fg-strong: #0F1419;
+  --home-fg-muted: #52606D;
+  --home-fg-subtle: #7B8794;
+  --home-border: #E4E7EB;
+
+  background: var(--home-surface);
+  color: var(--home-fg-strong);
+  border: 1px solid var(--home-border);
+  border-radius: 12px;
+  padding: 24px 20px;
+  box-shadow: 0 1px 2px rgba(15, 20, 25, 0.08);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Variante séance active : accent latéral pour renforcer la dominance. */
+.today-home__hero--active {
+  border-left: 4px solid var(--home-accent);
+}
+
+.today-home__eyebrow {
+  margin: 0 0 6px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--home-fg-subtle);
+}
+
+.today-home__title {
+  margin: 0 0 8px;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--home-fg-strong);
+  letter-spacing: 0;
+}
+
+.today-home__meta {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: var(--home-fg-muted);
+}
+.today-home__meta-sep {
+  color: var(--home-fg-subtle);
+  margin: 0 2px;
+}
+
+/* CTA primaire unique : dominante, tap target ≥ 44px. */
+.today-home__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: var(--home-accent);
+  color: var(--home-on-accent);
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.today-home__cta:hover { background: var(--home-accent-strong); }
+.today-home__cta:focus-visible {
+  outline: 2px solid var(--home-accent);
+  outline-offset: 2px;
+}
+
+/* Lien secondaire discret : jamais concurrent de la CTA primaire. */
+.today-home__secondary {
+  display: inline-block;
+  margin-top: 12px;
+  min-height: 44px;
+  line-height: 44px;
+  font-size: 14px;
+  color: var(--home-accent-strong);
+  text-decoration: none;
+}
+.today-home__secondary:hover { text-decoration: underline; }
+.today-home__secondary:focus-visible {
+  outline: 2px solid var(--home-accent);
+  outline-offset: 2px;
+}
+
+/* Readiness teaser : micro-repère qualitatif, non médical, calme. */
+.today-home__readiness {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--home-border);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.today-home__readiness-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--home-fg-subtle);
+}
+.today-home__readiness-hint {
+  font-size: 13px;
+  color: var(--home-fg-muted);
+}
+
+/* -------- Secondary zone : dashboard existant dé-priorisé.
+   On ne restyle pas les cartes legacy (app.css les gère) ; on les
+   place simplement sous le hero, avec un léger retrait visuel pour
+   marquer la hiérarchie. -------- */
+.today-home__secondary-zone {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 16px);
+}
+
+/* Desktop : le hero peut s'étendre, le reste garde sa grille. */
+@media (min-width: 900px) {
+  .today-home__hero { padding: 28px 28px; }
+  .today-home__title { font-size: 30px; }
+  .today-home__cta { width: auto; min-width: 280px; }
+}
+
+/* Mobile 360×640 : compacter le hero. */
+@media (max-width: 380px) {
+  .today-home__hero { padding: 20px 16px; }
+  .today-home__title { font-size: 22px; }
+}
