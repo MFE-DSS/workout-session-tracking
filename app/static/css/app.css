@@ -1,24 +1,51 @@
-/* SPIGNOS Design System — Engineered, structured, calm, precise. */
+/* SPIGNOS Design System — AUREN TERMINAL (Sb_UI_02b.3).
+
+   Sx_UI_02b (accepté 2026-07-07) : la coque globale migre vers Auren
+   Terminal — graphite dense + tout-mono système + accent AMBRE rare
+   (#C8A24B). Cohérent avec le Home (Sb_UI_02b.1) et le Focus Mode
+   (Sb_UI_02b.2). L'ancien thème dark/orange (#f25f3a) est retiré.
+
+   Méthode = redéfinition des VALEURS des tokens :root (noms de
+   variables inchangés) → toutes les pages qui consomment var(--bg),
+   var(--accent), var(--font)… héritent automatiquement du nouveau
+   look, sans réécrire les sélecteurs métier. Aucun changement de
+   route/service/model/logique. Zéro webfont (stack mono système). */
 
 :root {
-  --bg: #0f1115;
-  --surface: #161a22;
-  --surface-2: #1e222c;
-  --border: #232834;
-  --fg: #e8ecf1;
-  --fg-muted: #9aa3ad;
-  --fg-dim: #6e7785;
-  --accent: #f25f3a;
-  --accent-soft: #f25f3a1a;
-  --accent-muted: #d4715a;
-  --ok: #2ecc71;
-  --ok-soft: #2ecc711a;
-  --warn: #f4a261;
-  --danger: #e74c3c;
-  --info: #3b82f6;
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
-  --radius: 8px;
+  /* Surfaces graphite (séparation par luminosité) */
+  --bg: #0F1318;
+  --surface: #151A21;
+  --surface-2: #1B2029;
+  --border: #2A303A;
+  --border-strong: #3A4250;
+
+  /* Foreground gris froids (AA sur --bg) */
+  --fg: #E8ECEF;
+  --fg-muted: #A7B0BA;
+  --fg-dim: #8A94A0;
+
+  /* Accent AMBRE unique (remplace l'orange #f25f3a) */
+  --accent: #C8A24B;
+  --accent-hover: #D7B45C;
+  --accent-soft: rgba(200, 162, 75, 0.12);
+  --accent-muted: #8A7538;
+  --on-accent: #0A0C0F;
+
+  /* États sémantiques désaturés graphite-compatibles */
+  --ok: #6E9E7A;
+  --ok-soft: rgba(110, 158, 122, 0.14);
+  --warn: #C77B54;
+  --danger: #B85C5C;
+  --info: #6E8FA8;
+
+  /* Typo : TOUT-MONO système, zéro webfont. --font remappé sur mono
+     pour que toute la coque passe en terminal sans réécrire chaque
+     sélecteur. */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font: var(--font-mono);
+
+  /* Chrome resserré (terminal) */
+  --radius: 6px;
   --radius-sm: 4px;
   --space-xs: 4px;
   --space-sm: 8px;
@@ -3009,12 +3036,73 @@ details.exercise-card[open] .card__actions--exercise {
   margin-right: 4px;
   vertical-align: middle;
 }
-.timeline-legend__dot--strength { background: #f25f3a; }
-.timeline-legend__dot--cardio { background: #38b2ac; }
+.timeline-legend__dot--strength { background: var(--accent); }
+.timeline-legend__dot--cardio { background: var(--fg-muted); }
 .timeline-legend--compact {
   gap: var(--space-sm);
   font-size: 11px;
   margin-top: 4px;
   justify-content: flex-end;
 }
+
+/* ============================================================
+   Sb_UI_02b.3 — Auren Terminal shell hardening (global)
+   ------------------------------------------------------------
+   Harmonise la coque (topbar, nav, active-banner, cards génériques,
+   forms, focus) avec le monde graphite/mono/ambre du Home et du
+   Focus Mode. Additive : ne réécrit pas les sélecteurs métier, pose
+   des ajustements terminal par-dessus les tokens déjà migrés.
+   Aucune logique, aucune route touchée.
+   ============================================================ */
+
+/* Coque en mono + chiffres tabular. Le remap --font → mono couvre déjà
+   la famille ; on explicite tabular-nums pour les métriques globales. */
+body { font-variant-numeric: tabular-nums; }
+
+/* Focus visible ambre net, universel (accessibilité). */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Topbar / brand : mono, sobre, sans bruit. */
+.topbar__brand {
+  font-family: var(--font-mono);
+  color: var(--fg);
+}
+/* Lien nav actif (aria-current) : ambre rare — le seul accent de la nav. */
+.topbar__link[aria-current="page"],
+.topbar__link[aria-current="location"] {
+  color: var(--accent);
+}
+
+/* Active session banner : rail ambre, surface raised, mono. */
+.active-banner {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent);
+  border-radius: var(--radius);
+}
+.active-banner__dot { background: var(--accent); }
+
+/* Cards génériques : graphite + 1px line, ombres décoratives
+   neutralisées (chrome terminal). Les overlays modaux gardent leur
+   ombre fonctionnelle (rgba noir), non ciblés ici. */
+.card {
+  border-radius: var(--radius);
+}
+
+/* CTA primaire global : ambre plein, texte graphite, mono. */
+.btn--primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.btn--primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 
