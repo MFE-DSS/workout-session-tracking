@@ -290,10 +290,15 @@ jobs:
           name: linter-reports
           path: .
 
-      - name: SonarCloud scan
-        # Sb_20.5 — gate now required (Quality Gate green on first
-        # complete cycle). If this step fails, the merge is blocked.
-        uses: SonarSource/sonarcloud-github-action@v2
+      - name: SonarQube scan
+        # Sb_20.5 — gate required (Quality Gate). If this step fails, the
+        # merge is blocked.
+        # Sb_OPS.sonar-java21 (2026-07-07) — bump legacy
+        # `sonarcloud-github-action@v2` (bundled scanner ran on Java 17,
+        # now rejected by SonarQube Cloud) to the current
+        # `sonarqube-scan-action@v7.1.0` which ships a Java 21 scanner.
+        # No setup-java needed: the v7 action bundles its own runtime.
+        uses: SonarSource/sonarqube-scan-action@v7.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
