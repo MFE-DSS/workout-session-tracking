@@ -104,14 +104,30 @@
           </p>
         </div>
 
-        {# --- Worked Area Panel (§18.C / §23) : zone principale +
-           assistants + stabilisation. Source réelle = atlas family
-           (zone déjà présente dans data/machine_atlas.json). Fallback
-           conservateur "à qualifier" si aucune donnée fiable. Aucune
-           activation réelle prétendue : formulation "zone ciblée
-           estimée". --- #}
-        <div class="session-focus__worked-area" aria-label="Zone travaillée estimée">
-          <span class="session-focus__worked-area-title">Zone travaillée</span>
+        {# --- Worked Area Visual Slot (§18.C / §23, enrichi Sb_UI_04.5) :
+           surface biomécanique clinique SSR/CSS, sans asset externe, sans
+           GIF, sans image générée. Sources RÉELLES existantes uniquement
+           (atlas family : name/zone/description déjà dans
+           data/machine_atlas.json). Fallbacks conservateurs "à qualifier"
+           pour assistants/stabilisation (aucun muscle inventé). Prudence
+           anti-médicale : zones estimées, jamais diagnostic ni activation
+           réelle. Le "body-map" est une forme décorative CSS accessible
+           (aria-hidden), le contenu textuel porte toute la sémantique. --- #}
+        {% set _zone_code = _family.zone if _family and _family.zone else None %}
+        <div class="session-focus__worked-area session-focus__body-slot" aria-label="Zone travaillée estimée">
+          <div class="session-focus__body-slot-head">
+            <span class="session-focus__worked-area-title">Zone travaillée</span>
+            {% if _zone_code %}
+              <span class="session-focus__body-zone-chip" aria-hidden="true">{{ _zone_code }}</span>
+            {% endif %}
+          </div>
+
+          {# Forme clinique décorative (CSS-only, aria-hidden). Fallback
+             texte porté par la liste ci-dessous. #}
+          <div class="session-focus__body-map" aria-hidden="true">
+            <span class="session-focus__body-map-shape session-focus__body-map-shape--{{ _zone_code or 'generic' }}"></span>
+          </div>
+
           <ul class="session-focus__worked-area-list">
             <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
               <span class="session-focus__worked-area-role">Principale</span>
@@ -121,15 +137,25 @@
             </li>
             <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
               <span class="session-focus__worked-area-role">Assistants</span>
-              <span class="session-focus__worked-area-value">Assistants à qualifier</span>
+              <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">Assistants à qualifier</span>
             </li>
             <li class="session-focus__worked-area-row session-focus__worked-area-row--stabilizer">
               <span class="session-focus__worked-area-role">Stabilisation</span>
-              <span class="session-focus__worked-area-value">Stabilisation à qualifier</span>
+              <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">Stabilisation à qualifier</span>
             </li>
           </ul>
+
+          {# Movement pattern / rôle — source réelle = family.description
+             (repère du geste), tronquée. Fallback neutre sinon. #}
+          <div class="session-focus__worked-area-pattern">
+            <span class="session-focus__worked-area-role">Pattern</span>
+            <span class="session-focus__worked-area-value">
+              {% if _family and _family.description %}{{ _family.description[:90] }}{% if _family.description|length > 90 %}…{% endif %}{% else %}Pattern moteur à qualifier{% endif %}
+            </span>
+          </div>
+
           <p class="session-focus__worked-area-note">
-            Zones ciblées estimées — repère d'entraînement, pas une mesure physiologique.
+            Zones ciblées estimées — repère d'entraînement pédagogique, non diagnostic médical.
           </p>
         </div>
 
@@ -212,6 +238,16 @@
       </details>
     {% endif %}
 
+    {# ============================================================
+       Sb_UI_04.5 — Alternatives Surface (§18.F / §23)
+       ------------------------------------------------------------
+       La substitution existante (Sb_03 / Sb_07 / Sb_22a N1/N2/N3) est
+       rendue plus lisible via un wrapper "Adapter l'exercice", SANS
+       changer le mécanisme : mêmes radios name="substituted_name",
+       même form POST, même route (soumission via le form exercice).
+       Aucune alternative inventée, aucun service appelé depuis le
+       template. Surface accessible mais non dominante (drawer replié).
+       ============================================================ #}
     {# Substitution (Sb_03 + Sb_07 drawer, étendu Sb_22a tiered N1/N2/N3) #}
     {% set sub_data = substitution_data.get(se.id, {}) %}
     {% set subs = sub_data.get('substitutes', []) %}
@@ -220,16 +256,18 @@
     {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
 
     {% if can_sub and (subs or total_grouped > 0) %}
-      <details class="substitute-picker substitute-picker--drawer">
-        <summary class="substitute-picker__summary">
-          <span class="substitute-picker__label">Remplacer cet exercice</span>
+      <div class="session-focus__alternatives">
+        <details class="substitute-picker substitute-picker--drawer session-focus__alternatives-drawer">
+        <summary class="substitute-picker__summary" aria-label="Adapter l'exercice — Remplacer cet exercice">
+          <span class="substitute-picker__label session-focus__alternatives-label">Adapter l'exercice</span>
+          <span class="substitute-picker__sublabel session-focus__alternatives-sublabel">Remplacer cet exercice</span>
           <span class="substitute-picker__count">
             {% if total_grouped > 0 %}{{ total_grouped }}{% else %}{{ subs|length }}{% endif %}
             alternative{% if (total_grouped or subs|length) > 1 %}s{% endif %}
           </span>
         </summary>
         <div class="substitute-picker__body">
-          <p class="substitute-picker__hint">Machine occupée ou indisponible ? Choisissez une alternative avant la première série travail.</p>
+          <p class="substitute-picker__hint session-focus__alternatives-role">Machine occupée, gêne, ou charge inadaptée ? Choisissez une alternative de même zone / même pattern avant la première série travail.</p>
           <div class="segmented segmented--stacked">
             <label class="segmented__option">
               <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
@@ -283,7 +321,8 @@
             {% endif %}
           </div>
         </div>
-      </details>
+        </details>
+      </div>
     {% elif se.substituted_name %}
       <div class="substitute-badge">
         Substitué : <b>{{ se.substituted_name }}</b>

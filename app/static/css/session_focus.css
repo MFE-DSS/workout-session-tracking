@@ -1479,3 +1479,135 @@
   .session-focus__console { padding: var(--space-2); }
   .session-focus__console-refs { flex-direction: column; }
 }
+
+/* ============================================================
+   Sb_UI_04.5 — Worked Area Visual Slot + Alternatives Surface
+   ------------------------------------------------------------
+   Enrichit le Worked Area Panel textuel (Sb_UI_04.3) en surface
+   biomécanique clinique SSR/CSS : chip de zone, forme décorative
+   CSS-only (aucune image / GIF / SVG asset), pattern moteur, note
+   anti-médicale. Rend la substitution existante plus lisible via
+   une surface "Adapter l'exercice" (mécanisme inchangé). Additive,
+   scoped .session-focus, mobile-first 360×640. Hardening : le slot
+   et les alternatives restent secondaires ; la console de logging
+   garde la priorité visuelle.
+   ============================================================ */
+
+.session-focus__body-slot {
+  /* hérite de session-focus__worked-area (Sb_UI_04.3) ; ajoute la
+     structure du visual slot. */
+  position: relative;
+}
+.session-focus__body-slot-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+/* Chip de zone (code atlas réel, ex. "pecs"). Décoratif + label. */
+.session-focus__body-zone-chip {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--color-accent-weak);
+  color: var(--color-accent-strong);
+  font-family: var(--font-family-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Body map : forme clinique décorative, CSS pur, aria-hidden. Aucun
+   asset. Un simple bloc de zones abstraites en dégradé sobre — repère
+   visuel, jamais anatomiquement précis (donc jamais un claim). */
+.session-focus__body-map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  margin: var(--space-1) 0 var(--space-2);
+  border-radius: var(--radius-md);
+  background:
+    repeating-linear-gradient(
+      135deg,
+      var(--color-surface-sunken),
+      var(--color-surface-sunken) 6px,
+      var(--color-surface-alt) 6px,
+      var(--color-surface-alt) 12px
+    );
+  border: 1px solid var(--color-border-subtle);
+  overflow: hidden;
+}
+.session-focus__body-map-shape {
+  display: block;
+  width: 40%;
+  height: 60%;
+  border-radius: 40% 40% 45% 45% / 50% 50% 40% 40%;
+  background: var(--color-accent-weak);
+  border: 1.5px solid var(--color-accent);
+  opacity: 0.9;
+}
+/* Variantes de zone : léger décalage de forme pour distinguer sans
+   prétendre à l'anatomie. Purement décoratif. */
+.session-focus__body-map-shape--pecs,
+.session-focus__body-map-shape--upper_back { width: 52%; height: 44%; }
+.session-focus__body-map-shape--lats { width: 44%; height: 58%; }
+.session-focus__body-map-shape--delt_lat { width: 46%; height: 46%; border-radius: 50%; }
+.session-focus__body-map-shape--quads,
+.session-focus__body-map-shape--posterior { width: 34%; height: 66%; }
+
+/* Pattern moteur (source réelle : family.description tronquée). */
+.session-focus__worked-area-pattern {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+  font-size: var(--font-size-body-sm);
+}
+.session-focus__worked-area-pattern .session-focus__worked-area-role {
+  flex: 0 0 84px;
+}
+
+/* Valeur "à qualifier" : distinguée typographiquement (non-affirmative). */
+.session-focus__worked-area-value--empty {
+  color: var(--color-fg-subtle);
+  font-style: italic;
+  font-weight: var(--font-weight-regular);
+}
+
+/* -------- Alternatives Surface (§18.F) --------
+   Wrapper autour de la substitution existante. Secondaire, non
+   dominant : bordure discrète, drawer replié par défaut (le
+   <details> natif gère l'ouverture au clavier / no-JS). Tap 44×44
+   préservé sur le summary. -------- */
+.session-focus__alternatives {
+  margin: var(--space-2) 0;
+}
+.session-focus__alternatives-drawer > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+}
+.session-focus__alternatives-label {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-fg-strong);
+}
+.session-focus__alternatives-role {
+  color: var(--color-fg-muted);
+  font-size: var(--font-size-body-sm);
+}
+.session-focus__alternatives-sublabel {
+  color: var(--color-fg-subtle);
+  font-size: 12px;
+}
+
+/* Hardening : sur mobile 360×640, le visual slot ne doit pas créer un
+   mur — hauteur body-map réduite, pattern empilé. La console de logging
+   reste prioritaire (déjà dominante via Sb_UI_04.4). */
+@media (max-width: 380px) {
+  .session-focus__body-map { height: 44px; }
+  .session-focus__worked-area-pattern { flex-direction: column; gap: 2px; }
+  .session-focus__worked-area-pattern .session-focus__worked-area-role { flex-basis: auto; }
+}
