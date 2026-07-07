@@ -71,6 +71,65 @@ class TestHomeIA:
     def test_secondary_zone_present(self, client):
         assert "today-home__secondary-zone" in _home(client)
 
+    def test_terminal_direction_marker(self, client):
+        """Sb_UI_02b.1 — the Home carries the Auren Terminal marker class."""
+        assert "today-home--terminal" in _home(client)
+
+    def test_status_label_present(self, client):
+        assert "today-home__status" in _home(client)
+
+    def test_action_block_present(self, client):
+        assert "today-home__action" in _home(client)
+
+    def test_summary_eyebrow_deprioritizes_dashboard(self, client):
+        body = _home(client)
+        assert "today-home__summary-eyebrow" in body
+        assert "Résumé" in body
+
+
+# ───────── Auren Terminal visual system (graphite / mono / amber) ─────────
+
+
+class TestAurenTerminal:
+    def test_no_teal_in_home_css(self):
+        """The teal-light COLOR VALUES must be fully removed from home.css
+        (the word 'teal' may still appear in a comment documenting the
+        removal — we check hex tokens, i.e. the actual visual leak risk)."""
+        css = HOME_CSS.read_text(encoding="utf-8").lower()
+        for teal_hex in ("#0f8a85", "#0b7a75", "#095e5a", "#d4edeb"):
+            assert teal_hex not in css, f"leftover teal hex {teal_hex!r} in home.css"
+
+    def test_amber_accent_present(self):
+        css = HOME_CSS.read_text(encoding="utf-8").lower()
+        assert "#c8a24b" in css, "amber accent #C8A24B missing from home.css"
+
+    def test_graphite_surfaces_present(self):
+        """Graphite dark surfaces must be defined (dark bg, not white)."""
+        css = HOME_CSS.read_text(encoding="utf-8").lower()
+        assert "#0f1318" in css or "#151a21" in css
+        # white surface of the teal build must be gone as a hero background
+        assert "--home-surface: #ffffff" not in css
+
+    def test_mono_typography(self):
+        """The Home must use a monospace stack (terminal), not a sans stack."""
+        css = HOME_CSS.read_text(encoding="utf-8").lower()
+        assert "monospace" in css
+        assert "ui-monospace" in css
+
+    def test_no_webfont_import(self):
+        """No @import / @font-face / external font in home.css (system mono)."""
+        css = HOME_CSS.read_text(encoding="utf-8").lower()
+        assert "@import" not in css
+        assert "@font-face" not in css
+        assert "fonts.googleapis" not in css
+
+    def test_no_decorative_box_shadow_on_hero(self):
+        """Terminal chrome: the hero uses 1px line, no decorative drop shadow."""
+        css = HOME_CSS.read_text(encoding="utf-8")
+        m = re.search(r"\.today-home__hero\s*\{[^}]*\}", css, re.DOTALL)
+        assert m is not None
+        assert "box-shadow" not in m.group(0) or "box-shadow: none" in m.group(0)
+
 
 # ───────── decision model branches ─────────
 
@@ -88,7 +147,7 @@ class TestDecisionBranches:
         sid = _start_session(client, "push-a")
         body = _home(client)
         assert "today-home__hero--active" in body
-        assert "Reprendre la séance" in body
+        assert "Reprendre" in body
         assert f"/sessions/{sid}" in body
 
     def test_active_session_cta_single(self, client):

@@ -8,60 +8,68 @@
 <link rel="stylesheet" href="{{ url_for('static', path='css/home.css') }}" />
 {% endblock %}
 {% block content %}
-<div class="today-home">
+{# Sb_UI_02b.1 — Auren Terminal re-skin : graphite + mono + ambre.
+   Marqueur `today-home--terminal` pour distinguer la direction visuelle. #}
+<div class="today-home today-home--terminal">
 
 {# ============================================================
    Hero Decision Surface (Sx_UI_05 §8 — Today Decision Model)
    ------------------------------------------------------------
    Une seule CTA primaire, résolue par l'état :
-   1. open_session   → « Reprendre la séance » (domine)
-   2. sinon reco/next → « Démarrer une séance »
-   3. sinon nouvel utilisateur → « Commencer »
-   Readiness (si présente) = micro-teaser qualitatif, jamais un score
-   médical. Données déjà en contexte uniquement ; aucune inventée.
+   1. open_session   → « Reprendre » (domine)
+   2. sinon           → « Démarrer une séance »
+   Readiness (si présente) = readout qualitatif, jamais un score médical.
+   Données déjà en contexte uniquement ; aucune inventée.
    ============================================================ #}
-<section class="today-home__hero {% if open_session %}today-home__hero--active{% endif %}"
+<section class="today-home__hero {% if open_session %}today-home__hero--active{% else %}today-home__hero--next{% endif %}"
          aria-label="Décision du jour">
   <p class="today-home__eyebrow">Aujourd'hui</p>
 
   {% if open_session %}
     {# 1. Séance active domine. #}
-    <h1 class="today-home__title">Séance en cours</h1>
+    <span class="today-home__status">Séance active</span>
+    <h1 class="today-home__title">{{ open_session.template_name_snapshot }}</h1>
     <p class="today-home__meta">
-      {{ open_session.template_name_snapshot }}
-      {% if open_since %}<span class="today-home__meta-sep" aria-hidden="true">·</span> depuis {{ open_since }}{% endif %}
+      {% if open_since %}En cours <span class="today-home__meta-sep" aria-hidden="true">·</span> depuis {{ open_since }}{% else %}Reprends là où tu t'es arrêté{% endif %}
     </p>
-    <a class="today-home__cta" href="{{ url_for('session_detail', session_id=open_session.id) }}">
-      Reprendre la séance →
-    </a>
-    <a class="today-home__secondary" href="{{ url_for('launcher') }}">Démarrer une autre séance</a>
+    <div class="today-home__action">
+      <a class="today-home__cta" href="{{ url_for('session_detail', session_id=open_session.id) }}">
+        Reprendre <span aria-hidden="true">→</span>
+      </a>
+      <a class="today-home__secondary" href="{{ url_for('launcher') }}">Démarrer une autre séance</a>
+    </div>
 
   {% else %}
-    {# 2/3. Pas de séance active : prochaine séance ou démarrage. #}
-    <h1 class="today-home__title">Prêt à t'entraîner ?</h1>
-    <p class="today-home__meta">Choisis ta séance du jour quand tu veux.</p>
-    <a class="today-home__cta" href="{{ url_for('launcher') }}">
-      Démarrer une séance →
-    </a>
-    <a class="today-home__secondary" href="{{ url_for('library') }}">Voir les programmes</a>
+    {# 2/3. Pas de séance active : démarrage. #}
+    <span class="today-home__status">Aucune séance active</span>
+    <h1 class="today-home__title">Prêt à t'entraîner&nbsp;?</h1>
+    <p class="today-home__meta">Lance ta séance du jour quand tu veux.</p>
+    <div class="today-home__action">
+      <a class="today-home__cta" href="{{ url_for('launcher') }}">
+        Démarrer une séance <span aria-hidden="true">→</span>
+      </a>
+      <a class="today-home__secondary" href="{{ url_for('library') }}">Voir les programmes</a>
+    </div>
   {% endif %}
 
-  {# Readiness teaser — micro-surface qualitative uniquement (Sx_UI_05
-     §9, teaser V1 ; le snapshot complet est réservé à Sb_UI_05.3).
-     Repère self-report, non médical. #}
+  {# Readiness teaser — readout qualitatif uniquement (Sx_UI_05 §9,
+     teaser V1 ; snapshot complet réservé à Sb_UI_05.3). Self-report,
+     non médical. #}
   {% if readiness_today %}
     <p class="today-home__readiness" aria-label="Repère du jour, déclaré">
       <span class="today-home__readiness-label">Repère du jour</span>
-      <span class="today-home__readiness-hint">état déclaré · voir plus bas</span>
+      <span class="today-home__readiness-hint">état déclaré · détail plus bas</span>
     </p>
   {% endif %}
 </section>
 
 {# ============================================================
    Surfaces secondaires — l'information existante conservée mais
-   dé-priorisée sous le hero. Aucun bloc supprimé.
+   dé-priorisée sous le hero. Aucun bloc supprimé. En-tête « Résumé »
+   marque la bascule décision → readouts.
    ============================================================ #}
 <div class="today-home__secondary-zone">
+<p class="today-home__summary-eyebrow">Résumé <span class="today-home__summary-hint">· indicateurs et navigation</span></p>
 
 {# Sb_27.1 — Coaching loop tiles (Today / Last / Week) #}
 {% include "_partials/home_coaching_loop.html" %}
