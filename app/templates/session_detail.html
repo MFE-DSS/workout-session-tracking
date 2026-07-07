@@ -9,7 +9,7 @@
 {% endblock %}
 {% block content %}
 
-<div class="session-page session-focus {% if session.status == 'completed' %}session-page--completed{% endif %}">
+<div class="session-page session-focus session-focus--terminal {% if session.status == 'completed' %}session-page--completed{% endif %}">
 
 {# Sb_UI_04.2 — le lien retour "← Accueil" est désormais intégré au
    header partial pour éviter un anchor flottant hors du sticky header
