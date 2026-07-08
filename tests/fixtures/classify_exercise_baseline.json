@@ -1,0 +1,609 @@
+{
+  "description": "Sb_32.1 non-regression baseline: classify_exercise() output for the current catalog. Sb_32.2 (classify -> DB lookup + fallback) must reproduce this EXACTLY (invariance contrainte #1).",
+  "source": "app.services.muscle_mapping.classify_exercise on data/reference_split.json catalog",
+  "count": 91,
+  "entries": [
+    {
+      "code": "E5",
+      "name": "Adduction assise",
+      "primary": "posterior",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Butterfly pec machine",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E3",
+      "name": "Cable cross-over (bas→haut)",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E1",
+      "name": "Chest Press machine",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Chest Press machine",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Crunch câble à genoux",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Crunch câble à genoux",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E7",
+      "name": "Crunch câble à genoux",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E2",
+      "name": "Curl EZ-bar debout",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Curl EZ-bar debout",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Curl incliné haltères",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Curl incliné haltères (banc 45°)",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Curl incliné haltères (banc 45°)",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Curl marteau câble (corde)",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E7",
+      "name": "Curl marteau haltères",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Curl poulie basse",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Curl poulie basse (barre)",
+      "primary": "biceps",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Dips pectoraux (buste penché)",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Développé couché haltères",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E1",
+      "name": "Développé incliné haltères 30°",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E4",
+      "name": "Extension overhead câble (corde)",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Extension overhead câble (corde)",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Face pull câble",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Face pull câble",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E7",
+      "name": "Face pull câble",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Face pull câble (corde)",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Hack Squat machine",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Hip thrust Smith",
+      "primary": "posterior",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Hip thrust Smith machine",
+      "primary": "posterior",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Incline Smith Press",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E7",
+      "name": "Kickback câble",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E2",
+      "name": "Leg Press (pieds bas)",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E2",
+      "name": "Leg Press (pieds bas, serrés)",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Leg Press (pieds hauts, écartés)",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E2",
+      "name": "Leg curls allongé",
+      "primary": "posterior",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Leg curls assis",
+      "primary": "posterior",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Leg extensions assises",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Leg extensions assises",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Leg extensions assises",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Machine shoulder press",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Machine shoulder press",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Machine shoulder press",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Mollets assis machine",
+      "primary": "calves",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Mollets assis machine",
+      "primary": "calves",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Neutral Grip Shoulder Press machine",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Pallof press câble",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Pullover câble (bras tendus)",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E3",
+      "name": "Pullover câble (bras tendus, poulie haute)",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E6",
+      "name": "Pullover machine",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E5",
+      "name": "Rear delt fly machine",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Rear delt fly machine",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Rear delt fly machine (pec deck inversé)",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E3",
+      "name": "Relevé de jambes suspendu",
+      "primary": "calves",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Relevés mollets debout",
+      "primary": "calves",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Relevés mollets debout machine",
+      "primary": "calves",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Romanian Deadlift haltères",
+      "primary": "posterior",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Roulette abdominale",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E7",
+      "name": "Roulette abdominale",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Roulette abdominale (ab wheel rollout)",
+      "primary": "core",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Rowing câble assis prise large",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Rowing câble assis prise neutre",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E3",
+      "name": "Rowing câble assis prise serrée",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E3",
+      "name": "Rowing haltère un bras (banc)",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E1",
+      "name": "Rowing machine chest-supported",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Rowing machine chest-supported",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E4",
+      "name": "Shrugs haltères",
+      "primary": "upper_back",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E5",
+      "name": "Skull crushers EZ-bar",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Squat Smith machine (pieds avancés)",
+      "primary": "quads",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Straight-arm pulldown câble",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E7",
+      "name": "Straight-arm pulldown câble",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E4",
+      "name": "Tirage front câble (prise large)",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Tirage front câble (prise large)",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Tirage poulie haute prise large",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Tirage poulie haute prise large",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E1",
+      "name": "Tirage poulie haute prise neutre",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Tirage poulie haute prise neutre",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E2",
+      "name": "Tirage vertical unilatéral câble",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E3",
+      "name": "Tirage vertical unilatéral câble",
+      "primary": "lats",
+      "secondary": [
+        "biceps"
+      ]
+    },
+    {
+      "code": "E7",
+      "name": "Triceps extension poulie haute (corde)",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Triceps pushdown barre",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E7",
+      "name": "Triceps pushdown barre",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Triceps pushdown corde",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E7",
+      "name": "Triceps pushdown corde",
+      "primary": "triceps",
+      "secondary": []
+    },
+    {
+      "code": "E6",
+      "name": "Écarté arrière d'épaule câble",
+      "primary": "delt_post",
+      "secondary": []
+    },
+    {
+      "code": "E1",
+      "name": "Écarté pec aux câbles (incliné bas→haut)",
+      "primary": "pecs",
+      "secondary": [
+        "triceps"
+      ]
+    },
+    {
+      "code": "E4",
+      "name": "Élévations latérales câble",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Élévations latérales câble",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E2",
+      "name": "Élévations latérales câble (derrière le dos)",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E5",
+      "name": "Élévations latérales câble (derrière le dos)",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E3",
+      "name": "Élévations latérales haltères assis",
+      "primary": "delt_lat",
+      "secondary": []
+    },
+    {
+      "code": "E4",
+      "name": "Élévations latérales haltères assis",
+      "primary": "delt_lat",
+      "secondary": []
+    }
+  ]
+}

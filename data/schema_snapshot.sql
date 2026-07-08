@@ -28,8 +28,14 @@ CREATE TABLE body_consents ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, cons
 -- table: body_measurements
 CREATE TABLE "body_measurements" ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, measured_at DATETIME NOT NULL, weight_kg FLOAT, chest_cm FLOAT, waist_cm FLOAT, calf_cm FLOAT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, arm_cm_left FLOAT, arm_cm_right FLOAT, thigh_cm_left FLOAT, thigh_cm_right FLOAT, hip_cm FLOAT, neck_cm FLOAT, shoulder_width_cm FLOAT, calf_cm_left FLOAT, calf_cm_right FLOAT, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
 
+-- table: body_zones
+CREATE TABLE body_zones ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, label VARCHAR(128) NOT NULL, measurement_field VARCHAR(64), radar_axis VARCHAR(64), volume_target INTEGER, is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), UNIQUE (code) );
+
 -- table: method_rules
 CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, position INTEGER NOT NULL, title VARCHAR(128) NOT NULL, body TEXT NOT NULL, PRIMARY KEY (id), UNIQUE (slug) );
+
+-- table: muscles
+CREATE TABLE muscles ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, name VARCHAR(128) NOT NULL, body_zone_code VARCHAR(64), category VARCHAR(32), is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), UNIQUE (code), FOREIGN KEY(body_zone_code) REFERENCES body_zones (code) ON DELETE SET NULL );
 
 -- table: readiness_entries
 CREATE TABLE readiness_entries ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, recorded_on DATE NOT NULL, sleep_quality INTEGER NOT NULL, fatigue_level INTEGER NOT NULL, soreness_level INTEGER NOT NULL, stress_level INTEGER NOT NULL, motivation_level INTEGER NOT NULL, resting_hr INTEGER, note TEXT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_readiness_user_day UNIQUE (user_id, recorded_on) );
