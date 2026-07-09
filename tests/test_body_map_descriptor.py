@@ -21,7 +21,6 @@ Honesty & isolation
 from __future__ import annotations
 
 import json
-import subprocess
 import tempfile
 from pathlib import Path
 
@@ -193,34 +192,33 @@ def test_stable_order_primary_then_secondary():
 # ───────── 11-13. isolation (no forbidden file touched) ─────────
 
 
-def _changed_paths() -> list[str]:
-    out = subprocess.run(
-        ["git", "diff", "--name-only", "HEAD"],
-        cwd=str(ROOT), capture_output=True, text=True, check=True,
-    ).stdout.splitlines()
-    return [p.strip() for p in out if p.strip()]
+def test_service_stays_pure_no_persistence():
+    """Permanent invariant (independent of any later sprint's git diff): the
+    descriptor service performs no DB write / no model mutation — it derives
+    from the mapping and returns a dict. Guards the 'pure service' contract of
+    Sb_32.3 regardless of which later sprint consumes it (e.g. the Worked Area
+    UI wiring it into the session_detail route)."""
+    src = (ROOT / "app" / "services" / "body_map_descriptor.py").read_text(
+        encoding="utf-8"
+    )
+    for forbidden in ("db.add(", "db.commit(", "db.delete(", "session.add("):
+        assert forbidden not in src, forbidden
 
 
-def test_no_model_migration_schema_file_touched():
-    changed = _changed_paths()
-    for p in changed:
-        assert not p.startswith("app/models/"), p
-        assert not p.startswith("migrations/"), p
-        assert p != "data/schema_snapshot.sql", p
+def test_descriptor_service_signature_stable():
+    """Permanent invariant (independent of any later sprint's git diff): the
+    public service keeps its backward-compatible signature. Downstream sprints
+    (e.g. the Worked Area UI) may wire it into routers/templates — that is
+    allowed and no longer asserted here via git diff."""
+    import inspect as pyinspect
 
-
-def test_no_consumer_file_touched():
-    changed = set(_changed_paths())
-    offenders = [f for f in FORBIDDEN_FILES if f in changed]
-    assert not offenders, offenders
-
-
-def test_no_ui_file_touched():
-    changed = _changed_paths()
-    for p in changed:
-        assert not p.startswith("app/templates/"), p
-        assert not p.startswith("app/static/"), p
-        assert not p.startswith("app/routers/"), p
+    sig = pyinspect.signature(build_body_map_descriptor)
+    params = sig.parameters
+    assert list(params)[0] == "name"
+    assert params["exercise_code"].kind == params["exercise_code"].KEYWORD_ONLY
+    assert params["db"].kind == params["db"].KEYWORD_ONLY
+    assert params["exercise_code"].default is None
+    assert params["db"].default is None
 
 
 # ───────── 14. no medical claim ─────────

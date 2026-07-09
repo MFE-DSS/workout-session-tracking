@@ -114,10 +114,21 @@
            réelle. Le "body-map" est une forme décorative CSS accessible
            (aria-hidden), le contenu textuel porte toute la sémantique. --- #}
         {% set _zone_code = _family.zone if _family and _family.zone else None %}
-        <div class="session-focus__worked-area session-focus__body-slot" aria-label="Zone travaillée estimée">
+        {# Sb_32.next — body-map descriptor (Sx_32) : zone réellement résolue
+           par le mapping exercice→zone. Remplace les fallbacks hardcodés
+           "à qualifier" par les labels réels quand le descriptor est mapped.
+           SSR strict, aucune valeur inventée : status unknown → "À qualifier".
+           Le chip de zone reste discret (data-*, aria-hidden). #}
+        {% set _bmd = body_map_data.get(se.id) if body_map_data is defined and body_map_data else None %}
+        {% set _bmd_mapped = _bmd and _bmd.status == "mapped" %}
+        <div class="session-focus__worked-area session-focus__body-slot"
+             aria-label="Zone travaillée estimée"
+             {% if _bmd %}data-resolution-path="{{ _bmd.resolution_path }}"{% endif %}>
           <div class="session-focus__body-slot-head">
             <span class="session-focus__worked-area-title">Zone travaillée</span>
-            {% if _zone_code %}
+            {% if _bmd_mapped %}
+              <span class="session-focus__body-zone-chip" aria-hidden="true">{{ _bmd.primary_zone }}</span>
+            {% elif _zone_code %}
               <span class="session-focus__body-zone-chip" aria-hidden="true">{{ _zone_code }}</span>
             {% endif %}
           </div>
@@ -125,23 +136,29 @@
           {# Forme clinique décorative (CSS-only, aria-hidden). Fallback
              texte porté par la liste ci-dessous. #}
           <div class="session-focus__body-map" aria-hidden="true">
-            <span class="session-focus__body-map-shape session-focus__body-map-shape--{{ _zone_code or 'generic' }}"></span>
+            <span class="session-focus__body-map-shape session-focus__body-map-shape--{{ (_bmd.primary_zone if _bmd_mapped else _zone_code) or 'generic' }}"></span>
           </div>
 
           <ul class="session-focus__worked-area-list">
             <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
-              <span class="session-focus__worked-area-role">Principale</span>
+              <span class="session-focus__worked-area-role">Principal</span>
               <span class="session-focus__worked-area-value">
-                {% if _family and _family.name %}{{ _family.name }}{% else %}Zone principale à qualifier{% endif %}
+                {%- if _bmd_mapped %}{{ _bmd.primary_label }}
+                {%- elif _family and _family.name %}{{ _family.name }}
+                {%- else %}À qualifier{% endif %}
               </span>
             </li>
             <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
               <span class="session-focus__worked-area-role">Assistants</span>
-              <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">Assistants à qualifier</span>
+              {% if _bmd_mapped and _bmd.secondary_labels %}
+                <span class="session-focus__worked-area-value">{{ _bmd.secondary_labels | join(" · ") }}</span>
+              {% else %}
+                <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">À qualifier</span>
+              {% endif %}
             </li>
             <li class="session-focus__worked-area-row session-focus__worked-area-row--stabilizer">
               <span class="session-focus__worked-area-role">Stabilisation</span>
-              <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">Stabilisation à qualifier</span>
+              <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">À qualifier</span>
             </li>
           </ul>
 
@@ -150,12 +167,12 @@
           <div class="session-focus__worked-area-pattern">
             <span class="session-focus__worked-area-role">Pattern</span>
             <span class="session-focus__worked-area-value">
-              {% if _family and _family.description %}{{ _family.description[:90] }}{% if _family.description|length > 90 %}…{% endif %}{% else %}Pattern moteur à qualifier{% endif %}
+              {% if _family and _family.description %}{{ _family.description[:90] }}{% if _family.description|length > 90 %}…{% endif %}{% else %}À qualifier{% endif %}
             </span>
           </div>
 
           <p class="session-focus__worked-area-note">
-            Zones ciblées estimées — repère d'entraînement pédagogique, non diagnostic médical.
+            Lecture indicative issue du mapping exercice — repère d'entraînement, non diagnostic médical.
           </p>
         </div>
 

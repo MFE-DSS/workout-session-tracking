@@ -283,14 +283,21 @@ def session_detail(
     }
 
     from app.services import machine_atlas
+    from app.services.body_map_descriptor import build_body_map_descriptor
     from app.services.hints import compute_hints as compute_sb08_hints
     from app.services.substitution import (
+        actual_exercise_name,
         can_substitute,
         compute_suggestions,
         get_substitutes,
     )
     substitution_data: dict[int, dict] = {}
     atlas_data: dict[int, dict | None] = {}
+    # Sb_32.next — body-map descriptor (Sx_32) per session exercise. First
+    # visible consumer of body_map_descriptor: the Worked Area reads the zone
+    # actually resolved by the Sx_32 mapping (not just the atlas family).
+    # exercise_code = actual exercise name (Sb_32.2 identity convention).
+    body_map_data: dict[int, dict] = {}
     sb08_hints_by_exercise: dict[int, list[dict]] = {}
     for se in session.session_exercises:
         # Sb_22a — keep legacy `substitutes` (flat list) for backward
@@ -314,6 +321,13 @@ def session_detail(
         # et les cues du peek affichent les bonnes consignes. Sinon
         # fallback transparent sur le prescrit.
         atlas_data[se.id] = machine_atlas.get_for_session_exercise(se)
+        # Sb_32.next — resolve the worked body zones via the Sx_32 mapping.
+        # Uses the name actually performed (follows substitution) as both the
+        # display name and the lookup key (Sb_32.2 `exercise_code = name`).
+        _ex_name = actual_exercise_name(se)
+        body_map_data[se.id] = build_body_map_descriptor(
+            _ex_name, exercise_code=_ex_name, db=db
+        )
         sb08_hints_by_exercise[se.id] = [
             h.to_dict()
             for h in compute_sb08_hints(se, last_time.get(se.exercise_code_snapshot))
@@ -442,6 +456,7 @@ def session_detail(
             "active_exercise_id": active_exercise_id,
             "substitution_data": substitution_data,
             "atlas_data": atlas_data,
+            "body_map_data": body_map_data,
             "sb08_hints_by_exercise": sb08_hints_by_exercise,
             "briefing_chips": briefing_chips,
             "peek_for_active": peek_for_active,
