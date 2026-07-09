@@ -1,0 +1,51 @@
+{
+  "_doc": "Sb_OPS.scope-guard — garde-fou anti-overcheck. Classe le diff courant en un TIER de risque (déterministe, basé sur les fichiers touchés) et recommande le niveau de vérification MINIMAL suffisant. But : éviter de lancer un full sweep local de 10-15 min sur un changement isolé (service pur, docs) qui ne peut structurellement pas régresser le reste de la suite. La CI réelle (3 jobs) reste TOUJOURS la source de vérité au push — ce garde-fou ne réduit JAMAIS la CI, seulement les checks LOCAUX redondants. Consommé par scripts/check_scope.py. Versionné : non aliénable par un prompt.",
+  "policy_version": 1,
+  "principles": [
+    "La CI réelle au push fait foi de non-régression globale (3 jobs). Ne jamais y toucher, ne jamais [skip ci] sur du code.",
+    "Le full sweep LOCAL n'est qu'un pré-filtre. Il n'est requis que quand le diff touche du code partagé (importé ailleurs) — là où une régression cross-cutting est plausible.",
+    "Un fichier NEUF que personne n'importe encore (service isolé) ne peut pas casser un test lointain : broad sweep ciblé suffit en local.",
+    "Docs-only : aucun sweep, aucun migration check. Seul spec_protocol s'applique.",
+    "En cas de doute sur le tier, remonter d'un cran (plus de checks), jamais descendre."
+  ],
+  "tiers": {
+    "docs": {
+      "when": "Tous les fichiers touchés sont sous docs/ (ou *.md hors code).",
+      "match_all": ["^docs/", "\\.md$"],
+      "required_local_checks": ["check_spec_protocol"],
+      "skip": ["full_sweep", "broad_sweep", "migration_checks", "ruff_budget"],
+      "ci_note": "paths-ignore docs/** — la CI est légitimement skippée pour un commit 100% docs."
+    },
+    "isolated": {
+      "when": "Fichier(s) de service/util NEUF(S) + leurs tests, sans modifier aucun fichier importé ailleurs, sans migration/model/schema/UI.",
+      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "targeted_tests", "broad_sweep_scoped"],
+      "skip": ["full_sweep_local"],
+      "ci_note": "La CI réelle joue le rôle du full sweep. Full sweep LOCAL non requis.",
+      "rationale": "Un nouveau module non importé par le code existant ne peut pas régresser un test hors de sa surface. Broad sweep ciblé (module + consommateurs potentiels) suffit localement."
+    },
+    "shared_code": {
+      "when": "Modifie un fichier de code déjà importé ailleurs (service consommé, util partagé, muscle_mapping.py, etc.) SANS toucher migration/model/schema.",
+      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "targeted_tests", "broad_sweep_scoped", "full_sweep_local"],
+      "skip": [],
+      "rationale": "Modifier un fichier partagé peut casser un test lointain. Full sweep local justifié."
+    },
+    "migration": {
+      "when": "Touche migrations/**, app/models/**, ou data/schema_snapshot.sql.",
+      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "check_alembic_drift", "check_schema_snapshot", "check_migration_patterns", "check_migration_roundtrip", "targeted_tests", "broad_sweep_scoped", "full_sweep_local"],
+      "skip": [],
+      "rationale": "Changement de schéma : risque maximal. Tous les migration checks + full sweep."
+    },
+    "ci_infra": {
+      "when": "Touche .github/**, scripts/**, requirements*.txt, pyproject.toml, package.json.",
+      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "full_sweep_local"],
+      "skip": [],
+      "ci_note": "Valider IMPÉRATIVEMENT sur la CI réelle (le changement affecte le pipeline lui-même)."
+    }
+  },
+  "tier_precedence": ["migration", "ci_infra", "shared_code", "isolated", "docs"],
+  "_precedence_doc": "Si un diff matche plusieurs tiers, on retient le PLUS STRICT (ordre ci-dessus, migration > ci_infra > shared_code > isolated > docs). On ne descend jamais.",
+  "shared_code_detection": {
+    "_doc": "Un fichier sous app/ (hors le fichier neuf lui-même) est 'partagé' s'il est référencé par un `import`/`from ... import` ailleurs dans app/. check_scope.py teste : le fichier modifié est-il importé par au moins un AUTRE module app/ ?",
+    "roots": ["app/"]
+  }
+}
