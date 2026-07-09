@@ -56,8 +56,14 @@ def test_shared_code_when_modified_file_imported_elsewhere():
 
 
 def test_isolated_when_new_leaf_file_not_imported_anywhere():
-    # body_map_descriptor exists but is not imported by any app/ module yet.
-    assert _classify(["app/services/body_map_descriptor.py"]) == "isolated"
+    # A synthetic app/ service path that no module imports → isolated.
+    # NB: we deliberately use a NON-EXISTENT fixture path rather than a real
+    # file, so the test stays semantic: it asserts the classifier's logic for
+    # an un-imported leaf, and never breaks when a later sprint wires a real
+    # service into a router (which correctly reclassifies it as shared_code).
+    assert (
+        _classify(["app/services/__scope_guard_new_leaf_fixture.py"]) == "isolated"
+    )
 
 
 def test_isolated_tier_allows_skipping_full_sweep():
