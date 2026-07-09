@@ -4,8 +4,21 @@ Maps exercise names (substring match, case-insensitive) to
 muscle zones for scoring. Two levels:
   - 11 detailed zones (analytical view)
   - 6 radar axes (macro view, aggregation of detailed zones)
+
+Sb_32.2 adds an OPTIONAL DB-backed classification path
+(``ExerciseMuscleMapping`` lookup by ``exercise_code``) with the historical
+substring matcher as fallback. The public signature stays
+backward-compatible: ``classify_exercise(name)`` is byte-identical to before
+(it never touches the DB). Only callers that explicitly pass ``db=`` and
+``exercise_code=`` opt into the relational lookup. Invariance vs the Sb_32.1
+baseline is contrainte #1 — see ``tests/fixtures/classify_exercise_baseline.json``.
 """
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
 
 
 ZONE_LABELS: dict[str, str] = {
@@ -93,14 +106,80 @@ _EXERCISE_PATTERNS: list[tuple[list[str], str, list[str]]] = [
 ]
 
 
-def classify_exercise(name: str) -> tuple[str, list[str]]:
-    """Classify an exercise name into (primary_zone, secondary_zones).
+def _classify_exercise_by_patterns(name: str) -> tuple[str, list[str]]:
+    """Historical substring classifier (unchanged behaviour).
 
-    Uses case-insensitive substring matching against known patterns.
-    Returns ("unknown", []) if no pattern matches.
+    Case-insensitive substring matching against known patterns.
+    Returns ("unknown", []) if no pattern matches. This is the fallback
+    and the single source of truth captured in the Sb_32.1 baseline.
     """
     name_lower = name.lower()
     for keywords, primary, secondary in _EXERCISE_PATTERNS:
         if any(kw in name_lower for kw in keywords):
             return primary, secondary
     return "unknown", []
+
+
+def _classify_exercise_by_lookup(
+    db: Session, exercise_code: str
+) -> tuple[str, list[str]] | None:
+    """DB-backed classification via ``ExerciseMuscleMapping``.
+
+    Returns (primary_zone, secondary_zones) if a primary mapping row exists
+    for ``exercise_code``, else ``None`` (caller falls back to substring).
+    Secondary zones are ordered by ``position`` then ``id`` to reproduce the
+    historical ordering deterministically. Only active rows are considered.
+    """
+    # Local import: keep the module import-light and avoid a hard ORM
+    # dependency for the name-only path.
+    from app.models.exercise_muscle_mapping import ExerciseMuscleMapping
+
+    rows = (
+        db.query(ExerciseMuscleMapping)
+        .filter(
+            ExerciseMuscleMapping.exercise_code == exercise_code,
+            ExerciseMuscleMapping.is_active.is_(True),
+        )
+        .order_by(
+            ExerciseMuscleMapping.position.asc(),
+            ExerciseMuscleMapping.id.asc(),
+        )
+        .all()
+    )
+    if not rows:
+        return None
+
+    primary: str | None = None
+    secondary: list[str] = []
+    for r in rows:
+        if r.role == "primary" and primary is None:
+            primary = r.body_zone_code
+        elif r.role == "secondary":
+            secondary.append(r.body_zone_code)
+    if primary is None:
+        # No primary row for this code → treat as no usable mapping.
+        return None
+    return primary, secondary
+
+
+def classify_exercise(
+    name: str,
+    *,
+    exercise_code: str | None = None,
+    db: Session | None = None,
+) -> tuple[str, list[str]]:
+    """Classify an exercise into (primary_zone, secondary_zones).
+
+    Backward-compatible: ``classify_exercise(name)`` behaves exactly as
+    before (pure substring matching, no DB access).
+
+    When BOTH ``db`` and ``exercise_code`` are provided, an optional
+    DB-backed lookup (``ExerciseMuscleMapping``) is tried first; on a miss
+    (or if either argument is absent) the call falls back to the historical
+    substring matcher. Output format is always ``tuple[str, list[str]]``.
+    """
+    if db is not None and exercise_code is not None:
+        looked_up = _classify_exercise_by_lookup(db, exercise_code)
+        if looked_up is not None:
+            return looked_up
+    return _classify_exercise_by_patterns(name)

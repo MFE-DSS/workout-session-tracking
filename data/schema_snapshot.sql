@@ -7,6 +7,12 @@
 -- index: ix_body_measurements_user_date
 CREATE INDEX ix_body_measurements_user_date ON body_measurements (user_id, measured_at);
 
+-- index: ix_exercise_muscle_mapping_exercise
+CREATE INDEX ix_exercise_muscle_mapping_exercise ON exercise_muscle_mappings (exercise_code);
+
+-- index: ix_exercise_muscle_mapping_zone
+CREATE INDEX ix_exercise_muscle_mapping_zone ON exercise_muscle_mappings (body_zone_code);
+
 -- index: ix_session_exercises_session_id
 CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
 
@@ -30,6 +36,9 @@ CREATE TABLE "body_measurements" ( id INTEGER NOT NULL, user_id INTEGER NOT NULL
 
 -- table: body_zones
 CREATE TABLE body_zones ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, label VARCHAR(128) NOT NULL, measurement_field VARCHAR(64), radar_axis VARCHAR(64), volume_target INTEGER, is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), UNIQUE (code) );
+
+-- table: exercise_muscle_mappings
+CREATE TABLE exercise_muscle_mappings ( id INTEGER NOT NULL, exercise_code VARCHAR(256) NOT NULL, body_zone_code VARCHAR(64) NOT NULL, muscle_code VARCHAR(64), role VARCHAR(16) NOT NULL, source VARCHAR(16) NOT NULL, position INTEGER DEFAULT '0' NOT NULL, is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_exercise_muscle_mapping UNIQUE (exercise_code, body_zone_code, role), FOREIGN KEY(body_zone_code) REFERENCES body_zones (code) ON DELETE CASCADE, FOREIGN KEY(muscle_code) REFERENCES muscles (code) ON DELETE SET NULL );
 
 -- table: method_rules
 CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, position INTEGER NOT NULL, title VARCHAR(128) NOT NULL, body TEXT NOT NULL, PRIMARY KEY (id), UNIQUE (slug) );

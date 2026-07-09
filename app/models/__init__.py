@@ -8,6 +8,7 @@ from app.models import (  # noqa: F401
     body_zone,
     catalog,
     challenge,
+    exercise_muscle_mapping,
     measurement,
     muscle,
     readiness,
