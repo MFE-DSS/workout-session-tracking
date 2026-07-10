@@ -121,20 +121,28 @@
            Le chip de zone reste discret (data-*, aria-hidden). #}
         {% set _bmd = body_map_data.get(se.id) if body_map_data is defined and body_map_data else None %}
         {% set _bmd_mapped = _bmd and _bmd.status == "mapped" %}
+        {# Sx_UI_06 D3 (Sb_UI_06.2) — Worked Area density cleanup. Règle : une
+           information = un seul endroit. Décisions (brainstorming §0 du report) :
+           - chip de zone décoratif (code brut aria-hidden) RETIRÉ (redondant
+             avec le label texte) ;
+           - body-map CSS conservé (repère visuel discret, aria-hidden) ;
+           - « À qualifier » n'apparaît qu'UNE fois (sur Principal quand unknown) :
+             les rows vides (assistants, stabilisation, pattern) sont MASQUÉES au
+             lieu de répéter « À qualifier » — le signal unknown reste porté par
+             Principal ; le Worked Area n'est jamais masqué entièrement ;
+           - note raccourcie en microcopy courte non médicale ;
+           - resolution_path CONSERVÉ en data-* (jamais visible utilisateur ;
+             db_lookup / substring_fallback non exposés en UI). #}
+        {% set _wa_pattern = _family.description if _family and _family.description else None %}
         <div class="session-focus__worked-area session-focus__body-slot"
              aria-label="Zone travaillée estimée"
              {% if _bmd %}data-resolution-path="{{ _bmd.resolution_path }}"{% endif %}>
           <div class="session-focus__body-slot-head">
             <span class="session-focus__worked-area-title">Zone travaillée</span>
-            {% if _bmd_mapped %}
-              <span class="session-focus__body-zone-chip" aria-hidden="true">{{ _bmd.primary_zone }}</span>
-            {% elif _zone_code %}
-              <span class="session-focus__body-zone-chip" aria-hidden="true">{{ _zone_code }}</span>
-            {% endif %}
           </div>
 
-          {# Forme clinique décorative (CSS-only, aria-hidden). Fallback
-             texte porté par la liste ci-dessous. #}
+          {# Forme clinique décorative (CSS-only, aria-hidden). Repère visuel
+             discret ; toute la sémantique est portée par le texte ci-dessous. #}
           <div class="session-focus__body-map" aria-hidden="true">
             <span class="session-focus__body-map-shape session-focus__body-map-shape--{{ (_bmd.primary_zone if _bmd_mapped else _zone_code) or 'generic' }}"></span>
           </div>
@@ -148,32 +156,24 @@
                 {%- else %}À qualifier{% endif %}
               </span>
             </li>
+            {# Assistants : rendu UNIQUEMENT si non vide (plus de « À qualifier »
+               répété dans un slot vide). #}
+            {% if _bmd_mapped and _bmd.secondary_labels %}
             <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
               <span class="session-focus__worked-area-role">Assistants</span>
-              {% if _bmd_mapped and _bmd.secondary_labels %}
-                <span class="session-focus__worked-area-value">{{ _bmd.secondary_labels | join(" · ") }}</span>
-              {% else %}
-                <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">À qualifier</span>
-              {% endif %}
+              <span class="session-focus__worked-area-value">{{ _bmd.secondary_labels | join(" · ") }}</span>
             </li>
-            <li class="session-focus__worked-area-row session-focus__worked-area-row--stabilizer">
-              <span class="session-focus__worked-area-role">Stabilisation</span>
-              <span class="session-focus__worked-area-value session-focus__worked-area-value--empty">À qualifier</span>
+            {% endif %}
+            {# Pattern moteur : rendu UNIQUEMENT si une description atlas existe. #}
+            {% if _wa_pattern %}
+            <li class="session-focus__worked-area-row session-focus__worked-area-row--pattern">
+              <span class="session-focus__worked-area-role">Pattern</span>
+              <span class="session-focus__worked-area-value">{{ _wa_pattern[:90] }}{% if _wa_pattern|length > 90 %}…{% endif %}</span>
             </li>
+            {% endif %}
           </ul>
 
-          {# Movement pattern / rôle — source réelle = family.description
-             (repère du geste), tronquée. Fallback neutre sinon. #}
-          <div class="session-focus__worked-area-pattern">
-            <span class="session-focus__worked-area-role">Pattern</span>
-            <span class="session-focus__worked-area-value">
-              {% if _family and _family.description %}{{ _family.description[:90] }}{% if _family.description|length > 90 %}…{% endif %}{% else %}À qualifier{% endif %}
-            </span>
-          </div>
-
-          <p class="session-focus__worked-area-note">
-            Lecture indicative issue du mapping exercice — repère d'entraînement, non diagnostic médical.
-          </p>
+          <p class="session-focus__worked-area-note">Estimation — repère, non médical.</p>
         </div>
 
         {# --- Technical cues shell (§18.D) : max 3 cues visibles.

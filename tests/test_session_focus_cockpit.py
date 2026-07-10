@@ -141,12 +141,14 @@ class TestCockpitHero:
         assert "session-focus__worked-area" in body
         assert "session-focus__worked-area-title" in body
 
-    def test_worked_area_has_three_roles(self, client):
-        """Primary / assistants / stabilisation rows must all render."""
+    def test_worked_area_primary_row_and_no_empty_slots(self, client):
+        """Sx_UI_06 Sb_UI_06.2 — density cleanup: the primary row always
+        renders; the secondary row only when there are real assistants; the
+        permanently-empty « stabilisation » row is removed (no repeated
+        « À qualifier »)."""
         body = _body(client)
         assert "session-focus__worked-area-row--primary" in body
-        assert "session-focus__worked-area-row--secondary" in body
-        assert "session-focus__worked-area-row--stabilizer" in body
+        assert "session-focus__worked-area-row--stabilizer" not in body
 
     def test_worked_area_has_conservative_note(self, client):
         """No medical claim: note must frame zones as estimation."""

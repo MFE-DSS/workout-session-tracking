@@ -134,8 +134,9 @@ def test_no_forbidden_medical_wording(client):
     html = _render(client, s.id).lower()
     for term in FORBIDDEN_MEDICAL:
         assert term.lower() not in html, term
-    # prudent non-medical note is present
-    assert "non diagnostic médical" in html
+    # prudent non-medical note is present (Sb_UI_06.2: shortened microcopy
+    # « Estimation — repère, non médical »).
+    assert "non médical" in html
 
 
 # ───────── 6. no-JS: content in initial HTML ─────────
@@ -199,13 +200,16 @@ def test_no_model_migration_schema_touched():
 
 def test_auren_terminal_worked_area_classes_preserved():
     src = EXERCISE_CARD.read_text(encoding="utf-8")
+    # Sb_UI_06.2 — the decorative `body-zone-chip` (raw code, aria-hidden,
+    # redundant with the text label) is removed by the density cleanup. The
+    # structural Auren Terminal classes remain.
     for cls in (
         "session-focus__worked-area",
         "session-focus__worked-area-row--primary",
         "session-focus__worked-area-row--secondary",
-        "session-focus__body-zone-chip",
     ):
         assert cls in src, cls
+    assert "session-focus__body-zone-chip" not in src  # decorative chip removed
 
 
 def test_worked_area_accessible_named_section(client):

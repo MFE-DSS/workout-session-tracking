@@ -95,3 +95,121 @@ def test_console_still_present(client):
     body = _body(client)
     assert "session-focus__console" in body
     assert "Référence précédente" in body
+
+
+# ───────── Sb_UI_06.2 : Worked Area density cleanup (D3) ─────────
+
+
+def _known_body(client) -> str:
+    """Render a session whose active exercise is a KNOWN catalog exercise
+    (maps to real zones) so the Worked Area shows primary + assistants."""
+    from datetime import UTC, datetime
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        uid = db.query(User).first().id
+        s = WorkoutSession(
+            user_id=uid, template_slug_snapshot="wa", template_name_snapshot="wa",
+            started_at=datetime.now(UTC), status="in_progress",
+        )
+        se = SessionExercise(
+            exercise_code_snapshot="E1",
+            exercise_name_snapshot="Chest Press machine",  # → pecs / triceps
+            position=1,
+        )
+        se.set_logs.append(SetLog(kind="work", set_index=1, completed=False))
+        s.session_exercises.append(se)
+        db.add(s)
+        db.commit()
+        db.refresh(s)
+        sid = s.id
+    r = client.get(f"/sessions/{sid}", follow_redirects=False)
+    assert r.status_code == 200
+    return r.text
+
+
+def test_worked_area_chip_removed(client):
+    """The decorative zone chip (raw code) is gone; the text label remains."""
+    body = _known_body(client)
+    assert "session-focus__body-zone-chip" not in body
+    assert "Pectoraux" in body  # readable primary label kept
+
+
+def test_worked_area_primary_shown_once(client):
+    """Known exercise: the primary zone label appears once in the Worked Area
+    (no chip + label duplication)."""
+    body = _known_body(client)
+    assert body.count("Pectoraux") == 1
+
+
+def test_worked_area_assistants_shown_when_present(client):
+    body = _known_body(client)
+    assert "Triceps" in body
+    assert "session-focus__worked-area-row--secondary" in body
+
+
+def test_worked_area_no_empty_qualifier_repetition_on_known(client):
+    """Known exercise with real zones: « À qualifier » must not appear at all
+    in the Worked Area (no empty stabilizer / assistants slot)."""
+    body = _known_body(client)
+    assert "À qualifier" not in body
+    assert "session-focus__worked-area-row--stabilizer" not in body
+
+
+def _unknown_body(client) -> str:
+    """Render a session whose active exercise is UNKNOWN (no mapping, no
+    atlas) so the Worked Area shows the qualifier fallback."""
+    from datetime import UTC, datetime
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        uid = db.query(User).first().id
+        s = WorkoutSession(
+            user_id=uid, template_slug_snapshot="wa-u", template_name_snapshot="wa-u",
+            started_at=datetime.now(UTC), status="in_progress",
+        )
+        se = SessionExercise(
+            exercise_code_snapshot="E1",
+            exercise_name_snapshot="Zzz mouvement non répertorié",  # → unknown
+            position=1,
+        )
+        se.set_logs.append(SetLog(kind="work", set_index=1, completed=False))
+        s.session_exercises.append(se)
+        db.add(s)
+        db.commit()
+        db.refresh(s)
+        sid = s.id
+    r = client.get(f"/sessions/{sid}", follow_redirects=False)
+    assert r.status_code == 200
+    return r.text
+
+
+def test_worked_area_unknown_qualifier_once(client):
+    """Unknown exercise: « À qualifier » renders exactly once (carried by the
+    primary row); empty assistant/stabilizer slots are not rendered."""
+    body = _unknown_body(client)
+    assert body.count("À qualifier") == 1
+    assert "session-focus__worked-area-row--secondary" not in body
+    assert "session-focus__worked-area-row--stabilizer" not in body
+
+
+def test_worked_area_resolution_path_in_data_only(client):
+    """resolution_path stays a data-* attribute (debug/smoke); it is never a
+    visible user badge (« db_lookup » / « substring_fallback »)."""
+    body = _known_body(client)
+    assert "data-resolution-path=" in body
+    # not surfaced as visible technical text
+    assert ">db_lookup<" not in body
+    assert ">substring_fallback<" not in body
+
+
+def test_worked_area_note_short_non_medical(client):
+    body = _body(client)
+    assert "session-focus__worked-area-note" in body
+    assert "non médical" in body

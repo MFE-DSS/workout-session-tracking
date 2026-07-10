@@ -104,13 +104,25 @@ class TestWorkedAreaVisualSlot:
     def test_primary_zone_row_present(self, client):
         assert "session-focus__worked-area-row--primary" in _body(client)
 
-    def test_secondary_and_stabilizer_rows_present(self, client):
+    def test_primary_row_always_present(self, client):
+        """Sx_UI_06 Sb_UI_06.2 — density cleanup: the primary row always
+        renders. The secondary row renders ONLY when there are real
+        assistants; the permanently-empty « stabilisation » row is removed
+        (it only ever said « À qualifier »). Empty slots are no longer
+        rendered — the unknown signal is carried once by the primary row."""
         body = _body(client)
-        assert "session-focus__worked-area-row--secondary" in body
-        assert "session-focus__worked-area-row--stabilizer" in body
+        assert "session-focus__worked-area-row--primary" in body
+        # stabilizer row removed by the cleanup
+        assert "session-focus__worked-area-row--stabilizer" not in body
 
-    def test_movement_pattern_row_present(self, client):
-        assert "session-focus__worked-area-pattern" in _body(client)
+    def test_movement_pattern_row_only_when_data(self, client):
+        """Sb_UI_06.2 — the movement pattern is now a list row rendered ONLY
+        when an atlas description exists (no « À qualifier » empty slot).
+        Synthetic exercises have no atlas ⇒ the pattern row is absent."""
+        body = _body(client)
+        assert "session-focus__worked-area-row--pattern" not in body  # no atlas data
+        # the old standalone pattern div class is gone
+        assert "session-focus__worked-area-pattern" not in body
 
     def test_conservative_fallbacks_when_no_atlas(self, client):
         """Synthetic exercises have no atlas family ⇒ conservative
@@ -127,9 +139,13 @@ class TestWorkedAreaVisualSlot:
 
 class TestAntiMedical:
     def test_prudence_note_present(self, client):
+        """Sb_UI_06.2 — the prudent note is shortened to compact microcopy
+        (« Estimation — repère, non médical ») but still framed as an
+        estimation and explicitly non-medical."""
         body = _body(client)
         assert "session-focus__worked-area-note" in body
-        assert "non diagnostic médical" in body
+        assert "non médical" in body
+        assert "estim" in body.lower()
 
     def test_no_diagnostic_or_activation_claim(self, client):
         """No claim of medical diagnosis or measured activation."""
