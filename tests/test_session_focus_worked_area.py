@@ -114,8 +114,11 @@ class TestWorkedAreaVisualSlot:
 
     def test_conservative_fallbacks_when_no_atlas(self, client):
         """Synthetic exercises have no atlas family ⇒ conservative
-        fallbacks, never an invented muscle."""
-        body = _body(client)
+        fallbacks, never an invented muscle. Sx_UI_06 D2 : the removed
+        « Cible » console row used « ...à qualifier » (lowercase); the
+        surviving Worked Area fallback is « À qualifier ». Case-insensitive
+        assertion on the real Worked Area surface."""
+        body = _body(client).lower()
         assert "à qualifier" in body
 
 

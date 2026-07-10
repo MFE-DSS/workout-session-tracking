@@ -197,9 +197,11 @@
       </div>
     {% endif %}
 
-    {% if se.template_exercise and se.template_exercise.set_scheme %}
-      <div class="exercise-card__scheme">{{ se.template_exercise.set_scheme }}</div>
-    {% endif %}
+    {# Sx_UI_06 D2 — dé-densification : le set_scheme (cible) était affiché ici
+       en tête ET dans la console (« Cible ») ET comme placeholder dans les
+       cases de saisie. On garde la suggestion cible UNIQUEMENT dans la case
+       (au plus près de l'action). Le bloc « scheme » en tête est retiré ; le
+       scheme reste disponible dans le contexte (se.template_exercise). #}
 
     {% if session.status == 'completed' and summary %}
       <div class="done-summary">
@@ -348,6 +350,13 @@
     {% endif %}
 
     {% set lt = last_time.get(se.exercise_code_snapshot) %}
+    {# Sx_UI_06 D1 — dé-densification : sur la carte ACTIVE, la charge de la
+       dernière séance est déjà portée par la console (« Référence
+       précédente », au plus près des cases de saisie). On retire donc le bloc
+       « Dernière fois » redondant UNIQUEMENT sur la carte active. Sur les
+       cartes non-actives (repliées / à venir / passées), la console n'existe
+       pas → on conserve « Dernière fois » (aucune perte d'info). #}
+    {% if not is_active %}
     <div class="last-time {% if not lt %}last-time--empty{% endif %}">
       {% if lt and lt.has_data %}
         <span class="last-time__label">Dernière fois</span>
@@ -364,6 +373,7 @@
         <span class="last-time__values">Aucune séance précédente</span>
       {% endif %}
     </div>
+    {% endif %}
 
     {% set delta_label = deltas.get(se.exercise_code_snapshot) %}
     {% if delta_label %}
@@ -497,7 +507,10 @@
              culpabilisant, jamais inventé. #}
           {% if is_active %}
             {% set _ref = last_time.get(se.exercise_code_snapshot) %}
-            {% set _tgt = overload_placeholders.get(se.id) %}
+            {# Sx_UI_06 D2 — la « Référence précédente » (charge dernière séance)
+               est conservée ici, au plus près des cases. La row « Cible » est
+               retirée : la suggestion cible ne vit plus que comme placeholder
+               dans le champ de saisie (dé-densification). #}
             <div class="session-focus__console-refs">
               <div class="session-focus__console-ref session-focus__console-ref--prev">
                 <span class="session-focus__console-ref-label">Référence précédente</span>
@@ -505,16 +518,6 @@
                   <span class="session-focus__console-ref-value">{{ _ref.weights_str }} kg · {{ _ref.reps_str }} reps</span>
                 {% else %}
                   <span class="session-focus__console-ref-value session-focus__console-ref-value--empty">Non disponible</span>
-                {% endif %}
-              </div>
-              <div class="session-focus__console-ref session-focus__console-ref--target">
-                <span class="session-focus__console-ref-label">Cible</span>
-                {% if _tgt and (_tgt.weight or _tgt.reps) %}
-                  <span class="session-focus__console-ref-value">{{ _tgt.weight or '—' }} kg · {{ _tgt.reps or '—' }} reps</span>
-                {% elif se.template_exercise and se.template_exercise.set_scheme %}
-                  <span class="session-focus__console-ref-value">{{ se.template_exercise.set_scheme }}</span>
-                {% else %}
-                  <span class="session-focus__console-ref-value session-focus__console-ref-value--empty">Objectif à qualifier</span>
                 {% endif %}
               </div>
             </div>

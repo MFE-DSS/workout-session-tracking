@@ -73,8 +73,11 @@ def test_last_time_is_absent_when_no_prior_session(client):
     r = client.get(f"/sessions/{sid}")
     assert r.status_code == 200
     body = r.text
-    # The "Aucune séance précédente" state must render for every exercise (7 in v10)
-    assert body.count("Aucune séance précédente") >= 7
+    # Sx_UI_06 D1 : the « Dernière fois » block is now suppressed on the
+    # ACTIVE card (its previous-load info lives in the console « Référence
+    # précédente »). It still renders on every NON-active card, so the empty
+    # state shows for the 6 non-active exercises (7 total − 1 active).
+    assert body.count("Aucune séance précédente") >= 6
 
 
 def test_last_time_shows_weights_and_reps_when_prior_exists(client):
@@ -130,10 +133,15 @@ def test_current_session_is_excluded_from_its_own_last_time(client):
     r = client.get(f"/sessions/{sid}")
     body = r.text
 
-    # The E1 card must still show the empty "last time" state.
-    # We verify by locating the E1 card's section and checking its
-    # surrounding last-time block says "Aucune séance précédente".
-    assert body.count("Aucune séance précédente") >= 7  # still 7 empty blocks (v10)
+    # Current session is excluded from its own last-time lookup: every
+    # NON-active card still shows the empty state. Sx_UI_06 D1 : the active
+    # card (E1, just filled) no longer renders the « Dernière fois » block
+    # (its info lives in the console « Référence précédente »), so the empty
+    # state shows on the 6 non-active cards.
+    # NB: the just-saved values DO legitimately appear in this session's own
+    # compact recap (.exercise-card__recap) — that is the CURRENT session, not
+    # a previous-load — so we do not assert their global absence here.
+    assert body.count("Aucune séance précédente") >= 6
 
 
 def test_last_time_uses_only_completed_work_sets(client):

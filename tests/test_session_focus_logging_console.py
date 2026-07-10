@@ -155,9 +155,15 @@ class TestReferenceAndTarget:
         body = _body(client)
         assert "session-focus__console-ref--prev" in body
 
-    def test_target_surface_present(self, client):
+    def test_target_lives_in_input_placeholder_not_console_row(self, client):
+        """Sx_UI_06 D2 — the target suggestion no longer has its own console
+        « Cible » row (de-densification). It lives ONLY as the input
+        placeholder, closest to the action. The redundant row is gone."""
         body = _body(client)
-        assert "session-focus__console-ref--target" in body
+        # The dedicated console target row is removed…
+        assert "session-focus__console-ref--target" not in body
+        # …and the input still carries a placeholder (kg / reps or a suggestion).
+        assert 'placeholder="kg"' in body or 'placeholder=' in body
 
     def test_reference_fallback_when_no_data(self, client):
         """Synthetic exercises have no prior session ⇒ conservative
@@ -165,10 +171,12 @@ class TestReferenceAndTarget:
         body = _body(client)
         assert "Non disponible" in body
 
-    def test_target_fallback_when_no_data(self, client):
-        """No overload placeholder + no scheme ⇒ 'Objectif à qualifier'."""
+    def test_target_console_row_removed(self, client):
+        """Sx_UI_06 D2 — the « Cible » console row (and its « Objectif à
+        qualifier » fallback) is removed; the reference-previous row stays."""
         body = _body(client)
-        assert "Objectif à qualifier" in body
+        assert "Objectif à qualifier" not in body
+        assert "session-focus__console-ref--prev" in body
 
 
 # ───────── progression guidance ─────────

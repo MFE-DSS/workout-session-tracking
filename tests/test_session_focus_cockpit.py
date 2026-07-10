@@ -157,8 +157,12 @@ class TestCockpitHero:
 
     def test_worked_area_fallback_when_no_atlas(self, client):
         """Synthetic exercises have no atlas family ⇒ conservative
-        fallback labels must appear, never an invented body zone."""
-        body = _body(client)
+        fallback labels must appear, never an invented body zone.
+        Sx_UI_06 D2 : the removed « Cible » console row used the lowercase
+        « ...à qualifier » spelling; the surviving Worked Area fallback is
+        « À qualifier » (uppercase). Assert case-insensitively on the real
+        Worked Area surface."""
+        body = _body(client).lower()
         assert "à qualifier" in body
 
     def test_technical_cues_shell_present(self, client):
