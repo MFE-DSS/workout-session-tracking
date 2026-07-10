@@ -125,7 +125,7 @@
            information = un seul endroit. Décisions (brainstorming §0 du report) :
            - chip de zone décoratif (code brut aria-hidden) RETIRÉ (redondant
              avec le label texte) ;
-           - body-map CSS conservé (repère visuel discret, aria-hidden) ;
+           - body-map CSS conservé (aide visuelle discrète, aria-hidden) ;
            - « À qualifier » n'apparaît qu'UNE fois (sur Principal quand unknown) :
              les rows vides (assistants, stabilisation, pattern) sont MASQUÉES au
              lieu de répéter « À qualifier » — le signal unknown reste porté par
@@ -141,8 +141,8 @@
             <span class="session-focus__worked-area-title">Zone travaillée</span>
           </div>
 
-          {# Forme clinique décorative (CSS-only, aria-hidden). Repère visuel
-             discret ; toute la sémantique est portée par le texte ci-dessous. #}
+          {# Forme clinique décorative (CSS-only, aria-hidden). Forme visuelle
+             discrète ; toute la sémantique est portée par le texte ci-dessous. #}
           <div class="session-focus__body-map" aria-hidden="true">
             <span class="session-focus__body-map-shape session-focus__body-map-shape--{{ (_bmd.primary_zone if _bmd_mapped else _zone_code) or 'generic' }}"></span>
           </div>
@@ -173,7 +173,7 @@
             {% endif %}
           </ul>
 
-          <p class="session-focus__worked-area-note">Estimation — repère, non médical.</p>
+          <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
         </div>
 
         {# --- Technical cues shell (§18.D) : max 3 cues visibles.
