@@ -64,9 +64,15 @@ class TestHomeIA:
         assert "Aujourd'hui" in _home(client)
 
     def test_single_primary_cta_in_hero(self, client):
-        """Exactly one primary hero CTA (.today-home__cta)."""
+        """Exactly one primary hero CTA. Sx_UI_06 Sb_UI_06.3 : the CTA is
+        either an <a> (resume / fallback start) or a <button> in a POST form
+        (start the recommended session directly). In all cases exactly one
+        `today-home__cta` element carries the primary action (the optional
+        `today-home__cta-form` wrapper is not counted)."""
         body = _home(client)
-        assert body.count("today-home__cta") == 1
+        # count the CTA element itself: class token followed by a quote,
+        # excluding the form wrapper class `today-home__cta-form`.
+        assert body.count('today-home__cta"') == 1
 
     def test_secondary_zone_present(self, client):
         assert "today-home__secondary-zone" in _home(client)
@@ -136,9 +142,12 @@ class TestAurenTerminal:
 
 class TestDecisionBranches:
     def test_no_active_session_cta_is_start(self, client):
-        """Fresh client (no open session) → 'Démarrer une séance' CTA."""
+        """Fresh client (no open session) → a start CTA. Sx_UI_06 Sb_UI_06.3 :
+        with a recommendation the hero starts it directly (« Démarrer »); the
+        cold-start fallback is « Démarrer une séance ». Either way it is a
+        start action and the hero is not in the active state."""
         body = _home(client)
-        assert "Démarrer une séance" in body
+        assert "Démarrer" in body
         assert "today-home__hero--active" not in body
 
     def test_active_session_dominates(self, client):
@@ -168,19 +177,17 @@ class TestReadinessTeaser:
                           "récupération réelle", "score médical"):
             assert forbidden not in body
 
-    def test_readiness_teaser_is_qualitative_marker(self, client):
-        """If the teaser renders, it is a qualitative marker ('Repère du
-        jour'), never a numeric medical score in the hero."""
-        # fresh user has no readiness_today ⇒ teaser absent; that's fine.
-        # We assert the template only ever renders the teaser as a marker.
+    def test_readiness_teaser_removed_from_hero(self, client):
+        """Sx_UI_06 Sb_UI_06.3 — the hero readiness teaser (which only said
+        « détail plus bas », carrying no data) is removed. Readiness now lives
+        in its single widget below the hero; no numeric medical score in the
+        hero."""
         src = INDEX.read_text(encoding="utf-8")
-        assert "today-home__readiness" in src
-        assert "Repère du jour" in src
-        # the teaser block must not embed a raw numeric readiness score
-        m = re.search(
-            r'today-home__readiness".*?</p>', src, re.DOTALL
-        )
-        assert m is not None
+        # teaser class gone from the hero
+        assert "today-home__readiness" not in src
+        # the readiness widget (self-report state) still exists
+        assert "readiness-widget" in src
+        assert "État du jour" in src
 
 
 # ───────── dashboard preserved but de-prioritized ─────────
@@ -213,11 +220,19 @@ class TestDashboardPreserved:
 
 
 class TestNoFramework:
-    def test_hero_cta_is_plain_anchor(self, client):
-        """The hero CTA must be a plain <a href=...> (no JS handler)."""
+    def test_hero_cta_is_no_js(self, client):
+        """The hero CTA must be no-JS: either a plain <a href> (resume /
+        fallback) or a <button> submitting a POST form to /sessions (start
+        the recommended session). Both are server-driven, no JS handler.
+        Sx_UI_06 Sb_UI_06.3."""
         body = _home(client)
-        m = re.search(r'<a class="today-home__cta"[^>]*href="[^"]+"', body)
-        assert m is not None
+        anchor = re.search(r'<a class="today-home__cta"[^>]*href="[^"]+"', body)
+        form_button = (
+            'today-home__cta-form' in body
+            and 'action="/sessions"' in body
+            and re.search(r'<button[^>]*class="today-home__cta"', body) is not None
+        )
+        assert anchor is not None or form_button
 
     def test_no_new_js_file(self):
         js_files = sorted(p.name for p in JS_DIR.glob("*.js"))

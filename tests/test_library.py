@@ -10,8 +10,14 @@ def test_home_renders_action_tiles(client):
     r = client.get("/")
     assert r.status_code == 200
     body = r.text
-    # Main CTA: "Démarrer une séance" (primary) or "Nouvelle séance" (when open session)
-    assert "Démarrer une séance" in body or "Nouvelle séance" in body
+    # Main CTA (Sx_UI_06 Sb_UI_06.3): a start/resume action in the hero —
+    # « Démarrer » (recommended session, direct start), « Démarrer une séance »
+    # (cold-start fallback), « Reprendre » (active session) or the « Nouvelle
+    # séance » tile when a session is open.
+    assert any(
+        label in body
+        for label in ("Démarrer", "Reprendre", "Nouvelle séance")
+    )
     for label in ["Historique", "Progression", "Programmes"]:
         assert label in body
 

@@ -9,17 +9,25 @@ from tests.test_recommendation_service import _mk_session
 from tests.helpers import get_test_user_id
 
 
-def test_home_shows_reco_block_when_no_open_session(client):
-    """Cold-start user on /: the reco partial must render with a primary CTA
-    pointing at POST /sessions."""
+def test_home_hero_starts_reco_when_no_open_session(client):
+    """Sx_UI_06 Sb_UI_06.3 — the standalone « Prochaine séance suggérée »
+    block is removed from the home; the hero CTA now starts the recommended
+    session directly. The start mechanism is unchanged: a POST /sessions with
+    a template_slug hidden input and creation_source=reco_top. Seed history so
+    the user leaves cold-start and a reco exists."""
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    for delta in (10, 6, 2):
+        _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
     r = client.get("/")
     assert r.status_code == 200
     body = r.text
-    assert 'class="reco-next' in body
-    assert 'Prochaine séance suggérée' in body
-    # Primary CTA posts to /sessions with a template_slug hidden input.
+    # standalone reco block is gone from the home
+    assert 'class="reco-next' not in body
+    # the hero carries the direct-start form (same contract as before)
+    assert 'today-home__cta-form' in body
     assert 'action="/sessions"' in body
     assert 'name="template_slug"' in body
+    assert 'value="reco_top"' in body
 
 
 def test_home_hides_reco_block_when_session_open(client):
@@ -47,14 +55,15 @@ def test_launcher_deep_step_does_not_show_reco(client):
     assert 'class="reco-next' not in r.text
 
 
-def test_reco_phrase_appears_in_rendered_page(client):
-    """The short explanation phrase must surface verbatim on the home page."""
-    # Seed history so we leave cold-start and get a dynamic phrase.
+def test_reco_phrase_appears_on_launcher(client):
+    """Sx_UI_06 Sb_UI_06.3 — the reco explanation phrase moved off the home
+    (the home hero is a single decision now). It still surfaces verbatim on
+    the launcher step-1, which keeps the full reco block."""
     now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
     for delta in (10, 6, 2):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 
-    r = client.get("/")
+    r = client.get("/launcher")
     body = r.text
     assert 'reco-next__phrase' in body
     # Phrase is non-empty (check the text between opening and closing tag).

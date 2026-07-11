@@ -40,27 +40,41 @@
     </div>
 
   {% else %}
-    {# 2/3. Pas de séance active : démarrage. #}
+    {# Sx_UI_06 Sb_UI_06.3 D-home — décision unique. Le CTA hero DÉMARRE
+       directement la séance recommandée (form POST /sessions, même contrat
+       que l'ancien bloc « Prochaine séance suggérée » : template_slug +
+       creation_source=reco_top). Le bloc reco séparé est retiré plus bas
+       (plus de double CTA de démarrage). Fallback launcher si pas de reco. #}
     <span class="today-home__status">Aucune séance active</span>
-    <h1 class="today-home__title">Prêt à t'entraîner&nbsp;?</h1>
-    <p class="today-home__meta">Lance ta séance du jour quand tu veux.</p>
-    <div class="today-home__action">
-      <a class="today-home__cta" href="{{ url_for('launcher') }}">
-        Démarrer une séance <span aria-hidden="true">→</span>
-      </a>
-      <a class="today-home__secondary" href="{{ url_for('library') }}">Voir les programmes</a>
-    </div>
+    {% if reco and reco.top %}
+      {% set _top = reco.top %}
+      <h1 class="today-home__title">{{ _top.template.name }}</h1>
+      <p class="today-home__meta">{% if _top.template.focus %}{{ _top.template.focus }}{% else %}Séance recommandée du jour{% endif %}</p>
+      <div class="today-home__action">
+        <form method="post" action="/sessions" class="today-home__cta-form">
+          <input type="hidden" name="template_slug" value="{{ _top.template.slug }}">
+          <input type="hidden" name="creation_source" value="reco_top">
+          <button type="submit" class="today-home__cta">
+            Démarrer <span aria-hidden="true">→</span>
+          </button>
+        </form>
+        <a class="today-home__secondary" href="{{ url_for('launcher') }}">Choisir une autre séance</a>
+      </div>
+    {% else %}
+      <h1 class="today-home__title">Prêt à t'entraîner&nbsp;?</h1>
+      <p class="today-home__meta">Lance ta séance du jour quand tu veux.</p>
+      <div class="today-home__action">
+        <a class="today-home__cta" href="{{ url_for('launcher') }}">
+          Démarrer une séance <span aria-hidden="true">→</span>
+        </a>
+        <a class="today-home__secondary" href="{{ url_for('library') }}">Voir les programmes</a>
+      </div>
+    {% endif %}
   {% endif %}
 
-  {# Readiness teaser — readout qualitatif uniquement (Sx_UI_05 §9,
-     teaser V1 ; snapshot complet réservé à Sb_UI_05.3). Self-report,
-     non médical. #}
-  {% if readiness_today %}
-    <p class="today-home__readiness" aria-label="Repère du jour, déclaré">
-      <span class="today-home__readiness-label">Repère du jour</span>
-      <span class="today-home__readiness-hint">état déclaré · détail plus bas</span>
-    </p>
-  {% endif %}
+  {# Sx_UI_06 Sb_UI_06.3 — teaser readiness du hero retiré : il ne portait
+     aucune donnée (juste « détail plus bas »). L'état du jour vit dans son
+     widget unique plus bas. #}
 </section>
 
 {# ============================================================
@@ -74,10 +88,10 @@
 {# Sb_27.1 — Coaching loop tiles (Today / Last / Week) #}
 {% include "_partials/home_coaching_loop.html" %}
 
-{# Sb_12 — Prochaine séance suggérée #}
-{% if not open_session %}
-  {% include "_partials/next_session_reco.html" %}
-{% endif %}
+{# Sx_UI_06 Sb_UI_06.3 — le bloc « Prochaine séance suggérée » est retiré de
+   la home : le CTA hero démarre désormais directement la reco (une seule
+   décision, plus de double CTA). Le détail reco + alternatives reste dans le
+   launcher (où next_session_reco.html est aussi inclus). #}
 
 {# === Readiness widget (self-report, existant) — conservé, dé-priorisé.
    Sb_UI_05.1 : le build complet Readiness/Recovery est réservé à
@@ -160,18 +174,14 @@
     </details>
 
     <div class="card">
+      {# Sx_UI_06 Sb_UI_06.3 — KPI home réduits au seul signal décisionnel
+         « cette semaine ». Les indicateurs analytiques (score moyen,
+         complétion 30j) vivent dans /progress (lien ci-dessous), plus
+         recopiés ici. #}
       <div class="kpi-row">
         <div class="kpi">
           <span class="kpi__value">{{ kpis.sessions_this_week }}</span>
-          <span class="kpi__label">cette sem.</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi__value">{{ "%.0f"|format(kpis.avg_success_score_30d) if kpis.avg_success_score_30d is not none else "—" }}</span>
-          <span class="kpi__label">score moy.</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi__value">{% if kpis.completion_rate_30d is not none %}{{ "%.0f"|format(kpis.completion_rate_30d * 100) }}%{% else %}—{% endif %}</span>
-          <span class="kpi__label">complétion 30j</span>
+          <span class="kpi__label">séances cette sem.</span>
         </div>
       </div>
       {% if sparkline_svg %}

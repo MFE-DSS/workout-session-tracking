@@ -85,18 +85,9 @@
             <span style="opacity:0.6;font-weight:400;font-size:13px;">· il y a {{ home.last_session.days_ago }} j</span>
           {% endif %}
         </div>
-        <div class="tile__hint" style="margin-top:6px;display:flex;gap:var(--space-sm);flex-wrap:wrap;font-size:13px;">
-          {% if home.last_session.implicit_label %}
-            <span><strong>Ressenti :</strong> {{ home.last_session.implicit_label }}</span>
-          {% elif home.last_session.implicit_label_note %}
-            <span style="opacity:0.6;"><strong>Ressenti :</strong> {{ home.last_session.implicit_label_note }}</span>
-          {% endif %}
-          {% if home.last_session.quality_score is not none %}
-            <span><strong>Qualité :</strong> {{ home.last_session.quality_score }}</span>
-          {% elif home.last_session.quality_score_note %}
-            <span style="opacity:0.6;"><strong>Qualité :</strong> {{ home.last_session.quality_score_note }}</span>
-          {% endif %}
-        </div>
+        {# Sx_UI_06 Sb_UI_06.3 — dernière séance compacte : nom + date seulement.
+           Le ressenti / la qualité (analytiques) vivent dans le détail de la
+           séance (session done) et /progress, plus sur la home. #}
       </a>
     {% endif %}
   </div>
