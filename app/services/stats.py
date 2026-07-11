@@ -1,13 +1,26 @@
 """Read-side helpers for the session detail page.
 
-In V1 the only consumer is the "Dernière fois" block rendered per
-exercise card. The lookup is:
-  - identity = (template_slug_snapshot, exercise_code_snapshot)
+The "Dernière fois" / "Référence précédente" surfaces are rendered per
+exercise card from this lookup. The identity is:
+  - identity = (template_slug_snapshot, exercise_code_snapshot,
+               substitution_key)
   - scope    = prior sessions only (strictly excluding the current one)
   - source   = work sets only (warmups never count)
 
-The function returns a dict keyed by `exercise_code_snapshot`, so the
-view can match it against each SessionExercise on the page in O(1).
+Sb_DOGFOOD_01.1 — substitution-aware. A previous load is only comparable
+if it belongs to the SAME exercise actually performed, so the lookup
+applies the SAME substitution policy as the overload inputs
+(``overload_inputs._matches_substitution_policy``):
+  - current PRESCRIBED (substituted_name is None) → only prescribed
+    history counts (past substituted_name IS NULL);
+  - current SUBSTITUTED by X → only history with the exact same
+    substituted_name X counts;
+  - any other case → skipped → the code is ABSENT from the returned dict
+    (silence rather than a false previous load from another exercise).
+
+The function still returns a dict keyed by `exercise_code_snapshot`, so
+every consumer (`last_time.get(se.exercise_code_snapshot)`) is unchanged;
+they simply inherit the coherence guarantee.
 """
 from __future__ import annotations
 
@@ -115,6 +128,25 @@ def summarise_current_exercise(se: SessionExercise) -> Optional[dict]:
     }
 
 
+def _normalize_sub(name: str | None) -> str | None:
+    """Normalize a substituted_name: empty/whitespace → None, else stripped."""
+    return (name or "").strip() or None
+
+
+def _matches_current_substitution(
+    past_sub: str | None, current_sub: str | None
+) -> bool:
+    """Same substitution policy as ``overload_inputs._matches_substitution_policy``.
+
+    - current prescribed (current_sub is None) → only prescribed past (past_sub None);
+    - current substituted by X → only past with the exact same X.
+    Both arguments are already normalized (see :func:`_normalize_sub`).
+    """
+    if current_sub is None:
+        return past_sub is None
+    return past_sub == current_sub
+
+
 def last_time_by_exercise_code(
     db: Session,
     current_session: WorkoutSession,
@@ -122,13 +154,24 @@ def last_time_by_exercise_code(
 ) -> dict[str, dict]:
     """Return a dict mapping exercise_code_snapshot -> prior summary.
 
-    Codes that have no prior match are simply absent from the dict.
-    The caller decides how to render the empty case.
+    Codes that have no comparable prior match are simply absent from the
+    dict. The caller decides how to render the empty case.
 
-    V1 identity key: (template_slug_snapshot, exercise_code_snapshot).
-    Sessions from other templates never contribute — doing so would
-    merge "E2 Incline Smith" with "E2 Tirage nuque" etc.
+    Identity key: (template_slug_snapshot, exercise_code_snapshot,
+    substitution_key). Sessions from other templates never contribute —
+    doing so would merge "E2 Incline Smith" with "E2 Tirage nuque" etc.
+
+    Sb_DOGFOOD_01.1 — the previous load must belong to the SAME exercise
+    actually performed for the current slot. We therefore only accept a
+    prior whose substitution matches the current SessionExercise's
+    substitution (prescribed↔prescribed, substituted↔same substituted_name).
     """
+    # Current substitution per slot (normalized). A code absent here means
+    # the slot isn't in the current session → we never surface a prior for it.
+    current_sub_by_code: dict[str, str | None] = {
+        se.exercise_code_snapshot: _normalize_sub(se.substituted_name)
+        for se in current_session.session_exercises
+    }
     # One query that fetches every prior SessionExercise of the same
     # template, ordered by session started_at desc, with its parent
     # session and its set_logs eagerly loaded. We then walk the list
@@ -152,6 +195,14 @@ def last_time_by_exercise_code(
     for prior in db.execute(stmt).unique().scalars().all():
         code = prior.exercise_code_snapshot
         if code in result:
-            continue  # we already have a more recent one
+            continue  # we already have a more recent comparable one
+        if code not in current_sub_by_code:
+            continue  # slot not present in the current session
+        # Sb_DOGFOOD_01.1 — only accept a prior whose substitution matches
+        # the current slot's substitution (silence rather than false load).
+        if not _matches_current_substitution(
+            _normalize_sub(prior.substituted_name), current_sub_by_code[code]
+        ):
+            continue  # keep scanning older sessions for a comparable one
         result[code] = _summarise_prior(prior, now)
     return result
