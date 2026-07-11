@@ -185,26 +185,30 @@ def _build_overload_placeholder(hint: OverloadHint) -> dict | None:
     available (state ``unknown`` is already filtered upstream via
     ``is_silent``, but we keep a defensive None-check).
 
-    Format :
-      - ``weight`` : ``"≈ 102.5"`` (kg unit reste affichée à côté du champ
-        par le label existant ; on garde le placeholder court).
-      - ``reps``   : ``"≈ 6-10"`` ou ``"≈ 6"`` (deload : range collapsée).
+    Format (Sb_DOGFOOD_01.3 — compact mobile placeholder) :
+      - ``weight`` : ``"102.5"`` (valeur nue ; l'unité kg reste portée par le
+        label existant à côté du champ ; le placeholder reste court pour tenir
+        dans les inputs mobiles étroits).
+      - ``reps``   : ``"6-10"`` ou ``"6"`` (deload : range collapsée).
 
-    Le préfixe ``≈`` indique explicitement "suggestion", jamais "valeur".
-    Aucun verbe ; aucune injection en ``value=``.
+    Le caractère "suggestion" est porté par le placeholder lui-même (texte
+    grisé, jamais rempli) et par le contexte de la console de saisie : on
+    retire le préfixe ``≈`` qui alourdissait le rendu sur mobile étroit
+    (ex. ``"≈ 102.5"``). Aucun verbe ; aucune injection en ``value=`` ;
+    jamais un préremplissage.
     """
     if hint.target_weight_kg is None:
         return None
-    weight = f"≈ {hint.target_weight_kg:g}"
+    weight = f"{hint.target_weight_kg:g}"
     if hint.target_reps_min is None and hint.target_reps_max is None:
         reps = None
     elif hint.target_reps_min == hint.target_reps_max:
-        reps = f"≈ {hint.target_reps_min}"
+        reps = f"{hint.target_reps_min}"
     elif hint.target_reps_min is None or hint.target_reps_max is None:
         v = hint.target_reps_min if hint.target_reps_min is not None else hint.target_reps_max
-        reps = f"≈ {v}"
+        reps = f"{v}"
     else:
-        reps = f"≈ {hint.target_reps_min}-{hint.target_reps_max}"
+        reps = f"{hint.target_reps_min}-{hint.target_reps_max}"
     return {"weight": weight, "reps": reps}
 
 

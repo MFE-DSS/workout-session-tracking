@@ -7,7 +7,12 @@ Garde-fous (verbatim user) :
 - placeholder seulement sur carte active (jamais sur les autres cartes)
 - aucune valeur préremplie par erreur (value="" reste vide)
 - aucune régression sur le flow de saisie (input contracts intacts)
-- wording sobre, non autoritaire, préfixe ≈ "suggestion"
+- wording sobre, non autoritaire
+
+Sb_DOGFOOD_01.3 — placeholder cible compacté pour mobile étroit : la valeur
+est nue ("102.5", "6-10", "6"), sans le préfixe "≈ " qui alourdissait le rendu
+sur petits écrans. Le caractère "suggestion" reste porté par le placeholder
+lui-même (texte grisé, jamais rempli) et le contexte de la console.
 """
 
 from __future__ import annotations
@@ -40,7 +45,7 @@ def test_build_helper_returns_none_on_no_target():
 
 
 def test_build_helper_progress_range():
-    """Progress : range complète → "≈ 102.5" + "≈ 6-10"."""
+    """Progress : range complète → "102.5" + "6-10" (compact, sans ≈)."""
     from app.routers.sessions import _build_overload_placeholder
     from app.services.overload_engine import OverloadHint
 
@@ -53,11 +58,13 @@ def test_build_helper_progress_range():
         reasons=(),
     )
     ph = _build_overload_placeholder(h)
-    assert ph == {"weight": "≈ 102.5", "reps": "≈ 6-10"}
+    assert ph == {"weight": "102.5", "reps": "6-10"}
+    # Sb_DOGFOOD_01.3 — plus de préfixe ≈ (placeholder compact mobile)
+    assert "≈" not in ph["weight"] and "≈" not in ph["reps"]
 
 
 def test_build_helper_deload_collapses_reps():
-    """Deload : min == max → "≈ 6" sans tiret."""
+    """Deload : min == max → "6" sans tiret (compact, sans ≈)."""
     from app.routers.sessions import _build_overload_placeholder
     from app.services.overload_engine import OverloadHint
 
@@ -70,7 +77,7 @@ def test_build_helper_deload_collapses_reps():
         reasons=(),
     )
     ph = _build_overload_placeholder(h)
-    assert ph == {"weight": "≈ 90", "reps": "≈ 6"}
+    assert ph == {"weight": "90", "reps": "6"}
 
 
 def test_build_helper_drops_zero_decimals():
@@ -87,7 +94,7 @@ def test_build_helper_drops_zero_decimals():
         reasons=(),
     )
     ph = _build_overload_placeholder(h)
-    assert ph["weight"] == "≈ 90"
+    assert ph["weight"] == "90"
 
 
 def test_build_helper_never_authoritative():
@@ -284,9 +291,11 @@ def test_placeholder_visible_on_first_work_set_when_progress(client):
         sid = s.id
 
     body = _render(client, sid)
-    # Compound +2.5 sur 100 → "≈ 102.5"
-    assert 'placeholder="≈ 102.5"' in body
-    assert 'placeholder="≈ 6-10"' in body
+    # Compound +2.5 sur 100 → "102.5" (compact mobile, sans ≈)
+    assert 'placeholder="102.5"' in body
+    assert 'placeholder="6-10"' in body
+    # Plus aucun ≈ dans les placeholders cible (Sb_DOGFOOD_01.3)
+    assert 'placeholder="≈ 102.5"' not in body
     # Marqueur de row porteur du placeholder
     assert "set-row--has-overload-placeholder" in body
 
@@ -304,8 +313,8 @@ def test_no_placeholder_when_history_empty(client):
         sid = s.id
 
     body = _render(client, sid)
-    # Aucun préfixe ≈ donc fallback default placeholders kg/reps uniquement
-    assert "≈" not in body
+    # Pas d'historique → engine unknown → aucun placeholder cible ; les inputs
+    # retombent sur les placeholders par défaut kg/reps uniquement.
     assert "set-row--has-overload-placeholder" not in body
     # Les inputs gardent les placeholders par défaut
     assert 'placeholder="kg"' in body
@@ -362,8 +371,8 @@ def test_placeholder_only_on_first_work_set_not_second(client):
         f"only the first work set of the active card should carry the placeholder, "
         f"found {len(placeholder_rows)}"
     )
-    # Le row porteur doit aussi contenir le placeholder textuel
-    assert "≈ 102.5" in placeholder_rows[0]
+    # Le row porteur doit aussi contenir le placeholder textuel (compact)
+    assert 'placeholder="102.5"' in placeholder_rows[0]
 
 
 # ───────── aucune valeur préremplie ─────────
@@ -462,14 +471,18 @@ def test_rendered_placeholders_are_not_authoritative(client):
         sid = s.id
 
     body = _render(client, sid).lower()
-    # Tout placeholder utilisant ≈ doit rester court et sans verbe.
+    # Sb_DOGFOOD_01.3 — les placeholders cible sont désormais compacts (sans ≈).
+    # Chaque placeholder chiffré (weight / reps) doit rester court et sans verbe.
+    numeric_ph = re.compile(r"^\d+([.,]\d+)?(-\d+)?$")
     for m in re.finditer(r'placeholder="([^"]*)"', body):
         text = m.group(1)
-        if "≈" in text:
+        if numeric_ph.match(text):  # cible chiffrée (ex. "102.5", "6-10", "90")
             for tok in ("tu dois", "il faut", "obligatoire"):
                 assert tok not in text, (
                     f"forbidden authoritative token {tok!r} in placeholder {text!r}"
                 )
+            # jamais de préfixe ≈ résiduel
+            assert "≈" not in text
 
 
 # ───────── garde structurelle template ─────────

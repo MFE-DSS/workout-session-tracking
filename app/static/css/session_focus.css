@@ -1681,3 +1681,26 @@
 .session-focus--terminal textarea::placeholder {
   color: var(--color-fg-subtle);
 }
+
+/* ============================================================
+   Sb_DOGFOOD_01.3 — Compact mobile overload placeholder
+   ------------------------------------------------------------
+   Sur mobile étroit, un placeholder cible chiffré (ex. "102.5"
+   ou "6-10") peut devenir trop large / trop lourd visuellement
+   dans les inputs de la console de saisie. On réduit UNIQUEMENT
+   la taille du texte du ::placeholder de la ligne active porteuse
+   d'un placeholder d'overload (classe existante
+   .set-row--has-overload-placeholder), sans toucher :
+     - le font-size 16px de l'input (anti-zoom iOS conservé) ;
+     - le min-height 44px (tap target WCAG 2.5.5 conservé) ;
+     - la structure HTML (aucun span unité) ;
+     - la valeur value= (jamais préremplie).
+   Le placeholder reste une indication légère, jamais une valeur.
+   ============================================================ */
+@media (max-width: 380px) {
+  .session-focus .set-row--has-overload-placeholder input[name$="_weight_kg"]::placeholder,
+  .session-focus .set-row--has-overload-placeholder input[name$="_reps"]::placeholder {
+    font-size: 0.8125rem; /* ~13px : cible chiffrée plus discrète, input inchangé */
+    letter-spacing: -0.01em;
+  }
+}
