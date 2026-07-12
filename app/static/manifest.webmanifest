@@ -1,6 +1,9 @@
 {
+  "id": "/",
   "name": "Workout Session Tracking",
   "short_name": "Workout",
+  "lang": "fr",
+  "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
