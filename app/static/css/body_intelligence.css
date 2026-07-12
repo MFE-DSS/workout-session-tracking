@@ -372,6 +372,46 @@
   color: var(--fg-dim, #6b7280);
 }
 
+/* ───── Sb_BI_01.2 — Drill inline (<details>) ───── */
+.zone-card__drill {
+  margin: 8px 0 0;
+}
+
+.zone-card__drill-summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-dim, #6b7280);
+  /* tap target confortable sans casser la densité (WCAG 2.5.5). */
+  padding: 4px 0;
+  min-height: 24px;
+}
+
+.zone-card__drill-label {
+  margin: 6px 0 2px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim, #6b7280);
+}
+
+.zone-card__drill-list {
+  margin: 0;
+  padding-left: 16px;
+  list-style: disc;
+}
+
+.zone-card__drill-item {
+  font-size: 13px;
+  color: var(--fg, inherit);
+}
+
+.zone-card__drill-note,
+.zone-card__drill-empty {
+  margin: 6px 0 0;
+  font-size: 11px;
+  color: var(--fg-dim, #6b7280);
+}
+
 @media (max-width: 360px) {
   .zone-card {
     padding: 8px 10px;

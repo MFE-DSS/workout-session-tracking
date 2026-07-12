@@ -43,4 +43,25 @@
   <p class="zone-card__confidence">
     Confiance {{ card.confidence }}
   </p>
+
+  {# Sb_BI_01.2 — drill inline no-JS (<details> SSR natif). Explique la card
+     en montrant les exercices principaux de la zone (noms issus des séances
+     loggées). Aucun score, aucun radar, aucun graphique. Volume par exercice
+     non affiché en V1 (recalcul lourd différé). #}
+  <details class="zone-card__drill">
+    <summary class="zone-card__drill-summary">Détail zone</summary>
+    {% if card.top_exercises %}
+    <p class="zone-card__drill-label">Exercices principaux</p>
+    <ul class="zone-card__drill-list">
+      {% for ex in card.top_exercises %}
+      <li class="zone-card__drill-item">{{ ex }}</li>
+      {% endfor %}
+    </ul>
+    <p class="zone-card__drill-note">
+      Volume issu des séances loggées. Estimation non médicale.
+    </p>
+    {% else %}
+    <p class="zone-card__drill-empty">Détail insuffisant</p>
+    {% endif %}
+  </details>
 </li>

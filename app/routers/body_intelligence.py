@@ -64,7 +64,11 @@ def _build_zone_cards(zone_scores: list[ZoneScore]) -> list[dict]:
                 "trend": z.trend,  # "up" | "down" | "stable"
                 "confidence": z.confidence,  # "élevée" | "moyenne" | "faible"
                 "contribution_pct": contribution_pct,
-                "top_exercises": list(z.top_exercises[:2]),
+                # Sb_BI_01.2 — top exercises (names only) power the inline
+                # drill <details>. muscle_scoring already computes up to 3 by
+                # frequency; we surface them without per-exercise volume (no
+                # heavy recompute in V1 — see report §limits).
+                "top_exercises": list(z.top_exercises[:3]),
             }
         )
     # Most-trained zone first — a transparent ordering by recent volume,
