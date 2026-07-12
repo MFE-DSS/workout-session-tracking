@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
+from app.config import get_settings
 from app.deps import CurrentUser, DbSession
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
@@ -495,6 +496,11 @@ def physique(
             "dashboard": dashboard,
             "window": window,
             "active_session": latest_open_session(db, user.id),
+            # Sb_BI_01.3 — the guardrail link to /body/intelligence is only
+            # shown when the surface actually exists (flag ON), never a dead
+            # 404 link. The physique score/grade/radar and the shared
+            # compute_physique_dashboard service are left untouched.
+            "body_intelligence_enabled": get_settings().body_intelligence_enabled,
         },
     )
 
