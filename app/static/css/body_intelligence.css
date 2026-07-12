@@ -278,4 +278,107 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Sb_BI_01.1 — Zone Intelligence Cards
+   ---------------------------------------------------------------
+   Lecture par zones traçable, mobile-first, Auren Terminal (tokens
+   sémantiques existants : --fg / --fg-dim / --border / --bg-elev /
+   --accent). AUCUNE couleur supplémentaire. Aucun radar. Aucun score
+   opaque affiché. Un seul accent (état de tendance neutre par défaut).
+   ═══════════════════════════════════════════════════════════════ */
+.body-intelligence__zones {
+  margin: 16px 0;
+}
+
+.body-intelligence__zones-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg, inherit);
+}
+
+.zone-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.zone-card {
+  padding: 10px 12px;
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+  background: var(--bg-elev, rgba(0, 0, 0, 0.02));
+}
+
+.zone-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.zone-card__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--fg, inherit);
+}
+
+.zone-card__trend {
+  font-family: var(--font-family-mono, ui-monospace, monospace);
+  font-size: 14px;
+  line-height: 1;
+  color: var(--fg-dim, #6b7280);
+}
+
+.zone-card__metrics {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.zone-card__metric {
+  margin: 0;
+}
+
+.zone-card__metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim, #6b7280);
+}
+
+.zone-card__metric-value {
+  margin: 0;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg, inherit);
+}
+
+.zone-card__confidence {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--fg-dim, #6b7280);
+}
+
+.body-intelligence__zones-note,
+.body-intelligence__zones-empty {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--fg-dim, #6b7280);
+}
+
+@media (max-width: 360px) {
+  .zone-card {
+    padding: 8px 10px;
+  }
+  .zone-card__metrics {
+    gap: 2px 12px;
+  }
+}
+
 /* prefers-reduced-motion : aucune animation introduite (OQ-E Sx_29). */

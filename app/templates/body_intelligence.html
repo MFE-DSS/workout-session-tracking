@@ -40,6 +40,32 @@
     {% endif %}
   </header>
 
+  {# Sb_BI_01.1 — Zone Intelligence Cards : lecture par zones traçable,
+     en tête des blocs. Réutilise les signaux muscle_scoring (hard sets,
+     tendance, confidence) ; aucun score global opaque affiché ; aucun
+     radar. Silence sobre si aucune zone n'a de volume récent. #}
+  <section
+    class="body-intelligence__zones"
+    aria-label="Lecture par zones"
+  >
+    <h2 class="body-intelligence__zones-title">Lecture par zones</h2>
+    {% if zone_cards %}
+    <ul class="zone-cards" aria-label="Zones travaillées récemment">
+      {% for card in zone_cards %}
+        {% include "_partials/body_intelligence_zone_card.html" %}
+      {% endfor %}
+    </ul>
+    <p class="body-intelligence__zones-note">
+      Estimation non médicale. Sur les 30 derniers jours, séances loggées.
+    </p>
+    {% else %}
+    <p class="body-intelligence__zones-empty">
+      Données insuffisantes pour une lecture par zones. Logge des séances
+      pour voir apparaître le volume par zone.
+    </p>
+    {% endif %}
+  </section>
+
   {% if snapshot.priorities %}
   <section
     class="body-intelligence__priorities"

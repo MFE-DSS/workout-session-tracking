@@ -1,0 +1,46 @@
+{# Sb_BI_01.1 — Zone Intelligence Card.
+
+   Une card par zone travaillée récemment. Affiche des chiffres TRAÇABLES,
+   jamais un score global opaque ni un radar :
+     - nom de zone (label FR) ;
+     - volume récent (hard sets 30 j) + nombre de séances ;
+     - tendance sobre (↑ / → / ↓) issue de muscle_scoring ;
+     - contribution (part relative du volume total, dérivée arithmétique) ;
+     - confidence (badge : élevée / moyenne / faible).
+
+   Variable : card (dict) construit par _build_zone_cards dans le router.
+   Aucune couleur supplémentaire (Auren Terminal, un seul accent).
+   Aucune mention médicale.
+#}
+<li
+  class="zone-card"
+  data-zone="{{ card.zone }}"
+  aria-label="Zone {{ card.label }}"
+>
+  <div class="zone-card__head">
+    <span class="zone-card__label">{{ card.label }}</span>
+    <span
+      class="zone-card__trend trend-indicator trend-indicator--{{ card.trend }}"
+      aria-label="Tendance {% if card.trend == 'up' %}en hausse{% elif card.trend == 'down' %}en baisse{% else %}stable{% endif %}"
+    >{% if card.trend == 'up' %}↑{% elif card.trend == 'down' %}↓{% else %}→{% endif %}</span>
+  </div>
+
+  <dl class="zone-card__metrics">
+    <div class="zone-card__metric">
+      <dt class="zone-card__metric-label">Volume récent</dt>
+      <dd class="zone-card__metric-value">
+        {{ card.hard_sets }} séries{% if card.session_count %} · {{ card.session_count }} séance{{ 's' if card.session_count > 1 else '' }}{% endif %}
+      </dd>
+    </div>
+    {% if card.contribution_pct is not none %}
+    <div class="zone-card__metric">
+      <dt class="zone-card__metric-label">Contribution</dt>
+      <dd class="zone-card__metric-value">{{ card.contribution_pct }} % du volume</dd>
+    </div>
+    {% endif %}
+  </dl>
+
+  <p class="zone-card__confidence">
+    Confiance {{ card.confidence }}
+  </p>
+</li>
