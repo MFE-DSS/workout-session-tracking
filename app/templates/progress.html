@@ -1,11 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Progression</h1>
-<p class="lede">KPI · sessions terminées.</p>
+<p class="lede">Lecture des séances terminées, de la régularité et des signaux récents.</p>
 
 {# Sb_27.3 — Weekly training loop tile (count, dominantes, anomalie, hint) #}
 {% include "_partials/weekly_loop.html" %}
 
+{# Sx_UI_07.1 — readability pass : les KPI existants sont regroupés sous une
+   section « Rythme récent » (lecture d'entraînement, pas cockpit). Aucune
+   valeur/calcul changé — seuls le regroupement et la microcopy évoluent. #}
+<h2 class="section-header">Rythme récent</h2>
 <div class="kpi-grid">
   <div class="kpi-card">
     <div class="kpi-card__value">{{ kpis.sessions_this_week }}</div>
@@ -101,7 +105,7 @@
 
 {% if quality_svg %}
   <div class="card">
-    <h2 class="card__title">Qualité de séance dans le temps</h2>
+    <h2 class="card__title">Qualité des séances</h2>
     <div class="timeline-chart">{{ quality_svg|safe }}</div>
     <p class="timeline-legend">
       <span class="timeline-legend__dot timeline-legend__dot--strength"></span> Musculation
@@ -112,12 +116,12 @@
 
 {% if bodyweight_svg %}
   <div class="card">
-    <h2 class="card__title">Poids corporel dans le temps</h2>
+    <h2 class="card__title">Poids corporel</h2>
     <div class="timeline-chart">{{ bodyweight_svg|safe }}</div>
   </div>
 {% endif %}
 
 <p class="kpi-note">
-  Sessions terminées uniquement · warmup sets exclus · prescrits = nombre de work sets définis par les programmes que tu as choisis.
+  Lecture indicative · séances terminées uniquement · warmup exclus · prescrits = nombre de work sets définis par les programmes que tu as choisis.
 </p>
 {% endblock %}
