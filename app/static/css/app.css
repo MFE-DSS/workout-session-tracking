@@ -124,6 +124,9 @@ input, button, textarea, select {
 }
 
 .topbar__link:hover { color: var(--fg); }
+/* Sx_NAV_01 — état actif de navigation. Réutilise var(--fg) (couleur pleine,
+   comme :hover) : aucune nouvelle couleur, aucune ombre, aucun rebrand. */
+.topbar__link.is-active { color: var(--fg); font-weight: 600; }
 
 .topbar__link--btn {
   background: none;

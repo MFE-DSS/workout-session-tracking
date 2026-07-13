@@ -1,7 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Programmes de séance</h1>
-<p class="lede">Catalogue complet.</p>
+{# Sx_UI_07.3 — lede enrichi (additif). Conserve la sous-chaîne « Catalogue
+   complet » (test asservi) ; aucune section, carte, form POST ni
+   creation_source touché. #}
+<p class="lede">Catalogue complet des séances disponibles, classées par usage.</p>
 
 {% for section_key, section_label in sections %}
   {% if section_key in grouped %}
@@ -9,6 +12,10 @@
     <h2 class="section-header">{{ section_label }}</h2>
     <ul class="template-list">
       {% for tpl in grouped[section_key] %}
+        {# Sx_LIB_01 — semantic cleanup : le <form> de démarrage était imbriqué
+           DANS le lien <a> (HTML invalide → hacks stopPropagation). On sort le
+           form comme frère du lien dans le <li> : structure valide, plus de JS
+           inline, comportement inchangé (lien détail + POST create_session). #}
         <li class="template-card template-card--{{ tpl.kind }}">
           <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
             <div class="template-card__row">
@@ -22,19 +29,17 @@
             {% if tpl.suggested_label %}
               <div class="template-card__hint">{{ tpl.suggested_label }}</div>
             {% endif %}
-            <form
-              method="post"
-              action="{{ url_for('create_session') }}"
-              class="template-card__start"
-              onclick="event.stopPropagation();"
-              onkeydown="event.stopPropagation();"
-            >
-              <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
-              {# Sb_13 telemetry: library CTA. #}
-              <input type="hidden" name="creation_source" value="library" />
-              <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
-            </form>
           </a>
+          <form
+            method="post"
+            action="{{ url_for('create_session') }}"
+            class="template-card__start"
+          >
+            <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
+            {# Sb_13 telemetry: library CTA. #}
+            <input type="hidden" name="creation_source" value="library" />
+            <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
+          </form>
         </li>
       {% endfor %}
     </ul>

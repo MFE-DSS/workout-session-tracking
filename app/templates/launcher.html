@@ -8,7 +8,10 @@
 
 {% if step == 1 %}
   <h1 class="page-title">Nouvelle séance</h1>
-  <p class="lede">Type de séance ?</p>
+  {# Sx_UI_07.3 — ledes de flow plus explicites (step 1/2/3), non asservis.
+     Additif ; flow, liens retour, reco partial, CTA et creation_source
+     inchangés. #}
+  <p class="lede">Choisis le format de séance à lancer.</p>
   <div class="tile-grid">
     {% for t in types %}
       <a class="tile {% if loop.first %}tile--primary{% endif %}"
@@ -23,7 +26,7 @@
 
 {% elif step == 2 %}
   <h1 class="page-title">{{ type_label }}</h1>
-  <p class="lede">Quelle zone ?</p>
+  <p class="lede">Sélectionne la zone ou l'objectif du jour.</p>
   <div class="tile-grid">
     {% for v in variants %}
       <a class="tile" href="{{ url_for('launcher') }}?type={{ type_key }}&amp;variant={{ v.key }}">
@@ -40,7 +43,7 @@
 
 {% elif step == 3 %}
   <h1 class="page-title">{{ type_label }}</h1>
-  <p class="lede">Choisis un programme.</p>
+  <p class="lede">Choisis le programme à démarrer maintenant.</p>
   <ul class="template-list">
     {% for tpl in templates_list %}
       <li class="template-card template-card--{{ tpl.kind }}">

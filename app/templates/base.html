@@ -20,21 +20,35 @@
     <title>{{ page_title }} · SPIGNOS</title>
   </head>
   <body>
+    {# Sx_NAV_01 — état actif de navigation dérivé de request.url.path (SSR,
+       no-JS). Chaque grande surface pilote is-active + aria-current="page" sur
+       son lien topbar. Template-only : aucune route/service touché. Les liens
+       non actifs ne portent AUCUN aria-current (jamais "false"). #}
+    {% set _p = request.url.path if request else '' %}
+    {% set is_home = _p == '/' or _p.startswith('/home') %}
+    {% set is_programs = _p.startswith('/library') or _p.startswith('/launcher') %}
+    {% set is_history = _p.startswith('/history') %}
+    {% set is_physique = _p.startswith('/physique') or _p.startswith('/body/intelligence') %}
+    {% set is_progress = _p.startswith('/progress') %}
+    {% set is_leaderboard = _p.startswith('/leaderboard') %}
+    {% set is_squads = _p.startswith('/squads') %}
+    {% set is_profile = _p.startswith('/profile') %}
+    {% set is_coach = _p.startswith('/coach') %}
     <header class="topbar">
       <a class="topbar__brand" href="{{ url_for('home') }}">SPIGNOS</a>
       <details class="topbar__menu">
         <summary class="topbar__toggle" aria-label="Menu">☰</summary>
         <nav class="topbar__nav" aria-label="Navigation">
-          <a class="topbar__link" href="{{ url_for('home') }}">Accueil</a>
-          <a class="topbar__link" href="{{ url_for('library') }}">Programmes</a>
-          <a class="topbar__link" href="{{ url_for('history') }}">Historique</a>
-          <a class="topbar__link" href="{{ url_for('physique') }}">Physique</a>
+          <a class="topbar__link {% if is_home %}is-active{% endif %}" href="{{ url_for('home') }}"{% if is_home %} aria-current="page"{% endif %}>Accueil</a>
+          <a class="topbar__link {% if is_programs %}is-active{% endif %}" href="{{ url_for('library') }}"{% if is_programs %} aria-current="page"{% endif %}>Programmes</a>
+          <a class="topbar__link {% if is_history %}is-active{% endif %}" href="{{ url_for('history') }}"{% if is_history %} aria-current="page"{% endif %}>Historique</a>
+          <a class="topbar__link {% if is_physique %}is-active{% endif %}" href="{{ url_for('physique') }}"{% if is_physique %} aria-current="page"{% endif %}>Physique</a>
           {# Sb_27.6 — OQ-3 : /dashboard déprécié, Progression (/progress) devient la surface analytique principale. #}
-          <a class="topbar__link" href="{{ url_for('progress') }}">Progression</a>
-          <a class="topbar__link" href="{{ url_for('leaderboard_page') }}">Classement</a>
-          <a class="topbar__link" href="{{ url_for('squads_list') }}">Squads</a>
-          <a class="topbar__link" href="{{ url_for('profile_page') }}">Profil</a>
-          <a class="topbar__link" href="{{ url_for('coach_report') }}">Coach</a>
+          <a class="topbar__link {% if is_progress %}is-active{% endif %}" href="{{ url_for('progress') }}"{% if is_progress %} aria-current="page"{% endif %}>Progression</a>
+          <a class="topbar__link {% if is_leaderboard %}is-active{% endif %}" href="{{ url_for('leaderboard_page') }}"{% if is_leaderboard %} aria-current="page"{% endif %}>Classement</a>
+          <a class="topbar__link {% if is_squads %}is-active{% endif %}" href="{{ url_for('squads_list') }}"{% if is_squads %} aria-current="page"{% endif %}>Squads</a>
+          <a class="topbar__link {% if is_profile %}is-active{% endif %}" href="{{ url_for('profile_page') }}"{% if is_profile %} aria-current="page"{% endif %}>Profil</a>
+          <a class="topbar__link {% if is_coach %}is-active{% endif %}" href="{{ url_for('coach_report') }}"{% if is_coach %} aria-current="page"{% endif %}>Coach</a>
           <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
             <button type="submit" class="topbar__link topbar__link--btn">Déconnexion</button>
           </form>

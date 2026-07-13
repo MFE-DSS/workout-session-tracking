@@ -10,9 +10,24 @@
   <p class="hint"><em>{{ template.suggested_label }}</em></p>
 {% endif %}
 
+{# Sx_UI_07.4 — readability pass (additif) : clarifie que c'est une fiche
+   descriptive. Sx_TPL_01 la rend actionnable (CTA ci-dessous). #}
+<p class="lede">Fiche programme · structure prévue avant lancement.</p>
+
+{# Sx_TPL_01 — CTA de démarrage direct depuis la fiche. Template-only :
+   réutilise create_session + la whitelist creation_source=library existante
+   (pas de nouvelle valeur telemetry → sessions.py non touché). Un seul CTA,
+   aucun JS, aucune confirmation. #}
+<form method="post" action="{{ url_for('create_session') }}" class="template-card__start">
+  <input type="hidden" name="template_slug" value="{{ template.slug }}" />
+  <input type="hidden" name="creation_source" value="library" />
+  <button type="submit" class="btn btn--primary btn--sm">Démarrer cette séance</button>
+</form>
+
 {% if template.exercises|length == 0 %}
   <p class="empty">Séance cardio / activité basse intensité. Aucun exercice de musculation prescrit.</p>
 {% else %}
+  <h2 class="section-header">Structure de séance</h2>
   <ol class="exercise-list">
     {% for ex in template.exercises %}
       <li class="exercise">
@@ -38,5 +53,7 @@
       </li>
     {% endfor %}
   </ol>
+  {# Sx_UI_07.4 — note indicative finale (additive). #}
+  <p class="kpi-note">Les charges et reps réelles se saisissent dans la séance active.</p>
 {% endif %}
 {% endblock %}

@@ -323,8 +323,8 @@
             "Upright row haltères",
             "Upright row câble"
           ],
-          "machine_slug": "lat-pulldown",
-          "machine_family": "back-vertical"
+          "machine_slug": null,
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 6,
@@ -1044,8 +1044,8 @@
               "max_reps": 12
             }
           ],
-          "machine_slug": "leg-press",
-          "machine_family": "legs-quad-dominant"
+          "machine_slug": null,
+          "machine_family": "legs-posterior-calves"
         },
         {
           "position": 4,
@@ -2215,8 +2215,8 @@
             "Upright row haltères",
             "Upright row câble"
           ],
-          "machine_slug": "lat-pulldown",
-          "machine_family": "back-vertical"
+          "machine_slug": null,
+          "machine_family": "shoulders-lateral-posterior"
         },
         {
           "position": 5,
