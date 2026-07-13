@@ -1,8 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Historique</h1>
+{# Sx_UI_07.2 — readability pass : lede sobre + aria-label plus explicite.
+   Additif uniquement ; wording des filtres, badges, actions et confirm
+   conservé à l'identique (comportement métier + tests inchangés). #}
+<p class="lede">Séances enregistrées, reprises possibles et séances exclues des indicateurs.</p>
 
-<nav class="filter-bar" aria-label="Filtrer par statut">
+<nav class="filter-bar" aria-label="Filtrer l'historique par statut">
   {% for choice in status_choices %}
     <a
       class="filter-bar__item {% if status_filter == choice %}is-active{% endif %}"
@@ -73,5 +77,10 @@
       </li>
     {% endfor %}
   </ul>
+  {# Sx_UI_07.2 — note indicative sobre (additive). Aucun calcul, aucune
+     action ; rappelle simplement le rôle de l'exclusion KPI. #}
+  <p class="kpi-note">
+    Lecture indicative · les séances exclues ne comptent pas dans les KPI.
+  </p>
 {% endif %}
 {% endblock %}
