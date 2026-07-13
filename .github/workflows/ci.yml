@@ -27,7 +27,8 @@ jobs:
   test:
     name: pytest + QA scripts
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    # Sx_UI_07.1 CI headroom — full pytest+coverage can exceed 35 min on slow runners; gates unchanged.
+    timeout-minutes: 45
     # Sb_20.4 — Le repo n'est pas installé en éditable. pytest trouve
     # `app/` via sa config, mais `python scripts/x.py` exécute le script
     # avec sys.path = [scripts/, ...] et perd la racine. PYTHONPATH=. le
