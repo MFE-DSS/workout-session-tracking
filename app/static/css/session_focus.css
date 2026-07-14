@@ -1544,44 +1544,59 @@
   text-transform: uppercase;
 }
 
-/* Body map : forme clinique décorative, CSS pur, aria-hidden. Aucun
-   asset. Un simple bloc de zones abstraites en dégradé sobre — repère
-   visuel, jamais anatomiquement précis (donc jamais un claim). */
+/* Sb_BODYMAP_01.1 — Body map : silhouette SVG inline face+dos, décorative,
+   aria-hidden, non-médicale. Aucun asset externe, aucune nouvelle couleur
+   (réutilise les vars accent/border/surface existantes), no-JS. La forme est
+   schématique (rectangles/cercle) — jamais anatomiquement précise, donc jamais
+   un claim médical. Toute la sémantique reste dans le texte « Principal /
+   Secondaire » sous la silhouette. */
 .session-focus__body-map {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 56px;
+  gap: var(--space-2);
+  min-height: 64px;
   margin: var(--space-1) 0 var(--space-2);
+  padding: var(--space-1) 0;
   border-radius: var(--radius-md);
-  background:
-    repeating-linear-gradient(
-      135deg,
-      var(--color-surface-sunken),
-      var(--color-surface-sunken) 6px,
-      var(--color-surface-alt) 6px,
-      var(--color-surface-alt) 12px
-    );
+  background: var(--color-surface-sunken);
   border: 1px solid var(--color-border-subtle);
   overflow: hidden;
 }
-.session-focus__body-map-shape {
-  display: block;
-  width: 40%;
-  height: 60%;
-  border-radius: 40% 40% 45% 45% / 50% 50% 40% 40%;
-  background: var(--color-accent-weak);
-  border: 1.5px solid var(--color-accent);
-  opacity: 0.9;
+.wa-silhouettes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
 }
-/* Variantes de zone : léger décalage de forme pour distinguer sans
-   prétendre à l'anatomie. Purement décoratif. */
-.session-focus__body-map-shape--pecs,
-.session-focus__body-map-shape--upper_back { width: 52%; height: 44%; }
-.session-focus__body-map-shape--lats { width: 44%; height: 58%; }
-.session-focus__body-map-shape--delt_lat { width: 46%; height: 46%; border-radius: 50%; }
-.session-focus__body-map-shape--quads,
-.session-focus__body-map-shape--posterior { width: 34%; height: 66%; }
+.wa-silhouette {
+  display: block;
+  width: 34px;
+  height: 58px;
+}
+/* Corps neutre (silhouette de base, non surlignée). */
+.wa-body {
+  fill: var(--color-accent-weak);
+  stroke: var(--color-border-subtle);
+  stroke-width: 0.6;
+}
+/* Régions : neutres par défaut (transparentes, portées par le corps). */
+.wa-region {
+  fill: transparent;
+  stroke: none;
+  transition: none;
+}
+/* Zone primaire : accent plein. Zone secondaire : accent faible. Réutilise
+   strictement les vars existantes — aucune nouvelle couleur. */
+.wa-region.is-primary {
+  fill: var(--color-accent);
+  opacity: 0.92;
+}
+.wa-region.is-secondary {
+  fill: var(--color-accent-weak);
+  stroke: var(--color-accent);
+  stroke-width: 0.5;
+}
 
 /* Pattern moteur (source réelle : family.description tronquée). */
 .session-focus__worked-area-pattern {

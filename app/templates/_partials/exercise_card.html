@@ -141,10 +141,16 @@
             <span class="session-focus__worked-area-title">Zone travaillée</span>
           </div>
 
-          {# Forme clinique décorative (CSS-only, aria-hidden). Forme visuelle
-             discrète ; toute la sémantique est portée par le texte ci-dessous. #}
+          {# Sb_BODYMAP_01.1 — silhouette « Zone travaillée » (SVG inline face+dos).
+             Remplace le blob décoratif. DÉCORATIF : aria-hidden, toute la
+             sémantique reste portée par le texte « Principal / Secondaire »
+             ci-dessous. Le conteneur .session-focus__body-map est conservé
+             (slot visuel stable). #}
+          {% set wa_status = "mapped" if _bmd_mapped else "unknown" %}
+          {% set wa_primary_zone = _bmd.primary_zone if _bmd_mapped else None %}
+          {% set wa_secondary_zones = _bmd.secondary_zones if _bmd_mapped and _bmd.secondary_zones else [] %}
           <div class="session-focus__body-map" aria-hidden="true">
-            <span class="session-focus__body-map-shape session-focus__body-map-shape--{{ (_bmd.primary_zone if _bmd_mapped else _zone_code) or 'generic' }}"></span>
+            {% include "_partials/worked_area_body_map.html" with context %}
           </div>
 
           <ul class="session-focus__worked-area-list">

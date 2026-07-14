@@ -89,9 +89,14 @@ class TestWorkedAreaVisualSlot:
         assert "session-focus__body-slot" in _body(client)
 
     def test_body_map_present(self, client):
+        # Sb_BODYMAP_01.1 — the decorative blob shape (…__body-map-shape) was
+        # replaced by an inline SVG silhouette (face + back). The stable slot
+        # container (…__body-map) is preserved; its content is now the
+        # silhouette partial (wa-silhouettes). New truth, not a masked
+        # regression: the visual is still decorative + aria-hidden.
         body = _body(client)
         assert "session-focus__body-map" in body
-        assert "session-focus__body-map-shape" in body
+        assert "wa-silhouettes" in body
 
     def test_body_map_is_aria_hidden(self, client):
         """The decorative body map must be aria-hidden (text carries the

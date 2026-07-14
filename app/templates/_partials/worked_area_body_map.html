@@ -1,0 +1,84 @@
+{# Sb_BODYMAP_01.1 — Silhouette « Zone travaillée » (SVG inline, SSR, no-JS).
+   Remplace le blob décoratif. DÉCORATIF : aria-hidden, toute la sémantique
+   reste portée par le texte « Principal / Secondaire » de la carte.
+
+   Contrat d'inclusion (variables passées par exercise_card.html) :
+     - wa_primary_zone   : code zone primaire ("pecs" | ... | "unknown" | None)
+     - wa_secondary_zones: liste de codes zones secondaires (peut être vide)
+     - wa_status         : "mapped" | "unknown"
+
+   Mapping zone (11) → macro-région visuelle (6) — décision OQ-BM-A :
+     pecs                      -> chest        (face)
+     delt_lat                  -> shoulders    (face + dos)
+     delt_post                 -> shoulders    (face + dos)
+     lats, upper_back          -> back         (dos)
+     biceps, triceps           -> arms         (face + dos)  (OQ-BM-B : macro « Bras »)
+     quads, posterior, calves  -> legs         (face + dos)
+     core                      -> core         (face)        (OQ-BM-C : tronc dessiné)
+   unknown / None -> aucune région active (silhouette neutre). #}
+
+{% set _WA_ZONE_TO_REGION = {
+     'pecs': 'chest',
+     'delt_lat': 'shoulders', 'delt_post': 'shoulders',
+     'lats': 'back', 'upper_back': 'back',
+     'biceps': 'arms', 'triceps': 'arms',
+     'quads': 'legs', 'posterior': 'legs', 'calves': 'legs',
+     'core': 'core',
+   } %}
+
+{% set _wa_primary_region = _WA_ZONE_TO_REGION.get(wa_primary_zone) if wa_status == 'mapped' else None %}
+{% set _wa_secondary_regions = [] %}
+{% if wa_status == 'mapped' and wa_secondary_zones %}
+  {% for _z in wa_secondary_zones %}
+    {% set _r = _WA_ZONE_TO_REGION.get(_z) %}
+    {% if _r and _r != _wa_primary_region and _r not in _wa_secondary_regions %}
+      {% set _ = _wa_secondary_regions.append(_r) %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% macro _wa_cls(region) -%}
+  wa-region wa-region--{{ region }}
+  {%- if region == _wa_primary_region %} is-primary
+  {%- elif region in _wa_secondary_regions %} is-secondary{% endif %}
+{%- endmacro %}
+
+<div class="wa-silhouettes" aria-hidden="true">
+  {# ---- Vue de face ---- #}
+  <svg class="wa-silhouette wa-silhouette--front" viewBox="0 0 60 100"
+       role="presentation" focusable="false">
+    {# corps schématique (non anatomique) #}
+    <circle class="wa-body" cx="30" cy="9" r="6"/>
+    <rect class="wa-body" x="20" y="16" width="20" height="34" rx="6"/>
+    <rect class="wa-body" x="11" y="18" width="8" height="30" rx="4"/>
+    <rect class="wa-body" x="41" y="18" width="8" height="30" rx="4"/>
+    <rect class="wa-body" x="21" y="51" width="8" height="40" rx="4"/>
+    <rect class="wa-body" x="31" y="51" width="8" height="40" rx="4"/>
+    {# régions surlignables (front) #}
+    <rect class="{{ _wa_cls('shoulders') }}" x="18" y="16" width="24" height="7" rx="3"/>
+    <rect class="{{ _wa_cls('chest') }}" x="21" y="22" width="18" height="11" rx="3"/>
+    <rect class="{{ _wa_cls('core') }}" x="22" y="33" width="16" height="14" rx="3"/>
+    <rect class="{{ _wa_cls('arms') }}" x="11" y="20" width="8" height="26" rx="4"/>
+    <rect class="{{ _wa_cls('arms') }}" x="41" y="20" width="8" height="26" rx="4"/>
+    <rect class="{{ _wa_cls('legs') }}" x="21" y="52" width="8" height="38" rx="4"/>
+    <rect class="{{ _wa_cls('legs') }}" x="31" y="52" width="8" height="38" rx="4"/>
+  </svg>
+
+  {# ---- Vue de dos ---- #}
+  <svg class="wa-silhouette wa-silhouette--back" viewBox="0 0 60 100"
+       role="presentation" focusable="false">
+    <circle class="wa-body" cx="30" cy="9" r="6"/>
+    <rect class="wa-body" x="20" y="16" width="20" height="34" rx="6"/>
+    <rect class="wa-body" x="11" y="18" width="8" height="30" rx="4"/>
+    <rect class="wa-body" x="41" y="18" width="8" height="30" rx="4"/>
+    <rect class="wa-body" x="21" y="51" width="8" height="40" rx="4"/>
+    <rect class="wa-body" x="31" y="51" width="8" height="40" rx="4"/>
+    {# régions surlignables (back) #}
+    <rect class="{{ _wa_cls('shoulders') }}" x="18" y="16" width="24" height="7" rx="3"/>
+    <rect class="{{ _wa_cls('back') }}" x="21" y="23" width="18" height="24" rx="3"/>
+    <rect class="{{ _wa_cls('arms') }}" x="11" y="20" width="8" height="26" rx="4"/>
+    <rect class="{{ _wa_cls('arms') }}" x="41" y="20" width="8" height="26" rx="4"/>
+    <rect class="{{ _wa_cls('legs') }}" x="21" y="52" width="8" height="38" rx="4"/>
+    <rect class="{{ _wa_cls('legs') }}" x="31" y="52" width="8" height="38" rx="4"/>
+  </svg>
+</div>
