@@ -548,6 +548,17 @@
                   {% if _is_done %}<span class="session-focus__console-check" aria-label="Série validée">✓</span>{% endif %}
                   {% if _is_active_set %}<span class="session-focus__console-badge" aria-label="Série active">actif</span>{% endif %}
                   {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+                  {# Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la
+                     dernière séance, collé à la ligne ACTIVE, au point exact de
+                     saisie. Additif : le bloc « Référence précédente » en tête
+                     de console est conservé. Silence si pas de donnée (jamais de
+                     faux poids). Décoratif : la référence complète reste portée
+                     par le bloc console-ref ci-dessus. #}
+                  {% if _is_active_set and _ref and _ref.has_data %}
+                    <span class="session-focus__console-row-prev" aria-hidden="true">
+                      dernière : {{ _ref.weights_str }} kg · {{ _ref.reps_str }} reps
+                    </span>
+                  {% endif %}
                 </div>
 
                 <div class="set-row__inputs">

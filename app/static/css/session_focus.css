@@ -1482,6 +1482,20 @@
   font-weight: var(--font-weight-medium);
 }
 
+/* Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la dernière séance,
+   sur la ligne du set ACTIF, au point de saisie. Non impératif, muté, tabular
+   pour aligner les chiffres. Réutilise --fg-dim (var existante) — aucune
+   nouvelle couleur. Passe à la ligne sous le label sur mobile étroit. */
+.session-focus__console-row-prev {
+  display: block;
+  width: 100%;
+  margin-top: 2px;
+  color: var(--fg-dim);
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+
 /* -------- Progression guidance : présentation du hint overload.
    Wrapper non impératif ; le contenu métier (overload_hint.html)
    est inchangé. -------- */
