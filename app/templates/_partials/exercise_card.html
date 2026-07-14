@@ -252,97 +252,12 @@
       </details>
     {% endif %}
 
-    {# ============================================================
-       Sb_UI_04.5 — Alternatives Surface (§18.F / §23)
-       ------------------------------------------------------------
-       La substitution existante (Sb_03 / Sb_07 / Sb_22a N1/N2/N3) est
-       rendue plus lisible via un wrapper "Adapter l'exercice", SANS
-       changer le mécanisme : mêmes radios name="substituted_name",
-       même form POST, même route (soumission via le form exercice).
-       Aucune alternative inventée, aucun service appelé depuis le
-       template. Surface accessible mais non dominante (drawer replié).
-       ============================================================ #}
-    {# Substitution (Sb_03 + Sb_07 drawer, étendu Sb_22a tiered N1/N2/N3) #}
-    {% set sub_data = substitution_data.get(se.id, {}) %}
-    {% set subs = sub_data.get('substitutes', []) %}
-    {% set grouped = sub_data.get('grouped', {'N1':[], 'N2':[], 'N3':[]}) %}
-    {% set can_sub = sub_data.get('can_substitute', False) %}
-    {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
-
-    {% if can_sub and (subs or total_grouped > 0) %}
-      <div class="session-focus__alternatives">
-        <details class="substitute-picker substitute-picker--drawer session-focus__alternatives-drawer">
-        <summary class="substitute-picker__summary" aria-label="Adapter l'exercice — Remplacer cet exercice">
-          <span class="substitute-picker__label session-focus__alternatives-label">Adapter l'exercice</span>
-          <span class="substitute-picker__sublabel session-focus__alternatives-sublabel">Remplacer cet exercice</span>
-          <span class="substitute-picker__count">
-            {% if total_grouped > 0 %}{{ total_grouped }}{% else %}{{ subs|length }}{% endif %}
-            alternative{% if (total_grouped or subs|length) > 1 %}s{% endif %}
-          </span>
-        </summary>
-        <div class="substitute-picker__body">
-          <p class="substitute-picker__hint session-focus__alternatives-role">Machine occupée, gêne, ou charge inadaptée ? Choisissez une alternative de même zone / même pattern avant la première série travail.</p>
-          <div class="segmented segmented--stacked">
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
-              <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
-            </label>
-            {# Sb_22a — N1 Équivalent (curé + match parfait) #}
-            {% for s in grouped.get('N1', []) %}
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
-              <span>
-                {{ s.name }}
-                <span class="sub-badge sub-badge--n1">{{ s.badge }}</span>
-              </span>
-            </label>
-            {% endfor %}
-            {# Sb_22a — N2 Proche (même pattern, équipement/chaîne différents) #}
-            {% for s in grouped.get('N2', []) %}
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
-              <span>
-                {{ s.name }}
-                <span class="sub-badge sub-badge--n2">{{ s.badge }}</span>
-                {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
-              </span>
-            </label>
-            {% endfor %}
-            {# Sb_22a — N3 Élargi (zone-only ou cross-pattern bridge). Replié par défaut. #}
-            {% if grouped.get('N3', []) | length > 0 %}
-            <details class="sub-elargi">
-              <summary>Voir alternatives élargies ({{ grouped.get('N3', []) | length }})</summary>
-              {% for s in grouped.get('N3', []) %}
-              <label class="segmented__option">
-                <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
-                <span>
-                  {{ s.name }}
-                  <span class="sub-badge sub-badge--n3">{{ s.badge }}</span>
-                  {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
-                </span>
-              </label>
-              {% endfor %}
-            </details>
-            {% endif %}
-            {# Legacy fallback — if grouped is empty but flat subs exist (out-of-scope exercises) #}
-            {% if total_grouped == 0 %}
-              {% for sub in subs %}
-              <label class="segmented__option">
-                <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
-                <span>{{ sub }}</span>
-              </label>
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
-        </details>
-      </div>
-    {% elif se.substituted_name %}
-      <div class="substitute-badge">
-        Substitué : <b>{{ se.substituted_name }}</b>
-        <span class="substitute-badge__prescribed">(prescrit : {{ se.exercise_name_snapshot }})</span>
-      </div>
-    {% endif %}
+    {# Sb_SESSION_UX_01.2b (F1) — Bloc « Adapter l'exercice » (alternatives)
+       DÉPLACÉ sous la console de saisie (priorité à l'action). Le bloc est
+       ré-inséré plus bas, entre la console et les cues, À L'IDENTIQUE (mêmes
+       {% set %}, mêmes radios name="substituted_name", mêmes N1/N2/N3, même
+       fallback legacy, même elif se.substituted_name, même form POST). Ici,
+       seule sa position change ; aucun contenu/condition modifié. #}
 
     {% set lt = last_time.get(se.exercise_code_snapshot) %}
     {# Sx_UI_06 D1 — dé-densification : sur la carte ACTIVE, la charge de la
@@ -581,6 +496,100 @@
       <p class="empty">Pas de série pour cet exercice.</p>
     {% endif %}
 
+    {# ============================================================
+       Sb_UI_04.5 — Alternatives Surface (§18.F / §23)
+       ------------------------------------------------------------
+       La substitution existante (Sb_03 / Sb_07 / Sb_22a N1/N2/N3) est
+       rendue plus lisible via un wrapper "Adapter l'exercice", SANS
+       changer le mécanisme : mêmes radios name="substituted_name",
+       même form POST, même route (soumission via le form exercice).
+       Aucune alternative inventée, aucun service appelé depuis le
+       template. Surface accessible mais non dominante (drawer replié).
+       Sb_SESSION_UX_01.2b — bloc DÉPLACÉ ici (sous la console), contenu
+       inchangé à l'identique.
+       ============================================================ #}
+    {# Substitution (Sb_03 + Sb_07 drawer, étendu Sb_22a tiered N1/N2/N3) #}
+    {% set sub_data = substitution_data.get(se.id, {}) %}
+    {% set subs = sub_data.get('substitutes', []) %}
+    {% set grouped = sub_data.get('grouped', {'N1':[], 'N2':[], 'N3':[]}) %}
+    {% set can_sub = sub_data.get('can_substitute', False) %}
+    {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
+
+    {% if can_sub and (subs or total_grouped > 0) %}
+      <div class="session-focus__alternatives">
+        <details class="substitute-picker substitute-picker--drawer session-focus__alternatives-drawer">
+        <summary class="substitute-picker__summary" aria-label="Adapter l'exercice — Remplacer cet exercice">
+          <span class="substitute-picker__label session-focus__alternatives-label">Adapter l'exercice</span>
+          <span class="substitute-picker__sublabel session-focus__alternatives-sublabel">Remplacer cet exercice</span>
+          <span class="substitute-picker__count">
+            {% if total_grouped > 0 %}{{ total_grouped }}{% else %}{{ subs|length }}{% endif %}
+            alternative{% if (total_grouped or subs|length) > 1 %}s{% endif %}
+          </span>
+        </summary>
+        <div class="substitute-picker__body">
+          <p class="substitute-picker__hint session-focus__alternatives-role">Machine occupée, gêne, ou charge inadaptée ? Choisissez une alternative de même zone / même pattern avant la première série travail.</p>
+          <div class="segmented segmented--stacked">
+            <label class="segmented__option">
+              <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
+              <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
+            </label>
+            {# Sb_22a — N1 Équivalent (curé + match parfait) #}
+            {% for s in grouped.get('N1', []) %}
+            <label class="segmented__option">
+              <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+              <span>
+                {{ s.name }}
+                <span class="sub-badge sub-badge--n1">{{ s.badge }}</span>
+              </span>
+            </label>
+            {% endfor %}
+            {# Sb_22a — N2 Proche (même pattern, équipement/chaîne différents) #}
+            {% for s in grouped.get('N2', []) %}
+            <label class="segmented__option">
+              <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+              <span>
+                {{ s.name }}
+                <span class="sub-badge sub-badge--n2">{{ s.badge }}</span>
+                {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
+              </span>
+            </label>
+            {% endfor %}
+            {# Sb_22a — N3 Élargi (zone-only ou cross-pattern bridge). Replié par défaut. #}
+            {% if grouped.get('N3', []) | length > 0 %}
+            <details class="sub-elargi">
+              <summary>Voir alternatives élargies ({{ grouped.get('N3', []) | length }})</summary>
+              {% for s in grouped.get('N3', []) %}
+              <label class="segmented__option">
+                <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                <span>
+                  {{ s.name }}
+                  <span class="sub-badge sub-badge--n3">{{ s.badge }}</span>
+                  {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
+                </span>
+              </label>
+              {% endfor %}
+            </details>
+            {% endif %}
+            {# Legacy fallback — if grouped is empty but flat subs exist (out-of-scope exercises) #}
+            {% if total_grouped == 0 %}
+              {% for sub in subs %}
+              <label class="segmented__option">
+                <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
+                <span>{{ sub }}</span>
+              </label>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+        </details>
+      </div>
+    {% elif se.substituted_name %}
+      <div class="substitute-badge">
+        Substitué : <b>{{ se.substituted_name }}</b>
+        <span class="substitute-badge__prescribed">(prescrit : {{ se.exercise_name_snapshot }})</span>
+      </div>
+    {% endif %}
+
     {# Sb_SESSION_UX_01.2 (F1) — Cues techniques ré-insérées ICI, APRÈS la console
        de saisie (priorité à l'action, carte active). Bloc identique à l'ancien
        (hero) ; _machine re-résolu localement depuis atlas_data (présentation,
@@ -588,8 +597,12 @@
     {% if is_active %}
       {% set _cues_atlas = atlas_data.get(se.id) %}
       {% set _cues_machine = _cues_atlas.machine if _cues_atlas else None %}
-      <div class="session-focus__cues">
-        <span class="session-focus__cues-title">Cues techniques</span>
+      {# Sb_SESSION_UX_01.4 (F3) — cues post-console repliées dans un <details>
+         natif (no-JS), replié par défaut (pas d'attribut `open`). Réduit la
+         densité mobile une fois la saisie priorisée. Contenu (liste + fallback)
+         et classes inchangés ; aucune information supprimée. #}
+      <details class="session-focus__cues">
+        <summary class="session-focus__cues-title">Cues techniques</summary>
         {% if _cues_machine and _cues_machine.execution_cues %}
           <ol class="session-focus__cues-list">
             {% for cue in _cues_machine.execution_cues[:3] %}
@@ -601,7 +614,7 @@
             Exécution contrôlée, amplitude complète, tempo maîtrisé.
           </p>
         {% endif %}
-      </div>
+      </details>
     {% endif %}
 
     <h3 class="card__subtitle">Ressenti exercice</h3>

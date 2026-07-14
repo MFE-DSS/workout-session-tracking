@@ -1299,6 +1299,19 @@
   color: var(--color-fg-muted);
   font-style: italic;
 }
+/* Sb_SESSION_UX_01.4 (F3) — cues post-console repliées dans un <details> natif.
+   Le <summary> réutilise .session-focus__cues-title (label uppercase). On rend
+   l'état repliable lisible (curseur + chevron natif conservé), sans nouvelle
+   couleur ni JS. `display:block` sur cues-title masquerait le marker natif →
+   on force list-item pour garder l'indicateur repliable. */
+details.session-focus__cues > summary.session-focus__cues-title {
+  cursor: pointer;
+  display: list-item;
+  list-style-position: inside;
+}
+details.session-focus__cues[open] > summary.session-focus__cues-title {
+  margin-bottom: var(--space-1);
+}
 
 /* -------- Up next (§18.G / OQ-F) : nom + rôle + zone principale.
    Secondaire visuellement, ancré bas de carte active. -------- */
