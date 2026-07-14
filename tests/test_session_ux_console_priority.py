@@ -1,0 +1,146 @@
+"""Sb_SESSION_UX_01.2 (F1) — Active console priority.
+
+On the ACTIVE card, the set-logging console now renders BEFORE the technical
+cues block (the always-visible block that previously pushed input down).
+Option A (light repriorisation): cues are moved AFTER the console. The
+alternatives drawer (collapsed <details>, form-critical) is intentionally left
+in place. Order on active card: worked-area → (alternatives, collapsed) →
+console → cues.
+
+Template-only, no-JS, no route/service/data/model change. Same POST form, same
+input names, value="" strict, server-derived completion, sticky CTA, rest timer
+and BodyMap silhouette preserved.
+"""
+from __future__ import annotations
+
+from datetime import UTC, datetime
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+EXERCISE_CARD = ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
+JS_DIR = ROOT / "app" / "static" / "js"
+
+
+def _seed(db, user_id, n=2):
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
+
+    s = WorkoutSession(
+        user_id=user_id,
+        template_slug_snapshot="console-priority",
+        template_name_snapshot="Console priority test",
+        started_at=datetime.now(UTC),
+        status="in_progress",
+    )
+    for i in range(n):
+        se = SessionExercise(
+            exercise_code_snapshot=f"E{i + 1}",
+            exercise_name_snapshot=f"Exercise {i + 1}",
+            position=i + 1,
+        )
+        se.set_logs.append(
+            SetLog(kind="work", set_index=1, weight_kg=None, reps=None, completed=False)
+        )
+        s.session_exercises.append(se)
+    db.add(s)
+    db.commit()
+    db.refresh(s)
+    return s
+
+
+def _body(client, n=2):
+    from app.database import SessionLocal
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        user = db.query(User).first()
+        s = _seed(db, user.id, n=n)
+        sid = s.id
+    r = client.get(f"/sessions/{sid}", follow_redirects=False)
+    assert r.status_code == 200, r.text[:400]
+    return r.text
+
+
+# ───────── order on the active card ─────────
+
+
+def test_console_before_cues(client):
+    body = _body(client)
+    console = body.find("session-focus__console-list")
+    cues = body.find("session-focus__cues")
+    assert console != -1 and cues != -1
+    assert console < cues, "console must render before technical cues"
+
+
+def test_worked_area_before_console(client):
+    body = _body(client)
+    worked = body.find("session-focus__body-slot")
+    console = body.find("session-focus__console-list")
+    assert worked != -1 and console != -1
+    assert worked < console, "worked area (Zone travaillée) stays before console"
+
+
+def test_cues_still_present(client):
+    body = _body(client)
+    assert "session-focus__cues" in body
+    assert "Cues techniques" in body
+
+
+def test_cues_rendered_once(client):
+    """No duplicate cues block (moved, not copied)."""
+    body = _body(client)
+    assert body.count('session-focus__cues"') == 1
+
+
+# ───────── invariants preserved ─────────
+
+
+def test_set_inputs_present(client):
+    body = _body(client)
+    assert "_weight_kg" in body
+    assert "_reps" in body
+
+
+def test_alternatives_still_in_form():
+    """Alternatives drawer preserved (left in place, form-critical). Checked in
+    the template source: synthetic exercises have no computed substitutions, so
+    the drawer only renders for real catalog exercises — but the mechanism
+    (substituted_name radios) must remain present and unchanged."""
+    src = EXERCISE_CARD.read_text(encoding="utf-8")
+    assert 'name="substituted_name"' in src
+    assert "session-focus__alternatives" in src
+
+
+def test_sticky_cta_present(client):
+    body = _body(client)
+    assert "session-focus__sticky-cta" in body
+
+
+def test_rest_timer_rendered(client):
+    body = _body(client)
+    # rest timer partial renders on the active card
+    assert "rest" in body.lower()
+
+
+def test_bodymap_silhouette_preserved(client):
+    body = _body(client)
+    assert "wa-silhouettes" in body
+
+
+# ───────── non-goals ─────────
+
+
+def test_no_js_added():
+    src = EXERCISE_CARD.read_text(encoding="utf-8")
+    assert "addEventListener" not in src
+    if JS_DIR.exists():
+        assert not any("console_priority" in p.name.lower() for p in JS_DIR.glob("*.js"))
+
+
+def test_no_orphan_machine_var():
+    """The old hero _machine (only consumed by cues) is removed to avoid dead
+    code; cues re-resolve _cues_machine locally after the console."""
+    src = EXERCISE_CARD.read_text(encoding="utf-8")
+    # the cues block uses the locally re-resolved var
+    assert "_cues_machine" in src
+    # the old hero assignment `{% set _machine = ` is gone
+    assert "{% set _machine =" not in src
