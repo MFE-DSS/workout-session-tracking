@@ -132,6 +132,21 @@ Motifs (§7) — tous satisfaits :
 
 ---
 
+## 9. Correction documentaire (post-review, mandat opérateur 2026-07-15)
+
+- Le build report, le registre et la roadmap annonçaient « **15 tests dédiés** » : **erreur de
+  comptage** (le fichier `test_auren_public_auth_strings.py` collecte **14 tests**, confirmé par
+  `pytest --collect-only` et par le delta CI).
+- **Valeur corrigée : 14 tests dédiés.** Les agrégats CI restent cohérents :
+  baseline **2138** (run `29403226554`, Sb_UI_10.1) + **14** = **2152 passed**
+  (run `29408336175`) ; 2 warnings non bloquants ; ruff **543 ≤ 548** ; spec protocol **PASS**.
+- Warnings CI hors périmètre (préexistants, non bloquants) : shellcheck SC2046
+  (`.github/workflows/ci.yml:190`, reviewdog) + dépréciation Node.js 20 des actions GitHub.
+- Correction appliquée aux 3 documents (build report ×3 occurrences, `SPEC_REGISTRY.md`,
+  `ROADMAP_AND_NEXT_STEPS.md`) — docs-only, aucun code/test modifié.
+
+---
+
 ## Verdict
 
 **Verdict :** ✅ **Sb_UI_10.3 — HUMAN REVIEW ACCEPTED.** La migration visible SPIGNOS → Auren des trois

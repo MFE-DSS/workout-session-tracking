@@ -70,7 +70,7 @@
 | `app/templates/welcome.html` | 4 chaînes visibles + commentaire (13 lignes) |
 | `app/templates/login.html` | 2 chaînes visibles + commentaire (9 lignes) |
 | `app/templates/register.html` | 2 chaînes visibles + commentaire (9 lignes) |
-| `tests/test_auren_public_auth_strings.py` | **nouveau** — 15 tests dédiés |
+| `tests/test_auren_public_auth_strings.py` | **nouveau** — 14 tests dédiés *(« 15 » initialement annoncé : erreur de comptage, corrigée en review — CI 2138 + 14 = 2152)* |
 | `tests/test_pwa_public_auth_heads.py` | 2 assertions réalignées (apple-title Auren ; titles Auren) + renommage honnête du test no-rebrand |
 | `tests/test_auth.py` | 1 assertion réalignée (welcome affiche Auren) |
 
@@ -101,7 +101,7 @@ branche `spec/sx-custom-program-01-intelligent-builder`. **Aucun asset introduit
 
 | Suite | Résultat |
 |---|---|
-| `test_auren_public_auth_strings.py` (dédiés, **nouveau**) | **15/15** |
+| `test_auren_public_auth_strings.py` (dédiés, **nouveau**) | **14/14** |
 | Fichiers directement affectés (dédiés + pwa_heads + auth) | **35 passed / 0 échec** (12,6 s) |
 | Sweep ciblé `-k "auth or welcome or pwa or login or register or auren or public"` | **180 passed / 0 échec** (66 s) |
 | ruff (fichier de tests neuf) | clean |
@@ -145,7 +145,7 @@ Les 3 surfaces publiques standalone (welcome/login/register) affichent désormai
 (8 chaînes visibles migrées, dont les 2 titles legacy « · Workout ») ; SPIGNOS reste le nom
 interne (commentaires techniques uniquement, 0 rendu). **Strings-only/template-only** :
 formulaires, routes, messages d'erreur, meta PWA, manifest, assets, CSS **intacts** —
-prouvé par 15 tests dédiés + sentinelles + 180 tests sweep auth/pwa verts. Les 3 assertions
+prouvé par 14 tests dédiés + sentinelles + 180 tests sweep auth/pwa verts. Les 3 assertions
 asservies qui pinnaient SPIGNOS (invariant Sx_UI_08.2 « no rebrand by this sprint ») sont
 réalignées honnêtement dans le même diff. check_scope ISOLATED (surface bornée, non promue —
 justification §4). **Recommandation : GO COMMIT + CI complète** (template + tests touchés).
