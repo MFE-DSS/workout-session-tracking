@@ -126,6 +126,21 @@
 > - Hard contracts Sx_26/Sx_27 inchangés
 > - Sx_29 doit produire sa spec d'abord (SPEC ONLY), comme tout cycle Sx_
 
+## 1bis. Track parallèle — Custom Program Builder (`Sx_CUSTOM_PROGRAM`, SPEC DRAFT)
+
+- **Custom Program Builder = future product track** (wizard guidé + Exercise
+  Knowledge Base + génération déterministe + scoring A/B/C explicable) —
+  spec draft : `docs/strategy/Sx_CUSTOM_PROGRAM_01_INTELLIGENT_PROGRAM_BUILDER_SPEC.md`
+  (branche `spec/sx-custom-program-01-intelligent-builder`, docs-only).
+- Vit **en parallèle du cycle UI/Auren** actif : branche dédiée, aucun fichier
+  partagé, merge seulement après stabilisation des builds UI en cours.
+- **Pas de build avant spec acceptance** : build/migrations/app code/seed
+  non autorisés ; prochaine décision = human review de `Sx_CUSTOM_PROGRAM_01`.
+- Dépendances fortes identifiées : catalogue (`WorkoutTemplate` + seed wipe),
+  `session_builder`, substitution, overload, history/stats — d'où la
+  recommandation Option C (drafts `UserProgram*` isolés, publication en
+  template custom protégé) et le wipe-guard seed comme pré-requis absolu.
+
 ## 2. Protocole spec-driven — règle d'or
 
 > **On ne développe plus de nouveau cycle produit tant que la boucle livrée n'a pas été vécue en conditions réelles.**
