@@ -159,6 +159,16 @@
   des specs/builds suivants. `Sb_CUSTOM_PROGRAM_SCORING_01→04` NOT AUTHORIZED.
   **Next : `Sx_CUSTOM_PROGRAM_04 — User Program Persistence Spec` (NEXT SPEC CANDIDATE,
   sur GO explicite).**
+- **`Sx_CUSTOM_PROGRAM_04 — User Program Persistence Spec` : ⚪ SPEC DRAFT OPENED** 2026-07-15
+  (`docs/strategy/Sx_CUSTOM_PROGRAM_04_USER_PROGRAM_PERSISTENCE_SPEC.md`). 5 tables
+  `UserProgram*` (source de vérité d'édition), statuts draft/validated/published/archived,
+  published édité = nouveau cycle (artefact immuable), ownership dur + soft delete, quotas V1
+  (10/5/7/10), trace scoring figée par version, `exercise_name` = nom EKB invariant,
+  migrations futures additive-only une par build (zéro table existante modifiée).
+  Publication/matérialisation/wipe-guard renvoyés à la spec 05. 10 OQ (OQ-PERS-A→J) ;
+  build queue `Sb_CUSTOM_PROGRAM_PERSISTENCE_01→05` non ouverte.
+  **Next decision : human review de la spec 04. Ensuite : `Sx_CUSTOM_PROGRAM_05 — Session
+  Instantiation Compatibility Spec` (NEXT SPEC CANDIDATE).**
 - **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
   tant que les specs filles ne sont pas acceptées.
 
