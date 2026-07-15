@@ -170,17 +170,19 @@
   NOT AUTHORIZED.
   **Next : `Sx_CUSTOM_PROGRAM_05 — Session Instantiation Compatibility Spec` (NEXT SPEC
   CANDIDATE, dernière spec fille — matérialisation + wipe-guard + filtres, sur GO explicite).**
-- **`Sx_CUSTOM_PROGRAM_05 — Session Instantiation Compatibility Spec` : ⚪ SPEC DRAFT OPENED**
-  2026-07-15 (`docs/strategy/Sx_CUSTOM_PROGRAM_05_SESSION_INSTANTIATION_COMPATIBILITY_SPEC.md`).
-  Dernière spec fille (4/4), la plus sensible : wipe-guard seed précisé (filtre custom aux
-  3 DELETE, `LAUNCH_01` strictement premier, test bump-survie), slugs `up{uid}-{base}-v{n}`
-  immuables, matérialisation 1 session → 1 template (codes figés par version, reviews jamais
-  côté catalogue), session_builder inchangé V1 (zéro `ProgramDefinition` dedans), historique
+- **`Sx_CUSTOM_PROGRAM_05 — Session Instantiation Compatibility Spec` : ✅ HUMAN REVIEW
+  ACCEPTED / SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_05_SESSION_INSTANTIATION_COMPATIBILITY_HUMAN_REVIEW_REPORT.md`,
+  spec `b61f4c9`). Contrats de lançabilité actés : wipe-guard seed (`LAUNCH_01` strictement
+  premier, test bump-survie), slugs `up{uid}-{base}-v{n}` immuables, matérialisation
+  1 session → 1 template, session_builder inchangé V1, codes figés par version, historique
   étanche par slug versionné, filtres reco/librairie + tests anti-pollution, publication
-  idempotente, lancement ownership-gated. 11 OQ (OQ-LAUNCH-A→K) ; build queue
-  `Sb_CUSTOM_PROGRAM_LAUNCH_01→06` non ouverte.
-  **Next decision : human review de la spec 05 — clôt la spec queue 01→05 ; ensuite toute
-  ouverture de build = GO/override explicite, wipe-guard en premier.**
+  idempotente, lancement ownership-gated. OQ-LAUNCH-A→K = décision de build.
+- **🏁 SPEC QUEUE `Sx_CUSTOM_PROGRAM` 01→05 : COMPLETE** (2026-07-15) — les 5 specs sont
+  HUMAN REVIEW ACCEPTED. **Prochaine frontière : décision opérateur séparée de build
+  (GO/override explicite, build par build). `Sb_CUSTOM_PROGRAM_LAUNCH_01 — seed wipe-guard`
+  = FIRST BUILD CANDIDATE, NOT OPENED. Tous les builds (`Sb_*`, `EKB_*`, `SCORING_*`,
+  `PERSISTENCE_*`, `LAUNCH_*`) restent NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
   tant que les specs filles ne sont pas acceptées.
 
