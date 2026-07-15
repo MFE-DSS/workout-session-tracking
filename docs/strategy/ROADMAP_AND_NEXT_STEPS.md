@@ -134,9 +134,14 @@
 - Vit **en parallèle du cycle UI/Auren** actif : **worktree isolé**
   (`workout-session-tracking-custom`), aucun fichier partagé, zéro concurrence `Sb_UI_10.4b`,
   rebase obligatoire avant toute PR/build.
-- **Next : `Sx_CUSTOM_PROGRAM_02 — Exercise Knowledge Base Spec` (NEXT SPEC CANDIDATE,
-  SPEC ONLY, sur GO explicite).** **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration,
-  aucun seed, aucun code `app/` tant que les specs filles ne sont pas acceptées.
+- **`Sx_CUSTOM_PROGRAM_02 — Exercise Knowledge Base Spec` : ⚪ SPEC DRAFT OPENED** 2026-07-15
+  (`docs/strategy/Sx_CUSTOM_PROGRAM_02_EXERCISE_KNOWLEDGE_BASE_SPEC.md`). Audit chiffré
+  (53 properties vs 103 noms catalogue → 52 absents ; socle Sx_32 prêt, `Muscle` vide),
+  identité = noms historiques (zéro renommage) + `variant_group`, taxonomie V1 18 champs,
+  stockage Option C séquencée (JSON canonique → seed DB optionnel gaté), QA 8 checks,
+  9 OQ (OQ-EKB-A→I). **Next decision : human review de la spec 02.**
+- **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
+  tant que les specs filles ne sont pas acceptées.
 
 ## 2. Protocole spec-driven — règle d'or
 
