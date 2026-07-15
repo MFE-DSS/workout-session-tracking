@@ -1,7 +1,8 @@
 ---
 name: UI_TRANSFORMATION_ROADMAP
 type: strategy-roadmap
-status: SPEC ROADMAP (docs-only)
+status: HISTORICAL OPENING ROADMAP (docs-only) — source vivante = Sx_UI_12
+superseded_by: docs/strategy/Sx_UI_12_UI_TRANSFORMATION_RESIDUAL_RECONCILIATION_SPEC.md
 created: 2026-07-02
 depends_on:
   - docs/strategy/brainstorm/UI_TRANSFORMATION_BRAINSTORM_V1_normalized.md
@@ -11,6 +12,12 @@ depends_on_gate:
 ---
 
 # UI Transformation Roadmap — Auren
+
+> ⚠️ **HISTORICAL OPENING ROADMAP (2026-07-02).** Ce document a servi à **ouvrir** le programme
+> `Sx_UI`. Il n'est **plus la source vivante** de l'état d'avancement. La **source actuelle de vérité**
+> (ce qui est clos / partiel / superseded / à construire / à ne pas construire, + la build queue
+> résiduelle) est **`docs/strategy/Sx_UI_12_UI_TRANSFORMATION_RESIDUAL_RECONCILIATION_SPEC.md`**.
+> Ce document est **conservé tel quel** comme trace d'ouverture ; ne pas s'y fier pour les statuts.
 
 Synthèse actionnable dérivée des brainstorms `brainstorm/UI_TRANSFORMATION_BRAINSTORM_V1_normalized.md` et `brainstorm/UI_TRANSFORMATION_BRAINSTORM_V2_normalized.md`. Ce document remplace les brainstorms comme **source unique** pour la roadmap. Les brainstorms restent archivés pour traçabilité et matière brute d'inspiration ; ils ne pilotent pas les specs directement.
 
