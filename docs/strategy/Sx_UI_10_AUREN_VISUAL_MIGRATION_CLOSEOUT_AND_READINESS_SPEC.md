@@ -1,7 +1,7 @@
 # Sx_UI_10 — Auren Visual Migration Closeout & Visible Rebrand Readiness — SPEC
 
 **Type** : SPEC / AUDIT / CLOSEOUT ONLY — **NO CODE**, docs-only
-**Statut** : 🟢 SPEC RÉDIGÉE — **non commité** (attente GO)
+**Statut** : ✅ **FINAL STATUS — CLOSED** (voir section finale ; commité `49fa7d3`, closeout final ci-dessous)
 **Date** : 2026-07-15
 **Remplace** : le brouillon erroné « ORION » (non canonique, jamais committé, supprimé — voir §0.4)
 
@@ -213,3 +213,28 @@ touché.**
 recommandé : **`Sb_UI_10.1` Visible Product Strings** (le plus visible, template-only, sûr). En
 parallèle : agent artistique sur `docs/design/auren/**` (assets §6) ; due diligence nom/domaine avant
 tout public.
+
+---
+
+## FINAL STATUS — CLOSED
+
+**Sx_UI_10 — CLOSED / HUMAN REVIEW COMPLETE** (2026-07-15).
+
+Le plan de cette spec a été exécuté intégralement. Les 5 builds (`Sb_UI_10.1`/`.3`/`.4`/`.4b`/`.2`) sont
+**human-review accepted**, chacun avec **CI 3/3 verte** (SHA exacts) ; le gate `Sb_UI_10.2a` a été
+débloqué par arbitrage opérateur (glyphe haltère approuvé, `#f25f3a`→`#C8A24B`, path canonique inchangé).
+La migration **visible** SPIGNOS→Auren est **complète** sur les surfaces couvertes : shell (`base.html`),
+auth/welcome (welcome/login/register), docs (science/atlas/coach_report + science_diagram.svg), donnée
+seedée rendue (`method_rules.json`), packaging PWA (manifest name/short_name « Auren » + pack d'icônes).
+Les **non-goals sont préservés** (aucun renommage code/repo/package/route/model/table). **0 Orion
+applicatif.** SPIGNOS reste volontairement le nom **interne**.
+
+**Gate externe encore ouvert** : la **due diligence juridique / commerciale / domaine du nom Auren**
+reste un **EXTERNAL OPEN ITEM** avant toute exposition ou lancement public à grande échelle. Elle ne
+bloque pas ce closeout technique interne.
+
+**Preuve complète** : `docs/SPRINT_Sx_UI_10_AUREN_VISUAL_MIGRATION_FINAL_CLOSEOUT_REPORT.md`
+(matrice build/CI/review, audit des objectifs, non-goals, résidus classifiés, risques acceptés).
+
+*L'intention historique ci-dessus (Option A, canon, split, inventaire) est conservée telle quelle ;
+cette section n'ajoute que le statut final.*
