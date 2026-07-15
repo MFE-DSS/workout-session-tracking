@@ -138,12 +138,16 @@
 - Vit **en parallèle du cycle UI/Auren** actif : **worktree isolé**
   (`workout-session-tracking-custom`), aucun fichier partagé, zéro concurrence `Sb_UI_10.4b`,
   rebase obligatoire avant toute PR/build.
-- **`Sx_CUSTOM_PROGRAM_02 — Exercise Knowledge Base Spec` : ⚪ SPEC DRAFT OPENED** 2026-07-15
-  (`docs/strategy/Sx_CUSTOM_PROGRAM_02_EXERCISE_KNOWLEDGE_BASE_SPEC.md`). Audit chiffré
-  (53 properties vs 103 noms catalogue → 52 absents ; socle Sx_32 prêt, `Muscle` vide),
-  identité = noms historiques (zéro renommage) + `variant_group`, taxonomie V1 18 champs,
-  stockage Option C séquencée (JSON canonique → seed DB optionnel gaté), QA 8 checks,
-  9 OQ (OQ-EKB-A→I). **Next decision : human review de la spec 02.**
+- **`Sx_CUSTOM_PROGRAM_02 — Exercise Knowledge Base Spec` : ✅ HUMAN REVIEW ACCEPTED /
+  SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_02_EXERCISE_KNOWLEDGE_BASE_HUMAN_REVIEW_REPORT.md`,
+  spec `cbba7d9`). Audit chiffré accepté comme référence (53 properties vs 103 noms →
+  52 absents, gap assumé jusqu'à `EKB_02` ; socle Sx_32 prêt, `Muscle` vide), identité =
+  noms historiques invariants + `variant_group`, taxonomie V1 18 champs, **Option C
+  séquencée** (JSON canonique → seed DB optionnel gaté), QA 8 checks obligatoires avant
+  tout seed, OQ-EKB-A→I = questions des builds/specs suivantes.
+  **Next : `Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` (NEXT SPEC CANDIDATE,
+  sur GO explicite).** `Sb_CUSTOM_PROGRAM_EKB_01→04` NOT AUTHORIZED.
 - **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
   tant que les specs filles ne sont pas acceptées.
 
