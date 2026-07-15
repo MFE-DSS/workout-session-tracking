@@ -143,5 +143,5 @@ def test_user_exists_in_db(client):
 def test_welcome_page_renders(client):
     r = client.get("/welcome")
     assert r.status_code == 200
-    assert "SPIGNOS" in r.text
+    assert "Auren" in r.text  # Sb_UI_10.3 — visible product name
     assert "Connexion" in r.text

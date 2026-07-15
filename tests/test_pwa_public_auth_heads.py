@@ -54,7 +54,7 @@ _REQUIRED_META = (
     'name="mobile-web-app-capable"',
     'name="apple-mobile-web-app-capable"',
     'name="apple-mobile-web-app-title"',
-    'content="SPIGNOS"',
+    'content="Auren"',  # Sb_UI_10.3 — visible product name migrated to Auren
 )
 
 
@@ -130,9 +130,10 @@ def test_auth_templates_reference_shared_manifest():
         assert "manifest.webmanifest" in src
 
 
-def test_auth_titles_unchanged_no_rebrand():
-    """Visible <title> wording must not be rebranded by this sprint."""
-    assert "<title>SPIGNOS</title>" in WELCOME.read_text(encoding="utf-8")
+def test_auth_titles_auren_product_name():
+    """Sb_UI_10.3 — visible product name in the auth titles is Auren; the
+    functional page labels (Connexion / Inscription) are preserved."""
+    assert "<title>Auren</title>" in WELCOME.read_text(encoding="utf-8")
     assert "Connexion" in LOGIN.read_text(encoding="utf-8")
     assert "Inscription" in REGISTER.read_text(encoding="utf-8")
 
