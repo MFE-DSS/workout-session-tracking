@@ -43,17 +43,16 @@ def test_science_renders_auren_template_strings(client):
     assert "Architecture du cockpit Auren" in body
 
 
-def test_science_remaining_spignos_is_only_the_seeded_method_rule(client):
-    """KNOWN RESIDUAL, pinned so it cannot silently grow. The seeded method
-    rule 'plages-repetitions' (data/method_rules.json → method_rules table)
-    still reads « …dans SPIGNOS est dérivé… » on /science. data/** is
-    FORBIDDEN in Sb_UI_10.4 → the fix is a dedicated data micro-pass on
-    explicit operator GO. When that pass lands, flip this test to assert 0."""
+def test_science_no_visible_spignos_after_method_rule_migration(client):
+    """Sb_UI_10.4b — the last user-facing SPIGNOS residual (the seeded method
+    rule 'plages-repetitions' in data/method_rules.json → method_rules table,
+    rendered on /science) is now migrated to « Auren ». /science therefore
+    renders ZERO SPIGNOS. This closes the OPEN item deferred by Sb_UI_10.4."""
     body = _get(client, "/science")
-    assert body.count("SPIGNOS") == 1, (
-        f"expected exactly the 1 known seeded residual, got {body.count('SPIGNOS')}"
+    assert body.count("SPIGNOS") == 0, (
+        f"expected zero visible SPIGNOS on /science, got {body.count('SPIGNOS')}"
     )
-    assert "dans SPIGNOS est dérivé" in body
+    assert "dans Auren est dérivé" in body
 
 
 def test_science_diagram_svg_title_is_auren(client):
