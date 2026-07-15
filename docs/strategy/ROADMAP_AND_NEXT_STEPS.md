@@ -180,14 +180,15 @@
   = FIRST BUILD CANDIDATE, NOT OPENED. Tous les builds (`Sb_*`, `EKB_*`, `SCORING_*`,
   `PERSISTENCE_*`, `LAUNCH_*`) restent NOT AUTHORIZED.**
 - **`Sx_CUSTOM_PROGRAM_BUILD_GATE_00 — Spec Queue Closeout & Build Entry Plan` :
-  ⚪ DRAFT OPENED** 2026-07-15
-  (`docs/strategy/Sx_CUSTOM_PROGRAM_BUILD_GATE_00_SPEC_QUEUE_CLOSEOUT_AND_BUILD_ENTRY_PLAN.md`).
-  Porte de build : ordre recommandé (`LAUNCH_01` wipe-guard d'abord — build de sécurité —
-  puis persistence ∥ EKB ∥ scoring, wizard, launch), pré-périmètre LAUNCH_01 cadré (5 tests
-  obligatoires), branching plan (`sb/custom-program-launch-01-seed-wipe-guard` depuis
-  canonique propre, jamais de code sur la branche spec), Go/No-Go criteria (canonique clean,
-  aucun agent sur `seed.py`, CI 3/3). **BUILD STILL FORBIDDEN — prochaine commande possible,
-  séparée : `GO BUILD Sb_CUSTOM_PROGRAM_LAUNCH_01`.**
+  ✅ HUMAN REVIEW ACCEPTED / BUILD DECISION PENDING / LAUNCH_01 NOT OPENED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_BUILD_GATE_00_HUMAN_REVIEW_REPORT.md`, gate `8df0af6`).
+  Gouvernance de build actée : ordre contraignant (`LAUNCH_01` wipe-guard d'abord — build de
+  sécurité — puis persistence ∥ EKB ∥ scoring, wizard, launch), pré-périmètre LAUNCH_01
+  cadré (5 tests obligatoires, aucun schema change sauf STOP explicite), branching plan
+  (`sb/custom-program-launch-01-seed-wipe-guard` depuis canonique propre, jamais de code sur
+  la branche spec), Go/No-Go criteria préflight (canonique clean, aucun agent sur `seed.py`,
+  CI 3/3). **Prochaine commande possible, séparée : `GO BUILD Sb_CUSTOM_PROGRAM_LAUNCH_01`
+  (opérateur uniquement) ; tout le reste reste NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
   tant que les specs filles ne sont pas acceptées.
 
