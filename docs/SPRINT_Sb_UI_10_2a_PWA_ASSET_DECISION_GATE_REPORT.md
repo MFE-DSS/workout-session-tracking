@@ -1,6 +1,11 @@
 # Sprint Sb_UI_10.2a — PWA Asset Decision Gate — REPORT
 
-**Statut** : 🔴 **BLOCKED — ASSET SOURCE REQUIRED**
+> **MISE À JOUR 2026-07-15 — ASSET GATE: GO — HUMAN SOURCE APPROVED.** Décision opérateur : le
+> pictogramme d'haltère existant (`favicon.svg`, path canonique) devient le symbole Auren,
+> recoloré `#f25f3a` → `#C8A24B` sur fond graphite `#0f1115`. Le gate est **débloqué** ; build
+> réalisé en `Sb_UI_10.2` (voir `SPRINT_Sb_UI_10_2_PWA_MANIFEST_APP_ICONS_AUREN_REPORT.md`).
+
+**Statut** : 🔴 **BLOCKED — ASSET SOURCE REQUIRED** *(historique — levé par la mise à jour ci-dessus)*
 **Type** : DECISION GATE / AUDIT ONLY — docs-only (aucun code/asset/manifest touché)
 **Date** : 2026-07-15
 **Worktree** : `work/auren-pwa-asset-gate` (isolé)

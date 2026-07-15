@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Workout Session Tracking",
-  "short_name": "Workout",
+  "name": "Auren",
+  "short_name": "Auren",
   "lang": "fr",
   "dir": "ltr",
   "start_url": "/",
@@ -12,10 +12,22 @@
   "theme_color": "#0f1115",
   "icons": [
     {
-      "src": "/static/icons/favicon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "src": "/static/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

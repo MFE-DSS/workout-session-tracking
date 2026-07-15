@@ -105,10 +105,13 @@ def test_brand_route_unchanged():
 # ───────── non-goals: manifest / static / no Orion ─────────
 
 
-def test_manifest_not_modified_by_this_sprint():
-    """Manifest stays as-is (Sb_UI_10.2 handles it) — still generic name."""
+def test_manifest_migrated_to_auren_by_10_2():
+    """Sb_UI_10.1 left the manifest generic (« Workout Session Tracking »);
+    Sb_UI_10.2 migrated it to « Auren ». This test now asserts the migrated
+    state (manifest coverage lives in tests/test_auren_pwa_assets.py)."""
     src = MANIFEST.read_text(encoding="utf-8")
-    assert '"name": "Workout Session Tracking"' in src  # unchanged here
+    assert '"name": "Auren"' in src
+    assert "Workout Session Tracking" not in src
 
 
 def test_no_orion_string_introduced():
@@ -125,9 +128,14 @@ def test_no_new_asset_referenced():
     assert "icons/favicon.svg" in src
 
 
-def test_no_new_static_file_created():
-    """This sprint must not create any static file."""
-    # base.html only; a rough guard: no *.svg/png added under icons beyond favicon
+def test_icon_pack_present_after_10_2():
+    """Sb_UI_10.1 created no static file; Sb_UI_10.2 shipped the approved Auren
+    PNG icon pack + master SVG. Guard that the expected set is present (exact
+    dimensions/palette are covered in tests/test_auren_pwa_assets.py)."""
     icons = list((STATIC_DIR / "icons").glob("*"))
     names = {p.name for p in icons}
-    assert names == {"favicon.svg"}, f"unexpected icons: {names}"
+    assert names == {
+        "favicon.svg", "auren-mark.svg",
+        "icon-192.png", "icon-512.png", "icon-maskable-512.png",
+        "apple-touch-icon.png",
+    }, f"unexpected icons set: {names}"

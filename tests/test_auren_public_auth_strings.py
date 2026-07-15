@@ -155,17 +155,21 @@ def test_error_and_reset_blocks_preserved():
 # ───────── non-goals: manifest / icons / assets untouched ─────────
 
 
-def test_manifest_not_modified_by_this_sprint():
-    """Manifest stays generic — Sb_UI_10.2 (assets gate) owns it."""
+def test_manifest_migrated_to_auren_by_10_2():
+    """Sb_UI_10.2 (assets sprint) migrated the manifest product name to Auren.
+    Full manifest coverage lives in tests/test_auren_pwa_assets.py."""
     src = MANIFEST.read_text(encoding="utf-8")
-    assert '"name": "Workout Session Tracking"' in src
+    assert '"name": "Auren"' in src
+    assert "Workout Session Tracking" not in src
 
 
-def test_no_new_icon_or_asset_added():
-    names = {p.name for p in STATIC_ICONS.glob("*")}
-    assert names == {"favicon.svg"}, f"unexpected icons: {names}"
+def test_auth_favicon_reference_preserved():
+    """Sb_UI_10.3 shipped no new asset; Sb_UI_10.2 later added the approved
+    Auren PNG icon pack + apple-touch-icon. This test now only guards that the
+    auth heads keep referencing the favicon.svg (icon pack coverage lives in
+    tests/test_auren_pwa_assets.py)."""
     for f in AUTH_TEMPLATES:
         src = f.read_text(encoding="utf-8")
-        assert "apple-touch-icon" not in src
         assert "icons/favicon.svg" in src  # same single favicon reference
+        assert "apple-touch-icon" in src  # added by Sb_UI_10.2
         assert "<script" not in src  # still SSR / no-JS

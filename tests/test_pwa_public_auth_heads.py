@@ -119,7 +119,16 @@ def test_no_js_or_service_worker_in_auth_templates():
         assert "<script" not in src, f"unexpected <script> in {f.name}"
         assert "serviceworker" not in src.lower()
         assert "service-worker" not in src.lower()
-        assert "apple-touch-icon" not in src  # no PNG asset → not added
+
+
+def test_auth_templates_have_apple_touch_icon():
+    """Sb_UI_10.2 — the approved Auren PNG icon pack now exists, so the
+    standalone auth heads reference the apple-touch-icon (180x180). Re-orients
+    the earlier « no PNG asset → not added » invariant of Sx_UI_08.2."""
+    for f in (WELCOME, LOGIN, REGISTER):
+        src = f.read_text(encoding="utf-8")
+        assert "apple-touch-icon" in src, f"missing apple-touch-icon in {f.name}"
+        assert "apple-touch-icon.png" in src
 
 
 def test_auth_templates_reference_shared_manifest():
