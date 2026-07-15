@@ -144,14 +144,17 @@
   tout seed, OQ-EKB-A→I = questions des builds/specs suivantes.
   **Next : `Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` (NEXT SPEC CANDIDATE,
   sur GO explicite).** `Sb_CUSTOM_PROGRAM_EKB_01→04` NOT AUTHORIZED.
-- **`Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` : ⚪ SPEC DRAFT OPENED** 2026-07-15
-  (`docs/strategy/Sx_CUSTOM_PROGRAM_03_PROGRAM_QUALITY_SCORING_SPEC.md`). Moteur pur
-  déterministe versionné (pattern Sx_30) → `QualityReview` (A/B/C + 8 sous-scores +
-  assumptions) ; grade hybride plafonné (jamais opaque) ; microcopy non-médicale sans
+- **`Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` : ✅ HUMAN REVIEW ACCEPTED /
+  SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_03_PROGRAM_QUALITY_SCORING_HUMAN_REVIEW_REPORT.md`,
+  spec `e082b17`). Moteur pur/déterministe/versionné acté (pattern Sx_30) → `QualityReview`
+  (A/B/C + 8 sous-scores explicables + assumptions/missing_data) ; grade hybride plafonné
+  jamais opaque, sous-scores visibles avant la lettre ; microcopy non-médicale sans
   « tu dois » ; C publiable avec avertissement (défaut) ; persistance = à la volée + trace
-  versionnée figée à la publication ; historique réel = V2 strict. 8 OQ (OQ-SCORE-A→H) ;
-  build queue `Sb_CUSTOM_PROGRAM_SCORING_01→04` non ouverte.
-  **Next decision : human review de la spec 03.**
+  versionnée figée à la publication ; historique réel = V2 strict. OQ-SCORE-A→H = questions
+  des specs/builds suivants. `Sb_CUSTOM_PROGRAM_SCORING_01→04` NOT AUTHORIZED.
+  **Next : `Sx_CUSTOM_PROGRAM_04 — User Program Persistence Spec` (NEXT SPEC CANDIDATE,
+  sur GO explicite).**
 - **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
   tant que les specs filles ne sont pas acceptées.
 
