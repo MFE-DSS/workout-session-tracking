@@ -7,9 +7,11 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    {# Sx_UI_08.1 — titre de l'app sur l'écran d'accueil iOS. Cohérent avec le
-       <title> existant (« · SPIGNOS ») ; aucun rebrand, aucun asset ajouté. #}
-    <meta name="apple-mobile-web-app-title" content="SPIGNOS" />
+    {# Sx_UI_08.1 + Sb_UI_10.1 — titre de l'app sur l'écran d'accueil iOS.
+       Nom PRODUIT VISIBLE = « Auren » (migration visible SPIGNOS → Auren,
+       Sx_UI_10). SPIGNOS reste le nom interne (repo/code) ; aucun renommage
+       code/route/asset ici. Cohérent avec le <title> ci-dessous. #}
+    <meta name="apple-mobile-web-app-title" content="Auren" />
     {# Sb_UI_02b.3 — Auren Terminal : typographie tout-mono SYSTÈME, zéro
        webfont. Le lien Google Fonts (Inter + JetBrains Mono) est retiré ;
        la coque utilise le stack mono système (cf. app.css --font-mono). #}
@@ -17,7 +19,7 @@
     <link rel="icon" href="{{ url_for('static', path='icons/favicon.svg') }}" type="image/svg+xml" />
     <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}" />
     {% block extra_head %}{% endblock %}
-    <title>{{ page_title }} · SPIGNOS</title>
+    <title>{{ page_title }} · Auren</title>
   </head>
   <body>
     {# Sx_NAV_01 — état actif de navigation dérivé de request.url.path (SSR,
@@ -35,7 +37,7 @@
     {% set is_profile = _p.startswith('/profile') %}
     {% set is_coach = _p.startswith('/coach') %}
     <header class="topbar">
-      <a class="topbar__brand" href="{{ url_for('home') }}">SPIGNOS</a>
+      <a class="topbar__brand" href="{{ url_for('home') }}">Auren</a>
       <details class="topbar__menu">
         <summary class="topbar__toggle" aria-label="Menu">☰</summary>
         <nav class="topbar__nav" aria-label="Navigation">
@@ -67,7 +69,7 @@
       {% block content %}{% endblock %}
     </main>
     <footer class="foot">
-      <small>SPIGNOS</small>
+      <small>Auren</small>
       <a href="{{ url_for('contact_page') }}" class="foot__contact">Contact</a>
     </footer>
   </body>
