@@ -126,20 +126,21 @@
 > - Hard contracts Sx_26/Sx_27 inchangés
 > - Sx_29 doit produire sa spec d'abord (SPEC ONLY), comme tout cycle Sx_
 
-## 1bis. Track parallèle — Custom Program Builder (`Sx_CUSTOM_PROGRAM`, SPEC DRAFT)
+## 1bis. Track parallèle — Custom Program Builder (`Sx_CUSTOM_PROGRAM`, SPEC ACCEPTED)
 
-- **Custom Program Builder = future product track** (wizard guidé + Exercise
-  Knowledge Base + génération déterministe + scoring A/B/C explicable) —
-  spec draft : `docs/strategy/Sx_CUSTOM_PROGRAM_01_INTELLIGENT_PROGRAM_BUILDER_SPEC.md`
-  (branche `spec/sx-custom-program-01-intelligent-builder`, docs-only).
-- Vit **en parallèle du cycle UI/Auren** actif : branche dédiée, aucun fichier
-  partagé, merge seulement après stabilisation des builds UI en cours.
-- **Pas de build avant spec acceptance** : build/migrations/app code/seed
-  non autorisés ; prochaine décision = human review de `Sx_CUSTOM_PROGRAM_01`.
-- Dépendances fortes identifiées : catalogue (`WorkoutTemplate` + seed wipe),
-  `session_builder`, substitution, overload, history/stats — d'où la
-  recommandation Option C (drafts `UserProgram*` isolés, publication en
-  template custom protégé) et le wipe-guard seed comme pré-requis absolu.
+- **`Sx_CUSTOM_PROGRAM_01` — ✅ HUMAN REVIEW ACCEPTED / SPEC ONLY / BUILD NOT AUTHORIZED**
+  2026-07-15 (`docs/SPRINT_Sx_CUSTOM_PROGRAM_01_INTELLIGENT_PROGRAM_BUILDER_HUMAN_REVIEW_REPORT.md` ;
+  spec : `docs/strategy/Sx_CUSTOM_PROGRAM_01_INTELLIGENT_PROGRAM_BUILDER_SPEC.md`,
+  branche `spec/sx-custom-program-01-intelligent-builder` rebasée sans conflit).
+- **Architecture cible actée : Option C hybride** (drafts `UserProgram*` isolés → publication
+  en `WorkoutTemplate` custom protégé) + 4 contrats durs (wipe-guard seed pré-matérialisation,
+  slugs namespacés, versions publiées immuables, reco/librairie filtrées).
+- Vit **en parallèle du cycle UI/Auren** actif : **worktree isolé**
+  (`workout-session-tracking-custom`), aucun fichier partagé, zéro concurrence `Sb_UI_10.4b`,
+  rebase obligatoire avant toute PR/build.
+- **Next : `Sx_CUSTOM_PROGRAM_02 — Exercise Knowledge Base Spec` (NEXT SPEC CANDIDATE,
+  SPEC ONLY, sur GO explicite).** **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration,
+  aucun seed, aucun code `app/` tant que les specs filles ne sont pas acceptées.
 
 ## 2. Protocole spec-driven — règle d'or
 
