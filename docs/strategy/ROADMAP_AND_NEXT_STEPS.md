@@ -144,6 +144,14 @@
   tout seed, OQ-EKB-A→I = questions des builds/specs suivantes.
   **Next : `Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` (NEXT SPEC CANDIDATE,
   sur GO explicite).** `Sb_CUSTOM_PROGRAM_EKB_01→04` NOT AUTHORIZED.
+- **`Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` : ⚪ SPEC DRAFT OPENED** 2026-07-15
+  (`docs/strategy/Sx_CUSTOM_PROGRAM_03_PROGRAM_QUALITY_SCORING_SPEC.md`). Moteur pur
+  déterministe versionné (pattern Sx_30) → `QualityReview` (A/B/C + 8 sous-scores +
+  assumptions) ; grade hybride plafonné (jamais opaque) ; microcopy non-médicale sans
+  « tu dois » ; C publiable avec avertissement (défaut) ; persistance = à la volée + trace
+  versionnée figée à la publication ; historique réel = V2 strict. 8 OQ (OQ-SCORE-A→H) ;
+  build queue `Sb_CUSTOM_PROGRAM_SCORING_01→04` non ouverte.
+  **Next decision : human review de la spec 03.**
 - **`Sb_CUSTOM_PROGRAM_*` NOT AUTHORIZED** ; aucune migration, aucun seed, aucun code `app/`
   tant que les specs filles ne sont pas acceptées.
 
