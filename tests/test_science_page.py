@@ -50,10 +50,12 @@ def test_science_page_has_cardio_section(client):
 
 
 def test_science_page_has_materialisation_section(client):
-    """The 'Comment SPIGNOS materialise' section must appear."""
+    """Sb_UI_10.4 — the materialisation section must appear. Visible product
+    name migrated SPIGNOS → Auren (the section header is now
+    'Comment Auren materialise'); the section itself is unchanged."""
     r = client.get("/science")
     body = r.text
-    assert "Comment SPIGNOS materialise" in body
+    assert "Comment Auren materialise" in body
     assert "Ce qui reste prive" in body
 
 

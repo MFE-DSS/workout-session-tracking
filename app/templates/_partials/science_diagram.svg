@@ -1,7 +1,7 @@
 <svg viewBox="0 0 800 540" xmlns="http://www.w3.org/2000/svg"
      role="img" aria-labelledby="diagram-title diagram-desc"
      style="width:100%;height:auto;max-width:800px;display:block;margin:0 auto;">
-  <title id="diagram-title">Architecture des modules SPIGNOS</title>
+  <title id="diagram-title">Architecture des modules Auren</title>
   <desc id="diagram-desc">
     Programmes alimente Seance. Seance alimente Historique. Historique alimente
     Synthese, Physique et Classement. Etat du jour et Mesures alimentent
