@@ -99,6 +99,25 @@ visible non dominant, menu secondaire accessible.
 - Focus/heads/auren (`session_focus_*` + `pwa_public_auth_heads` + `auren_pwa_assets` + `auren_visible`) :
   **133 passed**.
 - Broad sweep ciblé (surfaces base.html/CSS, `-k nav/shell/mobile/topbar/base/foot/home/pwa/auth/layout/a11y`) : **586 passed, 0 failed** (191s).
+
+### 13bis. Incident CI (1er run rouge) + correctif
+Le 1er run CI (`29481248620`) est **rouge** sur `pytest + QA scripts` (lint success, SonarCloud skipped ;
+step `Run pytest with coverage=failure` — vrai échec de test, **pas** une annulation infra). **2 tests
+asservis** hors de mon 1er `-k`, cassés par des **conséquences directes et légitimes** du build (non des
+bugs), tous deux **réorientés vers la nouvelle vérité** (jamais affaiblis) :
+
+1. `tests/test_session_focus_sticky_cta.py::test_css_contains_sticky_cta_block` — regex exigeait
+   `position: sticky … bottom: 0` **littéral**. Mon offset Focus Mode a changé `bottom: 0` →
+   `bottom: var(--app-bottom-nav-h, 0px)`. Regex élargi pour accepter `bottom: 0` **ou** le token
+   (= 0 en desktop). Intention (CTA collé en bas de la carte active) **préservée**.
+2. `tests/test_session_management.py::test_progress_shows_no_timeline_when_no_data` (+ son pendant
+   `…_when_data_exists`) — assertion `"<svg" (not) in body` sur `/progress`. Trop large : la bottom nav
+   ajoute des SVG d'icônes légitimes. Réorienté vers le **conteneur réel du graphique** (`timeline-chart`),
+   l'intention véritable du test (présence/absence de la timeline), pas « zéro SVG dans le shell ».
+
+Sweep de sécurité élargi post-fix (`-k session_management/session_focus/sticky/progress/timeline/svg/
+chart/shell/nav/mobile/cockpit`) : **440 passed, 0 failed** (148s). Correctif = **2 fichiers de tests
+uniquement** (aucun changement de code applicatif). Commit `_(voir clôture)_`.
 - ruff clean ; budget **543 ≤ 548** ; spec_protocol PASS ; check_scope = **ISOLATED** (5 fichiers).
 
 ## 14. Scope

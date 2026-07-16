@@ -204,8 +204,10 @@ def test_admin_page_shows_excluded_badge(client):
 
 def test_progress_shows_no_timeline_when_no_data(client):
     body = client.get("/progress").text
-    # No SVG should be rendered
-    assert "<svg" not in body
+    # Sb_UI_03.1 — the shell now ships decorative bottom-nav SVG icons, so a
+    # bare "<svg" check no longer isolates the timeline chart. Assert on the
+    # timeline chart container specifically (the real intent of this test).
+    assert "timeline-chart" not in body
 
 
 def test_progress_shows_quality_timeline_when_data_exists(client):
@@ -213,7 +215,9 @@ def test_progress_shows_quality_timeline_when_data_exists(client):
     _fill_e2_and_complete(client, sid)
     body = client.get("/progress").text
     assert "Qualité de séance" in body
-    assert "<svg" in body
+    # Sb_UI_03.1 — target the timeline chart container, not any "<svg"
+    # (bottom-nav icons now add unrelated SVGs to the shell).
+    assert "timeline-chart" in body
 
 
 def test_progress_shows_bodyweight_timeline_when_bodyweight_present(client):

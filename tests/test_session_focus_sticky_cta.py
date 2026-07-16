@@ -147,11 +147,14 @@ def test_form_action_preserved(client):
 
 def test_css_contains_sticky_cta_block():
     css = _css()
-    # The Sx_29.3 CTA rule must include position:sticky with bottom:0
-    # scoped to the active card.
+    # The Sx_29.3 CTA rule must include position:sticky scoped to the active
+    # card. Sb_UI_03.1 lifts it above the mobile bottom nav, so `bottom` is now
+    # either `0` (legacy) or the shared offset token `var(--app-bottom-nav-h…)`
+    # (which resolves to 0 on desktop) — both keep the CTA pinned to the bottom.
     pattern = re.compile(
         r"\.session-focus__card--active\s+\.session-focus__sticky-cta\s*\{"
-        r"[^}]*position:\s*sticky[^}]*bottom:\s*0",
+        r"[^}]*position:\s*sticky"
+        r"[^}]*bottom:\s*(?:0|var\(--app-bottom-nav-h)",
         re.DOTALL,
     )
     assert pattern.search(css), (
