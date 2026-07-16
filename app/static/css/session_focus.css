@@ -1749,3 +1749,17 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
     letter-spacing: -0.01em;
   }
 }
+
+/* ---- Sb_UI_03.2 — Focus Mode resserré sur desktop (rail visible) ---- */
+/* À partir de 1024px, le rail latéral (Sb_UI_03.2) occupe la gauche ; le
+   contenu Focus Mode se resserre (~720px) et se centre dans la zone
+   principale pour préserver l'ergonomie mobile (spec Sx_UI_03 §"Focus mode
+   session en desktop"). Le rail est horizontalement à côté — il n'entre pas
+   dans le calcul vertical du sticky CTA (--app-bottom-nav-h reste 0 desktop).
+   Aucun partial métier / contrat POST / ordre F1-F2-F3 touché. */
+@media (min-width: 1024px) {
+  .session-focus {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+}

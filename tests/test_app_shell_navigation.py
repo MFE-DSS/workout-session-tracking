@@ -200,11 +200,14 @@ def test_css_safe_area_inset():
 
 def test_css_hidden_on_desktop():
     css = APP_CSS.read_text(encoding="utf-8")
-    # the ≥769px media query hides the bottom nav
+    # Sb_UI_03.2 — the bottom nav is now hidden at ≥1024px (was 769px in .1),
+    # aligned on the Sx_UI_03 spec: the desktop rail takes over at 1024px and
+    # the bottom nav stays on mobile + tablet portrait (<1024px). Re-oriented
+    # toward the new truth, not weakened.
     assert re.search(
-        r"@media \(min-width: 769px\)\s*\{[^}]*\.app-bottom-nav\s*\{\s*display:\s*none",
+        r"@media \(min-width: 1024px\)\s*\{[^@]*\.app-bottom-nav\s*\{\s*display:\s*none",
         css, re.DOTALL,
-    ) or (".app-bottom-nav { display: none; }" in css)
+    ), "bottom nav must be hidden at the ≥1024px desktop breakpoint"
 
 
 def test_css_no_new_hex_color():

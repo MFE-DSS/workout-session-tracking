@@ -3168,10 +3168,136 @@ summary:focus-visible,
   padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
 }
 
-/* Desktop : la bottom nav disparaît, la topbar reste le shell (fallback).
-   Le rail latéral dédié arrive en Sb_UI_03.2. */
-@media (min-width: 769px) {
+/* Desktop rail (≥1024px, Sb_UI_03.2) : la bottom nav disparaît au profit du
+   rail latéral. En dessous de 1024px (mobile + tablette portrait) la bottom
+   nav reste la navigation principale (Sb_UI_03.1). Breakpoint réorienté de
+   769px → 1024px pour aligner sur la spec Sx_UI_03 (rail dès 1024px). */
+@media (min-width: 1024px) {
   :root { --app-bottom-nav-h: 0px; }
   .app-bottom-nav { display: none; }
   .foot { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
+}
+
+/* ---- Sb_UI_03.2 — Desktop Rail / Secondary Shell (Sx_UI_03) ---- */
+/* Rail latéral gauche persistant, visible ≥1024px uniquement. En dessous,
+   la bottom nav (Sb_UI_03.1) reste la navigation. Tokens existants only
+   (accent var(--accent) ambre, 0 nouvelle couleur). */
+:root {
+  --app-rail-w: 232px;
+  --app-shell-content-max: 960px;
+}
+
+/* Masqué par défaut (mobile + tablette portrait < 1024px). */
+.app-rail { display: none; }
+
+@media (min-width: 1024px) {
+  .app-rail {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: var(--app-rail-w);
+    padding: var(--space-lg) var(--space-md) calc(env(safe-area-inset-bottom, 0px) + var(--space-md));
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+    z-index: 50;
+  }
+  .app-rail__brand {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--fg);
+    text-decoration: none;
+    padding: 0 var(--space-sm) var(--space-lg);
+  }
+  .app-rail__primary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+  }
+  .app-rail__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    min-height: 44px;
+    padding: var(--space-sm);
+    border-radius: var(--radius);
+    border-left: 2px solid transparent;
+    color: var(--fg-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 14px;
+  }
+  .app-rail__icon { width: 22px; height: 22px; flex-shrink: 0; }
+  .app-rail__item:hover { color: var(--fg); background: var(--surface-2); }
+  .app-rail__item:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  /* État actif : accent ambre + bordure gauche + poids (pas couleur seule). */
+  .app-rail__item.is-active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--surface-2);
+    font-weight: 600;
+  }
+  .app-rail__spacer { flex: 1 1 auto; }
+  /* Secondaire : visuellement plus faible que les 4 destinations. */
+  .app-rail__secondary { font-family: var(--font-mono); font-size: 13px; }
+  .app-rail__secondary-toggle {
+    cursor: pointer;
+    list-style: none;
+    display: list-item;
+    padding: var(--space-sm);
+    color: var(--fg-dim);
+    min-height: 44px;
+  }
+  .app-rail__secondary-toggle::-webkit-details-marker { display: none; }
+  .app-rail__secondary-toggle::marker { content: ""; }
+  .app-rail__secondary-nav { display: flex; flex-direction: column; }
+  .app-rail__sublink {
+    padding: var(--space-sm);
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    color: var(--fg-dim);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .app-rail__sublink:hover { color: var(--fg-muted); }
+  .app-rail__sublink:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .app-rail__sublink.is-subactive { color: var(--fg-muted); font-weight: 600; }
+  .app-rail__footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-sm);
+  }
+  .app-rail__logout {
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-sm);
+    min-height: 44px;
+    color: var(--fg-dim);
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
+  .app-rail__logout:hover { color: var(--fg-muted); }
+  .app-rail__logout:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* Topbar masquée sur desktop (Option A) : le rail EST la navigation. */
+  .topbar { display: none; }
+
+  /* Contenu / footer / active-banner décalés à droite du rail. */
+  .container {
+    margin-left: var(--app-rail-w);
+    max-width: calc(var(--app-shell-content-max) + var(--app-rail-w));
+  }
+  .foot { margin-left: var(--app-rail-w); }
+  .active-banner { margin-left: var(--app-rail-w); }
 }
