@@ -195,15 +195,16 @@
   la branche spec), Go/No-Go criteria préflight (canonique clean, aucun agent sur `seed.py`,
   CI 3/3). **Prochaine commande possible, séparée : `GO BUILD Sb_CUSTOM_PROGRAM_LAUNCH_01`
   (opérateur uniquement) ; tout le reste reste NOT AUTHORIZED.**
-- **`Sb_CUSTOM_PROGRAM_LAUNCH_01 — Seed Wipe-Guard` : ✅ HUMAN REVIEW ACCEPTED / CI BUSINESS
-  GREEN / SONARCLOUD UPSTREAM BLOCKED / MERGE FORBIDDEN** 2026-07-16 (build `248af1c`,
-  **PR #22 draft**, `docs/SPRINT_Sb_CUSTOM_PROGRAM_LAUNCH_01_SEED_WIPE_GUARD_HUMAN_REVIEW_REPORT.md`).
-  Garde `catalog_section != 'user'` sans migration (slug-prefix invalidé au préflight) ;
-  custom + arbre survivent, système reconstruit à l'identique ; garde d'entrée du namespace.
-  CI PR `29479993187` : pytest ✅ **2190 passed** · lint ✅ · SonarCloud ❌ **panne upstream**
-  (504 ×2 avant analyse — non-actionnable, aucun skip/patch CI). **PR reste draft, MERGE
-  INTERDIT jusqu'à CI 3/3** (re-run SonarCloud au rétablissement, sur GO).
-  **`PERSISTENCE_01` NOT OPENED · build queue paused until PR #22 CI 3/3.**
+- **`Sb_CUSTOM_PROGRAM_LAUNCH_01 — Seed Wipe-Guard` : ✅ MERGED + CANONICAL CI GREEN**
+  2026-07-16 (build `248af1c` + review `56f77a2`, **PR #22 MERGED**, merge commit
+  **`fd875fa`** ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_LAUNCH_01_SEED_WIPE_GUARD_HUMAN_REVIEW_REPORT.md`
+  + appendice post-review). Garde `catalog_section != 'user'` sans migration ; custom +
+  arbre survivent, système reconstruit à l'identique ; garde d'entrée du namespace.
+  **CI canonique `29494384156` : 3/3 GREEN** — pytest ✅ **2223 passed** · lint ✅ ·
+  SonarCloud ✅ (panne upstream 504 **résolue**, re-runs sans commit ; CI PR `29488023234`
+  aussi 3/3). **Le trunk est protégé — premier build du track livré et vérifié.**
+  **`PERSISTENCE_01` = FIRST NEXT BUILD CANDIDATE, NOT OPENED** (première migration du
+  track, préflight tier `migration` requis, sur GO explicite).
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.

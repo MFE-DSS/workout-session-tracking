@@ -116,3 +116,25 @@ namespace custom est réservé et gardé en entrée, l'arbre custom complet surv
 (504 ×2, avant analyse) : la PR #22 reste draft et **le merge reste interdit** jusqu'au
 3/3. La build queue reste en pause ; `PERSISTENCE_01` non ouvert. Aucun code touché par
 cette revue.
+
+---
+
+## Appendice — Post-review : résolution CI et merge final (2026-07-16, closeout)
+
+*Le corps du rapport ci-dessus reflète l'état exact au moment de la review (SonarCloud
+bloqué). Cet appendice acte la suite, sans réécrire l'historique.*
+
+- **SonarCloud rétabli** : la panne upstream (HTTP 504 sur `api.sonarcloud.io/analysis/jres`,
+  3 échecs identiques au total) s'est résorbée côté service ; re-runs des jobs échoués
+  **sans aucun commit ni patch CI**.
+- **CI PR 3/3 GREEN** : run `29488023234` (attempt 2) — pytest ✅ **2223 passed** (merge
+  testé contre la canonique à jour) · lint ✅ · SonarCloud ✅.
+- **MERGE exécuté sur GO opérateur** : PR #22 marquée ready puis mergée — merge commit
+  **`fd875fa`** (méthode merge commit, préservant les SHA `248af1c`/`56f77a2` référencés
+  dans la gouvernance).
+- **CI canonique 3/3 GREEN** : run `29494384156` (attempt 2, après une annulation
+  manuelle intermédiaire) — pytest ✅ **2223 passed, 2 warnings (27:09)** · lint ✅ ·
+  SonarCloud ✅.
+- **État final** : le trunk est protégé (aucun reseed ne peut détruire un template custom) ;
+  `PERSISTENCE_01` = FIRST NEXT BUILD CANDIDATE, NOT OPENED ; tous les autres builds
+  NOT AUTHORIZED.
