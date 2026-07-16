@@ -193,14 +193,15 @@
   la branche spec), Go/No-Go criteria préflight (canonique clean, aucun agent sur `seed.py`,
   CI 3/3). **Prochaine commande possible, séparée : `GO BUILD Sb_CUSTOM_PROGRAM_LAUNCH_01`
   (opérateur uniquement) ; tout le reste reste NOT AUTHORIZED.**
-- **`Sb_CUSTOM_PROGRAM_LAUNCH_01 — Seed Wipe-Guard` : 🟢 BUILD READY FOR REVIEW (non
-  commité)** 2026-07-15 (`docs/SPRINT_Sb_CUSTOM_PROGRAM_LAUNCH_01_SEED_WIPE_GUARD_REPORT.md`,
-  branche `sb/custom-program-launch-01-seed-wipe-guard` rebasée sur `9a405a7`). Préflight GO
-  PATCH validé (slug-prefix `up%` invalidé — collision `upper-*` — → garde
-  `catalog_section != 'user'`, **zéro migration**). Patch `seed.py` seul (+40/-3) : garde
-  d'entrée + 3 DELETE filtrés ; custom + arbre survivent, système reconstruit à l'identique.
-  10 tests dédiés 10/10 + 42 adjacents ; check_scope SHARED_CODE → full sweep + CI 3/3.
-  **Aucune migration, aucun `UserProgram*`.** Suite : GO COMMIT → GO PUSH + CI → GO VALIDATE.
+- **`Sb_CUSTOM_PROGRAM_LAUNCH_01 — Seed Wipe-Guard` : ✅ HUMAN REVIEW ACCEPTED / CI BUSINESS
+  GREEN / SONARCLOUD UPSTREAM BLOCKED / MERGE FORBIDDEN** 2026-07-16 (build `248af1c`,
+  **PR #22 draft**, `docs/SPRINT_Sb_CUSTOM_PROGRAM_LAUNCH_01_SEED_WIPE_GUARD_HUMAN_REVIEW_REPORT.md`).
+  Garde `catalog_section != 'user'` sans migration (slug-prefix invalidé au préflight) ;
+  custom + arbre survivent, système reconstruit à l'identique ; garde d'entrée du namespace.
+  CI PR `29479993187` : pytest ✅ **2190 passed** · lint ✅ · SonarCloud ❌ **panne upstream**
+  (504 ×2 avant analyse — non-actionnable, aucun skip/patch CI). **PR reste draft, MERGE
+  INTERDIT jusqu'à CI 3/3** (re-run SonarCloud au rétablissement, sur GO).
+  **`PERSISTENCE_01` NOT OPENED · build queue paused until PR #22 CI 3/3.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
