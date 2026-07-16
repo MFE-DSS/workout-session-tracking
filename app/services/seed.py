@@ -7,6 +7,11 @@ version changes. Safe to call on every boot.
 Rebuilds are safe for history: `session_exercises` snapshot the
 `exercise_code_snapshot` / `exercise_name_snapshot` fields at log
 time, and the FKs to the catalog are `ON DELETE SET NULL`.
+
+Wipe-guard (Sb_CUSTOM_PROGRAM_LAUNCH_01, Sx_CUSTOM_PROGRAM_05 §4):
+`catalog_section == "user"` is the reserved namespace of user-created
+custom templates. The reseed only ever deletes SYSTEM rows — a version
+bump must never destroy a custom template or its children.
 """
 from __future__ import annotations
 
@@ -27,6 +32,11 @@ from app.models.catalog import (
 
 REFERENCE_PATH = BASE_DIR / "data" / "reference_split.json"
 METHOD_RULES_PATH = BASE_DIR / "data" / "method_rules.json"
+
+# Reserved catalog_section of user-created custom templates. Rows in this
+# namespace are NEVER touched by the system reseed, and the system seed
+# payload is NEVER allowed to claim it.
+CUSTOM_CATALOG_SECTION = "user"
 
 
 def load_reference_payload(path: Path = REFERENCE_PATH) -> dict:
@@ -55,9 +65,36 @@ def seed_reference_split(db: Session, payload: dict | None = None) -> bool:
     if existing is not None:
         return False
 
-    db.execute(delete(RepTarget))
-    db.execute(delete(TemplateExercise))
-    db.execute(delete(WorkoutTemplate))
+    # Input guard: the system payload must never claim the custom namespace.
+    if any(
+        tpl.get("catalog_section") == CUSTOM_CATALOG_SECTION
+        for tpl in payload["templates"]
+    ):
+        raise ValueError(
+            f"catalog_section '{CUSTOM_CATALOG_SECTION}' is reserved for "
+            "user-created templates and must never appear in the system seed"
+        )
+
+    # Wipe-guard: only SYSTEM rows are deleted; custom templates and their
+    # children survive every reseed. Children are resolved by join before
+    # their parents are removed.
+    system_template_ids = select(WorkoutTemplate.id).where(
+        WorkoutTemplate.catalog_section != CUSTOM_CATALOG_SECTION
+    )
+    system_exercise_ids = select(TemplateExercise.id).where(
+        TemplateExercise.template_id.in_(system_template_ids)
+    )
+    db.execute(
+        delete(RepTarget).where(
+            RepTarget.template_exercise_id.in_(system_exercise_ids)
+        )
+    )
+    db.execute(
+        delete(TemplateExercise).where(TemplateExercise.id.in_(system_exercise_ids))
+    )
+    db.execute(
+        delete(WorkoutTemplate).where(WorkoutTemplate.id.in_(system_template_ids))
+    )
 
     for tpl in payload["templates"]:
         template = WorkoutTemplate(

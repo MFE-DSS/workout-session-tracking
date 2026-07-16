@@ -128,6 +128,86 @@
 > - Hard contracts Sx_26/Sx_27 inchangés
 > - Sx_29 doit produire sa spec d'abord (SPEC ONLY), comme tout cycle Sx_
 
+## 1bis. Track parallèle — Custom Program Builder (`Sx_CUSTOM_PROGRAM`, SPEC ACCEPTED)
+
+- **`Sx_CUSTOM_PROGRAM_01` — ✅ HUMAN REVIEW ACCEPTED / SPEC ONLY / BUILD NOT AUTHORIZED**
+  2026-07-15 (`docs/SPRINT_Sx_CUSTOM_PROGRAM_01_INTELLIGENT_PROGRAM_BUILDER_HUMAN_REVIEW_REPORT.md` ;
+  spec : `docs/strategy/Sx_CUSTOM_PROGRAM_01_INTELLIGENT_PROGRAM_BUILDER_SPEC.md`,
+  branche `spec/sx-custom-program-01-intelligent-builder` rebasée sans conflit).
+- **Architecture cible actée : Option C hybride** (drafts `UserProgram*` isolés → publication
+  en `WorkoutTemplate` custom protégé) + 4 contrats durs (wipe-guard seed pré-matérialisation,
+  slugs namespacés, versions publiées immuables, reco/librairie filtrées).
+- Vit **en parallèle du cycle UI/Auren** actif : **worktree isolé**
+  (`workout-session-tracking-custom`), aucun fichier partagé, zéro concurrence `Sb_UI_10.4b`,
+  rebase obligatoire avant toute PR/build.
+- **`Sx_CUSTOM_PROGRAM_02 — Exercise Knowledge Base Spec` : ✅ HUMAN REVIEW ACCEPTED /
+  SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_02_EXERCISE_KNOWLEDGE_BASE_HUMAN_REVIEW_REPORT.md`,
+  spec `cbba7d9`). Audit chiffré accepté comme référence (53 properties vs 103 noms →
+  52 absents, gap assumé jusqu'à `EKB_02` ; socle Sx_32 prêt, `Muscle` vide), identité =
+  noms historiques invariants + `variant_group`, taxonomie V1 18 champs, **Option C
+  séquencée** (JSON canonique → seed DB optionnel gaté), QA 8 checks obligatoires avant
+  tout seed, OQ-EKB-A→I = questions des builds/specs suivantes.
+  **Next : `Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` (NEXT SPEC CANDIDATE,
+  sur GO explicite).** `Sb_CUSTOM_PROGRAM_EKB_01→04` NOT AUTHORIZED.
+- **`Sx_CUSTOM_PROGRAM_03 — Program Quality Scoring Spec` : ✅ HUMAN REVIEW ACCEPTED /
+  SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_03_PROGRAM_QUALITY_SCORING_HUMAN_REVIEW_REPORT.md`,
+  spec `e082b17`). Moteur pur/déterministe/versionné acté (pattern Sx_30) → `QualityReview`
+  (A/B/C + 8 sous-scores explicables + assumptions/missing_data) ; grade hybride plafonné
+  jamais opaque, sous-scores visibles avant la lettre ; microcopy non-médicale sans
+  « tu dois » ; C publiable avec avertissement (défaut) ; persistance = à la volée + trace
+  versionnée figée à la publication ; historique réel = V2 strict. OQ-SCORE-A→H = questions
+  des specs/builds suivants. `Sb_CUSTOM_PROGRAM_SCORING_01→04` NOT AUTHORIZED.
+  **Next : `Sx_CUSTOM_PROGRAM_04 — User Program Persistence Spec` (NEXT SPEC CANDIDATE,
+  sur GO explicite).**
+- **`Sx_CUSTOM_PROGRAM_04 — User Program Persistence Spec` : ✅ HUMAN REVIEW ACCEPTED /
+  SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_04_USER_PROGRAM_PERSISTENCE_HUMAN_REVIEW_REPORT.md`,
+  spec `263810d`). Modèle 5 tables `UserProgram*` accepté (source de vérité d'édition,
+  Option C) ; statuts + nouveau cycle obligatoire post-publication (artefact immuable) ;
+  ownership dur + soft delete ; quotas V1 (10/5/7/10) ; trace scoring figée par version ;
+  `exercise_name` = nom EKB invariant ; migrations futures additive-only une par build.
+  OQ-PERS-A→J = questions spec 05/builds. `Sb_CUSTOM_PROGRAM_PERSISTENCE_01→05`
+  NOT AUTHORIZED.
+  **Next : `Sx_CUSTOM_PROGRAM_05 — Session Instantiation Compatibility Spec` (NEXT SPEC
+  CANDIDATE, dernière spec fille — matérialisation + wipe-guard + filtres, sur GO explicite).**
+- **`Sx_CUSTOM_PROGRAM_05 — Session Instantiation Compatibility Spec` : ✅ HUMAN REVIEW
+  ACCEPTED / SPEC ONLY / BUILD NOT AUTHORIZED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_05_SESSION_INSTANTIATION_COMPATIBILITY_HUMAN_REVIEW_REPORT.md`,
+  spec `b61f4c9`). Contrats de lançabilité actés : wipe-guard seed (`LAUNCH_01` strictement
+  premier, test bump-survie), slugs `up{uid}-{base}-v{n}` immuables, matérialisation
+  1 session → 1 template, session_builder inchangé V1, codes figés par version, historique
+  étanche par slug versionné, filtres reco/librairie + tests anti-pollution, publication
+  idempotente, lancement ownership-gated. OQ-LAUNCH-A→K = décision de build.
+- **🏁 SPEC QUEUE `Sx_CUSTOM_PROGRAM` 01→05 : COMPLETE** (2026-07-15) — les 5 specs sont
+  HUMAN REVIEW ACCEPTED. **Prochaine frontière : décision opérateur séparée de build
+  (GO/override explicite, build par build). `Sb_CUSTOM_PROGRAM_LAUNCH_01 — seed wipe-guard`
+  = FIRST BUILD CANDIDATE, NOT OPENED. Tous les builds (`Sb_*`, `EKB_*`, `SCORING_*`,
+  `PERSISTENCE_*`, `LAUNCH_*`) restent NOT AUTHORIZED.**
+- **`Sx_CUSTOM_PROGRAM_BUILD_GATE_00 — Spec Queue Closeout & Build Entry Plan` :
+  ✅ HUMAN REVIEW ACCEPTED / BUILD DECISION PENDING / LAUNCH_01 NOT OPENED** 2026-07-15
+  (`docs/SPRINT_Sx_CUSTOM_PROGRAM_BUILD_GATE_00_HUMAN_REVIEW_REPORT.md`, gate `8df0af6`).
+  Gouvernance de build actée : ordre contraignant (`LAUNCH_01` wipe-guard d'abord — build de
+  sécurité — puis persistence ∥ EKB ∥ scoring, wizard, launch), pré-périmètre LAUNCH_01
+  cadré (5 tests obligatoires, aucun schema change sauf STOP explicite), branching plan
+  (`sb/custom-program-launch-01-seed-wipe-guard` depuis canonique propre, jamais de code sur
+  la branche spec), Go/No-Go criteria préflight (canonique clean, aucun agent sur `seed.py`,
+  CI 3/3). **Prochaine commande possible, séparée : `GO BUILD Sb_CUSTOM_PROGRAM_LAUNCH_01`
+  (opérateur uniquement) ; tout le reste reste NOT AUTHORIZED.**
+- **`Sb_CUSTOM_PROGRAM_LAUNCH_01 — Seed Wipe-Guard` : ✅ HUMAN REVIEW ACCEPTED / CI BUSINESS
+  GREEN / SONARCLOUD UPSTREAM BLOCKED / MERGE FORBIDDEN** 2026-07-16 (build `248af1c`,
+  **PR #22 draft**, `docs/SPRINT_Sb_CUSTOM_PROGRAM_LAUNCH_01_SEED_WIPE_GUARD_HUMAN_REVIEW_REPORT.md`).
+  Garde `catalog_section != 'user'` sans migration (slug-prefix invalidé au préflight) ;
+  custom + arbre survivent, système reconstruit à l'identique ; garde d'entrée du namespace.
+  CI PR `29479993187` : pytest ✅ **2190 passed** · lint ✅ · SonarCloud ❌ **panne upstream**
+  (504 ×2 avant analyse — non-actionnable, aucun skip/patch CI). **PR reste draft, MERGE
+  INTERDIT jusqu'à CI 3/3** (re-run SonarCloud au rétablissement, sur GO).
+  **`PERSISTENCE_01` NOT OPENED · build queue paused until PR #22 CI 3/3.**
+- **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
+  `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
+  l'ordre du gate.
+
 ## 2. Protocole spec-driven — règle d'or
 
 > **On ne développe plus de nouveau cycle produit tant que la boucle livrée n'a pas été vécue en conditions réelles.**
