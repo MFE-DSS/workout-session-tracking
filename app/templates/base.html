@@ -37,6 +37,14 @@
     {% set is_squads = _p.startswith('/squads') %}
     {% set is_profile = _p.startswith('/profile') %}
     {% set is_coach = _p.startswith('/coach') %}
+    {# Sb_UI_03.1 — mapping des 4 onglets de la bottom nav mobile (Sx_UI_03).
+       Dérivé de request.url.path (SSR, no-JS). Regroupe les surfaces
+       secondaires sous leur onglet primaire ; les routes secondaires
+       restent accessibles via le menu topbar (aucune route supprimée).
+       Un seul onglet actif ; jamais aria-current="false". #}
+    {% set is_sess = is_home or _p.startswith('/sessions') %}
+    {% set is_prog = is_progress or is_history or is_physique or is_coach %}
+    {% set is_prof = is_profile or is_squads or is_leaderboard %}
     <header class="topbar">
       <a class="topbar__brand" href="{{ url_for('home') }}">Auren</a>
       <details class="topbar__menu">
@@ -73,5 +81,31 @@
       <small>Auren</small>
       <a href="{{ url_for('contact_page') }}" class="foot__contact">Contact</a>
     </footer>
+    {# Sb_UI_03.1 — Mobile Bottom Navigation (Sx_UI_03). Shell app-like
+       persistant, 4 destinations top-level, SSR/no-JS. Liens natifs <a>
+       (aucun form/bouton/CTA/logout ici). Icônes SVG inline décoratives
+       (aria-hidden) ; label texte toujours visible. Onglet actif dérivé de
+       request.url.path (is_sess/is_prog/is_prof). Masquée ≥769px (topbar =
+       fallback desktop ; rail desktop = Sb_UI_03.2). Routes secondaires
+       (Historique/Physique/Coach/Classement/Squads/Déconnexion) préservées
+       dans le menu topbar. #}
+    <nav class="app-bottom-nav" aria-label="Navigation principale">
+      <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
+        <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12 12 4l8 8"/><path d="M6 10v9h12v-9"/></svg>
+        <span class="app-bottom-nav__label">Séance</span>
+      </a>
+      <a class="app-bottom-nav__item {% if is_programs %}is-active{% endif %}" href="{{ url_for('library') }}"{% if is_programs %} aria-current="page"{% endif %}>
+        <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 4h11a2 2 0 0 1 2 2v14l-4-2-4 2V4"/><path d="M5 4v16"/></svg>
+        <span class="app-bottom-nav__label">Programmes</span>
+      </a>
+      <a class="app-bottom-nav__item {% if is_prog %}is-active{% endif %}" href="{{ url_for('progress') }}"{% if is_prog %} aria-current="page"{% endif %}>
+        <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 19V5"/><path d="M4 15l5-5 4 3 6-7"/></svg>
+        <span class="app-bottom-nav__label">Progression</span>
+      </a>
+      <a class="app-bottom-nav__item {% if is_prof %}is-active{% endif %}" href="{{ url_for('profile_page') }}"{% if is_prof %} aria-current="page"{% endif %}>
+        <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+        <span class="app-bottom-nav__label">Profil</span>
+      </a>
+    </nav>
   </body>
 </html>

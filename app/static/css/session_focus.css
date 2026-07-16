@@ -540,7 +540,10 @@
    collant inutile. */
 .session-focus__card--active .session-focus__sticky-cta {
   position: sticky;
-  bottom: 0;
+  /* Sb_UI_03.1 — décalé au-dessus de la bottom nav mobile pour ne jamais la
+     recouvrir ni être masqué par elle. La variable vaut 0 en desktop (nav
+     masquée), donc comportement inchangé hors mobile. */
+  bottom: var(--app-bottom-nav-h, 0px);
   z-index: var(--z-sticky, 100);
   /* Background opaque pour eviter que le contenu defilant en dessous
      transparaisse. Hérite de --bg defini sur :root, fallback blanc. */

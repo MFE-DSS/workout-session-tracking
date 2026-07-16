@@ -28,8 +28,21 @@ def _active_labels(html: str) -> list[str]:
     )
 
 
+def _region(html: str, cls: str) -> str:
+    """Isolate a nav region (<header class="topbar"> or <nav class="cls">)."""
+    if cls == "topbar":
+        m = re.search(r"<header class=\"topbar\".*?</header>", html, re.DOTALL)
+    else:
+        m = re.search(rf'<nav class="{cls}".*?</nav>', html, re.DOTALL)
+    return m.group(0) if m else ""
+
+
 def _aria_current_count(html: str) -> int:
-    # count only within the topbar nav (aria-current="page")
+    # Sb_UI_03.1 — the shell now has TWO nav regions (topbar menu + mobile
+    # bottom nav), each marking its own active destination. The invariant is
+    # "exactly one active PER REGION", not one globally. This re-orientation
+    # tracks the new truth and is stricter (it checks both regions), never a
+    # weakening. Kept for backward reference; region-aware checks below.
     return html.count('aria-current="page"')
 
 
@@ -80,9 +93,15 @@ def test_leaderboard_marks_classement_active(client):
 
 
 def test_single_aria_current_per_route(client):
+    # Sb_UI_03.1 — new truth: exactly one active PER REGION (topbar menu AND
+    # mobile bottom nav), each derived from request.url.path. Previously the
+    # shell had a single region; now both must mark exactly one active tab.
     for path in ("/", "/library", "/history", "/progress", "/physique"):
         html = _get(client, path)
-        assert _aria_current_count(html) == 1, f"{path}: expected 1 aria-current=page"
+        assert _region(html, "topbar").count('aria-current="page"') == 1, \
+            f"{path}: expected 1 active in topbar"
+        assert _region(html, "app-bottom-nav").count('aria-current="page"') == 1, \
+            f"{path}: expected 1 active in bottom nav"
 
 
 def test_no_aria_current_false_in_topbar(client):
