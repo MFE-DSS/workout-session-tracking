@@ -19,6 +19,15 @@ CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
 -- index: ix_set_logs_exercise_kind_completed
 CREATE INDEX ix_set_logs_exercise_kind_completed ON set_logs (session_exercise_id, kind, completed);
 
+-- index: ix_user_programs_user_id
+CREATE INDEX ix_user_programs_user_id ON user_programs (user_id);
+
+-- index: ix_user_programs_user_status
+CREATE INDEX ix_user_programs_user_status ON user_programs (user_id, status);
+
+-- index: ix_user_programs_user_updated
+CREATE INDEX ix_user_programs_user_updated ON user_programs (user_id, updated_at);
+
 -- index: ix_workout_sessions_started_at
 CREATE INDEX ix_workout_sessions_started_at ON workout_sessions (started_at);
 
@@ -81,6 +90,9 @@ CREATE TABLE squads ( id INTEGER NOT NULL, name VARCHAR(64) NOT NULL, owner_id I
 
 -- table: template_exercises
 CREATE TABLE template_exercises ( id INTEGER NOT NULL, template_id INTEGER NOT NULL, position INTEGER NOT NULL, code VARCHAR(8) NOT NULL, name VARCHAR(255) NOT NULL, set_scheme VARCHAR(255) NOT NULL, notes TEXT, substitutes_json TEXT, machine_slug VARCHAR(64), machine_family VARCHAR(64), PRIMARY KEY (id), FOREIGN KEY(template_id) REFERENCES workout_templates (id) ON DELETE CASCADE, CONSTRAINT uq_template_exercise_position UNIQUE (template_id, position) );
+
+-- table: user_programs
+CREATE TABLE user_programs ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, title VARCHAR(128) NOT NULL, slug_base VARCHAR(64) NOT NULL, status VARCHAR(16) DEFAULT 'draft' NOT NULL, current_version INTEGER DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, archived_at DATETIME, PRIMARY KEY (id), CONSTRAINT uq_user_program_slug_base UNIQUE (user_id, slug_base), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
 
 -- table: users
 CREATE TABLE "users" ( id INTEGER NOT NULL, username VARCHAR(64) NOT NULL, password_hash VARCHAR(255) NOT NULL, is_active BOOLEAN NOT NULL, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, height_cm INTEGER, weight_kg FLOAT, resting_hr INTEGER, waist_cm FLOAT, bp_systolic INTEGER, bp_diastolic INTEGER, email VARCHAR(255), PRIMARY KEY (id), CONSTRAINT uq_users_email UNIQUE (email), UNIQUE (username) );

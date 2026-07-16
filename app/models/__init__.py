@@ -16,4 +16,5 @@ from app.models import (  # noqa: F401
     sharing,
     squad,
     user,
+    user_program,
 )

@@ -206,6 +206,15 @@
   aussi 3/3). **Le trunk est protégé — premier build du track livré et vérifié.**
   **`PERSISTENCE_01` = FIRST NEXT BUILD CANDIDATE, NOT OPENED** (première migration du
   track, préflight tier `migration` requis, sur GO explicite).
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_01 — User Program Root Persistence` : 🟢 BUILD READY
+  FOR REVIEW (non commité)** 2026-07-16
+  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_01_USER_PROGRAMS_REPORT.md`, branche
+  `sb/custom-program-persistence-01-user-programs`, base `79d11fd`). Table racine
+  `user_programs` seule (9 colonnes : ownership CASCADE testé, `slug_base` unique par
+  user, statut `draft`, version 1, soft delete), **zéro FK catalogue, zéro enfant, zéro
+  consommateur**. Migration `l3m8g4h5j76` ADD TABLE ONLY idempotente ; 4 checks QA
+  migration verts ; snapshot +12 additives ; 9 tests dédiés + 36 adjacents ; check_scope
+  MIGRATION. Suite : full sweep → GO COMMIT → GO PR DRAFT → GO VALIDATE.
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
