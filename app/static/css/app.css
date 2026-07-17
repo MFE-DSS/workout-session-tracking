@@ -3327,3 +3327,23 @@ summary:focus-visible,
 /* Topbar rétrogradée : lien secondaire courant discret (is-subactive), jamais
    un 2ᵉ aria-current (le primaire correspondant le porte). */
 .topbar__link.is-subactive { color: var(--fg); font-weight: 600; }
+
+/* ---- Sb_UI_09.1 — Reduced-Motion Global (Sx_UI_09) ---- */
+/* Respect global de prefers-reduced-motion : neutralise les transitions et
+   animations DÉCORATIVES sur toute la coque (pattern universel WCAG 2.2 AA).
+   Les transitions du repo ne portent que du décoratif (opacity/color/
+   background/border/width) — aucune information n'est perdue quand elles sont
+   ramenées à ~0. Robuste aux transitions ajoutées ultérieurement (pas
+   d'énumération fragile). Cohérent avec les blocs scopés existants
+   (session_focus.css, body_intelligence.css). Aucune nouvelle couleur, aucun
+   JS, aucun changement de contenu ou d'ordre DOM. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
