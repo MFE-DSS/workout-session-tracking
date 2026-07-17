@@ -228,7 +228,10 @@
   enfants 10). **`PERSISTENCE_03` = FIRST NEXT BUILD CANDIDATE / NOT OPENED**
   (`user_program_quality_reviews`, dernière migration de persistance, sur GO explicite).
 - **`Sb_CUSTOM_PROGRAM_PERSISTENCE_03 — User Program Quality Review Persistence` :
-  🟢 PATCH COMPLETE / REVIEW PENDING (non commité)** 2026-07-17
+  ✅ MERGED + CANONICAL CI GREEN** 2026-07-17 (PR #25, merge `007c428`, CI PR
+  `29581428102` 3/3 · preuve canonique : pytest+lint verts sur `007c428` puis run
+  descendant `29586630426` 3/3 — SonarCloud du run direct annulé par concurrency,
+  push UI `a2c753a`)
   (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_03_QUALITY_REVIEWS_REPORT.md`, branche
   `sb/custom-program-persistence-03-quality-reviews` rebasée sur `edcad4e` — closeout 02
   poussé d'abord, séquence opérateur). Table `user_program_quality_reviews` = **réceptacle
@@ -236,18 +239,19 @@
   NOT NULL, ekb_version dédiée, 5 payloads JSON opaques, computed_at server_default.
   **Zéro moteur/calcul/seuil** — le sens = `SCORING_01+`. Migration `n5o0i6j7l98` ADD TABLE
   ONLY. 10 dédiés premier coup + 41 sentinelles ; 4 QA verts premier coup ; snapshot +6 ;
-  check_scope MIGRATION. **La persistance du track est complète.** Suite : full sweep →
-  GO COMMIT → PR (CI 3/3) → merge sur GO. **`PERSISTENCE_04+` NOT AUTHORIZED.**
-- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_04 — Draft CRUD Repository Service` : 🟢 PATCH
-  COMPLETE / REVIEW PENDING (non commité)** 2026-07-17
+  check_scope MIGRATION. **La persistance du track est complète : 5 tables, head
+  `n5o0i6j7l98`, 39 sentinelles schéma.**
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_04 — Draft CRUD Repository Service` : ✅ MERGED +
+  CI GREEN** 2026-07-17 (PR #26, merge `d12acc7`, CI PR `29586681320` 3/3 — pytest
+  2339 passed)
   (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_04_DRAFT_CRUD_REPORT.md`, branche
   `sb/custom-program-persistence-04-draft-crud`, base `007c428`). **Premier service du
   track, zéro migration** : `user_program_drafts.py` — CRUD de brouillon owner-scoped
   (inexistant/non-possédé indistinguables), soft-delete-only, `validated`→`draft` à
   l'édition, `published` verrouillé, `replace_draft_tree` avec purge d'orphelins prouvée.
   12 dédiés + 67 sentinelles + broad sweep 192 verts ; check_scope ISOLATED (leaf).
-  Quotas = `PERSISTENCE_05`. Suite : GO COMMIT → PR (CI 3/3) → merge sur GO.
-  **`PERSISTENCE_05+` NOT AUTHORIZED.**
+  **51 tests dédiés track cumulés.** Quotas = `PERSISTENCE_05`.
+  **`PERSISTENCE_05` = NEXT BUILD CANDIDATE / NOT OPENED · reste NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.

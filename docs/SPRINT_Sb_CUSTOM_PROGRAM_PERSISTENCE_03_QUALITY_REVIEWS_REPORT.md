@@ -72,3 +72,19 @@ versions moteur/EKB pinnées, payloads explicables opaques) — tout le sens app
 moteur `SCORING_01+`. 10 dédiés premier coup, 41 sentinelles vertes, 4 QA verts premier coup.
 Prochaines étapes : full sweep → GO COMMIT → PR (CI 3/3) → merge sur GO. **`PERSISTENCE_04`
 (CRUD) et le reste de la queue restent NOT AUTHORIZED.**
+
+---
+
+## Appendice — Post-merge : verdicts finaux (2026-07-17, closeout)
+
+- **Commit `f784c36` → PR #25 → CI PR `29581428102` : 3/3 GREEN premier coup** (pytest 2318 passed).
+- **MERGE sur GO conditionnel : `007c428`.**
+- **Chaîne de preuve canonique** : run post-merge `29584197232` — pytest ✅ **2318 passed
+  (30:24)** + lint ✅ obtenus sur `007c428` directement ; SonarCloud **cancelled** par le
+  `cancel-in-progress` du push UI suivant (`a2c753a`, posé sur notre merge — divergence UI
+  résolue par rebase de leur côté) → **run descendant `29586630426` (canonique incluant ce
+  build) : 3/3 GREEN**, complétant la vérification.
+- **État final** : phase persistance COMPLETE — 5 tables (`user_programs`, sessions,
+  exercises, rep_targets, quality_reviews), head Alembic `n5o0i6j7l98`, 39 sentinelles
+  schéma. Full sweep local : non conclusif sur ce sprint (artefact garde-fou arbre-sale
+  pré-commit documenté en 02) — la CI a fait foi, comme prévu.
