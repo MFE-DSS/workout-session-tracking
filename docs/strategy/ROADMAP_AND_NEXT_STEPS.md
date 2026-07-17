@@ -214,16 +214,17 @@
   catalogue). Migration `l3m8g4h5j76` = head canonique. 9 dédiés + 36 adjacents +
   **full sweep 2232 passed** ; **CI PR `29514324922` 3/3 premier coup (2272 passed) ·
   CI canonique `29520029077` 3/3.** 2e build du track livré et vérifié.
-- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_02 — User Program Children Persistence` : 🟢 PATCH
-  COMPLETE / REVIEW PENDING (non commité)** 2026-07-17
-  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_02_CHILDREN_REPORT.md`, branche
-  `sb/custom-program-persistence-02-children`, base `a3a32c9`). **3 tables enfants en
-  1 migration `m4n9h5i6k87`** (lot unique validé) : sessions/exercises/rep_targets —
-  cascade d'arbre testée en chaîne, uniques par parent, `exercise_name` = nom EKB
-  invariant, **zéro FK catalogue/EKB**, relationships ORM patron catalogue. 10 dédiés
-  premier coup + 43 adjacents (wipe-guard + racine inclus) ; 4 checks QA verts premier
-  coup ; snapshot +18 ; check_scope MIGRATION. Suite : full sweep → GO COMMIT → PR
-  (CI 3/3) → merge sur GO. **`PERSISTENCE_03+` NOT AUTHORIZED.**
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_02 — User Program Children Persistence` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-17 (build `819f17c`, **PR #24 MERGED**, merge **`0056baf`** ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_02_CHILDREN_REPORT.md` + appendice
+  post-merge). 3 tables enfants (sessions/exercises/rep_targets) en 1 migration
+  `m4n9h5i6k87` = **head Alembic canonique** — cascade d'arbre testée, uniques par
+  parent, `exercise_name` = nom EKB invariant, **zéro FK catalogue/EKB**. **CI PR
+  `29571272500` 3/3 premier coup · CI canonique `29574276201` 3/3 (pytest 2308 passed,
+  lint, SonarCloud).** L'**arbre de persistance Option C complet** est livré et vérifié
+  sur le trunk ; **29 tests sentinelles track cumulés** (wipe-guard 10 + racine 9 +
+  enfants 10). **`PERSISTENCE_03` = FIRST NEXT BUILD CANDIDATE / NOT OPENED**
+  (`user_program_quality_reviews`, dernière migration de persistance, sur GO explicite).
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.

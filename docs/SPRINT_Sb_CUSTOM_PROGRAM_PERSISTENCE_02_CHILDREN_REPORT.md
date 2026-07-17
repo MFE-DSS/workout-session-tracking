@@ -82,3 +82,25 @@ L'arbre de persistance complet du programme utilisateur existe (racine + 3 enfan
 cascades et unicités prouvées, ordre relationnel garanti, zéro couplage catalogue/EKB,
 4 checks QA migration verts du premier coup. Prochaines étapes : full sweep → GO COMMIT →
 PR (CI 3/3) → merge sur GO. `PERSISTENCE_03+` et le reste de la queue restent NOT AUTHORIZED.
+
+---
+
+## Appendice — Post-merge : verdicts finaux (2026-07-17, closeout)
+
+*Le corps du rapport reflète l'état au moment du build. Cet appendice acte la suite.*
+
+- **Full sweep local** : terminé en 11:48 — **2281 passed, 1 failed** =
+  `test_no_model_migration_schema_touched`, garde-fou du sprint UI worked-area qui exige
+  zéro modif **non commitée** de models/migrations/snapshot (`git diff HEAD`) → rouge par
+  construction sur tout sweep pré-commit d'un sprint de migration ; **14/14 vert
+  post-commit** (prouvé). Verdict effectif : **sweep vert**. (Éclaire aussi le « hang »
+  supposé des sweeps précédents : à consigner comme piège d'environnement.)
+- **Commit** `819f17c` → **PR #24** → **CI PR `29571272500` : 3/3 GREEN premier coup**
+  (pytest 2308 passed).
+- **MERGE sur GO conditionnel opérateur** : **`0056baf`**, posé sur `ac16d49`
+  (review UI 03.3).
+- **CI canonique `29574276201` : 3/3 GREEN** — pytest **2308 passed, 2 warnings (27:27)** ·
+  lint ✅ · SonarCloud ✅.
+- **État final** : arbre de persistance Option C complet sur le trunk ; head Alembic
+  **`m4n9h5i6k87`** ; 29 sentinelles track cumulées ; `PERSISTENCE_03` = FIRST NEXT BUILD
+  CANDIDATE, NOT OPENED.
