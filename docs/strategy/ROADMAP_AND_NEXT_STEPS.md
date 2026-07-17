@@ -237,6 +237,16 @@
   ONLY. 10 dédiés premier coup + 41 sentinelles ; 4 QA verts premier coup ; snapshot +6 ;
   check_scope MIGRATION. **La persistance du track est complète.** Suite : full sweep →
   GO COMMIT → PR (CI 3/3) → merge sur GO. **`PERSISTENCE_04+` NOT AUTHORIZED.**
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_04 — Draft CRUD Repository Service` : 🟢 PATCH
+  COMPLETE / REVIEW PENDING (non commité)** 2026-07-17
+  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_04_DRAFT_CRUD_REPORT.md`, branche
+  `sb/custom-program-persistence-04-draft-crud`, base `007c428`). **Premier service du
+  track, zéro migration** : `user_program_drafts.py` — CRUD de brouillon owner-scoped
+  (inexistant/non-possédé indistinguables), soft-delete-only, `validated`→`draft` à
+  l'édition, `published` verrouillé, `replace_draft_tree` avec purge d'orphelins prouvée.
+  12 dédiés + 67 sentinelles + broad sweep 192 verts ; check_scope ISOLATED (leaf).
+  Quotas = `PERSISTENCE_05`. Suite : GO COMMIT → PR (CI 3/3) → merge sur GO.
+  **`PERSISTENCE_05+` NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
