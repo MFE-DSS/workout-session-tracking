@@ -19,6 +19,15 @@ CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
 -- index: ix_set_logs_exercise_kind_completed
 CREATE INDEX ix_set_logs_exercise_kind_completed ON set_logs (session_exercise_id, kind, completed);
 
+-- index: ix_user_program_exercises_user_program_session_id
+CREATE INDEX ix_user_program_exercises_user_program_session_id ON user_program_exercises (user_program_session_id);
+
+-- index: ix_user_program_rep_targets_user_program_exercise_id
+CREATE INDEX ix_user_program_rep_targets_user_program_exercise_id ON user_program_rep_targets (user_program_exercise_id);
+
+-- index: ix_user_program_sessions_user_program_id
+CREATE INDEX ix_user_program_sessions_user_program_id ON user_program_sessions (user_program_id);
+
 -- index: ix_user_programs_user_id
 CREATE INDEX ix_user_programs_user_id ON user_programs (user_id);
 
@@ -90,6 +99,15 @@ CREATE TABLE squads ( id INTEGER NOT NULL, name VARCHAR(64) NOT NULL, owner_id I
 
 -- table: template_exercises
 CREATE TABLE template_exercises ( id INTEGER NOT NULL, template_id INTEGER NOT NULL, position INTEGER NOT NULL, code VARCHAR(8) NOT NULL, name VARCHAR(255) NOT NULL, set_scheme VARCHAR(255) NOT NULL, notes TEXT, substitutes_json TEXT, machine_slug VARCHAR(64), machine_family VARCHAR(64), PRIMARY KEY (id), FOREIGN KEY(template_id) REFERENCES workout_templates (id) ON DELETE CASCADE, CONSTRAINT uq_template_exercise_position UNIQUE (template_id, position) );
+
+-- table: user_program_exercises
+CREATE TABLE user_program_exercises ( id INTEGER NOT NULL, user_program_session_id INTEGER NOT NULL, position INTEGER NOT NULL, exercise_name VARCHAR(255) NOT NULL, variant_key VARCHAR(128), variant_group VARCHAR(128), equipment_family VARCHAR(64), movement_pattern VARCHAR(64), set_scheme VARCHAR(255) NOT NULL, notes TEXT, source_reason VARCHAR(255), PRIMARY KEY (id), CONSTRAINT uq_user_program_exercise_position UNIQUE (user_program_session_id, position), FOREIGN KEY(user_program_session_id) REFERENCES user_program_sessions (id) ON DELETE CASCADE );
+
+-- table: user_program_rep_targets
+CREATE TABLE user_program_rep_targets ( id INTEGER NOT NULL, user_program_exercise_id INTEGER NOT NULL, set_index INTEGER NOT NULL, min_reps INTEGER NOT NULL, max_reps INTEGER NOT NULL, technique VARCHAR(8), is_warmup BOOLEAN DEFAULT '0' NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_user_program_rep_target_set UNIQUE (user_program_exercise_id, set_index, is_warmup), FOREIGN KEY(user_program_exercise_id) REFERENCES user_program_exercises (id) ON DELETE CASCADE );
+
+-- table: user_program_sessions
+CREATE TABLE user_program_sessions ( id INTEGER NOT NULL, user_program_id INTEGER NOT NULL, position INTEGER NOT NULL, name VARCHAR(128) NOT NULL, kind VARCHAR(16) DEFAULT 'strength' NOT NULL, focus VARCHAR(128) DEFAULT '' NOT NULL, duration_target_minutes INTEGER, notes TEXT, PRIMARY KEY (id), CONSTRAINT uq_user_program_session_position UNIQUE (user_program_id, position), FOREIGN KEY(user_program_id) REFERENCES user_programs (id) ON DELETE CASCADE );
 
 -- table: user_programs
 CREATE TABLE user_programs ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, title VARCHAR(128) NOT NULL, slug_base VARCHAR(64) NOT NULL, status VARCHAR(16) DEFAULT 'draft' NOT NULL, current_version INTEGER DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, archived_at DATETIME, PRIMARY KEY (id), CONSTRAINT uq_user_program_slug_base UNIQUE (user_id, slug_base), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );

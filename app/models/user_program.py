@@ -32,21 +32,26 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import (
+    Boolean,
     DateTime,
     ForeignKey,
     Index,
     Integer,
     String,
+    Text,
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
 # Status vocabulary (spec 04 §6). Kept as plain constants — no logic
 # branches on anything but "draft" until the wizard/publication builds.
 USER_PROGRAM_STATUSES = ("draft", "validated", "published", "archived")
+
+# ORM cascade shared by the whole ownership tree (catalog.py pattern).
+_TREE_CASCADE = "all, delete-orphan"
 
 
 class UserProgram(Base):
@@ -100,8 +105,137 @@ class UserProgram(Base):
         DateTime(timezone=True), nullable=True
     )
 
+    # Child tree (PERSISTENCE_02) — catalog.py pattern: ordered children,
+    # ORM-level delete-orphan mirroring the DB-level ON DELETE CASCADE.
+    sessions: Mapped[list[UserProgramSession]] = relationship(
+        back_populates="program",
+        cascade=_TREE_CASCADE,
+        order_by="UserProgramSession.position",
+    )
+
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"<UserProgram id={self.id} user_id={self.user_id} "
             f"slug_base={self.slug_base} status={self.status}>"
         )
+
+
+class UserProgramSession(Base):
+    """One planned session slot inside a user program (e.g. « Push A »).
+
+    Spec 04 §5. Materialization contract (spec 05 §6): ONE UserProgramSession
+    becomes ONE custom `WorkoutTemplate` at publication — never here.
+    """
+
+    __tablename__ = "user_program_sessions"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_program_id", "position", name="uq_user_program_session_position"
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_program_id: Mapped[int] = mapped_column(
+        ForeignKey("user_programs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    name: Mapped[str] = mapped_column(String(128), nullable=False)
+    # strength / cardio — aligned on the catalog vocabulary.
+    kind: Mapped[str] = mapped_column(String(16), nullable=False, default="strength")
+    focus: Mapped[str] = mapped_column(String(128), nullable=False, default="")
+    # Declared time budget — consumed by the future duration_realism subscore.
+    duration_target_minutes: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    program: Mapped[UserProgram] = relationship(back_populates="sessions")
+    exercises: Mapped[list[UserProgramExercise]] = relationship(
+        back_populates="session",
+        cascade=_TREE_CASCADE,
+        order_by="UserProgramExercise.position",
+    )
+
+
+class UserProgramExercise(Base):
+    """One exercise slot inside a user program session.
+
+    `exercise_name` is the canonical EKB name (historical identity —
+    NEVER renamed, spec 02 §4); `variant_key`/`variant_group` and the
+    denormalized equipment/pattern copies are editing/scoring helpers,
+    the EKB stays the reference. ZERO foreign key toward the system
+    catalog or the EKB (PERSISTENCE contract).
+    """
+
+    __tablename__ = "user_program_exercises"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_program_session_id",
+            "position",
+            name="uq_user_program_exercise_position",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_program_session_id: Mapped[int] = mapped_column(
+        ForeignKey("user_program_sessions.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    position: Mapped[int] = mapped_column(Integer, nullable=False)
+    exercise_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    variant_key: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    variant_group: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    # Denormalized EKB copies (filtering/scoring convenience only).
+    equipment_family: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    movement_pattern: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    set_scheme: Mapped[str] = mapped_column(String(255), nullable=False)
+    notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Generation explainability (« pattern push requis par le split ») or
+    # "manual" when the slot was hand-picked.
+    source_reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    session: Mapped[UserProgramSession] = relationship(back_populates="exercises")
+    rep_targets: Mapped[list[UserProgramRepTarget]] = relationship(
+        back_populates="exercise",
+        cascade=_TREE_CASCADE,
+        order_by="UserProgramRepTarget.set_index",
+    )
+
+
+class UserProgramRepTarget(Base):
+    """One prescribed rep range for a working (or warmup) set.
+
+    Mirrors the catalog `RepTarget` shape so materialization (spec 05 §6)
+    is a straight copy — the condition for native overload compatibility.
+    `is_warmup` is prepared (spec 04 §5) but defaults to false everywhere
+    in V1 (warmups stay generated at instantiation, like the catalog).
+    """
+
+    __tablename__ = "user_program_rep_targets"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_program_exercise_id",
+            "set_index",
+            "is_warmup",
+            name="uq_user_program_rep_target_set",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_program_exercise_id: Mapped[int] = mapped_column(
+        ForeignKey("user_program_exercises.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    set_index: Mapped[int] = mapped_column(Integer, nullable=False)
+    min_reps: Mapped[int] = mapped_column(Integer, nullable=False)
+    max_reps: Mapped[int] = mapped_column(Integer, nullable=False)
+    technique: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    is_warmup: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="0"
+    )
+
+    exercise: Mapped[UserProgramExercise] = relationship(
+        back_populates="rep_targets"
+    )
