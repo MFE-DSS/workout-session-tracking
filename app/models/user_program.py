@@ -113,6 +113,14 @@ class UserProgram(Base):
         order_by="UserProgramSession.position",
     )
 
+    # Frozen scoring traces (PERSISTENCE_03) — one immutable row per
+    # published version (spec 03 §9 / spec 04 §7).
+    quality_reviews: Mapped[list[UserProgramQualityReview]] = relationship(
+        back_populates="program",
+        cascade=_TREE_CASCADE,
+        order_by="UserProgramQualityReview.version",
+    )
+
     def __repr__(self) -> str:  # pragma: no cover
         return (
             f"<UserProgram id={self.id} user_id={self.user_id} "
@@ -239,3 +247,56 @@ class UserProgramRepTarget(Base):
     exercise: Mapped[UserProgramExercise] = relationship(
         back_populates="rep_targets"
     )
+
+
+class UserProgramQualityReview(Base):
+    """Frozen trace of one quality scoring run (Sx_CUSTOM_PROGRAM_03 §9-C).
+
+    One row per published program version — written at publication time,
+    NEVER rewritten (immutability is enforced by the per-version unique
+    constraint plus service discipline; the past is never recomputed,
+    same doctrine as `scoring_version` on sessions / Sx_30).
+
+    This table is a RECEPTACLE only: no score is computed, interpreted or
+    thresholded here — the scoring engine is a later, separately gated
+    build (`Sb_CUSTOM_PROGRAM_SCORING_01+`). Payload columns mirror the
+    `QualityReview` model of spec 03 §4 as opaque explicable JSON text.
+    """
+
+    __tablename__ = "user_program_quality_reviews"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_program_id",
+            "version",
+            name="uq_user_program_quality_review_version",
+        ),
+    )
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_program_id: Mapped[int] = mapped_column(
+        ForeignKey("user_programs.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    # Program version this trace belongs to (spec 04 §7) — one per version.
+    version: Mapped[int] = mapped_column(Integer, nullable=False)
+
+    grade: Mapped[str] = mapped_column(String(1), nullable=False)
+    global_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+    # Explicable payloads of the QualityReview (spec 03 §4) — opaque here.
+    subscores_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    alerts_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    suggestions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    assumptions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    missing_data_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Engine + knowledge-base versions pinned on every trace.
+    scoring_version: Mapped[int] = mapped_column(Integer, nullable=False)
+    ekb_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+    # Set by the caller (the pure engine has no clock — spec 03 §4);
+    # server default keeps the column NOT NULL-safe.
+    computed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    program: Mapped[UserProgram] = relationship(back_populates="quality_reviews")

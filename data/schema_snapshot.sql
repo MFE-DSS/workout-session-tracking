@@ -22,6 +22,9 @@ CREATE INDEX ix_set_logs_exercise_kind_completed ON set_logs (session_exercise_i
 -- index: ix_user_program_exercises_user_program_session_id
 CREATE INDEX ix_user_program_exercises_user_program_session_id ON user_program_exercises (user_program_session_id);
 
+-- index: ix_user_program_quality_reviews_user_program_id
+CREATE INDEX ix_user_program_quality_reviews_user_program_id ON user_program_quality_reviews (user_program_id);
+
 -- index: ix_user_program_rep_targets_user_program_exercise_id
 CREATE INDEX ix_user_program_rep_targets_user_program_exercise_id ON user_program_rep_targets (user_program_exercise_id);
 
@@ -102,6 +105,9 @@ CREATE TABLE template_exercises ( id INTEGER NOT NULL, template_id INTEGER NOT N
 
 -- table: user_program_exercises
 CREATE TABLE user_program_exercises ( id INTEGER NOT NULL, user_program_session_id INTEGER NOT NULL, position INTEGER NOT NULL, exercise_name VARCHAR(255) NOT NULL, variant_key VARCHAR(128), variant_group VARCHAR(128), equipment_family VARCHAR(64), movement_pattern VARCHAR(64), set_scheme VARCHAR(255) NOT NULL, notes TEXT, source_reason VARCHAR(255), PRIMARY KEY (id), CONSTRAINT uq_user_program_exercise_position UNIQUE (user_program_session_id, position), FOREIGN KEY(user_program_session_id) REFERENCES user_program_sessions (id) ON DELETE CASCADE );
+
+-- table: user_program_quality_reviews
+CREATE TABLE user_program_quality_reviews ( id INTEGER NOT NULL, user_program_id INTEGER NOT NULL, version INTEGER NOT NULL, grade VARCHAR(1) NOT NULL, global_score INTEGER, subscores_json TEXT, alerts_json TEXT, suggestions_json TEXT, assumptions_json TEXT, missing_data_json TEXT, scoring_version INTEGER NOT NULL, ekb_version VARCHAR(32), computed_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_user_program_quality_review_version UNIQUE (user_program_id, version), FOREIGN KEY(user_program_id) REFERENCES user_programs (id) ON DELETE CASCADE );
 
 -- table: user_program_rep_targets
 CREATE TABLE user_program_rep_targets ( id INTEGER NOT NULL, user_program_exercise_id INTEGER NOT NULL, set_index INTEGER NOT NULL, min_reps INTEGER NOT NULL, max_reps INTEGER NOT NULL, technique VARCHAR(8), is_warmup BOOLEAN DEFAULT '0' NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_user_program_rep_target_set UNIQUE (user_program_exercise_id, set_index, is_warmup), FOREIGN KEY(user_program_exercise_id) REFERENCES user_program_exercises (id) ON DELETE CASCADE );
