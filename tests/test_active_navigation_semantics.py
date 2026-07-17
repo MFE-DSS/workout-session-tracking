@@ -23,8 +23,21 @@ def _get(client, path):
 
 
 def _active_labels(html: str) -> list[str]:
+    # Sb_UI_03.3 — the topbar was demoted to SECONDARY nav only (no primary
+    # is-active anymore). The primary active state now lives in the bottom nav
+    # (mobile) and the rail (desktop). This helper now reads the active label
+    # from the bottom-nav region (always rendered), which is the source of
+    # truth for the four primary destinations (Séance/Programmes/Progression/
+    # Profil). Re-oriented toward the new truth, not weakened.
+    nav = _region(html, "app-bottom-nav")
     return re.findall(
-        r'<a class="topbar__link is-active"[^>]*>([^<]+)</a>', html
+        r'<span class="app-bottom-nav__label">([^<]+)</span>',
+        "".join(
+            it for it in re.findall(
+                r'<a class="app-bottom-nav__item[^>]*aria-current="page".*?</a>',
+                nav, re.DOTALL,
+            )
+        ),
     )
 
 
@@ -49,9 +62,13 @@ def _aria_current_count(html: str) -> int:
 # ───────── 1. each surface marks the right link active ─────────
 
 
-def test_home_marks_accueil_active(client):
+# Sb_UI_03.3 — primary active state now lives in the bottom nav / rail. The
+# four primary destinations are Séance / Programmes / Progression / Profil, and
+# secondary surfaces map onto their primary tab (history/physique → Progression,
+# leaderboard → Profil). Tests re-oriented to the four-destination truth.
+def test_home_marks_seance_active(client):
     html = _get(client, "/")
-    assert "Accueil" in _active_labels(html)
+    assert "Séance" in _active_labels(html)
 
 
 def test_library_marks_programmes_active(client):
@@ -69,9 +86,9 @@ def test_launcher_marks_programmes_active(client):
     assert "Programmes" in _active_labels(html)
 
 
-def test_history_marks_historique_active(client):
+def test_history_maps_to_progression(client):
     html = _get(client, "/history")
-    assert "Historique" in _active_labels(html)
+    assert "Progression" in _active_labels(html)
 
 
 def test_progress_marks_progression_active(client):
@@ -79,29 +96,33 @@ def test_progress_marks_progression_active(client):
     assert "Progression" in _active_labels(html)
 
 
-def test_physique_marks_physique_active(client):
+def test_physique_maps_to_progression(client):
     html = _get(client, "/physique")
-    assert "Physique" in _active_labels(html)
+    assert "Progression" in _active_labels(html)
 
 
-def test_leaderboard_marks_classement_active(client):
+def test_leaderboard_maps_to_profil(client):
     html = _get(client, "/leaderboard")
-    assert "Classement" in _active_labels(html)
+    assert "Profil" in _active_labels(html)
 
 
 # ───────── 2. exactly one aria-current="page", never "false" ─────────
 
 
 def test_single_aria_current_per_route(client):
-    # Sb_UI_03.1 — new truth: exactly one active PER REGION (topbar menu AND
-    # mobile bottom nav), each derived from request.url.path. Previously the
-    # shell had a single region; now both must mark exactly one active tab.
+    # Sb_UI_03.3 — the topbar is now SECONDARY nav only (no aria-current). The
+    # primary active state lives in the bottom nav (always) and the rail. Each
+    # PRIMARY region marks exactly one active destination; the topbar carries
+    # none. Re-oriented to the demoted-topbar truth (stricter: asserts the
+    # topbar has zero primary aria-current).
     for path in ("/", "/library", "/history", "/progress", "/physique"):
         html = _get(client, path)
-        assert _region(html, "topbar").count('aria-current="page"') == 1, \
-            f"{path}: expected 1 active in topbar"
+        assert _region(html, "topbar").count('aria-current="page"') == 0, \
+            f"{path}: topbar (secondary) must carry no aria-current"
         assert _region(html, "app-bottom-nav").count('aria-current="page"') == 1, \
             f"{path}: expected 1 active in bottom nav"
+        assert _region(html, "app-rail__primary").count('aria-current="page"') == 1, \
+            f"{path}: expected 1 active in rail"
 
 
 def test_no_aria_current_false_in_topbar(client):
@@ -112,16 +133,24 @@ def test_no_aria_current_false_in_topbar(client):
         assert 'aria-current="step"' not in html
 
 
-# ───────── 3. preserved shell: all links, logout, banner, brand ─────────
+# ───────── 3. preserved shell: all routes reachable, logout, brand ─────────
 
 
-def test_all_nav_links_and_logout_preserved(client):
+def test_all_routes_reachable_and_logout_preserved(client):
+    # Sb_UI_03.3 — the four primary destinations moved out of the topbar (they
+    # live in the bottom nav as "Séance/Programmes/Progression/Profil" and in
+    # the rail). Secondary routes stay in the topbar menu. All routes remain
+    # reachable; no route removed. "Accueil" as a topbar label is gone (the
+    # primary tab is "Séance"), so we assert on the surviving labels + shared
+    # primary set instead.
     html = _get(client, "/library")
-    for label in (
-        "Accueil", "Programmes", "Historique", "Physique", "Progression",
-        "Classement", "Squads", "Profil", "Coach", "Déconnexion",
-    ):
-        assert label in html, f"nav label missing: {label}"
+    # secondary destinations preserved in the topbar menu
+    for label in ("Historique", "Physique", "Coach", "Classement", "Squads",
+                  "Contact", "Déconnexion"):
+        assert label in html, f"secondary nav label missing: {label}"
+    # four primary destinations present in the shell (bottom nav + rail)
+    for label in ("Séance", "Programmes", "Progression", "Profil"):
+        assert label in html, f"primary destination missing: {label}"
     # logout is still a POST form
     assert 'method="post"' in html
     assert "topbar__brand" in html  # brand preserved

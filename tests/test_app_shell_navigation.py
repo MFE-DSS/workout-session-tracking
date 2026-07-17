@@ -246,10 +246,16 @@ def test_topbar_brand_auren_preserved(client):
     assert re.search(r'<a class="topbar__brand"[^>]*>Auren</a>', html)
 
 
-def test_active_banner_preserved_in_template():
+def test_active_session_indicator_replaces_banner():
+    # Sb_UI_03.3 — the global .active-banner was removed; the active-session
+    # state now lives on the Séance tab (has-active-session + sr-only "En
+    # cours"). This sentinel is re-oriented from "banner preserved" to "banner
+    # gone, nav indicator present" — the new truth (Home hero is the single
+    # direct Reprendre surface).
     src = BASE_TPL.read_text(encoding="utf-8")
-    assert "active-banner" in src
-    assert "Reprendre →" in src
+    assert "active-banner" not in src
+    assert "has-active-session" in src
+    assert "app-shell__session-dot" in src
 
 
 def test_pwa_heads_intact(client):

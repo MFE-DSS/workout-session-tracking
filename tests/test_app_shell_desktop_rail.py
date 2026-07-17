@@ -293,10 +293,12 @@ def test_bottom_nav_still_present(client):
     assert 'class="app-bottom-nav"' in _get(client)
 
 
-def test_active_banner_preserved(client):
+def test_active_session_indicator_replaces_banner(client):
+    # Sb_UI_03.3 — .active-banner removed; active-session state carried by the
+    # Séance tab (has-active-session). Re-oriented to the new truth.
     src = BASE_TPL.read_text(encoding="utf-8")
-    assert "active-banner" in src
-    assert "Reprendre →" in src
+    assert "active-banner" not in src
+    assert "has-active-session" in src
 
 
 def test_pwa_heads_intact(client):

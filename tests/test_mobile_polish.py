@@ -184,35 +184,53 @@ def test_save_last_exercise_card_redirects_to_session_feedback(client):
 # ---------------------------------------------------------------------------
 
 
-def test_active_session_banner_appears_on_library_when_session_open(client):
+# Sb_UI_03.3 — the global .active-banner is REMOVED. The active-session state
+# is now carried by the "Séance" tab of the bottom nav / rail
+# (has-active-session + a discreet dot + sr-only "En cours"); the Home hero
+# stays the single direct "Reprendre" surface. These tests are re-oriented from
+# "banner present/absent" to "no banner anywhere + nav indicator present when a
+# session is open", the new truth — not weakened.
+def test_active_session_indicator_on_library_when_session_open(client):
     _start(client, "push-a")
     body = client.get("/library").text
-    assert "active-banner" in body
-    assert "Séance en cours" in body
-    assert "Reprendre" in body
-    assert "Push A" in body
+    assert "active-banner" not in body  # global banner gone
+    assert "has-active-session" in body  # Séance tab flagged
+    assert "En cours" in body  # accessible indicator text
 
 
-def test_active_session_banner_appears_on_history_progress_rules(client):
+def test_no_active_banner_on_secondary_pages(client):
     _start(client, "push-a")
     for url in ["/history", "/progress", "/rules", "/exercise-history/push-a/E2"]:
         body = client.get(url).text
-        assert "active-banner" in body, f"banner missing on {url}"
+        assert "active-banner" not in body, f"banner must be gone on {url}"
+        assert "has-active-session" in body, f"nav indicator missing on {url}"
 
 
-def test_active_session_banner_hidden_when_no_session_open(client):
+def test_no_active_indicator_when_no_session_open(client):
     body = client.get("/library").text
     assert "active-banner" not in body
+    assert "has-active-session" not in body
+    assert "En cours" not in body
 
 
-def test_active_session_banner_hidden_on_session_detail_page(client):
+def test_no_active_banner_on_session_detail_page(client):
     sid = _start(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
     assert "active-banner" not in body
+    # /sessions/{id} keeps the Séance tab active (is_sess covers /sessions).
+    # Note: the session_detail view does not pass `active_session` to the
+    # template (unchanged — routers are out of scope for Sb_UI_03.3), so the
+    # has-active-session indicator is not rendered here; this mirrors the old
+    # banner which was also hidden on this page. The Séance tab is still active.
+    nav = re.search(r'<nav class="app-bottom-nav".*?</nav>', body, re.DOTALL).group(0)
+    active = [re.search(r'__label">([^<]+)<', it).group(1)
+              for it in re.findall(r'<a class="app-bottom-nav__item[^>]*>.*?</a>', nav, re.DOTALL)
+              if 'aria-current="page"' in it]
+    assert active == ["Séance"]
 
 
-def test_active_session_banner_hidden_on_home(client):
-    """Home already has the Reprendre tile — banner would be redundant."""
+def test_no_active_banner_on_home(client):
+    """Home already has the Reprendre hero — no global banner."""
     _start(client, "push-a")
     body = client.get("/").text
     assert "active-banner" not in body

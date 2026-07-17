@@ -23,6 +23,10 @@
     <title>{{ page_title }} · Auren</title>
   </head>
   <body>
+    {# Sb_UI_03.3 — skip link : premier élément interactif du body, masqué
+       hors écran au repos, visible au focus clavier. SSR/no-JS, tokens Auren
+       existants. Cible le <main id="main-content">. #}
+    <a class="skip-link" href="#main-content">Aller au contenu principal</a>
     {# Sx_NAV_01 — état actif de navigation dérivé de request.url.path (SSR,
        no-JS). Chaque grande surface pilote is-active + aria-current="page" sur
        son lien topbar. Template-only : aucune route/service touché. Les liens
@@ -47,19 +51,22 @@
     {% set is_prof = is_profile or is_squads or is_leaderboard %}
     <header class="topbar">
       <a class="topbar__brand" href="{{ url_for('home') }}">Auren</a>
+      {# Sb_UI_03.3 — topbar rétrogradée en navigation SECONDAIRE uniquement.
+         Les 4 destinations primaires (Accueil/Programmes/Progression/Profil)
+         sont retirées du menu : elles vivent dans la bottom nav (<1024px) et
+         le rail (≥1024px). Le menu ne garde que les surfaces secondaires +
+         Contact + logout POST (aucune route supprimée). Liens secondaires =
+         is-subactive (jamais un 2ᵉ aria-current : le primaire correspondant
+         le porte). <details> natif, no-JS. Masquée ≥1024px (rail). #}
       <details class="topbar__menu">
-        <summary class="topbar__toggle" aria-label="Menu">☰</summary>
-        <nav class="topbar__nav" aria-label="Navigation">
-          <a class="topbar__link {% if is_home %}is-active{% endif %}" href="{{ url_for('home') }}"{% if is_home %} aria-current="page"{% endif %}>Accueil</a>
-          <a class="topbar__link {% if is_programs %}is-active{% endif %}" href="{{ url_for('library') }}"{% if is_programs %} aria-current="page"{% endif %}>Programmes</a>
-          <a class="topbar__link {% if is_history %}is-active{% endif %}" href="{{ url_for('history') }}"{% if is_history %} aria-current="page"{% endif %}>Historique</a>
-          <a class="topbar__link {% if is_physique %}is-active{% endif %}" href="{{ url_for('physique') }}"{% if is_physique %} aria-current="page"{% endif %}>Physique</a>
-          {# Sb_27.6 — OQ-3 : /dashboard déprécié, Progression (/progress) devient la surface analytique principale. #}
-          <a class="topbar__link {% if is_progress %}is-active{% endif %}" href="{{ url_for('progress') }}"{% if is_progress %} aria-current="page"{% endif %}>Progression</a>
-          <a class="topbar__link {% if is_leaderboard %}is-active{% endif %}" href="{{ url_for('leaderboard_page') }}"{% if is_leaderboard %} aria-current="page"{% endif %}>Classement</a>
-          <a class="topbar__link {% if is_squads %}is-active{% endif %}" href="{{ url_for('squads_list') }}"{% if is_squads %} aria-current="page"{% endif %}>Squads</a>
-          <a class="topbar__link {% if is_profile %}is-active{% endif %}" href="{{ url_for('profile_page') }}"{% if is_profile %} aria-current="page"{% endif %}>Profil</a>
-          <a class="topbar__link {% if is_coach %}is-active{% endif %}" href="{{ url_for('coach_report') }}"{% if is_coach %} aria-current="page"{% endif %}>Coach</a>
+        <summary class="topbar__toggle" aria-label="Navigation secondaire">☰</summary>
+        <nav class="topbar__nav" aria-label="Navigation secondaire">
+          <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
+          <a class="topbar__link {% if is_physique %}is-subactive{% endif %}" href="{{ url_for('physique') }}">Physique</a>
+          <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
+          <a class="topbar__link {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
+          <a class="topbar__link {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
+          <a class="topbar__link" href="{{ url_for('contact_page') }}">Contact</a>
           <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
             <button type="submit" class="topbar__link topbar__link--btn">Déconnexion</button>
           </form>
@@ -78,9 +85,10 @@
     <aside class="app-rail" aria-label="Navigation latérale">
       <a class="app-rail__brand" href="{{ url_for('home') }}">Auren</a>
       <nav class="app-rail__primary" aria-label="Navigation principale (desktop)">
-        <a class="app-rail__item {% if is_sess %}is-active{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
+        <a class="app-rail__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
           <svg class="app-rail__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12 12 4l8 8"/><path d="M6 10v9h12v-9"/></svg>
           <span class="app-rail__label">Séance</span>
+          {% if active_session %}<span class="app-shell__session-dot" aria-hidden="true"></span><span class="sr-only">En cours</span>{% endif %}
         </a>
         <a class="app-rail__item {% if is_programs %}is-active{% endif %}" href="{{ url_for('library') }}"{% if is_programs %} aria-current="page"{% endif %}>
           <svg class="app-rail__icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 4h11a2 2 0 0 1 2 2v14l-4-2-4 2V4"/><path d="M5 4v16"/></svg>
@@ -113,15 +121,12 @@
         </form>
       </div>
     </aside>
-    {% if active_session %}
-      <a class="active-banner" href="{{ url_for('session_detail', session_id=active_session.id) }}">
-        <span class="active-banner__dot" aria-hidden="true"></span>
-        <span class="active-banner__label">Séance en cours</span>
-        <span class="active-banner__name">{{ active_session.template_name_snapshot }}</span>
-        <span class="active-banner__cta">Reprendre →</span>
-      </a>
-    {% endif %}
-    <main class="container">
+    {# Sb_UI_03.3 — bannière globale de séance active SUPPRIMÉE. Le hero Home
+       (index.html) reste l'unique surface directe « Reprendre » ; sur les
+       autres pages, l'état actif est porté par l'onglet Séance de la bottom
+       nav / du rail (indicateur discret, cf. has-active-session ci-dessous).
+       Aucune redirection, aucune donnée nouvelle, aucune animation. #}
+    <main id="main-content" class="container">
       {% block content %}{% endblock %}
     </main>
     <footer class="foot">
@@ -137,9 +142,10 @@
        (Historique/Physique/Coach/Classement/Squads/Déconnexion) préservées
        dans le menu topbar. #}
     <nav class="app-bottom-nav" aria-label="Navigation principale">
-      <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
+      <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
         <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12 12 4l8 8"/><path d="M6 10v9h12v-9"/></svg>
         <span class="app-bottom-nav__label">Séance</span>
+        {% if active_session %}<span class="app-shell__session-dot" aria-hidden="true"></span><span class="sr-only">En cours</span>{% endif %}
       </a>
       <a class="app-bottom-nav__item {% if is_programs %}is-active{% endif %}" href="{{ url_for('library') }}"{% if is_programs %} aria-current="page"{% endif %}>
         <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 4h11a2 2 0 0 1 2 2v14l-4-2-4 2V4"/><path d="M5 4v16"/></svg>
