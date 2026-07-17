@@ -225,6 +225,17 @@
   sur le trunk ; **29 tests sentinelles track cumulés** (wipe-guard 10 + racine 9 +
   enfants 10). **`PERSISTENCE_03` = FIRST NEXT BUILD CANDIDATE / NOT OPENED**
   (`user_program_quality_reviews`, dernière migration de persistance, sur GO explicite).
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_03 — User Program Quality Review Persistence` :
+  🟢 PATCH COMPLETE / REVIEW PENDING (non commité)** 2026-07-17
+  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_03_QUALITY_REVIEWS_REPORT.md`, branche
+  `sb/custom-program-persistence-03-quality-reviews` rebasée sur `edcad4e` — closeout 02
+  poussé d'abord, séquence opérateur). Table `user_program_quality_reviews` = **réceptacle
+  figé** : une trace immuable par version publiée (unique nommée), grade + scoring_version
+  NOT NULL, ekb_version dédiée, 5 payloads JSON opaques, computed_at server_default.
+  **Zéro moteur/calcul/seuil** — le sens = `SCORING_01+`. Migration `n5o0i6j7l98` ADD TABLE
+  ONLY. 10 dédiés premier coup + 41 sentinelles ; 4 QA verts premier coup ; snapshot +6 ;
+  check_scope MIGRATION. **La persistance du track est complète.** Suite : full sweep →
+  GO COMMIT → PR (CI 3/3) → merge sur GO. **`PERSISTENCE_04+` NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
