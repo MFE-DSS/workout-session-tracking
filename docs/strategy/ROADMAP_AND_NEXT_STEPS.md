@@ -207,15 +207,23 @@
   aussi 3/3). **Le trunk est protégé — premier build du track livré et vérifié.**
   **`PERSISTENCE_01` = FIRST NEXT BUILD CANDIDATE, NOT OPENED** (première migration du
   track, préflight tier `migration` requis, sur GO explicite).
-- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_01 — User Program Root Persistence` : 🟢 BUILD READY
-  FOR REVIEW (non commité)** 2026-07-16
-  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_01_USER_PROGRAMS_REPORT.md`, branche
-  `sb/custom-program-persistence-01-user-programs`, base `79d11fd`). Table racine
-  `user_programs` seule (9 colonnes : ownership CASCADE testé, `slug_base` unique par
-  user, statut `draft`, version 1, soft delete), **zéro FK catalogue, zéro enfant, zéro
-  consommateur**. Migration `l3m8g4h5j76` ADD TABLE ONLY idempotente ; 4 checks QA
-  migration verts ; snapshot +12 additives ; 9 tests dédiés + 36 adjacents ; check_scope
-  MIGRATION. Suite : full sweep → GO COMMIT → GO PR DRAFT → GO VALIDATE.
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_01 — User Program Root Persistence` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-16 (build `14804a6`, **PR #23 MERGED**, merge **`3eb8d99`** ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_01_USER_PROGRAMS_REPORT.md`). Table racine
+  `user_programs` (ownership CASCADE testé, `slug_base` unique par user, zéro FK
+  catalogue). Migration `l3m8g4h5j76` = head canonique. 9 dédiés + 36 adjacents +
+  **full sweep 2232 passed** ; **CI PR `29514324922` 3/3 premier coup (2272 passed) ·
+  CI canonique `29520029077` 3/3.** 2e build du track livré et vérifié.
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_02 — User Program Children Persistence` : 🟢 PATCH
+  COMPLETE / REVIEW PENDING (non commité)** 2026-07-17
+  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_02_CHILDREN_REPORT.md`, branche
+  `sb/custom-program-persistence-02-children`, base `a3a32c9`). **3 tables enfants en
+  1 migration `m4n9h5i6k87`** (lot unique validé) : sessions/exercises/rep_targets —
+  cascade d'arbre testée en chaîne, uniques par parent, `exercise_name` = nom EKB
+  invariant, **zéro FK catalogue/EKB**, relationships ORM patron catalogue. 10 dédiés
+  premier coup + 43 adjacents (wipe-guard + racine inclus) ; 4 checks QA verts premier
+  coup ; snapshot +18 ; check_scope MIGRATION. Suite : full sweep → GO COMMIT → PR
+  (CI 3/3) → merge sur GO. **`PERSISTENCE_03+` NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
