@@ -91,7 +91,7 @@
       {% endif %}
     </ul>
     {% if verification and verification.errors %}
-      <div class="integrity-errors">
+      <div class="integrity-errors" role="alert">
         <b>Erreurs détectées :</b>
         <ul>
           {% for err in verification.errors %}

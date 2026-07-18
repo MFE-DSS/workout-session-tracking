@@ -23,13 +23,16 @@
       <div class="auth-container">
         <h1 class="page-title">Inscription</h1>
 
+        {# Sb_UI_09.2 — erreur annoncée (role="alert", SSR/no-JS) ; le formulaire
+           la référence via aria-describedby. Pas d'aria-invalid (message
+           global, champ fautif non identifié par le backend). #}
         {% if error %}
-          <div class="integrity-errors">
+          <div class="integrity-errors" role="alert" id="register-error">
             <b>{{ error }}</b>
           </div>
         {% endif %}
 
-        <form method="post" action="{{ url_for('register_submit') }}" class="card">
+        <form method="post" action="{{ url_for('register_submit') }}" class="card"{% if error %} aria-describedby="register-error"{% endif %}>
           <label class="field">
             <span class="field__label">Nom d'utilisateur</span>
             <input type="text" name="username" required autofocus autocomplete="username" minlength="3" />

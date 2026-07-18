@@ -23,8 +23,13 @@
       <div class="auth-container">
         <h1 class="page-title">Connexion</h1>
 
+        {# Sb_UI_09.2 — erreur annoncée aux lecteurs d'écran (role="alert" =>
+           aria-live assertive implicite, SSR au reload, no-JS). id relie le
+           formulaire au message via aria-describedby (pas d'aria-invalid :
+           l'erreur est un message global, le backend n'identifie pas le champ
+           fautif). #}
         {% if error %}
-          <div class="integrity-errors">
+          <div class="integrity-errors" role="alert" id="login-error">
             <b>{{ error }}</b>
           </div>
         {% endif %}
@@ -37,7 +42,7 @@
           </div>
         {% endif %}
 
-        <form method="post" action="{{ url_for('login_submit') }}" class="card">
+        <form method="post" action="{{ url_for('login_submit') }}" class="card"{% if error %} aria-describedby="login-error"{% endif %}>
           <label class="field">
             <span class="field__label">Nom d'utilisateur</span>
             <input type="text" name="username" required autofocus autocomplete="username" />
