@@ -252,6 +252,17 @@
   12 dédiés + 67 sentinelles + broad sweep 192 verts ; check_scope ISOLATED (leaf).
   **51 tests dédiés track cumulés.** Quotas = `PERSISTENCE_05`.
   **`PERSISTENCE_05` = NEXT BUILD CANDIDATE / NOT OPENED · reste NOT AUTHORIZED.**
+- **`Sb_CUSTOM_PROGRAM_PERSISTENCE_05 — QA/Quotas Hardening` : 🟢 PATCH COMPLETE /
+  REVIEW PENDING** 2026-07-18 (branche `sb/custom-program-persistence-05-hardening`,
+  base `a1fe5a6` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_PERSISTENCE_05_HARDENING_REPORT.md`).
+  **Zéro migration** (modèle touché sans schéma, prouvé par les 4 checks QA — head
+  `n5o0i6j7l98` inchangé) : quotas V1 spec 04 §9 (10 programmes actifs / 7 séances /
+  10 exercices, messages doux, quota publiés différé), `validate_draft` (transition
+  idempotente, complétude minimale, sans fuite d'existence), invariance applicative
+  des quality reviews (listener `before_update`). 13 dédiés premier coup +
+  51 sentinelles (64/64) ; check_scope MIGRATION. **64 tests dédiés track cumulés.**
+  Statut PR/CI/merge à consigner au closeout.
+  **`EKB_01`/`SCORING_01` = file suivante / NOT AUTHORIZED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.

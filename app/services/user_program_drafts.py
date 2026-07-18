@@ -13,8 +13,9 @@ Hard boundaries (specs 03/04/05):
   editable; editing a `validated` program flips it back to `draft`.
   `published` is immutable here — the post-publication new-cycle logic
   belongs to the publication era (spec 05), not to this service.
-- NO publication, NO scoring, NO wizard, NO EKB, NO quota enforcement
-  (quotas = PERSISTENCE_05 hardening).
+- NO publication, NO scoring, NO wizard, NO EKB.
+- QUOTAS (PERSISTENCE_05, spec 04 §9): versioned application constants,
+  enforced with gentle, actionable messages — never guilt-tripping.
 
 Transaction convention: mutations validate, then commit themselves
 (domain-CRUD pattern of squad/challenge/readiness); on integrity errors
@@ -24,7 +25,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
@@ -38,6 +39,13 @@ from app.models.user_program import (
 _EDITABLE_STATUSES = ("draft", "validated")
 
 _NOT_FOUND = "Programme introuvable"
+
+# Quotas V1 (Sx_CUSTOM_PROGRAM_04 §9, PERSISTENCE_05) — versioned application
+# constants, never DB config. The published-versions quota (5) only makes
+# sense at publication time and is deferred to that era.
+MAX_ACTIVE_PROGRAMS = 10
+MAX_SESSIONS_PER_PROGRAM = 7
+MAX_EXERCISES_PER_SESSION = 10
 
 
 class UserProgramDraftError(Exception):
@@ -88,6 +96,17 @@ def create_draft(
         raise UserProgramDraftError("Le titre ne peut pas être vide")
     if not slug_base:
         raise UserProgramDraftError("Le slug ne peut pas être vide")
+
+    active_count = db.execute(
+        select(func.count())
+        .select_from(UserProgram)
+        .where(UserProgram.user_id == user_id, UserProgram.archived_at.is_(None))
+    ).scalar_one()
+    if active_count >= MAX_ACTIVE_PROGRAMS:
+        raise UserProgramDraftError(
+            f"Tu as déjà {MAX_ACTIVE_PROGRAMS} programmes actifs — en archiver "
+            "un libère une place"
+        )
 
     program = UserProgram(user_id=user_id, title=title, slug_base=slug_base)
     db.add(program)
@@ -150,6 +169,11 @@ def replace_draft_tree(
     by the delete-orphan cascade."""
     program = _owned_editable(db, user_id, program_id)
 
+    if len(sessions_payload) > MAX_SESSIONS_PER_PROGRAM:
+        raise UserProgramDraftError(
+            f"Un programme compte au plus {MAX_SESSIONS_PER_PROGRAM} séances "
+            "par semaine — regrouper ou alléger le plan"
+        )
     _validate_positions(
         [s.get("position") for s in sessions_payload], "séances"
     )
@@ -165,6 +189,11 @@ def replace_draft_tree(
             notes=s.get("notes"),
         )
         exercises_payload = s.get("exercises", [])
+        if len(exercises_payload) > MAX_EXERCISES_PER_SESSION:
+            raise UserProgramDraftError(
+                f"Une séance compte au plus {MAX_EXERCISES_PER_SESSION} "
+                "exercices — garder l'essentiel aide à tenir la durée"
+            )
         _validate_positions(
             [e.get("position") for e in exercises_payload],
             f"exercices (séance {s['position']})",
@@ -201,6 +230,50 @@ def replace_draft_tree(
     program.sessions.clear()
     db.flush()
     program.sessions.extend(new_sessions)
+    db.commit()
+    db.refresh(program)
+    return program
+
+
+def validate_draft(db: Session, user_id: int, program_id: int) -> UserProgram:
+    """Transition draft → validated (spec 04 §6) with a MINIMAL completeness
+    check: at least one session, every session has at least one exercise,
+    every exercise has at least one rep target. Publication stays a later,
+    separately gated era — `validated` only marks the recap as accepted.
+    Idempotent on an already-validated program."""
+    program = db.execute(
+        _owned_query(user_id)
+        .where(UserProgram.id == program_id)
+        .options(
+            selectinload(UserProgram.sessions)
+            .selectinload(UserProgramSession.exercises)
+            .selectinload(UserProgramExercise.rep_targets)
+        )
+    ).scalar_one_or_none()
+    if program is None:
+        raise UserProgramDraftError(_NOT_FOUND)
+    if program.archived_at is not None:
+        raise UserProgramDraftError("Programme archivé — désarchiver d'abord")
+    if program.status == "published":
+        raise UserProgramDraftError("Une version publiée est déjà validée")
+    if program.status == "validated":
+        return program
+
+    if not program.sessions:
+        raise UserProgramDraftError("Ajoute au moins une séance avant de valider")
+    for session in program.sessions:
+        if not session.exercises:
+            raise UserProgramDraftError(
+                f"La séance « {session.name} » n'a pas encore d'exercice"
+            )
+        for exercise in session.exercises:
+            if not exercise.rep_targets:
+                raise UserProgramDraftError(
+                    f"« {exercise.exercise_name} » n'a pas encore de plage "
+                    "de répétitions"
+                )
+
+    program.status = "validated"
     db.commit()
     db.refresh(program)
     return program
