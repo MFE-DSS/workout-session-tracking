@@ -1,8 +1,8 @@
 ---
 name: UI_TRANSFORMATION_ROADMAP
 type: strategy-roadmap
-status: HISTORICAL OPENING ROADMAP (docs-only) — source vivante = Sx_UI_12
-superseded_by: docs/strategy/Sx_UI_12_UI_TRANSFORMATION_RESIDUAL_RECONCILIATION_SPEC.md
+status: HISTORICAL OPENING ROADMAP (docs-only) — programme CLOSED (cf. closeout global)
+superseded_by: docs/SPRINT_Sx_UI_GLOBAL_FINAL_CLOSEOUT_REPORT.md
 created: 2026-07-02
 depends_on:
   - docs/strategy/brainstorm/UI_TRANSFORMATION_BRAINSTORM_V1_normalized.md
@@ -13,6 +13,11 @@ depends_on_gate:
 
 # UI Transformation Roadmap — Auren
 
+> ✅ **PROGRAMME CLOSED (2026-07-19).** Le programme UI est **clos** : `Sx_UI INTERNAL TRANSFORMATION
+> PROGRAM: CLOSED / HUMAN REVIEW COMPLETE` — voir le **closeout global**
+> `docs/SPRINT_Sx_UI_GLOBAL_FINAL_CLOSEOUT_REPORT.md` (source finale). Gates externes ouverts : baseline
+> visuelle opérateur (`Sb_UI_11.3`), clearance nom/domaine Auren, dogfood séance.
+>
 > ⚠️ **HISTORICAL OPENING ROADMAP (2026-07-02).** Ce document a servi à **ouvrir** le programme
 > `Sx_UI`. Il n'est **plus la source vivante** de l'état d'avancement. La **source actuelle de vérité**
 > (ce qui est clos / partiel / superseded / à construire / à ne pas construire, + la build queue
