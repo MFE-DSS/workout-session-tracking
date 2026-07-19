@@ -67,5 +67,13 @@ delt_post) · Back(lats/upper_back) · Arms(biceps/triceps) · Legs(quads/poster
 - **P2** (futur, **hors première queue**) : silhouette féminine · abstraite · vue latérale ·
   micro-animations · texture graphite · éditoriaux.
 
+## Avancement
+- **`Sb_ASSET_01.1`** Governance Scaffold & Provenance Registry : 🟢 **CODE COMPLETE — CI PENDING — HUMAN
+  REVIEW PENDING** 2026-07-19 (`SPRINT_Sb_ASSET_01_1_GOVERNANCE_SCAFFOLD_REPORT.md`). `design/auren/` créé
+  (README, manifest, provenance, style rules, intake checklist, LICENSES/README) + 21 tests de garde
+  (stdlib). 0 asset produit ; assets runtime référencés (non copiés) ; `ASSET INTEGRATION GATE: BLOCKED`
+  inchangé.
+
 ## Prochaine action
-`GO BUILD — Sb_ASSET_01.1 Governance Scaffold & Provenance Registry` (non commencé).
+`GO VALIDATE — Sb_ASSET_01.1` (non commencé), puis `GO BUILD — Sb_ASSET_01.2 Body Zone Taxonomy & Mapping
+Contract`.

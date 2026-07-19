@@ -1,0 +1,66 @@
+# AUREN — Style Rules
+
+Règles stylistiques normatives du système d'assets Auren. Transcrites du *AUREN — Visual Asset Production
+Brief v1.0* et alignées sur le runtime existant (Auren Terminal).
+
+---
+
+## 1. Positionnement
+Auren est **un instrument de progression biomécanique**.
+Auren **n'est pas** : médical · atlas anatomique · gamer · fitness générique · pseudo-IA (gradients) ·
+bodybuilding illustratif.
+Qualités : **précision perçue · honnêteté informationnelle · friction minimale.**
+
+## 2. Palette
+Runtime actuel = **Auren Terminal** : graphite (`--bg #0F1318`, surfaces `#151A21`/`#1B2029`) · typographie
+**mono système** (0 webfont) · accent **ambre unique `#C8A24B`** (`--accent`) · `--on-accent #0A0C0F`.
+- **Aucune** nouvelle palette · **aucune** couleur codée en dur dans un SVG d'icône.
+- **`currentColor`** pour l'iconographie ; **tokens CSS** = source runtime des couleurs.
+- **primary/secondary jamais distingués uniquement par teinte** (voir §Accessibilité).
+
+## 3. Contrat SVG des icônes
+```
+viewBox="0 0 24 24"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"
+fill="none"
+stroke="currentColor"
+```
+Tailles autorisées : **16** (micro) · **20** (compact) · **24** (standard) · **32** (carte/empty) · **48**
+(illustration exceptionnelle).
+
+## 4. Interdits (icônes & SVG)
+gradient · filtre · ombre SVG · bitmap embarqué · script · URL externe · emoji · webfont d'icônes · texte
+dans un SVG (hors marque) · mix outline/filled non gouverné · **couleur hex codée en dur** (utiliser
+`currentColor`/tokens).
+
+## 5. Anatomie (BodyMap master futur)
+adulte · athlétique (non culturiste) · symétrique · neutre · bras/jambes légèrement écartés · vues
+**orthographiques** · face/dos **cohérents** (même échelle) · **non médical** · **aucune activation
+mesurée prétendue** (pas d'EMG/mesure physiologique). Sans visage détaillé/veines/fibres/organes/ombrage
+réaliste/détails sexuels. Lisible **60–120 px**, exploitable côte à côte à **360 px**. Le BodyMap
+**localise** une région du catalogue ; il **ne mesure pas** l'intensité.
+
+## 6. Taxonomie (figée — cf. spec)
+**11 zones** : `pecs · delt_lat · delt_post · lats · upper_back · biceps · triceps · quads · posterior ·
+calves · core` (+ `unknown` = état métier neutre). **6 macros** : Chest · Shoulders · Back · Arms · Legs ·
+Core. **Ne jamais inventer une 12ᵉ zone pour améliorer le dessin.**
+
+## 7. Accessibilité
+- **BodyMap décoratif** (texte adjacent suffit) : `aria-hidden="true"` · `focusable="false"`. Le texte
+  reste la **vérité accessible**.
+- **Icônes d'action** : label visible/accessible · cible tactile suffisante · focus visible · état **non**
+  porté par la couleur seule.
+- **primary / secondary** : distinguer par remplissage plein vs opacité réduite · contour · structure ·
+  texte adjacent — **jamais** par 2 seules nuances d'ambre.
+
+## 8. Formats
+Canonique = **SVG** (BodyMap · icônes · mark · wordmark · glyphes · schémas). **PNG** = PWA/previews/
+captures/exports uniquement. **WebP** = images complexes éventuelles — **jamais** BodyMap ni icônes.
+
+## 9. Non médical (formulations)
+**Interdits** : diagnostic · mesure d'activation · détection de blessure · prescription · preuve de
+récupération · validation clinique.
+**Autorisé** : zone associée · région principalement travaillée · estimation indicative · classification
+d'exercice · représentation non médicale · données insuffisantes · à qualifier.
