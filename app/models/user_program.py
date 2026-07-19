@@ -40,6 +40,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    event,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -300,3 +301,21 @@ class UserProgramQualityReview(Base):
     )
 
     program: Mapped[UserProgram] = relationship(back_populates="quality_reviews")
+
+
+@event.listens_for(UserProgramQualityReview, "before_update")
+def _reject_quality_review_update(mapper, connection, target) -> None:
+    """Application-level immutability (PERSISTENCE_05, spec 03 §9-C).
+
+    A frozen scoring trace is NEVER rewritten — the past is not
+    recomputed (same doctrine as `scoring_version` on sessions). The
+    unique (program, version) constraint blocks duplicates; this
+    listener blocks in-place mutation, closing the remaining gap
+    without any schema change. Deletes stay possible only through the
+    owning program's cascade (spec 04 §8 keeps even that soft).
+    """
+    raise ValueError(
+        "UserProgramQualityReview est immuable : une trace de scoring "
+        f"gelée ne se modifie pas (review id={target.id}, "
+        f"version={target.version})"
+    )
