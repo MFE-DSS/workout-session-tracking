@@ -139,6 +139,21 @@ note: >
 **Aucun** de ces fichiers n'existe (pas de faux master). Le champ `status: approved` **n'apparaît sur
 aucune entrée** de ce manifest initial.
 
+## 5bis. Governance and semantic contracts (Sb_ASSET_01.2)
+Ces objets sont des **contrats**, pas des assets graphiques : ils **ne comptent pas** dans l'inventaire des
+assets visuels produits (0 SVG/PNG). Statut `provisional` (jamais `approved`).
+
+| id | type | status | source_file | note |
+|---|---|---|---|---|
+| `auren.contract.body-zone-taxonomy` | semantic-contract | provisional | `design/auren/AUREN_BODY_ZONE_TAXONOMY.md` | 11 zones + labels FR + 6 macros + IDs SVG. Acceptance tracked by Sb_ASSET_01.2 human review. No runtime integration authorization. |
+| `auren.contract.body-zone-mapping` | semantic-contract | provisional | `design/auren/source/bodymap/auren_bodymap_mapping.yaml` | Contrat machine-lisible (YAML 1.2 / JSON-compatible, stdlib `json`). 0 géométrie. Miroir de `ZONE_LABELS` + `_WA_ZONE_TO_REGION`, ne les remplace pas. Acceptance tracked by Sb_ASSET_01.2 human review. No runtime integration authorization. |
+
+- `type: semantic-contract` (nouveau) — distinct des types d'assets graphiques (§3). Aucun contrat n'a de
+  `runtime_file` (ils ne sont **pas** servis par l'app) ni de géométrie.
+- **`BODYMAP COMPACT MACROS ARE NOT RADAR_AXES`** : le contrat documente explicitement la séparation
+  présentation (6 macros) vs analytics (`RADAR_AXES`), non modifiés.
+- Aucun master futur n'est passé `source_file: existing` — les masters restent `NOT YET PRODUCED` (§5).
+
 ## 6. Gate & nom
 `ASSET INTEGRATION GATE: BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS`. Nom Auren =
 **WORKING PRODUCT NAME · EXTERNAL PROFESSIONAL CLEARANCE OPEN** — les assets brand-bearing restent

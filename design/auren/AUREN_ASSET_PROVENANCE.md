@@ -10,7 +10,8 @@ Les entrées ci-dessous couvrent les objets runtime existants (repository-author
 |---|---|
 | `asset_id` | id du manifest |
 | `author` | auteur réel (personne/équipe) ou `UNKNOWN — MANUAL VERIFICATION REQUIRED` |
-| `owner` | propriétaire des droits |
+| `owner` | **gardien opérationnel du repository OU titulaire de droits revendiqué** — *n'est pas* une preuve de propriété intellectuelle juridiquement démontrée (voir `ip_ownership_status`) |
+| `ip_ownership_status` | état de la propriété intellectuelle : `not-legally-reviewed` \| `verified` \| `unknown` \| `not-applicable`. **Jamais `verified` sans revue juridique aboutie.** |
 | `source_project` | projet/bibliothèque d'origine (si tiers) |
 | `source_version` | version de la source |
 | `source_type` | voir §2 |
@@ -41,6 +42,10 @@ Les entrées ci-dessous couvrent les objets runtime existants (repository-author
   `status: manual-verification-required`.
 - **Aucune** source juridique via un agrégateur : la licence est vérifiée sur la **source officielle** au
   moment de l'intake réel.
+- **`owner` ≠ propriété juridique prouvée.** Le champ `owner` désigne le **gardien opérationnel** du
+  repository (ou un titulaire de droits *revendiqué*), jamais une PI juridiquement démontrée. La preuve
+  juridique est portée par `ip_ownership_status`, qui reste **`not-legally-reviewed`** tant qu'aucune revue
+  juridique n'a abouti. `IP OWNERSHIP NOT LEGALLY VERIFIED` est l'état par défaut des entrées repository.
 
 ## 5. Entrées initiales (runtime existant)
 
@@ -48,7 +53,8 @@ Les entrées ci-dessous couvrent les objets runtime existants (repository-author
 ```yaml
 asset_id: auren.runtime.bodymap.prototype
 author: repository (Sb_BODYMAP_01.1)
-owner: MFE-DSS/workout-session-tracking
+owner: MFE-DSS/workout-session-tracking — OPERATIONAL REPOSITORY CUSTODIAN
+ip_ownership_status: not-legally-reviewed   # IP OWNERSHIP NOT LEGALLY VERIFIED
 source_project: NOT APPLICABLE
 source_version: NOT APPLICABLE
 source_type: repository-authored
@@ -70,7 +76,8 @@ status: verified-repository-authored
 ```yaml
 asset_id: auren.runtime.pwa.mark  (+ favicon, apple-touch, icon-192/512, maskable-512)
 author: repository (Sb_UI_10.2)
-owner: MFE-DSS/workout-session-tracking
+owner: MFE-DSS/workout-session-tracking — OPERATIONAL REPOSITORY CUSTODIAN
+ip_ownership_status: not-legally-reviewed   # IP OWNERSHIP NOT LEGALLY VERIFIED (brand-bearing — cf. legal_note)
 source_type: repository-authored     # glyphe haltère existant recoloré, pas d'import tiers
 source_reference: internal — app/static/icons/*  ; docs/SPRINT_Sb_UI_10_2_..._REPORT.md
 license_spdx: NOT APPLICABLE
@@ -91,7 +98,8 @@ legal_note: >
 ```yaml
 asset_id: auren.runtime.shell.inline-icons
 author: repository (Sb_UI_03.1)
-owner: MFE-DSS/workout-session-tracking
+owner: MFE-DSS/workout-session-tracking — OPERATIONAL REPOSITORY CUSTODIAN
+ip_ownership_status: not-legally-reviewed   # IP OWNERSHIP NOT LEGALLY VERIFIED
 source_project: NOT APPLICABLE       # PAS Tabler/Health Icons — dessinées à la main dans le repo
 source_type: repository-authored
 source_reference: internal — app/templates/base.html
@@ -107,6 +115,28 @@ status: verified-repository-authored
 note: >
   upstream provenance = NOT APPLICABLE (création originale). Le futur subset gouverné
   (Tabler vendored) fera l'objet d'un intake tiers complet en Sb_ASSET_02.1.
+```
+
+### 5.4 Contrats sémantiques (Sb_ASSET_01.2 — non graphiques)
+```yaml
+asset_id: auren.contract.body-zone-taxonomy (+ auren.contract.body-zone-mapping)
+author: repository (Sb_ASSET_01.2)
+owner: MFE-DSS/workout-session-tracking — OPERATIONAL REPOSITORY CUSTODIAN
+ip_ownership_status: not-legally-reviewed   # IP OWNERSHIP NOT LEGALLY VERIFIED
+source_project: NOT APPLICABLE       # contrat interne, miroir de ZONE_LABELS / _WA_ZONE_TO_REGION
+source_type: repository-authored
+license_spdx: NOT APPLICABLE
+attribution_required: no
+usage_nature: reference-only          # contrat design, PAS servi par l'app (0 runtime_file)
+modifications: taxonomie 11 zones + 6 macros + IDs SVG (Markdown + YAML JSON-compatible) ; 0 géométrie
+tooling: hand-authored (Markdown/JSON-YAML)
+reviewer: NOT YET REVIEWED            # acceptance = Sb_ASSET_01.2 human review (séparée)
+review_date: NOT APPLICABLE
+evidence: docs/SPRINT_Sb_ASSET_01_2_BODY_ZONE_TAXONOMY_MAPPING_REPORT.md
+status: provisional
+note: >
+  Contrat sémantique, pas un asset graphique. Miroir de la vérité runtime, ne la remplace pas.
+  Aucune autorisation d'intégration runtime.
 ```
 
 ## 6. Assets tiers

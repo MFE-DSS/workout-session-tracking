@@ -77,7 +77,15 @@ delt_post) · Back(lats/upper_back) · Arms(biceps/triceps) · Legs(quads/poster
   (`OPERATIONAL REPOSITORY OWNER — IP OWNERSHIP NOT LEGALLY VERIFIED`, §11.1) ; (b) documenter la
   temporalité du garde binaire (interdiction SVG/PNG sous `design/auren/` = garde du lot, évolue au 1ᵉʳ
   intake `Sb_ASSET_02.1`, §16). Aucune n'est un défaut matériel.
+- **`Sb_ASSET_01.2`** Body Zone Taxonomy & Mapping Contract : 🟢 **CODE COMPLETE — CI PENDING — HUMAN REVIEW
+  PENDING** 2026-07-19 (`SPRINT_Sb_ASSET_01_2_BODY_ZONE_TAXONOMY_MAPPING_REPORT.md` ; baseline `7da5334`).
+  **2ᵉ et dernier build du socle `Sx_ASSET_01`** (socle complet après cette revue). Contrat sémantique
+  versionné (Layer A, 0 géométrie, 0 runtime) : `AUREN_BODY_ZONE_TAXONOMY.md` + `source/bodymap/`
+  (`auren_bodymap_mapping.yaml` YAML JSON-compatible lu par `json` stdlib — 0 dépendance ; README). Parité
+  runtime testée (`ZONE_LABELS`, `_WA_ZONE_TO_REGION`, descriptor). `unknown` séparé (non-anatomie). IDs SVG
+  figés. **`BODYMAP COMPACT MACROS ARE NOT RADAR_AXES`** — `RADAR_AXES` intouché. **2 dettes de la revue
+  01.1 résolues** : `owner` nuancé (`ip_ownership_status: not-legally-reviewed`) ; garde binaire → garde
+  évolutive allowlistée. 29 + 23 tests + broad sweep 273 verts. `ASSET INTEGRATION GATE: BLOCKED` inchangé.
 
 ## Prochaine action
-`GO BUILD — Sb_ASSET_01.2 Body Zone Taxonomy & Mapping Contract` (non commencé) — absorbe les 2 dettes
-ci-dessus.
+`GO VALIDATE — Sb_ASSET_01.2 Body Zone Taxonomy & Mapping Contract` (non commencé).

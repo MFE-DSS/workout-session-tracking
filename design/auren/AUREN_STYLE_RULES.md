@@ -42,10 +42,15 @@ mesurée prétendue** (pas d'EMG/mesure physiologique). Sans visage détaillé/v
 réaliste/détails sexuels. Lisible **60–120 px**, exploitable côte à côte à **360 px**. Le BodyMap
 **localise** une région du catalogue ; il **ne mesure pas** l'intensité.
 
-## 6. Taxonomie (figée — cf. spec)
+## 6. Taxonomie (figée — contrat normatif)
 **11 zones** : `pecs · delt_lat · delt_post · lats · upper_back · biceps · triceps · quads · posterior ·
-calves · core` (+ `unknown` = état métier neutre). **6 macros** : Chest · Shoulders · Back · Arms · Legs ·
-Core. **Ne jamais inventer une 12ᵉ zone pour améliorer le dessin.**
+calves · core` (+ `unknown` = état métier neutre, **pas** une zone anatomique). **6 macros** : Chest ·
+Shoulders · Back · Arms · Legs · Core. **Ne jamais inventer une 12ᵉ zone pour améliorer le dessin.**
+Contrat normatif complet (labels FR, mapping, IDs SVG stables, séparation `RADAR_AXES`) :
+[`AUREN_BODY_ZONE_TAXONOMY.md`](AUREN_BODY_ZONE_TAXONOMY.md) +
+[`source/bodymap/auren_bodymap_mapping.yaml`](source/bodymap/auren_bodymap_mapping.yaml). Les IDs SVG
+(`zone-<code>`) sont une **API figée** : toute évolution incompatible = nouvelle spec + migration de contrat.
+**`BODYMAP COMPACT MACROS ARE NOT RADAR_AXES`** (macros visuelles ≠ axes analytics — ne pas fusionner).
 
 ## 7. Accessibilité
 - **BodyMap décoratif** (texte adjacent suffit) : `aria-hidden="true"` · `focusable="false"`. Le texte

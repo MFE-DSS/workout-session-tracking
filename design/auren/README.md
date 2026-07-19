@@ -34,7 +34,9 @@ Auren name              : WORKING PRODUCT NAME — EXTERNAL PROFESSIONAL CLEARAN
 - **Validation mobile 360 px avant intégration.**
 
 ## Navigation
-- [`AUREN_VISUAL_ASSET_MANIFEST.md`](AUREN_VISUAL_ASSET_MANIFEST.md) — schéma + entrées d'assets (statuts bornés)
+- [`AUREN_VISUAL_ASSET_MANIFEST.md`](AUREN_VISUAL_ASSET_MANIFEST.md) — schéma + entrées d'assets (statuts bornés) + contrats sémantiques
+- [`AUREN_BODY_ZONE_TAXONOMY.md`](AUREN_BODY_ZONE_TAXONOMY.md) — **taxonomie normative** des 11 zones, 6 macros, IDs SVG (Sb_ASSET_01.2)
+- [`source/bodymap/auren_bodymap_mapping.yaml`](source/bodymap/auren_bodymap_mapping.yaml) — **contrat de mapping** versionné (0 géométrie)
 - [`AUREN_STYLE_RULES.md`](AUREN_STYLE_RULES.md) — positionnement, palette, contrat SVG, anatomie, a11y
 - [`AUREN_ASSET_PROVENANCE.md`](AUREN_ASSET_PROVENANCE.md) — registre de provenance
 - [`AUREN_ASSET_INTAKE_CHECKLIST.md`](AUREN_ASSET_INTAKE_CHECKLIST.md) — accepter/refuser un futur asset
@@ -50,15 +52,18 @@ design/auren/
 ├── AUREN_STYLE_RULES.md               # créé (Sb_ASSET_01.1)
 ├── AUREN_ASSET_PROVENANCE.md          # créé (Sb_ASSET_01.1)
 ├── AUREN_ASSET_INTAKE_CHECKLIST.md    # créé (Sb_ASSET_01.1)
+├── AUREN_BODY_ZONE_TAXONOMY.md        # créé (Sb_ASSET_01.2)
 ├── LICENSES/                          # créé (README seul ; 0 licence tierce)
+├── source/bodymap/                    # créé (Sb_ASSET_01.2 : README + auren_bodymap_mapping.yaml — CONTRAT, 0 dessin)
 ├── references/{anatomy,licences,review-notes}/   # futur (Sx_ASSET_03) — non créé
-├── source/{bodymap,brand,icons/{vendor/tabler,custom}}/  # futur (Sb_ASSET_01.2+/02.1) — non créé
+├── source/{brand,icons/{vendor/tabler,custom}}/  # futur (02.1) — non créé
 ├── tokens/auren.tokens.json           # futur (build ultérieur) — non créé
 ├── exports/{svg,png,pwa}/             # futur (03.2/04.1) — non créé
 └── previews/{bodymap,session,home,body-intelligence}/  # futur — non créé
 ```
-> Les dossiers `references/`, `source/`, `tokens/`, `exports/`, `previews/` **ne sont pas créés vides** :
-> ils apparaîtront quand un build y déposera un contenu réel. Créer des dossiers vides serait trompeur.
+> Les dossiers `references/`, `source/{brand,icons}/`, `tokens/`, `exports/`, `previews/` **ne sont pas créés
+> vides** : ils apparaîtront quand un build y déposera un contenu réel. `source/bodymap/` existe désormais
+> car `Sb_ASSET_01.2` y dépose un **contrat** (YAML), pas un dessin.
 
 ## Règle importante
 ```

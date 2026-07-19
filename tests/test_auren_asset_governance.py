@@ -168,18 +168,62 @@ def test_no_fabricated_license_text():
         assert not (AUREN / "LICENSES" / name).exists(), f"fabricated license: {name}"
 
 
-# ───────── security: no binary/asset under design/auren/ ─────────
+# ───────── security: evolving governance guard under design/auren/ ─────────
+#
+# The zero-asset BINARY guard is PERMANENT (no svg/png/... may ever live under
+# design/auren/ without a governed intake).
+#
+# The zero-STRUCTURED-file guard was specific to Sb_ASSET_01.1. From
+# Sb_ASSET_01.2 onwards, structured contract files are allowed by an EXPLICIT
+# ALLOWLIST only — everything else (any other .yaml/.yml/.json) is still denied.
+# Future SVG intake requires Sb_ASSET_02.1 / Sb_ASSET_03.2 to evolve this guard
+# from blanket denial to manifest-backed validation.
+
+# Binary/asset extensions — PERMANENTLY forbidden under design/auren/.
+FORBIDDEN_BINARY_SUFFIXES = {
+    ".svg", ".png", ".webp", ".ico", ".jpg", ".jpeg", ".gif",
+    ".woff", ".woff2", ".ttf", ".otf", ".blend", ".fig",
+}
+
+# Structured contract files explicitly allowed (exact repo-relative paths).
+ALLOWED_STRUCTURED_FILES = {
+    "design/auren/source/bodymap/auren_bodymap_mapping.yaml",
+}
+
+# Structured extensions allowed ONLY via the allowlist above.
+STRUCTURED_SUFFIXES = {".yaml", ".yml", ".json"}
 
 
 def test_no_asset_binaries_under_design_auren():
-    forbidden = {".svg", ".png", ".webp", ".ico", ".jpg", ".jpeg", ".gif",
-                 ".woff", ".woff2", ".ttf", ".otf", ".blend", ".fig"}
+    """PERMANENT guard: no binary/asset file may live under design/auren/."""
     offenders = [
         str(p.relative_to(ROOT))
         for p in AUREN.rglob("*")
-        if p.is_file() and p.suffix.lower() in forbidden
+        if p.is_file() and p.suffix.lower() in FORBIDDEN_BINARY_SUFFIXES
     ]
     assert not offenders, f"asset/binary files under design/auren/: {offenders}"
+
+
+def test_structured_files_only_via_allowlist():
+    """Only allowlisted structured contract files are permitted; any other
+    .yaml/.yml/.json under design/auren/ is denied (no blanket YAML/JSON)."""
+    offenders = [
+        rel
+        for p in AUREN.rglob("*")
+        if p.is_file() and p.suffix.lower() in STRUCTURED_SUFFIXES
+        and (rel := str(p.relative_to(ROOT))) not in ALLOWED_STRUCTURED_FILES
+    ]
+    assert not offenders, f"non-allowlisted structured files under design/auren/: {offenders}"
+
+
+def test_allowlisted_contract_present_and_binary_free():
+    """The allowlisted mapping contract exists and is a structured file (never a
+    binary). This proves the guard evolved without opening SVG/PNG intake."""
+    for rel in ALLOWED_STRUCTURED_FILES:
+        p = ROOT / rel
+        assert p.is_file(), f"allowlisted contract missing: {rel}"
+        assert p.suffix.lower() in STRUCTURED_SUFFIXES
+        assert p.suffix.lower() not in FORBIDDEN_BINARY_SUFFIXES
 
 
 def test_no_master_files_exist():

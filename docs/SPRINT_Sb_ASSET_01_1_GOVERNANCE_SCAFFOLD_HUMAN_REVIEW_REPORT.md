@@ -1,6 +1,6 @@
 # Sb_ASSET_01.1 — Governance Scaffold & Provenance Registry — HUMAN REVIEW REPORT
 
-**Verdict** : 🟢 **HUMAN REVIEW: ACCEPTED** (avec 1 dette corrective enregistrée — §20/§24)
+**Verdict :** 🟢 **HUMAN REVIEW: ACCEPTED** (avec 1 dette corrective enregistrée — §20/§24)
 **Type** : human review — **DOCS-ONLY** (aucune modif `design/**`/`tests/**`/`app/**`)
 **Date** : 2026-07-19
 **Programme** : `Sx_ASSET` — Auren Proprietary Visual Asset System (1er build, `Sb_ASSET_01.1`)
