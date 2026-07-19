@@ -163,7 +163,7 @@ obligatoire ne reste dans la queue.**
 1. OPERATOR — Sb_UI_11.3 Final Auren Baseline Capture (local, PNG non committés)
 2. EXTERNAL — Auren professional trademark/domain clearance (CPI)
 3. OPERATOR — Sb_SESSION_UX_01.5 gym dogfood
-4. OPTIONAL FUTURE PROGRAM — Auren proprietary visual assets (BodyMap/iconographie)
+4. OPTIONAL FUTURE PROGRAM — Auren proprietary visual assets (BodyMap/iconographie) — **ouvert le 2026-07-19 sur GO opérateur** : programme indépendant `Sx_ASSET` (cf. `Sx_ASSET_01_AUREN_VISUAL_ASSET_SYSTEM_SPEC.md`). **N'affecte pas le closeout Sx_UI** (qui reste CLOSED).
 ```
 *(Distincte des chantiers Custom Program / Exercise System, non mélangée.)*
 
