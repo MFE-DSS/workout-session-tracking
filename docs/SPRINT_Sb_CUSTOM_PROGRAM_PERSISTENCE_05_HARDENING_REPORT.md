@@ -87,3 +87,23 @@ immuables au niveau applicatif — le tout **sans toucher au schéma** (prouvé 
 QA). 13 dédiés + 51 sentinelles verts premier coup. Prochaines étapes : GO COMMIT → PR
 (CI 3/3) → merge sur GO. **`EKB_01`/`SCORING_01` et le reste de la queue restent NOT
 AUTHORIZED.**
+
+---
+
+## Appendice post-merge (closeout 2026-07-19)
+
+- **Commit build** : `f9a62f8` (6 fichiers, +518/−3) sur
+  `sb/custom-program-persistence-05-hardening`, base `a1fe5a6`.
+- **Garde-fou arbre-sale** : `test_worked_area_descriptor.py` **14/14 vert post-commit** —
+  l'unique failed du full sweep confirmé comme artefact pré-commit, pas un défaut.
+- **PR #27 MERGED** (2026-07-19) — merge **`bf5998e`** sur le canonique.
+- **CI PR `29658159984` : 3/3 GREEN premier coup** (pytest + QA ✅ · lint ✅ · SonarCloud ✅).
+- **CI canonique `29687387565` sur `bf5998e` : 3/3 GREEN** — non-régression confirmée sur
+  le trunk.
+- **Quality gate externe SonarCloud** (« SonarCloud Code Analysis ») : FAIL sur
+  `new_coverage` 0.0 % < 80 % uniquement — **état structurel identique aux PR #23–#26**
+  (la CI n'uploade aucune couverture Python vers Sonar ; les 35 lignes nouvelles sont en
+  réalité couvertes par les 13 tests dédiés). Jamais bloquant ; correction éventuelle
+  (coverage.xml + `sonar.python.coverage.reportPaths`) = sprint `ci_infra` gated.
+- **Head Alembic canonique inchangé : `n5o0i6j7l98`** — PERSISTENCE_05 est bien un build
+  zéro-schéma livré.
