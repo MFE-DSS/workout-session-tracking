@@ -1,0 +1,133 @@
+{
+  "schema": "auren.body-zone-mapping",
+  "schema_version": 1,
+  "contract_version": "1.0.0",
+
+  "purpose": "Versioned, testable semantic contract for the Auren BodyMap: the eleven functional body zones, their labels, the mapping to the six compact visual macro-regions, and the stable SVG IDs. This is a DESIGN CONTRACT (Layer A, business semantics). It carries NO geometry and does NOT replace runtime truth. It is expressed as YAML 1.2 in JSON-compatible syntax so it is readable with the Python standard library (json) without adding PyYAML.",
+
+  "runtime_sources": {
+    "note": "The design contract MIRRORS runtime truth. It does NOT replace runtime truth in Sb_ASSET_01.2. Parity is enforced by tests/test_auren_body_zone_contract.py.",
+    "zone_codes_and_labels": "app/services/muscle_mapping.py#ZONE_LABELS",
+    "compact_macro_mapping": "app/templates/_partials/worked_area_body_map.html#_WA_ZONE_TO_REGION",
+    "exchange_contract": "app/services/body_map_descriptor.py#build_body_map_descriptor"
+  },
+
+  "analytics_separation": {
+    "statement": "BODYMAP COMPACT MACROS ARE NOT RADAR_AXES",
+    "why": "The compact BodyMap macros are a VISUAL presentation model (11 zones -> 6 macros). RADAR_AXES is an ANALYTICS model with different granularity: it splits back into back_width (lats) and back_thickness (upper_back), folds the whole lower body into a single 'lower' axis, and carries no 'core' axis. The two models must NEVER be merged. This contract does not touch RADAR_AXES / RADAR_AXIS_ORDER.",
+    "radar_axes_reference_readonly": ["pecs", "shoulders", "back_width", "back_thickness", "arms", "lower"]
+  },
+
+  "zones": [
+    {"code": "pecs",       "label_fr": "Pectoraux",             "compact_macro": "chest",     "stable_svg_id": "zone-pecs",       "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "delt_lat",   "label_fr": "Deltoïdes latéraux",    "compact_macro": "shoulders", "stable_svg_id": "zone-delt_lat",   "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "delt_post",  "label_fr": "Deltoïdes postérieurs", "compact_macro": "shoulders", "stable_svg_id": "zone-delt_post",  "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "lats",       "label_fr": "Dos largeur",           "compact_macro": "back",      "stable_svg_id": "zone-lats",       "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "upper_back", "label_fr": "Dos épaisseur",         "compact_macro": "back",      "stable_svg_id": "zone-upper_back", "semantic_kind": "functional-aggregate", "medical_claim": false},
+    {"code": "biceps",     "label_fr": "Biceps",                "compact_macro": "arms",      "stable_svg_id": "zone-biceps",     "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "triceps",    "label_fr": "Triceps",               "compact_macro": "arms",      "stable_svg_id": "zone-triceps",    "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "quads",      "label_fr": "Quadriceps",            "compact_macro": "legs",      "stable_svg_id": "zone-quads",      "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "posterior",  "label_fr": "Ischios / Fessiers",    "compact_macro": "legs",      "stable_svg_id": "zone-posterior",  "semantic_kind": "functional-aggregate", "medical_claim": false},
+    {"code": "calves",     "label_fr": "Mollets",               "compact_macro": "legs",      "stable_svg_id": "zone-calves",     "semantic_kind": "functional-body-zone", "medical_claim": false},
+    {"code": "core",       "label_fr": "Core / Abdos",          "compact_macro": "core",      "stable_svg_id": "zone-core",       "semantic_kind": "functional-body-zone", "medical_claim": false}
+  ],
+
+  "aggregate_notes": {
+    "upper_back": "Functional back-thickness zone. Does NOT claim to distinguish trapezius / rhomboids / individual fascicles / precise insertion.",
+    "posterior": "Functional aggregate: hamstrings / glutes / lower posterior chain. Does NOT claim to localise each muscle or fascicle.",
+    "rule": "The future BodyMap must reflect the granularity of the data, never a higher precision than the data supports."
+  },
+
+  "unknown_state": {
+    "code": "unknown",
+    "nature": "qualification-state",
+    "anatomical_zone": false,
+    "label_fr": "À qualifier",
+    "visual_behavior": "neutral",
+    "rules": [
+      "unknown is NOT a twelfth zone",
+      "unknown has NO zone-unknown SVG id",
+      "unknown produces NO active anatomy",
+      "unknown is NEVER counted in the eleven-zone coverage metrics",
+      "unknown is NEVER auto-converted to a nearby region"
+    ]
+  },
+
+  "compact_macros": [
+    {"code": "chest",     "label": "Pectoraux", "zones": ["pecs"],                          "compact_render_views": ["front"]},
+    {"code": "shoulders", "label": "Épaules",   "zones": ["delt_lat", "delt_post"],         "compact_render_views": ["front", "back"]},
+    {"code": "back",      "label": "Dos",       "zones": ["lats", "upper_back"],            "compact_render_views": ["back"]},
+    {"code": "arms",      "label": "Bras",      "zones": ["biceps", "triceps"],            "compact_render_views": ["front", "back"]},
+    {"code": "legs",      "label": "Jambes",    "zones": ["quads", "posterior", "calves"], "compact_render_views": ["front", "back"]},
+    {"code": "core",      "label": "Core",      "zones": ["core"],                          "compact_render_views": ["front"]}
+  ],
+  "compact_render_views_note": "compact_render_views describes the EXISTING compact prototype (which base view highlights the macro), NOT a final per-zone anatomical decision. The human master (Layer B) may refine views WITHOUT changing the eleven codes, the six macros, or business data.",
+
+  "stable_svg_ids": [
+    "auren-bodymap",
+    "body-front-base",
+    "body-back-base",
+    "zone-pecs",
+    "zone-delt_lat",
+    "zone-delt_post",
+    "zone-lats",
+    "zone-upper_back",
+    "zone-biceps",
+    "zone-triceps",
+    "zone-quads",
+    "zone-posterior",
+    "zone-calves",
+    "zone-core"
+  ],
+  "stable_svg_ids_rules": [
+    "one id per zone",
+    "no zone-unknown id",
+    "no rename",
+    "no minification",
+    "no implicit alias",
+    "no gendered id",
+    "no path merged between two zones",
+    "any incompatible change = new spec + contract migration (these ids are an API of the future asset pack)"
+  ],
+
+  "presentation_states": [
+    {"code": "neutral",  "meaning": "known zone, not currently active"},
+    {"code": "primary",  "meaning": "primary worked zone"},
+    {"code": "secondary","meaning": "secondary worked zone"},
+    {"code": "unknown",  "meaning": "no qualified zone"},
+    {"code": "disabled", "meaning": "surface or variant unavailable"}
+  ],
+  "presentation_states_note": "No colour is encoded here. Colours stay driven by the runtime CSS tokens (Auren Terminal). States must NOT be distinguished by colour alone (non-color cue required).",
+
+  "surfaces": [
+    {"code": "session-compact",   "integration": "current",           "evidence": "app/templates/_partials/exercise_card.html includes worked_area_body_map.html"},
+    {"code": "body-intelligence", "integration": "not-yet-integrated","evidence": "body_intelligence uses its own body_intelligence_zone_card.html; the worked_area BodyMap partial is not included there"},
+    {"code": "program-card",      "integration": "future"},
+    {"code": "history",           "integration": "future"},
+    {"code": "progress-overview", "integration": "future"},
+    {"code": "onboarding",        "integration": "future"}
+  ],
+  "surfaces_note": "integration reflects ONLY what the repository audit demonstrates at Sb_ASSET_01.2. This contract does NOT claim that every surface already consumes the BodyMap.",
+
+  "body_variants": [
+    {"code": "male_neutral_v1",     "available": false},
+    {"code": "female_neutral_v1",   "available": false},
+    {"code": "neutral_abstract_v1", "available": false}
+  ],
+  "body_variants_note": "Compatibility contract only. No variant is produced. The human V1 may start with male_neutral_v1, BUT: no business code depends on any variant; no gender is encoded in zone codes; the eleven SVG ids are identical across variants; no variant is marked available today.",
+
+  "geometry_status": "NOT YET PRODUCED",
+  "geometry_note": "This contract carries NO geometry: no path, no polygon, no coordinates, no activation, no percentage, no EMG. Geometry and anatomical validation belong to human production (OPERATOR_ASSET_03.1) and technical intake (Sb_ASSET_03.2). A semantic contract is NOT an anatomical validation.",
+
+  "invariants": [
+    "exactly eleven zones, canonical order preserved",
+    "labels_fr identical to ZONE_LABELS",
+    "each zone belongs to exactly one compact macro; union of macros = the eleven zones",
+    "compact macro mapping identical to _WA_ZONE_TO_REGION",
+    "unknown is a qualification state, never an anatomical zone, never a macro",
+    "BodyMap compact macros are not RADAR_AXES; RADAR_AXES / RADAR_AXIS_ORDER are untouched",
+    "stable SVG ids are frozen; incompatible change requires a new spec + contract migration",
+    "no geometry, no activation, no medical claim",
+    "presence in design/auren/ != authorization in app/static/ (ASSET INTEGRATION GATE remains BLOCKED)"
+  ]
+}
