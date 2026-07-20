@@ -294,17 +294,20 @@
   `python:S5863` (commit `2f39db6`).
   **`EKB_02` = FIRST NEXT EKB BUILD CANDIDATE / NOT OPENED · `EKB_03`/`EKB_04`,
   `SCORING_01`, `WIZARD_*` NOT OPENED.**
-- **`Sb_CUSTOM_PROGRAM_EKB_02 — Canonical Exercise Knowledge Base JSON` : 🟢 PATCH
-  COMPLETE / REVIEW PENDING** 2026-07-20 (branche `sb/custom-program-ekb-02-canonical-json`,
-  base `8ef3240` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_EKB_02_CANONICAL_JSON_REPORT.md`).
+- **`Sb_CUSTOM_PROGRAM_EKB_02 — Canonical Exercise Knowledge Base JSON` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-20 (build `eeab131`, **PR #29 MERGED**, merge `eafede6`,
+  CI PR `29746901012` 4/4 · CI canonique `29749856878` 3/3 — gate externe SonarCloud
+  passé sans incident)
+  (`docs/SPRINT_Sb_CUSTOM_PROGRAM_EKB_02_CANONICAL_JSON_REPORT.md` + appendice,
+  branche `sb/custom-program-ekb-02-canonical-json`, base `8ef3240`).
   **Data-only** : `data/exercise_knowledge_base.json` (`Sb_CUSTOM_PROGRAM_EKB_02.v1`),
   **103 entrées générées par script depuis le snapshot** (noms byte-à-byte), enrichissement
   strictement dérivable : 51 covered = properties verbatim, `zone_primary` 11 fines +
   `zone_macro` dérivé (RADAR_AXES), equipment multi-source (73/103). **52 gaps visibles**
   dont **19 trous noirs** (`todo`). **`variant_group` null V1** ; curation différée.
   **2 orphelines → `_aliases`** (lien sourcé). 19 dédiés + 13 non-régression (32/32) ;
-  check_scope ISOLATED (full sweep skippé) ; head `n5o0i6j7l98` inchangé.
-  Statut PR/CI/merge à consigner au closeout.
+  check_scope ISOLATED (full sweep skippé) ; head `n5o0i6j7l98` inchangé. Parent
+  `804b08c` (session ASSET) : run push annulé par concurrency, remplacé sans impact.
   **`EKB_03` (checks complets) = FIRST NEXT / NOT OPENED · `EKB_04`, `SCORING_01`,
   `WIZARD_*` NOT OPENED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,

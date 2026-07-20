@@ -120,3 +120,18 @@ multi-source), 52 gaps et 19 trous noirs visibles, 2 orphelines consignées en a
 13 non-régression verts, check_scope ISOLATED. `EKB_03` (checks complets, spec 02 §14) = **FIRST
 NEXT EKB BUILD CANDIDATE / NOT OPENED** · `EKB_04` (seed DB) = **NOT OPENED** · `SCORING_01`,
 `WIZARD_*` = **NOT OPENED**.
+
+---
+
+## Appendice post-merge (closeout 2026-07-20)
+
+- **Commit build** : `eeab131` (5 fichiers, +2035) sur `sb/custom-program-ekb-02-canonical-json`,
+  base `8ef3240`.
+- **PR #29 MERGED** — merge **`eafede6`** sur le canonique (parent immédiat `804b08c`, session
+  ASSET, surfaces disjointes — aucun conflit).
+- **CI PR `29746901012` : 4/4 GREEN** — les 3 jobs **+ le quality gate externe SonarCloud**, sans
+  incident (2ᵉ build de code du track à passer le gate externe).
+- **CI canonique `29749856878` sur `eafede6` : 3/3 GREEN** (lint · pytest+QA · SonarCloud).
+- **Run ASSET `804b08c` annulé par concurrency** (`cancel-in-progress` sur le même ref) —
+  comportement normal, remplacé sans impact par le run descendant `eafede6` qui inclut son contenu.
+- **Head Alembic canonique inchangé : `n5o0i6j7l98`** — EKB_02 est bien data-only, zéro schéma.
