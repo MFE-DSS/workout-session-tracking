@@ -176,7 +176,9 @@ def test_baseline_coherence_without_inventing_mappings():
 
 
 def test_audit_is_deterministic_across_two_runs():
-    assert run_audit() == run_audit()
+    first = run_audit()
+    second = run_audit()
+    assert first == second
 
 
 def test_script_never_mutates_its_sources(capsys):
