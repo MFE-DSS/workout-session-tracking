@@ -3,12 +3,16 @@
 Ce dossier conserve le **texte de licence complet** de chaque projet tiers dont un asset est ingéré dans
 le pack source Auren.
 
-## État initial
+## État (2026-07-20)
 ```
-No third-party asset has been accepted into the Auren source pack.
+FIRST THIRD-PARTY LICENSE ACCEPTED INTO THE AUREN DESIGN SOURCE:
+  tabler-MIT.txt — Tabler Icons v3.45.0 (commit 975920ff…), SPDX MIT, © Paweł Kuna 2020-2026.
+  Texte officiel copié byte-for-byte depuis le commit épinglé.
+  Intake DESIGN SOURCE uniquement — human/legal review PENDING — 0 autorisation app/static/.
+No other third-party license present (Health Icons ABSENT — NOT REQUIRED FOR P0).
 ```
-**Aucune licence tierce n'est présente** — aucun asset tiers n'a été ingéré dans `Sb_ASSET_01.1`. Le
-premier intake tiers (subset **Tabler**) relève de `Sb_ASSET_02.1`.
+- **`tabler-MIT.txt`** : premier projet tiers accepté (Sb_ASSET_02.1), pour le subset de 10 icônes outline.
+- Le fichier conserve l'avis officiel MIT incluant **Paweł Kuna**. Aucune traduction/résumé/reconstruction.
 
 ## Règles
 - **Un texte de licence complet par projet tiers**, récupéré depuis la **source officielle** au moment de

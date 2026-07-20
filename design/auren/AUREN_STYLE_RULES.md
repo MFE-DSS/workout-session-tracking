@@ -69,3 +69,18 @@ captures/exports uniquement. **WebP** = images complexes éventuelles — **jama
 récupération · validation clinique.
 **Autorisé** : zone associée · région principalement travaillée · estimation indicative · classification
 d'exercice · représentation non médicale · données insuffisantes · à qualifier.
+
+## 10. Functional icon source subset — Sb_ASSET_02.1
+Premier **intake tiers** de la source de design : **Tabler outline v3.45.0** (commit `975920ff…`), **MIT**.
+10 SVG P0 dans `source/icons/vendor/tabler/v3.45.0/outline/`. Contrat par fichier :
+```
+viewBox="0 0 24 24" · stroke-width="2" · stroke-linecap/linejoin="round" · fill="none" · stroke="currentColor"
+```
+- **Commentaire de métadonnées Tabler retiré** ; **géométrie NON modifiée** ; LF + newline final.
+- **Aucune icône filled** · **aucune Health Icon** · **aucun glyphe custom** (NOT REQUIRED) · **0 runtime**.
+- Labels & accessibilité : cf. [`AUREN_ICON_SEMANTIC_MAP.md`](AUREN_ICON_SEMANTIC_MAP.md) — icône seule
+  réservée aux contrôles universels (timer play/pause/reset, menu) avec accessible name ; nav primaire &
+  Body Intelligence restent **textuels**.
+- **Statut** : `legal-review-required` · **HUMAN REVIEW PENDING** · **NOT AUTHORIZED FOR APP INTEGRATION**.
+- Tout nouveau vendor / SVG BodyMap = **nouvelle évolution gouvernée** du garde
+  (`tests/test_auren_asset_governance.py`) + provenance + licence.

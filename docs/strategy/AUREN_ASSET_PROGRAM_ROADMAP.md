@@ -103,14 +103,18 @@ Gates ouverts après `Sx_ASSET_01` : `Sx_ASSET_02` **NOT OPENED** · `Sx_ASSET_0
 `Sx_ASSET_04`/`Sb_ASSET_04.1` **BLOCKED BY ASSET INTEGRATION GATE**.
 
 ## Cycle 02 — Iconographie
-- **`Sx_ASSET_02`** Functional Iconography Selection : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT** 2026-07-20
-  (`Sx_ASSET_02_FUNCTIONAL_ICONOGRAPHY_SELECTION_SPEC.md` + rapport + `research/AUREN_ICON_VENDOR_DUE_DILIGENCE.md`
-  ; baseline `c1ad76c`). SEMANTICS BEFORE ICONS. Due diligence datée (2026-07-20) : **Tabler v3.45.0** commit
-  `975920ff…` MIT (format = contrat Auren) primaire ; **Health Icons** `891ace7a…` **icônes CC0 / code MIT**
-  secondaire **NOT REQUIRED FOR P0**. **P0 = 10 Tabler** (17 noms vérifiés existants au tag) ; P1 différé ;
-  métriques/confidence typographic-only ; **0 gap custom** → `Sb_ASSET_02.2 NOT REQUIRED`. Rend `ICON INTAKE
-  GATE: READY FOR Sb_ASSET_02.1` ; `ASSET INTEGRATION GATE: BLOCKED` inchangé. Docs-only (0 SVG/licence/app).
+- **`Sx_ASSET_02`** Functional Iconography Selection : 🟢 **SPEC COMMITTED** 2026-07-20 (`fe97adc`).
+  SEMANTICS BEFORE ICONS. Tabler v3.45.0 MIT (primaire) ; Health Icons CC0 assets/MIT code (NOT REQUIRED FOR
+  P0). P0 = 10 Tabler ; 0 gap custom → `Sb_ASSET_02.2 NOT REQUIRED`. Rend `ICON INTAKE GATE: READY FOR
+  Sb_ASSET_02.1`.
+- **`Sb_ASSET_02.1`** Vendored Icon Subset & License Intake : 🟢 **CODE COMPLETE — CI PENDING — HUMAN REVIEW
+  PENDING** 2026-07-20 (baseline `fe97adc` ; `SPRINT_Sb_ASSET_02_1_VENDOR_ICON_SUBSET_LICENSE_INTAKE_REPORT.md`).
+  **PREMIER INTAKE TIERS** : 10 SVG **Tabler v3.45.0** (commit `975920ff…`, pins vérifiés) + **licence MIT
+  byte-identique**. Normalisation bornée (commentaire+LF+newline, géométrie inchangée, prouvée indépendamment).
+  Semantic map + registre machine-lisible (preuves par fichier) + manifest 10 entrées (0 approved) +
+  provenance (`vendor`, NOT AUREN IP OWNERSHIP, 0 verified) + preview statique. Garde évolué (allowlist SVG
+  exacte). 20 + 25 tests stdlib. **0** Health Icons/custom/`app/**`/dépendance. **`ASSET INTEGRATION GATE:
+  BLOCKED`** — 10 icônes NOT AUTHORIZED FOR APP INTEGRATION. `Sb_ASSET_02.2 NOT REQUIRED`.
 
 ## Prochaine action
-`GO COMMIT SPEC — Sx_ASSET_02 Functional Iconography Selection` (non commencé). Puis `GO BUILD — Sb_ASSET_02.1
-Vendored Icon Subset & License Intake` (P0 = 10 SVG Tabler v3.45.0).
+`GO VALIDATE — Sb_ASSET_02.1 Vendored Icon Subset & License Intake` (non commencé).

@@ -136,9 +136,13 @@ def test_provenance_allows_explicit_unknown():
     assert "manual-verification-required" in src
 
 
-def test_provenance_declares_no_third_party_intake():
+def test_provenance_records_tabler_intake_only():
+    """After Sb_ASSET_02.1 the provenance records the Tabler MIT intake and
+    explicitly declares Health Icons ABSENT (no undisclosed third party)."""
     src = _read("AUREN_ASSET_PROVENANCE.md")
-    assert "No third-party asset" in src or "Aucun asset tiers" in src
+    assert "tabler/tabler-icons" in src
+    assert "975920ff99c12c4dc9e3fe61a03738330600f9b2" in src
+    assert "HEALTH ICONS : ABSENT" in src or "Health Icons" in src and "ABSENT" in src
 
 
 def test_provenance_does_not_invent_upstream_for_repo_assets():
@@ -152,20 +156,31 @@ def test_provenance_does_not_invent_upstream_for_repo_assets():
 # ───────── licenses ─────────
 
 
-def test_licenses_dir_holds_only_readme():
-    files = [p.name for p in (AUREN / "LICENSES").iterdir() if p.is_file()]
-    assert files == ["README.md"], f"LICENSES must hold only README, found: {files}"
+def test_licenses_dir_holds_exactly_readme_and_tabler():
+    """After Sb_ASSET_02.1 LICENSES holds exactly README + the official Tabler
+    MIT text — and nothing else (no Health Icons, no fabricated license)."""
+    files = sorted(p.name for p in (AUREN / "LICENSES").iterdir() if p.is_file())
+    assert files == ["README.md", "tabler-MIT.txt"], f"LICENSES must hold exactly README + tabler-MIT.txt, found: {files}"
 
 
-def test_licenses_readme_declares_no_intake():
+def test_tabler_license_is_official_mit():
+    src = _read("LICENSES/tabler-MIT.txt")
+    assert "MIT License" in src
+    assert "Paweł Kuna" in src  # official upstream attribution preserved
+
+
+def test_licenses_readme_records_tabler_intake():
     src = _read("LICENSES/README.md")
-    assert "No third-party asset has been accepted" in src
+    assert "tabler-MIT.txt" in src
+    # Health Icons must remain declared absent
+    assert "Health Icons ABSENT" in src or "Health Icons" in src and "ABSENT" in src
 
 
-def test_no_fabricated_license_text():
-    """No reconstructed license file (MIT.txt/CC-BY-4.0.txt/Apache-2.0.txt) yet."""
-    for name in ("MIT.txt", "CC-BY-4.0.txt", "Apache-2.0.txt"):
-        assert not (AUREN / "LICENSES" / name).exists(), f"fabricated license: {name}"
+def test_no_fabricated_or_health_icons_license():
+    """No reconstructed generic license, and NO Health Icons license ingested."""
+    for name in ("MIT.txt", "CC-BY-4.0.txt", "CC0-1.0.txt", "Apache-2.0.txt",
+                 "health-icons-MIT.txt", "health-icons-CC0.txt", "healthicons-CC0-1.0.txt"):
+        assert not (AUREN / "LICENSES" / name).exists(), f"forbidden license file: {name}"
 
 
 # ───────── security: evolving governance guard under design/auren/ ─────────
@@ -175,27 +190,45 @@ def test_no_fabricated_license_text():
 #
 # The zero-STRUCTURED-file guard was specific to Sb_ASSET_01.1. From
 # Sb_ASSET_01.2 onwards, structured contract files are allowed by an EXPLICIT
-# ALLOWLIST only — everything else (any other .yaml/.yml/.json) is still denied.
-# Future SVG intake requires Sb_ASSET_02.1 / Sb_ASSET_03.2 to evolve this guard
-# from blanket denial to manifest-backed validation.
+# ALLOWLIST only. From Sb_ASSET_02.1 onwards, SVG files are allowed ONLY when
+# they are on the exact vendored-icon allowlist (Tabler P0 subset). Any other
+# SVG/YAML/JSON, and every raster/font/binary format, is still denied.
+# Future SVG intake (Health Icons, BodyMap master, new vendors) requires a NEW
+# governed evolution of this test (extend the allowlist + provenance + license).
 
-# Binary/asset extensions — PERMANENTLY forbidden under design/auren/.
+# Raster/font/binary extensions — PERMANENTLY forbidden under design/auren/.
 FORBIDDEN_BINARY_SUFFIXES = {
-    ".svg", ".png", ".webp", ".ico", ".jpg", ".jpeg", ".gif",
+    ".png", ".webp", ".ico", ".jpg", ".jpeg", ".gif",
     ".woff", ".woff2", ".ttf", ".otf", ".blend", ".fig",
+}
+
+# Vendored SVGs explicitly allowed (exact repo-relative paths). Sb_ASSET_02.1:
+# the ten Tabler v3.45.0 outline P0 icons — and NOTHING else.
+_TABLER = "design/auren/source/icons/vendor/tabler/v3.45.0/outline"
+ALLOWED_VENDOR_SVGS = {
+    f"{_TABLER}/arrows-exchange.svg",
+    f"{_TABLER}/player-play.svg",
+    f"{_TABLER}/player-pause.svg",
+    f"{_TABLER}/rotate.svg",
+    f"{_TABLER}/chevron-down.svg",
+    f"{_TABLER}/chevron-up.svg",
+    f"{_TABLER}/bulb.svg",
+    f"{_TABLER}/alert-triangle.svg",
+    f"{_TABLER}/check.svg",
+    f"{_TABLER}/menu-2.svg",
 }
 
 # Structured contract files explicitly allowed (exact repo-relative paths).
 ALLOWED_STRUCTURED_FILES = {
     "design/auren/source/bodymap/auren_bodymap_mapping.yaml",
+    "design/auren/source/icons/auren_icon_subset.yaml",
 }
 
-# Structured extensions allowed ONLY via the allowlist above.
 STRUCTURED_SUFFIXES = {".yaml", ".yml", ".json"}
 
 
 def test_no_asset_binaries_under_design_auren():
-    """PERMANENT guard: no binary/asset file may live under design/auren/."""
+    """PERMANENT guard: no raster/font/binary file may live under design/auren/."""
     offenders = [
         str(p.relative_to(ROOT))
         for p in AUREN.rglob("*")
@@ -204,8 +237,21 @@ def test_no_asset_binaries_under_design_auren():
     assert not offenders, f"asset/binary files under design/auren/: {offenders}"
 
 
+def test_svgs_match_vendor_allowlist_exactly():
+    """The set of SVGs under design/auren/ MUST equal the vendored allowlist —
+    equality (not subset) so a MISSING file also fails, not only an intruder."""
+    actual = {
+        str(p.relative_to(ROOT))
+        for p in AUREN.rglob("*.svg")
+        if p.is_file()
+    }
+    assert actual == ALLOWED_VENDOR_SVGS, (
+        f"SVG set drift.\n  missing: {ALLOWED_VENDOR_SVGS - actual}\n  extra: {actual - ALLOWED_VENDOR_SVGS}"
+    )
+
+
 def test_structured_files_only_via_allowlist():
-    """Only allowlisted structured contract files are permitted; any other
+    """Only allowlisted structured files are permitted; any other
     .yaml/.yml/.json under design/auren/ is denied (no blanket YAML/JSON)."""
     offenders = [
         rel
@@ -216,14 +262,17 @@ def test_structured_files_only_via_allowlist():
     assert not offenders, f"non-allowlisted structured files under design/auren/: {offenders}"
 
 
-def test_allowlisted_contract_present_and_binary_free():
-    """The allowlisted mapping contract exists and is a structured file (never a
-    binary). This proves the guard evolved without opening SVG/PNG intake."""
+def test_allowlisted_files_present_and_correct_kind():
+    """Allowlisted contracts and vendored SVGs all exist and are the right kind."""
     for rel in ALLOWED_STRUCTURED_FILES:
         p = ROOT / rel
         assert p.is_file(), f"allowlisted contract missing: {rel}"
         assert p.suffix.lower() in STRUCTURED_SUFFIXES
-        assert p.suffix.lower() not in FORBIDDEN_BINARY_SUFFIXES
+    for rel in ALLOWED_VENDOR_SVGS:
+        p = ROOT / rel
+        assert p.is_file(), f"allowlisted vendor SVG missing: {rel}"
+        assert p.suffix.lower() == ".svg"
+        assert not p.is_symlink(), f"vendor SVG must be a regular file: {rel}"
 
 
 def test_no_master_files_exist():

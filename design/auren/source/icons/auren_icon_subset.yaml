@@ -1,0 +1,356 @@
+{
+  "schema": "auren.functional-icon-subset",
+  "schema_version": 1,
+  "subset_id": "auren.icons.vendor.tabler.p0",
+  "subset_version": "0.1.0",
+  "status": "legal-review-required",
+  "selected_by": {
+    "spec": "docs/strategy/Sx_ASSET_02_FUNCTIONAL_ICONOGRAPHY_SELECTION_SPEC.md",
+    "commit": "fe97adc"
+  },
+  "vendor": {
+    "project": "tabler/tabler-icons",
+    "version": "3.45.0",
+    "tag": "v3.45.0",
+    "tag_object": "64bfab222b4626fafb2301358dd41d3f3f3d84b2",
+    "commit": "975920ff99c12c4dc9e3fe61a03738330600f9b2",
+    "style": "outline",
+    "upstream_directory": "icons/outline",
+    "official_source": "https://github.com/tabler/tabler-icons",
+    "access_date": "2026-07-20"
+  },
+  "license": {
+    "spdx": "MIT",
+    "upstream_path": "LICENSE",
+    "upstream_blob_sha": "3e82379dab3fe93d9ee22251949604ed63ddea39",
+    "upstream_sha256": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db",
+    "local_path": "design/auren/LICENSES/tabler-MIT.txt",
+    "local_sha256": "b740a1d46122672da62833e97f7e7c8a13fa85cbc7445b584b297cc00dde93db",
+    "attribution_required": true,
+    "review": "NOT YET REVIEWED"
+  },
+  "normalization": {
+    "removed": [
+      "upstream XML metadata comment"
+    ],
+    "line_endings": "LF",
+    "final_newline": true,
+    "geometry_modified": false,
+    "tooling": "git object extraction + stdlib transparent normalization (no SVGO/resvg)"
+  },
+  "icons": [
+    {
+      "asset_id": "auren.icons.vendor.tabler.arrows-exchange",
+      "semantic_id": "auren.icon.action.substitute",
+      "label_fr": "Substituer",
+      "label_en_internal": "Substitute exercise",
+      "vendor_icon_name": "arrows-exchange",
+      "upstream_path": "icons/outline/arrows-exchange.svg",
+      "upstream_blob_sha": "721498aad6eefa7795af38c50d7990dc4ed81ddf",
+      "upstream_sha256": "b37e7394c5fbeb57fd6303a77415c579d914d267dde77641f3399d91ab457a8a",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg",
+      "local_sha256": "b6e118f2c7b47a6249644fc3da37ede2b2abe52e44976125750e3cbe0dc96660",
+      "raw_size_bytes": 415,
+      "local_size_bytes": 268,
+      "category": "action",
+      "accessibility_role": "decorative",
+      "visible_label_required": false,
+      "allowed_surfaces": [
+        "exercise-card",
+        "session-console",
+        "history-row"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.player-play",
+      "semantic_id": "auren.icon.action.timer-start",
+      "label_fr": "Démarrer le repos",
+      "label_en_internal": "Start rest timer",
+      "vendor_icon_name": "player-play",
+      "upstream_path": "icons/outline/player-play.svg",
+      "upstream_blob_sha": "bb84dbe9e4166071e66414ab6ce1a3b12cc6fd5a",
+      "upstream_sha256": "0178cf0262ec89422d632f6122c6be34a8b57db32dd1aea38dd283bdeecbfc2f",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/player-play.svg",
+      "local_sha256": "635b17e8ab5d04da3e906b38cdf93610c6570d503cef317cff12a3c2ab625ce7",
+      "raw_size_bytes": 396,
+      "local_size_bytes": 244,
+      "category": "action",
+      "accessibility_role": "action",
+      "visible_label_required": true,
+      "allowed_surfaces": [
+        "rest-timer",
+        "session-console"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.player-pause",
+      "semantic_id": "auren.icon.action.timer-pause",
+      "label_fr": "Pause repos",
+      "label_en_internal": "Pause rest timer",
+      "vendor_icon_name": "player-pause",
+      "upstream_path": "icons/outline/player-pause.svg",
+      "upstream_blob_sha": "b2a2a253d45357d8d3dceebbb84a8dc08050eda6",
+      "upstream_sha256": "d7ad7676cd255ce1032aec7af31c96ca99609dfee562a24f153475c0e992a664",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg",
+      "local_sha256": "d0b40a7a745f9083e36ddfe33ef2f20be4f7a6ad4aae2880ad00803f84e6510c",
+      "raw_size_bytes": 542,
+      "local_size_bytes": 397,
+      "category": "action",
+      "accessibility_role": "action",
+      "visible_label_required": true,
+      "allowed_surfaces": [
+        "rest-timer",
+        "session-console"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.rotate",
+      "semantic_id": "auren.icon.action.timer-reset",
+      "label_fr": "Réinitialiser repos",
+      "label_en_internal": "Reset rest timer",
+      "vendor_icon_name": "rotate",
+      "upstream_path": "icons/outline/rotate.svg",
+      "upstream_blob_sha": "abc20f17dfe83cbf7d5065f62c922a34217ae54d",
+      "upstream_sha256": "795d0fb5a27b04d34378c30086a8f25af4129b9d928b27a4d231fe2a7f8b8455",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/rotate.svg",
+      "local_sha256": "98e321e256a58222ceb301d7422519c9606b3486becb4139e16c79ef7f112d18",
+      "raw_size_bytes": 414,
+      "local_size_bytes": 260,
+      "category": "action",
+      "accessibility_role": "action",
+      "visible_label_required": true,
+      "allowed_surfaces": [
+        "rest-timer",
+        "session-console"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.chevron-down",
+      "semantic_id": "auren.icon.action.expand",
+      "label_fr": "Déplier",
+      "label_en_internal": "Expand",
+      "vendor_icon_name": "chevron-down",
+      "upstream_path": "icons/outline/chevron-down.svg",
+      "upstream_blob_sha": "8650685dc264b07d6a93c11c3efa40ac2a39c327",
+      "upstream_sha256": "06bd20b8cbe565b97046c5d0ec917f11ed6b29c0e4885a82ae057325c972bf9a",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg",
+      "local_sha256": "aef395a3cdd9fd8de6024f86a6f8ddbd6320cd97c78f749010af7cdd564baaa4",
+      "raw_size_bytes": 377,
+      "local_size_bytes": 237,
+      "category": "action",
+      "accessibility_role": "decorative",
+      "visible_label_required": false,
+      "allowed_surfaces": [
+        "exercise-card",
+        "program-card",
+        "history-row"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.chevron-up",
+      "semantic_id": "auren.icon.action.collapse",
+      "label_fr": "Replier",
+      "label_en_internal": "Collapse",
+      "vendor_icon_name": "chevron-up",
+      "upstream_path": "icons/outline/chevron-up.svg",
+      "upstream_blob_sha": "194897aea5092cde42532d7984e3bbd56a588edc",
+      "upstream_sha256": "bfe732786b05d90a0e4840eb6d6a36fabd8a67ad6258170f09e2883b3b5a1851",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg",
+      "local_sha256": "a60e86e1f61a67f28ebd4efbad87c6c9bbfb15009ac588644b5b5e2fbc71ce63",
+      "raw_size_bytes": 378,
+      "local_size_bytes": 238,
+      "category": "action",
+      "accessibility_role": "decorative",
+      "visible_label_required": false,
+      "allowed_surfaces": [
+        "exercise-card",
+        "program-card",
+        "history-row"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.bulb",
+      "semantic_id": "auren.icon.information.guidance",
+      "label_fr": "Conseil",
+      "label_en_internal": "Guidance hint",
+      "vendor_icon_name": "bulb",
+      "upstream_path": "icons/outline/bulb.svg",
+      "upstream_blob_sha": "b6577b33d7f502a1c4c211da3252e3ccb0b7f7fd",
+      "upstream_sha256": "3617f3cd3f835b03b9d8d4feeaa180fa3d436a01de8e109ced052e419f9fa7e0",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/bulb.svg",
+      "local_sha256": "dacbb19c084baafb6ac0a2c0c85306f85d93d0d67878f36f8ef79332211fa652",
+      "raw_size_bytes": 518,
+      "local_size_bytes": 395,
+      "category": "information",
+      "accessibility_role": "decorative",
+      "visible_label_required": false,
+      "allowed_surfaces": [
+        "exercise-card",
+        "session-console"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.alert-triangle",
+      "semantic_id": "auren.icon.information.warning",
+      "label_fr": "Avertissement",
+      "label_en_internal": "Warning",
+      "vendor_icon_name": "alert-triangle",
+      "upstream_path": "icons/outline/alert-triangle.svg",
+      "upstream_blob_sha": "8d9332ef3ad33b78200e5df0dba04be9c06fdbb7",
+      "upstream_sha256": "fc82f02dc9702293cb8609a8aed3242c0fe5f5b3337d79d341aa9343b4526ad4",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg",
+      "local_sha256": "fa52e1980826c8fa3cf9881cf93d8d6709985a339956b213d41386cbe58e823b",
+      "raw_size_bytes": 563,
+      "local_size_bytes": 409,
+      "category": "information",
+      "accessibility_role": "decorative",
+      "visible_label_required": false,
+      "allowed_surfaces": [
+        "form-feedback",
+        "session-console",
+        "exercise-card"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.check",
+      "semantic_id": "auren.icon.status.completed",
+      "label_fr": "Terminé",
+      "label_en_internal": "Completed",
+      "vendor_icon_name": "check",
+      "upstream_path": "icons/outline/check.svg",
+      "upstream_blob_sha": "6e9114c4255cc68b82c6193418d1f02297edb8bf",
+      "upstream_sha256": "fe359b27c74ed0f4f72bfabbe5ca969a8bb13a5f39648bae63f9e798034ebed3",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/check.svg",
+      "local_sha256": "9c2121aef5a60a02a3bf4a6cd3c8a42d2dbc453acdad84288108c2228de9e743",
+      "raw_size_bytes": 395,
+      "local_size_bytes": 240,
+      "category": "status",
+      "accessibility_role": "decorative",
+      "visible_label_required": false,
+      "allowed_surfaces": [
+        "form-feedback",
+        "history-row",
+        "session-console"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    },
+    {
+      "asset_id": "auren.icons.vendor.tabler.menu-2",
+      "semantic_id": "auren.icon.action.menu",
+      "label_fr": "Menu secondaire",
+      "label_en_internal": "Open secondary menu",
+      "vendor_icon_name": "menu-2",
+      "upstream_path": "icons/outline/menu-2.svg",
+      "upstream_blob_sha": "277dd841bddb1b972a32186a2740079375cb7358",
+      "upstream_sha256": "a0080a4db00a4168cfea54a74724e4147cbd9d003f65e70fa367ae797b9cfed8",
+      "source_file": "design/auren/source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg",
+      "local_sha256": "30db8248598fa11626ad6e40525c78fc073ac15d114011d33821f028064dd702",
+      "raw_size_bytes": 446,
+      "local_size_bytes": 285,
+      "category": "action",
+      "accessibility_role": "action",
+      "visible_label_required": true,
+      "allowed_surfaces": [
+        "secondary-nav"
+      ],
+      "forbidden_surfaces": [
+        "bottom-nav",
+        "desktop-rail",
+        "body-intelligence"
+      ],
+      "selection_status": "vendor-selected-for-intake",
+      "manifest_status": "legal-review-required",
+      "modifications": "upstream metadata XML comment removed; LF/final newline normalized; geometry and functional SVG attributes unchanged",
+      "review_status": "human-review-pending"
+    }
+  ],
+  "invariants": [
+    "exactly ten Tabler outline SVGs, canonical order preserved",
+    "pinned to tag v3.45.0 / commit 975920ff99c12c4dc9e3fe61a03738330600f9b2",
+    "only normalization = header comment removal + LF + final newline; geometry unchanged",
+    "MIT license copied byte-for-byte from the pinned commit",
+    "no Health Icons, no custom glyph, no P1 icon",
+    "no status approved; human/legal review pending",
+    "presence in design/auren/ != authorization in app/static/ (ASSET INTEGRATION GATE remains BLOCKED)"
+  ]
+}

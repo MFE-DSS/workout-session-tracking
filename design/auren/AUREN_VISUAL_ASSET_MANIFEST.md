@@ -134,7 +134,7 @@ note: >
 |---|---|---|---|
 | `auren.bodymap.master` | anatomical-map-master | `NOT YET PRODUCED` → `anatomical-review-required` | `OPERATOR_ASSET_03.1` + `Sb_ASSET_03.2` |
 | `auren.brand.wordmark` | wordmark | `NOT YET PRODUCED` — brand-bearing, provisional until clearance | build futur conditionnel au nom |
-| `auren.icons.vendor.tabler.<name>` | functional-icon | `NOT YET PRODUCED` — legal-review-required | `Sb_ASSET_02.1` |
+| `auren.icons.vendor.tabler.<name>` | functional-icon | **INGÉRÉ (Sb_ASSET_02.1)** → voir §5ter (`legal-review-required`, non `approved`) | `Sb_ASSET_02.1` ✅ |
 
 **Aucun** de ces fichiers n'existe (pas de faux master). Le champ `status: approved` **n'apparaît sur
 aucune entrée** de ce manifest initial.
@@ -153,6 +153,31 @@ assets visuels produits (0 SVG/PNG). Statut `provisional` (jamais `approved`).
 - **`BODYMAP COMPACT MACROS ARE NOT RADAR_AXES`** : le contrat documente explicitement la séparation
   présentation (6 macros) vs analytics (`RADAR_AXES`), non modifiés.
 - Aucun master futur n'est passé `source_file: existing` — les masters restent `NOT YET PRODUCED` (§5).
+
+## 5ter. Functional icon subset — Tabler P0 (Sb_ASSET_02.1)
+
+Premier **intake tiers** de la source de design. **Tabler Icons v3.45.0** (commit `975920ff…`), **MIT**.
+Icônes SVG **outline** vendored dans `design/auren/source/icons/vendor/tabler/v3.45.0/outline/`. **Aucune**
+`status: approved` ; **HUMAN REVIEW PENDING** ; `runtime_file: NOT APPLICABLE` (0 intégration app).
+
+| id | source_file | semantic_contract | surfaces | a11y role | source_bytes | status |
+|---|---|---|---|---|---|---|
+| `auren.icons.vendor.tabler.arrows-exchange` | `source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg` | `auren.icon.action.substitute` | exercise-card·session-console·history-row | decorative | 268 | `legal-review-required` |
+| `auren.icons.vendor.tabler.player-play` | `source/icons/vendor/tabler/v3.45.0/outline/player-play.svg` | `auren.icon.action.timer-start` | rest-timer·session-console | action | 244 | `legal-review-required` |
+| `auren.icons.vendor.tabler.player-pause` | `source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg` | `auren.icon.action.timer-pause` | rest-timer·session-console | action | 397 | `legal-review-required` |
+| `auren.icons.vendor.tabler.rotate` | `source/icons/vendor/tabler/v3.45.0/outline/rotate.svg` | `auren.icon.action.timer-reset` | rest-timer·session-console | action | 260 | `legal-review-required` |
+| `auren.icons.vendor.tabler.chevron-down` | `source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg` | `auren.icon.action.expand` | exercise-card·program-card·history-row | decorative | 237 | `legal-review-required` |
+| `auren.icons.vendor.tabler.chevron-up` | `source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg` | `auren.icon.action.collapse` | exercise-card·program-card·history-row | decorative | 238 | `legal-review-required` |
+| `auren.icons.vendor.tabler.bulb` | `source/icons/vendor/tabler/v3.45.0/outline/bulb.svg` | `auren.icon.information.guidance` | exercise-card·session-console | decorative | 395 | `legal-review-required` |
+| `auren.icons.vendor.tabler.alert-triangle` | `source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg` | `auren.icon.information.warning` | form-feedback·session-console·exercise-card | decorative | 409 | `legal-review-required` |
+| `auren.icons.vendor.tabler.check` | `source/icons/vendor/tabler/v3.45.0/outline/check.svg` | `auren.icon.status.completed` | form-feedback·history-row·session-console | decorative | 240 | `legal-review-required` |
+| `auren.icons.vendor.tabler.menu-2` | `source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg` | `auren.icon.action.menu` | secondary-nav | action | 285 | `legal-review-required` |
+
+Champs communs par entrée : `version: 0.1.0` · `type: functional-icon` · `format: svg` · `license: MIT`
+· `provenance: <asset_id>` (cf. `AUREN_ASSET_PROVENANCE.md`) · `review: {product: NOT YET REVIEWED,
+technical: automated checks passed, accessibility: NOT YET REVIEWED, legal: NOT YET REVIEWED, mobile:
+NOT YET REVIEWED}` · `budgets: {source_bytes: <réel>, maximum: 2048}` · `consumers: NOT YET INTEGRATED` ·
+`deprecated_by: NONE`. Preuves complètes (blob SHA, sha256) : `source/icons/auren_icon_subset.yaml`.
 
 ## 6. Gate & nom
 `ASSET INTEGRATION GATE: BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS`. Nom Auren =

@@ -18,7 +18,8 @@ le rouvre pas.
 ## Statut
 ```
 Asset system scaffold : active
-Asset production        : not started
+Asset source intake     : Tabler P0 v0.1.0 ingested / human review pending (Sb_ASSET_02.1)
+Runtime integration     : not started / blocked
 Asset integration gate  : BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS
 Auren name              : WORKING PRODUCT NAME — EXTERNAL PROFESSIONAL CLEARANCE OPEN
 ```
@@ -42,6 +43,8 @@ Auren name              : WORKING PRODUCT NAME — EXTERNAL PROFESSIONAL CLEARAN
 - [`AUREN_ASSET_INTAKE_CHECKLIST.md`](AUREN_ASSET_INTAKE_CHECKLIST.md) — accepter/refuser un futur asset
 - [`LICENSES/README.md`](LICENSES/README.md) — procédure licences (0 licence tierce à ce jour)
 - Spec programme : [`Sx_ASSET_01_..._SPEC.md`](../../docs/strategy/Sx_ASSET_01_AUREN_VISUAL_ASSET_SYSTEM_SPEC.md)
+- [`AUREN_ICON_SEMANTIC_MAP.md`](AUREN_ICON_SEMANTIC_MAP.md) — **iconographie fonctionnelle** (subset Tabler P0, Sb_ASSET_02.1)
+- [`source/icons/auren_icon_subset.yaml`](source/icons/auren_icon_subset.yaml) — **registre machine-lisible** du subset (preuves SHA)
 - Roadmap programme : [`AUREN_ASSET_PROGRAM_ROADMAP.md`](../../docs/strategy/AUREN_ASSET_PROGRAM_ROADMAP.md)
 
 ## Architecture cible (documentée — dossiers créés au fur et à mesure)
@@ -53,17 +56,20 @@ design/auren/
 ├── AUREN_ASSET_PROVENANCE.md          # créé (Sb_ASSET_01.1)
 ├── AUREN_ASSET_INTAKE_CHECKLIST.md    # créé (Sb_ASSET_01.1)
 ├── AUREN_BODY_ZONE_TAXONOMY.md        # créé (Sb_ASSET_01.2)
-├── LICENSES/                          # créé (README seul ; 0 licence tierce)
+├── AUREN_ICON_SEMANTIC_MAP.md         # créé (Sb_ASSET_02.1)
+├── LICENSES/                          # README + tabler-MIT.txt (Sb_ASSET_02.1 — 1 licence tierce : Tabler MIT)
 ├── source/bodymap/                    # créé (Sb_ASSET_01.2 : README + auren_bodymap_mapping.yaml — CONTRAT, 0 dessin)
+├── source/icons/                      # créé (Sb_ASSET_02.1 : README + auren_icon_subset.yaml + vendor/tabler/v3.45.0/outline/*.svg ×10)
+├── previews/icons/                    # créé (Sb_ASSET_02.1 : auren-icon-subset-v0.1.0.html — revue statique)
 ├── references/{anatomy,licences,review-notes}/   # futur (Sx_ASSET_03) — non créé
-├── source/{brand,icons/{vendor/tabler,custom}}/  # futur (02.1) — non créé
+├── source/{brand,icons/{vendor/health-icons,custom}}/  # futur — non créé (Health Icons/custom NOT REQUIRED)
 ├── tokens/auren.tokens.json           # futur (build ultérieur) — non créé
-├── exports/{svg,png,pwa}/             # futur (03.2/04.1) — non créé
-└── previews/{bodymap,session,home,body-intelligence}/  # futur — non créé
+└── exports/{svg,png,pwa}/             # futur (03.2/04.1) — non créé
 ```
-> Les dossiers `references/`, `source/{brand,icons}/`, `tokens/`, `exports/`, `previews/` **ne sont pas créés
-> vides** : ils apparaîtront quand un build y déposera un contenu réel. `source/bodymap/` existe désormais
-> car `Sb_ASSET_01.2` y dépose un **contrat** (YAML), pas un dessin.
+> Les dossiers non créés **ne le sont pas vides** : ils apparaîtront quand un build y déposera un contenu
+> réel. `source/bodymap/` = contrat (Sb_ASSET_01.2) ; `source/icons/` + `previews/icons/` +
+> `LICENSES/tabler-MIT.txt` = **premier intake tiers Tabler** (Sb_ASSET_02.1). `source/icons/vendor/health-icons/`
+> et `source/icons/custom/` restent **non créés** (Health Icons & custom NOT REQUIRED pour P0).
 
 ## Règle importante
 ```
