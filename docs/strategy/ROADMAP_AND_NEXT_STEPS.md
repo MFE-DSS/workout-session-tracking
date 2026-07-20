@@ -275,6 +275,18 @@
   SonarCloud (`new_coverage` 0.0 %) = état structurel identique aux PR #23–#26,
   jamais bloquant. **64 tests dédiés track cumulés.**
   **`EKB_01`/`SCORING_01` = file suivante / NOT AUTHORIZED.**
+- **`Sb_CUSTOM_PROGRAM_EKB_01 — Exercise Knowledge Base Foundation` : 🟢 PATCH
+  COMPLETE / REVIEW PENDING** 2026-07-19 (branche `sb/custom-program-ekb-01-foundation`,
+  base `e88865c` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_EKB_01_FOUNDATION_REPORT.md`).
+  **Audit + QA read-only** (spec 02 §14) : script `ekb_coverage_qa` (stdlib pur,
+  drift-check, exit 1 sur invariance) + snapshot opposable des **103 noms canoniques**
+  (`tests/fixtures/ekb_names_snapshot.json`). Mesuré : couverture properties 51/103,
+  **52 gaps pinnés nominativement**, **2 orphelines** (décision EKB_02), clôtures
+  N1/bridges/baseline prouvées. 13 dédiés premier coup + 146 adjacents ;
+  check_scope CI_INFRA. **Zéro migration, zéro `data/`, zéro `app/`.**
+  Statut PR/CI/merge à consigner au closeout.
+  **`EKB_02` = FIRST NEXT EKB BUILD CANDIDATE / NOT OPENED · `EKB_03`/`EKB_04`,
+  `SCORING_01`, `WIZARD_*` NOT OPENED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
