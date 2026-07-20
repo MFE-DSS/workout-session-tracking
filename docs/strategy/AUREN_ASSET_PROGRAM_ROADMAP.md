@@ -90,8 +90,17 @@ delt_post) · Back(lats/upper_back) · Arms(biceps/triceps) · Legs(quads/poster
   `ASSET INTEGRATION GATE: BLOCKED` inchangé.
 
 ## Statut du socle
-**`Sx_ASSET_01` implementation : COMPLETE / READY FOR CLOSEOUT** (01.1 + 01.2 acceptés). Non marqué
-`Sx_ASSET_01 CLOSED` — closeout séparé requis. `Sx_ASSET_02` NON ouvert.
+🔒 **`Sx_ASSET_01` : CLOSED / HUMAN REVIEW COMPLETE** 2026-07-20
+(`SPRINT_Sx_ASSET_01_FINAL_CLOSEOUT_REPORT.md` ; closeout `6345f5a`, baseline logique `1fbbb31`). Socle
+**GOUVERNANCE + CONTRAT SÉMANTIQUE complet** (01.1 ACCEPTED + 01.2 ACCEPTED ; chaîne `6167485`→`1fbbb31` ;
+CI historiques `29697874021` + `29702926887` 3/3). **GRAPHICAL ASSET PRODUCTION: NOT STARTED** (0 asset
+produit). **OPEN DEBT: NONE** (dettes 01.1 owner + garde résolues, human review verified). `app/`
+byte-identique tout le cycle. **`ASSET INTEGRATION GATE: BLOCKED`** — le closeout n'autorise ni intégration,
+ni clearance, ni master, ni anatomie, ni mobile.
+
+Gates ouverts après `Sx_ASSET_01` : `Sx_ASSET_02` **NOT OPENED** · `Sx_ASSET_03`/`OPERATOR_ASSET_03.1`
+**HUMAN PRODUCTION PENDING** · clearance nom/assets Auren **EXTERNAL PROFESSIONAL CLEARANCE OPEN** ·
+`Sx_ASSET_04`/`Sb_ASSET_04.1` **BLOCKED BY ASSET INTEGRATION GATE**.
 
 ## Prochaine action
-`GO CLOSEOUT — Sx_ASSET_01 Architecture, Governance & Production Gate` (non commencé).
+`GO SPEC — Sx_ASSET_02 Functional Iconography Selection` (non commencé).

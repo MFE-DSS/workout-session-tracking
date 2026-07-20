@@ -1,7 +1,7 @@
 # Sx_ASSET_01 — Auren Visual Asset Architecture, Governance & Production Gate — SPEC
 
 **Type** : SPEC / AUDIT / GOUVERNANCE — **NO CODE / NO ASSET / NO CAPTURE**, docs-only
-**Statut** : ✅ **SPEC RÉDIGÉE** (attente human review)
+**Statut** : 🔒 **CLOSED / HUMAN REVIEW COMPLETE** 2026-07-20 — socle implémenté (`Sb_ASSET_01.1` + `Sb_ASSET_01.2` acceptés) ; cf. [`../SPRINT_Sx_ASSET_01_FINAL_CLOSEOUT_REPORT.md`](../SPRINT_Sx_ASSET_01_FINAL_CLOSEOUT_REPORT.md). Graphical asset production NOT STARTED ; `ASSET INTEGRATION GATE: BLOCKED`. *(statut initial : SPEC RÉDIGÉE 2026-07-19)*
 **Programme** : `Sx_ASSET` — Auren Proprietary Visual Asset System (**nouveau, indépendant de `Sx_UI`**)
 **Date** : 2026-07-19
 **Baseline auditée** : `e4624b7`
