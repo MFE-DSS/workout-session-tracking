@@ -102,5 +102,15 @@ Gates ouverts après `Sx_ASSET_01` : `Sx_ASSET_02` **NOT OPENED** · `Sx_ASSET_0
 **HUMAN PRODUCTION PENDING** · clearance nom/assets Auren **EXTERNAL PROFESSIONAL CLEARANCE OPEN** ·
 `Sx_ASSET_04`/`Sb_ASSET_04.1` **BLOCKED BY ASSET INTEGRATION GATE**.
 
+## Cycle 02 — Iconographie
+- **`Sx_ASSET_02`** Functional Iconography Selection : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT** 2026-07-20
+  (`Sx_ASSET_02_FUNCTIONAL_ICONOGRAPHY_SELECTION_SPEC.md` + rapport + `research/AUREN_ICON_VENDOR_DUE_DILIGENCE.md`
+  ; baseline `c1ad76c`). SEMANTICS BEFORE ICONS. Due diligence datée (2026-07-20) : **Tabler v3.45.0** commit
+  `975920ff…` MIT (format = contrat Auren) primaire ; **Health Icons** `891ace7a…` **icônes CC0 / code MIT**
+  secondaire **NOT REQUIRED FOR P0**. **P0 = 10 Tabler** (17 noms vérifiés existants au tag) ; P1 différé ;
+  métriques/confidence typographic-only ; **0 gap custom** → `Sb_ASSET_02.2 NOT REQUIRED`. Rend `ICON INTAKE
+  GATE: READY FOR Sb_ASSET_02.1` ; `ASSET INTEGRATION GATE: BLOCKED` inchangé. Docs-only (0 SVG/licence/app).
+
 ## Prochaine action
-`GO SPEC — Sx_ASSET_02 Functional Iconography Selection` (non commencé).
+`GO COMMIT SPEC — Sx_ASSET_02 Functional Iconography Selection` (non commencé). Puis `GO BUILD — Sb_ASSET_02.1
+Vendored Icon Subset & License Intake` (P0 = 10 SVG Tabler v3.45.0).
