@@ -114,3 +114,28 @@ gardé par 13 tests ; l'état de couverture est mesuré au nom près (52 gaps, 2
 clôtures N1/N3/baseline prouvées). `EKB_02` (JSON canonique 103 entrées) = **FIRST NEXT
 EKB BUILD CANDIDATE / NOT OPENED** · `EKB_03`/`EKB_04`, `SCORING_01`, `WIZARD_*` = **NOT
 OPENED / NOT AUTHORIZED**.
+
+---
+
+## Appendice post-merge (closeout 2026-07-20)
+
+- **Commit build** : `282a47f` (6 fichiers, +689) sur `sb/custom-program-ekb-01-foundation`,
+  base `e88865c`.
+- **PR #28 MERGED** — merge **`6345f5a`** sur le canonique.
+- **CI canonique `29726786735` sur `6345f5a` : 3/3 GREEN** (pytest+QA · lint · SonarCloud).
+- **CI PR finale 4/4 GREEN** — les 3 jobs **+ le quality gate externe « SonarCloud Code
+  Analysis »**, première PR de code du track à passer ce gate.
+- **Incident #1 (externe, résolu par refresh sans force)** : au premier run, la CI de la PR
+  était rouge sur `check_spec_protocol` / `test_spec_protocol` — cause racine **hors branche
+  EKB** : `docs/SPRINT_Sb_ASSET_01_1_GOVERNANCE_SCAFFOLD_HUMAN_REVIEW_REPORT.md` (poussé sur
+  le canonique par la session ASSET en commit 100 % docs, donc sans CI) n'avait aucun
+  marqueur de verdict. Après correction opérateur côté ASSET, la branche EKB a été
+  **rafraîchie par merge du canonique (sans `--force`)** → merge `3ee5ff3` ; les 6 fichiers
+  EKB sont restés inchangés hors intégration canonique.
+- **Incident #2 (défaut réel du test, fix minimal)** : le quality gate externe a ensuite
+  signalé un bug MAJOR `python:S5863` sur `tests/test_ekb_coverage.py` — le test de
+  déterminisme comparait `run_audit() == run_audit()` (mêmes expressions). Corrigé en liant
+  les deux runs à `first`/`second` avant comparaison (**commit `2f39db6`**) — même intention
+  (deux appels distincts doivent concorder), sémantique préservée, 13/13 toujours verts.
+- **Head Alembic canonique inchangé : `n5o0i6j7l98`** — EKB_01 est bien un build
+  audit-only, zéro schéma / zéro `data/` / zéro `app/`.
