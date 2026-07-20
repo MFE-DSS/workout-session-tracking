@@ -107,14 +107,19 @@ Gates ouverts après `Sx_ASSET_01` : `Sx_ASSET_02` **NOT OPENED** · `Sx_ASSET_0
   SEMANTICS BEFORE ICONS. Tabler v3.45.0 MIT (primaire) ; Health Icons CC0 assets/MIT code (NOT REQUIRED FOR
   P0). P0 = 10 Tabler ; 0 gap custom → `Sb_ASSET_02.2 NOT REQUIRED`. Rend `ICON INTAKE GATE: READY FOR
   Sb_ASSET_02.1`.
-- **`Sb_ASSET_02.1`** Vendored Icon Subset & License Intake : 🟢 **CODE COMPLETE — CI PENDING — HUMAN REVIEW
-  PENDING** 2026-07-20 (baseline `fe97adc` ; `SPRINT_Sb_ASSET_02_1_VENDOR_ICON_SUBSET_LICENSE_INTAKE_REPORT.md`).
-  **PREMIER INTAKE TIERS** : 10 SVG **Tabler v3.45.0** (commit `975920ff…`, pins vérifiés) + **licence MIT
-  byte-identique**. Normalisation bornée (commentaire+LF+newline, géométrie inchangée, prouvée indépendamment).
-  Semantic map + registre machine-lisible (preuves par fichier) + manifest 10 entrées (0 approved) +
-  provenance (`vendor`, NOT AUREN IP OWNERSHIP, 0 verified) + preview statique. Garde évolué (allowlist SVG
-  exacte). 20 + 25 tests stdlib. **0** Health Icons/custom/`app/**`/dépendance. **`ASSET INTEGRATION GATE:
-  BLOCKED`** — 10 icônes NOT AUTHORIZED FOR APP INTEGRATION. `Sb_ASSET_02.2 NOT REQUIRED`.
+- **`Sb_ASSET_02.1`** Vendored Icon Subset & License Intake : 🔴 **CODE COMPLETE — CI GREEN (`29749856878`
+  3/3 sur `eafede6`) — HUMAN REVIEW REJECTED (preview only)** 2026-07-20 (revue
+  `SPRINT_Sb_ASSET_02_1_VENDOR_ICON_SUBSET_LICENSE_INTAKE_HUMAN_REVIEW_REPORT.md` ; commit `804b08c`).
+  **PREMIER INTAKE TIERS** : 10 SVG **Tabler v3.45.0** (commit `975920ff…`) + **licence MIT byte-identique**.
+  **Assets / licence / gouvernance VÉRIFIÉS et NON remis en cause** (revalidation upstream indépendante 10/10
+  byte-for-byte ; licence sha256 `b740a1d4…` ; registre/manifest/provenance 0 approved/0 verified ; garde
+  effective par test négatif ; CI descendante 3/3 ; 0 app change). **Rejet UNIQUEMENT sur la surface de
+  revue (§14)** : preview via `<img>` → `currentColor` non transmis → icônes **noires invisibles sur fond
+  graphite** (`DARK PREVIEW DOES NOT REPRESENT A USABLE REVIEW SURFACE`). **`ASSET INTEGRATION GATE: BLOCKED`**
+  ; 10 icônes NOT AUTHORIZED FOR APP INTEGRATION ; `Sb_ASSET_02.2 NOT REQUIRED`.
 
 ## Prochaine action
-`GO VALIDATE — Sb_ASSET_02.1 Vendored Icon Subset & License Intake` (non commencé).
+`GO BUILD — Sb_ASSET_02.1-fix Review Preview Rendering Fix` (non commencé) — corriger la preview (SVG inline
+ou `mask` coloré par `currentColor`) **sans** toucher aux 10 SVG source / licence / registre / manifest /
+provenance (tous vérifiés), puis re-`GO VALIDATE — Sb_ASSET_02.1`. Le closeout `Sx_ASSET_02` reste
+**conditionné** à une acceptation.
