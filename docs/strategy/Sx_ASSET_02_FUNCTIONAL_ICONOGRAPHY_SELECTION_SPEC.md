@@ -1,7 +1,7 @@
 # Sx_ASSET_02 — Functional Iconography Selection — SPEC
 
 **Type** : SPEC / AUDIT / OFFICIAL-SOURCE RESEARCH — **DOCS-ONLY**, NO SVG INTAKE, NO LICENSE FILE, NO APP CHANGE
-**Statut** : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT**
+**Statut** : 🔒 **CLOSED / HUMAN REVIEW COMPLETE** 2026-07-21 — cycle `Sx_ASSET_02` clos (spec + intake Tabler P0 accepté + correctif preview + re-review) ; cf. [`../SPRINT_Sx_ASSET_02_FINAL_CLOSEOUT_REPORT.md`](../SPRINT_Sx_ASSET_02_FINAL_CLOSEOUT_REPORT.md). `ICON SOURCE INTAKE: ACCEPTED FOR DESIGN SOURCE` ; 10 icônes NOT AUTHORIZED FOR APP INTEGRATION ; `ASSET INTEGRATION GATE: BLOCKED`. *(statut initial : SPEC RÉDIGÉE / READY FOR GO COMMIT 2026-07-20)*
 **Programme** : `Sx_ASSET` — Auren Proprietary Visual Asset System · **2ᵉ cycle**
 **Date** : 2026-07-20 · **Baseline** : `c1ad76c` (closeout Sx_ASSET_01)
 **Due diligence** : [`../research/AUREN_ICON_VENDOR_DUE_DILIGENCE.md`](../research/AUREN_ICON_VENDOR_DUE_DILIGENCE.md)
