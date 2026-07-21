@@ -310,6 +310,16 @@
   `804b08c` (session ASSET) : run push annulé par concurrency, remplacé sans impact.
   **`EKB_03` (checks complets) = FIRST NEXT / NOT OPENED · `EKB_04`, `SCORING_01`,
   `WIZARD_*` NOT OPENED.**
+- **`Sb_CUSTOM_PROGRAM_EKB_03 — EKB Classifiability QA` : 🟢 PATCH COMPLETE /
+  REVIEW PENDING** 2026-07-21 (branche `sb/custom-program-ekb-03-classifiability-qa`,
+  base `64ab789` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_EKB_03_CLASSIFIABILITY_QA_REPORT.md`).
+  **QA script CI-able + branchement CI** : `scripts/ekb_classifiability_qa.py` consolide
+  les 8 checks §9 sur le JSON EKB_02 (lecture seule, exit 1 si erreur), branché en CI
+  (étape additive). **Doctrine** : invariances = erreurs dures ; 52 gaps + 19 trous noirs =
+  warnings à compteur figé (dérive = erreur). Script exit 0 (0 erreur, 4 warnings) ;
+  14 dédiés + 32 non-régression (46/46) ; check_scope CI_INFRA ; head `n5o0i6j7l98` inchangé.
+  Statut PR/CI/merge à consigner au closeout.
+  **`EKB_04` (seed DB optionnel) = NEXT / NOT OPENED · `SCORING_01`, `WIZARD_*` NOT OPENED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.

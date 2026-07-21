@@ -96,6 +96,9 @@ jobs:
       - name: Machine atlas QA
         run: python scripts/machine_atlas_qa.py
 
+      - name: EKB classifiability QA (Sb_CUSTOM_PROGRAM_EKB_03)
+        run: python -m scripts.ekb_classifiability_qa
+
       - name: Alembic drift check
         run: python scripts/check_alembic_drift.py
 
