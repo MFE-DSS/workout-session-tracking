@@ -217,21 +217,38 @@ def test_provenance_has_tabler_intake_no_verified():
 # ───────── preview ─────────
 
 
-def test_preview_is_static_and_references_ten_local_svgs():
+def test_preview_uses_css_mask_not_img():
+    """Sb_ASSET_02.1-fix: the preview must render icons via CSS mask (colour from
+    background-color:currentColor), NOT via <img> (which cannot receive the parent
+    colour → black/invisible on graphite, the original rejection cause)."""
     src = PREVIEW.read_text(encoding="utf-8")
+    # static: no JS, no network (only the w3.org SVG namespace URL, if any, is allowed)
     assert "<script" not in src.lower()
-    assert "http://" not in src and "https://" not in src.replace("http://www.w3.org", "")
-    # exactly ten distinct svg references, all local
-    refs = set(re.findall(r'src="([^"]+\.svg)"', src))
-    assert len(refs) == 10, f"expected 10 distinct svg refs, got {len(refs)}"
-    for r in refs:
-        assert r.endswith(".svg") and "://" not in r
-        assert (PREVIEW.parent / r).resolve().is_file()
-    # sizes documented
-    for px in ("16", "20", "24"):
-        assert px in src
-    # no inline geometry copied
-    assert "<path" not in src
+    assert (src.lower().count("http://") + src.lower().count("https://")
+            == src.lower().count("http://www.w3.org/2000/svg"))
+    # NO <img> element used to render icons (the rejected technique)
+    assert "<img " not in src.lower()
+    # CSS mask present, both standard and WebKit prefixes
+    assert "-webkit-mask-image" in src
+    assert re.search(r"(?<!-)mask-image", src)  # standard (not only the webkit one)
+    # exactly ten DISTINCT svg URLs (10 std + 10 webkit declarations, 10 unique URLs)
+    urls = set(re.findall(r'mask-image:\s*url\("([^"]+\.svg)"\)', src))
+    assert len(urls) == 10, f"expected 10 distinct mask svg URLs, got {len(urls)}: {sorted(urls)}"
+    for u in urls:
+        assert u.endswith(".svg") and "://" not in u
+        assert (PREVIEW.parent / u).resolve().is_file(), f"mask URL not a real file: {u}"
+    # colour driven by currentColor (so light/dark contexts colour the icons)
+    assert "background-color:currentColor" in src.replace(" ", "")
+    # a light context and a graphite/dark context, each setting a colour
+    assert re.search(r"\.light\s*\{[^}]*color", src)
+    assert re.search(r"\.dark\s*\{[^}]*color", src)
+    # three sizes present
+    for cls in ("icon-16", "icon-20", "icon-24"):
+        assert cls in src, f"missing size class {cls}"
+    # NO inline SVG geometry copied into the HTML
+    assert "<path" not in src and "<svg" not in src
+    # no premature approval marker (lower-case token; prose "aucun APPROVED" is fine)
+    assert "approved" not in src.lower()
 
 
 # ───────── non-integration ─────────

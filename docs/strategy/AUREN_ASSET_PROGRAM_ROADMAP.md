@@ -117,9 +117,16 @@ Gates ouverts après `Sx_ASSET_01` : `Sx_ASSET_02` **NOT OPENED** · `Sx_ASSET_0
   revue (§14)** : preview via `<img>` → `currentColor` non transmis → icônes **noires invisibles sur fond
   graphite** (`DARK PREVIEW DOES NOT REPRESENT A USABLE REVIEW SURFACE`). **`ASSET INTEGRATION GATE: BLOCKED`**
   ; 10 icônes NOT AUTHORIZED FOR APP INTEGRATION ; `Sb_ASSET_02.2 NOT REQUIRED`.
+- **`Sb_ASSET_02.1-fix`** Review Preview Rendering Fix : 🟢 **PREVIEW FIXED — CI PENDING — RE-REVIEW
+  REQUIRED** 2026-07-21 (baseline `64ab789` ; `SPRINT_Sb_ASSET_02_1_FIX_PREVIEW_RENDERING_REPORT.md`).
+  Corrige l'unique motif de rejet : la preview rend désormais les icônes par **CSS mask** (géométrie dans les
+  10 SVG canoniques référencés par `mask-image` — **10 URL distinctes** ; couleur par `background-color:
+  currentColor`) → **graphite sur clair, ambre `#C8A24B` sur graphite**, 16/20/24 px, **0 géométrie inline**,
+  0 JS/CDN. **Non-régression VÉRIFIÉE** : 10 SVG / registre / LICENSES / manifest / provenance
+  **byte-identiques** à `64ab789` ; garde `ALLOWED_VENDOR_SVGS` inchangée ; **45 tests verts** ; test preview
+  renforcé (`test_preview_uses_css_mask_not_img`). **0** modif SVG/licence/gouvernance/`app/**`/Custom.
+  `ASSET INTEGRATION GATE: BLOCKED` inchangé.
 
 ## Prochaine action
-`GO BUILD — Sb_ASSET_02.1-fix Review Preview Rendering Fix` (non commencé) — corriger la preview (SVG inline
-ou `mask` coloré par `currentColor`) **sans** toucher aux 10 SVG source / licence / registre / manifest /
-provenance (tous vérifiés), puis re-`GO VALIDATE — Sb_ASSET_02.1`. Le closeout `Sx_ASSET_02` reste
-**conditionné** à une acceptation.
+`GO VALIDATE — Sb_ASSET_02.1 Vendored Icon Subset & License Intake` (re-review après correctif preview
+`Sb_ASSET_02.1-fix`) — non commencé. Le closeout `Sx_ASSET_02` reste **conditionné** à une acceptation.

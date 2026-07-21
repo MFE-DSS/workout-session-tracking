@@ -7,80 +7,100 @@
   table{border-collapse:collapse;width:100%} td,th{border:1px solid #2A313B;padding:10px;vertical-align:middle}
   .lbl{width:34%} code{color:#C8A24B} small{color:#8A94A0}
   .cell{text-align:center} .cell .ic{margin:0 6px}
-  .light{background:#F4F5F6;color:#0F1318} .dark{background:#0F1318;color:#C8A24B}
-  .light .ic{color:#0F1318} .dark .ic{color:#C8A24B}
+  /* CSS MASK RENDERING : la géométrie reste dans les 10 SVG canoniques (référencés par
+     mask-image), la COULEUR vient de background-color:currentColor. currentColor prend
+     la valeur 'color' du contexte (clair/graphite) — impossible avec un rendu bitmap
+     externe où la couleur du parent ne traverse pas la frontière du document. */
+  .icon-mask{display:inline-block;background-color:currentColor;
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+    -webkit-mask-position:center;mask-position:center;
+    -webkit-mask-size:contain;mask-size:contain}
+  .icon-16{width:16px;height:16px}
+  .icon-20{width:20px;height:20px}
+  .icon-24{width:24px;height:24px}
+  .icon-arrows-exchange{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg")}
+  .icon-player-play{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg")}
+  .icon-player-pause{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg")}
+  .icon-rotate{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg")}
+  .icon-chevron-down{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg")}
+  .icon-chevron-up{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg")}
+  .icon-bulb{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg")}
+  .icon-alert-triangle{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg")}
+  .icon-check{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/check.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/check.svg")}
+  .icon-menu-2{-webkit-mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg");mask-image:url("../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg")}
+  .light{background:#F4F5F6;color:#0F1318}   /* fond clair : icônes graphite */
+  .dark{background:#0F1318;color:#C8A24B}     /* fond graphite : icônes ambre Auren */
   .st{color:#C8A24B;font-size:11px;text-align:center}
-  /* currentColor sur les <img> ne s'applique pas ; le fond montre le rendu clair/sombre.
-     La revue humaine ouvre aussi les .svg directement pour le rendu currentColor. */
 </style></head>
 <body>
 <h1>Auren Functional Icon Subset — v0.1.0 (Sb_ASSET_02.1)</h1>
 <p class="meta">Tabler Icons v3.45.0 · commit 975920ff99c12c4dc9e3fe61a03738330600f9b2 · MIT ·
 tailles 16 / 20 / 24 px · <strong>HUMAN REVIEW PENDING</strong> · NOT AUTHORIZED FOR APP INTEGRATION ·
-aucun APPROVED.</p>
+non validé. Rendu par CSS mask (currentColor) — 0 géométrie recopiée.</p>
 <table>
   <tr><th>Concept</th><th>Fond clair (16/20/24)</th><th>Fond graphite (16/20/24)</th><th>Statut</th></tr>
   <tr>
     <td class="lbl"><strong>Substituer</strong><br><code>auren.icon.action.substitute</code><br><small>tabler:arrows-exchange.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/arrows-exchange.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-arrows-exchange icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-arrows-exchange icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-arrows-exchange icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-arrows-exchange icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-arrows-exchange icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-arrows-exchange icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Démarrer le repos</strong><br><code>auren.icon.action.timer-start</code><br><small>tabler:player-play.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-play.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-player-play icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-player-play icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-player-play icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-player-play icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-player-play icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-player-play icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Pause repos</strong><br><code>auren.icon.action.timer-pause</code><br><small>tabler:player-pause.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/player-pause.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-player-pause icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-player-pause icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-player-pause icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-player-pause icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-player-pause icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-player-pause icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Réinitialiser repos</strong><br><code>auren.icon.action.timer-reset</code><br><small>tabler:rotate.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/rotate.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-rotate icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-rotate icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-rotate icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-rotate icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-rotate icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-rotate icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Déplier</strong><br><code>auren.icon.action.expand</code><br><small>tabler:chevron-down.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-down.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-chevron-down icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-down icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-down icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-chevron-down icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-down icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-down icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Replier</strong><br><code>auren.icon.action.collapse</code><br><small>tabler:chevron-up.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/chevron-up.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-chevron-up icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-up icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-up icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-chevron-up icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-up icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-chevron-up icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Conseil</strong><br><code>auren.icon.information.guidance</code><br><small>tabler:bulb.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/bulb.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-bulb icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-bulb icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-bulb icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-bulb icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-bulb icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-bulb icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Avertissement</strong><br><code>auren.icon.information.warning</code><br><small>tabler:alert-triangle.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/alert-triangle.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-alert-triangle icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-alert-triangle icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-alert-triangle icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-alert-triangle icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-alert-triangle icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-alert-triangle icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Terminé</strong><br><code>auren.icon.status.completed</code><br><small>tabler:check.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/check.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/check.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/check.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/check.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/check.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/check.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-check icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-check icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-check icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-check icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-check icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-check icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
   <tr>
     <td class="lbl"><strong>Menu secondaire</strong><br><code>auren.icon.action.menu</code><br><small>tabler:menu-2.svg</small></td>
-    <td class="cell light"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg" alt=""></td>
-    <td class="cell dark"><img class="ic" width="16" height="16" src="../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg" alt=""><img class="ic" width="20" height="20" src="../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg" alt=""><img class="ic" width="24" height="24" src="../../source/icons/vendor/tabler/v3.45.0/outline/menu-2.svg" alt=""></td>
+    <td class="cell light"><span class="ic icon-mask icon-menu-2 icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-menu-2 icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-menu-2 icon-24" aria-hidden="true"></span></td>
+    <td class="cell dark"><span class="ic icon-mask icon-menu-2 icon-16" aria-hidden="true"></span><span class="ic icon-mask icon-menu-2 icon-20" aria-hidden="true"></span><span class="ic icon-mask icon-menu-2 icon-24" aria-hidden="true"></span></td>
     <td class="st">human-review-pending</td>
   </tr>
 </table>
 <p class="meta">Matériel de revue statique — 0 JavaScript, 0 police externe, 0 requête réseau.
-Les SVG sont référencés par chemin relatif (aucune géométrie recopiée ici).</p>
+Les 10 SVG sont référencés par chemin relatif via mask-image (aucune géométrie recopiée ici).
+Si le navigateur bloque les masks en file://, servir localement : <code>python -m http.server</code>.</p>
 </body></html>
