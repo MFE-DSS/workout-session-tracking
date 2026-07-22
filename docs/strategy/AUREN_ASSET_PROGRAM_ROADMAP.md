@@ -136,9 +136,11 @@ produits. Détail par sprint ci-dessous.
   COMPLETE / READY FOR CLOSEOUT.** `ASSET INTEGRATION GATE: BLOCKED` inchangé.
 
 ## Cycle 03 — BodyMap Human Production Package
-- **`Sx_ASSET_03`** BodyMap Human Production Package : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT** 2026-07-22
-  (`Sx_ASSET_03_BODYMAP_HUMAN_PRODUCTION_PACKAGE_SPEC.md` + rapport + `research/AUREN_BODYMAP_REFERENCE_DUE_DILIGENCE.md`
-  + `production/bodymap/` ×6 ; baseline `cf41188`). Transforme le contrat sémantique BodyMap (immuable) en
+- **`Sx_ASSET_03`** BodyMap Human Production Package : 🟢 **SPEC COMMITTED** 2026-07-22 (commit
+  **`66d18d47a1f1f9a75556bede8de45f9a94daa055`**, parent `062ee92`, poussé sur le canonique ;
+  `Sx_ASSET_03_BODYMAP_HUMAN_PRODUCTION_PACKAGE_SPEC.md` + rapport + `research/AUREN_BODYMAP_REFERENCE_DUE_DILIGENCE.md`
+  + `production/bodymap/` ×6 ; baseline `cf41188`). **BODYMAP HUMAN PRODUCTION PACKAGE: DEFINED** ·
+  **OPERATOR_ASSET_03.1: PACKAGE READY / NOT STARTED**. Transforme le contrat sémantique BodyMap (immuable) en
   **package de production humaine exécutable** — **master NON produit**. Brief illustrateur (`male_neutral_v1`
   P0), **contrat SVG tranché** (viewBox `0 0 240 200`, 14 IDs figés, `<g>`/zone, 0 zone-unknown, convention IDs
   enfants `geom-<zone>-<view>-<side>-<index>`), exigences PI (`PROCUREMENT CHECKLIST`, pas un contrat),
@@ -150,10 +152,10 @@ produits. Détail par sprint ci-dessous.
   INTEGRATION GATE: BLOCKED`.
 
 ## Statut des socles
-🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟢 **`Sx_ASSET_03` : SPEC RÉDIGÉE**. Programme
-global `Sx_ASSET` **non fermé**. `ASSET INTEGRATION GATE: BLOCKED` conservé.
+🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟢 **`Sx_ASSET_03` : SPEC COMMITTED**
+(`66d18d4`). Programme global `Sx_ASSET` **non fermé**. `ASSET INTEGRATION GATE: BLOCKED` conservé.
 
 ## Prochaine action
-`GO COMMIT SPEC — Sx_ASSET_03 BodyMap Human Production Package` (non commencé). Puis (séparément) :
-`OPERATOR_ASSET_03.1` (production humaine externe) → `Sb_ASSET_03.2` (intake) → [gate]. `Sx_ASSET_04`/
-`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
+`GO OPERATOR — OPERATOR_ASSET_03.1 Human BodyMap Master Production` (non commencé) — **production humaine /
+externe** guidée par le package, pas un build logiciel automatique. Puis (séparément) : `Sb_ASSET_03.2`
+(intake technique) → [gate]. `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.

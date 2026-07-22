@@ -1,6 +1,6 @@
 # Sprint Sx_ASSET_03 — BodyMap Human Production Package — SPEC REPORT
 
-**Statut** : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT**
+**Statut** : 🟢 **SPEC COMMITTED** — commit `66d18d47a1f1f9a75556bede8de45f9a94daa055`, parent `062ee92`, poussé sur la branche canonique
 **Type** : SPEC / PRODUCTION PACKAGE / OFFICIAL-SOURCE RESEARCH — **DOCS-ONLY** (0 SVG/image/app/asset/test)
 **Date** : 2026-07-22 · **Baseline** : `cf41188` (closeout Sx_ASSET_02) ; posé sur HEAD réel `062ee92`.
 
@@ -46,7 +46,7 @@ ANATOMYTOOL RESOURCE-BY-RESOURCE · FULL SOURCE DISCLOSURE · PROFESSIONAL LEGAL
   avant signature+sources+revue ; statuts `contract-requirements-defined`/PENDING.
 
 ## 18-20. Package illustrateur / manifest / protocole revue
-Livrables (master SVG + source native hashée + références + déclarations + previews) ; template manifeste (17
+Livrables (master SVG + source native hashée + références + déclarations + previews) ; template manifeste (26
 champs, **0 approved**, statuts `not-started`/`professional-review-required`) ; protocole revue anatomique
 (compétence documentée, **≠ validation médicale**, verdict par zone) + produit/mobile (360 + 60/80/120,
 non-régression logging) + **32 previews bornées**.
@@ -68,14 +68,16 @@ d'`exports/`) · **0** `tests/**` · **0** `app/**` · **0** binaire/image/font/
 fichier Custom. Documents Sx_ASSET_01/02 historiques non modifiés (hors registry/roadmaps).
 
 ## 29-30. Git & statut
-Working tree du worktree propre. **Non committé** (point d'arrêt §33).
-🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT.**
+**Committé** : `66d18d47a1f1f9a75556bede8de45f9a94daa055` (parent `062ee92`), fast-forward canonique et
+**poussé** sur `claude/sprint-reporting-fitness-app-V7Qr6` ; commit 100 % `docs/**` → `CI: SKIPPED —
+DOCS-ONLY / PATHS-IGNORE`.
+🟢 **SPEC COMMITTED.**
 
 ---
 
 ## Verdict
 
-**Verdict :** 🟢 **Sx_ASSET_03: SPEC RÉDIGÉE / READY FOR GO COMMIT.** Package de production humaine du master
+**Verdict :** 🟢 **Sx_ASSET_03: SPEC COMMITTED** (`66d18d4`, parent `062ee92`)**.** Package de production humaine du master
 BodyMap défini et exécutable : brief illustrateur (male_neutral_v1), contrat SVG tranché (viewBox `0 0 240
 200`, 14 IDs, `<g>`/zone, 0 zone-unknown), exigences PI/provenance (checklist, pas un contrat), protocole de
 revue (anatomique ≠ médical + produit/mobile + 32 previews bornées), manifest template (0 approved), contrat
@@ -84,4 +86,4 @@ spatiale uniquement** (dérivation écartée), AnatomyTOOL ressource-par-ressour
 contrat sémantique immuable ; **12 fichiers 100% docs** ; 0 design/tests/app/asset/Custom ; `ASSET INTEGRATION
 GATE: BLOCKED` ; `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` ; `Sx_ASSET_01/02` CLOSED.
 
-**Prochaine action** (séparée, non commencée) : `GO COMMIT SPEC — Sx_ASSET_03 BodyMap Human Production Package`.
+**Prochaine action** (séparée, non commencée) : `GO OPERATOR — OPERATOR_ASSET_03.1 Human BodyMap Master Production`.

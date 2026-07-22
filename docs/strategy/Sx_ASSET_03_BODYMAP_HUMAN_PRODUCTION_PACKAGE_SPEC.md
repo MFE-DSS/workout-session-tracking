@@ -1,7 +1,7 @@
 # Sx_ASSET_03 — BodyMap Human Production Package — SPEC
 
 **Type** : SPEC / PRODUCTION PACKAGE / OFFICIAL-SOURCE RESEARCH — **DOCS-ONLY**, NO SVG, NO IMAGE, NO APP CHANGE
-**Statut** : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT**
+**Statut** : 🟢 **SPEC COMMITTED** — commit `66d18d47a1f1f9a75556bede8de45f9a94daa055` (parent `062ee92`), poussé sur la branche canonique
 **Programme** : `Sx_ASSET` · **3ᵉ cycle** · **Date** : 2026-07-22 · **Baseline** : `cf41188` (closeout
 Sx_ASSET_02) ; posé sur HEAD canonique réel `062ee92` (avance Custom EKB_03, indépendante).
 
@@ -97,7 +97,7 @@ affirmer « Auren owns the master » avant contrat signé + sources + revue juri
 
 ## 13. Package illustrateur & manifeste de livraison (§19/§20)
 Livrables : master SVG canonique + source native (hashée, non nécessairement commitée) + registre références +
-déclarations (outils/tiers/IA) + previews + notes/changelog. Template de manifeste (17 champs, statuts initiaux
+déclarations (outils/tiers/IA) + previews + notes/changelog. Template de manifeste (26 champs, statuts initiaux
 `not-started`/`professional-review-required`, **0 approved**) : [manifest template](../production/bodymap/AUREN_BODYMAP_DELIVERY_MANIFEST_TEMPLATE.md).
 
 ## 14. Protocole de revue anatomique / produit / mobile & previews (§21/§22/§23)
@@ -136,7 +136,7 @@ fichier Custom.
 
 ## 20. Statut & queue
 ```
-Sx_ASSET_03: SPEC RÉDIGÉE / READY FOR GO COMMIT
+Sx_ASSET_03: SPEC COMMITTED (commit 66d18d47a1f1f9a75556bede8de45f9a94daa055, parent 062ee92)
 BODYMAP SEMANTIC CONTRACT: ALREADY COMPLETE / IMMUTABLE
 BODYMAP HUMAN PRODUCTION PACKAGE: DEFINED
 BODYMAP MASTER: NOT YET PRODUCED
@@ -152,7 +152,7 @@ Queue : `OPERATOR_ASSET_03.1` (production humaine) → `Sb_ASSET_03.2` (intake) 
 
 ## Verdict
 
-**Verdict :** 🟢 **Sx_ASSET_03: SPEC RÉDIGÉE / READY FOR GO COMMIT.** Le package de production humaine du master
+**Verdict :** 🟢 **Sx_ASSET_03: SPEC COMMITTED** (`66d18d4`, parent `062ee92`)**.** Le package de production humaine du master
 BodyMap est **défini et exécutable** : brief illustrateur (male_neutral_v1, biomécanique non médical, 11 zones,
 agrégats honnêtes), **contrat SVG tranché** (viewBox `0 0 240 200`, 14 IDs stables figés, `<g>` unique/zone,
 convention IDs enfants, 0 `zone-unknown`), exigences PI/provenance (`PROCUREMENT CHECKLIST`, pas un contrat),
@@ -163,4 +163,4 @@ AnatomyTOOL ressource-par-ressource. **Le master n'est PAS produit** ; `BODYMAP 
 immuable ; `ASSET INTEGRATION GATE: BLOCKED` ; `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED`. `Sx_ASSET_01/02`
 restent CLOSED.
 
-**Prochaine action** (séparée, non commencée) : `GO COMMIT SPEC — Sx_ASSET_03 BodyMap Human Production Package`.
+**Prochaine action** (séparée, non commencée) : `GO OPERATOR — OPERATOR_ASSET_03.1 Human BodyMap Master Production`.
