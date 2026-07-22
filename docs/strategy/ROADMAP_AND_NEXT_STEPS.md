@@ -326,6 +326,26 @@
   14 dédiés + 32 non-régression (46/46) ; full sweep 2491 passed ; check_scope CI_INFRA ;
   head `n5o0i6j7l98` inchangé. Parent `8342d99` (fix ASSET, surfaces disjointes).
   **`EKB_04` (seed DB optionnel) = FIRST NEXT / NOT OPENED · `SCORING_01`, `WIZARD_*` NOT OPENED.**
+- **`Sb_CUSTOM_PROGRAM_EKB_04 — EKB Seed DB (optionnel)` : ⏸️ DEFERRED** 2026-07-22
+  (décision opérateur après préflight complet ; aucun patch, aucune migration, aucun seed,
+  worktree/branche de préflight nettoyés). La spec 02 §7 le qualifie d'« optionnel, ouvert
+  seulement si les consommateurs le justifient » — **aucun consommateur DB n'existe**
+  (wizard/scoring/génération fermés). **Le JSON EKB_02 reste la source canonique** et
+  **le gate EKB_03 reste la protection CI**. Réouvrable sur GO explicite.
+- **`Sb_CUSTOM_PROGRAM_SCORING_01 — Program Quality Engine` : 🟢 PATCH COMPLETE /
+  REVIEW PENDING** 2026-07-22 (branche `sb/custom-program-scoring-01-engine`,
+  base `062ee92` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_01_PROGRAM_QUALITY_ENGINE_REPORT.md`).
+  **Moteur PUR** (Option A(a)) : zéro DB/ORM/I-O (prouvé), zéro migration, zéro `data/`,
+  zéro écriture `quality_reviews` (persistance = `SCORING_03`). **4 sous-scores livrés**
+  (volume/zone, équilibre push-pull-legs, fréquence/zone, faisabilité matériel) ;
+  **4 déclarés `missing_data`** (fatigue, redondance, durée, overload — champs EKB non
+  curés), **exclus de la moyenne, jamais notés 0**. **Grade plafonné à B** (A inatteignable
+  en V1, `grade_cap_reason` explicite) ; C publiable, aucun état bloquant. `confidence`
+  dérivée de la couverture EKB — les gaps réduisent la confiance, ne cassent jamais le
+  moteur. `PROGRAM_QUALITY_SCORING_VERSION = 1` + `ekb_version` pinné. 19 dédiés +
+  46 non-régression + 208 broad sweep ; check_scope ISOLATED ; head `n5o0i6j7l98` inchangé.
+  Statut PR/CI/merge à consigner au closeout.
+  **`SCORING_02`, `SCORING_03`, `EKB_04`, `WIZARD_*` = NOT OPENED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
