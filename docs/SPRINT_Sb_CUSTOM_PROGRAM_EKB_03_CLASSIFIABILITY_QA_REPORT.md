@@ -100,3 +100,17 @@ Les 8 checks QA de la spec §9 sont consolidés en un script CI-able (`scripts/e
 branché dans la CI, avec la doctrine tranchée : invariances = erreurs dures, gaps/trous noirs =
 warnings à compteur figé (dérive = erreur). 14 dédiés + 32 non-régression verts, exit 0 sur l'EKB
 actuel. `EKB_04` (seed DB optionnel) = **NOT OPENED** · `SCORING_01`, `WIZARD_*` = **NOT OPENED**.
+
+---
+
+## Appendice post-merge (closeout 2026-07-21)
+
+- **Commit build** : `94ac158` (6 fichiers, +618) sur `sb/custom-program-ekb-03-classifiability-qa`,
+  base `64ab789`.
+- **PR #30 MERGED** — merge **`a6be9c4`** sur le canonique (parent immédiat `8342d99`, fix ASSET,
+  surfaces disjointes — aucun conflit).
+- **CI PR #30 : 4/4 GREEN** — les 3 jobs **+ le quality gate externe SonarCloud**, sans incident ;
+  la nouvelle étape **`EKB classifiability QA`** passe sur le runner (dans le job pytest+QA).
+- **CI canonique `29832528309` sur `a6be9c4` : 3/3 GREEN** — le gate QA fait désormais partie du
+  pipeline du trunk et est vert.
+- **Head Alembic canonique inchangé : `n5o0i6j7l98`** — EKB_03 est QA-only, zéro `data/`/`app/`/schéma.
