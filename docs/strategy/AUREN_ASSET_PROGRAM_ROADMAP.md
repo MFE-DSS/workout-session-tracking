@@ -135,11 +135,25 @@ produits. Détail par sprint ci-dessous.
   HUMAN REVIEW ACCEPTED · ICON SOURCE INTAKE: ACCEPTED FOR DESIGN SOURCE · Sx_ASSET_02 implementation:
   COMPLETE / READY FOR CLOSEOUT.** `ASSET INTEGRATION GATE: BLOCKED` inchangé.
 
+## Cycle 03 — BodyMap Human Production Package
+- **`Sx_ASSET_03`** BodyMap Human Production Package : 🟢 **SPEC RÉDIGÉE / READY FOR GO COMMIT** 2026-07-22
+  (`Sx_ASSET_03_BODYMAP_HUMAN_PRODUCTION_PACKAGE_SPEC.md` + rapport + `research/AUREN_BODYMAP_REFERENCE_DUE_DILIGENCE.md`
+  + `production/bodymap/` ×6 ; baseline `cf41188`). Transforme le contrat sémantique BodyMap (immuable) en
+  **package de production humaine exécutable** — **master NON produit**. Brief illustrateur (`male_neutral_v1`
+  P0), **contrat SVG tranché** (viewBox `0 0 240 200`, 14 IDs figés, `<g>`/zone, 0 zone-unknown, convention IDs
+  enfants `geom-<zone>-<view>-<side>-<index>`), exigences PI (`PROCUREMENT CHECKLIST`, pas un contrat),
+  protocole revue (**anatomique ≠ médical** + produit/mobile + 32 previews bornées), manifest template (0
+  approved), contrat `Sb_ASSET_03.2` préparé, budgets par artefact. **Due diligence datée (2026-07-22)** :
+  **BodyParts3D CC BY-SA 2.1 Japan** = référence spatiale uniquement (ShareAlike → dérivation écartée) ;
+  **AnatomyTOOL** par ressource. IA = moodboard uniquement. 12 fichiers 100% docs ; 0 SVG/design/tests/app/
+  asset/Custom. `BODYMAP MASTER: NOT YET PRODUCED` ; `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` ; `ASSET
+  INTEGRATION GATE: BLOCKED`.
+
 ## Statut des socles
-🔒 **`Sx_ASSET_01` : CLOSED** (socle gouvernance + contrat sémantique) · 🔒 **`Sx_ASSET_02` : CLOSED** (cycle
-iconographie). Programme global `Sx_ASSET` **non fermé**. `ASSET INTEGRATION GATE: BLOCKED` conservé.
+🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟢 **`Sx_ASSET_03` : SPEC RÉDIGÉE**. Programme
+global `Sx_ASSET` **non fermé**. `ASSET INTEGRATION GATE: BLOCKED` conservé.
 
 ## Prochaine action
-`GO SPEC — Sx_ASSET_03 — BodyMap Human Production Package` (non commencé) — production humaine du master
-BodyMap + relecture anatomique (`OPERATOR_ASSET_03.1` externe). Ce closeout n'ouvre ni sa spec, ni la
-production, ni le gate. `Sx_ASSET_03: NOT OPENED` ; `Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
+`GO COMMIT SPEC — Sx_ASSET_03 BodyMap Human Production Package` (non commencé). Puis (séparément) :
+`OPERATOR_ASSET_03.1` (production humaine externe) → `Sb_ASSET_03.2` (intake) → [gate]. `Sx_ASSET_04`/
+`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
