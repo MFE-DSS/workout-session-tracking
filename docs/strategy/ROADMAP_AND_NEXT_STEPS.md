@@ -333,8 +333,13 @@
   (wizard/scoring/génération fermés). **Le JSON EKB_02 reste la source canonique** et
   **le gate EKB_03 reste la protection CI**. Réouvrable sur GO explicite.
 - **`Sb_CUSTOM_PROGRAM_SCORING_01 — Program Quality Engine` : 🟢 PATCH COMPLETE /
-  REVIEW PENDING** 2026-07-22 (branche `sb/custom-program-scoring-01-engine`,
-  base `062ee92` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_01_PROGRAM_QUALITY_ENGINE_REPORT.md`).
+  CANONICAL CI GREEN** 2026-07-22 (build `52a344d`, **PR #31 MERGED**, merge `c756a8e`,
+  CI PR 3 jobs verts · CI canonique `29933966019` 3/3 — check externe SonarCloud rouge
+  sur `new_coverage` 0.0 % uniquement, artefact structurel connu, **zéro issue de code**
+  vérifiée par API)
+  (branche `sb/custom-program-scoring-01-engine`,
+  base `062ee92` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_01_PROGRAM_QUALITY_ENGINE_REPORT.md`
+  + appendice post-merge).
   **Moteur PUR** (Option A(a)) : zéro DB/ORM/I-O (prouvé), zéro migration, zéro `data/`,
   zéro écriture `quality_reviews` (persistance = `SCORING_03`). **4 sous-scores livrés**
   (volume/zone, équilibre push-pull-legs, fréquence/zone, faisabilité matériel) ;
@@ -344,8 +349,9 @@
   dérivée de la couverture EKB — les gaps réduisent la confiance, ne cassent jamais le
   moteur. `PROGRAM_QUALITY_SCORING_VERSION = 1` + `ekb_version` pinné. 19 dédiés +
   46 non-régression + 208 broad sweep ; check_scope ISOLATED ; head `n5o0i6j7l98` inchangé.
-  Statut PR/CI/merge à consigner au closeout.
-  **`SCORING_02`, `SCORING_03`, `EKB_04`, `WIZARD_*` = NOT OPENED.**
+  **`SCORING_02` (microcopy/alertes/suggestions) = FIRST NEXT SCORING CANDIDATE / NOT
+  OPENED · `SCORING_03` (persistance reviews), `WIZARD_*` = NOT OPENED · `EKB_04` =
+  DEFERRED UNTIL DB CONSUMER EXISTS.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.

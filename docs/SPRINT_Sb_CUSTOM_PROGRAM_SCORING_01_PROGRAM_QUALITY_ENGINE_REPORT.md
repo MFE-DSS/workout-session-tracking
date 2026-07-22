@@ -129,3 +129,27 @@ mesurables plutôt que d'inventer un chiffre — grade plafonné à B, confiance
 couverture EKB réelle, aucun claim médical. 19 dédiés + 46 non-régression + 208 broad sweep
 verts ; check_scope ISOLATED. **`SCORING_02`, `SCORING_03`, `EKB_04`, `WIZARD_*` restent NOT
 OPENED.**
+
+---
+
+## Appendice post-merge (closeout 2026-07-22)
+
+- **Commit build** : `52a344d` (5 fichiers, +872) sur `sb/custom-program-scoring-01-engine`,
+  base `062ee92`.
+- **PR #31 MERGED** — merge **`c756a8e`** sur le canonique. Le canonique avait avancé
+  pendant le patch (`062ee92` → `66d18d4`, sessions ASSET parallèles) ; la garde de base a
+  confirmé que `HEAD` restait un **ancêtre** du canonique (aucune divergence) avant commit.
+- **CI PR #31 : les 3 jobs GitHub verts** (pytest+QA · lint · SonarCloud).
+- **CI canonique `29933966019` sur `c756a8e` : 3/3 GREEN.**
+- **Check externe « SonarCloud Code Analysis » rouge** : condition en échec **unique** =
+  `new_coverage` 0.0 % < 80 %. C'est l'**artefact structurel** du repo (aucun rapport de
+  couverture Python n'est envoyé à SonarCloud), identique aux PR #23–#27 toutes mergées.
+  **Vérification API explicite** : `issues/search` sur la PR → **total 0**, aucune issue de
+  code ; reliability / security / maintainability **A**, duplication **0 %**, hotspots
+  **100 %**. Distinct du cas EKB_01, où le gate avait signalé un **vrai** défaut
+  (`python:S5863`) qui avait alors été corrigé.
+- **Head Alembic canonique inchangé : `n5o0i6j7l98`** — SCORING_01 est bien un moteur pur,
+  zéro schéma, zéro `data/`, zéro DB.
+- **Statuts après closeout** : `SCORING_02` = **FIRST NEXT SCORING CANDIDATE / NOT OPENED** ·
+  `SCORING_03`, `WIZARD_*` = **NOT OPENED** · `EKB_04` = **DEFERRED UNTIL DB CONSUMER
+  EXISTS**.
