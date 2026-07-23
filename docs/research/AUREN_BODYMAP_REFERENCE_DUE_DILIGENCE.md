@@ -1,15 +1,48 @@
 # AUREN — BodyMap Reference Due Diligence (Sx_ASSET_03)
 
 **Type** : recherche source-officielle — **DOCS-ONLY** (0 image/référence importée)
-**Date d'accès** : **2026-07-22** (données relevées à cette date via sources primaires : sites officiels +
-miroir GitHub officiel du dataset).
-**Portée** : évaluer les références anatomiques candidates pour la **production humaine** du master BodyMap.
+**Date d'accès initiale** : **2026-07-22** · **AMENDÉ le 2026-07-23**
+**Portée** : évaluer les références anatomiques candidates pour la production du master BodyMap.
 **NON une conclusion juridique.** Établit `OFFICIAL LICENSE EVIDENCE RECORDED AT ACCESS DATE`, jamais
 `LEGAL CLEARANCE COMPLETE`. Aucun texte de licence, aucune image n'est copié dans le repo à ce stade.
 
 ---
 
-## 1. BodyParts3D / Anatomography
+## 0. ⚠️ AMENDEMENT 2026-07-23 — LE §1 CI-DESSOUS EST PÉRIMÉ
+
+> **La licence de BodyParts3D relevée le 2026-07-22 était fausse.** Le §1 est **conservé tel quel comme
+> preuve historique** de ce qui avait été relevé et de la conclusion qui en avait été tirée — il ne doit
+> **plus** être utilisé comme référence opérationnelle.
+
+| | Source consultée | Licence relevée | Statut |
+|---|---|---|---|
+| 2026-07-22 | miroir GitHub `Kevin-Mattheus-Moerman/BodyParts3D` (`LICENSE_content`) | CC BY-SA 2.1 Japan | ❌ **copie ancienne** (clone figé de la version `3.0` / `20110915`) |
+| **2026-07-23** | **page de licence officielle DBCLS** `dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html` | **CC BY 4.0 International** | ✅ **officielle et courante — mise à jour 2025-02-27** |
+
+**Cause de l'erreur** : le miroir GitHub a été traité comme « miroir officiel du dataset » et sa
+`LICENSE_content` comme faisant foi. C'est un **clone de 2011** qui reproduit la licence de l'époque ; DBCLS a
+depuis **relicencié** la base en **CC BY 4.0 International**. La page descriptive officielle `desc.html`
+n'aide pas à trancher : elle affiche « CC BY » **sans version**, avec une dernière mise à jour **2013/05**.
+**Seule `lic.html` fait foi.**
+
+**Conséquences** (détail complet : [stratégie de réutilisation](AUREN_BODYMAP_OPEN_SOURCE_REUSE_STRATEGY.md)) :
+- **CC BY 4.0 ne comporte aucune clause ShareAlike** → le verdict « **dérivation écartée** » du §1 et du §4
+  est **ANNULÉ**. La dérivation vers un master Auren propriétaire est **licite**, sous **attribution
+  obligatoire et irrévocable** : *« BodyParts3D, © The Database Center for Life Science licensed under
+  CC Attribution 4.0 International »*.
+- BodyParts3D passe de **référence spatiale uniquement** à **`PRIMARY DERIVATION SOURCE`**.
+- **Règle opérationnelle** : télécharger **exclusivement** depuis l'archive officielle DBCLS — la licence
+  applicable est celle de la source dont on obtient effectivement la copie, jamais celle d'un miroir.
+- **Nuance conservée** : CC BY autorise la dérivation commerciale, **pas** l'effacement de l'origine. Auren
+  possède sa contribution créative, **pas** les données anatomiques sous-jacentes ; « Auren owns the master »
+  sans qualification reste **faux**.
+
+**Leçon de méthode retenue** : un miroir, même complet et de bonne foi, **n'est pas une source juridique
+primaire**. Seule la page de licence de l'éditeur, relevée à la date d'usage, l'est.
+
+---
+
+## 1. BodyParts3D / Anatomography — ⚠️ SECTION HISTORIQUE PÉRIMÉE (relevé 2026-07-22, cf. §0)
 
 | Champ | Valeur (relevée 2026-07-22) |
 |---|---|
@@ -72,13 +105,20 @@ Toute référence additionnelle exigera : auteur · titre · source officielle �
 rôle exact · copie autorisée ou non · décision (consultable / utilisable comme référence / adaptation
 possible / rejetée). **Aucune** référence supplémentaire n'est retenue à ce stade.
 
-## 4. Conclusion d'éligibilité
-- **BodyParts3D** : **REFERENCE ONLY** (repère spatial), **CC BY-SA** → **derivative écarté** pour un master
-  propriétaire ; `LEGAL CLASSIFICATION PENDING`.
+## 4. Conclusion d'éligibilité — ⚠️ PARTIELLEMENT PÉRIMÉE (cf. §0)
+> La première puce est **annulée** par l'amendement du 2026-07-23 : BodyParts3D est **CC BY 4.0**, la
+> dérivation est **licite sous attribution**. Les autres puces restent valables.
+
+- ~~**BodyParts3D** : **REFERENCE ONLY** (repère spatial), **CC BY-SA** → **derivative écarté** pour un master
+  propriétaire~~ → **ANNULÉ** : **CC BY 4.0**, `PRIMARY DERIVATION SOURCE`, attribution obligatoire ;
+  `LEGAL CLASSIFICATION PENDING` (qualification dérivé/original toujours du ressort d'un conseil).
 - **AnatomyTOOL** : éligible **ressource-par-ressource** uniquement, CC compatible commercial (CC BY / CC0)
   requise ; NC/étudiant écartés ; qualification individuelle obligatoire.
-- **Le master doit être une œuvre humaine ORIGINALE**, informée par des références spatiales, **non dérivée
-  automatiquement** d'un dataset sous licence copyleft.
+- ~~**Le master doit être une œuvre humaine ORIGINALE**, informée par des références spatiales, **non dérivée
+  automatiquement** d'un dataset sous licence copyleft.~~ → **REMPLACÉ** par la doctrine
+  **SOURCE-REUSE-FIRST** : le master peut être **dérivé** de BodyParts3D (CC BY 4.0), avec attribution. La
+  contrainte « pas de copyleft » demeure et s'applique désormais à **Z-Anatomy**, au **SVG Wikimedia** et à
+  **OpenStax 2e** (cf. [stratégie](AUREN_BODYMAP_OPEN_SOURCE_REUSE_STRATEGY.md)).
 - État : **OFFICIAL LICENSE EVIDENCE RECORDED AT ACCESS DATE 2026-07-22** — la clearance juridique complète
   (classification dérivé/original, ShareAlike, attribution, cession) relève d'un **conseil juridique
   professionnel** au moment de `OPERATOR_ASSET_03.1` / `Sb_ASSET_03.2`. `PROFESSIONAL LEGAL CLEARANCE: NOT

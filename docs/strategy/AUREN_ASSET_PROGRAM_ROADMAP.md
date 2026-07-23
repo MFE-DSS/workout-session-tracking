@@ -151,11 +151,25 @@ produits. Détail par sprint ci-dessous.
   asset/Custom. `BODYMAP MASTER: NOT YET PRODUCED` ; `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` ; `ASSET
   INTEGRATION GATE: BLOCKED`.
 
+## Amendement 2026-07-23 — SOURCE-REUSE-FIRST
+Le master **n'est plus commandé** en première intention. **Correction sur source officielle** :
+**BodyParts3D = CC BY 4.0** (DBCLS, maj **2025-02-27**), et non CC BY-SA 2.1 Japan — relevé initial issu d'un
+**miroir GitHub figé en 2011**. Sans ShareAlike, **la dérivation vers un master propriétaire est licite** sous
+**attribution obligatoire** → `PRIMARY DERIVATION SOURCE`. Hiérarchie : Servier CC BY 4.0 (contrôle 2D) ·
+AnatomyTOOL par ressource · OpenStax **1ʳᵉ éd.** (la 2e est NC, exclue) · Z-Anatomy référence (BY-SA + NC) ·
+Wikimedia `Muscles front and back.svg` **prototype jetable** (BY-SA, dérivé d'OpenStax). Gate humain révisé :
+**cohérence multi-sources REQUISE**, revue professionnelle **non revendiquée/optionnelle**, **illustrateur
+nommé n'est plus un préalable**. Nouvelle dette : `ATTRIBUTION SURFACE: NOT YET IMPLEMENTED`.
+Détail : [stratégie de réutilisation](../research/AUREN_BODYMAP_OPEN_SOURCE_REUSE_STRATEGY.md) ·
+[spec `Sb_ASSET_03.1`](Sb_ASSET_03_1_OPEN_ANATOMY_SOURCE_DERIVATION_SPEC.md).
+
 ## Statut des socles
-🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟢 **`Sx_ASSET_03` : SPEC COMMITTED**
-(`66d18d4`). Programme global `Sx_ASSET` **non fermé**. `ASSET INTEGRATION GATE: BLOCKED` conservé.
+🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟠 **`Sx_ASSET_03` : AMENDED —
+SOURCE-REUSE-FIRST** (spec versée `66d18d4`, amendée 2026-07-23) · 🟢 **`Sb_ASSET_03.1` : SPEC READY / BUILD
+NOT STARTED**. Programme global `Sx_ASSET` **non fermé**. `ASSET INTEGRATION GATE: BLOCKED` conservé.
 
 ## Prochaine action
-`GO OPERATOR — OPERATOR_ASSET_03.1 Human BodyMap Master Production` (non commencé) — **production humaine /
-externe** guidée par le package, pas un build logiciel automatique. Puis (séparément) : `Sb_ASSET_03.2`
-(intake technique) → [gate]. `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
+`GO BUILD — Sb_ASSET_03.1 Open Anatomy Source Acquisition & BodyMap Derivation Prototype` (non commencé).
+Puis (séparément) : `Sb_ASSET_03.2` (intake technique) → [gate].
+`OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue en 1ʳᵉ intention.
+`Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.

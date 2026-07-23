@@ -46,14 +46,27 @@ identifiable en < 1 s ; `secondary` visible sans concurrencer `primary`. `biceps
 `lats`/`upper_back` distinguables sur le dos ; `quads`/`posterior`/`calves` distinguables sur les vues
 pertinentes.
 
-## 7. Références (voir due diligence)
-- **BodyParts3D** (CC BY-SA) : **RÉFÉRENCE SPATIALE/volumétrique uniquement** (position, adjacence des
-  régions). **INTERDIT** : extraction/vectorisation directe du maillage (ShareAlike → dériverait le master).
-  Le master est une **création humaine ORIGINALE, redessinée**.
+## 7. Références (voir due diligence) — **amendé 2026-07-23**
+> **Correction** : BodyParts3D est sous **CC BY 4.0** (source officielle DBCLS, mise à jour 2025-02-27), et
+> non CC BY-SA comme indiqué auparavant d'après un miroir GitHub périmé. **La dérivation n'est plus
+> interdite.** Hiérarchie complète : [stratégie de réutilisation](../../research/AUREN_BODYMAP_OPEN_SOURCE_REUSE_STRATEGY.md).
+
+- **BodyParts3D** (**CC BY 4.0**) : **source de dérivation primaire autorisée** — extraction et vectorisation
+  du maillage **permises**, sous **attribution obligatoire** (*« BodyParts3D, © The Database Center for Life
+  Science licensed under CC Attribution 4.0 International »*). Téléchargement **uniquement** depuis l'archive
+  officielle DBCLS, jamais depuis un miroir.
+- **Servier Medical Art** (**CC BY 4.0**) : contrôle 2D face/dos, incorporable sous attribution.
 - **AnatomyTOOL** : uniquement des ressources **CC compatibles commercial** (CC BY / CC0), **qualifiées une par
   une** ; NC/étudiant écartés.
+- **OpenStax** : **1ʳᵉ édition CC BY 4.0** utilisable ; **2e édition CC BY-NC-SA 4.0 EXCLUE** (clause NC).
+- **Z-Anatomy** (CC BY-SA 4.0 + composant NC) et **`Muscles front and back.svg`** de Wikimedia (CC BY-SA 4.0,
+  lui-même dérivé d'OpenStax) : **référence / prototype jetable uniquement — exclus du master livré**.
 - Toute autre référence : déclarée (auteur/source/URL/date/licence/rôle/décision). **Aucune image de référence
   n'est committée dans Git.**
+
+> **Si le master est produit par dérivation** (`Sb_ASSET_03.1`), il n'est plus une « création humaine
+> originale » au sens strict mais une **œuvre dérivée sous attribution**. Les exigences de style (§3),
+> d'agrégats honnêtes (§4) et de lisibilité (§6) restent **intégralement applicables**.
 
 ## 8. IA (strictement bornée)
 IA autorisée **uniquement** pour : exploration de style · moodboard abstrait · variantes de composition **non

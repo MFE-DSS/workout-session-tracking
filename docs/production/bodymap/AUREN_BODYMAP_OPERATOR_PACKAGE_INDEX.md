@@ -35,9 +35,21 @@ Master SVG canonique `auren_bodymap_master.svg` + source native éditable + regi
 (outils/tiers/IA) + previews de revue + manifeste de livraison rempli. **Aucun de ces fichiers n'entre dans
 `app/static/` ni ne franchit le gate.**
 
-## Chaîne
+## Chaîne — **amendée 2026-07-23 (SOURCE-REUSE-FIRST)**
 ```
-Sx_ASSET_03 (ce package, spec)  →  OPERATOR_ASSET_03.1 (production humaine externe)
+Sx_ASSET_03 (ce package, spec, AMENDÉ)
+   →  Sb_ASSET_03.1 (dérivation depuis sources ouvertes)   ← CHEMIN RETENU
    →  Sb_ASSET_03.2 (intake technique + validation)  →  [gate]  →  Sx_ASSET_04 / Sb_ASSET_04.1 (intégration)
+
+OPERATOR_ASSET_03.1 (commande externe à un illustrateur) = OPTION DE REPLI, non retenue en 1ʳᵉ intention
 ```
-**Point d'arrêt** : le package est défini ; le master n'est **pas** produit ; le gate reste **BLOCKED**.
+Le master n'est plus commandé en première intention : il est **dérivé de BodyParts3D (CC BY 4.0)** et
+contrôlé par croisement multi-sources — cf.
+[stratégie de réutilisation](../../research/AUREN_BODYMAP_OPEN_SOURCE_REUSE_STRATEGY.md) et
+[spec `Sb_ASSET_03.1`](../../strategy/Sb_ASSET_03_1_OPEN_ANATOMY_SOURCE_DERIVATION_SPEC.md).
+
+**Ce que le package reste** : le **contrat de ce qui doit être produit** (direction artistique, structure SVG,
+exigences PI, protocole de revue, manifeste). Il s'applique **identiquement** à un master dérivé — seule la
+**méthode d'obtention** de la géométrie change.
+
+**Point d'arrêt** : le master n'est **pas** produit ; le gate reste **BLOCKED**.

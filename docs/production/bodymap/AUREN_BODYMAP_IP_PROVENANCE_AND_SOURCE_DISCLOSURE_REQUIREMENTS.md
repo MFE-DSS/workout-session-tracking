@@ -29,15 +29,24 @@ NOT A FINAL LEGAL CONTRACT · NOT LEGAL ADVICE · PROFESSIONAL COUNSEL REQUIRED
 - procédure de **correction** · procédure de **rejet** ;
 - **conservation des preuves de création**.
 
-## 2. Impact des références sous licence (due diligence)
-- **BodyParts3D = CC BY-SA 2.1 Japan** (ShareAlike) : une **dérivation** imposerait ShareAlike → **écartée**.
-  Usage retenu = **référence spatiale uniquement**. Si toutefois une quelconque donnée était réutilisée, une
-  **attribution** exacte serait requise et la classification dérivé/original devrait être tranchée par conseil
-  juridique. → `LEGAL CLASSIFICATION PENDING`.
+## 2. Impact des références sous licence (due diligence) — **amendé 2026-07-23**
+> **Correction majeure** : la mention « CC BY-SA 2.1 Japan » provenait d'un **miroir GitHub figé en 2011**.
+> La page de licence **officielle DBCLS** (mise à jour **2025-02-27**) donne **CC BY 4.0 International**.
+
+- **BodyParts3D = CC BY 4.0 International** (**aucune clause ShareAlike**) : la **dérivation est licite**, y
+  compris pour un master commercial propriétaire, **sous attribution obligatoire et irrévocable** :
+  *« BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International »*.
+  La classification finale dérivé/original reste du ressort d'un conseil → `LEGAL CLASSIFICATION PENDING`.
+- **Servier Medical Art = CC BY 4.0** : incorporable sous attribution.
 - **AnatomyTOOL** : licences **par ressource** ; seules CC BY / CC0 (compatibles commercial) sont éligibles,
   **qualifiées individuellement** ; NC / étudiant écartés.
-- Le contrat doit **garantir** que le master ne contient **aucun asset tiers non déclaré** et n'est pas une
-  œuvre dérivée soumise à copyleft.
+- **OpenStax** : **1ʳᵉ éd. CC BY 4.0** éligible ; **2e éd. CC BY-NC-SA 4.0 exclue** (NC).
+- **Z-Anatomy** (CC BY-SA 4.0, sources mélangées dont un composant **NC**) et **Wikimedia
+  `Muscles front and back.svg`** (CC BY-SA 4.0) : **jamais dans le master livré**.
+- Le contrat — ou, en dérivation interne, le registre de provenance — doit **garantir** que le master ne
+  contient **aucun asset tiers non déclaré** et **aucun composant copyleft ou NC**.
+- **L'attribution n'est pas optionnelle et ne s'éteint pas** avec la stylisation : même fortement simplifié,
+  un master dérivé de BodyParts3D reste soumis à l'attribution CC BY 4.0.
 
 ## 3. Interdiction de revendication prématurée
 Ne **jamais** affirmer :

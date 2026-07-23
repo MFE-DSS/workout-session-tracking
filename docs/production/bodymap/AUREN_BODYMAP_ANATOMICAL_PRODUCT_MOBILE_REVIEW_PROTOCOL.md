@@ -5,7 +5,31 @@
 
 ---
 
-## 1. Revue anatomique
+## 0. Gate humain révisé (amendement 2026-07-23 — SOURCE-REUSE-FIRST)
+
+```
+MULTI-SOURCE ANATOMICAL CONSISTENCY REVIEW: REQUIRED
+PROFESSIONAL ANATOMICAL REVIEW: NOT CLAIMED / OPTIONAL BEFORE FINAL INTEGRATION DECISION
+NAMED ILLUSTRATOR: NO LONGER A PRECONDITION
+```
+
+Pour un master **dérivé de sources ouvertes** (`Sb_ASSET_03.1`), la revue professionnelle préalable est
+**remplacée** par une **revue de cohérence multi-sources** : chaque zone est confrontée à **au moins deux
+sources indépendantes** parmi Servier Medical Art (CC BY 4.0), AnatomyTOOL (ressources CC0/CC BY qualifiées)
+et OpenStax **1ʳᵉ édition** (CC BY 4.0). Verdict par zone : `PASS / ADJUST / BLOCKED / NOT APPLICABLE`.
+
+**Ce que cette revue n'est pas** : une validation médicale, une preuve clinique, une garantie d'exactitude.
+Elle constate une **cohérence de représentation** entre sources concordantes. La revue professionnelle reste
+**possible et recommandée avant la décision d'intégration finale** — elle n'est simplement **pas revendiquée**
+ni exigée pour produire le prototype.
+
+**Indépendance des sources** : le SVG Wikimedia `Muscles front and back.svg` étant **dérivé d'OpenStax**, il
+ne compte **pas** comme second avis face à OpenStax. Z-Anatomy étant **dérivé de BodyParts3D**, il ne compte
+pas comme second avis face à la source primaire.
+
+Le §1 ci-dessous reste applicable **tel quel** si une revue professionnelle est effectivement conduite.
+
+## 1. Revue anatomique (professionnelle — applicable si conduite)
 ### Compétence du relecteur
 Compétence **documentée** en anatomie / biomécanique / illustration anatomique / kinésithérapie (ou domaine
 voisin pertinent). **Pas** de titre médical précis exigé si non juridiquement nécessaire, mais **compétence
