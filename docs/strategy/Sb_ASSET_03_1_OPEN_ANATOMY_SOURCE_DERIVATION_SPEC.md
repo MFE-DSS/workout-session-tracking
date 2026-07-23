@@ -1,6 +1,7 @@
 # Sb_ASSET_03.1 — Open Anatomy Source Acquisition & BodyMap Derivation Prototype — SPEC
 
-**Type** : SPEC DE BUILD FUTUR — **NON EXÉCUTÉE** · **Statut** : 🟢 **SPEC READY / BUILD NOT STARTED**
+**Type** : SPEC DE BUILD — **EXÉCUTÉE le 2026-07-23** · **Statut** : 🟢 **BUILD COMPLETE / MIXED-SOURCE
+PROTOTYPE READY FOR TECHNICAL INTAKE** (cf. [rapport de build](../SPRINT_Sb_ASSET_03_1_OPEN_ANATOMY_SOURCE_DERIVATION_REPORT.md))
 **Programme** : `Sx_ASSET` · cycle **`Sx_ASSET_03` amendé SOURCE-REUSE-FIRST** · **Date** : 2026-07-23
 **Baseline** : `357802b` (brief opérateur) ; posé sur HEAD canonique réel `141ebd4` (avances Custom SCORING,
 indépendantes, 0 fichier BodyMap).
@@ -230,7 +231,7 @@ juridique · aucune revendication de propriété exclusive · aucune clearance j
 
 ```
 Sx_ASSET_03: AMENDED — SOURCE-REUSE-FIRST
-Sb_ASSET_03.1: SPEC READY / BUILD NOT STARTED
+Sb_ASSET_03.1: BUILD COMPLETE / MIXED-SOURCE PROTOTYPE READY FOR TECHNICAL INTAKE
 BODYMAP SEMANTIC CONTRACT: ALREADY COMPLETE / IMMUTABLE
 BODYMAP MASTER: NOT YET PRODUCED
 PRIMARY DERIVATION SOURCE: BodyParts3D official current archive — CC BY 4.0
@@ -254,7 +255,7 @@ chemin retenu en première intention** — il redevient l'option de repli si la 
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_ASSET_03.1: SPEC READY / BUILD NOT STARTED.** Le pipeline de dérivation est défini de
+**Verdict :** 🟢 **Sb_ASSET_03.1: BUILD COMPLETE / MIXED-SOURCE PROTOTYPE READY FOR TECHNICAL INTAKE.** Le pipeline de dérivation est défini de
 bout en bout — acquisition bornée depuis l'**archive officielle DBCLS** (hashes + provenance), mapping OBJ via
 `isa_parts_list_e.txt`, sélection des seules structures superficielles, scène Blender reproductible, caméras
 orthographiques face/dos alignées sur la grille du contrat, rendu monochrome par zone, vectorisation

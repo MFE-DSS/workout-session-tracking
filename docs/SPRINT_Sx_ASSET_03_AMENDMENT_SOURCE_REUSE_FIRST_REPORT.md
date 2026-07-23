@@ -1,6 +1,6 @@
 # Sprint Sx_ASSET_03 — AMENDEMENT « SOURCE-REUSE-FIRST » — REPORT
 
-**Statut** : 🟠 **AMENDED — SOURCE-REUSE-FIRST** — **DOCS-ONLY**, non committé (point d'arrêt : GO COMMIT)
+**Statut** : 🟠 **AMENDED — SOURCE-REUSE-FIRST** — **DOCS-ONLY** — **COMMITTED — `cd4aeb3`, parent `141ebd4`**
 **Type** : AMENDEMENT DE STRATÉGIE + RECHERCHE SOURCE-OFFICIELLE — 0 SVG, 0 image, 0 archive, 0 `app/**`
 **Date** : 2026-07-23 · **Baseline brief** : `357802b` ; **posé sur HEAD canonique réel `141ebd4`**
 (avances Custom `SCORING_01`/`SCORING_02`, indépendantes, 0 fichier BodyMap/Sx_ASSET).
@@ -164,8 +164,9 @@ légitimement skippée via `paths-ignore` ; aucun autre contrôle local requis p
 
 ## 8. Git & statut
 
-Worktree isolé `work/sx-asset-03-source-reuse-amendment` sur `141ebd4`. **Non committé** — point d'arrêt
-`GO COMMIT` conformément au double GO.
+Worktree isolé `work/sx-asset-03-source-reuse-amendment` sur `141ebd4`. **COMMITTED — `cd4aeb3`, parent
+`141ebd4`**, fast-forward canonique et poussé ; commit 100 % `docs/**` → `CI: SKIPPED — DOCS-ONLY /
+PATHS-IGNORE`.
 
 ---
 
