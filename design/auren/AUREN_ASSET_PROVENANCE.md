@@ -191,3 +191,28 @@ HEALTH ICONS : ABSENT (aucun fichier, aucune licence ingérée — NOT REQUIRED 
 CUSTOM GLYPHS : ABSENT (CUSTOM GLYPH TRACK: NOT REQUIRED).
 Tout nouveau vendor exigera une nouvelle entrée de provenance complète + licence officielle.
 ```
+
+## BodyMap master — provenance (Sb_ASSET_03.2, 2026-07-23)
+```
+asset_id: auren.bodymap.master.male_neutral_v1
+author: repository-derived (pipeline reproductible, package v2)
+owner: OPERATIONAL REPOSITORY OWNER
+ip_ownership_status: not-legally-reviewed
+source_type: derived-open-source
+primary_source: BodyParts3D (DBCLS) — license_spdx: CC-BY-4.0 — access_date: 2026-07-23
+  license_text_location: design/auren/LICENSES/CC-BY-4.0.txt + LICENSES/bodyparts3d-NOTICE.md
+  attribution_required: yes — "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International"
+supplemental_source: Servier Medical Art — license_spdx: CC-BY-4.0 — access_date: 2026-07-23
+  license_text_location: design/auren/LICENSES/servier-medical-art-NOTICE.md
+  attribution_required: yes — "Image adapted from Servier Medical Art, licensed under CC BY 4.0"
+modifications: mesh extraction, orthographic monochrome render, Potrace vectorization, Inkscape
+  simplification, deterministic Servier region selection, uniform alignment, contract SVG mapping
+tooling: Blender 5.2.0 LTS, Potrace 1.16, Inkscape 1.4.4, Python 3.14 stdlib
+ai_usage: none
+reviewer: NOT YET REVIEWED
+review_date: NOT YET REVIEWED
+evidence: master sha256 dbb57db3… · compact sha256 8024fd4c… · package v2 f45e0dbf… (reproduit indépendamment)
+status: technical-intake-accepted-human-review-pending
+```
+**Aucune entrée `verified`/`approved`/`legally-cleared`.** Cross-check OpenStax 1ʳᵉ éd. + Sobotta 1909 =
+contrôle documentaire, aucune géométrie incorporée. **Aucune conclusion juridique.**

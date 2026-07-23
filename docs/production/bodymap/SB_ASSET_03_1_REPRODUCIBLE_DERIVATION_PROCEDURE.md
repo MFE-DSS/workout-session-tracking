@@ -1,5 +1,15 @@
 # SB_ASSET_03.1 — Procédure de dérivation reproductible
 
+> ```
+> PACKAGE V1: HISTORICAL / SUPERSEDED
+> CURRENT PACKAGE: V2 — see SB_ASSET_03_1_REPRODUCIBILITY_CLOSURE.md
+> ```
+> La procédure d'origine décrite ici comportait une **étape ad hoc non scriptée** (sélection des régions
+> Servier), corrigée par `Sb_ASSET_03.1-fix` : producteur `extract_servier_regions.py`, scripts
+> **relocalisés**, graphe de build explicite, entrypoint `run_pipeline.py`. Le pipeline courant est
+> **rejouable de bout en bout depuis un workspace vide** (package v2 `f45e0dbf…`), ce qui a été **vérifié
+> indépendamment** à l'intake `Sb_ASSET_03.2`.
+
 **Cycle** : `Sx_ASSET_03` (amendé SOURCE-REUSE-FIRST) · **Build** : `Sb_ASSET_03.1` · **Date** : 2026-07-23
 
 > Tous les artefacts binaires (archives, OBJ, `.blend`, BMP, PNG, SVG) vivent **hors Git**, dans

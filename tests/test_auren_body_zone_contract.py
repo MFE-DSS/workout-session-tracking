@@ -264,10 +264,14 @@ def test_contract_is_allowlisted_not_binary():
     assert CONTRACT.suffix.lower() in {".yaml", ".yml", ".json"}
 
 
-def test_no_master_svg_next_to_contract():
+def test_only_governed_master_svg_next_to_contract():
+    """Sb_ASSET_03.2 governed intake: exactly the BodyMap master SVG may sit
+    beside the contract; still zero raster, and no other SVG."""
     bodymap_dir = CONTRACT.parent
-    svgs = list(bodymap_dir.rglob("*.svg")) + list(bodymap_dir.rglob("*.png"))
-    assert not svgs, f"unexpected asset next to the contract: {svgs}"
+    svgs = sorted(p.name for p in bodymap_dir.rglob("*.svg"))
+    pngs = list(bodymap_dir.rglob("*.png"))
+    assert svgs == ["auren_bodymap_master.svg"], f"unexpected SVG next to the contract: {svgs}"
+    assert not pngs, f"no raster may sit next to the contract: {pngs}"
 
 
 # ───────── 23/24 descriptor parity (runtime untouched) ─────────

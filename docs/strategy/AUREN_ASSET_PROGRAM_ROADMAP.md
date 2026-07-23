@@ -186,16 +186,25 @@ entrypoint, **rejoué la chaîne en clean-room dans deux racines** (master/compa
 réémis un **package v2 auto-descriptif et déterministe** (`f45e0dbf…`). Le master et le compact sont
 **inchangés**. Package v1 et preuves d'intake **conservés**.
 
+## Intake réussi avec le package v2 (2026-07-23)
+La reprise `Sb_ASSET_03.2` a **validé le prototype indépendamment** avec le package v2 : identité exacte,
+manifeste embarqué (`62=61+1`), **replay clean-room byte-identique** (master `dbb57db3…`, compact `8024fd4c…`,
+package `f45e0dbf…`, 32 previews) dans une racine vierge à espace+Unicode, SVG conformes (3 méthodes
+géométriques, Chrome+Inkscape concordants), provenance **CC BY 4.0 double** sans contamination. Le **master et
+le compact entrent en design source** (`design/auren/source/bodymap/`, `exports/svg/`, octets préservés), avec
+registre YAML, notices d'attribution, surface de revue HTML et **garde automatisé** ; 97 tests Auren verts.
+**Rien n'entre dans `app/**`.**
+
 ## Statut des socles
 🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟠 **`Sx_ASSET_03` : AMENDED —
-SOURCE-REUSE-FIRST** (spec versée `66d18d4`, amendée `cd4aeb3`) · 🟢 **`Sb_ASSET_03.1` : BUILD COMPLETE** ·
-🟢 **`Sb_ASSET_03.1-fix` : REPRODUCIBILITY GAP CLOSED / PACKAGE V2 READY** · ⛔ **`Sb_ASSET_03.2` : INTAKE
-BLOCKED (v1) / READY TO RESUME AT §11 (v2)**. Programme global `Sx_ASSET` **non fermé**.
-`BODYMAP MASTER: NOT YET APPROVED` · `ATTRIBUTION SURFACE: NOT YET IMPLEMENTED` ·
+SOURCE-REUSE-FIRST** · 🟢 **`Sb_ASSET_03.1` : BUILD COMPLETE** · 🟢 **`Sb_ASSET_03.1-fix` : PACKAGE V2
+READY** · 🟢 **`Sb_ASSET_03.2` : TECHNICAL VALIDATION PASSED / ACCEPTED FOR DESIGN SOURCE / HUMAN REVIEW
+PENDING**. Programme global `Sx_ASSET` **non fermé**.
+`BODYMAP MASTER: TECHNICALLY VALIDATED / NOT YET HUMAN APPROVED` · `ATTRIBUTION SURFACE: NOT YET IMPLEMENTED` ·
 `ASSET INTEGRATION GATE: BLOCKED` conservé.
 
 ## Prochaine action
-`GO RESUME INTAKE — Sb_ASSET_03.2 from §11 using package v2` (non commencé) — reprise de la validation
-technique avec le package réémis. Puis [gate].
+`GO HUMAN REVIEW — Sb_ASSET_03.2 Auren BodyMap Design Source` (non commencé) — revue humaine (produit /
+anatomique de cohérence / mobile) sur la surface hors runtime. Puis [gate] avant tout `Sx_ASSET_04`.
 `OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue.
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.

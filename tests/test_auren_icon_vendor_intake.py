@@ -189,8 +189,13 @@ def test_license_sha256_matches_registry():
 
 
 def test_no_other_license_file():
+    """LICENSES = README + Tabler MIT (Sb_ASSET_02.1) + the CC BY 4.0 text and
+    BodyMap attribution notices (Sb_ASSET_03.2 governed intake)."""
     files = sorted(p.name for p in (AUREN / "LICENSES").iterdir() if p.is_file())
-    assert files == ["README.md", "tabler-MIT.txt"]
+    assert files == sorted([
+        "README.md", "tabler-MIT.txt", "CC-BY-4.0.txt",
+        "bodyparts3d-NOTICE.md", "servier-medical-art-NOTICE.md",
+    ])
 
 
 # ───────── manifest / provenance ─────────

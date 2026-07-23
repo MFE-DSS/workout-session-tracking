@@ -156,11 +156,18 @@ def test_provenance_does_not_invent_upstream_for_repo_assets():
 # ───────── licenses ─────────
 
 
-def test_licenses_dir_holds_exactly_readme_and_tabler():
-    """After Sb_ASSET_02.1 LICENSES holds exactly README + the official Tabler
-    MIT text — and nothing else (no Health Icons, no fabricated license)."""
+def test_licenses_dir_holds_exactly_allowlisted():
+    """LICENSES holds exactly the allowlisted files. Sb_ASSET_02.1: README +
+    official Tabler MIT. Sb_ASSET_03.2 governed evolution: the OFFICIAL verbatim
+    CC BY 4.0 text + the BodyParts3D and Servier Medical Art attribution
+    notices (BodyMap design-source intake). No Health Icons, no fabricated
+    generic license."""
     files = sorted(p.name for p in (AUREN / "LICENSES").iterdir() if p.is_file())
-    assert files == ["README.md", "tabler-MIT.txt"], f"LICENSES must hold exactly README + tabler-MIT.txt, found: {files}"
+    expected = sorted([
+        "README.md", "tabler-MIT.txt", "CC-BY-4.0.txt",
+        "bodyparts3d-NOTICE.md", "servier-medical-art-NOTICE.md",
+    ])
+    assert files == expected, f"LICENSES drift, found: {files}"
 
 
 def test_tabler_license_is_official_mit():
@@ -177,10 +184,20 @@ def test_licenses_readme_records_tabler_intake():
 
 
 def test_no_fabricated_or_health_icons_license():
-    """No reconstructed generic license, and NO Health Icons license ingested."""
-    for name in ("MIT.txt", "CC-BY-4.0.txt", "CC0-1.0.txt", "Apache-2.0.txt",
+    """No reconstructed generic license, and NO Health Icons license ingested.
+    NOTE: CC-BY-4.0.txt is now ALLOWED — but only as the OFFICIAL verbatim text
+    (governed BodyMap intake), verified by test_cc_by_40_is_official below."""
+    for name in ("MIT.txt", "CC0-1.0.txt", "Apache-2.0.txt",
                  "health-icons-MIT.txt", "health-icons-CC0.txt", "healthicons-CC0-1.0.txt"):
         assert not (AUREN / "LICENSES" / name).exists(), f"forbidden license file: {name}"
+
+
+def test_cc_by_40_is_official():
+    """The CC BY 4.0 text must be the official verbatim license, not fabricated."""
+    src = _read("LICENSES/CC-BY-4.0.txt")
+    assert "Attribution 4.0 International" in src
+    assert "Creative Commons Corporation" in src
+    assert len(src) > 10000  # full legal code, not a stub
 
 
 # ───────── security: evolving governance guard under design/auren/ ─────────
@@ -203,7 +220,7 @@ FORBIDDEN_BINARY_SUFFIXES = {
 }
 
 # Vendored SVGs explicitly allowed (exact repo-relative paths). Sb_ASSET_02.1:
-# the ten Tabler v3.45.0 outline P0 icons — and NOTHING else.
+# the ten Tabler v3.45.0 outline P0 icons.
 _TABLER = "design/auren/source/icons/vendor/tabler/v3.45.0/outline"
 ALLOWED_VENDOR_SVGS = {
     f"{_TABLER}/arrows-exchange.svg",
@@ -218,9 +235,22 @@ ALLOWED_VENDOR_SVGS = {
     f"{_TABLER}/menu-2.svg",
 }
 
+# Sb_ASSET_03.2 GOVERNED EVOLUTION: the BodyMap design-source master + compact,
+# derived from BodyParts3D (CC BY 4.0) + Servier Medical Art (CC BY 4.0),
+# technically validated and independently reproduced (package v2). NOT AUTHORIZED
+# FOR APP INTEGRATION. Detailed guard: tests/test_auren_bodymap_master.py.
+ALLOWED_BODYMAP_SVGS = {
+    "design/auren/source/bodymap/auren_bodymap_master.svg",
+    "design/auren/exports/svg/auren_bodymap_compact.svg",
+}
+
+# Full SVG allowlist under design/auren/ = vendored icons + governed BodyMap.
+ALLOWED_SVGS = ALLOWED_VENDOR_SVGS | ALLOWED_BODYMAP_SVGS
+
 # Structured contract files explicitly allowed (exact repo-relative paths).
 ALLOWED_STRUCTURED_FILES = {
     "design/auren/source/bodymap/auren_bodymap_mapping.yaml",
+    "design/auren/source/bodymap/auren_bodymap_source.yaml",
     "design/auren/source/icons/auren_icon_subset.yaml",
 }
 
@@ -245,8 +275,8 @@ def test_svgs_match_vendor_allowlist_exactly():
         for p in AUREN.rglob("*.svg")
         if p.is_file()
     }
-    assert actual == ALLOWED_VENDOR_SVGS, (
-        f"SVG set drift.\n  missing: {ALLOWED_VENDOR_SVGS - actual}\n  extra: {actual - ALLOWED_VENDOR_SVGS}"
+    assert actual == ALLOWED_SVGS, (
+        f"SVG set drift.\n  missing: {ALLOWED_SVGS - actual}\n  extra: {actual - ALLOWED_SVGS}"
     )
 
 
@@ -268,19 +298,22 @@ def test_allowlisted_files_present_and_correct_kind():
         p = ROOT / rel
         assert p.is_file(), f"allowlisted contract missing: {rel}"
         assert p.suffix.lower() in STRUCTURED_SUFFIXES
-    for rel in ALLOWED_VENDOR_SVGS:
+    for rel in ALLOWED_SVGS:
         p = ROOT / rel
-        assert p.is_file(), f"allowlisted vendor SVG missing: {rel}"
+        assert p.is_file(), f"allowlisted SVG missing: {rel}"
         assert p.suffix.lower() == ".svg"
-        assert not p.is_symlink(), f"vendor SVG must be a regular file: {rel}"
+        assert not p.is_symlink(), f"SVG must be a regular file: {rel}"
 
 
-def test_no_master_files_exist():
-    for master in ("source/bodymap/auren_bodymap_master.svg",
-                   "source/brand/auren_mark_master.svg",
+def test_no_brand_master_files_exist():
+    """Brand masters remain forbidden. The BodyMap master is NO LONGER here:
+    Sb_ASSET_03.2 introduced it by governed intake (allowlisted above,
+    guarded by tests/test_auren_bodymap_master.py). Brand identity masters
+    (mark/wordmark/app-icon) are still unproduced and forbidden."""
+    for master in ("source/brand/auren_mark_master.svg",
                    "source/brand/auren_wordmark_master.svg",
                    "source/brand/auren_app_icon_master.svg"):
-        assert not (AUREN / master).exists(), f"forbidden master present: {master}"
+        assert not (AUREN / master).exists(), f"forbidden brand master present: {master}"
 
 
 def test_style_rules_and_intake_have_content():

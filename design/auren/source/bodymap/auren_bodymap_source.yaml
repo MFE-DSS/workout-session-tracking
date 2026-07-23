@@ -1,0 +1,41 @@
+{
+  "_doc": "AUREN BodyMap design-source registry (Sb_ASSET_03.2 technical intake). YAML 1.2 / JSON-compatible, lu par le garde stdlib json. Statuts bornes : voir tests/test_auren_bodymap_master.py pour les valeurs interdites.",
+  "asset_id": "auren.bodymap.master.male_neutral_v1",
+  "version": "0.1.0",
+  "status": "technical-intake-accepted-human-review-pending",
+
+  "source_master_sha256": "dbb57db333863434442b476277170017db442d83e2eced6e7191266ee9ecfa73",
+  "compact_sha256": "8024fd4ced62ca2010808bf85f94c3eaca4d334dde2b7c3b7683c3e5a4676c9a",
+  "package_sha256": "f45e0dbf0a20fb9b11f0e0314c5588f19303724665e96b91ceb0e7c092957029",
+  "package_name": "auren_bodymap_sb_asset_03_1_intake_package_v2.zip",
+
+  "master_path": "design/auren/source/bodymap/auren_bodymap_master.svg",
+  "compact_path": "design/auren/exports/svg/auren_bodymap_compact.svg",
+
+  "body_variant": "male_neutral_v1",
+  "viewbox": "0 0 240 200",
+
+  "primary_source": "BodyParts3D",
+  "primary_source_license": "CC-BY-4.0",
+  "supplemental_source": "Servier Medical Art",
+  "supplemental_source_license": "CC-BY-4.0",
+  "servier_zones": ["lats", "core"],
+  "bodyparts3d_zones": ["pecs", "delt_lat", "delt_post", "upper_back", "biceps",
+    "triceps", "quads", "posterior", "calves"],
+  "body_base_source": "BodyParts3D FMA7163 skin",
+
+  "cross_check_sources": ["OpenStax Anatomy and Physiology 1st edition (CC-BY-4.0)",
+    "Sobotta 1909 (public domain)"],
+  "cross_check_note": "Controle documentaire uniquement - aucune geometrie incorporee.",
+
+  "ai_usage": "none",
+  "professional_anatomical_review": "not-claimed",
+  "multi_source_consistency_review": "recorded",
+  "legal_review": "required",
+  "attribution_surface": "not-yet-implemented",
+  "runtime_authorization": "blocked",
+
+  "reproducibility": "independently-verified-package-v2",
+  "intake_date": "2026-07-23",
+  "intake_sprint": "Sb_ASSET_03.2"
+}

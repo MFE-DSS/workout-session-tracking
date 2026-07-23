@@ -179,7 +179,23 @@ technical: automated checks passed, accessibility: NOT YET REVIEWED, legal: NOT 
 NOT YET REVIEWED}` · `budgets: {source_bytes: <réel>, maximum: 2048}` · `consumers: NOT YET INTEGRATED` ·
 `deprecated_by: NONE`. Preuves complètes (blob SHA, sha256) : `source/icons/auren_icon_subset.yaml`.
 
+## 5bis. BodyMap master (Sb_ASSET_03.2 — design-source intake)
+
+| asset_id | fichier | statut |
+|---|---|---|
+| `auren.bodymap.master.male_neutral_v1` | `source/bodymap/auren_bodymap_master.svg` | `technical-intake-accepted-human-review-pending` |
+| `auren.bodymap.compact.male_neutral_v1` | `exports/svg/auren_bodymap_compact.svg` | `technical-intake-accepted-human-review-pending` |
+
+Œuvre **dérivée sous attribution** : base + 9 zones depuis **BodyParts3D** (CC BY 4.0, `FMA7163` skin +
+maillages 4.0), zones `lats`/`core` depuis **Servier Medical Art** (CC BY 4.0). viewBox `0 0 240 200`,
+14 IDs stables, 11 zones, 0 `zone-unknown`. master sha256 `dbb57db3…`, compact sha256 `8024fd4c…` (≤ 12 Ko),
+package v2 déterministe `f45e0dbf…` **reproduit indépendamment**. `ai_usage: none` ·
+`professional_anatomical_review: not-claimed` · `legal_review: required` · `attribution_surface: not-yet-implemented`.
+Revue produit/anatomique/mobile : **NOT YET REVIEWED**. **0 entrée `approved`.** Registre machine-lisible :
+`source/bodymap/auren_bodymap_source.yaml`. **NOT AUTHORIZED FOR APP INTEGRATION.**
+
 ## 6. Gate & nom
 `ASSET INTEGRATION GATE: BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS`. Nom Auren =
 **WORKING PRODUCT NAME · EXTERNAL PROFESSIONAL CLEARANCE OPEN** — les assets brand-bearing restent
-`provisional`.
+`provisional`. Le master BodyMap est **ACCEPTED FOR DESIGN SOURCE / HUMAN REVIEW PENDING**, jamais
+`approved`/`legally-cleared`/`runtime-integrated`.

@@ -1,5 +1,14 @@
 # SB_ASSET_03.1 — Manifeste des artefacts externes
 
+> ```
+> PACKAGE V1: HISTORICAL / SUPERSEDED
+> CURRENT PACKAGE: V2 — see SB_ASSET_03_1_REPRODUCIBILITY_CLOSURE.md
+> ```
+> Le package v1 (`098d1b42…`) décrit ci-dessous a **bloqué à l'intake** (`NON-REPRODUCIBLE OUTPUT`). Il est
+> **conservé comme preuve historique**. Le package courant est le **v2 déterministe** (`f45e0dbf…`),
+> auto-descriptif et rejouable — cf. `SB_ASSET_03_1_REPRODUCIBILITY_CLOSURE.md`. Master et compact
+> **inchangés**.
+
 **Cycle** : `Sx_ASSET_03` (amendé SOURCE-REUSE-FIRST) · **Build** : `Sb_ASSET_03.1` · **Date** : 2026-07-23
 
 > **Aucun de ces artefacts n'est committé.** Ils vivent dans un espace de travail **hors de tout dépôt et

@@ -19,6 +19,9 @@ le rouvre pas.
 ```
 Asset system scaffold : active
 Asset source intake     : Tabler P0 v0.1.0 ingested / human review pending (Sb_ASSET_02.1)
+BodyMap design source   : master + compact ingested / human review pending (Sb_ASSET_03.2)
+                          derived from BodyParts3D + Servier Medical Art (both CC BY 4.0)
+                          reproducibility independently verified (package v2 f45e0dbf…)
 Runtime integration     : not started / blocked
 Asset integration gate  : BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS
 Auren name              : WORKING PRODUCT NAME — EXTERNAL PROFESSIONAL CLEARANCE OPEN

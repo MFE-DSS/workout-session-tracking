@@ -1,5 +1,18 @@
 # Sb_ASSET_03.1 — Open Anatomy Source Acquisition & BodyMap Derivation Prototype — SPEC
 
+> **Statuts courants (réconciliés à l'intake `Sb_ASSET_03.2`, 2026-07-23)** :
+> ```
+> BODYMAP DERIVATION PROTOTYPE: PRODUCED EXTERNALLY
+> SPECIFIC MESH DEFECTS: VERIFIED ON SELECTED MESHES (0 non-manifold, 0 degenerate, 112 intersecting pairs)
+> SERVIER PPTX CONTENT: EDITABLE VECTOR
+> PACKAGE V2: SELF-DESCRIBING / DETERMINISTIC / RELOCATABLE (f45e0dbf…) — package v1 SUPERSEDED
+> Sb_ASSET_03.2: TECHNICAL INTAKE IN PROGRESS → ACCEPTED FOR DESIGN SOURCE / HUMAN REVIEW PENDING
+> BODYMAP FINAL MASTER: NOT YET APPROVED
+> ASSET INTEGRATION GATE: BLOCKED
+> ```
+> Les formulations pré-build (« 2 points non tranchés », « package ISA/PART-OF à décider ») ne valent que
+> dans les sections historiques datées ci-dessous.
+
 **Type** : SPEC DE BUILD — **EXÉCUTÉE le 2026-07-23** · **Statut** : 🟢 **BUILD COMPLETE / MIXED-SOURCE
 PROTOTYPE READY FOR TECHNICAL INTAKE** (cf. [rapport de build](../SPRINT_Sb_ASSET_03_1_OPEN_ANATOMY_SOURCE_DERIVATION_REPORT.md))
 **Programme** : `Sx_ASSET` · cycle **`Sx_ASSET_03` amendé SOURCE-REUSE-FIRST** · **Date** : 2026-07-23

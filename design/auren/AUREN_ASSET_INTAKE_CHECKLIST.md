@@ -68,3 +68,17 @@ NOT AUTHORIZED FOR APP INTEGRATION
 > Le verdict d'intake statue sur l'entrée dans `design/auren/source/`. Il **n'autorise pas** l'intégration
 > runtime (`app/static/`), qui reste subordonnée à l'`ASSET INTEGRATION GATE` (15 approbations : humaine,
 > anatomique, juridique, mobile).
+
+## Intake réalisé — BodyMap master (Sb_ASSET_03.2, 2026-07-23)
+```
+ACCEPTED FOR DESIGN SOURCE
+HUMAN REVIEW PENDING
+ANATOMICAL REVIEW REQUIRED
+LEGAL REVIEW REQUIRED
+NOT AUTHORIZED FOR APP INTEGRATION
+```
+Master + compact acceptés : contrat SVG validé indépendamment (viewBox `0 0 240 200`, 14 IDs, 11 zones,
+0 `zone-unknown`, surface statique sûre), hashes immuables (`dbb57db3…`/`8024fd4c…`), compact ≤ 12 Ko,
+**reproductibilité vérifiée indépendamment** (package v2 déterministe `f45e0dbf…`), provenance CC BY 4.0
+double (BodyParts3D + Servier) avec notices d'attribution, `ai_usage: none`, revue anatomique professionnelle
+**non revendiquée**, gardes automatisés (`tests/test_auren_bodymap_master.py`). Statut initial **≠ approved**.
