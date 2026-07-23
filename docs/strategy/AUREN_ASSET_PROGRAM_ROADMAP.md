@@ -176,15 +176,26 @@ dégénérée**, **112 paires en intersection** — intersections peau/muscle **
 et **package d'intake hashé** (14 495 063 o, `098d1b42…`). `AI_USAGE: NONE` · **0 contamination** ShareAlike/NC
 · **0 binaire committé**.
 
+## Intake tenté puis corrigé (2026-07-23)
+L'intake technique `Sb_ASSET_03.2` (validation indépendante) a **bloqué en reproductibilité** : le producteur
+des régions Servier `lats`/`core` n'était pas dans le package (`INCOMPLETE EXECUTABLE BUILD GRAPH`). Tout le
+reste passait (intégrité, master 66/66, compact, trois méthodes géométriques concordantes). **Rien n'a été
+copié dans `design/auren/`**. Le correctif `Sb_ASSET_03.1-fix` a **scripté le producteur manquant**
+(sélecteurs exacts 117/157, parité byte-identique), **relocalisé les 14 scripts**, ajouté graphe explicite et
+entrypoint, **rejoué la chaîne en clean-room dans deux racines** (master/compact reproduits exactement), et
+réémis un **package v2 auto-descriptif et déterministe** (`f45e0dbf…`). Le master et le compact sont
+**inchangés**. Package v1 et preuves d'intake **conservés**.
+
 ## Statut des socles
 🔒 **`Sx_ASSET_01` : CLOSED** · 🔒 **`Sx_ASSET_02` : CLOSED** · 🟠 **`Sx_ASSET_03` : AMENDED —
-SOURCE-REUSE-FIRST** (spec versée `66d18d4`, amendée `cd4aeb3`) · 🟢 **`Sb_ASSET_03.1` : BUILD COMPLETE /
-PROTOTYPE READY FOR TECHNICAL INTAKE**. Programme global `Sx_ASSET` **non fermé**.
+SOURCE-REUSE-FIRST** (spec versée `66d18d4`, amendée `cd4aeb3`) · 🟢 **`Sb_ASSET_03.1` : BUILD COMPLETE** ·
+🟢 **`Sb_ASSET_03.1-fix` : REPRODUCIBILITY GAP CLOSED / PACKAGE V2 READY** · ⛔ **`Sb_ASSET_03.2` : INTAKE
+BLOCKED (v1) / READY TO RESUME AT §11 (v2)**. Programme global `Sx_ASSET` **non fermé**.
 `BODYMAP MASTER: NOT YET APPROVED` · `ATTRIBUTION SURFACE: NOT YET IMPLEMENTED` ·
 `ASSET INTEGRATION GATE: BLOCKED` conservé.
 
 ## Prochaine action
-`GO INTAKE — Sb_ASSET_03.2 BodyMap Prototype Technical Validation` (non commencé) — validation technique du
-prototype livré. Puis [gate].
+`GO RESUME INTAKE — Sb_ASSET_03.2 from §11 using package v2` (non commencé) — reprise de la validation
+technique avec le package réémis. Puis [gate].
 `OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue.
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
