@@ -137,3 +137,25 @@ info/warning/tip **n'émet aucun blocage**, et la microcopy est verrouillée par
 (médical, injonctions, culpabilisation). 20 dédiés + 19 non-régression verts ;
 check_scope ISOLATED. **`SCORING_03` (persistance `quality_reviews`), `EKB_04`,
 `WIZARD_*` restent NOT OPENED.**
+
+---
+
+## Appendice post-merge (closeout 2026-07-23)
+
+- **Commit build** : `d0b80cb` (5 fichiers, +710/−2) sur
+  `sb/custom-program-scoring-02-feedback`, base `65d1381`.
+- **PR #32 MERGED** — merge **`7576600`** sur le canonique.
+- **CI PR #32 : les 3 jobs GitHub verts** (pytest+QA · lint · SonarCloud).
+- **CI canonique `29959174506` sur `7576600` : 3/3 GREEN.**
+- **Check externe « SonarCloud Code Analysis » rouge** : condition en échec **unique** =
+  `new_coverage` 0.0 % < 80 %. **Artefact structurel** du repo (aucun rapport de couverture
+  Python n'est envoyé à SonarCloud), identique à SCORING_01 et aux PR #23–#27 toutes
+  mergées. **Vérification API explicite** : `issues/search` sur la PR → **`total: 0`**,
+  aucune issue de code. Distinct du cas EKB_01, où le gate avait signalé un **vrai** défaut
+  (`python:S5863`) alors corrigé.
+- **Head Alembic canonique inchangé : `n5o0i6j7l98`** — SCORING_02 est bien un wrapper pur :
+  zéro DB/ORM, zéro schéma, zéro `data/`, zéro persistance.
+- **Moteur SCORING_01 intact** — absent du commit, ses 19 tests verts inchangés.
+- **Statuts après closeout** : `SCORING_03` (persistance `quality_reviews`) = **FIRST NEXT
+  SCORING CANDIDATE / NOT OPENED** · `WIZARD_*` = **NOT OPENED** · `EKB_04` = **DEFERRED
+  UNTIL DB CONSUMER EXISTS**.

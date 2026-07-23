@@ -351,9 +351,14 @@
   46 non-régression + 208 broad sweep ; check_scope ISOLATED ; head `n5o0i6j7l98` inchangé.
   **`SCORING_03` (persistance reviews), `WIZARD_*` = NOT OPENED · `EKB_04` =
   DEFERRED UNTIL DB CONSUMER EXISTS.**
-- **`Sb_CUSTOM_PROGRAM_SCORING_02 — Program Quality Feedback Layer` : 🟢 PATCH
-  COMPLETE / REVIEW PENDING** 2026-07-22 (branche `sb/custom-program-scoring-02-feedback`,
-  base `65d1381` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_02_FEEDBACK_LAYER_REPORT.md`).
+- **`Sb_CUSTOM_PROGRAM_SCORING_02 — Program Quality Feedback Layer` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-23 (build `d0b80cb`, **PR #32 MERGED**, merge `7576600`,
+  CI PR 3 jobs verts · CI canonique `29959174506` 3/3 — check externe SonarCloud rouge
+  sur `new_coverage` 0.0 % uniquement, artefact connu, **zéro issue de code** vérifiée
+  par API)
+  (branche `sb/custom-program-scoring-02-feedback`,
+  base `65d1381` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_02_FEEDBACK_LAYER_REPORT.md`
+  + appendice post-merge).
   **Wrapper PUR de présentation** (Option C) : `build_program_quality_feedback(result)`
   traduit le score brut en langage produit **sans jamais recalculer** et **sans modifier
   le moteur** (ses 19 tests restent verts inchangés). Comble 4 trous mesurés : plafond de
@@ -362,9 +367,10 @@
   retour utile (4 items contre 1 alerte). **3 niveaux info/warning/tip, aucun bloquant**
   (C reste publiable) ; ordre priorisé stable, plafonné à 3 items/niveau. Microcopy
   verrouillée par grep (médical, injonctions, culpabilisation). 20 dédiés premier coup +
-  19 non-régression (39/39) ; check_scope ISOLATED ; head `n5o0i6j7l98` inchangé.
-  Statut PR/CI/merge à consigner au closeout.
-  **`SCORING_03`, `EKB_04`, `WIZARD_*` = NOT OPENED.**
+  19 non-régression (39/39) ; broad sweep ciblé 228 passed ; check_scope ISOLATED ;
+  head `n5o0i6j7l98` inchangé.
+  **`SCORING_03` (persistance `quality_reviews`) = FIRST NEXT SCORING CANDIDATE / NOT
+  OPENED · `WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED UNTIL DB CONSUMER EXISTS.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
