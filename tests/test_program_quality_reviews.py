@@ -255,16 +255,18 @@ def test_cross_user_is_indistinguishable_from_missing(client):
     with SessionLocal() as db:
         uid = _uid(db)
         program = _make_program(db, uid, "cross")
+        other_uid = _other_uid(db)
         with pytest.raises(QualityReviewError, match="introuvable"):
-            compute_and_store_quality_review(db, _other_uid(db), program.id)
+            compute_and_store_quality_review(db, other_uid, program.id)
 
 
 def test_missing_program_raises_the_same_error(client):
     from app.database import SessionLocal
 
     with SessionLocal() as db:
+        uid = _uid(db)
         with pytest.raises(QualityReviewError, match="introuvable"):
-            compute_and_store_quality_review(db, _uid(db), 999_999)
+            compute_and_store_quality_review(db, uid, 999_999)
 
 
 def test_archived_program_is_refused(client):
