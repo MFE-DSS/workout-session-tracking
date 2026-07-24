@@ -208,5 +208,7 @@ def test_alembic_head_unchanged():
     from alembic.script import ScriptDirectory
 
     script = ScriptDirectory.from_config(Config(str(PROJECT_ROOT / "alembic.ini")))
-    # EKB_02 est data-only : le head ne bouge pas (zéro migration).
-    assert script.get_current_head() == "n5o0i6j7l98"
+    # EKB_02 est data-only ; le head a ensuite avancé avec SCORING_03
+    # (migration additive `o6p1j7k8m09` : 3 colonnes runtime sur
+    # user_program_quality_reviews). Cette sentinelle suit le head courant.
+    assert script.get_current_head() == "o6p1j7k8m09"

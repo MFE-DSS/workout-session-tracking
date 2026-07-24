@@ -34,6 +34,7 @@ from datetime import datetime
 from sqlalchemy import (
     Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -259,9 +260,19 @@ class UserProgramQualityReview(Base):
     same doctrine as `scoring_version` on sessions / Sx_30).
 
     This table is a RECEPTACLE only: no score is computed, interpreted or
-    thresholded here — the scoring engine is a later, separately gated
-    build (`Sb_CUSTOM_PROGRAM_SCORING_01+`). Payload columns mirror the
-    `QualityReview` model of spec 03 §4 as opaque explicable JSON text.
+    thresholded here — the scoring engine lives in
+    `app/services/program_quality_engine.py` (`SCORING_01`) and the writer
+    in `app/services/program_quality_reviews.py` (`SCORING_03`). Payload
+    columns mirror the `QualityReview` model of spec 03 §4 as opaque
+    explicable JSON text.
+
+    `SCORING_03` extends the receptacle with the three RUNTIME fields the
+    engine produces beyond spec 03 §4 (`confidence`, `coverage_ratio`,
+    `grade_cap_reason`). They exist because the engine only measures 4 of
+    the 8 subscores while the EKB stays partially curated: without them a
+    stored "B" would read as a fully measured B. They depend on the EKB
+    state AT SCORING TIME, so they are not derivable after the fact — a
+    faithful frozen trace requires storing them.
     """
 
     __tablename__ = "user_program_quality_reviews"
@@ -293,6 +304,13 @@ class UserProgramQualityReview(Base):
     # Engine + knowledge-base versions pinned on every trace.
     scoring_version: Mapped[int] = mapped_column(Integer, nullable=False)
     ekb_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+
+    # Runtime fields of the engine (SCORING_03) — reliability of the reading
+    # and grade-cap explanation. Not derivable after the fact: they depend
+    # on the EKB coverage at scoring time.
+    confidence: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    coverage_ratio: Mapped[float | None] = mapped_column(Float, nullable=True)
+    grade_cap_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Set by the caller (the pure engine has no clock — spec 03 §4);
     # server default keeps the column NOT NULL-safe.
