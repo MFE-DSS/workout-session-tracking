@@ -203,8 +203,33 @@ PENDING**. Programme global `Sx_ASSET` **non fermé**.
 `BODYMAP MASTER: TECHNICALLY VALIDATED / NOT YET HUMAN APPROVED` · `ATTRIBUTION SURFACE: NOT YET IMPLEMENTED` ·
 `ASSET INTEGRATION GATE: BLOCKED` conservé.
 
+## Cycle 03B — Muscle Focus Technical Surface System (additif · spec) 🟢 SPEC COMMITTED
+🟢 **`Sx_ASSET_03B` : SPEC COMMITTED** 2026-07-24 (docs-only ;
+`Sx_ASSET_03B_MUSCLE_FOCUS_TECHNICAL_SURFACE_SYSTEM_SPEC.md` + rapport + `research/AUREN_MUSCLE_FOCUS_REFERENCE_RESEARCH.md`
++ `production/muscle-focus/` ×3). **Sous-cycle additif et stratégique** — **ne remplace pas** le bodymap
+global, il **redéfinit la couche visuelle premium**. Correction stratégique de cible : le bodymap global était
+trop « corps entier » pour être la surface héro ; la vraie valeur = « **comment** ce muscle s'insère, se
+contracte, quels exercices le sollicitent », pas « où ça tape ». **Système à 3 niveaux** ancrés sur les **11
+zones immuables** : **Niveau 1 = Global BodyMap conservé** (navigation/synthèse/score) · **Niveau 2 = 8
+Regional Focus Plates** (une par macro, `legs` éclatée en quads/posterior/calves) · **Niveau 3 = 11 Muscle
+Focus / Exercise Mechanics Plates** (faisceaux/insertions/fonctions/exercices ; 9 muscle-heads + 2
+grouped-honest). **Aucune 12ᵉ zone** (faisceaux = géométrie Layer B, jamais des codes). Direction visuelle
+clean-view + technical-overlay, profondeur par le trait, ancrage osseux, ≤ 3 teintes ; **5 cas d'exigence**
+(pectoraux sans « poumons » · deltoïdes 3 faisceaux ancrés sur l'os · postérieur zoom bassin · lats/upper_back
+largeur vs épaisseur · core corset non caricatural). **Stratégie de sources source-reuse-first** (Servier +
+OpenStax 1ʳᵉ éd. + PD Gray's/Visible Human = géométrie dérivable ; BodyParts3D/Z-Anatomy = validation seulement ;
+MuscleWiki/BioDigital/OpenStax 2ᵉ éd. = exclus ; IA = plan B/C borné et déclaré). **Contradiction de licence
+arbitrée** par croisement adversarial : BodyParts3D **CC BY 4.0** (officiel DBCLS), le « CC BY-SA » venait du
+miroir GitHub figé (piège déjà résolu au BodyMap). **Amendement de gouvernance requis** au build : autoriser
+fibres/insertions **uniquement sur la surface plaque dédiée** (le global reste régi par `AUREN_STYLE_RULES §5`).
+Queue `Sb_ASSET_03B.1→4` gatée. 7 fichiers créés + 3 mis à jour, **100 % docs**. `MUSCLE FOCUS PLATES:
+CONCEPTUALLY DEFINED / NOT PRODUCED` · `GLOBAL BODYMAP: RETAINED AS NAVIGATION / SYNTHESIS LAYER` · `SOURCE
+STRATEGY: DEFINED` · `RUNTIME INTEGRATION: NOT STARTED` · `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` · `ASSET
+INTEGRATION GATE: BLOCKED`.
+
 ## Prochaine action
 `GO HUMAN REVIEW — Sb_ASSET_03.2 Auren BodyMap Design Source` (non commencé) — revue humaine (produit /
 anatomique de cohérence / mobile) sur la surface hors runtime. Puis [gate] avant tout `Sx_ASSET_04`.
 `OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue.
+Sous-cycle premium : `GO BUILD — Sb_ASSET_03B.1 Muscle Focus System Blueprint & Plate Template` (non ouvert).
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
