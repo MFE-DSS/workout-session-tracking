@@ -4,8 +4,10 @@
 **Date** : 2026-07-24
 **Cycle** : `Sx_ASSET` (programme visuel propriétaire, indépendant de `Sx_UI` clos). Ce document ouvre un
 **sous-cycle additif et stratégique** : `Sx_ASSET_03B`.
-**Statut** : ⚪ SPEC DRAFT — **BUILD NOT AUTHORIZED**. `ASSET INTEGRATION GATE: BLOCKED`.
-**Base canonique** : `b1f0b63`. **Ne rouvre PAS** `Sx_UI` (CLOSED), ni `Sx_ASSET_01` (CLOSED), ni
+**Statut** : 🟢 **SPEC COMMITTED — `ff9541a`** · **`Sb_ASSET_03B.1` AUTHORIZED / NOT YET COMPLETE**.
+`ASSET INTEGRATION GATE: BLOCKED`.
+**Parent du cycle** : `b1f0b63` (baseline historique) · **HEAD courant** : `ff9541a` (spec versée). **Ne rouvre
+PAS** `Sx_UI` (CLOSED), ni `Sx_ASSET_01` (CLOSED), ni
 `Sx_ASSET_02` (CLOSED), ni le contrat sémantique BodyMap (immuable). Ne modifie **aucun** master existant.
 
 > `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` · `MUSCLE FOCUS PLATES: CONCEPTUALLY DEFINED / NOT PRODUCED` ·
@@ -181,13 +183,15 @@ plaque**, Layer B, licites tant qu'elles ne touchent ni les 11 codes ni les 6 ma
 Détail complet et vérifié dans [`../research/AUREN_MUSCLE_FOCUS_REFERENCE_RESEARCH.md`](../research/AUREN_MUSCLE_FOCUS_REFERENCE_RESEARCH.md).
 Synthèse (relevés **2026-07-24**, `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED`) :
 
-**4 rôles de source** :
-- **Géométrie (dérivable, master propriétaire)** : **Servier Medical Art** (CC BY 4.0) — socle et continuité
-  avec le BodyMap · **OpenStax A&P 1ʳᵉ éd.** (CC BY 4.0) · **domaine public** (Gray's 1918, atlas historiques,
-  NLM Visible Human) — relief fin / coupes profondes, zéro contrainte.
+**4 rôles de source** *(revalidés 2026-07-24 — cf. [`../production/muscle-focus/AUREN_MUSCLE_FOCUS_SOURCE_LEDGER.md`](../production/muscle-focus/AUREN_MUSCLE_FOCUS_SOURCE_LEDGER.md))* :
+- **Géométrie (dérivable, master propriétaire)** : **Servier Medical Art** (CC BY 4.0, **images seules** —
+  marques/UI exclues) — socle et continuité avec le BodyMap · **OpenStax A&P 1ʳᵉ éd.** (CC BY 4.0, **+ clause
+  anti-ingestion IA**) · **domaine public CONDITIONNEL** (Gray's 1918, atlas historiques — PD **par édition/
+  scan/juridiction**, absence de couche moderne ; **pas** « zéro contrainte »).
 - **Style** : Servier (trait vectoriel « maison ») + registre PD à **moderniser**, jamais décalquer.
-- **Validation (lecture seule, jamais dérivé)** : **BodyParts3D / Anatomography** (FMA IDs) · **Z-Anatomy** —
-  attaches/nommage/couches.
+- **Validation (lecture seule, jamais dérivé)** : **BodyParts3D / Anatomography** (FMA IDs) · **NLM Visible
+  Human** (**terms-based** : attribution NLM + non-endossement + fraîcheur, mesh protégé — **reclassé** hors du
+  PD « zéro contrainte », rôle validation par défaut) · **Z-Anatomy** — attaches/nommage/couches.
 - **Inspiration (consulter, jamais dériver)** : MuscleWiki, BioDigital, Muscle&Motion, Complete Anatomy —
   conventions de cadrage/zoom UX.
 

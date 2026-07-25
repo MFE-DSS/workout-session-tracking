@@ -227,9 +227,22 @@ CONCEPTUALLY DEFINED / NOT PRODUCED` · `GLOBAL BODYMAP: RETAINED AS NAVIGATION 
 STRATEGY: DEFINED` · `RUNTIME INTEGRATION: NOT STARTED` · `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` · `ASSET
 INTEGRATION GATE: BLOCKED`.
 
+🟢 **`Sb_ASSET_03B.1` : BLUEPRINT COMPLETE / PLATE CONTRACT LOCKED** 2026-07-24 (docs-only ; base `ff9541a` ;
+worktree `work/sb-asset-03b-1-muscle-focus-blueprint`). Vision 03B → **système exécutable sur le papier, 0
+géométrie**. **5 axes parallèles** (Contract&IDs · P0 Visual Blueprint · Source **revalidation web réelle** ·
+UX/Mobile/A11y · **Adversarial Review**) + synthèse arbitrée. **9 créés + 6 modifiés (100 % `docs/**`)** :
+blueprint spec + rapport + `production/muscle-focus/` ×7 (**ID Contract v0.1.0** namespace `auren-plate-*` disjoint de `zone-*`,
+descriptor schema, view/crop contract, **7 blueprints P0**, overlay/a11y/mobile, **source ledger revalidé**,
+governance amendment). **4 corrections de source** : NLM Visible Human **reclassé terms-based** (validation par
+défaut), **clause anti-ingestion IA OpenStax**, Gray's/atlas **PD conditionnel**, Servier **images-only**.
+**Amendement `§5bis`** borné aux surfaces plaque (master global inchangé), **spécifié / enactment gaté** au build
+géométrie + guard test. **8 findings adversariaux résolus.** `PLATE GEOMETRY: NOT PRODUCED` · `GOVERNANCE
+AMENDMENT: SPECIFIED / NOT YET ENACTED` · `SOURCE STRATEGY: REVALIDATED` · `ASSET INTEGRATION GATE: BLOCKED`.
+
 ## Prochaine action
 `GO HUMAN REVIEW — Sb_ASSET_03.2 Auren BodyMap Design Source` (non commencé) — revue humaine (produit /
 anatomique de cohérence / mobile) sur la surface hors runtime. Puis [gate] avant tout `Sx_ASSET_04`.
 `OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue.
-Sous-cycle premium : `GO BUILD — Sb_ASSET_03B.1 Muscle Focus System Blueprint & Plate Template` (non ouvert).
+Sous-cycle premium : `Sb_ASSET_03B.1` **COMPLETE** → prochaine étape gatée `GO BUILD — Sb_ASSET_03B.2 Regional
+Plate Production & Intake` (non ouvert ; requiert master validé).
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
