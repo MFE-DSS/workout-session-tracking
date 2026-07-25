@@ -169,3 +169,38 @@ insert-only, owner-scopé, idempotent, et **fidèle** — les 3 champs runtime d
 que perdus, pour qu'une trace figée ne mente jamais sur sa propre fiabilité. 19 dédiés premier coup +
 51 non-régression ; 4 QA migration vertes ; head `o6p1j7k8m09`. **`SCORING_04`, `WIZARD_*` = NOT OPENED ·
 `EKB_04` = DEFERRED.**
+
+---
+
+## Appendice post-merge (closeout 2026-07-25)
+
+- **Commit build** : `713fbcc` (10 fichiers) sur `sb/custom-program-scoring-03-persistence`,
+  base `b1f0b63` (rafraîchie sur le canonique via 3-way apply, contenu ASSET préservé).
+- **Fix Sonar** : `74ccc28` (`tests/test_program_quality_reviews.py` uniquement) — **2 vrais
+  `python:S5778`** signalés par SonarCloud sur la PR (un appel dans un `pytest.raises` à argument
+  unique), **corrigés** en hoistant les bindings `other_uid`/`uid` hors du bloc `raises`. Distinct
+  de l'artefact `new_coverage` : ce sont de **vraies** issues de code, arrêtées et corrigées per contrat.
+- **PR #33 MERGED** — merge **`036d91c`** sur le canonique (first-parent `ff9541a`), via
+  `--match-head-commit 74ccc280…` (garde anti-push-concurrent).
+- **CI PR #33 : les 3 jobs GitHub verts** (pytest+QA · lint · SonarCloud).
+- **CI canonique `30135595424` sur `036d91c` : 3/3 GREEN.** Les **4 QA migration** (drift ·
+  snapshot · patterns · roundtrip) pour `o6p1j7k8m09` sont **rejouées vertes sur le trunk** par le
+  job `pytest + QA scripts` du run canonique.
+- **Check externe « SonarCloud Code Analysis » rouge** : condition en échec **unique** =
+  `new_coverage` 0.0 % < 80 %. **Artefact structurel** du repo (aucun rapport de couverture Python
+  n'est envoyé à SonarCloud), identique à SCORING_01/02 et aux PR #23–#27 toutes mergées.
+  **Vérification API explicite** après le fix : `issues/search` sur la PR → **`total: 0`**.
+- **Head Alembic canonique passé à `o6p1j7k8m09`** (revises `n5o0i6j7l98`) — premier build scoring
+  à toucher le schéma ; migration **additive-only** (ADD COLUMN ×3 nullable, downgrade symétrique,
+  aucun backfill).
+- **Full sweep local (check_scope MIGRATION)** : 30/30 dédiés verts ; l'unique échec
+  `test_no_model_migration_schema_touched` est l'artefact **by-design** d'arbre sale pré-commit
+  (garde `git diff HEAD` sur `app/models/`), **vert post-commit** — comportement identique à
+  PERSISTENCE_01→05.
+- **Co-existence ASSET/SCORING sur le trunk** : le canonique a intégré les commits ASSET (`ff9541a`)
+  et SCORING_03 **sans conflit** (surfaces disjointes : ASSET = `docs/`, SCORING = `app/` +
+  `migrations/` + `tests/` + `data/`).
+- **Statuts après closeout** : `SCORING_04` = **NOT OPENED** · `WIZARD_*` = **NOT OPENED** ·
+  `EKB_04` = **DEFERRED UNTIL DB CONSUMER EXISTS**.
+- **Cleanup** : branche `sb/custom-program-scoring-03-persistence` (remote + locale) et worktree
+  `-custom-scoring-03` **conservés** — suppression au prochain GO CLEANUP.

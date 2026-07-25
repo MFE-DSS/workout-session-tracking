@@ -378,10 +378,17 @@
   19 non-régression (39/39) ; broad sweep ciblé 228 passed ; check_scope ISOLATED ;
   head `n5o0i6j7l98` inchangé.
   **`WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED UNTIL DB CONSUMER EXISTS.**
-- **`Sb_CUSTOM_PROGRAM_SCORING_03 — Quality Review Persistence` : 🟢 PATCH COMPLETE /
-  REVIEW PENDING** 2026-07-23 (branche `sb/custom-program-scoring-03-persistence`,
-  base `141ebd4` ;
-  `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_03_QUALITY_REVIEW_PERSISTENCE_REPORT.md`).
+- **`Sb_CUSTOM_PROGRAM_SCORING_03 — Quality Review Persistence` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-25 (build `713fbcc` + fix Sonar `74ccc28`, **PR #33 MERGED**,
+  merge `036d91c` — first-parent canonique `ff9541a`,
+  CI PR 3 jobs verts · CI canonique `30135595424` 3/3 — check externe SonarCloud rouge
+  sur `new_coverage` 0.0 % uniquement, artefact structurel connu ; **2 vrais `python:S5778`**
+  rencontrés sur la PR **corrigés** au commit `74ccc28`, **zéro issue de code** revérifiée
+  par API)
+  (branche `sb/custom-program-scoring-03-persistence`,
+  base `b1f0b63` ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_03_QUALITY_REVIEW_PERSISTENCE_REPORT.md`
+  + appendice post-merge).
   **Premier build scoring touchant la DB.** Migration **`o6p1j7k8m09`** : ADD COLUMN ×3
   additive-only (`confidence`, `coverage_ratio` FLOAT, `grade_cap_reason`), nullable,
   downgrade symétrique, aucun backfill — **justifiée** parce que ces 3 champs du moteur
@@ -391,8 +398,9 @@
   owner-scopé sans fuite d'existence, `draft`/`validated` scorables, `archived`/`published`
   refusés, **aucun branchement dans `validate_draft`** (Option B). Adaptateur ORM→payload
   (`working_sets` = rep_targets hors warmup). Feedback SCORING_02 **non persisté**.
-  19 dédiés premier coup + 51 non-régression ; 4 QA migration vertes ; snapshot régénéré ;
-  check_scope MIGRATION. Statut PR/CI/merge à consigner au closeout.
+  19 dédiés premier coup + 51 non-régression ; 4 QA migration vertes (rejouées vertes
+  sur le trunk par le run canonique) ; snapshot régénéré ; check_scope MIGRATION ;
+  head Alembic **passé à `o6p1j7k8m09`**.
   **`SCORING_04`, `WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
