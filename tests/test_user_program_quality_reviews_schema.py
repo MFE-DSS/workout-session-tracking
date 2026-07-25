@@ -69,6 +69,8 @@ def test_quality_reviews_table_exists_with_expected_columns(client):
         "subscores_json", "alerts_json", "suggestions_json",
         "assumptions_json", "missing_data_json", "scoring_version",
         "ekb_version", "computed_at",
+        # SCORING_03 (migration o6p1j7k8m09) — champs runtime du moteur.
+        "confidence", "coverage_ratio", "grade_cap_reason",
     }
 
 

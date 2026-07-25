@@ -377,8 +377,23 @@
   verrouillée par grep (médical, injonctions, culpabilisation). 20 dédiés premier coup +
   19 non-régression (39/39) ; broad sweep ciblé 228 passed ; check_scope ISOLATED ;
   head `n5o0i6j7l98` inchangé.
-  **`SCORING_03` (persistance `quality_reviews`) = FIRST NEXT SCORING CANDIDATE / NOT
-  OPENED · `WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED UNTIL DB CONSUMER EXISTS.**
+  **`WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED UNTIL DB CONSUMER EXISTS.**
+- **`Sb_CUSTOM_PROGRAM_SCORING_03 — Quality Review Persistence` : 🟢 PATCH COMPLETE /
+  REVIEW PENDING** 2026-07-23 (branche `sb/custom-program-scoring-03-persistence`,
+  base `141ebd4` ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_SCORING_03_QUALITY_REVIEW_PERSISTENCE_REPORT.md`).
+  **Premier build scoring touchant la DB.** Migration **`o6p1j7k8m09`** : ADD COLUMN ×3
+  additive-only (`confidence`, `coverage_ratio` FLOAT, `grade_cap_reason`), nullable,
+  downgrade symétrique, aucun backfill — **justifiée** parce que ces 3 champs du moteur
+  dépendent de l'état de l'EKB au moment du scoring et ne sont pas dérivables après coup
+  (sans eux, une trace « B » se lirait comme un B pleinement mesuré). Service
+  `program_quality_reviews.py` : **INSERT-ONLY**, idempotence douce (`created=False`),
+  owner-scopé sans fuite d'existence, `draft`/`validated` scorables, `archived`/`published`
+  refusés, **aucun branchement dans `validate_draft`** (Option B). Adaptateur ORM→payload
+  (`working_sets` = rep_targets hors warmup). Feedback SCORING_02 **non persisté**.
+  19 dédiés premier coup + 51 non-régression ; 4 QA migration vertes ; snapshot régénéré ;
+  check_scope MIGRATION. Statut PR/CI/merge à consigner au closeout.
+  **`SCORING_04`, `WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
