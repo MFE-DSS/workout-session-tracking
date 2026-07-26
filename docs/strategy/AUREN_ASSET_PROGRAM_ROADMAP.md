@@ -227,7 +227,11 @@ CONCEPTUALLY DEFINED / NOT PRODUCED` · `GLOBAL BODYMAP: RETAINED AS NAVIGATION 
 STRATEGY: DEFINED` · `RUNTIME INTEGRATION: NOT STARTED` · `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` · `ASSET
 INTEGRATION GATE: BLOCKED`.
 
-🟢 **`Sb_ASSET_03B.1` : BLUEPRINT COMPLETE / PLATE CONTRACT LOCKED** 2026-07-24 (docs-only ; base `ff9541a` ;
+🟢 **`Sb_ASSET_03B.1` : CLOSED — CANONICAL DELIVERY COMPLETE** (merge `805b8a9` / **PR #34 MERGED** 2026-07-26 ;
+blueprint `95f47b3` ; **1er parent réel `c48714b6`** = closeout SCORING_03, canonique avancé avant merge — sans
+conflit, SCORING_03 préservé ; **PR CI 3/3 verte** run `30193520498` ; aucun run post-merge — docs-only
+paths-ignore ; `docs/SPRINT_Sb_ASSET_03B_1_FINAL_CLOSEOUT_REPORT.md`). `Sb_ASSET_03B.2: READY TO OPEN / NOT
+STARTED`. — *build docs ci-dessous (historique).* 🟢 **BLUEPRINT COMPLETE / PLATE CONTRACT LOCKED** 2026-07-24 (docs-only ; base `ff9541a` ;
 worktree `work/sb-asset-03b-1-muscle-focus-blueprint`). Vision 03B → **système exécutable sur le papier, 0
 géométrie**. **5 axes parallèles** (Contract&IDs · P0 Visual Blueprint · Source **revalidation web réelle** ·
 UX/Mobile/A11y · **Adversarial Review**) + synthèse arbitrée. **9 créés + 6 modifiés (100 % `docs/**`)** :
@@ -243,6 +247,7 @@ AMENDMENT: SPECIFIED / NOT YET ENACTED` · `SOURCE STRATEGY: REVALIDATED` · `AS
 `GO HUMAN REVIEW — Sb_ASSET_03.2 Auren BodyMap Design Source` (non commencé) — revue humaine (produit /
 anatomique de cohérence / mobile) sur la surface hors runtime. Puis [gate] avant tout `Sx_ASSET_04`.
 `OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue.
-Sous-cycle premium : `Sb_ASSET_03B.1` **COMPLETE** → prochaine étape gatée `GO BUILD — Sb_ASSET_03B.2 Regional
-Plate Production & Intake` (non ouvert ; requiert master validé).
+Sous-cycle premium : `Sb_ASSET_03B.1` **CLOSED / DELIVERED** (canonical `805b8a9`, PR #34) → prochaine étape
+gatée `GO BUILD — Sb_ASSET_03B.2 P0 Regional Plate Production Package` (`READY TO OPEN / NOT STARTED` ; requiert
+master validé + enactment `§5bis` + guard test).
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.

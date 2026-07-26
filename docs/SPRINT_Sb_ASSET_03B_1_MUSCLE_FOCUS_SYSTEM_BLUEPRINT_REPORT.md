@@ -6,6 +6,12 @@ aucune géométrie, aucune gate franchie**. `ASSET INTEGRATION GATE: BLOCKED`.
 **Date** : 2026-07-24 · **Base** : `ff9541a` · **Worktree** : `work/sb-asset-03b-1-muscle-focus-blueprint`.
 **Ne rouvre pas** : `Sx_UI` (CLOSED) · `Sx_ASSET_01/02` (CLOSED) · contrat sémantique BodyMap (immuable).
 
+> **BANDEAU POST-MERGE (closeout 2026-07-26)** — `DELIVERED TO CANONICAL: 805b8a9 via PR #34` ·
+> `FIRST PARENT: c48714b6` (le canonique avait avancé avec le closeout SCORING_03 avant le merge ; merge sans
+> conflit, SCORING_03 préservé) · `PR CI: 3/3 GREEN` (run 30193520498) · `CI ON MERGE COMMIT: NONE — docs-only
+> paths-ignore`. Détail : [`SPRINT_Sb_ASSET_03B_1_FINAL_CLOSEOUT_REPORT.md`](SPRINT_Sb_ASSET_03B_1_FINAL_CLOSEOUT_REPORT.md).
+> **`Sb_ASSET_03B.1: CLOSED — CANONICAL DELIVERY COMPLETE`.**
+
 ---
 
 ## 0. Étape 0 — Brainstorming / Options / Risques / Choix retenu (CLAUDE.md §3)

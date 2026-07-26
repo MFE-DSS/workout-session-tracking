@@ -3,8 +3,11 @@
 **Type** : BLUEPRINT NORMATIF / PLATE CONTRACT — **DOCS-ONLY**. Transforme la vision `Sx_ASSET_03B` en un
 **système de production exécutable sur le papier**, **sans produire aucune géométrie**.
 **Date** : 2026-07-24 · **Base** : `ff9541a` · **Worktree** : `work/sb-asset-03b-1-muscle-focus-blueprint`.
-**Statut** : 🟢 **`Sb_ASSET_03B.1: BLUEPRINT COMPLETE / PLATE CONTRACT LOCKED`** · `ASSET INTEGRATION GATE:
-BLOCKED`.
+**Statut** : 🟢 **`Sb_ASSET_03B.1: CLOSED — CANONICAL DELIVERY COMPLETE`** · **`BLUEPRINT: COMPLETE / PLATE
+CONTRACT LOCKED`** · `ASSET INTEGRATION GATE: BLOCKED`.
+**`CANONICAL MERGE: 805b8a9`** (PR #34, mergé 2026-07-26 ; blueprint commit `95f47b3` ; premier parent réel
+`c48714b6` = closeout SCORING_03, cf. `docs/SPRINT_Sb_ASSET_03B_1_FINAL_CLOSEOUT_REPORT.md`). Les sections de
+conception ci-dessous sont **historiques** (état au build) et **conservées telles quelles**.
 **Ne rouvre PAS** : `Sx_UI` (CLOSED) · `Sx_ASSET_01/02` (CLOSED) · contrat sémantique BodyMap (**immuable**).
 **Ne modifie aucun master.** `PLATE GEOMETRY: NOT PRODUCED` · `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED`.
 
