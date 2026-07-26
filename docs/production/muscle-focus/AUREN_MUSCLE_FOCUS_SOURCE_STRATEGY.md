@@ -9,12 +9,13 @@ BLOCKED`. **Détail et sources** : [`../../research/AUREN_MUSCLE_FOCUS_REFERENCE
 ```
 PRIMARY DERIVATION (géométrie du livrable)
   Servier Medical Art — CC BY 4.0        socle + continuité visuelle avec le BodyMap
-  OpenStax A&P 1ʳᵉ éd. (2013) — CC BY 4.0 planches musculaires locales (crédit PAR figure)
-  Domaine public : Gray's 1918 · NLM Visible Human · atlas historiques (<1929)
-                                          relief fin / coupes profondes, zéro contrainte
+  OpenStax A&P 1ʳᵉ éd. (2013) — CC BY 4.0 planches musculaires locales (crédit PAR figure) [+ clause anti-IA¹]
+  Domaine public CONDITIONNEL : Gray's 1918 · atlas historiques
+                                          relief fin / coupes profondes — PD par édition/scan/juridiction²
 
 ANATOMICAL VALIDATION (lecture seule — JAMAIS de mesh tracé)
   BodyParts3D / Anatomography — CC BY 4.0 (DBCLS officiel, maj 2025-02-27)  attaches / FMA / nommage
+  NLM Visible Human — TERMS-BASED gov. data (attribution + non-endossement + fraîcheur)³  validation par défaut
   Z-Anatomy — CC BY-SA 4.0                 couches superficiel/profond
   AnatomyTOOL (CC BY / CC0 items) · Kenhub  croisement pédagogique
 
@@ -26,6 +27,14 @@ EXCLUS
   OpenStax A&P 2ᵉ éd. — CC BY-NC-SA (NC)
   Wikimedia « Muscles front and back.svg » — CC BY-SA (prototype jetable, hors master livré)
 ```
+
+> **Revalidation 2026-07-24** (détail : [`AUREN_MUSCLE_FOCUS_SOURCE_LEDGER.md`](AUREN_MUSCLE_FOCUS_SOURCE_LEDGER.md)) :
+> **¹** OpenStax 1ʳᵉ éd. porte une **clause anti-ingestion IA** (les 2 éditions) : jamais d'usage comme entrée
+> d'entraînement/LLM sans permission. **²** Gray's/atlas = **PD conditionnel** (édition/scan/juridiction +
+> absence de couche moderne ; couche Lewis †1964 encore protégée en UE). **³** NLM Visible Human **n'est pas**
+> « zéro contrainte » : donnée gouvernementale **terms-based** (attribution « Courtesy of the U.S. National
+> Library of Medicine » + non-endossement + fraîcheur, mesh protégé) → **rôle validation/référence par défaut**,
+> promotion en dérivation seulement après vérification plaque par plaque.
 
 ## Règles dures
 

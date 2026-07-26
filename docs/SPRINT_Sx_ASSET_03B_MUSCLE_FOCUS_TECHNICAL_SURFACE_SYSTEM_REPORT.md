@@ -54,13 +54,17 @@ non subdivisibles. **Ce ne sont pas des défauts** mais les choix qui rendent le
 
 ## 4. Fichiers créés / modifiés
 
-**Créés (7)** :
+**Créés (6)** :
 - `docs/strategy/Sx_ASSET_03B_MUSCLE_FOCUS_TECHNICAL_SURFACE_SYSTEM_SPEC.md` (spec, 18 sections + verdict)
 - `docs/research/AUREN_MUSCLE_FOCUS_REFERENCE_RESEARCH.md` (recherche + arbitrage)
 - `docs/production/muscle-focus/AUREN_MUSCLE_FOCUS_SYSTEM_OVERVIEW.md`
 - `docs/production/muscle-focus/AUREN_MUSCLE_FOCUS_PLATE_TEMPLATE.md`
 - `docs/production/muscle-focus/AUREN_MUSCLE_FOCUS_SOURCE_STRATEGY.md`
 - ce rapport
+
+*(6 créés + 3 modifiés = 9 fichiers. Le suivi documentaire aval — contrat d'IDs figé, schéma de
+descripteur, contrat de vues/crops, blueprints P0, contrat overlay/a11y/mobile, source-ledger, amendement de
+gouvernance — est produit au build `Sb_ASSET_03B.1` sur baseline `ff9541a`.)*
 **Modifiés (3)** :
 - `docs/strategy/AUREN_ASSET_PROGRAM_ROADMAP.md` (ajout sous-cycle 03B)
 - `docs/strategy/SPEC_REGISTRY.md` (ligne `Sx_ASSET_03B`)
