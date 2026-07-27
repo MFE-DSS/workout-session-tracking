@@ -243,11 +243,29 @@ défaut), **clause anti-ingestion IA OpenStax**, Gray's/atlas **PD conditionnel*
 géométrie + guard test. **8 findings adversariaux résolus.** `PLATE GEOMETRY: NOT PRODUCED` · `GOVERNANCE
 AMENDMENT: SPECIFIED / NOT YET ENACTED` · `SOURCE STRATEGY: REVALIDATED` · `ASSET INTEGRATION GATE: BLOCKED`.
 
+🟢 **`Sb_ASSET_03B.2` : OPEN — PHASE 1 PRODUCTION PACKAGE READY / GEOMETRY PENDING (AWAITING OPERATOR TOOLCHAIN)** (docs-only, lot a) —
+2026-07-27, base `c70bdb0`, worktree `work/sb-asset-03b-2-p0-regional-plates`. **Décision de provenance** : la
+géométrie anatomique **ne peut pas** être produite par l'assistant IA (§6 interdit l'IA-anatomie ; Descriptor
+Schema impose `ai_usage: NONE` ; provenance de source acquise requise) → **produite par le toolchain opérateur**
+(Blender/Potrace/Inkscape sur figures Servier/OpenStax acquises), comme le master BodyMap `Sb_ASSET_03.1`.
+**Structuré en 2 lots** : **(a)** package de production (ce commit) — brief exécutable des 3 plaques (chest
+front / shoulders front+back / posterior back), contrat SVG/descripteur/registry/**guard 26 pos+nég**/preview,
+budgets, **clarification « crop du master »** (repère spatial seul, géométrie musculaire redessinée, aucun ID
+master recopié, `GLOBAL BODYMAP: UNCHANGED`, contrat 11 zones inchangé), sources (Servier + OpenStax 1ʳᵉ éd. =
+dérivation), protocole de revue par plaque ; **(b)** intake atomique (sur GO, sur la géométrie livrée) —
+**`§5bis` enactment + guard test + descripteurs/registry/manifest/preview à provenance réelle**. `§5bis` **non
+enacté ce lot** (couplé atomiquement au guard + géométrie, principe 03B.1 anti « prose-only »). **3 créés + 4
+modifiés, 100 % `docs/**`** ; check_scope DOCS ; spec PASS. PR #35 (Custom wizard) + dependabot **préservées**.
+`REGIONAL PLATE GEOMETRY: NOT PRODUCED (this lot)` · `GOVERNANCE AMENDMENT: SPECIFIED / ENACTMENT SCHEDULED AT
+INTAKE` · `GLOBAL BODYMAP: UNCHANGED` · `HUMAN ANATOMICAL REVIEW: REQUIRED / NOT STARTED` · `ASSET INTEGRATION
+GATE: BLOCKED`.
+
 ## Prochaine action
 `GO HUMAN REVIEW — Sb_ASSET_03.2 Auren BodyMap Design Source` (non commencé) — revue humaine (produit /
 anatomique de cohérence / mobile) sur la surface hors runtime. Puis [gate] avant tout `Sx_ASSET_04`.
 `OPERATOR_ASSET_03.1` (commande externe) = **option de repli**, non retenue.
-Sous-cycle premium : `Sb_ASSET_03B.1` **CLOSED / DELIVERED** (canonical `805b8a9`, PR #34) → prochaine étape
-gatée `GO BUILD — Sb_ASSET_03B.2 P0 Regional Plate Production Package` (`READY TO OPEN / NOT STARTED` ; requiert
-master validé + enactment `§5bis` + guard test).
+Sous-cycle premium : `Sb_ASSET_03B.1` **CLOSED / DELIVERED** ; `Sb_ASSET_03B.2` **PACKAGE DE PRODUCTION LIVRÉ
+(lot a)** → géométrie **par le toolchain opérateur** (sur GO `GO OPERATOR`), puis **`GO INTAKE — Sb_ASSET_03B.2`**
+(via PR) = `§5bis` enactment + guard test + intake à provenance réelle, atomiquement sur la géométrie livrée.
+Aucun des deux n'est ouvert par ce lot.
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
