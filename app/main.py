@@ -35,6 +35,7 @@ from app.routers import (
     readiness,
     sessions,
     squads,
+    user_programs,
 )
 from app.services.seed import seed_method_rules, seed_reference_split
 
@@ -239,6 +240,11 @@ def create_app() -> FastAPI:
     app.include_router(readiness.router)
     app.include_router(squads.router)
     app.include_router(coach_report.router)
+    # Sb_CUSTOM_PROGRAM_WIZARD_01 — Custom Program creation entry flow
+    # (SSR: GET /programs, /programs/new, POST /programs, GET /programs/{id}).
+    # Thin owner-scoped layer over the existing draft service; no migration,
+    # no scoring, no publication.
+    app.include_router(user_programs.router)
     # Sb_Body_01 — Manual Body Profile. Routes self-gate on
     # BODY_ASSESSMENT_ENABLED (404 when off), so mounting is inert in prod
     # until the flag is explicitly enabled.

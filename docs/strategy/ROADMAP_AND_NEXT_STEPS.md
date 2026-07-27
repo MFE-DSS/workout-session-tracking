@@ -403,6 +403,28 @@
   sur le trunk par le run canonique) ; snapshot régénéré ; check_scope MIGRATION ;
   head Alembic **passé à `o6p1j7k8m09`**.
   **`SCORING_04`, `WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_WIZARD_01 — Custom Program Creation Entry Flow` : 🟢 PATCH
+  COMPLETE / REVIEW PENDING** 2026-07-26 (branche `sb/custom-program-wizard-01-entry-flow`,
+  base `805b8a9` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_01_ENTRY_FLOW_REPORT.md`).
+  **Premier flow utilisateur du track** — première surface HTTP+UI pour `UserProgram`.
+  Option B (SSR minimal, clone `squads`) : `GET /programs` (librairie owner-scopée, archivés
+  exclus, CTA « Créer un programme »), `GET /programs/new` (formulaire titre no-JS, déclaré
+  **avant** `/programs/{id}`), `POST /programs` (`create_draft(title)` → 303 détail), `GET
+  /programs/{program_id}` (récap minimal owner-scopé). **Titre seul** persistable (la racine
+  `UserProgram` n'a aucune colonne durée/split/objectif/matériel — différées) ; `slug_base`
+  **dérivé serveur** (`_slugify`, jamais demandé) ; collision même user → message de service ;
+  **quota `MAX_ACTIVE_PROGRAMS=10`** réutilisé ; **owner-scope sans fuite** (absent ⇄ autre
+  user = même 404) ; `/programs` **libre** (catalogue système = `/library`). Nav : lien
+  secondaire « Mes programmes » (topbar + rail « Plus »), zéro changement des 4 onglets
+  primaires. **Interdits tenus** : zéro migration, zéro scoring, **zéro review écrite**, **zéro
+  `WorkoutTemplate`**, zéro `session_builder`/EKB/ASSET/BodyMap/JS/LLM/générateur/claim médical ;
+  `user_program_drafts.py`/`models`/`program_quality_*` non modifiés. 19 dédiés premier coup +
+  70 non-régression (drafts 12 + scoring 58) ; ruff clean, budget **544 ≤ 548**, spec PASS ;
+  **check_scope ISOLATED** (anticipé SHARED_CODE, documenté) + full sweep local car `app/main.py`
+  touché.
+  **`WIZARD_02` (édition arbre/cartes via `replace_draft_tree`) = FIRST NEXT / NOT OPENED ·
+  `WIZARD_03+` (génération déterministe / scoring branché) = NOT OPENED · `SCORING_04` = NOT
+  OPENED · `EKB_04` = DEFERRED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
