@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Mes programmes</h1>
+
+<div style="display:flex; gap:.75rem; margin-bottom:1.5rem;">
+  <a class="btn btn--primary" href="{{ url_for('user_program_new') }}">Créer un programme</a>
+</div>
+
+{% if programs|length == 0 %}
+  <p class="text-dim">Tu n'as pas encore de programme personnel. Crée ton premier programme pour commencer.</p>
+{% else %}
+  <div style="display:flex; flex-direction:column; gap:1rem;">
+    {% for program in programs %}
+      <a class="card" href="{{ url_for('user_program_detail', program_id=program.id) }}" style="text-decoration:none; color:inherit;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>{{ program.title }}</strong>
+          <span class="badge">{{ program.status }}</span>
+        </div>
+        <div class="text-dim" style="margin-top:.25rem;">
+          modifié le {{ program.updated_at.strftime('%d/%m/%Y') }}
+        </div>
+      </a>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

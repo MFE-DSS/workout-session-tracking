@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">{{ program.title }}</h1>
+
+<div class="card" style="max-width:32rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <strong>{{ program.title }}</strong>
+    <span class="badge">{{ program.status }}</span>
+  </div>
+  <dl class="text-dim" style="margin-top:.75rem; display:grid; grid-template-columns:auto 1fr; gap:.25rem .75rem;">
+    <dt>Version</dt><dd>{{ program.current_version }}</dd>
+    <dt>Séances</dt><dd>{{ session_count }}</dd>
+    <dt>Exercices</dt><dd>{{ exercise_count }}</dd>
+    <dt>Créé le</dt><dd>{{ program.created_at.strftime('%d/%m/%Y') }}</dd>
+  </dl>
+</div>
+
+<p class="text-dim" style="margin-top:1.5rem;">
+  Programme créé. L'édition détaillée arrive dans le prochain lot.
+</p>
+
+<p style="margin-top:1rem;">
+  <a class="btn btn--ghost" href="{{ url_for('user_programs_list') }}">← Mes programmes</a>
+</p>
+{% endblock %}

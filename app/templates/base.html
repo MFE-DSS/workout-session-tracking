@@ -39,6 +39,7 @@
     {% set is_progress = _p.startswith('/progress') %}
     {% set is_leaderboard = _p.startswith('/leaderboard') %}
     {% set is_squads = _p.startswith('/squads') %}
+    {% set is_my_programs = _p.startswith('/programs') %}
     {% set is_profile = _p.startswith('/profile') %}
     {% set is_coach = _p.startswith('/coach') %}
     {# Sb_UI_03.1 — mapping des 4 onglets de la bottom nav mobile (Sx_UI_03).
@@ -61,6 +62,7 @@
       <details class="topbar__menu">
         <summary class="topbar__toggle" aria-label="Navigation secondaire">☰</summary>
         <nav class="topbar__nav" aria-label="Navigation secondaire">
+          <a class="topbar__link {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
           <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
           <a class="topbar__link {% if is_physique %}is-subactive{% endif %}" href="{{ url_for('physique') }}">Physique</a>
           <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
@@ -107,6 +109,7 @@
       <details class="app-rail__secondary">
         <summary class="app-rail__secondary-toggle">Plus</summary>
         <nav class="app-rail__secondary-nav" aria-label="Navigation secondaire">
+          <a class="app-rail__sublink {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
           <a class="app-rail__sublink {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
           <a class="app-rail__sublink {% if is_physique %}is-subactive{% endif %}" href="{{ url_for('physique') }}">Physique</a>
           <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
