@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -101,7 +102,7 @@ def user_program_create(
     request: Request,
     db: DbSession,
     user: CurrentUser,
-    title: str = Form(...),
+    title: Annotated[str, Form()],
 ):
     title = (title or "").strip()
     if not title:
@@ -132,6 +133,7 @@ def user_program_create(
     "/programs/{program_id}",
     response_class=HTMLResponse,
     name="user_program_detail",
+    responses={404: {"description": "Programme introuvable"}},
 )
 def user_program_detail(
     request: Request,
