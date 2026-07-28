@@ -128,11 +128,17 @@ deltoïdienne commune · continuité du **même** deltoïde sous plusieurs angle
 postérieur dans le haut du dos. **Parts** : `part-delt_lat-anterior`, `part-delt_lat-lateral`,
 `part-delt_post-posterior`.
 
-### 5.3 `auren-plate-region-posterior` — back — crop bassin→cuisse — grouped-honest
+### 5.3 `auren-plate-region-posterior` — back — crop bassin→cuisse — mode muscle-heads
 **Montrer** : bassin (contexte) · fessier superficiel · groupe ischio-jambier · séparation hanche/cuisse ·
 continuité de chaîne postérieure · genou-repère sans détail hors sujet.
 **Éviter** : corps entier · « bas du corps générique » · fusion fessier/ischios · localisation par faisceau
-prétendue. **Parts** : `part-posterior-gluteus`, `part-posterior-hamstring`. **Mode** : grouped-honest.
+prétendue. **Parts** : `part-posterior-gluteus`, `part-posterior-hamstring`. **Mode** : muscle-heads.
+
+> **Clarification normative (mode N2)** : `muscle-heads` est le **mode contractuel N2** de cette plaque
+> régionale ; les **parts restent `part-posterior-gluteus` + `part-posterior-hamstring`** ; la plaque **ne
+> subdivise pas** le groupe ischio-jambier en chefs non sourcés ; cette **retenue visuelle n'est pas** le mode
+> `grouped-honest` ; **`grouped-honest` reste réservé à `auren-plate-muscle-posterior` (N3)** — blueprint
+> `Sb_ASSET_03B.1` inchangé.
 
 ## 6. Contrat SVG (intake — chaque plaque)
 
@@ -153,6 +159,9 @@ lien interactif runtime.
 `exercise_link_granularity: zone` · `exercise_link_mode: list` · `attribution_required: true` · `ai_usage: NONE`
 · `non_medical: true` · `scored: false` · `caption_mirrors_overlay: true`. `region_key_kind` : chest/shoulders =
 `macro` ; posterior = `zone`. Vues : chest `[front]` · shoulders `[front, back]` · posterior `[back]`.
+**Mode (P0 Regional)** : `chest` = `muscle-heads` · `shoulders` = `muscle-heads` · `posterior` = `muscle-heads`
+— **aucune** plaque Regional P0 n'est `grouped-honest` ; `grouped-honest` reste réservé au N3
+`auren-plate-muscle-posterior` (blueprint `Sb_ASSET_03B.1`, inchangé).
 Registry `design/auren/source/muscle-focus/auren_muscle_focus_p0_regional_source.json` : 3 plaques exactes,
 path · SHA-256 · taille · viewBox · vues · parts · sources · licence · attribution · modifications · tooling ·
 statut de revue · runtime authorization · anatomical/legal/mobile review · AI usage. **Statuts** :

@@ -49,8 +49,9 @@ REJECTED).
   si deux ovales miroir / aspect poumons / plastron.
 - **Shoulders** : 3 faisceaux **ancrés** (clavicule/acromion/épine), même deltoïde sous 2 vues ; **rejet** si 3
   muscles indépendants / faisceaux sans os / postérieur fondu dans le dos.
-- **Posterior** : crop bassin→cuisse, fessier vs ischios distincts, **grouped-honest** ; **rejet** si corps
-  entier / « bas du corps générique » / fusion / localisation par faisceau prétendue.
+- **Posterior** : crop bassin→cuisse, fessier vs groupe ischio-jambier distincts, **mode N2 `muscle-heads`,
+  sans localisation prétendue des chefs ischio-jambiers** ; **rejet** si corps entier / « bas du corps
+  générique » / fusion / localisation par faisceau prétendue.
 
 ## 5. Surface de revue
 
