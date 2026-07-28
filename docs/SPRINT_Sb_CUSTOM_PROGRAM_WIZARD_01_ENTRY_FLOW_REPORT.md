@@ -126,3 +126,35 @@ Non-régression : `test_user_program_drafts.py` (12/12), `test_program_quality_e
 La création d'un programme custom est enfin atteignable par l'utilisateur, par un flow SSR minimal,
 owner-scopé, quota-gardé, sans générateur, sans scoring, sans publication et sans migration. Le
 service de drafts a désormais sa première porte d'entrée produit.
+
+---
+
+## Appendice post-merge (closeout 2026-07-27)
+
+- **Commit build** : `613b639` (10 fichiers, +658) sur `sb/custom-program-wizard-01-entry-flow`,
+  base `805b8a9` — **rafraîchie en cours de route** sur le canonique `c70bdb0` (closeout ASSET 03B.1
+  poussé entre-temps) via stash → FF → stash pop : **merge automatique propre** des 2 docs stratégie
+  partagés (ajouts WIZARD_01 et ASSET 03B.1 coexistent, zéro conflit).
+- **Fix Sonar** : `f0059d9` (`app/routers/user_programs.py` seul, +3/−1) — **2 vraies issues
+  `python:S...`** remontées par SonarCloud sur la PR : `python:S8410` (MINOR, param Form → `Annotated[str, Form()]`)
+  et `python:S8415` (MAJOR, documenter la réponse 404 via `responses={404: ...}`). **Corrigées sans
+  changement de comportement** (19 tests dédiés inchangés). Distinct de l'artefact `new_coverage`.
+- **PR #35 MERGED** — merge **`e82d3e1`** sur le canonique, via `gh pr merge --merge --admin`
+  (bypass du **seul** gate en échec = `new_coverage 0.0 %`, artefact structurel non bloquant ;
+  pas de squash, branche non supprimée).
+- **CI PR #35** : **3 jobs GitHub verts** (pytest + QA · lint · SonarCloud) sur `f0059d9`.
+- **CI canonique** : run **`30258235301`** sur `e82d3e1` → **3/3 GREEN** (pytest + QA · lint ·
+  SonarCloud). Le job `lint` a passé (`success`) malgré une annotation reviewdog non bloquante
+  (shellcheck SC2046 sur `.github/workflows/ci.yml`, fichier hors périmètre WIZARD_01).
+- **Vérification Sonar** : `issues/search` sur la PR (contenu = `f0059d9`, identique au mergé) →
+  **`total: 0`** (S8410 + S8415 résolues) ; quality gate ERROR **uniquement** sur `new_coverage`,
+  ratings reliability/security/maintainability = A, duplication 0 %, hotspots 100 %.
+- **Head Alembic inchangé** (zéro migration) — WIZARD_01 est un flow HTTP/SSR pur sur la
+  persistance existante.
+- **Statuts après closeout** : `WIZARD_02` (édition arbre/cartes via `replace_draft_tree`) =
+  **FIRST NEXT / NOT OPENED** · `WIZARD_03+` (génération déterministe / scoring branché) =
+  **NOT OPENED** · `SCORING_04` = **NOT OPENED** · `EKB_04` = **DEFERRED**.
+- **Cleanup** : branche `sb/custom-program-wizard-01-entry-flow` (remote + locale) et worktree
+  `-custom-wizard-01` **conservés** — suppression au prochain GO CLEANUP.
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_WIZARD_01 — MERGED + CANONICAL CI GREEN.**

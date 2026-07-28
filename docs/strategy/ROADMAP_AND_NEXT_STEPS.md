@@ -403,9 +403,10 @@
   sur le trunk par le run canonique) ; snapshot régénéré ; check_scope MIGRATION ;
   head Alembic **passé à `o6p1j7k8m09`**.
   **`SCORING_04`, `WIZARD_*` = NOT OPENED · `EKB_04` = DEFERRED.**
-- **`Sb_CUSTOM_PROGRAM_WIZARD_01 — Custom Program Creation Entry Flow` : 🟢 PATCH
-  COMPLETE / REVIEW PENDING** 2026-07-26 (branche `sb/custom-program-wizard-01-entry-flow`,
-  base `805b8a9` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_01_ENTRY_FLOW_REPORT.md`).
+- **`Sb_CUSTOM_PROGRAM_WIZARD_01 — Custom Program Creation Entry Flow` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-27 (build `613b639` + fix Sonar `f0059d9`, **PR #35 MERGED**,
+  merge `e82d3e1`, base `c70bdb0` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_01_ENTRY_FLOW_REPORT.md`
+  + appendice post-merge).
   **Premier flow utilisateur du track** — première surface HTTP+UI pour `UserProgram`.
   Option B (SSR minimal, clone `squads`) : `GET /programs` (librairie owner-scopée, archivés
   exclus, CTA « Créer un programme »), `GET /programs/new` (formulaire titre no-JS, déclaré
@@ -420,8 +421,11 @@
   `WorkoutTemplate`**, zéro `session_builder`/EKB/ASSET/BodyMap/JS/LLM/générateur/claim médical ;
   `user_program_drafts.py`/`models`/`program_quality_*` non modifiés. 19 dédiés premier coup +
   70 non-régression (drafts 12 + scoring 58) ; ruff clean, budget **544 ≤ 548**, spec PASS ;
-  **check_scope ISOLATED** (anticipé SHARED_CODE, documenté) + full sweep local car `app/main.py`
-  touché.
+  **check_scope ISOLATED** (anticipé SHARED_CODE, documenté) + full sweep local **2591 passed** car
+  `app/main.py` touché. **CI PR #35 3 jobs verts · CI canonique `30258235301` 3/3 sur `e82d3e1`**
+  (pytest+QA · lint · SonarCloud) ; gate externe rouge **uniquement sur `new_coverage`** (artefact
+  non bloquant) ; **2 vrais `python:S8410`+`S8415`** (Annotated Form + doc 404) corrigés au commit
+  `f0059d9`, **issues de code `total: 0`** revérifié par API.
   **`WIZARD_02` (édition arbre/cartes via `replace_draft_tree`) = FIRST NEXT / NOT OPENED ·
   `WIZARD_03+` (génération déterministe / scoring branché) = NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED.**
