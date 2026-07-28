@@ -1,25 +1,102 @@
 {% extends "base.html" %}
 {% block content %}
+{% set editable = program.archived_at is none and program.status in ['draft', 'validated'] %}
 <h1 class="page-title">{{ program.title }}</h1>
 
-<div class="card" style="max-width:32rem;">
+{% if error %}
+  <p style="color:var(--danger); margin-bottom:1rem;">{{ error }}</p>
+{% endif %}
+
+<div class="card" style="max-width:40rem;">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <strong>{{ program.title }}</strong>
     <span class="badge">{{ program.status }}</span>
   </div>
-  <dl class="text-dim" style="margin-top:.75rem; display:grid; grid-template-columns:auto 1fr; gap:.25rem .75rem;">
+  <dl class="text-dim" style="margin-top:.5rem; display:grid; grid-template-columns:auto 1fr; gap:.2rem .75rem;">
     <dt>Version</dt><dd>{{ program.current_version }}</dd>
     <dt>Séances</dt><dd>{{ session_count }}</dd>
     <dt>Exercices</dt><dd>{{ exercise_count }}</dd>
-    <dt>Créé le</dt><dd>{{ program.created_at.strftime('%d/%m/%Y') }}</dd>
   </dl>
+  {% if program.status == 'validated' %}
+    <p class="text-dim" style="margin-top:.5rem;">Éditer ce programme validé le repassera en brouillon.</p>
+  {% elif not editable %}
+    <p class="text-dim" style="margin-top:.5rem;">Ce programme n'est plus éditable ici.</p>
+  {% endif %}
 </div>
 
-<p class="text-dim" style="margin-top:1.5rem;">
-  Programme créé. L'édition détaillée arrive dans le prochain lot.
-</p>
+{% if program.sessions|length == 0 %}
+  <p class="text-dim" style="margin-top:1.5rem;">Ce programme est vide. Ajoute une première séance ci-dessous.</p>
+{% else %}
+  <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+    {% for session in program.sessions %}
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>{{ session.position }}. {{ session.name }}</strong>
+          {% if editable %}
+            <form method="post" action="{{ url_for('user_program_delete_session', program_id=program.id, position=session.position) }}" style="display:inline;">
+              <button type="submit" class="btn btn--ghost">Supprimer la séance</button>
+            </form>
+          {% endif %}
+        </div>
 
-<p style="margin-top:1rem;">
+        {% if session.exercises|length == 0 %}
+          <p class="text-dim" style="margin-top:.25rem;">Aucun exercice.</p>
+        {% else %}
+          <ul style="margin-top:.5rem; padding-left:1rem; list-style:none;">
+            {% for exercise in session.exercises %}
+              <li style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.25rem;">
+                <span>{{ exercise.exercise_name }} — <span class="text-dim">{{ exercise.set_scheme }}</span></span>
+                {% if editable %}
+                  <form method="post" action="{{ url_for('user_program_delete_exercise', program_id=program.id, session_position=session.position, exercise_position=exercise.position) }}" style="display:inline;">
+                    <button type="submit" class="btn btn--ghost" aria-label="Supprimer l'exercice">×</button>
+                  </form>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+        {% if editable %}
+          <form method="post" action="{{ url_for('user_program_add_exercise', program_id=program.id, position=session.position) }}" style="margin-top:.5rem; display:flex; flex-wrap:wrap; gap:.5rem; align-items:end;">
+            <div class="field" style="flex:1 1 12rem;">
+              <label class="field__label" for="ex-{{ session.position }}">Exercice</label>
+              <input type="text" id="ex-{{ session.position }}" name="exercise_name" required maxlength="255" class="field__input" placeholder="Développé couché haltères" />
+            </div>
+            <div class="field">
+              <label class="field__label" for="sets-{{ session.position }}">Séries</label>
+              <input type="number" id="sets-{{ session.position }}" name="sets" value="3" min="1" max="6" required class="field__input" style="width:5rem;" />
+            </div>
+            <div class="field">
+              <label class="field__label" for="min-{{ session.position }}">Rép. min</label>
+              <input type="number" id="min-{{ session.position }}" name="min_reps" value="8" min="1" max="50" required class="field__input" style="width:5rem;" />
+            </div>
+            <div class="field">
+              <label class="field__label" for="max-{{ session.position }}">Rép. max</label>
+              <input type="number" id="max-{{ session.position }}" name="max_reps" value="12" min="1" max="50" required class="field__input" style="width:5rem;" />
+            </div>
+            <button type="submit" class="btn btn--primary">Ajouter l'exercice</button>
+          </form>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+{% if editable %}
+  <form method="post" action="{{ url_for('user_program_add_session', program_id=program.id) }}" class="card" style="margin-top:1.5rem; max-width:32rem;">
+    <div class="field">
+      <label class="field__label" for="session-name">Nouvelle séance</label>
+      <input type="text" id="session-name" name="name" required maxlength="128" class="field__input" placeholder="Push A" />
+    </div>
+    <button type="submit" class="btn btn--primary" style="margin-top:.75rem;">Ajouter une séance</button>
+  </form>
+
+  <form method="post" action="{{ url_for('user_program_validate', program_id=program.id) }}" style="margin-top:1rem;">
+    <button type="submit" class="btn btn--primary">Valider le brouillon</button>
+  </form>
+{% endif %}
+
+<p style="margin-top:1.5rem;">
   <a class="btn btn--ghost" href="{{ url_for('user_programs_list') }}">← Mes programmes</a>
 </p>
 {% endblock %}
