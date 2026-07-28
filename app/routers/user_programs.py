@@ -205,7 +205,10 @@ def _append_exercise(
                     "source_reason": "manual",
                     "rep_targets": [
                         {"min_reps": min_reps, "max_reps": max_reps}
-                        for _ in range(sets)
+                        # Clamp the loop bound at the sink: `sets` is already
+                        # validated 1.._MAX_SETS upstream, but never loop on a
+                        # raw user-controlled value (Sonar S6680, defense-in-depth).
+                        for _ in range(min(sets, _MAX_SETS))
                     ],
                 }
             )
