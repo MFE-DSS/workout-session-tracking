@@ -52,10 +52,17 @@ amendement, **contradiction directe**. Le gabarit plaque spécifiant déjà `ove
    `mesure`/`clinique`) — miroir de `test_registry_status_never_approved` ;
 4. `caption_mirrors_overlay == true` et caption **hors SVG**.
 
-## 5. Enactment — **gaté, déféré** (décision de scope)
+## 5. Enactment — **gaté, planifié à l'intake 03B.2** (décision de scope)
+
+> **MàJ 2026-07-27 (`Sb_ASSET_03B.2` ouvert, base `c70bdb0`)** : `Sb_ASSET_03B.2` est ouvert en **deux lots** —
+> (a) *package de production* (docs, ce commit) ; (b) *intake atomique* (sur GO, sur la géométrie livrée par le
+> toolchain opérateur). **`AMENDMENT: SPECIFIED / ENACTMENT SCHEDULED AT Sb_ASSET_03B.2 INTAKE`** — l'édition de
+> `design/auren/AUREN_STYLE_RULES.md` `§5bis` se fait **au lot (b)**, **atomiquement** avec le guard test et la
+> première géométrie P0. Elle **n'est pas** faite au lot (a) : enacter avant la géométrie et son guard recréerait
+> la faiblesse « prose-only ». `GLOBAL BODYMAP: UNCHANGED`.
 
 **État : `AMENDMENT: SPECIFIED / NOT YET ENACTED`.** L'édition réelle de `design/auren/AUREN_STYLE_RULES.md` §5
-est **différée au build géométrie `Sb_ASSET_03B.2`** (première plaque productible), pour deux raisons :
+est **différée à l'intake géométrique de `Sb_ASSET_03B.2`** (première plaque productible), pour deux raisons :
 
 1. **Co-écriture avec le guard test** : enacter la relaxation **sans** son test serait la faiblesse « prose-only »
    (adversarial #6). On enacte la règle **au moment où** la surface qu'elle gouverne existe **et** où son test
