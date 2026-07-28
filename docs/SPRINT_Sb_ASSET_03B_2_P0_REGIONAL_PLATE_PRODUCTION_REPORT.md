@@ -49,7 +49,8 @@ géométrie · `0` `tests/**` (guard écrit à l'intake) · `0` `app/**` · `0` 
 
 ## 3. Contenu figé (package)
 - **Brief géométrique par plaque** (spec §5) : chest (front, éventail convergent, anti-poumons) · shoulders
-  (front+back, 3 faisceaux ancrés os) · posterior (back, bassin→cuisse, grouped-honest).
+  (front+back, 3 faisceaux ancrés os) · posterior (back, bassin→cuisse, mode N2 muscle-heads,
+  sans fausse localisation des chefs ischio-jambiers).
 - **Clarification « crop du master »** (spec §3) : repère spatial seul, géométrie musculaire redessinée, aucun
   ID master recopié, `GLOBAL BODYMAP: UNCHANGED`, contrat des 11 zones inchangé.
 - **Sources & licences** (spec §4) : Servier + OpenStax 1ʳᵉ éd. = dérivation ; BodyParts3D/NLM/Z-Anatomy =
@@ -57,6 +58,18 @@ géométrie · `0` `tests/**` (guard écrit à l'intake) · `0` `app/**` · `0` 
 - **Contrats d'intake** : SVG (§6) · descripteurs/registry (§7) · guard test 26 positifs + négatifs (§8) ·
   budgets (§9) · manifest/provenance/licences (§11) · preview 360 px/desktop/no-JS + captions FR figées (§12).
 - **Critères d'acceptation** (§13) · **procédure de revue par plaque** (protocole dédié).
+
+## 3bis. Réconciliation de contrat post-livraison — mode N2 posterior
+
+`POST-MERGE CONTRACT RECONCILIATION` (correction docs-only, non-closeout) :
+- le blueprint `Sb_ASSET_03B.1` **était et reste correct** (`auren-plate-region-posterior` N2 = `muscle-heads`) ;
+- le package `Sb_ASSET_03B.2` avait employé **par erreur** `grouped-honest` pour le **N2** ;
+- la correction **réaligne** 03B.2 **sans modifier** le contrat v0.1.0 (ID Contract / Descriptor Schema /
+  blueprint P0 **byte-identiques**) ;
+- **N3 `auren-plate-muscle-posterior` reste `grouped-honest`** (inchangé) ;
+- **aucune géométrie n'existait** au moment de la correction ; **aucun artefact opérateur** à rejeter ou migrer
+  (le snapshot de contrats du workspace opérateur devient toutefois **périmé** → re-snapshot requis avant reprise).
+- **Statut inchangé** : `Sb_ASSET_03B.2: OPEN — PHASE 1 PRODUCTION PACKAGE DELIVERED / GEOMETRY PENDING`.
 
 ## 4. Ce qui reste AVAL (gated, non fait ici)
 Géométrie SVG (toolchain opérateur) · `§5bis` enactment · guard test vert (pos+nég) · descripteurs/registry/
