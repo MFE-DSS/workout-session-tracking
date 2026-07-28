@@ -430,9 +430,10 @@
   **`WIZARD_02` (édition arbre/cartes via `replace_draft_tree`) = FIRST NEXT / NOT OPENED ·
   `WIZARD_03+` (génération déterministe / scoring branché) = NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED.**
-- **`Sb_CUSTOM_PROGRAM_WIZARD_02 — Draft Tree Editor` : 🟢 PATCH COMPLETE /
-  REVIEW PENDING** 2026-07-28 (branche `sb/custom-program-wizard-02-draft-tree-editor`,
-  base `3a3a1d4` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_02_DRAFT_TREE_EDITOR_REPORT.md`).
+- **`Sb_CUSTOM_PROGRAM_WIZARD_02 — Draft Tree Editor` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-28 (build `5fd1f52` + fix Sonar `65e7043`, **PR #37 MERGED**,
+  merge `790fedb`, base `3a3a1d4` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_02_DRAFT_TREE_EDITOR_REPORT.md`
+  + appendice post-merge).
   **Deuxième surface user-facing** — l'éditeur d'arbre du brouillon custom. Option B (actions
   SSR granulaires no-JS déléguant à `replace_draft_tree`, **aucun nouveau service**) : 5 routes
   POST (`/sessions`, `/sessions/{pos}/delete`, `/sessions/{pos}/exercises`,
@@ -445,8 +446,11 @@
   zéro migration, **zéro nouveau service** (drafts / model / `program_quality_*` / `app/main.py`
   non modifiés), zéro scoring, **zéro review écrite**, **zéro `WorkoutTemplate`**, zéro
   EKB/ASSET/BodyMap/JS/LLM/générateur/claim médical. 27 dédiés + 89 non-régression ; ruff clean,
-  budget **543 ≤ 548**, spec PASS ; **check_scope ISOLATED** + full sweep local car le router
-  user-facing change.
+  budget **543 ≤ 548**, spec PASS ; **check_scope ISOLATED** + full sweep local **2618 passed**.
+  **CI PR #37 3 jobs verts · CI canonique `30394952158` 3/3 sur `790fedb`** (pytest+QA · lint ·
+  SonarCloud) ; gate externe rouge **uniquement sur `new_coverage`** ; **vraie vuln
+  `pythonsecurity:S6680`** (`range(sets)` user, ligne 208) **arrêtée puis corrigée**
+  (`range(min(sets, _MAX_SETS))`, commit `65e7043`), **issues code `total: 0`** + security A revérifiés.
   **`WIZARD_03+` (génération déterministe / liaison EKB / scoring branché éventuel) = FIRST NEXT /
   NOT OPENED · `SCORING_04` = NOT OPENED · `EKB_04` = DEFERRED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,

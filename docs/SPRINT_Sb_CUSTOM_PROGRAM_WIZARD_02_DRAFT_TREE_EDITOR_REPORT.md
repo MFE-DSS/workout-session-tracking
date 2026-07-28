@@ -106,3 +106,31 @@ Non-régression : `test_user_programs_http.py` (19) + `test_user_program_drafts.
 Un programme custom draft est désormais **constructible manuellement** par l'utilisateur — séances,
 exercices, rep targets, validation — via un éditeur SSR no-JS owner-scopé, en déléguant toute la
 persistance au service testé, sans générateur, sans scoring, sans publication et sans migration.
+
+---
+
+## Appendice post-merge (closeout 2026-07-28)
+
+- **Commit build** : `5fd1f52` (6 fichiers, +962/−39) sur `sb/custom-program-wizard-02-draft-tree-editor`,
+  base `3a3a1d4`.
+- **Fix Sonar** : `65e7043` (`app/routers/user_programs.py` seul, +4/−1).
+- **PR #37 MERGED** — merge **`790fedb`** sur le canonique (via `--merge --admin`, garde
+  `--match-head-commit`, bypass du **seul** gate en échec = `new_coverage 0.0 %`, artefact structurel ;
+  pas de squash).
+- **CI PR #37** : **3 jobs GitHub verts** (pytest + QA · lint · SonarCloud) sur `65e7043`.
+- **CI canonique** : run **`30394952158`** sur `790fedb` → **3/3 GREEN** (pytest + QA · lint · SonarCloud).
+- **Incident sécurité Sonar `pythonsecurity:S6680` (CRITICAL)** : la première analyse a signalé une
+  **vraie vulnérabilité** — `for _ in range(sets)` (ligne 208) bornait une boucle sur une valeur
+  `sets` user-contrôlée (flux taint form → `_append_exercise` → `range`), faisant échouer le gate
+  `new_security_rating` (= 4). **Arrêt (pas de merge) + rapport**, puis correctif sur GO :
+  `range(min(sets, _MAX_SETS))` (sanitizer au sink, comportement inchangé car `sets` déjà validé
+  `1..6` en amont ; defense-in-depth). Après fix : **`issues/search` `total: 0`**, `new_security_rating`
+  repassé **A (1)** ; seul `new_coverage` reste rouge. Distinct de l'artefact `new_coverage`.
+- **Head Alembic inchangé** (zéro migration) · **aucun nouveau service** (`user_program_drafts.py`
+  et le modèle intacts) · **zéro `UserProgramQualityReview`** · **zéro `WorkoutTemplate`**.
+- **Statuts après closeout** : `WIZARD_03+` (génération déterministe / liaison EKB / scoring branché
+  éventuel) = **FIRST NEXT / NOT OPENED** · `SCORING_04` = **NOT OPENED** · `EKB_04` = **DEFERRED**.
+- **Cleanup** : branche `sb/custom-program-wizard-02-draft-tree-editor` (remote + locale) et worktree
+  `-custom-wizard-02` **conservés** — suppression au prochain GO CLEANUP.
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_WIZARD_02 — MERGED + CANONICAL CI GREEN.**
