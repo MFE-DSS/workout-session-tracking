@@ -99,6 +99,12 @@
   <form method="post" action="{{ url_for('user_program_validate', program_id=program.id) }}" style="margin-top:1rem;">
     <button type="submit" class="btn btn--primary">Valider le brouillon</button>
   </form>
+
+  {% if exercise_count > 0 %}
+    <p style="margin-top:1rem;">
+      <a class="btn btn--ghost" href="{{ url_for('user_program_quality', program_id=program.id) }}">Voir la qualité du brouillon</a>
+    </p>
+  {% endif %}
 {% endif %}
 
 <p style="margin-top:1.5rem;">
