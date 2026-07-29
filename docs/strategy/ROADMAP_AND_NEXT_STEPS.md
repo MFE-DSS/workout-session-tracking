@@ -453,9 +453,10 @@
   (`range(min(sets, _MAX_SETS))`, commit `65e7043`), **issues code `total: 0`** + security A revérifiés.
   **`WIZARD_03+` (génération déterministe / liaison EKB / scoring branché éventuel) = FIRST NEXT /
   NOT OPENED · `SCORING_04` = NOT OPENED · `EKB_04` = DEFERRED.**
-- **`Sb_CUSTOM_PROGRAM_WIZARD_03 — Deterministic Draft Generation` : 🟢 PATCH COMPLETE /
-  REVIEW PENDING** 2026-07-29 (branche `sb/custom-program-wizard-03-deterministic-generator`,
-  base `8a28f18` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_03_DETERMINISTIC_GENERATION_REPORT.md`).
+- **`Sb_CUSTOM_PROGRAM_WIZARD_03 — Deterministic Draft Generation` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-29 (build `99dc3d9` + fix Sonar `d591f8c`, **PR #39 MERGED**,
+  merge `bc1a42c`, base `8a28f18` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_03_DETERMINISTIC_GENERATION_REPORT.md`
+  + appendice post-merge).
   **Troisième surface user-facing** — génération déterministe d'une base de programme. Option B :
   nouveau **service pur** `app/services/user_program_generator.py` (`generate_program_tree(split,
   sessions) -> payload`) assemblant N **séances de référence curées** depuis `data/reference_split.json`
@@ -469,7 +470,11 @@
   zéro seed, zéro scoring, **zéro review écrite**, **zéro `WorkoutTemplate`**, `reference_split.json`
   lu en read-only, `drafts`/`models`/`program_quality_*` non modifiés ; **WIZARD_02 reste l'éditeur**.
   28 dédiés (12 service + 16 HTTP) + 116 non-régression ; ruff clean, budget **543 ≤ 548**, spec PASS ;
-  **check_scope SHARED_CODE** (nouveau service ; anticipé ISOLATED, documenté) → full sweep local.
+  **check_scope SHARED_CODE** (nouveau service ; anticipé ISOLATED, documenté) → full sweep local
+  **2646 passed**. **CI PR #39 3 jobs verts · CI canonique `30448452394` 3/3 sur `bc1a42c`** (lint ·
+  pytest+QA · SonarCloud) ; gate externe rouge **uniquement sur `new_coverage`** ; **2 vraies issues
+  `python:S5863`+`S1172`** (BUG reliability auto-comparaison + param `duration` inutilisé) **arrêtées
+  puis corrigées** (fix `d591f8c`), **issues code `total: 0`** + reliability A revérifiés.
   **`WIZARD_04+` (preview scoring non persisté / picker EKB / flow de regénération) = FIRST NEXT /
   NOT OPENED · `SCORING_04` = NOT OPENED · `EKB_04` = DEFERRED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,

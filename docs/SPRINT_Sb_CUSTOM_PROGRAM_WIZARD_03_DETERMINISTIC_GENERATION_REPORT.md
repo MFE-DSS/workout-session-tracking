@@ -111,3 +111,34 @@ Un programme custom vide peut désormais recevoir une **base générée détermi
 assemblée depuis des séances de référence curées, écrite via `replace_draft_tree`, et immédiatement
 éditable dans WIZARD_02 — sans LLM, sans boîte noire, sans scoring, sans publication, sans seed EKB
 et sans migration.
+
+---
+
+## Appendice post-merge (closeout 2026-07-29)
+
+- **Commit build** : `99dc3d9` (9 fichiers, +797/−5) sur `sb/custom-program-wizard-03-deterministic-generator`,
+  base `8a28f18`.
+- **Fix Sonar** : `d591f8c` (3 fichiers, +6/−8) — service + router + test.
+- **PR #39 MERGED** — merge **`bc1a42c`** sur le canonique (via `--merge --admin`, garde
+  `--match-head-commit`, bypass du **seul** gate en échec = `new_coverage 0.0 %`, artefact structurel ;
+  pas de squash).
+- **CI PR #39** : **3 jobs GitHub verts** (lint · pytest + QA · SonarCloud) sur `d591f8c`.
+- **CI canonique** : run **`30448452394`** sur `bc1a42c` → **3/3 GREEN** (lint · pytest + QA · SonarCloud).
+- **Incident qualité Sonar (2 vraies issues, arrêtées avant merge)** :
+  - `python:S5863` — **BUG (reliability MAJOR)** — `tests/test_user_program_generator.py` : l'assertion de
+    déterminisme comparait la **même expression** des deux côtés (`f(...) == f(...)`), faisant échouer le
+    gate `new_reliability_rating` (= 3). **Fix** : binding `first`/`second` (2 appels nommés puis
+    comparaison), comportement identique.
+  - `python:S1172` — **CODE_SMELL (MAJOR)** — `app/services/user_program_generator.py` : param `duration`
+    accepté mais **inutilisé** en V1. **Fix** : retrait complet (service + param de route + appel) — code
+    mort supprimé, re-ajoutable en WIZARD_04 quand réellement utilisé.
+  - Après fix : **`issues/search` `total: 0`**, reliability/security/maintainability **A**. Aucune faille
+    sécurité (leçon `S6680` de WIZARD_02 appliquée : jamais de `range(user)`).
+- **Head Alembic inchangé** (zéro migration) · **`reference_split.json` lu en read-only** · **zéro
+  `UserProgramQualityReview`** · **zéro `WorkoutTemplate`** · `drafts`/`models`/`program_quality_*` intacts.
+- **Statuts après closeout** : `WIZARD_04+` (preview scoring non persisté / picker EKB / flow de
+  regénération) = **FIRST NEXT / NOT OPENED** · `SCORING_04` = **NOT OPENED** · `EKB_04` = **DEFERRED**.
+- **Cleanup** : branche `sb/custom-program-wizard-03-deterministic-generator` (remote + locale) et worktree
+  `-custom-wizard-03` **conservés** — suppression au prochain GO CLEANUP.
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_WIZARD_03 — MERGED + CANONICAL CI GREEN.**
