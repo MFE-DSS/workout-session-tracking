@@ -9,6 +9,12 @@ source_brief: AUREN — Visual Asset Production Brief v1.0 (2026-07-15)
 
 # Auren Asset Program — Roadmap
 
+> **⚠️ SOURCE RESET — Sb_ASSET_03B.2R (2026-07-29).** Socle géométrique des Regional Plates P0 réinitialisé de
+> Servier vers **BodyParts3D 4.0 (DBCLS officiel, CC BY 4.0)** (Plan A déterministe ; Plan B sculpting humain
+> conditionnel ; Plan C Open3DModel CC BY-SA séparé, non autorisé). Couverture P0 **prouvée** (exact-FMA, 35 reps).
+> `SOURCE DOCTRINE: RESET LOCALLY` · `P0 GEOMETRY: NOT PRODUCED` · `QUALIFIED ANATOMICAL REVIEW: REQUIRED_PENDING`
+> · `RUNTIME: BLOCKED`. Doctrine : [`Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md`](Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md).
+
 > Programme **indépendant** de `Sx_UI` (clos). Système d'assets propriétaire, traçable, intégrable
 > **après gate**. Auren = **instrument de progression biomécanique** (non médical, non atlas, non fitness
 > générique, non gamer, non « IA » à gradients, non catalogue bodybuilding). Règle centrale : assets

@@ -11,6 +11,16 @@ Amendment `§5bis`.
 > **`PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED`** · **`PROFESSIONAL ANATOMICAL REVIEW: NOT CLAIMED`** ·
 > **`GLOBAL BODYMAP: UNCHANGED`** · **`AI GENERATION OF ANATOMY: FORBIDDEN`**.
 
+> **⚠️ SOURCE RESET — Sb_ASSET_03B.2R (2026-07-29), prioritaire sur la section « Sources » de ce spec.** La
+> géométrie P0 dérive désormais de **BodyParts3D 4.0 (DBCLS officiel, CC BY 4.0)** — **PLAN A** dérivation
+> déterministe (Blender/OBJ) ; **Servier** = `SUPERSEDED FOR BODY-FITTING GEOMETRY` (candidats muscle antérieurs
+> conservés comme preuve). Couverture P0 **prouvée** (exact-FMA, 35 reps, 0 conflit). **Contrat de segmentation
+> corrigé** : pectoral = mesh source **entier** → partitions `functional-visual-region` (`separately_segmented:
+> false`) ; **deltoïde = source-segmenté** (clavicular/acromial/spinal → antérieur/latéral/postérieur,
+> `separately_segmented: true`) ; posterior N2 `muscle-heads` / N3 `grouped-honest` inchangés. Doctrine :
+> [`Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md`](Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md).
+> `GEOMETRY: NOT PRODUCED` · `QUALIFIED ANATOMICAL REVIEW: REQUIRED_PENDING` · `RUNTIME: BLOCKED`.
+
 ---
 
 ## 0. Décision structurante — production géométrique par le toolchain opérateur
