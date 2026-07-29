@@ -478,6 +478,31 @@
   puis corrigées** (fix `d591f8c`), **issues code `total: 0`** + reliability A revérifiés.
   **`WIZARD_04+` (preview scoring non persisté / picker EKB / flow de regénération) = FIRST NEXT /
   NOT OPENED · `SCORING_04` = NOT OPENED · `EKB_04` = DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_WIZARD_04 — Draft Quality Preview` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-29 (build `944e1b6` **sans fix Sonar**, **PR #41 MERGED**,
+  merge `ebbe4e3`, base `557b5a0` refresh depuis `c34040e` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_04_DRAFT_QUALITY_PREVIEW_REPORT.md`
+  + appendice post-merge).
+  **Quatrième surface user-facing** — la qualité d'un brouillon devient **lisible dans l'éditeur** via une
+  **preview NON PERSISTÉE**. Option B + **helper pur** `app/services/user_program_quality_preview.py`
+  (`compute_quality_preview(program) -> QualityPreview(result, feedback)`) réutilisant l'adaptateur
+  `program_to_quality_definition` (SCORING_03) + `score_program` (SCORING_01) +
+  `build_program_quality_feedback` (SCORING_02), **sans importer le writer** → preview et trace future de
+  la même version **identiques** (parité prouvée par test). Route `GET /programs/{id}/quality` owner-scopée
+  (`Annotated`, `responses={404}`, **aucun POST, zéro écriture**) ; `quality.html` à **3 états** (ère non
+  scorable / brouillon vide = **message amical sans carte** évitant un grade C trompeur / carte
+  grade+score/100+couverture+confiance+cap+items+limitations+disclaimer) ; CTA `detail.html` ssi éditable
+  + ≥1 exercice. Preview `draft`+`validated` ; données insuffisantes = dégradation honnête SCORING_01/02
+  (`confidence very_low`) ; `profile=None`. **Interdits tenus** : zéro migration, **zéro review écrite**
+  (writer jamais importé ; 2 tests `count == 0`), **zéro `WorkoutTemplate`**, **preview non bloquante**,
+  SCORING_01/02/03 / `drafts` / `models` non modifiés, zéro EKB/seed/ASSET/BodyMap/LLM/claim médical.
+  17 dédiés (6 helper + 11 HTTP) + 161 non-régression ; ruff clean, budget **543 ≤ 548**, spec PASS ;
+  **check_scope SHARED_CODE** → full sweep local **2663 passed**. **CI PR #41 3 jobs verts · CI canonique
+  `30475415569` sur `ebbe4e3`** (push, diff identique à la PR #41 verte) ; gate externe rouge **uniquement
+  sur `new_coverage`** ; **issues code `total: 0`** + reliability A revérifiés. **Zéro incident Sonar** (5
+  leçons `S8410`/`S8415`/`S6680`/`S5863`/`S1172` pré-appliquées). Refresh mid-build `c34040e→557b5a0`
+  (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
+  **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
+  OPENED · `EKB_04` = DEFERRED · `Sb_OPS` CI-methodology (4 leviers) = QUEUED / NOT OPENED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
