@@ -12,15 +12,23 @@ service — so the deep business rules (quotas 7 sessions / 10 exercises,
 sequential positions, editable statuses, owner-scope) stay owned and tested in
 `app/services/user_program_drafts.py`. This router adds NO new service.
 
-Deliberate NON-goals (spec 01 §6 + build-gate order):
-- NO generator (no deterministic proposition, no LLM) — editing is MANUAL;
+Sb_CUSTOM_PROGRAM_WIZARD_03 — adds a DETERMINISTIC generator: assemble a full
+editable tree from curated `data/reference_split.json` templates (read-only),
+written once via `replace_draft_tree`, only on an EMPTY program. The generation
+logic lives in the pure `app/services/user_program_generator.py`; this router
+only wires the SSR form. WIZARD_02 remains the editor for correction.
+
+Deliberate NON-goals (spec 01 §6/§11 + build-gate order):
+- NO LLM, NO opaque generation — the proposal is a deterministic assembly of
+  named reference templates;
 - NO scoring, NO `UserProgramQualityReview` write (a review is a publication-
   time artifact, spec 03 §9-C);
 - NO publication to `WorkoutTemplate`, NO `session_builder` touch (spec 05);
+- NO EKB dependency / no seed (reference_split.json is self-contained);
 - NO migration — the existing draft persistence is reused as-is.
 
-Branching the scoring/feedback layer and the deterministic generator onto the
-flow is WIZARD_03+.
+Branching the scoring/feedback layer and an EKB-assisted picker onto the flow
+is WIZARD_04+.
 """
 from __future__ import annotations
 
@@ -40,6 +48,12 @@ from app.services.user_program_drafts import (
     list_drafts,
     replace_draft_tree,
     validate_draft,
+)
+from app.services.user_program_generator import (
+    MAX_SESSIONS,
+    SPLIT_LABELS,
+    ProgramGenerationError,
+    generate_program_tree,
 )
 from app.templating import templates
 
@@ -251,6 +265,25 @@ def _redirect_to_editor(request: Request, program_id: int) -> RedirectResponse:
     return RedirectResponse(
         url=request.url_for("user_program_detail", program_id=program_id),
         status_code=303,
+    )
+
+
+def _render_generate(
+    request: Request, db, user, program, *, error: str | None = None
+) -> HTMLResponse:
+    """Render the deterministic-generation form (WIZARD_03)."""
+    return templates.TemplateResponse(
+        request,
+        "user_programs/generate.html",
+        {
+            "page_title": f"Générer — {program.title}",
+            "program": program,
+            "split_labels": SPLIT_LABELS,
+            "max_sessions": MAX_SESSIONS,
+            "is_empty": len(program.sessions) == 0,
+            "error": error,
+            "active_session": latest_open_session(db, user.id),
+        },
     )
 
 
@@ -473,6 +506,69 @@ def user_program_validate(
     except UserProgramDraftError as exc:
         db.rollback()
         return _render_editor(
+            request, db, user, _owned_or_404(db, user, program_id), error=str(exc)
+        )
+    return _redirect_to_editor(request, program_id)
+
+
+# ─────────────────── deterministic generation (WIZARD_03) ────────────────────
+
+
+@router.get(
+    "/programs/{program_id}/generate",
+    response_class=HTMLResponse,
+    name="user_program_generate_form",
+    responses={404: {"description": "Programme introuvable"}},
+)
+def user_program_generate_form(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Deterministic-generation form. Owner-scoped 404 like every program route."""
+    return _render_generate(request, db, user, _owned_or_404(db, user, program_id))
+
+
+@router.post(
+    "/programs/{program_id}/generate",
+    response_class=HTMLResponse,
+    name="user_program_generate",
+    responses={404: {"description": "Programme introuvable"}},
+)
+def user_program_generate(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+    split: Annotated[str, Form()],
+    sessions: Annotated[int, Form()],
+    duration: Annotated[str | None, Form()] = None,
+):
+    program = _owned_or_404(db, user, program_id)
+    # Generation ONLY on an empty tree: `replace_draft_tree` overwrites the whole
+    # tree, so generating over an existing program would destroy manual work.
+    if program.sessions:
+        return _render_generate(
+            request, db, user, program,
+            error="Ce programme contient déjà des séances. "
+            "Videz-le ou créez-en un autre pour générer une base.",
+        )
+    if split not in SPLIT_LABELS:
+        return _render_generate(
+            request, db, user, program, error="Style de split inconnu."
+        )
+    if not 1 <= sessions <= MAX_SESSIONS:
+        return _render_generate(
+            request, db, user, program,
+            error=f"Le nombre de séances doit être entre 1 et {MAX_SESSIONS}.",
+        )
+    try:
+        payload = generate_program_tree(split, sessions, duration)
+        replace_draft_tree(db, user.id, program_id, payload)
+    except (ProgramGenerationError, UserProgramDraftError) as exc:
+        db.rollback()
+        return _render_generate(
             request, db, user, _owned_or_404(db, user, program_id), error=str(exc)
         )
     return _redirect_to_editor(request, program_id)

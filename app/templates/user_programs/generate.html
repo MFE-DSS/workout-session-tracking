@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">Générer une base de programme</h1>
+
+{% if error %}
+  <p style="color:var(--danger); margin-bottom:1rem;">{{ error }}</p>
+{% endif %}
+
+<div class="card" style="max-width:36rem;">
+  <p><strong>{{ program.title }}</strong></p>
+  <p class="text-dim" style="margin-top:.5rem;">
+    La génération assemble une base de programme à partir de séances de référence
+    curées — <strong>déterministe et reproductible</strong> (mêmes choix, même
+    résultat). Le programme généré reste <strong>entièrement éditable</strong>
+    ensuite dans l'éditeur.
+  </p>
+  {% if not is_empty %}
+    <p style="color:var(--danger); margin-top:.5rem;">
+      Ce programme contient déjà des séances. La génération n'est disponible que
+      sur un programme vide — videz-le ou créez-en un autre.
+    </p>
+  {% endif %}
+</div>
+
+{% if is_empty %}
+<form method="post" action="{{ url_for('user_program_generate', program_id=program.id) }}" class="card" style="margin-top:1.5rem; max-width:36rem;">
+  <div class="field">
+    <label class="field__label" for="split">Style de split</label>
+    <select id="split" name="split" required class="field__input">
+      {% for value, label in split_labels.items() %}
+        <option value="{{ value }}">{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field" style="margin-top:.75rem;">
+    <label class="field__label" for="sessions">Nombre de séances</label>
+    <input type="number" id="sessions" name="sessions" value="3" min="1" max="{{ max_sessions }}" required class="field__input" style="width:6rem;" />
+  </div>
+  <button type="submit" class="btn btn--primary" style="margin-top:1rem;">Générer la base</button>
+</form>
+{% endif %}
+
+<p style="margin-top:1.5rem;">
+  <a class="btn btn--ghost" href="{{ url_for('user_program_detail', program_id=program.id) }}">← Éditeur</a>
+</p>
+{% endblock %}
