@@ -25,7 +25,12 @@
 </div>
 
 {% if program.sessions|length == 0 %}
-  <p class="text-dim" style="margin-top:1.5rem;">Ce programme est vide. Ajoute une première séance ci-dessous.</p>
+  <p class="text-dim" style="margin-top:1.5rem;">Ce programme est vide. Génère une base ci-dessous, ou ajoute une première séance à la main.</p>
+  {% if editable %}
+    <p style="margin-top:.75rem;">
+      <a class="btn btn--primary" href="{{ url_for('user_program_generate_form', program_id=program.id) }}">Générer une base de programme</a>
+    </p>
+  {% endif %}
 {% else %}
   <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
     {% for session in program.sessions %}

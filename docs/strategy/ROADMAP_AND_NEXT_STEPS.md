@@ -453,6 +453,25 @@
   (`range(min(sets, _MAX_SETS))`, commit `65e7043`), **issues code `total: 0`** + security A revérifiés.
   **`WIZARD_03+` (génération déterministe / liaison EKB / scoring branché éventuel) = FIRST NEXT /
   NOT OPENED · `SCORING_04` = NOT OPENED · `EKB_04` = DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_WIZARD_03 — Deterministic Draft Generation` : 🟢 PATCH COMPLETE /
+  REVIEW PENDING** 2026-07-29 (branche `sb/custom-program-wizard-03-deterministic-generator`,
+  base `8a28f18` ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_03_DETERMINISTIC_GENERATION_REPORT.md`).
+  **Troisième surface user-facing** — génération déterministe d'une base de programme. Option B :
+  nouveau **service pur** `app/services/user_program_generator.py` (`generate_program_tree(split,
+  sessions) -> payload`) assemblant N **séances de référence curées** depuis `data/reference_split.json`
+  (lecture seule), **zéro DB/random/LLM/scoring**, même entrée → même payload, compatible
+  `replace_draft_tree`. Slugs : `ppl` = `[push-a, pull-a, legs-a, push-b, pull-b, legs-b]`,
+  `upper_lower` = `[upper-pecs-delts, lower-quad-bias, upper-back-arms, lower-posterior-bias]` ;
+  cardio/vides exclus ; `source_reason` traçant chaque slot (non opaque). Routes `GET/POST
+  /programs/{id}/generate` owner-scopées : **génération seulement si vide** (`replace_draft_tree`
+  écrase tout), `published`/`archived` refusés, succès → 303 éditeur. `generate.html` no-JS + CTA
+  sur l'éditeur vide. **Zéro couplage EKB** → EKB_04 non ouvert. **Interdits tenus** : zéro migration,
+  zéro seed, zéro scoring, **zéro review écrite**, **zéro `WorkoutTemplate`**, `reference_split.json`
+  lu en read-only, `drafts`/`models`/`program_quality_*` non modifiés ; **WIZARD_02 reste l'éditeur**.
+  28 dédiés (12 service + 16 HTTP) + 116 non-régression ; ruff clean, budget **543 ≤ 548**, spec PASS ;
+  **check_scope SHARED_CODE** (nouveau service ; anticipé ISOLATED, documenté) → full sweep local.
+  **`WIZARD_04+` (preview scoring non persisté / picker EKB / flow de regénération) = FIRST NEXT /
+  NOT OPENED · `SCORING_04` = NOT OPENED · `EKB_04` = DEFERRED.**
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
   l'ordre du gate.
