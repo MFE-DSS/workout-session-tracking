@@ -5,6 +5,13 @@ Plates P0 **après** production géométrique (toolchain opérateur) et intake t
 BLOCKED`.
 **Amont** : [`../../strategy/Sb_ASSET_03B_2_P0_REGIONAL_PLATE_PRODUCTION_SPEC.md`](../../strategy/Sb_ASSET_03B_2_P0_REGIONAL_PLATE_PRODUCTION_SPEC.md).
 
+> **⚠️ SOURCE RESET — Sb_ASSET_03B.2R (2026-07-29).** Géométrie P0 dérivée de **BodyParts3D 4.0** (voir
+> [`../../strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md`](../../strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md)).
+> **Gate double** : revue **produit/visuelle** (Martin) **+** revue **anatomique qualifiée** (`REQUIRED_PENDING`) —
+> les deux requises avant acceptation globale ; runtime bloqué. L'axe 6 (« fidélité aux ancrages ») s'appuie
+> désormais sur les os BodyParts3D sourcés (scapula/clavicule/humérus, bassin/fémur/patella). Deltoïde =
+> parts source-segmentées ; attribution BodyParts3D (© DBCLS, CC BY 4.0) à porter sur la surface de revue.
+
 > Ce protocole **ne préjuge d'aucun verdict**. La revue est humaine (Martin) ; l'assistant ne remplit pas les
 > décisions. **`PROFESSIONAL ANATOMICAL REVIEW: NOT CLAIMED`** même après acceptation produit.
 

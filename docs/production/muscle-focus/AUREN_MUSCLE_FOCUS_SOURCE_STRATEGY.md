@@ -4,7 +4,28 @@
 **NON une conclusion juridique.** `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` · `ASSET INTEGRATION GATE:
 BLOCKED`. **Détail et sources** : [`../../research/AUREN_MUSCLE_FOCUS_REFERENCE_RESEARCH.md`](../../research/AUREN_MUSCLE_FOCUS_REFERENCE_RESEARCH.md).
 
-## Hiérarchie retenue (source-reuse-first, cohérente BodyMap)
+## ⚠️ SOURCE RESET — Sb_ASSET_03B.2R (BodyParts3D-primary) — prioritaire
+
+> **Amendement normatif (2026-07-29), postérieur à la revalidation ci-dessous.** La hiérarchie « Servier-primary »
+> qui suit est **conservée pour l'historique** mais **superseded** pour la géométrie de body-fitting. Doctrine
+> courante : [`../../strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md`](../../strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md).
+>
+> ```
+> PRIMARY DERIVATION:  BodyParts3D 4.0 — official DBCLS distribution — CC BY 4.0
+> PLAN A: deterministic BodyParts3D derivation
+> PLAN B: conditional human-only controlled sculpting (no free invention; before/after; traceability;
+>         change-log; qualified anatomical review; never automated by the agent)
+> PLAN C: Open3DModel — conditional, CC BY-SA provenance branch, separated, NOT authorized for P0
+> VALIDATION / REFERENCE: Visible Human & approved references under their precise terms
+> SUPERSEDED: Servier Medical Art — for BODY-FITTING GEOMETRY only (historical candidates preserved)
+> ```
+> BodyParts3D est **géométrie source traçable**, **pas** une vérité anatomique canonique (référence masculin
+> adulte, non universelle, peut contenir des erreurs). `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` ·
+> `AI GENERATION OF ANATOMY: FORBIDDEN` · `QUALIFIED ANATOMICAL REVIEW: REQUIRED` · `RUNTIME: BLOCKED`.
+> Segmentation prouvée : pectoral = mesh source **entier** (partitions functional-visual) ; deltoïde =
+> **source-segmenté** (clavicular/acromial/spinal → antérieur/latéral/postérieur).
+
+## Hiérarchie retenue (source-reuse-first, cohérente BodyMap) — ⚠️ SUPERSEDED pour body-fitting (voir reset ci-dessus)
 
 ```
 PRIMARY DERIVATION (géométrie du livrable)

@@ -1,5 +1,14 @@
 # AUREN — Muscle Focus Source Ledger (`Sb_ASSET_03B.1`)
 
+> **⚠️ SOURCE RESET — Sb_ASSET_03B.2R (2026-07-29), prioritaire.** Pour la **géométrie de body-fitting**, la
+> source primaire est désormais **BodyParts3D 4.0 (DBCLS officiel, CC BY 4.0)** ; **Servier** = `SUPERSEDED FOR
+> BODY-FITTING GEOMETRY` (la classification historique ci-dessous est **conservée**, non réécrite). BodyParts3D =
+> géométrie source **traçable**, **pas** vérité anatomique canonique (référence masculin adulte, peut contenir des
+> erreurs). Preuves licence : workspace opérateur `01_acquisition/license_evidence/` — PDF officiel **type-vérifié**
+> (non rendu texte, poppler absent) + 2 HTML corroborant **CC BY 4.0 / Release 4.0** ; **origine attestée
+> manuellement par Martin** ; `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED`. Doctrine + mapping P0 prouvé (exact-FMA,
+> 35 reps) : [`../../strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md`](../../strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md).
+
 **Type** : **registre de sources normatif** (revalidé) — **DOCS-ONLY**. Relevés officiels **2026-07-24**.
 **NON une conclusion juridique** : `PROFESSIONAL LEGAL CLEARANCE: NOT CLAIMED` · `ASSET INTEGRATION GATE:
 BLOCKED`.

@@ -1,5 +1,12 @@
 # Sprint Sb_ASSET_03B.2 — P0 Regional Plate Production Package — REPORT
 
+> **⚠️ SUPERSEDED (partiel) par Sb_ASSET_03B.2R (2026-07-29).** Le **socle géométrique Servier** de ce package est
+> `SUPERSEDED FOR BODY-FITTING GEOMETRY` : la production P0 dérive désormais de **BodyParts3D 4.0 (CC BY 4.0)**.
+> Voir [`strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md`](strategy/Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_SPEC.md)
+> + [`SPRINT_Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_REPORT.md`](SPRINT_Sb_ASSET_03B_2R_BODYPARTS3D_SOURCE_RESET_REPORT.md).
+> Le **protocole de revue, les budgets et le contrat d'intake** de ce package **restent valides** ; seule la
+> **source géométrique** change (et le deltoïde devient source-segmenté). Historique conservé, non réécrit.
+
 **Statut** : 🟢 **`Sb_ASSET_03B.2: OPEN — PHASE 1 PRODUCTION PACKAGE READY / GEOMETRY PENDING (AWAITING OPERATOR TOOLCHAIN)`** —
 docs-only ; **aucune géométrie produite, aucun `ai_usage: NONE` fabriqué, aucune gate franchie**. `ASSET
 INTEGRATION GATE: BLOCKED`.
