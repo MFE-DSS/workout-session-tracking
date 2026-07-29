@@ -52,15 +52,24 @@ jobs:
           pip install -r requirements.txt
           # Sb_20.1 — pytest-cov + coverage[toml] produce coverage.xml
           # for SonarCloud. httpx is required by the FastAPI TestClient.
-          pip install pytest pytest-cov "coverage[toml]" httpx
+          # Sb_OPS.ci-efficiency — pytest-xdist runs the suite in parallel
+          # (`-n auto`); coverage is combined across workers by pytest-cov.
+          pip install pytest pytest-cov pytest-xdist "coverage[toml]" httpx
 
       - name: Run pytest with coverage
         # test_v1_acceptance.py checks a local VSCode setup and is
         # intentionally excluded from CI. Coverage is collected over
         # `app/` (configured in pyproject.toml [tool.coverage.run]).
         # The XML report is consumed by SonarCloud (Sb_20.4).
+        # Sb_OPS.ci-efficiency — `-n auto` fans the suite across the
+        # runner's cores; `--dist worksteal` rebalances uneven test
+        # durations. The suite is xdist-safe (per-test tempdir SQLite in
+        # tests/conftest.py); pytest-cov merges per-worker coverage so
+        # coverage.xml stays complete for the SonarCloud sensor.
         run: |
           pytest \
+            -n auto \
+            --dist worksteal \
             --ignore=tests/test_v1_acceptance.py \
             --cov=app \
             --cov-report=xml \
