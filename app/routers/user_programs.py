@@ -18,17 +18,26 @@ written once via `replace_draft_tree`, only on an EMPTY program. The generation
 logic lives in the pure `app/services/user_program_generator.py`; this router
 only wires the SSR form. WIZARD_02 remains the editor for correction.
 
+Sb_CUSTOM_PROGRAM_WIZARD_04 — surfaces a NON-PERSISTED quality preview of the
+draft: a dedicated read-only `GET /programs/{id}/quality` reuses the pure
+SCORING_01 engine + SCORING_02 feedback layer (via the pure
+`app/services/user_program_quality_preview.py`) to show a grade, sub-scores and
+plain-language feedback. It writes NOTHING — reusing the SAME adapter as the
+SCORING_03 writer so a preview and a future persisted trace of the same version
+compute identically. Scorable eras only (draft/validated), and an empty draft
+gets a friendly prompt instead of a misleading grade.
+
 Deliberate NON-goals (spec 01 §6/§11 + build-gate order):
 - NO LLM, NO opaque generation — the proposal is a deterministic assembly of
   named reference templates;
-- NO scoring, NO `UserProgramQualityReview` write (a review is a publication-
-  time artifact, spec 03 §9-C);
+- NO `UserProgramQualityReview` write and NO DB mutation from the preview (a
+  persisted review is a publication-time artifact, spec 03 §9-C); scoring is
+  surfaced read-only, never persisted here;
 - NO publication to `WorkoutTemplate`, NO `session_builder` touch (spec 05);
 - NO EKB dependency / no seed (reference_split.json is self-contained);
 - NO migration — the existing draft persistence is reused as-is.
 
-Branching the scoring/feedback layer and an EKB-assisted picker onto the flow
-is WIZARD_04+.
+An EKB-assisted exercise picker onto the flow is WIZARD_05+.
 """
 from __future__ import annotations
 
@@ -40,6 +49,7 @@ from fastapi import APIRouter, Form, HTTPException, Path, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.deps import CurrentUser, DbSession
+from app.services.program_quality_reviews import SCORABLE_STATUSES
 from app.services.session_state import latest_open_session
 from app.services.user_program_drafts import (
     UserProgramDraftError,
@@ -55,6 +65,7 @@ from app.services.user_program_generator import (
     ProgramGenerationError,
     generate_program_tree,
 )
+from app.services.user_program_quality_preview import compute_quality_preview
 from app.templating import templates
 
 router = APIRouter(tags=["user_programs"])
@@ -282,6 +293,28 @@ def _render_generate(
             "max_sessions": MAX_SESSIONS,
             "is_empty": len(program.sessions) == 0,
             "error": error,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+def _render_quality(
+    request: Request, db, user, program, *, scorable: bool, is_empty: bool, preview
+) -> HTMLResponse:
+    """Render the non-persisted quality preview (WIZARD_04).
+
+    `preview` is a `QualityPreview` only when the draft is both scorable and
+    non-empty; otherwise it is None and the template shows a friendly prompt.
+    """
+    return templates.TemplateResponse(
+        request,
+        "user_programs/quality.html",
+        {
+            "page_title": f"Qualité — {program.title}",
+            "program": program,
+            "scorable": scorable,
+            "is_empty": is_empty,
+            "preview": preview,
             "active_session": latest_open_session(db, user.id),
         },
     )
@@ -571,3 +604,36 @@ def user_program_generate(
             request, db, user, _owned_or_404(db, user, program_id), error=str(exc)
         )
     return _redirect_to_editor(request, program_id)
+
+
+# ─────────────────── non-persisted quality preview (WIZARD_04) ────────────────
+
+
+@router.get(
+    "/programs/{program_id}/quality",
+    response_class=HTMLResponse,
+    name="user_program_quality",
+    responses={404: {"description": "Programme introuvable"}},
+)
+def user_program_quality(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Non-persisted quality preview. Owner-scoped 404 like every program route.
+
+    Reads the scored draft and renders it — writing NOTHING. Only the edition
+    eras (draft/validated) get a scorecard; an empty draft gets a friendly
+    prompt rather than a misleading grade computed on zero exercises.
+    """
+    program = _owned_or_404(db, user, program_id)
+    scorable = program.archived_at is None and program.status in SCORABLE_STATUSES
+    is_empty = sum(len(s.exercises) for s in program.sessions) == 0
+    preview = (
+        compute_quality_preview(program) if scorable and not is_empty else None
+    )
+    return _render_quality(
+        request, db, user, program,
+        scorable=scorable, is_empty=is_empty, preview=preview,
+    )
