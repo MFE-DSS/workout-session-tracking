@@ -543,7 +543,6 @@ def user_program_generate(
     program_id: Annotated[int, Path()],
     split: Annotated[str, Form()],
     sessions: Annotated[int, Form()],
-    duration: Annotated[str | None, Form()] = None,
 ):
     program = _owned_or_404(db, user, program_id)
     # Generation ONLY on an empty tree: `replace_draft_tree` overwrites the whole
@@ -564,7 +563,7 @@ def user_program_generate(
             error=f"Le nombre de séances doit être entre 1 et {MAX_SESSIONS}.",
         )
     try:
-        payload = generate_program_tree(split, sessions, duration)
+        payload = generate_program_tree(split, sessions)
         replace_draft_tree(db, user.id, program_id, payload)
     except (ProgramGenerationError, UserProgramDraftError) as exc:
         db.rollback()

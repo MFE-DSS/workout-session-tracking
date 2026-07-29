@@ -96,14 +96,11 @@ def _template_to_session(template: dict) -> dict:
     }
 
 
-def generate_program_tree(
-    split: str, sessions: int, duration: str | None = None
-) -> list[dict]:
+def generate_program_tree(split: str, sessions: int) -> list[dict]:
     """Deterministically assemble a program tree from reference templates.
 
     Pure: the same ``(split, sessions)`` always returns the same payload. No DB,
-    no randomness, no scoring, no write. ``duration`` is accepted for forward
-    compatibility but does NOT change the V1 output (documented). Contract:
+    no randomness, no scoring, no write. Contract:
 
     - unknown ``split`` -> ``ProgramGenerationError``;
     - ``sessions < 1`` -> ``ProgramGenerationError``;

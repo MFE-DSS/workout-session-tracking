@@ -68,7 +68,9 @@ def test_source_reason_traces_the_template():
 
 
 def test_deterministic_same_input_same_payload():
-    assert generate_program_tree("ppl", 5) == generate_program_tree("ppl", 5)
+    first = generate_program_tree("ppl", 5)
+    second = generate_program_tree("ppl", 5)
+    assert first == second
 
 
 def test_unknown_split_is_refused():
