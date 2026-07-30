@@ -23,16 +23,25 @@ verdict** :
 |---|---|---|
 | `docs` | `check_spec_protocol` | tout le reste (la CI est légitimement skippée via `paths-ignore`) |
 | `isolated` | ruff (fichiers neufs) + budget + spec_protocol + tests ciblés + **broad sweep ciblé** | **full sweep local** — la CI réelle le remplace |
-| `shared_code` | ci-dessus **+ full sweep local** | — |
-| `migration` | ci-dessus + tous les `check_migration_*` / drift / snapshot | — |
+| `shared_code` | ci-dessus (broad sweep ciblé **obligatoire**) — **full sweep local : recommandé si doute, non systématique** | **full sweep local systématique** — la CI parallélisée sur PR fait office de filet (Sb_OPS.ci-efficiency) |
+| `migration` | `isolated` + **full sweep local** + tous les `check_migration_*` / drift / snapshot | — |
 | `ci_infra` | ruff + budget + spec + **full sweep local** + **validation CI réelle impérative** | — |
 
 Règles d'application :
 
-- **Ne PAS lancer un full sweep local (`pytest --ignore=... -q`, ~10-15 min)
-  quand le tier est `isolated` ou `docs`.** C'est de l'overcheck : un fichier
-  neuf non importé ailleurs ne peut pas régresser un test hors de sa surface.
-  Le **broad sweep ciblé** (module + consommateurs potentiels) suffit en local.
+- **Ne PAS lancer un full sweep local quand le tier est `isolated`, `docs` ou
+  `shared_code`.** Pour `isolated`/`docs` c'est de l'overcheck (un fichier neuf non
+  importé ailleurs ne peut pas régresser un test lointain). Pour `shared_code`, le
+  **broad sweep ciblé** (module + consommateurs potentiels) est le garde local
+  **obligatoire** et la **CI parallélisée sur PR** est le filet de vérité — le full
+  sweep local y reste **recommandé si un doute de blast radius subsiste**, non
+  systématique (Sb_OPS.ci-efficiency).
+- **Commande de référence du full sweep** (parallélisée depuis `Sb_OPS.ci-efficiency`,
+  ~4 min au lieu de ~14, même couverture) :
+  `pytest -n auto --dist worksteal --ignore=tests/test_v1_acceptance.py --cov=app --cov-report=xml -q`.
+- **Sprints `ci_infra`** (le pipeline lui-même) : la **CI réelle sur GitHub est
+  source de vérité obligatoire avant merge** — un changement de pipeline doit
+  **prouver son effet sur une CI réelle**, jamais seulement en local.
 - La **CI réelle au push (3 jobs)** reste **TOUJOURS la source de vérité** de
   non-régression globale. Ce garde-fou ne réduit **jamais** la CI, seulement les
   checks *locaux* redondants.
