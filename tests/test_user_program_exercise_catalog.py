@@ -97,8 +97,14 @@ def test_alias_only_name_does_not_match_in_v1():
 
 def test_repeated_calls_are_stable():
     cat = _catalog()
-    assert cat.picker_options() == cat.picker_options()
-    assert cat.enrich("Adduction assise") == cat.enrich("Adduction assise")
+    # Distinct bindings (not `f() == f()`) so the assertion compares two real
+    # computed results — deterministic, and free of the S5863 self-comparison.
+    first_options = cat.picker_options()
+    second_options = cat.picker_options()
+    assert first_options == second_options
+    first_enrich = cat.enrich("Adduction assise")
+    second_enrich = cat.enrich("Adduction assise")
+    assert first_enrich == second_enrich
 
 
 def test_callers_cannot_mutate_cached_data():
