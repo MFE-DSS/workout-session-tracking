@@ -504,8 +504,9 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
-- **`Sb_CUSTOM_PROGRAM_WIZARD_05 — EKB-Assisted Exercise Picker` : 🟡 PATCH COMPLETE /
-  REVIEW PENDING** 2026-07-30 (base `1c4604d`, branche `sb/custom-program-wizard-05-ekb-picker` ;
+- **`Sb_CUSTOM_PROGRAM_WIZARD_05 — EKB-Assisted Exercise Picker` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-07-30 (build `5a85941` + fix Sonar `4badb0f`, **PR #43 MERGED**, merge
+  `097bf48` via `--merge --admin` — bypass du seul `new_coverage`, base `1c4604d`, branche `sb/custom-program-wizard-05-ekb-picker` ;
   `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_05_EKB_ASSISTED_PICKER_REPORT.md` +
   `docs/strategy/Sb_CUSTOM_PROGRAM_WIZARD_05_EKB_ASSISTED_PICKER_SPEC.md`).
   Picker EKB **read-only** dans l'éditeur : service isolé `user_program_exercise_catalog.py`
@@ -513,8 +514,12 @@
   (4 champs dénormalisés, match EXACT sinon `{}`) ; `<datalist>` no-JS + `list=` sur l'input ;
   **saisie libre préservée**. Hygiène de nom → l'exercice ajouté à la main devient reconnu par le
   scoring/WIZARD_04. **Zéro migration · EKB en JSON (aucune table) · engine non modifié · no JS.**
-  50 tests verts (12 catalog + 11 HTTP + 27 WIZARD_02) ; check_scope ISOLATED. **Non commité** (mandat
-  GO BUILD = patch seul). Régénération gardée → **WIZARD_06**. **Gouvernance actée** : `SCORING_04`
+  50 tests verts (12 catalog + 11 HTTP + 27 WIZARD_02) + broad sweep **179 passed** ; check_scope
+  **SHARED_CODE** (service importé par le router). **CI PR #43 3 jobs verts après fix · CI canonique
+  `30530864581` sur `097bf48` 3/3 GREEN** (job `test` xdist **11:43**). **1 vraie régression Sonar
+  arrêtée avant merge** : `python:S5863` ×2 (auto-comparaison `f()==f()` du test de stabilité) → fix
+  `4badb0f` (bindings distincts), `issues/search total: 0` + reliability A revérifiés. Régénération
+  gardée → **WIZARD_06**. **Gouvernance actée** : `SCORING_04`
   **SUPERSEDED** · `EKB_04` (seed DB) **DEFERRED** · `Sb_OPS` leviers 3+4 **DEFERRED**.
 - **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
   `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans

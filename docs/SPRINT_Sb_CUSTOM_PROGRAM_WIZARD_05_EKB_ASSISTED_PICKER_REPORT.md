@@ -87,3 +87,35 @@ regeneration change (B → WIZARD_06) · ✅ **zéro `UserProgramQualityReview`*
 Le picker EKB read-only aligne la saisie manuelle sur les noms canoniques (donc sur le scoring),
 peuple les colonnes dénormalisées sur match exact, et **préserve la saisie libre** — sans migration,
 sans consommateur DB, sans toucher le moteur, sans JS. La régénération gardée est réservée à WIZARD_06.
+
+---
+
+## Appendice post-merge (closeout 2026-07-30)
+
+- **Commit build** : `5a85941` (9 fichiers, +566/−1) sur `sb/custom-program-wizard-05-ekb-picker`,
+  base `1c4604d`.
+- **Fix Sonar** : `4badb0f` (1 fichier, +8/−2) — voir incident ci-dessous.
+- **PR #43 MERGED** — merge **`097bf48`** sur le canonique (via `--merge --admin`, garde
+  `--match-head-commit 4badb0f…fe74`, bypass du **seul** gate résiduel = `new_coverage 0.0 %`, artefact ;
+  pas de squash).
+- **CI PR #43** : après fix, **3 jobs GitHub verts** (`pytest + QA` **parallélisé** · `lint` ·
+  `SonarCloud`) sur `4badb0f` ; job `test` = 11 min 50 s.
+- **CI canonique** : run **`30530864581`** (push) sur `097bf48` → **3/3 GREEN** ; job `test` = **11 min
+  43 s** (pipeline xdist Sb_OPS.ci-efficiency, vs ~37 min avant).
+- **Sonar** : `issues/search total: 0` (après fix) ; `new_reliability_rating` = **A** ; seul
+  `new_coverage` rouge (artefact structurel, non bloquant).
+- **Incident qualité Sonar (1 vraie régression, arrêtée avant merge)** :
+  - `python:S5863` ×2 — **BUG (reliability)** — `tests/test_user_program_exercise_catalog.py:100-101` :
+    le test de stabilité comparait `f() == f()` (auto-comparaison), faisant passer
+    `new_reliability_rating` à 3. **Fix** `4badb0f` : bindings distincts `first_*`/`second_*` (2 appels
+    nommés puis comparaison), sémantique identique. Après fix : `total: 0`, reliability A. **Leçon S5863
+    déjà rencontrée en WIZARD_03 — à pré-appliquer systématiquement aux tests de déterminisme/stabilité.**
+- **Head Alembic inchangé** (zéro migration) · **EKB JSON inchangé** (`afa91ca6…`) ·
+  `program_quality_engine.py` non modifié · **zéro `UserProgramQualityReview`** persistée.
+- **Statuts après closeout** : `WIZARD_06` (régénération gardée sur programme non vide) = **FIRST NEXT /
+  NOT OPENED** · `SCORING_04` = **SUPERSEDED** · `EKB_04` = **DEFERRED** · `Sb_OPS` leviers 3+4 =
+  **DEFERRED**.
+- **Cleanup** : branche `sb/custom-program-wizard-05-ekb-picker` (remote + locale) et worktree
+  `-sb-custom-program-wizard-05` supprimés au GO CLEANUP.
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_WIZARD_05 — MERGED + CANONICAL CI GREEN.**
