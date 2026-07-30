@@ -402,3 +402,184 @@ def test_wizard01_routes_still_green(client):
     assert client.get("/programs/new").status_code == 200
     r = client.post("/programs", data={"title": "Non-regression"}, follow_redirects=False)
     assert r.status_code == 303
+
+
+# ═══════════════ WIZARD_05 — EKB-assisted exercise picker ═══════════════
+# Read-only <datalist> on the add-exercise form + exact-match denormalized
+# enrichment. Free-text entry stays unrestricted. No DB-backed EKB, no review.
+
+_EKB_NAME = "Adduction assise"  # canonical EKB entry (zone_primary=posterior)
+
+
+def _exercise_fields(pid: int) -> list[dict]:
+    from app.services.user_program_drafts import get_draft
+
+    with _session() as db:
+        program = get_draft(db, _uid(), pid)
+        return [
+            {
+                "exercise_name": e.exercise_name,
+                "variant_key": e.variant_key,
+                "variant_group": e.variant_group,
+                "equipment_family": e.equipment_family,
+                "movement_pattern": e.movement_pattern,
+                "source_reason": e.source_reason,
+            }
+            for s in program.sessions
+            for e in s.exercises
+        ]
+
+
+def _editor_with_one_session(title: str, slug: str) -> int:
+    pid = _make_program(title, slug)
+    _seed_tree(pid, [_session_payload(1)])
+    return pid
+
+
+def test_editor_renders_ekb_datalist(client):
+    pid = _editor_with_one_session("Picker", "w05-datalist")
+    body = client.get(f"/programs/{pid}").text
+    assert 'list="ekb-exercises"' in body
+    assert '<datalist id="ekb-exercises">' in body
+
+
+def test_editor_datalist_contains_canonical_option(client):
+    pid = _editor_with_one_session("Picker", "w05-option")
+    body = client.get(f"/programs/{pid}").text
+    assert f'value="{_EKB_NAME}"' in body
+
+
+def test_editor_datalist_label_has_no_literal_none(client):
+    pid = _editor_with_one_session("Picker", "w05-nonull")
+    body = client.get(f"/programs/{pid}").text
+    assert 'label="None"' not in body
+    # a real, gap-free label renders (nulls are dropped, never "None")
+    assert 'label="posterior · isolation_lower · machine"' in body
+
+
+def test_add_exercise_ekb_name_persists_enrichment(client):
+    pid = _editor_with_one_session("Enrich", "w05-enrich")
+    r = client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    rows = _exercise_fields(pid)
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["exercise_name"] == _EKB_NAME  # verbatim
+    assert row["variant_key"] == "adduction-assise"
+    assert row["movement_pattern"] == "isolation_lower"
+    assert row["equipment_family"] == "machine"
+    assert row["variant_group"] is None  # null in V1 by design
+    assert row["source_reason"] == "manual"
+
+
+def test_add_exercise_free_text_leaves_enrichment_null(client):
+    pid = _editor_with_one_session("Free", "w05-free")
+    r = client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={
+            "exercise_name": "Mon Exercice Perso XYZ",
+            "sets": 3,
+            "min_reps": 8,
+            "max_reps": 12,
+        },
+        follow_redirects=False,
+    )
+    assert r.status_code == 303  # free-text fallback: non-blocking
+    row = _exercise_fields(pid)[0]
+    assert row["exercise_name"] == "Mon Exercice Perso XYZ"  # verbatim
+    assert row["variant_key"] is None
+    assert row["variant_group"] is None
+    assert row["equipment_family"] is None
+    assert row["movement_pattern"] is None
+    assert row["source_reason"] == "manual"
+
+
+def test_add_exercise_owner_scope_404_unchanged(client):
+    _other_id, pid = _make_other_program("Foreign", "w05-foreign")
+    r = client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    assert r.status_code == 404
+
+
+def test_add_exercise_quota_unchanged_with_picker(client):
+    from app.models.user_program import UserProgramExercise
+
+    pid = _make_program("QuotaW05", "w05-quota")
+    _seed_tree(pid, [_session_payload(1, n_exercises=10)])
+    r = client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    assert r.status_code == 200  # 10-exercise quota still fires through the enriched path
+    assert _count(UserProgramExercise) == 10
+
+
+def test_add_exercise_archived_refused_unchanged(client):
+    from app.models.user_program import UserProgramExercise
+    from app.services.user_program_drafts import archive_draft
+
+    pid = _make_program("ArchW05", "w05-arch")
+    _seed_tree(pid, [_session_payload(1)])
+    with _session() as db:
+        archive_draft(db, _uid(), pid)
+    r = client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    assert r.status_code == 200  # non-editable status → soft re-render, no add
+    assert _count(UserProgramExercise) == 0
+
+
+def test_wizard04_recognizes_manually_added_ekb_exercise(client):
+    from app.services.user_program_drafts import get_draft
+    from app.services.user_program_quality_preview import compute_quality_preview
+
+    pid = _editor_with_one_session("Reco", "w05-reco")
+    client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    with _session() as db:
+        preview = compute_quality_preview(get_draft(db, _uid(), pid))
+    # An exact canonical name is resolved by the engine → contributes to coverage
+    # (no longer "hors EKB"). This is the point of the picker's name hygiene.
+    assert preview.result.coverage_ratio > 0
+
+
+def test_wizard04_free_text_stays_outside_aggregates(client):
+    from app.services.user_program_drafts import get_draft
+    from app.services.user_program_quality_preview import compute_quality_preview
+
+    pid = _editor_with_one_session("Outside", "w05-outside")
+    client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": "Zzz Inconnu Perso", "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    with _session() as db:
+        preview = compute_quality_preview(get_draft(db, _uid(), pid))
+    # Free-text unknown stays outside EKB-derived aggregates, no crash.
+    assert preview.result.coverage_ratio == 0.0
+
+
+def test_picker_flow_persists_no_quality_review(client):
+    from app.models.user_program import UserProgramQualityReview
+
+    pid = _editor_with_one_session("NoRev05", "w05-norev")
+    client.post(
+        f"/programs/{pid}/sessions/1/exercises",
+        data={"exercise_name": _EKB_NAME, "sets": 3, "min_reps": 8, "max_reps": 12},
+        follow_redirects=False,
+    )
+    client.get(f"/programs/{pid}/quality")
+    assert _count(UserProgramQualityReview) == 0

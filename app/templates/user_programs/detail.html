@@ -65,7 +65,7 @@
           <form method="post" action="{{ url_for('user_program_add_exercise', program_id=program.id, position=session.position) }}" style="margin-top:.5rem; display:flex; flex-wrap:wrap; gap:.5rem; align-items:end;">
             <div class="field" style="flex:1 1 12rem;">
               <label class="field__label" for="ex-{{ session.position }}">Exercice</label>
-              <input type="text" id="ex-{{ session.position }}" name="exercise_name" required maxlength="255" class="field__input" placeholder="Développé couché haltères" />
+              <input type="text" id="ex-{{ session.position }}" name="exercise_name" list="ekb-exercises" required maxlength="255" class="field__input" placeholder="Développé couché haltères" />
             </div>
             <div class="field">
               <label class="field__label" for="sets-{{ session.position }}">Séries</label>
@@ -106,6 +106,17 @@
     </p>
   {% endif %}
 {% endif %}
+
+{# WIZARD_05 — read-only EKB name picker (no JS). One page-level datalist shared
+   by every add-exercise input (list="ekb-exercises"). Free-text entry stays
+   unrestricted (the input is a plain type=text). All 103 canonical names; null
+   metadata segments are dropped so the label never renders "None". #}
+<datalist id="ekb-exercises">
+  {% for opt in picker_options %}
+    {%- set meta = [opt.zone_primary, opt.movement_pattern, opt.equipment_family] | select | join(' · ') -%}
+    <option value="{{ opt.name }}"{% if meta %} label="{{ meta }}"{% endif %}></option>
+  {% endfor %}
+</datalist>
 
 <p style="margin-top:1.5rem;">
   <a class="btn btn--ghost" href="{{ url_for('user_programs_list') }}">← Mes programmes</a>
