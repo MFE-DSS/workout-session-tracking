@@ -99,7 +99,29 @@ et 4 (sélection par impact) explicitement différés.** La preuve définitive a
 
 ---
 
-## Appendice post-merge (closeout — à compléter)
+## Appendice post-merge (closeout 2026-07-30)
 
-- Commit build · PR # · merge commit · CI PR (job `test` parallélisé) · durée CI avant/après réelle ·
-  Sonar `total: 0` + `coverage.xml` reçue · CI canonique · statuts leviers 3/4 (DEFERRED).
+- **Commit build** : `626fc55` (5 fichiers, +140/−11) sur `sb/ops-ci-efficiency`, base `a2e2b6d`.
+  **Aucun fix** (premier passage propre).
+- **PR #42 MERGED** — merge **`9d98f82`** sur le canonique (via `--merge`, **SANS `--admin`** — gate
+  `mergeStateStatus: CLEAN` ; pas de squash ; garde `--match-head-commit`).
+- **CI PR #42** : **3 jobs GitHub verts** (`pytest + QA scripts` **parallélisé** · `lint` · `SonarCloud`)
+  sur `626fc55`. **Job `test` = 11 min 06 s** (21:11:41 → 21:22:47) vs ~37-43 min avant = **~3.4-3.9×**.
+  Fait notable : gate **`CLEAN` intégral** — le 4ᵉ check externe `SonarCloud Code Analysis` **vert** (patch
+  sans ligne `app/` neuve → `new_coverage` sans nouvelle ligne à couvrir → gate entièrement passé, pas
+  d'artefact rouge). Première PR du track mergée sans bypass admin.
+- **CI canonique** : run **`30520718331`** (push) sur `9d98f82` → **3/3 GREEN**. **Job `test` = 11 min
+  41 s** (06:47:44 → 06:59:25) — pipeline xdist **prouvé en contexte trunk** (2ᵉ preuve).
+- **`coverage.xml`** : produite (job `test` sous xdist) ET consommée (job `sonar`) sur **PR ET canonique**
+  — couverture **intacte** sous parallélisme, le risque n°1 écarté et doublement vérifié.
+- **Sonar** : delta PR #42 (code neuf) **`issues/search` `total: 0`** ; gate canonique new-code **vert**
+  (job SonarCloud success). Le total branche entière (711, dates ≤ 2026-07-18, majorité `S5778` tests) est
+  la **baseline accumulée pré-existante**, hors scope (ce sprint n'ajoute aucune ligne `app/`).
+- **Résultat local (dogfood)** : full sweep xdist **2677 passed**, **834 s → 298.72 s ≈ 2.8×**, **0 `serial`**.
+- **Statuts leviers** : **Levier 3 (CI deux vitesses) = DEFERRED** · **Levier 4 (sélection par impact /
+  testmon) = DEFERRED** — à rouvrir sur GO explicite après cette Phase 1 mesurée.
+- **Cleanup** : branche `sb/ops-ci-efficiency` (remote + locale) et worktree `-ops-ci-efficiency`
+  supprimés au GO CLEANUP.
+
+**Verdict post-merge :** ✅ **Sb_OPS.ci-efficiency — MERGED + CANONICAL CI GREEN.** Pipeline parallélisé
+sur le trunk : job `test` **~37 → ~11 min** (~3.4×), couverture intacte, gate CLEAN, zéro test retiré.
