@@ -59,6 +59,7 @@ from app.services.user_program_drafts import (
     replace_draft_tree,
     validate_draft,
 )
+from app.services.user_program_exercise_catalog import enrich, picker_options
 from app.services.user_program_generator import (
     MAX_SESSIONS,
     SPLIT_LABELS,
@@ -128,6 +129,10 @@ def _render_editor(
             "program": program,
             "session_count": session_count,
             "exercise_count": exercise_count,
+            # WIZARD_05 — read-only EKB picker options (all 103 canonical names)
+            # for the add-exercise <datalist>. Single common render path → every
+            # editor re-render inherits the same catalog, no duplicated loading.
+            "picker_options": picker_options(),
             "error": error,
             "active_session": latest_open_session(db, user.id),
         },
@@ -224,6 +229,12 @@ def _append_exercise(
             exercises = session.setdefault("exercises", [])
             exercises.append(
                 {
+                    # WIZARD_05 — denormalized EKB fields for an EXACT canonical
+                    # match; `enrich` returns {} for free-text (fields stay
+                    # absent/null). Spread FIRST so the explicit contract keys
+                    # below always win: `exercise_name` verbatim, source_reason
+                    # 'manual'. No EKB DB dependency (JSON read-only).
+                    **enrich(exercise_name),
                     "position": len(exercises) + 1,
                     "exercise_name": exercise_name,
                     "set_scheme": f"{sets}x {min_reps}-{max_reps}",
