@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{# Same editability rule, and the same expression, as detail.html — not a second
+   implementation: `replace_draft_tree` owns the refusal, this only avoids offering an
+   action that can never succeed. #}
+{% set editable = program.archived_at is none and program.status in ['draft', 'validated'] %}
 {% block content %}
 <h1 class="page-title">Générer une base de programme</h1>
 
@@ -41,6 +45,7 @@
   {% endif %}
 </div>
 
+{% if editable %}
 <form method="post" action="{{ url_for('user_program_generate', program_id=program.id) }}" class="card" style="margin-top:1.5rem; max-width:36rem;">
   <div class="field">
     <label class="field__label" for="split">Style de split</label>
@@ -70,6 +75,16 @@
     {% if has_existing_tree %}Remplacer et générer{% else %}Générer la base{% endif %}
   </button>
 </form>
+{% else %}
+  {# A locked programme keeps its summary — the user should still see what it holds — but
+     is offered no control, because a confirmed POST would be refused by the service.
+     Showing a button that can only ever fail is worse than showing none. #}
+  <p class="card" style="margin-top:1.5rem; max-width:36rem;">
+    Ce programme n'est plus modifiable
+    ({% if program.archived_at is not none %}archivé{% else %}{{ program.status }}{% endif %}) :
+    la génération n'est pas disponible.
+  </p>
+{% endif %}
 
 <p style="margin-top:1.5rem;">
   <a class="btn btn--ghost" href="{{ url_for('user_program_detail', program_id=program.id) }}">← Éditeur</a>

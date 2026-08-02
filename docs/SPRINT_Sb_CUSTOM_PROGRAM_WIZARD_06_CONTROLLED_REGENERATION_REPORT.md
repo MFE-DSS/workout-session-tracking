@@ -20,7 +20,7 @@ l'arbre séance par séance, ou abandonner le programme. La protection est conse
 |---|---|
 | `app/routers/user_programs.py` | `confirm_replace` sur le POST ; refus conditionnel ; 4 clés de résumé dans `_render_generate` |
 | `app/templates/user_programs/generate.html` | avertissement, résumé chiffré, case à cocher ; formulaire rendu dans les deux cas |
-| `tests/test_user_programs_generate_http.py` | 17 tests ajoutés (15 → 32 fonctions) |
+| `tests/test_user_programs_generate_http.py` | 20 tests ajoutés (15 → 35 fonctions) |
 | `docs/strategy/SPEC_REGISTRY.md` | entrée WIZARD_06 |
 | `docs/strategy/ROADMAP_AND_NEXT_STEPS.md` | statut WIZARD_06 |
 
@@ -61,7 +61,7 @@ serveur, et la case n'est que la façon d'exprimer le consentement. Aucun JS n'e
 
 ## 6. Tests
 
-`tests/test_user_programs_generate_http.py` — **41 passés** (15 existants + 17 ajoutés, dont des
+`tests/test_user_programs_generate_http.py` — **44 passés** (15 existants + 20 ajoutés, dont des
 cas paramétrés).
 
 Ajoutés : génération vide inchangée · non vide sans confirmation (`200` + arbre, exercices et nom de
@@ -94,6 +94,13 @@ correctement (`0` affiché) — aucune expression de template ne casse.
 
 **Double POST confirmé.** Un remplacement par requête ; aucune `UserProgramQualityReview` ni
 `WorkoutTemplate` supplémentaire (mesuré avant/après).
+
+**REQUIRED corrigé après revue distante (Gitar, PR #44) — un bouton condamné.** Retirer le
+`{% if is_empty %}` du template faisait apparaître « Remplacer et générer » et la case de
+confirmation sur un programme `published`/`archived`, alors que tout POST confirmé y est refusé par
+le service : une impasse que l'ancien template évitait en masquant le formulaire. Le contrôle est
+désormais masqué pour les statuts verrouillés, via **la même expression que `detail.html`** (pas une
+seconde implémentation) ; le résumé, lui, reste visible — l'utilisateur peut regarder, pas agir.
 
 Aucun BLOCKER. Une limitation acceptée : le résumé reste un instantané (§8).
 

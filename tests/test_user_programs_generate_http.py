@@ -605,3 +605,43 @@ def test_the_summary_survives_sessions_and_exercises_with_no_children(client):
     assert r.status_code == 200
     assert "<strong>2</strong>" in r.text  # 2 séances
     assert "<strong>0</strong>" in r.text  # 0 séries
+
+
+@pytest.mark.parametrize("locked", ["published", "archived"])
+def test_a_locked_program_is_offered_no_generation_control(client, locked):
+    """Gitar (PR #44): removing the `is_empty` gate exposed a doomed button.
+
+    A locked programme would have shown "Remplacer et générer" and a confirmation
+    checkbox, while any confirmed POST is refused by the service — a dead end the
+    pre-WIZARD_06 template avoided by hiding the form. The summary stays visible; the
+    control does not.
+    """
+    from app.models.user_program import UserProgram
+    from app.services.user_program_drafts import archive_draft
+
+    pid = _make_program("LockedUI", f"gen06-lockedui-{locked}")
+    _seed_one_session(pid)
+    with _session() as db:
+        if locked == "archived":
+            archive_draft(db, _uid(), pid)
+        else:
+            db.get(UserProgram, pid).status = "published"
+            db.commit()
+
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert "n'est plus modifiable" in r.text
+    assert 'name="confirm_replace"' not in r.text
+    assert "Remplacer et générer" not in r.text
+    # The factual summary is still shown — the user may look, just not act.
+    assert "<strong>1</strong>" in r.text
+
+
+def test_an_editable_nonempty_program_still_offers_the_control(client):
+    """The guard above must not swallow the case the sprint exists for."""
+    pid = _make_program("EditableUI", "gen06-editableui")
+    _seed_one_session(pid)
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert 'name="confirm_replace"' in r.text
+    assert "Remplacer et générer" in r.text
