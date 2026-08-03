@@ -4,9 +4,9 @@
 #
 #    pip-compile --output-file=requirements-lock.txt --strip-extras requirements.txt
 #
-alembic==1.18.4
+alembic==1.18.5
     # via -r requirements.txt
-annotated-doc==0.0.4
+annotated-doc==0.0.5
     # via fastapi
 annotated-types==0.7.0
     # via pydantic
@@ -18,7 +18,7 @@ bcrypt==4.3.0
     # via
     #   -r requirements.txt
     #   passlib
-click==8.4.1
+click==8.4.2
     # via uvicorn
 fastapi==0.136.3
     # via -r requirements.txt
@@ -47,7 +47,7 @@ pydantic==2.13.4
     #   pydantic-settings
 pydantic-core==2.46.4
     # via pydantic
-pydantic-settings==2.14.1
+pydantic-settings==2.14.2
     # via -r requirements.txt
 python-dotenv==1.2.2
     # via
@@ -57,7 +57,7 @@ python-multipart==0.0.32
     # via -r requirements.txt
 pyyaml==6.0.3
     # via uvicorn
-sqlalchemy==2.0.50
+sqlalchemy==2.0.51
     # via
     #   -r requirements.txt
     #   alembic
