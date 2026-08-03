@@ -54,6 +54,14 @@ include = ["app*"]
 # CI always runs with --cov to produce coverage.xml for SonarCloud.
 [tool.coverage.run]
 source = ["app"]
+# Sb_OPS.sonar-coverage-fix — emit RELATIVE file paths in coverage.xml so the
+# SonarCloud Cobertura sensor resolves them against `sonar.sources=app`
+# deterministically, independent of scanner version. Previously the paths were
+# absolute (`<source>.../app</source>` + `filename="config.py"`) and the CI
+# `sed` `app/`-prefix double-prefixed under the bumped Java 21 scanner
+# (`.../app` + `app/config.py` -> `.../app/app/config.py`), so NO path resolved
+# and ALL coverage read 0.0%. This pairs with removing that `sed` step in ci.yml.
+relative_files = true
 branch = false
 omit = [
     "app/__init__.py",
