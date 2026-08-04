@@ -51,7 +51,8 @@ def finding(sev="MAJOR"):
 # ---- schema / validator ----
 
 def test_five_judge_roles_exist():
-    assert V.ROLES == set(ROLES) and len(V.ROLES) == 5
+    assert V.ROLES == set(ROLES)
+    assert len(V.ROLES) == 5
 
 
 def test_schema_rejects_missing_evidence():
