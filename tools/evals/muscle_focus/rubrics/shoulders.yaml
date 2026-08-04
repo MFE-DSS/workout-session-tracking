@@ -1,0 +1,40 @@
+# Shoulders region rubric — constraints given to judges (no suggested verdict).
+schema_version: "1.0.0"
+region: shoulders
+candidate_sha256: "5eb7bedfa031b2e9fe29e60c1a17c1fe2822a46c0a3153f2fab14951fcc94983"
+views: [front, back]
+
+product_candidate: "source-segmented deltoid (clavicular/acromial/spinal -> anterior/lateral/posterior) + scapula/clavicle/humerus context"
+
+special_rules:
+  - "Assess front and back distinctly."
+  - "Assess shared scale between front and back."
+  - "Verify clavicular -> anterior mapping."
+  - "Verify acromial -> lateral mapping."
+  - "Verify spinal -> posterior mapping."
+
+constraints:
+  front_and_back_master_views_retained: true
+  runtime_one_view_at_a_time: "future implementation constraint only; NOT under review"
+  source_separated_deltoid_mapping_must_remain_exact: true
+  plan_b_expected: "no, unless a MAJOR visual defect is found"
+
+evidence_files:
+  - "02_PREVIEWS/shoulders_isolated_neutral.png"
+  - "02_PREVIEWS/shoulders_preview_360.png"
+  - "02_PREVIEWS/shoulders_preview_desktop.png"
+  - "03_DIAGNOSTICS/shoulders_front_back_comparison.png"
+  - "03_DIAGNOSTICS/shoulders_front_hero_only.png"
+  - "03_DIAGNOSTICS/shoulders_back_hero_only.png"
+  - "03_DIAGNOSTICS/shoulders_front_context_only.png"
+  - "03_DIAGNOSTICS/shoulders_back_context_only.png"
+  - "03_DIAGNOSTICS/shoulders_front_source_part_audit.png"
+  - "03_DIAGNOSTICS/shoulders_back_source_part_audit.png"
+  - "03_DIAGNOSTICS/shoulders_front_source_id_audit.png"
+  - "03_DIAGNOSTICS/shoulders_back_source_id_audit.png"
+  - "03_DIAGNOSTICS/shoulders_front_occlusion_audit.png"
+  - "03_DIAGNOSTICS/shoulders_back_occlusion_audit.png"
+  - "04_PROVENANCE/auren-plate-region-shoulders.source-to-path.json"
+  - "04_PROVENANCE/bodyparts3d_shoulders_input_lock.json"
+
+known_unresolved_warnings: []

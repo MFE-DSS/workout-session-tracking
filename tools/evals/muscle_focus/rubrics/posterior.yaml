@@ -1,0 +1,35 @@
+# Posterior region rubric — constraints given to judges (no suggested verdict).
+schema_version: "1.0.0"
+region: posterior
+candidate_sha256: "b84c8bceea47455c88d4ee2d3117a6387383187109a20850db2d54feaa71710f"
+views: [back]
+
+product_candidate: "gluteus maximus (whole) + grouped-honest hamstring (semitendinosus + semimembranosus + biceps femoris long/short, individual provenance preserved) + hip bone/femur/patella context"
+
+special_rules:
+  - "Assess gluteus maximus."
+  - "Assess each individual hamstring source structure (semitendinosus, semimembranosus, biceps femoris long/short)."
+  - "Assess grouped-honest presentation (grouped visually, individual provenance preserved)."
+  - "Assess distal knee region (hamstring divergence around the popliteal fossa)."
+  - "Assess subgluteal transition."
+
+constraints:
+  grouped_honest_presentation_permitted: true
+  individual_hamstring_provenance_mandatory: true
+  bone_context_must_remain_secondary: true
+  distal_knee_and_subgluteal_transitions_must_be_scored: true
+
+evidence_files:
+  - "02_PREVIEWS/posterior_isolated_neutral.png"
+  - "02_PREVIEWS/posterior_preview_360.png"
+  - "02_PREVIEWS/posterior_preview_desktop.png"
+  - "03_DIAGNOSTICS/posterior_hero_only.png"
+  - "03_DIAGNOSTICS/posterior_context_only.png"
+  - "03_DIAGNOSTICS/posterior_grouped_presentation_audit.png"
+  - "03_DIAGNOSTICS/posterior_source_id_audit.png"
+  - "03_DIAGNOSTICS/posterior_individual_structure_audit.png"
+  - "03_DIAGNOSTICS/posterior_occlusion_audit.png"
+  - "04_PROVENANCE/auren-plate-region-posterior.source-to-path.json"
+  - "04_PROVENANCE/bodyparts3d_posterior_input_lock.json"
+
+known_unresolved_warnings: []

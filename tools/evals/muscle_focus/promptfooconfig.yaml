@@ -1,0 +1,44 @@
+# Auren Muscle Focus — synthetic multimodel review council (Promptfoo config, versioned).
+# Reproducible run definition. The live council for Sb_ASSET_03B.2R-C2 was executed via independent
+# blinded Claude Code subagents because no promptfoo-usable vision-provider credential was available in
+# the build environment (see 08_synthetic_review/toolchain_lock.json). This config lets the identical
+# council be re-run through Promptfoo once a provider credential + supported Node runtime exist.
+#
+# Evidence and cases are resolved from AUREN_MUSCLE_FOCUS_REVIEW_ROOT via scripts/build_cases.py.
+# No credential is written here. Mandatory baseline = Anthropic Claude vision via Claude Code auth.
+
+description: "Auren Muscle Focus blinded synthetic anatomical/product review council (5 judges x 3 regions)"
+
+env:
+  PROMPTFOO_DISABLE_TELEMETRY: "1"
+  PROMPTFOO_DISABLE_SHARING: "1"
+
+providers:
+  - id: anthropic:messages:claude-opus-4-8
+    label: claude-vision
+    config:
+      apiKeyRequired: false      # use Claude Code auth; do NOT write a credential into this file
+      temperature: 0
+      max_tokens: 4096
+  # Optional cross-family providers are added ONLY when a valid credential already exists:
+  # - id: openai:gpt-4o           # requires OPENAI_API_KEY already present in env
+  # - id: google:gemini-1.5-pro   # requires GOOGLE_API_KEY already present in env
+
+prompts:
+  - file://prompts/anatomy_consistency.md
+  - file://prompts/medical_illustration.md
+  - file://prompts/fitness_semantics.md
+  - file://prompts/adversarial_falsifier.md
+  - file://prompts/provenance_governance.md
+
+# Test cases (region x role, with per-case evidence images + text) are generated deterministically:
+#   AUREN_MUSCLE_FOCUS_REVIEW_ROOT=<root> python scripts/build_cases.py
+# which writes generated/cases.yaml consumed here.
+tests: file://generated/cases.yaml
+
+defaultTest:
+  assert:
+    - type: is-json
+      value: file://schemas/agent_review.schema.json
+  options:
+    repeat: 3          # three independent Claude runs per (region, role); §10

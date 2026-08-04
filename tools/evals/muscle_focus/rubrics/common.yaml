@@ -1,0 +1,65 @@
+# Auren Muscle Focus — common rubric (deterministic aggregation policy)
+# Consumed by scripts/aggregate_reviews.py. Weights, thresholds and veto rules are the
+# single source of truth for aggregation. Changing them changes governance, so this file
+# is versioned. Scores are integers 0-5 per criterion, normalized to 0-100 (x*20).
+
+schema_version: "1.0.0"
+
+# Weighted regional score. MUST total 100.
+weights:
+  anatomical_visual_consistency: 20
+  orientation_and_laterality: 12
+  source_structure_completeness: 12
+  context_relationships: 8
+  occlusion_integrity: 8
+  silhouette_readability: 10
+  mobile_readability: 8
+  product_semantic_clarity: 8
+  provenance_honesty: 8
+  scope_and_claim_discipline: 6
+
+consensus:
+  # standard deviation is computed on the weighted per-judge composite (0-100).
+  high_max_stddev: 7      # stddev <= 7 and no unresolved role disagreement
+  medium_max_stddev: 12   # 7 < stddev <= 12 and no critical disagreement
+  # LOW when stddev > 12, OR verdict classes differ by more than one level.
+
+veto_confirmation:
+  # A veto is confirmed only when:
+  min_independent_roles: 2         # >=2 independent judge roles each with confidence >= threshold
+  min_role_confidence: 0.80
+  # OR one judge identifies it AND the arbiter confirms it using cited evidence.
+  arbiter_single_confirm_allowed: true
+
+status_rules:
+  synthetic_accepted_internal:
+    min_score: 85
+    allowed_consensus: [HIGH, MEDIUM]
+    no_veto: true
+    no_unresolved_major: true
+  synthetic_accepted_with_constraints:
+    min_score: 75
+    no_veto: true
+    constraints_explicit_and_testable: true
+  revision_required:
+    any_of:
+      - score_below: 75
+      - unresolved_major_finding: true
+      - low_consensus_unreconciled: true
+  blocked:
+    any_of:
+      - confirmed_veto: true
+      - calibration_failure: true
+      - evidence_integrity_failure: true
+
+arbiter:
+  may_raise_score: false          # HARD: the arbiter can never increase a score
+  may_lower_status: true
+  may_reconcile_duplicate_findings: true
+  may_preserve_disagreement: true
+  may_request_martin_adjudication: true
+
+calibration:
+  require_critical_detection: 1.00   # 100% of CRITICAL calibration mutations
+  require_overall_detection: 0.90    # >= 90% of all calibration mutations
+  must_detect_all: [mirror_or_laterality, source_provenance, false_professional_or_runtime_claim]

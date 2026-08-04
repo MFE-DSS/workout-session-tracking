@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "auren/muscle_focus/agent_review.schema.json",
+  "title": "Auren Muscle Focus — synthetic judge review (single blinded agent)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "region", "candidate_sha256", "judge_role", "provider_family",
+    "model_id", "run_id", "evidence_files_reviewed", "scores", "findings", "vetoes",
+    "confidence", "proposed_verdict"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "region": { "enum": ["chest", "shoulders", "posterior"] },
+    "candidate_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "judge_role": {
+      "enum": ["J1_anatomy_consistency", "J2_medical_illustration", "J3_fitness_semantics",
+               "J4_adversarial_falsifier", "J5_provenance_governance"]
+    },
+    "provider_family": { "type": "string", "minLength": 1 },
+    "model_id": { "type": "string", "minLength": 1 },
+    "run_id": { "type": "string", "minLength": 1 },
+    "evidence_files_reviewed": {
+      "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }
+    },
+    "scores": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "orientation_and_laterality", "source_structure_completeness",
+        "anatomical_visual_consistency", "context_relationships", "occlusion_integrity",
+        "silhouette_readability", "mobile_readability", "product_semantic_clarity",
+        "provenance_honesty", "scope_and_claim_discipline"
+      ],
+      "properties": {
+        "orientation_and_laterality": { "$ref": "#/$defs/score" },
+        "source_structure_completeness": { "$ref": "#/$defs/score" },
+        "anatomical_visual_consistency": { "$ref": "#/$defs/score" },
+        "context_relationships": { "$ref": "#/$defs/score" },
+        "occlusion_integrity": { "$ref": "#/$defs/score" },
+        "silhouette_readability": { "$ref": "#/$defs/score" },
+        "mobile_readability": { "$ref": "#/$defs/score" },
+        "product_semantic_clarity": { "$ref": "#/$defs/score" },
+        "provenance_honesty": { "$ref": "#/$defs/score" },
+        "scope_and_claim_discipline": { "$ref": "#/$defs/score" }
+      }
+    },
+    "findings": { "type": "array", "items": { "$ref": "#/$defs/finding" } },
+    "vetoes": { "type": "array", "items": { "$ref": "#/$defs/veto" } },
+    "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+    "proposed_verdict": {
+      "enum": ["ACCEPT", "ACCEPT_WITH_CONSTRAINTS", "REVISION_REQUIRED", "BLOCKED", "INSUFFICIENT_EVIDENCE"]
+    }
+  },
+  "$defs": {
+    "score": { "type": "integer", "minimum": 0, "maximum": 5 },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["severity", "structure", "side", "view", "evidence", "rationale",
+                   "proposed_action", "confidence"],
+      "properties": {
+        "severity": { "enum": ["CRITICAL", "MAJOR", "MINOR", "OBSERVATION"] },
+        "structure": { "type": "string", "minLength": 1 },
+        "side": { "enum": ["left", "right", "bilateral", "midline", "not_applicable"] },
+        "view": { "enum": ["front", "back", "both", "not_applicable"] },
+        "evidence": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string", "minLength": 1 },
+        "proposed_action": { "type": "string", "minLength": 1 },
+        "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 }
+      }
+    },
+    "veto": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "rationale", "confidence", "evidence"],
+      "properties": {
+        "type": {
+          "enum": ["mirror_or_laterality_inversion", "mandatory_source_structure_missing",
+                   "source_provenance_lost", "false_source_segmented_claim",
+                   "open3dmodel_or_servier_contamination", "generative_anatomy",
+                   "false_professional_approval_claim", "unsafe_runtime_claim",
+                   "schema_or_calibration_integrity_failure"]
+        },
+        "rationale": { "type": "string", "minLength": 1 },
+        "confidence": { "type": "number", "minimum": 0.0, "maximum": 1.0 },
+        "evidence": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
