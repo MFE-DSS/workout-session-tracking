@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auren Muscle Focus — P0 Regional Plates (design-source preview v0.2.0)</title>
+<style>
+:root{color-scheme:light dark}
+*{box-sizing:border-box}body{margin:0;font-family:ui-monospace,Menlo,monospace;line-height:1.5;
+ background:#0f1318;color:#e6e6e6}
+main{max-width:1000px;margin:0 auto;padding:16px}h1{font-size:18px}
+.muted{color:#8a97a8}.gate{display:inline-block;border:1px solid #2a3140;border-radius:5px;padding:2px 8px;margin:2px;font-size:12px}
+figure{background:#151a21;border:1px solid #2a3140;border-radius:10px;padding:12px;margin:16px 0}
+figcaption{font-size:13px;color:#f6c667;margin-bottom:6px}
+.plate{width:100%;background:#0b0e12;border-radius:8px}
+img{width:100%;height:auto;display:block;filter:invert(0.82) sepia(0.4) saturate(3) hue-rotate(5deg)}
+table{border-collapse:collapse;width:100%;font-size:12px;margin-top:8px}td{border:1px solid #2a3140;padding:3px 6px}
+td:first-child{color:#8a97a8;white-space:nowrap}code{color:#f6c667;word-break:break-all}
+@media print{body{background:#fff;color:#000}}@media(max-width:400px){main{padding:10px}}
+</style>
+<main>
+<h1>Auren Muscle Focus — P0 Regional Plates (design-source preview)</h1>
+<div class="muted">Sb_ASSET_03B.2R-D1 · design-source intake · v0.2.0. Silhouette preview only — runtime
+applies Auren Terminal colour tokens; the plate SVGs carry no business colour.</div>
+<div style="margin-top:8px">
+<span class="gate">SOURCE: BodyParts3D 4.0 (CC BY 4.0)</span>
+<span class="gate">ai_usage: NONE</span>
+<span class="gate">PROFESSIONAL ANATOMICAL REVIEW: NOT PERFORMED / NOT CLAIMED</span>
+<span class="gate">ASSET INTEGRATION GATE: BLOCKED</span>
+<span class="gate">NOT AUTHORIZED FOR APP INTEGRATION</span></div>
+
+<figure><figcaption>Chest — whole bilateral pectoralis (front · partition excluded)</figcaption>
+<img class="plate" alt="chest regional plate silhouette" src="../../source/muscle-focus/auren-plate-region-chest.svg">
+<table><tbody>
+<tr><td>plate_id</td><td><code>auren-plate-region-chest</code></td></tr>
+<tr><td>mode</td><td>whole-region (diagnostic partition NOT ACCEPTED / forbidden at runtime)</td></tr>
+<tr><td>sha256</td><td><code>7a4167eac1db085f1cfb41ae2b2465a3b2c720a4978361eef69e422b104bddfd</code></td></tr>
+<tr><td>owner decision</td><td>ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS (C1/C2 deferred)</td></tr>
+</tbody></table></figure>
+
+<figure><figcaption>Shoulders — source-segmented deltoid (front | back, shared scale)</figcaption>
+<img class="plate" alt="shoulders regional plate silhouette" src="../../source/muscle-focus/auren-plate-region-shoulders.svg">
+<table><tbody>
+<tr><td>plate_id</td><td><code>auren-plate-region-shoulders</code></td></tr>
+<tr><td>mode</td><td>muscle-heads (anterior / lateral / posterior — clavicular / acromial / spinal)</td></tr>
+<tr><td>sha256</td><td><code>5eb7bedfa031b2e9fe29e60c1a17c1fe2822a46c0a3153f2fab14951fcc94983</code></td></tr>
+<tr><td>owner decision</td><td>ACCEPT_INTERNAL_P0 · runtime: one view at a time, front default (S2–S4)</td></tr>
+</tbody></table></figure>
+
+<figure><figcaption>Posterior — gluteus + grouped-honest hamstring (back)</figcaption>
+<img class="plate" alt="posterior regional plate silhouette" src="../../source/muscle-focus/auren-plate-region-posterior.svg">
+<table><tbody>
+<tr><td>plate_id</td><td><code>auren-plate-region-posterior</code></td></tr>
+<tr><td>mode</td><td>grouped-honest (individual hamstring provenance preserved; not a unified source mesh)</td></tr>
+<tr><td>sha256</td><td><code>b84c8bceea47455c88d4ee2d3117a6387383187109a20850db2d54feaa71710f</code></td></tr>
+<tr><td>owner decision</td><td>ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS (P4 deferred)</td></tr>
+</tbody></table></figure>
+
+<p class="muted">Attribution: BodyParts3D, © The Database Center for Life Science, licensed under CC
+Attribution 4.0 International (see design/auren/LICENSES/bodyparts3d-NOTICE.md). Internal synthetic
+single-family multi-agent review only — this is NOT a qualified professional anatomical review and makes
+no medical or legal claim. Machine-readable descriptors: source/muscle-focus/auren_muscle_focus_registry.yaml.</p>
+</main></html>

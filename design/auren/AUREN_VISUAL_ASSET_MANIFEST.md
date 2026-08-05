@@ -194,6 +194,35 @@ package v2 déterministe `f45e0dbf…` **reproduit indépendamment**. `ai_usage:
 Revue produit/anatomique/mobile : **NOT YET REVIEWED**. **0 entrée `approved`.** Registre machine-lisible :
 `source/bodymap/auren_bodymap_source.yaml`. **NOT AUTHORIZED FOR APP INTEGRATION.**
 
+## 5ter. Muscle Focus P0 Regional Plates (Sb_ASSET_03B.2R-D1 — design-source intake)
+
+| asset_id | fichier | semantic_contract | surfaces | statut |
+|---|---|---|---|---|
+| `auren.muscle-focus.region.chest.v1` | `source/muscle-focus/auren-plate-region-chest.svg` | `auren.plate.region.chest` | muscle-focus (N2) | `technical-intake-accepted-human-review-pending` |
+| `auren.muscle-focus.region.shoulders.v1` | `source/muscle-focus/auren-plate-region-shoulders.svg` | `auren.plate.region.shoulders` | muscle-focus (N2) | `technical-intake-accepted-human-review-pending` |
+| `auren.muscle-focus.region.posterior.v1` | `source/muscle-focus/auren-plate-region-posterior.svg` | `auren.plate.region.posterior` | muscle-focus (N2) | `technical-intake-accepted-human-review-pending` |
+
+Œuvres **dérivées sous attribution** : géométrie **entièrement issue de BodyParts3D 4.0** (CC BY 4.0, DBCLS ;
+FMA-curated, 0 arterial), produite par un **pipeline opérateur déterministe** (projection orthographique +
+rastérisation + potrace ; masques byte-répétables) — **`ai_usage: NONE`** (géométrie jamais générée par IA).
+**chest** = pectoral entier (partition clavicular/sternocostal **exclue, non acceptée, interdite au runtime**),
+sha256 `7a4167ea…`, 18811 o ; **shoulders** = deltoïde source-segmenté antérieur/latéral/postérieur, front+back
+échelle partagée, sha256 `5eb7bedf…`, 33159 o ; **posterior** = grand fessier + ischio **grouped-honest**
+(provenance individuelle préservée, **pas** de maillage source unifié), sha256 `b84c8bce…`, 13701 o.
+
+Champs communs par entrée : `version: 0.2.0` · `type: muscle-focus-regional-plate` · `format: svg` ·
+`license: CC-BY-4.0` · `provenance: <asset_id>` (cf. `AUREN_ASSET_PROVENANCE.md`) · `semantic_contract:
+auren.plate.region.<macro>` · `accessibility: {caption: adjacent-HTML (§5bis), aria: bodymap-style decorative}` ·
+`review: {product: AWAITING MARTIN → ACCEPT_WITH_CONSTRAINTS recorded (owner internal decision, NOT professional),
+synthetic_single_family_multi_agent: COMPLETE (internal QA), professional_anatomical: NOT PERFORMED / NOT CLAIMED,
+technical: deterministic replay + validators + 25-mutation harness PASS, legal: NOT YET, mobile: NOT YET}` ·
+`budgets: {source_bytes: <réel>, maximum: 65536}` · `consumers: NOT YET INTEGRATED` · `deprecated_by: NONE`.
+Descripteurs machine-lisibles + shas + contraintes owner (C1–C5 / S1–S5 / P1–P5) :
+`source/muscle-focus/auren_muscle_focus_registry.yaml`. Autorité de gel : **C3 freeze manifest**
+(`d402ef64…`) + décision owner (`eea8b683…`, Martin, `ACCEPT_WITH_CONSTRAINTS`).
+`professional_anatomical_review: not-claimed` · `legal_review: required` · **0 entrée `approved`**.
+**NOT AUTHORIZED FOR APP INTEGRATION.**
+
 ## 6. Gate & nom
 `ASSET INTEGRATION GATE: BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS`. Nom Auren =
 **WORKING PRODUCT NAME · EXTERNAL PROFESSIONAL CLEARANCE OPEN** — les assets brand-bearing restent

@@ -1,0 +1,134 @@
+# Auren Muscle Focus — P0 Regional Plate Registry (machine-readable)
+# Sb_ASSET_03B.2R-D1 — governed intake of the three frozen P0 regional plate candidates.
+# Authority: the C3 freeze manifest (owner-decided). This registry is the machine-readable descriptor
+# set; the manifest (AUREN_VISUAL_ASSET_MANIFEST.md) and provenance (AUREN_ASSET_PROVENANCE.md) are the
+# human-facing companions. Guarded by tests/test_auren_muscle_focus_plates.py.
+#
+# NOT AUTHORIZED FOR APP INTEGRATION. Internal synthetic review only — NOT a qualified professional
+# anatomical review, NOT professionally/legally cleared. ai_usage: NONE (geometry never AI-generated).
+
+contract_version: "0.2.0"          # AUREN_MUSCLE_FOCUS_ID_CONTRACT.md
+schema_version: "0.2.0"            # AUREN_MUSCLE_FOCUS_DESCRIPTOR_SCHEMA.md
+sprint: "Sb_ASSET_03B.2R-D1"
+
+source:
+  name: "BodyParts3D 4.0"
+  owner: "The Database Center for Life Science (DBCLS)"
+  license_spdx: "CC-BY-4.0"
+  attribution_required: true
+  notice: "design/auren/LICENSES/bodyparts3d-NOTICE.md"
+
+provenance_authority:
+  freeze_manifest_sha256: "d402ef6429cdc566e58f6753620e7e198d1eeb99d7d3a9ff80c4a6da087eb060"
+  owner_decision_sha256: "eea8b683e15958e73b98bde30d4ef23782ca4248946344451c49f50a30a2f567"
+  owner_decision: "ACCEPT_WITH_CONSTRAINTS (Martin Feldmann, 2026-07-30T15:13:11Z)"
+
+review_status:
+  synthetic_single_family_multi_agent_review: "COMPLETE (45/45 judges, calibration 9/9 critical + 12/12; internal QA only)"
+  professional_anatomical_review: "NOT_PERFORMED_NOT_CLAIMED"
+  professional_legal_clearance: "NOT_PERFORMED_NOT_CLAIMED"
+  medical_validation: "NOT_CLAIMED"
+  asset_integration_gate: "BLOCKED"
+
+id_scheme: "p0-pipeline"           # ID Contract §3bis (v0.2.0) — prefix-isolated descriptive scheme; geom-* remains the authoring target.
+ai_usage: "NONE"
+
+plates:
+  - plate_id: "auren-plate-region-chest"
+    level: "2-regional"
+    mode: "whole-region"           # whole bilateral pectoralis; diagnostic partition EXCLUDED
+    schema_version: "0.2.0"
+    zone_codes: ["pecs"]
+    macro: "chest"
+    region_key_kind: "macro"
+    views: ["front"]
+    viewbox_local: "0 0 2048.000000 2048.000000"
+    parts: []                      # partition excluded — no sub-heads claimed (honest whole muscle)
+    markers: []
+    exercise_link_granularity: "zone"
+    exercise_link_mode: "list"
+    source_refs: ["bodyparts3d-4.0"]
+    attribution_required: true
+    ai_usage: "NONE"
+    non_medical: true
+    scored: false
+    caption_mirrors_overlay: true
+    file: "design/auren/source/muscle-focus/auren-plate-region-chest.svg"
+    sha256: "7a4167eac1db085f1cfb41ae2b2465a3b2c720a4978361eef69e422b104bddfd"
+    bytes: 18811
+    status: "technical-intake-accepted-human-review-pending"
+    owner_decision: "ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS"
+    diagnostic_partition: "REVIEW_PARTITION_UNRESOLVED / NOT ACCEPTED / FORBIDDEN AT RUNTIME"
+    plan_b: "OPEN / DEFERRED"
+    constraints:
+      C1: "reassess medial sternal contour feathering before a later visual refinement release"
+      C2: "reassess sternal-origin / humeral-insertion z-layering before any N3 overlay or insertion markers"
+      C3: "clavicular/sternocostal partition must not enter intake as an accepted product region"
+      C4: "unresolved partition must not appear in runtime"
+      C5: "whole-pectoralis asset may proceed to P0 intake and controlled runtime integration"
+
+  - plate_id: "auren-plate-region-shoulders"
+    level: "2-regional"
+    mode: "muscle-heads"           # source-segmented deltoid (clavicular/acromial/spinal -> anterior/lateral/posterior)
+    schema_version: "0.2.0"
+    zone_codes: ["delt_lat", "delt_post"]
+    macro: "shoulders"
+    region_key_kind: "macro"
+    views: ["front", "back"]
+    viewbox_local: "0 0 4096.000 2048.0"
+    parts: ["part-delt_lat-anterior", "part-delt_lat-lateral", "part-delt_post-posterior"]
+    markers: []
+    exercise_link_granularity: "zone"
+    exercise_link_mode: "list"
+    source_refs: ["bodyparts3d-4.0"]
+    attribution_required: true
+    ai_usage: "NONE"
+    non_medical: true
+    scored: false
+    caption_mirrors_overlay: true
+    file: "design/auren/source/muscle-focus/auren-plate-region-shoulders.svg"
+    sha256: "5eb7bedfa031b2e9fe29e60c1a17c1fe2822a46c0a3153f2fab14951fcc94983"
+    bytes: 33159
+    status: "technical-intake-accepted-human-review-pending"
+    owner_decision: "ACCEPT_INTERNAL_P0"
+    plan_b: "NOT REQUIRED"
+    constraints:
+      S1: "master asset retains front and back views"
+      S2: "mobile runtime presents one view at a time"
+      S3: "front is the default mobile view"
+      S4: "back available through an explicit accessible control"
+      S5: "clavicular/acromial/spinal source terminology <-> anterior/lateral/posterior product mapping remain traceable"
+
+  - plate_id: "auren-plate-region-posterior"
+    level: "2-regional"
+    mode: "grouped-honest"         # gluteus maximus + grouped-honest hamstring (individual provenance preserved)
+    schema_version: "0.2.0"
+    zone_codes: ["posterior"]
+    macro: "legs"
+    region_key_kind: "zone"
+    views: ["back"]
+    viewbox_local: "0 0 2048.000 2048.0"
+    parts: ["part-posterior-gluteus", "part-posterior-hamstring"]
+    markers: []
+    exercise_link_granularity: "zone"
+    exercise_link_mode: "list"
+    source_refs: ["bodyparts3d-4.0"]
+    attribution_required: true
+    ai_usage: "NONE"
+    non_medical: true
+    scored: false
+    caption_mirrors_overlay: true
+    file: "design/auren/source/muscle-focus/auren-plate-region-posterior.svg"
+    sha256: "b84c8bceea47455c88d4ee2d3117a6387383187109a20850db2d54feaa71710f"
+    bytes: 13701
+    status: "technical-intake-accepted-human-review-pending"
+    owner_decision: "ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS"
+    plan_b: "DEFERRED / NOT REQUIRED FOR P0"
+    hamstring_individual_sources: ["semitendinosus", "semimembranosus", "biceps femoris long head", "biceps femoris short head"]
+    hamstring_unified_source_mesh: false
+    constraints:
+      P1: "preserve individual source provenance (semitendinosus, semimembranosus, biceps femoris long & short)"
+      P2: "do not represent the hamstrings as one official source mesh"
+      P3: "keep bone context visually secondary"
+      P4: "reassess distal hamstring tendon behaviour near the knee before any N3 overlay / insertion marker / high-detail zoom"
+      P5: "current N2 grouped-honest clean plate may proceed to P0 intake and controlled runtime integration"

@@ -42,6 +42,28 @@ mesurée prétendue** (pas d'EMG/mesure physiologique). Sans visage détaillé/v
 réaliste/détails sexuels. Lisible **60–120 px**, exploitable côte à côte à **360 px**. Le BodyMap
 **localise** une région du catalogue ; il **ne mesure pas** l'intensité.
 
+## 5bis. Surfaces Muscle Focus (N2/N3, `auren-plate-*`) — carve-out gouverné
+> **Enacté `Sb_ASSET_03B.2R-D1`** (atomiquement avec le guard `tests/test_auren_muscle_focus_plates.py` et
+> la première géométrie P0). Portée **strictement bornée aux surfaces Muscle Focus Plate** (Niveaux 2 et 3,
+> IDs `auren-plate-*`).
+
+Par exception **strictement bornée aux surfaces Muscle Focus Plate** (Niveaux 2 et 3, IDs `auren-plate-*`),
+sont **autorisés, schématiques et non médicaux** : (a) la **direction de fibres** (vecteurs le long de l'axe
+réel, **jamais** histologie/veines) ; (b) les **marqueurs d'origine/insertion** ; (c) un **schéma de
+raccourcissement fonctionnel** (sens le long des fibres — **jamais** EMG/activation/%/recrutement) ; (d) une
+**vue `section` (coupe locale) schématique** — **sans viscère, sans organe, sans rendu médical**.
+**Restent interdits partout** : rendu médical réaliste, activation mesurée/EMG, viscères/organes, gradients/
+ombres, détails sexuels, visage détaillé.
+**Le contrat du BodyMap global (silhouette master) reste inchangé** : **§5** (vues orthographiques, non
+médical, pas de fibres/organes) **continue de lier** `auren-bodymap` et le compact global. Le carve-out **ne
+s'applique qu'aux plaques `auren-plate-*`**.
+**Texte hors SVG** (**§4**) : la **caption** (module 9) vit dans le **HTML adjacent**, jamais dans le SVG de
+la plaque ; elle **reflète** tout fait rendu par un overlay (invariant `caption_mirrors_overlay`).
+**Bornes dures** : n'autorise pas de toucher le master global, ni une 12ᵉ zone, ni un code hors des 11 ; ni
+activation mesurée/EMG/%/recrutement ; ni viscères même en `section`. La première géométrie P0 intakée
+(`Sb_ASSET_03B.2R-D1`) est **clean** (aucun overlay fibre/insertion/section produit à ce stade) ; ces
+overlays restent gouvernés par le présent carve-out pour les builds ultérieurs.
+
 ## 6. Taxonomie (figée — contrat normatif)
 **11 zones** : `pecs · delt_lat · delt_post · lats · upper_back · biceps · triceps · quads · posterior ·
 calves · core` (+ `unknown` = état métier neutre, **pas** une zone anatomique). **6 macros** : Chest ·
