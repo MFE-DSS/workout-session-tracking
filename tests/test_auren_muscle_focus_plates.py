@@ -22,6 +22,7 @@ tests/test_auren_bodymap_master.py / test_auren_asset_governance.py.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from pathlib import Path
 
@@ -194,13 +195,18 @@ def test_posterior_grouped_honest_individual_provenance():
 # ───────── no lying / measurement tokens anywhere in the intake ─────────
 
 def test_no_lying_or_measurement_tokens_in_registry():
-    raw = REGISTRY.read_text(encoding="utf-8").lower()
-    # 'approved' etc. may appear only as NOT_* disclaimers, never as an affirmative status value.
-    assert not re.search(r"status:\s*approved\b", raw)
-    for tok in ("legally-cleared", "runtime-ready", "integration-authorized"):
-        assert tok not in raw, f"lying token in registry: {tok}"
+    # Scan ONLY the parsed machine-readable content (YAML comments excluded), so honest NEGATIVE
+    # disclaimers that legitimately live in comments (e.g. "NOT professionally/legally cleared") never
+    # false-positive, while EVERY declared token is enforced against the actual serialized data.
+    machine_registry_text = json.dumps(_registry(), sort_keys=True, ensure_ascii=False).lower()
+    for tok in LYING_TOKENS:
+        assert tok not in machine_registry_text, (
+            f"lying token in machine-readable registry: {tok}"
+        )
     for tok in MEASURE_TOKENS:
-        assert tok not in raw, f"measurement token in registry: {tok}"
+        assert tok not in machine_registry_text, (
+            f"measurement token in machine-readable registry: {tok}"
+        )
 
 
 def test_registry_declares_gate_blocked_and_review_not_claimed():
