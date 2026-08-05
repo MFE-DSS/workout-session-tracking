@@ -68,7 +68,27 @@ appartient à la **CI de la PR**, seule capable de valider la résolution de che
 
 ---
 
-## Appendice post-merge (closeout — à compléter)
+## Appendice post-merge (closeout 2026-08-05)
 
-- Commit · PR # · **`coverage` réel post-fix (API)** · `new_coverage` sur code neuf · merge commit ·
-  CI canonique · confirmation « plus de bypass `--admin` requis ».
+- **Commit build** : `62df735` (3 fichiers, +89/−10) sur `sb/ops-sonar-coverage-fix`, base `5a85d67`.
+- **PR #47 MERGED** — merge **`cc3978e`** sur le canonique (via `--merge`, **SANS `--admin`** — gate
+  `mergeStateStatus: CLEAN` ; pas de squash ; garde `--match-head-commit`). Première PR de code du
+  cycle Custom Program mergée **sans bypass admin** grâce au coverage réparé.
+- **CI PR #47** : **5 checks verts** — `pytest + QA` · `lint` · `SonarCloud` · `Gitar` · **`SonarCloud
+  Code Analysis`** (le gate externe, **rouge à chaque PR avant ce fix**, désormais **vert**).
+- **CI canonique** : run **`30996238572`** (push) sur `cc3978e` → **3/3 GREEN** (job `test` xdist
+  **11 min 41 s**).
+- **Preuve de couverture (API `measures/component`)** :
+  - **PR #47** : `coverage = 91.1 %` (vs 0.0 % avant).
+  - **Trunk `cc3978e` (post-scan canonique)** : **`coverage = 91.1 %`**, `uncovered_lines` **6456 → 662**
+    / `lines_to_cover` 7432. **Aucun retour à 0.0 %.**
+- **Sonar issues** : delta PR #47 = **`total: 0`** (P0 n'ajoute aucune ligne `app/`). La baseline trunk
+  (~15 issues accumulées, la plus ancienne `Web:S7930` du 2026-07-17) est **pré-existante, hors scope**.
+- **Effet** : le gate `new_coverage 80%` devient **significatif** sur les futures PR de code ; **plus de
+  `--admin` systématique** si le code neuf est testé (toujours le cas). Le fix (`relative_files=true` +
+  retrait du `sed`) est **prouvé sur CI réelle**, PR **et** trunk.
+- **Cleanup** : branche `sb/ops-sonar-coverage-fix` (remote + locale) et worktree `-ops-sonar-coverage-fix`
+  supprimés au closeout.
+
+**Verdict post-merge :** ✅ **Sb_OPS.sonar-coverage-fix — MERGED + CANONICAL CI GREEN + COVERAGE
+0.0 % → 91.1 %.**
