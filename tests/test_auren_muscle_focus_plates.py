@@ -131,7 +131,8 @@ def test_no_text_inside_plate_svg():
 def test_no_script_or_external_resource():
     for root in P0_ROOTS:
         s = _svg(root).lower()
-        assert "<script" not in s and "onload" not in s, f"{root}: script/handler"
+        assert "<script" not in s, f"{root}: script"
+        assert "onload" not in s, f"{root}: handler"
         assert not re.search(r'href="https?:(?!//www\.w3\.org)', s), f"{root}: external URL"
 
 
@@ -150,7 +151,8 @@ def test_each_descriptor_invariants():
         assert d["level"] == "2-regional"
         assert d["mode"] in MODES
         assert d["schema_version"] == "0.2.0"
-        assert d["zone_codes"] and set(d["zone_codes"]) <= ZONE_CODES
+        assert d["zone_codes"]
+        assert set(d["zone_codes"]) <= ZONE_CODES
         assert d["macro"] in MACROS
         assert d["region_key_kind"] in ("macro", "zone")   # REQUIS since level=2-regional
         assert set(d["views"]) <= {"front", "back"}         # N2 ⊆ {front, back}
@@ -217,10 +219,12 @@ def test_5bis_names_plate_scope_and_bounds():
     assert "## 5bis." in src
     bis = src.split("## 5bis.", 1)[1].split("\n## 6.", 1)[0]
     assert "auren-plate-*" in bis                            # bounded to plate surfaces
-    assert "N2" in bis and "N3" in bis
+    assert "N2" in bis
+    assert "N3" in bis
     assert "reste inchangé" in bis                           # master global unchanged
     # measured activation / EMG stay forbidden even in the carve-out
-    assert "EMG" in bis and ("jamais" in bis or "interdit" in bis.lower())
+    assert "EMG" in bis
+    assert "jamais" in bis or "interdit" in bis.lower()
 
 
 def test_section5_stays_flat_prohibition_for_bodymap():
