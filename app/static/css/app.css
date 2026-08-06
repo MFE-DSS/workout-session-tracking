@@ -3381,7 +3381,7 @@ summary:focus-visible,
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-.muscle-focus__toggle { display: inline-flex; gap: 4px; margin-bottom: var(--space-sm); }
+.muscle-focus__toggle { display: inline-flex; gap: 4px; margin: 0 0 var(--space-sm); border: 0; padding: 0; min-inline-size: 0; }
 .muscle-focus__toggle-btn {
   cursor: pointer; padding: 4px 14px; border: 1px solid var(--border-strong);
   border-radius: 999px; font-size: 13px; color: var(--fg-dim); background: var(--surface);

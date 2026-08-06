@@ -7,7 +7,7 @@
    tokens (Auren Terminal); the SVGs carry no business colour.
 
    Non-medical fitness visualisation. NOT a professional anatomical review; not claimed. #}
-<div class="muscle-focus" role="group" aria-labelledby="mf-title">
+<div class="muscle-focus">
   <p class="muscle-focus__intro text-dim">
     Trois planches régionales dérivées de sources anatomiques ouvertes. Repères visuels
     non médicaux — aucune mesure d'activation, aucune prétention clinique.
@@ -29,10 +29,11 @@
   <figure class="muscle-focus__plate muscle-focus__plate--shoulders">
     <input type="radio" name="mf-shoulders-view" id="mf-shoulders-front" class="muscle-focus__view-input" checked>
     <input type="radio" name="mf-shoulders-view" id="mf-shoulders-back" class="muscle-focus__view-input">
-    <div class="muscle-focus__toggle" role="group" aria-label="Vue des épaules">
+    <fieldset class="muscle-focus__toggle">
+      <legend class="sr-only">Vue des épaules</legend>
       <label class="muscle-focus__toggle-btn" for="mf-shoulders-front">Face</label>
       <label class="muscle-focus__toggle-btn" for="mf-shoulders-back">Dos</label>
-    </div>
+    </fieldset>
     <div class="muscle-focus__frame muscle-focus__frame--shoulders" aria-hidden="true">
       {% include "_partials/muscle_focus_plate_shoulders.svg" %}
     </div>
