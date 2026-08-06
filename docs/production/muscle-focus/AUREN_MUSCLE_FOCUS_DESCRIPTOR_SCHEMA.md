@@ -5,7 +5,10 @@ qu'un descripteur de Muscle Focus Plate doit porter, **sans produire aucune plaq
 BLOCKED` · `PLATE GEOMETRY: NOT PRODUCED`.
 **Références normatives** : [`AUREN_MUSCLE_FOCUS_ID_CONTRACT.md`](AUREN_MUSCLE_FOCUS_ID_CONTRACT.md) ·
 [`../../strategy/Sx_ASSET_03B_MUSCLE_FOCUS_TECHNICAL_SURFACE_SYSTEM_SPEC.md`](../../strategy/Sx_ASSET_03B_MUSCLE_FOCUS_TECHNICAL_SURFACE_SYSTEM_SPEC.md) §7-§10.
-**`SCHEMA VERSION: 0.1.0`** (aligné sur `CONTRACT VERSION` de l'ID Contract ; bump conjoint).
+**`SCHEMA VERSION: 0.2.0`** (aligné sur `CONTRACT VERSION` de l'ID Contract ; bump conjoint).
+**v0.2.0 (`Sb_ASSET_03B.2R-D1`, évolution gouvernée additive)** : ajoute le mode **`whole-region`** (plaque N2
+montrant un muscle **entier** sans chef ni regroupement — ex. chest, partition exclue) et **clarifie** l'usage
+des modes au niveau **N2 régional** (invariant #1). Additif : aucun champ retiré, aucun invariant affaibli.
 
 > Ce schéma **succède au gabarit** de `AUREN_MUSCLE_FOCUS_PLATE_TEMPLATE.md` : il en **fige** la forme et
 > **ajoute** les garde-fous issus de la revue adversariale (exercise-link zone-only, caption-miroir de
@@ -20,7 +23,7 @@ BLOCKED` · `PLATE GEOMETRY: NOT PRODUCED`.
 # ── identité ────────────────────────────────────────────────────────────────
 plate_id:            <string>     # REQUIS · ∈ les 19 racines figées (ID Contract §3)
 level:               <enum>       # REQUIS · "2-regional" | "3-muscle"
-mode:                <enum>       # REQUIS · "muscle-heads" | "grouped-honest"
+mode:                <enum>       # REQUIS · "muscle-heads" | "grouped-honest" | "whole-region" (N2, v0.2.0)
 schema_version:      <semver>     # REQUIS · == "0.1.0" en v0.1.0 (== CONTRACT VERSION)
 
 # ── ancrage taxonomie (Layer A, jamais étendu) ──────────────────────────────
@@ -53,8 +56,12 @@ caption_mirrors_overlay: true     # CONSTANT · true — la caption porte le tex
 
 ## 2. Invariants durs (à faire respecter par le futur guard)
 
-1. **`plate_id` ∈ 19 racines** (ID Contract §3) ; `level`/`mode` cohérents (les 2 `grouped-honest` sont
-   `upper_back` et `posterior`, toutes deux `level: 3-muscle`).
+1. **`plate_id` ∈ 19 racines** (ID Contract §3) ; `level`/`mode` cohérents. Au **N3 muscle**, les 2
+   `grouped-honest` sont `upper_back` et `posterior`. Au **N2 régional (v0.2.0)** : `whole-region` = muscle
+   entier sans chef ni regroupement (**chest**, partition exclue) ; `muscle-heads` = chefs/parts réellement
+   source-segmentés (**shoulders** : deltoïde clavicular/acromial/spinal → antérieur/latéral/postérieur) ;
+   `grouped-honest` = présentation regroupée honnête à provenance individuelle préservée (**posterior** :
+   fessier + groupe ischio). `whole-region` est **réservé au N2** (`level: 2-regional`).
 2. **`zone_codes ⊆ 11`, non vide, aucun code inventé.** `scored == false` et `non_medical == true` **littéraux**
    (rejet si absents ou modifiés).
 3. **`region_key_kind`** REQUIS ⇔ `level == 2-regional` ; valeur cohérente avec ID Contract §3 (chest/shoulders/
