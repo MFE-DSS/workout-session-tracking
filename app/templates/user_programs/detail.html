@@ -19,6 +19,15 @@
   </dl>
   {% if program.status == 'validated' %}
     <p class="text-dim" style="margin-top:.5rem;">Éditer ce programme validé le repassera en brouillon.</p>
+    {# PUBLICATION_01 — a validated program is the only publishable state. #}
+    <p style="margin-top:.75rem;">
+      <a class="btn btn--primary" href="{{ url_for('user_program_publish_form', program_id=program.id) }}">Publier ce programme</a>
+    </p>
+  {% elif program.status == 'published' %}
+    <p class="text-dim" style="margin-top:.5rem;">Programme publié — ses séances sont disponibles dans vos modèles.</p>
+    <p style="margin-top:.75rem;">
+      <a class="btn btn--ghost" href="{{ url_for('user_program_publish_form', program_id=program.id) }}">Voir la publication</a>
+    </p>
   {% elif not editable %}
     <p class="text-dim" style="margin-top:.5rem;">Ce programme n'est plus éditable ici.</p>
   {% endif %}

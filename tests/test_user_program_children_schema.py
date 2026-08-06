@@ -69,6 +69,8 @@ def test_child_tables_have_expected_columns(client):
     assert cols["user_program_sessions"] == {
         "id", "user_program_id", "position", "name", "kind", "focus",
         "duration_target_minutes", "notes",
+        # PUBLICATION_01 (spec 05 §6) — the session→published-template link.
+        "published_template_id", "template_slug_snapshot",
     }
     assert cols["user_program_exercises"] == {
         "id", "user_program_session_id", "position", "exercise_name",
@@ -175,15 +177,26 @@ def test_defaults_kind_strength_and_is_warmup_false(client):
 
 
 def test_child_tables_have_no_fk_to_catalog_or_ekb(client):
-    """PERSISTENCE contract: the whole tree only references itself and
-    (at the root) users — never workout_templates or any EKB table."""
+    """PERSISTENCE contract: the tree only references itself and (at the root)
+    users — never the EKB. The SOLE sanctioned catalog reference is the
+    PUBLICATION_01 publication link `user_program_sessions.published_template_id`
+    → workout_templates (spec 05 §6, ON DELETE SET NULL); nothing else may reach
+    the catalog."""
     from app.database import engine
 
     inspector = inspect(engine)
     allowed = {"user_programs", "user_program_sessions", "user_program_exercises"}
     for table in _CHILD_TABLES:
-        targets = {fk["referred_table"] for fk in inspector.get_foreign_keys(table)}
-        assert targets <= allowed, f"{table} référence hors arbre: {targets}"
+        for fk in inspector.get_foreign_keys(table):
+            referred = fk["referred_table"]
+            if referred in allowed:
+                continue
+            # The one whitelisted catalog reference: the publication link.
+            assert table == "user_program_sessions", (
+                f"{table} référence hors arbre: {referred}"
+            )
+            assert referred == "workout_templates"
+            assert fk["constrained_columns"] == ["published_template_id"]
 
 
 # ───────── 9. ordre relationnel ─────────

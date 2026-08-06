@@ -290,8 +290,11 @@ def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     grouped: dict[str, list] = {}
     for tpl in all_templates:
         section = getattr(tpl, "catalog_section", "core")
-        if section == "archived":
-            continue  # Hidden from catalog
+        if section in ("archived", "user"):
+            # archived: retired from the catalog. user: published custom
+            # programs (PUBLICATION_01) — owner-private, they live under
+            # "Mes programmes", never in the shared library.
+            continue
         grouped.setdefault(section, []).append(tpl)
     return templates.TemplateResponse(
         request,
@@ -319,7 +322,9 @@ def template_detail(
         )
     )
     tpl = db.execute(stmt).scalar_one_or_none()
-    if tpl is None:
+    if tpl is None or tpl.catalog_section == "user":
+        # A published custom program (catalog_section "user", PUBLICATION_01) is
+        # not part of the shared catalog — it must not be reachable by slug here.
         raise HTTPException(status_code=404, detail="Template not found")
     return templates.TemplateResponse(
         request,
