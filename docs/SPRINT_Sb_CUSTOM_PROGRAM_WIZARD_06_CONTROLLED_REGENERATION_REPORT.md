@@ -1,6 +1,6 @@
 # SPRINT Sb_CUSTOM_PROGRAM_WIZARD_06 — Controlled Regeneration (RAPPORT)
 
-**Base canonique :** `5a85d67` · **Tier :** ISOLATED · **Statut :** PATCH COMPLETE / REVIEW PENDING
+**Base canonique :** `5a85d67` (rebasé `219313c`) · **Tier :** ISOLATED · **Statut :** ✅ MERGED + CANONICAL CI GREEN
 **Spec :** [`Sb_CUSTOM_PROGRAM_WIZARD_06_CONTROLLED_REGENERATION_SPEC.md`](strategy/Sb_CUSTOM_PROGRAM_WIZARD_06_CONTROLLED_REGENERATION_SPEC.md)
 
 ## 1. Ce qui change
@@ -123,4 +123,28 @@ différent de celui annoncé. Le verrouillage optimiste relève de l'éditeur.
 
 ## Verdict
 
-**WIZARD_06 PATCH COMPLETE / REVIEW PENDING** — non commité, non poussé, aucune PR.
+**WIZARD_06 PATCH COMPLETE** — validé, mergé (voir appendice).
+
+---
+
+## Appendice post-merge (closeout 2026-08-06)
+
+- **PR #44 MERGED** — merge commit **`b7ee34e`** (via `--merge`, **SANS `--admin`** — gate
+  `mergeStateStatus: CLEAN` ; pas de squash). La branche autoritative a été **rebasée sur canonique
+  `219313c`** (`1c00892 → efe27a9`) avant merge ; le duplicata périmé du main repo a été archivé + retiré.
+- **CI PR #44** : **5 checks verts** (`pytest + QA` · `lint` · `SonarCloud` · `Gitar` · `SonarCloud Code
+  Analysis`) sur `efe27a9` ; job `test` xdist **11:54**.
+- **CI canonique** : run **`31082333554`** (push) sur `b7ee34e` → **3/3 GREEN** (job `test` **~12:00**).
+- **Sonar (par API)** : delta PR #44 **`issues/search total: 0`** ; **`new_coverage: 100.0 %`** (code neuf
+  WIZARD_06 intégralement couvert, `new_uncovered_lines: 0`) ; **trunk `coverage: 91.1 %`** (post-fix P0,
+  aucun retour à 0.0 %). **Première PR de code au gate `CLEAN` sans `--admin`.**
+- **Comportement livré** : régénération sur programme non vide **exige `confirm_replace`** (sinon 200 +
+  résumé de l'existant, arbre inchangé) ; avec confirmation → `generate_program_tree` →
+  `replace_draft_tree` → 303 ; programme vide **inchangé** ; `validated` repassé `draft` ;
+  `published`/`archived` **refusés** ; **no-JS SSR**.
+- **Interdits tenus** : zéro migration · zéro snapshot · zéro EKB_04 · zéro `UserProgramQualityReview` ·
+  zéro publication `WorkoutTemplate`.
+- **Cleanup** : branche `sb/custom-program-wizard-06-controlled-regeneration` (remote + locale) et
+  worktree `-custom-wizard-06` supprimés au closeout.
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_WIZARD_06 — MERGED + CANONICAL CI GREEN.**
