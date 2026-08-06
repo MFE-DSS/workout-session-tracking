@@ -504,6 +504,20 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_WIZARD_06 — Controlled Regeneration` : ⏳ PATCH COMPLETE /
+  REVIEW PENDING** (base `5a85d67`, **non commité, non poussé, aucune PR** ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_06_CONTROLLED_REGENERATION_REPORT.md` +
+  `docs/strategy/Sb_CUSTOM_PROGRAM_WIZARD_06_CONTROLLED_REGENERATION_SPEC.md`).
+  Le refus dur de générer sur un programme non vide devient une **confirmation explicite** :
+  `confirm_replace` sur le POST, **200 + résumé chiffré** (séances / exercices / séries) tant qu'il
+  n'est pas coché, **arbre strictement intact** — `replace_draft_tree` n'est pas appelé. Le
+  garde-fou protégeait la donnée et bloquait l'intention ; il protège toujours, sans être une
+  impasse. Programme vide **inchangé** · `validated` remplaçable et repassé `draft` ·
+  `published`/`archived` refusés **même confirmés** (la confirmation n'est pas une autorité sur le
+  cycle de vie) · **zéro JS** (case non `required`, le contrôle est serveur).
+  **Zéro migration · zéro service · générateur / drafts / quality non modifiés · zéro review · zéro
+  `WorkoutTemplate`.** 28 tests verts sur la suite de génération. Le « flow de regénération »
+  annoncé comme `WIZARD_05+` est donc livré.
 - **`Sb_CUSTOM_PROGRAM_WIZARD_05 — EKB-Assisted Exercise Picker` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-07-30 (build `5a85941` + fix Sonar `4badb0f`, **PR #43 MERGED**, merge
   `097bf48` via `--merge --admin` — bypass du seul `new_coverage`, base `1c4604d`, branche `sb/custom-program-wizard-05-ekb-picker` ;

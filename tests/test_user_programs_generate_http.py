@@ -278,3 +278,370 @@ def test_wizard01_02_routes_still_green(client):
         f"/programs/{pid}/sessions", data={"name": "S1"}, follow_redirects=False
     )
     assert r.status_code == 303
+
+
+# ───────── Sb_CUSTOM_PROGRAM_WIZARD_06 — controlled regeneration (16-26) ─────────
+#
+# The hard refusal became an explicit confirmation. What must not change is that an
+# UNCONFIRMED post never touches the tree — the previous behaviour protected manual
+# work by refusing outright, and the new one has to protect it just as well while
+# offering a way through.
+
+
+def _exercise_count(pid: int) -> int:
+    from app.models.user_program import UserProgramExercise, UserProgramSession
+
+    with _session() as db:
+        return db.execute(
+            select(func.count())
+            .select_from(UserProgramExercise)
+            .join(UserProgramSession)
+            .where(UserProgramSession.user_program_id == pid)
+        ).scalar_one()
+
+
+def _status(pid: int) -> str:
+    from app.models.user_program import UserProgram
+
+    with _session() as db:
+        return db.get(UserProgram, pid).status
+
+
+def _first_session_name(pid: int) -> str:
+    from app.models.user_program import UserProgramSession
+
+    with _session() as db:
+        return db.execute(
+            select(UserProgramSession.name)
+            .where(UserProgramSession.user_program_id == pid)
+            .order_by(UserProgramSession.position)
+            .limit(1)
+        ).scalar_one()
+
+
+def test_empty_program_generation_is_unchanged_by_wizard06(client):
+    """The existing path keeps working without any confirmation: an empty program has
+    nothing to lose, so asking for consent would be ceremony."""
+    pid = _make_program("Still Empty", "gen06-empty")
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    assert _session_count(pid) == 3
+
+
+def test_nonempty_without_confirm_leaves_the_tree_untouched(client):
+    """A soft 200, and — the part that matters — the same tree afterwards."""
+    pid = _make_program("Guard", "gen06-guard")
+    _seed_one_session(pid)
+    before = _first_session_name(pid)
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3},
+        follow_redirects=False,
+    )
+    assert r.status_code == 200
+    assert _session_count(pid) == 1
+    assert _exercise_count(pid) == 1
+    assert _first_session_name(pid) == before
+
+
+def test_nonempty_with_confirm_replaces_the_tree(client):
+    pid = _make_program("Replace", "gen06-replace")
+    _seed_one_session(pid)
+    assert _session_count(pid) == 1
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    assert _session_count(pid) == 3
+    # The seeded session is gone, not merely joined by new ones.
+    assert _first_session_name(pid) != "S1"
+
+
+def test_validated_program_regenerates_and_reopens_as_draft(client):
+    """Regenerating a validated program reopens it: the validation attested to content
+    that no longer exists, so keeping the badge would be a false claim."""
+    from app.services.user_program_drafts import validate_draft
+
+    pid = _make_program("Validated", "gen06-validated")
+    _seed_one_session(pid)
+    with _session() as db:
+        validate_draft(db, _uid(), pid)
+    assert _status(pid) == "validated"
+
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    assert _status(pid) == "draft"
+    assert _session_count(pid) == 3
+
+
+@pytest.mark.parametrize("locked", ["published", "archived"])
+def test_locked_program_refuses_even_with_confirmation(client, locked):
+    """Confirmation is consent to lose the tree, never authority over the lifecycle.
+
+    The existing service owns that refusal; the checkbox must not become a way past it.
+    """
+    from app.models.user_program import UserProgram
+    from app.services.user_program_drafts import archive_draft
+
+    pid = _make_program("Locked06", f"gen06-locked-{locked}")
+    _seed_one_session(pid)
+    with _session() as db:
+        if locked == "archived":
+            archive_draft(db, _uid(), pid)
+        else:
+            db.get(UserProgram, pid).status = "published"
+            db.commit()
+
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 200
+    assert _session_count(pid) == 1  # untouched
+    assert _exercise_count(pid) == 1
+
+
+def test_get_generate_on_nonempty_shows_the_warning_and_the_checkbox(client):
+    pid = _make_program("Warn", "gen06-warn")
+    _seed_one_session(pid)
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert 'name="confirm_replace"' in r.text
+    assert "remplacera" in r.text.lower()
+
+
+def test_get_generate_summarises_sessions_exercises_and_sets(client):
+    """The three numbers are the consent: "this will overwrite your program" is not."""
+    pid = _make_program("Summary", "gen06-summary")
+    _seed_one_session(pid)  # 1 session, 1 exercise, 1 rep target
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    body = r.text.lower()
+    assert "séance" in body
+    assert "exercice" in body
+    assert "série" in body
+    assert "<strong>1</strong>" in r.text
+
+
+def test_empty_program_shows_no_confirmation_checkbox(client):
+    pid = _make_program("NoBox", "gen06-nobox")
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert 'name="confirm_replace"' not in r.text
+
+
+def test_regeneration_on_foreign_program_is_404(client):
+    """Owner-scope is not relaxed by the confirmation."""
+    _other_id, pid = _make_other_program("Foreign06", "gen06-foreign")
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 404
+
+
+def test_regeneration_on_absent_program_is_the_same_404(client):
+    """Indistinct from the foreign case: a 404 that differed would leak existence."""
+    r = client.post(
+        "/programs/999998/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 404
+
+
+def test_regeneration_writes_no_quality_review_and_no_workout_template(client):
+    """The WIZARD_03 non-goals survive regeneration."""
+    from app.models.catalog import WorkoutTemplate
+    from app.models.user_program import UserProgramQualityReview
+
+    pid = _make_program("NonGoals06", "gen06-nongoals")
+    _seed_one_session(pid)
+    reviews_before = _count(UserProgramQualityReview)
+    templates_before = _count(WorkoutTemplate)
+
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert r.status_code == 303
+    assert _count(UserProgramQualityReview) == reviews_before
+    assert _count(WorkoutTemplate) == templates_before
+
+
+@pytest.mark.parametrize(
+    "value", ["", "false", "False", "0", "off", "no", "maybe", "TRUE-ish"]
+)
+def test_unaccepted_confirmation_values_never_replace_the_tree(client, value):
+    """Consent is parsed SERVER-side, and anything not explicitly true fails closed.
+
+    Browser checkbox behaviour proves nothing here: a direct POST can carry any string.
+    A malformed value is a 422 rather than a silent pass — either way the tree survives.
+    """
+    pid = _make_program("Bypass", f"gen06-bypass-{abs(hash(value))}")
+    _seed_one_session(pid)
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": value},
+        follow_redirects=False,
+    )
+    assert r.status_code in (200, 422)
+    assert _session_count(pid) == 1
+    assert _exercise_count(pid) == 1
+
+
+def test_a_duplicated_confirmation_field_cannot_smuggle_consent(client):
+    """`false` then `true` in the same body is refused outright, not resolved to the last."""
+    pid = _make_program("Dup", "gen06-dup")
+    _seed_one_session(pid)
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data=[
+            ("split", "ppl"),
+            ("sessions", "3"),
+            ("confirm_replace", "false"),
+            ("confirm_replace", "true"),
+        ],
+        follow_redirects=False,
+    )
+    assert r.status_code == 422
+    assert _session_count(pid) == 1
+
+
+def test_the_unconfirmed_page_is_not_presented_as_an_error(client):
+    """An unconfirmed replacement is a step not yet taken, not a mistake made.
+
+    The message must therefore not be rendered in the danger colour reserved for real
+    errors (unknown split, out-of-range session count).
+    """
+    pid = _make_program("Tone", "gen06-tone")
+    _seed_one_session(pid)
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3},
+        follow_redirects=False,
+    )
+    assert r.status_code == 200
+    assert "Cochez la confirmation" in r.text
+    assert "color:var(--danger)\">Ce programme contient déjà" not in r.text
+
+
+def test_a_real_error_is_still_rendered_as_an_error(client):
+    """The danger styling is not removed — it is reserved for actual input errors."""
+    pid = _make_program("RealErr", "gen06-realerr")
+    r = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "bro-split", "sessions": 3},
+        follow_redirects=False,
+    )
+    assert r.status_code == 200
+    assert "color:var(--danger)" in r.text
+    assert _session_count(pid) == 0
+
+
+def test_the_unconfirmed_page_can_be_resubmitted_with_confirmation(client):
+    """The returned form carries everything a confirmed retry needs — no re-navigation."""
+    pid = _make_program("Retry", "gen06-retry")
+    _seed_one_session(pid)
+    first = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3},
+        follow_redirects=False,
+    )
+    assert first.status_code == 200
+    assert 'name="split"' in first.text
+    assert 'name="sessions"' in first.text
+    assert 'name="confirm_replace"' in first.text
+
+    second = client.post(
+        f"/programs/{pid}/generate",
+        data={"split": "ppl", "sessions": 3, "confirm_replace": "true"},
+        follow_redirects=False,
+    )
+    assert second.status_code == 303
+    assert _session_count(pid) == 3
+
+
+def test_the_summary_survives_sessions_and_exercises_with_no_children(client):
+    """Counts are derived, so an empty collection must render 0 rather than break."""
+    from app.services.user_program_drafts import replace_draft_tree
+
+    pid = _make_program("Sparse", "gen06-sparse")
+    with _session() as db:
+        replace_draft_tree(
+            db,
+            _uid(),
+            pid,
+            [
+                {"position": 1, "name": "Sans exercice", "exercises": []},
+                {
+                    "position": 2,
+                    "name": "Sans série",
+                    "exercises": [
+                        {
+                            "position": 1,
+                            "exercise_name": "Squat",
+                            "set_scheme": "3x8",
+                            "rep_targets": [],
+                        }
+                    ],
+                },
+            ],
+        )
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert "<strong>2</strong>" in r.text  # 2 séances
+    assert "<strong>0</strong>" in r.text  # 0 séries
+
+
+@pytest.mark.parametrize("locked", ["published", "archived"])
+def test_a_locked_program_is_offered_no_generation_control(client, locked):
+    """Gitar (PR #44): removing the `is_empty` gate exposed a doomed button.
+
+    A locked programme would have shown "Remplacer et générer" and a confirmation
+    checkbox, while any confirmed POST is refused by the service — a dead end the
+    pre-WIZARD_06 template avoided by hiding the form. The summary stays visible; the
+    control does not.
+    """
+    from app.models.user_program import UserProgram
+    from app.services.user_program_drafts import archive_draft
+
+    pid = _make_program("LockedUI", f"gen06-lockedui-{locked}")
+    _seed_one_session(pid)
+    with _session() as db:
+        if locked == "archived":
+            archive_draft(db, _uid(), pid)
+        else:
+            db.get(UserProgram, pid).status = "published"
+            db.commit()
+
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert "n'est plus modifiable" in r.text
+    assert 'name="confirm_replace"' not in r.text
+    assert "Remplacer et générer" not in r.text
+    # The factual summary is still shown — the user may look, just not act.
+    assert "<strong>1</strong>" in r.text
+
+
+def test_an_editable_nonempty_program_still_offers_the_control(client):
+    """The guard above must not swallow the case the sprint exists for."""
+    pid = _make_program("EditableUI", "gen06-editableui")
+    _seed_one_session(pid)
+    r = client.get(f"/programs/{pid}/generate")
+    assert r.status_code == 200
+    assert 'name="confirm_replace"' in r.text
+    assert "Remplacer et générer" in r.text

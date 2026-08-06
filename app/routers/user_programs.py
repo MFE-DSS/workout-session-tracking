@@ -291,9 +291,17 @@ def _redirect_to_editor(request: Request, program_id: int) -> RedirectResponse:
 
 
 def _render_generate(
-    request: Request, db, user, program, *, error: str | None = None
+    request: Request,
+    db,
+    user,
+    program,
+    *,
+    error: str | None = None,
+    notice: str | None = None,
 ) -> HTMLResponse:
-    """Render the deterministic-generation form (WIZARD_03)."""
+    """Render the deterministic-generation form (WIZARD_03, regeneration WIZARD_06)."""
+    sessions = program.sessions
+    exercises = [exercise for session in sessions for exercise in session.exercises]
     return templates.TemplateResponse(
         request,
         "user_programs/generate.html",
@@ -302,8 +310,18 @@ def _render_generate(
             "program": program,
             "split_labels": SPLIT_LABELS,
             "max_sessions": MAX_SESSIONS,
-            "is_empty": len(program.sessions) == 0,
+            "is_empty": len(sessions) == 0,
+            # WIZARD_06 — a regeneration REPLACES the whole tree, so the form states exactly
+            # what would be lost. A bare "this will overwrite" is not informed consent.
+            "has_existing_tree": len(sessions) > 0,
+            "existing_session_count": len(sessions),
+            "existing_exercise_count": len(exercises),
+            "existing_set_count": sum(len(exercise.rep_targets) for exercise in exercises),
             "error": error,
+            # WIZARD_06 — an unconfirmed replacement is NOT an error: the user did nothing
+            # wrong, the form simply has not been agreed to yet. Painting it in the danger
+            # colour would say "you made a mistake" when the answer is "please confirm".
+            "notice": notice,
             "active_session": latest_open_session(db, user.id),
         },
     )
@@ -587,15 +605,21 @@ def user_program_generate(
     program_id: Annotated[int, Path()],
     split: Annotated[str, Form()],
     sessions: Annotated[int, Form()],
+    confirm_replace: Annotated[bool, Form()] = False,
 ):
     program = _owned_or_404(db, user, program_id)
-    # Generation ONLY on an empty tree: `replace_draft_tree` overwrites the whole
-    # tree, so generating over an existing program would destroy manual work.
-    if program.sessions:
+    # WIZARD_06 — regeneration over a filled program is allowed, but only on an EXPLICIT
+    # confirmation. `replace_draft_tree` overwrites the whole tree, so an unconfirmed POST
+    # would silently destroy manual work; the previous hard refusal protected against that
+    # but also left the user with no way through except emptying the program by hand.
+    #
+    # Unconfirmed is not an error the user made: the form simply has not been agreed to yet,
+    # so this returns 200 with the summary and the checkbox rather than a failure.
+    if program.sessions and not confirm_replace:
         return _render_generate(
             request, db, user, program,
-            error="Ce programme contient déjà des séances. "
-            "Videz-le ou créez-en un autre pour générer une base.",
+            notice="Ce programme contient déjà des séances. "
+            "Cochez la confirmation pour remplacer l'arbre existant.",
         )
     if split not in SPLIT_LABELS:
         return _render_generate(
