@@ -58,15 +58,19 @@ def test_wrapper_includes_three_plates_and_toggle():
     for region in ("chest", "shoulders", "posterior"):
         assert f'_partials/muscle_focus_plate_{region}.svg' in w, f"wrapper missing {region} include"
     # no-JS front/back toggle for shoulders (radio inputs, front default checked)
-    assert 'type="radio"' in w and 'id="mf-shoulders-front"' in w and 'id="mf-shoulders-back"' in w
+    assert 'type="radio"' in w
     assert 'id="mf-shoulders-front"' in w
+    assert 'id="mf-shoulders-back"' in w
     assert w.index('id="mf-shoulders-front"') < w.index('checked') or 'checked' in w
     # posterior individual provenance named
     low = w.lower()
-    assert "semi-tendineux" in low and "semi-membraneux" in low and "biceps fémoral" in low
+    assert "semi-tendineux" in low
+    assert "semi-membraneux" in low
+    assert "biceps fémoral" in low
     # attribution present and NOT inside an aria-hidden block
     assert "bodyparts3d" in low
-    assert "cc" in low and "4.0" in low
+    assert "cc" in low
+    assert "4.0" in low
     assert "muscle-focus__attribution" in w
 
 
@@ -98,8 +102,9 @@ def test_science_renders_attribution_and_toggle(client):
     body = client.get("/science").text
     low = body.lower()
     assert "bodyparts3d" in low
-    assert "creativecommons.org/licenses/by/4.0" in low or ("cc" in low and "4.0" in low)
-    assert 'id="mf-shoulders-front"' in body and 'id="mf-shoulders-back"' in body
+    assert "creativecommons.org/licenses/by/4.0" in low
+    assert 'id="mf-shoulders-front"' in body
+    assert 'id="mf-shoulders-back"' in body
 
 
 def test_science_renders_non_medical_not_claimed(client):
