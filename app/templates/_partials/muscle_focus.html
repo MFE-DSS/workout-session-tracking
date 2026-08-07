@@ -1,62 +1,119 @@
-{# Sb_ASSET_04.1-P0 — Muscle Focus P0 Regional Plates (SSR, no-JS, educational).
-   Controlled runtime integration of the three owner-accepted P0 regional plates
-   (Sb_ASSET_03B.2R-D1 intake). The plate SVGs are DECORATIVE (aria-hidden); the
-   accessible truth is carried by the adjacent captions (§5bis / STYLE_RULES §7).
-   No geometry rewrite: the three plate SVGs are inlined byte-exact from design source
-   (guarded by tests/test_auren_muscle_focus_runtime.py). Colour comes from runtime
-   tokens (Auren Terminal); the SVGs carry no business colour.
-
-   Non-medical fitness visualisation. NOT a professional anatomical review; not claimed. #}
+{# Sb_ASSET_04.1-P0 + 04.2-P1 — Muscle Focus regional plates (SSR, no-JS, educational).
+   P0 (04.1): the three owner-accepted P0 plates inlined byte-exact (guarded by
+   tests/test_auren_muscle_focus_runtime.py); the plate SVGs are DECORATIVE (aria-hidden), the
+   accessible truth is carried by the adjacent text (§5bis / STYLE_RULES §7). P1 (04.2): product-grade
+   enrichment — one region card per plate (title · « ce que ça représente » · honest limitation) plus
+   progressive-disclosure blocks (« ce que cette planche montre » / « ce qu'elle ne montre pas »).
+   NO geometry rewrite (SVGs unchanged), NO new plate, NO measurement claim. Plate presence is raised
+   through LAYOUT (region cards), never by editing viewBox/paths. Colour comes from runtime tokens
+   (Auren Terminal). Non-medical fitness visualisation; NOT a professional anatomical review; not claimed. #}
 <div class="muscle-focus">
   <p class="muscle-focus__intro text-dim">
-    Trois planches régionales dérivées de sources anatomiques ouvertes. Repères visuels
-    non médicaux — aucune mesure d'activation, aucune prétention clinique.
+    Trois planches régionales dérivées de sources anatomiques ouvertes. Repères visuels non
+    médicaux — aucune mesure d'effort ni de sollicitation, aucune prétention clinique.
   </p>
 
-  {# ── Chest — whole bilateral pectoralis (front; diagnostic partition excluded) ── #}
-  <figure class="muscle-focus__plate">
-    <div class="muscle-focus__frame" aria-hidden="true">
-      {% include "_partials/muscle_focus_plate_chest.svg" %}
-    </div>
-    <figcaption class="muscle-focus__caption">
-      <strong>Pectoraux — face.</strong> Grand pectoral entier (gauche + droit) avec repères osseux
-      (sternum, clavicules, humérus). Muscle entier ; aucune sous-division « chef claviculaire /
-      sternocostal » n'est représentée à ce stade.
-    </figcaption>
-  </figure>
+  <div class="muscle-focus__grid">
 
-  {# ── Shoulders — source-segmented deltoid, front|back no-JS accessible toggle ── #}
-  <figure class="muscle-focus__plate muscle-focus__plate--shoulders">
-    <input type="radio" name="mf-shoulders-view" id="mf-shoulders-front" class="muscle-focus__view-input" checked>
-    <input type="radio" name="mf-shoulders-view" id="mf-shoulders-back" class="muscle-focus__view-input">
-    <fieldset class="muscle-focus__toggle">
-      <legend class="sr-only">Vue des épaules</legend>
-      <label class="muscle-focus__toggle-btn" for="mf-shoulders-front">Face</label>
-      <label class="muscle-focus__toggle-btn" for="mf-shoulders-back">Dos</label>
-    </fieldset>
-    <div class="muscle-focus__frame muscle-focus__frame--shoulders" aria-hidden="true">
-      {% include "_partials/muscle_focus_plate_shoulders.svg" %}
-    </div>
-    <figcaption class="muscle-focus__caption">
-      <strong>Épaules — face et dos.</strong> Deltoïde en trois faisceaux distincts :
-      antérieur (claviculaire), latéral (acromial), postérieur (spinal), sur la scapula, la clavicule
-      et l'humérus. La face montre surtout le faisceau antérieur ; le dos, le postérieur.
-      Une seule vue à la fois : « Face » par défaut, « Dos » via le bouton ci-dessus.
-    </figcaption>
-  </figure>
+    {# ── Chest — whole bilateral pectoralis (front; diagnostic partition excluded) ── #}
+    <section class="muscle-focus__card">
+      <div class="muscle-focus__plate-area">
+        <div class="muscle-focus__frame" aria-hidden="true">
+          {% include "_partials/muscle_focus_plate_chest.svg" %}
+        </div>
+      </div>
+      <div class="muscle-focus__body">
+        <h3 class="muscle-focus__title">Pectoraux — face</h3>
+        <p class="muscle-focus__represents">
+          <span class="muscle-focus__label">Ce que ça représente</span>
+          Grand pectoral entier (gauche + droit) avec ses repères osseux : sternum, clavicules, humérus.
+        </p>
+        <p class="muscle-focus__limit">
+          <span class="muscle-focus__label">Limite honnête</span>
+          Muscle entier ; aucune sous-division « chef claviculaire / sternocostal » n'est représentée
+          à ce stade.
+        </p>
+        <details class="muscle-focus__disclosure">
+          <summary>Ce que cette planche montre</summary>
+          <p>La silhouette du grand pectoral et son ancrage osseux — un repère visuel de la région travaillée.</p>
+        </details>
+        <details class="muscle-focus__disclosure">
+          <summary>Ce qu'elle ne montre pas</summary>
+          <p>Aucune mesure d'effort, aucune part de sollicitation chiffrée, aucune donnée physiologique — une illustration éducative, pas une lecture d'intensité.</p>
+        </details>
+      </div>
+    </section>
 
-  {# ── Posterior — gluteus + grouped-honest hamstring (back) ── #}
-  <figure class="muscle-focus__plate">
-    <div class="muscle-focus__frame" aria-hidden="true">
-      {% include "_partials/muscle_focus_plate_posterior.svg" %}
-    </div>
-    <figcaption class="muscle-focus__caption">
-      <strong>Chaîne postérieure — dos.</strong> Grand fessier et <em>groupe</em> ischio-jambier.
-      Le groupe reste honnête : il réunit visuellement des muscles distincts —
-      semi-tendineux, semi-membraneux, biceps fémoral (chefs long et court) — sans prétendre à un
-      maillage unique. Contexte osseux (bassin, fémur, patella) volontairement secondaire.
-    </figcaption>
-  </figure>
+    {# ── Shoulders — source-segmented deltoid, front|back no-JS accessible toggle.
+         The radios stay siblings preceding the toggle + frame INSIDE the plate area so the
+         `:checked ~ .muscle-focus__toggle` / `~ .muscle-focus__frame--shoulders` selectors hold. ── #}
+    <section class="muscle-focus__card muscle-focus__card--shoulders">
+      <div class="muscle-focus__plate-area">
+        <input type="radio" name="mf-shoulders-view" id="mf-shoulders-front" class="muscle-focus__view-input" checked>
+        <input type="radio" name="mf-shoulders-view" id="mf-shoulders-back" class="muscle-focus__view-input">
+        <fieldset class="muscle-focus__toggle">
+          <legend class="sr-only">Vue des épaules</legend>
+          <label class="muscle-focus__toggle-btn" for="mf-shoulders-front">Face</label>
+          <label class="muscle-focus__toggle-btn" for="mf-shoulders-back">Dos</label>
+        </fieldset>
+        <div class="muscle-focus__frame muscle-focus__frame--shoulders" aria-hidden="true">
+          {% include "_partials/muscle_focus_plate_shoulders.svg" %}
+        </div>
+      </div>
+      <div class="muscle-focus__body">
+        <h3 class="muscle-focus__title">Épaules — face et dos</h3>
+        <p class="muscle-focus__represents">
+          <span class="muscle-focus__label">Ce que ça représente</span>
+          Deltoïde en trois faisceaux distincts : antérieur (claviculaire), latéral (acromial),
+          postérieur (spinal), sur la scapula, la clavicule et l'humérus.
+        </p>
+        <p class="muscle-focus__limit">
+          <span class="muscle-focus__label">Limite honnête</span>
+          Une seule vue à la fois : « Face » par défaut (surtout le faisceau antérieur), « Dos » via
+          le bouton ci-dessus (surtout le postérieur).
+        </p>
+        <details class="muscle-focus__disclosure">
+          <summary>Ce que cette planche montre</summary>
+          <p>La forme des trois faisceaux du deltoïde et leur orientation osseuse, en vue face ou dos.</p>
+        </details>
+        <details class="muscle-focus__disclosure">
+          <summary>Ce qu'elle ne montre pas</summary>
+          <p>Aucune part chiffrée par faisceau, aucune mesure d'effort — le choix Face/Dos change la vue, pas une donnée.</p>
+        </details>
+      </div>
+    </section>
+
+    {# ── Posterior — gluteus + grouped-honest hamstring (back) ── #}
+    <section class="muscle-focus__card">
+      <div class="muscle-focus__plate-area">
+        <div class="muscle-focus__frame" aria-hidden="true">
+          {% include "_partials/muscle_focus_plate_posterior.svg" %}
+        </div>
+      </div>
+      <div class="muscle-focus__body">
+        <h3 class="muscle-focus__title">Chaîne postérieure — dos</h3>
+        <p class="muscle-focus__represents">
+          <span class="muscle-focus__label">Ce que ça représente</span>
+          Grand fessier et <em>groupe</em> ischio-jambier, avec un contexte osseux volontairement
+          secondaire (bassin, fémur, patella).
+        </p>
+        <p class="muscle-focus__limit">
+          <span class="muscle-focus__label">Limite honnête</span>
+          Le groupe reste honnête : il réunit visuellement des muscles distincts — semi-tendineux,
+          semi-membraneux, biceps fémoral (chefs long et court) — sans prétendre à un maillage unique.
+        </p>
+        <details class="muscle-focus__disclosure">
+          <summary>Ce que cette planche montre</summary>
+          <p>La silhouette du grand fessier et du groupe ischio-jambier, vue de dos.</p>
+        </details>
+        <details class="muscle-focus__disclosure">
+          <summary>Ce qu'elle ne montre pas</summary>
+          <p>Aucun maillage muscle par muscle du groupe ischio, aucune mesure d'effort — un repère de région, pas une dissection.</p>
+        </details>
+      </div>
+    </section>
+
+  </div>
 
   <p class="muscle-focus__attribution text-dim">
     Géométrie dérivée de <strong>BodyParts3D</strong>, © The Database Center for Life Science,

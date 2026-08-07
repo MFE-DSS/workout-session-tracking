@@ -61,7 +61,11 @@ def test_wrapper_includes_three_plates_and_toggle():
     assert 'type="radio"' in w
     assert 'id="mf-shoulders-front"' in w
     assert 'id="mf-shoulders-back"' in w
-    assert w.index('id="mf-shoulders-front"') < w.index('checked') or 'checked' in w
+    # front radio is checked by default, back radio is NOT (non-tautological — parse each tag).
+    front_tag = w[w.index('id="mf-shoulders-front"'):].split(">", 1)[0]
+    back_tag = w[w.index('id="mf-shoulders-back"'):].split(">", 1)[0]
+    assert "checked" in front_tag, "front shoulders radio must be checked by default"
+    assert "checked" not in back_tag, "back shoulders radio must not be checked by default"
     # posterior individual provenance named
     low = w.lower()
     assert "semi-tendineux" in low
@@ -113,3 +117,55 @@ def test_science_renders_non_medical_not_claimed(client):
     assert "non revendiqué" in low or "non revendiquée" in low
     for tok in AFFIRMATIVE_LIES:
         assert tok not in low, f"affirmative claim rendered on /science: {tok}"
+
+
+# ── P1 (Sb_ASSET_04.2) — product enrichment: region cards + progressive disclosure, no new claims ──
+
+# Hard guardrails: no activation percentage / EMG / recruitment claim anywhere in the surface.
+FORBIDDEN_CLAIMS = ("%", "activation", "emg", "recruitment", "recrutement")
+
+
+def _muscle_focus_section(body: str) -> str:
+    """The rendered #section-muscle-focus slice (up to the next section)."""
+    start = body.index('id="section-muscle-focus"')
+    end = body.index('id="section-diagram"', start)
+    return body[start:end]
+
+
+def test_wrapper_has_three_region_cards():
+    w = WRAPPER.read_text(encoding="utf-8")
+    assert w.count('class="muscle-focus__card') == 3, "expected exactly three region cards"
+    assert w.count('class="muscle-focus__title"') == 3, "each card carries a title"
+    for title in ("Pectoraux", "Épaules", "Chaîne postérieure"):
+        assert title in w, f"missing region card title: {title}"
+
+
+def test_wrapper_has_progressive_disclosure_blocks():
+    w = WRAPPER.read_text(encoding="utf-8")
+    assert w.count("<details") == 6, "one 'shows' + one 'does not show' per region"
+    assert w.count("Ce que cette planche montre") == 3
+    assert w.count("Ce qu'elle ne montre pas") == 3
+
+
+def test_wrapper_has_no_forbidden_claim_token():
+    low = WRAPPER.read_text(encoding="utf-8").lower()
+    # "%" is excluded here only because the Jinja `{% include %}` syntax legitimately uses it in the
+    # SOURCE; the rendered-surface test below enforces "%" absence where Jinja is gone.
+    for tok in (t for t in FORBIDDEN_CLAIMS if t != "%"):
+        assert tok not in low, f"forbidden claim token in muscle-focus wrapper: {tok!r}"
+
+
+def test_science_section_enriched_without_forbidden_claims(client):
+    section = _muscle_focus_section(client.get("/science").text)
+    low = section.lower()
+    # three region cards + progressive disclosure rendered SSR (no-JS)
+    assert low.count("muscle-focus__card") >= 3
+    assert "ce que cette planche montre" in low
+    assert "ce qu'elle ne montre pas" in low
+    # hard guardrails: no activation/EMG/recruitment/percentage claim in the muscle-focus surface
+    for tok in FORBIDDEN_CLAIMS:
+        assert tok not in low, f"forbidden claim rendered in muscle-focus section: {tok!r}"
+    # provenance + non-medical honesty preserved in the section itself
+    assert "bodyparts3d" in low
+    assert "creativecommons.org/licenses/by/4.0" in low
+    assert "non médical" in low
