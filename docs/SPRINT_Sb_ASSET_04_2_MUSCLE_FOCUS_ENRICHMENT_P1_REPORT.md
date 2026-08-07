@@ -50,3 +50,17 @@ check_scope **ISOLATED** · `check_spec_protocol` PASS · `ruff check` (test) **
 ## Verdict
 
 **Verdict :** 🟢 **Sb_ASSET_04.2 — PATCH COMPLETE / PR PENDING.** Enrichissement produit **template + CSS, no-JS** : cartes région + synthèse + divulgation progressive + lisibilité, **plaques byte-exact, zéro géométrie touchée, zéro claim d'activation/EMG/recrutement**, provenance BodyParts3D préservée. **Merge = GO humain.**
+
+---
+
+## Appendice post-merge (closeout 2026-08-07)
+
+Premier build de **code** livré de bout en bout sous le **protocole de livraison agentique** (`CLAUDE.md §4`) : `GO BUILD` → patch → 12 tests + broad sweep 54 → commit → push → PR → **drive-to-green** en autonomie ; `GO MERGE` (opérateur : « merge si green ») → merge → vérif CI canonique + Sonar → ce closeout → cleanup, jusqu'à `CLOSED + CLEANED`.
+
+- **PR #52 MERGED** — merge commit **`47e7c0e`** (via `--merge`, **sans `--admin`** — gate `CLEAN` ; garde `--match-head-commit c34bfde`). Base `831a38f`.
+- **CI PR #52** : 5 checks verts (`pytest + QA scripts` · `lint` · `SonarCloud` · `SonarCloud Code Analysis` · `Gitar`).
+- **CI canonique (push) : run `31201147891` sur `47e7c0e` → 3/3 GREEN** (pytest+QA · lint · SonarCloud). **Coverage `91.1 %`** (> 0), **Sonar delta `total: 0`**.
+- **Dette a11y différée (nit `gitar-bot`, `muscle_focus.html`)** : dans la carte épaules, le toggle Face/Dos précède le `<h3>Épaules` dans l'ordre DOM. **Mitigation existante** : le `<legend>Vue des épaules</legend>` nomme déjà la région au niveau du contrôle. **Non bloquant** (gate CLEAN, Sonar delta 0, check Gitar vert) → acté en **hardening a11y** (P2/suivi), sans changement de code au closeout.
+- **Cleanup** : branche `sb/asset-04-2-muscle-focus-enrichment-p1` (remote + locale) et worktree `-asset-04-2` supprimés.
+
+**Verdict post-merge :** ✅ **Sb_ASSET_04.2 — MERGED + CANONICAL CI GREEN + CLOSED + CLEANED.**
