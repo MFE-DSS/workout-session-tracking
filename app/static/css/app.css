@@ -3347,3 +3347,57 @@ summary:focus-visible,
     scroll-behavior: auto !important;
   }
 }
+
+/* ── Sb_ASSET_04.1-P0 — Muscle Focus regional plates (SSR, no-JS, educational) ──
+   Colour comes from runtime Auren Terminal tokens; the plate SVGs carry no business
+   colour. Plates are decorative (aria-hidden); captions carry the accessible truth. */
+.muscle-focus { display: flex; flex-direction: column; gap: var(--space-md); min-width: 0; overflow-x: clip; }
+.muscle-focus > * { min-width: 0; }
+.muscle-focus__intro,
+.muscle-focus__attribution { font-size: 13px; line-height: 1.5; }
+.muscle-focus__attribution { border-top: 1px solid var(--border); padding-top: var(--space-sm); }
+.muscle-focus__plate { margin: 0; }
+.muscle-focus__frame {
+  width: 100%; max-width: 100%; background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 12px; padding: 10px; overflow: hidden;
+}
+.muscle-focus__frame svg { width: 100%; height: auto; display: block; max-width: 100%; }
+.muscle-focus__caption { font-size: 13px; line-height: 1.5; margin-top: var(--space-sm); color: var(--fg); }
+
+/* plate colours (tokens) */
+.muscle-focus .auren-mf-context path { fill: var(--fg-dim); }
+.muscle-focus .auren-mf-hero path { fill: var(--accent); }
+.muscle-focus .auren-mf-part path { fill: var(--accent); }
+/* shoulders: three deltoid parts in three accent shades (anterior / lateral / posterior) */
+#auren-plate-region-shoulders .auren-mf-view-front > g:nth-of-type(3) path,
+#auren-plate-region-shoulders .auren-mf-view-back  > g:nth-of-type(3) path { fill: var(--accent-hover); }
+#auren-plate-region-shoulders .auren-mf-view-front > g:nth-of-type(4) path,
+#auren-plate-region-shoulders .auren-mf-view-back  > g:nth-of-type(4) path { fill: var(--accent-muted); }
+/* posterior: gluteus (accent) + hamstring group (softer accent) */
+#auren-plate-region-posterior .auren-mf-view-back > g:nth-of-type(3) path { fill: var(--accent-soft); }
+
+/* shoulders front|back — no-JS accessible toggle (one view at a time, front default) */
+.muscle-focus__view-input {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.muscle-focus__toggle { display: inline-flex; gap: 4px; margin: 0 0 var(--space-sm); border: 0; padding: 0; min-inline-size: 0; }
+.muscle-focus__toggle-btn {
+  cursor: pointer; padding: 4px 14px; border: 1px solid var(--border-strong);
+  border-radius: 999px; font-size: 13px; color: var(--fg-dim); background: var(--surface);
+}
+#mf-shoulders-front:checked ~ .muscle-focus__toggle label[for="mf-shoulders-front"],
+#mf-shoulders-back:checked ~ .muscle-focus__toggle label[for="mf-shoulders-back"] {
+  background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+}
+#mf-shoulders-front:focus-visible ~ .muscle-focus__toggle label[for="mf-shoulders-front"],
+#mf-shoulders-back:focus-visible ~ .muscle-focus__toggle label[for="mf-shoulders-back"] {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+/* the frame crops the 2:1 (front|back) plate to one square view; the toggle shifts to the back half.
+   The SVG is absolutely positioned so its 200% width never pushes the flex column wider than 360 px. */
+.muscle-focus__frame--shoulders { aspect-ratio: 1 / 1; padding: 0; position: relative; }
+.muscle-focus__frame--shoulders svg {
+  position: absolute; top: 0; left: 0; width: 200%; height: 100%; transition: transform 0.2s ease;
+}
+#mf-shoulders-back:checked ~ .muscle-focus__frame--shoulders svg { transform: translateX(-50%); }
