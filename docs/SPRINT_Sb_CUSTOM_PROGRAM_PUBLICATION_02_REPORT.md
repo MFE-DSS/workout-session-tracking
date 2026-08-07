@@ -51,3 +51,16 @@ check_scope **SHARED_CODE** · `check_spec_protocol` PASS · `ruff check` **clea
 ## Verdict
 
 **Verdict :** 🟢 **Sb_CUSTOM_PROGRAM_PUBLICATION_02 — PATCH COMPLETE / PR PENDING.** Versioning **mono-row spec-compliant** : le même `UserProgram` publié → `draft` `current_version + 1`, liens de séance effacés, **templates v{n} intactes**, **zéro migration/copie/table/archivage/quality-write**. **Merge = GO humain.**
+
+---
+
+## Appendice post-merge (closeout 2026-08-07)
+
+Livré de bout en bout sous le **protocole agentique** : `GO BUILD` (avec préflight STOP → arbitrage Option A) → build → drive-to-green → `GO MERGE` → merge → vérif → closeout → cleanup.
+
+- **PR #53 MERGED** — merge commit **`90a4caf`** (via `--merge`, **sans `--admin`** — gate `CLEAN`, 0 thread ; garde `--match-head-commit 9efcf7a`). Base `a4e54c5`, build `ad0f13d` + fix Sonar `9efcf7a`.
+- **CI 1ᵉʳ passage rouge — 1 seule règle, fixable in-scope** : `python:S1192` sur `app/routers/user_programs.py:158` (littéral « Programme introuvable » dupliqué ×3 dans les `HTTPException(detail=)` — la nouvelle route `/new-version` en était la 3ᵉ), gate `new_code_smells_severity` 20 > 14. **Fix** : extraction d'une constante module `_NOT_FOUND` (commit `9efcf7a`), 108 tests router revérifiés. **Re-CI : 5/5 verts, Sonar delta `total: 0`.**
+- **CI canonique (push) : run `31223321518` sur `90a4caf` → 3/3 GREEN** (pytest+QA · lint · SonarCloud). **Coverage `91.1 %`** (> 0).
+- **Cleanup** : branche `sb/custom-program-publication-02` (remote + locale) et worktree `-publication-02` supprimés.
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_PUBLICATION_02 — MERGED + CANONICAL CI GREEN + CLOSED + CLEANED.**

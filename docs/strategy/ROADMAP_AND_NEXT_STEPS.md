@@ -507,8 +507,9 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
-- **`Sb_CUSTOM_PROGRAM_PUBLICATION_02 — Nouveau cycle d'édition post-publication` : 🟢 PR OPENED /
-  MERGE PENDING** 2026-08-07 (base `a4e54c5`, branche `sb/custom-program-publication-02` ;
+- **`Sb_CUSTOM_PROGRAM_PUBLICATION_02 — Nouveau cycle d'édition post-publication` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-08-07 (base `a4e54c5`, **PR #53 MERGED**, merge `90a4caf` via `--merge`
+  **sans `--admin`** — gate `CLEAN` ; CI canonique `31223321518` 3/3, coverage 91.1 %, Sonar delta 0 ;
   `docs/SPRINT_Sb_CUSTOM_PROGRAM_PUBLICATION_02_REPORT.md` + spec ; **sous protocole agentique**).
   **Versioning mono-row spec-compliant** (spec 04 §6-7 / 05 §6-7) : un programme **publié** redevient
   éditable — **le même** `UserProgram` repasse `published → draft` à `current_version + 1`, liens de
@@ -518,8 +519,9 @@
   idempotent (garde double-submit) ; `archived` = refus doux ; owner-scope 404. Route
   `POST /programs/{id}/new-version` (303 éditeur) + CTA détail **uniquement `published`**. **`WorkoutTemplate`
   v{n} ni mutées ni supprimées · zéro quality write · zéro migration/copie/table/unpublish/archivage.**
-  **14 tests** + broad sweep ciblé **171** ; check_scope **SHARED_CODE**. **Prochaine action** : merge PR
-  (GO humain) puis closeout. `PUBLICATION_03` (UI templates user) = NEXT / NOT OPENED.
+  **14 tests** + broad sweep ciblé **171** ; check_scope **SHARED_CODE**. **CI 1ᵉʳ passage rouge sur
+  `python:S1192`** (littéral 404 dupliqué) → **fix in-scope** (constante `_NOT_FOUND`, `9efcf7a`) →
+  re-CI 5/5 verts → mergé. `PUBLICATION_03` (UI templates user) = NEXT / NOT OPENED.
 - **`Sb_CUSTOM_PROGRAM_PUBLICATION_01 — Publication en N templates` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-07 (build `6da8ffa`, base `83a7d58`, **PR #50 MERGED**, merge `7d03f1f`
   via `--merge` **sans `--admin`** — gate `CLEAN` ;
