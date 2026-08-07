@@ -53,3 +53,26 @@ ruff + gitleaks below · full CI + SonarCloud on the PR.
 BodyParts3D CC BY 4.0 attribution, no chest partition, preserved posterior provenance, and no 360 px overflow.
 Internal synthetic review only — **NOT a professional anatomical review**; design-source gate unchanged; no
 model/score/migration change. Delivered via PR under BOUNDED_DELIVERY; **merge remains a separate human GO.**
+
+---
+
+## Appendice post-merge (closeout 2026-08-07)
+
+- **PR #49 MERGED** — merge commit **`ae10737`** (via `--merge`, **no squash, no `--admin`** — gate
+  `mergeStateStatus: CLEAN`, 0 thread non résolu ; garde `--match-head-commit 1adc0d1`). Base `49bacfa`
+  (D1 intake).
+- **CI recovery** : le head final n'avait aucun run GitHub Actions (outage ~12 h) → **close/reopen (×1)**
+  a redispatché ; **5 checks verts** (run `31156308300`) — `pytest + QA scripts` (11m59) · `lint` ·
+  `SonarCloud` · `SonarCloud Code Analysis` · `Gitar`.
+- **CI canonique (push) : run `31161250110` sur `ae10737` → 3/3 GREEN** (lint · pytest+QA · SonarCloud).
+  **Coverage `91.1 %`**, Sonar delta `issues total: 0`.
+- **Comportement livré** : 3 plaques P0 Muscle Focus (chest / shoulders / posterior) surfacées
+  **SSR / no-JS** sur `/science` ; **aucune réécriture de géométrie** ; attribution **BodyParts3D
+  CC BY 4.0 visible** ; disclaimers **non médicaux** ; toggle épaules face/dos no-JS accessible ;
+  **pas d'overflow 360 px** (vérifié par le flux antérieur) ; fallback silhouette décorative préservé ;
+  zéro changement route/modèle/score/migration.
+- **Nit Gitar (« front default » tautologique)** : **résolu / différé sans changement de code** (revue
+  acceptée en dette de durcissement de test).
+
+**Verdict post-merge :** ✅ **Sb_ASSET_04.1-P0 — MERGED + CANONICAL CI GREEN.** (Dogfood humain réel
+Martin sur `/science` desktop + 360 px : relève d'un flux séparé, non couvert par ce closeout docs.)

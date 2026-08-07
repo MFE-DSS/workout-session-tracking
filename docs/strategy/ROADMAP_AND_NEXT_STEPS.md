@@ -505,6 +505,22 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_PUBLICATION_01 — Publication en N templates` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-08-07 (build `6da8ffa`, base `83a7d58`, **PR #50 MERGED**, merge `7d03f1f`
+  via `--merge` **sans `--admin`** — gate `CLEAN` ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_PUBLICATION_01_REPORT.md` +
+  `docs/strategy/Sb_CUSTOM_PROGRAM_PUBLICATION_01_SPEC.md`).
+  **Matérialisation spec 05 §6** : un `UserProgram` **validé** → **N `WorkoutTemplate` custom** (un par
+  `UserProgramSession`, **jamais aplati**), slug `up{uid}-{base}-v{n}-s{pos}` ≤64, codes `E1..En`, lien
+  `published_template_id` + `template_slug_snapshot` **côté séance** (migration additive `p7q2k8l9n10`).
+  Gel qualité **1×** · idempotence · refus doux draft/archived · `catalog_section="user"` · **survie
+  reseed** · `/library` exclut les templates user · **`session_builder` inchangé**. **Zéro aplati · zéro
+  `WorkoutTemplate.user_id` · zéro table de publication · zéro `user_programs.published_template_id`.**
+  **CI PR #50 5 checks verts · migration QA 4/4 dans le job · canonique `31167968166` 3/3 · Sonar delta
+  `total: 0` · `new_coverage 93 %` · `coverage 91.1 %` · gate `CLEAN`.** **CI récupérée par close/reopen
+  après un outage GitHub Actions ~12 h** — jamais force-mergé. Dette différée : thread Gitar
+  `user_program_publish.py:256` (durcissement test). **`PUBLICATION_02` (nouvelle version d'un programme
+  publié) = FIRST NEXT / NOT OPENED · `PUBLICATION_03` (UI templates user) = NOT OPENED.**
 - **`Sb_CUSTOM_PROGRAM_WIZARD_06 — Controlled Regeneration` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-06 (**PR #44 MERGED**, merge `b7ee34e` via `--merge` **sans `--admin`**, branche autoritative rebasée `1c00892 → efe27a9` sur `219313c` ;
   `docs/SPRINT_Sb_CUSTOM_PROGRAM_WIZARD_06_CONTROLLED_REGENERATION_REPORT.md` +
@@ -537,9 +553,15 @@
   `4badb0f` (bindings distincts), `issues/search total: 0` + reliability A revérifiés. Régénération
   gardée → **WIZARD_06**. **Gouvernance actée** : `SCORING_04`
   **SUPERSEDED** · `EKB_04` (seed DB) **DEFERRED** · `Sb_OPS` leviers 3+4 **DEFERRED**.
-- **`Sb_CUSTOM_PROGRAM_*` (tous les autres : `LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`,
-  `SCORING_*`, `WIZARD_*`) : NOT AUTHORIZED** — chacun sur GO/override explicite, dans
-  l'ordre du gate.
+- **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01` = ✅ **LIVRÉS**
+  (MERGED + canonical CI green). **Prochains candidats (sur GO explicite, aucun ouvert)** :
+  1. **`PUBLICATION_02`** — cycle de vie d'un programme publié / flow de nouvelle version ;
+  2. **`PUBLICATION_03`** — UI d'accès aux templates user-owned ;
+  3. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
+  4. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;
+  5. **activation Vortex MCP** (SonarQube MCP, sur setup opérateur).
+  Tous les autres `Sb_CUSTOM_PROGRAM_*` (`LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`, `SCORING_*`) restent
+  **NOT AUTHORIZED** — chacun sur GO/override explicite, dans l'ordre du gate.
 
 ## 2. Protocole spec-driven — règle d'or
 

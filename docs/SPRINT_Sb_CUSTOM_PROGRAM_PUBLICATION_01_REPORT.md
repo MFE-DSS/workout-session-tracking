@@ -148,3 +148,27 @@ Publication spec-05-§6-conforme : N templates (un par séance), slug versionné
 tronqué, lien côté séance, gel de qualité une fois, idempotence, refus doux,
 survie reseed, compatibilité native `session_builder`. Migration additive,
 4/4 QA verts. **Aucun commit, aucun push, aucune PR** — en attente d'un GO explicite.
+
+---
+
+## Appendice post-merge (closeout 2026-08-07)
+
+- **PR #50 MERGED** — merge commit **`7d03f1f`** (via `--merge`, **SANS `--admin`** — gate
+  `mergeStateStatus: CLEAN` ; pas de squash ; garde `--match-head-commit 6da8ffa`). Base `83a7d58`,
+  révision Alembic `p7q2k8l9n10`.
+- **Parcours CI** : PR initialement bloquée par un **outage GitHub Actions ~12 h** (le workflow
+  `pull_request` ne dispatchait plus — Actions `enabled`, config correcte → échec de dispatch infra).
+  **Jamais force-mergé.** Outage résorbé → **close/reopen (×1)** a redispatché la CI complète. **Aucun
+  rebase** (canonique n'avait ajouté aucune migration ; chaîne `p7q2k8l9n10 → o6p1j7k8m09` intacte).
+- **CI PR #50 (run `31164706015`) : 5 checks verts** — `pytest + QA scripts` · `lint` · `SonarCloud` ·
+  `SonarCloud Code Analysis` · `Gitar`. **Migration QA 4/4 dans le job** (Alembic drift · Schema
+  snapshot · Migration patterns · Migration roundtrip).
+- **CI canonique (push) : run `31167968166` sur `7d03f1f` → 3/3 GREEN** (lint · pytest+QA · SonarCloud).
+- **Sonar** : delta PR #50 `issues/search total: 0` ; `new_coverage 93.04 %` ; **`coverage 91.1 %`**
+  (trunk, ncloc 23176→23505). Gate PR **CLEAN sans `--admin`**.
+- **Dette différée (thread Gitar `app/services/user_program_publish.py:256`)** : l'`except
+  IntegrityError` attribue toute violation d'intégrité à une collision de slug — **dette de
+  durcissement test/qualité acceptée et différée**, aucun fix de code au closeout (non bloquant, gate
+  CLEAN, Sonar delta 0).
+
+**Verdict post-merge :** ✅ **Sb_CUSTOM_PROGRAM_PUBLICATION_01 — MERGED + CANONICAL CI GREEN.**
