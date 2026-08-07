@@ -120,3 +120,16 @@ Un CR est produit **à un point d'arrêt**, pas à chaque micro-étape. Contenu 
 ---
 
 **Verdict :** 🟢 **AGENTIC DELIVERY PROTOCOL — DÉFINI.** Deux GO humains (`GO BUILD`, `GO MERGE`) encadrent une boucle autonome bornée par des garde-fous durs et des conditions d'arrêt explicites. Réduit les micro-GO sans réduire la sécurité. **Périmètre interdit** : §5 (arrêts durs) + §10 (non-goals).
+
+---
+
+## Appendice — protocole ACTIF sur le canonique (2026-08-07)
+
+Livré et **actif** via **Sb_OPS.agent-autonomy-01** :
+
+- **PR #51 MERGED** — merge commit **`a55618e`** (via `--merge`, **sans `--admin`** — gate `CLEAN`, 0 thread non résolu ; garde `--match-head-commit 57f32fc`). Base `190fa8c`.
+- **CI PR #51** : 5 checks verts (`pytest + QA scripts` · `lint` · `SonarCloud` · `SonarCloud Code Analysis` · `Gitar`) — CI déclenchée car `CLAUDE.md` est **hors `paths-ignore`**.
+- **CI canonique (push) : run `31188046923` sur `a55618e` → 3/3 GREEN** (pytest+QA · lint · SonarCloud). **Coverage `91.1 %`** (> 0, inchangé), **Sonar delta `total: 0`**.
+- **Ce sprint est le premier exemple du protocole** : après le mandat (`GO BUILD`-équivalent), l'agent a livré patch → commit → push → PR → **drive to green** en autonomie ; après `GO MERGE`, il a mergé → vérifié CI canonique + Sonar → rédigé ce closeout → poussé docs-only → nettoyé branche/worktree, jusqu'à `CLOSED + CLEANED`.
+
+**Verdict post-merge :** ✅ **Sb_OPS.agent-autonomy-01 — MERGED + CANONICAL CI GREEN + CLOSED + CLEANED.** Protocole de livraison agentique **en vigueur** (`CLAUDE.md §4`).
