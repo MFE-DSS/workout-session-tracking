@@ -25,9 +25,15 @@
     </p>
   {% elif program.status == 'published' %}
     <p class="text-dim" style="margin-top:.5rem;">Programme publié — ses séances sont disponibles dans vos modèles.</p>
-    <p style="margin-top:.75rem;">
+    {# PUBLICATION_02 — start a new edit cycle: the same program returns to draft (v+1).
+       The published version stays available; only a published program shows this. #}
+    <p style="margin-top:.75rem; display:flex; flex-wrap:wrap; gap:.5rem;">
       <a class="btn btn--ghost" href="{{ url_for('user_program_publish_form', program_id=program.id) }}">Voir la publication</a>
+      <form method="post" action="{{ url_for('user_program_new_version', program_id=program.id) }}" style="display:inline;">
+        <button type="submit" class="btn btn--primary">Créer une nouvelle version modifiable</button>
+      </form>
     </p>
+    <p class="text-dim" style="margin-top:.5rem; font-size:.9em;">Repasse ce programme en brouillon (version suivante) pour le modifier ; la version publiée reste disponible.</p>
   {% elif not editable %}
     <p class="text-dim" style="margin-top:.5rem;">Ce programme n'est plus éditable ici.</p>
   {% endif %}

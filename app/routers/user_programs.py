@@ -73,6 +73,11 @@ from app.services.user_program_publish import (
     publish_user_program,
 )
 from app.services.user_program_quality_preview import compute_quality_preview
+from app.services.user_program_versioning import (
+    VersioningNotFound,
+    VersioningRefused,
+    start_new_edit_cycle,
+)
 from app.templating import templates
 
 router = APIRouter(tags=["user_programs"])
@@ -87,6 +92,8 @@ _MAX_SESSION_NAME = 128
 _MAX_EXERCISE_NAME = 255
 _MAX_SETS = 6
 _MAX_REPS = 50
+# Owner-scoped 404 detail, reused across routes (missing OR foreign, no existence leak).
+_NOT_FOUND = "Programme introuvable"
 
 
 def _slugify(value: str) -> str:
@@ -150,7 +157,7 @@ def _owned_or_404(db, user, program_id: int):
     existence leak) — `get_draft` already collapses both to None."""
     program = get_draft(db, user.id, program_id)
     if program is None:
-        raise HTTPException(status_code=404, detail="Programme introuvable")
+        raise HTTPException(status_code=404, detail=_NOT_FOUND)
     return program
 
 
@@ -417,7 +424,7 @@ def user_program_create(
     "/programs/{program_id}",
     response_class=HTMLResponse,
     name="user_program_detail",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_detail(
     request: Request,
@@ -434,7 +441,7 @@ def user_program_detail(
     "/programs/{program_id}/sessions",
     response_class=HTMLResponse,
     name="user_program_add_session",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_add_session(
     request: Request,
@@ -470,7 +477,7 @@ def user_program_add_session(
     "/programs/{program_id}/sessions/{position}/delete",
     response_class=HTMLResponse,
     name="user_program_delete_session",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_delete_session(
     request: Request,
@@ -495,7 +502,7 @@ def user_program_delete_session(
     "/programs/{program_id}/sessions/{position}/exercises",
     response_class=HTMLResponse,
     name="user_program_add_exercise",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_add_exercise(
     request: Request,
@@ -532,7 +539,7 @@ def user_program_add_exercise(
     "/programs/{program_id}/sessions/{session_position}/exercises/{exercise_position}/delete",
     response_class=HTMLResponse,
     name="user_program_delete_exercise",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_delete_exercise(
     request: Request,
@@ -560,7 +567,7 @@ def user_program_delete_exercise(
     "/programs/{program_id}/validate",
     response_class=HTMLResponse,
     name="user_program_validate",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_validate(
     request: Request,
@@ -586,7 +593,7 @@ def user_program_validate(
     "/programs/{program_id}/generate",
     response_class=HTMLResponse,
     name="user_program_generate_form",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_generate_form(
     request: Request,
@@ -602,7 +609,7 @@ def user_program_generate_form(
     "/programs/{program_id}/generate",
     response_class=HTMLResponse,
     name="user_program_generate",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_generate(
     request: Request,
@@ -654,7 +661,7 @@ def user_program_generate(
     "/programs/{program_id}/quality",
     response_class=HTMLResponse,
     name="user_program_quality",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_quality(
     request: Request,
@@ -746,7 +753,7 @@ def _render_publish(
     "/programs/{program_id}/publish",
     response_class=HTMLResponse,
     name="user_program_publish_form",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_publish_form(
     request: Request,
@@ -765,7 +772,7 @@ def user_program_publish_form(
     "/programs/{program_id}/publish",
     response_class=HTMLResponse,
     name="user_program_publish",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_publish(
     request: Request,
@@ -782,7 +789,7 @@ def user_program_publish(
     try:
         result = publish_user_program(db, user.id, program_id)
     except PublishNotFound as exc:
-        raise HTTPException(status_code=404, detail="Programme introuvable") from exc
+        raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
     except PublishRefused as exc:
         db.rollback()
         return _render_publish(
@@ -796,3 +803,37 @@ def user_program_publish(
         else "Ce programme est déjà publié — aucune séance dupliquée."
     )
     return _render_publish(request, db, user, program, success=success)
+
+
+# ─────────────────── new edit cycle from published (PUBLICATION_02) ────────────
+
+
+@router.post(
+    "/programs/{program_id}/new-version",
+    response_class=HTMLResponse,
+    name="user_program_new_version",
+    responses={404: {"description": _NOT_FOUND}},
+)
+def user_program_new_version(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Start a new edit cycle on a PUBLISHED program (spec 04 §6-7, mono-row).
+
+    The same `UserProgram` row returns to `draft` at `current_version + 1`; the
+    published v{n} templates are untouched. Owner-scoped 404. An archived program
+    is softly refused; a draft/validated program is already editable (no
+    increment). Success → the existing editor (the returned draft)."""
+    _owned_or_404(db, user, program_id)  # 404 guard; the service re-checks ownership
+    try:
+        start_new_edit_cycle(db, user.id, program_id)
+    except VersioningNotFound as exc:
+        raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
+    except VersioningRefused as exc:
+        db.rollback()
+        return _render_editor(
+            request, db, user, _owned_or_404(db, user, program_id), error=exc.message
+        )
+    return _redirect_to_editor(request, program_id)
