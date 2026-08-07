@@ -66,6 +66,12 @@ from app.services.user_program_generator import (
     ProgramGenerationError,
     generate_program_tree,
 )
+from app.services.user_program_publish import (
+    PublishNotFound,
+    PublishRefused,
+    publication_slug,
+    publish_user_program,
+)
 from app.services.user_program_quality_preview import compute_quality_preview
 from app.templating import templates
 
@@ -672,3 +678,121 @@ def user_program_quality(
         request, db, user, program,
         scorable=scorable, is_empty=is_empty, preview=preview,
     )
+
+
+# ──────────────────── publication to catalog (PUBLICATION_01) ─────────────────
+
+
+def _publish_rows(program, user) -> list[dict]:
+    """Per-session preview rows for the publish page.
+
+    A published program shows the FROZEN slugs (`template_slug_snapshot`); a
+    not-yet-published one shows the SAME slug the service will mint — so the page
+    never promises a slug the materializer would not produce."""
+    published = program.status == "published" and program.archived_at is None
+    rows = []
+    for session in program.sessions:
+        slug = (
+            session.template_slug_snapshot
+            if published
+            else publication_slug(
+                user.id, program.slug_base, program.current_version, session.position
+            )
+        )
+        rows.append(
+            {
+                "position": session.position,
+                "name": session.name,
+                "slug": slug,
+                "exercise_count": len(session.exercises),
+            }
+        )
+    return rows
+
+
+def _render_publish(
+    request: Request,
+    db,
+    user,
+    program,
+    *,
+    error: str | None = None,
+    success: str | None = None,
+) -> HTMLResponse:
+    """Render the SSR publication confirmation/status page (no JS)."""
+    is_archived = program.archived_at is not None or program.status == "archived"
+    is_published = program.status == "published" and not is_archived
+    return templates.TemplateResponse(
+        request,
+        "user_programs/publish.html",
+        {
+            "page_title": f"Publier — {program.title}",
+            "program": program,
+            "rows": _publish_rows(program, user),
+            "session_count": len(program.sessions),
+            # A validated, non-archived program is the only publishable state.
+            "publishable": program.status == "validated" and not is_archived,
+            "is_published": is_published,
+            "is_archived": is_archived,
+            "is_draft": program.status == "draft" and not is_archived,
+            "error": error,
+            "success": success,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+@router.get(
+    "/programs/{program_id}/publish",
+    response_class=HTMLResponse,
+    name="user_program_publish_form",
+    responses={404: {"description": "Programme introuvable"}},
+)
+def user_program_publish_form(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Publication confirmation/status page. Owner-scoped 404 like every route.
+
+    Shows how many sessions would publish, their future (or frozen) template
+    slugs, and the immutable-publication warning. Writes nothing."""
+    return _render_publish(request, db, user, _owned_or_404(db, user, program_id))
+
+
+@router.post(
+    "/programs/{program_id}/publish",
+    response_class=HTMLResponse,
+    name="user_program_publish",
+    responses={404: {"description": "Programme introuvable"}},
+)
+def user_program_publish(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Materialize a validated program into N user-owned templates.
+
+    Owner-scoped: a missing/foreign program 404s. A lifecycle refusal
+    (draft/archived/slug clash) returns 200 with a soft message and NO template
+    created. Success re-renders the published state (idempotent on re-submit)."""
+    _owned_or_404(db, user, program_id)  # 404 guard; the service re-checks ownership
+    try:
+        result = publish_user_program(db, user.id, program_id)
+    except PublishNotFound as exc:
+        raise HTTPException(status_code=404, detail="Programme introuvable") from exc
+    except PublishRefused as exc:
+        db.rollback()
+        return _render_publish(
+            request, db, user, _owned_or_404(db, user, program_id), error=exc.message
+        )
+    program = _owned_or_404(db, user, program_id)
+    success = (
+        f"Programme publié : {len(result.templates)} séance(s) disponible(s) "
+        "dans vos modèles."
+        if result.created
+        else "Ce programme est déjà publié — aucune séance dupliquée."
+    )
+    return _render_publish(request, db, user, program, success=success)
