@@ -73,6 +73,11 @@ from app.services.user_program_publish import (
     publish_user_program,
 )
 from app.services.user_program_quality_preview import compute_quality_preview
+from app.services.user_program_versioning import (
+    VersioningNotFound,
+    VersioningRefused,
+    start_new_edit_cycle,
+)
 from app.templating import templates
 
 router = APIRouter(tags=["user_programs"])
@@ -796,3 +801,37 @@ def user_program_publish(
         else "Ce programme est déjà publié — aucune séance dupliquée."
     )
     return _render_publish(request, db, user, program, success=success)
+
+
+# ─────────────────── new edit cycle from published (PUBLICATION_02) ────────────
+
+
+@router.post(
+    "/programs/{program_id}/new-version",
+    response_class=HTMLResponse,
+    name="user_program_new_version",
+    responses={404: {"description": "Programme introuvable"}},
+)
+def user_program_new_version(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Start a new edit cycle on a PUBLISHED program (spec 04 §6-7, mono-row).
+
+    The same `UserProgram` row returns to `draft` at `current_version + 1`; the
+    published v{n} templates are untouched. Owner-scoped 404. An archived program
+    is softly refused; a draft/validated program is already editable (no
+    increment). Success → the existing editor (the returned draft)."""
+    _owned_or_404(db, user, program_id)  # 404 guard; the service re-checks ownership
+    try:
+        start_new_edit_cycle(db, user.id, program_id)
+    except VersioningNotFound as exc:
+        raise HTTPException(status_code=404, detail="Programme introuvable") from exc
+    except VersioningRefused as exc:
+        db.rollback()
+        return _render_editor(
+            request, db, user, _owned_or_404(db, user, program_id), error=exc.message
+        )
+    return _redirect_to_editor(request, program_id)
