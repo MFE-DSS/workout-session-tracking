@@ -97,6 +97,14 @@
             <button type="submit" class="btn btn--primary">Ajouter l'exercice</button>
           </form>
         {% endif %}
+
+        {# PUBLICATION_03 — launch a published session (owned context only). Shown only when the
+           program is published, not archived, and this session is linked to its template. #}
+        {% if program.status == 'published' and program.archived_at is none and session.published_template_id %}
+          <form method="post" action="{{ url_for('user_program_start_session', program_id=program.id, session_id=session.id) }}" style="margin-top:.5rem;">
+            <button type="submit" class="btn btn--primary">Démarrer cette séance</button>
+          </form>
+        {% endif %}
       </div>
     {% endfor %}
   </div>
