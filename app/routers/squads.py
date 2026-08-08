@@ -42,6 +42,12 @@ from app.templating import templates
 
 router = APIRouter(tags=["squads"])
 
+# Reused owner-scope messages + template name (Sb_OPS.sonar-hygiene-p1 — S1192 dedup,
+# behavior-preserving: same values, named once).
+_SQUAD_NOT_FOUND = "Squad introuvable"
+_ACCESS_DENIED = "Accès refusé"
+_CHALLENGE_CREATE_TEMPLATE = "squad_challenge_create.html"
+
 
 # ---------------------------------------------------------------------------
 # List
@@ -173,9 +179,9 @@ def squad_detail(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     if not is_member(db, squad_id, user.id):
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     members = get_squad_members(db, squad_id)
     leaderboard = compute_squad_leaderboard(db, squad_id)
@@ -298,9 +304,9 @@ def squad_challenges(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     if not is_member(db, squad_id, user.id):
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     challenges = get_squad_challenges(db, squad_id)
     membership = get_membership(db, squad_id, user.id)
@@ -328,14 +334,14 @@ def squad_challenge_create_page(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     membership = get_membership(db, squad_id, user.id)
     if not membership or membership.role != "owner":
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     return templates.TemplateResponse(
         request,
-        "squad_challenge_create.html",
+        _CHALLENGE_CREATE_TEMPLATE,
         {
             "page_title": f"Nouveau challenge · {squad.name}",
             "squad": squad,
@@ -359,10 +365,10 @@ def squad_challenge_create_post(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     membership = get_membership(db, squad_id, user.id)
     if not membership or membership.role != "owner":
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     try:
         starts = date.fromisoformat(starts_at)
@@ -370,7 +376,7 @@ def squad_challenge_create_post(
     except ValueError:
         return templates.TemplateResponse(
             request,
-            "squad_challenge_create.html",
+            _CHALLENGE_CREATE_TEMPLATE,
             {
                 "page_title": f"Nouveau challenge · {squad.name}",
                 "squad": squad,
@@ -389,7 +395,7 @@ def squad_challenge_create_post(
     except ChallengeError as exc:
         return templates.TemplateResponse(
             request,
-            "squad_challenge_create.html",
+            _CHALLENGE_CREATE_TEMPLATE,
             {
                 "page_title": f"Nouveau challenge · {squad.name}",
                 "squad": squad,
@@ -410,9 +416,9 @@ def squad_challenge_detail(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     if not is_member(db, squad_id, user.id):
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     challenge = get_challenge_or_none(db, challenge_id)
     if not challenge or challenge.squad_id != squad_id:
@@ -450,9 +456,9 @@ def squad_compare(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     if not is_member(db, squad_id, user.id):
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     members = get_squad_members(db, squad_id)
     comparison = None
@@ -491,9 +497,9 @@ def squad_recommend(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     if not is_member(db, squad_id, user.id):
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     recommend_template(db, squad_id, user.id, template_slug, template_name, note or None)
     return RedirectResponse(
@@ -512,9 +518,9 @@ def squad_share_session(
 ):
     squad = get_squad_or_none(db, squad_id)
     if not squad:
-        raise HTTPException(status_code=404, detail="Squad introuvable")
+        raise HTTPException(status_code=404, detail=_SQUAD_NOT_FOUND)
     if not is_member(db, squad_id, user.id):
-        raise HTTPException(status_code=403, detail="Accès refusé")
+        raise HTTPException(status_code=403, detail=_ACCESS_DENIED)
 
     try:
         share_session(db, squad_id, user.id, session_id)
