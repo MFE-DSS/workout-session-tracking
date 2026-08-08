@@ -1,7 +1,7 @@
 # Sb_CUSTOM_PROGRAM_PUBLICATION_03 — Accès & lancement des séances publiées (SPEC)
 
 **Cycle :** Custom Program · **Amont :** `Sx_CUSTOM_PROGRAM_05 §14` (accès propriétaire) + PUBLICATION_01 (matérialisation N templates) + PUBLICATION_02 (cycle d'édition)
-**Tier :** SHARED_CODE (services importés par les routers ; **aucune migration**) · **Statut :** PR PENDING
+**Tier :** SHARED_CODE (services importés par les routers ; **aucune migration**) · **Statut :** ✅ MERGED (PR #56, merge `bc0f68f`, 2026-08-08)
 
 ---
 

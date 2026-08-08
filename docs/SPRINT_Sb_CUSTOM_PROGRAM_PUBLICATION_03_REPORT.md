@@ -56,6 +56,16 @@ check_scope **SHARED_CODE** · `check_spec_protocol` PASS · `check_ruff_budget`
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_CUSTOM_PROGRAM_PUBLICATION_03 — PATCH COMPLETE / PR PENDING.** Le propriétaire accède & lance ses séances publiées **par le contexte programme possédé** ; garde de propriété ajoutée au chemin slug (**fermeture d'un défaut cross-utilisateur préexistant**) ; archivé non lançable ; **zéro migration / table / `user_id` / réécriture `session_builder`** ; `/library` inchangé. **Merge = GO humain.**
+**Verdict :** ✅ **Sb_CUSTOM_PROGRAM_PUBLICATION_03 — MERGED + CANONICAL CI GREEN.** Le propriétaire accède & lance ses séances publiées **par le contexte programme possédé** ; garde de propriété ajoutée au chemin slug (**fermeture d'un défaut cross-utilisateur préexistant**) ; archivé non lançable ; **zéro migration / table / `user_id` / réécriture `session_builder`** ; `/library` inchangé.
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#56 MERGED** 2026-08-08, build `56f206f` + fix Gitar `ac454b9`, merge commit **`bc0f68f`** sur `claude/sprint-reporting-fitness-app-V7Qr6` via `--merge --match-head-commit ac454b9` — **sans squash, sans `--admin`** (gate `CLEAN`, **0 thread non résolu**). `GO BUILD` → autonome jusqu'à PR GREEN ; `GO MERGE` → merge + closeout (protocole `CLAUDE.md §4`).
+- **CI PR #56** : 5 checks verts (lint · pytest+QA · Gitar · SonarCloud · SonarCloud Code Analysis).
+- **CI canonique** : run **`31256743949`** 3/3 GREEN sur `bc0f68f` — `pytest + QA scripts` (dont drift Alembic · schema snapshot · migration patterns/roundtrip · perf budget), `lint`, `SonarCloud`.
+- **Sonar** : gate PR **OK**, delta `total: 0`, `new_coverage` **97.1 %** (524 lignes neuves), `new_violations` **0** ; fichiers neufs `app/services/user_program_launch.py` + `tests/test_user_program_launch.py` = **0 issue** sur main.
+- **Thread Gitar** (qualité) : `db.add(session)` redondant dans la route de lancement (`instantiate_session` stage déjà, `create_session` idem) → **vérifié réel, corrigé in-scope** (`ac454b9`), comportement inchangé (15/15 tests reverts verts), thread **auto-résolu**.
+- **Gate main-branch = ERROR préexistant** : dette repo accumulée (période *new code* `previous_version` depuis 2026-04-10) — 20 bugs / 6 vulns / 724 code smells au total ; **PUBLICATION_03 y contribue 0** (prouvé par le gate PR delta 0 + 0 issue sur les fichiers neufs). La **CI canonique 3/3** reste la source de vérité de non-régression (`CLAUDE.md §2`).
+- **Nettoyage branche/worktree** : `sb/custom-program-publication-03` + worktree `workout-session-tracking-publication-03` **conservés** — suppression = **GO humain séparé** (jamais en autonomie, `CLAUDE.md §4`).

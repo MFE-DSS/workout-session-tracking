@@ -508,10 +508,11 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
-- **`Sb_CUSTOM_PROGRAM_PUBLICATION_03 — Accès & lancement des séances publiées` : 🟡 PATCH
-  COMPLETE / PR PENDING** 2026-08-08 (base `c606448`, branche `sb/custom-program-publication-03` ;
-  **sous protocole agentique** `CLAUDE.md §4` — `GO BUILD` → autonome jusqu'à `PR GREEN / MERGE PENDING`,
-  **merge = GO humain** ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_PUBLICATION_03_REPORT.md` +
+- **`Sb_CUSTOM_PROGRAM_PUBLICATION_03 — Accès & lancement des séances publiées` : ✅ MERGED +
+  CANONICAL CI GREEN** 2026-08-08 (base `c606448`, build `56f206f` + fix Gitar `ac454b9`, **PR #56
+  MERGED**, merge `bc0f68f` via `--merge --match-head-commit` **sans squash / sans `--admin`** — gate
+  `CLEAN`, 0 thread ; **sous protocole agentique** `CLAUDE.md §4` : `GO BUILD` → PR GREEN, `GO MERGE` →
+  merge + closeout ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_PUBLICATION_03_REPORT.md` +
   `docs/strategy/Sb_CUSTOM_PROGRAM_PUBLICATION_03_SPEC.md`). **Fermeture de boucle spec 05 §14** : le
   propriétaire **accède & lance** ses séances publiées depuis l'UI de son **programme possédé** — PUBLICATION_01
   les matérialisait en `WorkoutTemplate` `catalog_section="user"` **exclus de `/library`**, sans porte de
@@ -523,7 +524,11 @@
   d'un défaut cross-utilisateur préexistant** ; **système inchangé**. **Zéro exposition catalogue · zéro
   `WorkoutTemplate.user_id` · zéro table · zéro migration · zéro réécriture `session_builder` · gardes
   `/library` inchangées.** **15 tests** + broad sweep ciblé **673** (46 fichiers) ; check_scope
-  **SHARED_CODE** ; budget **543 ≤ 548** ; spec PASS. **PR/CI + finalisation = closeout (GO humain).**
+  **SHARED_CODE** ; budget **543 ≤ 548** ; spec PASS. **CI PR #56 5 checks verts · canonique
+  `31256743949` 3/3 GREEN sur `bc0f68f`** ; **Sonar gate PR OK, delta 0, new_coverage 97.1 %, fichiers
+  neufs 0 issue** ; **1 thread Gitar** (`db.add` redondant) corrigé in-scope (`ac454b9`), auto-résolu.
+  **Gate main-branch = ERROR préexistant** (dette repo depuis 2026-04-10 : 20 bugs / 6 vulns / 724
+  smells — PUBLICATION_03 y contribue **0**). Nettoyage branche/worktree = **GO humain séparé (non fait)**.
 - **`Sb_CUSTOM_PROGRAM_PUBLICATION_02 — Nouveau cycle d'édition post-publication` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-07 (base `a4e54c5`, **PR #53 MERGED**, merge `90a4caf` via `--merge`
   **sans `--admin`** — gate `CLEAN` ; CI canonique `31223321518` 3/3, coverage 91.1 %, Sonar delta 0 ;
