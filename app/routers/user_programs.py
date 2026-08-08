@@ -871,7 +871,6 @@ def user_program_start_session(
     except LaunchNotFound as exc:
         raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
     session = instantiate_session(db, template, datetime.now(UTC), user_id=user.id)
-    db.add(session)
-    db.commit()
+    db.commit()  # instantiate_session already stages the session (session_builder.py:82)
     db.refresh(session)
     return RedirectResponse(url=f"/sessions/{session.id}", status_code=303)
