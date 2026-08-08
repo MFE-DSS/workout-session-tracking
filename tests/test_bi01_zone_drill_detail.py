@@ -153,7 +153,8 @@ def test_drill_shows_top_exercises_inline_no_js(client):
     assert "Back squat" in section or "Curl EZ-bar debout" in section
     # no JS anywhere in the section
     assert "<script" not in section
-    assert "onclick" not in section and "addEventListener" not in section
+    assert "onclick" not in section
+    assert "addEventListener" not in section
 
 
 def test_drill_summary_is_native_details_element(client):
@@ -175,7 +176,8 @@ def test_drill_section_has_no_opaque_score_or_radar(client):
     with SessionLocal() as db:
         _seed(db, _uid(db))
     section = _zone_section(_render(client).text).lower()
-    assert "/100" not in section and "/ 100" not in section
+    assert "/100" not in section
+    assert "/ 100" not in section
     assert "radar" not in section
     assert "score global" not in section
     assert "note globale" not in section
@@ -210,7 +212,8 @@ def test_router_still_reuses_top_exercises_no_new_score():
     assert "top_exercises" in src
     # still no opaque score/grade surfaced by the router
     assert ".global_grade" not in src
-    assert '"score"' not in src and "'score'" not in src
+    assert '"score"' not in src
+    assert "'score'" not in src
 
 
 def test_physique_and_home_untouched_by_drill():
