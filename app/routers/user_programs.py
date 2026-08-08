@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Path, Request
@@ -50,6 +51,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.deps import CurrentUser, DbSession
 from app.services.program_quality_reviews import SCORABLE_STATUSES
+from app.services.session_builder import instantiate_session
 from app.services.session_state import latest_open_session
 from app.services.user_program_drafts import (
     UserProgramDraftError,
@@ -65,6 +67,10 @@ from app.services.user_program_generator import (
     SPLIT_LABELS,
     ProgramGenerationError,
     generate_program_tree,
+)
+from app.services.user_program_launch import (
+    LaunchNotFound,
+    resolve_owned_published_template,
 )
 from app.services.user_program_publish import (
     PublishNotFound,
@@ -837,3 +843,35 @@ def user_program_new_version(
             request, db, user, _owned_or_404(db, user, program_id), error=exc.message
         )
     return _redirect_to_editor(request, program_id)
+
+
+# ─────────────── launch a published session template (PUBLICATION_03) ───────────────
+
+
+@router.post(
+    "/programs/{program_id}/sessions/{session_id}/start",
+    name="user_program_start_session",
+    responses={404: {"description": _NOT_FOUND}},
+)
+def user_program_start_session(
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+    session_id: Annotated[int, Path()],
+) -> RedirectResponse:
+    """Launch an OWNED, PUBLISHED session as a real WorkoutSession (spec 05 §14).
+
+    Ownership is resolved through `UserProgram (owner) → UserProgramSession →
+    published_template_id` — a missing/foreign/not-published session is an indistinct
+    404 (no existence leak). The published `WorkoutTemplate` is instantiated via the
+    existing `session_builder` (reused, unchanged) and never mutated; the program is
+    never mutated. Success → the existing session page."""
+    try:
+        template = resolve_owned_published_template(db, user.id, program_id, session_id)
+    except LaunchNotFound as exc:
+        raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
+    session = instantiate_session(db, template, datetime.now(UTC), user_id=user.id)
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return RedirectResponse(url=f"/sessions/{session.id}", status_code=303)

@@ -508,6 +508,22 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_PUBLICATION_03 — Accès & lancement des séances publiées` : 🟡 PATCH
+  COMPLETE / PR PENDING** 2026-08-08 (base `c606448`, branche `sb/custom-program-publication-03` ;
+  **sous protocole agentique** `CLAUDE.md §4` — `GO BUILD` → autonome jusqu'à `PR GREEN / MERGE PENDING`,
+  **merge = GO humain** ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_PUBLICATION_03_REPORT.md` +
+  `docs/strategy/Sb_CUSTOM_PROGRAM_PUBLICATION_03_SPEC.md`). **Fermeture de boucle spec 05 §14** : le
+  propriétaire **accède & lance** ses séances publiées depuis l'UI de son **programme possédé** — PUBLICATION_01
+  les matérialisait en `WorkoutTemplate` `catalog_section="user"` **exclus de `/library`**, sans porte de
+  lancement. Service neuf **READ-ONLY** `user_program_launch.py` (`resolve_owned_published_template` +
+  `is_owned_published_template` + `LaunchNotFound`, chaîne `UserProgram(owner) → UserProgramSession →
+  published_template_id`, **`archived_at IS NULL` exigé**), route `POST /programs/{id}/sessions/{sid}/start`
+  → `instantiate_session` → 303, CTA détail « Démarrer cette séance » (publié + non archivé + lié). **Garde
+  de propriété ajoutée à `create_session`** (chemin slug) : template `user` non possédé → 404 — **fermeture
+  d'un défaut cross-utilisateur préexistant** ; **système inchangé**. **Zéro exposition catalogue · zéro
+  `WorkoutTemplate.user_id` · zéro table · zéro migration · zéro réécriture `session_builder` · gardes
+  `/library` inchangées.** **15 tests** + broad sweep ciblé **673** (46 fichiers) ; check_scope
+  **SHARED_CODE** ; budget **543 ≤ 548** ; spec PASS. **PR/CI + finalisation = closeout (GO humain).**
 - **`Sb_CUSTOM_PROGRAM_PUBLICATION_02 — Nouveau cycle d'édition post-publication` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-07 (base `a4e54c5`, **PR #53 MERGED**, merge `90a4caf` via `--merge`
   **sans `--admin`** — gate `CLEAN` ; CI canonique `31223321518` 3/3, coverage 91.1 %, Sonar delta 0 ;
@@ -571,13 +587,12 @@
   `4badb0f` (bindings distincts), `issues/search total: 0` + reliability A revérifiés. Régénération
   gardée → **WIZARD_06**. **Gouvernance actée** : `SCORING_04`
   **SUPERSEDED** · `EKB_04` (seed DB) **DEFERRED** · `Sb_OPS` leviers 3+4 **DEFERRED**.
-- **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01` = ✅ **LIVRÉS**
-  (MERGED + canonical CI green). **Prochains candidats (sur GO explicite, aucun ouvert)** :
-  1. **`PUBLICATION_02`** — cycle de vie d'un programme publié / flow de nouvelle version ;
-  2. **`PUBLICATION_03`** — UI d'accès aux templates user-owned ;
-  3. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
-  4. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;
-  5. **activation Vortex MCP** (SonarQube MCP, sur setup opérateur).
+- **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01` + `PUBLICATION_02` = ✅ **LIVRÉS**
+  (MERGED + canonical CI green) · `PUBLICATION_03` = 🟡 **PATCH COMPLETE / PR PENDING** (accès & lancement
+  des séances publiées ; merge = GO humain). **Prochains candidats (sur GO explicite, aucun ouvert)** :
+  1. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
+  2. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;
+  3. **activation Vortex MCP** (SonarQube MCP, sur setup opérateur).
   Tous les autres `Sb_CUSTOM_PROGRAM_*` (`LAUNCH_02+`, `PERSISTENCE_*`, `EKB_*`, `SCORING_*`) restent
   **NOT AUTHORIZED** — chacun sur GO/override explicite, dans l'ordre du gate.
 
