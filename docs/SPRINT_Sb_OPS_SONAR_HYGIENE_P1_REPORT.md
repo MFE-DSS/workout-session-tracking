@@ -51,3 +51,14 @@ La 1ʳᵉ tentative (dédup `python:S1192` dans `app/routers/squads.py`) a **cas
 ## Verdict
 
 **Verdict :** 🟢 **Sb_OPS.sonar-hygiene-p1 (safe batch) — PATCH COMPLETE / PR PENDING.** 6 assertions composites `S9073` splittées en tests BI, **test-only, behavior-preserving, aucune assertion affaiblie, aucun impact coverage**, **PR-level Sonar delta 0** attendu. 1ʳᵉ tentative squads (cascade) documentée et abandonnée. **Merge = GO humain.**
+
+---
+
+## Appendice post-merge (closeout 2026-08-07)
+
+- **PR #55 MERGED** — merge commit **`45ead13`** (via `--merge`, **sans `--admin`** — gate `CLEAN`, 0 thread ; garde `--match-head-commit 8f1925c`). Base `038d194`.
+- **CI PR #55** : 5 checks verts (`pytest + QA scripts` · `lint` · `SonarCloud` · `SonarCloud Code Analysis` · `Gitar`) — **aucune cascade** (test-only), contrairement à la 1ʳᵉ tentative squads (PR #54).
+- **CI canonique (push) : run `31253319877` sur `45ead13` → 3/3 GREEN** · **coverage `91.1 %`** · **Sonar delta `total: 0`**.
+- **Cleanup** : branche `sb/ops-sonar-hygiene-p1-safe-batch` (remote + locale) et worktree `-hygiene-safe` supprimés. (PR #54 + sa branche/worktree squads déjà supprimés au retarget.)
+
+**Verdict post-merge :** ✅ **Sb_OPS.sonar-hygiene-p1 — MERGED + CANONICAL CI GREEN + CLOSED + CLEANED.** 6 `S9073` résorbées ; le patron « split d'assertions de test » est validé pour les lots hygiène suivants.
