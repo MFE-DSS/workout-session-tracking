@@ -92,5 +92,10 @@ absent from canonical). **Verdict: SALVAGE** — the branch was rebased **additi
 canonical (`6037661`) by merging canonical in; the only conflict was `SPEC_REGISTRY.md` (resolved by
 keeping canonical's D1/04.1/04.2 entries + the refreshed C2 entry); the shared roadmaps were refreshed.
 **No candidate SVG/PNG/OBJ, no external review outputs, no credentials, no runtime/intake/§5bis** are
-introduced; the harness is self-contained (no `app` coupling). Harness tests **22 passed**. PR #46 is
-driven to green; **merge remains a human GO**.
+introduced; the harness is self-contained (no `app` coupling). Harness tests **26 passed** (22 + 4
+regression for the Gitar robustness fixes). Three Gitar review threads were fixed in-scope (non-dict
+finding/veto guards, arbiter-veto `.get(type)` skip with an anti-S3776 extraction, distinct MAJOR count).
+**PR #46 MERGED** 2026-08-09 (merge `d73af7d`, `--merge --match-head-commit`, no squash/`--admin`, gate
+CLEAN, 3/3 threads resolved) — **canonical CI `31310301874` 3/3 GREEN, Sonar delta 0**. The reusable
+harness is now versioned on canonical for future plate reviews; **no runtime / intake / §5bis / candidate
+geometry / professional-review claim** introduced.

@@ -276,7 +276,7 @@ Sous-cycle premium : `Sb_ASSET_03B.1` **CLOSED / DELIVERED** ; `Sb_ASSET_03B.2` 
 Aucun des deux n'est ouvert par ce lot.
 `Sx_ASSET_04`/`Sb_ASSET_04.1: BLOCKED BY ASSET INTEGRATION GATE`.
 
-**⚙️ SYNTHETIC INTERNAL REVIEW — Sb_ASSET_03B.2R-C2 (2026-07-30 ; harnais réutilisable versionné via PR #46, 2026-08-09).** La géométrie P0
+**⚙️ SYNTHETIC INTERNAL REVIEW — Sb_ASSET_03B.2R-C2 (2026-07-30 ; harnais réutilisable MERGÉ via PR #46 `d73af7d`, 2026-08-09).** La géométrie P0
 (chest/shoulders/posterior, produite hors Git par le toolchain opérateur BodyParts3D) a passé un
 **review interne synthétique single-family multi-agent** (conseil aveugle de 5 juges Claude + arbitre,
 harness Promptfoo MIT versionné `tools/evals/muscle_focus/`, calibration 9/9 critiques + 12/12) :
@@ -286,5 +286,6 @@ dispatch réviseur externe (C1) est différé par le propriétaire, non passé**
 interne **n'est PAS** une revue anatomique professionnelle qualifiée et ne la revendique pas ; une revue
 professionnelle future peut le superséder. `RUNTIME/INTAKE/§5bis: BLOCKED` (ce sprint) ; `CANDIDATES: UNCHANGED`.
 **Résultat historique** — a alimenté le C3 freeze → intake D1 → runtime 04.1 (déjà livrés). **Résolution `Sb_OPS`
-(GO RESOLVE PR #46, 2026-08-09)** : le harnais réutilisable (eval only) est versionné via **PR #46** rebasé
-additivement sur la canonique — merge = GO humain.
+(GO RESOLVE PR #46, 2026-08-09)** : le harnais réutilisable (eval only) a été salvagé et **MERGÉ** via **PR #46**
+(`d73af7d`, CI canonique 3/3 GREEN, Sonar delta 0) — versionné pour les revues de plaques futures, sans
+runtime/intake/§5bis.
