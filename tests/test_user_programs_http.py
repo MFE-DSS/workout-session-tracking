@@ -126,7 +126,8 @@ def test_redirect_target_shows_created_program(client):
     detail = client.get(path)
     assert detail.status_code == 200
     assert "Prog Detail" in detail.text
-    assert "draft" in detail.text
+    # DOGFOOD_01 (F1): the lifecycle badge now shows the French label, not raw "draft".
+    assert "Brouillon" in detail.text
 
 
 def test_title_is_trimmed(client):
