@@ -508,6 +508,22 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_PUBLICATION_04 — Cycle de republication sûr` : 🟡 PATCH COMPLETE /
+  PR PENDING** 2026-08-08 (base `e1bcca1`, branche `sb/custom-program-publication-04` ; **sous protocole
+  agentique** `CLAUDE.md §4` : `GO BUILD` → préflight → **STOP + arbitrage (Option A)** → autonome jusqu'à
+  `PR GREEN / MERGE PENDING`, **merge = GO humain** ;
+  `docs/SPRINT_Sb_CUSTOM_PROGRAM_PUBLICATION_04_REPORT.md` +
+  `docs/strategy/Sb_CUSTOM_PROGRAM_PUBLICATION_04_SPEC.md`). **Preuve + verrouillage** du cycle
+  `publish v{n}` → nouveau cycle (PUBLICATION_02) → édition/validation → **republication `v{n+1}`**.
+  **Décision schéma (Option A opérateur)** : le lifecycle requis est **déjà exprimable** — slugs
+  `…-v{n+1}-s{pos}` (version ⇒ aucune collision, N **nouveaux** templates) ; PUBLICATION_02 a **effacé**
+  `published_template_id`/`template_slug_snapshot` ⇒ republication repointe vers `v{n+1}`, les `v{n}` ne
+  sont plus liés ⇒ **non lançables** (programme + slug), restent `catalog_section="user"` (immuables,
+  exclus `/library` listing + slug, protégés du wipe-guard). **Archivage `catalog_section="archived"`
+  REFUSÉ** (expose via `/library/{slug}` · supprimable au reseed · sémantique système) ⇒ un vrai champ
+  exigerait une migration, **non nécessaire**. **Zéro code app · zéro migration · zéro table · zéro
+  re-label.** **11 tests** de republication + broad sweep ciblé **94** ; check_scope **ISOLATED** ;
+  budget **543 ≤ 548** ; spec PASS. **PR/CI + finalisation = closeout (GO humain).**
 - **`Sb_CUSTOM_PROGRAM_PUBLICATION_03 — Accès & lancement des séances publiées` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-08 (base `c606448`, build `56f206f` + fix Gitar `ac454b9`, **PR #56
   MERGED**, merge `bc0f68f` via `--merge --match-head-commit` **sans squash / sans `--admin`** — gate
@@ -592,9 +608,10 @@
   `4badb0f` (bindings distincts), `issues/search total: 0` + reliability A revérifiés. Régénération
   gardée → **WIZARD_06**. **Gouvernance actée** : `SCORING_04`
   **SUPERSEDED** · `EKB_04` (seed DB) **DEFERRED** · `Sb_OPS` leviers 3+4 **DEFERRED**.
-- **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01` + `PUBLICATION_02` = ✅ **LIVRÉS**
-  (MERGED + canonical CI green) · `PUBLICATION_03` = 🟡 **PATCH COMPLETE / PR PENDING** (accès & lancement
-  des séances publiées ; merge = GO humain). **Prochains candidats (sur GO explicite, aucun ouvert)** :
+- **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01` + `PUBLICATION_02` + `PUBLICATION_03`
+  = ✅ **LIVRÉS** (MERGED + canonical CI green) · `PUBLICATION_04` = 🟡 **PATCH COMPLETE / PR PENDING**
+  (cycle de republication prouvé sûr, zéro archivage/migration ; merge = GO humain). **Prochains candidats
+  (sur GO explicite, aucun ouvert)** :
   1. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
   2. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;
   3. **activation Vortex MCP** (SonarQube MCP, sur setup opérateur).
