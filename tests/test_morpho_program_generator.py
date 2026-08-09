@@ -77,6 +77,24 @@ def test_fingerprint_changes_with_inputs():
     assert base.generated_program_id != more.generated_program_id
 
 
+def test_fingerprint_is_a_full_content_address():
+    """The id folds in the pool and each slot's fallbacks/warning: different pools that yield the
+    same preferred pick still get different ids, and the same custom pool stays deterministic."""
+    default = GEN.generate_program(priorities=[("upper_chest", 1)])
+    pool = dict(SUB.load_exercise_properties())
+    # An extra pecs press: same preferred (ties break by name, "Chest Press machine" wins) but the
+    # pool differs and a new fallback appears → the id must differ.
+    pool["Zzz incline press"] = {
+        "zone_primary": "pecs", "pattern_motor": "push_horizontal",
+        "equipment_family": "machine", "chain": "compound", "muscle_group": None,
+    }
+    custom = GEN.generate_program(priorities=[("upper_chest", 1)], pool=pool)
+    custom_again = GEN.generate_program(priorities=[("upper_chest", 1)], pool=pool)
+    assert custom.selections[0].preferred_exercise == default.selections[0].preferred_exercise
+    assert custom.generated_program_id != default.generated_program_id  # pool folded in
+    assert custom.generated_program_id == custom_again.generated_program_id  # still deterministic
+
+
 # ─────────────────── intents match morphology priorities ───────────────────
 
 

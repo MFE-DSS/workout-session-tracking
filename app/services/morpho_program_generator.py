@@ -225,20 +225,40 @@ def _compose_slot_intents(
     return tuple(out)
 
 
+def _pool_fingerprint(pool: dict[str, dict]) -> str:
+    """A stable digest of the candidate pool used — so proposals built from different pools
+    (e.g. a custom `pool=` argument) never collide on the same id."""
+    blob = json.dumps(pool, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
+
+
 def _fingerprint(
     source_descriptors: Sequence[str],
     priorities: Sequence[tuple[str, int]],
     availability: frozenset[str] | None,
     selections: Sequence[SlotSelection],
+    pool_digest: str,
 ) -> str:
-    """Stable content hash of the proposal (deterministic — hashlib only, no clock/random)."""
+    """Stable content hash of the proposal (deterministic — hashlib only, no clock/random).
+
+    A full content-address of the discriminating output: it folds in each slot's fallback
+    candidates and warning and the pool digest, so two proposals that differ only in fallbacks,
+    warnings, or the pool used receive different ids (never a collision)."""
     payload = {
         "engine_version": MORPHO_PROGRAM_GENERATOR_ENGINE_VERSION,
         "source_descriptors": sorted(source_descriptors),
         "priorities": [list(p) for p in priorities],
         "availability": sorted(availability) if availability is not None else None,
+        "pool": pool_digest,
         "slots": [
-            [s.slot_id, s.intent_id, s.preferred_exercise, s.preferred_score]
+            [
+                s.slot_id,
+                s.intent_id,
+                s.preferred_exercise,
+                s.preferred_score,
+                [list(fc) for fc in s.fallback_candidates],
+                s.warning,
+            ]
             for s in selections
         ],
     }
@@ -304,7 +324,9 @@ def generate_program(
     warnings.extend(s.warning for s in selections if s.warning is not None)
 
     source_ids = tuple(getattr(d, "descriptor_id", "<unknown>") for d in descs)
-    fingerprint = _fingerprint(source_ids, priorities, availability_set, selections)
+    fingerprint = _fingerprint(
+        source_ids, priorities, availability_set, selections, _pool_fingerprint(candidate_pool)
+    )
 
     return GeneratedProgram(
         generated_program_id=fingerprint,
