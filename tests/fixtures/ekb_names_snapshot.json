@@ -1,6 +1,6 @@
 {
   "_doc": "Snapshot opposable du référentiel de noms canoniques d'exercices (prescrits + substituts N1 de reference_split.json). Invariance contrainte #1: aucun renommage, byte-à-byte, ordre codepoint.",
-  "source_version": "2026-04-21.v13",
+  "source_version": "2026-04-21.v14",
   "count": 103,
   "names": [
     "Adduction assise",

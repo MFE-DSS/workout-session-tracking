@@ -108,14 +108,17 @@ def test_exactly_103_unique_canonical_names():
     assert len(report["canonical_names"]) == 103
 
 
-def test_exactly_65_prescribed_and_59_substitutes():
+def test_exactly_68_prescribed_and_66_substitutes():
     split = json.loads(REFERENCE_SPLIT_FILE.read_text(encoding="utf-8"))
     extraction = extract_names(split)
-    assert len(extraction["prescribed"]) == 65
-    assert len(extraction["substitutes"]) == 59
-    # 65 + 59 − 21 (overlap) = 103 — la somme est cohérente par construction
-    assert extraction["templates"] == 16
-    assert extraction["slots"] == 98
+    # +1 template "full-body-morphotype-priority-v1" (specialization, 8 slots) reusing
+    # existing EKB names only — the canonical set stays 103 (no new name), while the
+    # prescribed/substitute category counts and the template/slot totals grow.
+    assert len(extraction["prescribed"]) == 68
+    assert len(extraction["substitutes"]) == 66
+    # 68 + 66 − 31 (overlap) = 103 — la somme est cohérente par construction
+    assert extraction["templates"] == 17
+    assert extraction["slots"] == 106
 
 
 def test_names_are_unique_sorted_and_byte_exact():

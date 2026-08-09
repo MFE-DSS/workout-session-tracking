@@ -120,12 +120,14 @@ def test_positions_sequential_within_template():
 
 
 def test_template_slugs_unchanged():
-    """The 16 template slugs must be intact (no slug renamed by this cleanup)."""
+    """The original 16 template slugs must be intact (no slug renamed) — plus the
+    additive 'full-body-morphotype-priority-v1' catalog program (specialization)."""
     slugs = {t["slug"] for t in _catalog()["templates"]}
     expected = {
         "push-a", "push-b", "pull-a", "pull-b", "legs-a", "legs-b",
         "upper-pecs-delts", "upper-back-arms", "lower-quad-bias",
         "lower-posterior-bias", "liss-only", "liss-abs", "short-upper",
         "catch-up-shoulders", "catch-up-arms", "catch-up-back-width",
+        "full-body-morphotype-priority-v1",
     }
     assert slugs == expected
