@@ -143,10 +143,14 @@ DESCRIPTOR_TO_INTENT: dict[str, str] = {
 KNOWN_INTENT_IDS: frozenset[str] = frozenset(_INTENT_SPECS)
 
 # Module-load invariants: every intent uses valid, existing taxonomy values.
+# Raise (not assert) — matches substitution.py's load-time validation and survives `python -O`.
 for _iid, _spec in _INTENT_SPECS.items():
-    assert _spec["movement_pattern"] in VALID_PATTERN_MOTORS, _iid
-    assert all(p in VALID_PATTERN_MOTORS for p in _spec["forbidden"]), _iid
-    assert _spec["primary_zone"] in DETAILED_TO_REGION, _iid
+    if _spec["movement_pattern"] not in VALID_PATTERN_MOTORS:
+        raise ValueError(f"slot_intent: intent {_iid!r} has invalid movement_pattern")
+    if any(p not in VALID_PATTERN_MOTORS for p in _spec["forbidden"]):
+        raise ValueError(f"slot_intent: intent {_iid!r} has an invalid forbidden pattern")
+    if _spec["primary_zone"] not in DETAILED_TO_REGION:
+        raise ValueError(f"slot_intent: intent {_iid!r} has an unknown primary_zone")
 
 
 # ── Builders ─────────────────────────────────────────────────────────────
