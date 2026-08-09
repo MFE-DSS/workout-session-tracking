@@ -55,6 +55,14 @@ check_scope **ISOLATED** · `check_spec_protocol` PASS · `check_ruff_budget` **
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_PROGRAM_SLOT_INTENT_01 — PATCH COMPLETE / PR PENDING.** Couche `SlotIntent` **pure et additive** : priorités/descripteurs morphologie → intentions de slot dans la taxonomie existante, `compute_proximity` **réutilisé en lecture seule**, **substitution N1/N2/N3 inchangée** (0 modif), 0 DB/migration/générateur. Merge = GO humain.
+**Verdict :** ✅ **Sb_PROGRAM_SLOT_INTENT_01 — MERGED + CANONICAL CI GREEN.** Couche `SlotIntent` **pure et additive** : priorités/descripteurs morphologie → intentions de slot dans la taxonomie existante, `compute_proximity` **réutilisé en lecture seule**, **substitution N1/N2/N3 inchangée** (0 modif), 0 DB/migration/générateur.
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#63 MERGED** 2026-08-09, build `ef549c8` + fix Sonar `6b95ac4`, merge commit **`2c989bd`** via `--merge --match-head-commit 6b95ac4` — **sans squash, sans `--admin`** (gate `CLEAN`, 0 thread).
+- **CI canonique** : run **`31329924105`** 3/3 GREEN sur `2c989bd` (pytest+QA · lint · SonarCloud) ; `app/services/slot_intent.py` = **0 issue** Sonar sur main.
+- **Incident CI de PR résolu in-scope** : gate Sonar rouge sur `new_vulnerabilities_severity 10 > 9` — **3× `bandit:B101`** (`assert` d'invariant au chargement du module, strippés en `python -O`) → convertis en `raise ValueError` (`6b95ac4`), même convention que `substitution.py` ; invariant préservé et couvert par `test_intents_use_valid_taxonomy`. new_coverage/smells étaient OK.
+- **Cleanup** : branche `sb/program-slot-intent-01` + worktree `workout-session-tracking-slot-intent` **conservés** — suppression = **GO humain séparé**.
+- **File restante** (sur GO) : `Sb_MORPHO_PROGRAM_GENERATOR_01` → `Sb_MARTIN_PROGRAM_01` → `Sb_MORPHO_DOGFOOD_01`.
