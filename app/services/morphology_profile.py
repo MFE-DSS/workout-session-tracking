@@ -376,12 +376,39 @@ def _inference_descriptors(facts: MorphologyFacts) -> list[MorphologyDescriptor]
 # ── API publique ───────────────────────────────────────────────────────────
 
 
+def _validate_facts(facts: MorphologyFacts) -> None:
+    """Applique les vocabulaires FERMÉS (spec §5/§6) : une observation ou un candidat hors
+    vocabulaire est **rejeté**, jamais silencieusement ignoré. Fail-fast déterministe
+    (`ValueError`), même doctrine que `substitution.load_exercise_properties` sur un
+    `pattern_motor` invalide."""
+    for obs in facts.observations:
+        allowed = OBSERVATION_VOCAB.get(obs.key)
+        if allowed is None:
+            raise ValueError(
+                f"observation clé inconnue '{obs.key}' — vocabulaire fermé : "
+                f"{sorted(OBSERVATION_VOCAB)}"
+            )
+        if obs.tag not in allowed:
+            raise ValueError(
+                f"observation '{obs.key}' tag invalide '{obs.tag}' — admis : {sorted(allowed)}"
+            )
+    for candidate in facts.focus_candidates:
+        if candidate not in FOCUS_CANDIDATE_VOCAB:
+            raise ValueError(
+                f"focus candidate inconnu '{candidate}' — vocabulaire fermé : "
+                f"{sorted(FOCUS_CANDIDATE_VOCAB)}"
+            )
+
+
 def build_morphology_profile(facts: MorphologyFacts) -> tuple[MorphologyDescriptor, ...]:
     """Faits corporels → descripteurs de morphologie (FACT + INFERENCE), déterministe.
 
-    Pur : même entrée ⇒ même sortie. N'émet jamais un descripteur du garde-fou strict
-    (`GUARDED_NOT_DEDUCTIBLE`). Un descripteur dont les entrées manquent est **omis**
-    (jamais inventé)."""
+    Pur : même entrée ⇒ même sortie. Les vocabulaires fermés (`OBSERVATION_VOCAB`,
+    `FOCUS_CANDIDATE_VOCAB`) sont **appliqués** — une entrée hors vocabulaire lève
+    `ValueError` (jamais ignorée en silence). N'émet jamais un descripteur du garde-fou
+    strict (`GUARDED_NOT_DEDUCTIBLE`). Un descripteur dont les entrées **numériques**
+    manquent est **omis** (jamais inventé)."""
+    _validate_facts(facts)
     return tuple(_fact_descriptors(facts) + _inference_descriptors(facts))
 
 

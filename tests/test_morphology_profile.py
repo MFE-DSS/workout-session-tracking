@@ -194,3 +194,39 @@ def test_martin_facts_layer_has_the_measurements():
 def test_fixture_is_marked_private():
     # The dogfood sample must self-identify as private (never global/runtime).
     assert "private" in martin_morphology.MARTIN_SOURCE.lower()
+
+
+# ─────────────────── closed-vocabulary enforcement (Gitar PR #61) ───────────────────
+
+
+def test_invalid_observation_key_raises():
+    facts = MorphologyFacts(observations=(BodyObservation("not_a_real_key", "favorable"),))
+    with pytest.raises(ValueError):
+        build_morphology_profile(facts)
+
+
+def test_invalid_observation_tag_raises():
+    # 'quads' is a valid key but 'gigantic' is not an allowed tag -> rejected, not ignored.
+    facts = MorphologyFacts(observations=(BodyObservation("quads", "gigantic"),))
+    with pytest.raises(ValueError):
+        build_morphology_profile(facts)
+
+
+def test_invalid_focus_candidate_raises():
+    facts = MorphologyFacts(focus_candidates=("biceps_peak",))
+    with pytest.raises(ValueError):
+        build_morphology_profile(facts)
+
+
+def test_valid_closed_vocab_does_not_raise():
+    facts = MorphologyFacts(
+        observations=(BodyObservation("quads", "relatively_strong"),),
+        focus_candidates=("lateral_delts",),
+    )
+    assert build_morphology_profile(facts)  # valid closed-vocab input builds normally
+
+
+def test_martin_fixture_still_valid_after_enforcement():
+    # The valid Martin fixture must remain buildable (no false rejection).
+    facts = martin_morphology.martin_morphology_facts()
+    assert build_morphology_profile(facts)
