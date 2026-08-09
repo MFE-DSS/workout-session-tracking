@@ -509,6 +509,21 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
+- **`Sx_MORPHO_PROGRAM_01 — Morphology-Aware Programming Architecture` : 🟡 SPEC PATCH COMPLETE /
+  PR PENDING** 2026-08-09 (base `092207c`, branche `sb/sx-morpho-program-01-spec` ; **spec-only, sous
+  protocole agentique** `CLAUDE.md §4` ; `docs/strategy/Sx_MORPHO_PROGRAM_01_SPEC.md` +
+  `docs/SPRINT_Sx_MORPHO_PROGRAM_01_REPORT.md`). **Design** du pipeline **faits corporels → descripteurs
+  de morphologie → priorités → intentions de slots → substitution → programmes déterministes**.
+  Préflight : **aucune spec conflictuelle shippée** ; prédécesseurs spec-only non construits (`Body Signal
+  Model`, roadmap `Sb Body 04/05`) référencés **additivement** ; **posture réconciliée** vers le garde-fou
+  **strict** (0 posture/composition/diagnostic). Réutilise **sans changement** la substitution `Sx_22a`
+  (`compute_proximity`, N1/N2/N3), étend **additivement** le générateur déterministe, réutilise
+  `BodyMeasurement`/`body_consents` (flag-off, **0 photo**) ; Martin = **fixture dogfood privée** jamais
+  template global. Frontière **agent propose / déterministe décide**, 0 mutation silencieuse. **File de
+  build** : `Sb_MORPHO_PROFILE_01` → `Sb_PROGRAM_SLOT_INTENT_01` → `Sb_MORPHO_PROGRAM_GENERATOR_01` →
+  `Sb_MARTIN_PROGRAM_01` → `Sb_MORPHO_DOGFOOD_01` (chacun sur GO). **0 code / migration / schéma implémenté**
+  ; substitution/publication/EKB_04/ASSET/`/library`/`session_builder` non touchés. check_scope **DOCS**,
+  spec PASS, budget 543 ≤ 548. **PR/CI + finalisation = closeout (GO humain).**
 - **`Sb_CUSTOM_PROGRAM_DOGFOOD_01 — Dogfood du cycle Custom Program` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-09 (base `ecb5b4b`, build `80ab9ee`, **PR #58 MERGED**, merge `f2c32b0`
   via `--merge --match-head-commit` **sans squash / sans `--admin`** — gate `CLEAN`, 0 thread ; **CI
@@ -628,8 +643,15 @@
   **SUPERSEDED** · `EKB_04` (seed DB) **DEFERRED** · `Sb_OPS` leviers 3+4 **DEFERRED**.
 - **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01→04` = ✅ **LIVRÉS**
   (MERGED + canonical CI green). `DOGFOOD_01` (audit produit + 2 frictions P1 UX corrigées) = ✅ **MERGED
-  + CANONICAL CI GREEN**. **Prochains candidats
-  (sur GO explicite, aucun ouvert)** :
+  + CANONICAL CI GREEN**.
+- **Nouveau track — Morphology Program** : `Sx_MORPHO_PROGRAM_01` (architecture, **SPEC-ONLY**) = 🟡 **PR
+  PENDING**. File de build (chacun sur GO explicite, dans l'ordre des dépendances) :
+  1. **`Sb_MORPHO_PROFILE_01`** — descripteurs de morphologie (FACT→INFERENCE pur sur `BodyMeasurement`) ;
+  2. **`Sb_PROGRAM_SLOT_INTENT_01`** — `SlotIntent` + résolution via `compute_proximity` (substitution inchangée) ;
+  3. **`Sb_MORPHO_PROGRAM_GENERATOR_01`** — générateur déterministe morpho additif + availability Fitness Park ;
+  4. **`Sb_MARTIN_PROGRAM_01`** — fixture dogfood privée Martin + programme dérivé ;
+  5. **`Sb_MORPHO_DOGFOOD_01`** — dogfood réel via le cycle Custom existant.
+- **Prochains candidats (sur GO explicite, aucun ouvert)** :
   1. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
   2. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;
   3. **activation Vortex MCP** (SonarQube MCP, sur setup opérateur).
