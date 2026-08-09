@@ -62,6 +62,14 @@ check_scope **DOCS** · `check_spec_protocol` PASS · `check_ruff_budget` inchan
 
 ## Verdict
 
-**Verdict :** 🟢 **Sx_MORPHO_PROGRAM_01_SPEC — PATCH COMPLETE / PR PENDING.** Architecture morphologie-aware **spec-only** : 12 décisions tranchées, garde-fou **strict** (0 posture/médical), substitution **réutilisée sans changement**, générateur étendu **additivement**, frontière **agent propose / déterministe décide**, confidentialité **0 photo + fixture privée Martin**, file de build en 5 items. **Zéro code, zéro migration, zéro rupture.** Merge = GO humain.
+**Verdict :** ✅ **Sx_MORPHO_PROGRAM_01_SPEC — MERGED + VERIFIED (spec-only).** Architecture morphologie-aware **spec-only** : 12 décisions tranchées, garde-fou **strict** (0 posture/médical), substitution **réutilisée sans changement**, générateur étendu **additivement**, frontière **agent propose / déterministe décide**, confidentialité **0 photo + fixture privée Martin**, file de build en 5 items. **Zéro code, zéro migration, zéro rupture.**
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#60 MERGED** 2026-08-09, build `26c4bf2`, merge commit **`8d1ce98`** sur `claude/sprint-reporting-fitness-app-V7Qr6` via `--merge --match-head-commit 26c4bf2` — **sans squash, sans `--admin`** (gate `CLEAN`, 0 thread). `GO BUILD` → `GO MERGE` (protocole `CLAUDE.md §4`).
+- **CI** : **CI de vérité = PR #60 run `31313414699` (`pull_request`) success** — 5 checks verts (lint · pytest+QA · Gitar · SonarCloud · SonarCloud Code Analysis), Sonar gate PR **OK** (0 issue neuve). Le merge est **100 % docs** → la CI push canonique est **légitimement skippée** (`paths-ignore: docs/**`, CLAUDE.md §2) : aucun run canonique pour `8d1ce98`.
+- **Closeout** : docs-only (report + SPEC_REGISTRY + ROADMAP → MERGED). **Aucun code / migration / schéma / fixture personnelle** committé.
+- **File de build ouverte sur GO** : `Sb_MORPHO_PROFILE_01` → `Sb_PROGRAM_SLOT_INTENT_01` → `Sb_MORPHO_PROGRAM_GENERATOR_01` → `Sb_MARTIN_PROGRAM_01` → `Sb_MORPHO_DOGFOOD_01`.
+- **Cleanup** : branche `sb/sx-morpho-program-01-spec` + worktree `workout-session-tracking-morpho-spec` **conservés** — suppression = GO humain séparé.

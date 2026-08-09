@@ -509,8 +509,10 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
-- **`Sx_MORPHO_PROGRAM_01 — Morphology-Aware Programming Architecture` : 🟡 SPEC PATCH COMPLETE /
-  PR PENDING** 2026-08-09 (base `092207c`, branche `sb/sx-morpho-program-01-spec` ; **spec-only, sous
+- **`Sx_MORPHO_PROGRAM_01 — Morphology-Aware Programming Architecture` : ✅ MERGED + VERIFIED
+  (spec-only)** 2026-08-09 (base `092207c`, build `26c4bf2`, **PR #60 MERGED**, merge `8d1ce98` via
+  `--merge --match-head-commit` sans squash/`--admin` ; **CI de vérité = PR #60 run `31313414699` success**,
+  merge 100 % docs → CI push canonique skippée `paths-ignore`, CLAUDE.md §2 ; **spec-only, sous
   protocole agentique** `CLAUDE.md §4` ; `docs/strategy/Sx_MORPHO_PROGRAM_01_SPEC.md` +
   `docs/SPRINT_Sx_MORPHO_PROGRAM_01_REPORT.md`). **Design** du pipeline **faits corporels → descripteurs
   de morphologie → priorités → intentions de slots → substitution → programmes déterministes**.
@@ -644,8 +646,8 @@
 - **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01→04` = ✅ **LIVRÉS**
   (MERGED + canonical CI green). `DOGFOOD_01` (audit produit + 2 frictions P1 UX corrigées) = ✅ **MERGED
   + CANONICAL CI GREEN**.
-- **Nouveau track — Morphology Program** : `Sx_MORPHO_PROGRAM_01` (architecture, **SPEC-ONLY**) = 🟡 **PR
-  PENDING**. File de build (chacun sur GO explicite, dans l'ordre des dépendances) :
+- **Nouveau track — Morphology Program** : `Sx_MORPHO_PROGRAM_01` (architecture, **SPEC-ONLY**) = ✅
+  **MERGED + VERIFIED** (`8d1ce98`). File de build (chacun sur GO explicite, dans l'ordre des dépendances) :
   1. **`Sb_MORPHO_PROFILE_01`** — descripteurs de morphologie (FACT→INFERENCE pur sur `BodyMeasurement`) ;
   2. **`Sb_PROGRAM_SLOT_INTENT_01`** — `SlotIntent` + résolution via `compute_proximity` (substitution inchangée) ;
   3. **`Sb_MORPHO_PROGRAM_GENERATOR_01`** — générateur déterministe morpho additif + availability Fitness Park ;
