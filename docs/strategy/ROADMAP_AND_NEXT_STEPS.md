@@ -648,7 +648,7 @@
   + CANONICAL CI GREEN**.
 - **Nouveau track — Morphology Program** : `Sx_MORPHO_PROGRAM_01` (architecture, **SPEC-ONLY**) = ✅
   **MERGED + VERIFIED** (`8d1ce98`). File de build (chacun sur GO explicite, dans l'ordre des dépendances) :
-  1. **`Sb_MORPHO_PROFILE_01`** — descripteurs de morphologie (FACT→INFERENCE **module pur**, 0 DB/migration) = 🟡 **PR PENDING** (`sb/morpho-profile-01`, base `351a86c` ; `app/services/morphology_profile.py` + fixture dogfood privée Martin + 16 tests ; garde-fou strict `not_deductible` ; merge = GO humain) ;
+  1. **`Sb_MORPHO_PROFILE_01`** — descripteurs de morphologie (FACT→INFERENCE **module pur**, 0 DB/migration) = ✅ **MERGED + CANONICAL CI GREEN** (**PR #61**, merge `10637a4`, CI canonique `31317417878` 3/3, coverage main 91.3 %, 0 issue Sonar ; `app/services/morphology_profile.py` + fixture dogfood privée Martin + 21 tests ; garde-fou strict `not_deductible` + vocabulaires fermés appliqués) ;
   2. **`Sb_PROGRAM_SLOT_INTENT_01`** — `SlotIntent` + résolution via `compute_proximity` (substitution inchangée) ;
   3. **`Sb_MORPHO_PROGRAM_GENERATOR_01`** — générateur déterministe morpho additif + availability Fitness Park ;
   4. **`Sb_MARTIN_PROGRAM_01`** — fixture dogfood privée Martin + programme dérivé ;

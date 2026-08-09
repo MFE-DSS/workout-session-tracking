@@ -64,6 +64,16 @@ check_scope **ISOLATED** · `check_spec_protocol` PASS · `check_ruff_budget` **
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_MORPHO_PROFILE_01 — PATCH COMPLETE / PR PENDING.** Couche de profil de morphologie **pure et déterministe** : FACT/INFERENCE séparés, confidence à 4 niveaux, garde-fou **strict** (`not_deductible` testable, 0 posture/médical), fixture Martin **privée** produisant les 10 descripteurs requis. **0 génération/slot/substitution/migration.** Merge = GO humain.
+**Verdict :** ✅ **Sb_MORPHO_PROFILE_01 — MERGED + CANONICAL CI GREEN.** Couche de profil de morphologie **pure et déterministe** : FACT/INFERENCE séparés, confidence à 4 niveaux, garde-fou **strict** (`not_deductible` testable, 0 posture/médical), vocabulaires fermés **appliqués** (`ValueError` fail-fast), fixture Martin **privée** produisant les 10 descripteurs requis. **0 génération/slot/substitution/migration.**
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#61 MERGED** 2026-08-09, build `1f7704a` + fix vocab `4cba725` + fix Sonar `fa4fd9b`, merge commit **`10637a4`** via `--merge --match-head-commit fa4fd9b` — **sans squash, sans `--admin`** (gate `CLEAN`, 0 thread). `GO BUILD` → `PATCH` (Gitar) → `GO MERGE` (protocole `CLAUDE.md §4`).
+- **CI canonique** : run **`31317417878`** 3/3 GREEN sur `10637a4` (pytest+QA · lint · SonarCloud) ; **coverage main 91.3 %** ; module `app/services/morphology_profile.py` = **0 issue** Sonar sur main.
+- **2 incidents CI de PR résolus in-scope** (drive-to-green) :
+  1. **Thread Gitar** — vocabulaires `OBSERVATION_VOCAB`/`FOCUS_CANDIDATE_VOCAB` déclarés fermés mais **non appliqués** → `_validate_facts` + `ValueError` fail-fast (`4cba725`), +5 tests de régression.
+  2. **Gate Sonar rouge** — `new_code_smells_severity 15 > 14` : **3× `python:S9073`** (assertions composites `assert a and b` dans le fichier de test, lignes 62/82/152) → scindées (`fa4fd9b`). new_coverage était OK (98.6 %). Après fix : severity **0**, gate **OK**.
+- **Cleanup** : branche `sb/morpho-profile-01` + worktree `workout-session-tracking-morpho-profile` **conservés** — suppression = GO humain séparé.
+- **File restante** (sur GO) : `Sb_PROGRAM_SLOT_INTENT_01` → `Sb_MORPHO_PROGRAM_GENERATOR_01` → `Sb_MARTIN_PROGRAM_01` → `Sb_MORPHO_DOGFOOD_01`.
