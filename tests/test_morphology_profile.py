@@ -59,7 +59,8 @@ def test_inferences_are_inference_layer_and_never_fabricate_a_fact():
     inferences = [d for d in descriptors if d.layer == M.LAYER_INFERENCE]
     facts_out = [d for d in descriptors if d.layer == M.LAYER_FACT]
     # every inference cites evidence and is not measured-from-thin-air
-    assert inferences and all(d.evidence for d in inferences)
+    assert inferences
+    assert all(d.evidence for d in inferences)
     # a FACT descriptor id is never re-emitted as an INFERENCE
     fact_ids = {d.descriptor_id for d in facts_out}
     assert fact_ids.isdisjoint({d.descriptor_id for d in inferences})
@@ -79,7 +80,8 @@ def test_missing_inputs_are_omitted_never_fabricated():
 def test_descriptor_schema_fields_present():
     facts = MorphologyFacts(height_cm=179.0, waist_cm=83.0, chest_cm=100.0)
     for d in build_morphology_profile(facts):
-        assert d.descriptor_id and d.layer in (M.LAYER_FACT, M.LAYER_INFERENCE)
+        assert d.descriptor_id
+        assert d.layer in (M.LAYER_FACT, M.LAYER_INFERENCE)
         assert d.confidence in (
             M.CONF_MEASURED, M.CONF_DERIVED, M.CONF_INFERRED, M.CONF_NOT_DEDUCTIBLE,
         )
@@ -149,7 +151,8 @@ def test_no_descriptor_value_claims_posture_or_diagnosis():
         val = str(d.value).lower()
         assert "diagnos" not in val
         assert "posture" not in val
-        assert "femur" not in val and "fémur" not in val
+        assert "femur" not in val
+        assert "fémur" not in val
         assert d.non_medical_guardrail  # every descriptor carries a guardrail
 
 
