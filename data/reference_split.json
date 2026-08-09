@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-21.v13",
+  "version": "2026-04-21.v14",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -2610,6 +2610,238 @@
       ],
       "catalog_section": "specialization",
       "display_order": 22
+    },
+    {
+      "slug": "full-body-morphotype-priority-v1",
+      "name": "Full Body — Morphotype Priority",
+      "kind": "strength",
+      "focus": "Deltoïdes latéraux, Haut des pectoraux, Haut du dos + delts postérieurs, Mollets",
+      "suggested_label": "Séance full body orientée delts latéraux, haut des pecs, haut du dos/delts postérieurs et mollets, avec un volume jambes minimal efficace.",
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Développé incliné haltères 30°",
+          "set_scheme": "3x 6-10",
+          "notes": "Priorité haut des pectoraux. Banc incliné 15–30°, descente contrôlée sur le haut des pecs — ne pas en faire un développé épaules. Repos 120–180s. Intention: upper_chest_primary_press.",
+          "substitutes": [
+            "Incline Smith Press",
+            "Chest Press machine",
+            "Développé couché haltères"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Rowing chest-supported",
+          "set_scheme": "3x 8-12",
+          "notes": "Priorité haut du dos + delts postérieurs. Buste soutenu, coudes légèrement ouverts, pause en contraction — ne pas en faire un rowing dorsaux pur. Repos 120–180s. Intention: upper_back_depth_row.",
+          "substitutes": [
+            "Rowing machine chest-supported",
+            "Rowing câble assis prise large",
+            "Rowing câble assis prise neutre"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Hack Squat machine",
+          "set_scheme": "2x 6-10",
+          "notes": "Maintien quadriceps (dose minimale efficace) — ne pas sur-spécialiser les quadriceps. Profondeur contrôlée, exécution stable. Repos 150–210s. Intention: quad_minimum_effective_dose.",
+          "substitutes": [
+            "Squat Smith machine (pieds avancés)",
+            "Sissy squat machine"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Romanian Deadlift barre",
+          "set_scheme": "2x 6-10",
+          "notes": "Chaîne postérieure. Hip hinge, tension sur ischios/fessiers — pas un soulevé lombaire à l'échec. Repos 150–210s. Intention: posterior_chain_hinge.",
+          "substitutes": [
+            "Romanian Deadlift haltères",
+            "Back extension 45° (bias ischios)",
+            "Hip thrust haltères"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 5,
+          "code": "E5",
+          "name": "Élévations latérales câble",
+          "set_scheme": "4x 12-20",
+          "notes": "Priorité n°1 deltoïde latéral. Travail strict, contrôle en bas de l'amplitude, ne pas hausser les épaules. Repos 60–90s. Intention: lateral_delt_priority.",
+          "substitutes": [
+            "Élévations latérales machine",
+            "Élévations latérales haltères",
+            "Élévations latérales câble (derrière le dos)"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 6,
+          "code": "E6",
+          "name": "Reverse fly machine",
+          "set_scheme": "3x 12-20",
+          "notes": "Deltoïdes postérieurs + haut du dos. Mener avec les coudes, éviter le shrug des trapèzes. Repos 60–90s. Intention: rear_delt_upper_back_accessory.",
+          "substitutes": [
+            "Rear delt fly machine (pec deck inversé)",
+            "Face pull câble",
+            "Écarté arrière d'épaule câble"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 7,
+          "code": "E7",
+          "name": "Relevés mollets debout machine",
+          "set_scheme": "4x 8-12",
+          "notes": "Mollets (gastrocnémien). Étirement complet, pas de rebond, contraction haute forte. Repos 60–120s. Intention: calves_gastrocnemius_priority.",
+          "substitutes": [
+            "Relevés mollets debout",
+            "Calf press leg press"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 8,
+          "code": "E8",
+          "name": "Mollets assis machine",
+          "set_scheme": "3x 12-20",
+          "notes": "Mollets (soléaire). Genoux fléchis, étirement complet, reps contrôlées. Repos 60–90s. Intention: calves_soleus_priority.",
+          "substitutes": [
+            "Calf press leg press",
+            "Relevés mollets debout machine"
+          ],
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        }
+      ],
+      "catalog_section": "specialization",
+      "display_order": 23
     }
   ]
 }
