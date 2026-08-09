@@ -57,6 +57,14 @@ check_scope **ISOLATED** (templates = feuilles + fichiers de test neufs ; full s
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_CUSTOM_PROGRAM_DOGFOOD_01 — PATCH COMPLETE / PR PENDING.** Dogfood du cycle complet mené ; **2 frictions P1 corrigées** (libellés d'état FR sur 5 surfaces ; CTA de lancement post-publication), **3 P2 différées** avec justification. **Templates + tests uniquement — zéro migration, zéro exposition `/library`, zéro changement de service/router.** Merge = GO humain.
+**Verdict :** ✅ **Sb_CUSTOM_PROGRAM_DOGFOOD_01 — MERGED + CANONICAL CI GREEN.** Dogfood du cycle complet mené ; **2 frictions P1 corrigées** (libellés d'état FR sur 5 surfaces ; CTA de lancement post-publication), **3 P2 différées** avec justification. **Templates + tests uniquement — zéro migration, zéro exposition `/library`, zéro changement de service/router.**
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#58 MERGED** 2026-08-09, build `80ab9ee`, merge commit **`f2c32b0`** sur `claude/sprint-reporting-fitness-app-V7Qr6` via `--merge --match-head-commit 80ab9ee` — **sans squash, sans `--admin`** (gate `CLEAN`, **0 thread**). `GO BUILD` → `GO MERGE si green` (protocole `CLAUDE.md §4`).
+- **CI PR #58** : 5 checks verts (lint · pytest+QA · Gitar · SonarCloud · SonarCloud Code Analysis).
+- **CI canonique** : run **`31305314688`** 3/3 GREEN sur `f2c32b0` — `lint`, `pytest + QA scripts`, `SonarCloud`.
+- **Sonar** : gate PR **OK**, delta `total: 0` (0 bug/smell/vuln neuf) ; fichier neuf `tests/test_user_program_dogfood_ux.py` = **0 issue** sur main ; **coverage main 91.1 %**.
+- **Nettoyage branche/worktree** : `sb/custom-program-dogfood-01` + worktree `workout-session-tracking-dogfood-01` **conservés** — suppression = **GO humain séparé**.
