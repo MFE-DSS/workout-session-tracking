@@ -219,3 +219,35 @@ def test_no_credentials_serialized_in_harness():
     for p in HARNESS.rglob("*"):
         if p.is_file() and p.suffix in (".py", ".yaml", ".yml", ".json", ".md"):
             assert not key_re.search(p.read_text(errors="ignore").lower()), f"key-like token in {p}"
+
+
+# ---- robustness on malformed (untrusted) model output — Sb_OPS GO RESOLVE PR #46 ----
+
+def test_validator_flags_non_dict_finding_without_crashing():
+    r = review("J1_anatomy_consistency")
+    r["findings"] = ["a bare string, not an object"]
+    errs = V.validate_agent_review(r)  # must not raise AttributeError
+    assert any("must be an object" in e for e in errs)
+
+
+def test_validator_flags_non_dict_veto_without_crashing():
+    r = review("J1_anatomy_consistency")
+    r["vetoes"] = ["not an object"]
+    errs = V.validate_agent_review(r)  # must not raise AttributeError
+    assert any("must be an object" in e for e in errs)
+
+
+def test_arbiter_veto_missing_type_is_skipped_not_crash():
+    revs = council(region="shoulders")
+    arbiter = {"confirmed_vetoes": [{"rationale": "no type key"},
+                                    {"type": "ANATOMICAL_IMPOSSIBILITY", "rationale": "ok"}]}
+    confirmed = A.confirm_vetoes(revs, arbiter)  # must not raise KeyError
+    types = {c["type"] for c in confirmed}
+    assert "ANATOMICAL_IMPOSSIBILITY" in types  # the valid one is kept
+    assert len(confirmed) == len(types)  # no malformed/empty-type entry leaked in
+
+
+def test_major_count_dedupes_repeat_runs():
+    # 5 roles x 3 runs, each reporting the SAME major finding -> 5 distinct, not 15.
+    revs = council(region="shoulders", findings=[finding("MAJOR")], runs=3)
+    assert A._distinct_major_count(revs) == len(ROLES)

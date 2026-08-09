@@ -101,6 +101,25 @@ def _median(xs):
     return round(statistics.median(sorted(xs)), 4)
 
 
+def _arbiter_extra_vetoes(arbiter, confirmed):
+    """Arbiter-confirmed vetoes (single-judge, cited evidence) not already role-confirmed.
+
+    Reads untrusted arbiter output: an entry lacking `type` is skipped, never a KeyError."""
+    if not arbiter:
+        return []
+    seen = {c["type"] for c in confirmed}
+    extra = []
+    for cv in arbiter.get("confirmed_vetoes", []):
+        vtype = cv.get("type")
+        if not vtype or vtype in seen:
+            continue
+        seen.add(vtype)
+        extra.append({"type": vtype,
+                      "confirmed_by": cv.get("confirmed_by", ["arbiter"]),
+                      "rationale": "arbiter-confirmed with cited evidence: " + cv.get("rationale", "")})
+    return extra
+
+
 def confirm_vetoes(reviews, arbiter=None):
     """A veto type is confirmed if >=2 independent judge roles raised it with conf>=threshold,
     OR the arbiter confirmed it (single-judge) with cited evidence."""
@@ -114,13 +133,21 @@ def confirm_vetoes(reviews, arbiter=None):
         if len(roles) >= VETO_CFG["min_independent_roles"]:
             confirmed.append({"type": vtype, "confirmed_by": sorted(roles),
                               "rationale": f"{len(roles)} independent roles >= confidence threshold"})
-    if arbiter:
-        for cv in arbiter.get("confirmed_vetoes", []):
-            if cv["type"] not in {c["type"] for c in confirmed}:
-                confirmed.append({"type": cv["type"],
-                                  "confirmed_by": cv.get("confirmed_by", ["arbiter"]),
-                                  "rationale": "arbiter-confirmed with cited evidence: " + cv.get("rationale", "")})
+    confirmed += _arbiter_extra_vetoes(arbiter, confirmed)
     return sorted(confirmed, key=lambda c: c["type"])
+
+
+def _distinct_major_count(reviews):
+    """Count DISTINCT MAJOR/CRITICAL findings, collapsing the harness's repeat runs
+    (`repeat: 3`): the same defect reported by one judge across runs counts once, so the
+    human-facing count reflects distinct issues, not per-observation tallies."""
+    seen = set()
+    for r in reviews:
+        for f in r.get("findings", []):
+            if isinstance(f, dict) and f.get("severity") in ("MAJOR", "CRITICAL"):
+                seen.add((r.get("judge_role"), f.get("structure"), f.get("side"),
+                          f.get("view"), f.get("severity")))
+    return len(seen)
 
 
 def aggregate_region(reviews, region=None, arbiter=None, calibration_ok=True,
@@ -161,8 +188,7 @@ def aggregate_region(reviews, region=None, arbiter=None, calibration_ok=True,
         consensus = "LOW"
 
     confirmed = confirm_vetoes(reviews, arbiter)
-    major = sum(1 for r in reviews for f in r.get("findings", [])
-                if f["severity"] in ("MAJOR", "CRITICAL"))
+    major = _distinct_major_count(reviews)
     unresolved_major = major  # at synthetic stage every MAJOR/CRITICAL is unresolved
 
     if confirmed or (not calibration_ok) or (not evidence_integrity_ok):

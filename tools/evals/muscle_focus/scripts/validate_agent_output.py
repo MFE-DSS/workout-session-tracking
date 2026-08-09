@@ -78,6 +78,10 @@ def _check_findings(o) -> list[str]:
         return ["findings must be a list"]
     e = []
     for i, f in enumerate(fs):
+        if not isinstance(f, dict):
+            # Untrusted model output: a non-object element must be flagged, never crash.
+            e.append(f"finding[{i}] must be an object")
+            continue
         e += [f"finding[{i}] missing {k}" for k in
               ("severity", "structure", "side", "view", "evidence", "rationale", "proposed_action", "confidence")
               if k not in f]
@@ -98,6 +102,10 @@ def _check_vetoes(o) -> list[str]:
         return ["vetoes must be a list"]
     e = []
     for i, v in enumerate(vs):
+        if not isinstance(v, dict):
+            # Untrusted model output: a non-object element must be flagged, never crash.
+            e.append(f"veto[{i}] must be an object")
+            continue
         if v.get("type") not in VETO_TYPES:
             e.append(f"veto[{i}] bad type")
         if not _conf(v.get("confidence")):
