@@ -52,6 +52,15 @@ check_scope **ISOLATED** (1 fichier neuf ; full sweep local skippé par le garde
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_CUSTOM_PROGRAM_PUBLICATION_04 — PATCH COMPLETE / PR PENDING.** Cycle de republication **prouvé sûr et verrouillé** par 11 tests ; anciens `v{n}` préservés/immuables/non-lançables/non-exposés, nouveaux `v{n+1}` liés & lançables ; `/library` inchangé. **Décision schéma : zéro archivage, zéro migration** (le lifecycle requis s'exprime déjà ; l'archivage sûr exigerait une migration additive, hors périmètre). **Zéro code applicatif modifié. Merge = GO humain.**
+**Verdict :** ✅ **Sb_CUSTOM_PROGRAM_PUBLICATION_04 — MERGED + CANONICAL CI GREEN.** Cycle de republication **prouvé sûr et verrouillé** par 11 tests ; anciens `v{n}` préservés/immuables/non-lançables/non-exposés, nouveaux `v{n+1}` liés & lançables ; `/library` inchangé. **Décision schéma : zéro archivage, zéro migration** (le lifecycle requis s'exprime déjà ; l'archivage sûr exigerait une migration additive, hors périmètre). **Zéro code applicatif modifié.**
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#57 MERGED** 2026-08-09, build `ccda2e0`, merge commit **`1648a03`** sur `claude/sprint-reporting-fitness-app-V7Qr6` via `--merge --match-head-commit ccda2e0` — **sans squash, sans `--admin`** (gate `CLEAN`, **0 thread**). `GO BUILD` → préflight → **STOP + arbitrage (Option A)** → `GO MERGE` (protocole `CLAUDE.md §4`).
+- **CI PR #57** : 5 checks verts (lint · pytest+QA · Gitar · SonarCloud · SonarCloud Code Analysis).
+- **CI canonique** : run **`31302654840`** 3/3 GREEN sur `1648a03` — `pytest + QA scripts`, `lint`, `SonarCloud`.
+- **Sonar** : gate PR **OK**, delta `total: 0` (0 bug/smell/vuln neuf) ; fichier neuf `tests/test_user_program_republication.py` = **0 issue** sur main ; **coverage main 91.1 %** (> 0), ncloc inchangé (zéro code prod ajouté).
+- **Décision schéma actée** : **aucune migration · aucun champ d'archivage · lifecycle de republication verrouillé par 11 tests**. Les anciens `v{n}` restent `catalog_section="user"` (privés, immuables, non-lançables via liens effacés, exclus de `/library`).
+- **Nettoyage branche/worktree** : `sb/custom-program-publication-04` + worktree `workout-session-tracking-publication-04` **conservés** — suppression = **GO humain séparé** (hors périmètre de cette mission).
