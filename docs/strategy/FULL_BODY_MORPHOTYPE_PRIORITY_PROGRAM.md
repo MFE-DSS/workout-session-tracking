@@ -43,7 +43,7 @@ Le catalogue est un **référentiel fermé** : l'ensemble des noms (prescrits �
 - **E3** : Squat Smith machine (pieds avancés) · Sissy squat machine
 - **E4** : Romanian Deadlift haltères · Back extension 45° (bias ischios) · Hip thrust haltères
 - **E5** : Élévations latérales machine · Élévations latérales haltères · Élévations latérales câble (derrière le dos)
-- **E6** : Rear delt fly machine (pec deck inversé) · Face pull câble · Écarté arrière d'épaule câble
+- **E6** : Face pull câble · Écarté arrière d'épaule câble · Face pull câble (corde) *(tous classent en `delt_post` ; « Rear delt fly machine (pec deck inversé) » est **écarté** car « pec deck » le classerait en `pecs` au scoring — un swap fausserait l'attribution de volume)*
 - **E7** : Relevés mollets debout · Calf press leg press
 - **E8** : Calf press leg press · Relevés mollets debout machine
 
