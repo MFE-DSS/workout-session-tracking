@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "user_programs/_status.html" import status_label %}
+{% block content %}
+<h1 class="page-title">Publier — {{ program.title }}</h1>
+
+{% if success %}
+  <p style="color:var(--success, #2e7d32); font-weight:600; margin-bottom:1rem;">{{ success }}</p>
+{% endif %}
+{% if error %}
+  <p style="color:var(--danger); margin-bottom:1rem;">{{ error }}</p>
+{% endif %}
+
+<div class="card" style="max-width:40rem;">
+  <div style="display:flex; justify-content:space-between; align-items:center;">
+    <strong>{{ program.title }}</strong>
+    <span class="badge">{{ status_label(program.status) }}</span>
+  </div>
+
+  {% if is_published %}
+    <p style="margin-top:.75rem;">
+      Ce programme est <strong>publié</strong>. Ses {{ session_count }} séance(s) sont
+      disponibles comme modèles lançables et n'ont pas été dupliquées.
+    </p>
+    {# DOGFOOD_01 (F2) — after publishing, the obvious next action is to launch a
+       session. The launch CTAs live on the program page, so offer a direct route
+       there instead of leaving only the generic back-link. #}
+    <p style="margin-top:.75rem;">
+      <a class="btn btn--primary" href="{{ url_for('user_program_detail', program_id=program.id) }}">Voir et démarrer mes séances</a>
+    </p>
+  {% elif publishable %}
+    <p style="margin-top:.75rem;">
+      Publier créera <strong>{{ session_count }} modèle(s) de séance</strong> lançable(s),
+      un par séance de ce programme.
+    </p>
+    <p style="margin-top:.75rem; color:var(--danger);">
+      ⚠️ La publication est <strong>définitive pour cette version</strong> : une fois
+      publiées, ces séances ne se modifient plus. Éditer le programme ensuite ouvrira
+      une nouvelle version.
+    </p>
+  {% elif is_draft %}
+    <p style="margin-top:.75rem;">
+      Ce programme est encore un <strong>brouillon</strong>. Validez-le d'abord :
+      seul un programme validé peut être publié.
+    </p>
+  {% elif is_archived %}
+    <p style="margin-top:.75rem;">
+      Ce programme est <strong>archivé</strong>. Désarchivez-le avant de le publier.
+    </p>
+  {% endif %}
+</div>
+
+{% if rows %}
+  <h2 style="margin-top:1.5rem; font-size:1rem;">
+    {% if is_published %}Séances publiées{% else %}Séances à publier{% endif %}
+  </h2>
+  <ul class="card" style="max-width:40rem; margin-top:.5rem; list-style:none; padding:1rem;">
+    {% for row in rows %}
+      <li style="display:flex; justify-content:space-between; gap:1rem; padding:.35rem 0; border-bottom:1px solid var(--border, #ddd);">
+        <span>{{ row.position }}. <strong>{{ row.name }}</strong>
+          <span class="text-dim">({{ row.exercise_count }} exercice(s))</span>
+        </span>
+        <code class="text-dim" style="font-size:.85em;">{{ row.slug }}</code>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{% if publishable %}
+  <form method="post" action="{{ url_for('user_program_publish', program_id=program.id) }}" style="margin-top:1rem;">
+    <button type="submit" class="btn btn--primary">Publier définitivement</button>
+  </form>
+{% elif is_draft %}
+  <p style="margin-top:1rem;">
+    <a class="btn btn--primary" href="{{ url_for('user_program_detail', program_id=program.id) }}">Retour à l'éditeur pour valider</a>
+  </p>
+{% endif %}
+
+<p style="margin-top:1.5rem;">
+  <a class="btn btn--ghost" href="{{ url_for('user_program_detail', program_id=program.id) }}">← Retour au programme</a>
+</p>
+{% endblock %}

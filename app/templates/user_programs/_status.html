@@ -1,0 +1,13 @@
+{# Sb_CUSTOM_PROGRAM_DOGFOOD_01 — the ONE French label for a UserProgram lifecycle
+   state, shared by every custom-program surface so a raw "draft"/"validated"/
+   "published" never leaks to the owner in an otherwise French UI. Unknown values
+   fall back to the raw string (never blank), so a future status stays visible. #}
+{%- macro status_label(status) -%}
+  {%- set labels = {
+    'draft': 'Brouillon',
+    'validated': 'Validé',
+    'published': 'Publié',
+    'archived': 'Archivé',
+  } -%}
+  {{- labels.get(status, status) -}}
+{%- endmacro -%}

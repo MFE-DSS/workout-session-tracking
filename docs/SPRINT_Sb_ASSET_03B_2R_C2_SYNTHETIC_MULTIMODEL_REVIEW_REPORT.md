@@ -82,3 +82,15 @@ no credential serialized · `git diff --check` clean · no candidate binaries or
 
 ## Next
 Martin reviews the synthetic council report, then GO COMMIT and internal closeout.
+
+## Post-resolution (Sb_OPS — GO RESOLVE PR #46, 2026-08-09)
+The synthetic council **result is historical** — it fed the C3 freeze → D1 intake (PR #48) → 04.1-P0
+runtime (PR #49), all merged. What PR #46 ships is the **reusable eval harness only**
+(`tools/evals/muscle_focus/` + `tests/test_auren_muscle_focus_synthetic_review.py`), still useful for
+future plate reviews. Repo-triage found PR #46 **stale but NOT superseded** (`tools/evals/muscle_focus/`
+absent from canonical). **Verdict: SALVAGE** — the branch was rebased **additively** onto current
+canonical (`6037661`) by merging canonical in; the only conflict was `SPEC_REGISTRY.md` (resolved by
+keeping canonical's D1/04.1/04.2 entries + the refreshed C2 entry); the shared roadmaps were refreshed.
+**No candidate SVG/PNG/OBJ, no external review outputs, no credentials, no runtime/intake/§5bis** are
+introduced; the harness is self-contained (no `app` coupling). Harness tests **22 passed**. PR #46 is
+driven to green; **merge remains a human GO**.

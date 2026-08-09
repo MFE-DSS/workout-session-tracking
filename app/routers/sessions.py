@@ -48,6 +48,7 @@ from app.services.overload_engine import OverloadHint, compute_overload_hint
 from app.services.overload_explainer import explain_overload_hint
 from app.services.overload_inputs import build_overload_input_for_exercise
 from app.services.ownership import get_owned_session_or_404
+from app.services.seed import CUSTOM_CATALOG_SECTION
 from app.services.session_builder import instantiate_session
 from app.services.session_recap import build_recap
 from app.services.session_state import latest_open_session
@@ -55,6 +56,7 @@ from app.services.stats import (
     last_time_by_exercise_code,
     summarise_current_exercise,
 )
+from app.services.user_program_launch import is_owned_published_template
 from app.templating import local_weekday_iso, templates
 
 router = APIRouter(tags=["sessions"])
@@ -81,7 +83,7 @@ _CREATION_SOURCE_ALLOWED = {
 }
 
 
-@router.post("/sessions")
+@router.post("/sessions", responses={404: {"description": "Unknown template"}})
 def create_session(
     template_slug: Annotated[str, Form()],
     db: DbSession, user: CurrentUser,
@@ -97,6 +99,13 @@ def create_session(
         )
     ).scalar_one_or_none()
     if tpl is None:
+        raise HTTPException(status_code=404, detail="Unknown template")
+    # PUBLICATION_03 (spec 05 §14) — a custom (user) template is owner-private: only the
+    # owner, via a published UserProgramSession link, may launch it by slug. System
+    # templates stay launchable by all. Foreign custom template = indistinct 404 (no leak).
+    if tpl.catalog_section == CUSTOM_CATALOG_SECTION and not is_owned_published_template(
+        db, user.id, tpl.id
+    ):
         raise HTTPException(status_code=404, detail="Unknown template")
 
     session = instantiate_session(db, tpl, datetime.now(UTC), user_id=user.id)

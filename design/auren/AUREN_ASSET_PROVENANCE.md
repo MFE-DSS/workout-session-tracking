@@ -216,3 +216,33 @@ status: technical-intake-accepted-human-review-pending
 ```
 **Aucune entrée `verified`/`approved`/`legally-cleared`.** Cross-check OpenStax 1ʳᵉ éd. + Sobotta 1909 =
 contrôle documentaire, aucune géométrie incorporée. **Aucune conclusion juridique.**
+
+## Muscle Focus P0 Regional Plates — provenance (Sb_ASSET_03B.2R-D1, 2026-08-05)
+```
+asset_id: auren.muscle-focus.region.{chest,shoulders,posterior}.v1
+author: repository-derived (deterministic operator pipeline; byte-repeatable masks; two clean-run replay)
+owner: OPERATIONAL REPOSITORY OWNER
+ip_ownership_status: not-legally-reviewed
+source_project: BodyParts3D
+source_version: 4.0 (DBCLS official, 2025-02-27 release)
+source_type: derived-open-source
+primary_source: BodyParts3D (DBCLS) — license_spdx: CC-BY-4.0 — access_date: 2026-07-29
+  license_text_location: design/auren/LICENSES/CC-BY-4.0.txt + LICENSES/bodyparts3d-NOTICE.md
+  source_reference: exact-FMA-curated meshes (parts_list_e / element_parts / inclusion_relation), 0 arterial
+  attribution_required: yes — "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International"
+usage_nature: design-source only — NOT AUTHORIZED FOR APP INTEGRATION
+modifications: orthographic projection from a camera-only body frame (meshes UNCHANGED, no mirror/scale),
+  painter's-algorithm rasterization, potrace vectorization (frozen args), deterministic SVG assembly.
+  chest partition (clavicular/sternocostal) EXCLUDED (REVIEW_PARTITION_UNRESOLVED, not accepted).
+tooling: Python 3.14 + PIL, potrace 1.16 (no AI in the geometry path)
+ai_usage: none
+reviewer: internal synthetic single-family multi-agent review (COMPLETE — internal QA); owner decision
+  ACCEPT_WITH_CONSTRAINTS (Martin Feldmann). professional_anatomical_review: NOT PERFORMED / NOT CLAIMED.
+review_date: 2026-07-30 (owner internal decision) — professional review NOT performed
+evidence: chest sha256 7a4167ea… (18811 B) · shoulders sha256 5eb7bedf… (33159 B) · posterior sha256 b84c8bce… (13701 B)
+  · C3 freeze manifest d402ef64… · owner decision eea8b683… · deterministic replay + validators + 25-mutation harness PASS
+status: technical-intake-accepted-human-review-pending
+```
+**Aucune entrée `approved`/`verified`/`legally-cleared`.** `ai_usage: none` (géométrie jamais générée par IA).
+Le review synthétique interne **n'est PAS** une revue anatomique professionnelle qualifiée et ne la revendique
+pas. **Aucune conclusion juridique ni médicale.**

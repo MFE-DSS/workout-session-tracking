@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Path, Request
@@ -50,6 +51,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.deps import CurrentUser, DbSession
 from app.services.program_quality_reviews import SCORABLE_STATUSES
+from app.services.session_builder import instantiate_session
 from app.services.session_state import latest_open_session
 from app.services.user_program_drafts import (
     UserProgramDraftError,
@@ -66,7 +68,22 @@ from app.services.user_program_generator import (
     ProgramGenerationError,
     generate_program_tree,
 )
+from app.services.user_program_launch import (
+    LaunchNotFound,
+    resolve_owned_published_template,
+)
+from app.services.user_program_publish import (
+    PublishNotFound,
+    PublishRefused,
+    publication_slug,
+    publish_user_program,
+)
 from app.services.user_program_quality_preview import compute_quality_preview
+from app.services.user_program_versioning import (
+    VersioningNotFound,
+    VersioningRefused,
+    start_new_edit_cycle,
+)
 from app.templating import templates
 
 router = APIRouter(tags=["user_programs"])
@@ -81,6 +98,8 @@ _MAX_SESSION_NAME = 128
 _MAX_EXERCISE_NAME = 255
 _MAX_SETS = 6
 _MAX_REPS = 50
+# Owner-scoped 404 detail, reused across routes (missing OR foreign, no existence leak).
+_NOT_FOUND = "Programme introuvable"
 
 
 def _slugify(value: str) -> str:
@@ -144,7 +163,7 @@ def _owned_or_404(db, user, program_id: int):
     existence leak) — `get_draft` already collapses both to None."""
     program = get_draft(db, user.id, program_id)
     if program is None:
-        raise HTTPException(status_code=404, detail="Programme introuvable")
+        raise HTTPException(status_code=404, detail=_NOT_FOUND)
     return program
 
 
@@ -291,9 +310,17 @@ def _redirect_to_editor(request: Request, program_id: int) -> RedirectResponse:
 
 
 def _render_generate(
-    request: Request, db, user, program, *, error: str | None = None
+    request: Request,
+    db,
+    user,
+    program,
+    *,
+    error: str | None = None,
+    notice: str | None = None,
 ) -> HTMLResponse:
-    """Render the deterministic-generation form (WIZARD_03)."""
+    """Render the deterministic-generation form (WIZARD_03, regeneration WIZARD_06)."""
+    sessions = program.sessions
+    exercises = [exercise for session in sessions for exercise in session.exercises]
     return templates.TemplateResponse(
         request,
         "user_programs/generate.html",
@@ -302,8 +329,18 @@ def _render_generate(
             "program": program,
             "split_labels": SPLIT_LABELS,
             "max_sessions": MAX_SESSIONS,
-            "is_empty": len(program.sessions) == 0,
+            "is_empty": len(sessions) == 0,
+            # WIZARD_06 — a regeneration REPLACES the whole tree, so the form states exactly
+            # what would be lost. A bare "this will overwrite" is not informed consent.
+            "has_existing_tree": len(sessions) > 0,
+            "existing_session_count": len(sessions),
+            "existing_exercise_count": len(exercises),
+            "existing_set_count": sum(len(exercise.rep_targets) for exercise in exercises),
             "error": error,
+            # WIZARD_06 — an unconfirmed replacement is NOT an error: the user did nothing
+            # wrong, the form simply has not been agreed to yet. Painting it in the danger
+            # colour would say "you made a mistake" when the answer is "please confirm".
+            "notice": notice,
             "active_session": latest_open_session(db, user.id),
         },
     )
@@ -393,7 +430,7 @@ def user_program_create(
     "/programs/{program_id}",
     response_class=HTMLResponse,
     name="user_program_detail",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_detail(
     request: Request,
@@ -410,7 +447,7 @@ def user_program_detail(
     "/programs/{program_id}/sessions",
     response_class=HTMLResponse,
     name="user_program_add_session",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_add_session(
     request: Request,
@@ -446,7 +483,7 @@ def user_program_add_session(
     "/programs/{program_id}/sessions/{position}/delete",
     response_class=HTMLResponse,
     name="user_program_delete_session",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_delete_session(
     request: Request,
@@ -471,7 +508,7 @@ def user_program_delete_session(
     "/programs/{program_id}/sessions/{position}/exercises",
     response_class=HTMLResponse,
     name="user_program_add_exercise",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_add_exercise(
     request: Request,
@@ -508,7 +545,7 @@ def user_program_add_exercise(
     "/programs/{program_id}/sessions/{session_position}/exercises/{exercise_position}/delete",
     response_class=HTMLResponse,
     name="user_program_delete_exercise",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_delete_exercise(
     request: Request,
@@ -536,7 +573,7 @@ def user_program_delete_exercise(
     "/programs/{program_id}/validate",
     response_class=HTMLResponse,
     name="user_program_validate",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_validate(
     request: Request,
@@ -562,7 +599,7 @@ def user_program_validate(
     "/programs/{program_id}/generate",
     response_class=HTMLResponse,
     name="user_program_generate_form",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_generate_form(
     request: Request,
@@ -578,7 +615,7 @@ def user_program_generate_form(
     "/programs/{program_id}/generate",
     response_class=HTMLResponse,
     name="user_program_generate",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_generate(
     request: Request,
@@ -587,15 +624,21 @@ def user_program_generate(
     program_id: Annotated[int, Path()],
     split: Annotated[str, Form()],
     sessions: Annotated[int, Form()],
+    confirm_replace: Annotated[bool, Form()] = False,
 ):
     program = _owned_or_404(db, user, program_id)
-    # Generation ONLY on an empty tree: `replace_draft_tree` overwrites the whole
-    # tree, so generating over an existing program would destroy manual work.
-    if program.sessions:
+    # WIZARD_06 — regeneration over a filled program is allowed, but only on an EXPLICIT
+    # confirmation. `replace_draft_tree` overwrites the whole tree, so an unconfirmed POST
+    # would silently destroy manual work; the previous hard refusal protected against that
+    # but also left the user with no way through except emptying the program by hand.
+    #
+    # Unconfirmed is not an error the user made: the form simply has not been agreed to yet,
+    # so this returns 200 with the summary and the checkbox rather than a failure.
+    if program.sessions and not confirm_replace:
         return _render_generate(
             request, db, user, program,
-            error="Ce programme contient déjà des séances. "
-            "Videz-le ou créez-en un autre pour générer une base.",
+            notice="Ce programme contient déjà des séances. "
+            "Cochez la confirmation pour remplacer l'arbre existant.",
         )
     if split not in SPLIT_LABELS:
         return _render_generate(
@@ -624,7 +667,7 @@ def user_program_generate(
     "/programs/{program_id}/quality",
     response_class=HTMLResponse,
     name="user_program_quality",
-    responses={404: {"description": "Programme introuvable"}},
+    responses={404: {"description": _NOT_FOUND}},
 )
 def user_program_quality(
     request: Request,
@@ -648,3 +691,186 @@ def user_program_quality(
         request, db, user, program,
         scorable=scorable, is_empty=is_empty, preview=preview,
     )
+
+
+# ──────────────────── publication to catalog (PUBLICATION_01) ─────────────────
+
+
+def _publish_rows(program, user) -> list[dict]:
+    """Per-session preview rows for the publish page.
+
+    A published program shows the FROZEN slugs (`template_slug_snapshot`); a
+    not-yet-published one shows the SAME slug the service will mint — so the page
+    never promises a slug the materializer would not produce."""
+    published = program.status == "published" and program.archived_at is None
+    rows = []
+    for session in program.sessions:
+        slug = (
+            session.template_slug_snapshot
+            if published
+            else publication_slug(
+                user.id, program.slug_base, program.current_version, session.position
+            )
+        )
+        rows.append(
+            {
+                "position": session.position,
+                "name": session.name,
+                "slug": slug,
+                "exercise_count": len(session.exercises),
+            }
+        )
+    return rows
+
+
+def _render_publish(
+    request: Request,
+    db,
+    user,
+    program,
+    *,
+    error: str | None = None,
+    success: str | None = None,
+) -> HTMLResponse:
+    """Render the SSR publication confirmation/status page (no JS)."""
+    is_archived = program.archived_at is not None or program.status == "archived"
+    is_published = program.status == "published" and not is_archived
+    return templates.TemplateResponse(
+        request,
+        "user_programs/publish.html",
+        {
+            "page_title": f"Publier — {program.title}",
+            "program": program,
+            "rows": _publish_rows(program, user),
+            "session_count": len(program.sessions),
+            # A validated, non-archived program is the only publishable state.
+            "publishable": program.status == "validated" and not is_archived,
+            "is_published": is_published,
+            "is_archived": is_archived,
+            "is_draft": program.status == "draft" and not is_archived,
+            "error": error,
+            "success": success,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+@router.get(
+    "/programs/{program_id}/publish",
+    response_class=HTMLResponse,
+    name="user_program_publish_form",
+    responses={404: {"description": _NOT_FOUND}},
+)
+def user_program_publish_form(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Publication confirmation/status page. Owner-scoped 404 like every route.
+
+    Shows how many sessions would publish, their future (or frozen) template
+    slugs, and the immutable-publication warning. Writes nothing."""
+    return _render_publish(request, db, user, _owned_or_404(db, user, program_id))
+
+
+@router.post(
+    "/programs/{program_id}/publish",
+    response_class=HTMLResponse,
+    name="user_program_publish",
+    responses={404: {"description": _NOT_FOUND}},
+)
+def user_program_publish(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Materialize a validated program into N user-owned templates.
+
+    Owner-scoped: a missing/foreign program 404s. A lifecycle refusal
+    (draft/archived/slug clash) returns 200 with a soft message and NO template
+    created. Success re-renders the published state (idempotent on re-submit)."""
+    _owned_or_404(db, user, program_id)  # 404 guard; the service re-checks ownership
+    try:
+        result = publish_user_program(db, user.id, program_id)
+    except PublishNotFound as exc:
+        raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
+    except PublishRefused as exc:
+        db.rollback()
+        return _render_publish(
+            request, db, user, _owned_or_404(db, user, program_id), error=exc.message
+        )
+    program = _owned_or_404(db, user, program_id)
+    success = (
+        f"Programme publié : {len(result.templates)} séance(s) disponible(s) "
+        "dans vos modèles."
+        if result.created
+        else "Ce programme est déjà publié — aucune séance dupliquée."
+    )
+    return _render_publish(request, db, user, program, success=success)
+
+
+# ─────────────────── new edit cycle from published (PUBLICATION_02) ────────────
+
+
+@router.post(
+    "/programs/{program_id}/new-version",
+    response_class=HTMLResponse,
+    name="user_program_new_version",
+    responses={404: {"description": _NOT_FOUND}},
+)
+def user_program_new_version(
+    request: Request,
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+):
+    """Start a new edit cycle on a PUBLISHED program (spec 04 §6-7, mono-row).
+
+    The same `UserProgram` row returns to `draft` at `current_version + 1`; the
+    published v{n} templates are untouched. Owner-scoped 404. An archived program
+    is softly refused; a draft/validated program is already editable (no
+    increment). Success → the existing editor (the returned draft)."""
+    _owned_or_404(db, user, program_id)  # 404 guard; the service re-checks ownership
+    try:
+        start_new_edit_cycle(db, user.id, program_id)
+    except VersioningNotFound as exc:
+        raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
+    except VersioningRefused as exc:
+        db.rollback()
+        return _render_editor(
+            request, db, user, _owned_or_404(db, user, program_id), error=exc.message
+        )
+    return _redirect_to_editor(request, program_id)
+
+
+# ─────────────── launch a published session template (PUBLICATION_03) ───────────────
+
+
+@router.post(
+    "/programs/{program_id}/sessions/{session_id}/start",
+    name="user_program_start_session",
+    responses={404: {"description": _NOT_FOUND}},
+)
+def user_program_start_session(
+    db: DbSession,
+    user: CurrentUser,
+    program_id: Annotated[int, Path()],
+    session_id: Annotated[int, Path()],
+) -> RedirectResponse:
+    """Launch an OWNED, PUBLISHED session as a real WorkoutSession (spec 05 §14).
+
+    Ownership is resolved through `UserProgram (owner) → UserProgramSession →
+    published_template_id` — a missing/foreign/not-published session is an indistinct
+    404 (no existence leak). The published `WorkoutTemplate` is instantiated via the
+    existing `session_builder` (reused, unchanged) and never mutated; the program is
+    never mutated. Success → the existing session page."""
+    try:
+        template = resolve_owned_published_template(db, user.id, program_id, session_id)
+    except LaunchNotFound as exc:
+        raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
+    session = instantiate_session(db, template, datetime.now(UTC), user_id=user.id)
+    db.commit()  # instantiate_session already stages the session (session_builder.py:82)
+    db.refresh(session)
+    return RedirectResponse(url=f"/sessions/{session.id}", status_code=303)

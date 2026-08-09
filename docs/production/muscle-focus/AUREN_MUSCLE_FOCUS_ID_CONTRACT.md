@@ -6,10 +6,12 @@ Plates (N2 régional + N3 muscle) **sans produire aucune géométrie**. `ASSET I
 **Référence normative amont** : [`../../strategy/Sx_ASSET_03B_MUSCLE_FOCUS_TECHNICAL_SURFACE_SYSTEM_SPEC.md`](../../strategy/Sx_ASSET_03B_MUSCLE_FOCUS_TECHNICAL_SURFACE_SYSTEM_SPEC.md) §7-§10.
 **Base** : `ff9541a`. **Contrat de plaque** — analogue documentaire du contrat SVG master (`Sx_ASSET_01`).
 
-> **`CONTRACT VERSION: 0.1.0`** — semver. Tout changement **incompatible** (retrait/renommage d'un ID stable,
+> **`CONTRACT VERSION: 0.2.0`** — semver. Tout changement **incompatible** (retrait/renommage d'un ID stable,
 > changement de grammaire, ajout d'un segment obligatoire) **exige un bump majeur** et un commit modifiant ce
-> fichier. Un ajout **purement additif** (nouveau label `part-*`, nouvel index) → bump mineur. Correction de
-> formulation → patch.
+> fichier. Un ajout **purement additif** (nouveau label `part-*`, nouvel index, **acceptation d'un schéma d'ids
+> P0 alternatif borné, cf. §3bis**) → bump mineur. Correction de formulation → patch.
+> **v0.2.0 (`Sb_ASSET_03B.2R-D1`, évolution gouvernée additive)** : reconnaît le **schéma d'ids déterministe du
+> pipeline opérateur** pour les **trois plaques N2 P0** (§3bis) — additif, `geom-*` reste la grammaire cible.
 
 ---
 
@@ -112,6 +114,38 @@ est éclaté en `quads`/`posterior`/`calves`). Cette ambiguïté est **levée pa
 
 Les clefs `quads`, `posterior`, `calves`, `core` existent en **N2 (region)** ET **N3 (muscle)** : la collision
 est levée par le segment `level` (`region` vs `muscle`). Aucune autre racine n'est autorisée par v0.1.0.
+
+---
+
+## 3bis. Schéma d'ids P0 du pipeline opérateur (v0.2.0 — variante bornée acceptée)
+
+Les **trois plaques N2 P0** livrées par `Sb_ASSET_03B.2R` (chest / shoulders / posterior) sont produites par
+un **pipeline opérateur déterministe** (projection orthographique + rastérisation + potrace) et **gelées**
+(intake byte-exact, `Sb_ASSET_03B.2R-D1`). Elles n'utilisent **pas** la grammaire d'authoring `geom-*` (§2)
+mais un **schéma descriptif préfixé-racine** :
+
+```
+p0-child-id ::= <plate-root> "--" [view "-"] role "-" index
+view        ::= "front" | "back"
+role        ::= "context" | "hero" | "delt-anterior" | "delt-lateral" | "delt-posterior" | "gluteus" | "hamstring"
+index       ::= three-digit "000".."NNN", stable par (view, role)
+```
+Ex. `auren-plate-region-chest--context-000`, `auren-plate-region-shoulders--front-delt-anterior-000`,
+`auren-plate-region-posterior--back-hamstring-000`. Les **classes** portent la sémantique de calque
+(`auren-mf-view-front/back`, `auren-mf-context`, `auren-mf-hero`, `auren-mf-part`).
+
+**Bornes dures — ce schéma reste soumis à toutes les règles de sûreté** (vérifiées par le guard) :
+1. **Isolement de racine (Règle #2/#3)** : chaque id enfant est préfixé par la racine plaque `auren-plate-region-*`
+   via `--`. Disjonction dure avec les ids master **préservée**.
+2. **Aucune émission réservée (Règle #1/#6)** : **aucun** `zone-<code>`, `auren-bodymap`, `body-*-base`,
+   ni attribut `score/data-score/value/activation/emg`. Aucune couleur métier codée en dur (`fill="#..."`).
+3. `geom-*` **reste la grammaire cible** pour toute plaque **authored** future (N3, plaques régionales
+   régénérées) ; cette variante est **bornée aux 3 plaques P0 gelées** et n'autorise aucun nouvel id `geom-*`
+   non conforme.
+
+Cette reconnaissance est **additive** (bump mineur) : elle **n'affaiblit aucune règle dure** et **n'altère pas**
+la grammaire `geom-*` ; elle **acte** que le schéma P0 gelé satisfait les invariants de sûreté sans réécriture
+géométrique (interdite au niveau intake).
 
 ---
 

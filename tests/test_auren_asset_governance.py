@@ -244,14 +244,27 @@ ALLOWED_BODYMAP_SVGS = {
     "design/auren/exports/svg/auren_bodymap_compact.svg",
 }
 
-# Full SVG allowlist under design/auren/ = vendored icons + governed BodyMap.
-ALLOWED_SVGS = ALLOWED_VENDOR_SVGS | ALLOWED_BODYMAP_SVGS
+# Sb_ASSET_03B.2R-D1 GOVERNED EVOLUTION: the three frozen P0 Muscle Focus Regional Plate candidates,
+# derived from BodyParts3D 4.0 (CC BY 4.0), internal-synthetic-review-accepted + owner-decided
+# (ACCEPT_WITH_CONSTRAINTS). NOT AUTHORIZED FOR APP INTEGRATION; NOT a professional anatomical review.
+# Detailed guard: tests/test_auren_muscle_focus_plates.py.
+_MF = "design/auren/source/muscle-focus"
+ALLOWED_MUSCLE_FOCUS_SVGS = {
+    f"{_MF}/auren-plate-region-chest.svg",
+    f"{_MF}/auren-plate-region-shoulders.svg",
+    f"{_MF}/auren-plate-region-posterior.svg",
+}
+
+# Full SVG allowlist under design/auren/ = vendored icons + governed BodyMap + P0 Muscle Focus plates.
+ALLOWED_SVGS = ALLOWED_VENDOR_SVGS | ALLOWED_BODYMAP_SVGS | ALLOWED_MUSCLE_FOCUS_SVGS
 
 # Structured contract files explicitly allowed (exact repo-relative paths).
 ALLOWED_STRUCTURED_FILES = {
     "design/auren/source/bodymap/auren_bodymap_mapping.yaml",
     "design/auren/source/bodymap/auren_bodymap_source.yaml",
     "design/auren/source/icons/auren_icon_subset.yaml",
+    # Sb_ASSET_03B.2R-D1 — P0 Muscle Focus plate descriptor registry (governed evolution).
+    "design/auren/source/muscle-focus/auren_muscle_focus_registry.yaml",
 }
 
 STRUCTURED_SUFFIXES = {".yaml", ".yml", ".json"}

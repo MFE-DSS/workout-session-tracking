@@ -174,7 +174,8 @@ def test_zone_cards_no_opaque_global_score_in_section(client):
         _seed_zone_volume(db, _uid(db))
     section = _zone_section(_render(client).text).lower()
     assert "radar" not in section
-    assert "/100" not in section and "/ 100" not in section
+    assert "/100" not in section
+    assert "/ 100" not in section
     assert "global_grade" not in section
     assert "note globale" not in section
     assert "score global" not in section
@@ -211,8 +212,10 @@ def test_router_reuses_zonescore_no_new_score():
     # the router never surfaces the opaque score/grade: it must not read
     # `.score` or `.global_grade` off the dashboard into a card field.
     assert ".global_grade" not in src
-    assert '"score"' not in src and "'score'" not in src
-    assert '"grade"' not in src and "'grade'" not in src
+    assert '"score"' not in src
+    assert "'score'" not in src
+    assert '"grade"' not in src
+    assert "'grade'" not in src
 
 
 def test_home_not_touched_by_zone_cards():

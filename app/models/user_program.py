@@ -134,7 +134,16 @@ class UserProgramSession(Base):
     """One planned session slot inside a user program (e.g. « Push A »).
 
     Spec 04 §5. Materialization contract (spec 05 §6): ONE UserProgramSession
-    becomes ONE custom `WorkoutTemplate` at publication — never here.
+    becomes ONE custom `WorkoutTemplate` at publication — the copy itself lives
+    in `app/services/user_program_publish.py` (PUBLICATION_01), never here.
+
+    PUBLICATION_01 adds the program→template link SPEC 05 §6 places on the
+    session: `published_template_id` points to the materialized custom template
+    and `template_slug_snapshot` freezes its published slug. Both stay NULL for
+    every never-published session; a published program has one non-NULL pair per
+    session (`up{uid}-{base}-v{n}-s{position}`). The FK is ON DELETE SET NULL —
+    deleting a published template must never destroy the editable source
+    session; the snapshot then remains as a leak-proof historical trace.
     """
 
     __tablename__ = "user_program_sessions"
@@ -158,6 +167,20 @@ class UserProgramSession(Base):
         Integer, nullable=True
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # PUBLICATION_01 (spec 05 §6) — link to the materialized custom template.
+    # NULL until this session is published; ON DELETE SET NULL keeps the source
+    # session intact if the template is deleted. `template_slug_snapshot` is the
+    # frozen published slug (leak-proof trace, read directly by the UI — no
+    # relationship needed on this side).
+    published_template_id: Mapped[int | None] = mapped_column(
+        ForeignKey("workout_templates.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    template_slug_snapshot: Mapped[str | None] = mapped_column(
+        String(64), nullable=True
+    )
 
     program: Mapped[UserProgram] = relationship(back_populates="sessions")
     exercises: Mapped[list[UserProgramExercise]] = relationship(
