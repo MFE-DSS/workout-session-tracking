@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "user_programs/_status.html" import status_label %}
 {# Same editability rule, and the same expression, as detail.html — not a second
    implementation: `replace_draft_tree` owns the refusal, this only avoids offering an
    action that can never succeed. #}
@@ -81,7 +82,7 @@
      Showing a button that can only ever fail is worse than showing none. #}
   <p class="card" style="margin-top:1.5rem; max-width:36rem;">
     Ce programme n'est plus modifiable
-    ({% if program.archived_at is not none %}archivé{% else %}{{ program.status }}{% endif %}) :
+    ({% if program.archived_at is not none %}archivé{% else %}{{ status_label(program.status) }}{% endif %}) :
     la génération n'est pas disponible.
   </p>
 {% endif %}

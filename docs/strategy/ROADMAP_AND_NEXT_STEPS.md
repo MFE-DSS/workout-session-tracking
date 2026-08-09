@@ -508,6 +508,19 @@
   (**PR #40 ASSET**, surfaces disjointes) via stash→FF→pop sans conflit. Head Alembic inchangé.
   **`WIZARD_05+` (picker EKB / flow de regénération) = FIRST NEXT / NOT OPENED · `SCORING_04` = NOT
   OPENED · `EKB_04` = DEFERRED · `Sb_OPS.ci-efficiency` Phase 1 (leviers 1+2, parallélisation + allègement policy) = ✅ MERGED 2026-07-30 (`9d98f82`) · leviers 3/4 DEFERRED.**
+- **`Sb_CUSTOM_PROGRAM_DOGFOOD_01 — Dogfood du cycle Custom Program` : 🟡 PATCH COMPLETE /
+  PR PENDING** 2026-08-09 (base `ecb5b4b`, branche `sb/custom-program-dogfood-01` ; **sous protocole
+  agentique** `CLAUDE.md §4` : `GO BUILD` → autonome jusqu'à `PR GREEN / MERGE PENDING`, **merge = GO
+  humain** ; `docs/SPRINT_Sb_CUSTOM_PROGRAM_DOGFOOD_01_REPORT.md`). **Audit produit** du parcours complet
+  (créer→générer→éditer→qualité→valider→publier→lancer→nouveau cycle v+1→republier→v{n} privés). **2
+  frictions P1 corrigées, templates only** : **F1** libellés d'état FR (macro partagée
+  `_status.html` : Brouillon/Validé/Publié/Archivé, sur 5 surfaces — le brut anglais ne fuit plus) ;
+  **F2** CTA post-publication « Voir et démarrer mes séances » vers le détail (le lancement n'était plus
+  une impasse). **3 P2 différées** (slug technique · impasse `archived` inatteignable · heading séances).
+  **Zéro migration · zéro table · zéro exposition `/library` · zéro changement router/service · zéro
+  refonte.** **8 tests dogfood** + 1 test existant mis à jour (`"draft"`→`"Brouillon"`) + broad sweep
+  ciblé **321** ; check_scope **ISOLATED** ; budget **543 ≤ 548** ; spec PASS. **PR/CI + finalisation =
+  closeout (GO humain).**
 - **`Sb_CUSTOM_PROGRAM_PUBLICATION_04 — Cycle de republication sûr` : ✅ MERGED +
   CANONICAL CI GREEN** 2026-08-09 (base `e1bcca1`, build `ccda2e0`, **PR #57 MERGED**, merge `1648a03`
   via `--merge --match-head-commit` **sans squash / sans `--admin`** — gate `CLEAN`, 0 thread ; **sous
@@ -611,8 +624,8 @@
   gardée → **WIZARD_06**. **Gouvernance actée** : `SCORING_04`
   **SUPERSEDED** · `EKB_04` (seed DB) **DEFERRED** · `Sb_OPS` leviers 3+4 **DEFERRED**.
 - **Cycle Custom Program — état** : `WIZARD_01→06` + `PUBLICATION_01→04` = ✅ **LIVRÉS**
-  (MERGED + canonical CI green). `PUBLICATION_04` = cycle de republication prouvé sûr (zéro
-  archivage/migration, lifecycle verrouillé par tests). **Prochains candidats
+  (MERGED + canonical CI green). `DOGFOOD_01` (audit produit + 2 frictions P1 UX corrigées) = 🟡 **PATCH
+  COMPLETE / PR PENDING** (merge = GO humain). **Prochains candidats
   (sur GO explicite, aucun ouvert)** :
   1. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
   2. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;

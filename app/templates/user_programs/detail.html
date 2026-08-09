@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "user_programs/_status.html" import status_label %}
 {% block content %}
 {% set editable = program.archived_at is none and program.status in ['draft', 'validated'] %}
 <h1 class="page-title">{{ program.title }}</h1>
@@ -10,7 +11,7 @@
 <div class="card" style="max-width:40rem;">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <strong>{{ program.title }}</strong>
-    <span class="badge">{{ program.status }}</span>
+    <span class="badge">{{ status_label(program.status) }}</span>
   </div>
   <dl class="text-dim" style="margin-top:.5rem; display:grid; grid-template-columns:auto 1fr; gap:.2rem .75rem;">
     <dt>Version</dt><dd>{{ program.current_version }}</dd>

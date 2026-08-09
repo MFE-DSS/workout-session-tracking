@@ -1,11 +1,12 @@
 {% extends "base.html" %}
+{% from "user_programs/_status.html" import status_label %}
 {% block content %}
 <h1 class="page-title">Qualité du brouillon</h1>
 
 <div class="card" style="max-width:40rem;">
   <div style="display:flex; justify-content:space-between; align-items:center;">
     <strong>{{ program.title }}</strong>
-    <span class="badge">{{ program.status }}</span>
+    <span class="badge">{{ status_label(program.status) }}</span>
   </div>
   <p class="text-dim" style="margin-top:.5rem;">
     Lecture <strong>indicative</strong> de ton brouillon — elle t'aide à te
