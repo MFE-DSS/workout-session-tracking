@@ -174,7 +174,8 @@ def test_sparse_taxonomy_slots_warn_and_omit_no_fabrication():
         sel = by[intent_id]
         assert sel.preferred_exercise is None
         assert sel.fallback_candidates == ()
-        assert sel.warning is not None and "coverage gap" in sel.warning
+        assert sel.warning is not None
+        assert "coverage gap" in sel.warning
 
 
 def test_calves_only_selected_with_priority_evidence():
@@ -220,7 +221,8 @@ def test_availability_gap_warns_when_no_available_candidate():
     program = GEN.generate_program(priorities=[("upper_chest", 1)], availability={"kettlebell"})
     sel = program.selections[0]
     assert sel.preferred_exercise is None
-    assert sel.warning is not None and "availability gap" in sel.warning
+    assert sel.warning is not None
+    assert "availability gap" in sel.warning
 
 
 # ─────────────────── no mutation of data files ───────────────────
