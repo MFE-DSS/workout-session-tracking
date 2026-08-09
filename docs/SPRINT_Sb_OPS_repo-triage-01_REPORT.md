@@ -46,6 +46,13 @@ Rien de ce qui suit n'a été touché ; chaque item nécessite un GO explicite.
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_OPS.repo-triage-01 — PR GREEN / MERGE PENDING (record) + CLEANUP PLAN / OPERATOR DECISION REQUIRED (reste).** 3 worktrees ASSET mergés+propres retirés (worktrees 11→8, branches locales+remote supprimées, zéro perte). Tout le reste (PR #46 non-superseded, 10 PRs dependabot, 2 worktrees dirty, 1 spec non mergée, 2 références protégées, 5 branches orphelines) est **documenté pour décision opérateur** — aucune action risquée prise. Merge de ce rapport = GO humain.
+**Verdict :** ✅ **Sb_OPS.repo-triage-01 — MERGED + CANONICAL CI GREEN + CLOSED + CLEANED (record) · OPERATOR DECISION REQUIRED (reste).** 3 worktrees ASSET mergés+propres retirés (worktrees 11→8, branches locales+remote supprimées, zéro perte). Tout le reste (PR #46 non-superseded, 10 PRs dependabot, 2 worktrees dirty, 1 spec non mergée, 2 références protégées, 5 branches orphelines) est **documenté pour décision opérateur** — aucune action risquée prise.
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#59 MERGED** 2026-08-09, build `5df3af9`, merge commit **`a60145b`** sur `claude/sprint-reporting-fitness-app-V7Qr6` via `--merge --match-head-commit 5df3af9` — **sans squash, sans `--admin`** (gate `CLEAN`, 0 thread). `GO BUILD` → `GO MERGE` (protocole `CLAUDE.md §4`).
+- **CI** : PR #59 **5 checks verts** (lint · pytest+QA · Gitar · SonarCloud · SonarCloud Code Analysis), Sonar gate PR **OK** (0 issue neuve). Le merge est **100 % docs** → la CI push canonique est **légitimement skippée** (`paths-ignore: docs/**`, CLAUDE.md §2) : la CI de vérité du contenu est celle de la PR.
+- **Cleanup closeout** : branche `sb/ops-repo-triage-01` (locale + remote) + worktree `workout-session-tracking-ops-triage-01` supprimés (record docs mergé, plus nécessaires).
+- **NON exécuté (par mandat)** : les cleanups différés (PR #46, dependabot, worktrees dirty, custom spec, références géométrie/source, branches orphelines) restent en **décision opérateur** ; `ops-agent-autonomy-01` et `AGENTS.md` non touchés.
