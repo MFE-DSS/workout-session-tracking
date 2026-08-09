@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "auren/muscle_focus/aggregate_review.schema.json",
+  "title": "Auren Muscle Focus — deterministic aggregate review (per region)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "region", "candidate_sha256", "run_mode", "judge_output_count",
+    "criteria", "weighted_score", "consensus", "confirmed_vetoes", "major_findings_count",
+    "status", "arbiter"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "region": { "enum": ["chest", "shoulders", "posterior"] },
+    "candidate_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "run_mode": { "enum": ["MULTI_FAMILY", "SINGLE_FAMILY_MULTI_AGENT"] },
+    "judge_output_count": { "type": "integer", "minimum": 1 },
+    "criteria": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["median", "min", "max", "stddev", "by_role_median", "by_family_median"],
+        "properties": {
+          "median": { "type": "number", "minimum": 0, "maximum": 100 },
+          "min": { "type": "number", "minimum": 0, "maximum": 100 },
+          "max": { "type": "number", "minimum": 0, "maximum": 100 },
+          "stddev": { "type": "number", "minimum": 0 },
+          "by_role_median": { "type": "object" },
+          "by_family_median": { "type": "object" }
+        }
+      }
+    },
+    "weighted_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "consensus": { "enum": ["HIGH", "MEDIUM", "LOW"] },
+    "confirmed_vetoes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "confirmed_by", "rationale"],
+        "properties": {
+          "type": { "type": "string" },
+          "confirmed_by": { "type": "array", "items": { "type": "string" } },
+          "rationale": { "type": "string" }
+        }
+      }
+    },
+    "major_findings_count": { "type": "integer", "minimum": 0 },
+    "unresolved_major_findings_count": { "type": "integer", "minimum": 0 },
+    "status": {
+      "enum": ["SYNTHETIC_ACCEPTED_INTERNAL", "SYNTHETIC_ACCEPTED_WITH_CONSTRAINTS",
+               "REVISION_REQUIRED", "BLOCKED"]
+    },
+    "partition_status": { "type": "string" },
+    "arbiter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notes", "lowered_status", "preserved_disagreements"],
+      "properties": {
+        "notes": { "type": "string" },
+        "lowered_status": { "type": "boolean" },
+        "preserved_disagreements": { "type": "array", "items": { "type": "string" } },
+        "requests_martin_adjudication": { "type": "boolean" }
+      }
+    }
+  }
+}

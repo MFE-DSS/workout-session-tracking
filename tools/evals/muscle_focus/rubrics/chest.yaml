@@ -1,0 +1,38 @@
+# Chest region rubric — constraints given to judges (no suggested verdict).
+schema_version: "1.0.0"
+region: chest
+candidate_sha256: "7a4167eac1db085f1cfb41ae2b2465a3b2c720a4978361eef69e422b104bddfd"
+views: [front]
+
+product_candidate: "whole bilateral pectoralis major (2 hero) + bone context (sternum, clavicles, humeri)"
+
+special_rules:
+  - "The evaluated PRODUCT candidate is the WHOLE pectoralis representation."
+  - "The clavicular/sternocostal partition is DIAGNOSTIC ONLY: REVIEW_PARTITION_UNRESOLVED, NOT ACCEPTED FOR PRODUCT USE."
+  - "Score the whole-muscle candidate and the diagnostic partition SEPARATELY."
+  - "The partition CANNOT receive internal product acceptance in this sprint."
+
+must_score:
+  - medial_and_inferior_contours
+  - humeral_and_bone_context_dominance
+
+constraints:
+  whole_pectoralis_may_be_accepted_internally: true
+  diagnostic_partition_cannot_be_accepted: true
+  plan_b_open_may_be_deferred: true
+
+evidence_files:
+  - "02_PREVIEWS/chest_isolated_neutral.png"
+  - "02_PREVIEWS/chest_preview_360.png"
+  - "02_PREVIEWS/chest_preview_desktop.png"
+  - "03_DIAGNOSTICS/chest_hero_only.png"
+  - "03_DIAGNOSTICS/chest_context_only.png"
+  - "03_DIAGNOSTICS/chest_partition_diagnostic_clavicular_vs_sternocostal.png"
+  - "03_DIAGNOSTICS/chest_partition_overlay.png"
+  - "03_DIAGNOSTICS/chest_unpartitioned_pectoralis.png"
+  - "03_DIAGNOSTICS/chest_occlusion_audit.png"
+  - "04_PROVENANCE/auren-plate-region-chest.source-to-path.json"
+  - "04_PROVENANCE/bodyparts3d_chest_input_lock.json"
+
+known_unresolved_warnings:
+  - "pectoral clavicular/sternocostal partition = REVIEW_PARTITION_UNRESOLVED (jagged boundary); Plan-B open."
