@@ -70,4 +70,17 @@ check_scope **ISOLATED** · `check_spec_protocol` PASS · `check_ruff_budget` **
 
 ## Verdict
 
-**Verdict :** ✅ **Sb_MORPHO_PROGRAM_GENERATOR_01 — PR GREEN / MERGE PENDING (à valider en CI).** Générateur **pur, déterministe et additif** : descripteurs/priorités morphologie → intentions de slot → exercices EKB candidats via `compute_proximity` **lecture seule**, **substitution N1/N2/N3 inchangée** (0 modif), 0 DB/migration/publication, **manques de couverture signalés honnêtement (0 fabrication)**. **Le merge reste un GO humain.**
+**Verdict :** ✅ **Sb_MORPHO_PROGRAM_GENERATOR_01 — MERGED + CANONICAL CI GREEN.** Générateur **pur, déterministe et additif** : descripteurs/priorités morphologie → intentions de slot → exercices EKB candidats via `compute_proximity` **lecture seule**, **substitution N1/N2/N3 inchangée** (0 modif), 0 DB/migration/publication, **manques de couverture signalés honnêtement (0 fabrication)**.
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#64 MERGED** 2026-08-09, build `b92382c` + fix Sonar S9073 `95113e7` + fix qualité Gitar (fingerprint) `fdc93a9`, merge commit **`7570817`** via `--merge --match-head-commit fdc93a9` — **sans squash, sans `--admin`** (gate `CLEAN`, `MERGEABLE`, 0 thread non résolu, head épinglé). **Sous protocole agentique** `CLAUDE.md §4` : `GO BUILD` → `GO MERGE si green`.
+- **CI canonique** : run **`31334144907`** (`push`) **3/3 GREEN** sur `7570817` (lint · pytest + QA · SonarCloud). Le merge contient du **code** → CI push canonique jouée (pas de skip `paths-ignore`).
+- **Sonar sur main** : `app/services/morpho_program_generator.py` = **0 issue** ; coverage main **91.4 %**. Gate PR **OK** (`new_coverage 98.3 %`, `new_code_smells_severity 0`, 0 bug/vuln/dup neufs).
+- **2 incidents CI de PR résolus in-scope** :
+  1. **Gate Sonar rouge** `new_code_smells_severity 15 > 14` = **2× `python:S9073`** (assertions composites de test L177/L223) → split en assertions séparées (`95113e7`), même convention que `Sb_MORPHO_PROFILE_01`.
+  2. **Thread Gitar (qualité, in-scope)** : `_fingerprint` omettait `fallback_candidates`/`warning`/identité du pool → collision d'id possible entre propositions réellement différentes. Corrigé (`fdc93a9`) : `_pool_fingerprint` + fold `fallback_candidates`/`warning` par slot → `generated_program_id` est désormais un **content-address complet** (déterminisme préservé) ; +1 test ; **thread résolu**.
+- **Cleanup** : branche `sb/morpho-program-generator-01` + worktree `workout-session-tracking-morpho-generator` **conservés** — suppression = **GO humain séparé** (`CLAUDE.md §2`).
+- **File restante** (sur GO) : `Sb_MARTIN_PROGRAM_01` → `Sb_MORPHO_DOGFOOD_01`.
