@@ -70,6 +70,14 @@ Templates existants (push/pull/legs/liss/short/catch-up/upper-lower) **non modif
 
 ## Verdict
 
-**Verdict :** 🟢 **Sb_FULL_BODY_MORPHOTYPE_PRIORITY — PATCH COMPLETE / PR PENDING.** Programme catalogue **additif** livré (8 exercices, section specialization), lançable via le **pipeline session existant**, **0 modèle/migration/refonte**, référentiel fermé préservé (mapping noms EKB, Option A opérateur), non-régressions vérifiées. Merge = GO humain.
+**Verdict :** ✅ **Sb_FULL_BODY_MORPHOTYPE_PRIORITY — MERGED + CANONICAL CI GREEN.** Programme catalogue **additif** livré (8 exercices, section specialization), lançable via le **pipeline session existant**, **0 modèle/migration/refonte**, référentiel fermé préservé (mapping noms EKB, Option A opérateur), non-régressions vérifiées.
 
 ---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#62 MERGED** 2026-08-09, build `22e1f27` + fix Gitar E6 `dfcb7f2`, merge commit **`3e0dcf1`** via `--merge --match-head-commit dfcb7f2` — **sans squash, sans `--admin`** (gate `CLEAN`, 0 thread). `GO BUILD` → **STOP+arbitrage (Option A)** → PATCH Gitar → `GO MERGE`.
+- **CI canonique** : run **`31326910791`** 3/3 GREEN sur `3e0dcf1` (lint · pytest+QA · SonarCloud) ; **coverage main 91.3 %** (data/tests, 0 code prod).
+- **Finding Gitar E6 (résolu in-scope)** : le substitut « Rear delt fly machine (pec deck inversé) » contient « pec deck » → `classify_exercise` le classait en `pecs` avant `delt_post`. Comme un nom substitué remonte au scoring (`actual_exercise_name → classify_exercise`), un swap aurait attribué le volume aux pectoraux au lieu des delts postérieurs. Substituts E6 remappés en noms EKB classant `delt_post` (Face pull câble/corde, Écarté arrière) ; clôture 103 préservée, compteurs inchangés.
+- **Cleanup** : branche `sb/full-body-morphotype-priority` (locale + remote) + worktree `workout-session-tracking-morphotype-program` supprimés au closeout (GO cleanup inclus).
+- **Points non faits (volontaire)** : pas d'expansion EKB (noms EKB existants) ; N2/N3 documentées non ajoutées ; pas de logique « Martin » en code.
