@@ -93,4 +93,24 @@ ISOLATED.*
 
 ## Verdict
 
-**Verdict :** ✅ **Sb_MORPHO_DOGFOOD_01 — PR GREEN / MERGE PENDING (à valider en CI).** Le programme morphologie généré **entre dans le cycle Custom réel** par les services existants, reste **privé** (aucune exposition catalogue/`/library`), préserve **identité et ordre** des 8 exercices, et **ne change aucune sémantique** de validation/publication/versioning/lancement. **Dernier build de la file `Sx_MORPHO_PROGRAM_01`. Le merge reste un GO humain.**
+**Verdict :** ✅ **Sb_MORPHO_DOGFOOD_01 — MERGED + CANONICAL CI GREEN.** Le programme morphologie généré **entre dans le cycle Custom réel** par les services existants, reste **privé** (aucune exposition catalogue/`/library`), préserve **identité et ordre** des 8 exercices, et **ne change aucune sémantique** de validation/publication/versioning/lancement. **Dernier build de la file `Sx_MORPHO_PROGRAM_01`.**
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#68 MERGED** 2026-08-10, build `4d5ee02`, merge commit **`84d54e6`** via
+  `--merge --match-head-commit 4d5ee02` — **sans squash, sans `--admin`** (gate `CLEAN`,
+  `MERGEABLE`, **0 thread**, head épinglé).
+- **CI canonique** : run **`31397026757`** (`push`) **3/3 GREEN** sur `84d54e6`
+  (lint · pytest + QA · SonarCloud).
+- **Sonar** : gate PR **OK** (`new_coverage` **96.9 %**, 0 smell/bug/vuln/duplication) ;
+  `app/services/morpho_program_draft_mapper.py` = **0 issue** sur main ; coverage main **91.5 %**.
+- **Aucun thread de revue** sur la PR.
+- **File `Sx_MORPHO_PROGRAM_01` : COMPLÈTE** — spec + profil + slot intent + générateur + programme
+  Martin + couverture du pool + dogfood du cycle réel, tous mergés avec CI canonique verte.
+- **Suites identifiées (sur GO, non ouvertes)** : affiner la taxonomie mollets
+  (`calves_gastrocnemius` / `calves_soleus`) pour lever l'inversion mécanique documentée en §5 ;
+  la représentation du temps de repos reste hors modèle.
+- **Cleanup** : branche `sb/morpho-dogfood-01` + worktree `workout-session-tracking-morpho-dogfood`
+  supprimés au closeout (cleanup explicitement inclus par l'opérateur).
