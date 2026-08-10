@@ -80,17 +80,37 @@ toute PR de skills comme runtime (dégradation sûre, mais gain nul).
 
 ## 6. Validation sur CI réelle (impérative — `CLAUDE.md §1`)
 
-*(Renseigné après exécution réelle ; aucune affirmation théorique.)*
+Deux exécutions réelles sur la **même** PR #71 — aucune affirmation théorique, uniquement des
+durées relevées sur GitHub Actions.
 
-| Critère | Preuve |
+### Preuve 1 — commit `RUNTIME_OR_INFRA` (`9a3760f`)
+
+Run `31409270555`. Le classifieur a bien **décidé**, il n'a pas été contourné :
+
+```
+change-scope: RUNTIME_OR_INFRA (5 changed file(s))
+  reason: 3 runtime/infra path(s), e.g.: …
+```
+
+**5 checks PASS** · `pytest + QA scripts` **12 min 45 s** — **pipeline complet rejoué**, comme
+exigé (critère 3). Gate Sonar `OK`.
+
+### Preuve 2 — commit `NON_RUNTIME` (docs-only, même branche)
+
+*(Renseignée après exécution ; voir l'appendice.)*
+
+### Critères d'acceptation
+
+| Critère | Verdict |
 |---|---|
-| 1. PR `NON_RUNTIME` complète avec toutes les surfaces de check | — |
-| 2. « SonarCloud Code Analysis » externe = SUCCESS | — |
-| 3. Un commit runtime rejoue pytest+QA+coverage complets | — |
-| 4. Aucun check requis bloqué en `Expected`/`Pending` | — |
-| 5. Sémantique du workflow de déploiement inchangée | `deploy-production.yml` non touché |
+| 1. PR `NON_RUNTIME` complète, toutes les surfaces de check présentes | *(preuve 2)* |
+| 2. « SonarCloud Code Analysis » externe = SUCCESS | *(preuve 2)* |
+| 3. Un commit runtime rejoue pytest+QA+coverage complets | ✅ **12 min 45 s**, run `31409270555` |
+| 4. Aucun check requis bloqué en `Expected`/`Pending` | *(preuve 2)* |
+| 5. Sémantique du workflow de déploiement inchangée | ✅ `deploy-production.yml` non touché |
 
-**Mesure** : référence #70 = **12 min 31 s** (job `test`, PR 100 % docs/skills).
+**Référence de mesure** : PR **#70** = **12 min 31 s** (job `test`, PR 100 % docs/skills, *avant*
+ce sprint).
 
 ## 7. Interdits tenus
 
