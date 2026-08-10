@@ -1,18 +1,39 @@
 """Test fixtures: run each test against an isolated on-disk SQLite.
 
-V2 auth: the fixture auto-creates a test user ('testuser' /
-'testpass') and logs in via POST /login so the session cookie is
-set on the client. All existing tests continue to pass without
-modification because the cookie travels with every request.
+V2 auth: the fixture auto-creates a test user ('testuser' / 'testpass') and puts the client in
+an authenticated state. All existing tests continue to pass without modification because the
+cookie travels with every request.
+
+Sb_CI_02_2 — auth fast path. The fixture no longer pays bcrypt twice per test. It used to
+`hash_password("testpass")` when creating the user and then `POST /login`, which runs
+`verify_password` — two bcrypt(cost 12) operations, the single dominant cost of the ~1400
+authenticated tests. Instead it stores a **precomputed hash of the very same password** and
+mints the session cookie through the **production** `create_session_cookie` contract.
+
+What this does NOT change: one SQLite database per test, the per-test app module reset, the
+per-test `TestClient` and its lifespan, xdist, and production authentication behaviour
+(including bcrypt cost). Nothing is shared between tests.
+
+The stored hash is a genuine bcrypt hash of "testpass", so tests that exercise the REAL login
+route still run the full hash/verify path — `tests/test_auth_fixture_fastpath.py` pins that,
+and pins that the hash actually verifies, so a passlib/bcrypt change fails loudly.
 """
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 from pathlib import Path
 
+import httpx
 import pytest
 from fastapi.testclient import TestClient
+
+# The auth fast-path contract lives in tests/helpers.py so conftest and its pinning tests share
+# one definition. conftest is loaded by pytest under a reserved module name and cannot be
+# imported by tests, hence the plain sibling module.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from helpers import TESTPASS_BCRYPT_HASH  # noqa: E402
 
 
 @pytest.fixture()
@@ -35,25 +56,39 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
         # Auto-create a test user and log in so every subsequent
         # request carries the session cookie. This makes all V1
         # tests pass unchanged under the V2 auth layer.
+        from starlette.responses import Response
+
         from app.database import SessionLocal
         from app.models.user import User
-        from app.services.auth import hash_password
+        from app.services.auth import create_session_cookie
 
         with SessionLocal() as db:
-            user = User(
-                username="testuser",
-                password_hash=hash_password("testpass"),
-            )
+            # Precomputed hash of "testpass" — same password, no bcrypt call here.
+            user = User(username="testuser", password_hash=TESTPASS_BCRYPT_HASH)
             db.add(user)
             db.commit()
+            db.refresh(user)
+            user_id = user.id
 
-        # Log in via the login route to set the session cookie.
-        login_r = c.post(
-            "/login",
-            data={"username": "testuser", "password": "testpass"},
-            follow_redirects=False,
+        # Establish the already-assumed authenticated state WITHOUT a login round trip.
+        # The token is produced by the PRODUCTION helper, so the signing contract is never
+        # duplicated here: if it changes, this fixture follows it automatically.
+        # Produce the real `Set-Cookie` header with the production helper, then let httpx
+        # itself parse it into the jar. This gives byte-for-byte parity with a genuine login
+        # (same domain normalisation, same flags), so a later server-side `delete_cookie`
+        # matches and logout still works — pinned by test_logout_still_clears_the_session.
+        # Hand-setting the jar entry does NOT achieve this: httpx stores a dotless host as
+        # `testserver.local` with `domain_specified=False`, which a manual `set(domain=...)`
+        # cannot reproduce.
+        probe = Response()
+        create_session_cookie(probe, user_id)
+        c.cookies.extract_cookies(
+            httpx.Response(
+                200,
+                headers=[("set-cookie", probe.headers["set-cookie"])],
+                request=httpx.Request("GET", str(c.base_url)),
+            )
         )
-        assert login_r.status_code == 303, f"login failed: {login_r.status_code}"
 
         yield c
 
