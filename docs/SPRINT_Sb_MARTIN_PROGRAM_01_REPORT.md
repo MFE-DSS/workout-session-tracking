@@ -97,8 +97,18 @@ fichiers neufs **clean**.
 
 ## Verdict
 
-**Verdict :** ✅ **Sb_MARTIN_PROGRAM_01 — PR GREEN / MERGE PENDING (à valider en CI).** Programme de
+**Verdict :** ✅ **Sb_MARTIN_PROGRAM_01 — MERGED + CANONICAL CI GREEN.** Programme de
 Martin **dérivé** en pur/privé via le générateur livré, déterministe, honnête sur ses manques de
 couverture (0 fabrication), **0 persistance / DB / publication / EKB / donnée globale**. Finding :
-les priorités morphotype de Martin exigent une **couverture `exercise_properties`** avant le cycle
-réel. **Le merge reste un GO humain.**
+les priorités morphotype de Martin exigent une **couverture `exercise_properties`** avant le cycle réel.
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#65 MERGED** 2026-08-10, build `d00cb33`, merge commit **`364ea6a`** via `--merge --match-head-commit d00cb33` — **sans squash, sans `--admin`** (gate `CLEAN`, `MERGEABLE`, 0 thread non résolu, head épinglé). **Sous protocole agentique** `CLAUDE.md §4` : `GO BUILD` → `GO MERGE`.
+- **CI canonique** : run **`31359840845`** (`push`) **3/3 GREEN** sur `364ea6a` (lint · pytest + QA · SonarCloud). Le merge contient des **tests/fixtures** → CI push canonique jouée (pas de skip `paths-ignore`).
+- **Sonar sur main** : coverage main **91.4 %** ; gate PR **OK** (0 new smell/bug/vuln/dup). Livraison = **tests + fixture + docs** (0 code prod), rien de nouveau à mesurer côté couverture prod.
+- **1 thread Gitar (qualité, non bloquant) résolu avec justification** : mutation `sys.path` / shadowing — le test suit la **convention repo déjà mergée** (`test_slot_intent`, `test_morphology_profile`), aucune collision réelle (noms uniques, dossier unique) ; migration package-qualifiée = **refactor repo-wide hors périmètre** (candidat OPS futur). Aucun changement de code.
+- **Cleanup** : branche `sb/martin-program-01` + worktree `workout-session-tracking-martin-program` **conservés** — suppression = **GO humain séparé** (`CLAUDE.md §2`).
+- **File restante** (sur GO) : *(recommandé)* build de **couverture `exercise_properties`** → puis `Sb_MORPHO_DOGFOOD_01` (cycle Custom réel).
