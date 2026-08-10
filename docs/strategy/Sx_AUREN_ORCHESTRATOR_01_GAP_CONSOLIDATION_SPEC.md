@@ -295,8 +295,10 @@ BRIDGE_01           │                       │           Sb_MORPHO_EXPLAINABI
 
 ### P0 — Vérité et fondation
 
-#### P0.0 `Sb_MORPHO_DOGFOOD_01` — *(en vol, PR #68)*
-Dernier build de `Sx_MORPHO_PROGRAM_01`. **Non ré-ouvert ici.** Ferme la file morphologie.
+#### P0.0 `Sb_MORPHO_DOGFOOD_01` — ✅ **LIVRÉ** (PR #68, merge `84d54e6`, CI canonique `31397026757` 3/3)
+Dernier build de `Sx_MORPHO_PROGRAM_01`. **Non ré-ouvert ici.** **Ferme la file morphologie** : le
+programme généré traverse le cycle Custom réel sans changement de sémantique, sans exposition
+catalogue/`/library`, sans migration. La file P0 effective démarre donc à **P0.1**.
 
 #### P0.1 `Sb_ZONE_COUNT_TAXONOMY_FIX_01` — **AJOUT justifié par l'audit**
 - **Goal** : corriger la collision macro/détaillée de `_zone_session_counts` (§C.0-A) pour que le
