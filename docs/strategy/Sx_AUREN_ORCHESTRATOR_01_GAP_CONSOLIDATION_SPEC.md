@@ -16,10 +16,13 @@ le blueprint opérateur, et les manques restants.
 ## 0. Résumé exécutif — les 6 constats qui structurent la roadmap
 
 1. **La fondation biomécanique existe mais n'est pas la source de vérité.** `BodyZone` /
-   `ExerciseMuscleMapping` sont lus par **un seul** consommateur (la body-map de la carte d'exercice,
-   `app/services/body_map_descriptor.py:56`). **12+ consommateurs lourds** (recommandation, scoring,
-   coach, Body Intelligence, radar) utilisent encore la **classification par sous-chaîne**
-   (`app/services/muscle_mapping.py:109-120`) ou un JSON. ⇒ **`Sb_32.4` reste une fondation bloquante.**
+   `ExerciseMuscleMapping` ne sont atteints que par **un unique chemin d'intégration DB, étroit** —
+   le lecteur `app/services/body_map_descriptor.py` (`:56` pour `ExerciseMuscleMapping`, `:75` pour
+   `BodyZone`), servant la seule body-map de la carte de séance et emprunté depuis plusieurs points
+   d'appel/fournisseurs (`app/routers/sessions.py:341`). **12+ consommateurs lourds**
+   (recommandation, scoring, coach, Body Intelligence, radar) utilisent encore la **classification
+   par sous-chaîne** (`app/services/muscle_mapping.py:109-120`) ou un JSON.
+   ⇒ **`Sb_32.4` reste une fondation bloquante.**
 2. **Deux défauts vivants et visibles par l'utilisateur ont été découverts pendant l'audit**
    (non listés dans le blueprint) — voir §C.0. Ils sont peu coûteux et devancent la fondation.
 3. **Readiness / fatigue / récupération / disponibilité sont fragmentés** : **5 calculs
@@ -70,7 +73,7 @@ Légende : **DELIVERED** · **LEGACY/SPLIT-SoT** (livré mais source de vérité
 | Raison de substitution **utilisateur** | **MISSING** | `substitution_reason` : **0 occurrence** dans `app/`, `migrations/`, `tests/` |
 | `exercise_properties.json` (scoring) | **DELIVERED** | 69 entrées, validé au chargement `substitution.py:143-149` |
 | `exercise_knowledge_base.json` (catalogue) | **PARTIAL** | `_counts` = 103 total / **36 gaps** / **12 blackholes** ; **4 sous-scores qualité non calculables** `program_quality_engine.py:52-57` |
-| `BodyZone` / `ExerciseMuscleMapping` | **LEGACY/SPLIT-SoT** | tables peuplées **par migration uniquement** ; **1** consommateur DB |
+| `BodyZone` / `ExerciseMuscleMapping` | **LEGACY/SPLIT-SoT** | tables peuplées **par migration uniquement** ; **un unique chemin d'intégration DB étroit** (lecteur `body_map_descriptor`, plusieurs points d'appel) |
 | Cycle Custom Program (draft→publish→launch) | **DELIVERED / CLOSED** | `PUBLICATION_01→04` mergés |
 | Export / backup | **PARTIAL** | sessions seules `export_builder.py:100-126` ; export body **gated OFF** ; **restore CLI-only** |
 | Auren UI transformation | **CLOSED** (rebrand légal ouvert) | `Sx_UI_10` closeout ; interne « SPIGNOS » subsiste |
@@ -149,7 +152,7 @@ affiché ne doit pas attendre une refonte.
 
 | Question | Réponse prouvée |
 |---|---|
-| `BodyZone`/`ExerciseMuscleMapping` sont-ils la source de vérité ? | **NON.** Chemin DB **opt-in** : `muscle_mapping.py:181` n'interroge la base que si `db` **et** `exercise_code` sont fournis. Seuls `body_map_descriptor.py:56` et `sessions.py:341` les fournissent. |
+| `BodyZone`/`ExerciseMuscleMapping` sont-ils la source de vérité ? | **NON.** Chemin DB **opt-in** : `muscle_mapping.py:181` n'interroge la base que si `db` **et** `exercise_code` sont fournis. **Un seul chemin d'intégration** les fournit — le lecteur `body_map_descriptor.py` (`:56` mapping, `:75` `BodyZone`), atteint depuis `sessions.py:341` ; aucune autre surface n'emprunte ce chemin. |
 | Qui utilise encore la sous-chaîne ? | `recommendation.py:181,362` · `muscle_scoring.py:89,151,166` · `profile_metrics.py:205` · `session_recap.py:126` · `coach_report.py:184` (indirect) · `body_intelligence_inputs.py:129` (indirect) · `scripts/catalog_qa.py:212` |
 | Qui utilise un JSON parallèle ? | `program_quality_engine.py` (EKB détaillé) · `morpho_program_generator.py` + `slot_intent.py` (`exercise_properties` macro) |
 | Les erreurs connues sont-elles corrigées ? | **Non, elles sont figées** : `Rear delt fly machine (pec deck inversé)` → `pecs` et `Relevé de jambes suspendu` → `calves` sont **backfillés tels quels** dans `migrations/…20260708_add_exercise_muscle_mapping.py:92-94` **et** dans l'EKB |

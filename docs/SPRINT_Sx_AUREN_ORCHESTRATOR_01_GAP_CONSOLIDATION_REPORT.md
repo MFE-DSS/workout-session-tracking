@@ -41,9 +41,11 @@ contrainte « `recommendation.py` non modifiable » est intégrée à la concept
 
 ## 4. Constats majeurs de l'audit
 
-1. **`BodyZone`/`ExerciseMuscleMapping` ne sont pas la source de vérité** : **1** consommateur DB
-   (body-map de séance) contre **12+** consommateurs sur classification par sous-chaîne ou JSON.
-   `Sb_32.4` est donc **retenue comme fondation bloquante**, conformément à la consigne conditionnelle.
+1. **`BodyZone`/`ExerciseMuscleMapping` ne sont pas la source de vérité** : **un unique chemin
+   d'intégration DB, étroit** (le lecteur `body_map_descriptor`, emprunté depuis plusieurs points
+   d'appel, ne servant que la body-map de séance) contre **12+** consommateurs lourds encore sur
+   classification par sous-chaîne ou JSON. `Sb_32.4` est donc **retenue comme fondation bloquante**,
+   conformément à la consigne conditionnelle.
 2. **Deux défauts vivants et visibles par l'utilisateur, non listés au blueprint** :
    - `profile_metrics._zone_session_counts` mélange 6 axes macro et 11 zones détaillées → **seul
      `pecs` peut être compté** ; le coach (« zone travaillée / peu travaillée ») et le radar BI sont
