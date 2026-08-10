@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from martin_morphology import MARTIN_SOURCE, martin_morphology_facts
 
+from app.services.morpho_program_draft_mapper import generated_program_to_draft_tree
 from app.services.morpho_program_generator import GeneratedProgram, generate_program
 
 MARTIN_PROGRAM_SOURCE = "operator dogfood program derivation 2026-08-09 (private)"
@@ -66,11 +67,43 @@ def martin_program() -> GeneratedProgram:
     )
 
 
+# ── Dogfood cycle inputs (Sb_MORPHO_DOGFOOD_01) ──────────────────────────────
+# Martin's PRIVATE Custom Program identity. It exists only so the dogfood test can drive the
+# real lifecycle; it is never a catalog entry and never reaches `/library` (user programs are
+# published into `catalog_section="user"`, which the library filters out).
+
+MARTIN_PROGRAM_TITLE = "Martin — Morphotype Priority Program"
+MARTIN_PROGRAM_SLUG = "martin-morphotype-priority"
+MARTIN_SESSION_FOCUS = (
+    "Deltoïdes latéraux, Haut des pectoraux, Haut du dos + delts postérieurs, Mollets"
+)
+
+
+def martin_draft_tree() -> list[dict]:
+    """Martin's derived program as a Custom Program draft payload (pure, deterministic).
+
+    Uses the additive mapper only — it performs NO DB write and imports no persistence layer;
+    the caller drives the existing `create_draft` / `replace_draft_tree` services."""
+    return generated_program_to_draft_tree(
+        martin_program(),
+        session_focus=MARTIN_SESSION_FOCUS,
+        session_notes=(
+            "Séance générée depuis le profil morphologie (dogfood privé) — "
+            "priorités : deltoïdes latéraux, haut des pectoraux, haut du dos, mollets ; "
+            "quadriceps en maintien."
+        ),
+    )
+
+
 # Re-export the morphology source tag so callers can assert this stays private/test-only.
 __all__ = [
+    "MARTIN_PROGRAM_SLUG",
     "MARTIN_PROGRAM_SOURCE",
+    "MARTIN_PROGRAM_TITLE",
+    "MARTIN_SESSION_FOCUS",
     "MARTIN_SOURCE",
     "martin_availability",
+    "martin_draft_tree",
     "martin_program",
     "martin_training_priorities",
 ]
