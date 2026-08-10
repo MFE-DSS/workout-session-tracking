@@ -168,10 +168,28 @@ runtime · **aucun** split fast/full · **aucun** remplacement des tests requis 
 
 ## Verdict
 
-**Verdict :** ✅ **Sb_CI_02_1_PATH_AWARE_GATING — VALIDÉ SUR CI RÉELLE.** CI consciente du
+**Verdict :** ✅ **Sb_CI_02_1_PATH_AWARE_GATING — MERGED + CANONICAL CI GREEN.** CI consciente du
 périmètre via un classifieur **déterministe, possédé par le repo, fail-safe et testé** : les jobs
 ne disparaissent jamais, seules les étapes qui ne peuvent rien vérifier sont sautées. **Mesuré,
 pas extrapolé** : une PR entièrement non-runtime passe de **12 min 31 s** à **8 s** sur le job
 `test`, tandis qu'une PR runtime rejoue le pipeline complet à l'identique (**12 min 45 s**). La
 protection de branche, la validation runtime, gitleaks, le spec protocol et le gate Sonar restent
 **intacts** — aucun test retiré, aucun gate affaibli.
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#71 MERGED** 2026-08-10, build `9a3760f` + preuves docs `5e2f485`/`5a21be9`,
+  merge commit **`3a0e193`** via `--merge --match-head-commit 5a21be9` — **sans squash, sans
+  `--admin`, sans force** (gate `CLEAN`, `MERGEABLE`, **0 thread**).
+- **CI canonique** : run **`31415185233`** (`push`) **3/3 GREEN** sur `3a0e193`
+  (lint · pytest + QA · SonarCloud). Le merge contient du code (`ci.yml`, `scripts/`, `tests/`),
+  la CI push a donc bien tourné — classée `RUNTIME_OR_INFRA` par le classifieur lui-même.
+- **Gate Sonar** de la PR : `OK` (0 bug / smell / vuln / SCA neufs) ; **0 thread de revue**.
+- **PR de preuve #72** : fermée sans merge, branche supprimée.
+- **Cleanup** : branche `sb/ci-02-1-path-aware-gating` + worktree
+  `workout-session-tracking-ci-gating` supprimés (cleanup inclus par l'opérateur).
+- **Suite immédiate** : `Sb_CI_02_2_AUTH_FIXTURE_FASTPATH` — le gating ne change rien au coût
+  d'une PR runtime (12 min 45 s) ; le poste dominant restant est le double bcrypt par test
+  authentifié dans la fixture générique.
