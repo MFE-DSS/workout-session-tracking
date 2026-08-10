@@ -95,22 +95,68 @@ change-scope: RUNTIME_OR_INFRA (5 changed file(s))
 **5 checks PASS** · `pytest + QA scripts` **12 min 45 s** — **pipeline complet rejoué**, comme
 exigé (critère 3). Gate Sonar `OK`.
 
-### Preuve 2 — commit `NON_RUNTIME` (docs-only, même branche)
+### Sémantique confirmée : la PR est jugée sur son **diff complet vs base**
 
-*(Renseignée après exécution ; voir l'appendice.)*
+Première tentative de preuve `NON_RUNTIME` : un commit **docs-only** poussé sur la PR #71
+elle-même. Le job a quand même tourné **14 min 1 s**, et le log dit pourquoi :
 
-### Critères d'acceptation
+```
+change-scope: RUNTIME_OR_INFRA (5 changed file(s))
+  reason: 3 runtime/infra path(s), e.g.:
+    - .github/workflows/ci.yml
+    - scripts/classify_change_scope.py
+    - tests/test_classify_change_scope.py
+```
+
+**Ce n'est pas un défaut, c'est la bonne sémantique** — et la tentative de preuve était mal
+conçue, pas l'implémentation. Juger au **dernier commit** permettrait à une PR contenant du code
+runtime de **sauter la suite de tests** via un commit docs final : trou de sécurité réel. Le
+classifieur juge donc le diff **entier** de la PR contre sa base.
+
+**Conséquence opérationnelle** : le gain ne s'applique qu'aux PR **intégralement** non-runtime
+(closeouts, specs, rapports, skills). Une PR mixte code+docs paie le pipeline complet — voulu.
+
+### Preuve 2 — PR `NON_RUNTIME` réelle (PR #72, base = branche du sprint)
+
+Pour exercer le chemin sans rien merger : une PR dont le **diff entier** est un fichier `docs/`,
+avec pour base la branche du sprint (le workflow gaté est présent des deux côtés).
+Run `31412180977` :
+
+```
+change-scope: NON_RUNTIME (1 changed file(s))
+  reason: every changed path is documentation or agent tooling
+```
+
+| Check | Résultat |
+|---|---|
+| `pytest + QA scripts` | ✅ **8 secondes** — étape explicative exécutée, pytest + coverage + 8 QA sautés |
+| `lint (…)` | ✅ **49 s**, **intégral** — gitleaks, spec protocol, ruff budget, bandit, actionlint, shellcheck, pip-audit |
+| `SonarCloud` (job) | ✅ 1 min 20 s |
+| **`SonarCloud Code Analysis`** (gate **externe**) | ✅ **SUCCESS** — scanner exécuté, absence de `coverage.xml` tolérée |
+| `Gitar` | ✅ 32 s |
+
+PR de preuve **fermée sans merge**, branche supprimée.
+
+### Critères d'acceptation — tous couverts
 
 | Critère | Verdict |
 |---|---|
-| 1. PR `NON_RUNTIME` complète, toutes les surfaces de check présentes | *(preuve 2)* |
-| 2. « SonarCloud Code Analysis » externe = SUCCESS | *(preuve 2)* |
+| 1. PR `NON_RUNTIME` complète, toutes les surfaces de check présentes | ✅ 5/5 présents et verts (PR #72) |
+| 2. « SonarCloud Code Analysis » externe = SUCCESS | ✅ (PR #72) |
 | 3. Un commit runtime rejoue pytest+QA+coverage complets | ✅ **12 min 45 s**, run `31409270555` |
-| 4. Aucun check requis bloqué en `Expected`/`Pending` | *(preuve 2)* |
+| 4. Aucun check requis bloqué en `Expected`/`Pending` | ✅ aucun job supprimé — seules des étapes sont conditionnelles |
 | 5. Sémantique du workflow de déploiement inchangée | ✅ `deploy-production.yml` non touché |
 
-**Référence de mesure** : PR **#70** = **12 min 31 s** (job `test`, PR 100 % docs/skills, *avant*
-ce sprint).
+### Mesures réelles (GitHub Actions, aucune extrapolation)
+
+| Cas | Job `test` | Contexte |
+|---|---|---|
+| **Avant** — PR #70 (docs + skills) | **12 min 31 s** | pipeline complet, inévitable |
+| **Après** — PR #72 (`NON_RUNTIME`) | **8 s** | **≈ 94× plus rapide** sur ce cas |
+| **Après** — PR #71 (`RUNTIME_OR_INFRA`) | **12 min 45 s** | inchangé, **volontairement** |
+
+Sur une PR entièrement non-runtime, le chemin critique passe de **~14-16 min** à **~1 min 20 s**,
+borné désormais par le job `sonar` et non plus par pytest.
 
 ## 7. Interdits tenus
 
@@ -122,7 +168,10 @@ runtime · **aucun** split fast/full · **aucun** remplacement des tests requis 
 
 ## Verdict
 
-**Verdict :** ⏳ **Sb_CI_02_1_PATH_AWARE_GATING — en validation CI réelle.** CI consciente du
+**Verdict :** ✅ **Sb_CI_02_1_PATH_AWARE_GATING — VALIDÉ SUR CI RÉELLE.** CI consciente du
 périmètre via un classifieur **déterministe, possédé par le repo, fail-safe et testé** : les jobs
-ne disparaissent jamais, seules les étapes qui ne peuvent rien vérifier sont sautées. La protection
-de branche, la validation runtime, gitleaks, le spec protocol et le gate Sonar restent **intacts**.
+ne disparaissent jamais, seules les étapes qui ne peuvent rien vérifier sont sautées. **Mesuré,
+pas extrapolé** : une PR entièrement non-runtime passe de **12 min 31 s** à **8 s** sur le job
+`test`, tandis qu'une PR runtime rejoue le pipeline complet à l'identique (**12 min 45 s**). La
+protection de branche, la validation runtime, gitleaks, le spec protocol et le gate Sonar restent
+**intacts** — aucun test retiré, aucun gate affaibli.
