@@ -109,9 +109,36 @@ sur ces deux fichiers ; aucune autre intersection.
 
 ## 11. Verdict
 
-**Verdict :** ✅ **Sx_AUREN_ORCHESTRATOR_01_GAP_CONSOLIDATION_SPEC — PR GREEN / MERGE PENDING (à valider en CI).**
+**Verdict :** ✅ **Sx_AUREN_ORCHESTRATOR_01_GAP_CONSOLIDATION_SPEC — MERGED.**
 Roadmap canonique pilotée par les manques, adossée à un **audit du code actif** avec preuves
 `fichier:ligne` : capability map, architecture cible, matrice de manques (**dont 2 défauts vivants
 découverts**), garde-fous scientifiques contraignants, matrice de sources de vérité, graphe de
 dépendances, file ordonnée P0→P2→E2E entièrement spécifiée par slice, différés/rejetés, et
-définition de fin de programme. **SPEC ONLY : aucun build autorisé, le merge reste un GO humain.**
+définition de fin de programme. **SPEC ONLY : aucun build n'est autorisé par ce document.**
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#69 MERGED** 2026-08-10, build `7c36581` + fix Gitar cohérence `91a0252` +
+  synchronisation canonique `09238c8`, merge commit **`d69a1a6`** via
+  `--merge --match-head-commit 09238c8` — **sans squash, sans `--admin`, sans force** (gate `CLEAN`,
+  `MERGEABLE`, **0 thread non résolu**, head épinglé).
+- **Synchronisation sans réécriture d'historique** : la canonique `d447615` (incluant `Sb_MORPHO_DOGFOOD_01`
+  et son closeout) a été **fusionnée DANS** la branche — **pas de rebase, pas de force-push**. Le
+  conflit unique portait sur l'item 5 de la roadmap ; résolu en **préservant les deux apports** :
+  statut final MERGED de `#68` + le pointeur de roadmap canonique de `#69`. Diff final vs canonique :
+  **570 insertions, 0 suppression** — aucun contenu de `#68` perdu.
+- **CI de PR** : **5 checks PASS** sur `09238c8` (pytest + QA · lint · Gitar · SonarCloud · gate
+  externe SonarCloud Code Analysis) ; **gate Sonar OK** (0 bug/smell/vuln/SCA neufs).
+- **CI canonique** : **légitimement SKIPPÉE** — le merge `d69a1a6` est **100 % `docs/**`**
+  (5 fichiers, tous sous `docs/`), donc filtré par `paths-ignore` (`CLAUDE.md §2`). Ce n'est pas un
+  `[skip ci]` manuel : la CI de PR reste la source de vérité et elle est verte.
+- **Thread Gitar résolu par correction réelle** : le décompte « un seul consommateur DB » du résumé
+  exécutif contredisait §C.1 qui énumérait deux fournisseurs. Reformulé partout en **« un unique
+  chemin d'intégration DB étroit »** (lecteur `body_map_descriptor`, plusieurs points d'appel, une
+  seule surface servie) contre **12+** consommateurs lourds. **Conclusion inchangée : `Sb_32.4`
+  reste une fondation bloquante.**
+- **Cleanup** : branches + worktrees de `#68` et `#69` supprimés (cleanup explicitement inclus).
+- **Suite** : la file P0 effective démarre à **`Sb_ZONE_COUNT_TAXONOMY_FIX_01`**. **Aucun sprint
+  produit n'est ouvert** — chacun reste sur GO explicite.
