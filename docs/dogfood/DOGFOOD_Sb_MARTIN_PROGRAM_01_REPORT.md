@@ -79,8 +79,8 @@ sera un sprint dédié **sur GO explicite**.
 Le finding §3-§4 est **résolu** par le build de couverture `Sb_MORPHO_POOL_COVERAGE_01` : +16 entrées
 `exercise_properties` (E4–E8 prescrits + substituts, noms EKB existants) + désambiguïsation `shoulders`
 du générateur + règle no-duplicate. Le programme de Martin passe de **3/8 remplis (5 warnings)** à
-**8/8 remplis, 8 exercices distincts, 0 warning** (`generated_program_id = mpg1-b837ae570d6161b5`) :
-latéraux → Élévations latérales câble · postérieurs → Face pull câble · mollets → Calf press leg press
-(gastroc) + Mollets assis machine (soléaire) · hinge → Back extension 45°. Voir
+**8/8 remplis, 8 exercices distincts, 0 warning** (`generated_program_id = mpg1-eadcab6e2d104c45`) :
+latéraux → Élévations latérales câble · postérieurs → Face pull câble · mollets → Mollets assis machine
+(gastroc) + Calf press leg press (soléaire) · hinge → Back extension 45°. Voir
 `docs/SPRINT_Sb_MORPHO_POOL_COVERAGE_01_REPORT.md`. Le passage au **cycle Custom réel** reste
 `Sb_MORPHO_DOGFOOD_01` (build suivant, sur GO).

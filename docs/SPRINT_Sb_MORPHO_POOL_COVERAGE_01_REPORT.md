@@ -38,8 +38,12 @@ par `muscle_group` (`delts_lateral`/`delts_rear`), généralisant `_REGION_ZONE_
 
 **Point dur 2 — collision mollets** : la taxonomie `muscle_group` ne sépare pas mécaniquement
 gastrocnémien/soléaire (tous `calves`) → les 2 slots mollets piquaient le même exercice. Résolu par
-la règle **no-duplicate** (déterministe, ordre de slot fixe) : slot4 → « Calf press leg press »,
-slot5 → « Mollets assis machine » (mouvement assis, cohérent soléaire).
+la règle **no-duplicate**, implémentée comme un **couplage biparti maximum** (chemins augmentants,
+Kuhn) calculé **avant** la construction des slots : les slots réclament par **`priority_level`**
+(puis ordre de slot), et un *distinctness gap* n'est signalé que si **aucune** affectation complète
+n'existe. Une passe gloutonne en ordre de slot aurait affamé un slot à candidat unique (revue Gitar
+PR #67) : slot A qualifie {X,Y}, slot B seulement {X} → A prend X, B vide, alors que A→Y, B→X remplit
+les deux. Résultat mollets : gastroc → « Mollets assis machine », soléaire → « Calf press leg press ».
 
 **Risques traités** :
 1. **Régression substitution N1/N2/N3** (nouveau pool) → suite substitution **58 verte** + full sweep. *Testé.*
@@ -57,7 +61,7 @@ slot5 → « Mollets assis machine » (mouvement assis, cohérent soléaire).
 | Fichier | Changement |
 |---|---|
 | `data/exercise_properties.json` | **+16 entrées** (posterior/lateral/rear/calves, noms EKB existants) |
-| `app/services/morpho_program_generator.py` | `_REGION_ZONE_MUSCLE_GROUP` (ajout `shoulders`) + règle **no-duplicate** (`used`) — additif |
+| `app/services/morpho_program_generator.py` | `_REGION_ZONE_MUSCLE_GROUP` (ajout `shoulders`) + `_assign_distinct` (**couplage maximum**, réclamation par `priority_level`) — additif |
 | `data/exercise_knowledge_base.json` | 16 records `gap→covered` (curation) + `_counts` (covered 51→67, gap 52→36, blackholes 19→12) |
 | `tests/test_ekb_coverage.py` | `EXPECTED_GAPS` 52→36 + compteurs (gaps 36, covered 67, props 69) |
 | `tests/test_exercise_knowledge_base.py` | covered 51→67, gaps 52→36, blackholes 19→12 |
@@ -68,15 +72,15 @@ slot5 → « Mollets assis machine » (mouvement assis, cohérent soléaire).
 
 ## 4. Résultat — programme de Martin désormais complet
 
-`generated_program_id = mpg1-b837ae570d6161b5` — **8/8 slots remplis, 8 exercices distincts, 0 warning** :
+`generated_program_id = mpg1-eadcab6e2d104c45` — **8/8 slots remplis, 8 exercices distincts, 0 warning** :
 
 | Slot | Intent | Exercice | Score |
 |---|---|---|---|
 | 1 | lateral_delt | Élévations latérales câble | 80 |
 | 2 | upper_chest | Chest Press machine | 80 |
 | 3 | rear_delt | Face pull câble | 80 |
-| 4 | calves gastroc | Calf press leg press | 80 |
-| 5 | calves soléaire | Mollets assis machine | 80 |
+| 4 | calves gastroc | Mollets assis machine | 80 |
+| 5 | calves soléaire | Calf press leg press | 80 |
 | 6 | upper_back | Rowing chest-supported | 80 |
 | 7 | quad (maintien) | Leg extension câble unilatéral | 60 |
 | 8 | posterior hinge | Back extension 45° (bias ischios) | 90 |

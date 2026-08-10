@@ -209,6 +209,42 @@ def test_covered_morphotype_slots_fill_with_right_muscle():
         assert pool[sel.preferred_exercise]["muscle_group"] == mg
 
 
+def test_distinct_assignment_is_a_maximum_matching_not_greedy():
+    """Two slots contending for candidates are both filled whenever a complete distinct assignment
+    exists — a greedy pass in slot order could starve the second slot (Gitar review, PR #67)."""
+    two = {
+        "CalfX": {
+            "pattern_motor": "isolation_lower", "zone_primary": "lower",
+            "muscle_group": "calves", "equipment_family": "machine", "chain": "isolation",
+        },
+        "CalfY": {
+            "pattern_motor": "isolation_lower", "zone_primary": "lower",
+            "muscle_group": "calves", "equipment_family": "cable", "chain": "isolation",
+        },
+    }
+    program = GEN.generate_program(priorities=[("calves", 1)], pool=two)
+    picks = [s.preferred_exercise for s in program.selections]
+    assert set(picks) == {"CalfX", "CalfY"}  # both slots filled, distinct
+    assert program.warnings == ()
+
+
+def test_genuine_distinctness_gap_is_still_reported():
+    """With a single candidate for two slots no complete assignment exists → exactly one slot
+    fills and the other reports a real distinctness gap (never a duplicate prescription)."""
+    one = {
+        "CalfX": {
+            "pattern_motor": "isolation_lower", "zone_primary": "lower",
+            "muscle_group": "calves", "equipment_family": "machine", "chain": "isolation",
+        },
+    }
+    program = GEN.generate_program(priorities=[("calves", 1)], pool=one)
+    filled = [s for s in program.selections if s.preferred_exercise is not None]
+    gapped = [s for s in program.selections if s.preferred_exercise is None]
+    assert len(filled) == 1
+    assert len(gapped) == 1
+    assert "distinctness gap" in gapped[0].warning
+
+
 def test_calves_only_selected_with_priority_evidence():
     """Morphology descriptors alone never emit a calves slot; an explicit priority does — and now
     that the pool covers calves, both slots fill with genuine, DISTINCT calf exercises."""

@@ -30,10 +30,13 @@ Candidate-selection contract (deterministic, honest about pool coverage):
   ``lower`` bundles quads/hamstrings/adductors/**calves** — by the EXISTING `muscle_group`
   taxonomy for lower-body intents. A muscle without a pool representative (e.g. calves) therefore
   yields **no preferred exercise + an explicit coverage-gap warning**, never a false leg pick.
-- `preferred_exercise` = the highest-scoring qualifying, available candidate (ties broken by name
-  for determinism); the rest become `fallback_candidates`. If qualifying candidates exist but none
-  pass `availability`, the slot emits an **availability-gap warning**; if none qualify at all, a
-  **coverage-gap warning**. Guarded (`not_deductible`) descriptors produce **no slot**.
+- `preferred_exercise` = the candidate assigned to the slot by a **maximum bipartite matching**
+  across all slots (candidates ranked by score, then name; slots claim in `priority_level` order),
+  so a program never prescribes the same exercise twice AND no slot is starved when a complete
+  distinct assignment exists. The remaining available candidates become `fallback_candidates`.
+  Gaps are distinguished: **coverage** (nothing qualifies), **availability** (qualifies but none
+  available), **distinctness** (candidates exist but every complete assignment would duplicate).
+  Guarded (`not_deductible`) descriptors produce **no slot**.
 """
 from __future__ import annotations
 
@@ -161,23 +164,57 @@ def _rank_qualifying(intent: SlotIntent, pool: dict[str, dict]) -> list[tuple[st
     return scored
 
 
+def _assign_distinct(
+    ranked_by_slot: list[list[tuple[str, int]]],
+    order: list[int],
+) -> dict[int, str]:
+    """Assign at most one DISTINCT exercise per slot, maximising the number of filled slots.
+
+    A greedy pass in slot order would emit a spurious distinctness gap whenever an earlier slot
+    takes the only exercise a later slot could use (slot A qualifies {X,Y}, slot B only {X}).
+    This is a maximum bipartite matching (augmenting paths, Kuhn's algorithm) over
+    slot → its available candidates, so a slot is only ever reported as a distinctness gap when
+    NO complete alternative assignment exists.
+
+    `order` drives priority: slots earlier in `order` (higher training priority, then slot order)
+    claim their top-ranked candidate first, and keep it whenever an augmenting path exists for a
+    later, lower-priority slot. Candidates are visited best-score-first, so the result is
+    deterministic."""
+    owner: dict[str, int] = {}  # exercise -> slot index holding it
+
+    def _augment(slot_idx: int, seen: set[str]) -> bool:
+        for name, _score in ranked_by_slot[slot_idx]:
+            if name in seen:
+                continue
+            seen.add(name)
+            holder = owner.get(name)
+            if holder is None or _augment(holder, seen):
+                owner[name] = slot_idx
+                return True
+        return False
+
+    for slot_idx in order:
+        _augment(slot_idx, set())
+
+    return {slot_idx: name for name, slot_idx in owner.items()}
+
+
 def _select_for_slot(
     intent: SlotIntent,
     pool: dict[str, dict],
     availability: frozenset[str] | None,
     max_fallbacks: int,
-    used: set[str],
+    assigned: str | None,
 ) -> SlotSelection:
-    """Pick the preferred + fallback candidates for one slot, distinguishing a coverage gap
-    (nothing qualifies), a distinctness gap (all qualifying already used by earlier slots — a
-    program never prescribes the same exercise twice), and an availability gap (qualifies but
-    nothing available). `used` accumulates the exercises already chosen (deterministic slot order)."""
+    """Build one slot's selection, distinguishing a coverage gap (nothing qualifies), a
+    distinctness gap (candidates exist but a maximum matching cannot give this slot its own
+    exercise — a program never prescribes the same one twice), and an availability gap
+    (qualifies but nothing available). `assigned` comes from `_assign_distinct`."""
     qualifying = _rank_qualifying(intent, pool)
-    distinct = [c for c in qualifying if c[0] not in used]
     if availability is not None:
-        available = [c for c in distinct if pool[c[0]].get("equipment_family") in availability]
+        available = [c for c in qualifying if pool[c[0]].get("equipment_family") in availability]
     else:
-        available = distinct
+        available = qualifying
 
     preferred: str | None = None
     preferred_score: int | None = None
@@ -189,20 +226,21 @@ def _select_for_slot(
             f"coverage gap: no pool exercise matches region '{intent.target_region}' "
             f"for intent '{intent.intent_id}' (EKB/properties coverage gap — no fabrication)"
         )
-    elif not distinct:
-        warning = (
-            f"distinctness gap: all {len(qualifying)} qualifying exercise(s) for intent "
-            f"'{intent.intent_id}' already used by earlier slots (no duplicate prescription)"
-        )
     elif not available:
         warning = (
-            f"availability gap: {len(distinct)} distinct qualifying exercise(s) for intent "
+            f"availability gap: {len(qualifying)} qualifying exercise(s) for intent "
             f"'{intent.intent_id}' but none in availability set"
         )
+    elif assigned is None:
+        warning = (
+            f"distinctness gap: no distinct exercise left for intent '{intent.intent_id}' among "
+            f"{len(available)} candidate(s) — every complete assignment would prescribe a "
+            "duplicate (no duplicate prescription)"
+        )
     else:
-        preferred, preferred_score = available[0]
-        used.add(preferred)
-        fallbacks = tuple(available[1 : 1 + max_fallbacks])
+        preferred = assigned
+        preferred_score = next(score for name, score in available if name == assigned)
+        fallbacks = tuple(c for c in available if c[0] != assigned)[:max_fallbacks]
 
     return SlotSelection(
         slot_id=intent.slot_id,
@@ -321,10 +359,26 @@ def generate_program(
     candidate_pool = load_exercise_properties() if pool is None else pool
 
     slot_intents = _compose_slot_intents(descs, priorities)
-    used: set[str] = set()
-    selections = tuple(
-        _select_for_slot(intent, candidate_pool, availability_set, max_fallbacks, used)
+    # Distinct-exercise assignment, computed ACROSS slots before building selections: candidates
+    # ranked per slot, claimed in priority order (priority_level, then slot order), resolved by a
+    # maximum matching so no slot reports a spurious distinctness gap.
+    ranked_by_slot = [
+        [
+            c for c in _rank_qualifying(intent, candidate_pool)
+            if availability_set is None
+            or candidate_pool[c[0]].get("equipment_family") in availability_set
+        ]
         for intent in slot_intents
+    ]
+    order = sorted(
+        range(len(slot_intents)), key=lambda i: (slot_intents[i].priority_level, i)
+    )
+    assignment = _assign_distinct(ranked_by_slot, order)
+    selections = tuple(
+        _select_for_slot(
+            intent, candidate_pool, availability_set, max_fallbacks, assignment.get(idx)
+        )
+        for idx, intent in enumerate(slot_intents)
     )
 
     rejected = tuple(
