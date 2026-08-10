@@ -135,3 +135,38 @@ espion garantit que la route `/login` appelle toujours `verify_password`. **Suit
 authentifié). **Deux défauts trouvés et corrigés dans ce sprint même** : le logout cassé par un
 cookie posé à la main, et un test de falsification non déterministe — les deux diagnostiqués,
 jamais contournés.
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#73 MERGED** 2026-08-10, build + synchronisation canonique `4a8e12d`, merge
+  commit **`ab12d19`** via `--merge --match-head-commit 4a8e12d` — **sans squash, sans `--admin`,
+  sans force** (gate `CLEAN`, **0 thread**).
+- **Incident de livraison résolu in-scope** : la PR est d'abord passée **`DIRTY`** et **la CI ne
+  s'est pas déclenchée du tout** (GitHub ne peut pas construire le merge ref d'une PR en conflit).
+  Cause : le closeout de `Sb_CI_02_1` (`9dc4815`, qui touche `SPEC_REGISTRY.md`) a été poussé
+  **après** la création du worktree. Résolu en fusionnant la canonique **dans** la branche — pas
+  de rebase, pas de force-push — en préservant les deux apports (ligne `02_2` + ligne `02_1`
+  passée à MERGED).
+- **CI canonique** : run **`31431722270`** (`push`) **3/3 GREEN** sur `ab12d19`.
+- **Gate Sonar** de la PR : `OK` (0 bug / smell / vuln / SCA neufs).
+
+### Mesure faisant autorité — runs canoniques, infrastructure identique
+
+| Run canonique | `pytest + QA scripts` |
+|---|---|
+| `84d54e6` (avant `02_1` et avant fastpath) | **14 min 03 s** |
+| `3a0e193` (après `02_1`, avant fastpath) | **15 min 07 s** |
+| **`ab12d19` (après fastpath)** | **8 min 53 s** |
+
+⇒ **−41 % / 1,70×** sur les runners GitHub. L'écart avec le 2,27× local s'explique
+structurellement : le CPU retiré (~390 ms × ~1 400 tests ≈ 9 min) se divise par le nombre de
+workers, et un runner GitHub en a 2-4 contre 10 sur la machine de développement. Le gain **par
+test** est identique ; c'est le parallélisme disponible qui diffère.
+
+- **Cleanup** : branche `sb/ci-02-2-auth-fixture-fastpath` + worktree
+  `workout-session-tracking-auth-fastpath` supprimés.
+- **Gate de décision `Sb_CI_02_3`** : **8 min 53 s > 6 min** ⇒ le seuil **n'est pas franchi**,
+  `Sb_CI_02_3` **n'est pas ouvert** ; preuves et matrice de blocages remontées à l'opérateur pour
+  arbitrage GO/NO-GO.
