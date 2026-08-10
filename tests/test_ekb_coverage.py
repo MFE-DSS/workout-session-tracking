@@ -27,26 +27,22 @@ SOURCE_FILES = (REFERENCE_SPLIT_FILE, PROPERTIES_FILE, BRIDGES_FILE, BASELINE_FI
 
 # Liste EXACTE des 52 noms du catalogue sans entrée properties (état mesuré
 # Sb_22a.v1.1 — c'est le travail d'EKB_02 de la faire tomber à 0).
+# Sb_MORPHO_POOL_COVERAGE_01: the 16 morphotype exercises (E4-E8 prescribed + substitutes:
+# posterior-chain / lateral & rear delts / calves) moved from gap → covered. 52 → 36 gaps.
 EXPECTED_GAPS = [
-    "Back extension 45° (bias ischios)",
     "Butterfly pec machine",
     "Cable cross-over (bas→haut)",
-    "Calf press leg press",
     "Crunch câble à genoux",
     "Decline crunch",
-    "Face pull câble",
-    "Face pull câble (corde)",
     "Good morning haltères",
     "Hack Squat machine",
     "Hanging knee raise",
     "Hip thrust Smith",
     "Hip thrust Smith machine",
-    "Hip thrust haltères",
     "Leg Press (pieds bas)",
     "Leg Press (pieds bas, serrés)",
     "Leg Press (pieds hauts, écartés)",
     "Machine crunch",
-    "Mollets assis machine",
     "Mollets debout machine",
     "Pallof press câble",
     "Pullover câble (bras tendus)",
@@ -56,11 +52,6 @@ EXPECTED_GAPS = [
     "Rear delt fly machine",
     "Rear delt fly machine (pec deck inversé)",
     "Relevé de jambes suspendu",
-    "Relevés mollets debout",
-    "Relevés mollets debout machine",
-    "Reverse fly machine",
-    "Romanian Deadlift barre",
-    "Romanian Deadlift haltères",
     "Roulette abdominale",
     "Roulette abdominale (ab wheel rollout)",
     "Shrugs barre",
@@ -73,13 +64,8 @@ EXPECTED_GAPS = [
     "Upright row câble",
     "Upright row haltères",
     "Y-raise haltère",
-    "Écarté arrière d'épaule câble",
     "Écarté pec aux câbles (incliné bas→haut)",
-    "Élévations latérales câble",
-    "Élévations latérales câble (derrière le dos)",
-    "Élévations latérales haltères",
     "Élévations latérales haltères assis",
-    "Élévations latérales machine",
 ]
 
 # Entrées properties sans nom au catalogue (anciennes graphies non renommées
@@ -135,9 +121,9 @@ def test_names_are_unique_sorted_and_byte_exact():
 def test_gaps_are_exactly_the_52_known_missing_names():
     report = run_audit()
     assert report["gaps"] == EXPECTED_GAPS
-    assert len(report["gaps"]) == 52
-    assert report["covered_count"] == 51
-    assert report["properties_count"] == 53
+    assert len(report["gaps"]) == 36
+    assert report["covered_count"] == 67
+    assert report["properties_count"] == 69
 
 
 def test_orphan_properties_are_exactly_the_2_known_entries():

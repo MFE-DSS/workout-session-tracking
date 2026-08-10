@@ -57,10 +57,11 @@ def test_live_ekb_has_no_errors_and_exits_zero():
 
 
 def test_expected_frozen_counters():
+    # Sb_MORPHO_POOL_COVERAGE_01: +16 morphotype exercises covered (7 ex-blackholes).
     assert qa.EXPECTED_TOTAL == 103
-    assert qa.EXPECTED_COVERED == 51
-    assert qa.EXPECTED_GAP == 52
-    assert qa.EXPECTED_BLACKHOLES == 19
+    assert qa.EXPECTED_COVERED == 67
+    assert qa.EXPECTED_GAP == 36
+    assert qa.EXPECTED_BLACKHOLES == 12
 
 
 # ───────── cassures contrôlées → ERREUR ─────────

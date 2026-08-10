@@ -336,6 +336,118 @@
       "zone_primary": "pecs",
       "equipment_family": "dumbbell",
       "chain": "compound"
+    },
+    "Romanian Deadlift barre": {
+      "pattern_motor": "hinge",
+      "zone_primary": "lower",
+      "muscle_group": "hamstrings",
+      "equipment_family": "barbell",
+      "chain": "compound"
+    },
+    "Romanian Deadlift haltères": {
+      "pattern_motor": "hinge",
+      "zone_primary": "lower",
+      "muscle_group": "hamstrings",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Back extension 45° (bias ischios)": {
+      "pattern_motor": "hinge",
+      "zone_primary": "lower",
+      "muscle_group": "hamstrings",
+      "equipment_family": "bodyweight",
+      "chain": "compound"
+    },
+    "Hip thrust haltères": {
+      "pattern_motor": "hinge",
+      "zone_primary": "lower",
+      "muscle_group": "glutes",
+      "equipment_family": "dumbbell",
+      "chain": "compound"
+    },
+    "Élévations latérales câble": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_lateral",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Élévations latérales machine": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_lateral",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Élévations latérales haltères": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_lateral",
+      "equipment_family": "dumbbell",
+      "chain": "isolation"
+    },
+    "Élévations latérales câble (derrière le dos)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_lateral",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Reverse fly machine": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_rear",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Face pull câble": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_rear",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Écarté arrière d'épaule câble": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_rear",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Face pull câble (corde)": {
+      "pattern_motor": "isolation_upper",
+      "zone_primary": "shoulders",
+      "muscle_group": "delts_rear",
+      "equipment_family": "cable",
+      "chain": "isolation"
+    },
+    "Relevés mollets debout machine": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "muscle_group": "calves",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Relevés mollets debout": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "muscle_group": "calves",
+      "equipment_family": "bodyweight",
+      "chain": "isolation"
+    },
+    "Calf press leg press": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "muscle_group": "calves",
+      "equipment_family": "machine",
+      "chain": "isolation"
+    },
+    "Mollets assis machine": {
+      "pattern_motor": "isolation_lower",
+      "zone_primary": "lower",
+      "muscle_group": "calves",
+      "equipment_family": "machine",
+      "chain": "isolation"
     }
   }
 }
