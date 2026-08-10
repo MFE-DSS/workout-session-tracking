@@ -109,7 +109,19 @@ parallélisé 2933 vert** (0 échec après correction des 3 régressions consomm
 
 ## Verdict
 
-**Verdict :** ✅ **Sb_MORPHO_POOL_COVERAGE_01 — PR GREEN / MERGE PENDING (à valider en CI).** Couverture
-`exercise_properties` des priorités morphotype : générateur désambiguïse `shoulders`, règle no-duplicate,
-programme de Martin **complet (8/8, distincts)**, référentiel EKB cohérent, **substitution N1/N2/N3
-inchangée**. **Le merge reste un GO humain.**
+**Verdict :** ✅ **Sb_MORPHO_POOL_COVERAGE_01 — MERGED + CANONICAL CI GREEN.** Couverture
+`exercise_properties` des priorités morphotype : générateur désambiguïse `shoulders`, affectation
+distincte par **couplage maximum**, programme de Martin **complet (8/8, distincts)**, référentiel EKB
+cohérent, **substitution N1/N2/N3 inchangée**.
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#67 MERGED** 2026-08-10, build `5020c67` + fix Gitar couplage maximum `e9bd4d7`, merge commit **`16a00d1`** via `--merge --match-head-commit e9bd4d7` — **sans squash, sans `--admin`** (gate `CLEAN`, `MERGEABLE`, 0 thread non résolu, head épinglé). **Protocole agentique** `CLAUDE.md §4` : `GO BUILD` → `GO MERGE`.
+- **CI canonique** : run **`31388403040`** (`push`) **3/3 GREEN** sur `16a00d1` (lint · pytest + QA · SonarCloud).
+- **Sonar** : gate PR **OK** (`new_coverage 100 %`, 0 smell/bug/vuln/dup neufs) ; coverage main **91.5 %**.
+- **1 thread Gitar (edge case, in-scope) résolu par correction réelle** : la règle no-duplicate était un **greedy match** (un slot pouvait signaler un *distinctness gap* fallacieux ; l'ordre venait de l'insertion, pas de `priority_level`). Remplacée par `_assign_distinct` — **couplage biparti maximum** (Kuhn), réclamation par `(priority_level, ordre de slot)`, candidats visités par meilleur score : un gap n'est signalé que si **aucune** affectation complète n'existe. +2 tests (anti-starvation ; gap réel). Fingerprint de Martin → **`mpg1-eadcab6e2d104c45`** (content-address).
+- **Full sweep final** : **2935 passés, 0 échec**.
+- **Cleanup** : branche `sb/morpho-pool-coverage-01` + worktree `workout-session-tracking-pool-coverage` **conservés** — suppression = **GO humain séparé**.
+- **File restante** (sur GO) : `Sb_MORPHO_DOGFOOD_01` (cycle Custom réel) — **pré-requis de couverture levé**.
