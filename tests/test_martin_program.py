@@ -35,14 +35,16 @@ EXPECTED_INTENT_IDS = {
     "posterior_chain_hinge",
 }
 # Martin's morphotype-priority muscles that the current exercise_properties pool does NOT cover.
-UNCOVERED_MORPHOTYPE_INTENTS = {
+# Sb_MORPHO_POOL_COVERAGE_01 covered Martin's headline morphotype-priority muscles (lateral &
+# rear delts, calves) + the posterior-chain hinge, so all 8 slots now fill from the pool.
+NOW_COVERED_MORPHOTYPE_INTENTS = {
     "lateral_delt_priority",
     "rear_delt_upper_back_accessory",
     "calves_gastrocnemius_priority",
     "calves_soleus_priority",
+    "posterior_chain_hinge",
 }
-# Slots the pool CAN fill.
-COVERED_INTENTS = {
+ALWAYS_COVERED_INTENTS = {
     "upper_chest_primary_press",
     "upper_back_depth_row",
     "quad_minimum_effective_dose",
@@ -81,7 +83,7 @@ def test_covered_slots_get_genuine_pool_exercises():
     program = martin_program.martin_program()
     by = _by_intent(program)
     pool = SUB.load_exercise_properties()
-    for intent_id in COVERED_INTENTS:
+    for intent_id in ALWAYS_COVERED_INTENTS:
         sel = by[intent_id]
         assert sel.preferred_exercise is not None
         assert sel.preferred_exercise in pool  # a real EKB/properties exercise, never invented
@@ -105,27 +107,29 @@ def test_covered_picks_respect_martin_availability():
 # ─────────────────── honest coverage-gap finding (no fabrication) ───────────────────
 
 
-def test_uncovered_morphotype_priorities_are_honest_gaps():
-    """Martin's headline morphotype priorities (lateral delts, rear delts, calves) have no
-    scorable pool exercise → each is an explicit coverage-gap warning, never a fabricated pick."""
+def test_morphotype_priorities_now_fill_from_the_pool():
+    """After Sb_MORPHO_POOL_COVERAGE_01 Martin's headline morphotype priorities (lateral & rear
+    delts, calves) and the posterior-chain hinge fill with genuine pool exercises — no more gaps."""
     program = martin_program.martin_program()
     by = _by_intent(program)
-    for intent_id in UNCOVERED_MORPHOTYPE_INTENTS:
+    pool = SUB.load_exercise_properties()
+    for intent_id in NOW_COVERED_MORPHOTYPE_INTENTS:
         sel = by[intent_id]
-        assert sel.preferred_exercise is None
-        assert sel.fallback_candidates == ()
-        assert sel.warning is not None
-        assert "coverage gap" in sel.warning
+        assert sel.preferred_exercise is not None, intent_id
+        assert sel.preferred_exercise in pool
+        assert sel.warning is None, intent_id
 
 
-def test_program_surfaces_exactly_the_expected_gaps():
-    """5 slots warn (the 4 uncovered morphotype-priority intents + posterior-chain hinge); 3 fill."""
+def test_program_is_now_complete_and_distinct():
+    """All 8 slots fill (0 warnings) with 8 DISTINCT exercises — a program never prescribes the
+    same exercise twice (the two calf slots get different calf raises)."""
     program = martin_program.martin_program()
-    warned = {s.intent_id for s in program.selections if s.warning is not None}
     filled = {s.intent_id for s in program.selections if s.preferred_exercise is not None}
-    assert warned == UNCOVERED_MORPHOTYPE_INTENTS | {"posterior_chain_hinge"}
-    assert filled == COVERED_INTENTS
-    assert len(program.warnings) == 5
+    assert filled == NOW_COVERED_MORPHOTYPE_INTENTS | ALWAYS_COVERED_INTENTS
+    assert len(program.warnings) == 0
+    picks = [s.preferred_exercise for s in program.selections]
+    assert len(picks) == 8
+    assert len(set(picks)) == 8  # all distinct
 
 
 # ─────────────────── purity: no mutation, no persistence, private ───────────────────

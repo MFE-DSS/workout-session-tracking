@@ -139,7 +139,13 @@ def test_runtime_fields_are_populated(client):
 
     with SessionLocal() as db:
         uid = _uid(db)
-        program = _make_program(db, uid, "runtime")
+        # Explicit zone-diverse covered exercises (lower / pecs / arms) so the program grades A/B
+        # and the V1 B-cap reason is populated — robust to EKB ordering (Sb_MORPHO_POOL_COVERAGE_01
+        # added covered exercises that shifted the alphabetical `_known_exercises(3)` selection).
+        program = _make_program(
+            db, uid, "runtime",
+            names=["Adduction assise", "Chest Press machine", "Curl EZ-bar debout"],
+        )
         review = compute_and_store_quality_review(db, uid, program.id).review
 
         assert review.confidence in {"moderate", "low", "very_low"}

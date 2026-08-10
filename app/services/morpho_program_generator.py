@@ -59,15 +59,21 @@ from app.services.substitution import load_exercise_properties
 MORPHO_PROGRAM_GENERATOR_ENGINE_VERSION = 1
 _FINGERPRINT_PREFIX = "mpg1"
 
-# The macro region `lower` (exercise_properties `zone_primary`) bundles several muscles the
-# radar merges. Disambiguate it with the EXISTING `muscle_group` taxonomy, keyed by the slot's
-# DETAILED primary_zone (muscle_mapping). A muscle with no pool representative (calves) therefore
-# qualifies nothing → explicit coverage-gap warning (never a false leg-extension pick).
-_REGION_LOWER = "lower"
-_LOWER_ZONE_MUSCLE_GROUP: dict[str, str] = {
-    "quads": "quadriceps",
-    "posterior": "hamstrings",
-    "calves": "calves",
+# Some macro regions (exercise_properties `zone_primary`) bundle several DETAILED muscle_mapping
+# zones the radar merges: `lower` = quads/hamstrings/adductors/calves, `shoulders` = lateral/rear
+# delts (+ presses). Disambiguate them with the EXISTING `muscle_group` taxonomy, keyed by the
+# slot's DETAILED primary_zone. A detailed zone with no pool representative therefore qualifies
+# nothing → explicit coverage-gap warning (never a false pick from a sibling muscle in the region).
+_REGION_ZONE_MUSCLE_GROUP: dict[str, dict[str, str]] = {
+    "lower": {
+        "quads": "quadriceps",
+        "posterior": "hamstrings",
+        "calves": "calves",
+    },
+    "shoulders": {
+        "delt_lat": "delts_lateral",
+        "delt_post": "delts_rear",
+    },
 }
 
 _DEFAULT_MAX_FALLBACKS = 3
@@ -128,13 +134,14 @@ class GeneratedProgram:
 def _qualifies(intent: SlotIntent, cand_props: dict) -> bool:
     """A candidate qualifies for a slot only on a genuine (not merely zone-level) match.
 
-    The macro region carries the zone; upper-body intents additionally require the same
-    `pattern_motor`, while the overloaded `lower` region is disambiguated by `muscle_group`
-    (existing taxonomy) so calves — absent from the pool — qualifies nothing."""
+    The macro region carries the zone; a non-overloaded region additionally requires the same
+    `pattern_motor`, while an overloaded region (`lower`, `shoulders`) is disambiguated by
+    `muscle_group` (existing taxonomy) so a sibling muscle absent from the pool qualifies nothing."""
     if cand_props.get("zone_primary") != intent.target_region:
         return False
-    if intent.target_region == _REGION_LOWER:
-        req_mg = _LOWER_ZONE_MUSCLE_GROUP.get(intent.primary_zone)
+    zone_map = _REGION_ZONE_MUSCLE_GROUP.get(intent.target_region)
+    if zone_map is not None:
+        req_mg = zone_map.get(intent.primary_zone)
         if req_mg is not None:
             return cand_props.get("muscle_group") == req_mg
     return cand_props.get("pattern_motor") == intent.movement_pattern
@@ -159,14 +166,18 @@ def _select_for_slot(
     pool: dict[str, dict],
     availability: frozenset[str] | None,
     max_fallbacks: int,
+    used: set[str],
 ) -> SlotSelection:
     """Pick the preferred + fallback candidates for one slot, distinguishing a coverage gap
-    (nothing qualifies) from an availability gap (qualifies but nothing available)."""
+    (nothing qualifies), a distinctness gap (all qualifying already used by earlier slots — a
+    program never prescribes the same exercise twice), and an availability gap (qualifies but
+    nothing available). `used` accumulates the exercises already chosen (deterministic slot order)."""
     qualifying = _rank_qualifying(intent, pool)
+    distinct = [c for c in qualifying if c[0] not in used]
     if availability is not None:
-        available = [c for c in qualifying if pool[c[0]].get("equipment_family") in availability]
+        available = [c for c in distinct if pool[c[0]].get("equipment_family") in availability]
     else:
-        available = qualifying
+        available = distinct
 
     preferred: str | None = None
     preferred_score: int | None = None
@@ -178,13 +189,19 @@ def _select_for_slot(
             f"coverage gap: no pool exercise matches region '{intent.target_region}' "
             f"for intent '{intent.intent_id}' (EKB/properties coverage gap — no fabrication)"
         )
+    elif not distinct:
+        warning = (
+            f"distinctness gap: all {len(qualifying)} qualifying exercise(s) for intent "
+            f"'{intent.intent_id}' already used by earlier slots (no duplicate prescription)"
+        )
     elif not available:
         warning = (
-            f"availability gap: {len(qualifying)} qualifying exercise(s) for intent "
+            f"availability gap: {len(distinct)} distinct qualifying exercise(s) for intent "
             f"'{intent.intent_id}' but none in availability set"
         )
     else:
         preferred, preferred_score = available[0]
+        used.add(preferred)
         fallbacks = tuple(available[1 : 1 + max_fallbacks])
 
     return SlotSelection(
@@ -304,8 +321,9 @@ def generate_program(
     candidate_pool = load_exercise_properties() if pool is None else pool
 
     slot_intents = _compose_slot_intents(descs, priorities)
+    used: set[str] = set()
     selections = tuple(
-        _select_for_slot(intent, candidate_pool, availability_set, max_fallbacks)
+        _select_for_slot(intent, candidate_pool, availability_set, max_fallbacks, used)
         for intent in slot_intents
     )
 

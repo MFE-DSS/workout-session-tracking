@@ -10,8 +10,8 @@ Doctrine (arbitrage EKB_03) :
   canonical_name/variant_key, complétude des `covered`, clôture des
   substitutions, alias bien formés, non-médical, traçabilité, cohérence de
   groupe.
-- GAPS DE CURATION = WARNINGS À COMPTEUR FIGÉ (exit 0) : les 52 gaps et 19 trous
-  noirs sont l'état délibéré livré par EKB_02. On les rapporte sans échouer —
+- GAPS DE CURATION = WARNINGS À COMPTEUR FIGÉ (exit 0) : les 36 gaps et 12 trous
+  noirs sont l'état délibéré livré (après Sb_MORPHO_POOL_COVERAGE_01). On les rapporte sans échouer —
   MAIS toute DÉRIVE du compteur attendu (un covered qui régresse, un gap ou un
   trou noir surnuméraire) devient une ERREUR. On verrouille l'état, on n'exige
   aucune curation non encore faite (curation = build ultérieur).
@@ -31,11 +31,13 @@ SNAPSHOT_FILE = PROJECT_ROOT / "tests" / "fixtures" / "ekb_names_snapshot.json"
 REFERENCE_SPLIT_FILE = PROJECT_ROOT / "data" / "reference_split.json"
 BRIDGES_FILE = PROJECT_ROOT / "data" / "cross_pattern_substitutions.json"
 
-# Compteurs figés (état EKB_02 livré). Toute dérive = erreur.
+# Compteurs figés. Toute dérive = erreur.
+# Sb_MORPHO_POOL_COVERAGE_01 : +16 exercices morphotype (E4-E8) couverts → covered 51→67,
+# gap 52→36, dont 7 anciens trous noirs couverts → blackholes 19→12.
 EXPECTED_TOTAL = 103
-EXPECTED_COVERED = 51
-EXPECTED_GAP = 52
-EXPECTED_BLACKHOLES = 19
+EXPECTED_COVERED = 67
+EXPECTED_GAP = 36
+EXPECTED_BLACKHOLES = 12
 
 # 11 zones fines réconciliées (RADAR_AXES) — vocabulaire fermé.
 FINE_TO_MACRO = {

@@ -178,35 +178,51 @@ def test_quads_stay_maintenance_not_specialization():
 # ─────────────────── coverage gaps: honest warnings, no fabrication ───────────────────
 
 
-def test_sparse_taxonomy_slots_warn_and_omit_no_fabrication():
-    """Calves / lateral-delt / rear-delt / posterior-hinge have no pool exercise → warn, omit."""
-    program = GEN.generate_program(priorities=FULL_BODY_PRIORITIES)
-    by = _by_intent(program)
-    for intent_id in (
-        "posterior_chain_hinge",
-        "lateral_delt_priority",
-        "rear_delt_upper_back_accessory",
-        "calves_gastrocnemius_priority",
-        "calves_soleus_priority",
-    ):
-        sel = by[intent_id]
+def test_coverage_gap_warns_and_omits_no_fabrication_with_empty_pool():
+    """No-fabrication behaviour, robust to the real pool's coverage: against an EMPTY candidate
+    pool every slot is a coverage gap — the generator warns and omits, never inventing an exercise."""
+    program = GEN.generate_program(priorities=FULL_BODY_PRIORITIES, pool={})
+    for sel in program.selections:
         assert sel.preferred_exercise is None
         assert sel.fallback_candidates == ()
         assert sel.warning is not None
         assert "coverage gap" in sel.warning
 
 
+def test_covered_morphotype_slots_fill_with_right_muscle():
+    """After Sb_MORPHO_POOL_COVERAGE_01 the lateral/rear delt and calf slots fill from the pool,
+    each disambiguated to its own muscle_group (never a sibling muscle in the macro region)."""
+    program = GEN.generate_program(priorities=FULL_BODY_PRIORITIES)
+    by = _by_intent(program)
+    pool = SUB.load_exercise_properties()
+    expected_mg = {
+        "lateral_delt_priority": "delts_lateral",
+        "rear_delt_upper_back_accessory": "delts_rear",
+        "calves_gastrocnemius_priority": "calves",
+        "calves_soleus_priority": "calves",
+        "posterior_chain_hinge": "hamstrings",
+    }
+    for intent_id, mg in expected_mg.items():
+        sel = by[intent_id]
+        assert sel.preferred_exercise is not None, intent_id
+        assert sel.warning is None, intent_id
+        assert pool[sel.preferred_exercise]["muscle_group"] == mg
+
+
 def test_calves_only_selected_with_priority_evidence():
-    """Morphology descriptors alone never emit a calves slot; an explicit priority does — and it
-    still refuses to fabricate a lower-body exercise for the (pool-absent) calves muscle."""
+    """Morphology descriptors alone never emit a calves slot; an explicit priority does — and now
+    that the pool covers calves, both slots fill with genuine, DISTINCT calf exercises."""
     from_desc = GEN.generate_program(facts=martin_morphology.martin_morphology_facts())
     assert not any("calves" in s.intent_id for s in from_desc.selections)
 
     from_prio = GEN.generate_program(priorities=[("calves", 1)])
     calf_slots = [s for s in from_prio.selections if "calves" in s.intent_id]
     assert len(calf_slots) == 2
-    for sel in calf_slots:
-        assert sel.preferred_exercise is None  # never a leg extension / adduction
+    picks = [s.preferred_exercise for s in calf_slots]
+    assert all(p is not None for p in picks)  # calves now covered
+    assert len(set(picks)) == 2  # distinct — a program never prescribes the same exercise twice
+    pool = SUB.load_exercise_properties()
+    assert all(pool[p]["muscle_group"] == "calves" for p in picks)
 
 
 # ─────────────────── guarded / empty ───────────────────

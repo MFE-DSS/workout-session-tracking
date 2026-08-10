@@ -90,8 +90,8 @@ def test_coverage_split_51_covered_52_gap():
     exercises = _exercises()
     covered = [e for e in exercises.values() if e["coverage_status"] == "covered"]
     gaps = [e for e in exercises.values() if e["coverage_status"] == "gap"]
-    assert len(covered) == 51
-    assert len(gaps) == 52
+    assert len(covered) == 67
+    assert len(gaps) == 36
 
 
 def test_covered_entries_consistent_with_properties():
@@ -122,7 +122,8 @@ def test_gaps_remain_explicitly_marked():
 
 
 def test_blackholes_stay_visible_not_masked():
-    # les 19 trous noirs : gap SANS zone, SANS machine, SANS equipment → todo
+    # les trous noirs : gap SANS zone, SANS machine, SANS equipment → todo
+    # (Sb_MORPHO_POOL_COVERAGE_01: 7 anciens trous noirs morphotype couverts → 19 - 7 = 12)
     blackholes = [
         name
         for name, e in _exercises().items()
@@ -131,7 +132,7 @@ def test_blackholes_stay_visible_not_masked():
         and not e["machine_slug"]
         and not e["equipment_family"]
     ]
-    assert len(blackholes) == 19
+    assert len(blackholes) == 12
     for name in blackholes:
         assert _exercises()[name]["confidence"] == "todo"
 
