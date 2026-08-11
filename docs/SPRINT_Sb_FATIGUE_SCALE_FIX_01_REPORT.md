@@ -246,5 +246,20 @@ plus de dégradation muette vers "frais" ».
 **Preuve exécutée, pas affirmée** : le consommateur défectueux restauré fait échouer **10** tests,
 dont celui de la sentinelle d'échec ; rétabli, **69/69**.
 
-Statut : `Sb_FATIGUE_SCALE_FIX_01 PR GREEN / MERGE PENDING` — puis merge permanent autorisé par
-le `GO TRAIN`.
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #76 MERGÉE.** Base canonique `d9d78b1` → build `f1e6dbe` → correction Sonar `61dab46` →
+**merge `09cd474`** via `--merge --match-head-commit 61dab46…` — **sans squash, sans `--admin`,
+sans force**. Gate re-vérifié **autoritativement juste avant** le merge : head SHA confirmé,
+`mergeStateStatus: CLEAN`, `mergeable: MERGEABLE`, **5/5 checks** (dont le gate **externe**
+`SonarCloud Code Analysis`), gate Sonar **`OK`**, **0 thread non résolu**.
+
+**CI canonique `31484328369` — 3/3 GREEN** sur `09cd474` (lint · pytest + QA · SonarCloud).
+
+**Un vrai rouge, pas un faux signal.** Le gate externe Sonar a **échoué au premier passage**
+(`new_bugs_severity 15 > 9`). Diagnostic avant toute action : **une seule** issue,
+`python:S1764` sur la garde NaN. Corrigée en `math.isnan` (§6bis), sans supprimer la garde —
+qui est porteuse. Aucune cascade de correctifs : un diagnostic, un correctif, vert.
+
+**Statut final : `Sb_FATIGUE_SCALE_FIX_01 MERGED + CANONICAL GREEN + CLEANED`.**
+P0.2 du train `AUREN_P0_CORRECTNESS` **close**. Nouvelle base canonique pour P0.3 : `09cd474`.
