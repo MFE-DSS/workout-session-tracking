@@ -25,7 +25,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.session import SessionExercise, SetLog, WorkoutSession
-from app.services.muscle_mapping import RADAR_AXIS_ORDER, classify_exercise
+from app.services.muscle_mapping import (
+    RADAR_AXIS_ORDER,
+    classify_exercise,
+    radar_axis_for_zone,
+)
 
 _DATA_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 
@@ -196,20 +200,38 @@ def _eligible_sessions_in_window(
 def _zone_session_counts(
     db: Session, user_id: int, days: int = 30
 ) -> dict[str, int]:
-    """Count sessions that include at least one exercise of each zone."""
+    """Count sessions that include at least one exercise of each radar axis.
+
+    Keys are the 6 macro radar axes (``RADAR_AXIS_ORDER``) — that is the
+    contract every consumer already assumes (``coach_report._zones`` labels via
+    ``RADAR_AXES``, Body Intelligence keys its input on the same axes).
+
+    Sb_ZONE_COUNT_TAXONOMY_FIX_01 — ``classify_exercise`` returns a *detailed*
+    zone (``delt_lat``, ``lats``, ``quads``, …). Those were previously inserted
+    straight into this macro-keyed dict behind an ``if z in counts`` guard, so
+    only ``pecs`` — the single label that exists at both taxonomic levels —
+    could ever increment. Every other axis was structurally pinned to 0. The
+    detailed zone is now projected onto its axis *before* counting.
+
+    A session contributes at most once per axis: the projection happens inside
+    the per-session set, so a session doing lateral raises *and* face pulls
+    (``delt_lat`` + ``delt_post``) counts once for ``shoulders``, not twice.
+    """
     sessions = _eligible_sessions_in_window(db, user_id, days)
     counts: dict[str, int] = dict.fromkeys(RADAR_AXIS_ORDER, 0)
     for s in sessions:
-        zones_in_session: set[str] = set()
+        axes_in_session: set[str] = set()
         for se in s.session_exercises:
             primary, _ = classify_exercise(
                 se.substituted_name or se.exercise_name_snapshot or ""
             )
-            if primary:
-                zones_in_session.add(primary)
-        for z in zones_in_session:
-            if z in counts:
-                counts[z] += 1
+            axis = radar_axis_for_zone(primary) if primary else None
+            # None → zone with no radar axis ("core") or unclassified
+            # ("unknown"). Dropped rather than forced onto an arbitrary axis.
+            if axis is not None:
+                axes_in_session.add(axis)
+        for axis in axes_in_session:
+            counts[axis] += 1
     return counts
 
 

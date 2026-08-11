@@ -28,7 +28,7 @@ from app.models.user import User
 from app.services.body_intelligence import BodyIntelligenceInput
 from app.services.coach_report import _weight_trend_90d, _work_sets_per_week
 from app.services.confidence import compute_confidence_score
-from app.services.muscle_mapping import RADAR_AXIS_ORDER, classify_exercise
+from app.services.muscle_mapping import RADAR_AXIS_ORDER
 from app.services.profile_metrics import (
     cardio_minutes_per_week,
     dominant_pattern,
@@ -122,37 +122,28 @@ def _implicit_labels_30d(sessions: list[WorkoutSession]) -> dict[str, int]:
 def _radar_zone_counts(
     db: Session, user_id: int, days: int = 30
 ) -> dict[str, int]:
-    """Réagrège ``profile_metrics.zone_session_counts`` (11 zones) sur les
-    6 axes radar canoniques pour rester aligné avec
-    :data:`body_intelligence.RADAR_AXIS_ORDER`.
+    """Normalise ``profile_metrics.zone_session_counts`` sur les 6 axes radar
+    canoniques, alignés sur :data:`body_intelligence.RADAR_AXIS_ORDER`.
+
+    Sb_ZONE_COUNT_TAXONOMY_FIX_01 — cette fonction portait une **seconde
+    table** zone détaillée → axe radar, écrite à la main. C'était un doublon de
+    ``RADAR_AXES`` (la relation canonique), et il divergeait déjà : il déclarait
+    un ``glutes`` absent des 11 zones détaillées. Surtout, la projection est
+    désormais faite **une seule fois**, en amont, dans ``_zone_session_counts``
+    (l'unique frontière de projection). Réappliquer une table détaillée ici
+    aurait fait tomber tous les axes sauf ``pecs``. Le doublon est supprimé ;
+    il ne reste qu'une normalisation de forme.
+
+    On conserve la structure complète (axes à 0 inclus) pour que le composeur
+    puisse détecter ``undertrained_zone``.
     """
     raw_counts = zone_session_counts(db, user_id, days=days)
     if not raw_counts:
         return {}
-    # On dérive le mapping zone détaillée → axe radar via classify_exercise
-    # n'est pas possible directement (on n'a pas le nom ici). Heuristique
-    # V1 : on agrège par préfixe connu pour rester pur.
-    mapping: dict[str, str] = {
-        "pecs": "pecs",
-        "delt_lat": "shoulders",
-        "delt_post": "shoulders",
-        "lats": "back_width",
-        "upper_back": "back_thickness",
-        "biceps": "arms",
-        "triceps": "arms",
-        "quads": "lower",
-        "posterior": "lower",
-        "glutes": "lower",
-        "calves": "lower",
-    }
-    axis_counts: dict[str, int] = {axis: 0 for axis in RADAR_AXIS_ORDER}
-    for zone_key, count in raw_counts.items():
-        axis = mapping.get(zone_key)
-        if axis is None:
-            continue
-        axis_counts[axis] += int(count or 0)
-    # Drop axes à 0 → on garde la structure complète pour que le composeur
-    # puisse détecter "undertrained_zone".
+    axis_counts: dict[str, int] = dict.fromkeys(RADAR_AXIS_ORDER, 0)
+    for axis_key, count in raw_counts.items():
+        if axis_key in axis_counts:
+            axis_counts[axis_key] += int(count or 0)
     return axis_counts
 
 
@@ -277,9 +268,3 @@ def build_body_intelligence_input(
         waist_cm=waist,
         weight_trend_90d_kg=weight_trend,
     )
-
-
-# Anti unused import — `classify_exercise` est volontairement laissé
-# disponible pour Sb_31.next si on veut affiner le mapping zone→axe par
-# nom d'exercice ; on garde l'import pour éviter le retour à la base.
-_ = classify_exercise

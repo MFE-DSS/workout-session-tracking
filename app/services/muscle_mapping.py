@@ -74,6 +74,34 @@ RADAR_AXES: dict[str, dict] = {
 
 RADAR_AXIS_ORDER = ["pecs", "shoulders", "back_width", "back_thickness", "arms", "lower"]
 
+# Sb_ZONE_COUNT_TAXONOMY_FIX_01 — canonical detailed-zone → radar-axis projection.
+#
+# ``RADAR_AXES`` is the architecture's canonical macro/detailed relation: it is
+# what ``muscle_scoring`` iterates to aggregate zone scores onto axes, and what
+# ``tests/test_auren_body_zone_contract`` pins. The inverse below is DERIVED from
+# it rather than hand-written, so the two directions cannot drift apart and no
+# competing vocabulary is introduced.
+#
+# ``core`` is deliberately absent: it is one of the 11 detailed zones but has no
+# radar axis (see ``test_auren_bodymap_master``: "core" in CANONICAL_MACROS and
+# "core" not in RADAR_AXIS_ORDER). Projecting it would fabricate an axis, so it
+# resolves to ``None`` and callers drop it — same for "unknown".
+ZONE_TO_RADAR_AXIS: dict[str, str] = {
+    zone: axis_key
+    for axis_key in RADAR_AXIS_ORDER
+    for zone in RADAR_AXES[axis_key]["zones"]
+}
+
+
+def radar_axis_for_zone(zone: str) -> str | None:
+    """Project a detailed zone onto its radar axis, or ``None`` if it has none.
+
+    ``None`` means "this zone legitimately has no macro axis" (``core``) or "not
+    a known detailed zone" (``unknown``, or an already-macro key passed in by
+    mistake). Callers must drop those rather than invent an axis for them.
+    """
+    return ZONE_TO_RADAR_AXIS.get(zone)
+
 _EXERCISE_PATTERNS: list[tuple[list[str], str, list[str]]] = [
     (["chest press", "presse pectorale", "butterfly", "écarté pec",
       "développé couché", "développé incliné", "incline smith",
