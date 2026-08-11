@@ -331,5 +331,21 @@ revue et machine-testable.
 et `exercise_properties`. Chacun reste un pas suivant **explicite**, protégé par la garde
 retargetée du §4.7.
 
-Statut : `Sb_32.4_BODYZONE_CONSUMER_MIGRATION PR GREEN / MERGE PENDING` — puis merge permanent
-autorisé par le `GO TRAIN`.
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #77 MERGÉE.** Base canonique `0fd0502` → build `aa04bd3` → correction Sonar `f64acd4` →
+correction Gitar N+1 `46126ab` → **merge `246ed0a`** via `--merge --match-head-commit 46126ab…` —
+**sans squash, sans `--admin`, sans force**. Gate re-vérifié **autoritativement juste avant** le
+merge : head SHA confirmé, `CLEAN` / `MERGEABLE`, **5/5 checks** (dont le gate **externe**
+`SonarCloud Code Analysis`), gate Sonar **`OK`**, **0 thread non résolu**.
+
+**CI canonique `31495540887` — 3/3 GREEN** sur `246ed0a`.
+
+**Deux findings, deux corrections réelles** — aucun n'a été justifié plutôt que corrigé :
+le smell Sonar (§7bis, import mort laissé par le retarget de la garde) et surtout la **régression
+N+1 que ce sprint avait introduite** (§7ter), signalée par Gitar et confirmée : j'avais remplacé un
+classifieur en mémoire par une requête DB **dans une double boucle**, sur la primitive racine du
+scoring. Mémoïsation par nom distinct, par invocation, plus un test qui compte les résolutions.
+
+**Statut final : `Sb_32.4_BODYZONE_CONSUMER_MIGRATION MERGED + CANONICAL GREEN + CLEANED`.**
+P0.3 close. **Train `AUREN_P0_CORRECTNESS` COMPLET.** Canonique : `246ed0a`.
