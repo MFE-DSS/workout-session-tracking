@@ -18,13 +18,13 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.measurement import BodyMeasurement
 from app.models.session import SessionExercise, SetLog, WorkoutSession
+from app.services.body_zone_source import resolve_exercise_zones
 from app.services.muscle_mapping import (
     RADAR_AXES,
     RADAR_AXIS_ORDER,
     ZONE_LABELS,
     ZONE_MEASUREMENT,
     ZONE_VOLUME_TARGET,
-    classify_exercise,
 )
 from app.services.radar import build_radar_svg
 from app.services.substitution import actual_exercise_name
@@ -86,9 +86,22 @@ def _compute_tonnage_by_zone(
 
     for s in sessions:
         for se in s.session_exercises:
-            primary, secondary = classify_exercise(actual_exercise_name(se))
-            if primary == "unknown":
+            # Sb_32.4 — this is the migrated heavy consumer. It reads the
+            # canonical body-zone contract (formal ExerciseMuscleMapping rows,
+            # with the reviewed corrections applied) instead of calling the
+            # substring classifier itself. `resolve_exercise_zones` keeps the
+            # substring path as a *fallback* for names the referential does not
+            # cover, so no exercise loses its attribution — but the fallback
+            # can never override a formal mapping.
+            #
+            # The lookup key is the exercise NAME: `exercise_code` on
+            # ExerciseMuscleMapping holds the name, while
+            # `SessionExercise.exercise_code_snapshot` is a training-day slot
+            # (E1…E7) reused across exercises and must NOT be used here.
+            resolved = resolve_exercise_zones(db, actual_exercise_name(se))
+            if not resolved.is_known:
                 continue
+            primary, secondary = resolved.primary, resolved.secondary
 
             work_sets = [sl for sl in se.set_logs
                          if sl.kind == "work" and sl.completed]
