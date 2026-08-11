@@ -439,6 +439,33 @@ def test_body_intelligence_input_receives_corrected_values(client):
     assert axis_counts["pecs"] == 0
 
 
+def test_body_intelligence_input_is_always_the_full_six_axes(client):
+    """No sessions at all must still yield six zeros, never an empty dict.
+
+    The composer keys ``undertrained_zone`` off the full structure, so an
+    absent axis and an axis at zero are not interchangeable. A ``return {}``
+    short-circuit used to sit here; it was unreachable, and had it fired it
+    would have broken exactly that guarantee.
+    """
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.services.auth import hash_password
+    from app.services.body_intelligence_inputs import _radar_zone_counts
+
+    with SessionLocal() as db:
+        db.add(User(username="bi_no_data",
+                    password_hash=hash_password("anything1"), is_active=True))
+        db.commit()
+        uid = db.execute(
+            select(User.id).where(User.username == "bi_no_data")
+        ).scalar_one()
+        axis_counts = _radar_zone_counts(db, uid, days=30)
+
+    assert axis_counts == dict.fromkeys(RADAR_AXIS_ORDER, 0)
+
+
 def test_body_intelligence_input_no_longer_holds_a_second_mapping(client):
     """No sixth table: the BI module must not redefine zone→axis.
 

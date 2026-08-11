@@ -201,7 +201,7 @@ l'over-check a déjà attrapé de vraies régressions trois fois sur ce repo.
 |---|---|
 | Broad sweep ciblé (zone, profil, BI, coach, contrats taxonomie, scoring) | **204 passés** |
 | Full sweep parallélisé | voir §7 |
-| Nouveaux tests ciblés | **24 passés** |
+| Nouveaux tests ciblés | **25 passés** (24 au build + 1 au finding Gitar §6ter) |
 | ruff (fichiers touchés + neuf) | **clean** |
 | Budget ruff | **543 ≤ 548** — strictement **neutre** vs la canonique |
 | `check_spec_protocol` | **PASS** |
@@ -234,6 +234,25 @@ Deux choses méritent d'être dites plutôt que tues :
    sur `profile_metrics` et `body_intelligence_inputs`, et `classify_exercise` n'est pas modifié.
    Renforcer ces gardes serait un travail légitime — **hors périmètre de ce sprint**, donc non fait.
 
+### 6ter. Finding Gitar traité in-scope (PR #75)
+
+**Constat** : dans `_radar_zone_counts`, le court-circuit `if not raw_counts: return {}` est
+**inatteignable** — `zone_session_counts` est bâti sur `dict.fromkeys(RADAR_AXIS_ORDER, 0)` et
+n'est donc jamais vide — et s'il avait pu se déclencher il aurait renvoyé un dict **vide**,
+contredisant exactement la garantie annoncée par la docstring (« structure complète conservée pour
+que le composeur détecte `undertrained_zone` »).
+
+**Vérifié avant d'agir** : le court-circuit était **déjà** mort avant ce sprint (l'amont rendait
+déjà six clés macro), donc ce n'est pas une régression introduite ici — mais il vit dans la
+fonction que je modifie, et la contradiction est réelle. `tests/test_body_intelligence.py:151`
+teste le cas `{}` **en construisant l'entrée directement**, sans passer par cette fonction : ce
+comportement du composeur reste donc intact et non touché.
+
+**Correction** : branche retirée. L'absence de données s'exprime désormais par **six zéros**, pas
+par une structure absente — sémantique **identique** en pratique (la branche ne pouvait pas
+s'exécuter) et cohérente avec la docstring. Test ajouté : un utilisateur **sans aucune séance**
+obtient `dict.fromkeys(RADAR_AXIS_ORDER, 0)`. **25 tests.**
+
 ## Verdict
 
 **Livré.** La projection zone détaillée → axe radar existe désormais à **une seule frontière**,
@@ -250,7 +269,7 @@ actual sessions rather than the accidental overlap between detailed and macro la
 
 | Vérification | Résultat |
 |---|---|
-| Tests ciblés neufs | **24 passés** |
+| Tests ciblés neufs | **25 passés** |
 | Broad sweep ciblé (zone/profil/BI/coach/taxonomie/scoring) | **204 passés** |
 | Full sweep parallélisé | **3059 passés** + 2 gardes d'arbre de travail (§6bis), vertes au commit |
 | ruff (fichiers touchés + neuf) | clean |

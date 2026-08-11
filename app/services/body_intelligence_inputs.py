@@ -134,12 +134,16 @@ def _radar_zone_counts(
     aurait fait tomber tous les axes sauf ``pecs``. Le doublon est supprimé ;
     il ne reste qu'une normalisation de forme.
 
-    On conserve la structure complète (axes à 0 inclus) pour que le composeur
-    puisse détecter ``undertrained_zone``.
+    On retourne **toujours** la structure complète (les 6 axes, zéros inclus),
+    y compris pour un utilisateur sans aucune séance : le composeur en a besoin
+    pour détecter ``undertrained_zone``. Un court-circuit ``return {}`` existait
+    ici ; il était **inatteignable** — ``zone_session_counts`` est bâti sur
+    ``dict.fromkeys(RADAR_AXIS_ORDER, 0)`` et n'est donc jamais vide — et s'il
+    avait pu se déclencher il aurait renvoyé un dict vide, contredisant
+    exactement la garantie ci-dessus. Retiré : l'absence de données s'exprime
+    par **six zéros**, pas par une structure absente.
     """
     raw_counts = zone_session_counts(db, user_id, days=days)
-    if not raw_counts:
-        return {}
     axis_counts: dict[str, int] = dict.fromkeys(RADAR_AXIS_ORDER, 0)
     for axis_key, count in raw_counts.items():
         if axis_key in axis_counts:
