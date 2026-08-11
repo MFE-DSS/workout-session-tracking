@@ -214,6 +214,48 @@ lue comme « frais » · aucun `stale` promu en `sufficient`.
 **Livraison** : pas de force-push, pas de rebase, pas de squash, pas de merge `--admin`,
 `AGENTS.md` non touché, **`Sb_CARDIO_FATIGUE_ADAPTER_01` non ouvert**.
 
+### 7bis. Le gate Sonar — 4 findings, et 3 tours perdus à deviner
+
+Le gate externe `SonarCloud Code Analysis` a échoué **quatre fois** avant de passer. La partie
+utile de cette histoire n'est pas la liste des correctifs, c'est **comment j'ai fini par obtenir la
+vérité** — et le fait que je m'en sois passé trop longtemps.
+
+**Le problème d'outillage.** `api/issues/search` renvoie **`TOTAL 0`** pour cette PR, quelle que
+soit la combinaison de paramètres (`componentKeys`, `projectKeys`, `organization`, `components`,
+`inNewCodePeriod`, `issueStatuses`…), en `gh api` **comme** en `WebFetch`. Cet endpoint exige une
+authentification Sonar dont je ne dispose pas. Je n'avais donc que le **chiffre du gate**.
+
+**Ce que j'ai fait de mal.** Sur la seule foi de ce chiffre, j'ai modifié le code **deux fois** en
+supposant la cause. Les deux fois, la mesure est restée à **2 smells / severity 20** — ce qui
+prouvait que je m'étais trompé, et aurait dû m'arrêter dès le premier coup.
+
+**La route qui marche réellement**, et qui aurait dû être mon premier réflexe :
+
+```
+api/measures/component_tree?...&metricKeys=new_code_smells,new_critical_violations,
+                                            new_major_violations&qualifiers=FIL
+```
+
+Elle **localise le fichier** et donne la **classe de sévérité**. Combinée à un comptage local en
+AST, elle identifie la règle sans jamais lister les issues. Deux calibrations en sont tombées :
+**MAJOR = 15, CRITICAL = 10** — donc **un seul MAJOR suffit** à faire sauter le seuil
+`new_code_smells_severity > 14`.
+
+**Piège supplémentaire** : `qualifiers=FIL` **ne renvoie pas les fichiers de test** (indexés sous
+un autre qualifier). Quand le module est mesuré propre et que la sévérité reste non nulle, il faut
+interroger le chemin de test **directement** via `api/measures/component?component=<clé>%3Atests%2F…`.
+
+| # | Finding | Diagnostic | Correctif |
+|---|---|---|---|
+| 1 | *(deviné, faux)* | — | `zone_freshness_bonus_conversion` supprimée — stub sans paramètres utilisés, redondant avec la ligne du registre. **Amélioration réelle, mais pas la cause.** |
+| 2 | *(deviné, faux)* | — | Seuils `0.8`/`0.4` nommés `BAND_*_FROM`. **Amélioration réelle, mais pas la cause.** |
+| 3 | **`python:S1244`** × 2 CRITICAL | `component_tree` → 2 `new_critical_violations` dans le module ; 10 × 2 = 20 | `float(v) != int(v)` (×3) → helper nommé `_is_whole_number` sur `float.is_integer()` |
+| 4 | **`python:S9073`** × 1 MAJOR | Sévérité 20 → **15**, module mesuré **0** ⇒ le reste est ailleurs ; requête directe sur le chemin de test → 1 MAJOR | `assert a and b and c and d` → **un assert par condition**, chacun portant l'identité de la ligne |
+
+`python:S9073` avait **déjà mordu ce dépôt en PR #64**. Les deux règles sont désormais consignées
+en mémoire de session avec les poids de sévérité **et la route API qui fonctionne**, pour que le
+prochain gate rouge coûte une requête au lieu de trois cycles de CI.
+
 ## Verdict
 
 **Livré.** Le vocabulaire canonique existe et il est exécutable : quatre mots qui désignaient
