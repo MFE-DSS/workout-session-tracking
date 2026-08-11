@@ -276,5 +276,27 @@ actual sessions rather than the accidental overlap between detailed and macro la
 | Budget ruff | 543 ≤ 548 (neutre) |
 | `check_spec_protocol` | PASS |
 
-Statut : `Sb_ZONE_COUNT_TAXONOMY_FIX_01 PR GREEN / MERGE PENDING` — puis merge permanent
-autorisé par le `GO TRAIN`.
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #75 MERGÉE.** Base canonique `9f8323f` → build `50bfefa` → correction Gitar `cd79736` →
+**merge `452c589`** via `--merge --match-head-commit cd79736…` — **sans squash, sans `--admin`,
+sans force**. Gate re-vérifié **autoritativement juste avant** le merge : head SHA confirmé,
+`mergeStateStatus: CLEAN`, `mergeable: MERGEABLE`, **5/5 checks** (dont le gate **externe**
+`SonarCloud Code Analysis`, distinct du job interne `SonarCloud`), gate Sonar **`OK`**
+(`new_coverage 100.0 %`, 0 bug / 0 code smell / 0 vulnérabilité / 0 SCA neufs),
+**0 thread non résolu**.
+
+**CI canonique `31479653681` — 3/3 GREEN** sur `452c589` (lint · pytest + QA · SonarCloud).
+
+**1 finding Gitar, traité par une correction réelle** (§6ter) et non par une justification : la
+branche `return {}` morte a été **retirée**, avec un test supplémentaire pinnant les six zéros
+pour un utilisateur sans séance. Le thread a été résolu **après** la correction poussée.
+
+**Aucun faux signal CI** sur ce sprint. Aucune dérive de périmètre : les 7 fichiers de la PR sont
+exactement ceux annoncés (3 services, 1 fichier de tests, 3 docs).
+
+**Cleanup** : branche `sb/zone-count-taxonomy-fix-01` et worktree supprimés après vérification
+d'un arbre propre et d'une branche entièrement fusionnée.
+
+**Statut final : `Sb_ZONE_COUNT_TAXONOMY_FIX_01 MERGED + CANONICAL GREEN + CLEANED`.**
+P0.1 du train `AUREN_P0_CORRECTNESS` **close**. Nouvelle base canonique pour P0.2 : `452c589`.
