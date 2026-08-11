@@ -167,22 +167,29 @@ def test_zone_freshness_is_silent_when_days_is_none():
 
 
 # ─────────────────── fatigue ───────────────────
+#
+# Sb_FATIGUE_SCALE_FIX_01 — these three cases used to pass 0.9 / 0.1 / 0.5, as
+# if `context["fatigue_score"]` were a 0–1 value. It is not: `behavioral`
+# produces 0–100 and `recommendation.py` forwards it verbatim. The assertions
+# were right, the inputs were not — so the inputs are corrected to the real
+# producer scale, and nothing is weakened. See tests/test_fatigue_scale.py for
+# the full conversion table.
 
 
 def test_high_fatigue_surfaces_phrase():
-    payload = _mk_payload(phrase="X", fatigue_score=0.9)
+    payload = _mk_payload(phrase="X", fatigue_score=90)
     out = explain_recommendation(payload)
     assert any("fatigue élevé" in r.lower() for r in out["reasons"])
 
 
 def test_low_fatigue_surfaces_phrase():
-    payload = _mk_payload(phrase="X", fatigue_score=0.1)
+    payload = _mk_payload(phrase="X", fatigue_score=20)
     out = explain_recommendation(payload)
     assert any("fatigue bas" in r.lower() for r in out["reasons"])
 
 
 def test_medium_fatigue_says_nothing():
-    payload = _mk_payload(phrase="X", fatigue_score=0.5)
+    payload = _mk_payload(phrase="X", fatigue_score=50)
     out = explain_recommendation(payload)
     assert not any("fatigue" in r.lower() for r in out["reasons"])
 
@@ -204,7 +211,7 @@ def test_max_three_reasons_when_many_rules_fire():
         cold_start=True,
         fallback=True,
         days_strength=7,
-        fatigue_score=0.9,
+        fatigue_score=90,
     )
     out = explain_recommendation(payload)
     assert len(out["reasons"]) <= 3
