@@ -316,44 +316,257 @@ def fatigue_to_availability(value: Any) -> float | None:
     return 1.0 - v
 
 
+# ── Sb_CARDIO_FATIGUE_ADAPTER_01 — cardio exposure ─────────────────────────
+
+CARDIO_ADAPTER_VERSION = 1
+
+
+class CardioModality(StrEnum):
+    """Closed vocabulary for the adapter, versioned with it.
+
+    The four specific modalities plus the catalog's own catch-all, and one
+    adapter-side bucket for anything the vocabulary does not cover.
+
+    The persisted column is ``String(32)`` and the write endpoint applies **no
+    allow-list** (``sessions.py`` only does ``clean_str(max_length=32)``), so a
+    stored value outside this list is possible and must degrade gracefully. The
+    *UI*, by contrast, is already a closed ``<select>`` — the two are different
+    guarantees and the adapter relies only on the weaker one.
+    """
+
+    VELO = "velo"
+    MARCHE = "marche"
+    RAMEUR = "rameur"
+    ELLIPTIQUE = "elliptique"
+    AUTRE = "autre"
+    UNKNOWN = "unknown"
+
+
+#: Values the UI `<select>` in `session_detail.html` can currently produce.
+CARDIO_UI_VOCABULARY: frozenset[str] = frozenset(
+    {"velo", "marche", "rameur", "elliptique", "autre"}
+)
+
+#: Modalities specific enough to carry a zone distribution. ``AUTRE`` is a real
+#: catalog value but says nothing about what moved, so it is not one of them.
+CARDIO_SPECIFIC_MODALITIES: frozenset[CardioModality] = frozenset({
+    CardioModality.VELO, CardioModality.MARCHE,
+    CardioModality.RAMEUR, CardioModality.ELLIPTIQUE,
+})
+
+#: Duration at which a cardio session counts as full exposure, in minutes.
+#:
+#: **Taken from the product catalog, not invented and not biological.** Both
+#: cardio templates in ``reference_split.json`` prescribe "20-30 min LISS"
+#: (`liss-only`, `liss-abs`), so the top of the catalog's own prescribed range is
+#: the natural saturation point: a session at the prescription counts as a full
+#: unit of cardio exposure, and going longer cannot count for more than one.
+#:
+#: This is a **product normalization constant, not a biological fatigue
+#: threshold.** Nothing physiological happens at 30 minutes.
+#:
+#: `coach_inference.CARDIO_LOW_MIN_PER_WEEK` (90) was considered and rejected: it
+#: is a *weekly* volume floor derived from a public-health recommendation, the
+#: wrong granularity for a per-session exposure proxy.
+CARDIO_DURATION_REFERENCE_MINUTES = 30.0
+
+#: Relative distribution weights **inside the cardio signal only**. They order
+#: primary above secondary exposure; they are not percentages of anything, and
+#: they are not a claim about muscle activation.
+CARDIO_PRIMARY_ZONE_WEIGHT = 1.0
+CARDIO_SECONDARY_ZONE_WEIGHT = 0.5
+
+
+@dataclass(frozen=True)
+class CardioZoneExposure:
+    """Which body zones a cardio modality plausibly exposes. A **heuristic**.
+
+    Deliberately coarse, and expressed as two classes — primary and secondary —
+    rather than fake per-zone percentages. Zone codes are canonical
+    ``BodyZone`` codes; this introduces no taxonomy of its own.
+    """
+
+    modality: CardioModality
+    primary_zones: tuple[str, ...] = ()
+    secondary_zones: tuple[str, ...] = ()
+    basis: tuple[str, ...] = ()
+
+    @property
+    def is_distributed(self) -> bool:
+        return bool(self.primary_zones or self.secondary_zones)
+
+    def weights(self) -> dict[str, float]:
+        """Relative weights for the exposed zones. Empty when undistributed."""
+        weights = dict.fromkeys(self.primary_zones, CARDIO_PRIMARY_ZONE_WEIGHT)
+        for zone in self.secondary_zones:
+            weights.setdefault(zone, CARDIO_SECONDARY_ZONE_WEIGHT)
+        return weights
+
+
+#: Modality → zones. A **product heuristic**, versioned with the adapter.
+#:
+#: Not EMG, not measured activation, not tissue fatigue, not recovery. It says
+#: only "this modality plausibly puts these zones under some exposure", coarsely
+#: enough to be defensible without an ergometer.
+#:
+#: `elliptique` is deliberately lower-body only: the machine has moving handles,
+#: but nothing in the captured data says whether they were used, so adding
+#: upper-body zones would be inventing a fact about the session.
+#
+# The three lower-body-dominant modalities share one distribution, named once
+# rather than repeated: cycling, inclined walking and the elliptical differ in
+# how they load the legs, but nothing in the captured data distinguishes them,
+# and pretending otherwise would be precision we do not have.
+_LOWER_BODY_PRIMARY: tuple[str, ...] = ("quads", "posterior")
+_LOWER_BODY_SECONDARY: tuple[str, ...] = ("calves",)
+
+_CARDIO_ZONE_TABLE: dict[CardioModality, CardioZoneExposure] = {
+    CardioModality.VELO: CardioZoneExposure(
+        modality=CardioModality.VELO,
+        primary_zones=_LOWER_BODY_PRIMARY,
+        secondary_zones=_LOWER_BODY_SECONDARY,
+        basis=("cycling: seated lower-body cyclic work, no upper-body load",),
+    ),
+    CardioModality.MARCHE: CardioZoneExposure(
+        modality=CardioModality.MARCHE,
+        primary_zones=_LOWER_BODY_PRIMARY,
+        secondary_zones=_LOWER_BODY_SECONDARY,
+        basis=("inclined walking: lower-body cyclic work, calves on the incline",),
+    ),
+    CardioModality.RAMEUR: CardioZoneExposure(
+        modality=CardioModality.RAMEUR,
+        primary_zones=(*_LOWER_BODY_PRIMARY, "lats", "upper_back"),
+        secondary_zones=("biceps",),
+        basis=("rowing: leg drive plus a pulling chain — the one mixed modality",),
+    ),
+    CardioModality.ELLIPTIQUE: CardioZoneExposure(
+        modality=CardioModality.ELLIPTIQUE,
+        primary_zones=_LOWER_BODY_PRIMARY,
+        secondary_zones=_LOWER_BODY_SECONDARY,
+        basis=(
+            "elliptical: lower-body dominant; handle use is not captured, so no "
+            "upper-body zone is claimed",
+        ),
+    ),
+}
+
+
+def normalize_cardio_modality(raw: Any) -> tuple[CardioModality | None, str | None]:
+    """Stored ``cardio_machine_type`` → modality, plus the off-list raw value.
+
+    Returns ``(None, None)`` when nothing was recorded — no modality is
+    fabricated for an empty field.
+
+    Normalisation is **trim and case only**. No alias table: the repository
+    evidences no alias, and inventing spellings that were never observed is
+    exactly the fabrication this contract forbids. An unrecognised non-empty
+    value maps to :attr:`CardioModality.UNKNOWN` and is echoed back so the basis
+    can name it.
+    """
+    if not isinstance(raw, str):
+        return None, None
+    cleaned = raw.strip().casefold()
+    if not cleaned:
+        return None, None
+    if cleaned in CARDIO_UI_VOCABULARY:
+        return CardioModality(cleaned), None
+    return CardioModality.UNKNOWN, raw.strip()
+
+
+def cardio_zone_exposure(modality: CardioModality | None) -> CardioZoneExposure:
+    """Zone exposure for a modality. Undistributed when the modality is vague.
+
+    ``AUTRE`` and ``UNKNOWN`` return an empty distribution on purpose: "some
+    other machine" does not tell us what moved, and picking zones anyway to make
+    coverage look complete is what §5.3 forbids.
+    """
+    if modality is None:
+        return CardioZoneExposure(
+            modality=CardioModality.UNKNOWN,
+            basis=("no modality recorded",),
+        )
+    table_entry = _CARDIO_ZONE_TABLE.get(modality)
+    if table_entry is not None:
+        return table_entry
+    return CardioZoneExposure(
+        modality=modality,
+        basis=(f"modality '{modality.value}' carries no zone distribution",),
+    )
+
+
 def cardio_load_estimate(
     *,
     machine_type: str | None = None,
     duration_min: Any = None,
     bpm_avg: Any = None,
 ) -> tuple[float | None, Confidence, tuple[str, ...]]:
-    """Cardio contribution to fatigue — **declared here, computed later**.
+    """Cardio **exposure proxy** for a single session, on 0.0–1.0.
 
-    OQ-4 resolves that no cardio coefficient is invented in this sprint:
-    ``cardio_machine_type`` is a free-text ``String(32)``, so the vocabulary
-    actually present in the database is unknown, and a distribution table built
-    on an assumed vocabulary would be exactly the fabricated precision §8
-    forbids. Magnitude rules belong to ``Sb_CARDIO_FATIGUE_ADAPTER_01``, after it
-    audits the stored values.
+    What the number is: ``duration / CARDIO_DURATION_REFERENCE_MINUTES``,
+    clamped. One named, monotonic, bounded rule over the only quantitative input
+    every usable cardio session has. Nothing else scales it.
 
-    So V1 returns ``(None, Confidence.NONE, basis)``: the signature, the return
-    shape and the confidence ceiling are pinned now, the numbers are not
-    guessed now. The basis records which inputs were present, so the eventual
-    adapter — and any explanation surface — can say *why* there is no estimate.
+    What the number is **not**: a percentage of physiological fatigue, a
+    recovery reading, or a measurement of internal load. None of the captured
+    fields observes any of those. Call it an operational cardio exposure proxy
+    and nothing more.
 
-    The ceiling is part of the contract: no combination of today's fields can
-    ever justify :attr:`Confidence.HIGH`, because none of them observes internal
-    load or recovery state.
+    **Machine calories are not read** — they are not even a parameter. The
+    product labels them "indicatif" in the capture form, they come from machine
+    estimators of unknown calibration, and they are not an individualised load
+    measure. They stay display and export information.
+
+    **Average BPM does not scale the value.** With no individual anchor —
+    measured HRmax, resting HR, HR reserve, a ventilatory or lactate threshold —
+    an absolute 130 bpm is not comparable between two people. The catalog makes
+    this concrete: both LISS templates prescribe the *same* "120-130 bpm" band to
+    everyone, so a reading inside it carries no individual intensity
+    information. BPM here is **evidence that the session was recorded more
+    completely**, and it can lift confidence from LOW to MEDIUM on a specific
+    modality. It can never make the load larger.
+
+    Temporal decay is deliberately absent: this describes one session's
+    exposure. When that exposure stops mattering belongs to
+    ``Sb_ZONE_RECOVERY_ESTIMATE_01``.
     """
-    present: list[str] = []
-    if machine_type:
-        present.append("cardio_machine_type")
-    if _is_real_number(duration_min) and float(duration_min) > 0:
-        present.append("cardio_duration_min")
-    if _is_real_number(bpm_avg) and float(bpm_avg) > 0:
-        present.append("cardio_bpm_avg")
+    modality, off_list = normalize_cardio_modality(machine_type)
+    basis: list[str] = []
 
-    basis = (
-        f"cardio inputs present: {', '.join(present)}" if present
-        else "no usable cardio input",
-        "magnitude deferred to Sb_CARDIO_FATIGUE_ADAPTER_01 (OQ-4)",
+    usable_duration = (
+        _is_real_number(duration_min) and float(duration_min) > 0.0
     )
-    return None, Confidence.NONE, basis
+    if not usable_duration:
+        basis.append("no usable cardio_duration_min")
+        if modality is not None:
+            basis.append(f"modality: {modality.value}")
+        return None, Confidence.NONE, tuple(basis)
+
+    minutes = float(duration_min)
+    value = clamp_unit(minutes / CARDIO_DURATION_REFERENCE_MINUTES)
+    basis.append(
+        f"{minutes:g} min vs {CARDIO_DURATION_REFERENCE_MINUTES:g} min reference "
+        f"(product normalization, not a biological threshold)"
+    )
+
+    if modality is None:
+        basis.append("no modality recorded")
+    elif off_list is not None:
+        basis.append(f"modality outside the known vocabulary: {off_list!r}")
+    else:
+        basis.append(f"modality: {modality.value}")
+
+    usable_bpm = _is_real_number(bpm_avg) and float(bpm_avg) > 0.0
+    if usable_bpm:
+        basis.append(
+            "average BPM recorded — raises evidence, never the magnitude "
+            "(no individual heart-rate anchor exists)"
+        )
+
+    specific = modality in CARDIO_SPECIFIC_MODALITIES
+    confidence = (
+        Confidence.MEDIUM if (specific and usable_bpm) else Confidence.LOW
+    )
+    return value, confidence, tuple(basis)
 
 
 #: Confidence this contract may never exceed for cardio, whatever the inputs
