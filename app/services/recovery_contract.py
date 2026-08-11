@@ -372,16 +372,13 @@ def confidence_from_legacy_label(label: Any) -> Confidence | None:
     return _LEGACY_CONFIDENCE_LABELS.get(label.strip().casefold())
 
 
-def zone_freshness_bonus_conversion(*_args: Any, **_kwargs: Any) -> None:
-    """Deliberately **no conversion** — ``ZONE_FRESHNESS_BONUS_*`` stays put.
-
-    Those constants are scoring weights in points (base 15, step −6, floor −6)
-    internal to ``recommendation.py``'s ranking. They are not a measurement of
-    anything and have no meaning outside that formula, so normalizing them onto
-    0.0–1.0 would manufacture a quantity. Row 12 of the §3.1 table exists to say
-    this out loud rather than leave a gap someone later fills in.
-    """
-    return None
+# Row 12 of the §3.1 table has **no conversion, deliberately**.
+# ``ZONE_FRESHNESS_BONUS_{BASE,STEP,MIN}`` are scoring weights in points
+# (base 15, step -6, floor -6) internal to ``recommendation.py``'s ranking. They
+# measure nothing and have no meaning outside that formula, so normalizing them
+# onto 0.0-1.0 would manufacture a quantity. The row exists in
+# ``LEGACY_SCALE_CONVERSIONS`` with ``conversion=None`` so the omission is
+# recorded rather than left as a gap someone later fills in.
 
 
 # ---------------------------------------------------------------------------
@@ -633,6 +630,13 @@ class ZoneRecoveryEstimate:
         )
 
 
+#: Band cut-offs, named rather than inlined. They are **presentation
+#: thresholds**, not physiology: they decide which of three words a surface
+#: shows, and nothing else. Moving them changes wording, never a decision.
+BAND_LIKELY_AVAILABLE_FROM = 0.8
+BAND_PARTIALLY_RECOVERED_FROM = 0.4
+
+
 def band_for_estimate(estimate: Any) -> RecoveryBand:
     """Map an estimate onto its qualitative band. ``None`` → ``UNKNOWN``."""
     if not _is_real_number(estimate):
@@ -640,9 +644,9 @@ def band_for_estimate(estimate: Any) -> RecoveryBand:
     v = float(estimate)
     if v < 0.0 or v > 1.0:
         return RecoveryBand.UNKNOWN
-    if v >= 0.8:
+    if v >= BAND_LIKELY_AVAILABLE_FROM:
         return RecoveryBand.LIKELY_AVAILABLE
-    if v >= 0.4:
+    if v >= BAND_PARTIALLY_RECOVERED_FROM:
         return RecoveryBand.PARTIALLY_RECOVERED
     return RecoveryBand.LIKELY_FATIGUED
 
