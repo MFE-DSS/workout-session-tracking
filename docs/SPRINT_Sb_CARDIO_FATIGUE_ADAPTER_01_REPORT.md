@@ -147,7 +147,7 @@ cette exposition cesse de compter appartient à `Sb_ZONE_RECOVERY_ESTIMATE_01`. 
 Cardio reste une **composante observable séparée** : pas d'agrégat pondéré sur `FatigueSignal`, pas
 de score global sur `TrainingState`, aucune logique de décision. Pinné.
 
-## 6. Tests — `tests/test_cardio_fatigue_adapter.py`, 88 tests
+## 6. Tests — `tests/test_cardio_fatigue_adapter.py`, 89 tests
 
 **Cinq garanties centrales, prouvées mordantes par plantation de violations réelles :**
 
@@ -183,7 +183,7 @@ les garanties durables qu'elle protégeait (plafond de confiance, contenu de la 
 
 | Contrôle | Résultat |
 |---|---|
-| Tests dédiés | **88 passés** |
+| Tests dédiés | **89 passés** |
 | Broad sweep ciblé (adaptateur · contrat · capture cardio · scoring cardio · recap · session done · coach · profil · fatigue P0.2 · explainer · export ×3 · timeline · zones P0.1 · BodyZone P0.3) | **495 passés** |
 | ruff (fichiers touchés + neuf) | **clean** |
 | Budget ruff | **543 ≤ 548** — **neutre** |

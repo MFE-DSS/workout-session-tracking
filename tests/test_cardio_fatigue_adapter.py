@@ -320,6 +320,25 @@ def test_high_confidence_is_unreachable():
                 assert confidence is not Confidence.HIGH
 
 
+def test_the_declared_ceiling_is_the_one_actually_reached():
+    """`CARDIO_MAX_CONFIDENCE` must describe reality, not aspiration.
+
+    Two failure modes this closes: a ceiling declared above anything the code
+    can produce (a promise of precision never delivered), and a ceiling declared
+    below what the code actually returns (a documented bound that does not hold).
+    """
+    reached = {
+        cardio_load_estimate(machine_type=m, duration_min=d, bpm_avg=b)[1]
+        for m in (None, "", "velo", "marche", "rameur", "elliptique", "autre", "zzz")
+        for d in (None, 0, 1, 30, 600)
+        for b in (None, 0, 60, 130, 220)
+    }
+    ladder = [Confidence.NONE, Confidence.LOW, Confidence.MEDIUM, Confidence.HIGH]
+    best = max(reached, key=ladder.index)
+    assert best is rc.CARDIO_MAX_CONFIDENCE
+    assert reached == {Confidence.NONE, Confidence.LOW, Confidence.MEDIUM}
+
+
 def test_an_unknown_modality_cannot_be_lifted_to_medium_by_bpm():
     """BPM is evidence of a fuller recording, not a calibration."""
     for machine in ("stairmaster", "autre", "zzz"):
