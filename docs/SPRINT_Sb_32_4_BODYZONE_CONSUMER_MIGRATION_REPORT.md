@@ -269,6 +269,21 @@ faire du chiffre ».
 `--admin`, `AGENTS.md` non touché, flag Body Intelligence inchangé, aucun déploiement, aucune
 incertitude scientifique affaiblie, aucune revendication médicale.
 
+### 7bis. Finding Sonar traité in-scope (PR #77)
+
+**Gate externe `SonarCloud Code Analysis` en ÉCHEC** au premier passage :
+`new_code_smells_severity 15 > 14`, **une seule** issue — `external_ruff:F401`,
+`subprocess imported but unused` dans `tests/test_exercise_muscle_mapping.py`.
+
+Vrai résidu de ma part : en retargetant la garde du §4.7, j'ai supprimé le **seul** usage de
+`subprocess` du fichier sans retirer l'import. Le **budget ruff local ne l'a pas attrapé** parce
+que F401 fait partie de la dette tolérée (70 occurrences pré-existantes) — Sonar, lui, le compte
+comme un smell **neuf**. Import retiré ; budget **544 → 543**, donc strictement **neutre** vs la
+canonique. Un diagnostic, un correctif.
+
+*Leçon : le budget ruff plafonne un **total**, il ne protège pas contre l'ajout d'une occurrence
+d'une règle déjà en dette. Sur du code neuf, c'est le gate Sonar qui fait foi.*
+
 ## Verdict
 
 **Livré.** `ExerciseMuscleMapping` / `BodyZone` deviennent la source de vérité d'un **vrai
