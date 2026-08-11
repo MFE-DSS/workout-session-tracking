@@ -89,31 +89,54 @@ ok "Service: ${SERVICE_NAME}"
 step "Recording pre-deploy state"
 
 cd "${APP_DIR}"
-PRE_SHA="$(sudo -u "${APP_USER}" git rev-parse HEAD 2>/dev/null || echo 'unknown')"
-ok "Current commit: ${PRE_SHA:0:12}"
+# Sb_OPS_DEPLOY_SAFETY_01 — prefer the SHA captured by the CI wrapper BEFORE it reset the working
+# tree. Reading HEAD here would return the TARGET (the wrapper already checked it out), which made
+# the recorded "previous" SHA useless for rollback. Manual runs, which do their own pull further
+# down, keep the legacy behaviour.
+PRE_SHA="${HOST_PRE_SHA:-$(sudo -u "${APP_USER}" git rev-parse HEAD 2>/dev/null || echo 'unknown')}"
+ok "Previous commit (rollback target): ${PRE_SHA:0:12}"
 
 # ─── SQLite backup ────────────────────────────────────────────────
 SQLITE_BACKUP=""
 if [ "${IS_SQLITE}" -eq 1 ] && [ "${SKIP_BACKUP}" != "1" ]; then
     step "Backing up SQLite database"
 
-    SQLITE_PATH="${APP_DIR}/var/workout.db"
-    if [ -f "${SQLITE_PATH}" ]; then
-        SQLITE_BACKUP="${APP_DIR}/var/backups/workout_pre_deploy_${TIMESTAMP}.db"
-        mkdir -p "${APP_DIR}/var/backups"
+    # Sb_OPS_DEPLOY_SAFETY_01 — FAIL CLOSED. The path used to be hardcoded to
+    # `${APP_DIR}/var/workout.db`; when DATABASE_URL pointed elsewhere the file was "not found",
+    # the script only WARNED, and the deploy migrated with NO backup. Resolve the real file and
+    # abort on any failure — never run Alembic without a verified snapshot.
+    SQLITE_PATH="$(sudo -u "${APP_USER}" "${PYTHON}" \
+        "${APP_DIR}/scripts/resolve_sqlite_path.py" \
+        --database-url "${DB_URL}" --app-dir "${APP_DIR}")" \
+        || die "Could not resolve a SQLite file from DATABASE_URL — refusing to migrate without a backup"
 
-        # Use sqlite3 .backup for a consistent copy (handles WAL mode)
-        if command -v sqlite3 &>/dev/null; then
-            sudo -u "${APP_USER}" sqlite3 "${SQLITE_PATH}" ".backup '${SQLITE_BACKUP}'"
-        else
-            sudo -u "${APP_USER}" cp "${SQLITE_PATH}" "${SQLITE_BACKUP}"
-        fi
+    [ -n "${SQLITE_PATH}" ] \
+        || die "Empty SQLite path resolved from DATABASE_URL — refusing to migrate without a backup"
+    [ -e "${SQLITE_PATH}" ] \
+        || die "SQLite database not found at ${SQLITE_PATH} — refusing to migrate without a backup"
+    [ -f "${SQLITE_PATH}" ] \
+        || die "SQLite path ${SQLITE_PATH} is not a regular file — refusing to migrate without a backup"
 
-        BACKUP_SIZE="$(du -h "${SQLITE_BACKUP}" | cut -f1)"
-        ok "SQLite backup: ${SQLITE_BACKUP} (${BACKUP_SIZE})"
+    SQLITE_BACKUP="${APP_DIR}/var/backups/workout_pre_deploy_${TIMESTAMP}.db"
+    mkdir -p "${APP_DIR}/var/backups" \
+        || die "Cannot create backup directory ${APP_DIR}/var/backups"
+    chown "${APP_USER}" "${APP_DIR}/var/backups" 2>/dev/null || true
+
+    # sqlite3 .backup is WAL-consistent; cp is the fallback when sqlite3 is absent.
+    if command -v sqlite3 &>/dev/null; then
+        sudo -u "${APP_USER}" sqlite3 "${SQLITE_PATH}" ".backup '${SQLITE_BACKUP}'" \
+            || die "sqlite3 backup FAILED for ${SQLITE_PATH} — aborting before migrations"
     else
-        warn "No SQLite file found at ${SQLITE_PATH} — skipping backup"
+        sudo -u "${APP_USER}" cp "${SQLITE_PATH}" "${SQLITE_BACKUP}" \
+            || die "cp backup FAILED for ${SQLITE_PATH} — aborting before migrations"
     fi
+
+    [ -s "${SQLITE_BACKUP}" ] \
+        || die "Backup ${SQLITE_BACKUP} is missing or empty — aborting before migrations"
+
+    BACKUP_SIZE="$(du -h "${SQLITE_BACKUP}" | cut -f1)"
+    ok "SQLite backup: ${SQLITE_BACKUP} (${BACKUP_SIZE})"
+    ok "Source database: ${SQLITE_PATH}"
 elif [ "${SKIP_BACKUP}" = "1" ]; then
     warn "SQLite backup SKIPPED (SKIP_BACKUP=1)"
 fi
@@ -124,8 +147,10 @@ fi
 # the script manually keep the legacy pull-from-DEPLOY_BRANCH behaviour.
 if [ "${SKIP_GIT_PULL}" = "1" ]; then
     step "Pulling latest code (skipped — caller already placed repo at target SHA)"
-    POST_SHA="${PRE_SHA}"
-    ok "Using SHA: ${POST_SHA:0:12}"
+    # Sb_OPS_DEPLOY_SAFETY_01 — read the ACTUAL checked-out SHA. It used to be copied from
+    # PRE_SHA, which is now the genuine previous SHA, so copying would report the wrong target.
+    POST_SHA="$(sudo -u "${APP_USER}" git rev-parse HEAD 2>/dev/null || echo 'unknown')"
+    ok "Target SHA: ${POST_SHA:0:12} (previous: ${PRE_SHA:0:12})"
 else
     step "Pulling latest code"
 
@@ -262,6 +287,7 @@ fi
 step "Recording deploy state (Sb_26.3)"
 sudo -u "${APP_USER}" "${PYTHON}" "${APP_DIR}/scripts/write_deploy_state.py" \
     --sha "${POST_SHA}" \
+    --previous-sha "${PRE_SHA}" \
     --service "${SERVICE_NAME}" \
     --app-dir "${APP_DIR}" \
     --health "${HTTP_CODE:-unknown}" \

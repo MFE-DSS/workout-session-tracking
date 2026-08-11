@@ -39,6 +39,11 @@ ROOT = Path(__file__).resolve().parent.parent
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--sha", required=True)
+    parser.add_argument(
+        "--previous-sha",
+        default="",
+        help="SHA that was live BEFORE this deploy — the rollback target (Sb_OPS_DEPLOY_SAFETY_01).",
+    )
     parser.add_argument("--service", default="workout")
     parser.add_argument("--app-dir", default=str(ROOT))
     parser.add_argument(
@@ -56,6 +61,9 @@ def main() -> int:
 
     payload = {
         "sha": args.sha,
+        # Sb_OPS_DEPLOY_SAFETY_01 — machine-readable rollback target. Additive key: existing
+        # readers (/healthz/strict, prod_state_report) ignore unknown fields.
+        "previous_sha": args.previous_sha,
         "deployed_at": datetime.now(UTC).isoformat(),
         "service": args.service,
         "app_dir": args.app_dir,

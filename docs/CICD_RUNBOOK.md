@@ -253,7 +253,7 @@ Toujours dans `Settings → Environments → production → Environment secrets 
    ssh deploy@<VPS_HOST> "cd /srv/workout && git rev-parse HEAD"
    ```
 2. GitHub → Actions → **Deploy production** → **Run workflow**.
-3. Input `ref` : coller le SHA récupéré à l'étape 1 (ou le nom de la branche `main` si elle pointe déjà dessus).
+3. Input `ref` : coller le **SHA complet** récupéré à l'étape 1. Depuis `Sb_OPS_DEPLOY_SAFETY_01` l'input n'a **plus de valeur par défaut** — l'ancienne (`main`) désignait une branche **inexistante** dans ce repo. Une branche reste acceptée mais déconseillée : elle déploie une **tête mobile**, pas le SHA validé par la CI.
 4. Input `skip_smoke` : décoché (false).
 5. Click **Run workflow**.
 6. Une notification d'approbation apparaît dans l'environment `production`. Cliquer **Review deployments** → cocher `production` → **Approve and deploy**.
@@ -275,7 +275,7 @@ Si tout passe → la pipeline est **active**.
 
 1. Ouvrir une PR sur le code → `ci.yml` tourne automatiquement.
 2. Merger la PR sur `main` → `ci.yml` tourne une seconde fois sur le merge commit.
-3. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: main` → **Run**.
+3. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: <SHA complet>` (le champ est vide par défaut ; la branche canonique est `claude/sprint-reporting-fitness-app-V7Qr6`) → **Run**.
 4. Approuver le deployment dans l'environment `production`.
 5. Attendre la fin (≈ 2 à 4 min).
 6. Le tag `deploy/prod/<date>-<sha7>` trace ce deploy.
@@ -287,7 +287,7 @@ Durée attendue : ≈ 1 min de préparation côté GitHub + ≈ 2 min de déploi
 ## 6. Rollback — ramener la prod à un SHA précédent
 
 1. Trouver le SHA précédent :
-   - `git log origin/main --oneline`
+   - `git log origin/claude/sprint-reporting-fitness-app-V7Qr6 --oneline`
    - ou `git tag -l 'deploy/prod/*' --sort=-creatordate | head -5` (le tag juste avant le courant).
 2. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: <previous-sha>` → **Run**.
 3. Approuver.
@@ -318,7 +318,7 @@ Durée attendue : ≈ 1 min de préparation côté GitHub + ≈ 2 min de déploi
 
 ### 7.3 Script exit 2 « does not look like a git SHA »
 
-- Le workflow n'a pas réussi à résoudre le `ref` en un SHA. Vérifier que le ref existe sur `origin/main` et qu'on n'essaie pas de déployer une branche locale.
+- Le workflow n'a pas réussi à résoudre le `ref` en un SHA. Vérifier que le SHA existe sur `origin/claude/sprint-reporting-fitness-app-V7Qr6` et qu'on n'essaie pas de déployer une branche locale. **`main` n'existe pas** dans ce repo.
 
 ### 7.4 `deploy_prod.sh` échoue sur alembic drift
 

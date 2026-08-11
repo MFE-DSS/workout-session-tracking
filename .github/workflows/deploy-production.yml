@@ -3,10 +3,14 @@ name: Deploy production
 on:
   workflow_dispatch:
     inputs:
+      # Sb_OPS_DEPLOY_SAFETY_01 — NO default. It used to be "main", a branch that does not exist
+      # in this repo (the trunk is claude/sprint-reporting-fitness-app-V7Qr6), so a default
+      # dispatch failed at checkout. We deliberately do NOT swap in the canonical branch either:
+      # a branch default deploys a MOVING tip, whereas this repo's discipline is to deploy the
+      # exact SHA that CI validated. Leaving it empty forces a conscious, explicit choice.
       ref:
-        description: "Ref to deploy (branch or full SHA). Default: main."
+        description: "EXACT full SHA to deploy (40 hex chars). A branch name is accepted but discouraged — prefer the SHA CI validated."
         required: true
-        default: "main"
       skip_smoke:
         description: "Skip smoke_deploy.sh (emergency only — leaves prod unvalidated)."
         required: false
@@ -47,7 +51,13 @@ jobs:
           SHORT_SHA="$(git rev-parse --short=7 HEAD)"
           echo "full=$FULL_SHA"   >> "$GITHUB_OUTPUT"
           echo "short=$SHORT_SHA" >> "$GITHUB_OUTPUT"
-          echo "Deploying $FULL_SHA ($SHORT_SHA)"
+          echo "Requested ref : ${{ inputs.ref }}"
+          echo "Resolved SHA  : $FULL_SHA ($SHORT_SHA)"
+          # Sb_OPS_DEPLOY_SAFETY_01 — make a moving-tip deploy visible in the log rather than
+          # silent. The exact-SHA path stays fully supported and is the recommended one.
+          if [ "${{ inputs.ref }}" != "$FULL_SHA" ]; then
+            echo "::warning::Deployed ref '${{ inputs.ref }}' is not a full SHA; it resolved to $FULL_SHA at dispatch time."
+          fi
 
       - name: Configure SSH
         env:
