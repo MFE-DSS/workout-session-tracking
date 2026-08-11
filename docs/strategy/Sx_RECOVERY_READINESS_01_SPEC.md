@@ -656,6 +656,78 @@ transversale de ce contrat :
 C'est la généralisation de la borne unilatérale déjà retenue par `Sb_FATIGUE_SCALE_FIX_01` :
 *on refuse d'inventer une bonne nouvelle, on ne supprime pas une mauvaise.*
 
+## 12ter. Corrections d'audit — cardio (`Sb_CARDIO_FATIGUE_ADAPTER_01`)
+
+> **Ajout daté du 2026-08-11.** Deux affirmations du §1.1 et du §5.1 étaient **imprécises** et sont
+> corrigées ici sans réécrire l'audit d'origine.
+
+### C-1 — `cardio_machine_type` : le stockage est permissif, **l'UI ne l'est pas**
+
+Le §5.1 décrivait ce champ comme du « texte libre » et en concluait que le vocabulaire réellement
+présent était **inconnu**. C'est **inexact pour la saisie** :
+
+- **Vocabulaire de stockage** : `String(32)`, historiquement permissif — et
+  `routers/sessions.py:628` n'applique **aucune allow-list** (`clean_str(max_length=32)` seulement).
+  Un POST forgé peut donc stocker n'importe quelle chaîne ≤ 32 caractères. La permissivité est
+  **réelle**, mais elle vient de l'**endpoint**, pas de la saisie.
+- **Vocabulaire d'UI courant** : `session_detail.html` expose un `<select>` **fermé** —
+  `""` · `velo` · `marche` · `rameur` · `elliptique` · `autre`.
+
+Les deux garanties sont différentes et l'adaptateur ne s'appuie que sur la **plus faible**.
+
+**Vocabulaire réellement observé** (audit fait, sources déclarées) :
+
+| Source | Valeurs observées |
+|---|---|
+| `<select>` de `session_detail.html` | `velo`, `marche`, `rameur`, `elliptique`, `autre` |
+| `tests/test_cardio_capture.py` | `velo` |
+| `tests/test_session_done.py:183` | **`stairmaster`** — valeur **hors liste réellement présente dans le dépôt** |
+| Base de dev locale `var/workout.db` | **7 séances, `cardio_machine_type` NULL partout**, 0 durée, 0 bpm |
+| **Base de production** | **NON AUDITÉE — aucun accès** (voir ci-dessous) |
+
+> **L'audit de la base de production n'a pas pu être réalisé** : cette session n'a ni identifiants
+> ni accès DB au VPS (déjà constaté en `Sb_OPS_DEPLOY_SAFETY_01`, où le smoke test devait rester
+> non authentifié pour cette raison). **Les fixtures ne valent pas la production** et ne sont pas
+> présentées comme telles. Si des lignes historiques portent d'autres valeurs, l'adaptateur les
+> traite comme `UNKNOWN` — dégradation prévue, pas surprise.
+
+**Aucun alias n'est encodé** : aucun n'est attesté dans le dépôt. `velo` est stocké sans accent ;
+`vélo` n'existe que comme libellé d'affichage. Inventer des orthographes jamais observées est
+exactement la fabrication que le §5 interdit.
+
+### C-2 — BPM : preuve, jamais magnitude
+
+Le §5.2 autorisait `cardio_bpm_avg` comme « signal d'intensité disponible ». **Précision
+normative** : la BPM moyenne **absolue** ne détermine **jamais** la magnitude.
+
+AUREN n'a **aucun ancrage cardiaque individuel** — ni FCmax mesurée, ni FC de repos, ni réserve de
+FC, ni seuil ventilatoire ou lactique. 130 bpm n'est donc pas comparable d'une personne à l'autre.
+
+**Le catalogue le rend concret** : les deux templates cardio (`liss-only`, `liss-abs`) prescrivent
+la **même** cible « 120-130 bpm » à **tout le monde**. Une lecture dans cette bande ne distingue
+personne.
+
+La BPM peut donc uniquement : alimenter la `basis`, et **faire monter la confiance de `LOW` à
+`MEDIUM`** sur une modalité spécifique. Elle ne peut **jamais** agrandir la valeur.
+
+### C-3 — Calories machine : exclues du calcul
+
+`cardio_machine_calories` **n'influence pas** `cardio_load_estimate` — ce n'est même pas un
+paramètre. Le produit les étiquette « indicatif » dans le formulaire de saisie, elles proviennent
+d'estimateurs machine de calibration inconnue, et ne constituent pas une mesure de charge interne
+individualisée. Elles restent de l'**affichage et de l'export**.
+
+### C-4 — La référence de durée vient du catalogue
+
+`CARDIO_DURATION_REFERENCE_MINUTES = 30.0` n'est pas inventée : les deux templates cardio de
+`reference_split.json` prescrivent **« 20-30 min LISS »**, et 30 est le haut de cette plage. C'est
+une **constante de normalisation produit, pas un seuil biologique de fatigue** — rien de
+physiologique ne se produit à 30 minutes.
+
+`coach_inference.CARDIO_LOW_MIN_PER_WEEK` (90) a été examinée et **écartée** : c'est un plancher de
+volume **hebdomadaire** issu d'une recommandation de santé publique, mauvaise granularité pour un
+proxy d'exposition **par séance**.
+
 ## 13. Definition of Done de cette spec
 
 | Exigence | § |

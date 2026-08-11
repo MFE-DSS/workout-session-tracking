@@ -374,13 +374,27 @@ def test_unknown_confidence_label_is_none_not_a_default(label):
     assert confidence_from_legacy_label(label) is None
 
 
-def test_cardio_estimate_is_declared_but_computes_nothing_yet():
-    """OQ-4: no coefficient is invented before the stored vocabulary is audited."""
+def test_cardio_estimate_now_computes_a_bounded_exposure_proxy():
+    """Was "declared but computes nothing yet" — the audit has since happened.
+
+    `Sb_RECOVERY_CONTRACT_01` returned `(None, NONE, ...)` here on purpose:
+    OQ-4 forbade inventing a coefficient *before* the stored vocabulary was
+    audited. `Sb_CARDIO_FATIGUE_ADAPTER_01` did that audit and supplied the real
+    rule, so the placeholder expectation is retired rather than weakened — and
+    the enduring guarantees it protected are pinned harder below and in
+    tests/test_cardio_fatigue_adapter.py.
+    """
     value, confidence, basis = cardio_load_estimate(
+        machine_type="velo", duration_min=45, bpm_avg=130)
+    assert value == 1.0  # 45 min saturates the 30 min product reference
+    assert confidence is Confidence.MEDIUM
+    assert basis
+
+    # An unrecognised modality still yields a value, at reduced confidence.
+    value, confidence, _ = cardio_load_estimate(
         machine_type="bike", duration_min=45, bpm_avg=130)
-    assert value is None
-    assert confidence is Confidence.NONE
-    assert any("Sb_CARDIO_FATIGUE_ADAPTER_01" in b for b in basis)
+    assert value == 1.0
+    assert confidence is Confidence.LOW
 
 
 def test_cardio_confidence_can_never_exceed_medium():
@@ -392,11 +406,13 @@ def test_cardio_confidence_can_never_exceed_medium():
         assert confidence is not Confidence.HIGH
 
 
-def test_cardio_basis_records_which_inputs_were_present():
+def test_cardio_basis_explains_the_estimate_and_its_absence():
     _, _, basis = cardio_load_estimate(duration_min=30)
-    assert any("cardio_duration_min" in b for b in basis)
+    assert any("30 min" in b for b in basis)
+    assert any("no modality recorded" in b for b in basis)
+
     _, _, empty_basis = cardio_load_estimate()
-    assert any("no usable cardio input" in b for b in empty_basis)
+    assert any("no usable cardio_duration_min" in b for b in empty_basis)
 
 
 # ---------------------------------------------------------------------------
