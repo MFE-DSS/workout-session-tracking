@@ -18,13 +18,13 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.measurement import BodyMeasurement
 from app.models.session import SessionExercise, SetLog, WorkoutSession
+from app.services.body_zone_source import ZoneResolution, resolve_exercise_zones
 from app.services.muscle_mapping import (
     RADAR_AXES,
     RADAR_AXIS_ORDER,
     ZONE_LABELS,
     ZONE_MEASUREMENT,
     ZONE_VOLUME_TARGET,
-    classify_exercise,
 )
 from app.services.radar import build_radar_svg
 from app.services.substitution import actual_exercise_name
@@ -84,11 +84,39 @@ def _compute_tonnage_by_zone(
     # zone -> list of {date, tonnage, exercise_name}
     zone_data: dict[str, list[dict]] = defaultdict(list)
 
+    # Sb_32.4 — this is the migrated heavy consumer. It reads the canonical
+    # body-zone contract (formal ExerciseMuscleMapping rows, with the reviewed
+    # corrections applied) instead of calling the substring classifier itself.
+    # `resolve_exercise_zones` keeps the substring path as a *fallback* for
+    # names the referential does not cover, so no exercise loses its
+    # attribution — but the fallback can never override a formal mapping.
+    #
+    # The lookup key is the exercise NAME: `exercise_code` on
+    # ExerciseMuscleMapping holds the name, while
+    # `SessionExercise.exercise_code_snapshot` is a training-day slot (E1…E7)
+    # reused across exercises and must NOT be used here.
+    #
+    # Resolved once per DISTINCT name. The formal path costs a query where the
+    # substring classifier cost nothing, and the loop below runs once per set
+    # exercise over the whole window — without this cache that is a textbook
+    # N+1, re-querying the same handful of names dozens of times in the root
+    # scoring primitive. The cache is per invocation, so it cannot serve a
+    # stale mapping across requests.
+    resolved_by_name: dict[str, ZoneResolution] = {}
+
+    def _resolve(name: str) -> ZoneResolution:
+        cached = resolved_by_name.get(name)
+        if cached is None:
+            cached = resolve_exercise_zones(db, name)
+            resolved_by_name[name] = cached
+        return cached
+
     for s in sessions:
         for se in s.session_exercises:
-            primary, secondary = classify_exercise(actual_exercise_name(se))
-            if primary == "unknown":
+            resolved = _resolve(actual_exercise_name(se))
+            if not resolved.is_known:
                 continue
+            primary, secondary = resolved.primary, resolved.secondary
 
             work_sets = [sl for sl in se.set_logs
                          if sl.kind == "work" and sl.completed]

@@ -109,3 +109,15 @@ def init_db() -> None:
     )
 
     Base.metadata.create_all(bind=engine)
+
+    # Sb_32.4 — `create_all` above also creates `body_zones` and
+    # `exercise_muscle_mappings`, EMPTY, and the Alembic backfills only fire
+    # when they themselves created the table. So on any boot that precedes
+    # `alembic upgrade` — the whole test suite, a fresh dev machine — the
+    # reference tables would stay empty forever and every formal lookup would
+    # silently degrade to substring matching. The seed is deterministic,
+    # idempotent, reference-data-only and costs ~1 ms on an empty database.
+    from app.services.reference_data_seed import seed_reference_data
+
+    with SessionLocal() as db:
+        seed_reference_data(db)

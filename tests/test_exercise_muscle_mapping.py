@@ -24,7 +24,6 @@ Classification invariance (contrainte #1)
 from __future__ import annotations
 
 import json
-import subprocess
 import tempfile
 from pathlib import Path
 
@@ -302,16 +301,32 @@ def test_lookup_falls_back_to_substring_when_no_mapping():
 # ───────── 13-14. no consumer changed + public compat ─────────
 
 
-def test_no_consumer_service_file_changed():
-    """This sprint must not modify any consumer service (git diff)."""
-    changed = subprocess.run(
-        ["git", "diff", "--name-only", "HEAD", "--", *FORBIDDEN_CONSUMER_FILES],
-        cwd=str(ROOT),
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout.strip()
-    assert changed == "", f"consumer files changed: {changed}"
+def test_only_the_authorised_consumer_reads_the_formal_contract():
+    """Exactly one heavy consumer is migrated — pinned at source level.
+
+    Sb_32.4 replaces the previous `git diff --name-only HEAD` guard here. That
+    guard was written for Sb_32.2 to prove *that* sprint deferred the consumer
+    migration, and its own docstring named Sb_32.4 as the sprint that would
+    perform it — so this is the sprint it anticipated, not a contract being
+    broken. It is also **not weakened**: the old form compared the working tree,
+    so it went green the moment the change was committed and asserted nothing in
+    CI. This one reads the source and keeps biting forever.
+
+    The contract it now enforces: `muscle_scoring` reads the canonical
+    body-zone contract, and every other listed consumer still does not — a
+    later migration must be a deliberate, reviewed step, not a drift.
+    """
+    migrated = {"app/services/muscle_scoring.py"}
+    for rel in FORBIDDEN_CONSUMER_FILES:
+        source = (ROOT / rel).read_text(encoding="utf-8")
+        imports_contract = "body_zone_source" in source
+        if rel in migrated:
+            assert imports_contract, f"{rel} must read the formal contract"
+        else:
+            assert not imports_contract, (
+                f"{rel} started reading body_zone_source outside a migration "
+                f"sprint — migrating a consumer is a reviewed decision"
+            )
 
 
 def test_classify_exercise_public_compat_signature():
