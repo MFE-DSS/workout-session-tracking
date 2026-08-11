@@ -49,11 +49,20 @@ if [[ ! -d "$APP_DIR/.git" ]]; then
   exit 1
 fi
 
-echo "[deploy] target SHA: $SHA"
-echo "[deploy] app dir   : $APP_DIR"
-echo "[deploy] app user  : $APP_USER"
-
 cd "$APP_DIR"
+
+# Sb_OPS_DEPLOY_SAFETY_01 — capture the TRUE rollback target BEFORE moving the working tree.
+# Previously deploy_prod.sh read `git rev-parse HEAD` on its own, but by then this wrapper had
+# already run `git reset --hard $SHA`, so its "PRE_SHA" was the target SHA and the real previous
+# SHA was lost. Rollback then depended on tag archaeology. Exported so deploy_prod.sh and the
+# deploy-state writer record the genuine previous SHA.
+HOST_PRE_SHA="$(sudo -u "$APP_USER" git rev-parse HEAD 2>/dev/null || echo 'unknown')"
+export HOST_PRE_SHA
+
+echo "[deploy] previous SHA: $HOST_PRE_SHA   <-- rollback target"
+echo "[deploy] target   SHA: $SHA"
+echo "[deploy] app dir     : $APP_DIR"
+echo "[deploy] app user    : $APP_USER"
 
 echo "[deploy] step 1/3 — git fetch origin"
 sudo -u "$APP_USER" git fetch --prune --tags origin

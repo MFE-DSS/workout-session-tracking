@@ -253,7 +253,7 @@ Toujours dans `Settings → Environments → production → Environment secrets 
    ssh deploy@<VPS_HOST> "cd /srv/workout && git rev-parse HEAD"
    ```
 2. GitHub → Actions → **Deploy production** → **Run workflow**.
-3. Input `ref` : coller le SHA récupéré à l'étape 1 (ou le nom de la branche `main` si elle pointe déjà dessus).
+3. Input `ref` : coller le **SHA complet** récupéré à l'étape 1. Depuis `Sb_OPS_DEPLOY_SAFETY_01` l'input n'a **plus de valeur par défaut** — l'ancienne (`main`) désignait une branche **inexistante** dans ce repo. Une branche reste acceptée mais déconseillée : elle déploie une **tête mobile**, pas le SHA validé par la CI.
 4. Input `skip_smoke` : décoché (false).
 5. Click **Run workflow**.
 6. Une notification d'approbation apparaît dans l'environment `production`. Cliquer **Review deployments** → cocher `production` → **Approve and deploy**.
@@ -275,7 +275,7 @@ Si tout passe → la pipeline est **active**.
 
 1. Ouvrir une PR sur le code → `ci.yml` tourne automatiquement.
 2. Merger la PR sur `main` → `ci.yml` tourne une seconde fois sur le merge commit.
-3. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: main` → **Run**.
+3. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: <SHA complet>` (le champ est vide par défaut ; la branche canonique est `claude/sprint-reporting-fitness-app-V7Qr6`) → **Run**.
 4. Approuver le deployment dans l'environment `production`.
 5. Attendre la fin (≈ 2 à 4 min).
 6. Le tag `deploy/prod/<date>-<sha7>` trace ce deploy.
@@ -284,10 +284,38 @@ Durée attendue : ≈ 1 min de préparation côté GitHub + ≈ 2 min de déploi
 
 ---
 
+### 5bis. Sauvegarde pré-migration — comportement *fail-closed* (Sb_OPS_DEPLOY_SAFETY_01)
+
+Le chemin SQLite est **résolu depuis `DATABASE_URL`** (`scripts/resolve_sqlite_path.py`), il n'est
+plus codé en dur. Le déploiement **s'arrête AVANT `alembic upgrade head`** si la sauvegarde ne
+peut pas être garantie : chemin non résolu · fichier absent · pas un fichier régulier · commande
+de sauvegarde en échec · **sauvegarde vide**.
+
+Auparavant ces cas produisaient un simple *warning* et **la migration s'exécutait sans
+sauvegarde** — invisible, puisque `/healthz/strict` n'assure pas la présence d'un backup.
+
+**Cas légitime d'absence : premier déploiement ou restauration sur hôte vierge.** Le `.env`
+existe déjà mais la base n'a pas encore été créée. Le script s'arrête quand même, volontairement :
+« fichier absent » est indistinguable de « `DATABASE_URL` pointe ailleurs que prévu ». Dans ce cas
+seulement, relancer avec :
+
+```bash
+SKIP_BACKUP=1 bash scripts/deploy_prod.sh
+```
+
+**Ne jamais utiliser `SKIP_BACKUP=1` sur une production portant des données.**
+
+Après un déploiement, `var/deploy_state.json` contient désormais **`previous_sha`** : c'est la
+cible de rollback, lisible par machine, sans archéologie de tags.
+
+---
+
 ## 6. Rollback — ramener la prod à un SHA précédent
 
-1. Trouver le SHA précédent :
-   - `git log origin/main --oneline`
+0. Cible la plus fiable : le champ **`previous_sha`** de `var/deploy_state.json` sur l'hôte
+   (écrit par le déploiement précédent, cf. §5bis).
+1. Sinon, retrouver le SHA précédent :
+   - `git log origin/claude/sprint-reporting-fitness-app-V7Qr6 --oneline`
    - ou `git tag -l 'deploy/prod/*' --sort=-creatordate | head -5` (le tag juste avant le courant).
 2. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: <previous-sha>` → **Run**.
 3. Approuver.
@@ -318,7 +346,7 @@ Durée attendue : ≈ 1 min de préparation côté GitHub + ≈ 2 min de déploi
 
 ### 7.3 Script exit 2 « does not look like a git SHA »
 
-- Le workflow n'a pas réussi à résoudre le `ref` en un SHA. Vérifier que le ref existe sur `origin/main` et qu'on n'essaie pas de déployer une branche locale.
+- Le workflow n'a pas réussi à résoudre le `ref` en un SHA. Vérifier que le SHA existe sur `origin/claude/sprint-reporting-fitness-app-V7Qr6` et qu'on n'essaie pas de déployer une branche locale. **`main` n'existe pas** dans ce repo.
 
 ### 7.4 `deploy_prod.sh` échoue sur alembic drift
 

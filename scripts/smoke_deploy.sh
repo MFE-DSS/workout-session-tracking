@@ -104,6 +104,13 @@ check_auth_redirect "GET /export requires auth" "/export"
 check_auth_redirect "GET /export/sessions.json requires auth" "/export/sessions.json"
 check_auth_redirect "GET /export/sessions.csv requires auth" "/export/sessions.csv"
 
+# Sb_OPS_DEPLOY_SAFETY_01 — Custom Program surface. These 16 routes are mounted UNFLAGGED and
+# were the bulk of the Aug-10 sync, yet had zero smoke coverage. Unauthenticated only: the smoke
+# harness has no account and we will not invent production credentials, nor create/delete real
+# programs just to smoke them. A 303 proves the router is mounted AND owner-gated.
+check_auth_redirect "GET /programs requires auth" "/programs"
+check_auth_redirect "GET /programs/new requires auth" "/programs/new"
+
 # --- Offline schema drift (unrelated to backups, kept at the end). ---
 
 check "check_alembic_drift returns OK" \
