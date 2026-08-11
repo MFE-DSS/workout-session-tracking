@@ -26,6 +26,7 @@ Public API:
 """
 from __future__ import annotations
 
+import math
 from typing import Any
 
 _MAX_REASONS = 3
@@ -84,7 +85,11 @@ def normalize_fatigue_score(raw: Any) -> float | None:
     if isinstance(raw, bool) or not isinstance(raw, (int, float)):
         return None
     value = float(raw)
-    if value != value:  # NaN — never equal to itself
+    # NaN needs its own guard: every comparison against it is False, so the
+    # range check below would let it straight through. `math.isnan` rather than
+    # the `value != value` idiom — same result, and it does not read as a typo
+    # (Sonar python:S1764 flags the self-comparison form, correctly).
+    if math.isnan(value):
         return None
     if value < FATIGUE_RAW_MIN_PRODUCIBLE or value > FATIGUE_RAW_SCALE_MAX:
         return None

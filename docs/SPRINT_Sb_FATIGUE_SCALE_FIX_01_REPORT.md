@@ -213,6 +213,25 @@ sémantiques de repli existantes préservées hors du bug · aucun test affaibli
 merge `--admin`, `AGENTS.md` non touché, aucun flag Body Intelligence modifié, aucun déploiement,
 aucune migration.
 
+### 6bis. Finding Sonar traité in-scope (PR #76)
+
+**Gate externe `SonarCloud Code Analysis` en ÉCHEC** au premier passage :
+`new_bugs_severity 15 > 9`, une seule issue — **`python:S1764`**, « Correct one of the identical
+sub-expressions on both sides of operator `!=` », sur ma garde NaN `if value != value`.
+
+**Sonar a raison, et la règle est utile ici.** `value != value` est l'idiome NaN classique, mais
+il est visuellement indistinguable d'une faute de frappe ; un relecteur ne peut pas dire si c'est
+intentionnel. Remplacé par **`math.isnan(value)`** : résultat identique, intention explicite.
+
+**La garde reste nécessaire** et n'a pas été simplement supprimée pour verdir la CI : toute
+comparaison avec NaN vaut `False`, donc `NaN < 15` et `NaN > 100` sont **tous deux faux** et le
+contrôle de plage laisserait NaN passer jusqu'à la division. Vérifié après correction :
+`nan → None`, `inf → None`, `-inf → None`, `50 → 0.5`.
+
+*À noter — même famille que la règle `python:S5863` déjà rencontrée sur ce repo (auto-comparaison
+dans les tests de déterminisme) : Sonar refuse les expressions dont les deux côtés sont
+identiques, en code de production comme en test.*
+
 ## Verdict
 
 **Livré.** La frontière d'échelle est désormais **explicite, bornée, nommée et testée**, du côté
