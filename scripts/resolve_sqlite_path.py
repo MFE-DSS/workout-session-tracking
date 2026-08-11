@@ -72,7 +72,8 @@ def resolve_sqlite_path(database_url: str, app_dir: str | Path) -> Path | None:
     if not candidate.is_absolute():
         candidate = Path(app_dir) / candidate
 
-    # `./var/x.db` → `var/x.db`; never resolve symlinks (the file may not exist yet).
+    # `./var/x.db` → `var/x.db`. `strict=False` only relaxes the requirement that the final
+    # component exist — symlinks in the path ARE resolved, so the backup targets the real file.
     return Path(candidate.as_posix()).resolve(strict=False)
 
 

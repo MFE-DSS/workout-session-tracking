@@ -284,9 +284,37 @@ Durée attendue : ≈ 1 min de préparation côté GitHub + ≈ 2 min de déploi
 
 ---
 
+### 5bis. Sauvegarde pré-migration — comportement *fail-closed* (Sb_OPS_DEPLOY_SAFETY_01)
+
+Le chemin SQLite est **résolu depuis `DATABASE_URL`** (`scripts/resolve_sqlite_path.py`), il n'est
+plus codé en dur. Le déploiement **s'arrête AVANT `alembic upgrade head`** si la sauvegarde ne
+peut pas être garantie : chemin non résolu · fichier absent · pas un fichier régulier · commande
+de sauvegarde en échec · **sauvegarde vide**.
+
+Auparavant ces cas produisaient un simple *warning* et **la migration s'exécutait sans
+sauvegarde** — invisible, puisque `/healthz/strict` n'assure pas la présence d'un backup.
+
+**Cas légitime d'absence : premier déploiement ou restauration sur hôte vierge.** Le `.env`
+existe déjà mais la base n'a pas encore été créée. Le script s'arrête quand même, volontairement :
+« fichier absent » est indistinguable de « `DATABASE_URL` pointe ailleurs que prévu ». Dans ce cas
+seulement, relancer avec :
+
+```bash
+SKIP_BACKUP=1 bash scripts/deploy_prod.sh
+```
+
+**Ne jamais utiliser `SKIP_BACKUP=1` sur une production portant des données.**
+
+Après un déploiement, `var/deploy_state.json` contient désormais **`previous_sha`** : c'est la
+cible de rollback, lisible par machine, sans archéologie de tags.
+
+---
+
 ## 6. Rollback — ramener la prod à un SHA précédent
 
-1. Trouver le SHA précédent :
+0. Cible la plus fiable : le champ **`previous_sha`** de `var/deploy_state.json` sur l'hôte
+   (écrit par le déploiement précédent, cf. §5bis).
+1. Sinon, retrouver le SHA précédent :
    - `git log origin/claude/sprint-reporting-fitness-app-V7Qr6 --oneline`
    - ou `git tag -l 'deploy/prod/*' --sort=-creatordate | head -5` (le tag juste avant le courant).
 2. GitHub → Actions → **Deploy production** → **Run workflow** → `ref: <previous-sha>` → **Run**.

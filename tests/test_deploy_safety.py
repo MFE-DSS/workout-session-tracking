@@ -214,6 +214,20 @@ def test_backup_requires_a_regular_non_empty_file():
     assert '[ -s "${SQLITE_BACKUP}" ]' in src
 
 
+def test_missing_database_message_tells_the_operator_how_to_first_deploy():
+    """Fail-closed must stay fail-closed, but a first deploy / restore onto an empty host has
+    legitimately nothing to back up — the abort has to name the escape hatch."""
+    src = _src(_DEPLOY)
+    assert "SKIP_BACKUP=1" in src
+    assert "FIRST deploy" in src
+
+
+def test_first_deploy_escape_hatch_is_documented():
+    runbook = _src(_ROOT / "docs" / "CICD_RUNBOOK.md")
+    assert "SKIP_BACKUP=1" in runbook
+    assert "premier déploiement" in runbook.lower()
+
+
 def test_backup_failure_aborts():
     src = _src(_DEPLOY)
     assert "sqlite3 backup FAILED" in src

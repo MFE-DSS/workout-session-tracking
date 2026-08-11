@@ -112,8 +112,12 @@ if [ "${IS_SQLITE}" -eq 1 ] && [ "${SKIP_BACKUP}" != "1" ]; then
 
     [ -n "${SQLITE_PATH}" ] \
         || die "Empty SQLite path resolved from DATABASE_URL — refusing to migrate without a backup"
+    # A missing file is EXPECTED on a first deploy / disaster recovery, where .env exists but the
+    # database has not been created yet. We still abort rather than warn: "file absent" is
+    # indistinguishable from "DATABASE_URL points somewhere unexpected", which is the exact
+    # fail-open hole this sprint closes. The operator opts in explicitly instead.
     [ -e "${SQLITE_PATH}" ] \
-        || die "SQLite database not found at ${SQLITE_PATH} — refusing to migrate without a backup"
+        || die "SQLite database not found at ${SQLITE_PATH} — refusing to migrate without a backup. If this is a FIRST deploy or a restore onto an empty host (no database yet), re-run with SKIP_BACKUP=1."
     [ -f "${SQLITE_PATH}" ] \
         || die "SQLite path ${SQLITE_PATH} is not a regular file — refusing to migrate without a backup"
 
