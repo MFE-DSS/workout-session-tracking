@@ -408,13 +408,25 @@ class ScaleConversion:
     note: str
 
 
+# Shared descriptor vocabulary for the registry below. Named rather than
+# repeated inline so the rows describe the same thing with the same words — and
+# so a reader can tell "the same scale" from "a scale that happens to look
+# similar".
+_SCALE_PERCENT = "0–100"
+_DIR_HIGHER_BETTER = "higher = better"
+_DIR_HIGHER_OLDER = "higher = older"
+_DIR_HIGHER_MORE_FATIGUED = "higher = more fatigued"
+_DIR_NA = "n/a"
+_UNIT_HIGHER_BETTER = "0.0–1.0, higher = better"
+_UNIT_HIGHER_MORE_FATIGUED = "0.0–1.0, higher = more fatigued"
+
 #: The 13 rows of spec §3.1, in order. A test pins the count and that every row
 #: either has a callable or states why it has none — so the table and the code
 #: cannot drift apart.
 LEGACY_SCALE_CONVERSIONS: tuple[ScaleConversion, ...] = (
     ScaleConversion(
         "ReadinessEntry.sleep_quality / soreness_level / stress_level / motivation_level",
-        "1–5 integers", "5 = best", "0.0–1.0, higher = better",
+        "1–5 integers", "5 = best", _UNIT_HIGHER_BETTER,
         normalize_readiness_scale, "(v - 1) / 4; outside 1–5 → None",
     ),
     ScaleConversion(
@@ -425,19 +437,19 @@ LEGACY_SCALE_CONVERSIONS: tuple[ScaleConversion, ...] = (
     ),
     ScaleConversion(
         "behavioral.fatigue_score",
-        "0–100", "higher = more fatigued", "0.0–1.0, higher = more fatigued",
+        _SCALE_PERCENT, _DIR_HIGHER_MORE_FATIGUED, _UNIT_HIGHER_MORE_FATIGUED,
         normalize_legacy_fatigue,
         "delegates to recommendation_explainer.normalize_fatigue_score — never reimplemented",
     ),
     ScaleConversion(
         "behavioral.readiness_score",
-        "0–100", "higher = better", "0.0–1.0, higher = better",
+        _SCALE_PERCENT, _DIR_HIGHER_BETTER, _UNIT_HIGHER_BETTER,
         normalize_behavioral_readiness,
         "named for completeness; NOT consumed by TrainingState (OQ-1)",
     ),
     ScaleConversion(
         "dashboard recovery axis score",
-        "0–100", "higher = better", "0.0–1.0, higher = better",
+        _SCALE_PERCENT, _DIR_HIGHER_BETTER, _UNIT_HIGHER_BETTER,
         normalize_percent_scale,
         "does not carry active=False; an inactive axis stays INSUFFICIENT, not 0.0",
     ),
@@ -449,29 +461,29 @@ LEGACY_SCALE_CONVERSIONS: tuple[ScaleConversion, ...] = (
     ),
     ScaleConversion(
         "recommendation.hours_since_last_by_zone",
-        "hours, 24*365 = never", "higher = older", "float | None",
+        "hours, 24*365 = never", _DIR_HIGHER_OLDER, "float | None",
         hours_since_last_or_none, "the 24*365 sentinel becomes None",
     ),
     ScaleConversion(
         "recommendation.days_since_last_cardio / _strength",
-        "days | None", "higher = older", "int | None",
+        "days | None", _DIR_HIGHER_OLDER, "int | None",
         days_since_last_or_none, "already honest; only negatives and non-integers rejected",
     ),
     ScaleConversion(
         "recommendation.RECOVERY_HOURS_TARGET",
-        "hours 24–72", "n/a", "hours | None",
+        "hours 24–72", _DIR_NA, "hours | None",
         recovery_target_hours,
         "read through a deferred import; no BodyZone column, no migration (OQ-2)",
     ),
     ScaleConversion(
         "WorkoutSession.global_state / concentration",
-        "closed categorical", "n/a", "0.0–1.0, higher = more fatigued",
+        "closed categorical", _DIR_NA, _UNIT_HIGHER_MORE_FATIGUED,
         normalize_session_feedback,
         "reuses compute_session_fatigue then normalize_fatigue_score; both None → None",
     ),
     ScaleConversion(
         "WorkoutSession cardio fields",
-        "min / bpm / kcal / free text", "n/a", "0.0–1.0 + confidence",
+        "min / bpm / kcal / free text", _DIR_NA, "0.0–1.0 + confidence",
         cardio_load_estimate,
         "declared, not computed: magnitude deferred to Sb_CARDIO_FATIGUE_ADAPTER_01 (OQ-4)",
     ),
@@ -483,7 +495,7 @@ LEGACY_SCALE_CONVERSIONS: tuple[ScaleConversion, ...] = (
     ),
     ScaleConversion(
         "French confidence labels",
-        "categorical FR", "n/a", "Confidence",
+        "categorical FR", _DIR_NA, "Confidence",
         confidence_from_legacy_label, "unknown label → None, never a default",
     ),
 )
