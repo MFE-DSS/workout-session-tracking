@@ -238,10 +238,10 @@ pas une coïncidence : les seules divergences possibles sont celles que ce sprin
 
 | Contrôle | Résultat |
 |---|---|
-| Tests dédiés `test_bodyzone_consumer_migration.py` | **38 passés** |
+| Tests dédiés `test_bodyzone_consumer_migration.py` | **39 passés** |
 | Substitution + morphologie + Martin + dogfood | **144 passés** |
 | Coach · BI · profil · scoring · dashboard · worked area · P0.1 · P0.2 | **250 passés** |
-| **Full sweep parallélisé** (exigé, aucun raccourci) | **3146 passés, 0 échec** |
+| **Full sweep parallélisé** (exigé, aucun raccourci) | **3147 passés, 0 échec** |
 | `scripts/bodyzone_parity_qa.py` | **OK** — 0 inexpliquée, 0 ambiguë |
 | ruff (fichiers neufs + touchés) | **clean** |
 | Budget ruff | **544 ≤ 548** |
@@ -283,6 +283,23 @@ canonique. Un diagnostic, un correctif.
 
 *Leçon : le budget ruff plafonne un **total**, il ne protège pas contre l'ajout d'une occurrence
 d'une règle déjà en dette. Sur du code neuf, c'est le gate Sonar qui fait foi.*
+
+### 7ter. Finding Gitar traité in-scope (PR #77) — régression N+1 réelle
+
+**Constat, et il est juste** : en migrant `_compute_tonnage_by_zone`, j'ai remplacé un classifieur
+**purement en mémoire** par un appel qui **interroge la base**, à l'intérieur de la boucle
+`for s in sessions / for se in s.session_exercises`. Sur la primitive racine du scoring, c'est un
+**N+1 manuel** : le même nom d'exercice est re-requêté à chaque série de chaque séance de la
+fenêtre. Une fenêtre de 90 jours à 40 séances × 6 exercices, c'est ~240 requêtes pour une
+vingtaine de noms distincts.
+
+**C'est une régression que j'ai introduite**, pas un défaut préexistant : l'ancien chemin ne
+coûtait aucune requête.
+
+**Correctif** : mémoïsation **par nom distinct**, **par invocation**. Le cache vit le temps d'un
+appel, donc il ne peut pas servir un mapping périmé d'une requête HTTP à l'autre. Test ajouté :
+3 séances × 2 exercices = **6 séries pour 2 noms distincts** ⇒ **exactement 2 résolutions**
+(espion sur l'adaptateur). Avant le cache, ce test comptait 6.
 
 ## Verdict
 

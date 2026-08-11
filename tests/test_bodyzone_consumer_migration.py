@@ -546,6 +546,50 @@ def test_migrated_consumer_reads_the_formal_contract(client, monkeypatch):
     assert "Développé couché barre" in seen
 
 
+def test_migrated_consumer_resolves_each_distinct_name_once(client, monkeypatch):
+    """No N+1: the formal path costs a query, the loop runs per set exercise.
+
+    Six set exercises across three sessions, two distinct names. Before the
+    per-invocation cache this issued six lookups in the root scoring primitive;
+    it must issue two.
+    """
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
+    from app.services import muscle_scoring
+
+    calls: list[str] = []
+    real = muscle_scoring.resolve_exercise_zones
+
+    def spy(db, name):
+        calls.append(name)
+        return real(db, name)
+
+    monkeypatch.setattr(muscle_scoring, "resolve_exercise_zones", spy)
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        for day in (1, 2, 3):
+            s = WorkoutSession(
+                user_id=uid, template_slug_snapshot="push-a",
+                template_name_snapshot="Push A",
+                started_at=datetime.now(UTC) - timedelta(days=day),
+                status="completed")
+            for i, name in enumerate(("Hack squat", "Curl incliné haltères"), start=1):
+                se = SessionExercise(exercise_code_snapshot=f"E{i}",
+                                     exercise_name_snapshot=name, position=i)
+                se.set_logs.append(SetLog(kind="work", set_index=1, weight_kg=40.0,
+                                          reps=10, completed=True))
+                s.session_exercises.append(se)
+            db.add(s)
+        db.commit()
+
+        muscle_scoring.compute_physique_dashboard(db, uid)
+
+    # 3 sessions × 2 exercises = 6 set exercises, but only 2 distinct names.
+    assert len(calls) == 2, f"expected one resolution per distinct name, got {calls}"
+    assert sorted(set(calls)) == ["Curl incliné haltères", "Hack squat"]
+
+
 def test_migrated_consumer_applies_the_correction_end_to_end(client):
     """A rear-delt machine must now score shoulders, not chest."""
     from app.database import SessionLocal
