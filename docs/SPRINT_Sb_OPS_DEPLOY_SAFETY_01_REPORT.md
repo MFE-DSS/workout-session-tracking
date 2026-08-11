@@ -91,10 +91,10 @@ supporté, le **SHA complet résolu est journalisé**, et un **avertissement Git
 | `scripts/smoke_deploy.sh` | 2 contrôles `/programs` |
 | `.github/workflows/deploy-production.yml` | plus de défaut `main` · SHA résolu journalisé · avertissement tête mobile |
 | `docs/CICD_RUNBOOK.md` | consignes `main` corrigées |
-| `tests/test_deploy_safety.py` (**neuf**) | 38 tests |
+| `tests/test_deploy_safety.py` (**neuf**) | 40 tests |
 | **code applicatif · UI · migrations · schéma · flags** | **aucun** |
 
-## 3. Tests — 38
+## 3. Tests — 40
 
 **Logique réelle** (résolveur) : chemins relatifs/absolus, `+pysqlite`, query string, la paire
 production exacte, `:memory:`, rejet PostgreSQL/MySQL, détection de dialecte, **contrat de codes
@@ -113,7 +113,7 @@ contaminée** · smoke `/programs` sans identifiants · workflow sans défaut `m
 SHA résolu journalisé, dispatch-only + approbation conservés.
 
 **Full sweep local (exigé par le tier CI_INFRA)** : **3035 passés, 0 échec** en 1 min 59 s.
-**Validation sur CI réelle** : *(renseignée au closeout — impérative pour ce tier)*.
+**Validation sur CI réelle** : PR #74 **5/5 PASS** · gate Sonar **OK** · **CI canonique `31472257665` 3/3 GREEN** sur `43e3934` (`pytest + QA` 9 min 48 s).
 
 ## 4. Interdits tenus
 
@@ -124,7 +124,34 @@ Alembic de récupération (l'anomalie était une erreur de lecture, cf. §0).
 
 ## Verdict
 
-**Verdict :** ⏳ **Sb_OPS_DEPLOY_SAFETY_01 — en validation CI réelle.** Le chemin de déploiement
+**Verdict :** ✅ **Sb_OPS_DEPLOY_SAFETY_01 — MERGED + CANONICAL CI GREEN.** Le chemin de déploiement
 passe de *fail-open* à *fail-closed* sur la sauvegarde, retrouve un **vrai SHA de rollback**
 enregistré de façon exploitable, couvre la surface Custom Program au smoke, et supprime un défaut
 de `ref` qui pointait vers une branche inexistante — sans toucher une ligne de code produit.
+
+---
+
+## Appendice post-merge (closeout)
+
+- **Merge** : PR **#74 MERGED** 2026-08-11, build `8162e34` + corrections de revue `1f37703`,
+  merge commit **`43e3934`** via `--merge --match-head-commit 1f37703` — **sans squash, sans
+  `--admin`, sans force** (gate `CLEAN`, **0 thread non résolu**).
+- **CI canonique** : run **`31472257665`** (`push`) **3/3 GREEN** sur `43e3934`.
+- **Faux signal d'échec CI, à consigner** : le premier watch de la PR est sorti en erreur avec
+  `error connecting to api.github.com`. Ce n'était **pas** un échec de CI — le run était en
+  `attempt: 1`, `conclusion: success`, 3/3. Vérifié avant toute action : **aucun correctif n'a été
+  déclenché sur un problème fantôme** (`CLAUDE.md §2` : distinguer un échec de test d'un incident
+  d'infrastructure).
+- **2 findings Gitar traités in-scope** :
+  1. *Premier déploiement / reprise sur hôte vierge* — l'abandon fail-closed se déclenchait là où
+     il n'y a légitimement rien à sauvegarder. **L'option « avertir plutôt qu'abandonner » a été
+     refusée** : « fichier absent » est indistinguable de « `DATABASE_URL` pointe ailleurs », donc
+     dégrader rouvrirait le trou même que ce sprint ferme. Résolu par un **opt-in explicite** :
+     message nommant `SKIP_BACKUP=1`, raisonnement inline, **section 5bis** du runbook, 2 tests.
+  2. *Commentaire du résolveur inexact* — `Path.resolve(strict=False)` **résout** bien les liens
+     symboliques ; seul le contrôle d'existence est relâché. Commentaire corrigé (comportement
+     déjà correct).
+- **Cleanup** : branche `sb/ops-deploy-safety-01` + worktree `workout-session-tracking-deploy-safety`
+  supprimés.
+- **Aucun déploiement production** dans ce sprint. Les durcissements s'appliqueront au **prochain**
+  déploiement.
