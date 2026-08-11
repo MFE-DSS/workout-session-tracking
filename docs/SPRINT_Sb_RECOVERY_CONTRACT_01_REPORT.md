@@ -270,5 +270,17 @@ Le fail-open le plus vicieux de l'audit — une zone jamais entraînée rendue �
 disponible » — est corrigé **dans le vocabulaire lui-même** : il n'existe aucun chemin, dans ce
 contrat, permettant à une absence de donnée de produire une bonne nouvelle.
 
-Statut : `Sb_RECOVERY_CONTRACT_01 PR GREEN / MERGE PENDING` — puis merge permanent autorisé par la
-mission. **`Sb_CARDIO_FATIGUE_ADAPTER_01` n'est pas ouvert.**
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #79 MERGÉE.** Base canonique `5f66280` → build `babd944` → 4 correctifs de revue
+(`4d14ebc`, `6184647`, `039f52b`, `f8d160e`) → addendum de rapport `4ef0c9f` →
+**merge `fd8df8c`** via `--merge --match-head-commit 4ef0c9f…` — **sans squash, sans `--admin`,
+sans force**. Gate re-vérifié **autoritativement juste avant** le merge : head SHA confirmé,
+`CLEAN` / `MERGEABLE`, **5/5 checks** (dont le gate **externe** `SonarCloud Code Analysis`), gate
+Sonar **`OK`**, **0 thread non résolu**, **0 finding Gitar**.
+
+**CI canonique `31532704217` — 3/3 GREEN** sur `fd8df8c` (lint · pytest + QA · SonarCloud).
+
+**Statut final : `Sb_RECOVERY_CONTRACT_01 MERGED + CANONICAL GREEN + CLEANED`.**
+Tranche 1/5 de la file P0.4 **close**. Nouvelle base canonique : `fd8df8c` (puis closeout).
+**`Sb_CARDIO_FATIGUE_ADAPTER_01` n'est pas ouvert.**
