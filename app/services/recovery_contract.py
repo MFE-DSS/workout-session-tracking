@@ -114,6 +114,16 @@ def _is_real_number(value: Any) -> bool:
     return math.isfinite(float(value))
 
 
+def _is_whole_number(value: Any) -> bool:
+    """True for a usable value that denotes a whole number.
+
+    Uses ``float.is_integer()`` rather than ``float(v) != int(v)``: comparing
+    floats with ``==``/``!=`` is unreliable in general and Sonar flags it
+    (``python:S1244``). ``is_integer`` asks the question directly.
+    """
+    return _is_real_number(value) and float(value).is_integer()
+
+
 def clamp_unit(value: float) -> float:
     """Clamp to the canonical 0.0–1.0 interval."""
     return max(0.0, min(1.0, value))
@@ -135,7 +145,7 @@ def normalize_readiness_scale(value: Any) -> float | None:
 
     Anything outside integer 1–5 → ``None``.
     """
-    if not _is_real_number(value) or float(value) != int(value):
+    if not _is_whole_number(value):
         return None
     v = int(value)
     if v < _READINESS_MIN or v > _READINESS_MAX:
@@ -226,7 +236,7 @@ def days_since_last_or_none(value: Any) -> int | None:
     honest here: it returns an explicit ``None`` rather than a sentinel. The only
     job left is rejecting negatives and non-integers.
     """
-    if not _is_real_number(value) or float(value) != int(value):
+    if not _is_whole_number(value):
         return None
     v = int(value)
     return v if v >= 0 else None
@@ -532,7 +542,7 @@ def readiness_sufficiency_for_age(age_days: Any) -> Sufficiency:
     ``0`` → sufficient · ``1..2`` → partial (context only) · ``>= 3`` → stale ·
     missing or negative → insufficient.
     """
-    if not _is_real_number(age_days) or float(age_days) != int(age_days):
+    if not _is_whole_number(age_days):
         return Sufficiency.INSUFFICIENT
     age = int(age_days)
     if age < 0:
