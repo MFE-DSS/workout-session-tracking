@@ -26,9 +26,74 @@ Public API:
 """
 from __future__ import annotations
 
+import math
 from typing import Any
 
 _MAX_REASONS = 3
+
+# ── Sb_FATIGUE_SCALE_FIX_01 — explicit fatigue scale boundary ──────────────
+#
+# `behavioral.compute_behavioral_state` produces `fatigue_score` on a 0–100
+# scale; `recommendation.py` forwards it verbatim into `context`. This module
+# used to compare that value against 0.7 / 0.2 as if it were 0–1, so the
+# "fatigue élevée" branch fired for essentially every real value (20, 50 and 80
+# are all >= 0.7) and the "fatigue basse" branch was unreachable.
+#
+# The producer is not redesigned and `recommendation.py` is not touched (hard
+# architectural constraint). The conversion lives here, at the consumer
+# boundary, and is explicit, bounded, named and unit tested.
+FATIGUE_RAW_SCALE_MAX = 100.0
+
+# Lowest value `behavioral` can actually emit, DERIVED not guessed:
+# compute_session_fatigue = (global_state + concentration) / 2 with
+# global_state in {80, 50, 20} (default 50) and concentration in {70, 40, 10}
+# (default 40) → minimum (20 + 10) / 2 = 15. compute_weighted_fatigue is a
+# convex combination of such values, so it cannot leave [15, 75] either, and an
+# empty history returns the 50 default. A test derives this bound from those
+# dicts so it cannot drift silently.
+FATIGUE_RAW_MIN_PRODUCIBLE = 15.0
+
+# Normalised bands. FATIGUE_HIGH is deliberately 0.7 == 70/100 ==
+# recommendation.FATIGUE_HIGH_THRESHOLD: after normalisation the explainer
+# speaks of "high fatigue" exactly when the recommendation engine itself
+# filters on high fatigue. No new number is invented. Pinned by a test.
+FATIGUE_HIGH = 0.7
+FATIGUE_LOW = 0.2
+
+
+def normalize_fatigue_score(raw: Any) -> float | None:
+    """Convert a raw 0–100 fatigue score to 0.0–1.0, or ``None`` if unusable.
+
+    ``None`` means "no usable fatigue reading" and the caller must stay silent
+    rather than invent a band. Rejected: non-numeric values, booleans (``True``
+    is an ``int`` and would otherwise read as 0.01), NaN, and anything outside
+    the 0–100 contract.
+
+    Also rejected: anything **below** ``FATIGUE_RAW_MIN_PRODUCIBLE``.
+    ``recommendation.py`` degrades to ``fatigue_score = 0.0`` when
+    ``compute_behavioral_state`` raises, and 0.0 is provably not producible by
+    ``behavioral`` — so it is a failure sentinel, not a measurement. Reading it
+    as 0.0 normalised would tell a user whose data we failed to compute that
+    they are fresh and should push. That is the one direction where guessing
+    can do harm.
+
+    The bound is deliberately one-sided: we refuse to invent good news, but we
+    do not suppress bad news. A value above the producible ceiling still maps
+    to high fatigue rather than to silence — worst case the user is advised to
+    take it easy on a reading we could not fully vouch for.
+    """
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+        return None
+    value = float(raw)
+    # NaN needs its own guard: every comparison against it is False, so the
+    # range check below would let it straight through. `math.isnan` rather than
+    # the `value != value` idiom — same result, and it does not read as a typo
+    # (Sonar python:S1764 flags the self-comparison form, correctly).
+    if math.isnan(value):
+        return None
+    if value < FATIGUE_RAW_MIN_PRODUCIBLE or value > FATIGUE_RAW_SCALE_MAX:
+        return None
+    return value / FATIGUE_RAW_SCALE_MAX
 
 _FALLBACK_PHRASE = "Recommandation basée sur ton historique récent."
 _LOW_DATA_PHRASE = "Pas assez de données pour expliquer plus finement."
@@ -159,14 +224,13 @@ def _zone_freshness_reason(top: dict, context: dict) -> str | None:
 
 def _fatigue_reason(context: dict) -> str | None:
     """Surface a fatigue note only when the score is explicitly informative."""
-    score = context.get("fatigue_score")
-    if not isinstance(score, (int, float)):
+    score = normalize_fatigue_score(context.get("fatigue_score"))
+    if score is None:
         return None
-    # Scale assumption (read from recommendation.py callers): higher = more fatigued.
-    # We never tell the user a precise number — only a qualitative band,
-    # and only when the band is meaningful enough to act on.
-    if score >= 0.7:
+    # Higher = more fatigued. We never tell the user a precise number — only a
+    # qualitative band, and only when the band is meaningful enough to act on.
+    if score >= FATIGUE_HIGH:
         return "Niveau de fatigue élevé — séance légère privilégiée."
-    if score <= 0.2:
+    if score <= FATIGUE_LOW:
         return "Niveau de fatigue bas — bon moment pour pousser."
     return None
