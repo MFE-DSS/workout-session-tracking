@@ -164,5 +164,26 @@ cardio sans effet sur quoi que ce soit.
 **Sept questions ouvertes** remontent à l'opérateur — mais **aucune ne bloque la première
 tranche**, faite de types et de conversions.
 
-Statut : `Sx_RECOVERY_READINESS_01_SPEC PR GREEN / MERGE PENDING` — puis merge permanent autorisé
-par la mission. **Aucune tranche d'implémentation ne sera ouverte après le merge.**
+## Closeout — ✅ MERGED
+
+**PR #78 MERGÉE.** Base canonique `879d41d` → build `25e2997` → **merge `7369141`** via
+`--merge --match-head-commit 25e2997…` — **sans squash, sans `--admin`, sans force**. Gate
+re-vérifié **autoritativement juste avant** le merge : head SHA confirmé, `CLEAN` / `MERGEABLE`,
+**5/5 checks** (dont le gate **externe** `SonarCloud Code Analysis`), gate Sonar **`OK`**,
+**0 thread non résolu**. Aucun finding Gitar.
+
+**Le contrat CI conscient du périmètre a fonctionné comme prévu.** `Sb_CI_02_1` a classé la PR
+`NON_RUNTIME` : le job `pytest + QA scripts` a pris **7 secondes** au lieu de ~11 minutes, pendant
+que `lint` tournait **intégralement** (53 s) et que le gate externe Sonar restait évalué. C'est
+exactement le comportement conçu — les jobs ne disparaissent jamais, seules les étapes coûteuses
+sont conditionnelles.
+
+**CI canonique légitimement SKIPPÉE, et c'est consigné.** Le merge est **100 % `docs/**`**, filtré
+par le `paths-ignore: ['docs/**']` du trigger `push`. Ce n'est **pas** un `[skip ci]` manuel : c'est
+la policy CI versionnée (`CLAUDE.md §2`). Vérifié : `git diff --name-only 879d41d..7369141` ne
+renvoie que des chemins sous `docs/`.
+
+**Aucune tranche d'implémentation n'est ouverte.** Les 5 tranches du §11 de la spec attendent
+chacune un `GO BUILD` explicite.
+
+**Statut final : `Sx_RECOVERY_READINESS_01_SPEC MERGED + CLOSED + CLEANED`.**
