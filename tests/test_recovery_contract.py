@@ -410,7 +410,12 @@ def test_all_thirteen_spec_rows_are_registered():
 
 def test_every_row_either_converts_or_says_why_it_does_not():
     for row in LEGACY_SCALE_CONVERSIONS:
-        assert row.source and row.legacy_scale and row.target and row.note
+        # Split rather than chained with `and`: a composite assertion cannot say
+        # which part failed, and Sonar rejects it (python:S9073).
+        assert row.source, row
+        assert row.legacy_scale, row.source
+        assert row.target, row.source
+        assert row.note, row.source
         if row.conversion is None:
             assert "not converted" in row.note, row.source
         else:
