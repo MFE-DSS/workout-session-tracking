@@ -628,6 +628,34 @@ constituée de types et de conversions, dont aucune ne dépend d'OQ-1 à OQ-7.
 
 ---
 
+## 12bis. Décisions opérateur — RÉSOLUES
+
+> **Ajout daté du 2026-08-11, à l'ouverture de `Sb_RECOVERY_CONTRACT_01`.**
+> Cette section **complète** le §12 sans le réécrire : l'audit d'origine et les défauts proposés y
+> restent lisibles tels qu'ils ont été soumis. Ce qui suit est ce que l'opérateur a **tranché**.
+> **En cas de contradiction entre le §12 et le §12bis, le §12bis fait foi.**
+
+| OQ | Décision | Conséquence normative |
+|---|---|---|
+| **OQ-1** — `behavioral.readiness_score` | **Hérité, candidat à une dépréciation visible ultérieure.** Ne **DOIT PAS** entrer dans `TrainingState`. Producteur et UI restent compatibles ; **aucun retrait dans ce cycle**. Remplacement seulement une fois la surface `TrainingState`/explainer existante. | `normalize_behavioral_readiness` **existe** comme conversion nommée (la table §3.1 doit rester complète), mais **aucun champ de `TrainingState` ne la consomme**. Un test pinne cette absence. |
+| **OQ-2** — `RECOVERY_HOURS_TARGET` | **Pas de `BodyZone.recovery_hours`.** La durée de récupération **n'est pas une propriété anatomique intrinsèque**. La constante héritée peut être **lue via un adaptateur** tant que `recommendation.py` reste hérité. Le remplacement futur sera une **`RecoveryPolicy` versionnée**, pas un attribut de schéma. **Aucune migration.** | `recovery_target_hours(zone)` lit la constante existante en **import différé**, et le §6 est amendé : la piste « colonne `BodyZone` » est **fermée**. |
+| **OQ-3** — pondération de `FatigueSignal` | **Aucune pondération globale en V1.** Les trois composantes restent **séparément observables**. `FatigueSignal` **NE DOIT PAS** inventer d'agrégat pondéré. Un consommateur futur qui exige un scalaire **possède et documente sa propre formule**. | **Amende le §2.2** : les champs `overall` et `as_availability` **sont retirés** de `FatigueSignal`. Le complément de disponibilité devient une **fonction pure nommée** appliquée par l'appelant à une composante de son choix. Un test pinne l'absence de tout agrégat. |
+| **OQ-4** — plafond cardio | **Aucun pourcentage cardio universel.** La contribution cardio reste **explicite et séparée**. La confiance issue des champs actuels **ne peut jamais dépasser `medium`**. Les règles de magnitude appartiennent à `Sb_CARDIO_FATIGUE_ADAPTER_01`, **après audit du vocabulaire réellement stocké**. **Ne pas inventer de coefficient dans ce sprint.** | `cardio_load_estimate` est **déclarée** dans le contrat (la table §3.1 reste complète) mais rend `None` / `Confidence.NONE` en V1 : un **contrat déclaré, non implémenté**, pas un coefficient inventé. |
+| **OQ-5** — zones détaillées vs axes macro | Les **décisions** d'entraînement utilisent les **zones détaillées canoniques**. Les **axes macro sont de présentation uniquement**. Quand une présentation compacte exige une valeur macro : **pire zone constituante (WORST/MIN)**, et la **zone limitante est exposée dans `basis`**. La valeur macro **ne doit pas** devenir source de vérité du planificateur. | **Résout le §6** : l'agrégation macro est le **minimum**, conservatrice, traçable. |
+| **OQ-6** — péremption de la readiness | `age_days == 0` ⇒ `sufficient`, potentiellement pertinent pour une décision future. `1..2` ⇒ `partial`, **contexte seulement**. `>= 3` ⇒ `stale`. Une readiness non courante **ne peut jamais** justifier une recommandation plus agressive. | **Confirme le §2.1** et fige le seuil. |
+| **OQ-7** — influence de la readiness subjective | **OUI**, elle doit à terme influencer l'orchestration — **de façon ASYMÉTRIQUE**. Une mauvaise readiness courante **peut** réduire la confiance / l'agressivité. Une bonne readiness subjective **NE PEUT JAMAIS**, à elle seule, **augmenter** l'agressivité prescrite. Ce cycle V1 **ne modifie pas** `recommendation.py` ; l'intégration initiale est `TrainingState` + explication ; l'influence sur la décision appartient au consommateur orchestrateur futur. | **Direction produit actée.** Le contrat expose de quoi appliquer l'asymétrie plus tard, sans l'appliquer ici. |
+
+### Le principe d'asymétrie, énoncé une fois pour tout le cycle
+
+OQ-4, OQ-5 et OQ-7 disent la même chose sous trois angles, et c'est la règle de conception
+transversale de ce contrat :
+
+> **Un signal dégradé, ancien ou incertain peut rendre le système plus prudent.
+> Il ne peut jamais le rendre plus agressif.**
+
+C'est la généralisation de la borne unilatérale déjà retenue par `Sb_FATIGUE_SCALE_FIX_01` :
+*on refuse d'inventer une bonne nouvelle, on ne supprime pas une mauvaise.*
+
 ## 13. Definition of Done de cette spec
 
 | Exigence | § |
