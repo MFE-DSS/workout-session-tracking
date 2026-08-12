@@ -225,5 +225,21 @@ m'a fait chercher — puis trouver — une valeur hors liste réellement présen
 Le seul point que je ne peux pas clore : **la base de production n'a pas été auditée**, faute
 d'accès. C'est dit, pas contourné.
 
-Statut : `Sb_CARDIO_FATIGUE_ADAPTER_01 PR GREEN / MERGE PENDING` — puis merge permanent autorisé.
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #80 MERGÉE.** Base canonique `55958de` → build `01f119d` → test de complétude `0fc3753` →
+**merge `790dee0`** via `--merge --match-head-commit 0fc3753…` — **sans squash, sans `--admin`,
+sans force**. Gate re-vérifié **autoritativement juste avant** le merge : head SHA confirmé,
+`CLEAN` / `MERGEABLE`, **5/5 checks** (dont le gate **externe** `SonarCloud Code Analysis`), gate
+Sonar **`OK`**, **0 thread non résolu**, **0 finding Gitar**.
+
+**CI canonique `31538825629` — 3/3 GREEN** sur `790dee0`.
+
+**Le pré-scan Sonar a tenu sa promesse : gate `OK` au premier passage, zéro cycle perdu.** C'est
+le résultat direct de la leçon de la PR #79 (où trois tours ont été gaspillés à deviner) : un
+balayage AST local avant le push a trouvé et corrigé les 3 littéraux `S1192` du module. La méthode
+est maintenant en mémoire de session et vient d'être validée en conditions réelles.
+
+**Statut final : `Sb_CARDIO_FATIGUE_ADAPTER_01 MERGED + CANONICAL GREEN + CLEANED`.**
+Tranche 2/5 de la file P0.4 **close**. Nouvelle base canonique : `790dee0` (puis closeout).
 **`Sb_TRAINING_STATE_AGGREGATOR_01` n'est pas ouvert.**
