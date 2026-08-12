@@ -507,9 +507,12 @@ class TestCardio:
         assert "réduit" not in " ".join(item.reasons)
 
     def test_the_modality_vocabulary_covers_every_specific_modality(self):
+        # Les deux côtés viennent de la même génération de modules — voir
+        # `test_the_renderable_ceiling_matches_what_the_contract_produces`.
         from app.services.recovery_contract import CARDIO_SPECIFIC_MODALITIES
+        from app.services.recovery_explainer import MODALITY_LABELS
 
-        assert set(rx.MODALITY_LABELS) == set(CARDIO_SPECIFIC_MODALITIES)
+        assert set(MODALITY_LABELS) == set(CARDIO_SPECIFIC_MODALITIES)
 
     def test_the_catch_all_buckets_are_deliberately_unlabelled(self):
         assert CardioModality.AUTRE not in rx.MODALITY_LABELS
@@ -741,9 +744,20 @@ class TestConfidenceExposure:
             MAX_RENDERABLE_CONFIDENCE)
 
     def test_the_renderable_ceiling_matches_what_the_contract_produces(self):
-        from app.services.recovery_contract import CARDIO_MAX_CONFIDENCE
+        """Le plafond d'affichage est celui que le contrat peut réellement produire.
 
-        assert MAX_RENDERABLE_CONFIDENCE is CARDIO_MAX_CONFIDENCE
+        Les **deux** constantes sont importées ici, après la purge `sys.modules`
+        de la `conftest`. Un symbole lié à la collecte appartiendrait à une autre
+        génération du module, et l'identité échouerait sur deux membres d'enum
+        pourtant identiques — un faux échec, dépendant de l'ordre des tests, qui
+        ne dit rien du contrat.
+        """
+        from app.services.recovery_contract import CARDIO_MAX_CONFIDENCE
+        from app.services.recovery_explainer import (
+            MAX_RENDERABLE_CONFIDENCE as ceiling,
+        )
+
+        assert ceiling is CARDIO_MAX_CONFIDENCE
 
     def test_a_high_confidence_estimate_is_clamped_on_the_item(self):
         item = explain_zone(zone(confidence=Confidence.HIGH))
