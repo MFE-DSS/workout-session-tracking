@@ -824,6 +824,43 @@ def test_sessions_outside_the_window_are_ignored(client):
     assert state.fatigue.subjective_component is None
 
 
+def test_ancient_training_cannot_present_as_current_fatigue_evidence(client):
+    """Gitar finding on PR #81, and it was right.
+
+    `behavioral` has no date filter, so a single declaration from 400 days ago
+    populated `strength_component` and lifted an otherwise empty state to
+    PARTIAL/LOW — while a stale *readiness* declaration is deliberately not
+    counted. Abandoned training must not read as current evidence either.
+    """
+    from app.database import SessionLocal
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        _add_session(db, uid, days_ago=400, names=[CHEST],
+                     global_state="fatigued", concentration="low")
+        state = build_training_state(db, uid, now=NOW)
+
+    assert state.fatigue.strength_component is None
+    assert state.fatigue.subjective_component is None
+    assert state.sufficiency is Sufficiency.INSUFFICIENT
+    assert state.confidence is Confidence.NONE
+
+
+def test_a_declaration_inside_the_window_still_feeds_the_producer(client):
+    """The window bounds the gate; it must not disable the component."""
+    from app.database import SessionLocal
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        _add_session(db, uid, days_ago=400, names=[CHEST],
+                     global_state="good", concentration="high")
+        _add_session(db, uid, days_ago=2, names=[CHEST],
+                     global_state="fatigued", concentration="low")
+        state = build_training_state(db, uid, now=NOW)
+
+    assert state.fatigue.strength_component is not None
+
+
 def test_incomplete_and_excluded_sessions_are_ignored(client):
     from app.database import SessionLocal
 

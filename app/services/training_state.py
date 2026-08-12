@@ -156,8 +156,10 @@ def _readiness_signal(
 _PRODUCER_SESSION_REACH = 3
 
 
-def _has_declaration_behind_the_producer(db: Session, user_id: int) -> bool:
-    """Did any session the producer looks at actually carry a declaration?
+def _has_recent_declaration(
+    db: Session, user_id: int, *, window_start: datetime
+) -> bool:
+    """Did any **recent** session the producer looks at carry a declaration?
 
     **This gate exists because the producer fabricates a number out of nothing,
     and the fabrication is not detectable from its output.** Measured on the
@@ -177,6 +179,20 @@ def _has_declaration_behind_the_producer(db: Session, user_id: int) -> bool:
     This mirrors the producer's *selection* (its last three completed,
     non-excluded sessions) purely to ask that question. It does not recompute,
     reweight or duplicate its formula.
+
+    **The window applies here too.** `behavioral` has no date filter of its own,
+    so without this bound a single declaration from 400 days ago would still
+    populate `strength_component` and count as present evidence — lifting an
+    otherwise empty state to PARTIAL. That directly contradicts the rule this
+    module enforces for readiness, where a stale declaration is deliberately not
+    counted. Abandoned training must not present as current fatigue evidence.
+
+    **Residual, stated rather than hidden:** once a recent declaration exists,
+    the producer's own three-session reach may still fold in a session older
+    than the window. That is the canonical producer's semantics, and
+    reimplementing its selection to trim it would duplicate the formula this
+    slice must not touch. What the gate guarantees is that the producer is only
+    *consulted* when recent declared evidence exists.
     """
     rows = db.execute(
         select(WorkoutSession.global_state, WorkoutSession.concentration)
@@ -184,6 +200,7 @@ def _has_declaration_behind_the_producer(db: Session, user_id: int) -> bool:
             WorkoutSession.user_id == user_id,
             WorkoutSession.status == SessionStatus.COMPLETED,
             WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at >= window_start,
         )
         .order_by(WorkoutSession.started_at.desc())
         .limit(_PRODUCER_SESSION_REACH)
@@ -194,7 +211,9 @@ def _has_declaration_behind_the_producer(db: Session, user_id: int) -> bool:
     )
 
 
-def _strength_component(db: Session, user_id: int) -> tuple[float | None, str]:
+def _strength_component(
+    db: Session, user_id: int, *, window_start: datetime
+) -> tuple[float | None, str]:
     """Accumulated fatigue from the canonical producer, normalised once.
 
     Delegates to `behavioral.compute_behavioral_state` and converts with
@@ -209,8 +228,8 @@ def _strength_component(db: Session, user_id: int) -> tuple[float | None, str]:
     # import-light, matching how `recovery_contract` reaches production code.
     from app.services.behavioral import compute_behavioral_state
 
-    if not _has_declaration_behind_the_producer(db, user_id):
-        return None, "no declaration behind the accumulated producer"
+    if not _has_recent_declaration(db, user_id, window_start=window_start):
+        return None, "no declaration in window behind the accumulated producer"
 
     try:
         state = compute_behavioral_state(db, user_id)
@@ -423,7 +442,8 @@ def build_training_state(
     ).scalars())
 
     readiness = _readiness_signal(db, user_id, now=now)
-    strength_value, strength_basis = _strength_component(db, user_id)
+    strength_value, strength_basis = _strength_component(
+        db, user_id, window_start=window_start)
     subjective_value, subjective_basis = _subjective_component(sessions)
     cardio_value, cardio_confidence, cardio_basis, latest_cardio = (
         _cardio_component(sessions))

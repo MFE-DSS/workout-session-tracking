@@ -30,10 +30,10 @@ Donc `50.0` serait une sentinelle propre, mais **`45.0` est ambiguë** : la vale
 pas « l'athlète a dit se sentir bien » de « personne n'a répondu ». Les deux cas sont des
 fabrications, et un seul est détectable au nombre.
 
-**Correctif** : `_has_declaration_behind_the_producer` — une requête légère qui **miroite la
-sélection** du producteur (ses 3 dernières séances complétées non exclues) uniquement pour demander
-*« au moins une déclaration existe-t-elle ? »*. Si non, `strength_component = None`. Le producteur
-n'est ni recalculé, ni repondéré, ni dupliqué.
+**Correctif** : `_has_recent_declaration` — une requête légère qui **miroite la sélection** du
+producteur (ses 3 dernières séances complétées non exclues, **dans la fenêtre** — voir §7bis)
+uniquement pour demander *« au moins une déclaration existe-t-elle ? »*. Si non,
+`strength_component = None`. Le producteur n'est ni recalculé, ni repondéré, ni dupliqué.
 
 Preuve que la garde mord : la retirer fait échouer **3 tests**.
 
@@ -182,7 +182,7 @@ salle n'est fabriqué. **Agenda** : aucune source persistée en V1 ⇒ `schedule
 
 | Contrôle | Résultat |
 |---|---|
-| Tests dédiés | **59 passés** |
+| Tests dédiés | **61 passés** |
 | Broad sweep ciblé (état · contrat · adaptateur cardio · readiness · behavioral · reco ×2 · fatigue P0.2 · BodyZone P0.3 · zones P0.1 · scoring · dashboard · profil · substitution) | **589 passés** |
 | ruff (fichiers neufs) | **clean** |
 | Budget ruff | **543 ≤ 548** — **neutre** |
@@ -207,6 +207,40 @@ par l'IDE **pendant** l'écriture (`python:S3776`) et décomposée immédiatemen
 morphologie · planner · flag Body Intelligence · UI · templates : **aucun touché**. Aucune table,
 aucune colonne, aucun déploiement. Pas de force-push, pas de rebase, pas de squash, pas de merge
 `--admin`, `AGENTS.md` non touché. **`Sb_ZONE_RECOVERY_ESTIMATE_01` n'est pas ouvert.**
+
+## 7bis. Finding Gitar (PR #81) — un second fail-open, et il avait raison
+
+**Constat** : `_strength_component` ignorait la fenêtre de 30 jours. `behavioral` n'a **aucun
+filtre de date**, donc une seule déclaration vieille de 400 jours peuplait encore
+`strength_component`, que `_compose_sufficiency` comptait comme preuve présente — faisant passer un
+état par ailleurs vide de `INSUFFICIENT`/`NONE` à `PARTIAL`/`LOW`.
+
+**C'est une contradiction directe avec ma propre règle.** J'avais délibérément écrit qu'une
+readiness périmée ne compte pas comme preuve ; et je laissais un entraînement abandonné depuis plus
+d'un an le faire. Gitar a aussi noté, à juste titre, que
+`test_sessions_outside_the_window_are_ignored` n'assertait que sur `subjective_component` : le
+chemin n'était **pas testé**.
+
+**Vérifié avant de corriger** — une séance à J-400 avec `fatigued`/`low` donnait :
+
+```
+strength = 0.75 · subjective = None · sufficiency = partial · confidence = low
+```
+
+**Correctif** : la fenêtre borne aussi la garde (`_has_recent_declaration`). Même cas désormais :
+`strength = None`, `INSUFFICIENT`/`NONE`. Deux tests ajoutés — celui du cas ancien, et celui qui
+vérifie que la fenêtre **borne** la garde sans **désactiver** la composante quand une déclaration
+récente existe. Retirer la borne fait échouer le test : la garde mord.
+
+**Résidu, énoncé plutôt que masqué** : une fois qu'une déclaration récente existe, la portée
+« 3 dernières séances » du producteur peut encore inclure une séance hors fenêtre. C'est la
+sémantique du producteur canonique, et réimplémenter sa sélection pour la rogner dupliquerait la
+formule que cette tranche ne doit pas toucher. Ce que la garde garantit, c'est que le producteur
+n'est **consulté** que s'il existe une preuve déclarée récente.
+
+**Deux fail-opens dans une seule tranche** — l'un trouvé par mes tests, l'autre par la revue. Les
+deux ont la même forme : une donnée absente ou périmée rendue comme une preuve présente. C'est le
+défaut que ce train combat, et il se réintroduit à chaque frontière si on ne le cherche pas.
 
 ## Verdict
 
