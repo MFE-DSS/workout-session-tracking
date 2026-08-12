@@ -168,6 +168,26 @@ utilisateur** · `TrainingState` toujours **sans score global** · `FatigueSigna
 agrégat**. Pas de force-push, pas de rebase, pas de squash, pas de merge `--admin`, `AGENTS.md` non
 touché. **`Sb_RECOVERY_EXPLAINER_01` n'est pas ouvert.**
 
+## 12. Finding Sonar (PR #82) — et la faille était dans mon pré-scan
+
+**Gate externe en échec** : `new_code_smells_severity 15 > 14`. Un seul MAJOR.
+
+**Diagnostiqué en deux requêtes, sans deviner** — la route validée en PR #79 :
+`component_tree` avec `qualifiers=FIL` renvoie **vide**, ce qui est le signal connu que le finding
+est dans un **fichier de test** ; la requête directe sur le chemin de test donne
+`new_major_violations=1`, `severity=15` dans `tests/test_zone_recovery.py`. Calibration MAJOR = 15
+confirmée une fois de plus.
+
+**La cause : `python:S9073`**, une assertion composite
+(`assert case and legacy and here`) — et surtout, **une faille dans ma propre méthode**. Mon
+pré-scan avant push n'a couvert que les **deux modules**, pas les fichiers de test. La tranche
+précédente était passée par chance : elle n'avait pas d'assertion composite.
+
+**Corrigé** : un `assert` par condition, chacun portant le cas en message. Et le pré-scan est
+désormais rejoué sur **les quatre fichiers touchés** — `S9073` → `NONE` partout. La leçon est
+consignée en mémoire de session avec le snippet AST, pour que la prochaine tranche scanne les tests
+d'emblée.
+
 ## Verdict
 
 **Livré.** Les 11 zones canoniques portent désormais une **estimation** — bande, confiance, base,

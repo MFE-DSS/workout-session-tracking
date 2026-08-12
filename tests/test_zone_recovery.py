@@ -236,9 +236,13 @@ def test_an_unknown_zone_code_yields_no_estimate():
 def test_the_legacy_divergences_are_enumerated():
     assert LEGACY_DIVERGENCES
     for case, legacy, here in LEGACY_DIVERGENCES:
-        assert case and legacy and here
-        assert "legacy:" in legacy
-        assert "here:" in here
+        # One assert per condition: a chained `and` cannot say which part
+        # failed, and Sonar rejects it (python:S9073).
+        assert case, LEGACY_DIVERGENCES
+        assert legacy, case
+        assert here, case
+        assert "legacy:" in legacy, case
+        assert "here:" in here, case
 
 
 def test_the_never_trained_divergence_is_real_and_pinned():
