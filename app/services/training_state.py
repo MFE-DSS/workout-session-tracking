@@ -438,13 +438,12 @@ def build_training_state(
     reproducible for a fixed database state, and a hidden clock would make it
     untestable.
 
-    ``zone_recovery`` is returned **empty on purpose**. Producing a
-    `ZoneRecoveryEstimate` means producing an estimate, a band and a temporal
-    model, and all three belong to `Sb_ZONE_RECOVERY_ESTIMATE_01`. The raw facts
-    that slice will need are gathered and exposed as
-    :attr:`TrainingState.basis` counts rather than dressed up as estimates —
-    fabricating placeholder numbers here would be exactly the fail-open §4
-    forbids.
+    ``zone_recovery`` is populated by **delegating** to
+    `Sb_ZONE_RECOVERY_ESTIMATE_01`, which is handed the evidence gathered here
+    so the estimates cost no additional query. This module still computes no
+    estimate of its own: producing one means producing a value, a band and a
+    temporal model, and all three belong to that slice. It owns the queries and
+    the assembly, never a formula.
     """
     window_start = now - timedelta(days=lookback_days)
 
@@ -492,8 +491,10 @@ def build_training_state(
         fatigue=fatigue,
         # Sb_ZONE_RECOVERY_ESTIMATE_01 fills what this slice left empty. The
         # estimates are built from the evidence **already gathered above**, so
-        # populating them costs **zero additional queries** — the deferred
-        # import keeps the dependency one-way (estimator → aggregator).
+        # populating them costs **zero additional queries**. The delegation is a
+        # plain module-level import — see `_zone_recovery_from` for why a
+        # deferred one would be actively harmful here — and the dependency runs
+        # one way: aggregator → estimator.
         zone_recovery=_zone_recovery_from(evidence, now=now),
         zone_suitability=(),
         # No authoritative equipment source exists at this boundary:
