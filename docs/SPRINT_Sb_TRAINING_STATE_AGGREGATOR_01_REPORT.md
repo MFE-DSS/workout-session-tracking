@@ -256,4 +256,24 @@ valeurs sont réellement productibles, de constater que la valeur seule ne suffi
 classe de défaut que `Sx_RECOVERY_READINESS_01` a été écrite pour éliminer, et elle s'est glissée
 dans ma propre première version.
 
-Statut : `Sb_TRAINING_STATE_AGGREGATOR_01 PR GREEN / MERGE PENDING` — puis merge permanent autorisé.
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #81 MERGÉE.** Base canonique `c53ee7c` → build `a450409` → correction du finding Gitar
+`dacc0ff` → **merge `6d6d1c3`** via `--merge --match-head-commit dacc0ff…` — **sans squash, sans
+`--admin`, sans force**. Gate re-vérifié **autoritativement juste avant** le merge : head SHA
+confirmé, `CLEAN` / `MERGEABLE`, **5/5 checks** (dont le gate **externe**
+`SonarCloud Code Analysis`), gate Sonar **`OK`**, **0 thread non résolu**.
+
+**CI canonique `31575141601` — 3/3 GREEN** sur `6d6d1c3`.
+
+**1 finding Gitar, corrigé pour de vrai** (§7bis) : la fenêtre ne bornait pas la garde de la
+composante de force. Reproduit à J-400 (`strength = 0.75`, `partial`) avant correction, `None` /
+`INSUFFICIENT` après ; 2 tests ajoutés, dont un qui vérifie que la fenêtre **borne** sans
+**désactiver**. Thread résolu **après** la correction poussée.
+
+**Gate Sonar `OK` au premier passage** sur les deux poussées — le pré-scan AST avant push (méthode
+validée en `Sb_CARDIO_FATIGUE_ADAPTER_01`) continue d'éviter les cycles perdus.
+
+**Statut final : `Sb_TRAINING_STATE_AGGREGATOR_01 MERGED + CANONICAL GREEN + CLEANED`.**
+Tranche 3/5 de la file P0.4 **close**. Nouvelle base canonique : `6d6d1c3` (puis closeout).
+**`Sb_ZONE_RECOVERY_ESTIMATE_01` n'est pas ouvert.**
