@@ -497,7 +497,10 @@ def test_a_brand_new_user_gets_no_fabricated_favourable_signal(client):
     assert state.confidence is Confidence.NONE
     assert state.readiness.overall is None
     assert state.fatigue.observed_components == {}
-    assert state.zone_recovery == ()
+    # Every canonical zone is present and explicitly unknown — stronger than the
+    # empty tuple this asserted before the estimator slice existed.
+    assert all(e.estimate is None for e in state.zone_recovery)
+    assert all(e.confidence is Confidence.NONE for e in state.zone_recovery)
     assert state.equipment is None
     assert state.schedule is None
 
@@ -669,25 +672,60 @@ def test_the_cache_is_per_invocation_not_global():
 # ---------------------------------------------------------------------------
 
 
-def test_zone_recovery_is_empty_because_estimates_belong_to_the_next_slice(client):
+def test_zone_recovery_is_delegated_to_the_estimator_slice(client):
+    """Was "empty because the next slice owns it" — that slice now exists.
+
+    The boundary this test guarded has been filled by
+    `Sb_ZONE_RECOVERY_ESTIMATE_01`. The expectation is retired rather than
+    weakened: the property that matters is now stronger — all 11 canonical zones
+    are always present, and this module still computes no estimate itself.
+    """
     from app.database import SessionLocal
+    from app.services.muscle_mapping import ZONE_LABELS
 
     uid = get_test_user_id()
     with SessionLocal() as db:
         _add_session(db, uid, days_ago=1, names=[CHEST, BACK, LEGS])
         state = build_training_state(db, uid, now=NOW)
 
-    assert state.zone_recovery == ()
+    assert len(state.zone_recovery) == len(ZONE_LABELS)
+    assert {e.zone_code for e in state.zone_recovery} == set(ZONE_LABELS)
     assert state.zone_suitability == ()
-    assert any("Sb_ZONE_RECOVERY_ESTIMATE_01" in b for b in state.basis)
+    assert any("delegated to Sb_ZONE_RECOVERY_ESTIMATE_01" in b for b in state.basis)
 
 
-def test_no_estimate_band_or_decay_is_computed_here():
+def test_delegating_the_estimates_costs_no_additional_query(client):
+    """The estimates reuse evidence already gathered — not a second pass."""
+    from app.database import SessionLocal
+    from app.services import training_state as mod
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        for day in range(1, 5):
+            _add_session(db, uid, days_ago=day, names=[CHEST, BACK, LEGS])
+        with_estimates = _count_queries(
+            lambda: build_training_state(db, uid, now=NOW))
+        real = mod._zone_recovery_from
+        mod._zone_recovery_from = lambda evidence, *, now: ()
+        try:
+            without = _count_queries(
+                lambda: build_training_state(db, uid, now=NOW))
+        finally:
+            mod._zone_recovery_from = real
+
+    assert len(with_estimates) == len(without)
+
+
+def test_the_aggregator_computes_no_estimate_of_its_own():
+    """It may delegate; it may not calculate. No band, no decay, no roll-up."""
     source = _module_code()
     for forbidden in ("band_for_estimate", "RecoveryBand", "worst_zone_rollup",
-                      "never_trained_estimate", "ZoneRecoveryEstimate",
-                      "decay", "half_life"):
+                      "never_trained_estimate", "normalize_training_suitability",
+                      "recovery_target_hours", "decay", "half_life",
+                      "radar_axis_for_zone"):
         assert forbidden not in source, forbidden
+    # Delegation is the only permitted route to an estimate.
+    assert "build_zone_recovery_from_evidence" in source
 
 
 def test_zone_evidence_records_facts_not_conclusions(client):

@@ -2,9 +2,11 @@
 
 Spec: `docs/strategy/Sx_RECOVERY_READINESS_01_SPEC.md` §2.5, §4, §12bis.
 
-This service **gathers and normalises evidence**. It does not estimate per-zone
-recovery, does not decide anything, does not rank, and does not produce user
-text. Every value it emits comes from a canonical normaliser in
+This service **gathers and normalises evidence**. It computes no estimate of its
+own — per-zone recovery is **delegated** to `Sb_ZONE_RECOVERY_ESTIMATE_01`, which
+is handed the evidence this module already gathered so the delegation costs no
+extra query. It does not decide anything, does not rank, and does not produce
+user text. Every value it emits comes from a canonical normaliser in
 :mod:`app.services.recovery_contract`; this module owns the *queries* and the
 *assembly*, never a formula.
 
@@ -57,6 +59,7 @@ from app.services.recovery_contract import (
     ReadinessSignal,
     Sufficiency,
     TrainingState,
+    ZoneRecoveryEstimate,
     cardio_load_estimate,
     cardio_zone_exposure,
     mean_of_present,
@@ -67,6 +70,7 @@ from app.services.recovery_contract import (
     readiness_sufficiency_for_age,
 )
 from app.services.substitution import actual_exercise_name
+from app.services.zone_recovery import build_zone_recovery_from_evidence
 
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
@@ -366,6 +370,23 @@ def _zone_evidence(
     return evidence, len(cache)
 
 
+def _zone_recovery_from(
+    evidence: dict[str, _ZoneEvidence], *, now: datetime
+) -> tuple[ZoneRecoveryEstimate, ...]:
+    """Delegate the estimates to `Sb_ZONE_RECOVERY_ESTIMATE_01`.
+
+    A plain module-level import, deliberately. The estimator only needs this
+    module's evidence type under ``TYPE_CHECKING``, so there is no runtime cycle
+    to break — and a deferred import here would be worse than unnecessary: under
+    the test conftest, which purges ``app.*`` between tests, it would resolve a
+    *second generation* of `recovery_contract` and put two distinct `Confidence`
+    enums into one object graph, so ``is`` comparisons would silently stop
+    working. The estimator still owns every estimate; this module owns the
+    queries and computes none.
+    """
+    return build_zone_recovery_from_evidence(evidence, now=now)
+
+
 def _compose_sufficiency(
     readiness: ReadinessSignal, fatigue: FatigueSignal
 ) -> tuple[Sufficiency, Confidence]:
@@ -417,13 +438,12 @@ def build_training_state(
     reproducible for a fixed database state, and a hidden clock would make it
     untestable.
 
-    ``zone_recovery`` is returned **empty on purpose**. Producing a
-    `ZoneRecoveryEstimate` means producing an estimate, a band and a temporal
-    model, and all three belong to `Sb_ZONE_RECOVERY_ESTIMATE_01`. The raw facts
-    that slice will need are gathered and exposed as
-    :attr:`TrainingState.basis` counts rather than dressed up as estimates —
-    fabricating placeholder numbers here would be exactly the fail-open §4
-    forbids.
+    ``zone_recovery`` is populated by **delegating** to
+    `Sb_ZONE_RECOVERY_ESTIMATE_01`, which is handed the evidence gathered here
+    so the estimates cost no additional query. This module still computes no
+    estimate of its own: producing one means producing a value, a band and a
+    temporal model, and all three belong to that slice. It owns the queries and
+    the assembly, never a formula.
     """
     window_start = now - timedelta(days=lookback_days)
 
@@ -469,8 +489,13 @@ def build_training_state(
         computed_at=now,
         readiness=readiness,
         fatigue=fatigue,
-        # Empty by design — see the docstring. The next slice owns estimates.
-        zone_recovery=(),
+        # Sb_ZONE_RECOVERY_ESTIMATE_01 fills what this slice left empty. The
+        # estimates are built from the evidence **already gathered above**, so
+        # populating them costs **zero additional queries**. The delegation is a
+        # plain module-level import — see `_zone_recovery_from` for why a
+        # deferred one would be actively harmful here — and the dependency runs
+        # one way: aggregator → estimator.
+        zone_recovery=_zone_recovery_from(evidence, now=now),
         zone_suitability=(),
         # No authoritative equipment source exists at this boundary:
         # `program_quality_engine.UserProfile.available_equipment` is an input
@@ -486,8 +511,8 @@ def build_training_state(
             f"{len(sessions)} completed session(s) in window",
             f"zone evidence gathered for {len(evidence)} zone(s) "
             f"from {resolutions} distinct exercise name(s)",
-            "zone_recovery deliberately empty — estimates belong to "
-            "Sb_ZONE_RECOVERY_ESTIMATE_01",
+            "zone_recovery delegated to Sb_ZONE_RECOVERY_ESTIMATE_01 "
+            "from the evidence above — no additional query",
         ),
     )
 
