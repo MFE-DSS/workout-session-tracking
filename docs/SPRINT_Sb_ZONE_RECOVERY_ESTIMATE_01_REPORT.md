@@ -203,4 +203,32 @@ import différé inutile mettait deux générations du même enum dans un seul g
 retiré, et la raison est écrite dans le code pour que personne ne le réintroduise « pour casser un
 cycle » qui n'existe pas.
 
-Statut : `Sb_ZONE_RECOVERY_ESTIMATE_01 PR GREEN / MERGE PENDING` — puis merge permanent autorisé.
+## Closeout — ✅ MERGED + CANONICAL CI GREEN
+
+**PR #82 MERGÉE.** Base canonique `79a993b` → build `5433ff5` → correction `S9073` `f5097c9` →
+corrections de commentaires `fda8a2e` → **merge `609e876`** via
+`--merge --match-head-commit fda8a2e…` — **sans squash, sans `--admin`, sans force**. Gate
+re-vérifié **autoritativement juste avant** le merge : head SHA confirmé, `CLEAN` / `MERGEABLE`,
+**5/5 checks** (dont le gate **externe** `SonarCloud Code Analysis`), gate Sonar **`OK`**,
+**0 thread non résolu**.
+
+**CI canonique `31598565335` — 3/3 GREEN** sur `609e876`.
+
+### Trois findings de revue, tous de mon fait
+
+1. **`python:S9073`** — assertion composite dans le fichier de test (§12). **Faille de méthode** :
+   mon pré-scan ne couvrait que les modules. Corrigée, et la méthode l'est aussi.
+2. **Commentaire de câblage périmé** — il créditait encore « l'import différé » supprimé, et
+   nommait la direction de dépendance **à l'envers** (`estimator → aggregator` au lieu de
+   `aggregator → estimator`).
+3. **Docstring de `build_training_state` périmée** — elle affirmait encore que `zone_recovery` est
+   « vide à dessein » et appartient à la tranche suivante : exactement ce que cette PR change.
+
+Aucune n'affectait le comportement — les 106 tests passaient déjà. Mais les deux dernières
+faisaient **mentir le code sur lui-même**, ce qui coûte plus cher ici qu'ailleurs : la valeur de ce
+train tient largement à ce qu'un lecteur puisse faire confiance à ce que le code dit de ses propres
+limites. Les trois threads ont été résolus **après** correction poussée.
+
+**Statut final : `Sb_ZONE_RECOVERY_ESTIMATE_01 MERGED + CANONICAL GREEN + CLEANED`.**
+Tranche 4/5 de la file P0.4 **close**. Nouvelle base canonique : `609e876` (puis closeout).
+**`Sb_RECOVERY_EXPLAINER_01` n'est pas ouvert.**
