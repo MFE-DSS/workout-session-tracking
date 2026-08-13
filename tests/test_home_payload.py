@@ -18,8 +18,13 @@ import pytest
 # ─────────────────── shape contract ───────────────────
 
 
-def test_payload_always_has_three_keys(client):
-    """`build_home_payload` returns the 3 promised keys for any user."""
+def test_payload_always_has_its_promised_keys(client):
+    """`build_home_payload` returns the promised keys for any user.
+
+    Sb_RECOVERY_HOME_CONSUMER_01 added `training_state` — an **additive**
+    fourth tile. The assertion stays exact rather than becoming a subset check:
+    a loosened contract would no longer catch an accidentally dropped tile.
+    """
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.home import build_home_payload
@@ -27,7 +32,8 @@ def test_payload_always_has_three_keys(client):
     with SessionLocal() as db:
         user = db.query(User).first()
         payload = build_home_payload(db, user)
-    assert set(payload.keys()) == {"today", "last_session", "week"}
+    assert set(payload.keys()) == {
+        "today", "last_session", "week", "training_state"}
 
 
 def test_payload_for_user_with_no_session(client):

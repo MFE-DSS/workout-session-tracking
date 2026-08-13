@@ -43,6 +43,12 @@ def build_home_payload(
     today = _safe(_build_today, db, user, ref)
     last_session = _safe(_build_last_session, db, user, ref)
     week = _safe(_build_week, db, user, ref)
+    # Sb_RECOVERY_HOME_CONSUMER_01 — first consumer of the P0.4 chain. Wrapped
+    # in the same `_safe` guard as its siblings: if the aggregator or the
+    # explainer fails, this tile alone becomes unavailable and the
+    # recommendation stays usable. It is EXPLANATORY — it reads state and
+    # changes no training decision.
+    training_state = _safe(_build_training_state, db, user, ref)
 
     # Sb_27.5 — attach a deterministic narrative phrase per tile. The
     # narrative helpers are pure (no DB, no LLM) and never raise on
@@ -58,7 +64,20 @@ def build_home_payload(
         "today": today,
         "last_session": last_session,
         "week": week,
+        "training_state": training_state,
     }
+
+
+def _build_training_state(db: Session, user: User, now: datetime) -> dict[str, Any]:
+    """The P0.4 « État d'entraînement » tile. Read-only, one aggregation.
+
+    Deferred import: `training_state` pulls the behavioural producer and the
+    whole recovery chain, and this module is imported by the home route on a
+    hot path. Deferring matches how the sibling builders reach heavy services.
+    """
+    from app.services.home_training_state import build_home_training_state
+
+    return build_home_training_state(db, user.id, now=now)
 
 
 def _safe(fn, *args) -> dict[str, Any]:
