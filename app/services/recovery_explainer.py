@@ -237,8 +237,14 @@ AXIS_INSUFFICIENT_MESSAGE = (
 
 #: Un **seul** message agrégé pour une surface proactive sans aucune estimation
 #: — au lieu de onze fois le même constat.
+#:
+#: Formulation fixée par l'opérateur en `Sb_RECOVERY_HOME_CONSUMER_01`, au
+#: moment où un humain a commencé à la lire. Elle vit **ici** et non dans le
+#: consommateur : la décision produit « explicite sur la donnée manquante »
+#: garde un seul point de définition, et une deuxième surface héritera du même
+#: texte sans le recopier.
 GLOBAL_INSUFFICIENT_MESSAGE = (
-    "Pas encore assez de séances enregistrées pour estimer tes zones."
+    "Pas assez de données récentes pour estimer ton état d'entraînement."
 )
 
 

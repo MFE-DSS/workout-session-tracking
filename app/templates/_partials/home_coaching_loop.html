@@ -93,6 +93,54 @@
   </div>
   {% endif %}
 
+  {# ── État d'entraînement (Sb_RECOVERY_HOME_CONSUMER_01) ──
+     Premier affichage de la chaîne P0.4. Bloc EXPLICATIF : il décrit un état,
+     il ne prescrit rien et ne change aucune recommandation.
+
+     Distinct des deux surfaces d'état voisines : « État du jour » est ce que
+     l'utilisateur DÉCLARE, « disponibilité » est le KPI hérité 0–100 ; celui-ci
+     est ce qu'AUREN INFÈRE des séances enregistrées, d'où le sous-titre.
+
+     Aucun CTA ici : le widget « État du jour · à remplir » porte déjà celui de
+     la saisie, et le dupliquer créerait une double hiérarchie d'action. #}
+  {% if home.training_state and home.training_state.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <h2 class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;margin:0;">
+      {{ home.training_state.label }}
+    </h2>
+    <div class="text-dim" style="font-size:11px;margin-top:2px;">
+      {{ home.training_state.caption }}
+    </div>
+
+    {# Un SEUL message d'état de donnée, jamais onze. Il accompagne le contexte
+       plutôt que de le remplacer : sans estimation, une exposition cardio ou un
+       état déclaré restent des faits honnêtes à montrer. #}
+    {% if home.training_state.message %}
+    <div class="tile__hint" style="margin-top:var(--space-sm);font-size:13px;">
+      {{ home.training_state.message }}
+    </div>
+    {% endif %}
+
+    {% if home.training_state.entries %}
+    <ul style="list-style:none;padding:0;margin:var(--space-sm) 0 0 0;display:flex;flex-direction:column;gap:var(--space-sm);">
+      {% for item in home.training_state.entries %}
+      <li>
+        <div style="font-size:13px;">
+          {% if item.subject_label %}<b>{{ item.subject_label }}</b> — {% endif %}{{ item.message }}
+        </div>
+        {% if item.confidence_label %}
+        {# Libellé textuel : la confiance ne repose jamais sur la couleur seule. #}
+        <div class="text-dim" style="font-size:11px;margin-top:2px;">
+          {{ item.confidence_label }}
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+  {% endif %}
+
   {# ── This week ── #}
   {% if home.week and home.week.available %}
   <div class="card tile" style="padding:var(--space-md);">
