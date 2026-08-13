@@ -16,7 +16,9 @@ Re-check right before the merge call (state drifts while CI runs):
 2. **Required checks green** — `gh pr checks <N>` (every row `pass`, including the **external**
    `SonarCloud Code Analysis` gate, which is distinct from the internal `SonarCloud` job).
 3. **Sonar gate CLEAN** — `qualitygates/project_status?...&pullRequest=<N>` returns `status: OK`.
-   A red gate is **never** an artifact: query `issues/search` and fix the real cause.
+   A red gate is **never** an artifact: locate the exact finding with
+   `sonar list issues --pull-request <N>` and fix the real cause. Route and traps:
+   `auren-sonar-diagnosis`.
 4. **0 unresolved review thread** — GraphQL `reviewThreads`, count `isResolved == false`.
 5. **Mergeable** — `mergeStateStatus: CLEAN`, `mergeable: MERGEABLE`.
 6. **No scope drift** — the diff still matches the sprint's declared perimeter.
