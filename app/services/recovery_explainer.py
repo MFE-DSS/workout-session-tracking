@@ -452,6 +452,21 @@ _WHEN_TODAY = "aujourd'hui"
 _WHEN_RECENT = "récemment"
 
 
+def _when_phrase(age_days: int | None) -> str:
+    """Le mot de temps, **ou rien** si l'âge de la déclaration est inconnu.
+
+    `ReadinessSignal.age_days` vaut `None` par défaut et peut légalement l'être
+    alors que `overall` est renseigné. Rendre alors « récemment » affirmerait
+    une fraîcheur que rien n'atteste — la forme exacte de fabrication que cette
+    tranche interdit partout ailleurs. Un âge inconnu, ou négatif (horloge
+    décalée), ne produit donc **aucun** mot de temps : la déclaration est
+    rapportée sans prétendre savoir quand.
+    """
+    if age_days is None or age_days < 0:
+        return ""
+    return f" {_WHEN_TODAY}" if age_days == 0 else f" {_WHEN_RECENT}"
+
+
 def explain_readiness(readiness: ReadinessSignal) -> ExplanationItem | None:
     """La readiness telle qu'elle a été **déclarée**.
 
@@ -473,13 +488,13 @@ def explain_readiness(readiness: ReadinessSignal) -> ExplanationItem | None:
     if readiness.overall is None or readiness.sufficiency is Sufficiency.INSUFFICIENT:
         return None
 
-    when = _WHEN_TODAY if readiness.age_days == 0 else _WHEN_RECENT
+    when = _when_phrase(readiness.age_days)
     if readiness.overall < READINESS_DECLARED_LOW_BELOW:
-        message = f"Tu as déclaré te sentir moins frais {when}."
+        message = f"Tu as déclaré te sentir moins frais{when}."
     elif readiness.overall >= READINESS_DECLARED_GOOD_FROM:
-        message = f"Tu as déclaré te sentir en forme {when}."
+        message = f"Tu as déclaré te sentir en forme{when}."
     else:
-        message = f"Tu as déclaré ton état du jour {when}."
+        message = f"Tu as déclaré ton état{when}."
     return ExplanationItem(
         kind=KIND_READINESS,
         message=message,

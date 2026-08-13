@@ -61,6 +61,8 @@ ZONE_PECS = "pecs"
 ZONE_CORE = "core"
 ZONE_POSTERIOR = "posterior"
 MODALITY_BASIS_VELO = "modality: velo"
+TODAY_WORD = "aujourd'hui"
+RECENT_WORD = "récemment"
 SIGNAL_STRENGTH = "strength_load"
 SIGNAL_CARDIO = "cardio_exposure"
 AXIS_LOWER = "lower"
@@ -530,7 +532,7 @@ class TestReadiness:
 
     def test_a_poor_declaration_mentions_today(self):
         item = explain_readiness(declared_readiness(0.2))
-        assert "aujourd'hui" in item.message
+        assert TODAY_WORD in item.message
 
     def test_a_poor_declaration_never_speaks_of_the_body(self):
         item = explain_readiness(declared_readiness(0.2))
@@ -550,7 +552,41 @@ class TestReadiness:
 
     def test_a_middling_declaration_makes_no_direction_claim(self):
         item = explain_readiness(declared_readiness(0.55))
-        assert item.message == "Tu as déclaré ton état du jour aujourd'hui."
+        assert item.message == "Tu as déclaré ton état aujourd'hui."
+
+    def test_an_unknown_age_claims_no_recency(self):
+        """`age_days=None` ne doit pas devenir « récemment ».
+
+        Trouvé par la revue Gitar. `age_days` peut légalement être `None` alors
+        que `overall` est renseigné ; rendre « récemment » affirmerait une
+        fraîcheur que rien n'atteste — exactement la fabrication que cette
+        tranche interdit ailleurs.
+        """
+        unknown_age = ReadinessSignal(
+            overall=0.2, age_days=None, sufficiency=Sufficiency.SUFFICIENT)
+        assert explain_readiness(unknown_age).message == (
+            "Tu as déclaré te sentir moins frais.")
+
+    def test_an_unknown_age_still_reports_the_declaration(self):
+        unknown_age = ReadinessSignal(
+            overall=0.2, age_days=None, sufficiency=Sufficiency.SUFFICIENT)
+        assert explain_readiness(unknown_age) is not None
+
+    def test_a_negative_age_claims_no_recency_either(self):
+        """Une horloge décalée ne doit pas fabriquer une fraîcheur non plus."""
+        skewed = ReadinessSignal(
+            overall=0.2, age_days=-3, sufficiency=Sufficiency.SUFFICIENT)
+        assert RECENT_WORD not in explain_readiness(skewed).message
+
+    def test_a_negative_age_is_not_read_as_today(self):
+        skewed = ReadinessSignal(
+            overall=0.2, age_days=-3, sufficiency=Sufficiency.SUFFICIENT)
+        assert TODAY_WORD not in explain_readiness(skewed).message
+
+    def test_a_known_recent_age_still_says_recently(self):
+        """La correction borne le cas inconnu sans désactiver le cas connu."""
+        item = explain_readiness(declared_readiness(0.2, age_days=2))
+        assert RECENT_WORD in item.message
 
     def test_readiness_is_never_an_estimate_item(self):
         item = explain_readiness(declared_readiness(0.2))
@@ -562,7 +598,7 @@ class TestReadiness:
 
     def test_a_recent_but_not_today_declaration_drops_today(self):
         item = explain_readiness(declared_readiness(0.2, age_days=2))
-        assert "aujourd'hui" not in item.message
+        assert TODAY_WORD not in item.message
 
     def test_a_stale_declaration_is_only_context(self):
         stale = ReadinessSignal(
