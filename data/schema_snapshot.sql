@@ -19,6 +19,9 @@ CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
 -- index: ix_set_logs_exercise_kind_completed
 CREATE INDEX ix_set_logs_exercise_kind_completed ON set_logs (session_exercise_id, kind, completed);
 
+-- index: ix_training_preferences_user_id
+CREATE INDEX ix_training_preferences_user_id ON training_preferences (user_id);
+
 -- index: ix_user_program_exercises_user_program_session_id
 CREATE INDEX ix_user_program_exercises_user_program_session_id ON user_program_exercises (user_program_session_id);
 
@@ -105,6 +108,9 @@ CREATE TABLE squads ( id INTEGER NOT NULL, name VARCHAR(64) NOT NULL, owner_id I
 
 -- table: template_exercises
 CREATE TABLE template_exercises ( id INTEGER NOT NULL, template_id INTEGER NOT NULL, position INTEGER NOT NULL, code VARCHAR(8) NOT NULL, name VARCHAR(255) NOT NULL, set_scheme VARCHAR(255) NOT NULL, notes TEXT, substitutes_json TEXT, machine_slug VARCHAR(64), machine_family VARCHAR(64), PRIMARY KEY (id), FOREIGN KEY(template_id) REFERENCES workout_templates (id) ON DELETE CASCADE, CONSTRAINT uq_template_exercise_position UNIQUE (template_id, position) );
+
+-- table: training_preferences
+CREATE TABLE training_preferences ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, sessions_per_week INTEGER, focus_priorities TEXT, available_equipment TEXT, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_training_preferences_user_id UNIQUE (user_id) );
 
 -- table: user_program_exercises
 CREATE TABLE user_program_exercises ( id INTEGER NOT NULL, user_program_session_id INTEGER NOT NULL, position INTEGER NOT NULL, exercise_name VARCHAR(255) NOT NULL, variant_key VARCHAR(128), variant_group VARCHAR(128), equipment_family VARCHAR(64), movement_pattern VARCHAR(64), set_scheme VARCHAR(255) NOT NULL, notes TEXT, source_reason VARCHAR(255), PRIMARY KEY (id), CONSTRAINT uq_user_program_exercise_position UNIQUE (user_program_session_id, position), FOREIGN KEY(user_program_session_id) REFERENCES user_program_sessions (id) ON DELETE CASCADE );
