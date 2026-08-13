@@ -16,13 +16,32 @@ maintenue ici, la fenêtre « code neuf » est restée **gelée au 2026-04-10** 
 `71d36cd` elle contenait **79 854 lignes « neuves » pour un dépôt de 25 874 lignes** — soit 3,1×
 la taille totale du projet. Tout l'historique comptait comme neuf.
 
-Trois corrections ont été appliquées, toutes **sans toucher au Quality Gate, aux seuils, aux
+> ### ⛔ ARRÊT DUR — la correction principale N'A PAS ABOUTI
+>
+> **La définition New Code est toujours `previous_version` / 2026-04-10 après merge.** L'écriture
+> `settings/set sonar.leak.period=30` a été **acceptée et persiste à la relecture**, mais l'analyse
+> canonique complète du 2026-08-13T06:50:15Z (commit `6d16357`, ~8 h plus tard) rapporte encore
+> `mode: previous_version`, `date: 2026-04-10`, `new_lines: 81 825`. **Le réglage est inerte sur
+> SonarCloud.**
+>
+> Permission exacte manquante : **`admin` (« Administer ») sur le projet
+> `MFE-DSS_workout-session-tracking`**, portée par le groupe **`Owners`** de l'organisation
+> `mfe-dss` (`Members` ne porte que `securityhotspotadmin` + `issueadmin` — ce qui explique que
+> l'adjudication d'issues, elle, ait fonctionné). L'endpoint autoritatif
+> `/api/v2/new-code-definitions` renvoie **403** avec ce token ; `api/new_code_periods/*` renvoie
+> **404** (absent de Cloud).
+>
+> **Action opérateur requise** : UI SonarCloud → *Project Settings → New Code* → **Number of days
+> = 30**. Aucun commit ne peut le faire. Détail et preuves en §11.
+
+Corrections **effectivement** appliquées, toutes **sans toucher au Quality Gate, aux seuils, aux
 exigences de merge, ni aux imports d'analyseurs externes** :
 
-1. **New Code projet** : `previous_version` (hérité) → **30 jours glissants**.
-2. **Deux faux positifs CRITICAL** adjudiqués `FALSE POSITIVE`, preuve à l'appui, après
-   re-vérification du source.
-3. **Route de diagnostic Sonar** corrigée dans la documentation d'exploitation : la CLI `sonar`
+1. ❌ **New Code projet** — **ÉCHEC**, voir l'encadré ci-dessus. Le réglage écrit est **inerte**.
+   Ne pas lire la valeur `sonar.leak.period = 30` comme une fenêtre de 30 jours active.
+2. ✅ **Deux faux positifs CRITICAL** adjudiqués `FALSE POSITIVE`, preuve à l'appui, après
+   re-vérification du source. **Confirmé par l'analyse post-merge : `bugs` 20 → 18.**
+3. ✅ **Route de diagnostic Sonar** corrigée dans la documentation d'exploitation : la CLI `sonar`
    authentifiée remplace le contournement `component_tree` documenté comme obligatoire.
 
 Un quatrième constat est **documenté mais non corrigeable depuis le dépôt** : l'agent de
@@ -80,36 +99,114 @@ niveau PR.
 **Non modifiés** : définition du Quality Gate · seuils de couverture · seuils de sévérité ·
 required status checks · imports `sonar.python.ruff.reportPaths` / `sonar.python.bandit.reportPaths`.
 
-> **Preuve de mode différée.** SonarCloud n'expose pas de lecture `mode = NUMBER_OF_DAYS` : les
-> endpoints `new_code_periods/*` renvoient `404` et `/api/v2/new-code-definitions` renvoie `403`
-> avec ce token. La preuve autoritative est donc la **période rapportée par la première analyse
-> de la branche canonique** postérieure au changement — consignée en §3 (AFTER).
+> ### ⛔ La preuve est revenue NÉGATIVE — ce réglage est INERTE
+>
+> SonarCloud n'expose pas de lecture `mode = NUMBER_OF_DAYS` (`new_code_periods/*` → `404`,
+> `/api/v2/new-code-definitions` → `403`). La preuve autoritative était donc la période rapportée
+> par la première analyse canonique postérieure au changement. **Elle est revenue inchangée :**
+>
+> ```
+> analyse 6d16357 — 2026-08-13T06:50:15+0000
+> periods: [{"mode": "previous_version", "date": "2026-04-10T12:45:26+0000"}]
+> new_lines: 81 825   (79 854 avant — la fenêtre gelée continue de grossir)
+> ```
+>
+> `sonar.leak.period` est un réglage **hérité, sans effet** sur la définition New Code de
+> SonarCloud. L'écriture a été acceptée (204) et persiste — précisément **parce qu'elle ne pilote
+> plus rien**. Le vrai mécanisme est le store `new-code-definitions`, dont l'accès exige la
+> permission **`admin`** que ce token n'a pas.
+>
+> **La valeur `sonar.leak.period = 30` a été laissée en place** : elle est inoffensive et enregistre
+> l'intention. **Elle ne doit pas être lue comme une fenêtre de 30 jours active.**
+
+**Vérification de portée (faite, concluante).** Le sibling `MFE-DSS_platret-ops-app` renvoyant lui
+aussi `30`, la question « mon écriture a-t-elle fuité au niveau instance ? » a été tranchée :
+
+```bash
+sonar api GET '/api/settings/values?keys=sonar.leak.period'                              # {} — rien au global
+sonar api GET '/api/settings/values?component=workout-session-tracking&keys=sonar.leak.period'  # {} — projet orphelin intact
+```
+
+Le projet orphelin **non touché** ne renvoie rien : les valeurs sont bien **par projet** et
+l'écriture **n'a pas fuité**. `parentOrigin: INSTANCE` désigne l'origine de la *définition* du
+réglage, pas la portée de sa *valeur*. Que `platret` porte `30` de son côté corrobore au passage
+que `30` est bien la représentation SonarCloud d'une fenêtre de 30 jours.
 
 ---
 
 ## 3. Mesures BEFORE → AFTER
 
 **BEFORE** : `71d36cd`, analyse `609e876` du 2026-08-12T13:05:08Z.
-**AFTER** : voir l'appendice de closeout (§11) — nécessite une analyse de la branche canonique
-postérieure au merge.
+**AFTER** : analyse `6d16357` du **2026-08-13T06:50:15Z** (CI canonique `31675257579`, 3/3 verte).
+
+> **Facteur de confusion à déclarer.** Entre les deux analyses, **une autre session a mergé la PR
+> #83 (`Sb_RECOVERY_EXPLAINER_01`) en `534cbc2`**. `ncloc` +476 et la baisse de duplication lui
+> appartiennent, **pas à ce sprint**. Ce sprint n'a touché aucun fichier `app/`. Constat utile :
+> ce code entrant n'a produit **aucune issue nouvelle** (`code_smells` inchangé à 723, familles
+> externes inchangées).
 
 | Mesure | BEFORE | AFTER | Effet attribué |
 |---|---|---|---|
-| New Code — mode | `previous_version` (hérité INSTANCE) | *(closeout §11)* | **SETTING** |
-| New Code — début | `2026-04-10T12:45:26+0000` (124 j) | *(closeout §11)* | **SETTING** |
-| `new_lines` | **79 854** | *(closeout §11)* | **SETTING** |
-| `ncloc` | 25 874 | *(closeout §11)* | — (aucun code touché) |
-| Quality Gate projet | **ERROR** | *(closeout §11)* | SETTING + ADJUDICATION |
-| `reliability_rating` | **4.0 (D)** | *(closeout §11)* | **ADJUDICATION** (2 BUG retirés) |
-| `security_rating` | 2.0 (B) | *(closeout §11)* | — |
-| `sqale_rating` (maintenabilité) | 1.0 (A) | *(closeout §11)* | — |
-| `security_review_rating` | 3.0 (C) | *(closeout §11)* | — |
-| `coverage` | 92.2 % | *(closeout §11)* | — |
-| `new_coverage` | 91.7 % | *(closeout §11)* | SETTING (périmètre change) |
-| `duplicated_lines_density` | 0.4 % | *(closeout §11)* | — |
-| `new_duplicated_lines_density` | 0.115 % | *(closeout §11)* | SETTING |
-| Issues ouvertes — Sonar-native | **233** | *(closeout §11)* | ADJUDICATION (−2) |
-| Issues ouvertes — external | **516** | *(closeout §11)* | — |
+| New Code — mode | `previous_version` | **`previous_version`** | ⛔ **SETTING — SANS EFFET** |
+| New Code — début | `2026-04-10T12:45:26+0000` (124 j) | **`2026-04-10T12:45:26+0000`** (125 j) | ⛔ **SETTING — SANS EFFET** |
+| `new_lines` | 79 854 | **81 825** | fenêtre toujours gelée, elle grossit |
+| `ncloc` | 25 874 | 26 350 | **CODE CHANGE — PR #83, pas ce sprint** |
+| Quality Gate projet | **ERROR** (4 conditions) | **ERROR** (5 conditions) | voir §3bis |
+| `reliability_rating` | **4.0 (D)** | ✅ **3.0 (C)** | **ADJUDICATION** |
+| `security_rating` | 2.0 (B) | 2.0 (B) | — |
+| `sqale_rating` | 1.0 (A) | 1.0 (A) | — |
+| `security_review_rating` | 3.0 (C) | 3.0 (C) | — |
+| `coverage` | 92.2 % | ⚠️ **0.0 %** | **ARTEFACT CI** — voir §3bis |
+| `new_coverage` | 91.7 % (OK) | ⚠️ **0.0 % (ERROR)** | **ARTEFACT CI** — voir §3bis |
+| `duplicated_lines_density` | 0.4 % | 0.3 % | CODE CHANGE (PR #83) |
+| `new_duplicated_lines_density` | 0.115 % | 0.112 % | — |
+| `bugs` | 20 | ✅ **18** | **ADJUDICATION (−2)** |
+| `vulnerabilities` | 6 | 6 | — |
+| `code_smells` | 723 | 723 | — |
+| Issues ouvertes — total | 749 | ✅ **747** | **ADJUDICATION (−2)** |
+| Issues ouvertes — Sonar-native | 233 | ✅ **231** | **ADJUDICATION (−2)** |
+| Issues ouvertes — `external_ruff` | 510 | 510 | — |
+| Issues ouvertes — `external_bandit` | 6 | 6 | — |
+| `FALSE_POSITIVE` | 1 | ✅ **3** | **ADJUDICATION (+2)** |
+
+`FIXED` passe de 29 à 28 et le total de 779 à 778 : **purge**, pas régression —
+`sonar.dbcleaner.daysBeforeDeletingClosedIssues = 30`.
+
+### 3bis. Le gate reste ERROR, avec une condition de PLUS
+
+| Condition | Seuil | BEFORE | AFTER | Lecture |
+|---|---|---|---|---|
+| `new_coverage` | ≥ 80 | 91.7 **OK** | **0.0 ERROR** | ⚠️ **nouvelle défaillance — artefact** |
+| `new_duplicated_lines_density` | ≤ 3 | 0.1 OK | 0.1 OK | — |
+| `new_bugs_severity` | ≤ 9 | 20 | **15** | amélioré par l'adjudication |
+| `new_code_smells_severity` | ≤ 14 | 20 | 20 | inchangé |
+| `new_sca_severity_any_issue` | ≤ 9 | 10 | 10 | inchangé (risques de dépendances) |
+| `new_vulnerabilities_severity` | ≤ 9 | 10 | 10 | inchangé (100 % `external_bandit`) |
+
+`new_bugs_severity` 20 → 15 est cohérent avec le retrait des deux BUG CRITICAL, **mais la métrique
+n'est pas une somme linéaire** et sa formule exacte n'a pas été vérifiée dans cette session — le
+chiffre est rapporté, pas expliqué.
+
+**⚠️ `new_coverage` 0.0 — mécanisme établi, ce n'est pas une perte de tests.** Le merge de ce
+sprint ne touche que `docs/**` et `.claude/skills/**`. Le classifieur `Sb_CI_02_1` l'a donc rangé
+en **`NON_RUNTIME`** et a **volontairement sauté pytest + coverage** (log du run `31675257579` :
+*« Non-runtime change — full suite intentionally skipped »*). Sans `coverage.xml`, le scanner
+rapporte `coverage = 0.0`.
+
+Le commentaire de conception de `Sb_CI_02_1` (`ci.yml:346-351`) juge cela sûr :
+*« with no new lines of code, the quality gate does not evaluate `new_coverage` at all (verified on
+PR #69 and #70) »*. **Cette hypothèse est vraie au périmètre PR et fausse au périmètre
+branche/projet** : la fenêtre New Code gelée contient 81 825 lignes de code, donc `new_coverage`
+**est** évaluée — et vaut 0.
+
+> **C'est le défaut de New Code qui rend l'optimisation CI dangereuse.** Les deux se corrigent
+> d'un coup : une fenêtre de 30 jours glissants ne contiendrait pas de code un jour où seuls des
+> docs changent, et `new_coverage` cesserait d'être évaluée — exactement ce que `Sb_CI_02_1`
+> supposait déjà.
+
+**Transitoire** : la prochaine analyse canonique portant un `coverage.xml` (donc le prochain merge
+runtime) restaure la couverture. **Aucun changement fabriqué n'a été poussé pour la forcer** —
+c'est explicitement interdit par le périmètre de ce sprint.
 
 Conditions du gate BEFORE :
 
@@ -416,7 +513,64 @@ Observation annexe, non corrigée (hors périmètre) : ce fichier active `unitte
 
 ---
 
-## 11. Appendice de closeout — mesures AFTER
+## 11. Appendice de closeout
 
-*(Complété après merge, sur la première analyse de la branche canonique postérieure au changement
-de définition New Code. Voir §3 pour les valeurs BEFORE correspondantes.)*
+### Livraison
+
+| | |
+|---|---|
+| PR | **#84** — 5 checks verts (Gitar, SonarCloud, SonarCloud Code Analysis, lint, pytest+QA) |
+| Head mergé | `8d8f388` (merge épinglé `--match-head-commit`) |
+| Merge commit | **`6d16357`** — `--merge`, **sans squash, sans `--admin`, sans force** |
+| Gate Sonar PR | `status: OK` (0 new issue) · 0 thread non résolu · Gitar **Approved, no issues found** |
+| CI canonique | **`31675257579` — 3/3 success** sur `6d16357` |
+| Analyse Sonar canonique | `6d16357`, 2026-08-13T06:50:15Z |
+| Fichiers | 5 — `.claude/skills/**` ×2, `docs/ops/**` ×1, `docs/strategy/**` ×2. **0 fichier `app/`.** |
+
+La CI canonique **n'a pas été skippée** : deux fichiers sont sous `.claude/skills/`, hors du glob
+`paths-ignore: docs/**`. Le job `test` s'est bien exécuté, mais a classé le diff `NON_RUNTIME` et
+sauté la suite — d'où l'artefact de couverture analysé en §3bis.
+
+### ⛔ Arrêt dur — ce que ce sprint n'a PAS obtenu
+
+**PHASE 2 a échoué.** La définition New Code est inchangée. Preuve, permission manquante et action
+opérateur : encadrés §1 et §2.
+
+**Action requise, non automatisable :** UI SonarCloud → *Project Settings → New Code* →
+**Number of days = 30**, par un membre du groupe **`Owners`** de `mfe-dss`. Tant que ce n'est pas
+fait :
+
+- le gate projet restera `ERROR` pour une raison de périmètre et non de code ;
+- tout merge `NON_RUNTIME` continuera de faire tomber `new_coverage` à 0 sur la branche canonique.
+
+### Registres — mis à jour, après attente d'une session parallèle
+
+Au moment de rédiger le closeout, une **autre session** détenait des modifications **non
+commitées** dans `SPEC_REGISTRY.md` et `ROADMAP_AND_NEXT_STEPS.md` (sa ligne
+`Sb_RECOVERY_EXPLAINER_01`). Les stager aurait aspiré son travail en cours dans ce commit —
+`git add` prend le fichier entier, pas un hunk. **Les deux fichiers ont donc été laissés
+intacts** jusqu'à ce que cette session commite et pousse son closeout (`d68fa3d`).
+
+Une fois `origin` et le local alignés sur `d68fa3d` (0 commit d'écart, rien de non poussé chez
+l'autre agent), les deux registres ont été mis à jour :
+
+- statut → **`🟠 MERGED — CORRECTION NEW CODE NON ABOUTIE, action opérateur requise`** ;
+- la phrase « Corrigé en 30 jours glissants » a été **remplacée par le constat d'échec** dans les
+  deux registres — elle était fausse et aurait survécu comme un fait.
+
+### Vérification de portée des mutations SonarCloud
+
+Aucune fuite hors du projet ciblé — prouvé par le projet orphelin non touché (§2). Deux mutations
+seulement, toutes deux relues :
+
+| Mutation | État final |
+|---|---|
+| `sonar.leak.period` = `30` | persiste, **inerte**, laissée en place, documentée comme telle |
+| `pythonbugs:S6466` `AZ8LG_c4ZSTbxoM2Q4sD` | `FALSE_POSITIVE` / `lastChangeSource: USER` + justification |
+| `Web:S7930` `AZ9vNjbE3y4VQkKuhkCW` | `FALSE_POSITIVE` / `lastChangeSource: USER` + justification |
+
+### Observation d'exploitation
+
+`gitar-bot[bot]` signale que le budget de traitement automatique de son essai est **épuisé pour la
+période** : les revues automatiques sont **en pause** et devront être déclenchées à la main
+(commentaire `Gitar review`) jusqu'à mise à niveau. Ce sprint a bien reçu sa revue (Approved).
