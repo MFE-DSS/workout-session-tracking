@@ -66,12 +66,20 @@ def pytester_like_run(tmp_path):
         path.unlink(missing_ok=True)
 
 
+CONFTEST = REPO_ROOT / "tests" / "conftest.py"
+
+
+def _read(path: pathlib.Path) -> str:
+    """Un seul point de lecture — évite de répéter l'encodage partout."""
+    return path.read_text(encoding="utf-8")
+
+
 def _workflow() -> str:
-    return WORKFLOW.read_text(encoding="utf-8")
+    return _read(WORKFLOW)
 
 
 def _script() -> str:
-    return CI_SCRIPT.read_text(encoding="utf-8")
+    return _read(CI_SCRIPT)
 
 
 # ─────────────────── WS4 — nettoyage du répertoire temporaire ───────────────────
@@ -98,12 +106,12 @@ class TestFixtureTempCleanup:
         assert outcome != 0
 
     def test_the_fixture_deletes_only_its_own_directory(self):
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         teardown = source.split("finally:", 1)[1]
         assert "rmtree(tmp_dir" in teardown
 
     def test_the_fixture_never_removes_a_shared_parent(self):
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         teardown = source.split("finally:", 1)[1]
         assert "gettempdir" not in teardown
 
@@ -113,7 +121,7 @@ class TestFixtureTempCleanup:
         Le teardown mentionne `var/workout.db` précisément pour documenter qu'il
         n'y touche pas ; un scan brut échouerait sur sa propre explication.
         """
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         code = "\n".join(
             line.split("#", 1)[0] for line in source.splitlines()
         )
@@ -121,21 +129,21 @@ class TestFixtureTempCleanup:
 
     def test_cleanup_runs_in_a_finally_block(self):
         """Un nettoyage après le `with` est sauté quand un test lève."""
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         assert re.search(r"\n    finally:\n", source)
 
     def test_the_fixture_stays_function_scoped(self):
         """L'isolation par test n'est pas négociée par ce sprint."""
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         assert "@pytest.fixture()" in source
 
     def test_no_session_scoped_client_was_introduced(self):
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         assert 'scope="session"' not in source
 
     def test_each_invocation_gets_its_own_directory(self):
         """Deux invocations ⇒ deux `mkdtemp` : jamais de partage entre workers."""
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         assert source.count("tempfile.mkdtemp(") == 1
 
 
@@ -239,11 +247,11 @@ class TestDiagnostics:
         assert "/usr/bin/time -v" in _workflow()
 
     def test_the_sampler_emits_a_greppable_prefix(self):
-        assert 'PREFIX = "CI_RESOURCE"' in SAMPLER.read_text(encoding="utf-8")
+        assert 'PREFIX = "CI_RESOURCE"' in _read(SAMPLER)
 
     def test_the_sampler_streams_to_stdout(self):
         """Une mesure uploadée après l'arrêt du runner n'existe pas."""
-        assert "flush=True" in SAMPLER.read_text(encoding="utf-8")
+        assert "flush=True" in _read(SAMPLER)
 
     def test_the_sampler_runs_and_emits_a_host_header(self):
         result = subprocess.run(
@@ -287,15 +295,15 @@ class TestDiagnostics:
         assert values  # présents ou explicitement "na", jamais fabriqués
 
     def test_the_sampler_dumps_no_environment(self):
-        source = SAMPLER.read_text(encoding="utf-8")
+        source = _read(SAMPLER)
         assert "os.environ.items" not in source
 
     def test_the_sampler_reads_only_one_env_var(self):
-        source = SAMPLER.read_text(encoding="utf-8")
+        source = _read(SAMPLER)
         assert source.count("os.environ") == 1
 
     def test_the_sampler_never_raises_out_of_its_loop(self):
-        source = SAMPLER.read_text(encoding="utf-8")
+        source = _read(SAMPLER)
         assert "except Exception" in source
 
 
@@ -305,11 +313,11 @@ class TestDiagnostics:
 class TestModulePurgeMeasured:
     def test_the_purge_is_still_present(self):
         """Mesurer, pas supprimer : l'isolation reste autoritative."""
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         assert "sys.modules.pop(mod_name, None)" in source
 
     def test_the_purge_scope_is_unchanged(self):
-        source = (REPO_ROOT / "tests" / "conftest.py").read_text(encoding="utf-8")
+        source = _read(CONFTEST)
         assert 'm == "app" or m.startswith("app.")' in source
 
     def test_a_representative_app_module_count_is_measurable(self, client):
@@ -318,3 +326,88 @@ class TestModulePurgeMeasured:
 
         loaded = [m for m in live_sys.modules if m == "app" or m.startswith("app.")]
         assert len(loaded) > 0
+
+
+# ─────────────────── Sb_OPS_CI_SCALE_01 — partition des shards ───────────────────
+
+
+def _shards():
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location(
+        "ci_test_shards", REPO_ROOT / "scripts" / "ci_test_shards.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class TestShardPartition:
+    def test_the_union_is_the_whole_suite(self):
+        """Un fichier oublié réduirait la couverture en gardant tout au vert."""
+        mod = _shards()
+        union: set[str] = set()
+        for shard in mod.build_shards():
+            union |= set(shard)
+        assert union == set(mod.canonical_test_files())
+
+    def test_the_shards_are_disjoint(self):
+        mod = _shards()
+        first, second = mod.build_shards()
+        assert set(first) & set(second) == set()
+
+    def test_the_partition_verifier_accepts_the_repository(self):
+        _shards().verify()
+
+    def test_the_partition_is_deterministic(self):
+        mod = _shards()
+        first = mod.build_shards()
+        second = mod.build_shards()
+        assert first == second
+
+    def test_every_file_is_a_real_test_module(self):
+        mod = _shards()
+        for shard in mod.build_shards():
+            for name in shard:
+                assert (REPO_ROOT / name).is_file()
+
+    def test_the_excluded_acceptance_file_is_never_sharded(self):
+        """La même exclusion que la commande canonique, définie une seule fois."""
+        mod = _shards()
+        flat = [f for shard in mod.build_shards() for f in shard]
+        assert "tests/test_v1_acceptance.py" not in flat
+
+    def test_the_shards_are_balanced_within_one_file(self):
+        mod = _shards()
+        sizes = [len(s) for s in mod.build_shards()]
+        assert max(sizes) - min(sizes) <= 1
+
+    def test_a_shard_index_outside_the_range_is_refused(self):
+        mod = _shards()
+        with pytest.raises(ValueError):
+            mod.shard_for(3, 2)
+
+    def test_no_test_file_is_split_across_shards(self):
+        """Granularité FICHIER : plusieurs modules sont sensibles à l'état."""
+        mod = _shards()
+        flat = [f for shard in mod.build_shards() for f in shard]
+        assert len(flat) == len(set(flat))
+
+    def test_the_workflow_verifies_the_partition_before_running(self):
+        assert "ci_test_shards.py --verify" in _workflow()
+
+    def test_the_workflow_combines_coverage_centrally(self):
+        assert "coverage combine" in _workflow()
+
+    def test_the_workflow_emits_one_authoritative_xml(self):
+        assert "coverage xml -o coverage.xml" in _workflow()
+
+    def test_the_required_check_name_is_preserved(self):
+        """Une matrice nue l'aurait renommé et rendu toute PR non fusionnable."""
+        assert "name: pytest + QA scripts" in _workflow()
+
+    def test_the_aggregator_fails_when_a_shard_fails(self):
+        assert "needs.test-shard.result != 'success'" in _workflow()
+
+    def test_coverage_is_not_weakened_by_sharding(self):
+        for banned in ("--cov-fail-under=0", "testmon", "--no-cov"):
+            assert banned not in _workflow()

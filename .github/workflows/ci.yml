@@ -24,8 +24,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: pytest + QA scripts
+  test-shard:
+    name: pytest shard ${{ matrix.shard }}
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     runs-on: ubuntu-latest
     # Sx_UI_07.1 CI headroom — full pytest+coverage can exceed 35 min on slow runners; gates unchanged.
     timeout-minutes: 45
@@ -111,15 +115,27 @@ jobs:
         # reported as a validated fix. The canonical default lives in the script
         # and nowhere else; an unset repository variable yields an empty string,
         # which `:-` correctly treats as absent.
+        #
+        # Sb_OPS_CI_SCALE_01 — this shard runs ONLY its slice of the test files.
+        # The suite needs ~16.6 GB (measured ~4.4 MB/test over 3 861 tests) on a
+        # 15.99 GB machine, and that total is invariant to the worker count, so
+        # the only way under the ceiling without dropping a single test is fewer
+        # tests PER MACHINE. Coverage is written to a per-shard data file and
+        # combined downstream into ONE authoritative report.
         env:
           CI_PYTEST_WORKERS: ${{ vars.CI_PYTEST_WORKERS }}
+          COVERAGE_FILE: .coverage.shard-${{ matrix.shard }}
         run: |
           python scripts/ci_resource_sampler.py &
           SAMPLER_PID=$!
           trap 'kill "${SAMPLER_PID}" 2>/dev/null || true' EXIT
 
+          SHARD_FILES="$(python scripts/ci_test_shards.py --shard ${{ matrix.shard }})"
+          echo "[ci-pytest] shard ${{ matrix.shard }} file count: $(echo "${SHARD_FILES}" | wc -w)"
+
           set +e
-          /usr/bin/time -v bash scripts/run_ci_pytest.sh
+          # shellcheck disable=SC2086 # deliberate word splitting: a file list
+          /usr/bin/time -v bash scripts/run_ci_pytest.sh ${SHARD_FILES}
           PYTEST_RC=$?
           set -e
 
@@ -135,13 +151,116 @@ jobs:
       # Java 21 scanner (source `.../app` + `app/config.py`) and broke ALL
       # coverage (0.0% / 6456 uncovered) — dropping it is the fix.
 
+      - name: Verify the shard partition is exact
+        if: steps.scope.outputs.runtime == 'true'
+        # Refuses to run unless union(shards) == suite and the shards are
+        # disjoint. A dropped file would keep every job green while quietly
+        # reducing coverage — that is the failure this guard exists to prevent.
+        run: python scripts/ci_test_shards.py --verify
+
+      - name: Upload shard coverage data
+        if: always() && steps.scope.outputs.runtime == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-data-${{ matrix.shard }}
+          path: .coverage.shard-${{ matrix.shard }}
+          retention-days: 7
+          if-no-files-found: warn
+
+  test:
+    # Sb_OPS_CI_SCALE_01 — downstream aggregator. Keeps the required check name
+    # "pytest + QA scripts" EXACTLY as branch protection expects: a bare matrix
+    # would have renamed it to "... (1)" / "... (2)" and silently made every PR
+    # unmergeable. The shards do the running; this job proves the result and
+    # owns the single authoritative coverage report.
+    #
+    # It also hosts the QA / migration checks, which are cheap, must run once,
+    # and would be wasteful (and confusing) duplicated per shard.
+    name: pytest + QA scripts
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [test-shard]
+    # `always()` so a shard failure still produces this required check with a
+    # verdict instead of leaving it Expected forever.
+    if: always()
+    env:
+      PYTHONPATH: .
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Sb_CI_02_1 — full history so the change-scope classifier can diff against the
+          # PR base / previous push commit. Mirrors the lint and sonar jobs.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # Sb_CI_02_1 — path-aware gating. Classify the change set ONCE, then gate the
+      # expensive steps below. The job itself ALWAYS runs and always reports, so the
+      # required check "pytest + QA scripts" can never stay Expected/Pending.
+      # Fail-safe: any unknown path, an empty diff, or a failing diff command yields
+      # RUNTIME_OR_INFRA and the full pipeline runs. Only `docs/**` and
+      # `.claude/skills/**` can produce NON_RUNTIME (see scripts/classify_change_scope.py).
+      - name: Classify change scope (Sb_CI_02_1)
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -uo pipefail
+          changed=""
+          if [ -n "${BASE_SHA:-}" ] \
+             && [ "${BASE_SHA}" != "0000000000000000000000000000000000000000" ] \
+             && git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            changed="$(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" || true)"
+          fi
+          # An empty list means "undetermined" to the classifier, which then returns
+          # RUNTIME_OR_INFRA. Never skip the suite on ignorance.
+          printf '%s\n' "${changed}" | python scripts/classify_change_scope.py --github-output
+
+      - name: Install dependencies
+        if: steps.scope.outputs.runtime == 'true'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Sb_20.1 — pytest-cov + coverage[toml] produce coverage.xml
+          # for SonarCloud. httpx is required by the FastAPI TestClient.
+          # Sb_OPS.ci-efficiency — pytest-xdist runs the suite in parallel
+          # (`-n auto`); coverage is combined across workers by pytest-cov.
+          pip install pytest pytest-cov pytest-xdist "coverage[toml]" httpx
+
+      - name: Fail if any shard failed
+        # The aggregator must never report success over a red shard.
+        if: needs.test-shard.result != 'success' && steps.scope.outputs.runtime == 'true'
+        run: |
+          echo "A pytest shard did not succeed: ${{ needs.test-shard.result }}"
+          exit 1
+
+      - name: Download shard coverage data
+        if: steps.scope.outputs.runtime == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: coverage-data-*
+          merge-multiple: true
+
+      - name: Combine shard coverage into ONE authoritative report
+        if: steps.scope.outputs.runtime == 'true'
+        # coverage.py's native parallel mode: each shard wrote `.coverage.shard-N`
+        # with `relative_files = true` (pyproject), so paths resolve identically
+        # across machines and combine cleanly. Sonar consumes this single file —
+        # no shard-local report is ever published, and coverage is not weakened.
+        run: |
+          ls -la .coverage.shard-* || true
+          python -m coverage combine .coverage.shard-*
+          python -m coverage xml -o coverage.xml
+          python -m coverage report --skip-empty | tail -5
+
       - name: Upload coverage artifact
-        # Kept even if pytest failed so the SonarCloud step (Sb_20.4)
-        # can still publish the partial report. Retention 7 days is
-        # sufficient for debug.
-        # Sb_CI_02_1 — `always()` still applies WITHIN a runtime run (upload a partial
-        # report after a pytest failure), but a NON_RUNTIME run produces no coverage.xml
-        # at all, so the upload is skipped and the sonar job tolerates its absence.
         if: always() && steps.scope.outputs.runtime == 'true'
         uses: actions/upload-artifact@v4
         with:
@@ -209,6 +328,7 @@ jobs:
           echo "Still enforced on this PR: the entire lint job — ruff budget, bandit,"
           echo "actionlint, shellcheck, pip-audit, gitleaks, spec protocol, auth scope matrix"
           echo "— plus Gitar review and the SonarCloud quality gate."
+
 
   lint:
     # Sb_26.1 — ruff + bandit + actionlint + shellcheck.
