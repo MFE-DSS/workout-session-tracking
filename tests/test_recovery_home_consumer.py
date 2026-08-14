@@ -24,7 +24,20 @@ from sqlalchemy import event
 
 from tests.helpers import get_test_user_id
 
-NOW = datetime(2026, 8, 13, 9, 0, tzinfo=UTC)
+#: Ancré sur l'horloge **réelle**, et non sur une date figée.
+#:
+#: Correctif d'un défaut introduit par `Sb_RECOVERY_HOME_CONSUMER_01` : plusieurs
+#: tests comparent la vue-modèle (construite avec ce `NOW`) au HTML rendu par
+#: `GET /`, qui utilise forcément l'horloge réelle. Avec une date figée, les deux
+#: coïncidaient le jour de l'écriture puis divergeaient : une séance « il y a
+#: 1 jour » relative à la constante vieillit d'un jour de plus chaque jour réel,
+#: change de bande de récupération, et le message rendu cesse de correspondre.
+#: La canonique était donc **rouge sur ce test** sans qu'aucun code produit
+#: n'ait bougé — ce qui bloquait aussi ce sprint d'infrastructure.
+#:
+#: Toutes les échéances de ce fichier sont **relatives** à cette ancre, donc la
+#: rendre réelle aligne les deux horloges définitivement.
+NOW = datetime.now(UTC)
 
 CHEST = "Développé couché barre"
 LEGS = "Hack squat"

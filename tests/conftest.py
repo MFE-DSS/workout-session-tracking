@@ -20,7 +20,7 @@ and pins that the hash actually verifies, so a passlib/bcrypt change fails loudl
 """
 from __future__ import annotations
 
-import os
+import shutil
 import sys
 import tempfile
 from pathlib import Path
@@ -52,47 +52,57 @@ def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
 
     from app import main as main_mod  # noqa: E402
 
-    with TestClient(main_mod.app) as c:
-        # Auto-create a test user and log in so every subsequent
-        # request carries the session cookie. This makes all V1
-        # tests pass unchanged under the V2 auth layer.
-        from starlette.responses import Response
-
-        from app.database import SessionLocal
-        from app.models.user import User
-        from app.services.auth import create_session_cookie
-
-        with SessionLocal() as db:
-            # Precomputed hash of "testpass" — same password, no bcrypt call here.
-            user = User(username="testuser", password_hash=TESTPASS_BCRYPT_HASH)
-            db.add(user)
-            db.commit()
-            db.refresh(user)
-            user_id = user.id
-
-        # Establish the already-assumed authenticated state WITHOUT a login round trip.
-        # The token is produced by the PRODUCTION helper, so the signing contract is never
-        # duplicated here: if it changes, this fixture follows it automatically.
-        # Produce the real `Set-Cookie` header with the production helper, then let httpx
-        # itself parse it into the jar. This gives byte-for-byte parity with a genuine login
-        # (same domain normalisation, same flags), so a later server-side `delete_cookie`
-        # matches and logout still works — pinned by test_logout_still_clears_the_session.
-        # Hand-setting the jar entry does NOT achieve this: httpx stores a dotless host as
-        # `testserver.local` with `domain_specified=False`, which a manual `set(domain=...)`
-        # cannot reproduce.
-        probe = Response()
-        create_session_cookie(probe, user_id)
-        c.cookies.extract_cookies(
-            httpx.Response(
-                200,
-                headers=[("set-cookie", probe.headers["set-cookie"])],
-                request=httpx.Request("GET", str(c.base_url)),
-            )
-        )
-
-        yield c
-
     try:
-        os.unlink(db_path)
-    except OSError:
-        pass
+        with TestClient(main_mod.app) as c:
+            # Auto-create a test user and log in so every subsequent
+            # request carries the session cookie. This makes all V1
+            # tests pass unchanged under the V2 auth layer.
+            from starlette.responses import Response
+
+            from app.database import SessionLocal
+            from app.models.user import User
+            from app.services.auth import create_session_cookie
+
+            with SessionLocal() as db:
+                # Precomputed hash of "testpass" — same password, no bcrypt call here.
+                user = User(username="testuser", password_hash=TESTPASS_BCRYPT_HASH)
+                db.add(user)
+                db.commit()
+                db.refresh(user)
+                user_id = user.id
+
+            # Establish the already-assumed authenticated state WITHOUT a login round trip.
+            # The token is produced by the PRODUCTION helper, so the signing contract is never
+            # duplicated here: if it changes, this fixture follows it automatically.
+            # Produce the real `Set-Cookie` header with the production helper, then let httpx
+            # itself parse it into the jar. This gives byte-for-byte parity with a genuine login
+            # (same domain normalisation, same flags), so a later server-side `delete_cookie`
+            # matches and logout still works — pinned by test_logout_still_clears_the_session.
+            # Hand-setting the jar entry does NOT achieve this: httpx stores a dotless host as
+            # `testserver.local` with `domain_specified=False`, which a manual `set(domain=...)`
+            # cannot reproduce.
+            probe = Response()
+            create_session_cookie(probe, user_id)
+            c.cookies.extract_cookies(
+                httpx.Response(
+                    200,
+                    headers=[("set-cookie", probe.headers["set-cookie"])],
+                    request=httpx.Request("GET", str(c.base_url)),
+                )
+            )
+
+            yield c
+    finally:
+        # Sb_OPS_CI_RUNNER_STABILITY_01 (WS4) — remove the WHOLE directory this
+        # invocation created, not just the database file inside it.
+        #
+        # Two defects fixed together. The old cleanup unlinked `test.db` and left
+        # the `mkdtemp` directory behind — 53 765 empty directories had
+        # accumulated on the development machine. And it sat AFTER the `with`
+        # block, so a failing test propagated out of the generator and skipped it
+        # entirely: the runs that leaked most were the ones that went wrong.
+        #
+        # `finally` covers the success path, the failure path and teardown errors.
+        # `tmp_dir` is this invocation's own `mkdtemp` result, so the deletion can
+        # never reach a shared parent, another worker's directory, or var/workout.db.
+        shutil.rmtree(tmp_dir, ignore_errors=True)
