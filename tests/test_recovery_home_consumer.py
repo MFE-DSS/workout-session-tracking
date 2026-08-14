@@ -32,7 +32,8 @@ from tests.helpers import get_test_user_id
 #: coïncidaient le jour de l'écriture puis divergeaient : une séance « il y a
 #: 1 jour » relative à la constante vieillit d'un jour de plus chaque jour réel,
 #: change de bande de récupération, et le message rendu cesse de correspondre.
-#: Le test échouait donc à retardement, sans qu'aucun code produit n'ait bougé.
+#: La canonique était donc **rouge sur ce test** sans qu'aucun code produit
+#: n'ait bougé — le test échouait à retardement.
 #:
 #: Toutes les échéances de ce fichier sont **relatives** à cette ancre, donc la
 #: rendre réelle aligne les deux horloges définitivement.
