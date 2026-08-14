@@ -33,7 +33,7 @@ from tests.helpers import get_test_user_id
 #: 1 jour » relative à la constante vieillit d'un jour de plus chaque jour réel,
 #: change de bande de récupération, et le message rendu cesse de correspondre.
 #: La canonique était donc **rouge sur ce test** sans qu'aucun code produit
-#: n'ait bougé — ce qui bloquait aussi ce sprint d'infrastructure.
+#: n'ait bougé — le test échouait à retardement.
 #:
 #: Toutes les échéances de ce fichier sont **relatives** à cette ancre, donc la
 #: rendre réelle aligne les deux horloges définitivement.

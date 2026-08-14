@@ -432,11 +432,36 @@ def profile_page(
         for field in MEASUREMENT_FIELDS
     }
 
+    # Sb_TRAINING_PREFERENCES_01 — declared preferences, read-only here.
+    from app.services.training_preferences import (
+        EQUIPMENT_FAMILY_VOCAB,
+        FOCUS_PRIORITY_VOCAB,
+        SESSIONS_PER_WEEK_MAX,
+        SESSIONS_PER_WEEK_MIN,
+        equipment_family_label,
+        focus_priority_label,
+        get_training_preferences,
+    )
+
+    preferences = get_training_preferences(db, user.id)
+
     return templates.TemplateResponse(
         request, "profile.html",
         {
             "page_title": "Profil",
             "user": user,
+            "preferences": preferences,
+            "focus_vocab": [
+                (key, focus_priority_label(key)) for key in FOCUS_PRIORITY_VOCAB
+            ],
+            "equipment_vocab": [
+                (key, equipment_family_label(key)) for key in EQUIPMENT_FAMILY_VOCAB
+            ],
+            "sessions_range": list(
+                range(SESSIONS_PER_WEEK_MIN, SESSIONS_PER_WEEK_MAX + 1)
+            ),
+            "pref_saved": request.query_params.get("pref_saved") == "1",
+            "pref_error": request.query_params.get("pref_error") == "1",
             "session_count": session_count,
             "completed_count": completed_count,
             "quality_svg": quality_svg,
@@ -500,6 +525,66 @@ async def profile_body_submit(
     db.commit()
 
     return RedirectResponse(url="/profile", status_code=303)
+
+
+@router.post("/profile/preferences", response_model=None)
+async def profile_preferences_submit(
+    request: Request,
+    sessions_per_week: Annotated[str, Form()] = "",
+    focus_1: Annotated[str, Form()] = "",
+    focus_2: Annotated[str, Form()] = "",
+    focus_3: Annotated[str, Form()] = "",
+    equipment: Annotated[list[str], Form()] = None,
+    equipment_declared: Annotated[str, Form()] = "",
+    db: DbSession = None,
+    user: CurrentUser = None,
+):
+    """Save declared training preferences (Sb_TRAINING_PREFERENCES_01).
+
+    The owner is `CurrentUser`, resolved from the authenticated session — the
+    form never carries a `user_id`, so a forged one cannot escape the owner
+    scope. There is nothing to trust because nothing is read.
+
+    **Nothing here invents a value.** An empty cadence field stays `None`; the
+    equipment list is only stored when the hidden `equipment_declared` marker
+    proves the section was actually submitted, which is what keeps "no
+    declaration" distinguishable from "declared nothing available".
+    """
+    from app.services.training_preferences import (
+        PreferenceValidationError,
+        save_training_preferences,
+    )
+
+    cadence: int | None = None
+    raw_cadence = sessions_per_week.strip()
+    if raw_cadence:
+        try:
+            cadence = int(raw_cadence)
+        except ValueError:
+            return RedirectResponse(url="/profile?pref_error=1", status_code=303)
+
+    ordered = [slot.strip() for slot in (focus_1, focus_2, focus_3) if slot.strip()]
+    # An untouched priority section leaves all three selects empty. That is
+    # "not declared" (None), not "explicitly no priority" ([]) — the two are
+    # different statements and the contract keeps them apart.
+    priorities: list[str] | None = ordered if ordered else None
+
+    families: list[str] | None = None
+    if equipment_declared.strip():
+        families = list(equipment or [])
+
+    try:
+        save_training_preferences(
+            db,
+            user.id,
+            sessions_per_week=cadence,
+            focus_priorities=priorities,
+            available_equipment=families,
+        )
+    except PreferenceValidationError:
+        return RedirectResponse(url="/profile?pref_error=1", status_code=303)
+
+    return RedirectResponse(url="/profile?pref_saved=1", status_code=303)
 
 
 @router.post("/profile/measurements", response_model=None)
