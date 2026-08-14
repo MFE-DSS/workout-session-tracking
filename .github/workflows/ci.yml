@@ -95,15 +95,31 @@ jobs:
         # durations. The suite is xdist-safe (per-test tempdir SQLite in
         # tests/conftest.py); pytest-cov merges per-worker coverage so
         # coverage.xml stays complete for the SonarCloud sensor.
+        # Sb_OPS_CI_RUNNER_STABILITY_01 — the flags now live in
+        # `scripts/run_ci_pytest.sh`, the single source of truth that an
+        # operator runs verbatim. A guard test fails if this step stops
+        # invoking it, so "CI-identical" can no longer drift.
+        #
+        # WS1 — a resource sampler streams `CI_RESOURCE` lines to STDOUT during
+        # the run. Three runner shutdowns skipped every later step (artifact
+        # upload included), so telemetry must be in the live log to survive.
+        # WS2 — `/usr/bin/time -v` reports peak RSS. Both are diagnostics only:
+        # pytest's exit code is captured and re-raised unchanged.
+        env:
+          CI_PYTEST_WORKERS: ${{ vars.CI_PYTEST_WORKERS || 'auto' }}
         run: |
-          pytest \
-            -n auto \
-            --dist worksteal \
-            --ignore=tests/test_v1_acceptance.py \
-            --cov=app \
-            --cov-report=xml \
-            --cov-report=term \
-            -q
+          python scripts/ci_resource_sampler.py &
+          SAMPLER_PID=$!
+          trap 'kill "${SAMPLER_PID}" 2>/dev/null || true' EXIT
+
+          set +e
+          /usr/bin/time -v bash scripts/run_ci_pytest.sh
+          PYTEST_RC=$?
+          set -e
+
+          kill "${SAMPLER_PID}" 2>/dev/null || true
+          echo "[ci-pytest] pytest exit code: ${PYTEST_RC}"
+          exit "${PYTEST_RC}"
 
       # Sb_OPS.sonar-coverage-fix — the former "Prefix coverage paths with app/"
       # step is REMOVED. `[tool.coverage.run] relative_files = true` (pyproject)
