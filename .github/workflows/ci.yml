@@ -124,7 +124,10 @@ jobs:
         # combined downstream into ONE authoritative report.
         env:
           CI_PYTEST_WORKERS: ${{ vars.CI_PYTEST_WORKERS }}
-          COVERAGE_FILE: .coverage.shard-${{ matrix.shard }}
+          # NOT a dotfile: actions/upload-artifact@v4 silently skips hidden
+          # files, so `.coverage.shard-N` uploaded nothing and the combine step
+          # found no data. A visible name removes the whole class of problem.
+          COVERAGE_FILE: coverage-shard-${{ matrix.shard }}.data
         run: |
           python scripts/ci_resource_sampler.py &
           SAMPLER_PID=$!
@@ -163,9 +166,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-data-${{ matrix.shard }}
-          path: .coverage.shard-${{ matrix.shard }}
+          path: coverage-shard-${{ matrix.shard }}.data
           retention-days: 7
-          if-no-files-found: warn
+          # `error`, not `warn`: a missing shard would silently yield PARTIAL
+          # coverage that Sonar would then judge as if it were complete.
+          if-no-files-found: error
 
   test:
     # Sb_OPS_CI_SCALE_01 — downstream aggregator. Keeps the required check name
@@ -255,8 +260,15 @@ jobs:
         # across machines and combine cleanly. Sonar consumes this single file —
         # no shard-local report is ever published, and coverage is not weakened.
         run: |
-          ls -la .coverage.shard-* || true
-          python -m coverage combine .coverage.shard-*
+          find . -maxdepth 1 -name 'coverage-shard-*.data' -exec ls -la {} +
+          # Fail loudly if a shard's data never arrived, rather than combining
+          # whatever is present and publishing an understated coverage figure.
+          found=$(find . -maxdepth 1 -name 'coverage-shard-*.data' | wc -l)
+          if [ "${found}" -ne 2 ]; then
+            echo "expected 2 shard coverage files, found ${found}"
+            exit 1
+          fi
+          python -m coverage combine coverage-shard-*.data
           python -m coverage xml -o coverage.xml
           python -m coverage report --skip-empty | tail -5
 
