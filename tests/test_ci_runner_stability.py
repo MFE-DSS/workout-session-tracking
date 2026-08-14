@@ -168,8 +168,17 @@ class TestCanonicalCommand:
     def test_the_worker_policy_is_explicit(self):
         assert "CI_PYTEST_WORKERS" in _script()
 
-    def test_the_default_worker_policy_is_auto(self):
-        assert 'CI_PYTEST_WORKERS:-auto' in _script()
+    def test_the_default_worker_policy_is_bounded(self):
+        """`-n auto` (4 workers) exhausted the runner — the bound is the fix.
+
+        Pinned as a value, not a range: an accidental return to `auto` would
+        silently reintroduce the memory pressure that caused three shutdowns.
+        """
+        assert 'CI_PYTEST_WORKERS:-2' in _script()
+
+    def test_the_worker_bound_is_justified_in_the_script(self):
+        """The number must travel with the measurement that produced it."""
+        assert "MemAvailable" in _script()
 
     def test_the_script_preserves_the_pytest_exit_code(self):
         """Un diagnostic ne doit jamais verdir un échec réel."""
