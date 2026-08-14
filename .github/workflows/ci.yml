@@ -105,8 +105,14 @@ jobs:
         # upload included), so telemetry must be in the live log to survive.
         # WS2 — `/usr/bin/time -v` reports peak RSS. Both are diagnostics only:
         # pytest's exit code is captured and re-raised unchanged.
+        # No `|| 'auto'` fallback here. A literal default in the workflow SETS
+        # the variable, which defeats the script's own `:-` default — the first
+        # mitigation attempt silently ran on 4 workers again and would have been
+        # reported as a validated fix. The canonical default lives in the script
+        # and nowhere else; an unset repository variable yields an empty string,
+        # which `:-` correctly treats as absent.
         env:
-          CI_PYTEST_WORKERS: ${{ vars.CI_PYTEST_WORKERS || 'auto' }}
+          CI_PYTEST_WORKERS: ${{ vars.CI_PYTEST_WORKERS }}
         run: |
           python scripts/ci_resource_sampler.py &
           SAMPLER_PID=$!

@@ -180,6 +180,25 @@ class TestCanonicalCommand:
         """The number must travel with the measurement that produced it."""
         assert "MemAvailable" in _script()
 
+    def test_the_workflow_does_not_override_the_canonical_default(self):
+        """A literal default in the workflow silently defeats the script's.
+
+        The first mitigation attempt ran on 4 workers because the workflow set
+        `CI_PYTEST_WORKERS` to the literal 'auto': the variable was *set*, so
+        the script's `:-2` never applied, and a green run would have been
+        reported as a validated fix. An unset repository variable must reach
+        the script as an empty string so `:-` treats it as absent.
+        """
+        step = _workflow().split("Run pytest with coverage", 1)[1].split(
+            "Upload coverage artifact", 1)[0]
+        # Comments are stripped: the step documents this very trap, and a raw
+        # scan would fail on its own explanation.
+        code = "\n".join(
+            line for line in step.splitlines()
+            if not line.strip().startswith("#")
+        )
+        assert "'auto'" not in code
+
     def test_the_script_preserves_the_pytest_exit_code(self):
         """Un diagnostic ne doit jamais verdir un échec réel."""
         assert "exit $?" in _script()
