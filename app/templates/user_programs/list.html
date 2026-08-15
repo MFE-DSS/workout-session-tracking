@@ -7,6 +7,45 @@
   <a class="btn btn--primary" href="{{ url_for('user_program_new') }}">Créer un programme</a>
 </div>
 
+{# Sb_WEEKLY_PLAN_MATERIALIZATION_01 — proposition hebdomadaire.
+   Rien n'est créé sans une action explicite : ce bloc informe, le bouton agit. #}
+{% if weekly_plan_proposal %}
+  {% set p = weekly_plan_proposal %}
+  <section class="card" style="margin-bottom:1.5rem;">
+    <h2 style="margin-top:0;">Programme proposé pour ta semaine</h2>
+    <p class="text-dim" style="margin-bottom:.75rem;">
+      {{ p.sessions }} séance{{ 's' if p.sessions > 1 }}/semaine ·
+      {{ p.exercises }} exercice{{ 's' if p.exercises > 1 }} ·
+      {{ p.planned_sets }} série{{ 's' if p.planned_sets > 1 }} planifiée{{ 's' if p.planned_sets > 1 }}
+    </p>
+
+    {% if p.priorities %}
+      <p style="margin:.25rem 0;">Priorités déclarées : {{ p.priorities|join(' · ') }}</p>
+    {% endif %}
+
+    {% if p.status == 'constraint_unmet' %}
+      <p style="margin:.25rem 0;"><strong>Proposition partielle</strong> — une priorité que tu as déclarée n'est pas programmable :</p>
+      <ul style="margin:.25rem 0 .75rem 1.25rem;">
+        {% for constraint in p.constraints %}<li>{{ constraint }}</li>{% endfor %}
+      </ul>
+    {% elif p.status == 'partial' %}
+      <p style="margin:.25rem 0 .75rem;">
+        <strong>Proposition partielle</strong> — {{ p.unmet_zones }} zone{{ 's' if p.unmet_zones > 1 }}
+        rest{{ 'ent' if p.unmet_zones > 1 else 'e' }} sous le volume visé. Le programme est utilisable tel quel.
+      </p>
+    {% else %}
+      <p style="margin:.25rem 0 .75rem;">Toutes les zones visées sont couvertes.</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('user_program_from_weekly_plan') }}">
+      <button type="submit" class="btn btn--primary">Créer le programme proposé</button>
+    </form>
+    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
+      Crée un <strong>brouillon</strong> modifiable. Rien n'est publié ni lancé sans ton accord.
+    </p>
+  </section>
+{% endif %}
+
 {% if programs|length == 0 %}
   <p class="text-dim">Tu n'as pas encore de programme personnel. Crée ton premier programme pour commencer.</p>
 {% else %}

@@ -371,6 +371,47 @@ def _render_quality(
 # ─────────────────────────── list / create (WIZARD_01) ───────────────────────
 
 
+def _weekly_plan_proposal(db, user_id: int) -> dict | None:
+    """Le plan hebdomadaire proposé, prêt à être affiché — ou `None`.
+
+    Confiné : toute panne de la chaîne de planification laisse la page des
+    programmes strictement inchangée. Proposer un programme est un **plus** ;
+    ce n'est jamais une raison de casser la bibliothèque existante.
+    """
+    try:
+        from app.services.muscle_mapping import RADAR_AXES
+        from app.services.training_preferences import get_training_preferences
+        from app.services.weekly_plan_materialization import (
+            assess_materialization,
+        )
+        from app.services.weekly_planner import build_weekly_plan_for_user
+
+        preferences = get_training_preferences(db, user_id)
+        if preferences is None or not preferences.sessions_per_week:
+            return None
+        plan = build_weekly_plan_for_user(db, user_id)
+        readiness = assess_materialization(plan)
+        if not readiness.can_materialize:
+            return None
+        return {
+            "sessions": readiness.sessions,
+            "exercises": readiness.exercises,
+            "planned_sets": readiness.planned_sets,
+            "status": readiness.status.value,
+            "priorities": [
+                RADAR_AXES[axis]["label"]
+                for axis in (preferences.focus_priorities or ())
+                if axis in RADAR_AXES
+            ],
+            "constraints": list(readiness.unserved_priorities),
+            "unmet_zones": len(readiness.unmet_zones),
+        }
+    # Confinement volontaire et large : voir la docstring. Toute panne de la
+    # chaîne de planification doit laisser la bibliothèque servie.
+    except Exception:  # noqa: BLE001
+        return None
+
+
 @router.get("/programs", response_class=HTMLResponse, name="user_programs_list")
 def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
     """Owner-scoped library of the current user's custom programs (archived
@@ -383,8 +424,43 @@ def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
             "page_title": "Mes programmes",
             "programs": programs,
             "active_session": latest_open_session(db, user.id),
+            "weekly_plan_proposal": _weekly_plan_proposal(db, user.id),
         },
     )
+
+
+@router.post(
+    "/programs/from-weekly-plan",
+    response_class=HTMLResponse,
+    name="user_program_from_weekly_plan",
+)
+def user_program_from_weekly_plan(
+    request: Request, db: DbSession, user: CurrentUser
+):
+    """Matérialise le plan hebdomadaire proposé en **brouillon**.
+
+    Action explicite de l'utilisateur, jamais automatique. Rien n'est publié :
+    la page suivante est l'éditeur de brouillon habituel, où la validation puis
+    la publication restent des gestes séparés.
+    """
+    from app.services.weekly_plan_materialization import (
+        DEFAULT_PROGRAM_TITLE,
+        materialize_weekly_plan,
+    )
+    from app.services.weekly_planner import build_weekly_plan_for_user
+
+    try:
+        plan = build_weekly_plan_for_user(db, user.id)
+        program, _ = materialize_weekly_plan(
+            db, user.id, plan,
+            title=DEFAULT_PROGRAM_TITLE,
+            slug_base=_slugify(DEFAULT_PROGRAM_TITLE),
+        )
+    except UserProgramDraftError as exc:
+        # Quota, collision de slug, plan sans rien d'exécutable : message du
+        # service, jamais un 500.
+        return _render_new(request, db, user, title="", error=str(exc))
+    return _redirect_to_editor(request, program.id)
 
 
 # Declared BEFORE `/programs/{program_id}`: even though `{program_id:int}`
