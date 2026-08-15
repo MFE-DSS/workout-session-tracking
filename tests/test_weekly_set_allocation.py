@@ -89,21 +89,55 @@ def test_budget_satisfaction_is_judged_on_sets_not_on_exercise_count():
             assert not zone.is_within_band or zone.planned_slots == 0
 
 
-def test_a_zone_with_enough_slots_lands_inside_its_band():
-    """`calves` porte DEUX intentions : c'est la seule zone qui atteint sa bande."""
+def test_a_zone_reaching_its_band_is_judged_on_EFFECTIVE_sets():
+    """Le témoin change de zone parce que l'UNITÉ a changé.
+
+    Avant `Sb_SET_CONTRIBUTION_POLICY_01`, `calves` atteignait sa bande avec
+    8 séries **physiques** sur deux créneaux. La couverture se juge désormais
+    en séries **effectives**, et `calves` n'en reçoit que 4 : son second
+    exercice, « Calf press leg press », est canoniquement rattaché à `quads`
+    (voir `test_the_calf_press_miscredit_is_pinned`).
+
+    `biceps` devient le témoin : il atteint sa borne basse **grâce au crédit
+    indirect** des tirages, ce que le comptage physique ne voyait pas.
+    """
+    plan = _plan(sessions_per_week=4)
+    biceps = _zone(plan, "biceps")
+    assert biceps.indirect_sets > 0
+    assert biceps.unmet_reason is None
+    assert biceps.is_within_band
+
+
+def test_the_calf_press_miscredit_is_pinned():
+    """Défaut de DONNÉES pré-existant, rendu mesurable par cette tranche.
+
+    « Calf press leg press » est classé `calves` par l'EKB et `quads` par le
+    classifieur canonique — le groupe `quads` contient « leg press » et gagne
+    dans une liste ordonnée. Tant que la couverture se comptait par créneau, la
+    divergence était **invisible** ; en comptabilité effective elle **crédite la
+    mauvaise zone**.
+
+    Ce test épingle l'état actuel pour qu'une correction éventuelle soit un
+    choix explicite, pas une dérive silencieuse. Il n'approuve pas la donnée.
+    """
+    from app.services.body_zone_source import resolve_exercise_zones
+
+    assert resolve_exercise_zones(None, "Calf press leg press").primary == "quads"
+
     plan = _plan(sessions_per_week=4)
     calves = _zone(plan, "calves")
-    assert calves.planned_slots == 2
-    assert calves.unmet_reason is None
-    assert calves.is_within_band
+    assert calves.planned_sets == 8, "deux créneaux physiques"
+    assert calves.direct_sets == 4, "un seul est canoniquement rattaché à calves"
 
 
 def test_every_covered_zone_respects_the_band_or_names_a_reason():
     """Acceptance du brief, sur les 11 zones, sans exception tolérée."""
     plan = _plan(sessions_per_week=4)
     for zone in plan.zone_coverage:
-        within = zone.planning_low_sets <= zone.planned_sets <= zone.planning_high_sets
-        assert within or zone.unmet_reason is not None, (
+        # La bande se compare en séries EFFECTIVES depuis
+        # `Sb_SET_CONTRIBUTION_POLICY_01` — comparer les séries physiques
+        # reproduirait exactement la confusion d'unités que la tranche supprime.
+        assert zone.is_within_band or zone.unmet_reason is not None, (
             f"{zone.zone_code} hors bande ET sans raison nommée"
         )
 
