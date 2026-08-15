@@ -229,19 +229,18 @@ def test_upper_back_still_selects_a_row_and_is_unaffected():
 # ── 4. Core — intention réelle, lacune de données nommée ─────────────────────
 
 
-def test_core_has_an_intent_but_no_programmable_candidate():
-    """La lacune `core` est une lacune de DONNÉES, dite comme telle.
+def test_core_is_now_programmable():
+    """La lacune de données `core` est **fermée** par `Sb_CORE_EXERCISE_PROPERTIES_01`.
 
-    Les huit exercices de tronc du référentiel canonique existent, mais aucun
-    n'a de propriétés programmables (`exercise_properties.json` ne les contient
-    pas ; l'EKB les marque `coverage_status: gap`). Rien n'est fabriqué pour
-    combler ce trou : la zone sort en `UNMET_NO_CANDIDATE`.
+    Ce test pinnait l'inverse : `core` avait une intention mais aucun candidat
+    doté de propriétés. Cinq exercices canoniques — tous programmés dans un
+    template curé de `reference_split.json` — en ont désormais reçu, sans
+    qu'aucun `equipment_family` soit inventé.
     """
     plan = _plan(sessions_per_week=3)
     core = _zone(plan, "core")
-    assert core.unmet_reason == UNMET_NO_CANDIDATE
-    assert core.unmet_reason != UNMET_NO_INTENT
-    assert core.planned_slots == 0
+    assert core.planned_slots == 1
+    assert core.unmet_reason not in (UNMET_NO_CANDIDATE, UNMET_NO_INTENT)
 
 
 def test_core_never_selects_an_upper_body_isolation():
@@ -254,31 +253,52 @@ def test_core_never_selects_an_upper_body_isolation():
     assert isolations
     for name in isolations:
         assert not MPG._qualifies(intent, name, pool[name])
-    assert not MPG._rank_qualifying(intent, pool)
+    # …et les candidats qui QUALIFIENT désormais sont tous du motif `core`.
+    # Le pool du PLANIFICATEUR, pas le registre de substitution : depuis
+    # `Sb_CORE_EXERCISE_PROPERTIES_01` les candidats de tronc vivent à part.
+    from app.services.planner_candidates import planner_candidate_pool
+
+    pool = planner_candidate_pool()
+    qualifying = MPG._rank_qualifying(intent, pool)
+    assert qualifying, "core doit être servable depuis Sb_CORE_EXERCISE_PROPERTIES_01"
+    for name, _score in qualifying:
+        assert pool[name]["pattern_motor"] == "core"
 
 
-def test_the_canonical_referential_does_carry_core_exercises():
-    """La lacune est bien dans les PROPRIÉTÉS, pas dans l'identité des exercices."""
+def test_the_referential_carries_more_core_exercises_than_the_pool():
+    """La lacune restante est **partielle**, et nommée.
+
+    Cinq exercices canoniques ont reçu des propriétés (tous présents dans un
+    template curé). Trois restent dehors — aucun template ne les programme et
+    l'EKB ne leur attribue aucune zone : leur inventer un motif serait de la
+    fabrication.
+    """
+    from app.services.planner_candidates import planner_candidate_pool
     from app.services.reference_data_seed import mapping_rows
 
-    core_names = [
+    core_names = {
         r["exercise_code"] for r in mapping_rows()
         if r["role"] == "primary" and r["body_zone_code"] == "core"
-    ]
-    assert len(core_names) >= 5
-    pool = _pool()
-    assert not [n for n in core_names if n in pool], (
-        "des exercices core ont gagné des propriétés — la lacune est fermée et "
-        "ce test doit devenir une assertion de couverture"
-    )
+    }
+    programmable = core_names & set(planner_candidate_pool())
+    assert len(programmable) == 5
+    assert core_names - programmable == {
+        "Decline crunch", "Hanging knee raise", "Machine crunch"}
 
 
 # ── 5. Créneau vide ≠ couverture ─────────────────────────────────────────────
 
 
 def test_an_empty_slot_is_not_counted_as_coverage():
-    """Le fail-open que `core` met au jour : un créneau sans exercice ne couvre rien."""
-    plan = _plan(sessions_per_week=3)
+    """Un créneau sans exercice ne couvre rien — garde **générale**.
+
+    Le témoin était `core` sans candidat ; depuis
+    `Sb_CORE_EXERCISE_PROPERTIES_01` il en a un. La garde reste indispensable
+    et se vérifie désormais sous **restriction de matériel**, la seule
+    situation qui produit encore un créneau vide. Retirer le test aurait
+    supprimé la protection en même temps que son décor.
+    """
+    plan = _plan(sessions_per_week=3, available_equipment=("machine", "cable"))
     core_slots = [
         slot for session in plan.sessions for slot in session.slots
         if slot.zone_code == "core"
