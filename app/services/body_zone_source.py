@@ -98,6 +98,30 @@ KNOWN_MAPPING_CORRECTIONS: tuple[ZoneCorrection, ...] = (
             "Pallof press — all three of which classify as `core`."
         ),
     ),
+    ZoneCorrection(
+        exercise_name="Calf press leg press",
+        legacy_primary="quads",
+        legacy_secondary=(),
+        primary="calves",
+        secondary=(),
+        evidence=(
+            "The substring classifier scans an ORDERED list and the `quads` group "
+            "contains 'leg press', which matches before the `calves` group is ever "
+            "reached — the same ordered-list artifact as the two corrections above. "
+            "The repo contradicts that result with itself: exercise_properties.json "
+            "gives this exercise muscle_group 'calves' (the field that exists "
+            "precisely to disambiguate the overloaded `lower` region), and the EKB "
+            "classifies it zone_primary 'calves'. Two curated sources say calves; "
+            "only the name matcher says quads. "
+            "Adjudicated by the operator for this EXACT canonical identity. It is "
+            "NOT a statement about 'leg press' in general: the ordinary leg press "
+            "entries keep their quads attribution, and a mapping diff over the whole "
+            "referential proves this exercise is the only one that moves. "
+            "The classification is a PROGRAMMING attribution: this movement is "
+            "programmed as a calf-target exercise, and the record says only that. "
+            "It carries no claim about muscle physiology."
+        ),
+    ),
 )
 
 _CORRECTIONS_BY_NAME: dict[str, ZoneCorrection] = {

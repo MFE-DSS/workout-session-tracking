@@ -113,30 +113,23 @@ def test_a_zone_reaching_its_band_is_judged_on_EFFECTIVE_sets():
     assert biceps.reaches_planning_low
 
 
-def test_the_calf_press_miscredit_is_pinned():
-    """Défaut de DONNÉES pré-existant, rendu mesurable par cette tranche.
+def test_the_calf_press_contradiction_is_resolved():
+    """Le défaut de données épinglé ici est **adjugé** depuis
+    `Sb_BODYZONE_CALF_PRESS_ADJUDICATION_01`.
 
-    « Calf press leg press » est classé `calves` par l'EKB et `quads` par le
-    classifieur canonique — le groupe `quads` contient « leg press » et gagne
-    dans une liste ordonnée. Tant que la couverture se comptait par créneau, la
-    divergence était **invisible** ; en comptabilité effective elle **crédite la
-    mauvaise zone**.
+    Ce test surveillait une contradiction : « Calf press leg press » était
+    `calves` pour l'EKB et `exercise_properties`, mais `quads` pour le
+    classifieur de noms — lequel gagnait, et créditait donc la mauvaise zone.
 
-    Ce test épingle l'état actuel pour qu'une correction éventuelle soit un
-    choix explicite, pas une dérive silencieuse. Il n'approuve pas la donnée.
+    Il ne surveille plus un défaut mais sa **résolution** : une correction
+    revue exacte rend la zone canonique conforme aux deux sources curées, sans
+    toucher au sens générique de « leg press ».
     """
     from app.services.body_zone_source import resolve_exercise_zones
 
-    assert resolve_exercise_zones(None, "Calf press leg press").primary == "quads"
-
-    # Le mauvais crédit se lit désormais sur l'exercice lui-même plutôt que sur
-    # l'agrégat de la zone : l'allocateur peut ne plus retenir « Calf press leg
-    # press » selon la couverture relative, ce qui ne corrige en rien la donnée.
-    from app.services.set_contribution import exercise_roles
-
-    assert "calves" not in exercise_roles("Calf press leg press"), (
-        "la divergence a disparu — vérifier si la donnée a été corrigée"
-    )
+    assert resolve_exercise_zones(None, "Calf press leg press").primary == "calves"
+    # …et la presse à cuisses ordinaire n'a pas suivi.
+    assert resolve_exercise_zones(None, "Leg Press (pieds bas)").primary == "quads"
 
 
 def test_every_covered_zone_respects_the_band_or_names_a_reason():
