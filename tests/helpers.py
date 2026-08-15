@@ -28,3 +28,35 @@ def get_test_user_id() -> int:
             select(User).where(User.username == "testuser")
         ).scalar_one()
         return user.id
+
+
+def module_code_only(module) -> str:
+    """Source d'un module **sans ses docstrings**.
+
+    Plusieurs suites interdisent la présence de symboles dans le **code** —
+    `MEV`, `WeeklyPlanner`, `WorkoutSession`… — tout en ayant besoin de les
+    **nommer dans la documentation** pour expliquer précisément ce qui n'est pas
+    fait. Un scan brut fait alors échouer un module sur sa propre docstring,
+    ce qui pousse à affaiblir la garde plutôt qu'à la respecter.
+
+    Partagé plutôt que réécrit : le motif est apparu dans trois fichiers de
+    tests successifs.
+    """
+    import ast
+    import inspect
+
+    tree = ast.parse(inspect.getsource(module))
+    for node in ast.walk(tree):
+        if not isinstance(
+            node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)
+        ):
+            continue
+        body = node.body
+        if (
+            body
+            and isinstance(body[0], ast.Expr)
+            and isinstance(body[0].value, ast.Constant)
+            and isinstance(body[0].value.value, str)
+        ):
+            body.pop(0)
+    return ast.unparse(tree)
