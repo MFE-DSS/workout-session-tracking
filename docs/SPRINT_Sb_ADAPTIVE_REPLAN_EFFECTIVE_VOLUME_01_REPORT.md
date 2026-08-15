@@ -116,3 +116,55 @@ travail primaire d'une autre. `biceps` fatigués ne suppriment pas le dos.
 Et, pour la quatrième fois de cette session, une garde que je croyais solide ne
 tenait rien : elle vérifiait une liste correcte par construction plutôt que le
 filtre réellement à risque. Seule la plantation l'a révélé.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#100** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `514b56b` — aucun correctif de code |
+| Merge | **`466a6b0`** |
+| Gate Sonar | **`OK`** — couverture du neuf **100 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | full sweep local **4 296** |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 168 Mo** | **5 097 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+Quatrième tranche consécutive au-dessus de 5 Go sur les deux shards.
+
+### Incident CI — un test instable, hors périmètre
+
+Premier passage **rouge** sur `pytest shard 1` :
+
+```
+tests/test_ci_runner_stability.py::TestFixtureTempCleanup::test_a_failing_test_still_cleans_up
+assert 3 <= 2
+```
+
+**Sans rapport avec cette tranche** — qui touche `adaptive_replan.py` et deux
+fichiers de tests neufs, rien du nettoyage temporaire. Le test passe en local
+(60/60) et passait dans le full sweep de 4 296.
+
+**Cause : le test échantillonne un état GLOBAL sous exécution parallèle.** Il
+compte *tous* les répertoires temporaires portant un préfixe partagé, avant puis
+après un pytest imbriqué. Sous xdist, le fixture `client` d'un **autre worker**
+peut en créer un entre les deux relevés, et `after > before` sans que rien ne
+soit cassé.
+
+**Aucun code n'a été touché** : ce test appartient à
+`Sb_OPS_CI_RUNNER_STABILITY_01`, et modifier la garde d'un autre sprint pour
+verdir sa propre CI est précisément ce que le contrat interdit. Seuls les jobs
+échoués ont été relancés — **verts au second passage**, ce qui confirme le
+caractère non déterministe.
+
+**Correctif minimal proposé, non appliqué** : relever l'**ensemble** des chemins
+plutôt qu'un compte, et vérifier qu'aucun répertoire *imputable au run imbriqué*
+ne survit. Remonté comme finding hors périmètre : tant qu'il reste, ce test
+produira des rouges aléatoires.
