@@ -44,7 +44,9 @@ import hashlib
 import json
 from collections.abc import Iterable, Sequence
 from dataclasses import asdict, dataclass, replace
+from functools import lru_cache
 
+from app.services.body_zone_source import resolve_exercise_zones
 from app.services.morphology_profile import (
     MorphologyDescriptor,
     MorphologyFacts,
@@ -79,7 +81,35 @@ _REGION_ZONE_MUSCLE_GROUP: dict[str, dict[str, str]] = {
     },
 }
 
+# Sb_SLOT_INTENT_COVERAGE_01 — regions the pool's own metadata CANNOT separate.
+#
+# `arms` bundles two detailed zones (`biceps`, `triceps`) and, unlike `lower` and
+# `shoulders` above, **every one of its 17 pool entries carries
+# `muscle_group: null`** and the identical `(zone_primary=arms,
+# pattern_motor=isolation_upper, chain=isolation)` triple. A curl and a pushdown
+# are therefore byte-indistinguishable in `exercise_properties.json`: the table
+# above cannot be extended to cover them, and a biceps intent would score a
+# triceps candidate exactly as high as a curl.
+#
+# The discriminator is the CANONICAL detailed-zone identity
+# (`body_zone_source.resolve_exercise_zones` — the app's single body-zone read
+# contract, corrections included), never a second name matcher written here and
+# never a new field invented in the pool.
+#
+# Why not simply add `muscle_group` to those 17 entries: `substitution.py`
+# gates N1 eligibility on `muscle_group` equality, so writing the field would
+# silently change live substitution suggestions in the drawer. The pool file is
+# left untouched and runtime N1/N2/N3 stays byte-identical — a test pins it.
+_REGION_BY_CANONICAL_ZONE: frozenset[str] = frozenset({"arms"})
+
 _DEFAULT_MAX_FALLBACKS = 3
+
+# Named gap kinds. The `warning` text stays human-readable; these let a consumer
+# branch on WHY a slot is empty without parsing prose (Sb_SLOT_INTENT_COVERAGE_01
+# — the weekly planner needs the distinction to name an unmet zone correctly).
+GAP_COVERAGE = "coverage"
+GAP_AVAILABILITY = "availability"
+GAP_DISTINCTNESS = "distinctness"
 
 
 # ── Output model (frozen, pure data — nothing here is persisted) ─────────────
@@ -101,6 +131,8 @@ class SlotSelection:
     rationale: str
     warning: str | None
     slot_intent: SlotIntent
+    #: `None` when the slot is filled; otherwise the named reason it is not.
+    gap_kind: str | None = None
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -134,14 +166,34 @@ class GeneratedProgram:
 # ── Candidate selection (read-only reuse of the substitution proximity contract) ──
 
 
-def _qualifies(intent: SlotIntent, cand_props: dict) -> bool:
+@lru_cache(maxsize=512)
+def _canonical_detailed_zone(exercise_name: str) -> str | None:
+    """The exercise's canonical DETAILED body zone, or `None` when unknown.
+
+    Delegates to `body_zone_source.resolve_exercise_zones` — the app's single
+    body-zone read contract (reviewed corrections first, then the formal
+    `ExerciseMuscleMapping` row, then the historical classifier). `db=None` keeps
+    this generator PURE, which the contract supports explicitly; the DB-backed
+    path returns the same attribution for the pool, and a test pins that.
+
+    `None` (unknown) never qualifies a candidate: an exercise the referential
+    cannot attribute is left out rather than assigned to a zone by guesswork."""
+    resolution = resolve_exercise_zones(None, exercise_name)
+    return resolution.primary if resolution.is_known else None
+
+
+def _qualifies(intent: SlotIntent, cand_name: str, cand_props: dict) -> bool:
     """A candidate qualifies for a slot only on a genuine (not merely zone-level) match.
 
     The macro region carries the zone; a non-overloaded region additionally requires the same
     `pattern_motor`, while an overloaded region (`lower`, `shoulders`) is disambiguated by
-    `muscle_group` (existing taxonomy) so a sibling muscle absent from the pool qualifies nothing."""
+    `muscle_group` (existing taxonomy) so a sibling muscle absent from the pool qualifies nothing.
+    A region the pool cannot separate at all (`arms`) is disambiguated by the CANONICAL detailed
+    zone instead — see `_REGION_BY_CANONICAL_ZONE`."""
     if cand_props.get("zone_primary") != intent.target_region:
         return False
+    if intent.target_region in _REGION_BY_CANONICAL_ZONE:
+        return _canonical_detailed_zone(cand_name) == intent.primary_zone
     zone_map = _REGION_ZONE_MUSCLE_GROUP.get(intent.target_region)
     if zone_map is not None:
         req_mg = zone_map.get(intent.primary_zone)
@@ -157,7 +209,7 @@ def _rank_qualifying(intent: SlotIntent, pool: dict[str, dict]) -> list[tuple[st
         props = pool[name]
         if candidate_pattern_forbidden(intent, props):
             continue
-        if not _qualifies(intent, props):
+        if not _qualifies(intent, name, props):
             continue
         scored.append((name, score_candidate(intent, props)))
     scored.sort(key=lambda item: (-item[1], item[0]))
@@ -220,18 +272,22 @@ def _select_for_slot(
     preferred_score: int | None = None
     fallbacks: tuple[tuple[str, int], ...] = ()
     warning: str | None = None
+    gap_kind: str | None = None
 
     if not qualifying:
+        gap_kind = GAP_COVERAGE
         warning = (
             f"coverage gap: no pool exercise matches region '{intent.target_region}' "
             f"for intent '{intent.intent_id}' (EKB/properties coverage gap — no fabrication)"
         )
     elif not available:
+        gap_kind = GAP_AVAILABILITY
         warning = (
             f"availability gap: {len(qualifying)} qualifying exercise(s) for intent "
             f"'{intent.intent_id}' but none in availability set"
         )
     elif assigned is None:
+        gap_kind = GAP_DISTINCTNESS
         warning = (
             f"distinctness gap: no distinct exercise left for intent '{intent.intent_id}' among "
             f"{len(available)} candidate(s) — every complete assignment would prescribe a "
@@ -255,6 +311,7 @@ def _select_for_slot(
         rationale=intent.rationale,
         warning=warning,
         slot_intent=intent,
+        gap_kind=gap_kind,
     )
 
 

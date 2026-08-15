@@ -16,6 +16,7 @@ from app.services.muscle_mapping import RADAR_AXES, ZONE_VOLUME_TARGET
 from app.services.training_preferences import TrainingPreferencesData
 from app.services.weekly_planner import (
     UNMET_NO_CADENCE,
+    UNMET_NO_CANDIDATE,
     UNMET_NO_INTENT,
     build_weekly_plan,
     priority_keys_for_zones,
@@ -69,25 +70,49 @@ class TestCadence:
 
 
 class TestFeasibilityGaps:
-    def test_the_intent_registry_covers_only_part_of_the_taxonomy(self):
-        """Constat d'audit épinglé : le registre est fermé et incomplet."""
-        assert zones_servable_as_primary() < set(ZONE_VOLUME_TARGET)
+    def test_the_intent_registry_now_covers_the_whole_taxonomy(self):
+        """Depuis `Sb_SLOT_INTENT_COVERAGE_01` le registre couvre les 11 zones.
 
-    @pytest.mark.parametrize("zone", ["lats", "core", "biceps", "triceps"])
-    def test_an_unservable_zone_is_reported_not_filled(self, zone):
+        Ce test pinnait l'inverse (`<`, registre incomplet). Ce n'est pas la
+        garde qui a été relâchée : c'est la lacune qui a été fermée, et
+        l'assertion est passée d'un sous-ensemble strict à une égalité — donc
+        d'une contrainte faible à une contrainte forte.
+        """
+        assert zones_servable_as_primary() == set(ZONE_VOLUME_TARGET)
+
+    @pytest.mark.parametrize("zone", ["lats", "biceps", "triceps"])
+    def test_a_newly_servable_zone_is_actually_filled(self, zone):
         plan = _plan(sessions_per_week=3)
         entry = next(z for z in plan.zone_coverage if z.zone_code == zone)
-        assert entry.unmet_reason == UNMET_NO_INTENT
+        assert entry.unmet_reason is None
+        assert entry.planned_slots >= 1
 
-    def test_an_unservable_zone_receives_no_slot(self):
+    def test_core_remains_a_named_DATA_gap_not_an_intent_gap(self):
+        """`core` a une intention ; ce qui manque, ce sont les candidats."""
+        plan = _plan(sessions_per_week=3)
+        entry = next(z for z in plan.zone_coverage if z.zone_code == "core")
+        assert entry.unmet_reason == UNMET_NO_CANDIDATE
+        assert entry.unmet_reason != UNMET_NO_INTENT
+
+    def test_a_newly_servable_zone_receives_a_slot(self):
         plan = _plan(sessions_per_week=3)
         planned = {s.zone_code for sess in plan.sessions for s in sess.slots}
-        assert "lats" not in planned
+        assert "lats" in planned
 
-    def test_a_declared_but_unservable_axis_is_surfaced(self):
-        """L'utilisateur peut déclarer une priorité non programmable."""
-        plan = _plan(sessions_per_week=3, focus_priorities=(AXIS_BACK_WIDTH,))
-        label = RADAR_AXES[AXIS_BACK_WIDTH]["label"]
+    def test_a_declared_axis_without_candidates_is_still_surfaced(self):
+        """L'utilisateur peut encore déclarer une priorité non SERVABLE.
+
+        Le manque a changé de nature — plus « aucune intention » mais « aucun
+        exercice disponible » — et doit rester dit. Les cinq candidats triceps
+        du référentiel étant tous à la poulie, exclure le câble suffit à
+        rendre l'axe « Bras » incomplet.
+        """
+        plan = _plan(
+            sessions_per_week=3,
+            focus_priorities=(AXIS_ARMS,),
+            available_equipment=("dumbbell", "barbell", "machine"),
+        )
+        label = RADAR_AXES[AXIS_ARMS]["label"]
         assert any(label in c for c in plan.unmet_constraints)
 
     def test_a_servable_axis_raises_no_constraint(self):
@@ -302,10 +327,14 @@ class TestHomeConsumer:
         from tests.helpers import get_test_user_id
 
         uid = get_test_user_id()
+        # Deux axes déclarés dont les zones ne sont pas toutes servables sous
+        # cette restriction (triceps n'a que des candidats à la poulie) : la
+        # tuile doit en montrer UNE seule, pas la liste.
         with SessionLocal() as db:
             save_training_preferences(
                 db, uid, sessions_per_week=3,
-                focus_priorities=[AXIS_BACK_WIDTH, AXIS_ARMS])
+                focus_priorities=[AXIS_BACK_WIDTH, AXIS_ARMS],
+                available_equipment=[FAM_BARBELL])
         with SessionLocal() as db:
             tile = build_home_payload(db, db.get(User, uid))["weekly_plan"]
         assert isinstance(tile["unmet_constraint"], str)

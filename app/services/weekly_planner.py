@@ -19,27 +19,29 @@ sont **dérivées** en inversant les tables existantes
 (`PRIORITY_TO_INTENTS` × `primary_zone`), jamais écrites à la main : si le
 registre d'intentions bouge, la dérivation suit.
 
-## La limite structurelle que ce sprint met au jour
+## Couverture des zones — état depuis `Sb_SLOT_INTENT_COVERAGE_01`
 
-Le registre `SlotIntent` est **fermé** et couvre **7 zones sur 11** en primaire.
-`biceps` et `triceps` ne sont atteignables qu'en **secondaire** ; `lats` et
-`core` ne sont atteignables **par aucune intention**.
+Le registre `SlotIntent` couvre désormais **11 zones sur 11** en primaire, et
+les six axes déclarables sont tous atteignables. La limite documentée ici
+auparavant (`lats` et `core` sans intention, `biceps`/`triceps` en secondaire
+seulement) est **fermée**.
 
-Traduit en axes déclarables par l'utilisateur — ceux que
-`Sb_TRAINING_PREFERENCES_01` lui propose — **deux des six ne sont pas
-servables** :
+Il reste **une** lacune, et elle est de données, pas de registre : `core` a une
+intention (`trunk_core_direct`) mais **aucun candidat programmable** — les huit
+exercices de tronc du référentiel sont absents de `exercise_properties.json` et
+marqués `coverage_status: gap` dans l'EKB, sans `movement_pattern` ni
+`equipment_family`. Elle ressort en `UNMET_NO_CANDIDATE`, pas en
+`UNMET_NO_INTENT` : la distinction dit à quel mur on est.
 
-| Axe déclarable | Zones | Servable |
-|---|---|---|
-| `back_width` (Dos largeur) | `lats` | **aucune intention** |
-| `arms` (Bras) | `biceps`, `triceps` | **secondaire seulement** |
+**Un axe partiellement servi n'est pas servi.** `arms` n'est satisfait que si
+`biceps` **et** `triceps` le sont — ce qui n'est pas acquis sous restriction de
+matériel, les cinq candidats triceps du référentiel étant tous à la poulie.
 
-Un utilisateur peut donc **déclarer une priorité que le planificateur ne sait
-pas programmer**. La réponse correcte est de le **dire**, pas d'inventer une
-intention : fabriquer un slot pour `lats` reviendrait à créer une taxonomie
-d'exercice que personne n'a validée. Chaque zone non servie sort donc dans
-`unmet_budget` avec sa raison, et chaque axe déclaré non servable sort dans
-`unmet_constraints`.
+Un utilisateur peut donc encore **déclarer une priorité que le planificateur ne
+sait pas servir**. La réponse correcte est de le **dire**, jamais d'inventer un
+exercice : chaque zone non servie sort dans `unmet_budget` avec sa raison
+nommée, et chaque axe déclaré incomplet sort dans `unmet_constraints` en
+nommant les zones qui manquent.
 
 ## Ce que le planificateur ne fait pas
 
@@ -53,7 +55,7 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass, field
 
-from app.services.morpho_program_generator import generate_program
+from app.services.morpho_program_generator import GAP_AVAILABILITY, generate_program
 from app.services.muscle_mapping import RADAR_AXES, ZONE_LABELS
 from app.services.slot_intent import _INTENT_SPECS, PRIORITY_TO_INTENTS
 from app.services.training_preferences import TrainingPreferencesData
@@ -105,6 +107,13 @@ class PlannedSlot:
     exercise_name: str | None
     rationale: str
     warning: str | None = None
+    #: Raison nommée d'un créneau vide (`morpho_program_generator.GAP_*`).
+    gap_kind: str | None = None
+
+    @property
+    def is_filled(self) -> bool:
+        """Un créneau ne compte que s'il porte un exercice réel."""
+        return self.exercise_name is not None
 
 
 @dataclass(frozen=True)
@@ -168,19 +177,31 @@ def _fingerprint(sessions, coverage, unmet) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
 
 
-def _unservable_axes(preferences: TrainingPreferencesData) -> list[str]:
-    """Axes DÉCLARÉS dont aucune zone n'est servable en primaire.
+def _unservable_axes(
+    preferences: TrainingPreferencesData,
+    unmet_by_zone: dict[str, str],
+) -> list[tuple[str, tuple[str, ...]]]:
+    """Axes DÉCLARÉS dont **au moins une** zone n'est pas servie, et lesquelles.
 
     Cette information n'a de valeur que parce que l'utilisateur a explicitement
     demandé ces axes : signaler une lacune sur un axe qu'il n'a pas réclamé
     serait du bruit.
+
+    **Un axe partiellement servi n'est pas servi.** `arms` couvre `biceps` et
+    `triceps` : programmer les seuls biceps et déclarer l'axe satisfait ferait
+    passer une moitié manquante pour une réussite. La règle vaut pour l'absence
+    d'intention comme pour l'absence de candidat — un axe dont une zone n'a
+    aucun exercice disponible n'est pas davantage servi qu'un axe sans
+    intention.
     """
-    servable = zones_servable_as_primary()
-    out: list[str] = []
+    out: list[tuple[str, tuple[str, ...]]] = []
     for axis_key in preferences.focus_priorities or ():
         axis = RADAR_AXES.get(axis_key)
-        if axis and not any(z in servable for z in axis["zones"]):
-            out.append(axis_key)
+        if axis is None:
+            continue
+        missing = tuple(z for z in axis["zones"] if z in unmet_by_zone)
+        if missing:
+            out.append((axis_key, missing))
     return out
 
 
@@ -208,11 +229,28 @@ def _unmet_reason(
     servable: frozenset[str],
     equipment_declared: tuple[str, ...] | None,
 ) -> str | None:
-    """Pourquoi une zone n'est pas couverte — nommé, jamais deviné."""
+    """Pourquoi une zone n'est pas couverte — nommé, jamais deviné.
+
+    **Un créneau vide ne couvre rien.** Le générateur émet un créneau pour toute
+    intention retenue, y compris quand aucun exercice ne peut le remplir : ne
+    compter que les créneaux *remplis* évite qu'une zone sans le moindre
+    exercice ressorte comme couverte — la lacune se lirait alors comme une
+    réussite. C'est ce que `core` met au jour depuis
+    `Sb_SLOT_INTENT_COVERAGE_01` : une intention existe, aucun candidat n'a de
+    propriétés programmables.
+
+    La raison vient du `gap_kind` **nommé** par le générateur, jamais déduite de
+    la simple présence d'une déclaration de matériel : une zone sans candidat du
+    tout n'est pas une zone bloquée par le matériel, même sous restriction.
+    """
     if zone_code not in servable:
         return UNMET_NO_INTENT
-    if planned:
+    if any(slot.is_filled for slot in planned):
         return None
+    if any(slot.gap_kind == GAP_AVAILABILITY for slot in planned):
+        return UNMET_EQUIPMENT
+    if planned:
+        return UNMET_NO_CANDIDATE
     return UNMET_EQUIPMENT if equipment_declared else UNMET_NO_CANDIDATE
 
 
@@ -227,7 +265,8 @@ def _coverage(budget, slots_by_zone, servable, equipment_declared):
         entry = ZoneCoverage(
             zone_code=zone.zone_code,
             zone_label=zone.zone_label,
-            planned_slots=len(planned),
+            # Créneaux REMPLIS : un créneau sans exercice n'est pas une couverture.
+            planned_slots=sum(1 for slot in planned if slot.is_filled),
             planning_low_sets=zone.planning_low_sets,
             baseline_sets=zone.baseline_sets,
             planning_high_sets=zone.planning_high_sets,
@@ -240,16 +279,26 @@ def _coverage(budget, slots_by_zone, servable, equipment_declared):
     return tuple(coverage), tuple(unmet)
 
 
-def _constraints(prefs: TrainingPreferencesData, cadence: int | None) -> tuple[str, ...]:
+def _constraints(
+    prefs: TrainingPreferencesData,
+    cadence: int | None,
+    unmet_by_zone: dict[str, str],
+) -> tuple[str, ...]:
     """Contraintes non satisfaites, dites plutôt que contournées."""
     out: list[str] = []
     if not cadence:
         out.append(UNMET_NO_CADENCE)
-    for axis_key in _unservable_axes(prefs):
+    for axis_key, missing in _unservable_axes(prefs, unmet_by_zone):
         label = RADAR_AXES[axis_key]["label"]
+        zones = ", ".join(ZONE_LABELS.get(z, z) for z in missing)
+        cause = (
+            "aucune intention de créneau ne les vise"
+            if all(unmet_by_zone[z] == UNMET_NO_INTENT for z in missing)
+            else "aucun exercice disponible ne peut les servir"
+        )
         out.append(
-            f"priorité déclarée « {label} » : aucune intention de créneau ne vise "
-            "ses zones — aucun exercice n'est inventé pour combler ce manque"
+            f"priorité déclarée « {label} » : {zones} — {cause}, et aucun "
+            "exercice n'est inventé pour combler ce manque"
         )
     return tuple(out)
 
@@ -281,6 +330,7 @@ def _slots_by_zone(generated) -> dict[str, list[PlannedSlot]]:
             exercise_name=selection.preferred_exercise,
             rationale=selection.rationale,
             warning=selection.warning,
+            gap_kind=selection.gap_kind,
         ))
     return out
 
@@ -308,13 +358,15 @@ def build_weekly_plan(
     sessions = _distribute(slots_by_zone, prefs.sessions_per_week)
     coverage, unmet = _coverage(
         weekly_budget, slots_by_zone, servable, prefs.available_equipment)
+    unmet_by_zone = {c.zone_code: c.unmet_reason for c in unmet if c.unmet_reason}
 
     return WeeklyPlan(
         requested_sessions=prefs.sessions_per_week,
         sessions=sessions,
         zone_coverage=coverage,
         unmet_budget=unmet,
-        unmet_constraints=_constraints(prefs, prefs.sessions_per_week),
+        unmet_constraints=_constraints(
+            prefs, prefs.sessions_per_week, unmet_by_zone),
         equipment_declared=prefs.available_equipment,
         basis=_basis(weekly_budget, servable, prefs, generated),
         fingerprint=_fingerprint(sessions, coverage, unmet),

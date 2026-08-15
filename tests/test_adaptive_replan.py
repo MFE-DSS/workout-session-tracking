@@ -196,10 +196,17 @@ class TestInsufficientEvidence:
 
 class TestBudgetAndVersioning:
     def test_a_structural_gap_survives_the_replan(self):
-        """Replanifier ne comble pas un manque structurel."""
+        """Replanifier ne comble pas un manque structurel.
+
+        La zone témoin était `lats`, servable depuis
+        `Sb_SLOT_INTENT_COVERAGE_01`. Le témoin devient `core`, dont la lacune
+        est désormais la seule restante : une intention existe, aucun candidat
+        n'a de propriétés programmables. La propriété testée est inchangée —
+        replanifier ne comble pas ce qui manque à la source.
+        """
         plan = _plan(3)
         result = replan(plan, completed_sessions=1)
-        assert "lats" in result.unmet_budget_after
+        assert "core" in result.unmet_budget_after
 
     def test_an_impossible_redistribution_is_explicit(self):
         result = replan(_plan(3), completed_sessions=1,

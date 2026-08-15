@@ -50,6 +50,25 @@ def _entries() -> dict[str, dict]:
     return payload.get("exercises", {})
 
 
+def detailed_zone_regions() -> dict[str, str]:
+    """Detailed zone -> macro region, as the EKB curates it. Fresh dict, no cache leak.
+
+    The EKB is the only curated source that carries **both** granularities on the
+    same row (`zone_primary` detailed, `zone_macro` macro), which makes it the
+    place to ask "which macro region does this detailed zone belong to" for the
+    zones the radar does not cover — `core` in particular.
+
+    Entries whose curation is still a gap (either field `null`) contribute
+    nothing: a missing value is left missing rather than guessed.
+    """
+    out: dict[str, str] = {}
+    for entry in _entries().values():
+        zone, macro = entry.get("zone_primary"), entry.get("zone_macro")
+        if zone and macro:
+            out.setdefault(zone, macro)
+    return out
+
+
 def picker_options() -> list[dict]:
     """Toutes les entrées EKB, triées par nom, en dicts prêts pour le template.
 
