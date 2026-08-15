@@ -48,6 +48,7 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 
 from app.services.recovery_contract import Confidence, RecoveryBand, TrainingState
+from app.services.set_contribution import contributions_for
 from app.services.weekly_planner import WeeklyPlan
 
 REPLAN_VERSION = 1
@@ -71,6 +72,23 @@ PERFORMED_SET_IDENTITY_LIMITATION = (
     "no plan-to-session identity is persisted yet, so performed sets cannot be "
     "matched to planned sets; a shortened session diverges but never reduces a "
     "zone's sets by inference"
+)
+
+#: Une exposition **secondaire** n'est pas une contre-indication.
+#:
+#: Une récupération estimée limitante sur une zone ne retire QUE les
+#: occurrences dont cette zone est la **cible principale**. Un composé qui la
+#: sollicite en secondaire reste programmé.
+#:
+#: Retirer un tirage parce que les biceps sont estimés chargés priverait le dos
+#: de son travail primaire pour une exposition que le modèle n'a jamais mesurée
+#: comme telle. L'estimation de récupération est une **preuve comptable**, pas
+#: une prédiction de blessure — et elle ne porte pas sur les zones secondaires.
+SECONDARY_EXPOSURE_IS_NOT_A_CONTRAINDICATION = (
+    "a limiting recovery estimate removes only occurrences whose PRIMARY target "
+    "is that zone; a compound that merely involves it as a secondary zone stays "
+    "planned. Secondary exposure is accounting evidence, never an automatic "
+    "recovery contraindication."
 )
 
 
@@ -146,10 +164,20 @@ class ReplanResult:
     unmet_budget_after: tuple[str, ...] = ()
     basis: tuple[str, ...] = field(default_factory=tuple)
 
+    #: Conséquence EFFECTIVE du delta, **dérivée** de `SetContributionPolicy`
+    #: sur les occurrences survivantes — jamais écrite à la main, jamais mutée
+    #: directement. Zone → (unités avant, unités après).
+    effective_impact: tuple[tuple[str, int, int], ...] = ()
+
     @property
     def sets_removed_total(self) -> int:
-        """Séries retirées de la semaine, toutes zones confondues."""
+        """Séries **physiques** retirées de la semaine, toutes zones confondues."""
         return sum(d.sets_removed for d in self.deltas)
+
+    @property
+    def effective_units_removed_total(self) -> int:
+        """Unités effectives perdues, **conséquence** et non décision."""
+        return sum(max(0, before - after) for _, before, after in self.effective_impact)
 
 
 def detect_divergences(
@@ -215,6 +243,46 @@ def _limiting_recovery(training_state: TrainingState | None) -> list[Divergence]
     ]
 
 
+def _surviving_slots(plan: WeeklyPlan, limiting_zones: set[str]):
+    """Créneaux qui restent après report du travail des zones limitantes.
+
+    Le filtre porte sur `zone_code`, c'est-à-dire la **cible principale** du
+    créneau. Un composé dont la zone limitante n'est que **secondaire** reste
+    donc programmé : voir `SECONDARY_EXPOSURE_IS_NOT_A_CONTRAINDICATION`.
+    """
+    return [
+        slot
+        for session in plan.sessions
+        for slot in session.slots
+        if slot.is_prescribed and slot.zone_code not in limiting_zones
+    ]
+
+
+def _effective_impact(plan: WeeklyPlan, limiting_zones: set[str]):
+    """Conséquence effective du report — **dérivée**, jamais codée à la main.
+
+    La replanification mute des séries **physiques** ; l'effet sur les zones
+    est recalculé par `SetContributionPolicy` sur les occurrences avant et
+    après. Le ricochet sur les zones secondaires en tombe donc tout seul :
+    retirer un développé retire aussi du crédit triceps, sans qu'aucune règle
+    « la presse donne du triceps » ne soit écrite ici.
+    """
+    before = contributions_for([
+        slot for session in plan.sessions for slot in session.slots
+        if slot.is_prescribed
+    ])
+    after = contributions_for(_surviving_slots(plan, limiting_zones))
+    zones = sorted(set(before) | set(after))
+    return tuple(
+        (
+            zone,
+            before[zone].effective_units if zone in before else 0,
+            after[zone].effective_units if zone in after else 0,
+        )
+        for zone in zones
+    )
+
+
 def replan(
     plan: WeeklyPlan,
     completed_sessions: int,
@@ -263,6 +331,8 @@ def replan(
             reason="récupération estimée limitante — travail reporté, non supprimé",
         ))
 
+    effective_impact = _effective_impact(plan, limiting_zones)
+
     # Le budget non couvert AVANT reste non couvert : une replanification ne
     # comble pas un manque structurel, elle ne fait que déplacer du travail
     # réalisable.
@@ -298,12 +368,14 @@ def replan(
         divergences=divergences,
         deltas=tuple(deltas),
         unmet_budget_after=tuple(sorted(unmet)),
+        effective_impact=effective_impact,
         basis=tuple(basis),
     )
 
 
 __all__ = [
     "PERFORMED_SET_IDENTITY_LIMITATION",
+    "SECONDARY_EXPOSURE_IS_NOT_A_CONTRAINDICATION",
     "LIMITING_BANDS",
     "REPLAN_VERSION",
     "Divergence",
