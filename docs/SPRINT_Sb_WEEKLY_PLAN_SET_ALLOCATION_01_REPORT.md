@@ -196,3 +196,66 @@ candidats que le générateur classe déjà, plafonnés par
 `MAX_EXERCISES_PER_SESSION` × cadence. Faisable dès 4 séances/semaine
 (≈ 32 créneaux nécessaires pour 40 disponibles), impossible à 2 — et c'est une
 décision sur **la forme des séances**, donc la vôtre.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#94** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `f9cd9af` → fusion canonique `c40be81` → correctif Sonar `6e186aa` |
+| Merge | **`59fb09c`** |
+| Gate Sonar | **`OK`** — couverture du neuf **98,6 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | **4 127** (shard 1 : 1 935 · shard 2 : 2 192) |
+| Manifeste | 232 fichiers ⇒ 116 + 116 |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 658 Mo** | **4 853 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+| Durée | 7 min 58 | 8 min 49 |
+
+### Incident CI : **une PR sans AUCUN run**, et ce n'était pas GitHub
+
+La PR est restée avec **un seul check** (Gitar) : aucun run CI créé — ni `queued`,
+ni `failed`, rien dans `gh run list` ni dans l'API `actions/runs`. Diagnostic
+initial erroné (« panne de dispatch GitHub »), et la récupération `close/reopen`
+autorisée a été **dépensée pour rien**.
+
+**Cause réelle, et elle m'appartient** : `on: pull_request` s'exécute sur
+`refs/pull/N/merge` ; une PR **en conflit** rend cette ref inconstructible, donc
+le workflow ne se déclenche jamais. Le closeout de la tranche 1 a été poussé
+**après** le branchement de la tranche 2, et tous deux éditent
+`SPEC_REGISTRY.md` et `ROADMAP_AND_NEXT_STEPS.md`.
+
+Résolu par **fusion canonique normale** (jamais un rebase), en conservant la
+ligne tranche 1 **version closeout** plus la ligne tranche 2. La CI s'est
+déclenchée à la poussée suivante.
+
+**Règle d'ordonnancement retenue pour tout train multi-tranches : pousser le
+closeout de la tranche N AVANT de brancher la tranche N+1.** Et vérifier
+`mergeable` (un appel) avant de conclure à une panne d'infrastructure.
+
+### Findings Sonar — 2 réels, plus 1 défaut trouvé en les corrigeant
+
+`python:S9073` (assertion composite) et `python:S3415` (ordre d'assertion).
+
+**Le second n'était localisable qu'au CLI authentifié** : les **15** locations du
+`flow 0` disent toutes « Actual value first », et seul le **`flow 1`** nomme
+l'unique contrevenant (un affichage de tuple à gauche, lu comme le littéral).
+L'écart de gate seul n'aurait désigné personne.
+
+En pré-scannant les autres assertions composites, **une s'est révélée vacante** :
+`lateral_delt_priority` prescrit 4 séries et l'allocateur plafonne à 4, donc
+`planned_sets != mapper_sets or planned_sets == cap` passait sur le second
+disjoint **sans rien prouver**. Réécrite autour de
+`quad_minimum_effective_dose` (2 séries), où l'assertion doit tenir pour une
+vraie raison.
+
+**Troisième garde non porteuse de ce train** — après le plafond de bande et
+l'étanchéité de cadence. Toutes trois trouvées par plantation ou pré-scan,
+aucune par relecture.
