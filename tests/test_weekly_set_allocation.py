@@ -263,21 +263,33 @@ def test_a_contradictory_catalog_entry_is_not_arbitrated_here():
 
 def test_a_new_intent_without_prescription_uses_the_named_product_default():
     """Les intentions de la tranche 1 n'héritent PAS des prescriptions morpho."""
-    reps = resolve_rep_target("Exercice inexistant", "trunk_core_direct")
-    assert reps[2] == REP_SOURCE_PRODUCT_DEFAULT
-    assert (reps[0], reps[1]) == PRODUCT_DEFAULT_REPS
+    min_reps, max_reps, source = resolve_rep_target(
+        "Exercice inexistant", "trunk_core_direct")
+    assert source == REP_SOURCE_PRODUCT_DEFAULT
+    assert min_reps == PRODUCT_DEFAULT_REPS[0]
+    assert max_reps == PRODUCT_DEFAULT_REPS[1]
 
 
 def test_the_intent_source_contributes_reps_only_never_sets():
-    """Le nombre de séries du mapper appartenait à un autre modèle."""
+    """Le nombre de séries du mapper appartenait à un autre modèle.
+
+    Le témoin est `quad_minimum_effective_dose` (**2** séries au mapper) et non
+    `lateral_delt_priority` : celui-ci en prescrit 4, exactement le plafond de
+    l'allocateur, si bien que les deux valeurs coïncidaient par accident et que
+    l'assertion passait sans rien prouver.
+    """
     from app.services.morpho_program_draft_mapper import _INTENT_PRESCRIPTION
 
-    sets, min_reps, max_reps = _INTENT_PRESCRIPTION["lateral_delt_priority"]
-    resolved = resolve_rep_target("Exercice inexistant", "lateral_delt_priority")
-    assert (resolved[0], resolved[1]) == (min_reps, max_reps)
-    plan = _plan(sessions_per_week=4)
-    delt = _zone(plan, "delt_lat")
-    assert delt.planned_sets != sets or delt.planned_sets == SETS_PER_SLOT_MAX
+    mapper_sets, min_reps, max_reps = _INTENT_PRESCRIPTION[
+        "quad_minimum_effective_dose"]
+    resolved_min, resolved_max, _ = resolve_rep_target(
+        "Exercice inexistant", "quad_minimum_effective_dose")
+    # La PLAGE vient bien de l'intention…
+    assert resolved_min == min_reps
+    assert resolved_max == max_reps
+    # …mais le nombre de SÉRIES vient du budget, et diffère du mapper.
+    quads = _zone(_plan(sessions_per_week=4), "quads")
+    assert quads.planned_sets != mapper_sets
 
 
 def test_every_fallback_is_visible_in_the_basis():
@@ -313,7 +325,8 @@ def test_a_prescription_carries_everything_a_draft_needs():
 def test_the_set_scheme_matches_the_catalog_format():
     plan = _plan(sessions_per_week=4)
     scheme = plan.prescriptions[0].set_scheme
-    assert "x " in scheme and "-" in scheme
+    assert "x " in scheme
+    assert "-" in scheme
 
 
 def test_slots_carry_their_dose_so_a_session_reads_on_its_own():
