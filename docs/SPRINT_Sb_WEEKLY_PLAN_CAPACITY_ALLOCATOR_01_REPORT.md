@@ -170,3 +170,39 @@ introduit en chemin.** Optimiser la suppression d'un dépassement comptable m'a
 fait produire un programme sans aucun exercice de bras pour un utilisateur qui
 avait déclaré « Bras » — des chiffres corrects, une demande non servie. Le
 correctif est structurel, et la garde qui l'attrape est prouvée mordante.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#99** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `39d9b6e` + correctif Sonar `47dd691` |
+| Merge | **`cbf64f2`** |
+| Gate Sonar | **`OK`** — couverture du neuf **97,9 %**, **0 smell**, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | shard 2 : 2 257 · full sweep local **4 272** |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 148 Mo** | **5 173 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+Troisième tranche consécutive au-dessus de 5 Go sur les deux shards.
+
+### 1 finding Sonar — et l'affirmation sans preuve qu'il a révélée
+
+`python:S1481` (MINOR) : `allocator_units` lié puis jamais lu — reste d'un
+câblage antérieur. Le gate passait (10 < 14), mais la variable morte cachait
+plus gênant : la docstring de `_contributions_from_occurrences` **affirmait
+qu'un test vérifiait** la coïncidence entre les unités cumulées par
+l'allocateur et celles recalculées par la politique partagée. **Ce test
+n'existait pas.**
+
+Les deux sont corrigés : la liaison est explicitement écartée, et un test
+compare désormais `allocate_capacity` à `contributions_for` sur les mêmes
+occurrences. Deux chemins, un seul résultat — la promesse est tenue plutôt
+qu'écrite.
