@@ -406,7 +406,9 @@ def _weekly_plan_proposal(db, user_id: int) -> dict | None:
             "constraints": list(readiness.unserved_priorities),
             "unmet_zones": len(readiness.unmet_zones),
         }
-    except Exception:  # noqa: BLE001 — confinement volontaire, cf. docstring
+    # Confinement volontaire et large : voir la docstring. Toute panne de la
+    # chaîne de planification doit laisser la bibliothèque servie.
+    except Exception:  # noqa: BLE001
         return None
 
 
