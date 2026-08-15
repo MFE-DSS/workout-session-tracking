@@ -79,13 +79,17 @@ def test_the_verdict_counts_only_executable_work():
 
 
 def test_empty_slots_never_become_exercises():
-    """`core` n'a aucun exercice : il ne doit pas entrer dans l'arbre.
+    """Un créneau vide ne doit pas entrer dans l'arbre.
 
     `validate_draft` refuse une séance sans exercice ; y laisser un créneau
     vide rendrait tout le brouillon invalidable pour une lacune que le plan
     signale déjà.
+
+    Le témoin est désormais une **restriction de matériel** : `core` était le
+    seul créneau structurellement vide, et il est servable depuis
+    `Sb_CORE_EXERCISE_PROPERTIES_01`.
     """
-    plan = _plan(sessions_per_week=4)
+    plan = _plan(sessions_per_week=4, available_equipment=("machine", "cable"))
     empty = [s for sess in plan.sessions for s in sess.slots if not s.is_filled]
     assert empty, "fixture inutile sans créneau vide"
 

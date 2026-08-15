@@ -57,6 +57,7 @@ from dataclasses import asdict, dataclass, field, replace
 
 from app.services.morpho_program_generator import GAP_AVAILABILITY, generate_program
 from app.services.muscle_mapping import RADAR_AXES, ZONE_LABELS
+from app.services.planner_candidates import planner_candidate_pool
 from app.services.set_contribution import (
     SET_CONTRIBUTION_POLICY_VERSION,
     UNITS_PER_SET,
@@ -516,7 +517,10 @@ def build_weekly_plan(
         priorities=[(key, rank) for rank, key in enumerate(
             priority_keys_for_zones(target_zones), start=1)],
         availability=prefs.available_equipment,
-        pool=pool,
+        # Vue du PLANIFICATEUR : registre de substitution + candidats de tronc.
+        # Le registre de substitution n'est jamais modifié — voir
+        # `planner_candidates` pour l'erreur de catégorie que cela évite.
+        pool=pool if pool is not None else planner_candidate_pool(),
     )
 
     slots_by_zone = _slots_by_zone(generated)

@@ -155,7 +155,10 @@ def test_the_physical_total_is_untouched_by_the_accounting_policy():
     plan = _plan(sessions_per_week=4)
     physical = sum(p.planned_sets for p in plan.prescriptions)
     assert plan.planned_sets_total == physical
-    assert physical == 44, "la dose physique ne doit pas bouger avec la politique"
+    # 48 depuis `Sb_CORE_EXERCISE_PROPERTIES_01` (44 + le créneau core devenu
+    # programmable). Le chiffre est épinglé pour qu'un changement de dose
+    # physique soit un choix visible, jamais un effet de bord de comptabilité.
+    assert physical == 48, "la dose physique ne doit pas bouger avec la politique"
 
 
 def test_planned_sets_stays_physical_and_effective_stays_separate():

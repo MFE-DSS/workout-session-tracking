@@ -374,9 +374,15 @@ def test_slots_carry_their_dose_so_a_session_reads_on_its_own():
 
 
 def test_an_unfillable_slot_carries_no_dose():
-    plan = _plan(sessions_per_week=4)
+    """Garde générale — témoin déplacé sous restriction de matériel.
+
+    `core` avait ce rôle tant qu'il n'avait aucun candidat ; il en a un depuis
+    `Sb_CORE_EXERCISE_PROPERTIES_01`. Seule une restriction produit encore un
+    créneau vide, et la garde doit continuer d'y valoir.
+    """
+    plan = _plan(sessions_per_week=4, available_equipment=("machine", "cable"))
     empty = [s for sess in plan.sessions for s in sess.slots if not s.is_filled]
-    assert empty, "le créneau core doit exister sans exercice"
+    assert empty, "aucun créneau vide : la garde n'est plus éprouvée"
     for slot in empty:
         assert slot.planned_sets == 0
         assert not slot.is_prescribed
@@ -394,8 +400,10 @@ def test_prescriptions_are_ordered_deterministically():
 
 
 def test_a_zone_without_candidates_reports_that_not_a_volume_shortfall():
-    """`core` n'a aucun exercice : dire « il manque des séries » induirait en erreur."""
-    plan = _plan(sessions_per_week=4)
+    """Dire « il manque des séries » quand aucun exercice n'est disponible
+    désignerait le mauvais mur. Témoin sous restriction depuis que `core` est
+    servable sans contrainte de matériel."""
+    plan = _plan(sessions_per_week=4, available_equipment=("machine", "cable"))
     core = _zone(plan, "core")
     assert core.planned_sets == 0
     assert core.unmet_reason != UNMET_VOLUME

@@ -96,12 +96,21 @@ class TestFeasibilityGaps:
         assert entry.unmet_reason not in (
             UNMET_NO_INTENT, UNMET_NO_CANDIDATE, UNMET_EQUIPMENT)
 
-    def test_core_remains_a_named_DATA_gap_not_an_intent_gap(self):
-        """`core` a une intention ; ce qui manque, ce sont les candidats."""
-        plan = _plan(sessions_per_week=3)
-        entry = next(z for z in plan.zone_coverage if z.zone_code == "core")
-        assert entry.unmet_reason == UNMET_NO_CANDIDATE
-        assert entry.unmet_reason != UNMET_NO_INTENT
+    def test_core_is_served_but_still_names_its_gap_under_restriction(self):
+        """La lacune de candidats `core` est fermée sans matériel déclaré.
+
+        Sous restriction, aucun exercice de tronc ne porte d'`equipment_family`
+        au référentiel — la zone tombe alors en `UNMET_EQUIPMENT`, ce qui est
+        exact : le manque est du matériel documenté, pas de l'exercice.
+        """
+        served = _plan(sessions_per_week=3)
+        core = next(z for z in served.zone_coverage if z.zone_code == "core")
+        assert core.unmet_reason not in (UNMET_NO_CANDIDATE, UNMET_NO_INTENT)
+
+        restricted = _plan(
+            sessions_per_week=3, available_equipment=(FAM_BARBELL,))
+        core = next(z for z in restricted.zone_coverage if z.zone_code == "core")
+        assert core.unmet_reason == UNMET_EQUIPMENT
 
     def test_a_newly_servable_zone_receives_a_slot(self):
         plan = _plan(sessions_per_week=3)
