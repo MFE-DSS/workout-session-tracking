@@ -155,19 +155,22 @@ def test_the_physical_total_is_untouched_by_the_accounting_policy():
     plan = _plan(sessions_per_week=4)
     physical = sum(p.planned_sets for p in plan.prescriptions)
     assert plan.planned_sets_total == physical
-    # 48 depuis `Sb_CORE_EXERCISE_PROPERTIES_01` (44 + le créneau core devenu
-    # programmable). Le chiffre est épinglé pour qu'un changement de dose
-    # physique soit un choix visible, jamais un effet de bord de comptabilité.
-    assert physical == 48, "la dose physique ne doit pas bouger avec la politique"
+    # 96 depuis `Sb_WEEKLY_PLAN_CAPACITY_ALLOCATOR_01` : la capacité déclarée
+    # est enfin allouée (4 séances × 24 séries). Le chiffre reste épinglé pour
+    # qu'un changement de dose physique soit un choix visible, jamais un effet
+    # de bord de la comptabilité effective.
+    assert physical == 96, "la dose physique ne doit pas bouger avec la politique"
 
 
 def test_planned_sets_stays_physical_and_effective_stays_separate():
     plan = _plan(sessions_per_week=4)
-    calves = _zone(plan, "calves")
-    # `calves` porte 8 séries physiques mais n'en récupère que 4 en direct :
-    # les deux grandeurs ne peuvent pas être confondues.
-    assert calves.planned_sets == 8
-    assert calves.effective_sets == 4.0
+    # Une zone servie par un composé reçoit **plus** en effectif qu'en
+    # physique direct (crédit indirect), une autre peut en recevoir moins :
+    # dans les deux cas les grandeurs ne se confondent pas.
+    biceps = _zone(plan, "biceps")
+    assert biceps.effective_sets > biceps.planned_sets, (
+        "le crédit indirect doit distinguer effectif et physique"
+    )
 
 
 def test_removing_indirect_credit_changes_the_budget_verdict():

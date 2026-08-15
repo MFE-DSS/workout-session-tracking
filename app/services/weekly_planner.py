@@ -62,22 +62,33 @@ from app.services.set_contribution import (
     SET_CONTRIBUTION_POLICY_VERSION,
     UNITS_PER_SET,
     ZoneContribution,
-    contributions_for,
+    accumulate,
     units_for_sets,
 )
 from app.services.slot_intent import _INTENT_SPECS, PRIORITY_TO_INTENTS
 from app.services.training_preferences import TrainingPreferencesData
+from app.services.weekly_capacity_allocator import (
+    CAPACITY_ALLOCATOR_VERSION,
+    allocate_capacity,
+    classify_overshoot,
+    incidental_overshoot,
+)
 from app.services.weekly_set_allocation import (
     UNMET_VOLUME,
     ExercisePrescription,
     allocate_zone,
+    resolve_rep_target,
 )
 from app.services.weekly_volume_budget import (
     WeeklyVolumeBudget,
     build_weekly_volume_budget,
 )
 
-PLANNER_VERSION = 1
+# Bumpé par `Sb_WEEKLY_PLAN_CAPACITY_ALLOCATOR_01` : la sémantique réalisée
+# change matériellement (occurrence unique et capacité sous-utilisée ⇒
+# allocation multi-occurrences de la capacité déclarée). La politique de
+# volume, elle, n'a pas bougé — `weekly-volume-v1` reste inchangée.
+PLANNER_VERSION = 2
 
 #: Raisons de non-couverture, nommées pour qu'un consommateur puisse les
 #: distinguer sans analyser du texte.
@@ -184,6 +195,11 @@ class ZoneCoverage:
     indirect_sets: int = 0
     effective_units: int = 0
     contribution_basis: tuple[str, ...] = ()
+    #: Dépassement de la bande haute — trois états distincts, jamais confondus.
+    #: `PREVENTABLE` est un défaut d'allocateur et doit rester à zéro ;
+    #: `INCIDENTAL` est du crédit reçu en servant d'autres zones, autorisé.
+    overshoot_kind: str = "none"
+    effective_overshoot_units: int = 0
 
     @property
     def effective_sets(self) -> float:
@@ -245,6 +261,8 @@ def _fingerprint(sessions, coverage, unmet) -> str:
     """
     payload = json.dumps(
         {
+            "planner_version": PLANNER_VERSION,
+            "allocator_version": CAPACITY_ALLOCATOR_VERSION,
             "sessions": [asdict(s) for s in sessions],
             "coverage": [asdict(c) for c in coverage],
             "unmet": [c.zone_code for c in unmet],
@@ -369,7 +387,92 @@ def _apply_prescriptions(slots_by_zone, prescribed):
     return out
 
 
-def _contribution_basis(zone, contribution) -> tuple[str, ...]:
+def _candidates_by_zone(slots_by_zone) -> dict[str, list[tuple[str, str]]]:
+    """`{zone: [(exercice, intention), …]}` — classement du générateur fermé.
+
+    Le planificateur ne range aucun exercice : il reprend l'ordre déjà établi
+    par `morpho_program_generator`, préféré d'abord puis replis.
+    """
+    out: dict[str, list[tuple[str, str]]] = {}
+    for zone_code, slots in slots_by_zone.items():
+        ranked = [
+            (slot.exercise_name, slot.intent_id)
+            for slot in slots if slot.is_filled
+        ]
+        if ranked:
+            out[zone_code] = ranked
+    return out
+
+
+def _slot_for(occurrence, slots_by_zone) -> PlannedSlot:
+    """Le créneau modèle d'une occurrence — rationale et repères conservés."""
+    for slot in slots_by_zone.get(occurrence.zone_code, ()):
+        if slot.exercise_name == occurrence.exercise_name:
+            return slot
+    return next(iter(slots_by_zone[occurrence.zone_code]))
+
+
+def _sessions_from_occurrences(occurrences, slots_by_zone):
+    """Construit les séances à partir des occurrences allouées."""
+    if not occurrences:
+        return ()
+    by_session: dict[int, list[PlannedSlot]] = {}
+    for position, occurrence in enumerate(occurrences, start=1):
+        model = _slot_for(occurrence, slots_by_zone)
+        min_reps, max_reps, source = resolve_rep_target(
+            occurrence.exercise_name, occurrence.intent_id)
+        by_session.setdefault(occurrence.session_index, []).append(replace(
+            model,
+            slot_id=f"slot{position}",
+            planned_sets=occurrence.planned_sets,
+            min_reps=min_reps,
+            max_reps=max_reps,
+            rep_target_source=source,
+        ))
+    return tuple(
+        PlannedSession(index=index, slots=tuple(slots))
+        for index, slots in sorted(by_session.items())
+    )
+
+
+def _prescriptions_from_occurrences(occurrences, slots_by_zone):
+    """Une prescription par occurrence, dans l'ordre déterministe d'allocation."""
+    out = []
+    for position, occurrence in enumerate(occurrences, start=1):
+        model = _slot_for(occurrence, slots_by_zone)
+        min_reps, max_reps, source = resolve_rep_target(
+            occurrence.exercise_name, occurrence.intent_id)
+        out.append(ExercisePrescription(
+            slot_id=f"slot{position}",
+            exercise_name=occurrence.exercise_name,
+            zone_code=occurrence.zone_code,
+            intent_id=occurrence.intent_id,
+            planned_sets=occurrence.planned_sets,
+            min_reps=min_reps,
+            max_reps=max_reps,
+            rep_target_source=source,
+            rationale=model.rationale,
+            budget_source=SET_CONTRIBUTION_POLICY_VERSION,
+        ))
+    return tuple(out)
+
+
+def _contributions_from_occurrences(occurrences) -> dict[str, ZoneContribution]:
+    """Contributions par zone, cumulées depuis la **politique partagée**.
+
+    Le détail direct/indirect n'est pas transporté depuis l'allocateur : il est
+    recalculé par `set_contribution`, seule source de vérité. Un test vérifie
+    que le total en unités coïncide avec celui de l'allocateur — deux chemins,
+    un seul résultat.
+    """
+    contributions: dict[str, ZoneContribution] = {}
+    for occurrence in occurrences:
+        contributions = accumulate(
+            contributions, occurrence.exercise_name, occurrence.planned_sets)
+    return contributions
+
+
+def _contribution_basis(zone, contribution, allocated_sets=0) -> tuple[str, ...]:
     """D'où vient le crédit de cette zone — dit, jamais laissé à deviner."""
     out = [
         f"{contribution.direct_sets} série(s) directe(s) "
@@ -391,12 +494,18 @@ def _contribution_basis(zone, contribution) -> tuple[str, ...]:
             "aucun exercice ne vise cette zone en principal — elle n'est "
             "servie qu'indirectement"
         )
+    if incidental_overshoot(zone, contribution.effective_units, allocated_sets):
+        out.append(
+            f"au-dessus de la bande sans sur-allocation : {allocated_sets} "
+            "série(s) attribuée(s) seulement, le reste est du crédit indirect "
+            "reçu en servant d'autres zones — signalé, pas empêché"
+        )
     return tuple(out)
 
 
 def _coverage(
     budget, slots_by_zone, servable, equipment_declared, allocations,
-    contributions,
+    contributions, occurrences=(),
 ):
     """Couverture par zone face à sa bande, et la liste des manques.
 
@@ -414,6 +523,8 @@ def _coverage(
         contribution = contributions.get(
             zone.zone_code) or ZoneContribution(zone_code=zone.zone_code)
         low_units = units_for_sets(zone.planning_low_sets)
+        allocated = sum(
+            o.planned_sets for o in occurrences if o.zone_code == zone.zone_code)
         # Un manque de candidat prime sur un manque de volume : dire « il
         # manque des séries » alors qu'aucun exercice n'existe désignerait le
         # mauvais mur.
@@ -423,21 +534,28 @@ def _coverage(
         entry = ZoneCoverage(
             zone_code=zone.zone_code,
             zone_label=zone.zone_label,
-            # Créneaux REMPLIS : un créneau sans exercice n'est pas une couverture.
-            planned_slots=sum(1 for slot in planned if slot.is_filled),
+            # Occurrences réellement placées pour cette zone.
+            planned_slots=sum(
+                1 for o in occurrences if o.zone_code == zone.zone_code),
             planning_low_sets=zone.planning_low_sets,
             baseline_sets=zone.baseline_sets,
             planning_high_sets=zone.planning_high_sets,
             priority_rank=zone.priority_rank,
             unmet_reason=reason,
-            planned_sets=allocation.planned_sets,
+            planned_sets=allocated,
             target_sets=allocation.target_sets,
             slot_capacity_sets=allocation.slot_capacity_sets,
             allocation_basis=allocation.basis,
             direct_sets=contribution.direct_sets,
             indirect_sets=contribution.indirect_sets,
             effective_units=contribution.effective_units,
-            contribution_basis=_contribution_basis(zone, contribution),
+            overshoot_kind=classify_overshoot(
+                zone, contribution.effective_units, allocated).value,
+            effective_overshoot_units=max(
+                0, contribution.effective_units
+                - units_for_sets(zone.planning_high_sets)),
+            contribution_basis=_contribution_basis(
+                zone, contribution, allocated),
         )
         coverage.append(entry)
         if reason is not None:
@@ -524,25 +642,24 @@ def build_weekly_plan(
     )
 
     slots_by_zone = _slots_by_zone(generated)
-    allocations, prescribed = _allocate(weekly_budget, slots_by_zone)
-    slots_by_zone = _apply_prescriptions(slots_by_zone, prescribed)
-    sessions = _distribute(slots_by_zone, prefs.sessions_per_week)
-    # La comptabilité effective est cumulée APRÈS l'allocation physique : le
-    # crédit indirect d'une zone dépend d'exercices programmés pour d'autres
-    # zones, donc aucune allocation isolée ne peut le connaître.
-    prescribed_slots = [
-        slot for slots in slots_by_zone.values() for slot in slots
-        if slot.is_prescribed
-    ]
-    contributions = contributions_for(prescribed_slots)
+    # L'ALLOCATEUR DE CAPACITÉ remplace la répartition « un créneau par
+    # intention » : il place des **occurrences** dans les séances déclarées,
+    # jusqu'à ce qu'aucune zone ne puisse plus progresser. Une même identité
+    # d'exercice peut revenir dans plusieurs séances — c'est préférable à
+    # inventer des exercices équivalents pour faire du volume.
+    allocations, _ = _allocate(weekly_budget, slots_by_zone)
+    occurrences, allocator_units = allocate_capacity(
+        weekly_budget.zones,
+        _candidates_by_zone(slots_by_zone),
+        prefs.sessions_per_week or 0,
+    )
+    sessions = _sessions_from_occurrences(occurrences, slots_by_zone)
+    contributions = _contributions_from_occurrences(occurrences)
     coverage, unmet = _coverage(
         weekly_budget, slots_by_zone, servable, prefs.available_equipment,
-        allocations, contributions)
+        allocations, contributions, occurrences)
     unmet_by_zone = {c.zone_code: c.unmet_reason for c in unmet if c.unmet_reason}
-    prescriptions = tuple(
-        p for zone_code in sorted(prescribed)
-        for _, p in sorted(prescribed[zone_code].items())
-    )
+    prescriptions = _prescriptions_from_occurrences(occurrences, slots_by_zone)
 
     return WeeklyPlan(
         requested_sessions=prefs.sessions_per_week,

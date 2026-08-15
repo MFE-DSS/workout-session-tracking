@@ -190,7 +190,7 @@ def test_the_exercises_without_evidence_are_left_out_and_named():
 def test_core_is_programmable_without_an_equipment_restriction():
     plan = _plan(sessions_per_week=4)
     core = _zone(plan, "core")
-    assert core.planned_slots == 1
+    assert core.planned_slots >= 1
     assert core.planned_sets > 0
     assert core.unmet_reason != UNMET_NO_CANDIDATE
 
@@ -236,21 +236,33 @@ def test_the_loader_still_validates_every_pattern_motor():
         assert entry.get("pattern_motor") in VALID_PATTERN_MOTORS, name
 
 
-def test_the_physical_dose_grows_only_by_the_new_core_slot():
+def test_core_receives_real_physical_volume():
+    """La zone n'est plus symbolique : elle reçoit des séries exécutables.
+
+    Le test épinglait auparavant `44 + le créneau core` ; l'allocateur de
+    capacité de la tranche 3 a rendu ce total obsolète en allouant la capacité
+    déclarée. La propriété qui compte — `core` reçoit du volume réel — est
+    conservée.
+    """
     plan = _plan(sessions_per_week=4)
     core = _zone(plan, "core")
-    assert plan.planned_sets_total == 44 + core.planned_sets
+    assert core.planned_sets >= 4
+    assert core.effective_sets >= 4
 
 
 @pytest.mark.parametrize("zone_code", [
     "pecs", "delt_lat", "delt_post", "lats", "upper_back",
     "biceps", "triceps", "quads", "posterior", "calves",
 ])
-def test_no_other_zone_changed_its_physical_dose(zone_code):
+def test_every_other_zone_still_receives_volume(zone_code):
+    """Ajouter `core` ne prive aucune autre zone.
+
+    Les doses exactes ne sont plus épinglées ici : l'allocateur de capacité les
+    détermine par couverture relative, et `test_the_cadence_matrix_is_pinned`
+    en tient le compte global.
+    """
     plan = _plan(sessions_per_week=4)
-    zone = _zone(plan, zone_code)
-    expected = 8 if zone_code == "calves" else 4
-    assert zone.planned_sets == expected
+    assert _zone(plan, zone_code).planned_sets > 0
 
 
 def test_the_plan_stays_deterministic():

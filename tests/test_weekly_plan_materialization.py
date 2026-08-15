@@ -62,9 +62,17 @@ def test_an_unservable_declared_priority_outranks_a_volume_shortfall():
 
 
 def test_a_partial_plan_is_never_reported_as_ready():
-    for prefs in ({"sessions_per_week": 3}, {"sessions_per_week": 6}):
-        readiness = assess_materialization(_plan(**prefs))
-        assert readiness.status is not MaterializationStatus.READY
+    """Un plan incomplet reste `PARTIAL` — mais un plan complet existe enfin.
+
+    Depuis `Sb_WEEKLY_PLAN_CAPACITY_ALLOCATOR_01`, la capacité déclarée est
+    réellement allouée : à **6 séances**, toutes les zones atteignent leur
+    borne basse et le plan sort légitimement en `READY`. À 3 séances la
+    capacité ne suffit pas, et le statut le dit.
+    """
+    assert assess_materialization(
+        _plan(sessions_per_week=3)).status is MaterializationStatus.PARTIAL
+    assert assess_materialization(
+        _plan(sessions_per_week=6)).status is MaterializationStatus.READY
 
 
 def test_the_verdict_counts_only_executable_work():
@@ -90,9 +98,10 @@ def test_empty_slots_never_become_exercises():
     `Sb_CORE_EXERCISE_PROPERTIES_01`.
     """
     plan = _plan(sessions_per_week=4, available_equipment=("machine", "cable"))
-    empty = [s for sess in plan.sessions for s in sess.slots if not s.is_filled]
-    assert empty, "fixture inutile sans créneau vide"
-
+    # L'allocateur ne place plus que des occurrences réellement dotées : un
+    # créneau vide ne peut pas atteindre une séance. La garde vérifie donc que
+    # l'arbre ne contient aucun exercice sans nom, propriété qui reste
+    # nécessaire pour `validate_draft`.
     names = {
         e["exercise_name"]
         for session in plan_to_draft_tree(plan)
