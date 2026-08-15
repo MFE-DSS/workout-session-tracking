@@ -188,3 +188,35 @@ le brief l'exige, et la tranche 3 doit allouer de la capacité réelle.
 
 Un défaut de données est rendu visible et chiffré (`calves` / `quads`) : c'est
 une décision produit, remontée et épinglée, pas comblée en passant.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#97** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `1e4c7e5` — **vert au premier passage**, aucun correctif |
+| Merge | **`b56d12b`** |
+| Gate Sonar | **`OK`** — couverture du neuf **98,8 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | **4 205** (shard 1 : 2 261 · shard 2 : 1 944) |
+
+### Capacité CI — **HEALTHY**, et en amélioration
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 043 Mo** | **5 311 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+Le minimum des deux shards **remonte à 5 043 Mo**, contre **4 574 Mo** à la fin
+du train précédent. La pente signalée alors ne se confirme pas ici : cette
+tranche ajoute des tests **purs** (aucun fixture `client`), ce qui valide une
+fois de plus le modèle de coût — la mémoire suit les tests HTTP, pas leur
+nombre.
+
+### Zéro incident
+
+Vert au premier passage : aucun finding Sonar, aucun conflit, aucune reprise de
+CI. Le pré-scan `S9073`/`S5863`/`S3415` et la règle d'ordonnancement (closeout
+de N avant branchement de N+1) tiennent pour la deuxième tranche consécutive.
