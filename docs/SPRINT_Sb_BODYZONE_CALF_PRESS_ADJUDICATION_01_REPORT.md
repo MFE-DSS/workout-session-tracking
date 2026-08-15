@@ -124,3 +124,25 @@ le vrai risque du sprint, et il est mesuré, pas supposé.
 
 **L'effet sur le plan actuel est nul**, parce que l'allocateur ne retient pas cet
 exercice — dit franchement plutôt que déguisé en amélioration.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#101** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `87df204` — **vert au premier passage**, aucun correctif |
+| Merge | **`fa62329`** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | full sweep local **4 309** |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 182 Mo** | **5 028 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+Cinquième tranche consécutive au-dessus de 5 Go sur les deux shards.
