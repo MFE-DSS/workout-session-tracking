@@ -299,6 +299,37 @@ def test_the_fingerprint_incorporates_the_new_versions():
     assert plan.planner_version == PLANNER_VERSION
 
 
+def test_the_allocator_and_the_shared_policy_agree_on_the_units():
+    """Deux chemins, un seul résultat — la promesse est désormais testée.
+
+    L'allocateur cumule les unités au fil de ses décisions ; le planificateur
+    les recalcule depuis `set_contribution` sur les occurrences retenues. Les
+    deux doivent coïncider, sans quoi il existerait deux comptabilités.
+
+    Ce test comble une affirmation que la docstring du planificateur faisait
+    sans preuve.
+    """
+    from app.services.set_contribution import contributions_for
+    from app.services.weekly_capacity_allocator import allocate_capacity
+    from app.services.weekly_volume_budget import build_weekly_volume_budget
+
+    prefs = TrainingPreferencesData(sessions_per_week=4)
+    plan = build_weekly_plan(prefs)
+    candidates: dict[str, list[tuple[str, str]]] = {}
+    for session in plan.sessions:
+        for slot in session.slots:
+            candidates.setdefault(slot.zone_code, []).append(
+                (slot.exercise_name, slot.intent_id))
+
+    occurrences, allocator_units = allocate_capacity(
+        build_weekly_volume_budget(prefs).zones, candidates, 4)
+    derived = contributions_for(occurrences)
+
+    assert allocator_units == {
+        zone: c.effective_units for zone, c in derived.items()
+    }
+
+
 def test_the_plan_stays_deterministic():
     first = _plan(sessions_per_week=4, focus_priorities=("arms",))
     second = _plan(sessions_per_week=4, focus_priorities=("arms",))

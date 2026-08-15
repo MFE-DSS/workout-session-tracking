@@ -648,7 +648,7 @@ def build_weekly_plan(
     # d'exercice peut revenir dans plusieurs séances — c'est préférable à
     # inventer des exercices équivalents pour faire du volume.
     allocations, _ = _allocate(weekly_budget, slots_by_zone)
-    occurrences, allocator_units = allocate_capacity(
+    occurrences, _allocator_units = allocate_capacity(
         weekly_budget.zones,
         _candidates_by_zone(slots_by_zone),
         prefs.sessions_per_week or 0,
