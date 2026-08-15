@@ -299,12 +299,15 @@ def test_an_empty_slot_is_not_counted_as_coverage():
     supprimé la protection en même temps que son décor.
     """
     plan = _plan(sessions_per_week=3, available_equipment=("machine", "cable"))
+    # Depuis `Sb_WEEKLY_PLAN_CAPACITY_ALLOCATOR_01`, un créneau vide ne peut
+    # plus atteindre une séance : l'allocateur ne place que du réalisable. Le
+    # fail-open est devenu structurellement impossible, et la garde vérifie
+    # désormais que la zone non servable sort bien à zéro, nommée.
     core_slots = [
         slot for session in plan.sessions for slot in session.slots
         if slot.zone_code == "core"
     ]
-    assert core_slots, "le créneau core doit exister — l'intention est réelle"
-    assert all(slot.exercise_name is None for slot in core_slots)
+    assert not core_slots, "une zone non servable n'entre pas dans une séance"
     assert _zone(plan, "core").planned_slots == 0
     assert _zone(plan, "core") in plan.unmet_budget
 

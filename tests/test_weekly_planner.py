@@ -60,11 +60,32 @@ class TestCadence:
     def test_an_undeclared_cadence_is_an_explicit_constraint(self):
         assert UNMET_NO_CADENCE in _plan().unmet_constraints
 
-    def test_the_slot_total_does_not_depend_on_cadence(self):
-        """La cadence répartit ; elle ne crée ni ne retire de travail."""
-        two = sum(len(s.slots) for s in _plan(sessions_per_week=2).sessions)
-        five = sum(len(s.slots) for s in _plan(sessions_per_week=5).sessions)
-        assert two == five
+    def test_the_cadence_changes_what_is_REALIZABLE_not_the_budget(self):
+        """L'abstraction a changé avec `Sb_WEEKLY_PLAN_CAPACITY_ALLOCATOR_01`.
+
+        Tant que le plan émettait un créneau par intention, le total de
+        créneaux était nécessairement indépendant de la cadence. Désormais la
+        cadence définit la **capacité de séance**, donc plus de séances
+        permettent de réaliser une plus grande part d'un budget **inchangé**.
+
+        Ce n'est pas « plus de fréquence mérite plus de volume » : c'est
+        « plus de capacité permet de réaliser davantage du budget hebdomadaire,
+        qui n'a pas bougé ».
+        """
+        two = _plan(sessions_per_week=2)
+        five = _plan(sessions_per_week=5)
+
+        # Le BUDGET est identique…
+        bands = lambda plan: {  # noqa: E731
+            z.zone_code: (z.planning_low_sets, z.baseline_sets,
+                          z.planning_high_sets)
+            for z in plan.zone_coverage
+        }
+        assert bands(two) == bands(five)
+
+        # …seule sa RÉALISATION diffère.
+        assert sum(len(s.slots) for s in five.sessions) > sum(
+            len(s.slots) for s in two.sessions)
 
 
 # ─────────────────── les manques sont dits, pas comblés ───────────────────

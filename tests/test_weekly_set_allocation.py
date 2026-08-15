@@ -72,21 +72,26 @@ def test_a_single_slot_never_covers_a_sixteen_set_zone():
     plan = _plan(sessions_per_week=4)
     pecs = _zone(plan, "pecs")
     assert pecs.baseline_sets == 16
-    assert pecs.planned_slots == 1
-    assert pecs.planned_sets <= SETS_PER_SLOT_MAX
+    # L'allocateur de capacité place désormais plusieurs occurrences, mais la
+    # propriété testée est inchangée : le nombre d'exercices ne fait pas la
+    # couverture, seules les séries effectives la font.
+    assert pecs.planned_sets > SETS_PER_SLOT_MAX, "plusieurs occurrences"
+    assert pecs.effective_sets < pecs.planning_low_sets
     assert pecs.unmet_reason == UNMET_VOLUME
-    assert not pecs.is_within_band
 
 
 def test_budget_satisfaction_is_judged_on_sets_not_on_exercise_count():
     plan = _plan(sessions_per_week=4)
     for zone in plan.zone_coverage:
         if zone.unmet_reason is None:
-            assert zone.is_within_band, (
-                f"{zone.zone_code} déclarée couverte hors de sa bande"
+            # « Couverte » signifie **atteindre la borne basse**, pas rester
+            # sous la borne haute : une zone peut dépasser sa bande par crédit
+            # indirect en servant d'autres zones, sans avoir été sur-allouée.
+            assert zone.reaches_planning_low, (
+                f"{zone.zone_code} déclarée couverte sous sa borne basse"
             )
         else:
-            assert not zone.is_within_band or zone.planned_slots == 0
+            assert not zone.reaches_planning_low or zone.planned_slots == 0
 
 
 def test_a_zone_reaching_its_band_is_judged_on_EFFECTIVE_sets():
@@ -105,7 +110,7 @@ def test_a_zone_reaching_its_band_is_judged_on_EFFECTIVE_sets():
     biceps = _zone(plan, "biceps")
     assert biceps.indirect_sets > 0
     assert biceps.unmet_reason is None
-    assert biceps.is_within_band
+    assert biceps.reaches_planning_low
 
 
 def test_the_calf_press_miscredit_is_pinned():
@@ -124,21 +129,25 @@ def test_the_calf_press_miscredit_is_pinned():
 
     assert resolve_exercise_zones(None, "Calf press leg press").primary == "quads"
 
-    plan = _plan(sessions_per_week=4)
-    calves = _zone(plan, "calves")
-    assert calves.planned_sets == 8, "deux créneaux physiques"
-    assert calves.direct_sets == 4, "un seul est canoniquement rattaché à calves"
+    # Le mauvais crédit se lit désormais sur l'exercice lui-même plutôt que sur
+    # l'agrégat de la zone : l'allocateur peut ne plus retenir « Calf press leg
+    # press » selon la couverture relative, ce qui ne corrige en rien la donnée.
+    from app.services.set_contribution import exercise_roles
+
+    assert "calves" not in exercise_roles("Calf press leg press"), (
+        "la divergence a disparu — vérifier si la donnée a été corrigée"
+    )
 
 
 def test_every_covered_zone_respects_the_band_or_names_a_reason():
     """Acceptance du brief, sur les 11 zones, sans exception tolérée."""
     plan = _plan(sessions_per_week=4)
     for zone in plan.zone_coverage:
-        # La bande se compare en séries EFFECTIVES depuis
-        # `Sb_SET_CONTRIBUTION_POLICY_01` — comparer les séries physiques
-        # reproduirait exactement la confusion d'unités que la tranche supprime.
-        assert zone.is_within_band or zone.unmet_reason is not None, (
-            f"{zone.zone_code} hors bande ET sans raison nommée"
+        # La couverture se juge en séries EFFECTIVES, et « couverte » veut dire
+        # **borne basse atteinte** — un dépassement par crédit indirect n'est
+        # pas un manque.
+        assert zone.reaches_planning_low or zone.unmet_reason is not None, (
+            f"{zone.zone_code} sous sa borne basse ET sans raison nommée"
         )
 
 
@@ -159,10 +168,18 @@ def test_no_priority_targets_the_baseline():
     assert target_sets_for(pecs) == pecs.baseline_sets
 
 
-def test_priority_can_never_push_sets_above_the_high_bound():
+def test_priority_can_never_push_ALLOCATED_sets_above_the_high_bound():
+    """Le plafond borne ce qui est **attribué**, pas le crédit incident.
+
+    Servir `lats` et `upper_back` crédite `biceps` en secondaire ; refuser de
+    programmer le dos pour protéger un plafond de biceps affamerait deux zones
+    au profit d'une troisième que personne n'entraîne directement.
+    """
     plan = _plan(sessions_per_week=6, focus_priorities=("arms", "lower", "pecs"))
     for zone in plan.zone_coverage:
-        assert zone.planned_sets <= zone.planning_high_sets
+        assert zone.planned_sets <= zone.planning_high_sets, (
+            f"{zone.zone_code} SUR-ALLOUÉE au-delà de sa borne haute"
+        )
 
 
 def test_the_high_bound_binds_when_capacity_would_allow_more():
@@ -199,29 +216,53 @@ def test_priority_never_lowers_the_target():
 # ── Cadence : répartit, ne crée ni ne retire ─────────────────────────────────
 
 
-@pytest.mark.parametrize("cadence", [2, 3, 5, 6])
-def test_cadence_never_changes_the_weekly_set_total(cadence):
-    """La cadence déplace des créneaux entre séances, jamais des séries."""
-    reference = _plan(sessions_per_week=4).planned_sets_total
-    assert _plan(sessions_per_week=cadence).planned_sets_total == reference
+@pytest.mark.parametrize("cadence", [2, 3, 5])
+def test_cadence_never_changes_the_zone_BANDS(cadence):
+    """L'invariant réel : la cadence ne déplace **aucune borne**.
 
+    Il a changé de forme avec `Sb_WEEKLY_PLAN_CAPACITY_ALLOCATOR_01`. Tant que
+    l'allocation était pilotée par la bande, le **total réalisé** était lui
+    aussi indépendant de la cadence, et c'est ce que ce test épinglait.
 
-def test_cadence_does_not_change_any_zone_allocation():
-    """Comparer la CIBLE autant que le réalisé.
-
-    Une plantation a montré que `planned_sets` seul ne prouve rien : la
-    capacité (4 séries × 1 créneau) plafonne avant que la cible ne compte, si
-    bien qu'une cadence injectée dans la cible restait invisible. La cible est
-    l'intention avant plafonnement — c'est là que la fuite se voit.
+    Désormais la cadence définit la **capacité** — plus de séances, plus de
+    volume réalisable — ce que l'amendement opérateur demande explicitement de
+    mesurer et de rapporter. Ce qui ne doit toujours pas bouger, c'est la
+    **bande produit** de chaque zone : `planning_low`, `baseline`,
+    `planning_high` sont identiques à toutes les cadences.
     """
-    def snapshot(cadence):
+    reference = {
+        z.zone_code: (z.planning_low_sets, z.baseline_sets, z.planning_high_sets)
+        for z in _plan(sessions_per_week=4).zone_coverage
+    }
+    actual = {
+        z.zone_code: (z.planning_low_sets, z.baseline_sets, z.planning_high_sets)
+        for z in _plan(sessions_per_week=cadence).zone_coverage
+    }
+    assert actual == reference
+
+
+def test_more_sessions_allow_more_realized_volume():
+    """Corollaire assumé : la capacité déclarée est enfin utilisée."""
+    totals = [
+        _plan(sessions_per_week=c).planned_sets_total for c in (2, 3, 4, 5)]
+    assert totals == sorted(totals), "le volume doit croître avec la cadence"
+    assert totals[0] < totals[-1], "sinon la capacité n'est toujours pas allouée"
+
+
+def test_cadence_does_not_change_the_band_TARGET():
+    """La cible dans la bande reste indépendante de la cadence.
+
+    C'est la moitié survivante de l'ancien invariant : la cadence change ce
+    qu'on peut **réaliser**, jamais ce que la bande **vise**.
+    """
+    def targets(cadence):
         return {
-            z.zone_code: (z.planned_sets, z.target_sets)
+            z.zone_code: z.target_sets
             for z in _plan(sessions_per_week=cadence).zone_coverage
         }
 
-    assert snapshot(2) == snapshot(6)
-    assert snapshot(3) == snapshot(5)
+    assert targets(2) == targets(6)
+    assert targets(3) == targets(5)
 
 
 def test_cadence_never_reaches_the_allocator_at_all():
@@ -373,19 +414,26 @@ def test_slots_carry_their_dose_so_a_session_reads_on_its_own():
         assert slot.rep_target_source
 
 
-def test_an_unfillable_slot_carries_no_dose():
-    """Garde générale — témoin déplacé sous restriction de matériel.
+def test_an_unservable_zone_never_reaches_a_session():
+    """Le fail-open historique est devenu **structurellement impossible**.
 
-    `core` avait ce rôle tant qu'il n'avait aucun candidat ; il en a un depuis
-    `Sb_CORE_EXERCISE_PROPERTIES_01`. Seule une restriction produit encore un
-    créneau vide, et la garde doit continuer d'y valoir.
+    L'allocateur de capacité ne place que des occurrences réellement dotées :
+    un créneau vide ne peut plus entrer dans une séance, là où il fallait
+    auparavant une garde pour l'empêcher de compter comme couverture.
+
+    La garde change donc de forme — on vérifie que la zone non servable sort
+    bien à zéro avec une raison nommée, et qu'aucune séance ne contient de
+    créneau sans dose.
     """
     plan = _plan(sessions_per_week=4, available_equipment=("machine", "cable"))
-    empty = [s for sess in plan.sessions for s in sess.slots if not s.is_filled]
-    assert empty, "aucun créneau vide : la garde n'est plus éprouvée"
-    for slot in empty:
-        assert slot.planned_sets == 0
-        assert not slot.is_prescribed
+    core = _zone(plan, "core")
+    assert core.planned_slots == 0
+    assert core.planned_sets == 0
+    assert core.unmet_reason is not None
+
+    for session in plan.sessions:
+        for slot in session.slots:
+            assert slot.is_prescribed, "une séance ne contient que du réalisable"
 
 
 def test_prescriptions_are_ordered_deterministically():
@@ -432,8 +480,13 @@ def test_the_structural_shortfall_is_pinned():
     """
     plan = _plan(sessions_per_week=4)
     low_sum = sum(z.planning_low_sets for z in plan.zone_coverage)
-    assert plan.planned_sets_total < low_sum // 2, (
-        "le déficit structurel s'est refermé — vérifier que c'est intentionnel"
-    )
+    effective = sum(z.effective_sets for z in plan.zone_coverage)
+    # Le déficit s'est RÉDUIT sans disparaître : l'allocateur de capacité a
+    # fait passer le réalisé de 48 à 96 séries physiques, mais `Σ planning_low`
+    # reste hors d'atteinte à cette cadence — et ce n'est pas une cible dure.
+    assert effective < low_sum, "le déficit produit reste réel à cadence 4"
     unmet_volume = [z for z in plan.unmet_budget if z.unmet_reason == UNMET_VOLUME]
-    assert len(unmet_volume) >= 8, "le manque doit rester explicite zone par zone"
+    assert unmet_volume, "les zones encore courtes doivent rester nommées"
+    assert len(unmet_volume) < 8, (
+        "le déficit ne s'est pas réduit — l'allocateur n'alloue pas"
+    )
