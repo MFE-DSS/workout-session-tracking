@@ -24,13 +24,42 @@ from dataclasses import asdict, dataclass
 
 from app.services.muscle_mapping import RADAR_AXES
 from app.services.substitution import VALID_PATTERN_MOTORS, compute_proximity
+from app.services.user_program_exercise_catalog import detailed_zone_regions
 
 SLOT_INTENT_ENGINE_VERSION = 1
 
 # Detailed zone (muscle_mapping) -> macro region (exercise_properties zone_primary),
 # derived read-only from the existing RADAR_AXES — never redefined.
-DETAILED_TO_REGION: dict[str, str] = {
+_REGION_FROM_RADAR: dict[str, str] = {
     zone: axis for axis, spec in RADAR_AXES.items() for zone in spec["zones"]
+}
+
+
+def _region_from_knowledge_base() -> dict[str, str]:
+    """Detailed zone -> macro region, read from the curated EKB.
+
+    `core` is one of the 11 canonical detailed zones but has **no radar axis**
+    (`muscle_mapping.radar_axis_for_zone` returns `None` for it, deliberately).
+    It still owns a `BodyZone`, a `ZONE_VOLUME_TARGET` and — since
+    `Sb_WEEKLY_VOLUME_BUDGET_01` — a planning band, so it must be reachable as a
+    *detailed-zone* programming concern.
+
+    The region is **read from the EKB**, not written here: `_zone_macro_vocab`
+    carries `core` as a macro of the candidate taxonomy, and every curated entry
+    whose `zone_primary` is `core` carries `zone_macro: "core"`. Deriving it
+    keeps a single curated source of truth and, critically, **fabricates no
+    radar axis** — `RADAR_AXES` is untouched and `core` stays undeclarable as a
+    user-facing macro priority.
+
+    A test pins that this derivation agrees with `_REGION_FROM_RADAR` on all ten
+    zones that do have an axis, so the two sources cannot drift apart.
+    """
+    return detailed_zone_regions()
+
+
+DETAILED_TO_REGION: dict[str, str] = {
+    **_region_from_knowledge_base(),
+    **_REGION_FROM_RADAR,  # the radar projection wins wherever both speak
 }
 
 # Detailed zones that carry a curated exercise_properties `muscle_group` (sparse taxonomy).
@@ -120,7 +149,69 @@ _INTENT_SPECS: dict[str, dict] = {
         "families": ("machine",),
         "rationale": "Mollets soléaire — genoux fléchis, étirement complet.",
     },
+    # ── Sb_SLOT_INTENT_COVERAGE_01 — les 4 zones sans accès primaire ─────────
+    #
+    # Un `intent_id` nomme une FONCTION DE PROGRAMMATION, pas une certitude
+    # biologique : il dit quelle zone le créneau a pour cible principale. Aucune
+    # de ces intentions ne prétend à une activation exclusive, à un pourcentage
+    # EMG, à une supériorité hypertrophique d'une famille de mouvement, ni à
+    # une isolation obligatoire (voir `SCIENTIFIC_GUARD`).
+    "lats_width_vertical_pull": {
+        "primary_zone": "lats", "secondary_zones": ("biceps", "upper_back"),
+        "movement_pattern": "pull_vertical", "chain": "compound",
+        # Le rowing horizontal est la zone VOISINE (`upper_back` / dos épaisseur),
+        # pas une variante : l'interdire empêche un créneau largeur d'être servi
+        # par un exercice d'épaisseur.
+        "forbidden": ("pull_horizontal",),
+        "families": ("cable", "machine", "bodyweight"),
+        "rationale": "Tirage vertical orienté largeur du dos — pas un rowing d'épaisseur.",
+    },
+    "elbow_flexor_direct": {
+        "primary_zone": "biceps", "secondary_zones": (),
+        "movement_pattern": "isolation_upper", "chain": "isolation",
+        "forbidden": ("pull_vertical", "pull_horizontal"),
+        "families": ("barbell", "dumbbell", "cable", "machine"),
+        "rationale": "Créneau fléchisseurs du coude en direct — le travail indirect des tirages ne le remplace pas dans le comptage.",
+    },
+    "elbow_extensor_direct": {
+        "primary_zone": "triceps", "secondary_zones": (),
+        "movement_pattern": "isolation_upper", "chain": "isolation",
+        "forbidden": ("push_vertical", "push_horizontal"),
+        "families": ("cable", "dumbbell", "barbell", "machine"),
+        "rationale": "Créneau extenseurs du coude en direct — le travail indirect des presses ne le remplace pas dans le comptage.",
+    },
+    "trunk_core_direct": {
+        "primary_zone": "core", "secondary_zones": (),
+        # `core` est un PatternMotor DÉJÀ dans `VALID_PATTERN_MOTORS` — aucune
+        # extension du vocabulaire de mouvement n'est nécessaire.
+        "movement_pattern": "core", "chain": "isolation",
+        # `isolation_upper` est le motif des curls/élévations : sans cette
+        # interdiction, un créneau tronc pourrait être servi par une isolation
+        # de bras si le référentiel venait à s'élargir.
+        "forbidden": ("isolation_upper", "isolation_lower"),
+        "families": ("bodyweight", "cable", "machine"),
+        "rationale": "Créneau tronc/core en direct — zone détaillée sans axe radar, programmable malgré tout.",
+    },
 }
+
+#: Garde-fou scientifique, versionné avec le registre plutôt que dans un rapport.
+#:
+#: `SlotIntent` est une **taxonomie de programmation**. Une intention identifie
+#: la **cible principale d'un créneau** — rien d'autre. Elle n'affirme ni
+#: activation musculaire exclusive, ni pourcentage EMG, ni supériorité
+#: hypertrophique d'une famille de mouvement sur une autre, ni nécessité
+#: d'isolation, ni recrutement anatomique exact.
+#:
+#: En particulier : un créneau `elbow_flexor_direct` / `elbow_extensor_direct`
+#: est un choix de **comptabilité de volume** (du travail direct, attribuable à
+#: la zone), pas une thèse selon laquelle les bras ne progresseraient que par
+#: l'isolation — ce qui serait faux.
+SCIENTIFIC_GUARD = (
+    "SlotIntent is a programming taxonomy: it identifies the primary "
+    "programming target of a slot. It claims no exclusive muscle activation, "
+    "no EMG percentage, no superior hypertrophy from one movement family, no "
+    "mandatory isolation, and no exact anatomical recruitment."
+)
 
 # Training-priority vocabulary (spec §6) -> ordered intent_ids.
 PRIORITY_TO_INTENTS: dict[str, tuple[str, ...]] = {
@@ -131,6 +222,13 @@ PRIORITY_TO_INTENTS: dict[str, tuple[str, ...]] = {
     "back": ("upper_back_depth_row",),
     "quads_maintenance": ("quad_minimum_effective_dose",),
     "posterior_chain": ("posterior_chain_hinge",),
+    # Sb_SLOT_INTENT_COVERAGE_01 — `back` visait déjà l'épaisseur seule ; la
+    # largeur reçoit sa propre clé plutôt que d'élargir `back`, sans quoi une
+    # priorité « dos » deviendrait ambiguë entre deux zones distinctes.
+    "back_width": ("lats_width_vertical_pull",),
+    "biceps": ("elbow_flexor_direct",),
+    "triceps": ("elbow_extensor_direct",),
+    "core": ("trunk_core_direct",),
 }
 
 # Morphology priority-candidate descriptor_id (Sb_MORPHO_PROFILE_01) -> intent_id.
