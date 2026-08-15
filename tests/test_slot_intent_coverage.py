@@ -163,12 +163,15 @@ def test_every_arm_candidate_is_partitioned_by_canonical_zone():
             assert resolve_exercise_zones(None, name).primary == zone
 
 
-def test_the_discrimination_guard_bites_when_removed():
+def test_the_discrimination_guard_bites_when_removed(monkeypatch):
     """Plant : sans le discriminateur canonique, la séparation disparaît vraiment.
 
     Une garde non prouvée est une garde supposée. On retire la région `arms` de
     l'ensemble discriminé et on vérifie que les deux intentions retombent bien
     sur le MÊME jeu de candidats — c'est ce que le mécanisme empêche.
+
+    Le cache de `_canonical_detailed_zone` n'a pas à être vidé : il indexe des
+    noms d'exercices vers leur zone canonique, sans lire l'ensemble patché.
     """
     intents = {
         zone: SI.build_slot_intent(
@@ -181,17 +184,11 @@ def test_the_discrimination_guard_bites_when_removed():
     }
     assert not (with_guard["biceps"] & with_guard["triceps"])
 
-    original = MPG._REGION_BY_CANONICAL_ZONE
-    MPG._REGION_BY_CANONICAL_ZONE = frozenset()
-    try:
-        MPG._canonical_detailed_zone.cache_clear()
-        without = {
-            zone: {n for n, _ in MPG._rank_qualifying(intents[zone], _pool())}
-            for zone in intents
-        }
-    finally:
-        MPG._REGION_BY_CANONICAL_ZONE = original
-        MPG._canonical_detailed_zone.cache_clear()
+    monkeypatch.setattr(MPG, "_REGION_BY_CANONICAL_ZONE", frozenset())
+    without = {
+        zone: {n for n, _ in MPG._rank_qualifying(intents[zone], _pool())}
+        for zone in intents
+    }
 
     assert without["biceps"] == without["triceps"], (
         "le plant est inerte : les deux intentions se séparaient déjà sans le "
