@@ -139,3 +139,37 @@ possible ici, et la garde structurelle empêche qu'elle se glisse plus tard.
 
 Cette limite se lève naturellement avec la **tranche 4** : matérialiser le plan
 lui donne une existence persistée à laquelle une séance peut se rattacher.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#95** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `a982a2b` — **vert au premier passage**, aucun correctif |
+| Merge | **`b63b954`** |
+| Gate Sonar | **`OK`** — couverture du neuf **100 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | **4 147** (shard 1 : 2 191 · shard 2 : 1 956) |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **4 746 Mo** | **5 817 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+Les deux tiennent la cible ≥ 4 Go. Le shard le plus chargé alterne d'un run à
+l'autre selon la répartition en tourniquet ; le **minimum des deux** reste la
+grandeur à surveiller, et il tient entre 4,7 et 4,9 Go sur les trois tranches.
+
+### Zéro incident
+
+Première tranche du train verte **au premier passage** : pas de finding Sonar,
+pas de conflit, pas de reprise de CI. Le pré-scan `S9073`/`S3415` ajouté après
+la tranche 2 a fait son travail en amont plutôt qu'en réaction — 0 assertion
+composite, 9 comparaisons toutes « actual first » vérifiées avant la poussée.
+
+L'ordre **closeout de N avant branchement de N+1**, adopté après l'incident de
+la tranche 2, a également tenu : la PR est sortie `MERGEABLE` d'emblée.
