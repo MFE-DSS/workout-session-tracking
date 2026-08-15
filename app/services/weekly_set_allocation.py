@@ -239,13 +239,17 @@ def allocate_zone(zone, slots: Sequence) -> tuple[ZoneSetAllocation, tuple[Exerc
             "prescrit rien d'unique pour au moins un exercice de cette zone"
         )
 
+    # Le verdict de volume n'appartient PLUS à l'allocateur depuis
+    # `Sb_SET_CONTRIBUTION_POLICY_01` : une zone peut recevoir du crédit
+    # indirect d'exercices programmés pour d'autres zones, et l'allocation
+    # d'une zone isolée ne peut pas le savoir. Le planificateur tranche après
+    # avoir cumulé toutes les contributions.
     unmet = None
     if planned < zone.planning_low_sets:
-        unmet = UNMET_VOLUME
         basis.append(
-            f"{planned} série(s) planifiée(s) pour une borne basse à "
-            f"{zone.planning_low_sets} — manque de {zone.planning_low_sets - planned}, "
-            "non comblé : aucun exercice n'est dupliqué pour atteindre un chiffre"
+            f"{planned} série(s) physique(s) directe(s) pour une borne basse à "
+            f"{zone.planning_low_sets} — le crédit indirect éventuel est cumulé "
+            "par le planificateur avant tout verdict"
         )
 
     return ZoneSetAllocation(

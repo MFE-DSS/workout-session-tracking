@@ -57,9 +57,20 @@ from dataclasses import asdict, dataclass, field, replace
 
 from app.services.morpho_program_generator import GAP_AVAILABILITY, generate_program
 from app.services.muscle_mapping import RADAR_AXES, ZONE_LABELS
+from app.services.set_contribution import (
+    SET_CONTRIBUTION_POLICY_VERSION,
+    UNITS_PER_SET,
+    ZoneContribution,
+    contributions_for,
+    units_for_sets,
+)
 from app.services.slot_intent import _INTENT_SPECS, PRIORITY_TO_INTENTS
 from app.services.training_preferences import TrainingPreferencesData
-from app.services.weekly_set_allocation import ExercisePrescription, allocate_zone
+from app.services.weekly_set_allocation import (
+    UNMET_VOLUME,
+    ExercisePrescription,
+    allocate_zone,
+)
 from app.services.weekly_volume_budget import (
     WeeklyVolumeBudget,
     build_weekly_volume_budget,
@@ -159,16 +170,41 @@ class ZoneCoverage:
     planning_high_sets: int
     priority_rank: int | None = None
     unmet_reason: str | None = None
-    #: **La couverture du budget se juge ici**, pas sur `planned_slots` : un
-    #: créneau unique ne peut pas porter seize séries.
+    #: Séries **PHYSIQUES** prescrites par des exercices dont cette zone est la
+    #: cible principale. C'est la dose qu'on exécute, pas celle qu'on compte.
     planned_sets: int = 0
     target_sets: int = 0
     slot_capacity_sets: int = 0
     allocation_basis: tuple[str, ...] = ()
 
+    #: Comptabilité **EFFECTIVE** (`Sb_SET_CONTRIBUTION_POLICY_01`) : c'est elle
+    #: qui juge la couverture du budget, en **unités entières** de demi-série.
+    direct_sets: int = 0
+    indirect_sets: int = 0
+    effective_units: int = 0
+    contribution_basis: tuple[str, ...] = ()
+
+    @property
+    def effective_sets(self) -> float:
+        """Séries effectives — **affichage et rapports**, jamais une garde."""
+        return self.effective_units / UNITS_PER_SET
+
     @property
     def is_within_band(self) -> bool:
-        return self.planning_low_sets <= self.planned_sets <= self.planning_high_sets
+        """Comparaison en unités entières : aucune tolérance flottante."""
+        return (
+            units_for_sets(self.planning_low_sets)
+            <= self.effective_units
+            <= units_for_sets(self.planning_high_sets)
+        )
+
+    @property
+    def reaches_planning_low(self) -> bool:
+        return self.effective_units >= units_for_sets(self.planning_low_sets)
+
+    @property
+    def reaches_baseline(self) -> bool:
+        return self.effective_units >= units_for_sets(self.baseline_sets)
 
 
 @dataclass(frozen=True)
@@ -332,19 +368,57 @@ def _apply_prescriptions(slots_by_zone, prescribed):
     return out
 
 
-def _coverage(budget, slots_by_zone, servable, equipment_declared, allocations):
-    """Couverture par zone face à sa bande, et la liste des manques."""
+def _contribution_basis(zone, contribution) -> tuple[str, ...]:
+    """D'où vient le crédit de cette zone — dit, jamais laissé à deviner."""
+    out = [
+        f"{contribution.direct_sets} série(s) directe(s) "
+        f"+ {contribution.indirect_sets} indirecte(s) ⇒ "
+        f"{contribution.effective_sets:g} série(s) effective(s) "
+        f"({SET_CONTRIBUTION_POLICY_VERSION})",
+    ]
+    if contribution.indirect_sets:
+        # Formulation POSITIVE volontaire : dire ce que le chiffre est, sans
+        # nommer ce qu'il n'est pas. Un démenti (« ce n'est pas 50 % de… »)
+        # met malgré tout le cadre physiologique sous les yeux du lecteur ; le
+        # démenti complet vit dans `ACCOUNTING_GUARD`, à destination du code.
+        out.append(
+            "crédit indirect au coefficient 0,5 — convention de comptage "
+            f"versionnée avec {SET_CONTRIBUTION_POLICY_VERSION}"
+        )
+    if not contribution.direct_sets and contribution.indirect_sets:
+        out.append(
+            "aucun exercice ne vise cette zone en principal — elle n'est "
+            "servie qu'indirectement"
+        )
+    return tuple(out)
+
+
+def _coverage(
+    budget, slots_by_zone, servable, equipment_declared, allocations,
+    contributions,
+):
+    """Couverture par zone face à sa bande, et la liste des manques.
+
+    Le manque de **volume** se juge désormais sur la comptabilité effective :
+    une zone peut recevoir du crédit indirect d'exercices programmés pour une
+    autre zone, et l'ignorer sous-estimerait sa couverture réelle. Le manque de
+    **candidat**, lui, reste jugé sur les créneaux — c'est une question
+    d'existence d'exercice, pas de dose.
+    """
     coverage: list[ZoneCoverage] = []
     unmet: list[ZoneCoverage] = []
     for zone in budget.zones:
         planned = slots_by_zone.get(zone.zone_code, [])
         allocation = allocations[zone.zone_code]
+        contribution = contributions.get(
+            zone.zone_code) or ZoneContribution(zone_code=zone.zone_code)
+        low_units = units_for_sets(zone.planning_low_sets)
         # Un manque de candidat prime sur un manque de volume : dire « il
         # manque des séries » alors qu'aucun exercice n'existe désignerait le
         # mauvais mur.
         reason = _unmet_reason(
             zone.zone_code, planned, servable, equipment_declared
-        ) or allocation.unmet_reason
+        ) or (UNMET_VOLUME if contribution.effective_units < low_units else None)
         entry = ZoneCoverage(
             zone_code=zone.zone_code,
             zone_label=zone.zone_label,
@@ -359,6 +433,10 @@ def _coverage(budget, slots_by_zone, servable, equipment_declared, allocations):
             target_sets=allocation.target_sets,
             slot_capacity_sets=allocation.slot_capacity_sets,
             allocation_basis=allocation.basis,
+            direct_sets=contribution.direct_sets,
+            indirect_sets=contribution.indirect_sets,
+            effective_units=contribution.effective_units,
+            contribution_basis=_contribution_basis(zone, contribution),
         )
         coverage.append(entry)
         if reason is not None:
@@ -445,9 +523,17 @@ def build_weekly_plan(
     allocations, prescribed = _allocate(weekly_budget, slots_by_zone)
     slots_by_zone = _apply_prescriptions(slots_by_zone, prescribed)
     sessions = _distribute(slots_by_zone, prefs.sessions_per_week)
+    # La comptabilité effective est cumulée APRÈS l'allocation physique : le
+    # crédit indirect d'une zone dépend d'exercices programmés pour d'autres
+    # zones, donc aucune allocation isolée ne peut le connaître.
+    prescribed_slots = [
+        slot for slots in slots_by_zone.values() for slot in slots
+        if slot.is_prescribed
+    ]
+    contributions = contributions_for(prescribed_slots)
     coverage, unmet = _coverage(
         weekly_budget, slots_by_zone, servable, prefs.available_equipment,
-        allocations)
+        allocations, contributions)
     unmet_by_zone = {c.zone_code: c.unmet_reason for c in unmet if c.unmet_reason}
     prescriptions = tuple(
         p for zone_code in sorted(prescribed)
