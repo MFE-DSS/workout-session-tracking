@@ -13,6 +13,12 @@ imprévisible.
 Une preuve **limitante** peut réduire ou redistribuer du travail planifié.
 Une preuve **favorable** ne peut rien ajouter.
 
+Depuis `Sb_ADAPTIVE_REPLAN_SET_SEMANTICS_01` l'asymétrie porte sur les
+**séries**, unité réelle de la dose : un créneau pouvant en contenir plusieurs,
+un delta en créneaux ne disait plus combien de travail bougeait. Le mouvement de
+créneaux reste exposé **séparément** — il décrit la *forme* de la semaine, les
+séries en décrivent la *charge*.
+
 Concrètement : une séance manquée redistribue, une récupération incomplète
 reporte — mais une bonne readiness déclarée **ne crée aucune série, n'ajoute
 aucune séance, n'augmente aucune charge et ne dépasse jamais le budget**. Cette
@@ -46,6 +52,27 @@ from app.services.weekly_planner import WeeklyPlan
 
 REPLAN_VERSION = 1
 
+#: Limite assumée, énoncée plutôt que contournée.
+#:
+#: Le brief demande que, si une preuve de séries **réellement effectuées**
+#: existe, seules les séries planifiées **non effectuées** soient reconsidérées.
+#: Cette preuve n'existe pas encore : rien ne persiste l'identité
+#: **plan ↔ séance**, donc rien ne dit quelle séance enregistrée réalise quel
+#: créneau planifié, ni combien de séries d'un exercice donné ont été faites.
+#:
+#: Conséquence tenue : une séance écourtée est une **divergence** (elle peut
+#: déclencher une redistribution) mais **ne produit aucun delta de séries** —
+#: réduire une zone reviendrait à deviner ce qui a été fait. Prétendre un
+#: appariement exact serait la seule vraie faute ici.
+#:
+#: Levée prévue avec `Sb_WEEKLY_PLAN_MATERIALIZATION_01`, qui donne au plan une
+#: existence persistée à laquelle une séance peut se rattacher.
+PERFORMED_SET_IDENTITY_LIMITATION = (
+    "no plan-to-session identity is persisted yet, so performed sets cannot be "
+    "matched to planned sets; a shortened session diverges but never reduces a "
+    "zone's sets by inference"
+)
+
 
 class DivergenceKind(StrEnum):
     """Les seuls déclencheurs admis. Tout le reste ne replanifie pas."""
@@ -73,16 +100,37 @@ class Divergence:
 
 @dataclass(frozen=True)
 class PlanDelta:
-    """Ce qui change, et pourquoi. Jamais une augmentation."""
+    """Ce qui change, et pourquoi. Jamais une augmentation.
+
+    **La dose est en SÉRIES** depuis `Sb_WEEKLY_PLAN_SET_ALLOCATION_01` : un
+    créneau peut désormais en porter plusieurs, donc un delta exprimé en
+    créneaux ne dit plus combien de travail bouge. « Un créneau retiré » peut
+    valoir deux séries comme quatre.
+
+    Le mouvement de créneaux **reste observable séparément** : il décrit la
+    forme de la semaine (quels exercices sortent), là où les séries en décrivent
+    la charge. Les deux sont utiles, et aucun ne se déduit de l'autre.
+    """
 
     zone_code: str
     slots_before: int
     slots_after: int
+    sets_before: int
+    sets_after: int
     reason: str
 
     @property
     def is_reduction(self) -> bool:
-        return self.slots_after <= self.slots_before
+        """Réduction sur les DEUX axes — ni la charge ni la forme n'augmentent."""
+        return (
+            self.sets_after <= self.sets_before
+            and self.slots_after <= self.slots_before
+        )
+
+    @property
+    def sets_removed(self) -> int:
+        """Séries retirées de la semaine. Jamais négatif par construction."""
+        return max(0, self.sets_before - self.sets_after)
 
 
 @dataclass(frozen=True)
@@ -97,6 +145,11 @@ class ReplanResult:
     deltas: tuple[PlanDelta, ...] = ()
     unmet_budget_after: tuple[str, ...] = ()
     basis: tuple[str, ...] = field(default_factory=tuple)
+
+    @property
+    def sets_removed_total(self) -> int:
+        """Séries retirées de la semaine, toutes zones confondues."""
+        return sum(d.sets_removed for d in self.deltas)
 
 
 def detect_divergences(
@@ -205,6 +258,8 @@ def replan(
             zone_code=coverage.zone_code,
             slots_before=coverage.planned_slots,
             slots_after=0,
+            sets_before=coverage.planned_sets,
+            sets_after=0,
             reason="récupération estimée limitante — travail reporté, non supprimé",
         ))
 
@@ -219,6 +274,17 @@ def replan(
         "aucune preuve favorable n'ajoute de travail — l'adaptation ne peut que "
         "réduire ou redistribuer",
     ]
+    if deltas:
+        basis.append(
+            f"{sum(d.sets_removed for d in deltas)} série(s) retirée(s) de la "
+            "semaine et reportées — la dose se compte en séries, pas en créneaux"
+        )
+    if any(d.kind is DivergenceKind.SHORTENED_SESSION for d in divergences):
+        basis.append(
+            "séance écourtée : seul le travail non effectué serait à "
+            "reconsidérer, mais aucune identité plan↔séance n'est persistée — "
+            "aucune série n'est retirée par déduction"
+        )
     if not deltas:
         basis.append(
             "divergence sans zone limitante identifiée — le travail restant est "
@@ -237,6 +303,7 @@ def replan(
 
 
 __all__ = [
+    "PERFORMED_SET_IDENTITY_LIMITATION",
     "LIMITING_BANDS",
     "REPLAN_VERSION",
     "Divergence",
