@@ -33,7 +33,7 @@ def test_payload_always_has_its_promised_keys(client):
         user = db.query(User).first()
         payload = build_home_payload(db, user)
     assert set(payload.keys()) == {
-        "today", "last_session", "week", "training_state"}
+        "today", "last_session", "week", "training_state", "weekly_plan"}
 
 
 def test_payload_for_user_with_no_session(client):

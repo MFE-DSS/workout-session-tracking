@@ -49,6 +49,10 @@ def build_home_payload(
     # recommendation stays usable. It is EXPLANATORY — it reads state and
     # changes no training decision.
     training_state = _safe(_build_training_state, db, user, ref)
+    # Sb_WEEKLY_PLANNER_01 — weekly CONTEXT beside the daily decision. Same
+    # `_safe` guard: a planner failure costs this tile, never the Home or the
+    # recommendation. It proposes; it never replaces today's recommendation.
+    weekly_plan = _safe(_build_weekly_plan, db, user, ref)
 
     # Sb_27.5 — attach a deterministic narrative phrase per tile. The
     # narrative helpers are pure (no DB, no LLM) and never raise on
@@ -65,6 +69,36 @@ def build_home_payload(
         "last_session": last_session,
         "week": week,
         "training_state": training_state,
+        "weekly_plan": weekly_plan,
+    }
+
+
+def _build_weekly_plan(db: Session, user: User, now: datetime) -> dict[str, Any]:
+    """Smallest useful weekly context: how many sessions, what is next, one gap.
+
+    Deliberately NOT a dashboard. "Completed / remaining" needs plan-to-actual
+    divergence detection, which belongs to `Sb_ADAPTIVE_REPLAN_01`; claiming it
+    here would mean guessing which logged session fulfilled which planned one.
+    """
+    from app.services.weekly_planner import build_weekly_plan_for_user
+
+    plan = build_weekly_plan_for_user(db, user.id)
+    if not plan.requested_sessions:
+        return {"available": False, "reason": "cadence_undeclared"}
+
+    upcoming = plan.sessions[0] if plan.sessions else None
+    # ONE constraint, the first: a Home tile that lists every gap stops being a
+    # calm context block and becomes a defect report.
+    gap = plan.unmet_constraints[0] if plan.unmet_constraints else None
+    return {
+        "available": True,
+        "planned_sessions": len(plan.sessions),
+        "next_session_slots": [
+            {"zone_label": s.zone_label, "exercise_name": s.exercise_name}
+            for s in (upcoming.slots if upcoming else ())
+        ],
+        "unmet_constraint": gap,
+        "fingerprint": plan.fingerprint,
     }
 
 

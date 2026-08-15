@@ -141,6 +141,34 @@
   </div>
   {% endif %}
 
+  {# ── Semaine planifiée (Sb_WEEKLY_PLANNER_01) ──
+     CONTEXTE hebdomadaire, à côté de la décision du jour — il ne la remplace
+     pas. Une seule contrainte non satisfaite est montrée : lister tous les
+     manques transformerait un bloc de contexte en rapport de défauts. #}
+  {% if home.weekly_plan and home.weekly_plan.available %}
+  <div class="card tile" style="padding:var(--space-md);">
+    <h2 class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;margin:0;">
+      Semaine planifiée
+    </h2>
+    <div style="font-size:16px;font-weight:600;margin-top:4px;">
+      {{ home.weekly_plan.planned_sessions }} séance(s) proposée(s)
+    </div>
+    {% if home.weekly_plan.next_session_slots %}
+    <div class="text-dim" style="font-size:12px;margin-top:2px;">Prochaine séance proposée</div>
+    <ul style="list-style:none;padding:0;margin:4px 0 0 0;display:flex;flex-direction:column;gap:2px;font-size:13px;">
+      {% for slot in home.weekly_plan.next_session_slots %}
+      <li>· <b>{{ slot.zone_label }}</b>{% if slot.exercise_name %} — {{ slot.exercise_name }}{% endif %}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if home.weekly_plan.unmet_constraint %}
+    <div class="tile__hint" style="margin-top:var(--space-sm);font-size:12px;">
+      {{ home.weekly_plan.unmet_constraint }}
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   {# ── This week ── #}
   {% if home.week and home.week.available %}
   <div class="card tile" style="padding:var(--space-md);">
