@@ -53,12 +53,13 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 
 from app.services.morpho_program_generator import GAP_AVAILABILITY, generate_program
 from app.services.muscle_mapping import RADAR_AXES, ZONE_LABELS
 from app.services.slot_intent import _INTENT_SPECS, PRIORITY_TO_INTENTS
 from app.services.training_preferences import TrainingPreferencesData
+from app.services.weekly_set_allocation import ExercisePrescription, allocate_zone
 from app.services.weekly_volume_budget import (
     WeeklyVolumeBudget,
     build_weekly_volume_budget,
@@ -72,6 +73,18 @@ UNMET_NO_INTENT = "no_slot_intent_covers_this_zone"
 UNMET_NO_CANDIDATE = "no_candidate_exercise_for_the_intent"
 UNMET_EQUIPMENT = "no_candidate_within_declared_equipment"
 UNMET_NO_CADENCE = "no_declared_cadence_to_distribute_into"
+
+#: Raisons de **SERVABILITÉ** : la zone n'a pas d'exercice programmable du tout.
+#:
+#: `UNMET_VOLUME` en est délibérément absent. Un manque de dose n'est pas un
+#: manque d'exercice : dire à l'utilisateur qu'« aucun exercice ne peut servir
+#: ses biceps » alors qu'un curl est bien prescrit serait faux. Le déficit de
+#: séries se lit zone par zone dans `unmet_budget`, là où il est exact — et
+#: comme il touche aujourd'hui presque toutes les zones, le remonter en
+#: contrainte d'axe noierait le signal réel sous du bruit.
+_SERVABILITY_REASONS = frozenset(
+    {UNMET_NO_INTENT, UNMET_NO_CANDIDATE, UNMET_EQUIPMENT}
+)
 
 
 def zones_servable_as_primary() -> frozenset[str]:
@@ -109,11 +122,21 @@ class PlannedSlot:
     warning: str | None = None
     #: Raison nommée d'un créneau vide (`morpho_program_generator.GAP_*`).
     gap_kind: str | None = None
+    #: Dose réalisée — 0 tant qu'aucune série n'est allouée au créneau.
+    planned_sets: int = 0
+    min_reps: int | None = None
+    max_reps: int | None = None
+    rep_target_source: str | None = None
 
     @property
     def is_filled(self) -> bool:
         """Un créneau ne compte que s'il porte un exercice réel."""
         return self.exercise_name is not None
+
+    @property
+    def is_prescribed(self) -> bool:
+        """Un créneau n'est exécutable que s'il porte aussi une dose."""
+        return self.is_filled and self.planned_sets > 0
 
 
 @dataclass(frozen=True)
@@ -136,6 +159,16 @@ class ZoneCoverage:
     planning_high_sets: int
     priority_rank: int | None = None
     unmet_reason: str | None = None
+    #: **La couverture du budget se juge ici**, pas sur `planned_slots` : un
+    #: créneau unique ne peut pas porter seize séries.
+    planned_sets: int = 0
+    target_sets: int = 0
+    slot_capacity_sets: int = 0
+    allocation_basis: tuple[str, ...] = ()
+
+    @property
+    def is_within_band(self) -> bool:
+        return self.planning_low_sets <= self.planned_sets <= self.planning_high_sets
 
 
 @dataclass(frozen=True)
@@ -149,6 +182,9 @@ class WeeklyPlan:
     unmet_budget: tuple[ZoneCoverage, ...] = ()
     unmet_constraints: tuple[str, ...] = ()
     equipment_declared: tuple[str, ...] | None = None
+    #: Les exercices prescrits, dose comprise — l'unité qu'une matérialisation
+    #: pourra exécuter. Ordonnées par zone puis par créneau, donc stables.
+    prescriptions: tuple[ExercisePrescription, ...] = ()
     basis: tuple[str, ...] = field(default_factory=tuple)
     fingerprint: str = ""
 
@@ -156,6 +192,11 @@ class WeeklyPlan:
     def is_feasible(self) -> bool:
         """Aucun trou de budget **et** aucune contrainte non satisfaite."""
         return not self.unmet_budget and not self.unmet_constraints
+
+    @property
+    def planned_sets_total(self) -> int:
+        """Séries hebdomadaires réellement prescrites, toutes zones confondues."""
+        return sum(p.planned_sets for p in self.prescriptions)
 
 
 def _fingerprint(sessions, coverage, unmet) -> str:
@@ -199,7 +240,10 @@ def _unservable_axes(
         axis = RADAR_AXES.get(axis_key)
         if axis is None:
             continue
-        missing = tuple(z for z in axis["zones"] if z in unmet_by_zone)
+        missing = tuple(
+            z for z in axis["zones"]
+            if unmet_by_zone.get(z) in _SERVABILITY_REASONS
+        )
         if missing:
             out.append((axis_key, missing))
     return out
@@ -254,14 +298,53 @@ def _unmet_reason(
     return UNMET_EQUIPMENT if equipment_declared else UNMET_NO_CANDIDATE
 
 
-def _coverage(budget, slots_by_zone, servable, equipment_declared):
+def _allocate(budget, slots_by_zone):
+    """Alloue les séries zone par zone, **avant** toute répartition en séances.
+
+    L'ordre importe : allouer d'abord garantit qu'une cadence différente
+    déplace des créneaux sans jamais changer le total hebdomadaire de séries.
+    """
+    allocations: dict[str, object] = {}
+    prescribed: dict[str, dict[str, object]] = {}
+    for zone in budget.zones:
+        allocation, prescriptions = allocate_zone(
+            zone, slots_by_zone.get(zone.zone_code, []))
+        allocations[zone.zone_code] = allocation
+        prescribed[zone.zone_code] = {p.slot_id: p for p in prescriptions}
+    return allocations, prescribed
+
+
+def _apply_prescriptions(slots_by_zone, prescribed):
+    """Recopie la dose allouée sur les créneaux. Un créneau non doté reste à 0."""
+    out: dict[str, list[PlannedSlot]] = {}
+    for zone_code, slots in slots_by_zone.items():
+        by_slot = prescribed.get(zone_code, {})
+        out[zone_code] = [
+            replace(
+                slot,
+                planned_sets=p.planned_sets,
+                min_reps=p.min_reps,
+                max_reps=p.max_reps,
+                rep_target_source=p.rep_target_source,
+            ) if (p := by_slot.get(slot.slot_id)) is not None else slot
+            for slot in slots
+        ]
+    return out
+
+
+def _coverage(budget, slots_by_zone, servable, equipment_declared, allocations):
     """Couverture par zone face à sa bande, et la liste des manques."""
     coverage: list[ZoneCoverage] = []
     unmet: list[ZoneCoverage] = []
     for zone in budget.zones:
         planned = slots_by_zone.get(zone.zone_code, [])
+        allocation = allocations[zone.zone_code]
+        # Un manque de candidat prime sur un manque de volume : dire « il
+        # manque des séries » alors qu'aucun exercice n'existe désignerait le
+        # mauvais mur.
         reason = _unmet_reason(
-            zone.zone_code, planned, servable, equipment_declared)
+            zone.zone_code, planned, servable, equipment_declared
+        ) or allocation.unmet_reason
         entry = ZoneCoverage(
             zone_code=zone.zone_code,
             zone_label=zone.zone_label,
@@ -272,6 +355,10 @@ def _coverage(budget, slots_by_zone, servable, equipment_declared):
             planning_high_sets=zone.planning_high_sets,
             priority_rank=zone.priority_rank,
             unmet_reason=reason,
+            planned_sets=allocation.planned_sets,
+            target_sets=allocation.target_sets,
+            slot_capacity_sets=allocation.slot_capacity_sets,
+            allocation_basis=allocation.basis,
         )
         coverage.append(entry)
         if reason is not None:
@@ -355,10 +442,17 @@ def build_weekly_plan(
     )
 
     slots_by_zone = _slots_by_zone(generated)
+    allocations, prescribed = _allocate(weekly_budget, slots_by_zone)
+    slots_by_zone = _apply_prescriptions(slots_by_zone, prescribed)
     sessions = _distribute(slots_by_zone, prefs.sessions_per_week)
     coverage, unmet = _coverage(
-        weekly_budget, slots_by_zone, servable, prefs.available_equipment)
+        weekly_budget, slots_by_zone, servable, prefs.available_equipment,
+        allocations)
     unmet_by_zone = {c.zone_code: c.unmet_reason for c in unmet if c.unmet_reason}
+    prescriptions = tuple(
+        p for zone_code in sorted(prescribed)
+        for _, p in sorted(prescribed[zone_code].items())
+    )
 
     return WeeklyPlan(
         requested_sessions=prefs.sessions_per_week,
@@ -368,6 +462,7 @@ def build_weekly_plan(
         unmet_constraints=_constraints(
             prefs, prefs.sessions_per_week, unmet_by_zone),
         equipment_declared=prefs.available_equipment,
+        prescriptions=prescriptions,
         basis=_basis(weekly_budget, servable, prefs, generated),
         fingerprint=_fingerprint(sessions, coverage, unmet),
     )
