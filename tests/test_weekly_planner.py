@@ -15,6 +15,7 @@ import pytest
 from app.services.muscle_mapping import RADAR_AXES, ZONE_VOLUME_TARGET
 from app.services.training_preferences import TrainingPreferencesData
 from app.services.weekly_planner import (
+    UNMET_EQUIPMENT,
     UNMET_NO_CADENCE,
     UNMET_NO_CANDIDATE,
     UNMET_NO_INTENT,
@@ -82,10 +83,18 @@ class TestFeasibilityGaps:
 
     @pytest.mark.parametrize("zone", ["lats", "biceps", "triceps"])
     def test_a_newly_servable_zone_is_actually_filled(self, zone):
+        """Servabilité, pas dose.
+
+        Depuis `Sb_WEEKLY_PLAN_SET_ALLOCATION_01` une zone servie peut rester
+        **courte en séries** : c'est un manque de volume, pas un manque
+        d'exercice. Ce test porte sur la servabilité, que la tranche 1 a
+        ouverte — la couverture en séries est jugée ailleurs.
+        """
         plan = _plan(sessions_per_week=3)
         entry = next(z for z in plan.zone_coverage if z.zone_code == zone)
-        assert entry.unmet_reason is None
         assert entry.planned_slots >= 1
+        assert entry.unmet_reason not in (
+            UNMET_NO_INTENT, UNMET_NO_CANDIDATE, UNMET_EQUIPMENT)
 
     def test_core_remains_a_named_DATA_gap_not_an_intent_gap(self):
         """`core` a une intention ; ce qui manque, ce sont les candidats."""
@@ -116,6 +125,13 @@ class TestFeasibilityGaps:
         assert any(label in c for c in plan.unmet_constraints)
 
     def test_a_servable_axis_raises_no_constraint(self):
+        """Un déficit de séries ne doit PAS remonter en contrainte d'axe.
+
+        Les trois zones de « Bas du corps » sont servies par un exercice réel ;
+        elles sont seulement courtes en volume. Annoncer « aucun exercice
+        disponible » serait faux, et le faire pour presque toutes les zones
+        noierait les vraies lacunes de servabilité.
+        """
         plan = _plan(sessions_per_week=3, focus_priorities=(AXIS_LOWER,))
         labels = RADAR_AXES[AXIS_LOWER]["label"]
         assert not any(labels in c for c in plan.unmet_constraints)

@@ -297,7 +297,10 @@ def test_equipment_restriction_is_reported_as_such_not_as_a_missing_candidate():
         available_equipment=("dumbbell", "barbell", "machine"),
     )
     assert _zone(plan, "triceps").unmet_reason == UNMET_EQUIPMENT
-    assert _zone(plan, "biceps").unmet_reason is None
+    # Les biceps restent SERVIS : leur éventuel manque est de volume, pas de
+    # matériel — la distinction est tout l'intérêt des raisons nommées.
+    assert _zone(plan, "biceps").unmet_reason != UNMET_EQUIPMENT
+    assert _zone(plan, "biceps").planned_slots >= 1
 
 
 def test_a_half_served_axis_is_not_reported_as_served():
