@@ -184,69 +184,46 @@ def _unservable_axes(preferences: TrainingPreferencesData) -> list[str]:
     return out
 
 
-def build_weekly_plan(
-    preferences: TrainingPreferencesData | None = None,
-    budget: WeeklyVolumeBudget | None = None,
-    pool: dict[str, dict] | None = None,
-) -> WeeklyPlan:
-    """Plan hebdomadaire déterministe. Pur : aucune I/O, aucune horloge, aucun aléa."""
-    prefs = preferences or TrainingPreferencesData()
-    weekly_budget = budget or build_weekly_volume_budget(prefs)
-    servable = zones_servable_as_primary()
+def _distribute(slots_by_zone: dict[str, list[PlannedSlot]], cadence: int | None):
+    """Répartit les créneaux sur la cadence déclarée, en tourniquet.
 
-    # Ordre de service : priorité déclarée d'abord, puis l'ordre canonique du
-    # budget. Déterministe et explicable — pas un score.
-    ordered = sorted(
-        weekly_budget.zones,
-        key=lambda z: (z.priority_rank if z.priority_rank is not None else 99,),
-    )
-    target_zones = frozenset(z.zone_code for z in ordered if z.zone_code in servable)
-
-    generated = generate_program(
-        priorities=[(key, rank) for rank, key in enumerate(
-            priority_keys_for_zones(target_zones), start=1)],
-        availability=prefs.available_equipment,
-        pool=pool,
+    Sans cadence, aucune séance n'est fabriquée : inventer « 3 » transformerait
+    une absence de déclaration en fait utilisateur, ce que la tranche des
+    préférences interdit.
+    """
+    if not cadence:
+        return ()
+    buckets: list[list[PlannedSlot]] = [[] for _ in range(cadence)]
+    flat = [s for zone in sorted(slots_by_zone) for s in slots_by_zone[zone]]
+    for position, slot in enumerate(flat):
+        buckets[position % cadence].append(slot)
+    return tuple(
+        PlannedSession(index=i + 1, slots=tuple(b)) for i, b in enumerate(buckets)
     )
 
-    slots_by_zone: dict[str, list[PlannedSlot]] = {}
-    for selection in generated.selections:
-        slot = PlannedSlot(
-            slot_id=selection.slot_id,
-            intent_id=selection.intent_id,
-            zone_code=selection.primary_zone,
-            zone_label=ZONE_LABELS.get(selection.primary_zone, selection.primary_zone),
-            exercise_name=selection.preferred_exercise,
-            rationale=selection.rationale,
-            warning=selection.warning,
-        )
-        slots_by_zone.setdefault(selection.primary_zone, []).append(slot)
 
-    # Répartition sur la cadence déclarée. Sans cadence, aucune séance n'est
-    # fabriquée : inventer « 3 » transformerait une absence de déclaration en
-    # fait utilisateur, ce que la tranche des préférences interdit.
-    cadence = prefs.sessions_per_week
-    sessions: tuple[PlannedSession, ...] = ()
-    if cadence:
-        buckets: list[list[PlannedSlot]] = [[] for _ in range(cadence)]
-        flat = [s for zone in sorted(slots_by_zone) for s in slots_by_zone[zone]]
-        for position, slot in enumerate(flat):
-            buckets[position % cadence].append(slot)
-        sessions = tuple(
-            PlannedSession(index=i + 1, slots=tuple(b)) for i, b in enumerate(buckets)
-        )
+def _unmet_reason(
+    zone_code: str,
+    planned: list[PlannedSlot],
+    servable: frozenset[str],
+    equipment_declared: tuple[str, ...] | None,
+) -> str | None:
+    """Pourquoi une zone n'est pas couverte — nommé, jamais deviné."""
+    if zone_code not in servable:
+        return UNMET_NO_INTENT
+    if planned:
+        return None
+    return UNMET_EQUIPMENT if equipment_declared else UNMET_NO_CANDIDATE
 
+
+def _coverage(budget, slots_by_zone, servable, equipment_declared):
+    """Couverture par zone face à sa bande, et la liste des manques."""
     coverage: list[ZoneCoverage] = []
     unmet: list[ZoneCoverage] = []
-    for zone in weekly_budget.zones:
+    for zone in budget.zones:
         planned = slots_by_zone.get(zone.zone_code, [])
-        reason: str | None = None
-        if zone.zone_code not in servable:
-            reason = UNMET_NO_INTENT
-        elif not planned:
-            reason = (
-                UNMET_EQUIPMENT if prefs.available_equipment else UNMET_NO_CANDIDATE
-            )
+        reason = _unmet_reason(
+            zone.zone_code, planned, servable, equipment_declared)
         entry = ZoneCoverage(
             zone_code=zone.zone_code,
             zone_label=zone.zone_label,
@@ -260,38 +237,86 @@ def build_weekly_plan(
         coverage.append(entry)
         if reason is not None:
             unmet.append(entry)
+    return tuple(coverage), tuple(unmet)
 
-    constraints: list[str] = []
+
+def _constraints(prefs: TrainingPreferencesData, cadence: int | None) -> tuple[str, ...]:
+    """Contraintes non satisfaites, dites plutôt que contournées."""
+    out: list[str] = []
     if not cadence:
-        constraints.append(UNMET_NO_CADENCE)
+        out.append(UNMET_NO_CADENCE)
     for axis_key in _unservable_axes(prefs):
         label = RADAR_AXES[axis_key]["label"]
-        constraints.append(
+        out.append(
             f"priorité déclarée « {label} » : aucune intention de créneau ne vise "
             "ses zones — aucun exercice n'est inventé pour combler ce manque"
         )
+    return tuple(out)
 
-    basis = [
-        f"budget {weekly_budget.policy_version} — bandes de planification",
-        f"{len(servable)} zone(s) servables sur {len(weekly_budget.zones)} "
+
+def _basis(budget, servable, prefs, generated) -> tuple[str, ...]:
+    out = [
+        f"budget {budget.policy_version} — bandes de planification",
+        f"{len(servable)} zone(s) servables sur {len(budget.zones)} "
         "dans le registre d'intentions fermé",
     ]
     if prefs.available_equipment is not None:
-        basis.append(
-            f"{len(prefs.available_equipment)} famille(s) de matériel déclarée(s)"
-        )
+        out.append(
+            f"{len(prefs.available_equipment)} famille(s) de matériel déclarée(s)")
     else:
-        basis.append("matériel non déclaré — aucune contrainte appliquée")
-    basis.extend(generated.warnings)
+        out.append("matériel non déclaré — aucune contrainte appliquée")
+    out.extend(generated.warnings)
+    return tuple(out)
+
+
+def _slots_by_zone(generated) -> dict[str, list[PlannedSlot]]:
+    out: dict[str, list[PlannedSlot]] = {}
+    for selection in generated.selections:
+        out.setdefault(selection.primary_zone, []).append(PlannedSlot(
+            slot_id=selection.slot_id,
+            intent_id=selection.intent_id,
+            zone_code=selection.primary_zone,
+            zone_label=ZONE_LABELS.get(
+                selection.primary_zone, selection.primary_zone),
+            exercise_name=selection.preferred_exercise,
+            rationale=selection.rationale,
+            warning=selection.warning,
+        ))
+    return out
+
+
+def build_weekly_plan(
+    preferences: TrainingPreferencesData | None = None,
+    budget: WeeklyVolumeBudget | None = None,
+    pool: dict[str, dict] | None = None,
+) -> WeeklyPlan:
+    """Plan hebdomadaire déterministe. Pur : aucune I/O, aucune horloge, aucun aléa."""
+    prefs = preferences or TrainingPreferencesData()
+    weekly_budget = budget or build_weekly_volume_budget(prefs)
+    servable = zones_servable_as_primary()
+
+    target_zones = frozenset(
+        z.zone_code for z in weekly_budget.zones if z.zone_code in servable)
+    generated = generate_program(
+        priorities=[(key, rank) for rank, key in enumerate(
+            priority_keys_for_zones(target_zones), start=1)],
+        availability=prefs.available_equipment,
+        pool=pool,
+    )
+
+    slots_by_zone = _slots_by_zone(generated)
+    sessions = _distribute(slots_by_zone, prefs.sessions_per_week)
+    coverage, unmet = _coverage(
+        weekly_budget, slots_by_zone, servable, prefs.available_equipment)
 
     return WeeklyPlan(
-        requested_sessions=cadence,
+        requested_sessions=prefs.sessions_per_week,
         sessions=sessions,
-        zone_coverage=tuple(coverage),
-        unmet_budget=tuple(unmet),
-        unmet_constraints=tuple(constraints),
+        zone_coverage=coverage,
+        unmet_budget=unmet,
+        unmet_constraints=_constraints(prefs, prefs.sessions_per_week),
         equipment_declared=prefs.available_equipment,
-        basis=tuple(basis),
+        basis=_basis(weekly_budget, servable, prefs, generated),
         fingerprint=_fingerprint(sessions, coverage, unmet),
     )
 
