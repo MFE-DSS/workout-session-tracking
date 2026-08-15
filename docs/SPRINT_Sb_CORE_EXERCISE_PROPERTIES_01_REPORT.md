@@ -167,3 +167,41 @@ champ manquant.
 
 Le registre de substitution finit **inchangé au bit près**, et l'isolement du
 tiroir n'a plus besoin d'être prouvé : il est structurel.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#98** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `f44e518` — **vert au premier passage**, aucun correctif |
+| Merge | **`6d6878e`** |
+| Gate Sonar | **`OK`** — couverture du neuf **100 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | **4 233** (shard 1 : 1 932 · shard 2 : 2 301) |
+| CI canonique | **`31901135070` — 5/5 GREEN** |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 219 Mo** | **5 130 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+Deux tranches consécutives au-dessus de 5 Go sur les deux shards. La pente
+signalée à la fin du train précédent (4 574 Mo) ne se confirme toujours pas.
+
+### Incident de process — worktree
+
+Le développement de la **tranche 3** a été entamé par erreur **dans le worktree
+de la tranche 2**, alors que la règle d'ordonnancement adoptée précédemment
+(*closeout de N avant branchement de N+1*) existe précisément pour l'éviter.
+
+**Aucun code de tranche 3 n'a été fusionné dans #98** : la PR avait été poussée
+avant, et l'arbre a été vérifié identique au commit validé par la CI **avant**
+le merge. Le travail a été extrait (patch + module) puis le worktree restauré
+propre.
+
+C'est un **défaut de process, pas un défaut produit**. Consigné ici pour que la
+règle d'ordonnancement soit appliquée sans exception au reste du train.
