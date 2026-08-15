@@ -161,3 +161,50 @@ délivre **44 séries pour 126 en borne basse**. Il est utilisable, honnêtement
 étiqueté `PARTIAL`, mais il ne remplit pas le budget. La suite est
 `Sb_WEEKLY_PLAN_SLOT_EXPANSION_01` — et c'est une décision sur la forme des
 séances, donc une décision produit.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#96** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `b88700b` + correctif Sonar `f9ca953` |
+| Merge | **`8347104`** |
+| Gate Sonar | **`OK`** — couverture du neuf **95,4 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | **4 170** (shard 1 : 2 121 · shard 2 : 2 049) |
+| Manifeste | 234 fichiers ⇒ 117 + 117 |
+
+### Capacité CI — **HEALTHY**, mais c'est le minimum du train
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **4 574 Mo** | **5 799 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+
+**4 574 Mo est la plus faible marge des quatre tranches.** Le minimum des deux
+shards a évolué ainsi : 4 769 → 4 853 → 4 746 → **4 574 Mo**. Toujours au-dessus
+de la cible de 4 Go, donc `HEALTHY` sans ambiguïté, mais la pente est réelle et
+cohérente avec le modèle établi : cette tranche ajoute des tests utilisant le
+fixture `client` (surface HTTP + bout en bout), qui sont ceux qui coûtent de la
+mémoire. **À surveiller au prochain train** — deux tranches HTTP de plus
+suffiraient à approcher la bande WATCH.
+
+### 1 finding Sonar
+
+`python:S7632` — mon `# noqa: BLE001 — prose` : ajouter du texte après le code
+de règle **casse la syntaxe** de la suppression. Rationale déplacé sur sa propre
+ligne au-dessus.
+
+**Constat au passage** : le dépôt porte le même défaut dans `home.py` et
+`session_review.py` (pré-existant, hors du neuf donc non barré par le gate).
+Suivre la convention locale aurait reproduit une forme déjà fautive — la forme
+correcte a été retenue, et la dette existante est signalée sans être corrigée
+ici (hors périmètre).
+
+### Parité de recommandation — vérifiée, pas supposée
+
+126 tests de surface Home plus les **8 tests explicites de parité** passent.
+La Home n'est **pas touchée** par cette tranche : l'action de matérialisation
+vit sur `/programs`.
