@@ -253,3 +253,46 @@ tranche 2 va compter des séries plutôt que des créneaux.
 
 Reste `core` : intention réelle, aucun candidat programmable. **Décision produit
 remontée à l'opérateur**, pas comblée par fabrication.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#93** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `46e50de` + correctif Sonar `e134c8e` |
+| Merge | **`e80e4c5`** |
+| CI canonique | **`31887837362` — 5/5 GREEN** |
+| Gate Sonar | **`OK`** — couverture du neuf **98,1 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Tests | 4093 (shard 1 : 1978 · shard 2 : 2115) — identique au full sweep local |
+| Manifeste | 231 fichiers ⇒ 116 + 115, nouveau fichier absorbé automatiquement |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 777 Mo** | **4 769 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+| Durée | 8 min 06 | 9 min 28 |
+
+Les deux shards tiennent la cible ≥ 4 Go. **Tendance à surveiller** : le shard B
+passe de ~5 200 Mo (tranches précédentes) à **4 769 Mo**. Marge réelle mais en
+érosion — cohérent avec le modèle de coût établi (la mémoire suit les tests
+utilisant le fixture `client`, et cette tranche en ajoute peu).
+
+### Incident Sonar résolu dans le périmètre
+
+**1 finding réel** : `python:S8997` ×2 — le plant de discrimination échangeait un
+`frozenset` de module à la main avec restauration en `finally`. Sonar a raison,
+`monkeypatch` fait la même chose avec un démontage garanti. Les deux
+`cache_clear()` sont partis avec : `_canonical_detailed_zone` indexe des noms
+d'exercices et ne lit jamais l'ensemble patché — les vider suggérait un couplage
+inexistant.
+
+**Piège de diagnostic évité** : après le correctif, l'API du gate renvoyait
+**encore** `ERROR 15` alors que le job SonarCloud tournait toujours. Lire ce
+chiffre comme un échec aurait déclenché une seconde correction inutile sur du
+code déjà bon. Attendre l'analyse réelle a donné `OK` — application directe de
+la règle « ne jamais changer de code sur le seul agrégat ».
