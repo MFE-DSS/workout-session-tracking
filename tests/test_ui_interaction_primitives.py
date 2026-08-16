@@ -37,8 +37,13 @@ def _rule(selector: str) -> str:
     """
     wanted = selector.rstrip(" {")
     text = _css()
+    # Le sélecteur peut désormais être GROUPÉ : depuis
+    # Sb_UI_SESSION_CHOICES_DISCLOSURES_01, `.a11y-input` partage sa
+    # déclaration avec `.segmented__option input`, donc il n'est plus
+    # forcément suivi de `{` sur la même ligne.
     pattern = re.compile(
-        r"^" + re.escape(wanted) + r"\s*\{(.*?)\}", re.MULTILINE | re.DOTALL)
+        r"^" + re.escape(wanted) + r"\s*(?:,[^{]*)?\{(.*?)\}",
+        re.MULTILINE | re.DOTALL)
     match = pattern.search(text)
     assert match, f"no rule whose selector begins the line: {wanted}"
     return match.group(1)
@@ -291,7 +296,13 @@ def test_the_family_stays_small():
     #: des variantes de la famille. Elles restent listées explicitement pour
     #: que leur ajout soit un geste conscient.
     layout = {"prefs-form", "prefs-block", "prefs-fallback"}
-    assert roots <= primitives | layout, sorted(roots - (primitives | layout))
+    #: Composant HISTORIQUE réparé depuis ce fichier, pas une primitive neuve.
+    #: `Sb_UI_SESSION_CHOICES_DISCLOSURES_01` y corrige le `display:none` qui
+    #: retirait le radio natif du clavier ; la règle vit ici parce que le
+    #: masquage accessible ne doit exister qu'à UN seul endroit.
+    legacy_repaired = {"segmented"}
+    allowed = primitives | layout | legacy_repaired
+    assert roots <= allowed, sorted(roots - allowed)
     assert len(primitives) == 6
 
 

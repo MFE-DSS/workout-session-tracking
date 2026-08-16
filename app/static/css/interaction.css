@@ -23,9 +23,10 @@
  *    `display:none` — il est masqué visuellement **en restant focusable**,
  *    sinon le clavier perd le contrôle.
  *
- * Note d'audit : `.segmented__option input { display: none }` (app.css) viole
- * la règle 4. Cette famille ne reproduit pas ce défaut ; la correction du
- * composant existant sort du périmètre de cette tranche.
+ * Note d'audit : `.segmented__option input` portait un `display: none` qui
+ * violait la règle 4. Corrigé par Sb_UI_SESSION_CHOICES_DISCLOSURES_01 —
+ * le sélecteur partage désormais la déclaration de masquage ci-dessous,
+ * de sorte qu'il n'existe qu'UNE implémentation dans le dépôt.
  */
 
 /* ── Masquage accessible ──────────────────────────────────────────────────
@@ -34,7 +35,8 @@
  * retireraient de la navigation clavier — c'est exactement ce qu'il ne faut
  * pas faire quand c'est le seul contrôle opérable.
  */
-.a11y-input {
+.a11y-input,
+.segmented__option input {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -375,4 +377,43 @@
 .choice-row--button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+
+/* ── Sb_UI_SESSION_CHOICES_DISCLOSURES_01 — focus visible sur `.segmented` ──
+ * L'input est masqué visuellement mais reste focusable ; l'indicateur de focus
+ * doit donc apparaître sur la surface VISIBLE associée, pas sur un contrôle
+ * d'un pixel. Sémantique ambre existante, aucune nouvelle couleur.
+ */
+.segmented__option input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* L'état sélectionné du composant historique ne reposait que sur la couleur et
+ * un fond. On ajoute une coche textuelle : lisible sans couleur. */
+.segmented__option input:checked + span::before {
+  content: "✓ ";
+  font-weight: 700;
+}
+
+/* ── Alternatives d'exercice : UNE liste groupée ──────────────────────────
+ * Le défaut rapporté était « des boîtes dans des boîtes ». Les options
+ * n'ont donc ni bordure ni rayon propres : un filet les sépare, et le groupe
+ * est encadré une seule fois par la carte d'exercice qui les contient.
+ */
+.segmented--stacked .segmented__option + .segmented__option span {
+  border-top: 1px solid var(--border);
+}
+
+.segmented--stacked .segmented__option span {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  border-radius: 0;
+}
+
+.segmented--stacked .segmented__option input:checked + span {
+  box-shadow: inset 2px 0 0 var(--accent);
 }
