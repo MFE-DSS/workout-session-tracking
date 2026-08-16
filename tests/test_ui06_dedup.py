@@ -138,11 +138,35 @@ def test_worked_area_chip_removed(client):
     assert "Pectoraux" in body  # readable primary label kept
 
 
-def test_worked_area_primary_shown_once(client):
-    """Known exercise: the primary zone label appears once in the Worked Area
-    (no chip + label duplication)."""
+def test_worked_area_primary_shown_on_exactly_the_two_authorised_surfaces(client):
+    """Sb_UIV2_SESSION_FOCUS_02 — correction sémantique, contrainte CONSERVÉE.
+
+    ANCIEN CONTRAT : `body.count("Pectoraux") == 1`. Le défaut visé par
+    Sx_UI_06 D3 était la duplication **chip + label** dans le panneau Zone
+    travaillée — pas l'existence d'un contexte de cible ailleurs.
+
+    PREUVE DE DOGFOOD MESURÉE : sur mobile 360×640, la série courante tombait
+    à fold 2.1 tandis que le panneau Zone travaillée occupait le premier
+    écran (fold 0.8).
+
+    SUPERSESSION OPÉRATEUR EXPLICITE : un résumé de cible **compact** est
+    autorisé près de l'identité de l'exercice, la visualisation détaillée
+    descendant sous la console. La cible apparaît donc à deux endroits, qui
+    ne sont pas le même genre d'objet : un contexte d'une ligne, et un
+    panneau détaillé.
+
+    NOUVEAU CONTRAT — plus strict qu'un simple `== 2`, qui laisserait passer
+    n'importe quelle troisième duplication : la cible doit apparaître dans le
+    résumé compact ET dans la ligne « Principal », et **nulle part ailleurs**.
+    Le défaut d'origine reste donc interdit.
+    """
     body = _known_body(client)
-    assert body.count("Pectoraux") == 1
+    assert "session-focus__target-compact" in body, "compact target missing"
+    assert "session-focus__worked-area-row--primary" in body, "full panel row missing"
+    assert body.count("Pectoraux") == 2, (
+        "the target label must appear on exactly the two authorised surfaces "
+        "(compact summary + full worked-area row), never a third time"
+    )
 
 
 def test_worked_area_assistants_shown_when_present(client):
@@ -190,11 +214,24 @@ def _unknown_body(client) -> str:
     return r.text
 
 
-def test_worked_area_unknown_qualifier_once(client):
-    """Unknown exercise: « À qualifier » renders exactly once (carried by the
-    primary row); empty assistant/stabilizer slots are not rendered."""
+def test_worked_area_unknown_qualifier_on_the_two_authorised_surfaces(client):
+    """Sb_UIV2_SESSION_FOCUS_02 — même correction sémantique que ci-dessus.
+
+    ANCIEN CONTRAT : `count("À qualifier") == 1`. L'invariant réel visé était
+    « aucun slot vide ne répète le qualificatif » — assistants et
+    stabilisation ne doivent pas rendre une ligne vide. Cet invariant est
+    **intégralement conservé** par les deux dernières assertions.
+
+    Le résumé de cible compact, autorisé par l'opérateur, porte lui aussi le
+    fallback quand la zone est inconnue : ne pas l'afficher reviendrait à
+    laisser un contexte de cible **vide** près de l'identité, ce qui est pire
+    que de le qualifier.
+    """
     body = _unknown_body(client)
-    assert body.count("À qualifier") == 1
+    assert body.count("À qualifier") == 2, (
+        "the unknown fallback belongs on exactly the compact summary and the "
+        "primary row — a third occurrence means an empty slot is repeating it"
+    )
     assert "session-focus__worked-area-row--secondary" not in body
     assert "session-focus__worked-area-row--stabilizer" not in body
 

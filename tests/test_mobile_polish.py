@@ -214,19 +214,74 @@ def test_no_active_indicator_when_no_session_open(client):
 
 
 def test_no_active_banner_on_session_detail_page(client):
+    """Sb_UIV2_SESSION_FOCUS_02 — l'assertion principale est INCHANGÉE.
+
+    ANCIEN COMPLÉMENT : le test lisait ensuite la bottom nav de cette page
+    pour vérifier que l'onglet « Séance » y était actif.
+
+    DÉFAUT PROUVÉ EN PRODUCTION : `.app-bottom-nav` est `fixed` z-index 40 et
+    occupe toujours les ~57 derniers pixels ; le CTA d'exercice est `sticky`
+    à 8 px du bas. `elementFromPoint()` au centre du bouton « Enregistrer et
+    passer à E2 » renvoyait `app-bottom-nav__item` — l'action primaire de la
+    séance n'était pas cliquable en son centre, à toute hauteur d'écran.
+
+    SUPERSESSION OPÉRATEUR (étroite, contextuelle) : pendant une séance
+    `in_progress`, la barre globale n'est PAS rendue — focus mode. Il n'y a
+    donc plus d'onglet actif à mesurer ICI, et l'ancien complément n'a plus
+    d'objet sur cette page.
+
+    Ce que le test garantit désormais : la bannière reste absente ET la barre
+    est réellement ABSENTE DU DOM, pas seulement invisible — sinon ses liens
+    resteraient focusables derrière un écran qu'on ne voit pas.
+    La non-régression de la coque ailleurs est tenue par
+    `test_bottom_nav_present_on_non_active_routes`.
+    """
     sid = _start(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
     assert "active-banner" not in body
-    # /sessions/{id} keeps the Séance tab active (is_sess covers /sessions).
-    # Note: the session_detail view does not pass `active_session` to the
-    # template (unchanged — routers are out of scope for Sb_UI_03.3), so the
-    # has-active-session indicator is not rendered here; this mirrors the old
-    # banner which was also hidden on this page. The Séance tab is still active.
-    nav = re.search(r'<nav class="app-bottom-nav".*?</nav>', body, re.DOTALL).group(0)
-    active = [re.search(r'__label">([^<]+)<', it).group(1)
-              for it in re.findall(r'<a class="app-bottom-nav__item[^>]*>.*?</a>', nav, re.DOTALL)
-              if 'aria-current="page"' in it]
-    assert active == ["Séance"]
+    assert '<nav class="app-bottom-nav"' not in body, (
+        "an in-progress session must not render the global bottom nav — it "
+        "occludes the primary exercise CTA"
+    )
+    assert "app-bottom-nav__item" not in body, (
+        "no bottom-nav link may survive in the DOM during focus mode: hidden "
+        "links stay keyboard-focusable"
+    )
+
+
+def test_bottom_nav_present_on_non_active_routes(client):
+    """Garde anti-suppression GLOBALE de la navigation.
+
+    Le focus mode est contextuel. Si la barre disparaissait partout, ce test
+    tomberait — c'est exactement la plantation « masquer la nav globalement,
+    Home compris ».
+    """
+    _start(client, "push-a")
+    for route in ("/", "/library", "/profile"):
+        body = client.get(route).text
+        assert '<nav class="app-bottom-nav"' in body, (
+            f"{route} must keep the global bottom navigation"
+        )
+
+
+def test_focus_mode_only_for_in_progress_sessions(client):
+    """La règle d'activation suit l'état canonique, pas la route.
+
+    Une séance TERMINÉE n'est pas un flux de saisie : elle garde la coque.
+    Sans cette garde, « masquer sur /sessions/* » passerait pour correct.
+    """
+    sid = _start(client, "push-a")
+    active_body = client.get(f"/sessions/{sid}").text
+    assert "is-session-focus-mode" in active_body
+
+    client.post(f"/sessions/{sid}", data={"action": "end"}, follow_redirects=True)
+    done_body = client.get(f"/sessions/{sid}").text
+    assert "is-session-focus-mode" not in done_body, (
+        "a completed session is not the active logging workflow"
+    )
+    assert '<nav class="app-bottom-nav"' in done_body, (
+        "a completed session keeps the global shell navigation"
+    )
 
 
 def test_no_active_banner_on_home(client):

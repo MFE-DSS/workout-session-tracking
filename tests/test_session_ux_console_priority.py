@@ -71,12 +71,56 @@ def test_console_before_cues(client):
     assert console < cues, "console must render before technical cues"
 
 
-def test_worked_area_before_console(client):
+def test_console_before_full_worked_area(client):
+    """Sb_UIV2_SESSION_FOCUS_02 — supersession explicite, direction inversée.
+
+    ANCIEN CONTRAT (`test_worked_area_before_console`, Sb_SESSION_UX_01.2) :
+
+        assert worked < console, "worked area (Zone travaillée) stays before console"
+
+    PREUVE DE DOGFOOD MESURÉE (mobile 360×640, harnais stateful, géométrie
+    Playwright réelle, sans scroll) :
+
+        série courante ........ 1355 px  → fold 2.1  (HORS viewport)
+        Zone travaillée ....... 521 px   → fold 0.8  (DANS le viewport)
+
+    Autrement dit le panneau secondaire occupait le premier écran pendant que
+    l'action primaire tombait deux écrans plus bas.
+
+    SUPERSESSION OPÉRATEUR EXPLICITE : l'ordre historique est superseded pour
+    l'UI de séance active. Nouvelle hiérarchie : identité → console → action
+    primaire → détail secondaire (Zone travaillée, machine, alternatives).
+    La supersession porte UNIQUEMENT sur l'ordre d'affichage ; aucune
+    sémantique métier des composants n'est touchée.
+
+    NOUVEAU CONTRAT : ordre de SOURCE, pas ordre visuel. L'assertion lit le
+    HTML rendu, donc un `order` CSS ne peut pas la satisfaire — c'est
+    délibéré : la navigation clavier doit rencontrer l'action avant le
+    détail, ce qu'un réordonnancement purement visuel casserait.
+    """
     body = _body(client)
-    worked = body.find("session-focus__body-slot")
     console = body.find("session-focus__console-list")
-    assert worked != -1 and console != -1
-    assert worked < console, "worked area (Zone travaillée) stays before console"
+    worked = body.find("session-focus__body-slot")
+    assert console != -1, "console list missing"
+    assert worked != -1, "full worked-area panel missing — it must still exist"
+    assert console < worked, (
+        "the logging console must render BEFORE the full worked-area panel "
+        "in source order (superseded Sb_SESSION_UX_01.2 ordering)"
+    )
+
+
+def test_compact_target_precedes_the_console(client):
+    """Le contexte de cible compact reste, lui, AVANT la console.
+
+    Contexte de cible ≠ visualisation détaillée : la ligne d'une ligne
+    accompagne l'identité, le panneau descend. Sans cette garde, « descendre
+    la Zone travaillée » pourrait silencieusement emporter le contexte utile.
+    """
+    body = _body(client)
+    compact = body.find("session-focus__target-compact")
+    console = body.find("session-focus__console-list")
+    assert compact != -1, "compact target context missing"
+    assert compact < console, "compact target belongs with the exercise identity"
 
 
 def test_cues_still_present(client):

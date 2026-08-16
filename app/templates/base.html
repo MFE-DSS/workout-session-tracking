@@ -26,7 +26,38 @@
     {% block extra_head %}{% endblock %}
     <title>{{ page_title }} · Auren</title>
   </head>
-  <body>
+  {# ============================================================
+     Sb_UIV2_SESSION_FOCUS_02 — AUREN FOCUS MODE (supersession de coque,
+     étroite et contextuelle).
+     ------------------------------------------------------------
+     DÉFAUT PROUVÉ EN PRODUCTION : `.app-bottom-nav` est `fixed`, z-index 40 ;
+     `.session-focus__sticky-cta` est `sticky` à 8 px du bas, z-index 2. La
+     barre occupe toujours les ~57 derniers pixels, donc le CTA « Enregistrer
+     et passer à E2 » est peint DESSOUS à n'importe quelle hauteur d'écran.
+     `elementFromPoint()` au centre du bouton renvoyait
+     `app-bottom-nav__item` : l'action primaire de la séance n'était pas
+     cliquable en son centre.
+
+     RÈGLE D'ACTIVATION — dérivée de l'état canonique EXISTANT, aucune
+     seconde notion d'« actif » inventée : `session.status == 'in_progress'`.
+     `session` n'est une variable de contexte de premier niveau que pour
+     `session_detail.html` et `session_done.html` (l'admin l'imbrique dans
+     `rows`), donc la règle vise exactement le flux de saisie actif.
+
+         séance in_progress ....... barre masquée (focus mode)
+         séance terminée .......... barre présente
+         toute autre route ........ barre présente
+
+     La barre est NON RENDUE, pas masquée en opacité : ses liens ne doivent
+     pas rester focusables derrière un écran invisible.
+
+     SORTIE GARANTIE, uniquement par des contrôles EXISTANTS : le lien
+     « ← Accueil » du header de séance, le menu `☰` natif de la topbar (huit
+     destinations, sans JS) et « Terminer la séance ». Aucun nouvel
+     affordance, aucun nouveau cycle de vie.
+     ============================================================ #}
+  {% set shell_focus_mode = session is defined and session and session.status == 'in_progress' %}
+  <body{% if shell_focus_mode %} class="is-session-focus-mode"{% endif %}>
     {# Sb_UI_03.3 — skip link : premier élément interactif du body, masqué
        hors écran au repos, visible au focus clavier. SSR/no-JS, tokens Auren
        existants. Cible le <main id="main-content">. #}
@@ -148,6 +179,7 @@
        fallback desktop ; rail desktop = Sb_UI_03.2). Routes secondaires
        (Historique/Physique/Coach/Classement/Squads/Déconnexion) préservées
        dans le menu topbar. #}
+    {% if not shell_focus_mode %}
     <nav class="app-bottom-nav" aria-label="Navigation principale">
       <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
         <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12 12 4l8 8"/><path d="M6 10v9h12v-9"/></svg>
@@ -167,5 +199,6 @@
         <span class="app-bottom-nav__label">Profil</span>
       </a>
     </nav>
+    {% endif %}
   </body>
 </html>

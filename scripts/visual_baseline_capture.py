@@ -171,6 +171,9 @@ def _resolve_route(
             "AUREN_BASELINE_DONE_SESSION_ID": (
                 sessions.get("done", {}).get("id")
             ),
+            "AUREN_BASELINE_FOCUS_SESSION_ID": (
+                sessions.get("focus", {}).get("id")
+            ),
         }
         for name, value in runtime_map.items():
             placeholder = f"${{{name}}}"
@@ -259,6 +262,116 @@ def apply_actions(page, entry, *, timeout: int = 5000) -> None:
         page.wait_for_selector(expected, state="visible", timeout=timeout)
 
 
+def assert_in_viewport(page, entry, *, timeout: int = 5000) -> None:
+    """Vérifie que les sélecteurs `expect_in_viewport` coupent le viewport initial.
+
+    Sb_UIV2_SESSION_FOCUS_02 — `expect_visible` ne dit rien de la hiérarchie :
+    un élément situé six écrans plus bas est « visible ». La question produit
+    est « l'action courante est-elle atteignable **sans faire défiler** », et
+    seule la géométrie répond.
+
+    Trois contraintes rendent la preuve recevable :
+
+    * **aucun scroll automatique** — on lit `bounding_box()`, jamais
+      `scroll_into_view_if_needed()`, sinon la mesure fabriquerait le résultat
+      qu'elle prétend constater ;
+    * **on part de `scrollY = 0`**, sauf si les gestes du scénario ont
+      légitimement déplacé la page — vérifié, pas supposé ;
+    * **géométrie réelle** de Playwright et dimensions réelles du viewport,
+      aucune évaluation JavaScript pour simuler l'état.
+    """
+    selectors = getattr(entry, "expect_in_viewport", ())
+    if not selectors:
+        return
+
+    size = page.viewport_size
+    if size is None:  # pragma: no cover - contexte toujours dimensionné ici
+        raise RuntimeError("viewport size unavailable; cannot assert the fold")
+    fold_height = size["height"]
+
+    scroll_y = page.evaluate("window.scrollY")
+    has_scrolling_action = any(
+        a.kind in ("click", "open_details", "press")
+        for a in getattr(entry, "actions", ())
+    )
+    if scroll_y and not has_scrolling_action:
+        raise AssertionError(
+            f"{entry.slug}: page starts at scrollY={scroll_y}, not 0 — "
+            "a fold assertion measured from a scrolled page proves nothing")
+
+    for selector in selectors:
+        locator = page.locator(selector).first
+        locator.wait_for(state="visible", timeout=timeout)
+        box = locator.bounding_box()
+        if box is None:
+            raise AssertionError(
+                f"{entry.slug}: {selector!r} has no geometry; cannot prove "
+                "it is above the fold")
+        # `bounding_box()` est relative au viewport : un `y` négatif est
+        # au-dessus, `y >= fold_height` est sous la ligne de flottaison.
+        top = box["y"]
+        if top >= fold_height:
+            raise AssertionError(
+                f"{entry.slug}: {selector!r} starts at y={top:.0f}px, below "
+                f"the {fold_height}px fold (fold {top / fold_height:.1f}) — "
+                "the capture would not show it")
+        if top + box["height"] <= 0:
+            raise AssertionError(
+                f"{entry.slug}: {selector!r} sits entirely above the viewport")
+
+    assert_unobscured(page, entry, timeout=timeout)
+
+
+def assert_unobscured(page, entry, *, timeout: int = 5000) -> None:
+    """Vérifie qu'une cible est entièrement dégagée au-dessus d'un obstacle.
+
+    Sb_UIV2_SESSION_FOCUS_02 — cette porte existe à cause d'un faux vert
+    observé, pas d'un risque théorique : la série courante commençait à
+    577 px dans un viewport de 640, donc « dans le viewport », alors que le
+    CTA `sticky` commence à 571 px. La ligne et ses deux champs étaient
+    derrière lui. L'espace réellement utilisable s'arrête au HAUT de
+    l'obstacle.
+
+    Géométrie Playwright réelle, aucun `page.evaluate` pour fabriquer l'état,
+    aucun `scroll_into_view_if_needed` — la position de l'obstacle est lue
+    telle qu'elle est rendue.
+    """
+    expectations = getattr(entry, "expect_unobscured", ())
+    if not expectations:
+        return
+
+    size = page.viewport_size
+    if size is None:  # pragma: no cover - contexte toujours dimensionné ici
+        raise RuntimeError("viewport size unavailable")
+
+    for want in expectations:
+        target = page.locator(want.target).first
+        obstacle = page.locator(want.obstacle).first
+        target.wait_for(state="visible", timeout=timeout)
+        obstacle.wait_for(state="visible", timeout=timeout)
+
+        t_box = target.bounding_box()
+        o_box = obstacle.bounding_box()
+        if t_box is None or o_box is None:
+            raise AssertionError(
+                f"{entry.slug}: missing geometry for {want.target!r} or "
+                f"{want.obstacle!r}")
+
+        if t_box["y"] < 0 or t_box["y"] >= size["height"]:
+            raise AssertionError(
+                f"{entry.slug}: {want.target!r} starts at y={t_box['y']:.0f}, "
+                f"outside the {size['height']}px viewport")
+
+        target_bottom = t_box["y"] + t_box["height"]
+        gap = o_box["y"] - target_bottom
+        if gap < want.min_gap_px:
+            raise AssertionError(
+                f"{entry.slug}: {want.target!r} ends at y={target_bottom:.0f} "
+                f"but {want.obstacle!r} starts at y={o_box['y']:.0f} — gap "
+                f"{gap:.0f}px < {want.min_gap_px}px. The control is behind "
+                "the floating surface, whatever the viewport test says.")
+
+
 def _capture_real(
     plans: list[CapturePlan],
     base_url: str,
@@ -308,7 +421,18 @@ def _capture_real(
                     apply_actions(page, plan.entry)
                     output_dir = Path(plan.output_path).parent
                     output_dir.mkdir(parents=True, exist_ok=True)
-                    page.screenshot(path=plan.output_path, full_page=True)
+                    # `full_page` reste le défaut historique : basculer le
+                    # défaut réécrirait silencieusement toutes les baselines.
+                    mode = getattr(plan.entry, "capture_mode", "full_page")
+                    page.screenshot(
+                        path=plan.output_path,
+                        full_page=(mode == "full_page"),
+                    )
+                    # La porte de flottaison est évaluée APRÈS l'écriture de
+                    # l'image, délibérément : un échec doit laisser l'artefact
+                    # qui le prouve. Sinon l'état défaillant — celui qu'on a
+                    # le plus besoin de montrer — serait le seul sans preuve.
+                    assert_in_viewport(page, plan.entry)
                     print(f"  ✓ {plan.entry.slug}/{plan.viewport}")
                     ok += 1
                 except Exception as exc:  # noqa: BLE001 — CLI wants to keep going
