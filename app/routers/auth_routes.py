@@ -420,6 +420,12 @@ def profile_page(
 
     capture_fields = [(s.key, s.label) for s in bp.BODY_MEASUREMENT_FIELDS]
 
+    # Sb_MORPHO_PROFILE_READMODEL_01 — read-only. Owner-scoped like every other
+    # read on this page; no planner consumer reads this value.
+    from app.services.morphology_readmodel import build_morphology_readmodel
+
+    morpho = build_morphology_readmodel(db, user.id)
+
     latest_measurement = get_latest_measurement(db, user.id)
     latest_values: dict[str, str] = {}
     if latest_measurement:
@@ -482,6 +488,7 @@ def profile_page(
             "measure_saved": request.query_params.get("measure_saved") == "1",
             "measure_error": request.query_params.get("measure_error") == "1",
             "capture_fields": capture_fields,
+            "morpho": morpho,
             "session_count": session_count,
             "completed_count": completed_count,
             "quality_svg": quality_svg,

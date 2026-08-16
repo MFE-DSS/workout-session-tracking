@@ -117,6 +117,74 @@
       </form>
     </div>
 
+    {# Sb_MORPHO_PROFILE_READMODEL_01 — lecture seule. Le guardrail brut du
+       moteur n'est PAS rendu : c'est un démenti ("aucune posture, aucun
+       diagnostic") et l'afficher mettrait le cadre médical sous les yeux du
+       lecteur sans rien lui apprendre. Il reste disponible pour l'audit. #}
+    <div class="card">
+      <h2 class="card__title" id="morpho-title">Mesures morphologiques</h2>
+      <section aria-labelledby="morpho-title">
+      {% if morpho.has_anything %}
+        {% if morpho.is_mixed_date %}
+        <p class="text-dim" style="font-size:12px;">{{ morpho.mixed_date_notice }}</p>
+        {% endif %}
+
+        <table style="width:100%;font-size:13px;border-collapse:collapse;text-align:left;">
+          <caption class="sr-only">Derniers faits morphologiques connus</caption>
+          <thead>
+            <tr><th scope="col">Mesure</th><th scope="col">Valeur</th><th scope="col">Base</th></tr>
+          </thead>
+          <tbody>
+            {% for f in morpho.facts %}
+            <tr>
+              <th scope="row">{{ f.label }}</th>
+              <td>{{ f.value }} {{ f.unit }}</td>
+              <td class="text-dim">{{ f.basis }}</td>
+            </tr>
+            {% endfor %}
+            {% if morpho.ape_index %}
+            <tr>
+              <th scope="row">{{ morpho.ape_index.label }}</th>
+              <td>{{ morpho.ape_index.value }} {{ morpho.ape_index.unit }}</td>
+              <td class="text-dim">{{ morpho.ape_index.basis }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+
+        {% if morpho.missing %}
+        <p class="text-dim" style="font-size:12px;margin-top:var(--space-sm);">
+          {{ morpho.missing | join(' · ') }}
+        </p>
+        {% endif %}
+
+        {% if morpho.interpretations %}
+        <h3 style="font-size:13px;margin-top:var(--space-md);">Lectures</h3>
+        <ul style="font-size:13px;padding-left:1.1em;">
+          {% for i in morpho.interpretations %}
+          <li style="margin-bottom:var(--space-xs);">
+            {{ i.rationale }}
+            <span class="text-dim">
+              — {{ i.layer_label }}, {{ i.confidence_label }}{% if i.is_proxy %}, indicateur indirect{% endif %}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      {% else %}
+        <p class="text-dim" style="font-size:13px;">
+          Aucune mesure morphologique enregistrée pour l'instant.
+        </p>
+        {% if morpho.missing %}
+        <p class="text-dim" style="font-size:12px;">{{ morpho.missing | join(' · ') }}</p>
+        {% endif %}
+      {% endif %}
+        <p class="text-dim" style="font-size:12px;margin-top:var(--space-sm);">
+          {{ morpho.notice }}
+        </p>
+      </section>
+    </div>
+
     <div class="card">
       <h2 class="card__title">Données de référence</h2>
       <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
