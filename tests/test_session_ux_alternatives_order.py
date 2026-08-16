@@ -99,7 +99,8 @@ def test_console_before_full_worked_area_in_source():
     src = _src()
     console = src.find("session-focus__console-list")
     worked = src.find("session-focus__body-slot")
-    assert console != -1 and worked != -1
+    assert console != -1, "console list missing from template source"
+    assert worked != -1, "full worked-area panel missing from template source"
     assert console < worked, (
         "console must precede the full worked-area panel in template source"
     )

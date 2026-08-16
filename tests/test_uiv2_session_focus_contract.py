@@ -135,7 +135,8 @@ def test_current_set_is_rendered_before_completed_sets():
     src = CARD.read_text(encoding="utf-8")
     current = src.find("work_set_list([_current_set]")
     completed = src.find("session-focus__completed-sets")
-    assert current != -1 and completed != -1
+    assert current != -1, "current-set render site missing"
+    assert completed != -1, "completed-set history missing"
     assert current < completed, (
         "the current set must be emitted before the completed-set history"
     )
