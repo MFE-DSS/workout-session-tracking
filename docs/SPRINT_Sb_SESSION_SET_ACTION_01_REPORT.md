@@ -174,3 +174,47 @@ parce que quelque chose a été sauvegardé — pas parce qu'on a cliqué.
 Le travail utile n'a pas été d'ajouter un bouton : c'est d'avoir mesuré que
 les deux placements évidents cassaient soit la largeur du viewport, soit la
 géométrie que la tranche précédente venait de gagner.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#114** — `--merge --match-head-commit d3e3011`, **sans** squash / `--admin` / force |
+| Merge | **`99273bd`** |
+| CI canonique | run `31977090444` — **succès 6/6, au premier passage** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication, **couverture code neuf 85,7 %** |
+| Threads / Gitar | **0 / 0** |
+| CI PR | **9 checks verts au premier passage**, aucun aller-retour |
+| Parité métier | diff **vide** sur `app/models`, `migrations`, `data`, `app/services` |
+
+### Capacité CI — retour en zone `HEALTHY`
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 84 | 7 614 Mo | 3 071 — intact |
+| 2 | 84 | **6 722 Mo** | 3 071 — intact |
+| 3 | 83 | 7 644 Mo | 3 071 — intact |
+
+`workers=2`, manifeste de shards respecté, jamais `-n auto`. Le shard bas
+remonte de **5 939 → 6 722 Mo** et repasse au-dessus de 6 Go : l'arrivée du
+fichier de tests de cette tranche a redistribué la partition, confirmant une
+fois de plus que le déséquilibre suit la **partition**, pas la machine. La
+crainte exprimée au sprint précédent — « la marge se resserre, préférer une
+tranche CSS » — était donc mal fondée : c'est une tranche **fonctionnelle**
+qui a rendu la marge.
+
+### Aucun aller-retour
+
+Contrairement aux deux tranches précédentes, ni Sonar ni la CI n'ont demandé
+de correctif après ouverture de la PR. Les deux causes probables sont
+méthodologiques et méritent d'être notées : le pré-scan de complexité avant
+commit (qui a motivé l'extraction de `stay_redirect_target`) et le sweep
+lancé **depuis le worktree** dès le départ.
+
+### Suite
+
+`Sb_REST_EVENT_TRACE_01` reste ouvert si un historique durable des temps de
+repos est voulu — il exige une migration, donc un sprint dédié. Rien dans
+cette tranche ne le présuppose.
