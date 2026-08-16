@@ -5,7 +5,7 @@ Private: /logout, /profile, /profile/password
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Form, Request
@@ -13,12 +13,10 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import func, select
 from sqlalchemy.orm import selectinload
 
+from app.config import get_settings
 from app.deps import CurrentUser, DbSession
-from app.models.session import SessionExercise, SetLog, WorkoutSession
+from app.models.session import SessionExercise, WorkoutSession
 from app.models.user import User
-from app.services.quality_score import compute_session_quality
-from app.services.session_state import latest_open_session
-from app.services.timeline import TimelinePoint, build_quality_timeline_svg
 from app.services.auth import (
     clear_session_cookie,
     create_reset_token,
@@ -29,7 +27,9 @@ from app.services.auth import (
     verify_reset_token,
 )
 from app.services.email import send_email
-from app.config import get_settings
+from app.services.quality_score import compute_session_quality
+from app.services.session_state import latest_open_session
+from app.services.timeline import TimelinePoint, build_quality_timeline_svg
 from app.templating import templates
 
 router = APIRouter(tags=["auth"])
@@ -45,6 +45,7 @@ MAX_USERNAME_LENGTH = 64
 # Mirrors the path-param regex on /users/{username} so the public
 # profile route never has to deal with surprising characters.
 import re as _re
+
 USERNAME_REGEX = _re.compile(r"^[a-zA-Z0-9_-]+$")
 
 # Sb_20.3 — email regex (basic but strict). Replaces the prior loose
@@ -339,7 +340,7 @@ def profile_page(
     ).scalar_one() or 0
 
     # 30-day quality timeline
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     window_30 = now - timedelta(days=30)
     window_60 = now - timedelta(days=60)
 
@@ -388,6 +389,7 @@ def profile_page(
         trend = "stable"
         trend_label = "\u2192 stable"
 
+    from app.models.catalog import WorkoutTemplate
     from app.services.behavioral import compute_behavioral_state
     from app.services.measurements import (
         MEASUREMENT_FIELDS,
@@ -398,15 +400,30 @@ def profile_page(
         get_measurement_series,
     )
     from app.services.timeline import build_measurement_timeline_svg
-    from app.models.catalog import WorkoutTemplate
 
     behavioral = compute_behavioral_state(db, user.id)
 
-    # Body measurements
+    # Body measurements.
+    #
+    # Sb_MORPHO_PROFILE_RUNTIME_01 — capture and display are deliberately two
+    # different field sets, because they answer two different questions.
+    #
+    # `capture_fields` is the canonical writer's whitelist: exactly what this
+    # form is allowed to persist. Rendering the form from anything else would
+    # let it post a key the writer silently ignores.
+    #
+    # `MEASUREMENT_FIELDS` stays the *display* set for charts and history, and
+    # it still contains the legacy `calf_cm`. New entries no longer write that
+    # column, but users who have years of it must keep seeing their curve —
+    # "historical data remains readable exactly as it is".
+    from app.services import body_profile as bp
+
+    capture_fields = [(s.key, s.label) for s in bp.BODY_MEASUREMENT_FIELDS]
+
     latest_measurement = get_latest_measurement(db, user.id)
     latest_values: dict[str, str] = {}
     if latest_measurement:
-        for field in MEASUREMENT_FIELDS:
+        for field in {*MEASUREMENT_FIELDS, *(k for k, _ in capture_fields)}:
             val = getattr(latest_measurement, field, None)
             latest_values[field] = str(val) if val is not None else ""
 
@@ -462,6 +479,9 @@ def profile_page(
             ),
             "pref_saved": request.query_params.get("pref_saved") == "1",
             "pref_error": request.query_params.get("pref_error") == "1",
+            "measure_saved": request.query_params.get("measure_saved") == "1",
+            "measure_error": request.query_params.get("measure_error") == "1",
+            "capture_fields": capture_fields,
             "session_count": session_count,
             "completed_count": completed_count,
             "quality_svg": quality_svg,
@@ -593,89 +613,73 @@ async def profile_measurements_submit(
     db: DbSession = None,
     user: CurrentUser = None,
 ):
-    """Save a body measurement entry.
+    """Save a body measurement entry by delegating to the canonical writer.
 
-    Data quality rules:
-    - Date in the future → capped to today
-    - All fields empty → no insert (skip)
-    - Same date already exists → update existing row (upsert)
+    Sb_MORPHO_PROFILE_RUNTIME_01 — this route used to be a second, independent
+    writer on `body_measurements` (`Sx_MORPHO_CAPTURE_01_SPEC` §2). It kept its
+    own inline bounds, its own whitelist-free parsing, and an **upsert-by-day**
+    semantic, while `body_profile.create_measurement` treated the same table as
+    an append-only series. Two writers, one table, two temporal contracts.
+
+    It now delegates. Three behaviours change, deliberately:
+
+    - **Append-only.** A second entry on an already-measured day creates a new
+      dated row instead of overwriting the first. Correcting a measurement is
+      adding a later fact, not rewriting the earlier one. Rows already written
+      by the old upsert path stay exactly as they are — the change is
+      prospective, nothing is migrated, merged or deleted.
+    - **Bounds are enforced, not silently dropped.** The old parser turned an
+      out-of-range value into `None`, so a mistyped `1750` cm simply vanished
+      with a success redirect. The canonical validator rejects it and the user
+      is told, which is the spec's `§6` rule against silent truncation.
+    - **The legacy single `calf_cm` column is no longer written.** The canonical
+      whitelist carries the lateralized `calf_cm_left/right`, and the model has
+      documented them as the source of truth since Sb_Body_01. Historical
+      `calf_cm` values remain readable and keep charting.
+
+    Data quality rules kept from the previous implementation: a future date is
+    capped to today, and a fully empty submission is a no-op rather than an
+    error.
     """
-    from app.models.measurement import BodyMeasurement
-    from app.services.measurements import MEASUREMENT_FIELDS
+    from app.services import body_profile as bp
 
     form = await request.form()
 
-    # Parse date — fallback to today if empty/invalid
-    now = datetime.now(timezone.utc)
+    # Parse date — fallback to today if empty/invalid.
+    now = datetime.now(UTC)
     dt = now
     measured_at = (form.get("measured_at") or "").strip()
     if measured_at:
         try:
             dt = datetime.strptime(measured_at, "%Y-%m-%d").replace(
-                tzinfo=timezone.utc
+                tzinfo=UTC
             )
         except ValueError:
             pass
 
-    # Cap future dates to today
+    # Cap future dates to today.
     if dt.date() > now.date():
         dt = now
 
-    def _float_or_none(v: str, lo: float, hi: float) -> float | None:
-        v = v.strip()
-        if not v:
-            return None
-        try:
-            n = float(v)
-        except ValueError:
-            return None
-        if n < lo or n > hi:
-            return None
-        return n
-
-    # Parse all measurement fields dynamically
-    _RANGES: dict[str, tuple[float, float]] = {
-        "weight_kg": (30.0, 300.0),
+    raw = {
+        spec.key: (form.get(spec.key) or "")
+        for spec in bp.BODY_MEASUREMENT_FIELDS
     }
-    _DEFAULT_RANGE = (10.0, 200.0)
 
-    parsed: dict[str, float | None] = {}
-    for field in MEASUREMENT_FIELDS:
-        raw = form.get(field, "")
-        lo, hi = _RANGES.get(field, _DEFAULT_RANGE)
-        parsed[field] = _float_or_none(raw, lo, hi)
-
-    # Skip if all measurement fields are empty
-    if all(v is None for v in parsed.values()):
+    # A fully empty submission stays a no-op: `parse_and_validate` treats "no
+    # field at all" as an error, which would turn an accidental empty submit
+    # into a red banner. Preserved from the previous behaviour on purpose.
+    if not any(v.strip() for v in raw.values()):
         return RedirectResponse(url="/profile", status_code=303)
 
-    # Upsert: if a measurement exists for same date, update it
-    day_start = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    day_end = day_start + timedelta(days=1)
-    existing = db.execute(
-        select(BodyMeasurement)
-        .where(BodyMeasurement.user_id == user.id)
-        .where(BodyMeasurement.measured_at >= day_start)
-        .where(BodyMeasurement.measured_at < day_end)
-        .limit(1)
-    ).scalar_one_or_none()
+    try:
+        cleaned = bp.parse_and_validate(raw)
+    except ValueError:
+        return RedirectResponse(url="/profile?measure_error=1", status_code=303)
 
-    if existing:
-        # Update only non-null submitted values (don't erase existing data)
-        for field, val in parsed.items():
-            if val is not None:
-                setattr(existing, field, val)
-    else:
-        m = BodyMeasurement(
-            user_id=user.id,
-            measured_at=dt,
-            **{k: v for k, v in parsed.items()},
-        )
-        db.add(m)
+    bp.create_measurement(db, user.id, cleaned, measured_at=dt)
 
-    db.commit()
-
-    return RedirectResponse(url="/profile", status_code=303)
+    return RedirectResponse(url="/profile?measure_saved=1", status_code=303)
 
 
 # ---------------------------------------------------------------------------

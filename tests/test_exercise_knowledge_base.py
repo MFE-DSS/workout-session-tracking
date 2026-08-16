@@ -210,8 +210,10 @@ def test_alembic_head_unchanged():
 
     script = ScriptDirectory.from_config(Config(str(PROJECT_ROOT / "alembic.ini")))
     # EKB_02 est data-only ; le head a ensuite avancé avec SCORING_03
-    # (`o6p1j7k8m09`), PUBLICATION_01 (`p7q2k8l9n10`) puis
-    # TRAINING_PREFERENCES_01 (`q8r3l9m0o11` : table additive
-    # `training_preferences`, aucune colonne ajoutée à `users`, aucun backfill).
+    # (`o6p1j7k8m09`), PUBLICATION_01 (`p7q2k8l9n10`), TRAINING_PREFERENCES_01
+    # (`q8r3l9m0o11` : table additive `training_preferences`, aucune colonne
+    # ajoutée à `users`, aucun backfill) puis MORPHO_PROFILE_RUNTIME_01
+    # (`r9s4m0n1p12` : colonne additive nullable `wingspan_cm` sur
+    # `body_measurements`, aucun backfill, colonne héritée `calf_cm` intacte).
     # Cette sentinelle suit le head courant.
-    assert script.get_current_head() == "q8r3l9m0o11"
+    assert script.get_current_head() == "r9s4m0n1p12"
