@@ -144,3 +144,58 @@ sortie produit.
 Le vrai risque n'était pas d'écrire des lignes : c'était de laisser
 l'observabilité devenir une dépendance de disponibilité. Mes propres tests l'ont
 attrapée là où je ne l'avais pas prévue — au site d'appel, pas dans le service.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#106** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `38b56ce` — **vert au premier passage**, aucun correctif |
+| Merge | **`279bf14`** |
+| CI canonique | run `31939073702` — **succès, 5/5 jobs** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité, couverture new code **91,6 %** |
+| Threads / Gitar | **0 / 0** |
+| Migration en tête | **`s0t5n1o2q13`** |
+| Tests CI | 2 143 + 2 310 = **4 453** |
+
+### Forme réelle du graphe (mesurée, cadence 4, priorité `arms`)
+
+| | |
+|---|---|
+| Traces pour **une** génération | **81** |
+| `VOLUME_BAND` / `ZONE_ALLOCATION` / `CONTRIBUTION_CREDIT` | 11 / 11 / 11 |
+| `SLOT_SELECTION` / `SET_PRESCRIPTION` | 24 / 24 |
+| Arêtes amont | **83** |
+| Empreintes distinctes | 81 / 81 |
+| Séries physiques planifiées | **96** |
+
+Le dernier chiffre est la preuve de la règle de granularité : **96 séries
+physiques produisent 11 traces de contribution**, pas 96.
+
+### Capacité CI — **WATCH** (règle d'arrêt déclenchée)
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | 4 522 Mo — HEALTHY | **3 701 Mo — WATCH** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+| `workers=` | 2 | 2 |
+
+Le run de PR donnait 4 529 / **3 720 Mo** : les deux mesures concordent, ce
+n'est pas un accident d'exécution.
+
+| Tranche | Shard A | Shard B | Tests |
+|---|---|---|---|
+| `Sb_CI_TMPSTATE_FLAKE_01` | 5 195 | 5 065 | 4 314 |
+| `Sb_MORPHO_PROFILE_RUNTIME_01` | 4 838 | 4 772 | 4 378 |
+| `Sb_MORPHO_PROFILE_READMODEL_01` | 4 666 | 4 380 | 4 423 |
+| **`Sb_DECISION_ANALYTICS_RUNTIME_01`** | **4 522** | **3 701** | **4 453** |
+
+Le shard B a perdu **1 364 Mo en trois tranches** et passe sous le plancher
+`HEALTHY`. Le swap n'est pas entamé et aucun job n'a été tué : c'est `WATCH`,
+pas `HARD`.
+
+**Conséquence appliquée** : tranche 1 mergée et close, **tranche 2
+`Sb_ORCHESTRATOR_EXPLAINER_01` NON ouverte**, recommandation `GO` émise pour
+`Sb_OPS_CI_SCALE_02`.
