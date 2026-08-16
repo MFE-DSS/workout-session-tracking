@@ -60,14 +60,9 @@
     action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
     class="exercise-card__form"
   >
-    <div class="exercise-card__head-expanded">
-      <a
-        href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
-        class="exercise-card__code--link"
-        style="font-size:12px;color:var(--fg-dim);"
-      >Voir historique {{ se.exercise_code_snapshot }} →</a>
-    </div>
-
+    {# Sb_UIV2_SESSION_FOCUS_02 — le lien d'historique est explicitement du
+       détail de niveau 8 ; il est rendu avec le reste du secondaire, sous la
+       console. Contenu et URL inchangés. #}
     {# ============================================================
        Sb_UI_04.3 — Active Exercise Cockpit hero (Sx_UI_04 §18)
        ------------------------------------------------------------
@@ -95,17 +90,6 @@
            l'expose comme rôle prescrit ; sinon formulation neutre et
            conservatrice (jamais de justification biomécanique
            inventée). --- #}
-        <div class="session-focus__intent">
-          <span class="session-focus__intent-label">Intention</span>
-          <p class="session-focus__intent-text">
-            {% if _family and _family.name %}
-              Bloc <b>{{ _family.name }}</b> — exercice actif de la séance.
-            {% else %}
-              Exercice actif de la séance — reste concentré sur l'exécution.
-            {% endif %}
-          </p>
-        </div>
-
         {# --- Worked Area Visual Slot (§18.C / §23, enrichi Sb_UI_04.5) :
            surface biomécanique clinique SSR/CSS, sans asset externe, sans
            GIF, sans image générée. Sources RÉELLES existantes uniquement
@@ -441,6 +425,20 @@
       {% set _bmd_after_mapped = _bmd_after and _bmd_after.status == "mapped" %}
       {% set _wa_pattern_after = _family_after.description if _family_after and _family_after.description else None %}
 
+      {# Intention : contexte de séance, pas prescription. La cible est déjà
+         portée par le résumé compact en tête ; ce bloc rejoint donc le
+         secondaire. Contenu strictement inchangé. #}
+      <div class="session-focus__intent">
+        <span class="session-focus__intent-label">Intention</span>
+        <p class="session-focus__intent-text">
+          {% if _family_after and _family_after.name %}
+            Bloc <b>{{ _family_after.name }}</b> — exercice actif de la séance.
+          {% else %}
+            Exercice actif de la séance — reste concentré sur l'exécution.
+          {% endif %}
+        </p>
+      </div>
+
       <details class="disclosure session-focus__worked-area-disclosure">
         <summary class="disclosure__summary">
           <span class="session-focus__worked-area-title">Zone travaillée</span>
@@ -531,6 +529,17 @@
         </div>
       </details>
     {% endif %}
+
+    {# Historique de l'exercice — détail de niveau 8, rendu APRÈS la console.
+       Hors du garde `is_active` : les cartes non actives le portaient déjà et
+       doivent le conserver. Seule sa position change. #}
+    <div class="exercise-card__head-expanded">
+      <a
+        href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
+        class="exercise-card__code--link"
+        style="font-size:12px;color:var(--fg-dim);"
+      >Voir historique {{ se.exercise_code_snapshot }} →</a>
+    </div>
 
     {# ============================================================
        Sb_UI_04.5 — Alternatives Surface (§18.F / §23)
