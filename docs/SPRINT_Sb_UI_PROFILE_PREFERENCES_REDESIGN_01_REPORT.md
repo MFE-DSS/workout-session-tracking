@@ -96,5 +96,84 @@ Le panneau se lit maintenant comme un instrument : ce qui est choisi se voit,
 et dans quel ordre.
 
 Le point qui méritait le plus d'attention n'était pas le rendu mais le fallback.
-En laissant les `<select>` natifs porter la vérité, le mode sans JS cesse d'être
-un second chemin à maintenir — et le POST devient impossible à faire diverger.
+En laissant les menus natifs porter la vérité, le mode sans JS cesse d'être un
+second chemin à maintenir — et le POST devient impossible à faire diverger.
+
+---
+
+## 7. Trois CI rouges, trois causes de périmètre
+
+Aucune n'était un défaut du code livré. Toutes venaient de ce que je n'avais
+**pas cherché** avant d'écrire.
+
+### (a) L'inventaire JS épinglé dans 14 fichiers
+
+`app/static/js/` devait contenir exactement `preview.js` + `session_focus.js`,
+assertion dupliquée dans **14** modules de tests issus de tranches sans rapport
+entre elles.
+
+Mon balayage local couvrait 6 fichiers ; la suite en compte 245. Un `grep` sur
+`static/js` avant d'écrire le script aurait suffi. Pire : l'audit de la tranche 1
+lisait déjà ces fichiers pour `.segmented` — je regardais le bon répertoire sans
+regarder ce que ses tests affirmaient de son **contenu**.
+
+**Résolu par décision opérateur (Option A)** : invariant supersédé de façon
+étroite, 14 gardes amendées avec la correction sémantique, caractère **exact**
+conservé — un quatrième fichier JS fait toujours échouer, vérifié par plantation.
+
+### (b) Dérive de périmètre causée par un `--fix` global
+
+`ruff check --fix tests/` a réécrit `tests/test_behavioral.py`, hors périmètre.
+L'`E402` était **préexistant**, mais la réécriture en faisait une **ligne neuve
+du diff** : Sonar l'a compté comme dette de code neuf, et un seul MAJOR
+(poids 15 > seuil 14) casse le gate.
+
+CLAUDE.md §4 nomme la dérive de périmètre comme arrêt dur, et j'y suis entré en
+cherchant une commande commode. Fichier intégralement restauré. **Règle retenue :
+`--fix` uniquement sur les fichiers du périmètre, jamais sur un répertoire.**
+
+### (c) Deux faux positifs sur mes propres commentaires
+
+`Web:InputWithoutLabelCheck` sur deux lignes situées **dans des commentaires
+Jinja** où j'avais écrit une balise `select` en prose : l'analyseur HTML lit le
+contenu des commentaires comme du balisage vivant. Classe de faux positif
+documentée dans la route de diagnostic du dépôt.
+
+Plutôt qu'une adjudication sur le service externe — écriture délibérément
+laissée hors des permissions élargies — les commentaires décrivent désormais les
+éléments sans les écrire sous forme de balise.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#110** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Commits | `062fa7b` (refonte) · `f0e1765` (inventaire JS) · `8d045f6` (périmètre + faux positifs) |
+| Merge | **`a73ecef`** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Inventaire JS canonique | `prefs_focus_rank.js` · `preview.js` · `session_focus.js` |
+
+**Dette structurelle enregistrée** : `JS_INVENTORY_GUARD_DUPLICATION` — 14
+inventaires exacts dupliqués. Candidat futur `Sb_TEST_GUARD_CONSOLIDATION_01`,
+**non bloquant**, explicitement hors de cette PR.
+
+### Capacité CI canonique (run `31954805564`) — bande 4–6 Go
+
+| Shard | Fichiers | Tests | min MemAvailable | min SwapFree |
+|---|---|---|---|---|
+| 1 | 83 | 1 611 | 7 500 Mo | 3 071 — intact |
+| 2 | 82 | 1 398 | **5 973 Mo** | 3 071 — intact |
+| 3 | 82 | 1 570 | 8 764 Mo | 3 071 — intact |
+
+Le shard 2 passe sous 6 Go pour la première fois depuis le passage à 3 shards
+(6 458 → 6 354 → **5 973**). Swap intact, aucun job tué.
+
+Selon la règle de capacité du train : **4–6 Go ⇒ terminer la tranche verte en
+cours, puis ne continuer que si la suivante est principalement CSS/gabarit et
+que le risque mesuré est faible.** La tranche 2 est terminée et verte. La
+tranche 3 est bien de nature CSS/gabarit, donc la règle ne l'interdit pas — mais
+la décision d'ouvrir revient à l'opérateur, la marge se réduisant à chaque
+tranche.
