@@ -1859,6 +1859,34 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   }
 }
 
+/* ============================================================
+   Sb_UIV2_SESSION_FOCUS_02 — AUREN FOCUS MODE : la coque rend l'espace.
+   ------------------------------------------------------------
+   Pendant une séance `in_progress`, `base.html` NE REND PAS la bottom nav.
+   La réservation d'espace qui n'existait que pour cohabiter avec elle doit
+   donc disparaître aussi, sinon on garderait un décalage devenu sans objet.
+
+   On réutilise le token EXISTANT `--app-bottom-nav-h` — la même convention
+   que le desktop ≥1024px, qui le met déjà à 0 quand le rail remplace la
+   barre. Aucune seconde implémentation de safe-area n'est introduite, et
+   `env(safe-area-inset-bottom)` reste la source du dégagement matériel.
+
+   Effet de bord utile : `.session-focus__card--active
+   .session-focus__sticky-cta` lit déjà `bottom: var(--app-bottom-nav-h)`,
+   donc le CTA redescend naturellement dans l'espace libéré, sans nouvelle
+   règle de position et SANS guerre de z-index — les deux contrôles ne se
+   disputent plus la même région.
+   ============================================================ */
+body.is-session-focus-mode {
+  --app-bottom-nav-h: 0px;
+}
+body.is-session-focus-mode .container {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + var(--space-4));
+}
+body.is-session-focus-mode .foot {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
 /* ---- Sb_UI_03.2 — Focus Mode resserré sur desktop (rail visible) ---- */
 /* À partir de 1024px, le rail latéral (Sb_UI_03.2) occupe la gauche ; le
    contenu Focus Mode se resserre (~720px) et se centre dans la zone
