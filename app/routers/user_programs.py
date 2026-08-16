@@ -41,6 +41,7 @@ An EKB-assisted exercise picker onto the flow is WIZARD_05+.
 """
 from __future__ import annotations
 
+import logging
 import re
 import unicodedata
 from datetime import UTC, datetime
@@ -87,6 +88,8 @@ from app.services.user_program_versioning import (
 from app.templating import templates
 
 router = APIRouter(tags=["user_programs"])
+
+logger = logging.getLogger(__name__)
 
 # Mirrors the model column `UserProgram.title String(128)`. SQLite does not
 # enforce VARCHAR length, so the upper bound is guarded here (spec 04 §6).
@@ -460,6 +463,32 @@ def user_program_from_weekly_plan(
         # Quota, collision de slug, plan sans rien d'exécutable : message du
         # service, jamais un 500.
         return _render_new(request, db, user, title="", error=str(exc))
+
+    # Sb_DECISION_ANALYTICS_RUNTIME_01 — observation APRÈS la décision produit,
+    # et seulement ici.
+    #
+    # La matérialisation est le vrai point de décision : l'utilisateur agit. Un
+    # rendu de `/programs` calcule aussi une proposition, mais l'observer
+    # écrirait un groupe de traces à chaque affichage de page — c'est exactement
+    # ce que l'opérateur interdit pour la récupération et la morphologie
+    # (« pas à chaque rendu de read-model »), et la même règle vaut ici.
+    #
+    # Double garde, délibérément. `observe_plan_generation_for_user` avale déjà
+    # ses erreurs, mais une garantie qui dépend de la discipline interne de
+    # l'appelé n'est pas une garantie : le jour où quelqu'un modifie
+    # l'observateur et le laisse lever, cette route rendrait 500 alors que le
+    # brouillon est **déjà créé et valide**. Le brouillon prime sur sa trace.
+    try:
+        from app.services.decision_analytics import (
+            observe_plan_generation_for_user,
+        )
+
+        observe_plan_generation_for_user(db, user.id, plan)
+    except Exception:  # noqa: BLE001
+        logger.exception(
+            "decision-trace observation failed; draft %s stays valid", program.id
+        )
+
     return _redirect_to_editor(request, program.id)
 
 

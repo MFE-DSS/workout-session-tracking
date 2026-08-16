@@ -101,6 +101,7 @@ def init_db() -> None:
     from app.models import (  # noqa: F401
         catalog,
         challenge,
+        decision_trace,
         measurement,
         readiness,
         session,
