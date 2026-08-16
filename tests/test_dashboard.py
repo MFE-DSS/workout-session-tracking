@@ -1,7 +1,7 @@
 """Tests for the 5-axis dashboard service."""
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 from app.services.dashboard import (
     AxisScore,
@@ -12,7 +12,6 @@ from app.services.dashboard import (
     _trend_label,
 )
 from tests.helpers import get_test_user_id
-
 
 # ---------------------------------------------------------------------------
 # Dataclass basics
@@ -127,7 +126,7 @@ def test_consistency_with_sessions(client):
     from app.services.dashboard import compute_consistency_axis
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         for i in range(6):
@@ -192,7 +191,7 @@ def test_progression_with_data(client):
     from app.services.dashboard import compute_progression_axis
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         # Create 5 sessions with exercises in 2+ zones
@@ -269,7 +268,7 @@ def test_body_trend_with_measurements(client):
     from app.services.dashboard import compute_body_trend_axis
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         for i in range(4):
@@ -394,7 +393,7 @@ def test_dashboard_with_sessions_only(client):
     from app.services.dashboard import compute_dashboard
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         for i in range(4):

@@ -272,7 +272,19 @@ class TestNoFrameworkLeak:
         (preview.js + session_focus.js) — a cockpit built in pure SSR/CSS
         adds none."""
         js_files = sorted(p.name for p in JS_DIR.glob("*.js"))
-        expected = ["preview.js", "session_focus.js"]
+        # Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — inventaire JS versionné.
+        #
+        # Cette assertion prouvait à l'origine que CETTE tranche n'ajoutait
+        # aucun JS. Écrite comme un inventaire exact du répertoire, elle a
+        # transformé une garantie historique de tranche en interdiction
+        # permanente de toute amélioration progressive future — ce n'était
+        # pas le contrat produit visé.
+        #
+        # L'inventaire JS courant de l'application est désormais versionné
+        # explicitement ; `prefs_focus_rank.js` est autorisé par l'opérateur
+        # au titre de AUREN_INTERACTION_REFINEMENT_01. Le caractère EXACT est
+        # conservé : un quatrième fichier JS inattendu fait toujours échouer.
+        expected = ["prefs_focus_rank.js", "preview.js", "session_focus.js"]
         assert js_files == expected, (
             f"unexpected JS files (Sb_UI_04.3 must add no JS): {js_files}"
         )

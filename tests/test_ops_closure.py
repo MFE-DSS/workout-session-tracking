@@ -24,14 +24,10 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import subprocess
 import sys
-import time
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-
-import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -473,7 +469,7 @@ def test_systemd_verify_units_exist_and_point_at_script():
 def test_relative_hours_ago_buckets():
     from app.services.time_format import relative_hours_ago
 
-    now = datetime(2026, 4, 8, 12, 0, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 8, 12, 0, 0, tzinfo=UTC)
     assert relative_hours_ago(now, now) == "à l'instant"
     assert relative_hours_ago(now, now - timedelta(seconds=30)) == "à l'instant"
     assert relative_hours_ago(now, now - timedelta(minutes=5)) == "il y a 5 min"
@@ -487,6 +483,6 @@ def test_relative_hours_ago_naive_then_safe():
     """SQLite strips tzinfo; coerce instead of raising."""
     from app.services.time_format import relative_hours_ago
 
-    aware_now = datetime(2026, 4, 8, 12, 0, 0, tzinfo=timezone.utc)
+    aware_now = datetime(2026, 4, 8, 12, 0, 0, tzinfo=UTC)
     naive_then = datetime(2026, 4, 8, 11, 0, 0)  # 1 hour ago
     assert relative_hours_ago(aware_now, naive_then) == "il y a 1 h"

@@ -11,8 +11,6 @@ Hard contracts validated:
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
 from sqlalchemy import select
 
 
@@ -27,9 +25,10 @@ def _create_session_with_sets(client, template_slug: str = "push-a"):
     assert r.status_code == 303, r.text
     session_id = int(r.headers["location"].rsplit("/", 1)[-1])
 
+    from sqlalchemy.orm import selectinload
+
     from app.database import SessionLocal
     from app.models.session import WorkoutSession
-    from sqlalchemy.orm import selectinload
 
     with SessionLocal() as db:
         s = db.execute(
@@ -46,9 +45,10 @@ def _create_session_with_sets(client, template_slug: str = "push-a"):
 def _log_work_sets(session_id: int, se_id: int, sets: list[tuple[float, int]]):
     """Write work sets directly via the DB layer (the form layer is
     less convenient for parametrising). Marks every set as completed."""
+    from sqlalchemy.orm import selectinload
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog
-    from sqlalchemy.orm import selectinload
 
     with SessionLocal() as db:
         se = db.execute(
@@ -149,7 +149,7 @@ def test_re_finish_keeps_first_label_intact(client):
 
     # Capture computed_at after first finish
     from app.database import SessionLocal
-    from app.models.session import SessionExercise, WorkoutSession
+    from app.models.session import SessionExercise
     with SessionLocal() as db:
         se = db.execute(
             select(SessionExercise).where(SessionExercise.id == se_ids[0])

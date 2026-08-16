@@ -1,7 +1,7 @@
 """Tests for app.services.challenge — create, validate, list, standings."""
 from __future__ import annotations
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 
@@ -20,13 +20,13 @@ def _create_squad(db, uid, name="ChallengeSquad"):
 
 def _add_session_on_date(db, user_id, d: date, *, weight=60.0, reps=10):
     """Insert a completed session on a specific date."""
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
 
     s = WorkoutSession(
         user_id=user_id,
         template_slug_snapshot="push-a",
         template_name_snapshot="Push A",
-        started_at=datetime(d.year, d.month, d.day, 10, 0, tzinfo=timezone.utc),
+        started_at=datetime(d.year, d.month, d.day, 10, 0, tzinfo=UTC),
         status="completed",
         concentration="high",
         global_state="good",
@@ -48,9 +48,10 @@ def _add_session_on_date(db, user_id, d: date, *, weight=60.0, reps=10):
 
 
 def _create_second_user(db, username="challenger"):
+    from sqlalchemy import select
+
     from app.models.user import User
     from app.services.auth import hash_password
-    from sqlalchemy import select
 
     existing = db.execute(
         select(User).where(User.username == username)
@@ -151,7 +152,7 @@ def _add_member(db, squad_id, user_id):
 
 
 def test_compute_standings_sessions(client):
-    from app.services.challenge import create_challenge, compute_standings
+    from app.services.challenge import compute_standings, create_challenge
 
     uid = get_test_user_id()
     with _get_db() as db:
@@ -184,7 +185,7 @@ def test_compute_standings_sessions(client):
 # ---------------------------------------------------------------------------
 
 def test_compute_standings_tonnage(client):
-    from app.services.challenge import create_challenge, compute_standings
+    from app.services.challenge import compute_standings, create_challenge
 
     uid = get_test_user_id()
     with _get_db() as db:

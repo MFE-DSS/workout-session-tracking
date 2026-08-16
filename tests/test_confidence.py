@@ -1,7 +1,7 @@
 """Tests for app.services.confidence (Sb_08 — logging confidence score)."""
 from __future__ import annotations
 
-from tests.test_anomalies import _mk_session_for_anomalies, _load
+from tests.test_anomalies import _load, _mk_session_for_anomalies
 
 
 def test_confidence_high_on_clean_complete_session(client):
@@ -96,8 +96,8 @@ def test_confidence_level_thresholds():
 
 
 def test_confidence_penalised_by_many_anomalies(client):
-    from app.services.confidence import compute_confidence_score
     from app.services.anomalies import compute_anomalies
+    from app.services.confidence import compute_confidence_score
 
     sid = _mk_session_for_anomalies(
         exercises=[{

@@ -7,18 +7,21 @@ newly created sessions are owned by the current user.
 from __future__ import annotations
 
 import re
+from datetime import UTC
 
 from tests.helpers import get_test_user_id
 
 
 def _create_other_user_session() -> int:
     """Insert a session owned by a different user ('other')."""
+    from datetime import datetime
+
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import WorkoutSession
     from app.models.user import User
     from app.services.auth import hash_password
-    from datetime import datetime, timezone
-    from sqlalchemy import select
 
     with SessionLocal() as db:
         other = db.execute(select(User).where(User.username == "other")).scalar_one_or_none()
@@ -30,7 +33,7 @@ def _create_other_user_session() -> int:
             user_id=other.id,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="completed",
         )
         db.add(s)
@@ -181,12 +184,14 @@ def test_exercise_history_is_scoped(client):
 
 def test_resume_banner_only_shows_own_sessions(client):
     # Other user has an in-progress session
+    from datetime import datetime
+
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import WorkoutSession
     from app.models.user import User
     from app.services.auth import hash_password
-    from datetime import datetime, timezone
-    from sqlalchemy import select
 
     with SessionLocal() as db:
         other = db.execute(select(User).where(User.username == "other")).scalar_one_or_none()
@@ -198,7 +203,7 @@ def test_resume_banner_only_shows_own_sessions(client):
             user_id=other.id,
             template_slug_snapshot="pull-a",
             template_name_snapshot="Pull A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="in_progress",
         )
         db.add(s)

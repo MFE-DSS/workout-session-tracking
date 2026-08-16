@@ -56,9 +56,10 @@ def _post_sets(client, session_id: int, se_id: int, set_values: list[dict]):
 
 
 def _get_set_logs(se_id: int):
+    from sqlalchemy.orm import selectinload
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise
-    from sqlalchemy.orm import selectinload
     with SessionLocal() as db:
         se = db.execute(
             select(SessionExercise)

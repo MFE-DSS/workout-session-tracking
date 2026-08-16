@@ -3,10 +3,9 @@ home and launcher (Sb_12)."""
 from __future__ import annotations
 
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from tests.test_recommendation_service import _mk_session
-from tests.helpers import get_test_user_id
 
 
 def test_home_hero_starts_reco_when_no_open_session(client):
@@ -15,7 +14,7 @@ def test_home_hero_starts_reco_when_no_open_session(client):
     session directly. The start mechanism is unchanged: a POST /sessions with
     a template_slug hidden input and creation_source=reco_top. Seed history so
     the user leaves cold-start and a reco exists."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (10, 6, 2):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
     r = client.get("/")
@@ -59,7 +58,7 @@ def test_reco_phrase_appears_on_launcher(client):
     """Sx_UI_06 Sb_UI_06.3 — the reco explanation phrase moved off the home
     (the home hero is a single decision now). It still surfaces verbatim on
     the launcher step-1, which keeps the full reco block."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (10, 6, 2):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 
@@ -79,7 +78,7 @@ def test_reco_phrase_appears_on_launcher(client):
 def test_reco_alternatives_collapsed_when_present(client):
     """When alternatives exist they sit inside a <details> that is
     collapsed by default (no `open` attribute)."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (9, 5, 1):
         _mk_session(template_slug="pull-a", started_at=now - timedelta(days=delta))
 

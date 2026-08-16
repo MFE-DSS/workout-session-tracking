@@ -2,8 +2,7 @@
 from __future__ import annotations
 
 import re
-
-from tests.helpers import get_test_user_id
+from datetime import UTC
 
 
 def _start(client, data: dict) -> int:
@@ -64,10 +63,11 @@ def test_home_partial_has_reco_top_hidden_input(client):
 def test_home_partial_alternatives_carry_reco_alt(client):
     """When alternatives are shown, each carries creation_source=reco_alt."""
     # Seed a bit of history so we exit cold-start.
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
+
     from tests.test_recommendation_service import _mk_session
 
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (9, 5, 2):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 

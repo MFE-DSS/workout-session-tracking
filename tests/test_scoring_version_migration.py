@@ -10,6 +10,8 @@ Hard contracts validated:
 """
 from __future__ import annotations
 
+from datetime import UTC
+
 
 def _column_info(db, table: str) -> dict[str, dict]:
     """Return {column_name: {type, notnull, default}} via PRAGMA."""
@@ -55,11 +57,13 @@ def test_new_session_defaults_to_scoring_version_1(client):
     """Spec §H — any new session created RIGHT NOW gets scoring_version=1
     because Sb_24.5 (formula switch) hasn't shipped yet. Once it does,
     new sessions will explicitly set scoring_version=2 in the handler."""
-    from app.database import SessionLocal
-    from app.models.user import User
-    from app.models.session import WorkoutSession
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.models.user import User
     with SessionLocal() as db:
         uid = db.execute(
             select(User.id).where(User.username == "testuser")
@@ -68,7 +72,7 @@ def test_new_session_defaults_to_scoring_version_1(client):
             user_id=uid,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="in_progress",
         )
         db.add(ws)
@@ -79,11 +83,13 @@ def test_new_session_defaults_to_scoring_version_1(client):
 
 def test_session_exercise_accepts_implicit_label_string(client):
     """The column can be written with a string label up to 32 chars."""
-    from app.database import SessionLocal
-    from app.models.user import User
-    from app.models.session import SessionExercise, WorkoutSession
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, WorkoutSession
+    from app.models.user import User
     with SessionLocal() as db:
         uid = db.execute(
             select(User.id).where(User.username == "testuser")
@@ -92,7 +98,7 @@ def test_session_exercise_accepts_implicit_label_string(client):
             user_id=uid,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="in_progress",
         )
         db.add(ws)
@@ -103,7 +109,7 @@ def test_session_exercise_accepts_implicit_label_string(client):
             exercise_name_snapshot="Incline Smith Press",
             position=1,
             implicit_label="trajectoire_coherente",
-            implicit_label_computed_at=datetime.now(timezone.utc),
+            implicit_label_computed_at=datetime.now(UTC),
         )
         db.add(se)
         db.commit()
@@ -115,11 +121,13 @@ def test_session_exercise_accepts_implicit_label_string(client):
 def test_session_exercise_implicit_label_nullable(client):
     """A session_exercise can stay with implicit_label=None forever
     (historic + sessions with < 3 work sets)."""
-    from app.database import SessionLocal
-    from app.models.user import User
-    from app.models.session import SessionExercise, WorkoutSession
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, WorkoutSession
+    from app.models.user import User
     with SessionLocal() as db:
         uid = db.execute(
             select(User.id).where(User.username == "testuser")
@@ -128,7 +136,7 @@ def test_session_exercise_implicit_label_nullable(client):
             user_id=uid,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="in_progress",
         )
         db.add(ws)

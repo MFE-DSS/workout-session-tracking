@@ -1,19 +1,18 @@
 """Sb_18 — V2 antagonist + recovery logic in recommendation engine."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from tests.helpers import get_test_user_id
-from tests.test_recommendation_service import _mk_session, _call
-
+from tests.test_recommendation_service import _call, _mk_session
 
 # ---- Pure helpers ------------------------------------------------------
 
 
 def test_antagonist_bonus_zero_overlap_returns_perfect():
     from app.services.recommendation import (
-        _antagonist_bonus,
         ANTAGONIST_BONUS_PERFECT,
+        _antagonist_bonus,
     )
     bonus = _antagonist_bonus(
         ["lats", "delt_post"], ["pecs", "delt_lat", "triceps"]
@@ -29,7 +28,8 @@ def test_antagonist_bonus_full_overlap_returns_zero():
 
 def test_antagonist_bonus_one_zone_overlap_returns_partial():
     from app.services.recommendation import (
-        _antagonist_bonus, ANTAGONIST_BONUS_PARTIAL,
+        ANTAGONIST_BONUS_PARTIAL,
+        _antagonist_bonus,
     )
     # delt_lat shared, the rest distinct
     bonus = _antagonist_bonus(
@@ -51,11 +51,12 @@ def test_signals_compute_availability_after_recent_session(client):
     quads should be 1.0 (untouched in window)."""
     from app.database import SessionLocal
     from app.services.recommendation import (
-        _compute_signals, RECOVERY_HOURS_TARGET, reset_template_zones_cache,
+        _compute_signals,
+        reset_template_zones_cache,
     )
 
     reset_template_zones_cache()
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     six_hours_ago = now - timedelta(hours=6)
     _mk_session(template_slug="push-a", started_at=six_hours_ago)
 
@@ -80,7 +81,7 @@ def test_signals_quads_72h_recovery_window(client):
     from app.services.recommendation import _compute_signals, reset_template_zones_cache
 
     reset_template_zones_cache()
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     one_day_ago = now - timedelta(hours=24)
     _mk_session(template_slug="legs-a", started_at=one_day_ago)
 
@@ -97,7 +98,7 @@ def test_signals_quads_72h_recovery_window(client):
 def test_v2_prefers_antagonist_after_push_session(client):
     """Two Push-only sessions in the last 24h → V2 must NOT propose Push
     in top-1. The antagonist-aware engine should pick Pull or Legs."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     _mk_session(template_slug="push-a", started_at=now - timedelta(days=2))
     _mk_session(template_slug="push-b", started_at=now - timedelta(hours=18))
     _mk_session(template_slug="push-a", started_at=now - timedelta(hours=8))
@@ -115,7 +116,7 @@ def test_v2_prefers_antagonist_after_push_session(client):
 def test_v2_legs_recovery_phrase_under_72h(client):
     """When legs were recently trained (< 72h), suggesting another legs
     template must mention recovery in the phrase."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     # 36h ago: legs session — quads should be at availability 36/72 = 0.5
     _mk_session(template_slug="legs-a", started_at=now - timedelta(hours=36))
 
@@ -137,7 +138,7 @@ def test_v2_legs_recovery_phrase_under_72h(client):
 def test_v2_phrase_carries_antagonist_signal(client):
     """When the engine recommends after a clear push session, the phrase
     should reflect the antagonist logic somewhere in the candidate set."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     _mk_session(template_slug="push-a", started_at=now - timedelta(days=3))
     _mk_session(template_slug="push-b", started_at=now - timedelta(days=1))
     _mk_session(template_slug="push-a", started_at=now - timedelta(hours=10))
@@ -157,7 +158,7 @@ def test_v2_phrase_carries_antagonist_signal(client):
 
 def test_v2_phrase_under_140_chars(client):
     """V2 enriched slots must still respect the 140-char hard cap."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (4, 2, 1):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 
@@ -182,7 +183,6 @@ def test_v2_cold_start_unchanged(client):
 
 def test_v2_open_session_returns_none(client):
     """Open session short-circuits V2 the same way V1 did."""
-    import re
     r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
     assert r.status_code in {302, 303}
     assert _call(get_test_user_id()) is None
@@ -195,7 +195,7 @@ def test_v2_no_legacy_staleness_field_on_signals(client):
     from app.services.recommendation import _compute_signals, reset_template_zones_cache
 
     reset_template_zones_cache()
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     _mk_session(template_slug="push-a", started_at=now - timedelta(days=1))
 
     with SessionLocal() as db:

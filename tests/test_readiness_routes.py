@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from datetime import date
 
-
 # ---------------------------------------------------------------------------
 # POST /readiness — happy path
 # ---------------------------------------------------------------------------
@@ -18,9 +17,10 @@ def test_post_readiness_saves_and_redirects(client):
     assert r.status_code == 303
     assert r.headers["location"] == "/"
 
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.readiness import ReadinessEntry
-    from sqlalchemy import select
     from tests.helpers import get_test_user_id
 
     uid = get_test_user_id()
@@ -44,9 +44,10 @@ def test_post_readiness_with_optional_fields(client):
     }, follow_redirects=False)
     assert r.status_code == 303
 
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.readiness import ReadinessEntry
-    from sqlalchemy import select
     from tests.helpers import get_test_user_id
 
     uid = get_test_user_id()
@@ -94,6 +95,7 @@ def test_post_readiness_out_of_range_redirects(client):
 def test_post_readiness_requires_auth(client):
     """POST /readiness without auth redirects to /login."""
     from fastapi.testclient import TestClient
+
     from app.main import app
 
     # Use a fresh client without the auth cookie.
@@ -114,6 +116,7 @@ def test_post_readiness_requires_auth(client):
 def test_get_readiness_history_requires_auth(client):
     """GET /readiness/history without auth redirects to /login."""
     from fastapi.testclient import TestClient
+
     from app.main import app
 
     with TestClient(app) as anon:

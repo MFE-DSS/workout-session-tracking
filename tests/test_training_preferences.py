@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import re
 
 import pytest
 
@@ -663,8 +664,37 @@ class TestCaptureSurface:
         assert "white-space:nowrap" not in block
 
     def test_every_control_has_a_label(self, client):
+        """Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — même intention, autre balisage.
+
+        Cette assertion cherchait `for="sessions_per_week"`, c'est-à-dire UN
+        label pointant vers UN `<select>`. La cadence est désormais un groupe
+        de boutons radio, et le motif accessible correct pour un groupe de
+        radios n'est pas un label unique mais `<fieldset><legend>` plus un
+        label par option.
+
+        L'intention — « tout contrôle porte un nom accessible » — est donc
+        vérifiée sous la nouvelle forme, et renforcée : on exige maintenant que
+        **chaque** option soit étiquetée, pas seulement le groupe.
+        """
         page = client.get(PROFILE_URL).text
-        assert f'for="{FIELD_CADENCE}"' in page
+
+        # Le groupe porte son nom via <legend>.
+        assert "<legend" in page
+        assert LABEL_MEDIUM_CADENCE in page
+
+        # Chaque radio de cadence est enveloppé par un <label class="choice-row">
+        # qui contient son propre libellé — donc cliquer n'importe où l'active.
+        rows = re.findall(
+            r'<label class="choice-row"[^>]*>(.*?)</label>', page, re.DOTALL)
+        assert rows, "no labelled choice rows rendered"
+        cadence_rows = [r for r in rows if 'name="sessions_per_week"' in r]
+        assert len(cadence_rows) >= 7
+        for row in cadence_rows:
+            assert 'class="choice-row__label"' in row
+
+        # Et le fallback sans JS garde ses labels explicites.
+        for slot in (1, 2, 3):
+            assert f'for="focus_{slot}"' in page
 
 
 # ─────────────────── isolation ───────────────────

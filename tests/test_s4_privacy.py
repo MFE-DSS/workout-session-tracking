@@ -4,10 +4,11 @@ from __future__ import annotations
 
 def test_challenge_standings_only_allowed_keys(client):
     from datetime import date, timedelta
+
     from app.database import SessionLocal
-    from app.services.challenge import create_challenge, compute_standings
-    from app.services.squad import create_squad
     from app.models.challenge import SquadChallenge
+    from app.services.challenge import compute_standings, create_challenge
+    from app.services.squad import create_squad
     from tests.helpers import get_test_user_id
 
     uid = get_test_user_id()
@@ -25,7 +26,7 @@ def test_challenge_standings_only_allowed_keys(client):
 
 def test_shared_session_no_weights_or_reps(client):
     from app.database import SessionLocal
-    from app.services.sharing import share_session, get_squad_activity
+    from app.services.sharing import get_squad_activity, share_session
     from app.services.squad import create_squad
     from tests.helpers import get_test_user_id
 

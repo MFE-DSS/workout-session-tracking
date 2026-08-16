@@ -16,14 +16,13 @@ import io
 import json
 import sys
 import types
-from contextlib import redirect_stderr, redirect_stdout
+from contextlib import redirect_stderr
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
 
 from scripts import visual_baseline_runtime as runtime_mod
-
 
 # ------- Safety guards -----------------------------------------------
 

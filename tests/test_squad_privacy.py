@@ -40,7 +40,7 @@ def test_squad_detail_does_not_contain_bodyweight(client):
 
 def test_squad_leaderboard_only_contains_allowed_fields(client):
     from app.database import SessionLocal
-    from app.services.squad import create_squad, compute_squad_leaderboard
+    from app.services.squad import compute_squad_leaderboard, create_squad
     from tests.helpers import get_test_user_id
 
     uid = get_test_user_id()

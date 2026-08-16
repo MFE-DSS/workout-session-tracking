@@ -1,13 +1,15 @@
 """Leaderboard tests: scoring, ranking, privacy, auth."""
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
+from tests.helpers import get_test_user_id
 
 
 def _other_user_id() -> int:
     """Create or fetch the 'other' user for multi-user tests."""
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.auth import hash_password
@@ -24,14 +26,14 @@ def _other_user_id() -> int:
 def _add_session(user_id, *, quality_inputs, n_work=2, n_done=2):
     """Insert a completed session with controlled quality inputs."""
     from app.database import SessionLocal
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
 
     with SessionLocal() as db:
         s = WorkoutSession(
             user_id=user_id,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="completed",
             concentration=quality_inputs.get("concentration"),
             global_state=quality_inputs.get("global_state"),
@@ -133,7 +135,7 @@ def test_excluded_sessions_do_not_contribute(client):
 
 def test_in_progress_sessions_do_not_contribute(client):
     from app.database import SessionLocal
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
     from app.services.leaderboard import compute_leaderboard
 
     uid = get_test_user_id()
@@ -142,7 +144,7 @@ def test_in_progress_sessions_do_not_contribute(client):
             user_id=uid,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="in_progress",  # NOT completed
         )
         se = SessionExercise(

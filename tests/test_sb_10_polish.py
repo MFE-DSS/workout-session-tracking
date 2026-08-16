@@ -2,9 +2,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
-
-from tests.helpers import get_test_user_id
+from datetime import UTC, datetime
 
 
 def _start(client, slug: str) -> int:
@@ -17,12 +15,11 @@ def _complete_minimal(sid: int, kind: str = "strength") -> None:
     dispatcher path, or with cardio duration for the cardio path."""
     from app.database import SessionLocal
     from app.models.session import SetLog, WorkoutSession
-    from app.models.catalog import WorkoutTemplate
 
     with SessionLocal() as db:
         s = db.get(WorkoutSession, sid)
         s.status = "completed"
-        s.ended_at = datetime.now(timezone.utc)
+        s.ended_at = datetime.now(UTC)
         s.concentration = "high"
         s.global_state = "good"
         if kind == "cardio":

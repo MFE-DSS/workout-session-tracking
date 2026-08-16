@@ -1,11 +1,10 @@
 """Sb_19 — leaderboard drilldown (mini radar tooltip + /users/{username})."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from tests.helpers import get_test_user_id
 from tests.test_leaderboard_ui import _add_session
-
 
 # ---- Mini radar inside the leaderboard tooltip --------------------------
 
@@ -109,7 +108,7 @@ def test_user_profile_does_not_leak_session_details(client):
             user_id=uid,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="completed",
             free_note="A SECRET PRIVATE NOTE",
         )

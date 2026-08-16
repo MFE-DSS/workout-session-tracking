@@ -9,10 +9,11 @@ Covers:
 - cross-template isolation (E2 on Push A != E2 on Pull B)
 """
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
+from tests.helpers import get_test_user_id
 
 
 def _new_session(client, slug: str = "push-a") -> int:
@@ -43,7 +44,7 @@ def _manually_insert_prior_session(
             template_id=None,
             template_slug_snapshot=template_slug,
             template_name_snapshot=template_name, user_id=get_test_user_id(),
-            started_at=started_at or (datetime.now(timezone.utc) - timedelta(days=5)),
+            started_at=started_at or (datetime.now(UTC) - timedelta(days=5)),
             status="completed",
         )
         se = SessionExercise(

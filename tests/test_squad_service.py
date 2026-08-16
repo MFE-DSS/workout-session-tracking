@@ -1,7 +1,7 @@
 """Tests for app.services.squad — CRUD, invite codes, join, leave, leaderboard."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
@@ -15,9 +15,10 @@ def _get_db():
 
 
 def _create_second_user(db):
+    from sqlalchemy import select
+
     from app.models.user import User
     from app.services.auth import hash_password
-    from sqlalchemy import select
 
     existing = db.execute(
         select(User).where(User.username == "squadmate")
@@ -135,6 +136,8 @@ def test_join_by_code(client):
 
 
 def test_join_by_code_expired(client):
+    from sqlalchemy import select
+
     from app.models.squad import SquadInviteCode
     from app.services.squad import (
         SquadError,
@@ -142,7 +145,6 @@ def test_join_by_code_expired(client):
         generate_invite_code,
         join_by_code,
     )
-    from sqlalchemy import select
 
     uid = get_test_user_id()
     with _get_db() as db:
@@ -154,7 +156,7 @@ def test_join_by_code_expired(client):
         invite = db.execute(
             select(SquadInviteCode).where(SquadInviteCode.code == code)
         ).scalar_one()
-        invite.expires_at = datetime.now(timezone.utc) - timedelta(hours=1)
+        invite.expires_at = datetime.now(UTC) - timedelta(hours=1)
         db.commit()
 
         with pytest.raises(SquadError, match="expiré"):
@@ -243,7 +245,7 @@ def test_compute_squad_leaderboard(client):
             user_id=uid,
             template_slug_snapshot="upper-a",
             template_name_snapshot="Upper A",
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="completed",
             excluded_from_stats=False,
             concentration="high",

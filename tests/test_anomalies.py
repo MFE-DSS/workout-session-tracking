@@ -1,7 +1,7 @@
 """Tests for app.services.anomalies (Sb_08 — 5 rules)."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from tests.helpers import get_test_user_id
 
@@ -21,12 +21,12 @@ def _mk_session_for_anomalies(
         rep_targets: [{min_reps, max_reps}, ...]  (sets template_exercise inline)
     """
     from app.database import SessionLocal
-    from app.models.catalog import WorkoutTemplate, TemplateExercise, RepTarget
+    from app.models.catalog import RepTarget, TemplateExercise, WorkoutTemplate
     from app.models.session import SessionExercise, SetLog, WorkoutSession
 
     with SessionLocal() as db:
         tpl = WorkoutTemplate(
-            slug=f"anom-{int(datetime.now(timezone.utc).timestamp()*1000)}",
+            slug=f"anom-{int(datetime.now(UTC).timestamp()*1000)}",
             name="Anom T",
             kind="strength",
         )
@@ -38,8 +38,8 @@ def _mk_session_for_anomalies(
             template_id=tpl.id,
             template_slug_snapshot=tpl.slug,
             template_name_snapshot=tpl.name,
-            started_at=datetime(2026, 4, 18, 18, 0, tzinfo=timezone.utc),
-            ended_at=datetime(2026, 4, 18, 19, 0, tzinfo=timezone.utc),
+            started_at=datetime(2026, 4, 18, 18, 0, tzinfo=UTC),
+            ended_at=datetime(2026, 4, 18, 19, 0, tzinfo=UTC),
             status="completed",
             concentration=concentration,
             global_state=global_state,

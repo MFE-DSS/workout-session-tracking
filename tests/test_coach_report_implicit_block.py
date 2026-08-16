@@ -11,9 +11,8 @@ Hard contracts validated:
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
-import pytest
 from sqlalchemy import select
 
 
@@ -23,7 +22,7 @@ def _seed_labeled_session(user_id: int, labels: list[str], days_ago: int = 1):
     from app.database import SessionLocal
     from app.models.session import SessionExercise, WorkoutSession
 
-    started = datetime.now(timezone.utc) - timedelta(days=days_ago)
+    started = datetime.now(UTC) - timedelta(days=days_ago)
     with SessionLocal() as db:
         s = WorkoutSession(
             user_id=user_id,

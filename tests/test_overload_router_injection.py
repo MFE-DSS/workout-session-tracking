@@ -22,7 +22,6 @@ from app.services.overload_inputs import (
     categorize_exercise,
 )
 
-
 # ───────── categorize_exercise (pure) ─────────
 
 

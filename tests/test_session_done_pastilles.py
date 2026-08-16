@@ -12,8 +12,6 @@ Hard contracts validated:
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
 from sqlalchemy import select
 
 
@@ -27,9 +25,10 @@ def _create_and_complete_strength(client, with_pattern=False):
     sid = int(r.headers["location"].rsplit("/", 1)[-1])
 
     if with_pattern:
+        from sqlalchemy.orm import selectinload
+
         from app.database import SessionLocal
         from app.models.session import SessionExercise, SetLog
-        from sqlalchemy.orm import selectinload
 
         with SessionLocal() as db:
             se = db.execute(

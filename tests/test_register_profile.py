@@ -1,7 +1,6 @@
 """Registration, profile, and password change tests."""
 from __future__ import annotations
 
-
 # ---------------------------------------------------------------------------
 # Registration
 # ---------------------------------------------------------------------------
@@ -38,6 +37,7 @@ def test_register_success_creates_user_and_auto_logs_in(client):
 
     # User exists in DB
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
 

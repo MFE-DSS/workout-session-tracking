@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+from datetime import UTC
 from pathlib import Path
 
 from tests.helpers import get_test_user_id
@@ -54,14 +55,15 @@ def test_script_counts_creation_sources(client):
         sid = int(re.match(r"/sessions/(\d+)", r.headers["location"]).group(1))
         # Mark completed via direct DB touch — simpler than running the
         # full feedback form.
+        from datetime import datetime
+
         from app.database import SessionLocal
         from app.models.session import WorkoutSession
-        from datetime import datetime, timezone, timedelta
 
         with SessionLocal() as db:
             s = db.get(WorkoutSession, sid)
             s.status = "completed"
-            s.ended_at = datetime.now(timezone.utc)
+            s.ended_at = datetime.now(UTC)
             s.concentration = "high"
             s.global_state = "good"
             db.commit()

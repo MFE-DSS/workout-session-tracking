@@ -8,7 +8,6 @@ import re
 
 from fastapi.testclient import TestClient
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -29,6 +28,7 @@ def _start_session(client: TestClient, slug: str = "push-a") -> int:
 
 def _get_set_log_ids(client: TestClient, session_id: int) -> list[int]:
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog
 

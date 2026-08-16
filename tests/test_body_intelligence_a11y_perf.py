@@ -356,7 +356,19 @@ def test_coach_report_service_still_unchanged_by_sb_31_4():
 
 def test_no_new_js_file_by_sb_31_4():
     existing = {p.name for p in (ROOT / "app" / "static" / "js").glob("*.js")}
-    assert existing <= {"preview.js", "session_focus.js"}
+    # Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — inventaire JS versionné.
+    #
+    # Cette assertion prouvait à l'origine que CETTE tranche n'ajoutait
+    # aucun JS. Écrite comme un inventaire exact du répertoire, elle a
+    # transformé une garantie historique de tranche en interdiction
+    # permanente de toute amélioration progressive future — ce n'était
+    # pas le contrat produit visé.
+    #
+    # L'inventaire JS courant de l'application est désormais versionné
+    # explicitement ; `prefs_focus_rank.js` est autorisé par l'opérateur
+    # au titre de AUREN_INTERACTION_REFINEMENT_01. Le caractère EXACT est
+    # conservé : un quatrième fichier JS inattendu fait toujours échouer.
+    assert existing <= {"prefs_focus_rank.js", "preview.js", "session_focus.js"}
 
 
 def test_no_new_migration_mentions_a11y_perf():

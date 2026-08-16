@@ -9,10 +9,7 @@ Hard contracts validated:
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Endpoint smoke + ownership
@@ -114,11 +111,16 @@ def _fake_report(
 ):
     """Build a minimal CoachReport-shaped namespace for inference tests."""
     from app.services.coach_report import (
-        CoachReport, IdentityBlock, VolumeBlock, ZonesBlock, PatternsBlock,
+        CoachReport,
+        IdentityBlock,
         ImplicitSignalsBlock,
+        PatternsBlock,
+        VolumeBlock,
+        ZonesBlock,
     )
     from app.services.profile_metrics import (
-        DisciplineRates, StrengthCardioRatio,
+        DisciplineRates,
+        StrengthCardioRatio,
     )
     return CoachReport(
         identity=IdentityBlock(

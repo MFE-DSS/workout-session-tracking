@@ -1,7 +1,7 @@
 """Tests for session_recap.build_recap — agrégat lecture-seule pour /done."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from tests.helpers import get_test_user_id
 
@@ -26,8 +26,8 @@ def _mk_completed_session(
     from app.models.catalog import WorkoutTemplate
     from app.models.session import SessionExercise, SetLog, WorkoutSession
 
-    started = started_at or datetime(2026, 4, 13, 18, 0, tzinfo=timezone.utc)
-    ended = ended_at or datetime(2026, 4, 13, 19, 30, tzinfo=timezone.utc)
+    started = started_at or datetime(2026, 4, 13, 18, 0, tzinfo=UTC)
+    ended = ended_at or datetime(2026, 4, 13, 19, 30, tzinfo=UTC)
 
     with SessionLocal() as db:
         template_id = None
@@ -102,8 +102,8 @@ def test_build_recap_returns_expected_shape(client):
     from app.services.session_recap import build_recap
 
     sid = _mk_completed_session(
-        started_at=datetime(2026, 4, 13, 18, 45, tzinfo=timezone.utc),
-        ended_at=datetime(2026, 4, 13, 20, 2, tzinfo=timezone.utc),
+        started_at=datetime(2026, 4, 13, 18, 45, tzinfo=UTC),
+        ended_at=datetime(2026, 4, 13, 20, 2, tzinfo=UTC),
     )
     with SessionLocal() as db:
         session = db.get(WorkoutSession, sid)
@@ -263,8 +263,8 @@ def test_build_recap_duration_label(client):
     from app.services.session_recap import build_recap
 
     sid = _mk_completed_session(
-        started_at=datetime(2026, 4, 13, 18, 0, tzinfo=timezone.utc),
-        ended_at=datetime(2026, 4, 13, 19, 17, tzinfo=timezone.utc),
+        started_at=datetime(2026, 4, 13, 18, 0, tzinfo=UTC),
+        ended_at=datetime(2026, 4, 13, 19, 17, tzinfo=UTC),
     )
     with SessionLocal() as db:
         session = db.get(WorkoutSession, sid)

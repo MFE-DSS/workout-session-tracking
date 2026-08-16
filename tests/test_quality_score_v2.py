@@ -27,7 +27,6 @@ from app.services.quality_score import (
     compute_session_quality_strength,
 )
 
-
 # ---------------------------------------------------------------------------
 # Helpers — fake session with full control over fields
 # ---------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 """Tests for body measurement service."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace
 
 from app.services.measurements import (
@@ -85,7 +85,7 @@ def test_get_latest_measurement_returns_most_recent(client):
     from app.models.measurement import BodyMeasurement
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         db.add(BodyMeasurement(
@@ -108,7 +108,7 @@ def test_get_measurement_series(client):
     from app.models.measurement import BodyMeasurement
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         db.add(BodyMeasurement(
@@ -140,7 +140,7 @@ def test_get_measurement_series_weight_merges_session_bodyweight(client):
     from app.models.session import WorkoutSession
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         # Two formal measurements
@@ -207,7 +207,7 @@ def test_get_measurement_series_other_field_ignores_session_bodyweight(client):
     from app.models.session import WorkoutSession
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     with SessionLocal() as db:
         db.add(BodyMeasurement(
@@ -303,7 +303,7 @@ def test_compute_zone_measurement_unknown():
 # Timeline tests (existing)
 # ---------------------------------------------------------------------------
 
-from app.services.timeline import build_measurement_timeline_svg, TimelinePoint
+from app.services.timeline import TimelinePoint, build_measurement_timeline_svg
 
 
 def test_measurement_timeline_returns_svg():
