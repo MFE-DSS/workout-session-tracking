@@ -135,3 +135,67 @@ tentative de le faire diverger fait désormais tomber un test.
 Au passage, la plantation a montré que la garde censée empêcher un fichier de
 test de disparaître **se comparait à elle-même**. Elle regarde maintenant le
 disque.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#107** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `bac2b8a` — **vert au premier passage**, aucun correctif |
+| Merge | **`541900f`** |
+| CI de validation (PR) | run **`31946573499`** — 6/6 |
+| CI canonique | run **`31947072072`** — **6/6** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Full sweep local | **4 481** |
+
+### Acceptance de capacité — **CIBLE ATTEINTE**
+
+Cible : `min MemAvailable >= 6 Go` sur **chaque** shard.
+
+| Shard | Fichiers | Tests | min MemAvailable (PR) | min MemAvailable (canonique) | min SwapFree | Runtime |
+|---|---|---|---|---|---|---|
+| 1 | 82 | 1 532 | 6 261 Mo | **6 241 Mo** | 3 071 — intact | 7 min 22 |
+| 2 | 81 | 1 474 | 8 274 Mo | **8 289 Mo** | 3 071 — intact | 5 min 28 |
+| 3 | 81 | 1 475 | 8 528 Mo | **8 507 Mo** | 3 071 — intact | 5 min 42 |
+
+Les deux exécutions concordent à ~20 Mo près : la mesure est stable, pas un
+coup de chance d'ordonnancement.
+
+### Avant / après
+
+| | 2 shards | 3 shards |
+|---|---|---|
+| Pire shard | **3 701 Mo** (`WATCH`) | **6 241 Mo** (`HEALTHY`) |
+| Swap | intact | intact |
+| Runtime shard | 8 min 37 / 8 min 55 | 7 min 22 / 5 min 28 / 5 min 42 |
+| Tests | 2 143 + 2 310 = 4 453 | 1 532 + 1 474 + 1 475 = **4 481** |
+| Couverture combinée | 10 340 / 707 / **93,16 %** | 10 340 / 707 / **93,16 %** |
+| Workers | 2 | 2 |
+
+**Parité de couverture exacte**, aux trois nombres près. Le +28 de tests est
+exactement le fichier de topologie ajouté par ce sprint.
+
+L'agrégateur a journalisé `[coverage] expected 3 shard data files, found 3` :
+la dérivation fonctionne en production, pas seulement dans un test.
+
+### Déséquilibre constaté — **signalé, non corrigé**
+
+Le shard 1 est un vrai point aberrant : **6 241 Mo contre 8 289 / 8 507**, soit
+~2,2 Go d'écart, et **7 min 22 contre ~5 min 35** — pour **un seul fichier de
+plus**. Le déséquilibre vient donc du **contenu** des fichiers, pas de leur
+nombre : le round-robin alphabétique équilibre les fichiers, pas leur coût.
+
+Le brief est explicite : tous les shards ≥ 6 Go ⇒ **arrêter**, et ne pas
+implémenter de partition pondérée **préventivement**. Le constat est donc
+**consigné comme évidence** pour une décision future, et rien n'est optimisé.
+
+> Note honnête : ma première mesure d'acceptance a imprimé « 3 SHARDS SUFFICE »
+> à partir de **zéro échantillon** — le run était encore en cours, les logs
+> n'étaient pas téléchargeables, la boucle ne s'est jamais exécutée et le
+> drapeau `ok` est resté vrai par défaut. Exactement le mode d'échec des gardes
+> vacantes, cette fois dans mon propre outillage. Le script **sort en erreur**
+> si le nombre d'échantillons est nul ou si le nombre de shards mesurés ne
+> correspond pas à celui attendu.
