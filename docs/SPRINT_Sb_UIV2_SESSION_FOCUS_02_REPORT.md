@@ -232,3 +232,61 @@ entier et éditable — il a simplement cessé de passer devant le travail.
 Le défaut le plus sérieux n'était pas la densité : c'est que le bouton principal
 de la séance était **recouvert par la navigation globale**, avec un correctif
 déjà écrit et neutralisé par une règle plus spécifique.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#113** — `--merge --match-head-commit efcc8a0`, **sans** squash / `--admin` / force |
+| Merge | **`2fb30bb`** |
+| CI canonique | run `31972614441` — **succès 6/6** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication |
+| Threads / Gitar | **0 / 0** |
+| Périmètre | 14 fichiers : 2 CSS · 2 gabarits · 3 scripts · 5 tests · 1 doc |
+| Parité métier | diff **vide** sur `app/services`, `app/routers`, `app/models`, `migrations`, `data` |
+
+### Un aller-retour Sonar, localisé avant toute modification
+
+Gate rouge sur `new_code_smells_severity` = **15** pour un seuil de 14 — soit
+exactement un MAJOR. Diagnostiqué par la route documentée (gate puis
+`list issues`), jamais depuis le nombre agrégé : **`python:S9073`**, assertion
+composée, sur **deux** lignes que j'avais écrites dans cette tranche.
+
+Séparées — ce qui donne aussi un meilleur test : l'échec dit désormais
+*laquelle* des deux conditions manque. Un pré-scan AST des neuf fichiers
+touchés a confirmé que les autres occurrences vivent sur des lignes
+préexistantes, non comptées en code neuf : les réécrire aurait transformé de la
+dette ancienne en dette neuve.
+
+### CI canonique rouge au premier passage — flake, pas régression
+
+`test_body_intelligence_a11y_perf.py::test_perf_coach_report_route_p95` :
+`/coach-report p95 = 3389 ms > 3000 ms`. Route **non touchée** par la tranche
+(le diff est CSS, deux gabarits, scripts, tests), et les trois shards étaient
+verts sur la PR quelques minutes plus tôt. Budget de performance sensible à la
+charge du runner.
+
+Traité selon `CLAUDE.md §2` : **re-run des jobs échoués, sans nouveau commit**.
+Vert au second passage, 6/6.
+
+### Capacité CI — bande 4–6 Go
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 84 | 7 471 Mo | 3 071 — intact |
+| 2 | 83 | **5 939 Mo** | 3 071 — intact |
+| 3 | 83 | 8 777 Mo | 3 071 — intact |
+
+`workers=2`, manifeste de shards respecté, jamais `-n auto`. Le shard bas
+repasse **sous 6 Go** (6 467 → 5 939) : au-dessus du plancher `HEALTHY` de 4 Go,
+donc **aucun arrêt dur**, mais la marge se réduit à nouveau. La règle du
+programme s'applique : la tranche suivante ne s'ouvre que si elle est
+principalement CSS/gabarit et que le risque mesuré reste faible.
+
+### Suite obligatoire
+
+**`Sb_SESSION_SET_ACTION_01`** — le produit n'a **aucune action de série**. La
+porte d'acceptation UIV2 devra être rouverte le jour où elle existera ; un test
+de cette tranche tombe précisément à ce moment-là, pour le signaler.
