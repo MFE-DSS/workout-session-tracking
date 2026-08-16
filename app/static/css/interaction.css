@@ -1,0 +1,309 @@
+/* Sb_UI_INTERACTION_PRIMITIVES_01 — grammaire d'interaction Auren v1.
+ *
+ * Ce fichier ne rouvre NI la palette graphite, NI l'accent ambre, NI la
+ * typographie mono, NI la coque. Le problème rapporté par le dogfood réel
+ * n'est pas la marque : c'est la **grammaire d'interaction** — des boîtes
+ * dans des boîtes, une sélection illisible, des `<select>` de navigateur là
+ * où il faut un instrument.
+ *
+ * Quatre règles gouvernent tout ce qui suit.
+ *
+ * 1. UN CADRE PAR GROUPE SÉMANTIQUE. Une carte extérieure encadre le groupe ;
+ *    à l'intérieur, des RANGÉES et des séparateurs fins. Jamais bordure +
+ *    rayon + ombre + surface imbriquée sur chaque enfant.
+ *
+ * 2. L'ÉTAT SÉLECTIONNÉ SE LIT SANS COULEUR. Marqueur, graisse, arête de 2px.
+ *    L'ambre reste rare : on ne remplit jamais toute une surface en ambre.
+ *
+ * 3. CIBLE TACTILE 44px, et c'est la RANGÉE ENTIÈRE qui est cliquable, pas la
+ *    petite case à cocher au milieu d'un libellé qui a l'air cliquable.
+ *
+ * 4. SÉMANTIQUE NATIVE. `radio` pour un choix unique, `checkbox` pour un choix
+ *    multiple, `details/summary` pour une révélation. L'input n'est jamais
+ *    `display:none` — il est masqué visuellement **en restant focusable**,
+ *    sinon le clavier perd le contrôle.
+ *
+ * Note d'audit : `.segmented__option input { display: none }` (app.css) viole
+ * la règle 4. Cette famille ne reproduit pas ce défaut ; la correction du
+ * composant existant sort du périmètre de cette tranche.
+ */
+
+/* ── Masquage accessible ──────────────────────────────────────────────────
+ * L'input reste dans l'arbre d'accessibilité et reçoit le focus clavier ; il
+ * est seulement invisible. `display:none` ou `visibility:hidden` le
+ * retireraient de la navigation clavier — c'est exactement ce qu'il ne faut
+ * pas faire quand c'est le seul contrôle opérable.
+ */
+.a11y-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── F. CHOICE GROUP — le groupe est UN instrument ───────────────────────── */
+
+.choice-group {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.choice-group__legend {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg);
+  padding: 0 0 var(--space-sm);
+}
+
+.choice-group__hint {
+  font-size: 12px;
+  color: var(--fg-dim);
+  padding: 0 0 var(--space-sm);
+}
+
+/* Séparateur fin ENTRE les rangées — pas une bordure par enfant. */
+.choice-group .choice-row + .choice-row {
+  border-top: 1px solid var(--border);
+}
+
+/* ── A. CHOICE ROW ────────────────────────────────────────────────────────
+ * Anatomie : [marqueur] LIBELLÉ / métadonnée secondaire.
+ * Toute la rangée est la cible du pointeur.
+ */
+.choice-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;          /* règle 3 — cible produit */
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  background: transparent;
+  transition: background 0.12s ease;
+}
+
+.choice-row:hover {
+  background: var(--surface-2);
+}
+
+/* Le focus vit sur la RANGÉE, piloté par l'input masqué qu'elle contient. */
+.choice-row:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.choice-row__marker {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  color: transparent;
+  font-size: 12px;
+  line-height: 1;
+  background: var(--bg);
+}
+
+.choice-row__marker--radio { border-radius: 50%; }
+.choice-row__marker--check { border-radius: var(--radius-sm); }
+
+.choice-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.choice-row__label {
+  font-size: 14px;
+  color: var(--fg);
+  line-height: 1.3;
+}
+
+.choice-row__meta {
+  font-size: 12px;
+  color: var(--fg-dim);
+  line-height: 1.3;
+}
+
+/* ── B/C. ÉTAT SÉLECTIONNÉ — lisible SANS couleur ─────────────────────────
+ * Trois signaux non chromatiques : le marqueur se remplit d'un glyphe, le
+ * libellé passe en gras, et une arête de 2px apparaît à gauche. L'ambre n'est
+ * qu'un quatrième signal, pas le seul.
+ */
+.choice-row__input:checked ~ .choice-row__marker {
+  border-color: var(--accent);
+  color: var(--bg);
+  background: var(--accent);
+}
+
+.choice-row__input:checked ~ .choice-row__body .choice-row__label {
+  font-weight: 600;
+}
+
+.choice-row__input:checked ~ .choice-row__body .choice-row__rank {
+  color: var(--accent);
+}
+
+.choice-row:has(.choice-row__input:checked) {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);   /* arête, pas un remplissage */
+}
+
+.choice-row__input:disabled ~ .choice-row__body .choice-row__label {
+  color: var(--fg-dim);
+}
+
+.choice-row:has(.choice-row__input:disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ── B. RANKED CHOICE — le rang reste visible APRÈS sélection ─────────────── */
+
+.choice-row__rank {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fg-dim);
+  letter-spacing: 0.04em;
+  min-width: 2.2em;
+}
+
+/* Rang absent : on réserve la place pour que les libellés restent alignés
+   quand une sélection est retirée et que les rangs se recompactent. */
+.choice-row__rank:empty::before {
+  content: "··";
+  color: var(--border-strong);
+}
+
+/* ── D. DISCLOSURE ROW ────────────────────────────────────────────────────
+ * Fermé : libellé + chevron. Ouvert : + séparateur + contenu.
+ * PAS de seconde carte encadrée autour du contenu ouvert.
+ */
+.disclosure {
+  border-top: 1px solid var(--border);
+}
+
+.disclosure__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--fg-muted);
+  list-style: none;
+}
+
+.disclosure__summary::-webkit-details-marker { display: none; }
+
+.disclosure__summary:hover { background: var(--surface-2); }
+
+.disclosure__summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.disclosure__chevron {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--fg-dim);
+  transition: transform 0.15s ease;
+}
+
+.disclosure[open] > .disclosure__summary { color: var(--fg); font-weight: 600; }
+.disclosure[open] > .disclosure__summary .disclosure__chevron { transform: rotate(180deg); }
+
+/* Le contenu ouvert est séparé par un filet, pas encadré. */
+.disclosure__panel {
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+/* ── E. SELECT SHELL — une seule coque canonique ─────────────────────────── */
+
+.select-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.select-shell__control {
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-md);
+  background: var(--bg);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.select-shell__control:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.select-shell__control:disabled {
+  color: var(--fg-dim);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.select-shell__chevron {
+  position: absolute;
+  right: var(--space-md);
+  font-size: 11px;
+  color: var(--fg-dim);
+  pointer-events: none;
+}
+
+/* ── Grille compacte pour un domaine fini très court (cadence 1..7) ──────── */
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+  gap: var(--space-xs);
+}
+
+.choice-grid .choice-row {
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-xs);
+}
+
+.choice-grid .choice-row + .choice-row { border-top: 1px solid var(--border); }
+
+.choice-grid .choice-row__label {
+  font-family: var(--font-mono);
+  font-size: 15px;
+}
+
+/* ── Respect des préférences de mouvement ────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .choice-row,
+  .disclosure__chevron {
+    transition: none;
+  }
+}
