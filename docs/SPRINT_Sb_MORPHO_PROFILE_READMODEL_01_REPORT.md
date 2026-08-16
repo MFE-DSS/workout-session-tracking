@@ -121,3 +121,41 @@ qu'elle ne change pas encore le programme.
 
 Le vrai piège de la tranche n'était pas l'affichage : c'était de rendre un
 démenti et de croire que c'était une précaution. Il est resté côté audit.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#104** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `f39a665` — **vert au premier passage**, aucun correctif |
+| Merge | **`e559059`** |
+| CI canonique | run `31935918896` — **succès, 3/3** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité, couverture new code **100,0 %** |
+| Threads / Gitar | **0 / 0** |
+| Tests CI | 2 174 + 2 249 = **4 423** |
+
+### Capacité CI — **HEALTHY, mais la marge se resserre**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **4 666 Mo** | **4 380 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+| `workers=` | 2 | 2 |
+
+Les deux shards restent au-dessus du seuil `HEALTHY` de 4 Go, donc **aucune
+règle d'arrêt n'est déclenchée**. Mais la tendance mérite d'être dite plutôt que
+découverte au prochain train :
+
+| Tranche | Shard A | Shard B |
+|---|---|---|
+| `Sb_CI_TMPSTATE_FLAKE_01` | 5 195 Mo | 5 065 Mo |
+| `Sb_MORPHO_PROFILE_RUNTIME_01` | 4 838 Mo | 4 772 Mo |
+| **`Sb_MORPHO_PROFILE_READMODEL_01`** | **4 666 Mo** | **4 380 Mo** |
+
+Le shard B a perdu **685 Mo en deux tranches**, dont ~390 Mo sur celle-ci, et
+n'est plus qu'à **~380 Mo** du plancher. Trois tranches ne font pas une loi,
+mais la pente est régulière et elle suit l'ajout de tests (4 314 → 4 378 →
+4 423). Le prochain train devrait **vérifier la capacité avant** d'ouvrir une
+tranche runtime, pas après.
