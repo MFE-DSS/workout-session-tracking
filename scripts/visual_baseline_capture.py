@@ -36,8 +36,8 @@ import argparse
 import json
 import os
 import sys
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Sequence
 
 # Add repo root to sys.path so we can import scripts.visual_baseline_matrix.
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -49,12 +49,10 @@ from scripts.visual_baseline_matrix import (  # noqa: E402
     REQUIRED_ENV_VARS_FOR_ACTIVE_SESSION,
     REQUIRED_ENV_VARS_FOR_AUTH,
     REQUIRED_ENV_VARS_FOR_DONE_SESSION,
-    BaselineEntry,
     CapturePlan,
     build_plan,
     entries_for_priority,
 )
-
 
 # Substring tokens forbidden in CLI argument names (hard anti-secret rule).
 _FORBIDDEN_ARG_SUBSTRINGS: tuple[str, ...] = (
@@ -228,6 +226,39 @@ def _dry_run(plans: list[CapturePlan], runtime: dict | None = None) -> int:
     return 0
 
 
+def apply_actions(page, entry, *, timeout: int = 5000) -> None:
+    """Rejoue les gestes du scénario, puis vérifie l'état attendu.
+
+    Sb_UIV2_STATEFUL_VISUAL_HARNESS_01 — chaque geste passe par l'API Playwright
+    correspondante, jamais par une évaluation JavaScript : une capture doit
+    montrer un état que l'utilisateur peut réellement atteindre.
+
+    `expect_visible` n'est pas décoratif. Sans lui, un sélecteur devenu obsolète
+    ferait échouer silencieusement un geste et la capture montrerait l'écran
+    fermé en le faisant passer pour l'écran ouvert — exactement le genre de
+    preuve vide que ce harnais existe pour empêcher.
+    """
+    for action in getattr(entry, "actions", ()):
+        if action.kind == "wait_for":
+            page.wait_for_selector(action.selector, timeout=timeout)
+        elif action.kind == "click":
+            page.click(action.selector, timeout=timeout)
+        elif action.kind == "check":
+            page.check(action.selector, timeout=timeout)
+        elif action.kind == "open_details":
+            # Cliquer le <summary> : c'est le geste réel, et il exerce la
+            # sémantique native au lieu de forcer l'attribut `open`.
+            page.click(f"{action.selector} > summary", timeout=timeout)
+        elif action.kind == "press":
+            page.keyboard.press(action.key)
+        else:  # pragma: no cover - `Action` valide déjà le vocabulaire
+            raise ValueError(f"unhandled action kind: {action.kind}")
+
+    expected = getattr(entry, "expect_visible", "")
+    if expected:
+        page.wait_for_selector(expected, state="visible", timeout=timeout)
+
+
 def _capture_real(
     plans: list[CapturePlan],
     base_url: str,
@@ -274,6 +305,7 @@ def _capture_real(
                     route = _resolve_route(plan.entry.route, runtime=runtime)
                     url = base_url.rstrip("/") + route
                     page.goto(url, wait_until="networkidle", timeout=15000)
+                    apply_actions(page, plan.entry)
                     output_dir = Path(plan.output_path).parent
                     output_dir.mkdir(parents=True, exist_ok=True)
                     page.screenshot(path=plan.output_path, full_page=True)
