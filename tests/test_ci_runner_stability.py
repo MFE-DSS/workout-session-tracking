@@ -473,9 +473,19 @@ class TestShardPartition:
         assert union == set(mod.canonical_test_files())
 
     def test_the_shards_are_disjoint(self):
-        mod = _shards()
-        first, second = mod.build_shards()
-        assert set(first) & set(second) == set()
+        """Sb_OPS_CI_SCALE_02 — généralisé à N shards.
+
+        Cette assertion dépaquetait exactement deux shards (`first, second =
+        …`), donc passer à 3 la faisait tomber sur un `ValueError` de
+        dépaquetage — un échec de forme, pas de fond. Elle compare désormais
+        **toutes les paires**, ce qui est l'invariant réel.
+        """
+        import itertools
+
+        shards = _shards().build_shards()
+        assert len(shards) >= 2
+        for left, right in itertools.combinations(shards, 2):
+            assert set(left) & set(right) == set()
 
     def test_the_partition_verifier_accepts_the_repository(self):
         _shards().verify()
@@ -505,8 +515,11 @@ class TestShardPartition:
 
     def test_a_shard_index_outside_the_range_is_refused(self):
         mod = _shards()
+        beyond = mod.DEFAULT_SHARDS + 1
         with pytest.raises(ValueError):
-            mod.shard_for(3, 2)
+            mod.shard_for(beyond, mod.DEFAULT_SHARDS)
+        with pytest.raises(ValueError):
+            mod.shard_for(0, mod.DEFAULT_SHARDS)
 
     def test_no_test_file_is_split_across_shards(self):
         """Granularité FICHIER : plusieurs modules sont sensibles à l'état."""

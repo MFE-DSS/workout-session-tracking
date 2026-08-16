@@ -29,7 +29,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2]
+        # Sb_OPS_CI_SCALE_02 — 2 → 3 shards. GitHub Actions ne peut pas appeler
+        # Python pour construire une matrice, donc cette liste est la SEULE
+        # copie du nombre de shards que le YAML doit porter en dur. Elle est
+        # machine-vérifiée : `tests/test_ci_shard_topology.py` compare cette
+        # matrice à `ci_test_shards.DEFAULT_SHARDS` et échoue si elles
+        # divergent. Tout le reste du pipeline dérive le nombre.
+        shard: [1, 2, 3]
     runs-on: ubuntu-latest
     # Sx_UI_07.1 CI headroom — full pytest+coverage can exceed 35 min on slow runners; gates unchanged.
     timeout-minutes: 45
@@ -263,9 +269,17 @@ jobs:
           find . -maxdepth 1 -name 'coverage-shard-*.data' -exec ls -la {} +
           # Fail loudly if a shard's data never arrived, rather than combining
           # whatever is present and publishing an understated coverage figure.
+          #
+          # Sb_OPS_CI_SCALE_02 — le nombre attendu est DÉRIVÉ de la source
+          # unique versionnée, plus écrit en dur ici. C'était la troisième
+          # copie du chiffre : elle pouvait rester à 2 pendant que la matrice
+          # passait à 3, et la CI serait restée verte en publiant la couverture
+          # de deux shards sur trois.
+          expected=$(python scripts/ci_test_shards.py --shard-count)
           found=$(find . -maxdepth 1 -name 'coverage-shard-*.data' | wc -l)
-          if [ "${found}" -ne 2 ]; then
-            echo "expected 2 shard coverage files, found ${found}"
+          echo "[coverage] expected ${expected} shard data files, found ${found}"
+          if [ "${found}" -ne "${expected}" ]; then
+            echo "expected ${expected} shard coverage files, found ${found}"
             exit 1
           fi
           python -m coverage combine coverage-shard-*.data
