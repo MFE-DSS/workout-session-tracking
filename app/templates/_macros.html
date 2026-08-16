@@ -14,6 +14,74 @@
 </div>
 {% endmacro %}
 
+{# ── Sb_UI_INTERACTION_PRIMITIVES_01 — grammaire d'interaction Auren v1 ──────
+
+   Ces primitives partagent une seule règle de construction : l'input natif
+   reste l'élément opérable (radio / checkbox / details), il est seulement
+   masqué VISUELLEMENT via `.a11y-input`, et le `<label>` qui l'enveloppe rend
+   la rangée entière cliquable. Aucun ARIA custom, aucun JS requis.
+
+   `display:none` sur l'input est interdit : il le retirerait de la navigation
+   clavier alors que c'est le seul contrôle opérable. #}
+
+{# A. CHOICE ROW — une option dans un groupe fini.
+   `kind` vaut "radio" ou "checkbox" ; `rank` affiche un rang (primitive B). #}
+{% macro choice_row(name, value, label, kind="radio", checked=False,
+                    meta=None, rank=None, disabled=False, input_id=None) %}
+<label class="choice-row"{% if input_id %} for="{{ input_id }}"{% endif %}>
+  <input class="a11y-input choice-row__input" type="{{ kind }}"
+         name="{{ name }}" value="{{ value }}"
+         {% if input_id %}id="{{ input_id }}"{% endif %}
+         {% if checked %}checked{% endif %}
+         {% if disabled %}disabled{% endif %}>
+  <span class="choice-row__marker choice-row__marker--{{ 'radio' if kind == 'radio' else 'check' }}"
+        aria-hidden="true">{{ '●' if kind == 'radio' else '✓' }}</span>
+  <span class="choice-row__body">
+    <span class="choice-row__label">
+      {%- if rank is not none %}<span class="choice-row__rank">{{ rank }}</span> {% endif -%}
+      {{ label }}
+    </span>
+    {% if meta %}<span class="choice-row__meta">{{ meta }}</span>{% endif %}
+  </span>
+</label>
+{% endmacro %}
+
+{# F. CHOICE GROUP — encadre le groupe UNE fois. Les enfants sont des rangées. #}
+{% macro choice_group() %}
+<div class="choice-group">{{ caller() }}</div>
+{% endmacro %}
+
+{# D. DISCLOSURE ROW — `details/summary` natif, sans carte imbriquée. #}
+{% macro disclosure(summary_label, open=False) %}
+<details class="disclosure"{% if open %} open{% endif %}>
+  <summary class="disclosure__summary">
+    <span>{{ summary_label }}</span>
+    <span class="disclosure__chevron" aria-hidden="true">▾</span>
+  </summary>
+  <div class="disclosure__panel">{{ caller() }}</div>
+</details>
+{% endmacro %}
+
+{# E. SELECT SHELL — coque canonique du <select> natif. #}
+{% macro select_shell(name, options, selected=None, empty_label=None,
+                      select_id=None, disabled=False) %}
+<span class="select-shell">
+  <select class="select-shell__control" name="{{ name }}"
+          {% if select_id %}id="{{ select_id }}"{% endif %}
+          {% if disabled %}disabled{% endif %}>
+    {% if empty_label is not none %}
+    <option value="">{{ empty_label }}</option>
+    {% endif %}
+    {% for opt in options %}
+      {% set val = opt[0] if opt is iterable and opt is not string else opt %}
+      {% set lab = opt[1] if opt is iterable and opt is not string else opt %}
+      <option value="{{ val }}"{% if selected is not none and val|string == selected|string %} selected{% endif %}>{{ lab }}</option>
+    {% endfor %}
+  </select>
+  <span class="select-shell__chevron" aria-hidden="true">▾</span>
+</span>
+{% endmacro %}
+
 {% macro field_group(label, for_id=None) %}
 <label class="field"{% if for_id %} for="{{ for_id }}"{% endif %}>
   <span class="field__label">{{ label }}</span>
