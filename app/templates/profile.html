@@ -262,7 +262,7 @@
         </fieldset>
 
         {# ── Priorités : la sélection ET son rang doivent rester visibles.
-             Les trois <select> natifs restent LA source de vérité et le
+             Les trois menus natifs focus_1..3 restent LA source de vérité
              fallback sans JS ; le bloc classé ci-dessous n'est révélé que si
              JS est actif, et il ne fait qu'écrire dans ces mêmes selects. ── #}
         <fieldset class="prefs-block">
@@ -349,6 +349,6 @@
 {# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — amélioration progressive.
    `defer` : le script s'exécute après le parsing, donc le formulaire natif est
    déjà utilisable avant même qu'il ne tourne. S'il ne tourne jamais, les trois
-   <select> restent visibles et le formulaire fonctionne. #}
+   menus natifs restent visibles et le formulaire fonctionne. #}
 <script defer src="{{ url_for('static', path='js/prefs_focus_rank.js') }}"></script>
 {% endblock %}
