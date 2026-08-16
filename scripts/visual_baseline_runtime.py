@@ -222,6 +222,60 @@ def _ensure_active_session(db, user_id: int) -> tuple[int, bool]:
     return int(session.id), True
 
 
+def _advance_to_work_set(db, session_id: int, *, work_done: int = 1) -> int:
+    """Amène la 1re carte d'exercice à « série de travail courante ».
+
+    Sb_UIV2_SESSION_FOCUS_02 — une capture qui prétend montrer une **série de
+    travail courante** alors que l'échauffement n'est pas fait photographie un
+    état que le produit ne considère pas courant. Le fixture doit donc être
+    cohérent avec ce que l'image affirme, sinon la preuve de hiérarchie porte
+    sur un écran impossible.
+
+    Marque donc l'échauffement comme fait, puis `work_done` série(s) de
+    travail. La suivante devient la série courante, et celles d'après restent
+    à venir — ce qui donne d'un seul état honnête « terminée / courante /
+    à venir ».
+
+    Écrit uniquement `completed`/`weight_kg`/`reps` sur des lignes **déjà
+    créées** par le session builder : aucune sémantique métier n'est
+    contournée, aucune ligne n'est inventée.
+    """
+    from sqlalchemy import select
+
+    from app.models.session import SessionExercise, SetLog
+
+    first = db.execute(
+        select(SessionExercise)
+        .where(SessionExercise.session_id == session_id)
+        .order_by(SessionExercise.position.asc(), SessionExercise.id.asc())
+        .limit(1)
+    ).scalar_one_or_none()
+    if first is None:
+        return 0
+
+    rows = db.execute(
+        select(SetLog)
+        .where(SetLog.session_exercise_id == first.id)
+        .order_by(SetLog.kind.asc(), SetLog.set_index.asc())
+    ).scalars().all()
+
+    touched = 0
+    work_marked = 0
+    for row in rows:
+        if row.kind == "warmup":
+            row.completed = True
+            row.weight_kg = row.weight_kg or 20.0
+            row.reps = row.reps or 12
+            touched += 1
+        elif row.kind == "work" and work_marked < work_done:
+            row.completed = True
+            row.weight_kg = row.weight_kg or 40.0
+            row.reps = row.reps or 10
+            work_marked += 1
+            touched += 1
+    return touched
+
+
 def _ensure_done_session(db, user_id: int) -> tuple[int, bool]:
     """Ensure the user has ≥ 1 session with status='completed'.
 
@@ -362,6 +416,7 @@ def _cmd_prepare(args: argparse.Namespace) -> int:
             user_id, user_created = _ensure_user(db, BASELINE_USERNAME)
             active_id, active_created = _ensure_active_session(db, user_id)
             done_id, done_created = _ensure_done_session(db, user_id)
+            advanced = _advance_to_work_set(db, active_id)
             db.commit()
         except Exception:
             db.rollback()
@@ -395,6 +450,7 @@ def _cmd_prepare(args: argparse.Namespace) -> int:
     print("\nRuntime prepared (no secrets logged):")
     print(f"  user             : id={user_id} (created={user_created})")
     print(f"  active_session_id: {active_id} (created={active_created})")
+    print(f"  work-set state   : {advanced} set row(s) marked done on exo 1")
     print(f"  done_session_id  : {done_id} (created={done_created})")
     print(f"  state_file       : {state_path}")
     print(f"  runtime_file     : {runtime_path}")

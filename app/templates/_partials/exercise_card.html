@@ -136,61 +136,26 @@
            - resolution_path CONSERVÉ en data-* (jamais visible utilisateur ;
              db_lookup / substring_fallback non exposés en UI). #}
         {% set _wa_pattern = _family.description if _family and _family.description else None %}
-        <div class="session-focus__worked-area session-focus__body-slot"
-             aria-label="Zone travaillée estimée"
-             {% if _bmd %}data-resolution-path="{{ _bmd.resolution_path }}"{% endif %}>
-          <div class="session-focus__body-slot-head">
-            <span class="session-focus__worked-area-title">Zone travaillée</span>
-          </div>
-
-          {# Sb_BODYMAP_01.1 — silhouette « Zone travaillée » (SVG inline face+dos).
-             Remplace le blob décoratif. DÉCORATIF : aria-hidden, toute la
-             sémantique reste portée par le texte « Principal / Secondaire »
-             ci-dessous. Le conteneur .session-focus__body-map est conservé
-             (slot visuel stable). #}
-          {% set wa_status = "mapped" if _bmd_mapped else "unknown" %}
-          {% set wa_primary_zone = _bmd.primary_zone if _bmd_mapped else None %}
-          {% set wa_secondary_zones = _bmd.secondary_zones if _bmd_mapped and _bmd.secondary_zones else [] %}
-          <div class="session-focus__body-map" aria-hidden="true">
-            {% include "_partials/worked_area_body_map.html" with context %}
-          </div>
-
-          <ul class="session-focus__worked-area-list">
-            <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
-              <span class="session-focus__worked-area-role">Principal</span>
-              <span class="session-focus__worked-area-value">
-                {%- if _bmd_mapped %}{{ _bmd.primary_label }}
-                {%- elif _family and _family.name %}{{ _family.name }}
-                {%- else %}À qualifier{% endif %}
-              </span>
-            </li>
-            {# Assistants : rendu UNIQUEMENT si non vide (plus de « À qualifier »
-               répété dans un slot vide). #}
-            {% if _bmd_mapped and _bmd.secondary_labels %}
-            <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
-              <span class="session-focus__worked-area-role">Assistants</span>
-              <span class="session-focus__worked-area-value">{{ _bmd.secondary_labels | join(" · ") }}</span>
-            </li>
-            {% endif %}
-            {# Pattern moteur : rendu UNIQUEMENT si une description atlas existe. #}
-            {% if _wa_pattern %}
-            <li class="session-focus__worked-area-row session-focus__worked-area-row--pattern">
-              <span class="session-focus__worked-area-role">Pattern</span>
-              <span class="session-focus__worked-area-value">{{ _wa_pattern[:90] }}{% if _wa_pattern|length > 90 %}…{% endif %}</span>
-            </li>
-            {% endif %}
-          </ul>
-
-          <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
-        </div>
-
-        {# Sb_SESSION_UX_01.2 (F1) — Cues techniques DÉPLACÉES sous la console de
-           saisie (Option A : priorité à l'action). Le bloc est ré-inséré plus
-           bas, après la console ; ici, seule sa position change. Aucune donnée
-           ni logique modifiée. #}
-
+        {# Sb_UIV2_SESSION_FOCUS_02 — CONTEXTE DE CIBLE ≠ VISUALISATION DÉTAILLÉE.
+           Ici ne reste qu'un résumé d'une ligne, non interactif, tiré des
+           MÊMES données déjà résolues (`primary_label`, sinon le nom de
+           famille atlas). Pas de silhouette, pas de carte imbriquée, pas de
+           prose, aucune revendication d'activation ou de récupération.
+           Le panneau « Zone travaillée » COMPLET est rendu sous la console. #}
+        <p class="session-focus__target-compact">
+          <span class="session-focus__target-compact-label">Cible</span>
+          <span class="session-focus__target-compact-value">
+            {%- if _bmd_mapped %}{{ _bmd.primary_label }}
+            {%- elif _family and _family.name %}{{ _family.name }}
+            {%- else %}À qualifier{% endif %}
+          </span>
+        </p>
       </div>
+
+      {# Fin du hero : identité + cible compacte. Tout le détail secondaire
+         (Zone travaillée complète, machine) est rendu APRÈS la console. #}
     {% endif %}
+
 
     {# Sx_UI_06 D2 — dé-densification : le set_scheme (cible) était affiché ici
        en tête ET dans la console (« Cible ») ET comme placeholder dans les
@@ -210,46 +175,6 @@
           <span class="done-summary__score">score {{ summary.success_score }}</span>
         {% endif %}
       </div>
-    {% endif %}
-
-    {# Machine knowledge panel (Sb_07) — execution cues + common mistakes. #}
-    {% set atlas_entry = atlas_data.get(se.id) %}
-    {% if atlas_entry and atlas_entry.machine %}
-      {% set _m = atlas_entry.machine %}
-      <details class="machine-panel">
-        <summary class="machine-panel__summary">
-          <span class="machine-panel__icon" aria-hidden="true">ⓘ</span>
-          <span class="machine-panel__title">
-            Comment bien exécuter {{ _m.name }}
-            {% if se.substituted_name and _m.name == se.substituted_name %}
-              <em class="machine-panel__tag">(substitué)</em>
-            {% endif %}
-          </span>
-        </summary>
-        <div class="machine-panel__body">
-          {% if _m.execution_cues %}
-            <div class="machine-panel__section">
-              <h5 class="machine-panel__heading">Points d'exécution</h5>
-              <ul class="machine-panel__list">
-                {% for cue in _m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-          {% if _m.common_mistakes %}
-            <div class="machine-panel__section">
-              <h5 class="machine-panel__heading">Erreurs fréquentes</h5>
-              <ul class="machine-panel__list machine-panel__list--warn">
-                {% for mistake in _m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-          {% if _m.load_semantics %}
-            <p class="machine-panel__meta">
-              Charge : {% if _m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté (haltère / câble unilatéral){% endif %}
-            </p>
-          {% endif %}
-        </div>
-      </details>
     {% endif %}
 
     {# Sb_SESSION_UX_01.2b (F1) — Bloc « Adapter l'exercice » (alternatives)
@@ -494,6 +419,117 @@
       {% endif %}
     {% else %}
       <p class="empty">Pas de série pour cet exercice.</p>
+    {% endif %}
+
+    {# ============================================================
+       Sb_UIV2_SESSION_FOCUS_02 — DÉTAIL SECONDAIRE, APRÈS LA CONSOLE
+       ------------------------------------------------------------
+       Supersession explicite de l'ordre `Sb_SESSION_UX_01.2` par décision
+       opérateur, sur preuve de dogfood MESURÉE : sur mobile 360×640, la
+       série courante tombait à **fold 2.1** tandis que la « Zone travaillée »
+       occupait le premier écran (fold 0.8). Le contexte de cible reste en
+       tête sous forme compacte ; la VISUALISATION détaillée descend ici.
+
+       Ordre source, pas ordre visuel : aucun `order` CSS n'est utilisé, pour
+       que la navigation clavier rencontre l'action avant le détail.
+       Contenu et données strictement inchangés — déplacés, pas réécrits.
+       ============================================================ #}
+    {% if is_active %}
+      {% set _atlas_after = atlas_data.get(se.id) %}
+      {% set _family_after = _atlas_after.family if _atlas_after else None %}
+      {% set _bmd_after = body_map_data.get(se.id) if body_map_data is defined and body_map_data else None %}
+      {% set _bmd_after_mapped = _bmd_after and _bmd_after.status == "mapped" %}
+      {% set _wa_pattern_after = _family_after.description if _family_after and _family_after.description else None %}
+
+      <details class="disclosure session-focus__worked-area-disclosure">
+        <summary class="disclosure__summary">
+          <span class="session-focus__worked-area-title">Zone travaillée</span>
+        </summary>
+        <div class="disclosure__body">
+          <div class="session-focus__worked-area session-focus__body-slot"
+               aria-label="Zone travaillée estimée"
+               {% if _bmd_after %}data-resolution-path="{{ _bmd_after.resolution_path }}"{% endif %}>
+            {% set wa_status = "mapped" if _bmd_after_mapped else "unknown" %}
+            {% set wa_primary_zone = _bmd_after.primary_zone if _bmd_after_mapped else None %}
+            {% set wa_secondary_zones = _bmd_after.secondary_zones if _bmd_after_mapped and _bmd_after.secondary_zones else [] %}
+            <div class="session-focus__body-map" aria-hidden="true">
+              {% include "_partials/worked_area_body_map.html" with context %}
+            </div>
+
+            <ul class="session-focus__worked-area-list">
+              <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
+                <span class="session-focus__worked-area-role">Principal</span>
+                <span class="session-focus__worked-area-value">
+                  {%- if _bmd_after_mapped %}{{ _bmd_after.primary_label }}
+                  {%- elif _family_after and _family_after.name %}{{ _family_after.name }}
+                  {%- else %}À qualifier{% endif %}
+                </span>
+              </li>
+              {% if _bmd_after_mapped and _bmd_after.secondary_labels %}
+              <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
+                <span class="session-focus__worked-area-role">Assistants</span>
+                <span class="session-focus__worked-area-value">{{ _bmd_after.secondary_labels | join(" · ") }}</span>
+              </li>
+              {% endif %}
+              {% if _wa_pattern_after %}
+              <li class="session-focus__worked-area-row session-focus__worked-area-row--pattern">
+                <span class="session-focus__worked-area-role">Pattern</span>
+                <span class="session-focus__worked-area-value">{{ _wa_pattern_after[:90] }}{% if _wa_pattern_after|length > 90 %}…{% endif %}</span>
+              </li>
+              {% endif %}
+            </ul>
+
+            <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
+          </div>
+        </div>
+      </details>
+    {% endif %}
+
+    {# Machine knowledge panel (Sb_07) — execution cues + common mistakes.
+       Sb_UIV2_SESSION_FOCUS_02 : DÉPLACÉ sous la console, grammaire
+       `.disclosure` canonique, fermé par défaut. Chaque valeur et chaque cue
+       est conservée à l'identique. #}
+    {% set atlas_entry = atlas_data.get(se.id) %}
+    {% if atlas_entry and atlas_entry.machine %}
+      {% set _m = atlas_entry.machine %}
+      {# La grammaire `.disclosure` est appliquée à `.machine-panel` PAR LE CSS
+         (règle partagée), pas en ajoutant une classe : le contrat exact
+         `class="machine-panel"` est une sémantique indépendante, épinglée par
+         `test_machine_atlas_surface`, et la décision opérateur ne supersède
+         que l'ORDRE. On obtient la grammaire sans casser le contrat. #}
+      <details class="machine-panel">
+        <summary class="machine-panel__summary">
+          <span class="machine-panel__title">
+            Comment bien exécuter {{ _m.name }}
+            {% if se.substituted_name and _m.name == se.substituted_name %}
+              <em class="machine-panel__tag">(substitué)</em>
+            {% endif %}
+          </span>
+        </summary>
+        <div class="disclosure__body machine-panel__body">
+          {% if _m.execution_cues %}
+            <div class="machine-panel__section">
+              <h5 class="machine-panel__heading">Points d'exécution</h5>
+              <ul class="machine-panel__list">
+                {% for cue in _m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% if _m.common_mistakes %}
+            <div class="machine-panel__section">
+              <h5 class="machine-panel__heading">Erreurs fréquentes</h5>
+              <ul class="machine-panel__list machine-panel__list--warn">
+                {% for mistake in _m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+          {% if _m.load_semantics %}
+            <p class="machine-panel__meta">
+              Charge : {% if _m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté (haltère / câble unilatéral){% endif %}
+            </p>
+          {% endif %}
+        </div>
+      </details>
     {% endif %}
 
     {# ============================================================

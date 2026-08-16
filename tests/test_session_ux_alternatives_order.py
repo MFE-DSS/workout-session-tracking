@@ -83,11 +83,26 @@ def test_alternatives_before_cues_in_source():
     assert alts < cues, "alternatives drawer must come before the cues block"
 
 
-def test_worked_area_before_console_in_source():
+def test_console_before_full_worked_area_in_source():
+    """Sb_UIV2_SESSION_FOCUS_02 — deuxième exemplaire de la même supersession.
+
+    ANCIEN CONTRAT : `assert worked < console` — copie, dans ce fichier, de
+    l'assertion directionnelle de `Sb_SESSION_UX_01.2`. Sa duplication est
+    précisément ce qui rend une supersession coûteuse : l'invariant vivait à
+    deux endroits sans que l'un référence l'autre.
+
+    Même preuve mesurée et même décision opérateur que
+    `test_console_before_full_worked_area` : la console passe devant, le
+    panneau détaillé descend. Vérifié sur la SOURCE du gabarit, donc aucun
+    `order` CSS ne peut la satisfaire.
+    """
     src = _src()
-    worked = src.find("session-focus__body-slot")
     console = src.find("session-focus__console-list")
-    assert worked < console
+    worked = src.find("session-focus__body-slot")
+    assert console != -1 and worked != -1
+    assert console < worked, (
+        "console must precede the full worked-area panel in template source"
+    )
 
 
 def test_alternatives_block_present_once():

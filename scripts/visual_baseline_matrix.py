@@ -70,6 +70,18 @@ class Action:
             raise ValueError(f"{self.kind} requires a selector")
 
 
+#: Modes de capture. `full_page` est le mode HISTORIQUE et reste le défaut :
+#: changer le défaut réécrirait silencieusement toutes les baselines existantes.
+#:
+#: `viewport` existe parce que `full_page` ne peut PAS répondre à la question
+#: produit « l'action courante est-elle visible immédiatement ? ». Dans une
+#: composite pleine page, les éléments `sticky`/`fixed` de la coque
+#: (`.topbar`, `.app-bottom-nav`) sont peints à leur position de viewport et
+#: réapparaissent en plein milieu du document : l'image ne montre aucune
+#: ligne de flottaison réelle. Mesuré sur la baseline de cette tranche.
+CAPTURE_MODES: frozenset[str] = frozenset({"full_page", "viewport"})
+
+
 @dataclass(frozen=True)
 class BaselineEntry:
     """Une entrée de la matrice baseline.
@@ -90,6 +102,24 @@ class BaselineEntry:
     #: Sélecteur qui doit être visible une fois les gestes appliqués. Sans lui,
     #: une capture d'un état non atteint passerait pour une preuve.
     expect_visible: str = ""
+    #: `full_page` (historique, défaut) ou `viewport` (ligne de flottaison).
+    capture_mode: str = "full_page"
+    #: Sélecteurs qui doivent INTERSECTER le viewport initial, sans scroll.
+    #: C'est la seule preuve recevable d'une hiérarchie « au-dessus de la
+    #: ligne de flottaison » : `expect_visible` accepte un élément situé six
+    #: écrans plus bas, donc il ne prouve rien sur la hiérarchie.
+    expect_in_viewport: tuple[str, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.capture_mode not in CAPTURE_MODES:
+            raise ValueError(
+                f"unknown capture_mode {self.capture_mode!r}; "
+                f"allowed: {sorted(CAPTURE_MODES)}")
+        if self.expect_in_viewport and self.capture_mode != "viewport":
+            raise ValueError(
+                "expect_in_viewport is only meaningful with "
+                "capture_mode='viewport' — asserting the fold on a full-page "
+                "capture would be a claim the artifact cannot support")
 
 
 # Matrice P0 obligatoire (14 screenshots min V1, 16 acceptable si split home).
