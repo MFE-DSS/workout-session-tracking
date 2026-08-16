@@ -180,16 +180,34 @@ def test_the_legacy_flat_fallback_is_preserved():
     assert "total_grouped == 0" in src
 
 
-def test_no_substitution_service_was_touched():
-    """La présentation ne doit toucher aucun moteur de décision."""
+def test_no_decision_engine_was_touched():
+    """Aucun MOTEUR DE DÉCISION ne bouge.
+
+    ANCIEN CONTRAT : la liste gelée incluait `app/routers/sessions.py`, parce
+    que `Sb_UI_SESSION_CHOICES_DISCLOSURES_01` était une tranche de
+    PRÉSENTATION — elle n'avait aucune raison de toucher au routeur.
+
+    Sb_SESSION_SET_ACTION_01 est une tranche FONCTIONNELLE, explicitement
+    autorisée à modifier ce routeur : c'est là que vit l'action de série
+    (`nav=stay`), et le produit n'en avait aucune. Garder le routeur dans la
+    liste reviendrait à interdire le sprint qui l'a autorisé.
+
+    L'invariant réel — « la présentation ne décide de rien » — est CONSERVÉ
+    et reste vérifié sur les trois moteurs qui le portent réellement :
+    substitution, recommandation, comportement. Aucun d'eux n'est touché.
+
+    Le routeur, lui, est couvert par des gardes dédiées : `test_session_set_action`
+    vérifie que `stay` sauvegarde, ancre et n'altère ni `prev` ni `next`, et
+    qu'aucune sémantique de complétion n'est introduite.
+    """
     import subprocess
 
     out = subprocess.run(
         ["git", "diff", "--name-only", "e8614bd", "--",
-         "app/services/substitution.py", "app/routers/sessions.py",
+         "app/services/substitution.py",
          "app/services/recommendation.py", "app/services/behavioral.py"],
         cwd=str(REPO_ROOT), capture_output=True, text=True).stdout.strip()
-    assert out == "", f"frozen module touched: {out}"
+    assert out == "", f"decision engine touched: {out}"
 
 
 # ── Disclosures ──────────────────────────────────────────────────────────────

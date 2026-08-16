@@ -1575,6 +1575,38 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   background: var(--color-surface);
 }
 
+/* Sb_SESSION_SET_ACTION_01 — l'ancre de série doit dégager le chrome collant.
+   Après « Enregistrer la série », le serveur renvoie sur `#set-<id>`. Sans
+   marge de défilement, le navigateur cale la cible à y = 0, c'est-à-dire
+   DERRIÈRE les surfaces `sticky` : `elementFromPoint()` au centre du bouton
+   renvoyait alors `badge`/`header-kicker`, pas le contrôle. L'ancre marchait
+   et le résultat était inutilisable.
+
+   Mesuré à 360×640 en défilement : topbar 0→66, en-tête de séance 0→90,
+   stepper 48→101. Le bas le plus profond du chrome est donc 101 px ; on
+   dégage jusqu'à 110 px pour laisser un token de respiration.
+
+   `scroll-margin-top` est la propriété prévue pour exactement ça : pas de
+   JS, pas de `position: absolute`, pas de marge négative, aucun z-index
+   touché — les contrôles ne se disputent pas la surface, la cible se pose
+   simplement sous le chrome. */
+.session-focus__console-row {
+  scroll-margin-top: 110px;
+}
+
+/* `.set-row` est une grille `40px 1fr auto`. Ajouté tel quel, le bouton de
+   série devenait un QUATRIÈME élément et débordait dans une colonne
+   implicite : bord droit à 393 px pour un viewport de 360, et
+   `document.scrollWidth` à 393 — la page défilait horizontalement. Mesuré,
+   pas supposé.
+
+   Il occupe donc sa propre ligne, sur toute la largeur de la grille. */
+.set-row__action {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* Set complété : ledger compact, muté, check visible. Non dominant. */
 .session-focus__console-row--completed {
   opacity: 0.82;

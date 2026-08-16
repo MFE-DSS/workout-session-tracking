@@ -458,6 +458,13 @@ def session_detail(
         {
             "page_title": session.template_name_snapshot,
             "session": session,
+            # Sb_SESSION_SET_ACTION_01 — signal de repos ÉMIS PAR LE SERVEUR
+            # après un enregistrement de série (`nav=stay`). Ce n'est ni une
+            # durée persistée ni une valeur de confiance : juste « le repos
+            # vient de commencer ». Avec JS le compte à rebours démarre de
+            # là ; sans JS l'utilisateur lit un texte et continue — la
+            # sauvegarde n'en dépend jamais.
+            "rest_active": request.query_params.get("rest") == "1",
             "weekday_label": WEEKDAY_LABELS[local_weekday_iso(session.started_at) or session.weekday_iso],
             "stats": stats,
             "rules": rules,
@@ -663,6 +670,38 @@ async def update_session(
 # ----------------------------------------------------------------------
 
 
+def stay_redirect_target(session_id: int, se) -> str:
+    """Où revenir après avoir enregistré une série, sans quitter l'exercice.
+
+    Sb_SESSION_SET_ACTION_01 — le produit n'avait que `prev` et `next`, qui
+    quittent tous deux l'exercice. Le cockpit paraissait donc set-by-set
+    alors que la seule action réelle était exercise-by-exercise.
+
+    Trois propriétés portent tout le contrat :
+
+    * **on reste sur le même exercice** — c'est la définition de l'action ;
+    * **on retombe sur la PROCHAINE série non complétée**, jamais en haut de
+      page : un retour au sommet annulerait les 867 px que
+      `Sb_UIV2_SESSION_FOCUS_02` a gagnés devant l'action primaire. Quand
+      toutes les séries de travail sont faites, l'ancre vise la carte, donc
+      le CTA d'exercice — l'étape suivante réelle ;
+    * **`rest=1` est un signal de DÉPART émis par le serveur**, pas une
+      durée persistée. Le repos n'est pas historisé ici : un tracé durable
+      exigerait une migration, donc un sprint séparé
+      (`Sb_REST_EVENT_TRACE_01`).
+
+    Aucune sémantique de complétion n'est introduite : `completed` reste
+    dérivé côté serveur de la présence de weight/reps (Sx_24 §E), écrit par
+    la boucle de persistance commune, avant cet aiguillage.
+    """
+    pending = [
+        sl for sl in se.set_logs if sl.kind == "work" and not sl.completed
+    ]
+    pending.sort(key=lambda sl: sl.set_index)
+    anchor = f"#set-{pending[0].id}" if pending else f"#exercise-{se.id}"
+    return f"/sessions/{session_id}?active={se.id}&rest=1{anchor}"
+
+
 @router.post("/sessions/{session_id}/exercises/{session_exercise_id}")
 async def update_exercise_card(
     session_id: int,
@@ -726,6 +765,29 @@ async def update_exercise_card(
     #   "prev" → jump to previous exercise (save happens silently first)
     #   anything else → default = jump to next exercise (legacy behaviour)
     nav_direction = (form.get("nav") or "next").strip().lower()
+
+    # Sb_SESSION_SET_ACTION_01 — « stay » : l'action de SÉRIE.
+    #
+    # Jusqu'ici le produit n'avait que deux issues, `prev` et `next`, toutes
+    # deux quittant l'exercice. Le cockpit paraissait donc set-by-set alors
+    # que la seule action réelle était exercise-by-exercise.
+    #
+    # `stay` réutilise EXACTEMENT la persistance ci-dessus — mêmes champs,
+    # mêmes valeurs, même dérivation serveur de `completed` à partir de la
+    # présence de weight/reps (Sx_24 §E). Aucune sémantique nouvelle, aucune
+    # colonne, aucune migration : seule la DESTINATION change.
+    #
+    # Retour ancré sur la PROCHAINE série non complétée, jamais en haut de
+    # page — sinon l'action de série annulerait les 867 px gagnés par
+    # Sb_UIV2_SESSION_FOCUS_02.
+    #
+    # `rest=1` est un SIGNAL DE DÉPART émis par le serveur, pas une durée
+    # persistée : le repos n'est pas historisé dans cette tranche (un tracé
+    # durable demanderait une migration → Sb_REST_EVENT_TRACE_01).
+    if nav_direction == "stay":
+        return RedirectResponse(
+            url=stay_redirect_target(session_id, se), status_code=303
+        )
 
     if nav_direction == "prev":
         neighbor = db.execute(

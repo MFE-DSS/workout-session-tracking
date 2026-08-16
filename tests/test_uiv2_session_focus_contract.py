@@ -111,20 +111,42 @@ def test_cta_copy_does_not_claim_a_set_level_action():
         )
 
 
-def test_no_set_level_submit_exists_in_the_set_rows():
-    """Documente la limitation au lieu de la masquer.
+def test_the_set_level_action_is_real_and_wired():
+    """Ce test a fait exactement ce pour quoi il avait été écrit.
 
-    Si un jour une action de série apparaît, ce test tombe — et c'est le
-    signal que Sb_SESSION_SET_ACTION_01 a été livré et que la porte
-    d'acceptation UIV2 doit être rouverte.
+    ANCIEN CONTRAT (`test_no_set_level_submit_exists_in_the_set_rows`) :
+    aucun `<button>` dans la macro de ligne, parce qu'aucune action de série
+    n'existait — `completed` était dérivé serveur et le routeur n'offrait que
+    `prev`/`next`. Sa docstring annonçait sa propre chute : « si un jour une
+    action de série apparaît, ce test tombe, et c'est le signal que
+    Sb_SESSION_SET_ACTION_01 a été livré ».
+
+    C'est arrivé. La limitation est levée, donc la garde change de sens : au
+    lieu d'interdire un bouton, elle exige que celui qui existe soit **réel**
+    — un submit natif, câblé sur une valeur de `nav` réellement traitée par
+    le routeur. La règle de fond est inchangée : **l'UI ne montre pas une
+    action que le backend n'a pas.**
     """
     src = CARD.read_text(encoding="utf-8")
-    row_start = src.find("work_set_list")
-    row_end = src.find("endmacro", row_start)
-    macro = src[row_start:row_end]
-    assert "<button" not in macro, (
-        "no per-set action exists in the current product; adding one changes "
-        "the acceptance contract and must be a deliberate slice"
+    match = re.search(
+        r"<button[^>]*session-focus__set-action[^>]*>.*?</button>",
+        src, re.DOTALL,
+    )
+    assert match, "set-level action missing"
+    block = match.group(0)
+    assert 'value="stay"' in block, "the action must carry the stay nav value"
+    assert 'type="submit"' in block, "it must be a native submit, not JS-gated"
+
+    # Elle vit dans la zone d'action, pas dans la ligne de série : mesuré,
+    # la placer dans la ligne débordait le viewport (393 px pour 360) puis,
+    # une fois sur sa propre ligne de grille, repoussait la série courante
+    # SOUS le CTA collant — annulant l'écart gagné par la tranche précédente.
+    assert "session-focus__sticky-cta" in src
+
+    router = (pathlib.Path(__file__).resolve().parent.parent
+              / "app/routers/sessions.py").read_text(encoding="utf-8")
+    assert 'nav_direction == "stay"' in router, (
+        "the UI must never claim an action the router does not implement"
     )
 
 
