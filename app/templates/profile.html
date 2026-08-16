@@ -81,17 +81,36 @@
         Mesurer le matin, à jeun, mêmes conditions. Tape à plat, muscle relâché.
         Entrer les deux côtés même si similaires. Fréquence idéale : 1x/semaine.
       </p>
+      {% if measure_error %}
+      <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);color:var(--color-danger,#c0392b);">
+        Mesure non enregistrée : une valeur est hors de la plage plausible.
+        Corrige-la et réessaie — rien n'a été modifié.
+      </p>
+      {% elif measure_saved %}
+      <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);">
+        Mesure enregistrée. Chaque envoi ajoute une mesure datée ; les mesures
+        précédentes sont conservées.
+      </p>
+      {% endif %}
       <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
           <label for="measured_at">Date</label>
           <input type="date" id="measured_at" name="measured_at">
         </div>
-        {% for field in measurement_fields %}
+        {% for field, label in capture_fields %}
         <div class="body-profile__field">
-          <label for="{{ field }}">{{ measurement_labels[field] }}</label>
+          <label for="{{ field }}">{{ label }}</label>
           <input type="number" id="{{ field }}" name="{{ field }}" step="0.1"
                  value="{{ latest_values.get(field, '') }}"
-                 placeholder="—">
+                 placeholder="—"
+                 {% if field == 'wingspan_cm' %}aria-describedby="wingspan_cm_help"{% endif %}>
+          {% if field == 'wingspan_cm' %}
+          <span id="wingspan_cm_help" class="text-dim" style="font-size:11px;display:block;">
+            Bras écartés à l'horizontale, du bout du majeur gauche au bout du
+            majeur droit, dos au mur. Toujours le même protocole d'une fois sur
+            l'autre. Laisse vide si tu ne l'as pas mesurée.
+          </span>
+          {% endif %}
         </div>
         {% endfor %}
         <button type="submit" class="btn btn--primary">Enregistrer la mesure</button>

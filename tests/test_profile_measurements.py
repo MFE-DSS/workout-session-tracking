@@ -37,26 +37,28 @@ def test_profile_measurement_submit(client):
         assert m.thigh_cm_right is None
 
 
-def test_profile_measurement_upsert_same_day(client):
-    """Submitting twice on the same date updates instead of duplicating."""
-    # First submit
+def test_profile_measurement_same_day_appends_instead_of_overwriting(client):
+    """Two submissions on one date produce two dated facts.
+
+    Sb_MORPHO_PROFILE_RUNTIME_01 — this test previously asserted the opposite
+    (upsert-by-day: one row, overwritten). The contract changed deliberately:
+    `body_profile.create_measurement` is now the single canonical writer and it
+    treats `body_measurements` as an append-only series
+    (`Sx_MORPHO_CAPTURE_01_SPEC` §2.1). Correcting an entry means adding a later
+    fact, not rewriting the earlier one — so the first value must survive.
+
+    The guard is kept, not dropped: it now pins the new contract, including the
+    part that matters most, which is that the original reading is still there.
+    """
     client.post("/profile/measurements", data={
         "measured_at": "2026-04-10",
         "chest_cm": "95",
-        "arm_cm_left": "",
-        "arm_cm_right": "",
-        "thigh_cm_left": "",
-        "thigh_cm_right": "",
     }, follow_redirects=False)
 
-    # Second submit same date — should update, not create new row
     client.post("/profile/measurements", data={
         "measured_at": "2026-04-10",
         "chest_cm": "96",
         "arm_cm_left": "35",
-        "arm_cm_right": "",
-        "thigh_cm_left": "",
-        "thigh_cm_right": "",
     }, follow_redirects=False)
 
     from app.database import SessionLocal
@@ -74,11 +76,15 @@ def test_profile_measurement_upsert_same_day(client):
             .where(BodyMeasurement.user_id == uid)
             .where(BodyMeasurement.measured_at >= day)
             .where(BodyMeasurement.measured_at < day_end)
+            .order_by(BodyMeasurement.id)
         ).scalars().all()
-        # Only 1 row for that date, not 2
-        assert len(rows) == 1
-        assert rows[0].chest_cm == 96.0  # updated
-        assert rows[0].arm_cm_left == 35.0  # added
+
+    assert len(rows) == 2
+    # The earlier reading is intact — nothing was rewritten.
+    assert rows[0].chest_cm == 95.0
+    assert rows[0].arm_cm_left is None
+    assert rows[1].chest_cm == 96.0
+    assert rows[1].arm_cm_left == 35.0
 
 
 def test_profile_measurement_skip_when_all_empty(client):

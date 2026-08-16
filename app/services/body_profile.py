@@ -59,6 +59,10 @@ BODY_MEASUREMENT_FIELDS: list[FieldSpec] = [
     FieldSpec("hip_cm", "Tour de hanches (cm)", 60, 180),
     FieldSpec("calf_cm_left", "Mollet gauche (cm)", 20, 60),
     FieldSpec("calf_cm_right", "Mollet droit (cm)", 20, 60),
+    # Sb_MORPHO_PROFILE_RUNTIME_01 — bornes alignées sur HEIGHT_BOUNDS
+    # (120–230 cm) : l'envergure est du même ordre de grandeur que la taille
+    # (Sx_MORPHO_CAPTURE_01_SPEC §4.1). Mesurée, jamais estimée.
+    FieldSpec("wingspan_cm", "Envergure (cm)", 120, 230),
 ]
 
 HEIGHT_BOUNDS = (120.0, 230.0)
@@ -337,11 +341,28 @@ def set_consent(
 
 
 def create_measurement(
-    db: Session, user_id: int, cleaned: dict[str, float]
+    db: Session,
+    user_id: int,
+    cleaned: dict[str, float],
+    *,
+    measured_at: datetime | None = None,
 ) -> BodyMeasurement:
     """Persist a validated measurement row. ``cleaned`` must already be
-    validated by ``parse_and_validate``."""
-    m = BodyMeasurement(user_id=user_id, measured_at=datetime.now(UTC))
+    validated by ``parse_and_validate``.
+
+    Sb_MORPHO_PROFILE_RUNTIME_01 — this is the **canonical writer**
+    (`Sx_MORPHO_CAPTURE_01_SPEC` §2.1). It always **inserts**: a measurement is
+    a dated fact, and correcting an entry means adding a later one, not
+    rewriting history.
+
+    ``measured_at`` exists because the `/profile` form lets the user date their
+    own entry, a capability that predates this unification. Folding that route
+    into this writer without the parameter would have silently discarded the
+    submitted date and stamped everything ``now()`` — a data-quality regression
+    disguised as a refactor. Callers that do not date their entries keep the
+    ``now()`` default. The caller is responsible for rejecting future dates.
+    """
+    m = BodyMeasurement(user_id=user_id, measured_at=measured_at or datetime.now(UTC))
     for key, value in cleaned.items():
         if key in _FIELD_BY_KEY:
             setattr(m, key, value)

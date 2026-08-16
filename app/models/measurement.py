@@ -48,6 +48,12 @@ class BodyMeasurement(Base):
     shoulder_width_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     calf_cm_left: Mapped[float | None] = mapped_column(Float, nullable=True)
     calf_cm_right: Mapped[float | None] = mapped_column(Float, nullable=True)
+    # Sb_MORPHO_PROFILE_RUNTIME_01 — envergure, fait directement mesuré au
+    # mètre ruban. Jamais estimée depuis la taille : l'ape index est la
+    # soustraction `wingspan - height`, donc une envergure déduite de la taille
+    # produirait un ape index nul par construction pour tout le monde.
+    # NULL = non mesuré (cf. Sx_MORPHO_CAPTURE_01_SPEC §4.1).
+    wingspan_cm: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
