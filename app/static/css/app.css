@@ -1495,11 +1495,15 @@ input, button, textarea, select {
   display: inline;
 }
 
+/* Sb_UIV2_SESSION_FOCUS_02 — le hint reste INLINE à 360 px. Le passer en
+   bloc ajoutait une ligne entière au-dessus de la console, sur l'écran
+   exact où la série courante devait tenir. Le texte est conservé mot pour
+   mot (convention d'unité, information que les lignes de séries ne portent
+   pas) ; il se replie naturellement si la largeur manque. */
 @media (max-width: 360px) {
   .set-group-title__hint {
-    display: block;
-    margin-left: 0;
-    margin-top: 2px;
+    display: inline;
+    margin-left: var(--space-xs);
   }
 }
 

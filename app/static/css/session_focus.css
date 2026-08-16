@@ -1070,11 +1070,20 @@
 
 /* -------- Orientation (§18.A) : compteur exercice courant / total
    + restants. Chiffre courant en mono large (instrumental). -------- */
+/* Sb_UIV2_SESSION_FOCUS_02 — STEP A : l'orientation est de la MÉTADONNÉE.
+   Elle affichait « 1 » en 28 px gras accentué, soit le poids visuel d'un
+   objet primaire, pour une information que le mini-stepper porte déjà
+   (position active via aria-current + état par pastille). Aucune donnée
+   n'est retirée : les classes, le compteur et « N restants » subsistent et
+   restent épinglés par test_session_focus_cockpit. Seul le poids visuel
+   redescend au rang que la hiérarchie UIV2 lui assigne.
+   Aucun rétrécissement sous le système typographique : on réutilise les
+   échelles body-sm / 11 px déjà en usage sur cette surface. */
 .session-focus__orientation {
   display: flex;
   align-items: baseline;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-1);
+  gap: var(--space-2);
+  padding: 2px var(--space-1);
 }
 .session-focus__orientation-position {
   font-family: var(--font-family-mono);
@@ -1084,22 +1093,24 @@
   gap: 2px;
 }
 .session-focus__orientation-current {
-  font-size: 28px;
+  font-size: var(--font-size-body-sm);
   font-weight: var(--font-weight-bold);
-  color: var(--color-accent-strong);
+  color: var(--color-fg-muted);
   line-height: 1;
 }
 .session-focus__orientation-sep {
-  font-size: 20px;
+  font-size: var(--font-size-body-sm);
   color: var(--color-fg-subtle);
 }
 .session-focus__orientation-total {
-  font-size: 20px;
+  font-size: var(--font-size-body-sm);
   color: var(--color-fg-muted);
 }
 .session-focus__orientation-meta {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--space-2);
   line-height: 1.2;
 }
 .session-focus__orientation-label {
@@ -1201,14 +1212,38 @@
 
 /* -------- Cockpit hero interne (§18) : intent + worked area + cues.
    Bloc dense mais lisible, sous le head de la carte active. -------- */
+/* Sb_UIV2_SESSION_FOCUS_02 — le hero ne porte plus qu'une LIGNE de cible ;
+   en garder le fond, le rayon et le padding en ferait une carte dans une
+   carte pour un seul énoncé, ce que la doctrine UIV2 interdit explicitement
+   quand l'imbrication ne porte aucune sémantique. Il redevient donc un
+   simple bloc de flux. L'intention et le panneau détaillé, qui justifiaient
+   ce cadre, vivent désormais sous la console. */
 .session-focus__cockpit-hero {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  margin: var(--space-2) 0 var(--space-3);
-  padding: var(--space-3);
-  background: var(--color-surface-alt);
-  border-radius: var(--radius-md);
+  gap: var(--space-1);
+  margin: 0 0 var(--space-1);
+  padding: 0;
+}
+
+/* Contexte de cible : une ligne, poids de métadonnée. Sans règle propre,
+   le `<p>` héritait des marges de paragraphe (14 px haut + 14 px bas) pour
+   21 px de texte, juste au-dessus de l'action. */
+.session-focus__target-compact {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  font-size: var(--font-size-body-sm);
+}
+.session-focus__target-compact-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-fg-subtle);
+}
+.session-focus__target-compact-value {
+  color: var(--color-fg-strong);
 }
 
 /* Exercise intent (§18.B) */
@@ -1365,15 +1400,31 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
    .session-focus, aucun input renommé. Mobile-first 360×640.
    ============================================================ */
 
+/* Sb_UIV2_SESSION_FOCUS_02 — la console était une CARTE (fond, bordure,
+   rayon, padding) à l'intérieur de la carte d'exercice, qui est elle-même
+   une carte : deux cadres emboîtés pour la zone d'action principale, ce que
+   la doctrine UIV2 refuse quand l'imbrication ne porte pas de sémantique
+   propre. Elle devient une RÉGION séparée par un filet — un cadre de moins,
+   la même délimitation, et le padding récupéré profite à la série courante.
+   `--compact` (cartes non actives) conserve son propre traitement. */
 .session-focus__console {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin: var(--space-2) 0;
-  padding: var(--space-3);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
+  margin: var(--space-1) 0 0;
+  padding: var(--space-2) 0 0;
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+/* Sur la carte ACTIVE seulement, la ligne d'identité resserre son rembourrage
+   vertical. `min-height: 44px` est posé EXPLICITEMENT : la cible tactile du
+   `<summary>` reste au gabarit produit Auren, on ne récupère que du blanc,
+   jamais de la surface cliquable, et la taille de police est inchangée —
+   l'identité reste dominante. */
+.exercise-card[open] > .exercise-card__compact {
+  padding-top: var(--space-xs);
+  padding-bottom: var(--space-xs);
+  min-height: 44px;
 }
 /* Console des cartes non-actives : plus discrète (index secondaire). */
 .session-focus__console--compact {
@@ -1381,16 +1432,46 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   background: var(--color-bg-elevated);
 }
 
-/* -------- Console header : titre + progression séries. -------- */
+/* -------- Console header : titre + progression séries. --------
+   Sb_UIV2_SESSION_FOCUS_02 — STEP C : la grille de séries dit déjà qu'on est
+   dans la zone de saisie. Le titre redevient une petite étiquette de section :
+   le `<h4>` et son `id`/structure restent (accessibilité, contrat
+   `>Échauffement</h4>` et hiérarchie de titres), seul le chrome tombe —
+   plus de filet, plus de padding de séparation. Le hint « kg = comme affiché
+   sur l'équipement » est CONSERVÉ : c'est une convention d'unité que les
+   lignes de séries ne portent pas. */
 .session-focus__console-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: var(--space-2);
+  gap: var(--space-1);
   flex-wrap: wrap;
 }
 .session-focus__console-title {
   margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+/* L'échauffement terminé est un récapitulatif, pas une section : son titre
+   ne porte donc ni filet ni marge de section à l'intérieur du `<summary>`. */
+.session-focus__warmup-recap .set-group-title {
+  margin: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+  display: inline;
+}
+.session-focus__warmup-recap > .disclosure__summary {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+}
+.session-focus__warmup-recap-count {
+  font-family: var(--font-family-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-body-sm);
+  color: var(--color-fg-subtle);
 }
 .session-focus__console-progress {
   display: inline-flex;
@@ -1415,26 +1496,38 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   gap: var(--space-2);
   flex-wrap: wrap;
 }
+/* Sb_UIV2_SESSION_FOCUS_02 — densité : la référence précédente est une LIGNE,
+   pas une carte. Elle occupait 130 px d'un écran de 640, directement au-dessus
+   de l'action primaire, et le plus souvent pour annoncer une absence de
+   donnée. Le TEXTE est conservé intégralement — sa garde dit « jamais de
+   performance inventée », sémantique indépendante de l'ordre, donc non
+   supersédée. Seul le chrome tombe : plus de fond, plus de rayon, plus de
+   colonne. Un cadre de moins, la même information. */
 .session-focus__console-ref {
-  flex: 1 1 130px;
+  flex: 1 1 auto;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: var(--space-2);
-  background: var(--color-surface-alt);
-  border-radius: var(--radius-sm);
+  flex-direction: row;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding: 2px 0;
 }
+/* Sur 360 px, « Référence précédente » se repliait sur deux lignes et faisait
+   33 px de haut pour une étiquette de 11 px, juste au-dessus de la série
+   courante. Une seule ligne suffit : le texte est intact, seul le repli
+   disparaît. */
 .session-focus__console-ref-label {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--color-fg-subtle);
+  white-space: nowrap;
 }
 .session-focus__console-ref-value {
   font-family: var(--font-family-mono);
   font-variant-numeric: tabular-nums;
   font-size: var(--font-size-body-sm);
   color: var(--color-fg-strong);
+  white-space: nowrap;
 }
 .session-focus__console-ref--target .session-focus__console-ref-value {
   color: var(--color-accent-strong);
@@ -1445,22 +1538,6 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   font-style: italic;
 }
 
-/* Sb_UIV2_SESSION_FOCUS_02 — densité : la référence précédente est une LIGNE,
-   pas une carte. Elle occupait 130 px d'un écran de 640 px, directement
-   au-dessus de l'action primaire, et le plus souvent pour annoncer une
-   absence de donnée. Le TEXTE est conservé intégralement — sa garde dit
-   « jamais de performance inventée », sémantique indépendante de l'ordre et
-   donc non supersédée. Seul le chrome disparaît : plus de fond, plus de
-   rayon, plus de colonne. Un cadre de moins, la même information. */
-.session-focus__console-ref {
-  flex: 1 1 auto;
-  flex-direction: row;
-  align-items: baseline;
-  gap: var(--space-2);
-  padding: 2px 0;
-  background: none;
-  border-radius: 0;
-}
 
 /* -------- Console list : rows par état. -------- */
 .session-focus__console-list {

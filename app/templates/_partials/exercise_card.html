@@ -246,8 +246,41 @@
       {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
       {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
 
-      {% if warmup_sets|length > 0 %}
+      {# ============================================================
+         Sb_UIV2_SESSION_FOCUS_02 — STEP B : l'échauffement TERMINÉ est de
+         l'historique, pas la tâche courante.
+         ------------------------------------------------------------
+         Deux états distincts, et la distinction est le contrat :
+
+         * CURRENT_WARMUP — au moins un échauffement reste à faire : c'est
+           LUI la série courante, il reste déplié et dominant. Le replier
+           cacherait l'action en cours.
+         * CURRENT_WORK_SET — tous les échauffements sont faits : ils
+           deviennent un récapitulatif calme, dépliable par `details` natif.
+
+         Le repli est donc DÉRIVÉ de l'état réel (`completed`), jamais forcé
+         pour faire entrer une capture dans la ligne de flottaison.
+
+         Les champs restent dans le DOM : un `<details>` fermé soumet quand
+         même ses contrôles, donc le POST est rigoureusement inchangé.
+         Le `<h4>` reste dans le `<summary>` — structure de titre conservée
+         pour l'accessibilité, et contrat `>Échauffement</h4>` intact.
+         Aucun JS : sémantique `details/summary` native.
+         ============================================================ #}
+      {% set _warm_total = warmup_sets|length %}
+      {% set _warm_done = warmup_sets|selectattr('completed')|list|length %}
+      {% set _warm_collapsed = is_active and _warm_total > 0 and _warm_done == _warm_total %}
+
+      {% if _warm_total > 0 %}
+        {% if _warm_collapsed %}
+        <details class="disclosure session-focus__warmup-recap">
+          <summary class="disclosure__summary">
+            <h4 class="set-group-title">Échauffement</h4>
+            <span class="session-focus__warmup-recap-count">{{ _warm_done }}/{{ _warm_total }} terminé</span>
+          </summary>
+        {% else %}
         <h4 class="set-group-title">Échauffement</h4>
+        {% endif %}
       {% endif %}
       <ul class="set-list">
         {% for sl in warmup_sets %}
@@ -284,6 +317,9 @@
           </li>
         {% endfor %}
       </ul>
+      {% if _warm_collapsed %}
+        </details>
+      {% endif %}
 
       {# ============================================================
          Sb_UI_04.4 — Set Logging Console (Sx_UI_04 §18.E / §22)
