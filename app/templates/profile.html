@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import choice_row, select_shell %}
 {% block content %}
 <h1 class="page-title">Profil</h1>
 
@@ -238,56 +239,87 @@
       </p>
       {% endif %}
 
-      <form method="post" action="{{ url_for('profile_preferences_submit') }}">
-        <div class="body-profile__field" style="grid-column:1/-1;">
-          <label for="sessions_per_week">Séances souhaitées par semaine</label>
-          <select id="sessions_per_week" name="sessions_per_week">
-            <option value="">Non renseigné</option>
-            {% for n in sessions_range %}
-            <option value="{{ n }}"
-              {% if preferences.sessions_per_week == n %}selected{% endif %}>{{ n }}</option>
-            {% endfor %}
-          </select>
-        </div>
+      {# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — présentation seule.
+         Les noms POST sont INCHANGÉS : sessions_per_week, focus_1..3,
+         equipment, equipment_declared. Aucune sémantique de persistance n'est
+         touchée. #}
+      <form method="post" action="{{ url_for('profile_preferences_submit') }}"
+            class="prefs-form" data-prefs-form>
 
-        <fieldset style="border:none;padding:0;margin:var(--space-sm) 0 0;">
-          <legend style="font-size:13px;font-weight:600;">Priorités (optionnel, dans l'ordre)</legend>
-          {% for slot in [1, 2, 3] %}
-          <div class="body-profile__field">
-            <label for="focus_{{ slot }}">Priorité {{ slot }}</label>
-            <select id="focus_{{ slot }}" name="focus_{{ slot }}">
-              <option value="">Aucune</option>
-              {% for key, label in focus_vocab %}
-              <option value="{{ key }}"
-                {% if preferences.focus_priorities and preferences.focus_priorities|length >= slot
-                      and preferences.focus_priorities[slot - 1] == key %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
+        {# ── Cadence : domaine fini de 7 valeurs, donc une grille de choix,
+             pas un menu déroulant. Aucune valeur pré-sélectionnée si rien
+             n'est déclaré — NULL reste NULL. ── #}
+        <fieldset class="prefs-block">
+          <legend class="choice-group__legend">Séances souhaitées par semaine</legend>
+          <p class="choice-group__hint">Non renseigné tant que tu ne choisis pas.</p>
+          <div class="choice-grid">
+            {% for n in sessions_range %}
+              {{ choice_row("sessions_per_week", n, n, kind="radio",
+                            checked=(preferences.sessions_per_week == n),
+                            input_id="cadence_%s"|format(n)) }}
+            {% endfor %}
           </div>
-          {% endfor %}
         </fieldset>
 
-        <fieldset style="border:none;padding:0;margin:var(--space-sm) 0 0;">
-          <legend style="font-size:13px;font-weight:600;">Matériel disponible</legend>
-          {# Ce marqueur distingue « section jamais soumise » (rien n'est stocké)
-             de « soumise sans rien cocher » (déclaration explicite : aucun
-             matériel externe). Sans lui, les deux seraient indiscernables. #}
+        {# ── Priorités : la sélection ET son rang doivent rester visibles.
+             Les trois <select> natifs restent LA source de vérité et le
+             fallback sans JS ; le bloc classé ci-dessous n'est révélé que si
+             JS est actif, et il ne fait qu'écrire dans ces mêmes selects. ── #}
+        <fieldset class="prefs-block">
+          <legend class="choice-group__legend">Priorités (optionnel, dans l'ordre)</legend>
+          <p class="choice-group__hint">Trois au maximum. Le rang s'affiche sur l'option.</p>
+
+          <div class="prefs-fallback" data-prefs-fallback>
+            {% for slot in [1, 2, 3] %}
+            <div class="prefs-fallback__row">
+              <label class="choice-group__hint" for="focus_{{ slot }}">Priorité {{ slot }}</label>
+              {{ select_shell("focus_%s"|format(slot), focus_vocab,
+                              selected=(preferences.focus_priorities[slot - 1]
+                                        if preferences.focus_priorities
+                                           and preferences.focus_priorities|length >= slot
+                                        else None),
+                              empty_label="Aucune",
+                              select_id="focus_%s"|format(slot)) }}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="choice-group" data-prefs-ranked hidden>
+            {% for key, label in focus_vocab %}
+            <button type="button" class="choice-row choice-row--button"
+                    data-focus-key="{{ key }}" aria-pressed="false">
+              <span class="choice-row__marker choice-row__marker--check" aria-hidden="true">✓</span>
+              <span class="choice-row__body">
+                <span class="choice-row__label">
+                  <span class="choice-row__rank" data-focus-rank></span> {{ label }}
+                </span>
+              </span>
+            </button>
+            {% endfor %}
+          </div>
+        </fieldset>
+
+        {# ── Matériel : multi-sélection, donc checkbox. Le marqueur caché
+             distingue « jamais soumis » (rien stocké, NULL) de « soumis sans
+             rien cocher » (déclaration explicite : []). Le style ne doit pas
+             détruire cette distinction. ── #}
+        <fieldset class="prefs-block">
+          <legend class="choice-group__legend">Matériel disponible</legend>
           <input type="hidden" name="equipment_declared" value="1">
           {% if preferences.available_equipment is none %}
-          <p class="text-dim" style="font-size:12px;margin:0 0 var(--space-sm);">
-            Je n'ai pas encore renseigné mon équipement.
-          </p>
+          <p class="choice-group__hint">Je n'ai pas encore renseigné mon équipement.</p>
           {% endif %}
-          {% for key, label in equipment_vocab %}
-          <label style="display:block;font-size:13px;">
-            <input type="checkbox" name="equipment" value="{{ key }}"
-              {% if preferences.available_equipment and key in preferences.available_equipment %}checked{% endif %}>
-            {{ label }}
-          </label>
-          {% endfor %}
+          <div class="choice-group">
+            {% for key, label in equipment_vocab %}
+              {{ choice_row("equipment", key, label, kind="checkbox",
+                            checked=(preferences.available_equipment
+                                     and key in preferences.available_equipment),
+                            input_id="equipment_%s"|format(key)) }}
+            {% endfor %}
+          </div>
         </fieldset>
 
-        <button type="submit" class="btn btn--ghost" style="margin-top:var(--space-sm);">Enregistrer</button>
+        <button type="submit" class="btn btn--ghost prefs-form__submit">Enregistrer</button>
       </form>
     </div>
 
@@ -314,4 +346,9 @@
     {% endfor %}
   </div>
 </section>
+{# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — amélioration progressive.
+   `defer` : le script s'exécute après le parsing, donc le formulaire natif est
+   déjà utilisable avant même qu'il ne tourne. S'il ne tourne jamais, les trois
+   <select> restent visibles et le formulaire fonctionne. #}
+<script defer src="{{ url_for('static', path='js/prefs_focus_rank.js') }}"></script>
 {% endblock %}

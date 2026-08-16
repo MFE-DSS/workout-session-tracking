@@ -307,3 +307,72 @@
     transition: none;
   }
 }
+
+/* ── Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — mise en page du panneau ───────
+ * Le panneau de préférences doit se lire comme un instrument de configuration,
+ * pas comme un formulaire HTML brut. Aucune nouvelle primitive : uniquement
+ * l'agencement des blocs et l'état « bouton » de la rangée classée.
+ */
+
+.prefs-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.prefs-block {
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;   /* sans quoi un fieldset refuse de rétrécir en grille */
+}
+
+.prefs-form__submit { align-self: flex-start; }
+
+.prefs-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Rangée classée pilotée au clavier : c'est un vrai <button>, donc focusable
+ * et activable par Entrée/Espace sans une ligne d'ARIA maison. Elle n'apparaît
+ * que si JS est actif ; sans JS, les <select> natifs restent seuls et
+ * pleinement fonctionnels. */
+.choice-row--button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+}
+
+.choice-row--button[aria-pressed="true"] .choice-row__marker {
+  border-color: var(--accent);
+  color: var(--bg);
+  background: var(--accent);
+}
+
+.choice-row--button[aria-pressed="true"] .choice-row__label {
+  font-weight: 600;
+}
+
+.choice-row--button[aria-pressed="true"] {
+  background: var(--accent-soft);
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+.choice-row--button[aria-pressed="true"] .choice-row__rank {
+  color: var(--accent);
+}
+
+.choice-row--button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.choice-row--button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}

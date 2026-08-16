@@ -281,10 +281,18 @@ def test_the_family_stays_small():
         m.split("__")[0].split("--")[0]
         for m in re.findall(r"^\.([a-z0-9_-]+)", _css(), re.MULTILINE)
     }
-    assert roots <= {
+    #: Les primitives réutilisables — ce que ce test protège de la prolifération.
+    primitives = {
         "a11y-input", "choice-group", "choice-row", "choice-grid",
         "disclosure", "select-shell",
-    }, sorted(roots)
+    }
+    #: Agencement d'une page précise, pas des primitives : ces classes ne sont
+    #: pas destinées à être réutilisées ailleurs et ne comptent donc pas comme
+    #: des variantes de la famille. Elles restent listées explicitement pour
+    #: que leur ajout soit un geste conscient.
+    layout = {"prefs-form", "prefs-block", "prefs-fallback"}
+    assert roots <= primitives | layout, sorted(roots - (primitives | layout))
+    assert len(primitives) == 6
 
 
 def test_reduced_motion_is_respected():
