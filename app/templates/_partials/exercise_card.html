@@ -11,7 +11,16 @@
       {%- set _row_ph = ph if set_state == 'active' else None -%}
       {%- set _ph_w = _row_ph.weight if _row_ph and _row_ph.weight else 'kg' -%}
       {%- set _ph_r = _row_ph.reps if _row_ph and _row_ph.reps else 'reps' -%}
-      <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ set_state }}{% if _row_ph %} set-row--has-overload-placeholder{% endif %}">
+      {# Sb_SESSION_SET_ACTION_01 — ancre de série. Après « Enregistrer la
+         série », le serveur renvoie sur `#set-<id>` de la prochaine série
+         non complétée : l'utilisateur reprend là où il en est, jamais en
+         haut de page. L'identifiant est la clé primaire du SetLog, la même
+         que celle déjà encodée dans les noms de champs. #}
+      {# `class` reste le PREMIER attribut : plusieurs tests existants parsent
+         ces lignes avec `<li class="set-row set-row--work…`. Mettre `id`
+         devant les cassait sans rien apporter. #}
+      <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ set_state }}{% if _row_ph %} set-row--has-overload-placeholder{% endif %}"
+          id="set-{{ sl.id }}">
         <div class="set-row__label session-focus__console-row-label">
           <span class="set-row__kind">Série</span>
           <span class="set-row__idx">#{{ sl.set_index }}</span>
@@ -55,11 +64,12 @@
             placeholder="{{ _ph_r }}"
             value="{{ sl.reps if sl.reps is not none else '' }}"
           />
-          {# Sb_24.4 — completed dérivé serveur de la présence de
-             weight/reps. Aucune checkbox, et aucune action de série : il
-             n'en existe pas dans le produit actuel — limitation portée par
-             Sb_SESSION_SET_ACTION_01. #}
+          {# Sb_24.4 — completed reste dérivé serveur de la présence de
+             weight/reps. Aucune checkbox : le bouton ci-dessous ne déclare
+             pas un état, il SOUMET les valeurs saisies, exactement comme le
+             CTA d'exercice. #}
         </div>
+
       </li>
     {%- endfor %}
   </ul>
@@ -868,6 +878,37 @@
       <span class="card__actions__recap" aria-hidden="true">
         {{ work_done }}/{{ work_total }}
       </span>
+
+      {# Sb_SESSION_SET_ACTION_01 — l'action de SÉRIE vit dans la zone
+         d'action, pas dans la ligne de série.
+         ------------------------------------------------------------
+         Premier essai : le bouton dans la ligne elle-même. Deux mesures
+         l'ont écarté, et aucune n'était devinable en lisant le code —
+         `.set-row` est une grille `40px 1fr auto`, donc le bouton
+         débordait à 393 px pour un viewport de 360 (`scrollWidth` 393, page
+         défilant horizontalement) ; passé sur sa propre ligne de grille, la
+         ligne de série montait de 79 à 120 px et son bas repassait SOUS le
+         CTA collant, mangeant l'écart de 15 px gagné par
+         `Sb_UIV2_SESSION_FOCUS_02` et recréant exactement la collision que
+         cette tranche-là venait de supprimer.
+
+         Les deux issues d'une série vivent donc côte à côte, dans la seule
+         zone déjà prouvée non obstruée : « enregistrer et rester » et
+         « enregistrer et passer à l'exercice suivant ». Le choix devient
+         explicite au lieu d'être caché, et rien ne se dispute la surface.
+
+         Même formulaire, mêmes champs, même route : seule la valeur de
+         `nav` change. Rendu uniquement s'il reste une série à saisir —
+         sinon l'action n'aurait rien à enregistrer. #}
+      {% if is_active and work_done < work_total %}
+      <button
+        type="submit"
+        name="nav"
+        value="stay"
+        class="btn btn--ghost session-focus__tap-target session-focus__set-action"
+        title="Enregistrer la série et rester sur cet exercice"
+      >Enregistrer la série</button>
+      {% endif %}
       <button type="submit" name="nav" value="next"
               class="btn btn--primary session-focus__tap-target session-focus__cta-primary">
         {% if is_last %}

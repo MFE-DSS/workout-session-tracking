@@ -17,15 +17,26 @@
    Variable optionnelle :
    - rest_seconds (int, défaut 90)
 #}
+{# Sb_SESSION_SET_ACTION_01 — le départ du repos devient un ÉVÉNEMENT
+   SERVEUR. `rest_active` est posé par le routeur après un `nav=stay`, donc
+   après une série réellement enregistrée : le repos ne peut plus démarrer
+   sur une action qui n'a rien sauvegardé.
+
+   Rien n'est persisté et rien n'est critique : sans JS, l'utilisateur lit
+   que le repos a commencé et continue de saisir ; la sauvegarde n'a jamais
+   dépendu de ce bloc et n'en dépend toujours pas. Un historique durable des
+   temps de repos demanderait une migration → Sb_REST_EVENT_TRACE_01. #}
 {% set rest_seconds = rest_seconds | default(90) %}
+{% set rest_started = rest_active | default(false) %}
 <div
   class="session-focus__rest-timer"
   data-rest-duration="{{ rest_seconds }}"
   data-start-rest="{{ rest_seconds }}"
+  {% if rest_started %}data-rest-started="1"{% endif %}
   role="status"
   aria-live="polite"
 >
-  <span class="session-focus__rest-timer__label">Repos suggéré&nbsp;:</span>
+  <span class="session-focus__rest-timer__label">{% if rest_started %}Repos en cours&nbsp;:{% else %}Repos suggéré&nbsp;:{% endif %}</span>
   <span
     class="session-focus__rest-timer__countdown"
     data-rest-display
