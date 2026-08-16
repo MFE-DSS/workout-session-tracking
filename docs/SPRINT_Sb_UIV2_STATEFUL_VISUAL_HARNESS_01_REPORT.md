@@ -106,3 +106,38 @@ non atteint échoue au lieu de mentir.
 
 Le vrai risque n'était pas d'ajouter des actions — c'était qu'un geste raté
 produise une image plausible. C'est ce que `expect_visible` rend impossible.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#112** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Merge | **`fbed54b`** |
+| CI canonique | run `31958394501` — **succès** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication |
+| Threads / Gitar | **0 / 0** |
+| Périmètre final | `scripts/visual_baseline_matrix.py` · `scripts/visual_baseline_capture.py` · tests dédiés |
+
+### Capacité CI (run `31958394501`) — **HEALTHY**, marge regagnée
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 83 | 7 137 Mo | 3 071 — intact |
+| 2 | 83 | **6 467 Mo** | 3 071 — intact |
+| 3 | 83 | 8 662 Mo | 3 071 — intact |
+
+Le shard bas remonte de **5 973 → 6 467 Mo** et repasse au-dessus de 6 Go, avec
+une partition parfaitement équilibrée (83/83/83). Manifeste de shards respecté,
+`workers=2` — jamais `-n auto`. La règle de capacité du programme est donc
+satisfaite pour ouvrir la tranche suivante.
+
+### Incident de forme, consigné sans correction
+
+Le message de commit de cette tranche contient des backticks non échappés que le
+shell a substitués : les noms de champ `actions` et `expect_visible` ont été
+mangés. Le commit était **déjà poussé**, et la réécriture d'historique publié est
+interdite par la consigne permanente — aucun force-push n'a donc été tenté. Le
+texte intégral figure dans le corps de la PR #112 et dans ce rapport.
+**Règle retenue : pas de backticks dans un message de commit passé au shell.**
