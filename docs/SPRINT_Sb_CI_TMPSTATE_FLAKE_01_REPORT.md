@@ -113,3 +113,33 @@ Le sprint a aussi révélé que le même défaut de conception — échantillonn
 état global — rendait une assertion voisine **complètement vacante** depuis
 l'origine. Elle passait grâce à 53 945 répertoires qui n'avaient rien à voir
 avec elle.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#102** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `96a2b47` — **vert au premier passage**, aucun correctif |
+| Merge | **`5547601`** |
+| CI canonique | run `31931126902` — **succès, 3/3 jobs** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité (4 conditions à 0) |
+| Threads / Gitar | **0 / 0** |
+| Périmètre | 1 fichier de tests + 3 docs — **aucun code produit** |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **5 195 Mo** | **5 065 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+| `workers=` | 2 | 2 |
+
+Sixième tranche consécutive au-dessus de 5 Go sur les deux shards. `workers=2`
+vérifié dans les deux logs : le manifeste de shards n'a pas été contourné.
+
+**Télémétrie de la fuite** : `tmp_dirs` culmine à **9** (shard A) et **10**
+(shard B) sur 79 relevés — à comparer aux 53 945 répertoires hérités de la
+racine partagée. Le nettoyage du fixture fonctionne ; la correction de ce sprint
+portait bien sur la **mesure**, pas sur un défaut de nettoyage.
