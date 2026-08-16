@@ -1,7 +1,7 @@
 """Tests for the /sessions/{id}/done terminal-state route."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from tests.helpers import get_test_user_id
 
@@ -22,8 +22,8 @@ def _mk_completed_session(
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog, WorkoutSession
 
-    started = started_at or datetime(2026, 4, 13, 18, 0, tzinfo=timezone.utc)
-    ended = ended_at or datetime(2026, 4, 13, 19, 30, tzinfo=timezone.utc)
+    started = started_at or datetime(2026, 4, 13, 18, 0, tzinfo=UTC)
+    ended = ended_at or datetime(2026, 4, 13, 19, 30, tzinfo=UTC)
 
     with SessionLocal() as db:
         s = WorkoutSession(
@@ -187,8 +187,8 @@ def _mk_completed_cardio_session(
     from app.models.catalog import WorkoutTemplate
     from app.models.session import WorkoutSession
 
-    started = datetime(2026, 4, 13, 18, 0, tzinfo=timezone.utc)
-    ended = datetime(2026, 4, 13, 18, 0 + duration_min, tzinfo=timezone.utc)
+    started = datetime(2026, 4, 13, 18, 0, tzinfo=UTC)
+    ended = datetime(2026, 4, 13, 18, 0 + duration_min, tzinfo=UTC)
 
     with SessionLocal() as db:
         tpl = WorkoutTemplate(
@@ -268,7 +268,7 @@ def test_done_page_shows_zones_block(client):
 def test_done_page_shows_anomalies_when_present(client):
     """Inject a completed-empty set so rule A fires and 'À vérifier' renders."""
     from app.database import SessionLocal
-    from app.models.session import WorkoutSession, SetLog
+    from app.models.session import WorkoutSession
 
     sid = _mk_completed_session()
     with SessionLocal() as db:

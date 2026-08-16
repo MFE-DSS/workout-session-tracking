@@ -1,6 +1,8 @@
 """Tests for measurement integration on profile page."""
 from __future__ import annotations
 
+from datetime import UTC
+
 
 def test_profile_shows_measurement_form(client):
     body = client.get("/profile").text
@@ -20,10 +22,11 @@ def test_profile_measurement_submit(client):
     assert r.status_code == 303
 
     # Verify data persisted
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.measurement import BodyMeasurement
     from tests.helpers import get_test_user_id
-    from sqlalchemy import select
 
     uid = get_test_user_id()
     with SessionLocal() as db:
@@ -61,15 +64,17 @@ def test_profile_measurement_same_day_appends_instead_of_overwriting(client):
         "arm_cm_left": "35",
     }, follow_redirects=False)
 
+    from datetime import datetime
+
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.measurement import BodyMeasurement
     from tests.helpers import get_test_user_id
-    from sqlalchemy import select
-    from datetime import datetime, timezone
 
     uid = get_test_user_id()
-    day = datetime(2026, 4, 10, tzinfo=timezone.utc)
-    day_end = datetime(2026, 4, 11, tzinfo=timezone.utc)
+    day = datetime(2026, 4, 10, tzinfo=UTC)
+    day_end = datetime(2026, 4, 11, tzinfo=UTC)
     with SessionLocal() as db:
         rows = db.execute(
             select(BodyMeasurement)
@@ -89,10 +94,11 @@ def test_profile_measurement_same_day_appends_instead_of_overwriting(client):
 
 def test_profile_measurement_skip_when_all_empty(client):
     """All fields empty → no row inserted."""
+    from sqlalchemy import func, select
+
     from app.database import SessionLocal
     from app.models.measurement import BodyMeasurement
     from tests.helpers import get_test_user_id
-    from sqlalchemy import select, func
 
     uid = get_test_user_id()
     with SessionLocal() as db:
@@ -130,11 +136,13 @@ def test_profile_measurement_future_date_capped(client):
         "thigh_cm_right": "",
     }, follow_redirects=False)
 
+    from datetime import datetime
+
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.measurement import BodyMeasurement
     from tests.helpers import get_test_user_id
-    from sqlalchemy import select
-    from datetime import datetime, timezone
 
     uid = get_test_user_id()
     with SessionLocal() as db:
@@ -144,4 +152,4 @@ def test_profile_measurement_future_date_capped(client):
             .where(BodyMeasurement.chest_cm == 99.0)
         ).scalar_one_or_none()
         assert m is not None
-        assert m.measured_at.date() <= datetime.now(timezone.utc).date()
+        assert m.measured_at.date() <= datetime.now(UTC).date()

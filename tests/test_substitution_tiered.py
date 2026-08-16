@@ -43,7 +43,7 @@ def test_pattern_motor_enum_has_11_values():
 
 
 def test_exercise_properties_loads_and_validates():
-    from app.services.substitution import load_exercise_properties, VALID_PATTERN_MOTORS
+    from app.services.substitution import VALID_PATTERN_MOTORS, load_exercise_properties
     props = load_exercise_properties()
     assert len(props) > 0, "registry should not be empty"
     for name, entry in props.items():

@@ -54,9 +54,10 @@ def test_forgot_password_submit_always_shows_success(client):
 
 
 def test_forgot_password_submit_with_real_email(client):
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from sqlalchemy import select
 
     with SessionLocal() as db:
         user = db.execute(select(User).where(User.username == "testuser")).scalar_one()
@@ -124,9 +125,10 @@ def test_register_with_email(client):
     }, follow_redirects=False)
     assert r.status_code == 303
 
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from sqlalchemy import select
     with SessionLocal() as db:
         user = db.execute(select(User).where(User.username == "emailuser")).scalar_one()
         assert user.email == "emailuser@example.com"
@@ -144,9 +146,10 @@ def test_register_without_email(client):
     }, follow_redirects=False)
     assert r.status_code == 303
 
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from sqlalchemy import select
     with SessionLocal() as db:
         user = db.execute(select(User).where(User.username == "noemailuser")).scalar_one()
         assert user.email is None

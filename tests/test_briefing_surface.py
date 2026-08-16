@@ -12,6 +12,7 @@ def _start(client, slug: str = "push-a") -> int:
 
 def _get_exercise_ids(sid: int) -> list[int]:
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise
     from app.models.user import User  # noqa: F401 — mapper resolution
@@ -61,7 +62,7 @@ def test_chip_absent_on_completed_card(client):
     """Once a card is fully completed (done), the chip is replaced by the
     recap line — no chip markup should remain on that summary."""
     from app.database import SessionLocal
-    from app.models.session import SessionExercise, SetLog, WorkoutSession
+    from app.models.session import SessionExercise
     from app.models.user import User  # noqa: F401
 
     sid = _start(client, "push-a")

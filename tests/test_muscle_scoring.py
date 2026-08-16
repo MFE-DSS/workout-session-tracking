@@ -122,15 +122,16 @@ def test_classify_shoulder_press():
 # ---------------------------------------------------------------------------
 # Scoring service + radar SVG tests
 # ---------------------------------------------------------------------------
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
 from tests.helpers import get_test_user_id
 
 
 def _add_session_with_sets(client, user_id, exercise_name, sets_data, days_ago=0):
     from app.database import SessionLocal
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     with SessionLocal() as db:
         s = WorkoutSession(
             user_id=user_id,
@@ -206,8 +207,8 @@ def test_radar_axes_aggregate_zones(client):
     assert arms.score > 0
 
 
-from app.services.radar import build_radar_svg
 from app.services.muscle_scoring import RadarAxis
+from app.services.radar import build_radar_svg
 
 
 def test_radar_svg_renders():

@@ -1,8 +1,10 @@
 """Sprint 3 readability improvements on past sessions + /progress."""
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
 import re
+from datetime import UTC
+
+from tests.helpers import get_test_user_id
 
 
 def _start_session(client, slug="push-a") -> int:
@@ -36,7 +38,7 @@ def test_progress_page_has_exercise_activity_section(client):
 
 
 def test_progress_exercise_activity_shows_completed_exercises(client):
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog, WorkoutSession
@@ -45,7 +47,7 @@ def test_progress_exercise_activity_shows_completed_exercises(client):
         s = WorkoutSession(
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A", user_id=get_test_user_id(),
-            started_at=datetime.now(timezone.utc) - timedelta(days=2),
+            started_at=datetime.now(UTC) - timedelta(days=2),
             status="completed",
         )
         se = SessionExercise(
@@ -73,7 +75,7 @@ def test_progress_exercise_activity_shows_completed_exercises(client):
 
 
 def test_progress_exercise_activity_ignores_in_progress_sessions(client):
-    from datetime import datetime, timezone
+    from datetime import datetime
 
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog, WorkoutSession
@@ -82,7 +84,7 @@ def test_progress_exercise_activity_ignores_in_progress_sessions(client):
         s = WorkoutSession(
             template_slug_snapshot="legs",
             template_name_snapshot="Legs", user_id=get_test_user_id(),
-            started_at=datetime.now(timezone.utc),
+            started_at=datetime.now(UTC),
             status="in_progress",  # should NOT surface
         )
         se = SessionExercise(

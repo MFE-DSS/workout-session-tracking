@@ -255,3 +255,84 @@ def test_no_planner_or_engine_module_was_touched():
         src = (root / f"{name}.py").read_text(encoding="utf-8")
         assert "prefs_focus_rank" not in src
         assert "choice_row" not in src
+
+
+# ── Périmètre du script autorisé — Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 ─────
+#
+# L'opérateur a autorisé UN fichier JS d'amélioration progressive. Cette
+# autorisation est étroite : ces gardes fixent ce que le script a le droit de
+# faire, pour que « minimal vanilla JS » ne dérive pas en logique produit.
+
+def _script() -> str:
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    return (root / "app" / "static" / "js" / "prefs_focus_rank.js").read_text(
+        encoding="utf-8")
+
+
+@pytest.mark.parametrize("banned", [
+    "fetch(", "XMLHttpRequest", "WebSocket",
+    "localStorage", "sessionStorage",
+    ".submit(", "requestSubmit",
+    "import ", "require(", "define(",
+])
+def test_the_script_stays_presentation_only(banned):
+    assert banned not in _script()
+
+
+@pytest.mark.parametrize("banned", [
+    "planning_low", "baseline_sets", "budget", "allocator",
+    "planner", "recommendation", "volume",
+])
+def test_the_script_computes_no_planner_or_budget_logic(banned):
+    assert banned not in _script().lower()
+
+
+def test_the_script_invents_no_hidden_default():
+    js = _script()
+    # Aucune cadence ni priorité pré-remplie : l'état initial vient du serveur.
+    assert "sessions_per_week" not in js
+    assert 'value = "3"' not in js
+    assert "|| 3" not in js
+
+
+def test_the_script_only_reads_state_from_the_native_selects():
+    js = _script()
+    assert "currentOrder" in js
+    assert 'select[name="focus_' in js
+    # Pas d'état parallèle persistant.
+    assert "window." not in js
+
+
+def test_the_canonical_js_inventory_is_exactly_three_files():
+    import pathlib
+
+    root = pathlib.Path(__file__).resolve().parent.parent
+    names = sorted(p.name for p in (root / "app" / "static" / "js").glob("*.js"))
+    assert names == ["prefs_focus_rank.js", "preview.js", "session_focus.js"]
+
+
+def test_the_fallback_and_enhanced_paths_post_the_same_payload(client):
+    """Mêmes choix humains ⇒ mêmes octets persistés, JS ou non.
+
+    Le chemin « amélioré » n'a pas de POST propre : il écrit dans les mêmes
+    selects. Ce test le rend vérifiable côté serveur — le seul endroit où la
+    différence compterait.
+    """
+    client.post(PREFERENCES_URL, data={
+        "sessions_per_week": "4", "focus_1": "arms", "focus_2": "lower",
+        "equipment_declared": "1", "equipment": ["barbell"],
+    })
+    fallback = _prefs()
+
+    # Reset, puis rejoue exactement la même intention humaine.
+    client.post(PREFERENCES_URL, data={
+        "sessions_per_week": "4", "focus_1": "arms", "focus_2": "lower",
+        "equipment_declared": "1", "equipment": ["barbell"],
+    })
+    enhanced = _prefs()
+
+    assert fallback.sessions_per_week == enhanced.sessions_per_week
+    assert fallback.focus_priorities == enhanced.focus_priorities
+    assert fallback.available_equipment == enhanced.available_equipment

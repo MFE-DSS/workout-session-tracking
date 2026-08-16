@@ -19,7 +19,7 @@ No business / route / model / migration change; SSR & no-JS preserved.
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -36,7 +36,7 @@ def _home(client) -> str:
 def _seed_history(client):
     from tests.test_recommendation_service import _mk_session
 
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (10, 6, 2):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 

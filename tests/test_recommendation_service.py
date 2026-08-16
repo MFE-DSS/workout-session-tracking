@@ -1,10 +1,9 @@
 """Service tests for the next-session recommendation engine (Sb_12)."""
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from tests.helpers import get_test_user_id
-
 
 # ---------------------------------------------------------------------------
 # Fixture builder — creates a completed session tied to a given template.
@@ -21,6 +20,7 @@ def _mk_session(
 ):
     """Persist a completed WorkoutSession attached to the real template in DB."""
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.catalog import WorkoutTemplate
     from app.models.session import SessionExercise, SetLog, WorkoutSession
@@ -87,7 +87,7 @@ def _call(user_id: int, now: datetime | None = None):
     )
     reset_template_zones_cache()
     with SessionLocal() as db:
-        return recommend_next_session(db, user_id, now or datetime.now(timezone.utc))
+        return recommend_next_session(db, user_id, now or datetime.now(UTC))
 
 
 # ---------------------------------------------------------------------------
@@ -118,7 +118,6 @@ def test_cold_start_phrase_under_140_chars(client):
 
 def test_open_session_returns_none(client):
     """If the user has an in_progress session, recommendation is None."""
-    import re
     r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
     assert r.status_code in {303, 302}
     assert _call(get_test_user_id()) is None
@@ -133,7 +132,7 @@ def test_two_strengths_boost_cardio_alternation(client):
     """Two recent Push sessions → recommendation should lean towards cardio
     or a pull/legs template. Primary check: LISS must appear in the pool
     (top or alternative) with a cardio-alternation phrase."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     # Seed 3 strength sessions to push over cold-start threshold AND build
     # a meaningful recency signal.
     _mk_session(template_slug="push-a", started_at=now - timedelta(days=8))
@@ -156,7 +155,7 @@ def test_two_strengths_boost_cardio_alternation(client):
 
 def test_no_cardio_recently_surfaces_liss_phrase(client):
     """Strength-only history → LISS should appear with its cardio-absent phrase."""
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (15, 10, 5):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 
@@ -174,7 +173,7 @@ def test_no_cardio_recently_surfaces_liss_phrase(client):
 
 
 def test_archived_templates_are_excluded(client):
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (12, 7, 3):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 
@@ -191,7 +190,7 @@ def test_archived_templates_are_excluded(client):
 
 
 def test_phrase_never_empty_and_capped_140_chars(client):
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (10, 5, 2):
         _mk_session(template_slug="push-a", started_at=now - timedelta(days=delta))
 
@@ -208,7 +207,7 @@ def test_phrase_never_empty_and_capped_140_chars(client):
 
 
 def test_result_shape_is_consistent(client):
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (9, 5, 2):
         _mk_session(template_slug="pull-a", started_at=now - timedelta(days=delta))
 
@@ -226,7 +225,7 @@ def test_result_shape_is_consistent(client):
 
 
 def test_alternatives_are_at_most_two(client):
-    now = datetime(2026, 4, 21, 18, 0, tzinfo=timezone.utc)
+    now = datetime(2026, 4, 21, 18, 0, tzinfo=UTC)
     for delta in (10, 6, 3):
         _mk_session(template_slug="legs-a", started_at=now - timedelta(days=delta))
 
@@ -252,12 +251,13 @@ def test_staleness_mapping_monotonic():
 
 def test_template_primary_zones_caches(client):
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.catalog import WorkoutTemplate
     from app.services.recommendation import (
-        template_primary_zones,
-        reset_template_zones_cache,
         _primary_zones_cached,
+        reset_template_zones_cache,
+        template_primary_zones,
     )
 
     reset_template_zones_cache()

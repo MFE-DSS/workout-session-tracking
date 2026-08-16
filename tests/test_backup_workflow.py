@@ -16,18 +16,13 @@ Covers:
 """
 from __future__ import annotations
 
-import io
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
-
-import pytest
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -211,8 +206,9 @@ def test_export_landing_shows_latest_backup_when_present(client, tmp_path, monke
     backup_dir.mkdir()
     # Plant one fake backup
     sample = backup_dir / "sessions-20260408_0330.json"
-    from app.services.export_builder import SCHEMA_VERSION
     import json as _json
+
+    from app.services.export_builder import SCHEMA_VERSION
     sample.write_text(_json.dumps({
         "schema_version": SCHEMA_VERSION, "count": 0, "sessions": [],
     }))

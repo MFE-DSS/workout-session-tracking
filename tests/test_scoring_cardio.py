@@ -5,8 +5,6 @@ Validates the new cardio dispatcher and formula per Sx_06 §2.3.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from types import SimpleNamespace
-
 
 # ---------------------------------------------------------------------------
 # Test fixtures (no DB roundtrip needed)

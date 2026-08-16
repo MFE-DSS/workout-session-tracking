@@ -8,9 +8,10 @@ Validates that:
   rewrite.
 """
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+
+from tests.helpers import get_test_user_id
 
 
 def test_can_log_a_session_with_normalized_feedback(client):
@@ -41,7 +42,7 @@ def test_can_log_a_session_with_normalized_feedback(client):
             template_id=tpl.id,
             template_slug_snapshot=tpl.slug,
             template_name_snapshot=tpl.name, user_id=get_test_user_id(),
-            started_at=datetime(2026, 1, 5, 18, 30, tzinfo=timezone.utc),
+            started_at=datetime(2026, 1, 5, 18, 30, tzinfo=UTC),
             concentration=SessionConcentration.HIGH,
             global_state=SessionGlobalState.GOOD,
             bodyweight_kg=78.5,
@@ -98,13 +99,13 @@ def test_can_log_a_session_with_normalized_feedback(client):
 
 def test_catalog_rewrite_does_not_orphan_history(client):
     """A full catalog wipe must not destroy previously logged sessions."""
+    from datetime import datetime
+
     from sqlalchemy import delete, select
 
     from app.database import SessionLocal
     from app.models.catalog import RepTarget, TemplateExercise, WorkoutTemplate
     from app.models.session import WorkoutSession
-
-    from datetime import datetime, timezone as tz
 
     with SessionLocal() as db:
         tpl = db.execute(
@@ -114,7 +115,7 @@ def test_catalog_rewrite_does_not_orphan_history(client):
             template_id=tpl.id,
             template_slug_snapshot=tpl.slug,
             template_name_snapshot=tpl.name, user_id=get_test_user_id(),
-            started_at=datetime(2026, 2, 14, 9, 0, tzinfo=tz.utc),
+            started_at=datetime(2026, 2, 14, 9, 0, tzinfo=UTC),
         )
         db.add(session)
         db.commit()

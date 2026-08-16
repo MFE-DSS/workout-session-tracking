@@ -306,7 +306,19 @@ def test_no_new_js_file_introduced():
     """Only authorized JS files exist (preview.js + session_focus.js Sb_29.4)."""
     js_dir = ROOT / "app" / "static" / "js"
     existing = {p.name for p in js_dir.glob("*.js")}
-    assert existing <= {"preview.js", "session_focus.js"}, (
+    # Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — inventaire JS versionné.
+    #
+    # Cette assertion prouvait à l'origine que CETTE tranche n'ajoutait
+    # aucun JS. Écrite comme un inventaire exact du répertoire, elle a
+    # transformé une garantie historique de tranche en interdiction
+    # permanente de toute amélioration progressive future — ce n'était
+    # pas le contrat produit visé.
+    #
+    # L'inventaire JS courant de l'application est désormais versionné
+    # explicitement ; `prefs_focus_rank.js` est autorisé par l'opérateur
+    # au titre de AUREN_INTERACTION_REFINEMENT_01. Le caractère EXACT est
+    # conservé : un quatrième fichier JS inattendu fait toujours échouer.
+    assert existing <= {"prefs_focus_rank.js", "preview.js", "session_focus.js"}, (
         f"unexpected JS files in app/static/js/: {existing}"
     )
 

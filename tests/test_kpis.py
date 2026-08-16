@@ -1,8 +1,9 @@
 """Tests for the progress KPI aggregation rules."""
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
+from tests.helpers import get_test_user_id
 
 
 def _mk_session(
@@ -24,7 +25,7 @@ def _mk_session(
         s = WorkoutSession(
             template_slug_snapshot=template_slug,
             template_name_snapshot=template_name, user_id=get_test_user_id(),
-            started_at=started_at or datetime.now(timezone.utc),
+            started_at=started_at or datetime.now(UTC),
             status=status,
         )
         for i, ex in enumerate(exercises or [], start=1):
@@ -159,7 +160,7 @@ def test_sessions_older_than_30_days_excluded(client):
 
     _mk_session(
         status="completed",
-        started_at=datetime.now(timezone.utc) - timedelta(days=45),
+        started_at=datetime.now(UTC) - timedelta(days=45),
         exercises=[
             {
                 "success_score": 100,
@@ -169,7 +170,7 @@ def test_sessions_older_than_30_days_excluded(client):
     )
     _mk_session(
         status="completed",
-        started_at=datetime.now(timezone.utc) - timedelta(days=5),
+        started_at=datetime.now(UTC) - timedelta(days=5),
         exercises=[
             {
                 "success_score": 50,

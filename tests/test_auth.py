@@ -1,9 +1,6 @@
 """Sprint AUTH_01: authentication tests."""
 from __future__ import annotations
 
-from fastapi.testclient import TestClient
-
-
 # ---------------------------------------------------------------------------
 # Password hashing
 # ---------------------------------------------------------------------------
@@ -125,6 +122,7 @@ def test_public_routes_accessible_without_auth(client):
 
 def test_user_exists_in_db(client):
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
 

@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
-
 
 def _make_se(prescribed_machine_slug="chest-press-machine", substituted_name=None):
     """SessionExercise mock minimal."""

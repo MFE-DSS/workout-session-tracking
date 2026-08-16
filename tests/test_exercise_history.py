@@ -1,10 +1,11 @@
 """Sprint 4 integration tests for the exercise history detail page
 and the delta surface on session detail."""
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+
+from tests.helpers import get_test_user_id
 
 
 def _new_session(client, slug: str = "push-a") -> int:
@@ -32,7 +33,7 @@ def _manual_session(
             template_id=None,
             template_slug_snapshot=template_slug,
             template_name_snapshot=template_name, user_id=get_test_user_id(),
-            started_at=started_at or datetime.now(timezone.utc),
+            started_at=started_at or datetime.now(UTC),
             status=status,
         )
         se = SessionExercise(
@@ -76,7 +77,7 @@ def test_exercise_history_handles_unknown_template_slug(client):
 
 
 def test_exercise_history_lists_occurrences_newest_first(client):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     _manual_session(
         template_slug="push-a",
         template_name="Push A",
@@ -121,7 +122,7 @@ def test_exercise_history_cross_template_isolation(client):
 
 
 def test_exercise_history_renders_delta_vs_next_older(client):
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     _manual_session(
         template_slug="push-a",
         template_name="Push A",
@@ -171,6 +172,7 @@ def test_exercise_history_no_delta_on_oldest_row(client):
 
 def test_session_detail_shows_delta_when_prior_exists(client):
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog
 
@@ -181,7 +183,7 @@ def test_session_detail_shows_delta_when_prior_exists(client):
         exercise_code="E2",
         exercise_name="Incline Smith Chest Press",
         work_sets=[{"weight_kg": 60.0, "reps": 8}],
-        started_at=datetime.now(timezone.utc) - timedelta(days=3),
+        started_at=datetime.now(UTC) - timedelta(days=3),
         success_score=80,
     )
     # Current Push A

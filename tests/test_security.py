@@ -1,7 +1,6 @@
 """Security-focused tests added during the SECURITY_REVIEW_01 sprint."""
 from __future__ import annotations
 
-
 # ---------------------------------------------------------------------------
 # Security headers
 # ---------------------------------------------------------------------------

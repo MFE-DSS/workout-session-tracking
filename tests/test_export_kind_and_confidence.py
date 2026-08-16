@@ -2,7 +2,6 @@
 confidence_score, confidence_level."""
 from __future__ import annotations
 
-import json
 import re
 
 

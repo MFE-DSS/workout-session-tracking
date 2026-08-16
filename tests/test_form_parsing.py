@@ -10,7 +10,6 @@ from app.services.form_parsing import (
     to_int,
 )
 
-
 # ---------------------------------------------------------------------------
 # to_float — B01 decimal separator support (point AND comma)
 # ---------------------------------------------------------------------------

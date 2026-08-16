@@ -5,15 +5,15 @@ session tree that the mobile UI can just iterate over and tap-fill.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _get_template(slug: str):
     from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
 
     from app.database import SessionLocal
     from app.models.catalog import TemplateExercise, WorkoutTemplate
-    from sqlalchemy.orm import selectinload
 
     with SessionLocal() as db:
         stmt = (
@@ -34,7 +34,7 @@ def test_builder_prepopulates_warmup_and_work_rows(client):
     db, tpl = _get_template("push-a")
     with db:
         # Push A has 7 exercises (v10: E8 removed for 1h15 budget).
-        session = instantiate_session(db, tpl, datetime(2026, 1, 5, 18, 0, tzinfo=timezone.utc))
+        session = instantiate_session(db, tpl, datetime(2026, 1, 5, 18, 0, tzinfo=UTC))
         db.commit()
         db.refresh(session)
 
@@ -76,7 +76,7 @@ def test_builder_allows_custom_warmup_count(client):
     db, tpl = _get_template("legs-a")
     with db:
         session = instantiate_session(
-            db, tpl, datetime(2026, 2, 14, 9, 0, tzinfo=timezone.utc), warmup_sets=1
+            db, tpl, datetime(2026, 2, 14, 9, 0, tzinfo=UTC), warmup_sets=1
         )
         db.commit()
 
@@ -94,7 +94,7 @@ def test_builder_handles_cardio_template_with_no_exercises(client):
     db, tpl = _get_template("liss-abs")
     with db:
         session = instantiate_session(
-            db, tpl, datetime(2026, 2, 15, 7, 0, tzinfo=timezone.utc)
+            db, tpl, datetime(2026, 2, 15, 7, 0, tzinfo=UTC)
         )
         db.commit()
         db.refresh(session)
@@ -117,7 +117,7 @@ def test_warmup_and_work_sets_can_share_set_index(client):
     db, tpl = _get_template("push-a")
     with db:
         session = instantiate_session(
-            db, tpl, datetime(2026, 1, 6, 18, 0, tzinfo=timezone.utc)
+            db, tpl, datetime(2026, 1, 6, 18, 0, tzinfo=UTC)
         )
         db.commit()
 

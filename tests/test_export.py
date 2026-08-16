@@ -1,9 +1,10 @@
 """Tests for the JSON export endpoint."""
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
-import json
 import re
+from datetime import UTC
+
+from tests.helpers import get_test_user_id
 
 
 def test_export_empty_returns_valid_json_with_zero_sessions(client):
@@ -27,6 +28,7 @@ def test_export_contains_session_exercise_and_set_fields(client):
     sid = int(re.match(r"/sessions/(\d+)", r.headers["location"]).group(1))
 
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog
 
@@ -104,7 +106,7 @@ def test_export_contains_session_exercise_and_set_fields(client):
 
 
 def test_export_is_sorted_oldest_first(client):
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
 
     from app.database import SessionLocal
     from app.models.session import WorkoutSession
@@ -115,7 +117,7 @@ def test_export_is_sorted_oldest_first(client):
                 WorkoutSession(
                     template_slug_snapshot="push-a",
                     template_name_snapshot=name, user_id=get_test_user_id(),
-                    started_at=datetime.now(timezone.utc) - timedelta(days=days_ago),
+                    started_at=datetime.now(UTC) - timedelta(days=days_ago),
                     status="completed",
                 )
             )

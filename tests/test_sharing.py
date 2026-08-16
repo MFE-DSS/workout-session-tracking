@@ -1,7 +1,7 @@
 """Tests for app.services.sharing — recommendations, session sharing, activity feed."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 
@@ -14,13 +14,13 @@ def _get_db():
 
 
 def _add_session(db, user_id):
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
 
     s = WorkoutSession(
         user_id=user_id,
         template_slug_snapshot="push-a",
         template_name_snapshot="Push A",
-        started_at=datetime.now(timezone.utc),
+        started_at=datetime.now(UTC),
         status="completed",
         concentration="high",
         global_state="good",

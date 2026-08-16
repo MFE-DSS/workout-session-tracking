@@ -1,9 +1,10 @@
 """Sprint 8: session management, quality score, timelines."""
 from __future__ import annotations
-from tests.helpers import get_test_user_id
 
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime
+
+from tests.helpers import get_test_user_id
 
 
 def _start(client, slug: str = "push-a") -> int:
@@ -20,6 +21,7 @@ def _complete(client, sid: int) -> None:
 
 def _fill_e2_and_complete(client, sid: int) -> None:
     from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog
 
@@ -53,12 +55,12 @@ def _fill_e2_and_complete(client, sid: int) -> None:
 
 def test_quality_score_perfect_session(client):
     """All work done, all scored 100, high concentration, good state → 100."""
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
     from app.services.quality_score import compute_session_quality
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
 
     s = WorkoutSession(
         template_slug_snapshot="x", template_name_snapshot="X", user_id=get_test_user_id(),
-        started_at=datetime.now(timezone.utc), status="completed",
+        started_at=datetime.now(UTC), status="completed",
         concentration="high", global_state="good",
     )
     se = SessionExercise(
@@ -75,12 +77,12 @@ def test_quality_score_perfect_session(client):
 
 
 def test_quality_score_zero_when_nothing_filled(client):
-    from app.services.quality_score import compute_session_quality
     from app.models.session import WorkoutSession
+    from app.services.quality_score import compute_session_quality
 
     s = WorkoutSession(
         template_slug_snapshot="x", template_name_snapshot="X", user_id=get_test_user_id(),
-        started_at=datetime.now(timezone.utc), status="completed",
+        started_at=datetime.now(UTC), status="completed",
     )
     s.session_exercises = []
     assert compute_session_quality(s) == 0
@@ -88,12 +90,12 @@ def test_quality_score_zero_when_nothing_filled(client):
 
 def test_quality_score_partial(client):
     """1/2 work done (20pts), score 80 (32pts), medium (6), flat (6) → 64."""
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
     from app.services.quality_score import compute_session_quality
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
 
     s = WorkoutSession(
         template_slug_snapshot="x", template_name_snapshot="X", user_id=get_test_user_id(),
-        started_at=datetime.now(timezone.utc), status="completed",
+        started_at=datetime.now(UTC), status="completed",
         concentration="medium", global_state="flat",
     )
     se = SessionExercise(

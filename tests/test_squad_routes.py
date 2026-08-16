@@ -3,9 +3,6 @@ from __future__ import annotations
 
 import re
 
-from tests.helpers import get_test_user_id
-
-
 # ---------------------------------------------------------------------------
 # 1. List renders
 # ---------------------------------------------------------------------------

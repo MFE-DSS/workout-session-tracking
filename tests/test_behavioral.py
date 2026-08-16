@@ -1,15 +1,14 @@
 """Tests for behavioral engine scoring logic."""
 from __future__ import annotations
 
-
 from app.services.behavioral import (
     BehavioralState,
-    compute_session_fatigue,
-    compute_weighted_fatigue,
     compute_consistency,
     compute_readiness,
-    compute_trend,
     compute_recommendation,
+    compute_session_fatigue,
+    compute_trend,
+    compute_weighted_fatigue,
 )
 
 
@@ -153,7 +152,8 @@ def test_behavioral_state_dataclass():
     assert state.streak_days == 3
 
 
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
+
 from tests.helpers import get_test_user_id
 
 
@@ -161,14 +161,14 @@ def _add_completed_session(user_id, *, concentration="high", global_state="good"
                            success_score=100, n_work=2, n_done=2, started_at=None):
     """Insert a completed session with controlled inputs."""
     from app.database import SessionLocal
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
 
     with SessionLocal() as db:
         s = WorkoutSession(
             user_id=user_id,
             template_slug_snapshot="push-a",
             template_name_snapshot="Push A",
-            started_at=started_at or datetime.now(timezone.utc),
+            started_at=started_at or datetime.now(UTC),
             status="completed",
             concentration=concentration,
             global_state=global_state,
@@ -213,7 +213,7 @@ def test_compute_behavioral_state_with_sessions(client):
     from app.services.behavioral import compute_behavioral_state
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     for i in range(3):
         _add_completed_session(
@@ -236,7 +236,7 @@ def test_compute_behavioral_state_streak_breaks(client):
     from app.services.behavioral import compute_behavioral_state
 
     uid = get_test_user_id()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     _add_completed_session(uid, started_at=now)
     _add_completed_session(uid, started_at=now - timedelta(days=1))

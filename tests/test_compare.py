@@ -1,7 +1,7 @@
 """Tests for app.services.compare — head-to-head comparison."""
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from tests.helpers import get_test_user_id
 
@@ -12,9 +12,10 @@ def _get_db():
 
 
 def _create_second_user(db, username="comparee"):
+    from sqlalchemy import select
+
     from app.models.user import User
     from app.services.auth import hash_password
-    from sqlalchemy import select
 
     existing = db.execute(
         select(User).where(User.username == username)
@@ -30,13 +31,13 @@ def _create_second_user(db, username="comparee"):
 
 
 def _add_session(db, user_id):
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
 
     s = WorkoutSession(
         user_id=user_id,
         template_slug_snapshot="push-a",
         template_name_snapshot="Push A",
-        started_at=datetime.now(timezone.utc),
+        started_at=datetime.now(UTC),
         status="completed",
         concentration="high",
         global_state="good",

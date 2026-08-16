@@ -2,8 +2,6 @@
 from __future__ import annotations
 
 from app.services.providers import (
-    ActivitySummary,
-    BodyMetrics,
     ManualProvider,
     ProviderRegistry,
 )
@@ -16,9 +14,10 @@ def test_manual_provider_supports_body_metrics():
 
 def test_manual_provider_get_body_metrics(client):
     """ManualProvider reads physical fields from User model."""
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from sqlalchemy import select
 
     with SessionLocal() as db:
         user = db.execute(select(User).where(User.username == "testuser")).scalar_one()

@@ -11,7 +11,6 @@ import os
 import re
 import subprocess
 import sys
-from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -96,7 +95,8 @@ def test_restore_succeeds_on_valid_payload(client):
 
         # Post-restore data access: prove it's exploitable
         from sqlalchemy import select
-        from app.models.session import WorkoutSession, SessionExercise, SetLog
+
+        from app.models.session import SessionExercise, SetLog, WorkoutSession
 
         sessions = db.execute(select(WorkoutSession)).scalars().all()
         assert len(sessions) == 2
@@ -191,12 +191,12 @@ def test_export_then_restore_round_trip(client):
     """The ultimate proof: create sessions via the app, export them,
     wipe the DB, restore from the export, and verify that the
     restored data is identical to the original."""
-    import re
+    from sqlalchemy import delete, select
+
     from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog, WorkoutSession
     from app.services.export_builder import build_json_payload
     from app.services.restore import restore_from_json_payload
-    from sqlalchemy import delete, select
-    from app.models.session import WorkoutSession, SessionExercise, SetLog
 
     # 1. Create a session via the normal app flow
     r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)

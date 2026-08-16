@@ -9,10 +9,6 @@ Hard contracts validated:
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-
-import pytest
-
 
 def _hit(client, path):
     """Helper to GET a page so we know it returns 200 (auth wiring)."""
@@ -27,11 +23,12 @@ def _hit(client, path):
 
 def test_streak_zero_for_user_without_sessions(client):
     """A freshly created user with 0 sessions has streak 0."""
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.auth import hash_password
     from app.services.profile_metrics import streak_days
-    from sqlalchemy import select
 
     with SessionLocal() as db:
         # The fixture user already has the testuser account; create a
@@ -45,10 +42,11 @@ def test_streak_zero_for_user_without_sessions(client):
 
 def test_streak_counts_recent_session(client):
     """Logging a session today should produce streak >= 1."""
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.profile_metrics import streak_days
-    from sqlalchemy import select
 
     r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
     assert r.status_code == 303
@@ -64,10 +62,11 @@ def test_streak_counts_recent_session(client):
 
 
 def test_cardio_zero_when_no_cardio_session(client):
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.profile_metrics import cardio_minutes_per_week
-    from sqlalchemy import select
     with SessionLocal() as db:
         uid = db.execute(select(User.id).where(User.username == "testuser")).scalar_one()
         assert cardio_minutes_per_week(db, uid) == 0
@@ -80,10 +79,11 @@ def test_cardio_zero_when_no_cardio_session(client):
 
 def test_volume_delta_none_without_baseline(client):
     """No prior-window sessions → None (no baseline to compare)."""
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.profile_metrics import strength_volume_delta_pct
-    from sqlalchemy import select
     with SessionLocal() as db:
         uid = db.execute(select(User.id).where(User.username == "testuser")).scalar_one()
         # No completed work sets in this test DB → returns None
@@ -96,11 +96,12 @@ def test_volume_delta_none_without_baseline(client):
 
 
 def test_zone_returns_none_for_empty_window(client):
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from app.services.profile_metrics import top_zone, neglected_zone
     from app.services.auth import hash_password
-    from sqlalchemy import select
+    from app.services.profile_metrics import neglected_zone, top_zone
     with SessionLocal() as db:
         db.add(User(username="zone_no_data",
                     password_hash=hash_password("anything1"), is_active=True))
@@ -120,10 +121,11 @@ def test_zone_returns_none_for_empty_window(client):
 
 
 def test_build_preview_payload_structure(client):
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from app.services.profile_metrics import build_preview, PreviewPayload
-    from sqlalchemy import select
+    from app.services.profile_metrics import PreviewPayload, build_preview
     with SessionLocal() as db:
         uid = db.execute(select(User.id).where(User.username == "testuser")).scalar_one()
         p = build_preview(db, uid, sessions_30d=0)
@@ -134,10 +136,11 @@ def test_build_preview_payload_structure(client):
 
 
 def test_build_page_payload_structure(client):
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.user import User
-    from app.services.profile_metrics import build_page, PagePayload
-    from sqlalchemy import select
+    from app.services.profile_metrics import PagePayload, build_page
     with SessionLocal() as db:
         uid = db.execute(select(User.id).where(User.username == "testuser")).scalar_one()
         p = build_page(db, uid, sessions_30d=0)

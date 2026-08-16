@@ -1,5 +1,6 @@
 """Tests for exercise substitution service."""
 from __future__ import annotations
+
 from unittest.mock import MagicMock
 
 
@@ -75,9 +76,10 @@ def test_substitution_select_appears_for_new_session(client):
 
 def test_substitution_persists_after_save(client):
     """Submitting substituted_name stores it."""
+    from sqlalchemy import select
+
     from app.database import SessionLocal
     from app.models.session import SessionExercise
-    from sqlalchemy import select
 
     r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
     sid = int(r.headers["location"].split("/")[-1])

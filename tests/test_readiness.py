@@ -7,7 +7,6 @@ import pytest
 
 from tests.helpers import get_test_user_id
 
-
 # ---------------------------------------------------------------------------
 # Model basics
 # ---------------------------------------------------------------------------
@@ -35,7 +34,7 @@ def test_readiness_model_fields(client):
 def test_save_and_get_today(client):
     """save_readiness persists an entry retrievable via get_today_readiness."""
     from app.database import SessionLocal
-    from app.services.readiness import save_readiness, get_today_readiness
+    from app.services.readiness import get_today_readiness, save_readiness
 
     uid = get_test_user_id()
     data = {
@@ -80,7 +79,7 @@ def test_save_without_optional_fields(client):
 def test_upsert_same_day(client):
     """Second save on same day updates, does not duplicate."""
     from app.database import SessionLocal
-    from app.services.readiness import save_readiness, get_today_readiness
+    from app.services.readiness import save_readiness
 
     uid = get_test_user_id()
     base = {
@@ -98,7 +97,8 @@ def test_upsert_same_day(client):
         assert second.note == "Updated"
 
         # Confirm only one row
-        from sqlalchemy import select, func
+        from sqlalchemy import func, select
+
         from app.models.readiness import ReadinessEntry
 
         count = db.execute(
