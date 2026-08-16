@@ -37,7 +37,24 @@ import sys
 #: command cannot disagree about what "the suite" means.
 EXCLUDED = {"test_v1_acceptance.py"}
 
-DEFAULT_SHARDS = 2
+#: **Source unique et versionnée du nombre de shards.**
+#:
+#: Sb_OPS_CI_SCALE_02 — 2 → 3. Le nombre vivait auparavant à *trois* endroits
+#: (matrice du workflow, ce constant, et le `-ne 2` de l'agrégateur de
+#: couverture) : trois copies qu'aucune machine ne comparait. Une seule pouvait
+#: bouger et la CI serait restée verte en publiant une couverture partielle.
+#:
+#: Désormais l'agrégateur **dérive** ce nombre (`--shard-count`) au lieu de le
+#: répéter, et un test structurel compare la matrice YAML à cette constante.
+#: Il reste donc une seule valeur à changer, et une seule copie — la matrice —
+#: que le YAML ne peut pas calculer, mais qu'un test refuse de laisser diverger.
+#:
+#: Motif du passage à 3 : le shard B est descendu à **3 701 Mo** de
+#: MemAvailable (plancher `HEALTHY` = 4 Go), après 5 065 → 4 772 → 4 380 →
+#: 3 701 sur quatre tranches. Le goulet est la mémoire par machine, pas la
+#: correction ni la couverture : moins de tests par machine, mêmes tests au
+#: total.
+DEFAULT_SHARDS = 3
 
 
 def repo_root() -> pathlib.Path:
@@ -109,7 +126,17 @@ def main() -> int:
     parser.add_argument("--shard", type=int, help="1-based shard index to print")
     parser.add_argument("--count", type=int, default=DEFAULT_SHARDS)
     parser.add_argument("--verify", action="store_true")
+    # Laisse la CI DÉRIVER le nombre de shards au lieu de le répéter. C'est ce
+    # qui supprime la troisième copie du chiffre (l'assertion de couverture).
+    parser.add_argument(
+        "--shard-count", action="store_true",
+        help="print the canonical shard count and exit",
+    )
     args = parser.parse_args()
+
+    if args.shard_count:
+        print(DEFAULT_SHARDS)
+        return 0
 
     verify(args.count)
     if args.verify:
