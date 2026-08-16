@@ -24,6 +24,15 @@ import pytest
 # run. The neighbouring measurement tests already do this.
 
 
+# Named once rather than repeated: Sonar's S1192 fires at three duplications
+# of a literal, and a single MAJOR (weight 15) breaks the new-code gate
+# (threshold 14) on its own.
+MEASUREMENTS_URL = "/profile/measurements"
+MEASURE_ERROR_URL = "/profile?measure_error=1"
+WINGSPAN = "wingspan_cm"
+MEASURED_AT = "measured_at"
+
+
 @pytest.fixture(autouse=True)
 def _app_db(client):
     """Bind every test here to the fixture-owned database and test user."""
@@ -94,8 +103,8 @@ def test_the_route_writes_through_the_canonical_service(client, monkeypatch):
 
     monkeypatch.setattr(bp, "create_measurement", _spy)
 
-    client.post("/profile/measurements", data={
-        "measured_at": "2026-04-12", "chest_cm": "100",
+    client.post(MEASUREMENTS_URL, data={
+        MEASURED_AT: "2026-04-12", "chest_cm": "100",
     }, follow_redirects=False)
 
     assert seen["cleaned"] == {"chest_cm": 100.0}
@@ -113,7 +122,7 @@ def test_the_route_no_longer_writes_the_legacy_calf_column(client):
     `BODY_MEASUREMENT_FIELDS` left the whole file green, which is how the dead
     guard surfaced.
     """
-    client.post("/profile/measurements", data={
+    client.post(MEASUREMENTS_URL, data={
         "calf_cm_left": "38", "calf_cm_right": "38.5", "calf_cm": "37",
     }, follow_redirects=False)
 
@@ -140,11 +149,11 @@ def test_an_out_of_range_value_is_rejected_instead_of_silently_dropped(client):
     with _session() as db:
         before = len(_rows(db, _uid()))
 
-    r = client.post("/profile/measurements", data={
+    r = client.post(MEASUREMENTS_URL, data={
         "chest_cm": "1750",
     }, follow_redirects=False)
 
-    assert r.headers["location"] == "/profile?measure_error=1"
+    assert r.headers["location"] == MEASURE_ERROR_URL
     with _session() as db:
         assert len(_rows(db, _uid())) == before
 
@@ -155,7 +164,7 @@ def test_history_written_by_the_old_upsert_path_is_left_alone(client):
         legacy = _add(db, _uid(), days_ago=400, chest_cm=90.0, calf_cm=36.0)
         legacy_id = legacy.id
 
-    client.post("/profile/measurements", data={"chest_cm": "101"},
+    client.post(MEASUREMENTS_URL, data={"chest_cm": "101"},
                 follow_redirects=False)
 
     with _session() as db:
@@ -170,7 +179,7 @@ def test_history_written_by_the_old_upsert_path_is_left_alone(client):
 
 
 def test_a_valid_wingspan_is_accepted(client):
-    client.post("/profile/measurements", data={"wingspan_cm": "182.5"},
+    client.post(MEASUREMENTS_URL, data={WINGSPAN: "182.5"},
                 follow_redirects=False)
     with _session() as db:
         assert _rows(db, _uid())[-1].wingspan_cm == 182.5
@@ -178,9 +187,9 @@ def test_a_valid_wingspan_is_accepted(client):
 
 @pytest.mark.parametrize("bad", ["119", "231", "abc"])
 def test_an_implausible_wingspan_is_rejected(client, bad):
-    r = client.post("/profile/measurements", data={"wingspan_cm": bad},
+    r = client.post(MEASUREMENTS_URL, data={WINGSPAN: bad},
                     follow_redirects=False)
-    assert r.headers["location"] == "/profile?measure_error=1"
+    assert r.headers["location"] == MEASURE_ERROR_URL
 
 
 def test_a_missing_wingspan_stays_missing(client):
@@ -189,7 +198,7 @@ def test_a_missing_wingspan_stays_missing(client):
 
     with _session() as db:
         _set_height(db, _uid(), 180)
-    client.post("/profile/measurements", data={"chest_cm": "100"},
+    client.post(MEASUREMENTS_URL, data={"chest_cm": "100"},
                 follow_redirects=False)
     with _session() as db:
         assert _rows(db, _uid())[-1].wingspan_cm is None
@@ -527,7 +536,7 @@ def _capture_form(client) -> str:
     page = client.get("/profile").text
     # `url_for` renders an absolute URL (http://testserver/...), so anchor on
     # the path's tail rather than on `action="/profile/measurements"`.
-    start = page.index('/profile/measurements"')
+    start = page.index(MEASUREMENTS_URL + '"')
     return page[start:page.index("</form>", start)].lower()
 
 
@@ -556,7 +565,7 @@ def test_the_form_tells_the_user_to_measure_rather_than_estimate(client):
 
 def test_the_wingspan_field_states_one_consistent_protocol(client):
     form = _capture_form(client)
-    assert "wingspan_cm" in form
+    assert WINGSPAN in form
     assert "majeur" in form          # fingertip-to-fingertip, named concretely
     assert "même protocole" in form
 
