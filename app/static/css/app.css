@@ -1016,7 +1016,15 @@ input, button, textarea, select {
 }
 
 .segmented__option { flex: 1; text-align: center; }
-.segmented__option input { display: none; }
+/* Sb_UI_SESSION_CHOICES_DISCLOSURES_01 — la règle `display: none` qui vivait
+ * ici retirait le radio natif de la navigation clavier et de l'arbre
+ * d'accessibilité, sur les CINQ surfaces qui utilisent `.segmented`
+ * (échelle de disponibilité, concentration, énergie, sensation musculaire,
+ * et les alternatives d'exercice en séance).
+ *
+ * Le masquage accessible est désormais porté par la déclaration UNIQUE de
+ * `interaction.css` (`.a11y-input, .segmented__option input`) : une seule
+ * implémentation, pas deux. */
 
 .segmented__option span {
   display: block;
