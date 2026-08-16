@@ -46,6 +46,36 @@
   </section>
 {% endif %}
 
+{# Sb_ORCHESTRATOR_EXPLAINER_01 — lecture seule. Chaque explication porte son
+   étiquette de source EN CLAIR, jamais le jeton d'énumération : « tu l'as
+   demandé » et « le produit planifie ainsi » ne sont pas le même genre
+   d'énoncé, et les fondre détruirait la distinction. La morphologie est
+   absente par construction — le planificateur ne la consomme pas. #}
+{% if plan_explanation %}
+  <section class="card" style="margin-bottom:1.5rem;" aria-labelledby="why-plan-title">
+    <h2 id="why-plan-title" style="margin-top:0;">Pourquoi ce plan ?</h2>
+    {% if plan_explanation.available %}
+      <ul style="margin:.25rem 0 .75rem 1.25rem;">
+        {% for item in plan_explanation.items %}
+          <li style="margin-bottom:.4rem;">
+            {{ item.text }}
+            <span class="text-dim" style="display:block; font-size:.9em;">
+              {{ item.source_label }}{% if item.detail %} — {{ item.detail }}{% endif %}{% if item.confidence_label %} ({{ item.confidence_label }}){% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ul>
+      <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
+        {{ plan_explanation.notice }}
+      </p>
+    {% else %}
+      <p class="text-dim" style="margin:.25rem 0;">
+        {{ plan_explanation.unavailable_notice }}
+      </p>
+    {% endif %}
+  </section>
+{% endif %}
+
 {% if programs|length == 0 %}
   <p class="text-dim">Tu n'as pas encore de programme personnel. Crée ton premier programme pour commencer.</p>
 {% else %}

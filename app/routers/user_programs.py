@@ -428,8 +428,30 @@ def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
             "programs": programs,
             "active_session": latest_open_session(db, user.id),
             "weekly_plan_proposal": _weekly_plan_proposal(db, user.id),
+            # Sb_ORCHESTRATOR_EXPLAINER_01 — lecture seule, jamais bloquante.
+            "plan_explanation": _plan_explanation(db, user.id),
         },
     )
+
+
+def _plan_explanation(db, user_id: int):
+    """« Pourquoi ce plan ? » — l'explication ne peut pas casser la page.
+
+    `build_plan_explanation` avale déjà ses erreurs, mais la même leçon que
+    pour le collecteur s'applique : une garantie qui dépend de la discipline
+    interne de l'appelé n'en est pas une. `/programs` doit s'afficher même si
+    la couche d'explication est entièrement cassée.
+    """
+    from app.services.orchestrator_explainer import (
+        PlanExplanation,
+        build_plan_explanation,
+    )
+
+    try:
+        return build_plan_explanation(db, user_id)
+    except Exception:  # noqa: BLE001
+        logger.exception("plan explanation failed; /programs stays usable")
+        return PlanExplanation(items=(), available=False)
 
 
 @router.post(
