@@ -189,8 +189,32 @@ def _pick_template(db, preferred_slug: str = DEFAULT_TEMPLATE_SLUG):
     return any_tpl
 
 
+def _has_logged_work(db, session_id: int) -> bool:
+    """True si une série de travail est déjà validée dans cette séance."""
+    from sqlalchemy import select
+
+    from app.models.session import SessionExercise, SetLog
+
+    row = db.execute(
+        select(SetLog.id)
+        .join(SessionExercise, SetLog.session_exercise_id == SessionExercise.id)
+        .where(SessionExercise.session_id == session_id)
+        .where(SetLog.kind == "work")
+        .where(SetLog.completed.is_(True))
+        .limit(1)
+    ).scalar_one_or_none()
+    return row is not None
+
+
 def _ensure_active_session(db, user_id: int) -> tuple[int, bool]:
-    """Ensure the user has ≥ 1 session with status='in_progress'.
+    """Séance `in_progress` SANS aucune série de travail validée.
+
+    Sb_UIV2_SESSION_FOCUS_02 — deux états authentiques valent mieux qu'un
+    seul état impossible. `can_substitute()` renvoie False dès qu'une série
+    de travail est validée : une séance déjà entamée ne peut donc PAS servir
+    à photographier les alternatives. Cette séance-ci reste vierge et sert
+    aux scénarios de substitution ; la séance `focus` porte l'état
+    « série de travail courante ». On ne touche pas à `can_substitute()`.
 
     Returns (session_id, created).
     """
@@ -198,15 +222,15 @@ def _ensure_active_session(db, user_id: int) -> tuple[int, bool]:
 
     from app.models.session import WorkoutSession
 
-    existing = db.execute(
+    candidates = db.execute(
         select(WorkoutSession)
         .where(WorkoutSession.user_id == user_id)
         .where(WorkoutSession.status == "in_progress")
-        .order_by(WorkoutSession.id.desc())
-        .limit(1)
-    ).scalar_one_or_none()
-    if existing is not None:
-        return int(existing.id), False
+        .order_by(WorkoutSession.id.asc())
+    ).scalars().all()
+    for candidate in candidates:
+        if not _has_logged_work(db, int(candidate.id)):
+            return int(candidate.id), False
 
     from app.services.session_builder import instantiate_session
 
@@ -274,6 +298,42 @@ def _advance_to_work_set(db, session_id: int, *, work_done: int = 1) -> int:
             work_marked += 1
             touched += 1
     return touched
+
+
+def _ensure_focus_session(db, user_id: int) -> tuple[int, bool]:
+    """Séance `in_progress` AVEC échauffement fait et une série de travail.
+
+    C'est l'état « série de travail courante » : la suivante est la série
+    active, celles d'après sont à venir. Un seul état honnête couvre donc
+    « terminée / courante / à venir » sans rien simuler.
+    """
+    from sqlalchemy import select
+
+    from app.models.session import WorkoutSession
+
+    candidates = db.execute(
+        select(WorkoutSession)
+        .where(WorkoutSession.user_id == user_id)
+        .where(WorkoutSession.status == "in_progress")
+        .order_by(WorkoutSession.id.asc())
+    ).scalars().all()
+    for candidate in candidates:
+        if _has_logged_work(db, int(candidate.id)):
+            return int(candidate.id), False
+
+    from app.services.session_builder import instantiate_session
+
+    template = _pick_template(db)
+    session = instantiate_session(
+        db,
+        template=template,
+        started_at=datetime.now(timezone.utc),
+        user_id=user_id,
+    )
+    db.add(session)
+    db.flush()
+    _advance_to_work_set(db, int(session.id))
+    return int(session.id), True
 
 
 def _ensure_done_session(db, user_id: int) -> tuple[int, bool]:
@@ -416,7 +476,7 @@ def _cmd_prepare(args: argparse.Namespace) -> int:
             user_id, user_created = _ensure_user(db, BASELINE_USERNAME)
             active_id, active_created = _ensure_active_session(db, user_id)
             done_id, done_created = _ensure_done_session(db, user_id)
-            advanced = _advance_to_work_set(db, active_id)
+            focus_id, focus_created = _ensure_focus_session(db, user_id)
             db.commit()
         except Exception:
             db.rollback()
@@ -436,6 +496,9 @@ def _cmd_prepare(args: argparse.Namespace) -> int:
         "sessions": {
             "active": {"id": active_id, "created": active_created},
             "done": {"id": done_id, "created": done_created},
+            # État « série de travail courante ». Distinct de `active`, qui
+            # reste vierge pour que la substitution existe réellement.
+            "focus": {"id": focus_id, "created": focus_created},
         },
         "state_file": str(state_path),
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -450,7 +513,8 @@ def _cmd_prepare(args: argparse.Namespace) -> int:
     print("\nRuntime prepared (no secrets logged):")
     print(f"  user             : id={user_id} (created={user_created})")
     print(f"  active_session_id: {active_id} (created={active_created})")
-    print(f"  work-set state   : {advanced} set row(s) marked done on exo 1")
+    print(f"  focus_session_id : {focus_id} (created={focus_created}) "
+          "— warm-ups done + 1 work set, current-set state")
     print(f"  done_session_id  : {done_id} (created={done_created})")
     print(f"  state_file       : {state_path}")
     print(f"  runtime_file     : {runtime_path}")

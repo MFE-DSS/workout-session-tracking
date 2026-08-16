@@ -82,6 +82,37 @@ class Action:
 CAPTURE_MODES: frozenset[str] = frozenset({"full_page", "viewport"})
 
 
+#: Écart minimal exigé entre une cible et l'obstacle qui pourrait la masquer.
+#: Un token d'espacement, pas un nombre choisi pour faire passer une mesure.
+DEFAULT_UNOBSCURED_GAP_PX = 8
+
+
+@dataclass(frozen=True)
+class UnobscuredExpectation:
+    """« `target` doit être entièrement dégagé au-dessus de `obstacle`. »
+
+    Sb_UIV2_SESSION_FOCUS_02 — `expect_in_viewport` ne suffit pas quand une
+    surface `sticky` flotte au-dessus du contenu. Mesuré sur cet écran : la
+    série courante commençait à 577 px dans un viewport de 640, donc
+    « dans le viewport » ; mais le CTA sticky commence à 571 px, si bien que
+    la ligne et ses deux champs étaient **derrière** lui. La porte disait
+    PASS et l'utilisateur ne pouvait rien saisir.
+
+    L'espace utilisable s'arrête donc au HAUT de l'obstacle, pas au bas du
+    viewport — et c'est cette géométrie-là qu'il faut affirmer.
+    """
+
+    target: str
+    obstacle: str
+    min_gap_px: int = DEFAULT_UNOBSCURED_GAP_PX
+
+    def __post_init__(self) -> None:
+        if not self.target or not self.obstacle:
+            raise ValueError("target and obstacle selectors are both required")
+        if self.min_gap_px < 0:
+            raise ValueError("min_gap_px must be >= 0")
+
+
 @dataclass(frozen=True)
 class BaselineEntry:
     """Une entrée de la matrice baseline.
@@ -109,6 +140,10 @@ class BaselineEntry:
     #: ligne de flottaison » : `expect_visible` accepte un élément situé six
     #: écrans plus bas, donc il ne prouve rien sur la hiérarchie.
     expect_in_viewport: tuple[str, ...] = ()
+    #: Cibles qui doivent être ENTIÈREMENT dégagées au-dessus d'un obstacle
+    #: flottant. Intersecter le viewport ne suffit pas : un élément peut y
+    #: être et rester masqué par une surface `sticky`.
+    expect_unobscured: tuple[UnobscuredExpectation, ...] = ()
 
     def __post_init__(self) -> None:
         if self.capture_mode not in CAPTURE_MODES:
@@ -120,6 +155,11 @@ class BaselineEntry:
                 "expect_in_viewport is only meaningful with "
                 "capture_mode='viewport' — asserting the fold on a full-page "
                 "capture would be a claim the artifact cannot support")
+        if self.expect_unobscured and self.capture_mode != "viewport":
+            raise ValueError(
+                "expect_unobscured is only meaningful with "
+                "capture_mode='viewport' — a full-page capture repaints "
+                "sticky chrome at a position nobody ever sees")
 
 
 # Matrice P0 obligatoire (14 screenshots min V1, 16 acceptable si split home).
@@ -322,7 +362,43 @@ _P2_ENTRIES: tuple[BaselineEntry, ...] = (
 # Les sélecteurs viennent du balisage livré : `.substitute-picker` est le
 # `<details>` des alternatives, `.segmented--stacked` la liste de choix rendue
 # une fois ouverte (cf. `_partials/exercise_card.html`).
+#: Sélecteurs de la région de série courante et de son obstacle flottant.
+_CURRENT_SET_ROW = ".session-focus__console-row--active"
+_EXERCISE_CTA = ".session-focus__sticky-cta"
+_FOCUS_ROUTE = "/sessions/${AUREN_BASELINE_FOCUS_SESSION_ID}"
+_FIXTURE_WORK_SET_CURRENT = "db.user.with_current_work_set"
+
 _UIV2_GOLDEN_ENTRIES: tuple[BaselineEntry, ...] = (
+    BaselineEntry(
+        slug="uiv2-session-current-work-set",
+        route=_FOCUS_ROUTE,
+        priority="P1",
+        auth_required=True,
+        state="current-work-set-warmups-done",
+        data_fixture=_FIXTURE_WORK_SET_CURRENT,
+        capture_mode="viewport",
+        expect_visible=_CURRENT_SET_ROW,
+        expect_in_viewport=(
+            ".exercise-card[open] .exercise-card__name",
+            ".session-focus__target-compact",
+            _CURRENT_SET_ROW,
+            _EXERCISE_CTA,
+        ),
+        expect_unobscured=(
+            UnobscuredExpectation(
+                target=_CURRENT_SET_ROW,
+                obstacle=_EXERCISE_CTA,
+            ),
+        ),
+        notes=(
+            "PORTE D'ACCEPTATION UIV2. La série de travail courante et ses "
+            "deux champs doivent être entièrement dégagés au-dessus du CTA "
+            "sticky, sans défilement. L'échauffement est TERMINÉ dans ce "
+            "fixture : une capture affirmant « série de travail courante » "
+            "avec un échauffement en attente montrerait un état que le "
+            "produit ne considère pas courant."
+        ),
+    ),
     BaselineEntry(
         slug="uiv2-session-alternatives-closed",
         route="/sessions/${AUREN_BASELINE_ACTIVE_SESSION_ID}",
@@ -439,6 +515,8 @@ REQUIRED_ENV_VARS_FOR_DONE_SESSION: tuple[str, ...] = (
 
 OPTIONAL_ENV_VARS: tuple[str, ...] = (
     "AUREN_BASELINE_TEMPLATE_SLUG",
+    # Séance « série de travail courante », distincte de la séance vierge.
+    "AUREN_BASELINE_FOCUS_SESSION_ID",
 )
 
 

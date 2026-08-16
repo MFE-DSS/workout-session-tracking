@@ -171,6 +171,9 @@ def _resolve_route(
             "AUREN_BASELINE_DONE_SESSION_ID": (
                 sessions.get("done", {}).get("id")
             ),
+            "AUREN_BASELINE_FOCUS_SESSION_ID": (
+                sessions.get("focus", {}).get("id")
+            ),
         }
         for name, value in runtime_map.items():
             placeholder = f"${{{name}}}"
@@ -315,6 +318,58 @@ def assert_in_viewport(page, entry, *, timeout: int = 5000) -> None:
         if top + box["height"] <= 0:
             raise AssertionError(
                 f"{entry.slug}: {selector!r} sits entirely above the viewport")
+
+    assert_unobscured(page, entry, timeout=timeout)
+
+
+def assert_unobscured(page, entry, *, timeout: int = 5000) -> None:
+    """Vérifie qu'une cible est entièrement dégagée au-dessus d'un obstacle.
+
+    Sb_UIV2_SESSION_FOCUS_02 — cette porte existe à cause d'un faux vert
+    observé, pas d'un risque théorique : la série courante commençait à
+    577 px dans un viewport de 640, donc « dans le viewport », alors que le
+    CTA `sticky` commence à 571 px. La ligne et ses deux champs étaient
+    derrière lui. L'espace réellement utilisable s'arrête au HAUT de
+    l'obstacle.
+
+    Géométrie Playwright réelle, aucun `page.evaluate` pour fabriquer l'état,
+    aucun `scroll_into_view_if_needed` — la position de l'obstacle est lue
+    telle qu'elle est rendue.
+    """
+    expectations = getattr(entry, "expect_unobscured", ())
+    if not expectations:
+        return
+
+    size = page.viewport_size
+    if size is None:  # pragma: no cover - contexte toujours dimensionné ici
+        raise RuntimeError("viewport size unavailable")
+
+    for want in expectations:
+        target = page.locator(want.target).first
+        obstacle = page.locator(want.obstacle).first
+        target.wait_for(state="visible", timeout=timeout)
+        obstacle.wait_for(state="visible", timeout=timeout)
+
+        t_box = target.bounding_box()
+        o_box = obstacle.bounding_box()
+        if t_box is None or o_box is None:
+            raise AssertionError(
+                f"{entry.slug}: missing geometry for {want.target!r} or "
+                f"{want.obstacle!r}")
+
+        if t_box["y"] < 0 or t_box["y"] >= size["height"]:
+            raise AssertionError(
+                f"{entry.slug}: {want.target!r} starts at y={t_box['y']:.0f}, "
+                f"outside the {size['height']}px viewport")
+
+        target_bottom = t_box["y"] + t_box["height"]
+        gap = o_box["y"] - target_bottom
+        if gap < want.min_gap_px:
+            raise AssertionError(
+                f"{entry.slug}: {want.target!r} ends at y={target_bottom:.0f} "
+                f"but {want.obstacle!r} starts at y={o_box['y']:.0f} — gap "
+                f"{gap:.0f}px < {want.min_gap_px}px. The control is behind "
+                "the floating surface, whatever the viewport test says.")
 
 
 def _capture_real(
