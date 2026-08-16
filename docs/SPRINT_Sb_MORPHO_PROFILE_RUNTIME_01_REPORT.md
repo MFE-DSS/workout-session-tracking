@@ -184,3 +184,39 @@ qui pouvait faire disparaître silencieusement la rétro-datation et la saisie d
 mollet. Les deux ont été vues avant d'écrire, et traitées explicitement.
 
 **La morphologie n'influence pas le programme** — et c'est vérifié, pas promis.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#103** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `c9dfcd9` |
+| Merge | **`8313dcd`** |
+| CI canonique | run `31934710050` — **succès, 3/3** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité, couverture new code **93,0 %** |
+| Threads / Gitar | **0 / 0** |
+| Migration en tête | **`r9s4m0n1p12`** |
+| Tests CI | 2 134 + 2 244 = **4 378** |
+
+Un commit de correction a précédé le merge : le pré-scan Sonar a montré
+`/profile/measurements` répété **sept fois** dans le fichier de tests neuf.
+`S1192` se déclenche à trois occurrences et un seul MAJOR (poids 15) suffit à
+casser le gate new-code (seuil 14). Les littéraux ont été nommés **avant** que
+le gate ne rougisse — aucune assertion, aucune couverture, aucun comportement
+touché.
+
+### Capacité CI — **HEALTHY**
+
+| | Shard A | Shard B |
+|---|---|---|
+| min MemAvailable | **4 838 Mo** | **4 772 Mo** |
+| min SwapFree | 3 071 Mo — **jamais entamé** | 3 071 Mo — **jamais entamé** |
+| `workers=` | 2 | 2 |
+
+Les deux shards restent **au-dessus du seuil HEALTHY de 4 Go**. À signaler
+franchement : la marge recule (5 195 / 5 065 Mo à la tranche précédente, 4 838 /
+4 772 ici, soit ~300 Mo de moins sur chaque shard) — les 64 tests neufs et le
+sous-processus pytest imbriqué coûtent leur place. Toujours HEALTHY, pas encore
+WATCH, mais la tendance mérite d'être suivie plutôt que découverte.
