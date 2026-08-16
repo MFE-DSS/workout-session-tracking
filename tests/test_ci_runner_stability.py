@@ -11,11 +11,12 @@ not to conflate them:
 """
 from __future__ import annotations
 
+import hashlib
+import os
 import pathlib
 import re
 import subprocess
 import sys
-import tempfile
 
 import pytest
 
@@ -26,8 +27,13 @@ SAMPLER = REPO_ROOT / "scripts" / "ci_resource_sampler.py"
 TMP_PREFIX = "workout-test-"
 
 
-def _tmp_dir_count() -> int:
-    return len(list(pathlib.Path(tempfile.gettempdir()).glob(f"{TMP_PREFIX}*")))
+def _tmp_dir_count(root: pathlib.Path) -> int:
+    """Compte les répertoires du fixture **dans la racine passée**.
+
+    La racine est celle que le test POSSÈDE, jamais le répertoire temporaire
+    partagé de la machine — voir `pytester_like_run`.
+    """
+    return len(list(root.glob(f"{TMP_PREFIX}*")))
 
 
 @pytest.fixture()
@@ -39,25 +45,49 @@ def pytester_like_run(tmp_path):
     to completion. The nested file lives under `tests/` so the real
     `conftest.py` — the thing under test — actually applies.
 
+    **La mesure est confinée à une racine temporaire appartenant au test**
+    (`Sb_CI_TMPSTATE_FLAKE_01`). Auparavant elle comptait les
+    `workout-test-*` de `tempfile.gettempdir()` — un emplacement **partagé par
+    toute la machine**, contenant ici plus de 53 000 répertoires hérités et
+    alimenté en parallèle par les autres workers xdist. Il suffisait qu'un
+    worker voisin crée son répertoire entre les deux relevés pour que
+    `after > before` sans le moindre défaut : le test échantillonnait un état
+    global.
+
+    Le sous-processus reçoit donc `TMPDIR` pointant sur `tmp_path`, que pytest
+    alloue par test **et par worker**. `tempfile.mkdtemp` du fixture `client`
+    l'honore, si bien que les répertoires observés sont exactement ceux que ce
+    test a provoqués — aucun autre worker ne peut y écrire.
+
     Returns `(count_before, count_after, exit_code)`.
     """
     created: list[pathlib.Path] = []
+    owned_tmp = tmp_path / "owned-tmp"
+    owned_tmp.mkdir()
 
     def run(body: str) -> tuple[int, int, int]:
-        target = REPO_ROOT / "tests" / f"test_zz_nested_{abs(hash(body)) % 10**8}.py"
+        # Nom dérivé du contenu ET de la racine possédée : deux workers
+        # exécutant le même corps n'écrivent pas dans le même fichier.
+        # `hash()` est randomisé par processus, donc inutilisable comme
+        # identité stable entre workers.
+        stem = hashlib.sha256(
+            f"{owned_tmp}|{body}".encode()).hexdigest()[:12]
+        target = REPO_ROOT / "tests" / f"test_zz_nested_{stem}.py"
         target.write_text(
             "def test_nested(client):\n"
             f"    {body}\n",
             encoding="utf-8",
         )
         created.append(target)
-        before = _tmp_dir_count()
+        env = {**os.environ, "TMPDIR": str(owned_tmp)}
+        before = _tmp_dir_count(owned_tmp)
         result = subprocess.run(
             [sys.executable, "-m", "pytest", str(target),
              "-q", "-p", "no:cacheprovider", "--no-header"],
             capture_output=True, text=True, cwd=REPO_ROOT, timeout=300,
+            env=env,
         )
-        after = _tmp_dir_count()
+        after = _tmp_dir_count(owned_tmp)
         return (before, after, result.returncode)
 
     yield run
@@ -87,8 +117,25 @@ def _script() -> str:
 
 class TestFixtureTempCleanup:
     def test_the_directory_exists_while_the_fixture_is_in_use(self, client):
-        live = list(pathlib.Path(tempfile.gettempdir()).glob(f"{TMP_PREFIX}*"))
-        assert live != []
+        """Le répertoire de CETTE invocation, pas « au moins un quelque part ».
+
+        La version précédente cherchait un `workout-test-*` n'importe où dans le
+        répertoire temporaire de la machine. Avec les dizaines de milliers de
+        répertoires hérités qui y traînent, elle passait même si le fixture
+        n'avait rien créé : une assertion vacante, du même défaut que la course
+        corrigée par `Sb_CI_TMPSTATE_FLAKE_01`.
+
+        Le fixture publie son chemin exact via `DATABASE_URL` ; on interroge
+        celui-là.
+        """
+        db_url = os.environ["DATABASE_URL"]
+        db_path = pathlib.Path(db_url.replace("sqlite:///", "", 1))
+        owned = db_path.parent
+
+        assert owned.name.startswith(TMP_PREFIX), (
+            f"le fixture n'utilise pas le préfixe attendu : {owned.name}"
+        )
+        assert owned.is_dir(), "le répertoire de ce fixture n'existe pas"
 
     def test_the_directory_is_gone_after_teardown(self, pytester_like_run):
         """Exécuté dans un pytest imbriqué : le teardown doit avoir eu lieu."""
@@ -104,6 +151,81 @@ class TestFixtureTempCleanup:
         """Sans quoi le test précédent prouverait un nettoyage sur rien."""
         _, _, outcome = pytester_like_run("raise AssertionError('boom')")
         assert outcome != 0
+
+    def test_the_measurement_never_reads_the_shared_temp_root(self):
+        """Garde structurelle contre le retour de la course.
+
+        Le défaut n'était pas une malchance : le test comptait les
+        `workout-test-*` de `tempfile.gettempdir()`, un emplacement **partagé
+        par toute la machine** (plus de 53 000 répertoires hérités y traînent)
+        et alimenté en parallèle par les autres workers xdist. Un voisin créant
+        son répertoire entre les deux relevés suffisait à faire `after > before`.
+
+        La mesure lit désormais une racine que le test **possède**. Ce test
+        empêche quiconque de la reconnecter à la racine partagée.
+        """
+        source = _read(pathlib.Path(__file__))
+        measurement = source.split("def _tmp_dir_count", 1)[1].split("\n\n\n", 1)[0]
+        assert "gettempdir" not in measurement, (
+            "la mesure est revenue sur le répertoire temporaire partagé"
+        )
+
+    def test_the_nested_run_gets_an_owned_temp_root(self):
+        """Le sous-processus écrit dans `tmp_path`, alloué par test ET par worker."""
+        source = _read(pathlib.Path(__file__))
+        fixture = source.split("def pytester_like_run", 1)[1].split(
+            "\n\nCONFTEST", 1)[0]
+        assert 'TMPDIR' in fixture
+        assert "owned_tmp" in fixture
+
+    def test_two_owned_roots_cannot_observe_each_other(self, tmp_path):
+        """Deux workers ne peuvent pas voir l'état temporaire l'un de l'autre.
+
+        Reproduit la course exacte : une création « étrangère » dans la racine
+        partagée pendant qu'on observe une racine possédée.
+        """
+        import tempfile as _tempfile
+
+        owned_a = tmp_path / "a"
+        owned_b = tmp_path / "b"
+        owned_a.mkdir()
+        owned_b.mkdir()
+
+        (owned_a / f"{TMP_PREFIX}aaa").mkdir()
+        before_b = _tmp_dir_count(owned_b)
+        # Un « autre worker » crée le sien, dans la racine partagée.
+        foreign = _tempfile.mkdtemp(prefix=TMP_PREFIX)
+        try:
+            assert _tmp_dir_count(owned_b) == before_b, (
+                "une création étrangère est visible depuis une racine possédée"
+            )
+            assert _tmp_dir_count(owned_a) == 1
+        finally:
+            pathlib.Path(foreign).rmdir()
+
+    def test_the_nested_file_name_is_stable_across_processes(self):
+        """`hash()` est randomisé par processus : il ne peut pas nommer un fichier
+        partagé entre workers. Le nom dérive donc d'un digest stable."""
+        source = _read(pathlib.Path(__file__))
+        fixture = source.split("def pytester_like_run", 1)[1].split(
+            "\n\nCONFTEST", 1)[0]
+        assert "hashlib.sha256" in fixture
+        assert "abs(hash(" not in fixture
+
+    def test_the_suite_is_not_serialized_to_hide_the_race(self):
+        """Le correctif rend l'invariant déterministe — il ne masque rien.
+
+        Ni `-p no:xdist`, ni `xfail`, ni marqueur `flaky`, ni sleep, ni retry.
+        """
+        source = _read(pathlib.Path(__file__))
+        # Exclure le corps de CE test : il cite forcément les motifs qu'il
+        # interdit, et un scan brut échouerait sur sa propre liste.
+        marker = "def test_the_suite_is_not_serialized_to_hide_the_race"
+        scanned = source.split(marker, 1)[0] + source.split(marker, 1)[1].split(
+            "\n    def ", 1)[-1]
+        for banned in ("no:xdist", "flaky", "xfail", "time.sleep",
+                       "reruns", "--forked"):
+            assert banned not in scanned, f"contournement détecté : {banned!r}"
 
     def test_the_fixture_deletes_only_its_own_directory(self):
         source = _read(CONFTEST)
