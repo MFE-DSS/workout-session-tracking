@@ -1,3 +1,135 @@
+{# Sb_UIV2_SESSION_FOCUS_02 — une seule définition de la ligne de série.
+   Elle était écrite une fois dans une boucle ; le rendu CURRENT-FIRST en
+   demande trois emplacements (courante / terminées / à venir). Une macro
+   garantit qu'ils ne peuvent pas diverger : mêmes `name`, mêmes `value`,
+   mêmes attributs de saisie partout. Toute la variation d'état passe par
+   `set_state`, jamais par une réécriture du champ. #}
+{% macro work_set_list(sets, active_id, ph, ref, extra_class='') -%}
+  <ul class="set-list session-focus__console-list{% if extra_class %} {{ extra_class }}{% endif %}">
+    {%- for sl in sets %}
+      {%- set set_state = 'active' if (active_id and sl.id == active_id) else ('completed' if sl.completed else 'upcoming') -%}
+      {%- set _row_ph = ph if set_state == 'active' else None -%}
+      {%- set _ph_w = _row_ph.weight if _row_ph and _row_ph.weight else 'kg' -%}
+      {%- set _ph_r = _row_ph.reps if _row_ph and _row_ph.reps else 'reps' -%}
+      <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ set_state }}{% if _row_ph %} set-row--has-overload-placeholder{% endif %}">
+        <div class="set-row__label session-focus__console-row-label">
+          <span class="set-row__kind">Série</span>
+          <span class="set-row__idx">#{{ sl.set_index }}</span>
+          {% if set_state == 'completed' %}<span class="session-focus__console-check" aria-label="Série validée">✓</span>{% endif %}
+          {% if set_state == 'active' %}<span class="session-focus__console-badge" aria-label="Série active">actif</span>{% endif %}
+          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+          {# Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la
+             dernière séance, collé à la ligne ACTIVE, au point exact de
+             saisie. Silence si pas de donnée : jamais de faux poids. #}
+          {% if set_state == 'active' and ref and ref.has_data %}
+            <span class="session-focus__console-row-prev" aria-hidden="true">
+              dernière : {{ ref.weights_str }} kg · {{ ref.reps_str }} reps
+            </span>
+          {% endif %}
+        </div>
+
+        <div class="set-row__inputs">
+          {# Ces deux champs n'avaient AUCUN nom accessible : un lecteur
+             d'écran annonçait « zone de texte » sans dire de quelle série
+             ni de quelle grandeur il s'agit. Le `placeholder` ne fait pas
+             office d'étiquette et disparaît à la saisie. `aria-label` est
+             additif : ni `name`, ni `value`, ni validation, ni POST ne
+             changent. #}
+          <input
+            type="text"
+            inputmode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
+            autocomplete="off"
+            name="set_{{ sl.id }}_weight_kg"
+            aria-label="Charge en kg — série {{ sl.set_index }}"
+            placeholder="{{ _ph_w }}"
+            value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="off"
+            name="set_{{ sl.id }}_reps"
+            aria-label="Répétitions — série {{ sl.set_index }}"
+            placeholder="{{ _ph_r }}"
+            value="{{ sl.reps if sl.reps is not none else '' }}"
+          />
+          {# Sb_24.4 — completed dérivé serveur de la présence de
+             weight/reps. Aucune checkbox, et aucune action de série : il
+             n'en existe pas dans le produit actuel — limitation portée par
+             Sb_SESSION_SET_ACTION_01. #}
+        </div>
+      </li>
+    {%- endfor %}
+  </ul>
+{%- endmacro %}
+
+{# Sb_UIV2_SESSION_FOCUS_02 — bloc échauffement, défini une seule fois parce
+   qu'il est rendu à DEUX emplacements selon l'état réel :
+
+     CURRENT_WARMUP    un échauffement reste à faire → il EST la série
+                       courante : déplié, dominant, rendu AVANT la console.
+     CURRENT_WORK_SET  tous terminés → historique secondaire, replié, rendu
+                       APRÈS la région de série courante.
+
+   Le placement est donc dérivé de `completed`, jamais forcé pour faire
+   entrer une capture au-dessus de la ligne de flottaison. Dans les deux cas
+   les champs restent dans le DOM avec les mêmes `name` : un `details` fermé
+   soumet ses contrôles, la sérialisation est identique. #}
+{% macro warmup_block(warmup_sets, warm_done, warm_total, collapsed) -%}
+  {% if collapsed %}
+  <details class="disclosure session-focus__warmup-recap">
+    <summary class="disclosure__summary">
+      <h4 class="set-group-title">Échauffement</h4>
+      <span class="session-focus__warmup-recap-count">{{ warm_done }}/{{ warm_total }} terminé</span>
+    </summary>
+    <div class="disclosure__body">
+  {% elif warm_total > 0 %}
+  <h4 class="set-group-title">Échauffement</h4>
+  {% endif %}
+  <ul class="set-list">
+    {% for sl in warmup_sets %}
+      <li class="set-row set-row--warmup">
+        <div class="set-row__label">
+          <span class="set-row__kind">Échauf.</span>
+          <span class="set-row__idx">#{{ sl.set_index }}</span>
+          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+        </div>
+
+        <div class="set-row__inputs">
+          <input
+            type="text"
+            inputmode="decimal"
+            pattern="[0-9]*[.,]?[0-9]*"
+            autocomplete="off"
+            name="set_{{ sl.id }}_weight_kg"
+            aria-label="Charge en kg — échauffement {{ sl.set_index }}"
+            placeholder="kg"
+            value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
+          />
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            autocomplete="off"
+            name="set_{{ sl.id }}_reps"
+            aria-label="Répétitions — échauffement {{ sl.set_index }}"
+            placeholder="reps"
+            value="{{ sl.reps if sl.reps is not none else '' }}"
+          />
+          {# Sb_24.4 — checkbox « Fait » retirée. Spec Sx_24 §E : completed
+             est dérivé côté serveur de la présence de weight ou reps. #}
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  {% if collapsed %}
+    </div>
+  </details>
+  {% endif %}
+{%- endmacro %}
+
 {# Sb_29.1 — Exercise card partial (visual skeleton).
 
    Extrait verbatim du bloc <details class="card exercise-card"> du for-loop
@@ -271,54 +403,11 @@
       {% set _warm_done = warmup_sets|selectattr('completed')|list|length %}
       {% set _warm_collapsed = is_active and _warm_total > 0 and _warm_done == _warm_total %}
 
-      {% if _warm_total > 0 %}
-        {% if _warm_collapsed %}
-        <details class="disclosure session-focus__warmup-recap">
-          <summary class="disclosure__summary">
-            <h4 class="set-group-title">Échauffement</h4>
-            <span class="session-focus__warmup-recap-count">{{ _warm_done }}/{{ _warm_total }} terminé</span>
-          </summary>
-        {% else %}
-        <h4 class="set-group-title">Échauffement</h4>
-        {% endif %}
-      {% endif %}
-      <ul class="set-list">
-        {% for sl in warmup_sets %}
-          <li class="set-row set-row--warmup">
-            <div class="set-row__label">
-              <span class="set-row__kind">Échauf.</span>
-              <span class="set-row__idx">#{{ sl.set_index }}</span>
-              {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-            </div>
-
-            <div class="set-row__inputs">
-              <input
-                type="text"
-                inputmode="decimal"
-                pattern="[0-9]*[.,]?[0-9]*"
-                autocomplete="off"
-                name="set_{{ sl.id }}_weight_kg"
-                placeholder="kg"
-                value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-              />
-              <input
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                autocomplete="off"
-                name="set_{{ sl.id }}_reps"
-                placeholder="reps"
-                value="{{ sl.reps if sl.reps is not none else '' }}"
-              />
-              {# Sb_24.4 — checkbox "Fait" retirée. Spec Sx_24 §E :
-                 completed est dérivé côté serveur de la présence de
-                 weight ou reps. Vide = non fait, valeur saisie = fait. #}
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-      {% if _warm_collapsed %}
-        </details>
+      {# Échauffement EN COURS : il est la série courante, donc il précède la
+         console. Terminé, il descend sous la région de série courante — voir
+         l'appel symétrique plus bas. #}
+      {% if not _warm_collapsed %}
+        {{ warmup_block(warmup_sets, _warm_done, _warm_total, false) }}
       {% endif %}
 
       {# ============================================================
@@ -378,63 +467,65 @@
             </div>
           {% endif %}
 
-          <ul class="set-list session-focus__console-list">
-            {% for sl in work_sets %}
-              {# État de présentation dérivé (aucun recalcul métier). #}
-              {% set _is_done = sl.completed %}
-              {% set _is_active_set = (is_active and loop.index0 == _active_ns.idx) %}
-              {% set _set_state = 'completed' if _is_done else ('active' if _is_active_set else 'upcoming') %}
-              {# Sb_30.next.placeholder — placeholders contextuels uniquement
-                 sur le set ACTIF de la carte ACTIVE, et uniquement si un
-                 OverloadHint chiffré existe. Aucune injection en value=. #}
-              {% set _ph = overload_placeholders.get(se.id) if _is_active_set else None %}
-              {% set _ph_w = _ph.weight if _ph and _ph.weight else 'kg' %}
-              {% set _ph_r = _ph.reps if _ph and _ph.reps else 'reps' %}
-              <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ _set_state }}{% if _ph %} set-row--has-overload-placeholder{% endif %}">
-                <div class="set-row__label session-focus__console-row-label">
-                  <span class="set-row__kind">Série</span>
-                  <span class="set-row__idx">#{{ sl.set_index }}</span>
-                  {% if _is_done %}<span class="session-focus__console-check" aria-label="Série validée">✓</span>{% endif %}
-                  {% if _is_active_set %}<span class="session-focus__console-badge" aria-label="Série active">actif</span>{% endif %}
-                  {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-                  {# Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la
-                     dernière séance, collé à la ligne ACTIVE, au point exact de
-                     saisie. Additif : le bloc « Référence précédente » en tête
-                     de console est conservé. Silence si pas de donnée (jamais de
-                     faux poids). Décoratif : la référence complète reste portée
-                     par le bloc console-ref ci-dessus. #}
-                  {% if _is_active_set and _ref and _ref.has_data %}
-                    <span class="session-focus__console-row-prev" aria-hidden="true">
-                      dernière : {{ _ref.weights_str }} kg · {{ _ref.reps_str }} reps
-                    </span>
-                  {% endif %}
-                </div>
+          {# ============================================================
+             Sb_UIV2_SESSION_FOCUS_02 — STEP D : CURRENT-FIRST.
+             ------------------------------------------------------------
+             La série COURANTE est rendue avant les séries terminées. Ce
+             n'est PAS un réordonnancement visuel : le DOM lui-même change,
+             pour que le clavier rencontre l'action avant l'historique.
 
-                <div class="set-row__inputs">
-                  <input
-                    type="text"
-                    inputmode="decimal"
-                    pattern="[0-9]*[.,]?[0-9]*"
-                    autocomplete="off"
-                    name="set_{{ sl.id }}_weight_kg"
-                    placeholder="{{ _ph_w }}"
-                    value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-                  />
-                  <input
-                    type="text"
-                    inputmode="numeric"
-                    pattern="[0-9]*"
-                    autocomplete="off"
-                    name="set_{{ sl.id }}_reps"
-                    placeholder="{{ _ph_r }}"
-                    value="{{ sl.reps if sl.reps is not none else '' }}"
-                  />
-                  {# Sb_24.4 — completed dérivé serveur de la présence
-                     de weight/reps. Aucune checkbox. #}
+             PREUVE DE SÉRIALISATION (auditée avant de déplacer quoi que ce
+             soit) — `app/routers/sessions.py` :
+
+                 for sl in se.set_logs:            # itère les lignes DB
+                     p = f"set_{sl.id}_"
+                     form.get(p + "weight_kg")     # lecture PAR NOM
+
+             L'identité d'une série est la clé primaire `SetLog` encodée
+             dans le nom du champ ; l'ordre du DOM n'est jamais consulté.
+             Réordonner est donc sans effet sur la persistance. Mêmes noms,
+             mêmes valeurs, mêmes champs, même POST.
+
+             Les cartes NON actives gardent l'ordre naturel : rien ne change
+             pour elles.
+             ============================================================ #}
+          {% set _completed_sets = work_sets|selectattr('completed')|list %}
+          {% set _pending_sets = work_sets|rejectattr('completed')|list %}
+          {% set _current_set = _pending_sets[0] if (is_active and _pending_sets|length > 0) else None %}
+          {% set _upcoming_sets = _pending_sets[1:] if _current_set else [] %}
+
+          {% if _current_set %}
+            {{ work_set_list([_current_set], _current_set.id, overload_placeholders.get(se.id), _ref) }}
+
+            {% if _completed_sets|length > 0 %}
+              {# Séries terminées : HISTORIQUE secondaire, jamais supprimé et
+                 toujours éditable. Les champs restent dans le DOM et se
+                 sérialisent exactement comme avant — un `details` fermé
+                 soumet ses contrôles. #}
+              <details class="disclosure session-focus__completed-sets">
+                <summary class="disclosure__summary">
+                  <span class="session-focus__completed-sets-label">Séries précédentes</span>
+                  <span class="session-focus__completed-sets-count">{{ _completed_sets|length }}</span>
+                </summary>
+                <div class="disclosure__body">
+                  {{ work_set_list(_completed_sets, None, None, _ref, 'session-focus__console-list--completed') }}
                 </div>
-              </li>
-            {% endfor %}
-          </ul>
+              </details>
+            {% endif %}
+
+            {% if _upcoming_sets|length > 0 %}
+              {{ work_set_list(_upcoming_sets, None, None, _ref, 'session-focus__console-list--upcoming') }}
+            {% endif %}
+
+            {# Échauffement TERMINÉ : historique secondaire, sous la série
+               courante. Champs conservés dans le DOM, sérialisation
+               identique. #}
+            {% if _warm_collapsed %}
+              {{ warmup_block(warmup_sets, _warm_done, _warm_total, true) }}
+            {% endif %}
+          {% else %}
+            {{ work_set_list(work_sets, None, None, _ref) }}
+          {% endif %}
         </div>
       {% endif %}
     {% else %}

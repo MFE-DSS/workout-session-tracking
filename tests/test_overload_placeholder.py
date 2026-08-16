@@ -496,10 +496,25 @@ def test_template_uses_overload_placeholders_dict():
     # work set. Intent preserved: placeholder fires on exactly one set of
     # the active card, driven by the console active-set derivation
     # (_is_active_set), never on every row.
-    assert "_is_active_set" in src, (
-        "placeholder must be gated on the active-set derivation "
+    # Sb_UIV2_SESSION_FOCUS_02 — la garde visait la DÉRIVATION, pas le nom de
+    # la variable. Le rendu CURRENT-FIRST place la série courante avant les
+    # séries terminées, ce qui a demandé d'extraire la ligne dans une macro ;
+    # la dérivation `_is_active_set` y devient `set_state == 'active'`.
+    #
+    # L'invariant est INCHANGÉ et reste vérifié : le placeholder n'est attaché
+    # qu'à la série courante de la carte active, jamais à toutes les lignes.
+    # Le comportement lui-même est couvert par les tests rendus de ce fichier
+    # (test_placeholder_only_on_first_work_set_not_second,
+    # test_placeholder_only_on_active_card_not_others) — cette garde-ci reste
+    # structurelle et vérifie que le placeholder ne peut pas être passé sans
+    # condition d'état.
+    assert "set_state == 'active'" in src, (
+        "placeholder must stay gated on the active-set derivation "
         "(Sb_UI_04.4 console: first uncompleted work set of active card)"
     )
-    assert "overload_placeholders.get(se.id) if _is_active_set" in src, (
-        "placeholder must only fire on the active set of the active card"
+    assert "ph if set_state == 'active' else None" in src, (
+        "the placeholder must be nulled for every non-active row"
+    )
+    assert "overload_placeholders.get(se.id)" in src, (
+        "the active row must still receive the real placeholder dict"
     )

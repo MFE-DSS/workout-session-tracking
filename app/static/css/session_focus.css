@@ -269,6 +269,11 @@
 .session-focus__header {
   /* Skeleton : on hérite de session-header. Le sticky behavior
      vient via session-focus__sticky-header pour rester débrayable. */
+  /* Sb_UIV2_SESSION_FOCUS_02 — gouttière resserrée EN MODE FOCUS seulement.
+     `.session-header` porte `margin-bottom: --space-lg` pour toutes les
+     pages de séance ; la réduire globalement toucherait des écrans hors
+     périmètre. On surcharge donc ici, où la densité est le sujet. */
+  margin-bottom: var(--space-2);
 }
 
 .session-focus__sticky-header {
@@ -1062,10 +1067,16 @@
    prefers-reduced-motion préservés (hérités Sb_UI_04.1).
    ============================================================ */
 
+/* Sb_UIV2_SESSION_FOCUS_02 — rythme vertical de PAGE.
+   Escalade structurelle décidée par l'opérateur : plutôt que de comprimer
+   encore les contrôles, on récupère le blanc INTER-BLOCS au-dessus de la
+   carte. 79 px des 318 px précédant l'identité étaient des gouttières, pas
+   du contenu. Aucun bloc supprimé, aucune donnée perdue, aucun contrat
+   versionné touché — les gouttières ne sont épinglées par aucun test. */
 .session-focus__cockpit {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 /* -------- Orientation (§18.A) : compteur exercice courant / total
@@ -1137,6 +1148,10 @@
   -webkit-overflow-scrolling: touch;
   padding: var(--space-1) 0;
   scrollbar-width: thin;
+  /* Le `gap` du cockpit fournit déjà la gouttière ; une marge ici s'y
+     ajoutait au lieu de la remplacer (8 + 8 = 16 px pour une seule
+     séparation). */
+  margin-bottom: 0;
 }
 .session-focus__stepper-item {
   scroll-snap-align: start;
