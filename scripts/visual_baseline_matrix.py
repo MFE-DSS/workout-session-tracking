@@ -17,7 +17,7 @@ Contrats :
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Literal
 
 Priority = Literal["P0", "P1", "P2"]
@@ -27,6 +27,47 @@ VIEWPORTS: dict[ViewportName, tuple[int, int]] = {
     "mobile": (360, 640),
     "desktop": (1440, 900),
 }
+
+
+# ── Sb_UIV2_STATEFUL_VISUAL_HARNESS_01 — contrat de scénario ────────────────
+#
+# Le harnais ne savait capturer que des ROUTES. Les défauts rapportés par le
+# dogfood réel vivent dans des ÉTATS D'INTERACTION — « alternatives ouvertes »,
+# « une alternative retenue », « disclosure machine ouverte » — qu'aucune URL
+# n'atteint. La revue visuelle ne pouvait donc pas être un vrai gate.
+#
+# Une action décrit UN geste que l'utilisateur pourrait réellement faire. Le
+# vocabulaire est délibérément minuscule et fermé : pas d'évaluation JavaScript
+# arbitraire comme moyen normal de forcer un état, sans quoi le screenshot
+# montrerait un écran que personne ne peut atteindre.
+
+#: Vocabulaire fermé. Élargir cette liste doit rester un geste conscient.
+ACTION_KINDS: frozenset[str] = frozenset({
+    "click",         # cliquer un élément visible
+    "check",         # cocher/sélectionner un input natif
+    "open_details",  # ouvrir un <details> via son <summary>
+    "press",         # frapper une touche (Tab, Enter, Space…)
+    "wait_for",      # attendre un sélecteur déterministe
+})
+
+
+@dataclass(frozen=True)
+class Action:
+    """Un geste utilisateur, exprimé par sélecteur CSS."""
+
+    kind: str
+    selector: str = ""
+    key: str = ""
+
+    def __post_init__(self) -> None:
+        if self.kind not in ACTION_KINDS:
+            raise ValueError(
+                f"unknown action kind {self.kind!r}; allowed: {sorted(ACTION_KINDS)}")
+        if self.kind == "press":
+            if not self.key:
+                raise ValueError("press requires a key")
+        elif not self.selector:
+            raise ValueError(f"{self.kind} requires a selector")
 
 
 @dataclass(frozen=True)
@@ -44,6 +85,11 @@ class BaselineEntry:
     data_fixture: str
     viewports: tuple[ViewportName, ...] = ("mobile", "desktop")
     notes: str = ""
+    #: Gestes appliqués APRÈS le chargement, avant la capture.
+    actions: tuple[Action, ...] = ()
+    #: Sélecteur qui doit être visible une fois les gestes appliqués. Sans lui,
+    #: une capture d'un état non atteint passerait pour une preuve.
+    expect_visible: str = ""
 
 
 # Matrice P0 obligatoire (14 screenshots min V1, 16 acceptable si split home).
@@ -229,7 +275,74 @@ _P2_ENTRIES: tuple[BaselineEntry, ...] = (
 )
 
 
-BASELINE_MATRIX: tuple[BaselineEntry, ...] = _P0_ENTRIES + _P1_ENTRIES + _P2_ENTRIES
+# ── Sb_UIV2_STATEFUL_VISUAL_HARNESS_01 — scénarios GOLDEN ───────────────────
+#
+# Ces entrées gèlent l'état CANONIQUE ACTUEL : elles constituent la preuve
+# « AVANT » du programme UI V2. Elles ne décrivent pas une cible souhaitée.
+#
+# Chacune atteint son état par des gestes que l'utilisateur peut réellement
+# faire, et déclare le sélecteur qui doit alors être visible — sans quoi une
+# capture de l'écran fermé passerait pour l'écran ouvert.
+#
+# Priorité P1 délibérément : le contrat P0 historique est documenté et testé
+# comme « 8 slugs × 2 viewports = 16 captures ». Ces scénarios servent un
+# autre objectif — la preuve AVANT du programme UI V2 — et ne doivent pas
+# gonfler un ensemble dont la taille est un contrat.
+#
+# Les sélecteurs viennent du balisage livré : `.substitute-picker` est le
+# `<details>` des alternatives, `.segmented--stacked` la liste de choix rendue
+# une fois ouverte (cf. `_partials/exercise_card.html`).
+_UIV2_GOLDEN_ENTRIES: tuple[BaselineEntry, ...] = (
+    BaselineEntry(
+        slug="uiv2-session-alternatives-closed",
+        route="/sessions/${AUREN_BASELINE_ACTIVE_SESSION_ID}",
+        priority="P1",
+        auth_required=True,
+        state="active-session-alternatives-closed",
+        data_fixture="db.user.with_active_session",
+        expect_visible=".substitute-picker",
+        notes="AVANT UI V2 — état par défaut de la carte d'exercice active.",
+    ),
+    BaselineEntry(
+        slug="uiv2-session-alternatives-open",
+        route="/sessions/${AUREN_BASELINE_ACTIVE_SESSION_ID}",
+        priority="P1",
+        auth_required=True,
+        state="active-session-alternatives-open",
+        data_fixture="db.user.with_active_session",
+        actions=(
+            Action("wait_for", ".substitute-picker"),
+            Action("open_details", ".substitute-picker"),
+        ),
+        expect_visible=".segmented--stacked",
+        notes="L'état que le dogfood a jugé lourd — inatteignable par URL seule.",
+    ),
+    BaselineEntry(
+        slug="uiv2-profile-preferences",
+        route="/profile",
+        priority="P1",
+        auth_required=True,
+        state="preferences-panel",
+        data_fixture="db.user.standard",
+        actions=(Action("wait_for", ".prefs-form"),),
+        expect_visible=".prefs-form",
+        notes="AVANT UI V2 — panneau de préférences après la tranche 2.",
+    ),
+    BaselineEntry(
+        slug="uiv2-programs-proposal",
+        route="/programs",
+        priority="P1",
+        auth_required=True,
+        state="weekly-plan-proposal",
+        data_fixture="db.user.standard",
+        notes="AVANT UI V2 — proposition hebdomadaire et explication.",
+    ),
+)
+
+
+BASELINE_MATRIX: tuple[BaselineEntry, ...] = (
+    _P0_ENTRIES + _P1_ENTRIES + _P2_ENTRIES + _UIV2_GOLDEN_ENTRIES
+)
 
 
 def entries_for_priority(priority: Priority | Literal["all"]) -> list[BaselineEntry]:
