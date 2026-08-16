@@ -139,3 +139,30 @@ dépôt.
 La présentation des alternatives cesse d'empiler des cadres. Mais la revue
 visuelle humaine que le train prévoyait **ne peut pas s'appuyer sur des captures
 produites ici** — c'est la limite honnête de cette livraison.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#111** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `d92c4cc` — **vert au premier passage**, aucun correctif |
+| Merge | **`634f7fc`** |
+| CI canonique | run `31956576508` — **succès, 6/6** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+| Diff backend | **vide** — `app/services/`, `app/routers/`, `app/models/`, `migrations/` intacts |
+
+### Capacité CI — **HEALTHY**, marge regagnée
+
+| Shard | Fichiers | Tests | min MemAvailable | min SwapFree |
+|---|---|---|---|---|
+| 1 | 83 | 1 548 | 7 634 Mo | 3 071 — intact |
+| 2 | 83 | 1 444 | **6 340 Mo** | 3 071 — intact |
+| 3 | 82 | 1 609 | 8 253 Mo | 3 071 — intact |
+
+Le shard bas remonte de **5 973 → 6 340 Mo** et repasse au-dessus de 6 Go. Le
+rééquilibrage vient de l'arrivée du fichier de tests de cette tranche dans la
+partition : le round-robin a redistribué, confirmant une fois de plus que le
+déséquilibre **suit la partition**, pas une machine.
