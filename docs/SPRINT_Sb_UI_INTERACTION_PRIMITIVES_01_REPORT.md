@@ -125,3 +125,26 @@ une fois.
 Le vrai travail n'était pas d'écrire le CSS — c'était de rendre les quatre
 règles **exécutables**, puis de découvrir que ma propre garde contre les
 sélecteurs globaux ne regardait qu'un formatage sur trois.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#109** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `714b059` — **vert au premier passage** |
+| Merge | **`a724605`** |
+| CI canonique | run `31950712101` — **succès, 6/6** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité |
+| Threads / Gitar | **0 / 0** |
+
+### Capacité CI — **HEALTHY**
+
+| | Shard 1 | Shard 2 | Shard 3 |
+|---|---|---|---|
+| min MemAvailable | 7 557 Mo | **6 458 Mo** | 8 648 Mo |
+| min SwapFree | 3 071 — intact | 3 071 — intact | 3 071 — intact |
+| Tests | 1 546 | 1 359 | 1 633 |
+
+Tous ≥ 6 Go sous la topologie 3 shards. La tranche suivante peut s'ouvrir.
