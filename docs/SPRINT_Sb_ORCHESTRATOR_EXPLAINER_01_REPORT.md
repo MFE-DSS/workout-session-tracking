@@ -131,3 +131,37 @@ nature de chaque raison — déclarée, conventionnelle, contrainte.
 Le vrai piège n'était pas d'écrire les phrases : c'était de croire qu'un filtre
 existait parce qu'une constante portait son nom. Il comparait une étiquette
 française à un jeton, et la troncature masquait le reste.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#108** — `--merge --match-head-commit`, **sans** squash / `--admin` / force |
+| Build | `80e21b1` — **vert au premier passage**, aucun correctif |
+| Merge | **`c646378`** |
+| CI canonique | run `31948768149` — **succès, 6/6** |
+| Gate Sonar | **`OK`** — 0 smell, 0 bug, 0 vulnérabilité, couverture new code **89,9 %** |
+| Threads / Gitar | **0 / 0** |
+| Contrats gelés | diff **vide** (9 modules + `AGENTS.md`) |
+
+### Capacité sous la nouvelle topologie — **HEALTHY**
+
+| Shard | Fichiers | Tests | min MemAvailable | min SwapFree |
+|---|---|---|---|---|
+| 1 | 82 | 1 507 | **8 040 Mo** | 3 071 — intact |
+| 2 | 82 | 1 422 | **6 354 Mo** | 3 071 — intact |
+| 3 | 81 | 1 580 | **8 309 Mo** | 3 071 — intact |
+
+Tous les shards restent **au-dessus de 6 Go** avec la tranche ajoutée, donc
+très au-dessus du plancher de 4 Go : aucune règle d'arrêt ne se déclenche et
+une tranche runtime supplémentaire reste permise.
+
+**Observation sur le déséquilibre.** Le shard bas n'est plus le même : c'était
+le 1 (6 241 Mo) sous SCALE_02, c'est le 2 (6 354 Mo) ici. Le déséquilibre
+**suit la partition**, pas une machine — le round-robin a redistribué les
+fichiers quand celui de cette tranche est arrivé. Cela confirme que le coût est
+porté par le **contenu** des fichiers, et qu'un déséquilibre observé une fois
+n'incrimine aucun runner en particulier. Toujours consigné, toujours non
+corrigé : la pondération reste interdite tant que la capacité tient.
