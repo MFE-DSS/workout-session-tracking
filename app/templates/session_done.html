@@ -57,6 +57,14 @@
           <b>{{ recap.summary.global_state }}</b>
         </li>
       {% endif %}
+      {# Sb_SESSION_REVIEW_SIGNAL_01 — la note de séance était saisie puis
+         jamais relue. Silence si vide : pas de ligne vide, pas de « — ». #}
+      {% if recap.summary.note %}
+        <li>
+          <span>Note de séance</span>
+          <b class="session-done__note">{{ recap.summary.note }}</b>
+        </li>
+      {% endif %}
       {% if recap.summary.confidence_score is not none %}
         <li>
           <span>Confiance du logging</span>
@@ -170,6 +178,28 @@
             <span class="session-done__prog">{{ ex.done }}/{{ ex.total }}</span>
             {% if ex.score is not none %}
               <span class="session-done__score">{{ ex.score }}</span>
+            {% endif %}
+            {# Sb_SESSION_REVIEW_SIGNAL_01 — RESTITUTION. Le ressenti et la
+               note étaient saisis pendant la séance et n'étaient jamais
+               rendus ici : on demandait sans jamais rendre.
+
+               Silence honnête quand rien n'a été saisi — un ressenti absent
+               se lit « non mesuré », jamais « neutre ». Aucun texte de
+               remplacement, aucune valeur par défaut. #}
+            {# La valeur brute est rendue telle quelle, comme le fait déjà
+               `exercise_history.html`. Introduire ici une table de libellés
+               français dupliquerait le vocabulaire du widget de saisie et
+               créerait une deuxième source de vérité — le genre de doublon
+               que Sb_FEEDBACK_SIGNAL_AUDIT_01 vient de recenser. Traduire
+               ces valeurs est une décision produit à part entière, notée
+               comme limite. #}
+            {% if ex.muscle_sensation %}
+              <span class="session-done__sensation session-done__sensation--{{ ex.muscle_sensation }}">
+                {{ ex.muscle_sensation }}
+              </span>
+            {% endif %}
+            {% if ex.note %}
+              <span class="session-done__exnote">{{ ex.note }}</span>
             {% endif %}
           </li>
         {% endfor %}
