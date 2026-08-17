@@ -79,6 +79,24 @@
             "Banc trop incliné",
             "Descendre trop vite par à-coups"
           ]
+        },
+        {
+          "slug": "chest-dips",
+          "name": "Dips pectoraux (buste penché)",
+          "aliases": ["Dips pectoraux", "Chest dips", "Dips buste penché"],
+          "variants": ["lesté", "assisté"],
+          "equipment": "bodyweight",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Buste penché vers l'avant, regard au sol",
+            "Coudes légèrement écartés, descendre jusqu'à l'étirement des pecs",
+            "Remonter sans verrouiller complètement les coudes"
+          ],
+          "common_mistakes": [
+            "Buste trop vertical, la charge part sur les triceps",
+            "Descente trop profonde qui tire sur l'avant de l'épaule"
+          ]
         }
       ]
     },
@@ -389,6 +407,24 @@
             "Coudes trop bas (transfert dos large)",
             "Pas de rotation externe"
           ]
+        },
+        {
+          "slug": "cable-rear-delt-fly",
+          "name": "Écarté arrière d'épaule câble",
+          "aliases": ["Reverse fly câble", "Cable rear delt fly", "Écarté arrière câble"],
+          "variants": ["poulies croisées", "unilatéral"],
+          "equipment": "cable",
+          "laterality": "bilateral",
+          "load_semantics": "per_side",
+          "execution_cues": [
+            "Bras quasi tendus, ouverture large dans le plan des épaules",
+            "Amorcer par les coudes, pas par les mains",
+            "Retour contrôlé sans relâcher la tension"
+          ],
+          "common_mistakes": [
+            "Tirer avec les trapèzes en haussant les épaules",
+            "Plier les coudes et transformer l'écarté en tirage"
+          ]
         }
       ]
     },
@@ -584,6 +620,32 @@
           "common_mistakes": [
             "Rebondir",
             "Amplitude courte"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "arms-triceps",
+      "name": "Bras — Triceps",
+      "zone": "triceps",
+      "description": "Extension du coude, isolation des triceps",
+      "machines": [
+        {
+          "slug": "triceps-pushdown-rope",
+          "name": "Triceps extension poulie haute (corde)",
+          "aliases": ["Triceps pushdown corde", "Extension triceps poulie haute", "Rope pushdown"],
+          "variants": ["corde", "barre droite", "barre en V"],
+          "equipment": "cable",
+          "laterality": "bilateral",
+          "load_semantics": "total",
+          "execution_cues": [
+            "Coudes collés au buste, seuls les avant-bras bougent",
+            "Écarter la corde en fin d'extension",
+            "Remontée freinée jusqu'à l'angle droit"
+          ],
+          "common_mistakes": [
+            "Coudes qui avancent et transforment le mouvement en poussée",
+            "Buste qui s'incline pour accompagner la charge"
           ]
         }
       ]
