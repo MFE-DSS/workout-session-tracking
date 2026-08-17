@@ -1244,6 +1244,29 @@
 /* Contexte de cible : une ligne, poids de métadonnée. Sans règle propre,
    le `<p>` héritait des marges de paragraphe (14 px haut + 14 px bas) pour
    21 px de texte, juste au-dessus de l'action. */
+/* Sb_ATLAS_TECHNICAL_GUARDS_01 — le cue de tête vit dans le RÉSUMÉ de la
+   disclosure machine, donc lisible sans ouvrir. C'est du contenu, pas une
+   étiquette : il prend le poids du texte courant. Le résumé passe en colonne
+   pour que la consigne ne se batte pas avec le titre sur 360 px.
+
+   Il n'est PAS au-dessus de la console : mesuré, même réduit à une ligne de
+   20 px, il déplaçait les champs de la série courante de 497 à 520 px et
+   `elementFromPoint` cessait de les retourner — ils passaient derrière la
+   barre d'action collante. Préserver l'action de série et la géométrie
+   mobile prime sur le placement. */
+.machine-panel > .machine-panel__summary {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+.machine-panel__lead-cue {
+  font-size: var(--font-size-body-sm);
+  font-weight: 400;
+  color: var(--color-fg);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .session-focus__target-compact {
   margin: 0;
   display: flex;
