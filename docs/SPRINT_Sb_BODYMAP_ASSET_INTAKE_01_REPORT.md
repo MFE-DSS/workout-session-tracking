@@ -225,3 +225,55 @@ Second fait, moins visible : un avertissement a été **retiré** parce qu'il au
 poussé le workspace à trancher une question ouverte sans le savoir. Un outil de
 validation doit refuser ce que le contrat interdit — pas orienter ce que le
 contrat n'a pas décidé.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `57be4f4` |
+| PR | **#124 MERGED** |
+| Merge | **`856566c`** via `--merge --match-head-commit 28c3842` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32075585252` — 6/6 success** |
+| Sonar | `SonarCloud` **success** · gate externe **pass** |
+| Gitar | pass |
+| Threads | **0** (`reviewThreads.nodes` vide) |
+| CI PR | **7 checks verts du premier coup, aucun aller-retour** |
+
+Le tier `CI_INFRA` exigeait une **validation CI réelle avant merge** : les sept
+checks verts de la PR la fournissent, et la CI canonique la confirme après coup.
+
+### Portée réellement tenue
+
+13 fichiers, **1 262 insertions, 0 suppression**. Uniquement `scripts/`,
+`tests/` et `docs/`. Aucun fichier applicatif touché — le validateur est un outil
+hors chemin d'exécution, ce que la parité §7 confirme fichier par fichier.
+
+### Un incident d'outillage, pas de code
+
+Deux commandes ont demandé une confirmation alors que leurs règles
+d'autorisation existaient déjà :
+
+- `gh pr create` — le `--body` en ligne contenait des backticks et des retours à
+  la ligne, lisibles comme substitution de commande ; la règle ne peut pas passer
+  outre ce contrôle, et c'est sain. **Corrigé en `--body-file`** : plus aucun
+  métacaractère dans la commande.
+- `gh api graphql --jq` — l'expression `jq` contient un `|`, ce qui fait lire la
+  commande comme un pipeline. **Corrigé en supprimant le `--jq`** et en lisant le
+  JSON brut.
+
+Dans les deux cas la correction porte sur la **forme d'exécution**, pas sur
+l'élargissement d'une règle — ce que `CLAUDE.local.md` §2 demande explicitement.
+Les entrées ciblées ont tout de même été ajoutées à la demande de l'opérateur.
+
+### Ce que la CI ne couvre pas
+
+Rien de particulier à ce sprint : le validateur et ses 33 tests sont du Python
+pur et **tournent intégralement en CI**. Contrairement aux tranches précédentes,
+aucune preuve ne dépend de Playwright ici.
+
+En revanche, la porte n'a jamais été exercée sur un **asset réel non conforme** —
+seulement sur des fixtures et sur des altérations que j'ai injectées moi-même
+dans une plaque livrée. Le premier vrai candidat du workspace sera aussi le
+premier test grandeur nature du validateur.
