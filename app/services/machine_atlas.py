@@ -133,9 +133,37 @@ def get_for_session_exercise(session_exercise) -> dict[str, Any] | None:
         if machine is not None:
             family = family_of_machine(machine.get("slug"))
             return {"machine": machine, "family": family}
-    return get_for_template_exercise(
+
+    resolved = get_for_template_exercise(
         getattr(session_exercise, "template_exercise", None)
     )
+    if resolved and resolved.get("machine"):
+        return resolved
+
+    # Sb_ATLAS_COVERAGE_01 — dernier recours : le NOM figé de l'exercice.
+    #
+    # `machine_slug` / `machine_family` sont nuls pour une partie du
+    # catalogue, et les remplir passerait par `reference_split.json`, dont le
+    # seed est verrouillé sur la version du payload. Bumper cette version
+    # déclenche un wipe des lignes SYSTEM : mesuré sur copie jetable, le lien
+    # `template_exercise` des séances passées tombe de 7/7 à 0/7 et leurs cues
+    # de 4/7 à 0/7, `ondelete="SET NULL"` faisant son travail. Couvrir trois
+    # exercices en retirant les cues de tout l'historique serait un très
+    # mauvais échange.
+    #
+    # Le snapshot de nom, lui, est justement conçu pour survivre au reseed. Le
+    # résoudre ici rend la couverture INDÉPENDANTE du seed et rétroactive :
+    # une séance déjà enregistrée gagne son cue sans qu'aucune ligne ne bouge.
+    #
+    # Correspondance exacte nom/alias, insensible à la casse — aucun
+    # rapprochement approximatif : un cue qui ne correspond pas à la machine
+    # serait pire que le silence.
+    machine = get_machine_by_name(
+        getattr(session_exercise, "exercise_name_snapshot", None)
+    )
+    if machine is not None:
+        return {"machine": machine, "family": family_of_machine(machine.get("slug"))}
+    return resolved
 
 
 def get_for_template_exercise(template_exercise) -> dict[str, Any] | None:

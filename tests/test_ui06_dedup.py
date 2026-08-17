@@ -155,17 +155,47 @@ def test_worked_area_primary_shown_on_exactly_the_two_authorised_surfaces(client
     ne sont pas le même genre d'objet : un contexte d'une ligne, et un
     panneau détaillé.
 
-    NOUVEAU CONTRAT — plus strict qu'un simple `== 2`, qui laisserait passer
-    n'importe quelle troisième duplication : la cible doit apparaître dans le
-    résumé compact ET dans la ligne « Principal », et **nulle part ailleurs**.
-    Le défaut d'origine reste donc interdit.
+    Sb_ATLAS_COVERAGE_01 — LA GARDE DEVIENT STRUCTURELLE.
+
+    Compter une sous-chaîne sur toute la page était fragile : le nombre a dû
+    être relevé de 1 à 2 quand le résumé compact est arrivé, puis serait passé
+    à 3 quand la couverture atlas a donné sa VRAIE famille à un exercice qui
+    n'en avait pas — le bloc « Intention » affiche alors
+    « Bloc <famille> », ce qui est une amélioration, pas une duplication.
+
+    Relever la constante une troisième fois aurait desserré la garde sans rien
+    prouver. Elle vérifie donc désormais la **structure** : chaque surface
+    autorisée porte la cible **exactement une fois**, et aucune surface non
+    nommée ne la porte. C'est plus strict qu'un compteur global — une
+    quatrième surface, ou un doublon dans une surface existante, échoue.
+
+    Le défaut d'origine visé par Sx_UI_06 D3 (duplication **chip + label**
+    dans le panneau) reste donc interdit.
     """
+    import re
+
     body = _known_body(client)
     assert "session-focus__target-compact" in body, "compact target missing"
     assert "session-focus__worked-area-row--primary" in body, "full panel row missing"
-    assert body.count("Pectoraux") == 2, (
-        "the target label must appear on exactly the two authorised surfaces "
-        "(compact summary + full worked-area row), never a third time"
+
+    #: Surfaces autorisées à nommer la cible, chacune UNE seule fois.
+    surfaces = {
+        "compact target": r'session-focus__target-compact-value">\s*([^<]*)',
+        "intent block": r'session-focus__intent-text">\s*(?:.*?<b>)?([^<]*)',
+        "worked-area primary": (
+            r'worked-area-row--primary.*?worked-area-value">\s*([^<]*)'
+        ),
+    }
+    seen = 0
+    for label, pattern in surfaces.items():
+        found = re.findall(pattern, body, re.DOTALL)
+        hits = [f for f in found if "Pectoraux" in f]
+        assert len(hits) <= 1, f"{label} names the target more than once: {hits}"
+        seen += len(hits)
+
+    assert body.count("Pectoraux") == seen, (
+        "the target label appears outside the authorised surfaces "
+        f"(page total {body.count('Pectoraux')}, accounted for {seen})"
     )
 
 
