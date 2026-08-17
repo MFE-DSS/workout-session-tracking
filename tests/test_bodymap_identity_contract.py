@@ -232,22 +232,27 @@ def test_context_group_is_first_in_every_view():
 
 # ───────────── §3 — the positional-CSS defect is recorded, not fixed ─────────────
 
-def test_positional_css_defect_is_documented():
+def test_positional_css_history_is_kept_in_the_contract():
+    """The defect is fixed; the record of it must survive.
+
+    Deleting the story would let a future asset regeneration reintroduce
+    positional selectors with nobody remembering why they were banned.
+    """
     spec = SPEC.read_text(encoding="utf-8")
     assert "OQ_POSITIONAL_CSS_01" in spec
     assert "nth-of-type" in spec
 
 
-def test_positional_css_still_present_because_this_sprint_changes_no_runtime():
-    """If someone fixes it, this test must be retired WITH the open question."""
+def test_positional_css_defect_is_gone_from_the_runtime():
+    """Replaces the inverted guard that used to REQUIRE the defect.
+
+    OQ_POSITIONAL_CSS_01 closed it; the expectation flips with it, in the same
+    commit, so a fixed defect can never coexist with a live open question.
+    Detailed guards live in tests/test_bodymap_surface_identity.py.
+    """
     css = CSS.read_text(encoding="utf-8")
-    # bounded to a single line: `[^{]*` would span newlines and merge the
-    # selectors that share one rule block, counting 3 rules instead of 5 selectors.
     positional = re.findall(r"#auren-plate-region-\w+[^{\n]*nth-of-type\(\d\)", css)
-    assert len(positional) == 5, (
-        "positional plate rules changed — update OQ_POSITIONAL_CSS_01 before "
-        "editing this expectation"
-    )
+    assert positional == [], f"plate colour still depends on DOM rank: {positional}"
 
 
 # ───────────── A8 — zone_recovery is documented, not wired ─────────────

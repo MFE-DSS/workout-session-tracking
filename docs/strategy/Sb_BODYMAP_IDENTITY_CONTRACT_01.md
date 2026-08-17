@@ -132,8 +132,14 @@ quatrième est le plus fragile.
 | 3 | identifiants de plaque | `auren-plate-region-shoulders--front-delt-lateral-000` | les 3 SVG |
 | 4 | **position DOM** | `> g:nth-of-type(3)` | **`app.css` — le rendu réel** |
 
-Le quatrième mérite d'être dit clairement : **le runtime ne colore pas par
-identifiant, il colore par rang.**
+> **MISE À JOUR — `OQ_POSITIONAL_CSS_01` est RÉSOLUE** par le sprint du même nom
+> (voir §7 et l'annexe). Le texte ci-dessous décrit l'état **au moment de
+> l'audit** et est conservé : supprimer l'histoire laisserait une future
+> régénération d'assets réintroduire des sélecteurs positionnels sans que
+> personne ne se souvienne pourquoi ils avaient été bannis.
+
+Le quatrième mérite d'être dit clairement : **le runtime ne colorait pas par
+identifiant, il colorait par rang.**
 
 ```css
 #auren-plate-region-shoulders .auren-mf-view-front > g:nth-of-type(3) path { … }
@@ -314,10 +320,13 @@ Ce sprint ne le branche pas — c'est un interdit explicite du brief. Il en pose
 **précondition** : sans le présent contrat, brancher la récupération obligerait à
 choisir dans l'urgence lequel des quatre vocabulaires fait foi.
 
-**Précondition supplémentaire, non résolue ici** : tant que le CSS colore par
-rang (§3), une bande de récupération pilotée par identifiant **ne fonctionnerait
-pas** — les deux mécanismes ne parlent pas de la même chose. `OQ_POSITIONAL_CSS_01`
-est donc bloquant pour le branchement, pas seulement souhaitable.
+**Précondition supplémentaire — levée depuis** : au moment de cet audit, le CSS
+colorait par rang (§3), si bien qu'une bande de récupération pilotée par
+identifiant n'aurait pas fonctionné — les deux mécanismes ne parlaient pas de la
+même chose. `OQ_POSITIONAL_CSS_01` a **résolu** ce point : la couleur suit
+désormais le jeton de surface porté par l'identifiant, exactement le vocabulaire
+qu'une bande de récupération utiliserait. Le branchement reste **non fait** et
+hors périmètre, mais il n'est plus **empêché**.
 
 ---
 
@@ -325,7 +334,7 @@ est donc bloquant pour le branchement, pas seulement souhaitable.
 
 | Id | Sujet | État |
 |---|---|---|
-| `OQ_POSITIONAL_CSS_01` | Le CSS colore par `nth-of-type`, pas par identifiant. **Bloquant** pour tout pilotage par la donnée. | ouvert — corriger avant le branchement récupération |
+| `OQ_POSITIONAL_CSS_01` | Le CSS colorait par `nth-of-type`, pas par identifiant. | ✅ **RESOLVED** 2026-08-17 — la couleur suit désormais le jeton de surface porté par l'id ; équivalence de rendu **mesurée** sur les 53 chemins. Voir `docs/SPRINT_OQ_POSITIONAL_CSS_01_REPORT.md` |
 | `OQ_STABLE_ID_ORPHAN_01` | Le vocabulaire `zone-*` du contrat de design n'est implémenté par aucun asset ni consommé par aucun runtime. Faut-il l'implémenter, ou acter que les identifiants de plaque font foi ? | ouvert — **recommandation : acter les identifiants de plaque**, et rétrograder `zone-*` au rang de nom logique |
 | `OQ_PEC_SPLIT_01` | Partition claviculaire / sternocostale | documentée, non construite (`docs/OQ_PEC_SPLIT_01.md`) |
 | `OQ_WA_SILHOUETTE_01` | La silhouette worked-area est schématique et non anatomique ; doit-elle un jour être remplacée par des plaques réelles ? | ouvert — hors périmètre |
@@ -343,11 +352,15 @@ grammaire des noms est fixée (§5.1), la structure de groupes est imposée (§5
 les critères de rejet sont explicites (§5.4) et l'ordre de production est motivé
 par la biomécanique (§5.5).
 
-**Réserve à lever avant de commander** : `OQ_POSITIONAL_CSS_01`. Les contraintes
-§5.2 la neutralisent pour des assets conformes, mais elles reportent le risque
-sur la discipline du producteur au lieu de l'éliminer dans le code. Un asset
-livré demain fonctionnera ; un asset régénéré dans six mois avec un ordre de
-groupes différent casserait silencieusement.
+**Réserve levée** : `OQ_POSITIONAL_CSS_01` est **résolue**. Au moment de la
+rédaction, les contraintes §5.2 ne faisaient que *reporter* le risque sur la
+discipline du producteur ; le sprint homonyme l'a **éliminé dans le code**. Un
+asset régénéré avec un ordre de groupes différent conserve désormais les bonnes
+couleurs, parce que la couleur ne lit plus l'ordre.
+
+§5.2 reste néanmoins normatif : l'ordre des groupes n'est plus lu par le CSS,
+mais la structure `view → context → surfaces` reste ce que le moteur filmstrip
+attend.
 
 ---
 
@@ -364,11 +377,11 @@ géométrie. Les surfaces orphelines sont tranchées une par une : `delt-anterio
 Aucune taxonomie nouvelle, aucun renommage, aucun asset, aucun changement
 runtime. Le trou `zone_recovery` est documenté et **délibérément laissé ouvert**.
 
-Le point qui change la suite n'est pas la table : c'est **`OQ_POSITIONAL_CSS_01`**.
-Le contrat de production le borne, il ne le supprime pas. Tant que la couleur
-dépend du rang d'un groupe plutôt que de son identité, la promesse
-« l'identifiant choisit la surface » reste une intention — et c'est elle qu'il
-faudra tenir avant de brancher la moindre donnée de récupération.
+Le point qui changeait la suite n'était pas la table : c'était
+**`OQ_POSITIONAL_CSS_01`**. Le contrat de production le bornait sans le
+supprimer. **Il est désormais résolu** — la promesse « l'identifiant choisit la
+surface » n'est plus une intention, c'est le mécanisme, et l'équivalence de rendu
+a été mesurée sur les 53 chemins des trois plaques.
 
 ---
 
@@ -404,10 +417,12 @@ nommés parce qu'ils protègent contre des dérives silencieuses :
   (§3) ; déplacer le contexte décalerait toutes les couleurs. La contrainte de
   production §5.2.1 est désormais **exécutable**, pas seulement écrite.
 - `test_positional_css_still_present_because_this_sprint_changes_no_runtime` —
-  garde inversée : elle **exige** que le défaut soit encore là. Si quelqu'un le
-  corrige, le test tombe et force à retirer `OQ_POSITIONAL_CSS_01` en même temps.
-  Un défaut corrigé sans que sa question ouverte le soit est un piège pour le
-  suivant.
+  garde inversée : elle **exigeait** que le défaut soit encore là, de sorte que le
+  corriger fasse tomber le test et force à retirer `OQ_POSITIONAL_CSS_01` en même
+  temps. Un défaut corrigé sans que sa question ouverte le soit est un piège pour
+  le suivant. **Le mécanisme a fonctionné comme prévu** : le sprint
+  `OQ_POSITIONAL_CSS_01` a fait tomber cette garde, qui a été remplacée par
+  `test_positional_css_defect_is_gone_from_the_runtime` dans le même commit.
 
 **Plantation vérifiée** : `zone_recovery` injecté dans `muscle_focus.html` fait
 tomber `test_a8_zone_recovery_reaches_no_template`, qui **nomme le fichier
@@ -425,13 +440,15 @@ sélecteur dans un bloc existant.
 
 ### Ce que ce contrat ne résout pas
 
-Il rend une commande de géométrie **non ambiguë**. Il ne rend pas le rendu
-**robuste** : `OQ_POSITIONAL_CSS_01` reste ouvert, et les contraintes §5.2
-reportent le risque sur la discipline du producteur au lieu de l'éliminer dans le
-code. Un asset conforme livré demain fonctionnera ; un asset régénéré dans six
-mois avec un ordre de groupes différent casserait silencieusement, sans qu'aucun
-test actuel ne l'attrape — les gardes vérifient l'ordre des fichiers **présents**,
-pas celui d'un fichier à venir.
+Il rend une commande de géométrie **non ambiguë**. À la clôture de ce sprint, il
+ne rendait pas encore le rendu **robuste** : `OQ_POSITIONAL_CSS_01` restait
+ouvert, et les contraintes §5.2 reportaient le risque sur la discipline du
+producteur au lieu de l'éliminer dans le code.
+
+> **RÉSOLU DEPUIS** — le sprint `OQ_POSITIONAL_CSS_01` a supprimé le couplage
+> positionnel : la couleur suit le jeton de surface porté par l'identifiant. Un
+> asset régénéré avec un ordre de groupes différent garde ses bonnes couleurs.
+> Équivalence de rendu mesurée sur les 53 chemins.
 
 C'est le prochain sujet, et il est **bloquant** pour le branchement
 `zone_recovery`.
