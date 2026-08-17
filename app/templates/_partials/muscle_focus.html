@@ -6,7 +6,14 @@
    progressive-disclosure blocks (« ce que cette planche montre » / « ce qu'elle ne montre pas »).
    NO geometry rewrite (SVGs unchanged), NO new plate, NO measurement claim. Plate presence is raised
    through LAYOUT (region cards), never by editing viewBox/paths. Colour comes from runtime tokens
-   (Auren Terminal). Non-medical fitness visualisation; NOT a professional anatomical review; not claimed. #}
+   (Auren Terminal). Non-medical fitness visualisation; NOT a professional anatomical review; not claimed.
+
+   Sb_BODYMAP_FRAME_ATLAS_01 — the view selector is no longer hard-coded. Frames come from
+   app/services/bodymap_frames.py via the `muscle_focus_plates` context mapping and are rendered by
+   the generic N-frame macro. No per-region branching lives in this template (A7). The plate SVG
+   includes stay literal: geometry wiring is frozen by SHA, only the frame vocabulary is declarative. #}
+{% import "_partials/bodymap_frame_selector.html" as bodymap_frames with context %}
+{% set _mf_plates = muscle_focus_plates | default({}, true) %}
 <div class="muscle-focus">
   <p class="muscle-focus__intro text-dim">
     Trois planches régionales dérivées de sources anatomiques ouvertes. Repères visuels non
@@ -47,16 +54,11 @@
     {# ── Shoulders — source-segmented deltoid, front|back no-JS accessible toggle.
          The radios stay siblings preceding the toggle + frame INSIDE the plate area so the
          `:checked ~ .muscle-focus__toggle` / `~ .muscle-focus__frame--shoulders` selectors hold. ── #}
+    {% set _mf_shoulders = _mf_plates.get('shoulders') %}
     <section class="muscle-focus__card muscle-focus__card--shoulders">
-      <div class="muscle-focus__plate-area">
-        <input type="radio" name="mf-shoulders-view" id="mf-shoulders-front" class="muscle-focus__view-input" checked>
-        <input type="radio" name="mf-shoulders-view" id="mf-shoulders-back" class="muscle-focus__view-input">
-        <fieldset class="muscle-focus__toggle">
-          <legend class="sr-only">Vue des épaules</legend>
-          <label class="muscle-focus__toggle-btn" for="mf-shoulders-front">Face</label>
-          <label class="muscle-focus__toggle-btn" for="mf-shoulders-back">Dos</label>
-        </fieldset>
-        <div class="muscle-focus__frame muscle-focus__frame--shoulders" aria-hidden="true">
+      <div class="muscle-focus__plate-area muscle-focus__plate-area--frames-{{ _mf_shoulders.frame_count if _mf_shoulders else 1 }}">
+        {{ bodymap_frames.frame_selector(_mf_shoulders, "Vue des épaules") if _mf_shoulders }}
+        <div class="muscle-focus__frame muscle-focus__frame--strip" aria-hidden="true">
           {% include "_partials/muscle_focus_plate_shoulders.svg" %}
         </div>
       </div>

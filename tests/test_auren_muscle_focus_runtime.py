@@ -57,15 +57,12 @@ def test_wrapper_includes_three_plates_and_toggle():
     w = WRAPPER.read_text(encoding="utf-8")
     for region in ("chest", "shoulders", "posterior"):
         assert f'_partials/muscle_focus_plate_{region}.svg' in w, f"wrapper missing {region} include"
-    # no-JS front/back toggle for shoulders (radio inputs, front default checked)
-    assert 'type="radio"' in w
-    assert 'id="mf-shoulders-front"' in w
-    assert 'id="mf-shoulders-back"' in w
-    # front radio is checked by default, back radio is NOT (non-tautological — parse each tag).
-    front_tag = w[w.index('id="mf-shoulders-front"'):].split(">", 1)[0]
-    back_tag = w[w.index('id="mf-shoulders-back"'):].split(">", 1)[0]
-    assert "checked" in front_tag, "front shoulders radio must be checked by default"
-    assert "checked" not in back_tag, "back shoulders radio must not be checked by default"
+    # Sb_BODYMAP_FRAME_ATLAS_01 — the view selector is no longer a literal in this template; it is
+    # generated from app/services/bodymap_frames.py. The radio contract moved to the RENDERED
+    # assertions in test_science_renders_declared_frame_selector, which is strictly stronger than
+    # grepping template source: it proves the markup the browser actually receives.
+    assert "bodymap_frame_selector.html" in w, "wrapper must render the declarative frame selector"
+    assert "mf-shoulders-front" not in w, "frame ids must come from the contract, not template literals"
     # posterior individual provenance named
     low = w.lower()
     assert "semi-tendineux" in low
@@ -109,6 +106,36 @@ def test_science_renders_attribution_and_toggle(client):
     assert "creativecommons.org/licenses/by/4.0" in low
     assert 'id="mf-shoulders-front"' in body
     assert 'id="mf-shoulders-back"' in body
+
+
+def test_science_renders_declared_frame_selector(client):
+    """The rendered selector matches what bodymap_frames declares — no JS involved.
+
+    Moved here from a template-source grep in Sb_BODYMAP_FRAME_ATLAS_01: asserting on the response
+    body proves the ids the browser receives, which template text no longer contains now that the
+    frames are declarative.
+    """
+    from app.services.bodymap_frames import plate_for_region
+
+    body = client.get("/science").text
+    shoulders = plate_for_region("shoulders")
+    assert shoulders is not None
+    assert shoulders.is_strip
+
+    assert 'type="radio"' in body
+    for frame in shoulders.frames:
+        assert f'id="mf-shoulders-{frame.code}"' in body, f"missing radio for frame {frame.code}"
+
+    # first declared frame is checked, the others are not (parse each tag, non-tautological)
+    for index, frame in enumerate(shoulders.frames):
+        tag = body[body.index(f'id="mf-shoulders-{frame.code}"'):].split(">", 1)[0]
+        if index == 0:
+            assert "checked" in tag, f"first frame {frame.code} must be checked by default"
+        else:
+            assert "checked" not in tag, f"non-first frame {frame.code} must not be checked"
+
+    # no script is required to operate it
+    assert "<script" not in body[body.index("muscle-focus__toggle"):body.index("muscle-focus__attribution")]
 
 
 def test_science_renders_non_medical_not_claimed(client):

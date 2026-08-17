@@ -3415,28 +3415,68 @@ summary:focus-visible,
 /* posterior: gluteus (accent) + hamstring group (softer accent) */
 #auren-plate-region-posterior .auren-mf-view-back > g:nth-of-type(3) path { fill: var(--accent-soft); }
 
-/* shoulders front|back — no-JS accessible toggle (one view at a time, front default) */
+/* Sb_BODYMAP_FRAME_ATLAS_01 — generic N-frame selector (no JS, no canvas, no WebGL).
+   A multi-frame plate SVG is a horizontal filmstrip of --mf-frames equal panels. The frame element
+   crops to exactly one panel; the checked radio slides the strip by whole panels. Every rule below
+   is generic over the frame INDEX (:nth-of-type) — no rule names a region or a viewpoint, so adding
+   a produced frame is a data change in app/services/bodymap_frames.py alone.
+   For --mf-frames: 2 the offsets resolve to the pre-existing -50%, so the shipped shoulders plate
+   renders byte-identically to before this build. */
+.muscle-focus__plate-area--frames-1 { --mf-frames: 1; }
+.muscle-focus__plate-area--frames-2 { --mf-frames: 2; }
+.muscle-focus__plate-area--frames-3 { --mf-frames: 3; }
+.muscle-focus__plate-area--frames-4 { --mf-frames: 4; }
+
 .muscle-focus__view-input {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-.muscle-focus__toggle { display: inline-flex; gap: 4px; margin: 0 0 var(--space-sm); border: 0; padding: 0; min-inline-size: 0; }
+/* wraps rather than overflowing: four pills must stay inside a 360 px column */
+.muscle-focus__toggle {
+  display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 var(--space-sm);
+  border: 0; padding: 0; min-inline-size: 0;
+}
 .muscle-focus__toggle-btn {
   cursor: pointer; padding: 4px 14px; border: 1px solid var(--border-strong);
   border-radius: 999px; font-size: 13px; color: var(--fg-dim); background: var(--surface);
+  min-height: 44px; display: inline-flex; align-items: center;
 }
-#mf-shoulders-front:checked ~ .muscle-focus__toggle label[for="mf-shoulders-front"],
-#mf-shoulders-back:checked ~ .muscle-focus__toggle label[for="mf-shoulders-back"] {
+.muscle-focus__view-input:nth-of-type(1):checked ~ .muscle-focus__toggle label:nth-of-type(1),
+.muscle-focus__view-input:nth-of-type(2):checked ~ .muscle-focus__toggle label:nth-of-type(2),
+.muscle-focus__view-input:nth-of-type(3):checked ~ .muscle-focus__toggle label:nth-of-type(3),
+.muscle-focus__view-input:nth-of-type(4):checked ~ .muscle-focus__toggle label:nth-of-type(4) {
   background: var(--accent); color: var(--on-accent); border-color: var(--accent);
 }
-#mf-shoulders-front:focus-visible ~ .muscle-focus__toggle label[for="mf-shoulders-front"],
-#mf-shoulders-back:focus-visible ~ .muscle-focus__toggle label[for="mf-shoulders-back"] {
+.muscle-focus__view-input:nth-of-type(1):focus-visible ~ .muscle-focus__toggle label:nth-of-type(1),
+.muscle-focus__view-input:nth-of-type(2):focus-visible ~ .muscle-focus__toggle label:nth-of-type(2),
+.muscle-focus__view-input:nth-of-type(3):focus-visible ~ .muscle-focus__toggle label:nth-of-type(3),
+.muscle-focus__view-input:nth-of-type(4):focus-visible ~ .muscle-focus__toggle label:nth-of-type(4) {
   outline: 2px solid var(--accent); outline-offset: 2px;
 }
-/* the frame crops the 2:1 (front|back) plate to one square view; the toggle shifts to the back half.
-   The SVG is absolutely positioned so its 200% width never pushes the flex column wider than 360 px. */
-.muscle-focus__frame--shoulders { aspect-ratio: 1 / 1; padding: 0; position: relative; }
-.muscle-focus__frame--shoulders svg {
-  position: absolute; top: 0; left: 0; width: 200%; height: 100%; transition: transform 0.2s ease;
+/* orientation cue: only the landmark of the checked frame is shown */
+.muscle-focus__landmarks { margin: 0 0 var(--space-sm); font-size: 12px; line-height: 1.4; color: var(--fg-dim); }
+.muscle-focus__landmark { display: none; }
+.muscle-focus__view-input:nth-of-type(1):checked ~ .muscle-focus__landmarks .muscle-focus__landmark:nth-of-type(1),
+.muscle-focus__view-input:nth-of-type(2):checked ~ .muscle-focus__landmarks .muscle-focus__landmark:nth-of-type(2),
+.muscle-focus__view-input:nth-of-type(3):checked ~ .muscle-focus__landmarks .muscle-focus__landmark:nth-of-type(3),
+.muscle-focus__view-input:nth-of-type(4):checked ~ .muscle-focus__landmarks .muscle-focus__landmark:nth-of-type(4) {
+  display: inline;
 }
-#mf-shoulders-back:checked ~ .muscle-focus__frame--shoulders svg { transform: translateX(-50%); }
+/* the SVG is absolutely positioned so its N x 100% width never widens the flex column at 360 px */
+.muscle-focus__frame--strip { aspect-ratio: 1 / 1; padding: 0; position: relative; }
+.muscle-focus__frame--strip svg {
+  position: absolute; top: 0; left: 0; height: 100%;
+  width: calc(var(--mf-frames, 1) * 100%); transition: transform 0.2s ease;
+}
+.muscle-focus__view-input:nth-of-type(2):checked ~ .muscle-focus__frame--strip svg {
+  transform: translateX(calc(-100% / var(--mf-frames)));
+}
+.muscle-focus__view-input:nth-of-type(3):checked ~ .muscle-focus__frame--strip svg {
+  transform: translateX(calc(-200% / var(--mf-frames)));
+}
+.muscle-focus__view-input:nth-of-type(4):checked ~ .muscle-focus__frame--strip svg {
+  transform: translateX(calc(-300% / var(--mf-frames)));
+}
+@media (prefers-reduced-motion: reduce) {
+  .muscle-focus__frame--strip svg { transition: none; }
+}

@@ -1,0 +1,42 @@
+{# Sb_BODYMAP_FRAME_ATLAS_01 — reusable no-JS frame selector, generic over N frames.
+
+   Renders nothing when a plate holds a single frame: a one-view plate has no
+   view to choose. Otherwise it emits, in this exact sibling order:
+
+     1. one <input type="radio"> per declared frame (first one checked)
+     2. the <fieldset> of labels
+     3. the landmark caption line
+
+   The order matters. The stylesheet selects the active label, the active
+   landmark and the filmstrip offset with `:checked ~ …` sibling combinators, so
+   the radios MUST precede everything they drive and MUST stay siblings of the
+   frame element that muscle_focus.html renders after this macro.
+
+   Frames come from app/services/bodymap_frames.py. There is deliberately no
+   per-region branching here (Sb_BODYMAP_FRAME_ATLAS_01 A7): the template
+   renders whatever the contract declares.
+
+   Non-medical: labels name a viewpoint, landmarks name a bone visible in the
+   drawing. Neither claims activation, effort or recovery. #}
+
+{% macro frame_selector(plate, legend) -%}
+{%- if plate.is_strip -%}
+{%- for f in plate.frames %}
+<input type="radio" name="mf-{{ plate.region }}-view" id="mf-{{ plate.region }}-{{ f.code }}"
+       class="muscle-focus__view-input"{% if loop.first %} checked{% endif %}>
+{%- endfor %}
+<fieldset class="muscle-focus__toggle">
+  <legend class="sr-only">{{ legend }}</legend>
+  {%- for f in plate.frames %}
+  <label class="muscle-focus__toggle-btn" for="mf-{{ plate.region }}-{{ f.code }}">{{ f.label }}</label>
+  {%- endfor %}
+</fieldset>
+{%- if plate.frames | selectattr("landmark") | list %}
+<p class="muscle-focus__landmarks">
+  {%- for f in plate.frames %}
+  <span class="muscle-focus__landmark">{% if f.landmark %}Repère : {{ f.landmark }}{% endif %}</span>
+  {%- endfor %}
+</p>
+{%- endif %}
+{%- endif -%}
+{%- endmacro %}
