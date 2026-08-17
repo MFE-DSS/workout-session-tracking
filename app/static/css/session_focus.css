@@ -1617,6 +1617,17 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   scroll-margin-top: 110px;
 }
 
+/* Sb_SUBSTITUTION_COCKPIT_01 — même dégagement pour le sélecteur
+   d'alternatives. Défaut constaté au pilotage navigateur : en défilant
+   jusqu'au résumé « Adapter l'exercice », celui-ci se calait SOUS l'en-tête
+   collant et le clic était intercepté par `session-focus__header-main`. Même
+   famille de défaut que l'ancre de série, même correctif — la propriété
+   prévue pour ça, sans JS, sans z-index, sans position absolue. */
+.substitute-picker,
+.substitute-picker__summary {
+  scroll-margin-top: 110px;
+}
+
 /* `.set-row` est une grille `40px 1fr auto`. Ajouté tel quel, le bouton de
    série devenait un QUATRIÈME élément et débordait dans une colonne
    implicite : bord droit à 393 px pour un viewport de 360, et

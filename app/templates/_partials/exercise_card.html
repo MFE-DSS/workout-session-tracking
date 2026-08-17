@@ -758,12 +758,37 @@
         <div class="substitute-picker__body">
           <p class="substitute-picker__hint session-focus__alternatives-role">Machine occupée, gêne, ou charge inadaptée ? Choisissez une alternative de même zone / même pattern avant la première série travail.</p>
           <div class="segmented segmented--stacked">
+            {# ====================================================
+               Sb_SUBSTITUTION_COCKPIT_01 — PLAFOND DE 4, EN SÉANCE.
+               ----------------------------------------------------
+               Le moteur n'a pas changé : il propose toujours autant de
+               candidats, dans le même ordre de proximité. Ce qui change,
+               c'est ce que la séance MONTRE.
+
+               Mesuré sur push-a avant plafonnement, en liste directe
+               (N1+N2, hors élargies) : 6 · 6 · 5 · 4 · 5 · 5 · 5.
+               Autrement dit un mini-catalogue au milieu d'une série —
+               exactement ce que le brief refuse.
+
+               Le surplus n'est PAS supprimé : il rejoint la disclosure
+               « alternatives élargies » qui existe déjà. Aucun candidat
+               ne disparaît, aucune valeur postable ne change, et
+               l'ordre N1 → N2 → N3 est conservé.
+               ==================================================== #}
+            {% set _cap = 4 %}
+            {% set _n1_all = grouped.get('N1', []) %}
+            {% set _n2_all = grouped.get('N2', []) %}
+            {% set _n3_all = grouped.get('N3', []) %}
+            {% set _vis_n1 = _n1_all[:_cap] %}
+            {% set _n2_room = _cap - (_vis_n1 | length) %}
+            {% set _vis_n2 = _n2_all[:_n2_room] if _n2_room > 0 else [] %}
+            {% set _overflow = _n1_all[(_vis_n1 | length):] + _n2_all[(_vis_n2 | length):] + _n3_all %}
             <label class="segmented__option">
               <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
               <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
             </label>
             {# Sb_22a — N1 Équivalent (curé + match parfait) #}
-            {% for s in grouped.get('N1', []) %}
+            {% for s in _vis_n1 %}
             <label class="segmented__option">
               <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
               <span>
@@ -773,7 +798,7 @@
             </label>
             {% endfor %}
             {# Sb_22a — N2 Proche (même pattern, équipement/chaîne différents) #}
-            {% for s in grouped.get('N2', []) %}
+            {% for s in _vis_n2 %}
             <label class="segmented__option">
               <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
               <span>
@@ -783,11 +808,15 @@
               </span>
             </label>
             {% endfor %}
-            {# Sb_22a — N3 Élargi (zone-only ou cross-pattern bridge). Replié par défaut. #}
-            {% if grouped.get('N3', []) | length > 0 %}
+            {# Sb_22a — N3 Élargi (zone-only ou cross-pattern bridge). Replié par défaut.
+               Sb_SUBSTITUTION_COCKPIT_01 — cette disclosure accueille aussi le
+               SURPLUS de N1/N2 au-delà du plafond de 4. Rien n'est retiré :
+               tout candidat reste dans le DOM, sélectionnable, avec la même
+               valeur postée. Seule sa proéminence change. #}
+            {% if _overflow | length > 0 %}
             <details class="sub-elargi">
-              <summary>Voir alternatives élargies ({{ grouped.get('N3', []) | length }})</summary>
-              {% for s in grouped.get('N3', []) %}
+              <summary>Voir alternatives élargies ({{ _overflow | length }})</summary>
+              {% for s in _overflow %}
               <label class="segmented__option">
                 <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
                 <span>
