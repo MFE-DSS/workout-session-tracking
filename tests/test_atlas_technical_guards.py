@@ -129,7 +129,8 @@ def test_the_cue_is_readable_without_javascript(client):
     start = src.find("machine-panel__lead-cue")
     summary_open = src.rfind("<summary", 0, start)
     summary_close = src.find("</summary>", start)
-    assert summary_open != -1 and summary_close != -1
+    assert summary_open != -1, "no <summary> before the lead cue"
+    assert summary_close != -1, "no </summary> after the lead cue"
     assert summary_open < start < summary_close, (
         "the lead cue must sit inside the <summary> so it is visible while "
         "the disclosure is closed"
@@ -156,7 +157,8 @@ def test_the_cue_is_not_rendered_above_the_console():
     src = CARD.read_text(encoding="utf-8")
     cue = src.find("machine-panel__lead-cue")
     console = src.find("session-focus__console-list")
-    assert cue != -1 and console != -1
+    assert cue != -1, "lead cue not rendered"
+    assert console != -1, "console list not rendered"
     assert console < cue, (
         "the lead cue must render after the logging console; above it, it "
         "occludes the current set inputs at 360x640"
