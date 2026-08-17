@@ -62,7 +62,10 @@ def test_contract_parses_with_stdlib_json():
     d = _contract()
     assert d["schema"] == "auren.body-zone-mapping"
     assert d["schema_version"] == 1
-    assert d["contract_version"] == "1.0.0"
+    # 1.1.0 — Sb_BODYMAP_FRAME_ATLAS_01 added the `frames` vocabulary and the
+    # `regional_plates` mirror. Additive and backward compatible: the eleven
+    # zones, the six macros and the stable SVG ids are untouched.
+    assert d["contract_version"] == "1.1.0"
 
 
 # ───────── 22.2 taxonomy ─────────

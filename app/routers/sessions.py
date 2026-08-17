@@ -36,6 +36,7 @@ from app.enums import (
 )
 from app.models.catalog import MethodRule, TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, WorkoutSession
+from app.services.bodymap_frames import regional_plates
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
 from app.services.form_parsing import (
@@ -839,6 +840,10 @@ def science_page(request: Request, db: DbSession, user: CurrentUser) -> HTMLResp
         {
             "page_title": "Science",
             "rules": rules,
+            # Sb_BODYMAP_FRAME_ATLAS_01 — declared frames per produced plate.
+            # The template renders whatever this mapping declares; it holds no
+            # per-region logic of its own.
+            "muscle_focus_plates": {p.region: p for p in regional_plates()},
             "active_session": latest_open_session(db, user.id),
         },
     )

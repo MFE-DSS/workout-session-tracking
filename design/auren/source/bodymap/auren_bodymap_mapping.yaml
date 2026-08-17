@@ -1,7 +1,7 @@
 {
   "schema": "auren.body-zone-mapping",
   "schema_version": 1,
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
 
   "purpose": "Versioned, testable semantic contract for the Auren BodyMap: the eleven functional body zones, their labels, the mapping to the six compact visual macro-regions, and the stable SVG IDs. This is a DESIGN CONTRACT (Layer A, business semantics). It carries NO geometry and does NOT replace runtime truth. It is expressed as YAML 1.2 in JSON-compatible syntax so it is readable with the Python standard library (json) without adding PyYAML.",
 
@@ -9,8 +9,34 @@
     "note": "The design contract MIRRORS runtime truth. It does NOT replace runtime truth in Sb_ASSET_01.2. Parity is enforced by tests/test_auren_body_zone_contract.py.",
     "zone_codes_and_labels": "app/services/muscle_mapping.py#ZONE_LABELS",
     "compact_macro_mapping": "app/templates/_partials/worked_area_body_map.html#_WA_ZONE_TO_REGION",
-    "exchange_contract": "app/services/body_map_descriptor.py#build_body_map_descriptor"
+    "exchange_contract": "app/services/body_map_descriptor.py#build_body_map_descriptor",
+    "frames_and_regional_plates": "app/services/bodymap_frames.py#REGIONAL_PLATES"
   },
+
+  "frames": [
+    {"code": "front",   "label_fr": "Face",   "nature": "viewpoint"},
+    {"code": "profile", "label_fr": "Profil", "nature": "viewpoint"},
+    {"code": "back",    "label_fr": "Dos",    "nature": "viewpoint"},
+    {"code": "top",     "label_fr": "Dessus", "nature": "viewpoint"}
+  ],
+  "frames_note": "Sb_BODYMAP_FRAME_ATLAS_01. Four cardinal frames, frozen for V1 (architect decision: cardinal frames, NOT twelve angles, NOT a WebGL turntable). A frame is a VIEWPOINT on a plate; it is never a body zone and never appears in any zone table. Rendering is pre-rendered SVG selected by native radio inputs — no canvas, no WebGL, no required JavaScript. Declaring a frame here does NOT mean it has been produced: see regional_plates for what actually exists.",
+
+  "regional_plates": [
+    {"region": "chest",     "zones": ["pecs"],                    "frames_produced": ["front"]},
+    {"region": "shoulders", "zones": ["delt_lat", "delt_post"],   "frames_produced": ["front", "back"]},
+    {"region": "posterior", "zones": ["posterior"],               "frames_produced": ["back"]}
+  ],
+  "regional_plates_note": "MIRRORS runtime truth (app/services/bodymap_frames.py), parity enforced by tests/test_bodymap_frame_atlas.py. frames_produced lists only viewpoints whose panel exists in the shipped SVG today; a plate is a horizontal filmstrip of len(frames_produced) equal panels. Seven of the eleven zones have NO plate: lats, upper_back, biceps, triceps, quads, calves, core. Those zones fall back to the schematic macro silhouette and are never coloured as if geometry existed.",
+
+  "shoulders_anterior_decision": {
+    "decision": "OPTION A — the taxonomy governs",
+    "statement": "The shoulders plate contains distinct *-delt-anterior surfaces, but there is NO delt_ant business zone and none will be created by the visual layer. Those surfaces are depicted as part of the shoulders plate and carry no independent state.",
+    "why": "The eleven-zone taxonomy is read by ZONE_VOLUME_TARGET, RADAR_AXES, slot_intent and recommendation.py. Adding a twelfth zone to match a drawing would invert the governing rule: the business model governs the visual, never the reverse."
+  },
+
+  "open_questions": [
+    {"id": "OQ_PEC_SPLIT_01", "status": "documented-not-built", "subject": "clavicular / sternocostal pectoral distinction", "decision": "pecs remains ONE business zone. The distinction may be explained in prose or shown by a future profile frame, never modelled as a second zone.", "reference": "docs/OQ_PEC_SPLIT_01.md"}
+  ],
 
   "analytics_separation": {
     "statement": "BODYMAP COMPACT MACROS ARE NOT RADAR_AXES",
