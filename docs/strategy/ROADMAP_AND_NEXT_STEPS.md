@@ -9,6 +9,19 @@
 
 ## 1. Position actuelle (verrouillée)
 
+> 🚀 **PRODUCTION = `e51e4cb` depuis 2026-08-17** (run `32036251711`).
+> Déploiement du SHA exact validé par la CI, `skip_smoke=false`.
+> **Rollback target `64a6e75`** ≠ SHA déployé — preuve de rollback tenue.
+> **Sauvegarde SQLite prise avant migration** (`workout_pre_…_134105.db`, 648 K).
+> **Deux migrations additives** appliquées depuis le head de production
+> `q8r3l9m0o11` : `wingspan_cm` puis `decision_traces` — aucune reconstruction,
+> aucun `DROP`/`RENAME`/`UPDATE` de données historiques.
+> **`/healthz` 200, `/healthz/strict` 200, service actif, 18/18 smoke PASS.**
+> **« Reference catalog: unchanged »** — le verrou de version a tenu comme
+> prévu par `Sb_ATLAS_COVERAGE_01`, ce qui confirme que le repli par nom était
+> bien le seul chemin livrant la couverture sans reseed.
+> **47 commits rattrapés d'un coup.** Écart production/canonical : **0**.
+
 | Item | Valeur |
 |---|---|
 | Sx_26 — Engineering Control Plane | ✅ clôturé 2026-06-14 (cf. `Sx_26_CLOSURE_REPORT.md`) |
