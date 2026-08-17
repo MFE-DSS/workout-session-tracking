@@ -13,6 +13,7 @@ shipped CSS, which is where a filmstrip regression would live.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -123,6 +124,64 @@ def test_a5_selecting_a_frame_moves_the_strip_without_javascript(rendered):
 
     assert before != after, "selecting a different frame must move the strip"
     assert rendered.locator(f"#mf-shoulders-{second}").is_checked()
+
+
+#: OQ_POSITIONAL_CSS_01 — the colour each surface must actually resolve to.
+#: Measured against the pre-fix stylesheet: all 53 plate paths keep the exact
+#: same computed fill, so this table also pins "rendering unchanged".
+EXPECTED_FILL = {
+    "context": "rgb(138, 148, 160)",          # --fg-dim
+    "hero": "rgb(200, 162, 75)",              # --accent
+    "delt-anterior": "rgb(200, 162, 75)",     # --accent (fallback: Option A, no own zone)
+    "delt-lateral": "rgb(215, 180, 92)",      # --accent-hover
+    "delt-posterior": "rgb(138, 117, 56)",    # --accent-muted
+    "gluteus": "rgb(200, 162, 75)",           # --accent
+    "hamstring": "rgba(200, 162, 75, 0.12)",  # --accent-soft
+}
+
+
+def _surface_token(path_id: str) -> str:
+    tail = re.sub(r"-\d{3}$", "", path_id).split("--", 1)[1]
+    for frame in ("front", "profile", "back", "top"):
+        tail = tail.removeprefix(f"{frame}-")
+    return tail
+
+
+def test_surface_colour_follows_identity_not_dom_rank(rendered):
+    """Every plate path resolves to the colour its surface token declares.
+
+    This is the acceptance proof of OQ_POSITIONAL_CSS_01: colour is read from
+    the browser, so it exercises the real cascade rather than asserting that a
+    selector exists.
+    """
+    measured = rendered.evaluate("""() => {
+        const out = {};
+        document.querySelectorAll('path[id^="auren-plate-region-"]').forEach(
+            el => { out[el.id] = getComputedStyle(el).fill; });
+        return out;
+    }""")
+    assert len(measured) == 53, f"expected 53 plate paths, saw {len(measured)}"
+
+    for path_id, fill in measured.items():
+        token = _surface_token(path_id)
+        assert token in EXPECTED_FILL, f"unknown surface token {token!r}"
+        assert fill == EXPECTED_FILL[token], (
+            f"{path_id}: {token} rendered {fill}, expected {EXPECTED_FILL[token]}"
+        )
+
+
+def test_the_three_deltoid_fascicles_stay_visually_distinct(rendered):
+    """The whole point of the shoulders plate: three shades, not one."""
+    shades = rendered.evaluate("""() => {
+        const pick = t => {
+            const el = document.querySelector(`path[id*="-delt-${t}-"]`);
+            return el ? getComputedStyle(el).fill : null;
+        };
+        return {a: pick('anterior'), l: pick('lateral'), p: pick('posterior')};
+    }""")
+    assert shades["l"] != shades["p"]
+    assert shades["l"] != shades["a"]
+    assert shades["p"] != shades["a"]
 
 
 def test_a5_landmark_follows_the_selected_frame(rendered):

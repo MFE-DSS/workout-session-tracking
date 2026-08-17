@@ -3403,17 +3403,24 @@ summary:focus-visible,
   .muscle-focus__body { flex: 1 1 0; min-width: 0; }
 }
 
-/* plate colours (tokens) */
-.muscle-focus .auren-mf-context path { fill: var(--fg-dim); }
-.muscle-focus .auren-mf-hero path { fill: var(--accent); }
-.muscle-focus .auren-mf-part path { fill: var(--accent); }
-/* shoulders: three deltoid parts in three accent shades (anterior / lateral / posterior) */
-#auren-plate-region-shoulders .auren-mf-view-front > g:nth-of-type(3) path,
-#auren-plate-region-shoulders .auren-mf-view-back  > g:nth-of-type(3) path { fill: var(--accent-hover); }
-#auren-plate-region-shoulders .auren-mf-view-front > g:nth-of-type(4) path,
-#auren-plate-region-shoulders .auren-mf-view-back  > g:nth-of-type(4) path { fill: var(--accent-muted); }
-/* posterior: gluteus (accent) + hamstring group (softer accent) */
-#auren-plate-region-posterior .auren-mf-view-back > g:nth-of-type(3) path { fill: var(--accent-soft); }
+/* plate colours (tokens) — OQ_POSITIONAL_CSS_01 RESOLVED.
+   Colour used to be selected by DOM rank (`> g:nth-of-type(3)`), so reordering two groups in a
+   regenerated asset would have silently recoloured the wrong muscle. Surfaces are now selected by
+   their contractual IDENTITY: the path id carries the surface token
+   (`auren-plate-region-{region}--[{frame}-]{surface}-{NNN}`, Sb_BODYMAP_IDENTITY_CONTRACT_01 §5.1),
+   so group order no longer decides anything.
+
+   Cascade: the fallbacks below are wrapped in `:where()`, which contributes ZERO specificity, so the
+   per-surface rules (0,2,1) beat them strictly — not by source order. Moving a rule inside this
+   block cannot change the rendering. No `!important`, no id selector needed. */
+.muscle-focus :where(.auren-mf-context) path { fill: var(--fg-dim); }
+.muscle-focus :where(.auren-mf-hero, .auren-mf-part) path { fill: var(--accent); }
+/* shoulders — three deltoid shades. `delt-anterior` is deliberately absent: it keeps the fallback
+   accent because Option A makes it a surface of the shoulders plate, never an addressable zone. */
+.muscle-focus path[id*="-delt-lateral-"] { fill: var(--accent-hover); }
+.muscle-focus path[id*="-delt-posterior-"] { fill: var(--accent-muted); }
+/* posterior — gluteus keeps the fallback accent, the hamstring group is softer */
+.muscle-focus path[id*="-hamstring-"] { fill: var(--accent-soft); }
 
 /* Sb_BODYMAP_FRAME_ATLAS_01 — generic N-frame selector (no JS, no canvas, no WebGL).
    A multi-frame plate SVG is a horizontal filmstrip of --mf-frames equal panels. The frame element
