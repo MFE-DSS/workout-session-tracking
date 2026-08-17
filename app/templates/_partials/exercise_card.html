@@ -268,6 +268,29 @@
            famille atlas). Pas de silhouette, pas de carte imbriquée, pas de
            prose, aucune revendication d'activation ou de récupération.
            Le panneau « Zone travaillée » COMPLET est rendu sous la console. #}
+        {# ============================================================
+           Sb_ATLAS_TECHNICAL_GUARDS_01 — LE cue d'exécution, au-dessus de
+           la console.
+           ------------------------------------------------------------
+           RESTITUTION, PAS COLLECTE. Le contenu vient de l'atlas versionné
+           (`data/machine_atlas.json`, 29 machines, 3 cues chacune) via
+           `atlas_data`, déjà résolu par le routeur et déjà conscient des
+           substitutions (`get_for_session_exercise` suit le réalisé, pas le
+           prescrit). Aucune chaîne technique n'est écrite dans ce gabarit :
+           un cue codé en dur ici serait invisible à l'atlas et diverger de
+           lui sans que rien ne le signale.
+
+           UN SEUL cue est remonté ici — le premier. Les deux autres et les
+           erreurs fréquentes restent dans la disclosure machine, sous la
+           console : le budget vertical au-dessus de la série courante est
+           de ~15 px, et cette tranche ne doit pas reprendre ce que les deux
+           précédentes ont gagné.
+
+           Silence si l'exercice n'est pas mappé — c'est le cas de 3 des 7
+           exercices d'une séance type. Aucun texte générique de
+           remplacement : mieux vaut ne rien dire que dire une consigne qui
+           ne correspond pas à la machine.
+           ============================================================ #}
         <p class="session-focus__target-compact">
           <span class="session-focus__target-compact-label">Cible</span>
           <span class="session-focus__target-compact-value">
@@ -640,6 +663,30 @@
               <em class="machine-panel__tag">(substitué)</em>
             {% endif %}
           </span>
+          {# ========================================================
+             Sb_ATLAS_TECHNICAL_GUARDS_01 — LE cue principal, lisible
+             SANS ouvrir la disclosure.
+             --------------------------------------------------------
+             Ce résumé ne portait qu'une étiquette (« Comment bien
+             exécuter X ») : il annonçait du contenu sans en montrer.
+             Il porte désormais le premier cue de l'atlas, donc une
+             consigne réellement actionnable avant tout clic.
+
+             POURQUOI ICI ET PAS AU-DESSUS DE LA CONSOLE. Mesuré à
+             360×640 : placé au-dessus, même réduit à UNE ligne de
+             20 px, le cue déplaçait les champs de la série courante de
+             497 à 520 px et `elementFromPoint` cessait de les
+             retourner — ils passaient DERRIÈRE la barre d'action
+             collante. Les priorités du sprint tranchent : préserver
+             l'action de série et la géométrie mobile passent avant le
+             placement. L'atlas est la SOURCE, pas la POSITION.
+
+             Silence si l'exercice n'est pas mappé — 3 des 7 exercices
+             d'une séance type. Aucun texte générique de remplacement.
+             ======================================================== #}
+          {% if _m.execution_cues %}
+          <span class="machine-panel__lead-cue">{{ _m.execution_cues[0] }}</span>
+          {% endif %}
         </summary>
         <div class="disclosure__body machine-panel__body">
           {% if _m.execution_cues %}
