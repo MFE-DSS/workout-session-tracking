@@ -185,3 +185,47 @@ l'atlas versionné.
 Le travail utile a été de mesurer que le placement demandé était incompatible
 avec la saisie — et de le dire, plutôt que de livrer un cue joliment placé
 au-dessus de champs devenus inutilisables.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#117** — `--merge --match-head-commit f129df6`, **sans** squash / `--admin` / force |
+| Merge | **`9177724`** |
+| CI canonique | run `32013286672` — **succès 6/6** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication |
+| Threads / Gitar | **0 / 0** |
+| Parité métier | diff **vide** sur `app/models`, `migrations`, `app/services`, `app/routers` |
+| Atlas | **inchangé** — zéro octet ajouté |
+
+### Un aller-retour Sonar, et c'était ma leçon non appliquée
+
+Gate rouge à **15** pour un seuil de 14 — un MAJOR. Localisé par la route
+documentée avant toute modification : **`python:S9073`**, assertion composée,
+sur **deux lignes que j'avais écrites** dans ce sprint.
+
+Le sprint précédent s'était conclu en notant que le **pré-scan AST avant
+commit** évitait exactement cet aller-retour. Je ne l'ai pas fait ici. C'est
+la seule cause du cycle CI supplémentaire, et elle était entièrement évitable.
+
+### Capacité CI — `HEALTHY`
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 85 | 6 797 Mo | 3 071 — intact |
+| 2 | 84 | 7 033 Mo | 3 071 — intact |
+| 3 | 84 | 8 131 Mo | 3 071 — intact |
+
+`workers=2`, manifeste respecté, jamais `-n auto`. Le shard le plus bas est à
+**6 797 Mo**, très au-dessus du plancher de 4 Go. Quatre tranches successives
+confirment que l'équilibre suit la **partition**, pas la machine.
+
+### Ce que la tranche laisse ouvert
+
+- **3 exercices sur 7 n'ont pas de cue** faute d'entrée d'atlas. Travail de
+  **contenu**, pas de code — candidat `Sb_ATLAS_COVERAGE_01`.
+- **Le cue n'est pas dans le premier écran** : mesuré impossible sans occulter
+  la saisie. Le rouvrir supposerait de libérer de la place ailleurs, donc une
+  décision produit sur ce que Home ou l'en-tête de séance peuvent perdre.
