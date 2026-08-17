@@ -369,3 +369,69 @@ Le contrat de production le borne, il ne le supprime pas. Tant que la couleur
 dépend du rang d'un groupe plutôt que de son identité, la promesse
 « l'identifiant choisit la surface » reste une intention — et c'est elle qu'il
 faudra tenir avant de brancher la moindre donnée de récupération.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `28ca001` |
+| PR | **#122 MERGED** |
+| Merge | **`3873f58`** via `--merge --match-head-commit 810de7a` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32066531124` — 6/6 success** |
+| Sonar | `SonarCloud` **success** · gate externe **pass** |
+| Gitar | pass |
+| Threads | **0 non résolu** |
+| CI PR | **7 checks verts du premier coup, aucun aller-retour** |
+| Tier `check_scope` | `ISOLATED` |
+
+### Portée réellement tenue
+
+`git diff` du merge : **2 fichiers, 659 insertions, 0 suppression**. Aucun asset,
+aucun renommage, aucune ligne de runtime, aucune migration, aucune zone métier.
+Le sprint a produit un document et des gardes — rien d'autre, comme annoncé.
+
+### Ce que les gardes rendent impossible
+
+Vingt-six tests lisent les fichiers réels — les SVG, la taxonomie, la feuille de
+style — et non ce que le document affirme. Trois d'entre eux méritent d'être
+nommés parce qu'ils protègent contre des dérives silencieuses :
+
+- `test_a2_surface_tokens_match_the_audit` — un jeton de surface nouveau ou
+  disparu dans un SVG fait tomber le contrat. L'inventaire ne peut pas vieillir.
+- `test_context_group_is_first_in_every_view` — le CSS compte les rangs
+  (§3) ; déplacer le contexte décalerait toutes les couleurs. La contrainte de
+  production §5.2.1 est désormais **exécutable**, pas seulement écrite.
+- `test_positional_css_still_present_because_this_sprint_changes_no_runtime` —
+  garde inversée : elle **exige** que le défaut soit encore là. Si quelqu'un le
+  corrige, le test tombe et force à retirer `OQ_POSITIONAL_CSS_01` en même temps.
+  Un défaut corrigé sans que sa question ouverte le soit est un piège pour le
+  suivant.
+
+**Plantation vérifiée** : `zone_recovery` injecté dans `muscle_focus.html` fait
+tomber `test_a8_zone_recovery_reaches_no_template`, qui **nomme le fichier
+fautif**. Plantation retirée, `git diff` vide.
+
+### Un défaut de mesure dans ma propre garde
+
+Premier jet de `test_positional_css_still_present…` : la regex
+`#auren-plate-region-\w+[^{]*nth-of-type\(\d\)` comptait **3** au lieu de **5**.
+`[^{]*` traverse les retours à la ligne, donc elle fusionnait les sélecteurs
+partageant un même bloc et comptait des *règles* là où le contrat parle de
+*sélecteurs*. Bornée à la ligne (`[^{\n]*`). Sans cette correction la garde
+aurait épinglé un nombre faux et se serait déclenchée au premier ajout de
+sélecteur dans un bloc existant.
+
+### Ce que ce contrat ne résout pas
+
+Il rend une commande de géométrie **non ambiguë**. Il ne rend pas le rendu
+**robuste** : `OQ_POSITIONAL_CSS_01` reste ouvert, et les contraintes §5.2
+reportent le risque sur la discipline du producteur au lieu de l'éliminer dans le
+code. Un asset conforme livré demain fonctionnera ; un asset régénéré dans six
+mois avec un ordre de groupes différent casserait silencieusement, sans qu'aucun
+test actuel ne l'attrape — les gardes vérifient l'ordre des fichiers **présents**,
+pas celui d'un fichier à venir.
+
+C'est le prochain sujet, et il est **bloquant** pour le branchement
+`zone_recovery`.
