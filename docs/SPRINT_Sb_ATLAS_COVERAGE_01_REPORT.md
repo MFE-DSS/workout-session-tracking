@@ -176,3 +176,50 @@ migration, sans toucher le catalogue.
 Le travail utile n'a pas été d'écrire des cues : c'est d'avoir mesuré que le
 chemin évident — remplir le catalogue — aurait effacé les cues de tout
 l'historique pour en gagner trois.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#118** — `--merge --match-head-commit 399b81a`, **sans** squash / `--admin` / force |
+| Merge | **`99ef904`** |
+| CI canonique | run `32018420408` — **succès 6/6** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication, **couverture code neuf 100 %** |
+| Threads / Gitar | **0 / 0** |
+| CI PR | **9 checks verts au premier passage, aucun aller-retour** |
+
+### La leçon appliquée, cette fois
+
+Le sprint précédent s'était conclu sur un aller-retour Sonar évitable
+(`python:S9073`) faute de pré-scan AST avant commit. Ici le scan a été fait
+**avant** de pousser — et la PR est passée verte du premier coup, gate
+comprise. C'est la deuxième fois que ce scan décide de la présence ou non d'un
+cycle CI supplémentaire.
+
+### Capacité CI — `HEALTHY`, partition serrée
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 85 | 8 101 Mo | 3 071 — intact |
+| 2 | 85 | 7 048 Mo | 3 071 — intact |
+| 3 | 84 | 6 794 Mo | 3 071 — intact |
+
+`workers=2`, manifeste respecté, jamais `-n auto`. Shard bas à **6 794 Mo**,
+très au-dessus du plancher de 4 Go. **85/85/84** — la partition reste
+équilibrée alors que la suite a encore grandi.
+
+### Effet de bord bénéfique, non demandé
+
+Le repli par nom ne profite pas qu'aux trois exercices visés : **tout**
+exercice dont le nom figé correspond à une entrée d'atlas résout désormais son
+cue, y compris dans les séances déjà enregistrées et y compris si son lien
+`template_exercise` venait à disparaître. La couverture a cessé de dépendre de
+l'état du catalogue.
+
+### Suite
+
+`Sb_SUBSTITUTION_COCKPIT_01` peut maintenant s'appuyer sur une base sémantique
+complète pour la surface testée — c'était la condition posée par le rationnel
+du sprint.
