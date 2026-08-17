@@ -227,3 +227,53 @@ permanente plutôt qu'un tableur jeté après usage.
 
 Le dernier verrou technique avant la commande de géométrie est levé. Ce qui reste
 entre AUREN et le profil corps entier n'est plus dans le dépôt.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `75cd4eb` |
+| PR | **#123 MERGED** |
+| Merge | **`43469c3`** via `--merge --match-head-commit 17db3ae` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32070579966` — 6/6 success** |
+| Sonar | `SonarCloud` **success** · gate externe **pass** |
+| Gitar | pass |
+| Threads | **0 non résolu** |
+| CI PR | **7 checks verts du premier coup, aucun aller-retour** |
+
+### Portée réellement tenue
+
+6 fichiers, **520 insertions / 48 suppressions** — dont 458 insertions de tests
+et de documentation. Le changement de comportement tient en **onze lignes de
+CSS**. Aucun SVG, aucun template, aucun service, aucun modèle, aucune migration.
+
+### Ce que la CI a confirmé, et ce qu'elle n'a pas pu
+
+Les gardes structurelles — `test_bodymap_surface_identity.py` et la garde
+remplacée dans `test_bodymap_identity_contract.py` — **tournent en CI**. Un
+retour du `nth-of-type` sur une plaque sera attrapé automatiquement, sur
+n'importe quelle branche.
+
+La preuve de **couleur calculée**, elle, a skippé : `pyproject.toml`
+§`[baseline]` n'installe jamais Playwright en CI V1. Elle a tourné en local avec
+un vrai Chromium et c'est là que les 53 chemins ont été mesurés. Une régression
+de couleur qui n'emprunterait pas le sélecteur positionnel ne serait donc pas
+attrapée par la CI — c'est la même limite que celle déjà consignée pour A5 dans
+`Sb_BODYMAP_FRAME_ATLAS_01`, et elle est inchangée par ce sprint.
+
+### La leçon que je n'ai toujours pas apprise
+
+Trois gardes de ce sprint ont échoué au premier passage **en attrapant leurs
+propres commentaires** : le bloc CSS explique pourquoi `nth-of-type` et
+`!important` sont bannis, donc une garde qui grep le texte brut signale sa propre
+justification.
+
+C'est la **cinquième** occurrence de ce motif dans le programme — après la garde
+anti-médicale qui trippait sur son disclaimer, la garde case-à-cocher qui
+touchait `confirm_replace`, la garde `<input>` qui touchait le bouton
+« Rouvrir », et la garde anti-médicale du sprint précédent. Le correctif est
+désormais explicite dans le code (`_plate_declarations()` retire les commentaires
+avant de scanner), avec la raison écrite à côté : **une garde de déclaration ne
+doit jamais lire de la prose.**
