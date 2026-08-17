@@ -172,6 +172,20 @@ def build_recap(
                 "score": se.success_score,
                 "weights_str": summary["weights_str"] if summary else None,
                 "reps_str": summary["reps_str"] if summary else None,
+                # Sb_SESSION_REVIEW_SIGNAL_01 — RESTITUTION, pas collecte.
+                #
+                # Ces deux signaux étaient saisis pendant la séance et
+                # n'étaient jamais rendus à l'utilisateur : le ressenti
+                # musculaire n'apparaissait que dans l'historique par
+                # exercice, et la note d'exercice nulle part. On demandait
+                # donc une information qu'on ne rendait pas.
+                #
+                # Aucun nouveau champ, aucune collecte ajoutée : on expose ce
+                # que le modèle porte déjà. `None` reste `None` — un ressenti
+                # non saisi doit se lire comme non mesuré, jamais comme
+                # neutre ou mauvais.
+                "muscle_sensation": se.muscle_sensation,
+                "note": se.free_note,
             }
         )
 
@@ -204,6 +218,10 @@ def build_recap(
             "bodyweight_kg": session.bodyweight_kg,
             "concentration": session.concentration,
             "global_state": session.global_state,
+            # Sb_SESSION_REVIEW_SIGNAL_01 — la note de séance était saisie
+            # puis jamais relue. `concentration` et `global_state` étaient
+            # déjà restitués ; seule la phrase libre manquait.
+            "note": session.free_note,
             "cardio": _cardio_block(session, kind),
             "confidence_score": confidence_score,
             "confidence_level": confidence_level,
