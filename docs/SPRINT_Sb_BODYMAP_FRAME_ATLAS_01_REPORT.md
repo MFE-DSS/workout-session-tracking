@@ -236,3 +236,66 @@ contourner en écrivant du code aurait figé le mauvais choix.
 **Ce qui bloque la suite n'est pas technique** : les maillages BodyParts3D ne
 sont pas versionnés. Le socle sait déclarer et afficher N cadres ; il ne peut pas
 en produire un seul.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `92a3b6b` |
+| PR | **#121 MERGED** |
+| Merge | **`cbc3d96`** via `--merge --match-head-commit 18803f4` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32054167115` — 6/6 success** |
+| Sonar | `SonarCloud` **success** · gate externe `SonarCloud Code Analysis` **pass** |
+| Threads de revue | **0 non résolu** |
+| Gitar | pass |
+| Capacité | shard 1 : **1 543 passés, 1 skippé**, `workers=2`, 86 fichiers |
+
+### Un aller-retour CI, cause racine hors périmètre
+
+Le premier passage a échoué sur `test_reduced_motion_no_display_or_layout_change`
+(shard 2). **Ce n'était pas le `transition: none` ajouté par ce sprint.**
+
+Quatre tests extrayaient le bloc reduced-motion par
+`css[css.index(MARKER):]` — **tout depuis un commentaire jusqu'à la fin
+d'`app.css`** — en supposant que ce bloc y était le dernier. Il est ligne 3343
+sur 3482 : la section Muscle Focus le suit **depuis `Sb_ASSET_04.1`** et se
+trouvait donc attribuée au bloc. Le défaut était **latent depuis ce sprint-là** ;
+`.muscle-focus__landmark { display: none; }` — mécanique CSS sans aucun rapport
+avec la motion — l'a simplement réveillé.
+
+L'extraction apparie désormais les accolades du `@media` réel. C'est plus juste
+**dans les deux sens** : les déclarations ultérieures ne peuvent plus produire de
+faux positif, et un bloc reduced-motion placé plus haut dans le fichier serait
+désormais vérifié — ce que le découpage ne pouvait pas faire. Aucune assertion
+affaiblie ; une garde ajoutée (`test_reduced_motion_block_extraction_is_bounded`)
+pour que l'extracteur ne puisse pas régresser. Plantation vérifiée : un
+`display: none` injecté **dans** le bloc fait bien tomber le test.
+
+Le second job rouge (« pytest + QA scripts ») n'était que l'agrégateur
+« Fail if any shard failed » — **une seule cause réelle**.
+
+Un second aller-retour, trivial et de mon fait : `check_spec_protocol` exige un
+marqueur de verdict littéral, et j'avais lancé le check **avant** d'écrire ce
+rapport.
+
+### Limite de preuve à ne pas surestimer — A5 n'est pas gardé par la CI
+
+`pyproject.toml` §`[baseline]` est explicite : **Playwright n'est jamais installé
+en CI V1**. Les six tests de
+`tests/test_bodymap_frame_atlas_viewport.py` **skippent donc en CI** — c'est le
+skip unique du shard 1.
+
+A5 est **mesuré**, avec un vrai Chromium, en local : aucun débordement horizontal
+à 360 px, pastilles à 44 px, glissement effectif du filmstrip, repère
+d'orientation qui suit la vue cochée. Mais **la CI ne le rejouera pas**. Une
+régression de mise en page à 360 px ne serait pas attrapée automatiquement ;
+elle demande de relancer la suite en local avec l'extra `baseline`. C'est une
+limite du dispositif de preuve, cohérente avec la politique existante de
+l'outillage visuel — pas une garde permanente, et le rapport ne prétend pas le
+contraire.
+
+Les trente-six tests de `tests/test_bodymap_frame_atlas.py`, eux, **tournent en
+CI** : contrat, taxonomie, unknown honnête, parité contrat ↔ runtime, plaques
+préservées et copie non médicale sont gardés en permanence.
