@@ -318,3 +318,48 @@ ne sait plus s'il est une prescription ou un signal.
 
 Le seul vrai manque est la **qualité technique** — et le bon réflexe n'est pas
 de se dépêcher de la collecter, mais de construire d'abord de quoi la lire.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#116** — `--merge --match-head-commit d10c38c`, **sans** squash / `--admin` / force |
+| Merge | **`5af5ff4`** |
+| CI canonique | run `32005159366` — **succès 6/6, au premier passage** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication |
+| Threads / Gitar | **0 / 0** |
+| CI PR | **9 checks verts au premier passage**, aucun aller-retour |
+| Périmètre | **2 fichiers** : le rapport + la garde de véracité |
+| Code applicatif | **aucune modification** — `app/` intact |
+
+### Capacité CI — `HEALTHY`, partition parfaitement équilibrée
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 84 | 6 810 Mo | 3 071 — intact |
+| 2 | 84 | 8 296 Mo | 3 071 — intact |
+| 3 | 84 | 6 842 Mo | 3 071 — intact |
+
+`workers=2`, manifeste respecté, jamais `-n auto`. **84/84/84** — partition
+parfaitement équilibrée pour la première fois, et le shard le plus bas est à
+**6 810 Mo**, très au-dessus du plancher de 4 Go. Le déséquilibre suit bien la
+**partition**, pas la machine : trois tranches successives l'ont confirmé.
+
+### Ce que la garde de véracité protège désormais
+
+Le constat central de l'audit est **exécutable** et vit dans la suite
+canonique. Si `execution_quality` ou `reps_target` acquiert un producteur
+ailleurs que dans le modèle, l'export ou l'import, le test tombe avec un
+message explicite : **relire l'audit**, pas corriger une régression.
+
+C'est le point qui distingue ce document d'une note d'analyse : il **périme
+tout seul** au lieu de vieillir en silence.
+
+### Suite
+
+Les quatre OQ restent ouvertes et attendent un arbitrage humain. La queue de
+build recommandée (§8) place délibérément la **restitution avant la
+collecte** — `Sb_ATLAS_TECHNICAL_GUARDS_01` en tête, `Sb_EXECUTION_QUALITY_01`
+conditionné à OQ-2.
