@@ -209,3 +209,30 @@ Chaque plaque livrée ensuite **allume sa zone sans qu'une ligne d'UI change** :
   d'assets à produire.
 - **§1.2** — si et quand `zone_recovery` doit piloter une couleur de surface, et
   sur quelle surface (cockpit, `/science`, ou les deux).
+
+---
+
+## Verdict
+
+**LIVRÉ — conforme au brief, sans dérogation.**
+
+Les trois livrables de code sont en place : le contrat déclaratif
+zone → surfaces → cadres, le moteur multi-cadres générique sur N, et le socle des
+onze zones utilisable avant toute géométrie. Les dix critères d'acceptation
+passent, A5 par **mesure au navigateur** et non par lecture. Aucun interdit du
+brief n'a été approché : ni WebGL, ni canvas, ni JS obligatoire, ni migration, ni
+zone métier nouvelle, ni géométrie inventée.
+
+Le sprint n'a **rien inventé** là où il ne fallait pas. Le mécanisme de filmstrip
+existait ; il a été généralisé, pas remplacé. Le contrat de design existait ; il a
+été étendu en `1.1.0`, pas dupliqué.
+
+Deux constats d'audit sont remontés sans être traités, volontairement, parce
+qu'ils appellent une décision d'architecture et non du code : `zone_recovery`
+n'atteint aucun template (§1.2), et trois vocabulaires d'identifiants coexistent
+(§1.1). Les trancher est le préalable à toute commande de géométrie ; les
+contourner en écrivant du code aurait figé le mauvais choix.
+
+**Ce qui bloque la suite n'est pas technique** : les maillages BodyParts3D ne
+sont pas versionnés. Le socle sait déclarer et afficher N cadres ; il ne peut pas
+en produire un seul.
