@@ -112,3 +112,36 @@ enfin, et ce qu'il n'a pas écrit reste silencieux.
 
 C'était la recommandation la plus simple de l'audit — restitution avant
 collecte — et la moins coûteuse à tenir.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#120** — `--merge --match-head-commit 5a372d1`, **sans** squash / `--admin` / force |
+| Merge | **`a95d815`** |
+| CI canonique | run `32034932957` — **succès 6/6** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication |
+| Threads / Gitar | **0 / 0** |
+| CI PR | **9 checks verts au premier passage** |
+| Parité | diff **vide** sur `app/models`, `migrations`, `app/routers`, moteurs gelés |
+
+### Capacité CI — bande 4–6 Go
+
+| Shard | Fichiers | min MemAvailable |
+|---|---|---|
+| 1 | 86 | 8 011 Mo |
+| 2 | 85 | **5 983 Mo** |
+| 3 | 85 | 7 872 Mo |
+
+Le shard bas repasse **sous 6 Go** (6 895 → 5 983). Au-dessus du plancher dur
+de 4 Go, donc **aucun arrêt**, mais la marge se resserre à nouveau — comme à
+chaque fois que la partition se redistribue. Quatre tranches ont montré que
+cela suit la **partition**, pas la machine.
+
+### Quatre tranches d'affilée sans aller-retour
+
+`Sb_ATLAS_COVERAGE_01`, `Sb_SUBSTITUTION_COCKPIT_01`, celle-ci : PR verte du
+premier coup, gate comprise. Le pré-scan AST avant commit est devenu
+systématique.
