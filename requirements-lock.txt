@@ -6,7 +6,7 @@
 #
 alembic==1.18.4
     # via -r requirements.txt
-annotated-doc==0.0.4
+annotated-doc==0.0.5
     # via fastapi
 annotated-types==0.7.0
     # via pydantic
@@ -18,7 +18,7 @@ bcrypt==4.3.0
     # via
     #   -r requirements.txt
     #   passlib
-click==8.4.1
+click==8.4.2
     # via uvicorn
 fastapi==0.136.3
     # via -r requirements.txt
@@ -57,7 +57,7 @@ python-multipart==0.0.32
     # via -r requirements.txt
 pyyaml==6.0.3
     # via uvicorn
-sqlalchemy==2.0.50
+sqlalchemy==2.0.52
     # via
     #   -r requirements.txt
     #   alembic
@@ -71,7 +71,7 @@ typing-extensions==4.15.0
     #   pydantic-core
     #   sqlalchemy
     #   typing-inspection
-typing-inspection==0.4.2
+typing-inspection==0.4.4
     # via
     #   fastapi
     #   pydantic
