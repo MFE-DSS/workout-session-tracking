@@ -171,3 +171,43 @@ un catalogue, sans retirer un seul candidat.
 
 Le travail utile a été l'audit — établir que six des huit capacités demandées
 étaient déjà là, et que le vrai défaut tenait en un nombre.
+
+---
+
+## Closeout (post-merge)
+
+| | |
+|---|---|
+| PR | **#119** — `--merge --match-head-commit ab4c855`, **sans** squash / `--admin` / force |
+| Merge | **`4d4c40e`** |
+| CI canonique | run `32027643640` — **succès 6/6** |
+| Gate Sonar | **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication |
+| Threads / Gitar | **0 / 0** |
+| CI PR | **9 checks verts au premier passage, aucun aller-retour** |
+| Parité métier | diff **vide** sur `app/models`, `migrations`, `app/services`, `app/routers` |
+
+### Capacité CI — `HEALTHY`, partition parfaitement équilibrée
+
+| Shard | Fichiers | min MemAvailable | min SwapFree |
+|---|---|---|---|
+| 1 | 85 | 6 895 Mo | 3 071 — intact |
+| 2 | 85 | 7 321 Mo | 3 071 — intact |
+| 3 | 85 | 7 689 Mo | 3 071 — intact |
+
+`workers=2`, manifeste respecté, jamais `-n auto`. **85/85/85** — partition
+parfaitement équilibrée, shard bas à **6 895 Mo**, très au-dessus du plancher
+de 4 Go.
+
+### Trois sprints d'affilée sans aller-retour
+
+`Sb_ATLAS_COVERAGE_01`, puis celui-ci : PR verte du premier coup, gate
+comprise. Le pré-scan AST avant commit est devenu systématique, et c'est
+exactement la période où les cycles CI supplémentaires ont cessé.
+
+### Ce que le bénéfice composé a donné
+
+`A8` — le cue atlas suivant l'exercice **réellement exécuté** après
+substitution — a été satisfait **sans écrire une ligne**. Il découle de
+`get_for_session_exercise()` qui priorise `substituted_name`, et de la
+couverture complétée à la tranche précédente. Trois sprints qui s'empilent
+proprement plutôt que de se gêner.
