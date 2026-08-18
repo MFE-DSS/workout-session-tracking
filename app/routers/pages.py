@@ -78,6 +78,25 @@ def _build_reco_context(db, user_id: int, open_session) -> dict | None:
         return None
 
 
+def _template_work_set_count(db, template_id: int) -> int:
+    """Prescribed working sets for a template.
+
+    Sb_UIV2_HOME_RECO_BADGE_01 (décision D2) — the badge states the volume next
+    to « RECOMMANDÉ ». Counted here with one aggregate query rather than walking
+    `template.exercises[*].rep_targets` in Jinja, which would fire N+1 lazy loads
+    on every home render.
+    """
+    from sqlalchemy import func
+
+    from app.models.catalog import RepTarget, TemplateExercise
+
+    return db.execute(
+        select(func.count(RepTarget.id)).join(
+            TemplateExercise, RepTarget.template_exercise_id == TemplateExercise.id
+        ).where(TemplateExercise.template_id == template_id)
+    ).scalar_one()
+
+
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     from datetime import datetime, timedelta
@@ -86,6 +105,8 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     from app.services.timeline import build_sparkline_svg
 
     open_session = latest_open_session(db, user.id)
+    # Bound once: the badge needs both the recommendation and its set count.
+    _reco = _build_reco_context(db, user.id, open_session)
     open_since: str | None = None
     if open_session is not None:
         open_since = format_duration_short(
@@ -166,7 +187,14 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "kpis": global_kpis,
             "sparkline_svg": sparkline_svg,
             "sparkline_has_mixed_kinds": sparkline_has_mixed_kinds,
-            "reco": _build_reco_context(db, user.id, open_session),
+            "reco": _reco,
+            # D2 — volume shown beside the badge. None when there is no
+            # recommendation; the template then omits the figure rather than
+            # printing a zero it did not measure.
+            "reco_top_sets": (
+                _template_work_set_count(db, _reco["top"]["template"].id)
+                if _reco and _reco.get("top") else None
+            ),
             "behavioral": behavioral,
             "readiness_today": readiness_today,
             "readiness_labels": READINESS_LABELS,

@@ -9,58 +9,12 @@
 <section class="coaching-loop" aria-label="Boucle de coaching"
          style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-md);">
 
-  {# ── Today ── #}
-  {% if home.today and home.today.available %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Aujourd'hui
-    </div>
-    {# Sb_27.5 — narrative phrase one-liner #}
-    {% if home.today.narrative and home.today.narrative.available %}
-      <div style="font-size:13px;opacity:0.85;margin-top:4px;font-style:italic;">
-        {{ home.today.narrative.phrase }}
-      </div>
-    {% endif %}
-    {% if home.today.kind == "in_progress" %}
-      <a href="{{ url_for('session_detail', session_id=home.today.session_id) }}"
-         style="text-decoration:none;color:inherit;">
-        <div style="font-size:18px;font-weight:600;margin-top:4px;">
-          {{ home.today.template_name }} — en cours →
-        </div>
-        <div class="tile__hint" style="margin-top:4px;">
-          {{ home.today.reason }}
-        </div>
-      </a>
-    {% elif home.today.kind == "reco" %}
-      <div style="font-size:18px;font-weight:600;margin-top:4px;">
-        {{ home.today.template_name or "Séance recommandée" }}
-      </div>
-      <div class="tile__hint" style="margin-top:4px;">
-        {{ home.today.reason }}
-      </div>
-      {# Sb_27.4 — secondary reasons (max 3 total incl. primary) #}
-      {% if home.today.reasons and home.today.reasons | length > 1 %}
-      <ul style="list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:4px;font-size:13px;opacity:0.8;">
-        {% for r in home.today.reasons[1:] %}
-          <li>· {{ r }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-      {% if home.today.fallback_note %}
-        <div style="font-size:12px;opacity:0.6;margin-top:6px;">
-          {{ home.today.fallback_note }}
-        </div>
-      {% endif %}
-    {% else %}
-      <div style="font-size:16px;font-weight:600;margin-top:4px;opacity:0.7;">
-        Aucune recommandation pour le moment
-      </div>
-      <div class="tile__hint" style="margin-top:4px;">
-        {{ home.today.reason }}
-      </div>
-    {% endif %}
-  </div>
-  {% endif %}
+  {# ── Today ── RETIRÉE (décision D4).
+       Cette vignette dupliquait le hero : même libellé « Aujourd'hui », même nom
+       de séance, même raison. Le hero porte désormais la décision AVEC sa raison
+       (badge « Recommandé ⓘ »), et les raisons secondaires y ont été repliées —
+       on retire le doublon, pas l'information.
+       Dogfood opérateur 2026-08-17 : « il y a un doublon Aujourd'hui ». #}
 
   {# ── Last session ── #}
   {% if home.last_session and home.last_session.available %}
@@ -170,7 +124,13 @@
   {% endif %}
 
   {# ── This week ── #}
-  {% if home.week and home.week.available %}
+  {# D4 — masquée tant qu'aucune séance n'a eu lieu. « Pas encore de séance
+     cette semaine » n'apprenait rien : l'utilisateur le sait déjà, et la
+     vignette occupait une carte entière pour le dire.
+     Dogfood opérateur 2026-08-17 : « ne sert strictement à rien ».
+     Dès qu'il y a une séance, le signal redevient une vraie information et la
+     vignette réapparaît. #}
+  {% if home.week and home.week.available and home.week.sessions_done %}
   <div class="card tile" style="padding:var(--space-md);">
     <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
       Cette semaine

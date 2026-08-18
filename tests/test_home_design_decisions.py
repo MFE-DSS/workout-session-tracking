@@ -19,6 +19,7 @@ l'Accueil a changé — il n'a pas changé, et un test qui l'exigerait serait fa
 
 from __future__ import annotations
 
+import re
 import subprocess
 from pathlib import Path
 
@@ -88,11 +89,25 @@ def test_the_record_keeps_the_deletion_targets_locatable():
 
 # ───────────── D2, enforced now ─────────────
 
+def _renderable_text(path: Path) -> str:
+    """Source with comments stripped — what can actually reach a reader.
+
+    A guard that greps raw text flags the comment that *documents* the ban:
+    `index.html` legitimately writes « Interdit : Recommandé IA » next to the
+    badge to say why. Scanning prose instead of output is a mistake this
+    programme has now made ten times; strip it here.
+    """
+    text = path.read_text(encoding="utf-8")
+    text = re.sub(r"\{#.*?#\}", "", text, flags=re.DOTALL)   # Jinja
+    text = re.sub(r"^\s*#.*$", "", text, flags=re.MULTILINE)  # Python
+    return text
+
+
 def test_no_surface_claims_the_recommendation_comes_from_ai():
     """D2's hard interdiction. The engine is `zero-ML`; the claim would be false."""
     offenders: list[str] = []
     for path in _app_text_surfaces():
-        lowered = path.read_text(encoding="utf-8").lower()
+        lowered = _renderable_text(path).lower()
         for claim in FORBIDDEN_ORIGIN_CLAIMS:
             if claim in lowered:
                 offenders.append(f"{path.relative_to(ROOT)}: {claim!r}")

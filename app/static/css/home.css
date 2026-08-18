@@ -116,6 +116,72 @@
   margin-bottom: 6px;
 }
 
+/* ── D2 — badge d'origine de la recommandation ────────────────────────────
+   BLEU = « produit par le système, pas par toi » (D3). C'est une RÈGLE de
+   sémantique, pas une décoration : si le bleu ne servait qu'ici, ce serait une
+   couleur de plus et pas un sens de plus.
+
+   `<details>` natif : le ⓘ ouvre la vraie raison sans une ligne de JS, et la
+   page reste utilisable sans script. Même motif que le ⓘ déjà présent sur
+   « disponibilité ».
+
+   Rang de contrôle 2 au sens de D1 (bordure discrète, casse normale), donc
+   cible tactile ≥ 44 px — c'est un contrôle, pas une étiquette. */
+.reco-origin { margin-bottom: 8px; }
+
+.reco-origin__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 12px;
+  border: 1px solid var(--t-accent-blue, #2c5282);
+  border-radius: 999px;
+  background: var(--t-accent-blue-soft, rgba(125, 211, 252, 0.10));
+  color: var(--t-accent-blue-fg, #7dd3fc);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.reco-origin__badge::-webkit-details-marker { display: none; }
+.reco-origin__badge:focus-visible {
+  outline: 2px solid var(--t-accent-blue-fg, #7dd3fc);
+  outline-offset: 2px;
+}
+
+.reco-origin__label {
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.reco-origin__volume {
+  font-size: 12px;
+  color: var(--t-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
+.reco-origin__info { font-size: 12px; opacity: 0.8; }
+
+.reco-origin__reasons {
+  list-style: none;
+  margin: 6px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--t-accent-blue, #2c5282);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--t-fg-muted);
+}
+.reco-origin__reasons li::before { content: "· "; opacity: 0.6; }
+
+.reco-origin__why {
+  margin: 8px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--t-accent-blue, #2c5282);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--t-fg-muted);
+}
+
 /* Titre décisionnel : mono, graisse contenue, ≤ 26px, letter-spacing
    négatif (le mono s'étale sinon). Pas de gros bold marketing. */
 .today-home__title {

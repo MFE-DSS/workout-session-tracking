@@ -81,8 +81,16 @@ class TestHomeIA:
         """Sb_UI_02b.1 — the Home carries the Auren Terminal marker class."""
         assert "today-home--terminal" in _home(client)
 
-    def test_status_label_present(self, client):
-        assert "today-home__status" in _home(client)
+    def test_status_label_present_only_for_an_active_session(self, client):
+        """D4 removed « Aucune séance active » — it stated nothing the CTA did not.
+
+        The status label survives for the ACTIVE-session hero, where « Séance
+        active » is real information. The fixture user has no open session, so
+        the label is legitimately absent here.
+        """
+        body = _home(client)
+        assert "Aucune séance active" not in body
+        assert "today-home__hero--next" in body
 
     def test_action_block_present(self, client):
         assert "today-home__action" in _home(client)
