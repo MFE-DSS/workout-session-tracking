@@ -65,6 +65,21 @@
         {# D4 — les raisons secondaires vivaient dans la vignette « Aujourd'hui »,
            qui dupliquait ce hero. Elles sont repliées ici plutôt que perdues :
            on retire le doublon, pas l'information. #}
+        {# D6 — le cycle est piloté par la récupération : ceci est l'explication
+           de la recommandation, pas une décoration à côté d'elle. État lu, jamais
+           calculé ici ; une zone sans estimation dit « non mesurée », jamais
+           « disponible » par défaut. Le libellé porte le sens — la couleur ne fait
+           que le renforcer (aucun état distingué par la couleur seule). #}
+        {% if reco_zone_state %}
+        <ul class="reco-origin__zones">
+          {% for z in reco_zone_state %}
+          <li class="reco-origin__zone reco-origin__zone--{{ z.band }}">
+            <span class="reco-origin__zone-name">{{ z.label }}</span>
+            <span class="reco-origin__zone-band">{{ z.band_label }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
         {% if home and home.today and home.today.reasons and home.today.reasons | length > 1 %}
         <ul class="reco-origin__reasons">
           {% for r in home.today.reasons[1:] %}<li>{{ r }}</li>{% endfor %}

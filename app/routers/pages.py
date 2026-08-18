@@ -97,6 +97,55 @@ def _template_work_set_count(db, template_id: int) -> int:
     ).scalar_one()
 
 
+#: Libellés produit des bandes de récupération. Volontairement descriptifs et
+#: prudents : « estimée » partout, aucune prétention physiologique.
+_BAND_LABELS = {
+    "likely_available": "disponible",
+    "partially_recovered": "récupération partielle",
+    "likely_fatigued": "encore fatiguée",
+    "unknown": "non mesurée",
+}
+
+
+def _reco_zone_state(db, user_id: int, primary_zones) -> list[dict]:
+    """État de récupération des zones que la séance recommandée vise.
+
+    Sb_UIV2_HOME_RECO_WHY_01 (décision D6) — le cycle de ce produit n'est pas un
+    calendrier, c'est une rotation pilotée par la récupération. L'état corporel
+    n'est donc pas une vignette décorative posée à côté de la recommandation :
+    c'est **son explication**. Le hero dit « Push A » ; ceci dit pourquoi.
+
+    Lecture seule, aucun calcul propre : les bandes viennent de `zone_recovery`,
+    les libellés de `muscle_mapping`. Une zone sans estimation est rendue
+    « non mesurée » — jamais « disponible » par défaut.
+    """
+    if not primary_zones:
+        return []
+    from datetime import datetime
+
+    from app.services.muscle_mapping import ZONE_LABELS
+    from app.services.zone_recovery import build_zone_recovery
+
+    try:
+        estimates = build_zone_recovery(db, user_id, now=datetime.now(UTC))
+    except Exception:
+        # Non-critical readout: never break the home over an estimate.
+        return []
+
+    by_zone = {e.zone_code: e for e in estimates}
+    rows: list[dict] = []
+    for code in primary_zones:
+        estimate = by_zone.get(code)
+        band = getattr(getattr(estimate, "band", None), "value", "unknown")
+        rows.append({
+            "zone": code,
+            "label": ZONE_LABELS.get(code, code),
+            "band": band,
+            "band_label": _BAND_LABELS.get(band, _BAND_LABELS["unknown"]),
+        })
+    return rows
+
+
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     from datetime import datetime, timedelta
@@ -194,6 +243,11 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "reco_top_sets": (
                 _template_work_set_count(db, _reco["top"]["template"].id)
                 if _reco and _reco.get("top") else None
+            ),
+            # D6 — pourquoi CETTE séance : l'état des zones qu'elle vise.
+            "reco_zone_state": (
+                _reco_zone_state(db, user.id, _reco["top"].get("primary_zones"))
+                if _reco and _reco.get("top") else []
             ),
             "behavioral": behavioral,
             "readiness_today": readiness_today,

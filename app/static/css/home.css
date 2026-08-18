@@ -162,6 +162,39 @@
 }
 .reco-origin__info { font-size: 12px; opacity: 0.8; }
 
+/* D6 — état des zones visées. Sémantique de récupération, DISTINCTE de l'ambre
+   d'action (D3) : ici la couleur ne fait que renforcer un libellé qui porte déjà
+   le sens, conformément au contrat BodyMap (« aucun état distingué par la
+   couleur seule »). Une zone non mesurée reste grise — jamais verte par défaut. */
+.reco-origin__zones {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.reco-origin__zone {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 13px;
+}
+.reco-origin__zone::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--t-fg-muted);
+}
+.reco-origin__zone--likely_available::before { background: #4ade80; }
+.reco-origin__zone--partially_recovered::before { background: #d99a2b; }
+.reco-origin__zone--likely_fatigued::before { background: #ef4444; }
+
+.reco-origin__zone-name { color: var(--t-fg); }
+.reco-origin__zone-band { color: var(--t-fg-muted); font-size: 12px; }
+
 .reco-origin__reasons {
   list-style: none;
   margin: 6px 0 0;
