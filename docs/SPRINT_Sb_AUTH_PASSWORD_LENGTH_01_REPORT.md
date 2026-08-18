@@ -197,3 +197,47 @@ La réserve A6 est réelle et n'est pas minimisée : un compte au secret trop lo
 devra saisir ses 72 premiers octets ou se réinitialiser. On ne peut pas savoir
 combien de comptes sont concernés, et le rapport le dit plutôt que de rassurer à
 tort.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `2e61aa1` |
+| PR | **#126 MERGED** |
+| Merge | **`aca4eb9`** via `--merge --match-head-commit 899c622` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32118026792` — 6/6 success** |
+| Sonar | gate **`OK`** — smells code neuf **20 → 0**, couverture **96,8 %**, 0 bug, 0 vulnérabilité |
+| Gitar | pass |
+| Threads | **0** |
+
+### Un aller-retour Sonar, et le piège qui l'a presque doublé
+
+Le gate **externe** est tombé rouge au premier passage (`new_code_smells_severity` 20 > 14) alors
+que le job interne était vert. Une seule issue, **causée par ce sprint** : `python:S1192`, le
+littéral `"login.html"` porté à **trois** occurrences par la branche de rejet. Corrigé par une
+constante `LOGIN_TEMPLATE`.
+
+**Le piège** : juste après le push du correctif, le gate affichait **encore 20**. Lu tel quel, cela
+signifie « le correctif n'a rien changé » et invite à retoucher le code une seconde fois. C'était
+l'analyse **précédente** — le job SonarCloud du nouveau commit tournait encore. Après vérification
+de l'état du job puis relecture : **0**. Une cause, un correctif.
+
+Changer du code sur la foi d'un nombre agrégé périmé est exactement ce que la route de diagnostic du
+dépôt interdit, et ce qui a déjà coûté trois cycles CI ici.
+
+### Ce qui n'a délibérément pas été corrigé
+
+`auth_routes.py` contient d'autres littéraux dupliqués — `reset_password.html` (×4),
+`contact.html` (×4), `page_title` (×20). Sonar ne les signale pas : ils sont **préexistants** et hors
+du code neuf de la PR. Les « corriger » aurait touché des lignes non testées d'un fichier
+d'authentification pour satisfaire une règle qui ne les vise pas.
+
+### Pré-scan, et sa limite
+
+Un pré-scan AST des trois fichiers touchés a confirmé zéro `S9073` et zéro autre `S1192` en code
+applicatif neuf. Il **n'a pas** évité l'aller-retour : `S1192` compte les occurrences par fichier
+entier, or mon scan mesurait le fichier tel qu'écrit sans distinguer neuf et préexistant. La leçon
+n'est pas « pré-scanner davantage » mais « compter les littéraux du fichier, pas seulement les
+siens ».
