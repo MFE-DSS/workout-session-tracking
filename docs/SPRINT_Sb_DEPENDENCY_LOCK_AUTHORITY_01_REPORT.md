@@ -210,3 +210,54 @@ qu'elle n'a jamais testées ensemble, en croyant améliorer la reproductibilité
 Ce que le sprint ne prouve pas localement : que les versions verrouillées font
 tourner l'application. La CI réelle en décide, et c'est écrit plutôt que sous-
 entendu.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `37bb2b9` |
+| PR | **#127 MERGED** |
+| Merge | **`c48404c`** via `--merge --match-head-commit b575d20` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32125471885` — 6/6 success** |
+| Sonar | gate **`OK`** — smells code neuf **15 → 0** |
+| Gitar | pass |
+| Threads | **0** |
+
+### A10 — la CI réelle a tranché ce que le local ne pouvait pas
+
+Le tier `CI_INFRA` exigeait une validation sur CI réelle. Elle a livré exactement
+ce que le sweep local ne pouvait pas :
+
+- **le lock s'installe sur Python 3.11** et les trois shards passent dessus —
+  preuve que les 16 versions actualisées font tourner l'application, alors que
+  mon environnement local porte encore les anciennes ;
+- **`check_lock_drift.py` passe en CI, bloquant**, sur la vraie machine ;
+- **`pip-audit -r requirements-lock.txt --strict` est vert** : aucune CVE connue
+  dans l'arbre désormais verrouillé.
+
+### Un aller-retour Sonar, dans un fichier de test
+
+Gate externe rouge au premier passage : un MAJOR `python:S8997` —
+*« Use the monkeypatch fixture … instead of manually modifying global state »* —
+sur un `sys.path.insert` de mon test.
+
+**Le bon correctif n'était pas d'adopter `monkeypatch`** : la manipulation était
+**inutile**. `scripts/` est un package (`scripts/__init__.py`), donc l'import
+fonctionne directement — c'est déjà ce que fait
+`tests/test_bodymap_asset_intake.py`. Supprimée plutôt que déguisée.
+
+**Correction d'une affirmation antérieure** : au sprint précédent j'avais conclu
+que `sonar.tests` exemptait les fichiers de test des règles Sonar, après avoir
+constaté que `S1192` ne s'y appliquait pas. **Généralisation abusive** : `S8997`
+est une règle spécifiquement pytest et s'y applique. La bonne formulation est
+« certaines règles ne s'appliquent pas aux sources de test », pas « les tests
+sont exemptés ».
+
+### Ce que le sprint change pour la suite
+
+Une PR qui modifie `requirements-lock.txt` **change désormais ce qui s'installe**
+en CI et en production. Les PR dependabot Python cessent d'être cosmétiques — et
+celles ouvertes (#115, #12, #11, #8) visent des versions que la régénération a
+déjà dépassées.
