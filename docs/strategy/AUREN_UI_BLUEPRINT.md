@@ -1,7 +1,8 @@
 # AUREN — UI Blueprint
 
 **Document vivant.** Mis à jour à chaque tranche livrée.
-Dernière révision : **2026-08-18**, à la clôture de `UIV3_COCKPIT_LADDER_01`.
+Dernière révision : **2026-08-18**, au merge de `UIV3_COCKPIT_LADDER_01`
+(`6aecf6f`).
 
 ---
 
@@ -57,7 +58,8 @@ D'où trois règles qui traversent tout ce document :
 
 ### 2.1 Socle de tokens — `UIV3_COCKPIT_LADDER_01`
 
-**Statut : `PR #130 · GREEN · MERGE PENDING`.** Pas encore sur la canonique.
+**Statut : `MERGED`** — PR **#130**, merge **`6aecf6f`**, 2026-08-18.
+**Sur la canonique.** Premier acquis construit du programme V3.
 
 Autorité unique : `app/static/css/app.css :root`. **19 tokens.**
 
@@ -231,29 +233,58 @@ n'existe alors que `nav=stay` l'implémente.
 `00` Foundation · `00A` Cockpit Capability · `01` Home · `02` Session ·
 `03` Visual Regression · `04` Convergence.
 
-### Build
+### Build — **par phase produit, pas par micro-amélioration**
 
-| # | Tranche | Statut | Dépend de |
-|---|---|---|---|
-| **B0** | `UIV3_COCKPIT_LADDER_01` | **PR #130 · GREEN · MERGE PENDING** | — |
-| ~~B1~~ | ~~`UIV3_TOKENS_01`~~ | **ABSORBÉE PAR B0** — les trois tokens bleus existent et sont mesurés | — |
-| B2 | `UIV3_HOME_CAUSE_01` — la cause visible sans tap | à faire | B0 |
-| B3 | `UIV3_HOME_TALLY_01` — bilan 11 zones | à faire | B2 |
-| B4 | `UIV3_HOME_REJECTED_01` — « écarté, et pourquoi » | à faire | B2 + `G1` |
-| B5 | `UIV3_HOME_DEPRIORITISE_01` — Disponibilité part, État du jour se replie | à faire | B2 |
-| **B6+B7** | `UIV3_SESSION_EXECUTION_CONSOLE_01` — **une seule vertical slice** | à faire | B0, `02`, `04` |
-| B8 | `UIV3_TARGETS_44_01` — 0 cible sous 44 px | à faire | B0 |
-| B9 | `UIV3_VISUAL_BASELINE_01` — 13 golden states × 3 viewports | à faire | `03` |
-| — | `BODY_LEDGER_PAGE_01` — la matrice 11 cellules, second écran | à faire | B3 |
-| — | `LOGIN_IDENTITY_GATE_01` | à faire | `00A` |
+**Décision opérateur du 2026-08-18.** L'unité de revue humaine est une
+**surface complète**, jamais une somme de polissages. Une phase se juge sur ce
+qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 
-**`UIV3_SESSION_EXECUTION_CONSOLE_01` livre ensemble** : commande contextuelle ·
-série courante **réellement** au-dessus du pli · états `set`/`rest`/`complete` ·
-suppression de l'architecture sticky remplacée. Les quatre ou rien.
+| Phase | Contenu | Statut |
+|---|---|---|
+| **Socle** | `UIV3_COCKPIT_LADDER_01` *(B0)* | **`MERGED` — `6aecf6f`** |
+| | ~~`UIV3_TOKENS_01` *(B1)*~~ | **ABSORBÉE PAR B0** |
+| **Phase 1 — Accueil** | **`UIV3_HOME_CAUSAL_COCKPIT`** | à lancer |
+| **Phase 2 — Séance** | `UIV3_SESSION_EXECUTION_CONSOLE_01` *(B6+B7)* | après phase 1 acceptée |
+| **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | après phase 2 acceptée |
+| Hors phase | `BODY_LEDGER_PAGE_01` · `LOGIN_IDENTITY_GATE_01` | à planifier |
+
+#### Phase 1 — `UIV3_HOME_CAUSAL_COCKPIT`
+
+**Une seule phase produit verticale.** Les identifiants `B2`–`B5` sont
+conservés **pour la traçabilité**, comme sous-tranches internes — pas comme
+livraisons séparées soumises séparément au jugement.
+
+| Sous-tranche | Contenu |
+|---|---|
+| `B2` | la cause visible **sans tap** — `CausalRail` + `RecoveryBand` + `SystemOrigin` |
+| `B3` | `ZoneTally` — le bilan 11 zones |
+| `B4` | « écarté, et pourquoi » — dépend du pass-through `G1` |
+| `B5` | Disponibilité quitte l'accueil · État du jour se replie |
+
+**Objet de la revue humaine : l'Accueil complet.** Pas quatre mini-améliorations.
+
+**Chaque sous-tranche applique déjà le standard 44 × 44 à tout contrôle qu'elle
+crée ou touche.** L'accessibilité n'est pas différée à une tranche de nettoyage.
+
+#### Phase 2 — `UIV3_SESSION_EXECUTION_CONSOLE_01`
+
+Livre **ensemble** : commande contextuelle · série courante **réellement**
+au-dessus du pli · états `set`/`rest`/`complete` · suppression de
+l'architecture sticky remplacée. Les quatre ou rien.
 
 **Porte de sortie obligatoire** : la tranche ne passe pas `ACCEPTED` sans une
 **séance complète réelle** exécutée et validée humainement aux trois viewports.
 Les prototypes sont statiques ; le dogfood ne peut pas précéder la console.
+
+#### Phase 3 — fermeture
+
+**`B8` n'est pas une rénovation anticipée du legacy.** Elle ferme les
+**violations 44 px résiduelles** — celles que les phases 1 et 2 n'ont pas
+touchées parce qu'elles vivaient hors de leur périmètre. Lancer `B8` avant la
+Séance reviendrait à polir une console que la phase 2 remplace.
+
+`B9` clôt le programme avec les **golden states** : 13 états × 3 viewports,
+capturés sur des surfaces enfin stables.
 
 **Fichiers interdits pour toute la queue** : `recommendation.py` ·
 `zone_recovery.py` · `recovery_contract.py` · `app/models/**` · `migrations/**`
@@ -301,7 +332,6 @@ survivent à UIV3 (T4).
 
 ## 8. Ce qui reste ouvert
 
-- **Merge de `B0`** — décision opérateur, seul blocage de la suite.
 - **Amendement `Sx_UIV3_02`** : inscrire noir sur blanc qu'aucun texte de la
   console ne porte `--t-fg-faint`. Découvert en réalignant les prototypes sur
   la palette B0 : ils mettaient la charge de référence à **2,91:1**.

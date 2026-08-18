@@ -251,3 +251,44 @@ cette tranche ont été trouvés par des gardes qui se sont retournées contre
 moi** : le Build Gate qui affirmait qu'un test tiendrait, un test qui passait
 sur un hex de commentaire, et ma propre garde qui a refusé ma classification
 d'un séparateur. Aucun des trois n'aurait été vu en relisant le diff.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `8fddc91` |
+| PR | **#130 MERGED** — un commit, `b1b6ff3` |
+| Merge | **`6aecf6f`** via `--merge --match-head-commit b1b6ff3` — **sans squash, sans `--admin`, sans force** |
+| CI PR | **9/9 pass** — 3 shards pytest, lint, QA, Sonar ×2, SonarCloud Code Analysis, Gitar |
+| Sonar | gate **`OK`** — 0 bug, 0 smell, 0 vulnérabilité, 0 % duplication de code neuf |
+| Gitar | pass · **0 thread de revue** |
+| Merge state | `MERGEABLE / CLEAN`, aucun aller-retour |
+
+### `B0 = MERGED`
+
+**Premier acquis construit du programme V3.** La palette cockpit a désormais
+une autorité unique, atteignable depuis toutes les surfaces, et la profondeur
+qu'elle déclarait est rendue.
+
+**`B1` est annulée.** `UIV3_TOKENS_01` devait poser les trois tokens bleus ;
+`B0` les a posés, mesurés et pinnés. La tranche est **absorbée**, pas reportée.
+
+### Ce que cette tranche débloque
+
+Rien de visible pour l'utilisateur — c'est un socle. Ce qu'elle rend
+**possible** : la Session peut enfin lire les mêmes tokens que la Home, ce qui
+était la condition d'existence de la convergence `Sx_UIV3_04 §14`.
+
+### Un défaut trouvé après coup, hors périmètre
+
+En réalignant les prototypes de la Future Console sur la palette B0, il est
+apparu qu'ils avaient été bâtis sur les **anciennes** valeurs — escalier plat
+et `--t-blue-line: #4A7FB5` — et qu'ils mettaient de l'information réelle à
+**2,76–2,91:1**, dont la charge de référence de la série. Corrigé dans le lab
+jetable ; **zéro texte sous le seuil** sur les quatre consoles, mesuré sur le
+fond réellement composité de chaque nœud rendu.
+
+Conséquence à porter : `Sx_UIV3_02` doit inscrire qu'aucun texte de la console
+ne porte `--t-fg-faint`. À faire avec la phase Séance.
