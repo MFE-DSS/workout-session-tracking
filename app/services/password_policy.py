@@ -58,6 +58,16 @@ TOO_LONG_MESSAGE = (
 )
 
 
+class PasswordTooLongError(ValueError):
+    """Raised when a password would exceed what bcrypt can actually hash.
+
+    Lives here rather than in the auth layer because this module owns the rule.
+    It exists so `hash_password` can refuse **loudly**: silently truncating is
+    the defect this whole policy closes, and an opaque `ValueError` from bcrypt 5
+    would be almost as unhelpful.
+    """
+
+
 def password_utf8_len(password: str) -> int:
     """Length of the password as bcrypt sees it: UTF-8 bytes."""
     return len(password.encode("utf-8"))
