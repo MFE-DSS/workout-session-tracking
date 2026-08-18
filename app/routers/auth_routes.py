@@ -46,6 +46,11 @@ MIN_PASSWORD_LENGTH = 8
 MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 64
 
+# Sb_AUTH_PASSWORD_LENGTH_01 — the login view is rendered from three branches
+# (over-long password, bad credentials, and the GET page). Naming it once keeps
+# them from drifting apart.
+LOGIN_TEMPLATE = "login.html"
+
 # Sb_20.3 — username regex: alphanumeric + underscore + dash only.
 # Mirrors the path-param regex on /users/{username} so the public
 # profile route never has to deal with surprising characters.
@@ -83,7 +88,7 @@ def login_page(
         return RedirectResponse(url="/", status_code=303)
     return templates.TemplateResponse(
         request,
-        "login.html",
+        LOGIN_TEMPLATE,
         {
             "page_title": "Connexion",
             "error": None,
@@ -109,7 +114,7 @@ async def login_submit(
     if is_password_too_long(password):
         return templates.TemplateResponse(
             request,
-            "login.html",
+            LOGIN_TEMPLATE,
             {"page_title": "Connexion", "error": TOO_LONG_MESSAGE, "success": None},
             status_code=400,
         )
@@ -128,7 +133,7 @@ async def login_submit(
     if user is None or not pw_ok:
         return templates.TemplateResponse(
             request,
-            "login.html",
+            LOGIN_TEMPLATE,
             {"page_title": "Connexion", "error": "Identifiants invalides.", "success": None},
             status_code=401,
         )
