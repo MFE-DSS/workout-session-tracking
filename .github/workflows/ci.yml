@@ -87,7 +87,12 @@ jobs:
         if: steps.scope.outputs.runtime == 'true'
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          # Sb_DEPENDENCY_LOCK_AUTHORITY_01 — install the LOCK, not the source spec.
+          # requirements.txt carries open ranges (fastapi>=0.110, …), so installing
+          # it resolved the latest compatible versions at run time: two runs of the
+          # same SHA could test different dependency trees. The lock is the install
+          # contract; scripts/check_lock_drift.py keeps it honest against the spec.
+          pip install -r requirements-lock.txt
           # Sb_20.1 — pytest-cov + coverage[toml] produce coverage.xml
           # for SonarCloud. httpx is required by the FastAPI TestClient.
           # Sb_OPS.ci-efficiency — pytest-xdist runs the suite in parallel
@@ -238,7 +243,12 @@ jobs:
         if: steps.scope.outputs.runtime == 'true'
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          # Sb_DEPENDENCY_LOCK_AUTHORITY_01 — install the LOCK, not the source spec.
+          # requirements.txt carries open ranges (fastapi>=0.110, …), so installing
+          # it resolved the latest compatible versions at run time: two runs of the
+          # same SHA could test different dependency trees. The lock is the install
+          # contract; scripts/check_lock_drift.py keeps it honest against the spec.
+          pip install -r requirements-lock.txt
           # Sb_20.1 — pytest-cov + coverage[toml] produce coverage.xml
           # for SonarCloud. httpx is required by the FastAPI TestClient.
           # Sb_OPS.ci-efficiency — pytest-xdist runs the suite in parallel
@@ -428,8 +438,11 @@ jobs:
       # Required: the project baseline is clean as of Sb_26.4 (cf.
       # docs/SECURITY_BASELINE.md §3). Any new vulnerability must be
       # addressed via upgrade or explicit ignore with justification.
+      # Sb_DEPENDENCY_LOCK_AUTHORITY_01 — audit the LOCK. Auditing the source
+      # spec meant auditing whatever pip-audit resolved from open ranges, which
+      # was not necessarily what CI and prod installed. The lock IS what runs.
       - name: pip-audit runtime dependencies (required — Sb_26.4)
-        run: pip-audit -r requirements.txt --strict
+        run: pip-audit -r requirements-lock.txt --strict
 
       # Sb_26.4 — gitleaks scans the current tree for committed secrets.
       # Required on PR / push. Full-history scan is documented as a
@@ -454,19 +467,15 @@ jobs:
       - name: auth scope matrix presence (required — Sb_26.7)
         run: python scripts/check_auth_scope_matrix.py
 
-      # Sb_26.4 — verify requirements-lock.txt is committed and parses.
-      # ADVISORY for V1: a strict diff vs a fresh `pip-compile` is brittle
-      # across Python versions (CI is 3.11, dev may differ). We just
-      # ensure the file exists and is a syntactically valid requirements
-      # file. Strict cross-Python freshness is in Sb_26.next backlog.
-      # See docs/SECURITY_BASELINE.md §5.
-      - name: requirements-lock.txt presence + parse (advisory — Sb_26.4)
-        continue-on-error: true
-        run: |
-          test -f requirements-lock.txt
-          # `pip install --dry-run` parses the file and resolves the
-          # graph without installing — fast and version-tolerant.
-          pip install --dry-run -r requirements-lock.txt > /dev/null
+      # Sb_DEPENDENCY_LOCK_AUTHORITY_01 — the lock is now what CI and the VPS
+      # install, so this step is BLOCKING (it was advisory while nothing read the
+      # file). It compares the pins against the specs in requirements.txt offline:
+      # a dependency added to the source without regenerating the lock would
+      # otherwise produce a green CI that never installed it.
+      # The cross-Python brittleness that justified "advisory" is gone: the lock
+      # is now resolved FOR 3.11 explicitly (scripts/regen_lockfile.sh).
+      - name: requirements.txt ↔ requirements-lock.txt drift (blocking)
+        run: python scripts/check_lock_drift.py
 
       # Sb_20.4 — JSON reports consumed by the SonarCloud job. Stays
       # advisory: never fail this step, always upload for Sonar.

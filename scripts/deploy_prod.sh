@@ -180,9 +180,19 @@ fi
 step "Installing dependencies"
 
 sudo -u "${APP_USER}" "${PIP}" install --quiet --upgrade pip 2>/dev/null || true
-sudo -u "${APP_USER}" "${PIP}" install --quiet -r "${APP_DIR}/requirements.txt" \
-    || die "pip install failed"
-ok "Dependencies installed"
+
+# Sb_DEPENDENCY_LOCK_AUTHORITY_01 — install the LOCK, exactly like CI.
+# requirements.txt carries open ranges, so installing it resolved the newest
+# compatible versions AT DEPLOY TIME: two deploys of the same SHA could ship
+# different dependency trees, which quietly undermined the "deploy the exact SHA
+# CI validated" discipline this pipeline is built on. The lock is resolved for
+# Python 3.11 (scripts/regen_lockfile.sh) and CI installs the same file.
+LOCKFILE="${APP_DIR}/requirements-lock.txt"
+[ -f "${LOCKFILE}" ] \
+    || die "requirements-lock.txt absent from ${APP_DIR} — the deployed SHA predates Sb_DEPENDENCY_LOCK_AUTHORITY_01; roll back or regenerate"
+sudo -u "${APP_USER}" "${PIP}" install --quiet -r "${LOCKFILE}" \
+    || die "pip install failed (lockfile). Rollback: re-run the deploy workflow with the previous SHA."
+ok "Dependencies installed from requirements-lock.txt"
 
 # ─── Alembic drift check ─────────────────────────────────────────
 step "Checking schema drift"
