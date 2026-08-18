@@ -27,6 +27,11 @@ from app.services.auth import (
     verify_reset_token,
 )
 from app.services.email import send_email
+from app.services.password_policy import (
+    TOO_LONG_MESSAGE,
+    is_password_too_long,
+    validate_password_policy,
+)
 from app.services.quality_score import compute_session_quality
 from app.services.session_state import latest_open_session
 from app.services.timeline import TimelinePoint, build_quality_timeline_svg
@@ -40,6 +45,11 @@ router = APIRouter(tags=["auth"])
 MIN_PASSWORD_LENGTH = 8
 MIN_USERNAME_LENGTH = 3
 MAX_USERNAME_LENGTH = 64
+
+# Sb_AUTH_PASSWORD_LENGTH_01 — the login view is rendered from three branches
+# (over-long password, bad credentials, and the GET page). Naming it once keeps
+# them from drifting apart.
+LOGIN_TEMPLATE = "login.html"
 
 # Sb_20.3 — username regex: alphanumeric + underscore + dash only.
 # Mirrors the path-param regex on /users/{username} so the public
@@ -78,7 +88,7 @@ def login_page(
         return RedirectResponse(url="/", status_code=303)
     return templates.TemplateResponse(
         request,
-        "login.html",
+        LOGIN_TEMPLATE,
         {
             "page_title": "Connexion",
             "error": None,
@@ -94,6 +104,21 @@ async def login_submit(
     password: Annotated[str, Form()],
     db: DbSession,
 ):
+    # Sb_AUTH_PASSWORD_LENGTH_01 — reject an over-long password BEFORE touching
+    # the database or bcrypt. Under bcrypt 5 the verify below raises past 72
+    # bytes, which would turn a bad input into a 500. Only the MAXIMUM is
+    # enforced here: a minimum check at login would lock out accounts created
+    # before the floor was raised, and would say something about stored
+    # credentials. This early return leaks nothing — it depends solely on the
+    # length of the attacker's own input, never on whether the account exists.
+    if is_password_too_long(password):
+        return templates.TemplateResponse(
+            request,
+            LOGIN_TEMPLATE,
+            {"page_title": "Connexion", "error": TOO_LONG_MESSAGE, "success": None},
+            status_code=400,
+        )
+
     user = db.execute(
         select(User).where(User.username == username, User.is_active.is_(True))
     ).scalar_one_or_none()
@@ -108,7 +133,7 @@ async def login_submit(
     if user is None or not pw_ok:
         return templates.TemplateResponse(
             request,
-            "login.html",
+            LOGIN_TEMPLATE,
             {"page_title": "Connexion", "error": "Identifiants invalides.", "success": None},
             status_code=401,
         )
@@ -206,10 +231,8 @@ async def reset_password_submit(
             status_code=400,
         )
 
-    error = None
-    if len(new_password) < MIN_PASSWORD_LENGTH:
-        error = f"Le mot de passe doit faire au moins {MIN_PASSWORD_LENGTH} caract\u00e8res."
-    elif new_password != new_password_confirm:
+    error = validate_password_policy(new_password)
+    if error is None and new_password != new_password_confirm:
         error = "Les mots de passe ne correspondent pas."
 
     if error:
@@ -266,6 +289,9 @@ async def register_submit(
 ):
     error = None
     username_clean = username.strip()
+    # Sb_AUTH_PASSWORD_LENGTH_01 — one call, evaluated before the chain so the
+    # policy cannot be reached twice or skipped by a reordering.
+    password_error = validate_password_policy(password)
     if len(username_clean) < MIN_USERNAME_LENGTH:
         error = f"Le nom d'utilisateur doit faire au moins {MIN_USERNAME_LENGTH} caractères."
     elif len(username_clean) > MAX_USERNAME_LENGTH:
@@ -274,8 +300,8 @@ async def register_submit(
         # Sb_20.3 — explicit allowlist (CWE-20). Rejects unicode,
         # punctuation, spaces — only [a-zA-Z0-9_-] survive.
         error = "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, _ et -."
-    elif len(password) < MIN_PASSWORD_LENGTH:
-        error = f"Le mot de passe doit faire au moins {MIN_PASSWORD_LENGTH} caractères."
+    elif password_error is not None:
+        error = password_error
     elif password != password_confirm:
         error = "Les mots de passe ne correspondent pas."
     else:
@@ -715,10 +741,20 @@ async def password_change_submit(
     user: CurrentUser,
 ):
     error = None
-    if not verify_password(current_password, user.password_hash):
+    # Sb_AUTH_PASSWORD_LENGTH_01 — the CURRENT password is checked against the
+    # maximum too: it reaches bcrypt.verify, which under bcrypt 5 raises past
+    # 72 bytes. Its minimum is NOT re-checked — an account created before the
+    # floor was raised must still be able to authenticate to change it.
+    current_error = validate_password_policy(current_password, check_minimum=False)
+    new_error = validate_password_policy(
+        new_password, field_label="Le nouveau mot de passe"
+    )
+    if current_error is not None:
+        error = current_error
+    elif not verify_password(current_password, user.password_hash):
         error = "Le mot de passe actuel est incorrect."
-    elif len(new_password) < MIN_PASSWORD_LENGTH:
-        error = f"Le nouveau mot de passe doit faire au moins {MIN_PASSWORD_LENGTH} caractères."
+    elif new_error is not None:
+        error = new_error
     elif new_password != new_password_confirm:
         error = "Les nouveaux mots de passe ne correspondent pas."
 
