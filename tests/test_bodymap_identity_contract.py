@@ -257,13 +257,36 @@ def test_positional_css_defect_is_gone_from_the_runtime():
 
 # ───────────── A8 — zone_recovery is documented, not wired ─────────────
 
-def test_a8_zone_recovery_reaches_no_template():
-    hits = [
-        p.relative_to(ROOT)
-        for p in TEMPLATES.rglob("*.html")
-        if "zone_recovery" in p.read_text(encoding="utf-8")
-    ]
-    assert hits == [], f"zone_recovery was wired into templates by this sprint: {hits}"
+def test_a8_no_template_calls_zone_recovery_itself():
+    """Aucun gabarit n'appelle le service : la donnée vient du contexte.
+
+    **Onzième fois que ce motif se produit dans ce programme** : la garde
+    lisait le fichier BRUT, commentaires compris, et `UIV3_HOME_CAUSAL_COCKPIT`
+    est tombée dessus en écrivant, dans un commentaire Jinja, que le comptage
+    des bandes est « dérivé de `build_zone_recovery` ». Trois mentions en
+    prose, **zéro dans le markup vivant**.
+
+    Une garde ne doit pas lire de la prose. Elle vérifie désormais ce qu'elle
+    a toujours voulu dire : qu'un gabarit ne fait pas de logique métier — la
+    récupération est lue par le routeur et passée en contexte.
+
+    **Ce que ce test ne dit plus.** L'énoncé d'origine, « `zone_recovery`
+    n'atteint aucun template », servait de PREUVE au trou A8 : les plaques de
+    `/science` sont décoratives et ne portent aucune donnée. Ce trou-là
+    **reste ouvert** — l'Accueil rend des bandes, pas des plaques, et le
+    couplage « la bande choisit une couleur, l'identifiant choisit la
+    surface » reste une intention de conception. La formulation de
+    `Sb_BODYMAP_IDENTITY_CONTRACT_01 §6` mériterait d'être resserrée sur les
+    plaques ; c'est hors du périmètre de cette tranche, et signalé.
+    """
+    hits = []
+    for path in TEMPLATES.rglob("*.html"):
+        markup = re.sub(
+            r"\{#.*?#\}", "", path.read_text(encoding="utf-8"), flags=re.DOTALL
+        )
+        if "zone_recovery" in markup:
+            hits.append(path.relative_to(ROOT))
+    assert hits == [], f"un gabarit appelle zone_recovery lui-même : {hits}"
 
 
 def test_a8_contract_records_the_gap_without_closing_it():
