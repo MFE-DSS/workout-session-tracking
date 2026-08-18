@@ -588,3 +588,15 @@ Les sept critères passent. Le gate s'ouvre pour **`B0` uniquement**.
 gardes de contraste.
 
 **`B0` n'est pas démarrée dans ce cycle de décision** (instruction opérateur).
+
+---
+
+## Non-goals
+
+- Ne crée aucune direction artistique nouvelle. Ce document démontre l'unité
+  du langage existant et tranche les conflits amont.
+- N'uniformise pas les deux surfaces : une primitive absente d'une surface y
+  reste absente, elle n'est pas remplacée par un équivalent (§14).
+- N'ouvre le build que pour `B0`. Aucun refactor Home ou Session.
+- Ne persiste aucun état de présentation.
+- Ne lève pas `UI_DATA_GAP G6` (RIR) : il reste bloqué et hors périmètre.

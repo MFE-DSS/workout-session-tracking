@@ -21,6 +21,12 @@
       "Bash(EXPO_PORT=* /Users/martinfeldmann/workout-session-tracking/.venv/bin/python /private/tmp/claude-501/**)",
       "Bash(pkill -f:*)",
       "WebFetch(domain:gravl.ai)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python - <<:*)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -:*)",
+      "Bash(python - <<:*)",
+      "Bash(python3 - <<:*)",
+      "Bash(git commit -q -F -:*)",
+      "Bash(git commit -F -:*)",
       "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m http.server 8126 --directory /tmp/auren-ui-lab)"
     ]
   }
