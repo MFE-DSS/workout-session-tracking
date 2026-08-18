@@ -9,7 +9,19 @@
       "Bash(git commit:*)",
       "Bash(pytest tests/test_auth.py tests/test_register_profile.py -v)",
       "Bash(python -m pytest --tb=short -q)",
-      "Bash(python -m pytest tests/test_library.py::test_home_renders_action_tiles -v)"
+      "Bash(python -m pytest tests/test_library.py::test_home_renders_action_tiles -v)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m pytest /Users/martinfeldmann/workout-session-tracking/tests/test_session_instrument_rows.py -q)",
+      "Bash(pkill -f boot_local.py)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m pytest:*)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m ruff:*)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m scripts.:*)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -c:*)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python /Users/martinfeldmann/workout-session-tracking/scripts/**)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python /private/tmp/claude-501/**)",
+      "Bash(EXPO_PORT=* /Users/martinfeldmann/workout-session-tracking/.venv/bin/python /private/tmp/claude-501/**)",
+      "Bash(pkill -f:*)",
+      "WebFetch(domain:gravl.ai)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m http.server 8126 --directory /tmp/auren-ui-lab)"
     ]
   }
 }
