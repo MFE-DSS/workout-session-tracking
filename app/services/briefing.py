@@ -78,6 +78,21 @@ def _last_time_chip(prior_summary: dict | None) -> str:
     return f"dernière fois {_fmt_weight(w)} kg × {r}"
 
 
+def _has_prior_load(prior_summary: dict | None) -> bool:
+    """Whether ``_last_time_chip`` carries a real load rather than the empty case.
+
+    D5_SESSION_INSTRUMENT_ROWS_01 — the chip is a fixed-width surface in the
+    exercise summary; « 3×12-20 RP · première fois » overflowed it and the
+    ellipsis ate the tail. « première fois » is also already stated, in full,
+    by the « Référence précédente : Non disponible » block on the same card,
+    so the chip was spending its width on a duplicate.
+
+    Exposed as its own flag rather than string-matching the rendered chip in
+    the template: the wording of ``_last_time_chip`` stays free to change.
+    """
+    return not _last_time_chip(prior_summary).startswith("première")
+
+
 # ---------------------------------------------------------------------------
 # Public builders
 # ---------------------------------------------------------------------------
@@ -100,6 +115,7 @@ def build_chip(
     return {
         "scheme": scheme,
         "last_time": _last_time_chip(prior_summary),
+        "has_prior": _has_prior_load(prior_summary),
         "kind": template_kind or "strength",
     }
 
@@ -141,6 +157,7 @@ def build_peek(
         "name": display_name,
         "scheme": scheme,
         "last_time": _last_time_chip(prior_summary),
+        "has_prior": _has_prior_load(prior_summary),
         "cues": cues,
         "kind": template_kind or "strength",
     }

@@ -211,7 +211,20 @@ def test_the_set_action_button_posts_stay(client):
     block = match.group(0)
     assert 'name="nav"' in block
     assert 'value="stay"' in block
-    assert "Enregistrer la série" in block
+
+    # D5_SESSION_INSTRUMENT_ROWS_01 — le libellé VISIBLE est passé à
+    # « Valider » (compact, aligné sur « Valider · E2 » du bouton voisin), et
+    # la phrase entière vit dans le `title`.
+    #
+    # L'assertion d'origine cherchait « Enregistrer la série » n'importe où
+    # dans le bloc. Elle serait restée verte sur le seul `title`, sans plus
+    # rien vérifier du libellé rendu : on l'ouvre en deux pour que chaque
+    # moitié dise ce qu'elle garde vraiment.
+    label = re.sub(r"<[^>]+>", "", block).strip()
+    assert label == "Valider", f"unexpected visible label: {label!r}"
+    assert "Enregistrer la série et rester sur cet exercice" in block, (
+        "the full claim must survive somewhere reachable — here, the title"
+    )
 
     assert 'nav_direction == "stay"' in ROUTER.read_text(encoding="utf-8"), (
         "the button may only claim the action if the router implements it"

@@ -1515,9 +1515,20 @@ input, button, textarea, select {
   gap: 6px;
 }
 
+/* D5_SESSION_INSTRUMENT_ROWS_01 — la ligne de série est un instrument.
+
+   La première piste valait 40 px fixes et recevait jusqu'à 101 px de contenu
+   (« Série », « #1 », « actif », la technique, le rappel de charge). Sans
+   `overflow` déclaré, le débordement était VISIBLE : le chiffre de série
+   passait sous le champ kg. Mesuré à 390 px, 31 lignes concernées.
+
+   `auto` au lieu de `40px` : la piste ne peut plus être trop petite pour son
+   contenu — mais le contenu, lui, a été réduit à un code de deux caractères,
+   donc la piste reste étroite. Le rognage est réglé par construction, pas par
+   élargissement : la place gagnée revient aux valeurs. */
 .set-row {
   display: grid;
-  grid-template-columns: 40px 1fr auto;
+  grid-template-columns: auto 1fr auto;
   gap: var(--space-sm);
   align-items: center;
   padding: 6px 0;
@@ -1528,19 +1539,37 @@ input, button, textarea, select {
 .set-row__label {
   display: flex;
   gap: 4px;
-  align-items: baseline;
+  align-items: center;
   font-size: 12px;
+  /* Le code est court et ne doit jamais se casser en deux lignes. */
+  white-space: nowrap;
 }
 
-.set-row__kind {
-  color: var(--fg-dim);
-  font-size: 10px;
-  text-transform: uppercase;
-}
-
-.set-row__idx {
+/* Le code de ligne : « S1 » pour une série de travail, « É1 » pour un
+   échauffement. Mono + tabulaire pour que les lignes s'alignent verticalement
+   quel que soit le chiffre — c'est ce qui fait lire la colonne comme un axe
+   plutôt que comme une suite d'étiquettes. */
+.set-row__code {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-weight: 600;
+  font-size: 13px;
+  color: var(--fg-dim);
+  min-width: 2.2ch;
+}
+
+.set-row--work .set-row__code { color: var(--fg); }
+
+/* L'annexe : ce que la colonne étroite ne peut pas porter. Elle occupe la
+   ligne entière sous les champs, donc rien n'y déborde jamais, quelle que
+   soit la longueur de la technique ou du rappel de charge. */
+.set-row__annex {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  align-items: center;
+  margin-top: 2px;
 }
 
 .set-row__inputs {
@@ -2354,16 +2383,28 @@ details.exercise-card--done .exercise-card__compact .exercise-card__code {
   margin-top: var(--space-md);
   padding-top: var(--space-sm);
   border-top: 1px solid var(--border);
+  /* D5_SESSION_INSTRUMENT_ROWS_01 — filet de sécurité. Avec deux boutons et
+     un récapitulatif sur une seule ligne, une largeur insuffisante écrasait
+     le CTA primaire à 60 px et son libellé s'imprimait PAR-DESSUS le bouton
+     voisin : les deux actions devenaient illisibles en même temps. Le retour
+     à la ligne rend ce chevauchement impossible par construction, quelle que
+     soit la longueur future des libellés. */
+  flex-wrap: wrap;
 }
 
 .card__actions--exercise .btn {
   min-height: 44px;
   font-weight: 600;
+  /* Un libellé d'action ne se casse jamais en plein milieu d'un mot. */
+  white-space: nowrap;
 }
 
-/* Primary "next" CTA takes most of the width */
+/* Primary "next" CTA takes most of the width.
+   `flex-basis: auto` (et non 0) : le bouton part de la largeur de son texte
+   et grandit ensuite. Avec `flex: 1` (base 0) il était le premier candidat au
+   rétrécissement, ce qui est exactement l'inverse du rang qu'il occupe. */
 .card__actions--exercise .btn--primary {
-  flex: 1;
+  flex: 1 0 auto;
 }
 
 /* Sb_05 prev navigation button: compact, discreet */

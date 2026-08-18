@@ -21,20 +21,26 @@
          devant les cassait sans rien apporter. #}
       <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ set_state }}{% if _row_ph %} set-row--has-overload-placeholder{% endif %}"
           id="set-{{ sl.id }}">
+        {# D5_SESSION_INSTRUMENT_ROWS_01 — la ligne de série est un instrument,
+           pas une phrase.
+
+           Avant : « Série », « #1 », « actif », la technique ET le rappel de
+           charge s'entassaient dans une colonne de 40 px. Le contenu mesurait
+           jusqu'à 101 px et débordait SANS ellipse : le chiffre de série
+           passait sous le champ kg. On ne pouvait pas lire quelle série on
+           remplissait — mesuré à 390 px, 31 occurrences sur la page.
+
+           Après : la colonne ne porte plus que le code (`S1`) et l'état. Tout
+           ce qui a besoin de largeur descend dans l'annexe, qui occupe la
+           ligne entière. Le rognage est réglé par réduction sémantique, pas
+           par élargissement — la place gagnée va aux valeurs. #}
         <div class="set-row__label session-focus__console-row-label">
-          <span class="set-row__kind">Série</span>
-          <span class="set-row__idx">#{{ sl.set_index }}</span>
+          <span class="set-row__code">S{{ sl.set_index }}</span>
           {% if set_state == 'completed' %}<span class="session-focus__console-check" aria-label="Série validée">✓</span>{% endif %}
-          {% if set_state == 'active' %}<span class="session-focus__console-badge" aria-label="Série active">actif</span>{% endif %}
-          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-          {# Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la
-             dernière séance, collé à la ligne ACTIVE, au point exact de
-             saisie. Silence si pas de donnée : jamais de faux poids. #}
-          {% if set_state == 'active' and ref and ref.has_data %}
-            <span class="session-focus__console-row-prev" aria-hidden="true">
-              dernière : {{ ref.weights_str }} kg · {{ ref.reps_str }} reps
-            </span>
-          {% endif %}
+          {# Le mot « actif » coûtait 30 px dans une colonne de 40. Il devient
+             un point ambre dessiné en CSS ; `role="img"` porte le nom
+             accessible, qu'un span vide ne suffirait pas à annoncer. #}
+          {% if set_state == 'active' %}<span class="session-focus__console-badge" role="img" aria-label="Série active"></span>{% endif %}
         </div>
 
         <div class="set-row__inputs">
@@ -70,6 +76,24 @@
              CTA d'exercice. #}
         </div>
 
+        {# L'annexe : ce que la colonne de 40 px ne pouvait pas contenir. Elle
+           occupe la ligne entière sous les champs, donc rien n'y déborde
+           jamais. Rendue seulement s'il y a quelque chose à dire — pas de
+           conteneur vide. #}
+        {% if sl.technique or (set_state == 'active' and ref and ref.has_data) %}
+        <div class="set-row__annex">
+          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+          {# Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la
+             dernière séance, collé à la ligne ACTIVE, au point exact de
+             saisie. Silence si pas de donnée : jamais de faux poids. #}
+          {% if set_state == 'active' and ref and ref.has_data %}
+            <span class="session-focus__console-row-prev" aria-hidden="true">
+              dernière : {{ ref.weights_str }} kg · {{ ref.reps_str }} reps
+            </span>
+          {% endif %}
+        </div>
+        {% endif %}
+
       </li>
     {%- endfor %}
   </ul>
@@ -101,10 +125,11 @@
   <ul class="set-list">
     {% for sl in warmup_sets %}
       <li class="set-row set-row--warmup">
+        {# Même réduction que la série de travail : « Échauf. #1 » mesurait
+           61 px dans une colonne de 40 et le chiffre disparaissait sous le
+           champ kg. `É` distingue l'échauffement de la série sans un mot. #}
         <div class="set-row__label">
-          <span class="set-row__kind">Échauf.</span>
-          <span class="set-row__idx">#{{ sl.set_index }}</span>
-          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+          <span class="set-row__code">É{{ sl.set_index }}</span>
         </div>
 
         <div class="set-row__inputs">
@@ -131,6 +156,15 @@
           {# Sb_24.4 — checkbox « Fait » retirée. Spec Sx_24 §E : completed
              est dérivé côté serveur de la présence de weight ou reps. #}
         </div>
+
+        {# La technique quitte la colonne étroite mais ne quitte pas la page :
+           elle descend dans l'annexe pleine largeur, comme sur la série de
+           travail. Retirer sans remplacer serait une soustraction seule. #}
+        {% if sl.technique %}
+        <div class="set-row__annex">
+          <span class="tag">{{ sl.technique }}</span>
+        </div>
+        {% endif %}
       </li>
     {% endfor %}
   </ul>
@@ -193,7 +227,12 @@
     {% endif %}
     {% set briefing_chip = briefing_chips.get(se.id) %}
     {% if briefing_chip %}
-      <span class="exercise-card__chip exercise-card__chip--{{ briefing_chip.kind }}">{{ briefing_chip.scheme }} · {{ briefing_chip.last_time }}</span>
+      {# D5_SESSION_INSTRUMENT_ROWS_01 — la queue « · première fois » débordait
+         la puce et l'ellipse la mangeait à moitié. Elle est déjà dite en
+         entier par le bloc « Référence précédente » de la même carte : la
+         puce ne dépense plus sa largeur pour un doublon. Quand il y a une
+         charge réelle, elle reste — c'est l'information qui vaut la place. #}
+      <span class="exercise-card__chip exercise-card__chip--{{ briefing_chip.kind }}">{{ briefing_chip.scheme }}{% if briefing_chip.has_prior %} · {{ briefing_chip.last_time }}{% endif %}</span>
     {% endif %}
   </summary>
 
@@ -983,16 +1022,29 @@
         value="stay"
         class="btn btn--ghost session-focus__tap-target session-focus__set-action"
         title="Enregistrer la série et rester sur cet exercice"
-      >Enregistrer la série</button>
+      >Valider</button>
       {% endif %}
+      {# D5_SESSION_INSTRUMENT_ROWS_01 — « Enregistrer et passer à E2 » (26
+         caractères) était comprimé dans 60 px par le bouton voisin et
+         s'imprimait PAR-DESSUS lui : les deux actions de la ligne étaient
+         illisibles simultanément. Le verbe est le même pour les deux issues,
+         seule la destination change — c'est elle qui porte l'information, pas
+         la répétition du verbe. Le `title` conserve la phrase entière.
+
+         Le `title` dit « Enregistrer », jamais « Enregistrer LA SÉRIE » : ce
+         bouton poste `nav=next` et fait avancer l'exercice ENTIER. La garde
+         `test_cta_copy_does_not_claim_a_set_level_action` a rattrapé une
+         première rédaction qui revendiquait ici une action de série — elle
+         avait raison, le libellé aurait menti. #}
       <button type="submit" name="nav" value="next"
-              class="btn btn--primary session-focus__tap-target session-focus__cta-primary">
+              class="btn btn--primary session-focus__tap-target session-focus__cta-primary"
+              title="{% if is_last %}Enregistrer et terminer{% elif next_code %}Enregistrer et passer à {{ next_code }}{% else %}Enregistrer{% endif %}">
         {% if is_last %}
-          Enregistrer et terminer
+          Valider · fin
         {% elif next_code %}
-          Enregistrer et passer à {{ next_code }}
+          Valider · {{ next_code }}
         {% else %}
-          Enregistrer
+          Valider
         {% endif %}
       </button>
     </div>

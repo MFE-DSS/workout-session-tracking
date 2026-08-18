@@ -29,16 +29,65 @@ def _get_exercise_ids(sid: int) -> list[int]:
 # ---- Chip on future / partial cards ----------------------------------
 
 
+def _chips(body: str) -> list[str]:
+    return re.findall(
+        r'<span class="exercise-card__chip[^"]*">(.*?)</span>', body, re.DOTALL
+    )
+
+
 def test_chip_present_on_future_card_summary(client):
     """A fresh session has E1 active and E2+ future → chips on E2+."""
     sid = _start(client, "push-a")
     r = client.get(f"/sessions/{sid}")
     body = r.text
     assert 'exercise-card__chip' in body
-    # The chip carries the rep scheme and last-time.
-    # Push A E1 is '3x 6-10' but E1 is active so we look at another card.
-    # Any chip suffices — we just verify the markup class is rendered.
-    assert 'première fois' in body or 'dernière fois' in body
+    # The chip always carries the rep scheme — that is its irreducible payload.
+    chips = _chips(body)
+    assert chips, "no chip rendered"
+    assert all(re.search(r"\d+×", c) for c in chips), chips
+
+
+def test_the_chip_does_not_spend_its_width_on_the_empty_case(client):
+    """D5_SESSION_INSTRUMENT_ROWS_01 — « première fois » left the chip.
+
+    Measured at 390px the chip overflowed and the ellipsis ate the tail, so
+    « 3×12-20 RP · première fois » rendered as « 3×12-20 RP · pre… ». The
+    empty case is already stated in full by « Référence précédente : Non
+    disponible » on the same card: the chip was paying width for a duplicate.
+    """
+    sid = _start(client, "push-a")
+    body = client.get(f"/sessions/{sid}").text
+    offenders = [c for c in _chips(body) if "première fois" in c]
+    assert offenders == [], offenders
+
+
+def test_the_chip_still_carries_a_real_prior_load(client):
+    """The subtraction above is scoped to the EMPTY case, never to real data.
+
+    Without this, dropping « première fois » could silently become dropping
+    the whole `last_time` segment — losing the one thing on the chip worth
+    reading.
+    """
+    from app.services.briefing import build_chip
+
+    class _RT:
+        min_reps, max_reps, technique = 8, 12, None
+
+    class _TE:
+        rep_targets = [_RT(), _RT(), _RT()]
+
+    prior = {"first_set": {"weight_kg": 60.0, "reps": 10}}
+    chip = build_chip(_TE(), prior)
+    assert chip is not None
+    assert chip["has_prior"] is True
+    assert "dernière fois" in chip["last_time"]
+
+    empty = build_chip(_TE(), None)
+    assert empty is not None
+    assert empty["has_prior"] is False
+    assert empty["last_time"] == "première fois", (
+        "the wording itself is untouched — only whether the template renders it"
+    )
 
 
 def test_chip_absent_on_active_card(client):

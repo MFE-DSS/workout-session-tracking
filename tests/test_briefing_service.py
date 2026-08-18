@@ -80,9 +80,14 @@ def test_build_chip_strength_happy_path():
     te = _te([_rt(8, 12), _rt(8, 12), _rt(8, 12)])
     prior = {"first_set": {"weight_kg": 60.0, "reps": 10}}
     chip = build_chip(te, prior, "strength")
+    # D5_SESSION_INSTRUMENT_ROWS_01 — `has_prior` s'ajoute au contrat de la
+    # puce. L'égalité EXACTE est conservée volontairement : c'est elle qui a
+    # signalé l'ajout de clé pendant le broad sweep, et une clé silencieuse
+    # dans un contrat de rendu est exactement ce qu'il faut voir arriver.
     assert chip == {
         "scheme": "3×8-12",
         "last_time": "dernière fois 60 kg × 10",
+        "has_prior": True,
         "kind": "strength",
     }
 

@@ -860,18 +860,43 @@
    sur le titre pour éviter le overflow sur mobile 360×640. */
 .session-focus .session-focus__header-title-row {
   display: flex;
-  align-items: baseline;
+  /* D5_SESSION_INSTRUMENT_ROWS_01 — `flex-start` remplace `baseline` : le
+     titre peut désormais occuper deux lignes, et `baseline` faisait descendre
+     le badge « En cours » avec la dernière d'entre elles. */
+  align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
   min-width: 0;
 }
 
+/* D5_SESSION_INSTRUMENT_ROWS_01 — le titre passe de l'ellipse à deux lignes.
+
+   L'ellipse (Sb_UI_04.1) protégeait bien du débordement horizontal, mais à
+   390 px elle réduisait « Push A — Pecs épaisseur + Delts + Triceps » à
+   « Push A — Pecs épa… » : 292 px de contenu sur 233 px de piste. Le nom de
+   la séance dans laquelle on se trouve est l'information la plus identifiante
+   de la page ; la tronquer pour gagner une ligne est un mauvais échange.
+
+   Trois lignes maximum, coupure aux mots : aucun débordement horizontal n'est
+   réintroduit, et l'ellipse ne subsiste que pour un titre réellement
+   extravagant. Trois et non deux, mesuré : à 24 px sur une piste de 233 px,
+   deux lignes s'arrêtaient à « Push A — Pecs épaisseur + Delts… » et
+   mangeaient encore le dernier groupe musculaire. */
 .session-focus .session-focus__header-title-row .page-title {
   margin: 0;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow-wrap: anywhere;
+  /* `.page-title` est centré globalement. Le défaut ne se voyait pas tant que
+     le titre tenait sur une seule ligne en `nowrap` ; dès qu'il en occupe
+     trois, il se centre au milieu d'un en-tête entièrement aligné à gauche.
+     Corrigé dans la portée séance seulement — le reste du site garde son
+     titre centré. */
+  text-align: left;
   /* Rappel token : 24px bold sans (défini en Sb_UI_04.1). */
 }
 
@@ -1660,17 +1685,22 @@ details.session-focus__cues[open] > summary.session-focus__cues-title {
   padding: var(--space-1) var(--space-2);
 }
 
-/* Badge "actif" sur le label du set courant. */
+/* Marqueur de la série courante.
+
+   D5_SESSION_INSTRUMENT_ROWS_01 — c'était le mot « actif » : 30 px dans une
+   colonne de 40, à lui seul la moitié du débordement de la ligne. L'état
+   devient un point ambre — un objet visuel à la place d'un objet textuel
+   (D5), lisible d'un coup d'œil pendant une série. Le nom accessible est
+   porté par `role="img"` + `aria-label` dans le template, donc rien n'est
+   perdu pour un lecteur d'écran : ce n'est pas une soustraction, c'est une
+   substitution. */
 .session-focus__console-badge {
-  margin-left: var(--space-1);
-  padding: 1px 6px;
-  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   background: var(--color-accent);
-  color: var(--color-on-accent);
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: var(--font-weight-medium);
+  flex: 0 0 auto;
 }
 
 /* Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la dernière séance,
