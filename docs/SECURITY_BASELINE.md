@@ -16,7 +16,7 @@
 | Rate limiting | in-process per-IP buckets sur `/login`, `/register`, `/forgot-password` | **Sb_26.4** (cf. §2) |
 | Dependency audit | `pip-audit` required en CI | **Sb_26.4** (cf. §3) |
 | Dependabot | PRs hebdo pip + actions, pas d'auto-merge | **Sb_26.4** (cf. §4) |
-| Lockfile reproducible | `requirements-lock.txt` (advisory) | **Sb_26.4** (cf. §5) |
+| Lockfile reproducible | `requirements-lock.txt` — **autoritaire** (CI + prod installent depuis lui) | **Sb_DEPENDENCY_LOCK_AUTHORITY_01** (cf. §5) |
 | Secrets scan | `gitleaks` required sur PR / push | **Sb_26.4** (cf. §6) |
 | Static analysis Python | bandit `-ll` required, ruff budget locked | Sb_26.1 |
 | Workflow lint | actionlint required | Sb_26.1 |
@@ -94,7 +94,7 @@ Cette baseline est **figée par la gate CI** : tout commit qui introduit une dep
 ### 3.3 Étendre l'audit
 
 * `pip-audit` ne scanne pas les optional dev deps (pytest, ruff, etc.) par défaut. Ces deps ne tournent pas en prod — risque acceptable V1.
-* Pour étendre à transitives + optional : `pip-audit --strict` lit `requirements.txt` puis résout. Pour scanner explicitement le lockfile : `pip-audit -r requirements-lock.txt`.
+* `pip-audit --strict` scanne **`requirements-lock.txt`** — c'est le fichier réellement installé en CI comme en production.
 
 ## 4. Dependabot
 
@@ -134,29 +134,33 @@ bash scripts/regen_lockfile.sh
 git add requirements-lock.txt
 ```
 
-Utilise `pip-compile --strip-extras` (pip-tools). Le fichier liste toutes les transitives avec versions exactes.
+Résolu **pour Python 3.11**, la version de la CI, via `uv pip compile --python-version 3.11 --strip-extras`. Le fichier liste toutes les transitives avec versions exactes.
 
-### 5.2 Statut V1 : advisory
+Le script **refuse** de régénérer avec `pip-compile` sous un interpréteur différent de la cible : `pip-compile` résout pour l'interpréteur courant, et le lock ne porte aucun marqueur d'environnement — il n'est donc valide que pour la version qui l'a produit.
 
-Le lockfile **n'est pas encore** utilisé par :
-* CI (le job `test` installe via `pip install -r requirements.txt`)
-* `scripts/deploy_prod.sh` (idem)
+### 5.2 Statut : AUTORITAIRE
 
-Raison : basculer en prod sur `pip install -r requirements-lock.txt` est un changement de comportement (résolution figée). Il faut valider que (a) toutes les versions tiennent en Python 3.11 prod, (b) le lockfile est régénéré correctement à chaque merge, (c) on a un plan de rollback si la résolution figée révèle un conflit.
+Depuis `Sb_DEPENDENCY_LOCK_AUTHORITY_01`, le lockfile est **le fichier d'installation** :
 
-Décision : V1 livre **uniquement** :
-* le lockfile committé (source de vérité reproductible si quelqu'un veut un setup identique)
-* `scripts/regen_lockfile.sh`
-* CI `--dry-run` parse check (advisory)
+* CI — `pip install -r requirements-lock.txt` (les deux jobs runtime)
+* `scripts/deploy_prod.sh` — idem, avec échec explicite si le fichier est absent
+* `pip-audit` scanne le lock, puisque c'est lui qui s'installe
 
-### 5.3 Quand basculer en `lockfile-install` (Sb_26.next ou Sb_27+)
+`requirements.txt` reste la **spécification source** : plages ouvertes, éditée à la main. On ne modifie jamais le lock à la main.
 
-Pré-requis :
-1. Le lockfile est régénéré régulièrement (au moins via Dependabot weekly).
-2. Une CI matrix valide l'install lockfile sur Python 3.11 spécifiquement.
-3. Une procédure de rollback `deploy_prod.sh` est documentée.
+**Pourquoi ce basculement.** Les plages ouvertes (`fastapi>=0.110`, `sqlalchemy>=2.0`…) faisaient résoudre les dernières versions compatibles **à chaque installation**. Mesuré le 2026-08-18 : **13 paquets sur 29** divergeaient entre le lock déclaré et un environnement installé ainsi. La pipeline épinglait le code à un SHA exact tout en laissant l'arbre de dépendances flotter — deux déploiements du même SHA pouvaient livrer des bibliothèques différentes.
 
-Sprint dédié, hors Sb_26.4.
+### 5.3 Les pré-requis de bascule, et comment ils ont été tenus
+
+Les trois conditions posées en `Sb_26.4` :
+
+1. **Toutes les versions tiennent en Python 3.11** — vérifié : les 29 paquets se résolvent pour 3.11, et la CI réelle installe désormais le lock.
+2. **Le lockfile est régénéré correctement** — `scripts/check_lock_drift.py` est **bloquant** en CI : toute dépendance ajoutée à `requirements.txt` sans régénération fait échouer le build.
+3. **Plan de rollback** — `deploy_prod.sh` échoue explicitement si le lock est absent ou non installable, et le message indique la manœuvre : relancer le workflow de déploiement avec le SHA précédent.
+
+### 5.4 Ce que la garde de dérive ne vérifie pas
+
+Elle compare les épingles aux specs déclarées, **hors ligne**. Elle ne vérifie pas que le lock est la résolution la plus fraîche possible : qu'une version plus récente existe sur PyPI n'est pas une dérive, c'est du temps qui passe. Proposer ces montées est le travail de Dependabot.
 
 ## 6. Secrets scanning — gitleaks
 
@@ -231,8 +235,8 @@ git commit -m "chore(deps): bump <package> X → Y (CVE-... / security / minor)"
 | HSTS preload | Doit être posé côté nginx, pas FastAPI | OPS hors scope |
 | SBOM (Software Bill of Materials) | Hors scope V1 ; lockfile suffit pour traçabilité | Sb_27+ |
 | Audit dev/test deps | Risque acceptable V1 (pas en prod) | Sb_27+ |
-| Strict freshness lockfile cross-Python | Brittle V1 ; advisory suffit | Sb_26.next |
-| Auto-bascule deploy sur lockfile-install | Nécessite validation explicite | Sb_26.next ou plus tard |
+| Résolution la plus fraîche imposée en CI | Une version plus récente sur PyPI n'est pas une dérive ; c'est le rôle de Dependabot | — |
+| Auto-bascule deploy sur lockfile-install | ✅ **fait** — `Sb_DEPENDENCY_LOCK_AUTHORITY_01` | livré 2026-08-18 |
 | Cleanup ruff baseline 548 → < | Contrat sprint dédié | `Sb_26.next.ruff-cleanup-N` |
 
 ## 9. Backlog sécurité (incident log + TODOs)
