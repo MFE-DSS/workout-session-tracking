@@ -224,3 +224,16 @@ ne peut pas passer en `BUILD`.
   l'accessibilité**. Le jugement esthétique reste humain — c'est le seul
   domaine où il est la seule garde possible.
 - Elle n'introduit aucun navigateur dans la CI.
+
+---
+
+## Non-goals
+
+- Ne remplace pas `CLAUDE.md §5.1`. Un harnais vert n'est pas une exposition ;
+  l'opérateur tranche toujours.
+- Ne vérifie pas la beauté. Géométrie, lisibilité et accessibilité seulement.
+- N'introduit aucun navigateur dans la CI : la capture reste locale et
+  déclenchée par l'opérateur ; seul le relevé JSON est comparé en CI.
+- Ne teste pas la compatibilité navigateur — Chromium uniquement, parce que
+  l'objet mesuré est la géométrie du produit.
+- N'autorise jamais la mise à jour d'une baseline pour faire passer un diff.

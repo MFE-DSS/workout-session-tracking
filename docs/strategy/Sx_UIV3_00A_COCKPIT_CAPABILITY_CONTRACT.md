@@ -365,3 +365,17 @@ Nouvelle tranche de build, en tête de queue :
 
 `B0` précède `B1` : les tokens bleus se posent sur des surfaces dont la
 profondeur est enfin délivrée.
+
+---
+
+## Non-goals
+
+- Aucune fonctionnalité produit nouvelle. Ce contrat rend visible ce que le
+  produit sait déjà ; il n'ajoute aucune donnée, aucun calcul, aucun modèle.
+- Aucun redesign de la Home ni de la Session — c'est l'objet de `01` et `02`.
+- Aucune neuvième primitive sans amendement de ce document (§3).
+- Aucune dépendance de rendu à View Transitions, Popover ou Anchor
+  Positioning : les trois sont des améliorations progressives (§8, §9).
+- Aucun framework. La porte d'admission du §9 est fermée par défaut.
+- Le *glanceability budget* (§10) n'est délibérément pas automatisable : il
+  n'est pas un test et ne le deviendra pas.

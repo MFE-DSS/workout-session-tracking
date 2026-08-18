@@ -31,8 +31,22 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 HOME_CSS = ROOT / "app" / "static" / "css" / "home.css"
+#: `UIV3_COCKPIT_LADDER_01` (B0) — la palette `--t-*` vit désormais ici.
+APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
 INDEX = ROOT / "app" / "templates" / "index.html"
 JS_DIR = ROOT / "app" / "static" / "js"
+
+
+def _uncommented(path: Path) -> str:
+    """CSS sans ses commentaires.
+
+    `test_amber_accent_present` passait sur `#C8A24B` trouvé dans le
+    COMMENTAIRE d'en-tête de `home.css` — donc pour une mauvaise raison. Un
+    hex cité en prose ne prouve pas qu'une couleur est déclarée.
+    """
+    import re as _re
+    return _re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"),
+                   flags=_re.DOTALL).lower()
 
 
 def _start_session(client, slug: str = "push-a") -> int:
@@ -114,15 +128,37 @@ class TestAurenTerminal:
             assert teal_hex not in css, f"leftover teal hex {teal_hex!r} in home.css"
 
     def test_amber_accent_present(self):
-        css = HOME_CSS.read_text(encoding="utf-8").lower()
-        assert "#c8a24b" in css, "amber accent #C8A24B missing from home.css"
+        """L'ambre est DÉCLARÉ dans l'autorité et CONSOMMÉ par la Home.
+
+        Tier **T4** — mis à jour par `Sx_UIV3_04 §1bis C8` (décision versionnée).
+        `UIV3_COCKPIT_LADDER_01` a déplacé la déclaration de `home.css` vers
+        `app.css :root` : la palette était scopée `.today-home` et donc
+        inatteignable depuis la Session, ce qui rendait la convergence
+        impossible à écrire.
+
+        La garde n'est pas affaiblie, elle est **ouverte en deux** : on vérifie
+        désormais la déclaration ET la consommation, là où l'ancienne version
+        se contentait d'un hex qu'un commentaire suffisait à satisfaire.
+        """
+        assert "#c8a24b" in _uncommented(APP_CSS), (
+            "amber accent #C8A24B missing from the app.css :root authority"
+        )
+        assert "var(--t-amber)" in _uncommented(HOME_CSS), (
+            "the Home no longer consumes the amber accent"
+        )
 
     def test_graphite_surfaces_present(self):
-        """Graphite dark surfaces must be defined (dark bg, not white)."""
-        css = HOME_CSS.read_text(encoding="utf-8").lower()
-        assert "#0f1318" in css or "#151a21" in css
+        """Les surfaces graphite sont déclarées, et la Home s'y pose.
+
+        Tier **T4**, même migration que ci-dessus.
+        """
+        app_css = _uncommented(APP_CSS)
+        assert "#0f1318" in app_css, "L1 --t-base missing from the authority"
+        assert "var(--t-base)" in _uncommented(HOME_CSS), (
+            "the Home no longer consumes the graphite base"
+        )
         # white surface of the teal build must be gone as a hero background
-        assert "--home-surface: #ffffff" not in css
+        assert "--home-surface: #ffffff" not in _uncommented(HOME_CSS)
 
     def test_mono_typography(self):
         """The Home must use a monospace stack (terminal), not a sans stack."""

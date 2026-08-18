@@ -57,6 +57,73 @@
   /* Sb_UI_03.1 — hauteur de la bottom nav mobile (offset pour les éléments
      sticky bottom, ex. sticky CTA Focus Mode). 0 en desktop (nav masquée). */
   --app-bottom-nav-h: 56px;
+
+  /* ==========================================================
+     UIV3 — PALETTE COCKPIT · AUTORITÉ UNIQUE
+     `UIV3_COCKPIT_LADDER_01` (B0) · spec `Sx_UIV3_00A` + `Sx_UIV3_04`
+     ----------------------------------------------------------
+     Ces tokens vivaient sous `.today-home` dans `home.css`, donc
+     ATTEIGNABLES DEPUIS LA SEULE HOME. Compté avant la tranche :
+     `--t-*` apparaissait 0 fois dans `app.css` et 0 fois dans
+     `session_focus.css`. La convergence Home × Session exigée par
+     `Sx_UIV3_04 §14` — même profondeur, même chromie, mêmes primitives
+     sur les deux surfaces — était donc littéralement impossible à
+     écrire. Ils sont promus ici, et `home.css` ne les déclare plus.
+
+     RÈGLE : une seule autorité. Une redéclaration locale exige une
+     raison écrite ; sans elle, c'est un second point de vérité.
+
+     Contrastes CALCULÉS SUR LE FOND RÉEL, pas sur `--t-base` seul —
+     c'est l'erreur que `CLAUDE.md §5.4` interdit et qu'un token bleu
+     validé au cycle précédent avait commise (`#4A7FB5` tombait à
+     3,40:1 sur L3). Colonnes = pire cas sur L0→L3.
+     ========================================================== */
+
+  /* — Profondeur L0→L3. Indépendante du sens (`Sx_UIV3_04 §2`).
+       Marches mesurées : 1,065 · 1,124 · 1,161 — plancher 1,12:1
+       entre niveaux adjacents. L'ancien escalier valait 1,05 / 1,07 /
+       1,07 : trois marches sous le seuil de perception, donc une
+       profondeur déclarée par des tokens et jamais rendue à l'œil. */
+  --t-void:        #070A0D;  /* L0 */
+  --t-base:        #0F1318;  /* L1 — référence, inchangé */
+  --t-surface:     #191F27;  /* L2 */
+  --t-raised:      #232B36;  /* L3 */
+
+  /* — Filets STRUCTURELS. Ne portent aucun sens, donc exempts du
+       seuil 4:1 des rails porteurs (`Sx_UIV3_04 §5`). */
+  --t-line:        #333D4B;
+  --t-line-strong: #475365;
+
+  /* — Premier plan. Seuil texte 4,5:1 sur le pire fond réel (L3). */
+  --t-fg:          #E8ECEF;  /* 12,02 */
+  --t-fg-2:        #A7B0BA;  /*  6,50 */
+  --t-fg-muted:    #8A94A0;  /*  4,64 */
+  /* NON-TEXTE UNIQUEMENT — 3,27 sur L3, sous le seuil 4,5 du corps de
+     texte. Réservé aux séparateurs et glyphes décoratifs. Son seul
+     consommateur textuel réel (`.today-home__summary-hint`) est migré
+     vers `--t-fg-muted` par cette tranche. */
+  --t-fg-faint:    #6E7A8A;
+
+  /* — AMBRE = action utilisateur · objet actif (`Sx_UIV3_04 §3`). */
+  --t-amber:       #C8A24B;  /* 5,93 — porteur de sens, seuil 4,0 */
+  --t-amber-hover: #D7B45C;  /* 7,19 */
+  --t-amber-dim:   #8A7538;  /* 3,18 — NON-TEXTE uniquement */
+  --t-amber-weak:  rgba(200, 162, 75, 0.12);
+  --t-on-amber:    #0A0C0F;  /* 8,14 sur --t-amber */
+
+  /* — BLEU = origine système · ce que le moteur produit. Jamais une
+       action. `--t-blue-line` passe de #4A7FB5 à #5A93C9 : l'ancienne
+       valeur n'avait été mesurée que sur `--t-base` et tombait à
+       3,94 sur L2 et 3,40 sur L3, sous la cible AUREN de 4:1. */
+  --t-blue-fg:     #7DD3FC;  /* 8,57 — texte */
+  --t-blue-mid:    #5FA8D3;  /* 5,46 — trait de donnée */
+  --t-blue-line:   #5A93C9;  /* 4,39 — filet porteur de sens */
+
+  /* — INCONNU. Ni ambre ni bleu : une absence de donnée n'est ni une
+       action ni une production du système. Toujours accompagné d'un
+       libellé et d'une hachure — jamais distingué par la couleur
+       seule (`Sx_UIV3_00 §7`). */
+  --t-unknown:     #828E9E;  /* 4,29 */
 }
 
 /* ---- Reset + Base ---- */

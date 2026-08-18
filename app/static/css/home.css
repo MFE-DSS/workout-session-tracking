@@ -11,37 +11,33 @@
    touche PAS app.css, ni le reste de l'app (dashboard legacy conservé,
    dé-priorisé). Aucun webfont (stack mono système). No-JS, mobile-first.
 
-   Accessibilité (contrastes vérifiés sur base #0F1318) :
-   - fg-primary #E8ECEF ......... 15.7:1 ✅ AA
-   - fg-secondary #A7B0BA ....... 8.5:1  ✅ AA
-   - fg-muted #8A94A0 ........... 6.1:1  ✅ AA
-   - amber #C8A24B .............. 7.7:1  ✅ AA
-   - on-accent (#0A0C0F sur amber) 8.1:1 ✅
+   Accessibilité — `UIV3_COCKPIT_LADDER_01` (B0) : les ratios ne sont plus
+   documentés ici. Ils le sont là où les tokens sont désormais déclarés,
+   `app.css :root`, et surtout ils y sont mesurés SUR LE PIRE FOND RÉEL
+   (`--t-raised`) et non sur `--t-base` seul.
+
+   Mesurer sur le seul fond de base est exactement ce que `CLAUDE.md §5.4`
+   interdit : un token bleu validé de cette façon au cycle précédent
+   (#4A7FB5, 4,43:1 sur base) tombait en réalité à 3,40:1 sur L3.
    ============================================================ */
 
-/* -------- Tokens Auren Terminal, scoped .today-home -------- */
+/* -------- Surface Home -------- */
+
+/* `UIV3_COCKPIT_LADDER_01` (B0) — LES TOKENS `--t-*` NE SONT PLUS DÉCLARÉS
+   ICI. Ils vivent désormais dans `app.css :root`, autorité unique.
+
+   Ils étaient scopés `.today-home`, donc atteignables depuis la seule Home :
+   `--t-*` comptait 0 occurrence dans `app.css` et 0 dans `session_focus.css`.
+   La convergence Home × Session (`Sx_UIV3_04 §14`) était impossible à écrire.
+
+   Les redéclarer ici recréerait une seconde autorité et ferait diverger
+   silencieusement les deux surfaces. Une garde le pinne
+   (`test_uiv3_cockpit_ladder.py`).
+
+   `--t-mono` et `--t-radius*` restent locaux : ce ne sont pas des tokens de
+   la palette cockpit, ils ne sont pas dupliqués, et rien ne les lit hors de
+   cette feuille. Ils suivront la Session quand elle en aura besoin. */
 .today-home {
-  /* Surfaces graphite (séparation par luminosité, pas d'ombre) */
-  --t-void:        #0A0C0F;
-  --t-base:        #0F1318;
-  --t-surface:     #151A21;
-  --t-raised:      #1B2029;
-  --t-line:        #2A303A;
-  --t-line-strong: #3A4250;
-
-  /* Foreground gris froids (AA sur base) */
-  --t-fg:          #E8ECEF;
-  --t-fg-2:        #A7B0BA;
-  --t-fg-muted:    #8A94A0;
-  --t-fg-faint:    #5A6472;
-
-  /* Accent AMBRE — l'unique couleur, rare */
-  --t-amber:       #C8A24B;
-  --t-amber-hover: #D7B45C;
-  --t-amber-dim:   #8A7538;
-  --t-amber-weak:  rgba(200, 162, 75, 0.12);
-  --t-on-amber:    #0A0C0F;
-
   /* Typo : tout-mono système, zéro webfont */
   --t-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
@@ -233,7 +229,18 @@
   color: var(--t-fg-2);
   line-height: 1.45;
 }
-.today-home__meta-sep { color: var(--t-fg-faint); margin: 0 4px; }
+/* `UIV3_COCKPIT_LADDER_01` (B0) — migré de `--t-fg-faint` à `--t-fg-muted`.
+
+   C'est un « · » `aria-hidden` entre deux fragments de `__meta`, donc
+   décoratif — mais c'est un ÉLÉMENT RÉEL portant une `color`, pas un
+   pseudo-élément. La garde a refusé la distinction, et elle a raison :
+   « décoratif » se prouve par `aria-hidden`, pas par le mécanisme CSS qui
+   dessine le caractère. Un séparateur à 4,64:1 au lieu de 3,27 ne coûte rien
+   et retire l'ambiguïté.
+
+   Il reste plus discret que le texte qui l'entoure : `__meta` est en
+   `--t-fg-2` (6,50 sur L3), le séparateur en `--t-fg-muted` (4,64). */
+.today-home__meta-sep { color: var(--t-fg-muted); margin: 0 4px; }
 
 /* Bloc d'action ancré en bas du hero → la CTA est le point focal. */
 .today-home__action {
@@ -324,9 +331,20 @@
   font-family: var(--t-mono);
 }
 .today-home__summary-eyebrow::before { content: "▸ "; color: var(--t-fg-faint); }
+/* `UIV3_COCKPIT_LADDER_01` (B0) — seul consommateur TEXTUEL réel de
+   `--t-fg-faint`, migré vers `--t-fg-muted`.
+
+   `--t-fg-faint` vaut 3,27:1 sur `--t-raised`, sous le seuil AA de 4,5:1
+   pour du corps de texte : il ne peut plus porter de texte. `--t-fg-muted`
+   donne 4,64:1 sur le même fond.
+
+   Les trois autres usages du token (`__meta-sep`, `__secondary::before`,
+   `__summary-eyebrow::before`) sont des GLYPHES DÉCORATIFS — un « · » et un
+   « ▸ », `aria-hidden`, qui ne portent aucune information. Ils restent sur
+   `--t-fg-faint`, dont le seuil applicable est celui du non-texte (3,0). */
 .today-home__summary-hint {
   letter-spacing: 0.04em;
-  color: var(--t-fg-faint);
+  color: var(--t-fg-muted);
 }
 
 /* Re-skin léger des cards legacy DANS la zone Home uniquement (scoped

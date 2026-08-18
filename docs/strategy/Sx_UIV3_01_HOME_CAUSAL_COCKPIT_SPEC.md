@@ -290,3 +290,17 @@ sa grammaire :
 - `SystemOrigin` porte le filet bleu 2 px de `00A §2` ;
 - la section « écarté — et pourquoi » est éligible au **popover** (`00A §7`)
   puisqu'elle est L3 — sous réserve du repli en flux obligatoire.
+
+---
+
+## Non-goals
+
+- Aucun changement du moteur de recommandation ni de `zone_recovery`. La Home
+  n'affiche que ce qui est déjà produit.
+- Aucun pourcentage de récupération : l'`estimate` 0–1 ne quitte pas le service.
+- Aucune BodyMap sur l'accueil tant que 7 zones sur 11 n'ont pas de plaque
+  approuvée — un corps à moitié gris mentirait sur ce que le produit sait.
+- Aucune matrice 11 cellules au-dessus du CTA : elle est une surface de
+  second niveau (`BODY_LEDGER_PAGE_01`).
+- Aucune anticipation au-delà de la séance proposée (D9).
+- Aucune revendication d'IA.

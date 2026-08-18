@@ -378,3 +378,18 @@ migration — hors périmètre absolu.
 
 **La console V3 affiche charge, répétitions et référence. Pas de RIR.**
 Enregistré comme `UI_DATA_GAP G6`, **bloqué**.
+
+---
+
+## Non-goals
+
+- Aucun changement de route, de modèle, de migration ni de service métier.
+  `nav=stay` et `nav=next` gardent leur contrat serveur.
+- Aucun état de repos persisté : `REST` est un état de présentation à portée
+  de requête (`Sx_UIV3_04 §1bis C`).
+- Aucun RIR ni RPE par série : `SetLog` ne porte pas ces champs, les afficher
+  exigerait une migration (`UI_DATA_GAP G6`, bloqué).
+- Aucun pré-remplissage inventé de la charge ou des répétitions — la référence
+  s'affiche à côté du champ, jamais dedans.
+- Aucun `CausalRail` en Session (amendement opérateur A).
+- Aucun JS requis pour saisir, enregistrer, corriger ou terminer.
