@@ -81,15 +81,37 @@ modifié, aucun compte n'est migré, le format `$2b$` est inchangé.**
 ## Lien avec bcrypt 5.0
 
 bcrypt 5.0.0 lève `ValueError` au-delà de 72 octets au lieu de tronquer — il
-**refuse précisément de faire** ce qui cause ce défaut. C'est la ceinture en plus
-des bretelles.
+**refuse précisément de faire** ce qui cause ce défaut.
 
-Sans la présente politique, l'adopter transformerait inscription, connexion,
-changement et réinitialisation en **500**. Avec elle, aucun chemin utilisateur ne
-peut plus atteindre bcrypt avec un secret trop long : la montée devient sûre.
+> **CORRECTION (2026-08-18).** La première version de ce document concluait que
+> la présente politique rendait bcrypt 5 adoptable. **C'était faux**, et la
+> preuve existait déjà : la CI de la PR #7 (run `27494766766`, 2026-06-14) avait
+> échoué avec `passlib 1.7.4` + `bcrypt 5.0.0`, sur `_stub_requires_backend`.
 
-`Sb_AUTH_PASSWORD_LENGTH_01` **ne monte pas** la dépendance. La PR #7 reste
-ouverte et devient mergeable.
+**bcrypt 5 est incompatible avec passlib 1.7.4, indépendamment de cette
+politique.** La cause n'est pas les mots de passe des utilisateurs :
+
+```python
+# passlib/handlers/bcrypt.py — détection du bug de wraparound BSD
+secret = (b"0123456789" * 26)[:255]      # 255 OCTETS
+if verify(secret, bug_hash):
+```
+
+**passlib hache lui-même un secret de 255 octets** au chargement de son backend.
+Sous bcrypt 5 cet appel lève `ValueError`, la détection de backend échoue, et
+**tout** appel `hash`/`verify` tombe ensuite. Aucune politique applicative ne
+peut l'empêcher : l'appel est interne à passlib et se produit avant qu'un mot de
+passe utilisateur n'existe.
+
+**Adopter bcrypt 5 exige donc de remplacer passlib, pas de relever une borne.**
+Le chemin le plus court est d'appeler `bcrypt.hashpw` / `bcrypt.checkpw`
+directement : le format `$2b$` est identique, **les hashes existants restent
+valides**, et passlib — non maintenu depuis 2020 — sort de la chaîne
+d'authentification. C'est un sprint à part entière, pas un bump.
+
+`Sb_AUTH_PASSWORD_LENGTH_01` **ne monte pas** la dépendance et ne la débloque
+pas. `bcrypt>=4.0,<5` reste la bonne borne ; la PR #7 **ne doit pas être mergée
+telle quelle**.
 
 ## Ce que la politique ne fait pas
 

@@ -116,7 +116,7 @@ quatre flux HTTP. Plantation retirée, fichier restauré à l'identique.
 | A6 | Comptes existants préservés | **PASS avec réserve** — voir ci-dessous |
 | A7 | PR bcrypt #7 non incluse | **PASS** — dépendance non touchée |
 | A8 | Rationnel documenté | **PASS** — `docs/SECURITY_PASSWORD_LENGTH_POLICY.md` |
-| A9 | bcrypt 5 devient mergeable | **PASS** — voir §7 |
+| A9 | bcrypt 5 devient mergeable | **NON TENU** — l'affirmation était fausse, voir §7 |
 
 ### A6 — la réserve, dite et non cachée
 
@@ -152,7 +152,61 @@ exactement le doute que `CLAUDE.md` §1 dit de lever.
 
 ---
 
-## 7. bcrypt 5 devient mergeable (A9)
+## 7. bcrypt 5 — A9 ÉTAIT FAUX, correction
+
+> **Cette section a affirmé l'inverse et se trompait.** Elle est corrigée plutôt
+> que réécrite : l'erreur est instructive.
+
+**Ce que j'avais conclu** : bcrypt 5.0.0 n'a qu'un changement cassant — `hashpw`
+lève `ValueError` au-delà de 72 octets — donc, une fois la politique en place,
+aucun chemin utilisateur ne peut le provoquer et la PR #7 devient mergeable.
+
+**Ce qui est vrai** : bcrypt 5.0.0 est **incompatible avec passlib 1.7.4**,
+indépendamment de la politique.
+
+La preuve existait déjà, et je ne l'avais pas cherchée : la CI de la PR #7
+(run `27494766766`, 2026-06-14, `passlib 1.7.4` + `bcrypt 5.0.0`) a échoué sur
+`_stub_requires_backend` — passlib ne trouvait **aucun backend bcrypt
+utilisable**, et chaque appel `bcrypt.hash()` tombait.
+
+Le mécanisme, dans `passlib/handlers/bcrypt.py` :
+
+```python
+# détection du bug de wraparound BSD, au chargement du backend
+secret = (b"0123456789" * 26)[:255]      # 255 OCTETS
+if verify(secret, bug_hash):
+```
+
+**passlib hache lui-même 255 octets** pour tester son backend. Sous bcrypt 5
+l'appel lève, la détection échoue, et l'authentification entière est morte. Une
+politique applicative ne peut rien y faire : l'appel précède l'existence de tout
+mot de passe utilisateur.
+
+**Pourquoi je me suis trompé** : j'ai raisonné depuis le changelog de bcrypt, qui
+décrit correctement le seul changement cassant *de son API publique*, sans
+vérifier ce que **l'appelant** en fait. Le changelog était juste ; ma déduction
+sur l'intégration ne l'était pas. La CI de la PR portait la réponse depuis deux
+mois.
+
+### Ce que bcrypt 5 exige réellement
+
+**Remplacer passlib, pas relever une borne.** Le chemin le plus court est
+d'appeler `bcrypt.hashpw` / `bcrypt.checkpw` directement : le format `$2b$` est
+identique, **les hashes existants restent valides**, et passlib — non maintenu
+depuis 2020 — sort de la chaîne d'authentification.
+
+C'est un sprint à part entière. `bcrypt>=4.0,<5` reste la bonne borne, et la
+**PR #7 ne doit pas être mergée telle quelle**.
+
+### Ce qui reste vrai
+
+La politique de 72 octets ferme la faille et vaut par elle-même. Elle sera aussi
+une **précondition** du jour où l'authentification passera à bcrypt direct — mais
+elle n'est pas suffisante, et ce rapport l'affirmait à tort.
+
+---
+
+## 7bis. Note d'origine (conservée, erronée)
 
 bcrypt 5.0.0 a **un seul** changement cassant : `hashpw` lève `ValueError`
 au-delà de 72 octets au lieu de tronquer. `hashpw`/`checkpw` subsistent, et
@@ -241,3 +295,14 @@ applicatif neuf. Il **n'a pas** évité l'aller-retour : `S1192` compte les occu
 entier, or mon scan mesurait le fichier tel qu'écrit sans distinguer neuf et préexistant. La leçon
 n'est pas « pré-scanner davantage » mais « compter les littéraux du fichier, pas seulement les
 siens ».
+
+### L'erreur la plus coûteuse du sprint n'était pas dans le code
+
+A9 affirmait que bcrypt 5 devenait mergeable. **C'était faux** (§7), et la preuve dormait dans la
+CI de la PR #7 depuis deux mois. J'ai déduit une conclusion d'intégration depuis un changelog
+d'API, au lieu d'aller lire le seul run qui avait réellement installé `passlib 1.7.4` avec
+`bcrypt 5.0.0`.
+
+Un changelog dit ce qu'une bibliothèque change. Il ne dit pas ce que son appelant en fait. La règle
+à retenir : **quand une PR de dépendance a déjà tourné, lire son échec avant de raisonner sur sa
+faisabilité.**
