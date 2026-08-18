@@ -106,6 +106,35 @@ _BAND_LABELS = {
     "unknown": "non mesurée",
 }
 
+#: Formes courtes, imposées à 360 px (`Sx_UIV3_04 §13`). Même vocabulaire,
+#: jamais un synonyme de plus.
+_BAND_SHORT = {
+    "likely_available": "prête",
+    "partially_recovered": "partielle",
+    "likely_fatigued": "chargée",
+    "unknown": "n.m.",
+}
+
+#: Nombre de segments pleins, `Sx_UIV3_00 §5`. C'est la BANDE qui est encodée,
+#: jamais l'`estimate` 0–1 : une barre proportionnelle serait une affirmation de
+#: pourcentage, que `zone_recovery` refuse explicitement de faire.
+_BAND_SEGMENTS = {
+    "likely_available": 3,
+    "partially_recovered": 2,
+    "likely_fatigued": 1,
+    "unknown": 0,
+}
+
+#: Du pire au meilleur. Sert à désigner la zone qui EXPLIQUE qu'une alternative
+#: n'ait pas été retenue. `unknown` vient en tête : ne pas savoir est un motif
+#: d'écartement plus fort qu'une fatigue mesurée.
+_BAND_RANK = {
+    "unknown": 0,
+    "likely_fatigued": 1,
+    "partially_recovered": 2,
+    "likely_available": 3,
+}
+
 
 def _reco_zone_state(db, user_id: int, primary_zones) -> list[dict]:
     """État de récupération des zones que la séance recommandée vise.
@@ -133,17 +162,116 @@ def _reco_zone_state(db, user_id: int, primary_zones) -> list[dict]:
         return []
 
     by_zone = {e.zone_code: e for e in estimates}
-    rows: list[dict] = []
-    for code in primary_zones:
-        estimate = by_zone.get(code)
-        band = getattr(getattr(estimate, "band", None), "value", "unknown")
-        rows.append({
-            "zone": code,
-            "label": ZONE_LABELS.get(code, code),
+    return [_zone_row(code, by_zone, ZONE_LABELS) for code in primary_zones]
+
+
+def _zone_row(code: str, by_zone: dict, labels: dict) -> dict:
+    """Une zone, rendue. Le libellé porte le sens ; la forme le renforce.
+
+    `Sx_UIV3_00 §5` — on expose la BANDE et un nombre de segments, jamais
+    l'`estimate` 0–1. Le rendre proportionnellement serait une affirmation de
+    pourcentage physiologique, que `zone_recovery` refuse de faire.
+    """
+    band = getattr(getattr(by_zone.get(code), "band", None), "value", "unknown")
+    return {
+        "zone": code,
+        "label": labels.get(code, code),
+        "band": band,
+        "band_label": _BAND_LABELS.get(band, _BAND_LABELS["unknown"]),
+        "band_short": _BAND_SHORT.get(band, _BAND_SHORT["unknown"]),
+        "segments": _BAND_SEGMENTS.get(band, 0),
+    }
+
+
+def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
+    """Tout ce dont le Causal Cockpit a besoin, en UNE lecture de `zone_recovery`.
+
+    `Sx_UIV3_01` — trois sorties, trois `UI_DATA_GAP` refermés **par
+    pass-through de présentation** (`Sx_UIV3_00 §0`) :
+
+      `zones`        G3 partiel — les zones que la séance proposée vise
+      `tally`        G3 — les 11 zones comptées par bande
+      `alternatives` G1 + G2 — les options écartées, et la zone qui l'explique
+
+    **Aucune décision métier n'est créée ici.** Les alternatives et leur score
+    sont produits par `recommend_next_session` et simplement transmis ; la zone
+    limitante est un TRI des bandes existantes, pas une nouvelle inférence ; le
+    comptage est une somme. `recommendation.py` et `zone_recovery.py` ne sont
+    pas touchés.
+    """
+    empty = {"zones": [], "tally": [], "tally_total": 0, "alternatives": []}
+    if not reco:
+        return empty
+
+    from datetime import datetime
+
+    from app.services.muscle_mapping import ZONE_LABELS
+    from app.services.zone_recovery import build_zone_recovery
+
+    try:
+        estimates = build_zone_recovery(db, user_id, now=datetime.now(UTC))
+    except Exception:
+        # Readout non critique : la home ne tombe jamais pour une estimation.
+        return empty
+
+    by_zone = {e.zone_code: e for e in estimates}
+    rows = [_zone_row(e.zone_code, by_zone, ZONE_LABELS) for e in estimates]
+
+    # — G3. Le total DOIT valoir 11 : une garde le pinne. Les bandes vides sont
+    #   omises à l'affichage, jamais du comptage.
+    counts: dict[str, int] = {}
+    for row in rows:
+        counts[row["band"]] = counts.get(row["band"], 0) + 1
+    tally = [
+        {
             "band": band,
-            "band_label": _BAND_LABELS.get(band, _BAND_LABELS["unknown"]),
+            "count": counts[band],
+            "segments": _BAND_SEGMENTS[band],
+            "band_label": _BAND_LABELS[band],
+        }
+        for band in _BAND_SEGMENTS
+        if counts.get(band)
+    ]
+
+    top = reco.get("top") or {}
+    targeted = [
+        _zone_row(code, by_zone, ZONE_LABELS)
+        for code in (top.get("primary_zones") or [])
+    ]
+
+    # — G1 + G2. Ce qu'aucun des cinq produits comparés ne montre : ce qui a
+    #   été ÉCARTÉ, et pourquoi. Le moteur le calcule déjà et l'affichage le
+    #   jetait.
+    alternatives = []
+    for alt in (reco.get("alternatives") or [])[:2]:
+        template = alt.get("template")
+        alt_zones = [
+            _zone_row(code, by_zone, ZONE_LABELS)
+            for code in (alt.get("primary_zones") or [])
+        ]
+        limiting = min(
+            alt_zones, key=lambda z: _BAND_RANK.get(z["band"], 9), default=None
+        )
+        # Toutes les zones disponibles → ce n'est pas la récupération qui a
+        # écarté l'option, c'est le score. Le dire plutôt qu'afficher une zone
+        # « disponible » à côté du mot « écarté », ce qui n'expliquerait rien.
+        by_recovery = limiting is not None and limiting["band"] != "likely_available"
+        alternatives.append({
+            "name": getattr(template, "name", None) or alt.get("name") or "",
+            "slug": getattr(template, "slug", None),
+            "score": alt.get("score"),
+            "zone_label": limiting["label"] if by_recovery else None,
+            "zone_band": limiting["band"] if by_recovery else None,
+            "zone_short": limiting["band_short"] if by_recovery else None,
+            "reason_is_recovery": by_recovery,
         })
-    return rows
+
+    return {
+        "zones": targeted,
+        "tally": tally,
+        "tally_total": sum(counts.values()),
+        "alternatives": alternatives,
+    }
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -249,6 +377,9 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
                 _reco_zone_state(db, user.id, _reco["top"].get("primary_zones"))
                 if _reco and _reco.get("top") else []
             ),
+            # `Sx_UIV3_01` — la cause, le bilan 11 zones et les options
+            # écartées. Une seule lecture de `zone_recovery` pour les trois.
+            "causal": _home_causal_context(db, user.id, _reco),
             "behavioral": behavioral,
             "readiness_today": readiness_today,
             "readiness_labels": READINESS_LABELS,

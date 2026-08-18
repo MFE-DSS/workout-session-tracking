@@ -73,9 +73,21 @@ class TestHomeIA:
     def test_hero_present(self, client):
         assert "today-home__hero" in _home(client)
 
-    def test_eyebrow_today(self, client):
-        assert "today-home__eyebrow" in _home(client)
-        assert "Aujourd'hui" in _home(client)
+    def test_eyebrow_today_only_when_a_session_is_active(self, client):
+        """Tier **T4** — `Sx_UIV3_01`, décision versionnée.
+
+        « Aujourd'hui » n'est plus rendu sur la branche recommandée : la
+        section porte désormais son propre intitulé (« Ce que disent tes
+        séances »), et deux eyebrows empilés ne disent qu'une chose — que
+        personne n'a relu les deux ensemble.
+
+        Il survit pour la séance active, où il situe réellement l'objet.
+        """
+        assert "Aujourd'hui" not in _home(client)
+        _start_session(client, "push-a")
+        active = _home(client)
+        assert "today-home__eyebrow" in active
+        assert "Aujourd'hui" in active
 
     def test_single_primary_cta_in_hero(self, client):
         """Exactly one primary hero CTA. Sx_UI_06 Sb_UI_06.3 : the CTA is
@@ -253,11 +265,24 @@ class TestDashboardPreserved:
         zone = body.find("today-home__secondary-zone")
         assert hero != -1 and zone != -1 and hero < zone
 
-    def test_kpi_and_progress_link_preserved(self, client):
+    def test_analysis_is_reachable_from_the_home(self, client):
+        """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
+
+        La sparkline, « séances cette sem. » et le score « disponibilité »
+        quittent l'accueil pour Progression. Trois échelles d'état
+        concurrentes vivaient sur la même page — déclarée 1–5, inférée en 4
+        bandes, calculée 0–100 — dont aucune ne s'accordait avec les autres.
+
+        **Rien n'est supprimé** : `compute_behavioral_state` calcule toujours,
+        `/dashboard` montre toujours. C'est la surface de DÉCISION qui s'en
+        sépare, pas le produit. Ce que cette garde protège désormais, c'est
+        que le chemin vers l'analyse reste **à un tap**.
+        """
         body = _home(client)
-        # KPI labels + progression link kept
-        assert "cette sem." in body
-        assert "Voir analyse complète" in body
+        assert "today-home__analysis" in body, (
+            "l'analyse doit rester accessible depuis l'accueil"
+        )
+        assert "/progress" in body
 
 
 # ───────── no-JS / no-framework ─────────

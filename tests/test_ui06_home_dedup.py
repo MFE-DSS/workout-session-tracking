@@ -88,13 +88,20 @@ def test_last_session_compact_no_ressenti_quality(client):
 # ───────── KPI reduced on home ─────────
 
 
-def test_home_kpi_reduced_to_week(client):
+def test_home_kpi_moved_out_entirely(client):
+    """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
+
+    `Sx_UI_06` avait réduit les KPI de l'accueil au seul « séances cette
+    sem. ». `Sx_UIV3_01` va au bout : l'analytique **quitte** la surface de
+    décision. Home = décider, Progression = analyser (D8).
+
+    La garde ne s'affaiblit pas, elle se durcit : elle interdisait deux KPI,
+    elle les interdit désormais tous — et exige que le chemin vers l'analyse
+    reste présent.
+    """
     body = _home(client)
-    assert "séances cette sem." in body
-    # analytical KPI moved to /progress
-    assert "score moy." not in body
-    assert "complétion 30j" not in body
-    # link to full analysis kept
+    for moved in ("séances cette sem.", "score moy.", "complétion 30j"):
+        assert moved not in body, f"{moved!r} appartient à /progress"
     assert "/progress" in body
 
 

@@ -59,25 +59,32 @@
 /* ============================================================
    Hero Decision Surface — terminal readout
    ============================================================ */
+/* `Sx_UIV3_01` — Q5 APPLIQUÉE : le hero cesse d'être une carte.
+
+   Il réservait `min-height: 44vh` et n'en remplissait pas les trois quarts :
+   mesuré à 390 × 844, **422 px dont 115 vides**, soit 27 % de la surface la
+   plus chère du produit, au milieu de la décision.
+
+   Q5 réserve la surface encadrée à ce qui apporte une FONCTION. Un hero n'est
+   pas un objet actionnable : c'est la page. Le seul conteneur qui subsiste ici
+   est le CTA. Plus de `min-height`, donc plus de `margin-top: auto` à
+   compenser — le bloc fait la hauteur de ce qu'il contient. */
 .today-home__hero {
   position: relative;
-  background: var(--t-surface);
-  border: 1px solid var(--t-line);
-  border-radius: var(--t-radius);
-  padding: 20px 18px;
+  padding: 18px 2px 4px;
   display: flex;
   flex-direction: column;
-  min-height: 44vh;
   font-family: var(--t-mono);
 }
 /* Rail ambre en tête — le seul « glow », fin, signal de décision. */
-.today-home__hero::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 2px;
-  background: var(--t-amber);
-}
+/* `Sx_UIV3_01` — le filet ambre horizontal en tête du hero est retiré.
+
+   Il marquait « la décision » quand le hero était une carte. Le rail causal
+   VERTICAL porte désormais cette fonction, et il la porte mieux : il relie
+   au lieu de souligner. Deux rails concurrents, l'un horizontal ambre et
+   l'autre vertical bleu, donneraient deux syntaxes pour une seule idée.
+
+   L'ambre ne subsiste que là où il signifie une action : le CTA. */
 /* Séance active : la surface se distingue par luminosité + rail latéral. */
 .today-home__hero--active {
   background: var(--t-raised);
@@ -112,104 +119,236 @@
   margin-bottom: 6px;
 }
 
-/* ── D2 — badge d'origine de la recommandation ────────────────────────────
-   BLEU = « produit par le système, pas par toi » (D3). C'est une RÈGLE de
-   sémantique, pas une décoration : si le bleu ne servait qu'ici, ce serait une
-   couleur de plus et pas un sens de plus.
+/* ══ CAUSAL COCKPIT ══ `Sx_UIV3_01` — la cause, le « donc », la prescription.
 
-   `<details>` natif : le ⓘ ouvre la vraie raison sans une ligne de JS, et la
-   page reste utilisable sans script. Même motif que le ⓘ déjà présent sur
-   « disponibilité ».
+   LE RAIL est le mécanisme propre à AUREN. Un filet vertical continu part des
+   zones, traverse un segment pointillé marqué « donc », et se prolonge derrière
+   la séance. La causalité devient une CONTINUITÉ GRAPHIQUE, pas une phrase.
+   Aucun des cinq produits comparés (Gravl, Fitbod, Alpha Progression,
+   Boostcamp, Hevy) ne dessine ce lien : ils juxtaposent.
 
-   Rang de contrôle 2 au sens de D1 (bordure discrète, casse normale), donc
-   cible tactile ≥ 44 px — c'est un contrôle, pas une étiquette. */
-.reco-origin { margin-bottom: 8px; }
+   Il reste BLEU de la cause jusqu'à la prescription incluse — la séance
+   proposée est produite par le moteur, donc origine système — et ne cède la
+   place à l'ambre qu'au CTA (`Sx_UIV3_04 §1bis C2`).
 
-.reco-origin__badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 4px 12px;
-  border: 1px solid var(--t-accent-blue, #2c5282);
-  border-radius: 999px;
-  background: var(--t-accent-blue-soft, rgba(125, 211, 252, 0.10));
-  color: var(--t-accent-blue-fg, #7dd3fc);
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
+   Pseudo-éléments purs. Aucun JS. Décoratif pour les technologies
+   d'assistance : le sens est porté par « donc » et par les intitulés. */
+.cockpit__cause,
+.cockpit__effect {
+  position: relative;
+  padding-left: 18px;
 }
-.reco-origin__badge::-webkit-details-marker { display: none; }
-.reco-origin__badge:focus-visible {
-  outline: 2px solid var(--t-accent-blue-fg, #7dd3fc);
-  outline-offset: 2px;
+/* Les trois segments doivent ABOUTER. Un rail interrompu entre la cause et
+   le « donc » ne relie plus rien : il redevient trois accents décoratifs
+   empilés, exactement ce que `Sx_UIV3_00A §6` refuse. Mesuré : 10 px de vide
+   au-dessus de la jonction, 7 px en dessous. Les pseudo-éléments débordent
+   donc dans les marges de leurs voisins pour se rejoindre. */
+.cockpit__cause::before,
+.cockpit__effect::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 5px;
+  bottom: -10px;
+  width: 2px;
+  background: var(--t-blue-line);
 }
+.cockpit__effect::before { top: -10px; bottom: 6px; }
 
-.reco-origin__label {
-  font-size: 11px;
-  letter-spacing: 0.09em;
+/* Le segment pointillé : la jonction causale. */
+.cockpit__join {
+  position: relative;
+  margin: 10px 0;
+  padding-left: 18px;
+  font-size: 10px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  font-weight: 600;
+  color: var(--t-blue-fg);
 }
-.reco-origin__volume {
-  font-size: 12px;
-  color: var(--t-fg-muted);
-  font-variant-numeric: tabular-nums;
+.cockpit__join::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: repeating-linear-gradient(
+    180deg, var(--t-blue-line) 0 4px, transparent 4px 8px);
 }
-.reco-origin__info { font-size: 12px; opacity: 0.8; }
 
-/* D6 — état des zones visées. Sémantique de récupération, DISTINCTE de l'ambre
-   d'action (D3) : ici la couleur ne fait que renforcer un libellé qui porte déjà
-   le sens, conformément au contrat BodyMap (« aucun état distingué par la
-   couleur seule »). Une zone non mesurée reste grise — jamais verte par défaut. */
-.reco-origin__zones {
+.cockpit__key {
+  margin: 0 0 8px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t-fg-muted);
+}
+
+.cockpit__zones {
   list-style: none;
-  margin: 8px 0 0;
+  margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 9px;
 }
-.reco-origin__zone {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
+.cockpit__zone {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 14px;
+}
+.cockpit__zone-name { color: var(--t-fg); }
+.cockpit__zone-band {
+  color: var(--t-fg-muted);
+  font-size: 12px;
+  min-width: 11ch;
+  text-align: right;
+}
+
+/* La phrase du moteur — origine système, donc bleue. */
+.cockpit__why {
+  margin: 12px 0 16px;
   font-size: 13px;
+  line-height: 1.5;
+  color: var(--t-blue-fg);
 }
-.reco-origin__zone::before {
-  content: "";
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 2px;
-  background: var(--t-fg-muted);
-}
-.reco-origin__zone--likely_available::before { background: #4ade80; }
-.reco-origin__zone--partially_recovered::before { background: #d99a2b; }
-.reco-origin__zone--likely_fatigued::before { background: #ef4444; }
 
-.reco-origin__zone-name { color: var(--t-fg); }
-.reco-origin__zone-band { color: var(--t-fg-muted); font-size: 12px; }
-
-.reco-origin__reasons {
+/* Raisons secondaires. Même origine système, rang typographique en dessous :
+   elles complètent la phrase, elles ne la concurrencent pas. */
+.cockpit__reasons {
   list-style: none;
-  margin: 6px 0 0;
-  padding-left: 12px;
-  border-left: 2px solid var(--t-accent-blue, #2c5282);
-  font-size: 13px;
+  margin: -8px 0 16px;
+  padding: 0;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--t-fg-muted);
 }
-.reco-origin__reasons li::before { content: "· "; opacity: 0.6; }
+.cockpit__reasons li::before {
+  content: "· ";
+  color: var(--t-fg-faint);
+}
 
-.reco-origin__why {
-  margin: 8px 0 0;
-  padding-left: 12px;
-  border-left: 2px solid var(--t-accent-blue, #2c5282);
+/* ══ RECOVERYBAND ══ `Sx_UIV3_00 §5`.
+
+   Le NOMBRE DE SEGMENTS encode la bande, jamais l'`estimate` 0–1 : une barre
+   proportionnelle serait une affirmation de pourcentage physiologique, que
+   `zone_recovery` refuse de faire. Trois segments ne suggèrent pas une échelle
+   fine — c'est exactement le point.
+
+   Redondance obligatoire : segments + LUMINANCE + libellé. Jamais la couleur
+   seule, et jamais de feu tricolore vert/orange/rouge — c'est le vocabulaire de
+   tout le marché, il ne survit pas au daltonisme et il suggère un jugement
+   médical que le produit refuse. */
+.band {
+  display: inline-flex;
+  gap: 2px;
+  flex: none;
+}
+.band i {
+  width: 7px;
+  height: 14px;
+  border-radius: 1px;
+  background: var(--t-line);
+  display: block;
+}
+.band--likely_available .band__on { background: var(--t-fg); }
+.band--partially_recovered .band__on { background: var(--t-fg-muted); }
+.band--likely_fatigued .band__on { background: var(--t-fg-faint); }
+
+/* `unknown` n'est pas « zéro récupération » : c'est une autre NATURE de chose,
+   donc une autre FORME. Contour pointillé + hachure, JAMAIS rempli. Il ne peut
+   pas être confondu avec une zone chargée, qui est pleine à un segment. */
+.band--unknown i {
+  background: transparent;
+  border: 1px dashed var(--t-unknown);
+  background-image: repeating-linear-gradient(
+    45deg, var(--t-unknown) 0 1px, transparent 1px 3px);
+}
+
+/* ══ ZONETALLY ══ les 11 zones en une ligne. */
+.cockpit__tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--t-line);
+  border-bottom: 1px solid var(--t-line);
   font-size: 13px;
-  line-height: 1.5;
   color: var(--t-fg-muted);
 }
+.cockpit__tally-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cockpit__tally-item b {
+  color: var(--t-fg-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ══ ÉCARTÉ — ET POURQUOI ══ niveau 3.
+
+   Ce n'est pas la cause de la décision, c'est sa justification étendue : le
+   pli est donc légitime ici, là où il ne l'était pas sur la cause.
+   `<details>` en flux = la baseline sémantique de `Sx_UIV3_04 §9`. */
+.rejected { margin-top: 4px; }
+.rejected__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--t-fg-muted);
+}
+.rejected__summary::-webkit-details-marker { display: none; }
+.rejected__summary::after {
+  content: "⌄";
+  color: var(--t-fg-muted);
+  font-size: 14px;
+}
+.rejected[open] .rejected__summary::after { content: "⌃"; }
+.rejected__summary:focus-visible {
+  outline: 2px solid var(--t-amber);
+  outline-offset: 3px;
+}
+.rejected__count {
+  margin-left: auto;
+  margin-right: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.rejected__list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rejected__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--t-fg-2);
+}
+.rejected__why {
+  color: var(--t-fg-muted);
+  font-size: 12px;
+  text-align: right;
+  flex: none;
+  max-width: 48%;
+}
+.rejected__band { color: var(--t-unknown); }
 
 /* Titre décisionnel : mono, graisse contenue, ≤ 26px, letter-spacing
    négatif (le mono s'étale sinon). Pas de gros bold marketing. */
@@ -243,22 +382,44 @@
 .today-home__meta-sep { color: var(--t-fg-muted); margin: 0 4px; }
 
 /* Bloc d'action ancré en bas du hero → la CTA est le point focal. */
+/* `Sx_UIV3_01` — `margin-top: auto` retiré avec le `min-height` du hero.
+
+   Les deux formaient le mécanisme des 115 px vides : une hauteur réservée, et
+   une action poussée à son extrémité. Sans hauteur réservée, l'action suit
+   simplement ce qui la précède. */
 .today-home__action {
-  margin-top: auto;
-  padding-top: 20px;
+  padding-top: 4px;
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* CTA primaire UNIQUE : la seule surface ambre pleine. Mono, dense. */
+/* CommandDock — l'action dominante. La seule surface ambre pleine.
+
+   `Sx_UIV3_04 §11` : ≥ 56 px, pleine largeur de sa colonne.
+
+   Deux défauts corrigés ici, tous deux mesurés au navigateur et invisibles
+   dans la feuille de style :
+
+   `display: inline-flex` réduisait le bouton à la largeur de son texte —
+   **139 px mesurés** pour l'action dominante d'un écran de 390. Le rendu
+   dépendait du libellé : « Reprendre » et « Démarrer une séance » ne
+   donnaient pas la même surface tapable.
+
+   `border` n'était jamais remis à zéro. Sur l'`<a>` c'était sans effet, mais
+   sur le `<button>` de la branche recommandée le navigateur appliquait son
+   `2px outset` par défaut — un liseré en relief au milieu d'une direction
+   visuelle qui n'en a aucun. Personne ne l'avait vu parce que la capture de
+   référence montrait l'état « séance active », servi par un `<a>`. */
 .today-home__cta {
-  display: inline-flex;
+  display: flex;
+  width: 100%;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 52px;
+  min-height: 56px;
   padding: 14px 18px;
+  border: 0;
   border-radius: var(--t-radius-sm);
   background: var(--t-amber);
   color: var(--t-on-amber);
@@ -268,7 +429,40 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-decoration: none;
+  cursor: pointer;
   box-sizing: border-box;
+}
+/* `Sx_UIV3_04 §8` — `:active` est un contrat d'interaction (T3), pas une
+   coquetterie : sans retour immédiat, la latence SSR fait retaper. */
+.today-home__cta:active { filter: brightness(1.08); transform: scale(0.98); }
+
+/* Le lien vers l'analyse. Rang 3 de Q5 : pas de carte, un filet suffit.
+   C'est de la NAVIGATION, pas une action — donc jamais d'ambre. */
+.today-home__analysis {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  min-height: 44px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--t-line);
+  color: var(--t-fg-2);
+  text-decoration: none;
+  font-size: 14px;
+}
+.today-home__analysis::after {
+  content: "→";
+  color: var(--t-fg-muted);
+}
+.today-home__analysis-hint {
+  color: var(--t-fg-muted);
+  font-size: 12px;
+  margin-left: auto;
+}
+.today-home__analysis:focus-visible {
+  outline: 2px solid var(--t-amber);
+  outline-offset: 3px;
 }
 .today-home__cta:hover { background: var(--t-amber-hover); }
 .today-home__cta:focus-visible {

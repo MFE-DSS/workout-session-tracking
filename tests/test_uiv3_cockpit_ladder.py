@@ -239,22 +239,32 @@ def test_faint_is_no_longer_a_body_text_token():
 # ───────────────── périmètre de la tranche ─────────────────
 
 
-def test_no_new_token_consumer_outside_the_approved_scope():
-    """Preuve 5 — B0 DÉCLARE la palette, elle ne la consomme nulle part de neuf.
+def test_semantic_tokens_keep_their_declared_meaning():
+    """Remplace `test_no_new_token_consumer_outside_the_approved_scope`.
 
-    Les tokens introduits par cette tranche (`--t-blue-*`, `--t-unknown`) ne
-    doivent avoir AUCUN consommateur : les câbler serait commencer le
-    redesign, ce que le périmètre interdit explicitement.
+    **Tier T5 — la garde d'origine a expiré, et proprement.** Elle exigeait
+    ZÉRO consommateur des tokens neufs : c'était la preuve que `B0` déclarait
+    la palette sans commencer le redesign. `UIV3_HOME_CAUSAL_COCKPIT` les
+    consomme légitimement, donc la garde tombe — **le jour où la spec la
+    remplace, pas avant** (`AUREN_UIUX_V3_GUARD_MIGRATION_REGISTER`).
+
+    Ce qui la remplace protège l'invariant qui, lui, ne périme pas
+    (`Sx_UIV3_04 §3`) : **l'ambre ne marque jamais un état de récupération.**
+    L'ambre est l'action de l'utilisateur ; une bande est un fait le
+    concernant. Les confondre ferait lire « à toi de jouer » là où le produit
+    dit « voilà où tu en es » — et rouvrirait la porte au feu tricolore que
+    `Sx_UIV3_00 §4` interdit.
     """
-    introduced = ("--t-blue-fg", "--t-blue-line", "--t-blue-mid", "--t-unknown")
-    consumers = []
-    for path in (APP_CSS, HOME_CSS, FOCUS_CSS):
-        css = path.read_text(encoding="utf-8")
-        css = re.sub(r"/\*.*?\*/", "", css, flags=re.DOTALL)
-        for name in introduced:
-            if f"var({name}" in css:
-                consumers.append(f"{path.name}: var({name})")
-    assert consumers == [], f"consommateurs prématurés : {consumers}"
+    css = re.sub(r"/\*.*?\*/", "", HOME_CSS.read_text(encoding="utf-8"),
+                 flags=re.DOTALL)
+    offenders = []
+    for match in re.finditer(r"(\.band[^{]*)\{([^}]*)\}", css):
+        selector, body = match.group(1).strip(), match.group(2)
+        if "--t-amber" in body:
+            offenders.append(selector)
+    assert offenders == [], (
+        f"l'ambre marque un état de récupération : {offenders}"
+    )
 
 
 def test_session_css_still_declares_no_palette_token():
