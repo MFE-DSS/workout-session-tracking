@@ -23,6 +23,7 @@ from app.services.password_policy import (
     BCRYPT_MAX_PASSWORD_BYTES,
     MIN_PASSWORD_LENGTH,
     TOO_LONG_MESSAGE,
+    PasswordTooLongError,
     is_password_too_long,
     password_utf8_len,
     validate_password_policy,
@@ -84,16 +85,31 @@ def test_t4_the_over_long_twin_is_refused_by_the_policy():
     assert validate_password_policy(TWIN_PREFIX) == TOO_LONG_MESSAGE
 
 
-def test_t4_bcrypt_still_conflates_the_twins_which_is_why_the_policy_exists():
-    """Documents the underlying behaviour the policy shields against.
+def test_t4_the_auth_layer_no_longer_conflates_the_twins():
+    """The defect is now closed in the layer itself, not only at the route.
 
-    If this ever stops being true — because bcrypt 5 landed — the policy has
-    become belt-and-braces rather than the only guard, and the report's claim
-    that bcrypt 5 is mergeable can be re-read with that in mind.
+    This test used to assert the opposite — that `verify_password(twin, hash)`
+    returned True — and its docstring said that if it ever stopped being true,
+    the policy would have become belt-and-braces rather than the only guard.
+    `Sb_AUTH_PASSLIB_TO_BCRYPT_DIRECT_01` is what made it stop: the direct bcrypt
+    layer refuses an over-long candidate instead of handing it to a truncating C
+    implementation.
     """
     hashed = hash_password(EXACTLY_72)
     assert verify_password(EXACTLY_72, hashed) is True
-    assert verify_password(TWIN_PREFIX, hashed) is True
+    assert verify_password(TWIN_PREFIX, hashed) is False
+
+
+def test_t4_hashing_an_over_long_password_now_raises_instead_of_truncating():
+    """Silent truncation was the defect; a loud refusal is the fix.
+
+    `PasswordTooLongError` is imported at module level on purpose: conftest's
+    `client` fixture purges `app.*` from sys.modules per test, so an import
+    inside the function would yield a SECOND generation of the class and
+    `pytest.raises` would not recognise it.
+    """
+    with pytest.raises(PasswordTooLongError):
+        hash_password(TWIN_PREFIX)
 
 
 def test_t5_policy_rejects_before_any_hashing_happens(monkeypatch):

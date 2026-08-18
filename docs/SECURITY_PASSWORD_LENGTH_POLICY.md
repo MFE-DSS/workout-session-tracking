@@ -103,15 +103,31 @@ Sous bcrypt 5 cet appel lève `ValueError`, la détection de backend échoue, et
 peut l'empêcher : l'appel est interne à passlib et se produit avant qu'un mot de
 passe utilisateur n'existe.
 
-**Adopter bcrypt 5 exige donc de remplacer passlib, pas de relever une borne.**
-Le chemin le plus court est d'appeler `bcrypt.hashpw` / `bcrypt.checkpw`
-directement : le format `$2b$` est identique, **les hashes existants restent
-valides**, et passlib — non maintenu depuis 2020 — sort de la chaîne
-d'authentification. C'est un sprint à part entière, pas un bump.
+**Adopter bcrypt 5 exigeait donc de remplacer passlib, pas de relever une
+borne.** C'est fait.
 
-`Sb_AUTH_PASSWORD_LENGTH_01` **ne monte pas** la dépendance et ne la débloque
-pas. `bcrypt>=4.0,<5` reste la bonne borne ; la PR #7 **ne doit pas être mergée
-telle quelle**.
+> **`Sb_AUTH_PASSLIB_TO_BCRYPT_DIRECT_01` (2026-08-18)** — l'authentification
+> appelle désormais `bcrypt.hashpw` / `bcrypt.checkpw` **directement**. Format
+> `$2b$` au coût 12 inchangé, **hashes existants toujours valides**, aucun compte
+> migré, aucune réinitialisation forcée. Vérifié en rendant `passlib`
+> **introuvable** : l'application entière démarre et l'authentification
+> fonctionne.
+
+### Ce qui bloque encore la PR #7
+
+| Condition | État |
+|---|---|
+| Aucun import `passlib` en runtime | ✅ garde sur tout `app/` |
+| Aucun import `passlib` dans les tests | ✅ garde — un test chargeant `passlib.hash` déclencherait la sonde de 255 octets |
+| Aucun chemin ne dépasse 72 octets vers bcrypt | ✅ `hash_password` **lève**, `verify_password` **retourne False** |
+| API bcrypt utilisées stables en 5.0 | ✅ `hashpw`, `checkpw`, `gensalt` uniquement |
+| Borne `bcrypt>=4.0,<5` | ⛔ **à relever** — c'est le contenu de la PR #7 |
+| Lock régénéré | ⛔ à faire après le relèvement de borne |
+
+`passlib` reste **déclaré** dans `requirements.txt` : installé mais jamais
+importé, il ne peut pas casser bcrypt 5 — la sonde ne s'exécute qu'au chargement
+de `passlib.hash.bcrypt`. Le retirer est une tranche d'entretien distincte, à ne
+pas mélanger avec un changement d'authentification.
 
 ## Ce que la politique ne fait pas
 
