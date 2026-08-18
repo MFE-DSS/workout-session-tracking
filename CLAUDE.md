@@ -129,3 +129,63 @@ autorisés.
 Les §1 (check_scope), §2 (CI = source de vérité, additive-only, CI rouge = STOP),
 §3 (Brainstorming/Options/Risques/Choix) **restent intégralement en vigueur** — ce
 protocole les **orchestre**, il ne les remplace pas.
+
+---
+
+## 5. Contrat de livraison UI (OBLIGATOIRE)
+
+Toute tranche modifiant une **surface visible par l'utilisateur** respecte les
+cinq règles suivantes. Elles sont **bloquantes**, au même titre que §1. Le §4
+n'autorise **pas** à les contourner : une tranche UI n'atteint jamais
+`PR GREEN / MERGE PENDING` sans que 5.1 ait eu lieu.
+
+Ces règles existent parce que la tranche `Sb_UIV2_HOME_RECO_BADGE_01` a livré,
+avec CI verte, Sonar vert et 4 898 tests passants, un objet que l'opérateur a
+jugé inacceptable au premier coup d'œil. **Aucune garde automatisée du dépôt ne
+regarde un pixel.** C'est le seul domaine où le jugement humain est la seule
+garde possible — donc la seule où il doit être exigé explicitement.
+
+### 5.1 — Aucune livraison UI sans exposition visuelle préalable
+
+Avant tout commit touchant un template ou une feuille de style, l'agent produit
+un **rendu réel** — URL locale ou capture — et le **soumet à l'opérateur**, avec
+les alternatives lorsqu'il y en a. **L'opérateur tranche.**
+
+- Vérifier la présence d'une classe dans le HTML servi **ne vaut pas** exposition.
+- Un test vert **ne vaut pas** exposition.
+- Si le rendu ne peut pas être produit, **la tranche ne part pas**.
+
+### 5.2 — Relecture du relevé de décisions à chaque commit UI
+
+L'agent relit le relevé applicable (`docs/DESIGN_DECISIONS_*.md`) **décision par
+décision** contre ce qu'il vient d'écrire, et **consigne la relecture** dans le
+rapport de sprint : pour chaque décision, respectée / non concernée / violée.
+
+Un relevé de décisions n'est pas un menu dans lequel on choisit les items
+commodes.
+
+### 5.3 — Jamais une soustraction seule
+
+Une suppression part dans la **même livraison** que ce qui la remplace.
+« Retirer avant d'embellir » est une règle de **séquencement interne** à une
+tranche, jamais une autorisation de livrer le vide. Une tranche qui ne fait que
+retirer laisse le produit plus pauvre qu'avant.
+
+### 5.4 — Toute couleur est un token de la palette cible
+
+Une couleur **validée en brainstorming** doit être **promue en token** dans la
+feuille de style visée, avec son **ratio de contraste documenté sur le fond
+réel**, exactement comme les tokens existants de `home.css`.
+
+- **Interdit** : `var(--token-inexistant, #hex)` — le repli masque l'absence.
+- **Interdit** : un hex repris d'une maquette sans **recalibrage** sur le fond
+  du produit. Une maquette tourne rarement sur le même fond.
+- Une couleur validée **n'est jamais rejetée** au motif qu'elle est absente de
+  la palette : **on l'ajoute**, avec sa mesure. La palette cible est ce qui est
+  **écrit et mesuré dans la feuille de style**, pas un souvenir.
+
+### 5.5 — L'ordre des tranches suit la centralité, pas la facilité
+
+Une décision **centrale et difficile** passe **devant** une décision
+périphérique et commode. Livrer d'abord ce qui est facile produit des PR vertes
+et un produit inchangé — c'est le mode d'échec observé, pas une hypothèse.
