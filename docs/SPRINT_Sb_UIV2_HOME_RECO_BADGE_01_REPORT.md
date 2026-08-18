@@ -205,3 +205,45 @@ est, d'après la décision D6, la logique réelle du produit.
 Le plus notable est que **rien n'a dû être calculé**. La raison, les zones
 visées, les bandes de récupération : tout existait et rien n'était relié. La
 valeur de cette tranche tient dans trois liaisons, pas dans un moteur nouveau.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `ad5edc0` |
+| PR | **#129 MERGED** — deux commits : `193dca3` (D2 + D4) et `375551a` (D6) |
+| Merge | **`2512df2`** via `--merge --match-head-commit 375551a` — **sans squash, sans `--admin`, sans force** |
+| CI canonique | **`32141422107` — 6/6 success** |
+| Sonar | gate **`OK`** — 0 smell, 0 bug, 0 vulnérabilité, **couverture code neuf 87 %** |
+| Gitar | pass · **0 thread** |
+| CI PR | verte **sur les deux passages**, aucun aller-retour |
+
+### Ce que cette tranche change pour un utilisateur
+
+C'est la **première** de la session à modifier ce qu'il voit. Les huit
+précédentes étaient du socle, de la sécurité et de l'outillage — chacune
+justifiée, plusieurs demandées explicitement, mais l'effet cumulé était un
+produit inchangé après une journée de travail.
+
+L'opérateur l'a signalé, et il avait raison sur un point que le rapport doit
+garder : il **croyait le travail intégré** parce qu'il avait vu les maquettes
+dans son navigateur. Elles étaient réelles ; elles vivaient dans un dossier
+exclu de git. Montrer des visuels indiscernables du produit sans rendre leur
+statut évident crée cette confusion — un fichier marqué `DOCUMENTED — NOT BUILT`
+ne la compense pas.
+
+### Reste de la refonte
+
+**D7** (continuité sans streak) et **D8** (onglet Progression, qui absorbera le
+fourre-tout « Résumé · indicateurs et navigation »). D1, D3 et D5 sont appliquées
+partiellement — le badge en est la première instance ; elles se généraliseront
+avec les tranches suivantes.
+
+### Déploiement
+
+Non déployé à la clôture. Production reste à `aca4eb9` ; l'écart contient aussi
+le lock autoritaire, dont le chemin d'installation n'a jamais tourné sur le VPS —
+d'où la recommandation de déployer en **deux temps** plutôt qu'un, pour qu'un
+éventuel échec d'installation ait une cause sans ambiguïté.
