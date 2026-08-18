@@ -105,6 +105,69 @@ Deux reproches opérateur à ne pas répéter :
 
 ---
 
+## D6 — Le cycle est piloté par la récupération, pas par un calendrier ✅ validé
+
+**Pas de « semaine 3/8, séance 2/4 ».** Le produit n'expose pas une progression
+dans un plan linéaire.
+
+> *« C'est dans un cycle en réalité, mais le cycle est plutôt à considérer comme
+> le fait qu'il y ait des muscles fatigués, d'autres disponibles — et de chercher
+> dans la cyclicité à toujours travailler dans la cohérence de ce qui est
+> physiologiquement disponible. »*
+
+**Conséquence majeure sur la conception** : l'état corporel n'est pas une
+vignette décorative à côté de la recommandation. C'est **l'explication de la
+recommandation**. Le hero dit « Push A » ; les plaques disent *pourquoi* — poussée
+récupérée, tirage encore fatigué.
+
+Les deux objets racontent la même histoire et doivent être conçus ensemble. Un
+Accueil qui les juxtapose sans les relier rate la décision.
+
+---
+
+## D7 — La régularité est une métrique de premier plan ✅ validé
+
+À mettre en avant, avec une nuance qui écarte le motif habituel :
+
+> *« Pas de faire des séances tous les jours, mais une continuité, dans une
+> intensité qui est notée. »*
+
+**Pas un streak quotidien.** La continuité se mesure par le nombre de séances par
+semaine, la **qualité du repos** et la **qualité du travail** — trois signaux que
+le produit collecte déjà.
+
+Un streak journalier récompenserait la présence ; ce produit doit récompenser la
+cohérence. Un jour de repos bien pris ne doit jamais casser un compteur.
+
+---
+
+## D8 — Un onglet Progression ✅ validé
+
+L'Accueil peut garder l'essentiel, mais l'exhaustif mérite sa page.
+
+> *« C'est bien d'avoir un onglet progression qui, de manière exhaustive,
+> explique. »*
+
+Cela règle le fourre-tout « Résumé · indicateurs et navigation » : ce qui décide
+reste sur l'Accueil, ce qui s'analyse déménage.
+
+---
+
+## D9 — Aucune anticipation au-delà de la séance proposée ✅ validé
+
+**Ne pas afficher la séance N+2.**
+
+> *« La séance d'après va être logiquement adaptée en fonction de la performance
+> de la séance en cours. »*
+
+Le produit **ne connaît pas** la suivante : elle dépend de ce qui va se passer
+dans celle-ci. L'afficher serait une promesse que le moteur ne peut pas tenir —
+la même faute que « Recommandé IA » sous une autre forme.
+
+C'est aussi cohérent avec D1 : une décision par écran.
+
+---
+
 ## État d'entraînement corporel — ce qui a bougé depuis le brainstorm
 
 Le brainstorm concluait « c'est de l'assemblage ». **C'était faux**, et quatre

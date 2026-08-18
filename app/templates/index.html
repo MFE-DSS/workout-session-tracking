@@ -45,9 +45,47 @@
        que l'ancien bloc « Prochaine séance suggérée » : template_slug +
        creation_source=reco_top). Le bloc reco séparé est retiré plus bas
        (plus de double CTA de démarrage). Fallback launcher si pas de reco. #}
-    <span class="today-home__status">Aucune séance active</span>
+    {# D4 — « Aucune séance active » retiré : l'absence de séance est déjà dite
+       par le CTA « Démarrer », et l'étiquette n'apprenait rien. #}
     {% if reco and reco.top %}
       {% set _top = reco.top %}
+      {# D2 — origine de la proposition. BLEU = produit par le système (D3).
+         Le ⓘ révèle la VRAIE raison, déjà calculée par le moteur et jamais
+         affichée jusqu'ici. Interdit : « Recommandé IA » — le moteur se décrit
+         lui-même comme déterministe et explicable, la revendication serait
+         fausse. C'est justement son avantage : il sait dire pourquoi. #}
+      <details class="reco-origin">
+        <summary class="reco-origin__badge">
+          <span class="reco-origin__label">Recommandé</span>
+          {% if reco_top_sets %}<span class="reco-origin__volume">{{ reco_top_sets }} séries</span>{% endif %}
+          <span class="reco-origin__info" aria-hidden="true">ⓘ</span>
+          <span class="sr-only">— pourquoi cette séance ?</span>
+        </summary>
+        <p class="reco-origin__why">{{ _top.phrase }}</p>
+        {# D4 — les raisons secondaires vivaient dans la vignette « Aujourd'hui »,
+           qui dupliquait ce hero. Elles sont repliées ici plutôt que perdues :
+           on retire le doublon, pas l'information. #}
+        {# D6 — le cycle est piloté par la récupération : ceci est l'explication
+           de la recommandation, pas une décoration à côté d'elle. État lu, jamais
+           calculé ici ; une zone sans estimation dit « non mesurée », jamais
+           « disponible » par défaut. Le libellé porte le sens — la couleur ne fait
+           que le renforcer (aucun état distingué par la couleur seule). #}
+        {% if reco_zone_state %}
+        <ul class="reco-origin__zones">
+          {% for z in reco_zone_state %}
+          <li class="reco-origin__zone reco-origin__zone--{{ z.band }}">
+            <span class="reco-origin__zone-name">{{ z.label }}</span>
+            <span class="reco-origin__zone-band">{{ z.band_label }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% if home and home.today and home.today.reasons and home.today.reasons | length > 1 %}
+        <ul class="reco-origin__reasons">
+          {% for r in home.today.reasons[1:] %}<li>{{ r }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </details>
       <h1 class="today-home__title">{{ _top.template.name }}</h1>
       <p class="today-home__meta">{% if _top.template.focus %}{{ _top.template.focus }}{% else %}Séance recommandée du jour{% endif %}</p>
       <div class="today-home__action">
