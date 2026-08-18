@@ -24,6 +24,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from scripts.check_lock_drift import _lock_pins, _source_requirements
+
 ROOT = Path(__file__).resolve().parent.parent
 CI = ROOT / ".github" / "workflows" / "ci.yml"
 DEPLOY = ROOT / "scripts" / "deploy_prod.sh"
@@ -139,11 +141,10 @@ def test_a4_ci_runs_the_drift_check_as_blocking():
 
 
 def test_a4_every_declared_dependency_is_pinned():
-    from importlib import import_module
-
-    sys.path.insert(0, str(ROOT))
-    module = import_module("scripts.check_lock_drift")
-    source, pins = module._source_requirements(), module._lock_pins()
+    # `scripts` is a package (scripts/__init__.py), so it imports directly —
+    # the sys.path insertion this test first carried was both unnecessary and a
+    # mutation of global state (python:S8997).
+    source, pins = _source_requirements(), _lock_pins()
     missing = [name for name in source if name not in pins]
     assert missing == [], f"declared but not pinned: {missing}"
 
