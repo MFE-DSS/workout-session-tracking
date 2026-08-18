@@ -93,6 +93,44 @@ un étage plus haut. **`--t-blue-line` passe à `#5A93C9`.**
 **Résolution.** L'inconnu reçoit `--t-unknown: #828E9E`, et son libellé
 « non mesurée » est rendu en `--t-fg-muted` (4,64:1 sur L3).
 
+### C8 — La palette du cockpit est inaccessible depuis la Session · **trouvé au Build Gate**
+
+Vérifié, compté :
+
+| Fichier | Occurrences de `--t-*` |
+|---|---:|
+| `app/static/css/home.css` | toute la palette, **déclarée sous `.today-home`** |
+| `app/static/css/app.css` | **0** |
+| `app/static/css/session_focus.css` | **0** |
+
+**L'escalier de profondeur et les tokens chromatiques n'existent que dans la
+portée `.today-home`.** Or ce document exige que `SystemOrigin` et
+`CommandDock` se comportent **à l'identique sur les deux surfaces** — même
+profondeur, même chromie. C'est **impossible** en l'état : la Session ne peut
+pas atteindre les variables.
+
+C'est le genre de défaut qui n'apparaît ni dans une spec ni dans un test, et
+qui bloque au premier jour du build.
+
+**Résolution — élargissement du périmètre de `B0`.** La palette `--t-*` est
+**promue de `.today-home` vers un `:root` partagé** dans `app.css`, en même
+temps que la correction de l'escalier. `home.css` cesse de la déclarer et se
+contente de la consommer.
+
+**Vérifié sans risque pour les gardes :**
+
+- `test_contrast_guard` lit `app.css :root` mais pinne `--fg-dim`, `--bg`,
+  `--accent`, `--on-accent` — un **autre espace de noms**. Ajouter `--t-*` ne
+  le touche pas.
+- `test_expected_tokens_present` vérifie une **présence**, pas une exhaustivité.
+- `test_no_css_change_in_this_build` pinne `--fg-dim == #8A94A0`,
+  `--bg == #0F1318`, `--accent == #C8A24B` — **aucun n'est modifié par `B0`**.
+- `test_graphite_surfaces_present` accepte `#0f1318` **ou** `#151a21` ;
+  `--t-base` reste `#0F1318`, la garde tient.
+
+**Sans cette promotion, la convergence de `§14` est une intention et non un
+contrat.**
+
 ---
 
 ## 1bis. Amendements opérateur — 2026-08-18
@@ -499,61 +537,54 @@ même signal ne change jamais de sens en changeant de page.
 
 ---
 
-## 15. BUILD READINESS GATE
+## 15. BUILD READINESS GATE — deuxième passage, 2026-08-18
 
 | # | Critère | Verdict | Détail |
 |---|---|---|---|
-| 1 | Specs cohérentes | **PASS** | 7 conflits trouvés, 7 résolus au §1. `00A §1.2`, `00A §4`, `00A §5`, `00 §4`, `01 §3` sont amendés par ce document. |
-| 2 | Aucun `UI_DATA_GAP` non traité | **PASS** | G1/G2/G3/G5 = pass-through de présentation, conditions de `00 §0` remplies. G4 = état de présentation sans persistance. **G6 (RIR) = bloqué et explicitement hors périmètre** — traité, pas ignoré. |
-| 3 | Assets nécessaires autorisés | **PASS** | Aucune primitive n'exige d'asset. Tout est CSS et texte. La BodyMap est explicitement exclue (7 zones sur 11 sans plaque approuvée). |
-| 4 | Aucune garde T1/T2 à affaiblir | **PASS pour B0** | Vérifié : `test_graphite_surfaces_present` assert `#0f1318 or #151a21` → `--t-base` reste `#0F1318`, la garde tient. `test_amber_accent_present` assert `#c8a24b` → inchangé. `test_no_teal_in_home_css` → sans objet. `test_contrast_guard` est **renforcée**, pas affaiblie. |
-| 5 | Golden states réalisables | **PARTIEL** | 11 des 13 le sont aujourd'hui. **`S7`** (substitution ouverte) et **`S8`** (correction) décrivent des surfaces que `02 §7.4` et `§7.6` **créent** : leurs baselines naissent avec leur tranche, pas avant. Normal, mais à inscrire. |
-| 6 | Dogfood Session D préparé | **ÉCHEC** | Les prototypes de `/tmp/auren-ui-lab/session/` sont **statiques** : on ne peut pas y enregistrer une série. Or `BLOCKER-4` exige *une séance complète réellement exécutée*. **Par construction, ce dogfood ne peut pas précéder `B6`.** |
-| 7 | Working tree clairement identifié | **ÉCHEC** | L'arbre contient la tranche **`D5_SESSION_INSTRUMENT_ROWS_01` non commitée**, qui modifie `app/static/css/app.css`, `session_focus.css`, `exercise_card.html`, `briefing.py` et 4 modules de tests. **`B0` touche `app.css` et `home.css` — recouvrement direct sur `app.css`.** Construire par-dessus mélangerait deux tranches dans un même diff. |
+| 1 | Specs cohérentes | **PASS** | **8 conflits** trouvés, 8 résolus au §1 et §1bis. `00A` a été **corrigé à la source** (§1.2 quatre niveaux · §3 `CausalRail` Home-only · §4 forme au lieu de couleur · §5 tiers et `loading`) plutôt que laissé en contradiction sous couvert de préséance. `02` corrigé (§4 libellés figés, §10 rationnel de D). Aucune contradiction vivante. |
+| 2 | Aucun `UI_DATA_GAP` non traité | **PASS** | G1/G2/G3/G5 = pass-through de présentation, conditions de `00 §0` remplies. **G4 CLOS** par `§1bis C` : `REST` est request-scoped, jamais persisté. **G6 (RIR) bloqué et hors périmètre**, vérifié : `SetLog` ne porte ni `rir` ni `rpe`. Traité, pas ignoré. |
+| 3 | Assets nécessaires autorisés | **PASS** | Aucune primitive n'exige d'asset. Tout est CSS et texte. BodyMap explicitement exclue (7 zones sur 11 sans plaque approuvée). |
+| 4 | Aucune garde T1/T2 à affaiblir | **PASS** | Vérifié fichier par fichier. `test_contrast_guard` lit `app.css :root` et pinne `--fg-dim` / `--bg` / `--accent` / `--on-accent` — **espace de noms distinct de `--t-*`**, non touché. `test_no_css_change_in_this_build` pinne trois hexes qu'aucune tranche `B0` ne modifie. `test_graphite_surfaces_present` accepte `#0f1318` ou `#151a21` → `--t-base` inchangé. `test_amber_accent_present` → `#c8a24b` inchangé. `test_contrast_guard` est **renforcée** par `03 §9`, pas affaiblie. |
+| 5 | Golden states réalisables | **PASS** | 11 des 13 le sont immédiatement. `S7` (substitution ouverte) et `S8` (correction) décrivent des surfaces que `UIV3_SESSION_EXECUTION_CONSOLE_01` **crée** : elles sont désormais inscrites comme **golden states de cette tranche**, capturées avec elle. C'est le fonctionnement normal d'une baseline, pas un manque. |
+| 6 | Dogfood Session préparé | **PASS** | **Recadré par décision opérateur du 2026-08-18.** `BLOCKER-4` n'est plus une précondition de `B0` : il devient la **porte de sortie obligatoire** de `UIV3_SESSION_EXECUTION_CONSOLE_01`, qui ne passe pas `ACCEPTED` sans une séance complète réelle validée humainement aux trois viewports. Motif : les prototypes sont statiques, le dogfood ne peut pas précéder la console. |
+| 7 | Working tree clairement identifié | **PASS** | `D5_SESSION_INSTRUMENT_ROWS_01` est **parquée** sur `sb/uiv2-session-instrument-rows-01` au commit **`79c0026`**, **non mergée**, avec un message traçant ce qui reste vrai et ce que UIV3 supersede. La canonique `claude/sprint-reporting-fitness-app-V7Qr6` est à **`962c105`**, **sans aucune modification ni fichier indexé**. Restent deux fichiers non suivis **antérieurs et hors périmètre** : `AGENTS.md` (interdit de commit, règle permanente) et `docs/SONAR_AUDIT_01_REPORT.md`. |
 
 ### Verdict
 
-> ## `UIV3 BUILD GATE CLOSED`
+> ## `UIV3 BUILD GATE OPEN — B0 READY`
 
-**Deux points échouent. Aucun n'est structurel ; les deux sont des questions
-d'ordonnancement.**
+Les sept critères passent. Le gate s'ouvre pour **`B0` uniquement**.
 
-### Ce qui ferme la porte, et comment l'ouvrir
+### État de référence du build
 
-**Point 7 — bloquant dur, et le seul vrai.**
-`D5_SESSION_INSTRUMENT_ROWS_01` est terminée, mesurée, exposée et verte
-(1 415 tests), mais **non commitée**, et elle touche le même fichier que `B0`.
-Deux issues, toutes deux opérateur :
+| | |
+|---|---|
+| Branche canonique | `claude/sprint-reporting-fitness-app-V7Qr6` @ **`962c105`** |
+| Arbre de travail | **propre** — 0 modification, 0 fichier indexé |
+| Hors périmètre, non suivis | `AGENTS.md`, `docs/SONAR_AUDIT_01_REPORT.md` |
+| D5 préservée | `sb/uiv2-session-instrument-rows-01` @ **`79c0026`**, non mergée, **locale** |
+| Specs approuvées | `00` · `00A` · `01` · `02` · `03` · `04` |
 
-- **`GO` sur D5** → commit, PR, merge, puis `B0` part d'un arbre propre ;
-- **parquer D5** → `git stash` ou branche dédiée, puis `B0` part de la
-  canonique.
+> ⚠️ **La branche parquée n'existe que localement.** Elle n'est pas poussée
+> vers `origin` : `git push` est une action à validation humaine
+> (`CLAUDE.local.md §4`). Tant qu'elle n'est pas poussée, la préservation de D5
+> dépend de cette machine.
 
-Tant que l'une des deux n'est pas tranchée, `B0` produirait un diff mêlant une
-correction de débordement et une refonte de tokens. **Je ne le fais pas.**
+### `B0` — périmètre autorisé, et rien d'autre
 
-**Point 6 — re-cadrage à confirmer, pas un blocage.**
-Le dogfood d'une séance complète **ne peut pas** précéder la construction de la
-console : il n'y a rien à exécuter. Il doit donc devenir une **porte de sortie
-de `B6`**, pas une porte d'entrée du programme. `B0` (tokens et escalier de
-surfaces) n'en dépend en rien.
+`UIV3_COCKPIT_LADDER_01` :
 
-**Ce re-cadrage est une décision opérateur, pas une hypothèse que je pose.**
-`BLOCKER-4` a été validé comme condition préalable ; je constate qu'il est
-irréalisable en l'état et je remonte la question plutôt que de le déclarer
-satisfait.
+1. **promotion** de la palette `--t-*` de `.today-home` vers un `:root`
+   partagé dans `app.css` (`§1bis C8`) ;
+2. **escalier de surfaces** à **≥ 1,12:1** par marche —
+   `#070A0D` / `#0F1318` / `#191F27` / `#232B36` ;
+3. `--t-blue-line` → **`#5A93C9`** (pire cas 4,39:1) ·
+   `--t-unknown` → **`#828E9E`** ajouté (4,29:1) ·
+   `--t-fg-faint` réparé et **réservé au non-textuel** ;
+4. contrastes **documentés sur le fond réel** dans la feuille de style.
 
-**Point 5 — à inscrire, sans conséquence.**
-`S7` et `S8` naissent avec leurs tranches. C'est le fonctionnement normal d'une
-baseline ; il suffit que `03` le dise, ce que ce document fait.
+**Fichiers autorisés** : `app/static/css/app.css`, `app/static/css/home.css`.
+**Rien d'autre** — aucun template, aucun service, aucun test applicatif hors
+gardes de contraste.
 
-### État après résolution
-
-Si l'opérateur tranche le point 7 et confirme le re-cadrage du point 6 :
-
-> `UIV3 BUILD GATE OPEN — B0 READY`
-
-`B0` = `UIV3_COCKPIT_LADDER_01` : escalier de surfaces à ≥ 1,12:1 par marche ·
-`--t-blue-line` → `#5A93C9` · `--t-unknown` → `#828E9E` · `--t-fg-faint`
-réparé et réservé au non-textuel. **CSS uniquement**, aucun template, aucun
-service.
+**`B0` n'est pas démarrée dans ce cycle de décision** (instruction opérateur).

@@ -314,7 +314,7 @@ documente un `UI_DATA_GAP`.
 
 | # | Tranche | Objectif visible | Dépend de | Fichiers possibles | Tests / golden | Rollback |
 |---|---|---|---|---|---|---|
-| **B0** | `UIV3_COCKPIT_LADDER_01` | l'escalier de surfaces devient perceptible (≥ 1,12:1 par marche) ; `--t-fg-faint` et `--t-amber-dim` réparés | **00A** | `home.css`, `app.css` | garde de contraste **sur le fond réel** | revert CSS |
+| **B0** | `UIV3_COCKPIT_LADDER_01` | **(1)** la palette `--t-*` est **promue de `.today-home` vers un `:root` partagé** dans `app.css` — sans quoi la Session ne peut pas l'atteindre et la convergence reste une intention (`04 §1bis C8`) · **(2)** l'escalier de surfaces devient perceptible (**≥ 1,12:1** par marche) · **(3)** `--t-blue-line` → `#5A93C9`, `--t-unknown` → `#828E9E` ajouté, `--t-fg-faint` réparé et réservé au non-textuel | **00A**, **04** | `app.css`, `home.css` — **CSS uniquement**, aucun template, aucun service | garde de contraste **mesurée sur le fond réel** ; `surface_ladder_min_step`, `text_tokens_below_aa` (`03 §9`) | revert CSS |
 | B1 | `UIV3_TOKENS_01` | les 3 tokens bleus existent et sont mesurés | 00, **B0** | `home.css`, `app.css` | garde de contraste sur token | revert CSS |
 | B2 | `UIV3_HOME_CAUSE_01` | la cause est visible sans tap | 01 | `index.html`, `home.css`, `pages.py` (contexte seul) | HOME/reco, HOME/unknown | revert template |
 | B3 | `UIV3_HOME_TALLY_01` | la ligne de bilan 11 zones | 01, B2 | `index.html`, `home.css` | HOME/partial | revert bloc |
