@@ -28,7 +28,6 @@
       "Bash(git commit -q -F -:*)",
       "Bash(git commit -F -:*)",
       "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python -m http.server 8126 --directory /tmp/auren-ui-lab)",
-
       "Bash(sleep:*)",
       "Bash(until:*)",
       "Bash(while:*)",
@@ -36,7 +35,6 @@
       "Bash(test:*)",
       "Bash(true)",
       "Bash(false)",
-
       "Bash(gh pr checks:*)",
       "Bash(gh pr view:*)",
       "Bash(gh pr list:*)",
@@ -53,7 +51,6 @@
       "Bash(gh workflow list:*)",
       "Bash(gh workflow view:*)",
       "Bash(gh workflow run:*)",
-
       "Bash(git push:*)",
       "Bash(git fetch:*)",
       "Bash(git merge:*)",
@@ -63,12 +60,13 @@
       "Bash(git stash:*)",
       "Bash(git restore:*)",
       "Bash(git branch:*)",
-
       "Bash(curl:*)",
       "Bash(sonar api:*)",
+      "Bash(sonar api GET:*)",
+      "Bash(sonar api POST:*)",
       "Bash(sonar list:*)",
       "Bash(sonar auth status)",
-
+      "Bash(sonar:*)",
       "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python:*)",
       "Bash(EXPO_PORT=*:*)",
       "Bash(DATABASE_URL=*:*)",
@@ -92,7 +90,15 @@
       "Bash(uniq:*)",
       "Bash(awk:*)",
       "Bash(cut:*)",
-      "Bash(tr:*)"
+      "Bash(tr:*)",
+      "Bash(sonar api *)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python - <<'PY':*)",
+      "Bash(/Users/martinfeldmann/workout-session-tracking/.venv/bin/python - <<PY:*)",
+      "Bash(*python - <<*)",
+      "Bash(*.venv/bin/python*)",
+      "Bash(cp:*)",
+      "Bash(mv /private/tmp/claude-501/**)",
+      "Bash(mv /tmp/auren-ui-lab/**)"
     ]
   }
 }
