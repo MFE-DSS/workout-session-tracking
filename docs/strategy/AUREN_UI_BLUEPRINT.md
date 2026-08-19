@@ -441,6 +441,18 @@ l'architecture sticky remplacée. Les quatre ou rien.
 **séance complète réelle** exécutée et validée humainement aux trois viewports.
 Les prototypes sont statiques ; le dogfood ne peut pas précéder la console.
 
+**Dossier de cadrage : `Sx_UIV3_02B_SESSION_CONSOLE_BUILD_BRIEF.md`** — audit
+du runtime refait le 2026-08-19, inventaire du contrat serveur déjà en place,
+charge de gardes, découpage en sept étapes internes, risques, et **quatre
+décisions manquantes** (Q1 bande `E1…E7` · Q2 sortie anticipée d'exercice ·
+Q3 sémantique d'une correction vide · Q4 destination de `TERMINER LA SÉANCE`).
+
+Deux chiffres de `Sx_UIV3_02 §1` y sont **corrigés sur mesure fraîche** : les
+cibles sous 44 px sont **69** et non 161 — le décompte d'origine comptait les
+`input[type=radio]` de 1 × 1 px cachés derrière les labels, qui ne sont pas
+des cibles tactiles — et la géométrie citée ne se reproduit pas parce que le
+fixture de mesure ne rend que **5 blocs optionnels sur 13**.
+
 #### Phase 3 — fermeture
 
 **`B8` n'est pas une rénovation anticipée du legacy.** Elle ferme les
