@@ -264,11 +264,100 @@ terminer · aucune reprise des surfaces périphériques.
 
 ## 10. Ce qui reste, et ce qui bloque
 
-- **Aucun commit sur la tranche.** C'est la porte : `FULL SESSION DOGFOOD —
-  OPERATOR REVIEW`.
 - Sonar `css:S4666` : mes doublons de sélecteurs sont consolidés ; **5
   doublons préexistants** subsistent dans le legacy, non touchés.
-- Les deux commits `fix(ops)` sont sur la canonique **en local, non poussés** —
-  tier `ci_infra`, donc la CI réelle est source de vérité obligatoire avant
-  merge.
-- `UI_DATA_GAP G7` ouvert : aucun nom court de gabarit en base.
+- `UI_DATA_GAP G7` ouvert : aucun nom court de gabarit en base — le nom complet
+  est donc rendu canoniquement sur deux lignes plutôt qu'abrégé de force.
+- **`timeout-minutes: 5` sur le job lint** — quatrième annulation d'infra sur
+  cache froid, dont une sur la CI canonique de cette tranche. C'est du
+  `ci_infra` : tranche séparée, avec validation sur CI réelle (`CLAUDE.md §1`).
+
+---
+
+## 11. CLOSEOUT
+
+### 11.1 — Les deux livraisons, dans l'ordre demandé
+
+L'opérateur a exigé que les corrections `ops` **ne voyagent pas** avec la
+tranche UI. Deux PR, deux tiers, deux verdicts.
+
+| | PR | Tier | Merge | CI canonique |
+|---|---|---|---|---|
+| **1** | [#132](https://github.com/MFE-DSS/workout-session-tracking/pull/132) — plafond mémoire du sweep local | `ci_infra` | `c4972a1` | 6/6 |
+| **2** | [#133](https://github.com/MFE-DSS/workout-session-tracking/pull/133) — la console de séance | `shared_code` | **`547df67`** | **6/6** |
+
+PR #133 : `+4 253 / −1 438` sur 37 fichiers · 8/8 checks · gate Sonar `OK` ·
+**0 issue ouverte** · 0 thread non résolu · `MERGEABLE / CLEAN` · mergée avec
+`--merge --match-head-commit d3e65f1`. **Sans squash, sans `--admin`, sans
+force.**
+
+### 11.2 — L'ordre d'adjudication Sonar n'était pas cosmétique
+
+Quatre `Web:S7930 CRITICAL` sur `exercise_card.html`. Le réflexe était de les
+adjuger en bloc : un moteur HTML lisant un gabarit Jinja compte des `id`
+concurrents là où les macros sont mutuellement exclusives.
+
+**En les lisant une par une, l'une d'elles était vraie.** En état `CORRECTION`,
+`future_sets` réincluait les séries **déjà validées** — présentes aussi dans
+`past_sets`. Une série terminée était rendue **deux fois** : une fois en `✓`,
+une fois en `○`, avec le même `id` d'ancre et les **mêmes `name` de champs
+masqués**. Une ancre dupliquée renvoie l'utilisateur au mauvais endroit ; des
+`name` dupliqués font gagner la dernière valeur au POST.
+
+**1 178 tests ne l'avaient pas vu.** Aucun ne rendait `CORRECTION` avec deux
+séries déjà validées.
+
+Corrigé en `b9361db`. La preuve **au rendu** — pas une lecture de source —
+ajoutée en `d3e65f1` : `test_set_anchors_are_unique_in_every_rendered_state`
+rend `CURRENT_SET`, `REST` et `CORRECTION` et compte les identifiants
+dupliqués. **Plantée avant d'être crue** : en replantant le défaut elle rougit
+sur `correction : ancres dupliquées {'set-4'}`.
+
+Les quatre issues n'ont été adjugées `FALSE POSITIVE` **qu'ensuite**, une par
+une, chacune avec cette preuve attachée en commentaire (`auren-sonar-diagnosis`
+— « une issue, une preuve »). Adjuger d'abord aurait effacé le défaut avec le
+faux positif.
+
+Également corrigés dans le périmètre : `Web:S6819` ×4, `Web:S7927` ×2,
+`Web:LinksIdenticalTextsDifferentTargets`, `python:S9073` ×5,
+`external_ruff:I001` ×2.
+
+### 11.3 — Incidents CI, tous hors produit
+
+- **PR #133, lint `cancelled` à 5m17** — `timeout-minutes: 5`, cache froid.
+  Re-run du job seul, **sans nouveau commit** : 1m17. (`CLAUDE.md §2` :
+  distinguer une annulation d'infra d'un échec de test.)
+- **CI canonique sur `547df67`, lint `cancelled` à 5m20** — même cause,
+  interrompu au step `shellcheck`, laissant `gitleaks`, `spec protocol` et le
+  drift `requirements` **non exécutés**. Un re-run était donc nécessaire, pas
+  facultatif. Re-run → **6/6 vert**.
+- **PR #132, CI rouge** — la garde préexistante
+  `test_the_canonical_runner_script_never_uses_auto` a attrapé le littéral
+  `-n auto` dans un de mes **messages `echo`**. J'ai reformulé le message,
+  **pas la garde**.
+
+### 11.4 — La règle qui a changé, et pourquoi
+
+Le sweep local saturait la RAM du poste et emportait tout ce qui tournait à
+côté, Docker compris. La cause n'était pas mon comportement : **`CLAUDE.md §1`
+prescrivait littéralement `pytest -n auto`**, en contradiction avec son propre
+script canonique plafonné à 2 workers. La prose seule n'avait pas suffi — PR
+#132 met la garde dans le script (refus d'une valeur non entière, plafond sur
+la RAM physique hors CI) et corrige les trois documents qui se contredisaient.
+
+Les 23 « échecs » observés ce jour-là étaient des victimes d'OOM : **105/105
+verts en série** sur les mêmes modules.
+
+### 11.5 — Portes franchies
+
+`FULL SESSION DOGFOOD` (`BLOCKER-4`) **ACCEPTÉ par l'opérateur** aux trois
+viewports avec clavier visible, puis **re-vérifié vert** sur la canonique
+corrigée après le merge de #132 — la tranche n'a pas été validée sur une base
+qu'elle n'allait pas rejoindre.
+
+`CLAUDE.md §5.1` : rendu réel exposé avant tout commit UI, et l'opérateur a
+tranché deux fois (passe de densité, puis dogfood). La console a été **gelée**
+entre l'acceptation et la PR : aucune compaction, aucun pictogramme, aucune
+micro-animation, aucune réorganisation L2/L3, aucune variation de dock, aucune
+information nouvelle. Les observations esthétiques non bloquantes vont en
+backlog Phase 3.

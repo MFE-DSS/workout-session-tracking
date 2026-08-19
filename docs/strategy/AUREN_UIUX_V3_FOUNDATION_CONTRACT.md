@@ -320,7 +320,7 @@ documente un `UI_DATA_GAP`.
 | B3 | `UIV3_HOME_TALLY_01` | la ligne de bilan 11 zones | 01, B2 | `index.html`, `home.css` | HOME/partial | revert bloc |
 | B4 | `UIV3_HOME_REJECTED_01` | « écarté — et pourquoi » | 01, B2, **G1** | `index.html`, `home.css`, `pages.py` | HOME/reco | revert bloc |
 | B5 | `UIV3_HOME_DEPRIORITISE_01` | Disponibilité quitte l'accueil · État du jour replié | 01, D8 | `index.html`, partials | HOME/active | revert |
-| **B6+B7** | **`UIV3_SESSION_EXECUTION_CONSOLE_01`** — **une seule vertical slice utilisateur** (décision opérateur 2026-08-18) : commande contextuelle · série courante **réellement** au-dessus du pli · états `set` / `rest` / `complete` · **suppression de l'architecture sticky remplacée**. Les quatre livrent **ensemble** ou la tranche n'existe pas. | 02, 04 | `exercise_card.html`, `session_detail.html`, `session_focus.css`, `app.css` | tous les golden SESSION, `S7` et `S8` inclus | revert vers `nav=stay`+`next` et la sticky |
+| **B6+B7** | ✅ **`UIV3_SESSION_EXECUTION_CONSOLE_01` — MERGED** (`547df67`, PR #133, 2026-08-19) — **une seule vertical slice utilisateur** (décision opérateur 2026-08-18) : commande contextuelle · série courante **réellement** au-dessus du pli · états `set` / `rest` / `complete` · **suppression de l'architecture sticky remplacée**. Les quatre livrent **ensemble** ou la tranche n'existe pas. | 02, 04 | `exercise_card.html`, `session_detail.html`, `session_focus.css`, `app.css` | tous les golden SESSION, `S7` et `S8` inclus | revert vers `nav=stay`+`next` et la sticky |
 | B8 | `UIV3_TARGETS_44_01` | 0 cible sous 44 px sur les surfaces V3 | 00 | CSS uniquement | garde de cible mesurée | revert CSS |
 | B9 | `UIV3_VISUAL_BASELINE_01` | baselines capturées et versionnées | 03 | `scripts/`, `var/` | — | supprimer baselines |
 
@@ -335,6 +335,11 @@ n'a pas été exécutée et **validée humainement** aux trois viewports
 plus une précondition de `B0`, il devient cette porte de sortie. Motif : les
 prototypes sont statiques, on ne peut pas y enregistrer une série ; le dogfood
 ne peut donc pas précéder la construction de la console.
+
+> ✅ **`BLOCKER-4` FRANCHI (2026-08-19).** Séance `SESSION_RICH` complète —
+> 49 étapes, 360 / 390 / 430, clavier visible — **acceptée par l'opérateur**,
+> puis **re-vérifiée verte** sur la canonique corrigée avant le commit de la
+> tranche. Détail et mesures : `docs/SPRINT_UIV3_SESSION_EXECUTION_CONSOLE_REPORT.md §3.2`.
 
 ---
 

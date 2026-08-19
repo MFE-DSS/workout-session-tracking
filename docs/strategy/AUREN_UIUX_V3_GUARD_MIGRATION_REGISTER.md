@@ -106,3 +106,45 @@ exigés par les specs V3 :
    `STALE`, pas une spécification.
 6. Une garde qui protège un choix **officiellement abandonné** n'est pas un
    argument contre le redesign : c'est un élément à migrer.
+
+---
+
+## Exécution — Surfaces Session (2026-08-19)
+
+`UIV3_SESSION_EXECUTION_CONSOLE_01` (PR #133, merge `547df67`) a exécuté la
+migration des Surfaces Session : **65 gardes T5 migrées sur 20 modules**,
+chacune portant sa note de migration dans le diff (règle 1). **Aucune
+suppression pour verdir** (règle 3) — le remplacement voyage dans la même
+tranche.
+
+**Trois changements de contrat, déclarés :**
+
+- `test_session_ux_prev_load` — le rappel de charge était `aria-hidden` parce
+  qu'il **doublait** un bloc accessible. Le doublon n'existe plus : il **doit**
+  désormais être lisible. La garde T2 est **retournée**, pas affaiblie.
+- `test_session_ux_cues_density` — le cue de l'atlas vivait dans un `<summary>`
+  pour rester lisible sans ouvrir ; il est en L2, lisible **sans le moindre
+  geste**.
+- `test_session_focus_rest_timer` — les gardes vérifiaient la **présence** du
+  minuteur. C'est exactement l'angle mort qui a laissé passer `D3` : le bloc
+  était là, l'attribut absent, et le JS démarrait quand même le décompte en
+  lisant un **autre** attribut rendu inconditionnellement (`running=True, 89s`
+  mesuré au navigateur, sans qu'aucune série soit saisie). Elles vérifient
+  maintenant son **absence** hors repos — ce qu'aucune lecture d'attribut ne
+  peut contredire.
+
+**Gardes à créer — livrées** (`tests/test_uiv3_session_console.py`, 36 gardes) :
+« une seule commande dominante par état » · « la série courante est au-dessus
+de la ligne de flottaison » (mesurée) · « une série terminée porte une
+affordance de correction ». Les quatre gardes Home restantes appartiennent à
+leurs tranches.
+
+**Deux gardes neuves ont échoué sur leur propre prose** à la première écriture
+— le motif que ce dépôt répète (`guards-that-guard-nothing`), attrapé cette
+fois à l'écriture, corrigé par des dépouilleurs de commentaires `_uncommented()`
+et `_js_code()`.
+
+**Une garde manquait, et Sonar l'a trouvée.** Aucune des 1 178 gardes ne rendait
+`CORRECTION` avec deux séries déjà validées — l'état où le défaut d'ancres
+dupliquées vivait. `test_set_anchors_are_unique_in_every_rendered_state` comble
+le trou, et a été **plantée avant d'être crue**.
