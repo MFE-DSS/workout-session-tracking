@@ -32,6 +32,26 @@ principal).
 
 **Supprimer « ← Retour »** si le visiteur n'a pas de page précédente réelle.
 
+### Accroche — **en français**, tranché le 2026-08-19
+
+```
+AUREN
+S'entraîner avec intention biomécanique.
+```
+
+`Train with biomechanical intent.` au milieu d'une interface entièrement
+française **paraîtrait un vestige de maquette anglophone**, pas une signature
+internationale volontaire.
+
+La traduction littérale « Entraîne-toi avec une intention biomécanique » est
+trop lourde. La forme retenue est **légèrement inhabituelle en français, et
+c'est délibéré** : assez singulière pour devenir une signature, froide,
+précise, cohérente avec le positionnement déjà écrit — AUREN est un
+**instrument biomécanique**, pas une application de bien-être.
+
+*Alternative écartée* : « La progression guidée par la biomécanique » — plus
+naturelle, mais elle perd l'idée d'**intention**, qui est le mot porteur.
+
 ---
 
 ## Q2 — L'ancre visuelle de l'accueil ✅ **A, barres de récupération par zone**

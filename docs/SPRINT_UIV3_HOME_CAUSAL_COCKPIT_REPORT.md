@@ -232,3 +232,59 @@ une suppression, pas dans un moteur nouveau.
 Et le défaut le plus coûteux du lot n'était pas dans le produit : c'était un
 **harnais qui mesurait la page de connexion en croyant mesurer la Home**. Une
 mesure silencieusement fausse est pire qu'une mesure absente.
+
+---
+
+## Annexe de clôture (post-merge)
+
+| | |
+|---|---|
+| Base | `1e761b2` |
+| PR | **#131 MERGED** — 6 commits |
+| Merge | **`f10af0a`** via `--merge --match-head-commit f1ce7f7` — sans squash, sans `--admin`, sans force |
+| CI PR | **8/8 pass** |
+| CI canonique | **6/6 success** sur `f10af0a` |
+| Sonar | gate **`OK`** — 94,4 % de couverture du code neuf, 0 bug, 0 smell, 0 duplication |
+| Threads de revue | **0** |
+| UI | **validée par l'opérateur** avant merge (`CLAUDE.md §5.1`) |
+
+### Quatre CI rouges, quatre causes distinctes — aucune dans le produit
+
+| # | Cause | Traitement |
+|---|---|---|
+| 1 | `test_a8_zone_recovery_reaches_no_template` lisait ses **commentaires Jinja** | garde corrigée, plantation vérifiée |
+| 2 | Sonar `S3776` — complexité cognitive **16 pour 15** | `_rejected_alternatives` extrait, sortie identique vérifiée |
+| 3 | Sonar `S6466` — « IndexError » sur un **slice** | **`FALSE POSITIVE`** adjugé avec preuve empirique |
+| 4 | `test_no_raw_binary_source_in_git_docs` sur les captures de référence | exception étroite **et plafonnée**, 4 plantations détectées |
+
+**Deux annulations d'infra** en plus, sur le même job `lint`, toutes deux à
+5 min 20 : `timeout-minutes: 5` et un cache de dépendances froid. Le re-run sur
+le **même commit** passe en 1 min 16 — même code, durée différente. Traitées
+comme `CLAUDE.md §2` l'exige : **re-run sans nouveau commit**, jamais une
+cascade de correctifs.
+
+> **À corriger hors périmètre** : le budget de 5 minutes du job `lint` est trop
+> serré à cache froid. C'est du tier `ci_infra`, donc une tranche à part —
+> et la CI réelle en est la seule preuve valable.
+
+### Un défaut trouvé en écrivant la référence visuelle
+
+En ajoutant les captures au blueprint, j'ai ouvert `/progress` **pour la
+première fois** et découvert que la Disponibilité n'y est pas : elle vit sur
+`/dashboard`. J'avais donc déplacé un KPI « vers Progression » sans jamais
+regarder la destination, et le lien de l'accueil promettait ce qu'elle ne
+tient pas.
+
+Corrigé. Et la correction honnête du libellé a fait tomber **trois gardes qui
+passaient parce que le mot figurait dans un lien**.
+
+### Ce que cette phase débloque
+
+L'accueil est propre — et c'est précisément ce qui rend les **incohérences des
+surfaces périphériques visibles**. `/progress` mesure 2 735 px et n'a jamais
+été spécifiée sous UIV3.
+
+L'architecture cible en quatre instruments est désormais tranchée
+(`AUREN_UI_BLUEPRINT §2.5`), et son traitement est **délibérément différé** à
+une phase 4 : la Séance reste la surface souveraine avec le plus gros déficit
+mesuré.

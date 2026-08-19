@@ -228,7 +228,76 @@ pour rendre visible.
 | **Séance** | Future Console | spécifiée, non construite | **31 débordements durs** à 390 px · série courante à y=843 · **161 cibles sous 44 px** · 4,3 écrans par exercice |
 | **Connexion** | porte d'identité sobre | décidée, non spécifiée | « ← Retour » sans retour · 3 liens de poids égal |
 
-### 2.5 Plateforme — figée
+### 2.5 Architecture des surfaces — **quatre instruments, quatre questions**
+
+**Décision opérateur du 2026-08-19.** C'est la décision la plus structurante
+depuis le Causal Cockpit lui-même : elle transforme AUREN de « plusieurs
+écrans qui ont accumulé des métriques » en **quatre instruments répondant
+chacun à une question différente**.
+
+| Surface | Question souveraine | Contenu |
+|---|---|---|
+| **Home** | *Qu'est-ce que je fais maintenant, et pourquoi ?* | Causal Cockpit |
+| **Session** | *Qu'est-ce que je fais sur cette série ?* | Future Console |
+| **Progression** | *Est-ce que mon entraînement évolue correctement ?* | continuité · qualité · volume · tendances |
+| **Progression / Corps** — `/progress/body` | *Quelles zones sont disponibles, chargées ou inconnues ?* | Body Ledger, 11 zones |
+| History | *Qu'est-ce qui s'est réellement passé ?* | séances brutes |
+| ~~`/dashboard`~~ | — | **à déprécier** après inventaire |
+
+**Une seule racine analytique.** Deux surfaces génériques concurrentes —
+`/progress` et `/dashboard` — obligent l'utilisateur à deviner laquelle ouvrir.
+Le contenu actuel de `/progress` la désigne déjà pour ce rôle : boucle
+hebdomadaire, KPI, analyse par programme, activité par exercice, qualité des
+séances, poids corporel. Ce n'est pas un écran spécialisé, c'est déjà le hub —
+hérité d'une architecture antérieure.
+
+#### « Disponibilité » n'est pas déménagée — elle est auditée
+
+**Point tranché explicitement.** Le KPI 0–100 a quitté l'accueil **parce qu'il
+introduisait une échelle distincte du contrat de récupération**, pas parce
+qu'il manquait de place. Le déplacer tel quel dans Progression reviendrait à
+**le déménager pour justifier son existence**.
+
+S'il reste utile, il fait l'objet d'un **audit séparé** et devient un
+diagnostic secondaire **correctement nommé**. En attendant, le lien de
+l'accueil ne revendique jamais « disponibilité » tant que la destination ne la
+sert pas.
+
+#### D7 — la continuité vit dans Progression, pas sur l'accueil
+
+Les trois signaux — séances/semaine · qualité du repos · qualité du travail —
+**ne remontent pas sur l'accueil**. Celui-ci vient précisément de gagner en
+cessant d'être un tableau de bord ; les y réinjecter transformerait
+`cause → décision → action` en `cause → stats → décision → stats → action`.
+
+**Une seule exception** : si l'un de ces signaux explique réellement la
+recommandation du jour, le moteur peut déjà le faire apparaître dans la phrase
+de `SystemOrigin`. Il paraît alors comme **raison de la décision**, jamais
+comme KPI permanent.
+
+Forme visée, très compacte, en tête de Progression :
+
+```
+CONTINUITÉ · 4 SEMAINES
+3,2 séances / sem.
+repos · stable     travail · ↑
+```
+
+**Pas de flamme. Pas de streak. Pas de « 12 semaines consécutives ».**
+Une trajectoire, pas une mécanique de récompense.
+
+#### Body Ledger — enfant de Progression, pas destination principale
+
+`/progress/body`, nom produit **« État des zones »**. La `ZoneTally` de
+l'accueil ouvre directement cette sous-surface.
+
+Ni dans `/progress` — elle mesure déjà **2 735 px, 3,2 écrans**, et onze
+cellules plus leur interprétation la rendraient encore moins structurée — ni
+au même rang que Home et Progression. La matrice du concept B trouve enfin sa
+place : **trop dense pour l'accueil, excellente comme instrument de second
+niveau.**
+
+### 2.6 Plateforme — figée
 
 `FastAPI + Jinja SSR` **KEEP** · HTML/CSS natif **PRIMARY** ·
 View Transitions / Popover / Anchor Positioning **ADOPT en amélioration
@@ -328,10 +397,21 @@ qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 |---|---|---|
 | **Socle** | `UIV3_COCKPIT_LADDER_01` *(B0)* | **`MERGED` — `6aecf6f`** |
 | | ~~`UIV3_TOKENS_01` *(B1)*~~ | **ABSORBÉE PAR B0** |
-| **Phase 1 — Accueil** | **`UIV3_HOME_CAUSAL_COCKPIT`** | **PR #131 · 8/8 verts · Sonar OK · UI VALIDÉE OPÉRATEUR · `MERGE PENDING`** |
-| **Phase 2 — Séance** | `UIV3_SESSION_EXECUTION_CONSOLE_01` *(B6+B7)* | après phase 1 acceptée |
+| **Phase 1 — Accueil** | `UIV3_HOME_CAUSAL_COCKPIT` | **`MERGED` — PR #131, `f10af0a`** |
+| **Phase 2 — Séance** | **`UIV3_SESSION_EXECUTION_CONSOLE_01`** *(B6+B7)* | **prochaine** |
 | **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | après phase 2 acceptée |
-| Hors phase | `BODY_LEDGER_PAGE_01` · `LOGIN_IDENTITY_GATE_01` | à planifier |
+| **Phase 4 — Analyse** | **`UIV3_PROGRESS_ANALYTICS_01`** | après fermeture |
+| Hors phase | `LOGIN_IDENTITY_GATE_01` | à planifier |
+
+**Phase 4 traite ensemble** : refonte de `/progress` · dépréciation de
+`/dashboard` · **D7** continuité sans streak · **`/progress/body`** Body Ledger
+(qui absorbe `BODY_LEDGER_PAGE_01`).
+
+> **Pourquoi pas maintenant.** La Home est propre, et c'est précisément ce qui
+> rend les incohérences périphériques visibles — la tentation de les traiter
+> tout de suite est réelle. **Elle est refusée.** La Séance reste la surface
+> souveraine avec le plus gros déficit mesuré : série courante à **y = 843**,
+> **31 débordements durs**, **161 cibles sous 44 px**. La grosse énergie va là.
 
 #### Phase 1 — `UIV3_HOME_CAUSAL_COCKPIT`
 

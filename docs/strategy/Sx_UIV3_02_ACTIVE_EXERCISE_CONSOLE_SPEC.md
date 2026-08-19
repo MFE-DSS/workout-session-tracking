@@ -341,10 +341,87 @@ dernière séance est **affichée à côté**, pas injectée dans le champ.
   qualité de cette interface **ne peut plus être inférée du CSS**. Le dogfood
   est une **porte bloquante** de la tranche `B6`, pas une recommandation.
 
+### Amendements opérateur du 2026-08-19 — les trois points ouverts, tranchés
+
+#### A — `DeltaReadout` est le **pont** prescription → exécution
+
+Il n'est pas une donnée d'annexe : il se place **immédiatement avant** le
+`SetInstrument`. « Qu'est-ce que j'ai fait la dernière fois ? » est la question
+directement utile à la série en cours — Fitbod et Hevy mettent tous deux
+l'historique de performance à portée immédiate pour cette raison.
+
+Ordre figé :
+
+```
+SystemOrigin  →  DeltaReadout  →  SetInstrument  →  CommandDock
+```
+
+```
+S2 / 3
+
+3 × 8–12
+produit par le système
+
+RÉF. DERNIÈRE
+12 kg × 12
+
+┌──────────┐ ┌──────────┐
+│ 12.5 kg  │ │ 12 reps  │
+└──────────┘ └──────────┘
+
+VALIDER S2
+```
+
+**Aucun faux delta.** Sans référence : **`PREMIÈRE FOIS`**.
+
+#### B — Trois positions temporelles, **une seule surface de saisie**
+
+Ni « deux grosses séries » ni « trois grosses séries » :
+
+```
+✓ S1   12 × 12          ← passé, compact
+
+● S2   COURANTE         ← développé, la seule entrée complète
+  [12.5 kg] [12 reps]
+  VALIDER S2
+
+○ S3   à venir          ← futur, compact
+```
+
+L'utilisateur comprend **passé / maintenant / après** d'un coup d'œil, sans
+que l'écran devienne un tableur. C'est ce qui protège la différenciation du
+concept D : une console, pas une grille.
+
+À 360 px : précédente compacte · courante développée · suivante compacte.
+Première série : `S1` courante, `S2`/`S3` à venir. Dernière : `S1`/`S2`
+compactes, `S3` courante.
+
+#### C — Repos : 90 s en **repli**, ajustable, non persisté
+
+Le dépôt a déjà la bonne fondation : `rest_seconds` optionnel, défaut 90 s,
+décompte en amélioration progressive, rien de persisté, aucune action critique
+n'en dépend.
+
+**90 s reste un repli de présentation. Ce n'est pas une prescription.** AUREN
+ne dit pas « toujours 90 secondes » : la littérature récente trouve un petit
+avantage hypertrophique aux repos > 60 s sans avantage clairement détecté
+au-delà de 90 s, avec une incertitude réelle et une variabilité selon
+l'exercice et l'objectif.
+
+```
+Repos suggéré · 1:30
+−15 s   PASSER   +15 s
+```
+
+±30 s si ±15 s charge trop le dock. **L'ajustement ne persiste pas en V3.**
+
+Un `rest_target_seconds` par exercice serait une **prescription**, donc une
+feature métier séparée — **pas un glissement dans ce chantier UI**.
+
 ### Reste ouvert
 
-- Le nombre de séries visibles simultanément dans la bande à 360 px — à
-  trancher au dogfood.
+- Rien. Les trois points sont tranchés ci-dessus ; le dogfood de sortie reste
+  la seule porte.
 
 ## 10. Amendement `00A`
 
