@@ -310,6 +310,64 @@ class TestCanonicalCommand:
         """The number must travel with the measurement that produced it."""
         assert "MemAvailable" in _script()
 
+    def test_a_non_numeric_worker_count_is_refused(self):
+        """`Sb_OPS_LOCAL_SWEEP_CEILING_01` — la prose n'a pas suffi.
+
+        Le littéral `auto` a déjà rendu une mitigation invisible : la variable
+        était *définie*, donc le `:-2` ne jouait pas, et un run de validation
+        est passé au vert sans exécuter la mitigation. Le script doit
+        s'ARRÊTER sur une valeur non entière, pas la transmettre à pytest.
+        """
+        out = subprocess.run(
+            ["bash", str(CI_SCRIPT), "--collect-only"],
+            env={**os.environ, "CI_PYTEST_WORKERS": "auto"},
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert out.returncode == 2, out.stdout[-400:] + out.stderr[-400:]
+        assert "REFUS" in out.stderr
+        assert "-n auto" not in out.stdout
+
+    def test_the_local_worker_count_is_capped_by_physical_ram(self):
+        """Hors CI, un `-n` trop grand doit être RAMENÉ, pas obéi.
+
+        La suite consomme ~4,4 Mo par test, ~16,6 Go au total. Sur un poste de
+        développement, un worker par cœur fait partir la machine en swap et
+        emporte ce qui tourne à côté — conteneurs compris. Vécu trois fois le
+        2026-08-19.
+
+        Le plafond est vérifié par le COMPORTEMENT du script, pas par la
+        présence d'un commentaire : c'est précisément une règle écrite en
+        prose qui a été enfreinte.
+        """
+        env = {**os.environ, "CI_PYTEST_WORKERS": "64"}
+        env.pop("CI", None)
+        out = subprocess.run(
+            ["bash", str(CI_SCRIPT), "--collect-only", "-q"],
+            env=env, capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        match = re.search(r"\[ci-pytest\] workers=(\d+)", out.stdout)
+        assert match, out.stdout[-400:] + out.stderr[-400:]
+        assert int(match.group(1)) < 64, "le plafond local n'a pas été appliqué"
+        assert "ramenés à" in out.stderr
+
+    def test_the_ci_policy_is_not_touched_by_the_local_cap(self):
+        """Le plafond local ne doit pas réécrire la politique du runner : le
+        chiffre de CI a été mesuré SUR le runner, pas déduit d'un poste."""
+        script = _script()
+        cap = script[script.find("if [[ -z \"${CI:-}\" ]]"):]
+        assert cap, "le plafond local a disparu"
+        assert "CI:-" in script, "le plafond doit être conditionné à l'absence de CI"
+
+    def test_the_repo_contract_no_longer_prescribes_n_auto(self):
+        """`CLAUDE.md §1` prescrivait `pytest -n auto` à la main, en
+        contradiction avec son propre script canonique. C'est cette ligne qui
+        a été exécutée, trois fois, sur le poste de l'opérateur."""
+        contract = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+        assert "run_ci_pytest.sh" in contract, (
+            "le contrat doit pointer le script, pas une commande recopiée"
+        )
+        assert "`pytest -n auto --dist worksteal" not in contract
+
     def test_the_workflow_does_not_override_the_canonical_default(self):
         """A literal default in the workflow silently defeats the script's.
 
