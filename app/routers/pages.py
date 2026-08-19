@@ -239,24 +239,43 @@ def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
         for code in (top.get("primary_zones") or [])
     ]
 
-    # — G1 + G2. Ce qu'aucun des cinq produits comparés ne montre : ce qui a
-    #   été ÉCARTÉ, et pourquoi. Le moteur le calcule déjà et l'affichage le
-    #   jetait.
-    alternatives = []
+    return {
+        "zones": targeted,
+        "tally": tally,
+        "tally_total": sum(counts.values()),
+        # — G1 + G2. Extrait dans son propre helper : Sonar a mesuré la
+        #   complexité cognitive de la fonction à 16 pour 15 autorisés, et
+        #   c'est ce bloc qui la portait. Le sortir la ramène sous le seuil ET
+        #   donne un nom à ce qu'il fait.
+        "alternatives": _rejected_alternatives(reco, by_zone, ZONE_LABELS),
+    }
+
+
+def _rejected_alternatives(reco: dict, by_zone: dict, labels: dict) -> list[dict]:
+    """Les options écartées, et **la zone qui l'explique**.
+
+    Ce qu'aucun des cinq produits comparés ne montre : l'inverse d'une
+    recommandation. Le moteur classe déjà — il produit un score et des
+    alternatives — et l'affichage le jetait.
+
+    Aucune décision nouvelle : la zone limitante est un **tri** des bandes
+    déjà calculées, du pire au meilleur.
+    """
+    out: list[dict] = []
     for alt in (reco.get("alternatives") or [])[:2]:
         template = alt.get("template")
-        alt_zones = [
-            _zone_row(code, by_zone, ZONE_LABELS)
+        zones = [
+            _zone_row(code, by_zone, labels)
             for code in (alt.get("primary_zones") or [])
         ]
         limiting = min(
-            alt_zones, key=lambda z: _BAND_RANK.get(z["band"], 9), default=None
+            zones, key=lambda z: _BAND_RANK.get(z["band"], 9), default=None
         )
         # Toutes les zones disponibles → ce n'est pas la récupération qui a
-        # écarté l'option, c'est le score. Le dire plutôt qu'afficher une zone
+        # écarté l'option, c'est le score. Le dire, plutôt qu'afficher une zone
         # « disponible » à côté du mot « écarté », ce qui n'expliquerait rien.
         by_recovery = limiting is not None and limiting["band"] != "likely_available"
-        alternatives.append({
+        out.append({
             "name": getattr(template, "name", None) or alt.get("name") or "",
             "slug": getattr(template, "slug", None),
             "score": alt.get("score"),
@@ -265,13 +284,7 @@ def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
             "zone_short": limiting["band_short"] if by_recovery else None,
             "reason_is_recovery": by_recovery,
         })
-
-    return {
-        "zones": targeted,
-        "tally": tally,
-        "tally_total": sum(counts.values()),
-        "alternatives": alternatives,
-    }
+    return out
 
 
 @router.get("/", response_class=HTMLResponse)
