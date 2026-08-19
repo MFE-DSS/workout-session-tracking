@@ -22,6 +22,23 @@ Asserts (render-level, contracts preserved):
 
 Reads rendered HTML + CSS source only — no pixels.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  Migré par `UIV3_SESSION_EXECUTION_CONSOLE_01` (2026-08-19)
+#  ─────────────────────────────────────────────────────────────────────
+#  Ce module épinglait des marqueurs d'IMPLÉMENTATION que `Sx_UIV3_02`
+#  remplace. Les renommages sont mécaniques ; les invariants sont
+#  inchangés. Là où le contrat lui-même change, le test porte une note
+#  explicite — jamais une suppression silencieuse.
+#
+#    session-focus__console        → console__band
+#    session-focus__console-list   → console__band
+#    session-focus__console-refs   → console__delta
+#    session-focus__console-row-*  → setline--*
+#    session-focus__sticky-cta     → dock (plus AUCUN collant)
+#    session-focus__set-action     → dock__cmd (commande unique)
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -134,7 +151,7 @@ class TestTerminalMarkerAndContracts:
         assert "session-focus__stepper" in body
 
     def test_console_preserved(self, client):
-        assert "session-focus__console" in _body(client)
+        assert "console__band" in _body(client)
 
     def test_worked_area_preserved(self, client):
         assert "session-focus__worked-area" in _body(client)
@@ -150,8 +167,10 @@ class TestTerminalMarkerAndContracts:
         assert re.search(r'action="[^"]*/sessions/\d+/exercises/\d+"', body)
 
     def test_rest_timer_data_contracts_unchanged(self, client):
+        """MIGRÉ par `UIV3_SESSION_EXECUTION_CONSOLE_01` : le minuteur n'existe plus que dans l'état `REST` (`Sx_UIV3_02 §7.2`). Le rendre en permanence est précisément ce qui a masqué le défaut `D3` — le bloc était là, non démarré, et le JS partait quand même. Le contrat conservé est que le minuteur n'est JAMAIS requis pour enregistrer."""
         body = _body(client)
-        assert "data-rest-display" in body or "session-focus__rest-timer" in body
+        assert "data-rest-display" not in body
+        assert 'name="nav"' in body, "enregistrer ne dépend pas du minuteur"
 
     def test_anchors_and_feedback_preserved(self, client):
         body = _body(client, n=3)

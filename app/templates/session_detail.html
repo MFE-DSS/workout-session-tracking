@@ -41,44 +41,9 @@
     {% if jump_states[se.id] == 'active' %}{% set _ex_counts.position = loop.index %}{% endif %}
   {% endfor %}
   {% set _ex_remaining = _ex_total - _ex_counts.done %}
-  <div class="session-focus__orientation" aria-label="Progression des exercices">
-    <span class="session-focus__orientation-position">
-      <span class="session-focus__orientation-current">{{ _ex_counts.position if _ex_counts.position else 1 }}</span>
-      <span class="session-focus__orientation-sep" aria-hidden="true">/</span>
-      <span class="session-focus__orientation-total">{{ _ex_total }}</span>
-    </span>
-    <span class="session-focus__orientation-meta">
-      <span class="session-focus__orientation-label">exercice</span>
-      <span class="session-focus__orientation-remaining">{{ _ex_remaining }} restant{{ 's' if _ex_remaining > 1 else '' }}</span>
-    </span>
-  </div>
-
-  {# -------- Mini-stepper (Sx_UI_04 §18.A, OQ-A/OQ-B) --------
-     Remplace la jump bar dense. Compressé, cliquable, ancres
-     conservées, aria-current="location" UNIQUEMENT sur l'actif,
-     non-actifs sans aria-current. Non-color cues via CSS pseudo
-     hérités des états. Scroll horizontal snap préservé. #}
-  <nav class="ex-jump session-focus__stepper session-focus__sticky-jump"
-       aria-label="Aller à un exercice">
-    {% for se in session.session_exercises %}
-      {% set d, t = stats.per_exercise[se.id] %}
-      {% set state = jump_states[se.id] %}
-      <a
-        class="ex-jump__item session-focus__stepper-item ex-jump__item--{{ state }} session-focus__tap-target"
-        href="#exercise-{{ se.id }}"
-        {% if state == 'active' %}aria-current="location"{% endif %}
-        aria-label="Exercice {{ se.exercise_code_snapshot }}, {{ d }} sur {{ t }} séries loggées, état {{ state }}"
-      >
-        <span class="ex-jump__code session-focus__stepper-code">{{ se.exercise_code_snapshot }}</span>
-        <span class="ex-jump__prog session-focus__stepper-prog">{{ d }}/{{ t }}</span>
-      </a>
-    {% endfor %}
-    <a class="ex-jump__item session-focus__stepper-item ex-jump__item--feedback session-focus__tap-target"
-       href="#session-feedback"
-       aria-label="Aller au feedback de séance">
-      <span class="ex-jump__code session-focus__stepper-code">FB</span>
-    </a>
-  </nav>
+  {# La position `E1 / 7` a rejoint la ligne d'en-tête : elle y coûte 0 px
+     de hauteur supplémentaire. Le nombre d'exercices restants vit dans le
+     panneau `⋯` avec le reste de la méta de séance. #}
 
   {# -------- Exercise cards (one <details> per card) --------------
      Sb_29.1 : rendering extrait en partial. Sb_UI_04.3 : la carte
@@ -92,11 +57,19 @@
 {% endif %}
 
 {# -------- Session-level feedback (dedicated form) ---------- #}
+{# Q4 (opérateur, 2026-08-19) — SESSION REVIEW.
+   La première transition après la dernière série amène ici, et
+   `TERMINER LA SÉANCE` n'est émise que d'ici. Le bilan reste ENTIÈREMENT
+   optionnel et AUCUN champ n'est ajouté : c'est la surface existante, qui
+   devient la destination nommée de la fin de séance.
+   `tabindex="-1"` pour que l'ancre déplace réellement le focus clavier, et
+   pas seulement le défilement. #}
 <form
   method="post"
   action="{{ url_for('update_session', session_id=session.id) }}"
   class="card session-feedback"
   id="session-feedback"
+  tabindex="-1"
 >
   {% if session.template and session.template.kind == 'cardio' %}
   <h2 class="card__title">Cardio</h2>
@@ -184,13 +157,17 @@
     >{{ session.free_note or '' }}</textarea>
   </details>
 
-  <div class="card__actions">
-    <button type="submit" class="btn btn--primary">Enregistrer</button>
+  <div class="card__actions card__actions--review">
     {% if session.status == 'in_progress' %}
-      <button type="submit" name="action" value="end" class="btn btn--end">
-        Terminer la séance
+      {# La SEULE action qui clôt réellement la séance (Q4). Dominante ici,
+         et nulle part ailleurs : l'état `LAST EXERCISE COMPLETE` de la
+         console y CONDUIT, il ne termine pas lui-même. #}
+      <button type="submit" name="action" value="end" class="btn btn--end dock__cmd">
+        TERMINER LA SÉANCE
       </button>
+      <button type="submit" class="btn btn--ghost dock__alt">Enregistrer sans terminer</button>
     {% else %}
+      <button type="submit" class="btn btn--primary">Enregistrer</button>
       <button type="submit" name="action" value="reopen" class="btn btn--ghost">
         Rouvrir
       </button>

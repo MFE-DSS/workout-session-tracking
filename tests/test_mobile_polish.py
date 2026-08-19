@@ -315,8 +315,18 @@ def test_session_detail_has_warmup_and_work_subheaders(client):
     sid = _start(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
     # Both group titles must show up at least once per card
-    assert "set-group-title" in body
+    # MIGRÉ — les sous-titres « Échauffement » / « Travail — console »
+    # disparaissent : la bande dit ✓ ● ○ sans en-tête de section. Le
+    # groupe échauffement reste NOMMÉ, dans sa ligne repliable.
+    assert "Échauffement" in body
     # Warmup subheading appears for every exercise (7 cards in v10)
-    assert body.count(">Échauffement</h4>") >= 7
+    # MIGRÉ — les sous-titres `<h4>` par carte disparaissent : la carte
+    # active dit ✓ ● ○, et les cartes repliées nomment le TYPE sur chaque
+    # ligne (« Échauf. #1 » / « Série #1 »). L'information demeure, le
+    # titrage répété par exercice non.
+    assert body.count("Échauf.") >= 1
+    assert body.count("Échauffement") >= 1
     # "Travail" heading now includes a C05 hint span; count the heading text
-    assert body.count("Travail\n") >= 7 or body.count("Travail ") >= 7 or body.count(">Travail<") >= 7
+    # MIGRÉ — le titre « Travail » par carte disparaît avec les autres
+    # sous-titres. Chaque ligne de série reste nommée « Série #n ».
+    assert body.count("Série") >= 7

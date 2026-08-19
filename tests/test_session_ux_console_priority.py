@@ -11,6 +11,23 @@ Template-only, no-JS, no route/service/data/model change. Same POST form, same
 input names, value="" strict, server-derived completion, sticky CTA, rest timer
 and BodyMap silhouette preserved.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  Migré par `UIV3_SESSION_EXECUTION_CONSOLE_01` (2026-08-19)
+#  ─────────────────────────────────────────────────────────────────────
+#  Les marqueurs `session-focus__console-list`,
+#  `session-focus__console-row-prev` et `session-focus__sticky-cta`
+#  épinglaient une IMPLÉMENTATION que la spec `Sx_UIV3_02` remplace :
+#
+#    · la console devient `.console__band` (trois positions temporelles) ;
+#    · le rappel de charge devient le `DeltaReadout` (`.console__delta`) ;
+#    · la barre d'action collante est SUPPRIMÉE — mesurée, elle recouvrait
+#      la ligne `É1` et n'existait que parce que la commande était loin.
+#
+#  L'INVARIANT — l'action précède le détail dans l'ordre SOURCE, pour que
+#  le clavier la rencontre en premier — est conservé tel quel.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -20,6 +37,8 @@ ROOT = Path(__file__).resolve().parent.parent
 EXERCISE_CARD = ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
 JS_DIR = ROOT / "app" / "static" / "js"
 
+
+# MIGRÉ — la succession verticale « console → alternatives → cues » devient UNE ligne L3 : `TECHNIQUE · ADAPTER · HISTORIQUE`, aucune dépliée par défaut. L'invariant conservé est que TOUT le L3 vient APRÈS la console dans l'ordre SOURCE, pour que le clavier rencontre l'action avant le détail.
 
 def _seed(db, user_id, n=2):
     from app.models.session import SessionExercise, SetLog, WorkoutSession
@@ -65,7 +84,7 @@ def _body(client, n=2):
 
 def test_console_before_cues(client):
     body = _body(client)
-    console = body.find("session-focus__console-list")
+    console = body.find("console__band")
     cues = body.find("session-focus__cues")
     assert console != -1 and cues != -1
     assert console < cues, "console must render before technical cues"
@@ -99,7 +118,7 @@ def test_console_before_full_worked_area(client):
     détail, ce qu'un réordonnancement purement visuel casserait.
     """
     body = _body(client)
-    console = body.find("session-focus__console-list")
+    console = body.find("console__band")
     worked = body.find("session-focus__body-slot")
     assert console != -1, "console list missing"
     assert worked != -1, "full worked-area panel missing — it must still exist"
@@ -117,16 +136,19 @@ def test_compact_target_precedes_the_console(client):
     la Zone travaillée » pourrait silencieusement emporter le contexte utile.
     """
     body = _body(client)
-    compact = body.find("session-focus__target-compact")
-    console = body.find("session-focus__console-list")
+    compact = body.find("console__target")
+    console = body.find("console__band")
     assert compact != -1, "compact target context missing"
     assert compact < console, "compact target belongs with the exercise identity"
 
 
 def test_cues_still_present(client):
+    # MIGRÉ — les cues vivent sous `TECHNIQUE`, dans la ligne L3.
     body = _body(client)
     assert "session-focus__cues" in body
-    assert "Cues techniques" in body
+    # MIGRÉ — le déclencheur L3 s'appelle « Technique » : le mot « cues »
+    # était un anglicisme au milieu d'une interface française.
+    assert "Technique" in body
 
 
 def test_cues_rendered_once(client):
@@ -151,12 +173,12 @@ def test_alternatives_still_in_form():
     (substituted_name radios) must remain present and unchanged."""
     src = EXERCISE_CARD.read_text(encoding="utf-8")
     assert 'name="substituted_name"' in src
-    assert "session-focus__alternatives" in src
+    assert "l3__item" in src
 
 
 def test_sticky_cta_present(client):
     body = _body(client)
-    assert "session-focus__sticky-cta" in body
+    assert "dock__cmd" in body
 
 
 def test_rest_timer_rendered(client):
@@ -185,6 +207,6 @@ def test_no_orphan_machine_var():
     code; cues re-resolve _cues_machine locally after the console."""
     src = EXERCISE_CARD.read_text(encoding="utf-8")
     # the cues block uses the locally re-resolved var
-    assert "_cues_machine" in src
+    assert "_machine_top" in src
     # the old hero assignment `{% set _machine = ` is gone
     assert "{% set _machine =" not in src

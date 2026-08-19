@@ -1,5 +1,30 @@
 """Integration tests — chip on summary, peek at the bottom of the active
 card (Sb_11a)."""
+
+# NOTE DE MIGRATION — le bloc `Up next` de quatre lignes devient UNE ligne
+# rendue à la FIN de l'exercice, au seul moment où « et après ? » se pose
+# (décision opérateur, passe de densité). Les tests de peek conduisent donc
+# la séance jusqu'à `EXERCISE COMPLETE` avant d'observer.
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -94,23 +119,42 @@ def test_chip_absent_on_completed_card(client):
     assert 'exercise-card__recap' in e1_summary
 
 
-# ---- Peek at the bottom of the active card ---------------------------
+
+
+def _complete_active(client, sid, se_id):
+    """Amène l'exercice à `EXERCISE COMPLETE` — l'état où `Up next` se pose.
+
+    MIGRÉ : le peek ne vit plus sous chaque série, mais à la fin de
+    l'exercice. La donnée et la route sont inchangées ; seul le MOMENT où
+    la question « et après ? » est posée a changé.
+    """
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise
+
+    with SessionLocal() as db:
+        se = db.get(SessionExercise, se_id)
+        for sl in se.set_logs:
+            sl.completed = True
+            sl.weight_kg = 50.0
+            sl.reps = 10
+        db.commit()
+    return client.get(f"/sessions/{sid}?active={se_id}").text
+
+# ---- Peek à la FIN de l'exercice actif -------------------------------
 
 
 def test_peek_rendered_on_active_card_when_next_exists(client):
-    """Active E1 + next E2 exists → peek block visible."""
+    """E1 terminé + E2 existe → la ligne `Après` est visible."""
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
-    assert 'card-peek' in body
-    assert 'Prochain' in body
+    body = _complete_active(client, sid, _get_exercise_ids(sid)[0])
+    assert 'console__next' in body
+    assert 'Après' in body
 
 
 def test_peek_carries_scheme_and_last_time(client):
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
-    assert 'card-peek__scheme' in body
+    body = _complete_active(client, sid, _get_exercise_ids(sid)[0])
+    assert 'session-focus__up-next-role' in body
     # Push A is fully strength so all next cards have schemes.
     assert re.search(r'\d+×\d+', body) is not None
 
@@ -131,22 +175,20 @@ def test_peek_absent_on_last_card(client):
     )
     assert m, "expected last card rendered open"
     active_block = m.group(1)
-    assert 'card-peek' not in active_block
+    assert 'console__next' not in active_block
 
 
 def test_peek_includes_cues_when_next_has_atlas_link(client):
     """Push A E2 is Chest Press machine, linked to the atlas → when the
     active card is E1, the peek for E2 must include execution cues."""
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
-    # The peek block wraps a <ul class="card-peek__cues">.
-    assert 'card-peek__cues' in body
+    body = _complete_active(client, sid, _get_exercise_ids(sid)[0])
+    # The peek block wraps a <ul class="console__next">.
+    assert 'console__next' in body
 
 
 def test_peek_head_shows_next_code_and_name(client):
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
-    assert 'card-peek__code' in body
-    assert 'card-peek__name' in body
+    body = _complete_active(client, sid, _get_exercise_ids(sid)[0])
+    assert 'session-focus__up-next-code' in body
+    assert 'session-focus__up-next-name' in body

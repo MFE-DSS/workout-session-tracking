@@ -37,6 +37,12 @@ from app.enums import (
 from app.models.catalog import MethodRule, TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, WorkoutSession
 from app.services.bodymap_frames import regional_plates
+from app.services.console_state import (
+    build_console_state,
+    command_for,
+    condense_reference,
+    secondary_for,
+)
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
 from app.services.form_parsing import (
@@ -231,6 +237,90 @@ WEEKDAY_LABELS = {
     6: "Samedi",
     7: "Dimanche",
 }
+
+
+def _positive_int(raw: str | None) -> int | None:
+    """Un paramètre d'URL est une entrée hostile : il ne lève jamais.
+
+    `?fix=abc`, `?fix=-1`, `?fix=` rendent la page normalement, sans état de
+    correction. Refuser bruyamment ferait d'un lien mal recopié une erreur 500.
+    """
+    if not raw:
+        return None
+    try:
+        value = int(raw)
+    except ValueError:
+        return None
+    return value if value > 0 else None
+
+
+def _persist_set_values(se, form) -> None:
+    """Écrit les valeurs de série postées. `completed` reste dérivé serveur.
+
+    Sx_24 §E : vide = non fait, weight **ou** reps renseigné = fait. Aucune
+    checkbox, jamais.
+
+    Sx_UIV3_02 Q3 — « RETIRER CETTE SÉRIE ». `completed` étant dérivé de la
+    PRÉSENCE d'une valeur, vider les deux champs dé-complétait déjà la série,
+    mais **silencieusement**, comme effet de bord d'un champ effacé par
+    accident. La sémantique ne change pas — elle devient **nommée**.
+    `clear_set` force les deux valeurs à `None` quelles que soient les valeurs
+    sérialisées par le navigateur, pour que l'intention l'emporte sur le
+    contenu du formulaire.
+
+    Aucun état persisté nouveau : même colonne, même dérivation.
+    """
+    clear_set_id = _positive_int(form.get("clear_set"))
+    for sl in se.set_logs:
+        if sl.id == clear_set_id:
+            new_weight = new_reps = None
+        else:
+            p = f"set_{sl.id}_"
+            new_weight = to_float(form.get(p + "weight_kg"))
+            new_reps = to_int(form.get(p + "reps"))
+        sl.weight_kg = new_weight
+        sl.reps = new_reps
+        sl.completed = (new_weight is not None) or (new_reps is not None)
+
+
+def _console_context(
+    ordered: list,
+    *,
+    active_exercise_id: int | None,
+    next_code_by_exercise: dict[int, str | None],
+    prev_code_by_exercise: dict[int, str | None],
+    last_time: dict,
+    rest_signal: bool,
+    fix_set_id: int | None,
+) -> dict[str, dict]:
+    """État, commande dominante et sorties secondaires, par exercice.
+
+    `rest` et `fix` ne sont honorés que sur la carte ACTIVE. Un état de repos
+    ou de correction sur une carte repliée serait un état d'édition invisible :
+    l'utilisateur ne verrait ni la cause ni le moyen d'en sortir.
+    """
+    states, commands, secondaries, refs = {}, {}, {}, {}
+    for se in ordered:
+        is_active = se.id == active_exercise_id
+        st = build_console_state(
+            se,
+            next_code=next_code_by_exercise[se.id],
+            prev_code=prev_code_by_exercise[se.id],
+            rest_signal=rest_signal and is_active,
+            fix_set_id=fix_set_id if is_active else None,
+        )
+        states[se.id] = st
+        commands[se.id] = command_for(st)
+        secondaries[se.id] = secondary_for(st)
+        prior = last_time.get(se.exercise_code_snapshot)
+        refs[se.id] = (
+            condense_reference(prior["weights_str"], prior["reps_str"])
+            if prior and prior.get("has_data") else None
+        )
+    return {
+        "states": states, "commands": commands,
+        "secondaries": secondaries, "refs": refs,
+    }
 
 
 @router.get(
@@ -453,6 +543,17 @@ def session_detail(
             )
             break
 
+    # Sx_UIV3_02 §4 — l'ÉTAT devient le contrôleur de la commande.
+    console = _console_context(
+        ordered,
+        active_exercise_id=active_exercise_id,
+        next_code_by_exercise=next_code_by_exercise,
+        prev_code_by_exercise=prev_code_by_exercise,
+        last_time=last_time,
+        rest_signal=request.query_params.get("rest") == "1",
+        fix_set_id=_positive_int(request.query_params.get("fix")),
+    )
+
     return templates.TemplateResponse(
         request,
         "session_detail.html",
@@ -484,6 +585,11 @@ def session_detail(
             "jump_states": jump_states,
             "next_code_by_exercise": next_code_by_exercise,
             "prev_code_by_exercise": prev_code_by_exercise,
+            # Sx_UIV3_02 §4 — état de présentation, jamais persisté.
+            "console_states": console["states"],
+            "console_commands": console["commands"],
+            "console_secondaries": console["secondaries"],
+            "console_refs": console["refs"],
         },
     )
 
@@ -671,7 +777,13 @@ async def update_session(
 # ----------------------------------------------------------------------
 
 
-def stay_redirect_target(session_id: int, se) -> str:
+def stay_redirect_target(
+    session_id: int,
+    se,
+    *,
+    is_last_exercise: bool = False,
+    start_rest: bool = True,
+) -> str:
     """Où revenir après avoir enregistré une série, sans quitter l'exercice.
 
     Sb_SESSION_SET_ACTION_01 — le produit n'avait que `prev` et `next`, qui
@@ -686,6 +798,11 @@ def stay_redirect_target(session_id: int, se) -> str:
       `Sb_UIV2_SESSION_FOCUS_02` a gagnés devant l'action primaire. Quand
       toutes les séries de travail sont faites, l'ancre vise la carte, donc
       le CTA d'exercice — l'étape suivante réelle ;
+    * **sur la DERNIÈRE série du DERNIER exercice, l'ancre vise le bilan**
+      (`Sx_UIV3_02` Q4). L'opérateur a tranché : la première transition après
+      la dernière série ouvre la surface de bilan, et `TERMINER LA SÉANCE`
+      n'est émise que de là. Renvoyer sur la carte laisserait l'utilisateur
+      devant un exercice fini sans lui dire où aller ;
     * **`rest=1` est un signal de DÉPART émis par le serveur**, pas une
       durée persistée. Le repos n'est pas historisé ici : un tracé durable
       exigerait une migration, donc un sprint séparé
@@ -699,8 +816,19 @@ def stay_redirect_target(session_id: int, se) -> str:
         sl for sl in se.set_logs if sl.kind == "work" and not sl.completed
     ]
     pending.sort(key=lambda sl: sl.set_index)
-    anchor = f"#set-{pending[0].id}" if pending else f"#exercise-{se.id}"
-    return f"/sessions/{session_id}?active={se.id}&rest=1{anchor}"
+    if pending:
+        # Il reste une série : on la vise. `rest=1` seulement si ce qui vient
+        # d'être enregistré est une série de TRAVAIL — un échauffement validé
+        # ou une correction ne déclenchent pas de repos. Mesuré au navigateur :
+        # sans cette distinction, le décompte démarrait avant la première
+        # série de travail.
+        rest = "&rest=1" if start_rest else ""
+        return f"/sessions/{session_id}?active={se.id}{rest}#set-{pending[0].id}"
+    if is_last_exercise:
+        return f"/sessions/{session_id}#session-feedback"
+    # Exercice fini, d'autres restent : pas de repos à annoncer — la commande
+    # dominante est devenue `CONTINUER → Ex`, pas une série à enchaîner.
+    return f"/sessions/{session_id}?active={se.id}#exercise-{se.id}"
 
 
 @router.post("/sessions/{session_id}/exercises/{session_exercise_id}")
@@ -747,13 +875,7 @@ async def update_exercise_card(
     # UI. Spec Sx_24 §E : vide = non fait, weight or reps renseigné =
     # fait. This change ONLY affects new POSTs. Historic rows keep
     # their existing `completed` value untouched (no migration).
-    for sl in se.set_logs:
-        p = f"set_{sl.id}_"
-        new_weight = to_float(form.get(p + "weight_kg"))
-        new_reps = to_int(form.get(p + "reps"))
-        sl.weight_kg = new_weight
-        sl.reps = new_reps
-        sl.completed = (new_weight is not None) or (new_reps is not None)
+    _persist_set_values(se, form)
 
     # Derive success_score from set data (Sb_01)
     from app.services.feedback import compute_success_score
@@ -785,9 +907,30 @@ async def update_exercise_card(
     # `rest=1` est un SIGNAL DE DÉPART émis par le serveur, pas une durée
     # persistée : le repos n'est pas historisé dans cette tranche (un tracé
     # durable demanderait une migration → Sb_REST_EVENT_TRACE_01).
-    if nav_direction == "stay":
+    # `stay` — l'action de série, qui démarre le repos (contrat
+    # `Sb_SESSION_SET_ACTION_01`, inchangé).
+    # `stay_norest` — même destination, aucun repos : validation d'un
+    # échauffement ou enregistrement d'une correction. Ce ne sont pas des
+    # séries de travail exécutées.
+    if nav_direction in ("stay", "stay_norest"):
+        # Q4 — la dernière série du dernier exercice ouvre le bilan. Il faut
+        # donc savoir s'il existe un exercice après celui-ci.
+        has_next = db.execute(
+            select(SessionExercise.id)
+            .where(
+                SessionExercise.session_id == session_id,
+                SessionExercise.position > se.position,
+            )
+            .limit(1)
+        ).scalar_one_or_none() is not None
         return RedirectResponse(
-            url=stay_redirect_target(session_id, se), status_code=303
+            url=stay_redirect_target(
+                session_id,
+                se,
+                is_last_exercise=not has_next,
+                start_rest=nav_direction == "stay",
+            ),
+            status_code=303,
         )
 
     if nav_direction == "prev":

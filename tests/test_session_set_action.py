@@ -199,44 +199,72 @@ def test_prev_still_goes_back(client):
 # ───────── A3 — pas de CTA menteur ─────────
 
 
-def test_the_set_action_button_posts_stay(client):
-    """Le libellé « Enregistrer la série » n'est autorisé que parce que la
-    valeur `stay` est réellement traitée par le routeur."""
-    src = CARD.read_text(encoding="utf-8")
-    match = re.search(
-        r"<button[^>]*session-focus__set-action[^>]*>.*?</button>",
-        src, re.DOTALL,
+def test_the_dominant_command_posts_stay_on_a_work_set(client):
+    """**Migré T5 → T3** par `UIV3_SESSION_EXECUTION_CONSOLE_01`.
+
+    La garde d'origine cherchait `session-focus__set-action`, le bouton
+    secondaire « Enregistrer la série » qui COEXISTAIT en permanence avec
+    « Enregistrer et passer à E2 ». Mesuré à 390 px, cette coexistence ne
+    tenait pas dans la largeur d'un téléphone : l'étiquette de la seconde
+    demandait ~180 px dans un bouton de 62 et se peignait par-dessus la
+    première (`Sx_UIV3_02B §D2`).
+
+    L'invariant, lui, ne périme pas : **un libellé ne peut revendiquer une
+    action que si le routeur la traite**. Il est ici reporté sur la commande
+    dominante de l'état `CURRENT SET`.
+    """
+    from app.services.console_state import CURRENT_SET, command_for
+
+    from tests.test_uiv3_session_console import _exercise  # noqa: PLC0415
+    from app.services.console_state import build_console_state  # noqa: PLC0415
+
+    st = build_console_state(_exercise(warmups_done=1), next_code="E2")
+    assert st.state == CURRENT_SET
+    assert command_for(st)["nav"] == "stay"
+
+    router = ROUTER.read_text(encoding="utf-8")
+    assert '"stay"' in router and "stay_redirect_target" in router, (
+        "the command may only claim the action if the router implements it"
     )
-    assert match, "set-level action button missing"
-    block = match.group(0)
-    assert 'name="nav"' in block
-    assert 'value="stay"' in block
-    assert "Enregistrer la série" in block
-
-    assert 'nav_direction == "stay"' in ROUTER.read_text(encoding="utf-8"), (
-        "the button may only claim the action if the router implements it"
-    )
 
 
-def test_the_set_action_only_renders_on_the_current_set(client):
-    """Une action de série sur chaque ligne rendrait l'écran ambigu : la
-    série courante est la seule à porter l'action."""
+def test_exactly_one_dominant_command_is_rendered(client):
+    """**Migré T5 → T3.** La garde comptait une occurrence de l'action de
+    série ; elle compte désormais la commande dominante. Le principe est
+    inchangé et durci : deux commandes concurrentes sur un écran rendaient
+    l'action ambiguë — c'est le défaut que la tranche supprime."""
     sid = _start(client)
     body = client.get(f"/sessions/{sid}").text
-    assert body.count("session-focus__set-action") == 1
+    assert body.count('class="dock__cmd"') == 1, body.count('class="dock__cmd"')
 
 
 # ───────── A6 — repos émis par le serveur, jamais critique ─────────
 
 
 def test_rest_is_not_started_before_any_set_is_saved(client):
+    """**Durci par `UIV3_SESSION_EXECUTION_CONSOLE_01`.**
+
+    La garde d'origine vérifiait que le minuteur était PRÉSENT et non
+    démarré. C'est exactement l'angle mort qui a laissé passer `D3` : le
+    bloc était bien là, l'attribut `data-rest-started` bien absent, et le JS
+    démarrait quand même le décompte parce qu'il lisait un AUTRE attribut,
+    rendu inconditionnellement. Mesuré au navigateur : `running=True, 89s`
+    sans qu'aucune série n'ait été saisie.
+
+    Le minuteur n'existe désormais **que** dans l'état `REST`. La garde
+    vérifie donc son absence, ce qu'aucune lecture d'attribut ne peut
+    contredire.
+    """
     sid = _start(client)
     body = client.get(f"/sessions/{sid}").text
-    assert "session-focus__rest-timer" in body
+    assert "rest-readout" not in body
     assert 'data-rest-started="1"' not in body
 
 
-def test_rest_starts_only_after_a_saved_set(client):
+def test_rest_starts_only_after_a_saved_work_set(client):
+    """Un échauffement validé ne démarre PAS de repos — mesuré au
+    navigateur, `nav=stay` sur le dernier échauffement faisait partir le
+    décompte avant la première série de travail."""
     sid = _start(client)
     se_id, sets = _first_exercise(sid)
     r = client.post(
@@ -246,24 +274,27 @@ def test_rest_starts_only_after_a_saved_set(client):
     )
     assert "rest=1" in r.headers["location"]
 
-    body = client.get(f"/sessions/{sid}?rest=1").text
-    assert 'data-rest-started="1"' in body
-    assert "Repos en cours" in body
+    warm = client.post(
+        f"/sessions/{sid}/exercises/{se_id}",
+        data={f"set_{sets[0][0]}_weight_kg": "60", "nav": "stay_norest"},
+        follow_redirects=False,
+    )
+    assert "rest=1" not in warm.headers["location"]
 
 
 def test_saving_never_depends_on_the_timer(client):
     """Sans JS, le compte à rebours n'existe pas — la sauvegarde doit
-    fonctionner quand même. Le POST est un formulaire natif."""
+    fonctionner quand même. La commande dominante est une soumission de
+    formulaire native."""
     src = CARD.read_text(encoding="utf-8")
     match = re.search(
-        r"<button[^>]*session-focus__set-action[^>]*>.*?</button>",
-        src, re.DOTALL,
+        r'<button type="submit" name="nav"[^>]*\n?\s*class="dock__cmd">',
+        src,
     )
-    block = match.group(0)
-    assert 'type="submit"' in block
+    assert match, "dominant command is no longer a native submit"
     for js_only in ("onclick", "data-js-only", "hx-post"):
-        assert js_only not in block, (
-            "the set action must be a native form submit, never JS-gated"
+        assert js_only not in src, (
+            "the command must be a native form submit, never JS-gated"
         )
 
 
@@ -278,15 +309,16 @@ def test_rest_state_is_not_persisted():
 # ───────── A7 — noms accessibles ─────────
 
 
-def test_set_action_has_an_accessible_name(client):
+def test_the_dominant_command_has_an_accessible_name(client):
+    """**Migré T5 → T2.** Le changement d'état est annoncé par le LIBELLÉ de
+    la commande, pas seulement par la couleur (`Sx_UIV3_02 §7.11`)."""
     sid = _start(client)
     body = client.get(f"/sessions/{sid}").text
     match = re.search(
-        r"<button[^>]*session-focus__set-action[^>]*>(.*?)</button>",
-        body, re.DOTALL,
+        r'<button[^>]*class="dock__cmd">(.*?)</button>', body, re.DOTALL,
     )
-    assert match, "set action button not rendered"
-    assert match.group(1).strip(), "the button must carry visible text"
+    assert match, "dominant command not rendered"
+    assert "VALIDER" in match.group(1), match.group(1)
 
 
 def test_set_inputs_keep_their_accessible_names(client):

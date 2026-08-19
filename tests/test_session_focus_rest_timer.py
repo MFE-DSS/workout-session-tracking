@@ -60,8 +60,10 @@ def _seed_in_progress(db, user_id, n_exercises=2):
     return s
 
 
-def _render(client, session_id) -> str:
-    r = client.get(f"/sessions/{session_id}", follow_redirects=False)
+def _render(client, session_id, query: str = "") -> str:
+    """`query` permet de demander l'état `REST`, désormais le SEUL état où le
+    minuteur existe (`Sx_UIV3_02 §7.2`)."""
+    r = client.get(f"/sessions/{session_id}{query}", follow_redirects=False)
     assert r.status_code == 200, r.text[:400]
     return r.text
 
@@ -95,7 +97,12 @@ def test_no_js_fallback_text_present(client):
         session_id = session.id
 
     body = _render(client, session_id)
-    assert "Repos suggéré" in body
+    # MIGRÉ — le repli statique existe toujours, mais dans l'état `REST` seul.
+    # Hors repos, il n'y a pas de repos à annoncer : le rendre en permanence
+    # est ce qui a masqué le défaut `D3`.
+    rest_body = _render(client, session_id, query="?rest=1")
+    assert "Repos" in rest_body
+    assert "Repos suggéré" not in body
 
 
 def test_data_start_rest_attr_present(client):
@@ -107,8 +114,12 @@ def test_data_start_rest_attr_present(client):
         session = _seed_in_progress(db, user.id)
         session_id = session.id
 
-    body = _render(client, session_id)
-    assert "data-start-rest=" in body
+    # MIGRÉ — `data-start-rest` est SUPPRIMÉ : rendu inconditionnellement,
+    # il faisait démarrer le décompte pendant la série. Le seul déclencheur
+    # est désormais `data-rest-started`, posé par le serveur.
+    body = _render(client, session_id, query="?rest=1")
+    assert "data-start-rest=" not in body
+    assert 'data-rest-started="1"' in body
     assert "data-rest-duration=" in body
 
 
@@ -122,10 +133,12 @@ def test_rest_timer_only_on_active_card(client):
         session = _seed_in_progress(db, user.id, n_exercises=3)
         session_id = session.id
 
-    body = _render(client, session_id)
-    occurrences = body.count('class="session-focus__rest-timer"')
-    assert occurrences == 1, (
-        f"rest timer should appear exactly once (active card), got {occurrences}"
+    body = _render(client, session_id, query="?rest=1")
+    occurrences = body.count("rest-readout")
+    assert occurrences >= 1, "le minuteur doit exister à l'état repos"
+    plain = _render(client, session_id)
+    assert "rest-readout" not in plain, (
+        "et nulle part ailleurs — c'est l'objet de la correction D3"
     )
 
 
@@ -217,16 +230,17 @@ def test_skip_button_is_type_button(client):
         session = _seed_in_progress(db, user.id)
         session_id = session.id
 
-    body = _render(client, session_id)
-    pattern = re.compile(
-        r'<button\b[^>]*data-rest-skip[^>]*>',
-        re.IGNORECASE,
-    )
+    # MIGRÉ — « Skip rest » (anglais, `type="button"`, sans effet serveur)
+    # devient `PASSER LE REPOS`, la commande dominante de l'état `REST`, et
+    # un LIEN : soumettre marquerait « complétée » une série à peine
+    # commencée, puisque `completed` dérive de la présence d'une valeur.
+    # Les seuls boutons restants sont les ±15 s, toujours non critiques.
+    body = _render(client, session_id, query="?rest=1")
+    assert "PASSER LE REPOS" in body
+    pattern = re.compile(r'<button\b[^>]*data-rest-step[^>]*>', re.IGNORECASE)
     m = pattern.search(body)
-    assert m is not None, "Skip button not rendered"
-    assert 'type="button"' in m.group(0), (
-        "Skip button must be type='button' (non critical)"
-    )
+    assert m is not None, "les ajustements ±15 s ne sont pas rendus"
+    assert 'type="button"' in m.group(0)
 
 
 def test_rest_timer_is_outside_post_form(client):
@@ -268,9 +282,12 @@ def test_sticky_cta_still_present(client):
         session = _seed_in_progress(db, user.id)
         session_id = session.id
 
+    # MIGRÉ — plus AUCUNE barre collante (`Sx_UIV3_02 §7.9` + Q1). Elle
+    # produisait un recouvrement mesuré et n'existait que parce que la
+    # commande était loin. Ce qui la remplace est vérifié ici.
     body = _render(client, session_id)
-    assert "session-focus__sticky-cta" in body
-    assert "session-focus__cta-primary" in body
+    assert "session-focus__sticky-cta" not in body
+    assert "dock__cmd" in body
 
 
 def test_update_exercise_card_form_action_preserved(client):

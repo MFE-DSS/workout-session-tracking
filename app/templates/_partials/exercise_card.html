@@ -1,199 +1,151 @@
-{# Sb_UIV2_SESSION_FOCUS_02 — une seule définition de la ligne de série.
-   Elle était écrite une fois dans une boucle ; le rendu CURRENT-FIRST en
-   demande trois emplacements (courante / terminées / à venir). Une macro
-   garantit qu'ils ne peuvent pas diverger : mêmes `name`, mêmes `value`,
-   mêmes attributs de saisie partout. Toute la variation d'état passe par
-   `set_state`, jamais par une réécriture du champ. #}
-{% macro work_set_list(sets, active_id, ph, ref, extra_class='') -%}
-  <ul class="set-list session-focus__console-list{% if extra_class %} {{ extra_class }}{% endif %}">
-    {%- for sl in sets %}
-      {%- set set_state = 'active' if (active_id and sl.id == active_id) else ('completed' if sl.completed else 'upcoming') -%}
-      {%- set _row_ph = ph if set_state == 'active' else None -%}
-      {%- set _ph_w = _row_ph.weight if _row_ph and _row_ph.weight else 'kg' -%}
-      {%- set _ph_r = _row_ph.reps if _row_ph and _row_ph.reps else 'reps' -%}
-      {# Sb_SESSION_SET_ACTION_01 — ancre de série. Après « Enregistrer la
-         série », le serveur renvoie sur `#set-<id>` de la prochaine série
-         non complétée : l'utilisateur reprend là où il en est, jamais en
-         haut de page. L'identifiant est la clé primaire du SetLog, la même
-         que celle déjà encodée dans les noms de champs. #}
-      {# `class` reste le PREMIER attribut : plusieurs tests existants parsent
-         ces lignes avec `<li class="set-row set-row--work…`. Mettre `id`
-         devant les cassait sans rien apporter. #}
-      <li class="set-row set-row--work session-focus__console-row session-focus__console-row--{{ set_state }}{% if _row_ph %} set-row--has-overload-placeholder{% endif %}"
-          id="set-{{ sl.id }}">
-        <div class="set-row__label session-focus__console-row-label">
-          <span class="set-row__kind">Série</span>
-          <span class="set-row__idx">#{{ sl.set_index }}</span>
-          {% if set_state == 'completed' %}<span class="session-focus__console-check" aria-label="Série validée">✓</span>{% endif %}
-          {% if set_state == 'active' %}<span class="session-focus__console-badge" aria-label="Série active">actif</span>{% endif %}
-          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-          {# Sb_SESSION_UX_01.3 (F2) — rappel discret de la charge de la
-             dernière séance, collé à la ligne ACTIVE, au point exact de
-             saisie. Silence si pas de donnée : jamais de faux poids. #}
-          {% if set_state == 'active' and ref and ref.has_data %}
-            <span class="session-focus__console-row-prev" aria-hidden="true">
-              dernière : {{ ref.weights_str }} kg · {{ ref.reps_str }} reps
-            </span>
-          {% endif %}
-        </div>
+{# ====================================================================
+   UIV3_SESSION_EXECUTION_CONSOLE_01 — la console d'exécution.
+   + COCKPIT DENSITY & INSTRUMENT PASS (opérateur, 2026-08-19)
+   --------------------------------------------------------------------
+   `Sx_UIV3_02` §4/§7, amendements A/B/C, Q1–Q4, et la passe de densité.
 
-        <div class="set-row__inputs">
-          {# Ces deux champs n'avaient AUCUN nom accessible : un lecteur
-             d'écran annonçait « zone de texte » sans dire de quelle série
-             ni de quelle grandeur il s'agit. Le `placeholder` ne fait pas
-             office d'étiquette et disparaît à la saisie. `aria-label` est
-             additif : ni `name`, ni `value`, ni validation, ni POST ne
-             changent. #}
-          <input
-            type="text"
-            inputmode="decimal"
-            pattern="[0-9]*[.,]?[0-9]*"
-            autocomplete="off"
-            name="set_{{ sl.id }}_weight_kg"
-            aria-label="Charge en kg — série {{ sl.set_index }}"
-            placeholder="{{ _ph_w }}"
-            value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-          />
-          <input
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            autocomplete="off"
-            name="set_{{ sl.id }}_reps"
-            aria-label="Répétitions — série {{ sl.set_index }}"
-            placeholder="{{ _ph_r }}"
-            value="{{ sl.reps if sl.reps is not none else '' }}"
-          />
-          {# Sb_24.4 — completed reste dérivé serveur de la présence de
-             weight/reps. Aucune checkbox : le bouton ci-dessous ne déclare
-             pas un état, il SOUMET les valeurs saisies, exactement comme le
-             CTA d'exercice. #}
-        </div>
+   L'ORDRE EST LE CONTRAT (amendement A) :
 
-      </li>
-    {%- endfor %}
-  </ul>
+       SystemOrigin  →  DeltaReadout  →  SetInstrument  →  CommandDock
+
+   QUATRE NIVEAUX, ET CE QUI SE VOIT À CHAQUE ÉTAT
+   -----------------------------------------------
+   L1  exécuter   exercice · série courante · kg/reps · CommandDock
+   L2  décider    référence · delta réel · cible courte · UN cue
+   L3  comprendre technique · historique · adapter        → disclosure
+   L4  raconter   ressenti · note                         → fin d'exercice
+
+   **Aucun contenu L3 déplié par défaut** pendant `CURRENT SET`, `REST` ou
+   `CORRECTION`. **Aucun contenu L4** pendant ces états. L'écran raconte la
+   séance par du texte là où il devait montrer un état et présenter une
+   action ; cette passe supprime la prose, pas la capacité.
+
+   ⚠ DEUX PIÈGES DE SÉRIALISATION — LIRE AVANT DE MASQUER QUOI QUE CE SOIT.
+
+   1. `update_exercise_card` boucle sur TOUTES les `set_logs` et écrit
+      `sl.weight_kg = to_float(form.get(...))`. Un champ absent du DOM
+      renvoie `None`, donc **efface la série**. Les lignes compactes portent
+      leurs valeurs en `input type="hidden"`.
+
+   2. Le même POST écrit `muscle_sensation`, `free_note` et
+      `substituted_name`. Les masquer sans les conserver **effacerait un
+      ressenti, une note ou une SUBSTITUTION** à la première validation de
+      série. La macro `preserve()` existe pour ça et n'est pas décorative.
+   ==================================================================== #}
+
+{# ─── valeurs conservées, ligne non saisissable ─────────────────────── #}
+{% macro set_values(sl) -%}
+  <input type="hidden" name="set_{{ sl.id }}_weight_kg"
+         value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}" />
+  <input type="hidden" name="set_{{ sl.id }}_reps"
+         value="{{ sl.reps if sl.reps is not none else '' }}" />
 {%- endmacro %}
 
-{# Sb_UIV2_SESSION_FOCUS_02 — bloc échauffement, défini une seule fois parce
-   qu'il est rendu à DEUX emplacements selon l'état réel :
-
-     CURRENT_WARMUP    un échauffement reste à faire → il EST la série
-                       courante : déplié, dominant, rendu AVANT la console.
-     CURRENT_WORK_SET  tous terminés → historique secondaire, replié, rendu
-                       APRÈS la région de série courante.
-
-   Le placement est donc dérivé de `completed`, jamais forcé pour faire
-   entrer une capture au-dessus de la ligne de flottaison. Dans les deux cas
-   les champs restent dans le DOM avec les mêmes `name` : un `details` fermé
-   soumet ses contrôles, la sérialisation est identique. #}
-{% macro warmup_block(warmup_sets, warm_done, warm_total, collapsed) -%}
-  {% if collapsed %}
-  <details class="disclosure session-focus__warmup-recap">
-    <summary class="disclosure__summary">
-      <h4 class="set-group-title">Échauffement</h4>
-      <span class="session-focus__warmup-recap-count">{{ warm_done }}/{{ warm_total }} terminé</span>
-    </summary>
-    <div class="disclosure__body">
-  {% elif warm_total > 0 %}
-  <h4 class="set-group-title">Échauffement</h4>
-  {% endif %}
-  <ul class="set-list">
-    {% for sl in warmup_sets %}
-      <li class="set-row set-row--warmup">
-        <div class="set-row__label">
-          <span class="set-row__kind">Échauf.</span>
-          <span class="set-row__idx">#{{ sl.set_index }}</span>
-          {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-        </div>
-
-        <div class="set-row__inputs">
-          <input
-            type="text"
-            inputmode="decimal"
-            pattern="[0-9]*[.,]?[0-9]*"
-            autocomplete="off"
-            name="set_{{ sl.id }}_weight_kg"
-            aria-label="Charge en kg — échauffement {{ sl.set_index }}"
-            placeholder="kg"
-            value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}"
-          />
-          <input
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            autocomplete="off"
-            name="set_{{ sl.id }}_reps"
-            aria-label="Répétitions — échauffement {{ sl.set_index }}"
-            placeholder="reps"
-            value="{{ sl.reps if sl.reps is not none else '' }}"
-          />
-          {# Sb_24.4 — checkbox « Fait » retirée. Spec Sx_24 §E : completed
-             est dérivé côté serveur de la présence de weight ou reps. #}
-        </div>
-      </li>
-    {% endfor %}
-  </ul>
-  {% if collapsed %}
-    </div>
-  </details>
-  {% endif %}
+{# ─── champs d'exercice masqués mais TOUJOURS postés ────────────────── #}
+{% macro preserve(name, value) -%}
+  <input type="hidden" name="{{ name }}" value="{{ value if value else '' }}" />
 {%- endmacro %}
 
-{# Sb_29.1 — Exercise card partial (visual skeleton).
+{# ─── la SEULE surface de saisie de l'exercice ──────────────────────── #}
+{% macro set_inputs(sl, kind_label, ph) -%}
+  <div class="setline__inputs">
+    <input
+      type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
+      autocomplete="off"
+      class="setline__field setline__field--weight"
+      name="set_{{ sl.id }}_weight_kg"
+      aria-label="Charge en kg — {{ kind_label }} {{ sl.set_index }}"
+      placeholder="{{ ph.weight if ph and ph.weight else 'kg' }}"
+      value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}" />
+    <input
+      type="text" inputmode="numeric" pattern="[0-9]*"
+      autocomplete="off"
+      class="setline__field setline__field--reps"
+      name="set_{{ sl.id }}_reps"
+      aria-label="Répétitions — {{ kind_label }} {{ sl.set_index }}"
+      placeholder="{{ ph.reps if ph and ph.reps else 'reps' }}"
+      value="{{ sl.reps if sl.reps is not none else '' }}" />
+  </div>
+{%- endmacro %}
 
-   Extrait verbatim du bloc <details class="card exercise-card"> du for-loop
-   de session_detail.html. Aucune modification fonctionnelle :
-   - mêmes formulaires POST (action=url_for('update_exercise_card', ...))
-   - mêmes inputs name=set_{id}_weight_kg / set_{id}_reps
-   - mêmes <details> natifs HTML (no-JS friendly)
-   - mêmes ancres id=exercise-{id}
-   - mêmes navigations name=nav value=prev/next
-   - mêmes classes legacy (exercise-card, exercise-card__*, etc.)
-   - réutilise les macros segmented + field_group via {% from %} parent
+{# ─── ✓ passé · ● courant · ○ futur — trois marqueurs, aucune phrase ───
+   `§7.4` — la correction était possible mais MUETTE. L'affordance devient
+   visible sans pour autant ajouter une ligne de texte. #}
+{% macro past_line(sl, prefix, fix_url) -%}
+  {# `id` sur CHAQUE ligne : `stay_redirect_target` ancre sur `#set-<id>`, et
+     une ancre sans cible ramène en haut de page. #}
+  <li class="setline setline--past" id="set-{{ sl.id }}">
+    <span class="setline__marker" role="img"
+          aria-label="{{ prefix }}{{ sl.set_index }} validée">✓</span>
+    <span class="setline__code">{{ prefix }}{{ sl.set_index }}</span>
+    <span class="setline__done">
+      {%- if sl.weight_kg is not none %}{{ '%g' % sl.weight_kg }}{% else %}—{% endif %}
+      <span class="setline__x" aria-hidden="true">×</span>
+      {% if sl.reps is not none %}{{ sl.reps }}{% else %}—{% endif %}
+    </span>
+    {% if fix_url %}
+    <a class="setline__fix" href="{{ fix_url }}"
+       aria-label="Corriger {{ prefix }}{{ sl.set_index }}">corriger</a>
+    {% endif %}
+    {{ set_values(sl) }}
+  </li>
+{%- endmacro %}
 
-   Ajoute uniquement les hooks Sx_29 :
-   - session-focus__card (toujours)
-   - session-focus__card--{state} selon jump_states[se.id]
-   - session-focus__card--active si is_active
-   - session-focus__tap-target sur les boutons d'action
+{% macro future_line(sl, prefix) -%}
+  <li class="setline setline--future" id="set-{{ sl.id }}">
+    <span class="setline__marker" role="img"
+          aria-label="{{ prefix }}{{ sl.set_index }} à venir">○</span>
+    <span class="setline__code">{{ prefix }}{{ sl.set_index }}</span>
+    {{ set_values(sl) }}
+  </li>
+{%- endmacro %}
 
-   Variables consommées depuis le contexte parent :
-   - se (loop var)
-   - session, stats, active_exercise_id
-   - jump_states[se.id]
-   - exercise_summaries[se.id]
-   - briefing_chips[se.id]
-   - atlas_data[se.id]
-   - substitution_data[se.id]
-   - last_time[se.exercise_code_snapshot]
-   - deltas[se.exercise_code_snapshot]
-   - overload_hints[se.id]               (Sb_30.3 ; remplace `hints` legacy)
-   - overload_placeholders[se.id]        (Sb_30.next.placeholder ; light input hints)
-   - sb08_hints_by_exercise[se.id]
-   - peek_for_active (si is_active)
-   - next_code_by_exercise[se.id] / prev_code_by_exercise[se.id]
-   - segmented (macro from _macros.html)
-#}
 {% set done, total = stats.per_exercise[se.id] %}
 {% set is_active = (active_exercise_id == se.id) %}
 {% set summary = exercise_summaries.get(se.id) %}
 {% set state = jump_states[se.id] %}
+{# PAS de `is defined` ici. Un repli défensif sur un contexte manquant est
+   exactement le motif qui a produit onze gardes vertes sans comportement
+   dans ce dépôt : la page se rendrait « normalement », sans console, et
+   aucun test ne le dirait. Si le routeur cesse de fournir ces clés, le
+   rendu doit échouer bruyamment. #}
+{% set cs = console_states.get(se.id) %}
+{% set cmd = console_commands.get(se.id) %}
+{% set secondaries = console_secondaries.get(se.id, []) %}
+{# `REST` et `CORRECTION` sont des états où l'écran doit se TAIRE : rien de
+   L3 ni de L4 n'y est rendu au premier niveau. #}
+{% set _quiet = is_active and cs and (cs.is_resting or cs.is_correcting) %}
 <details
   class="card exercise-card session-focus__card session-focus__card--{{ state }} {% if is_active %}session-focus__card--active{% endif %} {% if total > 0 and done == total %}exercise-card--done{% endif %}"
   id="exercise-{{ se.id }}"
   {% if is_active %}open{% endif %}
+  {% if is_active and cs %}data-console-state="{{ cs.state }}"{% endif %}
 >
-  <summary class="exercise-card__compact">
+  {# Sur la carte ACTIVE, la console porte l'identité et l'avancement : le
+     résumé se réduit au code, qui reste la poignée de la disclosure. Sur les
+     cartes repliées, la console n'existe pas — le résumé porte tout. #}
+  {# Sur la carte ACTIVE, le résumé EST la ligne d'identité L1 : code, nom,
+     schéma. Une ligne d'identité séparée sous un résumé qui répétait déjà le
+     nom coûtait 24 px pour redire la même chose. Le résumé reste une cible
+     de 44 px — c'est la poignée qui replie l'exercice. #}
+  <summary class="exercise-card__compact{% if is_active %} exercise-card__compact--active{% endif %}">
     <span class="exercise-card__code">{{ se.exercise_code_snapshot }}</span>
-    <span class="exercise-card__name">{{ se.substituted_name or se.exercise_name_snapshot }}</span>
-    <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
-    {% if done > 0 and summary %}
-      <span class="exercise-card__recap">{{ summary.weights_str }} kg · {{ summary.reps_str }} reps</span>
+    {% if is_active %}
+      <span class="exercise-card__name console__origin-name">{{ se.substituted_name or se.exercise_name_snapshot }}</span>
+      {% if se.template_exercise and se.template_exercise.set_scheme %}
+        <span class="console__origin-scheme">{{ se.template_exercise.set_scheme }}</span>
+      {% endif %}
     {% endif %}
-    {% set briefing_chip = briefing_chips.get(se.id) %}
-    {% if briefing_chip %}
-      <span class="exercise-card__chip exercise-card__chip--{{ briefing_chip.kind }}">{{ briefing_chip.scheme }} · {{ briefing_chip.last_time }}</span>
+    {% if not is_active %}
+      <span class="exercise-card__name">{{ se.substituted_name or se.exercise_name_snapshot }}</span>
+      <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
+      {% if done > 0 and summary %}
+        <span class="exercise-card__recap">{{ summary.weights_str }} kg · {{ summary.reps_str }} reps</span>
+      {% endif %}
+      {% set briefing_chip = briefing_chips.get(se.id) %}
+      {% if briefing_chip %}
+        <span class="exercise-card__chip exercise-card__chip--{{ briefing_chip.kind }}">{{ briefing_chip.scheme }} · {{ briefing_chip.last_time }}</span>
+      {% endif %}
     {% endif %}
   </summary>
 
@@ -202,806 +154,553 @@
     action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
     class="exercise-card__form"
   >
-    {# Sb_UIV2_SESSION_FOCUS_02 — le lien d'historique est explicitement du
-       détail de niveau 8 ; il est rendu avec le reste du secondaire, sous la
-       console. Contenu et URL inchangés. #}
-    {# ============================================================
-       Sb_UI_04.3 — Active Exercise Cockpit hero (Sx_UI_04 §18)
-       ------------------------------------------------------------
-       Rendu UNIQUEMENT sur la carte active. Premier jalon du Live
-       Exercise Expert Model + du Body Representation System (§23).
-       Surfaces : exercise intent (§18.B) · worked area panel (§18.C
-       / §23) · technical cues shell (§18.D). Toutes les données
-       proviennent du contexte déjà calculé côté router (atlas_data,
-       se.template_exercise) — AUCUNE logique backend ajoutée, aucun
-       modèle, aucune migration, aucun mapping fragile inventé.
-       Fallbacks conservateurs si la donnée n'existe pas. Pas de
-       claim médical : "zone ciblée" / "estimée", jamais diagnostic.
-       ============================================================ #}
-    {% if is_active %}
-      {% set _atlas = atlas_data.get(se.id) %}
-      {% set _family = _atlas.family if _atlas else None %}
-      {# Sb_SESSION_UX_01.2 — _machine n'est plus résolu ici : les cues techniques
-         (seul consommateur) sont déplacées après la console et re-résolvent
-         _cues_machine localement. #}
-
-      <div class="session-focus__cockpit-hero">
-
-        {# --- Exercise intent (§18.B) : pourquoi cet exercice, rôle
-           dans la séance. Phrase courte. Si un set_scheme existe on
-           l'expose comme rôle prescrit ; sinon formulation neutre et
-           conservatrice (jamais de justification biomécanique
-           inventée). --- #}
-        {# --- Worked Area Visual Slot (§18.C / §23, enrichi Sb_UI_04.5) :
-           surface biomécanique clinique SSR/CSS, sans asset externe, sans
-           GIF, sans image générée. Sources RÉELLES existantes uniquement
-           (atlas family : name/zone/description déjà dans
-           data/machine_atlas.json). Fallbacks conservateurs "à qualifier"
-           pour assistants/stabilisation (aucun muscle inventé). Prudence
-           anti-médicale : zones estimées, jamais diagnostic ni activation
-           réelle. Le "body-map" est une forme décorative CSS accessible
-           (aria-hidden), le contenu textuel porte toute la sémantique. --- #}
-        {% set _zone_code = _family.zone if _family and _family.zone else None %}
-        {# Sb_32.next — body-map descriptor (Sx_32) : zone réellement résolue
-           par le mapping exercice→zone. Remplace les fallbacks hardcodés
-           "à qualifier" par les labels réels quand le descriptor est mapped.
-           SSR strict, aucune valeur inventée : status unknown → "À qualifier".
-           Le chip de zone reste discret (data-*, aria-hidden). #}
-        {% set _bmd = body_map_data.get(se.id) if body_map_data is defined and body_map_data else None %}
-        {% set _bmd_mapped = _bmd and _bmd.status == "mapped" %}
-        {# Sx_UI_06 D3 (Sb_UI_06.2) — Worked Area density cleanup. Règle : une
-           information = un seul endroit. Décisions (brainstorming §0 du report) :
-           - chip de zone décoratif (code brut aria-hidden) RETIRÉ (redondant
-             avec le label texte) ;
-           - body-map CSS conservé (aide visuelle discrète, aria-hidden) ;
-           - « À qualifier » n'apparaît qu'UNE fois (sur Principal quand unknown) :
-             les rows vides (assistants, stabilisation, pattern) sont MASQUÉES au
-             lieu de répéter « À qualifier » — le signal unknown reste porté par
-             Principal ; le Worked Area n'est jamais masqué entièrement ;
-           - note raccourcie en microcopy courte non médicale ;
-           - resolution_path CONSERVÉ en data-* (jamais visible utilisateur ;
-             db_lookup / substring_fallback non exposés en UI). #}
-        {% set _wa_pattern = _family.description if _family and _family.description else None %}
-        {# Sb_UIV2_SESSION_FOCUS_02 — CONTEXTE DE CIBLE ≠ VISUALISATION DÉTAILLÉE.
-           Ici ne reste qu'un résumé d'une ligne, non interactif, tiré des
-           MÊMES données déjà résolues (`primary_label`, sinon le nom de
-           famille atlas). Pas de silhouette, pas de carte imbriquée, pas de
-           prose, aucune revendication d'activation ou de récupération.
-           Le panneau « Zone travaillée » COMPLET est rendu sous la console. #}
-        {# ============================================================
-           Sb_ATLAS_TECHNICAL_GUARDS_01 — LE cue d'exécution, au-dessus de
-           la console.
-           ------------------------------------------------------------
-           RESTITUTION, PAS COLLECTE. Le contenu vient de l'atlas versionné
-           (`data/machine_atlas.json`, 29 machines, 3 cues chacune) via
-           `atlas_data`, déjà résolu par le routeur et déjà conscient des
-           substitutions (`get_for_session_exercise` suit le réalisé, pas le
-           prescrit). Aucune chaîne technique n'est écrite dans ce gabarit :
-           un cue codé en dur ici serait invisible à l'atlas et diverger de
-           lui sans que rien ne le signale.
-
-           UN SEUL cue est remonté ici — le premier. Les deux autres et les
-           erreurs fréquentes restent dans la disclosure machine, sous la
-           console : le budget vertical au-dessus de la série courante est
-           de ~15 px, et cette tranche ne doit pas reprendre ce que les deux
-           précédentes ont gagné.
-
-           Silence si l'exercice n'est pas mappé — c'est le cas de 3 des 7
-           exercices d'une séance type. Aucun texte générique de
-           remplacement : mieux vaut ne rien dire que dire une consigne qui
-           ne correspond pas à la machine.
-           ============================================================ #}
-        <p class="session-focus__target-compact">
-          <span class="session-focus__target-compact-label">Cible</span>
-          <span class="session-focus__target-compact-value">
-            {%- if _bmd_mapped %}{{ _bmd.primary_label }}
-            {%- elif _family and _family.name %}{{ _family.name }}
-            {%- else %}À qualifier{% endif %}
-          </span>
-        </p>
-      </div>
-
-      {# Fin du hero : identité + cible compacte. Tout le détail secondaire
-         (Zone travaillée complète, machine) est rendu APRÈS la console. #}
-    {% endif %}
-
-
-    {# Sx_UI_06 D2 — dé-densification : le set_scheme (cible) était affiché ici
-       en tête ET dans la console (« Cible ») ET comme placeholder dans les
-       cases de saisie. On garde la suggestion cible UNIQUEMENT dans la case
-       (au plus près de l'action). Le bloc « scheme » en tête est retiré ; le
-       scheme reste disponible dans le contexte (se.template_exercise). #}
 
     {% if session.status == 'completed' and summary %}
       <div class="done-summary">
-        <span class="done-summary__count">
-          Work : {{ summary.work_done }}/{{ summary.work_total }}
-        </span>
-        <span class="done-summary__values">
-          {{ summary.weights_str }} kg · {{ summary.reps_str }} reps
-        </span>
+        <span class="done-summary__count">Work : {{ summary.work_done }}/{{ summary.work_total }}</span>
+        <span class="done-summary__values">{{ summary.weights_str }} kg · {{ summary.reps_str }} reps</span>
         {% if summary.success_score is not none %}
           <span class="done-summary__score">score {{ summary.success_score }}</span>
         {% endif %}
       </div>
     {% endif %}
 
-    {# Sb_SESSION_UX_01.2b (F1) — Bloc « Adapter l'exercice » (alternatives)
-       DÉPLACÉ sous la console de saisie (priorité à l'action). Le bloc est
-       ré-inséré plus bas, entre la console et les cues, À L'IDENTIQUE (mêmes
-       {% set %}, mêmes radios name="substituted_name", mêmes N1/N2/N3, même
-       fallback legacy, même elif se.substituted_name, même form POST). Ici,
-       seule sa position change ; aucun contenu/condition modifié. #}
+    {% if is_active and cs %}
+      {% set _ph = overload_placeholders.get(se.id) %}
+      {% set _scheme = se.template_exercise.set_scheme if se.template_exercise and se.template_exercise.set_scheme else None %}
+      {% set _atlas_top = atlas_data.get(se.id) %}
+      {% set _family_top = _atlas_top.family if _atlas_top else None %}
+      {% set _machine_top = _atlas_top.machine if _atlas_top else None %}
+      {% set _bmd_top = body_map_data.get(se.id) if body_map_data is defined and body_map_data else None %}
+      {% set _ref_line = console_refs.get(se.id) %}
 
-    {% set lt = last_time.get(se.exercise_code_snapshot) %}
-    {# Sx_UI_06 D1 — dé-densification : sur la carte ACTIVE, la charge de la
-       dernière séance est déjà portée par la console (« Référence
-       précédente », au plus près des cases de saisie). On retire donc le bloc
-       « Dernière fois » redondant UNIQUEMENT sur la carte active. Sur les
-       cartes non-actives (repliées / à venir / passées), la console n'existe
-       pas → on conserve « Dernière fois » (aucune perte d'info). #}
-    {% if not is_active %}
-    <div class="last-time {% if not lt %}last-time--empty{% endif %}">
-      {% if lt and lt.has_data %}
-        <span class="last-time__label">Dernière fois</span>
-        <span class="last-time__when">{{ lt.relative }}</span>
-        <span class="last-time__values">
-          {{ lt.weights_str }} kg · {{ lt.reps_str }} reps
-        </span>
-      {% elif lt %}
-        <span class="last-time__label">Dernière fois</span>
-        <span class="last-time__when">{{ lt.relative }}</span>
-        <span class="last-time__values">aucune donnée saisie</span>
-      {% else %}
-        <span class="last-time__label">Dernière fois</span>
-        <span class="last-time__values">Aucune séance précédente</span>
-      {% endif %}
-    </div>
-    {% endif %}
+      <div class="console" data-state="{{ cs.state }}">
 
-    {% set delta_label = deltas.get(se.exercise_code_snapshot) %}
-    {% if delta_label %}
-      <div class="delta">
-        <span class="delta__label">Delta</span>
-        <span class="delta__text">{{ delta_label }}</span>
-      </div>
-    {% endif %}
-
-    {# Sb_30.4 — Legacy qualitative hint block removed. Primary guidance
-       now lives in the overload hint partial rendered on the active card
-       (cf. _partials/overload_hint.html). #}
-
-    {# Sb_08 — contextual hints on the active card only #}
-    {% if is_active %}
-      {% set sb08_hints = sb08_hints_by_exercise.get(se.id, []) %}
-      {% if sb08_hints %}
-        <div class="exercise-card__hints">
-          {% for h in sb08_hints %}
-            <p class="hint-sb08 hint-sb08--{{ h.rule_code|lower }}">
-              <span class="hint-sb08__icon" aria-hidden="true">💡</span>
-              <span>{{ h.message }}</span>
-            </p>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endif %}
-
-    {# Sb_30.3 — Overload hint first render. Active card uniquement.
-       Le router skip déjà les hints silent / unknown ; le partial
-       garde l'assertion défensive `if hint and not hint.is_silent`.
-       Unique source de guidance après Sb_30.4 (le bloc qualitatif
-       legacy a été retiré) : ce partial propose une cible chiffrée
-       (kg/reps) + reasons. #}
-    {# Sb_UI_04.4 — Progression guidance : le hint overload existant est
-       présenté dans une section "Guidance" scoped (§18.E / §22). AUCUNE
-       modification du contenu métier ni du partial overload_hint.html :
-       seul un wrapper de présentation est ajouté, non impératif. La
-       provenance (engine_version) reste exposée par le partial inclus. #}
-    {% if is_active %}
-      {% set hint = overload_hints.get(se.id) %}
-      {% if hint %}
-        <div class="session-focus__guidance" aria-label="Guidance de progression">
-          <span class="session-focus__guidance-label">Guidance de progression</span>
-          {% include "_partials/overload_hint.html" %}
-        </div>
-      {% endif %}
-    {% endif %}
-
-    {% if se.set_logs|length > 0 %}
-      {% set warmup_sets = se.set_logs|selectattr('kind', 'equalto', 'warmup')|list %}
-      {% set work_sets = se.set_logs|selectattr('kind', 'equalto', 'work')|list %}
-
-      {# ============================================================
-         Sb_UIV2_SESSION_FOCUS_02 — STEP B : l'échauffement TERMINÉ est de
-         l'historique, pas la tâche courante.
-         ------------------------------------------------------------
-         Deux états distincts, et la distinction est le contrat :
-
-         * CURRENT_WARMUP — au moins un échauffement reste à faire : c'est
-           LUI la série courante, il reste déplié et dominant. Le replier
-           cacherait l'action en cours.
-         * CURRENT_WORK_SET — tous les échauffements sont faits : ils
-           deviennent un récapitulatif calme, dépliable par `details` natif.
-
-         Le repli est donc DÉRIVÉ de l'état réel (`completed`), jamais forcé
-         pour faire entrer une capture dans la ligne de flottaison.
-
-         Les champs restent dans le DOM : un `<details>` fermé soumet quand
-         même ses contrôles, donc le POST est rigoureusement inchangé.
-         Le `<h4>` reste dans le `<summary>` — structure de titre conservée
-         pour l'accessibilité, et contrat `>Échauffement</h4>` intact.
-         Aucun JS : sémantique `details/summary` native.
-         ============================================================ #}
-      {% set _warm_total = warmup_sets|length %}
-      {% set _warm_done = warmup_sets|selectattr('completed')|list|length %}
-      {% set _warm_collapsed = is_active and _warm_total > 0 and _warm_done == _warm_total %}
-
-      {# Échauffement EN COURS : il est la série courante, donc il précède la
-         console. Terminé, il descend sous la région de série courante — voir
-         l'appel symétrique plus bas. #}
-      {% if not _warm_collapsed %}
-        {{ warmup_block(warmup_sets, _warm_done, _warm_total, false) }}
-      {% endif %}
-
-      {# ============================================================
-         Sb_UI_04.4 — Set Logging Console (Sx_UI_04 §18.E / §22)
-         ------------------------------------------------------------
-         Transforme la liste de séries "travail" en console
-         d'exécution guidée. AUCUN changement de contrat : mêmes
-         inputs (name=set_{id}_weight_kg / _reps), même form POST,
-         completed toujours dérivé serveur (présence de valeur).
-         L'état par set (completed / active / upcoming) est une
-         DÉRIVATION DE PRÉSENTATION à partir de sl.completed — aucune
-         logique métier, aucun recalcul. Le "set actif" = premier
-         work set non complété. Additive : classes legacy set-list /
-         set-row / set-row__inputs conservées.
-         ============================================================ #}
-      {% if work_sets|length > 0 %}
-        {% set _work_total = work_sets|length %}
-        {% set _work_done = work_sets|selectattr('completed')|list|length %}
-        {% set _active_ns = namespace(idx=None) %}
-        {% for _ws in work_sets %}
-          {% if _active_ns.idx is none and not _ws.completed %}{% set _active_ns.idx = loop.index0 %}{% endif %}
-        {% endfor %}
-
-        <div class="session-focus__console{% if not is_active %} session-focus__console--compact{% endif %}">
-
-          {# Console header : progression set courant / total. #}
-          <div class="session-focus__console-head">
-            <h4 class="set-group-title set-group-title--work session-focus__console-title">
-              Travail — console
-              <span class="set-group-title__hint">kg = comme affiché sur l'équipement</span>
-            </h4>
-            <span class="session-focus__console-progress" aria-label="Séries travail complétées">
-              <span class="session-focus__console-progress-value">{{ _work_done }} / {{ _work_total }}</span>
-              <span class="session-focus__console-progress-label">séries</span>
+        {# ── L2 · cible ET référence sur UNE ligne.
+             Elles répondent à deux questions voisines — « quoi » et « par
+             rapport à quoi » — et occupaient jusqu'ici deux blocs de 59 px
+             au total. La cible remplace à elle seule les trois titres
+             « CIBLE » / « INTENTION » / « ZONE TRAVAILLÉE », qui énonçaient
+             le même fait sous trois en-têtes.
+             AUCUN FAUX DELTA : sans référence, « Première fois ». ── #}
+        <p class="console__readout session-focus__target-compact console__target">
+          <span class="session-focus__target-compact-value">
+            {%- if _bmd_top and _bmd_top.status == "mapped" %}{{ _bmd_top.primary_label }}
+            {%- elif _family_top and _family_top.name %}{{ _family_top.name }}
+            {%- else %}À qualifier{% endif %}
+          </span>
+          {% if not cs.is_resting %}
+            <span class="console__delta">
+              {% if _ref_line %}
+                <span class="console__delta-label">Réf.</span>
+                <span class="console__delta-value">{{ _ref_line }}</span>
+              {% else %}
+                <span class="console__delta-first">Première fois</span>
+              {% endif %}
             </span>
-          </div>
+          {% endif %}
+        </p>
 
-          {# Reference + target surfaces (active card only). Données
-             déjà présentes dans le contexte (last_time / overload
-             placeholder). Fallback sobre si absentes — jamais
-             culpabilisant, jamais inventé. #}
-          {% if is_active %}
-            {% set _ref = last_time.get(se.exercise_code_snapshot) %}
-            {# Sx_UI_06 D2 — la « Référence précédente » (charge dernière séance)
-               est conservée ici, au plus près des cases. La row « Cible » est
-               retirée : la suggestion cible ne vit plus que comme placeholder
-               dans le champ de saisie (dé-densification). #}
-            <div class="session-focus__console-refs">
-              <div class="session-focus__console-ref session-focus__console-ref--prev">
-                <span class="session-focus__console-ref-label">Référence précédente</span>
-                {% if _ref and _ref.has_data %}
-                  <span class="session-focus__console-ref-value">{{ _ref.weights_str }} kg · {{ _ref.reps_str }} reps</span>
-                {% else %}
-                  <span class="session-focus__console-ref-value session-focus__console-ref-value--empty">Non disponible</span>
+        {# L2 — le DELTA réel, dès qu'il existe. La table de hiérarchie de
+           l'opérateur le place en L2 « directement adjacent », pas en
+           annexe de fin d'exercice : c'est pendant la série qu'il informe
+           la charge à mettre. Il n'apparaît que quand le moteur en produit
+           un — jamais de faux delta. #}
+        {% set _delta_now = deltas.get(se.exercise_code_snapshot) %}
+        {% if _delta_now and not cs.is_resting %}
+          <p class="console__delta-line delta">
+            <span class="delta__label">Delta</span>
+            <span class="delta__text console__delta-now">{{ _delta_now }}</span>
+          </p>
+        {% endif %}
+
+        {# ── L2 · UN cue, et un seul, quand il aide réellement le geste
+             suivant. Le texte vient de l'atlas versionné, verbatim : le
+             raccourcir ici fabriquerait une consigne que l'atlas n'a jamais
+             écrite. Silence si l'exercice n'est pas mappé — 3 des 7
+             exercices d'une séance type. Jamais pendant repos ni
+             correction : à ces instants, ce n'est pas la question. ── #}
+        {% if not _quiet and _machine_top and _machine_top.execution_cues %}
+          <p class="console__cue">
+            <span class="console__cue-mark" aria-hidden="true">▸</span>
+            {{ _machine_top.execution_cues[0] }}
+          </p>
+        {% endif %}
+
+        {# ── L1 · la bande : ✓ passé · ● courant · ○ futur ── #}
+        <ol class="console__band">
+
+          {% set _warm_done = cs.warmup_total > 0 and cs.warmup_done == cs.warmup_total %}
+          {% if not _warm_done %}
+            {# Échauffement EN COURS : il EST la série courante, donc il est
+               en tête de bande (`§7.3`). #}
+            {% for sl in cs.warmup_sets %}
+              {% if sl.completed %}
+                {{ past_line(sl, 'É', None) }}
+              {% elif cs.current_set and sl.id == cs.current_set.id %}
+                <li class="setline setline--current" id="set-{{ sl.id }}">
+                  <span class="setline__marker setline__marker--current" role="img"
+                        aria-label="Échauffement {{ sl.set_index }} en cours">●</span>
+                  <span class="setline__code">É{{ sl.set_index }}</span>
+                  {{ set_inputs(sl, 'échauffement', None) }}
+                </li>
+              {% else %}
+                {{ future_line(sl, 'É') }}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% for sl in cs.past_sets %}
+            {% if not (cs.current_set and sl.id == cs.current_set.id) %}
+              {{ past_line(sl, 'S', url_for('session_detail', session_id=session.id) ~ '?active=' ~ se.id ~ '&fix=' ~ sl.id ~ '#set-' ~ sl.id) }}
+            {% endif %}
+          {% endfor %}
+
+          {% if cs.current_set and cs.state != 'warmup' %}
+            {% set _c = cs.current_set %}
+            {# `set-row--has-overload-placeholder` : marqueur CONSERVÉ. Il
+               signale que cette ligne porte une suggestion du moteur de
+               surcharge dans son placeholder. Le retirer aurait laissé le
+               placeholder fonctionner sans que rien ne puisse le styler ni
+               le distinguer d'un `kg` générique. #}
+            <li class="setline setline--current{% if cs.is_correcting %} setline--correcting{% endif %}{% if cs.is_resting %} setline--resting{% endif %}{% if _ph %} set-row--has-overload-placeholder{% endif %}"
+                id="set-{{ _c.id }}">
+              <span class="setline__marker setline__marker--{{ 'rest' if cs.is_resting else 'current' }}"
+                    role="img"
+                    aria-label="Série {{ _c.set_index }} — {% if cs.is_resting %}repos{% elif cs.is_correcting %}en correction{% else %}en cours{% endif %}">●</span>
+              <span class="setline__code">S{{ _c.set_index }}</span>
+              {% if cs.is_resting %}
+                {{ set_values(_c) }}
+              {% else %}
+                {{ set_inputs(_c, 'série', _ph) }}
+              {% endif %}
+            </li>
+          {% endif %}
+
+          {% for sl in cs.future_sets %}
+            {{ future_line(sl, 'S') }}
+          {% endfor %}
+
+          {% if _warm_done %}
+            {# Échauffement TERMINÉ : `§7.3` le dit lui-même — « c'est du L3
+               une fois fait ». Le laisser EN TÊTE poussait le `SetInstrument`
+               à 309 px pour un budget de 300, et faisait précéder la série
+               courante par de l'historique. Il descend donc SOUS la bande
+               vive, sans rien perdre : une ligne, dépliable, et les champs
+               restent saisissables et postés. #}
+            <li class="setline setline--warmup-recap">
+              <details class="warmup-recap">
+                <summary class="warmup-recap__summary">
+                  <span class="setline__marker" aria-hidden="true">✓</span>
+                  <span class="setline__code">Échauffement</span>
+                  <span class="warmup-recap__count">{{ cs.warmup_done }}/{{ cs.warmup_total }}</span>
+                </summary>
+                <ul class="warmup-recap__list">
+                  {% for sl in cs.warmup_sets %}
+                    <li class="setline setline--warmup-done" id="set-{{ sl.id }}">
+                      <span class="setline__marker" aria-hidden="true">✓</span>
+                      <span class="setline__code">É{{ sl.set_index }}</span>
+                      {{ set_inputs(sl, 'échauffement', None) }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </details>
+            </li>
+          {% endif %}
+        </ol>
+
+        {# ── REST · le minuteur EST l'écran. Rien d'autre au premier
+             niveau : c'est tout l'intérêt d'une machine à états, elle
+             change la quantité d'information disponible, pas seulement le
+             bouton. ── #}
+        {% if cs.is_resting %}
+          {% include "_partials/rest_timer.html" %}
+        {% endif %}
+
+        {# ── EXERCISE COMPLETE · le résumé remplace la bande vive ── #}
+        {% if cs.is_finished %}
+          <div class="console__recap">
+            <p class="console__recap-head">
+              <span class="console__recap-mark" aria-hidden="true">✓</span>
+              {{ cs.work_done }} / {{ cs.work_total }}
+            </p>
+            {% set delta_label = deltas.get(se.exercise_code_snapshot) %}
+            {% if delta_label %}
+              <p class="console__recap-delta">
+                <span class="console__recap-delta-label">vs dernière fois</span>
+                <span class="console__recap-delta-value">{{ delta_label }}</span>
+              </p>
+            {% endif %}
+            {# UN SEUL aperçu système, et il est BLEU : c'est une lecture
+               produite par AUREN, pas une action de l'utilisateur. L'ambre
+               plein est réservé au CommandDock. #}
+            {% set sb08_hints = sb08_hints_by_exercise.get(se.id, []) %}
+            {% if sb08_hints %}
+              <p class="console__insight">
+                <span class="console__insight-mark" aria-hidden="true">ⓘ</span>
+                {{ sb08_hints[0].message }}
+              </p>
+            {% endif %}
+            {# `Up next`, réduit à UNE ligne et placé au seul moment où la
+               question se pose (`§7.7`). Le bloc autonome de quatre lignes
+               qui vivait sous chaque série est supprimé, pas la donnée. #}
+            {% if peek_for_active %}
+              {% set _next_se = namespace(v=None) %}
+              {% for _se2 in session.session_exercises %}
+                {% if _se2.exercise_code_snapshot == peek_for_active.code %}{% set _next_se.v = _se2 %}{% endif %}
+              {% endfor %}
+              {% set _next_atlas = atlas_data.get(_next_se.v.id) if _next_se.v else None %}
+              {% set _next_zone = _next_atlas.family.name if _next_atlas and _next_atlas.family else None %}
+              <p class="console__next session-focus__up-next">
+                <span class="session-focus__up-next-label">Après</span>
+                <span class="session-focus__up-next-code">{{ peek_for_active.code }}</span>
+                <span class="session-focus__up-next-name">{{ peek_for_active.name }}</span>
+                <span class="session-focus__up-next-role">{{ peek_for_active.scheme }}</span>
+                {% if _next_zone %}<span class="session-focus__up-next-zone">· {{ _next_zone }}</span>{% endif %}
+              </p>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {# ── L1 · CommandDock — UNE commande dominante ── #}
+        <div class="dock">
+          {% if cs.is_resting %}
+            {# Lien, pas soumission : il n'y a rien à enregistrer, et
+               soumettre marquerait « complétée » une série à peine
+               commencée. Repli sans JS naturel. #}
+            <a class="dock__cmd dock__cmd--link"
+               href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#set-{{ cs.current_set.id }}">
+              <span class="dock__label">{{ cmd.label }}</span>
+              {% if cmd.sub %}<span class="dock__sub">{{ cmd.sub }}</span>{% endif %}
+            </a>
+          {% else %}
+            <button type="submit" name="nav" value="{{ cmd.nav }}" class="dock__cmd">
+              <span class="dock__label">{{ cmd.label }}</span>
+              {% if cmd.sub %}<span class="dock__sub">{{ cmd.sub }}</span>{% endif %}
+            </button>
+          {% endif %}
+
+          {% if secondaries %}
+            <div class="dock__secondary">
+              {% for s in secondaries %}
+                {% if s.kind == 'skip' %}
+                  {# Q2 — un exercice incomplet peut être quitté à tout
+                     moment. Le produit ne force jamais la complétion. #}
+                  <button type="submit" name="nav" value="next"
+                          class="dock__alt">{{ s.label }}</button>
+                {% elif s.kind == 'remove' %}
+                  {# Q3 — rend INTENTIONNEL ce qui n'était qu'un effet de
+                     bord : vider les deux champs dé-complétait déjà la
+                     série, silencieusement. #}
+                  <button type="submit" name="clear_set" value="{{ cs.current_set.id }}"
+                          class="dock__alt dock__alt--remove">{{ s.label }}</button>
+                {% elif s.kind == 'cancel' %}
+                  <a class="dock__alt"
+                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#exercise-{{ se.id }}">{{ s.label }}</a>
+                {% elif s.kind == 'back' %}
+                  {# Capacité PRÉEXISTANTE : enregistrer ET revenir. Une ancre
+                     ne la remplace pas — un lien ne sauvegarde pas. #}
+                  <button type="submit" name="nav" value="prev"
+                          class="dock__alt dock__alt--back"
+                          title="Enregistrer et revenir à {{ cs.prev_code }}">{{ s.label }}</button>
+                {% elif s.kind == 'review' %}
+                  <a class="dock__alt" href="#exercise-{{ se.id }}">{{ s.label }}</a>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# ════════════════════════════════════════════════════════════════
+         L3 — UNE ligne, trois disclosures, aucune dépliée par défaut.
+         Remplace la succession verticale INTENTION → ZONE TRAVAILLÉE →
+         panneau machine → historique → cues, qui redisait sous cinq titres
+         ce que la console dit déjà.
+         Absente pendant REPOS et CORRECTION : à ces instants, l'écran doit
+         se taire.
+         ════════════════════════════════════════════════════════════════ #}
+      {% if not _quiet %}
+        {% set sub_data = substitution_data.get(se.id, {}) %}
+        {% set subs = sub_data.get('substitutes', []) %}
+        {% set grouped = sub_data.get('grouped', {'N1':[], 'N2':[], 'N3':[]}) %}
+        {% set can_sub = sub_data.get('can_substitute', False) %}
+        {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
+
+        <div class="l3">
+          <details class="l3__item session-focus__cues">
+            <summary class="l3__trigger session-focus__cues-title session-focus__tap-target">Technique</summary>
+            <div class="l3__body machine-panel__body">
+              {% if _machine_top %}
+                {# Le nom de la machine est une information, pas une
+                   étiquette : « Comment bien exécuter Incline Smith Press »
+                   dit de QUOI parlent les consignes qui suivent. #}
+                <h5 class="machine-panel__title machine-panel__heading">
+                  Comment bien exécuter {{ _machine_top.name }}
+                  {% if se.substituted_name and _machine_top.name == se.substituted_name %}
+                    <em class="machine-panel__tag">(substitué)</em>
+                  {% endif %}
+                </h5>
+              {% endif %}
+              {% if _machine_top and _machine_top.execution_cues %}
+                <h5 class="machine-panel__heading">Points d'exécution</h5>
+                <ol class="session-focus__cues-list">
+                  {% for cue in _machine_top.execution_cues[:3] %}
+                    <li class="session-focus__cues-item">{{ cue }}</li>
+                  {% endfor %}
+                </ol>
+              {% else %}
+                <p class="session-focus__cues-empty">
+                  Exécution contrôlée, amplitude complète, tempo maîtrisé.
+                </p>
+              {% endif %}
+              {% if _machine_top and _machine_top.common_mistakes %}
+                <h5 class="machine-panel__heading">Erreurs fréquentes</h5>
+                <ul class="machine-panel__list machine-panel__list--warn">
+                  {% for mistake in _machine_top.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
+                </ul>
+              {% endif %}
+              {% if _machine_top and _machine_top.load_semantics %}
+                <p class="machine-panel__meta">
+                  Charge : {% if _machine_top.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté (haltère / câble unilatéral){% endif %}
+                </p>
+              {% endif %}
+
+              {# Zone travaillée détaillée — c'est du L3, elle vit ici et
+                 non plus comme un bloc autonome dans le flux. Son titre est
+                 conservé : sans lui, la liste « Principal / Assistants /
+                 Pattern » perdrait ce qu'elle qualifie. #}
+              <h5 class="session-focus__worked-area-title machine-panel__heading">Zone travaillée</h5>
+              {% set _bmd_mapped = _bmd_top and _bmd_top.status == "mapped" %}
+              <div class="session-focus__worked-area session-focus__body-slot"
+                   aria-label="Zone travaillée estimée"
+                   {% if _bmd_top %}data-resolution-path="{{ _bmd_top.resolution_path }}"{% endif %}>
+                {% set wa_status = "mapped" if _bmd_mapped else "unknown" %}
+                {% set wa_primary_zone = _bmd_top.primary_zone if _bmd_mapped else None %}
+                {% set wa_secondary_zones = _bmd_top.secondary_zones if _bmd_mapped and _bmd_top.secondary_zones else [] %}
+                <div class="session-focus__body-map" aria-hidden="true">
+                  {% include "_partials/worked_area_body_map.html" with context %}
+                </div>
+                <ul class="session-focus__worked-area-list">
+                  <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
+                    <span class="session-focus__worked-area-role">Principal</span>
+                    <span class="session-focus__worked-area-value">
+                      {%- if _bmd_mapped %}{{ _bmd_top.primary_label }}
+                      {%- elif _family_top and _family_top.name %}{{ _family_top.name }}
+                      {%- else %}À qualifier{% endif %}
+                    </span>
+                  </li>
+                  {% if _bmd_mapped and _bmd_top.secondary_labels %}
+                  <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
+                    <span class="session-focus__worked-area-role">Assistants</span>
+                    <span class="session-focus__worked-area-value">{{ _bmd_top.secondary_labels | join(" · ") }}</span>
+                  </li>
+                  {% endif %}
+                  {% if _family_top and _family_top.description %}
+                  <li class="session-focus__worked-area-row session-focus__worked-area-row--pattern">
+                    <span class="session-focus__worked-area-role">Pattern</span>
+                    <span class="session-focus__worked-area-value">{{ _family_top.description[:90] }}{% if _family_top.description|length > 90 %}…{% endif %}</span>
+                  </li>
+                  {% endif %}
+                </ul>
+                <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
+              </div>
+
+              {# Guidance de surcharge — lecture SYSTÈME, donc bleue. #}
+              {% set hint = overload_hints.get(se.id) %}
+              {% if hint %}
+                <div class="session-focus__guidance" aria-label="Guidance de progression">
+                  <span class="session-focus__guidance-label">Guidance de progression</span>
+                  {% include "_partials/overload_hint.html" %}
+                </div>
+              {% endif %}
+            </div>
+          </details>
+
+          {% if can_sub and (subs or total_grouped > 0) %}
+          <details class="l3__item session-focus__alternatives substitute-picker substitute-picker--drawer">
+            <summary class="l3__trigger substitute-picker__summary session-focus__tap-target"
+                     aria-label="Adapter l'exercice — Remplacer cet exercice">
+              <span class="substitute-picker__label session-focus__alternatives-label">Adapter</span>
+              <span class="substitute-picker__count">{% if total_grouped > 0 %}{{ total_grouped }}{% else %}{{ subs|length }}{% endif %}</span>
+            </summary>
+            <div class="l3__body substitute-picker__body">
+              <p class="substitute-picker__hint session-focus__alternatives-role">Machine occupée, gêne, ou charge inadaptée ? Choisissez une alternative de même zone / même pattern avant la première série travail.</p>
+              <div class="segmented segmented--stacked">
+                {% set _cap = 4 %}
+                {% set _n1_all = grouped.get('N1', []) %}
+                {% set _n2_all = grouped.get('N2', []) %}
+                {% set _n3_all = grouped.get('N3', []) %}
+                {% set _vis_n1 = _n1_all[:_cap] %}
+                {% set _n2_room = _cap - (_vis_n1 | length) %}
+                {% set _vis_n2 = _n2_all[:_n2_room] if _n2_room > 0 else [] %}
+                {% set _overflow = _n1_all[(_vis_n1 | length):] + _n2_all[(_vis_n2 | length):] + _n3_all %}
+                <label class="segmented__option">
+                  <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
+                  <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
+                </label>
+                {% for s in _vis_n1 %}
+                <label class="segmented__option">
+                  <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                  <span>{{ s.name }} <span class="sub-badge sub-badge--n1">{{ s.badge }}</span></span>
+                </label>
+                {% endfor %}
+                {% for s in _vis_n2 %}
+                <label class="segmented__option">
+                  <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                  <span>{{ s.name }} <span class="sub-badge sub-badge--n2">{{ s.badge }}</span>{% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}</span>
+                </label>
+                {% endfor %}
+                {% if _overflow | length > 0 %}
+                <details class="sub-elargi">
+                  <summary>Voir alternatives élargies ({{ _overflow | length }})</summary>
+                  {% for s in _overflow %}
+                  <label class="segmented__option">
+                    <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
+                    <span>{{ s.name }} <span class="sub-badge sub-badge--n3">{{ s.badge }}</span>{% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}</span>
+                  </label>
+                  {% endfor %}
+                </details>
+                {% endif %}
+                {% if total_grouped == 0 %}
+                  {% for sub in subs %}
+                  <label class="segmented__option">
+                    <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
+                    <span>{{ sub }}</span>
+                  </label>
+                  {% endfor %}
                 {% endif %}
               </div>
             </div>
-          {% endif %}
-
-          {# ============================================================
-             Sb_UIV2_SESSION_FOCUS_02 — STEP D : CURRENT-FIRST.
-             ------------------------------------------------------------
-             La série COURANTE est rendue avant les séries terminées. Ce
-             n'est PAS un réordonnancement visuel : le DOM lui-même change,
-             pour que le clavier rencontre l'action avant l'historique.
-
-             PREUVE DE SÉRIALISATION (auditée avant de déplacer quoi que ce
-             soit) — `app/routers/sessions.py` :
-
-                 for sl in se.set_logs:            # itère les lignes DB
-                     p = f"set_{sl.id}_"
-                     form.get(p + "weight_kg")     # lecture PAR NOM
-
-             L'identité d'une série est la clé primaire `SetLog` encodée
-             dans le nom du champ ; l'ordre du DOM n'est jamais consulté.
-             Réordonner est donc sans effet sur la persistance. Mêmes noms,
-             mêmes valeurs, mêmes champs, même POST.
-
-             Les cartes NON actives gardent l'ordre naturel : rien ne change
-             pour elles.
-             ============================================================ #}
-          {% set _completed_sets = work_sets|selectattr('completed')|list %}
-          {% set _pending_sets = work_sets|rejectattr('completed')|list %}
-          {% set _current_set = _pending_sets[0] if (is_active and _pending_sets|length > 0) else None %}
-          {% set _upcoming_sets = _pending_sets[1:] if _current_set else [] %}
-
-          {% if _current_set %}
-            {{ work_set_list([_current_set], _current_set.id, overload_placeholders.get(se.id), _ref) }}
-
-            {% if _completed_sets|length > 0 %}
-              {# Séries terminées : HISTORIQUE secondaire, jamais supprimé et
-                 toujours éditable. Les champs restent dans le DOM et se
-                 sérialisent exactement comme avant — un `details` fermé
-                 soumet ses contrôles. #}
-              <details class="disclosure session-focus__completed-sets">
-                <summary class="disclosure__summary">
-                  <span class="session-focus__completed-sets-label">Séries précédentes</span>
-                  <span class="session-focus__completed-sets-count">{{ _completed_sets|length }}</span>
-                </summary>
-                <div class="disclosure__body">
-                  {{ work_set_list(_completed_sets, None, None, _ref, 'session-focus__console-list--completed') }}
-                </div>
-              </details>
-            {% endif %}
-
-            {% if _upcoming_sets|length > 0 %}
-              {{ work_set_list(_upcoming_sets, None, None, _ref, 'session-focus__console-list--upcoming') }}
-            {% endif %}
-
-            {# Échauffement TERMINÉ : historique secondaire, sous la série
-               courante. Champs conservés dans le DOM, sérialisation
-               identique. #}
-            {% if _warm_collapsed %}
-              {{ warmup_block(warmup_sets, _warm_done, _warm_total, true) }}
-            {% endif %}
+          </details>
           {% else %}
-            {{ work_set_list(work_sets, None, None, _ref) }}
+            {{ preserve('substituted_name', se.substituted_name) }}
+            {% if se.substituted_name %}
+              <span class="substitute-badge l3__item">Substitué : <b>{{ se.substituted_name }}</b></span>
+            {% endif %}
           {% endif %}
+
+          <a class="l3__item l3__trigger exercise-card__code--link session-focus__tap-target"
+             href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
+          >Historique</a>
         </div>
+      {% else %}
+        {# PIÈGE 2 — masquer le sélecteur sans conserver sa valeur EFFACERAIT
+           la substitution au prochain POST. #}
+        {{ preserve('substituted_name', se.substituted_name) }}
       {% endif %}
-    {% else %}
-      <p class="empty">Pas de série pour cet exercice.</p>
-    {% endif %}
 
-    {# ============================================================
-       Sb_UIV2_SESSION_FOCUS_02 — DÉTAIL SECONDAIRE, APRÈS LA CONSOLE
-       ------------------------------------------------------------
-       Supersession explicite de l'ordre `Sb_SESSION_UX_01.2` par décision
-       opérateur, sur preuve de dogfood MESURÉE : sur mobile 360×640, la
-       série courante tombait à **fold 2.1** tandis que la « Zone travaillée »
-       occupait le premier écran (fold 0.8). Le contexte de cible reste en
-       tête sous forme compacte ; la VISUALISATION détaillée descend ici.
-
-       Ordre source, pas ordre visuel : aucun `order` CSS n'est utilisé, pour
-       que la navigation clavier rencontre l'action avant le détail.
-       Contenu et données strictement inchangés — déplacés, pas réécrits.
-       ============================================================ #}
-    {% if is_active %}
-      {% set _atlas_after = atlas_data.get(se.id) %}
-      {% set _family_after = _atlas_after.family if _atlas_after else None %}
-      {% set _bmd_after = body_map_data.get(se.id) if body_map_data is defined and body_map_data else None %}
-      {% set _bmd_after_mapped = _bmd_after and _bmd_after.status == "mapped" %}
-      {% set _wa_pattern_after = _family_after.description if _family_after and _family_after.description else None %}
-
-      {# Intention : contexte de séance, pas prescription. La cible est déjà
-         portée par le résumé compact en tête ; ce bloc rejoint donc le
-         secondaire. Contenu strictement inchangé. #}
-      <div class="session-focus__intent">
-        <span class="session-focus__intent-label">Intention</span>
-        <p class="session-focus__intent-text">
-          {% if _family_after and _family_after.name %}
-            Bloc <b>{{ _family_after.name }}</b> — exercice actif de la séance.
-          {% else %}
-            Exercice actif de la séance — reste concentré sur l'exécution.
-          {% endif %}
-        </p>
-      </div>
-
-      <details class="disclosure session-focus__worked-area-disclosure">
-        <summary class="disclosure__summary">
-          <span class="session-focus__worked-area-title">Zone travaillée</span>
-        </summary>
-        <div class="disclosure__body">
-          <div class="session-focus__worked-area session-focus__body-slot"
-               aria-label="Zone travaillée estimée"
-               {% if _bmd_after %}data-resolution-path="{{ _bmd_after.resolution_path }}"{% endif %}>
-            {% set wa_status = "mapped" if _bmd_after_mapped else "unknown" %}
-            {% set wa_primary_zone = _bmd_after.primary_zone if _bmd_after_mapped else None %}
-            {% set wa_secondary_zones = _bmd_after.secondary_zones if _bmd_after_mapped and _bmd_after.secondary_zones else [] %}
-            <div class="session-focus__body-map" aria-hidden="true">
-              {% include "_partials/worked_area_body_map.html" with context %}
+      {# ════════════════════════════════════════════════════════════════
+         L4 — le ressenti n'est pas l'action présente.
+         Il n'apparaît qu'à la FIN de l'exercice, et reste offert, jamais
+         imposé. Pendant `CURRENT SET`, `REST` ou `CORRECTION`, ses valeurs
+         sont conservées en champs masqués : sans elles, valider une série
+         effacerait un ressenti déjà saisi.
+         ════════════════════════════════════════════════════════════════ #}
+      {% if cs.is_finished %}
+        <details class="l4">
+          <summary class="l4__trigger session-focus__tap-target">Ajouter un ressenti</summary>
+          <div class="l4__body">
+            <div class="field-block field-block--optional">
+              <span class="field__label">Sensation musculaire (optionnel)</span>
+              {{ segmented(
+                "muscle_sensation",
+                [("strong", "Fort"), ("partial", "Partiel"), ("weak", "Faible")],
+                se.muscle_sensation
+              ) }}
             </div>
-
-            <ul class="session-focus__worked-area-list">
-              <li class="session-focus__worked-area-row session-focus__worked-area-row--primary">
-                <span class="session-focus__worked-area-role">Principal</span>
-                <span class="session-focus__worked-area-value">
-                  {%- if _bmd_after_mapped %}{{ _bmd_after.primary_label }}
-                  {%- elif _family_after and _family_after.name %}{{ _family_after.name }}
-                  {%- else %}À qualifier{% endif %}
-                </span>
-              </li>
-              {% if _bmd_after_mapped and _bmd_after.secondary_labels %}
-              <li class="session-focus__worked-area-row session-focus__worked-area-row--secondary">
-                <span class="session-focus__worked-area-role">Assistants</span>
-                <span class="session-focus__worked-area-value">{{ _bmd_after.secondary_labels | join(" · ") }}</span>
-              </li>
-              {% endif %}
-              {% if _wa_pattern_after %}
-              <li class="session-focus__worked-area-row session-focus__worked-area-row--pattern">
-                <span class="session-focus__worked-area-role">Pattern</span>
-                <span class="session-focus__worked-area-value">{{ _wa_pattern_after[:90] }}{% if _wa_pattern_after|length > 90 %}…{% endif %}</span>
-              </li>
-              {% endif %}
-            </ul>
-
-            <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
+            <label class="field__label" for="note-{{ se.id }}">Note exercice (optionnel)</label>
+            <textarea id="note-{{ se.id }}" name="free_note" maxlength="140" rows="2">{{ se.free_note or '' }}</textarea>
           </div>
-        </div>
-      </details>
-    {% endif %}
-
-    {# Machine knowledge panel (Sb_07) — execution cues + common mistakes.
-       Sb_UIV2_SESSION_FOCUS_02 : DÉPLACÉ sous la console, grammaire
-       `.disclosure` canonique, fermé par défaut. Chaque valeur et chaque cue
-       est conservée à l'identique. #}
-    {% set atlas_entry = atlas_data.get(se.id) %}
-    {% if atlas_entry and atlas_entry.machine %}
-      {% set _m = atlas_entry.machine %}
-      {# La grammaire `.disclosure` est appliquée à `.machine-panel` PAR LE CSS
-         (règle partagée), pas en ajoutant une classe : le contrat exact
-         `class="machine-panel"` est une sémantique indépendante, épinglée par
-         `test_machine_atlas_surface`, et la décision opérateur ne supersède
-         que l'ORDRE. On obtient la grammaire sans casser le contrat. #}
-      <details class="machine-panel">
-        <summary class="machine-panel__summary">
-          <span class="machine-panel__title">
-            Comment bien exécuter {{ _m.name }}
-            {% if se.substituted_name and _m.name == se.substituted_name %}
-              <em class="machine-panel__tag">(substitué)</em>
-            {% endif %}
-          </span>
-          {# ========================================================
-             Sb_ATLAS_TECHNICAL_GUARDS_01 — LE cue principal, lisible
-             SANS ouvrir la disclosure.
-             --------------------------------------------------------
-             Ce résumé ne portait qu'une étiquette (« Comment bien
-             exécuter X ») : il annonçait du contenu sans en montrer.
-             Il porte désormais le premier cue de l'atlas, donc une
-             consigne réellement actionnable avant tout clic.
-
-             POURQUOI ICI ET PAS AU-DESSUS DE LA CONSOLE. Mesuré à
-             360×640 : placé au-dessus, même réduit à UNE ligne de
-             20 px, le cue déplaçait les champs de la série courante de
-             497 à 520 px et `elementFromPoint` cessait de les
-             retourner — ils passaient DERRIÈRE la barre d'action
-             collante. Les priorités du sprint tranchent : préserver
-             l'action de série et la géométrie mobile passent avant le
-             placement. L'atlas est la SOURCE, pas la POSITION.
-
-             Silence si l'exercice n'est pas mappé — 3 des 7 exercices
-             d'une séance type. Aucun texte générique de remplacement.
-             ======================================================== #}
-          {% if _m.execution_cues %}
-          <span class="machine-panel__lead-cue">{{ _m.execution_cues[0] }}</span>
-          {% endif %}
-        </summary>
-        <div class="disclosure__body machine-panel__body">
-          {% if _m.execution_cues %}
-            <div class="machine-panel__section">
-              <h5 class="machine-panel__heading">Points d'exécution</h5>
-              <ul class="machine-panel__list">
-                {% for cue in _m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-          {% if _m.common_mistakes %}
-            <div class="machine-panel__section">
-              <h5 class="machine-panel__heading">Erreurs fréquentes</h5>
-              <ul class="machine-panel__list machine-panel__list--warn">
-                {% for mistake in _m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
-              </ul>
-            </div>
-          {% endif %}
-          {% if _m.load_semantics %}
-            <p class="machine-panel__meta">
-              Charge : {% if _m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté (haltère / câble unilatéral){% endif %}
-            </p>
-          {% endif %}
-        </div>
-      </details>
-    {% endif %}
-
-    {# Historique de l'exercice — détail de niveau 8, rendu APRÈS la console.
-       Hors du garde `is_active` : les cartes non actives le portaient déjà et
-       doivent le conserver. Seule sa position change. #}
-    <div class="exercise-card__head-expanded">
-      <a
-        href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
-        class="exercise-card__code--link"
-        style="font-size:12px;color:var(--fg-dim);"
-      >Voir historique {{ se.exercise_code_snapshot }} →</a>
-    </div>
-
-    {# ============================================================
-       Sb_UI_04.5 — Alternatives Surface (§18.F / §23)
-       ------------------------------------------------------------
-       La substitution existante (Sb_03 / Sb_07 / Sb_22a N1/N2/N3) est
-       rendue plus lisible via un wrapper "Adapter l'exercice", SANS
-       changer le mécanisme : mêmes radios name="substituted_name",
-       même form POST, même route (soumission via le form exercice).
-       Aucune alternative inventée, aucun service appelé depuis le
-       template. Surface accessible mais non dominante (drawer replié).
-       Sb_SESSION_UX_01.2b — bloc DÉPLACÉ ici (sous la console), contenu
-       inchangé à l'identique.
-       ============================================================ #}
-    {# Substitution (Sb_03 + Sb_07 drawer, étendu Sb_22a tiered N1/N2/N3) #}
-    {% set sub_data = substitution_data.get(se.id, {}) %}
-    {% set subs = sub_data.get('substitutes', []) %}
-    {% set grouped = sub_data.get('grouped', {'N1':[], 'N2':[], 'N3':[]}) %}
-    {% set can_sub = sub_data.get('can_substitute', False) %}
-    {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
-
-    {% if can_sub and (subs or total_grouped > 0) %}
-      <div class="session-focus__alternatives">
-        <details class="substitute-picker substitute-picker--drawer session-focus__alternatives-drawer">
-        <summary class="substitute-picker__summary" aria-label="Adapter l'exercice — Remplacer cet exercice">
-          <span class="substitute-picker__label session-focus__alternatives-label">Adapter l'exercice</span>
-          <span class="substitute-picker__sublabel session-focus__alternatives-sublabel">Remplacer cet exercice</span>
-          <span class="substitute-picker__count">
-            {% if total_grouped > 0 %}{{ total_grouped }}{% else %}{{ subs|length }}{% endif %}
-            alternative{% if (total_grouped or subs|length) > 1 %}s{% endif %}
-          </span>
-        </summary>
-        <div class="substitute-picker__body">
-          <p class="substitute-picker__hint session-focus__alternatives-role">Machine occupée, gêne, ou charge inadaptée ? Choisissez une alternative de même zone / même pattern avant la première série travail.</p>
-          <div class="segmented segmented--stacked">
-            {# ====================================================
-               Sb_SUBSTITUTION_COCKPIT_01 — PLAFOND DE 4, EN SÉANCE.
-               ----------------------------------------------------
-               Le moteur n'a pas changé : il propose toujours autant de
-               candidats, dans le même ordre de proximité. Ce qui change,
-               c'est ce que la séance MONTRE.
-
-               Mesuré sur push-a avant plafonnement, en liste directe
-               (N1+N2, hors élargies) : 6 · 6 · 5 · 4 · 5 · 5 · 5.
-               Autrement dit un mini-catalogue au milieu d'une série —
-               exactement ce que le brief refuse.
-
-               Le surplus n'est PAS supprimé : il rejoint la disclosure
-               « alternatives élargies » qui existe déjà. Aucun candidat
-               ne disparaît, aucune valeur postable ne change, et
-               l'ordre N1 → N2 → N3 est conservé.
-               ==================================================== #}
-            {% set _cap = 4 %}
-            {% set _n1_all = grouped.get('N1', []) %}
-            {% set _n2_all = grouped.get('N2', []) %}
-            {% set _n3_all = grouped.get('N3', []) %}
-            {% set _vis_n1 = _n1_all[:_cap] %}
-            {% set _n2_room = _cap - (_vis_n1 | length) %}
-            {% set _vis_n2 = _n2_all[:_n2_room] if _n2_room > 0 else [] %}
-            {% set _overflow = _n1_all[(_vis_n1 | length):] + _n2_all[(_vis_n2 | length):] + _n3_all %}
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="" {% if not se.substituted_name %}checked{% endif %}>
-              <span>{{ se.exercise_name_snapshot }} <em>(prescrit)</em></span>
-            </label>
-            {# Sb_22a — N1 Équivalent (curé + match parfait) #}
-            {% for s in _vis_n1 %}
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
-              <span>
-                {{ s.name }}
-                <span class="sub-badge sub-badge--n1">{{ s.badge }}</span>
-              </span>
-            </label>
-            {% endfor %}
-            {# Sb_22a — N2 Proche (même pattern, équipement/chaîne différents) #}
-            {% for s in _vis_n2 %}
-            <label class="segmented__option">
-              <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
-              <span>
-                {{ s.name }}
-                <span class="sub-badge sub-badge--n2">{{ s.badge }}</span>
-                {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
-              </span>
-            </label>
-            {% endfor %}
-            {# Sb_22a — N3 Élargi (zone-only ou cross-pattern bridge). Replié par défaut.
-               Sb_SUBSTITUTION_COCKPIT_01 — cette disclosure accueille aussi le
-               SURPLUS de N1/N2 au-delà du plafond de 4. Rien n'est retiré :
-               tout candidat reste dans le DOM, sélectionnable, avec la même
-               valeur postée. Seule sa proéminence change. #}
-            {% if _overflow | length > 0 %}
-            <details class="sub-elargi">
-              <summary>Voir alternatives élargies ({{ _overflow | length }})</summary>
-              {% for s in _overflow %}
-              <label class="segmented__option">
-                <input type="radio" name="substituted_name" value="{{ s.name }}" {% if se.substituted_name == s.name %}checked{% endif %}>
-                <span>
-                  {{ s.name }}
-                  <span class="sub-badge sub-badge--n3">{{ s.badge }}</span>
-                  {% if s.rationale %}<em class="sub-rationale">· {{ s.rationale }}</em>{% endif %}
-                </span>
-              </label>
-              {% endfor %}
-            </details>
-            {% endif %}
-            {# Legacy fallback — if grouped is empty but flat subs exist (out-of-scope exercises) #}
-            {% if total_grouped == 0 %}
-              {% for sub in subs %}
-              <label class="segmented__option">
-                <input type="radio" name="substituted_name" value="{{ sub }}" {% if se.substituted_name == sub %}checked{% endif %}>
-                <span>{{ sub }}</span>
-              </label>
-              {% endfor %}
-            {% endif %}
-          </div>
-        </div>
         </details>
-      </div>
-    {% elif se.substituted_name %}
-      <div class="substitute-badge">
-        Substitué : <b>{{ se.substituted_name }}</b>
-        <span class="substitute-badge__prescribed">(prescrit : {{ se.exercise_name_snapshot }})</span>
-      </div>
-    {% endif %}
-
-    {# Sb_SESSION_UX_01.2 (F1) — Cues techniques ré-insérées ICI, APRÈS la console
-       de saisie (priorité à l'action, carte active). Bloc identique à l'ancien
-       (hero) ; _machine re-résolu localement depuis atlas_data (présentation,
-       aucune logique métier). Rendu uniquement sur la carte active, comme avant. #}
-    {% if is_active %}
-      {% set _cues_atlas = atlas_data.get(se.id) %}
-      {% set _cues_machine = _cues_atlas.machine if _cues_atlas else None %}
-      {# Sb_SESSION_UX_01.4 (F3) — cues post-console repliées dans un <details>
-         natif (no-JS), replié par défaut (pas d'attribut `open`). Réduit la
-         densité mobile une fois la saisie priorisée. Contenu (liste + fallback)
-         et classes inchangés ; aucune information supprimée. #}
-      <details class="session-focus__cues">
-        <summary class="session-focus__cues-title">Cues techniques</summary>
-        {% if _cues_machine and _cues_machine.execution_cues %}
-          <ol class="session-focus__cues-list">
-            {% for cue in _cues_machine.execution_cues[:3] %}
-              <li class="session-focus__cues-item">{{ cue }}</li>
-            {% endfor %}
-          </ol>
-        {% else %}
-          <p class="session-focus__cues-empty">
-            Exécution contrôlée, amplitude complète, tempo maîtrisé.
-          </p>
-        {% endif %}
-      </details>
-    {% endif %}
-
-    <h3 class="card__subtitle">Ressenti exercice</h3>
-
-    <details class="field-block field-block--optional">
-      <summary class="field__label" style="cursor:pointer;font-size:13px;color:var(--fg-dim);">
-        Sensation musculaire (optionnel)
-      </summary>
-      {{ segmented(
-        "muscle_sensation",
-        [("strong", "Fort"), ("partial", "Partiel"), ("weak", "Faible")],
-        se.muscle_sensation
-      ) }}
-    </details>
-
-    <details class="exercise-card__note" {% if se.free_note %}open{% endif %}>
-      <summary>Note exercice (optionnel)</summary>
-      <textarea name="free_note" maxlength="140" rows="1">{{ se.free_note or '' }}</textarea>
-    </details>
-
-    {# Sb_11a — peek preparing the next exercise, active card only.
-       Sb_UI_04.3 (§18.G / OQ-F) — promu en surface "Up next" du
-       cockpit : nom + rôle court + zone principale (issue de l'atlas
-       du prochain exercice si disponible). Pas de charge complète
-       dans l'up-next (OQ-F). Reste secondaire visuellement (styling
-       scoped). Classes legacy card-peek conservées pour compat CSS. #}
-    {% if is_active and peek_for_active %}
-      {% set _next_se = None %}
-      {% for _se2 in session.session_exercises %}
-        {% if _se2.exercise_code_snapshot == peek_for_active.code %}{% set _next_se = _se2 %}{% endif %}
-      {% endfor %}
-      {% set _next_atlas = atlas_data.get(_next_se.id) if _next_se else None %}
-      {% set _next_zone = _next_atlas.family.name if _next_atlas and _next_atlas.family else None %}
-      <aside class="card-peek session-focus__up-next" aria-label="Prochain exercice">
-        <header class="card-peek__head session-focus__up-next-head">
-          <span class="card-peek__label session-focus__up-next-label">Up next</span>
-          <span class="card-peek__code session-focus__up-next-code">{{ peek_for_active.code }}</span>
-          <span class="card-peek__name session-focus__up-next-name">{{ peek_for_active.name }}</span>
-        </header>
-        <p class="card-peek__scheme session-focus__up-next-role">
-          {{ peek_for_active.scheme }}
-          {% if _next_zone %}<span class="session-focus__up-next-zone"> · {{ _next_zone }}</span>{% endif %}
-        </p>
-        {% if peek_for_active.cues %}
-          <ul class="card-peek__cues">
-            {% for cue in peek_for_active.cues %}<li>{{ cue }}</li>{% endfor %}
-          </ul>
-        {% endif %}
-      </aside>
-    {% endif %}
-
-    {# Sb_02.1 + Sb_05: enriched footer with prev/next navigation.
-       Sb_29.1: ajout classe session-focus__tap-target sur les boutons
-       pour préparer le sizing 44×44px du Sb_29.2. #}
-    {% set next_code = next_code_by_exercise.get(se.id) %}
-    {% set prev_code = prev_code_by_exercise.get(se.id) %}
-    {% set is_last = next_code is none %}
-    {% set work_total = se.set_logs | selectattr('kind', 'equalto', 'work') | list | length %}
-    {% set work_done = se.set_logs | selectattr('kind', 'equalto', 'work') | selectattr('completed') | list | length %}
-    {# Sb_29.3 — CTA wrapper avec hooks Sx_29.
-       Classes legacy conservées (card__actions, card__actions--exercise,
-       btn, btn--primary, btn--ghost, btn--nav-prev).
-       Hooks ajoutés :
-       - session-focus__cta : wrapper générique
-       - session-focus__sticky-cta : déclencheur du sticky bottom via CSS
-         scoped à .session-focus__card--active (cf. app.css Sb_29.3)
-       - session-focus__cta-primary : marqueur sur le bouton principal
-       Le sticky est purement CSS — aucune dépendance JS. Si la propriété
-       position:sticky n'est pas supportée, le CTA reste dans le flow
-       (comportement par défaut) — fallback no-JS gracieux. #}
-    <div class="card__actions card__actions--exercise session-focus__cta session-focus__sticky-cta">
-      {% if prev_code %}
-      <button type="submit" name="nav" value="prev"
-              class="btn btn--ghost btn--nav-prev session-focus__tap-target"
-              title="Enregistrer et revenir à {{ prev_code }}">
-        ← {{ prev_code }}
-      </button>
+      {% else %}
+        {{ preserve('muscle_sensation', se.muscle_sensation) }}
+        {{ preserve('free_note', se.free_note) }}
       {% endif %}
-      <span class="card__actions__recap" aria-hidden="true">
-        {{ work_done }}/{{ work_total }}
-      </span>
 
-      {# Sb_SESSION_SET_ACTION_01 — l'action de SÉRIE vit dans la zone
-         d'action, pas dans la ligne de série.
-         ------------------------------------------------------------
-         Premier essai : le bouton dans la ligne elle-même. Deux mesures
-         l'ont écarté, et aucune n'était devinable en lisant le code —
-         `.set-row` est une grille `40px 1fr auto`, donc le bouton
-         débordait à 393 px pour un viewport de 360 (`scrollWidth` 393, page
-         défilant horizontalement) ; passé sur sa propre ligne de grille, la
-         ligne de série montait de 79 à 120 px et son bas repassait SOUS le
-         CTA collant, mangeant l'écart de 15 px gagné par
-         `Sb_UIV2_SESSION_FOCUS_02` et recréant exactement la collision que
-         cette tranche-là venait de supprimer.
-
-         Les deux issues d'une série vivent donc côte à côte, dans la seule
-         zone déjà prouvée non obstruée : « enregistrer et rester » et
-         « enregistrer et passer à l'exercice suivant ». Le choix devient
-         explicite au lieu d'être caché, et rien ne se dispute la surface.
-
-         Même formulaire, mêmes champs, même route : seule la valeur de
-         `nav` change. Rendu uniquement s'il reste une série à saisir —
-         sinon l'action n'aurait rien à enregistrer. #}
-      {% if is_active and work_done < work_total %}
-      <button
-        type="submit"
-        name="nav"
-        value="stay"
-        class="btn btn--ghost session-focus__tap-target session-focus__set-action"
-        title="Enregistrer la série et rester sur cet exercice"
-      >Enregistrer la série</button>
+    {% else %}
+      {# Carte NON active : liste plate, aucun état, aucune commande. Les
+         champs restent saisissables et postables — rouvrir un exercice passé
+         reste possible (OQ-E). #}
+      {% if se.set_logs|length > 0 %}
+        <ul class="set-list set-list--compact">
+          {% for sl in se.set_logs|sort(attribute='set_index') %}
+            <li class="set-row set-row--{{ sl.kind }}" id="set-{{ sl.id }}">
+              <div class="set-row__label">
+                <span class="set-row__kind">{{ 'Échauf.' if sl.kind == 'warmup' else 'Série' }}</span>
+                <span class="set-row__idx">#{{ sl.set_index }}</span>
+                {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
+              </div>
+              <div class="set-row__inputs">
+                <input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
+                       autocomplete="off" name="set_{{ sl.id }}_weight_kg"
+                       aria-label="Charge en kg — {{ 'échauffement' if sl.kind == 'warmup' else 'série' }} {{ sl.set_index }}"
+                       placeholder="kg"
+                       value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}" />
+                <input type="text" inputmode="numeric" pattern="[0-9]*"
+                       autocomplete="off" name="set_{{ sl.id }}_reps"
+                       aria-label="Répétitions — {{ 'échauffement' if sl.kind == 'warmup' else 'série' }} {{ sl.set_index }}"
+                       placeholder="reps"
+                       value="{{ sl.reps if sl.reps is not none else '' }}" />
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty">Pas de série pour cet exercice.</p>
       {% endif %}
-      <button type="submit" name="nav" value="next"
-              class="btn btn--primary session-focus__tap-target session-focus__cta-primary">
-        {% if is_last %}
-          Enregistrer et terminer
-        {% elif next_code %}
-          Enregistrer et passer à {{ next_code }}
+
+      {% set lt = last_time.get(se.exercise_code_snapshot) %}
+      <div class="last-time {% if not lt %}last-time--empty{% endif %}">
+        {% if lt and lt.has_data %}
+          <span class="last-time__label">Dernière fois</span>
+          <span class="last-time__when">{{ lt.relative }}</span>
+          <span class="last-time__values">{{ lt.weights_str }} kg · {{ lt.reps_str }} reps</span>
+        {% elif lt %}
+          <span class="last-time__label">Dernière fois</span>
+          <span class="last-time__when">{{ lt.relative }}</span>
+          <span class="last-time__values">aucune donnée saisie</span>
         {% else %}
-          Enregistrer
+          <span class="last-time__label">Dernière fois</span>
+          <span class="last-time__values">Aucune séance précédente</span>
         {% endif %}
-      </button>
-    </div>
+      </div>
+
+      {# Le delta existait sur TOUTES les cartes. Le restreindre à la console
+         active l'aurait retiré des exercices déjà faits, où il est
+         précisément la lecture utile. #}
+      {% set _delta_off = deltas.get(se.exercise_code_snapshot) %}
+      {% if _delta_off %}
+        <div class="delta">
+          <span class="delta__label">Delta</span>
+          <span class="delta__text">{{ _delta_off }}</span>
+        </div>
+      {% endif %}
+
+      {# L'accès à l'historique existait sur TOUTES les cartes, actives comme
+         repliées. Le restreindre à la carte active en aurait retiré la
+         moitié des points d'entrée. #}
+      <div class="exercise-card__head-expanded">
+        <a href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
+           class="exercise-card__code--link session-focus__tap-target"
+        >Voir historique {{ se.exercise_code_snapshot }} →</a>
+      </div>
+
+      {# Les champs d'exercice de la carte repliée doivent survivre au POST. #}
+      {{ preserve('muscle_sensation', se.muscle_sensation) }}
+      {{ preserve('free_note', se.free_note) }}
+      {{ preserve('substituted_name', se.substituted_name) }}
+
+      {% set _prev = prev_code_by_exercise.get(se.id) %}
+      <div class="card__actions card__actions--exercise session-focus__cta">
+        {% if _prev %}
+        <button type="submit" name="nav" value="prev"
+                class="btn btn--ghost btn--nav-prev session-focus__tap-target"
+                title="Enregistrer et revenir à {{ _prev }}">← {{ _prev }}</button>
+        {% endif %}
+        <button type="submit" name="nav" value="next"
+                class="btn btn--primary session-focus__tap-target session-focus__cta-primary">Enregistrer</button>
+      </div>
+    {% endif %}
   </form>
-  {# Sb_29.4 — Rest timer (progressive enhancement) sur la carte active
-     uniquement. Outside <form> pour ne pas affecter les POST. No-JS :
-     affichage statique "Repos suggéré : 90s". JS : countdown vanilla via
-     session_focus.js. Aucune action critique ne dépend de ce timer. #}
-  {% if is_active %}
-    {% include "_partials/rest_timer.html" %}
-  {% endif %}
 </details>

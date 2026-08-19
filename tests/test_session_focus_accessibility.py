@@ -105,6 +105,50 @@ def test_aria_current_step_on_active_jump_item(client):
     assert pattern.search(body), "active jump item missing aria-current=location"
 
 
+def _rest_body(client, session_id) -> str:
+    """La page dans l'état `REST` — le seul où le minuteur existe.
+
+    `REST` se dérive d'un signal serveur ET d'une série de travail restante :
+    les échauffements doivent donc être terminés, sinon l'état courant est
+    `WARMUP` et le repos n'a rien à annoncer.
+    """
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, WorkoutSession
+    from sqlalchemy import select
+    from sqlalchemy.orm import selectinload
+
+    with SessionLocal() as db:
+        sess = db.execute(
+            select(WorkoutSession)
+            .where(WorkoutSession.id == session_id)
+            .options(selectinload(WorkoutSession.session_exercises)
+                     .selectinload(SessionExercise.set_logs))
+        ).scalar_one()
+        for se in sess.session_exercises:
+            for sl in se.set_logs:
+                if sl.kind == "warmup":
+                    sl.completed, sl.weight_kg, sl.reps = True, 40.0, 12
+        db.commit()
+        # `REST` exige aussi qu'une série de travail soit DÉJÀ validée et
+        # qu'il en reste une : sinon il n'y a pas de repos à annoncer.
+        sess2 = db.execute(
+            select(WorkoutSession)
+            .where(WorkoutSession.id == session_id)
+            .options(selectinload(WorkoutSession.session_exercises)
+                     .selectinload(SessionExercise.set_logs))
+        ).scalar_one()
+        for se in sess2.session_exercises:
+            work = sorted((sl for sl in se.set_logs if sl.kind == "work"),
+                          key=lambda sl: sl.set_index)
+            if len(work) >= 2:
+                work[0].completed, work[0].weight_kg, work[0].reps = True, 60.0, 10
+        db.commit()
+    r = client.get(f"/sessions/{session_id}?rest=1")
+    assert r.status_code == 200, r.text[:300]
+    assert "rest-readout" in r.text, "l'état REST n'est pas atteint"
+    return r.text
+
+
 def test_rest_timer_has_aria_live_polite(client):
     from app.database import SessionLocal
     from app.models.user import User
@@ -114,18 +158,28 @@ def test_rest_timer_has_aria_live_polite(client):
         session = _seed(db, user.id)
         session_id = session.id
 
-    body = _render(client, session_id)
+    # MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`), ce qui est exactement la correction du défaut `D3`. Les gardes de repos conduisent donc la séance jusqu'à cet état.
+    body = _rest_body(client, session_id)
     pattern = re.compile(
-        r'<div\b[^>]*\bclass="[^"]*session-focus__rest-timer[^"]*"[^>]*\baria-live="polite"',
-        re.IGNORECASE,
+        r'<div\b[^>]*\bclass="[^"]*rest-readout[^"]*"[^>]*\baria-live="polite"',
+        re.IGNORECASE | re.DOTALL,
     )
-    assert pattern.search(body), "rest timer missing aria-live=polite"
+    assert pattern.search(body), "le RestReadout n'annonce pas aria-live=polite"
 
 
 # ───────── button types (no-JS contract) ─────────
 
 
 def test_skip_rest_is_type_button(client):
+    """**Migré, et le contrat change.** « Skip rest » — anglais,
+    `type="button"`, sans effet serveur — devient `PASSER LE REPOS`, la
+    commande DOMINANTE de l'état `REST`, et un LIEN : soumettre marquerait
+    « complétée » une série à peine commencée, puisque `completed` dérive de
+    la présence d'une valeur.
+
+    Les seuls boutons restants dans le repos sont les ±15 s, toujours
+    non critiques et toujours `type="button"`.
+    """
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -134,10 +188,18 @@ def test_skip_rest_is_type_button(client):
         session = _seed(db, user.id)
         session_id = session.id
 
-    body = _render(client, session_id)
-    m = re.search(r'<button\b[^>]*data-rest-skip[^>]*>', body, re.IGNORECASE)
-    assert m is not None, "skip rest button missing"
-    assert 'type="button"' in m.group(0), "skip rest must be type=button"
+    body = _rest_body(client, session_id)
+    assert "PASSER LE REPOS" in body
+    assert "Skip rest" not in body, "l'anglais a quitté l'interface"
+    flat = " ".join(body.split())
+    m = re.search(r"<button[^>]*data-rest-step[^>]*>", flat)
+    assert m is not None, (
+        "les ajustements ±15 s ne sont pas rendus — "
+        f"data-rest-step présent ? {'data-rest-step' in flat}"
+    )
+    assert 'type="button"' in m.group(0), (
+        "un ajustement de repos n'est jamais critique : jamais un submit"
+    )
 
 
 def test_primary_cta_is_type_submit(client):

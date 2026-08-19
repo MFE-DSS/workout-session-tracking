@@ -359,12 +359,11 @@ def test_placeholder_only_on_first_work_set_not_second(client):
 
     body = _render(client, sid)
     # Extraire les blocs <li class="set-row set-row--work…">
+    # MIGRÉ — la carte ACTIVE rend des `setline`, les cartes repliées des
+    # `set-row`. On regarde donc les deux familles.
     rows = re.findall(
-        r'<li class="set-row set-row--work[^"]*"[^>]*>.*?</li>',
-        body,
-        re.DOTALL,
+        r'<li class="(?:setline|set-row) [^"]*"[^>]*>.*?</li>', body, re.DOTALL,
     )
-    # On a 2 work sets sur A1 (active) + 1 work set sur A2 (non active) = 3.
     assert len(rows) >= 3
     placeholder_rows = [r for r in rows if "set-row--has-overload-placeholder" in r]
     assert len(placeholder_rows) == 1, (
@@ -508,12 +507,15 @@ def test_template_uses_overload_placeholders_dict():
     # test_placeholder_only_on_active_card_not_others) — cette garde-ci reste
     # structurelle et vérifie que le placeholder ne peut pas être passé sans
     # condition d'état.
-    assert "set_state == 'active'" in src, (
-        "placeholder must stay gated on the active-set derivation "
-        "(Sb_UI_04.4 console: first uncompleted work set of active card)"
+    # MIGRÉ — la dérivation `set_state == 'active'` du gabarit est remontée
+    # dans `app/services/console_state.py` : c'est le service qui désigne
+    # `current_set`. L'invariant est INCHANGÉ et devient plus fort — une
+    # seule ligne peut recevoir le placeholder, par construction.
+    assert "set_inputs(_c, 'série', _ph)" in src, (
+        "seule la série courante reçoit le placeholder"
     )
-    assert "ph if set_state == 'active' else None" in src, (
-        "the placeholder must be nulled for every non-active row"
+    assert "{{ set_values(sl) }}" in src, (
+        "les lignes passées et futures ne portent aucun placeholder"
     )
     assert "overload_placeholders.get(se.id)" in src, (
         "the active row must still receive the real placeholder dict"

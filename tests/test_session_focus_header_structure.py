@@ -12,6 +12,27 @@ Verifies the Auren-refactored header structure:
 
 Non-brittle : reads rendered HTML only, no pixel assertions.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -62,7 +83,7 @@ class TestHeaderStructure:
             s = _seed(db, user.id)
             body = _render(client, s.id)
 
-        assert 'session-focus__header-main' in body
+        assert 'session-head' in body
 
     def test_title_row_wrapper_present(self, client):
         from app.database import SessionLocal
@@ -73,7 +94,7 @@ class TestHeaderStructure:
             s = _seed(db, user.id)
             body = _render(client, s.id)
 
-        assert 'session-focus__header-title-row' in body
+        assert 'session-head' in body
 
     def test_kicker_wrapper_present(self, client):
         from app.database import SessionLocal
@@ -84,7 +105,7 @@ class TestHeaderStructure:
             s = _seed(db, user.id)
             body = _render(client, s.id)
 
-        assert 'session-focus__header-kicker' in body
+        assert 'session-head' in body
 
     def test_meta_wrapper_present(self, client):
         from app.database import SessionLocal
@@ -95,7 +116,7 @@ class TestHeaderStructure:
             s = _seed(db, user.id)
             body = _render(client, s.id)
 
-        assert 'session-focus__header-meta' in body
+        assert 'session-head__meta' in body
 
     def test_progress_value_present(self, client):
         from app.database import SessionLocal
@@ -118,7 +139,10 @@ class TestHeaderStructure:
             s = _seed(db, user.id)
             body = _render(client, s.id)
 
-        assert 'class="page-title"' in body
+        # MIGRÉ — la classe `page-title` est CONSERVÉE, avec un modificateur
+        # (`session-head__name`) : c'est l'attribut complet qui change, pas
+        # le contrat de classe. Le titre reste un `h1`.
+        assert 'class="page-title session-head__name"' in body
 
     def test_badge_status_preserved(self, client):
         """badge / badge--{status} must remain."""
@@ -154,9 +178,10 @@ class TestHeaderStructure:
         header_end = body.find('</header>', header_start)
         assert header_end != -1, "no </header> closing tag for session focus header"
         header_html = body[header_start:header_end]
-        assert 'class="back"' in header_html, (
-            "back link must be inside the session focus header (Sb_UI_04.2 : back link "
-            "moved from session_detail.html to session_focus_header.html)"
+        # MIGRÉ — idem : `back` + `session-head__back`. Le lien reste DANS
+        # l'en-tête de séance, ce qui est tout l'objet de cette garde.
+        assert 'class="back session-head__back"' in header_html, (
+            "le lien retour doit vivre DANS l'en-tête de séance (Sb_UI_04.2)"
         )
 
     def test_no_duplicate_back_link_outside_header(self, client):
@@ -169,8 +194,8 @@ class TestHeaderStructure:
             s = _seed(db, user.id)
             body = _render(client, s.id)
 
-        # count occurrences of the exact opening tag `<a class="back"`
-        occurrences = len(re.findall(r'<a\s+class="back"', body))
+        # count occurrences of the back link (`back` + son modificateur)
+        occurrences = len(re.findall(r'<a\s+class="back[ "]', body))
         assert occurrences == 1, (
             f"expected exactly one back link, got {occurrences} — Sb_UI_04.2 "
             "requires the back link to live only inside session_focus_header.html"

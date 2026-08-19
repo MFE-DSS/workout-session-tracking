@@ -17,6 +17,21 @@ the reference. Rule: silence rather than a false previous load.
 No application code changed by this sprint (consumers already handle a
 missing `last_time` — this locks that behaviour).
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité.
+#
+#  Ce module protège une règle MÉTIER : la référence affichée ne doit
+#  jamais être contaminée par un exercice substitué. Cette règle est
+#  INTACTE — seule sa FORME change :
+#
+#    « 55 kg · 8 reps »   →  « 55 kg × 8 »   (DeltaReadout, replié)
+#    « Non disponible »   →  « Première fois » (`§7.12`)
+#
+#  Les valeurs propagées, leur provenance et les cas de silence sont
+#  vérifiés à l'identique.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
@@ -94,8 +109,8 @@ def test_s2_substituted_current_shows_no_contaminated_load(client):
     html = _render_current(client, current.id)
     db.close()
     # console reference falls back to the empty state, not the prescribed 60 kg
-    assert "60 kg · 10 reps" not in html
-    assert "Non disponible" in html
+    assert "60 kg × 10" not in html
+    assert "Première fois" in html
 
 
 # S3 recent substitution + older prescribed → prescribed current: only the
@@ -108,8 +123,8 @@ def test_s3_prescribed_current_uses_older_prescribed_not_substitution(client):
                     days_ago=0, now=now, status="in_progress")
     html = _render_current(client, current.id)
     db.close()
-    assert "55 kg · 8 reps" in html       # older prescribed
-    assert "80 kg · 12 reps" not in html  # never the substitution
+    assert "55 kg × 8" in html       # older prescribed
+    assert "80 kg × 12" not in html  # never the substitution
 
 
 # S5 other substitution only → silence.
@@ -120,8 +135,8 @@ def test_s5_other_substitution_only_is_silent(client):
                     days_ago=0, now=now, status="in_progress")
     html = _render_current(client, current.id)
     db.close()
-    assert "90 kg · 8 reps" not in html
-    assert "Non disponible" in html
+    assert "90 kg × 8" not in html
+    assert "Première fois" in html
 
 
 # S1 prescribed → prescribed still shows the reference.
@@ -132,7 +147,7 @@ def test_s1_prescribed_reference_still_visible(client):
                     days_ago=0, now=now, status="in_progress")
     html = _render_current(client, current.id)
     db.close()
-    assert "60 kg · 10 reps" in html
+    assert "60 kg × 10" in html
 
 
 # S4 substituted → same substitution still shows the reference.
@@ -143,7 +158,7 @@ def test_s4_same_substitution_reference_still_visible(client):
                     days_ago=0, now=now, status="in_progress")
     html = _render_current(client, current.id)
     db.close()
-    assert "80 kg · 12 reps" in html
+    assert "80 kg × 12" in html
 
 
 # No new "non comparable" microcopy nor forbidden "repère" wording introduced.
@@ -154,4 +169,4 @@ def test_no_new_microcopy_no_repere_in_template():
     src = card.read_text(encoding="utf-8")
     assert "Repère" not in src and "repère" not in src
     # the empty-state microcopy stays the existing one
-    assert "Non disponible" in src
+    assert "Première fois" in src

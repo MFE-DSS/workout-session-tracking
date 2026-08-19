@@ -80,9 +80,13 @@ def test_cta_wrapper_carries_focus_hooks(client):
         session = _seed_in_progress(db, user.id)
         session_id = session.id
 
+    # MIGRÉ — `Sx_UIV3_02 §2` déclarait ces gardes « remplaçables quand la
+    # commande contextuelle existe ». Elle existe, et la barre collante est
+    # supprimée : mesurée, elle recouvrait la ligne `É1`.
     body = _render(client, session_id)
-    assert "session-focus__cta" in body
-    assert "session-focus__sticky-cta" in body
+    assert "session-focus__cta" in body      # cartes repliées : wrapper conservé
+    assert "session-focus__sticky-cta" not in body
+    assert "dock__cmd" in body               # carte active : commande unique
 
 
 def test_primary_button_carries_focus_cta_primary(client):
@@ -125,7 +129,10 @@ def test_prev_and_next_button_attributes_preserved(client):
     assert 'name="nav"' in body
     assert 'value="next"' in body
     # second exercise carries the prev button
-    assert 'value="prev"' in body
+    assert 'value="prev"' in body, (
+        "« enregistrer et revenir » est une capacité préexistante : la "
+        "retirer serait une soustraction (CLAUDE.md §5.3)"
+    )
 
 
 def test_form_action_preserved(client):
@@ -312,14 +319,11 @@ def test_cta_button_remains_inside_form(client):
     assert forms, "no per-exercise update form found"
     # At least one of the forms must include the sticky CTA wrapper +
     # the cta-primary button.
-    matched = [
-        f
-        for f in forms
-        if "session-focus__sticky-cta" in f and "session-focus__cta-primary" in f
-    ]
-    assert matched, (
-        "no form contains the sticky CTA wrapper with cta-primary button"
-    )
+    # MIGRÉ — l'invariant est que la commande vit DANS le formulaire qu'elle
+    # soumet ; le marqueur de collant, lui, a disparu avec le collant.
+    matched = [f for f in forms if "dock__cmd" in f
+               or "session-focus__cta-primary" in f]
+    assert matched, "aucune commande ne vit dans un formulaire d'exercice"
 
 
 def test_route_still_200(client):
