@@ -133,6 +133,32 @@ def test_correction_outranks_the_exercise_progress():
     assert st.current_set.id == 200
 
 
+def test_correction_never_renders_a_completed_set_twice():
+    """La garde que je n'avais pas écrite, et que Sonar a écrite pour moi.
+
+    `future_sets` prenait « toutes les séries sauf la corrigée », ce qui y
+    remettait les séries DÉJÀ validées — présentes aussi dans `past_sets`.
+    Une série terminée sortait donc deux fois : en `✓` et en `○`, avec le
+    même `id` d'ancre et les mêmes `name` de champs masqués.
+
+    Aucun des 34 tests neufs ni des 1178 du broad sweep ne comparait
+    `CORRECTION` à **deux** séries déjà validées. `Web:S7930` l'a vu.
+    """
+    from app.services.console_state import build_console_state
+
+    ex = _exercise(warmups_done=1, works=3, works_done=2)
+    st = build_console_state(ex, next_code="E2", fix_set_id=200)
+
+    past_ids = {s.id for s in st.past_sets}
+    future_ids = {s.id for s in st.future_sets}
+    assert past_ids & future_ids == set(), (
+        f"séries rendues deux fois : {past_ids & future_ids}"
+    )
+    # Et le futur ne contient QUE ce qui reste réellement à faire.
+    still_pending = [s.completed for s in st.future_sets]
+    assert still_pending == [False] * len(still_pending)
+
+
 def test_a_hostile_fix_parameter_is_ignored_not_fatal():
     """Un paramètre d'URL est une entrée hostile. `?fix=999999` rend la page
     normalement — refuser bruyamment ferait d'un lien mal recopié un 500."""

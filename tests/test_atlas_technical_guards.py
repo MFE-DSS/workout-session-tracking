@@ -71,7 +71,8 @@ def test_the_lead_cue_comes_from_the_atlas_not_the_template():
         f"le cue doit être LU dans l'atlas, trouvé {body!r}"
     )
     # Et rien d'écrit en dur : la seule chaîne littérale est le chevron.
-    assert "Banc à" not in body and "°" not in body
+    assert "Banc à" not in body
+    assert "°" not in body
 
 
 def test_every_atlas_machine_can_supply_a_lead_cue():
@@ -160,7 +161,8 @@ def test_the_cue_is_readable_without_javascript(client):
     # c'est celle-là qu'il ne faut pas confondre avec un repli.)
     console = src.find('<div class="console"')
     l3 = src.find('<div class="l3">')
-    assert console != -1 and l3 != -1
+    assert console != -1
+    assert l3 != -1
     assert console < start < l3, "le cue doit vivre dans la console, avant L3"
     assert "<details" not in src[console:start], (
         "aucune disclosure ne doit s'ouvrir entre la console et le cue"
@@ -198,7 +200,8 @@ def test_the_cue_sits_above_the_console_and_costs_nothing():
     src = CARD.read_text(encoding="utf-8")
     cue = src.find('<p class="console__cue">')
     band = src.find('<ol class="console__band">')
-    assert cue != -1 and band != -1
+    assert cue != -1
+    assert band != -1
     assert cue < band, "le cue précède la bande : il prépare le geste"
     # La cause historique : plus AUCUNE couche collante sur cette surface.
     assert "sticky-cta" not in src

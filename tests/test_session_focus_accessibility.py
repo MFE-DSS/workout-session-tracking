@@ -112,10 +112,11 @@ def _rest_body(client, session_id) -> str:
     les échauffements doivent donc être terminés, sinon l'état courant est
     `WARMUP` et le repos n'a rien à annoncer.
     """
-    from app.database import SessionLocal
-    from app.models.session import SessionExercise, WorkoutSession
     from sqlalchemy import select
     from sqlalchemy.orm import selectinload
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, WorkoutSession
 
     with SessionLocal() as db:
         sess = db.execute(

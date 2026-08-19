@@ -75,8 +75,8 @@
   {# `id` sur CHAQUE ligne : `stay_redirect_target` ancre sur `#set-<id>`, et
      une ancre sans cible ramène en haut de page. #}
   <li class="setline setline--past" id="set-{{ sl.id }}">
-    <span class="setline__marker" role="img"
-          aria-label="{{ prefix }}{{ sl.set_index }} validée">✓</span>
+    <span class="setline__marker" aria-hidden="true">✓</span>
+    <span class="sr-only">{{ prefix }}{{ sl.set_index }} validée</span>
     <span class="setline__code">{{ prefix }}{{ sl.set_index }}</span>
     <span class="setline__done">
       {%- if sl.weight_kg is not none %}{{ '%g' % sl.weight_kg }}{% else %}—{% endif %}
@@ -93,8 +93,8 @@
 
 {% macro future_line(sl, prefix) -%}
   <li class="setline setline--future" id="set-{{ sl.id }}">
-    <span class="setline__marker" role="img"
-          aria-label="{{ prefix }}{{ sl.set_index }} à venir">○</span>
+    <span class="setline__marker" aria-hidden="true">○</span>
+    <span class="sr-only">{{ prefix }}{{ sl.set_index }} à venir</span>
     <span class="setline__code">{{ prefix }}{{ sl.set_index }}</span>
     {{ set_values(sl) }}
   </li>
@@ -239,8 +239,8 @@
                 {{ past_line(sl, 'É', None) }}
               {% elif cs.current_set and sl.id == cs.current_set.id %}
                 <li class="setline setline--current" id="set-{{ sl.id }}">
-                  <span class="setline__marker setline__marker--current" role="img"
-                        aria-label="Échauffement {{ sl.set_index }} en cours">●</span>
+                  <span class="setline__marker setline__marker--current" aria-hidden="true">●</span>
+                  <span class="sr-only">Échauffement {{ sl.set_index }} en cours</span>
                   <span class="setline__code">É{{ sl.set_index }}</span>
                   {{ set_inputs(sl, 'échauffement', None) }}
                 </li>
@@ -266,8 +266,8 @@
             <li class="setline setline--current{% if cs.is_correcting %} setline--correcting{% endif %}{% if cs.is_resting %} setline--resting{% endif %}{% if _ph %} set-row--has-overload-placeholder{% endif %}"
                 id="set-{{ _c.id }}">
               <span class="setline__marker setline__marker--{{ 'rest' if cs.is_resting else 'current' }}"
-                    role="img"
-                    aria-label="Série {{ _c.set_index }} — {% if cs.is_resting %}repos{% elif cs.is_correcting %}en correction{% else %}en cours{% endif %}">●</span>
+                    aria-hidden="true">●</span>
+              <span class="sr-only">Série {{ _c.set_index }} — {% if cs.is_resting %}repos{% elif cs.is_correcting %}en correction{% else %}en cours{% endif %}</span>
               <span class="setline__code">S{{ _c.set_index }}</span>
               {% if cs.is_resting %}
                 {{ set_values(_c) }}
@@ -404,7 +404,10 @@
                           class="dock__alt dock__alt--back"
                           title="Enregistrer et revenir à {{ cs.prev_code }}">{{ s.label }}</button>
                 {% elif s.kind == 'review' %}
-                  <a class="dock__alt" href="#exercise-{{ se.id }}">{{ s.label }}</a>
+                  {# Même destination que `annuler` : la carte de l'exercice.
+                     Un fragment nu ne nettoierait aucun paramètre de requête. #}
+                  <a class="dock__alt"
+                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#exercise-{{ se.id }}">{{ s.label }}</a>
                 {% endif %}
               {% endfor %}
             </div>

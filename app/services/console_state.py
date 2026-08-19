@@ -181,10 +181,21 @@ def build_console_state(
     # pas être arbitrée par l'avancement de l'exercice.
     corrected = _resolve_correction(works, fix_set_id)
     if corrected is not None:
+        # `future_sets` ne contient QUE ce qui reste à faire.
+        #
+        # La première écriture prenait « toutes les séries sauf la corrigée »,
+        # ce qui y remettait les séries DÉJÀ validées — lesquelles figurent
+        # aussi dans `past_sets`. Une série terminée était alors rendue DEUX
+        # FOIS : une fois en `✓`, une fois en `○`, avec le même `id` d'ancre
+        # et les mêmes `name` de champs masqués.
+        #
+        # Trouvé par le moteur Sonar (`Web:S7930`, identifiant dupliqué), pas
+        # par les 34 gardes neuves ni par les 1178 tests du broad sweep :
+        # aucun ne comparait l'état `CORRECTION` à deux séries déjà validées.
         return ConsoleState(
             state=CORRECTION,
             current_set=corrected,
-            future_sets=[sl for sl in works if sl.id != corrected.id],
+            future_sets=list(pending_works),
             **common,
         )
 

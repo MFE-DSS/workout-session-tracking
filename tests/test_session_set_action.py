@@ -213,19 +213,22 @@ def test_the_dominant_command_posts_stay_on_a_work_set(client):
     action que si le routeur la traite**. Il est ici reporté sur la commande
     dominante de l'état `CURRENT SET`.
     """
-    from app.services.console_state import CURRENT_SET, command_for
-
+    from app.services.console_state import (
+        CURRENT_SET,
+        build_console_state,  # noqa: PLC0415
+        command_for,
+    )
     from tests.test_uiv3_session_console import _exercise  # noqa: PLC0415
-    from app.services.console_state import build_console_state  # noqa: PLC0415
 
     st = build_console_state(_exercise(warmups_done=1), next_code="E2")
     assert st.state == CURRENT_SET
     assert command_for(st)["nav"] == "stay"
 
     router = ROUTER.read_text(encoding="utf-8")
-    assert '"stay"' in router and "stay_redirect_target" in router, (
+    assert '"stay"' in router, (
         "the command may only claim the action if the router implements it"
     )
+    assert "stay_redirect_target" in router
 
 
 def test_exactly_one_dominant_command_is_rendered(client):
