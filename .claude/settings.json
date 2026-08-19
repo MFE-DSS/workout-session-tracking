@@ -98,7 +98,14 @@
       "Bash(*.venv/bin/python*)",
       "Bash(cp:*)",
       "Bash(mv /private/tmp/claude-501/**)",
-      "Bash(mv /tmp/auren-ui-lab/**)"
+      "Bash(mv /tmp/auren-ui-lab/**)",
+      "Bash(until [:*)",
+      "Bash(until gh:*)",
+      "Bash(until curl:*)",
+      "Bash(while [:*)",
+      "Bash(for i in:*)",
+      "Bash(gh:*)",
+      "Bash(git:*)"
     ]
   }
 }
