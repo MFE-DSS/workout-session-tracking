@@ -67,9 +67,14 @@ CI_PYTEST_WORKERS="${CI_PYTEST_WORKERS:-2}"
 #    n'est pas touchée : c'est là que le chiffre a été validé.
 # ---------------------------------------------------------------------------
 if ! [[ "${CI_PYTEST_WORKERS}" =~ ^[0-9]+$ ]]; then
+    # Le message ne cite PAS l'argument interdit littéralement : une garde
+    # préexistante (`test_the_canonical_runner_script_never_uses_auto`) scanne
+    # les lignes EXÉCUTABLES de ce script et n'accepte le littéral que dans un
+    # commentaire. Elle a raison — un `echo` est exécutable — et la première
+    # version de ce garde-fou l'a fait rougir sur la CI.
     echo "[ci-pytest] REFUS : CI_PYTEST_WORKERS='${CI_PYTEST_WORKERS}' n'est pas un entier." >&2
-    echo "[ci-pytest] '-n auto' est interdit ici : il a déjà rendu une mitigation invisible," >&2
-    echo "[ci-pytest] et il sature la mémoire d'un poste de développement." >&2
+    echo "[ci-pytest] La valeur speciale d'xdist est interdite ici : elle a deja rendu" >&2
+    echo "[ci-pytest] une mitigation invisible, et elle sature un poste de developpement." >&2
     exit 2
 fi
 
