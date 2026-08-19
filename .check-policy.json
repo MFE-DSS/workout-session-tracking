@@ -3,7 +3,7 @@
   "policy_version": 1,
   "principles": [
     "La CI réelle au push fait foi de non-régression globale (3 jobs). Ne jamais y toucher, ne jamais [skip ci] sur du code.",
-    "Le full sweep LOCAL n'est qu'un pré-filtre, désormais parallélisé (`pytest -n auto`, Sb_OPS.ci-efficiency). Il reste OBLIGATOIRE pour les tiers `migration` et `ci_infra`. Pour `shared_code`, la CI complète parallélisée sur PR fait office de filet : le broad sweep ciblé est le garde local obligatoire, le full sweep local devient recommandé-si-doute.",
+    "Le full sweep LOCAL n'est qu'un pré-filtre. Il s'exécute UNIQUEMENT via `bash scripts/run_ci_pytest.sh`, jamais par un `pytest -n auto` recopié : hors CI, `auto` vaut le nombre de coeurs du poste, la suite demande ~16,6 Go, la machine part en swap et emporte ce qui tourne a cote (Sb_OPS_LOCAL_SWEEP_CEILING_01). Il reste OBLIGATOIRE pour les tiers `migration` et `ci_infra`. Pour `shared_code`, la CI complete parallelisee sur PR fait office de filet : le broad sweep cible est le garde local obligatoire, le full sweep local devient recommande-si-doute.",
     "Un fichier NEUF que personne n'importe encore (service isolé) ne peut pas casser un test lointain : broad sweep ciblé suffit en local.",
     "Docs-only : aucun sweep, aucun migration check. Seul spec_protocol s'applique.",
     "En cas de doute sur le tier, remonter d'un cran (plus de checks), jamais descendre."
@@ -27,7 +27,7 @@
       "when": "Modifie un fichier de code déjà importé ailleurs (service consommé, util partagé, muscle_mapping.py, etc.) SANS toucher migration/model/schema.",
       "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "targeted_tests", "broad_sweep_scoped"],
       "skip": ["full_sweep_local"],
-      "ci_note": "Sb_OPS.ci-efficiency — la CI complète parallélisée (`pytest -n auto`) sur PR devient le filet de vérité du blast radius partagé. Le broad sweep ciblé reste le garde LOCAL obligatoire ; le full sweep local n'est PLUS systématiquement requis.",
+      "ci_note": "Sb_OPS.ci-efficiency — la CI complete parallelisee sur PR (via `scripts/run_ci_pytest.sh`, workers bornes) est le filet de verite du blast radius partage. Le broad sweep cible reste le garde LOCAL obligatoire ; le full sweep local n'est PLUS systematiquement requis, et ne se lance jamais en `-n auto`.",
       "rationale": "Modifier un fichier partagé peut casser un test lointain, mais la CI parallélisée le rejoue vite et fait foi. Le broad sweep ciblé (module + consommateurs) est le garde local obligatoire ; le full sweep local devient RECOMMANDÉ-SI-DOUTE, plus une obligation systématique (dogfood du levier xdist : un full sweep local ~4 min reste peu coûteux si on choisit de le lancer)."
     },
     "migration": {
