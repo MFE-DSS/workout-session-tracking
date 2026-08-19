@@ -234,9 +234,12 @@ suppression pour verdir.** Trois ont changé de contrat, explicitement :
 - les gardes de repos vérifiaient la **présence** du minuteur ; elles
   vérifient son **absence** hors repos — c'est la correction `D3`.
 
-**34 gardes neuves** (`test_uiv3_session_console.py`). Deux ont échoué **sur
-leur propre prose** à la première écriture — le motif que ce dépôt répète,
-attrapé cette fois à l'écriture.
+**36 gardes neuves** (`test_uiv3_session_console.py`) — 34 à l'écriture de la
+tranche, **plus deux ajoutées après le diagnostic Sonar** (`§11.2`) : celle qui
+interdit de rendre deux fois une série terminée, et la preuve d'unicité des
+ancres à travers les états rendus. Deux ont échoué **sur leur propre prose** à
+la première écriture — le motif que ce dépôt répète, attrapé cette fois à
+l'écriture.
 
 ---
 
