@@ -250,8 +250,43 @@ class TestReadinessTeaser:
 
 
 class TestDashboardPreserved:
-    def test_disponibilite_still_present(self, client):
-        assert "disponibilit" in _home(client).lower()
+    def test_disponibilite_left_the_home_but_not_the_product(self, client):
+        """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
+
+        Le KPI « disponibilité » quitte la surface de décision. Il n'est pas
+        supprimé : `compute_behavioral_state` le calcule toujours et
+        `/dashboard` le montre toujours.
+
+        **Ce test passait pour une mauvaise raison.** Après le déplacement, il
+        restait vert parce que le libellé du lien vers l'analyse contenait le
+        mot « disponibilité ». Le mot suffisait ; le KPI n'était plus là.
+        Corriger le libellé — la destination réelle ne porte pas ce KPI — l'a
+        fait tomber, ce qui est exactement ce qu'il aurait dû faire d'emblée.
+
+        Il vérifie désormais les deux moitiés de la décision : parti de
+        l'accueil, toujours présent dans le produit.
+        """
+        assert "disponibilit" not in _home(client).lower(), (
+            "le KPI appartient à la surface d'analyse, pas à celle de décision"
+        )
+        # « Déplacé, pas supprimé » se prouve au niveau du SERVICE, pas d'un mot
+        # dans une page : le rendu du dashboard dépend de l'historique, et une
+        # fixture vierge n'affiche rien. Une assertion sur le HTML serait donc
+        # verte ou rouge selon les données — exactement le genre de test qui
+        # ment plus tard.
+        from app.database import SessionLocal
+        from app.models.user import User
+        from app.services.behavioral import compute_behavioral_state
+
+        with SessionLocal() as db:
+            user = db.query(User).first()
+            state = compute_behavioral_state(db, user.id)
+        assert state.readiness_score is not None, (
+            "déplacé, pas supprimé — le moteur doit toujours le calculer"
+        )
+        assert client.get("/dashboard").status_code == 200, (
+            "la surface d'analyse doit rester atteignable"
+        )
 
     def test_nav_tiles_preserved(self, client):
         body = _home(client)
@@ -263,14 +298,17 @@ class TestDashboardPreserved:
         body = _home(client)
         hero = body.find("today-home__hero")
         zone = body.find("today-home__secondary-zone")
-        assert hero != -1 and zone != -1 and hero < zone
+        assert hero != -1, "hero absent"
+        assert zone != -1, "zone secondaire absente"
+        assert hero < zone, "la décision doit précéder le contexte"
 
     def test_analysis_is_reachable_from_the_home(self, client):
         """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
 
-        La sparkline, « séances cette sem. » et le score « disponibilité »
-        quittent l'accueil pour Progression. Trois échelles d'état
-        concurrentes vivaient sur la même page — déclarée 1–5, inférée en 4
+        La sparkline et « séances cette sem. » quittent l'accueil pour
+        `/progress` ; le score « disponibilité » vit sur `/dashboard`. Trois
+        échelles d'état concurrentes vivaient sur la même page — déclarée 1–5,
+        inférée en 4
         bandes, calculée 0–100 — dont aucune ne s'accordait avec les autres.
 
         **Rien n'est supprimé** : `compute_behavioral_state` calcule toujours,

@@ -826,8 +826,23 @@ class TestNamingAndAccessibility:
         """Additif d'abord : la tranche ne retire pas la surface héritée."""
         assert LEGACY_WIDGET_LABEL in _page(client)
 
-    def test_the_legacy_kpi_still_exists(self, client):
-        assert "disponibilité" in _page(client)
+    def test_the_legacy_kpi_left_the_home(self, client):
+        """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
+
+        `Sb_RECOVERY_HOME_CONSUMER_01` était **additive** : elle ajoutait la
+        tuile « état d'entraînement » **sans** retirer le KPI hérité, et ce
+        test le pinnait. C'était juste à l'époque.
+
+        Le problème qu'elle a créé est précisément celui que `Sx_UIV3_01`
+        ferme : trois échelles d'état sur une même page, dont deux nommées
+        presque pareil. La règle « additif d'abord » a une fin — celle où
+        l'accumulation devient le défaut.
+
+        Le KPI n'est pas supprimé du produit : il quitte la surface de
+        DÉCISION. Les tests de non-homonymie ci-dessus restent entièrement
+        valables et inchangés.
+        """
+        assert "disponibilité" not in _page(client)
 
     def test_the_tile_declares_its_provenance(self, client):
         """Ce qui distingue les deux surfaces à la lecture, pas seulement au nom."""
