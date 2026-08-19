@@ -24,6 +24,27 @@ Invariants (must NOT change):
 
 Reads rendered HTML + template/CSS source only — no pixels.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -99,22 +120,27 @@ def _body(client, **kw) -> str:
 
 class TestConsoleStructure:
     def test_console_present(self, client):
-        assert "session-focus__console" in _body(client)
+        assert "console" in _body(client)
 
     def test_console_head_and_progress(self, client):
         body = _body(client)
-        assert "session-focus__console-head" in body
-        assert "session-focus__console-progress" in body
+        assert "exercise-card__compact--active" in body
+        # MIGRÉ — la progression `1/3` de la console est supprimée : elle
+        # était la TROISIÈME formulation du même fait sur un écran
+        # (`E1/7`, `1/3 séries`, `1/3` dans la barre d'action). La bande
+        # ✓ ● ○ la porte visuellement, et le total vit dans le panneau ⋯.
+        assert "console__band" in body
 
     def test_console_progress_counts_done_over_total(self, client):
         """First exercise has 1/3 work sets done."""
         body = _body(client, sets_per=3, first_done=True)
-        assert re.search(
-            r'session-focus__console-progress-value[^>]*>\s*1\s*/\s*3\s*<', body
-        )
+        # MIGRÉ — la progression locale est portée par les marqueurs de la
+        # bande : une série validée = une ligne `setline--past`.
+        assert body.count("setline--past") >= 1
+        assert "setline--current" in body
 
     def test_console_list_present(self, client):
-        assert "session-focus__console-list" in _body(client)
+        assert "console__band" in _body(client)
 
 
 # ───────── set states ─────────
@@ -122,15 +148,15 @@ class TestConsoleStructure:
 
 class TestSetStates:
     def test_active_set_present(self, client):
-        assert "session-focus__console-row--active" in _body(client)
+        assert "setline--current" in _body(client)
 
     def test_completed_set_present(self, client):
         body = _body(client, first_done=True)
-        assert "session-focus__console-row--completed" in body
+        assert "setline--past" in body
 
     def test_upcoming_set_present(self, client):
         body = _body(client, sets_per=3, first_done=True)
-        assert "session-focus__console-row--upcoming" in body
+        assert "setline--future" in body
 
     def test_exactly_one_active_set_on_active_card(self, client):
         """Only the first uncompleted work set of the active card is active.
@@ -140,11 +166,11 @@ class TestSetStates:
         # active card is the first <details open> exercise card; count the
         # active console rows globally — only the active card renders the
         # active-set badge, and only one set per active card is active.
-        assert body.count("session-focus__console-badge") == 1
+        assert body.count("setline__marker--current") == 1
 
     def test_completed_set_has_check(self, client):
         body = _body(client, first_done=True)
-        assert "session-focus__console-check" in body
+        assert "setline__marker" in body
 
 
 # ───────── reference + target ─────────
@@ -153,7 +179,7 @@ class TestSetStates:
 class TestReferenceAndTarget:
     def test_reference_surface_present(self, client):
         body = _body(client)
-        assert "session-focus__console-ref--prev" in body
+        assert "console__delta" in body
 
     def test_target_lives_in_input_placeholder_not_console_row(self, client):
         """Sx_UI_06 D2 — the target suggestion no longer has its own console
@@ -169,14 +195,16 @@ class TestReferenceAndTarget:
         """Synthetic exercises have no prior session ⇒ conservative
         fallback 'Non disponible', never an invented performance."""
         body = _body(client)
-        assert "Non disponible" in body
+        # MIGRÉ — `§7.12` : sans référence, le produit DIT « Première fois ».
+        # « Non disponible » occupait une ligne entière pour ne rien dire.
+        assert "Première fois" in body
 
     def test_target_console_row_removed(self, client):
         """Sx_UI_06 D2 — the « Cible » console row (and its « Objectif à
         qualifier » fallback) is removed; the reference-previous row stays."""
         body = _body(client)
         assert "Objectif à qualifier" not in body
-        assert "session-focus__console-ref--prev" in body
+        assert "console__delta" in body
 
 
 # ───────── progression guidance ─────────
@@ -259,8 +287,11 @@ class TestCockpitStillIntact:
         assert 'id="session-feedback"' in _body(client)
 
     def test_rest_timer_contracts_preserved(self, client):
+        """MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`). Le
+        rendre en permanence est PRÉCISÉMENT ce qui a masqué le défaut `D3` :
+        le bloc était là, non démarré, et le JS partait quand même."""
         body = _body(client)
-        assert "data-rest-display" in body or "session-focus__rest-timer" in body
+        assert "data-rest-display" not in body
 
 
 # ───────── no framework leak ─────────

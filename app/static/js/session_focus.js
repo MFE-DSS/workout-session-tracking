@@ -1,37 +1,53 @@
-/* Sb_29.4 — Rest timer (progressive enhancement).
+/* Repos — amélioration progressive. `Sx_UIV3_02 §7.5`, amendement C.
  *
- * Contrat verbatim Sb_29.4 :
- * - JS vanilla uniquement (aucun import, aucun framework, aucun bundler).
- * - Aucune requête réseau.
- * - Aucune action critique ne dépend de ce JS (no-JS fallback intégral).
- * - Lecture des éléments via data-start-rest / data-rest-duration.
- * - Countdown 90s par défaut si aucune durée valide.
- * - setInterval avec cleanup propre (clearInterval) à 0 ou sur skip.
- * - Bouton skip via data-rest-skip.
- * - Respect prefers-reduced-motion (pas d'animation introduite).
- * - Aucune erreur si aucun timer DOM présent.
+ * LE DÉFAUT QUE CE FICHIER CORRIGE (Sx_UIV3_02B §D3)
+ * --------------------------------------------------
+ * La version précédente démarrait le décompte sur TOUT élément portant
+ * `[data-start-rest]` — attribut rendu inconditionnellement par le gabarit.
+ * Le serveur émettait bien `data-rest-started` après un `nav=stay`, donc
+ * après une série réellement enregistrée ; **personne ne lisait cet
+ * attribut**. Mesuré au navigateur, sur une URL sans `rest=1` et sans
+ * qu'aucune série n'ait été saisie : `running=True, 89s`.
+ *
+ * Autrement dit : le minuteur de repos tournait PENDANT la série.
+ *
+ * Deux tests couvraient le sujet et n'assertaient que la présence de la
+ * chaîne dans le HTML — ni l'un ni l'autre n'exerçait le comportement. Le
+ * contrat était écrit, publié, gardé, et inopérant.
+ *
+ * LE CONTRAT MAINTENANT
+ * ---------------------
+ * - Le décompte ne démarre QUE si le serveur a posé `data-rest-started`.
+ * - `±15 s` ajuste l'affichage, **rien n'est persisté** : la durée est un
+ *   repli de présentation, pas une prescription (amendement C).
+ * - Aucune action critique n'en dépend : sans JS, l'utilisateur lit
+ *   « Repos suggéré · 1:30 » et `PASSER LE REPOS` reste un lien fonctionnel.
+ * - Aucun réseau, aucun framework, aucun bundler, aucune dépendance.
  */
 (function () {
   "use strict";
 
-  var DEFAULT_REST_SECONDS = 90;
+  var FALLBACK_SECONDS = 90;
+  var STEP_SECONDS = 15;
+  var FLOOR_SECONDS = 0;
+  var CEILING_SECONDS = 600;
 
   function parseDuration(el) {
-    var raw =
-      el.getAttribute("data-rest-duration") ||
-      el.getAttribute("data-start-rest");
-    var n = parseInt(raw, 10);
+    var n = parseInt(el.getAttribute("data-rest-duration"), 10);
     if (!isFinite(n) || n <= 0) {
-      return DEFAULT_REST_SECONDS;
+      return FALLBACK_SECONDS;
     }
     return n;
   }
 
+  /* `1:30`, pas `90s` — une durée de repos se lit en minutes:secondes. */
   function format(seconds) {
     if (seconds <= 0) {
-      return "Repos terminé";
+      return "terminé";
     }
-    return seconds + "s";
+    var m = Math.floor(seconds / 60);
+    var s = seconds % 60;
+    return m + ":" + (s < 10 ? "0" : "") + s;
   }
 
   function startTimer(root) {
@@ -39,48 +55,72 @@
     if (!display) {
       return;
     }
-    var remaining = parseDuration(root);
-    display.textContent = format(remaining);
-    root.classList.add("session-focus__rest-timer--running");
 
+    var remaining = parseDuration(root);
     var intervalId = null;
 
-    function stop() {
+    function paint() {
+      display.textContent = format(remaining);
+    }
+
+    function stop(doneClass) {
       if (intervalId !== null) {
         clearInterval(intervalId);
         intervalId = null;
       }
       root.classList.remove("session-focus__rest-timer--running");
-      root.classList.add("session-focus__rest-timer--done");
+      if (doneClass) {
+        root.classList.add("session-focus__rest-timer--done");
+      }
     }
 
     function tick() {
       remaining -= 1;
       if (remaining <= 0) {
-        display.textContent = format(0);
-        stop();
+        remaining = 0;
+        paint();
+        stop(true);
         return;
       }
-      display.textContent = format(remaining);
+      paint();
     }
 
+    function adjust(delta) {
+      remaining = Math.min(CEILING_SECONDS,
+                           Math.max(FLOOR_SECONDS, remaining + delta));
+      paint();
+      if (remaining === 0) {
+        stop(true);
+      }
+    }
+
+    paint();
+    root.classList.add("session-focus__rest-timer--running");
     intervalId = setInterval(tick, 1000);
 
-    var skipBtn = root.querySelector("[data-rest-skip]");
-    if (skipBtn) {
-      skipBtn.addEventListener("click", function (ev) {
-        ev.preventDefault();
-        remaining = 0;
-        display.textContent = format(0);
-        stop();
-      });
+    /* `±15 s` n'existe que si JS tourne : sans lui, la valeur affichée est
+       un repli statique et il n'y a rien à ajuster. Les boutons sont donc
+       rendus `hidden` et révélés ici. L'ajustement NE PERSISTE PAS. */
+    var steps = root.querySelectorAll("[data-rest-step]");
+    for (var i = 0; i < steps.length; i++) {
+      (function (btn) {
+        btn.hidden = false;
+        btn.addEventListener("click", function (ev) {
+          ev.preventDefault();
+          var d = parseInt(btn.getAttribute("data-rest-step"), 10);
+          adjust(isFinite(d) ? d : 0);
+        });
+      })(steps[i]);
     }
   }
 
   function init() {
-    var roots = document.querySelectorAll("[data-start-rest]");
+    /* LA CORRECTION : `data-rest-started` — posé par le serveur uniquement
+       après une série réellement enregistrée — et non `[data-start-rest]`,
+       qui était rendu sur toute carte active. */
+    var roots = document.querySelectorAll("[data-rest-started]");
     if (!roots || roots.length === 0) {
-      return;
+      return;   /* aucune racine : rien à faire, et surtout aucune erreur */
     }
     for (var i = 0; i < roots.length; i++) {
       startTimer(roots[i]);

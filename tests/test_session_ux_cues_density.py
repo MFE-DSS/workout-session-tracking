@@ -8,6 +8,23 @@ unchanged; no information removed; no-JS.
 Template-only (+ minimal CSS for the summary affordance); no
 route/service/data/model change.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  Migré par `UIV3_SESSION_EXECUTION_CONSOLE_01` (2026-08-19)
+#  ─────────────────────────────────────────────────────────────────────
+#  Les marqueurs `session-focus__console-list`,
+#  `session-focus__console-row-prev` et `session-focus__sticky-cta`
+#  épinglaient une IMPLÉMENTATION que la spec `Sx_UIV3_02` remplace :
+#
+#    · la console devient `.console__band` (trois positions temporelles) ;
+#    · le rappel de charge devient le `DeltaReadout` (`.console__delta`) ;
+#    · la barre d'action collante est SUPPRIMÉE — mesurée, elle recouvrait
+#      la ligne `É1` et n'existait que parce que la commande était loin.
+#
+#  L'INVARIANT — l'action précède le détail dans l'ordre SOURCE, pour que
+#  le clavier la rencontre en premier — est conservé tel quel.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -19,6 +36,8 @@ EXERCISE_CARD = ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
 FOCUS_CSS = ROOT / "app" / "static" / "css" / "session_focus.css"
 JS_DIR = ROOT / "app" / "static" / "js"
 
+
+# MIGRÉ — la succession verticale « console → alternatives → cues » devient UNE ligne L3 : `TECHNIQUE · ADAPTER · HISTORIQUE`, aucune dépliée par défaut. L'invariant conservé est que TOUT le L3 vient APRÈS la console dans l'ordre SOURCE, pour que le clavier rencontre l'action avant le détail.
 
 def _src():
     return EXERCISE_CARD.read_text(encoding="utf-8")
@@ -67,22 +86,23 @@ def _body(client, n=2):
 
 
 def test_cues_rendered_in_details(client):
+    """MIGRÉ — `TECHNIQUE`, `ADAPTER` et `HISTORIQUE` sont désormais TROIS FRÈRES sur UNE ligne L3, aucun déplié par défaut. L'ordre entre eux n'est plus une hiérarchie mais un rangement de gauche à droite ; l'invariant qui compte — tout le L3 vient APRÈS la console — est vérifié séparément."""
     body = _body(client)
-    assert '<details class="session-focus__cues">' in body
+    assert '<details class="l3__item session-focus__cues">' in body
 
 
 def test_cues_details_not_open(client):
     body = _body(client)
-    # no `open` attribute on the cues details
-    assert '<details class="session-focus__cues" open' not in body
-    m = re.search(r'<details class="session-focus__cues"[^>]*>', body)
+    m = re.search(r'<details class="l3__item session-focus__cues"[^>]*>', body)
     assert m is not None
-    assert " open" not in m.group(0)
+    assert " open" not in m.group(0), (
+        "aucune disclosure L3 ne s'ouvre par défaut (budget de densité)"
+    )
 
 
 def test_summary_cues_techniques_present(client):
     body = _body(client)
-    assert '<summary class="session-focus__cues-title">Cues techniques</summary>' in body
+    assert 'session-focus__cues-title' in body
 
 
 def test_cues_list_or_fallback_present(client):
@@ -102,7 +122,7 @@ def test_cues_content_classes_preserved():
 
 def test_cues_rendered_once(client):
     body = _body(client)
-    assert body.count('session-focus__cues"') == 1
+    assert body.count('<details class="l3__item session-focus__cues">') == 1
 
 
 # ───────── order invariants (01.2 / 01.2b preserved) ─────────
@@ -110,28 +130,32 @@ def test_cues_rendered_once(client):
 
 def test_console_before_alternatives(client):
     body = _body(client)
-    assert body.find("session-focus__console-list") < body.find('session-focus__alternatives"') \
-        or 'session-focus__alternatives"' not in body  # drawer absent for synthetic exos
+    assert body.find("console__band") < body.find('session-focus__alternatives') \
+        or 'session-focus__alternatives' not in body  # drawer absent for synthetic exos
     # assert on source where the block literally lives
     src = _src()
-    assert src.find("session-focus__console-list") < src.find('session-focus__alternatives"')
+    assert src.find("console__band") < src.find('session-focus__alternatives')
 
 
-def test_alternatives_before_cues():
+def test_alternatives_and_cues_share_the_l3_line():
+    """MIGRÉ — `TECHNIQUE`, `ADAPTER` et `HISTORIQUE` sont désormais TROIS FRÈRES sur UNE ligne L3, aucun déplié par défaut. L'ordre entre eux n'est plus une hiérarchie mais un rangement de gauche à droite ; l'invariant qui compte — tout le L3 vient APRÈS la console — est vérifié séparément."""
     src = _src()
-    assert src.find('session-focus__alternatives"') < src.find('session-focus__cues"')
+    l3 = src.find('<div class="l3">')
+    assert l3 != -1
+    assert src.find("session-focus__cues", l3) != -1
+    assert src.find("session-focus__alternatives", l3) != -1
 
 
 def test_console_before_cues(client):
     body = _body(client)
-    assert body.find("session-focus__console-list") < body.find('session-focus__cues"')
+    assert body.find("console__band") < body.find('session-focus__cues')
 
 
 # ───────── neighbouring features preserved ─────────
 
 
 def test_previous_load_hint_present():
-    assert "session-focus__console-row-prev" in _src()
+    assert "console__delta" in _src()
 
 
 def test_bodymap_silhouette_present():
@@ -145,7 +169,7 @@ def test_substitutions_present():
 
 
 def test_sticky_cta_present(client):
-    assert "session-focus__sticky-cta" in _body(client)
+    assert "dock__cmd" in _body(client)
 
 
 def test_set_inputs_present(client):

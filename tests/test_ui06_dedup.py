@@ -13,6 +13,23 @@ Locks the de-densification of the exercise card, per the accepted spec
 Guarantees the redundancy is gone WITHOUT weakening the logging contract
 (input names, form, no-JS) and WITHOUT losing information on non-active cards.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  Migré par `UIV3_SESSION_EXECUTION_CONSOLE_01` (2026-08-19)
+#  ─────────────────────────────────────────────────────────────────────
+#  Ce module épinglait des marqueurs d'IMPLÉMENTATION que `Sx_UIV3_02`
+#  remplace. Les renommages sont mécaniques ; les invariants sont
+#  inchangés. Là où le contrat lui-même change, le test porte une note
+#  explicite — jamais une suppression silencieuse.
+#
+#    session-focus__console        → console__band
+#    session-focus__console-list   → console__band
+#    session-focus__console-refs   → console__delta
+#    session-focus__console-row-*  → setline--*
+#    session-focus__sticky-cta     → dock (plus AUCUN collant)
+#    session-focus__set-action     → dock__cmd (commande unique)
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -35,12 +52,16 @@ def _body(client) -> str:
 
 
 def test_active_card_has_no_last_time_block(client):
-    """The active card carries the previous load ONLY via the console
-    « Référence précédente », not the redundant « Dernière fois » head block."""
+    """La carte active porte la référence UNIQUEMENT via le `DeltaReadout`,
+    jamais via le bloc « Dernière fois » redondant.
+
+    MIGRÉ : le libellé « Référence précédente » devient « Réf. dernière » et
+    le bloc se place AVANT le `SetInstrument` (amendement A). L'invariant —
+    une seule surface de référence sur la carte active — est inchangé.
+    """
     body = _body(client)
-    # console reference exists (previous load surface on the active card)
-    assert "session-focus__console-ref--prev" in body
-    assert "Référence précédente" in body
+    assert "console__delta" in body
+    assert "Réf. dernière" in body or "Première fois" in body
 
 
 def test_last_time_block_still_present_on_non_active_cards(client):
@@ -56,10 +77,10 @@ def test_previous_load_not_duplicated_on_active_card(client):
     previous load near the inputs; the console does not also render a
     « Dernière fois » label inside itself."""
     body = _body(client)
-    # console block present…
-    assert "session-focus__console-refs" in body
-    # …and the reference label used in the console is the console one.
-    assert "Référence précédente" in body
+    assert "console__delta" in body
+    # Une seule surface de référence : jamais le doublon de l'ancien rendu.
+    assert "Référence précédente" not in body
+    assert body.count("Réf. dernière") <= 1
 
 
 # ───────── D2 : target lives only in the input placeholder ─────────
@@ -93,8 +114,8 @@ def test_logging_input_names_unchanged(client):
 
 def test_console_still_present(client):
     body = _body(client)
-    assert "session-focus__console" in body
-    assert "Référence précédente" in body
+    assert "console__band" in body
+    assert "dock__cmd" in body, "la console porte une commande dominante"
 
 
 # ───────── Sb_UI_06.2 : Worked Area density cleanup (D3) ─────────

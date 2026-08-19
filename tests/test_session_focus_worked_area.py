@@ -26,6 +26,23 @@ Invariants (must NOT change):
 
 Reads rendered HTML + template/CSS source only — no pixels.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  Migré par `UIV3_SESSION_EXECUTION_CONSOLE_01` (2026-08-19)
+#  ─────────────────────────────────────────────────────────────────────
+#  Ce module épinglait des marqueurs d'IMPLÉMENTATION que `Sx_UIV3_02`
+#  remplace. Les renommages sont mécaniques ; les invariants sont
+#  inchangés. Là où le contrat lui-même change, le test porte une note
+#  explicite — jamais une suppression silencieuse.
+#
+#    session-focus__console        → console__band
+#    session-focus__console-list   → console__band
+#    session-focus__console-refs   → console__delta
+#    session-focus__console-row-*  → setline--*
+#    session-focus__sticky-cta     → dock (plus AUCUN collant)
+#    session-focus__set-action     → dock__cmd (commande unique)
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -211,10 +228,10 @@ class TestAlternativesSurface:
 
 class TestInvariantsIntact:
     def test_logging_console_present(self, client):
-        assert "session-focus__console" in _body(client)
+        assert "console__band" in _body(client)
 
     def test_active_set_present(self, client):
-        assert "session-focus__console-row--active" in _body(client)
+        assert "setline--current" in _body(client)
 
     def test_worked_area_title_present(self, client):
         assert "session-focus__worked-area-title" in _body(client)
@@ -243,8 +260,10 @@ class TestInvariantsIntact:
         assert 'id="session-feedback"' in _body(client)
 
     def test_rest_timer_contracts_preserved(self, client):
+        """MIGRÉ par `UIV3_SESSION_EXECUTION_CONSOLE_01` : le minuteur n'existe plus que dans l'état `REST` (`Sx_UIV3_02 §7.2`). Le rendre en permanence est précisément ce qui a masqué le défaut `D3` — le bloc était là, non démarré, et le JS partait quand même. Le contrat conservé est que le minuteur n'est JAMAIS requis pour enregistrer."""
         body = _body(client)
-        assert "data-rest-display" in body or "session-focus__rest-timer" in body
+        assert "data-rest-display" not in body
+        assert 'name="nav"' in body, "enregistrer ne dépend pas du minuteur"
 
 
 # ───────── no framework leak ─────────

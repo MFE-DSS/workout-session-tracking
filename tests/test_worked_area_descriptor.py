@@ -161,12 +161,17 @@ def test_focus_mode_contracts_preserved(client):
     db.close()
     html = _render(client, s.id)
     # logging console still present (active card cockpit)
-    assert "session-focus__console" in html
+    # MIGRÉ — la console devient `.console` / `.console__band`.
+    assert 'class="console"' in html
     assert "weight_kg" in html and "reps" in html  # set logging inputs
     # worked area list rows still present
     assert "session-focus__worked-area-list" in html
     # rest timer contract preserved (data-* attributes)
-    assert "data-rest" in html or "rest-timer" in html or "session-focus__rest" in html
+    # MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`), ce qui
+    # est la correction du défaut `D3`. Hors repos, son absence EST le
+    # contrat. La commande dominante, elle, est toujours là.
+    assert "data-rest-display" not in html
+    assert "dock__cmd" in html
 
 
 # ───────── 8-10. isolation (services / models untouched) ─────────

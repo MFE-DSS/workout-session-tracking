@@ -127,40 +127,44 @@ def test_the_set_level_action_is_real_and_wired():
     le routeur. La règle de fond est inchangée : **l'UI ne montre pas une
     action que le backend n'a pas.**
     """
-    src = CARD.read_text(encoding="utf-8")
-    match = re.search(
-        r"<button[^>]*session-focus__set-action[^>]*>.*?</button>",
-        src, re.DOTALL,
+    src = " ".join(CARD.read_text(encoding="utf-8").split())
+    assert 'type="submit" name="nav" value="{{ cmd.nav }}" class="dock__cmd"' in src, (
+        "la commande dominante n'est plus un submit natif"
     )
-    assert match, "set-level action missing"
-    block = match.group(0)
-    assert 'value="stay"' in block, "the action must carry the stay nav value"
-    assert 'type="submit"' in block, "it must be a native submit, not JS-gated"
 
-    # Elle vit dans la zone d'action, pas dans la ligne de série : mesuré,
-    # la placer dans la ligne débordait le viewport (393 px pour 360) puis,
-    # une fois sur sa propre ligne de grille, repoussait la série courante
-    # SOUS le CTA collant — annulant l'écart gagné par la tranche précédente.
-    assert "session-focus__sticky-cta" in src
+    # MIGRÉ — la commande ne vit plus dans une barre collante : elle vit dans
+    # la console, au-dessus du pli, ce qui rend le collant inutile. Mesuré,
+    # ce collant recouvrait la ligne `É1`.
+    assert "session-focus__sticky-cta" not in src
 
+    # La règle de fond est INCHANGÉE : l'UI ne montre jamais une action que
+    # le routeur n'implémente pas.
     router = (pathlib.Path(__file__).resolve().parent.parent
               / "app/routers/sessions.py").read_text(encoding="utf-8")
-    assert 'nav_direction == "stay"' in router, (
-        "the UI must never claim an action the router does not implement"
-    )
+    for nav in ('"stay"', '"stay_norest"', '"prev"'):
+        assert nav in router, nav
 
 
 # ───────── 3. ordre CURRENT-FIRST, en SOURCE ─────────
 
 
 def test_current_set_is_rendered_before_completed_sets():
+    # MIGRÉ — l'amendement B remplace « courante d'abord, historique
+    # ensuite » par TROIS POSITIONS TEMPORELLES : passé compact, courante
+    # développée, futur compact. L'utilisateur lit passé/maintenant/après
+    # d'un coup d'œil. L'invariant conservé : une SEULE surface de saisie,
+    # et c'est la courante.
     src = CARD.read_text(encoding="utf-8")
-    current = src.find("work_set_list([_current_set]")
-    completed = src.find("session-focus__completed-sets")
-    assert current != -1, "current-set render site missing"
-    assert completed != -1, "completed-set history missing"
-    assert current < completed, (
-        "the current set must be emitted before the completed-set history"
+    assert "setline--past" in src
+    assert "setline--current" in src
+    assert "setline--future" in src
+    # `set_inputs` (la surface de saisie) n'est appelée que pour la ligne
+    # courante et pour l'échauffement — jamais pour une ligne passée ou
+    # future, qui portent `set_values` (des hidden).
+    body = src[src.find("{% macro past_line"):]
+    past = body[:body.find("endmacro")]
+    assert "set_inputs" not in past, (
+        "une ligne passée ne doit pas ouvrir une seconde surface de saisie"
     )
 
 
@@ -168,11 +172,17 @@ def test_completed_and_warmup_history_stay_editable_in_the_dom():
     """Repliés, mais jamais retirés : un `details` fermé soumet ses
     contrôles, donc la sérialisation est identique."""
     src = CARD.read_text(encoding="utf-8")
-    assert "session-focus__completed-sets" in src
-    assert "session-focus__warmup-recap" in src
-    # les deux passent par la MÊME macro que la série courante
-    assert src.count("work_set_list(") >= 4
-    assert "warmup_block(" in src
+    assert "setline--past" in src
+    assert "warmup-recap" in src
+    # MIGRÉ — les valeurs passées ne sont plus éditables SUR PLACE : elles
+    # sont conservées en `hidden` (donc postées à l'identique) et rouvertes
+    # explicitement par l'état `CORRECTION`. C'est le §7.4 : la correction
+    # existait déjà mais était MUETTE, aucune affordance ne la signalait.
+    assert "macro set_values(sl)" in src
+    assert 'type="hidden"' in src
+    assert "setline__fix" in src, "l'affordance de correction doit être visible"
+    # L'échauffement replié, lui, reste directement saisissable.
+    assert "setline--warmup-done" in src
 
 
 def test_no_css_order_is_used_to_fake_the_hierarchy():

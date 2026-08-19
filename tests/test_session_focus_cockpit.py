@@ -23,6 +23,27 @@ Asserts:
 
 Non-brittle : reads rendered HTML + CSS file content only, no pixels.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import re
@@ -96,25 +117,27 @@ class TestCockpitShell:
 
     def test_orientation_present(self, client):
         body = _body(client)
-        assert "session-focus__orientation" in body
-        assert "session-focus__orientation-current" in body
+        assert "session-pos" in body
+        assert "session-pos__current" in body
         assert "session-focus__orientation-remaining" in body
 
     def test_orientation_counter_renders_position_over_total(self, client):
-        """Orientation must show current/total like 1 / 3."""
+        """MIGRÉ — l'orientation `E1 / 7` a rejoint la ligne d'en-tête et
+        est devenue le DÉCLENCHEUR de navigation (correction opérateur) :
+        elle décrivait la position sans être actionnable, pendant qu'un menu
+        voisin permettait d'en changer. Le compteur reste le même."""
         body = _body(client, n=3)
-        # current in its span, total in its span
         assert re.search(
-            r'session-focus__orientation-current[^>]*>\s*\d+\s*<', body
-        )
+            r'session-pos__current[^>]*>E\s*\d+\s*<', body
+        ), body[body.find("session-pos"):][:200]
         assert re.search(
-            r'session-focus__orientation-total[^>]*>\s*3\s*<', body
+            r'session-pos__total[^>]*>\s*3\s*<', body
         )
 
     def test_mini_stepper_present(self, client):
         body = _body(client)
         assert "session-focus__stepper" in body
-        assert "session-focus__stepper-item" in body
+        assert "ex-jump__item" in body
 
     def test_stepper_preserves_anchors(self, client):
         """Every exercise must remain addressable via #exercise-{id}."""
@@ -133,8 +156,8 @@ class TestCockpitShell:
 class TestCockpitHero:
     def test_intent_shell_present(self, client):
         body = _body(client)
-        assert "session-focus__intent" in body
-        assert "session-focus__intent-text" in body
+        assert "console__target" in body
+        assert "console__target" in body
 
     def test_worked_area_panel_present(self, client):
         body = _body(client)
@@ -172,11 +195,13 @@ class TestCockpitHero:
         assert "session-focus__cues" in body
         assert "session-focus__cues-title" in body
 
-    def test_hero_only_on_active_card(self, client):
-        """The cockpit hero (intent+worked area+cues) is rendered once,
-        on the active card only — not per exercise."""
+    def test_console_only_on_active_card(self, client):
+        """MIGRÉ — le « hero » disparaît : l'identité vit dans le résumé de
+        la carte active et le reste est la console. L'invariant demeure —
+        UNE seule carte porte la surface d'exécution, jamais sept."""
         body = _body(client, n=3)
-        assert body.count("session-focus__cockpit-hero") == 1
+        assert body.count('class="console"') == 1
+        assert body.count('class="dock"') == 1
 
 
 # ───────── up next ─────────
@@ -202,10 +227,12 @@ class TestUpNext:
         set weight_kg/reps inputs."""
         card = EXERCISE_CARD.read_text(encoding="utf-8")
         # locate the up-next aside block and assert no weight input inside it
+        # MIGRÉ — l'`aside` de quatre lignes devient UNE ligne, rendue à la
+        # fin de l'exercice, au seul moment où « et après ? » se pose.
         m = re.search(
-            r'<aside[^>]*session-focus__up-next.*?</aside>', card, re.DOTALL
+            r'<p class="console__next[^>]*>.*?</p>', card, re.DOTALL
         )
-        assert m is not None, "up-next aside block not found"
+        assert m is not None, "ligne up-next introuvable"
         assert "set_" not in m.group(0)
         assert "weight_kg" not in m.group(0)
 
@@ -259,7 +286,9 @@ class TestRestTimerContracts:
         """data-* rest timer hooks must still be present on active card."""
         body = _body(client)
         # rest timer is rendered on the active card
-        assert "data-rest-display" in body or "session-focus__rest-timer" in body
+        # MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`).
+        # Le rendre en permanence est ce qui a masqué le défaut `D3`.
+        assert "data-rest-display" not in body
 
 
 # ───────── no-JS / no-framework invariants ─────────

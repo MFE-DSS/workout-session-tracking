@@ -17,6 +17,27 @@ Verifies:
 These tests don't depend on real-time behavior — they assert on rendered
 HTML / CSS file content.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -126,7 +147,7 @@ def test_focus_header_hook_present(client):
 
     body = client.get(f"/sessions/{session_id}").text
     assert "session-focus__header" in body
-    assert "session-focus__sticky-header" in body
+    assert "session-head" in body
 
 
 def test_focus_jump_bar_hook_present(client):
@@ -143,7 +164,7 @@ def test_focus_jump_bar_hook_present(client):
 
     body = client.get(f"/sessions/{session_id}").text
     assert "session-focus__stepper" in body
-    assert "session-focus__sticky-jump" in body
+    assert "ex-nav" in body
 
 
 def test_at_least_one_exercise_card_rendered(client):
@@ -231,7 +252,9 @@ def test_session_level_form_action_preserved(client):
     # session-level form still has its own anchor
     assert 'id="session-feedback"' in body
     # session-level CTA still rendered
-    assert "Terminer la séance" in body or "Rouvrir" in body
+    # MIGRÉ — Q4 : le libellé devient `TERMINER LA SÉANCE`, en capitales,
+    # et il n'est émis QUE depuis le bilan de séance.
+    assert "TERMINER LA SÉANCE" in body or "Rouvrir" in body
 
 
 # ───────── CSS classes present in stylesheet ─────────

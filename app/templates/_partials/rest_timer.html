@@ -1,50 +1,45 @@
-{# Sb_29.4 — Rest timer (progressive enhancement, no-JS friendly).
+{# `RestReadout` — `Sx_UIV3_02 §7.5` + amendement C.
 
-   Contrat :
-   - Affichage statique no-JS : "Repos suggéré : 90s"
-   - Si JS activé : countdown vanilla via app/static/js/session_focus.js
-   - Bouton "Skip rest" type="button", non critique (n'envoie aucun POST)
-   - Aucune action critique ne dépend de ce timer
-   - Aucune persistance V1
-   - Aucune nouvelle route, aucun modèle, aucune migration
-   - Hooks DOM :
-     * data-rest-duration="<seconds>" : durée demandée
-     * data-start-rest="<seconds>"    : signal de démarrage (OQ-C)
-     * data-rest-skip                  : bouton skip
-     * .session-focus__rest-timer__countdown : cible affichage JS
-   - prefers-reduced-motion respecté côté JS (pas d'animation ici)
+   CE QUE CE BLOC AFFIRME, ET CE QU'IL N'AFFIRME PAS
+   -------------------------------------------------
+   90 s est un **repli de présentation, jamais une prescription**. AUREN ne
+   dit pas « toujours 90 secondes » : la littérature récente trouve un petit
+   avantage hypertrophique aux repos > 60 s sans avantage clairement détecté
+   au-delà de 90 s, avec une variabilité réelle selon l'exercice et
+   l'objectif. Un `rest_target_seconds` par exercice serait une prescription,
+   donc une feature métier séparée — pas un glissement dans ce chantier UI.
 
-   Variable optionnelle :
-   - rest_seconds (int, défaut 90)
+   L'ajustement `±15 s` **ne persiste pas**.
+
+   `data-rest-started` est posé par le serveur (`rest=1`, émis après un
+   `nav=stay`), et c'est LE SEUL déclencheur du décompte. La version
+   précédente démarrait sur `data-start-rest`, rendu inconditionnellement :
+   le minuteur tournait pendant la série (`Sx_UIV3_02B §D3`).
+
+   Sans JS : le texte statique est lu, `PASSER LE REPOS` reste un lien
+   fonctionnel dans le `CommandDock`, et la sauvegarde n'a jamais dépendu de
+   ce bloc.
 #}
-{# Sb_SESSION_SET_ACTION_01 — le départ du repos devient un ÉVÉNEMENT
-   SERVEUR. `rest_active` est posé par le routeur après un `nav=stay`, donc
-   après une série réellement enregistrée : le repos ne peut plus démarrer
-   sur une action qui n'a rien sauvegardé.
-
-   Rien n'est persisté et rien n'est critique : sans JS, l'utilisateur lit
-   que le repos a commencé et continue de saisir ; la sauvegarde n'a jamais
-   dépendu de ce bloc et n'en dépend toujours pas. Un historique durable des
-   temps de repos demanderait une migration → Sb_REST_EVENT_TRACE_01. #}
 {% set rest_seconds = rest_seconds | default(90) %}
 {% set rest_started = rest_active | default(false) %}
+{% set _m = rest_seconds // 60 %}
+{% set _s = rest_seconds % 60 %}
 <div
-  class="session-focus__rest-timer"
+  class="session-focus__rest-timer rest-readout"
   data-rest-duration="{{ rest_seconds }}"
-  data-start-rest="{{ rest_seconds }}"
   {% if rest_started %}data-rest-started="1"{% endif %}
   role="status"
   aria-live="polite"
 >
-  <span class="session-focus__rest-timer__label">{% if rest_started %}Repos en cours&nbsp;:{% else %}Repos suggéré&nbsp;:{% endif %}</span>
+  <span class="rest-readout__label">{% if rest_started %}Repos en cours{% else %}Repos suggéré{% endif %}</span>
   <span
-    class="session-focus__rest-timer__countdown"
+    class="rest-readout__value session-focus__rest-timer__countdown"
     data-rest-display
-  >{{ rest_seconds }}s</span>
-  <button
-    type="button"
-    class="btn btn--ghost session-focus__rest-timer__skip session-focus__tap-target"
-    data-rest-skip
-    aria-label="Passer le repos"
-  >Skip rest</button>
+  >{{ _m }}:{{ '%02d' % _s }}</span>
+  {# Révélés par le JS. Sans JS il n'y a rien à ajuster : la valeur affichée
+     est statique, et les masquer évite un contrôle qui ne ferait rien. #}
+  <button type="button" class="rest-readout__step" data-rest-step="-15"
+          hidden aria-label="−15 s de repos">−15 s</button>
+  <button type="button" class="rest-readout__step" data-rest-step="15"
+          hidden aria-label="+15 s de repos">+15 s</button>
 </div>

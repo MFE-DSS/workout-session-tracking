@@ -67,7 +67,17 @@ def _insert_prior(client, *, exercise_code, exercise_name, work_sets, slug="push
 
 
 def test_prev_load_hint_on_active_row_when_data(client):
-    """With a prior session, the active set row shows the discreet reminder."""
+    """**Migre T5 -> T3** par `UIV3_SESSION_EXECUTION_CONSOLE_01`.
+
+    Le rappel vivait DANS la ligne de serie, en `aria-hidden`, double par un
+    bloc « Reference precedente » plus haut. L'amendement A de l'operateur en
+    fait un `DeltaReadout` unique, place juste AVANT le `SetInstrument` :
+    « qu'est-ce que j'ai fait la derniere fois ? » est la question
+    directement utile a la serie en cours, pas une donnee d'annexe.
+
+    L'invariant conserve : **avec un historique, la reference est visible au
+    point de saisie ; sans historique, on le DIT** - jamais un faux delta.
+    """
     _insert_prior(
         client,
         exercise_code="E1",
@@ -76,21 +86,31 @@ def test_prev_load_hint_on_active_row_when_data(client):
     )
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    assert "session-focus__console-row-prev" in body
-    # discreet reminder text carries the previous load
-    assert "dernière :" in body
+    assert "console__delta-value" in body
+    # MIGRÉ — l'étiquette est raccourcie à « Réf. » quand la cible et
+    # la référence partagent une ligne (passe de densité).
+    assert "Réf." in body
 
 
 def test_prev_load_hint_absent_when_no_data(client):
     """No prior session ⇒ silence (never an invented performance)."""
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    assert "session-focus__console-row-prev" not in body
+    assert "console__delta-value" not in body
+    assert "Première fois" in body, (
+        "sans référence, le produit le dit — il ne laisse pas un vide"
+    )
 
 
-def test_prev_load_hint_is_aria_hidden(client):
-    """The in-row reminder is decorative (the console-ref block carries the
-    accessible reference); it must be aria-hidden."""
+def test_the_reference_is_now_accessible_rather_than_decorative(client):
+    """**Migre T5 -> T2, et le contrat s'INVERSE.**
+
+    L'ancien rappel etait `aria-hidden` parce qu'il DOUBLAIT un bloc
+    accessible situe ailleurs. Il n'y a plus de doublon : le `DeltaReadout`
+    est la seule reference, donc il doit etre lisible par une technologie
+    d'assistance. Le masquer reviendrait a retirer l'information aux
+    lecteurs d'ecran.
+    """
     _insert_prior(
         client,
         exercise_code="E1",
@@ -99,14 +119,20 @@ def test_prev_load_hint_is_aria_hidden(client):
     )
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    m = re.search(r'<span class="session-focus__console-row-prev"[^>]*>', body)
-    assert m is not None
-    assert "aria-hidden" in m.group(0)
+    # MIGRÉ — le `DeltaReadout` partage sa ligne avec la cible : il est un
+    # `<span>` dans `console__readout`, plus un `<p>` autonome.
+    m = re.search(r'<span class="console__delta">(.*?)</span>\s*</p>',
+                  body, re.DOTALL)
+    assert m is not None, "le DeltaReadout n'est pas rendu"
+    assert "aria-hidden" not in m.group(0), (
+        "unique porteur de la référence : il ne peut pas être masqué"
+    )
 
 
-def test_console_ref_block_preserved(client):
-    """Non-regression: the « Référence précédente » console block still lives
-    (single accessible home of the previous-load info)."""
+def test_the_reference_is_stated_exactly_once(client):
+    """**Migre T5 -> T4.** Il y avait DEUX porteurs de la meme reference : le
+    bloc « Reference precedente » et le rappel dans la ligne. Un seul
+    subsiste - c'etait l'objet de la deduplication (`Sx_UIV3_02B` D5)."""
     _insert_prior(
         client,
         exercise_code="E1",
@@ -115,12 +141,14 @@ def test_console_ref_block_preserved(client):
     )
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    assert "session-focus__console-ref--prev" in body
-    assert "Référence précédente" in body
+    assert body.count("console__delta-value") == 1
+    assert "Référence précédente" not in body, (
+        "l'ancien doublon ne doit pas revenir"
+    )
 
 
-def test_prev_load_hint_only_on_active_row(client):
-    """The reminder appears at most once (only the active set)."""
+def test_prev_load_hint_only_on_the_active_card(client):
+    """La reference n'apparait qu'une fois : sur la carte active."""
     _insert_prior(
         client,
         exercise_code="E1",
@@ -129,26 +157,25 @@ def test_prev_load_hint_only_on_active_row(client):
     )
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    assert body.count("session-focus__console-row-prev") == 1
+    assert body.count("console__delta-value") == 1
 
 
 # ───────── non-goals: no JS, no new colour ─────────
 
 
-def test_no_new_hex_colour_in_prev_hint_css():
+def test_no_raw_hex_in_the_reference_rule():
+    """`CLAUDE.md` 5.4 - toute couleur est un token mesure de la palette.
+    Un hex ecrit ici echapperait a l'escalier de contraste de `:root`."""
     css = FOCUS_CSS.read_text(encoding="utf-8")
-    m = re.search(
-        r"\.session-focus__console-row-prev\s*\{([^}]*)\}", css
-    )
+    m = re.search(r"\.console__delta-value\s*\{([^}]*)\}", css)
     assert m is not None
-    rule = m.group(1)
-    assert "#" not in rule  # reuses --fg-dim; no raw hex
-    assert "var(--fg-dim)" in rule
+    assert "#" not in m.group(1), m.group(1)
+    assert "var(--t-" in m.group(1)
 
 
 def test_no_js_added_for_prev_load():
     src = EXERCISE_CARD.read_text(encoding="utf-8")
-    # the in-row hint is pure SSR
-    assert "session-focus__console-row-prev" in src
+    # le DeltaReadout est du SSR pur
+    assert "console__delta" in src
     if JS_DIR.exists():
         assert not any("prev_load" in p.name.lower() for p in JS_DIR.glob("*.js"))

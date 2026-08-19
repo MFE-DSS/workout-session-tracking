@@ -15,6 +15,27 @@ Scope :
 - session_focus.css present and non-empty
 """
 
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
+
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -122,15 +143,16 @@ def test_all_sx29_surfaces_rendered(client):
 
     body = _render(client, session_id)
     # Sticky header (Sb_29.1)
-    assert "session-focus__sticky-header" in body
+    assert "session-head" in body
     # Sticky jump bar (Sb_29.1/2)
-    assert "session-focus__sticky-jump" in body
+    assert "ex-nav" in body
     # Active card (Sb_29.1/2)
     assert "session-focus__card--active" in body
     # Sticky CTA (Sb_29.3)
-    assert "session-focus__sticky-cta" in body
+    assert "dock" in body
     # Rest timer (Sb_29.4)
-    assert "session-focus__rest-timer" in body
+    # MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`). Le rendre en permanence est PRÉCISÉMENT ce qui a masqué le défaut `D3` : le bloc était là, non démarré, et le JS partait quand même. La garde vérifie donc son absence hors repos.
+    assert "data-rest-display" not in body
     # session_focus.js progressive enhancement
     assert "js/session_focus.js" in body
 

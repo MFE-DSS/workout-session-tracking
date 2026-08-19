@@ -59,8 +59,11 @@ def test_the_direct_list_is_capped_on_every_card(client):
     """
     body = _rendered_session(client)
 
+    # MIGRÉ — le picker est passé dans la ligne L3 : sa classe porte
+    # désormais `l3__item` en tête, et il n'est plus enveloppé d'un `<div>`.
+    # Le PLAFOND de 4, lui, est inchangé — c'est ce que la garde protège.
     pickers = re.findall(
-        r'<details class="substitute-picker.*?</details>\s*</div>',
+        r'<details class="l3__item session-focus__alternatives.*?</details>',
         body, re.DOTALL,
     )
     assert pickers, "no substitute picker rendered"
@@ -182,8 +185,9 @@ def test_substitution_stays_gated_on_can_substitute():
 
 def test_the_picker_summary_has_an_accessible_name():
     src = _card_src()
-    match = re.search(r"<summary class=\"substitute-picker__summary\"[^>]*>", src)
-    assert match, "picker summary missing"
+    match = re.search(
+        r'<summary class="l3__trigger substitute-picker__summary[^>]*>', src)
+    assert match, "le déclencheur du picker n'est plus rendu"
     assert "aria-label=" in match.group(0)
 
 
@@ -192,6 +196,6 @@ def test_the_picker_summary_has_an_accessible_name():
 
 def test_the_picker_is_a_native_details_with_no_script():
     src = _card_src()
-    assert "<details class=\"substitute-picker" in src
+    assert '<details class="l3__item session-focus__alternatives' in src
     assert "addEventListener" not in src
     assert "onclick" not in src

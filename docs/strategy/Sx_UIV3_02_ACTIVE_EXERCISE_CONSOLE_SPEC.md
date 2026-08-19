@@ -418,10 +418,179 @@ Repos suggéré · 1:30
 Un `rest_target_seconds` par exercice serait une **prescription**, donc une
 feature métier séparée — **pas un glissement dans ce chantier UI**.
 
+### Amendements opérateur du 2026-08-19 (soir) — les quatre trous de `02B`
+
+Le dossier de cadrage `Sx_UIV3_02B` a levé quatre décisions que cette spec ne
+tranchait pas. Elles sont **normatives** et priment sur toute lecture
+antérieure des §4 et §7.
+
+#### Q1 — La bande `E1 … E7` disparaît, la navigation reste
+
+**`C` retenu, amendé.** Le rail collant permanent est **supprimé**. La
+navigation arbitraire vers un exercice quelconque est **préservée** par **un
+seul déclencheur secondaire** `E#/N` qui ouvre la **liste d'ancres déjà
+existante**, en `details/summary` sémantique sans JS, enrichi en popover
+ancré (`00A §7`) quand JS est disponible.
+
+**Aucune primitive de cockpit nouvelle.** Le déclencheur réutilise la
+grammaire `.disclosure` du dépôt ; les ancres `#exercise-{id}` sont celles qui
+existent déjà.
+
+> C'est une suppression **accompagnée de son remplaçant dans la même
+> livraison** — `CLAUDE.md §5.3`. Retirer le rail sans le déclencheur
+> retirerait une capacité.
+
+#### Q2 — La sortie anticipée d'exercice est CONSERVÉE
+
+**Un exercice incomplet peut être quitté à tout moment.** Le produit ne force
+jamais la complétion.
+
+| Situation | Commande dominante | Secondaire |
+|---|---|---|
+| exercice **incomplet** | `VALIDER Sx` (état courant) | **`PASSER À Ex`** |
+| exercice **complet** | **`CONTINUER → Ex`** | revoir l'exercice |
+
+`PASSER À Ex` est servi par `nav=next`, inchangé. La table du §4 est complétée
+en conséquence : elle décrivait la commande **dominante** par état, jamais
+l'ensemble des sorties.
+
+#### Q3 — La sémantique de la correction vide est CONSERVÉE, et rendue explicite
+
+La signification existante ne change pas : **ni charge ni répétitions =
+série non complétée**. Aucun nouvel état persisté.
+
+Mais **un champ vidé par accident ne doit pas être l'interaction**. L'état
+`CORRECTION` expose donc une action **secondaire explicite** :
+
+```
+ENREGISTRER LA CORRECTION        RETIRER CETTE SÉRIE        annuler
+```
+
+`RETIRER CETTE SÉRIE` soumet le même formulaire avec les deux champs vidés —
+même route, même dérivation serveur, aucune sémantique nouvelle. Elle rend
+**intentionnel** ce qui n'était qu'un effet de bord silencieux.
+
+#### Q4 — Le dernier exercice mène au BILAN, qui seul clôt la séance
+
+La première transition après la dernière série **ouvre et met au point** la
+surface de bilan **existante** (`#session-feedback`). Le bilan reste
+**entièrement optionnel** ; **aucun champ nouveau**.
+
+La seule action qui clôt réellement la séance est **`TERMINER LA SÉANCE`**,
+émise **depuis le bilan**. L'état `LAST EXERCISE COMPLETE` du §4 mène donc à
+`SESSION REVIEW`, il ne termine pas lui-même.
+
+```
+LAST SET → SESSION REVIEW → TERMINER LA SÉANCE
+```
+
+#### Amendement — `D3` est un défaut bloquant, à corriger EN PREMIER
+
+Le minuteur de repos démarre sur toute page portant `[data-start-rest]`,
+attribut rendu inconditionnellement ; `data-rest-started`, émis par le
+serveur, **n'est lu par personne**. Mesuré sans `rest=1` :
+`running=True, 89s`.
+
+**Ce n'est pas une tâche de présentation.** La transition d'état est corrigée
+**et vérifiée au navigateur** *avant* de construire `RestReadout` — pas
+pendant, pas après.
+
+#### Amendement de mesure — deux fixtures nommés
+
+- **161 cibles sous 44 px est remplacé par 69** — décompte tactile réel
+  (`02B §0.1`). Le chiffre d'origine comptait des radios de 1 × 1 px.
+- **`y = 843` cesse d'être une référence universelle.** Il ne se reproduit pas
+  et dépend entièrement de la richesse du compte.
+- Deux fixtures nommés remplacent la mesure implicite :
+
+| Fixture | Contenu | Usage |
+|---|---|---|
+| **`SESSION_LEAN`** | aucun historique — 5 blocs optionnels sur 13 rendus | plancher, tests de structure |
+| **`SESSION_RICH`** | historique complet — référence, delta, guidance, hints, Up next, chip, alternatives | **dogfood et acceptation golden** |
+
+Le dogfood de `BLOCKER-4` et les golden states de `B9` s'exécutent sur
+**`SESSION_RICH`**. Une mesure produite sur `SESSION_LEAN` ne vaut jamais
+acceptation.
+
+### Passe de densité — `COCKPIT DENSITY & INSTRUMENT PASS` (2026-08-19, soir)
+
+Machine à états **acceptée**, rendu **pas encore**. L'écran racontait la séance
+par du texte là où il devait montrer un état et présenter une action. Une
+passe interne, sans nouveau Design Lab, avec un budget d'acceptation qui
+remplace la géométrie seule.
+
+#### Hiérarchie figée
+
+| Niveau | Contenu | Visible pendant |
+|---|---|---|
+| **L1** exécuter | exercice · série courante · kg/reps · `CommandDock` | toujours |
+| **L2** décider | référence · delta réel · cible courte · **un** cue | toujours |
+| **L3** comprendre | technique · historique · adapter · zone détaillée | disclosure, **jamais dépliée** |
+| **L4** raconter | ressenti · note · analyse | **fin d'exercice / bilan seulement** |
+
+`REST` et `CORRECTION` ne rendent **ni L3 ni L4** au premier niveau.
+
+#### Budget d'acceptation (390 × 844, `SESSION_RICH`)
+
+| Porte | Cible | Mesuré |
+|---|---:|---:|
+| Contexte avant l'exercice actif | ≤ 160 | **140** |
+| Début du `SetInstrument` | ≤ 300 | **219–266** |
+| Paragraphes avant l'action | 0 | **0** |
+| Disclosures L3 ouvertes par défaut | 0 | **0** |
+| Feedback visible en `CURRENT`/`REST`/`CORRECTION` | 0 | **0** |
+| Actions dominantes | 1 | **1** |
+| Actions secondaires simultanées | ≤ 2 | **0–2** |
+| Ambre plein hors `CommandDock` | 0 | **0** |
+| Débordements horizontaux durs | 0 | **0** |
+| Cibles < 44 px dans la console | 0 | **0** |
+| Couches collantes | 1 | **1** |
+
+**Test humain** : en deux secondes, sans lire de paragraphe, l'opérateur doit
+pouvoir dire quel exercice, quelle série, quelle référence, quoi saisir et
+quoi toucher.
+
+#### Discipline chromatique, désormais stricte
+
+`ambre plein` → `CommandDock`, **et rien d'autre** · `ambre ponctuel` →
+marqueur de série courante · `graphite` → structure · `bleu` → système :
+référence, schéma prescrit, **aperçu produit par AUREN**.
+
+Le grand contour ambre de la carte active devient un rail de 2 px : deux
+ambres pleins sur un écran, et l'ambre cesse de vouloir dire « c'est à toi de
+jouer ».
+
+#### `CommandDock` collant — prototypé puis ÉCARTÉ sur preuve
+
+Les deux variantes ont été conduites au navigateur sur les cinq états. Le
+collant ne gagne **rien de mesurable** — la commande est déjà visible sans
+défiler dans les cinq états — et coûte une couche collante de plus, un
+débordement par état, et un bas de contenu masqué en permanence. Un dock
+collant répond au problème « la commande est loin » ; elle ne l'est plus.
+
+**Le dock reste en flux.**
+
+#### Deux corrections opérateur du même soir
+
+1. **Le nom de séance ne dépend plus de `title`.** Un `title` ne s'ouvre pas
+   au doigt. Le nom s'affiche sur **deux lignes au plus**, ce qui couvre tout
+   le catalogue, sans fabriquer de nom court — celui-ci n'existe pas en base
+   (`UI_DATA_GAP G7`).
+2. **`E1 / 7` EST le déclencheur de navigation.** Il décrivait la position
+   sans être actionnable, pendant qu'un menu voisin permettait d'en changer.
+   `⋯` ne garde que le rare : métadonnées et actions exceptionnelles.
+
+#### `UI_DATA_GAP` ouverts par cette passe
+
+| # | Gap | Statut |
+|---|---|---|
+| **G7** | Aucun nom court de gabarit en base (`slug` est technique, `name` est long, `suggested_label` est une phrase) | **bloqué** — une colonne serait une feature métier, pas un glissement UI |
+
 ### Reste ouvert
 
-- Rien. Les trois points sont tranchés ci-dessus ; le dogfood de sortie reste
-  la seule porte.
+- Rien. Les sept points (trois du 19/08 matin, quatre de `02B`) et la passe
+  de densité sont tranchés ; le **dogfood d'une séance entière sur
+  `SESSION_RICH` à 360 / 390 / 430, clavier visible**, reste la seule porte.
 
 ## 10. Amendement `00A`
 

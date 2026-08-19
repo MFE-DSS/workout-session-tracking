@@ -11,6 +11,27 @@ Couvre :
 - CSS contient les 5 états avec non-color cues
 """
 
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
+
 from __future__ import annotations
 
 import re
@@ -351,9 +372,10 @@ def test_session_flow_intact_with_hint(client):
 
     body = _render(client, sid)
     # Sticky CTA + rest timer + jump bar toujours présents (non-regression Sx_29)
-    assert "session-focus__sticky-cta" in body
-    assert "session-focus__rest-timer" in body
-    assert "session-focus__sticky-jump" in body
+    assert "dock" in body
+    # MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`). Le rendre en permanence est PRÉCISÉMENT ce qui a masqué le défaut `D3` : le bloc était là, non démarré, et le JS partait quand même. La garde vérifie donc son absence hors repos.
+    assert "data-rest-display" not in body
+    assert "ex-nav" in body
 
 
 # ───────── CSS : 5 états + non-color cues ─────────
@@ -385,7 +407,10 @@ def test_exercise_card_includes_overload_partial():
     src = CARD.read_text(encoding="utf-8")
     assert '_partials/overload_hint.html' in src
     # Doit être dans un bloc {% if is_active %} (active card only).
-    assert "Sb_30.3" in src
+    # MIGRÉ — cette assertion lisait un COMMENTAIRE. Un commentaire n'est
+    # pas un comportement : le renommer faisait rougir la garde alors que
+    # le partial était bien inclus. Elle épingle désormais l'inclusion.
+    assert '{% include "_partials/overload_hint.html" %}' in src
 
 
 # ───────── progression_hint legacy supprimé (Sb_30.4) ─────────

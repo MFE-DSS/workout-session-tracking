@@ -6,6 +6,27 @@ les quatre choses qui pourraient dériver : la source (l'atlas, pas un
 hardcode), l'absence de collecte, le wording non médical, et la géométrie que
 les deux tranches précédentes ont gagnée.
 """
+
+# ══════════════════════════════════════════════════════════════════════
+#  MIGRÉ — `UIV3_SESSION_EXECUTION_CONSOLE_01` + passe de densité
+#  (2026-08-19). Ce module épinglait des marqueurs d'IMPLÉMENTATION que
+#  `Sx_UIV3_02` remplace. Correspondance :
+#
+#    session-focus__console            → console
+#    session-focus__console-list       → console__band
+#    session-focus__console-row--active    → setline--current
+#    session-focus__console-row--completed → setline--past
+#    session-focus__console-row--upcoming  → setline--future
+#    session-focus__console-refs       → console__delta
+#    session-focus__orientation*       → session-pos*  (dans l'en-tête)
+#    session-focus__header-main/kicker → en-tête recomposé en 4 colonnes
+#    card-peek*                        → console__next (fin d'exercice)
+#    session-focus__sticky-*           → SUPPRIMÉ, plus aucune couche
+#
+#  Les invariants sont conservés ; là où le CONTRAT change, le test porte
+#  une note explicite. Aucune suppression pour verdir.
+# ══════════════════════════════════════════════════════════════════════
+
 from __future__ import annotations
 
 import json
@@ -43,12 +64,15 @@ def test_the_lead_cue_comes_from_the_atlas_not_the_template():
     pourrait diverger de lui sans que rien ne le signale."""
     src = CARD.read_text(encoding="utf-8")
     match = re.search(
-        r'<span class="machine-panel__lead-cue">(.*?)</span>', src, re.DOTALL)
-    assert match, "lead cue not rendered"
-    body = match.group(1).strip()
-    assert body == "{{ _m.execution_cues[0] }}", (
-        f"the lead cue must be read from the atlas, found {body!r}"
+        r'<p class="console__cue">(.*?)</p>', src, re.DOTALL)
+    assert match, "le cue de tête n'est plus rendu"
+    body = match.group(1)
+    assert "_machine_top.execution_cues[0]" in body, (
+        f"le cue doit être LU dans l'atlas, trouvé {body!r}"
     )
+    # Et rien d'écrit en dur : la seule chaîne littérale est le chevron.
+    assert "Banc à" not in body
+    assert "°" not in body
 
 
 def test_every_atlas_machine_can_supply_a_lead_cue():
@@ -76,7 +100,7 @@ def test_no_technical_feedback_input_was_added(client):
 def test_the_card_adds_no_new_control_around_the_cue():
     """La zone du cue ne contient aucun contrôle : c'est de la lecture."""
     src = CARD.read_text(encoding="utf-8")
-    start = src.find("machine-panel__lead-cue")
+    start = src.find("console__cue")
     window = src[max(0, start - 600):start + 400]
     for control in ("<input", "<select", "<textarea"):
         assert control not in window, (
@@ -123,43 +147,61 @@ def test_the_template_makes_no_medical_claim():
 
 
 def test_the_cue_is_readable_without_javascript(client):
-    """Le cue vit dans un `<summary>` natif : il s'affiche sans ouvrir la
-    disclosure et sans JS. Aucun script n'est requis pour le lire."""
+    """**Migré, et le contrat se RENFORCE.**
+
+    Le cue vivait dans un `<summary>` pour être lisible sans ouvrir la
+    disclosure. La passe de densité le sort complètement du disclosure : il
+    est en L2, dans le flux de la console, visible sans le moindre geste.
+    Il n'a plus besoin d'un `<summary>` pour l'être."""
     src = CARD.read_text(encoding="utf-8")
-    start = src.find("machine-panel__lead-cue")
-    summary_open = src.rfind("<summary", 0, start)
-    summary_close = src.find("</summary>", start)
-    assert summary_open != -1, "no <summary> before the lead cue"
-    assert summary_close != -1, "no </summary> after the lead cue"
-    assert summary_open < start < summary_close, (
-        "the lead cue must sit inside the <summary> so it is visible while "
-        "the disclosure is closed"
+    start = src.find('<p class="console__cue">')
+    assert start != -1, "le cue de tête n'est plus rendu"
+    # Il vit dans la console, AVANT la première disclosure L3 : rien à
+    # ouvrir pour le lire. (La carte elle-même est un `<details open>` —
+    # c'est celle-là qu'il ne faut pas confondre avec un repli.)
+    console = src.find('<div class="console"')
+    l3 = src.find('<div class="l3">')
+    assert console != -1
+    assert l3 != -1
+    assert console < start < l3, "le cue doit vivre dans la console, avant L3"
+    assert "<details" not in src[console:start], (
+        "aucune disclosure ne doit s'ouvrir entre la console et le cue"
     )
     assert "addEventListener" not in src
 
 
 def test_the_machine_panel_stays_a_native_details():
+    """**Migré.** Le panneau machine cesse d'être un bloc autonome : son
+    contenu vit sous `TECHNIQUE`, une disclosure NATIVE de la ligne L3.
+    L'invariant — pas de JS, `details/summary` natif — est intact ; seule
+    la classe exacte change."""
     src = CARD.read_text(encoding="utf-8")
-    assert '<details class="machine-panel">' in src, (
-        "the exact class contract is pinned by test_machine_atlas_surface"
-    )
+    assert '<details class="l3__item session-focus__cues">' in src
+    assert "machine-panel__title" in src, "le nom de la machine reste nommé"
 
 
 # ───────── A2 / géométrie — le cue ne coûte rien au-dessus de la console ─────
 
 
-def test_the_cue_is_not_rendered_above_the_console():
-    """La contrainte mesurée : au-dessus de la console, même sur une ligne de
-    20 px, le cue poussait les champs de la série courante de 497 à 520 px et
-    `elementFromPoint` cessait de les retourner — ils passaient derrière la
-    barre d'action collante. L'atlas est la SOURCE, pas la POSITION.
+def test_the_cue_sits_above_the_console_and_costs_nothing():
+    """**Migré — la CAUSE de la contrainte a disparu.**
+
+    L'ancienne règle interdisait le cue au-dessus de la console : il y
+    poussait les champs de 497 à 520 px et les faisait passer DERRIÈRE LA
+    BARRE D'ACTION COLLANTE. Cette barre n'existe plus (`§7.9` + Q1). La
+    raison de la contrainte est partie avec elle.
+
+    Le cue est donc remonté en L2, où il aide réellement le geste suivant.
+    Mesuré après ce déplacement, à 390 × 844 sur `SESSION_RICH` : début du
+    `SetInstrument` à 263 px pour un budget de 300, et zéro débordement.
+    La géométrie aux trois largeurs est revérifiée au dogfood de sortie —
+    c'est le navigateur qui tranche, pas ce test.
     """
     src = CARD.read_text(encoding="utf-8")
-    cue = src.find("machine-panel__lead-cue")
-    console = src.find("session-focus__console-list")
-    assert cue != -1, "lead cue not rendered"
-    assert console != -1, "console list not rendered"
-    assert console < cue, (
-        "the lead cue must render after the logging console; above it, it "
-        "occludes the current set inputs at 360x640"
-    )
+    cue = src.find('<p class="console__cue">')
+    band = src.find('<ol class="console__band">')
+    assert cue != -1
+    assert band != -1
+    assert cue < band, "le cue précède la bande : il prépare le geste"
+    # La cause historique : plus AUCUNE couche collante sur cette surface.
+    assert "sticky-cta" not in src
