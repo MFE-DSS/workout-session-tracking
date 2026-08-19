@@ -277,7 +277,8 @@ def test_a_genuinely_varying_reference_keeps_its_detail():
     from app.services.console_state import condense_reference
 
     out = condense_reference("60 / 55 / 50", "10 / 9 / 8")
-    assert "55" in out and "50" in out
+    assert "55" in out
+    assert "50" in out
 
 
 def test_no_reference_means_no_reference():
@@ -460,7 +461,8 @@ def test_the_navigation_trigger_is_reachable_without_js():
     block = header[header.find('class="session-head__nav ex-nav"'):]
     block = block[:block.find("</details>")]
     assert "<summary" in block
-    assert "onclick" not in block and "data-js" not in block
+    assert "onclick" not in block
+    assert "data-js" not in block
 
 
 # ══════════════════════════════════════════════════════════════════════
@@ -525,3 +527,71 @@ def test_the_dominant_command_has_a_pressed_state():
     qui soumet deux fois."""
     css = re.sub(r"/\*.*?\*/", "", CSS.read_text(encoding="utf-8"), flags=re.DOTALL)
     assert re.search(r"\.dock__cmd:active\s*\{", css)
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  `Web:S7930` — la preuve que l'analyseur se trompe SUR CE FICHIER
+# ══════════════════════════════════════════════════════════════════════
+
+
+def _rendered_ids(body: str) -> list[str]:
+    return re.findall(r'id="(set-\d+)"', body)
+
+
+def test_set_anchors_are_unique_in_every_rendered_state(client):
+    """Aucun identifiant d'ancre dupliqué, à AUCUN état, au RENDU.
+
+    `Web:S7930` signale quatre identifiants dupliqués dans
+    `exercise_card.html`. L'analyseur lit un gabarit Jinja comme un document
+    HTML statique : il voit le littéral `id="set-{{ sl.id }}"` écrit dans
+    plusieurs macros et conclut à une duplication. Il ne peut pas savoir que
+    ces macros sont MUTUELLEMENT EXCLUSIVES — une série est passée, ou
+    courante, ou future, jamais deux à la fois.
+
+    Cette garde est la preuve que la sortie réelle est saine. Elle n'a pas
+    été écrite pour faire taire l'analyseur : sa première exécution aurait
+    ÉCHOUÉ, parce qu'à l'état `CORRECTION` une série déjà validée sortait
+    bien deux fois — c'est le vrai défaut que `S7930` a permis de trouver et
+    que `future_sets=list(pending_works)` corrige.
+    """
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog
+
+    r = client.post("/sessions", data={"template_slug": "push-a"},
+                    follow_redirects=False)
+    sid = int(re.match(r"/sessions/(\d+)", r.headers["location"]).group(1))
+
+    with SessionLocal() as db:
+        se = db.execute(
+            select(SessionExercise)
+            .where(SessionExercise.session_id == sid)
+            .order_by(SessionExercise.position.asc()).limit(1)
+        ).scalar_one()
+        se_id = se.id
+        work = db.execute(
+            select(SetLog).where(SetLog.session_exercise_id == se_id)
+            .where(SetLog.kind == "work").order_by(SetLog.set_index.asc())
+        ).scalars().all()
+        # DEUX séries validées — la configuration exacte que le défaut
+        # exigeait, et qu'aucune garde ne couvrait.
+        for sl in work[:2]:
+            sl.completed, sl.weight_kg, sl.reps = True, 60.0, 10
+        for sl in db.execute(
+            select(SetLog).where(SetLog.session_exercise_id == se_id)
+            .where(SetLog.kind == "warmup")
+        ).scalars().all():
+            sl.completed, sl.weight_kg, sl.reps = True, 40.0, 12
+        db.commit()
+        first_done = work[0].id
+
+    for label, url in (
+        ("current_set", f"/sessions/{sid}?active={se_id}"),
+        ("rest", f"/sessions/{sid}?active={se_id}&rest=1"),
+        ("correction", f"/sessions/{sid}?active={se_id}&fix={first_done}"),
+    ):
+        ids = _rendered_ids(client.get(url).text)
+        duplicates = {i for i in ids if ids.count(i) > 1}
+        assert duplicates == set(), f"{label} : ancres dupliquées {duplicates}"
+        assert ids, f"{label} : aucune ancre rendue — la garde ne garderait rien"
