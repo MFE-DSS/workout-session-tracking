@@ -36,9 +36,34 @@ Règles d'application :
   **obligatoire** et la **CI parallélisée sur PR** est le filet de vérité — le full
   sweep local y reste **recommandé si un doute de blast radius subsiste**, non
   systématique (Sb_OPS.ci-efficiency).
-- **Commande de référence du full sweep** (parallélisée depuis `Sb_OPS.ci-efficiency`,
-  ~4 min au lieu de ~14, même couverture) :
-  `pytest -n auto --dist worksteal --ignore=tests/test_v1_acceptance.py --cov=app --cov-report=xml -q`.
+- **Commande de référence du full sweep — UNE SEULE, et elle est scriptée** :
+
+  ```bash
+  bash scripts/run_ci_pytest.sh          # CI comme local, même source de vérité
+  ```
+
+  **Ne JAMAIS écrire `pytest -n auto` à la main.** Cette ligne prescrivait
+  exactement cela jusqu'au 2026-08-19, et elle contredisait son propre script
+  canonique, qui plafonne à **2 workers** depuis `Sb_OPS_CI_RUNNER_STABILITY_01`
+  sur preuve mesurée. Deux dégâts, tous deux vécus :
+
+  * **sur le runner** — `-n auto` y vaut 4 workers et épuise la machine : la
+    suite demande ~16,6 Go pour 15,99 Go. Trois arrêts à 95–96 %, sans aucun
+    échec de test ;
+  * **sur un poste de développement** — `auto` vaut le nombre de cœurs, la
+    machine part en swap et **emporte tout ce qui tourne à côté, conteneurs
+    compris**. Arrivé trois fois de suite sur le poste de l'opérateur le
+    2026-08-19.
+
+  Le script refuse désormais une valeur non entière (le littéral `auto` a déjà
+  rendu une mitigation invisible) et **plafonne les workers sur la RAM physique
+  hors CI**. La prose seule n'avait pas suffi.
+
+- **Un sweep parallèle local saturé ne diagnostique RIEN.** Il rend des échecs
+  qui passent tous en série — mesuré le 2026-08-19 : 23 rouges en `-n auto`,
+  **105/105 verts en série** sur les mêmes modules. Avant d'imputer un échec au
+  produit, **le rejouer en série**. Chercher un défaut applicatif dans du bruit
+  mémoire coûte des heures et conclut faux.
 - **Sprints `ci_infra`** (le pipeline lui-même) : la **CI réelle sur GitHub est
   source de vérité obligatoire avant merge** — un changement de pipeline doit
   **prouver son effet sur une CI réelle**, jamais seulement en local.
