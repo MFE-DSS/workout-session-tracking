@@ -398,8 +398,8 @@ qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 | **Socle** | `UIV3_COCKPIT_LADDER_01` *(B0)* | **`MERGED` — `6aecf6f`** |
 | | ~~`UIV3_TOKENS_01` *(B1)*~~ | **ABSORBÉE PAR B0** |
 | **Phase 1 — Accueil** | `UIV3_HOME_CAUSAL_COCKPIT` | **`MERGED` — PR #131, `f10af0a`** |
-| **Phase 2 — Séance** | **`UIV3_SESSION_EXECUTION_CONSOLE_01`** *(B6+B7)* | **prochaine** |
-| **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | après phase 2 acceptée |
+| **Phase 2 — Séance** | **`UIV3_SESSION_EXECUTION_CONSOLE_01`** *(B6+B7)* | **`MERGED` — PR #133, `547df67`** · `BLOCKER-4` franchi |
+| **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | **prochaine** |
 | **Phase 4 — Analyse** | **`UIV3_PROGRESS_ANALYTICS_01`** | après fermeture |
 | Hors phase | `LOGIN_IDENTITY_GATE_01` | à planifier |
 
@@ -412,6 +412,14 @@ qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 > tout de suite est réelle. **Elle est refusée.** La Séance reste la surface
 > souveraine avec le plus gros déficit mesuré : série courante à **y = 843**,
 > **31 débordements durs**, **161 cibles sous 44 px**. La grosse énergie va là.
+
+> **Phase 2 livrée le 2026-08-19.** Les trois chiffres ci-dessus étaient en
+> partie faux et sont conservés tels quels comme trace : `y = 843` n'était pas
+> une géométrie universelle (le fixture de mesure ne rendait que 5 blocs
+> optionnels sur 13), et **69** et non 161 cibles étaient réellement tactiles —
+> le décompte d'origine comptait des `input[type=radio]` de 1 × 1 px cachés
+> derrière leurs labels. La correction est dans `Sx_UIV3_02B`. **Le déficit
+> était réel ; sa mesure ne l'était pas.**
 
 #### Phase 1 — `UIV3_HOME_CAUSAL_COCKPIT`
 
@@ -480,6 +488,7 @@ un `UI_DATA_GAP`.
 | `G4` | état `REST` | **CLOS** — état de présentation à portée de requête, jamais persisté |
 | `G5` | volume d'exercice | somme de présentation |
 | `G6` | **RIR par série** | **BLOQUÉ** — `SetLog` ne porte ni `rir` ni `rpe`. L'afficher exigerait un modèle et une migration. **Hors périmètre absolu.** |
+| `G7` | **nom court de gabarit** | **OUVERT** — aucun champ court en base. Phase 2 refuse de fabriquer une abréviation et rend le nom complet **canoniquement sur 2 lignes**, `title=""` relégué au rôle de secours. Un nom court serait un champ métier, donc une migration. |
 
 ---
 
