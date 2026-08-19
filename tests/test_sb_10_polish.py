@@ -40,31 +40,33 @@ def _complete_minimal(sid: int, kind: str = "strength") -> None:
         db.commit()
 
 
-# ---- G1 — home sparkline legend --------------------------------------
+# ---- G1 — sparkline legend -------------------------------------------
+#
+# Tier **T5** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
+#
+# La sparkline QUITTE l'accueil : c'est de l'analytique, et l'accueil est une
+# surface de décision (D8). Ces deux tests pinnaient sa légende SUR L'ACCUEIL ;
+# ils ne pinnaient pas la légende elle-même.
+#
+# Le comportement reste vrai là où la sparkline vit désormais — il est gardé
+# par les tests de `/progress`. Ce qui est retiré ici, c'est l'affirmation
+# « la sparkline est sur l'accueil », qui est le choix abandonné.
+#
+# La règle de non-régression est donc reformulée : l'accueil ne doit PAS la
+# porter. Un test qui l'y ramènerait sans décision versionnée doit tomber.
 
-def test_home_sparkline_no_legend_without_cardio_session(client):
-    """Only strength sessions → legend hidden (single color, no noise)."""
-    sid = _start(client, "push-a")
-    _complete_minimal(sid, kind="strength")
-    r = client.get("/")
-    assert r.status_code == 200
-    # Sparkline renders but no legend because only one kind is present.
-    assert 'timeline-legend--compact' not in r.text
-
-
-def test_home_sparkline_legend_appears_when_kinds_mix(client):
-    """One strength + one cardio session → compact legend is visible."""
+def test_the_home_no_longer_carries_the_sparkline(client):
+    """L'inverse exact de l'ancienne garde, et c'est délibéré."""
     sid_s = _start(client, "push-a")
     _complete_minimal(sid_s, kind="strength")
     sid_c = _start(client, "liss-abs")
     _complete_minimal(sid_c, kind="cardio")
 
-    r = client.get("/")
-    body = r.text
-    assert r.status_code == 200
-    assert 'timeline-legend--compact' in body
-    assert 'Musculation' in body
-    assert 'Cardio' in body
+    body = client.get("/").text
+    assert 'timeline-legend--compact' not in body
+    assert 'sparkline-wrap' not in body
+    # …mais le chemin vers l'analyse reste à un tap.
+    assert '/progress' in body
 
 
 # ---- G2 — session note in <details> ----------------------------------

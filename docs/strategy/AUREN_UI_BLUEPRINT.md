@@ -1,8 +1,12 @@
 # AUREN — UI Blueprint
 
 **Document vivant.** Mis à jour à chaque tranche livrée.
-Dernière révision : **2026-08-18**, au merge de `UIV3_COCKPIT_LADDER_01`
-(`6aecf6f`).
+Dernière révision : **2026-08-19**, à la validation opérateur de l'Accueil
+Causal Cockpit (phase 1, PR #131).
+
+> **§2.3 porte la référence visuelle canonique.** Le rendu y est fixé par des
+> images versionnées, pas seulement par des règles écrites. C'est le
+> garde-fou contre la dérive de style : on compare au screen, pas au souvenir.
 
 ---
 
@@ -16,6 +20,7 @@ specs pour le détail contraignant.
 | Besoin | Document |
 |---|---|
 | Comprendre le système en un tour | **ce blueprint** |
+| **Savoir à quoi ça doit ressembler** | **ce blueprint, §2.3 — référence visuelle** |
 | Règles transverses non négociables | `Sx_UIV3_00` Foundation Contract |
 | Grammaire instrumentale | `Sx_UIV3_00A` Cockpit Capability |
 | Contrat de l'Accueil | `Sx_UIV3_01` Home Causal Cockpit |
@@ -145,10 +150,16 @@ texte ne les porte, sur aucune surface. Une garde le pinne.
 | `DeltaReadout` | Session | spécifiée |
 | `RestReadout` | Session | spécifiée |
 
-**Aucune n'est construite.** Les tokens qu'elles consommeront existent ; les
-câbler serait commencer le redesign, ce que le périmètre de `B0` interdisait —
-une garde vérifie que `--t-blue-*` et `--t-unknown` n'ont **aucun**
-consommateur.
+| Primitive | Surfaces | Statut |
+|---|---|---|
+| `CausalRail` · `RecoveryBand` · `ZoneTally` · `SystemOrigin` · `CommandDock` | Accueil | **construites** — phase 1 |
+| `SetInstrument` · `DeltaReadout` · `RestReadout` | Séance | spécifiées, non construites |
+
+**La garde « zéro consommateur » de `B0` a expiré**, et proprement : elle
+prouvait que le socle déclarait la palette sans commencer le redesign. La
+phase 1 les consomme légitimement, donc elle tombe — **le jour où la spec la
+remplace, pas avant**. Elle est remplacée par un invariant qui ne périme pas :
+**l'ambre ne marque jamais un état de récupération**.
 
 `CausalRail` est **Home-only** : une timeline de séries porte des données et
 des actions **utilisateur**, elle ne peut pas porter la sémantique « origine
@@ -156,15 +167,68 @@ système ». La chronologie de la Session est portée par les `SetInstrument`
 eux-mêmes et par un **filet structurel neutre** — de la profondeur, pas une
 primitive.
 
-### 2.3 Surfaces
+### 2.3 Référence visuelle — **ce document fixe le rendu, pas seulement les règles**
+
+> **Pourquoi cette section existe.** Tout ce qui précède décrit le système en
+> **mots et en nombres**. Rien n'y fixait à quoi il **ressemble**. C'est
+> exactement par là que le programme a déjà dérivé une fois : des décisions
+> validées, un relevé écrit, et un objet livré que l'opérateur a rejeté au
+> premier coup d'œil.
+>
+> Les images ci-dessous sont **la référence canonique**. Un rendu qui s'en
+> écarte n'est pas « une variante » : c'est une dérive, jusqu'à ce qu'une
+> **décision versionnée** dise le contraire.
+
+#### Accueil · Causal Cockpit · 390 × 844
+
+![Accueil Causal Cockpit, 390 px](../assets/uiv3/home-390-fold.png)
+
+Ce que cette image fixe, et qu'aucune règle écrite ne suffit à tenir :
+
+| | |
+|---|---|
+| **L'ordre** | cause → `donc` → séance → action. Jamais l'inverse, jamais entrelacé. |
+| **Le rail** | continu, bleu jusqu'à la prescription **incluse**, pointillé à la jonction |
+| **L'ambre** | **une seule occurrence** sur l'écran : le CTA. Nulle part ailleurs. |
+| **Les bandes** | segments en luminance neutre, libellé à droite, **jamais de couleur d'état** |
+| **La densité** | pas de carte autour du hero · pas de vide réservé · le bilan en une ligne |
+| **Le pli** | seul « écarté — et pourquoi » est replié. La cause ne l'est jamais. |
+
+#### Le rail causal, en détail
+
+![Détail du rail causal](../assets/uiv3/home-rail-detail.png)
+
+La **continuité** est le mécanisme, pas l'accent coloré. Un rail interrompu
+redevient trois accents décoratifs empilés — c'est ce qu'a produit le premier
+rendu, avec 10 px de vide au-dessus de la jonction, et c'est ce que la mesure
+a corrigé.
+
+#### Page entière
+
+![Accueil, page entière](../assets/uiv3/home-390-full.png)
+
+**1 804 px**, contre 2 463 avant la phase. Ce qui suit la décision est du
+contexte et de la navigation : rien n'y concurrence le CTA.
+
+#### Règle de mise à jour
+
+Ces images se remplacent **exactement comme une baseline de régression
+visuelle** (`Sx_UIV3_03 §6`) : référence de la décision versionnée · tier de
+garde · rendu exposé à l'opérateur et arbitré · delta chiffré.
+
+**Remplacer une image de référence parce que le rendu a changé, sans décision,
+est la définition même de la dérive** — c'est le cas que cette section existe
+pour rendre visible.
+
+### 2.4 Surfaces
 
 | Surface | Cible | Statut | Défaut vivant |
 |---|---|---|---|
-| **Accueil** | Causal Cockpit | spécifiée, non construite | hero de 422 px dont **115 vides** · cause visible **0 px** au-dessus du pli · 3 échelles d'état concurrentes |
+| **Accueil** | Causal Cockpit | **construite · UI validée opérateur · PR #131 `MERGE PENDING`** | — |
 | **Séance** | Future Console | spécifiée, non construite | **31 débordements durs** à 390 px · série courante à y=843 · **161 cibles sous 44 px** · 4,3 écrans par exercice |
 | **Connexion** | porte d'identité sobre | décidée, non spécifiée | « ← Retour » sans retour · 3 liens de poids égal |
 
-### 2.4 Plateforme — figée
+### 2.5 Plateforme — figée
 
 `FastAPI + Jinja SSR` **KEEP** · HTML/CSS natif **PRIMARY** ·
 View Transitions / Popover / Anchor Positioning **ADOPT en amélioration
@@ -202,6 +266,27 @@ CSS qui dessine le caractère.
 **Conséquence de méthode** : les deux gardes T4 concernées ont été **ouvertes
 en deux plutôt qu'affaiblies** — elles vérifient désormais la **déclaration** à
 l'autorité **et** la **consommation** par la surface.
+
+**Une garde ne doit pas lire de la prose.** *(onzième occurrence)*
+`test_a8_zone_recovery_reaches_no_template` greppait le fichier brut. Un
+commentaire Jinja expliquant que le comptage est « dérivé de
+`build_zone_recovery` » suffisait à la faire tomber : **3 mentions en prose,
+0 dans le markup vivant.** Toute garde qui lit un gabarit ou un CSS le fait
+désormais **sans les commentaires**.
+
+**Un harnais de mesure peut mentir en silence.** Le serveur applique un
+limiteur de tentatives (`429`) ; à la troisième largeur le login échouait et le
+harnais rapportait « hero absent, document 602 px » **comme si c'était le
+produit**. Corrigé deux fois : une assertion qui refuse de mesurer autre chose
+que la Home, et **une seule authentification** réutilisée. *Une mesure
+silencieusement fausse est pire qu'une mesure absente.*
+
+**Un analyseur peut se tromper, et il faut le dire.** Sonar a signalé un bug
+`CRITICAL S6466` — « access on a collection that may trigger an IndexError » —
+sur `(reco.get("alternatives") or [])[:2]`. Les offsets pointent le **slice**.
+Un slice ne lève **jamais** `IndexError` en Python. Adjugé **`FALSE POSITIVE`
+avec preuve**, jamais `ACCEPTED` : marquer `ACCEPTED` enregistrerait l'outil
+comme ayant raison et masquerait le défaut de son moteur.
 
 ---
 
@@ -243,7 +328,7 @@ qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 |---|---|---|
 | **Socle** | `UIV3_COCKPIT_LADDER_01` *(B0)* | **`MERGED` — `6aecf6f`** |
 | | ~~`UIV3_TOKENS_01` *(B1)*~~ | **ABSORBÉE PAR B0** |
-| **Phase 1 — Accueil** | **`UIV3_HOME_CAUSAL_COCKPIT`** | à lancer |
+| **Phase 1 — Accueil** | **`UIV3_HOME_CAUSAL_COCKPIT`** | **PR #131 · 8/8 verts · Sonar OK · UI VALIDÉE OPÉRATEUR · `MERGE PENDING`** |
 | **Phase 2 — Séance** | `UIV3_SESSION_EXECUTION_CONSOLE_01` *(B6+B7)* | après phase 1 acceptée |
 | **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | après phase 2 acceptée |
 | Hors phase | `BODY_LEDGER_PAGE_01` · `LOGIN_IDENTITY_GATE_01` | à planifier |
@@ -297,9 +382,9 @@ un `UI_DATA_GAP`.
 
 | # | Gap | Statut |
 |---|---|---|
-| `G1` | alternatives + score non passées au template | **pass-through possible** — la valeur existe |
-| `G2` | zone limitante d'une alternative | **dérivable** des bandes, tri en présentation |
-| `G3` | comptage 11 zones par bande | **dérivable** |
+| `G1` | alternatives + score non passées au template | **CLOS** — pass-through de présentation, phase 1 |
+| `G2` | zone limitante d'une alternative | **CLOS** — tri des bandes existantes, phase 1 |
+| `G3` | comptage 11 zones par bande | **CLOS** — somme, phase 1 |
 | `G4` | état `REST` | **CLOS** — état de présentation à portée de requête, jamais persisté |
 | `G5` | volume d'exercice | somme de présentation |
 | `G6` | **RIR par série** | **BLOQUÉ** — `SetLog` ne porte ni `rir` ni `rpe`. L'afficher exigerait un modèle et une migration. **Hors périmètre absolu.** |
