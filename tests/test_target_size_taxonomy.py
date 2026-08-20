@@ -27,6 +27,7 @@ import re
 
 from scripts.target_size_taxonomy import (
     CATEGORIES,
+    OPEN_ALL_DISCLOSURES_JS,
     PROBE_JS,
     PRODUCT_THRESHOLD_PX,
     TAXONOMY,
@@ -34,6 +35,8 @@ from scripts.target_size_taxonomy import (
     WCAG_AA_MIN_PX,
     is_violation,
     is_wcag_aa_failure,
+    newly_revealed,
+    target_identity,
 )
 
 
@@ -266,6 +269,52 @@ def test_the_probe_only_treats_choice_inputs_as_label_owned():
     assert "clipPath" not in code, (
         "le clipping ne suffit pas à faire d'un label la cible — le TYPE le fait"
     )
+
+
+# ───────────────── couverture sous disclosure (B9) ─────────────────
+
+
+def test_the_identity_key_ignores_vertical_position():
+    """**Le piège qui a gonflé l'inventaire de 558 à 688.**
+
+    Ouvrir une disclosure décale tout ce qui suit. Une identité qui inclut
+    `y` fait passer chaque élément déplacé pour « révélé » — `topbar__brand`,
+    déjà réparé en B8, réapparaissait ainsi parmi les cibles cachées.
+    """
+    a = {"path": "a.topbar__brand", "text": "Auren", "y": 20}
+    b = {"path": "a.topbar__brand", "text": "Auren", "y": 260}
+    assert target_identity(a) == target_identity(b)
+
+
+def test_the_identity_key_separates_different_controls():
+    """Ignorer `y` ne doit pas fusionner deux contrôles distincts."""
+    a = {"path": "a.topbar__link", "text": "Historique", "y": 100}
+    b = {"path": "a.topbar__link", "text": "Physique", "y": 100}
+    assert target_identity(a) != target_identity(b)
+
+
+def test_only_targets_absent_from_the_default_state_count_as_revealed():
+    default = [{"path": "a.x", "text": "Déjà là", "y": 10}]
+    opened = [
+        {"path": "a.x", "text": "Déjà là", "y": 300},      # décalé, pas révélé
+        {"path": "a.y", "text": "Sous le menu", "y": 320},  # vraiment révélé
+    ]
+    revealed = newly_revealed(default, opened)
+    assert [r["text"] for r in revealed] == ["Sous le menu"]
+
+
+def test_nothing_is_revealed_when_no_disclosure_hides_anything():
+    rows = [{"path": "a.x", "text": "t", "y": 1}]
+    assert newly_revealed(rows, rows) == []
+
+
+def test_the_disclosure_sweep_opens_every_closed_disclosure():
+    """L'inventaire ne vaut que s'il ouvre TOUT : une disclosure oubliée est
+    une poche de cibles qui reste invisible, exactement comme avant B9."""
+    js = OPEN_ALL_DISCLOSURES_JS
+    assert "querySelectorAll('details')" in js
+    assert "d.open = true" in js
+    assert "opened:" in js, "la sonde doit dire COMBIEN elle a ouvert"
 
 
 def test_the_probe_skips_closed_disclosures():

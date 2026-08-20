@@ -190,3 +190,85 @@ a.text-muted::after,
   height: 100%;
   transform: translate(-50%, -50%);
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   UIV3_VISUAL_BASELINE_01 — ce que B8 ne POUVAIT pas voir
+   ══════════════════════════════════════════════════════════════════════════
+
+   Chromium verrouille la mise en page dans un `<details>` fermé
+   (`content-visibility`) : y mesurer une géométrie rend des faux positifs —
+   23 en phase 2. B8 les a donc exclus, et son inventaire était un PLANCHER
+   assumé, jamais un total.
+
+   B9 ouvre chaque disclosure, mesure, et fait l'UNION avec l'état par défaut.
+   Résultat : **214 occurrences sous le standard, 7 sélecteurs**, entièrement
+   invisibles jusqu'ici. Et l'essentiel n'est pas un détail périphérique :
+   c'est la NAVIGATION GLOBALE, présente sur les sept surfaces.
+
+   Piège de mesure payé ici : identifier une cible par `chemin|texte|y` fait
+   passer pour « révélé » tout ce qu'une disclosure ouverte DÉCALE. La clé
+   ignore désormais `y` — sans quoi `topbar__brand`, réparé en B8,
+   réapparaissait comme fautif.
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* ── A — la navigation globale ─────────────────────────────────────────────
+ * `.topbar__link` mesurait 37 px de haut, sur SEPT surfaces. C'est le menu
+ * principal du produit : rien n'est plus fréquent ni plus séquentiel.
+ *
+ * Ici la croissance visible est la bonne réponse, pas une extension : les
+ * liens vivent dans un panneau déroulant qui n'est en concurrence avec rien,
+ * et on vise ce qu'on voit. */
+:where(.topbar__link) {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+/* Le déclencheur du menu mesurait 39,4 × 41 — court sur les DEUX axes.
+ * `min-width` autant que `min-height` : un glyphe étroit ne devient pas
+ * touchable en grandissant seulement en hauteur. */
+:where(.topbar__toggle) {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── SIX CIBLES NON FERMÉES, NOMMÉES ET JUSTIFIÉES (`§3.4`) ────────────────
+ *
+ * Une extension par pseudo-élément a été écrite ici pour ces `<summary>`,
+ * mesurée SANS EFFET, puis retirée. Elle est restée dans deux versions
+ * successives avant d'être mesurée correctement — un rappel que du CSS mort
+ * accompagné d'un commentaire assuré se lit exactement comme du CSS qui
+ * marche.
+ *
+ * Et elle n'aurait pas pu marcher, pour une raison PHYSIQUE plutôt que
+ * technique.
+ *
+ * Trois `<summary>` empilés à 19,5 px d'intervalle ne peuvent pas recevoir
+ * chacun 44 px de zone tactile : les zones SE CHEVAUCHERAIENT, et un appui
+ * atterrirait sur le contrôle voisin. Une extension qui se recouvre est pire
+ * que pas d'extension — elle déplace le défaut au lieu de le corriger, et
+ * elle le rend invisible à la mesure.
+ *
+ * Ce qui reste ouvert, mesuré sous disclosure ouverte :
+ *
+ *   .method-reminder details > summary        19,5–39 px   × 3
+ *   .session-feedback__note > summary         27,5 px      × 1
+ *   .history-item__actions > summary          26 px        × 1
+ *   .history-item__actions .btn--ghost        26,8 px      × 1  (voisins)
+ *
+ * Ce ne sont PAS des défauts de feuille de style : ce sont des densités de
+ * mise en page. Les fermer demande de l'ESPACE entre les contrôles, donc un
+ * changement structurel.
+ *
+ *   · `method-reminder` et `session-feedback` vivent sur `session-active`,
+ *     mais HORS de la console — la console elle-même est à 0. Les retoucher
+ *     ici violerait le statut `reference consumer` de la surface.
+ *   · `history` est `TRANSITIONAL` : sa mise en page est déjà programmée pour
+ *     `UX4_03`, et lui imposer un espacement maintenant reviendrait à
+ *     contractualiser une architecture qu'on prévoit de refaire.
+ *
+ * Reportées à `UX4`, avec leur mesure. Une exception nommée et chiffrée n'est
+ * pas une dette cachée. */

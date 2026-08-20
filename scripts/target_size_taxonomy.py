@@ -329,6 +329,50 @@ PROBE_JS: Final[str] = r"""
 """
 
 
+# ── Couverture sous disclosure — le trou que B8 ne POUVAIT pas voir ─────────
+#
+# Chromium verrouille la mise en page dans un `<details>` fermé
+# (`content-visibility`) : y mesurer une géométrie rend des faux positifs — 23
+# en phase 2. B8 les a donc exclus, et son inventaire était un PLANCHER assumé.
+#
+# B9 ouvre chaque disclosure, mesure, et fait l'UNION avec l'état par défaut.
+# Résultat : **558 cibles révélées, 214 sous le standard, 7 sélecteurs** — dont
+# la NAVIGATION GLOBALE, présente sur les sept surfaces et jamais mesurée.
+#
+# `state coverage` ≠ `visual contract coverage`. Ouvrir tout est nécessaire à
+# l'INVENTAIRE ; ce n'est pas une raison de créer 2^N captures.
+
+OPEN_ALL_DISCLOSURES_JS: Final[str] = """
+() => {
+  const all = [...document.querySelectorAll('details')];
+  const closed = all.filter((d) => !d.open);
+  closed.forEach((d) => { d.open = true; });
+  return {total: all.length, opened: closed.length};
+}
+"""
+
+
+def target_identity(row: dict) -> str:
+    """Identité d'une cible, STABLE entre l'état par défaut et l'état ouvert.
+
+    ⚠ **Sans `y`.** Ouvrir une disclosure décale tout ce qui suit : avec `y`
+    dans la clé, chaque élément déplacé passe pour « révélé ». La première
+    écriture a ainsi compté `topbar__brand` — déjà réparé en B8 — parmi les
+    cibles cachées, et gonflé le total de 558 à 688.
+
+    Un inventaire qui compte du décalage pour de la découverte fait exactement
+    ce que le décompte 161 faisait : mesurer le mauvais objet, avec assurance.
+    """
+    return f"{row.get('path', '')}|{row.get('text', '')}"
+
+
+def newly_revealed(default_rows: list[dict], opened_rows: list[dict]
+                   ) -> list[dict]:
+    """Les cibles que seule l'ouverture des disclosures fait apparaître."""
+    seen = {target_identity(r) for r in default_rows}
+    return [r for r in opened_rows if target_identity(r) not in seen]
+
+
 def is_violation(row: dict) -> bool:
     """Le standard PRODUIT AUREN est-il manqué ?
 
