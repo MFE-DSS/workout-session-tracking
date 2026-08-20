@@ -81,16 +81,37 @@ séquentiel — c'est-à-dire tout ce qu'on touche plus d'une fois par séance.
 **Ne jamais rapporter 44 × 44 comme une obligation WCAG AA.** C'est faux, et
 c'est faux dans le sens qui expose : cela sur-déclare une conformité.
 
-| Référence | Seuil | Niveau |
+| Référence | Seuil | Nature |
 |---|---|---|
-| **WCAG 2.2 SC 2.5.8** *Target Size (Minimum)* | **24 × 24 px CSS**, avec exceptions définies (espacement, inline, contrôle du user-agent, équivalent ailleurs, essentiel) | **AA** — plancher légal |
-| **WCAG 2.2 SC 2.5.5** *Target Size (Enhanced)* | 44 × 44 px CSS | **AAA** |
+| **WCAG 2.2 SC 2.5.8** *Target Size (Minimum)* | **24 × 24 px CSS**, ou une exception valide (espacement, inline, contrôle du user-agent, équivalent ailleurs, essentiel) | **seuil WCAG 2.2 niveau AA** |
+| **WCAG 2.2 SC 2.5.5** *Target Size (Enhanced)* | 44 × 44 px CSS | seuil WCAG niveau **AAA** |
 | **Apple HIG** | 44 × 44 pt | recommandation plateforme |
-| **AUREN** | **44 × 44 px** sur contrôle fréquent/séquentiel | **standard produit interne** |
+| **AUREN** | **44 × 44 px** sur contrôle tactile désigné | **standard produit interne** |
+
+**Vocabulaire normatif, corrigé le 2026-08-20.** `24 × 24` est le **seuil
+WCAG 2.2 niveau AA**, et rien de plus fort que cela.
+
+> Le **W3C ne produit pas les lois**. Les obligations d'accessibilité varient
+> selon la juridiction et passent par des textes distincts — en UE notamment
+> **`EN 301 549`** et l'**European Accessibility Act**. Le décrire comme un
+> « plancher légal » inscrirait dans ce dépôt une affirmation VOCAB-INTERDIT
+> juridique que personne ici n'a qualité pour faire, et qui serait fausse
+> dans plusieurs ressorts.
+>
+> **Une garde balaie cette formulation** (`test_target_size_taxonomy.py`).
+> Une ligne qui doit la citer porte le token `VOCAB-INTERDIT` — c'est un
+> geste conscient, pas une heuristique de prose.
+
+**Les deux formulations autorisées, littéralement :**
+
+```
+WCAG 2.2 AA baseline      24 × 24 px CSS, ou exception SC 2.5.8 valide
+AUREN product standard    44 × 44 px CSS minimum sur contrôle tactile désigné
+```
 
 AUREN vise 44 parce qu'on manipule l'interface **en salle, une main occupée,
-parfois en sueur** — pas parce qu'un texte réglementaire l'impose. Le plancher
-WCAG 2.2 AA (24 × 24) reste un **minimum absolu jamais négociable**, et les
+parfois en sueur** — pas parce qu'un texte réglementaire l'impose. Le seuil AA
+reste **non négociable en tant que seuil de conformité technique**, et les
 exceptions de `2.5.8` sont des exceptions **réelles**, pas des échappatoires.
 
 ### 3.2 — Classifier AVANT de modifier (obligatoire)
