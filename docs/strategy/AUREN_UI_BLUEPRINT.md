@@ -399,7 +399,7 @@ qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 | | ~~`UIV3_TOKENS_01` *(B1)*~~ | **ABSORBÉE PAR B0** |
 | **Phase 1 — Accueil** | `UIV3_HOME_CAUSAL_COCKPIT` | **`MERGED` — PR #131, `f10af0a`** |
 | **Phase 2 — Séance** | **`UIV3_SESSION_EXECUTION_CONSOLE_01`** *(B6+B7)* | **`MERGED` — PR #133, `547df67`** · `BLOCKER-4` franchi |
-| **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | **en cours** |
+| **Phase 3 — Fermeture** | ✅ `UIV3_TARGETS_44_01` *(B8)* **MERGED** — PR #134, `3fe5556` · puis `UIV3_VISUAL_BASELINE_01` *(B9)* | **B9 prochaine** |
 | **Après UIV3** | **`AUREN_EXPERIENCE_ARCHITECTURE_V4`** — 4 chantiers, voir §5bis | **ouvert, non démarré** |
 | ~~Phase 4 — Analyse~~ | ~~`UIV3_PROGRESS_ANALYTICS_01`~~ | **absorbée par `UX4_03`** |
 | Hors phase | `LOGIN_IDENTITY_GATE_01` | à planifier |

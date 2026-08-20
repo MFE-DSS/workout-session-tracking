@@ -370,7 +370,7 @@ documente un `UI_DATA_GAP`.
 | B4 | `UIV3_HOME_REJECTED_01` | « écarté — et pourquoi » | 01, B2, **G1** | `index.html`, `home.css`, `pages.py` | HOME/reco | revert bloc |
 | B5 | `UIV3_HOME_DEPRIORITISE_01` | Disponibilité quitte l'accueil · État du jour replié | 01, D8 | `index.html`, partials | HOME/active | revert |
 | **B6+B7** | ✅ **`UIV3_SESSION_EXECUTION_CONSOLE_01` — MERGED** (`547df67`, PR #133, 2026-08-19) — **une seule vertical slice utilisateur** (décision opérateur 2026-08-18) : commande contextuelle · série courante **réellement** au-dessus du pli · états `set` / `rest` / `complete` · **suppression de l'architecture sticky remplacée**. Les quatre livrent **ensemble** ou la tranche n'existe pas. | 02, 04 | `exercise_card.html`, `session_detail.html`, `session_focus.css`, `app.css` | tous les golden SESSION, `S7` et `S8` inclus | revert vers `nav=stay`+`next` et la sticky |
-| B8 | `UIV3_TARGETS_44_01` | 0 cible sous 44 px sur les surfaces V3 | 00 | CSS uniquement | garde de cible mesurée | revert CSS |
+| **B8** | ✅ **`UIV3_TARGETS_44_01` — MERGED** (`3fe5556`, PR #134, 2026-08-20) | **63 → 0** cible sous le standard produit, 7 surfaces × 3 largeurs · **0 non-conformité WCAG AA** (elles passaient déjà par l'exception d'espacement) · **0 élément rétréci** | 00 | `target_closure.css` (feuille dédiée), 3 gabarits, 2 modules purs | taxonomie A–E + manifeste de géométrie, 42 gardes, 7 plantations | revert CSS |
 | B9 | `UIV3_VISUAL_BASELINE_01` | baselines capturées et versionnées | 03 | `scripts/`, `var/` | — | supprimer baselines |
 
 **Porte de revue humaine** : chaque tranche s'arrête à `PR GREEN / MERGE

@@ -291,7 +291,48 @@ SHELL_MOTION_POLISH. Doctrines détaillées : `AUREN_UI_BLUEPRINT §5bis`.
   est donc un **plancher**, pas un total. Les atteindre demande un harnais qui
   ouvre chaque disclosure — c'est le travail de `UIV3_VISUAL_BASELINE_01`, qui
   dispose déjà du vocabulaire d'actions `open_details`.
-- **La frontière A/B de « Rouvrir pour éditer »** attend un verdict opérateur.
+- ~~La frontière A/B de « Rouvrir pour éditer »~~ → **tranchée en `B` par
+  l'opérateur le 2026-08-20** : une action rare et potentiellement disruptive
+  ne doit pas recevoir le poids visuel de l'action principale.
 - **`Sb_OPS_CI_LINT_TIMEOUT_01`** reste ouverte et **hors queue UI**.
 - `UI_DATA_GAP` **G6** et **G7** : inchangés, hors périmètre, confirmés par
   l'opérateur.
+
+---
+
+## 13. CLOSEOUT
+
+| | |
+|---|---|
+| PR | [#134](https://github.com/MFE-DSS/workout-session-tracking/pull/134) **MERGED** |
+| merge | **`3fe5556`** — `--merge --match-head-commit 158c3be`, sans squash, sans `--admin`, sans force |
+| CI de PR | **8/8** · gate Sonar `OK` · **0 issue ouverte** · 0 thread |
+| **CI canonique** | **6/6 success, du premier coup** (run `32351774107`) |
+| diff | +1 814 / −20 sur 13 fichiers |
+| sweep local | 4981 passed (script canonique, 2 workers) |
+
+### Deux CI rouges, deux gardes préexistantes, aucune affaiblie
+
+**`test_the_family_stays_small`** — `interaction.css` est tenu à six primitives
+réutilisables ; j'y avais fait apparaître `btn`, `topbar`, `foot`,
+`method-reminder`. La garde avait raison : ce fichier **crée** des primitives,
+la fermeture **ferme** des surfaces héritées. **Déménagement** vers
+`target_closure.css`, pas élargissement de la liste autorisée. Re-mesuré après
+le déplacement : rendu identique, 0 violation, 0 rétrécissement.
+
+**Deux `python:S9073`** — assertions composites, MAJOR à 15 chacune ; une seule
+suffisait à faire sauter `new_code_smells_severity > 14`. Séparées, plus un
+pré-scan AST des quatre fichiers touchés.
+
+### Ce que la tranche laisse derrière elle
+
+Un **instrument** (`target_size_taxonomy`, `geometry_manifest`), une
+**doctrine** (taxonomie A–E, zone tactile ≠ chrome, 44 = produit et non WCAG),
+et un **garde-fou de programme** : `SURFACE_STATUS` empêche `B9` de
+contractualiser la dette de Profile et Library.
+
+Le défaut le plus instructif n'était pas dans le produit : ma propre règle a
+**abaissé** une commande acceptée de 56 à 44 px, et **ma propre garde est
+restée verte** parce qu'elle lisait des noms de sélecteurs là où la collision
+vivait dans la cascade. C'est la comparaison de géométrie qui l'a vue — et
+c'est pour cela qu'elle devient la couche B des baselines.
