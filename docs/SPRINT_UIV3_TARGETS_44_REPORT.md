@@ -162,6 +162,28 @@ Rien dans le fichier ne le montrait à la lecture. Une garde de parité
 
 ---
 
+## 7bis. La CI a refusé mon domicile, et elle avait raison
+
+Premier push, `pytest shard 3` rouge sur une garde **préexistante** :
+`test_ui_interaction_primitives.py::test_the_family_stays_small`.
+
+`interaction.css` est tenu à **six primitives réutilisables**. J'y avais écrit
+la fermeture parce que son en-tête porte déjà la doctrine « cible tactile
+44px » — et j'y ai fait apparaître quatre racines neuves : `btn`, `topbar`,
+`foot`, `method-reminder`.
+
+**La garde ne s'est pas trompée de cible.** `interaction.css` **crée** des
+primitives ; la fermeture **ferme** des surfaces héritées. Deux métiers. Les
+mélanger aurait transformé le fichier des primitives en dépotoir transversal —
+lentement, et sans que personne ne le décide.
+
+Réponse : **déménager**, pas élargir la liste autorisée. La fermeture vit
+désormais dans `app/static/css/target_closure.css`, chargée après
+`interaction.css`. **Aucune garde affaiblie.** Mesure refaite après le
+déménagement : 0 violation, 0 rétrécissement, rendu identique.
+
+---
+
 ## 8. Résultat
 
 | | avant | après |

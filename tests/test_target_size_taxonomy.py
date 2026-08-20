@@ -204,7 +204,12 @@ def test_every_category_key_used_by_the_probe_exists_in_the_taxonomy():
 # ───────────────────── la feuille de style de fermeture ─────────────────────
 
 CSS_DIR = pathlib.Path(__file__).resolve().parent.parent / "app/static/css"
-INTERACTION = CSS_DIR / "interaction.css"
+#: La fermeture vit dans SA feuille, pas dans `interaction.css`.
+#: `test_the_family_stays_small` garde ce dernier à six primitives et a refusé
+#: d'y voir apparaître `btn`, `topbar`, `foot`, `method-reminder`. Elle avait
+#: raison : `interaction.css` CRÉE des primitives, cette feuille FERME des
+#: surfaces héritées. Deux métiers, deux fichiers.
+CLOSURE = CSS_DIR / "target_closure.css"
 
 
 def test_css_comment_delimiters_are_balanced():
@@ -231,9 +236,9 @@ def test_the_closure_section_never_reaches_the_session_console():
     cette tranche. Profiter d'une passe d'accessibilité pour modifier une
     surface acceptée est le mode d'échec décrit par `CLAUDE.md §5.5`.
     """
-    src = INTERACTION.read_text(encoding="utf-8")
-    marker = "UIV3_TARGETS_44_01 — fermeture des cibles tactiles"
-    assert marker in src, "section de fermeture introuvable"
+    src = CLOSURE.read_text(encoding="utf-8")
+    marker = "UIV3_TARGETS_44_01"
+    assert marker in src, "feuille de fermeture introuvable"
     # On ne lit que les SÉLECTEURS, jamais la prose. Ce fichier EXPLIQUE
     # pourquoi il ne touche pas la console : une garde naïve trouverait
     # `.console` dans son propre commentaire et rougirait sur l'explication
