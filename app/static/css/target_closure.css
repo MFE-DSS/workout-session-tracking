@@ -30,10 +30,14 @@
  *                              l'input clippé qui vit derrière.
  *   E  USER_AGENT_OR_EDITABLE  l'aire éditable elle-même.
  *
- * 44 EST UN STANDARD PRODUIT, PAS UNE OBLIGATION WCAG AA. Le plancher légal
- * est 24 × 24 (SC 2.5.8), avec exception d'espacement. Mesuré sur les sept
- * surfaces : ZÉRO non-conformité AA, avant comme après. Ce qui suit relève du
- * confort en salle, une main occupée — pas du droit.
+ * 44 EST UN STANDARD PRODUIT, PAS UNE OBLIGATION WCAG AA. Le seuil WCAG 2.2
+ * niveau AA est 24 × 24 (SC 2.5.8), ou une exception valide — notamment
+ * l'espacement. Mesuré sur les sept surfaces : ZÉRO non-conformité AA, avant
+ * comme après. Ce qui suit relève du confort en salle, une main occupée.
+ *
+ * Ce seuil n'est PAS décrit ici comme une obligation juridique : le W3C ne
+ * produit pas les lois, et les obligations dépendent de la juridiction
+ * (`EN 301 549` / European Accessibility Act en UE).
  *
  * POURQUOI PAS UN `min-height: 44px` GLOBAL
  * ------------------------------------------

@@ -10,10 +10,20 @@ CE QUE 44 EST, ET CE QU'IL N'EST PAS
 `AUREN_UIUX_V3_FOUNDATION_CONTRACT §3.1`. **Ne jamais rapporter 44 × 44 comme
 une obligation WCAG AA** — c'est faux, et faux dans le sens qui expose :
 
-    WCAG 2.2 SC 2.5.8  Target Size (Minimum)   24 × 24 px   AA   ← plancher légal
-    WCAG 2.2 SC 2.5.5  Target Size (Enhanced)  44 × 44 px   AAA
-    Apple HIG                                  44 × 44 pt   recommandation
-    AUREN                                      44 × 44 px   standard PRODUIT
+    WCAG 2.2 SC 2.5.8  Target Size (Minimum)   24 × 24 px   ← SEUIL AA
+    WCAG 2.2 SC 2.5.5  Target Size (Enhanced)  44 × 44 px     AAA
+    Apple HIG                                  44 × 44 pt     recommandation
+    AUREN                                      44 × 44 px     standard PRODUIT
+
+`24 × 24` est le **seuil WCAG 2.2 niveau AA**, et rien de plus fort que cela.
+Le W3C **ne produit pas les lois** : les obligations varient selon la
+juridiction, et l'articulation juridique passe par des textes distincts —
+en UE notamment `EN 301 549` et l'`European Accessibility Act`.
+
+Décrire ce seuil comme un « plancher légal » revient à inscrire dans le  VOCAB-INTERDIT
+dépôt une affirmation juridique que personne ici n'a qualité pour faire.
+Une garde balaie cette formulation ; une ligne qui doit la citer porte le
+token d'échappement.
 
 AUREN vise 44 parce qu'on manipule l'interface en salle, une main occupée.
 Pas parce qu'un texte réglementaire l'impose.
@@ -36,7 +46,10 @@ Category = Literal["A", "B", "C", "D", "E"]
 #: Standard produit AUREN.
 PRODUCT_THRESHOLD_PX: Final[int] = 44
 
-#: Plancher WCAG 2.2 SC 2.5.8 niveau AA. **Minimum absolu, jamais une cible.**
+#: **Seuil WCAG 2.2 SC 2.5.8, niveau AA.** Le W3C ne produit pas les lois ;
+#: les obligations dépendent de la juridiction (`EN 301 549` / `EAA` en UE).
+#: C'est un seuil de conformité technique, jamais une cible de conception —
+#: et jamais à présenter comme une exigence juridique.
 WCAG_AA_MIN_PX: Final[int] = 24
 
 #: Les trois largeurs du contrat produit.

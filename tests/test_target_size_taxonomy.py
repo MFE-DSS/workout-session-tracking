@@ -68,13 +68,99 @@ def test_inline_is_the_only_category_exempt_from_the_product_threshold():
 
 
 def test_the_product_threshold_is_not_presented_as_a_wcag_aa_obligation():
-    """44 est un standard PRODUIT. Le plancher légal AA est 24.
+    """44 est un standard PRODUIT. Le seuil WCAG 2.2 AA est 24.
 
-    Les confondre sur-déclare une conformité — c'est faux dans le sens qui
-    expose juridiquement."""
+    Les confondre sur-déclare une conformité — faux dans le sens qui expose."""
     assert PRODUCT_THRESHOLD_PX == 44
     assert WCAG_AA_MIN_PX == 24
     assert WCAG_AA_MIN_PX < PRODUCT_THRESHOLD_PX
+
+
+#: Les surfaces où le vocabulaire des seuils tactiles est écrit. Une garde qui
+#: ne balaie qu'un fichier laisserait la formulation revenir par un autre.
+_TARGET_SIZE_SURFACES = (
+    "scripts/target_size_taxonomy.py",
+    "tests/test_target_size_taxonomy.py",
+    "app/static/css/target_closure.css",
+    "docs/strategy/AUREN_UIUX_V3_FOUNDATION_CONTRACT.md",
+    "docs/SPRINT_UIV3_TARGETS_44_REPORT.md",
+)
+
+#: Formulations INTERDITES. Chacune transforme un seuil technique en
+#: affirmation juridique. VOCAB-INTERDIT — cette ligne les cite pour les
+#: déclarer, elle ne les affirme pas.
+_FORBIDDEN_LEGAL_CLAIMS = (
+    "plancher légal", "legal floor", "legally required",      # VOCAB-INTERDIT
+    "obligation légale", "exigence légale",                   # VOCAB-INTERDIT
+)
+
+#: Marqueur d'ÉCHAPPEMENT. La règle interdit d'AFFIRMER qu'un seuil WCAG est
+#: une obligation juridique — pas de citer la formulation pour l'interdire.
+#:
+#: La première écriture cherchait une négation dans les 80 caractères
+#: précédents. C'était de l'analyse de prose française, et elle a rougi sur
+#: quatre fichiers qui disaient tous le contraire de ce qu'elle cherche — la garde
+#: punissait sa propre doctrine. Une heuristique de langage naturel dans une
+#: garde produit des faux positifs pour toujours, et les auteurs finissent par
+#: se battre contre elle.
+#:
+#: Un marqueur mécanique n'a pas ce défaut : la ligne qui cite une formulation
+#: interdite porte le token, et c'est un geste conscient.
+_VOCAB_ESCAPE = "VOCAB-INTERDIT"
+
+
+def _asserts_legality(text: str, phrase: str) -> bool:
+    """La phrase est-elle AFFIRMÉE, ou citée sur une ligne échappée ?"""
+    escape = _VOCAB_ESCAPE.lower()
+    return any(phrase in line and escape not in line
+               for line in text.splitlines())
+
+
+def test_no_wcag_threshold_is_ever_described_as_a_legal_obligation():
+    """**Correction normative de l'opérateur, 2026-08-20.**
+
+    `24 × 24` est le **seuil WCAG 2.2 niveau AA**, et rien de plus fort.
+    Le **W3C ne produit pas les lois** : les obligations varient selon la
+    juridiction et passent par des textes distincts — en UE, `EN 301 549` et
+    l'European Accessibility Act.
+
+    Décrire ce seuil comme une obligation juridique inscrit dans le dépôt une
+    affirmation que personne ici n'a qualité pour faire, et qui est fausse dans
+    plusieurs ressorts. C'est la faute symétrique de celle qu'on évite en
+    testant l'exception d'espacement : l'une sur-déclare une conformité,
+    l'autre sur-déclare une obligation.
+
+    Cette garde balaie les fichiers, pas la mémoire : la formulation est
+    revenue naturellement sous plusieurs plumes dans une seule tranche.
+
+    Une ligne qui doit citer une formulation interdite porte le token
+    d'échappement — c'est un geste conscient, pas une heuristique de prose.
+    """
+    root = pathlib.Path(__file__).resolve().parent.parent
+    offenders = []
+    for rel in _TARGET_SIZE_SURFACES:
+        text = (root / rel).read_text(encoding="utf-8").lower()
+        for phrase in _FORBIDDEN_LEGAL_CLAIMS:
+            if _asserts_legality(text, phrase):
+                offenders.append(f"{rel} → « {phrase} »")
+    assert not offenders, (
+        "seuil WCAG AFFIRMÉ comme une obligation juridique : "
+        + " · ".join(offenders)
+    )
+
+
+def test_the_authorised_wording_is_present_in_the_contract():
+    """La correction n'est pas seulement une suppression : les deux
+    formulations autorisées doivent être écrites, sinon la prochaine plume
+    réinvente la sienne."""
+    contract = (pathlib.Path(__file__).resolve().parent.parent
+                / "docs/strategy/AUREN_UIUX_V3_FOUNDATION_CONTRACT.md"
+                ).read_text(encoding="utf-8")
+    assert "WCAG 2.2 AA baseline" in contract
+    assert "AUREN product standard" in contract
+    assert "EN 301 549" in contract, (
+        "l'articulation juridique réelle doit être nommée, pas suggérée"
+    )
 
 
 def test_the_three_product_viewports_are_pinned():

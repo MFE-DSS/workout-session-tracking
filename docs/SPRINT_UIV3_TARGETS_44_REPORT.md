@@ -68,7 +68,7 @@ sur-déclare une conformité — faux dans le sens qui expose.
 
 | Référence | Seuil | Niveau |
 |---|---|---|
-| WCAG 2.2 **SC 2.5.8** *Target Size (Minimum)* | **24 × 24 px**, avec exceptions | **AA** — plancher légal |
+| WCAG 2.2 **SC 2.5.8** *Target Size (Minimum)* | **24 × 24 px**, ou exception valide | **seuil WCAG 2.2 niveau AA** |
 | WCAG 2.2 SC 2.5.5 *Target Size (Enhanced)* | 44 × 44 px | AAA |
 | Apple HIG | 44 × 44 pt | recommandation plateforme |
 | **AUREN** | **44 × 44 px** | **standard produit** |
