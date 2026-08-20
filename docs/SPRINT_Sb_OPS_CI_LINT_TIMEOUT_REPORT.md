@@ -137,7 +137,41 @@ La PR est la preuve.
 
 ---
 
-## 7. Ce que la tranche ne fait pas
+## 7. Une erreur de procédure, attrapée par la CI
+
+Le premier push est parti rouge sur `check_spec_protocol` — ce rapport n'avait
+pas de section verdict — **et sur `test_spec_protocol`, qui exécute le même
+contrôle**. Une seule cause pour deux échecs.
+
+**La cause racine n'est pas l'oubli, c'est l'ordre.** J'ai lancé le contrôle
+requis **et** le sweep complet, puis j'ai écrit ce rapport. Les deux étaient
+verts sur un arbre qui n'existait plus au moment du commit.
+
+> Une vérification requise se lance **juste avant le commit**, sur l'arbre
+> qu'on committe. La cocher tôt puis continuer à écrire, c'est vérifier autre
+> chose que ce qu'on livre.
+
+C'est exactement le motif que ce dépôt combat ailleurs — une preuve verte qui
+ne porte pas sur l'objet qu'elle prétend couvrir.
+
+---
+
+## Verdict
+
+**`Sb_OPS_CI_LINT_TIMEOUT_01` — cause corrigée, symptôme non traité, et c'est
+délibéré.**
+
+Le job lint ne dépend plus d'aucun miroir réseau. `timeout-minutes: 5` du job
+est **conservé** : la distribution mesurée — médiane 51 s, p90 77 s, max 109 s
+sur 39 exécutions — dit qu'il n'a jamais été en cause. Aucun gate retiré,
+aucun step rendu advisory, aucun cache désactivé.
+
+La validation fait autorité **sur la CI réelle**, pas en local
+(`CLAUDE.md §1`, tier `ci_infra`).
+
+---
+
+## 9. Ce que la tranche ne fait pas
 
 - **Ne touche à aucun autre job.** `pytest` (45 min), les shards (20 min) et
   l'agrégateur (10 min) sont inchangés.
