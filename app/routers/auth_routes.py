@@ -540,12 +540,27 @@ async def profile_body_submit(
     email: Annotated[str, Form()] = "",
     height_cm: Annotated[str, Form()] = "",
     resting_hr: Annotated[str, Form()] = "",
-    bp_systolic: Annotated[str, Form()] = "",
-    bp_diastolic: Annotated[str, Form()] = "",
     db: DbSession = None,
     user: CurrentUser = None,
 ):
-    """Save physical profile fields."""
+    """Save physical profile fields.
+
+    `UX4_01` — **la tension artérielle n'est plus acquise ici**, et ce handler
+    ne touche plus `bp_systolic` / `bp_diastolic`.
+
+    Décision opérateur (`AUREN_UI_BLUEPRINT §5ter`) : `REMOVE_NO_ASK` de
+    l'acquisition courante, **données existantes préservées**. La donnée
+    traversait `providers.py` et `coach_report.py` jusqu'à un gabarit sans
+    jamais atteindre `recommendation.py` ni `zone_recovery.py` — affichée,
+    jamais décisionnelle.
+
+    **Ne pas assigner est ce qui rend la préservation vraie.** Tant que le
+    handler écrivait `user.bp_systolic = _int_or_none(bp_systolic)` avec un
+    défaut de formulaire à `""`, **retirer le champ du gabarit suffisait à
+    effacer la valeur stockée au prochain enregistrement** — le piège de
+    sérialisation déjà payé sur la console de séance. Une garde le prouve en
+    enregistrant, pas en le lisant.
+    """
     def _int_or_none(v: str, lo: int, hi: int) -> int | None:
         v = v.strip()
         if not v:
@@ -560,8 +575,6 @@ async def profile_body_submit(
 
     user.height_cm = _int_or_none(height_cm, 100, 250)
     user.resting_hr = _int_or_none(resting_hr, 30, 220)
-    user.bp_systolic = _int_or_none(bp_systolic, 60, 250)
-    user.bp_diastolic = _int_or_none(bp_diastolic, 30, 150)
 
     email_clean = email.strip().lower() if email.strip() else None
     if email_clean:

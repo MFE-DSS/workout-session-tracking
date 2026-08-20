@@ -2096,6 +2096,64 @@ input, button, textarea, select {
   gap: 12px;
 }
 
+/* ── UX4_01 — état lisible du Profil ─────────────────────────────────────────
+ * Trois classes, aucune couleur nouvelle : tout est repris des tokens déjà
+ * mesurés de cette feuille (`CLAUDE.md §5.4`).
+ *
+ * Les deux premières corrigent des défauts que la CAPTURE a montrés et que
+ * la relecture du gabarit n'aurait pas révélés : sans style, `.quicklog__input`
+ * tombait sur le rendu par défaut du navigateur — un champ BLANC au milieu
+ * d'une interface graphite — et `.pstate__legacy` se collait à son résumé,
+ * lisible comme « Mettre à jour mes mesures saisie complète ». */
+
+/* Un état pur n'a pas de cadre : le titre et l'espace disent le groupe.
+ * L'audit de nécessité a ramené le Profil de 18 régions encadrées à 4, toutes
+ * des objets manipulables. */
+.pstate--flat {
+  margin-bottom: var(--space-md);
+}
+
+/* Saisie compacte, sur la ligne, là où la donnée se lit. */
+.quicklog {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.quicklog__label {
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
+.quicklog__input {
+  background: var(--surface-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  color: var(--fg);
+  font-size: 14px;
+  font-family: var(--font-mono);
+  min-height: 44px;
+  width: 6.5em;
+}
+
+.quicklog__input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Le mécanisme d'acquisition hérité se signale comme tel, sans crier. */
+.pstate__legacy {
+  display: block;
+  font-size: 11px;
+  color: var(--fg-dim);
+  font-weight: 400;
+}
+
 .body-profile__field {
   display: flex;
   flex-direction: column;

@@ -129,11 +129,25 @@ def test_profile_requires_auth(client):
 
 
 def test_profile_renders_for_authenticated_user(client):
+    """**Migré par `UX4_01`.**
+
+    La garde exigeait « Sessions totales » sur le Profil. Ce compteur a
+    déménagé : il répond à « comment est-ce que je progresse ? », question que
+    la décision opérateur du 2026-08-20 réserve à `PROGRESSION` — laquelle
+    rend déjà « sessions cette semaine » et « sessions terminées (30 j) ». La
+    capacité n'est pas perdue, elle est à sa place.
+
+    L'invariant qui ne périme pas est ailleurs : la page rend, elle identifie
+    son utilisateur, et elle offre l'action de compte. Il est conservé et
+    élargi aux faits d'identité que le Profil doit porter.
+    """
     r = client.get("/profile")
     assert r.status_code == 200
     assert "testuser" in r.text
-    assert "Sessions totales" in r.text
     assert "Changer le mot de passe" in r.text
+    # Ce que le Profil DOIT savoir dire de l'utilisateur.
+    for fact in ("Utilisateur", "Inscrit le", "Statut"):
+        assert fact in r.text, f"fait d'identité absent du Profil : {fact}"
 
 
 # ---------------------------------------------------------------------------
