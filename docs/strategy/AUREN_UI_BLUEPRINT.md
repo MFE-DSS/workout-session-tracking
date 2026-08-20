@@ -582,11 +582,16 @@ aveugle : quatre ensembles, chacun avec son propre gate.
 > capture au moment pertinent**, et de faire disparaître une part importante de
 > l'interface actuelle.
 
+> **`5ter` est le registre de référence de ce programme.** Aucune tranche `UX4`
+> ne place une capacité ni ne demande une donnée sans une ligne au
+> `PRODUCT PLACEMENT & ACQUISITION LEDGER`. Les lignes `OPERATOR_DECISION` sont
+> normatives ; les candidates ne le sont pas.
+
 | # | Chantier | Objectif |
 |---|---|---|
 | **UX4_01** | `PROFILE_DATA_ACQUISITION` | passer de « modifier une base de données » à « apprendre ce dont AUREN a besoin » |
-| **UX4_02** | `LIBRARY_WORKOUT_DISCOVERY` | passer d'un catalogue de cartes textuelles à une **surface de décision** |
-| **UX4_03** | `PROGRESSION_BODY_LEDGER` | fusionner la logique analytique, mettre fin à la confusion `/progress` ↔ `/dashboard` ; absorbe l'ancienne « Phase 4 » et `BODY_LEDGER_PAGE_01` |
+| **UX4_02** | `LIBRARY_WORKOUT_DISCOVERY` | passer d'un catalogue de cartes textuelles à une **surface de décision**, **rattachée à Programmes** (`5ter.3`, `OD`) |
+| **UX4_03** | `PROGRESSION_BODY_LEDGER` | fusionner la logique analytique ; **absorber les capacités utiles de `/dashboard` dans Progression puis le RETIRER** (`5ter.3`, `OD`) ; absorbe l'ancienne « Phase 4 » et `BODY_LEDGER_PAGE_01` |
 | **UX4_04** | `SHELL_MOTION_POLISH` | **seulement après les surfaces** : transitions, overlays, micro-motion, espacement global |
 
 ### UX4_01 — doctrine de capture de donnée
@@ -653,6 +658,143 @@ résiduels** · contenu secondaire qui disparaît au bon moment.
 Une boîte presque aussi grande que son conteneur perd sa capacité à exprimer un
 groupement : l'alignement, l'espace et le fond disent le groupe mieux qu'un
 cadre de plus.
+
+---
+
+## 5ter. `PRODUCT PLACEMENT & ACQUISITION LEDGER`
+
+**Registre d'AUGMENTATION, pas d'anti-drift.** Décision opérateur du
+2026-08-20. Il ne fige rien : chaque ligne porte **ce qui justifierait d'en
+changer**, et un meilleur pattern remet la ligne en compétition par
+construction.
+
+Il répond à une seule question : **où une capacité doit-elle vivre, et comment
+une donnée doit-elle entrer dans AUREN ?**
+
+### 5ter.0 — Nature des preuves
+
+Quatre étiquettes, jamais mélangées. La règle précédente (*mesuré / connu*)
+était trop faible : « connu » couvrait aussi bien un fait vérifiable qu'un
+souvenir.
+
+| Étiquette | Ce qu'elle garantit | Ce qu'elle ne garantit pas |
+|---|---|---|
+| `[MEASURED]` | relevé au navigateur sur le runtime AUREN, fixture et viewport nommés | que la mesure soit la bonne — l'instrument doit être planté |
+| `[VERIFIED_BENCHMARK]` | pattern d'**architecture d'information** confirmé sur source officielle, **avec URL et date de vérification** | **aucune comparaison visuelle** — aucune capture concurrente n'est mesurée |
+| `[DESIGN_HYPOTHESIS]` | conclusion dérivée, explicitement attribuée à l'agent | rien. **Ce n'est pas une décision.** |
+| `[OPERATOR_DECISION]` | arbitrage humain accepté | l'immutabilité — voir le déclencheur de changement |
+
+> **Seules les lignes `OPERATOR_DECISION` sont normatives pour un build.**
+> Une hypothèse ne devient jamais une décision par ancienneté.
+
+**Les comptes concurrents sont des preuves DATÉES, pas de la doctrine.**
+Vérifié le 2026-08-20 : la page produit de Hevy écrit « Eight routine
+categories » et en liste huit, quand son centre d'aide en annonce sept. **Deux
+sources officielles du même éditeur se contredisent.** Le nombre exact n'a
+aucune portée doctrinale ; c'est la **forme** — quelques résultats puis filtres
+— qui en a une. Toute ligne du registre qui repose sur un décompte porte sa
+date et se relit avant d'être invoquée.
+
+### 5ter.1 — Neuf classes de placement
+
+| Classe | Test |
+|---|---|
+| `PRIMARY_DESTINATION` | question utilisateur autonome, fréquente, compréhensible hors contexte |
+| `SECONDARY_DESTINATION` | domaine cohérent mais dépendant d'une destination mère |
+| `CONTEXT_ACTION` | n'a de sens que sur l'objet ou l'état courant |
+| `ONCE_SETUP` | donnée stable qui change réellement le comportement du produit |
+| `JUST_IN_TIME` | utile uniquement quand une situation la requiert |
+| `QUICK_LOG` | donnée volatile qu'on doit pouvoir corriger vite |
+| `CONNECTED_TRANSFER` | une source externe est plus fiable et moins pénible que la saisie |
+| `DERIVED_INFERRED` | AUREN possède déjà les observations nécessaires |
+| `REMOVE_NO_ASK` | aucune décision ni lecture utile ne consomme la donnée |
+
+**Cinq critères cumulatifs pour une destination globale** : question autonome ·
+plusieurs contextes ou sessions · profondeur suffisante · aucun objet
+préalablement sélectionné · stabilité conceptuelle quand les features évoluent.
+
+**Test inverse, plus rapide** : si l'utilisateur doit d'abord savoir « de quel
+exercice, de quelle séance, de quel lieu parle-t-on ? », la fonction est
+contextuelle.
+
+> **Une capacité ne mérite jamais une destination au seul motif qu'elle possède
+> déjà une route.**
+
+#### Règle de contexte par défaut, et son déclencheur de promotion
+
+*Formulation amendée par l'opérateur le 2026-08-20 : « jamais global » était un
+absolu, et un absolu ne se révise pas.*
+
+**Par défaut**, une action spécifique à un objet vit **sur l'objet**. Elle est
+**promue** en destination lorsque **les cinq critères** de destination sont
+satisfaits **et** qu'au moins un déclencheur est mesuré :
+
+- l'action est engagée depuis **plusieurs contextes distincts** sans que
+  l'objet soit déjà sélectionné ;
+- elle acquiert une **profondeur propre** — recherche, filtres, comparaison —
+  que le contexte de l'objet ne peut plus porter ;
+- elle devient une **activité de planification** menée hors de l'exécution.
+
+La promotion est un `OPERATOR_DECISION`, jamais une dérive.
+
+### 5ter.2 — Doctrine d'acquisition
+
+**Question obligatoire pour chaque champ demandé à l'utilisateur :**
+
+> Quel comportement, quelle recommandation ou quelle lecture **change** si
+> cette donnée existe ?
+
+Sans réponse précise, la donnée est `QUESTIONABLE_VALUE` et ne mérite pas une
+place visible. **Un champ n'est pas légitime parce que la colonne SQL existe.**
+
+`[VERIFIED_BENCHMARK 2026-08-20]` La question n'est pas seulement interne :
+**Google Play** soumet les permissions santé de haute sensibilité — dont
+`READ_BLOOD_PRESSURE` — à un *heightened scrutiny*, et exige de **démontrer que
+la donnée est requise par une fonctionnalité utilisateur**. **Health Connect**
+documente le type et la permission ; **c'est la politique Play qui pose
+l'exigence.** La plateforme applique donc déjà la doctrine d'acquisition, avec
+un refus au bout.
+
+### 5ter.3 — Le registre
+
+`OD` = `OPERATOR_DECISION`, normatif · `C` = candidat, non normatif.
+
+| Capacité / donnée | Placement actuel | Classe cible | Preuve | Rationale | Déclencheur de changement | Statut | Vérifié |
+|---|---|---|---|---|---|---|---|
+| Séance du jour | Accueil | `PRIMARY_DESTINATION` | `[VERIFIED_BENCHMARK]` Fitbod · `[MEASURED]` 1,9 écran / 114 mots | Question souveraine unique, tenue en un écran | si l'accueil devait servir plusieurs questions souveraines | **`OD`** | 2026-08-20 |
+| **Bibliothèque de programmes** | destination propre | **`SECONDARY_DESTINATION` sous Programmes** | `[VERIFIED_BENCHMARK]` Hevy loge la découverte sous `Workout → Explore` · `[MEASURED]` 3,9 écrans / 319 mots pour ~13 gabarits | La découverte est une surface de sélection, pas une racine de navigation ; deux racines de programme obligeraient à deviner | corpus atteignant plusieurs centaines de gabarits, ou usage hors planification | **`OD`** | 2026-08-20 |
+| **Dashboard** | route dédiée | **ABSORBER dans Progression puis RETIRER** | `[MEASURED]` deux racines analytiques concurrentes | Une seule racine analytique ; l'utilisateur ne doit pas deviner laquelle ouvrir | — (décision prise) | **`OD`** | 2026-08-20 |
+| **Tension artérielle** | formulaire Profil, rang 1 | **`REMOVE_NO_ASK`** de l'acquisition courante · **données existantes préservées** · **aucune permission connectée demandée** | `[MEASURED]` traverse `providers.py` → `coach_report.py` → gabarit ; n'atteint ni `recommendation.py` ni `zone_recovery.py` · `[VERIFIED_BENCHMARK]` Google Play, haute sensibilité | La justification actuelle est **faible et non démontrée** : aucun moteur de décision ne la consomme | **un consommateur produit démontré** — alors seulement l'acquisition et la permission se rediscutent | **`OD`** | 2026-08-20 |
+| Substitution d'exercice | Séance | `CONTEXT_ACTION` | `[DESIGN_HYPOTHESIS]` test des cinq critères | Dépend de l'exercice courant | promotion selon `5ter.1` | **`OD`** | 2026-08-20 |
+| Équipement du jour | Profil | `CONTEXT_ACTION` | `[VERIFIED_BENCHMARK]` Fitbod · *Training Session Mods*, « changes only affecting your current workout » | Contrainte temporaire, pas configuration durable | si l'équipement cessait de varier d'une séance à l'autre | `C` | 2026-08-20 |
+| Salle principale | Profil | `ONCE_SETUP` + bascule | `[VERIFIED_BENCHMARK]` Fitbod · *My Plan*, lieux multiples avec bascule | Configuration persistante qui altère la génération | — | `C` | 2026-08-20 |
+| Taille · envergure · morphométrie | formulaire géant | `ONCE_SETUP` · capture guidée | `[MEASURED]` 19 champs, 6,6 écrans | Quasi statique, coût de saisie sans rapport avec la fréquence | si une mesure devenait fréquente | `C` | 2026-08-20 |
+| Poids corporel | formulaire Profil | `QUICK_LOG` · `CONNECTED_TRANSFER` préféré | `[VERIFIED_BENCHMARK]` Health Connect expose `Weight` | Volatile, consommé par l'entraînement et la progression | — | `C` | 2026-08-20 |
+| FC repos | formulaire Profil | `CONNECTED_TRANSFER` · repli avancé | `[MEASURED]` écrite dans l'entrée de disponibilité, aucune lecture décisionnelle trouvée · `[VERIFIED_BENCHMARK]` `RestingHeartRateRecord` | Mesurable automatiquement, pénible à saisir | un moteur AUREN qui la consomme | `C` | 2026-08-20 |
+| Régularité d'entraînement | KPI de profil | `DERIVED_INFERRED` | `[MEASURED]` runtime AUREN possède les séances | Jamais demander ce qu'on observe déjà | — | `C` | 2026-08-20 |
+| Historique d'exercice | menu global | `CONTEXT_ACTION` · enfant de Progression | `[DESIGN_HYPOTHESIS]` | Dépend de l'exercice courant | s'il devenait une surface d'analyse autonome | `C` | 2026-08-20 |
+| État vide analytique | six cartes encadrées | guider ou disparaître | `[MEASURED]` Progression rend 6 cartes dont 3 disent « pas assez de données » | Un cadre pour zéro information coûte sans rendre | — | `C` | 2026-08-20 |
+
+### 5ter.4 — Principes durables
+
+Chacun adossé à au moins une preuve.
+
+| Principe | Preuve |
+|---|---|
+| La configuration qui **altère durablement la génération** appartient au plan ; les **contraintes temporaires** appartiennent au contexte du jour. | `[VERIFIED_BENCHMARK]` Fitbod sépare *My Plan* de *Training Session Mods* |
+| Une action spécifique à un objet vit **par défaut** sur l'objet, et n'est promue en destination que par les critères de `5ter.1`. | `[DESIGN_HYPOTHESIS]` + règle de promotion |
+| Ne demander manuellement que ce qu'AUREN ne peut raisonnablement **dériver, différer ou importer**. | `[VERIFIED_BENCHMARK]` Health Connect · politique Play · `[MEASURED]` tension sans consommateur décisionnel |
+| Un module analytique vide **guide vers la preuve suffisante, ou disparaît**. | `[MEASURED]` Progression, 3 cartes vides sur 6 |
+| Une surface de **parcours** optimise le scan et le choix ; le **détail** vit dans la fiche. | `[VERIFIED_BENCHMARK]` Hevy : quelques programmes puis filtres `Level/Goal/Equipment` · `[MEASURED]` AUREN : 3 gabarits par écran sur 3,9 écrans |
+
+**Sources vérifiées le 2026-08-20** — Hevy (centre d'aide · page produit
+`gym-workout-routines`) · Fitbod (*My Plan* · *Training Session Mods*) ·
+Boostcamp (*Program Selector* · *Programs*) · Android Health Connect (types de
+données) · Google Play (Android Health Permissions).
+
+**Non vérifié, donc non inscrit** : les patterns Gravl cités en brainstorming
+(Gym Profile sur Home, remplacement via trois points) — aucune source
+officielle atteignable. Le même principe est établi par Fitbod, avec source.
 
 ---
 
