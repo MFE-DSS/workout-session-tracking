@@ -6,6 +6,83 @@
 {# Sb_27.3 — Weekly training loop tile (count, dominantes, anomalie, hint) #}
 {% include "_partials/weekly_loop.html" %}
 
+{# ── `UX4_03` — LES TROIS SIGNAUX, ENFIN RENDUS ─────────────────────────────
+   Le chapeau de cette page promettait « la régularité » depuis toujours sans
+   jamais l'afficher, et `UX4_01` a retiré ces lectures du Profil parce
+   qu'elles y répondaient à la mauvaise question. Elles étaient calculées et
+   visibles NULLE PART.
+
+   AUCUN CALCUL NOUVEAU. `compute_behavioral_state` est le service que
+   consomme déjà l'accueil ; il est simplement branché sur la surface qui le
+   promettait.
+
+   `streak_days` EXISTE ET N'EST PAS RENDU — décision assumée.
+   Il compte des jours calendaires CONSÉCUTIFS : un jour de repos
+   correctement pris le remet à zéro. Le rendre contredirait « la régularité
+   ne doit pas être un streak quotidien ». La continuité est donc exprimée par
+   la comparaison de deux fenêtres de sept jours, qui explique le rythme réel
+   sans le gamifier.
+
+   VOCABULAIRE. `test_no_forbidden_wording_in_progress` interdit certains mots
+   dans CE FICHIER, commentaires compris — et cette garde est plus stricte que
+   celle que j'avais écrite. Elle a raison : une règle mécanique ne se discute
+   pas au cas par cas, et un démenti reste une occurrence.
+   D'où « Lecture d'entraînement — rien d'autre. » plutôt qu'une négation qui
+   emploierait le mot qu'elle nie.
+
+   « Charge ressentie » décrit ce que l'utilisateur a DÉCLARÉ en fin de séance.
+   Aucune revendication d'un état physiologique mesuré, aucun « score IA ». #}
+<h2 class="section-header">Signaux d'entraînement</h2>
+<div class="signals">
+
+  <div class="signal">
+    <div class="signal__head">
+      <span class="signal__name">Charge ressentie</span>
+      <span class="signal__value">{{ "%.0f"|format(behavioral.fatigue_score) }}<span class="signal__unit">/100</span></span>
+    </div>
+    {# Une jauge sans dépendance JS : une barre, une largeur, un fond. #}
+    <div class="signal__gauge" role="img"
+         aria-label="Charge ressentie {{ '%.0f'|format(behavioral.fatigue_score) }} sur 100">
+      <span class="signal__fill" style="width:{{ behavioral.fatigue_score }}%"></span>
+    </div>
+    <p class="signal__note">
+      Dérivée de ce que tu as déclaré en fin de séance sur les trois dernières.
+      Lecture d'entraînement — rien d'autre.
+    </p>
+  </div>
+
+  <div class="signal">
+    <div class="signal__head">
+      <span class="signal__name">Régularité</span>
+      <span class="signal__value">{{ "%.0f"|format(behavioral.consistency_score) }}<span class="signal__unit">/100</span></span>
+    </div>
+    <div class="signal__gauge" role="img"
+         aria-label="Régularité {{ '%.0f'|format(behavioral.consistency_score) }} sur 100">
+      <span class="signal__fill" style="width:{{ behavioral.consistency_score }}%"></span>
+    </div>
+    <p class="signal__note">
+      Séances sur les quatorze derniers jours. <strong>Un jour de repos ne
+      casse rien</strong> — c'est un rythme, pas une chaîne à ne pas rompre.
+    </p>
+  </div>
+
+  <div class="signal">
+    <div class="signal__head">
+      <span class="signal__name">Continuité</span>
+      <span class="signal__value signal__value--word">
+        {% if behavioral.trend_direction == 'up' %}en hausse
+        {% elif behavioral.trend_direction == 'down' %}en baisse
+        {% else %}stable{% endif %}
+      </span>
+    </div>
+    <p class="signal__note">
+      Compare tes sept derniers jours aux sept précédents. Aucun compteur de
+      jours consécutifs : une semaine plus calme se lit, elle ne s'efface pas.
+    </p>
+  </div>
+
+</div>
+
 {# Sx_UI_07.1 — readability pass : les KPI existants sont regroupés sous une
    section « Rythme récent » (lecture d'entraînement, pas cockpit). Aucune
    valeur/calcul changé — seuls le regroupement et la microcopy évoluent. #}

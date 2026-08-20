@@ -691,6 +691,19 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
 
     weekly = build_weekly_loop(db, user)
 
+    # `UX4_03` — les trois signaux comportementaux existaient, calculés, et
+    # n'étaient rendus NULLE PART : `/progress` annonçait « la régularité »
+    # dans son chapeau sans jamais l'afficher, et `UX4_01` les a retirés du
+    # Profil parce qu'ils y répondaient à la mauvaise question.
+    #
+    # COMPOSITION EN LECTURE SEULE. `compute_behavioral_state` est le même
+    # service que consomme l'accueil : aucun calcul nouveau, aucun modèle,
+    # aucune migration. On branche une valeur déjà produite sur la surface qui
+    # la promettait.
+    from app.services.behavioral import compute_behavioral_state
+
+    behavioral = compute_behavioral_state(db, user.id)
+
     return templates.TemplateResponse(
         request,
         "progress.html",
@@ -703,6 +716,7 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db, user.id),
             "weekly": weekly,
+            "behavioral": behavioral,
         },
     )
 

@@ -1757,6 +1757,85 @@ input, button, textarea, select {
 
 /* ---- KPI Grid (progress page) ---- */
 
+/* ── UX4_03 — les trois signaux d'entraînement ───────────────────────────────
+ * Aucune couleur nouvelle : tout vient des tokens déjà mesurés de cette
+ * feuille (`CLAUDE.md §5.4`). Aucune dépendance JS : la jauge est une largeur
+ * en pourcentage, elle se rend sans une ligne de script.
+ *
+ * PAS DE CADRE PAR SIGNAL. L'audit de nécessité d'`UX4_01` a montré qu'une
+ * boîte aussi large que son conteneur n'exprime plus un groupement : trois
+ * cartes bordées de plus rendraient cette page plus dense sans la rendre plus
+ * lisible. Un filet sépare, l'espace groupe.
+ */
+.signals {
+  display: grid;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.signal + .signal {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-md);
+}
+
+.signal__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.signal__name {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+.signal__value {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Une continuité se lit en mots, pas en chiffre : « stable » n'a pas d'unité,
+ * et lui en donner une suggérerait une précision qui n'existe pas. */
+.signal__value--word {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.signal__unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fg-dim);
+  margin-left: 2px;
+}
+
+.signal__gauge {
+  margin-top: var(--space-xs);
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  overflow: hidden;
+}
+
+/* `--accent` est le token porteur de sens du dépôt. La jauge ne code AUCUN
+ * jugement par la couleur : une charge haute et une charge basse ont le même
+ * remplissage, seule la longueur change. Colorer en rouge une fatigue élevée
+ * en ferait un verdict, et ce n'en est pas un. */
+.signal__fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+}
+
+.signal__note {
+  margin: var(--space-xs) 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
