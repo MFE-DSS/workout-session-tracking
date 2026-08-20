@@ -194,11 +194,25 @@ def test_the_surface_needs_no_javascript(client):
         assert js not in section, f"dépendance JS introduite : {js}"
 
 
-def test_the_gauge_has_an_accessible_name(client):
-    """Une barre sans nom accessible ne dit rien à qui ne la voit pas."""
+def test_every_signal_value_is_readable_without_seeing_the_gauge(client):
+    """**Migrée.** La garde exigeait un `role="img"` + `aria-label` sur la
+    barre. `Web:S6819` l'a signalé, et la règle avait raison sur le fond : la
+    valeur est **déjà** rendue en texte juste au-dessus, donc un lecteur
+    d'écran l'annonçait deux fois.
+
+    L'invariant qui ne périme pas n'est pas « la barre a un nom » — c'est que
+    **la valeur reste lisible sans voir la barre**. La jauge est désormais
+    `aria-hidden`, et c'est une amélioration : elle redit visuellement ce que
+    le chiffre dit déjà, elle n'ajoute rien à l'oreille.
+    """
     body = client.get("/progress").text
-    assert 'role="img"' in body
-    assert "aria-label=\"Charge ressentie" in body
+    # La valeur vit dans du texte, pas dans un attribut d'image.
+    assert body.count('class="signal__value') >= 3
+    # Et la barre ne double plus l'annonce.
+    gauges = body.count('class="signal__gauge"')
+    assert gauges == body.count('class="signal__gauge" aria-hidden="true"'), (
+        "une jauge est encore annoncée en plus de sa valeur"
+    )
 
 
 def test_no_body_map_or_anatomical_asset_was_added():

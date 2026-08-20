@@ -40,9 +40,15 @@
       <span class="signal__name">Charge ressentie</span>
       <span class="signal__value">{{ "%.0f"|format(behavioral.fatigue_score) }}<span class="signal__unit">/100</span></span>
     </div>
-    {# Une jauge sans dépendance JS : une barre, une largeur, un fond. #}
-    <div class="signal__gauge" role="img"
-         aria-label="Charge ressentie {{ '%.0f'|format(behavioral.fatigue_score) }} sur 100">
+    {# Une jauge sans dépendance JS : une barre, une largeur, un fond.
+
+       `aria-hidden` — et c'est une AMÉLIORATION, pas une concession. La barre
+       porte d'abord `role="img"` + `aria-label`, ce que `Web:S6819` a signalé.
+       La règle avait raison sur le fond : la valeur `45/100` est DÉJÀ rendue
+       en texte juste au-dessus, donc un lecteur d'écran l'annonçait deux fois.
+       La jauge redit visuellement ce que le chiffre dit déjà ; elle n'ajoute
+       rien à l'oreille. #}
+    <div class="signal__gauge" aria-hidden="true">
       <span class="signal__fill" style="width:{{ behavioral.fatigue_score }}%"></span>
     </div>
     <p class="signal__note">
@@ -56,8 +62,7 @@
       <span class="signal__name">Régularité</span>
       <span class="signal__value">{{ "%.0f"|format(behavioral.consistency_score) }}<span class="signal__unit">/100</span></span>
     </div>
-    <div class="signal__gauge" role="img"
-         aria-label="Régularité {{ '%.0f'|format(behavioral.consistency_score) }} sur 100">
+    <div class="signal__gauge" aria-hidden="true">
       <span class="signal__fill" style="width:{{ behavioral.consistency_score }}%"></span>
     </div>
     <p class="signal__note">
