@@ -21,7 +21,9 @@
 <form method="post" action="{{ url_for('create_session') }}" class="template-card__start">
   <input type="hidden" name="template_slug" value="{{ template.slug }}" />
   <input type="hidden" name="creation_source" value="library" />
-  <button type="submit" class="btn btn--primary btn--sm">Démarrer cette séance</button>
+  {# `UIV3_TARGETS_44_01` — voir `library.html` : `btn--sm` sur l'action
+     principale d'une surface est une erreur de variante. #}
+  <button type="submit" class="btn btn--primary">Démarrer cette séance</button>
 </form>
 
 {% if template.exercises|length == 0 %}

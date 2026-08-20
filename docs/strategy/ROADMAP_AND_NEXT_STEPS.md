@@ -719,6 +719,18 @@
 - 📋 **QUEUE DE BUILD recommandée par l'audit** — **la restitution avant la collecte** : 1 `Sb_ATLAS_TECHNICAL_GUARDS_01` (le plus sûr, valeur la plus visible, aucun modèle) · 2 `Sb_SUBSTITUTION_COCKPIT_01` · 3 `Sb_SESSION_REVIEW_SIGNAL_01` · 4 `Sb_EXECUTION_QUALITY_01` **conditionné à OQ-2** · 5 `Sb_REST_EVENT_TRACE_01` (migration).
 - 🚦 **PROGRAMME `AUREN_UI_V2_PRODUCT_QUALITY_01` : 2 tranches livrées sur 8.** Restent : 1 Home (préflight prêt) · **2 Session focus — priorité produit la plus haute** · 3 Programs · 4 Profile · 5 Progress · 6 cohérence · 7 acceptance + revue humaine unique. **Déploiement** : une seule release cohérente après 0–6 + acceptation visuelle, **pas de déploiement par tranche**. Dette reportée : **panneau machine jamais restylé**, à reprendre en tranche 2.
 - 🚦 ~~**CAPACITÉ CI = `WATCH`**~~ → **RÉSOLU** par `Sb_OPS_CI_SCALE_02` (passage à **3 shards**) ; état courant **HEALTHY**, shard bas à **6 467 Mo**. Enregistrement historique conservé ci-dessous. **CAPACITÉ CI = `WATCH` — règle d'arrêt déclenchée.** Shard B à **3 701 Mo** (canonique) / 3 720 Mo (PR), sous le plancher `HEALTHY` de 4 Go ; swap intact, aucun job tué. Le shard B a perdu **1 364 Mo en trois tranches** (5 065 → 4 772 → 4 380 → 3 701) en suivant la croissance des tests (4 314 → 4 453). **Conséquence** : `Sb_ORCHESTRATOR_EXPLAINER_01` (tranche 2) **NON ouverte**. **`GO` recommandé pour `Sb_OPS_CI_SCALE_02`** avant toute nouvelle tranche runtime.
+- ⏱️ **`Sb_OPS_CI_LINT_TIMEOUT_01` — OUVERT, `ci_infra`, hors queue UI.** Décision
+  opérateur du 2026-08-19 : **quatre annulations** du job lint sur
+  `timeout-minutes: 5` avec cache froid ne sont plus un incident ponctuel. La
+  quatrième est la plus parlante — elle s'est produite **sur la CI canonique** et
+  s'est interrompue au step `shellcheck`, laissant `gitleaks`, `spec protocol` et
+  le drift `requirements` **non exécutés**. Un job annulé n'est pas un job
+  permissif : il est **muet**, ce qui est pire. **Objectif unique** : donner au
+  job un budget dérivé de sa **distribution réelle cache chaud / cache froid**,
+  **sans relâcher une seule étape**. **Interdits** : retirer un step, rendre un
+  gate advisory, désactiver le cache. **Validation obligatoire sur la vraie CI**
+  (contrat `ci_infra`, désormais mécanique). **Ne doit pas contaminer le diff
+  UI** — tranche séparée, exécutable en parallèle ou juste avant la phase 3.
 - **Prochains candidats (sur GO explicite, aucun ouvert)** :
   1. **curation EKB → scoring V2** (activer les sous-scores non mesurables) ;
   2. **`Sb_OPS` hygiène Sonar P1** (résorber la dette pré-existante du gate main-branch) ;

@@ -1,0 +1,188 @@
+/* `UIV3_TARGETS_44_01` — fermeture des cibles tactiles.
+ *
+ * POURQUOI CETTE FEUILLE EXISTE SÉPARÉMENT
+ * =========================================
+ * Ces règles ont d'abord été écrites dans `interaction.css`, dont l'en-tête
+ * porte déjà la doctrine « cible tactile 44px ». La CI a refusé :
+ * `test_the_family_stays_small` garde ce fichier à SIX primitives réutilisables,
+ * et y voyait apparaître quatre racines neuves — `btn`, `topbar`, `foot`,
+ * `method-reminder`.
+ *
+ * La garde avait raison. `interaction.css` CRÉE des primitives ; cette feuille
+ * FERME des surfaces héritées. Ce sont deux métiers, et les mélanger aurait
+ * transformé le fichier des primitives en dépotoir transversal. La réponse
+ * juste était de déménager, pas d'élargir la liste autorisée.
+ *
+ * Chargée APRÈS `interaction.css` — mais l'ordre importe peu : presque tout
+ * ici est enveloppé de `:where()`, donc de spécificité nulle.
+ *
+ * CE QUI EST FERMÉ, ET CE QUI NE L'EST PAS — `FOUNDATION_CONTRACT §3.2`
+ *
+ *   A  FREQUENT_SEQUENTIAL     44 requis, chrome inclus : on vise ce qu'on
+ *                              voit, et un bouton de 27 px se rate même avec
+ *                              une zone étendue.
+ *   B  SECONDARY_STANDALONE    zone tactile 44 SANS toucher au chrome — un
+ *                              pseudo-élément étend la surface, la
+ *                              typographie ne bouge pas.
+ *   C  INLINE                  intouché. Gonfler un lien dans une phrase
+ *                              casse l'interligne. Exception WCAG 2.5.8.
+ *   D  HIDDEN_IMPLEMENTATION   c'est le LABEL qu'on dimensionne, jamais
+ *                              l'input clippé qui vit derrière.
+ *   E  USER_AGENT_OR_EDITABLE  l'aire éditable elle-même.
+ *
+ * 44 EST UN STANDARD PRODUIT, PAS UNE OBLIGATION WCAG AA. Le plancher légal
+ * est 24 × 24 (SC 2.5.8), avec exception d'espacement. Mesuré sur les sept
+ * surfaces : ZÉRO non-conformité AA, avant comme après. Ce qui suit relève du
+ * confort en salle, une main occupée — pas du droit.
+ *
+ * POURQUOI PAS UN `min-height: 44px` GLOBAL
+ * ------------------------------------------
+ * Le décompte de dette est passé de 161 à 69 sur une seule mesure fraîche :
+ * l'original comptait des `input[type=radio]` de 1 × 1 px cachés derrière
+ * leurs labels. Une règle générique aurait gonflé 19 étiquettes de champs
+ * texte de `/profile` — du texte statique que personne ne touche — et
+ * maintenu la vraie dette ailleurs.
+ *
+ * CE QUE CETTE FEUILLE NE TOUCHE PAS
+ * -----------------------------------
+ * La console de séance (`.console`, `.dock`, `.setline`, `.session-head`) est
+ * un `reference consumer` : 0 violation au dogfood accepté. Aucun sélecteur
+ * ci-dessous ne l'atteint, et une garde le vérifie.
+ */
+
+/* ── A — commandes et navigation : 44 visible ──────────────────────────────
+ * `.btn` mesurait 26,8 px de haut. Sur `/library`, c'est le bouton
+ * « Démarrer » de chaque carte de gabarit — l'action la plus fréquente de la
+ * surface, répétée 13 fois.
+ *
+ * `--sm` est délibérément exclu : c'est la variante des actions rares et
+ * denses, et l'y inclure reviendrait à supprimer la variante.
+ *
+ * ⚠ `:where()` N'EST PAS UNE COQUETTERIE — C'EST LE CŒUR DE LA RÈGLE.
+ *
+ * Écrite en `.btn:not(.btn--sm)`, cette règle a fait RÉTRÉCIR
+ * `TERMINER LA SÉANCE` de 56 à 44 px. `.btn--end` portait déjà un
+ * `min-height: 56px` délibéré ; ma règle, plus spécifique ET chargée après,
+ * l'a ABAISSÉ. Un plancher de 44 posé par-dessus un plancher de 56 rabote la
+ * commande dominante de l'état `SESSION REVIEW` — acceptée au dogfood de
+ * phase 2.
+ *
+ * `:where()` compte pour ZÉRO en spécificité : la règle devient un plancher
+ * de dernier recours, que n'importe quelle déclaration explicite écrase. Elle
+ * ne peut plus que RELEVER.
+ *
+ * Une garde qui lit des noms de sélecteurs ne voyait rien : la collision est
+ * dans la CASCADE, pas dans le texte. Seule la comparaison de géométrie
+ * avant/après l'a rendue visible — d'où `scripts/geometry_manifest.py`. */
+:where(.btn:not(.btn--sm)) {
+  min-height: 44px;
+}
+
+/* Onglets de filtre d'historique — navigation séquentielle.
+ * `inline-flex` est conservé ICI : `.filter-bar__item` est un `<a>`, qui ne
+ * centre pas verticalement son contenu tout seul. Mesuré : 31,5 → 44, rien
+ * ne rétrécit. */
+:where(.filter-bar__item) {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── D — le label est la cible, l'input est clippé ─────────────────────────
+ * `.segmented__option` mesurait 31,5 px. La hauteur se pose sur le `span`
+ * visible, qui est ce que le doigt rencontre ; le radio derrière reste
+ * masqué-mais-focusable (déclaration unique en tête d'`interaction.css`).
+ *
+ * La variante `--stacked` porte déjà ses 44 px depuis
+ * `Sb_UI_SESSION_CHOICES_DISCLOSURES_01` — elle n'est pas redéclarée. */
+:where(.segmented:not(.segmented--stacked) .segmented__option span) {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── E — l'aire éditable ───────────────────────────────────────────────────
+ * 39 px mesurés. Cinq pixels manquants sur des champs qu'on remplit au doigt,
+ * en salle.
+ *
+ * CIBLÉ SUR CE QUI EST ÉDITABLE, PAS SUR UN CONTENEUR. La première écriture
+ * visait `.field input` : les 19 champs de `/profile` vivent dans
+ * `.body-profile__field` et n'ont pas bougé d'un pixel. Poursuivre conteneur
+ * par conteneur aurait produit une liste sans fin et un CSS illisible.
+ *
+ * LES EXCLUSIONS SONT LE CŒUR DE LA RÈGLE, pas un détail. Un `min-height`
+ * global sur `input` gonflerait les radios masqués-mais-focusables de 1 × 1 px
+ * (`interaction.css`) : ils sortiraient de leur label et casseraient les
+ * groupes segmentés. C'est LITTÉRALEMENT l'erreur du décompte 161 — compter,
+ * puis gonfler, des objets que personne ne touche.
+ *
+ * `min-height` ne fait que RELEVER un plancher : un champ déjà à 44 ou plus
+ * n'est pas touché. La console de séance, à 0 violation, est donc inchangée —
+ * et une garde le vérifie plutôt que de l'espérer. */
+:where(input:not([type="radio"]):not([type="checkbox"]):not([type="hidden"]):not([type="submit"]):not([type="button"])),
+:where(textarea),
+:where(select) {
+  min-height: 44px;
+}
+
+/* ── B — zone tactile étendue, chrome inchangé ─────────────────────────────
+ * `§3.3` : le standard porte sur la surface qui reçoit le doigt, pas sur la
+ * taille apparente. Ces liens gardent leur graisse et leur taille de
+ * caractère — un pseudo-élément centré porte la zone à 44 px.
+ *
+ * C'est la forme qui préserve la densité gagnée en phase 2. Grossir le texte
+ * de la marque ou du pied de page pour atteindre 44 échangerait un défaut
+ * d'accessibilité contre un défaut de densité.
+ *
+ * `position: relative` est nécessaire au positionnement du pseudo-élément ;
+ * `pointer-events` n'est pas touché — le pseudo-élément hérite du lien.
+ *
+ * `inline-block` N'EST PAS COSMÉTIQUE ICI. Un lien `inline` qui passe sur
+ * deux lignes n'a pas UNE boîte mais deux fragments, et un pseudo-élément
+ * absolu se cale sur le premier — mesuré sur « Comment c'est calculé → » à
+ * 390 px : 4 points sondés sur 5, le cinquième reçu par le conteneur. Ces
+ * liens sont tous des actions autonomes sur leur propre ligne ; leur
+ * interdire de se scinder rend l'extension fiable sans rien changer au rendu.
+ */
+.topbar__brand,
+.foot__contact,
+.method-reminder__more a,
+a.text-muted {
+  position: relative;
+  display: inline-block;
+}
+
+/* `.btn--sm` EST la variante des actions rares et denses — c'est sa
+ * définition, donc catégorie `B` par construction. Trois usages où elle
+ * portait l'action PRINCIPALE d'une surface ont été corrigés au gabarit
+ * (« Démarrer » sur `library`, `launcher`, `template_detail`) ; ce qui reste
+ * est authentiquement rare : rouvrir un bilan, supprimer, éditer, imprimer.
+ *
+ * Les grossir inviterait la frappe accidentelle sur des actions dont
+ * plusieurs sont destructrices. On étend donc la zone sans toucher au chrome.
+ *
+ * FRONTIÈRE A/B — « Rouvrir pour éditer » (`session_done`) est un `<button>`,
+ * donc `A` à la lettre de la taxonomie, mais ni fréquent ni séquentiel.
+ * Classé `B` par l'opérateur le 2026-08-20 : une action rare et potentiellement
+ * disruptive ne doit pas recevoir le poids visuel de l'action principale. */
+.btn--sm {
+  position: relative;
+}
+
+.topbar__brand::after,
+.foot__contact::after,
+.method-reminder__more a::after,
+a.text-muted::after,
+.btn--sm::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  min-width: 44px;
+  min-height: 44px;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}

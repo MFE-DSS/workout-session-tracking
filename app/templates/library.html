@@ -38,7 +38,11 @@
             <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
             {# Sb_13 telemetry: library CTA. #}
             <input type="hidden" name="creation_source" value="library" />
-            <button type="submit" class="btn btn--ghost btn--sm">Démarrer</button>
+            {# `UIV3_TARGETS_44_01` — `btn--sm` retiré. C'est la variante des
+               actions RARES et denses ; « Démarrer » est l'action principale
+               de cette surface, répétée une fois par gabarit. Mesurée à
+               26,8 px de haut, catégorie `FREQUENT_SEQUENTIAL`. #}
+            <button type="submit" class="btn btn--ghost">Démarrer</button>
           </form>
         </li>
       {% endfor %}

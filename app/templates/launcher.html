@@ -62,7 +62,9 @@
           <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
           {# Sb_13 telemetry: provenance "launcher" full picker. #}
           <input type="hidden" name="creation_source" value="launcher" />
-          <button type="submit" class="btn btn--primary btn--sm">Démarrer</button>
+          {# `UIV3_TARGETS_44_01` — voir `library.html` : `btn--sm` sur l'action
+             principale d'une surface est une erreur de variante. #}
+          <button type="submit" class="btn btn--primary">Démarrer</button>
         </form>
         <div style="margin-top:var(--space-xs);">
           <a class="text-muted" href="{{ url_for('template_detail', slug=tpl.slug) }}" style="font-size:13px;">Détails →</a>
