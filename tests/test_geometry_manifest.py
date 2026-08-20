@@ -149,7 +149,8 @@ def test_hard_overflow_requires_all_three_conditions():
     il faut aussi `overflow-x: visible` et pas d'ellipse. Sans ces deux
     conditions, la mesure rendait 31 débordements dont 23 faux."""
     code = _code()
-    assert "scrollWidth" in code and "clientWidth" in code
+    assert "scrollWidth" in code
+    assert "clientWidth" in code
     assert "overflowX" in code
     assert "textOverflow" in code
 

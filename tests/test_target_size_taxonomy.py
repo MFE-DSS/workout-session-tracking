@@ -175,7 +175,8 @@ def test_the_probe_only_treats_choice_inputs_as_label_owned():
 
     19 libellés de `/profile` auraient exigé 44 px sur du texte statique."""
     code = _code()
-    assert "'radio'" in code and "'checkbox'" in code
+    assert "'radio'" in code
+    assert "'checkbox'" in code
     assert "clipPath" not in code, (
         "le clipping ne suffit pas à faire d'un label la cible — le TYPE le fait"
     )
