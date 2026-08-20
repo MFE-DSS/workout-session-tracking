@@ -5,17 +5,80 @@
 
 <div class="cockpit-grid">
   <div class="cockpit-main">
-    <div class="card">
-      <h2 class="card__title">Identite</h2>
+    {# ── `UX4_01` — L'ÉTAT LISIBLE, avant toute édition ──────────────────────
+       Le Profil mesurait 6,6 écrans, 641 mots, 39 contrôles : quatre
+       formulaires empilés, soit une interface d'ADMINISTRATION DE DONNÉES.
+
+       Il répond désormais d'abord à « qu'est-ce qu'AUREN sait de moi ? », et
+       ne propose de modifier qu'ensuite. Aucune donnée n'est perdue : les
+       faits d'identité vivent ici, les formulaires vivent derrière leur
+       déclencheur.
+
+       `CLAUDE.md §5.3` — c'est ce bloc qui accompagne le retrait de la
+       tension artérielle. Une soustraction ne part jamais seule.
+
+       Ce qui est rendu est ce qu'AUREN POSSÈDE. « — » n'est pas un vide de
+       mise en page : c'est « non mesuré », et il se lit comme tel. #}
+    {% set morpho_known = capture_fields | selectattr('0', 'in', latest_values) | list | length %}
+    <div class="card pstate">
+      <h2 class="card__title">Corps</h2>
+      <ul class="stats-list">
+        <li><span>Poids</span><b>{{ (latest_values.get('weight_kg') ~ ' kg') if latest_values.get('weight_kg') else '—' }}</b></li>
+        <li><span>Taille</span><b>{{ (user.height_cm ~ ' cm') if user.height_cm else '—' }}</b></li>
+        <li><span>Morphologie</span><b>{{ morpho_known }} / {{ capture_fields | length }} mesures</b></li>
+        <li><span>FC repos</span><b>{{ (user.resting_hr ~ ' bpm') if user.resting_hr else '—' }}</b></li>
+      </ul>
+
+      {# ── `UX4_01` — POIDS : `QUICK_LOG` ────────────────────────────────────
+         `OPERATOR_DECISION` : le poids est volatil et consommé par
+         l'entraînement et la progression. Il ne doit pas exiger d'ouvrir un
+         formulaire de morphométrie complet.
+
+         Saisie compacte, **manuelle**, au même endroit que sa lecture. Elle
+         poste vers la MÊME route canonique que la mesure complète — aucun
+         second écrivain sur `body_measurements`, la leçon de
+         `Sb_MORPHO_PROFILE_RUNTIME_01` tient.
+
+         `CONNECTED_FUTURE` est une DIRECTION, pas une implémentation : aucune
+         permission santé n'est demandée ici, et l'architecture ne suppose
+         simplement plus que le grand formulaire soit le canal permanent. #}
+      <form method="post" action="{{ url_for('profile_measurements_submit') }}"
+            class="quicklog">
+        <label class="quicklog__label" for="quicklog_weight">Poids du jour</label>
+        <input class="quicklog__input" type="number" step="0.1" min="30" max="300"
+               id="quicklog_weight" name="weight_kg"
+               placeholder="{{ latest_values.get('weight_kg') or '—' }}">
+        <button type="submit" class="btn btn--ghost">Noter</button>
+      </form>
+    </div>
+
+    {# `UX4_01` — résumé COMPACT et EN LECTURE SEULE de la configuration
+       d'entraînement, tel que la décision opérateur l'autorise. Il ne dit pas
+       « comment je progresse » — les compteurs de séances ont été retirés,
+       ils appartenaient à `PROGRESSION` — mais « ce qu'AUREN sait de mes
+       intentions ». « Non renseigné » est un état à part entière. #}
+    {# `UX4_01` — état PUR : pas de cadre. L'audit de nécessité a classé cette
+       région `SEMANTIC_STATE` à 0 contrôle et 100 % de la largeur du
+       conteneur. Une boîte aussi large que son conteneur n'exprime plus un
+       groupement : le titre et l'espace le disent mieux. #}
+    <section class="pstate pstate--flat">
+      <h2 class="section-header">Entraînement</h2>
+      <ul class="stats-list">
+        <li><span>Cadence souhaitée</span><b>{% if preferences.sessions_per_week %}{{ preferences.sessions_per_week }} / semaine{% else %}—{% endif %}</b></li>
+        <li><span>Priorités</span><b>{% if preferences.focus_priorities %}{{ preferences.focus_priorities | length }} déclarée(s){% else %}—{% endif %}</b></li>
+        <li><span>Équipement</span><b>{% if preferences.available_equipment is none %}—{% else %}{{ preferences.available_equipment | length }} déclaré(s){% endif %}</b></li>
+      </ul>
+    </section>
+
+    <section class="pstate pstate--flat">
+      <h2 class="section-header">Compte</h2>
       <ul class="stats-list">
         <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
+        <li><span>Email</span><b>{{ user.email or "—" }}</b></li>
         <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
         <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
-        <li><span>Email</span><b>{{ user.email or "—" }}</b></li>
-        <li><span>Sessions totales</span><b>{{ session_count }}</b></li>
-        <li><span>Sessions terminées</span><b>{{ completed_count }}</b></li>
       </ul>
-    </div>
+    </section>
 
     {# Sb_31.next.profile-link — Découvrabilité Body Intelligence v2.
        Lien sobre vers /body/intelligence ; aucune réimplémentation
@@ -37,42 +100,21 @@
     </div>
     {% endif %}
 
-    <div class="card">
-      <h2 class="card__title">Mes 30 derniers jours</h2>
-      <div class="kpi-row">
-        <div class="kpi">
-          <span class="kpi__value">{{ sessions_30d_count }}</span>
-          <span class="kpi__label">séances</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi__value trend-indicator trend-indicator--{{ trend }}">{{ trend_label }}</span>
-          <span class="kpi__label">tendance</span>
-        </div>
-      </div>
-      <div class="kpi-row" style="margin-top:var(--space-sm);">
-        <div class="kpi">
-          <span class="kpi__value">{{ "%.0f"|format(behavioral.fatigue_score) }}</span>
-          <span class="kpi__label">fatigue</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi__value">{{ "%.0f"|format(behavioral.consistency_score) }}</span>
-          <span class="kpi__label">régularité</span>
-        </div>
-        <div class="kpi">
-          <span class="kpi__value">{{ behavioral.streak_days }}</span>
-          <span class="kpi__label">jours de série</span>
-        </div>
-      </div>
-      {% if quality_svg %}
-        <div class="timeline-chart">{{ quality_svg|safe }}</div>
-        <p class="timeline-legend">
-          <span class="timeline-legend__dot timeline-legend__dot--strength"></span> Musculation
-          <span class="timeline-legend__dot timeline-legend__dot--cardio"></span> Cardio
-        </p>
-      {% else %}
-        <p class="text-dim" style="font-size:13px;margin:var(--space-sm) 0;">Pas encore de données</p>
-      {% endif %}
-    </div>
+    {# ── `UX4_01` — « MES 30 DERNIERS JOURS » A QUITTÉ LE PROFIL ─────────────
+       Le Profil répond à DEUX questions, et à deux seulement :
+       « que sait AUREN de moi ? » et « que puis-je changer volontairement ? ».
+
+       Ce bloc répondait à une troisième — « comment est-ce que je
+       progresse ? » — qui appartient à `PROGRESSION`, laquelle EXISTE déjà.
+
+       Et il rendait `0` comme une valeur mesurée : fatigue 0, régularité 0,
+       série 0, avec une tendance « en baisse ». Un zéro dérivé d'aucune
+       observation n'est pas une mesure, c'est une absence de mesure. La
+       décision opérateur l'interdit explicitement.
+
+       Aucun lien de remplacement ici : `Progression` est déjà une destination
+       de premier rang du rail de navigation. Y renvoyer depuis le Profil
+       dupliquerait la navigation au lieu de la clarifier. #}
   </div>
 
   <div class="cockpit-side">
@@ -93,6 +135,20 @@
         précédentes sont conservées.
       </p>
       {% endif %}
+      {# ── `UX4_01` — MORPHOMÉTRIE : MÉCANISME DE REPLI, PAS ARCHITECTURE CIBLE
+         `OPERATOR_DECISION` : la morphométrie est `ONCE_SETUP` +
+         `GUIDED_CAPTURE`. Ce grand formulaire est un **mécanisme d'acquisition
+         hérité**, conservé parce qu'il fonctionne — pas parce qu'il est la
+         cible.
+
+         L'assistant guidé n'est PAS construit ici : il sort du périmètre
+         approuvé de cette tranche, et l'opérateur l'interdit explicitement
+         tant qu'il n'y entre pas.
+
+         Ce qui change dès maintenant : il ne constitue plus la page. Il
+         s'ouvre par un geste, et sa lecture vit en tête. #}
+      <details class="pstate__edit">
+      <summary>Mettre à jour mes mesures <span class="pstate__legacy">saisie complète</span></summary>
       <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
           <label for="measured_at">Date</label>
@@ -116,14 +172,16 @@
         {% endfor %}
         <button type="submit" class="btn btn--primary">Enregistrer la mesure</button>
       </form>
+      </details>
     </div>
 
     {# Sb_MORPHO_PROFILE_READMODEL_01 — lecture seule. Le guardrail brut du
        moteur n'est PAS rendu : c'est un démenti ("aucune posture, aucun
        diagnostic") et l'afficher mettrait le cadre médical sous les yeux du
        lecteur sans rien lui apprendre. Il reste disponible pour l'audit. #}
-    <div class="card">
-      <h2 class="card__title" id="morpho-title">Mesures morphologiques</h2>
+    {# `UX4_01` — état PUR, cadre retiré (audit de nécessité). #}
+    <div class="pstate pstate--flat">
+      <h2 class="section-header" id="morpho-title">Mesures morphologiques</h2>
       <section aria-labelledby="morpho-title">
       {% if morpho.has_anything %}
         {% if morpho.is_mixed_date %}
@@ -173,12 +231,22 @@
         </ul>
         {% endif %}
       {% else %}
+        {# `UX4_01`, décision n°5 — UN état vide représente le domaine, et donne
+           AU PLUS un prochain pas véridique.
+
+           Le bloc énumérait chaque champ absent : « Taille non renseignée ·
+           Envergure non renseignée · Tour de taille non renseigné · … ». Sept
+           façons de dire la même chose, et la liste devient plus longue à
+           chaque champ ajouté au modèle. L'état vide s'écrit une fois. #}
+        {# Aucun chiffre ici : le décompte vit UNE FOIS, dans « Corps ».
+           La première écriture annonçait « 6 mesures attendues » alors que
+           l'état lisible disait « 0 / 13 » — deux modèles distincts de la
+           morphologie (`morpho.missing` vs `BODY_MEASUREMENT_FIELDS`), donc
+           deux comptes contradictoires pour la même chose, à trois écrans
+           d'intervalle. #}
         <p class="text-dim" style="font-size:13px;">
-          Aucune mesure morphologique enregistrée pour l'instant.
+          Aucune mesure morphologique enregistrée.
         </p>
-        {% if morpho.missing %}
-        <p class="text-dim" style="font-size:12px;">{{ morpho.missing | join(' · ') }}</p>
-        {% endif %}
       {% endif %}
         <p class="text-dim" style="font-size:12px;margin-top:var(--space-sm);">
           {{ morpho.notice }}
@@ -188,6 +256,24 @@
 
     <div class="card">
       <h2 class="card__title">Données de référence</h2>
+      {# `UX4_01` — LA TENSION ARTÉRIELLE N'EST PLUS DEMANDÉE ICI.
+
+         Décision opérateur (`AUREN_UI_BLUEPRINT §5ter`) : `REMOVE_NO_ASK` de
+         l'acquisition courante, **données existantes préservées**, aucune
+         permission connectée tant qu'un consommateur produit n'est pas
+         démontré.
+
+         Mesuré : la donnée traversait `providers.py` et `coach_report.py`
+         jusqu'à un gabarit, sans jamais atteindre `recommendation.py` ni
+         `zone_recovery.py`. Affichée, jamais décisionnelle — la justification
+         de la demander était faible et non démontrée.
+
+         Le rapport coach continue de la rendre : `REMOVE_NO_ASK` porte sur
+         l'ACQUISITION, pas sur la donnée. Et `profile_body_submit` n'assigne
+         plus ces colonnes, sans quoi retirer le champ les aurait effacées au
+         prochain enregistrement. #}
+      <details class="pstate__edit">
+      <summary>Modifier mes données de référence</summary>
       <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
           <label for="email">Email</label>
@@ -204,18 +290,9 @@
           <input type="number" id="resting_hr" name="resting_hr"
                  value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
         </div>
-        <div class="body-profile__field">
-          <label for="bp_systolic">Tension sys.</label>
-          <input type="number" id="bp_systolic" name="bp_systolic"
-                 value="{{ user.bp_systolic or '' }}" min="60" max="250" placeholder="120">
-        </div>
-        <div class="body-profile__field">
-          <label for="bp_diastolic">Tension dia.</label>
-          <input type="number" id="bp_diastolic" name="bp_diastolic"
-                 value="{{ user.bp_diastolic or '' }}" min="30" max="150" placeholder="80">
-        </div>
         <button type="submit" class="btn btn--ghost">Enregistrer</button>
       </form>
+      </details>
     </div>
 
     {# ── Préférences d'entraînement déclarées (Sb_TRAINING_PREFERENCES_01) ──
@@ -223,11 +300,29 @@
        valeur par défaut n'est proposée ni pré-cochée : « non renseigné » est un
        état à part entière, distinct d'un choix explicitement vide. Aucun
        libellé ne présente une fréquence comme optimale. #}
+    {# ── `UX4_01` — CONFIGURATION D'ENTRAÎNEMENT : TRANSITIONNELLE ICI ──────
+       `OPERATOR_DECISION` : la configuration persistante appartient à
+       `PROGRAMMES / PLAN`, pas à l'édition du Profil. Le Profil peut en
+       montrer un **résumé compact en lecture seule** — c'est ce que fait la
+       section « Entraînement » en tête de page.
+
+       L'ÉDITEUR RESTE ICI, ET C'EST DÉLIBÉRÉ. Le déplacer exige de construire
+       la surface de destination dans `Programmes`, ce qui est une tranche
+       structurelle à part. Le retirer maintenant supprimerait la capacité sans
+       la remplacer.
+
+       DÉPENDANCE ENREGISTRÉE :
+         `UX4_02 LIBRARY_WORKOUT_DISCOVERY` doit accueillir cet éditeur.
+         Tant que ce n'est pas fait, cet emplacement est TRANSITIONNEL et ne
+         vaut pas architecture cible.
+
+       Le formulaire n'est PAS dupliqué : il n'existe qu'ici. #}
     <div class="card">
       <h2 class="card__title">Préférences d'entraînement</h2>
       <p class="text-dim" style="font-size:12px;margin:0 0 var(--space-sm);">
         Ce que tu souhaites et ce dont tu disposes. Ces informations ne
         modifient pas la séance recommandée aujourd'hui.
+        <br><em>Emplacement transitionnel — ces réglages rejoindront Programmes.</em>
       </p>
 
       {% if pref_saved %}
@@ -243,6 +338,9 @@
          Les noms POST sont INCHANGÉS : sessions_per_week, focus_1..3,
          equipment, equipment_declared. Aucune sémantique de persistance n'est
          touchée. #}
+      {# `UX4_01` — configuration persistante : lisible d'abord, éditable ensuite. #}
+      <details class="pstate__edit">
+      <summary>Modifier mes préférences</summary>
       <form method="post" action="{{ url_for('profile_preferences_submit') }}"
             class="prefs-form" data-prefs-form>
 
@@ -321,6 +419,7 @@
 
         <button type="submit" class="btn btn--ghost prefs-form__submit">Enregistrer</button>
       </form>
+      </details>
     </div>
 
     <div class="card__actions" style="margin-top:var(--space-md);">
@@ -329,23 +428,24 @@
   </div>
 </div>
 
-<section style="margin-top:var(--space-lg);">
-  <h2 class="section-header">Évolution corporelle</h2>
-  <div class="measurement-grid">
-    {% for field in measurement_fields %}
-    <div class="card">
-      {% if measurement_charts[field] %}
-        <div class="timeline-chart">{{ measurement_charts[field]|safe }}</div>
-      {% else %}
-        <p class="text-dim" style="font-size:13px;">{{ measurement_labels[field] }} — pas encore de données</p>
-      {% endif %}
-      {% if related_templates[field] %}
-        <p class="measurement-grid__related">Programmes associés : {{ related_templates[field]|join(', ') }}</p>
-      {% endif %}
-    </div>
-    {% endfor %}
-  </div>
-</section>
+{# ── `UX4_01` — « ÉVOLUTION CORPORELLE » A QUITTÉ LE PROFIL ─────────────────
+   `OPERATOR_DECISION` du 2026-08-20 : l'analytique corporelle appartient à
+   `PROGRESSION / BODY`, en `SECONDARY_DESTINATION`. Elle ne répond pas à la
+   question du Profil (« que sait AUREN de moi ? · que puis-je changer ? »)
+   mais à « comment est-ce que je progresse ? ».
+
+   Mesuré avant retrait : **neuf cartes encadrées, toutes disant « pas encore
+   de données »**, chacune suivie de son paragraphe de programmes associés —
+   soit environ deux des 4,2 écrans du Profil. Un cadre par module futur, pour
+   zéro information.
+
+   AUCUN LIEN N'EST POSÉ À LA PLACE. La destination `PROGRESSION / BODY`
+   **n'existe pas encore** : `/progress/body` n'a pas de route. Poser un lien
+   vers elle serait une promesse fausse, et l'opérateur l'interdit
+   explicitement. Le domaine reste représenté par UN état, en tête de page.
+
+   Ce bloc n'est pas « supprimé » au sens de `§5.3` : il est **déplacé**, et
+   sa destination est inscrite au registre avec sa dépendance. #}
 {# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — amélioration progressive.
    `defer` : le script s'exécute après le parsing, donc le formulaire natif est
    déjà utilisable avant même qu'il ne tourne. S'il ne tourne jamais, les trois

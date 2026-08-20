@@ -536,7 +536,16 @@ def _capture_form(client) -> str:
     page = client.get("/profile").text
     # `url_for` renders an absolute URL (http://testserver/...), so anchor on
     # the path's tail rather than on `action="/profile/measurements"`.
-    start = page.index(MEASUREMENTS_URL + '"')
+    #
+    # ⚠ `UX4_01` — s'ancrer sur la PREMIÈRE occurrence de cette URL ne suffit
+    # plus : le quick-log de poids poste vers la MÊME route canonique et vient
+    # avant dans la page. La garde lisait donc un formulaire à un champ et
+    # concluait que le protocole d'envergure avait disparu.
+    #
+    # L'intention de ce helper — « le formulaire de mesure SEULEMENT » — était
+    # juste ; c'est son ancrage qui ne l'était plus. On vise la classe qui
+    # identifie la saisie complète.
+    start = page.index('class="body-profile"')
     return page[start:page.index("</form>", start)].lower()
 
 

@@ -88,9 +88,26 @@ def _visible_text(client) -> str:
 
 
 def test_a_new_user_sees_the_surface_without_inventing_a_single_value(client):
+    """**Migré par `UX4_01`, invariant conservé.**
+
+    La garde exigeait que la surface ÉNUMÈRE chaque mesure absente
+    (« Envergure non renseignée · Tour de taille non renseigné · … »). La
+    décision opérateur du 2026-08-20 l'interdit : *un seul état vide représente
+    le domaine et donne au plus un prochain pas véridique*. Sept façons de dire
+    la même absence, et la liste s'allongeait à chaque champ ajouté au modèle.
+
+    **L'invariant qui compte n'est pas l'énumération — c'est de ne rien
+    inventer.** Il est conservé et durci : aucun chiffre ne doit apparaître
+    dans l'état vide. Le read-model, lui, continue de nommer chaque manque —
+    les gardes sur `rm.missing` sont inchangées.
+    """
     section = _section(client)
     assert "Aucune mesure morphologique" in section
-    assert WINGSPAN_MISSING in section
+    # Aucune valeur inventée : pas un seul chiffre dans l'état vide.
+    import re
+    assert not re.search(r"\d", _visible_text(client)), (
+        "un nombre apparaît alors qu'aucune mesure n'existe"
+    )
 
 
 def test_partial_measurements_show_what_exists_and_name_what_does_not():
@@ -164,7 +181,11 @@ def test_the_page_never_shows_a_neutral_ape_index(client):
         _add(db, uid, waist_cm=80.0)
     text = _visible_text(client).lower()
     assert "ape index" not in text
-    assert WINGSPAN_MISSING.lower() in text
+    # `UX4_01` — la surface n'énumère plus les manques (décision n°5) ; c'est
+    # le read-model qui les nomme, et les gardes sur `rm.missing` le vérifient.
+    # Ce qui est gardé ici reste l'essentiel : **aucun indice dérivé n'apparaît
+    # tant que ses deux faits n'existent pas**.
+    assert WINGSPAN_MISSING in _readmodel().missing
 
 
 def test_the_ape_index_appears_only_when_both_facts_exist():

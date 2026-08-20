@@ -2,9 +2,28 @@
 from __future__ import annotations
 
 
-def test_profile_shows_30d_section(client):
+def test_the_30d_reading_left_the_profile(client):
+    """**Migré par `UX4_01`.**
+
+    La garde exigeait « 30 derniers jours » sur le Profil. Ce bloc répondait à
+    « comment est-ce que je progresse ? », question que la décision opérateur
+    du 2026-08-20 réserve à `PROGRESSION` — laquelle rend déjà « sessions
+    cette semaine » et « sessions terminées (30 j) ».
+
+    La capacité n'est pas perdue, elle est à sa place. La garde est retournée :
+    elle vérifie désormais que la lecture de progression a bien quitté le
+    Profil.
+    """
     body = client.get("/profile").text
-    assert "30 derniers jours" in body
+    assert "30 derniers jours" not in body
+
+
+def test_the_30d_reading_exists_on_progression(client):
+    """L'invariant qui survit au déplacement : la lecture existe toujours,
+    ailleurs. Sans cette garde, le retrait ci-dessus passerait aussi si la
+    capacité avait simplement disparu."""
+    body = client.get("/progress").text
+    assert "30 j" in body or "30 derniers jours" in body
 
 
 def test_profile_shows_body_form(client):
