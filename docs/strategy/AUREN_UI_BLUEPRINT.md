@@ -399,13 +399,17 @@ qu'un utilisateur voit changer, pas sur le nombre de tranches vertes.
 | | ~~`UIV3_TOKENS_01` *(B1)*~~ | **ABSORBÉE PAR B0** |
 | **Phase 1 — Accueil** | `UIV3_HOME_CAUSAL_COCKPIT` | **`MERGED` — PR #131, `f10af0a`** |
 | **Phase 2 — Séance** | **`UIV3_SESSION_EXECUTION_CONSOLE_01`** *(B6+B7)* | **`MERGED` — PR #133, `547df67`** · `BLOCKER-4` franchi |
-| **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | **prochaine** |
-| **Phase 4 — Analyse** | **`UIV3_PROGRESS_ANALYTICS_01`** | après fermeture |
+| **Phase 3 — Fermeture** | `UIV3_TARGETS_44_01` *(B8)* puis `UIV3_VISUAL_BASELINE_01` *(B9)* | **en cours** |
+| **Après UIV3** | **`AUREN_EXPERIENCE_ARCHITECTURE_V4`** — 4 chantiers, voir §5bis | **ouvert, non démarré** |
+| ~~Phase 4 — Analyse~~ | ~~`UIV3_PROGRESS_ANALYTICS_01`~~ | **absorbée par `UX4_03`** |
 | Hors phase | `LOGIN_IDENTITY_GATE_01` | à planifier |
 
-**Phase 4 traite ensemble** : refonte de `/progress` · dépréciation de
+~~**Phase 4 traite ensemble** : refonte de `/progress` · dépréciation de
 `/dashboard` · **D7** continuité sans streak · **`/progress/body`** Body Ledger
-(qui absorbe `BODY_LEDGER_PAGE_01`).
+(qui absorbe `BODY_LEDGER_PAGE_01`).~~
+**Absorbée par `UX4_03` (§5bis)** — le périmètre est conservé intégralement,
+mais il rejoint un programme qui traite aussi Profile et Library, dont le
+problème est de même nature.
 
 > **Pourquoi pas maintenant.** La Home est propre, et c'est précisément ce qui
 > rend les incohérences périphériques visibles — la tentation de les traiter
@@ -463,18 +467,192 @@ fixture de mesure ne rend que **5 blocs optionnels sur 13**.
 
 #### Phase 3 — fermeture
 
+> **Ce n'est pas une phase de design.** Décision opérateur du 2026-08-19 :
+> la phase 3 **ferme l'interface**, elle ne la fait pas évoluer. Elle répond à
+> **deux questions, et à aucune autre** :
+>
+> 1. **Est-ce que tout ce qu'on touche réellement est correctement touchable ?**
+>    → `UIV3_TARGETS_44_01`
+> 2. **Est-ce que ce qu'on vient de valider peut désormais dériver visuellement
+>    sans qu'on le sache ?** → `UIV3_VISUAL_BASELINE_01`
+>
+> Toute question d'une troisième nature est hors phase 3.
+
 **`B8` n'est pas une rénovation anticipée du legacy.** Elle ferme les
 **violations 44 px résiduelles** — celles que les phases 1 et 2 n'ont pas
 touchées parce qu'elles vivaient hors de leur périmètre. Lancer `B8` avant la
 Séance reviendrait à polir une console que la phase 2 remplace.
 
-`B9` clôt le programme avec les **golden states** : 13 états × 3 viewports,
-capturés sur des surfaces enfin stables.
+**La console de séance est un `reference consumer`, pas une cible de refonte.**
+Elle est à **0 violation** au dogfood accepté. `B8` la teste en
+**non-régression** et n'a **pas le droit** de modifier ses espacements, ses
+commandes, sa typographie ni sa hiérarchie. Profiter d'une tranche
+d'accessibilité pour retoucher une surface acceptée est exactement le mode
+d'échec que `CLAUDE.md §5.5` décrit.
+
+**Classification obligatoire avant toute modification** — taxonomie A–E,
+`AUREN_UIUX_V3_FOUNDATION_CONTRACT §3.2`. Et **zone tactile ≥ 44, pas chrome
+visible ≥ 44** (`§3.3`) : la densité gagnée en phase 2 n'est pas une variable
+d'ajustement.
+
+### ⚠ B9 — trois statuts de surface, décidés le 2026-08-20
+
+**Une baseline visuelle transforme ce qu'elle capture en contrat.** Appliquée
+sans discernement, elle ferait exactement la mauvaise chose : **geler la dette
+en la rendant contractuelle**.
+
+La fermeture 44 px a rendu ce risque concret. Elle améliore la qualité
+*mécanique* de surfaces dont le **modèle d'interaction lui-même est hérité** :
+agrandir proprement les zones tactiles d'un formulaire Profil qui restera
+pénible à remplir ne transforme pas ce formulaire en bonne UX.
+
+| Statut | Surfaces | Ce que la baseline signifie |
+|---|---|---|
+| **GOLDEN / SOVEREIGN** | **Home** (Causal Cockpit) · **Session** (Future Console) | architecture passée par Design Lab, dogfood et **validation humaine**. Une dérive est une **régression**. |
+| **TRANSITIONAL** | **Profile** · **Library** · **Progress** · **Dashboard** · *potentiellement* History | capture versionnable en **`legacy_reference = true`** : preuve de l'état de départ, **jamais** design à préserver. Une refonte structurelle **n'est pas une régression**. |
+| **UTILITY** | login · mot de passe · admin · exports · pages techniques | garde **mécanique et accessibilité** seulement. La baseline ne prétend rien sur leur direction artistique. |
+
+**Interdit à `B9`** : créer une garde de capture dont l'effet serait de figer
+l'**architecture d'information** d'une surface `TRANSITIONAL`. Pour ces
+surfaces, la couche pixel est une **archive**, pas un gate ; seule la garde
+mécanique (cibles, débordements, `id` dupliqués) mord.
+
+**Home et Session avaient une bonne matière fonctionnelle et une mauvaise
+hiérarchie** — on les a refactorées. **Profile et Library ont un problème plus
+profond** : leur modèle d'interaction est hérité, et aucun micro-correctif CSS
+ne l'atteindra.
+
+---
+
+`B9` clôt le programme avec les **golden states**, et **un golden state n'est
+pas un PNG**. Décision opérateur : **deux couches synchronisées** pour chaque
+état.
+
+| Couche | Contenu | Ce qu'elle attrape |
+|---|---|---|
+| **A — capture** | PNG versionné | la dérive perceptive |
+| **B — manifeste de géométrie** | JSON du **même** état | la dérive structurelle que des pixels proches masquent |
+
+Champs minimaux du manifeste : `viewport` · `document_width` ·
+`document_height` · `hard_overflow_count` · `target_below_44_count` ·
+`dominant_action_count` · `open_disclosure_count` · `sticky_layer_count` ·
+`primary_action_y` · `active_instrument_y` · `duplicate_id_count`.
+
+Une PR échoue si **les pixels changent** *ou* si **la géométrie dérive**. Le
+motif de `d3e65f1` — un `id` dupliqué invisible à l'œil — est précisément ce
+qu'une couche pixel seule ne voit pas.
+
+**Tolérance pixel : on part de zéro.** La séquence est *stabiliser
+l'environnement → neutraliser le contenu dynamique → mesurer le bruit → fixer
+la tolérance*, jamais *poser 5 % → déclarer stable*. Une tolérance ne
+s'introduit qu'après **preuve mesurée** d'un bruit reproductible et
+inéliminable sur la CI canonique.
+
+**L'environnement des baselines est versionné** : navigateur, version,
+`viewport`, `deviceScaleFactor`, pile de polices, locale, fuseau, schéma de
+couleurs, `reduced-motion`, fixture, seed. Les **golden officielles sont
+produites dans l'environnement canonique** ; les captures locales sont
+**informatives**. Comparer un Chromium macOS à un Chromium Linux CI teste la
+rastérisation, pas le design.
+
+**`--update-snapshots` n'est jamais une correction.** Remplacer une baseline
+exige : référence de décision/spec · capture AVANT · capture APRÈS · delta de
+géométrie · **verdict humain**. La baseline **documente** une décision, elle ne
+la **prend** pas. Les captures acceptées des phases 1 et 2 sont conservées
+comme **ancres visuelles canoniques**.
 
 **Fichiers interdits pour toute la queue** : `recommendation.py` ·
 `zone_recovery.py` · `recovery_contract.py` · `app/models/**` · `migrations/**`
 · tout service métier. Une tranche UI qui en a besoin **bloque** et documente
 un `UI_DATA_GAP`.
+
+---
+
+## 5bis. `AUREN_EXPERIENCE_ARCHITECTURE_V4` — après la fermeture UIV3
+
+**Ouvert le 2026-08-20, non démarré.** Ce n'est **pas** une refonte globale
+aveugle : quatre ensembles, chacun avec son propre gate.
+
+> **Le constat qui l'ouvre.** UIV3 a supposé que toutes les surfaces méritaient
+> le même type d'optimisation. C'est faux. Home et Session avaient une **bonne
+> matière fonctionnelle et une mauvaise hiérarchie** — refactorées, elles
+> tiennent. Profile et Library ont un problème d'une **autre nature** : leur
+> **modèle d'interaction est hérité**. Dix micro-correctifs CSS n'y changeront
+> rien ; il faudra accepter de **supprimer des formulaires**, de **déplacer la
+> capture au moment pertinent**, et de faire disparaître une part importante de
+> l'interface actuelle.
+
+| # | Chantier | Objectif |
+|---|---|---|
+| **UX4_01** | `PROFILE_DATA_ACQUISITION` | passer de « modifier une base de données » à « apprendre ce dont AUREN a besoin » |
+| **UX4_02** | `LIBRARY_WORKOUT_DISCOVERY` | passer d'un catalogue de cartes textuelles à une **surface de décision** |
+| **UX4_03** | `PROGRESSION_BODY_LEDGER` | fusionner la logique analytique, mettre fin à la confusion `/progress` ↔ `/dashboard` ; absorbe l'ancienne « Phase 4 » et `BODY_LEDGER_PAGE_01` |
+| **UX4_04** | `SHELL_MOTION_POLISH` | **seulement après les surfaces** : transitions, overlays, micro-motion, espacement global |
+
+### UX4_01 — doctrine de capture de donnée
+
+**Ne demande pas une donnée parce qu'un champ existe. Demande-la au moment où
+elle produit de la valeur.**
+
+| Niveau | Quand | Forme |
+|---|---|---|
+| **1 — ONBOARDING** | la donnée change **immédiatement** ce que le produit génère | question directe, au démarrage |
+| **2 — JUST IN TIME** | la donnée manque **au moment** où elle devient utile | une seule question, puis **retour immédiat à la tâche** |
+| **3 — GUIDED CAPTURE** | mesure biomécanique complexe | **une métrique à la fois**, avec le protocole visuel — pas une grille de quinze champs |
+| **4 — PASSIVE / CONNECTED** | la donnée existe ailleurs | canal d'acquisition futur (HealthKit / Health Connect exposent taille, poids, tour de taille, FC repos, tension). **Capacité native/bridge — jamais introduite clandestinement dans UIV3.** |
+
+**Le Profil cible n'est presque plus un formulaire** : un état lisible
+(`Corps` · `Entraînement` · `Données connectées` · `Paramètres`) où
+« Mettre à jour » ouvre une **acquisition guidée**, pas une grille d'inputs.
+
+**Audit préalable obligatoire — qui consomme réellement chaque donnée ?**
+
+| Donnée | Consommateur réel | Fréquence | Acquisition cible |
+|---|---|---|---|
+| Taille | à vérifier | quasi statique | onboarding / import |
+| Poids | entraînement + progression | fréquente | quick-log / import |
+| FC repos | **usage réel à vérifier** | automatique idéalement | connected |
+| Tension | **usage réel à vérifier** | rare | avancé / connected |
+| Envergure | morphologie | quasi statique | guided capture |
+| Priorités | planification | occasionnelle | guided preferences |
+| Équipement | génération de séance | contextuelle | profil de salle |
+
+> **Une donnée qui n'améliore aucune décision ni aucune lecture ne mérite pas
+> d'être un champ de premier rang.** C'est une question UX avant d'être
+> technique. La supprimer est un résultat valide de l'audit.
+
+### UX4_02 — doctrine de la Library
+
+**Ne pas polir cosmétiquement `template-card`.** Le défaut n'est plus le
+contraste : c'est l'**archétype de composant**. La vignette actuelle empile
+nom, type, focus, note cardio, `suggested_label`, un lien sur toute la carte
+**et** un formulaire séparé — une carte de document descriptif là où il faut un
+instrument de décision.
+
+Règles du **`WorkoutTile`** cible :
+
+- une **identité courte** ;
+- **une seule** phrase de focus ;
+- **deux métadonnées utiles au maximum** ;
+- une **action évidente** ;
+- **les détails ailleurs** — `suggested_label` long est du L2/L3, pas du
+  catalogue.
+
+**Une Library maximise le scan et la décision, elle ne raconte pas chaque
+séance.** Recherche, filtres et catégorisation quand le corpus le justifie ;
+le détail vit dans la fiche.
+
+### UX4_04 — ce que « smooth » veut dire, et ce que ça ne veut pas dire
+
+**Ce n'est pas `border-radius: 20px` et une ombre.** C'est un ensemble :
+alignements répétés · densité maîtrisée · **moins de cadres** · profondeur
+lisible · priorité d'action stable · retour au toucher · transitions de
+disclosure · typographie moins agressive · **vides intentionnels, pas
+résiduels** · contenu secondaire qui disparaît au bon moment.
+
+Une boîte presque aussi grande que son conteneur perd sa capacité à exprimer un
+groupement : l'alignement, l'espace et le fond disent le groupe mieux qu'un
+cadre de plus.
 
 ---
 

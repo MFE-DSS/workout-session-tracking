@@ -76,17 +76,66 @@ pas de casse capitale, pas de largeur pleine.
 **Standard AUREN : 44 × 44 px CSS minimum** pour tout contrôle fréquent ou
 séquentiel — c'est-à-dire tout ce qu'on touche plus d'une fois par séance.
 
-- Le plancher WCAG 2.2 AA (24 × 24 px) est un **minimum absolu**, jamais une
-  cible.
-- Un contrôle sous 44 px doit être **nommé et justifié** dans la spec de sa
-  surface. L'absence de justification vaut violation.
-- **La mesure est faite dans le navigateur**, pas déduite du CSS : `padding`,
-  `line-height` et `display` produisent des hauteurs que la feuille de style
-  ne dit pas.
+### 3.1 — Ce que 44 est, et ce qu'il n'est PAS
 
-**Dette connue à la signature de ce contrat** : 161 occurrences sous 44 px sur
-`/sessions/{id}`, dont 27 `label.segmented__option` à 32 px et le CTA de séance
-à 38 px. Elle est inscrite dans la BUILD QUEUE, pas amnistiée.
+**Ne jamais rapporter 44 × 44 comme une obligation WCAG AA.** C'est faux, et
+c'est faux dans le sens qui expose : cela sur-déclare une conformité.
+
+| Référence | Seuil | Niveau |
+|---|---|---|
+| **WCAG 2.2 SC 2.5.8** *Target Size (Minimum)* | **24 × 24 px CSS**, avec exceptions définies (espacement, inline, contrôle du user-agent, équivalent ailleurs, essentiel) | **AA** — plancher légal |
+| **WCAG 2.2 SC 2.5.5** *Target Size (Enhanced)* | 44 × 44 px CSS | **AAA** |
+| **Apple HIG** | 44 × 44 pt | recommandation plateforme |
+| **AUREN** | **44 × 44 px** sur contrôle fréquent/séquentiel | **standard produit interne** |
+
+AUREN vise 44 parce qu'on manipule l'interface **en salle, une main occupée,
+parfois en sueur** — pas parce qu'un texte réglementaire l'impose. Le plancher
+WCAG 2.2 AA (24 × 24) reste un **minimum absolu jamais négociable**, et les
+exceptions de `2.5.8` sont des exceptions **réelles**, pas des échappatoires.
+
+### 3.2 — Classifier AVANT de modifier (obligatoire)
+
+Le décompte de dette de ce contrat est passé de **161 à 69** en une seule
+mesure fraîche : l'original comptait des `input[type=radio]` de 1 × 1 px cachés
+derrière leurs labels, qui **ne sont pas des cibles tactiles**. Appliquer
+`min-height: 44px` à une liste non classifiée, c'est gonfler des objets qui
+n'ont jamais été touchés et manquer ceux qui le sont.
+
+**Toute cible mesurée sous 44 entre dans exactement une catégorie avant qu'une
+seule ligne de CSS ne bouge :**
+
+| Cat. | Ce que c'est | Exigence |
+|---|---|---|
+| **A** — `FREQUENT_SEQUENTIAL` | bouton, segmented control, `<summary>` fréquent, navigation de séance, action de formulaire | **44 × 44 requis** |
+| **B** — `SECONDARY_STANDALONE` | lien d'historique, disclosure secondaire, action isolée | **zone tactile 44 visée**, sans chrome visible inutile |
+| **C** — `INLINE` | lien réellement intégré à une phrase | **ne pas gonfler** — exception `2.5.8` explicite |
+| **D** — `HIDDEN_IMPLEMENTATION` | `input` 1 × 1 derrière son `<label>` | **mesurer le label réellement cliquable**, jamais l'input caché |
+| **E** — `USER_AGENT_OR_EDITABLE` | `textarea`, `input` dont la cible effective est l'aire éditable | **mesurer le vrai rectangle interactif**, pas une sous-partie |
+
+### 3.3 — Zone tactile ≥ 44, pas chrome visible ≥ 44
+
+Le standard porte sur la **surface qui reçoit le doigt**, pas sur la taille
+apparente du contrôle. Un lien de 14 px peut avoir une zone interactive de
+44 px sans devenir un bouton massif — `padding`, pseudo-élément d'extension ou
+`::after` en position absolue font le travail.
+
+**La densité gagnée en phase 2 est un acquis, pas une variable d'ajustement.**
+Une tranche qui atteint 44 en gonflant le chrome visible a échangé un défaut
+d'accessibilité contre un défaut de densité. C'est un refus, pas un compromis.
+
+### 3.4 — La mesure
+
+**Faite dans le navigateur**, jamais déduite du CSS : `padding`, `line-height`
+et `display` produisent des géométries que la feuille de style ne dit pas. Un
+contrôle sous 44 après classification doit être **nommé et justifié** dans la
+spec de sa surface — l'absence de justification vaut violation.
+
+**Dette à la signature de ce contrat : 161 occurrences sous 44 px sur
+`/sessions/{id}`.** ⚠️ **Ce chiffre est faux et conservé comme trace.** Mesure
+fraîche du 2026-08-19 : **69 cibles réellement tactiles**, l'écart étant
+intégralement des `input[type=radio]` de 1 × 1 px de catégorie **D**. La console
+de séance livrée en phase 2 en compte **0** — la dette résiduelle vit **hors
+console**, et son volume réel n'a jamais été mesuré (voir `Sx_UIV3_02B`).
 
 ---
 
