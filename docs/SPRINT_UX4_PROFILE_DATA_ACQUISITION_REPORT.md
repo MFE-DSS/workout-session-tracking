@@ -163,7 +163,57 @@ destination dans `Programmes` ; l'**analytique corporelle** attend
 
 ---
 
-## 10. Ce que la tranche ne fait pas
+## 10. CLOSEOUT
+
+| | |
+|---|---|
+| PR | [#137](https://github.com/MFE-DSS/workout-session-tracking/pull/137) **MERGED** |
+| merge | **`d146cdb`** — sans squash, sans `--admin`, sans force, tête épinglée |
+| CI de PR | 8/8 · gate Sonar `OK` · 0 issue · 0 thread |
+| **CI canonique** | **6/6 success** |
+| diff | +878 / −96 sur 10 fichiers |
+
+### La CI a trouvé cinq échecs que mon sweep local déclarait verts
+
+Trois causes, dont deux de fragilité de harnais :
+
+- **`_capture_form()`** s'ancrait sur la première occurrence de
+  `/profile/measurements`. Le quick-log poste vers la **même route canonique**
+  et vient avant dans la page : la garde lisait un formulaire à un champ et
+  concluait que le protocole d'envergure avait disparu. Sa docstring disait
+  « le formulaire de mesure SEULEMENT » — l'intention était juste, l'ancrage ne
+  l'était plus. **Réparé, pas affaibli.**
+- **Trois gardes de placement** migrées, chacune avec l'invariant qui survit au
+  déplacement. Pour « 30 derniers jours », une **seconde garde** vérifie que la
+  lecture existe sur `PROGRESSION` — sans elle, le retrait passerait aussi si
+  la capacité avait disparu.
+
+### Le défaut le plus instructif de la tranche est dans l'instrument
+
+**Mon « full sweep local » a rendu 5053 passed sur une tranche où la CI a
+trouvé cinq échecs.**
+
+`scripts/run_ci_pytest.sh` **ne contient aucun `cd`** : il lance pytest dans le
+répertoire courant du shell, qui revient à la canonique. La preuve était
+visible — `coverage.xml` s'est écrit dans la canonique, jamais dans le
+worktree.
+
+**Et la correction a échoué une seconde fois, plus subtilement.** En passant
+`pytest <worktree>/tests`, **5071 tests** ont été collectés — donc les tests
+venaient bien du worktree — mais **`import app` résolvait encore vers la
+canonique**. Tests d'un arbre, application d'un autre : deux gardes neuves
+rendaient l'ancien gabarit.
+
+> Le compte de tests prouvait qu'on avait changé d'arbre, ce qui donnait
+> confiance dans un résultat encore faux.
+
+La seule forme correcte impose `PYTHONPATH=<worktree>` en plus du chemin des
+tests. **Pour une tranche développée en worktree, la CI reste la source de
+vérité** — et c'est elle qui a tranché ici.
+
+---
+
+## 11. Ce que la tranche ne fait pas
 
 Aucun canal santé connecté · aucun assistant guidé de morphométrie · aucune
 refonte de Progression · aucun changement de modèle métier · aucune migration ·

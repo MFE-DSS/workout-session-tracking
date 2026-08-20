@@ -589,10 +589,22 @@ aveugle : quatre ensembles, chacun avec son propre gate.
 
 | # | Chantier | Objectif |
 |---|---|---|
-| **UX4_01** | `PROFILE_DATA_ACQUISITION` | passer de « modifier une base de données » à « apprendre ce dont AUREN a besoin » |
+| **UX4_01** | ✅ `PROFILE_DATA_ACQUISITION` — **PREMIÈRE TRANCHE MERGÉE** (`d146cdb`, PR #137, 2026-08-20) : **6,6 → 2,0 écrans · 641 → 140 mots · 39 → 10 contrôles · 18 → 4 régions encadrées · 6 → 0 modules analytiques**. Six lignes `OPERATOR_DECISION` appliquées, **zéro ligne candidate**. | passer de « modifier une base de données » à « apprendre ce dont AUREN a besoin » |
 | **UX4_02** | `LIBRARY_WORKOUT_DISCOVERY` | passer d'un catalogue de cartes textuelles à une **surface de décision**, **rattachée à Programmes** (`5ter.3`, `OD`) |
 | **UX4_03** | `PROGRESSION_BODY_LEDGER` | fusionner la logique analytique ; **absorber les capacités utiles de `/dashboard` dans Progression puis le RETIRER** (`5ter.3`, `OD`) ; absorbe l'ancienne « Phase 4 » et `BODY_LEDGER_PAGE_01` |
 | **UX4_04** | `SHELL_MOTION_POLISH` | **seulement après les surfaces** : transitions, overlays, micro-motion, espacement global |
+
+> ### ⚠ Dépendances ouvertes par `UX4_01`, à traiter avant de clore V4
+>
+> | Capacité | État | Bloque |
+> |---|---|---|
+> | **fatigue · régularité · série** | **calculées, visibles NULLE PART** — retirées du Profil, `PROGRESSION` annonce « la régularité » dans son chapeau sans la rendre | `UX4_03` |
+> | **éditeur de préférences** | reste dans le Profil, **marqué transitionnel à l'écran** | `UX4_02` |
+> | **analytique corporelle** | retirée du Profil, **aucun lien posé** — `/progress/body` n'a pas de route | `UX4_03` |
+>
+> Le premier trou est **assumé et signalé**, pas comblé : la refonte de
+> Progression était explicitement hors périmètre de `UX4_01`. C'est le coût
+> d'un déplacement en deux temps.
 
 ### UX4_01 — doctrine de capture de donnée
 
