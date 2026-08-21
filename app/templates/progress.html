@@ -1,92 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Progression</h1>
-<p class="lede">Lecture des séances terminées, de la régularité et des signaux récents.</p>
+{# Le chapeau promettait « la régularité », un mot auquel plus aucun libellé ne
+   répond depuis que le score sur 100 a été retiré. Il annonce désormais ce que
+   la page montre vraiment — sinon la promesse invisible que `UX4_03` devait
+   fermer se rouvrirait, déplacée d'un cran. #}
+<p class="lede">Lecture des séances terminées, de ta cadence récente et de ce que tu as déclaré.</p>
 
 {# Sb_27.3 — Weekly training loop tile (count, dominantes, anomalie, hint) #}
 {% include "_partials/weekly_loop.html" %}
 
-{# ── `UX4_03` — LES TROIS SIGNAUX, ENFIN RENDUS ─────────────────────────────
-   Le chapeau de cette page promettait « la régularité » depuis toujours sans
-   jamais l'afficher, et `UX4_01` a retiré ces lectures du Profil parce
-   qu'elles y répondaient à la mauvaise question. Elles étaient calculées et
-   visibles NULLE PART.
+{# ── `UX4_03B` — L'INSTRUMENT DES SIGNAUX, APRÈS L'AUDIT SÉMANTIQUE ──────────
+   `UX4_03` rendait trois valeurs sur 100 avec leur jauge. L'audit
+   `UX4_03A` a mesuré que les trois habillaient une donnée absente en mesure :
 
-   AUCUN CALCUL NOUVEAU. `compute_behavioral_state` est le service que
-   consomme déjà l'accueil ; il est simplement branché sur la surface qui le
-   promettait.
+     · « Charge 45/100 »    → 45,0 est le DÉFAUT rendu quand rien n'est déclaré
+     · « Régularité 0/100 » → le /100 pose UNE SÉANCE PAR JOUR comme la cible,
+                              donc 3 séances sur 14 jours s'affichaient 21/100
+     · « Continuité stable »→ `compute_trend(0, 0)` rend « stable », donc
+                              quelqu'un qui n'a jamais rien fait lisait que son
+                              rythme était stable
 
-   `streak_days` EXISTE ET N'EST PAS RENDU — décision assumée.
-   Il compte des jours calendaires CONSÉCUTIFS : un jour de repos
-   correctement pris le remet à zéro. Le rendre contredirait « la régularité
-   ne doit pas être un streak quotidien ». La continuité est donc exprimée par
-   la comparaison de deux fenêtres de sept jours, qui explique le rythme réel
-   sans le gamifier.
+   Le dépôt avait déjà écrit la règle, dans `recovery_contract` :
+   « the user told us nothing » is not a measurement and must not be dressed up
+   as a neutral reading.
+
+   LE GABARIT NE VOIT PLUS L'ÉTAT BRUT. Il reçoit `signals`, une vue-modèle
+   pure (`progress_signals`), et n'a donc plus accès aux trois champs écartés :
+   la correction est structurelle, pas typographique.
+
+   `streak_days` N'EST PAS RENDU — `OPERATOR_DECISION / DO_NOT_SURFACE`.
+   Il compte des jours calendaires consécutifs : un jour de repos correctement
+   pris le remet à zéro. La cadence compare deux fenêtres de sept jours, ce qui
+   décrit le rythme réel sans le transformer en chaîne à ne pas rompre.
 
    VOCABULAIRE. `test_no_forbidden_wording_in_progress` interdit certains mots
-   dans CE FICHIER, commentaires compris — et cette garde est plus stricte que
-   celle que j'avais écrite. Elle a raison : une règle mécanique ne se discute
-   pas au cas par cas, et un démenti reste une occurrence.
-   D'où « Lecture d'entraînement — rien d'autre. » plutôt qu'une négation qui
-   emploierait le mot qu'elle nie.
-
-   « Charge ressentie » décrit ce que l'utilisateur a DÉCLARÉ en fin de séance.
-   Aucune revendication d'un état physiologique mesuré, aucun « score IA ». #}
+   dans CE FICHIER, commentaires compris. Cette garde est plus stricte que
+   celle que j'avais écrite, et elle a raison : un démenti reste une
+   occurrence. Les libellés d'état ci-dessous ne sont pas réécrits — ce sont
+   ceux du formulaire de fin de séance, cités tels quels. #}
 <h2 class="section-header">Signaux d'entraînement</h2>
-<div class="signals">
-
-  <div class="signal">
-    <div class="signal__head">
-      <span class="signal__name">Charge ressentie</span>
-      <span class="signal__value">{{ "%.0f"|format(behavioral.fatigue_score) }}<span class="signal__unit">/100</span></span>
+<dl class="signals">
+  {% for s in signals %}
+    <div class="signal{% if not s.known %} signal--unknown{% endif %}">
+      <dt class="signal__name">{{ s.name }}</dt>
+      <dd class="signal__value">{{ s.value }}</dd>
+      <dd class="signal__context">{{ s.context }}</dd>
     </div>
-    {# Une jauge sans dépendance JS : une barre, une largeur, un fond.
+  {% endfor %}
+</dl>
 
-       `aria-hidden` — et c'est une AMÉLIORATION, pas une concession. La barre
-       porte d'abord `role="img"` + `aria-label`, ce que `Web:S6819` a signalé.
-       La règle avait raison sur le fond : la valeur `45/100` est DÉJÀ rendue
-       en texte juste au-dessus, donc un lecteur d'écran l'annonçait deux fois.
-       La jauge redit visuellement ce que le chiffre dit déjà ; elle n'ajoute
-       rien à l'oreille. #}
-    <div class="signal__gauge" aria-hidden="true">
-      <span class="signal__fill" style="width:{{ behavioral.fatigue_score }}%"></span>
-    </div>
-    <p class="signal__note">
-      Dérivée de ce que tu as déclaré en fin de séance sur les trois dernières.
-      Lecture d'entraînement — rien d'autre.
-    </p>
-  </div>
-
-  <div class="signal">
-    <div class="signal__head">
-      <span class="signal__name">Régularité</span>
-      <span class="signal__value">{{ "%.0f"|format(behavioral.consistency_score) }}<span class="signal__unit">/100</span></span>
-    </div>
-    <div class="signal__gauge" aria-hidden="true">
-      <span class="signal__fill" style="width:{{ behavioral.consistency_score }}%"></span>
-    </div>
-    <p class="signal__note">
-      Séances sur les quatorze derniers jours. <strong>Un jour de repos ne
-      casse rien</strong> — c'est un rythme, pas une chaîne à ne pas rompre.
-    </p>
-  </div>
-
-  <div class="signal">
-    <div class="signal__head">
-      <span class="signal__name">Continuité</span>
-      <span class="signal__value signal__value--word">
-        {% if behavioral.trend_direction == 'up' %}en hausse
-        {% elif behavioral.trend_direction == 'down' %}en baisse
-        {% else %}stable{% endif %}
-      </span>
-    </div>
-    <p class="signal__note">
-      Compare tes sept derniers jours aux sept précédents. Aucun compteur de
-      jours consécutifs : une semaine plus calme se lit, elle ne s'efface pas.
-    </p>
-  </div>
-
-</div>
+{# UNE SEULE divulgation pour les trois provenances. `UX4_03` en écrivait une
+   par signal — 77 mots pour dire trois fois la même chose : d'où vient le
+   chiffre. Repliée, elle ne coûte qu'une ligne. #}
+<details class="signals__how">
+  <summary>Comment AUREN calcule ces signaux</summary>
+  <p><strong>Ressenti général</strong> — le mot que tu as choisi en répondant
+  « Comment te sentais-tu pendant la séance ? », sur la dernière séance où tu
+  y as répondu. AUREN le cite ; il ne le convertit en aucune note. Si cette
+  réponse n'est pas celle de ta dernière séance, sa date est affichée.</p>
+  <p><strong>Séances</strong> — le nombre de séances terminées sur quatorze
+  jours. Un comptage, pas une note : aucun objectif hebdomadaire n'est supposé.</p>
+  <p><strong>Cadence 7 j</strong> — les sept jours précédents, puis les sept
+  derniers, côte à côte. <strong>Un jour de repos ne casse rien</strong> :
+  aucune série de jours n'est comptée.</p>
+</details>
 
 {# Sx_UI_07.1 — readability pass : les KPI existants sont regroupés sous une
    section « Rythme récent » (lecture d'entraînement, pas cockpit). Aucune

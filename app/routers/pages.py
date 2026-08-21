@@ -700,9 +700,22 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     # service que consomme l'accueil : aucun calcul nouveau, aucun modèle,
     # aucune migration. On branche une valeur déjà produite sur la surface qui
     # la promettait.
-    from app.services.behavioral import compute_behavioral_state
+    # `UX4_03B` — le gabarit ne reçoit ni l'état comportemental, ni les faits :
+    # il reçoit la vue-modèle. L'audit `UX4_03A` a montré que trois champs de
+    # `BehavioralState` ne sont pas présentables tels quels — `fatigue_score`
+    # rend 45,0 pour une ABSENCE de déclaration, `consistency_score` pose une
+    # séance par jour comme le 100 %, et `trend_direction` rend « stable » pour
+    # 0 séance contre 0. Ne pas les passer au gabarit rend la correction
+    # STRUCTURELLE : aucun changement de libellé ne peut les ramener.
+    #
+    # `compute_behavioral_state` n'est plus appelé ici. `progress_facts` lit les
+    # faits — des comptages et une déclaration recopiée — sans passer par un
+    # moteur de décision, que `test_no_decision_engine_was_touched` gèle depuis
+    # `e8614bd` précisément pour que la présentation n'y touche pas.
+    from app.services.progress_facts import build_progress_facts
+    from app.services.progress_signals import build_progress_signals
 
-    behavioral = compute_behavioral_state(db, user.id)
+    signals = build_progress_signals(build_progress_facts(db, user.id))
 
     return templates.TemplateResponse(
         request,
@@ -716,7 +729,7 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db, user.id),
             "weekly": weekly,
-            "behavioral": behavioral,
+            "signals": signals,
         },
     )
 
