@@ -1,6 +1,8 @@
 """Tests for behavioral engine scoring logic."""
 from __future__ import annotations
 
+import dataclasses
+import re
 
 from app.services.behavioral import (
     BehavioralState,
@@ -8,8 +10,6 @@ from app.services.behavioral import (
     compute_weighted_fatigue,
     compute_consistency,
     compute_readiness,
-    compute_trend,
-    compute_recommendation,
 )
 
 
@@ -81,73 +81,61 @@ def test_readiness_high_fatigue():
     assert abs(r - 30.0) < 0.01
 
 
-def test_trend_up():
-    assert compute_trend(last_7=4, prev_7=2) == "up"
+# ── `UX4_03B` — trois tests de tendance et cinq de recommandation, MIGRÉS ────
+#
+# Ils vérifiaient `compute_trend` et `compute_recommendation`, supprimés par
+# `OPERATOR_DECISION` D6. Les supprimer sans rien mettre à la place laisserait
+# la porte ouverte à leur retour silencieux : ce qui suit garde la DÉCISION,
+# pas l'implémentation disparue.
 
 
-def test_trend_down():
-    assert compute_trend(last_7=1, prev_7=3) == "down"
+def test_the_trend_producer_is_gone_and_replaced_by_raw_counts():
+    """`compute_trend(0, 0)` rendait **« stable »** — donc un utilisateur qui
+    n'avait jamais rien enregistré lisait que son rythme était stable.
+    `UX4_03` l'a affiché, l'opérateur l'a refusé.
+
+    La suppression arrive **après** son remplacement, jamais avant
+    (`CLAUDE.md §5.3`) : `fc786a2` rend déjà les deux comptages bruts.
+    """
+    import app.services.behavioral as behavioral
+
+    assert not hasattr(behavioral, "compute_trend")
+
+    # Le remplacement existe, sinon ceci serait une soustraction sèche.
+    from app.services.progress_facts import ProgressFacts
+
+    assert {"sessions_last_7", "sessions_prev_7"} <= {
+        f.name for f in dataclasses.fields(ProgressFacts)
+    }
 
 
-def test_trend_stable():
-    assert compute_trend(last_7=2, prev_7=2) == "stable"
+def test_the_coaching_string_producer_is_gone_with_its_loaded_branches():
+    """`compute_recommendation` n'était rendue nulle part, et deux de ses
+    branches étaient indéfendables : elle lisait `readiness_score` — fabriqué à
+    100 % sur un compte vide — et écrivait « Série en cours, garde le
+    rythme ! », la chaîne même que `DO_NOT_SURFACE` interdit.
 
+    **Capacité supprimée, non déplacée.** Si AUREN veut un jour des messages de
+    coaching, ils devront être rebâtis sur des entrées honnêtes.
+    """
+    import inspect
 
-def test_reco_fatigue_critical():
-    state = BehavioralState(
-        performance_score=80, consistency_score=70, fatigue_score=80,
-        trend_direction="stable", streak_days=2, readiness_score=40,
-        recommendation="",
-    )
-    reco = compute_recommendation(state)
-    assert "repos" in reco.lower() or "fatigue" in reco.lower()
+    import app.services.behavioral as behavioral
 
+    assert not hasattr(behavioral, "compute_recommendation")
 
-def test_reco_streak_fatigue():
-    state = BehavioralState(
-        performance_score=70, consistency_score=60, fatigue_score=65,
-        trend_direction="up", streak_days=6, readiness_score=50,
-        recommendation="",
-    )
-    reco = compute_recommendation(state)
-    assert "récupérer" in reco.lower() or "serie" in reco.lower() or "série" in reco.lower()
-
-
-def test_reco_low_consistency():
-    state = BehavioralState(
-        performance_score=50, consistency_score=20, fatigue_score=40,
-        trend_direction="stable", streak_days=0, readiness_score=45,
-        recommendation="",
-    )
-    reco = compute_recommendation(state)
-    assert "régularité" in reco.lower() or "regularite" in reco.lower()
-
-
-def test_reco_high_readiness():
-    state = BehavioralState(
-        performance_score=85, consistency_score=70, fatigue_score=20,
-        trend_direction="up", streak_days=2, readiness_score=85,
-        recommendation="",
-    )
-    reco = compute_recommendation(state)
-    assert "pousser" in reco.lower() or "intensité" in reco.lower()
-
-
-def test_reco_fallback():
-    state = BehavioralState(
-        performance_score=40, consistency_score=35, fatigue_score=45,
-        trend_direction="stable", streak_days=1, readiness_score=45,
-        recommendation="",
-    )
-    reco = compute_recommendation(state)
-    assert "chaque" in reco.lower() or "séance" in reco.lower() or "seance" in reco.lower()
+    src = inspect.getsource(behavioral)
+    code = re.sub(r"#.*", " ", src)
+    for banned in ("Série en cours", "Belle série"):
+        assert banned not in code, (
+            f"le vocabulaire de série est revenu dans le moteur : « {banned} »"
+        )
 
 
 def test_behavioral_state_dataclass():
     state = BehavioralState(
         performance_score=88.0, consistency_score=71.4, fatigue_score=35.0,
-        trend_direction="up", streak_days=3, readiness_score=72.0,
-        recommendation="Bonne condition.",
+        streak_days=3, readiness_score=72.0,
     )
     assert state.readiness_score == 72.0
     assert state.streak_days == 3
@@ -203,9 +191,18 @@ def test_compute_behavioral_state_no_sessions(client):
     assert state.consistency_score == 0.0
     assert state.fatigue_score == 50.0
     assert state.streak_days == 0
-    assert state.trend_direction == "stable"
-    assert state.readiness_score > 0
-    assert len(state.recommendation) > 0
+
+    # ⚠ `readiness_score > 0` sur un compte SANS AUCUNE DONNÉE. Ce test
+    # l'affirmait déjà, et personne n'avait relevé ce que ça voulait dire :
+    # 25,0, dont la totalité vient du défaut de fatigue — `0,5 × (100 − 50)`.
+    #
+    # L'assertion est conservée telle quelle parce qu'elle décrit le
+    # comportement RÉEL du moteur gelé. Elle est simplement nommée pour ce
+    # qu'elle est : la preuve que ce champ ne doit jamais atteindre un écran.
+    assert state.readiness_score == 25.0, (
+        "la valeur fabriquée a changé — la garde de non-exposition doit être "
+        "relue avant d'accepter la nouvelle"
+    )
 
 
 def test_compute_behavioral_state_with_sessions(client):

@@ -1,0 +1,110 @@
+{# `UX4_03D` — EXPOSITION MUSCULAIRE, 14 JOURS.
+
+   Une seule question : « où ai-je travaillé pendant les mêmes quatorze
+   jours ? ». Même fenêtre que Volume & rythme — deux instruments côte à côte
+   sur des fenêtres différentes rouvriraient la contradiction que l'écrémage
+   vient de fermer.
+
+   CE QUE CET INSTRUMENT NE DIRA JAMAIS : sous-entraîné · sur-entraîné ·
+   optimal · pourcentage de cible · N sur cible. Tous supposent une CIBLE, et
+   le dépôt ne produit que des bandes de planification dont l'en-tête précise
+   qu'aucune littérature ne justifie ses bornes.
+
+   TROIS ÉTATS, ET LES CONFONDRE MENTIRAIT.
+     known    des séances, au moins un exercice classable → carte + détail
+     zero     des séances, aucune zone touchée — un FAIT → carte seule
+     unknown  aucune séance, ou rien de reconnaissable — une ABSENCE DE
+              PREUVE → carte seule, non interactive
+
+   UNE AFFORDANCE DE DÉTAIL N'EXISTE QUE SI LE NIVEAU SUIVANT CONTIENT UNE
+   INFORMATION SUPPLÉMENTAIRE. Onze lignes disant chacune 0 n'en contiennent
+   aucune : les états `zero` et `unknown` n'ouvrent donc rien.
+
+   LA SILHOUETTE EST DÉCORATIVE. Elle est `aria-hidden`, et elle ne peut
+   l'être que parce que le paragraphe hors écran ci-dessous porte les mêmes
+   faits — zones touchées avec leur compte, zones à zéro nommées. Si cet
+   équivalent disparaît, la silhouette doit cesser d'être masquée.
+
+   LE MOTIF D'INCONNU EST DÉCLARÉ EN CSS, pas en attribut : une règle CSS bat
+   un attribut de présentation SVG, et `fill="url(#…)"` était écrasé par
+   `.ze-r { fill: transparent }`. Mesuré, pas supposé. #}
+
+{% macro _ze_svg(regions, view) -%}
+<svg class="ze-sil" viewBox="0 0 60 100" role="presentation" focusable="false">
+  <circle class="ze-b" cx="30" cy="9" r="6"/>
+  <rect class="ze-b" x="20" y="16" width="20" height="34" rx="6"/>
+  <rect class="ze-b" x="11" y="18" width="8" height="30" rx="4"/>
+  <rect class="ze-b" x="41" y="18" width="8" height="30" rx="4"/>
+  <rect class="ze-b" x="21" y="51" width="8" height="40" rx="4"/>
+  <rect class="ze-b" x="31" y="51" width="8" height="40" rx="4"/>
+  {% if view == 'front' %}
+    <rect class="ze-r ze-r--{{ regions.shoulders }}" x="18" y="16" width="24" height="7" rx="3"/>
+    <rect class="ze-r ze-r--{{ regions.chest }}" x="21" y="22" width="18" height="11" rx="3"/>
+    <rect class="ze-r ze-r--{{ regions.core }}" x="22" y="33" width="16" height="14" rx="3"/>
+    <rect class="ze-r ze-r--{{ regions.arms }}" x="11" y="20" width="8" height="26" rx="4"/>
+    <rect class="ze-r ze-r--{{ regions.arms }}" x="41" y="20" width="8" height="26" rx="4"/>
+    <rect class="ze-r ze-r--{{ regions.legs }}" x="21" y="52" width="8" height="38" rx="4"/>
+    <rect class="ze-r ze-r--{{ regions.legs }}" x="31" y="52" width="8" height="38" rx="4"/>
+  {% else %}
+    <rect class="ze-r ze-r--{{ regions.shoulders }}" x="18" y="16" width="24" height="7" rx="3"/>
+    <rect class="ze-r ze-r--{{ regions.back }}" x="21" y="23" width="18" height="24" rx="3"/>
+    <rect class="ze-r ze-r--{{ regions.arms }}" x="11" y="20" width="8" height="26" rx="4"/>
+    <rect class="ze-r ze-r--{{ regions.arms }}" x="41" y="20" width="8" height="26" rx="4"/>
+    <rect class="ze-r ze-r--{{ regions.legs }}" x="21" y="52" width="8" height="38" rx="4"/>
+    <rect class="ze-r ze-r--{{ regions.legs }}" x="31" y="52" width="8" height="38" rx="4"/>
+  {% endif %}
+</svg>
+{%- endmacro %}
+
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <pattern id="auren-hatch" width="4" height="4"
+             patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="4" stroke="currentColor" stroke-width="1.4"/>
+    </pattern>
+  </defs>
+</svg>
+
+<h2 class="section-header">Exposition · 14 j</h2>
+
+{% set _ze_figs %}
+  <span class="ze-figs" aria-hidden="true">
+    <span class="ze-fig">{{ _ze_svg(exposure.regions, 'front') }}<span class="ze-cap">face</span></span>
+    <span class="ze-fig">{{ _ze_svg(exposure.regions, 'back') }}<span class="ze-cap">dos</span></span>
+  </span>
+{% endset %}
+
+{% if exposure.state == 'known' %}
+  <details class="ze">
+    <summary class="ze__map">
+      {{ _ze_figs }}
+      <span class="ze__read">
+        <b class="ze__n">{{ exposure.touched }}</b>
+        <span class="ze__k">zones touchées</span>
+        <span class="ze__go">détail par zone</span>
+      </span>
+    </summary>
+    <ul class="ze-list">
+      <li class="ze-list__head"><span>11 zones suivies</span><span>séances</span></li>
+      {% for label, n in exposure.rows %}
+        <li class="ze-row"><span class="ze-row__n">{{ label }}</span>
+          <span class="ze-row__v{% if not n %} ze-row__v--zero{% endif %}">{{ n }}</span></li>
+      {% endfor %}
+    </ul>
+  </details>
+{% else %}
+  <div class="ze__map ze__map--static">
+    {{ _ze_figs }}
+    <span class="ze__read">
+      {% if exposure.state == 'zero' %}
+        <b class="ze__n ze__n--muted">0</b>
+        <span class="ze__k">zone touchée</span>
+      {% else %}
+        <b class="ze__n ze__n--unknown">inconnu</b>
+        <span class="ze__k">aucune séance exploitable</span>
+      {% endif %}
+    </span>
+  </div>
+{% endif %}
+
+<p class="sr-only">{{ exposure.sr }}</p>

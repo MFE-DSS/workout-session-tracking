@@ -131,7 +131,7 @@ def _fake_report(
         ),
         volume=VolumeBlock(
             sessions_30d=sessions_30d, sessions_90d=sessions_30d * 3,
-            streak_days=2, cardio_minutes_per_week=cardio_min_per_week,
+            sessions_14d=2, cardio_minutes_per_week=cardio_min_per_week,
             work_sets_per_week=50,
         ),
         ratio=StrengthCardioRatio(10, 7, 3, 70, 30),
@@ -209,3 +209,39 @@ def test_inference_axes_capped_at_3():
     )
     out = suggested_axes(rep)
     assert len(out) <= 3
+
+
+# ── `UX4_03B` — le streak quitte le rapport coach (`OPERATOR_DECISION` D7) ───
+
+
+def test_the_coach_report_no_longer_counts_consecutive_days():
+    """Le rapport affichait « Streak », un compteur de jours calendaires
+    consécutifs — punissant un jour de repos correctement pris, et venant d'un
+    SECOND producteur aux règles différentes de celui du moteur comportemental
+    (jour de grâce et filtres d'un côté, rupture stricte et aucun filtre de
+    l'autre). Deux surfaces pouvaient afficher deux valeurs le même jour.
+    """
+    import pathlib
+    import re as _re
+
+    tpl = (pathlib.Path(__file__).resolve().parent.parent
+           / "app/templates/coach_report.html")
+    body = _re.sub(r"\{#.*?#\}", " ", tpl.read_text(encoding="utf-8"),
+                   flags=_re.S)
+    for banned in ("Streak", "streak_days", "jours de série"):
+        assert banned not in body, f"le streak est revenu : « {banned} »"
+
+
+def test_the_replacement_shipped_in_the_same_slice():
+    """`CLAUDE.md §5.3` — jamais une soustraction seule. Sans cette garde,
+    retirer « Streak » laisserait le bloc plus pauvre qu'avant, et le test
+    précédent serait vert."""
+    import pathlib
+    import re as _re
+
+    tpl = (pathlib.Path(__file__).resolve().parent.parent
+           / "app/templates/coach_report.html")
+    body = _re.sub(r"\{#.*?#\}", " ", tpl.read_text(encoding="utf-8"),
+                   flags=_re.S)
+    assert "Séances 14 j" in body
+    assert "report.volume.sessions_14d" in body

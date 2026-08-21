@@ -205,9 +205,94 @@ def test_no_decision_engine_was_touched():
     out = subprocess.run(
         ["git", "diff", "--name-only", "e8614bd", "--",
          "app/services/substitution.py",
-         "app/services/recommendation.py", "app/services/behavioral.py"],
+         "app/services/recommendation.py"],
         cwd=str(REPO_ROOT), capture_output=True, text=True).stdout.strip()
     assert out == "", f"decision engine touched: {out}"
+
+
+def test_the_behavioural_engine_may_shrink_but_never_grow():
+    """**AMENDEMENT DU GEL — `OPERATOR_DECISION` D6, 2026-08-21.**
+
+    `behavioral.py` sort du gel par diff de fichier. Ce n'est pas un
+    relâchement : c'est un **remplacement par une garde plus précise**, et il
+    faut dire pourquoi les deux ne sont pas équivalentes.
+
+    Le gel par diff a servi, cette semaine encore : il a refusé cinq champs
+    additifs qu'`UX4_03B` voulait y ajouter pour servir une surface. Mais il
+    interdit aussi de **retirer** ce qui est mort, et le dépôt en avait quatre
+    exemples — dont un composite fabriqué et une phrase de coaching contenant
+    la chaîne même que `DO_NOT_SURFACE` interdit.
+
+    Un gel qui empêche de nettoyer une arme chargée protège mal.
+
+    Ce qui remplace le diff est **l'invariant que le gel visait vraiment** :
+    la présentation ne doit pas faire GROSSIR ce moteur. On épingle donc
+    l'API — champs et fonctions publiques. Un ajout rougit ; un retrait exige
+    de modifier cette liste, donc de le déclarer.
+
+    `substitution.py` et `recommendation.py` restent gelés par diff : aucune
+    décision ne les a rouverts.
+    """
+    import dataclasses
+
+    import app.services.behavioral as behavioral
+
+    assert {f.name for f in dataclasses.fields(behavioral.BehavioralState)} == {
+        "performance_score", "consistency_score", "fatigue_score",
+        "streak_days", "readiness_score",
+    }, "l'état comportemental a changé de forme — décision requise"
+
+    public = {n for n in vars(behavioral) if not n.startswith("_")
+              and callable(getattr(behavioral, n))
+              and getattr(getattr(behavioral, n), "__module__", "")
+              == behavioral.__name__}
+    assert public == {
+        "BehavioralState",
+        "compute_session_fatigue", "compute_weighted_fatigue",
+        "compute_consistency", "compute_readiness", "compute_behavioral_state",
+    }, "l'API du moteur a changé — décision requise"
+
+
+def test_the_deprecated_composite_has_no_new_consumer():
+    """`OPERATOR_DECISION` D8 — `readiness_score` est **déprécié**.
+
+    Mesuré : sur un compte sans aucune donnée il vaut `25,0`, dont la
+    **totalité** vient du défaut de fatigue. Il n'est rendu sur aucune surface,
+    et cette garde existe pour que ça reste vrai — parce que le mode d'échec
+    est établi : `UX4_03` a fait exactement cela avec `fatigue_score`, et
+    l'opérateur a refusé le rendu.
+
+    ⚠ La première écriture de cette garde utilisait `git grep -l` et rougissait
+    sur **son propre commentaire d'avertissement** — huitième occurrence dans
+    ce dépôt d'une garde qui lit de la prose au lieu du code. On dépouille donc
+    les commentaires avant de chercher.
+
+    L'invariant tenu : **aucun gabarit ne le rend**, et aucun module `app/`
+    hors de la liste ne le lit.
+    """
+    import re as _re
+
+    # 1. Aucune surface. C'est l'invariant qui compte : le composite peut
+    #    survivre dans un service, il ne peut pas atteindre un écran.
+    for tpl in (REPO_ROOT / "app" / "templates").rglob("*.html"):
+        body = _re.sub(r"\{#.*?#\}", " ", tpl.read_text(encoding="utf-8"),
+                       flags=_re.S)
+        assert "readiness_score" not in body, (
+            f"le composite déprécié est rendu par {tpl.name}"
+        )
+
+    # 2. Aucun lecteur nouveau côté application, commentaires exclus.
+    readers = set()
+    for src in (REPO_ROOT / "app").rglob("*.py"):
+        code = _re.sub(r"#.*", " ", src.read_text(encoding="utf-8"))
+        code = _re.sub(r'""".*?"""', " ", code, flags=_re.S)
+        if "readiness_score" in code:
+            readers.add(src.relative_to(REPO_ROOT).as_posix())
+
+    assert readers == {
+        "app/services/behavioral.py",         # le producteur, déprécié
+        "app/services/recovery_contract.py",  # le normaliseur nommé, sans consommateur
+    }, f"consommateur nouveau du composite déprécié : {sorted(readers)}"
 
 
 # ── Disclosures ──────────────────────────────────────────────────────────────

@@ -713,9 +713,25 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     # moteur de décision, que `test_no_decision_engine_was_touched` gèle depuis
     # `e8614bd` précisément pour que la présentation n'y touche pas.
     from app.services.progress_facts import build_progress_facts
-    from app.services.progress_signals import build_progress_signals
+    from app.services.progress_signals import (
+        build_progress_rail,
+        build_progress_signals,
+        build_rail_summary,
+    )
+    from app.services.zone_exposure import (
+        build_zone_exposure,
+        build_zone_exposure_view,
+    )
 
-    signals = build_progress_signals(build_progress_facts(db, user.id))
+    facts = build_progress_facts(db, user.id)
+    signals = build_progress_signals(facts)
+    rail = build_progress_rail(facts)
+    rail_summary = build_rail_summary(facts)
+
+    # `UX4_03D` — « où ai-je travaillé pendant les MÊMES quatorze jours ? ».
+    # Même fenêtre que le rail : deux instruments côte à côte sur des fenêtres
+    # différentes rouvriraient la contradiction que l'écrémage a fermée.
+    exposure = build_zone_exposure_view(build_zone_exposure(db, user.id))
 
     return templates.TemplateResponse(
         request,
@@ -730,6 +746,9 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "active_session": latest_open_session(db, user.id),
             "weekly": weekly,
             "signals": signals,
+            "rail": rail,
+            "rail_summary": rail_summary,
+            "exposure": exposure,
         },
     )
 

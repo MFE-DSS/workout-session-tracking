@@ -93,9 +93,8 @@ SUBJECTIVE_LABEL = "Ressenti général"
 #: « Ressenti », pas avec l'ancienne « Charge ».
 UNKNOWN_VALUE = "inconnu"
 
-#: Rendu de l'indécidable. Ici le tiret est correct : il n'y a pas de rythme à
-#: comparer, donc rien à nommer.
-NO_CADENCE_VALUE = "—"
+#: Rendu de l'indécidable. Le tiret est correct ici : il n'y a rien à nommer.
+NO_DATA_VALUE = "—"
 
 
 def _general_feeling(facts: ProgressFacts) -> dict[str, Any]:
@@ -142,28 +141,120 @@ def _sessions(facts: ProgressFacts) -> dict[str, Any]:
     }
 
 
-def _cadence(facts: ProgressFacts) -> dict[str, Any]:
-    """Deux comptages comparés, rendus comme deux comptages.
+# ── `UX4_03D` — L'OBJET « CADENCE 7 J » EST RETIRÉ ───────────────────────────
+#
+# `OPERATOR_DECISION`, décision 2 : **la cadence est absorbée par le rail.**
+# Elle rendait `3 → 2`, c'est-à-dire le nombre de séances des sept jours
+# précédents puis des sept derniers. Le rail rend ces quatorze jours un par un :
+# la densité de sa moitié droite contre celle de sa moitié gauche EST cette
+# comparaison, à l'œil, sans un objet de plus.
+#
+# Ce n'est pas une soustraction (`CLAUDE.md §5.3`) : la preuve visuelle part
+# dans la MÊME livraison que le retrait, et elle en dit davantage — la cadence
+# donnait deux nombres, le rail donne les quatorze jours qui les composent.
 
-    Le défaut que ceci ferme : `compute_trend(0, 0)` rend `"stable"`, donc
-    l'ancien gabarit annonçait une continuité **stable** à quelqu'un qui n'avait
-    jamais rien enregistré. Zéro contre zéro n'est pas une stabilité, c'est une
-    absence de rythme — et c'est ce que dit `NO_CADENCE_VALUE`.
+
+#: Classe CSS par état de trace. Aucune couleur ne code le TYPE de séance :
+#: musculation et cardio sont deux actions utilisateur, et le socle réserve
+#: l'ambre à « action / actuel ». Le type passe par une texture.
+_TRACE_CLASS = {
+    "done": "rail__c rail__c--on",
+    "rest": "rail__c rail__c--rest",
+    "active": "rail__c rail__c--active",
+    "none": "rail__c rail__c--void",
+}
+
+
+def build_progress_rail(facts: ProgressFacts) -> list[dict[str, Any]]:
+    """Les 14 traces, prêtes pour le gabarit. Fonction pure.
+
+    Le `title` n'invente rien : il cite le nom du programme quand il existe,
+    et dit « repos » ou « séance en cours » sinon. Le type n'est ajouté que
+    s'il est **connu** — un template supprimé rend `kind is None`, et la trace
+    reste alors une trace sans qualificatif plutôt qu'une musculation
+    supposée.
     """
-    last_7, prev_7 = facts.sessions_last_7, facts.sessions_prev_7
-    if not last_7 and not prev_7:
-        return {
-            "name": "Cadence 7 j",
-            "value": NO_CADENCE_VALUE,
-            "context": "aucune séance sur 14 jours",
-            "known": False,
-        }
-    return {
-        "name": "Cadence 7 j",
-        "value": f"{prev_7} → {last_7}",
-        "context": "7 jours précédents, puis les 7 derniers",
-        "known": True,
-    }
+    cells = []
+    for d in facts.days:
+        cls = _TRACE_CLASS.get(d.state, _TRACE_CLASS["rest"])
+        if d.state == "done" and d.kind == "cardio":
+            cls += " rail__c--cardio"
+        if d.state == "done":
+            title = f"{d.label} · {d.name}" if d.name else d.label
+        elif d.state == "active":
+            title = f"{d.label} · séance en cours"
+        elif d.state == "none":
+            title = f"{d.label} · hors historique"
+        else:
+            title = f"{d.label} · repos"
+        cells.append({"cls": cls, "title": title, "label": d.label})
+    return cells
+
+
+#: Comment nommer un type de séance à l'oreille. Le rail le distingue par une
+#: texture ; un lecteur d'écran ne voit pas de texture.
+_KIND_WORD = {"strength": "musculation", "cardio": "cardio"}
+
+
+def _split_days(facts: ProgressFacts) -> tuple[list[str], list[str], int]:
+    """Trie les 14 traces en trois listes : terminées, en cours, hors histo.
+
+    Extrait de `build_rail_summary` : `python:S3776` a mesuré 17 de complexité
+    cognitive pour 15 autorisés. La règle avait raison — la fonction triait ET
+    rédigeait. Le nom d'un type n'est ajouté que s'il est CONNU.
+    """
+    done, active, void = [], [], 0
+    for d in facts.days:
+        if d.state == "done":
+            word = _KIND_WORD.get(d.kind or "")
+            done.append(f"{d.label} {word}" if word else d.label)
+        elif d.state == "active":
+            active.append(d.label)
+        elif d.state == "none":
+            void += 1
+    return done, active, void
+
+
+def build_rail_summary(facts: ProgressFacts) -> str:
+    """Équivalent TEXTUEL du rail, rendu côté serveur.
+
+    POURQUOI CETTE FONCTION EXISTE
+    --------------------------------
+    Le rail est `aria-hidden` — `Web:S6819` avait raison, le compte « 5 séances
+    · 14 derniers jours » est déjà rendu en texte juste au-dessus et une
+    étiquette d'image le répétait à l'oreille.
+
+    Mais le rail porte **davantage** que ce compte : la répartition des jours,
+    la distinction entre séance terminée et séance en cours, la couverture de
+    l'historique, et le type de chaque séance. Rien de tout cela n'était
+    accessible — les `title` ne sont pas annoncés de façon fiable.
+
+    Masquer un objet dont l'information n'existe nulle part ailleurs, c'est la
+    rendre visuelle-seulement. D'où cet équivalent, **construit à partir des
+    mêmes `facts.days`** que `build_progress_rail` : aucun recalcul, une seule
+    source, et la divergence entre ce qu'on voit et ce qu'on entend devient
+    structurellement impossible.
+    """
+    done, active, void = _split_days(facts)
+
+    # ⚠ Aucun `+`, pas même sur des chaînes. `test_no_new_business_calculation`
+    # interdit tout `ast.BinOp` additif dans ce module, et il a rougi sur une
+    # concaténation. La garde vise l'arithmétique métier, pas le formatage —
+    # mais elle ne peut pas distinguer les deux statiquement, et l'affaiblir
+    # pour un confort d'écriture serait le mauvais échange. On formate donc
+    # sans opérateur.
+    parts = ["Quatorze derniers jours."]
+    if done:
+        n = len(done)
+        s = "s" if n > 1 else ""
+        parts.append(f"{n} séance{s} terminée{s} : {', '.join(done)}.")
+    else:
+        parts.append("Aucune séance terminée.")
+    if active:
+        parts.append(f"Séance en cours, non comptée : {', '.join(active)}.")
+    if void:
+        parts.append(f"{void} jour{'s' if void > 1 else ''} hors historique.")
+    return " ".join(parts)
 
 
 def build_progress_signals(facts: ProgressFacts) -> list[dict[str, Any]]:
@@ -172,13 +263,14 @@ def build_progress_signals(facts: ProgressFacts) -> list[dict[str, Any]]:
     Le ressenti d'abord — ce que l'utilisateur a **dit** passe avant ce
     qu'AUREN **compte**, comme dans `home_training_state._select_items`.
     """
-    return [_general_feeling(facts), _sessions(facts), _cadence(facts)]
+    return [_general_feeling(facts), _sessions(facts)]
 
 
 __all__ = [
     "DECLARED_STATE_LABELS",
-    "NO_CADENCE_VALUE",
     "SUBJECTIVE_LABEL",
     "UNKNOWN_VALUE",
+    "build_progress_rail",
     "build_progress_signals",
+    "build_rail_summary",
 ]

@@ -13,12 +13,14 @@
     <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
       Cette semaine
     </div>
-    {# Sb_27.5 — narrative phrase one-liner #}
-    {% if weekly.narrative and weekly.narrative.available %}
-      <div style="font-size:13px;opacity:0.85;margin-top:4px;font-style:italic;">
-        {{ weekly.narrative.phrase }}
-      </div>
-    {% endif %}
+    {# `UX4_03D` — LA PHRASE NARRATIVE EST RETIRÉE (`OPERATOR_DECISION` 4).
+       Elle rendait des verdicts de comportement en prose — « Semaine régulière
+       — garde ce rythme » — en tête de Progression, au-dessus de tous les
+       objets. C'est la grammaire que cette refonte remplace : un cockpit rend
+       des états, il ne les commente pas.
+
+       Le producteur `weekly.narrative` n'est PAS supprimé : la décision porte
+       sur le premier niveau de cette surface, pas sur la capacité. #}
     <div style="font-size:18px;font-weight:600;margin-top:4px;">
       {{ weekly.volume_signal }}
     </div>
@@ -45,10 +47,14 @@
     <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
       Séances dominantes
     </div>
+    {# `UX4_03D` — FENÊTRE EXPLICITE (`OPERATOR_DECISION` 3). « Push A · 2× »
+       et « Push A · 5 sessions » du bloc « Par programme » comptaient le même
+       programme sur deux fenêtres muettes. Rien à l'écran ne disait laquelle,
+       et la position dans la page ne suffit pas à la porter. #}
     <ul style="list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:4px;font-size:14px;">
       {% for t in weekly.dominant_templates %}
         <li><strong>{{ t.name }}</strong>
-          <span style="opacity:0.6;">· {{ t.count }}×</span></li>
+          <span style="opacity:0.6;">· {{ t.count }}× · cette semaine</span></li>
       {% endfor %}
     </ul>
   </div>
@@ -83,19 +89,14 @@
     {% endif %}
   </div>
 
-  {# ── Hint ── #}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Hint de la semaine
-    </div>
-    {% if weekly.hint %}
-      <div style="font-size:14px;margin-top:6px;">{{ weekly.hint }}</div>
-    {% else %}
-      <div style="font-size:13px;opacity:0.6;margin-top:6px;">
-        {{ weekly.hint_note }}
-      </div>
-    {% endif %}
-  </div>
+  {# `UX4_03D` — LA CARTE « HINT DE LA SEMAINE » EST RETIRÉE
+     (`OPERATOR_DECISION` 4). Elle rendait « Continue sur cette base — les
+     recommandations s'affinent à chaque séance » : un encouragement, pas un
+     fait. Une carte entière, en tête de Progression, pour une phrase que
+     l'écran ne peut ni prouver ni contredire.
+
+     `weekly.hint` reste produit — la décision porte sur ce que la surface
+     rend, pas sur ce que le service calcule. #}
 
 </section>
 {% endif %}
