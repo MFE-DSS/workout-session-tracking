@@ -395,3 +395,61 @@ check_ruff_budget    281 ≤ 548
 broad sweep          167 passed sur le rayon d'impact
 navigateur           trois états mesurés SUR LA PAGE RÉELLE, 390 px
 ```
+
+---
+
+## 9. Closeout
+
+| | |
+|---|---|
+| **PR** | [#139](https://github.com/MFE-DSS/workout-session-tracking/pull/139) |
+| **Commits** | `bdc04ac` architecture d'information · `04d391e` complexité Sonar · `c2a5c43` exposition anatomique |
+| **Merge** | `2ff1865`, 2026-08-21, méthode `--merge`, tête épinglée |
+| **Gate Sonar** | `OK` — couverture du code neuf **98,0 %**, 0 bug, 0 smell, 0 vulnérabilité, 0 duplication |
+| **Checks PR** | 7/7, gate externe `SonarCloud Code Analysis` compris |
+| **Threads de revue** | 0 non résolu |
+| **Full sweep local** | **5135 passés**, 0 échec, `coverage.xml` écrit dans le worktree |
+
+### 9.1 — Un gate rouge, diagnostiqué avant d'être corrigé
+
+Le premier run a rendu `SonarCloud Code Analysis` rouge :
+`new_code_smells_severity = 20` pour un seuil de 14. Deux `python:S3776`
+CRITICAL — **2 × 10 = 20**, l'arithmétique exacte du dépassement, ce qui disait
+déjà combien de findings chercher avant d'aller les chercher.
+
+Les deux étaient les miennes : `build_progress_facts` (20 de complexité) et
+`build_rail_summary` (17). La règle avait raison sur le fond — les deux
+fonctions avaient absorbé une responsabilité de plus. **Découpées, pas
+suppressées** : `_occupant`, `_day_traces`, `_split_days`. Aucun comportement
+changé, 174 tests du rayon d'impact verts.
+
+### 9.2 — Deux tranches sur une PR, signalé et assumé
+
+La PR avait obtenu `PR GREEN` sur la seule architecture d'information ;
+l'instrument anatomique s'y est ajouté après un `GO BUILD` explicite. Le fait a
+été **remonté à l'opérateur avant le merge**, avec l'offre de scinder. La
+décision de merge couvre donc les deux tranches.
+
+### 9.3 — Ce que ce train a corrigé chez moi
+
+Trois fois, ma prose a décrit autre chose que le rendu, et trois fois c'est une
+mesure qui l'a montré :
+
+1. « hachure » écrite, `fill-opacity` implémentée ;
+2. « le motif survit à la feuille de style » — faux, une règle CSS bat un
+   attribut de présentation SVG, et rien ne s'affichait ;
+3. le registre de closeout d'`UX4_03` classait quatre défauts dont **trois
+   entrées étaient inexactes**, corrigées avant d'ouvrir la tranche.
+
+Le remède appliqué à chaque fois : faire viser le **rendu** à la garde, pas la
+source ni l'intention.
+
+### 9.4 — Ce qui reste ouvert
+
+| Sujet | Nature |
+|---|---|
+| niveau 2 du rail temporel | le détail jour par jour n'est pas inspectable |
+| couverture de `muscle_mapping` | deux exercices courants reconnus par aucun motif |
+| doublon `ZONE_TO_REGION` | assumé, gardé, non résolu |
+| absorption de `/dashboard` | périmètre initial d'`UX4_03`, jamais ouvert |
+| route `/progress/body` | dépendance héritée d'`UX4_01` |
