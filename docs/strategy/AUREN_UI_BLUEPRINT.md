@@ -591,16 +591,17 @@ aveugle : quatre ensembles, chacun avec son propre gate.
 |---|---|---|
 | **UX4_01** | ✅ `PROFILE_DATA_ACQUISITION` — **PREMIÈRE TRANCHE MERGÉE** (`d146cdb`, PR #137, 2026-08-20) : **6,6 → 2,0 écrans · 641 → 140 mots · 39 → 10 contrôles · 18 → 4 régions encadrées · 6 → 0 modules analytiques**. Six lignes `OPERATOR_DECISION` appliquées, **zéro ligne candidate**. | passer de « modifier une base de données » à « apprendre ce dont AUREN a besoin » |
 | **UX4_02** | `LIBRARY_WORKOUT_DISCOVERY` | passer d'un catalogue de cartes textuelles à une **surface de décision**, **rattachée à Programmes** (`5ter.3`, `OD`) |
-| **UX4_03** | `PROGRESSION_BODY_LEDGER` | fusionner la logique analytique ; **absorber les capacités utiles de `/dashboard` dans Progression puis le RETIRER** (`5ter.3`, `OD`) ; absorbe l'ancienne « Phase 4 » et `BODY_LEDGER_PAGE_01` |
+| **UX4_03** | 🟡 `PROGRESSION_BODY_LEDGER` — **signaux MERGÉS** (`fc786a2`, PR #138, 2026-08-21) : les trois signaux sont rendus, **et corrigés**. Le premier rendu affichait `45/100` là où 45 est le DÉFAUT du calcul, `21/100` pour un rythme sain, et « stable » à qui n'avait jamais rien enregistré — refusé par l'opérateur, corrigé par `UX4_03B`. **Reste ouvert** : absorption de `/dashboard`, analytique corporelle, et `UX4_03B_BEHAVIORAL_CONSUMER_ALIGNMENT` (voir dépendances). | fusionner la logique analytique ; **absorber les capacités utiles de `/dashboard` dans Progression puis le RETIRER** (`5ter.3`, `OD`) ; absorbe l'ancienne « Phase 4 » et `BODY_LEDGER_PAGE_01` |
 | **UX4_04** | `SHELL_MOTION_POLISH` | **seulement après les surfaces** : transitions, overlays, micro-motion, espacement global |
 
 > ### ⚠ Dépendances ouvertes par `UX4_01`, à traiter avant de clore V4
 >
 > | Capacité | État | Bloque |
 > |---|---|---|
-> | **fatigue · régularité · série** | **calculées, visibles NULLE PART** — retirées du Profil, `PROGRESSION` annonce « la régularité » dans son chapeau sans la rendre | `UX4_03` |
+> | ~~**fatigue · régularité · série**~~ | ✅ **FERMÉE** par `fc786a2` — rendues sur Progression sous « Ressenti général · Séances · Cadence 7 j ». La série n'est **pas** rendue : `OPERATOR_DECISION / DO_NOT_SURFACE`, un jour de repos la remet à zéro. | — |
 > | **éditeur de préférences** | reste dans le Profil, **marqué transitionnel à l'écran** | `UX4_02` |
 > | **analytique corporelle** | retirée du Profil, **aucun lien posé** — `/progress/body` n'a pas de route | `UX4_03` |
+> | **consommateurs de `consistency_score`** | ⚠ **NOUVEAU, ouvert par `fc786a2`** — `readiness_score` consomme la régularité héritée : un compte **sans aucune donnée** rend `25,0`, dont la **totalité** vient du défaut de fatigue. Plus : « Streak » rendu dans le rapport coach par un **second** producteur aux règles différentes, « Série en cours » émis par `compute_recommendation`, trois cartes vides de `weekly_loop`. Détail : `docs/UX4_03A_BEHAVIORAL_SIGNAL_SEMANTICS.md §9`. | `UX4_03B_BEHAVIORAL_CONSUMER_ALIGNMENT`, **avant closeout final de `UX4_03`** |
 >
 > Le premier trou est **assumé et signalé**, pas comblé : la refonte de
 > Progression était explicitement hors périmètre de `UX4_01`. C'est le coût

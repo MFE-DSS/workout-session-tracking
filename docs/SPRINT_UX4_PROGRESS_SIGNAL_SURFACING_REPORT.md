@@ -1,7 +1,6 @@
 # `UX4_03` — rendre perceptible ce qui est déjà calculé
 
-**Statut : `UX4_03B` construit et exposé, NON COMMITÉ.** En attente du verdict
-opérateur sur le rendu (`CLAUDE.md §5.1`).
+**Statut : MERGÉ** — `fc786a2`, PR #138, 2026-08-21. Closeout au §9.
 
 Ce rapport remplace celui de `UX4_03`, dont le rendu a été refusé.
 
@@ -316,4 +315,50 @@ Aucune migration · aucun modèle · aucun asset anatomique · aucune dépendanc
 
 ---
 
-**`UX4_03B` — EXPOSÉ, NON COMMITÉ. En attente du verdict opérateur.**
+## 9. Closeout
+
+| | |
+|---|---|
+| **PR** | [#138](https://github.com/MFE-DSS/workout-session-tracking/pull/138) |
+| **Commits** | `e32576e` (`UX4_03`, rendu refusé) · `b119b5d` (`UX4_03B`, correction) |
+| **Merge** | `fc786a2`, 2026-08-21, méthode `--merge`, tête épinglée |
+| **CI canonique** | **6/6 verte** sur `fc786a2` (run `32480681098`) |
+| **Gate Sonar** | `OK` — **couverture du code neuf 100 %**, 0 bug, 0 smell, 0 vulnérabilité, 0 duplication |
+| **Threads de revue** | 0 non résolu |
+
+### 9.1 — Un échec CI qui n'était pas une régression
+
+Le premier run a rendu `pytest shard 1` rouge sur
+`test_perf_body_intelligence_route_p95` : `p95 = 5042 ms > 2500 ms`.
+
+**Diagnostic avant conclusion**, pas l'inverse :
+
+| Preuve | Constat |
+|---|---|
+| dépendances de `/body/intelligence` | `body_intelligence`, `body_intelligence_inputs`, `muscle_scoring`, `templating` — **aucun fichier de la tranche** |
+| rejoué en local sur le commit exact | **20 passés en 3,89 s** |
+| full sweep local sur le même commit | **5106 passés**, ce test inclus |
+| commit précédent de la même branche | même test **vert** |
+| shards 2 et 3 | **verts** |
+| nature du test | p95 sur 10 itérations, budget « intentionnellement très large […] pas les variations < 100 ms (variance CI) » |
+
+Une requête à 5 s sur dix, sur une route sans lien avec le diff : contention de
+runner. `CLAUDE.md §2` prévoit ce cas — **re-run des jobs échoués, sans nouveau
+commit**. Le re-run est passé **vert sur les six jobs**.
+
+Deux effets de cascade méritent d'être nommés plutôt que passés sous silence :
+l'agrégateur `pytest + QA scripts` avait échoué **par dépendance** du shard, et
+`SonarCloud` avait été **skippé** — donc le gate n'avait alors **aucun verdict**
+sur `b119b5d`. Il a été exigé et obtenu avant merge.
+
+### 9.2 — Ce que la tranche laisse ouvert
+
+`UX4_03B_BEHAVIORAL_CONSUMER_ALIGNMENT` (§9 de
+`docs/UX4_03A_BEHAVIORAL_SIGNAL_SEMANTICS.md`), **à terminer avant le closeout
+final d'`UX4_03`** — priorité **B1**, désignée par l'opérateur :
+`readiness_score` consomme le `consistency_score` hérité, et un compte sans
+aucune donnée rend `25,0` **entièrement fabriqué** par le défaut de fatigue.
+
+---
+
+**`UX4_03` — CLOSED.**
