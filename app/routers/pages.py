@@ -718,11 +718,20 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
         build_progress_signals,
         build_rail_summary,
     )
+    from app.services.zone_exposure import (
+        build_zone_exposure,
+        build_zone_exposure_view,
+    )
 
     facts = build_progress_facts(db, user.id)
     signals = build_progress_signals(facts)
     rail = build_progress_rail(facts)
     rail_summary = build_rail_summary(facts)
+
+    # `UX4_03D` — « où ai-je travaillé pendant les MÊMES quatorze jours ? ».
+    # Même fenêtre que le rail : deux instruments côte à côte sur des fenêtres
+    # différentes rouvriraient la contradiction que l'écrémage a fermée.
+    exposure = build_zone_exposure_view(build_zone_exposure(db, user.id))
 
     return templates.TemplateResponse(
         request,
@@ -739,6 +748,7 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "signals": signals,
             "rail": rail,
             "rail_summary": rail_summary,
+            "exposure": exposure,
         },
     )
 

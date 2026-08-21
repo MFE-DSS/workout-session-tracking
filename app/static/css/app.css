@@ -1913,6 +1913,110 @@ input, button, textarea, select {
   color: var(--fg-dim);
 }
 
+/* ── `UX4_03D` — EXPOSITION MUSCULAIRE ───────────────────────────────────────
+ * Trois états, trois traitements, et les confondre mentirait :
+ *   touchée  → aplat bleu
+ *   zéro     → transparent — un FAIT, pas un manque
+ *   inconnu  → MOTIF hachuré — une autre NATURE, pas une intensité plus faible
+ *
+ * BLEU ET NON AMBRE. Le socle `UIV3_COCKPIT_LADDER_01` : BLEU = ce que le
+ * moteur produit, AMBRE = action utilisateur / objet actif. Une exposition
+ * dérivée d'un mapping d'exercices EST une production du moteur. En ambre, six
+ * régions entreraient en concurrence avec la seule affordance de la carte.
+ *
+ * LE MOTIF EST DÉCLARÉ ICI, PAS EN ATTRIBUT. Posé en `fill="url(#…)"` sur
+ * l'élément, il était écrasé par `.ze-r { fill: transparent }` — une règle CSS
+ * bat un attribut de présentation SVG, et rien ne s'affichait. Mesuré au
+ * `fill` calculé, pas supposé.
+ */
+.ze__map {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  min-height: 48px;
+  padding: var(--space-xs) 0;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  list-style: none;
+}
+
+.ze__map::-webkit-details-marker { display: none; }
+.ze__map--static { cursor: default; }
+.ze[open] .ze__map { margin-bottom: var(--space-xs); }
+
+.ze-figs { display: flex; gap: var(--space-sm); }
+
+.ze-fig {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.ze-sil { width: 44px; height: 74px; display: block; }
+.ze-cap { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--fg-dim); }
+
+.ze-b { fill: var(--surface-2); }
+.ze-r { fill: transparent; }
+.ze-r--on { fill: var(--info); fill-opacity: 0.85; }
+.ze-r--zero { fill: transparent; }
+.ze-r--unknown { fill: url(#auren-hatch); color: var(--fg-dim); }
+
+.ze__read { display: flex; flex-direction: column; gap: 1px; }
+
+.ze__n {
+  font-size: 34px;
+  line-height: 0.9;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Zéro connu : un chiffre, donc un fait — mais en sourdine. Un « 0 » au poids
+ * d'une performance mesurée se lirait comme un échec. */
+.ze__n--muted { color: var(--fg-dim); font-weight: 400; }
+.ze__n--unknown { font-size: 20px; font-weight: 400; color: var(--fg-dim);
+  font-style: italic; }
+
+.ze__k { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--fg-muted); }
+
+.ze__go {
+  margin-top: 5px;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.ze-list { list-style: none; margin: 0 0 var(--space-md); padding: 0; }
+.ze-list__head {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--space-xs);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+
+.ze-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  min-height: 36px;
+  padding: 5px 0;
+}
+
+.ze-row + .ze-row { border-top: 1px solid var(--border); }
+.ze-row__n { font-size: 13.5px; color: var(--fg-muted); }
+.ze-row__v { font-size: 16px; font-weight: 600; color: var(--fg);
+  font-variant-numeric: tabular-nums; }
+.ze-row__v--zero { color: var(--fg-dim); font-weight: 400; }
+
 .signals__how {
   margin: 0 0 var(--space-lg);
   font-size: 12px;

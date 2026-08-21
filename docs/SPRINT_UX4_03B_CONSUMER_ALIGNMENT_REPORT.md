@@ -286,3 +286,112 @@ qu'aucune littérature ne justifie ses bornes.
 
 Restent ouverts : le niveau 2 du rail · l'instrument PROGRESSIF
 (`exercise_history` existe, l'agrégat non) · le PRESCRIPTIF (moteur gelé).
+
+---
+
+## 8. `UX4_03D_ANATOMICAL_EXPOSURE` — instrument livré
+
+**Une seule question** : « où ai-je travaillé pendant les mêmes quatorze
+jours ? ». Même fenêtre que Volume & rythme — deux instruments côte à côte sur
+des fenêtres différentes rouvriraient la contradiction que le §7 vient de
+fermer, et une garde compare les deux constantes.
+
+### 8.1 — La découverte qui a changé le build
+
+`profile_metrics._zone_session_counts` rend **six axes radar, pas onze zones**,
+et documente sa propre perte :
+
+> zone with no radar axis (``core``) or unclassified (``unknown``). Dropped
+> rather than forced onto an arbitrary axis.
+
+`core` est pourtant l'une des onze zones canoniques. Compter au niveau détaillé
+n'est donc **pas une approximation** du comptage existant : c'est le comptage
+qui ne perd pas une zone. Une garde le prouve en plantant le cas.
+
+### 8.2 — Trois états, parce que deux mentiraient
+
+| État | Condition | Rendu |
+|---|---|---|
+| `known` | des séances, au moins un exercice classable | carte + détail 11 zones |
+| `zero` | des séances, aucune zone touchée — **un fait** (du cardio) | carte seule |
+| `unknown` | aucune séance, ou rien de reconnaissable — **une absence de preuve** | carte seule, motif hachuré |
+
+Une séance sans exercice a réellement touché zéro zone. Des exercices qu'aucun
+motif ne reconnaît rendent l'attribution **impossible**, pas nulle. Confondre
+les deux ferait passer une ignorance pour une mesure.
+
+### 8.3 — La règle d'affordance, encodée
+
+> **Une affordance de détail n'existe que si le niveau suivant contient une
+> information supplémentaire.**
+
+Onze lignes disant chacune `0` n'en contiennent aucune : `zero` et `unknown`
+n'ouvrent rien. Mesuré en production — `known` : 1 action, 11 lignes ;
+`zero` et `unknown` : 0 action, 0 ligne.
+
+### 8.4 — Deux fois où ma prose a devancé le rendu
+
+**Première fois.** Rapport : « hachure, jamais une intensité plus faible ».
+Implémentation : `fill-opacity: .18` — exactement l'intensité que la règle
+interdit, avec le bon mot collé dessus.
+
+**Seconde fois.** Corrigé en posant `fill="url(#…)"` **en attribut**, avec la
+phrase « il survit à la feuille de style ». **Faux** : une règle CSS bat un
+attribut de présentation SVG, `.ze-r { fill: transparent }` l'écrasait, et
+**rien ne s'affichait**. La sonde l'a vu, pas moi.
+
+Le motif est désormais déclaré en CSS et référence un `<pattern>` réel. La
+garde vise le **rendu** : le `<pattern>` doit exister dans la page servie,
+contenir un tracé, et la règle doit le référencer sans opacité.
+
+### 8.5 — Mesuré sur la page réelle, aux trois états
+
+| | connu | zéro | inconnu |
+|---|---:|---:|---:|
+| valeur | 9 | 0 | *inconnu* |
+| actions | **1** | **0** | **0** |
+| lignes L2 | 11 | 0 | 0 |
+| liens menteurs | 0 | 0 | 0 |
+| tracés tactiles | 0 | 0 | 0 |
+| régions hachurées | 0 | 0 | **13** |
+| motif SVG réel | — | — | **oui** |
+| hauteur du bloc | 130 px | 130 px | 130 px |
+| cible du BodyMap | 99 px | 99 px | 99 px |
+
+**Aucune divergence avec le prototype accepté.**
+
+Contrastes mesurés sur le fond réel : exposition `--info` **4,79**, inconnu
+**5,31** — au-dessus de la cible porteuse de 4,0.
+
+### 8.6 — Ce que l'instrument ne dira jamais
+
+Ni *sous-entraîné*, ni *sur-entraîné*, ni *optimal*, ni *% de cible*, ni
+*N / cible séries*, ni revendication d'activation. Tous supposent une CIBLE, et
+le dépôt ne produit que des **bandes de planification**
+(`weekly_volume_budget`) dont l'en-tête précise qu'« aucune littérature n'est
+invoquée » pour justifier ses bornes. Une garde scanne le service.
+
+### 8.7 — Un trou du matcher, signalé et non traité
+
+Sur la fixture de mesure, **« Développé militaire » et « Soulevé de terre
+roumain » ne sont reconnus par aucun motif** de `muscle_mapping`. Deux
+exercices courants dont l'exposition est perdue silencieusement. Hors périmètre
+de cette tranche — mais c'est une donnée réelle qui ne compte nulle part.
+
+### 8.8 — Un doublon assumé et gardé
+
+`ZONE_TO_REGION` duplique la table inline de `worked_area_body_map.html`. La
+sortir du gabarit modifierait une surface partagée par la carte d'exercice,
+hors périmètre. Le doublon est donc **surveillé** : une garde compare les deux
+et rougit si l'une dérive.
+
+### 8.9 — Contrôles
+
+```
+full sweep local     5135 passed, 0 échec (31 min, 2 workers)
+                     coverage.xml écrit DANS LE WORKTREE
+ruff (py311)         All checks passed sur les fichiers neufs
+check_ruff_budget    281 ≤ 548
+broad sweep          167 passed sur le rayon d'impact
+navigateur           trois états mesurés SUR LA PAGE RÉELLE, 390 px
+```
