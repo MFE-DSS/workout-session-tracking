@@ -691,6 +691,32 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
 
     weekly = build_weekly_loop(db, user)
 
+    # `UX4_03` — les trois signaux comportementaux existaient, calculés, et
+    # n'étaient rendus NULLE PART : `/progress` annonçait « la régularité »
+    # dans son chapeau sans jamais l'afficher, et `UX4_01` les a retirés du
+    # Profil parce qu'ils y répondaient à la mauvaise question.
+    #
+    # COMPOSITION EN LECTURE SEULE. `compute_behavioral_state` est le même
+    # service que consomme l'accueil : aucun calcul nouveau, aucun modèle,
+    # aucune migration. On branche une valeur déjà produite sur la surface qui
+    # la promettait.
+    # `UX4_03B` — le gabarit ne reçoit ni l'état comportemental, ni les faits :
+    # il reçoit la vue-modèle. L'audit `UX4_03A` a montré que trois champs de
+    # `BehavioralState` ne sont pas présentables tels quels — `fatigue_score`
+    # rend 45,0 pour une ABSENCE de déclaration, `consistency_score` pose une
+    # séance par jour comme le 100 %, et `trend_direction` rend « stable » pour
+    # 0 séance contre 0. Ne pas les passer au gabarit rend la correction
+    # STRUCTURELLE : aucun changement de libellé ne peut les ramener.
+    #
+    # `compute_behavioral_state` n'est plus appelé ici. `progress_facts` lit les
+    # faits — des comptages et une déclaration recopiée — sans passer par un
+    # moteur de décision, que `test_no_decision_engine_was_touched` gèle depuis
+    # `e8614bd` précisément pour que la présentation n'y touche pas.
+    from app.services.progress_facts import build_progress_facts
+    from app.services.progress_signals import build_progress_signals
+
+    signals = build_progress_signals(build_progress_facts(db, user.id))
+
     return templates.TemplateResponse(
         request,
         "progress.html",
@@ -703,6 +729,7 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db, user.id),
             "weekly": weekly,
+            "signals": signals,
         },
     )
 

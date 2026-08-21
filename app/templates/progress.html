@@ -1,10 +1,70 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Progression</h1>
-<p class="lede">Lecture des séances terminées, de la régularité et des signaux récents.</p>
+{# Le chapeau promettait « la régularité », un mot auquel plus aucun libellé ne
+   répond depuis que le score sur 100 a été retiré. Il annonce désormais ce que
+   la page montre vraiment — sinon la promesse invisible que `UX4_03` devait
+   fermer se rouvrirait, déplacée d'un cran. #}
+<p class="lede">Lecture des séances terminées, de ta cadence récente et de ce que tu as déclaré.</p>
 
 {# Sb_27.3 — Weekly training loop tile (count, dominantes, anomalie, hint) #}
 {% include "_partials/weekly_loop.html" %}
+
+{# ── `UX4_03B` — L'INSTRUMENT DES SIGNAUX, APRÈS L'AUDIT SÉMANTIQUE ──────────
+   `UX4_03` rendait trois valeurs sur 100 avec leur jauge. L'audit
+   `UX4_03A` a mesuré que les trois habillaient une donnée absente en mesure :
+
+     · « Charge 45/100 »    → 45,0 est le DÉFAUT rendu quand rien n'est déclaré
+     · « Régularité 0/100 » → le /100 pose UNE SÉANCE PAR JOUR comme la cible,
+                              donc 3 séances sur 14 jours s'affichaient 21/100
+     · « Continuité stable »→ `compute_trend(0, 0)` rend « stable », donc
+                              quelqu'un qui n'a jamais rien fait lisait que son
+                              rythme était stable
+
+   Le dépôt avait déjà écrit la règle, dans `recovery_contract` :
+   « the user told us nothing » is not a measurement and must not be dressed up
+   as a neutral reading.
+
+   LE GABARIT NE VOIT PLUS L'ÉTAT BRUT. Il reçoit `signals`, une vue-modèle
+   pure (`progress_signals`), et n'a donc plus accès aux trois champs écartés :
+   la correction est structurelle, pas typographique.
+
+   `streak_days` N'EST PAS RENDU — `OPERATOR_DECISION / DO_NOT_SURFACE`.
+   Il compte des jours calendaires consécutifs : un jour de repos correctement
+   pris le remet à zéro. La cadence compare deux fenêtres de sept jours, ce qui
+   décrit le rythme réel sans le transformer en chaîne à ne pas rompre.
+
+   VOCABULAIRE. `test_no_forbidden_wording_in_progress` interdit certains mots
+   dans CE FICHIER, commentaires compris. Cette garde est plus stricte que
+   celle que j'avais écrite, et elle a raison : un démenti reste une
+   occurrence. Les libellés d'état ci-dessous ne sont pas réécrits — ce sont
+   ceux du formulaire de fin de séance, cités tels quels. #}
+<h2 class="section-header">Signaux d'entraînement</h2>
+<dl class="signals">
+  {% for s in signals %}
+    <div class="signal{% if not s.known %} signal--unknown{% endif %}">
+      <dt class="signal__name">{{ s.name }}</dt>
+      <dd class="signal__value">{{ s.value }}</dd>
+      <dd class="signal__context">{{ s.context }}</dd>
+    </div>
+  {% endfor %}
+</dl>
+
+{# UNE SEULE divulgation pour les trois provenances. `UX4_03` en écrivait une
+   par signal — 77 mots pour dire trois fois la même chose : d'où vient le
+   chiffre. Repliée, elle ne coûte qu'une ligne. #}
+<details class="signals__how">
+  <summary>Comment AUREN calcule ces signaux</summary>
+  <p><strong>Ressenti général</strong> — le mot que tu as choisi en répondant
+  « Comment te sentais-tu pendant la séance ? », sur la dernière séance où tu
+  y as répondu. AUREN le cite ; il ne le convertit en aucune note. Si cette
+  réponse n'est pas celle de ta dernière séance, sa date est affichée.</p>
+  <p><strong>Séances</strong> — le nombre de séances terminées sur quatorze
+  jours. Un comptage, pas une note : aucun objectif hebdomadaire n'est supposé.</p>
+  <p><strong>Cadence 7 j</strong> — les sept jours précédents, puis les sept
+  derniers, côte à côte. <strong>Un jour de repos ne casse rien</strong> :
+  aucune série de jours n'est comptée.</p>
+</details>
 
 {# Sx_UI_07.1 — readability pass : les KPI existants sont regroupés sous une
    section « Rythme récent » (lecture d'entraînement, pas cockpit). Aucune

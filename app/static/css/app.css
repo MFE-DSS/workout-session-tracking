@@ -1757,6 +1757,109 @@ input, button, textarea, select {
 
 /* ---- KPI Grid (progress page) ---- */
 
+/* ── UX4_03B — l'instrument compact des signaux d'entraînement ───────────────
+ * Aucune couleur nouvelle : tout vient des tokens déjà mesurés de cette
+ * feuille (`CLAUDE.md §5.4`). Aucune dépendance JS.
+ *
+ * AUCUNE JAUGE, ET C'EST LA CORRECTION CENTRALE DE LA TRANCHE.
+ *
+ * `UX4_03` en affichait trois, dont la largeur était le score lui-même. Deux
+ * règles déjà écrites dans ce dépôt l'interdisaient :
+ *
+ *   · l'Accueil (`Sx_UIV3_01`) — « une barre proportionnelle serait une
+ *     affirmation de pourcentage physiologique » ; il encode donc la BANDE en
+ *     nombre de segments, jamais l'estimation continue ;
+ *   · `recovery_contract.FatigueSignal` — « there is deliberately no
+ *     aggregate », parce qu'un scalaire détruit l'information dont une surface
+ *     d'explication a besoin.
+ *
+ * Une jauge à 45 % dessinait donc, au pixel près, une valeur qui était le
+ * DÉFAUT du calcul pour « l'utilisateur n'a rien déclaré ». Rien à recolorer
+ * ici : l'objet lui-même n'avait pas lieu d'être.
+ *
+ * PAS DE CADRE PAR SIGNAL. L'audit de nécessité d'`UX4_01` a montré qu'une
+ * boîte aussi large que son conteneur n'exprime plus un groupement. Un filet
+ * sépare, l'espace groupe.
+ */
+.signals {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-md);
+}
+
+.signal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 2px var(--space-sm);
+}
+
+.signal + .signal {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-sm);
+}
+
+.signal__name {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+.signal__value {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le contexte temporel vit DANS la ligne, plus dans un paragraphe sous chaque
+ * signal : les trois notes d'`UX4_03` coûtaient 77 mots pour trois provenances
+ * que le dépliant partagé porte désormais une seule fois. */
+.signal__context {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+/* L'inconnu n'est pas une valeur faible, c'est une autre NATURE de chose — la
+ * Home applique déjà cette règle à ses bandes (`Sx_UIV3_01` : hachure, jamais
+ * un remplissage plus pâle). Ici la valeur perd son poids typographique au
+ * lieu de perdre en longueur : rien ne suggère « peu » là où il faut lire
+ * « pas de donnée ». Le libellé porte le sens, jamais la couleur seule. */
+.signal--unknown .signal__value {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--fg-dim);
+}
+
+.signals__how {
+  margin: 0 0 var(--space-lg);
+  font-size: 12px;
+}
+
+/* Le seul contrôle tactile de la section, donc le seul soumis au standard
+ * produit AUREN — 44 px (SC 2.5.5 AAA + Apple HIG), pas au seuil WCAG 2.2 AA
+ * de 24 px. Mesuré à 26 px avec `--space-xs` : conforme AA, sous le standard
+ * du produit.
+ *
+ * La zone est portée par le REMBOURRAGE, pas par le chrome visible : la
+ * taxonomie B8 a établi que « zone tactile ≥ 44 » et « chrome visible ≥ 44 »
+ * sont deux choses différentes, et grossir le texte pour atteindre 44 aurait
+ * donné du poids visuel à une divulgation qui doit rester discrète. */
+.signals__how > summary {
+  color: var(--fg-muted);
+  cursor: pointer;
+  padding: var(--space-md) 0;
+}
+
+.signals__how p {
+  margin: var(--space-xs) 0 0;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
 .kpi-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
