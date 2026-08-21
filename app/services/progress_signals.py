@@ -196,6 +196,25 @@ def build_progress_rail(facts: ProgressFacts) -> list[dict[str, Any]]:
 _KIND_WORD = {"strength": "musculation", "cardio": "cardio"}
 
 
+def _split_days(facts: ProgressFacts) -> tuple[list[str], list[str], int]:
+    """Trie les 14 traces en trois listes : terminées, en cours, hors histo.
+
+    Extrait de `build_rail_summary` : `python:S3776` a mesuré 17 de complexité
+    cognitive pour 15 autorisés. La règle avait raison — la fonction triait ET
+    rédigeait. Le nom d'un type n'est ajouté que s'il est CONNU.
+    """
+    done, active, void = [], [], 0
+    for d in facts.days:
+        if d.state == "done":
+            word = _KIND_WORD.get(d.kind or "")
+            done.append(f"{d.label} {word}" if word else d.label)
+        elif d.state == "active":
+            active.append(d.label)
+        elif d.state == "none":
+            void += 1
+    return done, active, void
+
+
 def build_rail_summary(facts: ProgressFacts) -> str:
     """Équivalent TEXTUEL du rail, rendu côté serveur.
 
@@ -216,15 +235,7 @@ def build_rail_summary(facts: ProgressFacts) -> str:
     source, et la divergence entre ce qu'on voit et ce qu'on entend devient
     structurellement impossible.
     """
-    done, active, void = [], [], 0
-    for d in facts.days:
-        if d.state == "done":
-            word = _KIND_WORD.get(d.kind or "")
-            done.append(f"{d.label} {word}" if word else d.label)
-        elif d.state == "active":
-            active.append(d.label)
-        elif d.state == "none":
-            void += 1
+    done, active, void = _split_days(facts)
 
     # ⚠ Aucun `+`, pas même sur des chaînes. `test_no_new_business_calculation`
     # interdit tout `ast.BinOp` additif dans ce module, et il a rougi sur une

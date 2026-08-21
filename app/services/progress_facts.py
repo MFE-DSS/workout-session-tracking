@@ -134,6 +134,51 @@ class ProgressFacts:
     declared_is_latest: bool = False
 
 
+def _occupant(rows, now: datetime) -> dict[int, WorkoutSession]:
+    """Quelle séance occupe chaque jour de la fenêtre.
+
+    Une séance OUVERTE occupe son jour sans le compter : elle est visible sur
+    le rail — l'utilisateur sait qu'elle existe — et absente des comptages,
+    parce qu'elle n'est pas faite.
+    """
+    by_day: dict[int, WorkoutSession] = {}
+    for s in rows:
+        if s.status == "completed" and not s.excluded_from_stats:
+            by_day[_offset(s.started_at, now)] = s
+        elif s.status == "in_progress":
+            by_day.setdefault(_offset(s.started_at, now), s)
+    return by_day
+
+
+def _day_traces(rows, now: datetime) -> list[DayTrace]:
+    """Les 14 traces, du plus ancien jour au plus récent.
+
+    Extrait de `build_progress_facts` : `python:S3776` a mesuré une complexité
+    cognitive de 20 pour 15 autorisés, et la règle avait raison — la fonction
+    faisait deux requêtes, deux comptages, un regroupement et une projection.
+    """
+    by_day = _occupant(rows, now)
+    days = []
+    for off in range(WINDOW_DAYS):
+        s = by_day.get(off)
+        if s is None:
+            state, kind, name = "rest", None, None
+        elif s.status == "in_progress":
+            state, kind, name = "active", None, None
+        else:
+            # `kind is None` quand le template a été supprimé : le type est
+            # INCONNU, pas « musculation par défaut ».
+            state = "done"
+            kind = s.template.kind if s.template else None
+            name = s.template_name_snapshot
+        days.append(DayTrace(
+            offset=off,
+            label=(now - timedelta(days=WINDOW_DAYS - 1 - off)).strftime("%d/%m"),
+            state=state, kind=kind, name=name,
+        ))
+    return days
+
+
 def build_progress_facts(
     db: Session, user_id: int, *, now: datetime | None = None
 ) -> ProgressFacts:
@@ -180,31 +225,7 @@ def build_progress_facts(
         .options(selectinload(WorkoutSession.template))
     ).scalars().all()
 
-    by_day: dict[int, WorkoutSession] = {}
-    for s in rows:
-        if s.status != "completed" or s.excluded_from_stats:
-            # Une séance ouverte occupe son jour sans le compter.
-            if s.status == "in_progress":
-                by_day.setdefault(_offset(s.started_at, now), s)
-            continue
-        by_day[_offset(s.started_at, now)] = s
-
-    days = []
-    for off in range(WINDOW_DAYS):
-        s = by_day.get(off)
-        if s is None:
-            state, kind, name = "rest", None, None
-        elif s.status == "in_progress":
-            state, kind, name = "active", None, None
-        else:
-            state = "done"
-            kind = s.template.kind if s.template else None
-            name = s.template_name_snapshot
-        days.append(DayTrace(
-            offset=off,
-            label=(now - timedelta(days=WINDOW_DAYS - 1 - off)).strftime("%d/%m"),
-            state=state, kind=kind, name=name,
-        ))
+    days = _day_traces(rows, now)
 
     recent = db.execute(
         select(WorkoutSession.started_at, WorkoutSession.global_state)
