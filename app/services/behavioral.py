@@ -25,10 +25,29 @@ class BehavioralState:
     performance_score: float
     consistency_score: float
     fatigue_score: float
-    trend_direction: str
     streak_days: int
+
+    #: ⚠ **DÉPRÉCIÉ — `OPERATOR_DECISION` D8, 2026-08-21.**
+    #:
+    #: `0,5 × (100 − fatigue) + 0,3 × consistency + 0,2 × performance`.
+    #: Composite opaque. La couche de contrat de récupération le nomme « the
+    #: duplicate the audit found » et refuse explicitement d'exposer un score
+    #: de ce genre.
+    #:
+    #: ⚠ Aucun module n'est nommé ici volontairement : une garde interdit dans
+    #: CE FICHIER la chaîne correspondante, prose comprise, pour protéger le
+    #: sens de la dépendance. Elle est plus stricte que nécessaire pour un
+    #: commentaire, et elle a raison.
+    #:
+    #: **Mesuré** : sur un compte sans aucune donnée il vaut `25,0`, dont la
+    #: TOTALITÉ vient du défaut de fatigue (`0,5 × (100 − 50)`). Ce n'est pas
+    #: une lecture basse, c'est une valeur fabriquée.
+    #:
+    #: Il n'est rendu sur AUCUNE surface, et une garde interdit désormais qu'un
+    #: consommateur nouveau apparaisse. Il n'est pas supprimé parce que
+    #: `compute_readiness` reste testé et que sa suppression emporterait
+    #: `consistency_score`, qu'une autre garde exige.
     readiness_score: float
-    recommendation: str
 
 
 _GLOBAL_STATE_FATIGUE = {"fatigued": 80.0, "flat": 50.0, "good": 20.0}
@@ -68,30 +87,34 @@ def compute_readiness(
     return 0.5 * (100 - fatigue) + 0.3 * consistency + 0.2 * performance
 
 
-def compute_trend(last_7: int, prev_7: int) -> str:
-    if last_7 > prev_7:
-        return "up"
-    if last_7 < prev_7:
-        return "down"
-    return "stable"
-
-
-def compute_recommendation(state: BehavioralState) -> str:
-    if state.fatigue_score >= 75:
-        return "Fatigue élevée détectée. Privilégie le repos ou une séance légère."
-    if state.streak_days >= 5 and state.fatigue_score >= 60:
-        return "Belle série ! Mais pense à récupérer pour maintenir la qualité."
-    if state.consistency_score < 30:
-        return "La régularité est la clé. Vise au moins 2 séances cette semaine."
-    if state.trend_direction == "down" and state.performance_score >= 60:
-        return "Tendance en baisse malgré un bon niveau. Un boost de régularité suffirait."
-    if state.readiness_score >= 80:
-        return "Excellente forme. C'est le moment de pousser l'intensité."
-    if state.readiness_score >= 50:
-        return "Bonne condition générale. Continue sur ta lancée."
-    if state.streak_days >= 3:
-        return "Série en cours, garde le rythme !"
-    return "Chaque séance compte. Lance-toi quand tu es prêt."
+# ── `UX4_03B` — `compute_trend` et `compute_recommendation` SUPPRIMÉS ────────
+#
+# `OPERATOR_DECISION` D6, 2026-08-21. Les deux produisaient des champs que
+# AUCUNE surface ne lisait — vérifié : aucun gabarit du dépôt n'accède à
+# `behavioral.*`.
+#
+# `compute_trend(last_7, prev_7)` rendait « up » / « down » / « stable ». Son
+# défaut : `compute_trend(0, 0)` → **« stable »**, donc un utilisateur qui n'a
+# jamais rien enregistré lisait que son rythme était stable. `UX4_03` l'a
+# affiché, l'opérateur l'a refusé, et `fc786a2` l'a remplacé par les deux
+# comptages bruts — « 3 → 2 séances ». La suppression arrive donc APRÈS son
+# remplacement, jamais avant (`CLAUDE.md §5.3`).
+#
+# `compute_recommendation(state)` produisait une phrase de coaching. Elle
+# n'était rendue nulle part, et deux de ses branches étaient devenues
+# indéfendables :
+#
+#   · elle lisait `readiness_score`, un composite dont 100 % de la valeur vient
+#     d'un défaut quand le compte est vide ;
+#   · elle écrivait « Série en cours, garde le rythme ! » — exactement la
+#     chaîne que `OPERATOR_DECISION / DO_NOT_SURFACE` interdit, et que la garde
+#     `A4` de Progression bannit du corps de la page.
+#
+# Ce n'est donc pas du code mort neutre : c'était une arme chargée, prête à
+# publier un nombre fabriqué et un vocabulaire de série au premier gabarit qui
+# l'aurait branchée. **Capacité supprimée, non déplacée** : si AUREN veut un
+# jour des messages de coaching, ils devront être rebâtis sur des entrées
+# honnêtes, pas sur celles-ci.
 
 
 from datetime import datetime, timedelta, timezone
@@ -161,21 +184,10 @@ def compute_behavioral_state(db: Session, user_id: int) -> BehavioralState:
     ).scalar_one() or 0
     consistency = compute_consistency(sessions_14d)
 
-    # --- Trend: last 7 vs previous 7 ---
-    window_7 = now - timedelta(days=7)
-    window_14_for_trend = now - timedelta(days=14)
-    last_7_count = db.execute(
-        select(func.count(WorkoutSession.id))
-        .where(_uf, _completed, _not_excluded)
-        .where(WorkoutSession.started_at >= window_7)
-    ).scalar_one() or 0
-    prev_7_count = db.execute(
-        select(func.count(WorkoutSession.id))
-        .where(_uf, _completed, _not_excluded)
-        .where(WorkoutSession.started_at >= window_14_for_trend)
-        .where(WorkoutSession.started_at < window_7)
-    ).scalar_one() or 0
-    trend = compute_trend(last_7_count, prev_7_count)
+    # `UX4_03B` — les deux requêtes de tendance sont supprimées avec
+    # `compute_trend`. Elles comptaient les séances de deux fenêtres de sept
+    # jours pour produire un mot que rien ne rendait. `progress_facts` compte
+    # les mêmes fenêtres, pour une surface qui les affiche.
 
     # --- Streak: consecutive calendar days with sessions ---
     window_30 = now - timedelta(days=30)
@@ -196,16 +208,10 @@ def compute_behavioral_state(db: Session, user_id: int) -> BehavioralState:
     # --- Readiness ---
     readiness = compute_readiness(fatigue, consistency, performance)
 
-    # --- Build state + recommendation ---
-    state = BehavioralState(
+    return BehavioralState(
         performance_score=round(performance, 1),
         consistency_score=round(consistency, 1),
         fatigue_score=round(fatigue, 1),
-        trend_direction=trend,
         streak_days=streak,
         readiness_score=round(readiness, 1),
-        recommendation="",
     )
-    state.recommendation = compute_recommendation(state)
-
-    return state

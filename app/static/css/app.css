@@ -1834,6 +1834,85 @@ input, button, textarea, select {
   color: var(--fg-dim);
 }
 
+/* ── `UX4_03D` — LE RAIL TEMPOREL ────────────────────────────────────────────
+ * Quatorze jours, une trace par jour. Il remplace l'objet « Cadence 7 j » :
+ * la densité de sa moitié droite contre sa moitié gauche EST la comparaison
+ * que la cadence chiffrait, et il montre en plus les quatorze jours qui la
+ * composent.
+ *
+ * QUATRE NATURES, ET LES CONFONDRE MENTIRAIT.
+ *   terminée      trace pleine
+ *   repos         graduation d'axe — l'utilisateur pouvait, il ne l'a pas fait
+ *   en cours      contour pointillé — ouverte, PAS faite, jamais comptée
+ *   hors histo.   hachure fine — AUREN ne sait rien de ce jour
+ *
+ * LE TYPE PASSE PAR LA TEXTURE, JAMAIS PAR LA COULEUR. Musculation et cardio
+ * sont deux actions utilisateur ; leur donner deux couleurs inventerait une
+ * hiérarchie que le socle ne porte pas, où l'ambre signifie « action /
+ * actuel ». Un type INCONNU (template supprimé) ne reçoit aucune texture — on
+ * ne suppose pas « musculation par défaut ».
+ *
+ * UN SEUL OBJET, PAS QUATORZE CIBLES. À 390 px une trace fait ~25 px : la
+ * rendre tactile passerait l'exception d'espacement WCAG 2.2 AA et violerait
+ * quatorze fois le standard produit AUREN de 44 px.
+ */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 3px;
+  align-items: end;
+  height: 34px;
+  margin-bottom: var(--space-xs);
+}
+
+.rail__c {
+  display: block;
+  align-self: end;
+  border-radius: 2px;
+}
+
+.rail__c--rest {
+  height: 3px;
+  background: var(--border);
+}
+
+.rail__c--on {
+  height: 100%;
+  background: var(--fg-muted);
+}
+
+/* Cardio : même intensité, autre texture. */
+.rail__c--cardio {
+  background: repeating-linear-gradient(
+    -45deg, var(--fg-muted) 0 3px, transparent 3px 6px);
+}
+
+.rail__c--active {
+  height: 100%;
+  background: transparent;
+  border: 1.5px dashed var(--fg-dim);
+}
+
+.rail__c--void {
+  height: 3px;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    90deg, var(--fg-dim) 0 2px, transparent 2px 4px);
+}
+
+.rail__axis {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.rail__axis span {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
 .signals__how {
   margin: 0 0 var(--space-lg);
   font-size: 12px;

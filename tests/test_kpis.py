@@ -130,8 +130,15 @@ def test_in_progress_sessions_excluded_from_kpis(client):
     with SessionLocal() as db:
         k = compute_global_kpis(db)
         assert k.completion_rate_30d == 1.0
-        # sessions_this_week counts all regardless of status
-        assert k.sessions_this_week >= 2
+        # `UX4_03D` — MIGRÉ. Cette assertion épinglait « compte tous les
+        # statuts », et c'est précisément la sémantique retirée : elle
+        # affichait 3 à côté du 2 de `weekly_loop`, sur la même semaine ISO.
+        # Le contrat est désormais COMPLETED_STAT_ELIGIBLE, donc la séance en
+        # cours de cette fixture ne compte plus.
+        assert k.sessions_this_week == 1, (
+            "le compteur hebdomadaire de Progression compte une séance non "
+            "terminée — la contradiction avec weekly_loop est revenue"
+        )
         # completed_last_30 excludes in-progress
         assert k.completed_last_30 == 1
 

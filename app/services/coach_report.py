@@ -118,7 +118,23 @@ def _identity(db: Session, user: User) -> IdentityBlock:
 class VolumeBlock:
     sessions_30d: int
     sessions_90d: int
-    streak_days: int
+
+    #: `UX4_03B` — REMPLACE `streak_days` (`OPERATOR_DECISION` D7).
+    #:
+    #: Le rapport affichait « Streak », un compteur de jours calendaires
+    #: consécutifs. Deux raisons de le retirer, et la seconde est la plus
+    #: gênante :
+    #:
+    #:   · la décision produit `DO_NOT_SURFACE` l'interdit — un jour de repos
+    #:     correctement pris le remet à zéro, donc il punit la récupération ;
+    #:   · il venait d'un SECOND producteur, aux règles différentes de celui
+    #:     du moteur comportemental : jour de grâce et filtres d'un côté,
+    #:     rupture stricte et aucun filtre de l'autre. Deux surfaces pouvaient
+    #:     afficher deux valeurs le même jour.
+    #:
+    #: Le remplacement part dans la MÊME livraison (`CLAUDE.md §5.3`), et
+    #: emploie le vocabulaire que Progression a adopté en `fc786a2`.
+    sessions_14d: int
     cardio_minutes_per_week: int
     work_sets_per_week: int  # average over 30d
 
@@ -162,7 +178,7 @@ def _volume(db: Session, user_id: int, preview: PreviewPayload) -> VolumeBlock:
     return VolumeBlock(
         sessions_30d=preview.sessions_30d,
         sessions_90d=_sessions_in_window(db, user_id, 90),
-        streak_days=preview.streak,
+        sessions_14d=_sessions_in_window(db, user_id, 14),
         cardio_minutes_per_week=preview.cardio_min_per_week,
         work_sets_per_week=_work_sets_per_week(db, user_id, 30),
     )

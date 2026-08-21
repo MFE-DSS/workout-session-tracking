@@ -59,7 +59,12 @@
     <ul class="coach-grid">
       <li><span>Sessions 30j</span><b>{{ report.volume.sessions_30d }}</b></li>
       <li><span>Sessions 90j</span><b>{{ report.volume.sessions_90d }}</b></li>
-      <li><span>Streak</span><b>{{ report.volume.streak_days }}{% if report.volume.streak_days > 0 %}j{% endif %}</b></li>
+      {# `UX4_03B` — « Streak » remplacé par un comptage (`OPERATOR_DECISION`
+         D7). Le compteur de jours consécutifs punissait un jour de repos
+         correctement pris, et venait d'un second producteur aux règles
+         différentes de celui du moteur comportemental. Même vocabulaire que
+         Progression depuis `fc786a2`. #}
+      <li><span>Séances 14 j</span><b>{{ report.volume.sessions_14d }}</b></li>
       <li><span>Cardio /sem</span><b>{{ report.volume.cardio_minutes_per_week }}'</b></li>
       <li><span>Sets travail /sem</span><b>{{ report.volume.work_sets_per_week }}</b></li>
     </ul>

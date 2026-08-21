@@ -415,19 +415,19 @@ def profile_page(
         trend = "stable"
         trend_label = "\u2192 stable"
 
+    # `UX4_03B` — L'ÉTAT COMPORTEMENTAL N'EST PLUS CALCULÉ ICI.
+    #
+    # `UX4_01` a retiré les modules analytiques du Profil sans retirer le calcul
+    # qui les alimentait. Le gabarit ne lisait plus aucun champ de `behavioral`,
+    # mais chaque affichage du Profil exécutait quand même les requêtes du
+    # moteur — dont un chargement des trois dernières séances avec leurs séries.
+    #
+    # Ce n'était pas seulement du coût : c'était le dernier chemin par lequel
+    # `readiness_score` — un composite dont 100 % de la valeur vient d'un défaut
+    # quand le compte est vide — pouvait ressortir à l'écran par un simple
+    # accès d'attribut depuis le gabarit. Couper l'alimentation ferme le risque
+    # sans toucher au moteur, qui est gelé.
     from app.models.catalog import WorkoutTemplate
-    from app.services.behavioral import compute_behavioral_state
-    from app.services.measurements import (
-        MEASUREMENT_FIELDS,
-        MEASUREMENT_LABELS,
-        MEASUREMENT_UNITS,
-        find_related_templates,
-        get_latest_measurement,
-        get_measurement_series,
-    )
-    from app.services.timeline import build_measurement_timeline_svg
-
-    behavioral = compute_behavioral_state(db, user.id)
 
     # Body measurements.
     #
@@ -443,6 +443,15 @@ def profile_page(
     # column, but users who have years of it must keep seeing their curve —
     # "historical data remains readable exactly as it is".
     from app.services import body_profile as bp
+    from app.services.measurements import (
+        MEASUREMENT_FIELDS,
+        MEASUREMENT_LABELS,
+        MEASUREMENT_UNITS,
+        find_related_templates,
+        get_latest_measurement,
+        get_measurement_series,
+    )
+    from app.services.timeline import build_measurement_timeline_svg
 
     capture_fields = [(s.key, s.label) for s in bp.BODY_MEASUREMENT_FIELDS]
 
@@ -521,7 +530,6 @@ def profile_page(
             "sessions_30d_count": sessions_30d_count,
             "trend": trend,
             "trend_label": trend_label,
-            "behavioral": behavioral,
             "latest_values": latest_values,
             "measurement_charts": measurement_charts,
             "measurement_labels": MEASUREMENT_LABELS,

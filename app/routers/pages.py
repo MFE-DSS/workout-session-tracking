@@ -713,9 +713,16 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     # moteur de décision, que `test_no_decision_engine_was_touched` gèle depuis
     # `e8614bd` précisément pour que la présentation n'y touche pas.
     from app.services.progress_facts import build_progress_facts
-    from app.services.progress_signals import build_progress_signals
+    from app.services.progress_signals import (
+        build_progress_rail,
+        build_progress_signals,
+        build_rail_summary,
+    )
 
-    signals = build_progress_signals(build_progress_facts(db, user.id))
+    facts = build_progress_facts(db, user.id)
+    signals = build_progress_signals(facts)
+    rail = build_progress_rail(facts)
+    rail_summary = build_rail_summary(facts)
 
     return templates.TemplateResponse(
         request,
@@ -730,6 +737,8 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "active_session": latest_open_session(db, user.id),
             "weekly": weekly,
             "signals": signals,
+            "rail": rail,
+            "rail_summary": rail_summary,
         },
     )
 

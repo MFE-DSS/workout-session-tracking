@@ -47,9 +47,22 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.models.session import WorkoutSession
+
+
+def _offset(started_at: datetime, now: datetime) -> int:
+    """Index de la trace, 0 = le plus ancien jour de la fenêtre.
+
+    ⚠ SQLite rend des datetimes NAÏFS même pour une colonne déclarée
+    `DateTime(timezone=True)`. Comparer directement à un `now` conscient lève
+    un `TypeError` — c'est arrivé, et seuls les tests qui rendaient la page
+    l'avaient attrapé. On normalise donc avant de soustraire.
+    """
+    if started_at.tzinfo is None:
+        started_at = started_at.replace(tzinfo=now.tzinfo)
+    return WINDOW_DAYS - 1 - (now.date() - started_at.date()).days
 
 #: Fenêtre de comptage, en jours. Deux semaines : c'est la fenêtre que le
 #: produit utilise déjà partout ailleurs pour parler de rythme récent.
@@ -67,8 +80,37 @@ DECLARATION_LOOKBACK_SESSIONS = 3
 
 
 @dataclass(frozen=True)
+class DayTrace:
+    """Un jour de la fenêtre. Une trace, pas un jugement.
+
+    `state` distingue **quatre** natures, et les confondre mentirait :
+
+        ``done``    séance terminée ce jour-là
+        ``rest``    l'utilisateur pouvait s'entraîner, il ne l'a pas fait
+        ``active``  une séance est OUVERTE — elle n'est pas faite
+        ``none``    hors historique : le compte n'existait pas encore
+
+    `kind` vaut ``None`` quand le type est **inconnu**, jamais « musculation
+    par défaut ». `quality_score.session_kind` retombe sur ``"strength"`` quand
+    le template a été supprimé — un repli sûr pour un SCORE, un mensonge pour
+    un AFFICHAGE qui prétend dire ce qu'était la séance.
+    """
+
+    offset: int
+    label: str
+    state: str
+    kind: str | None = None
+    name: str | None = None
+
+
+@dataclass(frozen=True)
 class ProgressFacts:
     """Faits bruts. **Aucun score, aucune bande, aucun seuil.**"""
+
+    #: Les 14 jours, du plus ancien au plus récent. Le rail les rend tels
+    #: quels ; il ABSORBE de ce fait la cadence — les sept dernières cellules
+    #: contre les sept précédentes disent le même écart, sans objet de plus.
+    days: tuple[DayTrace, ...] = ()
 
     sessions_14d: int = 0
     sessions_last_7: int = 0
@@ -128,6 +170,42 @@ def build_progress_facts(
     sessions_14d = _count(window_start)
     last_7 = _count(half_start)
 
+    # ── les 14 traces ────────────────────────────────────────────────────
+    # Une requête pour la fenêtre, avec le template chargé : sans lui, le type
+    # serait inconnu pour TOUTES les séances, et le rail ne pourrait rien dire.
+    rows = db.execute(
+        select(WorkoutSession)
+        .where(WorkoutSession.user_id == user_id,
+               WorkoutSession.started_at >= window_start)
+        .options(selectinload(WorkoutSession.template))
+    ).scalars().all()
+
+    by_day: dict[int, WorkoutSession] = {}
+    for s in rows:
+        if s.status != "completed" or s.excluded_from_stats:
+            # Une séance ouverte occupe son jour sans le compter.
+            if s.status == "in_progress":
+                by_day.setdefault(_offset(s.started_at, now), s)
+            continue
+        by_day[_offset(s.started_at, now)] = s
+
+    days = []
+    for off in range(WINDOW_DAYS):
+        s = by_day.get(off)
+        if s is None:
+            state, kind, name = "rest", None, None
+        elif s.status == "in_progress":
+            state, kind, name = "active", None, None
+        else:
+            state = "done"
+            kind = s.template.kind if s.template else None
+            name = s.template_name_snapshot
+        days.append(DayTrace(
+            offset=off,
+            label=(now - timedelta(days=WINDOW_DAYS - 1 - off)).strftime("%d/%m"),
+            state=state, kind=kind, name=name,
+        ))
+
     recent = db.execute(
         select(WorkoutSession.started_at, WorkoutSession.global_state)
         .where(*eligible)
@@ -138,6 +216,7 @@ def build_progress_facts(
     declared = next((r for r in recent if r.global_state is not None), None)
 
     return ProgressFacts(
+        days=tuple(days),
         sessions_14d=sessions_14d,
         sessions_last_7=last_7,
         sessions_prev_7=sessions_14d - last_7,

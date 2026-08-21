@@ -12,10 +12,13 @@
   (`completion_rate_30d`, `avg_success_score_30d`, `completed_last_30`).
   They would otherwise drag the completion rate down with unfilled
   rows that simply haven't been touched yet.
-- `sessions_this_week` and `total_sessions` include every session
-  regardless of status — they answer the question "how often am I
-  opening the app", which must not depend on whether I pressed
-  *Terminer* at the end.
+- `total_sessions` includes every session regardless of status — it answers
+  "how often am I opening the app", which must not depend on whether I
+  pressed *Terminer*. **It is not rendered on Progression.**
+- `sessions_this_week` **no longer does** (`UX4_03D`,
+  `PROGRESSION_SESSION_COUNT = COMPLETED_STAT_ELIGIBLE`). It counted every
+  status, and rendered "3" beside `weekly_loop`'s "2" for the same ISO week —
+  two definitions, one page, nothing on screen to tell them apart.
 """
 from __future__ import annotations
 
@@ -67,10 +70,27 @@ def compute_global_kpis(
         .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
+    # `UX4_03D` — `PROGRESSION_SESSION_COUNT = COMPLETED_STAT_ELIGIBLE`.
+    #
+    # Ce compteur incluait TOUS les statuts, séances exclues des stats
+    # comprises. L'intention était « à quelle fréquence j'ouvre l'app » — une
+    # question légitime, mais opérationnelle, pas analytique.
+    #
+    # Mesuré : sur une même page, `weekly_loop` affichait « 2 séances cette
+    # semaine » et ce KPI « 3 sessions cette semaine ». MÊME fenêtre ISO, les
+    # deux appellent `_start_of_iso_week`. La seule différence était le filtre,
+    # et rien à l'écran ne permettait de la deviner.
+    #
+    # Sur Progression, une séance compte pour l'analytique si et seulement si
+    # elle est TERMINÉE et NON EXCLUE des statistiques. L'état « séance
+    # ouverte » appartient aux surfaces opérationnelles — l'Accueil et la
+    # console de séance —, pas à la lecture d'entraînement.
     sessions_this_week = db.execute(
-        select(func.count(WorkoutSession.id)).where(
-            WorkoutSession.started_at >= week_start).where(_uf
-        )
+        select(func.count(WorkoutSession.id))
+        .where(_uf)
+        .where(WorkoutSession.started_at >= week_start)
+        .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.excluded_from_stats.is_(False))
     ).scalar_one() or 0
 
     sessions_last_30 = db.execute(

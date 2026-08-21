@@ -5,7 +5,12 @@
    répond depuis que le score sur 100 a été retiré. Il annonce désormais ce que
    la page montre vraiment — sinon la promesse invisible que `UX4_03` devait
    fermer se rouvrirait, déplacée d'un cran. #}
-<p class="lede">Lecture des séances terminées, de ta cadence récente et de ce que tu as déclaré.</p>
+{# `UX4_03D` — le chapeau promettait « ta cadence récente », un objet que la
+   décision 2 vient de retirer. Une promesse sans réponse à l'écran est
+   exactement ce qu'`UX4_03` devait fermer ; la laisser la rouvrirait. Il
+   annonce désormais ce que la page montre : les séances, leur empreinte, et
+   ce qui a été déclaré. #}
+<p class="lede">Lecture des séances terminées, de leur empreinte sur quatorze jours et de ce que tu as déclaré.</p>
 
 {# Sb_27.3 — Weekly training loop tile (count, dominantes, anomalie, hint) #}
 {% include "_partials/weekly_loop.html" %}
@@ -39,6 +44,12 @@
    celle que j'avais écrite, et elle a raison : un démenti reste une
    occurrence. Les libellés d'état ci-dessous ne sont pas réécrits — ce sont
    ceux du formulaire de fin de séance, cités tels quels. #}
+{# `UX4_03D` — LA CADENCE A DISPARU, LE RAIL L'ABSORBE.
+   Elle rendait « 3 → 2 » : les séances des sept jours précédents puis des
+   sept derniers. Le rail rend les quatorze jours un par un, donc la densité
+   de sa moitié droite contre sa moitié gauche EST cette comparaison. Deux
+   nombres remplacés par les quatorze jours qui les composent — la preuve part
+   dans la même livraison que le retrait (`CLAUDE.md §5.3`). #}
 <h2 class="section-header">Signaux d'entraînement</h2>
 <dl class="signals">
   {% for s in signals %}
@@ -49,6 +60,32 @@
     </div>
   {% endfor %}
 </dl>
+
+{# Le rail est UN objet, pas quatorze. Quatorze cibles de ~25 px passeraient
+   l'exception d'espacement WCAG 2.2 mais violeraient quatorze fois le standard
+   produit AUREN de 44 px : un instrument neuf ne se bâtit pas sur des
+   dérogations. Les traces portent leur `title` pour le survol et un texte hors
+   écran pour la synthèse ; l'inspection détaillée est une tranche à venir. #}
+{# `aria-hidden` — et c'est la bonne réponse, pas une concession.
+   Le rail portait d'abord `role="img"` + `aria-label`, ce que `Web:S6819` a
+   signalé. La règle a raison pour la MÊME raison que sur les jauges
+   d'`UX4_03` : le compte « 5 séances · 14 derniers jours » est déjà rendu en
+   texte juste au-dessus, donc l'étiquette le répétait à l'oreille.
+
+   Le rail ne peut rester masqué QUE parce qu'un équivalent textuel existe :
+   il porte plus que le compte — la répartition des jours, la distinction
+   terminée / en cours, la couverture de l'historique et le type de séance.
+   Masquer un objet dont l'information n'existe nulle part ailleurs le rendrait
+   visuel-seulement. `build_rail_summary` le rédige à partir des MÊMES
+   `facts.days`, côté serveur, sans recalcul et sans une ligne de script. #}
+<div class="rail" aria-hidden="true">
+  {% for c in rail %}<span class="{{ c.cls }}" title="{{ c.title }}"></span>{% endfor %}
+</div>
+<p class="sr-only">{{ rail_summary }}</p>
+<div class="rail__axis">
+  <span>{{ rail[0].label }}</span>
+  <span>aujourd'hui</span>
+</div>
 
 {# UNE SEULE divulgation pour les trois provenances. `UX4_03` en écrivait une
    par signal — 77 mots pour dire trois fois la même chose : d'où vient le
@@ -112,11 +149,21 @@
           <li class="template-kpi">
             <div class="template-kpi__row">
               <span class="template-kpi__name">{{ tk.name }}</span>
+              {# `UX4_03D` — fenêtre explicite. Ce compte porte sur TOUT
+                 l'historique ; « Séances dominantes », plus haut, porte sur la
+                 semaine. Deux nombres du même programme, deux fenêtres — sans
+                 le dire, l'écart se lit comme une incohérence. #}
               <span class="template-kpi__count">{{ tk.n_completed }} session{% if tk.n_completed > 1 %}s{% endif %}</span>
             </div>
             <div class="template-kpi__meta">
+              {# `UX4_03D` — fenêtre explicite (`OPERATOR_DECISION` 3), placée
+                 sur la ligne de métadonnées et non à côté du nombre : inline,
+                 elle repliait la ligne à 390 px. Ce compte porte sur TOUT
+                 l'historique, là où « Séances dominantes » porte sur la
+                 semaine — deux nombres du même programme, deux fenêtres. #}
+              <span>historique</span>
               {% if tk.last_done_at %}
-                <span>dernière : {{ tk.last_done_at.strftime('%d/%m') }}</span>
+                <span>· dernière : {{ tk.last_done_at.strftime('%d/%m') }}</span>
               {% endif %}
               {% if tk.avg_success_score is not none %}
                 <span>· score moy. {{ tk.avg_success_score | round(0, 'floor') | int }}</span>
