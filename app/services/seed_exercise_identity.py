@@ -29,7 +29,7 @@ produit ; la table d'alias existe pour que ce jugement, quand il tombera, soit
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from sqlalchemy import func, select
@@ -52,12 +52,8 @@ class SeedReport:
     aliases_declared: int = 0
     #: Alias déclaré pointant vers un nom qui désigne déjà un AUTRE exercice.
     #: Rendu, jamais résolu en silence : ce serait une fusion.
-    alias_conflicts: list[str] = None  # type: ignore[assignment]
+    alias_conflicts: list[str] = field(default_factory=list)
     total: int = 0
-
-    def __post_init__(self) -> None:
-        if self.alias_conflicts is None:
-            self.alias_conflicts = []
 
 
 def _catalog_names(path: Path = CATALOG_PATH) -> list[str]:
@@ -73,6 +69,40 @@ def _ekb(path: Path = EKB_PATH) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _create_missing(db: Session, names, source: str) -> int:
+    """Crée ce qui manque, compte ce qui a été créé. Rien d'autre."""
+    created = 0
+    for name in names:
+        if resolve_exercise(db, name) is None:
+            created += 1
+        ensure_exercise(db, name, source=source)
+    return created
+
+
+def _apply_declared_aliases(db: Session, declared: dict, report: SeedReport) -> None:
+    """Applique `_aliases`, ou **dit pourquoi il ne l'a pas fait**.
+
+    Extrait de `seed_exercise_identity` : la création d'identités et
+    l'arbitrage des alias sont deux lectures, et les tenir ensemble coûtait 16
+    de complexité cognitive pour 15 permis (`python:S3776`).
+    """
+    for alias, canonical in declared.items():
+        target = resolve_exercise(db, canonical)
+        if target is None:
+            # Un alias vers un nom inconnu : on le dit, on ne l'invente pas.
+            report.alias_conflicts.append(f"{alias!r} → cible inconnue {canonical!r}")
+            continue
+        held_by = resolve_exercise(db, alias)
+        if held_by is None:
+            if add_alias(db, target, alias, source=SOURCE_EKB) is not None:
+                report.aliases_declared += 1
+        elif held_by.id != target.id:
+            report.alias_conflicts.append(
+                f"{alias!r} déjà porté par {held_by.slug!r}, "
+                f"déclaré pour {target.slug!r}"
+            )
+
+
 def seed_exercise_identity(
     db: Session,
     *,
@@ -80,37 +110,14 @@ def seed_exercise_identity(
     ekb_path: Path = EKB_PATH,
 ) -> SeedReport:
     report = SeedReport()
-
-    for name in _catalog_names(catalog_path):
-        before = resolve_exercise(db, name)
-        ensure_exercise(db, name, source=SOURCE_CATALOG)
-        if before is None:
-            report.created_catalog += 1
-
     payload = _ekb(ekb_path)
 
-    for name in payload["exercises"]:
-        before = resolve_exercise(db, name)
-        ensure_exercise(db, name, source=SOURCE_EKB)
-        if before is None:
-            report.created_ekb += 1
-
-    for alias, canonical in payload.get("_aliases", {}).items():
-        target = resolve_exercise(db, canonical)
-        if target is None:
-            # Un alias vers un nom inconnu : on le dit, on ne l'invente pas.
-            report.alias_conflicts.append(f"{alias!r} → cible inconnue {canonical!r}")
-            continue
-        held_by = resolve_exercise(db, alias)
-        if held_by is not None:
-            if held_by.id != target.id:
-                report.alias_conflicts.append(
-                    f"{alias!r} déjà porté par {held_by.slug!r}, "
-                    f"déclaré pour {target.slug!r}"
-                )
-            continue
-        if add_alias(db, target, alias, source=SOURCE_EKB) is not None:
-            report.aliases_declared += 1
+    # Le catalogue d'abord : c'est lui qui fixe le `name` que l'utilisateur voit.
+    report.created_catalog = _create_missing(
+        db, _catalog_names(catalog_path), SOURCE_CATALOG
+    )
+    report.created_ekb = _create_missing(db, payload["exercises"], SOURCE_EKB)
+    _apply_declared_aliases(db, payload.get("_aliases", {}), report)
 
     report.total = db.execute(select(func.count()).select_from(Exercise)).scalar_one()
     return report
