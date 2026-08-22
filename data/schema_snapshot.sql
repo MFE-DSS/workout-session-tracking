@@ -16,11 +16,17 @@ CREATE INDEX ix_decision_traces_group ON decision_traces (trace_group_id);
 -- index: ix_decision_traces_user_created
 CREATE INDEX ix_decision_traces_user_created ON decision_traces (user_id, created_at);
 
+-- index: ix_exercise_aliases_exercise
+CREATE INDEX ix_exercise_aliases_exercise ON exercise_aliases (exercise_id);
+
 -- index: ix_exercise_muscle_mapping_exercise
 CREATE INDEX ix_exercise_muscle_mapping_exercise ON exercise_muscle_mappings (exercise_code);
 
 -- index: ix_exercise_muscle_mapping_zone
 CREATE INDEX ix_exercise_muscle_mapping_zone ON exercise_muscle_mappings (body_zone_code);
+
+-- index: ix_exercises_name
+CREATE INDEX ix_exercises_name ON exercises (name);
 
 -- index: ix_session_exercises_session_id
 CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
@@ -76,8 +82,14 @@ CREATE TABLE body_zones ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, label 
 -- table: decision_traces
 CREATE TABLE decision_traces ( id INTEGER NOT NULL, decision_id VARCHAR(64) NOT NULL, trace_group_id VARCHAR(64) NOT NULL, user_id INTEGER NOT NULL, decision_type VARCHAR(48) NOT NULL, policy_version VARCHAR(48) NOT NULL, decision_fingerprint VARCHAR(64) NOT NULL, upstream_decision_ids TEXT NOT NULL, constraint_sources TEXT NOT NULL, preference_sources TEXT NOT NULL, morphology_sources TEXT NOT NULL, recovery_sources TEXT NOT NULL, selected_output TEXT NOT NULL, rejected_alternatives TEXT NOT NULL, basis TEXT NOT NULL, confidence VARCHAR(32), plan_fingerprint VARCHAR(64), program_id INTEGER, program_version INTEGER, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_decision_traces_decision_id UNIQUE (decision_id) );
 
+-- table: exercise_aliases
+CREATE TABLE exercise_aliases ( id INTEGER NOT NULL, exercise_id INTEGER NOT NULL, alias VARCHAR(255) NOT NULL, normalized VARCHAR(255) NOT NULL, source VARCHAR(16) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(exercise_id) REFERENCES exercises (id) ON DELETE CASCADE, CONSTRAINT uq_exercise_aliases_normalized UNIQUE (normalized) );
+
 -- table: exercise_muscle_mappings
 CREATE TABLE exercise_muscle_mappings ( id INTEGER NOT NULL, exercise_code VARCHAR(256) NOT NULL, body_zone_code VARCHAR(64) NOT NULL, muscle_code VARCHAR(64), role VARCHAR(16) NOT NULL, source VARCHAR(16) NOT NULL, position INTEGER DEFAULT '0' NOT NULL, is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_exercise_muscle_mapping UNIQUE (exercise_code, body_zone_code, role), FOREIGN KEY(body_zone_code) REFERENCES body_zones (code) ON DELETE CASCADE, FOREIGN KEY(muscle_code) REFERENCES muscles (code) ON DELETE SET NULL );
+
+-- table: exercises
+CREATE TABLE exercises ( id INTEGER NOT NULL, slug VARCHAR(96) NOT NULL, name VARCHAR(255) NOT NULL, source VARCHAR(16) NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_exercises_slug UNIQUE (slug) );
 
 -- table: method_rules
 CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, position INTEGER NOT NULL, title VARCHAR(128) NOT NULL, body TEXT NOT NULL, PRIMARY KEY (id), UNIQUE (slug) );
