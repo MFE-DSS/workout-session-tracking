@@ -218,6 +218,11 @@ def test_alembic_head_unchanged():
     # puis DECISION_ANALYTICS_RUNTIME_01 (`s0t5n1o2q13` : table additive
     # `decision_traces`, aucune colonne ajoutée ailleurs, aucun backfill — les
     # décisions passées n'ont pas été tracées et fabriquer leurs lignes
-    # inventerait un raisonnement qui n'a jamais eu lieu).
+    # inventerait un raisonnement qui n'a jamais eu lieu),
+    # puis EXERCISE_IDENTITY_01 (`t1u6o2p3r14` : deux tables additives
+    # `exercises` et `exercise_aliases`, **aucune clé étrangère posée sur
+    # `template_exercises` ni `session_exercises`** — remplir une colonne neuve
+    # sur ces tables resterait un UPDATE de lignes historiques ; la résolution
+    # se fait à la lecture, par la table d'alias).
     # Cette sentinelle suit le head courant.
-    assert script.get_current_head() == "s0t5n1o2q13"
+    assert script.get_current_head() == "t1u6o2p3r14"
