@@ -428,10 +428,37 @@ jobs:
       # Sb_26.1 — shellcheck vérifie nos scripts shell (deploy_prod.sh,
       # smoke_deploy.sh, deploy_from_github_actions.sh, etc.).
       # `-S warning` ne bloque que les niveaux warning/error, pas les info.
+      #
+      # Sb_OPS_CI_LINT_TIMEOUT_01 — `sudo apt-get update` + `install shellcheck`
+      # ONT ÉTÉ RETIRÉS ICI, et c'est la correction entière de la tranche.
+      #
+      # Ce step a annulé le job quatre fois. Le diagnostic « cache froid » était
+      # FAUX : sur l'annulation mesurée (run 32226738467), les neuf premiers
+      # steps prennent 22 s au total, dont 6 s d'installation des linters —
+      # exactement la normale. C'est `shellcheck` SEUL qui a tourné 290 s sans
+      # jamais finir, parce que `apt-get update` interroge un miroir Ubuntu au
+      # moment du job. Un miroir lent bloque, et le job meurt au plafond.
+      #
+      # Le remède n'était donc PAS un budget plus grand : augmenter
+      # `timeout-minutes` aurait seulement fait durer le blocage plus longtemps.
+      # Sur 39 exécutions réussies, la distribution est min 36 s · médiane 51 s ·
+      # p90 77 s · max 109 s — le budget de 5 min n'a jamais été en cause.
+      #
+      # `shellcheck` est PRÉINSTALLÉ sur l'image du runner (`shellcheck 0.9.0-1`,
+      # section « Installed apt packages » de `Ubuntu2404-Readme.md`). Les deux
+      # lignes retirées étaient donc inutiles ET la seule dépendance réseau du
+      # job. Aucun gate n'est affaibli : la même commande s'exécute sur les
+      # mêmes fichiers.
+      #
+      # Si une image future cessait de le fournir, le step échoue bruyamment sur
+      # `command not found` — un échec nommé, pas une annulation muette.
       - name: shellcheck (required — Sb_26.1)
+        # Garde de ceinture : ce step prend ~1 s. S'il dépasse la minute, c'est
+        # qu'il pend à nouveau, et l'échec doit NOMMER le step au lieu de
+        # consommer le budget du job et d'emporter les six steps suivants.
+        timeout-minutes: 1
         run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y shellcheck
+          shellcheck --version
           shellcheck -S warning $(find scripts -maxdepth 2 -name "*.sh" -not -path "*/\.*")
 
       # Sb_26.4 — pip-audit scans runtime deps for known CVEs.

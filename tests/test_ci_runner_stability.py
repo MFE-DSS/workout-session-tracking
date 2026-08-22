@@ -604,3 +604,127 @@ class TestShardPartition:
     def test_coverage_is_not_weakened_by_sharding(self):
         for banned in ("--cov-fail-under=0", "testmon", "--no-cov"):
             assert banned not in _workflow()
+
+
+class TestLintJobHasNoNetworkDependency:
+    """`Sb_OPS_CI_LINT_TIMEOUT_01` — le job lint ne doit pendre sur rien.
+
+    QUATRE ANNULATIONS, ET UN DIAGNOSTIC FAUX PENDANT TOUT CE TEMPS
+    ---------------------------------------------------------------
+    Le job lint a été annulé quatre fois au plafond de 5 minutes, dont une sur
+    la CI canonique. J'ai attribué ça à un « cache froid » pendant quatre
+    occurrences. **La mesure a réfuté ce diagnostic** : sur l'annulation
+    relevée (run `32226738467`), les neuf premiers steps prennent **22 s au
+    total**, dont **6 s d'installation des linters** — pile la normale. C'est
+    `shellcheck` SEUL qui a tourné **290 s** sans finir.
+
+    La cause était `sudo apt-get update`, qui interroge un miroir Ubuntu au
+    moment du job. **La seule dépendance réseau du job**, dans un step dont le
+    travail réel dure une seconde.
+
+    CE QUE CES GARDES EMPÊCHENT
+    ----------------------------
+    1. Qu'une dépendance réseau revienne dans le job lint. Le prochain miroir
+       lent annulerait à nouveau le job — et une annulation n'est pas un job
+       permissif, c'est un job **muet** : celle de la canonique a laissé
+       `gitleaks`, `spec protocol` et le drift `requirements` NON EXÉCUTÉS.
+    2. Qu'on « corrige » le symptôme en gonflant `timeout-minutes`. Sur 39
+       exécutions réussies — min 36 s, médiane 51 s, p90 77 s, max 109 s — le
+       budget de 5 minutes n'a jamais été en cause. L'augmenter ferait
+       seulement durer le blocage plus longtemps.
+    3. Qu'un step long puisse à nouveau emporter silencieusement les six steps
+       suivants.
+    """
+
+    #: Le job lint commence à sa ligne `name:` et court jusqu'au job suivant.
+    @staticmethod
+    def _lint_job() -> str:
+        wf = _workflow()
+        start = wf.index("lint (ruff budget")
+        rest = wf[start:]
+        for marker in ("\n  sonar", "\n  aggregate", "\n  test:", "\n  deploy"):
+            idx = rest.find(marker)
+            if idx != -1:
+                rest = rest[:idx]
+                break
+        return rest
+
+    @classmethod
+    def _lint_commands(cls) -> str:
+        """Le job SANS ses commentaires.
+
+        Le workflow EXPLIQUE pourquoi `apt-get` a été retiré, donc la chaîne
+        apparaît dans sa propre justification. Une garde qui lit la prose
+        rougirait sur l'explication du correctif — le motif
+        `guards-that-guard-nothing` retourné contre lui-même, et la troisième
+        fois qu'il se présente dans ce dépôt.
+        """
+        lines = []
+        for line in cls._lint_job().splitlines():
+            stripped = line.lstrip()
+            if stripped.startswith("#"):
+                continue
+            lines.append(line)
+        return "\n".join(lines)
+
+    def test_the_lint_job_installs_nothing_over_the_network(self):
+        """`apt-get` dans un job de lint, c'est un miroir distant sur le chemin
+        critique d'un travail qui dure une seconde."""
+        job = self._lint_commands()
+        for banned in ("apt-get", "apt install", "add-apt-repository"):
+            assert banned not in job, (
+                f"{banned!r} réintroduit une dépendance réseau dans le job lint"
+            )
+
+    def test_shellcheck_still_runs_on_the_same_files(self):
+        """Retirer l'installation ne doit pas retirer la vérification.
+        L'outil est préinstallé sur l'image du runner."""
+        job = self._lint_commands()
+        assert "shellcheck -S warning" in job
+        assert 'find scripts -maxdepth 2 -name "*.sh"' in job
+
+    def test_shellcheck_declares_its_version_so_a_silent_swap_is_visible(self):
+        """Un outil préinstallé peut changer de version avec l'image. La
+        journaliser rend le changement lisible dans le log plutôt que dans un
+        écart de résultat inexpliqué."""
+        assert "shellcheck --version" in self._lint_commands()
+
+    def test_the_shellcheck_step_carries_its_own_timeout(self):
+        """Ceinture : un step d'une seconde qui dépasse la minute PEND. Sans
+        garde de step, il consomme le budget du job et emporte les suivants
+        sans les nommer."""
+        job = self._lint_commands()
+        head = job[:job.index("shellcheck -S warning")]
+        assert "timeout-minutes: 1" in head, (
+            "le step shellcheck doit porter sa propre limite"
+        )
+
+    #: Les steps requis, par leur DÉBUT DE DÉCLARATION exact.
+    #:
+    #: Chercher un simple mot-clé ne garde rien : la plantation a renommé
+    #: « gitleaks scan (required — Sb_26.4) » en « gitleaks scan DISABLED
+    #: (required — Sb_26.4) », et une garde qui cherchait `"gitleaks"` est
+    #: restée VERTE. Neutraliser un gate en le renommant est exactement le
+    #: geste qu'il faut attraper.
+    REQUIRED_STEPS = (
+        "- name: ruff budget check (required",
+        "- name: bandit security scan (required",
+        "- name: actionlint (required",
+        "- name: shellcheck (required",
+        "- name: pip-audit runtime dependencies (required",
+        "- name: gitleaks scan (required",
+        "- name: spec protocol check (required",
+        "- name: auth scope matrix presence (required",
+    )
+
+    def test_no_required_lint_step_was_removed_or_renamed(self):
+        """La correction ne devait retirer AUCUN gate — seulement une
+        installation superflue."""
+        job = self._lint_job()
+        for step in self.REQUIRED_STEPS:
+            assert step in job, f"gate requis disparu ou renommé : {step}"
+
+    def test_the_dependency_drift_gate_is_still_blocking(self):
+        """Le drift `requirements` ↔ lock faisait partie des six steps que
+        l'annulation de la canonique a sautés. Il doit rester bloquant."""
+        assert "drift (blocking)" in self._lint_job()
