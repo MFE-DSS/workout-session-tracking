@@ -114,6 +114,50 @@ class ZoneExposure:
         return sum(1 for n in self.counts.values() if n)
 
 
+@dataclass
+class _Tally:
+    """Dépouillement brut de la fenêtre — sans aucune décision d'état.
+
+    Extrait de `build_zone_exposure` pour la même raison que `_occupant` et
+    `_day_traces` l'ont été de `progress_facts` : la boucle imbriquée qui
+    compte et la cascade qui arbitre l'état sont deux lectures différentes, et
+    les tenir dans une seule fonction coûtait 22 de complexité cognitive pour
+    15 permis (`python:S3776`).
+    """
+
+    counts: dict[str, int]
+    exercises: int = 0
+    classified: int = 0
+    unmapped: int = 0
+    resolved_db: int = 0
+    resolved_legacy: int = 0
+
+
+def _tally(db: Session, sessions) -> _Tally:
+    """Une séance compte **au plus une fois par zone** — d'où le `set` par
+    séance : la question est « ce jour-là, oui ou non », pas « combien ».
+    """
+    t = _Tally(counts=dict.fromkeys(ZONE_LABELS, 0))
+    for s in sessions:
+        zones: set[str] = set()
+        for se in s.session_exercises:
+            t.exercises += 1
+            res = resolve_zone(
+                db, se.substituted_name or se.exercise_name_snapshot or "")
+            if not res.mapped:
+                t.unmapped += 1
+                continue
+            t.classified += 1
+            zones.add(res.zone)
+            if res.source == SOURCE_DB:
+                t.resolved_db += 1
+            else:
+                t.resolved_legacy += 1
+        for z in zones:
+            t.counts[z] += 1
+    return t
+
+
 def build_zone_exposure(
     db: Session, user_id: int, *, now: datetime | None = None
 ) -> ZoneExposure:
@@ -135,33 +179,15 @@ def build_zone_exposure(
     if not sessions:
         return ZoneExposure(state=STATE_UNKNOWN)
 
-    counts = dict.fromkeys(ZONE_LABELS, 0)
-    exercises = classified = unmapped = n_db = n_legacy = 0
-    for s in sessions:
-        zones: set[str] = set()
-        for se in s.session_exercises:
-            exercises += 1
-            res = resolve_zone(
-                db, se.substituted_name or se.exercise_name_snapshot or "")
-            if res.mapped:
-                classified += 1
-                zones.add(res.zone)
-                if res.source == SOURCE_DB:
-                    n_db += 1
-                else:
-                    n_legacy += 1
-            else:
-                unmapped += 1
-        for z in zones:
-            counts[z] += 1
-
-    common = {"sessions": len(sessions), "unmapped_exercises": unmapped,
-              "resolved_db": n_db, "resolved_legacy": n_legacy}
+    t = _tally(db, sessions)
+    common = {"sessions": len(sessions), "unmapped_exercises": t.unmapped,
+              "resolved_db": t.resolved_db,
+              "resolved_legacy": t.resolved_legacy}
 
     # Des exercices existent mais AUCUN n'est attribuable : l'attribution est
     # impossible, pas nulle. Un compte dont tous les exercices sont inconnus
     # n'a pas « travaillé zéro zone » — on ne sait simplement pas lesquelles.
-    if exercises and not classified:
+    if t.exercises and not t.classified:
         return ZoneExposure(state=STATE_UNKNOWN, **common)
 
     # `PARTIAL` — les deux natures de preuve coexistent dans la fenêtre.
@@ -171,13 +197,13 @@ def build_zone_exposure(
     # attribué a sollicité, donc **aucune** zone à zéro ne peut être affirmée.
     # Les `counts` sont donc des MINIMA OBSERVÉS, et la vue-modèle a
     # l'interdiction d'en rendre les zéros.
-    if classified and unmapped:
-        return ZoneExposure(state=STATE_PARTIAL, counts=counts, **common)
+    if t.classified and t.unmapped:
+        return ZoneExposure(state=STATE_PARTIAL, counts=t.counts, **common)
 
     # Des séances sans aucun exercice — du cardio, typiquement — ont bel et
     # bien touché zéro zone de force. C'est un fait, pas une ignorance.
-    state = STATE_KNOWN if classified else STATE_ZERO
-    return ZoneExposure(state=state, counts=counts, **common)
+    state = STATE_KNOWN if t.classified else STATE_ZERO
+    return ZoneExposure(state=state, counts=t.counts, **common)
 
 
 def build_zone_exposure_view(exp: ZoneExposure) -> dict:
