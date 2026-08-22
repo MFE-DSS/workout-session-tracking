@@ -35,6 +35,14 @@ SOURCE = ROOT / "requirements.txt"
 LOCK = ROOT / "requirements-lock.txt"
 BASELINE = ROOT / "docs" / "SECURITY_BASELINE.md"
 
+#: `Sb_OPS_INSTALL_AUTHORITY_01` — les procédures que suit un **humain**.
+#: Elles étaient hors de la portée de ce fichier, et c'est exactement là que la
+#: divergence a survécu : cf. §A10.
+HUMAN_PROCEDURES = (
+    ROOT / "deploy" / "CHECKLISTS.md",
+    ROOT / "deploy" / "README.md",
+)
+
 TARGET_PYTHON = "3.11"
 
 
@@ -192,6 +200,125 @@ def test_a5_regen_script_no_longer_says_the_lock_is_unused():
     src = REGEN.read_text(encoding="utf-8")
     assert "NOT yet used by deploy_prod.sh" not in src
     assert "AUTHORITATIVE" in src
+
+
+# ───────────── A10 — le chemin HUMAIN installe le lock, lui aussi ─────────────
+#
+# `Sb_DEPENDENCY_LOCK_AUTHORITY_01` a converti les deux consommateurs
+# AUTOMATISÉS — la CI et `deploy_prod.sh` — et a **oublié les procédures que
+# suit un humain**. Mesuré le 2026-08-22 : `deploy/CHECKLISTS.md` (§1.2, §2.2)
+# et `deploy/README.md` (§2, §6) prescrivaient encore
+# `pip install -r requirements.txt`, à plages ouvertes.
+#
+# Un déploiement suivi à la main installait donc des versions que la CI n'avait
+# jamais testées — le défaut même que le lock existe pour fermer, rouvert par la
+# porte de derrière. La prose de `regen_lockfile.sh` disait déjà que les deux
+# chemins installaient le lock ; elle décrivait un monde qui n'existait pas.
+# C'est pourquoi la garde regarde désormais le texte, et non plus seulement les
+# scripts.
+
+_INSTALLS_SOURCE_SPEC = re.compile(r"pip install\s+(-\S+\s+)*-r\s+requirements\.txt")
+
+
+def test_a10_human_procedures_never_install_the_source_spec():
+    offenders: list[str] = []
+    for path in HUMAN_PROCEDURES:
+        offenders += [
+            f"{path.relative_to(ROOT)}:{n}: {line.strip()}"
+            for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1)
+            if _INSTALLS_SOURCE_SPEC.search(line)
+        ]
+    assert offenders == [], (
+        "a human following these steps would install open ranges the CI never "
+        f"tested: {offenders}"
+    )
+
+
+def test_a10_human_procedures_install_the_lock():
+    """Pas seulement « ne fait pas le mauvais » — fait bien le bon."""
+    for path in HUMAN_PROCEDURES:
+        assert "pip install -r requirements-lock.txt" in path.read_text(encoding="utf-8"), (
+            f"{path.relative_to(ROOT)} never names the install contract"
+        )
+
+
+def test_a10_the_manual_path_points_back_at_the_canonical_script():
+    """A13-B — le chemin manuel est un **repli** du chemin canonique, pas une
+    seconde procédure qui vit sa vie. C'est en vivant sa vie qu'il a dérivé."""
+    checklists = (ROOT / "deploy" / "CHECKLISTS.md").read_text(encoding="utf-8")
+    fallback = checklists[checklists.index("### 2.2"):]
+    assert "deploy_prod.sh" in fallback[:1200], (
+        "the manual fallback must name the script it stands in for"
+    )
+
+
+#: Documents qui **racontent** un déploiement passé au lieu d'en prescrire un.
+#: Ils citent la commande telle qu'elle était, et la réécrire falsifierait un
+#: compte rendu daté. Liste **nominative** : un glob sur `docs/` aurait
+#: silencieusement absous les procédures vivantes qui y habitent aussi
+#: (`V1_ACCEPTANCE_CHECKLIST`, `SECURITY_BASELINE`).
+HISTORICAL_RECORDS = frozenset({
+    "docs/SPRINT_Sb_16_prod_cicd_pipeline_BUILD_REPORT.md",
+    "docs/SPRINT_Sb_26_4_REPORT.md",
+    "docs/SPRINT_Sb_DEPENDENCY_LOCK_AUTHORITY_01_REPORT.md",
+    "docs/strategy/SPIGNOS_PROD_CICD_PIPELINE_SPEC_v1.md",
+    "docs/strategy/Sx_26_ENGINEERING_CONTROL_PLANE_AND_ANTI_DRIFT_HARDENING_SPEC.md",
+})
+
+
+def test_a10_every_live_procedure_installs_the_lock():
+    """La garde qui aurait attrapé la divergence d'origine.
+
+    Elle balaie **tout fichier suivi** plutôt qu'une liste de chemins connus :
+    une liste ne protège que ce qu'on a pensé à y mettre, et `deploy/` n'y était
+    pas. Seuls les comptes rendus historiques sont exclus, nommément.
+    """
+    tracked = subprocess.run(
+        ["git", "ls-files"], capture_output=True, text=True, check=True, cwd=ROOT
+    ).stdout.split()
+    offenders: list[str] = []
+    for rel in tracked:
+        path = ROOT / rel
+        # Ce fichier-ci cite le motif fautif pour le tester ; s'auto-signaler
+        # serait un nouveau cas de garde qui lit sa propre prose.
+        if path == Path(__file__) or rel in HISTORICAL_RECORDS:
+            continue
+        if path.suffix in {".png", ".jpg", ".svg", ".db", ".ico", ".woff2"}:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (UnicodeDecodeError, OSError):
+            continue
+        offenders += [
+            f"{rel}:{n}"
+            for n, line in enumerate(text.splitlines(), 1)
+            if _INSTALLS_SOURCE_SPEC.search(line)
+        ]
+    assert offenders == [], f"install directives bypassing the lock: {offenders}"
+
+
+def test_a10_the_historical_exclusions_are_all_real_files():
+    """Une exclusion qui ne désigne plus rien est un trou qui s'élargit."""
+    missing = [rel for rel in HISTORICAL_RECORDS if not (ROOT / rel).exists()]
+    assert missing == [], f"stale exclusions: {missing}"
+
+
+def test_a10_the_bcrypt_ceiling_states_its_reason_in_the_source_spec():
+    """A14 — le plafond existe, sans dire pourquoi. Le prochain dependabot le
+    retirera. La raison vit donc **à côté du pin**, pas seulement en revue.
+
+    La première version de cette garde cherchait « passlib » n'importe où
+    au-dessus du pin — et passait, satisfaite par la ligne de dépendance
+    `passlib[bcrypt]>=1.7`. Elle mesurait la présence d'un paquet, pas celle
+    d'une explication. Elle exige maintenant un **commentaire**.
+    """
+    lines = SOURCE.read_text(encoding="utf-8").splitlines()
+    pin = next(i for i, ln in enumerate(lines) if ln.startswith("bcrypt>=4.0,<5"))
+    comments = [ln for ln in lines[:pin] if ln.lstrip().startswith("#")]
+    assert any("passlib" in ln.lower() for ln in comments), (
+        "the bcrypt ceiling must carry its reason, as a comment, where the next "
+        f"person edits it — comments found above the pin: {comments}"
+    )
 
 
 # ───────────── A8 / A9 — scope ─────────────

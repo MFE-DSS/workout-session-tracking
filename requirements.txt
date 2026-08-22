@@ -8,4 +8,9 @@ pydantic-settings>=2.2
 python-multipart>=0.0.9
 itsdangerous>=2.2
 passlib[bcrypt]>=1.7
+# PLAFOND DÉLIBÉRÉ — ne pas relever sans avoir d'abord remplacé passlib.
+# passlib 1.7.4 sonde bcrypt en interne avec un mot de passe de 255 octets ;
+# bcrypt 5.0 lève désormais ValueError au-delà de 72 octets au lieu de tronquer,
+# donc le backend passlib échoue à se charger et TOUTE authentification tombe.
+# PR dependabot #7 (bcrypt 4.3.0 → 5.0.0) a été fermée pour cette raison.
 bcrypt>=4.0,<5

@@ -35,7 +35,7 @@ sudo -u workout bash -c '
   cd /opt/workout-session-tracking &&
   git clone https://github.com/mfe-dss/workout-session-tracking.git . &&
   python3.11 -m venv .venv &&
-  .venv/bin/pip install -r requirements.txt
+  .venv/bin/pip install -r requirements-lock.txt
 '
 ```
 
