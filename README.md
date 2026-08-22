@@ -44,7 +44,7 @@ prêt pour analytics.
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-lock.txt    # le lock : ce que la CI teste
 cp .env.example .env
 alembic upgrade head                    # schema
 uvicorn app.main:app --reload           # http://localhost:8000

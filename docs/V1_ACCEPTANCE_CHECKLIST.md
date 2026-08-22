@@ -13,7 +13,7 @@ Répertoire de travail : racine du repo.
 ```bash
 python3.11 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-lock.txt
 cp .env.example .env
 ```
 

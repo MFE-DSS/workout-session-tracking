@@ -34,7 +34,7 @@ sudo -u workout bash -c '
   cd /srv/workout &&
   git clone <repo-url> . &&
   python3.11 -m venv .venv &&
-  .venv/bin/pip install -r requirements.txt &&
+  .venv/bin/pip install -r requirements-lock.txt &&
   cp .env.example .env
 '
 # then edit /srv/workout/.env with your real values:
@@ -42,6 +42,12 @@ sudo -u workout vi /srv/workout/.env
 # set APP_SECRET_KEY, APP_BASE_URL, DATABASE_URL, BACKUP_DIR, BACKUP_RETENTION_DAYS
 ```
 **Expected:** venv exists, requirements installed, `.env` is real.
+
+> **Why the lock and not `requirements.txt`?** `requirements.txt` is the
+> human-edited *source spec* and carries open ranges (`fastapi>=0.110`, …).
+> `requirements-lock.txt` is what CI installs and what
+> `scripts/deploy_prod.sh` installs. Installing the source spec by hand ships
+> versions no test ever ran against. One install contract, every consumer.
 
 ### 1.3 Migrations + seed
 
@@ -165,13 +171,16 @@ sudo DEPLOY_BRANCH=release/v2 bash /srv/workout/scripts/deploy_prod.sh
 
 ### 2.2 Manual (fallback)
 
-Use if the deploy script is not available or needs debugging:
+Use if `scripts/deploy_prod.sh` is not available or needs debugging. **These
+steps stand in for that script and must stay identical to it** — in particular
+the install line, which reads the lock exactly as the script does. The manual
+path is a wrapper of the canonical path, never a second procedure:
 
 ```bash
 sudo -u workout bash -c '
   cd /srv/workout &&
   git pull &&
-  .venv/bin/pip install -r requirements.txt &&
+  .venv/bin/pip install -r requirements-lock.txt &&
   .venv/bin/python -m scripts.check_alembic_drift &&
   .venv/bin/alembic upgrade head &&
   .venv/bin/python -m scripts.seed_db

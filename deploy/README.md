@@ -24,7 +24,7 @@ sudo -u workout bash
 cd /srv/workout
 git clone https://github.com/mfe-dss/workout-session-tracking.git .
 python3.11 -m venv .venv
-.venv/bin/pip install -r requirements.txt
+.venv/bin/pip install -r requirements-lock.txt
 cp .env.example .env
 # éditer .env (APP_SECRET_KEY, APP_BASE_URL, DATABASE_URL)
 mkdir -p var
@@ -197,7 +197,7 @@ Workflow recommandé après un `git pull` :
 sudo -u workout bash -c '
   cd /srv/workout &&
   git pull &&
-  .venv/bin/pip install -r requirements.txt &&
+  .venv/bin/pip install -r requirements-lock.txt &&
   .venv/bin/python -m scripts.check_alembic_drift &&
   .venv/bin/alembic upgrade head &&
   .venv/bin/python -m scripts.seed_db
@@ -207,7 +207,10 @@ sudo -u workout bash -c '
 Étapes en détail :
 
 1. `git pull` : récupère le code.
-2. `pip install -r requirements.txt` : aligne les dépendances.
+2. `pip install -r requirements-lock.txt` : aligne les dépendances sur les
+   versions exactes que la CI a testées. **Jamais `requirements.txt`** — ce
+   fichier est la déclaration source, à plages ouvertes ; l'installer résout des
+   versions fraîches et fait diverger la production du testé.
 3. `scripts.check_alembic_drift` (Sprint 4) : vérifie qu'aucun
    modèle ORM n'a divergé du dernier `alembic head` sans qu'une
    migration ait été générée. Sort en code 1 si drift, dans ce

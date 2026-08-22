@@ -214,9 +214,10 @@ vim requirements.txt
 # 2. Régénérer le lockfile
 bash scripts/regen_lockfile.sh
 
-# 3. Audit + tests locaux
-pip install -r requirements.txt
-pip-audit -r requirements.txt --strict
+# 3. Audit + tests locaux — sur le LOCK, qui est ce qui sera déployé.
+#    Auditer requirements.txt auditerait des plages, pas des versions.
+pip install -r requirements-lock.txt
+pip-audit -r requirements-lock.txt --strict
 PYTHONPATH=. pytest --ignore=tests/test_v1_acceptance.py -q
 
 # 4. Si tests verts → commit + PR
