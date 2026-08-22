@@ -315,3 +315,143 @@ def test_the_silhouette_is_hidden_only_because_the_text_exists(client):
         "la silhouette est masquée sans équivalent textuel"
     )
     assert "Exposition des quatorze derniers jours" in block[:4000]
+
+
+# ── `MUSCLE_MAPPING_TRUTH_01` — les quatre états de preuve ───────────────────
+
+
+def test_mapped_and_unmapped_together_is_partial_not_known(client):
+    """**Le défaut central, refermé.**
+
+    Avant cet état, une séance de trois exercices dont un non attribuable
+    rendait `known` : « 2 zones touchées » et **neuf lignes à zéro**, sans rien
+    signaler. Neuf zéros fabriqués, mesurés en contrôlé.
+    """
+    from app.database import SessionLocal
+    from app.services.zone_exposure import STATE_PARTIAL
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        _add(db, uid, days_ago=2, exercises=[
+            "Développé couché", "Curl biceps", "Zorglub 3000"])
+
+    exp = _exposure(uid)
+    assert exp.state == STATE_PARTIAL
+    assert exp.unmapped_exercises == 1
+    assert exp.touched == 2
+
+
+def test_partial_never_renders_a_zero_row(client):
+    """**La règle sémantique de `PARTIAL`.**
+
+    Une preuve non attribuée rend les zones non observées **inconnues, pas
+    nulles** : on ignore ce que l'exercice manquant a touché, donc n'importe
+    laquelle a pu l'être. Le niveau 2 n'énumère que les zones OBSERVÉES.
+    """
+    from app.database import SessionLocal
+    from app.services.zone_exposure import (
+        build_zone_exposure,
+        build_zone_exposure_view,
+    )
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        _add(db, uid, days_ago=2, exercises=["Squat", "Zorglub 3000"])
+        view = build_zone_exposure_view(build_zone_exposure(db, uid, now=NOW))
+
+    assert view["state"] == "partial"
+    assert view["rows"], "aucune zone observée rendue"
+    assert all(n > 0 for _lab, n in view["rows"]), (
+        "une ligne à zéro est rendue alors qu'un exercice n'est pas attribué"
+    )
+    # Le fond de la silhouette devient inconnu, jamais vide.
+    assert "zero" not in view["regions"].values(), (
+        "une région est affirmée vide alors que l'attribution est incomplète"
+    )
+
+
+def test_partial_says_how_many_are_unattributed(client):
+    """Taire la donnée manquante serait la même faute que la compter pour
+    zéro. Le nombre est rendu, et l'équivalent textuel le dit."""
+    from app.database import SessionLocal
+    from app.services.zone_exposure import (
+        build_zone_exposure,
+        build_zone_exposure_view,
+    )
+
+    uid = get_test_user_id()
+    with SessionLocal() as db:
+        _add(db, uid, days_ago=1, exercises=["Squat", "Zorglub", "Machin"])
+        view = build_zone_exposure_view(build_zone_exposure(db, uid, now=NOW))
+
+    assert view["unmapped"] == 2
+    assert "2 exercices non attribués" in view["sr"]
+    assert "pas à zéro" in view["sr"]
+
+
+def test_the_four_states_are_reachable_and_distinct(client):
+    """Les quatre fixtures contrôlées du mandat, dans un seul test pour que la
+    matrice se lise d'un coup."""
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.services.zone_exposure import (
+        STATE_KNOWN,
+        STATE_PARTIAL,
+        STATE_UNKNOWN,
+        STATE_ZERO,
+    )
+
+    uid = get_test_user_id()
+    cases = [
+        ([["Squat", "Développé couché"]], STATE_KNOWN),      # tout mappé
+        ([[]], STATE_ZERO),                                   # séance sans exo
+        ([["Squat", "Zorglub 3000"]], STATE_PARTIAL),         # mappé + non mappé
+        ([["Zorglub 3000", "Machin"]], STATE_UNKNOWN),        # rien de mappé
+    ]
+    for exercises, expected in cases:
+        with SessionLocal() as db:
+            db.query(WorkoutSession).filter(
+                WorkoutSession.user_id == uid).delete()
+            db.commit()
+            for ex in exercises:
+                _add(db, uid, days_ago=2, exercises=ex)
+        assert _exposure(uid).state == expected, (
+            f"{exercises} devrait rendre {expected}"
+        )
+
+
+# ── le résolveur et sa provenance ───────────────────────────────────────────
+
+
+def test_the_resolver_reports_where_the_mapping_came_from(client):
+    """`classify_exercise` rend une zone ou « unknown » : un consommateur
+    analytique ne peut pas distinguer « vraiment non attribuable » de « le
+    matcher a répondu par défaut ». Le résolveur rend la PROVENANCE."""
+    from app.database import SessionLocal
+    from app.services.exercise_zone_resolver import (
+        SOURCE_UNMAPPED,
+        resolve_zone,
+    )
+
+    with SessionLocal() as db:
+        unknown = resolve_zone(db, "Zorglub 3000")
+        known = resolve_zone(db, "Squat")
+
+    assert unknown.zone is None
+    assert unknown.source == SOURCE_UNMAPPED
+    assert unknown.mapped is False
+    assert known.mapped is True
+    assert known.source in ("DB_EXACT", "LEGACY_FALLBACK")
+
+
+def test_the_decision_engines_never_import_the_resolver():
+    """`recommendation` et `substitution` sont GELÉS et consomment
+    `classify_exercise(name)`. Changer l'autorité sous eux modifierait des
+    décisions d'entraînement — le mandat l'interdit explicitement."""
+    for module in ("app/services/recommendation.py",
+                   "app/services/substitution.py"):
+        src = (ROOT / module).read_text(encoding="utf-8")
+        assert "exercise_zone_resolver" not in src, (
+            f"{module} consomme le résolveur analytique — l'autorité d'une "
+            "décision d'entraînement a changé"
+        )

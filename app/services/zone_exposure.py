@@ -42,7 +42,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.session import WorkoutSession
-from app.services.muscle_mapping import ZONE_LABELS, classify_exercise
+from app.services.exercise_zone_resolver import SOURCE_DB, resolve_zone
+from app.services.muscle_mapping import ZONE_LABELS
 
 #: Même fenêtre que `progress_facts`. Le dire ici plutôt que de l'importer
 #: garde les deux modules indépendants ; une garde vérifie qu'ils s'accordent.
@@ -50,6 +51,20 @@ WINDOW_DAYS = 14
 
 STATE_KNOWN = "known"
 STATE_ZERO = "zero"
+#: `MUSCLE_MAPPING_TRUTH_01` — la fenêtre contient **à la fois** des exercices
+#: attribuables et des exercices qui ne le sont pas.
+#:
+#: L'état manquant, et le plus important. Sans lui, une séance dont un exercice
+#: n'était pas reconnu rendait `known` : « 2 zones touchées » et neuf lignes à
+#: `0`, sans signaler l'échec d'attribution. Mesuré en contrôlé avant
+#: correction — **9 zéros fabriqués sur 11 zones**.
+#:
+#: RÈGLE SÉMANTIQUE : en `partial`, une preuve non attribuée rend les zones
+#: non observées **INCONNUES, pas nulles**. On ne sait pas ce que l'exercice
+#: manquant a touché, donc **n'importe quelle** zone a pu l'être. Les comptages
+#: positifs restent exposables comme des **minima observés** — ils sont vrais,
+#: simplement pas exhaustifs.
+STATE_PARTIAL = "partial"
 STATE_UNKNOWN = "unknown"
 
 #: 11 zones canoniques → 6 macro-régions de la silhouette.
@@ -78,12 +93,69 @@ class ZoneExposure:
     #: zone canonique → nombre de séances l'ayant touchée. Une séance compte
     #: au plus une fois par zone, même si elle contient trois exercices qui la
     #: sollicitent : la question est « ce jour-là, oui ou non », pas « combien ».
+    #:
+    #: En `partial`, ces comptages sont des **minima observés** : vrais, mais
+    #: non exhaustifs. Un zéro n'y signifie pas « pas travaillé ».
     counts: dict[str, int] = field(default_factory=dict)
     sessions: int = 0
+
+    #: Exercices que ni la base ni le matcher n'ont su attribuer. C'est ce
+    #: nombre qui fait basculer en `partial`, et il est **rendu à l'écran** :
+    #: taire la donnée manquante serait la même faute que la compter pour zéro.
+    unmapped_exercises: int = 0
+
+    #: Combien de résolutions viennent de l'autorité cible plutôt que du repli.
+    #: Non rendu — instrument de mesure de la migration.
+    resolved_db: int = 0
+    resolved_legacy: int = 0
 
     @property
     def touched(self) -> int:
         return sum(1 for n in self.counts.values() if n)
+
+
+@dataclass
+class _Tally:
+    """Dépouillement brut de la fenêtre — sans aucune décision d'état.
+
+    Extrait de `build_zone_exposure` pour la même raison que `_occupant` et
+    `_day_traces` l'ont été de `progress_facts` : la boucle imbriquée qui
+    compte et la cascade qui arbitre l'état sont deux lectures différentes, et
+    les tenir dans une seule fonction coûtait 22 de complexité cognitive pour
+    15 permis (`python:S3776`).
+    """
+
+    counts: dict[str, int]
+    exercises: int = 0
+    classified: int = 0
+    unmapped: int = 0
+    resolved_db: int = 0
+    resolved_legacy: int = 0
+
+
+def _tally(db: Session, sessions) -> _Tally:
+    """Une séance compte **au plus une fois par zone** — d'où le `set` par
+    séance : la question est « ce jour-là, oui ou non », pas « combien ».
+    """
+    t = _Tally(counts=dict.fromkeys(ZONE_LABELS, 0))
+    for s in sessions:
+        zones: set[str] = set()
+        for se in s.session_exercises:
+            t.exercises += 1
+            res = resolve_zone(
+                db, se.substituted_name or se.exercise_name_snapshot or "")
+            if not res.mapped:
+                t.unmapped += 1
+                continue
+            t.classified += 1
+            zones.add(res.zone)
+            if res.source == SOURCE_DB:
+                t.resolved_db += 1
+            else:
+                t.resolved_legacy += 1
+        for z in zones:
+            t.counts[z] += 1
+    return t
 
 
 def build_zone_exposure(
@@ -107,32 +179,31 @@ def build_zone_exposure(
     if not sessions:
         return ZoneExposure(state=STATE_UNKNOWN)
 
-    counts = dict.fromkeys(ZONE_LABELS, 0)
-    exercises = 0
-    classified = 0
-    for s in sessions:
-        zones: set[str] = set()
-        for se in s.session_exercises:
-            exercises += 1
-            primary, _ = classify_exercise(
-                se.substituted_name or se.exercise_name_snapshot or ""
-            )
-            if primary in counts:
-                classified += 1
-                zones.add(primary)
-        for z in zones:
-            counts[z] += 1
+    t = _tally(db, sessions)
+    common = {"sessions": len(sessions), "unmapped_exercises": t.unmapped,
+              "resolved_db": t.resolved_db,
+              "resolved_legacy": t.resolved_legacy}
 
-    # Des exercices existent mais AUCUN n'est reconnu : l'attribution est
+    # Des exercices existent mais AUCUN n'est attribuable : l'attribution est
     # impossible, pas nulle. Un compte dont tous les exercices sont inconnus
     # n'a pas « travaillé zéro zone » — on ne sait simplement pas lesquelles.
-    if exercises and not classified:
-        return ZoneExposure(state=STATE_UNKNOWN, sessions=len(sessions))
+    if t.exercises and not t.classified:
+        return ZoneExposure(state=STATE_UNKNOWN, **common)
+
+    # `PARTIAL` — les deux natures de preuve coexistent dans la fenêtre.
+    #
+    # Les comptages positifs restent VRAIS : ces zones ont bien été touchées.
+    # Ce qui devient faux, c'est le reste — on ignore ce que l'exercice non
+    # attribué a sollicité, donc **aucune** zone à zéro ne peut être affirmée.
+    # Les `counts` sont donc des MINIMA OBSERVÉS, et la vue-modèle a
+    # l'interdiction d'en rendre les zéros.
+    if t.classified and t.unmapped:
+        return ZoneExposure(state=STATE_PARTIAL, counts=t.counts, **common)
 
     # Des séances sans aucun exercice — du cardio, typiquement — ont bel et
     # bien touché zéro zone de force. C'est un fait, pas une ignorance.
-    state = STATE_KNOWN if classified else STATE_ZERO
-    return ZoneExposure(state=state, counts=counts, sessions=len(sessions))
+    state = STATE_KNOWN if t.classified else STATE_ZERO
+    return ZoneExposure(state=state, counts=t.counts, **common)
 
 
 def build_zone_exposure_view(exp: ZoneExposure) -> dict:
@@ -154,10 +225,36 @@ def build_zone_exposure_view(exp: ZoneExposure) -> dict:
                    "zéro séance par zone, c'est une absence de preuve."),
         }
 
-    regions = dict.fromkeys(set(ZONE_TO_REGION.values()), "zero")
+    # `PARTIAL` — une preuve non attribuée rend TOUT le reste inconnu.
+    #
+    # On ignore ce que l'exercice manquant a touché, donc n'importe quelle zone
+    # a pu l'être. Le fond neutre devient donc `unknown`, jamais `zero` : sur
+    # la silhouette comme dans les lignes, une zone non observée ne peut plus
+    # être affirmée vide. Les zones observées restent affirmées — elles sont
+    # vraies, simplement non exhaustives.
+    base = "unknown" if exp.state == STATE_PARTIAL else "zero"
+    regions = dict.fromkeys(set(ZONE_TO_REGION.values()), base)
     for zone, n in exp.counts.items():
         if n:
             regions[ZONE_TO_REGION[zone]] = "on"
+
+    if exp.state == STATE_PARTIAL:
+        # ⚠ AUCUNE LIGNE À ZÉRO. Le niveau 2 n'expose que les zones
+        # OBSERVÉES ; rendre les autres à `0` fabriquerait exactement le
+        # mensonge que cet état existe pour empêcher.
+        rows = [(ZONE_LABELS[z], exp.counts[z]) for z in ZONE_LABELS
+                if exp.counts.get(z)]
+        hit = ", ".join(f"{lab} {n}" for lab, n in rows)
+        return {
+            "state": STATE_PARTIAL, "regions": regions, "rows": rows,
+            "touched": exp.touched, "unmapped": exp.unmapped_exercises,
+            "sr": (f"Exposition des quatorze derniers jours : partielle. "
+                   f"{exp.touched} zones identifiées — {hit}. "
+                   f"{exp.unmapped_exercises} exercice"
+                   f"{'s' if exp.unmapped_exercises > 1 else ''} non attribué"
+                   f"{'s' if exp.unmapped_exercises > 1 else ''} : les autres "
+                   f"zones sont inconnues, pas à zéro."),
+        }
 
     if exp.state == STATE_ZERO or not exp.touched:
         return {
@@ -183,6 +280,7 @@ __all__ = [
     "STATE_KNOWN",
     "STATE_UNKNOWN",
     "STATE_ZERO",
+    "STATE_PARTIAL",
     "WINDOW_DAYS",
     "ZONE_TO_REGION",
     "ZoneExposure",

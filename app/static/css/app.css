@@ -1977,6 +1977,11 @@ input, button, textarea, select {
 /* Zéro connu : un chiffre, donc un fait — mais en sourdine. Un « 0 » au poids
  * d'une performance mesurée se lirait comme un échec. */
 .ze__n--muted { color: var(--fg-dim); font-weight: 400; }
+
+/* PARTIEL — un mot, pas un chiffre. Mettre « 2 » en grand donnerait à un
+ * minimum observé le poids d'un compte exhaustif, ce qu'il n'est pas. */
+.ze__n--partial { font-size: 20px; font-weight: 400; color: var(--fg-muted);
+  font-style: italic; }
 .ze__n--unknown { font-size: 20px; font-weight: 400; color: var(--fg-dim);
   font-style: italic; }
 

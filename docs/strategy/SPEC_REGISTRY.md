@@ -289,6 +289,34 @@
 
 **Build remains blocked.** Aucun sprint `Sb_UI_NN.k` d'implémentation autorisé. `Sx_UI_02` reste blocked tant que `Sx_UI_01` n'a pas été validé par human review. Après validation Sx_UI_01, prochain step docs-only : `Sx_UI_02_DESIGN_TOKENS_SPEC` SPEC ONLY.
 
+## 1terdecies. Cycle UX4 — Information Architecture & Instrument Truth (actif)
+
+**Blueprint :** `docs/strategy/AUREN_UI_BLUEPRINT.md` (file de tranches versionnée, supersede le programme UI V2)
+**Doctrine :** `SEMANTIC TRUTH > INSPECTABILITY > NEW CAPABILITY` (ordre opérateur)
+**Hard contracts :** moteurs de décision gelés (`recommendation.py`, `substitution.py`) · migrations additive-only · CLAUDE.md §5 (exposition visuelle avant tout commit UI) · aucune revendication scientifique neuve
+
+| Tranche | Domaine | Statut | SHA / PR |
+|---|---|---|---|
+| `UX4_01` | Profile — le Profil répond à deux questions et à deux seulement | ✅ **MERGÉE** 2026-08-20 | `c57a7a5` · closeout `be392d6` |
+| `UX4_03` | Progression — trois signaux comportementaux calculés depuis toujours, enfin perceptibles ; sémantique corrigée (`Ressenti général`, fraîcheur de déclaration) | ✅ **MERGÉE** 2026-08-21 (PR #138) | `b96a762` + `b119b5d` · closeout `ac1210a` |
+| `UX4_03B/C/D` | Progression — alignement des consommateurs de `consistency_score`, cockpit Volume & rythme (variante C), écrémage des duplications, exposition anatomique | ✅ **MERGÉE** 2026-08-21 (PR #139) | `bdc04ac` + `c2a5c43` · closeout `a29a104` |
+| `MUSCLE_MAPPING_TRUTH_01` | Quatrième état de preuve `PARTIAL` + résolveur d'exercice avec provenance (`DB_EXACT` / `LEGACY_FALLBACK` / `UNMAPPED`) | 🟢 **PR OUVERTE** | rapport [`SPRINT_MUSCLE_MAPPING_TRUTH_01_REPORT.md`](../SPRINT_MUSCLE_MAPPING_TRUTH_01_REPORT.md) |
+
+**Registre d'arbitrage A1–A15** — les 15 décisions ouvertes ont été **tranchées en batch par
+l'opérateur le 2026-08-22**. Elles ne sont plus des questions : `A1` identité d'exercice stable
+(additive + backfill) · `A2` substitution libre conservée + résolution puis exercice custom
+structuré · `A3` autorité DB pour l'analytique seulement · `A4` état vide compact ·
+`A5` rail L2 local (`<details>` = fallback SSR, pas la cible) · `A6` `/dashboard` absorbé puis
+redirigé · `A7` analytique corporelle en niveau 2 de Progression · `A8` `readiness_score` gelé
+déprécié · `A9` bandes de volume **non exposées** · `A10` instrument PROGRESSIF factuel sans
+agrégat inventé · `A11` `weekly_loop` absorbé · `A12` PR #136 mergée · `A13` documentation de
+déploiement alignée sur le lock · `A14` bcrypt 5 fermée + pin `<5` · `A15` `UX4_02` recadrée en
+Programs & Discovery.
+
+**Ordre d'exécution (trains opérateur)** : TRAIN 0 livraison/risque (`MUSCLE_MAPPING_TRUTH_01`,
+#136, A13, A14) → TRAIN 1 fermeture de Progression (A1 → A4 → A5 → A10 → A11 → A7 → A6) →
+TRAIN 2 `UX4_02` Programs & Discovery (A15 + « Mon plan ») → TRAIN 3 substitution structurée (A2).
+
 ## 1sexies. Sprints OPS hors-cycle (infra CI, tooling, cost control)
 
 Sprints infra chirurgicaux ne relevant d'aucun cycle produit `Sx_`. Chaque sprint est indépendant, docs + fichier infra ciblé, aucun impact code applicatif.
