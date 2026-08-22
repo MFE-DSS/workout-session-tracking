@@ -453,3 +453,45 @@ source ni l'intention.
 | doublon `ZONE_TO_REGION` | assumé, gardé, non résolu |
 | absorption de `/dashboard` | périmètre initial d'`UX4_03`, jamais ouvert |
 | route `/progress/body` | dépendance héritée d'`UX4_01` |
+
+---
+
+## 10. ERRATUM — §8.7 était faux
+
+Le §8.7 affirmait que « Développé militaire » et « Soulevé de terre roumain »
+étaient **deux exercices courants du catalogue** non reconnus par
+`muscle_mapping`, et que leur exposition était perdue silencieusement.
+
+**C'est faux.** Ces deux noms **n'existent pas dans le catalogue** : ils
+venaient de `seed_zones.py`, une fixture de mesure que j'avais écrite
+moi-même. J'ai décrit mes données de test comme un défaut produit.
+
+L'affirmation figure aussi dans le message de commit **`c2a5c43`** et dans le
+closeout **`a29a104`**. Ces commits ne sont pas réécrits : ils restent la trace
+historique de ce qui a été dit et quand. Le présent erratum les corrige.
+
+### Ce que l'audit a réellement mesuré
+
+| Mesure | Valeur |
+|---|---:|
+| exercices actifs du catalogue | **68** |
+| mappés en base (exact) | **68 / 68** |
+| reconnus par le motif hérité | **68 / 68** |
+| non mappés | **0** |
+| conflits entre les deux autorités | **0** |
+| couverture pondérée programme | **100 %** |
+
+**Couverture d'usage en production : NON MESURÉE.** Les pourcentages 30 j / 90 j
+obtenus sur le bac à sable ne sont **pas** une preuve produit — l'historique
+récent y avait été semé par mes propres fixtures. Ils ne sont pas publiés.
+
+### Le défaut réel, que l'audit a trouvé à la place
+
+Deux, et aucun n'était celui que j'avais annoncé :
+
+1. **L'autorité de mapping était inerte.** Les 103 lignes actives
+   d'`ExerciseMuscleMapping` n'étaient jamais consultées — les sept sites
+   d'appel invoquaient `classify_exercise(name)`, le chemin par sous-chaînes.
+2. **L'instrument fabriquait des zéros.** Une séance dont un exercice n'était
+   pas attribuable rendait `known` : « 2 zones touchées » et **neuf lignes à
+   zéro**, sans rien signaler. Mesuré en contrôlé.

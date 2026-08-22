@@ -92,6 +92,41 @@
       {% endfor %}
     </ul>
   </details>
+
+{% elif exposure.state == 'partial' %}
+  {# `MUSCLE_MAPPING_TRUTH_01` — ÉTAT PARTIEL.
+
+     La fenêtre contient à la fois des exercices attribuables et des exercices
+     qui ne le sont pas. Les zones observées restent AFFIRMÉES : elles ont bien
+     été touchées. Tout le reste devient INCONNU — on ignore ce que l'exercice
+     non attribué a sollicité, donc aucune zone ne peut être déclarée vide.
+
+     Le niveau 2 n'énumère donc QUE les zones observées, et son en-tête dit
+     « minimum observé » : le compte est vrai, il n'est pas exhaustif.
+
+     Avant cet état, une séance dont un exercice n'était pas reconnu rendait
+     « connu » avec neuf lignes à zéro. Neuf zéros fabriqués, mesurés. #}
+  <details class="ze">
+    <summary class="ze__map">
+      {{ _ze_figs }}
+      <span class="ze__read">
+        <b class="ze__n ze__n--partial">partielle</b>
+        <span class="ze__k">{{ exposure.touched }} zones identifiées ·
+          {{ exposure.unmapped }} exercice{% if exposure.unmapped > 1 %}s{% endif %}
+          non attribué{% if exposure.unmapped > 1 %}s{% endif %}</span>
+        <span class="ze__go">zones identifiées</span>
+      </span>
+    </summary>
+    <ul class="ze-list">
+      <li class="ze-list__head"><span>zones identifiées</span>
+        <span>minimum observé</span></li>
+      {% for label, n in exposure.rows %}
+        <li class="ze-row"><span class="ze-row__n">{{ label }}</span>
+          <span class="ze-row__v">{{ n }}</span></li>
+      {% endfor %}
+    </ul>
+  </details>
+
 {% else %}
   <div class="ze__map ze__map--static">
     {{ _ze_figs }}
