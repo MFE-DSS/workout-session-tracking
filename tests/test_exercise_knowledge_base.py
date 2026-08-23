@@ -277,7 +277,8 @@ def test_the_alias_entry_records_why_it_was_aligned():
     """Sans la note, le prochain lecteur croira à deux exercices distincts."""
     for name in ("Curl marteau câble (corde)", "Curl marteau câble corde"):
         note = _exercises()[name]["curation_note"]
-        assert note and "ORTHOGRAPHIC_ALIAS" in note, name
+        assert note is not None, name
+        assert "ORTHOGRAPHIC_ALIAS" in note, name
 
 
 def test_both_spellings_are_kept_history_is_not_rewritten():
