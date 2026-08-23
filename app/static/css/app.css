@@ -1996,10 +1996,20 @@ input, button, textarea, select {
   transform: rotate(-135deg) translate(-2px, -2px);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .rail-l2__chevron { transition: none; }
-}
-
+/* PAS DE BLOC `prefers-reduced-motion` ICI, ET C'EST DÉLIBÉRÉ.
+ *
+ * La première écriture en ajoutait un pour neutraliser la transition du
+ * chevron. `test_reduced_motion_targets_universal_selector` a rougi, et elle
+ * avait raison deux fois :
+ *
+ *   1. le bloc UNIVERSEL de ce fichier couvre déjà toute transition ajoutée
+ *      ensuite — il se décrit lui-même comme « robuste aux transitions
+ *      ajoutées ultérieurement (pas d'énumération fragile) » ;
+ *   2. placé plus haut dans le fichier, un bloc scopé devient le PREMIER que
+ *      la garde rencontre, et la contrainte universelle cesse d'être vérifiée.
+ *
+ * Une redondance qui désarme sa propre garde coûte plus qu'elle n'apporte.
+ */
 .rail-l2__summary:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
