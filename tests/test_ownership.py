@@ -151,12 +151,20 @@ def test_export_csv_is_scoped_to_current_user(client):
 
 
 def test_progress_kpis_are_scoped(client):
-    # Create a completed session for 'other'
+    """`TRAIN1-A` / A4 — RÉORIENTÉ, ET RENFORCÉ.
+
+    Ce test cherchait un `0` quelque part dans la page : un proxy faible de
+    l'étanchéité — n'importe quel zéro le satisfaisait. Depuis A4, une page
+    sans séance ne rend plus de compteur à zéro du tout, mais la propriété qui
+    compte est intacte et se vérifie mieux : **rien de l'autre compte
+    n'apparaît**, et la page dit qu'elle n'a rien.
+    """
     _create_other_user_session()
 
     body = client.get("/progress").text
-    # With no sessions of our own, KPIs should show 0
-    assert "0</div>" in body or ">0<" in body
+    assert 'class="empty-line"' in body
+    assert "Push A" not in body
+    assert "Aucune séance" in body
 
 
 def test_admin_sessions_only_shows_own(client):

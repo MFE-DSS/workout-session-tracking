@@ -10,6 +10,8 @@ appear instead of crashes (Sx_27 §16).
 """
 from __future__ import annotations
 
+import pathlib
+import re
 from datetime import UTC, datetime, timedelta
 
 _REQUIRED_KEYS = {
@@ -335,12 +337,40 @@ def test_progress_route_returns_200(client):
     assert r.status_code == 200
 
 
-def test_progress_route_renders_weekly_section(client):
+def test_progress_route_no_longer_renders_the_weekly_container(client):
+    """`TRAIN1-A` / A11 — RÉORIENTÉ VERS LA NOUVELLE VÉRITÉ, PAS AFFAIBLI.
+
+    Ce test assertait que le conteneur `weekly-loop` se rendait sur
+    `/progress`. La décision opérateur le retire : il portait deux
+    duplications mesurées — « 3 séances cette semaine » et « Semaine
+    précédente : 2 (+1) » répétaient la ligne « Séances » et les quatorze
+    cellules du rail.
+
+    L'invariant utile n'était pas « ce conteneur existe » mais **« ses faits
+    atteignent la surface »**. C'est ce qui est asserté maintenant, et c'est
+    plus strict : le conteneur doit être ABSENT, et ses deux faits uniques
+    présents ailleurs — l'anomalie dans l'instrument temporel, la dominance
+    hebdomadaire dans « Par programme ».
+    """
     r = client.get("/progress", follow_redirects=False)
     assert r.status_code == 200
-    body = r.text
-    # The new section marker
-    assert "weekly-loop" in body or "Cette semaine" in body
+    assert "weekly-loop" not in r.text
+
+    template = (
+        pathlib.Path(__file__).resolve().parent.parent
+        / "app/templates/progress.html"
+    ).read_text(encoding="utf-8")
+    template = re.sub(r"\{#.*?#\}", " ", template, flags=re.S)
+    assert "top_anomaly" in template
+    assert "tk.week_count" in template
+
+
+def test_the_weekly_producer_is_still_called_by_the_route():
+    """La décision porte sur le conteneur, jamais sur la capacité."""
+    pages = (
+        pathlib.Path(__file__).resolve().parent.parent / "app/routers/pages.py"
+    ).read_text(encoding="utf-8")
+    assert "build_weekly_loop(db, user)" in pages
 
 
 def test_progress_route_no_secret_leak(client):

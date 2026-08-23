@@ -167,6 +167,16 @@ class TemplateKPI:
     last_done_at: Optional[datetime]
     avg_success_score: Optional[float]
 
+    #: `TRAIN1-A` / A11 — séances de ce programme **dans la semaine ISO en
+    #: cours**, là où `n_completed` porte sur tout l'historique.
+    #:
+    #: Ce champ n'est PAS calculé ici : `compute_template_kpis` reste une
+    #: requête d'historique, et la fenêtre hebdomadaire est déjà produite par
+    #: `build_weekly_loop`. La surface les rapproche plutôt que d'ajouter un
+    #: second comptage — deux blocs disaient ce fait sur deux fenêtres, il n'en
+    #: reste qu'un, à deux colonnes.
+    week_count: int = 0
+
 
 @dataclass
 class RecentExerciseActivity:

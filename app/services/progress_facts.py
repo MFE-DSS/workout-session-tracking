@@ -50,6 +50,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.session import WorkoutSession
+from app.models.user import User
 
 
 def _offset(started_at: datetime, now: datetime) -> int:
@@ -102,6 +103,14 @@ class DayTrace:
     kind: str | None = None
     name: str | None = None
 
+    #: `TRAIN1-A` — la séance terminée de ce jour-là, quand il y en a une.
+    #:
+    #: C'est ce qui rend le niveau 2 du rail possible **sans nouvelle route** :
+    #: une trace `done` pointe vers la surface de séance qui existe déjà
+    #: (`/sessions/{id}/done`). Une trace `rest` n'a rien à ouvrir, et n'ouvre
+    #: donc rien — un lien vers le vide se lit comme une promesse.
+    session_id: int | None = None
+
 
 @dataclass(frozen=True)
 class ProgressFacts:
@@ -150,7 +159,33 @@ def _occupant(rows, now: datetime) -> dict[int, WorkoutSession]:
     return by_day
 
 
-def _day_traces(rows, now: datetime) -> list[DayTrace]:
+def _first_known_offset(created_at: datetime | None, now: datetime) -> int:
+    """Premier jour de la fenêtre où le compte existait.
+
+    `TRAIN1-A` — LE RAIL AFFIRMAIT DU REPOS AVANT L'EXISTENCE DU COMPTE.
+    `DayTrace` documente quatre natures depuis le premier jour, dont
+    ``none`` — « hors historique : le compte n'existait pas encore ». La
+    vue-modèle sait la rendre : classe `rail__c--void`, titre « hors
+    historique », phrase dédiée dans l'équivalent textuel.
+
+    **Ce producteur ne l'a jamais émise.** Mesuré : un compte créé la veille
+    rendait **quatorze traces `rest`**, c'est-à-dire treize affirmations
+    « il pouvait s'entraîner, il ne l'a pas fait » sur des jours où il n'avait
+    pas de compte. C'est le défaut que toute cette surface combat — une absence
+    habillée en mesure — et il survivait dans l'objet censé la rendre visible.
+
+    Trois chemins de code et une phrase du lecteur d'écran étaient donc morts,
+    et aucune garde ne l'avait vu : elles éprouvaient l'état ``none`` via une
+    fabrique de test, jamais via le producteur réel.
+    """
+    if created_at is None:
+        return 0
+    if created_at.tzinfo is None:
+        created_at = created_at.replace(tzinfo=now.tzinfo)
+    return max(0, min(WINDOW_DAYS, _offset(created_at, now)))
+
+
+def _day_traces(rows, now: datetime, first_known: int = 0) -> list[DayTrace]:
     """Les 14 traces, du plus ancien jour au plus récent.
 
     Extrait de `build_progress_facts` : `python:S3776` a mesuré une complexité
@@ -161,7 +196,19 @@ def _day_traces(rows, now: datetime) -> list[DayTrace]:
     days = []
     for off in range(WINDOW_DAYS):
         s = by_day.get(off)
-        if s is None:
+        sid = None
+        if s is None and off < first_known:
+            # Le compte n'existait pas : ni repos, ni séance. Rien à dire.
+            #
+            # ⚠ LA DONNÉE PASSE AVANT LA BORNE. Une séance enregistrée ce
+            # jour-là PROUVE que le compte existait, quoi qu'en dise
+            # `created_at` — un import, une reprise de données ou une horloge
+            # de travers ne doivent pas effacer une séance réelle. Tester
+            # `s is None` d'abord n'est pas un détail d'écriture : la première
+            # version testait la borne en premier et faisait disparaître des
+            # séances antérieures à la création du compte.
+            state, kind, name = "none", None, None
+        elif s is None:
             state, kind, name = "rest", None, None
         elif s.status == "in_progress":
             state, kind, name = "active", None, None
@@ -171,10 +218,11 @@ def _day_traces(rows, now: datetime) -> list[DayTrace]:
             state = "done"
             kind = s.template.kind if s.template else None
             name = s.template_name_snapshot
+            sid = s.id
         days.append(DayTrace(
             offset=off,
             label=(now - timedelta(days=WINDOW_DAYS - 1 - off)).strftime("%d/%m"),
-            state=state, kind=kind, name=name,
+            state=state, kind=kind, name=name, session_id=sid,
         ))
     return days
 
@@ -225,7 +273,14 @@ def build_progress_facts(
         .options(selectinload(WorkoutSession.template))
     ).scalars().all()
 
-    days = _day_traces(rows, now)
+    # `TRAIN1-A` — jusqu'où l'historique de ce compte remonte-t-il ?
+    # Sans cette borne, le rail affirme du repos sur des jours antérieurs à la
+    # création du compte : une absence de données rendue comme un choix de
+    # l'utilisateur.
+    created_at = db.execute(
+        select(User.created_at).where(User.id == user_id)
+    ).scalar_one_or_none()
+    days = _day_traces(rows, now, _first_known_offset(created_at, now))
 
     recent = db.execute(
         select(WorkoutSession.started_at, WorkoutSession.global_state)

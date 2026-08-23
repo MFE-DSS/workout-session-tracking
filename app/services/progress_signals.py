@@ -191,6 +191,56 @@ def build_progress_rail(facts: ProgressFacts) -> list[dict[str, Any]]:
     return cells
 
 
+#: Ce que chaque nature de jour donne à LIRE au niveau 2. Le rail ne montre
+#: qu'une densité ; ces mots portent ce que la densité tait.
+_L2_WORD = {
+    "done": "séance",
+    "active": "séance en cours",
+    "rest": "repos",
+    "none": "hors historique",
+}
+
+
+def build_rail_days(facts: ProgressFacts) -> list[dict[str, Any]]:
+    """Le niveau 2 du rail : quatorze lignes lisibles, du plus récent au plus
+    ancien.
+
+    `TRAIN1-A` — POURQUOI PAS UNE ROUTE PAR JOUR
+    ---------------------------------------------
+    Décision opérateur : « pas de nouvelle route jour ; le rail ouvre un L2
+    **local** ». Un jour n'est pas une entité du produit — il n'a ni cycle de
+    vie, ni page, ni contenu propre. Ce qu'il a, c'est **au plus une séance**,
+    et cette séance a déjà sa surface. Le L2 est donc une projection, pas une
+    destination : il donne à lire ce que les quatorze cellules taisent, et
+    renvoie vers l'objet réel quand il existe.
+
+    `href` n'est posé QUE sur un jour dont la séance est terminée et
+    identifiable. **Aucun lien sur un jour de repos** : un lien qui n'ouvre
+    rien est une promesse, et ce cockpit n'en fait pas.
+
+    L'ordre est **antéchronologique** — l'inverse du rail. Le rail se lit comme
+    une frise, de gauche à droite ; une liste se lit du plus pertinent au moins,
+    et le jour le plus récent est celui qu'on cherche.
+    """
+    rows = []
+    for d in reversed(facts.days):
+        word = _L2_WORD.get(d.state, "repos")
+        detail = d.name if d.state == "done" and d.name else None
+        kind = _KIND_WORD.get(d.kind or "") if d.state == "done" else None
+        rows.append({
+            "label": d.label,
+            "state": d.state,
+            "word": word,
+            "detail": detail,
+            "kind": kind,
+            # Une séance sans identifiant reste lisible, simplement pas
+            # ouvrable — on ne fabrique pas de cible.
+            "href": (f"/sessions/{d.session_id}/done"
+                     if d.state == "done" and d.session_id else None),
+        })
+    return rows
+
+
 #: Comment nommer un type de séance à l'oreille. Le rail le distingue par une
 #: texture ; un lecteur d'écran ne voit pas de texture.
 _KIND_WORD = {"strength": "musculation", "cardio": "cardio"}
@@ -266,11 +316,25 @@ def build_progress_signals(facts: ProgressFacts) -> list[dict[str, Any]]:
     return [_general_feeling(facts), _sessions(facts)]
 
 
+def has_any_trace(facts: ProgressFacts) -> bool:
+    """La fenêtre porte-t-elle quoi que ce soit à montrer ?
+
+    `TRAIN1-A` / A4 — c'est ce prédicat qui décide entre l'instrument et sa
+    forme compacte. « Aucune séance » ne veut pas dire « rien à dire » : une
+    séance ouverte est une trace, et un compte trop jeune pour la fenêtre est
+    une information. Seul un compte qui a vécu quatorze jours sans rien
+    enregistrer n'a **rien** à instrumenter.
+    """
+    return any(d.state in ("done", "active") for d in facts.days)
+
+
 __all__ = [
     "DECLARED_STATE_LABELS",
     "SUBJECTIVE_LABEL",
     "UNKNOWN_VALUE",
     "build_progress_rail",
     "build_progress_signals",
+    "build_rail_days",
     "build_rail_summary",
+    "has_any_trace",
 ]
