@@ -1,0 +1,157 @@
+{# `TRAIN1-B` / A10 — L'INSTRUMENT PROGRESSIF.
+
+   CE QU'IL REND, ET CE QU'IL REFUSE DE RENDRE.
+   Il rend, par exercice, la dernière performance contre la précédente :
+
+       Développé incliné haltères
+       70 × 10   →   72,5 × 10        +2,5 kg
+
+   Il ne rend PAS « 2 progressent · 1 stable ». Cette seconde formulation
+   exige un seuil au-delà duquel un écart « compte » — un seuil qui n'existe
+   nulle part dans ce produit. L'inventer ici en ferait une revendication.
+
+   AUCUNE COULEUR DE JUGEMENT. Un `+2,5 kg` est un fait ; « mieux » est une
+   appréciation, et elle est fausse dès qu'une charge baisse volontairement —
+   reprise, allègement, travail de technique. Le socle
+   `UIV3_COCKPIT_LADDER_01` réserve l'ambre à l'action de l'utilisateur ;
+   l'écart est produit par le système et reste neutre.
+
+   L'IDENTITÉ EST CELLE D'`A1`, PAS `(gabarit, code)`. Mesuré sur le
+   catalogue : 106 identités héritées pour 68 exercices, et
+   `Leg extensions assises` vit dans 4 gabarits sous 3 codes différents. Le
+   gabarit est rendu comme PROVENANCE lorsqu'un exercice en a franchi
+   plusieurs — jamais comme séparateur. #}
+
+{% if progression.any %}
+<h2 class="section-header">Progression par exercice</h2>
+
+{% if progression.rows %}
+<ul class="prog">
+  {% for r in progression.rows %}
+    <li class="prog__row">
+      <a class="prog__link" href="{{ r.href }}">
+        <span class="prog__name">{{ r.name }}</span>
+        <span class="prog__cmp">
+          <span class="prog__was">{{ r.previous }}</span>
+          <span class="prog__arrow" aria-hidden="true">→</span>
+          <span class="prog__sr sr-only">puis</span>
+          <span class="prog__now">{{ r.latest }}</span>
+        </span>
+      </a>
+      {% if r.parts or r.crossed %}
+        <div class="prog__meta">
+          {% for p in r.parts %}<span class="prog__delta">{{ p }}</span>{% endfor %}
+          {# Provenance, pas identité : on le dit seulement quand l'identité
+             stable a réuni plusieurs gabarits, sinon c'est du bruit. #}
+          {% if r.provenance %}
+            <span class="prog__prov">{{ r.provenance }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{# Ce qui n'a pas encore de comparaison. « Pas encore » n'est pas « pas de
+   progrès » — le libellé doit l'empêcher, et il porte sa raison. #}
+{% if progression.more or progression.awaiting or progression.unresolved %}
+<details class="prog__more">
+  <summary>
+    {% if progression.more %}{{ progression.more | length }} autre{% if progression.more | length > 1 %}s{% endif %} exercice{% if progression.more | length > 1 %}s{% endif %}{% endif %}
+    {%- if progression.more and (progression.awaiting or progression.unresolved) %} · {% endif -%}
+    {% if progression.awaiting %}{{ progression.awaiting | length }} sans comparaison{% endif %}
+    {%- if progression.unresolved %}{% if progression.more or progression.awaiting %} · {% endif %}{{ progression.unresolved }} non rattaché{% if progression.unresolved > 1 %}s{% endif %}{% endif %}
+  </summary>
+
+  {% if progression.more %}
+  <ul class="prog prog--folded">
+    {% for r in progression.more %}
+      <li class="prog__row">
+        <a class="prog__link" href="{{ r.href }}">
+          <span class="prog__name">{{ r.name }}</span>
+          <span class="prog__cmp">
+            <span class="prog__was">{{ r.previous }}</span>
+            <span class="prog__arrow" aria-hidden="true">→</span>
+            <span class="prog__now">{{ r.latest }}</span>
+          </span>
+        </a>
+        {% if r.parts %}
+          <div class="prog__meta">
+            {% for p in r.parts %}<span class="prog__delta">{{ p }}</span>{% endfor %}
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if progression.awaiting %}
+  <ul class="prog prog--awaiting">
+    {% for a in progression.awaiting %}
+      <li class="prog__row">
+        <span class="prog__name">{{ a.name }}</span>
+        <span class="prog__cmp"><span class="prog__now">{{ a.latest }}</span></span>
+        <div class="prog__meta"><span class="prog__why">{{ a.reason }}</span></div>
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {# Les occurrences non rattachées sont RENDUES, jamais tues. Les taire
+     ferait passer une couverture partielle pour une couverture totale — la
+     même faute que l'état `PARTIAL` de l'exposition anatomique ferme. #}
+  {% if progression.unresolved %}
+  <p class="prog__unresolved">
+    {{ progression.unresolved }} occurrence{% if progression.unresolved > 1 %}s{% endif %}
+    sous un nom qu'AUREN ne rattache à aucun exercice connu — donc hors
+    comparaison, jamais rapprochée du plus ressemblant.
+    {% if progression.unresolved_names %}
+      <span class="prog__names">{{ progression.unresolved_names | join(' · ') }}</span>
+    {% endif %}
+  </p>
+  {% endif %}
+</details>
+{% endif %}
+{% endif %}
+
+{# `TRAIN1-B` — LA VOIE CARDIO, SÉPARÉE ET SECONDAIRE.
+
+   Décision opérateur : ne pas forcer le cardio dans une identité
+   d'exercice. Le modèle le dit déjà — durée, bpm et type de machine vivent
+   sur `WorkoutSession`, pas sur `SessionExercise`. Ni série, ni charge, ni
+   répétition.
+
+   Fait primaire : la DURÉE. Contexte : le bpm moyen, rendu à côté et jamais
+   comparé. Comparaison uniquement à MACHINE IDENTIQUE — vingt minutes de
+   rameur et vingt minutes de tapis ne sont pas la même chose.
+
+   Les calories machine ne sont pas rendues, et ne sont même pas chargées :
+   estimations propriétaires, non comparables entre appareils. Ne pas les
+   avoir est plus solide qu'une note disant de ne pas s'en servir.
+
+   Aucun score, et aucun jugement : plus longtemps n'est pas mieux — ce peut
+   être une récupération voulue. #}
+{% if cardio.any %}
+<h2 class="section-header">Cardio · par machine</h2>
+<ul class="cardio">
+  {% for l in cardio.lanes %}
+    <li class="cardio__row">
+      <a class="cardio__link" href="{{ l.href }}">
+        <span class="cardio__machine">{{ l.machine }}</span>
+        <span class="cardio__dur">{{ l.duration }}</span>
+      </a>
+      <div class="cardio__meta">
+        {% if l.delta %}<span class="cardio__delta">{{ l.delta }}</span>{% endif %}
+        {% if l.bpm %}<span class="cardio__bpm">{{ l.bpm }}</span>{% endif %}
+      </div>
+    </li>
+  {% endfor %}
+  {% if cardio.untyped %}
+    <li class="cardio__row cardio__row--untyped">
+      <span class="cardio__machine">{{ cardio.untyped }} séance{% if cardio.untyped > 1 %}s{% endif %} sans machine renseignée</span>
+      <div class="cardio__meta"><span class="cardio__why">hors comparaison</span></div>
+    </li>
+  {% endif %}
+</ul>
+{% endif %}

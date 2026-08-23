@@ -239,17 +239,53 @@ def test_session_detail_links_exercise_code_to_history_page(client):
     assert "/exercise-history/push-a/E2" in body
 
 
-def test_progress_activity_rows_link_to_exercise_history(client):
+def test_progress_links_to_exercise_history_on_the_stable_identity(client):
+    """`TRAIN1-B` — RÉORIENTÉ, PAS AFFAIBLI.
+
+    Ce test assertait `/exercise-history/push-a/E2` sur `/progress` : le
+    drill-down par identité HÉRITÉE `(gabarit, code)`. Décision opérateur :
+    « converger le drill-down d'historique d'exercice sur la même identité
+    stable ; conserver les entrées héritées en compatibilité seulement ».
+
+    L'invariant — « depuis Progression on atteint l'historique d'un
+    exercice » — est intact. Ce qui change est la clé, et pour cause :
+    `Leg extensions assises` vit dans 4 gabarits sous 3 codes, donc l'ancienne
+    entrée ne menait jamais qu'à un quart de son histoire.
+    """
     _manual_session(
         template_slug="push-a",
         template_name="Push A",
         exercise_code="E2",
-        exercise_name="Incline Smith Chest Press",
+        exercise_name="Chest Press machine",
         work_sets=[{"weight_kg": 60.0, "reps": 10}],
         success_score=80,
     )
+    _manual_session(
+        template_slug="push-b",
+        template_name="Push B",
+        exercise_code="E1",
+        exercise_name="Chest Press machine",
+        work_sets=[{"weight_kg": 62.5, "reps": 10}],
+        success_score=80,
+    )
     body = client.get("/progress").text
-    assert "/exercise-history/push-a/E2" in body
+    assert "/exercise-history/chest-press-machine" in body
+
+
+def test_the_legacy_two_segment_entrypoint_still_answers(client):
+    """« conservées en compatibilité » veut dire qu'elles répondent encore :
+    des liens existants la visent, et casser une URL pour gagner de
+    l'élégance serait un mauvais échange."""
+    _manual_session(
+        template_slug="push-a",
+        template_name="Push A",
+        exercise_code="E2",
+        exercise_name="Chest Press machine",
+        work_sets=[{"weight_kg": 60.0, "reps": 10}],
+        success_score=80,
+    )
+    r = client.get("/exercise-history/push-a/E2", follow_redirects=False)
+    assert r.status_code == 200
 
 
 # ---------------------------------------------------------------------------

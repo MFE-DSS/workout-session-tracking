@@ -83,6 +83,77 @@ def _summarise(se: SessionExercise) -> tuple[ExerciseHistoryEntry, Optional[floa
     return entry, first_w, first_r
 
 
+def get_exercise_history_by_slug(
+    db: Session, slug: str, *, user_id: int | None = None
+) -> list[ExerciseHistoryEntry]:
+    """`TRAIN1-B` — le MÊME historique, sur l'identité stable d'`A1`.
+
+    Décision opérateur : « converger le drill-down d'historique d'exercice sur
+    la même identité stable ; conserver les entrées héritées en compatibilité
+    seulement ».
+
+    La fonction héritée ci-dessous compare sur `(template_slug,
+    exercise_code)`. Mesuré sur le catalogue : **106 identités héritées pour 68
+    exercices réels**, et `Leg extensions assises` vit dans **4 gabarits sous 3
+    codes différents**. Un même mouvement avait donc jusqu'à quatre historiques
+    séparés, et aucun ne le disait.
+
+    Ici, l'appartenance est décidée par `resolve_exercise` — correspondance
+    **exacte après normalisation**, alias canoniques compris. **Aucun
+    rapprochement approximatif** : un nom libre non résolu n'apparaît pas, il
+    n'est pas rattaché au plus ressemblant.
+
+    Le calcul des écarts est **partagé** avec la version héritée : deux
+    surfaces qui compareraient des points différents se contrediraient.
+    """
+    from app.services.exercise_identity import resolve_exercise
+
+    ses = db.execute(
+        select(SessionExercise)
+        .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(
+            WorkoutSession.user_id == user_id if user_id is not None else True,
+            WorkoutSession.status == "completed",
+            WorkoutSession.excluded_from_stats.is_(False),
+        )
+        .options(
+            selectinload(SessionExercise.set_logs),
+            joinedload(SessionExercise.session),
+        )
+        .order_by(WorkoutSession.started_at.desc())
+    ).unique().scalars().all()
+
+    kept = []
+    for se in ses:
+        name = se.substituted_name or se.exercise_name_snapshot or ""
+        found = resolve_exercise(db, name)
+        if found is not None and found.slug == slug:
+            kept.append(se)
+
+    entries = [_summarise(se)[0] for se in kept]
+    _attach_row_deltas(entries)
+    return entries
+
+
+def _attach_row_deltas(entries: list[ExerciseHistoryEntry]) -> None:
+    """Chaque ligne contre la suivante, plus ancienne. Extrait pour que les
+    deux entrées — héritée et par identité stable — partagent exactement la
+    même règle de comparaison."""
+    for i, entry in enumerate(entries):
+        if i + 1 >= len(entries):
+            continue
+        older = entries[i + 1]
+        if entry.first_weight is None and entry.first_reps is None:
+            continue
+        if older.first_weight is None and older.first_reps is None:
+            continue
+        entry.delta = compute_delta(
+            entry.first_weight, entry.first_reps, entry.success_score,
+            older.first_weight, older.first_reps, older.success_score,
+        )
+        entry.delta_label = format_delta(entry.delta) if entry.delta else None
+
+
 def get_exercise_history(
     db: Session,
     template_slug: str,
@@ -112,24 +183,11 @@ def get_exercise_history(
         entry, _, _ = _summarise(se)
         entries.append(entry)
 
-    # Deltas: for each row i, compare against row i+1 (next older)
-    # when both rows have a first_completed_work_set.
-    for i, entry in enumerate(entries):
-        if i + 1 >= len(entries):
-            continue
-        older = entries[i + 1]
-        if entry.first_weight is None and entry.first_reps is None:
-            continue
-        if older.first_weight is None and older.first_reps is None:
-            continue
-        entry.delta = compute_delta(
-            entry.first_weight,
-            entry.first_reps,
-            entry.success_score,
-            older.first_weight,
-            older.first_reps,
-            older.success_score,
-        )
-        entry.delta_label = format_delta(entry.delta)
+    # `TRAIN1-B` — LA RÈGLE DE COMPARAISON EST PARTAGÉE, PAS RECOPIÉE.
+    # Cette boucle était écrite ici et rien n'aurait signalé qu'elle diverge de
+    # celle de `get_exercise_history_by_slug`. Deux surfaces qui comparent des
+    # points différents se contredisent, et c'est précisément la classe de
+    # défaut que cette tranche ferme ailleurs.
+    _attach_row_deltas(entries)
 
     return entries

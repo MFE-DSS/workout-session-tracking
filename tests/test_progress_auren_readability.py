@@ -102,14 +102,38 @@ def test_progress_keeps_weekly_loop_and_kpis(client):
     assert "sessions terminées (30 j)" in html
 
 
-def test_progress_keeps_per_program_and_recent_activity(client):
+def test_progress_keeps_per_program_and_replaces_recent_activity(client):
+    """`TRAIN1-B` / A10 — RÉORIENTÉ VERS LA NOUVELLE VÉRITÉ, PAS AFFAIBLI.
+
+    Ce test assertait la présence de « Activité récente par exercice ». Ce
+    bloc listait, par exercice, la dernière charge et les dernières reps —
+    exactement ce que l'instrument progressif rend désormais, en le COMPARANT
+    à l'occurrence précédente.
+
+    Il était clavé sur l'identité HÉRITÉE `(gabarit, code)`. Vu au rendu :
+    « Chest Press machine » y apparaissait DEUX FOIS, une par gabarit — la
+    fragmentation qu'`A1` corrige, affichée comme deux exercices distincts.
+
+    L'invariant utile n'était pas « ce bloc existe » mais **« la surface rend
+    l'activité par exercice »**. C'est ce qui est asserté ici, et c'est plus
+    strict : le bloc dupliqué doit être ABSENT, et son remplaçant présent.
+    """
     from app.database import SessionLocal
 
     with SessionLocal() as db:
         _seed(db, _uid(db))
     html = _render(client)
     assert "Par programme" in html
-    assert "Activité récente par exercice" in html
+    assert "Activité récente par exercice" not in html
+    # « Back squat » n'appartient pas au catalogue : il ne se résout vers
+    # aucune identité, donc il n'est PAS comparé. La section se rend quand
+    # même — pour DIRE qu'une occurrence n'a pas été rattachée. La taire
+    # ferait passer une couverture nulle pour une absence de pratique.
+    assert "Progression par exercice" in html
+    # ⚠ Fragment qui ne traverse AUCUN retour à la ligne du gabarit : la
+    # première écriture cherchait « hors comparaison », coupé en deux par le
+    # rendu. Un test d'affichage qui échoue sur un pli est un faux échec.
+    assert "ne rattache à aucun exercice connu" in html
 
 
 def test_progress_keeps_technical_note(client):

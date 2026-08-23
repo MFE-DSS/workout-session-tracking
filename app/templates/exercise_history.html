@@ -4,12 +4,17 @@
 <a class="back" href="{{ url_for('progress') }}">← Progression</a>
 
 <header class="session-header">
+  {# `TRAIN1-B` — deux entrées, un seul gabarit.
+     L'entrée héritée porte `(gabarit, code)` ; l'entrée par identité stable
+     n'a NI l'un NI l'autre, parce qu'elle réunit potentiellement plusieurs
+     gabarits — le gabarit y est une provenance rendue ligne par ligne, jamais
+     un titre. Sans ces gardes, la page affichait littéralement « None ». #}
   <h1 class="page-title">
-    <span class="exercise-card__code">{{ exercise_code }}</span>
+    {% if exercise_code %}<span class="exercise-card__code">{{ exercise_code }}</span>{% endif %}
     {{ display_exercise_name }}
   </h1>
   <div class="session-header__meta">
-    <span>{{ display_template_name }}</span>
+    {% if display_template_name %}<span>{{ display_template_name }}</span>{% endif %}
     <span>{{ entries|length }} occurrence{% if entries|length > 1 %}s{% endif %}</span>
   </div>
   <p class="lede">
@@ -19,7 +24,8 @@
 
 {% if entries|length == 0 %}
   <p class="empty">
-    Aucune séance pour cet exercice dans ce template.
+    {% if template_slug %}Aucune séance pour cet exercice dans ce template.
+    {% else %}Aucune séance terminée pour cet exercice.{% endif %}
     Commence par <a href="{{ url_for('library') }}">démarrer une séance</a>.
   </p>
 {% else %}
