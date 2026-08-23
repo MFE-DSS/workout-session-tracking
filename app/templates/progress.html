@@ -12,8 +12,19 @@
    ce qui a été déclaré. #}
 <p class="lede">Lecture des séances terminées, de leur empreinte sur quatorze jours et de ce que tu as déclaré.</p>
 
-{# Sb_27.3 — Weekly training loop tile (count, dominantes, anomalie, hint) #}
-{% include "_partials/weekly_loop.html" %}
+{# `TRAIN1-A` / A11 — LE CONTENEUR `weekly_loop` A ÉTÉ RETIRÉ D'ICI.
+   Il rendait trois cartes en tête de page. Mesuré sur un compte peuplé :
+   « 3 séances cette semaine » + « Semaine précédente : 2 (+1) » répétaient ce
+   que la ligne « Séances » et les quatorze cellules du rail disent déjà —
+   précisément la cadence qu'`UX4_03D` déclarait absorbée par le rail, et qui
+   survivait dans ce bloc. Sur un compte vide, la même phrase « Pas encore
+   assez de données cette semaine » s'affichait DEUX FOIS dans la même carte.
+
+   Ses deux faits uniques partent dans la MÊME livraison (`CLAUDE.md §5.3`) :
+   la dominance hebdomadaire rejoint « Par programme » en seconde colonne,
+   l'anomalie devient une ligne de l'instrument temporel ci-dessous. Le service
+   `build_weekly_loop` n'est pas supprimé — la décision porte sur le conteneur,
+   pas sur les producteurs. #}
 
 {# ── `UX4_03B` — L'INSTRUMENT DES SIGNAUX, APRÈS L'AUDIT SÉMANTIQUE ──────────
    `UX4_03` rendait trois valeurs sur 100 avec leur jauge. L'audit
@@ -50,6 +61,19 @@
    de sa moitié droite contre sa moitié gauche EST cette comparaison. Deux
    nombres remplacés par les quatorze jours qui les composent — la preuve part
    dans la même livraison que le retrait (`CLAUDE.md §5.3`). #}
+{# `TRAIN1-A` / A4 — L'ÉTAT VIDE N'EST PAS L'INSTRUMENT AVEC DES BLANCS.
+   Sans une seule trace dans la fenêtre, l'instrument n'instrumente rien :
+   deux lignes de signaux, quatorze cellules identiques, un axe et une carte
+   d'exposition, pour un écran qui n'apprend rien. Il se réduit donc à UNE
+   ligne — un fait vrai, la fenêtre nommée, rien d'autre.
+
+   Pas de CTA ici. L'Accueil porte déjà l'appel à démarrer une séance, et
+   `home_training_state` a explicitement refusé de le dupliquer ; le rouvrir
+   sur Progression rejouerait la duplication que cette tranche ferme. #}
+{% if not has_traces %}
+<h2 class="section-header">Signaux d'entraînement</h2>
+<p class="empty-line">Aucune séance <span class="empty-line__win">· 14 j</span></p>
+{% else %}
 <h2 class="section-header">Signaux d'entraînement</h2>
 <dl class="signals">
   {% for s in signals %}
@@ -78,14 +102,66 @@
    Masquer un objet dont l'information n'existe nulle part ailleurs le rendrait
    visuel-seulement. `build_rail_summary` le rédige à partir des MÊMES
    `facts.days`, côté serveur, sans recalcul et sans une ligne de script. #}
-<div class="rail" aria-hidden="true">
-  {% for c in rail %}<span class="{{ c.cls }}" title="{{ c.title }}"></span>{% endfor %}
-</div>
-<p class="sr-only">{{ rail_summary }}</p>
+{# `TRAIN1-A` / A5 — LE RAIL DEVIENT INSPECTABLE, SANS NOUVELLE ROUTE.
+   Le détail jour par jour n'était atteignable par personne : ni à l'œil (les
+   `title` ne s'annoncent pas de façon fiable), ni au lecteur d'écran (la
+   synthèse donne le compte, pas la ligne). Le rail reste UN objet — quatorze
+   cibles de 25 px violeraient quatorze fois le standard produit de 44 px — et
+   c'est le `<summary>`, une cible pleine largeur, qui l'ouvre.
+
+   `<details>` est le socle SSR, pas un pis-aller : il fonctionne sans une
+   ligne de script, et un enrichissement interactif viendra par-dessus, jamais
+   à sa place. La cible visée reste *rail inspectable → détail temporel →
+   séance concernée* : la troisième marche est le lien ci-dessous, qui pointe
+   vers la surface de séance DÉJÀ EXISTANTE. #}
+<details class="rail-l2">
+  <summary class="rail-l2__summary">
+    <div class="rail" aria-hidden="true">
+      {% for c in rail %}<span class="{{ c.cls }}" title="{{ c.title }}"></span>{% endfor %}
+    </div>
+    <span class="sr-only">{{ rail_summary }} Ouvrir le détail jour par jour.</span>
+    <span class="rail-l2__chevron" aria-hidden="true"></span>
+  </summary>
+
+  {# Antéchronologique : le rail se lit comme une frise, une liste se lit du
+     plus pertinent au moins. Le jour cherché est le plus récent. #}
+  <ol class="rail-l2__days">
+    {% for d in rail_days %}
+      <li class="rail-l2__day rail-l2__day--{{ d.state }}">
+        <span class="rail-l2__date">{{ d.label }}</span>
+        {% if d.href %}
+          {# Lien UNIQUEMENT sur une séance terminée et identifiable. Un jour
+             de repos n'ouvre rien : un lien vers le vide est une promesse. #}
+          <a class="rail-l2__link" href="{{ d.href }}">{{ d.detail or d.word }}{% if d.kind %} · {{ d.kind }}{% endif %}</a>
+        {% else %}
+          <span class="rail-l2__word">{{ d.detail or d.word }}{% if d.kind %} · {{ d.kind }}{% endif %}</span>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ol>
+</details>
 <div class="rail__axis">
   <span>{{ rail[0].label }}</span>
   <span>aujourd'hui</span>
 </div>
+
+{# `TRAIN1-A` / A11 — L'ANOMALIE, ABSORBÉE, ET SEULEMENT QUAND ELLE EXISTE.
+   Elle occupait une carte entière qui, sans anomalie, rendait « Aucune
+   anomalie détectée » : un objet de pleine hauteur pour dire qu'il n'y a rien
+   à dire. C'est un fait UNIQUE — aucun autre bloc ne le porte — donc il est
+   conservé, mais comme une ligne de l'instrument temporel, et absente quand
+   il n'y a rien. #}
+{% if top_anomaly %}
+<p class="anomaly">
+  <span class="anomaly__tag">Anomalie</span>
+  {% if top_anomaly.exercise_name %}<strong>{{ top_anomaly.exercise_name }}</strong> — {% endif %}
+  {{ top_anomaly.label or top_anomaly.code }}
+  {% if top_anomaly.session_id %}
+    <a class="anomaly__link" href="/sessions/{{ top_anomaly.session_id }}/done">voir la séance</a>
+  {% endif %}
+</p>
+{% endif %}
+{% endif %}
 
 {# `UX4_03D` — l'instrument anatomique suit immédiatement le rail : « quand »
    puis « où », sur la même fenêtre de quatorze jours. #}
@@ -93,7 +169,13 @@
 
 {# UNE SEULE divulgation pour les trois provenances. `UX4_03` en écrivait une
    par signal — 77 mots pour dire trois fois la même chose : d'où vient le
-   chiffre. Repliée, elle ne coûte qu'une ligne. #}
+   chiffre. Repliée, elle ne coûte qu'une ligne.
+
+   `TRAIN1-A` — ELLE SUIT L'INSTRUMENT. Vu au rendu réel : sur un compte sans
+   séance, elle proposait d'expliquer le calcul de signaux qui n'étaient pas
+   affichés. Une explication sans objet est le symétrique de la promesse sans
+   réponse qu'`UX4_03` devait fermer. #}
+{% if has_traces %}
 <details class="signals__how">
   <summary>Comment AUREN calcule ces signaux</summary>
   <p><strong>Ressenti général</strong> — le mot que tu as choisi en répondant
@@ -102,14 +184,34 @@
   réponse n'est pas celle de ta dernière séance, sa date est affichée.</p>
   <p><strong>Séances</strong> — le nombre de séances terminées sur quatorze
   jours. Un comptage, pas une note : aucun objectif hebdomadaire n'est supposé.</p>
-  <p><strong>Cadence 7 j</strong> — les sept jours précédents, puis les sept
-  derniers, côte à côte. <strong>Un jour de repos ne casse rien</strong> :
-  aucune série de jours n'est comptée.</p>
+  {# `TRAIN1-A` — CE PARAGRAPHE DÉCRIVAIT « CADENCE 7 J », RETIRÉ PAR
+     `UX4_03D`. La divulgation documentait donc un signal absent de l'écran
+     depuis deux tranches. Elle décrit maintenant ce qui l'a remplacé. #}
+  <p><strong>Les quatorze traces</strong> — un jour par trace, du plus ancien
+  au plus récent. Une trace pleine est une séance terminée, un trait fin un
+  jour de repos, un pointillé un jour antérieur à ton compte.
+  <strong>Un jour de repos ne casse rien</strong> : aucune série de jours n'est
+  comptée. Ouvre le rail pour lire le détail jour par jour.</p>
 </details>
+{% endif %}
 
 {# Sx_UI_07.1 — readability pass : les KPI existants sont regroupés sous une
    section « Rythme récent » (lecture d'entraînement, pas cockpit). Aucune
    valeur/calcul changé — seuls le regroupement et la microcopy évoluent. #}
+{# `TRAIN1-A` / A4 — MÊME RÈGLE, MÊME ÉCRAN.
+   Mesuré au rendu réel : sur un compte sans séance, deux `kpi-card__value`
+   affichaient encore `—`. L'ordre opérateur dit « sans compteurs — », et la
+   règle vaut pour l'écran, pas pour un bloc choisi : un tiret est le rendu de
+   « rien à diviser », pas une mesure. Quatre cartes pour dire qu'il n'y a rien
+   à dire, c'est le même défaut que celui qu'on vient de retirer plus haut.
+
+   La fenêtre est ici de TRENTE jours, pas quatorze : le prédicat est donc
+   `completed_last_30`, pas `has_traces`. Confondre les deux rendrait la
+   section vide alors qu'elle a quelque chose à montrer. #}
+{% if not kpis.completed_last_30 %}
+<h2 class="section-header">Rythme récent</h2>
+<p class="empty-line">Aucune séance terminée <span class="empty-line__win">· 30 j</span></p>
+{% else %}
 <h2 class="section-header">Rythme récent</h2>
 <div class="kpi-grid">
   <div class="kpi-card">
@@ -141,6 +243,7 @@
     </div>
   </div>
 </div>
+{% endif %}
 
 <div class="cockpit-grid">
   <div class="card">
@@ -153,11 +256,16 @@
           <li class="template-kpi">
             <div class="template-kpi__row">
               <span class="template-kpi__name">{{ tk.name }}</span>
-              {# `UX4_03D` — fenêtre explicite. Ce compte porte sur TOUT
-                 l'historique ; « Séances dominantes », plus haut, porte sur la
-                 semaine. Deux nombres du même programme, deux fenêtres — sans
-                 le dire, l'écart se lit comme une incohérence. #}
-              <span class="template-kpi__count">{{ tk.n_completed }} session{% if tk.n_completed > 1 %}s{% endif %}</span>
+              {# `TRAIN1-A` / A11 — LES DEUX FENÊTRES SUR UNE SEULE LIGNE.
+                 « Séances dominantes · cette semaine » vivait plus haut, dans
+                 `weekly_loop`, et disait le même fait sur une autre fenêtre.
+                 `UX4_03D` avait rendu les deux explicites — le correctif le
+                 moins cher — sans supprimer la seconde lecture. Une ligne,
+                 deux comptes, aucun fait perdu, un bloc de moins. #}
+              <span class="template-kpi__count">
+                {% if tk.week_count %}<span class="template-kpi__week">{{ tk.week_count }}× cette sem.</span>{% endif %}
+                <span>{{ tk.n_completed }} session{% if tk.n_completed > 1 %}s{% endif %}</span>
+              </span>
             </div>
             <div class="template-kpi__meta">
               {# `UX4_03D` — fenêtre explicite (`OPERATOR_DECISION` 3), placée

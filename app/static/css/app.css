@@ -1900,6 +1900,165 @@ input, button, textarea, select {
     90deg, var(--fg-dim) 0 2px, transparent 2px 4px);
 }
 
+/* ── `TRAIN1-A` / A4 — L'ÉTAT VIDE, EN UNE LIGNE ─────────────────────────────
+ * Pas une carte, pas une hauteur d'instrument : une ligne. Sans trace dans la
+ * fenêtre, l'instrument n'instrumente rien, et un panneau plein n'apprend
+ * qu'une chose — qu'il est vide.
+ *
+ * Aucun CTA : l'Accueil porte déjà l'appel à démarrer, et le dupliquer ici
+ * rejouerait la duplication que cette tranche ferme.
+ */
+.empty-line {
+  margin: 0 0 var(--space-md);
+  font-size: 15px;
+  color: var(--fg-dim);
+}
+
+.empty-line__win {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
+/* ── `TRAIN1-A` / A11 — L'ANOMALIE ABSORBÉE ──────────────────────────────────
+ * Une ligne, pas une carte. Elle ne se rend que lorsqu'il y a une anomalie :
+ * l'objet qui annonçait « Aucune anomalie détectée » occupait une carte
+ * entière pour dire qu'il n'avait rien à dire.
+ */
+.anomaly {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  margin: 0 0 var(--space-md);
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+.anomaly__tag {
+  flex: none;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+
+.anomaly__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--accent);
+}
+
+/* Le compte hebdomadaire, absorbé depuis `weekly_loop`, se distingue du compte
+ * d'historique sans crier : deux fenêtres sur une ligne, hiérarchisées. */
+
+/* ── `TRAIN1-A` / A5 — LE RAIL S'OUVRE, EN RESTANT UN SEUL OBJET ─────────────
+ * Le `<summary>` est la cible : pleine largeur, hauteur ≥ 44 px avec le rail
+ * à l'intérieur. Les quatorze traces restent décoratives et non tactiles —
+ * les rendre cliquables violerait quatorze fois le standard produit de 44 px,
+ * ce que la note du bloc ci-dessus refuse déjà.
+ *
+ * Aucune couleur neuve : tout vient des tokens existants.
+ */
+.rail-l2 {
+  margin-bottom: var(--space-xs);
+}
+
+.rail-l2__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-xs) 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.rail-l2__summary::-webkit-details-marker { display: none; }
+
+.rail-l2__summary .rail {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Chevron en CSS pur — pas d'asset, pas de glyphe dépendant de la police. */
+.rail-l2__chevron {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--fg-dim);
+  border-bottom: 1.5px solid var(--fg-dim);
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 120ms ease;
+}
+
+.rail-l2[open] .rail-l2__chevron {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-l2__chevron { transition: none; }
+}
+
+.rail-l2__summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.rail-l2__days {
+  list-style: none;
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rail-l2__day {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  min-height: 32px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.rail-l2__day:last-child { border-bottom: none; }
+
+/* Un jour hors historique se distingue d'un jour de repos : l'un est une
+ * absence de compte, l'autre un choix. Les confondre est le défaut que ce
+ * niveau 2 rend enfin visible. */
+.rail-l2__day--rest .rail-l2__word,
+.rail-l2__day--none .rail-l2__word {
+  color: var(--fg-dim);
+}
+
+.rail-l2__day--none { opacity: 0.6; }
+
+.rail-l2__date {
+  flex: none;
+  min-width: 48px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+
+/* La cible du lien couvre la ligne : 44 px de haut en tapant n'importe où. */
+.rail-l2__link {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  flex: 1;
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.rail-l2__link:hover,
+.rail-l2__link:focus-visible {
+  border-bottom-color: var(--accent);
+}
+
 .rail__axis {
   display: flex;
   justify-content: space-between;
@@ -2105,12 +2264,42 @@ input, button, textarea, select {
 .template-kpi__name {
   font-weight: 600;
   font-size: 14px;
+  /* `TRAIN1-A` — le nom prend la place restante ; sans `min-width: 0` un nom
+   * long refuse de se replier et pousse la colonne de droite hors de la carte. */
+  flex: 1;
+  min-width: 0;
 }
 
+/* `TRAIN1-A` / A11 — DEUX FENÊTRES, EMPILÉES ET ALIGNÉES À DROITE.
+ *
+ * ⚠ VU AU RENDU, PAS DÉDUIT. La première écriture posait les deux comptes côte
+ * à côte dans le flux : à 390 px « 1× cette sem. » s'écrasait contre le nom du
+ * programme ET contre « 2 sessions ». Les nombres d'une colonne se lisent l'un
+ * SOUS l'autre.
+ *
+ * ⚠ ET ÉCRITE ICI, PAS PLUS HAUT. Posée près du bloc du rail (ligne ~1950),
+ * cette règle était écrasée par la définition d'origine qui suit dans le
+ * fichier — même spécificité, la dernière gagne. Le correctif n'avait aucun
+ * effet, et rien ne l'aurait signalé.
+ */
 .template-kpi__count {
   font-family: var(--font-mono);
   font-size: 13px;
   color: var(--fg-muted);
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding-left: var(--space-sm);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.template-kpi__week {
+  color: var(--fg-dim);
+  font-size: 11px;
+  letter-spacing: 0.02em;
 }
 
 .template-kpi__meta {

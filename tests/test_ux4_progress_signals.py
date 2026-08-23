@@ -577,11 +577,46 @@ def test_the_page_promises_only_what_it_shows(client):
 # ───────── outillage ─────────
 
 
+def _with_traces(client, uid: int = 1):
+    """Donne au compte du harnais de quoi instrumenter.
+
+    `TRAIN1-A` / A4 — POURQUOI CE HELPER EXISTE MAINTENANT.
+    Le `conftest` crée un utilisateur **sans aucune séance**, et `/progress`
+    rend depuis cette tranche un état COMPACT quand la fenêtre ne porte aucune
+    trace : une ligne « Aucune séance · 14 j », ni signaux ni rail. Les gardes
+    ci-dessous éprouvent l'INSTRUMENT ; elles doivent donc le faire exister.
+
+    Ce n'est pas un affaiblissement : leur invariant — « rien à l'écran ne
+    prétend savoir plus que le calcul » — est inchangé, et il porte désormais
+    sur l'état où l'instrument se rend vraiment.
+    """
+    from datetime import UTC, datetime, timedelta
+
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.models.user import User
+
+    now = datetime.now(UTC)
+    with SessionLocal() as db:
+        u = db.get(User, uid)
+        # Un compte créé à l'instant rend légitimement quatorze jours « hors
+        # historique » depuis cette tranche.
+        u.created_at = now - timedelta(days=90)
+        db.add(WorkoutSession(
+            user_id=uid, template_slug_snapshot="s",
+            template_name_snapshot="Push A",
+            started_at=now - timedelta(days=2), status="completed",
+            excluded_from_stats=False, global_state="good",
+        ))
+        db.commit()
+    return client
+
+
 def _signals_section(client) -> str:
     """La section des signaux seule — le reste de Progression contient des
     jauges et des pourcentages légitimes qui ne relèvent pas de cette tranche.
     """
-    body = client.get("/progress").text
+    body = _with_traces(client).get("/progress").text
     start = body.index('class="signals"')
     return body[start:body.index("Rythme récent")]
 
@@ -747,8 +782,14 @@ def test_the_rail_is_one_object_not_fourteen_targets(client):
     """À 390 px une trace fait ~25 px. La rendre tactile passerait l'exception
     d'espacement WCAG 2.2 AA et violerait QUATORZE FOIS le standard produit
     AUREN de 44 px. Un instrument neuf ne se bâtit pas sur des dérogations."""
-    body = client.get("/progress").text
-    section = body[body.index('class="rail"'):body.index('class="rail__axis"')]
+    body = _with_traces(client).get("/progress").text
+    # `TRAIN1-A` / A5 — le rail s'ouvre désormais, mais l'invariant tient : la
+    # cible est le `<summary>` pleine largeur, jamais les quatorze traces. On
+    # borne donc la lecture au `<div class="rail">` lui-même, pas au bloc
+    # jusqu'à l'axe — qui contient maintenant le niveau 2, et ses liens
+    # LÉGITIMES vers les séances.
+    start = body.index('<div class="rail"')
+    section = body[start:body.index("</div>", start)]
     for interactive in ("<a ", "<button", "onclick", "tabindex"):
         assert interactive not in section, (
             f"les traces du rail sont devenues des cibles : {interactive}"
@@ -767,7 +808,7 @@ def test_the_hidden_rail_has_a_server_rendered_textual_equivalent(client):
     l'historique, type de séance. Masquer un objet dont l'information n'existe
     nulle part ailleurs le rend visuel-seulement.
     """
-    body = client.get("/progress").text
+    body = _with_traces(client).get("/progress").text
     assert 'class="rail" aria-hidden="true"' in body, "le rail n'est plus masqué"
 
     start = body.index('class="rail" aria-hidden')

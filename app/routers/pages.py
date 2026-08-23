@@ -716,7 +716,9 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     from app.services.progress_signals import (
         build_progress_rail,
         build_progress_signals,
+        build_rail_days,
         build_rail_summary,
+        has_any_trace,
     )
     from app.services.zone_exposure import (
         build_zone_exposure,
@@ -727,6 +729,27 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     signals = build_progress_signals(facts)
     rail = build_progress_rail(facts)
     rail_summary = build_rail_summary(facts)
+    # `TRAIN1-A` / A5 — le niveau 2 du rail, rendu côté serveur. Pas de route
+    # jour : une projection locale des mêmes `facts.days`, qui renvoie vers la
+    # surface de séance déjà existante quand il y en a une.
+    rail_days = build_rail_days(facts)
+    # `TRAIN1-A` / A4 — l'instrument ou sa forme compacte. Le gabarit n'a pas à
+    # redécider ce que le service sait déjà.
+    has_traces = has_any_trace(facts)
+
+    # `TRAIN1-A` / A11 — LA DOMINANCE HEBDOMADAIRE REJOINT « PAR PROGRAMME ».
+    #
+    # Deux blocs disaient le même fait sur deux fenêtres : « Séances
+    # dominantes · cette semaine » dans `weekly_loop`, et « Par programme ·
+    # historique » plus bas. `UX4_03D` avait rendu les deux fenêtres
+    # explicites — le moins cher des correctifs — sans supprimer la seconde
+    # lecture. Une seule liste, deux colonnes : aucun fait perdu, un bloc et
+    # une carte de moins.
+    _this_week = {
+        t["name"]: t["count"] for t in (weekly.get("dominant_templates") or [])
+    }
+    for tk in template_kpis:
+        tk.week_count = _this_week.get(tk.name, 0)
 
     # `UX4_03D` — « où ai-je travaillé pendant les MÊMES quatorze jours ? ».
     # Même fenêtre que le rail : deux instruments côte à côte sur des fenêtres
@@ -744,10 +767,26 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "quality_svg": quality_svg,
             "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db, user.id),
-            "weekly": weekly,
+            # `TRAIN1-A` / A11 — LE CONTENEUR `weekly_loop` EST RETIRÉ.
+            #
+            # Il rendait trois cartes en tête de Progression, dont deux
+            # duplications mesurées : « 3 séances cette semaine » et « Semaine
+            # précédente : 2 (+1) » répétaient ce que la ligne « Séances » et
+            # les quatorze cellules du rail disent déjà — c'est exactement la
+            # cadence qu'`UX4_03D` déclarait absorbée par le rail, et qui
+            # survivait ici. Sur un compte vide, la même phrase « Pas encore
+            # assez de données cette semaine » s'affichait DEUX FOIS dans la
+            # même carte.
+            #
+            # Les producteurs ne sont pas supprimés : `build_weekly_loop` reste
+            # appelé, et ses deux faits UNIQUES sont absorbés — l'anomalie
+            # ci-dessous, la dominance hebdomadaire dans « Par programme ».
+            "top_anomaly": weekly.get("top_anomaly"),
             "signals": signals,
             "rail": rail,
             "rail_summary": rail_summary,
+            "rail_days": rail_days,
+            "has_traces": has_traces,
             "exposure": exposure,
         },
     )

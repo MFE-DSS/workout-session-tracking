@@ -61,11 +61,25 @@ def _mk_session(
 
 
 def test_progress_renders_with_empty_db(client):
+    """`TRAIN1-A` / A4 — RÉORIENTÉ, PAS AFFAIBLI.
+
+    Ce test assertait « sessions cette semaine », c'est-à-dire la présence de
+    la grille de KPI. Sur une base vide elle rendait deux valeurs à `—` : le
+    tiret est le rendu de « rien à diviser », pas une mesure, et l'ordre
+    opérateur dit « sans compteurs — ». La grille se réduit donc à une ligne.
+
+    L'invariant utile n'était pas « cette grille existe » mais **« la page se
+    rend sans données, et le dit »**. C'est ce qui est asserté maintenant, et
+    c'est plus strict : la ligne compacte DOIT être là, et aucun `—` ne doit
+    survivre comme valeur de KPI.
+    """
     r = client.get("/progress")
     assert r.status_code == 200
     body = r.text
     assert "Progression" in body
-    assert "sessions cette semaine" in body
+    assert 'class="empty-line"' in body
+    assert "Aucune séance terminée" in body
+    assert 'class="kpi-card__value">\n      —' not in body
     # Empty state for per-template list
     assert "Aucune session terminée" in body
 
