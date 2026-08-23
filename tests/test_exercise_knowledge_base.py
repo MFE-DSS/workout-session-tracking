@@ -204,6 +204,114 @@ def test_ekb01_coverage_audit_still_green():
     assert report["canonical_count"] == 103
 
 
+# ───────── Sb_EKB_ORTHOGRAPHIC_ALIAS_01 — deux écritures, une vérité ─────────
+#
+# LE DÉFAUT QU'AUCUNE GARDE NE VOYAIT. L'EKB portait 103 entrées pour 102
+# exercices : `Curl marteau câble (corde)` et `Curl marteau câble corde`
+# désignent le même mouvement, et se CONTREDISAIENT —
+# `zone_primary: biceps` / `confidence: measured` d'un côté, `None` / `derived`
+# de l'autre. Le même exercice était donc cartographié ou non **selon
+# l'orthographe rencontrée**, dans la base dite canonique.
+#
+# Aucune source amont ne justifiait cet écart : `exercise_properties` porte les
+# deux orthographes avec un contenu identique, et `classify_exercise` rend
+# `biceps` pour les deux. C'était un défaut de CONSTRUCTION.
+#
+# Les 19 gardes existantes vérifiaient l'unicité des `variant_key`, la
+# répartition covered/gap, la réconciliation des zones — jamais l'accord entre
+# deux écritures d'un même nom. Cette garde ferme ce trou.
+#
+# ⚠ PORTÉE. La décision opérateur du 2026-08-23 **ne se généralise pas** aux 17
+# autres candidats de quasi-doublon relevés par l'audit A1 : distinguer
+# « Hip thrust Smith » de « Hip thrust Smith machine » reste un jugement
+# produit. Cette garde ne teste que l'égalité APRÈS normalisation stricte, ce
+# qui n'attrape que les écarts de ponctuation, d'accent et de casse — jamais
+# une différence de mots.
+
+#: Champs de cartographie qui doivent s'accorder entre deux écritures d'un même
+#: nom. `variant_key` en est EXCLU : il est distinct par construction et sert
+#: de clé de variante, pas d'identité — l'aligner créerait une collision.
+_MAPPING_FIELDS = (
+    "movement_pattern", "equipment_family", "chain",
+    "zone_primary", "zone_macro", "coverage_status", "confidence",
+)
+
+
+def _normalized_groups() -> dict[str, list[str]]:
+    from app.services.exercise_identity import normalize
+
+    groups: dict[str, list[str]] = {}
+    for name in _exercises():
+        groups.setdefault(normalize(name), []).append(name)
+    return {k: v for k, v in groups.items() if len(v) > 1}
+
+
+def test_two_spellings_of_one_name_never_disagree():
+    """La garde qui aurait attrapé la contradiction, si elle avait existé."""
+    exercises = _exercises()
+    conflicts: list[str] = []
+    for names in _normalized_groups().values():
+        first = names[0]
+        for other in names[1:]:
+            for field in _MAPPING_FIELDS:
+                if exercises[first][field] != exercises[other][field]:
+                    conflicts.append(
+                        f"{field}: {first!r}={exercises[first][field]!r} vs "
+                        f"{other!r}={exercises[other][field]!r}"
+                    )
+    assert conflicts == [], (
+        "deux écritures d'un même nom portent des cartographies différentes — "
+        f"l'exercice serait décrit selon l'orthographe rencontrée : {conflicts}"
+    )
+
+
+def test_the_known_orthographic_pair_is_still_the_only_one():
+    """Un doublon d'orthographe NEUF doit se faire remarquer, pas se fondre
+    dans une garde d'accord déjà satisfaite."""
+    assert {tuple(sorted(v)) for v in _normalized_groups().values()} == {
+        ("Curl marteau câble (corde)", "Curl marteau câble corde")
+    }
+
+
+def test_the_alias_entry_records_why_it_was_aligned():
+    """Sans la note, le prochain lecteur croira à deux exercices distincts."""
+    for name in ("Curl marteau câble (corde)", "Curl marteau câble corde"):
+        note = _exercises()[name]["curation_note"]
+        assert note is not None, name
+        assert "ORTHOGRAPHIC_ALIAS" in note, name
+
+
+def test_both_spellings_are_kept_history_is_not_rewritten():
+    """Décision opérateur : **préserver les chaînes historiques.** Supprimer
+    l'alias casserait toute donnée déjà écrite avec cette orthographe."""
+    exercises = _exercises()
+    assert "Curl marteau câble (corde)" in exercises
+    assert "Curl marteau câble corde" in exercises
+    assert len(exercises) == 103
+
+
+def test_the_two_spellings_resolve_to_a_single_exercise_identity():
+    """L'autorité d'identité reste `exercise_aliases`, pas l'EKB. Les 103
+    entrées produisent **102** identités, et c'est la forme du catalogue qui
+    porte le nom."""
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from app.database import Base
+    from app.services.exercise_identity import resolve_exercise
+    from app.services.seed_exercise_identity import seed_exercise_identity
+
+    engine = create_engine("sqlite://")
+    Base.metadata.create_all(engine)
+    with sessionmaker(bind=engine)() as db:
+        report = seed_exercise_identity(db)
+        assert report.total == 102
+        canon = resolve_exercise(db, "Curl marteau câble (corde)")
+        alias = resolve_exercise(db, "Curl marteau câble corde")
+        assert canon.id == alias.id
+        assert canon.name == "Curl marteau câble (corde)"
+
+
 def test_alembic_head_unchanged():
     from alembic.config import Config
     from alembic.script import ScriptDirectory

@@ -289,7 +289,7 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": "Sb_EKB_ORTHOGRAPHIC_ALIAS_01 — forme canonique. « Curl marteau câble corde » en est un alias orthographique et porte désormais la même cartographie."
     },
     "Curl marteau câble corde": {
       "canonical_name": "Curl marteau câble corde",
@@ -297,15 +297,15 @@
       "variant_group": null,
       "movement_pattern": "isolation_upper",
       "equipment_family": "cable",
-      "zone_primary": null,
-      "zone_macro": null,
+      "zone_primary": "biceps",
+      "zone_macro": "arms",
       "chain": "isolation",
       "machine_slug": null,
       "machine_family": null,
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
-      "confidence": "derived",
-      "curation_note": null
+      "confidence": "measured",
+      "curation_note": "Sb_EKB_ORTHOGRAPHIC_ALIAS_01 — alias orthographique de « Curl marteau câble (corde) ». Cartographie alignée sur la canonique : les deux sources amont (exercise_properties, classify_exercise) rendent des valeurs IDENTIQUES pour les deux orthographes ; le null précédent n'était justifié par aucune d'elles. Autorité d'identité : table exercise_aliases. Chaîne historique préservée."
     },
     "Curl marteau haltères": {
       "canonical_name": "Curl marteau haltères",
