@@ -2069,6 +2069,184 @@ input, button, textarea, select {
   border-bottom-color: var(--accent);
 }
 
+/* ── `TRAIN1-B` / A10 — INSTRUMENT PROGRESSIF ────────────────────────────────
+ *
+ * AUCUNE COULEUR DE JUGEMENT, et c'est le point. Un `+2,5 kg` est un fait ;
+ * « mieux » est une appréciation, fausse dès qu'une charge baisse
+ * volontairement. Pas de vert, pas de rouge, pas de flèche montante : l'écart
+ * est rendu dans le vocabulaire neutre du système.
+ *
+ * Aucune couleur neuve : `--fg`, `--fg-muted`, `--fg-dim`, `--border`,
+ * `--accent` pour la seule affordance.
+ *
+ * Écrit ICI — après le bloc du rail, avant l'axe — et non plus haut : un
+ * correctif de TRAIN1-A avait été posé en amont de la définition d'origine et
+ * s'était fait écraser en silence, même spécificité, la dernière gagne.
+ */
+.prog {
+  list-style: none;
+  margin: 0 0 var(--space-md);
+  padding: 0;
+}
+
+.prog__row {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 0;
+}
+
+.prog__row:last-child { border-bottom: none; }
+
+/* La ligne entière est la cible : 44 px de haut, en tapant n'importe où. */
+.prog__link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: 44px;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.prog__link:hover .prog__name,
+.prog__link:focus-visible .prog__name {
+  border-bottom: 1px solid var(--accent);
+}
+
+.prog__name {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* Les deux performances se lisent comme une comparaison, pas comme deux
+ * nombres voisins : mono et tabulaire pour que les colonnes s'alignent d'une
+ * ligne à l'autre. */
+.prog__cmp {
+  flex: none;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* L'ancien est en retrait, le récent au premier plan. La hiérarchie porte le
+ * sens de lecture — pas une couleur qui porterait un verdict. */
+.prog__was { color: var(--fg-dim); }
+.prog__arrow { color: var(--fg-dim); }
+.prog__now { color: var(--fg); }
+
+.prog__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  padding-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.prog__delta { color: var(--fg-muted); }
+
+/* Provenance, pas identité — visuellement en retrait de l'écart. */
+.prog__prov,
+.prog__why { color: var(--fg-dim); }
+
+.prog--awaiting .prog__row,
+.prog--folded .prog__row { padding: 4px 0; }
+
+.prog--awaiting .prog__name { font-weight: 400; color: var(--fg-muted); }
+
+.prog__more { margin-bottom: var(--space-md); }
+
+.prog__more > summary {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--fg-muted);
+  cursor: pointer;
+}
+
+.prog__unresolved {
+  margin: var(--space-sm) 0 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+.prog__names {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+}
+
+/* ── `TRAIN1-B` — VOIE CARDIO, SECONDAIRE ────────────────────────────────────
+ * Une ligne par machine, jamais de total inter-machines : additionner du
+ * rameur et du tapis produirait un nombre sans référent.
+ */
+.cardio-lane {
+  list-style: none;
+  margin: 0 0 var(--space-md);
+  padding: 0;
+}
+
+.cardio-lane__row {
+  border-bottom: 1px solid var(--border);
+  padding: 6px 0;
+}
+
+.cardio-lane__row:last-child { border-bottom: none; }
+
+.cardio-lane__link {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: 44px;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.cardio-lane__link:hover .cardio-lane__machine,
+.cardio-lane__link:focus-visible .cardio-lane__machine {
+  border-bottom: 1px solid var(--accent);
+}
+
+.cardio-lane__machine {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.cardio-lane__dur {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cardio-lane__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  padding-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.cardio-lane__delta { color: var(--fg-muted); }
+
+/* Le bpm est un CONTEXTE. En retrait, jamais comparé. */
+.cardio-lane__bpm,
+.cardio-lane__why { color: var(--fg-dim); }
+
+.cardio-lane__row--untyped .cardio-lane__machine {
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+
 .rail__axis {
   display: flex;
   justify-content: space-between;
@@ -2756,6 +2934,9 @@ input, button, textarea, select {
   line-height: 1.4;
 }
 
+/* Note de cardio d'un gabarit (`template_detail.html`). PRÉEXISTANTE et
+ * intacte : c'est elle qui possède le nom `.cardio`, et c'est pour cela que
+ * la voie cardio de `TRAIN1-B` s'appelle `.cardio-lane`. */
 .cardio {
   margin: 0 0 var(--space-md);
   color: var(--fg-dim);

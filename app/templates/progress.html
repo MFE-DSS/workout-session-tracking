@@ -167,6 +167,12 @@
    puis « où », sur la même fenêtre de quatorze jours. #}
 {% include "_partials/zone_exposure.html" %}
 
+{# `TRAIN1-B` / A10 — « quand », puis « où », puis « quoi ».
+   L'instrument progressif suit l'exposition anatomique : le rail dit quand on
+   s'est entraîné, la silhouette où, et ceci ce qui a bougé. Trois questions,
+   trois instruments, dans l'ordre où on se les pose. #}
+{% include "_partials/progression.html" %}
+
 {# UNE SEULE divulgation pour les trois provenances. `UX4_03` en écrivait une
    par signal — 77 mots pour dire trois fois la même chose : d'où vient le
    chiffre. Repliée, elle ne coûte qu'une ligne.
@@ -287,39 +293,22 @@
     {% endif %}
   </div>
 
-  <div class="card">
-    <h2 class="card__title">Activité récente par exercice</h2>
-    {% if recent_activity|length == 0 %}
-      <p class="empty">Aucune activité sur les 30 derniers jours.</p>
-    {% else %}
-      <ul class="activity-list">
-        {% for a in recent_activity %}
-          <li>
-            <a
-              class="activity-row"
-              href="{{ url_for('exercise_history_detail', template_slug=a.template_slug, exercise_code=a.exercise_code) }}"
-            >
-              <div class="activity-row__head">
-                <span class="activity-row__code">{{ a.exercise_code }}</span>
-                <span class="activity-row__name">{{ a.exercise_name }}</span>
-                <span class="activity-row__count">{{ a.n_sessions_30d }}×</span>
-              </div>
-              <div class="activity-row__meta">
-                <span class="activity-row__template">{{ a.template_name }}</span>
-                <span>· {{ a.last_done_at.strftime('%d/%m') }}</span>
-                {% if a.last_weights_str %}
-                  <span>· {{ a.last_weights_str }} kg</span>
-                {% endif %}
-                {% if a.last_reps_str %}
-                  <span>· {{ a.last_reps_str }} reps</span>
-                {% endif %}
-              </div>
-            </a>
-          </li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  </div>
+  {# `TRAIN1-B` / A10 — « ACTIVITÉ RÉCENTE PAR EXERCICE » EST RETIRÉE.
+
+     Elle listait, par exercice, la dernière charge et les dernières reps sur
+     trente jours. L'instrument progressif ci-dessus rend les MÊMES faits et
+     va plus loin : il les COMPARE à l'occurrence précédente.
+
+     Elle était en outre clavetée sur l'identité HÉRITÉE
+     `(gabarit, code d'exercice)`. Vu au rendu, sur un compte de test :
+     « Chest Press machine » y apparaissait DEUX FOIS, une par gabarit — la
+     fragmentation même qu'`A1` corrige, affichée comme deux exercices
+     distincts. Et son lien menait vers l'historique partiel de l'un des deux.
+
+     Ce n'est pas une soustraction seule (`CLAUDE.md §5.3`) : le remplacement
+     part dans la MÊME livraison, et il est strictement plus riche — même
+     faits, identité entière, écart calculé, drill-down convergé. La route
+     héritée reste servie pour les liens existants. #}
 </div>
 
 {% if quality_svg %}

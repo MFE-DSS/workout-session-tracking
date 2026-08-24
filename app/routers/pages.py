@@ -737,6 +737,25 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     # redécider ce que le service sait déjà.
     has_traces = has_any_trace(facts)
 
+    # `TRAIN1-B` / A10 — L'INSTRUMENT PROGRESSIF.
+    #
+    # Identité analytique = celle d'`A1`, pas `(gabarit, code)`. Mesuré sur le
+    # catalogue : 106 identités héritées pour 68 exercices réels, et
+    # `Leg extensions assises` vit dans 4 gabarits sous 3 codes différents.
+    # Le gabarit devient une PROVENANCE.
+    #
+    # Le cardio est une voie SÉPARÉE, au niveau séance : ses données vivent sur
+    # `WorkoutSession`, pas sur `SessionExercise`, et il n'a ni série ni charge.
+    from app.services.cardio_lane import build_cardio_facts
+    from app.services.progression_facts import build_progression_facts
+    from app.services.progression_view import (
+        build_cardio_view,
+        build_progression_view,
+    )
+
+    progression = build_progression_view(build_progression_facts(db, user.id))
+    cardio = build_cardio_view(build_cardio_facts(db, user.id))
+
     # `TRAIN1-A` / A11 — LA DOMINANCE HEBDOMADAIRE REJOINT « PAR PROGRAMME ».
     #
     # Deux blocs disaient le même fait sur deux fenêtres : « Séances
@@ -788,6 +807,8 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "rail_days": rail_days,
             "has_traces": has_traces,
             "exposure": exposure,
+            "progression": progression,
+            "cardio": cardio,
         },
     )
 

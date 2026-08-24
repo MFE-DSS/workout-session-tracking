@@ -38,6 +38,7 @@ from app.routers import (
     user_programs,
 )
 from app.services.seed import seed_method_rules, seed_reference_split
+from app.services.seed_exercise_identity import seed_exercise_identity
 
 
 @asynccontextmanager
@@ -46,6 +47,21 @@ async def lifespan(app: FastAPI):
     with SessionLocal() as db:
         seed_reference_split(db)
         seed_method_rules(db)
+        # `TRAIN1-B` — L'IDENTITÉ D'EXERCICE SE SÈME AU DÉMARRAGE, ELLE AUSSI.
+        #
+        # `A1` a créé les tables `exercises` / `exercise_aliases` et branché
+        # leur peuplement sur `scripts/seed_db`. Le démarrage, lui, ne semait
+        # que le catalogue et les règles de méthode. Conséquence mesurée : sur
+        # tout déploiement où `seed_db` n'a pas été rejoué depuis, la table est
+        # VIDE, `resolve_exercise` ne rend jamais rien, et l'instrument
+        # progressif n'affiche aucun exercice — **sans erreur, sans message**.
+        #
+        # Une surface qui dépend d'une table que le démarrage ne remplit pas
+        # est une surface qui marche sur le poste du développeur et nulle part
+        # ailleurs. La graine est idempotente (prouvée sur base réelle : 102
+        # puis +0), donc l'appeler ici ne coûte rien au redémarrage.
+        seed_exercise_identity(db)
+        db.commit()
     yield
 
 

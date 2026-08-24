@@ -1066,3 +1066,61 @@ def exercise_history_detail(
             "active_session": latest_open_session(db, user.id),
         },
     )
+
+
+@router.get(
+    "/exercise-history/{slug}",
+    response_class=HTMLResponse,
+    # `python:S8415` — un 404 non documenté n'apparaît pas dans le schéma, et
+    # un client généré ne sait pas qu'il peut arriver. Même forme que le
+    # `POST /sessions` de ce routeur.
+    responses={404: {"description": "Unknown exercise identity"}},
+)
+def exercise_history_by_identity(
+    slug: str,
+    request: Request,
+    db: DbSession, user: CurrentUser,
+) -> HTMLResponse:
+    """`TRAIN1-B` — l'historique d'un exercice sur son IDENTITÉ STABLE.
+
+    Décision opérateur : « converger le drill-down d'historique d'exercice sur
+    la même identité stable ; conserver les entrées héritées en compatibilité
+    seulement ».
+
+    La route héritée ci-dessus reste **intacte et fonctionnelle** — aucune
+    redirection, aucun changement de contrat : des liens existants la visent,
+    et casser une URL pour gagner de l'élégance serait un mauvais échange.
+    Elle continue simplement de répondre sur `(gabarit, code)`, c'est-à-dire
+    sur une vue **partielle** du même mouvement.
+
+    Mesuré : `Leg extensions assises` vit dans 4 gabarits sous 3 codes. Sous
+    l'ancienne clé, son historique était éclaté en quatre sans que rien ne le
+    dise. Ici il est entier.
+    """
+    from app.models.exercise import Exercise
+    from app.services.exercise_history import get_exercise_history_by_slug
+
+    exercise = db.execute(
+        select(Exercise).where(Exercise.slug == slug)
+    ).scalars().first()
+    if exercise is None:
+        raise HTTPException(status_code=404, detail="Exercice inconnu")
+
+    entries = get_exercise_history_by_slug(db, slug, user_id=user.id)
+
+    return templates.TemplateResponse(
+        request,
+        "exercise_history.html",
+        {
+            "page_title": exercise.name,
+            "template_slug": None,
+            "exercise_code": None,
+            # Pas de gabarit unique à nommer : l'identité stable en réunit
+            # potentiellement plusieurs. Le gabarit est une provenance, rendue
+            # ligne par ligne, jamais un titre.
+            "display_template_name": None,
+            "display_exercise_name": exercise.name,
+            "entries": entries,
+            "active_session": latest_open_session(db, user.id),
+        },
+    )
