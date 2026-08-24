@@ -9,9 +9,12 @@ Les tests historiques qui rendaient le template directement sont
 remplacés par leur équivalent "deprecated redirect" — l'intention V1
 ("/dashboard renders") n'est plus contractuelle ; l'intention V2 ("/dashboard
 deprecates to /") l'est.
+
+`TRAIN1-C` — la cible de la redirection devient `/progress`. L'audit du contenu
+du tableau de bord est clos : rien d'unique à absorber. Reste l'atterrissage —
+qui tape `/dashboard` cherche de l'analytique, et elle vit sur Progression.
 """
 from __future__ import annotations
-
 
 PROGRESSION = "/progress"
 

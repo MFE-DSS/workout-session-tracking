@@ -222,7 +222,16 @@ l'écran sans l'ajouter là l'aurait rendue visuelle-seulement.
    mesurer ; il rendait « 0 problème » sans avoir regardé. Et le détecteur de
    modules vides normalisait les sauts de ligne **avant** de découper dessus,
    donc il rendait 0 partout, y compris là où la carte vide existait.
-4. **Une collision de cascade, évitée de justesse.** J'ai d'abord écrit la
+4. **Une occurrence ruff neuve, passée sous le budget.** Mon insertion d'une
+   constante dans `test_dashboard_routes.py` a produit un `I001` ; la CI l'a
+   ingéré dans Sonar, où il vaut **MAJOR = 15** et a fait rougir le gate à
+   15 pour un seuil de 14. **`check_ruff_budget.py` ne pouvait pas l'attraper** :
+   c'est un cliquet sur le TOTAL (282 ≤ 548), pas une garde de code neuf. Une
+   régression locale reste donc invisible tant que le total baisse par ailleurs.
+   Mon pré-scan local, lui, ne portait que sur les fichiers que je croyais avoir
+   touchés — celui-ci avait été modifié par un script, pas à la main. *La CI a
+   rattrapé ce que mes deux gardes locales laissaient passer.*
+5. **Une collision de cascade, évitée de justesse.** J'ai d'abord écrit la
    grille de `.ze-row` dans un bloc groupé placé **au-dessus** du bloc d'origine,
    qui garde `display: flex` — à spécificité égale, le dernier gagne. C'est
    exactement le défaut de la tranche précédente ; il a été vu avant tout rendu
