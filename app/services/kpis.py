@@ -159,6 +159,39 @@ def compute_global_kpis(
     )
 
 
+def absent_measures(kpis: GlobalKPIs) -> list[str]:
+    """`TRAIN1-C` — CE QUI N'EST PAS CALCULABLE, DIT COMME TEL.
+
+    UN DÉNOMINATEUR ABSENT N'EST PAS UN ZÉRO, et ce n'est pas non plus un
+    tiret. Les deux mesures dérivées de cette page rendaient un `—` en grand,
+    à la place d'un nombre, dans une carte de la même taille que les autres :
+    l'écran affichait quatre KPI dont deux ne mesuraient rien.
+
+    Le cas n'est pas théorique — un compte qui ne fait que du cardio a des
+    séances terminées, **zéro série de travail prescrite** et **zéro exercice
+    noté**. Il lisait donc deux tirets géants, présentés comme des résultats.
+
+    Chaque entrée nomme la CAUSE, telle que le producteur la définit :
+
+      · `completion_rate_30d is None` ⟺ `work_sets_total_30d == 0` — aucune
+        série de travail n'a été prescrite. Ce n'est pas « 0 % validé » : à 0
+        prescrit, il n'y a rien à valider. (À l'inverse, 0 validé sur 12
+        prescrits vaut bien 0 %, et ce 0 % est rendu — c'est une mesure.)
+      · `avg_success_score_30d is None` ⟺ aucune ligne `success_score` non
+        NULL — aucun exercice n'a été noté. Une moyenne sans terme n'existe
+        pas ; `NULL` est explicitement exclu de la moyenne, jamais compté 0.
+
+    La carte disparaît, la raison reste. Retirer les deux sans rien dire
+    laisserait croire que la page n'a jamais eu ces mesures.
+    """
+    absent: list[str] = []
+    if kpis.completion_rate_30d is None:
+        absent.append("aucune série de travail prescrite")
+    if kpis.avg_success_score_30d is None:
+        absent.append("aucun exercice noté")
+    return absent
+
+
 @dataclass
 class TemplateKPI:
     slug: str

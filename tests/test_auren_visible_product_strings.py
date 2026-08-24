@@ -76,8 +76,11 @@ def test_base_template_visible_strings_are_auren():
 
 def test_nav_links_and_classes_preserved(client):
     html = _get(client)
+    # `TRAIN1-C` — « Physique » a quitté la liste : la surface est retirée et
+    # sa route redirige vers `/progress`. Un libellé de navigation vers elle
+    # serait un lien qui rebondit.
     for label in (
-        "Accueil", "Programmes", "Historique", "Physique", "Progression",
+        "Accueil", "Programmes", "Historique", "Progression",
         "Classement", "Squads", "Profil", "Coach", "Déconnexion",
     ):
         assert label in html, f"nav label missing: {label}"

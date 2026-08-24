@@ -1919,6 +1919,26 @@ input, button, textarea, select {
   opacity: 0.7;
 }
 
+/* ── `TRAIN1-C` — CE QUI N'EST PAS CALCULABLE ────────────────────────────────
+ * Même famille visuelle que `.empty-line` — c'est la même nature de fait : une
+ * absence, dite une fois, sur une ligne. Un cran plus petit parce qu'elle
+ * QUALIFIE la grille au-dessus au lieu de la remplacer.
+ *
+ * Ce qu'elle remplace : deux `—` de 26 px dans deux cartes pleines, à la même
+ * échelle typographique que les mesures réelles d'à côté. Le tiret n'était pas
+ * seulement peu informatif — il était rendu comme un résultat.
+ */
+.kpi-absent {
+  margin: calc(-1 * var(--space-xs)) 0 var(--space-md);
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+
+.kpi-absent__win {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+
 /* ── `TRAIN1-A` / A11 — L'ANOMALIE ABSORBÉE ──────────────────────────────────
  * Une ligne, pas une carte. Elle ne se rend que lorsqu'il y a une anomalie :
  * l'objet qui annonçait « Aucune anomalie détectée » occupait une carte
@@ -2344,9 +2364,26 @@ input, button, textarea, select {
 }
 
 .ze-list { list-style: none; margin: 0 0 var(--space-md); padding: 0; }
+
+/* `TRAIN1-C` — DEUX COLONNES DE CHIFFRES, DONC UNE GRILLE, PLUS UN FLEX.
+ *
+ * `space-between` alignait deux éléments aux deux bords ; avec trois, le
+ * chiffre du milieu flotte et rien ne s'aligne d'une ligne à l'autre. Les deux
+ * colonnes numériques sont donc FIXES et partagées par l'en-tête et les
+ * lignes — c'est ce qui fait qu'une colonne de chiffres se lit comme une
+ * colonne. Les largeurs viennent des LIBELLÉS d'en-tête, plus longs que les
+ * nombres : « séances » à 10 px suivi de 0.12em tient dans 4.5rem, « séries »
+ * dans 3.25rem.
+ *
+ * ⚠ La grille est déclarée DANS chaque bloc d'origine, pas dans un bloc groupé
+ * ajouté au-dessus. Écrit au-dessus, il aurait été battu par le
+ * `display: flex` de `.ze-row` resté plus bas — à spécificité égale, le
+ * dernier gagne. C'est exactement le défaut de la tranche précédente, où un
+ * correctif placé 300 lignes trop haut n'a jamais rien corrigé. */
 .ze-list__head {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.5rem 3.25rem;
+  gap: var(--space-xs);
   border-bottom: 1px solid var(--border);
   padding-bottom: var(--space-xs);
   font-size: 10px;
@@ -2356,18 +2393,38 @@ input, button, textarea, select {
 }
 
 .ze-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4.5rem 3.25rem;
+  gap: var(--space-xs);
   align-items: baseline;
-  justify-content: space-between;
   min-height: 36px;
   padding: 5px 0;
 }
+
+.ze-list__head > span + span,
+.ze-row > span + span { text-align: right; }
 
 .ze-row + .ze-row { border-top: 1px solid var(--border); }
 .ze-row__n { font-size: 13.5px; color: var(--fg-muted); }
 .ze-row__v { font-size: 16px; font-weight: 600; color: var(--fg);
   font-variant-numeric: tabular-nums; }
 .ze-row__v--zero { color: var(--fg-dim); font-weight: 400; }
+
+/* Les SÉRIES sont le comptage fin ; les SÉANCES restent la réponse à la
+ * question posée par l'instrument (« où, ces quatorze jours »). Le second
+ * chiffre est donc lisible sans disputer le premier — même famille numérique,
+ * un cran plus bas. */
+.ze-row__s { font-size: 14px; color: var(--fg-muted);
+  font-variant-numeric: tabular-nums; }
+.ze-row__s--zero { color: var(--fg-dim); }
+
+/* PROVENANCE — le 4ᵉ terme, au fond du niveau d'inspection. Une ligne, en
+ * sourdine : elle qualifie les chiffres au-dessus, elle n'en est pas un. */
+.ze-prov {
+  margin: 0 0 var(--space-xs);
+  font-size: 11.5px;
+  color: var(--fg-muted);
+}
 
 .signals__how {
   margin: 0 0 var(--space-lg);

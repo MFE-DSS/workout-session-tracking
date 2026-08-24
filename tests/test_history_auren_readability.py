@@ -17,7 +17,10 @@ PAGES_ROUTER = ROOT / "app" / "routers" / "pages.py"
 SESSIONS_ROUTER = ROOT / "app" / "routers" / "sessions.py"
 PROGRESS_TPL = ROOT / "app" / "templates" / "progress.html"
 INDEX_TPL = ROOT / "app" / "templates" / "index.html"
-PHYSIQUE_TPL = ROOT / "app" / "templates" / "physique.html"
+# `TRAIN1-C` — `physique.html` a été supprimé avec sa surface. Ces gardes
+# de confinement visent la SURFACE VOISINE : c'est Progression qui porte
+# désormais l'instrument anatomique, donc c'est elle qu'il faut vérifier.
+DASHBOARD_TPL = ROOT / "app" / "templates" / "dashboard.html"
 BI_TPL = ROOT / "app" / "templates" / "body_intelligence.html"
 
 
@@ -153,7 +156,7 @@ def test_sessions_router_not_modified_by_readability():
 
 
 def test_other_surfaces_untouched_by_history_pass():
-    for tpl in (PROGRESS_TPL, INDEX_TPL, PHYSIQUE_TPL, BI_TPL):
+    for tpl in (PROGRESS_TPL, INDEX_TPL, DASHBOARD_TPL, BI_TPL):
         src = tpl.read_text(encoding="utf-8")
         assert "Séances enregistrées, reprises possibles" not in src
 

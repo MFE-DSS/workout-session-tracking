@@ -80,8 +80,12 @@ def test_progress_renders_with_empty_db(client):
     assert 'class="empty-line"' in body
     assert "Aucune séance terminée" in body
     assert 'class="kpi-card__value">\n      —' not in body
-    # Empty state for per-template list
-    assert "Aucune session terminée" in body
+    # `TRAIN1-C` / A4 — « Par programme » ne rend plus une carte pleine pour
+    # annoncer qu'elle n'a rien à dire : sans séance terminée, elle ne se rend
+    # pas. L'absence est déjà à l'écran deux fois, et `template_kpis` vide ⟺
+    # aucune séance terminée non exclue, jamais. C'est donc l'ABSENCE de la
+    # carte qui est l'invariant — la ligne compacte ci-dessus porte le fait.
+    assert "Par programme" not in body
 
 
 def test_completion_rate_ignores_warmup_rows(client):

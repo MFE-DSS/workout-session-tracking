@@ -41,7 +41,7 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models.session import WorkoutSession
+from app.models.session import SessionExercise, WorkoutSession
 from app.services.exercise_zone_resolver import SOURCE_DB, resolve_zone
 from app.services.muscle_mapping import ZONE_LABELS
 
@@ -97,6 +97,28 @@ class ZoneExposure:
     #: En `partial`, ces comptages sont des **minima observés** : vrais, mais
     #: non exhaustifs. Un zéro n'y signifie pas « pas travaillé ».
     counts: dict[str, int] = field(default_factory=dict)
+
+    #: `TRAIN1-C` — SÉRIES DE TRAVAIL VALIDÉES, par zone. Le fait absorbé
+    #: depuis `/physique`.
+    #:
+    #: Là où `counts` répond « combien de jours », celui-ci répond « combien de
+    #: séries » — la même question posée plus finement, sur la MÊME fenêtre et
+    #: par le MÊME résolveur. Deux fenêtres ou deux résolveurs auraient mis
+    #: deux attributions contradictoires sur un seul écran.
+    #:
+    #: ⚠ TROIS DIFFÉRENCES DÉLIBÉRÉES avec le `hard_sets` de `muscle_scoring` :
+    #:
+    #:   1. **Aucun coefficient.** Là-bas, une zone secondaire reçoit
+    #:      `round(hard_sets * 0.3)`. Ce 0,3 est un arbitrage, pas une mesure ;
+    #:      ici une série est comptée une fois, sur la zone primaire, ou pas.
+    #:   2. **Aucune cible.** Là-bas le compte devient
+    #:      `hard_sets / (ZONE_VOLUME_TARGET × semaines) × 100`, c'est-à-dire
+    #:      exactement le « % de cible » que l'en-tête de ce module s'interdit.
+    #:      Ici, c'est un entier, rendu comme un entier.
+    #:   3. **Fenêtre unique.** Là-bas 30/60/90 au choix ; ici les quatorze
+    #:      jours de l'instrument, sans sélecteur.
+    sets: dict[str, int] = field(default_factory=dict)
+
     sessions: int = 0
 
     #: Exercices que ni la base ni le matcher n'ont su attribuer. C'est ce
@@ -105,7 +127,16 @@ class ZoneExposure:
     unmapped_exercises: int = 0
 
     #: Combien de résolutions viennent de l'autorité cible plutôt que du repli.
-    #: Non rendu — instrument de mesure de la migration.
+    #:
+    #: `TRAIN1-C` — CES DEUX CHAMPS SONT DÉSORMAIS RENDUS. Ils ne l'étaient pas,
+    #: et c'était un défaut de ma part : `MUSCLE_MAPPING_TRUTH_01` les a
+    #: instrumentés pour qu'on puisse mesurer combien d'attributions dépendent
+    #: encore du repli, puis personne n'a prévu de les lire. Un instrument
+    #: qu'aucune surface n'expose ne mesure rien.
+    #:
+    #: C'est le quatrième terme de la cible — `FAIT → INSTRUMENT → INSPECTION →
+    #: PROVENANCE` : le niveau d'inspection dit *combien*, la provenance dit
+    #: *d'où l'attribution vient*, et donc à quel point la lire est sûr.
     resolved_db: int = 0
     resolved_legacy: int = 0
 
@@ -126,6 +157,7 @@ class _Tally:
     """
 
     counts: dict[str, int]
+    sets: dict[str, int]
     exercises: int = 0
     classified: int = 0
     unmapped: int = 0
@@ -133,11 +165,26 @@ class _Tally:
     resolved_legacy: int = 0
 
 
+def _work_sets(se) -> int:
+    """Séries de travail **validées** d'un exercice de séance.
+
+    L'échauffement n'est pas une série de travail, et une série prescrite mais
+    non cochée n'a pas eu lieu. Même définition que `kpis.work_sets_done_30d` —
+    le dépôt n'a besoin que d'une seule notion de « série faite ».
+    """
+    return sum(1 for sl in se.set_logs if sl.kind == "work" and sl.completed)
+
+
 def _tally(db: Session, sessions) -> _Tally:
     """Une séance compte **au plus une fois par zone** — d'où le `set` par
     séance : la question est « ce jour-là, oui ou non », pas « combien ».
+
+    Les SÉRIES, elles, s'additionnent sans dédoublonnage : trois exercices de
+    pectoraux dans la même séance font un jour d'exposition et la somme de
+    leurs séries. Les deux comptages répondent à deux questions.
     """
-    t = _Tally(counts=dict.fromkeys(ZONE_LABELS, 0))
+    t = _Tally(counts=dict.fromkeys(ZONE_LABELS, 0),
+               sets=dict.fromkeys(ZONE_LABELS, 0))
     for s in sessions:
         zones: set[str] = set()
         for se in s.session_exercises:
@@ -149,6 +196,7 @@ def _tally(db: Session, sessions) -> _Tally:
                 continue
             t.classified += 1
             zones.add(res.zone)
+            t.sets[res.zone] += _work_sets(se)
             if res.source == SOURCE_DB:
                 t.resolved_db += 1
             else:
@@ -173,7 +221,13 @@ def build_zone_exposure(
             WorkoutSession.excluded_from_stats.is_(False),
             WorkoutSession.started_at >= window_start,
         )
-        .options(selectinload(WorkoutSession.session_exercises))
+        # `TRAIN1-C` — les séries entrent dans le chargement. Sans ce second
+        # niveau, compter les séries validées déclencherait un `SELECT` par
+        # exercice de séance : la boucle de `_tally` les touche toutes.
+        .options(
+            selectinload(WorkoutSession.session_exercises)
+            .selectinload(SessionExercise.set_logs)
+        )
     ).scalars().all()
 
     if not sessions:
@@ -198,12 +252,45 @@ def build_zone_exposure(
     # Les `counts` sont donc des MINIMA OBSERVÉS, et la vue-modèle a
     # l'interdiction d'en rendre les zéros.
     if t.classified and t.unmapped:
-        return ZoneExposure(state=STATE_PARTIAL, counts=t.counts, **common)
+        return ZoneExposure(
+            state=STATE_PARTIAL, counts=t.counts, sets=t.sets, **common)
 
     # Des séances sans aucun exercice — du cardio, typiquement — ont bel et
     # bien touché zéro zone de force. C'est un fait, pas une ignorance.
     state = STATE_KNOWN if t.classified else STATE_ZERO
-    return ZoneExposure(state=state, counts=t.counts, **common)
+    return ZoneExposure(
+        state=state, counts=t.counts, sets=t.sets, **common)
+
+
+def _provenance(exp: ZoneExposure) -> str | None:
+    """D'où viennent les attributions de cette fenêtre — le 4ᵉ terme de la
+    cible `FAIT → INSTRUMENT → INSPECTION → PROVENANCE`.
+
+    Compte des **occurrences résolues**, pas des exercices distincts : c'est
+    l'unité que `_tally` incrémente, et prétendre l'inverse serait faux.
+
+    Rend `None` quand rien n'a été résolu — il n'y a alors aucune provenance à
+    déclarer, et écrire « 0 attribution » ferait passer un écran vide pour une
+    mesure.
+    """
+    total = exp.resolved_db + exp.resolved_legacy
+    if not total:
+        return None
+    if not exp.resolved_legacy:
+        return f"Attribution : {total} depuis le référentiel"
+    return (f"Attribution : {exp.resolved_db} depuis le référentiel, "
+            f"{exp.resolved_legacy} par repli de nom")
+
+
+def _s(n: int) -> str:
+    """Marque du pluriel français : rien jusqu'à 1, « s » au-delà."""
+    return "s" if n > 1 else ""
+
+
+def _rows(exp: ZoneExposure, zones) -> list[tuple[str, int, int]]:
+    """`(libellé, séances, séries)` — deux comptages, une ligne."""
+    return [(ZONE_LABELS[z], exp.counts.get(z, 0), exp.sets.get(z, 0))
+            for z in zones]
 
 
 def build_zone_exposure_view(exp: ZoneExposure) -> dict:
@@ -242,12 +329,12 @@ def build_zone_exposure_view(exp: ZoneExposure) -> dict:
         # ⚠ AUCUNE LIGNE À ZÉRO. Le niveau 2 n'expose que les zones
         # OBSERVÉES ; rendre les autres à `0` fabriquerait exactement le
         # mensonge que cet état existe pour empêcher.
-        rows = [(ZONE_LABELS[z], exp.counts[z]) for z in ZONE_LABELS
-                if exp.counts.get(z)]
-        hit = ", ".join(f"{lab} {n}" for lab, n in rows)
+        rows = _rows(exp, [z for z in ZONE_LABELS if exp.counts.get(z)])
+        hit = ", ".join(f"{lab} {n}" for lab, n, _s in rows)
         return {
             "state": STATE_PARTIAL, "regions": regions, "rows": rows,
             "touched": exp.touched, "unmapped": exp.unmapped_exercises,
+            "provenance": _provenance(exp),
             "sr": (f"Exposition des quatorze derniers jours : partielle. "
                    f"{exp.touched} zones identifiées — {hit}. "
                    f"{exp.unmapped_exercises} exercice"
@@ -264,14 +351,22 @@ def build_zone_exposure_view(exp: ZoneExposure) -> dict:
                    "des onze zones suivies."),
         }
 
-    rows = [(ZONE_LABELS[z], exp.counts.get(z, 0)) for z in ZONE_LABELS]
-    hit = ", ".join(f"{lab} {n}" for lab, n in rows if n)
-    idle = ", ".join(lab for lab, n in rows if not n)
+    rows = _rows(exp, ZONE_LABELS)
+    hit = ", ".join(f"{lab} {n} séance{_s(n)}, {s} série{_s(s)}"
+                    for lab, n, s in rows if n)
+    idle = ", ".join(lab for lab, n, _sets in rows if not n)
+    # « 1 zones touchées » — accord vu au rendu dans l'équivalent textuel, sur
+    # la ligne même que cette tranche réécrit. La silhouette est `aria-hidden`
+    # et ce paragraphe est donc la SEULE lecture de l'instrument pour un
+    # lecteur d'écran ; y laisser une faute d'accord connue serait la laisser
+    # là où elle s'entend le plus.
+    z = exp.touched
     return {
         "state": STATE_KNOWN, "regions": regions, "rows": rows,
         "touched": exp.touched,
-        "sr": (f"Exposition des quatorze derniers jours : {exp.touched} zones "
-               f"touchées — {hit}."
+        "provenance": _provenance(exp),
+        "sr": (f"Exposition des quatorze derniers jours : {z} zone{_s(z)} "
+               f"touchée{_s(z)} — {hit}."
                + (f" Zones à zéro séance : {idle}." if idle else "")),
     }
 

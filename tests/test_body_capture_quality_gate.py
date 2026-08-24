@@ -338,7 +338,10 @@ def test_non_reg_progress_still_200(monkeypatch: pytest.MonkeyPatch) -> None:
         assert r.status_code == 200
 
 
-def test_non_reg_physique_still_200(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_non_reg_physique_still_served(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`TRAIN1-C` — `/physique` redirige vers `/progress`. Ce que cette garde
+    vérifie est inchangé : le drapeau Capture Quality ne casse pas cette
+    route. 303 est servi, pas 404 ni 500."""
     with _make_client(monkeypatch, capture_enabled=False, login=True) as c:
         r = c.get("/physique", follow_redirects=False)
-        assert r.status_code == 200
+        assert r.status_code == 303

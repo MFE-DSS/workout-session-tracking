@@ -96,9 +96,12 @@ def test_progress_marks_progression_active(client):
     assert "Progression" in _active_labels(html)
 
 
-def test_physique_maps_to_progression(client):
-    html = _get(client, "/physique")
-    assert "Progression" in _active_labels(html)
+def test_physique_redirect_maps_to_progression(client):
+    """`TRAIN1-C` — la surface est retirée, la route redirige. Le chemin
+    appartient toujours à Progression : c'est son arrivée qui le prouve."""
+    r = client.get("/physique", follow_redirects=True)
+    assert r.status_code == 200
+    assert "Progression" in _active_labels(r.text)
 
 
 def test_leaderboard_maps_to_profil(client):
@@ -115,8 +118,11 @@ def test_single_aria_current_per_route(client):
     # PRIMARY region marks exactly one active destination; the topbar carries
     # none. Re-oriented to the demoted-topbar truth (stricter: asserts the
     # topbar has zero primary aria-current).
+    # `TRAIN1-C` — `/physique` reste couvert, redirection suivie.
     for path in ("/", "/library", "/history", "/progress", "/physique"):
-        html = _get(client, path)
+        r = client.get(path, follow_redirects=True)
+        assert r.status_code == 200, f"{path} -> {r.status_code}"
+        html = r.text
         assert _region(html, "topbar").count('aria-current="page"') == 0, \
             f"{path}: topbar (secondary) must carry no aria-current"
         assert _region(html, "app-bottom-nav").count('aria-current="page"') == 1, \
@@ -145,7 +151,9 @@ def test_all_routes_reachable_and_logout_preserved(client):
     # primary set instead.
     html = _get(client, "/library")
     # secondary destinations preserved in the topbar menu
-    for label in ("Historique", "Physique", "Coach", "Classement", "Squads",
+    # `TRAIN1-C` — « Physique » n'est plus une destination secondaire : sa
+    # surface est retirée et sa route redirige vers `/progress`.
+    for label in ("Historique", "Coach", "Classement", "Squads",
                   "Contact", "Déconnexion"):
         assert label in html, f"secondary nav label missing: {label}"
     # four primary destinations present in the shell (bottom nav + rail)

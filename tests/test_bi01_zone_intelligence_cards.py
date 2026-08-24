@@ -20,7 +20,10 @@ TEMPLATE = ROOT / "app" / "templates" / "body_intelligence.html"
 ZONE_CARD_PARTIAL = ROOT / "app" / "templates" / "_partials" / "body_intelligence_zone_card.html"
 ROUTER_FILE = ROOT / "app" / "routers" / "body_intelligence.py"
 CSS_FILE = ROOT / "app" / "static" / "css" / "body_intelligence.css"
-PHYSIQUE_TEMPLATE = ROOT / "app" / "templates" / "physique.html"
+# `TRAIN1-C` — `physique.html` a été supprimé avec sa surface. Ces gardes
+# de confinement visent la SURFACE VOISINE : c'est Progression qui porte
+# désormais l'instrument anatomique, donc c'est elle qu'il faut vérifier.
+PROGRESS_TEMPLATE = ROOT / "app" / "templates" / "progress.html"
 INDEX_TEMPLATE = ROOT / "app" / "templates" / "index.html"
 
 
@@ -228,11 +231,11 @@ def test_home_not_touched_by_zone_cards():
 # ───────── 5. regression: /physique untouched, limits preserved ─────────
 
 
-def test_physique_template_not_modified_for_zone_cards():
-    """/physique must not reference the new zone-card partial."""
-    phys = PHYSIQUE_TEMPLATE.read_text(encoding="utf-8")
-    assert "body_intelligence_zone_card" not in phys
-    assert "Lecture par zones" not in phys
+def test_progression_template_not_modified_for_zone_cards():
+    """Progression must not reference the new zone-card partial."""
+    prog = PROGRESS_TEMPLATE.read_text(encoding="utf-8")
+    assert "body_intelligence_zone_card" not in prog
+    assert "Lecture par zones" not in prog
 
 
 def test_bi_non_medical_limits_still_present(client):

@@ -16,10 +16,12 @@ referencing stable href patterns rather than fragile DOM structure.
 from __future__ import annotations
 
 
-def test_dashboard_redirects_to_home(client):
+def test_dashboard_redirects_to_progression(client):
+    """`TRAIN1-C` — la cible passe de `/` à `/progress` : qui tape `/dashboard`
+    cherche de l'analytique, et l'analytique vit sur Progression."""
     r = client.get("/dashboard", follow_redirects=False)
     assert r.status_code == 303
-    assert r.headers["location"] == "/"
+    assert r.headers["location"] == "/progress"
 
 
 def test_home_still_200(client):

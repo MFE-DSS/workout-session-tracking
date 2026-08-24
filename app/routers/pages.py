@@ -11,13 +11,12 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from app.config import get_settings
 from app.deps import CurrentUser, DbSession
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
 from app.services.kpis import (
+    absent_measures,
     compute_global_kpis,
-    compute_recent_exercise_activity,
     compute_template_kpis,
 )
 from app.services.launcher import (
@@ -52,6 +51,18 @@ def _load_templates(db) -> list[WorkoutTemplate]:
     )
     return list(db.execute(stmt).scalars().all())
 
+
+#: `TRAIN1-C` — la destination des deux redirections de compatibilité
+#: (`/physique` et `/dashboard`).
+#:
+#: Une constante plutôt que trois littéraux : `python:S1192` mord à partir de
+#: trois, et deux routes de repli qui dériveraient l'une de l'autre seraient un
+#: défaut silencieux.
+#:
+#: ⚠ Elle vit ICI, sous le bloc d'imports, et non au milieu. Placée entre deux
+#: `import`, elle a produit NEUF `E402` d'un coup — tout ce qui suivait cessait
+#: d'être « en tête de fichier ».
+PROGRESSION_URL = "/progress"
 
 # Catalog section labels for the library page.
 CATALOG_SECTIONS = [
@@ -646,7 +657,16 @@ def history(
 def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     global_kpis = compute_global_kpis(db, user_id=user.id)
     template_kpis = compute_template_kpis(db, user_id=user.id)
-    recent_activity = compute_recent_exercise_activity(db, limit=10, user_id=user.id)
+
+    # `TRAIN1-C` — `compute_recent_exercise_activity` N'EST PLUS APPELÉE ICI.
+    #
+    # `TRAIN1-B` a retiré « Activité récente par exercice » du gabarit et a
+    # oublié son producteur : la requête, ses deux chargements et son
+    # regroupement tournaient encore à chaque affichage, pour un résultat que
+    # personne ne lisait. Mon oubli, une tranche plus tôt.
+    #
+    # Le service reste — il est testé, et rien ne justifie de le supprimer
+    # parce qu'une surface a cessé de l'appeler.
 
     # Sprint 8: build quality + bodyweight timeline SVGs from
     # completed non-excluded sessions, oldest first.
@@ -684,12 +704,17 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     quality_svg = build_quality_timeline_svg(quality_points)
     bodyweight_svg = build_bodyweight_timeline_svg(bw_points)
 
-    # Sb_27.3 — weekly training loop tile at the top of /progress (OQ-1
-    # tranchée : enrichir /progress, pas de nouvelle route). Composed
-    # read-only on top of existing services (anomalies, model columns).
-    from app.services.weekly_loop import build_weekly_loop
+    # `TRAIN1-C` — LE CHEMIN PROGRESSION NE CALCULE PLUS QUE CE QU'IL REND.
+    #
+    # `build_weekly_loop` composait quatorze clés ; depuis que `TRAIN1-A` a
+    # retiré son conteneur, la surface en lit DEUX. Les douze autres étaient
+    # produites à chaque affichage puis jetées — dont quatre PHRASES
+    # (`narrative`, `hint`, `volume_signal`, `data_quality_note`) qui
+    # prescrivent et encouragent, calculées pour une page qui ne veut plus les
+    # dire. Le composeur complet reste en place pour ses autres usages.
+    from app.services.weekly_loop import build_progress_week
 
-    weekly = build_weekly_loop(db, user)
+    weekly = build_progress_week(db, user)
 
     # `UX4_03` — les trois signaux comportementaux existaient, calculés, et
     # n'étaient rendus NULLE PART : `/progress` annonçait « la régularité »
@@ -781,8 +806,10 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
         {
             "page_title": "Progression",
             "kpis": global_kpis,
+            # `TRAIN1-C` — les mesures dont le dénominateur n'existe pas. Leur
+            # carte disparaît ; la raison de leur absence est rendue une fois.
+            "absent_measures": absent_measures(global_kpis),
             "template_kpis": template_kpis,
-            "recent_activity": recent_activity,
             "quality_svg": quality_svg,
             "bodyweight_svg": bodyweight_svg,
             "active_session": latest_open_session(db, user.id),
@@ -813,33 +840,50 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     )
 
 
-@router.get("/physique", response_class=HTMLResponse)
-def physique(
-    request: Request,
-    db: DbSession,
-    user: CurrentUser,
-    window: int = Query(30),
-) -> HTMLResponse:
-    from app.services.muscle_scoring import compute_physique_dashboard
+@router.get("/physique", response_model=None)
+def physique(request: Request, db: DbSession, user: CurrentUser) -> RedirectResponse:
+    """`TRAIN1-C` — DÉPRÉCIÉE. Redirection de compatibilité vers `/progress`.
 
-    window = window if window in (30, 60, 90) else 30
-    dashboard = compute_physique_dashboard(db, user.id, window_days=window)
+    Physique était un SECOND produit analytique. Elle rendait, sur les mêmes
+    séances que Progression :
 
-    return templates.TemplateResponse(
-        request,
-        "physique.html",
-        {
-            "page_title": "Physique",
-            "dashboard": dashboard,
-            "window": window,
-            "active_session": latest_open_session(db, user.id),
-            # Sb_BI_01.3 — the guardrail link to /body/intelligence is only
-            # shown when the surface actually exists (flag ON), never a dead
-            # 404 link. The physique score/grade/radar and the shared
-            # compute_physique_dashboard service are left untouched.
-            "body_intelligence_enabled": get_settings().body_intelligence_enabled,
-        },
-    )
+      · un score global sur 100 et une lettre A/B/C ;
+      · un radar de six axes agrégeant ces mêmes scores ;
+      · onze scores de zone sur 100, avec leur barre de remplissage.
+
+    Les onze scores de zone ne sont pas un détail du score global : ils en sont
+    le SUBSTRAT — le global est la moyenne de leurs agrégats. Retirer la somme
+    en gardant les termes aurait masqué la doctrine sans la retirer.
+
+    ET CETTE DOCTRINE CONTREDISAIT UNE RÈGLE ÉCRITE DU DÉPÔT. Son pilier
+    d'exposition vaut `hard_sets / (ZONE_VOLUME_TARGET × semaines) × 100` :
+    c'est un **pourcentage de cible**, exactement ce que l'en-tête de
+    `zone_exposure` s'interdit de dire, au motif qu'aucune littérature ne
+    justifie les bornes du dépôt. La barre le rendait comme une progression
+    vers un objectif.
+
+    CE QUI A SURVÉCU AU DÉMÉNAGEMENT — les **séries de travail validées par
+    zone**, absorbées dans l'instrument d'exposition de `/progress`, sur SA
+    fenêtre et avec SON résolveur. C'était le seul fait que cette surface
+    portait et que Progression n'avait pas.
+
+    CE QUI N'A PAS SUIVI, ET POURQUOI :
+      · le score, la lettre, le radar, les barres — la doctrine elle-même. Ils
+        ne sont pas déplacés ailleurs (ordre opérateur) ;
+      · `confidence` (« élevée / moyenne / faible ») — un compte de signaux
+        présents avec des seuils arbitraires, pas une mesure ;
+      · `measurement_trend` (« +1,5 cm ») — un fait, celui-là, mais qui répond
+        à une autre question et qu'aucun écran ne peut produire aujourd'hui :
+        rien n'écrit de `BodyMeasurement` hors du parcours `/body`, désactivé
+        par défaut. Il appartient à la surface où l'on saisit des mesures.
+
+    Le service `compute_physique_dashboard` n'est PAS supprimé : le classement
+    public et les profils publics en consomment le radar. Ils sont recensés
+    `LEGACY_SCORE_CONSUMER` dans `docs/LEGACY_SCORE_CONSUMERS.md`, sous garde —
+    tolérés parce que les retirer sortirait du périmètre de Progression, pas
+    validés pour autant.
+    """
+    return RedirectResponse(url=PROGRESSION_URL, status_code=303)
 
 
 @router.get("/dashboard", response_model=None)
@@ -850,17 +894,27 @@ def dashboard(
     window: int = Query(30),
 ) -> RedirectResponse:
     """Sb_27.6 — DEPRECATED. OQ-3 tranchée verbatim user : `/dashboard`
-    n'est plus une surface principale. Redirige vers `/` (Home coaching).
+    n'est plus une surface principale.
 
-    Le template `dashboard.html` et le service `compute_dashboard` sont
-    volontairement préservés (pas de suppression brutale de code métier)
-    pour permettre une réintroduction future si nécessaire — mais aucun
-    lien n'y pointe désormais depuis la navigation.
+    `TRAIN1-C` — LA CIBLE DEVIENT `/progress`, PLUS L'ACCUEIL.
+
+    L'audit de son contenu est clos : **rien d'unique à absorber**. Ce qu'elle
+    rendait, Progression le rend, et le rend mieux. Reste donc la seule
+    question qui vaille pour une route dépréciée — où atterrit celui qui
+    l'ouvre. `/` était le choix par défaut de l'époque ; l'analytique vit sur
+    `/progress`, et c'est ce que cherchait quelqu'un qui tape `/dashboard`.
+
+    Le template `dashboard.html` et le service `compute_dashboard` restent en
+    place, **dépréciés et sous garde** : aucun nouveau consommateur de
+    production ne peut apparaître sans faire rougir
+    `test_train1c_progression_consolidation`. Ils ne sont pas supprimés dans
+    cette tranche — huit fichiers de tests en dépendent, et les remuer pour
+    effacer du code mort n'apporterait rien à Progression.
 
     Le paramètre `window` est ignoré pendant la redirection ; il restera
     accepté tant que d'éventuels bookmarks externes existent.
     """
-    return RedirectResponse(url="/", status_code=303)
+    return RedirectResponse(url=PROGRESSION_URL, status_code=303)
 
 
 @router.get("/readiness/history", response_class=HTMLResponse)

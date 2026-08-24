@@ -1,172 +1,121 @@
-"""Sb_BI_01.3 — Physique Surface Guardrails.
+"""Sb_BI_01.3 — Physique Surface Guardrails · **CONTRAT RENVERSÉ PAR `TRAIN1-C`**.
 
-Encadre la surface live /physique (score A/B/C + radar) sans la renforcer ni
-la casser : microcopy « lecture synthétique · score indicatif, non médical »,
-et un lien vers /body/intelligence UNIQUEMENT quand le flag BI est actif (jamais
-un lien mort 404).
+CE QUE CE FICHIER GARDAIT
+--------------------------
+`Sb_BI_01.3` avait choisi l'« Option B prudente » : encadrer le score de
+`/physique` **sans le retirer**. Un de ses tests s'appelait littéralement
+`test_physique_keeps_score_grade_radar`, et il exigeait que le score sur 100,
+la lettre A/B/C et le radar restent rendus.
 
-Invariants (Sb_BI_01.next, Option B prudente) :
-- score / grade / radar existants CONSERVÉS ;
-- compute_physique_dashboard NON modifié (service partagé leaderboard/user_profile) ;
-- lien BI conditionnel au flag ;
-- pas de JS, pas de nouveau score, pas de nouveau radar, pas de suppression.
+CE QUI L'A RENVERSÉ
+--------------------
+Ordre opérateur `TRAIN1-C` : `/physique` cesse d'être un second produit
+analytique. Les trois objets sont retirés, la route redirige vers `/progress`.
+
+La prudence de `Sb_BI_01.3` était cohérente à sa date — mais la microcopie
+qu'elle ajoutait (« Score indicatif, non médical ») ne relativisait pas la
+doctrine : elle la légitimait en la commentant. Le pilier d'exposition du score
+valait `hard_sets / (cible × semaines) × 100`, soit exactement le « % de
+cible » que `zone_exposure` s'interdit de dire. Un avertissement ne corrige pas
+un calcul.
+
+CE FICHIER RESTE, ET NE SE CONTENTE PAS DE CONSTATER. Deux propriétés de sûreté
+qu'il portait n'ont pas de raison de mourir avec la surface — le vocabulaire
+interdit et l'absence de script — et elles suivent le contenu là où il a
+atterri : `progress.html` et ses partiels.
+
+Les gardes de la convergence elle-même vivent dans
+`test_train1c_progression_consolidation.py`.
 """
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PHYSIQUE_TEMPLATE = ROOT / "app" / "templates" / "physique.html"
+TEMPLATES = ROOT / "app" / "templates"
+PROGRESS_TEMPLATE = TEMPLATES / "progress.html"
 MUSCLE_SCORING = ROOT / "app" / "services" / "muscle_scoring.py"
 LEADERBOARD_SVC = ROOT / "app" / "services" / "leaderboard.py"
-USER_PROFILE_TPL = ROOT / "app" / "templates" / "user_profile.html"
-INDEX_TPL = ROOT / "app" / "templates" / "index.html"
-BI_TEMPLATE = ROOT / "app" / "templates" / "body_intelligence.html"
+USER_PROFILE_TPL = TEMPLATES / "user_profile.html"
+INDEX_TPL = TEMPLATES / "index.html"
+BI_TEMPLATE = TEMPLATES / "body_intelligence.html"
+
+GUARDRAIL_MARKER = "physique-guardrails"
 
 
-# ───────── seed (some volume so /physique renders a real dashboard) ─────────
+def _progression_surfaces() -> list[Path]:
+    """La page et les partiels QU'ELLE INCLUT — dérivés, pas listés à la main."""
+    body = re.sub(r"\{#.*?#\}", " ", PROGRESS_TEMPLATE.read_text(encoding="utf-8"),
+                  flags=re.S)
+    return [PROGRESS_TEMPLATE] + [
+        TEMPLATES / name for name in re.findall(r'include\s+"([^"]+)"', body)
+    ]
 
 
-def _seed(db, user_id):
-    from app.models.catalog import RepTarget, TemplateExercise, WorkoutTemplate
-    from app.models.session import SessionExercise, SetLog, WorkoutSession
-
-    t = WorkoutTemplate(slug=f"phys-{user_id}", name="Phys test", kind="strength")
-    db.add(t)
-    db.flush()
-    te = TemplateExercise(
-        template_id=t.id, position=1, code="A1", name="Back squat", set_scheme="3×6-10"
-    )
-    db.add(te)
-    db.flush()
-    db.add(RepTarget(template_exercise_id=te.id, set_index=1, min_reps=6, max_reps=10))
-    db.flush()
-    now = datetime.now(UTC)
-    for k in range(4):
-        s = WorkoutSession(
-            user_id=user_id, template_id=t.id, template_slug_snapshot=t.slug,
-            template_name_snapshot=t.name, started_at=now - timedelta(days=k * 3 + 1),
-            ended_at=now - timedelta(days=k * 3 + 1), status="completed",
-            global_state="good", concentration="high",
-        )
-        se = SessionExercise(
-            template_exercise_id=te.id, exercise_code_snapshot="A1",
-            exercise_name_snapshot="Back squat", position=1, success_score=80,
-        )
-        se.set_logs.append(
-            SetLog(kind="work", set_index=1, weight_kg=100.0, reps=8, completed=True)
-        )
-        s.session_exercises.append(se)
-        db.add(s)
-    db.commit()
+# ───────── 1. le renversement, nommé ─────────
 
 
-def _uid(db):
-    from app.models.user import User
+def test_the_physique_surface_no_longer_exists():
+    """`test_physique_keeps_score_grade_radar` exigeait le contraire.
 
-    return db.query(User).first().id
-
-
-def _render_physique(client):
-    r = client.get("/physique", follow_redirects=False)
-    assert r.status_code == 200, r.text[:300]
-    return r.text
+    Il est conservé sous forme renversée plutôt que supprimé : quelqu'un qui
+    lit `Sb_BI_01.3` doit tomber sur ce qui l'a annulé, pas sur un vide.
+    """
+    assert not (TEMPLATES / "physique.html").exists()
 
 
-# ───────── 1. /physique renders guardrails + keeps score/grade/radar ─────────
+def test_the_guardrail_microcopy_left_with_the_score_it_qualified(client):
+    """Une mise en garde sur un objet absent est de la prose. Elle part avec
+    lui — et pas seulement de la page : de tout le dépôt rendu."""
+    for path in TEMPLATES.rglob("*.html"):
+        src = path.read_text(encoding="utf-8")
+        assert "Score indicatif, non médical" not in src, path.name
+        assert GUARDRAIL_MARKER not in src, path.name
 
 
-def test_physique_shows_guardrail_microcopy(client):
-    from app.database import SessionLocal
-
-    with SessionLocal() as db:
-        _seed(db, _uid(db))
-    html = _render_physique(client)
-    assert "Lecture synthétique" in html
-    assert "Score indicatif, non médical." in html
-    assert "signaux d'entraînement et d'exposition" in html
+# ───────── 2. Body Intelligence n'est pas orpheline ─────────
 
 
-def test_physique_keeps_score_grade_radar(client):
-    from app.database import SessionLocal
+def test_body_intelligence_keeps_an_entry_point(client):
+    """Le lien vers `/body/intelligence` vivait AUSSI sur `/physique`.
 
-    with SessionLocal() as db:
-        _seed(db, _uid(db))
-    html = _render_physique(client)
-    # score + grade badge + radar still rendered (not masked, not moved out)
-    assert "global-score" in html
-    assert "grade-badge" in html
-    assert "radar-wrap" in html
-
-
-# ───────── 2. flag OFF (default) → no dead link ─────────
-
-
-def test_no_bi_link_when_flag_off(client):
-    """Default prod config: flag OFF → no link to the (404) BI surface."""
-    from app.database import SessionLocal
-
-    with SessionLocal() as db:
-        _seed(db, _uid(db))
-    html = _render_physique(client)
-    assert "Voir la lecture par zones" not in html
-    assert "/body/intelligence" not in html
+    Le retirer sans vérifier aurait pu rendre une surface inatteignable —
+    exactement la « soustraction seule » que `CLAUDE.md §5.3` interdit. Deux
+    entrées subsistent, toutes deux derrière le même drapeau.
+    """
+    entries = [
+        p for p in TEMPLATES.rglob("*.html")
+        if p.name != "body_intelligence.html"
+        and "url_for('body_intelligence')" in p.read_text(encoding="utf-8")
+    ]
+    assert len(entries) >= 2, f"entrées restantes : {[p.name for p in entries]}"
 
 
-# ───────── 3. flag ON → link present (real HTTP client, auth'd) ─────────
+def test_no_dead_link_to_body_intelligence_when_the_flag_is_off(client):
+    """Jamais un lien mort vers un 404 : c'était la moitié saine du contrat
+    `Sb_BI_01.3`, et elle survit intacte.
+
+    ⚠ VÉRIFIÉE AU RENDU, PAS DANS LA SOURCE. La première écriture cherchait
+    `body_intelligence_enabled` avant le lien dans chaque gabarit — et rougissait
+    sur `coach_body_snapshot.html`, qui est gardé **par son parent**
+    (`{% if body_snapshot %}`, lui-même produit sous drapeau). Le gabarit avait
+    raison, la garde avait tort : elle vérifiait UN mécanisme au lieu de la
+    propriété. On sert les deux surfaces et on regarde ce qui sort.
+    """
+    for path in ("/profile", "/coach-report"):
+        r = client.get(path, follow_redirects=True)
+        assert r.status_code == 200, f"{path} -> {r.status_code}"
+        assert "/body/intelligence" not in r.text, path
 
 
-def test_bi_link_present_when_flag_on(monkeypatch):
-    """A flag-ON app must render the guardrail link on /physique. Rebuilds an
-    auth'd client exactly like the conftest `client` fixture (auto-login), so
-    the assertion runs on a real authenticated request."""
-    import sys
-    import tempfile
-    from pathlib import Path as P
-
-    monkeypatch.setenv("BODY_INTELLIGENCE_ENABLED", "1")
-    tmp = tempfile.mkdtemp(prefix="workout-test-physon-")
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{P(tmp) / 'on.db'}")
-    monkeypatch.setenv("APP_ENV", "test")
-    monkeypatch.setenv("APP_SECRET_KEY", "test-secret-key-for-signing")
-    for m in [x for x in list(sys.modules) if x == "app" or x.startswith("app.")]:
-        sys.modules.pop(m, None)
-    from fastapi.testclient import TestClient
-
-    from app import main as main_mod
-
-    with TestClient(main_mod.app) as c:
-        # Replicate the conftest auto-login (username/password + POST /login).
-        from app.database import SessionLocal
-        from app.models.user import User
-        from app.services.auth import hash_password
-
-        with SessionLocal() as db:
-            db.add(User(username="testuser", password_hash=hash_password("testpass")))
-            db.commit()
-            uid = db.query(User).first().id
-            _seed(db, uid)
-        login_r = c.post(
-            "/login",
-            data={"username": "testuser", "password": "testpass"},
-            follow_redirects=False,
-        )
-        assert login_r.status_code == 303, f"login failed: {login_r.status_code}"
-        r = c.get("/physique", follow_redirects=False)
-        assert r.status_code == 200, r.text[:300]
-        assert "Voir la lecture par zones" in r.text
-        assert "/body/intelligence" in r.text
-
-
-# ───────── 4. non-regression: shared service + consumers untouched ─────────
+# ───────── 3. non-régression : le service partagé et ses consommateurs ─────────
 
 
 def test_muscle_scoring_not_modified_by_guardrails():
     """The guardrails must not touch compute_physique_dashboard."""
     src = MUSCLE_SCORING.read_text(encoding="utf-8")
-    # sentinel: the guardrail marker must NOT appear in the service
-    assert "physique-guardrails" not in src
+    assert GUARDRAIL_MARKER not in src
     assert "Lecture synthétique" not in src
 
 
@@ -174,34 +123,44 @@ def test_leaderboard_and_userprofile_untouched():
     lb = LEADERBOARD_SVC.read_text(encoding="utf-8")
     up = USER_PROFILE_TPL.read_text(encoding="utf-8")
     for src in (lb, up):
-        assert "physique-guardrails" not in src
+        assert GUARDRAIL_MARKER not in src
 
 
 def test_home_and_bi_templates_untouched_by_guardrails():
     home = INDEX_TPL.read_text(encoding="utf-8")
     bi = BI_TEMPLATE.read_text(encoding="utf-8")
-    assert "physique-guardrails" not in home
-    assert "physique-guardrails" not in bi
+    assert GUARDRAIL_MARKER not in home
+    assert GUARDRAIL_MARKER not in bi
 
 
-# ───────── 5. non-goals: no JS ─────────
+# ───────── 4. les deux propriétés de sûreté SUIVENT LE CONTENU ─────────
 
 
-def test_no_js_added_to_physique():
-    src = PHYSIQUE_TEMPLATE.read_text(encoding="utf-8")
-    assert "<script" not in src
-    assert "onclick" not in src
-    assert "addEventListener" not in src
+def test_no_js_on_the_progression_surfaces():
+    """`test_no_js_added_to_physique`, déplacé sur la surface qui a absorbé le
+    contenu. La propriété n'avait rien de spécifique à Physique : tout ce
+    train est SSR sans une ligne de script."""
+    for path in _progression_surfaces():
+        src = path.read_text(encoding="utf-8")
+        for token in ("<script", "onclick", "addEventListener"):
+            assert token not in src, f"{path.name} introduit du script"
 
 
-# ───────── 6. forbidden wording ─────────
+def test_no_forbidden_wording_on_the_progression_surfaces():
+    """`test_no_forbidden_wording_in_physique`, déplacé de même.
 
-
-def test_no_forbidden_wording_in_physique():
-    src = PHYSIQUE_TEMPLATE.read_text(encoding="utf-8").lower()
-    for tok in (
+    Le vocabulaire interdit — diagnostic, composition corporelle, bilan
+    médical — l'était parce que le produit ne le mesure pas. Rien de cela ne
+    dépendait de la page où il aurait pu apparaître : laisser cette liste
+    mourir avec `physique.html` aurait retiré une garde de fond en effaçant
+    une surface.
+    """
+    forbidden = (
         "diagnostic", "body fat", "morphotype", "attractivité",
         "pathologie", "score de santé", "vérité corporelle",
         "composition corporelle", "bilan médical",
-    ):
-        assert tok not in src, f"forbidden token {tok!r} in physique.html"
+    )
+    for path in _progression_surfaces():
+        src = path.read_text(encoding="utf-8").lower()
+        for tok in forbidden:
+            assert tok not in src, f"forbidden token {tok!r} in {path.name}"

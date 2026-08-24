@@ -27,7 +27,29 @@
 
    LE MOTIF D'INCONNU EST DÉCLARÉ EN CSS, pas en attribut : une règle CSS bat
    un attribut de présentation SVG, et `fill="url(#…)"` était écrasé par
-   `.ze-r { fill: transparent }`. Mesuré, pas supposé. #}
+   `.ze-r { fill: transparent }`. Mesuré, pas supposé.
+
+   ── `TRAIN1-C` — CE QUE `/physique` A LÉGUÉ ICI ────────────────────────────
+   Les SÉRIES par zone. C'est le seul fait que la surface Physique portait et
+   que Progression n'avait pas ; tout le reste y était soit un score, soit un
+   fait déjà rendu ici.
+
+   Il arrive à trois conditions, et les trois comptent :
+     · MÊME FENÊTRE — quatorze jours, pas le sélecteur 30/60/90 de Physique.
+       Deux fenêtres sur un écran rouvriraient la contradiction fermée plus
+       haut ;
+     · MÊME RÉSOLVEUR — `resolve_zone`, pas `resolve_exercise_zones`. Deux
+       autorités d'attribution auraient mis deux comptes contradictoires sur
+       une même ligne ;
+     · AUCUN COEFFICIENT, AUCUNE CIBLE — Physique attribuait 30 % d'une série
+       aux zones secondaires puis divisait par un objectif hebdomadaire. Le
+       premier est un arbitrage, le second est le « % de cible » que cet
+       instrument s'interdit à la ligne 9. Ici : un entier, rendu tel quel.
+
+   ET LA PROVENANCE, qui manquait. `MUSCLE_MAPPING_TRUTH_01` comptait déjà les
+   résolutions venues du référentiel et celles venues du repli — sans jamais
+   les rendre nulle part. La cible est `FAIT → INSTRUMENT → INSPECTION →
+   PROVENANCE` : le quatrième terme n'existait pas à l'écran. #}
 
 {% macro _ze_svg(regions, view) -%}
 <svg class="ze-sil" viewBox="0 0 60 100" role="presentation" focusable="false">
@@ -85,12 +107,15 @@
       </span>
     </summary>
     <ul class="ze-list">
-      <li class="ze-list__head"><span>11 zones suivies</span><span>séances</span></li>
-      {% for label, n in exposure.rows %}
+      <li class="ze-list__head"><span>11 zones suivies</span>
+        <span>séances</span><span>séries</span></li>
+      {% for label, n, s in exposure.rows %}
         <li class="ze-row"><span class="ze-row__n">{{ label }}</span>
-          <span class="ze-row__v{% if not n %} ze-row__v--zero{% endif %}">{{ n }}</span></li>
+          <span class="ze-row__v{% if not n %} ze-row__v--zero{% endif %}">{{ n }}</span>
+          <span class="ze-row__s{% if not s %} ze-row__s--zero{% endif %}">{{ s }}</span></li>
       {% endfor %}
     </ul>
+    {% if exposure.provenance %}<p class="ze-prov">{{ exposure.provenance }}</p>{% endif %}
   </details>
 
 {% elif exposure.state == 'partial' %}
@@ -119,12 +144,19 @@
     </summary>
     <ul class="ze-list">
       <li class="ze-list__head"><span>zones identifiées</span>
-        <span>minimum observé</span></li>
-      {% for label, n in exposure.rows %}
+        <span>séances</span><span>séries</span></li>
+      {% for label, n, s in exposure.rows %}
         <li class="ze-row"><span class="ze-row__n">{{ label }}</span>
-          <span class="ze-row__v">{{ n }}</span></li>
+          <span class="ze-row__v">{{ n }}</span>
+          <span class="ze-row__s">{{ s }}</span></li>
       {% endfor %}
     </ul>
+    {# « minimum observé » vivait dans l'en-tête de colonne ; à deux colonnes de
+       chiffres, il n'y a plus de place pour le répéter au-dessus de chacune, et
+       le dire une fois sous la liste le porte pour les deux. La nuance ne peut
+       pas disparaître : c'est elle qui distingue cet état de `known`. #}
+    <p class="ze-prov">Minimum observé — d'autres zones ont pu être touchées.</p>
+    {% if exposure.provenance %}<p class="ze-prov">{{ exposure.provenance }}</p>{% endif %}
   </details>
 
 {% else %}
