@@ -134,23 +134,23 @@
    être une récupération voulue. #}
 {% if cardio.any %}
 <h2 class="section-header">Cardio · par machine</h2>
-<ul class="cardio">
+<ul class="cardio-lane">
   {% for l in cardio.lanes %}
-    <li class="cardio__row">
-      <a class="cardio__link" href="{{ l.href }}">
-        <span class="cardio__machine">{{ l.machine }}</span>
-        <span class="cardio__dur">{{ l.duration }}</span>
+    <li class="cardio-lane__row">
+      <a class="cardio-lane__link" href="{{ l.href }}">
+        <span class="cardio-lane__machine">{{ l.machine }}</span>
+        <span class="cardio-lane__dur">{{ l.duration }}</span>
       </a>
-      <div class="cardio__meta">
-        {% if l.delta %}<span class="cardio__delta">{{ l.delta }}</span>{% endif %}
-        {% if l.bpm %}<span class="cardio__bpm">{{ l.bpm }}</span>{% endif %}
+      <div class="cardio-lane__meta">
+        {% if l.delta %}<span class="cardio-lane__delta">{{ l.delta }}</span>{% endif %}
+        {% if l.bpm %}<span class="cardio-lane__bpm">{{ l.bpm }}</span>{% endif %}
       </div>
     </li>
   {% endfor %}
   {% if cardio.untyped %}
-    <li class="cardio__row cardio__row--untyped">
-      <span class="cardio__machine">{{ cardio.untyped }} séance{% if cardio.untyped > 1 %}s{% endif %} sans machine renseignée</span>
-      <div class="cardio__meta"><span class="cardio__why">hors comparaison</span></div>
+    <li class="cardio-lane__row cardio-lane__row--untyped">
+      <span class="cardio-lane__machine">{{ cardio.untyped }} séance{% if cardio.untyped > 1 %}s{% endif %} sans machine renseignée</span>
+      <div class="cardio-lane__meta"><span class="cardio-lane__why">hors comparaison</span></div>
     </li>
   {% endif %}
 </ul>

@@ -1068,7 +1068,14 @@ def exercise_history_detail(
     )
 
 
-@router.get("/exercise-history/{slug}", response_class=HTMLResponse)
+@router.get(
+    "/exercise-history/{slug}",
+    response_class=HTMLResponse,
+    # `python:S8415` — un 404 non documenté n'apparaît pas dans le schéma, et
+    # un client généré ne sait pas qu'il peut arriver. Même forme que le
+    # `POST /sessions` de ce routeur.
+    responses={404: {"description": "Unknown exercise identity"}},
+)
 def exercise_history_by_identity(
     slug: str,
     request: Request,

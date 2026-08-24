@@ -2186,20 +2186,20 @@ input, button, textarea, select {
  * Une ligne par machine, jamais de total inter-machines : additionner du
  * rameur et du tapis produirait un nombre sans référent.
  */
-.cardio {
+.cardio-lane {
   list-style: none;
   margin: 0 0 var(--space-md);
   padding: 0;
 }
 
-.cardio__row {
+.cardio-lane__row {
   border-bottom: 1px solid var(--border);
   padding: 6px 0;
 }
 
-.cardio__row:last-child { border-bottom: none; }
+.cardio-lane__row:last-child { border-bottom: none; }
 
-.cardio__link {
+.cardio-lane__link {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -2209,25 +2209,25 @@ input, button, textarea, select {
   text-decoration: none;
 }
 
-.cardio__link:hover .cardio__machine,
-.cardio__link:focus-visible .cardio__machine {
+.cardio-lane__link:hover .cardio-lane__machine,
+.cardio-lane__link:focus-visible .cardio-lane__machine {
   border-bottom: 1px solid var(--accent);
 }
 
-.cardio__machine {
+.cardio-lane__machine {
   flex: 1;
   min-width: 0;
   font-size: 14px;
 }
 
-.cardio__dur {
+.cardio-lane__dur {
   flex: none;
   font-family: var(--font-mono);
   font-size: 13px;
   font-variant-numeric: tabular-nums;
 }
 
-.cardio__meta {
+.cardio-lane__meta {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs) var(--space-sm);
@@ -2236,13 +2236,13 @@ input, button, textarea, select {
   font-size: 11px;
 }
 
-.cardio__delta { color: var(--fg-muted); }
+.cardio-lane__delta { color: var(--fg-muted); }
 
 /* Le bpm est un CONTEXTE. En retrait, jamais comparé. */
-.cardio__bpm,
-.cardio__why { color: var(--fg-dim); }
+.cardio-lane__bpm,
+.cardio-lane__why { color: var(--fg-dim); }
 
-.cardio__row--untyped .cardio__machine {
+.cardio-lane__row--untyped .cardio-lane__machine {
   font-size: 13px;
   color: var(--fg-dim);
 }
@@ -2934,6 +2934,9 @@ input, button, textarea, select {
   line-height: 1.4;
 }
 
+/* Note de cardio d'un gabarit (`template_detail.html`). PRÉEXISTANTE et
+ * intacte : c'est elle qui possède le nom `.cardio`, et c'est pour cela que
+ * la voie cardio de `TRAIN1-B` s'appelle `.cardio-lane`. */
 .cardio {
   margin: 0 0 var(--space-md);
   color: var(--fg-dim);
