@@ -89,13 +89,29 @@
     {% set is_my_programs = _p.startswith('/programs') %}
     {% set is_profile = _p.startswith('/profile') %}
     {% set is_coach = _p.startswith('/coach') %}
+    {# `TRAIN1-D` — `/export` n'était liée depuis AUCUN gabarit : la route
+       existait, la surface était inatteignable autrement qu'en tapant l'URL.
+       Y « déplacer » le Coach Report l'aurait envoyé dans un cul-de-sac. #}
+    {% set is_export = _p.startswith('/export') %}
     {# Sb_UI_03.1 — mapping des 4 onglets de la bottom nav mobile (Sx_UI_03).
        Dérivé de request.url.path (SSR, no-JS). Regroupe les surfaces
        secondaires sous leur onglet primaire ; les routes secondaires
        restent accessibles via le menu topbar (aucune route supprimée).
        Un seul onglet actif ; jamais aria-current="false". #}
     {% set is_sess = is_home or _p.startswith('/sessions') %}
-    {% set is_prog = is_progress or is_history or is_body_intel or is_coach %}
+    {# `TRAIN1-D` / C1 — LE COACH REPORT QUITTE L'ONGLET PROGRESSION.
+       C'est un DOCUMENT exportable — « à présenter à un coach externe », avec
+       son bouton Imprimer — et non une surface d'application. Il rejoint donc
+       la classe des utilitaires (`/export`), qui n'allument aucun onglet
+       primaire : un document qu'on produit n'est pas un endroit où l'on va.
+
+       Mesuré avant de décider : la surface rendait 349 mots sur un compte
+       SANS AUCUNE SÉANCE, et 369 sur un compte peuplé — elle ne variait
+       presque pas avec les données, exactement le symptôme qui a condamné
+       `/physique`. Là où Physique a été retirée, celle-ci est requalifiée :
+       son intention de document la justifie, sa place dans l'analytique
+       quotidienne non. #}
+    {% set is_prog = is_progress or is_history or is_body_intel %}
     {% set is_prof = is_profile or is_squads or is_leaderboard %}
     <header class="topbar">
       <a class="topbar__brand" href="{{ url_for('home') }}">Auren</a>
@@ -111,7 +127,8 @@
         <nav class="topbar__nav" aria-label="Navigation secondaire">
           <a class="topbar__link {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
           <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
-          <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
+          <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
+          <a class="topbar__link {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>
           <a class="topbar__link {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
           <a class="topbar__link {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
           <a class="topbar__link" href="{{ url_for('contact_page') }}">Contact</a>
@@ -157,7 +174,8 @@
         <nav class="app-rail__secondary-nav" aria-label="Navigation secondaire">
           <a class="app-rail__sublink {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
           <a class="app-rail__sublink {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
-          <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
+          <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
+          <a class="app-rail__sublink {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>
           <a class="app-rail__sublink {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
           <a class="app-rail__sublink {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
         </nav>

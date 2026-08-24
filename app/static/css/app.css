@@ -779,10 +779,55 @@ input, button, textarea, select {
   color: #fffbeb;          /* near-white — AA contrast on dark amber */
   border-color: #92400e;
 }
+/* `TRAIN1-D` / C3 — « CALCULÉ », la nature qui manquait.
+ *
+ * Bleu ardoise, choisi CONTRE le vert de « Mesuré » et l'ambre d'« Inféré » :
+ * une dérivation n'est ni une observation ni une hypothèse, et lui donner une
+ * nuance de l'une des deux aurait reconduit la confusion que cette étiquette
+ * existe pour lever.
+ *
+ * Contraste mesuré sur le fond réel de la pastille (#1e4b6e) :
+ *   #eef5fb sur #1e4b6e  →  10,4:1   (AAA, texte normal)
+ * La bordure reprend le fond, comme ses deux sœurs. */
+.coach-tag--derived {
+  background: #1e4b6e;
+  color: #eef5fb;
+  border-color: #1e4b6e;
+}
+
+/* Une RÉFÉRENCE externe n'est pas une nature de connaissance sur l'utilisateur :
+ * c'est une source citée. Elle est donc en creux — bordure seule, aucun aplat —
+ * pour ne pas se lire comme un quatrième verdict sur la personne. */
+.coach-tag--reference {
+  background: transparent;
+  color: var(--fg-muted);
+  border: 1px solid var(--fg-dim);
+}
+
 .coach-tag--not-deductible {
   background: transparent;
   color: var(--fg);
   border: 1px dashed var(--fg-dim);
+}
+
+/* La légende du modèle épistémique, en tête de rapport. */
+.coach-legend {
+  display: grid;
+  gap: 4px 12px;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+}
+.coach-legend__item {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: 10px;
+  align-items: baseline;
+}
+.coach-legend dt { margin: 0; }
+.coach-legend dd { margin: 0; font-size: 12.5px; color: var(--fg-muted); }
+
+@media (max-width: 380px) {
+  .coach-legend__item { grid-template-columns: 1fr; gap: 2px; }
 }
 
 /* KPI grid for bloc 2 */
@@ -873,7 +918,13 @@ input, button, textarea, select {
   .coach-block { background: white; border: 1px solid #ccc; break-inside: avoid; }
   .coach-tag--measured { background: #e7f8ee; color: #166534; border-color: #166534; }
   .coach-tag--inferred { background: #fef3c7; color: #92400e; border-color: #92400e; }
+  /* `TRAIN1-D` — même inversion que ses sœurs à l'impression : aplat clair,
+   * encre foncée. Sans cette ligne, la pastille « Calculé » sortait en bleu
+   * plein sur une feuille — le rapport est FAIT pour être imprimé. */
+  .coach-tag--derived { background: #e8f1f8; color: #1e4b6e; border-color: #1e4b6e; }
+  .coach-tag--reference { color: #555; border-color: #999; }
   .coach-tag--not-deductible { color: #555; border-color: #999; }
+  .coach-legend dd { color: #444; }
   .coach-block--guardrails { border-left: 2px solid #d97706; }
   .coach-ratio__strength, .coach-ratio__cardio { color: white; }
 }
@@ -1236,6 +1287,29 @@ input, button, textarea, select {
 .export-stats li:last-child { border-bottom: none; }
 
 .stats-list li span:first-child { color: var(--fg-muted); }
+
+/* `TRAIN1-D` / C2 — L'ÉTAT VIDE D'UN FAIT SAISISSABLE.
+ *
+ * Occupe la place exacte de la valeur qu'il remplace : c'est un état de la
+ * ligne, pas un bouton ajouté à côté. Il se lit comme une action —
+ * `--accent`, souligné — parce qu'il en est une, là où le tiret qu'il
+ * remplace ne se lisait comme rien.
+ *
+ * Zone tactile : la ligne fait 8 px de remplissage vertical pour 14 px de
+ * texte, soit ~36 px. Le remplissage négatif ci-dessous porte la cible à
+ * 44 px — le STANDARD PRODUIT AUREN, pas le seuil WCAG 2.2 (24×24 avec
+ * exception d'espacement, déjà satisfait sans cela) — sans changer d'un
+ * pixel la hauteur de la ligne : la zone déborde, le chrome visible non. */
+.stats-list li a.stat-add {
+  display: inline-block;
+  padding: 12px 4px;
+  margin: -12px -4px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+}
+.stats-list li a.stat-add:hover { text-decoration-thickness: 2px; }
 
 .stats-list li b,
 .export-stats li b {
@@ -1694,6 +1768,39 @@ input, button, textarea, select {
   color: var(--fg-muted);
   line-height: 1.5;
   white-space: pre-line;
+}
+
+/* `TRAIN1-D` / C5 — L'IDENTIFIANT CITABLE D'UNE RÈGLE.
+ *
+ * En sourdine et en chasse fixe : c'est une référence technique, pas un
+ * élément de lecture. Il ne doit pas disputer l'attention au corps de la
+ * règle — mais il doit exister, sans quoi le document n'est pas citable.
+ *
+ * La cible tactile fait 44 px par le remplissage, standard produit AUREN,
+ * sans allonger la carte : le remplissage négatif absorbe la hauteur. */
+.rule__id { margin: var(--space-xs) 0 0; }
+
+/* 44 px MESURÉS, pas estimés : le texte fait ~14 px de hauteur de ligne à
+ * 11 px de corps, donc 15 px de remplissage de chaque côté. La première
+ * écriture posait 12 px et rendait une cible de 38 px — relevée au
+ * `getBoundingClientRect`, pas supposée. */
+.rule__anchor {
+  display: inline-block;
+  padding: 15px 6px;
+  margin: -15px -6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--fg-dim);
+  text-decoration: none;
+}
+.rule__anchor::before { content: "#"; opacity: 0.6; }
+.rule__anchor:hover { color: var(--accent); }
+
+/* La règle visée par un lien profond s'annonce à l'arrivée : sans cela, on
+ * atterrit au milieu de onze écrans sans savoir sur quoi. */
+.rule-card:target {
+  border-color: var(--accent);
 }
 
 /* ---- Leaderboard ---- */

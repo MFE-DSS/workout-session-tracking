@@ -15,6 +15,29 @@
       Synthèse 2 min · à présenter à un coach externe ou à lire en bilan personnel.
     </p>
     <button type="button" class="btn btn--small" onclick="window.print()">Imprimer</button>
+
+    {# `TRAIN1-D` / C3 — LA LÉGENDE ÉPISTÉMIQUE, ENFIN ÉCRITE.
+       Ce rapport étiquetait ses blocs depuis Sb_23 sans jamais dire ce que les
+       étiquettes signifient. Un lecteur — et c'est un document destiné à un
+       TIERS — devait deviner que « Inféré » veut dire « produit par une règle
+       dont le seuil est un choix d'AUREN ».
+
+       « Calculé » est neuf, et il corrige une imprécision : les blocs 2, 4 et
+       6 s'annonçaient « Mesuré » alors que ce sont des COMPTAGES. Un comptage
+       est exact et reproductible, et il reste une dérivation — appeler cela
+       une mesure faisait passer une convention (« qu'est-ce qu'une séance qui
+       compte ? ») pour une observation brute.
+
+       Les libellés viennent de `app/services/epistemic.py`, foyer unique du
+       modèle : une garde vérifie que le gabarit n'en invente aucun. #}
+    <dl class="coach-legend">
+      {% for nature, name in epistemic.labels %}
+        <div class="coach-legend__item">
+          <dt><span class="coach-tag coach-tag--{{ nature }}">{{ name }}</span></dt>
+          <dd>{{ epistemic.meaning[nature] }}</dd>
+        </div>
+      {% endfor %}
+    </dl>
   </header>
 
   {# ---- 1. IDENTITÉ ---- #}
@@ -54,7 +77,7 @@
   {# ---- 2. VOLUME + FRÉQUENCE ---- #}
   <section class="coach-block">
     <h2 class="coach-block__title">
-      2. Volume et fréquence <span class="coach-tag coach-tag--measured">Mesuré</span>
+      2. Volume et fréquence <span class="coach-tag coach-tag--derived">Calculé</span>
     </h2>
     <ul class="coach-grid">
       <li><span>Sessions 30j</span><b>{{ report.volume.sessions_30d }}</b></li>
@@ -73,7 +96,7 @@
   {# ---- 3. RATIO STRENGTH / CARDIO ---- #}
   <section class="coach-block">
     <h2 class="coach-block__title">
-      3. Ratio strength / cardio <span class="coach-tag coach-tag--inferred">Inféré</span>
+      3. Ratio strength / cardio <span class="coach-tag coach-tag--derived">Calculé</span>
     </h2>
     {% if report.ratio.total_sessions == 0 %}
       <p class="text-dim">Pas de séance dans la fenêtre 30j.</p>
@@ -98,7 +121,7 @@
   {# ---- 4. RÉPARTITION PAR ZONE MUSCULAIRE ---- #}
   <section class="coach-block">
     <h2 class="coach-block__title">
-      4. Répartition par zone musculaire <span class="coach-tag coach-tag--measured">Mesuré</span>
+      4. Répartition par zone musculaire <span class="coach-tag coach-tag--derived">Calculé</span>
     </h2>
     {% if not report.zones.counts %}
       <p class="text-dim">Pas assez de données.</p>
@@ -109,8 +132,14 @@
           {{ label }} ({{ n }}){% if not loop.last %}, {% endif %}
         {% endfor %}
       </p>
+      {# `TRAIN1-D` / C1 — « Zones négligées » disait un JUGEMENT sur un fait.
+         « Négliger » impute une faute ; le nombre, lui, ne dit que le nombre.
+         Un bloc étiqueté « Calculé » n'a pas le droit de porter un verdict :
+         c'est l'étiquette « Inféré » qui l'autorise, et les blocs 7 et 8 sont
+         là pour ça. Même correction que « sous-entraîné », interdit dans
+         l'instrument d'exposition depuis `UX4_03D`. #}
       <p>
-        <strong>Zones négligées :</strong>
+        <strong>Zones les moins travaillées :</strong>
         {% for key, label, n in report.zones.neglected_zones %}
           {{ label }} ({{ n }}){% if not loop.last %}, {% endif %}
         {% endfor %}
@@ -121,7 +150,7 @@
   {# ---- 5. PATTERNS MOTEURS DOMINANTS ---- #}
   <section class="coach-block">
     <h2 class="coach-block__title">
-      5. Patterns moteurs dominants <span class="coach-tag coach-tag--inferred">Inféré</span>
+      5. Patterns moteurs dominants <span class="coach-tag coach-tag--derived">Calculé</span>
     </h2>
     {% if not report.patterns.distribution %}
       <p class="text-dim">Pas assez de sets enregistrés sur le périmètre catalogue Sb_22a.</p>
@@ -141,8 +170,15 @@
   {# ---- 6. DISCIPLINE DE LOGGING ---- #}
   <section class="coach-block">
     <h2 class="coach-block__title">
-      6. Discipline de logging <span class="coach-tag coach-tag--measured">Mesuré</span>
+      6. Discipline de logging <span class="coach-tag coach-tag--derived">Calculé</span>
     </h2>
+    {# `TRAIN1-D` / C5 — LIEN PROFOND CONTEXTUEL, pas un renvoi générique.
+       Ce bloc mesure la tenue du carnet ; la règle qui dit à quoi sert le
+       carnet a un identifiant stable. Le lecteur — un coach — atterrit sur
+       LA règle, pas en haut de onze écrans de référence. #}
+    <p class="coach-block__hint">
+      <a href="{{ url_for('science_page') }}#rule-carnet-progression">Méthode : carnet et surcharge progressive →</a>
+    </p>
     <ul class="coach-discipline">
       {% set d = report.discipline %}
       {% for label, value in [
@@ -155,7 +191,14 @@
         <li>
           <span>{{ label }}</span>
           {% if value is none %}
-            <b><span class="coach-tag coach-tag--not-deductible">—</span></b>
+            {# `TRAIN1-D` / C3 — LE MOT, PAS LE TIRET.
+               La pastille portait déjà la classe `not-deductible`, donc la
+               bordure en pointillés disait la bonne chose — mais son TEXTE
+               était « — ». Mesuré sur un compte vide : cinq tirets à
+               l'échelle d'une valeur dans un document destiné à un tiers.
+               Le modèle épistémique canonique a un libellé pour cet état ;
+               il n'y a aucune raison de le remplacer par un signe. #}
+            <b><span class="coach-tag coach-tag--not-deductible">Non déductible</span></b>
           {% else %}
             <b class="{% if value >= 80 %}pill--ok{% elif value >= 50 %}pill--mid{% else %}pill--bad{% endif %}">{{ value }}%</b>
           {% endif %}
@@ -205,7 +248,13 @@
     {% else %}
       <ul class="coach-list">
         {% for line in inference.strong_points %}
-          <li>{{ line|safe }}</li>
+          {# `TRAIN1-D` / C10 — `|safe` retiré avec les astérisques.
+             L'échappement était désactivé pour laisser passer un balisage
+             Markdown que le gabarit ne rend pas : il s'affichait littéralement
+             (« **Dos épaisseur** ») ET l'échappement restait désarmé sur une
+             chaîne qui contient un nom d'exercice. Aucun des deux n'avait de
+             raison d'être. #}
+          <li>{{ line }}</li>
         {% endfor %}
       </ul>
     {% endif %}
@@ -221,27 +270,75 @@
     {% else %}
       <ul class="coach-list">
         {% for line in inference.weak_points %}
-          <li>{{ line|safe }}</li>
+          {# `TRAIN1-D` / C10 — `|safe` retiré avec les astérisques.
+             L'échappement était désactivé pour laisser passer un balisage
+             Markdown que le gabarit ne rend pas : il s'affichait littéralement
+             (« **Dos épaisseur** ») ET l'échappement restait désarmé sur une
+             chaîne qui contient un nom d'exercice. Aucun des deux n'avait de
+             raison d'être. #}
+          <li>{{ line }}</li>
         {% endfor %}
       </ul>
     {% endif %}
   </section>
 
-  {# ---- 9. AXES DE TRAVAIL SUGGÉRÉS ---- #}
+  {# ---- 9. COUVERTURE DES DONNÉES ----
+
+     `TRAIN1-D` / C1 — « AXES DE TRAVAIL SUGGÉRÉS » A ÉTÉ RETIRÉ.
+
+     Le bloc rendait jusqu'à trois prescriptions d'entraînement chiffrées —
+     « viser 2 séances/sem sur 4 semaines », « cible OMS 150'/sem », « viser
+     2-3 séances/sem comme socle » — qu'aucune source du dépôt ne soutient.
+     C'est la même faute que le « % de cible » retiré de `/physique`, en
+     phrases plutôt qu'en barres.
+
+     CE N'EST PAS UNE SOUSTRACTION SEULE (`CLAUDE.md §5.3`). Les faits sur
+     lesquels ces consignes reposaient sont TOUS restés à l'écran : le bloc 2
+     porte le volume, le bloc 4 la répartition par zone, le bloc 5 les
+     patterns. Ce qui part est la consigne, pas l'information.
+
+     Et une chose ARRIVE à sa place, dans la même livraison : la couverture
+     des données, qui n'était rendue nulle part. Le bloc 6 dit des taux ; ici
+     on dit ce que ces taux impliquent pour la LECTURE du rapport — l'axe
+     `COVERAGE` du modèle épistémique canonique. #}
   <section class="coach-block">
     <h2 class="coach-block__title">
-      9. Axes de travail suggérés <span class="coach-tag coach-tag--inferred">Inféré</span>
+      9. Couverture des données <span class="coach-tag coach-tag--measured">Calculé</span>
     </h2>
-    {% if not inference.suggested_axes %}
-      <p class="text-dim">Aucun axe d'amélioration prioritaire identifié.</p>
+    {% if not inference.coverage_gaps %}
+      <p class="text-dim">Aucune lacune de couverture sur la fenêtre.</p>
     {% else %}
-      <ol class="coach-list coach-list--axes">
-        {% for line in inference.suggested_axes %}
-          <li>{{ line|safe }}</li>
+      <ul class="coach-list">
+        {% for line in inference.coverage_gaps %}
+          <li>{{ line }}</li>
         {% endfor %}
-      </ol>
+      </ul>
+      <p class="text-dim" style="font-size:13px;margin:var(--space-xs) 0 0;">
+        Ce que ces données ne couvrent pas ne peut pas être lu dans les blocs
+        ci-dessus. Aucun objectif n'en découle.
+      </p>
     {% endif %}
   </section>
+
+  {# ---- 9bis. RÉFÉRENCES EXTERNES ----
+     Une recommandation de santé publique est une référence légitime dans un
+     rapport destiné à un tiers. Ce qui ne l'était pas, c'est de la convertir
+     en objectif calculé pour quelqu'un dont AUREN ignore l'âge, l'état de
+     santé et le contexte. Elle est citée, attribuée, et détachée du cas
+     personnel — jamais posée à côté du chiffre réel comme un écart. #}
+  {% if inference.external_references %}
+  <section class="coach-block coach-block--references">
+    <h2 class="coach-block__title">
+      Références externes
+      <span class="coach-tag coach-tag--reference">Référence</span>
+    </h2>
+    <ul class="coach-list">
+      {% for line in inference.external_references %}
+        <li>{{ line }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
 
   {# ---- 10. GARDE-FOUS ---- #}
   <section class="coach-block coach-block--guardrails">
@@ -258,7 +355,19 @@
       <li>Pas de verdict performance maximale (pas de 1RM mesuré).</li>
       <li>Pas de comparaison vs autres utilisateurs.</li>
       <li>VO2max / masse maigre / composition corporelle : <span class="coach-tag coach-tag--not-deductible">Non déductible</span></li>
+      {# `TRAIN1-D` / C1 — dit explicitement ce que ce rapport a CESSÉ de faire.
+         Un document lu par un tiers doit annoncer ses limites, et « ne
+         prescrit pas » en est une aussi importante que « ne diagnostique
+         pas ». La version précédente rendait jusqu'à trois consignes
+         chiffrées sous le titre « Axes de travail suggérés ». #}
+      <li>Aucune prescription d'entraînement : ni volume cible, ni fréquence
+        cible, ni objectif de rééquilibrage. Les recommandations externes
+        citées sont des <strong>références</strong>, jamais des objectifs
+        calculés pour cette personne.</li>
     </ul>
+    <p class="coach-block__hint">
+      <a href="{{ url_for('science_page') }}#section-method">Les règles de méthode qu'AUREN applique →</a>
+    </p>
   </section>
 
   {% if report.last_session %}
