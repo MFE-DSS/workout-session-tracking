@@ -311,3 +311,55 @@ quand le budget descend sous ce qu'un lot de quatre demande. Noté pour
   VPS. En particulier, `body_assessment_enabled` n'y est pas vérifiable, et
   l'argument « `measurement_trend` est inatteignable » repose sur la valeur par
   défaut du drapeau, pas sur une mesure en production.
+
+---
+
+## 8. Closeout post-merge
+
+| | |
+|---|---|
+| PR | [#152](https://github.com/MFE-DSS/workout-session-tracking/pull/152) |
+| Méthode | `--merge`, tête épinglée `92029d3` — **pas de squash, pas de `--admin`, pas de force** |
+| Commit de merge | **`05335fc`** |
+| CI de PR | **8 / 8** verts, gate Sonar `OK` (0 code smell neuf, 0 bug, 0 vulnérabilité, couverture neuve **93,9 %**) |
+| CI canonique au push | run `32770709727` — **6 / 6 verts** |
+| Fils de revue non résolus | 0 |
+| Migration | aucune |
+
+### L'incident CI, et ce qu'il a appris
+
+Un seul cycle rouge : `external_ruff:I001` sur `tests/test_dashboard_routes.py`,
+introduit par mon insertion d'une constante. Ingéré dans Sonar comme
+**MAJOR = 15**, il a fait rougir `new_code_smells_severity` à 15 pour un seuil
+de 14 — une occurrence, un point au-dessus.
+
+**Aucune de mes deux gardes locales n'était compétente pour ce cas :**
+
+- `check_ruff_budget.py` est un **cliquet sur le total** (282 pour une base de
+  548) ; une régression locale y reste invisible tant que le total baisse par
+  ailleurs ;
+- mon pré-scan AST ne portait que sur les fichiers modifiés **à la main** —
+  celui-là l'avait été par un script.
+
+Corrigé, puis vérifié à la source : `ruff check . --output-format=json`,
+exactement comme la CI le produit, ne rend plus **aucune** occurrence sur une
+ligne modifiée par cette tranche (13 subsistent dans ces fichiers, toutes sur
+des lignes que je n'ai pas écrites).
+
+### Le gate canonique est ERROR, et ce n'est pas cette tranche
+
+`ERROR` sur les trois conditions de sévérité — **dette pré-existante documentée**
+(`SONAR-AUDIT-01` : période *new code* gelée sur la branche canonique,
+782 findings au total, remédiation 0/13).
+
+**Vérifié plutôt que supposé** : sur les 493 findings non résolus lisibles, 21
+tombent dans des fichiers de cette tranche, et **les 21 sont sur des lignes
+pré-existantes** — sélecteurs dupliqués et contrastes d'`app.css` aux lignes
+898–4016, le `# noqa` historique de `weekly_loop.py:62`, la complexité de
+`_pick_top_anomaly`, les littéraux `launcher.html` / `Nouvelle séance` de
+`pages.py`. Le gate de PR, lui, comptait **0 code smell neuf**.
+
+### État
+
+**`CLOSED`** — nettoyage branche/worktree **non exécuté** : il reste une action
+opérateur (`CLAUDE.md §2`).
