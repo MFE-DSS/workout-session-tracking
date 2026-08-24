@@ -78,6 +78,36 @@ if ! [[ "${CI_PYTEST_WORKERS}" =~ ^[0-9]+$ ]]; then
     exit 2
 fi
 
+# ---------------------------------------------------------------------------
+# Sb_OPS_LOCAL_SWEEP_MEMORY_01 — CE SCRIPT NE TOURNE PLUS SUR UN POSTE.
+#
+# Le plafond ci-dessous raisonne sur la RAM INSTALLÉE. Sur le poste de
+# l'opérateur — 16 Go — il autorise 2 workers. Mesuré le 2026-08-24 :
+# **5 365 Mo seulement étaient DISPONIBLES**, l'éditeur et ses serveurs de
+# langage occupant le reste. Deux interpréteurs qui cumulent le graphe
+# applicatif, les métadonnées SQLAlchemy et le traceur de couverture sur
+# 5 200 tests ont fait tomber la machine à répétition : VS Code tué, sweep
+# jamais terminé, aucune information obtenue.
+#
+# Le plafond était donc juste dans sa formule et faux dans son hypothèse : il
+# supposait la machine dédiée au sweep. Elle ne l'est jamais.
+#
+# `scripts/run_local_sweep.sh` fait le travail autrement — par lots, dans des
+# processus neufs, avec un chien de garde mémoire. Le refus ci-dessous est
+# MÉCANIQUE parce que la prose a déjà échoué : la version précédente de ce
+# fichier expliquait longuement le risque, et le script a quand même été lancé
+# en local, plusieurs fois, par moi.
+#
+# `ALLOW_LOCAL_CI_SWEEP=1` reste ouvert pour un diagnostic délibéré — nommé,
+# donc jamais accidentel.
+# ---------------------------------------------------------------------------
+if [[ -z "${CI:-}" && -z "${ALLOW_LOCAL_CI_SWEEP:-}" ]]; then
+    echo "[ci-pytest] REFUS : hors CI, ce script sature un poste de developpement." >&2
+    echo "[ci-pytest] Sur un poste :  bash scripts/run_local_sweep.sh" >&2
+    echo "[ci-pytest] Diagnostic delibere : ALLOW_LOCAL_CI_SWEEP=1 bash scripts/run_ci_pytest.sh" >&2
+    exit 2
+fi
+
 if [[ -z "${CI:-}" ]]; then
     # Poste local : plafonner sur la RAM physique, ~5 Go par worker.
     if [[ "$(uname -s)" == "Darwin" ]]; then
