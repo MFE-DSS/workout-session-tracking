@@ -119,8 +119,11 @@ def test_rail_history_active_progression(client):
     assert _active_primary(_get(client, "/history")) == ["Progression"]
 
 
-def test_rail_physique_active_progression(client):
-    assert _active_primary(_get(client, "/physique")) == ["Progression"]
+def test_rail_physique_redirect_lands_on_progression(client):
+    """`TRAIN1-C` — `/physique` redirige ; c'est son arrivée qui est marquée."""
+    r = client.get("/physique", follow_redirects=True)
+    assert r.status_code == 200
+    assert _active_primary(r.text) == ["Progression"]
 
 
 def test_rail_coach_active_progression(client):
@@ -140,10 +143,13 @@ def test_rail_leaderboard_active_profil(client):
 
 
 def test_rail_exactly_one_primary_active_per_route(client):
+    # `TRAIN1-C` — `/physique` reste couvert, suivi jusqu'à son arrivée.
     for path in ("/", "/library", "/launcher", "/progress", "/history",
                  "/physique", "/coach-report", "/profile", "/squads",
                  "/leaderboard"):
-        prim = _rail_primary(_get(client, path))
+        r = client.get(path, follow_redirects=True)
+        assert r.status_code == 200, f"{path} -> {r.status_code}"
+        prim = _rail_primary(r.text)
         assert prim.count('aria-current="page"') == 1, f"{path}: expected 1 active in rail"
 
 
@@ -170,8 +176,9 @@ def test_rail_and_bottom_nav_same_mapping(client):
 
 
 def test_rail_secondary_routes_present(client):
+    # `TRAIN1-C` — « Physique » a quitté le rail avec la surface elle-même.
     rail = _rail_html(_get(client))
-    for label in ("Historique", "Physique", "Coach", "Squads", "Classement", "Contact"):
+    for label in ("Historique", "Coach", "Squads", "Classement", "Contact"):
         assert f">{label}</a>" in rail, f"secondary link missing in rail: {label}"
 
 

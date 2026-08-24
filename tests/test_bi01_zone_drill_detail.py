@@ -20,7 +20,10 @@ ZONE_CARD_PARTIAL = ROOT / "app" / "templates" / "_partials" / "body_intelligenc
 ROUTER_FILE = ROOT / "app" / "routers" / "body_intelligence.py"
 CSS_FILE = ROOT / "app" / "static" / "css" / "body_intelligence.css"
 TEMPLATE = ROOT / "app" / "templates" / "body_intelligence.html"
-PHYSIQUE_TEMPLATE = ROOT / "app" / "templates" / "physique.html"
+# `TRAIN1-C` — `physique.html` a été supprimé avec sa surface. Ces gardes
+# de confinement visent la SURFACE VOISINE : c'est Progression qui porte
+# désormais l'instrument anatomique, donc c'est elle qu'il faut vérifier.
+PROGRESS_TEMPLATE = ROOT / "app" / "templates" / "progress.html"
 INDEX_TEMPLATE = ROOT / "app" / "templates" / "index.html"
 
 
@@ -216,10 +219,10 @@ def test_router_still_reuses_top_exercises_no_new_score():
     assert "'score'" not in src
 
 
-def test_physique_and_home_untouched_by_drill():
-    phys = PHYSIQUE_TEMPLATE.read_text(encoding="utf-8")
+def test_progression_and_home_untouched_by_drill():
+    prog = PROGRESS_TEMPLATE.read_text(encoding="utf-8")
     home = INDEX_TEMPLATE.read_text(encoding="utf-8")
-    assert "zone-card__drill" not in phys
+    assert "zone-card__drill" not in prog
     assert "zone-card__drill" not in home
     assert "zone-card" not in home
 

@@ -214,6 +214,17 @@
    La fenêtre est ici de TRENTE jours, pas quatorze : le prédicat est donc
    `completed_last_30`, pas `has_traces`. Confondre les deux rendrait la
    section vide alors qu'elle a quelque chose à montrer. #}
+{# `TRAIN1-C` — UN DÉNOMINATEUR ABSENT N'EST PAS UN ZÉRO, NI UN TIRET.
+   Deux des quatre cartes rendaient un `—` en grand, dans une carte de la même
+   taille que les autres. Un compte qui ne fait que du cardio les voyait toutes
+   les deux : des séances terminées, aucune série prescrite, aucun exercice
+   noté — deux tirets géants présentés comme des résultats.
+
+   La carte d'une mesure incalculable disparaît ; sa RAISON reste, sur une
+   ligne, nommée par la sémantique du producteur (`kpis.absent_measures`).
+   Retirer les deux en silence laisserait croire que la page n'a jamais eu ces
+   mesures. Le lien « comment c'est calculé » suit son score : la provenance
+   d'un objet absent n'a rien à expliquer. #}
 {% if not kpis.completed_last_30 %}
 <h2 class="section-header">Rythme récent</h2>
 <p class="empty-line">Aucune séance terminée <span class="empty-line__win">· 30 j</span></p>
@@ -228,35 +239,50 @@
     <div class="kpi-card__value">{{ kpis.completed_last_30 }}</div>
     <div class="kpi-card__label">sessions terminées (30 j)</div>
   </div>
+  {% if kpis.completion_rate_30d is not none %}
   <div class="kpi-card">
-    <div class="kpi-card__value">
-      {% if kpis.completion_rate_30d is none %}—{% else %}{{ (kpis.completion_rate_30d * 100) | round(0, 'floor') | int }}%{% endif %}
-    </div>
+    <div class="kpi-card__value">{{ (kpis.completion_rate_30d * 100) | round(0, 'floor') | int }}%</div>
     <div class="kpi-card__label">work sets validés (30 j)</div>
-    {% if kpis.work_sets_total_30d > 0 %}
-      <div class="kpi-card__sub">
-        {{ kpis.work_sets_done_30d }} cochés / {{ kpis.work_sets_total_30d }} prescrits sur {{ kpis.completed_last_30 }} séance{% if kpis.completed_last_30 > 1 %}s{% endif %}
-      </div>
-    {% endif %}
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-card__value">
-      {% if kpis.avg_success_score_30d is none %}—{% else %}{{ kpis.avg_success_score_30d | round(0, 'floor') | int }}{% endif %}
+    <div class="kpi-card__sub">
+      {{ kpis.work_sets_done_30d }} cochés / {{ kpis.work_sets_total_30d }} prescrits sur {{ kpis.completed_last_30 }} séance{% if kpis.completed_last_30 > 1 %}s{% endif %}
     </div>
+  </div>
+  {% endif %}
+  {% if kpis.avg_success_score_30d is not none %}
+  <div class="kpi-card">
+    <div class="kpi-card__value">{{ kpis.avg_success_score_30d | round(0, 'floor') | int }}</div>
     <div class="kpi-card__label">score moyen exercices (30 j)</div>
     <div class="kpi-card__sub">
       <a class="text-muted" href="{{ url_for('science_page') }}#rule-plages-repetitions">Comment c'est calculé →</a>
     </div>
   </div>
+  {% endif %}
 </div>
+{% if absent_measures %}
+<p class="kpi-absent">Non calculable <span class="kpi-absent__win">· 30 j</span>
+  — {{ absent_measures | join(', ') }}</p>
+{% endif %}
 {% endif %}
 
-<div class="cockpit-grid">
+{# `TRAIN1-C` / A4 — « PAR PROGRAMME » DISPARAÎT QUAND ELLE N'A RIEN À DIRE.
+
+   Elle instanciait une carte pleine pour porter « Aucune session terminée pour
+   l'instant. » — le défaut que `TRAIN1-A` a retiré partout ailleurs sur cette
+   page, resté ici.
+
+   ELLE EST MASQUÉE, PAS RÉDUITE À UNE LIGNE, et l'implication le justifie :
+   `template_kpis` est vide ⟺ **aucune séance terminée non exclue, jamais**.
+   Ce qui force `completed_last_30 = 0`, donc « Aucune séance terminée · 30 j »
+   est déjà à l'écran, et « Aucune séance · 14 j » aussi. Une troisième phrase
+   dirait la même absence une troisième fois.
+
+   `cockpit-grid` PART AVEC ELLE. Ce conteneur vaut `3fr 2fr` au-delà de
+   1024 px ; depuis que `TRAIN1-B` en a retiré le second enfant, il réservait
+   40 % de la largeur à une colonne vide. Une carte seule n'a pas besoin d'une
+   grille à deux colonnes. #}
+{% if template_kpis %}
   <div class="card">
     <h2 class="card__title">Par programme</h2>
-    {% if template_kpis|length == 0 %}
-      <p class="empty">Aucune session terminée pour l'instant.</p>
-    {% else %}
       <ul class="template-kpi-list">
         {% for tk in template_kpis %}
           <li class="template-kpi">
@@ -290,8 +316,8 @@
           </li>
         {% endfor %}
       </ul>
-    {% endif %}
   </div>
+{% endif %}
 
   {# `TRAIN1-B` / A10 — « ACTIVITÉ RÉCENTE PAR EXERCICE » EST RETIRÉE.
 
@@ -309,7 +335,6 @@
      part dans la MÊME livraison, et il est strictement plus riche — même
      faits, identité entière, écart calculé, drill-down convergé. La route
      héritée reste servie pour les liens existants. #}
-</div>
 
 {% if quality_svg %}
   <div class="card">
@@ -329,7 +354,17 @@
   </div>
 {% endif %}
 
+{# `TRAIN1-C` — LA NOTE N'EXPLIQUE QUE CE QUI EST À L'ÉCRAN.
+
+   Vu au rendu réel sur le compte vide : elle définissait « prescrits = nombre
+   de work sets définis par les programmes que tu as choisis » sous un écran
+   où le mot « prescrits » n'apparaissait nulle part — la carte qui l'emploie
+   venait d'être supprimée faute de dénominateur.
+
+   C'est la promesse sans réponse, retournée : une réponse sans question. Même
+   famille de défaut que tout ce train ferme, et invisible autrement qu'en
+   regardant l'écran. #}
 <p class="kpi-note">
-  Lecture indicative · séances terminées uniquement · warmup exclus · prescrits = nombre de work sets définis par les programmes que tu as choisis.
+  Lecture indicative · séances terminées uniquement{% if kpis.completed_last_30 %} · warmup exclus{% endif %}{% if kpis.completion_rate_30d is not none %} · prescrits = nombre de work sets définis par les programmes que tu as choisis{% endif %}.
 </p>
 {% endblock %}

@@ -713,15 +713,21 @@ def test_no_behavioural_verdict_prose_at_the_first_level(client):
 
 def test_the_unique_weekly_objects_survive():
     """Le pendant : `weekly_loop` est RECOMPOSÉ, pas supprimé (`§5.3`).
-    Dominantes et anomalie sont des objets réels et restent."""
-    import pathlib
+    Dominantes et anomalie sont des objets réels et restent.
 
-    src = (pathlib.Path(__file__).resolve().parent.parent
-           / "app/templates/_partials/weekly_loop.html").read_text(encoding="utf-8")
-    body = re.sub(r"\{#.*?#\}", " ", src, flags=re.S)
-    assert "Séances dominantes" in body
-    assert "dominant_templates" in body
-    assert "anomaly" in body.lower()
+    ⚠ `TRAIN1-C` — CETTE GARDE LISAIT UN GABARIT QUE PLUS RIEN NE RENDAIT.
+    Elle vérifiait la survie des deux faits dans `_partials/weekly_loop.html`,
+    orphelin depuis que `TRAIN1-A` a retiré son `include`. Elle était donc
+    verte quoi qu'il arrive à la vraie page — la treizième garde de cette
+    famille. Le partiel est supprimé ; elle lit désormais la SURFACE, là où
+    les deux faits ont réellement atterri.
+    """
+    body = _uncommented(TEMPLATE.read_text(encoding="utf-8"))
+    # la dominance hebdomadaire, absorbée dans « Par programme »
+    assert "tk.week_count" in body
+    assert "cette sem." in body
+    # l'anomalie, absorbée en ligne de l'instrument temporel
+    assert "top_anomaly" in body
 
 
 def test_coexisting_counts_of_the_same_entity_state_their_window():
@@ -732,21 +738,21 @@ def test_coexisting_counts_of_the_same_entity_state_their_window():
     quand la fixture n'avait ni programme dominant ni KPI par programme —
     une garde qui ne garde que si les données veulent bien exister. On lit les
     gabarits : la fenêtre doit être écrite à côté du nombre, données ou pas.
+
+    ⚠ `TRAIN1-C` — sa moitié « dominantes » lisait elle aussi le partiel
+    orphelin `weekly_loop.html`. Les DEUX comptes vivent maintenant dans la
+    même entrée « Par programme » : c'est cette entrée, et elle seule, qui doit
+    porter les deux fenêtres.
     """
-    import pathlib
-
-    wl = (pathlib.Path(__file__).resolve().parent.parent
-          / "app/templates/_partials/weekly_loop.html").read_text(encoding="utf-8")
-    dominant = re.sub(r"\{#.*?#\}", " ", wl, flags=re.S)
-    dominant = dominant.split("Séances dominantes", 1)[1].split("</ul>", 1)[0]
-    assert "cette semaine" in dominant, (
-        "les dominantes ne disent plus sur quelle fenêtre elles comptent"
-    )
-
-    # La fenêtre vit sur la ligne de métadonnées, pas collée au nombre : à
-    # 390 px, inline, elle repliait la ligne. On lit donc l'entrée entière.
     prog = _uncommented(TEMPLATE.read_text(encoding="utf-8"))
     entry = prog.split('class="template-kpi"', 1)[1].split("</li>", 1)[0]
+
+    # fenêtre 1 — la semaine ISO en cours, collée au compte hebdomadaire
+    assert "cette sem." in entry, (
+        "les dominantes ne disent plus sur quelle fenêtre elles comptent"
+    )
+    # fenêtre 2 — tout l'historique. Sur la ligne de métadonnées et non collée
+    # au nombre : inline, à 390 px, elle repliait la ligne.
     assert "historique" in entry, (
         "le compte par programme ne dit plus sur quelle fenêtre il porte"
     )

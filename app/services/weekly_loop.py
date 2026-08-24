@@ -64,6 +64,49 @@ def build_weekly_loop(
     return payload
 
 
+def build_progress_week(
+    db: Session, user: User, now: datetime | None = None
+) -> dict[str, Any]:
+    """`TRAIN1-C` — CE QUE `/progress` CONSOMME, ET RIEN D'AUTRE.
+
+    `build_weekly_loop` produit quatorze clés. Depuis `TRAIN1-A`, la surface en
+    lit **deux** : les programmes dominants de la semaine et l'anomalie. Les
+    douze autres étaient calculées à chaque affichage puis jetées.
+
+    Quatre d'entre elles ne sont pas de simples calculs perdus, ce sont des
+    PHRASES — `narrative`, `hint`, `volume_signal`, `data_quality_note`. Elles
+    prescrivent (« pense à la récupération »), encouragent (« bon démarrage »)
+    et qualifient (« données partielles »). Les produire pour une surface qui a
+    retiré son conteneur, c'est garder vivante une voix que la surface a
+    congédiée : il suffit d'un `{{ weekly.hint }}` pour la faire revenir sans
+    que rien ne l'arbitre.
+
+    `build_weekly_loop` N'EST PAS SUPPRIMÉE, et `narrate_week` non plus. La
+    décision porte sur ce que **le chemin Progression** calcule, pas sur
+    l'existence de services réutilisables. Ceux-ci restent testés et appelables.
+
+    Même dégradation que le composeur complet : une erreur DB rend un payload
+    vide plutôt que de faire tomber `/progress`.
+    """
+    ref = now or datetime.now(UTC)
+    try:
+        week_start = _start_of_iso_week(ref)
+        sessions = _load_window_sessions(
+            db, user.id, week_start, week_start + timedelta(days=7))
+        counter = Counter(s.template_name_snapshot for s in sessions)
+        return {
+            "dominant_templates": [
+                {"name": name, "count": cnt}
+                for name, cnt in counter.most_common(_MAX_DOMINANT)
+            ],
+            "top_anomaly": _pick_top_anomaly(sessions),
+        }
+    # Dégradation, jamais une page cassée : `/progress` vaut mieux sans son
+    # anomalie qu'en erreur 500 parce qu'une requête hebdomadaire a échoué.
+    except Exception:  # noqa: BLE001
+        return {"dominant_templates": [], "top_anomaly": None}
+
+
 def _start_of_iso_week(ref: datetime) -> datetime:
     """Monday 00:00 UTC of the ISO week containing `ref`."""
     monday = ref - timedelta(days=ref.weekday())

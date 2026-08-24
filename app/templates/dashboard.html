@@ -1,3 +1,18 @@
+{# ⚠ GABARIT DÉPRÉCIÉ — AUCUNE ROUTE NE LE REND (`TRAIN1-C`).
+
+   `/dashboard` redirige vers `/progress` depuis cette tranche (vers `/` depuis
+   Sb_27.6). Ce fichier n'est donc atteint par aucune requête. Il est conservé
+   volontairement : huit fichiers de tests s'appuient encore sur
+   `compute_dashboard`, et les remuer pour effacer du code mort n'apporterait
+   rien à Progression.
+
+   IL RESTE UN SECOND PRODUIT ANALYTIQUE, et c'est pour cela qu'on ne le
+   rebranche pas : il rend un score global sur 100, une lettre et un radar —
+   la doctrine même que `TRAIN1-C` a retirée de `/physique`.
+
+   ⛔ NE PAS LE REBRANCHER SANS DÉCISION EXPLICITE. Une garde
+   (`test_train1c_progression_consolidation`) rougit si une route, un lien de
+   navigation ou un nouveau consommateur de production réapparaît. #}
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Synthèse</h1>

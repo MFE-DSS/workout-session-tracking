@@ -76,7 +76,13 @@
     {% set is_home = _p == '/' or _p.startswith('/home') %}
     {% set is_programs = _p.startswith('/library') or _p.startswith('/launcher') %}
     {% set is_history = _p.startswith('/history') %}
-    {% set is_physique = _p.startswith('/physique') or _p.startswith('/body/intelligence') %}
+    {# `TRAIN1-C` — « PHYSIQUE » A QUITTÉ LA NAVIGATION.
+       La surface était un second produit analytique ; `/physique` redirige
+       désormais vers `/progress`, donc aucun chemin ne peut plus commencer par
+       `/physique` une fois la redirection suivie. Ne reste que Body
+       Intelligence, derrière son drapeau, qui appartient bien à l'onglet
+       Progression quand il est actif. #}
+    {% set is_body_intel = _p.startswith('/body/intelligence') %}
     {% set is_progress = _p.startswith('/progress') %}
     {% set is_leaderboard = _p.startswith('/leaderboard') %}
     {% set is_squads = _p.startswith('/squads') %}
@@ -89,7 +95,7 @@
        restent accessibles via le menu topbar (aucune route supprimée).
        Un seul onglet actif ; jamais aria-current="false". #}
     {% set is_sess = is_home or _p.startswith('/sessions') %}
-    {% set is_prog = is_progress or is_history or is_physique or is_coach %}
+    {% set is_prog = is_progress or is_history or is_body_intel or is_coach %}
     {% set is_prof = is_profile or is_squads or is_leaderboard %}
     <header class="topbar">
       <a class="topbar__brand" href="{{ url_for('home') }}">Auren</a>
@@ -105,7 +111,6 @@
         <nav class="topbar__nav" aria-label="Navigation secondaire">
           <a class="topbar__link {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
           <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
-          <a class="topbar__link {% if is_physique %}is-subactive{% endif %}" href="{{ url_for('physique') }}">Physique</a>
           <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
           <a class="topbar__link {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
           <a class="topbar__link {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
@@ -152,7 +157,6 @@
         <nav class="app-rail__secondary-nav" aria-label="Navigation secondaire">
           <a class="app-rail__sublink {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
           <a class="app-rail__sublink {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
-          <a class="app-rail__sublink {% if is_physique %}is-subactive{% endif %}" href="{{ url_for('physique') }}">Physique</a>
           <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach</a>
           <a class="app-rail__sublink {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
           <a class="app-rail__sublink {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
@@ -183,8 +187,9 @@
        (aria-hidden) ; label texte toujours visible. Onglet actif dérivé de
        request.url.path (is_sess/is_prog/is_prof). Masquée ≥769px (topbar =
        fallback desktop ; rail desktop = Sb_UI_03.2). Routes secondaires
-       (Historique/Physique/Coach/Classement/Squads/Déconnexion) préservées
-       dans le menu topbar. #}
+       (Historique/Coach/Classement/Squads/Déconnexion) préservées
+       dans le menu topbar. `TRAIN1-C` a retiré « Physique » de cette liste —
+       la surface n'existe plus, sa route redirige. #}
     {% if not shell_focus_mode %}
     <nav class="app-bottom-nav" aria-label="Navigation principale">
       <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>

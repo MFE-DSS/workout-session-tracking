@@ -239,17 +239,24 @@ def test_radar_svg_zero_scores():
 # --- Integration tests for /physique page ---
 
 
-def test_physique_page_renders(client):
-    r = client.get("/physique")
-    assert r.status_code == 200
-    assert "Physique" in r.text
-    assert "zone-card" in r.text
+def test_physique_page_redirects_to_progression(client):
+    """`TRAIN1-C` — la surface est retirée ; le SERVICE reste testé par tout ce
+    fichier, et par ses consommateurs `LEGACY_SCORE_CONSUMER`.
+
+    C'est la distinction que cette tranche fait : `compute_physique_dashboard`
+    n'est pas supprimé — le classement public en consomme le radar —, mais il
+    n'a plus de surface exposée par défaut à un utilisateur connecté.
+    """
+    r = client.get("/physique", follow_redirects=False)
+    assert r.status_code == 303
+    assert r.headers["location"] == "/progress"
 
 
-def test_physique_page_window_param(client):
-    r = client.get("/physique?window=60")
-    assert r.status_code == 200
-    assert "is-active" in r.text
+def test_physique_window_param_is_still_accepted(client):
+    """Les signets externes portent `?window=60`. La redirection les accueille
+    sans 422 — le paramètre est ignoré, pas refusé."""
+    r = client.get("/physique?window=60", follow_redirects=False)
+    assert r.status_code == 303
 
 
 def test_physique_page_requires_auth(client):

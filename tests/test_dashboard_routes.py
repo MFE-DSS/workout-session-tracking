@@ -9,22 +9,34 @@ Les tests historiques qui rendaient le template directement sont
 remplacés par leur équivalent "deprecated redirect" — l'intention V1
 ("/dashboard renders") n'est plus contractuelle ; l'intention V2 ("/dashboard
 deprecates to /") l'est.
+
+`TRAIN1-C` — la cible de la redirection devient `/progress`. L'audit du contenu
+du tableau de bord est clos : rien d'unique à absorber. Reste l'atterrissage —
+qui tape `/dashboard` cherche de l'analytique, et elle vit sur Progression.
 """
 from __future__ import annotations
 
+PROGRESSION = "/progress"
 
-def test_dashboard_redirects_to_home(client):
-    """GET /dashboard returns 303 redirect to / for an authenticated user."""
+
+def test_dashboard_redirects_to_progression(client):
+    """`TRAIN1-C` — LA CIBLE A CHANGÉ : `/` → `/progress`.
+
+    Sb_27.6 renvoyait vers l'Accueil, faute de mieux à l'époque. L'audit du
+    contenu du tableau de bord est clos — rien d'unique à absorber —, donc la
+    seule question qui restait est celle de l'atterrissage : quelqu'un qui tape
+    `/dashboard` cherche de l'analytique, et l'analytique vit sur `/progress`.
+    """
     r = client.get("/dashboard", follow_redirects=False)
     assert r.status_code == 303
-    assert r.headers["location"] == "/"
+    assert r.headers["location"] == PROGRESSION
 
 
 def test_dashboard_redirects_with_window_param(client):
-    """The deprecated `window` query param is ignored — redirect still 303 /."""
+    """The deprecated `window` query param is ignored — redirect still 303."""
     r = client.get("/dashboard?window=60", follow_redirects=False)
     assert r.status_code == 303
-    assert r.headers["location"] == "/"
+    assert r.headers["location"] == PROGRESSION
 
 
 def test_dashboard_unauth_redirects_to_login(client):
@@ -38,9 +50,8 @@ def test_dashboard_unauth_redirects_to_login(client):
     assert r.headers["location"].endswith("/login")
 
 
-def test_dashboard_follow_redirect_lands_on_home(client):
-    """Following the redirect lands on the new Home coaching surface."""
+def test_dashboard_follow_redirect_lands_on_progression(client):
+    """Following the redirect lands on the analytical surface, not the Home."""
     r = client.get("/dashboard", follow_redirects=True)
     assert r.status_code == 200
-    # Home renders the coaching loop section
-    assert "coaching-loop" in r.text or "Aujourd'hui" in r.text
+    assert "Progression" in r.text

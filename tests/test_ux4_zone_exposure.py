@@ -361,7 +361,10 @@ def test_partial_never_renders_a_zero_row(client):
 
     assert view["state"] == "partial"
     assert view["rows"], "aucune zone observée rendue"
-    assert all(n > 0 for _lab, n in view["rows"]), (
+    # `TRAIN1-C` — les lignes portent désormais DEUX comptages : les séances
+    # (la question de l'instrument) et les séries (le fait repris à Physique).
+    # C'est le premier qui décide qu'une zone a été observée.
+    assert all(n > 0 for _lab, n, _sets in view["rows"]), (
         "une ligne à zéro est rendue alors qu'un exercice n'est pas attribué"
     )
     # Le fond de la silhouette devient inconnu, jamais vide.

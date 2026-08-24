@@ -366,11 +366,41 @@ def test_progress_route_no_longer_renders_the_weekly_container(client):
 
 
 def test_the_weekly_producer_is_still_called_by_the_route():
-    """La décision porte sur le conteneur, jamais sur la capacité."""
+    """La décision porte sur le conteneur, jamais sur la capacité.
+
+    `TRAIN1-C` — LE PRODUCTEUR A RÉTRÉCI, IL N'A PAS DISPARU.
+
+    `TRAIN1-A` avait retiré le conteneur et gardé le composeur complet ; ses
+    quatorze clés étaient donc calculées à chaque affichage pour deux qui
+    étaient lues. Quatre d'entre elles sont des PHRASES — `narrative`, `hint`,
+    `volume_signal`, `data_quality_note` — qui prescrivent et encouragent : les
+    produire pour une surface qui a retiré son conteneur garde vivante une voix
+    qu'elle a congédiée.
+
+    L'invariant utile n'était pas « ce nom de fonction apparaît » mais **« la
+    fenêtre hebdomadaire alimente encore ses deux faits »**. C'est ce qui est
+    asserté, et c'est plus strict : le producteur étroit doit être appelé ET
+    ne rendre que ces deux clés.
+    """
     pages = (
         pathlib.Path(__file__).resolve().parent.parent / "app/routers/pages.py"
     ).read_text(encoding="utf-8")
-    assert "build_weekly_loop(db, user)" in pages
+    assert "build_progress_week(db, user)" in pages
+
+
+def test_the_narrow_producer_drops_the_prescriptive_phrases(client):
+    """Le pendant du test ci-dessus, côté valeur plutôt que côté source."""
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.services.weekly_loop import build_progress_week
+
+    with SessionLocal() as db:
+        payload = build_progress_week(db, db.query(User).first())
+
+    assert set(payload) == {"dominant_templates", "top_anomaly"}
+    for phrase_key in ("narrative", "hint", "volume_signal",
+                       "data_quality_note"):
+        assert phrase_key not in payload
 
 
 def test_progress_route_no_secret_leak(client):

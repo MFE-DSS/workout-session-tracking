@@ -126,8 +126,16 @@ def test_history_marks_progression_active(client):
     assert _active_bottom_labels(_get(client, "/history")) == ["Progression"]
 
 
-def test_physique_marks_progression_active(client):
-    assert _active_bottom_labels(_get(client, "/physique")) == ["Progression"]
+def test_physique_redirect_lands_on_progression(client):
+    """`TRAIN1-C` — « Physique » n'est plus une destination.
+
+    L'intention de cette garde ne change pas : ce chemin appartient à l'onglet
+    Progression. Elle ne l'affirme simplement plus sur une page rendue —
+    `/physique` redirige, et c'est l'arrivée qui doit être marquée.
+    """
+    r = client.get("/physique", follow_redirects=True)
+    assert r.status_code == 200
+    assert _active_bottom_labels(r.text) == ["Progression"]
 
 
 def test_coach_marks_progression_active(client):
@@ -147,10 +155,15 @@ def test_leaderboard_marks_profil_active(client):
 
 
 def test_bottom_nav_exactly_one_active_per_route(client):
+    # `TRAIN1-C` — `/physique` reste dans la liste, suivi jusqu'à son arrivée.
+    # Le retirer aurait réduit la couverture en silence ; ce qui compte est que
+    # ce chemin, redirection comprise, mène à un écran correctement marqué.
     for path in ("/", "/library", "/launcher", "/progress", "/history",
                  "/physique", "/coach-report", "/profile", "/squads",
                  "/leaderboard"):
-        nav = _bottom_nav_html(_get(client, path))
+        r = client.get(path, follow_redirects=True)
+        assert r.status_code == 200, f"{path} -> {r.status_code}"
+        nav = _bottom_nav_html(r.text)
         assert nav.count('aria-current="page"') == 1, f"{path}: expected 1 active tab"
 
 
@@ -164,9 +177,16 @@ def test_bottom_nav_never_aria_current_false(client):
 
 
 def test_secondary_routes_still_reachable(client):
-    """All demoted-from-bottom-nav destinations remain in the topbar menu."""
+    """All demoted-from-bottom-nav destinations remain in the topbar menu.
+
+    `TRAIN1-C` — « Physique » a quitté cette liste. Ce n'est pas une
+    destination rétrogradée de plus : la surface a été retirée et sa route
+    redirige vers `/progress`. Un lien de navigation vers elle serait un lien
+    qui rebondit. La garde de son absence vit dans
+    `test_train1c_progression_consolidation`.
+    """
     html = _get(client)
-    for label in ("Historique", "Physique", "Coach", "Classement", "Squads"):
+    for label in ("Historique", "Coach", "Classement", "Squads"):
         assert label in html, f"secondary destination missing from shell: {label}"
 
 

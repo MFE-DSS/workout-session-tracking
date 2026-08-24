@@ -17,7 +17,10 @@ TIMELINE_SVC = ROOT / "app" / "services" / "timeline.py"
 WEEKLY_SVC = ROOT / "app" / "services" / "weekly_loop.py"
 PAGES_ROUTER = ROOT / "app" / "routers" / "pages.py"
 SESSION_TPL = ROOT / "app" / "templates" / "session_focus.html"
-PHYSIQUE_TPL = ROOT / "app" / "templates" / "physique.html"
+# `TRAIN1-C` — `physique.html` a été supprimé avec sa surface. La garde qui le
+# citait vérifiait que la passe de lisibilité de Progression ne débordait pas
+# sur les pages voisines ; elle porte désormais sur celles qui existent.
+DASHBOARD_TPL = ROOT / "app" / "templates" / "dashboard.html"
 INDEX_TPL = ROOT / "app" / "templates" / "index.html"
 BI_TPL = ROOT / "app" / "templates" / "body_intelligence.html"
 
@@ -181,7 +184,7 @@ def test_router_not_required_for_readability():
 
 
 def test_other_surfaces_untouched_by_progress_pass():
-    for tpl in (PHYSIQUE_TPL, INDEX_TPL, BI_TPL):
+    for tpl in (DASHBOARD_TPL, INDEX_TPL, BI_TPL):
         src = tpl.read_text(encoding="utf-8")
         assert "Rythme récent" not in src
 
