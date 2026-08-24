@@ -36,11 +36,33 @@ Règles d'application :
   **obligatoire** et la **CI parallélisée sur PR** est le filet de vérité — le full
   sweep local y reste **recommandé si un doute de blast radius subsiste**, non
   systématique (Sb_OPS.ci-efficiency).
-- **Commande de référence du full sweep — UNE SEULE, et elle est scriptée** :
+- **Deux commandes de full sweep, et une seule est licite par contexte** :
 
   ```bash
-  bash scripts/run_ci_pytest.sh          # CI comme local, même source de vérité
+  bash scripts/run_ci_pytest.sh      # SUR CI UNIQUEMENT — reproduction fidèle
+  bash scripts/run_local_sweep.sh    # SUR UN POSTE — par lots, mémoire bornée
   ```
+
+  **⛔ `run_ci_pytest.sh` NE SE LANCE PLUS SUR UN POSTE DE DÉVELOPPEMENT.**
+  Elle y a fait tomber la machine de l'opérateur **à répétition** : VS Code tué,
+  conteneurs emportés, sweep jamais terminé — donc aucune information obtenue,
+  et du travail perdu à côté. Ce n'était pas un garde-fou, c'était une panne.
+
+  La cause est mesurée (`Sb_OPS_LOCAL_SWEEP_MEMORY_01`). Le plafond « ~5 Go par
+  worker » de ce script raisonne sur la **RAM installée** : 16 Go → 2 workers
+  autorisés. Or sur ce poste, **5,3 Go seulement étaient disponibles**, l'éditeur
+  et ses serveurs de langage occupant le reste. S'y ajoute une croissance
+  **monotone** : un interpréteur qui enchaîne 5 200 tests cumule graphe
+  applicatif, métadonnées SQLAlchemy, fixtures et traceur de couverture.
+
+  `run_local_sweep.sh` borne le pic **par construction** : la suite est
+  découpée en lots, chacun dans un processus neuf, sans couverture par défaut,
+  avec un **chien de garde** qui arrête le sweep lui-même plutôt que de laisser
+  l'OS choisir quel programme tuer. Pics mesurés : 0,7 à 2,9 Go selon le lot —
+  le coût dépend des **fichiers** autant que de leur nombre.
+
+  Un test de garde vérifie que le script CI refuse de s'exécuter hors CI et que
+  la prose ci-dessus ne diverge pas des scripts.
 
   **Ne JAMAIS écrire `pytest -n auto` à la main.** Cette ligne prescrivait
   exactement cela jusqu'au 2026-08-19, et elle contredisait son propre script

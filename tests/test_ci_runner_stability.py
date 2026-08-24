@@ -318,13 +318,19 @@ class TestCanonicalCommand:
         est passé au vert sans exécuter la mitigation. Le script doit
         s'ARRÊTER sur une valeur non entière, pas la transmettre à pytest.
         """
+        # ⚠ `ALLOW_LOCAL_CI_SWEEP` est indispensable depuis
+        # `Sb_OPS_LOCAL_SWEEP_MEMORY_01` : sans lui le script refuse d'abord
+        # parce qu'on est hors CI, et cette garde passerait en vérifiant le
+        # MAUVAIS refus. Les deux messages contiennent « REFUS » ; on asserte
+        # donc celui qui est propre à la valeur non entière.
         out = subprocess.run(
             ["bash", str(CI_SCRIPT), "--collect-only"],
-            env={**os.environ, "CI_PYTEST_WORKERS": "auto"},
+            env={**os.environ, "CI_PYTEST_WORKERS": "auto",
+                 "ALLOW_LOCAL_CI_SWEEP": "1"},
             capture_output=True, text=True, cwd=str(REPO_ROOT),
         )
         assert out.returncode == 2, out.stdout[-400:] + out.stderr[-400:]
-        assert "REFUS" in out.stderr
+        assert "n'est pas un entier" in out.stderr
         assert "-n auto" not in out.stdout
 
     def test_the_local_worker_count_is_capped_by_physical_ram(self):
@@ -339,7 +345,11 @@ class TestCanonicalCommand:
         présence d'un commentaire : c'est précisément une règle écrite en
         prose qui a été enfreinte.
         """
-        env = {**os.environ, "CI_PYTEST_WORKERS": "64"}
+        # `ALLOW_LOCAL_CI_SWEEP` : depuis `Sb_OPS_LOCAL_SWEEP_MEMORY_01`, le
+        # script refuse purement et simplement hors CI. Ce plafond reste utile
+        # pour ce diagnostic délibéré, et cette garde doit donc l'atteindre.
+        env = {**os.environ, "CI_PYTEST_WORKERS": "64",
+               "ALLOW_LOCAL_CI_SWEEP": "1"}
         env.pop("CI", None)
         out = subprocess.run(
             ["bash", str(CI_SCRIPT), "--collect-only", "-q"],
@@ -728,3 +738,145 @@ class TestLintJobHasNoNetworkDependency:
         """Le drift `requirements` ↔ lock faisait partie des six steps que
         l'annulation de la canonique a sautés. Il doit rester bloquant."""
         assert "drift (blocking)" in self._lint_job()
+
+
+# ───────── Sb_OPS_LOCAL_SWEEP_MEMORY_01 — le sweep local ne tue plus la machine ─────────
+#
+# LE DÉFAUT, VÉCU PLUSIEURS FOIS. `run_ci_pytest.sh` lancée sur le poste de
+# l'opérateur a fait tomber la machine à répétition : VS Code tué, sweep jamais
+# terminé, donc AUCUNE information obtenue et du travail perdu à côté. Un
+# garde-fou qui empêche de travailler n'est pas un garde-fou.
+#
+# LA CAUSE, MESURÉE le 2026-08-24. Le plafond « ~5 Go par worker » de ce script
+# raisonne sur la RAM INSTALLÉE — 16 Go, donc 2 workers autorisés. Or seuls
+# **5 365 Mo étaient DISPONIBLES** : l'éditeur et ses serveurs de langage
+# occupaient le reste. La formule était juste, son hypothèse — machine dédiée
+# au sweep — était fausse.
+#
+# S'y ajoute une croissance MONOTONE : un interpréteur qui enchaîne 5 200 tests
+# cumule graphe applicatif, métadonnées SQLAlchemy, fixtures et traceur de
+# couverture. Mesuré : un lot de 12 fichiers atteint 2 896 Mo, un lot de 6 en
+# atteint 436 à 1 793 selon les fichiers. Le coût dépend des FICHIERS autant
+# que de leur nombre.
+#
+# POURQUOI CES GARDES SONT MÉCANIQUES. La version précédente de ce dépôt
+# expliquait déjà le risque, longuement, en commentaire et dans `CLAUDE.md`.
+# Le script a quand même été lancé en local, plusieurs fois, par l'agent.
+# La prose ne suffit pas ; le refus doit être exécutable.
+
+LOCAL_SCRIPT = REPO_ROOT / "scripts" / "run_local_sweep.sh"
+
+
+def _local_script() -> str:
+    return LOCAL_SCRIPT.read_text(encoding="utf-8")
+
+
+class TestLocalSweepMemory:
+    def test_the_local_sweep_script_exists(self):
+        assert LOCAL_SCRIPT.is_file()
+
+    def test_the_ci_script_refuses_to_run_outside_ci(self):
+        """LA GARDE CENTRALE. Elle éprouve le COMPORTEMENT, pas un commentaire."""
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("CI", "ALLOW_LOCAL_CI_SWEEP")}
+        out = subprocess.run(
+            ["bash", str(CI_SCRIPT), "--collect-only", "-q"],
+            env=env, capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert out.returncode == 2, out.stdout[-400:] + out.stderr[-400:]
+        assert "run_local_sweep.sh" in out.stderr, (
+            "le refus doit NOMMER la commande à utiliser à la place"
+        )
+
+    def test_the_refusal_can_be_lifted_deliberately_never_by_accident(self):
+        """Un diagnostic reste possible — mais il faut le NOMMER."""
+        assert "ALLOW_LOCAL_CI_SWEEP" in _script()
+
+    def test_the_local_sweep_refuses_to_run_on_ci(self):
+        """La réciproque. Deux chemins qui prétendent tous deux être « le
+        sweep » est la divergence que `Sb_OPS_INSTALL_AUTHORITY_01` vient de
+        fermer côté dépendances."""
+        out = subprocess.run(
+            ["bash", str(LOCAL_SCRIPT)],
+            env={**os.environ, "CI": "true"},
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        assert out.returncode == 2
+        assert "run_ci_pytest.sh" in out.stderr
+
+    def test_the_local_sweep_batches_instead_of_running_one_process(self):
+        """Le pic doit être borné par CONSTRUCTION, pas par une multiplication
+        optimiste : un processus neuf par lot remet la RSS à zéro."""
+        src = _local_script()
+        assert "SWEEP_BATCH" in src
+        assert "for ((i = 0" in src
+
+    def test_the_local_sweep_has_a_memory_watchdog(self):
+        src = _local_script()
+        assert "SWEEP_BUDGET_MB" in src
+        assert "ARRÊT" in src
+
+    def test_the_budget_reads_available_memory_not_installed(self):
+        """C'est TOUTE l'erreur du plafond précédent : 16 Go installés, 5,3 Go
+        disponibles."""
+        src = _local_script()
+        assert "vm_stat" in src or "MemAvailable" in src
+        assert "hw.memsize" not in src, (
+            "la RAM installée ne dit pas ce qu'on peut prendre"
+        )
+
+    def test_coverage_is_off_by_default_locally(self):
+        """`--cov` change le profil mémoire ET la durée. La couverture sert à
+        Sonar, c'est-à-dire à la CI."""
+        src = _local_script()
+        assert "WITH_COVERAGE=0" in src
+        assert "--with-coverage" in src
+
+    def test_the_batch_default_carries_its_measurement(self):
+        """Un chiffre doit voyager avec la mesure qui l'a produit."""
+        src = _local_script()
+        assert "SWEEP_BATCH:-4" in src
+        assert "2896" in src, "le pic mesuré qui a fait baisser le défaut"
+
+    def test_the_script_records_that_memory_is_not_released_between_files(self):
+        """LA MESURE QUI A CHANGÉ LE RAISONNEMENT.
+
+        Trois fichiers coûtent 1346 + 697 + 334 Mo individuellement, et
+        2157 Mo en lot : la mémoire n'est **pas rendue** d'un fichier à
+        l'autre dans un même processus. Le plancher du pic n'est donc pas la
+        taille du lot mais le fichier le plus lourd — 1,3 Go à lui seul.
+
+        Sans cette mesure, on réduit le lot indéfiniment en croyant descendre.
+        """
+        src = _local_script()
+        assert "1346" in src
+        assert "pas rendue" in src
+
+    def test_the_budget_floor_stays_reachable(self):
+        """Un plancher sous le coût du fichier le plus lourd arrêterait le
+        sweep sur le premier lot venu — le défaut corrigé, sous une autre
+        forme."""
+        src = _local_script()
+        assert "-lt 1600" in src
+
+    def test_the_watchdog_names_the_files_of_the_offending_batch(self):
+        """« réduire SWEEP_BATCH » sans dire lesquels laisse chercher à
+        l'aveugle — le coût dépend des fichiers."""
+        assert "fichiers du lot" in _local_script()
+
+    def test_the_repo_contract_points_at_the_local_script(self):
+        """`CLAUDE.md` prescrivait `run_ci_pytest.sh` « CI comme local ». C'est
+        cette ligne qui a été exécutée, et qui a tué la machine."""
+        contract = (REPO_ROOT / "CLAUDE.md").read_text(encoding="utf-8")
+        assert "run_local_sweep.sh" in contract
+        assert "CI comme local, même source de vérité" not in contract
+
+    def test_the_local_script_passes_shellcheck(self):
+        """Le script neuf entre dans le même gate que les autres."""
+        out = subprocess.run(
+            ["shellcheck", str(LOCAL_SCRIPT)],
+            capture_output=True, text=True, cwd=str(REPO_ROOT),
+        )
+        if out.returncode == 127:
+            pytest.skip("shellcheck absent de cet environnement")
+        assert out.returncode == 0, out.stdout[-600:]
