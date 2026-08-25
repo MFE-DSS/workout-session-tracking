@@ -290,3 +290,45 @@ chiffre est consigné pour que la décision soit prise sur mesure.
   `muscle_mapping` sont **lus**, jamais modifiés.
 * Aucune migration, aucune écriture de schéma, aucun gabarit ajouté ou retiré
   du catalogue.
+
+---
+
+## 10. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#163** |
+| Merge | **`ea5880d`** — `--merge`, tête épinglée `4fbcc1b`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | 9/9 `pass`, **aucun cycle rouge** |
+| CI canonique (`push` sur le merge) | run **32902173485** — **succès** |
+| Sonar (gate PR) | **OK** — couverture neuve **96,7 %** · 0 bug · 0 code smell · 0 vulnérabilité · duplication 0,0 % |
+| Fils de revue non résolus | 0 |
+
+### Ce que cette tranche laisse au dépôt, au-delà du code
+
+**Une mesure peut supprimer une fonctionnalité, et c'est le meilleur usage
+qu'on puisse en faire.** L'étiquette « zone sous le volume visé » était prévue,
+justifiée, facile à écrire. Mesurée avant d'être écrite : 7 zones sur 11 sous la
+cible pour une déclaration de 4 séances. Elle serait tombée sur presque chaque
+carte. Livrée, elle aurait été indiscernable d'une fonctionnalité utile — c'est
+précisément ce qui la rendait dangereuse.
+
+**Trois fautes d'instrument, toutes dans les gardes, dont une qui aurait pu
+créditer une garde jamais exécutée.** `pytest` sort avec le code 5 quand il ne
+collecte **rien** ; un harnais de plantation qui teste `returncode != 0` compte
+alors un sélecteur `-k` invalide comme une garde qui mord. Le harnais nomme
+désormais ce cas explicitement.
+
+Même famille, corrigée dans la foulée sur l'outil qui surveille la CI
+canonique : un appel `gh` en échec n'est **pas** « aucun run ». La première
+version laissait remonter l'erreur et s'arrêtait sur ce qui ressemblait à un
+verdict. Un hoquet d'API doit faire réessayer, jamais conclure.
+
+### Reste ouvert — deux arbitrages, aucun bloquant
+
+1. **Q5 (tranche A)** — « Pourquoi ce plan ? » est rendue en carte bordée alors
+   que c'est un objet informatif de rang 2. Manquement **antérieur** au
+   déménagement ; corriger l'apparence dépasse une tranche de déplacement.
+2. **Appellation « Explore »** — C8 nomme ainsi la destination ; le produit
+   l'appelle « Programmes de séance », onglet « Programmes ». Décision
+   d'appellation, pas conséquence technique. **Non fait.**
