@@ -188,3 +188,38 @@ exactement ce pour quoi elle existe.
   plus lourde du produit, absente de toutes les cartes précédentes.
 - **`rules.html` est un second gabarit mort** (comme `dashboard.html`) :
   `/rules` redirige vers `/science`.
+
+---
+
+## 7. Closeout post-merge
+
+| | |
+|---|---|
+| PR | [#156](https://github.com/MFE-DSS/workout-session-tracking/pull/156) |
+| Méthode | `--merge`, tête épinglée `13f6b01` — pas de squash, pas de `--admin`, pas de force |
+| Commit de merge | **`117976f`** |
+| CI de PR | **9 / 9** verts · gate Sonar `OK` · **couverture neuve 100 %** · 0 code smell neuf |
+| CI canonique au push | run `32830881213` — **6 / 6 verts** |
+| Fils de revue · migration | 0 · aucune |
+
+**Deuxième tranche consécutive sans cycle rouge.** Le pré-scan AST a trouvé la
+seule occurrence Sonar de mon code neuf (`S9073`) avant le push.
+
+### Ce que le parcours exhaustif laisse ouvert
+
+Trois constats sont sortis du parcours des 69 surfaces et **n'appartiennent à
+aucun arbitrage rendu**. Ils sont remontés, pas traités :
+
+| Constat | Mesure |
+|---|---|
+| `/` déborde horizontalement à **1024 px** | seule surface du produit dans ce cas, et elle est `SOVEREIGN` |
+| `/science/atlas` | **15,3 écrans · 2 074 mots · 32 boîtes** — la plus lourde du produit |
+| `rules.html` | second gabarit mort ; `/rules` redirige vers `/science` |
+
+Aucun n'était visible depuis la carte manuelle de 13 surfaces : le premier
+demande de mesurer au-delà de 430 px, les deux autres de suivre les liens
+plutôt que de lister les routes de mémoire.
+
+### État
+
+**`CLOSED`** — nettoyage exécuté sur ordre opérateur.
