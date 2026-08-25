@@ -277,9 +277,38 @@ class TestEndToEnd:
 
 
 class TestUserSurface:
+    """`UX4_02` / TRAIN 2 — la surface de la proposition est **Mon plan**.
+
+    Elle vivait sur « Mes programmes », qui répond à « qu'est-ce que j'ai
+    créé ». La proposition répond à « comment je veux m'entraîner » : même
+    question que la déclaration qui la produit, et qu'on ne pouvait pas lire
+    sur le même écran. Aucune assertion n'est retirée — seule l'adresse change.
+
+    Les deux gardes d'ABSENCE restent pointées sur `/programs` : elles y
+    vérifient maintenant que la proposition n'est pas revenue.
+    """
+
+    PLAN_URL = "/plan"
+
     def test_the_proposal_is_absent_without_declared_cadence(self, client):
+        page = client.get(self.PLAN_URL).text
+        assert "Créer le programme proposé" not in page
+
+    def test_the_proposal_did_not_stay_on_mes_programmes(self, client):
+        """Sans cette garde, le déménagement pourrait être une COPIE : deux
+        surfaces proposant le même plan, dont une sans la déclaration qui
+        l'explique."""
+        from app.database import SessionLocal
+        from app.services.training_preferences import save_training_preferences
+        from tests.helpers import get_test_user_id
+
+        with SessionLocal() as db:
+            save_training_preferences(
+                db, get_test_user_id(), sessions_per_week=4)
+
         page = client.get("/programs").text
         assert "Créer le programme proposé" not in page
+        assert "Programme proposé pour ta semaine" not in page
 
     def test_the_proposal_appears_once_a_cadence_is_declared(self, client):
         import html
@@ -293,7 +322,7 @@ class TestUserSurface:
                 db, get_test_user_id(), sessions_per_week=4,
                 focus_priorities=["arms"])
 
-        page = html.unescape(client.get("/programs").text)
+        page = html.unescape(client.get(self.PLAN_URL).text)
         assert "Créer le programme proposé" in page
         assert "Programme proposé pour ta semaine" in page
         assert "Bras" in page
@@ -309,7 +338,7 @@ class TestUserSurface:
             save_training_preferences(
                 db, get_test_user_id(), sessions_per_week=4)
 
-        page = html.unescape(client.get("/programs").text)
+        page = html.unescape(client.get(self.PLAN_URL).text)
         assert "brouillon" in page.lower()
         assert "Rien n'est publié ni lancé sans ton accord" in page
 
@@ -324,7 +353,7 @@ class TestUserSurface:
             save_training_preferences(
                 db, get_test_user_id(), sessions_per_week=4)
 
-        page = html.unescape(client.get("/programs").text)
+        page = html.unescape(client.get(self.PLAN_URL).text)
         assert "Proposition partielle" in page
 
     def test_the_action_creates_a_draft_and_lands_on_the_editor(self, client):
@@ -379,6 +408,6 @@ class TestUserSurface:
             raise RuntimeError("planner down")
 
         monkeypatch.setattr(weekly_planner, "build_weekly_plan_for_user", _boom)
-        response = client.get("/programs")
+        response = client.get(self.PLAN_URL)
         assert response.status_code == 200
         assert "Créer le programme proposé" not in response.text

@@ -11,7 +11,10 @@ import re
 
 import pytest
 
-PROFILE_URL = "/profile"
+# `UX4_02` / TRAIN 2 — l'éditeur est rendu par **Mon plan** (`OPERATOR_DECISION`
+# C2). La route de SOUMISSION, elle, ne bouge pas : c'est un contrat, et rien
+# ne justifie de le rompre parce que le formulaire a changé d'écran.
+EDITOR_URL = "/plan"
 PREFERENCES_URL = "/profile/preferences"
 
 
@@ -35,7 +38,7 @@ def _prefs():
 
 
 def _page(client) -> str:
-    return client.get(PROFILE_URL).text
+    return client.get(EDITOR_URL).text
 
 
 # ── Le contrat POST ne bouge pas ─────────────────────────────────────────────

@@ -6,81 +6,22 @@
 <div style="display:flex; gap:.75rem; margin-bottom:1.5rem;">
   <a class="btn btn--primary" href="{{ url_for('user_program_new') }}">Créer un programme</a>
 </div>
+{# `UX4_02` / TRAIN 2 — LE PLAN ET SON EXPLICATION ONT DÉMÉNAGÉ.
 
-{# Sb_WEEKLY_PLAN_MATERIALIZATION_01 — proposition hebdomadaire.
-   Rien n'est créé sans une action explicite : ce bloc informe, le bouton agit. #}
-{% if weekly_plan_proposal %}
-  {% set p = weekly_plan_proposal %}
-  <section class="card" style="margin-bottom:1.5rem;">
-    <h2 style="margin-top:0;">Programme proposé pour ta semaine</h2>
-    <p class="text-dim" style="margin-bottom:.75rem;">
-      {{ p.sessions }} séance{{ 's' if p.sessions > 1 }}/semaine ·
-      {{ p.exercises }} exercice{{ 's' if p.exercises > 1 }} ·
-      {{ p.planned_sets }} série{{ 's' if p.planned_sets > 1 }} planifiée{{ 's' if p.planned_sets > 1 }}
-    </p>
+   Les deux blocs vivaient ici — la proposition hebdomadaire (`Sb_WEEKLY_PLAN_
+   MATERIALIZATION_01`) et « Pourquoi ce plan ? » (`Sb_ORCHESTRATOR_EXPLAINER_01`).
+   Ils répondent à « comment je veux m'entraîner » ; cette page répond à
+   « qu'est-ce que j'ai créé ». Deux questions, deux surfaces.
 
-    {% if p.priorities %}
-      <p style="margin:.25rem 0;">Priorités déclarées : {{ p.priorities|join(' · ') }}</p>
-    {% endif %}
+   Ils sont sur **Mon plan** (`/plan`), réunis avec la DÉCLARATION qui les
+   produit — ce qui manquait le plus : on lisait un plan sans pouvoir voir, sur
+   le même écran, ce dont il découlait. Rien n'est supprimé.
 
-    {% if p.status == 'constraint_unmet' %}
-      <p style="margin:.25rem 0;"><strong>Proposition partielle</strong> — une priorité que tu as déclarée n'est pas programmable :</p>
-      <ul style="margin:.25rem 0 .75rem 1.25rem;">
-        {% for constraint in p.constraints %}<li>{{ constraint }}</li>{% endfor %}
-      </ul>
-    {% elif p.status == 'partial' %}
-      <p style="margin:.25rem 0 .75rem;">
-        <strong>Proposition partielle</strong> — {{ p.unmet_zones }} zone{{ 's' if p.unmet_zones > 1 }}
-        rest{{ 'ent' if p.unmet_zones > 1 else 'e' }} sous le volume visé. Le programme est utilisable tel quel.
-      </p>
-    {% else %}
-      <p style="margin:.25rem 0 .75rem;">Toutes les zones visées sont couvertes.</p>
-    {% endif %}
+   Le bouton « Créer le programme proposé » part avec la proposition : la même
+   action que ce qu'elle matérialise. La route `user_program_from_weekly_plan`
+   est inchangée, et le programme créé atterrit bien ici. #}
 
-    <form method="post" action="{{ url_for('user_program_from_weekly_plan') }}">
-      <button type="submit" class="btn btn--primary">Créer le programme proposé</button>
-    </form>
-    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
-      Crée un <strong>brouillon</strong> modifiable. Rien n'est publié ni lancé sans ton accord.
-    </p>
-  </section>
-{% endif %}
 
-{# Sb_ORCHESTRATOR_EXPLAINER_01 — lecture seule. Chaque explication porte son
-   étiquette de source EN CLAIR, jamais le jeton d'énumération : « tu l'as
-   demandé » et « le produit planifie ainsi » ne sont pas le même genre
-   d'énoncé, et les fondre détruirait la distinction. La morphologie est
-   absente par construction — le planificateur ne la consomme pas. #}
-{% if plan_explanation and plan_explanation.available %}
-  <section class="card" style="margin-bottom:1.5rem;" aria-labelledby="why-plan-title">
-    <h2 id="why-plan-title" style="margin-top:0;">Pourquoi ce plan ?</h2>
-    <ul style="margin:.25rem 0 .75rem 1.25rem;">
-      {% for item in plan_explanation.items %}
-        <li style="margin-bottom:.4rem;">
-          {{ item.text }}
-          <span class="text-dim" style="display:block; font-size:.9em;">
-            {{ item.source_label }}{% if item.detail %} — {{ item.detail }}{% endif %}{% if item.confidence_label %} ({{ item.confidence_label }}){% endif %}
-          </span>
-        </li>
-      {% endfor %}
-    </ul>
-    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
-      {{ plan_explanation.notice }}
-    </p>
-  </section>
-{% endif %}
-
-{# `TRAIN1-E` / C7 — « POURQUOI CE PLAN ? » NE S'INSTANCIE PLUS À VIDE.
-
-   Mesuré : sur les deux comptes de test, cette carte rendait une boîte de plus
-   de 80 px dont tout le corps était une phrase d'absence. Un module pleine
-   taille pour annoncer qu'il n'a rien à dire — le défaut que `TRAIN1-C` a
-   retiré de Progression, resté ici.
-
-   La condition d'affichage devient `plan_explanation.available` : la carte
-   existe quand elle a une explication, et disparaît sinon. L'information
-   « aucune trace de décision » n'est pas perdue pour autant — elle n'était
-   qu'une reformulation de l'absence de plan, que la liste vide dit déjà. #}
 
 {% if programs|length == 0 %}
   {# État compact, même forme que Progression. PAS de second appel à créer :

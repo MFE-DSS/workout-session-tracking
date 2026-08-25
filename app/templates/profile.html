@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% from "_macros.html" import choice_row, select_shell %}
 {% block content %}
 <h1 class="page-title">Profil</h1>
 
@@ -335,132 +334,24 @@
       </details>
     </div>
 
-    {# ── Préférences d'entraînement déclarées (Sb_TRAINING_PREFERENCES_01) ──
-       Faits DÉCLARÉS par l'utilisateur, destinés au futur planificateur. Aucune
-       valeur par défaut n'est proposée ni pré-cochée : « non renseigné » est un
-       état à part entière, distinct d'un choix explicitement vide. Aucun
-       libellé ne présente une fréquence comme optimale. #}
-    {# ── `UX4_01` — CONFIGURATION D'ENTRAÎNEMENT : TRANSITIONNELLE ICI ──────
-       `OPERATOR_DECISION` : la configuration persistante appartient à
-       `PROGRAMMES / PLAN`, pas à l'édition du Profil. Le Profil peut en
-       montrer un **résumé compact en lecture seule** — c'est ce que fait la
-       section « Entraînement » en tête de page.
+    {# `UX4_02` / TRAIN 2 — LES PRÉFÉRENCES D'ENTRAÎNEMENT ONT DÉMÉNAGÉ.
 
-       L'ÉDITEUR RESTE ICI, ET C'EST DÉLIBÉRÉ. Le déplacer exige de construire
-       la surface de destination dans `Programmes`, ce qui est une tranche
-       structurelle à part. Le retirer maintenant supprimerait la capacité sans
-       la remplacer.
+       Elles vivent désormais sur **Mon plan** (`/plan`), avec le plan qu'elles
+       produisent et l'explication de ce plan. C'est ce que cet emplacement
+       annonçait lui-même depuis `Sb_TRAINING_PREFERENCES_01` :
 
-       DÉPENDANCE ENREGISTRÉE :
-         `UX4_02 LIBRARY_WORKOUT_DISCOVERY` doit accueillir cet éditeur.
-         Tant que ce n'est pas fait, cet emplacement est TRANSITIONNEL et ne
-         vaut pas architecture cible.
+         « `UX4_02 LIBRARY_WORKOUT_DISCOVERY` doit accueillir cet éditeur.
+           Tant que ce n'est pas fait, cet emplacement est TRANSITIONNEL et ne
+           vaut pas architecture cible. »
 
-       Le formulaire n'est PAS dupliqué : il n'existe qu'ici. #}
-    <div class="card">
-      <h2 class="card__title">Préférences d'entraînement</h2>
-      <p class="text-dim" style="font-size:12px;margin:0 0 var(--space-sm);">
-        Ce que tu souhaites et ce dont tu disposes. Ces informations ne
-        modifient pas la séance recommandée aujourd'hui.
-        <br><em>Emplacement transitionnel — ces réglages rejoindront Programmes.</em>
-      </p>
+       Le formulaire n'est pas dupliqué — il n'existe toujours qu'à UN endroit,
+       et la route de soumission (`/profile/preferences`) ainsi que les noms de
+       champs sont INCHANGÉS : ce sont des contrats, pas des détails de page.
+       Seule la redirection suit le formulaire.
 
-      {% if pref_saved %}
-      <p class="text-dim" style="font-size:12px;color:var(--good);">Préférences enregistrées.</p>
-      {% endif %}
-      {% if pref_error %}
-      <p class="text-dim" style="font-size:12px;color:var(--warn);">
-        Enregistrement refusé : une priorité est en double ou une valeur est hors liste.
-      </p>
-      {% endif %}
-
-      {# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — présentation seule.
-         Les noms POST sont INCHANGÉS : sessions_per_week, focus_1..3,
-         equipment, equipment_declared. Aucune sémantique de persistance n'est
-         touchée. #}
-      {# `UX4_01` — configuration persistante : lisible d'abord, éditable ensuite. #}
-      <details class="pstate__edit">
-      <summary>Modifier mes préférences</summary>
-      <form method="post" action="{{ url_for('profile_preferences_submit') }}"
-            class="prefs-form" data-prefs-form>
-
-        {# ── Cadence : domaine fini de 7 valeurs, donc une grille de choix,
-             pas un menu déroulant. Aucune valeur pré-sélectionnée si rien
-             n'est déclaré — NULL reste NULL. ── #}
-        <fieldset class="prefs-block">
-          <legend class="choice-group__legend">Séances souhaitées par semaine</legend>
-          <p class="choice-group__hint">Non renseigné tant que tu ne choisis pas.</p>
-          <div class="choice-grid">
-            {% for n in sessions_range %}
-              {{ choice_row("sessions_per_week", n, n, kind="radio",
-                            checked=(preferences.sessions_per_week == n),
-                            input_id="cadence_%s"|format(n)) }}
-            {% endfor %}
-          </div>
-        </fieldset>
-
-        {# ── Priorités : la sélection ET son rang doivent rester visibles.
-             Les trois menus natifs focus_1..3 restent LA source de vérité
-             fallback sans JS ; le bloc classé ci-dessous n'est révélé que si
-             JS est actif, et il ne fait qu'écrire dans ces mêmes selects. ── #}
-        <fieldset class="prefs-block">
-          <legend class="choice-group__legend">Priorités (optionnel, dans l'ordre)</legend>
-          <p class="choice-group__hint">Trois au maximum. Le rang s'affiche sur l'option.</p>
-
-          <div class="prefs-fallback" data-prefs-fallback>
-            {% for slot in [1, 2, 3] %}
-            <div class="prefs-fallback__row">
-              <label class="choice-group__hint" for="focus_{{ slot }}">Priorité {{ slot }}</label>
-              {{ select_shell("focus_%s"|format(slot), focus_vocab,
-                              selected=(preferences.focus_priorities[slot - 1]
-                                        if preferences.focus_priorities
-                                           and preferences.focus_priorities|length >= slot
-                                        else None),
-                              empty_label="Aucune",
-                              select_id="focus_%s"|format(slot)) }}
-            </div>
-            {% endfor %}
-          </div>
-
-          <div class="choice-group" data-prefs-ranked hidden>
-            {% for key, label in focus_vocab %}
-            <button type="button" class="choice-row choice-row--button"
-                    data-focus-key="{{ key }}" aria-pressed="false">
-              <span class="choice-row__marker choice-row__marker--check" aria-hidden="true">✓</span>
-              <span class="choice-row__body">
-                <span class="choice-row__label">
-                  <span class="choice-row__rank" data-focus-rank></span> {{ label }}
-                </span>
-              </span>
-            </button>
-            {% endfor %}
-          </div>
-        </fieldset>
-
-        {# ── Matériel : multi-sélection, donc checkbox. Le marqueur caché
-             distingue « jamais soumis » (rien stocké, NULL) de « soumis sans
-             rien cocher » (déclaration explicite : []). Le style ne doit pas
-             détruire cette distinction. ── #}
-        <fieldset class="prefs-block">
-          <legend class="choice-group__legend">Matériel disponible</legend>
-          <input type="hidden" name="equipment_declared" value="1">
-          {% if preferences.available_equipment is none %}
-          <p class="choice-group__hint">Je n'ai pas encore renseigné mon équipement.</p>
-          {% endif %}
-          <div class="choice-group">
-            {% for key, label in equipment_vocab %}
-              {{ choice_row("equipment", key, label, kind="checkbox",
-                            checked=(preferences.available_equipment
-                                     and key in preferences.available_equipment),
-                            input_id="equipment_%s"|format(key)) }}
-            {% endfor %}
-          </div>
-        </fieldset>
-
-        <button type="submit" class="btn btn--ghost prefs-form__submit">Enregistrer</button>
-      </form>
-      </details>
-    </div>
+       `TRAIN1-D` avait déjà retiré leur LECTURE du niveau 1 du Profil ; c'est
+       l'édition qui part maintenant, et le Profil ne répond plus qu'à « que
+       sait AUREN de moi ? ». #}
 
     <div class="card__actions" style="margin-top:var(--space-md);">
       <a class="btn" href="{{ url_for('password_change_page') }}">Changer le mot de passe</a>

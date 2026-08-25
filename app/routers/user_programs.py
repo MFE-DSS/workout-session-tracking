@@ -419,6 +419,13 @@ def _weekly_plan_proposal(db, user_id: int) -> dict | None:
 def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
     """Owner-scoped library of the current user's custom programs (archived
     excluded — `list_drafts` filters them by default)."""
+    # `UX4_02` / TRAIN 2 — LE PLAN A QUITTÉ CETTE SURFACE.
+    #
+    # « Mes programmes » répond à « qu'est-ce que j'ai créé ». La proposition
+    # hebdomadaire et son explication répondent à « comment je veux
+    # m'entraîner » — c'est la question de **Mon plan**, et elles y vivent
+    # désormais avec la déclaration qui les produit. Aucune des deux n'est
+    # supprimée : elles sont réunies avec ce qui les explique.
     programs = list_drafts(db, user.id)
     return templates.TemplateResponse(
         request,
@@ -427,11 +434,86 @@ def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
             "page_title": "Mes programmes",
             "programs": programs,
             "active_session": latest_open_session(db, user.id),
+        },
+    )
+
+
+@router.get("/plan", response_class=HTMLResponse, name="user_plan")
+def user_plan(request: Request, db: DbSession, user: CurrentUser):
+    """`UX4_02` / TRAIN 2 — **Mon plan**.
+
+    Réunit ce qui ne pouvait pas se lire séparément : la déclaration
+    d'entraînement, le plan qu'elle produit, et l'explication de ce plan.
+
+    L'éditeur de préférences arrive du Profil, où le gabarit lui-même
+    déclarait son emplacement TRANSITIONNEL en attendant `UX4_02`. La route de
+    soumission et les noms de champs sont inchangés — ce sont des contrats.
+
+    ⚠ AUCUN MOTEUR OPAQUE (`OPERATOR_DECISION` C8). `build_weekly_plan_for_user`
+    ne lit que les déclarations ; `build_plan_explanation` cite ses sources une
+    par une. Sans déclaration, il n'y a pas de plan, et c'est dit.
+    """
+    from app.services.muscle_mapping import RADAR_AXES
+    from app.services.training_preferences import (
+        EQUIPMENT_FAMILY_VOCAB,
+        FOCUS_PRIORITY_VOCAB,
+        SESSIONS_PER_WEEK_MAX,
+        SESSIONS_PER_WEEK_MIN,
+        equipment_family_label,
+        focus_priority_label,
+        get_training_preferences,
+    )
+
+    preferences = get_training_preferences(db, user.id)
+    labels = [
+        RADAR_AXES[axis]["label"]
+        for axis in ((preferences.focus_priorities if preferences else None) or ())
+        if axis in RADAR_AXES
+    ]
+    return templates.TemplateResponse(
+        request,
+        "user_programs/plan.html",
+        {
+            "page_title": "Mon plan",
+            "preferences": preferences or _NO_PREFERENCES,
+            "priority_labels": labels,
+            # Les trois vocabulaires de l'éditeur voyagent AVEC lui. Sans eux
+            # le formulaire rend ses légendes et zéro option : une grille de
+            # cadence vide, muette, et qu'aucune erreur ne signale — Jinja
+            # itère sur `Undefined` sans rien dire.
+            "focus_vocab": [
+                (key, focus_priority_label(key)) for key in FOCUS_PRIORITY_VOCAB
+            ],
+            "equipment_vocab": [
+                (key, equipment_family_label(key)) for key in EQUIPMENT_FAMILY_VOCAB
+            ],
+            "sessions_range": list(
+                range(SESSIONS_PER_WEEK_MIN, SESSIONS_PER_WEEK_MAX + 1)
+            ),
             "weekly_plan_proposal": _weekly_plan_proposal(db, user.id),
             # Sb_ORCHESTRATOR_EXPLAINER_01 — lecture seule, jamais bloquante.
             "plan_explanation": _plan_explanation(db, user.id),
+            "active_session": latest_open_session(db, user.id),
+            "pref_saved": request.query_params.get("pref_saved") == "1",
+            "pref_error": request.query_params.get("pref_error") == "1",
         },
     )
+
+
+class _NoPreferences:
+    """Aucune préférence enregistrée — les trois champs sont NON DÉCLARÉS.
+
+    `None` pour `available_equipment` est significatif et distinct de `[]` :
+    « pas déclaré » n'est pas « déclaré vide ». Un objet plutôt qu'un `dict`
+    pour que le gabarit lise les mêmes attributs dans les deux cas.
+    """
+
+    sessions_per_week = None
+    focus_priorities = None
+    available_equipment = None
+
+
+_NO_PREFERENCES = _NoPreferences()
 
 
 def _plan_explanation(db, user_id: int):

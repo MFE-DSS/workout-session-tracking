@@ -490,36 +490,15 @@ def profile_page(
         for field in MEASUREMENT_FIELDS
     }
 
-    # Sb_TRAINING_PREFERENCES_01 — declared preferences, read-only here.
-    from app.services.training_preferences import (
-        EQUIPMENT_FAMILY_VOCAB,
-        FOCUS_PRIORITY_VOCAB,
-        SESSIONS_PER_WEEK_MAX,
-        SESSIONS_PER_WEEK_MIN,
-        equipment_family_label,
-        focus_priority_label,
-        get_training_preferences,
-    )
-
-    preferences = get_training_preferences(db, user.id)
-
     return templates.TemplateResponse(
         request, "profile.html",
         {
             "page_title": "Profil",
             "user": user,
-            "preferences": preferences,
-            "focus_vocab": [
-                (key, focus_priority_label(key)) for key in FOCUS_PRIORITY_VOCAB
-            ],
-            "equipment_vocab": [
-                (key, equipment_family_label(key)) for key in EQUIPMENT_FAMILY_VOCAB
-            ],
-            "sessions_range": list(
-                range(SESSIONS_PER_WEEK_MIN, SESSIONS_PER_WEEK_MAX + 1)
-            ),
-            "pref_saved": request.query_params.get("pref_saved") == "1",
-            "pref_error": request.query_params.get("pref_error") == "1",
+            # `UX4_02` / TRAIN 2 — `preferences` et ses trois vocabulaires ont
+            # suivi l'éditeur vers `/plan`. Ils n'alimentaient que lui : le
+            # gabarit du Profil n'en lit plus une seule occurrence. Les laisser
+            # aurait coûté une requête par affichage du Profil, pour rien.
             "measure_saved": request.query_params.get("measure_saved") == "1",
             "measure_error": request.query_params.get("measure_error") == "1",
             "capture_fields": capture_fields,
@@ -635,7 +614,7 @@ async def profile_preferences_submit(
         try:
             cadence = int(raw_cadence)
         except ValueError:
-            return RedirectResponse(url="/profile?pref_error=1", status_code=303)
+            return RedirectResponse(url="/plan?pref_error=1", status_code=303)
 
     ordered = [slot.strip() for slot in (focus_1, focus_2, focus_3) if slot.strip()]
     # An untouched priority section leaves all three selects empty. That is
@@ -656,9 +635,9 @@ async def profile_preferences_submit(
             available_equipment=families,
         )
     except PreferenceValidationError:
-        return RedirectResponse(url="/profile?pref_error=1", status_code=303)
+        return RedirectResponse(url="/plan?pref_error=1", status_code=303)
 
-    return RedirectResponse(url="/profile?pref_saved=1", status_code=303)
+    return RedirectResponse(url="/plan?pref_saved=1", status_code=303)
 
 
 @router.post("/profile/measurements", response_model=None)
