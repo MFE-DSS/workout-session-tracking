@@ -589,7 +589,38 @@
 @media (min-width: 900px) {
   .today-home__hero { min-height: 300px; padding: 28px 28px; }
   .today-home__title { font-size: 26px; }
-  .today-home__action { flex-direction: row; align-items: center; }
+  /* `POST_CONVERGENCE_INTEGRITY_01` / A — LE DÉBORDEMENT DE 39 px.
+   *
+   * DIAGNOSTIC, mesuré au navigateur plutôt que supposé. À 1280 px :
+   *
+   *   .today-home__action     958 px  [ 278 → 1236 ]
+   *   .today-home__cta        958 px  [ 278 → 1236 ]   ← toute la ligne
+   *   .today-home__secondary   73 px  [1246 → 1319 ]   ← +39 px hors cadre
+   *
+   * La règle de base pose `width: 100%` — correct en colonne, sur mobile. À
+   * partir de 900 px la ligne passe en `row`, et ce bloc réglait `flex` et
+   * `min-width` SANS JAMAIS DÉFAIRE le `width: 100%`. Le CTA revendiquait
+   * donc la largeur entière, et `nowrap` poussait le lien secondaire dehors.
+   *
+   * Le débordement valait 39 px à 1024 comme à 1280 — constant, parce qu'il
+   * ne dépend pas de la fenêtre mais de la largeur du lien secondaire moins
+   * l'espace nul qui lui restait.
+   *
+   * UN SEUL MOT, ET AUCUNE REFONTE : `flex-wrap: wrap`. Le lien passe à la
+   * ligne au lieu de sortir de l'écran. Le CTA garde exactement l'apparence
+   * qu'il a aujourd'hui, et le lien secondaire — jusqu'ici ÉCRASÉ à 73 px
+   * faute de place — retrouve ses 210 px, donc sa lisibilité. Le défaut
+   * corrigé rendait aussi le texte illisible, pas seulement hors cadre.
+   *
+   * ⚠ DEUX AUTRES CORRECTIFS ONT ÉTÉ ESSAYÉS ET ÉCARTÉS, et il faut dire
+   * pourquoi : ajouter `width: auto` ici ferait enfin agir le
+   * `min-width: 300px` ci-dessous — inerte depuis toujours, puisque
+   * `width: 100%` le domine — et le CTA passerait de pleine largeur à 300 px.
+   * C'est peut-être l'intention d'origine de ce bloc, mais c'est un
+   * CHANGEMENT VISUEL de l'action dominante d'une surface souveraine, et
+   * l'ordre est de corriger sans refondre. La déclaration reste donc inerte,
+   * et c'est consigné plutôt que corrigé au passage. */
+  .today-home__action { flex-direction: row; align-items: center; flex-wrap: wrap; }
   .today-home__cta { flex: 0 0 auto; min-width: 300px; }
 }
 
