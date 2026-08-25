@@ -120,14 +120,27 @@ def test_the_preferences_editor_exists_exactly_once_in_the_whole_product():
 # ═════════ LES CONTRATS DE SOUMISSION NE BOUGENT PAS ═════════
 
 
-def test_the_submit_route_is_unchanged():
+def test_the_submit_route_is_unchanged(client):
     """La route de soumission est un CONTRAT : des signets, des tests et des
     formulaires historiques en dépendent. Le déménagement d'un formulaire ne
-    justifie pas de la renommer."""
-    from app.main import app
+    justifie pas de la renommer.
 
-    paths = {getattr(r, "path", "") for r in app.routes}
-    assert PREFS_POST in paths
+    ⚠ VÉRIFIÉE PAR LE COMPORTEMENT, ET AVEC LA FIXTURE. Ma première écriture
+    lisait `app.main.app.routes` sans prendre `client` — verte en local, ROUGE
+    sur le shard 1 de la CI, où la table ne contenait que les routes par défaut
+    de FastAPI. La fixture `client` PURGE tout `app.*` de `sys.modules` et
+    réimporte : un test qui lit l'état global d'un module sans posséder ce
+    cycle de vie lit une génération d'application qui n'est pas la sienne. Le
+    dépôt connaît déjà ce piège (purge du conftest, faux échecs d'identité
+    d'enum entre deux générations).
+
+    Un 404 sur cette route est de toute façon le VRAI symptôme d'un contrat
+    rompu — plus proche du signet cassé que l'inspection d'une table.
+    """
+    r = client.post(PREFS_POST, data={"sessions_per_week": "3"},
+                    follow_redirects=False)
+    assert r.status_code != 404, "la route de soumission a été renommée"
+    assert r.status_code == 303
 
 
 def test_the_field_names_are_unchanged(client):
