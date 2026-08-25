@@ -48,9 +48,6 @@ class LeaderboardEntry:
     last_session_score: Optional[int]
     grade: str
     grade_label: str
-    # Sb_19 — mini SVG radar 30j shown inside the leaderboard tooltip.
-    # None when the user has no data to plot in the window.
-    radar_svg_mini: Optional[str] = None
 
 
 def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
@@ -103,26 +100,27 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
 
     raw.sort(key=lambda x: (-x[2], x[1]))
 
-    # Sb_19 — mini radar SVG per user, generated on the leaderboard
-    # build path. Volume is small (mono-user / handful of users); if it
-    # ever gets > 50 active users we will cache or batch.
-    from app.services.muscle_scoring import compute_physique_dashboard
-    from app.services.radar import build_radar_svg
-
+    # `TRAIN1-E` / C4 — LE MINI-RADAR N'EST PLUS PRODUIT.
+    #
+    # Sb_19 le générait par utilisateur sur le chemin de construction du
+    # classement, en notant que « le volume est petit ; si on dépasse 50
+    # utilisateurs actifs on mettra en cache ». Le problème n'était pas le coût.
+    #
+    # Il appelait `compute_physique_dashboard` UNE FOIS PAR LIGNE de classement,
+    # pour rendre l'analytique physique en infobulle sur le profil des autres.
+    # La surface ne la rend plus ; la calculer serait payer une lecture
+    # corporelle par utilisateur affiché pour la jeter — et garder le chemin
+    # ouvert pour qu'un `{{ e.radar_svg_mini }}` la ramène sans arbitrage.
+    #
+    # Effet de bord assumé et mesurable : le classement ne dépend plus du tout
+    # de `muscle_scoring`. Un consommateur `LEGACY_SCORE_CONSUMER` de moins.
     entries: list[LeaderboardEntry] = []
-    for i, (uid, username, pts, counted, last_score) in enumerate(raw, start=1):
+    # `_uid` : plus aucun consommateur depuis le retrait du radar. Le tuple le
+    # porte encore parce que `raw` sert aussi au tri ; le préfixe dit qu'il
+    # n'est pas lu ici plutôt que de laisser ruff signaler une variable morte.
+    for i, (_uid, username, pts, counted, last_score) in enumerate(raw, start=1):
         avg = round(pts / counted, 1) if counted > 0 else None
         grade = compute_grade(avg or 0.0, counted)
-
-        radar_svg_mini: Optional[str] = None
-        if counted > 0:
-            try:
-                dash = compute_physique_dashboard(db, uid, window_days=30)
-                radar_svg_mini = build_radar_svg(
-                    dash.radar_axes, size=140, compact=True,
-                )
-            except Exception:
-                radar_svg_mini = None  # never fail the leaderboard for one user
 
         entries.append(LeaderboardEntry(
             rank=i,
@@ -133,6 +131,5 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
             last_session_score=last_score,
             grade=grade,
             grade_label=GRADE_LABELS.get(grade, ""),
-            radar_svg_mini=radar_svg_mini,
         ))
     return entries

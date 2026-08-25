@@ -9,18 +9,26 @@ from tests.test_leaderboard_ui import _add_session
 # ---- Mini radar inside the leaderboard tooltip --------------------------
 
 
-def test_leaderboard_tooltip_carries_mini_radar(client):
+def test_leaderboard_tooltip_carries_no_physique_radar(client):
+    """`TRAIN1-E` / C4 — GARDE RETOURNÉE.
+
+    Elle EXIGEAIT le mini-radar dans l'infobulle. Or ce radar est l'analytique
+    physique — les six axes de `compute_physique_dashboard` —, c'est-à-dire la
+    doctrine que `TRAIN1-C` a retirée de Progression. La garder ici la
+    réintroduisait par la porte sociale, et sur le profil des AUTRES.
+
+    L'infobulle RESTE, avec la note sociale : un classement sans ordre n'est
+    pas un classement, et la lettre vient de `compute_grade`, dérivée de la
+    qualité de séance, pas du physique.
+    """
     uid = get_test_user_id()
     _add_session(uid, quality_inputs={
         "concentration": "high", "global_state": "good", "success_score": 100,
     })
     body = client.get("/leaderboard").text
-    # New rich tooltip class
     assert "tooltip-content--rich" in body
-    # Mini radar SVG embedded
-    assert "tooltip-radar" in body
-    # SVG markup actually present
-    assert "<svg" in body
+    assert "grade-badge" in body
+    assert "tooltip-radar" not in body
 
 
 def test_leaderboard_username_is_clickable(client):
@@ -47,8 +55,13 @@ def test_user_profile_returns_200_for_active_user(client):
     assert r.status_code == 200
     body = r.text
     assert "testuser" in body
+    # `TRAIN1-E` / C4 — la lettre RESTE (note sociale), le radar et le score
+    # physique partent : un score sur 100 que le produit ne sait pas justifier
+    # est déjà discutable pour soi ; rendu sur autrui, il devient une
+    # comparaison, que le contrat du rapport coach s'interdit explicitement.
     assert "grade-badge" in body
-    assert "user-profile__radar" in body or "radar-wrap" in body
+    assert "user-profile__radar" not in body
+    assert "radar-wrap" not in body
 
 
 def test_user_profile_returns_404_for_unknown_user(client):

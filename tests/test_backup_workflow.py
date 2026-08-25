@@ -187,8 +187,24 @@ def test_backup_script_retention_zero_keeps_everything(client, tmp_path):
 # ---------------------------------------------------------------------------
 
 
-def test_export_landing_shows_no_backup_message_when_dir_empty(client, tmp_path, monkeypatch):
-    # Point the app at a fresh empty backup dir.
+def test_export_landing_hides_the_backup_card_when_dir_empty(client, tmp_path, monkeypatch):
+    """`TRAIN1-E` / C7 — GARDE RETOURNÉE.
+
+    Elle EXIGEAIT la carte « Sauvegarde planifiée » et sa phrase « Aucune
+    sauvegarde locale détectée » sur un dossier vide. Mesuré : une boîte de
+    plus de 80 px dont tout le corps était cette phrase — un module pleine
+    taille pour dire qu'il n'a rien à montrer, exactement le défaut que
+    `TRAIN1-C` a retiré de Progression.
+
+    La sauvegarde planifiée est un dispositif d'exploitation. Sur un poste où
+    il ne tourne pas, l'absence de fichier n'est pas une information
+    exploitable : la carte « Télécharger », juste au-dessus, est la réponse à
+    « comment j'archive ».
+
+    L'invariant utile n'était pas « cette carte existe » mais **« la page se
+    rend sans sauvegarde, et n'invente aucun état »**. C'est ce qui est
+    asserté, et c'est plus strict.
+    """
     backup_dir = tmp_path / "empty-backups"
     monkeypatch.setenv("BACKUP_DIR", str(backup_dir))
     # Settings is cached -- clear it so the new env var sticks.
@@ -197,8 +213,10 @@ def test_export_landing_shows_no_backup_message_when_dir_empty(client, tmp_path,
     config.get_settings.cache_clear()
 
     body = client.get("/export").text
-    assert "Sauvegarde planifiée" in body
-    assert "Aucune sauvegarde locale détectée" in body
+    assert "Sauvegarde planifiée" not in body
+    assert "Aucune sauvegarde locale détectée" not in body
+    # La surface reste utile : ce qu'on vient y faire est toujours là.
+    assert "Télécharger JSON" in body
 
 
 def test_export_landing_shows_latest_backup_when_present(client, tmp_path, monkeypatch):

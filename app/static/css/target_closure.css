@@ -272,3 +272,81 @@ a.text-muted::after,
  *
  * Reportées à `UX4`, avec leur mesure. Une exception nommée et chiffrée n'est
  * pas une dette cachée. */
+
+/* ═══ `TRAIN1-E` / C6 — L'HISTORIQUE SORT DE LA LISTE DES REPORTÉES ═══════════
+ *
+ * L'exception ci-dessus tenait par deux arguments. L'un était juste et le
+ * reste ; l'autre a expiré.
+ *
+ *   · JUSTE — « les fermer demande de l'ESPACE, donc un changement
+ *     structurel ». Mesuré à nouveau ici : le `<summary>` fait 26 px, avec
+ *     8 px au-dessus (la carte) et 4 px en dessous (les boutons, une fois
+ *     dépliés). Un remplissage portant la zone à 44 px chevaucherait les deux.
+ *     Aucune astuce de feuille de style ne contourne cela.
+ *
+ *   · EXPIRÉ — « `history` est `TRANSITIONAL`, sa mise en page est programmée
+ *     pour `UX4_03` ». `UX4_03` a été livré, et n'a pas touché l'Historique.
+ *     L'arbitrage C6 tranche désormais explicitement sa forme : la LIGNE est
+ *     l'action primaire, la gestion est rare et vit derrière une divulgation.
+ *     L'espacement n'est donc plus une contractualisation prématurée — c'est
+ *     la forme décidée.
+ *
+ * CE QUE LA MESURE A CORRIGÉ. L'exception comptait « × 1 » pour les boutons
+ * voisins. Vérifié au `checkVisibility()` : repliés, les deux boutons rendent
+ * `false`, et `elementFromPoint` à leur centre renvoie la carte. Ils ne sont
+ * PAS tapables tant que la divulgation est fermée. Par défaut, il n'y a donc
+ * qu'UNE cible sous le standard par ligne, pas trois.
+ *
+ * COÛT ASSUMÉ : +18 px par ligne repliée. Six lignes → +108 px, soit ~0,13
+ * écran à 390 px. C'est le prix du standard produit, et C6 le commande.
+ *
+ * ⚠ 44 px est le STANDARD PRODUIT AUREN, pas le seuil WCAG 2.2 (24×24 avec
+ * exception d'espacement, déjà satisfait avant cette tranche). Aucune
+ * non-conformité réglementaire n'est corrigée ici. */
+
+.history-item__actions {
+  margin-top: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+/* Le déclencheur devient un contrôle à part entière : 44 px de haut, pleine
+ * largeur, et sa zone ne déborde sur rien puisqu'elle est sa propre hauteur. */
+.history-item__toggle {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+/* Les boutons ne sont tapables que la divulgation ouverte — c'est là qu'il
+ * faut leur donner leurs 44 px, et l'espace existe alors. `gap` sépare les
+ * zones : deux cibles de 44 px collées se toucheraient sans se recouvrir,
+ * mais un pouce n'a pas cette précision. */
+.history-item__buttons {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.history-item__btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+}
+
+/* Un lien DANS une phrase : sa zone doit atteindre 44 px sans casser
+ * l'interligne du paragraphe qui l'entoure. Le remplissage l'étend, la marge
+ * négative le réabsorbe — la ligne garde sa hauteur, la cible non.
+ *
+ * ⚠ Ne convient qu'à un lien SEUL dans son paragraphe. Deux liens inline
+ * voisins verraient leurs zones se recouvrir, et une zone qui se recouvre est
+ * pire que pas de zone : elle déplace le défaut au lieu de le corriger. */
+.inline-target {
+  display: inline-block;
+  padding: 14px 2px;
+  margin: -14px -2px;
+}

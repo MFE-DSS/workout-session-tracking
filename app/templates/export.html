@@ -39,14 +39,22 @@
       <span>Work sets complétés</span>
       <b>{{ work_sets_done }}</b>
     </li>
-    <li>
-      <span>Première session</span>
-      <b>{{ first_started.strftime('%d/%m/%Y') if first_started else '—' }}</b>
-    </li>
-    <li>
-      <span>Dernière session</span>
-      <b>{{ last_started.strftime('%d/%m/%Y') if last_started else '—' }}</b>
-    </li>
+    {# `TRAIN1-E` / C7 — les deux dates ne s'affichent que si elles existent.
+       Sur un compte sans séance elles rendaient deux `—` à l'échelle d'une
+       valeur, dans un résumé dont la première ligne dit déjà « 0 sessions ».
+       Un tiret n'ajoutait rien à ce zéro : il le répétait deux fois. #}
+    {% if first_started %}
+      <li>
+        <span>Première session</span>
+        <b>{{ first_started.strftime('%d/%m/%Y') }}</b>
+      </li>
+    {% endif %}
+    {% if last_started %}
+      <li>
+        <span>Dernière session</span>
+        <b>{{ last_started.strftime('%d/%m/%Y') }}</b>
+      </li>
+    {% endif %}
     <li>
       <span>Schema version</span>
       <b>{{ schema_version }}</b>
@@ -72,9 +80,20 @@
   </div>
 </div>
 
+{# `TRAIN1-E` / C7 — LA CARTE DE SAUVEGARDE PLANIFIÉE NE S'INSTANCIE PLUS À VIDE.
+
+   Mesuré sur les deux comptes : une carte de plus de 80 px dont tout le corps
+   était « Aucune sauvegarde locale détectée. » — un module pleine taille pour
+   dire qu'il n'a rien à montrer.
+
+   La sauvegarde planifiée est un dispositif d'exploitation (`scripts/
+   backup_sessions.py`) : sur un poste où il ne tourne pas, il n'y a pas d'état
+   à afficher, et l'absence de fichier n'est pas une information que
+   l'utilisateur peut exploiter — la carte « Télécharger » juste au-dessus est
+   la réponse à « comment j'archive ». #}
+{% if last_backup %}
 <div class="card export-card">
   <h2 class="card__title">Sauvegarde planifiée</h2>
-  {% if last_backup %}
     <ul class="export-stats">
       <li>
         <span>Dernier fichier</span>
@@ -124,12 +143,8 @@
     <p class="export-card__hint" style="margin-top: 10px;">
       Dossier : <code>{{ backup_dir }}</code>
     </p>
-  {% else %}
-    <p class="export-card__hint">
-      Aucune sauvegarde locale détectée.
-    </p>
-  {% endif %}
 </div>
+{% endif %}
 
 <p class="kpi-note">
   Stockage local · télécharge régulièrement pour archiver.

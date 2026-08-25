@@ -53,12 +53,28 @@ la taille. Ce sont des jugements de valeur, pas des mesures.
 
 ## 2. Les consommateurs recensés
 
-| Module | Ce qu'il lit | Pourquoi il reste |
+| Module | Ce qu'il lit | Statut |
 |---|---|---|
-| `app/routers/leaderboard.py` | `dashboard.radar_svg` (profil public) | Surface **sociale**, avec sa propre doctrine de note (`compute_grade`). La refondre est un sujet à elle seule. |
-| `app/services/leaderboard.py` | `dashboard.radar_axes` (mini-radar par ligne) | Idem — c'est le même produit que ci-dessus. |
-| `app/routers/body_intelligence.py` | `compute_physique_dashboard` complet | Derrière `body_intelligence_enabled`, **désactivé par défaut**. Zéro surface de production tant que le drapeau est à `false`. |
+| ~~`app/routers/leaderboard.py`~~ | ~~`dashboard.radar_svg`~~ | ✅ **SORTI** — `TRAIN1-E` / C4 |
+| ~~`app/services/leaderboard.py`~~ | ~~`dashboard.radar_axes`~~ | ✅ **SORTI** — `TRAIN1-E` / C4 |
+| `app/routers/body_intelligence.py` | `compute_physique_dashboard` complet | 🔒 `DO_NOT_ACTIVATE_AS_STANDALONE` — voir §5 |
 | `app/services/dashboard.py` | `compute_physique_dashboard` complet | Alimente `dashboard.html`, **qu'aucune route ne rend** depuis Sb_27.6. Code mort conservé : huit fichiers de tests en dépendent. |
+
+### Ce qui est sorti, et ce que cela change
+
+`TRAIN1-E` / C4 a retiré l'analytique physique des **surfaces sociales**. Le
+classement ne dépend plus du tout de `muscle_scoring` : il ne l'importe plus,
+ne l'appelle plus une fois par ligne, et ne rend plus de radar.
+
+**La lettre A/B/C reste, et ce n'est plus une tolérance.** Elle vient de
+`compute_grade`, dérivée de la qualité de séance — pas du physique. Un
+classement sans ordre n'est pas un classement : c'est une note **sociale**,
+inscrite comme un choix.
+
+Le radar vivait sous **trois classes CSS différentes** — `tooltip-radar` au
+classement, `radar-wrap` au profil public, `profile-preview__radar` dans la
+carte d'aperçu. Chercher une seule d'entre elles en aurait laissé deux en place ;
+la garde les vise toutes les trois.
 
 ### Ce qui a quitté la liste
 
@@ -104,3 +120,47 @@ Cela suppose deux décisions qui ne relèvent pas de Progression :
 
 Tant qu'elles ne sont pas prises, la doctrine survit là où elle est inscrite
 ci-dessus, et **nulle part ailleurs**.
+
+
+---
+
+## 5. `DO_NOT_ACTIVATE_AS_STANDALONE` — Body Intelligence
+
+**Arbitrage C9.** Body Intelligence n'est **pas** activable comme surface
+autonome. Le drapeau `body_intelligence_enabled` reste à `false`, et son
+passage à `true` n'est pas une décision d'implémentation.
+
+Ce que cela veut dire, précisément :
+
+- **les internes réutilisables sont préservés** — `body_intelligence.py`,
+  `body_intelligence_inputs.py` et le bloc de snapshot du rapport coach restent
+  en place et testés. Le travail n'est pas jeté ;
+- **aucune nouvelle surface** ne s'y branche ;
+- **les anciens consommateurs analytiques partent progressivement**, tranche
+  par tranche, à mesure que chacun trouve son remplacement. C4 en a retiré deux
+  d'un coup ;
+- **la condition de sortie de `muscle_scoring` passe donc par ici.** Il ne
+  reste que deux appelants, et tous deux sont des surfaces que rien ne rend :
+  Body Intelligence derrière son drapeau, et le tableau de bord mort.
+
+Autrement dit : **`compute_physique_dashboard` n'a plus aucun consommateur
+atteignable par un utilisateur.** Le supprimer est désormais un travail de
+nettoyage, plus un arbitrage produit — mais il reste hors du périmètre de
+Progression, et les huit fichiers de tests du tableau de bord attendent leur
+propre tranche.
+
+---
+
+## 6. Statut des surfaces (arbitrage C11)
+
+| Surface | Statut | Ce que cela implique |
+|---|---|---|
+| **Accueil** · **Séance** | `SOVEREIGN` | une dérive est une régression |
+| **`PROGRESSION_L1`** | `SOVEREIGN` | l'architecture de premier niveau — signaux, rail, exposition, instrument progressif, rythme — est **gelée**. La toucher demande une décision explicite. |
+| **`PROGRESSION_L2`** | `EVOLVABLE` | les niveaux d'inspection (détail du rail, détail par zone, `prog__more`) peuvent évoluer sans que ce soit une régression. |
+| Profil · Bibliothèque · Historique | `TRANSITIONAL` | refonte structurelle attendue, pas une régression |
+
+La distinction L1/L2 est ce qui rend le gel praticable : quatre tranches de
+travail sont protégées **sans** interdire d'approfondir l'inspection, qui est
+précisément là où la cible `FAIT → INSTRUMENT → INSPECTION → PROVENANCE`
+continue de se construire.
