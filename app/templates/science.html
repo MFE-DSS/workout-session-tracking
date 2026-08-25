@@ -60,10 +60,34 @@
     <p class="text-dim" style="font-size:12px;">Données opératoires. Pas de pseudo-science.</p>
   </div>
 
+  {# `POST_CONVERGENCE_INTEGRITY_01` / B — AUDIT : **CURRENT**, reformulé.
+
+     Les quatre nombres de ce bloc ont été vérifiés ligne à ligne contre
+     `quality_score.py`, et ils sont exacts :
+
+       20 min      `_cardio_duration_component` : ≥ 20 → 50 points sur 50
+       115-135     `_cardio_intensity_component` : dans la zone → 20 sur 20
+       > 85 / 100  arithmétique : 50 + 20 + 20 = 90 avant tout point subjectif
+       muscu       `compute_session_quality_strength` : complétion 40, score
+                   d'exercice 40, concentration 10, état général 10
+
+     Ce n'était donc PAS du contenu périmé — c'était une description juste
+     dans un vocabulaire qui a cessé d'être le nôtre.
+
+     LE MOT « CIBLE » ÉTAIT LE PROBLÈME. Trois tranches viennent de retirer le
+     langage d'objectif des instruments : « % de cible » de l'exposition,
+     « cible OMS » du rapport coach. Le laisser ici, sur le document de
+     provenance canonique, rouvrait la contradiction d'un cran plus loin — un
+     seuil de barème lu comme un objectif d'entraînement.
+
+     Aucun nombre n'a bougé. Aucune règle nouvelle n'a été inventée. Le texte
+     dit désormais ce que le barème FAIT, pas ce que l'utilisateur DEVRAIT
+     viser — et il nomme la distinction explicitement. #}
   <div class="card">
-    <h3 class="card__title">Scoring cardio vs musculation</h3>
-    <p>Le score d'une séance dépend de son type. En musculation, il combine completion des séries de travail, score d'exercice (reps vs plage), concentration et état général. En cardio, il combine durée (cible 20 min LISS), intensité mesurée par BPM si disponible, complétion éventuelle d'abs, et ressenti.</p>
-    <p>Conséquence : une séance LISS bien exécutée (20 min en zone 115-135 bpm) dépasse 85 / 100. La visualisation ne pénalise plus les formats courts mais complets.</p>
+    <h3 class="card__title">Comment une séance est notée</h3>
+    <p>Le barème dépend du type de séance. En musculation, il combine la complétion des séries de travail, le score d'exercice (reps vs plage), la concentration et l'état général. En cardio, il combine la durée, l'intensité mesurée par BPM lorsqu'elle existe, la complétion éventuelle des abdos, et le ressenti.</p>
+    <p>Les paliers du barème cardio : la durée atteint son maximum à partir de 20 minutes, l'intensité au sien entre 115 et 135 bpm. Une séance LISS de 20 minutes dans cette zone totalise donc plus de 85 sur 100.</p>
+    <p class="text-dim" style="font-size:12px;"><b>Ce sont des paliers de barème, pas des objectifs d'entraînement.</b> AUREN ne te dit pas de viser 20 minutes ni 125 bpm : il décrit comment il compte ce que tu as fait.</p>
   </div>
 </section>
 
@@ -109,10 +133,33 @@
     <p>Chaque seance est conservee telle qu'elle a ete logguee. Tu peux la revoir, comparer a la meme seance passee, voir les deltas (charge, reps) pour un meme exercice.</p>
   </div>
 
+  {# `POST_CONVERGENCE_INTEGRITY_01` / B — AUDIT : **STALE_PRODUCT_MODEL**.
+
+     Le seul bloc réellement périmé de cette page, et il décrivait DEUX
+     surfaces qui n'existent plus :
+
+       « La page Synthèse calcule 5 axes (régularité, progression, évolution
+         corporelle, récupération, équilibre musculaire)… »
+            → c'est le modèle du tableau de bord, qu'aucune route ne rend
+              depuis Sb_27.6 ; `/dashboard` redirige vers `/progress`.
+
+       « La page Physique montre l'équilibre de développement par zone… »
+            → retirée par `TRAIN1-C` ; `/physique` redirige vers `/progress`.
+
+     Le remplacement décrit ce que le produit rend AUJOURD'HUI, et rien de
+     plus. Aucune règle scientifique nouvelle n'est introduite : ce bloc n'en
+     contenait pas, il décrivait des surfaces.
+
+     ⚠ La phrase qui méritait d'être sauvée — « tu ne vois jamais un score
+     qu'on ne peut pas calculer honnêtement » — est devenue littéralement
+     vraie entre-temps : une mesure sans dénominateur ne rend plus un tiret,
+     elle disparaît en nommant sa cause. Elle est donc conservée, et pour la
+     première fois elle décrit le produit au lieu de le promettre. #}
   <div class="card">
-    <h3 class="card__title">Synthese et physique</h3>
-    <p>La page <b>Synthese</b> calcule 5 axes (regularite, progression, evolution corporelle, recuperation, equilibre musculaire) avec un niveau de confiance par axe. Si les donnees sont insuffisantes, l'axe est grise. Tu ne vois jamais un score qu'on ne peut pas calculer honnetement.</p>
-    <p>La page <b>Physique</b> montre l'equilibre de developpement par zone musculaire, base sur le volume d'entrainement et les mesures corporelles si saisies.</p>
+    <h3 class="card__title">Progression</h3>
+    <p>Une seule surface d'analyse : <b>Progression</b>. Elle répond à trois questions dans l'ordre où on se les pose — <i>quand</i> me suis-je entraîné (les quatorze traces), <i>où</i> (l'exposition par zone), <i>quoi</i> (l'écart par exercice d'une séance à la suivante).</p>
+    <p>Chaque niveau s'ouvre sur le suivant : un fait, l'instrument qui le porte, son inspection, et la provenance de l'attribution. Aucun score global, aucune note de physique.</p>
+    <p>Tu ne vois jamais un chiffre qu'on ne peut pas calculer honnêtement : une mesure dont le dénominateur n'existe pas ne s'affiche pas en tiret — elle disparaît, et sa cause est nommée.</p>
   </div>
 
   <div class="card">
