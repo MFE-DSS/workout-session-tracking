@@ -284,8 +284,15 @@ def test_the_training_configuration_left_level_one(client):
 def test_the_training_configuration_is_still_editable(client):
     """ET ELLE RESTE MODIFIABLE — `weekly_planner` consomme ces valeurs.
     Retirer la lecture sans garder l'écriture aurait cassé le planificateur
-    en rendant ses entrées inatteignables."""
-    r = client.get(PROFILE_URL)
+    en rendant ses entrées inatteignables.
+
+    `UX4_02` / TRAIN 2 lui a donné son domicile, comme le disait la garde
+    voisine : l'éditeur est sur **Mon plan**. La garde ne s'affaiblit pas en
+    suivant l'adresse — elle vérifie la même chose, à l'endroit où la chose
+    est désormais, et le test jumeau vérifie qu'elle a bien quitté le Profil.
+    """
+    r = client.get("/plan")
+    assert r.status_code == 200
     assert "Modifier mes préférences" in r.text
     assert "cadence_" in r.text, "les contrôles de cadence ont disparu"
 

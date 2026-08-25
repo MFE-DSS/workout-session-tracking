@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% from "_macros.html" import choice_row, select_shell %}
+{% block content %}
+<h1 class="page-title">Mon plan</h1>
+
+{# `UX4_02` / TRAIN 2 — MON PLAN : LA DÉCLARATION, LE PLAN, ET LE POURQUOI.
+
+   Cette surface réunit trois objets qui vivaient séparés et ne pouvaient pas
+   se lire l'un sans l'autre :
+
+     · CE QUE TU AS DÉCLARÉ — cadence, priorités, matériel. L'éditeur vivait
+       sur le Profil, à un emplacement que le gabarit lui-même déclarait
+       TRANSITIONNEL en attendant `UX4_02`.
+     · LE PLAN QUI EN DÉCOULE — il vivait sur « Mes programmes », une surface
+       qui répond à « qu'est-ce que j'ai créé », pas à « comment je veux
+       m'entraîner ».
+     · POURQUOI CE PLAN — l'explication vivait au même mauvais endroit, et
+       c'est pourtant elle qui relie les deux autres.
+
+   ⚠ AUCUN MOTEUR OPAQUE (`OPERATOR_DECISION` C8). Rien ici n'est deviné : le
+   plan est construit par `weekly_planner` à partir des SEULES déclarations
+   ci-dessus, et « Pourquoi ce plan ? » cite ses sources une par une. Si la
+   déclaration est vide, il n'y a pas de plan — et c'est dit, pas comblé. #}
+
+{# Le retour d'enregistrement est ANNONCÉ, pas seulement affiché : sur le
+   Profil il n'était qu'un paragraphe coloré, muet pour une synthèse vocale.
+   `<output>` porte nativement le rôle `status` — la forme que `Web:S6819`
+   demande, et la seule qui fonctionne sur tous les lecteurs. #}
+{% if pref_saved %}
+  <output class="empty-line">Préférences enregistrées.</output>
+{% elif pref_error %}
+  <p class="empty-line" role="alert">Préférences non enregistrées — valeur hors domaine.</p>
+{% endif %}
+
+{# ── 1. CE QUE TU AS DÉCLARÉ ─────────────────────────────────────────────
+   Même doctrine qu'au Profil depuis `TRAIN1-D` / C2 : un fait vide et
+   saisissable porte l'ACTION, jamais un tiret. La saisie est juste en
+   dessous, dans la même page. #}
+<section class="pstate pstate--flat">
+  <h2 class="section-header">Ce que tu as déclaré</h2>
+  <ul class="stats-list">
+    <li><span>Cadence souhaitée</span>
+      {% if preferences.sessions_per_week %}<b>{{ preferences.sessions_per_week }} / semaine</b>
+      {% else %}<b><a class="stat-add" href="#declaration">À déclarer</a></b>{% endif %}</li>
+    <li><span>Priorités</span>
+      {% if preferences.focus_priorities %}<b>{{ priority_labels | join(', ') }}</b>
+      {% else %}<b><a class="stat-add" href="#declaration">À déclarer</a></b>{% endif %}</li>
+    <li><span>Équipement</span>
+      {% if preferences.available_equipment is none %}<b><a class="stat-add" href="#declaration">À déclarer</a></b>
+      {% elif preferences.available_equipment %}<b>{{ preferences.available_equipment | length }} famille{% if preferences.available_equipment | length > 1 %}s{% endif %}</b>
+      {% else %}<b>aucune déclarée</b>{% endif %}</li>
+  </ul>
+</section>
+
+{# ── 2. LE PLAN QUI EN DÉCOULE ───────────────────────────────────────────
+   Déplacé depuis « Mes programmes ». Le bouton de matérialisation part avec
+   lui : c'est la même action, au même endroit que ce qu'elle matérialise. #}
+{% if weekly_plan_proposal %}
+  {% set p = weekly_plan_proposal %}
+  <section class="card">
+    <h2 class="card__title">Programme proposé pour ta semaine</h2>
+    <p class="text-dim" style="margin-bottom:.75rem;">
+      {{ p.sessions }} séance{{ 's' if p.sessions > 1 }}/semaine ·
+      {{ p.exercises }} exercice{{ 's' if p.exercises > 1 }} ·
+      {{ p.planned_sets }} série{{ 's' if p.planned_sets > 1 }} planifiée{{ 's' if p.planned_sets > 1 }}
+    </p>
+    {% if p.priorities %}
+      <p class="text-dim" style="font-size:.9em;margin:0 0 .75rem;">
+        Priorités déclarées : {{ p.priorities | join(', ') }}
+      </p>
+    {% endif %}
+
+    {# CE QUE LE PLAN NE TIENT PAS SE DIT ICI. Une proposition qui n'annonce
+       que son volume laisse croire qu'elle couvre tout ce qui a été déclaré.
+       Les trois branches sont exhaustives et mutuellement exclusives : une
+       priorité non programmable, un volume en deçà, ou rien à signaler. #}
+    {% if p.status == 'constraint_unmet' %}
+      <p style="margin:.25rem 0;"><strong>Proposition partielle</strong> — une priorité que tu as déclarée n'est pas programmable :</p>
+      <ul style="margin:.25rem 0 .75rem 1.25rem;">
+        {% for constraint in p.constraints %}<li>{{ constraint }}</li>{% endfor %}
+      </ul>
+    {% elif p.status == 'partial' %}
+      <p style="margin:.25rem 0 .75rem;">
+        <strong>Proposition partielle</strong> — {{ p.unmet_zones }} zone{{ 's' if p.unmet_zones > 1 }}
+        rest{{ 'ent' if p.unmet_zones > 1 else 'e' }} sous le volume visé. Le programme est utilisable tel quel.
+      </p>
+    {% else %}
+      <p style="margin:.25rem 0 .75rem;">Toutes les zones visées sont couvertes.</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('user_program_from_weekly_plan') }}">
+      <button type="submit" class="btn btn--primary">Créer le programme proposé</button>
+    </form>
+    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
+      Crée un <strong>brouillon</strong> modifiable. Rien n'est publié ni lancé sans ton accord.
+    </p>
+  </section>
+{% else %}
+  {# Pas de plan, et on dit POURQUOI plutôt que d'afficher un cadre vide —
+     `TRAIN1-C` / A4. La cause est toujours la même : rien n'a été déclaré,
+     ou la déclaration ne suffit pas à couvrir une semaine. #}
+  <p class="empty-line">Aucun plan proposé
+    <span class="empty-line__win">· déclare au moins une cadence</span></p>
+{% endif %}
+
+{# ── 3. POURQUOI CE PLAN ──────────────────────────────────────────────────
+   Déplacé depuis « Mes programmes ». `TRAIN1-E` / C7 avait déjà réglé son
+   état vide : la carte ne s'instancie pas sans explication. #}
+{% if plan_explanation and plan_explanation.available %}
+  <section class="card" aria-labelledby="why-plan-title">
+    <h2 id="why-plan-title" class="card__title">Pourquoi ce plan ?</h2>
+    <ul style="margin:.25rem 0 .75rem 1.25rem;">
+      {% for item in plan_explanation.items %}
+        <li style="margin-bottom:.4rem;">
+          {{ item.text }}
+          <span class="text-dim" style="display:block; font-size:.9em;">
+            {{ item.source_label }}{% if item.detail %} — {{ item.detail }}{% endif %}{% if item.confidence_label %} ({{ item.confidence_label }}){% endif %}
+          </span>
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
+      {{ plan_explanation.notice }}
+    </p>
+  </section>
+{% endif %}
+
+{# ── 4. LA DÉCLARATION ELLE-MÊME ─────────────────────────────────────────
+   Le formulaire, déplacé VERBATIM depuis le Profil : même route de
+   soumission, mêmes noms de champs, même sémantique de persistance. Rien
+   n'est dupliqué — il n'existe toujours qu'ici. #}
+<div id="declaration">
+{# ── Préférences d'entraînement déclarées (Sb_TRAINING_PREFERENCES_01) ──
+   Faits DÉCLARÉS par l'utilisateur, destinés au futur planificateur. Aucune
+   valeur par défaut n'est proposée ni pré-cochée : « non renseigné » est un
+   état à part entière, distinct d'un choix explicitement vide. Aucun
+   libellé ne présente une fréquence comme optimale. #}
+{# ── `UX4_01` — CONFIGURATION D'ENTRAÎNEMENT : TRANSITIONNELLE ICI ──────
+   `OPERATOR_DECISION` : la configuration persistante appartient à
+   `PROGRAMMES / PLAN`, pas à l'édition du Profil. Le Profil peut en
+   montrer un **résumé compact en lecture seule** — c'est ce que fait la
+   section « Entraînement » en tête de page.
+
+   L'ÉDITEUR RESTE ICI, ET C'EST DÉLIBÉRÉ. Le déplacer exige de construire
+   la surface de destination dans `Programmes`, ce qui est une tranche
+   structurelle à part. Le retirer maintenant supprimerait la capacité sans
+   la remplacer.
+
+   DÉPENDANCE ENREGISTRÉE :
+     `UX4_02 LIBRARY_WORKOUT_DISCOVERY` doit accueillir cet éditeur.
+     Tant que ce n'est pas fait, cet emplacement est TRANSITIONNEL et ne
+     vaut pas architecture cible.
+
+   Le formulaire n'est PAS dupliqué : il n'existe qu'ici. #}
+<div class="card">
+  <h2 class="card__title">Préférences d'entraînement</h2>
+  {# « ci-dessus » ne désigne quelque chose que s'il y a quelque chose. Sur un
+     compte vierge, la phrase pointait vers la ligne « Aucun plan proposé » :
+     elle promettait un objet en montrant son absence. Vu à l'écran, pas dans
+     le gabarit — un rendu vaut mieux qu'une relecture (`CLAUDE.md §5.1`). #}
+  <p class="text-dim" style="font-size:12px;margin:0 0 var(--space-sm);">
+    Ce que tu déclares ici — et rien d'autre —
+    {% if weekly_plan_proposal %}produit le plan ci-dessus.
+    {% else %}produira le plan proposé.{% endif %}
+    Ces informations ne modifient pas la séance recommandée aujourd'hui.
+  </p>
+
+  {% if pref_saved %}
+  <p class="text-dim" style="font-size:12px;color:var(--good);">Préférences enregistrées.</p>
+  {% endif %}
+  {% if pref_error %}
+  <p class="text-dim" style="font-size:12px;color:var(--warn);">
+    Enregistrement refusé : une priorité est en double ou une valeur est hors liste.
+  </p>
+  {% endif %}
+
+  {# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — présentation seule.
+     Les noms POST sont INCHANGÉS : sessions_per_week, focus_1..3,
+     equipment, equipment_declared. Aucune sémantique de persistance n'est
+     touchée. #}
+  {# `UX4_01` — configuration persistante : lisible d'abord, éditable ensuite. #}
+  <details class="pstate__edit">
+  <summary>Modifier mes préférences</summary>
+  <form method="post" action="{{ url_for('profile_preferences_submit') }}"
+        class="prefs-form" data-prefs-form>
+
+    {# ── Cadence : domaine fini de 7 valeurs, donc une grille de choix,
+         pas un menu déroulant. Aucune valeur pré-sélectionnée si rien
+         n'est déclaré — NULL reste NULL. ── #}
+    <fieldset class="prefs-block">
+      <legend class="choice-group__legend">Séances souhaitées par semaine</legend>
+      <p class="choice-group__hint">Non renseigné tant que tu ne choisis pas.</p>
+      <div class="choice-grid">
+        {% for n in sessions_range %}
+          {{ choice_row("sessions_per_week", n, n, kind="radio",
+                        checked=(preferences.sessions_per_week == n),
+                        input_id="cadence_%s"|format(n)) }}
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    {# ── Priorités : la sélection ET son rang doivent rester visibles.
+         Les trois menus natifs focus_1..3 restent LA source de vérité
+         fallback sans JS ; le bloc classé ci-dessous n'est révélé que si
+         JS est actif, et il ne fait qu'écrire dans ces mêmes selects. ── #}
+    <fieldset class="prefs-block">
+      <legend class="choice-group__legend">Priorités (optionnel, dans l'ordre)</legend>
+      <p class="choice-group__hint">Trois au maximum. Le rang s'affiche sur l'option.</p>
+
+      <div class="prefs-fallback" data-prefs-fallback>
+        {% for slot in [1, 2, 3] %}
+        <div class="prefs-fallback__row">
+          <label class="choice-group__hint" for="focus_{{ slot }}">Priorité {{ slot }}</label>
+          {{ select_shell("focus_%s"|format(slot), focus_vocab,
+                          selected=(preferences.focus_priorities[slot - 1]
+                                    if preferences.focus_priorities
+                                       and preferences.focus_priorities|length >= slot
+                                    else None),
+                          empty_label="Aucune",
+                          select_id="focus_%s"|format(slot)) }}
+        </div>
+        {% endfor %}
+      </div>
+
+      <div class="choice-group" data-prefs-ranked hidden>
+        {% for key, label in focus_vocab %}
+        <button type="button" class="choice-row choice-row--button"
+                data-focus-key="{{ key }}" aria-pressed="false">
+          <span class="choice-row__marker choice-row__marker--check" aria-hidden="true">✓</span>
+          <span class="choice-row__body">
+            <span class="choice-row__label">
+              <span class="choice-row__rank" data-focus-rank></span> {{ label }}
+            </span>
+          </span>
+        </button>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    {# ── Matériel : multi-sélection, donc checkbox. Le marqueur caché
+         distingue « jamais soumis » (rien stocké, NULL) de « soumis sans
+         rien cocher » (déclaration explicite : []). Le style ne doit pas
+         détruire cette distinction. ── #}
+    <fieldset class="prefs-block">
+      <legend class="choice-group__legend">Matériel disponible</legend>
+      <input type="hidden" name="equipment_declared" value="1">
+      {% if preferences.available_equipment is none %}
+      <p class="choice-group__hint">Je n'ai pas encore renseigné mon équipement.</p>
+      {% endif %}
+      <div class="choice-group">
+        {% for key, label in equipment_vocab %}
+          {{ choice_row("equipment", key, label, kind="checkbox",
+                        checked=(preferences.available_equipment
+                                 and key in preferences.available_equipment),
+                        input_id="equipment_%s"|format(key)) }}
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn btn--ghost prefs-form__submit">Enregistrer</button>
+  </form>
+  </details>
+</div>
+</div>
+{% endblock %}

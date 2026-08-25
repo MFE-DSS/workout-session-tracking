@@ -22,7 +22,12 @@ import pytest
 
 from tests.helpers import get_test_user_id
 
-PROFILE_URL = "/profile"
+# `UX4_02` / TRAIN 2 — la surface de saisie est **Mon plan**, plus le Profil.
+# `OPERATOR_DECISION` C2 : la configuration d'entraînement persistante quitte
+# le niveau 1 du Profil. Le gabarit y déclarait lui-même son emplacement
+# TRANSITIONNEL en attendant `UX4_02`. Aucune assertion de ce fichier n'est
+# affaiblie : elles portent sur le CONTENU du formulaire, pas sur son adresse.
+CAPTURE_URL = "/plan"
 PREFERENCES_URL = "/profile/preferences"
 LABEL_MEDIUM_CADENCE = "Séances souhaitées par semaine"
 AXIS_LOWER = "lower"
@@ -566,16 +571,16 @@ class TestOwnership:
 
 class TestCaptureSurface:
     def test_the_profile_page_exposes_the_form(self, client):
-        assert LABEL_MEDIUM_CADENCE in client.get(PROFILE_URL).text
+        assert LABEL_MEDIUM_CADENCE in client.get(CAPTURE_URL).text
 
     def test_a_new_user_has_no_preselected_cadence(self, client):
         """Aucune valeur par défaut ne doit être proposée comme choix fait."""
-        page = client.get(PROFILE_URL).text
+        page = client.get(CAPTURE_URL).text
         section = page.split(LABEL_MEDIUM_CADENCE, 1)[1][:600]
         assert "selected" not in section
 
     def test_the_undeclared_equipment_state_is_visible(self, client):
-        page = client.get(PROFILE_URL).text
+        page = client.get(CAPTURE_URL).text
         assert "pas encore renseigné mon équipement" in page
 
     def test_saved_values_round_trip_to_the_page(self, client):
@@ -628,21 +633,21 @@ class TestCaptureSurface:
         aujourd'hui », et cette phrase est précisément la garantie produit.
         Ce qui est interdit, c'est de qualifier **la fréquence**.
         """
-        page = client.get(PROFILE_URL).text.lower()
+        page = client.get(CAPTURE_URL).text.lower()
         section = page.split("préférences d'entraînement", 1)[-1][:2500]
         assert banned not in section
 
     def test_the_form_labels_the_cadence_as_a_wish(self, client):
-        assert "souhaitées" in client.get(PROFILE_URL).text
+        assert "souhaitées" in client.get(CAPTURE_URL).text
 
     def test_equipment_is_shown_with_presentation_labels(self, client):
-        page = client.get(PROFILE_URL).text
+        page = client.get(CAPTURE_URL).text
         assert "Haltères" in page
 
     def test_priorities_use_the_canonical_axis_labels(self, client):
         from app.services.muscle_mapping import RADAR_AXES
 
-        page = client.get(PROFILE_URL).text
+        page = client.get(CAPTURE_URL).text
         assert RADAR_AXES[AXIS_LOWER]["label"] in page
 
     def test_the_form_adds_no_javascript(self, client):
@@ -676,7 +681,7 @@ class TestCaptureSurface:
         vérifiée sous la nouvelle forme, et renforcée : on exige maintenant que
         **chaque** option soit étiquetée, pas seulement le groupe.
         """
-        page = client.get(PROFILE_URL).text
+        page = client.get(CAPTURE_URL).text
 
         # Le groupe porte son nom via <legend>.
         assert "<legend" in page

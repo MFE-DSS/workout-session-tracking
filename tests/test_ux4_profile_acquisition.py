@@ -178,7 +178,13 @@ def test_every_acquisition_form_sits_behind_an_explicit_update(client):
     # supplémentaire. C'est la décision opérateur, pas un oubli.
     acquisition = src.count('<form method="post"') - src.count('class="quicklog"')
     disclosures = src.count('class="pstate__edit"')
-    assert acquisition >= 3, f"seulement {acquisition} formulaires d'acquisition"
+    # `UX4_02` / TRAIN 2 — le seuil passe de 3 à 2 : l'éditeur de préférences a
+    # quitté le Profil pour **Mon plan**. Ce n'est PAS un assouplissement de la
+    # règle — la règle est l'invariant `disclosures >= acquisition` juste en
+    # dessous, inchangé, et il vaut aussi sur `/plan` (garde jumelle dans
+    # `test_train2_mon_plan`). Le seuil, lui, reste un cliquet : il interdit
+    # qu'un formulaire disparaisse en silence du Profil.
+    assert acquisition >= 2, f"seulement {acquisition} formulaires d'acquisition"
     assert disclosures >= acquisition, (
         f"{acquisition} formulaires pour {disclosures} déclencheurs — un "
         "formulaire est resté à découvert"
@@ -258,23 +264,42 @@ def test_training_configuration_left_level_one_but_stays_editable(client):
     la lecture sans garder l'écriture aurait rendu les entrées du
     planificateur inatteignables.
 
-    L'emplacement reste déclaré transitionnel — c'est `TRAIN2` qui lui donne
-    son domicile.
+    `UX4_02` / TRAIN 2 A TENU LA PROMESSE. Ce test disait : « l'emplacement
+    reste déclaré transitionnel — c'est `TRAIN2` qui lui donne son domicile ».
+    C'est fait : l'éditeur est sur **Mon plan**, avec la déclaration qu'il
+    produit. La garde suit le déménagement au lieu de le refuser — et elle
+    vérifie toujours les DEUX moitiés, dont la seconde compte le plus : un
+    éditeur retiré d'un écran sans réapparaître ailleurs rendrait les entrées
+    du planificateur inatteignables.
     """
     body = client.get("/profile").text
     assert "Cadence souhaitée" not in body, (
         "la configuration est remontée au niveau 1"
     )
-    assert "Modifier mes préférences" in body, "l'éditeur a disparu"
-    assert "transitionnel" in body.lower(), (
-        "l'emplacement de l'éditeur n'est pas déclaré transitionnel"
+    assert "Modifier mes préférences" not in body, (
+        "l'éditeur est resté sur le Profil"
+    )
+    assert "transitionnel" not in body.lower(), (
+        "la mention transitionnelle promet un déménagement déjà survenu"
+    )
+    plan = client.get("/plan")
+    assert plan.status_code == 200
+    assert "Modifier mes préférences" in plan.text, (
+        "l'éditeur a disparu du produit : soustraction seule (`§5.3`)"
     )
 
 
 def test_the_preferences_editor_is_not_duplicated(client):
-    """La décision interdit de dupliquer le formulaire d'édition."""
+    """La décision interdit de dupliquer le formulaire d'édition. Elle vaut
+    maintenant à l'échelle du PRODUIT, pas d'un gabarit : le compter dans le
+    seul `profile.html` rendrait la garde verte pour la mauvaise raison — en
+    lisant zéro éditeur là où il n'y en a plus."""
     src = _uncommented(TEMPLATE.read_text(encoding="utf-8"))
-    assert src.count("url_for('profile_preferences_submit')") == 1
+    assert src.count("url_for('profile_preferences_submit')") == 0
+    hosts = [p.name for p in TEMPLATE.parent.rglob("*.html")
+             if "profile_preferences_submit"
+             in _uncommented(p.read_text(encoding="utf-8"))]
+    assert hosts == ["plan.html"], f"éditeur présent dans : {hosts}"
 
 
 def test_body_weight_has_a_quick_log(client):
