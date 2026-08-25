@@ -147,9 +147,19 @@ def test_the_remaining_score_consumers_are_the_recorded_ones():
     garde rougit dans les deux sens : un consommateur qui s'ajoute sans être
     inscrit, et un inscrit qui disparaît sans que le registre soit mis à jour.
     """
+    # `TRAIN1-E` / C4 — DEUX CONSOMMATEURS SONT SORTIS, et cette garde l'a
+    # signalé d'elle-même : elle rougit dans les deux sens, y compris quand un
+    # inscrit disparaît sans que le registre soit mis à jour. C'est
+    # exactement ce pour quoi elle a été écrite.
+    #
+    #   app/routers/leaderboard.py   ← radar retiré du profil public
+    #   app/services/leaderboard.py  ← mini-radar retiré du classement
+    #
+    # Il ne reste que deux appelants, et AUCUN n'est atteignable par un
+    # utilisateur : Body Intelligence est derrière un drapeau éteint
+    # (`DO_NOT_ACTIVATE_AS_STANDALONE`), le tableau de bord n'est rendu par
+    # aucune route depuis Sb_27.6.
     recorded = {
-        "app/routers/leaderboard.py",
-        "app/services/leaderboard.py",
         "app/routers/body_intelligence.py",
         "app/services/dashboard.py",
     }

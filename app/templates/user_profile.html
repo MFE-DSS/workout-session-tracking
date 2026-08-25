@@ -15,14 +15,23 @@
     <span class="text-mono user-profile__grade-label">{{ grade_label }}</span>
   </header>
 
-  {# Radar 30j — silhouette, sans score au centre (B3 confirmé Sb_20.x). #}
-  <div class="user-profile__radar">
-    <div class="radar-wrap">{{ dashboard.radar_svg|safe }}</div>
-    {# Score numérique — affiché 1 seule fois, sous le radar (spec §A.bis). #}
-    <p class="user-profile__score">
-      Score · <b>{{ "%.0f"|format(dashboard.global_score) }}/100</b>
-    </p>
-  </div>
+  {# `TRAIN1-E` / C4 — LE RADAR ET LE SCORE PHYSIQUE QUITTENT LE PROFIL PUBLIC.
+
+     Cette surface rendait DEUX objets de la doctrine retirée par `TRAIN1-C` :
+     le radar des six axes, et « Score · N/100 », c'est-à-dire le score global
+     de `compute_physique_dashboard` — sur le profil de QUELQU'UN D'AUTRE.
+
+     C'est le pire endroit où cette doctrine pouvait survivre. Un score sur 100
+     que le produit ne sait pas justifier est déjà discutable pour soi ; rendu
+     sur autrui, il devient une comparaison, ce que le contrat du rapport coach
+     s'interdit explicitement (« pas de comparaison vs autres utilisateurs »).
+
+     LA LETTRE RESTE, en en-tête : elle vient de `compute_grade`, dérivée de la
+     qualité de séance, et c'est la note SOCIALE du classement — un choix
+     inscrit, plus une tolérance héritée.
+
+     Ce qui prend la place : les agrégats publics 30 j, qui vivaient déjà en
+     dessous et deviennent le contenu du profil. Aucune soustraction seule. #}
 
   {# Bloc KPI 30j — agrégats publics. #}
   <ul class="user-profile__kpi-row">

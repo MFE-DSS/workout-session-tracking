@@ -12,7 +12,6 @@ from app.deps import CurrentUser, DbSession
 from app.models.session import WorkoutSession
 from app.models.user import User
 from app.services.leaderboard import compute_leaderboard
-from app.services.muscle_scoring import compute_physique_dashboard
 from app.services.performance import GRADE_LABELS, compute_grade
 from app.services.profile_metrics import build_page, build_preview
 from app.services.quality_score import compute_session_quality
@@ -72,8 +71,9 @@ def user_profile(
     if target is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    dashboard = compute_physique_dashboard(db, target.id, window_days=30)
-
+    # `TRAIN1-E` / C4 — le profil public ne rend plus ni radar ni score
+    # physique : le calculer serait produire une lecture corporelle
+    # d'autrui pour la jeter.
     sessions_30d = db.execute(
         select(WorkoutSession)
         .where(
@@ -103,7 +103,6 @@ def user_profile(
         {
             "page_title": f"Profil de {target.username}",
             "target": target,
-            "dashboard": dashboard,
             "sessions_count_30d": len(sessions_30d),
             "last_session_score": last_session_score,
             "grade": grade,
@@ -143,7 +142,6 @@ def user_profile_preview(
     if target is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    dashboard = compute_physique_dashboard(db, target.id, window_days=30)
     sessions_count = db.execute(
         select(WorkoutSession)
         .where(
@@ -180,6 +178,5 @@ def user_profile_preview(
             "preview": preview,
             "grade": grade,
             "grade_label": GRADE_LABELS.get(grade, ""),
-            "radar_svg_mini": dashboard.radar_svg,
         },
     )

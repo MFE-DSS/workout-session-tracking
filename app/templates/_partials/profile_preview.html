@@ -1,17 +1,23 @@
 {# Sb_22b — L2 preview card.
    Spec §A.bis v2.1 — vit ici :
    - badge grade (PAS de score numérique)
-   - mini-radar 30j silhouette (PAS de score au centre)
    - 3-4 KPI courts (sessions/30j · streak · cardio min/sem · volume Δ)
    Vit ailleurs et n'apparaît PAS ici : score numérique, métadonnées,
-   activité agrégée (top zone / pattern / dernière séance). #}
+   activité agrégée (top zone / pattern / dernière séance).
+
+   `TRAIN1-E` / C4 — LE MINI-RADAR EST RETIRÉ. C'était la troisième et dernière
+   apparition de l'analytique physique sur une surface sociale, sous une
+   TROISIÈME classe CSS (`profile-preview__radar`, après `tooltip-radar` au
+   classement et `radar-wrap` au profil public). Chercher une seule de ces
+   classes en aurait laissé deux en place — la garde les vise toutes les trois.
+
+   La carte garde sa lettre et ses KPI : ce sont des faits d'activité publics,
+   pas une lecture corporelle d'autrui. #}
 <div class="profile-preview card" role="dialog" aria-label="Aperçu profil {{ target.username }}">
   <header class="profile-preview__head">
     <span class="profile-preview__name">@{{ target.username }}</span>
     <span class="grade-badge grade-badge--{{ grade|lower }}">{{ grade }}</span>
   </header>
-
-  <div class="profile-preview__radar">{{ radar_svg_mini|safe }}</div>
 
   <ul class="profile-preview__kpi">
     <li>

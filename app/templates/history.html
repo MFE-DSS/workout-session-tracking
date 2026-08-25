@@ -25,8 +25,11 @@
     {% elif status_filter == 'completed' %}
       Aucune séance terminée pour l'instant.
     {% else %}
+      {# `TRAIN1-E` / C6 — le seul lien de l'état vide relève du même standard
+         que le reste de la surface. Mesuré à 160×16 px ; la classe lui donne
+         sa zone sans changer la hauteur de la phrase. #}
       Aucune séance enregistrée. Commence par
-      <a href="{{ url_for('library') }}">choisir un template</a>.
+      <a class="inline-target" href="{{ url_for('library') }}">choisir un template</a>.
     {% endif %}
   </p>
 {% else %}
@@ -59,18 +62,38 @@
             {% endif %}
           </div>
         </a>
-        <details class="history-item__actions" style="margin-top:var(--space-xs);margin-bottom:var(--space-sm);">
-          <summary style="cursor:pointer;font-size:12px;color:var(--fg-dim);padding:var(--space-xs) 0;">Gérer cette séance</summary>
-          <div style="display:flex;gap:var(--space-sm);margin-top:var(--space-xs);flex-wrap:wrap;">
-            <form method="post" action="{{ url_for('toggle_exclude', session_id=s.id) }}" style="display:inline;">
-              <button type="submit" class="btn btn--ghost btn--sm">
+        {# `TRAIN1-E` / C6 — LA LIGNE EST L'ACTION PRIMAIRE, LA GESTION EST RARE.
+
+           Les deux moitiés de la décision étaient déjà en place : la carte est
+           un `<a>` de 358×101 px, et les deux actions de gestion vivent déjà
+           derrière une divulgation. Ce qui manquait était l'ESPACE.
+
+           `UIV3_TARGETS_44_01` avait déféré ces cibles pour une raison
+           PHYSIQUE, et elle avait raison : à 8 px au-dessus et 4 px en dessous,
+           un `<summary>` de 26 px ne peut pas recevoir 44 px de zone sans
+           chevaucher la carte ou les boutons. Une zone qui se recouvre est pire
+           que pas de zone — elle déplace le défaut et le rend invisible à la
+           mesure. C6 autorise le changement structurel qui manquait.
+
+           CE QUE LA MESURE A CORRIGÉ DANS MON PROPRE RELEVÉ. Je comptais 18
+           cibles sous 44 px ici. Faux : replié, les deux boutons rendent
+           `checkVisibility() === false` et `elementFromPoint` à leur centre
+           renvoie la CARTE. Ils ne sont pas tapables. Le vrai chiffre par
+           défaut est **une** cible par ligne — le `<summary>`.
+
+           Les styles en ligne partent avec : rien ne pouvait être visé tant
+           que tout était écrit dans l'attribut `style`. #}
+        <details class="history-item__actions">
+          <summary class="history-item__toggle">Gérer cette séance</summary>
+          <div class="history-item__buttons">
+            <form method="post" action="{{ url_for('toggle_exclude', session_id=s.id) }}">
+              <button type="submit" class="btn btn--ghost history-item__btn">
                 {% if s.excluded_from_stats %}Inclure dans KPI{% else %}Exclure des KPI{% endif %}
               </button>
             </form>
             <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}"
-                  onsubmit="return confirm('Supprimer définitivement cette séance ?');"
-                  style="display:inline;">
-              <button type="submit" class="btn btn--ghost btn--sm btn--danger">Supprimer</button>
+                  onsubmit="return confirm('Supprimer définitivement cette séance ?');">
+              <button type="submit" class="btn btn--ghost btn--danger history-item__btn">Supprimer</button>
             </form>
           </div>
         </details>

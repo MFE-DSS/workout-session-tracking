@@ -22,13 +22,23 @@
           <span class="tooltip-wrapper" tabindex="0">
             <span class="grade-badge grade-badge--{{ e.grade|lower }}">{{ e.grade }}</span>
             <span class="tooltip-content tooltip-content--rich">
+              {# `TRAIN1-E` / C4 — LE RADAR PHYSIQUE QUITTE LA SURFACE SOCIALE.
+
+                 La lettre RESTE : c'est une note de jeu, dérivée de la qualité
+                 de séance (`compute_grade`), et un classement sans ordre n'est
+                 pas un classement. Elle n'est plus une tolérance héritée mais
+                 un choix inscrit.
+
+                 Le radar, lui, était l'ANALYTIQUE PHYSIQUE — les six axes de
+                 `compute_physique_dashboard`, c'est-à-dire la doctrine que
+                 `TRAIN1-C` a retirée de Progression. La garder ici la
+                 réintroduisait par la porte sociale, et sur les profils des
+                 AUTRES, ce qui est pire : une lecture corporelle d'autrui
+                 rendue en infobulle. #}
               <span class="tooltip-summary">
                 Dernière session : {{ e.last_session_score if e.last_session_score is not none else "—" }}/100<br>
                 Note : {{ e.grade }} — {{ e.grade_label }}
               </span>
-              {% if e.radar_svg_mini %}
-                <span class="tooltip-radar">{{ e.radar_svg_mini|safe }}</span>
-              {% endif %}
             </span>
           </span>
         </span>

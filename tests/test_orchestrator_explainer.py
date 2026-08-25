@@ -280,10 +280,24 @@ def test_without_traces_the_surface_says_so_instead_of_inventing():
     assert "Aucune trace" in exp.unavailable_notice
 
 
-def test_the_page_shows_an_unavailable_state_rather_than_a_fake_reason(client):
+def test_the_page_invents_no_reason_when_there_is_no_trace(client):
+    """`TRAIN1-E` / C7 — GARDE RÉORIENTÉE, PAS AFFAIBLIE.
+
+    Elle exigeait la phrase « Aucune trace de décision » DANS une carte
+    « Pourquoi ce plan ? » rendue à vide. Mesuré : une boîte de plus de 80 px
+    dont tout le corps était cette phrase — le module vide pleine taille que
+    l'arbitrage C7 retire.
+
+    L'invariant qui compte n'était jamais la phrase : c'était **qu'aucune
+    raison ne soit inventée**. La carte n'apparaît plus faute de trace ; la
+    garde vérifie donc que le vocabulaire des raisons est absent, ce qui est
+    strictement plus fort — il couvre les huit étiquettes de source, pas une
+    formule d'absence.
+    """
     blob = _visible(client)
-    assert "Aucune trace de décision" in blob
-    assert "Tu as demandé" not in blob
+    assert "Pourquoi ce plan" not in blob
+    for invented in ("Tu as demandé", "Le produit planifie", "déduit de"):
+        assert invented not in blob
 
 
 # ── Déterminisme et absence de prose générée ─────────────────────────────────
