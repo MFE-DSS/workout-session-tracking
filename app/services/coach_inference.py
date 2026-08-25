@@ -1,19 +1,47 @@
-"""Sb_23 — Coach Report inference (blocks 7, 8, 9).
+"""Sb_23 — Coach Report inference (blocs 7 et 8) + couverture et références.
 
-Deterministic rule set producing the ``Inféré`` blocks of the report
-(points forts probables / points faibles probables / axes de travail
-suggérés). No ML, no probabilities — fully explainable conditions.
+Jeu de règles déterministe. Aucun apprentissage, aucune probabilité — des
+conditions entièrement explicables.
 
-Contract Sx_23 v1.1 §B.bis :
-* Vocabulary is bounded — never claim "you are X", always "X probable".
-* No aesthetic appreciation ("bel équilibre", "physique harmonieux").
-* No morphological prognosis ("vous prenez/perdez du gras/muscle").
-* No performance verdict ("vous êtes fort/faible").
-* No inter-user comparison.
+Contrat Sx_23 v1.1 §B.bis :
+* Vocabulaire borné — jamais « tu es X », toujours « X probable ».
+* Aucune appréciation esthétique, aucun pronostic morphologique.
+* Aucun verdict de performance, aucune comparaison entre utilisateurs.
 
-Output dataclasses are flat strings to keep the templating layer
-trivial. The rationale (the *why*) is folded into the sentence so a
-coach reads one self-contained line per item.
+`TRAIN1-D` / C1 — LE BLOC 9 « AXES DE TRAVAIL SUGGÉRÉS » EST RETIRÉ
+--------------------------------------------------------------------
+Il produisait cinq prescriptions d'entraînement que rien dans le dépôt ne
+soutient :
+
+    « Rééquilibrer X : viser 2 séances/sem sur 4 semaines »
+    « Augmenter le volume cardio : … cible OMS 150'/sem »
+    « Diversifier les patterns moteurs : intégrer plus de variétés »
+    « Augmenter la fréquence : viser 2-3 séances/sem comme socle »
+    « Logger le poids de corps plus systématiquement — indispensable … »
+
+Les quatre premières fixent des **objectifs chiffrés** (2 séances/sem, 4
+semaines, 150'/sem, 2-3 séances/sem) qu'aucune source du dépôt ne justifie —
+la même faute que le « % de cible » retiré de `/physique` par `TRAIN1-C`, mais
+en phrases.
+
+CE QU'ELLES DEVIENNENT (ordre opérateur : *factual signals, or removed*) :
+
+* **Retirées** — les quatre prescriptions de volume, de fréquence et
+  d'équilibrage. Les FAITS sur lesquels elles reposaient restent tous à
+  l'écran : le bloc 2 dit le volume, le bloc 4 la répartition par zone, le
+  bloc 5 les patterns. Rien n'est perdu ; seule la consigne disparaît.
+* **Converties en couverture** — la discipline de logging n'est pas une règle
+  d'entraînement mais un fait sur la **complétude des données**. Elle devient
+  `coverage_gaps`, sur l'axe `COVERAGE` du modèle épistémique canonique.
+* **Conservée comme RÉFÉRENCE** — la recommandation de l'OMS. Une
+  recommandation de santé publique est une référence légitime ; ce qui ne
+  l'était pas, c'est de la convertir en **cible individuelle calculée** pour
+  quelqu'un dont le produit ignore l'âge, l'état de santé et le contexte.
+  Elle est donc citée, attribuée, et explicitement détachée du cas personnel.
+
+Les blocs 7 et 8 (points forts / faibles **probables**) restent : ce sont des
+inférences, pas des prescriptions, et l'ordre opérateur demande de préserver la
+provenance mesuré / inféré, pas de la supprimer.
 """
 from __future__ import annotations
 
@@ -22,23 +50,43 @@ from dataclasses import dataclass
 from app.services.coach_report import CoachReport
 from app.services.muscle_mapping import RADAR_AXES
 
-# Thresholds — V1 deterministic, easy to tune.
-TOP_ZONE_MIN_SESSIONS = 3        # a zone is a probable strength point only if ≥ 3 sessions
-NEGLECTED_ZONE_MAX_SESSIONS = 1  # ≤ 1 session in 30d = neglected
-CARDIO_LOW_MIN_PER_WEEK = 90     # < 90'/week is "low" (OMS reco = 150')
-DOMINANT_PATTERN_OVERWEIGHT_PCT = 35  # > 35 % of work sets on one pattern = unbalanced
-DISCIPLINE_WEAK_THRESHOLD = 50   # any rate < 50 % surfaces in axes
-LOW_VOLUME_SESSIONS_30D = 4      # < 4 sessions in 30d = low volume context
+# Seuils — V1 déterministes. Ce sont des CHOIX DE PRODUIT, et c'est
+# exactement pourquoi ce qu'ils produisent est étiqueté `INFERRED` et non
+# `DERIVED` : un comptage est reproductible, un seuil est une décision.
+TOP_ZONE_MIN_SESSIONS = 3        # ≥ 3 séances/30 j → point fort probable
+NEGLECTED_ZONE_MAX_SESSIONS = 1  # ≤ 1 séance/30 j → point faible probable
+DISCIPLINE_WEAK_THRESHOLD = 50   # < 50 % → lacune de couverture signalée
+
+#: `TRAIN1-D` / C1 — RÉFÉRENCE EXTERNE, JAMAIS UNE CIBLE INDIVIDUELLE.
+#:
+#: 150 min/semaine d'activité d'endurance est une recommandation de santé
+#: publique de l'OMS, adressée à une population adulte générale. Le produit
+#: ignore l'âge, l'état de santé, les traitements et le contexte de la personne
+#: qui lit l'écran : il n'a rien qui lui permette de convertir cette
+#: recommandation en objectif calculé pour elle.
+#:
+#: Elle est donc citée comme référence attribuée, et détachée du cas personnel.
+#: La version précédente écrivait « cible OMS 150'/sem » à côté du volume réel,
+#: ce qui en faisait un écart à combler.
+OMS_ENDURANCE_MIN_PER_WEEK = 150
 
 
 @dataclass(frozen=True)
 class InferredBlocks:
-    """The three Inféré blocks of the report (each list is 0..N short
-    sentences). All sentences end with no period and use the qualifier
-    "probable" / "suggéré" — never assertive."""
+    """Les blocs non factuels du rapport.
+
+    `strong_points` / `weak_points` — INFÉRÉS. Phrases bornées, toujours
+    qualifiées « probable », jamais assertives.
+
+    `coverage_gaps` — FACTUELS, sur l'axe COUVERTURE : ce que les données ne
+    couvrent pas. Aucune consigne, aucun objectif.
+
+    `external_references` — RÉFÉRENCES attribuées. Ni cibles, ni écarts.
+    """
     strong_points: list[str]
     weak_points: list[str]
-    suggested_axes: list[str]
+    coverage_gaps: list[str]
+    external_references: list[str]
 
 
 def _axis_label(key: str) -> str:
@@ -49,10 +97,14 @@ def strong_points(report: CoachReport) -> list[str]:
     """Rule : a zone is a "probable strength point" if it appears in
     top_zones with ≥ TOP_ZONE_MIN_SESSIONS over 30d. Capped to 2 lines."""
     out: list[str] = []
-    for key, label, n in report.zones.top_zones:
+    for _key, label, n in report.zones.top_zones:
         if n >= TOP_ZONE_MIN_SESSIONS:
+            # `TRAIN1-D` / C10 — les astérisques Markdown ont disparu. Elles
+            # s'affichaient littéralement : « **Dos épaisseur** ». Le gabarit
+            # ne rend pas de Markdown, et il n'a pas à le faire — c'est au
+            # producteur de rendre du texte, pas du balisage.
             out.append(
-                f"Zone travaillée fréquemment : **{label}** "
+                f"Zone travaillée fréquemment : {label} "
                 f"({n} séances/30j) — point fort probable"
             )
         if len(out) >= 2:
@@ -64,10 +116,10 @@ def weak_points(report: CoachReport) -> list[str]:
     """Rule : a zone with ≤ NEGLECTED_ZONE_MAX_SESSIONS over 30d
     surfaces as a probable weak point. Capped to 2 lines."""
     out: list[str] = []
-    for key, label, n in report.zones.neglected_zones:
+    for _key, label, n in report.zones.neglected_zones:
         if n <= NEGLECTED_ZONE_MAX_SESSIONS:
             out.append(
-                f"Zone peu travaillée : **{label}** "
+                f"Zone peu travaillée : {label} "
                 f"({n} séance{'s' if n != 1 else ''}/30j) — point faible probable"
             )
         if len(out) >= 2:
@@ -75,70 +127,55 @@ def weak_points(report: CoachReport) -> list[str]:
     return out
 
 
-def suggested_axes(report: CoachReport) -> list[str]:
-    """Rule set : produces 0..3 short suggested axes. Order = priority.
+def coverage_gaps(report: CoachReport) -> list[str]:
+    """Ce que les données ne couvrent pas — des FAITS, aucune consigne.
 
-    Heuristics V1:
-      1. neglected zone rebalance (if any)
-      2. cardio increase to OMS reco (if < CARDIO_LOW_MIN_PER_WEEK)
-      3. pattern rebalance (if any > DOMINANT_PATTERN_OVERWEIGHT_PCT)
-      4. discipline reminder (if any rate < DISCIPLINE_WEAK_THRESHOLD)
-      5. volume warning (if sessions_30d < LOW_VOLUME_SESSIONS_30D)
+    Remplace la « discipline reminder » du bloc 9, qui disait « Logger le poids
+    de corps plus systématiquement — indispensable pour suivre le trend ».
+    Deux problèmes dans une seule phrase : un impératif, et une affirmation
+    (« indispensable ») que rien n'établit.
+
+    Ce qui reste est le fait : sur quelle proportion des séances la donnée est
+    présente. Un lecteur en tire ce qu'il veut ; le produit ne le lui dit pas.
     """
     out: list[str] = []
-
-    # (1) Neglected zone rebalance
-    for key, label, n in report.zones.neglected_zones:
-        if n <= NEGLECTED_ZONE_MAX_SESSIONS:
-            out.append(
-                f"Rééquilibrer **{label}** : viser 2 séances/sem sur 4 semaines"
-            )
-            break  # one zone is enough — don't pile up
-
-    # (2) Cardio low
-    if 0 <= report.volume.cardio_minutes_per_week < CARDIO_LOW_MIN_PER_WEEK:
-        out.append(
-            f"Augmenter le volume cardio : actuellement "
-            f"{report.volume.cardio_minutes_per_week}'/sem — cible OMS 150'/sem"
-        )
-
-    # (3) Pattern overweighted
-    if (
-        report.patterns.dominant
-        and report.patterns.dominant[1] > DOMINANT_PATTERN_OVERWEIGHT_PCT
-    ):
-        pat, pct = report.patterns.dominant
-        out.append(
-            f"Diversifier les patterns moteurs : **{pat}** représente {pct}% "
-            "des sets travail — intégrer plus de variétés"
-        )
-
-    # (4) Discipline reminder
     disc = report.discipline
-    if (
-        disc.with_bodyweight_rate is not None
-        and disc.with_bodyweight_rate < DISCIPLINE_WEAK_THRESHOLD
+    for rate, what in (
+        (disc.with_bodyweight_rate, "Poids de corps"),
+        (disc.with_free_note_rate, "Note libre"),
+        (disc.with_sensation_rate, "Sensation musculaire"),
     ):
-        out.append(
-            f"Logger le poids de corps plus systématiquement "
-            f"(actuellement {disc.with_bodyweight_rate}% des séances) — "
-            "indispensable pour suivre le trend"
-        )
+        if rate is not None and rate < DISCIPLINE_WEAK_THRESHOLD:
+            out.append(f"{what} : renseigné sur {rate}% des séances (30 j)")
+    return out
 
-    # (5) Volume context
-    if report.volume.sessions_30d < LOW_VOLUME_SESSIONS_30D:
-        out.append(
-            f"Augmenter la fréquence d'entraînement : "
-            f"{report.volume.sessions_30d} séances/30j sur la fenêtre — "
-            "viser 2-3 séances/sem comme socle"
-        )
 
-    return out[:3]  # spec V1 = max 3 axes
+def external_references(report: CoachReport) -> list[str]:
+    """Références externes attribuées — jamais des cibles individuelles.
+
+    La recommandation de l'OMS n'est pas retirée : c'est une référence de santé
+    publique légitime, et un rapport destiné à un tiers a des raisons de la
+    citer. Ce qui est retiré, c'est sa conversion en objectif calculé pour une
+    personne dont le produit ignore l'âge, l'état de santé et le contexte.
+
+    Rendue **inconditionnellement** dès qu'il y a du cardio à situer : une
+    référence qui n'apparaît que lorsqu'on est « en dessous » n'est pas une
+    référence, c'est un reproche déclenché par un seuil.
+    """
+    if report.volume.cardio_minutes_per_week < 0:
+        return []
+    return [
+        f"OMS — {OMS_ENDURANCE_MIN_PER_WEEK} min d'activité d'endurance par "
+        "semaine, recommandation de santé publique pour une population adulte "
+        "générale. AUREN ne connaît ni ton âge ni ton état de santé : ce "
+        "nombre n'est pas un objectif calculé pour toi."
+    ]
 
 
 def build_inference(report: CoachReport) -> InferredBlocks:
     return InferredBlocks(
         strong_points=strong_points(report),
         weak_points=weak_points(report),
-        suggested_axes=suggested_axes(report),
+        coverage_gaps=coverage_gaps(report),
+        external_references=external_references(report),
     )

@@ -1,7 +1,28 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Sauvegarde</h1>
-<p class="lede">Journal complet · JSON ou CSV.</p>
+<p class="lede">Ce que tu peux emporter hors d'AUREN : le journal, et la synthèse à présenter.</p>
+
+{# `TRAIN1-D` / C1 — LE COACH REPORT ATTERRIT ICI.
+
+   Il quitte l'onglet Progression parce que c'est un DOCUMENT : son chapeau dit
+   « à présenter à un coach externe », il porte un bouton Imprimer, et il ne
+   varie presque pas avec les données (349 mots mesurés sur un compte sans une
+   seule séance, 369 sur un compte peuplé).
+
+   Cette surface est l'endroit d'où l'on sort quelque chose du produit. Un
+   rapport destiné à un tiers y est chez lui, à côté du JSON et du CSV. #}
+<div class="card export-card">
+  <h2 class="card__title">Synthèse à présenter</h2>
+  <p class="export-card__hint">
+    Lecture de deux minutes, à imprimer ou à montrer à un coach. Chaque bloc
+    dit d'où vient ce qu'il affirme — mesuré, calculé, inféré, ou non
+    déductible.
+  </p>
+  <div class="card__actions">
+    <a class="btn btn--wide" href="{{ url_for('coach_report') }}">Ouvrir le Coach Report</a>
+  </div>
+</div>
 
 <div class="card export-card">
   <h2 class="card__title">Résumé du journal</h2>

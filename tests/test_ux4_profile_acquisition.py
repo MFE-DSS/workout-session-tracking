@@ -244,11 +244,28 @@ def test_progress_analytics_left_the_profile(client):
         assert banned not in body, f"analytique résiduelle sur le Profil : {banned}"
 
 
-def test_training_configuration_is_summarised_and_marked_transitional(client):
-    """**2 — TRAINING CONFIGURATION.** Résumé compact en lecture seule, et
-    l'emplacement de l'éditeur est déclaré transitionnel avec sa dépendance."""
+def test_training_configuration_left_level_one_but_stays_editable(client):
+    """**2 — TRAINING CONFIGURATION.** `TRAIN1-D` / C2 — LE RÉSUMÉ QUITTE LE
+    NIVEAU 1.
+
+    `UX4_01` exigeait ici un résumé en lecture seule. Il rendait trois lignes
+    dont les trois valaient `—` sur un compte neuf — trois des six tirets nus
+    de la page. Et il répondait à « comment je veux m'entraîner », qui est la
+    question de **Mon plan**, pas celle du Profil.
+
+    L'éditeur RESTE : `weekly_planner` et `user_programs` consomment
+    `sessions_per_week`, `focus_priorities` et `available_equipment`. Retirer
+    la lecture sans garder l'écriture aurait rendu les entrées du
+    planificateur inatteignables.
+
+    L'emplacement reste déclaré transitionnel — c'est `TRAIN2` qui lui donne
+    son domicile.
+    """
     body = client.get("/profile").text
-    assert "Cadence souhaitée" in body, "aucun résumé de configuration"
+    assert "Cadence souhaitée" not in body, (
+        "la configuration est remontée au niveau 1"
+    )
+    assert "Modifier mes préférences" in body, "l'éditeur a disparu"
     assert "transitionnel" in body.lower(), (
         "l'emplacement de l'éditeur n'est pas déclaré transitionnel"
     )

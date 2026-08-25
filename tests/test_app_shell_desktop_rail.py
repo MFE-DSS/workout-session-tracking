@@ -126,8 +126,21 @@ def test_rail_physique_redirect_lands_on_progression(client):
     assert _active_primary(r.text) == ["Progression"]
 
 
-def test_rail_coach_active_progression(client):
-    assert _active_primary(_get(client, "/coach-report")) == ["Progression"]
+# ── `TRAIN1-D` / C1 — LE COACH REPORT EST UN UTILITAIRE ──────────────────────
+#
+# Il n'allume plus l'onglet Progression, et c'est délibéré : c'est un DOCUMENT
+# exportable (« à présenter à un coach externe », bouton Imprimer), pas une
+# destination d'application. Il rejoint la classe de `/export`, qui n'a jamais
+# allumé d'onglet primaire non plus.
+#
+# La garde est RETOURNÉE, pas supprimée : elle exige désormais ZÉRO onglet
+# actif, ce qui est un contrat plus précis que l'ancien « exactement un ».
+UTILITY_SURFACES = ("/coach-report", "/export")
+
+
+def test_rail_utility_surfaces_light_no_primary(client):
+    for path in UTILITY_SURFACES:
+        assert _active_primary(_get(client, path)) == [], path
 
 
 def test_rail_profile_active_profil(client):
@@ -145,8 +158,7 @@ def test_rail_leaderboard_active_profil(client):
 def test_rail_exactly_one_primary_active_per_route(client):
     # `TRAIN1-C` — `/physique` reste couvert, suivi jusqu'à son arrivée.
     for path in ("/", "/library", "/launcher", "/progress", "/history",
-                 "/physique", "/coach-report", "/profile", "/squads",
-                 "/leaderboard"):
+                 "/physique", "/profile", "/squads", "/leaderboard"):
         r = client.get(path, follow_redirects=True)
         assert r.status_code == 200, f"{path} -> {r.status_code}"
         prim = _rail_primary(r.text)
@@ -178,7 +190,11 @@ def test_rail_and_bottom_nav_same_mapping(client):
 def test_rail_secondary_routes_present(client):
     # `TRAIN1-C` — « Physique » a quitté le rail avec la surface elle-même.
     rail = _rail_html(_get(client))
-    for label in ("Historique", "Coach", "Squads", "Classement", "Contact"):
+    # `TRAIN1-D` — « Coach » devient « Coach Report » (c'est un document, et
+    # le libellé le dit), et « Sauvegarde » entre dans le rail : la route
+    # `/export` n'était liée depuis AUCUN gabarit.
+    for label in ("Historique", "Coach Report", "Sauvegarde", "Squads",
+                  "Classement", "Contact"):
         assert f">{label}</a>" in rail, f"secondary link missing in rail: {label}"
 
 

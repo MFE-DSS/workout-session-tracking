@@ -66,7 +66,11 @@ def test_topbar_has_no_primary_destinations(client):
 def test_topbar_keeps_secondary_routes(client):
     tb = _topbar(_get(client))
     # `TRAIN1-C` — « Physique » retirée : surface supprimée, route redirigée.
-    for label in ("Historique", "Coach", "Squads", "Classement", "Contact"):
+    # `TRAIN1-D` — « Coach » devient « Coach Report » (c'est un document, et le
+    # libellé le dit) ; « Sauvegarde » entre dans le menu, la route `/export`
+    # n'étant liée depuis aucun gabarit jusqu'ici.
+    for label in ("Historique", "Coach Report", "Sauvegarde", "Squads",
+                  "Classement", "Contact"):
         assert f">{label}</a>" in tb, f"secondary route missing from topbar: {label}"
 
 

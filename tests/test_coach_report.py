@@ -48,7 +48,9 @@ def test_coach_report_contains_10_blocks(client):
         "6. Discipline de logging",
         "7. Points forts probables",
         "8. Points faibles probables",
-        "9. Axes de travail",
+        # `TRAIN1-D` / C1 — le bloc 9 prescrivait ; il compte désormais
+        # ce que les données NE couvrent pas. Le rapport garde ses 10 blocs.
+        "9. Couverture des données",
         "10. Garde-fous",
     ]
     for title in expected_titles:
@@ -183,32 +185,70 @@ def test_inference_weak_point_when_zone_neglected():
     assert "probable" in out[0].lower()
 
 
-def test_inference_suggested_axes_cardio_when_low():
-    from app.services.coach_inference import suggested_axes
-    rep = _fake_report(cardio_min_per_week=30)
-    out = suggested_axes(rep)
-    assert any("cardio" in axis.lower() for axis in out)
-    assert len(out) <= 3
+# ── `TRAIN1-D` / C1 — LES PRESCRIPTIONS SONT RETIRÉES ────────────────────────
+#
+# Les trois tests remplacés ici EXIGEAIENT les consignes : « un axe cardio
+# apparaît quand le volume est bas », « un axe pattern apparaît quand un
+# pattern domine », « au plus trois axes ». Ils sont retournés plutôt que
+# supprimés — qui lit l'ancien contrat doit tomber sur ce qui l'a annulé.
 
 
-def test_inference_suggested_axes_pattern_when_overweighted():
-    from app.services.coach_inference import suggested_axes
-    rep = _fake_report(dominant_pattern_pct=60)
-    out = suggested_axes(rep)
-    assert any("push_horizontal" in axis for axis in out)
+def test_the_external_guideline_is_a_reference_never_a_target():
+    """La recommandation OMS reste citée — c'est une référence de santé
+    publique légitime dans un document destiné à un tiers. Ce qui est retiré,
+    c'est sa conversion en objectif calculé pour quelqu'un dont AUREN ignore
+    l'âge et l'état de santé."""
+    from app.services.coach_inference import external_references
+
+    out = external_references(_fake_report(cardio_min_per_week=30))
+    assert len(out) == 1
+    assert "OMS" in out[0]
+    assert "150" in out[0]
+    assert "cible" not in out[0].lower()
+    assert "objectif calculé pour toi" in out[0]
 
 
-def test_inference_axes_capped_at_3():
-    from app.services.coach_inference import suggested_axes
-    rep = _fake_report(
+def test_the_reference_does_not_depend_on_being_below_it():
+    """Une référence qui n'apparaît QUE lorsqu'on est en dessous n'est pas une
+    référence : c'est un reproche déclenché par un seuil. Elle est donc rendue
+    à l'identique quel que soit le volume."""
+    from app.services.coach_inference import external_references
+
+    low = external_references(_fake_report(cardio_min_per_week=10))
+    high = external_references(_fake_report(cardio_min_per_week=400))
+    assert low == high
+
+
+def test_no_training_prescription_survives_anywhere_in_the_inference():
+    """La garde de fond, et elle est plus stricte que le plafond de trois
+    axes qu'elle remplace : sur un compte qui déclenchait AUTREFOIS les cinq
+    prescriptions à la fois, aucun verbe de consigne ne doit subsister."""
+    from app.services.coach_inference import build_inference
+
+    blocks = build_inference(_fake_report(
         cardio_min_per_week=10,
         dominant_pattern_pct=60,
         discipline_bw_rate=10,
         sessions_30d=2,
         neglected_zone_n=0,
-    )
-    out = suggested_axes(rep)
-    assert len(out) <= 3
+    ))
+    produced = " ".join(
+        blocks.strong_points + blocks.weak_points
+        + blocks.coverage_gaps + blocks.external_references
+    ).lower()
+    for verb in ("viser", "augmenter", "rééquilibrer", "diversifier",
+                 "intégrer", "logger", "indispensable"):
+        assert verb not in produced, f"consigne rendue : « {verb} »"
+
+
+def test_coverage_gaps_are_facts_not_instructions():
+    """La discipline de logging devient un fait de COUVERTURE : quelle part
+    des séances porte la donnée. Aucun impératif, aucun « indispensable »."""
+    from app.services.coach_inference import coverage_gaps
+
+    out = coverage_gaps(_fake_report(discipline_bw_rate=10))
+    assert any("Poids de corps" in line for line in out)
+    assert all("%" in line for line in out)
 
 
 # ── `UX4_03B` — le streak quitte le rapport coach (`OPERATOR_DECISION` D7) ───

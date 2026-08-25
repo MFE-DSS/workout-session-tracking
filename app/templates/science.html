@@ -17,10 +17,30 @@
 <!-- SECTION 2 — PRINCIPES : methode -->
 <section class="science-section" id="section-method">
   <h2 class="section-header">Methode d'entrainement</h2>
+  {# `TRAIN1-D` / C5 — SCIENCE RESTE UN DOCUMENT DE RÉFÉRENCE, ET LE DEVIENT
+     VRAIMENT.
+
+     Les ancres `#rule-<slug>` existaient déjà — mais invisibles : rien à
+     l'écran ne disait qu'une règle a un identifiant, ni lequel. Un document
+     de référence qu'on ne peut pas CITER n'en est pas un ; et `/progress`
+     pointait déjà vers `#rule-plages-repetitions` sans que le lecteur, une
+     fois arrivé, sache où il avait atterri.
+
+     L'identifiant est donc rendu, et il est lui-même le lien : cliquer met
+     l'ancre dans la barre d'adresse, ce qui suffit à la copier.
+
+     Les slugs viennent de `data/method_rules.json`, versionné. Une garde
+     épingle l'ensemble : renommer un slug casse silencieusement TOUS les
+     liens profonds qui le visent, et rien à l'exécution ne le signalerait. #}
   {% for rule in rules %}
   <article class="card rule-card" id="rule-{{ rule.slug }}">
     <h3 class="card__title">{{ rule.title }}</h3>
     <p class="rule__body">{{ rule.body }}</p>
+    <p class="rule__id">
+      <a class="rule__anchor" href="#rule-{{ rule.slug }}">
+        <span class="sr-only">Lien vers la règle </span>{{ rule.slug }}
+      </a>
+    </p>
   </article>
   {% endfor %}
 </section>

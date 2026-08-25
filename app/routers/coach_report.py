@@ -11,6 +11,7 @@ from fastapi.responses import HTMLResponse
 
 from app.config import get_settings
 from app.deps import CurrentUser, DbSession
+from app.services import epistemic
 from app.services.body_intelligence import compute_body_intelligence
 from app.services.body_intelligence_inputs import build_body_intelligence_input
 from app.services.coach_inference import build_inference
@@ -51,6 +52,14 @@ def coach_report_page(
             "page_title": "Coach Report",
             "report": report,
             "inference": inference,
+            # `TRAIN1-D` / C3 — la légende vient du foyer unique du modèle
+            # épistémique. Le gabarit n'invente aucun libellé : une garde
+            # vérifie qu'il n'en existe pas d'autre que ceux-ci.
+            "epistemic": {
+                "labels": [(n, epistemic.NATURE_LABELS[n])
+                           for n in epistemic.NATURES],
+                "meaning": epistemic.NATURE_MEANING,
+            },
             "active_session": latest_open_session(db, user.id),
             "body_snapshot": body_snapshot,
         },

@@ -138,8 +138,21 @@ def test_physique_redirect_lands_on_progression(client):
     assert _active_bottom_labels(r.text) == ["Progression"]
 
 
-def test_coach_marks_progression_active(client):
-    assert _active_bottom_labels(_get(client, "/coach-report")) == ["Progression"]
+# ── `TRAIN1-D` / C1 — LE COACH REPORT EST UN UTILITAIRE ──────────────────────
+#
+# Il n'allume plus l'onglet Progression, et c'est délibéré : c'est un DOCUMENT
+# exportable (« à présenter à un coach externe », bouton Imprimer), pas une
+# destination d'application. Il rejoint la classe de `/export`, qui n'a jamais
+# allumé d'onglet primaire non plus.
+#
+# La garde est RETOURNÉE, pas supprimée : elle exige désormais ZÉRO onglet
+# actif, ce qui est un contrat plus précis que l'ancien « exactement un ».
+UTILITY_SURFACES = ("/coach-report", "/export")
+
+
+def test_utility_surfaces_light_no_primary_tab(client):
+    for path in UTILITY_SURFACES:
+        assert _active_bottom_labels(_get(client, path)) == [], path
 
 
 def test_profile_marks_profil_active(client):
@@ -159,8 +172,7 @@ def test_bottom_nav_exactly_one_active_per_route(client):
     # Le retirer aurait réduit la couverture en silence ; ce qui compte est que
     # ce chemin, redirection comprise, mène à un écran correctement marqué.
     for path in ("/", "/library", "/launcher", "/progress", "/history",
-                 "/physique", "/coach-report", "/profile", "/squads",
-                 "/leaderboard"):
+                 "/physique", "/profile", "/squads", "/leaderboard"):
         r = client.get(path, follow_redirects=True)
         assert r.status_code == 200, f"{path} -> {r.status_code}"
         nav = _bottom_nav_html(r.text)

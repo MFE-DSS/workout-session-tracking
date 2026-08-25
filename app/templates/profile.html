@@ -19,14 +19,44 @@
 
        Ce qui est rendu est ce qu'AUREN POSSÈDE. « — » n'est pas un vide de
        mise en page : c'est « non mesuré », et il se lit comme tel. #}
+    {# `TRAIN1-D` / C2 — UN CHAMP VIDE ET SAISISSABLE N'EST PAS UN TIRET.
+
+       Le Profil rendait SIX `—` à l'échelle d'une valeur : Poids, Taille,
+       FC repos, et les trois lignes d'entraînement. Le commentaire ci-dessus
+       affirmait que « — » se lit « non mesuré » ; mesuré au rendu, il se lit
+       surtout comme une case cassée.
+
+       La différence avec Progression est décisive et change le correctif :
+       là-bas un dénominateur absent est un FAIT sur lequel personne ne peut
+       agir, donc la carte disparaît. Ici la donnée manque parce que personne
+       ne l'a saisie, et la saisie est à un clic. L'état vide doit donc porter
+       l'action, pas le constat.
+
+       « Ajouter » est une affordance, pas un ordre : il nomme ce qui se
+       passera. Rien n'est ajouté à l'écran — le tiret devient le lien.
+
+       MORPHOLOGIE — « 0 / 13 mesures » posait un dénominateur comme un score
+       à remplir, dans un produit qui vient de retirer les scores. Les treize
+       champs ne sont pas un objectif : ce sont les cases disponibles. L'état
+       zéro se dit donc « À compléter », et le compte n'apparaît qu'à partir
+       du moment où il y a quelque chose à compter. #}
     {% set morpho_known = capture_fields | selectattr('0', 'in', latest_values) | list | length %}
+    {% set morpho_href = url_for('profile_page') ~ '#measurements' %}
     <div class="card pstate">
       <h2 class="card__title">Corps</h2>
       <ul class="stats-list">
-        <li><span>Poids</span><b>{{ (latest_values.get('weight_kg') ~ ' kg') if latest_values.get('weight_kg') else '—' }}</b></li>
-        <li><span>Taille</span><b>{{ (user.height_cm ~ ' cm') if user.height_cm else '—' }}</b></li>
-        <li><span>Morphologie</span><b>{{ morpho_known }} / {{ capture_fields | length }} mesures</b></li>
-        <li><span>FC repos</span><b>{{ (user.resting_hr ~ ' bpm') if user.resting_hr else '—' }}</b></li>
+        <li><span>Poids</span>
+          {% if latest_values.get('weight_kg') %}<b>{{ latest_values.get('weight_kg') }} kg</b>
+          {% else %}<b><a class="stat-add" href="#quicklog_weight">Ajouter</a></b>{% endif %}</li>
+        <li><span>Taille</span>
+          {% if user.height_cm %}<b>{{ user.height_cm }} cm</b>
+          {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
+        <li><span>Morphologie</span>
+          {% if morpho_known %}<b>{{ morpho_known }} mesure{% if morpho_known > 1 %}s{% endif %}</b>
+          {% else %}<b><a class="stat-add" href="{{ morpho_href }}">À compléter</a></b>{% endif %}</li>
+        <li><span>FC repos</span>
+          {% if user.resting_hr %}<b>{{ user.resting_hr }} bpm</b>
+          {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
       </ul>
 
       {# ── `UX4_01` — POIDS : `QUICK_LOG` ────────────────────────────────────
@@ -47,34 +77,44 @@
         <label class="quicklog__label" for="quicklog_weight">Poids du jour</label>
         <input class="quicklog__input" type="number" step="0.1" min="30" max="300"
                id="quicklog_weight" name="weight_kg"
-               placeholder="{{ latest_values.get('weight_kg') or '—' }}">
+               placeholder="{{ latest_values.get('weight_kg') or 'kg' }}">
         <button type="submit" class="btn btn--ghost">Noter</button>
       </form>
     </div>
 
-    {# `UX4_01` — résumé COMPACT et EN LECTURE SEULE de la configuration
-       d'entraînement, tel que la décision opérateur l'autorise. Il ne dit pas
-       « comment je progresse » — les compteurs de séances ont été retirés,
-       ils appartenaient à `PROGRESSION` — mais « ce qu'AUREN sait de mes
-       intentions ». « Non renseigné » est un état à part entière. #}
-    {# `UX4_01` — état PUR : pas de cadre. L'audit de nécessité a classé cette
-       région `SEMANTIC_STATE` à 0 contrôle et 100 % de la largeur du
-       conteneur. Une boîte aussi large que son conteneur n'exprime plus un
-       groupement : le titre et l'espace le disent mieux. #}
-    <section class="pstate pstate--flat">
-      <h2 class="section-header">Entraînement</h2>
-      <ul class="stats-list">
-        <li><span>Cadence souhaitée</span><b>{% if preferences.sessions_per_week %}{{ preferences.sessions_per_week }} / semaine{% else %}—{% endif %}</b></li>
-        <li><span>Priorités</span><b>{% if preferences.focus_priorities %}{{ preferences.focus_priorities | length }} déclarée(s){% else %}—{% endif %}</b></li>
-        <li><span>Équipement</span><b>{% if preferences.available_equipment is none %}—{% else %}{{ preferences.available_equipment | length }} déclaré(s){% endif %}</b></li>
-      </ul>
-    </section>
+    {# `TRAIN1-D` / C2 — LA CONFIGURATION D'ENTRAÎNEMENT QUITTE LE NIVEAU 1.
 
+       Elle rendait trois lignes en lecture seule — Cadence souhaitée,
+       Priorités, Équipement — dont les trois valaient `—` sur un compte neuf.
+       Trois des six tirets de cette page venaient d'ici.
+
+       CE N'EST PAS UNE SUPPRESSION, et il faut être précis : ces valeurs SONT
+       consommées. `weekly_planner` lit `sessions_per_week`,
+       `focus_priorities` et `available_equipment` ; `user_programs` aussi. Le
+       formulaire qui les renseigne reste donc en place, au niveau 2, derrière
+       « Modifier mes préférences ».
+
+       CE QUI PART EST LEUR PLACE AU PREMIER PLAN. Le Profil répond à « que
+       sait AUREN de moi ? » ; une configuration de plan répond à « comment je
+       veux m'entraîner », qui est la question de **Mon plan**. La page le
+       disait déjà elle-même, en toutes lettres, plus bas :
+       « Emplacement transitionnel — ces réglages rejoindront Programmes. »
+
+       `TRAIN2` leur donne leur domicile. D'ici là elles sont éditables, pas
+       exposées : personne ne perd la main dessus, et le niveau 1 cesse
+       d'annoncer trois absences sur lesquelles il n'agit pas. #}
     <section class="pstate pstate--flat">
       <h2 class="section-header">Compte</h2>
       <ul class="stats-list">
         <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
-        <li><span>Email</span><b>{{ user.email or "—" }}</b></li>
+        {# `TRAIN1-D` / C2 — l'e-mail aussi. Il est saisissable dans « Données
+           de référence », donc il relève de la même règle que le poids ou la
+           taille : un fait vide sur lequel on peut agir porte l'action. Et ce
+           n'est pas cosmétique — sans e-mail, la réinitialisation de mot de
+           passe est impossible, et le tiret ne le disait pas. #}
+        <li><span>Email</span>
+          {% if user.email %}<b>{{ user.email }}</b>
+          {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
         <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
         <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
       </ul>
@@ -147,7 +187,7 @@
 
          Ce qui change dès maintenant : il ne constitue plus la page. Il
          s'ouvre par un geste, et sa lecture vit en tête. #}
-      <details class="pstate__edit">
+      <details class="pstate__edit" id="measurements">
       <summary>Mettre à jour mes mesures <span class="pstate__legacy">saisie complète</span></summary>
       <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
@@ -272,7 +312,7 @@
          l'ACQUISITION, pas sur la donnée. Et `profile_body_submit` n'assigne
          plus ces colonnes, sans quoi retirer le champ les aurait effacées au
          prochain enregistrement. #}
-      <details class="pstate__edit">
+      <details class="pstate__edit" id="reference_data">
       <summary>Modifier mes données de référence</summary>
       <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
