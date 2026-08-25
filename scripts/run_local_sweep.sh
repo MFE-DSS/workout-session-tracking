@@ -143,7 +143,40 @@ peak_mb=0
 failed_batches=()
 batch_no=0
 
-for ((i = 0; i < TOTAL_FILES; i += SWEEP_BATCH)); do
+# ── `Sb_OPS_LOCAL_SWEEP_ADAPTIVE_BATCH_01` — LE LOT S'ADAPTE, LE SWEEP ABOUTIT.
+#
+# CE QUI A ÉTÉ MESURÉ, sur quatre tranches consécutives :
+#
+#   TRAIN 1-C   115/139 lots  · arrêt à 1866 Mo pour 1852 de budget
+#   TRAIN 1-D   140/140 lots  · abouti
+#   TRAIN 1-E   113/140 lots  · arrêt à 1932 Mo pour 1772
+#   POST_CONV   117/140 lots  · arrêt à 1936 Mo pour 1841
+#
+# Trois arrêts sur quatre, TOUS sans un seul test rouge. À chaque fois la même
+# manœuvre à la main : lire le conseil imprimé, relancer avec un lot plus
+# petit, ou finir la queue avec un runner improvisé. Le garde-fou protégeait
+# la machine et laissait le travail inachevé.
+#
+# LA CAUSE N'EST PAS LE CODE TESTÉ. Le budget vaut 60 % de la mémoire
+# DISPONIBLE au démarrage — 2397 Mo une semaine, 1772 la suivante, selon ce
+# que l'éditeur et ses serveurs de langage occupent. Le pic d'un lot, lui, ne
+# dépend pas de ce budget. Sur une machine chargée, la taille de lot par
+# défaut devient donc inatteignable quoi que fasse le dépôt.
+#
+# CE QUE FAIT L'ADAPTATION : au lieu d'abandonner, le sweep HALVE le lot et
+# REJOUE les mêmes fichiers. Le conseil qu'il imprimait, il l'applique.
+#
+# ⚠ IL RÉTRÉCIT, IL NE REGROSSIT JAMAIS. La pression mémoire d'un poste est
+# monotone sur la durée d'un sweep : l'éditeur ne rend pas ce qu'il a pris.
+# Regrossir rouvrirait l'arrêt qu'on vient de payer, et ferait osciller la
+# taille de lot autour du seuil — plus de démarrages, pas moins d'arrêts.
+#
+# L'ABANDON SUBSISTE POUR LE SEUL CAS OÙ IL VEUT DIRE QUELQUE CHOSE : un lot
+# d'UN fichier au-dessus du budget. Là, le coût vient de ce fichier, et aucun
+# découpage n'y changera rien.
+adaptations=0
+i=0
+while [[ "${i}" -lt "${TOTAL_FILES}" ]]; do
     batch_no=$((batch_no + 1))
     batch=("${FILES[@]:i:SWEEP_BATCH}")
 
@@ -163,25 +196,33 @@ for ((i = 0; i < TOTAL_FILES; i += SWEEP_BATCH)); do
         rss_mb=$(( rss_kb / 1024 ))
         [[ "${rss_mb}" -gt "${batch_peak}" ]] && batch_peak="${rss_mb}"
         if [[ "${rss_mb}" -gt "${SWEEP_BUDGET_MB}" ]]; then
-            echo "" >&2
-            echo "[local-sweep] ARRÊT : lot ${batch_no} à ${rss_mb} Mo, budget ${SWEEP_BUDGET_MB} Mo." >&2
-            echo "[local-sweep] Le sweep s'arrête LUI-MÊME plutôt que de laisser l'OS" >&2
-            echo "[local-sweep] choisir quel programme tuer." >&2
-            # Nommer les fichiers : le coût dépend d'EUX autant que de leur
-            # nombre, et « réduire SWEEP_BATCH » sans dire lesquels laisse
-            # chercher à l'aveugle.
-            echo "[local-sweep] fichiers du lot : ${batch[*]}" >&2
-            echo "[local-sweep] relancer avec SWEEP_BATCH=$(( SWEEP_BATCH > 1 ? SWEEP_BATCH / 2 : 1 ))" >&2
-            # Le plancher n'est PAS la taille du lot : mesuré, un seul fichier
-            # de cette suite coûte 1,3 Go. Si le lot vaut déjà 1, c'est ce
-            # fichier qu'il faut alléger, pas le découpage.
-            if [[ "${SWEEP_BATCH}" -le 1 ]]; then
-                echo "[local-sweep] lot déjà à 1 fichier : le coût vient de CE fichier," >&2
-                echo "[local-sweep] pas du découpage. SWEEP_BUDGET_MB=... pour l'admettre." >&2
-            fi
             kill -TERM "${pid}" 2>/dev/null
             wait "${pid}" 2>/dev/null
-            exit 3
+
+            # Le lot est toujours NOMMÉ : le coût dépend des fichiers autant
+            # que de leur nombre, et un message qui dit seulement « réduire »
+            # laisse chercher à l'aveugle.
+            echo "" >&2
+            echo "[local-sweep] lot ${batch_no} à ${rss_mb} Mo, budget ${SWEEP_BUDGET_MB} Mo." >&2
+            echo "[local-sweep] fichiers du lot : ${batch[*]}" >&2
+
+            # Le plancher n'est PAS la taille du lot : mesuré, un seul fichier
+            # de cette suite coûte 1,3 Go. À un fichier, le découpage n'a plus
+            # rien à donner — c'est le fichier qu'il faut alléger.
+            if [[ "${SWEEP_BATCH}" -le 1 ]]; then
+                echo "[local-sweep] ARRÊT : lot déjà à 1 fichier. Le coût vient de CE" >&2
+                echo "[local-sweep] fichier, pas du découpage. Le sweep s'arrête LUI-MÊME" >&2
+                echo "[local-sweep] plutôt que de laisser l'OS choisir quel programme tuer." >&2
+                echo "[local-sweep] SWEEP_BUDGET_MB=... pour l'admettre délibérément." >&2
+                exit 3
+            fi
+
+            SWEEP_BATCH=$(( SWEEP_BATCH / 2 ))
+            adaptations=$((adaptations + 1))
+            batch_no=$((batch_no - 1))
+            echo "[local-sweep] ADAPTATION ${adaptations} : lot ramené à ${SWEEP_BATCH}," >&2
+            echo "[local-sweep] les mêmes fichiers sont rejoués. Aucun test n'est sauté." >&2
+            continue 2
         fi
         sleep 1
     done
@@ -194,14 +235,24 @@ for ((i = 0; i < TOTAL_FILES; i += SWEEP_BATCH)); do
         status="ÉCHEC(${rc})"
         failed_batches+=("${batch_no}")
     fi
-    printf '[local-sweep] lot %2d/%d · %s · pic %4d Mo\n' \
-        "${batch_no}" "$(( (TOTAL_FILES + SWEEP_BATCH - 1) / SWEEP_BATCH ))" \
-        "${status}" "${batch_peak}"
+    # Le total de lots n'est plus connu d'avance : il dépend des adaptations.
+    # Afficher une progression en FICHIERS reste exact quoi qu'il arrive.
+    i=$(( i + SWEEP_BATCH ))
+    printf '[local-sweep] lot %3d · %s · pic %4d Mo · %d/%d fichiers\n' \
+        "${batch_no}" "${status}" "${batch_peak}" \
+        "$(( i < TOTAL_FILES ? i : TOTAL_FILES ))" "${TOTAL_FILES}"
 done
 
 echo "[local-sweep] pic mémoire observé : ${peak_mb} Mo (budget ${SWEEP_BUDGET_MB} Mo)"
+if [[ "${adaptations}" -gt 0 ]]; then
+    echo "[local-sweep] ${adaptations} adaptation(s) : lot final ${SWEEP_BATCH}."
+    echo "[local-sweep] Aucun fichier sauté — les lots réduits ont été rejoués."
+fi
 if [[ "${#failed_batches[@]}" -gt 0 ]]; then
-    echo "[local-sweep] LOTS EN ÉCHEC : ${failed_batches[*]}" >&2
+    # ⚠ « LOTS EN ÉCHEC : 4 » se lit « quatre lots » alors que la ligne
+    # imprime les NUMÉROS. Je l'ai moi-même mal lu une fois, et j'ai failli
+    # rapporter un défaut inexistant. Le libellé le dit maintenant.
+    echo "[local-sweep] NUMÉROS DES LOTS EN ÉCHEC : ${failed_batches[*]}" >&2
     exit 1
 fi
 echo "[local-sweep] tous les lots sont verts."

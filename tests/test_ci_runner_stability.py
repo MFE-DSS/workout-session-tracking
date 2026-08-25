@@ -806,10 +806,78 @@ class TestLocalSweepMemory:
 
     def test_the_local_sweep_batches_instead_of_running_one_process(self):
         """Le pic doit être borné par CONSTRUCTION, pas par une multiplication
-        optimiste : un processus neuf par lot remet la RSS à zéro."""
+        optimiste : un processus neuf par lot remet la RSS à zéro.
+
+        `Sb_OPS_LOCAL_SWEEP_ADAPTIVE_BATCH_01` — la boucle `for` est devenue un
+        `while` : la taille de lot change en cours de route, donc l'index ne
+        peut plus être incrémenté par le pas de la boucle.
+        """
         src = _local_script()
         assert "SWEEP_BATCH" in src
-        assert "for ((i = 0" in src
+        assert "while [[ \"${i}\" -lt \"${TOTAL_FILES}\" ]]" in src
+
+    # ── `Sb_OPS_LOCAL_SWEEP_ADAPTIVE_BATCH_01` ───────────────────────────────
+
+    def test_the_sweep_halves_the_batch_instead_of_abandoning(self):
+        """LE DÉFAUT QUE CETTE TRANCHE FERME.
+
+        Trois arrêts sur quatre tranches consécutives, TOUS sans un seul test
+        rouge : le garde-fou protégeait la machine et laissait le travail
+        inachevé. Il imprimait le conseil — « relancer avec SWEEP_BATCH=… » —
+        et attendait qu'un humain l'applique.
+        """
+        src = _local_script()
+        assert "SWEEP_BATCH=$(( SWEEP_BATCH / 2 ))" in src
+        assert "ADAPTATION" in src
+        assert "continue 2" in src, (
+            "sans reprise de la boucle externe, le lot réduit n'est pas rejoué"
+        )
+
+    def test_no_file_is_skipped_when_the_batch_shrinks(self):
+        """Un sweep qui saute des fichiers en silence serait pire que celui
+        qui s'arrête : il rendrait un vert qui ne couvre pas tout."""
+        src = _local_script()
+        assert "batch_no=$((batch_no - 1))" in src, (
+            "le numéro de lot doit être rendu, sinon la progression ment"
+        )
+        assert "Aucun test n'est sauté" in src
+        # L'index n'avance qu'APRÈS un lot réussi.
+        assert "i=$(( i + SWEEP_BATCH ))" in src
+
+    def test_the_batch_never_grows_back(self):
+        """La pression mémoire d'un poste est monotone sur la durée d'un
+        sweep : l'éditeur ne rend pas ce qu'il a pris. Regrossir rouvrirait
+        l'arrêt qu'on vient de payer et ferait osciller la taille autour du
+        seuil."""
+        src = _local_script()
+        assert "IL RÉTRÉCIT, IL NE REGROSSIT JAMAIS" in src
+        assert "SWEEP_BATCH * 2" not in src
+        assert "SWEEP_BATCH + 1" not in src
+
+    def test_the_abort_survives_for_the_only_case_that_means_something(self):
+        """Un lot d'UN fichier au-dessus du budget : le coût vient de ce
+        fichier, et aucun découpage n'y changera rien. C'est là — et là
+        seulement — que l'arrêt reste la bonne réponse."""
+        src = _local_script()
+        assert 'if [[ "${SWEEP_BATCH}" -le 1 ]]; then' in src
+        block = src.split('if [[ "${SWEEP_BATCH}" -le 1 ]]; then', 1)[1][:600]
+        assert "ARRÊT" in block
+        assert "exit 3" in block
+
+    def test_the_measured_history_that_justifies_the_change_is_recorded(self):
+        """Un changement d'outillage doit voyager avec la mesure qui l'a
+        déclenché, sinon la prochaine tranche le défera par hypothèse."""
+        src = _local_script()
+        for tranche in ("TRAIN 1-C", "TRAIN 1-D", "TRAIN 1-E"):
+            assert tranche in src, f"historique mesuré incomplet : {tranche}"
+        assert "sans un seul test rouge" in src
+
+    def test_the_failed_batch_line_says_it_prints_numbers(self):
+        """« LOTS EN ÉCHEC : 4 » se lit « quatre lots » alors que la ligne
+        imprime les NUMÉROS. Je l'ai moi-même mal lu une fois, et j'ai failli
+        rapporter un défaut inexistant."""
+        src = _local_script()
+        assert "NUMÉROS DES LOTS EN ÉCHEC" in src
 
     def test_the_local_sweep_has_a_memory_watchdog(self):
         src = _local_script()
