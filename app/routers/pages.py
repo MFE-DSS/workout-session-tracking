@@ -522,17 +522,66 @@ def launcher(
 
 @router.get("/library", response_class=HTMLResponse)
 def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
+    """`UX4_02` / TRAIN 2 tranche B — le corpus commun, contextualisé.
+
+    `OPERATOR_DECISION` C8 : **aucun moteur de recommandation opaque, contexte
+    de plan explicite uniquement**. Concrètement, ici :
+
+    * le corpus reste **commun et entier** — mêmes 13 gabarits, même ordre
+      d'affichage (`display_order`). Rien n'est classé, noté ni masqué par le
+      produit ;
+    * chaque gabarit dit **ce qu'il travaille**, fait résolu par l'autorité
+      canonique, et **ce que l'utilisateur en a déclaré**, rappel de sa propre
+      parole ;
+    * le seul filtrage est **demandé par l'utilisateur** (`?zone=`), explicite
+      dans l'URL, et toujours accompagné du moyen de revenir au corpus entier.
+      Un filtre qu'on choisit n'est pas une recommandation qu'on subit.
+    """
+    from app.services.muscle_mapping import RADAR_AXES, ZONE_LABELS
+    from app.services.template_zone_context import annotate_templates
+    from app.services.training_preferences import get_training_preferences
+
     all_templates = _load_templates(db)
-    # Group templates by catalog_section for display
+    visible = [
+        tpl for tpl in all_templates
+        # archived: retired from the catalog. user: published custom programs
+        # (PUBLICATION_01) — owner-private, they live under "Mes programmes",
+        # never in the shared library.
+        if getattr(tpl, "catalog_section", "core") not in ("archived", "user")
+    ]
+
+    preferences = get_training_preferences(db, user.id)
+    zones_by_template = annotate_templates(
+        db, visible,
+        preferences.focus_priorities if preferences else None,
+    )
+
+    # Le filtre est une DEMANDE, pas une décision du produit. Une valeur hors
+    # vocabulaire est ignorée plutôt que rendue : elle ne peut venir que d'une
+    # URL bricolée, et afficher « 0 résultat pour <valeur> » lui donnerait
+    # l'apparence d'une zone qui existe.
+    requested = request.query_params.get("zone")
+    active_zone = requested if requested in ZONE_LABELS else None
+    if active_zone:
+        shown = [t for t in visible
+                 if any(z.code == active_zone
+                        for z in zones_by_template[t.id].zones)]
+    else:
+        shown = visible
+
     grouped: dict[str, list] = {}
-    for tpl in all_templates:
-        section = getattr(tpl, "catalog_section", "core")
-        if section in ("archived", "user"):
-            # archived: retired from the catalog. user: published custom
-            # programs (PUBLICATION_01) — owner-private, they live under
-            # "Mes programmes", never in the shared library.
-            continue
-        grouped.setdefault(section, []).append(tpl)
+    for tpl in shown:
+        grouped.setdefault(getattr(tpl, "catalog_section", "core"), []).append(tpl)
+
+    # Une zone ne s'offre au filtrage que si un gabarit la travaille — proposer
+    # un filtre qui ne peut rien rendre est une impasse construite exprès.
+    filterable = [
+        (code, ZONE_LABELS[code])
+        for code in ZONE_LABELS
+        if any(z.code == code for tz in zones_by_template.values()
+               for z in tz.zones)
+    ]
+
     return templates.TemplateResponse(
         request,
         "library.html",
@@ -540,6 +589,20 @@ def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "page_title": "Programmes de séance",
             "sections": CATALOG_SECTIONS,
             "grouped": grouped,
+            "zones_by_template": zones_by_template,
+            "filterable_zones": filterable,
+            "active_zone": active_zone,
+            "active_zone_label": ZONE_LABELS.get(active_zone or ""),
+            "shown_count": len(shown),
+            "total_count": len(visible),
+            # Les axes DÉCLARÉS, dans l'ordre où l'utilisateur les a posés —
+            # c'est un rang qu'il a choisi, le réordonner effacerait son
+            # intention.
+            "declared_axes": [
+                RADAR_AXES[a]["label"]
+                for a in ((preferences.focus_priorities if preferences else None) or ())
+                if a in RADAR_AXES
+            ],
             "active_session": latest_open_session(db, user.id),
         },
     )

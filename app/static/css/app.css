@@ -4452,3 +4452,119 @@ summary:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .muscle-focus__frame--strip svg { transition: none; }
 }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   `UX4_02` / TRAIN 2 tranche B — contexte de zones sur le corpus commun.
+
+   AUCUNE COULEUR NEUVE (`CLAUDE.md §5.4`). Tout vient de la palette mesurée
+   d'`app.css`, et les ratios ont été RECALCULÉS sur les fonds réels de cette
+   surface plutôt que supposés :
+
+     --fg-muted sur --surface    7,96:1   AA
+     --fg-dim   sur --surface    5,68:1   AA
+     --accent   sur --surface    7,26:1   AA
+     --accent   sur --bg         7,74:1   AA
+
+   Les puces de filtre sont des CIBLES : 44 px de haut, standard produit AUREN
+   (`UIV3_TARGETS_44_01`) — pas WCAG 2.2, qui demande 24×24. Une puce plus
+   petite ferait retomber cette surface sous le plancher que `TRAIN1-E` vient
+   de remonter ailleurs.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.zone-filter {
+  margin: 0 0 var(--space-md);
+}
+
+/* Le déclencheur est une CIBLE : 44 px, standard produit. Le chevron natif est
+   conservé — le remplacer coûterait du balisage pour rien. */
+.zone-filter__summary {
+  display: flex;
+  align-items: center;
+  /* ⚠ `gap` OBLIGATOIRE ici. En flex, le nœud de texte « Filtrer par zone » et
+     le `<b>` de l'état sont DEUX éléments flex, et l'espace du gabarit entre
+     eux disparaît : le rendu donnait « Filtrer par zone· Dos largeur ». Vu à
+     l'écran, invisible dans le gabarit — le HTML y contient bien l'espace. */
+  gap: 6px;
+  min-height: 44px;
+  color: var(--fg-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.zone-filter__summary b {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.zone-filter__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0 0;
+}
+
+.zone-filter__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--fg-muted);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.zone-filter__chip:hover {
+  border-color: var(--border-strong);
+  color: var(--fg);
+}
+
+/* L'état actif se dit par la COULEUR ET par le fond : une puce distinguée par
+   la seule teinte serait invisible à qui ne la perçoit pas. `aria-current`
+   porte la même information pour la synthèse vocale. */
+.zone-filter__chip.is-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.zone-filter__state,
+.zone-filter__legend {
+  margin: 0 0 var(--space-md);
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+
+.zone-filter__legend b { color: var(--fg); }
+
+.template-card__zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.template-card__zone {
+  color: var(--fg-dim);
+  font-size: 12px;
+}
+
+/* PAS de séparateur en pseudo-élément. J'en avais posé un (`·` en `::before`)
+   et le rendu l'a démenti : avec `flex-wrap`, un élément qui passe à la ligne
+   emporte son séparateur EN TÊTE de la nouvelle ligne, où il se lit comme une
+   puce et non comme une séparation. L'espacement de la grille sépare déjà, et
+   il ne se casse pas au retour à la ligne. */
+
+/* Une zone DÉCLARÉE en priorité : teinte + graisse + soulignement. Trois
+   marques plutôt qu'une, parce qu'une seule teinte ne se voit pas de tout le
+   monde, et que la légende en tête de page nomme les axes en clair. */
+.template-card__zone.is-declared {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
