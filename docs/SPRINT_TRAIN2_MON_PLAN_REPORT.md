@@ -327,3 +327,58 @@ pour `exercise_properties` (`Sb_MORPHO_*`).
 * Aucun changement de moteur : `weekly_planner`, `orchestrator_explainer`,
   `training_preferences` sont lus, jamais modifiés.
 * Aucune migration. Aucune écriture de schéma.
+
+---
+
+## 11. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#161** |
+| Merge | **`6a5bb68`** — `--merge`, tête épinglée `a80041d`, **pas de squash, pas de `--admin`, pas de force** |
+| Mergée le | 2026-08-25 15:30 UTC |
+| CI de PR | 8/8 `pass` |
+| CI canonique (`push` sur le merge) | run **32866883846** — **6/6 succès** |
+| Sonar (gate PR) | **OK** — couverture neuve **93,3 %** · 0 bug · 0 code smell · 0 vulnérabilité · duplication 0,0 % |
+| Fils de revue non résolus | 0 |
+
+### L'incident du cycle rouge, et ce qu'il apprend
+
+Un cycle CI rouge, **un seul échec, dans ma propre garde** — pas dans le
+produit.
+
+`test_the_submit_route_is_unchanged` lisait `app.main.app.routes` sans prendre
+la fixture `client`. Verte en local, rouge sur le shard 1, où la table ne
+contenait que les routes par défaut de FastAPI :
+
+```
+assert '/profile/preferences' in {'', '/api/docs', '/docs/oauth2-redirect',
+                                  '/openapi.json', '/static'}
+```
+
+La cause est la fixture elle-même : elle **purge tout `app.*` de
+`sys.modules`** puis réimporte. Un test qui lit l'état global d'un module sans
+posséder ce cycle de vie lit **une génération d'application qui n'est pas la
+sienne** — et l'ordre des tests décide alors du résultat, ce qui diffère entre
+un fichier lancé seul et un shard. Le dépôt connaît déjà ce piège : faux échecs
+d'identité d'enum entre deux générations, invisibles hors full sweep.
+
+Ce n'était donc pas rattrapable par un sweep local plus large : c'est le
+**partitionnement** de la CI qui expose la dépendance d'ordre.
+
+La garde POSTe désormais sur la route et exige un `303`. Un `404` est de toute
+façon le **vrai symptôme** d'un contrat de soumission rompu — plus proche du
+signet cassé que l'inspection d'une table de routage. Vérifiée en plantant le
+renommage de la route : rouge. Les deux autres gardes du fichier qui touchent à
+l'application prennent déjà `client` ; les autres lisent des fichiers sur
+disque.
+
+**Règle à retenir** : dans ce dépôt, une garde qui inspecte l'état global d'un
+module d'application **doit** prendre la fixture qui en possède le cycle de
+vie, ou se poser sur le comportement.
+
+### Reste ouvert
+
+* **Arbitrage Q5** (§8) — « Pourquoi ce plan ? » en carte bordée pour un objet
+  de rang 2. Trois cartes bordées sur 2,1 écrans.
+* **Tranche B — Explorer** : conception arrêtée, non commencée (§10).
