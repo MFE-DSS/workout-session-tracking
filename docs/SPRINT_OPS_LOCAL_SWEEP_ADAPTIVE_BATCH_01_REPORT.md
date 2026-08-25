@@ -108,3 +108,28 @@ mauvaise.
 
 **Aucun gate retiré. Le chemin CI est inchangé** — ce script refuse toujours de
 tourner en CI, et `run_ci_pytest.sh` reste la commande du runner.
+
+---
+
+## Closeout post-merge
+
+| | |
+|---|---|
+| PR | [#159](https://github.com/MFE-DSS/workout-session-tracking/pull/159) |
+| Méthode | `--merge`, tête épinglée `4119fd6` |
+| Commit de merge | **`5499c34`** |
+| CI de PR | **9 / 9** verts · gate Sonar `OK` |
+| CI canonique au push | run `32849308202` — **succès** |
+| Fils de revue · migration | 0 · aucune |
+
+**Validation CI réelle : satisfaite** (tier `CI_INFRA`).
+
+⚠ Un détail de procédure, consigné : après le merge de #158, GitHub a rendu
+`mergeable: UNKNOWN` sur #159 le temps de recalculer l'état contre la nouvelle
+base. Ce n'est **pas** un conflit — attendre le recalcul avant de juger évite
+de diagnostiquer une panne qui n'existe pas. Même famille que
+`ci-dispatch-blocked-by-conflict`, mais bénigne.
+
+### État
+
+**`CLOSED`** — nettoyage exécuté sur ordre opérateur.
