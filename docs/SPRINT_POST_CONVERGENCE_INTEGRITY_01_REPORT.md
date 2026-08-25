@@ -189,3 +189,26 @@ jamais — une garde vérifie que la condition reste écrite.
 | gardes plantées | **14 / 14 rougissent** |
 | full sweep local | **obligatoire à ce tier** |
 | CI réelle | **impérative avant merge à ce tier** |
+
+---
+
+## Closeout post-merge
+
+| | |
+|---|---|
+| PR | [#158](https://github.com/MFE-DSS/workout-session-tracking/pull/158) |
+| Méthode | `--merge`, tête épinglée `d7e31de` — pas de squash, pas de `--admin`, pas de force |
+| Commit de merge | **`0ccab96`** |
+| CI de PR | **9 / 9** verts · gate Sonar `OK` · 0 code smell neuf |
+| CI canonique au push | run `32846681960` — **succès** |
+| Fils de revue · migration | 0 · aucune |
+
+**Validation CI réelle : satisfaite.** Le tier `CI_INFRA` l'exige avant merge,
+et c'est la première tranche de cette série où l'exigence porte réellement —
+elle ajoute un script à `scripts/`.
+
+**Aucun cycle rouge.** Troisième tranche consécutive.
+
+### État
+
+**`CLOSED`** — nettoyage exécuté sur ordre opérateur.
