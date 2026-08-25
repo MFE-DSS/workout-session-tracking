@@ -6,6 +6,60 @@
    creation_source touché. #}
 <p class="lede">Catalogue complet des séances disponibles, classées par usage.</p>
 
+{# `UX4_02` / TRAIN 2 tranche B — FILTRE DEMANDÉ, JAMAIS SUBI.
+
+   Le corpus reste commun et entier ; c'est l'utilisateur qui restreint, par
+   une URL explicite, et le retour au tout est toujours à un geste. Un filtre
+   qu'on choisit n'est pas une recommandation qu'on subit (`OPERATOR_DECISION`
+   C8 : aucun moteur opaque).
+
+   Les zones proposées sont celles qu'au moins un gabarit travaille — offrir un
+   filtre qui ne peut rien rendre serait une impasse construite exprès. #}
+{# ⚠ LES PUCES SONT REPLIÉES, ET C'EST UNE MESURE, PAS UN GOÛT. Déployées, les
+   douze puces occupaient SIX rangs — près d'un écran entier de 390 px avant le
+   premier gabarit. Un outil de tri qui repousse hors de vue ce qu'il sert à
+   trier coûte plus qu'il ne rend. Vu au rendu ; les chiffres seuls disaient
+   « +1 écran » sans dire d'où.
+
+   Le repli s'OUVRE quand un filtre est actif : replier l'état courant
+   laisserait un catalogue amputé sans dire pourquoi. #}
+<details class="zone-filter"{% if active_zone %} open{% endif %}>
+  <summary class="zone-filter__summary">
+    Filtrer par zone
+    {% if active_zone %}<b>· {{ active_zone_label }}</b>{% endif %}
+  </summary>
+  <nav class="zone-filter__chips" aria-label="Filtrer par zone travaillée">
+    <a class="zone-filter__chip{% if not active_zone %} is-active{% endif %}"
+       href="{{ url_for('library') }}"
+       {% if not active_zone %}aria-current="true"{% endif %}>Toutes</a>
+    {% for code, label in filterable_zones %}
+      <a class="zone-filter__chip{% if active_zone == code %} is-active{% endif %}"
+         href="{{ url_for('library') }}?zone={{ code }}"
+         {% if active_zone == code %}aria-current="true"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
+</details>
+
+{% if active_zone %}
+  <p class="zone-filter__state">
+    {{ shown_count }} séance{{ 's' if shown_count > 1 }} sur {{ total_count }}
+    travaille{{ 'nt' if shown_count > 1 }} <b>{{ active_zone_label }}</b>
+  </p>
+{% endif %}
+
+{# La marque des priorités s'explique UNE FOIS, ici, et nomme les axes tels que
+   l'utilisateur les a déclarés. Répéter l'explication sur chaque carte
+   reviendrait à poser un badge sur plus de la moitié du corpus — ce qui n'est
+   plus un signal. Sans déclaration, cette ligne n'existe pas : elle
+   n'annoncerait qu'un vide. #}
+{% if declared_axes %}
+  <p class="zone-filter__legend">
+    Tes priorités déclarées — <b>{{ declared_axes | join(', ') }}</b> —
+    sont marquées sur les séances qui les travaillent.
+    <a class="inline-target" href="{{ url_for('user_plan') }}">Modifier</a>
+  </p>
+{% endif %}
+
 {% for section_key, section_label in sections %}
   {% if section_key in grouped %}
   <section style="margin-bottom: var(--space-xl);">
@@ -22,12 +76,53 @@
               <span class="template-card__name">{{ tpl.name }}</span>
               <span class="template-card__kind">{{ tpl.kind|upper }}</span>
             </div>
-            <div class="template-card__focus">{{ tpl.focus }}</div>
+            {# ⚠ LA LIGNE `focus` NE S'AFFICHE QUE FAUTE DE MIEUX, et ce n'est
+               pas un retrait déguisé (`§5.3`) — c'est une SUBSTITUTION dans la
+               même livraison, décidée en regardant l'écran.
+
+               Rendues côte à côte, les deux lignes disaient deux fois la même
+               chose en deux vocabulaires : Push A affichait « Pectoraux,
+               Deltoïdes, Triceps » (texte libre saisi à la main) puis
+               « Pectoraux · Deltoïdes latéraux · Deltoïdes postérieurs ·
+               Triceps » (fait résolu par le référentiel). La seconde est plus
+               précise, porte la marque des priorités déclarées et partage le
+               vocabulaire du filtre ; la première ne peut rien de tout cela.
+
+               `focus` reste la seule source pour les gabarits SANS zone
+               résolue — le LISS pur n'a aucun exercice — et il reste intact
+               sur la page de détail, où il est un texte éditorial et non un
+               doublon. #}
+            {% if not zones_by_template.get(tpl.id) %}
+              <div class="template-card__focus">{{ tpl.focus }}</div>
+            {% endif %}
             {% if tpl.kind == 'cardio' and tpl.cardio_note %}
               <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
             {% endif %}
             {% if tpl.suggested_label %}
               <div class="template-card__hint">{{ tpl.suggested_label }}</div>
+            {% endif %}
+            {# CE QUE LE GABARIT TRAVAILLE — un FAIT, résolu par l'autorité
+               canonique (`ExerciseMuscleMapping`), pas une paraphrase du champ
+               `focus`, qui est du texte libre et ne dit pas la même chose.
+
+               Une zone DÉCLARÉE en priorité est marquée sur place plutôt que
+               par un badge à part : sur le corpus réel, plus de la moitié des
+               gabarits en portent une, et un badge sur sept cartes sur treize
+               n'est plus un signal. Le rappel nomme l'axe que l'utilisateur a
+               déclaré (« Bras »), pas la zone (« Biceps ») — lui renvoyer un
+               mot qu'il n'a pas employé serait lui prêter sa déclaration.
+
+               Rien si le gabarit ne résout aucune zone (le LISS pur n'a aucun
+               exercice) : pas de ligne vide, pas de « aucune zone » (A4). #}
+            {% set tz = zones_by_template.get(tpl.id) %}
+            {% if tz %}
+              <ul class="template-card__zones">
+                {% for z in tz.zones %}
+                  <li class="template-card__zone{% if z.is_declared %} is-declared{% endif %}">
+                    {{ z.label }}{% if z.is_declared %}<span class="sr-only"> — ta priorité déclarée : {{ z.declared_as }}</span>{% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
             {% endif %}
           </a>
           <form
