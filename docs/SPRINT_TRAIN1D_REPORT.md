@@ -227,3 +227,37 @@ calculé pour quelqu'un. Rien à corriger.
 - **Les deux avertissements « ceci ne fait encore rien »** du Profil restent.
   Je les avais signalés ; l'arbitrage C2 ne les a pas retenus.
 - **`/dashboard` et `muscle_scoring`** restent tels que `TRAIN1-C` les a laissés.
+
+---
+
+## 8. Closeout post-merge
+
+| | |
+|---|---|
+| PR | [#154](https://github.com/MFE-DSS/workout-session-tracking/pull/154) |
+| Méthode | `--merge`, tête épinglée `20fceb3` — pas de squash, pas de `--admin`, pas de force |
+| Commit de merge | **`f4ef8d0`** |
+| CI de PR | **9 / 9** verts · gate Sonar `OK` · **couverture neuve 94,7 %** · 0 code smell neuf |
+| CI canonique au push | run `32815250363` — **6 / 6 verts** |
+| Fils de revue · migration | 0 · aucune |
+
+**Aucun cycle rouge.** Le pré-scan AST avait trouvé deux occurrences dans mon
+code neuf (`S9073` composite, `S1192` sur le chemin du référentiel de règles),
+corrigées avant le push — c'est exactement ce que ce pré-scan existe pour
+attraper, et c'est la première tranche où il le fait avant la CI plutôt qu'après.
+
+**Le sweep local a abouti d'un seul tenant** — 140/140 lots à `SWEEP_BATCH=2`,
+pic 1634 Mo pour 1968 de budget, sans intervention du chien de garde. Un seul
+lot rouge en cours de route (`test_topbar_keeps_secondary_routes`, migré).
+
+⚠ Une lecture erronée à consigner : j'ai d'abord lu « LOTS EN ÉCHEC : 4 » comme
+« quatre lots », alors que la ligne imprime la **liste des numéros** de lots
+fautifs — donc le lot n° 4, un seul. Vérifié dans le script avant de rapporter
+un défaut qui n'existait pas. Le libellé reste ambigu ; le corriger fait passer
+la tranche en `ci_infra` (validation CI réelle impérative), donc c'est noté pour
+un sprint `Sb_OPS`, pas fait ici.
+
+### État
+
+**`CLOSED`** — nettoyage branche/worktree non exécuté : action opérateur
+(`CLAUDE.md §2`).
