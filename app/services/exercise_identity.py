@@ -120,10 +120,60 @@ def add_alias(
     return row
 
 
+#: Préfixes des clés de comparaison. Ils sont **dans** la clé pour qu'un slug
+#: et une forme normalisée ne puissent jamais se confondre : sans eux, un
+#: exercice de slug `curl-marteau` et un nom brut normalisé « curl marteau »
+#: produiraient deux chaînes différentes aujourd'hui et pourraient coïncider
+#: demain, au gré d'un changement de slugification.
+KEY_IDENTITY = "id:"
+KEY_RAW = "raw:"
+
+
+def identity_key(db: Session, name: str | None) -> str | None:
+    """Clé de comparaison de **ce qui a été exécuté**.
+
+    `TRAIN 3` / `A2` étape B. Deux endroits du produit décident si deux séances
+    portent sur le même mouvement, et tous deux le faisaient par **égalité de
+    chaîne exacte** : `overload_inputs._matches_substitution_policy` et
+    `stats._matches_current_substitution`.
+
+    DÉFAUT PROUVÉ, PAS DÉDUIT. `Curl marteau câble (corde)` et
+    `Curl marteau câble corde` sont **toutes deux présentes dans les données du
+    dépôt** et désignent le même mouvement — leur forme normalisée est
+    identique. Appelée avec ces deux écritures, la politique de substitution
+    rendait `False` : le même mouvement ne partageait pas son historique de
+    charges, sans le moindre signal à l'écran.
+
+    Trois valeurs possibles, et aucune n'est un trou :
+
+    * ``None`` — rien n'a été substitué (le **prescrit**). Se compare à
+      lui-même, comme avant.
+    * ``id:<slug>`` — le nom est reconnu par le référentiel d'identités. Deux
+      écritures d'un même mouvement rendent **la même** clé.
+    * ``raw:<forme normalisée>`` — aucune identité ne reconnaît ce nom. Il se
+      compare alors **à lui-même**, jamais à rien d'autre : un inconnu ne
+      devient pas comparable à tout, il reste comparable à son égal.
+
+    Cette fonction n'élargit l'appariement qu'entre écritures d'un **même**
+    mouvement : deux mouvements distincts ont des formes normalisées
+    distinctes, donc des lignes d'alias distinctes, donc des identités
+    distinctes. Les fusionner resterait une **décision produit** — c'est ce que
+    `Sb_EXERCISE_IDENTITY_01` a délibérément laissé ouvert.
+    """
+    key = normalize(name or "")
+    if not key:
+        return None
+    found = resolve_exercise(db, name or "")
+    return f"{KEY_IDENTITY}{found.slug}" if found is not None else f"{KEY_RAW}{key}"
+
+
 __all__ = [
+    "KEY_IDENTITY",
+    "KEY_RAW",
     "SLUG_MAX",
     "add_alias",
     "ensure_exercise",
+    "identity_key",
     "normalize",
     "resolve_exercise",
     "slugify",
