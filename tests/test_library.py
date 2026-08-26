@@ -104,14 +104,23 @@ def test_progress_stub_renders(client):
 
 
 # ---------------------------------------------------------------------------
-# Vocabulary: "Programmes de séance", no stale "Bibliothèque" / "template"
+# Vocabulaire : « Explorer », sans « Bibliothèque » ni « template » résiduels
 # ---------------------------------------------------------------------------
 
 
 def test_library_page_uses_programmes_vocabulary(client):
+    """`OPERATOR_DECISION` NAMING — le domaine s'appelle **Programmes** ; cette
+    surface est l'un de ses trois enfants et s'appelle **Explorer**.
+
+    « Programmes de séance » confondait l'enfant avec le domaine. La garde
+    suit la décision au lieu de la refuser, et elle vérifie EN PLUS que
+    l'ancienne appellation ne subsiste pas : deux noms pour une surface, c'est
+    le défaut qu'on vient de retirer.
+    """
     r = client.get("/library")
     body = r.text
-    assert "Programmes de séance" in body
+    assert "Explorer" in body
+    assert "Programmes de séance" not in body
     assert "Bibliothèque" not in body
     assert "Catalogue complet" in body
 

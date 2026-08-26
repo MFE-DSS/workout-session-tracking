@@ -1,6 +1,13 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Programmes de séance</h1>
+{# `OPERATOR_DECISION` NAMING — le domaine s'appelle **Programmes** ; cette
+   surface est l'un de ses trois enfants et s'appelle **Explorer**.
+   « Programmes de séance » confondait les deux : l'onglet du domaine menait à
+   une page portant presque le nom du domaine, et « Explorer » n'existait
+   comme mot nulle part dans l'interface.
+
+   En français, pas « Explore » : l'ordre est explicite. #}
+<h1 class="page-title">Explorer</h1>
 {# Sx_UI_07.3 — lede enrichi (additif). Conserve la sous-chaîne « Catalogue
    complet » (test asservi) ; aucune section, carte, form POST ni
    creation_source touché. #}

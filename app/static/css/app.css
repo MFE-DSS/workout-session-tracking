@@ -4568,3 +4568,89 @@ summary:focus-visible,
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   `OPERATOR_DECISION` Q5 — « Pourquoi ce plan ? » est du contenu de NIVEAU 2.
+
+   Plus de carte bordée autonome : une divulgation progressive DANS LE FLUX.
+   Le titre reste visible — c'est ce qui distingue un repli d'une suppression
+   — et le détail s'ouvre d'un geste.
+
+   Le déclencheur est une CIBLE : 44 px, standard produit AUREN
+   (`UIV3_TARGETS_44_01`), pas WCAG 2.2 qui demande 24×24.
+
+   Aucune couleur neuve. `--fg-muted` sur `--bg` vaut 8,49:1 (AA), `--fg` sur
+   `--bg` 15,69:1 (AA) — ratios recalculés sur le fond réel de cette surface.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.why-plan {
+  margin: 0 0 var(--space-md);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-sm);
+}
+
+.why-plan__summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--fg-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.why-plan[open] .why-plan__summary {
+  color: var(--fg);
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   MARQUEUR DE DIVULGATION — un repli doit AVOIR L'AIR de s'ouvrir.
+
+   DÉFAUT MESURÉ, pas supposé : un `<summary>` en `display: flex` perd son
+   marqueur natif. Comparé aux styles calculés sur trois déclencheurs de la
+   même page — le témoin qui fonctionne rend `display: list-item`, les deux
+   autres rendent `flex` et n'affichent plus rien. « Pourquoi ce plan ? » et
+   « Filtrer par zone » ressemblaient donc à du texte inerte.
+
+   ⚠ Le second n'est pas neuf : il est arrivé avec `UX4_02` tranche B et a été
+   livré ainsi. Le corriger AVANT l'étude utilisateur est délibéré — mesurer si
+   quelqu'un découvre un filtre dont rien n'indique qu'il s'ouvre ne mesurerait
+   pas la découverte mais un défaut d'affordance connu.
+
+   On garde `flex` (l'alignement en dépend) et on dessine le chevron
+   explicitement. `list-style: none` retire le marqueur résiduel de Safari.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.why-plan__summary,
+.zone-filter__summary {
+  list-style: none;
+}
+
+.why-plan__summary::-webkit-details-marker,
+.zone-filter__summary::-webkit-details-marker {
+  display: none;
+}
+
+.why-plan__summary::before,
+.zone-filter__summary::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 120ms ease;
+}
+
+.why-plan[open] > .why-plan__summary::before,
+.zone-filter[open] > .zone-filter__summary::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .why-plan__summary::before,
+  .zone-filter__summary::before { transition: none; }
+}

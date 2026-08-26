@@ -96,6 +96,8 @@
     {% set is_leaderboard = _p.startswith('/leaderboard') %}
     {% set is_squads = _p.startswith('/squads') %}
     {% set is_my_programs = _p.startswith('/programs') %}
+    {# `OPERATOR_DECISION` NAMING — « Explorer », troisième enfant du domaine. #}
+    {% set is_library = _p.startswith('/library') %}
     {% set is_profile = _p.startswith('/profile') %}
     {% set is_coach = _p.startswith('/coach') %}
     {# `TRAIN1-D` — `/export` n'était liée depuis AUCUN gabarit : la route
@@ -136,6 +138,7 @@
         <nav class="topbar__nav" aria-label="Navigation secondaire">
           <a class="topbar__link {% if is_plan %}is-subactive{% endif %}" href="{{ url_for('user_plan') }}">Mon plan</a>
           <a class="topbar__link {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
+          <a class="topbar__link {% if is_library %}is-subactive{% endif %}" href="{{ url_for('library') }}">Explorer</a>
           <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
           <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
           <a class="topbar__link {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>
@@ -182,8 +185,13 @@
       <details class="app-rail__secondary">
         <summary class="app-rail__secondary-toggle">Plus</summary>
         <nav class="app-rail__secondary-nav" aria-label="Navigation secondaire">
+          {# `OPERATOR_DECISION` NAMING — les TROIS enfants du domaine
+             « Programmes » sont nommés ici. « Explorer » manquait : l'onglet
+             du domaine y menait sans que le mot existe nulle part, si bien
+             qu'aucun des trois n'était désignable par son nom. #}
           <a class="app-rail__sublink {% if is_plan %}is-subactive{% endif %}" href="{{ url_for('user_plan') }}">Mon plan</a>
           <a class="app-rail__sublink {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
+          <a class="app-rail__sublink {% if is_library %}is-subactive{% endif %}" href="{{ url_for('library') }}">Explorer</a>
           <a class="app-rail__sublink {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
           <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
           <a class="app-rail__sublink {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>

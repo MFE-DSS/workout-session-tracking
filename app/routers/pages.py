@@ -586,7 +586,9 @@ def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
         request,
         "library.html",
         {
-            "page_title": "Programmes de séance",
+            # `OPERATOR_DECISION` NAMING — enfant « Explorer » du domaine
+            # « Programmes ». Voir le commentaire de `library.html`.
+            "page_title": "Explorer",
             "sections": CATALOG_SECTIONS,
             "grouped": grouped,
             "zones_by_template": zones_by_template,
