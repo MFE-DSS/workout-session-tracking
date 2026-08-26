@@ -203,3 +203,44 @@ c'est exactement pourquoi cette étude a été ordonnée, et pourquoi la tranche
 s'arrête ici.
 
 Prochain état : **`PROGRAMS REAL-USER DOGFOOD — OPERATOR REVIEW`**.
+
+---
+
+## 10. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#167** |
+| Merge | **`bb35bba`** — `--merge`, tête épinglée `4fe0e72`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | 9/9 `pass`, **aucun cycle rouge** |
+| CI canonique (`push` sur le merge) | run **32967851055** — **succès** |
+| Sonar (gate PR) | **OK** — 0 bug · 0 code smell · 0 vulnérabilité · duplication 0,0 % |
+| Fils de revue non résolus | 0 |
+
+### La leçon de cette tranche
+
+**Une plantation qui rougit ne prouve rien si la garde rougit aussi à vide.**
+
+Mes deux plantations du marqueur de divulgation sont revenues rouges, et je les
+aurais comptées comme des preuves. Elles ne l'étaient pas : mon extracteur CSS
+n'acceptait pas les sélecteurs sur plusieurs lignes, or la règle groupe les
+deux replis — la garde échouait **déjà sur du code sain**. C'est le **sweep
+élargi** qui l'a montré, pas la plantation.
+
+La méthode « planter le défaut » gagne donc une condition qu'elle n'avait pas
+énoncée : **vérifier que la garde est VERTE sur le code sain avant de compter
+son rouge comme une preuve**. Le rouge seul est ambigu — il peut venir du
+défaut planté ou de la garde elle-même.
+
+C'est la troisième famille d'erreur d'instrument de la session, après « une
+garde verte pour la mauvaise raison » et « un harnais qui compte rouge un test
+jamais exécuté ». Les trois disent la même chose sous trois angles : **un
+instrument non vérifié mesure son propre défaut.**
+
+### Reste ouvert
+
+* **`.substitute-picker__summary`** — même défaut de marqueur, sur l'écran de
+  séance (surface souveraine). Mesuré, non corrigé, **soumis à arbitrage**.
+* **`A2` étape C** — l'exercice custom structuré.
+* Aucune tranche de fonctionnalité avant
+  **`PROGRAMS REAL-USER DOGFOOD — OPERATOR REVIEW`**.
