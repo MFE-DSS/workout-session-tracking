@@ -209,3 +209,56 @@ comportement mesurent bout en bout.
   fusionner est un **jugement produit**, pas une dérivation. Cette tranche ne
   fusionne rien — elle rapproche seulement deux écritures dont la forme
   normalisée est **déjà identique**.
+
+---
+
+## 8. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#165** |
+| Merge | **`d8a3f2a`** — `--merge`, tête épinglée `fa8a831`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | 9/9 `pass`, **aucun cycle rouge** |
+| CI canonique (`push` sur le merge) | run **32950139170** — **succès** |
+| Sonar (gate PR) | **OK** — couverture neuve **96,9 %** · 0 bug · 0 code smell · 0 vulnérabilité · duplication 0,0 % |
+| Fils de revue non résolus | 0 |
+
+### Ce que cette tranche laisse au dépôt, au-delà du code
+
+**Un défaut qu'on peut prouver vaut mieux qu'un défaut qu'on peut décrire.**
+Le tableau du §1 n'est pas une lecture du code : c'est la sortie de la fonction
+réelle appelée avec les deux orthographes. Cela a coûté quinze lignes de script
+et a rendu la suite indiscutable — y compris pour décider **quoi ne pas
+faire**.
+
+**La correction n'a eu besoin d'aucune heuristique parce que la mesure l'a
+montré.** 83 noms proposables sur 83 déjà résolus : il n'y avait rien à
+deviner. Sans cette mesure, l'appariement flou aurait paru raisonnable — et
+aurait été exactement ce qu'`A2` interdit.
+
+**Deux fautes d'agent, consignées :**
+
+1. **Une mutation a survécu**, et c'est elle qui a trouvé le trou : le cas
+   conservateur (`current_is_substituted=True`, clé courante nulle) n'était
+   exercé par aucune garde. Sans plantation, ce branchement serait resté non
+   couvert et son inversion serait passée inaperçue.
+2. **J'ai affirmé un N+1 croissant sans le mesurer.** La boucle court-circuite
+   dès qu'un créneau trouve sa correspondance : le coût est borné par le nombre
+   de créneaux, pas par l'historique. La mémoïsation reste justifiée — elle
+   divise par 3,5 sur le banc et aplatit le cas défavorable — mais la raison
+   que j'avançais était fausse, et le §5 porte la correction.
+
+**Le sweep adaptatif a servi pour la première fois en conditions réelles.**
+`Sb_OPS_LOCAL_SWEEP_ADAPTIVE_BATCH_01` a été livré sur un banc forcé ; ici, une
+dépassement de budget réel a déclenché **une adaptation automatique** et le
+sweep a terminé **285/285 fichiers** sans intervention. Sur les quatre tranches
+qui ont précédé cet outil, trois s'étaient arrêtées en laissant le travail
+inachevé.
+
+### Reste ouvert
+
+* **`A2` étape C — l'exercice custom structuré.** La population `raw:` que
+  cette tranche vient de nommer est exactement ce qu'elle aura à traiter.
+* Deux arbitrages UI hérités de TRAIN 2, aucun bloquant : **Q5** (« Pourquoi ce
+  plan ? » en carte bordée pour un objet de rang 2) et l'**appellation
+  « Explore »**.
