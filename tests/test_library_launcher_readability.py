@@ -28,7 +28,10 @@ def _render(client, path):
 
 def test_library_title_and_enriched_lede(client):
     html = _render(client, "/library")
-    assert "Programmes de séance" in html          # title preserved (asserted)
+    # `OPERATOR_DECISION` NAMING — l'enfant s'appelle « Explorer », le domaine
+    # « Programmes ». L'ancien titre confondait les deux.
+    assert "Explorer" in html                      # titre décidé
+    assert "Programmes de séance" not in html      # l'ancien ne subsiste pas
     assert "Catalogue complet" in html             # substring preserved (asserted)
     assert "classées par usage" in html            # new enriched part
     assert "Bibliothèque" not in html              # forbidden vocab (asserted)

@@ -103,7 +103,10 @@ def test_form_and_link_are_siblings(client):
 
 def test_library_vocabulary_preserved(client):
     html = _render(client)
-    assert "Programmes de séance" in html
+    # `OPERATOR_DECISION` NAMING — « Explorer », enfant du domaine
+    # « Programmes ». L'ancien titre confondait l'enfant et le domaine.
+    assert "Explorer" in html
+    assert "Programmes de séance" not in html
     assert "Catalogue complet" in html
     assert "Bibliothèque" not in html
 
