@@ -128,9 +128,30 @@ def summarise_current_exercise(se: SessionExercise) -> Optional[dict]:
     }
 
 
-def _normalize_sub(name: str | None) -> str | None:
-    """Normalize a substituted_name: empty/whitespace → None, else stripped."""
-    return (name or "").strip() or None
+def _normalize_sub(db, name: str | None,
+                   cache: dict[str | None, str | None] | None = None) -> str | None:
+    """Clé de comparaison d'un `substituted_name` — l'IDENTITÉ, pas la chaîne.
+
+    `TRAIN 3` / `A2` étape B. Cette fonction ne faisait que `strip()`, donc
+    deux écritures d'un même mouvement produisaient deux clés. Mesuré :
+    `Curl marteau câble (corde)` et `Curl marteau câble corde` sont toutes deux
+    présentes dans les données du dépôt et désignent le même mouvement.
+
+    Le nom reste le contrat de STOCKAGE ; seule la **comparaison** change.
+
+    ⚠ MÉMOÏSÉE PAR APPEL. La boucle appelante parcourt **tous** les
+    `SessionExercise` passés du même gabarit — un ensemble qui grandit avec
+    l'usage. Résoudre chaque ligne séparément serait un N+1 que rien ne
+    signalerait avant qu'un compte chargé ne ralentisse. Le cache ne survit
+    pas à l'appel : il ne peut pas devenir périmé quand le référentiel change.
+    """
+    from app.services.exercise_identity import identity_key
+
+    if cache is None:
+        return identity_key(db, name)
+    if name not in cache:
+        cache[name] = identity_key(db, name)
+    return cache[name]
 
 
 def _matches_current_substitution(
@@ -168,8 +189,9 @@ def last_time_by_exercise_code(
     """
     # Current substitution per slot (normalized). A code absent here means
     # the slot isn't in the current session → we never surface a prior for it.
+    key_cache: dict[str | None, str | None] = {}
     current_sub_by_code: dict[str, str | None] = {
-        se.exercise_code_snapshot: _normalize_sub(se.substituted_name)
+        se.exercise_code_snapshot: _normalize_sub(db, se.substituted_name, key_cache)
         for se in current_session.session_exercises
     }
     # One query that fetches every prior SessionExercise of the same
@@ -201,7 +223,8 @@ def last_time_by_exercise_code(
         # Sb_DOGFOOD_01.1 — only accept a prior whose substitution matches
         # the current slot's substitution (silence rather than false load).
         if not _matches_current_substitution(
-            _normalize_sub(prior.substituted_name), current_sub_by_code[code]
+            _normalize_sub(db, prior.substituted_name, key_cache),
+            current_sub_by_code[code],
         ):
             continue  # keep scanning older sessions for a comparable one
         result[code] = _summarise_prior(prior, now)

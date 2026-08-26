@@ -21,6 +21,7 @@ from sqlalchemy.orm import Session
 
 from app.enums import SessionStatus
 from app.models.session import SessionExercise, SetLog, WorkoutSession
+from app.services.exercise_identity import identity_key
 from app.services.overload_engine import (
     HistoricalSetSignal,
     OverloadInput,
@@ -142,21 +143,17 @@ def _history_signals_for_code(
     ).scalars().all()
 
     signals: list[HistoricalSetSignal] = []
+    # `TRAIN 3` / `A2` étape B — la clé courante se calcule UNE fois, et les
+    # clés passées sont mémoïsées le temps de cet appel.
+    key_cache: dict[str | None, str | None] = {}
+    current_key = _keyed(db, current_substituted_name, key_cache)
     for s in sessions:
         if len(signals) >= n:
             break
-        match = next(
-            (
-                se
-                for se in s.session_exercises
-                if se.exercise_code_snapshot == exercise_code
-                and _matches_substitution_policy(
-                    se,
-                    current_is_substituted=current_is_substituted,
-                    current_substituted_name=current_substituted_name,
-                )
-            ),
-            None,
+        match = _comparable_exercise(
+            s, exercise_code,
+            current_is_substituted=current_is_substituted,
+            current_key=current_key, db=db, cache=key_cache,
         )
         if match is None:
             continue
@@ -191,24 +188,84 @@ def _history_signals_for_code(
     return tuple(signals)
 
 
+def _comparable_exercise(
+    session: WorkoutSession,
+    exercise_code: str,
+    *,
+    current_is_substituted: bool,
+    current_key: str | None,
+    db: Session,
+    cache: dict[str | None, str | None],
+) -> SessionExercise | None:
+    """Le `SessionExercise` de cette séance comparable au créneau courant.
+
+    Extrait de la boucle appelante : y laisser la compréhension portait sa
+    complexité cognitive à 16 pour 15 permises (`python:S3776`). Aucun
+    comportement ne change — c'est le même `next(...)`, nommé.
+    """
+    return next(
+        (
+            se
+            for se in session.session_exercises
+            if se.exercise_code_snapshot == exercise_code
+            and _matches_substitution_policy(
+                se,
+                current_is_substituted=current_is_substituted,
+                current_key=current_key,
+                db=db,
+                cache=cache,
+            )
+        ),
+        None,
+    )
+
+
 def _matches_substitution_policy(
     past_se: SessionExercise,
     *,
     current_is_substituted: bool,
-    current_substituted_name: str | None,
+    current_key: str | None,
+    db: Session,
+    cache: dict[str | None, str | None] | None = None,
 ) -> bool:
     """Renvoie ``True`` si ``past_se`` peut entrer dans l'historique
     overload de la séance courante au regard de la politique de
     substitution V2.
+
+    `TRAIN 3` / `A2` étape B — LA COMPARAISON PORTE SUR L'IDENTITÉ, plus sur
+    l'orthographe. Elle exigeait auparavant l'égalité **exacte** des chaînes.
+    Mesuré : `Curl marteau câble (corde)` et `Curl marteau câble corde` sont
+    toutes deux présentes dans les données du dépôt, désignent le même
+    mouvement, et ne partageaient **pas** leur historique de charges.
+
+    L'appariement ne s'élargit qu'entre écritures d'un **même** mouvement :
+    deux mouvements distincts gardent des clés distinctes, et un nom
+    qu'aucune identité ne reconnaît ne se compare qu'à son égal.
     """
-    past_sub = (past_se.substituted_name or "").strip() or None
+    past_key = _keyed(db, past_se.substituted_name, cache)
     if not current_is_substituted:
         # Prescrit : on ne consomme QUE le prescrit passé.
-        return past_sub is None
-    # Substitué courant : on exige le même substituted_name exact.
-    if current_substituted_name is None:
+        return past_key is None
+    # Substitué courant : on exige la même identité exécutée.
+    if current_key is None:
         return False
-    return past_sub == current_substituted_name.strip()
+    return past_key == current_key
+
+
+def _keyed(db: Session, name: str | None,
+           cache: dict[str | None, str | None] | None) -> str | None:
+    """`identity_key` mémoïsée pour la durée d'un appel.
+
+    La boucle d'historique parcourt jusqu'à 50 séances : résoudre chaque nom
+    séparément multiplierait les requêtes sans rien apprendre de neuf. Le cache
+    ne survit pas à l'appel — il ne peut donc pas devenir périmé quand le
+    référentiel change.
+    """
+    if cache is None:
+        return identity_key(db, name)
+    if name not in cache:
+        cache[name] = identity_key(db, name)
+    return cache[name]
 
 
 def _history_weight_is_plausible(signals: list[HistoricalSetSignal]) -> bool:
