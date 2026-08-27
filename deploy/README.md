@@ -92,11 +92,36 @@ server {
 
     # Statics : pas de secrets, on les rend publics pour économiser
     # un round-trip d'auth sur chaque image / CSS.
+    #
+    # ⚠ `STATIC_ASSET_COHERENCE_01` — CE BLOC COURT-CIRCUITE L'APPLICATION.
+    #
+    # nginx sert `/static/` depuis le disque : la requête n'atteint JAMAIS
+    # FastAPI, donc la politique de cache posée par le middleware applicatif
+    # ne s'applique pas ici. C'est nginx qui décide, et lui seul.
+    #
+    # L'ancien `expires 7d;` disait au navigateur de garder CHAQUE fichier
+    # sept jours SANS revalider — sur des URL qui, à l'époque, ne portaient
+    # aucune empreinte. Un client ayant chargé `session_focus.js` dans les
+    # sept jours précédant un déploiement continuait donc de servir l'ancien
+    # script tandis que le HTML arrivait à jour. C'est très exactement le
+    # décalage qui a été reproduit en laboratoire (compteur figé, contrôles
+    # `±15 s` absents).
+    #
+    # Les URL portent désormais `?v=<empreinte de contenu>`. On distingue donc
+    # les deux régimes, et on les fait correspondre à ceux de l'application :
     location /static/ {
         auth_basic off;
         alias /srv/workout/app/static/;
-        expires 7d;
         access_log off;
+
+        # Empreint → immuable. Sûr PARCE QUE l'URL change avec le contenu.
+        if ($arg_v) {
+            add_header Cache-Control "public, max-age=31536000, immutable" always;
+        }
+        # Nu (icônes, manifeste, URL tapée à la main) → revalidation.
+        if ($arg_v = "") {
+            add_header Cache-Control "no-cache" always;
+        }
     }
 
     # Tout le reste passe par auth_basic.

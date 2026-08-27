@@ -39,6 +39,7 @@ from app.routers import (
 )
 from app.services.seed import seed_method_rules, seed_reference_split
 from app.services.seed_exercise_identity import seed_exercise_identity
+from app.services.static_assets import is_fingerprinted
 
 
 @asynccontextmanager
@@ -94,6 +95,56 @@ class RequestTimingMiddleware(BaseHTTPMiddleware):
         return response
 
 
+#: `STATIC_ASSET_COHERENCE_01` — un an. La valeur n'a de sens QUE parce que
+#: l'URL porte une empreinte de contenu : si le fichier change, l'URL change,
+#: et cette entrée de cache cesse d'être demandée. `immutable` dit au
+#: navigateur de ne même pas revalider — y compris sur un rechargement.
+IMMUTABLE_MAX_AGE = 31_536_000
+
+#: Ce que reçoit un asset servi SANS empreinte (icône, manifeste, ou une URL
+#: nue tapée à la main). `no-cache` n'interdit pas de stocker : il impose de
+#: **revalider** avant de servir. C'est précisément ce qui manquait — sans
+#: `Cache-Control`, le navigateur inventait sa propre fraîcheur.
+REVALIDATE = "no-cache"
+
+#: Le HTML authentifié ne se met jamais en cache partagé : il porte les
+#: données d'UN utilisateur. `private` l'interdit aux intermédiaires,
+#: `no-cache` force la revalidation — c'est ce qui garantit qu'un HTML à jour
+#: accompagne toujours les assets à jour.
+PRIVATE_HTML = "private, no-cache"
+
+
+def _apply_cache_semantics(request: StarletteRequest, response: StarletteResponse) -> None:
+    """Rendre explicite ce que le navigateur avait le droit de deviner.
+
+    Trois régimes, et un seul défaut à fermer : le HTML et ses assets doivent
+    évoluer ENSEMBLE. Un HTML frais accompagné d'un script périmé est
+    exactement ce que le dogfood a produit — compteur figé, contrôles absents,
+    aucune erreur.
+
+    On n'écrase jamais un `Cache-Control` déjà posé par une route : une
+    décision explicite en amont prime sur cette politique par défaut.
+    """
+    if "cache-control" in response.headers:
+        return
+
+    path = request.url.path
+    if path.startswith("/static/"):
+        fingerprinted = "v" in request.query_params and is_fingerprinted(path)
+        response.headers["Cache-Control"] = (
+            f"public, max-age={IMMUTABLE_MAX_AGE}, immutable"
+            if fingerprinted else REVALIDATE
+        )
+        return
+
+    # Tout le reste est du document applicatif. On ne restreint que ce qui est
+    # réellement du HTML : une réponse JSON ou une redirection n'a pas à
+    # hériter d'une politique pensée pour des pages.
+    content_type = response.headers.get("content-type", "")
+    if content_type.startswith("text/html"):
+        response.headers["Cache-Control"] = PRIVATE_HTML
+
+
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add standard security headers to every response."""
 
@@ -114,6 +165,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "img-src 'self' data:; "
             "frame-ancestors 'none'"
         )
+        _apply_cache_semantics(request, response)
         return response
 
 

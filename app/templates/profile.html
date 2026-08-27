@@ -381,5 +381,5 @@
    `defer` : le script s'exécute après le parsing, donc le formulaire natif est
    déjà utilisable avant même qu'il ne tourne. S'il ne tourne jamais, les trois
    menus natifs restent visibles et le formulaire fonctionne. #}
-<script defer src="{{ url_for('static', path='js/prefs_focus_rank.js') }}"></script>
+<script defer src="{{ asset_url('js/prefs_focus_rank.js') }}"></script>
 {% endblock %}
