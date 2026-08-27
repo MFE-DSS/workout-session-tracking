@@ -15,6 +15,7 @@ from zoneinfo import ZoneInfo
 from fastapi.templating import Jinja2Templates
 
 from app.config import BASE_DIR, DEFAULT_TIMEZONE
+from app.services.static_assets import asset_url
 
 
 _DEFAULT_TZ = ZoneInfo(DEFAULT_TIMEZONE)
@@ -45,3 +46,12 @@ def local_weekday_iso(dt: datetime | None) -> int | None:
 templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
 templates.env.filters["local"] = to_local
 templates.env.filters["local_weekday"] = local_weekday_iso
+
+# `STATIC_ASSET_COHERENCE_01` — L'AUTORITÉ D'URL DES ASSETS MUTABLES.
+#
+# Les gabarits appellent `asset_url('js/session_focus.js')` et jamais
+# `url_for('static', …)` pour une feuille ou un script : l'URL nue est
+# dépourvue d'empreinte, donc un client peut conserver un ancien fichier
+# pendant que le HTML arrive à jour. Ce couplage rompu a été REPRODUIT — il ne
+# reste pas une hypothèse (cf. `SPRINT_STATIC_ASSET_COHERENCE_01_REPORT`).
+templates.env.globals["asset_url"] = asset_url

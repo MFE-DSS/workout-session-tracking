@@ -18,17 +18,17 @@
     <link rel="manifest" href="{{ url_for('static', path='manifest.webmanifest') }}" />
     <link rel="icon" href="{{ url_for('static', path='icons/favicon.svg') }}" type="image/svg+xml" />
     <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='icons/apple-touch-icon.png') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', path='css/app.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('css/app.css') }}" />
     {# Sb_UI_INTERACTION_PRIMITIVES_01 — grammaire d'interaction Auren v1.
        Chargée APRÈS app.css : les primitives s'appuient sur ses tokens et
        peuvent surcharger localement, jamais l'inverse. #}
-    <link rel="stylesheet" href="{{ url_for('static', path='css/interaction.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('css/interaction.css') }}" />
     {# UIV3_TARGETS_44_01 — fermeture des cibles tactiles sur les surfaces
        héritées. Feuille SÉPARÉE d'interaction.css : celle-ci CRÉE des
        primitives, celle-là FERME des surfaces. `test_the_family_stays_small`
        a refusé le mélange, et avait raison. Presque tout y est enveloppé de
        `:where()`, donc l'ordre de chargement n'y change rien. #}
-    <link rel="stylesheet" href="{{ url_for('static', path='css/target_closure.css') }}" />
+    <link rel="stylesheet" href="{{ asset_url('css/target_closure.css') }}" />
     {% block extra_head %}{% endblock %}
     <title>{{ page_title }} · Auren</title>
   </head>
