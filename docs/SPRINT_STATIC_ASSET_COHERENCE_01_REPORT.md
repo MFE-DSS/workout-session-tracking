@@ -210,13 +210,73 @@ remplace.
 
 | Vérification | Résultat |
 |---|---|
-| `check_scope.py` | à relever au commit — traité en **`shared_code`** (`main.py`, `templating.py`, `base.html`) |
+| `check_scope.py` | **`SHARED_CODE`** |
 | Sweep ciblé, 12 fichiers consommateurs | **232 passés, 0 échec** |
-| `tests/test_static_asset_coherence.py` | **14 passés** |
-| Full sweep local | *(reporté en closeout)* |
-| ruff | *(reporté en closeout)* |
+| `tests/test_static_asset_coherence.py` | **15 passés** |
+| **Full sweep local** (arbre stable) | **287/287 fichiers, 85 lots, tous verts** · pic 1967 Mo / 1998 de budget · 1 adaptation automatique, aucun fichier sauté |
+| ruff (rapport CI reproduit) | **276 avant / 276 après** — 2 `I001` introduits puis corrigés |
 
 **Aucune surface visible modifiée** : pas de gabarit rendu différemment, pas de
 feuille de style changée. Les URL changent, pas les pixels. `CLAUDE.md §5.1`
 ne s'applique donc pas — et les deux relevés de runtime ci-dessus valent
 davantage qu'une capture, puisque le sujet est un comportement dans le temps.
+
+---
+
+## 9. Fautes de l'agent
+
+### 9.1 — Deux gardes passaient pour la mauvaise raison
+
+* **Une garde interrogeait `/`** — une page qui ne charge même pas le script du
+  minuteur. Elle passait **à vide**, sans jamais regarder la surface de
+  l'incident. Elle ouvre désormais une vraie séance.
+* **`assert asset_url(x) == asset_url(x)`** — tautologie qui ne prouvait que la
+  mémoïsation. Signalée par `python:S5863`, et le signalement était juste. La
+  garde vide maintenant le cache interne entre les deux lectures.
+
+### 9.2 — J'ai décrit une politique que la production n'applique pas
+
+J'avais rédigé le §4 en présentant la sémantique de cache applicative comme
+celle de la production. **Faux** : nginx sert `/static/` depuis le disque, la
+requête n'atteint jamais FastAPI. Seul l'examen de la configuration documentée
+l'a montré — aucun test applicatif ne pouvait le révéler, puisqu'ils
+interrogent l'application.
+
+C'est la même famille d'erreur que le reste de la session : **un instrument
+qui mesure autre chose que ce qu'on croit**. Ici, la suite de tests mesurait
+fidèlement une politique qui, en production, est court-circuitée.
+
+### 9.3 — J'ai muté l'arbre de travail pendant qu'un sweep le lisait
+
+`git stash` puis `git stash pop` pour relever la ligne de base ruff, **pendant
+qu'un full sweep tournait**. Un lot a été exécuté sur un état transitoire et a
+rendu un faux `'asset_url' is undefined`. Le fichier passe seul et avec ses
+voisins ; le sweep relancé sur arbre stable est **287/287 vert**.
+
+Règle : **ne jamais toucher à l'arbre de travail pendant qu'un sweep le lit.**
+Un sweep lit des fichiers, pas un instantané.
+
+---
+
+## 10. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#169** |
+| Merge | **`faa4208`** — `--merge`, tête épinglée `bb37c84`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | 9/9 `pass`, **aucun cycle rouge** |
+| CI canonique (`push` sur le merge) | run **33062160377** — **succès** |
+| Sonar (gate PR) | **OK** — couverture neuve **95,7 %** · 0 bug · 0 code smell · 0 vulnérabilité |
+| Fils de revue non résolus | 0 |
+
+### Reste à l'opérateur
+
+1. **Appliquer le bloc nginx corrigé sur le VPS.** Le dépôt ne fait que le
+   documenter ; tant que `expires 7d` vit sur le serveur, les assets **nus**
+   (icônes, manifeste) gardent l'ancien régime. Les assets **empreints**, eux,
+   sont déjà sûrs : leur URL change avec leur contenu, quelle que soit la durée
+   de cache.
+2. **Le test appareil** qui trancherait l'attribution : séance en navigation
+   privée, valider une série de travail, observer le décompte.
+
+L'attribution de l'incident reste **`PROBABLE — CACHE APPAREIL NON OBSERVÉ`**.
