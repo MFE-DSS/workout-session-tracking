@@ -50,17 +50,35 @@
     return m + ":" + (s < 10 ? "0" : "") + s;
   }
 
+  /* `DF-B` — LE MINUTEUR RAISONNE SUR UNE ÉCHÉANCE, PAS SUR UN DÉCRÉMENT.
+
+     La version précédente faisait `remaining -= 1` à chaque tick. Un
+     `setInterval` n'est pas une horloge : le navigateur bride les rappels
+     quand l'onglet passe en arrière-plan, quand l'appareil économise
+     l'énergie, ou simplement quand le fil est occupé. Chaque rappel manqué
+     devenait une seconde de repos qui n'existait pas — la dérive s'accumule
+     et le compteur ment d'autant plus qu'on le regarde moins.
+
+     On fixe donc une ÉCHÉANCE, et chaque tick ne fait que lire l'heure. Un
+     rappel en retard corrige au lieu de dériver ; `±15 s` déplace
+     l'échéance, ce qui reste local à la requête et n'est jamais persisté. */
   function startTimer(root) {
     var display = root.querySelector("[data-rest-display]");
     if (!display) {
       return;
     }
 
-    var remaining = parseDuration(root);
+    var deadline = Date.now() + parseDuration(root) * 1000;
+    var resumeUrl = root.getAttribute("data-rest-resume-url");
     var intervalId = null;
+    var done = false;
+
+    function remaining() {
+      return Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
+    }
 
     function paint() {
-      display.textContent = format(remaining);
+      display.textContent = format(remaining());
     }
 
     function stop(doneClass) {
@@ -74,29 +92,53 @@
       }
     }
 
-    function tick() {
-      remaining -= 1;
-      if (remaining <= 0) {
-        remaining = 0;
-        paint();
-        stop(true);
+    /* À ZÉRO, ON SORT — on ne reste pas sur « terminé » avec la série encore
+       verrouillée, ce qui imposerait un tap de plus pour rien. La navigation
+       mène exactement où le lien de la ligne de série mène : même URL, même
+       état d'arrivée. Rien n'est enregistré au passage. */
+    function finish() {
+      if (done) {
         return;
       }
+      done = true;
+      stop(true);
       paint();
+      if (resumeUrl) {
+        window.location.assign(resumeUrl);
+      }
+    }
+
+    function tick() {
+      paint();
+      if (remaining() <= 0) {
+        finish();
+      }
     }
 
     function adjust(delta) {
-      remaining = Math.min(CEILING_SECONDS,
-                           Math.max(FLOOR_SECONDS, remaining + delta));
+      if (done) {
+        return;
+      }
+      var next = Math.min(CEILING_SECONDS,
+                          Math.max(FLOOR_SECONDS, remaining() + delta));
+      deadline = Date.now() + next * 1000;
       paint();
-      if (remaining === 0) {
-        stop(true);
+      if (next === 0) {
+        finish();
       }
     }
 
     paint();
     root.classList.add("session-focus__rest-timer--running");
     intervalId = setInterval(tick, 1000);
+
+    /* Revenir d'un onglet en arrière-plan doit RATTRAPER, pas reprendre où
+       l'on croyait en être. C'est le pendant du raisonnement par échéance. */
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) {
+        tick();
+      }
+    });
 
     /* `±15 s` n'existe que si JS tourne : sans lui, la valeur affichée est
        un repli statique et il n'y a rien à ajuster. Les boutons sont donc
@@ -114,10 +156,100 @@
     }
   }
 
+  /* ════════════════════════════════════════════════════════════════════
+     `DF-B` — SAISIR EST VALIDER, MAIS SEULEMENT SUR UNE TRANSITION EXPLICITE.
+
+     LE DÉFAUT. Le domaine dit déjà que la donnée remplie EST la preuve du
+     set : `completed` se dérive de `weight OR reps`, et la case « Fait » a
+     été retirée pour cette raison. L'interface, elle, exigeait encore un
+     `VALIDER Sx`. En dogfood ce tap est régulièrement oublié — et c'est
+     logique : après avoir noté la charge et les répétitions, l'acte est
+     mentalement terminé.
+
+     CE QUI DÉCLENCHE, ET CE QUI NE DÉCLENCHE PAS. On valide sur un geste
+     EXPLICITE de fin de saisie : `Entrée` / `Done` au clavier. **Jamais sur
+     la frappe, jamais sur le `blur`.** Un `blur` part quand on touche l'écran
+     ailleurs, quand le clavier se referme, quand on veut juste relire — ce
+     n'est pas une intention de valider, et enregistrer là surprendrait.
+
+     CE QUI EST ENVOYÉ. `form.requestSubmit(boutonDominant)` : exactement la
+     soumission qu'un appui sur le bouton aurait produite. Pas de `fetch`, pas
+     d'endpoint parallèle, pas de mini-POST — le formulaire sérialise TOUTES
+     les valeurs de la carte, et n'en envoyer qu'une partie effacerait le
+     reste. Le serveur reste l'unique autorité de persistance.
+
+     OÙ L'ON NE VALIDE PAS. En `CORRECTION`, la rectification doit rester
+     intentionnelle. Et tant que les deux champs ne portent pas une valeur,
+     il n'y a rien à enregistrer.
+     ════════════════════════════════════════════════════════════════════ */
+  function currentFields(form) {
+    var line = form.querySelector(".setline--current:not(.setline--resting)");
+    if (!line) {
+      return null;
+    }
+    var weight = line.querySelector("[name$='_weight_kg']:not([type=hidden])");
+    var reps = line.querySelector("[name$='_reps']:not([type=hidden])");
+    if (!weight || !reps) {
+      return null;
+    }
+    return {line: line, weight: weight, reps: reps};
+  }
+
+  function readyToCommit(fields) {
+    return fields.weight.value.trim() !== "" && fields.reps.value.trim() !== "";
+  }
+
+  function initAutoCommit() {
+    var forms = document.querySelectorAll("[data-session-form]");
+    for (var i = 0; i < forms.length; i++) {
+      (function (form) {
+        var submitter = form.querySelector("[data-dominant-submit]");
+        if (!submitter) {
+          return;   /* aucun soumetteur dominant : rien à automatiser */
+        }
+        var fields = currentFields(form);
+        if (!fields) {
+          return;   /* repos, correction, exercice fini : pas de saisie */
+        }
+        if (fields.line.classList.contains("setline--correcting")) {
+          return;   /* corriger reste un geste délibéré */
+        }
+
+        function onKey(ev) {
+          if (ev.key !== "Enter" && ev.keyCode !== 13) {
+            return;
+          }
+          /* Empêcher la soumission NATIVE d'`Entrée` : sans soumetteur
+             explicite elle n'enverrait pas `nav`, et le serveur ne saurait
+             pas s'il doit enchaîner sur un repos. */
+          ev.preventDefault();
+          if (!readyToCommit(fields)) {
+            /* Incomplet : on passe au champ suivant plutôt que d'enregistrer
+               une série à moitié saisie. */
+            if (ev.target === fields.weight) {
+              fields.reps.focus();
+            }
+            return;
+          }
+          form.requestSubmit(submitter);
+        }
+
+        fields.weight.addEventListener("keydown", onKey);
+        fields.reps.addEventListener("keydown", onKey);
+      })(forms[i]);
+    }
+  }
+
   function init() {
     /* LA CORRECTION : `data-rest-started` — posé par le serveur uniquement
        après une série réellement enregistrée — et non `[data-start-rest]`,
        qui était rendu sur toute carte active. */
+    /* `DF-B` — l'auto-validation ne dépend PAS du repos : elle vit sur la
+       série courante, c'est-à-dire précisément quand il n'y a pas de repos.
+       La brancher après le `return` ci-dessous l'aurait rendue inopérante
+       dans le seul état où elle sert. */
+    initAutoCommit();
+
     var roots = document.querySelectorAll("[data-rest-started]");
     if (!roots || roots.length === 0) {
       return;   /* aucune racine : rien à faire, et surtout aucune erreur */

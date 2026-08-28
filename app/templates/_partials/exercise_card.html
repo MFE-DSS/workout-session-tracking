@@ -149,10 +149,22 @@
     {% endif %}
   </summary>
 
+  {# `DF-B` — `data-session-form` : l'ancrage de l'auto-validation.
+
+     Le JS ne construit AUCUNE requête : il appelle
+     `form.requestSubmit(boutonDominant)` sur CE formulaire. Le navigateur
+     exécute donc exactement la soumission qu'un appui sur `VALIDER Sx`
+     aurait produite — mêmes champs, mêmes `<input hidden>` des séries déjà
+     faites, même `nav`, mêmes redirections SSR. Le serveur reste l'unique
+     autorité de persistance.
+
+     ⚠ Ce formulaire SÉRIALISE TOUTES LES VALEURS de la carte. Un mini-POST
+     parallèle qui n'enverrait que la série courante EFFACERAIT les autres. #}
   <form
     method="post"
     action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
     class="exercise-card__form"
+    data-session-form
   >
 
     {% if session.status == 'completed' and summary %}
@@ -271,6 +283,26 @@
               <span class="setline__code">S{{ _c.set_index }}</span>
               {% if cs.is_resting %}
                 {{ set_values(_c) }}
+                {# `DF-B` — TOUCHER LA PROCHAINE SÉRIE, C'EST REPRENDRE.
+
+                   Le repos est un ÉTAT, pas une porte. L'utilisateur voit
+                   déjà « S{{ _c.set_index }} » ; son intention quand il veut
+                   reprendre est « je commence cette série », pas « j'exécute
+                   d'abord une opération administrative ».
+
+                   C'est un LIEN NATIF vers la même page SANS `rest=1` :
+                   `console_state` dérive alors `CURRENT_SET` et la série
+                   redevient saisissable. Donc **aucune donnée persistée**,
+                   **aucun état écrit**, et **ça marche sans JS**.
+
+                   Le repli `PASSER LE REPOS` du dock reste disponible : c'est
+                   la même destination, conservée comme sortie explicite. #}
+                <a class="setline__resume"
+                   data-rest-resume
+                   href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#set-{{ _c.id }}">
+                  <span class="setline__resume-label">Commencer S{{ _c.set_index }}</span>
+                  <span class="sr-only">— interrompt le repos, aucune donnée n'est enregistrée</span>
+                </a>
               {% else %}
                 {{ set_inputs(_c, 'série', _ph) }}
               {% endif %}
@@ -314,6 +346,12 @@
              change la quantité d'information disponible, pas seulement le
              bouton. ── #}
         {% if cs.is_resting %}
+          {# `DF-B` — une seule URL de reprise, calculée ICI et partagée par
+             les deux chemins : le lien de la ligne de série et la sortie
+             automatique à T=0. Les faire diverger produirait deux
+             destinations pour une seule intention. #}
+          {% set rest_resume_url = url_for('session_detail', session_id=session.id)
+                                   ~ '?active=' ~ se.id ~ '#set-' ~ cs.current_set.id %}
           {% include "_partials/rest_timer.html" %}
         {% endif %}
 
@@ -368,13 +406,21 @@
             {# Lien, pas soumission : il n'y a rien à enregistrer, et
                soumettre marquerait « complétée » une série à peine
                commencée. Repli sans JS naturel. #}
-            <a class="dock__cmd dock__cmd--link"
+            {# `DF-B` — `dock__cmd--muted` : la sortie de repos reste
+               disponible mais cesse de rivaliser avec la ligne de la série,
+               qui porte désormais la même intention là où le regard est. #}
+            <a class="dock__cmd dock__cmd--link{% if cmd.tone == 'muted' %} dock__cmd--muted{% endif %}"
                href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#set-{{ cs.current_set.id }}">
               <span class="dock__label">{{ cmd.label }}</span>
               {% if cmd.sub %}<span class="dock__sub">{{ cmd.sub }}</span>{% endif %}
             </a>
           {% else %}
-            <button type="submit" name="nav" value="{{ cmd.nav }}" class="dock__cmd">
+            {# `DF-B` — `data-dominant-submit` désigne LE soumetteur que
+               l'auto-validation doit employer. Sans soumetteur explicite,
+               `requestSubmit()` n'enverrait pas `nav`, et le serveur ne
+               saurait pas s'il faut enchaîner sur un repos. #}
+            <button type="submit" name="nav" value="{{ cmd.nav }}" class="dock__cmd"
+                    data-dominant-submit="{{ cmd.nav }}">
               <span class="dock__label">{{ cmd.label }}</span>
               {% if cmd.sub %}<span class="dock__sub">{{ cmd.sub }}</span>{% endif %}
             </button>

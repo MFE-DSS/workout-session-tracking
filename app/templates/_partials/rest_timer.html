@@ -24,10 +24,22 @@
 {% set rest_started = rest_active | default(false) %}
 {% set _m = rest_seconds // 60 %}
 {% set _s = rest_seconds % 60 %}
+{# `DF-B` — `data-rest-resume-url` : la SORTIE AUTOMATIQUE à T=0.
+
+   Rester sur « terminé » avec la série encore verrouillée imposerait un tap
+   de plus pour rien. À zéro, le JS suit cette URL — la même que celle du lien
+   sur la ligne de la série, donc les deux chemins mènent au même état :
+
+       REST --minuteur 0--> CURRENT_SET
+       REST --tap S2------> CURRENT_SET
+
+   Sans JS, il n'y a pas de sortie automatique : le lien de la ligne et le
+   repli du dock restent les deux sorties, et elles suffisent. #}
 <div
   class="session-focus__rest-timer rest-readout"
   data-rest-duration="{{ rest_seconds }}"
   {% if rest_started %}data-rest-started="1"{% endif %}
+  {% if rest_started and rest_resume_url %}data-rest-resume-url="{{ rest_resume_url }}"{% endif %}
   role="status"
   aria-live="polite"
 >

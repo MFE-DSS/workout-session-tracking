@@ -2917,3 +2917,34 @@ body.is-session-focus-mode .foot {
 .setline--resting { background: transparent; box-shadow: none; min-height: 34px; }
 
 .setline__x { color: var(--t-fg-faint); margin: 0 3px; }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   `DF-B` — LA SORTIE DE REPOS RESTE, SANS RIVALISER.
+
+   Mesuré au rendu à 390 px : pendant le repos, l'écran portait DEUX
+   affordances ambre pour une seule intention — « Commencer S{n} » sur la
+   ligne de la série, et ce bouton pleine largeur juste en dessous. C'est
+   le « bouton de trop » relevé en dogfood.
+
+   La ligne porte désormais la commande, là où le regard est déjà. Ce bouton
+   devient une sortie explicite au ton secondaire : il ne disparaît pas — la
+   consigne dit qu'il reste disponible — il cesse de réclamer le geste.
+
+   Aucune couleur neuve : mêmes tokens que les sorties secondaires du dock.
+   La cible reste à 56 px, bien au-dessus du standard produit de 44.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.dock__cmd--muted {
+  background: transparent;
+  border: 1px solid var(--t-line, var(--border));
+  color: var(--t-fg-dim, var(--fg-dim));
+  font-weight: 600;
+}
+
+.dock__cmd--muted:hover,
+.dock__cmd--muted:active {
+  background: transparent;
+  border-color: var(--t-fg-dim, var(--fg-dim));
+  color: var(--t-fg, var(--fg));
+}

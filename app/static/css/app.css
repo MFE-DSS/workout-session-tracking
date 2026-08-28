@@ -4624,17 +4624,27 @@ summary:focus-visible,
    ════════════════════════════════════════════════════════════════════════ */
 
 .why-plan__summary,
-.zone-filter__summary {
+.zone-filter__summary,
+.substitute-picker__summary {
   list-style: none;
 }
 
 .why-plan__summary::-webkit-details-marker,
-.zone-filter__summary::-webkit-details-marker {
+.zone-filter__summary::-webkit-details-marker,
+.substitute-picker__summary::-webkit-details-marker {
   display: none;
 }
 
+/* `DF-B` — `.substitute-picker__summary` rejoint la règle. C'était le
+   troisième `<summary>` en `display: flex` du produit, mesuré sans marqueur
+   dès `UX4_02C` et laissé intact alors parce qu'il vit sur l'écran de séance,
+   surface souveraine, et que la tranche portait sur deux corrections nommées.
+   Cette tranche-ci EST celle de l'écran de séance : « Adapter » cesse de
+   ressembler à du texte inerte. Aucun autre changement sur ce contrôle — le
+   badge de compte et la disposition `space-between` sont inchangés. */
 .why-plan__summary::before,
-.zone-filter__summary::before {
+.zone-filter__summary::before,
+.substitute-picker__summary::before {
   content: "";
   flex: 0 0 auto;
   width: 0;
@@ -4646,11 +4656,48 @@ summary:focus-visible,
 }
 
 .why-plan[open] > .why-plan__summary::before,
-.zone-filter[open] > .zone-filter__summary::before {
+.zone-filter[open] > .zone-filter__summary::before,
+.substitute-picker[open] > .substitute-picker__summary::before {
   transform: rotate(90deg);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .why-plan__summary::before,
-  .zone-filter__summary::before { transition: none; }
+  .zone-filter__summary::before,
+  .substitute-picker__summary::before { transition: none; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   `DF-B` — LA LIGNE DE LA PROCHAINE SÉRIE EST LA COMMANDE, PENDANT LE REPOS.
+
+   Le repos est un état, pas une porte. La ligne « S2 » est déjà sous les
+   yeux : c'est elle qui doit reprendre, pas une opération administrative
+   séparée. Le lien couvre toute la largeur utile de la ligne et respecte le
+   standard tactile produit — 44 px.
+
+   Aucune couleur neuve : `--accent` sur `--surface` vaut 7,26:1 (AA), déjà
+   mesuré et déjà employé par les affordances de cette famille.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.setline__resume {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 4px;
+  color: var(--accent);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.setline__resume-label {
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+
+.setline__resume:hover .setline__resume-label,
+.setline__resume:focus-visible .setline__resume-label {
+  border-bottom-color: transparent;
 }
