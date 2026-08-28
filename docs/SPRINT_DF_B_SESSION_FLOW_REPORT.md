@@ -166,7 +166,7 @@ montré que le produit était juste.
 | `tests/test_df_b_session_flow.py` | **18 passés** |
 | Gardes de la console de séance (5 fichiers) | **117 passés** |
 | ruff (rapport CI reproduit) | **276 / 276** |
-| Full sweep local | *(reporté en closeout)* |
+| **Full sweep local** | **288/288 fichiers, tous les lots verts** · pic 1945 Mo / 2042 de budget |
 
 **Aucune couleur introduite** : le ton secondaire réutilise les tokens des
 sorties existantes du dock, et la reprise emploie `--accent`, déjà mesuré à
@@ -181,3 +181,59 @@ sorties existantes du dock, et la reprise emploie `--accent`, déjà mesuré à
   l'anticipe.
 * **Les hauteurs des `<summary>`** de l'écran de séance : mesurées, non
   touchées, soumises à arbitrage.
+
+---
+
+## 9. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#172** |
+| Merge | **`b002119`** — `--merge`, tête épinglée `484c642`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | 8/8 `pass` après **deux cycles rouges**, tous deux dans des gardes ou de la prose, jamais dans le produit |
+| Sonar (gate PR) | **OK** — 0 bug · 0 code smell · 0 vulnérabilité · duplication 0,0 % |
+| CI canonique (`push` sur le merge) | run **33191403810** — **succès** |
+| Full sweep local | **288/288 fichiers verts** |
+| Fils de revue non résolus | 0 |
+
+### Les deux cycles rouges, et ce qu'ils apprennent
+
+**Cycle 1 — deux gardes épinglaient l'ORDRE DES ATTRIBUTS.** Elles exigeaient
+`class="dock__cmd">`, donc la classe suivie immédiatement du chevron. Ajouter
+`data-dominant-submit` après elle les faisait échouer **sans que la propriété
+testée change** : la commande dominante restait une soumission native portant
+un libellé. Les expressions acceptent désormais d'autres attributs autour de la
+classe. Aucune assertion retirée.
+
+**Cycle 2 — une balise littérale dans un commentaire n'est pas de la prose.**
+Mon commentaire Jinja contenait `<input hidden>` pour *expliquer* la
+sérialisation. Le parseur HTML de Sonar ne connaît pas `{# … #}` : il y a lu un
+champ de saisie sans étiquette. **Le signalement était exact** — c'était bien
+une balise, dans un fichier de gabarit.
+
+Et une **faute de méthode** : je n'avais pas lancé le pré-scan AST avant de
+pousser, alors que c'est précisément ce qu'il attrape. Lancé après coup, il a
+trouvé les deux `S9073` **et** un littéral triplé que Sonar n'avait pas encore
+signalé.
+
+### Ce que cette tranche laisse au dépôt
+
+**Quatre instruments faux, aucun défaut produit.** Un clic de test qui
+perturbait la page · `wait_for_load_state("networkidle")` qui rendait la main
+avant la navigation, me faisant lire l'URL précédente · un test pressant
+`Entrée` sur des champs vides · un serveur de lab qui ne recharge pas Python.
+
+Ces quatre erreurs m'ont fait **soupçonner le produit trois fois**. À chaque
+fois, la vérification ciblée a montré qu'il était juste. C'est le même
+enseignement que les tranches précédentes, sous un nouvel angle : **un
+instrument non vérifié mesure son propre défaut** — et quand il se trompe, il
+accuse le code.
+
+### Reste ouvert
+
+* **`DF-C`** — sémantique visuelle `É`/`S` par microglyphes.
+* **`DF-D`** — repos adaptatif, différé par l'ordre.
+* **Hauteurs des `<summary>`** de l'écran de séance (5 cibles < 44 px,
+  28 et 39 px), mesurées et non touchées.
+* **Déploiement** : `b002119` n'est pas en production — le dernier déploiement
+  est `faf57de`.
