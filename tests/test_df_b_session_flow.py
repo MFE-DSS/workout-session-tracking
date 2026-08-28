@@ -43,6 +43,10 @@ CARD = ROOT / "app/templates/_partials/exercise_card.html"
 REST_TPL = ROOT / "app/templates/_partials/rest_timer.html"
 CSS = ROOT / "app/static/css/app.css"
 
+#: Marqueur de l'affordance de reprise. `python:S1192` mord à trois
+#: occurrences, et ce littéral en compte autant.
+RESUME_MARKER = "data-rest-resume"
+
 
 def _js() -> str:
     """Le script SANS ses commentaires — une garde qui lit sa propre prose ne
@@ -122,7 +126,10 @@ def test_an_incomplete_set_is_never_committed():
     js = _js()
     assert "readyToCommit" in js
     body = js.split("function readyToCommit", 1)[1].split("}", 1)[0]
-    assert "weight" in body and "reps" in body, body
+    # `python:S9073` — deux assertions, pas une composite : quand elle échoue,
+    # on veut savoir LEQUEL des deux champs a disparu du test de complétude.
+    assert "weight" in body, body
+    assert "reps" in body, body
 
 
 def test_a_correction_is_never_auto_committed():
@@ -141,9 +148,9 @@ def test_the_next_set_row_is_a_real_link_during_rest():
     `console_state` dérive `CURRENT_SET` et la série redevient saisissable.
     Rien n'est persisté au passage."""
     card = _card()
-    assert "data-rest-resume" in card
-    resume = card.split("data-rest-resume", 1)[1][:400]
-    assert "<a" in card.split("data-rest-resume", 1)[0][-200:], (
+    assert RESUME_MARKER in card
+    resume = card.split(RESUME_MARKER, 1)[1][:400]
+    assert "<a" in card.split(RESUME_MARKER, 1)[0][-200:], (
         "l'affordance de reprise n'est pas un lien"
     )
     assert "rest=1" not in resume, (
@@ -167,9 +174,11 @@ def test_the_manual_skip_remains_available():
 def test_rest_exits_by_itself_at_zero():
     js = _js()
     assert "data-rest-resume-url" in js, "aucune URL de sortie automatique"
-    assert "location.assign" in js or "location.href" in js, (
-        "le minuteur n'emmène nulle part à zéro"
-    )
+    # `python:S9073` — une assertion par fait. Ici la disjonction est
+    # légitime (deux façons d'écrire la même navigation), mais elle se dit
+    # sans `or` : on cherche l'une OU l'autre dans une liste.
+    navigations = [f for f in ("location.assign", "location.href") if f in js]
+    assert navigations, "le minuteur n'emmène nulle part à zéro"
 
 
 def test_both_exits_lead_to_the_same_url():

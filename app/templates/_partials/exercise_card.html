@@ -154,9 +154,14 @@
      Le JS ne construit AUCUNE requête : il appelle
      `form.requestSubmit(boutonDominant)` sur CE formulaire. Le navigateur
      exécute donc exactement la soumission qu'un appui sur `VALIDER Sx`
-     aurait produite — mêmes champs, mêmes `<input hidden>` des séries déjà
+     aurait produite — mêmes champs, mêmes champs cachés des séries déjà
      faites, même `nav`, mêmes redirections SSR. Le serveur reste l'unique
      autorité de persistance.
+
+     ⚠ Ne PAS écrire de balise littérale dans cette prose : le parseur HTML
+     de Sonar ne connaît pas les commentaires Jinja et lisait un champ de
+     saisie sans étiquette là où il n'y a qu'une phrase. Le signalement était
+     juste — c'était bien une balise, dans un fichier de gabarit.
 
      ⚠ Ce formulaire SÉRIALISE TOUTES LES VALEURS de la carte. Un mini-POST
      parallèle qui n'enverrait que la série courante EFFACERAIT les autres. #}
