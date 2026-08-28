@@ -289,10 +289,16 @@ def test_saving_never_depends_on_the_timer(client):
     """Sans JS, le compte à rebours n'existe pas — la sauvegarde doit
     fonctionner quand même. La commande dominante est une soumission de
     formulaire native."""
+    # ⚠ `DF-B` — l'expression exigeait `class="dock__cmd">`, donc la classe
+    # SUIVIE IMMÉDIATEMENT du chevron. Ajouter un attribut après elle
+    # (`data-dominant-submit`, l'ancrage de l'auto-validation) faisait échouer
+    # la garde sans que la propriété testée change d'un iota. On vérifie
+    # désormais ce qui compte : c'est bien un `<button type="submit">` portant
+    # `name="nav"` et la classe de la commande dominante.
     src = CARD.read_text(encoding="utf-8")
     match = re.search(
-        r'<button type="submit" name="nav"[^>]*\n?\s*class="dock__cmd">',
-        src,
+        r'<button type="submit" name="nav"[^>]*class="dock__cmd"[^>]*>',
+        src, re.DOTALL,
     )
     assert match, "dominant command is no longer a native submit"
     for js_only in ("onclick", "data-js-only", "hx-post"):
@@ -317,8 +323,11 @@ def test_the_dominant_command_has_an_accessible_name(client):
     la commande, pas seulement par la couleur (`Sx_UIV3_02 §7.11`)."""
     sid = _start(client)
     body = client.get(f"/sessions/{sid}").text
+    # ⚠ Même fragilité que ci-dessus : la classe peut être suivie d'autres
+    # attributs. Ce qui est gardé, c'est que la commande dominante EXISTE et
+    # porte un libellé — pas l'ordre de ses attributs.
     match = re.search(
-        r'<button[^>]*class="dock__cmd">(.*?)</button>', body, re.DOTALL,
+        r'<button[^>]*class="dock__cmd"[^>]*>(.*?)</button>', body, re.DOTALL,
     )
     assert match, "dominant command not rendered"
     assert "VALIDER" in match.group(1), match.group(1)

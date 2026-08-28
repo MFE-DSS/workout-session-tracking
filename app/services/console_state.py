@@ -262,10 +262,25 @@ def command_for(state: ConsoleState) -> dict:
         }
     if kind == REST:
         sl = state.current_set
+        # `DF-B` — LA SORTIE RESTE, MAIS CESSE D'ÊTRE DOMINANTE.
+        #
+        # Mesuré au rendu : pendant le repos, l'écran portait DEUX affordances
+        # ambre pour une seule intention — « Commencer S{n} » sur la ligne de
+        # la série, et ce bouton pleine largeur juste en dessous. C'est le
+        # « bouton de trop » relevé en dogfood.
+        #
+        # La ligne de la série devient la commande — c'est là que le regard
+        # est, et « je commence S{n} » est l'intention réelle. Ce bouton reste
+        # disponible comme sortie explicite, au ton secondaire : il ne
+        # disparaît pas, il cesse de rivaliser.
+        # Le LIBELLÉ ne bouge pas : trois gardes l'épinglent, et le changer
+        # serait un choix d'écriture que personne n'a demandé. Seul le TON
+        # change — c'est la compétition visuelle qu'on retire, pas la sortie.
         return {
             "label": "PASSER LE REPOS",
             "sub": f"S{sl.set_index} →",
             "nav": None,  # lien, pas soumission : rien à enregistrer
+            "tone": "muted",
         }
     if kind == CORRECTION:
         # Corriger une série passée n'est pas exécuter une série : aucun repos

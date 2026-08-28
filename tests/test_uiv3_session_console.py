@@ -372,9 +372,17 @@ def test_the_countdown_is_gated_on_the_server_signal():
     saisie.
 
     Cette garde lit la SÉLECTION du JS, pas une chaîne de HTML — c'est
-    précisément ce que les deux gardes précédentes ne faisaient pas."""
+    précisément ce que les deux gardes précédentes ne faisaient pas.
+
+    ⚠ `DF-B` — elle visait d'abord TOUTE sélection par attribut du fichier, et
+    exigeait qu'il n'y en ait qu'une. C'était trop large : l'auto-validation a
+    légitimement besoin de sa propre racine (`[data-session-form]`), qui n'a
+    rien à voir avec le minuteur. La garde vise donc désormais la ligne qui
+    assigne les RACINES DU MINUTEUR — ce qu'elle a toujours voulu protéger —
+    et reste insensible aux sélections voisines."""
     js = _js_code()
-    roots = re.findall(r"document\.querySelectorAll\(\s*\"(\[[^\"]+\])\"", js)
+    roots = re.findall(
+        r"roots\s*=\s*document\.querySelectorAll\(\s*\"(\[[^\"]+\])\"", js)
     assert roots, "aucune sélection de racine de minuteur trouvée"
     assert roots == ["[data-rest-started]"], roots
 
