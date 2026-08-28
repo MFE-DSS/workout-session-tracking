@@ -236,31 +236,52 @@ def test_authenticated_html_is_private_and_revalidated(client):
 
 
 def test_the_documented_reverse_proxy_matches_the_application_policy():
-    """LA GARDE QUI M'A MANQUÉ D'ABORD.
+    """LA DOC NE DOIT PAS CONTREDIRE LE SERVEUR.
 
-    nginx sert `/static/` **depuis le disque** : la requête n'atteint jamais
-    FastAPI, donc le middleware applicatif ne gouverne pas la production sur
-    ce chemin. J'ai livré une politique applicative en croyant décrire la
-    production — c'était faux, et seul l'examen de la configuration
-    documentée l'a montré.
+    ⚠ CETTE GARDE A ÉTÉ ÉCRITE SUR UNE PRÉMISSE FAUSSE, puis corrigée.
 
-    L'ancien `expires 7d;` sur des URL sans empreinte est un mécanisme **plus
-    fort** que la mise en cache heuristique : il autorisait explicitement sept
-    jours sans revalidation. Cette garde interdit son retour et exige que les
-    deux régimes de la doc correspondent à ceux du code.
+    J'avais lu dans `deploy/README.md` que nginx servait `/static/` depuis le
+    disque avec `expires 7d`, et j'en avais tiré tout un raisonnement.
+    **Mesuré en production le 2026-08-28 : c'est l'inverse.** `/static/` est
+    PROXIFIÉ vers FastAPI — l'asset revient avec `X-Content-Type-Options`,
+    `Content-Security-Policy` et `X-Frame-Options`, que seul le middleware
+    applicatif pose — et aucun `expires` n'existe nulle part.
+
+    Deux leçons, et la seconde est la vraie : la politique applicative
+    gouverne bien la production ; et **un document n'est pas une mesure**.
+
+    La garde vérifie donc que la doc ne réintroduit pas la version fausse :
+    ni `expires 7d`, ni un bloc `alias` ACTIF qui court-circuiterait
+    l'application, et les deux régimes doivent rester nommés.
     """
     doc = (ROOT / "deploy/README.md").read_text(encoding="utf-8")
-    static_block = doc.split("location /static/", 1)
-    assert len(static_block) == 2, "le bloc statique nginx a disparu de la doc"
-    block = static_block[1].split("}", 1)[0] + doc.split("location /static/", 1)[1][:900]
 
-    assert "expires 7d" not in block, (
-        "`expires 7d` est de retour sur des assets : sept jours sans "
-        "revalidation, c'est le mécanisme même de l'incident"
+    # ⚠ Chercher la CHAÎNE `expires 7d` attrapait la phrase qui l'INTERDIT —
+    # une garde qui lit sa propre prose, piège que ce dépôt connaît. On ne
+    # cherche donc qu'une DIRECTIVE ACTIVE : une ligne non commentée qui
+    # commence par `expires`.
+    live_expires = [ln for ln in doc.splitlines()
+                    if ln.strip().startswith("expires ")]
+    assert not live_expires, (
+        f"directive `expires` ACTIVE dans la doc : {live_expires} — sept "
+        "jours sans revalidation sur des URL sans empreinte, c'est le "
+        "mécanisme même du décalage"
     )
-    assert "immutable" in block, "le régime empreint n'est pas documenté"
-    assert "no-cache" in block, "le régime nu n'est pas documenté"
-    assert f"max-age={IMMUTABLE_MAX_AGE}" in block, (
+    # Un bloc `location /static/` ACTIF (non commenté) rouvrirait le
+    # court-circuit : la requête cesserait d'atteindre l'application, et la
+    # politique mesurée en ligne disparaîtrait.
+    active = [ln for ln in doc.splitlines()
+              if "location /static/" in ln and not ln.strip().startswith("#")]
+    assert not active, (
+        f"bloc `location /static/` ACTIF dans la doc : {active} — il "
+        "court-circuiterait l'application"
+    )
+    assert "PROXIFIÉ vers FastAPI" in doc, (
+        "la doc ne dit plus ce qui a été MESURÉ en production"
+    )
+    assert "immutable" in doc, "le régime empreint n'est pas documenté"
+    assert "no-cache" in doc, "le régime nu n'est pas documenté"
+    assert f"max-age={IMMUTABLE_MAX_AGE}" in doc, (
         "la durée documentée diverge de celle du code"
     )
 

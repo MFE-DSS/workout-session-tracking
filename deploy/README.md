@@ -93,36 +93,46 @@ server {
     # Statics : pas de secrets, on les rend publics pour économiser
     # un round-trip d'auth sur chaque image / CSS.
     #
-    # ⚠ `STATIC_ASSET_COHERENCE_01` — CE BLOC COURT-CIRCUITE L'APPLICATION.
+    # ⚠ `STATIC_ASSET_COHERENCE_01` — CE BLOC N'EST **PAS** CE QUI TOURNE.
     #
-    # nginx sert `/static/` depuis le disque : la requête n'atteint JAMAIS
-    # FastAPI, donc la politique de cache posée par le middleware applicatif
-    # ne s'applique pas ici. C'est nginx qui décide, et lui seul.
+    # MESURÉ EN PRODUCTION le 2026-08-28, et c'est l'inverse de ce que ce
+    # fichier a longtemps décrit : `/static/` est **PROXIFIÉ vers FastAPI**,
+    # pas servi depuis le disque. La preuve est dans les en-têtes — un asset
+    # revient avec `X-Content-Type-Options`, `Content-Security-Policy` et
+    # `X-Frame-Options`, que **seul le middleware applicatif ajoute**. Aucun
+    # `expires` n'est posé nulle part : avant la tranche, les assets
+    # repartaient donc **sans aucune directive de cache**.
     #
-    # L'ancien `expires 7d;` disait au navigateur de garder CHAQUE fichier
-    # sept jours SANS revalider — sur des URL qui, à l'époque, ne portaient
-    # aucune empreinte. Un client ayant chargé `session_focus.js` dans les
-    # sept jours précédant un déploiement continuait donc de servir l'ancien
-    # script tandis que le HTML arrivait à jour. C'est très exactement le
-    # décalage qui a été reproduit en laboratoire (compteur figé, contrôles
-    # `±15 s` absents).
+    # CONSÉQUENCE : c'est l'application qui gouverne la politique de cache
+    # des assets, et elle le fait déjà. Mesuré en ligne après déploiement :
     #
-    # Les URL portent désormais `?v=<empreinte de contenu>`. On distingue donc
-    # les deux régimes, et on les fait correspondre à ceux de l'application :
-    location /static/ {
-        auth_basic off;
-        alias /srv/workout/app/static/;
-        access_log off;
-
-        # Empreint → immuable. Sûr PARCE QUE l'URL change avec le contenu.
-        if ($arg_v) {
-            add_header Cache-Control "public, max-age=31536000, immutable" always;
-        }
-        # Nu (icônes, manifeste, URL tapée à la main) → revalidation.
-        if ($arg_v = "") {
-            add_header Cache-Control "no-cache" always;
-        }
-    }
+    #     /static/js/session_focus.js?v=<empreinte>  → public, max-age=31536000, immutable
+    #     /static/js/session_focus.js                 → no-cache
+    #     /login (text/html)                          → private, no-cache
+    #
+    # IL N'Y A DONC RIEN À CONFIGURER DANS NGINX pour obtenir ces régimes, et
+    # le bloc `alias` ci-dessous ne doit **pas** être appliqué tel quel : il
+    # court-circuiterait l'application et ferait perdre la politique qu'on
+    # vient de vérifier.
+    #
+    # J'avais écrit l'inverse dans une version précédente de ce fichier, en
+    # raisonnant sur cette prose plutôt que sur le serveur. C'est la faute que
+    # cette correction ferme : **un document n'est pas une mesure.**
+    #
+    # Le bloc n'est conservé qu'à titre d'ALTERNATIVE documentée, si l'on
+    # décidait un jour de servir les statiques depuis le disque pour épargner
+    # un aller-retour applicatif. Dans ce cas seulement, ces deux régimes
+    # doivent être reproduits ici — et `expires 7d;`, qui figurait autrefois à
+    # cet endroit, reste proscrit : sept jours sans revalidation sur des URL
+    # sans empreinte est le mécanisme même du décalage HTML ↔ JS.
+    #
+    # location /static/ {
+    #     auth_basic off;
+    #     alias /srv/workout/app/static/;
+    #     access_log off;
+    #     if ($arg_v)      { add_header Cache-Control "public, max-age=31536000, immutable" always; }
+    #     if ($arg_v = "") { add_header Cache-Control "no-cache" always; }
+    # }
 
     # Tout le reste passe par auth_basic.
     location / {
