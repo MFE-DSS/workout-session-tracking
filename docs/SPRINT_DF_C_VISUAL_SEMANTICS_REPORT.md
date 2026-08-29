@@ -282,3 +282,73 @@ Je ne tranche pas : c'est une décision d'écriture, et `§5.1` dit que
   élément invisible et laissé le vrai.
 * **`DF-D`** — repos adaptatif : différé par l'ordre, rien ici ne l'anticipe.
 * Les codes **`E1…E7`** (exercice, pas série) : autre axe, hors de cette tranche.
+
+---
+
+## 11. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#174** |
+| Merge | **`6bc298e`** — `--merge`, tête épinglée `1d911b1`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | **8/8 `pass`** après **un** cycle rouge, hors produit |
+| Gate Sonar (PR) | **`OK`** — 0 bug · 0 code smell · 0 vulnérabilité · duplication 0,0 % |
+| CI canonique (`push` sur le merge) | run **33261259002** — **succès, 6/6 jobs** |
+| Full sweep local | **289/289 fichiers verts**, pic 1961 Mo / 1976 |
+| Fils de revue non résolus | **0** |
+
+### Le cycle rouge, et pourquoi il compte
+
+Un seul écart : `new_code_smells_severity` à **15** pour un plafond de 14. Comme
+MAJOR pèse exactement 15, l'arithmétique disait **un** finding avant même de le
+chercher — c'est le premier réflexe de la route de diagnostic, et il évite de
+partir en chasse.
+
+`css:S4666` : *« Duplicate selector `.setline__code`, first used at line 2157 »*.
+**Le signalement était exact.** J'avais posé un second bloc en fin de feuille
+alors que la règle existait déjà. Aucune propriété ne se chevauchait ici — mais
+deux règles pour un même sélecteur laissent croire à deux composants, et la
+seconde gagne **en silence** sur toute propriété commune. Un piège posé pour la
+prochaine lecture, pas une organisation.
+
+Les trois déclarations ont rejoint la règle d'origine. **Rendu inchangé,
+remesuré au pixel** : 12,02:1 / 12,02:1 sur la ligne courante, 2,66:1 / 2,66:1
+sur les futures. Balayage de tous les sélecteurs de premier niveau : **zéro
+doublon introduit par `DF-C`** (4 préexistants ailleurs, hors périmètre).
+
+C'est la **deuxième fois dans ce train** qu'un signalement d'analyseur qui
+« sentait » le faux positif avait raison — après la balise littérale dans un
+commentaire Jinja de `DF-B`. La leçon du dépôt tient : ne jamais adjuger un
+finding sans le lire.
+
+### Ce que cette tranche laisse au dépôt
+
+**Sept fautes : six dans l'instrument, une dans le produit.** Cinq
+vérifications de garde sur sept ont d'abord mesuré autre chose que ce qu'elles
+annonçaient — dont un harnais faisant un **POST partiel qui effaçait les séries
+précédentes**, exactement ce que `DF-B` documente et interdit.
+
+Et la seule faute qui a atteint le produit — l'`opacity: .85` qui affaiblissait
+le porteur du type — **n'a été trouvée ni par un test ni par la CI**. Les quinze
+gardes étaient vertes avec elle en place. Seule une mesure au pixel l'a vue, et
+**ma première mesure était fausse elle aussi** : elle comparait des pixels à une
+couleur calculée.
+
+Trois énoncés, du même bloc :
+
+1. **Une garde rouge ne prouve rien** tant qu'on n'a pas vérifié qu'elle est
+   verte pour la bonne raison — et qu'elle rougit pour la bonne raison.
+2. **Ce qu'aucune garde ne regarde, seule une mesure le voit.**
+3. **Comparer deux choses n'est une comparaison que si on les mesure pareil.**
+
+### Reste ouvert
+
+* **Arbitrage `VALIDER É1`** — §9, trois variantes rendues, **non tranché**.
+* **`.sub-elargi > summary`** — marqueur absent sans remplacement, 62 px donc
+  au-dessus du plancher, hors périmètre (§10).
+* **`DF-D`** — repos adaptatif, différé par l'ordre.
+* **Smoke iPhone `DF-B`** — action opérateur, pour marquer
+  `DF-B_RUNTIME = VALIDATED_IN_PRODUCTION`.
+* **Déploiement** : `6bc298e` **n'est pas en production** — le dernier
+  déploiement reste `d7ec388`.
+* **Suite** : retour à `UX4_02C_PROGRAMS_REAL_USER_DOGFOOD_01`, puis A2 étape C.
