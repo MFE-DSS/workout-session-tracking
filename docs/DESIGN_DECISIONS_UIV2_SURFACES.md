@@ -104,6 +104,37 @@ enregistrer une action, pas lire une carte.
 
 → Livré par `D5_SESSION_INSTRUMENT_ROWS_01`.
 
+### ⚠ AMENDEMENT — `É1` / `S1` sur les LIGNES, superséde le 2026-08-29
+
+**Autorité** : note de dogfood de séance de l'opérateur, point `DF-03` — « `É`/`S`
+sont des **codes techniques**, pas la sémantique visuelle d'AUREN ». Puis l'ordre
+`GO DF-C — SESSION VISUAL SEMANTICS & TARGET CLOSURE`.
+
+Cet amendement est **explicite et daté** : `CLAUDE.md §4` interdit d'amender
+silencieusement une spec versionnée, et de passer outre un conflit de spec. Le
+conflit est réel — la table ci-dessus **décidait** `É1` et `S1`.
+
+**Ce qui est superséde** : la colonne « Après » pour les deux premières lignes,
+**sur les lignes de série uniquement**.
+
+| Ligne | Q4 (2026-08) | `DF-C` (2026-08-29) |
+|---|---|---|
+| échauffement | `É1` | microglyphe `╱` + `1` |
+| série de travail | `S1` | microglyphe `▬` + `1` |
+
+**Ce qui reste entier** — et c'est pourquoi ce n'est pas un revirement :
+
+* « les valeurs deviennent l'objet, le texte recule » est **renforcé** : le code
+  à déchiffrer devient une forme perçue, et le nombre — la seule part utile —
+  survit inchangé ;
+* le **point d'état** (`✓ ● ○`) de Q4 est **conservé tel quel**. Deux
+  dimensions, deux porteurs : le glyphe dit le TYPE, le point dit l'ÉTAT ;
+* la 3ᵉ et la 4ᵉ ligne du tableau ne sont **pas** touchées.
+
+**Ce qui reste ouvert** : le libellé de la commande dominante dit encore
+`VALIDER É1` / `VALIDER S1`. Plus rien à l'écran ne porte ce nom. C'est un
+arbitrage d'écriture soumis à l'opérateur, **non tranché par l'agent**.
+
 ---
 
 ## Q5 — Les surfaces ✅ **A, trois rangs**
