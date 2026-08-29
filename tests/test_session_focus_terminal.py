@@ -174,7 +174,7 @@ class TestTerminalMarkerAndContracts:
 
     def test_anchors_and_feedback_preserved(self, client):
         body = _body(client, n=3)
-        assert len(re.findall(r'href="#exercise-\d+"', body)) >= 3
+        assert len(re.findall(r'href="[^"]*#exercise-\d+"', body)) >= 3
         assert 'id="session-feedback"' in body
 
     def test_aria_current_location_only(self, client):

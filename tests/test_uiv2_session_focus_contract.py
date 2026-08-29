@@ -50,13 +50,21 @@ def _cta_block() -> str:
     n'était pas le bouton.
     """
     src = CARD.read_text(encoding="utf-8")
+    # `DF-E` — LE PORTEUR A CHANGÉ, LA PROPRIÉTÉ NON.
+    #
+    # `session-focus__cta-primary` marquait le submit de la CARTE REPLIÉE.
+    # Depuis `DF-E`, une carte non active est un LIEN d'activation : elle n'a
+    # plus de submit, et ce marqueur n'existe plus nulle part.
+    #
+    # La capacité, elle, survit — sur le dock de la carte ACTIVE. On vise donc
+    # ce que la propriété DIT (« un submit qui avance d'un exercice »), pas le
+    # nom de classe que portait son ancien support.
     match = re.search(
-        r"<button\b[^>]*class=\"[^\"]*session-focus__cta-primary[^\"]*\"[^>]*>"
-        r".*?</button>",
+        r"<button\b[^>]*name=\"nav\"[^>]*value=\"next\"[^>]*>.*?</button>",
         src,
         re.DOTALL,
     )
-    assert match, "primary exercise CTA <button> not found"
+    assert match, "aucun submit d'avancement d'exercice trouvé"
     return match.group(0)
 
 
@@ -88,8 +96,11 @@ def test_primary_cta_is_not_the_finish_session_action():
 
     detail = DETAIL.read_text(encoding="utf-8")
     assert 'value="end"' in detail, "the session-level finish action must exist"
-    assert "session-focus__cta-primary" not in detail, (
-        "the exercise CTA marker must not leak onto the session finish action"
+    # `DF-E` — le marqueur de classe a disparu avec la carte repliée ; la
+    # propriété gardée reste que l'action de SÉANCE ne se confond pas avec
+    # l'avancement d'EXERCICE. On l'énonce sur ce qui existe.
+    assert 'value="next"' not in detail.split('value="end"')[0][-400:], (
+        "the exercise advance action must not leak onto the session finish"
     )
 
 

@@ -143,7 +143,7 @@ class TestCockpitShell:
         """Every exercise must remain addressable via #exercise-{id}."""
         body = _body(client, n=3)
         # 3 stepper anchors + 3 card anchors ⇒ at least 3 hrefs
-        hrefs = re.findall(r'href="#exercise-\d+"', body)
+        hrefs = re.findall(r'href="[^"]*#exercise-\d+"', body)
         assert len(hrefs) >= 3, f"expected ≥3 #exercise anchors, got {len(hrefs)}"
 
     def test_stepper_has_feedback_anchor(self, client):

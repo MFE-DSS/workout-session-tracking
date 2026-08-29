@@ -96,10 +96,28 @@ def test_only_active_card_is_open_by_default(client):
         re.IGNORECASE,
     )
     cards = pattern.findall(body)
-    assert len(cards) == 3, f"expected 3 cards rendered, got {len(cards)}"
-    open_count = sum(1 for attrs in cards if re.search(r"\bopen\b", attrs))
-    assert open_count == 1, (
-        f"expected exactly 1 open card by default, got {open_count}"
+
+    # `DF-E` — L'INVARIANT EST DEVENU PLUS FORT, PAS PLUS FAIBLE.
+    #
+    # Cette garde comptait « exactement un `<details open>` parmi trois ».
+    # Elle supposait donc que les trois cartes SOIENT des `<details>` — et
+    # c'est exactement ce qui permettait à l'utilisateur d'en ouvrir une
+    # autre côté client, sans que le serveur l'active. On obtenait alors une
+    # seconde interface pour le même exercice.
+    #
+    # Depuis `DF-E`, dans une séance en cours, seule la carte ACTIVE est un
+    # `<details>` ; les autres sont des LIENS d'activation. L'état « ouvert
+    # mais pas actif » n'est plus exprimable, donc la garde n'a plus à le
+    # compter : elle vérifie qu'il n'existe QU'UNE carte dépliable, qu'elle
+    # est ouverte, et que les deux autres exercices sont atteignables.
+    assert len(cards) == 1, (
+        f"une seule carte doit être dépliable dans une séance en cours, {len(cards)} rendues"
+    )
+    assert re.search(r"\bopen\b", cards[0]), "la carte active n'est pas ouverte"
+
+    activate = re.findall(r'<a\b[^>]*\bexercise-card--activate\b[^>]*>', body)
+    assert len(activate) == 2, (
+        f"les 2 exercices non actifs doivent être des liens d'activation, {len(activate)} trouvés"
     )
 
 
@@ -172,7 +190,10 @@ def test_jump_bar_contains_one_item_per_exercise(client):
 
     body = _render(client, session_id)
     for ex_id in ex_ids:
-        assert f'href="#exercise-{ex_id}"' in body, (
+        # `DF-E` — on vise le FRAGMENT, pas l'href entier : le lien porte
+        # désormais `?active=` devant, et l'exiger absent revenait à interdire
+        # l'activation.
+        assert re.search(rf'href="[^"]*#exercise-{ex_id}"', body), (
             f"jump bar missing href to exercise {ex_id}"
         )
 
@@ -226,11 +247,25 @@ def test_jump_bar_anchors_match_exercise_anchors(client):
         session_id = session.id
 
     body = _render(client, session_id)
-    hrefs = set(re.findall(r'href="#exercise-(\d+)"', body))
+    # `DF-E` — le fragment est extrait QUEL QUE SOIT ce qui le précède.
+    # La garde épinglait `href="#exercise-N"` : la FORME, pas la propriété.
+    # Elle interdisait donc mécaniquement d'ajouter `?active=` — c'est-à-dire
+    # la seule chose qui rendait ce lien capable de tenir sa promesse.
+    hrefs = set(re.findall(r'href="[^"]*#exercise-(\d+)"', body))
     anchors = set(re.findall(r'id="exercise-(\d+)"', body))
     assert hrefs == anchors, (
         f"jump bar hrefs ({hrefs}) and anchors ({anchors}) diverge"
     )
+
+    # ET la propriété neuve, qui est le cœur de `DF-E` : chaque entrée du
+    # sélecteur DEMANDE L'ACTIVATION. Une ancre seule fait défiler sans rien
+    # activer — c'est le défaut que cette tranche ferme.
+    jump = re.findall(r'<a\b[^>]*\bex-jump__item\b[^>]*href="([^"]+)"', body) \
+        or re.findall(r'<a\b[^>]*href="([^"]+)"[^>]*\bex-jump__item\b', body)
+    targeted = [h for h in jump if "#exercise-" in h]
+    assert targeted, "aucune entrée du sélecteur ne vise un exercice"
+    for href in targeted:
+        assert "active=" in href, f"entrée de sélecteur sans activation : {href!r}"
 
 
 # ───────── prev / next buttons preserved ─────────

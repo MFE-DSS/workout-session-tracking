@@ -75,10 +75,10 @@ def test_jump_bar_marks_completed_exercise_as_done(client):
     body = client.get(f"/sessions/{sid}").text
     # E2 jump item must carry the --done modifier and 3/3
     assert re.search(
-        r'class="[^"]*ex-jump__item--done[^"]*"[^>]*href="#exercise-' + str(se_id) + r'"',
+        r'class="[^"]*ex-jump__item--done[^"]*"[^>]*href="[^"]*#exercise-' + str(se_id) + r'"',
         body,
     ) or re.search(
-        r'href="#exercise-' + str(se_id) + r'"[^>]*class="[^"]*ex-jump__item--done',
+        r'href="[^"]*#exercise-' + str(se_id) + r'"[^>]*class="[^"]*ex-jump__item--done',
         body,
     )
     # And the in-card progress should be 3/3 too (look for the ex-jump__prog spelling)
@@ -314,19 +314,26 @@ def test_history_empty_state_specific_to_completed_filter(client):
 def test_session_detail_has_warmup_and_work_subheaders(client):
     sid = _start(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    # Both group titles must show up at least once per card
-    # MIGRÉ — les sous-titres « Échauffement » / « Travail — console »
-    # disparaissent : la bande dit ✓ ● ○ sans en-tête de section. Le
-    # groupe échauffement reste NOMMÉ, dans sa ligne repliable.
-    assert "Échauffement" in body
-    # Warmup subheading appears for every exercise (7 cards in v10)
-    # MIGRÉ — les sous-titres `<h4>` par carte disparaissent : la carte
-    # active dit ✓ ● ○, et les cartes repliées nomment le TYPE sur chaque
-    # ligne (« Échauf. #1 » / « Série #1 »). L'information demeure, le
-    # titrage répété par exercice non.
-    assert body.count("Échauf.") >= 1
-    assert body.count("Échauffement") >= 1
-    # "Travail" heading now includes a C05 hint span; count the heading text
-    # MIGRÉ — le titre « Travail » par carte disparaît avec les autres
-    # sous-titres. Chaque ligne de série reste nommée « Série #n ».
-    assert body.count("Série") >= 7
+    # MIGRÉ deux fois, et il faut le dire clairement.
+    #
+    # 1. Les sous-titres `<h4>` par carte ont disparu : la bande dit ✓ ● ○.
+    # 2. `DF-E` a supprimé la SECONDE INTERFACE des cartes non actives —
+    #    la liste plate qui étiquetait « Échauf. #1 » / « Série #1 ». Ces
+    #    abréviations étaient précisément ce que `Q4` puis `DF-C` avaient
+    #    remplacé sur la carte active ; elles ne survivaient que là.
+    #
+    # Cette garde comptait donc des occurrences produites par l'ancien écran,
+    # sur SEPT cartes. Elle n'aurait rien vu si la carte active avait cessé
+    # de nommer ses types — c'est dire ce qu'elle gardait.
+    #
+    # La propriété, elle, n'a pas bougé : LE TYPE D'UNE SÉRIE EST NOMMÉ EN
+    # TOUTES LETTRES partout où des séries sont rendues.
+    assert "Échauffement" in body, "le groupe d'échauffement n'est plus nommé"
+
+    names = re.findall(r'<span class="sr-only">([^<]+)</span>', body)
+    typed = [n for n in names if "Échauffement" in n or "Série de travail" in n]
+    assert typed, f"aucune ligne de série ne nomme son type : {names}"
+    for n in typed:
+        assert not re.match(r"^[ÉS]\d", n.strip()), (
+            f"le type est redevenu un code technique : {n!r}"
+        )
