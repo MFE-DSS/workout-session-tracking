@@ -2159,6 +2159,14 @@ body.is-session-focus-mode .foot {
   font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--t-fg-muted);
+  /* `DF-C` — le code de ligne devient « glyphe + ordinal ». La mise en ligne
+     est ICI et non dans un second bloc plus bas : `css:S4666` a signalé la
+     duplication de sélecteur, et il avait raison — deux règles pour un même
+     sélecteur laissent croire à deux composants, et la seconde gagne en
+     silence sur toute propriété commune. */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .setline__done {
   font-family: var(--font-mono, ui-monospace, monospace);
@@ -3021,14 +3029,12 @@ body.is-session-focus-mode .foot {
    l'ordinal reste du texte, et les marqueurs `✓ / ● / ○` continuent de
    porter l'ÉTAT — trois porteurs, trois informations, aucune superposition.
 
+   La mise en ligne de `.setline__code` est restée avec sa règle d'origine
+   (~l. 2157) : un second bloc pour le même sélecteur est un défaut, pas une
+   organisation.
+
    `currentColor` : le glyphe hérite de la couleur de sa ligne, donc il suit
    l'état (passé atténué, courant vif) sans qu'aucune règle ne le répète. */
-
-.setline__code {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
 
 .setline__glyph {
   flex: 0 0 auto;
