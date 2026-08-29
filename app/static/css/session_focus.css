@@ -702,10 +702,15 @@
   font-size: 12px;
   color: var(--fg-dim, #6b7280);
   list-style: none;
-  /* Sb_30.5 — tap target ergonomique sur mobile (secondary action,
-     pas obligatoire 44x44 mais > 24px confortable). */
+  /* `DF-C` — plancher porté de 24 à 44 px.
+     Le commentaire `Sb_30.5` disait « pas obligatoire 44x44 » : c'est le
+     raisonnement WCAG 2.2 (24×24 avec exception d'espacement), pas le
+     standard PRODUIT d'AUREN, qui est 44 (`UIV3_TARGETS_44_01`). Le contrôle
+     mesurait 29 px de haut, visible, sur l'écran de séance.
+     Le marqueur est déjà redessiné en `::before` — relever le plancher ne
+     retire donc aucune affordance. */
   padding: 6px 4px;
-  min-height: 24px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
 }
@@ -2154,6 +2159,14 @@ body.is-session-focus-mode .foot {
   font-size: 12px;
   letter-spacing: 0.04em;
   color: var(--t-fg-muted);
+  /* `DF-C` — le code de ligne devient « glyphe + ordinal ». La mise en ligne
+     est ICI et non dans un second bloc plus bas : `css:S4666` a signalé la
+     duplication de sélecteur, et il avait raison — deux règles pour un même
+     sélecteur laissent croire à deux composants, et la seconde gagne en
+     silence sur toute propriété commune. */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 .setline__done {
   font-family: var(--font-mono, ui-monospace, monospace);
@@ -2948,3 +2961,95 @@ body.is-session-focus-mode .foot {
   border-color: var(--t-fg-dim, var(--fg-dim));
   color: var(--t-fg, var(--fg));
 }
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   `DF-C` — LES REPLIS DE L'ÉCRAN DE SÉANCE : PLANCHER TACTILE ET MARQUEUR.
+
+   Repliés dans DF-C sur ordre — « fold the 5 measured <summary> targets into
+   DF-C, do not create a separate target-size tranche ». Mesuré à 390 px sur
+   l'écran de séance :
+
+       « Note séance (optionnel) »               28 px
+       « Carnet d'entraînement et surcharge… »   39 px
+       « Plages de répétitions »                 20 px
+       « Séries d'approche (feeder sets) »       20 px
+
+   Ce sont des `<summary>` SANS CLASSE : ils héritaient de la hauteur de leur
+   texte. 20 px de haut pour un doigt, c'est une cible qu'on rate.
+
+   44 px = **standard produit AUREN** (`UIV3_TARGETS_44_01`), pas WCAG 2.2 qui
+   demande 24×24 avec exception d'espacement. Aucune non-conformité
+   réglementaire n'est corrigée ici — c'est notre plancher, pas celui de la
+   norme.
+
+   `:where()` maintient la spécificité à zéro : n'importe quel composant peut
+   redéfinir ces valeurs sans lutte de cascade.
+
+   ⚠ `display: flex` sur un `<summary>` SUPPRIME SON MARQUEUR NATIF — défaut
+   mesuré et corrigé en `UX4_02C`. On redessine donc le chevron ici même,
+   plutôt que de reproduire l'erreur pour gagner un alignement.
+   ════════════════════════════════════════════════════════════════════════ */
+
+:where(.session-feedback__note, .rule) > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  list-style: none;
+  cursor: pointer;
+}
+
+:where(.session-feedback__note, .rule) > summary::-webkit-details-marker {
+  display: none;
+}
+
+:where(.session-feedback__note, .rule) > summary::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 0;
+  height: 0;
+  border-left: 5px solid currentColor;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  transition: transform 120ms ease;
+}
+
+:where(.session-feedback__note, .rule)[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where(.session-feedback__note, .rule) > summary::before { transition: none; }
+}
+
+
+/* ── `DF-C` — le microglyphe de type, dans la ligne de série ──────────────
+   Le code de ligne devient « glyphe + ordinal ». Le glyphe porte le TYPE,
+   l'ordinal reste du texte, et les marqueurs `✓ / ● / ○` continuent de
+   porter l'ÉTAT — trois porteurs, trois informations, aucune superposition.
+
+   La mise en ligne de `.setline__code` est restée avec sa règle d'origine
+   (~l. 2157) : un second bloc pour le même sélecteur est un défaut, pas une
+   organisation.
+
+   `currentColor` : le glyphe hérite de la couleur de sa ligne, donc il suit
+   l'état (passé atténué, courant vif) sans qu'aucune règle ne le répète. */
+
+.setline__glyph {
+  flex: 0 0 auto;
+  /* Optiquement centré sur la ligne de base du chiffre voisin. */
+  transform: translateY(0.5px);
+}
+
+/* ⚠ PAS D'`opacity` SUR LE GLYPHE. J'avais posé `opacity: .85` sur
+   l'échauffement pour « le rendre plus discret » — une subtilité que personne
+   n'a demandée. Mesuré au pixel, elle rendait le porteur du TYPE plus faible
+   que l'ordinal qu'il accompagne : 9,10:1 contre 12,02:1 sur la ligne
+   courante, 2,25:1 contre 2,66:1 sur les futures.
+
+   Le glyphe REMPLACE un caractère ; il doit être aussi visible que lui, pas
+   moins. La discrétion des lignes futures est déjà portée par la couleur de
+   la ligne — c'est la dimension ÉTAT, et `currentColor` la suit toute seule.
+   Ajouter une atténuation par-dessus, c'était affaiblir la seule chose que
+   cette tranche installe. */

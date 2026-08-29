@@ -33,6 +33,46 @@
       série. La macro `preserve()` existe pour ça et n'est pas décorative.
    ==================================================================== #}
 
+{# ─── `DF-C` — LE TYPE DE SÉRIE SE VOIT, IL NE SE DÉCHIFFRE PAS ───────
+
+   `É1` / `S1` sont des abréviations : il faut les LIRE, puis les traduire.
+   Sur un téléphone, entre deux séries, la distinction préparation / travail
+   doit être perceptible avant la lecture.
+
+   DEUX DIMENSIONS, DEUX PORTEURS — et c'est ce qui rend la chose lisible :
+
+     * le TYPE (échauffement vs travail) → ce microglyphe ;
+     * l'ÉTAT (passé · courant · futur) → les marqueurs `✓ / ● / ○`, inchangés.
+
+   Le NUMÉRO reste typographique : `1`, `2`, `3`. Il est utile et n'a aucune
+   raison de devenir un dessin.
+
+   LES DEUX FORMES, et pourquoi elles se distinguent en NIVEAUX DE GRIS :
+
+     * échauffement — une RAMPE qui monte, trait ouvert, fine. La montée en
+       charge, ce qui prépare et n'est pas encore la charge de travail.
+     * travail — une BARRE pleine, horizontale, épaisse. La charge posée,
+       stable, calibrée.
+
+   Diagonale ouverte contre horizontale pleine : la différence est
+   d'ORIENTATION et de REMPLISSAGE, pas de teinte. Elle survit donc au
+   niveau de gris, et à un écran lu de biais dans une salle.
+
+   Aucun emoji, aucune flamme, aucune couleur neuve : `currentColor`, la même
+   géométrie sobre que les icônes de la coque (24×24, trait 1.7). #}
+{% macro set_glyph(kind) -%}
+  {%- if kind == 'warmup' -%}
+    <svg class="setline__glyph setline__glyph--warmup" viewBox="0 0 24 24"
+         width="18" height="18" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+         aria-hidden="true" focusable="false"><path d="M4 18 L20 6"/></svg>
+  {%- else -%}
+    <svg class="setline__glyph setline__glyph--work" viewBox="0 0 24 24"
+         width="18" height="18" fill="currentColor" stroke="none"
+         aria-hidden="true" focusable="false"><rect x="3" y="10" width="18" height="4" rx="1"/></svg>
+  {%- endif -%}
+{%- endmacro %}
+
 {# ─── valeurs conservées, ligne non saisissable ─────────────────────── #}
 {% macro set_values(sl) -%}
   <input type="hidden" name="set_{{ sl.id }}_weight_kg"
@@ -76,8 +116,8 @@
      une ancre sans cible ramène en haut de page. #}
   <li class="setline setline--past" id="set-{{ sl.id }}">
     <span class="setline__marker" aria-hidden="true">✓</span>
-    <span class="sr-only">{{ prefix }}{{ sl.set_index }} validée</span>
-    <span class="setline__code">{{ prefix }}{{ sl.set_index }}</span>
+    <span class="sr-only">{{ 'Échauffement' if prefix == 'É' else 'Série de travail' }} {{ sl.set_index }} — validée</span>
+    <span class="setline__code">{{ set_glyph('warmup' if prefix == 'É' else 'work') }}{{ sl.set_index }}</span>
     <span class="setline__done">
       {%- if sl.weight_kg is not none %}{{ '%g' % sl.weight_kg }}{% else %}—{% endif %}
       <span class="setline__x" aria-hidden="true">×</span>
@@ -94,8 +134,8 @@
 {% macro future_line(sl, prefix) -%}
   <li class="setline setline--future" id="set-{{ sl.id }}">
     <span class="setline__marker" aria-hidden="true">○</span>
-    <span class="sr-only">{{ prefix }}{{ sl.set_index }} à venir</span>
-    <span class="setline__code">{{ prefix }}{{ sl.set_index }}</span>
+    <span class="sr-only">{{ 'Échauffement' if prefix == 'É' else 'Série de travail' }} {{ sl.set_index }} — à venir</span>
+    <span class="setline__code">{{ set_glyph('warmup' if prefix == 'É' else 'work') }}{{ sl.set_index }}</span>
     {{ set_values(sl) }}
   </li>
 {%- endmacro %}
@@ -257,8 +297,8 @@
               {% elif cs.current_set and sl.id == cs.current_set.id %}
                 <li class="setline setline--current" id="set-{{ sl.id }}">
                   <span class="setline__marker setline__marker--current" aria-hidden="true">●</span>
-                  <span class="sr-only">Échauffement {{ sl.set_index }} en cours</span>
-                  <span class="setline__code">É{{ sl.set_index }}</span>
+                  <span class="sr-only">Échauffement {{ sl.set_index }} — en cours</span>
+                  <span class="setline__code">{{ set_glyph('warmup') }}{{ sl.set_index }}</span>
                   {{ set_inputs(sl, 'échauffement', None) }}
                 </li>
               {% else %}
@@ -284,8 +324,8 @@
                 id="set-{{ _c.id }}">
               <span class="setline__marker setline__marker--{{ 'rest' if cs.is_resting else 'current' }}"
                     aria-hidden="true">●</span>
-              <span class="sr-only">Série {{ _c.set_index }} — {% if cs.is_resting %}repos{% elif cs.is_correcting %}en correction{% else %}en cours{% endif %}</span>
-              <span class="setline__code">S{{ _c.set_index }}</span>
+              <span class="sr-only">Série de travail {{ _c.set_index }} — {% if cs.is_resting %}repos{% elif cs.is_correcting %}en correction{% else %}en cours{% endif %}</span>
+              <span class="setline__code">{{ set_glyph('work') }}{{ _c.set_index }}</span>
               {% if cs.is_resting %}
                 {{ set_values(_c) }}
                 {# `DF-B` — TOUCHER LA PROCHAINE SÉRIE, C'EST REPRENDRE.
@@ -334,9 +374,15 @@
                 </summary>
                 <ul class="warmup-recap__list">
                   {% for sl in cs.warmup_sets %}
+                    {# Le nom accessible est NÉCESSAIRE ici, pas décoratif :
+                       le glyphe est `aria-hidden`, donc sans lui cette ligne
+                       ne s'annoncerait plus que « 1 ». Elle disait « É1 »
+                       avant la substitution — retirer le code sans rendre le
+                       mot aurait appauvri la ligne au lieu de la traduire. #}
                     <li class="setline setline--warmup-done" id="set-{{ sl.id }}">
                       <span class="setline__marker" aria-hidden="true">✓</span>
-                      <span class="setline__code">É{{ sl.set_index }}</span>
+                      <span class="sr-only">Échauffement {{ sl.set_index }} — validé</span>
+                      <span class="setline__code">{{ set_glyph('warmup') }}{{ sl.set_index }}</span>
                       {{ set_inputs(sl, 'échauffement', None) }}
                     </li>
                   {% endfor %}
