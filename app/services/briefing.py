@@ -65,16 +65,36 @@ def _compact_scheme(template_exercise) -> str | None:
 
 
 def _last_time_chip(prior_summary: dict | None) -> str:
-    """Return ``"dernière fois 60 kg × 10"`` or ``"première fois"``."""
+    """Return ``"dernière fois 60 kg × 10"``, ``"première fois"`` ou ``"sans données"``.
+
+    `D2 = a`, tranché par l'opérateur.
+
+    LE DÉFAUT QUE CECI FERME. Cette fonction renvoyait ``"première fois"`` dans
+    TROIS situations distinctes : aucune séance antérieure · une séance
+    antérieure sans première série · une séance antérieure dont la série n'a ni
+    charge ni répétitions. Les deux dernières ne sont pas des premières fois —
+    l'utilisateur EST déjà venu, il n'a simplement rien noté.
+
+    La puce énonçait donc quelque chose de faux, et `DF-E` l'a rendu visible en
+    la posant à côté du bloc « Dernière fois », qui distinguait correctement les
+    cas : on lisait `première fois` et `aujourd'hui · aucune donnée saisie` sur
+    la même carte, à propos de la même donnée.
+
+    Trois états, trois libellés :
+
+      * aucune occurrence antérieure  → ``première fois``
+      * occurrence sans valeurs exploitables → ``sans données``
+      * occurrence avec valeurs → ``dernière fois 60 kg × 10``
+    """
     if not prior_summary:
         return "première fois"
     first = prior_summary.get("first_set")
     if not first:
-        return "première fois"
+        return "sans données"
     w = first.get("weight_kg")
     r = first.get("reps")
     if w is None or r is None:
-        return "première fois"
+        return "sans données"
     return f"dernière fois {_fmt_weight(w)} kg × {r}"
 
 

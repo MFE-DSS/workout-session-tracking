@@ -233,10 +233,32 @@ def test_session_detail_has_no_delta_without_prior(client):
 
 
 def test_session_detail_links_exercise_code_to_history_page(client):
+    """L'historique d'un exercice reste atteignable depuis la séance.
+
+    ⚠ `D1 = variante D`, tranché par l'opérateur : le lien d'historique
+    RÉPÉTÉ sur chaque carte repliée est retiré — il était dupliqué six fois
+    pour un accès que la carte ACTIVE porte déjà.
+
+    Cette garde visait `E2`, un exercice NON actif. Elle mesurait donc la
+    duplication, pas l'accès. La propriété réelle — « depuis la séance, on
+    atteint l'historique d'un exercice » — est vérifiée ici sur les deux
+    chemins qui la portent : l'exercice actif directement, et n'importe quel
+    autre après activation (le geste que `DF-E` a rendu possible).
+    """
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
-    # The E2 header should link to /exercise-history/push-a/E2
-    assert "/exercise-history/push-a/E2" in body
+    assert "/exercise-history/push-a/E1" in body, (
+        "l'exercice actif n'expose plus son historique"
+    )
+
+    import re as _re
+
+    target = _re.search(r'href="([^"]*\?active=\d+[^"]*)"', body)
+    assert target, "aucun lien d'activation — voir `DF-E`"
+    on_other = client.get(target.group(1).split("#", 1)[0]).text
+    assert _re.search(r"/exercise-history/push-a/E\d", on_other), (
+        "activer un autre exercice n'expose pas son historique"
+    )
 
 
 def test_progress_links_to_exercise_history_on_the_stable_identity(client):

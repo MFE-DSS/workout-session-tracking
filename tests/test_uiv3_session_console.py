@@ -188,9 +188,14 @@ def test_an_uncompleted_set_cannot_be_corrected():
 def test_exactly_one_dominant_command_per_state():
     from app.services.console_state import build_console_state, command_for
 
+    # `D3 = B`, tranché par l'opérateur sur trois variantes rendues à 360 px.
+    # Les codes `É`/`S` avaient quitté les lignes de série en `DF-C` ; le
+    # bouton continuait de les employer, si bien que plus rien à l'écran ne
+    # portait le nom qu'il annonçait. Le libellé reprend désormais le mot que
+    # le nom accessible emploie déjà.
     cases = [
-        (_exercise(), None, "VALIDER É1"),
-        (_exercise(warmups_done=1), None, "VALIDER S1"),
+        (_exercise(), None, "VALIDER ÉCHAUFFEMENT 1"),
+        (_exercise(warmups_done=1), None, "VALIDER SÉRIE 1"),
         (_exercise(warmups_done=1, works_done=3), "E2", "CONTINUER → E2"),
         (_exercise(warmups_done=1, works_done=3), None, "ALLER AU BILAN"),
     ]
