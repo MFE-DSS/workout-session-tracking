@@ -364,7 +364,16 @@ def test_placeholder_only_on_first_work_set_not_second(client):
     rows = re.findall(
         r'<li class="(?:setline|set-row) [^"]*"[^>]*>.*?</li>', body, re.DOTALL,
     )
-    assert len(rows) >= 3
+    # `DF-E` — le seuil était calibré sur un rendu où les cartes REPLIÉES
+    # contribuaient elles aussi des `set-row`. Elles sont devenues des liens
+    # d'activation : seules les lignes de la carte ACTIVE subsistent, et ce
+    # sont les seules que cette garde observe de toute façon — l'assertion
+    # qui suit exige « exactement UN porteur du placeholder », ce qui n'a de
+    # sens que sur la carte active.
+    #
+    # Deux lignes suffisent à la propriété : il en faut une première et une
+    # seconde pour vérifier que la SECONDE ne porte pas le marqueur.
+    assert len(rows) >= 2
     placeholder_rows = [r for r in rows if "set-row--has-overload-placeholder" in r]
     assert len(placeholder_rows) == 1, (
         f"only the first work set of the active card should carry the placeholder, "

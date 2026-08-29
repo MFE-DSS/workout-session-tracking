@@ -74,9 +74,21 @@
       {% for se in session.session_exercises %}
         {% set d, t = stats.per_exercise[se.id] %}
         {% set state = jump_states[se.id] %}
+        {# `DF-E` — `?active=`, PAS UNE ANCRE.
+
+           Ce lien portait `href="#exercise-N"` : une ancre pure. Elle faisait
+           défiler jusqu'à la carte et l'ouvrait visuellement, sans jamais
+           demander au serveur d'activer l'exercice. On atterrissait donc sur
+           la seconde interface — liste plate, pas d'`Adapter`, pas de
+           console. « Aller à un exercice » nommait une action que le lien
+           n'accomplissait pas.
+
+           Le fragment est CONSERVÉ après la requête : il place le regard sur
+           la bonne carte une fois la page rendue. C'est le rôle d'une ancre —
+           positionner, pas changer d'état. #}
         <a
           class="ex-jump__item session-focus__stepper-item ex-jump__item--{{ state }} session-focus__tap-target"
-          href="#exercise-{{ se.id }}"
+          href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#exercise-{{ se.id }}"
           {% if state == 'active' %}aria-current="location"{% endif %}
           aria-label="Exercice {{ se.exercise_code_snapshot }}, {{ d }} sur {{ t }} séries loggées, état {{ state }}"
         >

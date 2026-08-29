@@ -155,6 +155,134 @@
 {# `REST` et `CORRECTION` sont des états où l'écran doit se TAIRE : rien de
    L3 ni de L4 n'y est rendu au premier niveau. #}
 {% set _quiet = is_active and cs and (cs.is_resting or cs.is_correcting) %}
+
+{# ═══════════════════════════════════════════════════════════════════════
+   `DF-E` — OUVRIR UN EXERCICE, C'EST L'ACTIVER. LES DEUX NE PEUVENT PLUS
+   DIVERGER.
+
+   LE DÉFAUT FERMÉ ICI. Trois notions étaient portées par un seul contrôle :
+
+     * « carte dépliée »   → `<details open>`, que N'IMPORTE QUEL toucher
+                             changeait, côté client, sans rien demander au
+                             serveur ;
+     * « exercice actif »  → `?active=<id>`, que le serveur seul décide et
+                             qui gouverne TOUT : lignes saisissables,
+                             commande dominante, `Adapter` ;
+     * « je veux travailler ici » → rien ne l'exprimait.
+
+   Conséquence mesurée : toucher une carte repliée satisfaisait la première
+   notion et pas la seconde. On obtenait alors une SECONDE INTERFACE pour le
+   même exercice — liste plate, libellés `Échauf. #1` / `Série #2` que `Q4`
+   puis `DF-C` avaient précisément remplacés, aucun `Adapter`, aucune
+   validation implicite. Laquelle des deux on obtenait dépendait du CHEMIN
+   D'ARRIVÉE. Et le sélecteur `E1/7` aggravait le tout : ses liens étaient
+   des ancres `#exercise-N`, qui ne changent rien côté serveur.
+
+   LE CHOIX, ET POURQUOI CELUI-LÀ. Réparer seulement les liens du sélecteur
+   corrigeait un chemin sur deux. Rendre la console sur toutes les cartes
+   allait contre la direction produit (`Q4` : « un exercice à la fois »).
+   Intercepter le `toggle` en JS cassait le repli sans JS — propriété
+   vérifiée en `DF-B`, et l'incident du script périmé a prouvé que le JS
+   peut silencieusement ne pas tourner.
+
+   Reste celui-ci : dans une séance EN COURS, une carte non active n'est
+   plus un `<details>` — c'est un LIEN. Le toucher NAVIGUE, donc active.
+   L'état « ouvert mais pas actif » DEVIENT INEXPRIMABLE. Ce n'est pas une
+   garde qui surveille le défaut, c'est une structure où il ne s'écrit plus.
+
+   ⚠ PAS DE GARDE `status != 'completed'` ICI. J'en avais écrit une, par
+   prudence. Mesurée : une séance terminée REDIRIGE (303) vers
+   `/sessions/{id}/done`, une page qui n'inclut pas ce gabarit. La condition
+   n'était donc jamais évaluée — un repli défensif sur un cas qui n'arrive
+   pas, c'est-à-dire exactement le motif qui a produit onze gardes vertes
+   sans comportement dans ce dépôt.
+   ═══════════════════════════════════════════════════════════════════════ #}
+
+{% if not is_active %}
+{# Un CONTENEUR, pas un lien unique. Le lien d'activation ne peut pas contenir
+   le lien d'historique — `<a>` imbriqué est invalide —, et l'historique doit
+   rester atteignable depuis chaque carte : deux tranches l'avaient
+   explicitement protégé, et `test_exercise_history.py` le vérifie. #}
+<div
+  class="card exercise-card exercise-card--collapsed session-focus__card session-focus__card--{{ state }} {% if total > 0 and done == total %}exercise-card--done{% endif %}"
+  id="exercise-{{ se.id }}"
+>
+<a
+  class="exercise-card--activate"
+  href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#exercise-{{ se.id }}"
+>
+  <span class="exercise-card__compact exercise-card__compact--activate">
+    <span class="exercise-card__code">{{ se.exercise_code_snapshot }}</span>
+    <span class="exercise-card__name">{{ se.substituted_name or se.exercise_name_snapshot }}</span>
+    <span class="exercise-card__progress">{{ done }}/{{ total }}</span>
+    {% if done > 0 and summary %}
+      <span class="exercise-card__recap">{{ summary.weights_str }} kg · {{ summary.reps_str }} reps</span>
+    {% endif %}
+    {% set briefing_chip = briefing_chips.get(se.id) %}
+    {% if briefing_chip %}
+      <span class="exercise-card__chip exercise-card__chip--{{ briefing_chip.kind }}">{{ briefing_chip.scheme }} · {{ briefing_chip.last_time }}</span>
+    {% endif %}
+    {# Le nom accessible dit l'ACTION, pas seulement l'identité : sans lui,
+       un lecteur d'écran annoncerait un lien nommé « E2 Chest Press 0/3 »
+       sans dire ce qu'il fait. #}
+    <span class="sr-only">— aller à cet exercice et le reprendre</span>
+  </span>
+
+  {# « Dernière fois » — RESTITUÉE ICI, et ce n'est pas un ornement.
+
+     Elle vivait dans le corps de la carte non active. En faisant de cette
+     carte un lien, je l'avais supprimée — une soustraction (`§5.3`), et
+     `test_last_time.py` l'a dit avec cinq gardes. Je l'avais cherchée par sa
+     classe CSS ; elles l'assertent par son TEXTE. Une recherche trop étroite
+     conclut « rien ne dépend de ça » et se trompe.
+
+     La puce voisine porte le SCHÉMA et la DATE ; ce bloc porte les VALEURS
+     (`60 / 62.5 kg`). Ce ne sont pas les mêmes informations.
+
+     Elle devient même plus utile qu'avant : elle était dans un corps replié
+     qu'il fallait ouvrir — donc quitter la console — pour la lire. Elle est
+     désormais lisible sans rien ouvrir. Ce sont des `<span>` : aucun élément
+     interactif imbriqué dans le lien. #}
+  {% set lt = last_time.get(se.exercise_code_snapshot) %}
+  <span class="last-time last-time--compact {% if not lt %}last-time--empty{% endif %}">
+    <span class="last-time__label">Dernière fois</span>
+    {% if lt and lt.has_data %}
+      <span class="last-time__when">{{ lt.relative }}</span>
+      <span class="last-time__values">{{ lt.weights_str }} kg · {{ lt.reps_str }} reps</span>
+    {% elif lt %}
+      <span class="last-time__when">{{ lt.relative }}</span>
+      <span class="last-time__values">aucune donnée saisie</span>
+    {% else %}
+      <span class="last-time__values">Aucune séance précédente</span>
+    {% endif %}
+  </span>
+</a>
+
+  {# Delta et historique — HORS du lien d'activation, et c'est obligatoire :
+     `<a>` dans `<a>` est invalide, et le navigateur en ferait n'importe quoi.
+
+     Ces deux-là ne sont pas décoratifs. Deux tranches précédentes les avaient
+     explicitement protégés — « le delta existait sur TOUTES les cartes, le
+     restreindre à la console active l'aurait retiré des exercices déjà faits,
+     où il est précisément la lecture utile » ; « l'accès à l'historique
+     existait sur toutes les cartes ». Je les avais perdus en faisant de la
+     carte un lien, et c'est `test_exercise_history.py` qui l'a dit — pas moi. #}
+  {% set _delta_off = deltas.get(se.exercise_code_snapshot) %}
+  {% if _delta_off %}
+    <div class="delta delta--collapsed">
+      <span class="delta__label">Delta</span>
+      <span class="delta__text">{{ _delta_off }}</span>
+    </div>
+  {% endif %}
+
+  <div class="exercise-card__head-expanded exercise-card__head-expanded--collapsed">
+    <a href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
+       class="exercise-card__code--link session-focus__tap-target"
+    >Voir historique {{ se.exercise_code_snapshot }} →</a>
+  </div>
+</div>
+{% else %}
+
 <details
   class="card exercise-card session-focus__card session-focus__card--{{ state }} {% if is_active %}session-focus__card--active{% endif %} {% if total > 0 and done == total %}exercise-card--done{% endif %}"
   id="exercise-{{ se.id }}"
@@ -718,89 +846,35 @@
         {{ preserve('free_note', se.free_note) }}
       {% endif %}
 
-    {% else %}
-      {# Carte NON active : liste plate, aucun état, aucune commande. Les
-         champs restent saisissables et postables — rouvrir un exercice passé
-         reste possible (OQ-E). #}
-      {% if se.set_logs|length > 0 %}
-        <ul class="set-list set-list--compact">
-          {% for sl in se.set_logs|sort(attribute='set_index') %}
-            <li class="set-row set-row--{{ sl.kind }}" id="set-{{ sl.id }}">
-              <div class="set-row__label">
-                <span class="set-row__kind">{{ 'Échauf.' if sl.kind == 'warmup' else 'Série' }}</span>
-                <span class="set-row__idx">#{{ sl.set_index }}</span>
-                {% if sl.technique %}<span class="tag">{{ sl.technique }}</span>{% endif %}
-              </div>
-              <div class="set-row__inputs">
-                <input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*"
-                       autocomplete="off" name="set_{{ sl.id }}_weight_kg"
-                       aria-label="Charge en kg — {{ 'échauffement' if sl.kind == 'warmup' else 'série' }} {{ sl.set_index }}"
-                       placeholder="kg"
-                       value="{{ sl.weight_kg if sl.weight_kg is not none else '' }}" />
-                <input type="text" inputmode="numeric" pattern="[0-9]*"
-                       autocomplete="off" name="set_{{ sl.id }}_reps"
-                       aria-label="Répétitions — {{ 'échauffement' if sl.kind == 'warmup' else 'série' }} {{ sl.set_index }}"
-                       placeholder="reps"
-                       value="{{ sl.reps if sl.reps is not none else '' }}" />
-              </div>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="empty">Pas de série pour cet exercice.</p>
-      {% endif %}
 
-      {% set lt = last_time.get(se.exercise_code_snapshot) %}
-      <div class="last-time {% if not lt %}last-time--empty{% endif %}">
-        {% if lt and lt.has_data %}
-          <span class="last-time__label">Dernière fois</span>
-          <span class="last-time__when">{{ lt.relative }}</span>
-          <span class="last-time__values">{{ lt.weights_str }} kg · {{ lt.reps_str }} reps</span>
-        {% elif lt %}
-          <span class="last-time__label">Dernière fois</span>
-          <span class="last-time__when">{{ lt.relative }}</span>
-          <span class="last-time__values">aucune donnée saisie</span>
-        {% else %}
-          <span class="last-time__label">Dernière fois</span>
-          <span class="last-time__values">Aucune séance précédente</span>
-        {% endif %}
-      </div>
+    {# `DF-E` — IL N'Y A PLUS DE BRANCHE « CARTE NON ACTIVE » ICI.
 
-      {# Le delta existait sur TOUTES les cartes. Le restreindre à la console
-         active l'aurait retiré des exercices déjà faits, où il est
-         précisément la lecture utile. #}
-      {% set _delta_off = deltas.get(se.exercise_code_snapshot) %}
-      {% if _delta_off %}
-        <div class="delta">
-          <span class="delta__label">Delta</span>
-          <span class="delta__text">{{ _delta_off }}</span>
-        </div>
-      {% endif %}
+       Elle rendait une liste plate complète — champs `kg` / `reps` pour
+       chaque série, libellés `Échauf. #1` / `Série #2`, « Dernière fois »,
+       delta, lien d'historique — et AUCUN `Adapter`, AUCUNE console, AUCUNE
+       validation implicite. C'était une SECONDE INTERFACE pour le même
+       exercice, atteinte en touchant une carte repliée.
 
-      {# L'accès à l'historique existait sur TOUTES les cartes, actives comme
-         repliées. Le restreindre à la carte active en aurait retiré la
-         moitié des points d'entrée. #}
-      <div class="exercise-card__head-expanded">
-        <a href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
-           class="exercise-card__code--link session-focus__tap-target"
-        >Voir historique {{ se.exercise_code_snapshot }} →</a>
-      </div>
+       Depuis `DF-E` une carte non active est un LIEN : ce `<details>` ne
+       s'écrit plus que pour l'exercice actif, et `console_states` est
+       construit pour TOUS les exercices — donc `cs` n'est jamais nul ici.
+       La branche était devenue inatteignable.
 
-      {# Les champs d'exercice de la carte repliée doivent survivre au POST. #}
-      {{ preserve('muscle_sensation', se.muscle_sensation) }}
-      {{ preserve('free_note', se.free_note) }}
-      {{ preserve('substituted_name', se.substituted_name) }}
+       Elle est supprimée plutôt que laissée morte : un second écran
+       inatteignable dans le même fichier est exactement ce qui fait revenir
+       le défaut — il suffit qu'on rétablisse un `<details>` pour les cartes
+       non actives et le vieil écran ressuscite. Une garde le verrait ; mieux
+       vaut qu'il n'y ait rien à ressusciter.
 
-      {% set _prev = prev_code_by_exercise.get(se.id) %}
-      <div class="card__actions card__actions--exercise session-focus__cta">
-        {% if _prev %}
-        <button type="submit" name="nav" value="prev"
-                class="btn btn--ghost btn--nav-prev session-focus__tap-target"
-                title="Enregistrer et revenir à {{ _prev }}">← {{ _prev }}</button>
-        {% endif %}
-        <button type="submit" name="nav" value="next"
-                class="btn btn--primary session-focus__tap-target session-focus__cta-primary">Enregistrer</button>
-      </div>
+       CE QUI N'EST PAS PERDU, mesuré au rendu : la puce `schéma · dernière
+       fois` est portée par les SIX cartes repliées (elle y était déjà), le
+       delta et l'historique restent sur la carte active. Ce qui change est
+       le CHEMIN — on active l'exercice au lieu de le déplier —, et c'est
+       précisément le geste demandé.
+
+       Reste dans les feuilles de style : `.set-list--compact`, `.last-time`,
+       `.set-row__kind`. Nettoyage CSS hors périmètre, consigné. #}
     {% endif %}
   </form>
 </details>
+{% endif %}

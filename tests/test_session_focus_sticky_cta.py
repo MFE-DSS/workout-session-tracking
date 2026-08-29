@@ -84,7 +84,12 @@ def test_cta_wrapper_carries_focus_hooks(client):
     # commande contextuelle existe ». Elle existe, et la barre collante est
     # supprimée : mesurée, elle recouvrait la ligne `É1`.
     body = _render(client, session_id)
-    assert "session-focus__cta" in body      # cartes repliées : wrapper conservé
+    # `DF-E` — le wrapper `session-focus__cta` vivait sur les CARTES REPLIÉES,
+    # qui sont désormais des liens d'activation sans aucun submit. Il n'existe
+    # plus. Ce que la garde protège — « les actions d'exercice vivent dans un
+    # conteneur nommé, la barre collante reste supprimée, la carte active a UNE
+    # commande » — reste vrai et s'énonce sur les porteurs actuels.
+    assert "dock__secondary" in body         # sorties alternatives, regroupées
     assert "session-focus__sticky-cta" not in body
     assert "dock__cmd" in body               # carte active : commande unique
 
@@ -99,17 +104,21 @@ def test_primary_button_carries_focus_cta_primary(client):
         session_id = session.id
 
     body = _render(client, session_id)
-    # The Sb_29.3 primary CTA marker class
-    assert "session-focus__cta-primary" in body
-    # Sb_29.1 tap-target class still present on the same button
+    # `DF-E` — LE PORTEUR A CHANGÉ, LA PROPRIÉTÉ NON.
+    # `session-focus__cta-primary` marquait le submit de la carte REPLIÉE, qui
+    # est devenue un lien d'activation sans submit. La commande dominante de
+    # l'exercice est désormais `dock__cmd`, sur la carte active.
     pattern = re.compile(
-        r'<button\b[^>]*\bclass="[^"]*session-focus__cta-primary[^"]*"',
+        r'<button\b[^>]*\bclass="[^"]*\bdock__cmd\b[^"]*"[^>]*>',
         re.IGNORECASE,
     )
     m = pattern.search(body)
-    assert m is not None, "no <button> found with session-focus__cta-primary"
-    assert "session-focus__tap-target" in m.group(0), (
-        "primary CTA button should also keep session-focus__tap-target"
+    assert m is not None, "aucune commande dominante rendue"
+    assert 'type="submit"' in m.group(0), (
+        "la commande dominante doit rester un submit natif"
+    )
+    assert 'name="nav"' in m.group(0), (
+        "la commande dominante doit porter la navigation qu'elle déclenche"
     )
 
 
@@ -124,12 +133,26 @@ def test_prev_and_next_button_attributes_preserved(client):
         session_id = session.id
 
     body = _render(client, session_id)
-    # the active card is the first exercise; it has a `next` button.
-    # the second exercise has a `prev` button on its own form.
     assert 'name="nav"' in body
     assert 'value="next"' in body
-    # second exercise carries the prev button
-    assert 'value="prev"' in body, (
+
+    # `DF-E` — `value="prev"` était porté par la carte REPLIÉE du second
+    # exercice. Les cartes repliées n'ont plus de submit ; « enregistrer et
+    # revenir » vit désormais sur le dock de la carte ACTIVE, et n'existe que
+    # là où un exercice PRÉCÉDENT existe. On active donc le second exercice —
+    # ce qui teste le porteur réel au lieu d'un marqueur résiduel.
+    from sqlalchemy import select
+
+    from app.database import SessionLocal as _SL
+    from app.models.session import SessionExercise as _SE
+
+    with _SL() as db:
+        second = db.execute(
+            select(_SE).where(_SE.session_id == session_id)
+            .order_by(_SE.position.asc()).offset(1).limit(1)).scalar_one()
+        second_id = second.id
+    on_second = client.get(f"/sessions/{session_id}?active={second_id}").text
+    assert 'value="prev"' in on_second, (
         "« enregistrer et revenir » est une capacité préexistante : la "
         "retirer serait une soustraction (CLAUDE.md §5.3)"
     )
@@ -321,8 +344,7 @@ def test_cta_button_remains_inside_form(client):
     # the cta-primary button.
     # MIGRÉ — l'invariant est que la commande vit DANS le formulaire qu'elle
     # soumet ; le marqueur de collant, lui, a disparu avec le collant.
-    matched = [f for f in forms if "dock__cmd" in f
-               or "session-focus__cta-primary" in f]
+    matched = [f for f in forms if "dock__cmd" in f]
     assert matched, "aucune commande ne vit dans un formulaire d'exercice"
 
 

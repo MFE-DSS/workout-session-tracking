@@ -3053,3 +3053,58 @@ body.is-session-focus-mode .foot {
    la ligne — c'est la dimension ÉTAT, et `currentColor` la suit toute seule.
    Ajouter une atténuation par-dessus, c'était affaiblir la seule chose que
    cette tranche installe. */
+
+
+/* ════════════════════════════════════════════════════════════════════════
+   `DF-E` — LA CARTE REPLIÉE EST UN LIEN D'ACTIVATION.
+
+   Dans une séance en cours, un exercice non actif n'est plus un `<details>`
+   mais un `<a>`. Le geste de l'utilisateur ne change pas — on touche la
+   carte —, seul le résultat change : au lieu d'ouvrir une seconde interface
+   côté client, on NAVIGUE, donc le serveur active l'exercice.
+
+   PARITÉ VISUELLE VOULUE. Rien ne doit bouger à l'écran : c'est le même
+   objet, au même endroit, avec le même contenu. Un `<a>` étant `inline` par
+   défaut et portant soulignement et couleur de lien, ces trois-là sont
+   ramenés à ce que la carte faisait déjà. Aucune couleur n'est introduite.
+
+   La cible tactile est la carte entière — bien au-delà du plancher de 44 px
+   (`UIV3_TARGETS_44_01`), et sans qu'aucune règle n'ait à le déclarer.
+   ════════════════════════════════════════════════════════════════════════ */
+
+.exercise-card--activate {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Le retour au toucher : la carte s'enfonce très légèrement. Pas de couleur,
+   pas d'ombre neuve — un déplacement, que le mode « mouvement réduit »
+   neutralise plus bas. */
+.exercise-card--activate:active {
+  transform: translateY(1px);
+}
+
+.exercise-card--activate:focus-visible {
+  outline: 2px solid var(--color-accent, var(--accent));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exercise-card--activate:active { transform: none; }
+}
+
+/* « Dernière fois » dans le lien d'activation. Une ligne, pas un bloc : elle
+   était auparavant dans un corps replié qu'il fallait ouvrir pour la lire,
+   donc quitter la console. La rendre visible ne doit pas pour autant coûter
+   la densité que `DF-B` a mesurée — d'où la mise en ligne et la taille
+   réduite. Aucune couleur neuve : les tokens sont ceux du bloc d'origine. */
+.exercise-card--activate .last-time--compact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 0 var(--space-md, 12px);
+  font-size: 12px;
+}

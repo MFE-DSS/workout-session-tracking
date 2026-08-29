@@ -107,8 +107,21 @@ def test_chip_absent_on_completed_card(client):
     r = client.get(f"/sessions/{sid}?active={ex_ids[1]}")
     body = r.text
     # Isolate E1's card markup and assert no chip.
+    # `DF-E` — une carte non active n'est plus un `<details>` mais un LIEN
+    # d'activation. La propriété gardée ici — « une carte terminée porte le
+    # récapitulatif, pas la puce » — ne dépend pas de la balise ; l'expression
+    # épinglait la FORME. On extrait donc la carte quelle que soit sa balise.
+    # On extrait la LIGNE D'IDENTITÉ de la carte, quelle que soit la balise
+    # qui la porte : `<details>` pour la carte active, `<div>` conteneur pour
+    # une carte repliée depuis `DF-E`. La propriété — « une carte terminée
+    # porte le récapitulatif, pas la puce » — ne dépend d'aucune des deux.
     m = re.search(
-        r'<details[^>]*id="exercise-%d"[^>]*>.*?</summary>' % ex_ids[0],
+        rf'id="exercise-{ex_ids[0]}"'
+        r'.*?<span class="exercise-card__compact[^"]*">(.*?)</span>\s*</',
+        body,
+        re.DOTALL,
+    ) or re.search(
+        rf'<details[^>]*id="exercise-{ex_ids[0]}"[^>]*>.*?</summary>',
         body,
         re.DOTALL,
     )

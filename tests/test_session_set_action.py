@@ -334,7 +334,58 @@ def test_the_dominant_command_has_an_accessible_name(client):
 
 
 def test_set_inputs_keep_their_accessible_names(client):
+    """TOUT champ de série rendu nomme son type et son rang.
+
+    ⚠ `DF-E` — cette garde cherchait « Charge en kg — série » sur une séance
+    NEUVE, dont l'exercice actif n'a qu'un ÉCHAUFFEMENT en cours. Elle
+    passait donc grâce aux listes plates des AUTRES cartes : la seconde
+    interface que `DF-E` a supprimée. Elle mesurait l'ancien écran en croyant
+    mesurer le nouveau.
+
+    La propriété réelle ne dépend d'aucun état particulier : aucun champ de
+    série ne doit être rendu sans nom accessible. On la vérifie sur ce qui
+    est effectivement rendu, puis on force un état où une SÉRIE DE TRAVAIL
+    est courante pour couvrir aussi ce libellé-là.
+    """
     sid = _start(client)
-    body = client.get(f"/sessions/{sid}").text
-    assert "Charge en kg — série" in body
-    assert "Répétitions — série" in body
+
+    def _labels(body: str) -> list[str]:
+        fields = re.findall(
+            r'<input[^>]*name="set_\d+_(?:weight_kg|reps)"[^>]*>', body)
+        visible = [f for f in fields if 'type="hidden"' not in f]
+        assert visible, "aucun champ de série rendu — la garde ne mesure rien"
+        out = []
+        for f in visible:
+            m = re.search(r'aria-label="([^"]+)"', f)
+            assert m, f"champ de série sans nom accessible : {f[:110]!r}"
+            out.append(m.group(1))
+        return out
+
+    seen = _labels(client.get(f"/sessions/{sid}").text)
+    assert any("échauffement" in x for x in seen), seen
+
+    # Amener une série de TRAVAIL à l'état courant, par la vraie soumission —
+    # cumulative, sinon chaque envoi effacerait les séries précédentes.
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SetLog
+
+    se_id, works = _first_exercise(sid)
+    with SessionLocal() as db:
+        warm = db.execute(
+            select(SetLog)
+            .where(SetLog.session_exercise_id == se_id, SetLog.kind != "work")
+            .order_by(SetLog.set_index.asc())
+        ).scalars().all()
+        ordered = [s.id for s in warm] + [w[0] for w in works[:1]]
+
+    data: dict[str, str] = {"nav": "stay_norest"}
+    for set_id in ordered:
+        data[f"set_{set_id}_weight_kg"] = "40"
+        data[f"set_{set_id}_reps"] = "10"
+        client.post(f"/sessions/{sid}/exercises/{se_id}", data=dict(data),
+                    follow_redirects=False)
+
+    seen = _labels(client.get(f"/sessions/{sid}").text)
+    assert any("série" in x for x in seen), seen

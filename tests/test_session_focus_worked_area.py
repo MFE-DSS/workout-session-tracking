@@ -254,7 +254,7 @@ class TestInvariantsIntact:
 
     def test_anchors_preserved(self, client):
         body = _body(client, n=2)
-        assert len(re.findall(r'href="#exercise-\d+"', body)) >= 2
+        assert len(re.findall(r'href="[^"]*#exercise-\d+"', body)) >= 2
 
     def test_session_feedback_preserved(self, client):
         assert 'id="session-feedback"' in _body(client)

@@ -213,12 +213,21 @@ def test_primary_cta_is_type_submit(client):
         session_id = session.id
 
     body = _render(client, session_id)
+    # `DF-E` — LE PORTEUR A CHANGÉ, LA PROPRIÉTÉ NON.
+    #
+    # `session-focus__cta-primary` marquait le submit de la CARTE REPLIÉE.
+    # Depuis `DF-E`, une carte non active est un LIEN d'activation : elle n'a
+    # plus de submit, et ce marqueur n'existe plus nulle part.
+    #
+    # La capacité, elle, survit — sur le dock de la carte ACTIVE. On vise donc
+    # ce que la propriété DIT (« un submit qui avance d'un exercice »), pas le
+    # nom de classe que portait son ancien support.
     m = re.search(
-        r'<button\b[^>]*\bsession-focus__cta-primary\b[^>]*>',
+        r'<button\b[^>]*\bname="nav"[^>]*\bvalue="next"[^>]*>',
         body,
         re.IGNORECASE,
     )
-    assert m is not None
+    assert m is not None, "aucun submit n'avance à l'exercice suivant"
     assert 'type="submit"' in m.group(0), "primary CTA must remain type=submit"
 
 

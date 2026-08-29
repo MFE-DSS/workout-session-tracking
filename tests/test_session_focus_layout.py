@@ -362,11 +362,13 @@ def test_anchors_for_each_exercise(client):
         # we created exactly one exercise; capture its id
         first_se_id = session.session_exercises[0].id
 
+    import re as _re
+
     body = client.get(f"/sessions/{session_id}").text
     # anchor target
     assert f'id="exercise-{first_se_id}"' in body
     # jump bar href to that anchor
-    assert f'href="#exercise-{first_se_id}"' in body
+    assert _re.search(rf'href="[^"]*#exercise-{first_se_id}"', body)
 
 
 def test_owner_isolation_unaffected(client):
