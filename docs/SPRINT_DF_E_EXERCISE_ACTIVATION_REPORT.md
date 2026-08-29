@@ -251,3 +251,76 @@ suivre les liens.
   vérifie. La réserve est **close par effet de bord**, pas par une commande.
 * **Nettoyage CSS** des classes de l'ancienne interface.
 * **`DF-D`** — repos adaptatif : tranche suivante.
+
+
+---
+
+## 11. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#176** |
+| Merge | **`6939854`** — `--merge`, tête épinglée `9c4845a`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | **9/9 `pass`**, **aucun cycle rouge** |
+| Gate Sonar (PR) | **`OK`** — 0 bug · **0 code smell** · 0 vulnérabilité · duplication 0,0 % |
+| CI canonique (`push` sur le merge) | run **33269633223** — **succès, 6/6 jobs** |
+| Full sweep local | **290/290 fichiers verts**, pic 1542 Mo / 2017 |
+| Fils de revue non résolus | **0** |
+
+### Aucun cycle rouge, et pourquoi
+
+`DF-C` avait coûté un cycle CI. `DF-E` n'en coûte aucun — non parce que la
+tranche était plus simple, mais parce que le **sweep complet local** avait
+déjà trouvé les dix gardes rouges. Il a fallu **trois passes** de sweep pour y
+arriver, et c'est le vrai enseignement d'opération de cette tranche.
+
+### Ce que cette tranche laisse au dépôt
+
+**Huit fautes, dont deux qui dominent** — et elles se résument en deux
+énoncés :
+
+> **Une garde qui construit elle-même l'état qu'elle observe ne teste que le
+> serveur.** Deux de mes gardes fabriquaient l'URL `?active=N` ; le routeur
+> l'a toujours honorée, donc elles restaient **vertes avec le défaut
+> intégralement rétabli**. Le défaut vivait dans ce que l'écran **propose**.
+
+> **Un sweep ciblé ne borne pas un rayon d'impact : il borne ce qu'on a pensé à
+> regarder.** Quinze fichiers, tous verts — et dix gardes rouges dans cinq
+> fichiers absents de ma liste, dont **deux capacités réelles supprimées**.
+
+S'y ajoute une faute de rapport : j'ai annoncé « CTA 16 → 4 » sur un comptage
+du **DOM**, pas des contrôles visibles. Douze éléments interactifs quittent
+bien la page — ce qui compte pour le clavier et les lecteurs d'écran — mais
+l'utilisateur n'en a jamais vu seize.
+
+### Une découverte hors périmètre, faite par le rendu
+
+Le comparatif de densité a mis la puce et « Dernière fois » **côte à côte**, et
+elles se **contredisent** : la puce affiche `première fois` là où le bloc dit
+`aujourd'hui · aucune donnée saisie`. Les deux lisent pourtant la **même**
+donnée. `_last_time_chip()` renvoie `"première fois"` dès qu'il n'y a pas de
+valeurs saisies, sans distinguer « aucune séance antérieure » de « séance
+antérieure sans données ».
+
+**La puce énonce donc quelque chose de faux.** `DF-E` ne l'a pas créé — il l'a
+rendu visible en le posant à côté de la vérité. Correctif de quelques lignes
+dans `briefing.py`, mais c'est une **règle d'affichage** : soumis à arbitrage,
+non tranché.
+
+### Reste ouvert
+
+* **Arbitrage densité** — quatre variantes rendues à 390 px : livrée 4,15 écr ·
+  sans « Dernière fois » 3,78 · sans étiquette 3,98 · sans historique 3,78.
+* **Arbitrage puce contradictoire** — ci-dessus.
+* **`VALIDER É1`** — arbitrage de `DF-C`, toujours ouvert.
+* **`DF-D`** — repos adaptatif. **Bloqué par les données, pas par le code** :
+  le champ `chain` du registre ne couvre que **48 / 86 exercices (55 %)**, et
+  les 38 manquants sont **les plus lourds** (Leg Press, Hack Squat, Squat
+  Smith, Hip thrust Smith). Une règle fondée sur `chain` renverrait donc au
+  repli de 90 s exactement les exercices qui en demandent le plus. Le schéma de
+  répétitions couvre **68 / 86 (79 %)** et reste le seul axe exploitable en
+  l'état. C'est la mesure de l'audit `EXERCISE_PROPERTIES_COVERAGE_AUDIT`, que
+  le dépôt avait consigné sans jamais l'exécuter.
+* **Nettoyage CSS** des classes de l'ancienne interface.
+* **Déploiement** : `6939854` **n'est pas en production** — le dernier
+  déploiement est `32cf5ee`.
