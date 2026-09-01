@@ -24,8 +24,84 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # ════════════════════════════════════════════════════════════════════════
+  # Sx_CI_CANONICAL_DEDUP_01 — ne pas recalculer le même verdict.
+  #
+  # MESURÉ sur 60 runs (2026-08-23 → 08-31) : le re-run canonique après merge
+  # consomme 39 % de tout le temps de runner, et sur les 20 derniers merges
+  # **19 rejouaient un arbre identique À L'OCTET** à celui que la CI de PR
+  # venait de valider. Une exécution sur un arbre identique ne peut pas, par
+  # construction, produire une information susceptible de changer le verdict.
+  #
+  # Ce job ne tourne QUE sur `push`. Sur une PR il est ignoré, et les shards
+  # tournent comme avant — leur `if:` le prévoit explicitement.
+  #
+  # ⚠ LA PROTECTION DE BRANCHE NE GARANTIT RIEN ICI. Mesuré le 2026-09-01 :
+  # `strict = false` (GitHub n'exige pas qu'une branche soit à jour avant
+  # merge), `enforce_admins = false`, aucune revue requise, push direct non
+  # bloqué. Le taux de 19/20 est une CONSÉQUENCE de l'usage séquentiel, pas un
+  # invariant appliqué — la vérification d'arbre ne peut donc jamais être
+  # sautée. Elle EST le garde-fou.
+  # ════════════════════════════════════════════════════════════════════════
+  canonical-attestation:
+    name: canonical attestation
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Least privilege : lire les runs pour vérifier que la PR était verte.
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      # `would_reuse` est la PRÉDICTION ; `skip_shards` est la seule sortie qui
+      # agit. Elles diffèrent tant que la réutilisation n'est pas armée — c'est
+      # tout l'objet du shadow mode.
+      would_reuse: ${{ steps.attest.outputs.would_reuse }}
+      skip_shards: ${{ steps.attest.outputs.skip_shards }}
+      armed: ${{ steps.attest.outputs.armed }}
+      reason: ${{ steps.attest.outputs.reason }}
+      attested_run_id: ${{ steps.attest.outputs.attested_run_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # L'attestation compare des objets ARBRE et remonte aux parents du
+          # merge : elle a besoin de l'historique.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Attest
+        id: attest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Absente ou ≠ `true` → SHADOW MODE : le verdict est calculé et
+          # journalisé, la suite complète tourne quand même. L'armer est une
+          # décision d'opérateur, réversible sans toucher au code.
+          CI_CANONICAL_REUSE_ENABLED: ${{ vars.CI_CANONICAL_REUSE_ENABLED }}
+        # Stdlib uniquement, aucune dépendance installée : ce job doit rester
+        # le moins cher et le moins fragile du pipeline. Il échoue FERMÉ —
+        # toute incertitude (API muette, run introuvable, parents inattendus)
+        # rend `reuse=false` et le pipeline complet se déclenche.
+        run: |
+          python scripts/canonical_attestation.py \
+            --sha "${{ github.sha }}" \
+            --repo "${{ github.repository }}" \
+            --github-output
+
   test-shard:
     name: pytest shard ${{ matrix.shard }}
+    needs: [canonical-attestation]
+    # `always()` est INDISPENSABLE, et pour deux raisons distinctes :
+    #  · sur une PR, `canonical-attestation` est ignoré (`if: push`), et sans
+    #    `always()` un job qui dépend d'un job ignoré est ignoré à son tour —
+    #    la PR ne serait plus testée du tout ;
+    #  · si l'attestation ÉCHOUE, ses outputs sont vides, donc `!= 'true'` est
+    #    vrai et les shards tournent. Échec fermé par construction.
+    if: always() && needs.canonical-attestation.outputs.skip_shards != 'true'
     strategy:
       fail-fast: false
       matrix:
@@ -195,12 +271,23 @@ jobs:
     name: pytest + QA scripts
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: [test-shard]
+    needs: [test-shard, canonical-attestation]
     # `always()` so a shard failure still produces this required check with a
     # verdict instead of leaving it Expected forever.
+    #
+    # Sx_CI_CANONICAL_DEDUP_01 — ce job garde son nom EXACT parce que la
+    # protection de branche l'exige (`pytest + QA scripts`). Il tourne dans les
+    # deux régimes et rend toujours un verdict : en réutilisation il n'exécute
+    # simplement pas les shards, mais il continue de porter les QA, les
+    # migrations, le perf smoke et la publication de la couverture.
+    permissions:
+      contents: read
+      actions: read
     if: always()
     env:
       PYTHONPATH: .
+      # Vide sur une PR ; `true` uniquement sur un push canonique attesté.
+      REUSE: ${{ needs.canonical-attestation.outputs.skip_shards }}
 
     steps:
       - name: Checkout
@@ -257,20 +344,62 @@ jobs:
 
       - name: Fail if any shard failed
         # The aggregator must never report success over a red shard.
-        if: needs.test-shard.result != 'success' && steps.scope.outputs.runtime == 'true'
+        #
+        # Sx_CI_CANONICAL_DEDUP_01 — en réutilisation attestée les shards sont
+        # `skipped`, ce qui n'est pas `success`. Sans la clause `REUSE`, cette
+        # garde ferait échouer TOUS les pushs réutilisés. Elle reste entière
+        # dans le régime normal : un shard rouge fait toujours tomber le job.
+        if: >-
+          env.REUSE != 'true'
+          && needs.test-shard.result != 'success'
+          && steps.scope.outputs.runtime == 'true'
         run: |
           echo "A pytest shard did not succeed: ${{ needs.test-shard.result }}"
           exit 1
 
+      - name: Reused verdict — import the attested run's coverage
+        # SonarCloud consomme `coverage.xml`. Sans cette étape, l'analyse DE
+        # BRANCHE (distincte de l'analyse de PR) publierait une couverture
+        # nulle et abîmerait le gate projet : on aurait échangé du temps de
+        # calcul contre une dégradation de signal, exactement ce que la
+        # mission interdit.
+        #
+        # L'artefact vient du run de PR ATTESTÉ — même contenu, donc même
+        # couverture. L'entrée de Sonar est rigoureusement identique à celle
+        # d'un run complet.
+        if: env.REUSE == 'true' && steps.scope.outputs.runtime == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-xml
+          run-id: ${{ needs.canonical-attestation.outputs.attested_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: .
+
+      - name: Reused verdict — say plainly what was skipped and why
+        if: env.REUSE == 'true'
+        run: |
+          echo "CANONICAL ATTESTATION — verdict réutilisé."
+          echo "  ${{ needs.canonical-attestation.outputs.reason }}"
+          echo ""
+          echo "NON exécuté : les 3 shards pytest."
+          echo "Exécuté à l'identique : lint, QA catalogue/atlas/EKB,"
+          echo "  drift Alembic, snapshot de schéma, patterns et roundtrip de"
+          echo "  migration, perf smoke, et l'analyse SonarCloud de branche"
+          echo "  — alimentée par la couverture du run attesté."
+          echo ""
+          echo "L'arbre Git de ce commit est identique, à l'octet, à celui que"
+          echo "la CI de PR a validé. Rejouer la suite ne pourrait pas changer"
+          echo "le verdict."
+
       - name: Download shard coverage data
-        if: steps.scope.outputs.runtime == 'true'
+        if: env.REUSE != 'true' && steps.scope.outputs.runtime == 'true'
         uses: actions/download-artifact@v4
         with:
           pattern: coverage-data-*
           merge-multiple: true
 
       - name: Combine shard coverage into ONE authoritative report
-        if: steps.scope.outputs.runtime == 'true'
+        if: env.REUSE != 'true' && steps.scope.outputs.runtime == 'true'
         # coverage.py's native parallel mode: each shard wrote `.coverage.shard-N`
         # with `relative_files = true` (pyproject), so paths resolve identically
         # across machines and combine cleanly. Sonar consumes this single file —
