@@ -45,7 +45,21 @@ jobs:
   # ════════════════════════════════════════════════════════════════════════
   canonical-attestation:
     name: canonical attestation
-    if: github.event_name == 'push'
+    # ⚠ AUCUNE CONDITION ICI, ET C'EST DÉLIBÉRÉ.
+    #
+    # Première écriture : `if: github.event_name == 'push'`. Le job était donc
+    # IGNORÉ sur une PR — et cet état SE PROPAGE dans le graphe. Mesuré sur la
+    # CI réelle (run 33534376497) : **`SonarCloud`, contrôle REQUIS par la
+    # protection de branche, a cessé de rendre un verdict.** C'est exactement
+    # ce que le critère `A7` de l'ordre interdit.
+    #
+    # Rescaper `sonar` avec `always()` aurait masqué la cause. On la supprime :
+    # le job tourne partout, et le script répond `FULL` hors `push`. Le graphe
+    # ne contient donc plus aucun job ignoré, et toute la classe de problème
+    # disparaît. Coût : ~10 s par run de PR.
+    #
+    # Ce défaut n'était visible NI en local NI dans le YAML. Seule la CI réelle
+    # pouvait le montrer — c'est la raison d'être du tier `ci_infra`.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     # Least privilege : lire les runs pour vérifier que la PR était verte.
@@ -78,6 +92,9 @@ jobs:
         id: attest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Le script s'arrête net hors `push` : l'attestation ne concerne que
+          # les commits qui atterrissent sur la canonique.
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           # Absente ou ≠ `true` → SHADOW MODE : le verdict est calculé et
           # journalisé, la suite complète tourne quand même. L'armer est une
           # décision d'opérateur, réversible sans toucher au code.

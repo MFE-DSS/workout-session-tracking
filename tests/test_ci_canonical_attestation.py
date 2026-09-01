@@ -101,7 +101,7 @@ def test_every_unknown_falls_back_to_full(sha, repo, token, cas):
     assert verdict == m.FULL, f"{cas} → {verdict} ({reason})"
 
 
-def test_a_direct_push_is_never_reused(tmp_path):
+def test_a_direct_push_is_never_reused(tmp_path, monkeypatch):
     """CAS G. Un commit sans deux parents n'est pas un merge de PR : il n'y a
     aucune tête de PR dont on pourrait hériter le verdict."""
     m = _mod()
@@ -121,6 +121,7 @@ def test_a_direct_push_is_never_reused(tmp_path):
 
     import os
 
+    monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
     cwd = os.getcwd()
     try:
         os.chdir(repo)
@@ -230,17 +231,53 @@ def _green_api(head_run_id="4242"):
     return fake
 
 
-def _attest_in(repo, sha, monkeypatch, api):
+def _attest_in(repo, sha, monkeypatch, api, event="push"):
     import os
 
     m = _mod()
     monkeypatch.setattr(m, "_api", api)
+    monkeypatch.setenv("GITHUB_EVENT_NAME", event)
     cwd = os.getcwd()
     try:
         os.chdir(repo)
         return m.attest(sha, REPO, TOKEN)
     finally:
         os.chdir(cwd)
+
+
+def test_a_pull_request_is_never_attested(tmp_path, monkeypatch):
+    """LE DÉFAUT TROUVÉ PAR LA CI RÉELLE, et sa correction.
+
+    Première écriture : le job portait `if: github.event_name == 'push'`, donc
+    il était IGNORÉ sur une PR — et cet état se propage dans le graphe. Mesuré
+    sur le run 33534376497 : **`SonarCloud`, un contrôle REQUIS par la
+    protection de branche, a cessé de rendre un verdict.** C'est exactement ce
+    que le critère `A7` interdit.
+
+    Rescaper `sonar` avec `always()` aurait masqué la cause. Elle est
+    supprimée : le job tourne sur TOUS les événements et répond `FULL` hors
+    `push`. Le graphe ne contient donc plus aucun job ignoré.
+
+    Ce défaut n'était visible ni en local ni dans le YAML. Seule la CI réelle
+    pouvait le montrer — c'est la raison d'être du tier `ci_infra`.
+    """
+    m = _mod()
+    repo, merge, _ = _repo_with_merge(tmp_path)
+    verdict, reason, _ = _attest_in(
+        repo, merge, monkeypatch, _green_api(), event=PR_EVENT
+    )
+    assert verdict == m.FULL, reason
+    assert "événement" in reason, reason
+
+
+def test_the_attestation_job_is_never_skipped(wf):
+    """LA GARDE DE CÂBLAGE CORRESPONDANTE. Un job ignoré propage son état aux
+    jobs qui en dépendent — jusqu'à un contrôle requis."""
+    job = wf["jobs"][ATTESTATION_JOB]
+    assert "if" not in job, (
+        "le job d'attestation porte une condition — il peut donc être IGNORÉ, "
+        "et cet état se propagerait jusqu'à un contrôle requis"
+    )
 
 
 def test_case_a_identical_tree_and_green_run_is_reused(tmp_path, monkeypatch):
@@ -459,9 +496,18 @@ def test_the_workflow_reads_the_arming_variable(wf):
 # ═════════ FAMILLE 2 — LE YAML CONSOMME RÉELLEMENT LE VERDICT ═════════
 
 
-def test_the_attestation_job_exists_and_only_runs_on_push(wf):
+def test_the_attestation_job_exists_and_reads_the_event(wf):
+    """L'attestation ne concerne que les pushs canoniques — mais ce filtre vit
+    dans le SCRIPT, pas dans un `if:` de job.
+
+    ⚠ Le filtre était dans le YAML. Le job était donc ignoré sur une PR, et cet
+    état se propageait jusqu'à `SonarCloud`, un contrôle requis. Le déplacer
+    dans le script supprime la cause au lieu de la contourner.
+    """
     job = wf["jobs"][ATTESTATION_JOB]
-    assert job["if"] == "github.event_name == 'push'", job["if"]
+    step = next(s for s in job["steps"] if s.get("id") == "attest")
+    assert "GITHUB_EVENT_NAME" in step["env"], step["env"]
+    assert "github.event_name" in step["env"]["GITHUB_EVENT_NAME"]
 
 
 def test_the_shards_are_gated_on_the_attestation_output(wf):

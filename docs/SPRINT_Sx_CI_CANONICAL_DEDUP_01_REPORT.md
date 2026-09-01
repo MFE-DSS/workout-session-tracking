@@ -181,7 +181,47 @@ dédiée l'épingle, et la planter la fait rougir.
 
 ---
 
-## 8. Fautes de l'agent — trois vagues de gardes creuses
+## 7bis. Le défaut que seule la CI réelle pouvait montrer
+
+La première version portait `if: github.event_name == 'push'` **sur le job**
+d'attestation. Il était donc **ignoré** sur une PR — ce qui semblait correct, et
+que ni le YAML ni le sweep local ne pouvaient contredire.
+
+Mesuré sur la CI réelle, run **33534376497** :
+
+```
+canonical attestation: skipped
+SonarCloud:            skipped   ← CONTRÔLE REQUIS par la protection de branche
+```
+
+**Un état « ignoré » se propage dans le graphe.** `SonarCloud` dépend de `test`,
+qui dépend désormais de l'attestation ; le contrôle requis a cessé de rendre un
+verdict. C'est exactement ce que le critère `A7` de l'ordre interdit — et ce que
+la mission avait nommé d'avance : *« aucun required check ne doit rester
+Expected/Pending parce qu'un workflow a été filtré avant de démarrer. »*
+
+### La correction, et pourquoi celle-là
+
+Rescaper `sonar` avec `always()` aurait **masqué la cause**. Elle est supprimée :
+
+* **le job ne porte plus aucune condition** — il tourne sur tous les événements ;
+* **le filtre vit dans le script**, qui répond `FULL` hors `push`.
+
+Le graphe ne contient donc plus **aucun job ignorable**, et la classe entière de
+problème disparaît. Coût mesuré : ≈ 10 s par run de PR.
+
+Deux gardes l'épinglent, et les planter les fait rougir : l'une interdit toute
+condition sur le job, l'autre vérifie que l'événement est bien transmis au
+script.
+
+**Ce défaut n'était visible ni en local, ni dans le YAML, ni dans les 43 gardes
+qui existaient alors.** Seule la CI réelle pouvait le montrer — c'est
+littéralement la raison pour laquelle `CLAUDE.md §1` impose une validation sur
+CI réelle au tier `ci_infra`.
+
+---
+
+## 8. Fautes de l'agent — trois vagues de gardes creuses, puis un défaut réel
 
 C'est le cœur de ce que cette tranche laisse au dépôt.
 

@@ -155,38 +155,26 @@ def attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
         return _attest(sha, repo, token)
     except Undecidable as exc:
         return FULL, str(exc), ""
-    except Exception as exc:  # noqa: BLE001 — fail closed, sans exception
+    # Attrape-tout DÉLIBÉRÉ : ce mécanisme décide si des tests tournent.
+    # Une exception non prévue doit produire `FULL`, jamais une exception.
+    except Exception as exc:  # noqa: BLE001
         return FULL, f"erreur inattendue : {type(exc).__name__}: {exc}", ""
 
 
-def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
-    if not sha:
-        raise Undecidable("aucun SHA fourni")
-    if not token:
-        raise Undecidable("aucun jeton GitHub")
-
+def _merge_parents(sha: str) -> tuple[str, str]:
+    """`(base, head)` d'un merge à deux parents, ou `Undecidable`."""
     parents = parents_of(sha)
     if len(parents) != 2:
         # Push direct, commit initial, ou merge octopus.
         raise Undecidable(
             f"{len(parents)} parent(s) — ce n'est pas un merge de PR à deux parents"
         )
-    base, head = parents
+    return parents[0], parents[1]
 
-    if tree_of(sha) != tree_of(head):
-        raise Undecidable(
-            "l'arbre du merge diffère de celui de la tête de PR — la base a bougé"
-        )
 
-    drift = touches_self_referential(base, sha)
-    if drift:
-        raise Undecidable(
-            f"le mécanisme de sélection lui-même a changé : {', '.join(drift[:3])}"
-        )
-
-    runs = _api(
-        f"/repos/{repo}/actions/runs?head_sha={head}&per_page=100", token
-    )
+def _green_pr_run(head: str, repo: str, token: str) -> str:
+    """L'identifiant du run de PR vert pour cette tête, ou `Undecidable`."""
+    runs = _api(f"/repos/{repo}/actions/runs?head_sha={head}&per_page=100", token)
     if not isinstance(runs, dict):
         raise Undecidable("réponse d'API inattendue")
     ci_runs = [
@@ -195,7 +183,6 @@ def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
     ]
     if not ci_runs:
         raise Undecidable(f"aucun run CI de PR pour la tête {head[:8]}")
-
     for run in ci_runs:
         if run.get("status") != "completed":
             raise Undecidable(f"run {run.get('id')} non terminé")
@@ -203,10 +190,12 @@ def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
             raise Undecidable(
                 f"run {run.get('id')} conclu « {run.get('conclusion')} »"
             )
-
     newest = max(ci_runs, key=lambda r: r.get("run_started_at") or "")
-    run_id = str(newest.get("id"))
+    return str(newest.get("id"))
 
+
+def _required_checks_green(run_id: str, repo: str, token: str) -> None:
+    """Lève si un contrôle exigé par la protection de branche manque."""
     jobs = _api(f"/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100", token)
     if not isinstance(jobs, dict):
         raise Undecidable("réponse d'API inattendue (jobs)")
@@ -220,11 +209,80 @@ def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
             f"contrôle requis absent ou non vert : {', '.join(missing)}"
         )
 
+
+def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
+    # ⚠ LE JOB TOURNE SUR TOUS LES ÉVÉNEMENTS, ET C'EST DÉLIBÉRÉ.
+    #
+    # Première écriture : le job portait `if: github.event_name == 'push'`, donc
+    # il était IGNORÉ sur une PR. Mesuré sur la CI réelle (run 33534376497) :
+    # cet état d'ignoré se propage dans le graphe, et **`SonarCloud` — un
+    # contrôle REQUIS par la protection de branche — a cessé de rendre un
+    # verdict**. C'est exactement ce que le critère `A7` de l'ordre interdit.
+    #
+    # Rescaper `sonar` avec `always()` aurait masqué la cause. On la supprime :
+    # le job ne s'ignore plus jamais, il répond `FULL` hors `push`. Le graphe
+    # ne contient donc plus aucun job ignoré, et la classe entière de problème
+    # disparaît. Coût mesuré : ~10 s par run de PR.
+    #
+    # Ce défaut n'était visible NI en local NI dans le YAML — seule la CI
+    # réelle pouvait le montrer. C'est la raison d'être du tier `ci_infra`.
+    event = os.environ.get("GITHUB_EVENT_NAME", "")
+    if event != "push":
+        raise Undecidable(
+            f"événement « {event or 'inconnu'} » — l'attestation ne concerne "
+            "que les pushs canoniques"
+        )
+    if not sha:
+        raise Undecidable("aucun SHA fourni")
+    if not token:
+        raise Undecidable("aucun jeton GitHub")
+
+    base, head = _merge_parents(sha)
+
+    if tree_of(sha) != tree_of(head):
+        raise Undecidable(
+            "l'arbre du merge diffère de celui de la tête de PR — la base a bougé"
+        )
+
+    drift = touches_self_referential(base, sha)
+    if drift:
+        raise Undecidable(
+            f"le mécanisme de sélection lui-même a changé : {', '.join(drift[:3])}"
+        )
+
+    run_id = _green_pr_run(head, repo, token)
+    _required_checks_green(run_id, repo, token)
+
     return (
         REUSE,
         f"arbre identique à la tête {head[:8]}, validée par le run {run_id}",
         run_id,
     )
+
+
+def _report(verdict: str, reason: str, *, armed: bool, skip: bool) -> None:
+    print(f"[attestation] WOULD_{verdict} — {reason}")
+    if armed:
+        state = "NON programmés" if skip else "programmés"
+        print(f"[attestation] ARMÉ ({ENABLE_VAR}=true) → shards {state}")
+        return
+    print(f"[attestation] SHADOW MODE — {ENABLE_VAR} n'est pas à `true`.")
+    print("[attestation] La suite complète tourne quand même. Ce verdict est "
+          "une PRÉDICTION, à comparer au résultat réel.")
+
+
+def _write_outputs(
+    verdict: str, reason: str, run_id: str, *, armed: bool, skip: bool
+) -> None:
+    out = os.environ.get("GITHUB_OUTPUT")
+    if not out:
+        return
+    with open(out, "a", encoding="utf-8") as fh:
+        fh.write(f"would_reuse={'true' if verdict == REUSE else 'false'}\n")
+        fh.write(f"skip_shards={'true' if skip else 'false'}\n")
+        fh.write(f"armed={'true' if armed else 'false'}\n")
+        fh.write(f"reason={reason}\n")
+        fh.write(f"attested_run_id={run_id}\n")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -242,24 +300,9 @@ def main(argv: list[str] | None = None) -> int:
     # Elle exige DEUX conditions : un verdict `REUSE`, et l'armement explicite.
     skip = verdict == REUSE and armed
 
-    print(f"[attestation] WOULD_{verdict} — {reason}")
-    if armed:
-        print(f"[attestation] ARMÉ ({ENABLE_VAR}=true) → shards "
-              f"{'NON programmés' if skip else 'programmés'}")
-    else:
-        print(f"[attestation] SHADOW MODE — {ENABLE_VAR} n'est pas à `true`.")
-        print("[attestation] La suite complète tourne quand même. Ce verdict "
-              "est une PRÉDICTION, à comparer au résultat réel.")
-
+    _report(verdict, reason, armed=armed, skip=skip)
     if args.github_output:
-        out = os.environ.get("GITHUB_OUTPUT")
-        if out:
-            with open(out, "a", encoding="utf-8") as fh:
-                fh.write(f"would_reuse={'true' if verdict == REUSE else 'false'}\n")
-                fh.write(f"skip_shards={'true' if skip else 'false'}\n")
-                fh.write(f"armed={'true' if armed else 'false'}\n")
-                fh.write(f"reason={reason}\n")
-                fh.write(f"attested_run_id={run_id}\n")
+        _write_outputs(verdict, reason, run_id, armed=armed, skip=skip)
     return 0
 
 
