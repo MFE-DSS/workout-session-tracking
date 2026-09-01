@@ -61,11 +61,37 @@ def test_last_time_chip_preserves_decimal_weights():
     assert _last_time_chip(prior) == "dernière fois 52.5 kg × 8"
 
 
-def test_last_time_chip_falls_back_to_premiere_fois():
+def test_last_time_chip_says_first_time_only_when_it_is_one():
+    """`D2 = a`, tranché par l'opérateur.
+
+    ⚠ CETTE GARDE ENCODAIT LE DÉFAUT. Elle exigeait `première fois` dans
+    QUATRE situations, dont deux où l'utilisateur était **déjà venu** : un
+    résumé antérieur sans première série, et une première série sans valeurs.
+    La puce annonçait donc quelque chose de faux, et la garde l'exigeait.
+
+    Le défaut est devenu visible quand `DF-E` a posé la puce à côté du bloc
+    « Dernière fois », qui distinguait les cas correctement : on lisait
+    `première fois` et `aujourd'hui · aucune donnée saisie` sur la même carte,
+    à propos de la même donnée.
+
+    Trois états, trois libellés — et la garde le dit maintenant.
+    """
+    # AUCUNE occurrence antérieure — la seule vraie première fois.
     assert _last_time_chip(None) == "première fois"
     assert _last_time_chip({}) == "première fois"
-    assert _last_time_chip({"first_set": None}) == "première fois"
-    assert _last_time_chip({"first_set": {"weight_kg": None, "reps": 10}}) == "première fois"
+
+
+def test_last_time_chip_says_no_data_when_the_visit_happened():
+    """L'utilisateur EST venu, il n'a rien noté. Ce n'est pas une première
+    fois, et le lui dire serait faux."""
+    assert _last_time_chip({"first_set": None}) == "sans données"
+    assert _last_time_chip({"first_set": {}}) == "sans données"
+    assert _last_time_chip({"first_set": {"weight_kg": None, "reps": 10}}) == (
+        "sans données"
+    )
+    assert _last_time_chip({"first_set": {"weight_kg": 60.0, "reps": None}}) == (
+        "sans données"
+    )
 
 
 # ---- build_chip -------------------------------------------------------

@@ -275,11 +275,24 @@
     </div>
   {% endif %}
 
-  <div class="exercise-card__head-expanded exercise-card__head-expanded--collapsed">
-    <a href="{{ url_for('exercise_history_detail', template_slug=session.template_slug_snapshot, exercise_code=se.exercise_code_snapshot) }}"
-       class="exercise-card__code--link session-focus__tap-target"
-    >Voir historique {{ se.exercise_code_snapshot }} →</a>
-  </div>
+  {# `D1 = variante D`, tranché par l'opérateur sur rendus mesurés.
+
+     LE LIEN D'HISTORIQUE RÉPÉTÉ EST RETIRÉ DES CARTES REPLIÉES. Il y était
+     dupliqué six fois pour un accès que la carte ACTIVE porte déjà — son
+     `Historique` de niveau L3 est intact, quelques lignes plus bas dans ce
+     même gabarit.
+
+     CE N'EST DONC PAS UNE SOUSTRACTION (`§5.3`) : l'accès n'est pas supprimé,
+     il cesse d'être répété. Et depuis `DF-E`, atteindre l'historique d'un
+     autre exercice se fait en touchant sa carte — ce qui l'active, et rend
+     son `Historique` disponible.
+
+     CE QUI RESTE SUR LA CARTE REPLIÉE, sur décision explicite : les valeurs
+     de la performance précédente (« Dernière fois ») et la puce
+     schéma · date. Ce sont des DONNÉES qu'on lit d'un coup d'œil ; le lien
+     était une ACTION qu'on ne déclenche qu'une fois.
+
+     Mesuré à 390 px : 4,15 → 3,78 écrans, carte 203 → 151 px. #}
 </div>
 {% else %}
 

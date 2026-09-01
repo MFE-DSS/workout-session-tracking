@@ -248,15 +248,21 @@ def command_for(state: ConsoleState) -> dict:
         # `stay_norest`, pas `stay` : le repos suit une série de TRAVAIL.
         # Mesuré au navigateur — valider le dernier échauffement avec `stay`
         # faisait démarrer le décompte de repos avant la première série.
+        # `D3 = B`, tranché par l'opérateur sur trois variantes rendues à
+        # 360 px. Le bouton disait `VALIDER É1` alors que `DF-C` avait retiré
+        # les codes `É`/`S` des lignes : plus rien à l'écran ne portait ce nom.
+        # Le libellé reprend désormais le mot que le nom accessible emploie
+        # déjà — aucun vocabulaire n'est inventé. Mesuré : tient sur une ligne
+        # à 360 px, hauteur de bouton inchangée (56 px).
         return {
-            "label": f"VALIDER É{sl.set_index}",
+            "label": f"VALIDER ÉCHAUFFEMENT {sl.set_index}",
             "sub": None,
             "nav": "stay_norest",
         }
     if kind == CURRENT_SET:
         sl = state.current_set
         return {
-            "label": f"VALIDER S{sl.set_index}",
+            "label": f"VALIDER SÉRIE {sl.set_index}",
             "sub": f"→ repos {state.rest_seconds} s",
             "nav": "stay",
         }
