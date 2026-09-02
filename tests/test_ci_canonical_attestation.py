@@ -29,6 +29,7 @@ import json
 import pathlib
 import subprocess
 import sys
+import urllib.request
 import zipfile
 
 import pytest
@@ -76,6 +77,7 @@ K_RUN = "run_id"
 COMPLETED = "completed"
 GIT_EMAIL = "user.email"
 GIT_NAME = "user.name"
+AUTH = "authorization"
 
 sys.path.insert(0, str(ROOT / "scripts"))
 
@@ -688,6 +690,81 @@ def test_the_capture_records_what_is_actually_checked_out(tmp_path, monkeypatch)
     assert payload[K_TREE] == expected, payload
     assert payload[K_HEAD] == head, payload
     assert payload[K_RUN] == "777", payload
+
+
+# ═════════ FAMILLE 1quinquies — LE TÉLÉCHARGEMENT DOIT ABOUTIR ═════════
+#
+# ⛔ UN MÉCANISME QUI NE MESURE RIEN EST LA COUSINE D'UNE GARDE QUI NE GARDE
+# RIEN. Toutes les gardes ci-dessus injectent une fausse API : aucune n'exerce
+# le VRAI téléchargement. Or il échouait — `urllib` recopie `Authorization` sur
+# la redirection vers le stockage signé, qui répond `401`. Verdict : `FULL`, à
+# chaque merge, indéfiniment. Échec fermé, donc INVISIBLE : le shadow mode
+# aurait affiché « aucun gain » sans jamais en donner la cause.
+#
+# Trouvé en rejouant le téléchargement réel de l'artefact du run 33604235503,
+# pas par un test. D'où ces gardes, qui exercent la couche redirection.
+
+
+def _redirect(monkeypatch, *, from_url, to_url):
+    """Rejoue une redirection à travers le vrai gestionnaire du module."""
+    m = _mod()
+    req = urllib.request.Request(
+        from_url, headers={"Authorization": "Bearer secret", "Accept": "*/*"}
+    )
+    handler = m._DropAuthOnRedirect()
+    return handler.redirect_request(req, None, 302, "Found", {}, to_url)
+
+
+def test_the_github_token_never_reaches_the_artifact_storage(monkeypatch):
+    """LE DÉFAUT MESURÉ. Sans ce retrait le stockage répond `401` et le
+    mécanisme entier est inerte — jamais un `REUSE`, jamais une explication."""
+    new = _redirect(
+        monkeypatch,
+        from_url="https://api.github.com/repos/o/r/actions/artifacts/1/zip",
+        to_url="https://productionresultssa.blob.core.windows.net/x?sig=abc",
+    )
+    sent = {k.lower() for k in new.headers}
+    assert AUTH not in sent, new.headers
+    assert AUTH not in {k.lower() for k in new.unredirected_hdrs}
+
+
+def test_the_token_survives_a_redirect_that_stays_on_the_same_host(monkeypatch):
+    """L'INVERSE, sans quoi la correction casserait l'API elle-même : une
+    redirection interne à GitHub a encore besoin du jeton."""
+    new = _redirect(
+        monkeypatch,
+        from_url="https://api.github.com/repos/o/r/actions/artifacts/1/zip",
+        to_url="https://api.github.com/repos/o/r/actions/artifacts/1/zip2",
+    )
+    assert AUTH in {k.lower() for k in new.headers}, new.headers
+
+
+def test_a_plaintext_redirect_is_refused(monkeypatch):
+    """Un `Location` en clair exfiltrerait le jeton. On refuse le schéma
+    plutôt que de se fier au fait que GitHub ne le fait pas."""
+    m = _mod()
+    with pytest.raises(m.Undecidable):
+        _redirect(
+            monkeypatch,
+            from_url="https://api.github.com/x",
+            to_url="http://evil.example/steal",
+        )
+
+
+def test_the_download_actually_goes_through_that_handler():
+    """CÂBLAGE. Le gestionnaire le mieux écrit ne sert à rien si le
+    téléchargement repasse par `urlopen`. Cette garde a été vérifiée en
+    replantant `urllib.request.urlopen` : elle rougit."""
+    m = _mod()
+    handlers = [type(h).__name__ for h in m._ARTIFACT_OPENER.handlers]
+    assert "_DropAuthOnRedirect" in handlers, handlers
+    src = SCRIPT.read_text(encoding="utf-8")
+    body = src.split("def _api_bytes(")[1].split("\ndef ")[0]
+    assert "_ARTIFACT_OPENER.open(" in body, body
+    assert "urllib.request.urlopen(" not in body, (
+        "le téléchargement d'artefact est repassé par `urlopen` — "
+        "la redirection réémettra `Authorization` et le stockage rendra 401"
+    )
 
 
 # ═════════ FAMILLE 1ter — LE SHADOW MODE EST LE DÉFAUT ═════════

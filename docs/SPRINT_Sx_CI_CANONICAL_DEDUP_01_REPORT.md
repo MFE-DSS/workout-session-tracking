@@ -281,7 +281,69 @@ CI réelle au tier `ci_infra`.
 
 ---
 
-## 8. Fautes de l'agent — trois vagues de gardes creuses, puis un défaut réel
+## 7ter. Le second défaut : un mécanisme qui n'aurait **rien mesuré**
+
+Trouvé le 2026-09-02, après une CI de PR **verte 9/9**, en téléchargeant à la
+main l'artefact que le run venait de déposer.
+
+```
+HTTP Error 401: Server failed to authenticate the request.
+```
+
+`urllib` **recopie les en-têtes de la requête initiale sur une redirection**.
+L'URL de téléchargement d'un artefact répond `302` vers un stockage dont l'URL
+porte **déjà sa propre signature** ; il reçoit alors un
+`Authorization: Bearer <jeton GitHub>` qu'il ne reconnaît pas, et refuse.
+
+### Pourquoi c'est grave alors que l'échec est fermé
+
+Ce défaut **ne produit aucun faux `REUSE`** : `attested_payload` lève, le
+verdict reste `FULL`. Il est pourtant plus pernicieux que le précédent.
+
+Le mécanisme aurait rendu `FULL` **à chaque merge, indéfiniment**. Le shadow
+mode aurait journalisé « aucune réutilisation » pendant des semaines, la
+comparaison demandée par la Phase 5 aurait été *parfaite* — zéro faux `REUSE`,
+puisque zéro `REUSE` — et la conclusion honnête aurait été « le gain mesuré est
+nul, la tranche ne sert à rien ». **La cause réelle — un en-tête de trop sur une
+redirection — n'apparaissait dans aucun journal.**
+
+> **Une garde qui ne garde rien a une cousine : un mécanisme qui ne mesure
+> rien.** Le premier échoue en laissant passer ; le second échoue en ne passant
+> jamais, et se déguise en résultat négatif.
+
+### Ce qui l'a trouvé, et ce qui ne l'aurait jamais trouvé
+
+Les 56 gardes d'alors **injectaient toutes une fausse API**. Aucune n'exerçait
+la couche redirection — par construction, puisqu'elles la remplaçaient. Le
+sweep local, la CI de PR verte et le gate Sonar étaient tous d'accord.
+
+Ce qui l'a trouvé : **avoir exécuté le vrai téléchargement sur le vrai artefact
+du vrai run**. C'est le même geste que le rendu réel exigé par `§5.1` pour l'UI,
+transposé à une couche réseau.
+
+### La correction, et les quatre gardes
+
+`_DropAuthOnRedirect` retire `Authorization` quand la redirection **change
+d'hôte**, et refuse un `Location` en clair — qui exfiltrerait le jeton. Les
+gardes ajoutées, chacune rouge à la plantation correspondante :
+
+| Garde | Ce qu'elle interdit |
+|---|---|
+| le jeton n'atteint jamais le stockage | le défaut d'origine, en entier |
+| le jeton survit à une redirection **même hôte** | une correction qui casserait l'API elle-même |
+| une redirection en clair est refusée | l'exfiltration du jeton |
+| le téléchargement passe **par cet ouvreur** | un retour silencieux à `urlopen` |
+
+Vérification finale, sur données réelles et non simulées : l'artefact du run
+**33604235503** se télécharge, et son `tested_tree_sha` vaut
+`8e917b78111ca5a34a691152db665a2b55faf86f`, **exactement** l'arbre de la tête
+`362ffcc` — tandis que `tested_merge_sha` (`c9b1a596`) est un **commit
+distinct**, l'aperçu de merge que GitHub avait réellement checkout. La capture
+décrit donc bien ce qu'elle prétend, et rien n'est reconstruit.
+
+---
+
+## 8. Fautes de l'agent — trois vagues de gardes creuses, une preuve fausse, un mécanisme inerte
 
 C'est le cœur de ce que cette tranche laisse au dépôt.
 
@@ -305,6 +367,27 @@ construisait cet état.
 C'est le même enseignement que `DF-C` et `DF-E`, sous un troisième angle. Il ne
 s'apprend apparemment qu'en plantant, à chaque fois.
 
+**Quatrième vague — et c'est la plus instructive.** Une preuve **fausse** :
+`tree(M) == tree(H) ⇒ l'arbre testé vaut tree(M)`. Aucune plantation ne pouvait
+l'attraper, puisque le défaut n'était pas dans le code mais dans le
+**raisonnement que le code implémentait fidèlement**. C'est l'opérateur qui l'a
+attrapée, avec un contre-exemple (§4). Première fois dans ce train qu'une faute
+survit à des gardes correctes : elles gardaient bien la règle — la règle était
+fausse.
+
+Aggravant : ma première reproduction de ce contre-exemple **a échoué en
+silence** (`git revert -q`, drapeau inexistant) et m'a rendu un résultat
+rassurant. Reprise avec vérification des codes de retour, elle a confirmé le
+faux `REUSE`. *Un banc d'essai dont on ne vérifie pas qu'il a réellement tourné
+est un troisième instrument faux.*
+
+**Cinquième vague.** Un mécanisme **inerte** plutôt qu'incorrect (§7ter) : le
+téléchargement d'artefact échouait toujours, donc le verdict était toujours
+`FULL`. Aucune des 56 gardes ne pouvait le voir — **elles remplaçaient toutes la
+couche défaillante**. Trouvé en exécutant le vrai téléchargement.
+
+> **Un mécanisme qui ne mesure rien se déguise en résultat négatif.**
+
 ---
 
 ## 9. Vérifications
@@ -312,7 +395,8 @@ s'apprend apparemment qu'en plantant, à chaque fois.
 | | |
 |---|---|
 | `check_scope.py` | **`CI_INFRA`** — full sweep local obligatoire, **validation sur CI réelle impérative** |
-| `tests/test_ci_canonical_attestation.py` | **56 gardes** · 23 défauts plantés, 23 rouges |
+| `tests/test_ci_canonical_attestation.py` | **60 gardes** · 26 défauts plantés, 26 rouges |
+| Téléchargement d'artefact | **exercé sur l'API réelle**, pas simulé (run 33604235503) |
 | Familles de gardes CI existantes | **253 passés** |
 | **Full sweep local** | **292/292 fichiers verts**, 86 lots, pic 1703 Mo / 1881, 0 fichier sauté |
 | ruff · budget | **propre** · 275 / 548 |

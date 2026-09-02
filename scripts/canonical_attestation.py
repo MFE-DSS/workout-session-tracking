@@ -115,6 +115,7 @@ K_RUN = "run_id"
 _REV_PARSE = "rev-parse"
 _REPOS = "/repos/"
 _CONCLUSION = "conclusion"
+AUTH_HEADER = "Authorization"
 
 #: Les contrôles que la protection de branche exige sur une PR. Mesurés le
 #: 2026-09-01 par `GET /repos/{owner}/{repo}/branches/{branch}/protection`.
@@ -146,14 +147,18 @@ def _git(*args: str) -> str:
     return out.stdout.strip()
 
 
+def _headers(token: str) -> dict[str, str]:
+    return {
+        AUTH_HEADER: f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
 def _api(path: str, token: str) -> object:
-    req = urllib.request.Request(  # noqa: S310 — schéma validé, hôte littéral
-        _require_https(f"https://api.github.com{path}"),
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
+    # Hôte littéral, schéma validé par `_require_https`.
+    req = urllib.request.Request(  # noqa: S310
+        _require_https(f"https://api.github.com{path}"), headers=_headers(token)
     )
     try:
         with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
@@ -179,17 +184,57 @@ def _require_https(url: str) -> str:
     return url
 
 
+class _DropAuthOnRedirect(urllib.request.HTTPRedirectHandler):
+    """Retire `Authorization` quand la redirection change d'hôte.
+
+    ⛔ SANS CECI, LE MÉCANISME ENTIER EST INERTE — et silencieusement.
+
+    L'URL de téléchargement d'un artefact répond `302` vers un stockage dont
+    l'URL porte DÉJÀ sa propre signature. `urllib` recopie les en-têtes de la
+    requête initiale sur la redirection ; ce stockage reçoit alors un
+    `Authorization: Bearer <jeton GitHub>` qu'il ne reconnaît pas et répond
+    **401**.
+
+    Mesuré le 2026-09-02 en rejouant le téléchargement de l'artefact du run
+    33604235503. La conséquence n'est pas un faux `REUSE` — l'échec reste
+    fermé, le verdict reste `FULL`. Elle est pire à diagnostiquer : le
+    mécanisme aurait rendu `FULL` **à chaque merge, indéfiniment**, le shadow
+    mode aurait journalisé « aucun gain » et rien n'en aurait donné la cause.
+    Une garde qui ne garde rien a une cousine : un mécanisme qui ne mesure
+    rien.
+    """
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        new = super().redirect_request(req, fp, code, msg, headers, newurl)
+        if new is None:
+            return None
+        # Un `Location` en clair détournerait le jeton : on refuse net.
+        _require_https(newurl)
+        same_host = (
+            urllib.parse.urlsplit(newurl).netloc
+            == urllib.parse.urlsplit(req.full_url).netloc
+        )
+        if not same_host:
+            drop = AUTH_HEADER.lower()
+            new.headers = {
+                k: v for k, v in new.headers.items() if k.lower() != drop
+            }
+            new.unredirected_hdrs.pop(AUTH_HEADER, None)
+        return new
+
+
+#: Ouvreur dédié au téléchargement d'artefacts. `urlopen` seul suffirait pour
+#: l'API JSON (aucune redirection inter-hôtes) mais pas ici.
+_ARTIFACT_OPENER = urllib.request.build_opener(_DropAuthOnRedirect)
+
+
 def _api_bytes(url: str, token: str) -> bytes:
-    req = urllib.request.Request(  # noqa: S310 — schéma validé ci-dessus
-        _require_https(url),
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-        },
+    # Schéma validé par `_require_https` ; l'hôte du stockage varie.
+    req = urllib.request.Request(  # noqa: S310
+        _require_https(url), headers=_headers(token)
     )
     try:
-        with urllib.request.urlopen(req, timeout=60) as resp:  # noqa: S310
+        with _ARTIFACT_OPENER.open(req, timeout=60) as resp:
             return resp.read()
     except (urllib.error.URLError, TimeoutError) as exc:
         raise Undecidable(f"artefact inatteignable : {exc}") from exc
