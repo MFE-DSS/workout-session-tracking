@@ -92,9 +92,12 @@ jobs:
         id: attest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Le script s'arrête net hors `push` : l'attestation ne concerne que
-          # les commits qui atterrissent sur la canonique.
           GITHUB_EVENT_NAME: ${{ github.event_name }}
+          # Sur une PR, ce job CAPTURE ce qui est réellement testé. Le checkout
+          # d'un événement `pull_request` est `refs/pull/N/merge`, donc `HEAD`
+          # EST le contenu que les shards vont exécuter.
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           # Absente ou ≠ `true` → SHADOW MODE : le verdict est calculé et
           # journalisé, la suite complète tourne quand même. L'armer est une
           # décision d'opérateur, réversible sans toucher au code.
@@ -108,6 +111,24 @@ jobs:
             --sha "${{ github.sha }}" \
             --repo "${{ github.repository }}" \
             --github-output
+
+      # ⛔ LA MOITIÉ SANS LAQUELLE LE RESTE EST FAUX.
+      #
+      # Une première version DÉDUISAIT l'arbre testé de `tree(M) == tree(H)`.
+      # Contre-exemple mesuré : la base reçoit `X`, la CI teste `H + X`, la
+      # base annule `X`, et le merge final retrouve `tree(H)` — l'ancienne
+      # règle concluait `REUSE` alors que la CI n'avait jamais vu le contenu
+      # devenu canonique. On ne déduit plus : on conserve ce qui a été testé.
+      - name: Upload the PR attestation
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-attestation
+          path: pr_attestation.json
+          retention-days: 7
+          # `error` : sans cet artefact, aucun push ne pourra jamais réutiliser
+          # ce verdict. Mieux vaut le savoir tout de suite.
+          if-no-files-found: error
 
   test-shard:
     name: pytest shard ${{ matrix.shard }}

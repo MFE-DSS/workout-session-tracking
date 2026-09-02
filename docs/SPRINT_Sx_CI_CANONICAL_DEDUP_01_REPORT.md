@@ -74,7 +74,67 @@ l'état du dépôt. Les occurrences de `git` dans `tests/` sont des assertions
 
 ---
 
-## 4. Phase 2 — la preuve, et l'obstacle qu'elle a dû contourner
+## 4. Phase 2 — UNE PREUVE FAUSSE, ET CE QUI LA REMPLACE
+
+### ⛔ Ce que j'avais écrit, et pourquoi c'était faux
+
+La première version raisonnait ainsi :
+
+> Si `tree(M) == tree(H)`, alors fusionner `B` dans `H` n'a rien apporté : `B`
+> est la base de branchement. Donc toute base antérieure `B′` est un ancêtre de
+> `H`, et l'arbre testé valait `tree(H)`.
+
+**L'étape du milieu est un saut.** `tree(M) == tree(H)` dit seulement que la
+contribution **nette** de la base est nulle — ce qui vaut aussi après un
+aller-retour. J'ai présenté comme une démonstration un raisonnement qui n'en
+était pas un, et l'opérateur l'a arrêté avant merge.
+
+### Le contre-exemple, reproduit mécaniquement
+
+```
+1. la base reçoit X
+2. la CI de PR teste merge(base+X, H)  →  H + X
+3. la base ANNULE X (revert) → son arbre redevient celui de la base
+4. le merge final donne tree(M) == tree(H)
+
+tree(M)          : 467910335a29
+tree(H)          : 467910335a29   ← l'ancienne règle disait REUSE
+tree TESTÉ en PR : 4a8143d2f455   ← contenait x.py
+```
+
+**Faux `REUSE`** : la CI n'a jamais vu le contenu devenu canonique. C'est
+exactement ce que l'ordre interdit sans exception.
+
+Deux gardes le figent : l'une **conserve le contre-exemple** pour qu'on ne
+puisse plus réintroduire l'ancien raisonnement en croyant l'avoir démontré,
+l'autre vérifie que la règle actuelle le refuse.
+
+### On ne déduit plus — on capture
+
+Pendant le run `pull_request`, là où GitHub a fait le checkout de
+`refs/pull/N/merge`, le job **enregistre ce qui est réellement testé** :
+
+```
+tested_merge_sha · tested_tree_sha · head_sha · base_sha · run_id
+        → artefact `pr-attestation`, rétention 7 jours
+```
+
+Au push canonique, `REUSE` exige que `tree(M)` soit **exactement** égal au
+`tested_tree_sha` attesté par un run de PR dont les contrôles requis sont
+verts. Six façons d'échouer, six gardes plantées :
+
+| Cas | Verdict |
+|---|---|
+| artefact **absent** | FULL |
+| artefact **expiré** | FULL |
+| jeu d'artefacts **ambigu** | FULL |
+| artefact **illisible** | FULL |
+| artefact attestant une **autre tête** | FULL |
+| artefact se réclamant d'un **autre run** | FULL |
+
+---
+
+## 4bis. L'obstacle qui avait motivé la déduction
 
 `refs/pull/N/merge` **est supprimé après merge** — vérifié, `git fetch` échoue.
 L'API ne conserve pas non plus la base du run : `pull_requests` revient vide.
@@ -252,9 +312,9 @@ s'apprend apparemment qu'en plantant, à chaque fois.
 | | |
 |---|---|
 | `check_scope.py` | **`CI_INFRA`** — full sweep local obligatoire, **validation sur CI réelle impérative** |
-| `tests/test_ci_canonical_attestation.py` | **43 gardes** · 16 défauts plantés, 16 rouges |
+| `tests/test_ci_canonical_attestation.py` | **56 gardes** · 23 défauts plantés, 23 rouges |
 | Familles de gardes CI existantes | **253 passés** |
-| **Full sweep local** | **292/292 fichiers verts**, pic 1711 Mo / 1920 |
+| **Full sweep local** | **292/292 fichiers verts**, 86 lots, pic 1703 Mo / 1881, 0 fichier sauté |
 | ruff · budget | **propre** · 275 / 548 |
 | Pré-scan AST (`S9073` · `S1192`) | **0** après factorisation |
 | Déploiement production | **non touché** — une garde le vérifie |

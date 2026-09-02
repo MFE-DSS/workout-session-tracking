@@ -16,24 +16,35 @@ consomme **39 % de tout le temps de runner**, et sur les 20 derniers merges,
 valider. Une exécution sur un arbre identique ne peut pas, par construction,
 produire une information susceptible de changer le verdict.
 
-POURQUOI L'ÉGALITÉ D'ARBRE SUFFIT — ET POURQUOI CE N'EST PAS UNE HEURISTIQUE
------------------------------------------------------------------------------
-`refs/pull/N/merge` est SUPPRIMÉ après merge : on ne peut pas récupérer a
-posteriori l'arbre que la PR a testé, et l'API ne conserve pas la base du run
-(`pull_requests` revient vide). La preuve passe donc par une démonstration :
+ON NE RECONSTRUIT PLUS L'ARBRE TESTÉ — ON LE CAPTURE
+-----------------------------------------------------
+⛔ UNE PREMIÈRE VERSION RAISONNAIT SUR `tree(M) == tree(H)` ET C'ÉTAIT FAUX.
 
-    Soit `M` le commit de merge, de parents `(B, H)`.
-    La CI de PR a testé `merge(B′, H)`, où `B′` est la tête canonique AU MOMENT
-    DU RUN — donc un ancêtre de `B`, la canonique n'avançant que dans un sens.
+L'argument était : « si `tree(M) == tree(H)`, la base est la base de
+branchement, donc toute base antérieure est un ancêtre de `H`, donc l'arbre
+testé valait `tree(H)` ». **L'étape du milieu est un saut.** `tree(M) ==
+tree(H)` dit seulement que la contribution NETTE de la base est nulle — ce qui
+est aussi vrai après un aller-retour.
 
-    Si `tree(M) == tree(H)`, alors fusionner `B` dans `H` n'a rien apporté :
-    `B` est la base de branchement. `B′ ≤ B` est donc lui aussi un ancêtre de
-    `H`, et fusionner un ancêtre dans `H` ne change rien.
+CONTRE-EXEMPLE, REPRODUIT MÉCANIQUEMENT (garde dédiée) :
 
-    ⇒ l'arbre testé valait `tree(H)` = `tree(M)`, QUELLE QUE SOIT `B′`.
+    1. la base reçoit `X`
+    2. la CI de PR teste `merge(base+X, H)` — donc `H + X`
+    3. la base ANNULE `X` (revert) → son arbre redevient celui de la base
+    4. le merge final donne `tree(M) == tree(H)`
 
-Le cas contraire — la base a bougé avant le merge — donne `tree(M) != tree(H)`
-et retombe en `FULL`. C'est exactement ce qui s'est produit sur la PR #159.
+    L'ancienne règle conclut `REUSE`. **Or la CI a validé `H + X`, jamais le
+    contenu qui devient canonique.** Faux `REUSE` — précisément ce que l'ordre
+    interdit sans exception.
+
+LA RÈGLE ACTUELLE NE DÉDUIT RIEN. Pendant le run `pull_request`, là où GitHub
+a fait le checkout de `refs/pull/N/merge`, on CAPTURE ce qui a réellement été
+testé — `tested_merge_sha`, `tested_tree_sha`, `head_sha`, `base_sha`,
+`run_id` — et on le conserve en artefact.
+
+Au push canonique, `REUSE` exige que `tree(M)` soit **exactement** égal au
+`tested_tree_sha` attesté par un run de PR dont les contrôles requis sont
+verts. Artefact absent, expiré, ambigu, divergent ou invérifiable → `FULL`.
 
 ⚠ LA PROTECTION DE BRANCHE NE GARANTIT RIEN ICI. Mesuré le 2026-09-01 :
 `required_status_checks.strict = false`, donc GitHub **n'exige pas** qu'une
@@ -60,12 +71,16 @@ Usage :
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import os
+import pathlib
 import subprocess
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
+import zipfile
 
 REUSE = "REUSE"
 FULL = "FULL"
@@ -84,6 +99,22 @@ FULL = "FULL"
 #: Le défaut est donc l'inaction. Passer à `true` est une décision d'opérateur,
 #: réversible en une variable, sans toucher au code.
 ENABLE_VAR = "CI_CANONICAL_REUSE_ENABLED"
+
+#: Artefact déposé par le run `pull_request`, consommé par le push canonique.
+#: Il porte CE QUI A ÉTÉ RÉELLEMENT TESTÉ — pas une reconstruction.
+ATTESTATION_ARTIFACT = "pr-attestation"
+ATTESTATION_FILE = "pr_attestation.json"
+
+#: Clés du payload d'attestation. Hoistées : chacune revient 3 fois ou plus et
+#: déclencherait `S1192`. Le pré-scan AST les voit avant Sonar.
+K_MERGE = "tested_merge_sha"
+K_TREE = "tested_tree_sha"
+K_HEAD = "head_sha"
+K_BASE = "base_sha"
+K_RUN = "run_id"
+_REV_PARSE = "rev-parse"
+_REPOS = "/repos/"
+_CONCLUSION = "conclusion"
 
 #: Les contrôles que la protection de branche exige sur une PR. Mesurés le
 #: 2026-09-01 par `GET /repos/{owner}/{repo}/branches/{branch}/protection`.
@@ -116,8 +147,8 @@ def _git(*args: str) -> str:
 
 
 def _api(path: str, token: str) -> object:
-    req = urllib.request.Request(
-        f"https://api.github.com{path}",
+    req = urllib.request.Request(  # noqa: S310 — schéma validé, hôte littéral
+        _require_https(f"https://api.github.com{path}"),
         headers={
             "Authorization": f"Bearer {token}",
             "Accept": "application/vnd.github+json",
@@ -133,12 +164,98 @@ def _api(path: str, token: str) -> object:
         raise Undecidable(f"API GitHub inatteignable : {exc}") from exc
 
 
+def _require_https(url: str) -> str:
+    """Refuse tout ce qui n'est pas `https`.
+
+    L'URL de téléchargement d'un artefact est fournie par l'API et pointe vers
+    un stockage dont l'hôte varie : on ne peut pas l'épingler. Le schéma, si —
+    et c'est ce que `S310` protège réellement (`file:` ou un schéma exotique).
+    """
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme != "https":
+        raise Undecidable(f"schéma refusé : {parsed.scheme or '(aucun)'}")
+    if not parsed.hostname:
+        raise Undecidable("URL sans hôte")
+    return url
+
+
+def _api_bytes(url: str, token: str) -> bytes:
+    req = urllib.request.Request(  # noqa: S310 — schéma validé ci-dessus
+        _require_https(url),
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:  # noqa: S310
+            return resp.read()
+    except (urllib.error.URLError, TimeoutError) as exc:
+        raise Undecidable(f"artefact inatteignable : {exc}") from exc
+
+
+def attested_payload(run_id: str, repo: str, token: str) -> dict:
+    """Le contenu RÉELLEMENT testé par ce run de PR, ou `Undecidable`.
+
+    Aucune reconstruction : on lit ce que le run a déposé pendant qu'il testait.
+    """
+    listing = _api(f"{_REPOS}{repo}/actions/runs/{run_id}/artifacts", token)
+    if not isinstance(listing, dict):
+        raise Undecidable("réponse d'API inattendue (artefacts)")
+    named = [
+        a for a in listing.get("artifacts", [])
+        if a.get("name") == ATTESTATION_ARTIFACT
+    ]
+    if not named:
+        raise Undecidable(
+            f"aucun artefact « {ATTESTATION_ARTIFACT} » sur le run {run_id}"
+        )
+    if len(named) > 1:
+        raise Undecidable(
+            f"{len(named)} artefacts « {ATTESTATION_ARTIFACT} » — ambigu"
+        )
+    art = named[0]
+    if art.get("expired"):
+        raise Undecidable(f"artefact du run {run_id} EXPIRÉ")
+    url = art.get("archive_download_url")
+    if not url:
+        raise Undecidable("artefact sans URL de téléchargement")
+
+    try:
+        with zipfile.ZipFile(io.BytesIO(_api_bytes(url, token))) as zf:
+            payload = json.loads(zf.read(ATTESTATION_FILE))
+    except (zipfile.BadZipFile, KeyError, ValueError) as exc:
+        raise Undecidable(f"artefact illisible : {type(exc).__name__}") from exc
+    if not isinstance(payload, dict):
+        raise Undecidable("artefact au format inattendu")
+    for field in (K_MERGE, K_TREE, K_HEAD, K_RUN):
+        if not payload.get(field):
+            raise Undecidable(f"artefact incomplet : « {field} » manquant")
+    return payload
+
+
+def capture_payload() -> dict:
+    """Ce que le run `pull_request` a RÉELLEMENT sous la main.
+
+    Appelé depuis le checkout de `refs/pull/N/merge` : `HEAD` EST le contenu
+    que les shards vont tester. On l'enregistre plutôt que de le déduire.
+    """
+    return {
+        K_MERGE: _git(_REV_PARSE, "HEAD"),
+        K_TREE: _git(_REV_PARSE, "HEAD^{tree}"),
+        K_HEAD: os.environ.get("PR_HEAD_SHA", ""),
+        K_BASE: os.environ.get("PR_BASE_SHA", ""),
+        K_RUN: os.environ.get("GITHUB_RUN_ID", ""),
+    }
+
+
 def parents_of(sha: str) -> list[str]:
     return _git("rev-list", "--parents", "-n", "1", sha).split()[1:]
 
 
 def tree_of(sha: str) -> str:
-    return _git("rev-parse", f"{sha}^{{tree}}")
+    return _git(_REV_PARSE, f"{sha}^{{tree}}")
 
 
 def touches_self_referential(base: str, head: str) -> list[str]:
@@ -174,7 +291,7 @@ def _merge_parents(sha: str) -> tuple[str, str]:
 
 def _green_pr_run(head: str, repo: str, token: str) -> str:
     """L'identifiant du run de PR vert pour cette tête, ou `Undecidable`."""
-    runs = _api(f"/repos/{repo}/actions/runs?head_sha={head}&per_page=100", token)
+    runs = _api(f"{_REPOS}{repo}/actions/runs?head_sha={head}&per_page=100", token)
     if not isinstance(runs, dict):
         raise Undecidable("réponse d'API inattendue")
     ci_runs = [
@@ -186,7 +303,7 @@ def _green_pr_run(head: str, repo: str, token: str) -> str:
     for run in ci_runs:
         if run.get("status") != "completed":
             raise Undecidable(f"run {run.get('id')} non terminé")
-        if run.get("conclusion") != "success":
+        if run.get(_CONCLUSION) != "success":
             raise Undecidable(
                 f"run {run.get('id')} conclu « {run.get('conclusion')} »"
             )
@@ -196,12 +313,12 @@ def _green_pr_run(head: str, repo: str, token: str) -> str:
 
 def _required_checks_green(run_id: str, repo: str, token: str) -> None:
     """Lève si un contrôle exigé par la protection de branche manque."""
-    jobs = _api(f"/repos/{repo}/actions/runs/{run_id}/jobs?per_page=100", token)
+    jobs = _api(f"{_REPOS}{repo}/actions/runs/{run_id}/jobs?per_page=100", token)
     if not isinstance(jobs, dict):
         raise Undecidable("réponse d'API inattendue (jobs)")
     green = {
         j.get("name") for j in jobs.get("jobs", [])
-        if j.get("conclusion") == "success"
+        if j.get(_CONCLUSION) == "success"
     }
     missing = [c for c in REQUIRED_CONTEXTS if c not in green]
     if missing:
@@ -238,12 +355,6 @@ def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
         raise Undecidable("aucun jeton GitHub")
 
     base, head = _merge_parents(sha)
-
-    if tree_of(sha) != tree_of(head):
-        raise Undecidable(
-            "l'arbre du merge diffère de celui de la tête de PR — la base a bougé"
-        )
-
     drift = touches_self_referential(base, sha)
     if drift:
         raise Undecidable(
@@ -253,9 +364,38 @@ def _attest(sha: str, repo: str, token: str) -> tuple[str, str, str]:
     run_id = _green_pr_run(head, repo, token)
     _required_checks_green(run_id, repo, token)
 
+    # ⛔ LE CŒUR, ET IL NE DÉDUIT RIEN.
+    #
+    # On compare l'arbre canonique à celui que le run de PR a CAPTURÉ pendant
+    # qu'il testait. Une version antérieure comparait `tree(M)` à `tree(H)` et
+    # en DÉDUISAIT l'arbre testé : faux. Contre-exemple reproduit dans les
+    # gardes — la base reçoit `X`, la CI teste `H + X`, la base annule `X`, et
+    # le merge final retrouve `tree(H)`. L'ancienne règle concluait `REUSE`
+    # alors que la CI n'avait jamais vu le contenu devenu canonique.
+    payload = attested_payload(run_id, repo, token)
+
+    if payload[K_HEAD] != head:
+        raise Undecidable(
+            f"l'artefact atteste la tête {payload['head_sha'][:8]}, "
+            f"le merge porte {head[:8]}"
+        )
+    if payload[K_RUN] != run_id:
+        raise Undecidable(
+            f"l'artefact se réclame du run {payload['run_id']}, trouvé sur {run_id}"
+        )
+
+    canonical_tree = tree_of(sha)
+    if payload[K_TREE] != canonical_tree:
+        raise Undecidable(
+            f"l'arbre canonique {canonical_tree[:12]} n'est PAS celui testé "
+            f"({payload['tested_tree_sha'][:12]}) — le contenu a changé entre "
+            "le run de PR et le merge"
+        )
+
     return (
         REUSE,
-        f"arbre identique à la tête {head[:8]}, validée par le run {run_id}",
+        f"arbre {canonical_tree[:12]} attesté testé par le run {run_id} "
+        f"(merge d'aperçu {payload['tested_merge_sha'][:8]})",
         run_id,
     )
 
@@ -285,12 +425,30 @@ def _write_outputs(
         fh.write(f"attested_run_id={run_id}\n")
 
 
+def _capture_for_pull_request() -> None:
+    """Dépose `pr_attestation.json` — ce que CE run va réellement tester.
+
+    C'est la moitié qui manquait : sans capture, le push canonique ne peut
+    que DÉDUIRE l'arbre testé, et cette déduction s'est révélée fausse.
+    """
+    payload = capture_payload()
+    pathlib.Path(ATTESTATION_FILE).write_text(
+        json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8"
+    )
+    print(f"[attestation] capture du contenu réellement testé → {ATTESTATION_FILE}")
+    for key in (K_MERGE, K_TREE, K_HEAD, K_BASE):
+        print(f"[attestation]   {key} = {payload[key] or '(vide)'}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--sha", default=os.environ.get("GITHUB_SHA", ""))
     parser.add_argument("--repo", default=os.environ.get("GITHUB_REPOSITORY", ""))
     parser.add_argument("--github-output", action="store_true")
     args = parser.parse_args(argv)
+
+    if os.environ.get("GITHUB_EVENT_NAME") == "pull_request":
+        _capture_for_pull_request()
 
     verdict, reason, run_id = attest(
         args.sha, args.repo, os.environ.get("GITHUB_TOKEN", "")

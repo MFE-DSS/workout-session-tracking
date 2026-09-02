@@ -24,9 +24,12 @@ D'où deux familles, et la seconde est la plus importante :
 """
 from __future__ import annotations
 
+import io
+import json
 import pathlib
 import subprocess
 import sys
+import zipfile
 
 import pytest
 import yaml
@@ -59,6 +62,20 @@ STARTED_KEY = "run_started_at"
 PR_EVENT = "pull_request"
 ALWAYS = "always()"
 RUN_ID_KEY = "run-id"
+ARTIFACT = "pr-attestation"
+EVENT_VAR = "GITHUB_EVENT_NAME"
+GIT_CHECKOUT = "checkout"
+GIT_NOFF = "--no-ff"
+EXPIRED = "expired"
+DL_URL = "archive_download_url"
+FAKE_ZIP = "https://example.invalid/a.zip"
+ATTEST_ID = "attest"
+K_TREE = "tested_tree_sha"
+K_HEAD = "head_sha"
+K_RUN = "run_id"
+COMPLETED = "completed"
+GIT_EMAIL = "user.email"
+GIT_NAME = "user.name"
 
 sys.path.insert(0, str(ROOT / "scripts"))
 
@@ -72,6 +89,13 @@ def _mod():
     import canonical_attestation
 
     return canonical_attestation
+
+
+def _tree_of(repo, rev="HEAD") -> str:
+    """Arbre d'une révision — un helper, pas quatre `^{tree}` recopiés (S1192)."""
+    return subprocess.run(
+        ("git", GIT_REVPARSE, f"{rev}^{{tree}}"), cwd=repo,
+        check=True, capture_output=True, text=True).stdout.strip()
 
 
 # ═════════ FAMILLE 1 — LA LOGIQUE ÉCHOUE FERMÉ ═════════
@@ -111,8 +135,8 @@ def test_a_direct_push_is_never_reused(tmp_path, monkeypatch):
         subprocess.run(("git", *a), cwd=repo, check=True, capture_output=True)
 
     run("init", "-q", "-b", "main")
-    run(GIT_CONFIG, "user.email", "t@t")
-    run(GIT_CONFIG, "user.name", "t")
+    run(GIT_CONFIG, GIT_EMAIL, "t@t")
+    run(GIT_CONFIG, GIT_NAME, "t")
     (repo / "a.txt").write_text("1")
     run("add", ".")
     run(GIT_COMMIT, "-qm", "direct")
@@ -121,7 +145,7 @@ def test_a_direct_push_is_never_reused(tmp_path, monkeypatch):
 
     import os
 
-    monkeypatch.setenv("GITHUB_EVENT_NAME", "push")
+    monkeypatch.setenv(EVENT_VAR, "push")
     cwd = os.getcwd()
     try:
         os.chdir(repo)
@@ -193,13 +217,13 @@ def _repo_with_merge(tmp_path, *, base_moves: bool = False,
                               capture_output=True, text=True).stdout.strip()
 
     g("init", "-q", "-b", "main")
-    g(GIT_CONFIG, "user.email", "t@t")
-    g(GIT_CONFIG, "user.name", "t")
+    g(GIT_CONFIG, GIT_EMAIL, "t@t")
+    g(GIT_CONFIG, GIT_NAME, "t")
     (repo / "app.py").write_text("v1\n")
     g("add", ".")
     g(GIT_COMMIT, "-qm", "base")
 
-    g("checkout", "-q", "-b", BRANCH_FEATURE)
+    g(GIT_CHECKOUT, "-q", "-b", BRANCH_FEATURE)
     (repo / "feature.py").write_text("f\n")
     if touch_workflow:
         wf = repo / ".github" / "workflows"
@@ -209,26 +233,134 @@ def _repo_with_merge(tmp_path, *, base_moves: bool = False,
     g(GIT_COMMIT, "-qm", BRANCH_FEATURE)
     head = g(GIT_REVPARSE, "HEAD")
 
-    g("checkout", "-q", "main")
+    g(GIT_CHECKOUT, "-q", "main")
     if base_moves:
         (repo / "other.py").write_text("moved\n")
         g("add", ".")
         g(GIT_COMMIT, "-qm", "la base avance")
 
-    g("merge", "--no-ff", "-q", BRANCH_FEATURE, "-m", "Merge pull request #1")
+    g("merge", GIT_NOFF, "-q", BRANCH_FEATURE, "-m", "Merge pull request #1")
     return repo, g(GIT_REVPARSE, "HEAD"), head
 
 
-def _green_api(head_run_id="4242"):
+def _repo_with_reverted_base(tmp_path):
+    """LE CONTRE-EXEMPLE. La base reçoit `X`, la CI teste `H + X`, la base
+    ANNULE `X`, puis on fusionne.
+
+    Résultat : `tree(M) == tree(H)` — l'ancienne règle concluait `REUSE` —
+    alors que **la CI n'a jamais vu le contenu devenu canonique**.
+
+    Renvoie `(dir, merge, head, tree_réellement_testé)`.
+    """
+    repo = tmp_path / "revert"
+    repo.mkdir()
+
+    def g(*a):
+        return subprocess.run(("git", *a), cwd=repo, check=True,
+                              capture_output=True, text=True).stdout.strip()
+
+    g("init", "-q", "-b", "main")
+    g(GIT_CONFIG, GIT_EMAIL, "t@t")
+    g(GIT_CONFIG, GIT_NAME, "t")
+    (repo / "app.py").write_text("v1\n")
+    g("add", ".")
+    g(GIT_COMMIT, "-qm", "base")
+
+    g(GIT_CHECKOUT, "-q", "-b", BRANCH_FEATURE)
+    (repo / "f.py").write_text("f\n")
+    g("add", ".")
+    g(GIT_COMMIT, "-qm", BRANCH_FEATURE)
+    head = g(GIT_REVPARSE, "HEAD")
+
+    # la base reçoit X
+    g(GIT_CHECKOUT, "-q", "main")
+    (repo / "x.py").write_text("X\n")
+    g("add", ".")
+    g(GIT_COMMIT, "-qm", "X")
+    base_with_x = g(GIT_REVPARSE, "HEAD")
+
+    # ce que la CI de PR teste À CET INSTANT : merge(base+X, H)
+    g(GIT_CHECKOUT, "-q", "-b", "preview", head)
+    g("merge", GIT_NOFF, "-m", "apercu", base_with_x)
+    tested_tree = _tree_of(repo)
+
+    # la base ANNULE X
+    g(GIT_CHECKOUT, "-q", "main")
+    g("revert", "--no-edit", base_with_x)
+
+    g("merge", GIT_NOFF, "-m", "Merge pull request #1", BRANCH_FEATURE)
+    return repo, g(GIT_REVPARSE, "HEAD"), head, tested_tree
+
+
+def test_the_old_tree_equality_rule_was_wrong(tmp_path):
+    """LA PREUVE QUE L'ANCIENNE RÈGLE PRODUISAIT UN FAUX REUSE.
+
+    Cette garde ne teste pas le code actuel : elle **fige le contre-exemple**,
+    pour qu'on ne puisse plus jamais réintroduire l'ancien raisonnement en
+    croyant l'avoir démontré.
+
+    L'argument fautif était : « si `tree(M) == tree(H)`, la base est la base de
+    branchement ». Faux — cela dit seulement que la contribution NETTE de la
+    base est nulle, ce qui vaut aussi après un aller-retour.
+    """
+    repo, merge, head, tested_tree = _repo_with_reverted_base(tmp_path)
+
+    def g(*a):
+        return subprocess.run(("git", *a), cwd=repo, check=True,
+                              capture_output=True, text=True).stdout.strip()
+
+    tree_m = _tree_of(repo, merge)
+    tree_h = _tree_of(repo, head)
+
+    assert tree_m == tree_h, (
+        "le contre-exemple exige tree(M) == tree(H) — sinon il ne démontre rien"
+    )
+    assert tested_tree != tree_m, (
+        "le contre-exemple exige que la CI ait testé AUTRE CHOSE"
+    )
+
+
+def test_the_counter_example_now_yields_full(tmp_path, monkeypatch):
+    """ET LA NOUVELLE RÈGLE LE REFUSE. L'artefact atteste `H + X` ; l'arbre
+    canonique est `tree(H)`. Ils diffèrent, donc `FULL`."""
+    m = _mod()
+    repo, merge, head, tested_tree = _repo_with_reverted_base(tmp_path)
+    api = _green_api(tested_tree_sha=tested_tree, head_sha=head)
+    verdict, reason, _ = _attest_in(repo, merge, monkeypatch, api)
+    assert verdict == m.FULL, reason
+    assert "n'est PAS celui testé" in reason, reason
+
+
+def _green_api(head_run_id="4242", tested_tree_sha=None, head_sha=None):
+    """Simulateur d'API. `tested_tree_sha` est ce que l'ARTEFACT atteste.
+
+    Laissé à `None`, il est aligné sur l'arbre canonique par `_attest_in` —
+    le cas nominal. Le contre-exemple, lui, le fixe à ce que la CI a
+    réellement testé, qui diffère.
+    """
     def fake(path, token):
         if RUNS_PATH in path:
             return {RUNS_KEY: [{
                 "id": int(head_run_id), "name": "CI", "event": PR_EVENT,
-                STATUS_KEY: "completed", CONCLUSION: SUCCESS,
+                STATUS_KEY: COMPLETED, CONCLUSION: SUCCESS,
                 STARTED_KEY: STARTED}]}
+        if "/artifacts" in path:
+            return {"artifacts": [{
+                "name": ARTIFACT, EXPIRED: False,
+                DL_URL: FAKE_ZIP}]}
         return {"jobs": [{"name": c, CONCLUSION: SUCCESS}
                          for c in (REQUIRED_CHECK, SONAR_CHECK)]}
+    fake.tested_tree_sha = tested_tree_sha
+    fake.head_sha = head_sha
+    fake.run_id = head_run_id
     return fake
+
+
+def _zip_payload(payload: dict) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as zf:
+        zf.writestr("pr_attestation.json", json.dumps(payload))
+    return buf.getvalue()
 
 
 def _attest_in(repo, sha, monkeypatch, api, event="push"):
@@ -236,7 +368,28 @@ def _attest_in(repo, sha, monkeypatch, api, event="push"):
 
     m = _mod()
     monkeypatch.setattr(m, "_api", api)
-    monkeypatch.setenv("GITHUB_EVENT_NAME", event)
+
+    # L'artefact que le run de PR aurait déposé. Par défaut il atteste l'arbre
+    # canonique lui-même (cas nominal) ; un test peut le faire diverger.
+    def _bytes(url, token):
+        tree = getattr(api, K_TREE, None)
+        if tree is None:
+            tree = _tree_of(repo, sha)
+        head = getattr(api, K_HEAD, None)
+        if head is None:
+            head = subprocess.run(
+                ("git", "rev-list", "--parents", "-n", "1", sha), cwd=repo,
+                capture_output=True, text=True).stdout.split()[-1]
+        return _zip_payload({
+            "tested_merge_sha": "a" * 40,
+            K_TREE: tree,
+            K_HEAD: head,
+            "base_sha": "b" * 40,
+            K_RUN: getattr(api, K_RUN, "4242"),
+        })
+
+    monkeypatch.setattr(m, "_api_bytes", _bytes)
+    monkeypatch.setenv(EVENT_VAR, event)
     cwd = os.getcwd()
     try:
         os.chdir(repo)
@@ -293,10 +446,14 @@ def test_case_b_a_moved_base_is_never_reused(tmp_path, monkeypatch):
     """CAS B — la famille de défaut de la PR #159, reproduite. La canonique a
     avancé avant le merge : l'arbre fusionné n'est plus celui testé."""
     m = _mod()
-    repo, merge, _ = _repo_with_merge(tmp_path, base_moves=True)
-    verdict, reason, _ = _attest_in(repo, merge, monkeypatch, _green_api())
+    repo, merge, head = _repo_with_merge(tmp_path, base_moves=True)
+    # La CI de PR a tourné AVANT que la base bouge : elle a donc testé l'arbre
+    # de la tête, pas celui du merge final. C'est ce que l'artefact atteste.
+    tested = _tree_of(repo, head)
+    api = _green_api(tested_tree_sha=tested, head_sha=head)
+    verdict, reason, _ = _attest_in(repo, merge, monkeypatch, api)
     assert verdict == m.FULL, reason
-    assert "arbre" in reason, reason
+    assert "n'est PAS celui testé" in reason, reason
 
 
 def test_case_c_no_ci_run_is_never_reused(tmp_path, monkeypatch):
@@ -326,7 +483,7 @@ def test_cases_d_and_e_a_non_green_run_is_never_reused(
         if RUNS_PATH in path:
             return {RUNS_KEY: [{
                 "id": 1, "name": "CI", "event": PR_EVENT,
-                STATUS_KEY: "completed", CONCLUSION: conclusion,
+                STATUS_KEY: COMPLETED, CONCLUSION: conclusion,
                 STARTED_KEY: STARTED}]}
         # ⚠ Les contrôles requis sont VERTS ici, délibérément. Avec une liste
         # de jobs vide, retirer la vérification de conclusion laissait la garde
@@ -414,6 +571,125 @@ def test_an_unexpected_exception_is_never_reused(tmp_path, monkeypatch):
     assert verdict == m.FULL, reason
 
 
+# ═════════ FAMILLE 1quater — L'ARTEFACT EST LA SEULE SOURCE ═════════
+#
+# « Artefact absent, expiré, ambigu, différent ou non vérifiable => FULL. »
+# Chacun de ces cinq mots est une garde.
+
+
+def _api_with_artifacts(arts):
+    def fake(path, token):
+        if RUNS_PATH in path:
+            return {RUNS_KEY: [{
+                "id": 4242, "name": "CI", "event": PR_EVENT,
+                STATUS_KEY: COMPLETED, CONCLUSION: SUCCESS,
+                STARTED_KEY: STARTED}]}
+        if "/artifacts" in path:
+            return {"artifacts": arts}
+        return {"jobs": [{"name": c, CONCLUSION: SUCCESS}
+                         for c in (REQUIRED_CHECK, SONAR_CHECK)]}
+    return fake
+
+
+def test_a_missing_artifact_is_never_reused(tmp_path, monkeypatch):
+    m = _mod()
+    repo, merge, _ = _repo_with_merge(tmp_path)
+    verdict, reason, _ = _attest_in(
+        repo, merge, monkeypatch, _api_with_artifacts([]))
+    assert verdict == m.FULL, reason
+    assert "aucun artefact" in reason, reason
+
+
+def test_an_expired_artifact_is_never_reused(tmp_path, monkeypatch):
+    """GitHub purge les artefacts. Un artefact expiré n'atteste plus rien."""
+    m = _mod()
+    repo, merge, _ = _repo_with_merge(tmp_path)
+    api = _api_with_artifacts([{
+        "name": ARTIFACT, EXPIRED: True,
+        DL_URL: FAKE_ZIP}])
+    verdict, reason, _ = _attest_in(repo, merge, monkeypatch, api)
+    assert verdict == m.FULL, reason
+    assert "EXPIRÉ" in reason, reason
+
+
+def test_an_ambiguous_artifact_set_is_never_reused(tmp_path, monkeypatch):
+    """Deux artefacts du même nom : on ne sait pas lequel fait foi."""
+    m = _mod()
+    repo, merge, _ = _repo_with_merge(tmp_path)
+    one = {"name": ARTIFACT, EXPIRED: False,
+           DL_URL: FAKE_ZIP}
+    verdict, reason, _ = _attest_in(
+        repo, merge, monkeypatch, _api_with_artifacts([one, dict(one)]))
+    assert verdict == m.FULL, reason
+    assert "ambigu" in reason, reason
+
+
+def test_an_unreadable_artifact_is_never_reused(tmp_path, monkeypatch):
+    m = _mod()
+    repo, merge, _ = _repo_with_merge(tmp_path)
+    monkeypatch.setattr(_mod(), "_api_bytes", lambda url, tok: b"pas un zip")
+    api = _green_api()
+    monkeypatch.setattr(_mod(), "_api", api)
+    import os
+
+    monkeypatch.setenv(EVENT_VAR, "push")
+    cwd = os.getcwd()
+    try:
+        os.chdir(repo)
+        verdict, reason, _ = _mod().attest(merge, REPO, TOKEN)
+    finally:
+        os.chdir(cwd)
+    assert verdict == m.FULL, reason
+    assert "illisible" in reason, reason
+
+
+def test_an_artifact_attesting_another_head_is_never_reused(tmp_path, monkeypatch):
+    """L'artefact doit parler DE CETTE tête de PR, pas d'une autre."""
+    m = _mod()
+    repo, merge, _ = _repo_with_merge(tmp_path)
+    api = _green_api(head_sha="f" * 40)
+    verdict, reason, _ = _attest_in(repo, merge, monkeypatch, api)
+    assert verdict == m.FULL, reason
+    assert "atteste la tête" in reason, reason
+
+
+def test_an_artifact_claiming_another_run_is_never_reused(tmp_path, monkeypatch):
+    """L'artefact doit se réclamer DU run sur lequel on l'a trouvé.
+
+    ⚠ Ce cas manquait, et le planter l'a montré : désarmer la vérification
+    laissait les 53 gardes vertes, parce qu'aucune ne construisait un artefact
+    incohérent avec son run. Une garde n'existe que pour l'état qu'elle
+    fabrique — troisième fois dans cette tranche.
+    """
+    m = _mod()
+    repo, merge, head = _repo_with_merge(tmp_path)
+    api = _green_api(head_sha=head)
+    api.run_id = "999999"          # l'artefact ment sur sa provenance
+    verdict, reason, _ = _attest_in(repo, merge, monkeypatch, api)
+    assert verdict == m.FULL, reason
+    assert "se réclame du run" in reason, reason
+
+
+def test_the_capture_records_what_is_actually_checked_out(tmp_path, monkeypatch):
+    """La moitié qui manquait : sans capture, on ne peut que DÉDUIRE."""
+    import os
+
+    m = _mod()
+    repo, merge, head = _repo_with_merge(tmp_path)
+    monkeypatch.setenv("PR_HEAD_SHA", head)
+    monkeypatch.setenv("GITHUB_RUN_ID", "777")
+    cwd = os.getcwd()
+    try:
+        os.chdir(repo)
+        payload = m.capture_payload()
+    finally:
+        os.chdir(cwd)
+    expected = _tree_of(repo)
+    assert payload[K_TREE] == expected, payload
+    assert payload[K_HEAD] == head, payload
+    assert payload[K_RUN] == "777", payload
+
+
 # ═════════ FAMILLE 1ter — LE SHADOW MODE EST LE DÉFAUT ═════════
 #
 # Phase 5 de l'ordre : « pendant plusieurs merges, calculer WOULD_REUSE /
@@ -429,7 +705,7 @@ def _main_with(monkeypatch, tmp_path, env: dict, verdict: str):
     m = _mod()
     out = tmp_path / "gh_output"
     out.write_text("")
-    monkeypatch.setattr(m, "attest", lambda *a, **k: (verdict, "raison", "99"))
+    monkeypatch.setattr(m, ATTEST_ID, lambda *a, **k: (verdict, "raison", "99"))
     monkeypatch.setenv("GITHUB_OUTPUT", str(out))
     monkeypatch.setenv("GITHUB_TOKEN", TOKEN)
     for k, v in env.items():
@@ -485,7 +761,7 @@ def test_the_workflow_reads_the_arming_variable(wf):
     """Le câblage : sans cette variable dans l'environnement du step, le
     shadow mode serait permanent et la tranche n'aurait aucun effet possible."""
     step = next(
-        s for s in wf["jobs"][ATTESTATION_JOB]["steps"] if s.get("id") == "attest"
+        s for s in wf["jobs"][ATTESTATION_JOB]["steps"] if s.get("id") == ATTEST_ID
     )
     assert "CI_CANONICAL_REUSE_ENABLED" in step["env"], step["env"]
     assert "vars.CI_CANONICAL_REUSE_ENABLED" in step["env"][
@@ -505,9 +781,9 @@ def test_the_attestation_job_exists_and_reads_the_event(wf):
     dans le script supprime la cause au lieu de la contourner.
     """
     job = wf["jobs"][ATTESTATION_JOB]
-    step = next(s for s in job["steps"] if s.get("id") == "attest")
-    assert "GITHUB_EVENT_NAME" in step["env"], step["env"]
-    assert "github.event_name" in step["env"]["GITHUB_EVENT_NAME"]
+    step = next(s for s in job["steps"] if s.get("id") == ATTEST_ID)
+    assert EVENT_VAR in step["env"], step["env"]
+    assert "github.event_name" in step["env"][EVENT_VAR]
 
 
 def test_the_shards_are_gated_on_the_attestation_output(wf):
@@ -583,6 +859,27 @@ def test_a_reused_push_still_feeds_sonar_real_coverage(wf):
     assert imp is not None, "aucune étape n'importe la couverture du run attesté"
     assert imp["with"][RUN_ID_KEY].strip().startswith("${{"), imp["with"]
     assert ATTESTATION_JOB in imp["with"][RUN_ID_KEY], imp["with"][RUN_ID_KEY]
+
+
+def test_the_pull_request_run_uploads_its_attestation(wf):
+    """LE CÂBLAGE DE LA CAPTURE. Sans ce dépôt, aucun push ne peut jamais
+    réutiliser un verdict — et pire, on serait tenté de le DÉDUIRE."""
+    steps = wf["jobs"][ATTESTATION_JOB]["steps"]
+    up = next(
+        (x for x in steps if "upload-artifact" in str(x.get("uses") or "")), None
+    )
+    assert up is not None, "le run de PR ne dépose aucune attestation"
+    assert up["with"]["name"] == ARTIFACT, up["with"]
+    assert up["if"] == "github.event_name == 'pull_request'", up["if"]
+    assert up["with"]["if-no-files-found"] == "error", up["with"]
+
+
+def test_the_capture_receives_the_pull_request_shas(wf):
+    step = next(
+        x for x in wf["jobs"][ATTESTATION_JOB]["steps"] if x.get("id") == ATTEST_ID
+    )
+    for var in ("PR_HEAD_SHA", "PR_BASE_SHA"):
+        assert var in step["env"], step["env"]
 
 
 def test_the_lint_job_is_never_gated_by_the_attestation(wf):
