@@ -197,3 +197,55 @@ Trois voies pour `D4`, soumises à l'opérateur :
 * **`D11`** — dette de dépendance (passlib / `bcrypt<5`) : PR séparée, sur ordre.
 * **Nettoyage CSS** des classes de l'ancienne interface.
 * **Déploiement** : la canonique n'est pas en production.
+
+
+---
+
+## 10. Closeout post-merge
+
+| | |
+|---|---|
+| PR | **#178** |
+| Merge | **`9094d72`** — `--merge`, tête épinglée `56e1203`, **pas de squash, pas de `--admin`, pas de force** |
+| CI de PR | **9/9 `pass`**, **aucun cycle rouge** |
+| Gate Sonar (PR) | **`OK`** — 0 bug · 0 code smell · 0 vulnérabilité · **couverture du code neuf 100 %** |
+| CI canonique (`push` sur le merge) | run **33528541413** — **succès, 6/6 jobs** |
+| Full sweep local | **291/291 fichiers verts**, pic 1956 Mo / 2184 |
+| Fils de revue non résolus | **0** |
+
+### Ce que cette tranche laisse au dépôt
+
+**Une garde peut exiger le défaut.**
+`test_last_time_chip_falls_back_to_premiere_fois` imposait `première fois` dans
+quatre situations, dont **deux où l'utilisateur était déjà venu**. Elle a tenu
+le défaut en place aussi solidement qu'elle aurait protégé une propriété — et
+personne ne l'a vue tant que la contradiction n'était pas **visible côte à côte
+à l'écran**.
+
+Ce défaut n'a pas été trouvé par un test mais **par un rendu fabriqué pour un
+arbitrage**. C'est le troisième cas de cette session où l'exposition visuelle
+trouve ce qu'aucune garde ne regardait — après l'`opacity` de `DF-C` et les
+cibles sous 44 px.
+
+**Et, deuxième tranche consécutive, c'est le sweep COMPLET qui a trouvé.** Mon
+sweep ciblé couvrait huit fichiers et était vert ; `test_briefing_service.py`
+n'y figurait pas.
+
+### Ce que cette tranche a découvert et qui la dépasse
+
+En préparant `D4`, une vérification a montré qu'une entrée ne portant que
+`chain` dans `exercise_properties.json` ferait proposer **« Skull crushers
+EZ-bar » (score 85) comme alternative N2 à « Leg press »**. Le registre a un
+contrat implicite — une entrée porte ses cinq champs — et `None == None` compte
+comme une correspondance dans le scoring. **Ce défaut vaut une tranche à part.**
+
+### Reste ouvert
+
+* **`DF-D`** — suggestion de repos contextuelle : la classification des 24
+  exercices est prête, la forme de `D4` attend l'arbitrage (fichier dédié
+  plutôt qu'entrées partielles dans le registre).
+* **Le scoring de substitution** — `None == None` traité comme une
+  correspondance. Tranche à part.
+* **`D11`** — dette de dépendance (passlib / `bcrypt<5`), PR séparée sur ordre.
+* **Déploiement** : `9094d72` **n'est pas en production** — le dernier
+  déploiement est `32cf5ee`.
