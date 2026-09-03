@@ -423,3 +423,49 @@ couche défaillante**. Trouvé en exécutant le vrai téléchargement.
 4. **Mesurer le gain réel** après activation — l'hypothèse de l'audit
    (≈ 95 % des merges, ≈ 39 % du runner-time) est une **prévision**, pas un
    critère de réussite.
+
+---
+
+## 12. Closeout — `MERGÉE`, et ce que la CI réelle a montré ensuite
+
+**Mergée le 2026-09-03** — PR #179, merge `d97d545`, `--merge` tête épinglée
+`95a0b73`, sans squash ni `--admin`. CI de PR **9/9**, gate Sonar **OK**
+(0 code smell, 0 bug, 0 vulnérabilité, couverture du code neuf sans ligne
+découverte), 0 fil de revue ouvert.
+
+### La CI canonique qui a suivi était ROUGE — et pas à cause de cette tranche
+
+Run `33732658392` : `pytest shard 1` en échec sur deux tests de
+`test_train1c_progression_consolidation.py`, un fichier que #179 n'a jamais
+touché.
+
+**Une bombe temporelle**, posée dix-neuf jours plus tôt : un ancrage `NOW` gelé
+au 2026-08-21 contre une route `/progress` qui lit l'heure réelle, sur une
+fenêtre de 14 jours. La donnée est sortie de la fenêtre **à minuit UTC**.
+
+> ⚠ **J'ai d'abord attribué la rougeur au décalage des shards**, et la mesure
+> était juste — #179 ajoutait un fichier de test, ce qui déplaçait la cible du
+> shard 3 au shard 1. **Ce n'était pas la cause** : rejouée, l'ancienne
+> partition est rouge elle aussi. *Vérifier une hypothèse ne suffit pas ; il
+> faut vérifier qu'aucune autre ne suffit.*
+
+Traitée dans sa propre tranche : `Sx_CI_CONTROL_COVERAGE_01` (PR #181, merge
+`0898f41`), avec la garde qui ferme la classe.
+
+### Le mécanisme, observé sur des runs réels
+
+| Événement | Verdict | Attendu ? |
+|---|---|---|
+| PR #181 (`pull_request`) | `WOULD_FULL` — « l'attestation ne concerne que les pushs canoniques » | oui |
+| Push canonique `0898f41` | `WOULD_FULL` — **« le mécanisme de sélection lui-même a changé : `.github/workflows/ci.yml` »** | oui — annoncé d'avance |
+
+La capture d'artefact fonctionne sur les runs de PR (`tested_merge_sha`,
+`tested_tree_sha`, `head_sha`, `base_sha`, `run_id` déposés), et la garde
+d'auto-référence a rendu son premier verdict **sur un vrai merge**.
+
+**Le shadow mode reste le défaut.** `CI_CANONICAL_REUSE_ENABLED` n'est pas
+armée : aucune décision de la CI n'a été modifiée par ce mécanisme à ce jour.
+
+### Canonique finale
+
+`0898f41` — CI canonique **7/7 verte**, `SonarCloud` compris.

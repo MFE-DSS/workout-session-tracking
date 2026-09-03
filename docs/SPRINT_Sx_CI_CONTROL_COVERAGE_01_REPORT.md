@@ -220,3 +220,51 @@ soit environ **+25 % de wall-clock** sur le shard le plus lourd.
    (dernier déploiement `32cf5ee`, 2026-08-29).
 3. **Reprendre le chemin critique UI** : `DF-D`, puis `B9`
    (`UIV3_VISUAL_BASELINE_01`), puis `AUREN_EXPERIENCE_ARCHITECTURE_V4`.
+
+---
+
+## 10. Closeout
+
+**Mergée le 2026-09-03** — PR #181, merge `0898f41`, `--merge` tête épinglée
+`153abb8`, sans squash ni `--admin`.
+
+| | |
+|---|---|
+| CI de PR | **verte**, aucun cycle rouge |
+| Gate Sonar | **OK** — 0 code smell, 0 bug, 0 vulnérabilité, 0 duplication |
+| Fils de revue ouverts | 0 |
+| **CI canonique** | **7/7 verte** (run `33748502362`), `SonarCloud` compris |
+
+### La canonique est réparée
+
+Le run canonique précédent (`33732658392`) était rouge sur la bombe temporelle.
+Celui qui suit ce merge est **vert de bout en bout**. Le défaut est fermé, et la
+garde qui l'interdit est en place.
+
+### L'étape d'isolation a réellement tourné
+
+Vérifié dans les logs de la CI réelle, et pas seulement en local :
+
+```
+[isolation] 5 fichier(s) de test modifié(s) — chacun joué SEUL.
+[isolation] OK   tests/test_scope_guard.py
+[isolation] OK   tests/test_time_bomb_guard.py
+[isolation] OK   tests/test_train1c_progression_consolidation.py
+[isolation] OK   tests/test_ui_surface_guards.py
+[isolation] OK   tests/test_ux4_zone_exposure.py
+```
+
+Le fichier qui avait fait tomber la canonique passe désormais **seul**.
+
+### Ce qui reste ouvert, et n'appartient pas à cette tranche
+
+1. **Arbitrage** — le `if:` du job `sonar` (une PR de fork laisserait le
+   contrôle requis en *pending* ; 0 occurrence sur 120 PR) et le passage de
+   **3 à 5 shards** (−3,6 min par PR pour +0,6 runner-minute, à information
+   identique).
+2. **Déploiement** — `DF-E` et `DF-F` sont mergées et **absentes de
+   production** (dernier déploiement `32cf5ee`, 2026-08-29).
+3. **Le chemin critique UI** reprend : `DF-D`, puis `B9`
+   (`UIV3_VISUAL_BASELINE_01`), puis `AUREN_EXPERIENCE_ARCHITECTURE_V4`.
+
+**Le chantier CI/CD est fermé.**
