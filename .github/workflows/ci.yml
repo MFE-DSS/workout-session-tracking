@@ -5,7 +5,9 @@ on:
   push:
     # Sb_20.4 — branche par défaut du repo (pas de `main` distant ; cette
     # branche fait office de trunk). À ajuster si on renomme un jour.
-    branches: [main, claude/sprint-reporting-fitness-app-V7Qr6]
+    # `main` retiré le 2026-09-03 : la branche n'existe PAS sur le remote
+    # (`git ls-remote --heads origin main` ne rend rien). Config morte.
+    branches: [claude/sprint-reporting-fitness-app-V7Qr6]
     # Sb_OPS.ci-path-filter — skip CI on docs-only pushes. Un push dont
     # TOUS les fichiers sont sous docs/ ne déclenche pas ce workflow ; il
     # suffit qu'un seul fichier hors docs/ change pour que la CI joue.
@@ -522,6 +524,24 @@ jobs:
       # suite ran. The `lint` job (ruff budget, bandit, actionlint, shellcheck, pip-audit,
       # gitleaks, spec protocol, auth-scope matrix) is deliberately NOT gated and still runs
       # in full on every change, which is what keeps documentation and skill changes covered.
+      # ═══ Sx_CI_TEST_ISOLATION_01 — un test modifié doit passer SEUL ═══
+      #
+      # Le 2026-09-03 la canonique est tombée sur un test que personne n'avait
+      # touché : il ne passait que grâce à ses voisins de shard. Deux propriétés
+      # rendaient le défaut invisible — l'ordre est déterministe
+      # (`pytest-randomly` absent), mais la LISTE de fichiers bouge : le
+      # shardage est un tourniquet par index, et ajouter un seul fichier de test
+      # déplace 229 fichiers sur 292.
+      #
+      # Quelques secondes par fichier changé, sur le seul diff qui peut
+      # introduire la classe.
+      - name: Changed test files must pass alone (Sx_CI_TEST_ISOLATION_01)
+        if: steps.scope.outputs.runtime == 'true' && github.event_name == 'pull_request'
+        run: |
+          python scripts/check_test_isolation.py \
+            --base "origin/${{ github.base_ref }}" \
+            --head "HEAD"
+
       - name: Non-runtime change — full suite intentionally skipped (Sb_CI_02_1)
         if: steps.scope.outputs.runtime != 'true'
         run: |

@@ -153,8 +153,30 @@ def classify(files: list[str], policy: dict) -> dict:
         }
 
     # shared_code vs isolated: any modified app/ py imported elsewhere?
+    #
+    # ⚠ LA DÉTECTION PAR IMPORTS NE VOIT QUE LE PYTHON, ET C'EST UN TROU.
+    #
+    # Une feuille de style et un gabarit ne s'`import`ent pas : ils étaient donc
+    # INDÉTECTABLES comme partagés, et `check_scope` les classait `isolated` —
+    # c'est-à-dire au niveau de vérification le PLUS BAS. Mesuré le 2026-09-03
+    # par observation dynamique de 1391 tests :
+    #
+    #     app/static/css/app.css            lu par 54,8 % de la suite
+    #     app/static/css/interaction.css               52,0 %
+    #     app/static/css/target_closure.css            51,7 %
+    #     app/templates/base.html          rendu par  50,7 %
+    #
+    # `AUREN_UI_BLUEPRINT §8` l'avait signalé sans le chiffrer. À la veille
+    # d'une phase de refonte UI, c'est exactement le mauvais sens d'erreur :
+    # toucher la feuille globale autorisait le minimum de contrôles.
+    #
+    # La liste vit dans `.check-policy.json` (versionné) : la faire évoluer
+    # demande un commit, jamais un prompt.
+    global_assets = _touches(files, *policy.get("global_surfaces", {}).get("paths", []))
     app_py = [f for f in files if f.startswith("app/") and f.endswith(".py")]
-    shared_hits = [f for f in app_py if _is_imported_elsewhere(f, files)]
+    shared_hits = [f for f in app_py if _is_imported_elsewhere(f, files)] + global_assets
+    if global_assets:
+        reasons.append("touches a globally-observed stylesheet/template")
     if shared_hits:
         triggers["shared_code"] = sorted(shared_hits)
         reasons.append("modifies app/ code imported elsewhere (shared)")

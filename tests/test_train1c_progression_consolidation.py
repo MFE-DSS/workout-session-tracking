@@ -41,7 +41,22 @@ PROGRESS = TEMPLATES / "progress.html"
 BASE = TEMPLATES / "base.html"
 PAGES = ROOT / "app/routers/pages.py"
 
-NOW = datetime(2026, 8, 21, 12, 0, tzinfo=UTC)
+#: ⏰ ANCRAGE FLOTTANT, ET C'EST UNE CORRECTION DE DÉFAUT.
+#:
+#: Cette constante valait `datetime(2026, 8, 21, 12, 0)`. Les tests de service
+#: reçoivent `now=NOW` et restaient donc cohérents — mais ceux qui passent par
+#: la VRAIE route `/progress` n'injectent rien : la route lit l'heure réelle.
+#:
+#: Mesuré le 2026-09-03 : `_session(days_ago=2)` posait la donnée au 08-19, et
+#: la fenêtre de `WINDOW_DAYS = 14` commençait au 08-20. **La donnée était
+#: dehors, et deux tests sont devenus rouges à minuit UTC** — sans qu'aucun
+#: commit n'ait touché ni le produit ni le test. La canonique est tombée
+#: (run 33732658392) sur une bombe posée dix-neuf jours plus tôt.
+#:
+#: Un ancrage flottant garde le déterminisme DANS un run (une seule lecture de
+#: l'horloge, réutilisée partout) tout en restant à distance constante de la
+#: fenêtre glissante. Les tests de service continuent de recevoir `now=NOW`.
+NOW = datetime.now(UTC).replace(hour=12, minute=0, second=0, microsecond=0)
 
 PROGRESS_URL = "/progress"
 KPI_VALUE = "kpi-card__value"

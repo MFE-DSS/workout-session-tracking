@@ -11,42 +11,109 @@
   "tiers": {
     "docs": {
       "when": "Tous les fichiers touchés sont sous docs/ (ou *.md hors code).",
-      "match_all": ["^docs/", "\\.md$"],
-      "required_local_checks": ["check_spec_protocol"],
-      "skip": ["full_sweep", "broad_sweep", "migration_checks", "ruff_budget"],
+      "match_all": [
+        "^docs/",
+        "\\.md$"
+      ],
+      "required_local_checks": [
+        "check_spec_protocol"
+      ],
+      "skip": [
+        "full_sweep",
+        "broad_sweep",
+        "migration_checks",
+        "ruff_budget"
+      ],
       "ci_note": "paths-ignore docs/** — la CI est légitimement skippée pour un commit 100% docs."
     },
     "isolated": {
       "when": "Fichier(s) de service/util NEUF(S) + leurs tests, sans modifier aucun fichier importé ailleurs, sans migration/model/schema/UI.",
-      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "targeted_tests", "broad_sweep_scoped"],
-      "skip": ["full_sweep_local"],
+      "required_local_checks": [
+        "ruff_new_files",
+        "check_ruff_budget",
+        "check_spec_protocol",
+        "targeted_tests",
+        "broad_sweep_scoped"
+      ],
+      "skip": [
+        "full_sweep_local"
+      ],
       "ci_note": "La CI réelle joue le rôle du full sweep. Full sweep LOCAL non requis.",
       "rationale": "Un nouveau module non importé par le code existant ne peut pas régresser un test hors de sa surface. Broad sweep ciblé (module + consommateurs potentiels) suffit localement."
     },
     "shared_code": {
       "when": "Modifie un fichier de code déjà importé ailleurs (service consommé, util partagé, muscle_mapping.py, etc.) SANS toucher migration/model/schema.",
-      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "targeted_tests", "broad_sweep_scoped"],
-      "skip": ["full_sweep_local"],
+      "required_local_checks": [
+        "ruff_new_files",
+        "check_ruff_budget",
+        "check_spec_protocol",
+        "targeted_tests",
+        "broad_sweep_scoped"
+      ],
+      "skip": [
+        "full_sweep_local"
+      ],
       "ci_note": "Sb_OPS.ci-efficiency — la CI complete parallelisee sur PR (via `scripts/run_ci_pytest.sh`, workers bornes) est le filet de verite du blast radius partage. Le broad sweep cible reste le garde LOCAL obligatoire ; le full sweep local n'est PLUS systematiquement requis, et ne se lance jamais en `-n auto`.",
       "rationale": "Modifier un fichier partagé peut casser un test lointain, mais la CI parallélisée le rejoue vite et fait foi. Le broad sweep ciblé (module + consommateurs) est le garde local obligatoire ; le full sweep local devient RECOMMANDÉ-SI-DOUTE, plus une obligation systématique (dogfood du levier xdist : un full sweep local ~4 min reste peu coûteux si on choisit de le lancer)."
     },
     "migration": {
       "when": "Touche migrations/**, app/models/**, ou data/schema_snapshot.sql.",
-      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "check_alembic_drift", "check_schema_snapshot", "check_migration_patterns", "check_migration_roundtrip", "targeted_tests", "broad_sweep_scoped", "full_sweep_local"],
+      "required_local_checks": [
+        "ruff_new_files",
+        "check_ruff_budget",
+        "check_spec_protocol",
+        "check_alembic_drift",
+        "check_schema_snapshot",
+        "check_migration_patterns",
+        "check_migration_roundtrip",
+        "targeted_tests",
+        "broad_sweep_scoped",
+        "full_sweep_local"
+      ],
       "skip": [],
       "rationale": "Changement de schéma : risque maximal. Tous les migration checks + full sweep."
     },
     "ci_infra": {
       "when": "Touche .github/**, scripts/**, requirements*.txt, pyproject.toml, package.json.",
-      "required_local_checks": ["ruff_new_files", "check_ruff_budget", "check_spec_protocol", "full_sweep_local"],
+      "required_local_checks": [
+        "ruff_new_files",
+        "check_ruff_budget",
+        "check_spec_protocol",
+        "full_sweep_local"
+      ],
       "skip": [],
       "ci_note": "Valider IMPÉRATIVEMENT sur la CI réelle (le changement affecte le pipeline lui-même)."
     }
   },
-  "tier_precedence": ["migration", "ci_infra", "shared_code", "isolated", "docs"],
+  "tier_precedence": [
+    "migration",
+    "ci_infra",
+    "shared_code",
+    "isolated",
+    "docs"
+  ],
   "_precedence_doc": "Si un diff matche plusieurs tiers, on retient le PLUS STRICT (ordre ci-dessus, migration > ci_infra > shared_code > isolated > docs). On ne descend jamais.",
   "shared_code_detection": {
     "_doc": "Un fichier sous app/ (hors le fichier neuf lui-même) est 'partagé' s'il est référencé par un `import`/`from ... import` ailleurs dans app/. check_scope.py teste : le fichier modifié est-il importé par au moins un AUTRE module app/ ?",
-    "roots": ["app/"]
+    "roots": [
+      "app/"
+    ]
+  },
+  "global_surfaces": {
+    "_doc": "Fichiers NON-PYTHON observés par une large fraction de la suite. La détection `shared_code_detection` ne voit que les `import` Python : une feuille de style et un gabarit ne s'importent pas, donc ils étaient classés `isolated` — le niveau de vérification le PLUS BAS.",
+    "_measured": "Observation dynamique de 1391 tests le 2026-09-03 (sonde hors dépôt sur `jinja2.Environment.get_template` et les lectures de `app/static`). Seuil retenu : plus de 40 % de la suite.",
+    "_evidence": {
+      "app/static/css/app.css": "54.8 %",
+      "app/static/css/interaction.css": "52.0 %",
+      "app/static/css/target_closure.css": "51.7 %",
+      "app/templates/base.html": "50.7 %"
+    },
+    "paths": [
+      "app/static/css/app.css",
+      "app/static/css/interaction.css",
+      "app/static/css/target_closure.css",
+      "app/templates/base.html",
+      "app/templates/_macros.html"
+    ]
   }
 }

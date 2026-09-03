@@ -55,6 +55,66 @@ def test_shared_code_when_modified_file_imported_elsewhere():
     assert _classify(["app/services/muscle_mapping.py"]) == "shared_code"
 
 
+def test_a_globally_observed_stylesheet_is_shared_not_isolated():
+    """⚠ LE TROU QUE LA DÉTECTION PAR IMPORTS NE POUVAIT PAS VOIR.
+
+    `shared_code_detection` cherche un `import` Python. Une feuille de style et
+    un gabarit ne s'importent pas : ils étaient donc classés `isolated`, c'est-
+    à-dire au niveau de vérification LE PLUS BAS — alors que l'observation
+    dynamique de 1391 tests les montre lus ou rendus par plus de la moitié de
+    la suite (`app.css` 54,8 %, `base.html` 50,7 %).
+
+    `AUREN_UI_BLUEPRINT §8` l'avait signalé sans le chiffrer.
+    """
+    for path in (
+        "app/static/css/app.css",
+        "app/static/css/interaction.css",
+        "app/static/css/target_closure.css",
+        "app/templates/base.html",
+        "app/templates/_macros.html",
+    ):
+        assert _classify([path]) == "shared_code", (
+            f"{path} est une surface globale : la classer `isolated` autorise "
+            "le minimum de vérification sur le fichier qui casse le plus loin"
+        )
+
+
+def test_a_scoped_stylesheet_stays_isolated():
+    """L'INVERSE, sans quoi la correction deviendrait un sur-contrôle général.
+
+    `home.css` n'est lu que par 16 % de la suite : il n'a rien à faire dans la
+    liste, et l'y mettre reviendrait à traiter tout le CSS comme global.
+    """
+    assert _classify(["app/static/css/home.css"]) == "isolated"
+    assert _classify(["app/templates/index.html"]) == "isolated"
+
+
+def test_the_global_list_is_documented_with_its_measure():
+    """Une liste sans mesure redevient une opinion au premier doute.
+
+    La policy porte le pourcentage observé pour chaque entrée ; sans lui,
+    personne ne saura si la liste est encore vraie dans six mois.
+    """
+    import json
+    import pathlib as _p
+
+    pol = json.loads(
+        (_p.Path(__file__).resolve().parent.parent / ".check-policy.json")
+        .read_text(encoding="utf-8")
+    )
+    gs = pol["global_surfaces"]
+    assert gs["paths"], "liste vide"
+    # `_macros.html` est inclus par `base.html` : sa portée est celle de son
+    # hôte, elle ne se mesure pas séparément. Toute AUTRE entrée doit porter
+    # son pourcentage observé.
+    measured = set(gs["_evidence"]) | {"app/templates/_macros.html"}
+    undocumented = sorted(set(gs["paths"]) - measured)
+    assert not undocumented, (
+        f"entrées sans mesure associée : {undocumented} — une liste sans "
+        "mesure redevient une opinion au premier doute"
+    )
+
+
 def test_isolated_when_new_leaf_file_not_imported_anywhere():
     # A synthetic app/ service path that no module imports → isolated.
     # NB: we deliberately use a NON-EXISTENT fixture path rather than a real
