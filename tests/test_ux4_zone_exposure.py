@@ -24,7 +24,12 @@ from tests.helpers import get_test_user_id
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEMPLATE = ROOT / "app/templates/progress.html"
 
-NOW = datetime(2026, 8, 21, 12, 0, tzinfo=UTC)
+#: ⏰ ANCRAGE FLOTTANT — même défaut que `test_train1c_progression_consolidation`,
+#: pas encore détoné. Ce fichier combine lui aussi une donnée posée sur une date
+#: GELÉE et des appels à la vraie route, qui lit l'heure réelle. Il serait tombé
+#: à son tour lorsque la dérive aurait dépassé `WINDOW_DAYS`.
+#: Corrigé AVANT l'incident, pas après : c'est le seul moment où ça coûte peu.
+NOW = datetime.now(UTC).replace(hour=12, minute=0, second=0, microsecond=0)
 
 
 def _add(db, uid, *, days_ago, exercises=(), status="completed",
