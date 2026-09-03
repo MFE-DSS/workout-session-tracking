@@ -642,7 +642,7 @@ jobs:
       # Required on PR / push. Full-history scan is documented as a
       # one-shot manual op (cf. docs/SECURITY_BASELINE.md §6).
       - name: gitleaks scan (required — Sb_26.4)
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
