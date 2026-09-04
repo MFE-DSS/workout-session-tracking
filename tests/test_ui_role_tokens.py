@@ -350,27 +350,30 @@ def test_no_stylesheet_redeclares_a_role(sheet):
 # ───────────────── périmètre de la tranche ─────────────────
 
 
-def test_the_role_layer_rewires_no_consumer():
-    """**Tier T5 — cette garde EXPIRE quand `U2` migre les consommateurs.**
+def test_the_chassis_primitive_consumes_roles_and_never_raw_palette():
+    """Remplace `test_the_role_layer_rewires_no_consumer`.
 
-    Elle prouve la propriété qui rend `U1` sûre : la tranche ajoute des noms et
-    ne déplace pas un pixel. Le rendu identique avant/après n'est pas une
-    espérance, c'est une conséquence vérifiable.
+    **La garde d'origine a expiré, et proprement.** Elle exigeait ZÉRO
+    consommateur des rôles : c'était la preuve que `U1` nommait sans rien
+    déplacer, et le rendu avant/après était bit-identique sur trois routes.
+    `U2` livre la primitive de châssis, qui les consomme légitimement — donc
+    la garde tombe, **le jour où la spec la remplace, pas avant**
+    (`AUREN_UIUX_V3_GUARD_MIGRATION_REGISTER`, même procédure que
+    `test_no_new_token_consumer_outside_the_approved_scope` avant elle).
 
-    Le jour où `U2` fait consommer ces rôles, cette garde tombe — **le jour où
-    la spec la remplace, pas avant** (`AUREN_UIUX_V3_GUARD_MIGRATION_REGISTER`,
-    même procédure que `test_no_new_token_consumer_outside_the_approved_scope`).
+    Ce qui la remplace protège l'invariant qui, lui, ne périme pas : **la
+    primitive parle en EMPLOIS, jamais en valeurs.** Une règle `.lvl-*` qui
+    lirait `--t-raised` au lieu de `--role-surface-instrument` rouvrirait
+    exactement le défaut que `U1` a fermé — un emploi sans nom, donc incapable
+    de diverger.
     """
-    consumers = []
-    for sheet in (APP_CSS, HOME_CSS, FOCUS_CSS):
-        css = re.sub(
-            r"/\*.*?\*/", "", sheet.read_text(encoding="utf-8"), flags=re.DOTALL
-        )
-        # une déclaration `--role-x: …` n'est pas une consommation
-        css = re.sub(r"--role-[\w-]+\s*:\s*[^;]+;", "", css)
-        consumers += [
-            f"{sheet.name}:{m}" for m in re.findall(r"var\(\s*(--role-[\w-]+)", css)
-        ]
-    assert consumers == [], (
-        f"`U1` est censée être inerte, or ces rôles sont consommés : {consumers}"
+    css = re.sub(r"/\*.*?\*/", "", APP_CSS.read_text(encoding="utf-8"), flags=re.DOTALL)
+    offenders = []
+    for m in re.finditer(r"(\.lvl-[^{]*)\{([^}]*)\}", css):
+        selector, body = m.group(1).strip(), m.group(2)
+        raw = re.findall(r"var\(\s*(--t-[\w-]+)", body)
+        if raw:
+            offenders.append(f"{selector} → {raw}")
+    assert offenders == [], (
+        f"la primitive lit des valeurs brutes au lieu de rôles : {offenders}"
     )

@@ -232,7 +232,225 @@
   --role-support-warning:     #C97F59;  /* 4,53 — corrigé de #C77B54 (4,35) */
   --role-support-error:       #C67D7D;  /* 4,51 — corrigé de #B85C5C (3,21) */
   --role-support-information: #7695AD;  /* 4,54 — corrigé de #6E8FA8 (4,19) */
+
+  /* ==========================================================
+     `AUREN_UI_U2_CHASSIS` — LE RELIEF
+     Arbitrages opérateur du 2026-09-04 : `Q1=C` · `Q2=A` · `Q4=B`
+     ----------------------------------------------------------
+     POURQUOI LE RELIEF, ET PAS PLUS DE CONTRASTE
+
+     `Q1=C` demandait « le fond dit où on est, le délimiteur dit
+     qu'on change ». En mesurant la marge disponible, la moitié
+     « fond » s'est révélée VIDE :
+
+       · L1 est la référence et ne bouge pas ;
+       · L3 est PLAFONNÉ à sa valeur actuelle — `support-error`
+         (#C67D7D) y vaut 4,51 pour un seuil de 4,5, soit **0,01
+         de marge**. Monter L3 d'un cran casse un message d'erreur ;
+       · L0 poussé au NOIR PUR ne gagne que 1,065 → 1,127.
+
+     La plage de luminance est donc épuisée. Ce n'est pas que le
+     délimiteur aide le contraste : **le délimiteur fait le
+     travail que le contraste ne peut plus faire.**
+
+     LA DICHOTOMIE (`Q2=A`, précisée par le code)
+
+     `--t-void` (L0) n'a qu'UN SEUL consommateur dans tout le
+     produit : le fond du champ de saisie d'une série
+     (`session_focus.css .setline__field`). Ce n'est pas un sol de
+     cockpit — c'est un PUITS.
+
+     D'où le modèle réel, qui n'est pas une échelle à quatre
+     degrés mais **trois élévations et un creux** :
+
+       L1 champ      ce qui ne change jamais pendant la séance
+       L2 logement   ce qui change entre deux séances
+       L3 plaque     ce qui change PENDANT la séance
+       L0 puits      ce dans quoi on SAISIT — creusé, pas empilé
+
+     L'élévation encode donc la VOLATILITÉ (`Q2=A`), et le puits
+     est **orthogonal** : il est taillé dans le niveau où il se
+     trouve, jamais un cinquième degré.
+
+     Règle mécanique qui en découle, et qui décide sans goût :
+     « cet objet change-t-il pendant une séance ? » → L3.
+     « entre deux séances ? » → L2. « jamais ? » → L1.
+     « on y saisit une valeur ? » → puits.
+     ========================================================== */
+
+  /* — ARÊTES. Une arête physique se lit à DEUX traits : le côté
+       qui reçoit la lumière et celui qui est dans l'ombre.
+       **L'ordre des deux décide du sens** — c'est toute la
+       dichotomie, et elle survit au niveaux de gris.
+
+       Valeurs en alpha, pas en hex : une arête doit fonctionner
+       sur les quatre fonds sans être remesurée à chaque fois.
+       Elles ne portent aucun texte, donc aucun seuil de lisibilité
+       ne s'y applique (`Sx_UIV3_04 §5`). */
+  --role-edge-lit:            rgba(255, 255, 255, 0.055);
+  --role-edge-shadow:         rgba(0, 0, 0, 0.50);
+
+  /* — RELIEF COMPOSÉ. Deux valeurs, deux sens opposés. */
+  --relief-raised:  inset 0 1px 0 var(--role-edge-lit),
+                    0 1px 2px var(--role-edge-shadow);
+  --relief-carved:  inset 0 1px 2px var(--role-edge-shadow),
+                    inset 0 -1px 0 var(--role-edge-lit);
+
+  /* — GRAIN. `Q3=A` tranché sur rendu le 2026-09-04 : le grain est
+       une PROPRIÉTÉ DU NIVEAU, de densité DÉCROISSANTE avec
+       l'élévation. C'est la seule des trois options qui rende la
+       profondeur lisible **sans la couleur** — donc la seule qui
+       réponde à la demande « au-delà de la couleur », et la seule
+       qui tienne encore en niveaux de gris.
+
+       `--texture-grain` est un MULTIPLICATEUR RÉEL, pas une
+       étiquette : chaque densité passe par
+       `calc(var(--texture-grain) * …)`. Le mettre à 0 éteint
+       vraiment la texture partout. Un token qui ne commanderait
+       rien serait une variable décorative — la forme de garde
+       creuse que ce dépôt a déjà payée trois fois. */
+  --texture-grain: 1;
+
+  /* Densités par niveau. Plus l'objet est BAS, plus il est granuleux :
+     ce qui est proche de vous est net. */
+  --grain-field:   0.17;   /* L1 · le champ */
+  --grain-housing: 0.10;   /* L2 · le logement */
+  --grain-plate:   0.05;   /* L3 · la plaque */
 }
+
+/* Le grain RÉDUIT le contraste. Sous `prefers-contrast: more`, il
+   s'éteint — ce n'est pas une préférence de mouvement, donc
+   `prefers-reduced-motion` ne s'applique pas ici et ne doit pas
+   servir d'alibi. */
+@media (prefers-contrast: more) {
+  :root { --texture-grain: 0; }
+}
+
+/* ==========================================================
+   `AUREN_UI_U2_CHASSIS` — LA PRIMITIVE
+   ----------------------------------------------------------
+   ⚠ CONSTRUITE ET EXPOSÉE, PAS ENCORE APPLIQUÉE. Aucun template
+   n'utilise ces classes dans cette tranche. L'application
+   surface par surface est `U3` et suivantes, chacune avec sa
+   propre exposition.
+
+   Ces règles consomment des RÔLES, jamais des `--t-*` bruts.
+   C'est l'invariant que garde `test_ui_chassis_primitive`.
+   ========================================================== */
+
+/* Le champ — ce qui ne change jamais pendant la séance. Pas de
+   relief : on ne surélève pas le sol, on pose dessus. */
+.lvl-field {
+  background: var(--role-surface-canvas);
+}
+
+/* Le logement — ce qui change entre deux séances. */
+.lvl-housing {
+  background: var(--role-surface-group);
+  box-shadow: var(--relief-raised);
+  border-radius: var(--radius);
+}
+
+/* La plaque — ce qui change PENDANT la séance. Seul niveau
+   autorisé à porter `state-active`. */
+.lvl-plate {
+  background: var(--role-surface-instrument);
+  box-shadow: var(--relief-raised);
+  border-radius: var(--radius);
+}
+
+/* Le puits — ce dans quoi on saisit. Creusé dans son parent,
+   quel qu'il soit : le relief est inversé, pas le fond empilé. */
+.lvl-well {
+  background: var(--role-surface-chassis);
+  box-shadow: var(--relief-carved);
+  border-radius: var(--radius-sm);
+}
+
+/* L'objet en vol. `state-active` n'est pas un niveau : c'est un
+   état posé sur un niveau (`BACKBONE §2`). Il ne déplace donc
+   aucun fond — il allume une arête. */
+.lvl-plate.is-live {
+  box-shadow: inset 0 0 0 1px var(--role-state-active),
+              var(--relief-raised);
+}
+
+/* ---- GRAIN PAR NIVEAU (`Q3=A`) ----
+   Deux couches : un bruit fractal (data-URI, zéro asset externe) et des
+   scanlines. Les deux passent par `--texture-grain`, donc s'éteignent
+   ensemble.
+
+   ⚠ PAS de `overflow: hidden` sur les niveaux. Le clip est obtenu par
+   `border-radius: inherit` sur la surcouche. Poser `overflow: hidden`
+   sur un conteneur de produit rognerait les enfants `position: sticky`
+   — dont le CTA collant du mode séance. */
+.lvl-field,
+.lvl-housing,
+.lvl-plate {
+  position: relative;
+  isolation: isolate;
+}
+
+.lvl-field::before,
+.lvl-housing::before,
+.lvl-plate::before,
+.lvl-field::after,
+.lvl-housing::after,
+.lvl-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* bruit */
+.lvl-field::before,
+.lvl-housing::before,
+.lvl-plate::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+/* scanlines */
+.lvl-field::after,
+.lvl-housing::after,
+.lvl-plate::after {
+  background: repeating-linear-gradient(
+    to bottom, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px
+  );
+}
+
+/* Densité décroissante avec l'élévation. `--texture-grain` multiplie
+   chaque valeur : le mettre à 0 éteint réellement les six couches. */
+.lvl-field::before  { opacity: calc(var(--texture-grain) * var(--grain-field)); }
+.lvl-housing::before{ opacity: calc(var(--texture-grain) * var(--grain-housing)); }
+.lvl-plate::before  { opacity: calc(var(--texture-grain) * var(--grain-plate)); }
+
+.lvl-field::after   { opacity: calc(var(--texture-grain) * 0.85); }
+.lvl-housing::after { opacity: calc(var(--texture-grain) * 0.55); }
+.lvl-plate::after   { opacity: calc(var(--texture-grain) * 0.30); }
+
+/* Le contenu passe AU-DESSUS du grain. Sans cela le texte serait
+   recouvert par les scanlines et la contrainte de premier rang —
+   « le texte doit rester très simple et lisible » — serait perdue
+   par un défaut d'empilement, pas par un choix. */
+.lvl-field > *,
+.lvl-housing > *,
+.lvl-plate > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Le puits ne reçoit pas de grain : il est petit, il porte une valeur
+   saisie, et le texturer coûterait de la lisibilité là où elle vaut le
+   plus cher. C'est un choix, pas un oubli.
+
+   Le relief est une information, pas une animation : rien à désarmer
+   sous `prefers-reduced-motion`. Le grain, lui, s'éteint sous
+   `prefers-contrast: more` — voir `:root` ci-dessus. */
 
 /* ---- Reset + Base ---- */
 
