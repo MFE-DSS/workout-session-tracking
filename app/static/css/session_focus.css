@@ -3383,6 +3383,90 @@ body.is-session-focus-mode .foot {
   font-size: 12px;
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   `Q-D = B` / `R7` — LE FIL D'ÉTAT.
+
+   Six exercices en attente occupaient six CARTES pleines, empilées sous
+   l'instrument. Chacune répétait la mise en page d'un objet actionnable pour
+   dire quatre faits courts : où j'en suis, quoi, combien, quand.
+
+   ⚠ CE N'EST PAS UNE SOUSTRACTION, et c'est vérifiable plutôt qu'affirmé :
+   AUCUNE donnée ne quitte le DOM. Code, nom, avancement, récapitulatif,
+   puce de briefing, « dernière fois » et delta étaient déjà tous rendus dans
+   la carte repliée — c'est la MISE EN PAGE qui était une carte. `§5.3` est
+   donc satisfait par construction, pas par compensation : le fil reprend
+   exactement ce que les cartes portaient.
+
+   Ce qui change : chaque exercice devient une RANGÉE d'instrument. La carte
+   redevient un signal (`Q5`, trois rangs de surfaces) — elle est réservée à
+   ce qui est actionnable maintenant, c'est-à-dire l'exercice en vol.
+
+   La cible tactile reste la rangée ENTIÈRE, bien au-delà de 44 px.
+   ════════════════════════════════════════════════════════════════════════ */
+.session-focus__cockpit .exercise-card--activate {
+  padding: 8px 0;
+  border-radius: var(--radius-sm);
+  opacity: 1;                 /* le retrait vient du RANG, pas d'un voile */
+}
+
+/* La ligne d'identité : code · nom · avancement, alignés en rangée. */
+.session-focus__cockpit .exercise-card__compact--activate {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 var(--space-md, 12px);
+  /* Ni `min-height` ni cible tactile ICI : c'est la RANGÉE entière qui est
+     le lien, donc la cible. La poser sur la ligne d'identité ajoutait 14 px
+     par exercice — 84 px sur une séance de sept — pour une garantie que le
+     parent offrait déjà. */
+  min-height: 0;
+  line-height: 1.2;
+}
+.session-focus__cockpit .exercise-card--activate .exercise-card__code {
+  min-height: 0;
+  padding: 2px 6px;
+}
+
+.session-focus__cockpit .exercise-card--activate .exercise-card__name {
+  font-size: 14px;
+  line-height: 1.3;
+  /* Deux lignes au plus : « Neutral Grip Shoulder Press machine » ne tient
+     pas sur une, et une ellipse au premier mot coupé ne dit plus quoi. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.session-focus__cockpit .exercise-card--activate .exercise-card__progress {
+  font-size: 12px;
+  color: var(--role-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* « Dernière fois » et la puce passent en seconde ligne, au rang méta. Elles
+   restent LUES d'un coup d'œil — c'est ce qui justifiait leur remontée dans
+   la carte repliée — mais cessent d'occuper la place d'un paragraphe. */
+/* La méta se replie sur deux lignes courtes plutôt qu'en paragraphe : on
+   garde les trois faits — « dernière fois », quand, ce qui a été saisi — et
+   on leur retire l'interligne d'un corps de texte. */
+.session-focus__cockpit .exercise-card--activate .last-time--compact {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--role-text-muted);
+  gap: 5px;
+}
+.session-focus__cockpit .exercise-card--activate .exercise-card__chip {
+  font-size: 10.5px;
+}
+.session-focus__cockpit .exercise-card--activate .delta--collapsed {
+  padding: 0 var(--space-md, 12px);
+  font-size: 11px;
+}
+
 /* ============================================================
    `AUREN_UI_U4_VISEUR` — L'INSTRUMENT DE SÉANCE
    Métaphore validée par l'opérateur sur rendu (P-03), trois états.

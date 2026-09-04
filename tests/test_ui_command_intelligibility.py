@@ -22,6 +22,7 @@ la garde de source insuffisante.
 
 from __future__ import annotations
 
+import html
 import re
 
 import pytest
@@ -256,6 +257,56 @@ def test_the_code_derivation_never_invents(name, expected):
     from app.routers.sessions import _session_head
 
     assert _session_head(name, None)["code"] == expected
+
+
+# ───────────────── `Q-D` — le fil ne perd rien ─────────────────
+
+
+def test_the_thread_keeps_every_fact_the_cards_carried(client):
+    """`Q-D = B` / `§5.3` — **une compaction, pas une soustraction.**
+
+    Les six exercices en attente passent de cartes pleines à des rangées.
+    L'arbitrage était explicite : le fil doit REPRENDRE ce que les cartes
+    portaient, pas l'effacer.
+
+    Ce test ne fait pas confiance à cette intention : il vérifie que chaque
+    fait est encore rendu, exercice par exercice — le code, le nom, et
+    l'avancement. Ce sont les trois que la carte annonçait en premier rang.
+    """
+    session_id = _start(client)
+    exercises = _exercises(session_id)
+    # ⚠ `unescape` : Jinja échappe l'apostrophe en `&#39;`, donc
+    # « Écarté arrière d'épaule câble » ne se trouve JAMAIS tel quel dans le
+    # HTML. Sans cela la garde signalait un nom perdu qui était bien rendu —
+    # un faux positif qui aurait fait chercher un défaut inexistant.
+    body = html.unescape(client.get(f"/sessions/{session_id}").text)
+
+    # Le premier exercice est ACTIF : il n'est pas dans le fil.
+    missing = []
+    for _se_id, code, name in exercises[1:]:
+        if code not in body:
+            missing.append(f"code {code}")
+        if name not in body:
+            missing.append(f"nom {name}")
+    assert missing == [], f"le fil a perdu : {missing}"
+
+    # « Dernière fois » et l'avancement : présents pour le fil entier.
+    assert "last-time--compact" in body, "« dernière fois » a quitté le fil"
+    assert "exercise-card__progress" in body, "l'avancement a quitté le fil"
+
+
+def test_the_thread_row_is_still_a_whole_target(client):
+    """La rangée entière reste le lien.
+
+    C'est ce qui autorise à retirer le plancher de 44 px de la ligne
+    d'identité : la cible est le parent. Si la rangée cessait d'être un lien,
+    on aurait retiré un plancher sans que rien ne le remplace.
+    """
+    session_id = _start(client)
+    body = client.get(f"/sessions/{session_id}").text
+    assert re.search(
+        r'<a[^>]*class="[^"]*exercise-card--activate', body
+    ), "la rangée du fil n'est plus un lien — la cible tactile a disparu"
 
 
 # ───────────────── `R9` — le panneau dit ce qu'il contient ─────────────────
