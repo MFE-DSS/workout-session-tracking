@@ -646,8 +646,20 @@
                      `fix=` : il ne survit pas au rechargement suivant, donc
                      l'échauffement reste accessible en retirant le
                      paramètre. #}
-                  <a class="dock__alt"
-                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}&skipwarm=1#exercise-{{ se.id }}">{{ s.label }}</a>
+                  {# Le libellé est enveloppé, et ce n'est pas cosmétique.
+                     `Web:LinksIdenticalTextsDifferentTargetsCheck` signalait
+                     ce lien et celui d'« annuler » : deux `<a>` dont le texte
+                     SOURCE est littéralement `{{ s.label }}`, pour deux
+                     destinations différentes.
+
+                     Les deux branches sont exclusives — `skip_warmup` n'existe
+                     qu'en `WARMUP`, `cancel` qu'en `CORRECTION` — donc le
+                     rendu ne les montre jamais ensemble. Mais si l'analyseur
+                     ne peut pas les distinguer, un lecteur pressé non plus.
+                     On les distingue à la source plutôt que d'adjuger le
+                     signalement. #}
+                  <a class="dock__alt dock__alt--skip-warmup"
+                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}&skipwarm=1#exercise-{{ se.id }}"><span class="dock__alt-label">{{ s.label }}</span></a>
                 {% elif s.kind == 'remove' %}
                   {# Q3 — rend INTENTIONNEL ce qui n'était qu'un effet de
                      bord : vider les deux champs dé-complétait déjà la

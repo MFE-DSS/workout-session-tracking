@@ -233,11 +233,15 @@
 <div class="kpi-grid">
   <div class="kpi-card">
     <div class="kpi-card__value">{{ kpis.sessions_this_week }}</div>
-    <div class="kpi-card__label">sessions cette semaine</div>
+    {# Accord ET vocabulaire. « 1 sessions » se lisait à l'écran, et le mot
+       « session » est un anglicisme : la coque dit « Séance », la commande
+       dit « TERMINER LA SÉANCE », et la sous-ligne de la carte voisine disait
+       déjà « séance ». Deux mots pour une chose dans la même carte. #}
+    <div class="kpi-card__label">séance{% if kpis.sessions_this_week > 1 %}s{% endif %} cette semaine</div>
   </div>
   <div class="kpi-card">
     <div class="kpi-card__value">{{ kpis.completed_last_30 }}</div>
-    <div class="kpi-card__label">sessions terminées (30 j)</div>
+    <div class="kpi-card__label">séance{% if kpis.completed_last_30 > 1 %}s{% endif %} terminée{% if kpis.completed_last_30 > 1 %}s{% endif %} (30 j)</div>
   </div>
   {% if kpis.completion_rate_30d is not none %}
   <div class="kpi-card">
@@ -296,7 +300,7 @@
                  deux comptes, aucun fait perdu, un bloc de moins. #}
               <span class="template-kpi__count">
                 {% if tk.week_count %}<span class="template-kpi__week">{{ tk.week_count }}× cette sem.</span>{% endif %}
-                <span>{{ tk.n_completed }} session{% if tk.n_completed > 1 %}s{% endif %}</span>
+                <span>{{ tk.n_completed }} séance{% if tk.n_completed > 1 %}s{% endif %}</span>
               </span>
             </div>
             <div class="template-kpi__meta">

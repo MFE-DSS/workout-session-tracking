@@ -266,7 +266,12 @@ def command_for(state: ConsoleState) -> dict:
     """
     kind = state.state
     if kind == WARMUP:
-        sl = state.current_set
+        # ⚠ `sl = state.current_set` RETIRÉ (`python:S1854`, et il avait
+        # raison). Le libellé citait `sl.set_index` — « VALIDER ÉCHAUFFEMENT
+        # 1 » — ; depuis `R6` il nomme une DESTINATION et ne cite plus aucun
+        # rang. L'affectation est devenue morte au moment où le libellé a
+        # changé, et rien ne le disait : une variable morte se lit comme une
+        # variable utile.
         # `stay_norest`, pas `stay` : le repos suit une série de TRAVAIL.
         # Mesuré au navigateur — valider le dernier échauffement avec `stay`
         # faisait démarrer le décompte de repos avant la première série.

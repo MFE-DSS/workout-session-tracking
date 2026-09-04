@@ -270,5 +270,15 @@ def test_progress_page_renders_with_real_data(client):
     # KPI card values render
     assert "work sets validés" in body
     assert "Push A" in body
-    # The explicit rule note is always visible
-    assert "sessions terminées" in body
+    # ⚠ Assertait « sessions terminées ». Le libellé dit désormais
+    # « séance(s) terminée(s) » : « session » était un ANGLICISME au milieu
+    # d'une interface française — la coque dit « Séance », la commande dit
+    # « TERMINER LA SÉANCE », et la sous-ligne de la carte voisine disait déjà
+    # « séance ». Deux mots pour une chose dans la même carte.
+    #
+    # Et le compteur n'accordait pas : « 1 sessions » était à l'écran.
+    #
+    # Ce qui est gardé ici — la règle de comptage est nommée et visible — ne
+    # change pas.
+    assert "terminée" in body
+    assert "30 j" in body
