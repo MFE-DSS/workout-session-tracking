@@ -1502,10 +1502,28 @@
    l'état repliable lisible (curseur + chevron natif conservé), sans nouvelle
    couleur ni JS. `display:block` sur cues-title masquerait le marker natif →
    on force list-item pour garder l'indicateur repliable. */
+/* ⚠ SUPERSÉDÉ PAR `R9`. Cette règle forçait `display: list-item` pour une
+   raison qui était juste à l'époque : `.session-focus__cues-title` pose
+   `display: block`, ce qui masque le marqueur natif du `<details>`, et il
+   n'existait alors AUCUN autre indicateur de repli.
+
+   Depuis `R9`, le déclencheur porte son propre chevron (`.l3__trigger::after`,
+   qui pivote à l'ouverture). Garder `list-item` afficherait DEUX marqueurs sur
+   un même contrôle — le natif et le nôtre.
+
+   Mesuré au navigateur, pas déduit : ce déclencheur rendait
+   `display: list-item` là où son frère `HISTORIQUE` rendait `flex`. Les deux
+   se ressemblaient à l'œil sans être le même objet. */
 details.session-focus__cues > summary.session-focus__cues-title {
   cursor: pointer;
-  display: list-item;
-  list-style-position: inside;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  list-style: none;
+}
+details.session-focus__cues > summary.session-focus__cues-title::marker {
+  content: "";
 }
 details.session-focus__cues[open] > summary.session-focus__cues-title {
   margin-bottom: var(--space-1);
@@ -3004,24 +3022,67 @@ body.is-session-focus-mode .foot {
   border-top: 1px solid var(--t-line);
 }
 .l3__item { min-width: 0; }
+/* `R9` — LE DÉCLENCHEUR DEVIENT OPÉRABLE.
+
+   Il était du TEXTE NU : marqueur natif masqué, aucun cadre, aucun chevron,
+   couleur atténuée. « On ne comprend pas que c'est opérable » — et c'était
+   exact, rien ne le disait.
+
+   Ce qu'il reçoit : un cadre, un fond, et un chevron qui pivote à
+   l'ouverture. Ce qu'il ne reçoit PAS : d'ambre. C'est un contrôle de rang 2,
+   il ne doit pas concurrencer la réglette — la seule commande dominante de
+   l'écran. La masse suffit à le rendre lisible ; la couleur reste réservée. */
 .l3__trigger {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 44px;
+  padding: 0 12px;
   cursor: pointer;
   list-style: none;
+  border: 1px solid var(--role-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--role-surface-group);
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 11.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--t-fg-muted);
+  color: var(--role-text-secondary);
   text-decoration: none;
 }
 .l3__trigger::-webkit-details-marker { display: none; }
+
+/* Le chevron dit « ça s'ouvre », et sa rotation dit « c'est ouvert ». Deux
+   états, deux FORMES — la couleur ne porte rien ici (`§7`). */
+.l3__trigger::after {
+  content: "›";
+  font-size: 17px;
+  line-height: 1;
+  color: var(--role-text-muted);
+  transform: rotate(90deg);
+  transition: transform 120ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .l3__trigger::after { transition: none; }
+}
+.l3__item[open] > .l3__trigger::after { transform: rotate(-90deg); }
+
 .l3__trigger:hover,
-.l3__trigger:focus-visible { color: var(--t-fg-2); }
-.l3__item[open] > .l3__trigger { color: var(--t-fg); }
+.l3__trigger:focus-visible {
+  color: var(--role-text-primary);
+  border-color: var(--role-border-emphasis);
+}
+.l3__item[open] > .l3__trigger {
+  color: var(--role-text-primary);
+  border-color: var(--role-border-emphasis);
+}
+
+/* La RECOMMANDATION porte une marque d'origine système : ce qu'elle contient
+   est produit par le moteur (`D2` — badge d'origine). Un filet bleu, pas un
+   fond : le bleu affirme la PROVENANCE, il n'appelle pas à l'action. */
+.l3__item--reco > .l3__trigger {
+  box-shadow: inset 2px 0 0 var(--role-origin-system-line);
+}
 .l3__body {
   flex: 1 1 100%;
   margin-top: 4px;

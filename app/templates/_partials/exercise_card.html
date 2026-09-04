@@ -691,9 +691,36 @@
         {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
 
         <div class="l3">
-          <details class="l3__item session-focus__cues">
-            <summary class="l3__trigger session-focus__cues-title session-focus__tap-target">Technique</summary>
+          {# `R9` / `Q-A = C` — UN SEUL PANNEAU : RECOMMANDATION.
+
+             Ce panneau contenait DÉJÀ les deux moitiés — ce que le moteur
+             propose (« Guidance de progression ») et comment bien exécuter
+             (points d'exécution, erreurs fréquentes, zone travaillée). Il
+             n'annonçait que la seconde, et la première était tout en bas.
+
+             Trois corrections, aucune addition de contenu :
+               · il porte le nom de ce qu'il contient VRAIMENT ;
+               · la guidance passe EN TÊTE — un panneau nommé
+                 « recommandation » qui commence par autre chose ment sur son
+                 ordre ;
+               · le déclencheur devient OPÉRABLE. Il était du texte nu :
+                 marqueur natif masqué, aucun cadre, aucun chevron. Rien ne
+                 disait qu'il s'ouvrait — c'est le retour exact de
+                 l'opérateur. #}
+          <details class="l3__item l3__item--reco session-focus__cues">
+            <summary class="l3__trigger session-focus__cues-title session-focus__tap-target">
+              <span class="l3__label">Recommandation</span>
+            </summary>
             <div class="l3__body machine-panel__body">
+              {# La guidance de surcharge EN TÊTE : c'est la recommandation.
+                 Lecture SYSTÈME, donc bleue (`D2` badge d'origine). #}
+              {% set hint = overload_hints.get(se.id) %}
+              {% if hint %}
+                <div class="session-focus__guidance" aria-label="Guidance de progression">
+                  <span class="session-focus__guidance-label">Guidance de progression</span>
+                  {% include "_partials/overload_hint.html" %}
+                </div>
+              {% endif %}
               {% if _machine_top %}
                 {# Le nom de la machine est une information, pas une
                    étiquette : « Comment bien exécuter Incline Smith Press »
@@ -769,14 +796,9 @@
                 <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
               </div>
 
-              {# Guidance de surcharge — lecture SYSTÈME, donc bleue. #}
-              {% set hint = overload_hints.get(se.id) %}
-              {% if hint %}
-                <div class="session-focus__guidance" aria-label="Guidance de progression">
-                  <span class="session-focus__guidance-label">Guidance de progression</span>
-                  {% include "_partials/overload_hint.html" %}
-                </div>
-              {% endif %}
+              {# La guidance vivait ICI, en dernier. Elle est remontée en tête
+                 du panneau (`R9`) : elle n'est pas déplacée deux fois, elle
+                 n'apparaît plus qu'une seule. #}
             </div>
           </details>
 

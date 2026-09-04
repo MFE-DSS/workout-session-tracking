@@ -258,6 +258,68 @@ def test_the_code_derivation_never_invents(name, expected):
     assert _session_head(name, None)["code"] == expected
 
 
+# ───────────────── `R9` — le panneau dit ce qu'il contient ─────────────────
+
+
+def test_the_panel_is_named_recommandation_and_reads_as_operable(client):
+    """`R9` — « on ne comprend pas que "technique" est opérable ».
+
+    Le déclencheur était du TEXTE NU : marqueur natif masqué, aucun cadre,
+    aucun chevron. Le mot « Technique » n'annonçait par ailleurs que la
+    moitié de ce que le panneau contient.
+    """
+    session_id = _start(client)
+    body = client.get(f"/sessions/{session_id}").text
+    assert "Recommandation" in body, "le panneau n'est plus nommé"
+    assert "Technique</summary>" not in body, "l'ancien libellé subsiste"
+    assert "l3__item--reco" in body, (
+        "le panneau n'est plus marqué comme portant une lecture système"
+    )
+
+
+def test_the_engine_guidance_leads_the_recommendation_panel():
+    """Un panneau nommé « recommandation » qui commence par autre chose ment
+    sur son ordre.
+
+    Vérifié à la SOURCE et non au rendu : la guidance n'apparaît que si le
+    moteur a produit une recommandation — sur une séance neuve (« première
+    fois »), il n'y en a aucune, et le test passerait à vide sur le rendu.
+    """
+    from pathlib import Path
+
+    card = (
+        Path(__file__).resolve().parent.parent
+        / "app/templates/_partials/exercise_card.html"
+    )
+    src = re.sub(r"\{#.*?#\}", "", card.read_text(encoding="utf-8"), flags=re.DOTALL)
+    body = src.split("l3__body machine-panel__body", 1)[1]
+    guidance = body.find("session-focus__guidance")
+    machine = body.find("machine-panel__title")
+    zone = body.find("session-focus__worked-area-title")
+    assert guidance > 0, "la guidance a disparu du panneau"
+    assert guidance < machine, "la recommandation ne vient pas en premier"
+    assert machine < zone, "l'ordre technique → zone travaillée a changé"
+
+
+def test_the_guidance_appears_exactly_once():
+    """Elle a été REMONTÉE, pas copiée.
+
+    Un déplacement fait à moitié laisserait deux blocs identiques dans le
+    même panneau — et personne ne le verrait, puisque le second serait
+    simplement plus bas.
+    """
+    from pathlib import Path
+
+    card = (
+        Path(__file__).resolve().parent.parent
+        / "app/templates/_partials/exercise_card.html"
+    )
+    src = re.sub(r"\{#.*?#\}", "", card.read_text(encoding="utf-8"), flags=re.DOTALL)
+    assert src.count('class="session-focus__guidance"') == 1, (
+        "la guidance est rendue plus d'une fois — déplacement fait à moitié"
+    )
+
+
 def test_an_unmapped_zone_is_silent_rather_than_qualified():
     """Trois exercices sur sept d'une séance type ne sont pas mappés.
 

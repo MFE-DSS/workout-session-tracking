@@ -143,12 +143,20 @@ def test_compact_target_precedes_the_console(client):
 
 
 def test_cues_still_present(client):
-    # MIGRÉ — les cues vivent sous `TECHNIQUE`, dans la ligne L3.
+    """MIGRÉ deux fois, et c'est la seconde qui compte.
+
+    Les cues ont d'abord quitté le flux pour la ligne L3 sous « Technique » —
+    le mot « cues » était un anglicisme au milieu d'une interface française.
+
+    `R9` / `Q-A = C` (opérateur, 2026-09-04) : le panneau contenait DÉJÀ les
+    deux moitiés — ce que le moteur propose et comment bien exécuter — mais
+    n'annonçait que la seconde. Il s'appelle donc **RECOMMANDATION**.
+
+    Ce qui est gardé ici ne change pas : les cues n'ont pas quitté le produit.
+    """
     body = _body(client)
     assert "session-focus__cues" in body
-    # MIGRÉ — le déclencheur L3 s'appelle « Technique » : le mot « cues »
-    # était un anglicisme au milieu d'une interface française.
-    assert "Technique" in body
+    assert "Recommandation" in body, "le déclencheur du panneau a disparu"
 
 
 def test_cues_rendered_once(client):
