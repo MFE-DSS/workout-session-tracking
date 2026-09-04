@@ -215,6 +215,19 @@
           return;   /* corriger reste un geste délibéré */
         }
 
+        var committed = false;
+
+        function commit() {
+          /* Une seule soumission. `change` et `keydown` peuvent se suivre de
+             quelques millisecondes — `Entrée` valide le champ ET le quitte —
+             et deux `requestSubmit` enverraient deux POST. */
+          if (committed) {
+            return;
+          }
+          committed = true;
+          form.requestSubmit(submitter);
+        }
+
         function onKey(ev) {
           if (ev.key !== "Enter" && ev.keyCode !== 13) {
             return;
@@ -231,11 +244,45 @@
             }
             return;
           }
-          form.requestSubmit(submitter);
+          commit();
+        }
+
+        /* ════════════════════════════════════════════════════════════════
+           `R5` — LA VALIDATION N'EST PLUS UNE ÉTAPE. Opérateur, 2026-09-04 :
+           « si je mets un kilo, un nombre de reps, c'est que j'ai validé la
+           série. Il n'y a pas d'étape de validation. »
+
+           POURQUOI `change` ET NON `input` NI `blur`.
+
+           `input` partirait EN COURS DE FRAPPE : avec les répétitions déjà
+           saisies, taper « 82 » enverrait la série sur le « 8 ».
+
+           `blur` a été refusé, et le motif reste écrit plus haut : il part
+           quand on touche l'écran ailleurs, quand le clavier se referme,
+           quand on veut juste relire. Ce n'est pas une intention.
+
+           `change` est la troisième voie et c'est ce qui la rend admissible :
+           **il ne part que si la VALEUR a changé.** Relire ne le déclenche
+           pas. Rouvrir le clavier non plus. Il dit « j'ai fini de saisir ce
+           champ », ce qui est exactement l'intention recherchée.
+
+           ⚠ `D9`/`D10` sont donc AMENDÉS, pas contournés : le déclencheur
+           s'élargit, le motif qui les fondait est intact.
+
+           On écoute les DEUX champs, pas « le second » : rien n'oblige à
+           saisir la charge avant les répétitions. La condition reste la
+           même — les deux portent une valeur.
+           ════════════════════════════════════════════════════════════════ */
+        function onChange() {
+          if (readyToCommit(fields)) {
+            commit();
+          }
         }
 
         fields.weight.addEventListener("keydown", onKey);
         fields.reps.addEventListener("keydown", onKey);
+        fields.weight.addEventListener("change", onChange);
+        fields.reps.addEventListener("change", onChange);
       })(forms[i]);
     }
   }

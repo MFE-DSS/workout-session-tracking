@@ -102,16 +102,43 @@ def test_the_dominant_button_still_exists_for_no_js():
 
 
 def test_the_commit_never_listens_to_typing_or_blur():
-    """LA CONTRAINTE EXPLICITE DE L'ORDRE. Un `blur` part quand on touche
-    l'écran ailleurs, quand le clavier se referme, quand on veut relire — ce
-    n'est pas une intention de valider."""
+    """LA CONTRAINTE EXPLICITE DE L'ORDRE — et son amendement `R5`.
+
+    Le motif d'origine est INTACT : un `blur` part quand on touche l'écran
+    ailleurs, quand le clavier se referme, quand on veut relire. Ce n'est pas
+    une intention de valider. `input` est pire encore : il part en cours de
+    frappe, et enverrait « 82 » sur le « 8 ».
+
+    Ce qui change (`R5 = C`, opérateur, 2026-09-04) : **`change` est admis.**
+    Il n'est pas un `blur` — il ne part que si la VALEUR A CHANGÉ. Relire ne
+    le déclenche pas, rouvrir le clavier non plus. Il dit « j'ai fini de
+    saisir ce champ », qui est exactement l'intention que la garde protégeait.
+
+    `D9`/`D10` sont donc amendés sur le déclencheur, pas sur le principe. Les
+    trois autres interdits restent, et un temporisateur reste proscrit : il
+    ferait dépendre l'enregistrement d'une durée plutôt que d'un geste.
+    """
     js = _js()
     for banned in ('"blur"', "'blur'", '"input"', "'input'",
-                   '"change"', "'change'", "focusout", "setTimeout("):
+                   "focusout", "setTimeout("):
         assert banned not in js, (
             f"l'auto-validation écoute « {banned} » : ce n'est pas une "
             f"transition explicite"
         )
+
+
+def test_the_commit_happens_at_most_once():
+    """`change` et `keydown` peuvent se suivre : `Entrée` valide le champ ET
+    le quitte. Sans garde d'unicité, deux `requestSubmit` partiraient — donc
+    deux POST, dont le second sur un formulaire déjà navigué.
+
+    Ce test naît AVEC le déclencheur qu'il protège : le défaut n'existait pas
+    tant qu'il n'y avait qu'un seul événement.
+    """
+    js = _js()
+    assert "committed" in js, "aucune garde d'unicité de soumission"
+    body = js.split("function commit(", 1)[1].split("}", 1)[0]
+    assert "committed" in body, body
 
 
 def test_the_commit_listens_to_an_explicit_key_transition():

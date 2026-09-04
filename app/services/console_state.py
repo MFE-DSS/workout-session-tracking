@@ -276,15 +276,36 @@ def command_for(state: ConsoleState) -> dict:
         # Le libellé reprend désormais le mot que le nom accessible emploie
         # déjà — aucun vocabulaire n'est inventé. Mesuré : tient sur une ligne
         # à 360 px, hauteur de bouton inchangée (56 px).
+        # `R6` (opérateur, 2026-09-04) — « LE BOUTON, C'EST JAMAIS VALIDER ».
+        #
+        # Le mot est devenu FAUX, pas seulement encombrant : depuis `R5`, la
+        # saisie valide d'elle-même. Un bouton nommé « VALIDER » annonce une
+        # étape qui n'existe plus, et laisse croire qu'oublier de l'appuyer
+        # perd la série — c'est l'inverse.
+        #
+        # Ce que le bouton fait réellement : enregistrer ce qui est saisi ET
+        # avancer. Il nomme donc sa DESTINATION. Il reste par ailleurs le seul
+        # chemin d'enregistrement **sans JavaScript** : le renommer était
+        # possible, le supprimer non.
+        #
+        # ⚠ `Sx_UIV3_02 §4` (amendement B) FIGEAIT ces deux libellés. Ils sont
+        # superséde par `R5`/`R6`, arbitrés sur rendu. La garde qui les
+        # épinglait est mise à jour dans la même livraison, pas contournée.
         return {
-            "label": f"VALIDER ÉCHAUFFEMENT {sl.set_index}",
+            "label": (
+                "PASSER AUX SÉRIES" if state.warmup_done + 1 >= state.warmup_total
+                else "ÉCHAUFFEMENT SUIVANT"
+            ),
             "sub": None,
             "nav": "stay_norest",
         }
     if kind == CURRENT_SET:
         sl = state.current_set
+        # Dernière série de travail : la destination n'est plus « la suivante ».
+        # Annoncer une série qui n'existe pas serait pire que l'ancien libellé.
+        is_last_work = sl.set_index >= state.work_total
         return {
-            "label": f"VALIDER SÉRIE {sl.set_index}",
+            "label": "EXERCICE TERMINÉ" if is_last_work else "SÉRIE SUIVANTE",
             "sub": f"→ repos {state.rest_seconds} s",
             "nav": "stay",
         }

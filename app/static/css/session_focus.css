@@ -3455,23 +3455,77 @@ body.is-session-focus-mode .foot {
   box-shadow: var(--relief-carved), inset 0 0 0 2px var(--role-origin-system-line);
 }
 
-/* ── LA COMMANDE EN TRAIT ─────────────────────────────────────
-   `P-03` : « la commande dominante peut être un TRAIT ». L'aplat n'est
-   pas nécessaire à la domination — la cible tactile, si. Elle reste
-   pleine largeur et ≥ 44 px ; seule la masse change.
+/* ── LA RÉGLETTE D'INSTRUMENT (`R1 = C`) ──────────────────────
+   Le trait a été rejeté par l'opérateur — « c'est moche, ça ne sert à
+   rien ». Ce qui le rendait faible : un contour de 1 px est le chrome
+   d'un bouton web, pas d'un instrument. Il n'appartenait à aucune des
+   deux familles du châssis.
 
-   Effet de bord voulu : il n'y a plus deux ambres pleins sur l'écran,
-   ce qui était exactement le motif du retrait de la surface de la carte
-   active. Le motif est servi SANS retirer la surface. */
+   La réglette en est une : **encastrée**, comme un contrôle physique
+   logé dans une console.
+
+   ⚠ DEUX OBJETS CREUSÉS VOISINS PEUVENT CESSER DE SE DISTINGUER.
+   Le puits de saisie est creusé sur L0 ; la réglette l'est sur L2. La
+   différence de fond est de 1,124 — au-dessus du plancher de perception
+   que le dépôt s'est fixé. Elle n'est pas supposée, elle est mesurée.
+
+   Ce qui la rend VIVE et non inerte : une arête gauche allumée en
+   ambre. Un contrôle encastré sans lumière se lit comme désactivé —
+   c'est le piège de cette forme, et c'est ce que l'arête écarte.
+
+   L'aplat n'est toujours pas nécessaire à la domination : la cible
+   tactile, si. Pleine largeur, ≥ 56 px.
+
+   Effet de bord conservé du trait : il n'y a toujours qu'UN aplat ambre
+   sur l'écran de séance, et c'est « TERMINER LA SÉANCE ». */
 .console .dock__cmd {
-  background: transparent;
+  position: relative;
+  background: var(--role-surface-group);
   color: var(--role-action-primary);
-  border: 1px solid var(--role-action-primary);
-  box-shadow: none;
+  border: 0;
+  border-radius: var(--radius-md);
+  min-height: 56px;
+  padding-right: 34px;                 /* la place du chevron */
+  box-shadow:
+    var(--relief-carved),
+    inset 3px 0 0 var(--role-action-primary);   /* l'arête allumée */
 }
-.console .dock__cmd:hover,
-.console .dock__cmd:active {
-  background: var(--t-amber-weak);
+
+/* Le chevron dit la DIRECTION : cette commande fait avancer la séance.
+   `::after` et non un glyphe dans le gabarit — c'est du chrome, il n'a
+   rien à faire dans le contenu, et un lecteur d'écran n'a pas à
+   l'annoncer. */
+.console .dock__cmd::after {
+  content: "›";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--role-action-primary);
+}
+
+.console .dock__cmd:hover {
+  background: var(--role-surface-instrument);
   color: var(--role-action-hover);
-  border-color: var(--role-action-hover);
 }
+/* Enfoncée : le relief s'approfondit. C'est la seule « animation » de la
+   commande, et c'en est à peine une — un contrôle physique s'enfonce. */
+.console .dock__cmd:active {
+  box-shadow:
+    inset 0 2px 4px var(--role-edge-shadow),
+    inset 3px 0 0 var(--role-action-hover);
+}
+.console .dock__cmd:focus-visible {
+  outline: 2px solid var(--role-focus);
+  outline-offset: 2px;
+}
+
+/* La sortie de repos garde son registre atténué : elle n'est pas
+   l'action de l'utilisateur, elle l'interrompt. */
+.console .dock__cmd--muted {
+  color: var(--role-text-secondary);
+  box-shadow: var(--relief-carved), inset 3px 0 0 var(--role-border-emphasis);
+}
+.console .dock__cmd--muted::after { color: var(--role-text-muted); }

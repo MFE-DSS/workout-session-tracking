@@ -186,22 +186,68 @@ def test_an_uncompleted_set_cannot_be_corrected():
 
 
 def test_exactly_one_dominant_command_per_state():
+    """⚠ DEUX LIBELLÉS ONT ÉTÉ SUPERSÉDÉS — `R5`/`R6`, opérateur, 2026-09-04.
+
+    `D3 = B` avait figé « VALIDER ÉCHAUFFEMENT n » / « VALIDER SÉRIE n » :
+    les codes `É`/`S` ayant quitté les lignes en `DF-C`, le bouton devait
+    reprendre le mot du nom accessible. Ce raisonnement portait sur le NOM de
+    la série, et il reste juste sur ce point.
+
+    Ce qui l'a périmé est ailleurs. **Depuis `R5`, la saisie valide
+    d'elle-même** : un champ quitté après modification enregistre la série et
+    démarre le repos. Un bouton nommé « VALIDER » annonce donc une étape qui
+    n'existe plus — et laisse craindre qu'oublier de l'appuyer perde la
+    série, alors que c'est l'inverse. *« Le bouton, c'est jamais valider »*
+    (`R6`).
+
+    Le bouton n'est pas supprimé : il reste le seul chemin d'enregistrement
+    **sans JavaScript**. Il nomme désormais sa DESTINATION.
+
+    `CONTINUER → E2` et `ALLER AU BILAN` sont INCHANGÉS : l'opérateur n'a pas
+    tranché dessus, et les étendre par analogie amenderait une spec versionnée
+    sans mandat.
+    """
     from app.services.console_state import build_console_state, command_for
 
-    # `D3 = B`, tranché par l'opérateur sur trois variantes rendues à 360 px.
-    # Les codes `É`/`S` avaient quitté les lignes de série en `DF-C` ; le
-    # bouton continuait de les employer, si bien que plus rien à l'écran ne
-    # portait le nom qu'il annonçait. Le libellé reprend désormais le mot que
-    # le nom accessible emploie déjà.
     cases = [
-        (_exercise(), None, "VALIDER ÉCHAUFFEMENT 1"),
-        (_exercise(warmups_done=1), None, "VALIDER SÉRIE 1"),
+        # dernier échauffement : la destination n'est pas « le suivant »
+        (_exercise(), None, "PASSER AUX SÉRIES"),
+        (_exercise(warmups_done=1), None, "SÉRIE SUIVANTE"),
         (_exercise(warmups_done=1, works_done=3), "E2", "CONTINUER → E2"),
         (_exercise(warmups_done=1, works_done=3), None, "ALLER AU BILAN"),
     ]
     for ex, nxt, label in cases:
         cmd = command_for(build_console_state(ex, next_code=nxt))
         assert cmd["label"] == label, (label, cmd)
+
+
+def test_no_dominant_command_still_says_valider():
+    """Ce qui remplace le libellé figé : **le mot lui-même est proscrit.**
+
+    Épingler quatre chaînes exactes protégeait une formulation ; l'invariant
+    qui survit à `R5` est plus simple et ne périme pas — aucune commande ne
+    peut annoncer une étape de validation, puisqu'il n'y en a plus.
+    """
+    from app.services.console_state import build_console_state, command_for
+
+    cases = [
+        (_exercise(), None),
+        (_exercise(warmups_done=1), None),
+        (_exercise(warmups_done=1, works_done=1), None),
+        (_exercise(warmups_done=1, works_done=3), "E2"),
+        (_exercise(warmups_done=1, works_done=3), None),
+    ]
+    offenders = []
+    for ex, nxt in cases:
+        cmd = command_for(build_console_state(ex, next_code=nxt))
+        text = f"{cmd['label']} {cmd.get('sub') or ''}"
+        if "VALID" in text.upper():
+            offenders.append(text.strip())
+    assert offenders == [], (
+        f"une commande annonce encore une validation : {offenders}. "
+        "Depuis `R5` la saisie valide d'elle-même ; le mot ferait croire "
+        "qu'oublier le bouton perd la série."
+    )
 
 
 def test_valider_e2_is_definitively_gone():
