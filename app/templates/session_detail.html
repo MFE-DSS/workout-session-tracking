@@ -185,7 +185,17 @@
     </details>
   {% endfor %}
   <p class="method-reminder__more">
-    <a href="{{ url_for('rules_page') }}">Voir toutes les règles →</a>
+    {# ⚠ Visait `rules_page`, c'est-à-dire `/rules`, qui répond **301** vers
+       `/science` depuis que la surface des règles a fusionné avec Science.
+       Le lien atteignait donc sa destination en traversant une redirection
+       héritée — exactement le défaut `R-03` (le CTA de fin de séance vers
+       `/dashboard`), à un SECOND endroit.
+
+       Deux occurrences font un motif : les liens du produit doivent viser les
+       routes ACTUELLES. La route `/rules` n'est pas supprimée — elle sert
+       encore les signets externes — mais plus rien à l'intérieur du produit
+       ne la traverse. #}
+    <a href="{{ url_for('science_page') }}">Voir toutes les règles →</a>
   </p>
 </aside>
 {% endif %}

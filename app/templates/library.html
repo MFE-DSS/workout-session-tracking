@@ -81,7 +81,18 @@
           <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
             <div class="template-card__row">
               <span class="template-card__name">{{ tpl.name }}</span>
-              <span class="template-card__kind">{{ tpl.kind|upper }}</span>
+              {# `{{ tpl.kind|upper }}` remontait la valeur BRUTE de la base à
+                 l'écran : `strength` devenait « STRENGTH », un anglicisme au
+                 milieu d'une interface française — treize fois sur cette
+                 seule page. `cardio` passait en français par hasard, ce qui
+                 rendait le défaut d'autant plus discret.
+
+                 La donnée n'est PAS touchée : `kind` reste `strength` en base,
+                 c'est un identifiant technique. Seul l'affichage est traduit,
+                 et le repli rend la valeur brute plutôt que de la taire — une
+                 étiquette manquante serait pire qu'une étiquette anglaise. #}
+              {% set _kinds = {'strength': 'FORCE', 'cardio': 'CARDIO'} %}
+              <span class="template-card__kind">{{ _kinds.get(tpl.kind, tpl.kind|upper) }}</span>
             </div>
             {# ⚠ LA LIGNE `focus` NE S'AFFICHE QUE FAUTE DE MIEUX, et ce n'est
                pas un retrait déguisé (`§5.3`) — c'est une SUBSTITUTION dans la

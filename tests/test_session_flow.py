@@ -400,4 +400,15 @@ def test_session_detail_shows_inline_method_reminder_link(client):
     r = client.get(f"/sessions/{sid}")
     body = r.text
     assert "Voir toutes les règles" in body
-    assert "/rules" in body
+    # ⚠ Assertait `/rules`, qui répond **301** vers `/science` depuis que la
+    # surface des règles a fusionné avec Science. La garde épinglait donc le
+    # produit sur une route HÉRITÉE : le lien atteignait sa destination en
+    # traversant une redirection, et ce test l'exigeait.
+    #
+    # C'est le même motif que `R-03` (le CTA de fin de séance vers
+    # `/dashboard`), à un second endroit — et `test_no_internal_link_traverses_
+    # a_redirect` garde désormais le motif plutôt que le cas.
+    #
+    # Ce qui est vérifié ici ne change pas : le rappel de méthode mène bien à
+    # la surface des règles.
+    assert "/science" in body
