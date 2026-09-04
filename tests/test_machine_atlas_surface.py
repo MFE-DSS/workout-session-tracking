@@ -18,7 +18,11 @@ def test_session_detail_renders_machine_panel_when_linked(client):
     body = r.text
     # MIGRÉ — passe de densité. Le panneau machine cesse d'être un bloc autonome dans le flux : il vit sous `TECHNIQUE`, un `<details>` natif de la ligne L3, et son PREMIER cue est remonté en L2 où il est VISIBLE SANS OUVRIR QUOI QUE CE SOIT. La capacité gardée ici — le cue vient de l'atlas versionné, jamais du gabarit, et reste lisible sans JS — est donc renforcée, pas affaiblie. Seule la classe exacte change.
     assert 'l3__item' in body
-    assert "Technique" in body
+    # `R9` / `Q-A = C` — le panneau contenait DÉJÀ ce que le moteur propose ET
+    # comment bien exécuter ; il n'annonçait que la seconde moitié. Il s'appelle
+    # RECOMMANDATION. Ce qui est gardé ici — le panneau existe et porte les cues
+    # de l'atlas — ne change pas.
+    assert "Recommandation" in body
     assert "Comment bien exécuter" in body
     assert "Points d'exécution" in body
     assert "Erreurs fréquentes" in body

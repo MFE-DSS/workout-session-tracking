@@ -176,7 +176,13 @@ def test_the_machine_panel_stays_a_native_details():
     L'invariant — pas de JS, `details/summary` natif — est intact ; seule
     la classe exacte change."""
     src = CARD.read_text(encoding="utf-8")
-    assert '<details class="l3__item session-focus__cues">' in src
+    # ⚠ Cherchait la chaîne d'attributs EXACTE. `R9` a ajouté `l3__item--reco`
+    # et la garde est tombée sur un AJOUT de classe, pas sur une régression.
+    # L'invariant est « une disclosure NATIVE porte le panneau », pas « les
+    # classes sont dans cet ordre-là ».
+    assert re.search(
+        r'<details[^>]*class="[^"]*session-focus__cues[^"]*"', src
+    ), "le panneau machine n'est plus une disclosure native"
     assert "machine-panel__title" in src, "le nom de la machine reste nommé"
 
 

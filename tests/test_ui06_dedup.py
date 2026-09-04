@@ -200,7 +200,18 @@ def test_worked_area_primary_shown_on_exactly_the_two_authorised_surfaces(client
     assert "session-focus__worked-area-row--primary" in body, "full panel row missing"
 
     #: Surfaces autorisées à nommer la cible, chacune UNE seule fois.
+    #:
+    #: `Q-E` (opérateur, 2026-09-04) ajoute LE BANDEAU. Ce n'est pas un
+    #: relâchement de la garde : le bandeau portait « Push A — Pecs épaisseur +
+    #: Delts + Triceps », un nom de GABARIT qui décrit ce que le programme
+    #: contient. Il porte désormais le code + la ZONE DOMINANTE, qui dit ce
+    #: qu'on travaille MAINTENANT.
+    #:
+    #: L'invariant que ce test protège — la cible n'est pas répétée partout,
+    #: et chaque surface autorisée ne la nomme QU'UNE FOIS — est inchangé.
+    #: Ce qui change est la liste des surfaces, et elle est décidée.
     surfaces = {
+        "session banner": r'session-head__zone">\s*([^<]*)',
         "compact target": r'session-focus__target-compact-value">\s*([^<]*)',
         "intent block": r'session-focus__intent-text">\s*(?:.*?<b>)?([^<]*)',
         "worked-area primary": (
