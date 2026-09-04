@@ -3063,6 +3063,20 @@ body.is-session-focus-mode .foot {
   font-size: 46px;
   line-height: 1.05;
   letter-spacing: -0.02em;
+  /* `AUREN_UI_U4_VISEUR` — MÊME INSTRUMENT, AUTRE PHOSPHORE.
+     Pendant le repos, le champ de saisie n'existe pas : le minuteur devient
+     le readout de cet état, et c'est LUI qui change de couleur.
+
+     Bleu système, pas un ambre atténué : **un décompte est produit par le
+     moteur, pas par l'utilisateur.** L'ambre veut dire « à toi de jouer » ;
+     pendant 90 secondes, ce n'est précisément pas le cas.
+
+     `§7 no-color-only-state` tient sans effort : l'état change aussi de
+     FORME — deux champs de saisie deviennent un cadran. La couleur confirme,
+     elle ne porte pas seule.
+
+     Écrit ICI et non dans une seconde règle : `css:S4666`. */
+  color: var(--role-origin-system);
 }
 .console[data-state="rest"] .rest-readout__label {
   grid-area: label;
@@ -3355,28 +3369,31 @@ body.is-session-focus-mode .foot {
 .console__band > .setline--current .setline__field--weight { flex: 2 1 0; }
 .console__band > .setline--current .setline__field--reps   { flex: 1 1 0; }
 
+/* ── LA CHARGE SUGGÉRÉE, RENDUE VISIBLE ──────────────────────
+   Le moteur de surcharge alimente déjà ce placeholder (« 102.5 », « 6-10 ») —
+   une SUGGESTION, jamais un préremplissage, et cette distinction est un
+   contrat (`Sb_30.next.placeholder`).
+
+   Deux défauts introduits par la première version du readout, tous deux
+   corrigés ici :
+
+     · 15 px dans un puits de 68 px : la suggestion du moteur devenait
+       illisible au moment précis où elle sert — l'instrument proposait une
+       charge que plus personne ne voyait ;
+     · `--role-glyph-decorative` est documenté NON-TEXTE UNIQUEMENT (3,27 sur
+       L3, sous le seuil 4,5). Un placeholder EST du texte.
+
+   Elle se lit désormais comme une valeur fantôme à l'échelle du readout :
+   c'est ce que l'instrument propose, pas ce qui est enregistré. */
 .console__band > .setline--current .setline__field::placeholder {
-  font-size: 15px;
+  font-size: 26px;
   font-weight: 400;
-  color: var(--role-glyph-decorative);
+  color: var(--role-text-muted);   /* 6,45 sur L0 — lisible, secondaire */
+  opacity: 1;                      /* Firefox applique 0.54 par défaut */
 }
 
-/* ── REPOS · MÊME INSTRUMENT, AUTRE PHOSPHORE ─────────────────
-   Pendant le repos le champ de saisie n'existe pas : il est remplacé par
-   le minuteur, qui devient le readout de cet état. C'est LUI qui change
-   de phosphore.
-
-   Et il passe au bleu système, pas à un ambre atténué : **un décompte
-   est produit par le moteur, pas par l'utilisateur.** L'ambre veut dire
-   « à toi de jouer » ; pendant 90 secondes, ce n'est précisément pas le
-   cas. Le rôle existait déjà, il n'y a rien à inventer.
-
-   `§7 no-color-only-state` tient sans effort ici : l'état change aussi
-   de FORME — deux champs de saisie deviennent un cadran. La couleur
-   confirme, elle ne porte pas seule. */
-.console[data-state="rest"] .rest-readout__value {
-  color: var(--role-origin-system);
-}
+/* Le phosphore du repos est posé sur la règle d'origine du minuteur
+   (`css:S4666`), plus haut dans cette feuille. */
 
 /* Correction (`S-11`) — variante de la série en cours, distinguée par
    une FORME (le liseré) et non par une couleur seule. Corriger, c'est
