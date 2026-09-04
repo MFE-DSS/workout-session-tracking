@@ -126,11 +126,49 @@ class TestTerminalCss:
         assert "@font-face" not in css
         assert "fonts.googleapis" not in css
 
-    def test_shadows_neutralized(self):
-        """Terminal chrome : the shadow tokens must resolve to none."""
+    def test_elevation_is_a_hairline_edge_not_a_halo(self):
+        """Remplace `test_shadows_neutralized` — **la doctrine a changé, sur
+        arbitrage opérateur.**
+
+        L'ancienne garde exigeait `--shadow-sm: none` au nom du « terminal
+        chrome ». C'était `SYS-078` (« surface par défaut sans ombre, une seule
+        élévation »), que `AUREN_VISUAL_BACKBONE §6` supersède explicitement
+        après les arbitrages `L-07` (profondeur assumée), `K-01` (échelle à
+        quatre niveaux), `Q1=C` et `Q4=B` du 2026-09-04.
+
+        Elle avait en outre un effet pervers mesuré : **elle exigeait le
+        défaut**. Trois règles écrivaient `box-shadow: var(--shadow-sm)` — dont
+        l'en-tête et la barre collants — et rendaient `none`. La garde
+        garantissait que l'intention écrite dans le code ne produise rien.
+
+        Ce qui la remplace protège ce qui, lui, ne périme pas : **le registre
+        reste terminal.** Une élévation y est une ARÊTE — un trait de lumière
+        et un trait d'ombre, flou ≤ 2 px — jamais un halo diffus. C'est la
+        différence entre un instrument et une carte de tableau de bord web.
+        """
         css = FOCUS_CSS.read_text(encoding="utf-8")
-        assert re.search(r"--shadow-sm:\s*none", css)
-        assert re.search(r"--shadow-md:\s*none", css)
+        for token in ("--shadow-sm", "--shadow-md"):
+            m = re.search(rf"{re.escape(token)}:\s*([^;]+);", css)
+            assert m, f"{token} n'est plus déclaré"
+            value = m.group(1).strip()
+            assert value != "none", (
+                f"{token} vaut `none` — les règles qui le consomment ne "
+                "rendent rien, alors que le code se lit comme une intention"
+            )
+            assert value.startswith("var(--relief-"), (
+                f"{token} = {value!r} : l'élévation doit passer par le relief "
+                "partagé, pas par une ombre déclarée sur place"
+            )
+
+        # Le relief lui-même reste une arête, pas un halo.
+        app_css = (FOCUS_CSS.parent / "app.css").read_text(encoding="utf-8")
+        relief = re.search(r"--relief-raised:\s*([^;]+);", app_css)
+        assert relief, "--relief-raised introuvable"
+        blurs = [int(b) for b in re.findall(r"\b(\d+)px\b", relief.group(1))]
+        assert blurs and max(blurs) <= 2, (
+            f"flou {max(blurs) if blurs else '?'}px — au-delà de 2 px ce n'est "
+            "plus une arête d'instrument, c'est une ombre portée de carte web"
+        )
 
     def test_consistent_with_home_amber(self):
         """Focus and Home must share the same amber accent."""
