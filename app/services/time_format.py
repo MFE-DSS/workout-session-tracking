@@ -32,11 +32,31 @@ def session_duration(
     return target_c - start_c
 
 
+#: Au-delà, on cesse de compter en heures. Une séance ne dure pas un jour ;
+#: passé ce seuil, la durée ne décrit plus un effort mais un OUBLI.
+_HOURS_CEILING = 24
+
+
 def format_duration_short(delta: timedelta) -> str:
     """Compact duration for mobile display.
 
-      < 1 h     -> "{m} min" (including 0 min for < 60 s)
-      otherwise -> "{h} h {mm:02d}"
+      < 1 h      -> "{m} min" (including 0 min for < 60 s)
+      < 24 h     -> "{h} h {mm:02d}"
+      otherwise  -> "{d} j"
+
+    ⚠ POURQUOI LE PLAFOND EXISTE. Cette fonction n'en avait pas, et l'accueil
+    affichait **« En cours · depuis 1502 h 16 »** sur une séance laissée
+    ouverte 62 jours. Le format était juste et le nombre exact ; ce qu'il
+    disait ne se lisait pas.
+
+    Le défaut n'était pas dans l'arithmétique mais dans la PORTÉE : la
+    fonction est écrite pour une durée de séance — quelques dizaines de
+    minutes — et rien ne l'empêchait d'être appelée hors de ce domaine. Un
+    formateur sans borne finit toujours par en sortir.
+
+    Passé 24 h on rend des JOURS. C'est moins précis et c'est le but : à ce
+    stade la minute n'informe personne, et « 62 j » se lit d'un coup d'œil là
+    où « 1502 h 16 » demande un calcul.
 
     No characters that would be HTML-escaped. Safe to substring-
     match in assertions.
@@ -44,6 +64,8 @@ def format_duration_short(delta: timedelta) -> str:
     total_seconds = max(int(delta.total_seconds()), 0)
     minutes = total_seconds // 60
     hours, minutes = divmod(minutes, 60)
+    if hours >= _HOURS_CEILING:
+        return f"{hours // 24} j"
     if hours == 0:
         return f"{minutes} min"
     return f"{hours} h {minutes:02d}"
