@@ -66,6 +66,11 @@ class ConsoleState:
     work_total: int = 0
     #: Code de l'exercice suivant (`None` sur le dernier).
     next_code: str | None = None
+    #: Nom de l'exercice suivant. `R4` (opérateur, 2026-09-04) — « PASSER À E2 »
+    #: n'est pas intelligible : un code de position ne dit pas ce qu'on va
+    #: faire. Le nom vit ici plutôt que dans le gabarit parce que la commande
+    #: est construite ici, et qu'un libellé assemblé à deux endroits diverge.
+    next_name: str | None = None
     #: Code de l'exercice précédent (`None` sur le premier).
     prev_code: str | None = None
     rest_seconds: int = REST_FALLBACK_SECONDS
@@ -145,16 +150,25 @@ def build_console_state(
     session_exercise,
     *,
     next_code: str | None,
+    next_name: str | None = None,
     prev_code: str | None = None,
     rest_signal: bool = False,
     fix_set_id: int | None = None,
+    skip_warmup: bool = False,
 ) -> ConsoleState:
     """Dérive l'état de la console pour un exercice.
 
     `rest_signal` vient de `?rest=1`, posé par le serveur après un `nav=stay`.
     `fix_set_id` vient de `?fix=<id>`, posé par le lien de correction.
-    Les deux sont à portée de requête et ne survivent pas au rechargement
-    suivant — c'est voulu.
+    `skip_warmup` vient de `?skipwarm=1`, posé par la sortie « SAUTER
+    L'ÉCHAUFFEMENT ». **Les trois sont à portée de requête et ne survivent pas
+    au rechargement suivant — c'est voulu.**
+
+    `Q-C` (opérateur, 2026-09-04) — sauter l'échauffement est une **pure
+    navigation** : elle amène à la première série de travail et **n'écrit
+    rien**. Marquer les échauffements comme faits fabriquerait des données
+    d'entraînement que l'utilisateur n'a pas produites, et un échauffement
+    sauté n'est pas un échauffement fait.
     """
     warmups, works = _split_sets(session_exercise)
 
@@ -173,6 +187,7 @@ def build_console_state(
         "work_done": work_done,
         "work_total": len(works),
         "next_code": next_code,
+        "next_name": next_name,
         "prev_code": prev_code,
     }
 
@@ -199,7 +214,14 @@ def build_console_state(
             **common,
         )
 
-    if pending_warmups:
+    # `Q-C` — SAUTER L'ÉCHAUFFEMENT. Signal de requête, jamais un état écrit :
+    # on n'entre dans cette branche que s'il reste une série de TRAVAIL à
+    # faire. Sans ce garde, sauter l'échauffement d'un exercice dont le travail
+    # est terminé afficherait `CURRENT_SET` sans série courante.
+    #
+    # Les échauffements restent `pending` en base : ils ne sont pas marqués
+    # faits, et l'utilisateur peut y revenir en rechargeant sans le paramètre.
+    if pending_warmups and not (skip_warmup and pending_works):
         return ConsoleState(
             state=WARMUP,
             current_set=pending_warmups[0],
@@ -298,6 +320,14 @@ def command_for(state: ConsoleState) -> dict:
             "nav": "stay_norest",
         }
     if kind == EXERCISE_COMPLETE:
+        # ⚠ LIBELLÉ FIGÉ par `Sx_UIV3_02 §4` (amendement B), et gardé par
+        # `test_exactly_one_dominant_command_per_state`.
+        #
+        # L'argument de `R4` — « un code de position ne dit pas ce qu'on va
+        # faire » — s'applique tout autant ici. Mais l'opérateur a tranché sur
+        # `PASSER À E2`, la sortie SECONDAIRE. Étendre par analogie à un
+        # libellé figé serait amender une spec versionnée sans mandat, ce que
+        # `CLAUDE.md §4` interdit. Reporté, et posé en question.
         return {
             "label": f"CONTINUER → {state.next_code}",
             "sub": None,
@@ -334,8 +364,21 @@ def secondary_for(state: ConsoleState) -> list[dict]:
         ]
     # `WARMUP` et `CURRENT_SET` : l'exercice est incomplet, la sortie existe.
     out = []
+    # `Q-C` — la sortie d'échauffement précède la sortie d'exercice : quand on
+    # est en échauffement, « je ne m'échauffe pas ici » est bien plus fréquent
+    # que « je saute tout l'exercice ».
+    if kind == WARMUP and state.work_done < state.work_total:
+        out.append({"label": "SAUTER L'ÉCHAUFFEMENT", "kind": "skip_warmup"})
     if state.next_code:
-        out.append({"label": f"PASSER À {state.next_code}", "kind": "skip"})
+        # `R4` / `Q-B` — « PASSER À E2 » ne dit pas ce qu'on va faire. Le
+        # libellé nomme l'INTENTION, la sous-ligne nomme la DESTINATION : un
+        # nom comme « Neutral Grip Shoulder Press machine » casse un libellé
+        # et devient illisible tronqué.
+        out.append({
+            "label": "EXERCICE SUIVANT",
+            "sub": state.next_name or state.next_code,
+            "kind": "skip",
+        })
     else:
         out.append({"label": "ALLER AU BILAN", "kind": "skip"})
     # « Enregistrer et revenir » — capacité PRÉEXISTANTE (`nav=prev`).

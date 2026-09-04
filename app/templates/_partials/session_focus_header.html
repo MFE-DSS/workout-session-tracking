@@ -19,18 +19,30 @@
    avec la navigation d'exercice. `CLAUDE.md §5.3` interdit la soustraction
    seule ; ici la remplaçante part dans la même livraison.
 
-   NOM DE SÉANCE — CE QUE JE N'AI PAS FAIT
-   ---------------------------------------
-   L'opérateur voulait `PUSH A`. **Ce nom court n'existe pas en base** :
-   `workout_templates` porte `slug` (`push-a`, un identifiant technique) et
-   `name` (`Push A — Pecs épaisseur + Delts + Triceps`). `suggested_label`
-   est une phrase de conseil, pas un nom.
+   NOM DE SÉANCE — LA DEMANDE EST ENFIN SERVIE (`Q-E`, 2026-09-04)
+   ---------------------------------------------------------------
+   Cette prose disait « ce que je n'ai pas fait » : l'opérateur voulait
+   `PUSH A`, et le refus était motivé — le nom court n'existe pas en base,
+   `workout_templates` ne porte que `slug` (identifiant technique) et `name`
+   (`Push A — Pecs épaisseur + Delts + Triceps`) ; découper la chaîne
+   fabriquerait un nom par convention typographique.
 
-   Découper la chaîne longue sur son tiret fabriquerait un nom court par
-   convention typographique — donc une donnée inventée, qui casserait au
-   premier gabarit nommé autrement. Le nom complet est donc conservé, tronqué
-   par ellipse GRACIEUSE (jamais un débordement dur), avec le texte intégral
-   en `title`. Un vrai nom court demanderait une colonne → `UI_DATA_GAP G7`.
+   **L'objection était juste et reste vraie ; l'arbitrage la lève pour une
+   raison qui n'avait pas été posée.** Le nom de gabarit décrit ce que le
+   programme CONTIENT ; il ne dit pas ce qu'on travaille MAINTENANT. Le
+   bandeau porte donc le code dérivé **et la ZONE DOMINANTE**, qui est, elle,
+   une vraie donnée du moteur (`body_map_data`).
+
+   Ce qui est tenu de l'objection :
+   * sans séparateur, la dérivation rend le nom ENTIER — rien n'est inventé
+     (`_session_head`, gardé par `test_the_code_derivation_never_invents`) ;
+   * sans zone mappée — 3 exercices sur 7 d'une séance type — la ligne
+     s'arrête au code : pas de « À qualifier » qui ferait passer une absence
+     pour une information ;
+   * le nom complet n'est PAS retiré (`§5.3`) : `title` ET le panneau `⋯`.
+
+   `UI_DATA_GAP G7` reste ouvert : une vraie colonne de nom court vaudrait
+   mieux qu'une dérivation, et la rendrait inutile.
 #}
 {# La position `E1 / 7` vit sur la MÊME ligne que le nom : deux lignes pour
    deux faits courts coûtaient 36 px de contexte avant l'exercice, sur un
@@ -53,8 +65,24 @@
      tiennent sous la hauteur des cibles voisines de 44 px.
      `title` est conservé en secours pour les noms hors norme, mais il n'est
      plus le seul chemin. #}
+  {# `Q-E` (opérateur, 2026-09-04) — LE CODE + LA ZONE DOMINANTE.
+     « Push A — Pecs épaisseur + Delts + Triceps » est un nom de GABARIT : il
+     décrit ce que le programme contient, pas ce qu'on travaille maintenant.
+
+     Le nom complet n'est PAS retiré (`§5.3`) : il reste dans `title` et dans
+     le panneau `⋯`. Il change de rang, il ne disparaît pas.
+
+     Sans zone mappée — 3 exercices sur 7 d'une séance type — la ligne
+     s'arrête au code. Écrire « À qualifier » ferait passer une absence de
+     donnée pour une information. #}
   <h1 class="page-title session-head__name"
-      title="{{ session.template_name_snapshot }}">{{ session.template_name_snapshot }}</h1>
+      title="{{ session.template_name_snapshot }}">
+    <span class="session-head__code">{{ session_head.code }}</span>
+    {%- if session_head.zone %}
+      <span class="session-head__sep" aria-hidden="true">·</span>
+      <span class="session-head__zone">{{ session_head.zone }}</span>
+    {%- endif %}
+  </h1>
 
   {# Correction opérateur — `E1 / 7` EST le déclencheur de navigation.
      Il portait l'information « où suis-je » sans être actionnable, alors que

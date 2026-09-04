@@ -283,15 +283,45 @@ def _persist_set_values(se, form) -> None:
         sl.completed = (new_weight is not None) or (new_reps is not None)
 
 
+#: Séparateurs de gabarit — « Push A — Pecs épaisseur + … », « Push A - … ».
+#: Le tiret cadratin d'abord : c'est celui du catalogue.
+_HEAD_SEPARATORS = ("—", "–", " - ", ":")
+
+
+def _session_head(template_name: str | None, active_zone: dict | None) -> dict:
+    """`Q-E` — le bandeau : le CODE de séance + la ZONE dominante.
+
+    Le nom de gabarit décrit ce que le programme CONTIENT ; la zone dit ce
+    qu'on travaille MAINTENANT. Le nom complet reste disponible — `title` et
+    panneau `⋯` — donc rien n'est retiré, seulement hiérarchisé (`§5.3`).
+
+    Aucun repli inventé : sans séparateur, on garde le nom tel quel ; sans
+    zone mappée, la ligne s'arrête au code. Fabriquer « À qualifier » ici
+    ferait passer une absence de donnée pour une information.
+    """
+    name = (template_name or "").strip()
+    code = name
+    for sep in _HEAD_SEPARATORS:
+        if sep in name:
+            code = name.split(sep, 1)[0].strip()
+            break
+    zone = None
+    if active_zone and active_zone.get("status") == "mapped":
+        zone = active_zone.get("primary_label")
+    return {"code": code or name, "zone": zone, "full": name}
+
+
 def _console_context(
     ordered: list,
     *,
     active_exercise_id: int | None,
     next_code_by_exercise: dict[int, str | None],
+    next_name_by_exercise: dict[int, str | None],
     prev_code_by_exercise: dict[int, str | None],
     last_time: dict,
     rest_signal: bool,
     fix_set_id: int | None,
+    skip_warmup: bool = False,
 ) -> dict[str, dict]:
     """État, commande dominante et sorties secondaires, par exercice.
 
@@ -305,9 +335,14 @@ def _console_context(
         st = build_console_state(
             se,
             next_code=next_code_by_exercise[se.id],
+            next_name=next_name_by_exercise[se.id],
             prev_code=prev_code_by_exercise[se.id],
             rest_signal=rest_signal and is_active,
             fix_set_id=fix_set_id if is_active else None,
+            # Comme `rest` et `fix` : honoré sur la carte ACTIVE seulement.
+            # Sauter l'échauffement d'une carte repliée changerait un état que
+            # l'utilisateur ne voit pas.
+            skip_warmup=skip_warmup and is_active,
         )
         states[se.id] = st
         commands[se.id] = command_for(st)
@@ -493,6 +528,7 @@ def session_detail(
     #   future  = done == 0 (and not active)
     jump_states: dict[int, str] = {}
     next_code_by_exercise: dict[int, str | None] = {}
+    next_name_by_exercise: dict[int, str | None] = {}
     prev_code_by_exercise: dict[int, str | None] = {}
     ordered = list(session.session_exercises)
     for idx, se in enumerate(ordered):
@@ -507,9 +543,17 @@ def session_detail(
             jump_states[se.id] = "future"
 
         if idx + 1 < len(ordered):
-            next_code_by_exercise[se.id] = ordered[idx + 1].exercise_code_snapshot
+            nxt = ordered[idx + 1]
+            next_code_by_exercise[se.id] = nxt.exercise_code_snapshot
+            # `R4` — le nom SUBSTITUÉ d'abord : si l'utilisateur a remplacé
+            # l'exercice suivant, la commande doit annoncer ce qu'il va
+            # réellement faire, pas ce que le gabarit prévoyait.
+            next_name_by_exercise[se.id] = (
+                nxt.substituted_name or nxt.exercise_name_snapshot
+            )
         else:
             next_code_by_exercise[se.id] = None
+            next_name_by_exercise[se.id] = None
         if idx > 0:
             prev_code_by_exercise[se.id] = ordered[idx - 1].exercise_code_snapshot
         else:
@@ -548,10 +592,12 @@ def session_detail(
         ordered,
         active_exercise_id=active_exercise_id,
         next_code_by_exercise=next_code_by_exercise,
+        next_name_by_exercise=next_name_by_exercise,
         prev_code_by_exercise=prev_code_by_exercise,
         last_time=last_time,
         rest_signal=request.query_params.get("rest") == "1",
         fix_set_id=_positive_int(request.query_params.get("fix")),
+        skip_warmup=request.query_params.get("skipwarm") == "1",
     )
 
     return templates.TemplateResponse(
@@ -579,6 +625,17 @@ def session_detail(
             "substitution_data": substitution_data,
             "atlas_data": atlas_data,
             "body_map_data": body_map_data,
+            # `Q-E` (opérateur, 2026-09-04) — le bandeau garde LE CODE + LA
+            # ZONE DOMINANTE. « Push A — Pecs épaisseur + Delts + Triceps »
+            # est un nom de GABARIT : il décrit ce que le programme contient,
+            # pas ce qu'on travaille maintenant. La zone, elle, le dit.
+            #
+            # Le nom complet n'est pas perdu : il reste dans `title` et dans le
+            # panneau `⋯` (`§5.3` — jamais une soustraction seule).
+            "session_head": _session_head(
+                session.template_name_snapshot,
+                body_map_data.get(active_exercise_id) if active_exercise_id else None,
+            ),
             "sb08_hints_by_exercise": sb08_hints_by_exercise,
             "briefing_chips": briefing_chips,
             "peek_for_active": peek_for_active,

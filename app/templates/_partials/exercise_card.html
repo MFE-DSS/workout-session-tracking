@@ -623,9 +623,31 @@
               {% for s in secondaries %}
                 {% if s.kind == 'skip' %}
                   {# Q2 — un exercice incomplet peut être quitté à tout
-                     moment. Le produit ne force jamais la complétion. #}
+                     moment. Le produit ne force jamais la complétion.
+
+                     `R4` — le libellé nomme l'INTENTION, la sous-ligne la
+                     DESTINATION. Un `<button>` peut contenir deux lignes ;
+                     un nom d'exercice dans le libellé, non. #}
                   <button type="submit" name="nav" value="next"
-                          class="dock__alt">{{ s.label }}</button>
+                          class="dock__alt dock__alt--named">
+                    <span class="dock__alt-label">{{ s.label }}</span>
+                    {% if s.sub %}<span class="dock__alt-sub">{{ s.sub }}</span>{% endif %}
+                  </button>
+                {% elif s.kind == 'skip_warmup' %}
+                  {# `Q-C` — PURE NAVIGATION, et c'est tout l'arbitrage.
+
+                     Un LIEN, pas une soumission : sauter l'échauffement
+                     n'écrit rien. Marquer les échauffements comme faits
+                     fabriquerait des données d'entraînement que
+                     l'utilisateur n'a pas produites — un échauffement sauté
+                     n'est pas un échauffement fait.
+
+                     `skipwarm=1` est à portée de requête, comme `rest=1` et
+                     `fix=` : il ne survit pas au rechargement suivant, donc
+                     l'échauffement reste accessible en retirant le
+                     paramètre. #}
+                  <a class="dock__alt"
+                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}&skipwarm=1#exercise-{{ se.id }}">{{ s.label }}</a>
                 {% elif s.kind == 'remove' %}
                   {# Q3 — rend INTENTIONNEL ce qui n'était qu'un effet de
                      bord : vider les deux champs dé-complétait déjà la

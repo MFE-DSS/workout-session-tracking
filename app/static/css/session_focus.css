@@ -2510,6 +2510,28 @@ body.is-session-focus-mode .foot {
 .dock__alt:active { background: var(--t-raised); }
 .dock__alt--remove { color: var(--t-fg-muted); }
 
+/* `R4` — la sortie d'exercice nomme sa destination.
+   Deux lignes : l'INTENTION au-dessus, la DESTINATION en dessous. Un nom
+   comme « Neutral Grip Shoulder Press machine » ne tient pas dans un libellé
+   et devient illisible tronqué ; il tient sur une seconde ligne. */
+.dock__alt--named {
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+}
+.dock__alt-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+.dock__alt-sub {
+  font-size: 11px;
+  color: var(--role-text-muted);
+  /* Un nom long se replie plutôt que de déborder : la commande garde sa
+     largeur, et deux lignes de nom valent mieux qu'un nom coupé. */
+  text-align: center;
+  line-height: 1.25;
+}
+
 /* ── Up next réduit à une ligne (`§7.7`), au seul moment où la question se
    pose : la fin d'exercice. Scopé sous `.console__next` pour ne pas
    redéclarer les sélecteurs legacy `.session-focus__up-next*`. ── */
@@ -2715,17 +2737,48 @@ body.is-session-focus-mode .foot {
   line-height: 1.25;
   letter-spacing: 0.01em;
   color: var(--t-fg-muted);
-  /* DEUX lignes, pas une ellipse au premier mot coupé. Le nom court
-     n'existe pas en base et le fabriquer en découpant la chaîne longue
-     inventerait une donnée ; en revanche rien n'oblige à n'en montrer
-     qu'une ligne. `title` ne s'ouvre pas au doigt — il ne peut pas être le
-     seul chemin vers le nom complet. */
+  /* ⚠ CE RAISONNEMENT EST SUPERSÉDÉ — `Q-E`, opérateur, 2026-09-04.
+     Il disait : « le nom court n'existe pas en base et le fabriquer en
+     découpant la chaîne longue inventerait une donnée », d'où deux lignes
+     plutôt qu'une ellipse.
+
+     L'objection était juste sur un point — découper une chaîne est une
+     dérivation, pas une lecture — et l'arbitrage la lève pour une raison
+     qui n'avait pas été posée : « Push A — Pecs épaisseur + Delts +
+     Triceps » est un nom de GABARIT. Il décrit ce que le programme
+     CONTIENT, pas ce qu'on travaille MAINTENANT. Le bandeau garde donc le
+     code + la ZONE DOMINANTE, qui est une vraie donnée du moteur.
+
+     Ce qui reste vrai de l'objection, et qui est tenu : le nom complet
+     n'est pas perdu. Il vit dans `title` ET dans le panneau `⋯` — deux
+     chemins, dont un tactile. `§5.3` : le nom change de rang, il ne
+     disparaît pas.
+
+     Les deux lignes restent, pour les gabarits sans séparateur : la
+     dérivation rend alors le nom entier, et il doit tenir. */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
+}
+
+/* Le code porte l'identité, la zone porte le travail du moment. Deux rangs
+   typographiques, pas deux couleurs : la zone vient du moteur mais elle
+   n'est pas une ACTION, donc pas d'ambre ; et elle n'est pas non plus une
+   recommandation, donc pas de bleu système. Le rang suffit. */
+.session-head .session-head__code {
+  color: var(--role-text-secondary);
+  font-weight: 600;
+}
+.session-head .session-head__sep {
+  color: var(--role-glyph-decorative);   /* non-texte : séparateur */
+  margin: 0 4px;
+}
+.session-head .session-head__zone {
+  color: var(--role-text-muted);
+  letter-spacing: 0.06em;
 }
 
 .session-head__more { justify-self: end; }
