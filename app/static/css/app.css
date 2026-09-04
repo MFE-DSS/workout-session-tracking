@@ -124,6 +124,114 @@
        libellé et d'une hachure — jamais distingué par la couleur
        seule (`Sx_UIV3_00 §7`). */
   --t-unknown:     #828E9E;  /* 4,29 */
+
+  /* ==========================================================
+     `AUREN_UI_U1_ROLE_TOKENS` — LA COUCHE DE RÔLES
+     Socle : `AUREN_VISUAL_BACKBONE §3.1`
+     ----------------------------------------------------------
+     POURQUOI CETTE COUCHE EXISTE
+
+     La palette cockpit ci-dessus nomme des VALEURS (`--t-amber`,
+     `--t-blue-fg`). Elle ne nomme pas des EMPLOIS. Conséquence
+     mesurable : `--t-amber` est documenté « action utilisateur ·
+     objet actif » — DEUX emplois sous un seul nom. Le jour où
+     l'objet actif doit cesser de ressembler à un bouton, aucun
+     sélecteur ne permet de les séparer, parce que le CSS n'a
+     jamais su lesquels étaient lesquels.
+
+     Cette couche déclare l'EMPLOI, aliasé sur la valeur en place.
+     `RÔLE → TOKEN → VALEUR`, jamais « ambre = action ».
+
+     ⚠ CETTE TRANCHE NE RECÂBLE AUCUN CONSOMMATEUR. Elle ajoute des
+     noms. Le rendu est identique avant/après, et c'est le résultat
+     attendu : la migration des consommateurs est une tranche à
+     part, qui passera par une exposition (`CLAUDE.md §5.1`).
+
+     ⚠ TROIS RÔLES PARTAGENT AUJOURD'HUI LA MÊME VALEUR AMBRE
+     (`action-primary`, `state-active`, `focus`). C'est voulu et
+     c'est tout l'objet : des tokens distincts qui aliasent la même
+     valeur peuvent DIVERGER un jour ; une valeur unique employée à
+     trois fins ne le peut pas.
+     ========================================================== */
+
+  /* — SURFACE · l'échelle L0→L3 reçoit ses emplois produit.
+       Les quatre niveaux de `AUREN_VISUAL_BACKBONE §2` ne sont pas
+       une échelle neuve : ce sont ces quatre fonds, déjà mesurés,
+       auxquels la structure produit donne enfin un sens.
+
+       ⚠ Le 4e niveau produit — « en vol », l'objet actif — n'est
+       PAS un 5e fond : c'est `--role-state-active` posé sur l'un
+       de ces quatre. Une profondeur de plus aurait été inventée
+       pour rien. */
+  --role-surface-chassis:     var(--t-void);     /* L0 · le sol du cockpit */
+  --role-surface-canvas:      var(--t-base);     /* L1 · le champ */
+  --role-surface-group:       var(--t-surface);  /* L2 · le logement */
+  --role-surface-instrument:  var(--t-raised);   /* L3 · la plaque */
+
+  /* — TEXTE · seuil 4,5:1 sur le pire fond réel (L3). */
+  --role-text-primary:        var(--t-fg);        /* 12,02 */
+  --role-text-secondary:      var(--t-fg-2);      /*  6,50 */
+  --role-text-muted:          var(--t-fg-muted);  /*  4,64 */
+  --role-text-on-action:      var(--t-on-amber);  /*  8,14 sur ambre */
+
+  /* — STRUCTURE · ne portent aucun sens, exempts du seuil 4:1. */
+  --role-border-subtle:       var(--t-line);
+  --role-border-emphasis:     var(--t-line-strong);
+  /* NON-TEXTE UNIQUEMENT (3,27 sur L3). Séparateurs et glyphes. */
+  --role-glyph-decorative:    var(--t-fg-faint);
+
+  /* — ACTION ET INTERACTION.
+       `action-terminal` est déclaré et aliasé sur l'ambre FAUTE DE
+       DÉCISION : `S-09` (registre d'une action irréversible) n'est
+       pas tranché. Le rôle existe pour que la décision ait un
+       endroit où atterrir, pas parce que sa valeur est arrêtée. */
+  --role-action-primary:      var(--t-amber);        /* 5,93 */
+  --role-action-hover:        var(--t-amber-hover);  /* 7,19 */
+  --role-action-terminal:     var(--t-amber);        /* ⚠ provisoire — `S-09` */
+  --role-action-dim:          var(--t-amber-dim);    /* 3,18 — NON-TEXTE */
+  --role-state-active:        var(--t-amber);        /* ⚠ même valeur, autre emploi */
+  --role-focus:               var(--t-amber);        /* ⚠ idem — cf. `:focus-visible` */
+
+  /* — PROVENANCE · ce que le MOTEUR produit. Jamais une action.
+       Distinct de `support-information` : une provenance n'est pas
+       une nature de retour. */
+  --role-origin-system:       var(--t-blue-fg);    /* 8,57 — texte */
+  --role-origin-system-data:  var(--t-blue-mid);   /* 5,46 — trait de donnée */
+  --role-origin-system-line:  var(--t-blue-line);  /* 4,39 — filet porteur */
+
+  /* — DONNÉE ABSENTE · ni action, ni production du système.
+       Toujours accompagnée d'un libellé et d'une hachure. */
+  --role-data-unknown:        var(--t-unknown);    /* 4,29 */
+
+  /* — SUPPORT · retour d'OPÉRATION (formulaire, erreur, succès).
+       ⛔ JAMAIS pour encoder une récupération : `Sx_UIV3_00 §4`
+       interdit le feu tricolore sur les bandes, et `Sx_UIV3_04 §3`
+       interdit l'ambre sur un état de récupération. Ces quatre
+       rôles servent ce que l'UTILISATEUR vient de faire, jamais ce
+       que son CORPS est.
+
+       ⚠ TROIS VALEURS SONT CORRIGÉES ICI, ET LE DÉFAUT ÉTAIT RÉEL.
+       Elles viennent de la génération héritée (`--ok` `--warn`
+       `--danger` `--info`), mesurées à l'époque sur `--bg` seul.
+       Sur le pire fond réel (L3 `--t-raised`) :
+
+           --danger #B85C5C → 3,21:1   ⛔ sous 4,0, très loin de 4,5
+           --info   #6E8FA8 → 4,19:1   ⛔ sous 4,5 (texte)
+           --warn   #C77B54 → 4,35:1   ⛔ sous 4,5 (texte)
+           --ok     #6E9E7A → 4,65:1   ✅ conforme, repris tel quel
+
+       C'est EXACTEMENT le défaut `--t-blue-line` (#4A7FB5, conforme
+       sur base, 3,40 sur L3) reproduit une génération plus tard.
+       Un message d'erreur est du TEXTE : 3,21:1 est illisible.
+
+       Corrections à teinte ET saturation constantes — seule la
+       luminosité monte, la couleur reste la même famille.
+       Les valeurs héritées ne sont PAS touchées : leurs
+       consommateurs actuels gardent leur rendu (`§5.3`). */
+  --role-support-success:     #6E9E7A;  /* 4,65 — inchangé */
+  --role-support-warning:     #C97F59;  /* 4,53 — corrigé de #C77B54 (4,35) */
+  --role-support-error:       #C67D7D;  /* 4,51 — corrigé de #B85C5C (3,21) */
+  --role-support-information: #7695AD;  /* 4,54 — corrigé de #6E8FA8 (4,19) */
 }
 
 /* ---- Reset + Base ---- */
