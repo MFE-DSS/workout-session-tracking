@@ -196,7 +196,13 @@ def test_shadows_are_no_longer_neutralised(token, app_tokens, session_tokens):
     assert resolved != "none", (
         f"{token} vaut `none` — les règles qui le consomment ne rendent rien"
     )
-    assert "inset" in resolved or "px" in resolved, resolved
+    # Une seule assertion, et elle dit ce qu'elle veut vraiment : une ombre
+    # RÉELLE porte au moins une longueur. `"inset" or "px"` énonçait deux
+    # conditions sous un message unique — et `inset` seul, sans longueur, ne
+    # rend rien non plus.
+    assert re.search(r"\b\d+px\b", resolved), (
+        f"{token} = {resolved!r} : aucune longueur, donc aucun relief rendu"
+    )
 
 
 def test_the_shadow_consumers_still_exist():

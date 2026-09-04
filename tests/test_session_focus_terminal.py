@@ -165,9 +165,16 @@ class TestTerminalCss:
         relief = re.search(r"--relief-raised:\s*([^;]+);", app_css)
         assert relief, "--relief-raised introuvable"
         blurs = [int(b) for b in re.findall(r"\b(\d+)px\b", relief.group(1))]
-        assert blurs and max(blurs) <= 2, (
-            f"flou {max(blurs) if blurs else '?'}px — au-delà de 2 px ce n'est "
-            "plus une arête d'instrument, c'est une ombre portée de carte web"
+        # Deux assertions distinctes, et pas par conformité : « aucune longueur
+        # lisible » et « flou trop large » sont deux défauts différents. Les
+        # réunir par un `and` rendait le même message pour les deux.
+        assert blurs, (
+            f"--relief-raised ne contient aucune longueur en px : "
+            f"{relief.group(1).strip()!r} — la garde ne mesurerait rien"
+        )
+        assert max(blurs) <= 2, (
+            f"flou {max(blurs)}px — au-delà de 2 px ce n'est plus une arête "
+            "d'instrument, c'est une ombre portée de carte web"
         )
 
     def test_consistent_with_home_amber(self):
