@@ -287,9 +287,30 @@ def test_the_family_stays_small():
         for m in re.findall(r"^\.([a-z0-9_-]+)", _css(), re.MULTILINE)
     }
     #: Les primitives réutilisables — ce que ce test protège de la prolifération.
+    #:
+    #: `input-shell` — AJOUTÉE PAR `Sb_UI_FORMULAIRES_01`, ET C'EST UN GESTE
+    #: CONSCIENT, comme cette garde l'exige.
+    #:
+    #: Pourquoi une SEPTIÈME plutôt qu'une variante de `select-shell` : ce sont
+    #: deux éléments natifs différents, avec des balisages différents. Le
+    #: `<select>` a besoin d'une enveloppe pour positionner son chevron ; un
+    #: champ texte n'en a pas. Les fondre sous un seul nom obligerait l'un des
+    #: deux à mentir sur ce qu'il enveloppe.
+    #:
+    #: Pourquoi ce n'est PAS de la prolifération : les deux partagent UNE SEULE
+    #: déclaration de géométrie dans `interaction.css`
+    #: (`.select-shell__control, .input-shell__control { … }`), et
+    #: `test_both_shells_share_one_geometry` interdit qu'elles divergent. Deux
+    #: noms, une définition — c'est l'inverse d'une variante.
+    #:
+    #: Pourquoi elle manquait : il n'existait AUCUNE coque pour les champs
+    #: texte. Hors du périmètre de la séance, chaque `<input>` rendait le défaut
+    #: du navigateur — un rectangle blanc pur dans une interface sombre. Mesuré
+    #: avant la tranche : neuf contrôles à fond clair sur les surfaces
+    #: d'escouade. Après : zéro.
     primitives = {
         "a11y-input", "choice-group", "choice-row", "choice-grid",
-        "disclosure", "select-shell",
+        "disclosure", "select-shell", "input-shell",
     }
     #: Agencement d'une page précise, pas des primitives : ces classes ne sont
     #: pas destinées à être réutilisées ailleurs et ne comptent donc pas comme
@@ -303,7 +324,22 @@ def test_the_family_stays_small():
     legacy_repaired = {"segmented"}
     allowed = primitives | layout | legacy_repaired
     assert roots <= allowed, sorted(roots - allowed)
-    assert len(primitives) == 6
+    # `Sb_UI_FORMULAIRES_01` — 6 → 7, ARBITRÉ PAR L'OPÉRATEUR.
+    #
+    # Ce nombre n'est pas un compteur : c'est un RALENTISSEUR. Il oblige à
+    # défendre chaque primitive nouvelle devant quelqu'un, et il a fonctionné —
+    # la question a été posée et tranchée plutôt que glissée dans un diff.
+    #
+    # Ce qui a été pesé : fondre les deux coques sous une racine unique
+    # (`field-shell`) aurait gardé six, au prix du renommage d'un composant qui
+    # marche. Poser la classe du `<select>` sur un `<input>` aurait gardé six
+    # aussi, au prix d'un nom qui ment sur ce qu'il habille.
+    #
+    # Sept a été retenu parce que la prolifération que ce plafond combat, c'est
+    # la DIVERGENCE — et ici il n'y en a pas : une seule déclaration de
+    # géométrie couvre les deux, et `test_both_shells_share_one_geometry`
+    # l'empêche de se dédoubler.
+    assert len(primitives) == 7
 
 
 def test_reduced_motion_is_respected():

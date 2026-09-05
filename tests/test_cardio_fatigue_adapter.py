@@ -57,15 +57,35 @@ def test_every_ui_select_value_is_recognised(raw):
 
 
 def test_ui_vocabulary_matches_the_template_exactly():
-    """If someone adds an option to the select, this fails until the adapter knows."""
+    """If someone adds an option to the select, this fails until the adapter knows.
+
+    ⚠ MIGRÉE PAR `Sb_UI_FORMULAIRES_01`, ET L'INVARIANT EST INCHANGÉ.
+
+    Cette garde découpait le HTML entre `<select name="cardio_machine_type">` et
+    `</select>` pour en extraire les `value=`. Le `<select>` est désormais rendu
+    par la macro canonique `select_shell` — les sept `<select>` écrits à la main
+    du produit l'ont adoptée — et ses options viennent d'une liste Jinja. Le
+    découpage ne trouvait donc plus rien, et l'`IndexError` remontait avant même
+    l'assertion.
+
+    Ce qu'elle protège n'a pas bougé d'un pouce : le vocabulaire que l'écran
+    peut produire doit être exactement celui que l'adaptateur sait normaliser.
+    On lit la liste à sa nouvelle source, qui est d'ailleurs plus fiable qu'un
+    découpage de balisage.
+    """
+    import ast
+    import re
+
     template = Path(rc.__file__).resolve().parents[1] / "templates" / "session_detail.html"
     html = template.read_text(encoding="utf-8")
-    select = html.split('<select name="cardio_machine_type">', 1)[1].split("</select>", 1)[0]
-    options = {
-        line.split('value="', 1)[1].split('"', 1)[0]
-        for line in select.splitlines() if 'value="' in line
-    }
-    assert options - {""} == set(CARDIO_UI_VOCABULARY)
+
+    m = re.search(r"\{%\s*set\s+_machines\s*=\s*(\[.*?\])\s*%\}", html, re.DOTALL)
+    assert m, (
+        "la liste `_machines` a disparu de `session_detail.html` : la garde ne "
+        "peut plus comparer le vocabulaire de l'écran à celui de l'adaptateur"
+    )
+    options = {code for code, _label in ast.literal_eval(m.group(1))}
+    assert options == set(CARDIO_UI_VOCABULARY)
 
 
 @pytest.mark.parametrize("raw", [None, "", "   ", 3, [], object()])

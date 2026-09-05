@@ -63,22 +63,76 @@
 {% endmacro %}
 
 {# E. SELECT SHELL — coque canonique du <select> natif. #}
+{# `Sb_UI_FORMULAIRES_01` — `required` AJOUTÉ, ET IL MANQUAIT VRAIMENT.
+   Sept `<select>` du produit étaient écrits à la main plutôt qu'avec cette
+   macro. En les convertissant, l'un d'eux portait `required` — que la macro ne
+   savait pas rendre. Adopter le composant aurait donc RETIRÉ une contrainte de
+   saisie en silence : le formulaire serait devenu soumettable à vide.
+   Un composant qui ne couvre pas les attributs réels de ses appelants les pousse
+   à l'écrire à la main. C'est une des raisons pour lesquelles il n'était employé
+   qu'une seule fois. #}
+{# `Sb_UI_FORMULAIRES_01` — `value_attr` / `label_attr` : LA MACRO SAIT ENFIN
+   LIRE UNE LISTE D'OBJETS.
+
+   Elle n'acceptait que des scalaires ou des paires. Or ce que les gabarits ont
+   sous la main, ce sont des listes de MODÈLES — `all_templates`, `user_sessions`
+   — et Jinja n'a pas de `zip`. Les appeler imposait donc de reconstruire des
+   paires à la main, ou de renvoyer le travail dans la route.
+
+   Personne ne l'a fait : on a écrit le `<select>` à la main. C'est la troisième
+   raison, avec `required` manquant et le `onchange` impossible, pour laquelle un
+   composant canonique n'était employé qu'une seule fois dans tout le produit.
+   Un composant qui ne consomme pas la donnée qu'on a n'est pas adopté. #}
 {% macro select_shell(name, options, selected=None, empty_label=None,
-                      select_id=None, disabled=False) %}
+                      select_id=None, disabled=False, required=False,
+                      value_attr=None, label_attr=None, empty_value="") %}
 <span class="select-shell">
   <select class="select-shell__control" name="{{ name }}"
           {% if select_id %}id="{{ select_id }}"{% endif %}
+          {% if required %}required{% endif %}
           {% if disabled %}disabled{% endif %}>
+    {# `empty_value` — QUATRIÈME RAISON DE NE PAS ADOPTER LA MACRO.
+       Elle imposait `value=""` à l'option vide. Or `squad_compare` lit
+       `a: int = Query(0)` : son sentinelle est `"0"`, et une chaîne vide y
+       produirait un 422. Le gabarit n'avait donc pas le choix d'écrire son
+       `<select>` à la main. #}
     {% if empty_label is not none %}
-    <option value="">{{ empty_label }}</option>
+    <option value="{{ empty_value }}">{{ empty_label }}</option>
     {% endif %}
     {% for opt in options %}
-      {% set val = opt[0] if opt is iterable and opt is not string else opt %}
-      {% set lab = opt[1] if opt is iterable and opt is not string else opt %}
+      {% if value_attr %}
+        {% set val = opt[value_attr] if opt is mapping else opt|attr(value_attr) %}
+        {% set lab = opt[label_attr] if opt is mapping else opt|attr(label_attr) %}
+      {% else %}
+        {% set val = opt[0] if opt is iterable and opt is not string else opt %}
+        {% set lab = opt[1] if opt is iterable and opt is not string else opt %}
+      {% endif %}
       <option value="{{ val }}"{% if selected is not none and val|string == selected|string %} selected{% endif %}>{{ lab }}</option>
     {% endfor %}
   </select>
   <span class="select-shell__chevron" aria-hidden="true">▾</span>
+</span>
+{% endmacro %}
+
+{# F. INPUT SHELL — la jumelle, pour les champs texte.
+
+   Elle n'existait PAS : hors du périmètre de la séance, chaque `<input>`
+   rendait le défaut du navigateur, c'est-à-dire un rectangle blanc pur dans
+   une interface sombre. Ce n'était pas un contournement du composant, c'était
+   son absence — et l'absence se voyait dès qu'on corrigeait le `<select>`
+   juste au-dessus : le champ d'à côté restait blanc.
+
+   Même géométrie, même fond, même focus : `interaction.css` les déclare
+   ensemble plutôt que deux fois, pour qu'elles ne puissent pas diverger. #}
+{% macro input_shell(name, value="", input_id=None, input_type="text",
+                     placeholder=None, required=False, maxlength=None) %}
+<span class="input-shell">
+  <input class="input-shell__control" type="{{ input_type }}" name="{{ name }}"
+         value="{{ value or '' }}"
+         {% if input_id %}id="{{ input_id }}"{% endif %}
+         {% if placeholder %}placeholder="{{ placeholder }}"{% endif %}
+         {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+         {% if required %}required{% endif %}>
 </span>
 {% endmacro %}
 

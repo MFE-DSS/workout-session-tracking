@@ -276,23 +276,55 @@
   align-items: center;
 }
 
-.select-shell__control {
+/* `Sb_UI_FORMULAIRES_01` — LA GÉOMÉTRIE EST ÉCRITE UNE FOIS, POUR LES DEUX.
+ *
+ * La coque du `<select>` existait ; celle du champ texte, NON. Les `<input>`
+ * n'étaient stylés que dans le périmètre de la séance, donc partout ailleurs
+ * ils rendaient le défaut du navigateur : un rectangle BLANC PUR dans une
+ * interface sombre.
+ *
+ * Mesuré : neuf contrôles à fond clair sur les surfaces d'escouade, et ZÉRO
+ * sur `/plan` — le seul gabarit qui employait la coque. La démonstration se
+ * faisait toute seule.
+ *
+ * Ce n'était pas deux fois le même problème. Pour le `<select>`, le composant
+ * existait et on le contournait. Pour le champ texte, il MANQUAIT — et un
+ * manque ne se corrige pas en recopiant, sinon les deux divergent à la
+ * première évolution. D'où une géométrie partagée, deux noms. */
+.select-shell__control,
+.input-shell__control {
   appearance: none;
   width: 100%;
   min-height: 44px;
-  padding: var(--space-sm) var(--space-xl) var(--space-sm) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
   background: var(--bg);
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   font-family: inherit;
   font-size: 14px;
+}
+
+/* Le `<select>` seul réserve la place du chevron à droite, et se comporte en
+   bouton. Un champ texte n'est pas cliquable au sens d'un menu : il garde le
+   curseur de saisie. */
+.select-shell__control {
+  padding-right: var(--space-xl);
   cursor: pointer;
 }
 
-.select-shell__control:focus-visible {
+.input-shell {
+  display: block;
+}
+
+.select-shell__control:focus-visible,
+.input-shell__control:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
+}
+
+.input-shell__control::placeholder {
+  color: var(--fg-dim);
 }
 
 .select-shell__control:disabled {

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import select_shell, input_shell %}
 {% block content %}
 <h1 class="page-title">{{ squad.name }}</h1>
 <p class="chip chip--private mb-sm">Activité partagée · Données privées protégées</p>
@@ -101,18 +102,18 @@
     <form method="post" action="{{ url_for('squad_recommend', squad_id=squad.id) }}" class="card" style="max-width:24rem;">
       <div style="margin-bottom:.75rem;">
         <label for="rec-template"><strong>Template</strong></label><br>
-        <select id="rec-template" name="template_slug" required style="width:100%;"
-                onchange="this.form.template_name.value=this.options[this.selectedIndex].text">
-          <option value="">--</option>
-          {% for t in all_templates %}
-            <option value="{{ t.slug }}">{{ t.name }}</option>
-          {% endfor %}
-        </select>
-        <input type="hidden" name="template_name" value="">
+        {# `Sb_UI_FORMULAIRES_01` — LE CHAMP CACHÉ ET SON JS DISPARAISSENT.
+           Un `onchange` inline recopiait le TEXTE de l'option dans un champ
+           caché, que le serveur recevait tel quel. Le nom est désormais dérivé
+           du slug côté serveur : rien à recopier, rien à cacher, et un client ne
+           peut plus envoyer un nom qui ne correspond pas au slug. #}
+        {{ select_shell("template_slug", all_templates, empty_label="--",
+                        select_id="rec-template", required=True,
+                        value_attr="slug", label_attr="name") }}
       </div>
       <div style="margin-bottom:.75rem;">
         <label for="rec-note"><strong>Note (optionnel)</strong></label><br>
-        <input type="text" id="rec-note" name="note" style="width:100%;">
+        {{ input_shell("note", input_id="rec-note") }}
       </div>
       <button type="submit" class="btn btn--primary">Recommander</button>
     </form>
@@ -125,11 +126,9 @@
       <form method="post" action="{{ url_for('squad_share_session', squad_id=squad.id) }}" class="card" style="max-width:24rem;">
         <div style="margin-bottom:.75rem;">
           <label for="share-session"><strong>Séance</strong></label><br>
-          <select id="share-session" name="session_id" required style="width:100%;">
-            {% for s in user_sessions %}
-              <option value="{{ s.id }}">{{ s.template_name_snapshot }} - {{ (s.started_at | local).strftime('%d/%m/%Y') }}</option>
-            {% endfor %}
-          </select>
+          {{ select_shell("session_id", user_sessions, select_id="share-session",
+                          required=True, value_attr="id",
+                          label_attr="template_name_snapshot") }}
         </div>
         <button type="submit" class="btn btn--primary">Partager</button>
       </form>
