@@ -614,11 +614,28 @@ nombre, sur un écran public.
 
 Vérifié au rendu : `/squads/1` et `/users/nadia` affichent « Streak ».
 
-**Traitement retenu** (tranche `Sb_UI_D7_STREAK_CLOSURE`) : appliquer D7 à la
-lettre — « remplacé par un comptage » — avec **un seul producteur** au lieu de
-trois, en promouvant le compteur déjà écrit et propre
-(`coach_report._sessions_in_window`) au rang de producteur partagé. Le moteur
-comportemental garde le sien, qui est gardé et n'est pas rendu.
+**✅ LIVRÉ — PR `#189`.** D7 appliquée à la lettre — « remplacé par un
+comptage » — avec **un seul producteur** au lieu de trois, en promouvant le
+compteur déjà écrit et propre (`coach_report._sessions_in_window`) au rang de
+producteur partagé. Le moteur comportemental garde le sien, qui est gardé et
+n'est pas rendu.
+
+Deux précisions que l'implémentation a apportées :
+
+* **Les deux producteurs d'affichage ne calculaient pas la même chose.**
+  `squad._compute_streak` partait strictement d'aujourd'hui ;
+  `profile_metrics.streak_days` accordait un délai de grâce jusqu'à la veille
+  pour ne pas perdre une suite avant minuit UTC. **Deux nombres différents pour
+  le même utilisateur, le même jour** — l'un sur le classement, l'autre sur la
+  carte de profil. La décision disait « aux règles différentes » ; c'était
+  littéral.
+* **`profile_metrics` portait aussi deux copies du prédicat d'éligibilité**
+  (« terminée, non exclue, dans la fenêtre »), l'une pour compter, l'autre pour
+  charger les exercices. Extraites en une. Même faute, un cran plus bas.
+
+La garde ajoutée est **universelle par construction** — sa liste vient d'un
+`rglob`, pas d'une énumération — et interdit aussi de **lire** `.streak`, sans
+quoi une colonne renommée « Constance » rendrait la même valeur.
 
 S'y ajoute, dans la même tranche, le reste du vocabulaire : **neuf libellés
 « Sessions… »** encore rendus sur `export`, `coach_report`, `profile_preview` et
@@ -715,11 +732,20 @@ sont sous confirmation humaine. Aucune base de production lue ni écrite.
    `#reference_data`). Mesuré au rendu, pas déduit. Dans une liste de liens de
    lecteur d'écran, ils sont indiscernables ; à l'œil aussi, hors contexte de
    ligne.
-3. **La carte alterne sans règle.** `CORPS` est dans une carte, `COMPTE` non,
-   `NOUVELLE MESURE` oui, `MESURES MORPHOLOGIQUES` non, `DONNÉES DE RÉFÉRENCE`
-   oui. L'échelle de profondeur est appliquée un bloc sur deux. Rien dans le
-   contenu ne justifie l'alternance — c'est le défaut que le socle existe pour
-   fermer, sur la surface qui porte votre nom.
+3. **La carte alterne sans règle — et c'est `Q5` qui est violée, nommément.**
+   `CORPS` est dans une carte, `COMPTE` non, `NOUVELLE MESURE` oui, `MESURES
+   MORPHOLOGIQUES` non, `DONNÉES DE RÉFÉRENCE` oui. Un bloc sur deux.
+
+   `DESIGN_DECISIONS_UIV2_SURFACES.md §Q5` tranche pourtant : trois rangs —
+   **actionnable** (carte bordée), **informatif** (filet), **ambiant** (aucun
+   conteneur) — et conclut : *« La carte redevient un signal, pas un décor. »*
+
+   Sur `/profile`, la carte n'est ni l'un ni l'autre : elle **alterne**. `COMPTE`
+   (utilisateur, e-mail, date d'inscription, statut) est du rang 2 informatif et
+   n'a pas de carte — correct. `CORPS`, qui contient quatre liens d'action et un
+   champ de saisie, en a une — correct aussi. Mais `MESURES MORPHOLOGIQUES`, un
+   état vide, n'en a pas, tandis que `NOUVELLE MESURE`, qui n'est qu'un bloc de
+   consigne replié, en a une. La règle est là ; elle n'est pas appliquée.
 
 ### 🔎 `O-07` — l'escouade n'a jamais reçu le traitement
 
