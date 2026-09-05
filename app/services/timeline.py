@@ -45,9 +45,18 @@ class TimelinePoint:
 #
 # Mesuré au passage : l'ambre contraste MIEUX que l'orange sur les quatre fonds
 # réels (7,24 contre 5,37 sur #161a22). Le remplacement n'est pas un compromis.
+# `python:S1192` — CINQ copies de `"var(--accent)"` vivaient dans ce fichier.
+# La règle a raison, et elle a raison ICI PLUS QU'AILLEURS : le défaut que ce
+# module vient de corriger — une légende qui ne décrivait pas son graphique —
+# est né exactement de ça, d'une valeur recopiée à un endroit et changée à
+# l'autre. Corriger la couleur sans corriger la duplication, c'était réarmer
+# la cause en désarmant l'effet.
+_ACCENT = "var(--accent)"
+_MUTED = "var(--fg-muted)"
+
 KIND_COLORS: dict[str, str] = {
-    "strength": "var(--accent)",
-    "cardio": "var(--fg-muted)",
+    "strength": _ACCENT,
+    "cardio": _MUTED,
 }
 KIND_LABELS: dict[str, str] = {
     "strength": "musculation",
@@ -92,7 +101,7 @@ def _build_svg(
     y_max: float,
     height: int = 220,
     width: int = 600,
-    color: str = "var(--accent)",
+    color: str = _ACCENT,
     dot_radius: float = 4.5,
     title: str = "",
     area_fill: bool = True,
@@ -283,7 +292,7 @@ def build_quality_timeline_svg(
         points,
         y_min=0,
         y_max=100,
-        color="var(--accent)",
+        color=_ACCENT,
         title="Qualité de séance",
     )
 
@@ -313,7 +322,7 @@ def build_sparkline_svg(
     *,
     width: int = 200,
     height: int = 40,
-    color: str = "var(--accent)",
+    color: str = _ACCENT,
     kinds: list[str | None] | None = None,
 ) -> str | None:
     """Build a compact sparkline SVG (no axes, no labels).
@@ -388,7 +397,7 @@ def build_measurement_timeline_svg(
         points,
         y_min=lo,
         y_max=hi,
-        color="var(--accent)",
+        color=_ACCENT,
         title=title,
         height=220,
         interactive=True,

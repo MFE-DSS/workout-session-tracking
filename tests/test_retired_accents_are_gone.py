@@ -106,7 +106,6 @@ def test_the_chart_consumes_the_tokens_of_its_own_legend():
     divergence reviendrait au premier changement de palette. Ce qui est gardé,
     c'est que le graphique et sa légende lisent **le même token**.
     """
-    timeline = (APP / "services/timeline.py").read_text(encoding="utf-8")
     css = (APP / "static/css/app.css").read_text(encoding="utf-8")
 
     legende = dict(
@@ -117,9 +116,22 @@ def test_the_chart_consumes_the_tokens_of_its_own_legend():
     )
     assert legende, "la légende ne lit plus de token — comparaison impossible"
 
-    m = re.search(r"KIND_COLORS[^=]*=\s*\{(.*?)\}", timeline, re.DOTALL)
-    assert m, "la palette du graphique est introuvable"
-    graphe = dict(re.findall(r'"(\w+)"\s*:\s*"var\((--[\w-]+)\)"', m.group(1)))
+    # ⚠ CETTE GARDE LISAIT LE TEXTE SOURCE de `KIND_COLORS` avec une regex sur
+    # des littéraux. Extraire les cinq copies du token en une constante — ce que
+    # `python:S1192` demandait, et à raison — l'a fait tomber, alors que la
+    # valeur rendue n'avait pas bougé d'un caractère.
+    #
+    # C'est la même faute que celles trouvées cette nuit dans le dépôt, commise
+    # par moi : une garde qui épingle une ÉCRITURE au lieu d'une VALEUR
+    # interdit le refactoring sans protéger l'invariant. On lit maintenant le
+    # dictionnaire résolu.
+    from app.services.timeline import KIND_COLORS
+
+    graphe = {
+        kind: m.group(1)
+        for kind, value in KIND_COLORS.items()
+        if (m := re.fullmatch(r"var\((--[\w-]+)\)", str(value).strip()))
+    }
 
     assert graphe, (
         "le graphique n'emploie plus de token : il ne peut plus suivre sa "
