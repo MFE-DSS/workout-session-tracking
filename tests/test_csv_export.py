@@ -15,7 +15,7 @@ def test_export_landing_page_renders_with_zero_sessions(client):
     assert r.status_code == 200
     body = r.text
     assert "Export" in body
-    assert "Sessions totales" in body
+    assert "Séances totales" in body
     # 0 totals + dash for first/last
     assert ">0<" in body
     # Both download buttons must be present
@@ -32,8 +32,8 @@ def test_export_landing_page_renders_summary_after_sessions(client):
 
     body = client.get("/export").text
     # totals should now show >=1 session
-    assert "Sessions totales" in body
-    assert "Sessions terminées" in body
+    assert "Séances totales" in body
+    assert "Séances terminées" in body
     # Schema version must be visible (it's frozen at 1)
     assert "Schema version" in body
 

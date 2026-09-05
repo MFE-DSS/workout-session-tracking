@@ -28,11 +28,11 @@
   <h2 class="card__title">Résumé du journal</h2>
   <ul class="export-stats">
     <li>
-      <span>Sessions totales</span>
+      <span>Séances totales</span>
       <b>{{ total_sessions }}</b>
     </li>
     <li>
-      <span>Sessions terminées</span>
+      <span>Séances terminées</span>
       <b>{{ completed_sessions }}</b>
     </li>
     <li>
@@ -45,13 +45,13 @@
        Un tiret n'ajoutait rien à ce zéro : il le répétait deux fois. #}
     {% if first_started %}
       <li>
-        <span>Première session</span>
+        <span>Première séance</span>
         <b>{{ first_started.strftime('%d/%m/%Y') }}</b>
       </li>
     {% endif %}
     {% if last_started %}
       <li>
-        <span>Dernière session</span>
+        <span>Dernière séance</span>
         <b>{{ last_started.strftime('%d/%m/%Y') }}</b>
       </li>
     {% endif %}
@@ -65,8 +65,8 @@
 <div class="card export-card">
   <h2 class="card__title">Télécharger</h2>
   <p class="export-card__hint">
-    JSON : structure complète (sessions → exercices → sets).
-    CSV : plat, une ligne par set.
+    JSON : structure complète (séances → exercices → séries).
+    CSV : plat, une ligne par série.
   </p>
   <div class="card__actions">
     <a class="btn btn--primary btn--wide" href="{{ url_for('export_sessions_json') }}">
@@ -124,7 +124,7 @@
         {% endif %}
         {% if verification.exported_count is not none %}
           <li>
-            <span>Sessions exportées</span>
+            <span>Séances exportées</span>
             <b>{{ verification.exported_count }}{% if verification.live_session_count is not none %} / {{ verification.live_session_count }} live{% endif %}</b>
           </li>
         {% endif %}

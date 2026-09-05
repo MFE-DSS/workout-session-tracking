@@ -55,43 +55,65 @@ def _load_properties() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Streak
+# Séances sur une fenêtre — LE producteur, un seul
 # ---------------------------------------------------------------------------
+#
+# ⚠ `streak_days` VIVAIT ICI. Retiré par `OPERATOR_DECISION D7` (`UX4_03B`),
+# dont le motif est un motif PRODUIT, pas de style :
+#
+#     « Le compteur de jours consécutifs punissait un jour de repos
+#       correctement pris, et venait d'un second producteur aux règles
+#       différentes de celui du moteur comportemental. »
+#
+# La décision datait, et n'avait atteint que DEUX surfaces sur six. Mesuré sur
+# trois pratiquants, avec les producteurs réels du dépôt :
+#
+#     marin  se repose bien       « 1 j »   6 séances/14 j   1er, 600 pts
+#     nadia  enchaîne les jours   « 5 j »   5 séances/14 j   2e,  480 pts
+#
+# Marin s'entraîne le PLUS, il est PREMIER, et la dernière colonne de sa ligne
+# affichait « 1j » contre « 5j ». Sur un classement d'escouade — donc en public.
+#
+# Elle soupçonnait « un second producteur » ; il y en avait TROIS. Il en reste
+# un seul destiné à l'affichage : celui-ci. Le moteur comportemental garde
+# `BehavioralState.streak_days`, qui n'est pas rendu — ne pas rendre n'est pas
+# supprimer, et `test_streak_days_is_still_computed` le protège déjà.
+#
+# Ce compteur-ci vient de `coach_report._sessions_in_window`, qui était déjà
+# écrit, déjà juste, et déjà la réponse de D7 sur la seule surface où elle avait
+# été appliquée. Il est promu ici plutôt que recopié : recopier en aurait fait
+# un quatrième.
 
 
-def streak_days(db: Session, user_id: int) -> int:
-    """Consecutive days (UTC) with ≥ 1 completed session, ending today
-    or yesterday (so a streak doesn't break if the day isn't over yet
-    in the user's local tz). Returns 0 if no eligible session."""
-    sessions = db.execute(
-        select(WorkoutSession.started_at)
-        .where(
-            WorkoutSession.user_id == user_id,
-            WorkoutSession.status == "completed",
-            WorkoutSession.excluded_from_stats.is_(False),
-        )
-        .order_by(WorkoutSession.started_at.desc())
-    ).scalars().all()
-    if not sessions:
-        return 0
-    dates = sorted({s.date() for s in sessions}, reverse=True)
-    today = datetime.now(timezone.utc).date()
-    # Start from today OR yesterday so we don't lose a streak before
-    # midnight UTC (common timezone offset).
-    if dates[0] == today:
-        expected = today
-    elif dates[0] == today - timedelta(days=1):
-        expected = today - timedelta(days=1)
-    else:
-        return 0
-    streak = 0
-    for d in dates:
-        if d == expected:
-            streak += 1
-            expected = expected - timedelta(days=1)
-        elif d < expected:
-            break
-    return streak
+def _eligibility(user_id: int, days: int):
+    """Le prédicat d'éligibilité, écrit UNE fois.
+
+    « Terminée, non exclue des statistiques, dans la fenêtre. » Deux fonctions
+    de ce module en avaient chacune leur copie — l'une pour compter, l'autre
+    pour charger les exercices. Deux copies d'une règle métier, c'est deux
+    endroits à corriger le jour où l'éligibilité change, et c'est la faute que
+    `OPERATOR_DECISION D7` reproche justement aux producteurs de streak.
+    """
+    window_start = datetime.now(timezone.utc) - timedelta(days=days)
+    return (
+        WorkoutSession.user_id == user_id,
+        WorkoutSession.status == "completed",
+        WorkoutSession.excluded_from_stats.is_(False),
+        WorkoutSession.started_at >= window_start,
+    )
+
+
+def sessions_in_window(db: Session, user_id: int, days: int) -> int:
+    """Nombre de séances TERMINÉES et comptabilisées sur les `days` derniers jours.
+
+    Ne charge que des identifiants : c'est la variante « compter ». La variante
+    « charger » est `_eligible_sessions_in_window`, qui partage le même
+    prédicat.
+    """
+    rows = db.execute(
+        select(WorkoutSession.id).where(*_eligibility(user_id, days))
+    ).all()
+    return len(rows)
 
 
 # ---------------------------------------------------------------------------
@@ -182,16 +204,11 @@ class ZoneRanking:
 def _eligible_sessions_in_window(
     db: Session, user_id: int, days: int
 ) -> list[WorkoutSession]:
-    window_start = datetime.now(timezone.utc) - timedelta(days=days)
+    """La variante « charger » : mêmes séances éligibles, exercices inclus."""
     return list(
         db.execute(
             select(WorkoutSession)
-            .where(
-                WorkoutSession.user_id == user_id,
-                WorkoutSession.status == "completed",
-                WorkoutSession.excluded_from_stats.is_(False),
-                WorkoutSession.started_at >= window_start,
-            )
+            .where(*_eligibility(user_id, days))
             .options(selectinload(WorkoutSession.session_exercises))
         ).scalars()
     )
@@ -511,7 +528,8 @@ class PreviewPayload:
     job). Radar is silhouette only, no center.
     """
     sessions_30d: int
-    streak: int
+    #: `OPERATOR_DECISION D7` — REMPLACE `streak`. Un comptage, pas une suite.
+    sessions_14d: int
     cardio_min_per_week: int
     volume_delta_pct: int | None  # None if no baseline
 
@@ -519,7 +537,7 @@ class PreviewPayload:
 def build_preview(db: Session, user_id: int, sessions_30d: int) -> PreviewPayload:
     return PreviewPayload(
         sessions_30d=sessions_30d,
-        streak=streak_days(db, user_id),
+        sessions_14d=sessions_in_window(db, user_id, 14),
         cardio_min_per_week=cardio_minutes_per_week(db, user_id),
         volume_delta_pct=strength_volume_delta_pct(db, user_id),
     )

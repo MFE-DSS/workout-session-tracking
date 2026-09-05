@@ -17,43 +17,56 @@ def _hit(client, path):
 
 
 # ---------------------------------------------------------------------------
-# streak_days
+# sessions_in_window — MIGRÉ depuis `streak_days`
 # ---------------------------------------------------------------------------
+#
+# `streak_days` est retiré par `OPERATOR_DECISION D7`. Les deux gardes qui le
+# visaient N'ONT PAS ÉTÉ SUPPRIMÉES : elles n'interrogeaient pas la consécutivité
+# — elles interrogeaient l'ÉLIGIBILITÉ, « seule une séance terminée compte ».
+#
+# Cet invariant survit intégralement au changement de métrique. Il est donc
+# reporté sur le compteur qui remplace, comme l'exige la procédure de migration
+# de gardes (`AUREN_UIUX_V3_GUARD_MIGRATION_REGISTER`) : jamais supprimer en
+# silence, toujours reporter ce qui survit.
 
 
-def test_streak_zero_for_user_without_sessions(client):
-    """A freshly created user with 0 sessions has streak 0."""
+def test_window_count_is_zero_for_user_without_sessions(client):
+    """Un compte neuf, sans séance, compte 0 — pas None, pas d'erreur."""
     from sqlalchemy import select
 
     from app.database import SessionLocal
     from app.models.user import User
     from app.services.auth import hash_password
-    from app.services.profile_metrics import streak_days
+    from app.services.profile_metrics import sessions_in_window
 
     with SessionLocal() as db:
         # The fixture user already has the testuser account; create a
         # secondary user with zero sessions for this specific test.
-        db.add(User(username="streak_no_data",
+        db.add(User(username="window_no_data",
                     password_hash=hash_password("anything1"), is_active=True))
         db.commit()
-        uid = db.execute(select(User.id).where(User.username == "streak_no_data")).scalar_one()
-        assert streak_days(db, uid) == 0
+        uid = db.execute(select(User.id).where(User.username == "window_no_data")).scalar_one()
+        assert sessions_in_window(db, uid, 14) == 0
 
 
-def test_streak_counts_recent_session(client):
-    """Logging a session today should produce streak >= 1."""
+def test_an_unfinished_session_is_not_counted(client):
+    """L'invariant que gardait l'ancien test : `in_progress` ne compte pas.
+
+    C'est ce qui empêche un compteur d'activité de récompenser une séance
+    ouverte et abandonnée.
+    """
     from sqlalchemy import select
 
     from app.database import SessionLocal
     from app.models.user import User
-    from app.services.profile_metrics import streak_days
+    from app.services.profile_metrics import sessions_in_window
 
     r = client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
     assert r.status_code == 303
     with SessionLocal() as db:
         uid = db.execute(select(User.id).where(User.username == "testuser")).scalar_one()
-        # Session is in_progress not completed — streak still 0
-        assert streak_days(db, uid) == 0
+        # La séance est `in_progress`, pas `completed` — elle ne compte pas.
+        assert sessions_in_window(db, uid, 14) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -131,7 +144,7 @@ def test_build_preview_payload_structure(client):
         p = build_preview(db, uid, sessions_30d=0)
         assert isinstance(p, PreviewPayload)
         assert p.sessions_30d == 0
-        assert p.streak >= 0
+        assert p.sessions_14d >= 0
         assert p.cardio_min_per_week >= 0
 
 

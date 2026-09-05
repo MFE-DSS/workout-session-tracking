@@ -284,7 +284,9 @@ def test_compute_squad_leaderboard(client):
         assert owner_entry["session_count"] == 1
         assert owner_entry["total_points"] > 0
         assert "grade" in owner_entry
-        assert "streak" in owner_entry
+        # `OPERATOR_DECISION D7` — l'entrée porte un COMPTAGE de séances
+        # récentes, plus une suite de jours consécutifs.
+        assert "sessions_14d" in owner_entry
 
         # Mate has 0 sessions
         mate_entry = next(e for e in lb if e["username"] == "squadmate")

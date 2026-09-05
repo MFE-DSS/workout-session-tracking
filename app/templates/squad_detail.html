@@ -18,7 +18,11 @@
               <th>Score</th>
               <th>Séances</th>
               <th>Grade</th>
-              <th>Streak</th>
+              {# `OPERATOR_DECISION D7` — « Streak » remplacé par un comptage.
+                 Le compteur de jours consécutifs punissait un repos bien pris,
+                 et c'est ICI qu'il faisait le plus de dégâts : sur un classement
+                 public, le repos devenait un désavantage compétitif. #}
+              <th>Séances 14 j</th>
             </tr>
           </thead>
           <tbody>
@@ -29,7 +33,7 @@
                 <td>{{ e.total_points }} pts</td>
                 <td>{{ e.session_count }}</td>
                 <td><span class="grade-badge grade-badge--{{ e.grade|lower }}">{{ e.grade }}</span> {{ e.grade_label }}</td>
-                <td>{{ e.streak }}j</td>
+                <td>{{ e.sessions_14d }}</td>
               </tr>
             {% endfor %}
           </tbody>

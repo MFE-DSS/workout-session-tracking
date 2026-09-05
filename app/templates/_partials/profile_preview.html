@@ -21,12 +21,13 @@
 
   <ul class="profile-preview__kpi">
     <li>
-      <span class="profile-preview__kpi-label">Sessions 30j</span>
+      <span class="profile-preview__kpi-label">Séances 30 j</span>
       <b>{{ preview.sessions_30d }}</b>
     </li>
+    {# `OPERATOR_DECISION D7` — « Streak » remplacé par un comptage. #}
     <li>
-      <span class="profile-preview__kpi-label">Streak</span>
-      <b>{{ preview.streak }}{% if preview.streak > 0 %}j{% endif %}</b>
+      <span class="profile-preview__kpi-label">Séances 14 j</span>
+      <b>{{ preview.sessions_14d }}</b>
     </li>
     <li>
       <span class="profile-preview__kpi-label">Cardio /sem</span>

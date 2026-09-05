@@ -33,6 +33,7 @@ from app.services.profile_metrics import (
     discipline_rates,
     last_session_summary,
     pattern_distribution,
+    sessions_in_window,
     strength_cardio_ratio,
     zone_session_counts,
 )
@@ -160,25 +161,20 @@ def _work_sets_per_week(db: Session, user_id: int, days: int = 30) -> int:
     return round(total / weeks)
 
 
-def _sessions_in_window(db: Session, user_id: int, days: int) -> int:
-    window_start = datetime.now(timezone.utc) - timedelta(days=days)
-    rows = db.execute(
-        select(WorkoutSession.id)
-        .where(
-            WorkoutSession.user_id == user_id,
-            WorkoutSession.status == "completed",
-            WorkoutSession.excluded_from_stats.is_(False),
-            WorkoutSession.started_at >= window_start,
-        )
-    ).all()
-    return len(rows)
+# `_sessions_in_window` VIVAIT ICI. Il était déjà juste, et il était déjà la
+# réponse de `OPERATOR_DECISION D7` — sur la seule surface où D7 avait été
+# appliquée. Les quatre surfaces sociales, elles, rendaient toujours « Streak ».
+#
+# Il est PROMU dans `profile_metrics` plutôt que recopié : la décision reprochait
+# précisément l'existence de plusieurs producteurs aux règles divergentes. Le
+# recopier en aurait fait un de plus.
 
 
 def _volume(db: Session, user_id: int, preview: PreviewPayload) -> VolumeBlock:
     return VolumeBlock(
         sessions_30d=preview.sessions_30d,
-        sessions_90d=_sessions_in_window(db, user_id, 90),
-        sessions_14d=_sessions_in_window(db, user_id, 14),
+        sessions_90d=sessions_in_window(db, user_id, 90),
+        sessions_14d=sessions_in_window(db, user_id, 14),
         cardio_minutes_per_week=preview.cardio_min_per_week,
         work_sets_per_week=_work_sets_per_week(db, user_id, 30),
     )
@@ -338,7 +334,7 @@ def build_report(db: Session, user: User) -> CoachReport:
     Pure read. Never mutates anything. Reuses profile_metrics for all
     primitives — no duplicated query layer.
     """
-    sessions_30 = _sessions_in_window(db, user.id, 30)
+    sessions_30 = sessions_in_window(db, user.id, 30)
     preview = build_preview(db, user.id, sessions_30d=sessions_30)
     return CoachReport(
         identity=_identity(db, user),
