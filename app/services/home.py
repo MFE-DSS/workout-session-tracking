@@ -90,13 +90,24 @@ def _build_weekly_plan(db: Session, user: User, now: datetime) -> dict[str, Any]
     # ONE constraint, the first: a Home tile that lists every gap stops being a
     # calm context block and becomes a defect report.
     gap = plan.unmet_constraints[0] if plan.unmet_constraints else None
+    slots = upcoming.slots if upcoming else ()
     return {
         "available": True,
         "planned_sessions": len(plan.sessions),
-        "next_session_slots": [
-            {"zone_label": s.zone_label, "exercise_name": s.exercise_name}
-            for s in (upcoming.slots if upcoming else ())
-        ],
+        # LES ZONES, PAS LES CRÉNEAUX — arbitrage opérateur, variante « F ».
+        #
+        # La carte rendait « 4 séance(s) proposée(s) » en ligne souveraine et
+        # les six créneaux dessous en 13 px : un COMPTAGE promu au-dessus de la
+        # substance qui l'accompagnait déjà. Même inversion que sur `/plan`, un
+        # rang plus bas.
+        #
+        # Dédupliqué : une séance peut travailler deux fois la même zone, et
+        # « Pectoraux · Pectoraux » ne dit rien de plus que « Pectoraux ».
+        # `dict.fromkeys` préserve l'ordre du plan, qui est celui de la séance.
+        "next_session_zones": tuple(dict.fromkeys(
+            s.zone_label for s in slots if s.zone_label
+        )),
+        "next_session_exercises": len(slots),
         "unmet_constraint": gap,
         "fingerprint": plan.fingerprint,
     }

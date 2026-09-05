@@ -100,26 +100,38 @@
      pas. Une seule contrainte non satisfaite est montrée : lister tous les
      manques transformerait un bloc de contexte en rapport de défauts. #}
   {% if home.weekly_plan and home.weekly_plan.available %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <h2 class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;margin:0;">
-      Semaine planifiée
-    </h2>
-    <div style="font-size:16px;font-weight:600;margin-top:4px;">
-      {%- set n = home.weekly_plan.planned_sessions -%}
-      {{ n }} {{ "séance" | pluriel(n) }} {{ "proposée" | pluriel(n) }}
-    </div>
-    {% if home.weekly_plan.next_session_slots %}
-    <div class="text-dim" style="font-size:12px;margin-top:2px;">Prochaine séance proposée</div>
-    <ul style="list-style:none;padding:0;margin:4px 0 0 0;display:flex;flex-direction:column;gap:2px;font-size:13px;">
-      {% for slot in home.weekly_plan.next_session_slots %}
-      <li>· <b>{{ slot.zone_label }}</b>{% if slot.exercise_name %} — {{ slot.exercise_name }}{% endif %}</li>
-      {% endfor %}
-    </ul>
+  {# Les styles inline de cette carte partent AVEC la refonte, pas dans une
+     tranche de nettoyage séparée : l'invariant `AUREN_VISUAL_BACKBONE §5`
+     interdit le style inline statique, et son cliquet
+     (`tests/inline_style_baseline.json`) est resserré en conséquence. #}
+  <div class="card tile home-wk">
+    <h2 class="tile__label home-wk__label">Semaine planifiée</h2>
+    {# CE QUE LA SEMAINE TRAVAILLE, PAS COMBIEN ELLE COMPTE.
+       Arbitrage opérateur, variante « F ». La ligne souveraine de la carte
+       était « 4 séances proposées » — un comptage — tandis que les six
+       créneaux, déjà présents, tenaient en 13 px dessous. Même inversion que
+       sur `/plan`, un rang plus bas.
+
+       Les noms d'exercices quittent l'accueil et vivent sur `Mon plan`, qui
+       les rend correctement depuis sa refonte. Cette carte est du CONTEXTE —
+       le service le dit — et doit rester basse : 306 px avant, 157 après. #}
+    {%- set n = home.weekly_plan.planned_sessions -%}
+    {%- set zones = home.weekly_plan.next_session_zones -%}
+    {%- set nex = home.weekly_plan.next_session_exercises -%}
+    {% if zones %}
+    <p class="home-wk__zones">
+      {{ zones[:3] | join(' · ') }}{% if zones | length > 3 %} <span class="home-wk__plus">+{{ zones | length - 3 }}</span>{% endif %}
+    </p>
+    <p class="home-wk__dose">
+      Première des {{ n }} {{ "séance" | pluriel(n) }} · {{ nex }} {{ "exercice" | pluriel(nex) }}
+    </p>
+    {% else %}
+    {# Aucun créneau exploitable : on ne rend pas un cadre vide, on dit le
+       nombre — qui reste vrai. #}
+    <p class="home-wk__zones">{{ n }} {{ "séance" | pluriel(n) }} {{ "proposée" | pluriel(n) }}</p>
     {% endif %}
     {% if home.weekly_plan.unmet_constraint %}
-    <div class="tile__hint" style="margin-top:var(--space-sm);font-size:12px;">
-      {{ home.weekly_plan.unmet_constraint }}
-    </div>
+    <div class="tile__hint home-wk__gap">{{ home.weekly_plan.unmet_constraint }}</div>
     {% endif %}
   </div>
   {% endif %}

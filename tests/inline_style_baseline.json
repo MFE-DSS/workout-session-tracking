@@ -5,7 +5,7 @@
     "dashboard.html": 1
   },
   "static_debt": {
-    "_partials/home_coaching_loop.html": 25,
+    "_partials/home_coaching_loop.html": 19,
     "_partials/session_review.html": 23,
     "_partials/zone_exposure.html": 1,
     "atlas.html": 1,
