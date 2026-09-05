@@ -5308,3 +5308,171 @@ summary:focus-visible,
 .setline__resume:focus-visible .setline__resume-label {
   border-bottom-color: transparent;
 }
+
+/* ── `Sb_UI_PROGRAM_DETAIL_01` — MON PROGRAMME ─────────────────────────────
+ *
+ * Mesuré au rendu avant cette tranche : **cinq commandes à aplat ambre** sur
+ * un seul écran — trois « Ajouter l'exercice », « Ajouter une séance »,
+ * « Valider le brouillon ». Le viseur repose sur UNE commande souveraine ;
+ * répété cinq fois, l'ambre ne désigne plus rien.
+ *
+ * S'y ajoutaient **treize champs de saisie ouverts en permanence** : le même
+ * formulaire d'ajout, avec son placeholder identique, répété sous chaque
+ * séance. Il occupait plus de place que le contenu auquel il ajoute.
+ *
+ * Ce bloc remplace aussi les **31 attributs `style` statiques** du gabarit
+ * (`AUREN_VISUAL_BACKBONE §5`). Ils partent AVEC la refonte : rouvrir le même
+ * gabarit deux fois coûterait deux expositions `§5.1` pour un changement.
+ *
+ * ⚠ LES QUATRE ESPACEMENTS À 12 px SONT ALIGNÉS SUR 8 px — arbitrage
+ * opérateur. Les 19 `margin-top` du gabarit n'avaient que 5 valeurs, dont 15
+ * tombaient déjà pile sur l'échelle (4/8/16/24). Les 4 restantes valaient
+ * `.75rem`, une marche qui n'existe pas. Étendre l'échelle à chaque valeur
+ * rencontrée reviendrait à ne plus en avoir.
+ */
+
+/* Le tiroir d'ajout. Le composant `.disclosure` existe, mais il porte son
+ * propre châssis de carte ; ici le tiroir vit DANS une carte de séance et ne
+ * doit pas en réintroduire une seconde (`Q5` — pas de carte dans une carte
+ * sans responsabilité propre). */
+.pd-drawer { margin-top: var(--space-sm); }
+
+.pd-drawer > summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;          /* cible tactile, standard produit */
+  padding: 4px 0;
+  font-size: 13px;
+  color: var(--role-text-muted);
+  cursor: pointer;
+}
+
+/* Les deux marqueurs natifs, désarmés : Chromium/Safari utilisent
+ * `::-webkit-details-marker`, Firefox `::marker`. N'en désarmer qu'un laisse
+ * un triangle sur l'autre moteur. */
+.pd-drawer > summary::-webkit-details-marker { display: none; }
+.pd-drawer > summary::marker { content: ""; }
+
+.pd-drawer > summary::after {
+  content: "›";
+  margin-left: auto;
+  font-family: var(--font-mono);
+  transition: transform var(--motion-duration-fast, 120ms) ease;
+}
+
+.pd-drawer[open] > summary::after { transform: rotate(90deg); }
+.pd-drawer[open] > summary { color: var(--role-text-primary); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pd-drawer > summary::after { transition: none; }
+}
+
+/* RANG 2 — un TRAIT, pas un aplat (`§4.2` règle 3). L'aplat n'est pas
+ * nécessaire à la domination ; la cible tactile, si. */
+.btn.pd-rank2 {
+  background: transparent;
+  color: var(--role-action-primary);
+  border-color: var(--role-border-emphasis);
+}
+
+.btn.pd-rank2:hover,
+.btn.pd-rank2:focus-visible {
+  background: transparent;
+  color: var(--role-action-hover);
+  border-color: var(--role-action-primary);
+}
+
+/* SUPPRESSION — au rang du texte. Une action destructive n'a pas à être un
+ * bouton de la taille du titre qu'elle jouxte ; elle reste reconnaissable par
+ * le soulignement, et garde ses 44 px de cible. */
+.btn.pd-destroy {
+  background: transparent;
+  border: none;
+  padding: 12px 0;
+  min-height: 44px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--role-text-muted);
+  text-decoration: underline;
+}
+
+.btn.pd-destroy:hover,
+.btn.pd-destroy:focus-visible {
+  background: transparent;
+  color: var(--role-text-primary);
+}
+
+/* ── Structure de l'écran, en remplacement des attributs `style`. ── */
+.pd-page { max-width: 40rem; }
+.pd-error { color: var(--danger); margin-bottom: var(--space-md); }
+
+.pd-head__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pd-head__facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px var(--space-sm);
+  margin: 0;
+}
+
+.pd-note { margin-top: var(--space-sm); }
+.pd-note--small { font-size: .9em; }
+.pd-action { margin-top: var(--space-sm); }
+
+.pd-actions--wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+/* La PILE de séances — une mise en page. */
+.pd-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+/* Un simple espacement de section. Distinct de `.pd-sessions` à dessein :
+ * réutiliser la classe de pile pour espacer un paragraphe lui appliquait un
+ * `display:flex` non voulu — commodité de valeur, pas de sens. */
+.pd-section { margin-top: var(--space-lg); }
+
+.pd-exercises {
+  margin: var(--space-sm) 0 0;
+  padding-left: var(--space-md);
+  list-style: none;
+}
+
+.pd-exercises li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.pd-empty { margin-top: var(--space-xs); }
+
+.pd-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: end;
+  margin-top: var(--space-sm);
+}
+
+.pd-form__wide { flex: 1 1 12rem; }
+.pd-form__num { width: 5rem; }
+
+.pd-newsession { margin-top: var(--space-lg); max-width: 32rem; }
+.pd-block { margin-top: var(--space-md); }
+.pd-inline { display: inline; }

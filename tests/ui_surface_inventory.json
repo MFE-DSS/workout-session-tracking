@@ -15,6 +15,7 @@
   ],
   "summary_display": [
     "app.css::.machine-panel__summary::display:flex",
+    "app.css::.pd-drawer > summary::display:flex",
     "app.css::.prog__more > summary::display:flex",
     "app.css::.rail-l2__summary::display:flex",
     "app.css::.substitute-picker__summary::display:flex",
