@@ -19,8 +19,12 @@
     <title>Inscription · Auren</title>
   </head>
   <body>
-    <main class="container" style="padding-top: 60px;">
-      <div class="auth-container">
+    <main class="container">
+      <div class="auth-container auth-container--threshold">
+        {# `T-02 = C` — même marque d'instrument qu'au login. Le seuil est
+           l'endroit où le produit doit dire son nom, et c'était le seul où il
+           ne le disait pas. #}
+        <span class="auth-mark">AUREN</span>
         <h1 class="page-title">Inscription</h1>
 
         {# Sb_UI_09.2 — erreur annoncée (role="alert", SSR/no-JS) ; le formulaire
@@ -49,13 +53,13 @@
             <span class="field__label">Confirmer le mot de passe</span>
             <input type="password" name="password_confirm" required autocomplete="new-password" />
           </label>
-          <div class="card__actions" style="margin-top: 16px;">
+          <div class="card__actions card__actions--auth">
             <button type="submit" class="btn btn--primary btn--wide">Créer le compte</button>
           </div>
         </form>
 
-        <p style="text-align: center; margin-top: 16px;">
-          <a href="{{ url_for('login_page') }}" style="color: var(--fg-dim); font-size: 13px;">
+        <p class="auth-exits">
+          <a class="auth-exit" href="{{ url_for('login_page') }}">
             Déjà un compte ? Se connecter
           </a>
         </p>

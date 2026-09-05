@@ -19,8 +19,19 @@
     <title>Connexion · Auren</title>
   </head>
   <body>
-    <main class="container" style="padding-top: 60px;">
-      <div class="auth-container">
+    <main class="container">
+      <div class="auth-container auth-container--threshold">
+        {# `T-02 = C` — LE NOM EST UNE MARQUE D'INSTRUMENT.
+
+           Le commentaire d'en-tête de ce fichier affirme depuis `Sb_UI_10.3`
+           que le « nom PRODUIT VISIBLE » est « Auren ». Il ne l'était pas :
+           il vivait dans le `<title>` et nulle part à l'écran. La prose
+           décrivait une visibilité qui n'existait pas.
+
+           Ce n'est pas un titre — « Connexion » reste le titre de la page, et
+           deux titres se concurrenceraient. C'est une signature gravée sur le
+           châssis, au-dessus. Un cockpit porte son nom sur sa coque. #}
+        <span class="auth-mark">AUREN</span>
         <h1 class="page-title">Connexion</h1>
 
         {# Sb_UI_09.2 — erreur annoncée aux lecteurs d'écran (role="alert" =>
@@ -35,8 +46,8 @@
         {% endif %}
 
         {% if success == "password_reset" %}
-          <div class="card" style="border-left: 3px solid var(--ok);">
-            <p style="font-size: 14px; color: var(--fg-muted);">
+          <div class="card auth-notice">
+            <p class="auth-notice__text">
               Mot de passe réinitialisé. Connecte-toi avec ton nouveau mot de passe.
             </p>
           </div>
@@ -51,26 +62,29 @@
             <span class="field__label">Mot de passe</span>
             <input type="password" name="password" required autocomplete="current-password" />
           </label>
-          <div class="card__actions" style="margin-top: 16px;">
+          <div class="card__actions card__actions--auth">
             <button type="submit" class="btn btn--primary btn--wide">Se connecter</button>
           </div>
         </form>
 
-        <p style="text-align: center; margin-top: 12px;">
-          <a href="{{ url_for('forgot_password_page') }}" style="color: var(--fg-dim); font-size: 13px;">
-            Mot de passe oublié ?
-          </a>
-        </p>
+        {# `T-03 = C` — TROIS LIENS DE POIDS ÉGAL DEVIENNENT UN RANG.
 
-        <p style="text-align: center; margin-top: 16px;">
-          <a href="{{ url_for('register_page') }}" style="color: var(--fg-dim); font-size: 13px;">
-            Pas encore de compte ? S'inscrire
-          </a>
+           ⚠ ET « ← RETOUR » MENTAIT. Il pointait vers `public_landing`,
+           c'est-à-dire une DESTINATION FIXE, pas un historique. Arrivé ici
+           par un signet ou par une session expirée, on « revenait » sur une
+           page qu'on n'avait jamais vue.
+
+           Le lien n'est pas retiré — il mène à quelque chose de réel, et le
+           retirer serait une soustraction (`§5.3`). Il est NOMMÉ pour ce
+           qu'il fait. #}
+        <p class="auth-exits">
+          <a class="auth-exit" href="{{ url_for('register_page') }}">Pas encore de compte ? S'inscrire</a>
         </p>
-        <p style="text-align: center; margin-top: 8px;">
-          <a href="{{ url_for('public_landing') }}" style="color: var(--fg-dim); font-size: 12px;">
-            ← Retour
-          </a>
+        <p class="auth-exits">
+          <a class="auth-exit auth-exit--minor" href="{{ url_for('forgot_password_page') }}">Mot de passe oublié ?</a>
+        </p>
+        <p class="auth-exits">
+          <a class="auth-exit auth-exit--minor" href="{{ url_for('public_landing') }}">Découvrir Auren</a>
         </p>
       </div>
     </main>
