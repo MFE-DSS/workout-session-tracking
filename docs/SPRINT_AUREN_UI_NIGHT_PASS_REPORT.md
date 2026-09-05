@@ -239,3 +239,74 @@ dictionnaire résolu. Plantation vérifiée : trois gardes mordent.
 Lancé **depuis le worktree** — la correction du défaut de §5 : depuis le
 répertoire canonique, `app` se résout sur le dépôt canonique et le sweep mesure
 un autre code que celui de la branche.
+
+---
+
+## 8. Closeout
+
+| PR | Contenu | Merge | Vérification |
+|---|---|---|---|
+| `#183` | 25 rôles de couleur | — | checks verts · Sonar `OK` · 0 fil · `CLEAN` |
+| `#184` | relief surélevé ↔ creusé, grain | — | idem |
+| `#185` | profondeur de la séance | — | idem |
+| `#187` | docs de stratégie | — | docs-only |
+| **`#186`** | **U4–U8** : viseur, réglette, validation implicite, panneau RECOMMANDATION, fil, accueil, progression, seuils, liens, doctrine d'icônes, accents retirés | `5f8ed10` | 6 checks verts · Sonar `OK` · 0 fil · `CLEAN` · **CI canonique de push : succès** |
+| **`#188`** | les trois trouvailles ci-dessus | `0818080` | **docs-only** — CI de push légitimement skippée par `paths-ignore: docs/**` (`CLAUDE.md §2`). **Ce n'est pas un `[skip ci]` manuel** ; la source de vérité est la CI de la PR. |
+
+Head épinglé à chaque merge. **Aucun squash, aucun `--admin`, aucune branche ni
+worktree supprimé** — le cleanup reste une décision séparée, et elle est vôtre.
+
+### Deux incidents Sonar sur `#186`, et ce qu'ils ont appris
+
+1. **`python:S1192` (CRITICAL)** — cinq copies de `"var(--accent)"` dans
+   `timeline.py`. La règle avait raison **ici plus qu'ailleurs** : le défaut que
+   ce module venait de corriger — la légende qui ne décrivait pas son graphique
+   — était né exactement de cette duplication. Corriger la couleur sans corriger
+   la duplication, c'était désarmer l'effet en réarmant la cause.
+2. **La correction a fait tomber une garde que j'avais écrite trois heures plus
+   tôt.** Elle lisait le *texte source* du dictionnaire, pas sa *valeur* — la
+   valeur rendue n'avait pas bougé d'un caractère. C'est la faute que je
+   documentais depuis la veille dans le code des autres, commise par moi, dans
+   le même fichier, la même nuit. Elle lit désormais le dictionnaire résolu.
+
+Les deux autres findings étaient déjà réglés : `python:S1854` **CLOSED/FIXED**,
+et `Web:LinksIdenticalTextsDifferentTargetsCheck` **RESOLVED/FALSE-POSITIVE**
+avec sa justification technique en quatre points — branches Jinja mutuellement
+exclusives, états disjoints de la machine à états, textes rendus différents,
+vérifié au rendu Playwright.
+
+### `O-08` — encore une décision appliquée sur une surface et pas l'autre
+
+Vu en relisant le profil public après correction : il rend **`arms`** et
+**`pecs`** — les clés brutes des axes du radar — là où
+`RADAR_AXES` porte déjà « **Bras** » et « **Pectoraux** », et où le rapport
+coach fait déjà la traduction (`RADAR_AXES.get(key, {}).get("label", key)`).
+
+Le libellé qui les introduit s'appelle « **Top zone** ».
+
+C'est le troisième exemplaire du même motif en une nuit — après `D7` et après
+l'accent retiré : **une décision prise, appliquée là où c'était commode.** Non
+corrigé, pour ne pas élargir une tranche déjà livrée ; consigné pour être pris
+en propre.
+
+### Ce que je n'ai pas fait, et qui reste à vous
+
+* **Le cleanup** — aucune branche ni worktree supprimé. **Huit** branches vivent
+  encore, relevées sur le distant :
+
+  ```
+  work/auren-ui-u1-role-tokens     work/auren-ui-strategy-docs
+  work/auren-ui-u2-chassis         work/auren-ui-night-findings
+  work/auren-ui-u3-session         work/auren-ui-night-closeout
+  work/auren-ui-u4-viseur          work/auren-ui-d7-social
+  ```
+
+  Plus les worktrees correspondants sur le poste. Supprimer une branche ou un
+  worktree reste une action **humaine** (`CLAUDE.md §4`), y compris sous
+  `GO MERGE`.
+* **Les 88 couleurs hors token** — recensées, non corrigées, pour les raisons
+  dites en §7.3.
+* **Les 353 styles en ligne** sur 39 gabarits — mesurés, non touchés.
+* **Les décisions de NOMMAGE** : « squad », « Challenges », « template »,
+  « Session courte — Full upper 45 min ». Ce sont des noms de produit, pas des
+  fautes.
