@@ -36,10 +36,17 @@ def _get(client, path):
 
 
 def test_science_renders_auren_template_strings(client):
+    """Le nom du produit est visible sur `/science`, à quatre endroits.
+
+    ⚠ `Sb_UI_SCIENCE_ACCENTS_01` — la troisième assertion épinglait
+    « materialise » SANS ACCENT. Ce test vérifie la présence d'AUREN, pas
+    l'orthographe ; il gelait pourtant la faute qu'il croisait au passage.
+    Seule la chaîne attendue change.
+    """
     body = _get(client, "/science")
     assert "Comment Auren transforme une série loguée" in body
     assert "Auren capture : durée, BPM moyen" in body
-    assert "Comment Auren materialise ces concepts" in body
+    assert "Comment Auren matérialise ces concepts" in body
     assert "Architecture du cockpit Auren" in body
 
 

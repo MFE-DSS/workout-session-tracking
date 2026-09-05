@@ -52,11 +52,22 @@ def test_science_page_has_cardio_section(client):
 def test_science_page_has_materialisation_section(client):
     """Sb_UI_10.4 — the materialisation section must appear. Visible product
     name migrated SPIGNOS → Auren (the section header is now
-    'Comment Auren materialise'); the section itself is unchanged."""
+    'Comment Auren matérialise'); the section itself is unchanged.
+
+    ⚠ `Sb_UI_SCIENCE_ACCENTS_01` — CETTE GARDE ÉPINGLAIT LE DÉFAUT.
+
+    Elle exigeait « Comment Auren materialise » et « Ce qui reste prive »,
+    c'est-à-dire les graphies SANS ACCENT, dans un produit français. Une garde
+    peut fixer un défaut aussi solidement qu'une propriété ; c'est la
+    cinquième fois que ce dépôt en prend une à le faire.
+
+    Son intention — la section doit apparaître — est intacte. Seule la chaîne
+    attendue est corrigée.
+    """
     r = client.get("/science")
     body = r.text
-    assert "Comment Auren materialise" in body
-    assert "Ce qui reste prive" in body
+    assert "Comment Auren matérialise" in body
+    assert "Ce qui reste privé" in body
 
 
 def test_rules_redirects_to_science(client):
