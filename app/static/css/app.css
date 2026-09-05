@@ -1752,18 +1752,24 @@ input, button, textarea, select {
   padding: 14px var(--space-md);
 }
 
+/* `Sb_UI_BIBLIO_01` — LA RANGÉE FLEX DEVIENT UNE PILE.
+   En flex `space-between`, l'étiquette de nature était poussée à droite d'un
+   titre qui, lui, passe à la ligne : elle atterrissait entre les deux lignes.
+   Le titre récupère toute la largeur, l'étiquette prend la sienne au-dessus. */
 .template-card__row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: block;
 }
 
 .template-card__name {
+  display: block;
   font-size: 16px;
   font-weight: 600;
+  line-height: 1.3;
 }
 
 .template-card__kind {
+  display: block;
+  margin-bottom: 4px;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.05em;
@@ -1790,10 +1796,29 @@ input, button, textarea, select {
   font-style: italic;
 }
 
+/* `Sb_UI_BIBLIO_01` — L'ACTION CESSE DE CHUCHOTER.
+   Démarrer une séance est la seule raison d'être de cet écran, et le bouton
+   était l'objet le plus faible de la carte : 101 px de large, poussé en bas à
+   droite, ton fantôme, sous une bande vide.
+
+   Pleine largeur et 44 px de haut — la cible standard du produit
+   (`UIV3_TARGETS_44_01`). Mesuré avant : 26,8 px. */
 .template-card__start {
   margin-top: var(--space-sm);
-  display: flex;
-  justify-content: flex-end;
+  display: block;
+}
+
+.template-card__start .btn {
+  width: 100%;
+  min-height: 44px;
+  background: var(--role-surface-group);
+  border: 1px solid var(--role-border-emphasis);
+  color: var(--role-text-primary);
+}
+
+.template-card__start .btn:hover {
+  border-color: var(--role-action-primary);
+  color: var(--role-action-primary);
 }
 
 /* ---- Exercise List (template detail) ---- */

@@ -35,9 +35,15 @@ def test_library_shows_catalog_sections(client):
     r = client.get("/library")
     assert r.status_code == 200
     body = r.text
-    # Sections headings visible
-    assert "Programmes principaux" in body
-    assert "Modules utilitaires" in body
+    # Sections headings visible.
+    # `Sb_UI_BIBLIO_01` / `OPERATOR_DECISION` NAMING — l'écran employait DEUX
+    # mots pour la même chose (« Programmes » / « Modules »), et « Programmes »
+    # nommait déjà le domaine qui contient cet écran. Un seul mot : « Séances ».
+    assert "Séances principales" in body
+    assert "Séances utilitaires" in body
+    assert "Programmes principaux" not in body, (
+        "l'ancien libellé est revenu — deux mots pour le même objet"
+    )
     # Core templates visible
     for name in ["Push A", "Push B", "Pull A", "Pull B", "Legs A", "Legs B"]:
         assert name in body

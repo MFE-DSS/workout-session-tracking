@@ -157,9 +157,21 @@ def test_the_zones_come_from_the_canonical_resolver():
 
 
 def test_every_rendered_zone_label_is_canonical(client):
-    """Une étiquette hors `ZONE_LABELS` serait une zone inventée."""
+    """Une étiquette hors `ZONE_LABELS` serait une zone inventée.
+
+    ⚠ MIGRÉE PAR `Sb_UI_BIBLIO_01`. Cette garde interrogeait le catalogue NU, à
+    l'époque où chaque carte rendait toutes ses zones. Depuis, une pastille
+    n'apparaît que si elle DIT quelque chose — priorité déclarée ou zone
+    filtrée — donc un catalogue nu n'en rend aucune, et l'assertion
+    « aucune zone rendue » tombait.
+
+    L'invariant, lui, n'a pas bougé d'un mot : ce qui est rendu appartient au
+    vocabulaire canonique. On lui donne simplement un contexte où quelque chose
+    est rendu, au lieu de le tester sur un écran qui n'affiche rien.
+    """
     from app.services.muscle_mapping import ZONE_LABELS
 
+    _declare(_uid(), sessions_per_week=4, focus_priorities=[AXIS])
     body = client.get(LIBRARY_URL).text
     rendered = re.findall(
         r'<li class="template-card__zone[^"]*">\s*([^<]+?)\s*(?:<|$)', body)
@@ -184,13 +196,39 @@ def test_a_template_without_resolvable_zones_renders_no_empty_list(client):
 def test_the_free_text_line_is_replaced_not_duplicated(client):
     """La substitution décidée AU RENDU : les deux lignes disaient deux fois la
     même chose en deux vocabulaires. Une carte qui a des zones ne rend plus son
-    texte libre — et le détail, lui, le garde."""
+    texte libre — et le détail, lui, le garde.
+
+    ⚠ MIGRÉE PAR `Sb_UI_BIBLIO_01`. La garde vérifiait la présence de
+    `template-card__zones` comme PREUVE que le gabarit résout des zones. Ce
+    n'était qu'un proxy, et il a cessé d'être vrai : les pastilles ne se
+    rendent plus que si elles disent quelque chose.
+
+    L'invariant gardé n'a pas changé — un gabarit qui résout des zones ne rend
+    pas en plus son texte libre — mais il se vérifie désormais à la source
+    (`zones_by_template`) plutôt qu'à travers un rendu conditionnel.
+    """
+    from app.services.template_zone_context import annotate_templates
+
     body = client.get(LIBRARY_URL).text
     push = [c for c in _cards(body) if "push-a" in c]
     assert len(push) == 1
-    assert "template-card__zones" in push[0]
     assert "template-card__focus" not in push[0], "doublon de vocabulaire rendu"
     assert "Pectoraux, Deltoïdes, Triceps" in client.get("/library/push-a").text
+
+    # La prémisse elle-même, mesurée : ce gabarit résout bien des zones.
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.catalog import WorkoutTemplate
+
+    with SessionLocal() as db:
+        tpl = db.execute(
+            select(WorkoutTemplate).where(WorkoutTemplate.slug == "push-a")
+        ).scalar_one()
+        assert annotate_templates(db, [tpl])[tpl.id].zones, (
+            "push-a ne résout plus aucune zone : la garde ne mesure plus la "
+            "substitution qu'elle prétend garder"
+        )
 
 
 # ═════════ LA PRIORITÉ EST RAPPELÉE, JAMAIS DEVINÉE ═════════

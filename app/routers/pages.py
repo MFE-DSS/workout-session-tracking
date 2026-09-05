@@ -66,9 +66,24 @@ PROGRESSION_URL = "/progress"
 
 # Catalog section labels for the library page.
 CATALOG_SECTIONS = [
-    ("core", "Programmes principaux"),
-    ("utility", "Modules utilitaires"),
-    ("specialization", "Modules de spécialisation"),
+    # `Sb_UI_BIBLIO_01` / `OPERATOR_DECISION` NAMING — UN SEUL MOT.
+    #
+    # L'écran employait DEUX mots pour la même chose : « Programmes » pour la
+    # première section, « Modules » pour les deux autres. Rien dans le produit
+    # ne distingue un programme d'un module — les trois sections contiennent le
+    # même objet, un gabarit de séance.
+    #
+    # Pire, « Programmes » est déjà le nom du DOMAINE qui contient cet écran :
+    # l'onglet « Programmes » menait à « Explorer », qui affichait « Programmes
+    # principaux ». Trois niveaux, le même mot, trois sens.
+    #
+    # Le produit dit « séance » partout ailleurs. Les clés (`core`, `utility`,
+    # `specialization`) ne bougent PAS : ce sont des identifiants techniques,
+    # présents en base dans `catalog_section`. Seul l'affichage change — aucun
+    # re-semis du catalogue n'est déclenché.
+    ("core", "Séances principales"),
+    ("utility", "Séances utilitaires"),
+    ("specialization", "Séances de spécialisation"),
 ]
 
 
