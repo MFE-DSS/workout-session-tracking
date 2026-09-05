@@ -154,3 +154,88 @@ résultat.
   `STRENGTH`. Le second est un correctif d'affichage ; le premier est une
   décision de contenu, donc la vôtre.
 * **Le profil**, non revu.
+
+---
+
+## 7. Addendum — seconde moitié de la nuit
+
+Cette section couvre ce qui s'est passé **après** l'écriture des six premières.
+Le rapport ci-dessus a été mergé avec `#187` ; il ne mentionnait donc ni `#186`,
+ni les deux trouvailles obtenues en changeant de méthode.
+
+### 7.1 J'ai arrêté de regarder les écrans un par un
+
+Les cinq défauts de la §2 ont été trouvés en **regardant** des rendus. C'est
+lent, et surtout ça ne dit rien sur ce que je n'ai pas ouvert. À partir du
+milieu de la nuit j'ai balayé les **classes** de défaut sur tout le dépôt.
+Trois balayages, trois verdicts nets :
+
+| Classe balayée | Verdict |
+|---|---|
+| **Absence rendue silencieuse** (`getattr(o,"x",None)` sur un attribut inexistant) — la cause d'« ANOMALIE None » | 64 occurrences, **aucune** ne lit un nom absent du dépôt. Classe **close**. ⚠ Le contrôle attrape les noms absents *partout* ; il ne verrait pas un nom qui existe sur une *autre* classe. |
+| **Décision opérateur appliquée partiellement** | **1 trouvée** — `D7`, ci-dessous. La plus grave de la nuit. |
+| **§5.4, couleur hors token** | **88 occurrences, 30 couleurs** — la plus lourde en volume. |
+
+### 7.2 `D7` — une décision à vous, appliquée sur 2 surfaces et oubliée sur 4
+
+`OPERATOR_DECISION D7` a retiré « Streak ». Le motif écrit dans le dépôt est un
+motif **produit** : *« le compteur de jours consécutifs punissait un jour de
+repos correctement pris »*.
+
+Elle a été appliquée au rapport coach et à Progression. **Quatre surfaces le
+rendent encore** : `squad_detail`, `squad_compare`, `profile_preview`,
+`user_profile` — **les quatre surfaces sociales**, celles que les autres voient
+de vous. Sur un classement d'escouade, un compteur qui punit un repos bien pris
+fait du repos un désavantage compétitif **public**. La décision a été appliquée
+aux surfaces intimes et oubliée sur les sociales : l'inverse de l'ordre de
+priorité.
+
+Les deux gardes de `D7` existent — **et chacune ne regarde qu'un gabarit.** La
+garde existe, elle ne regarde pas où est le défaut.
+
+La décision soupçonnait « un second producteur » ; il y en a **trois**.
+Vérifié : `streak` ne pèse pas sur le classement, qui se calcule sur les points.
+
+### 7.3 Une seconde palette, non mesurée, vit à côté de la vôtre
+
+**30 couleurs littérales, 88 occurrences**, hors du système de tokens. Ce n'est
+pas une dispersion : c'est la **palette par défaut de Tailwind**, nuance par
+nuance (`gray-500`, `blue-600`, `amber-500/600/800`, `green-400/600/800`).
+
+La mesure qui tranche : votre palette validée vit entre **20 % et 51 % de
+saturation**. Onze des clandestines sont à **S ≥ 56 %, jusqu'à 100 %**.
+
+**Cinq tokens n'existent nulle part** — leur repli est donc littéralement ce qui
+est rendu, exactement le piège que §5.4 nomme. Dont
+`--bg-elev → rgba(0,0,0,0.02)` : un film **noir** posé pour créer une élévation,
+sur un produit **sombre**. Invisible par construction — il a été écrit pour un
+thème clair.
+
+**Je ne les ai pas remplacées**, et c'est délibéré : elles vivent sur des
+surfaces que vous n'avez pas vues et que je n'ai pas revues. §5.1 exige une
+exposition avant tout commit UI, et §5.5 dit que la centralité prime. Le
+recensement est le livrable ; l'arbitrage est le vôtre.
+
+### 7.4 Une garde à moi, tombée pour la bonne raison
+
+`python:S1192` a signalé cinq copies de `"var(--accent)"` dans `timeline.py`. La
+règle avait raison **ici plus qu'ailleurs** : le défaut que ce module venait de
+corriger — la légende qui ne décrivait pas son graphique — était né exactement
+de ça, d'une valeur recopiée à un endroit et changée à l'autre.
+
+Extraire la constante a fait tomber `test_the_chart_consumes_the_tokens_of_its_own_legend`
+— **une garde que j'avais écrite quelques heures plus tôt**. Elle lisait le
+*texte source* du dictionnaire, pas sa *valeur*. La valeur rendue n'avait pas
+bougé d'un caractère.
+
+C'est la faute que je documentais depuis la veille dans le code des autres,
+commise par moi, dans le même fichier, la même nuit. Elle lit désormais le
+dictionnaire résolu. Plantation vérifiée : trois gardes mordent.
+
+### 7.5 Le balayage local, cette fois, a mesuré la bonne chose
+
+`77/77` lots · `307/307` fichiers · **5 720 tests, 0 échec** · pics 0,2 à 1,3 Go.
+
+Lancé **depuis le worktree** — la correction du défaut de §5 : depuis le
+répertoire canonique, `app` se résout sur le dépôt canonique et le sweep mesure
+un autre code que celui de la branche.
