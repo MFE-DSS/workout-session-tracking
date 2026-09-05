@@ -514,23 +514,65 @@ input, button, textarea, select {
   margin-top: 64px;
 }
 
+/* `Q1` — LA MARQUE ÉTAIT LE PLUS PETIT TEXTE DE SON PROPRE SEUIL.
+ *
+ * Mesuré : `AUREN` à 12 px, sous un « Connexion » à 18. Le nom du produit
+ * était donc le plus petit objet de la seule surface qu'un visiteur non
+ * connecté voit — et Q1 demande « une porte premium, terminale, silencieuse,
+ * avec une phrase forte ».
+ *
+ * Il passe au rang DISPLAY de l'échelle maison (32 px), le même que le relevé
+ * souverain de `Progression` et le titre de séance de l'accueil. L'interlettre
+ * gravée est conservée : c'est elle qui en fait une marque et non un titre. */
 .auth-mark {
   display: block;
-  margin: 0 0 4px;
+  margin: 0 0 10px;
   text-align: center;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 32px;
   font-weight: 600;
-  letter-spacing: 0.42em;      /* gravé, pas écrit */
-  text-indent: 0.42em;         /* compense l'interlettre finale */
+  letter-spacing: 0.24em;      /* gravé, pas écrit — resserré à 32 px */
+  text-indent: 0.24em;         /* compense l'interlettre finale */
   color: var(--role-action-primary);
+}
+
+/* La phrase de Q1. Rang BODY : elle se lit, elle ne crie pas. */
+.auth-tagline {
+  margin: 0 0 var(--space-lg);
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--role-text-secondary);
 }
 
 .auth-container .page-title {
   text-align: center;
 }
 
-/* Les sorties du seuil : un rang, pas trois poids égaux (`T-03`). */
+/* « Connexion » cesse d'être un second titre. Q1 liste « marque · une phrase ·
+ * formulaire » — pas de titre entre les deux. L'élément reste un `<h1>` : le
+ * niveau sémantique de la page ne dépend pas de sa taille, et le retirer
+ * priverait la page de son titre pour les technologies d'assistance.
+ * Il redescend au rang MÉTA et devient ce qu'il est réellement ici :
+ * l'étiquette du formulaire qui suit. */
+.auth-container .page-title.auth-title {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+/* Les sorties du seuil : un rang, pas trois poids égaux (`T-03`).
+ *
+ * ⚠ LA HIÉRARCHIE TENAIT SUR UN PIXEL. Mesuré : 13 px contre 12, même
+ * couleur, même graisse — imperceptible. Q1 nomme pourtant le défaut d'origine
+ * (« trois liens de poids égal, donc aucun chemin principal ») ; y répondre par
+ * un pixel d'écart, c'est le nommer sans le corriger.
+ *
+ * Le chemin principal — créer un compte — prend le rang BODY et la couleur du
+ * texte courant. Les deux autres restent en MÉTA et en sourdine. */
 .auth-exits {
   margin: 18px 0 0;
   text-align: center;
@@ -541,10 +583,13 @@ input, button, textarea, select {
   justify-content: center;
   min-height: 44px;
   padding: 0 8px;
-  color: var(--role-text-muted);
-  font-size: 13px;
+  color: var(--role-text-primary);
+  font-size: 15px;
 }
-.auth-exit--minor { font-size: 12px; }
+.auth-exit--minor {
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
 .auth-exit:hover,
 .auth-exit:focus-visible { color: var(--role-text-primary); }
 
@@ -5476,3 +5521,13 @@ summary:focus-visible,
 .pd-newsession { margin-top: var(--space-lg); max-width: 32rem; }
 .pd-block { margin-top: var(--space-md); }
 .pd-inline { display: inline; }
+
+/* ⚠ 9,17 px SUR TOUTES LES PAGES — le nom du produit, en pied de page.
+ *
+ * `.foot` vaut 11 px, et le `<small>` qu'il contient y applique le `smaller`
+ * de la feuille du navigateur : 11 × 0,833 ≈ 9,17 px. Personne ne l'avait
+ * écrit ; c'est le navigateur qui l'a décidé.
+ *
+ * Le `<small>` reste — il porte une nuance sémantique légitime — mais il
+ * cesse de choisir sa taille à notre place. */
+.foot small { font-size: inherit; }

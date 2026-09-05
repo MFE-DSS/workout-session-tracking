@@ -1,6 +1,8 @@
 """Tests for the /science page (replaces /rules)."""
 from __future__ import annotations
 
+import re
+
 
 def test_science_page_renders(client):
     r = client.get("/science")
@@ -77,12 +79,47 @@ def test_rules_redirects_to_science(client):
     assert r.headers["location"] == "/science"
 
 
-def test_home_tile_points_to_science(client):
-    """Home tile 'Science' must link to /science."""
-    r = client.get("/")
-    body = r.text
-    assert ">Science<" in body
-    assert "/science" in body
+def test_science_is_reached_from_the_question_not_from_the_home(client):
+    """`/science` reste atteignable — depuis le CONTEXTE, plus depuis l'accueil.
+
+    ⚠ `Sb_UI_HOME_COCKPIT_01` — CETTE GARDE ÉPINGLAIT UNE TUILE.
+
+    Elle exigeait un lien « Science » sur l'accueil. Arbitrage opérateur
+    2026-09-06 : `/science` n'est pas une destination qu'on choisit depuis un
+    cockpit, c'est une zone d'ARCHIVE et de DOCUMENTATION, qu'on atteint depuis
+    l'endroit où la question se pose.
+
+    Le produit le faisait déjà, à quatre endroits, dont trois pointent vers une
+    RÈGLE précise. La tuile de l'accueil était le seul lien sans contexte — elle
+    envoyait vers la page entière depuis un écran qui ne parle pas de méthode.
+
+    La garde protège donc ce qui compte : que la page ne soit pas ORPHELINE, et
+    que les entrées contextuelles survivent. Elle vérifie les gabarits plutôt
+    que l'accueil, parce que c'est là que vit la propriété.
+    """
+    import pathlib
+
+    tpl = pathlib.Path(__file__).resolve().parent.parent / "app/templates"
+    entrees = {
+        f.name
+        for f in tpl.rglob("*.html")
+        if f.name != "science.html" and "science_page" in f.read_text(encoding="utf-8")
+    }
+    assert len(entrees) >= 3, (
+        f"`/science` n'est plus atteignable que depuis {sorted(entrees)} — "
+        "une zone d'archive sans entrée contextuelle est une page orpheline"
+    )
+    # Les liens profonds doivent viser des ancres qui EXISTENT : renommer un
+    # slug casse silencieusement tous les liens qui le visent.
+    science = (tpl / "science.html").read_text(encoding="utf-8")
+    for f in tpl.rglob("*.html"):
+        if f.name == "science.html":
+            continue
+        for ancre in re.findall(r"science_page'\)\s*\}\}(#[a-z0-9-]+)", f.read_text(encoding="utf-8")):
+            cible = ancre.lstrip("#")
+            assert cible in science or "rule.slug" in science, (
+                f"{f.name} pointe vers `{ancre}`, absent de science.html"
+            )
 
 
 def test_science_page_requires_auth(client):

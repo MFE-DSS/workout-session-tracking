@@ -6,8 +6,7 @@
    never invents a value (Sx_27 §11.2, §16). #}
 
 {% if home %}
-<section class="coaching-loop" aria-label="Boucle de coaching"
-         style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-md);">
+<section class="coaching-loop" aria-label="Boucle de coaching">
 
   {# ── Today ── RETIRÉE (décision D4).
        Cette vignette dupliquait le hero : même libellé « Aujourd'hui », même nom
@@ -16,29 +15,30 @@
        on retire le doublon, pas l'information.
        Dogfood opérateur 2026-08-17 : « il y a un doublon Aujourd'hui ». #}
 
-  {# ── Last session ── #}
-  {% if home.last_session and home.last_session.available %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Dernière séance
-    </div>
+  {# ── Last session ──
+
+     ⚠ MASQUÉE QUAND UNE SÉANCE EST EN COURS — arbitrage opérateur 2026-09-06.
+
+     Le hero occupe déjà ce rôle : il nomme la séance ouverte. Ce bloc rendait
+     alors la même phrase 300 px plus bas — mesuré : « Push A — Pecs épaisseur
+     + Delts + Triceps » deux fois sur le même écran. Ce sont bien deux séances
+     distinctes dans le modèle, mais l'utilisateur lit deux fois la même chose.
+
+     Il reste entier quand AUCUNE séance n'est ouverte : c'est alors la seule
+     trace du passé sur l'écran, et la retirer serait une soustraction. #}
+  {% if home.last_session and home.last_session.available and not open_session %}
+  <div class="card tile hl-block">
+    <div class="tile__label hl-block__label">Dernière séance</div>
     {% if home.last_session.kind == "none" %}
-      <div style="font-size:14px;margin-top:4px;opacity:0.7;">
-        {{ home.last_session.reason }}
-      </div>
+      <p class="hl-block__empty">{{ home.last_session.reason }}</p>
     {% else %}
-      <a href="{{ url_for('session_detail', session_id=home.last_session.session_id) }}"
-         style="text-decoration:none;color:inherit;">
-        <div style="font-size:16px;font-weight:600;margin-top:4px;">
-          {{ home.last_session.template_name }}
-          {% if home.last_session.days_ago == 0 %}
-            <span style="opacity:0.6;font-weight:400;font-size:13px;">· aujourd'hui</span>
-          {% elif home.last_session.days_ago == 1 %}
-            <span style="opacity:0.6;font-weight:400;font-size:13px;">· hier</span>
-          {% else %}
-            <span style="opacity:0.6;font-weight:400;font-size:13px;">· il y a {{ home.last_session.days_ago }} j</span>
-          {% endif %}
-        </div>
+      <a class="hl-last__link" href="{{ url_for('session_detail', session_id=home.last_session.session_id) }}">
+        <span class="hl-last__name">{{ home.last_session.template_name }}</span>
+        <span class="hl-last__when">
+          {%- if home.last_session.days_ago == 0 %}· aujourd'hui
+          {%- elif home.last_session.days_ago == 1 %}· hier
+          {%- else %}· il y a {{ home.last_session.days_ago }} j{% endif -%}
+        </span>
         {# Sx_UI_06 Sb_UI_06.3 — dernière séance compacte : nom + date seulement.
            Le ressenti / la qualité (analytiques) vivent dans le détail de la
            séance (session done) et /progress, plus sur la home. #}
@@ -58,35 +58,25 @@
      Aucun CTA ici : le widget « État du jour · à remplir » porte déjà celui de
      la saisie, et le dupliquer créerait une double hiérarchie d'action. #}
   {% if home.training_state and home.training_state.available %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <h2 class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;margin:0;">
-      {{ home.training_state.label }}
-    </h2>
-    <div class="text-dim" style="font-size:11px;margin-top:2px;">
-      {{ home.training_state.caption }}
-    </div>
+  <div class="card tile hl-block">
+    <h2 class="tile__label hl-block__label">{{ home.training_state.label }}</h2>
+    <p class="text-dim hl-block__caption">{{ home.training_state.caption }}</p>
 
     {# Un SEUL message d'état de donnée, jamais onze. Il accompagne le contexte
        plutôt que de le remplacer : sans estimation, une exposition cardio ou un
        état déclaré restent des faits honnêtes à montrer. #}
     {% if home.training_state.message %}
-    <div class="tile__hint" style="margin-top:var(--space-sm);font-size:13px;">
-      {{ home.training_state.message }}
-    </div>
+    <p class="tile__hint hl-block__msg">{{ home.training_state.message }}</p>
     {% endif %}
 
     {% if home.training_state.entries %}
-    <ul style="list-style:none;padding:0;margin:var(--space-sm) 0 0 0;display:flex;flex-direction:column;gap:var(--space-sm);">
+    <ul class="hl-zones">
       {% for item in home.training_state.entries %}
       <li>
-        <div style="font-size:13px;">
-          {% if item.subject_label %}<b>{{ item.subject_label }}</b> — {% endif %}{{ item.message }}
-        </div>
+        <span class="hl-zones__line">{% if item.subject_label %}<b>{{ item.subject_label }}</b> — {% endif %}{{ item.message }}</span>
         {% if item.confidence_label %}
         {# Libellé textuel : la confiance ne repose jamais sur la couleur seule. #}
-        <div class="text-dim" style="font-size:11px;margin-top:2px;">
-          {{ item.confidence_label }}
-        </div>
+        <span class="text-dim hl-zones__conf">{{ item.confidence_label }}</span>
         {% endif %}
       </li>
       {% endfor %}
@@ -130,29 +120,38 @@
        nombre — qui reste vrai. #}
     <p class="home-wk__zones">{{ n }} {{ "séance" | pluriel(n) }} {{ "proposée" | pluriel(n) }}</p>
     {% endif %}
+    {# ── La régularité, JUXTAPOSÉE — jamais divisée.
+         Arbitrage opérateur 2026-09-06 : « Cette semaine » quitte sa carte et
+         devient une ligne sous les zones.
+
+         ⛔ LE RATIO EST INTERDIT. Écrire « 3 faites sur 4 prévues » exigerait
+         de savoir quelle séance ENREGISTRÉE a rempli quelle séance PLANIFIÉE.
+         `_build_weekly_plan` le refuse explicitement : « Completed / remaining
+         needs plan-to-actual divergence detection, which belongs to
+         Sb_ADAPTIVE_REPLAN_01 ; claiming it here would mean guessing ».
+
+         Les deux nombres voisinent. Ils ne se divisent pas. #}
+    {% if home.week and home.week.available and home.week.sessions_done %}
+    <p class="home-wk__done">{{ home.week.signal }}</p>
+    {% endif %}
     {% if home.weekly_plan.unmet_constraint %}
     <div class="tile__hint home-wk__gap">{{ home.weekly_plan.unmet_constraint }}</div>
     {% endif %}
   </div>
   {% endif %}
 
-  {# ── This week ── #}
-  {# D4 — masquée tant qu'aucune séance n'a eu lieu. « Pas encore de séance
-     cette semaine » n'apprenait rien : l'utilisateur le sait déjà, et la
-     vignette occupait une carte entière pour le dire.
-     Dogfood opérateur 2026-08-17 : « ne sert strictement à rien ».
-     Dès qu'il y a une séance, le signal redevient une vraie information et la
-     vignette réapparaît. #}
-  {% if home.week and home.week.available and home.week.sessions_done %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Cette semaine
-    </div>
-    <div style="font-size:16px;font-weight:600;margin-top:4px;">
-      {{ home.week.signal }}
-    </div>
-  </div>
-  {% endif %}
+  {# ── This week ──
+     D4 — masquée tant qu'aucune séance n'a eu lieu. « Pas encore de séance
+     cette semaine » n'apprenait rien. Dogfood opérateur 2026-08-17.
+
+     Depuis le 2026-09-06 elle n'a PLUS DE CARTE : elle est rendue en une ligne
+     dans « Semaine planifiée » ci-dessus. Son titre répétait la moitié de sa
+     phrase — « CETTE SEMAINE » suivi de « 3 séances cette semaine » — et une
+     carte entière pour un nombre est ce que `Q5` appelle une carte qui
+     n'entoure plus rien.
+
+     ⚠ Elle reste conditionnée à `home.week.sessions_done` : sans séance, rien
+     ne s'affiche, exactement comme avant. Le repli n'a pas changé. #}
 
 </section>
 {% endif %}
