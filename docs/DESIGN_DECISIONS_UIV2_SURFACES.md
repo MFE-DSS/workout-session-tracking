@@ -83,6 +83,48 @@ Le formulaire **ne doit plus dominer l'accueil**. Il devient une ligne compacte 
 Le formulaire complet se déploie au toucher. **Trente secondes de saisie ne
 sont pas l'objet principal d'un cockpit.**
 
+### ⚠ AMENDEMENT — la feature est **décommissionnée**, supersède le 2026-09-06
+
+Le repli ci-dessus était un **compromis de placement** sur une fonctionnalité
+dont l'opérateur a depuis tranché qu'elle ne devait pas exister sous cette
+forme. La question n'était pas *où mettre le formulaire* mais *pourquoi
+demander à quelqu'un de noter son état de 1 à 5*.
+
+Arbitrage, dans les termes de l'opérateur :
+
+> « L'état du jour va être décommissionné dans la façon dont il est
+> aujourd'hui. La personne ne va pas rentrer des chiffres de un à cinq. Ça va
+> être déterminé par ses performances sportives et par ce qui est rempli à la
+> fin de ses séances : il dit qu'il est focalisé, fatigué, distrait. Cette
+> feature qu'on a aujourd'hui à l'accueil, elle est complètement
+> décommissionnée. »
+
+**Ce qui est tranché :**
+
+1. la **saisie manuelle 1–5 disparaît** — ce n'est pas un déplacement vers une
+   autre surface, c'est un retrait ;
+2. la lecture d'état devient **dérivée** : performances sportives + déclarations
+   de **fin de séance** ;
+3. la surface de saisie **existe déjà** — c'est le bilan de fin de séance, où
+   l'utilisateur répond « Focalisé · Correct · Distrait » et « En forme · Moyen
+   · Fatigué ».
+
+**Ce qui rend le retrait possible sans appauvrir le produit** (`CLAUDE.md §5.3`
+— jamais une soustraction seule) : la matière première est **déjà collectée et
+désormais entièrement libellée**. `DECLARED_STATE_LABELS` traduisait l'énergie
+depuis `Sb_SESSION_REVIEW_SIGNAL_01` ; `DECLARED_CONCENTRATION_LABELS` a été
+ajouté par `Sb_UI_SESSION_DONE_01` (PR #207), qui a fermé la dernière fuite de
+clé de programme à l'écran. Les deux questions du bilan sont donc citables.
+
+**Ce qui n'est PAS tranché, et bloque l'implémentation** — la **règle de
+dérivation** elle-même : sur combien de séances, avec quelle pondération entre
+performance et déclaration, et ce que le produit affiche quand il n'y a pas
+encore de séance. Ce sont des décisions produit. Tant qu'elles ne sont pas
+prises, retirer la saisie livrerait un vide — précisément ce que `§5.3`
+interdit.
+
+**État : décision prise, implémentation en attente d'une règle.**
+
 ---
 
 ## Q4 — La page de séance ✅ **B, la ligne de série devient un instrument**
@@ -150,6 +192,71 @@ tout n'entoure plus rien.
 
 Même principe que les trois rangs de **contrôle** de D1, appliqué aux
 **surfaces**. La carte redevient un **signal**, pas un décor.
+
+---
+
+## Q6 — L'échelle typographique ✅ **E3 — 32 / 22 / 15 / 12**
+
+Quatre rangs, quatre seulement. Ils portent les noms que le socle visuel leur
+donne déjà (`AUREN_VISUAL_BACKBONE §3.2`) ; ce qui manquait était **leur
+valeur**.
+
+| Rang | Taille | Ce qu'il porte |
+|---|---|---|
+| **DISPLAY** | **32 px** | le relevé souverain, le titre d'écran — *un seul par écran* |
+| **SECTION** | **22 px** | les titres de bloc |
+| **BODY** | **15 px** | le texte courant |
+| **META** | **12 px** | provenance, étiquettes, légendes |
+
+**Pourquoi c'était urgent de l'écrire.** Cette échelle gouvernait déjà
+l'accueil, le récap de séance et les onze surfaces de `Sb_UI_SECTION_RANK_01`
+— sans exister dans un seul fichier du dépôt. Une décision appliquée trois fois
+et écrite zéro fois est une décision que la session suivante ne connaît pas.
+
+**Le défaut qu'elle ferme.** Le socle documentait, sans pouvoir le corriger :
+« body 14 px, section-header 13 px … **sur 101 usages** ». Un titre de bloc
+plus petit que le texte qu'il introduit ne hiérarchise rien.
+
+**Règle d'application** : un rang se propage **par classe, jamais par écran**.
+Corriger la surface où l'on a trébuché en laissant ses dix sœurs est le mode
+d'échec relevé sous *une décision appliquée là où c'était commode*.
+
+**Limite connue** : la primitive partagée `.btn` reste à 14 px, et `.card__title`
+à 13. Toutes deux sont portées par le **viseur intra-séance**, seul objet validé
+au rendu par l'opérateur — elles ne bougent pas sans lui.
+
+---
+
+## Q7 — Un seul aplat ambre par écran ✅ **strict**
+
+L'ambre désigne **l'action souveraine**. Deux aplats ambre sur un écran, c'est
+deux commandes souveraines — donc aucune.
+
+**Ce que la règle ne dit pas** : elle porte sur ce qu'un œil voit *à un instant
+donné*, pas sur ce qu'un gabarit contient. Un gabarit peut légitimement écrire
+plusieurs aplats dans des **branches Jinja mutuellement exclusives**, ou dans
+des **tiroirs repliés**.
+
+C'est mesuré : la première garde, écrite en « un par gabarit », a accusé
+**cinq surfaces saines** avant d'être remplacée par un **cliquet par gabarit**,
+strict dans les deux sens. La garde de vérité reste le **harnais de rendu** —
+seul endroit où l'on compte ce qui est réellement visible ensemble.
+
+---
+
+## Q8 — Aucune opacité décorative ✅ **tout passe par un token mesuré**
+
+`opacity: 0.6` sur du texte produit une couleur que **personne n'a mesurée** et
+que la palette ne connaît pas. Le contraste réel dépend alors du fond, qui
+change d'un rang de surface à l'autre.
+
+Toute atténuation devient un **token de couleur**, avec son ratio documenté sur
+le fond réel — exactement la règle `CLAUDE.md §5.4`, étendue à ce qui
+n'apparaissait pas comme une couleur.
+
+S'applique **aux écrans touchés**, au fil des tranches — pas en une passe
+globale : un remplacement en masse changerait des contrastes sans les mesurer,
+ce qui est le défaut qu'on corrige.
 
 ---
 
