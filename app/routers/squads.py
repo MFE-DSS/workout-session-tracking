@@ -486,7 +486,26 @@ def squad_recommend(
     db: DbSession,
     user: CurrentUser,
     template_slug: str = Form(...),
-    template_name: str = Form(...),
+    # `Sb_UI_FORMULAIRES_01` — LE NOM N'EST PLUS DEMANDÉ AU CLIENT.
+    #
+    # Il arrivait d'un champ CACHÉ, rempli par un `onchange` inline qui recopiait
+    # le TEXTE de l'option sélectionnée. Deux conséquences, l'une de forme et
+    # l'autre de fond :
+    #
+    #   · de forme — ce `<select>` ne pouvait pas adopter la coque canonique du
+    #     produit sans perdre son JS, ce qui explique en partie pourquoi il était
+    #     écrit à la main ;
+    #   · de fond — le nom d'une séance recommandée était fourni par le CLIENT.
+    #     Rien n'obligeait `template_name` à correspondre à `template_slug`.
+    #
+    # Il est désormais dérivé du slug, côté serveur. Le champ reste accepté pour
+    # ne casser aucun appel existant, mais il est IGNORÉ.
+    # ⚠ Accepté, jamais lu. Pas de `noqa` : j'en avais posé un — `ARG001` —
+    # avec une explication accolée au code, ce qui rend la suppression
+    # malformée (`python:S7632`). Vérifié en la retirant : ruff ne signalait
+    # RIEN. C'était une suppression décorative, qui aurait fait taire un jour
+    # un vrai signal sur cette ligne.
+    template_name: str = Form(""),
     note: str = Form(""),
 ):
     squad = get_squad_or_none(db, squad_id)
@@ -495,7 +514,15 @@ def squad_recommend(
     if not is_member(db, squad_id, user.id):
         raise HTTPException(status_code=403, detail="Accès refusé")
 
-    recommend_template(db, squad_id, user.id, template_slug, template_name, note or None)
+    tpl = db.execute(
+        select(WorkoutTemplate).where(WorkoutTemplate.slug == template_slug)
+    ).scalar_one_or_none()
+    # Un slug inconnu garde son slug comme nom plutôt que de lever : le
+    # formulaire est une entrée hostile, et un 500 sur une recommandation
+    # serait une réponse disproportionnée.
+    nom = tpl.name if tpl else template_slug
+
+    recommend_template(db, squad_id, user.id, template_slug, nom, note or None)
     return RedirectResponse(
         url=request.url_for("squad_detail", squad_id=squad_id),
         status_code=303,

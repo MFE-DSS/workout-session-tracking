@@ -192,3 +192,78 @@ def test_squad_nav_link_present(client):
     assert "Squads" in r.text
     # Check the topbar link specifically
     assert "squads" in r.text.lower()
+
+
+# ---------------------------------------------------------------------------
+# `Sb_UI_FORMULAIRES_01` — le nom d'une recommandation est DÉRIVÉ, pas reçu
+# ---------------------------------------------------------------------------
+#
+# ⚠ CES DEUX TESTS EXISTENT PARCE QUE LA PORTE DE COUVERTURE LES A RÉCLAMÉS.
+#
+# J'ai changé la logique de `squad_recommend` — le nom de la séance n'est plus
+# lu dans le formulaire mais dérivé du slug côté serveur — et j'ai vérifié le
+# résultat À LA MAIN, dans un navigateur. Aucun test ne l'exerçait : Sonar a
+# rendu `new_coverage: 0.0` sur la tranche.
+#
+# La porte avait raison, et pas seulement sur la forme. Ce que le changement
+# apporte est une propriété d'INTÉGRITÉ — un client ne peut plus faire dire à
+# une recommandation un nom qui ne correspond pas au gabarit qu'elle désigne —
+# et une propriété pareille sans test n'est pas une propriété, c'est une
+# intention.
+
+
+def _squad_id(client) -> int:
+    r = client.post("/squads/create", data={"name": "RecoSquad"},
+                    follow_redirects=False)
+    assert r.status_code == 303
+    return int(re.search(r"/squads/(\d+)", r.headers["location"]).group(1))
+
+
+def test_the_recommended_name_comes_from_the_slug(client):
+    """Le serveur nomme la séance lui-même, à partir du gabarit désigné."""
+    sid = _squad_id(client)
+    r = client.post(f"/squads/{sid}/recommend",
+                    data={"template_slug": "push-a", "note": "essai"},
+                    follow_redirects=False)
+    assert r.status_code == 303
+
+    body = client.get(f"/squads/{sid}").text
+    assert "Push A" in body, (
+        "la recommandation ne porte aucun nom : le serveur ne l'a pas dérivé"
+    )
+
+
+def test_a_client_supplied_name_is_ignored(client):
+    """LA PROPRIÉTÉ QUI COMPTE, et que le champ caché ne garantissait pas.
+
+    Avant, `template_name` arrivait d'un champ caché rempli par un `onchange`.
+    Rien n'obligeait ce nom à correspondre au slug : un client pouvait faire
+    dire à une recommandation ce qu'il voulait.
+    """
+    sid = _squad_id(client)
+    r = client.post(f"/squads/{sid}/recommend",
+                    data={"template_slug": "push-a",
+                          "template_name": "Un nom totalement inventé",
+                          "note": ""},
+                    follow_redirects=False)
+    assert r.status_code == 303
+
+    body = client.get(f"/squads/{sid}").text
+    assert "Un nom totalement inventé" not in body, (
+        "le nom fourni par le client est rendu tel quel — la dérivation "
+        "serveur ne sert à rien"
+    )
+    assert "Push A" in body
+
+
+def test_an_unknown_slug_does_not_raise(client):
+    """Un formulaire est une entrée hostile : il ne lève jamais.
+
+    Un 500 sur une recommandation serait une réponse disproportionnée à un slug
+    inconnu — le dépôt applique déjà cette règle aux paramètres d'URL.
+    """
+    sid = _squad_id(client)
+    r = client.post(f"/squads/{sid}/recommend",
+                    data={"template_slug": "gabarit-qui-n-existe-pas"},
+                    follow_redirects=False)
+    assert r.status_code == 303

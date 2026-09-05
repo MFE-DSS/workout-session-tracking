@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import select_shell %}
 {% block content %}
 <h1 class="page-title">Comparer &middot; {{ squad.name }}</h1>
 
@@ -6,21 +7,15 @@
   <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:end;">
     <div style="flex:1; min-width:8rem;">
       <label for="a"><strong>Membre A</strong></label><br>
-      <select id="a" name="a" required style="width:100%;">
-        <option value="0">--</option>
-        {% for m in members %}
-          <option value="{{ m.user_id }}" {% if selected_a == m.user_id %}selected{% endif %}>{{ m.username }}</option>
-        {% endfor %}
-      </select>
+      {{ select_shell("a", members, selected=selected_a, empty_label="--",
+                      empty_value="0", select_id="a", required=True,
+                      value_attr="user_id", label_attr="username") }}
     </div>
     <div style="flex:1; min-width:8rem;">
       <label for="b"><strong>Membre B</strong></label><br>
-      <select id="b" name="b" required style="width:100%;">
-        <option value="0">--</option>
-        {% for m in members %}
-          <option value="{{ m.user_id }}" {% if selected_b == m.user_id %}selected{% endif %}>{{ m.username }}</option>
-        {% endfor %}
-      </select>
+      {{ select_shell("b", members, selected=selected_b, empty_label="--",
+                      empty_value="0", select_id="b", required=True,
+                      value_attr="user_id", label_attr="username") }}
     </div>
     <div>
       <button type="submit" class="btn btn--primary">Comparer</button>

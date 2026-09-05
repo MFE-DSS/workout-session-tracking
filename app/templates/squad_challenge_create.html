@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros.html" import select_shell, input_shell %}
 {% block content %}
 <h1 class="page-title">Nouveau challenge &middot; {{ squad.name }}</h1>
 
@@ -9,23 +10,20 @@
 <form method="post" action="{{ url_for('squad_challenge_create_post', squad_id=squad.id) }}" class="card" style="max-width:28rem;">
   <div style="margin-bottom:1rem;">
     <label for="title"><strong>Titre</strong></label><br>
-    <input type="text" id="title" name="title" required style="width:100%;">
+    {{ input_shell("title", input_id="title", required=True) }}
   </div>
   <div style="margin-bottom:1rem;">
     <label for="metric"><strong>Métrique</strong></label><br>
-    <select id="metric" name="metric" required style="width:100%;">
-      {% for key, label in metric_labels.items() %}
-        <option value="{{ key }}">{{ label }}</option>
-      {% endfor %}
-    </select>
+    {{ select_shell("metric", metric_labels.items() | list,
+                    select_id="metric", required=True) }}
   </div>
   <div style="margin-bottom:1rem;">
     <label for="starts_at"><strong>Date de début</strong></label><br>
-    <input type="date" id="starts_at" name="starts_at" required style="width:100%;">
+    {{ input_shell("starts_at", input_id="starts_at", input_type="date", required=True) }}
   </div>
   <div style="margin-bottom:1rem;">
     <label for="ends_at"><strong>Date de fin</strong></label><br>
-    <input type="date" id="ends_at" name="ends_at" required style="width:100%;">
+    {{ input_shell("ends_at", input_id="ends_at", input_type="date", required=True) }}
   </div>
   <button type="submit" class="btn btn--primary">Créer le challenge</button>
 </form>
