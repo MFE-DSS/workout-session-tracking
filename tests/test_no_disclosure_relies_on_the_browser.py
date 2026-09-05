@@ -14,6 +14,27 @@ gabarits à corriger — donc elle n'aurait jamais vu le dixième. Elle part d'u
 `rglob` et n'admet aucune exception nommée : un dépliant est conforme s'il
 adopte le composant OU s'il désarme lui-même le marqueur, jamais parce qu'il
 figure sur une liste.
+
+⚠ ET POURQUOI ELLE N'EST PAS UN DOUBLON DE `test_ui_surface_guards`.
+
+J'ai écrit ce fichier sans voir que le dépôt avait DÉJÀ un cliquet sur les
+`<summary>` — `test_no_new_summary_loses_its_native_marker`, avec un inventaire
+de décisions dans `ui_surface_inventory.json`. C'est la CI qui me l'a appris, en
+rougissant sur une entrée devenue périmée. Neuvième fois de cette session qu'un
+outil existait et que je ne l'ai pas cherché : le motif que je traque, commis
+par moi.
+
+Les deux gardes tirent en sens OPPOSÉS, et c'est ce qui les rend
+complémentaires :
+
+* le CLIQUET interdit de **retirer** le marqueur natif sans l'inscrire comme
+  décision. Il regarde le CSS. Il n'a jamais pu voir les onze `<summary>` nus,
+  puisqu'aucune règle ne les visait ;
+* CE FICHIER interdit de **laisser** le marqueur natif. Il regarde les gabarits.
+  Il ne verra jamais un retrait silencieux, puisque le retrait le satisfait.
+
+Ensemble, ils forcent un choix EXPLICITE dans les deux sens. Séparément, chacun
+laisse passer exactement ce que l'autre attrape.
 """
 from __future__ import annotations
 
