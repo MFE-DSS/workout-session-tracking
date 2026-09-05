@@ -36,12 +36,15 @@
   {# Bloc KPI 30j — agrégats publics. #}
   <ul class="user-profile__kpi-row">
     <li>
-      <span class="profile-preview__kpi-label">Sessions 30j</span>
+      <span class="profile-preview__kpi-label">Séances 30 j</span>
       <b>{{ sessions_count_30d }}</b>
     </li>
+    {# `OPERATOR_DECISION D7` — « Streak » remplacé par un comptage. Sur le
+       profil PUBLIC de quelqu'un d'autre, une suite de jours consécutifs
+       transforme un repos bien pris en infériorité affichée. #}
     <li>
-      <span class="profile-preview__kpi-label">Streak</span>
-      <b>{{ page.preview.streak }}{% if page.preview.streak > 0 %}j{% endif %}</b>
+      <span class="profile-preview__kpi-label">Séances 14 j</span>
+      <b>{{ page.preview.sessions_14d }}</b>
     </li>
     <li>
       <span class="profile-preview__kpi-label">Cardio /sem</span>

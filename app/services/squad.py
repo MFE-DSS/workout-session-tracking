@@ -23,6 +23,7 @@ from app.models.session import SessionExercise, WorkoutSession
 from app.models.squad import Squad, SquadInviteCode, SquadMembership
 from app.models.user import User
 from app.services.performance import GRADE_LABELS, compute_grade
+from app.services.profile_metrics import sessions_in_window
 from app.services.quality_score import compute_session_quality
 
 
@@ -300,16 +301,18 @@ def compute_squad_leaderboard(db: Session, squad_id: int) -> list[dict]:
                 last_date = s.started_at.strftime("%Y-%m-%d")
                 last_template = s.template_name_snapshot
 
-        # Streak: consecutive days with sessions from today backwards
-        streak = _compute_streak(db, uid)
+        # `D7` — un COMPTAGE de séances récentes, pas une suite de jours.
+        # Une suite punit le repos ; un comptage sur 14 jours dit l'activité
+        # récente sans exiger la consécutivité.
+        recent = sessions_in_window(db, uid, 14)
 
-        raw.append((uname, total_pts, counted, last_date, last_template, streak))
+        raw.append((uname, total_pts, counted, last_date, last_template, recent))
 
     # Sort by total_points desc, username asc
     raw.sort(key=lambda x: (-x[1], x[0]))
 
     entries: list[dict] = []
-    for i, (uname, pts, counted, last_date, last_tpl, streak) in enumerate(
+    for i, (uname, pts, counted, last_date, last_tpl, recent) in enumerate(
         raw, start=1
     ):
         avg = round(pts / counted, 1) if counted > 0 else 0.0
@@ -325,40 +328,21 @@ def compute_squad_leaderboard(db: Session, squad_id: int) -> list[dict]:
                 "session_count": counted,
                 "last_session_date": last_date,
                 "last_session_template": last_tpl,
-                "streak": streak,
+                "sessions_14d": recent,
             }
         )
     return entries
 
 
-def _compute_streak(db: Session, user_id: int) -> int:
-    """Count consecutive days with at least one session, from today backwards."""
-    sessions = (
-        db.execute(
-            select(WorkoutSession.started_at)
-            .where(
-                WorkoutSession.user_id == user_id,
-                WorkoutSession.status == "completed",
-                WorkoutSession.excluded_from_stats.is_(False),
-            )
-            .order_by(WorkoutSession.started_at.desc())
-        )
-        .scalars()
-        .all()
-    )
-    if not sessions:
-        return 0
-
-    # Collect unique dates
-    dates = sorted({s.date() for s in sessions}, reverse=True)
-    today = datetime.now(timezone.utc).date()
-
-    streak = 0
-    expected = today
-    for d in dates:
-        if d == expected:
-            streak += 1
-            expected = expected - timedelta(days=1)
-        elif d < expected:
-            break
-    return streak
+# `_compute_streak` VIVAIT ICI — le TROISIÈME producteur de jours consécutifs
+# du dépôt, retiré par `OPERATOR_DECISION D7`.
+#
+# La décision reprochait « un second producteur aux règles différentes ». Elle
+# sous-estimait : celui-ci partait strictement d'AUJOURD'HUI, là où
+# `profile_metrics.streak_days` accordait un délai de grâce jusqu'à la veille
+# pour ne pas perdre une suite avant minuit UTC. Les deux rendaient donc, pour
+# le même utilisateur et le même jour, **deux nombres différents** — l'un sur le
+# classement d'escouade, l'autre sur la carte de profil.
+#
+# Le classement se calcule sur les points (`raw.sort(key=lambda x: (-x[1], x[0]))`) :
+# retirer cette colonne ne change aucun rang.

@@ -49,10 +49,14 @@ def test_squad_leaderboard_only_contains_allowed_fields(client):
     with SessionLocal() as db:
         lb = compute_squad_leaderboard(db, squad.id)
 
+    # `OPERATOR_DECISION D7` — `streak` → `sessions_14d`. La liste blanche
+    # reste une liste blanche : elle borne ce qui SORT du service vers une
+    # surface sociale, et cette propriété-là ne change pas de nature. Seul le
+    # nom du champ d'activité récente change.
     allowed_keys = {
         "rank", "username", "total_points", "avg_points", "grade",
         "grade_label", "session_count", "last_session_date",
-        "last_session_template", "streak",
+        "last_session_template", "sessions_14d",
     }
     for entry in lb:
         assert set(entry.keys()) == allowed_keys, f"Unexpected keys: {set(entry.keys()) - allowed_keys}"

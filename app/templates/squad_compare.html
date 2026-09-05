@@ -44,7 +44,8 @@
           <tr><td>Moyenne</td><td>{{ comparison.a.avg_points }}</td><td>{{ comparison.b.avg_points }}</td></tr>
           <tr><td>Grade</td><td><span class="grade-badge grade-badge--{{ comparison.a.grade|lower }}">{{ comparison.a.grade }}</span> {{ comparison.a.grade_label }}</td><td><span class="grade-badge grade-badge--{{ comparison.b.grade|lower }}">{{ comparison.b.grade }}</span> {{ comparison.b.grade_label }}</td></tr>
           <tr><td>Séances</td><td>{{ comparison.a.session_count }}</td><td>{{ comparison.b.session_count }}</td></tr>
-          <tr><td>Streak</td><td>{{ comparison.a.streak }}j</td><td>{{ comparison.b.streak }}j</td></tr>
+          {# `OPERATOR_DECISION D7` — comptage, pas suite de jours. #}
+          <tr><td>Séances 14 j</td><td>{{ comparison.a.sessions_14d }}</td><td>{{ comparison.b.sessions_14d }}</td></tr>
           <tr><td>Dernière séance</td><td>{{ comparison.a.last_session_date or '-' }}</td><td>{{ comparison.b.last_session_date or '-' }}</td></tr>
         {% else %}
           <tr><td colspan="3" class="text-dim">Données indisponibles pour un ou les deux membres.</td></tr>
