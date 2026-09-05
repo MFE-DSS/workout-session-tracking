@@ -83,7 +83,7 @@
             </li>
           {% elif item.type == 'shared_session' %}
             <li>
-              <strong>{{ item.username }}</strong> a partagé une séance du {{ item.created_at.strftime('%d/%m') }}
+              <strong>{{ item.username }}</strong> a partagé une séance du {{ (item.created_at | local).strftime('%d/%m') }}
               {% if item.exercises %}
                 <ul>
                   {% for ex in item.exercises %}
@@ -148,7 +148,7 @@
       {% if latest_code %}
         <p>
           Code actif : <strong>{{ latest_code.code }}</strong><br>
-          <span class="text-dim">Expire le {{ latest_code.expires_at.strftime('%d/%m/%Y %H:%M') }}</span>
+          <span class="text-dim">Expire le {{ (latest_code.expires_at | local).strftime('%d/%m/%Y %H:%M') }}</span>
         </p>
       {% else %}
         <p class="text-dim">Aucun code actif.</p>

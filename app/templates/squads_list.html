@@ -19,7 +19,7 @@
         </div>
         <div class="text-dim" style="margin-top:.25rem;">
           {{ item.member_count }} membre{% if item.member_count > 1 %}s{% endif %}
-          · créée le {{ item.squad.created_at.strftime('%d/%m/%Y') }}
+          · créée le {{ (item.squad.created_at | local).strftime('%d/%m/%Y') }}
         </div>
       </a>
     {% endfor %}

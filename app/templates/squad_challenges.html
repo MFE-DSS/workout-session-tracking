@@ -27,6 +27,10 @@
           <tr>
             <td><a href="{{ url_for('squad_challenge_detail', squad_id=squad.id, challenge_id=c.id) }}">{{ c.title }}</a></td>
             <td>{{ metric_labels.get(c.metric, c.metric) }}</td>
+            {# ⛔ PAS de `| local` : `starts_at`/`ends_at` sont des colonnes
+               `Date`, pas `DateTime`. Un jour de calendrier n'a pas de fuseau,
+               et le localiser n'aurait aucun sens — un défi qui commence le
+               6 septembre commence le 6 septembre partout. #}
             <td>{{ c.starts_at.strftime('%d/%m/%Y') }}</td>
             <td>{{ c.ends_at.strftime('%d/%m/%Y') }}</td>
             <td>

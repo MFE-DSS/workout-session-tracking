@@ -38,7 +38,7 @@
           <span class="badge">{{ status_label(program.status) }}</span>
         </div>
         <div class="text-dim" style="margin-top:.25rem;">
-          modifié le {{ program.updated_at.strftime('%d/%m/%Y') }}
+          modifié le {{ (program.updated_at | local).strftime('%d/%m/%Y') }}
         </div>
       </a>
     {% endfor %}

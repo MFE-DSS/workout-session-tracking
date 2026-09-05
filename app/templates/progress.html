@@ -311,7 +311,7 @@
                  semaine — deux nombres du même programme, deux fenêtres. #}
               <span>historique</span>
               {% if tk.last_done_at %}
-                <span>· dernière : {{ tk.last_done_at.strftime('%d/%m') }}</span>
+                <span>· dernière : {{ (tk.last_done_at | local).strftime('%d/%m') }}</span>
               {% endif %}
               {% if tk.avg_success_score is not none %}
                 <span>· score moy. {{ tk.avg_success_score | round(0, 'floor') | int }}</span>
