@@ -99,6 +99,27 @@ def format_delta_parts(prog: ExerciseProgression) -> list[str]:
     return [p for p in parts if p]
 
 
+def format_trace(prog: ExerciseProgression) -> list[str]:
+    """Les charges des occurrences RETENUES, du plus ancien au plus récent.
+
+    `KEEP_OCCURRENCES` en retient six ; `latest` et `previous` n'en lisaient
+    que **deux**. Les quatre autres étaient calculées, puis jetées avant la
+    vue — la même perte que `MaterializationReadiness` infligeait aux séances
+    du plan hebdomadaire.
+
+    Ce que la trace ajoute n'est pas décoratif. `30 · 29 · 26 · 25 · 24 · 23`
+    et `−1 kg` décrivent la même dernière séance ; seule la première dit qu'il
+    s'agit d'une décrue **régulière** plutôt que d'un accident. L'écart entre
+    26 et 29 dit lui aussi quelque chose : l'exercice n'a pas été pratiqué
+    entre les deux.
+
+    **Aucun jugement n'est ajouté** : ce sont les charges, dans l'ordre où
+    elles ont été notées. Pas de seuil, pas de tendance nommée, pas de couleur
+    de verdict — les trois interdits du contrat tiennent.
+    """
+    return [_fmt_weight(o.weight) for o in reversed(prog.occurrences)]
+
+
 def build_progression_rows(facts: ProgressionFacts) -> list[dict[str, Any]]:
     """Les exercices comparables, du plus récemment pratiqué au moins.
 
@@ -130,6 +151,25 @@ def build_progression_rows(facts: ProgressionFacts) -> list[dict[str, Any]]:
             "crossed": len(p.templates) > 1,
             "provenance": (f"{len(p.templates)} programmes"
                            if len(p.templates) > 1 else None),
+            # ── Les grandeurs SÉPARÉES, pour le relevé souverain.
+            #
+            # `previous` et `latest` restent des chaînes soudées (`70 × 10`) :
+            # la liste les lit ainsi, et rien ne le change. Le relevé, lui,
+            # a deux puits — charge et répétitions — et ne peut pas découper
+            # une chaîne déjà formatée sans refaire le formatage à l'envers.
+            "latest_weight": _fmt_weight(p.latest.weight),
+            "latest_reps": (str(p.latest.reps) if p.latest.reps is not None
+                            else NO_VALUE),
+            "previous_weight": _fmt_weight(p.previous.weight),
+            "previous_reps": (str(p.previous.reps)
+                              if p.previous.reps is not None else NO_VALUE),
+            "delta_weight": _fmt_signed(p.delta.weight_delta, "kg"),
+            "delta_reps": _fmt_signed(
+                p.delta.reps_delta,
+                "rep" if (p.delta.reps_delta is not None
+                          and abs(p.delta.reps_delta) == 1) else "reps",
+            ),
+            "trace": format_trace(p),
         })
     return rows
 
@@ -155,10 +195,37 @@ def build_awaiting_rows(facts: ProgressionFacts) -> list[dict[str, Any]]:
 
 
 def build_progression_view(facts: ProgressionFacts) -> dict[str, Any]:
-    """Le premier niveau, et ce qu'il replie."""
+    """Le premier niveau, ce qu'il PROMEUT, et ce qu'il replie.
+
+    `lead` — LE RELEVÉ SOUVERAIN, ET POURQUOI IL EST LÉGITIME.
+
+    Le patron d'instrument (`AUREN_VISUAL_BACKBONE §4`, validé sur rendu le
+    2026-09-04) veut un readout souverain : une valeur, très grande, comprise
+    « sans lire ». L'écran n'en avait pas — mesuré, ses cinq plus grosses
+    typographies étaient des COMPTAGES (« 3 zones », « 3 », « 10 », « 100 % »,
+    « 4 ») entre 28 et 34 px, tandis que la progression elle-même tenait en
+    13 px et son écart en 11 px, le plus petit texte de la page.
+
+    **`lead` n'est pas un classement.** C'est `rows[0]`, et `rows` est déjà
+    trié par la pratique, du plus récemment pratiqué au moins. La docstring de
+    `build_progression_rows` interdit explicitement tout tri par ampleur
+    d'écart — « classer par plus gros progrès reviendrait à décider que
+    l'écart est un mérite ». Promouvoir le plus RÉCENT ne décide rien : c'est
+    la chronologie, qui n'affirme pas.
+
+    Élire un « plus gros progrès » aurait de toute façon exigé de comparer des
+    kilos entre exercices — 6 kg au tirage vertical contre 1 kg au développé
+    haltères — c'est-à-dire exactement l'addition sans référent que la voie
+    cardio refuse déjà entre deux machines.
+
+    `lead` sort de `rows` : le rendre deux fois ferait passer une promotion
+    pour une duplication.
+    """
     rows = build_progression_rows(facts)
+    lead = rows[0] if rows else None
     return {
-        "rows": rows[:TOP_N],
+        "lead": lead,
+        "rows": rows[1:TOP_N],
         "more": rows[TOP_N:],
         "awaiting": build_awaiting_rows(facts),
         "unresolved": facts.unresolved,
@@ -213,4 +280,5 @@ __all__ = [
     "build_progression_view",
     "format_delta_parts",
     "format_performance",
+    "format_trace",
 ]
