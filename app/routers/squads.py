@@ -500,7 +500,12 @@ def squad_recommend(
     #
     # Il est désormais dérivé du slug, côté serveur. Le champ reste accepté pour
     # ne casser aucun appel existant, mais il est IGNORÉ.
-    template_name: str = Form(""),  # noqa: ARG001 — accepté, jamais lu
+    # ⚠ Accepté, jamais lu. Pas de `noqa` : j'en avais posé un — `ARG001` —
+    # avec une explication accolée au code, ce qui rend la suppression
+    # malformée (`python:S7632`). Vérifié en la retirant : ruff ne signalait
+    # RIEN. C'était une suppression décorative, qui aurait fait taire un jour
+    # un vrai signal sur cette ligne.
+    template_name: str = Form(""),
     note: str = Form(""),
 ):
     squad = get_squad_or_none(db, squad_id)
