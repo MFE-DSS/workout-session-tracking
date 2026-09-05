@@ -27,7 +27,6 @@ username ASC (deterministic, alphabetical). Documented.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -44,8 +43,8 @@ class LeaderboardEntry:
     username: str
     total_points: float
     counted_sessions: int
-    avg_points: Optional[float]
-    last_session_score: Optional[int]
+    avg_points: float | None
+    last_session_score: int | None
     grade: str
     grade_label: str
 
@@ -63,9 +62,9 @@ class LeaderboardEntry:
     #:
     #: Entier : la moyenne qu'il remplace s'affichait « moy. 60.0 », et le
     #: dixième de point ne sépare personne.
-    points_gap: Optional[int] = None
+    points_gap: int | None = None
     #: Le rang auquel `points_gap` se compare — 2 pour le premier, n-1 sinon.
-    gap_rank: Optional[int] = None
+    gap_rank: int | None = None
 
 
 def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
@@ -74,7 +73,7 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
         select(User).where(User.is_active.is_(True))
     ).scalars().all()
 
-    raw: list[tuple[str, float, int, Optional[int]]] = []
+    raw: list[tuple[str, float, int, int | None]] = []
 
     for user in users:
         sessions = db.execute(
@@ -93,7 +92,7 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
 
         total_pts = 0.0
         counted = 0
-        last_score: Optional[int] = None
+        last_score: int | None = None
 
         for s in sessions:
             total_work = sum(
