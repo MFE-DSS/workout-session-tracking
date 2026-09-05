@@ -548,6 +548,204 @@ revue, et il est dit.
   devenait ininterprétable, et j'ai arrêté le sweep plutôt que de garder son
   résultat.
 
+### 🔴 `D7-RESTE` — une décision opérateur appliquée sur 2 surfaces, oubliée sur 4
+
+Trouvé en balayant les **classes** de défaut plutôt que les écrans. C'est le
+défaut le plus sérieux de la nuit, parce qu'il ne s'agit pas d'un oubli de
+style : **une décision que vous avez prise n'a été appliquée que là où c'était
+commode.**
+
+`OPERATOR_DECISION D7` (`UX4_03B`) a retiré « Streak ». Le commentaire qui la
+consigne donne deux motifs, et le premier est un motif **produit** :
+
+> « Le compteur de jours consécutifs **punissait un jour de repos correctement
+> pris**, et venait d'un second producteur aux règles différentes de celui du
+> moteur comportemental. »
+
+Elle a été appliquée à **deux** surfaces — le rapport coach (remplacé par
+« Séances 14 j ») et Progression (`DO_NOT_SURFACE`). Elle est restée **non
+appliquée sur quatre** :
+
+| Surface | Ce qui est encore rendu |
+|---|---|
+| `squad_detail.html:21` | colonne `Streak`, valeur `{{ e.streak }}j` |
+| `squad_compare.html:47` | ligne `Streak`, deux valeurs comparées |
+| `_partials/profile_preview.html:28` | KPI `Streak` |
+| `user_profile.html:43` | KPI `Streak` |
+
+Trois aggravations, dans l'ordre de gravité :
+
+1. **Le motif produit est *pire* là où la décision n'a pas été appliquée.** Un
+   compteur qui punit un repos bien pris est discutable sur une page privée ; sur
+   un **classement d'escouade**, il fait du repos un désavantage compétitif
+   **devant les autres**. La décision a été appliquée aux surfaces intimes et
+   oubliée sur les surfaces sociales — exactement l'inverse de l'ordre de
+   priorité.
+2. **Les deux gardes de D7 existent — et ne regardent qu'un gabarit chacune.**
+   `test_coach_report.py:271` bannit `"Streak"` du rapport coach ;
+   `test_ux4_progress_signals.py:518` le bannit de `/progress`. Aucune ne
+   regarde les quatre autres. Même motif que les gardes aveugles par périmètre
+   déjà relevées cette nuit : **la garde existe, elle ne regarde pas où est le
+   défaut.**
+3. **Il y a bien trois producteurs, comme la décision le soupçonnait** —
+   `behavioral.BehavioralState.streak_days` (délibérément conservé, gardé par
+   `test_streak_days_is_still_computed`), `profile_metrics.streak_days` et
+   `squad._compute_streak`. La décision nommait « un second producteur » ; il y
+   en avait un troisième.
+
+Vérifié : `streak` **ne pèse pas** sur le classement — le rang se calcule sur
+les points. La retirer ne change aucun ordre.
+
+#### La preuve, mesurée par le code du produit
+
+Trois pratiquants construits dans un laboratoire au schéma courant, puis les
+**vrais producteurs** du dépôt appelés dessus :
+
+| | « Streak » affiché | Séances sur 14 j | Rang |
+|---|---|---|---|
+| **marin** — *se repose correctement* | **1 j** | **6** | 1er, 600 pts |
+| **nadia** — *enchaîne les jours consécutifs* | **5 j** | 5 | 2e, 480 pts |
+| come — *reprise après coupure* | 0 j | 3 | 3e, 300 pts |
+
+**Marin s'entraîne le plus, il est premier au classement, et la dernière chose
+qu'on lit sur sa ligne est « 1j » contre « 5j » pour nadia** — parce qu'il prend
+ses jours de repos. C'est exactement la phrase de la décision, devenue un
+nombre, sur un écran public.
+
+Vérifié au rendu : `/squads/1` et `/users/nadia` affichent « Streak ».
+
+**Traitement retenu** (tranche `Sb_UI_D7_STREAK_CLOSURE`) : appliquer D7 à la
+lettre — « remplacé par un comptage » — avec **un seul producteur** au lieu de
+trois, en promouvant le compteur déjà écrit et propre
+(`coach_report._sessions_in_window`) au rang de producteur partagé. Le moteur
+comportemental garde le sien, qui est gardé et n'est pas rendu.
+
+S'y ajoute, dans la même tranche, le reste du vocabulaire : **neuf libellés
+« Sessions… »** encore rendus sur `export`, `coach_report`, `profile_preview` et
+`user_profile` — l'anglicisme déjà corrigé sur Progression, resté partout
+ailleurs. Y compris **deux lignes au-dessus du commentaire de D7** qui affirme
+« même vocabulaire que Progression ».
+
+### 🔴 `X-06` — une seconde palette, non mesurée, vit à côté de la vôtre
+
+Trouvé en balayant §5.4 sur les feuilles de style plutôt que sur les gabarits.
+C'est la trouvaille la plus lourde de la nuit **en volume**, et elle est
+entièrement chiffrée.
+
+**30 couleurs littérales distinctes, 88 occurrences**, rendues **hors du système
+de tokens**, réparties sur `app.css` (50), `body_intelligence.css` (23) et
+`session_focus.css` (15).
+
+Ce n'est pas une dispersion aléatoire. C'est **la palette par défaut de
+Tailwind**, reconnaissable nuance par nuance :
+
+| Littéral | Nom Tailwind | Saturation | ×  |
+|---|---|---|---|
+| `#6b7280` | `gray-500` | 9 % | 25 |
+| `#4a9eff` | — (bleu électrique) | **100 %** | 5 |
+| `#2563eb` | `blue-600` | 83 % | 5 |
+| `#f59e0b` | `amber-500` | 92 % | 4 |
+| `#d97706` | `amber-600` | 95 % | 4 |
+| `#92400e` | `amber-800` | 82 % | 4 |
+| `#166534` | `green-800` | 64 % | 4 |
+| `#4ade80` | `green-400` | 69 % | 3 |
+| `#16a34a` | `green-600` | 76 % | 2 |
+
+**La mesure qui tranche** — la palette que vous avez validée et qui est écrite
+dans la feuille vit entre **20 % et 51 % de saturation** :
+
+```
+--role-support-success      #6E9E7A   S 20 %
+--role-support-information  #7695AD   S 25 %
+--role-support-error        #C67D7D   S 39 %
+--role-support-warning      #C97F59   S 51 %
+```
+
+Onze des couleurs clandestines sont à **S ≥ 56 %**, jusqu'à **100 %**. Sur un
+tableau de bord sombre, ce n'est pas une nuance différente : c'est un registre
+différent. `.trend--up` rend un vert néon `#4ade80` à dix pixels d'une palette
+qui dit sauge `#6E9E7A`.
+
+**Cinq tokens n'existent nulle part** — leur repli est donc littéralement ce que
+le produit rend, et §5.4 nomme exactement ce piège (« le repli masque
+l'absence ») :
+
+| Token invoqué | Ce qui est réellement rendu | Où |
+|---|---|---|
+| `--bg-soft` | `rgba(255,255,255,0.02)` ×3 | `app.css` |
+| `--bg-elev` | `rgba(0,0,0,0.02)` ×3 | `body_intelligence.css` |
+| `--good` | `#4ade80` ×1 | `app.css` — `.trend--up`, surface **sociale** |
+| `--warn-soft` | `rgba(224,160,48,0.18)` | `app.css` |
+| `--danger-soft` | `rgba(230,80,80,0.18)` | `app.css` |
+
+`--bg-elev → rgba(0,0,0,0.02)` mérite un mot : c'est un film **noir à 2 %** posé
+pour produire une élévation, sur un produit **sombre**. L'élévation qu'il
+prétend créer est invisible par construction. Il a été écrit pour un thème
+clair. Même origine que les 25 `#6b7280`, gris de thème clair.
+
+**Ce que je n'ai PAS fait, et pourquoi.** Je n'ai pas remplacé les 88. Elles
+vivent sur le rapport coach, le score breakdown et `body_intelligence` —
+**des surfaces que vous n'avez pas vues et que je n'ai pas revues**. §5.1 exige
+une exposition avant tout commit UI, et §5.5 dit que la centralité prime : une
+décision opérateur non appliquée (`D7`) passe devant une refonte chromatique que
+j'aurais choisie seul. Le recensement est le livrable ; l'arbitrage est le vôtre.
+
+⚠ `body_intelligence.css` sert une surface **derrière un drapeau éteint**
+(`/body` rend 404, comportement correct). Ses 23 littéraux sont donc **latents**,
+pas visibles aujourd'hui — mais ils s'allumeront avec le drapeau.
+
+### ✅ `O-06` — le profil est revu. Le trou de la revue est fermé.
+
+La revue de nuit s'arrêtait sur un aveu : *« le profil n'a pas pu être revu »*.
+La cause n'était pas le produit mais **mon laboratoire**, dont la base précédait
+la migration `body_measurements.shoulder_width_cm` — d'où un 500.
+
+Reconstruit **au schéma courant** en démarrant l'application sur une base vide :
+elle crée son schéma et amorce son catalogue par ses propres moyens (30 tables,
+102 exercices, 17 gabarits). Ni `alembic upgrade`, ni `seed_db.py` — les deux
+sont sous confirmation humaine. Aucune base de production lue ni écrite.
+
+`/profile` rend **200**. Trois constats, du plus objectif au plus discutable :
+
+1. **« Tape à plat, muscle relâché »** — `profile.html:163`. C'est l'anglais
+   *tape* (mètre ruban) laissé dans une phrase d'impératifs français
+   (« Mesurer le matin, à jeun… »). On lit le verbe *taper*. La consigne dit
+   littéralement de frapper à plat. Correction : « **Mètre ruban** à plat ».
+2. **Quatre liens « Ajouter », deux destinations** (`#quicklog_weight`,
+   `#reference_data`). Mesuré au rendu, pas déduit. Dans une liste de liens de
+   lecteur d'écran, ils sont indiscernables ; à l'œil aussi, hors contexte de
+   ligne.
+3. **La carte alterne sans règle.** `CORPS` est dans une carte, `COMPTE` non,
+   `NOUVELLE MESURE` oui, `MESURES MORPHOLOGIQUES` non, `DONNÉES DE RÉFÉRENCE`
+   oui. L'échelle de profondeur est appliquée un bloc sur deux. Rien dans le
+   contenu ne justifie l'alternance — c'est le défaut que le socle existe pour
+   fermer, sur la surface qui porte votre nom.
+
+### 🔎 `O-07` — l'escouade n'a jamais reçu le traitement
+
+Vue au rendu pour la première fois. Outre `D7` :
+
+* **Le `<select>` de partage est blanc pur** — contrôle de formulaire non stylé,
+  hérité du navigateur. C'est **l'objet le plus lumineux de tout l'écran**, et
+  ce n'est pas l'action principale. Défaut objectif, pas un choix de goût.
+* **« Zone danger »** — calque de *danger zone*. Le français dit « zone de
+  danger », ou mieux ici : « Actions irréversibles ».
+* **« owner » / « member »** — les badges de rôle ne sont pas traduits.
+* Le tableau de classement à 5 colonnes **se replie mal** en 430 px : « 600.0
+  pts » passe sur deux lignes, les libellés de grade sur trois.
+
+⚠ **Décisions de NOMMAGE, donc les vôtres** — je ne les ai pas prises :
+« squad » (« Supprimer la squad », « Retour aux squads »), « Challenges »,
+« template » (« Recommander un template »). Ce sont des noms de
+fonctionnalité, pas des fautes ; les renommer est un choix produit.
+
+⚠ **Un chevauchement que je n'ai PAS rapporté** : sur la capture pleine page,
+la barre de navigation basse paraît recouvrir un formulaire. Vérifié au
+viewport et en CSS — `main` porte `padding-bottom: 96px`, la barre est
+compensée. C'était un artefact de capture d'un élément `fixed`, le même que
+celui déjà rencontré cette nuit. Le signaler aurait coûté une correction
+inutile sur un défaut inexistant.
+
 ---
 
 ## Compte des points ouverts
