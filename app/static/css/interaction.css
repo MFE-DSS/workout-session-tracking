@@ -479,3 +479,102 @@
 .segmented--stacked .segmented__option input:checked + span {
   box-shadow: inset 2px 0 0 var(--accent);
 }
+
+/* ── `Sb_UI_PLAN_01` — MON PLAN : LA SEMAINE COMME UNE SÉQUENCE ────────────
+ *
+ * La carte du plan disait sa substance en une phrase — « 4 séances/semaine ».
+ * Le planificateur, lui, avait construit quatre séances avec leurs zones et
+ * leurs doses ; la structure était jetée trois fois avant l'écran.
+ *
+ * Ces règles transposent la grammaire du viseur de séance : une SÉQUENCE
+ * visible, un SOUVERAIN promu, un FIL pour la suite. Rien n'est inventé —
+ * chaque valeur vient du plan.
+ */
+
+.plan-seq {
+  display: flex;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+}
+
+/* Chaque séance est une cible de la taille du standard produit : la séquence
+   sera cliquable le jour où une séance sera consultable, et une pastille de
+   12 px ne pourrait pas le devenir sans être refaite. */
+.plan-seq__step {
+  flex: 1;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+/* `is-entry`, pas `is-active` : le programme n'est pas lancé, aucune séance
+   n'est en cours. Le cerclage dit « on commence par là », pas « c'est
+   aujourd'hui ». */
+.plan-seq__step.is-entry {
+  color: var(--fg);
+  font-weight: 700;
+  border-color: var(--accent);
+}
+
+.plan-hero { margin: 0; }
+
+.plan-hero__index {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 4px;
+}
+
+/* Le souverain. 22 px contre 14 px pour le contexte : le rapport est celui du
+   viseur entre son relevé et ses étiquettes. */
+.plan-hero__zones {
+  display: block;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.plan-hero__dose {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-thread {
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--border);
+}
+
+.plan-thread__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--fg-dim);
+}
+
+.plan-thread__row b { color: var(--fg-2, var(--fg)); font-weight: 600; }
+.plan-thread__dose { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+.plan-gap { margin-top: var(--space-sm); }
+.plan-gap__list { margin: 0; padding-left: 1.1rem; }

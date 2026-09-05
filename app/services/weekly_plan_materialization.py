@@ -79,6 +79,31 @@ BLOCKED_NO_PRESCRIPTION = "no_exercise_carries_a_set_prescription"
 
 
 @dataclass(frozen=True)
+class SessionSummary:
+    """Ce qu'UNE séance proposée travaille, et à quelle dose.
+
+    `Sb_UI_PLAN_01` — CE RÉSUMÉ EXISTE PARCE QUE LA STRUCTURE ÉTAIT JETÉE.
+
+    Le planificateur produit `WeeklyPlan.sessions` — quatre séances, chacune
+    avec ses créneaux et ses prescriptions. `_prescribed_sessions()` les
+    reconstitue en ne gardant que les créneaux exécutables. Puis
+    `MaterializationReadiness` n'en gardait que le NOMBRE, et l'écran écrivait
+    « 4 séances/semaine ».
+
+    La structure était calculée, puis jetée trois fois avant d'atteindre
+    l'utilisateur. L'écran n'était pas pauvre parce que la donnée l'était.
+    """
+
+    index: int
+    #: Les zones travaillées, dédupliquées, DANS L'ORDRE DES CRÉNEAUX — cet
+    #: ordre est celui du planificateur, il porte la structure de la séance.
+    #: Trier alphabétiquement le détruirait.
+    zone_labels: tuple[str, ...] = ()
+    exercises: int = 0
+    planned_sets: int = 0
+
+
+@dataclass(frozen=True)
 class MaterializationReadiness:
     """Verdict de matérialisation — jamais un simple booléen.
 
@@ -93,6 +118,9 @@ class MaterializationReadiness:
     sessions: int = 0
     exercises: int = 0
     planned_sets: int = 0
+    #: `Sb_UI_PLAN_01` — les séances elles-mêmes, pas seulement leur compte.
+    #: Additif : `sessions` reste, ses consommateurs ne bougent pas.
+    session_summaries: tuple[SessionSummary, ...] = ()
     basis: tuple[str, ...] = field(default_factory=tuple)
 
     @property
@@ -166,9 +194,25 @@ def assess_materialization(plan: WeeklyPlan) -> MaterializationReadiness:
             "brouillon — la lacune reste visible dans le plan"
         )
 
+    # `Sb_UI_PLAN_01` — on garde ce qu'on vient de calculer.
+    # `sessions` porte déjà (index, créneaux exécutables) ; en tirer les zones
+    # ne coûte rien et évite que l'écran ait à redemander le plan.
+    resumes = tuple(
+        SessionSummary(
+            index=index,
+            zone_labels=tuple(dict.fromkeys(
+                slot.zone_label for slot in slots if slot.zone_label
+            )),
+            exercises=len(slots),
+            planned_sets=sum(slot.planned_sets for slot in slots),
+        )
+        for index, slots in sessions
+    )
+
     return MaterializationReadiness(
         status=status,
         blocked_reasons=tuple(blocked),
+        session_summaries=resumes,
         unmet_zones=unmet_zones,
         unserved_priorities=unserved,
         sessions=len(sessions),

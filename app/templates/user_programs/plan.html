@@ -59,41 +59,114 @@
   {% set p = weekly_plan_proposal %}
   <section class="card">
     <h2 class="card__title">Programme proposé pour ta semaine</h2>
-    <p class="text-dim" style="margin-bottom:.75rem;">
-      {{ p.sessions }} séance{{ 's' if p.sessions > 1 }}/semaine ·
-      {{ p.exercises }} exercice{{ 's' if p.exercises > 1 }} ·
-      {{ p.planned_sets }} série{{ 's' if p.planned_sets > 1 }} planifiée{{ 's' if p.planned_sets > 1 }}
-    </p>
-    {% if p.priorities %}
-      <p class="text-dim" style="font-size:.9em;margin:0 0 .75rem;">
-        Priorités déclarées : {{ p.priorities | join(', ') }}
-      </p>
-    {% endif %}
+    {# `Sb_UI_PLAN_01` — LA GRAMMAIRE DU VISEUR, TRANSPOSÉE À LA SEMAINE.
 
-    {# CE QUE LE PLAN NE TIENT PAS SE DIT ICI. Une proposition qui n'annonce
-       que son volume laisse croire qu'elle couvre tout ce qui a été déclaré.
-       Les trois branches sont exhaustives et mutuellement exclusives : une
-       priorité non programmable, un volume en deçà, ou rien à signaler. #}
-    {% if p.status == 'constraint_unmet' %}
-      <p style="margin:.25rem 0;"><strong>Proposition partielle</strong> — une priorité que tu as déclarée n'est pas programmable :</p>
-      <ul style="margin:.25rem 0 .75rem 1.25rem;">
-        {% for constraint in p.constraints %}<li>{{ constraint }}</li>{% endfor %}
-      </ul>
-    {% elif p.status == 'partial' %}
-      <p style="margin:.25rem 0 .75rem;">
-        <strong>Proposition partielle</strong> — {{ p.unmet_zones }} zone{{ 's' if p.unmet_zones > 1 }}
-        rest{{ 'ent' if p.unmet_zones > 1 else 'e' }} sous le volume visé. Le programme est utilisable tel quel.
+       Cette carte disait « 4 séances/semaine · 24 exercices · 96 séries
+       planifiées » : la substance du plan rendue comme une PHRASE, en corps de
+       texte, alors que le planificateur avait construit QUATRE séances avec
+       leurs zones et leurs doses. La structure était jetée trois fois avant
+       d'arriver ici.
+
+       Le viseur de séance résout le même problème : une suite d'étapes
+       identiques, dont une est courante. Sa grammaire s'applique telle quelle.
+
+         · la bande `⁄2 —1 —2 —3`      → les quatre séances, la première cerclée
+         · les puits `kg` / `reps`     → ce que la prochaine séance travaille
+         · `3x 6-10` en support        → sa dose, en dessous
+         · `ÉCHAUFFEMENT SUIVANT`      → `Créer le programme proposé`
+         · la carte `E2` en dessous    → le fil des séances suivantes
+         · `ADAPTER (6)`               → `Ce qui n'est pas programmable (n)`
+
+       ⚠ CE QUI EST PROMU, ET CE QUI NE L'EST PAS. Le viseur promeut l'étape
+       COURANTE. Ici aucune séance ne l'est — le programme n'est pas même créé.
+       La première est promue comme POINT D'ENTRÉE, pas comme échéance :
+       « par quoi ça commence », jamais « ce que tu dois faire aujourd'hui ».
+       Promouvoir celle qui sert le mieux les priorités déclarées aurait été un
+       moteur de recommandation, ce que `OPERATOR_DECISION C8` interdit. #}
+    {% if p.session_summaries %}
+      <ol class="plan-seq" aria-label="Les séances de la semaine proposée">
+        {% for s in p.session_summaries %}
+          <li class="plan-seq__step{% if loop.first %} is-entry{% endif %}">
+            {{ s.index }}
+            <span class="sr-only">
+              séance {{ s.index }}{% if loop.first %} — par laquelle le programme commence{% endif %}
+            </span>
+          </li>
+        {% endfor %}
+      </ol>
+
+      {% set premiere = p.session_summaries[0] %}
+      <p class="plan-hero">
+        <span class="plan-hero__index">Le programme commence par</span>
+        <span class="plan-hero__zones">{{ premiere.zone_labels[:3] | join(' · ') }}</span>
+        <span class="plan-hero__dose">
+          {{ premiere.exercises }} exercice{{ 's' if premiere.exercises > 1 }} ·
+          {{ premiere.planned_sets }} série{{ 's' if premiere.planned_sets > 1 }}
+        </span>
       </p>
     {% else %}
-      <p style="margin:.25rem 0 .75rem;">Toutes les zones visées sont couvertes.</p>
+      {# Repli : le compte, faute de mieux — jamais un cadre vide (`A4`). #}
+      <p class="text-dim" style="margin-bottom:.75rem;">
+        {{ p.sessions }} séance{{ 's' if p.sessions > 1 }}/semaine ·
+        {{ p.exercises }} exercice{{ 's' if p.exercises > 1 }} ·
+        {{ p.planned_sets }} série{{ 's' if p.planned_sets > 1 }} planifiée{{ 's' if p.planned_sets > 1 }}
+      </p>
     {% endif %}
 
+    {# « Priorités déclarées » VIVAIT ICI ET DANS LE BLOC DU HAUT — deux fois
+       la même phrase, à deux écrans de distance. Le bloc « Ce que tu as
+       déclaré » est sa place : c'est ce qu'il annonce. #}
+
+    {# CE QUE LE PLAN NE TIENT PAS — un TIROIR COMPTÉ, plus un paragraphe.
+       L'avertissement occupait quatre lignes de prose et plus de place que le
+       plan lui-même. Rien n'est caché : le nombre le rend visible depuis
+       l'extérieur, et le détail est à un geste. Même patron qu'`ADAPTER (6)`
+       sur le viseur. #}
+    {% if p.status == 'constraint_unmet' and p.constraints %}
+      <details class="disclosure plan-gap">
+        <summary>
+          Ce qui n'est pas programmable ({{ p.constraints | length }})
+        </summary>
+        <div class="disclosure__panel">
+          <ul class="plan-gap__list">
+            {% for constraint in p.constraints %}<li>{{ constraint }}</li>{% endfor %}
+          </ul>
+        </div>
+      </details>
+    {% elif p.status == 'partial' %}
+      <details class="disclosure plan-gap">
+        <summary>
+          Zones sous le volume visé ({{ p.unmet_zones }})
+        </summary>
+        <div class="disclosure__panel">
+          Le programme est utilisable tel quel : ces zones reçoivent moins que
+          la bande visée, elles ne sont pas absentes.
+        </div>
+      </details>
+    {% endif %}
     <form method="post" action="{{ url_for('user_program_from_weekly_plan') }}">
       <button type="submit" class="btn btn--primary">Créer le programme proposé</button>
     </form>
     <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
       Crée un <strong>brouillon</strong> modifiable. Rien n'est publié ni lancé sans ton accord.
     </p>
+
+    {# LE FIL — ce qui vient après la première séance, comme la carte `E2` sous
+       le viseur. Chaque séance dit ce qu'elle travaille : c'est la seule chose
+       qui les distingue, et c'est précisément ce que « 4 séances/semaine »
+       taisait. #}
+    {% if p.session_summaries and p.session_summaries | length > 1 %}
+      <ul class="plan-thread">
+        {% for s in p.session_summaries[1:] %}
+          <li class="plan-thread__row">
+            <span><b>Séance {{ s.index }}</b> · {{ s.zone_labels[:3] | join(' · ') }}</span>
+            <span class="plan-thread__dose">{{ s.planned_sets }} séries</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+
   </section>
 {% else %}
   {# Pas de plan, et on dit POURQUOI plutôt que d'afficher un cadre vide —

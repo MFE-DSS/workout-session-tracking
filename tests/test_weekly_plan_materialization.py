@@ -354,7 +354,40 @@ class TestUserSurface:
                 db, get_test_user_id(), sessions_per_week=4)
 
         page = html.unescape(client.get(self.PLAN_URL).text)
-        assert "Proposition partielle" in page
+
+        # `Sb_UI_PLAN_01` — MIGRÉE, ET L'INVARIANT EST RENFORCÉ.
+        #
+        # Cette garde exigeait la chaîne « Proposition partielle ». Le manque
+        # est désormais annoncé par un TIROIR COMPTÉ — « Ce qui n'est pas
+        # programmable (1) » — qui dit COMBIEN plutôt que d'employer un
+        # adjectif, et dont le détail est à un geste.
+        #
+        # Ce qu'elle protège n'est pas le mot, c'est l'HONNÊTETÉ : un plan
+        # incomplet ne doit pas se présenter comme complet. Deux assertions
+        # plutôt qu'une chaîne — et la seconde est celle que l'ancienne
+        # version NE FAISAIT PAS.
+        # Deux formes honnêtes, selon la nature du manque — une priorité
+        # déclarée qu'aucun exercice ne sert, ou un volume sous la bande. Les
+        # deux annoncent un COMPTE ; la garde accepte l'une ou l'autre et
+        # n'impose aucune formulation.
+        annonce = next(
+            (m for m in ("n'est pas programmable", "sous le volume visé")
+             if m in page),
+            None,
+        )
+        assert annonce, (
+            "un plan partiel ne dit plus ce qu'il ne tient pas"
+        )
+        # ⚠ ET LE MANQUE EST ANNONCÉ AVANT LE BOUTON QUI CRÉE.
+        #
+        # Ma première écriture de la carte a déplacé l'avertissement SOUS le
+        # bouton « Créer le programme proposé ». La page le disait toujours —
+        # l'assertion d'origine serait passée — mais l'utilisateur pouvait
+        # agir avant de le lire. Un caveat sur ce qu'on s'apprête à créer se
+        # place avant l'action, jamais après.
+        assert page.index(annonce) < page.index("Créer le programme proposé"), (
+            "l'avertissement est passé sous le bouton qui crée le programme"
+        )
 
     def test_the_action_creates_a_draft_and_lands_on_the_editor(self, client):
         from app.database import SessionLocal
