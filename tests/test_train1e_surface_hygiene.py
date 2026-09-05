@@ -99,7 +99,20 @@ def test_the_history_row_is_the_primary_action(client):
     """La ligne entière est un lien vers la séance : c'est elle l'action, pas
     un contrôle posé à côté."""
     body = _uncommented((TEMPLATES / "history.html").read_text(encoding="utf-8"))
-    assert 'class="session-card"' in body
+    # `Sb_UI_HISTORIQUE_01` — ON CHERCHE LE JETON, PLUS L'ATTRIBUT ENTIER.
+    #
+    # La garde exigeait `class="session-card"` au caractère près. La carte porte
+    # désormais une seconde classe — `history-item__card`, qui lui permet enfin
+    # d'être stylée depuis une feuille plutôt que depuis un attribut `style=` —
+    # et la garde est tombée, alors que ce qu'elle protège, « la ligne entière
+    # EST le lien », n'a pas bougé d'un pouce.
+    #
+    # Troisième garde de cette session à épingler la forme exacte d'un attribut
+    # de classe. Le motif est assez fréquent pour être nommé : une garde qui
+    # exige une ÉCRITURE interdit le refactoring sans rien protéger de plus.
+    assert re.search(r'<a class="[^"]*\bsession-card\b[^"]*"', body), (
+        "la ligne n'est plus une carte-lien"
+    )
     assert "url_for('session_detail'" in body
 
 

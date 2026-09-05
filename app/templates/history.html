@@ -37,17 +37,35 @@
     {% for s in sessions %}
       {% set stats = session_stats[s.id] %}
       <li class="history-item {% if s.excluded_from_stats %}history-item--excluded{% endif %}">
-        <a class="session-card" href="{{ url_for('session_detail', session_id=s.id) }}" style="display:block;padding:var(--space-md);border-radius:var(--radius);background:var(--surface);">
-          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:var(--space-sm);margin-bottom:var(--space-xs);">
-            <span class="session-card__name" style="font-weight:600;font-size:14px;">{{ s.template_name_snapshot }}</span>
-            <span style="font-size:12px;color:var(--fg-dim);white-space:nowrap;">
-              {{ (s.started_at | local).strftime('%a %d/%m %H:%M') }}
+        {# `Sb_UI_HISTORIQUE_01` — LES STYLES EN LIGNE SORTENT DE LA CARTE.
+           Fond, retrait, rayon et les deux rangées flex étaient écrits dans des
+           attributs `style=`. Rien de visible n'en souffrait — et c'est le
+           problème : aucune classe ne portait l'apparence de cet objet, donc
+           rien ne pouvait la faire évoluer, ni la souder à sa commande.
+           C'est ce qui bloquait la correction demandée. #}
+        <a class="session-card history-item__card" href="{{ url_for('session_detail', session_id=s.id) }}">
+          <div class="history-item__head">
+            <span class="session-card__name">{{ s.template_name_snapshot }}</span>
+            <span class="history-item__date">
+              {# `Sb_UI_HISTORIQUE_01` — `strftime('%a …')` RENDAIT L'ANGLAIS.
+                 `%a` prend l'abréviation de la locale du PROCESSUS, pas celle
+                 du produit : « Sat 05/09 07:54 », dix fois par écran. Le filtre
+                 `date_fr` réunit `local` et la table française qui existaient
+                 déjà séparément. L'heure de début part avec : sur une liste
+                 d'historique, la minute ne se relit jamais. #}
+              {{ s.started_at | date_fr }}
             </span>
           </div>
-          <div style="display:flex;gap:var(--space-xs);flex-wrap:wrap;">
-            <span class="badge badge--{{ s.status }}">
-              {% if s.status == 'in_progress' %}en cours{% else %}terminée{% endif %}
-            </span>
+          <div class="history-item__badges">
+            {# `Sb_UI_HISTORIQUE_01` — ON MARQUE L'EXCEPTION, PAS LA NORME.
+               Le chip « terminée » était la seule chose colorée de la carte, et
+               il redisait deux fois ce que la carte disait déjà : l'onglet de
+               filtre actif, et le mot « durée » du chip voisin (une séance en
+               cours dit « depuis »). Sur un historique, terminée EST la norme.
+               « en cours » reste, parce que c'est l'exception. #}
+            {% if s.status == 'in_progress' %}
+              <span class="badge badge--in_progress">en cours</span>
+            {% endif %}
             {% if stats.total > 0 %}
               <span class="badge badge--neutral">{{ stats.done }}/{{ stats.total }} exos</span>
             {% endif %}

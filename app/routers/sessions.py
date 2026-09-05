@@ -63,6 +63,7 @@ from app.services.stats import (
     last_time_by_exercise_code,
     summarise_current_exercise,
 )
+from app.services.time_format import WEEKDAY_LABELS
 from app.services.user_program_launch import is_owned_published_template
 from app.templating import local_weekday_iso, templates
 
@@ -228,15 +229,12 @@ def _build_overload_placeholder(hint: OverloadHint) -> dict | None:
     return {"weight": weight, "reps": reps}
 
 
-WEEKDAY_LABELS = {
-    1: "Lundi",
-    2: "Mardi",
-    3: "Mercredi",
-    4: "Jeudi",
-    5: "Vendredi",
-    6: "Samedi",
-    7: "Dimanche",
-}
+# `Sb_UI_HISTORIQUE_01` — `WEEKDAY_LABELS` A QUITTÉ CE ROUTEUR pour
+# `services/time_format`. Le vocabulaire du produit n'a rien à faire dans une
+# couche de transport : logé ici, avec un seul consommateur, rien ne signalait
+# son existence à qui écrivait un autre gabarit — et l'historique a fini par
+# rendre ses jours en anglais faute de savoir que la table existait.
+# (import en tête de fichier)
 
 
 def _positive_int(raw: str | None) -> int | None:

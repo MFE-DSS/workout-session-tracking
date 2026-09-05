@@ -304,9 +304,60 @@ a.text-muted::after,
  * exception d'espacement, déjà satisfait avant cette tranche). Aucune
  * non-conformité réglementaire n'est corrigée ici. */
 
+/* `Sb_UI_HISTORIQUE_01` — LA CARTE ET SA COMMANDE DEVIENNENT UN SEUL OBJET.
+ *
+ * « Gérer cette séance » vivait HORS du cadre de la carte, aligné au bord de
+ * l'item alors que la carte a son propre retrait. Structurellement il était
+ * bien dans l'item — vérifié — mais l'œil lisait une étiquette de page posée
+ * entre deux cartes, avec le même espace au-dessus et au-dessous : rien ne
+ * disait à laquelle des deux elle appartenait.
+ *
+ * Carte et bande partagent maintenant fond, bordure et rayon, séparées par un
+ * filet. La commande appartient visiblement à la séance qu'elle commande.
+ *
+ * ⚠ Ces règles n'étaient PAS ÉCRIVABLES avant cette tranche : le fond, le
+ * retrait et le rayon de la carte vivaient dans un attribut `style=`, que
+ * rien ne peut surcharger proprement. Sortir les styles en ligne n'était pas
+ * du rangement, c'était la condition du correctif. */
+.history-item__card {
+  display: block;
+  margin-bottom: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+
+.history-item__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.history-item__date {
+  font-size: 12px;
+  color: var(--fg-dim);
+  white-space: nowrap;
+}
+
+.history-item__badges {
+  display: flex;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+.history-item {
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
 .history-item__actions {
-  margin-top: var(--space-xs);
-  margin-bottom: var(--space-sm);
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
 /* Le déclencheur devient un contrôle à part entière : 44 px de haut, pleine
@@ -314,10 +365,27 @@ a.text-muted::after,
 .history-item__toggle {
   display: flex;
   align-items: center;
+  /* `Sb_UI_HISTORIQUE_01` — le déclencheur vit désormais DANS la bande, donc
+     il prend le retrait horizontal de la carte, et un chevron dit qu'il
+     s'ouvre. Sans lui, une bande grise sous une carte ne s'annonce pas
+     comme un contrôle. La hauteur de 44 px ne bouge pas. */
+  justify-content: space-between;
+  padding: 0 var(--space-md);
   min-height: 44px;
   cursor: pointer;
   font-size: 12px;
   color: var(--fg-dim);
+}
+
+.history-item__toggle::after {
+  content: "\25BE";
+  font-size: 11px;
+  color: var(--fg-dim);
+  transition: transform 0.15s ease;
+}
+
+.history-item__actions[open] > .history-item__toggle::after {
+  transform: rotate(180deg);
 }
 
 /* Les boutons ne sont tapables que la divulgation ouverte — c'est là qu'il

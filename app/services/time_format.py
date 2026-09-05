@@ -8,6 +8,62 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+#: Les jours de la semaine, en français, indexés ISO (1 = lundi).
+#:
+#: `Sb_UI_HISTORIQUE_01` — PROMUS DEPUIS `routers/sessions.py`. Ils y vivaient,
+#: avec un unique consommateur, et un routeur n'est pas un endroit où loger le
+#: vocabulaire d'un produit : rien ne signalait leur existence à qui écrivait un
+#: autre gabarit. L'historique a donc écrit sa propre version, en appelant
+#: `strftime('%a …')` — qui rend la locale du PROCESSUS, c'est-à-dire l'anglais.
+#: « Sat 05/09 », dix fois par écran, dans une interface française.
+WEEKDAY_LABELS: dict[int, str] = {
+    1: "Lundi",
+    2: "Mardi",
+    3: "Mercredi",
+    4: "Jeudi",
+    5: "Vendredi",
+    6: "Samedi",
+    7: "Dimanche",
+}
+
+#: Les mêmes, abrégés — DÉRIVÉS, jamais recopiés. Une seconde table à la main
+#: divergerait de la première au premier ajout, et c'est exactement la faute que
+#: cette tranche corrige ailleurs.
+WEEKDAY_SHORT: dict[int, str] = {k: v[:3] for k, v in WEEKDAY_LABELS.items()}
+
+
+def format_date_short(dt: datetime | None) -> str:
+    """« Sam 05/09 » — jour abrégé en français, sans l'heure.
+
+    L'heure de DÉBUT ne survit pas au tri : sur une liste d'historique, personne
+    ne relit à quelle minute il a commencé il y a trois semaines. Le jour de la
+    semaine, lui, porte l'habitude d'entraînement — c'est la seule chose que la
+    date brute ne donne pas d'un coup d'œil.
+
+    ⚠ Attend un datetime DÉJÀ localisé (filtre `| local`). Formater un UTC brut
+    décalerait le jour de la semaine d'un cran une nuit sur deux.
+    """
+    if dt is None:
+        return "—"
+    return f"{WEEKDAY_SHORT[dt.isoweekday()]} {dt.strftime('%d/%m')}"
+
+
+def format_datetime_short(dt: datetime | None) -> str:
+    """« Sam 05/09 07:54 » — la même, quand l'heure porte du sens.
+
+    Deux formes, et la distinction est un choix, pas une commodité :
+
+    * sur une LISTE d'historique, l'heure de début ne se relit jamais —
+      `format_date_short` la retire ;
+    * sur le RÉCAP d'une séance, elle borne la séance (« 07:54 → 08:46 ») :
+      la retirer effacerait l'information même du bloc.
+
+    Dérivée de l'autre, jamais recopiée : le jour reste écrit à un seul endroit.
+    """
+    if dt is None:
+        return "—"
+    return f"{format_date_short(dt)} {dt.strftime('%H:%M')}"
+
 
 def _coerce(dt: datetime, ref: datetime) -> datetime:
     if dt.tzinfo is None and ref.tzinfo is not None:
