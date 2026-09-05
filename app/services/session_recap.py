@@ -11,8 +11,12 @@ from typing import Any
 
 from app.models.session import WorkoutSession
 from app.services.anomalies import compute_anomalies
-from app.services.confidence import compute_confidence_score, level_for
+from app.services.confidence import LEVEL_LABELS, compute_confidence_score, level_for
 from app.services.muscle_mapping import classify_exercise
+from app.services.progress_signals import (
+    DECLARED_CONCENTRATION_LABELS,
+    DECLARED_STATE_LABELS,
+)
 from app.services.stats import summarise_current_exercise
 from app.services.substitution import actual_exercise_name
 from app.services.time_format import format_duration_short
@@ -216,15 +220,34 @@ def build_recap(
             "completion_pct": completion_pct,
             "substitution_count": substitution_count,
             "bodyweight_kg": session.bodyweight_kg,
+            # ⚠ LES VALEURS RESTENT, LES LIBELLÉS S'AJOUTENT.
+            #
+            # `concentration` et `global_state` sont des IDENTIFIANTS
+            # (`low`, `tired`) : d'autres consommateurs les lisent, et le
+            # gabarit les rendait tels quels — « Concentration — low » sur une
+            # interface française.
+            #
+            # Les remplacer casserait ce qui les lit ; on les DOUBLE d'un
+            # libellé, cité mot pour mot du formulaire que l'utilisateur a
+            # rempli. Le gabarit affiche le libellé et ignore la clé.
             "concentration": session.concentration,
+            "concentration_label": DECLARED_CONCENTRATION_LABELS.get(
+                session.concentration or ""
+            ),
             "global_state": session.global_state,
+            "global_state_label": DECLARED_STATE_LABELS.get(
+                session.global_state or ""
+            ),
             # Sb_SESSION_REVIEW_SIGNAL_01 — la note de séance était saisie
             # puis jamais relue. `concentration` et `global_state` étaient
             # déjà restitués ; seule la phrase libre manquait.
             "note": session.free_note,
             "cardio": _cardio_block(session, kind),
             "confidence_score": confidence_score,
+            # `eleve` / `moyen` / `faible` sont des clés — elles partent dans
+            # l'export JSON et CSV. Le récap les rendait à l'écran, sans accent.
             "confidence_level": confidence_level,
+            "confidence_label": LEVEL_LABELS.get(confidence_level),
             "top_progression": _top_progression(session),
             "zones_touched": _zones_touched(session),
             "anomalies": [a.to_dict() for a in anomalies],

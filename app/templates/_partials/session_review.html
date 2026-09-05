@@ -2,99 +2,87 @@
 
    Receives `session_review` dict from build_session_review. Each sub-card
    degrades to an explicit "Non déductible" rather than inventing a value
-   (Sx_27 §16). Mobile-first 360×640, no horizontal scroll. #}
+   (Sx_27 §16). Mobile-first 360×640, no horizontal scroll.
+
+   `Sb_UI_SESSION_DONE_01` (2026-09-06) — les 23 styles en ligne de ce partiel
+   partent AVEC la refonte, pas dans une tranche de nettoyage séparée : rouvrir
+   le même gabarit deux fois coûterait deux expositions `§5.1` pour un seul
+   changement visuel. #}
 
 {% if session_review %}
-<section class="session-review" aria-label="Session review"
-         style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-md);">
+<section class="session-review" aria-label="Session review">
 
   {# ── Header: quality + implicit ── #}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Récap séance
-    </div>
+  <div class="card tile sr-block">
+    <div class="tile__label sr-block__label">Récap séance</div>
     {# Sb_27.5 — narrative phrase one-liner #}
     {% if session_review.narrative and session_review.narrative.available %}
-      <div style="font-size:13px;opacity:0.85;margin-top:4px;font-style:italic;">
-        {{ session_review.narrative.phrase }}
-      </div>
+      <p class="sr-narrative">{{ session_review.narrative.phrase }}</p>
     {% endif %}
 
-    {% if session_review.summary and session_review.summary.available %}
-    <div style="font-size:18px;font-weight:600;margin-top:4px;">
-      {{ session_review.summary.template_name }}
-      {% if session_review.summary.duration_min is not none %}
-        <span style="opacity:0.6;font-weight:400;font-size:13px;">· {{ session_review.summary.duration_min }} min</span>
-      {% elif session_review.summary.duration_note %}
-        <span style="opacity:0.6;font-weight:400;font-size:13px;">· durée {{ session_review.summary.duration_note }}</span>
-      {% endif %}
-    </div>
-    {% endif %}
+    {# ⚠ LE NOM DE LA SÉANCE ÉTAIT RENDU DEUX FOIS.
+       `session_done.html` l'affiche déjà en `<h1>`, avec sa durée dans la
+       ligne de méta — 200 px plus haut, mot pour mot, à la même taille de
+       18 px. Mesuré au rendu : « Push A — Pecs épaisseur + Delts + Triceps »
+       deux fois sur le même écran.
 
-    <div style="display:flex;flex-wrap:wrap;gap:var(--space-sm);margin-top:8px;font-size:13px;">
+       Ce n'est pas une soustraction (`§5.3`) : ni le nom ni la durée ne
+       disparaissent du produit, ils restent là où ils étaient déjà — dans
+       l'en-tête, qui est leur place. Ce qui part, c'est la RÉPÉTITION.
+
+       Même défaut, même semaine, que la carte « Dernière séance » de
+       l'accueil. #}
+
+    <p class="sr-facts">
       {% if session_review.quality and session_review.quality.available %}
         {% if session_review.quality.score is not none %}
-          <span><strong>Qualité :</strong> {{ session_review.quality.score }}</span>
+          {# Virgule décimale : le produit est en français, et « 55.0 » détonne à
+             côté du « 75,6 kg » rendu deux blocs plus bas. #}
+          <span><strong>Qualité :</strong> {{ session_review.quality.score | string | replace(".", ",") }}</span>
         {% elif session_review.quality.note %}
-          <span style="opacity:0.7;"><strong>Qualité :</strong> {{ session_review.quality.note }}</span>
+          <span class="sr-facts__muted"><strong>Qualité :</strong> {{ session_review.quality.note }}</span>
         {% endif %}
       {% endif %}
 
       {% if session_review.implicit_signal and session_review.implicit_signal.available %}
         {% if session_review.implicit_signal.label %}
           <span><strong>Ressenti :</strong> {{ session_review.implicit_signal.label }}
-            <span style="opacity:0.5;">({{ session_review.implicit_signal.source_ratio }})</span>
+            <span class="sr-facts__ratio">({{ session_review.implicit_signal.source_ratio }})</span>
           </span>
         {% elif session_review.implicit_signal.note %}
-          <span style="opacity:0.7;"><strong>Ressenti :</strong> {{ session_review.implicit_signal.note }}</span>
+          <span class="sr-facts__muted"><strong>Ressenti :</strong> {{ session_review.implicit_signal.note }}</span>
         {% endif %}
       {% endif %}
-    </div>
+    </p>
   </div>
 
   {# ── Notable movements ── #}
   {% if session_review.notable_movements and session_review.notable_movements.available %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Mouvements remarquables
-    </div>
+  <div class="card tile sr-block">
+    <div class="tile__label sr-block__label">Mouvements remarquables</div>
     {% if session_review.notable_movements['movements'] %}
-      <ul style="list-style:none;padding:0;margin:8px 0 0 0;display:flex;flex-direction:column;gap:6px;">
+      <ul class="sr-movements">
         {% for movement in session_review.notable_movements['movements'] %}
-          <li style="font-size:14px;">
+          <li>
             <strong>{{ movement.exercise_name }}</strong>
-            <span style="opacity:0.7;">— {{ movement.reasons | join(' · ') }}</span>
+            <span class="sr-movements__why">— {{ movement.reasons | join(' · ') }}</span>
           </li>
         {% endfor %}
       </ul>
     {% else %}
-      <div style="font-size:13px;opacity:0.6;margin-top:6px;">
-        {{ session_review.notable_movements.note }}
-      </div>
+      <p class="sr-empty">{{ session_review.notable_movements.note }}</p>
     {% endif %}
   </div>
   {% endif %}
 
   {# ── Next hint ── #}
   {% if session_review.next_hint and session_review.next_hint.available %}
-  <div class="card tile" style="padding:var(--space-md);">
-    <div class="tile__label" style="font-weight:600;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;opacity:0.7;">
-      Prochaine action
-    </div>
-    <div style="font-size:14px;margin-top:6px;">
-      {{ session_review.next_hint.phrase }}
-    </div>
-    <div style="display:flex;gap:var(--space-sm);margin-top:10px;flex-wrap:wrap;">
-      <a href="/"
-         class="tile tile--secondary"
-         style="padding:8px 14px;font-size:13px;text-decoration:none;">
-        Retour Accueil
-      </a>
-      <a href="{{ url_for('launcher') }}"
-         class="tile tile--secondary"
-         style="padding:8px 14px;font-size:13px;text-decoration:none;">
-        Nouvelle séance →
-      </a>
+  <div class="card tile sr-block">
+    <div class="tile__label sr-block__label">Prochaine action</div>
+    <p class="sr-hint">{{ session_review.next_hint.phrase }}</p>
+    <div class="sr-exits">
+      <a href="/" class="tile tile--secondary sr-exit">Retour Accueil</a>
+      <a href="{{ url_for('launcher') }}" class="tile tile--secondary sr-exit">Nouvelle séance →</a>
     </div>
   </div>
   {% endif %}

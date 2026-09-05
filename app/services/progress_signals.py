@@ -72,6 +72,25 @@ DECLARED_STATE_LABELS: dict[str, str] = {
     "fatigued": "Fatigué",
 }
 
+#: Le pendant, pour la CONCENTRATION — il n'existait pas.
+#:
+#: Le formulaire de fin de séance demande « Étais-tu focalisé sur tes
+#: mouvements ? » et propose « Focalisé · Correct · Distrait ». Le récap de
+#: séance, lui, rendait la valeur brute : « Concentration — low ».
+#:
+#: Le libellé de l'énergie avait sa table depuis `Sb_SESSION_REVIEW_SIGNAL_01` ;
+#: celui de la concentration n'en a jamais eu. Une des deux questions du bilan
+#: était donc citée, l'autre exposée en clé de programme.
+#:
+#: Mêmes règles que ci-dessus : ce sont les mots que l'utilisateur A VUS au
+#: moment de déclarer, pas des synonymes. Une garde compare cette table au
+#: gabarit et rougit si l'une dérive.
+DECLARED_CONCENTRATION_LABELS: dict[str, str] = {
+    "high": "Focalisé",
+    "medium": "Correct",
+    "low": "Distrait",
+}
+
 #: Libellé du signal subjectif.
 #:
 #: **Pas « Charge perçue ».** Ce libellé surinterprétait la source. Le

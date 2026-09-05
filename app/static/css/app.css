@@ -5531,3 +5531,147 @@ summary:focus-visible,
  * Le `<small>` reste — il porte une nuance sémantique légitime — mais il
  * cesse de choisir sa taille à notre place. */
 .foot small { font-size: inherit; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   `Sb_UI_SESSION_DONE_01` — LE RÉCAP DE SÉANCE.
+
+   Mesuré avant : 2,20 écrans, 57 blocs de texte — dont **32 à 14 px et 18 à
+   13 px**. Cinquante sur cinquante-sept dans deux corps voisins, et un seul
+   objet au-dessus : le titre, à 18 px.
+
+   Ce n'est pas le brouillard de l'accueil, c'est son inverse — un PLATEAU.
+   Rien n'y domine parce que tout y est à la même hauteur.
+
+   L'écran rejoint l'échelle maison : 32 / 22 / 15 / 12. Le titre de séance
+   prend le rang DISPLAY, les intitulés de bloc le rang SECTION, et les 23
+   attributs `style` du partiel disparaissent avec la refonte.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+.session-review {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.sr-block { padding: var(--space-md); }
+
+/* Rang SECTION — le titre de bloc dominait déjà mal : 11 px sous un corps à
+ * 13–14. Il passe à 22 px, comme sur l'accueil et les seuils. */
+.sr-block__label {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--role-text-secondary);
+  margin: 0;
+}
+
+/* La phrase du moteur : rang BODY, et l'italique conservé — c'est une
+ * narration, pas un fait mesuré. */
+.sr-narrative {
+  margin: var(--space-sm) 0 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--role-text-secondary);
+}
+
+.sr-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin: var(--space-sm) 0 0;
+  font-size: 15px;
+}
+
+/* `opacity: 0.7` et `0.5` atténuaient ce texte : aucun contraste déclarable.
+ * `--role-text-muted` vaut 4,64:1 sur le pire fond réel, et c'est écrit. */
+.sr-facts__muted,
+.sr-facts__ratio { color: var(--role-text-muted); }
+
+.sr-movements {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-sm) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 15px;
+}
+
+.sr-movements__why { color: var(--role-text-muted); }
+
+.sr-empty {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+
+.sr-hint {
+  margin: 6px 0 0;
+  font-size: 15px;
+}
+
+.sr-exits {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* Les deux sorties gardent leurs 44 px de cible : un `padding` de 8 px sur du
+ * texte à 13 px n'y suffisait pas. */
+.sr-exit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+/* Le titre de séance rejoint le rang DISPLAY. */
+.session-done .session-done__title { font-size: 32px; }
+.session-done .card__title {
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--role-text-secondary);
+}
+
+/* ── LE PLATEAU DU RÉCAP REJOINT L'ÉCHELLE ────────────────────────────────
+ * Après le partiel, quarante-deux éléments restaient à 13 ou 14 px dans le
+ * gabarit lui-même : la liste de statistiques, les zones, le tableau par
+ * exercice, les anomalies. Deux corps voisins pour quatre rôles différents.
+ *
+ * Ce qui se LIT passe au rang BODY (15), ce qui ANNOTE au rang MÉTA (12).
+ * Aucune valeur intermédiaire n'est conservée : c'est l'écart qui hiérarchise,
+ * pas la nuance. */
+.session-done .session-done__stats,
+.session-done .session-done__zones-list,
+.session-done .session-done__name,
+.session-done .top-progression__name { font-size: 15px; }
+
+.session-done .session-done__code,
+.session-done .session-done__prog,
+.session-done .session-done__score,
+.session-done .session-done__anomalies-list,
+.session-done .anomaly__icon,
+.session-done .session-done__meta { font-size: 12px; }
+
+/* ⚠ LE CODE D'EXERCICE ÉTAIT EN AMBRE.
+ * `E1`, `E2`… sont des identifiants positionnels du catalogue — une donnée
+ * technique. L'ambre désigne une ACTION ; le poser sur une clé lui fait
+ * promettre un geste qu'elle n'offre pas. Le code reste rendu — il sert à
+ * rapprocher deux séances — mais au rang de la provenance. */
+.session-done .session-done__code {
+  color: var(--role-text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Les deux dernières marches du plateau vivaient sur les `li`, pas sur la
+ * liste : `.session-done__stats li` à 14 px et `.session-done__anomalies-list
+ * li` à 13. Régler la liste ne les atteignait pas. */
+.session-done .session-done__stats li { font-size: 15px; }
+.session-done .session-done__anomalies-list li { font-size: 12px; }
+.session-done .top-progression__delta { font-size: 12px; }

@@ -1,6 +1,7 @@
 """Tests for the /sessions/{id}/done terminal-state route."""
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime
 
 from tests.helpers import get_test_user_id
@@ -249,12 +250,31 @@ def test_done_page_shows_substitution_arrow(client):
 
 
 def test_done_page_shows_confidence_badge(client):
+    """La fiabilité de la saisie est rendue, avec son libellé FRANÇAIS.
+
+    ⚠ `Sb_UI_SESSION_DONE_01` — CETTE GARDE ÉPINGLAIT « Confiance du logging ».
+
+    « logging » est de l'anglais de développeur, et le badge affichait en plus
+    la clé brute `eleve` — un identifiant sans accent, parce que c'en est un :
+    il part tel quel dans l'export JSON et CSV.
+
+    La garde vérifiait la présence de la ligne ; elle gelait au passage sa
+    formulation anglaise. Elle vérifie désormais la PROPRIÉTÉ — la ligne
+    existe, elle porte son badge, et elle ne montre pas de clé.
+    """
     sid = _mk_completed_session()
     r = client.get(f"/sessions/{sid}/done")
     assert r.status_code == 200
     body = r.text
-    assert "Confiance du logging" in body
+    assert "Fiabilité de la saisie" in body
     assert "confidence-badge" in body
+    # La clé pilote la classe ; elle ne doit pas être le texte rendu.
+    texte = re.sub(r"<[^>]+>", " ", body)
+    for cle in ("eleve", "logging"):
+        assert cle not in texte, (
+            f"« {cle} » est rendu à l'écran — c'est une clé de programme, "
+            "pas un mot français"
+        )
 
 
 def test_done_page_shows_zones_block(client):
