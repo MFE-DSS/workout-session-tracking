@@ -177,7 +177,15 @@ def test_every_acquisition_form_sits_behind_an_explicit_update(client):
     # doit pouvoir corriger vite ne se note pas derrière un geste
     # supplémentaire. C'est la décision opérateur, pas un oubli.
     acquisition = src.count('<form method="post"') - src.count('class="quicklog"')
-    disclosures = src.count('class="pstate__edit"')
+    # `Sb_UI_DISCLOSURE_01` — COMPTAGE PAR JETON, PLUS PAR CHAÎNE EXACTE.
+    # Ce comptage cherchait `class="pstate__edit"` au caractère près. Adopter le
+    # composant partagé a fait de l'attribut `class="disclosure pstate__edit"`,
+    # et la garde est tombée — alors que l'invariant qu'elle protège, « chaque
+    # formulaire est derrière un geste », n'avait pas bougé d'un pouce.
+    #
+    # C'est la faute que ce dépôt paie en boucle : épingler une ÉCRITURE au lieu
+    # d'une PROPRIÉTÉ interdit le refactoring sans rien garder de plus.
+    disclosures = len(re.findall(r'class="[^"]*\bpstate__edit\b', src))
     # `UX4_02` / TRAIN 2 — le seuil passe de 3 à 2 : l'éditeur de préférences a
     # quitté le Profil pour **Mon plan**. Ce n'est PAS un assouplissement de la
     # règle — la règle est l'invariant `disclosures >= acquisition` juste en

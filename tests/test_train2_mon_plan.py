@@ -166,9 +166,25 @@ def test_the_editor_still_sits_behind_an_explicit_gesture(client):
     déplié sur Mon plan rejouerait le même défaut sur un écran neuf — et
     noierait le plan, qui est le sujet de la surface."""
     body = PLAN_TPL.read_text(encoding="utf-8")
-    assert 'class="pstate__edit"' in body, "l'éditeur n'est plus derrière un geste"
-    assert "pstate__edit\" open" not in body
-    assert 'open class="pstate__edit"' not in body
+    # `Sb_UI_DISCLOSURE_01` — ON CHERCHE LE JETON, PLUS LA CHAÎNE EXACTE.
+    # La garde exigeait `class="pstate__edit"` au caractère près. Adopter le
+    # composant partagé a produit `class="disclosure pstate__edit"` et elle est
+    # tombée — alors que ce qu'elle protège, « l'éditeur est derrière un
+    # geste », n'a pas bougé. Une garde qui épingle une ÉCRITURE interdit le
+    # refactoring sans rien garder de plus.
+    import re as _re
+
+    assert _re.search(r'class="[^"]*\bpstate__edit\b', body), (
+        "l'éditeur n'est plus derrière un geste"
+    )
+    # Et il reste REPLIÉ : `open` sur ce `<details>` le rouvrirait par défaut,
+    # ce qui rejouerait exactement le défaut mesuré sur le Profil.
+    ouvert = _re.search(
+        r"<details[^>]*\bopen\b[^>]*class=\"[^\"]*\bpstate__edit\b"
+        r"|<details[^>]*class=\"[^\"]*\bpstate__edit\b[^>]*\bopen\b",
+        body,
+    )
+    assert not ouvert, "l'éditeur est déplié par défaut"
 
 
 def test_every_field_offers_its_options(client):

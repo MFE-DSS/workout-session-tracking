@@ -384,7 +384,20 @@
   /* tap target confortable sans casser la densité (WCAG 2.5.5). */
   padding: 4px 0;
   min-height: 24px;
+  /* `Sb_UI_DISCLOSURE_01` — ce `<summary>` rendait encore le triangle natif du
+     navigateur : c'était le dernier du produit dans ce cas, et il n'apparaît
+     dans aucun relevé au navigateur parce que la surface vit derrière un
+     drapeau éteint. Trouvé par la garde, pas par l'œil.
+
+     ⚠ ON NE LUI IMPOSE PAS LE COMPOSANT. `.disclosure` force 44 px, et la ligne
+     au-dessus est une décision ÉCRITE : 24 px pour ne pas casser la densité des
+     cartes de zone. Adopter le composant ici reviendrait à renverser cette
+     décision par effet de bord, sur un écran que personne ne peut regarder
+     aujourd'hui. On corrige le défaut réel — le marqueur — et rien d'autre. */
+  list-style: none;
 }
+
+.zone-card__drill-summary::-webkit-details-marker { display: none; }
 
 .zone-card__drill-label {
   margin: 6px 0 2px;

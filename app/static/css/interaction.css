@@ -198,6 +198,21 @@
   border-top: 1px solid var(--border);
 }
 
+/* `Sb_UI_DISCLOSURE_01` — LE COMPOSANT DEVIENT ADOPTABLE SANS RÉÉCRITURE.
+   Le sélecteur visait `.disclosure__summary` seul, donc adopter le composant
+   imposait de réécrire le `<summary>` : ajouter une classe, envelopper le
+   texte, poser un `<span>` de chevron. Sur six dépliants identiques de
+   `muscle_focus`, ce coût a suffi à ce que personne ne l'adopte — et ils sont
+   restés à 20 px avec le marqueur natif du navigateur.
+
+   `.disclosure > summary` couvre désormais les deux écritures : le balisage
+   explicite (chevron en `<span>`, utile quand le libellé porte du contenu
+   secondaire) ET le `<summary>` nu, dont le chevron est posé en `::after`.
+   Adopter le composant coûte maintenant UNE classe sur le `<details>`.
+
+   Un composant qu'on n'adopte pas parce qu'il coûte trop cher à adopter n'est
+   pas un composant : c'est une intention. */
+.disclosure > summary,
 .disclosure__summary {
   display: flex;
   align-items: center;
@@ -211,7 +226,22 @@
   list-style: none;
 }
 
+.disclosure > summary::-webkit-details-marker,
 .disclosure__summary::-webkit-details-marker { display: none; }
+
+/* Le chevron du `<summary>` nu. `:not(.disclosure__summary)` empêche le double
+   chevron quand le balisage explicite en pose déjà un. */
+.disclosure > summary:not(.disclosure__summary)::after {
+  content: "\25BE";
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--fg-dim);
+  transition: transform 0.15s ease;
+}
+
+.disclosure[open] > summary:not(.disclosure__summary)::after {
+  transform: rotate(180deg);
+}
 
 .disclosure__summary:hover { background: var(--surface-2); }
 

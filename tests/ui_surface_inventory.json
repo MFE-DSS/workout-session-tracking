@@ -24,7 +24,7 @@
     "app.css::.zone-filter__summary::display:flex",
     "body_intelligence.css::.bi-priority__why-toggle::display:inline-flex",
     "home.css::.rejected__summary::display:flex",
-    "interaction.css::.disclosure__summary::display:flex",
+    "interaction.css::.disclosure > summary, .disclosure__summary::display:flex",
     "session_focus.css::.console .session-focus__tap-target, .exercise-card__head-expanded .exercise-card__code--link, .session-focus__cues-title, .substitute-picker__summary, .field-block--optional > summary, .exercise-card__note > summary::display:flex",
     "session_focus.css::.ex-nav__trigger::display:flex",
     "session_focus.css::.l3__trigger::display:inline-flex",
