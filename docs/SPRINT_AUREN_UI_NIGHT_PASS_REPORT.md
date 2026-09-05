@@ -291,9 +291,19 @@ en propre.
 
 ### Ce que je n'ai pas fait, et qui reste à vous
 
-* **Le cleanup** — aucune branche ni worktree supprimé. Six branches vivent
-  encore : `work/auren-ui-u1-tokens`, `-u2-chassis`, `-u3-session`,
-  `-u4-viseur`, `-strategy-docs`, `-night-findings`, plus `-d7-social`.
+* **Le cleanup** — aucune branche ni worktree supprimé. **Huit** branches vivent
+  encore, relevées sur le distant :
+
+  ```
+  work/auren-ui-u1-role-tokens     work/auren-ui-strategy-docs
+  work/auren-ui-u2-chassis         work/auren-ui-night-findings
+  work/auren-ui-u3-session         work/auren-ui-night-closeout
+  work/auren-ui-u4-viseur          work/auren-ui-d7-social
+  ```
+
+  Plus les worktrees correspondants sur le poste. Supprimer une branche ou un
+  worktree reste une action **humaine** (`CLAUDE.md §4`), y compris sous
+  `GO MERGE`.
 * **Les 88 couleurs hors token** — recensées, non corrigées, pour les raisons
   dites en §7.3.
 * **Les 353 styles en ligne** sur 39 gabarits — mesurés, non touchés.
