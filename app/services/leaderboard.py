@@ -27,7 +27,6 @@ username ASC (deterministic, alphabetical). Documented.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -44,10 +43,28 @@ class LeaderboardEntry:
     username: str
     total_points: float
     counted_sessions: int
-    avg_points: Optional[float]
-    last_session_score: Optional[int]
+    avg_points: float | None
+    last_session_score: int | None
     grade: str
     grade_label: str
+
+    #: `Sb_UI_CLASSEMENT_01` — L'ÉCART, ET POURQUOI IL REMPLACE LA MOYENNE.
+    #:
+    #: Un total de points n'a pas d'échelle : personne ne sait si 600 est
+    #: beaucoup. Un classement ne répond pas « combien », il répond « où suis-je
+    #: et à quelle distance ». L'écart au voisin est la seule donnée qui rend la
+    #: liste actionnable, et elle était déjà calculable — elle n'était pas dite.
+    #:
+    #: Signé, et le signe porte le sens :
+    #:   · rang 1 → POSITIF, c'est une avance sur le rang 2 ;
+    #:   · rang n → NÉGATIF, c'est un retard sur le rang n-1.
+    #: `None` quand il n'y a personne à qui se comparer (un seul classé).
+    #:
+    #: Entier : la moyenne qu'il remplace s'affichait « moy. 60.0 », et le
+    #: dixième de point ne sépare personne.
+    points_gap: int | None = None
+    #: Le rang auquel `points_gap` se compare — 2 pour le premier, n-1 sinon.
+    gap_rank: int | None = None
 
 
 def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
@@ -56,7 +73,7 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
         select(User).where(User.is_active.is_(True))
     ).scalars().all()
 
-    raw: list[tuple[str, float, int, Optional[int]]] = []
+    raw: list[tuple[str, float, int, int | None]] = []
 
     for user in users:
         sessions = db.execute(
@@ -75,7 +92,7 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
 
         total_pts = 0.0
         counted = 0
-        last_score: Optional[int] = None
+        last_score: int | None = None
 
         for s in sessions:
             total_work = sum(
@@ -132,4 +149,30 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
             grade=grade,
             grade_label=GRADE_LABELS.get(grade, ""),
         ))
+
+    _attach_gaps(entries, [r[2] for r in raw])
     return entries
+
+
+def _attach_gaps(
+    entries: list[LeaderboardEntry], points: list[float]
+) -> None:
+    """Renseigne `points_gap` / `gap_rank` sur chaque entrée, en place.
+
+    Calculé sur les points BRUTS (`raw`), pas sur `total_points` déjà arrondi :
+    deux arrondis successifs déplacent l'écart d'une unité, et un écart faux de
+    1 sur un classement se voit.
+
+    Le premier regarde vers le bas (son avance), tout le monde regarde vers le
+    haut (son retard). Un classé seul n'a pas d'écart : `None`, pas zéro — zéro
+    signifierait « à égalité », ce qui est faux.
+    """
+    if len(entries) < 2:
+        return
+    for i, entry in enumerate(entries):
+        if i == 0:
+            entry.points_gap = round(points[0] - points[1])
+            entry.gap_rank = 2
+        else:
+            entry.points_gap = -round(points[i - 1] - points[i])
+            entry.gap_rank = i

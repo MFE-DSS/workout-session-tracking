@@ -1,8 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
 <h1 class="page-title">Classement</h1>
-<p class="chip chip--private mb-md">Privacy first · activité agrégée uniquement</p>
-<p class="lede">Qualité × complétion · séances terminées.</p>
+{# `Sb_UI_CLASSEMENT_01` — le badge disait « Privacy first », en anglais, sur la
+   seule ligne de l'écran dont le travail est de RASSURER. `/squads` porte le
+   même badge et le dit en français depuis toujours : « Activité partagée ·
+   Données privées protégées ». Une décision appliquée sur une surface et pas
+   sur l'autre — le quatrième exemplaire relevé cette semaine. #}
+<p class="chip chip--private mb-md">Confidentialité d'abord · activité agrégée uniquement</p>
+{# LA FORMULE ÉTAIT ÉNONCÉE DEUX FOIS, ET LES DEUX VERSIONS DIVERGEAIENT.
+   En haut, « Qualité × complétion · séances terminées » — approximatif : il
+   manquait que la complétion porte sur les SÉRIES DE TRAVAIL, et que les
+   séances exclues des statistiques ne comptent pas. En bas, la version juste,
+   mais avec « work sets » en anglais, et en note de bas de page — donc lue par
+   ceux qui la cherchent, pas par ceux qui lisent le classement.
+   Une seule règle, énoncée une fois, à l'endroit où on lit le résultat. #}
+<p class="lede">
+  Score = qualité × complétion des séries de travail · séances terminées,
+  hors séances exclues.
+</p>
 
 {% if entries|length == 0 %}
   <p class="empty">
@@ -36,25 +51,38 @@
                  AUTRES, ce qui est pire : une lecture corporelle d'autrui
                  rendue en infobulle. #}
               <span class="tooltip-summary">
-                Dernière session : {{ e.last_session_score if e.last_session_score is not none else "—" }}/100<br>
+                Dernière séance : {{ e.last_session_score if e.last_session_score is not none else "—" }}/100<br>
                 Note : {{ e.grade }} — {{ e.grade_label }}
               </span>
             </span>
           </span>
         </span>
-        <span class="lb-row__points">{{ e.total_points }} pts</span>
+        {# Le dixième de point ne sépare personne : « 600.0 pts » devient
+           « 600 pts ». La précision affichée était fausse — elle suggérait une
+           mesure au dixième là où le score est un produit de deux estimations. #}
+        <span class="lb-row__points">{{ e.total_points | round | int }} pts</span>
         <span class="lb-row__meta">
           {{ e.counted_sessions }} séance{% if e.counted_sessions > 1 %}s{% endif %}
-          {% if e.avg_points is not none %}· moy. {{ e.avg_points }}{% endif %}
+          {# `moy.` RETIRÉE, remplacée par l'ÉCART. La moyenne n'avait pas
+             d'échelle — sur trois classés elle valait 60.0 pour les trois — et
+             elle ne disait rien de ce que le classement est censé répondre :
+             à quelle distance suis-je du voisin. Le signe porte le sens :
+             positif = avance (le premier), négatif = retard (tous les autres). #}
+          {% if e.points_gap is not none %}
+            · <span class="lb-row__gap">
+                {# Le signe est écrit à la main pour obtenir un VRAI moins
+                   (U+2212), pas le trait d'union que rend Python. Sur des
+                   chiffres tabulaires alignés en colonne, le trait d'union est
+                   plus court et plus haut que le plus : la colonne se décale. #}
+                <b>{% if e.points_gap > 0 %}+{% else %}−{% endif %}{{ e.points_gap | abs }}</b>
+                {% if e.points_gap > 0 %}sur{% else %}du{% endif %} #{{ e.gap_rank }}
+              </span>
+          {% endif %}
         </span>
       </li>
     {% endfor %}
   </ol>
 {% endif %}
-
-<p class="kpi-note">
-  Score = qualité × complétion work sets · séances terminées non exclues.
-</p>
 
 {# Sb_22b — JS preview chargé uniquement sur le classement. #}
 <script src="{{ asset_url('js/preview.js') }}" defer></script>
