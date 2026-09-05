@@ -217,11 +217,14 @@
 
 /* Raisons secondaires. Même origine système, rang typographique en dessous :
    elles complètent la phrase, elles ne la concurrencent pas. */
+/* 12,5 px ne tombait sur aucun rang — une demi-marche inventée entre 12 et 13.
+ * Les raisons secondaires sont de la MÉTA : elles annotent la phrase du moteur
+ * sans la répéter. Elles rejoignent donc le rang 12. */
 .cockpit__reasons {
   list-style: none;
   margin: -8px 0 16px;
   padding: 0;
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.5;
   color: var(--t-fg-muted);
 }
@@ -289,6 +292,22 @@
   color: var(--t-fg-2);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+}
+
+/* ⚠ LE LIBELLÉ DEVIENT VISIBLE — le lecteur d'écran en savait plus que l'œil.
+ *
+ * Ce bilan ne rendait qu'un glyphe hachuré et un nombre ; le nom de l'état
+ * n'existait que dans le texte hors écran de `band(named=true)`. Mesuré sur un
+ * compte neuf, où les onze zones partagent le même état, la ligne entière se
+ * réduisait à « ▨▨▨ 11 » : illisible pour qui regarde, parfaitement clair pour
+ * qui écoute.
+ *
+ * Le `sr-only` de la macro est retiré du même geste (`band(t)` au lieu de
+ * `band(t, named=true)`) : le libellé rendu sert désormais tout le monde, et
+ * le conserver aurait fait entendre le nom deux fois. */
+.cockpit__tally-label {
+  color: var(--t-fg-muted);
+  white-space: nowrap;
 }
 
 /* ══ ÉCARTÉ — ET POURQUOI ══ niveau 3.
@@ -704,3 +723,199 @@
 }
 
 .home-wk__gap { margin-top: var(--space-sm); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL COMME COCKPIT — direction artistique opérateur, 2026-09-06.
+
+   Trois rôles, un ordre strict : AGIR → SITUER → RÉSULTAT.
+
+   CE QUI A ÉTÉ MESURÉ AVANT :
+     · UN seul objet au-dessus de 16 px — et QUATORZE à 11 px, HUIT à 12 px.
+       Vingt-deux blocs de texte sur trente-sept dans les deux plus petits
+       corps. Aucun registre intermédiaire : 24 px, puis le brouillard ;
+     · SEPT cartes empilées, même fond, même bordure, même rayon. `Q5` :
+       « une carte qui entoure tout n'entoure plus rien » ;
+     · le titre de bloc (`tile__label`, 11 px) SOUS le corps qu'il introduit
+       (13–15 px) — le défaut que le socle documente sur 101 usages ;
+     · DEUX conventions pour le même rôle : `tile__label` 11 px et
+       `card__title` 14 px ; et la MÊME classe faisant deux métiers,
+       `tile__label` titrant aussi les tuiles de navigation à 15 px.
+
+   ── RANG 2 : AUCUN CONTENEUR (traitement « T1 ») ─────────────────────────
+   `Q5` le prescrit depuis toujours : rang 1 actionnable = carte bordée ;
+   rang 2 informatif = simple filet ; rang 3 ambiant = aucun conteneur.
+   Le hero redevient le SEUL objet encadré de l'écran.
+
+   ── ÉCHELLE « E3 » : 32 / 22 / 15 / 12 ───────────────────────────────────
+   Quatre rôles, quatre tailles. Ce ne sont pas des valeurs neuves : 32 px est
+   le readout souverain de `Progression`, 22 px le rang `heading-2` du socle
+   que `Mon plan` rend déjà. L'accueil s'aligne sur l'application plutôt que
+   d'inventer une troisième convention.
+
+   ⚠ CONSÉQUENCE MESURÉE, ASSUMÉE : à 32 px, un nom de séance réel
+   (« Push A — Pecs épaisseur + Delts + Triceps ») tient sur TROIS lignes,
+   contre deux à 24 et 28 px. C'est l'objet le plus important de l'écran et il
+   a la place ; le hero ne s'en trouve pas encombré — vérifié au rendu.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── RANG 2 — le conteneur disparaît, le filet sépare. ── */
+.today-home .coaching-loop {
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.today-home .coaching-loop .hl-block,
+.today-home .coaching-loop .home-wk {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  border-top: 1px solid var(--role-border-subtle);
+  padding: var(--space-md) 0;
+}
+
+/* ── RANG 3 — ambiant : typographie et espace seuls. ── */
+.today-home .cockpit-grid .card,
+.today-home .cockpit-grid .tile {
+  background: transparent;
+  border: none;
+  padding: var(--space-sm) 0;
+}
+
+/* ── L'ÉCHELLE ────────────────────────────────────────────────────────────
+   DISPLAY 32 · SECTION 22 · BODY 15 · META 12.
+
+   Les sélecteurs distinguent par le PARENT ce que les classes confondent :
+   `.coaching-loop .tile__label` est un titre de bloc, `.cockpit-grid
+   .tile__label` est un libellé d'action. Même classe, deux rôles — c'est
+   l'ambiguïté d'origine, contournée ici et à corriger à la source un jour. */
+
+.today-home .today-home__title { font-size: 32px; }
+
+.today-home .coaching-loop .tile__label,
+.today-home .coaching-loop .card__title,
+.today-home .today-home__analysis > span:first-child {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0;
+  color: var(--t-fg-2);
+}
+
+/* Le libellé d'action d'une tuile n'est PAS un titre de section : il reste au
+   rang du corps, sans majuscules. */
+.today-home .cockpit-grid .tile__label {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.today-home .hl-zones__line,
+.today-home .hl-last__name,
+.today-home .home-wk__zones,
+.today-home .hl-block__empty { font-size: 15px; }
+
+.today-home .hl-block__caption,
+.today-home .hl-block__msg,
+.today-home .hl-zones__conf,
+.today-home .hl-last__when,
+.today-home .home-wk__dose,
+.today-home .home-wk__done,
+.today-home .home-wk__plus,
+.today-home .cockpit-grid .tile__hint { font-size: 12px; }
+
+/* ── LES OPACITÉS DEVIENNENT DES TOKENS MESURÉS ───────────────────────────
+   Sept `opacity` atténuaient du texte dans ce partiel. Un texte atténué par
+   opacité n'a AUCUN contraste déclarable : il dépend de ce qui est derrière.
+   `--role-text-muted` vaut 4,64:1 sur le pire fond réel, et c'est écrit.
+   L'opacité reste permise sur le NON-texte. */
+.today-home .hl-block__label,
+.today-home .hl-block__caption,
+.today-home .hl-block__msg,
+.today-home .hl-zones__conf,
+.today-home .hl-last__when,
+.today-home .hl-block__empty { color: var(--role-text-muted); }
+
+/* ── Structure des blocs de rang 2. ── */
+.today-home .hl-block__caption { margin: 2px 0 0; }
+.today-home .hl-block__msg { margin: var(--space-sm) 0 0; }
+.today-home .hl-block__empty { margin: 4px 0 0; }
+
+.today-home .hl-zones {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-sm) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.today-home .hl-zones__line,
+.today-home .hl-zones__conf { display: block; }
+.today-home .hl-zones__conf { margin-top: 2px; }
+
+.today-home .hl-last__link {
+  display: block;
+  min-height: 44px;
+  padding: 4px 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.today-home .hl-last__name { font-weight: 600; }
+.today-home .hl-last__when { margin-left: 4px; }
+
+/* La régularité — juxtaposée aux zones, jamais divisée par elles. */
+.today-home .home-wk__done {
+  margin: 6px 0 0;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--role-text-muted);
+}
+
+/* ── LE HERO REJOINT L'ÉCHELLE ────────────────────────────────────────────
+ * Le cockpit causal (`Sx_UIV3_01`) portait sa propre micro-échelle : 10 px
+ * pour ses intitulés, 13 px pour la phrase du moteur, 14 px pour les zones.
+ * Trois registres de plus, sur l'objet le plus important de l'écran.
+ *
+ * Ils rejoignent les quatre rôles. Le RAIL et la composition ne bougent pas —
+ * c'est la pièce validée sur rendu, et seul le corps du texte change. */
+.today-home .cockpit__key,
+.today-home .cockpit__join,
+.today-home .cockpit__tally,
+.today-home .cockpit__tally-item b,
+.today-home .today-home__meta-sep,
+.today-home .today-home__eyebrow,
+.today-home .today-home__status { font-size: 12px; }
+
+.today-home .cockpit__zone-name,
+.today-home .cockpit__why,
+.today-home .today-home__secondary { font-size: 15px; }
+
+/* Les intitulés du rail gardent leur interlettrage large : c'est lui qui les
+ * distingue du corps, pas leur taille. Sans cela, à 12 px, « LA SÉANCE »
+ * deviendrait une phrase parmi d'autres. */
+.today-home .cockpit__key { letter-spacing: 0.16em; }
+.today-home .cockpit__join { letter-spacing: 0.18em; }
+
+/* Le libellé du tiroir « Écarté — et pourquoi » et son compte rejoignent le
+ * rang MÉTA. C'est une affordance, pas un titre de section : à 22 px elle
+ * disputerait la vedette aux deux vrais titres de l'écran, à 11 px elle
+ * inventait une cinquième marche. */
+.today-home .rejected__summary,
+.today-home .rejected__count { font-size: 12px; }
+
+/* ⚠ TROIS FILETS D'AFFILÉE — défaut introduit par cette tranche, vu au rendu.
+ *
+ * `.cockpit__tally` ferme par un filet bas, `.today-home__secondary-zone`
+ * ouvre par un filet haut, et le `border-top` que je viens de poser sur le
+ * premier bloc de rang 2 en ajoutait un troisième. Résultat à l'écran : deux
+ * lignes séparées par une bande vide, avant le premier titre.
+ *
+ * Le filet du rang 2 SÉPARE des blocs entre eux ; il n'a rien à ouvrir, la
+ * zone le fait déjà. */
+.today-home .coaching-loop > *:first-child {
+  border-top: none;
+  padding-top: 0;
+}

@@ -63,6 +63,20 @@
      affordance, aucun nouveau cycle de vie.
      ============================================================ #}
   {% set shell_focus_mode = session is defined and session and session.status == 'in_progress' %}
+  {# `shell_bare` — LA COQUE SE RETIRE POUR UNE SECONDE RAISON.
+     `Sb_UI_HOME_COCKPIT_01`, 2026-09-06.
+
+     `shell_focus_mode` dit « une séance est en cours » : il retire la
+     navigation ET pose `is-session-focus-mode` sur le `<body>`. Un SEUIL veut
+     la première moitié et surtout pas la seconde — du style de séance sur une
+     page de connexion n'aurait aucun sens.
+
+     Les deux idées reçoivent donc deux noms. Réutiliser le premier pour le
+     second aurait été choisir un drapeau pour la commodité d'une de ses
+     valeurs, pas pour son sens.
+
+     Un gabarit de seuil pose `{% set shell_bare = true %}` avant son bloc. #}
+  {% set shell_bare = shell_bare | default(false) %}
   <body{% if shell_focus_mode %} class="is-session-focus-mode"{% endif %}>
     {# Sb_UI_03.3 — skip link : premier élément interactif du body, masqué
        hors écran au repos, visible au focus clavier. SSR/no-JS, tokens Auren
@@ -214,10 +228,12 @@
     <main id="main-content" class="container">
       {% block content %}{% endblock %}
     </main>
+    {% if not shell_bare %}
     <footer class="foot">
       <small>Auren</small>
       <a href="{{ url_for('contact_page') }}" class="foot__contact">Contact</a>
     </footer>
+    {% endif %}
     {# Sb_UI_03.1 — Mobile Bottom Navigation (Sx_UI_03). Shell app-like
        persistant, 4 destinations top-level, SSR/no-JS. Liens natifs <a>
        (aucun form/bouton/CTA/logout ici). Icônes SVG inline décoratives
@@ -227,7 +243,7 @@
        (Historique/Coach/Classement/Squads/Déconnexion) préservées
        dans le menu topbar. `TRAIN1-C` a retiré « Physique » de cette liste —
        la surface n'existe plus, sa route redirige. #}
-    {% if not shell_focus_mode %}
+    {% if not shell_focus_mode and not shell_bare %}
     <nav class="app-bottom-nav" aria-label="Navigation principale">
       <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
         <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12 12 4l8 8"/><path d="M6 10v9h12v-9"/></svg>

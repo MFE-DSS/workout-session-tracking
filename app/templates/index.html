@@ -140,12 +140,26 @@
            principale : les perdre en retirant leur véhicule serait exactement
            ce que la règle interdit.
 
-           Elles rejoignent la chaîne causale plutôt qu'un pli — même niveau
-           L2, même filet bleu d'origine système. Rendues seulement s'il y en
-           a : `reasons[0]` est déjà la phrase ci-dessus. #}
-        {% if home and home.today and home.today.reasons and home.today.reasons | length > 1 %}
+           ⚠ CE FILTRE ÉTAIT UNE POSITION, IL DEVIENT UNE VALEUR.
+
+           Il coupait à `reasons[1:]`, sur l'hypothèse écrite ici même que
+           « `reasons[0]` est déjà la phrase ci-dessus ». Mesuré sur un compte
+           NEUF — le tout premier écran qu'un utilisateur voit :
+
+               phrase  : « Bon premier template pour démarrer : Push A… »
+               reasons : [ « Première séance — démarrage doux suggéré. »,
+                           « Bon premier template pour démarrer : Push A… » ]
+
+           `reasons[0]` n'était PAS la phrase. Le découpage imprimait donc le
+           doublon et **jetait la seule raison différente**. Exactement à
+           l'envers.
+
+           Comparer la VALEUR ne suppose rien sur l'ordre. #}
+        {% set _autres = home.today.reasons | reject('equalto', _top.phrase) | list
+           if (home and home.today and home.today.reasons) else [] %}
+        {% if _autres %}
         <ul class="cockpit__reasons">
-          {% for r in home.today.reasons[1:] %}<li>{{ r }}</li>{% endfor %}
+          {% for r in _autres %}<li>{{ r }}</li>{% endfor %}
         </ul>
         {% endif %}
       </div>
@@ -188,11 +202,23 @@
 
    Ici le glyphe paraît sans libellé visible : il porte le sens, donc il reçoit
    un nom accessible (`band(t, named=true)`). #}
+{# ⚠ LE LECTEUR D'ÉCRAN EN SAVAIT PLUS QUE L'ŒIL.
+
+   Ce bilan rendait, pour chaque état, un glyphe hachuré et un nombre. Le nom
+   de l'état — « non mesurée », « récupérée » — n'existait QUE dans le texte
+   hors écran. Sur un compte neuf, où les onze zones partagent le même état,
+   la ligne se réduisait à « ▨▨▨ 11 » : un utilisateur voyant n'avait aucun
+   moyen de savoir de quoi on parle, quand un lecteur d'écran, lui, l'entendait.
+
+   Le libellé devient VISIBLE. Le texte hors écran de `band(named=true)`
+   deviendrait alors un doublon pour les lecteurs d'écran : on repasse donc en
+   `named=false`, et c'est le libellé rendu qui porte le sens pour tout le
+   monde. #}
 {% if causal.tally %}
 <p class="cockpit__tally">
   <span class="sr-only">État des {{ causal.tally_total }} zones :</span>
   {%- for t in causal.tally %}
-  <span class="cockpit__tally-item">{{ band(t, named=true) }}<b>{{ t.count }}</b></span>
+  <span class="cockpit__tally-item">{{ band(t) }}<b>{{ t.count }}</b><span class="cockpit__tally-label">{{ t.band_label }}</span></span>
   {%- endfor %}
 </p>
 {% endif %}
@@ -242,7 +268,12 @@
    marque la bascule décision → readouts.
    ============================================================ #}
 <div class="today-home__secondary-zone">
-<p class="today-home__summary-eyebrow">Résumé <span class="today-home__summary-hint">· indicateurs et navigation</span></p>
+{# « RÉSUMÉ · INDICATEURS ET NAVIGATION » est retiré : il décrivait la
+   STRUCTURE du document, pas son contenu. Personne n'ouvre AUREN pour chercher
+   « des indicateurs ». Ce que la bascule décision → contexte doit marquer,
+   c'est le rang visuel — et depuis cette tranche, c'est le cadre du hero qui
+   le fait, seul objet encadré de l'écran. Un intertitre n'y ajoutait rien
+   qu'un mot de plus à lire. #}
 
 {# Sb_27.1 — Coaching loop tiles (Today / Last / Week) #}
 {% include "_partials/home_coaching_loop.html" %}
@@ -389,16 +420,29 @@
          et par le chemin que l'utilisateur emprunte déjà partout. Ce qui est
          retiré, c'est la RÉPÉTITION — pas l'accès.
 
-         Les trois qui restent ne sont nulle part ailleurs : lancer une autre
-         séance, l'historique, la science. C'est ce que `N-02` appelle
-         « promouvoir ce qui sert ». #}
+         Les deux qui restent ne sont nulle part ailleurs : lancer une autre
+         séance, et l'historique. C'est ce que `N-02` appelle « promouvoir ce
+         qui sert ».
+
+         ⚠ SCIENCE QUITTE L'ACCUEIL — arbitrage opérateur du 2026-09-06.
+
+         `/science` n'est pas une destination qu'on choisit depuis un cockpit :
+         c'est une zone d'ARCHIVE et de DOCUMENTATION, qu'on atteint depuis
+         l'endroit où la question se pose. Le produit le fait déjà, à quatre
+         endroits, et trois pointent vers une règle précise :
+
+             progress.html      → #rule-plages-repetitions  « Comment c'est calculé → »
+             coach_report.html  → #rule-carnet-progression
+             coach_report.html  → #section-method
+             session_detail.html                            « Voir toutes les règles → »
+
+         La tuile de l'accueil était le SEUL lien sans contexte — elle envoyait
+         vers la page entière depuis un écran qui ne parle pas de méthode. La
+         retirer n'orpheline rien : les quatre entrées qui arrivent AVEC une
+         question restent en place. #}
       <a class="tile" href="{{ url_for('history') }}">
         <div class="tile__label">Historique</div>
         <div class="tile__hint">Séances passées</div>
-      </a>
-      <a class="tile" href="{{ url_for('science_page') }}">
-        <div class="tile__label">Science</div>
-        <div class="tile__hint">Méthode et fonctionnement</div>
       </a>
     </div>
   </div>

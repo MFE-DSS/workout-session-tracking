@@ -291,7 +291,37 @@ def test_the_secondary_reasons_were_kept_not_dropped():
     assert "cockpit__reasons" in markup
 
 
-def test_the_empty_week_tile_is_hidden_but_not_deleted():
+def test_the_empty_week_signal_is_hidden_but_not_deleted():
+    """La régularité ne s'affiche jamais à vide, et n'a pas disparu.
+
+    ⚠ `Sb_UI_HOME_COCKPIT_01` — CETTE GARDE ÉPINGLAIT UN TITRE.
+
+    Elle exigeait la chaîne « Cette semaine ». Or ce titre était suivi de
+    « 3 séances cette semaine » : **la moitié de la phrase répétait son propre
+    libellé**, et une carte entière portait un seul nombre — ce que `Q5`
+    appelle une carte qui n'entoure plus rien.
+
+    Arbitrage opérateur 2026-09-06 : la régularité devient une LIGNE sous les
+    zones de la semaine planifiée, sans cadre ni titre.
+
+    Deux propriétés doivent survivre, et elles survivent :
+      · le repli conditionnel — rien ne s'affiche sans séance faite (D4) ;
+      · le signal lui-même est rendu.
+
+    ⛔ Ce que la garde interdit en plus, désormais : le RATIO. Écrire
+    « 3 sur 4 » exigerait de savoir quelle séance enregistrée a rempli quelle
+    séance planifiée — ce que `_build_weekly_plan` refuse explicitement.
+    """
     markup = _without_jinja_comments(COACHING)
-    assert "home.week.sessions_done" in markup
-    assert "Cette semaine" in markup
+    assert "home.week.sessions_done" in markup, (
+        "le repli conditionnel a disparu — la régularité s'afficherait à vide"
+    )
+    assert "home.week.signal" in markup, "le signal de régularité n'est plus rendu"
+    assert "home-wk__done" in markup, (
+        "la régularité n'est plus rendue dans le bloc de la semaine planifiée"
+    )
+    for ratio in ("sur {{", "/ {{", "sessions_done }} sur"):
+        assert ratio not in markup, (
+            f"un RATIO plan-réel est apparu ({ratio!r}) — il exigerait de "
+            "deviner quelle séance enregistrée a rempli quelle séance planifiée"
+        )

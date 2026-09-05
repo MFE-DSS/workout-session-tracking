@@ -121,10 +121,38 @@ class TestHomeIA:
     def test_action_block_present(self, client):
         assert "today-home__action" in _home(client)
 
-    def test_summary_eyebrow_deprioritizes_dashboard(self, client):
+    def test_the_secondary_zone_is_ranked_below_the_hero(self, client):
+        """La zone secondaire reste d'un rang INFÉRIEUR au hero.
+
+        ⚠ `Sb_UI_HOME_COCKPIT_01` — CETTE GARDE ÉPINGLAIT SON VÉHICULE.
+
+        Elle exigeait la chaîne `today-home__summary-eyebrow` et le mot
+        « Résumé ». Or l'intertitre « Résumé · indicateurs et navigation »
+        décrivait la STRUCTURE du document, pas son contenu, et l'opérateur
+        l'a retiré : personne n'ouvre AUREN pour chercher « des indicateurs ».
+
+        Ce que la garde protège vraiment — la hiérarchie entre la décision et
+        le reste — n'a pas disparu ; son mécanisme a changé. Il est désormais
+        porté par la PROFONDEUR : le hero est le seul objet encadré de l'écran,
+        les blocs de rang 2 n'ont plus de conteneur (`Q5`).
+
+        La garde asserte donc la propriété, pas la chaîne qui la portait.
+        """
         body = _home(client)
-        assert "today-home__summary-eyebrow" in body
-        assert "Résumé" in body
+        assert "today-home__secondary-zone" in body, (
+            "la zone secondaire a disparu de l'accueil"
+        )
+        css = HOME_CSS.read_text(encoding="utf-8")
+        bloc = re.search(
+            r"\.today-home \.coaching-loop \.hl-block,\s*"
+            r"\.today-home \.coaching-loop \.home-wk\s*\{([^}]*)\}",
+            css,
+        )
+        assert bloc, "les blocs de rang 2 ne sont plus stylés comme un rang"
+        assert "border: none" in bloc.group(1), (
+            "un bloc de rang 2 a retrouvé une bordure — il redevient une carte, "
+            "et la carte cesse d'être le signal du rang 1"
+        )
 
 
 # ───────── Auren Terminal visual system (graphite / mono / amber) ─────────
