@@ -105,7 +105,8 @@
       Semaine planifiée
     </h2>
     <div style="font-size:16px;font-weight:600;margin-top:4px;">
-      {{ home.weekly_plan.planned_sessions }} séance(s) proposée(s)
+      {%- set n = home.weekly_plan.planned_sessions -%}
+      {{ n }} {{ "séance" | pluriel(n) }} {{ "proposée" | pluriel(n) }}
     </div>
     {% if home.weekly_plan.next_session_slots %}
     <div class="text-dim" style="font-size:12px;margin-top:2px;">Prochaine séance proposée</div>

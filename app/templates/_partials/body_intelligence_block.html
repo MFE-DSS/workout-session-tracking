@@ -88,7 +88,7 @@
       <p class="bi-block__lead">Top zones sollicitées sur 30 jours&nbsp;:</p>
       <ul class="bi-block__list">
         {% for z, n in block.content.top_zones %}
-        <li><strong>{{ z }}</strong> — {{ n }} séance(s)</li>
+        <li><strong>{{ z }}</strong> — {{ n }} {{ "séance" | pluriel(n) }}</li>
         {% endfor %}
       </ul>
       {% endif %}
@@ -96,7 +96,7 @@
       <p class="bi-block__lead">Zones moins représentées&nbsp;:</p>
       <ul class="bi-block__list">
         {% for z, n in block.content.bottom_zones %}
-        <li><strong>{{ z }}</strong> — {{ n }} séance(s)</li>
+        <li><strong>{{ z }}</strong> — {{ n }} {{ "séance" | pluriel(n) }}</li>
         {% endfor %}
       </ul>
       {% endif %}
@@ -140,7 +140,7 @@
       <p class="bi-block__lead">Distribution des labels implicites sur 30 jours&nbsp;:</p>
       <ul class="bi-block__list">
         {% for label, n in block.content.implicit_labels_30d.items() %}
-        <li><strong>{{ label }}</strong> — {{ n }} exercice(s)</li>
+        <li><strong>{{ label }}</strong> — {{ n }} {{ "exercice" | pluriel(n) }}</li>
         {% endfor %}
       </ul>
       {% endif %}

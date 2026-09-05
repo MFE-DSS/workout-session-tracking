@@ -18,8 +18,19 @@
 
   {% if is_published %}
     <p style="margin-top:.75rem;">
-      Ce programme est <strong>publié</strong>. Ses {{ session_count }} séance(s) sont
-      disponibles comme modèles lançables et n'ont pas été dupliquées.
+      {# Deux phrases plutôt que huit appels de filtre : en français l'accord
+         touche le verbe et les participes autant que le nom, et
+         `{{ "disponible"|pluriel(n) }}` répété six fois rend la phrase
+         illisible dans le gabarit. Le filtre sert un NOM isolé ; une phrase
+         qui s'accorde en entier s'écrit deux fois. #}
+      Ce programme est <strong>publié</strong>.
+      {% if session_count > 1 %}
+        Ses {{ session_count }} séances sont disponibles comme modèles
+        lançables et n'ont pas été dupliquées.
+      {% else %}
+        Sa séance est disponible comme modèle lançable et n'a pas été
+        dupliquée.
+      {% endif %}
     </p>
     {# DOGFOOD_01 (F2) — after publishing, the obvious next action is to launch a
        session. The launch CTAs live on the program page, so offer a direct route
@@ -29,7 +40,13 @@
     </p>
   {% elif publishable %}
     <p style="margin-top:.75rem;">
-      Publier créera <strong>{{ session_count }} modèle(s) de séance</strong> lançable(s),
+      {# Sur UNE ligne, délibérément. Replier ces expressions sur plusieurs
+         lignes insère des retours et de l'indentation DANS la phrase servie :
+         le HTML devient « 2\n      modèles ». Le rendu visuel est identique —
+         l'espace se réduit — mais le texte servi change, et un test qui
+         vérifiait que le compte est bien présent a rougi. Vu par le sweep,
+         pas par la relecture. #}
+      Publier créera <strong>{{ session_count }} {{ "modèle" | pluriel(session_count) }} de séance</strong> {{ "lançable" | pluriel(session_count) }},
       un par séance de ce programme.
     </p>
     <p style="margin-top:.75rem; color:var(--danger);">
@@ -57,7 +74,7 @@
     {% for row in rows %}
       <li style="display:flex; justify-content:space-between; gap:1rem; padding:.35rem 0; border-bottom:1px solid var(--border, #ddd);">
         <span>{{ row.position }}. <strong>{{ row.name }}</strong>
-          <span class="text-dim">({{ row.exercise_count }} exercice(s))</span>
+          <span class="text-dim">({{ row.exercise_count }} {{ "exercice" | pluriel(row.exercise_count) }})</span>
         </span>
         <code class="text-dim" style="font-size:.85em;">{{ row.slug }}</code>
       </li>
