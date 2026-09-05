@@ -70,6 +70,32 @@ class TemplateZones:
     def declared(self) -> tuple[ZoneMark, ...]:
         return tuple(z for z in self.zones if z.is_declared)
 
+    def shown(self, active_zone: str | None = None) -> tuple[ZoneMark, ...]:
+        """Les zones qui MÉRITENT d'être rendues sur la carte.
+
+        `Sb_UI_BIBLIO_01` — la carte rendait ses quatre zones, dont trois
+        redisaient son titre (« Pecs épaisseur + Delts + Triceps » contre
+        « Pectoraux · Deltoïdes latéraux · Deltoïdes postérieurs · Triceps »).
+        Le signal — la zone DÉCLARÉE en priorité, en ambre — se noyait dans sa
+        propre redite.
+
+        Deux zones méritent d'être dites, et deux seulement :
+
+        * celle que l'utilisateur a **déclarée en priorité** — le titre ne la
+          porte pas, elle est personnelle ;
+        * celle sur laquelle il **filtre en ce moment** — sinon le filtre garde
+          des cartes sans dire pourquoi. La garde
+          `test_every_template_kept_by_the_filter_really_works_that_zone` le
+          formule mieux : « un filtre qui garde un gabarit sans la zone demandée
+          ment deux fois ». Ma première écriture ne gardait que les déclarées,
+          et c'est cette garde qui l'a arrêtée.
+
+        Rien d'autre : le titre le dit déjà.
+        """
+        return tuple(
+            z for z in self.zones if z.is_declared or z.code == active_zone
+        )
+
     def __bool__(self) -> bool:
         return bool(self.zones)
 

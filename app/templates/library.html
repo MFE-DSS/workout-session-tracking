@@ -79,8 +79,18 @@
            inline, comportement inchangé (lien détail + POST create_session). #}
         <li class="template-card template-card--{{ tpl.kind }}">
           <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
+            {# `Sb_UI_BIBLIO_01` — LA NATURE PASSE AU-DESSUS DU NOM.
+               Elle flottait à droite, dans une rangée flex partagée avec le
+               titre. Or les titres passent à la ligne — « Push A — Pecs
+               épaisseur + Delts + Triceps » en occupe deux — et l'étiquette
+               atterrissait ENTRE les deux lignes, ni en haut ni en bas.
+               Vu au rendu ; le gabarit, lui, avait l'air correct.
+
+               Elle devient une étiquette de tête, sur sa propre ligne. Ordre
+               DOM changé plutôt qu'un `order:` CSS : ce qui se lit en premier
+               doit venir en premier dans le document, pour la voix comme pour
+               l'œil. #}
             <div class="template-card__row">
-              <span class="template-card__name">{{ tpl.name }}</span>
               {# `{{ tpl.kind|upper }}` remontait la valeur BRUTE de la base à
                  l'écran : `strength` devenait « STRENGTH », un anglicisme au
                  milieu d'une interface française — treize fois sur cette
@@ -93,6 +103,7 @@
                  étiquette manquante serait pire qu'une étiquette anglaise. #}
               {% set _kinds = {'strength': 'FORCE', 'cardio': 'CARDIO'} %}
               <span class="template-card__kind">{{ _kinds.get(tpl.kind, tpl.kind|upper) }}</span>
+              <span class="template-card__name">{{ tpl.name }}</span>
             </div>
             {# ⚠ LA LIGNE `focus` NE S'AFFICHE QUE FAUTE DE MIEUX, et ce n'est
                pas un retrait déguisé (`§5.3`) — c'est une SUBSTITUTION dans la
@@ -132,10 +143,43 @@
 
                Rien si le gabarit ne résout aucune zone (le LISS pur n'a aucun
                exercice) : pas de ligne vide, pas de « aucune zone » (A4). #}
+            {# `Sb_UI_BIBLIO_01` — SEULES LES ZONES DÉCLARÉES SUBSISTENT.
+
+               Les quatre pastilles d'une carte redisaient très largement son
+               titre : « Pecs épaisseur + Delts + Triceps » face à
+               « Pectoraux · Deltoïdes latéraux · Deltoïdes postérieurs ·
+               Triceps ». Trois grises pour une ambre — le signal se noyait
+               dans sa propre redite.
+
+               Ce qu'elles ajoutent VRAIMENT au titre, c'est la correspondance
+               avec une priorité déclarée. Mesuré sur deux priorités : 10
+               pastilles marquées sur 40, sur 7 cartes sur 13. En n'affichant
+               que celles-là, le signal cesse d'être noyé et devient l'unique
+               objet coloré de la carte.
+
+               ⚠ Les 6 cartes sans correspondance perdent la ligne entière, et
+               c'est voulu : une carte sans correspondance n'est pas mauvaise,
+               c'est une carte dont on n'a rien de personnalisé à dire. Écrire
+               « aucune priorité » en ferait un reproche (`A4`).
+
+               Sans aucune priorité déclarée ET sans filtre, aucune carte ne
+               porte de pastille : elle n'apparaît que lorsqu'elle veut dire
+               quelque chose.
+
+               ⚠ LA ZONE FILTRÉE RESTE, ET C'EST UNE GARDE QUI ME L'A APPRIS.
+               Ma première écriture n'affichait QUE les zones déclarées. Elle a
+               fait tomber
+               `test_every_template_kept_by_the_filter_really_works_that_zone`,
+               dont le commentaire dit exactement le défaut : « un filtre qui
+               garde un gabarit sans la zone demandée ment deux fois ». En
+               filtrant sur « Dos largeur », huit cartes restaient et aucune ne
+               disait pourquoi. Le filtre doit se justifier sur chaque carte
+               qu'il garde. #}
             {% set tz = zones_by_template.get(tpl.id) %}
-            {% if tz %}
+            {% set marquees = tz.shown(active_zone) if tz else [] %}
+            {% if marquees %}
               <ul class="template-card__zones">
-                {% for z in tz.zones %}
+                {% for z in marquees %}
                   <li class="template-card__zone{% if z.is_declared %} is-declared{% endif %}">
                     {{ z.label }}{% if z.is_declared %}<span class="sr-only"> — ta priorité déclarée : {{ z.declared_as }}</span>{% endif %}
                   </li>
@@ -155,7 +199,14 @@
                actions RARES et denses ; « Démarrer » est l'action principale
                de cette surface, répétée une fois par gabarit. Mesurée à
                26,8 px de haut, catégorie `FREQUENT_SEQUENTIAL`. #}
-            <button type="submit" class="btn btn--ghost">Démarrer</button>
+            {# `Sb_UI_BIBLIO_01` — LE NOM ACCESSIBLE NOMME CE QU'ON DÉMARRE.
+               Mesuré : `Counter({'Démarrer': 13})`. En navigation par liste de
+               boutons — ce que fait un lecteur d'écran — treize entrées
+               identiques, et le contexte de la carte ne voyage pas avec elles.
+               Le libellé VISIBLE ne change pas : c'est le nom accessible qu'on
+               complète, pas la colonne qu'on allonge. #}
+            <button type="submit" class="btn btn--ghost"
+                    aria-label="Démarrer {{ tpl.name }}">Démarrer</button>
           </form>
         </li>
       {% endfor %}
