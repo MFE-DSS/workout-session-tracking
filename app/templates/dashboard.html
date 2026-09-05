@@ -85,8 +85,14 @@
 </div>
 
 {# ── Scoring rules ── #}
-<details style="margin-top:var(--space-lg);">
-  <summary style="cursor:pointer; font-weight:600;">Comment ce score est calculé</summary>
+{# `Sb_UI_DISCLOSURE_01` — ce dépliant n'avait ni classe ni désarmement du
+   marqueur : `style="cursor:pointer; font-weight:600;"` habillait le curseur
+   et la graisse, et laissait le triangle natif du navigateur. Il n'est pas
+   apparu dans mon relevé au navigateur parce que cette branche ne se rend pas
+   dans l'état de mon laboratoire — c'est une non-conformité LATENTE, trouvée
+   en balayant les gabarits plutôt que les écrans. #}
+<details class="disclosure" style="margin-top:var(--space-lg);">
+  <summary>Comment ce score est calculé</summary>
   <div style="margin-top:var(--space-sm); color:var(--fg-dim); line-height:1.6;">
     <p><strong>Régularité</strong> — Fréquence de séances vs objectif de 4×/semaine.</p>
     <p><strong>Progression</strong> — Évolution du tonnage sur les zones actives.</p>

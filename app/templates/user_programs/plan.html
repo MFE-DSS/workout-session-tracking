@@ -190,8 +190,13 @@
      equipment, equipment_declared. Aucune sémantique de persistance n'est
      touchée. #}
   {# `UX4_01` — configuration persistante : lisible d'abord, éditable ensuite. #}
-  <details class="pstate__edit">
-  <summary>Modifier mes préférences</summary>
+  {# `Sb_UI_DISCLOSURE_01` — mesuré à 21 px de haut avant, marqueur natif,
+     aucun état de focus. Le composant `.disclosure` existait. #}
+  <details class="disclosure pstate__edit">
+  <summary class="disclosure__summary">
+    <span>Modifier mes préférences</span>
+    <span class="disclosure__chevron" aria-hidden="true">▾</span>
+  </summary>
   <form method="post" action="{{ url_for('profile_preferences_submit') }}"
         class="prefs-form" data-prefs-form>
 

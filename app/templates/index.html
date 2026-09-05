@@ -283,8 +283,19 @@
    c'est une SAISIE secondaire, pas la cause d'une décision (`Sx_UIV3_00 §6`).
    Les champs restent dans le DOM, donc la soumission sans JS est identique. #}
 <div class="card readiness-widget" style="margin-bottom:var(--space-md);border-left:3px solid var(--warn);">
-  <details>
-    <summary style="cursor:pointer;font-size:14px;margin:0;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);">
+  {# `Sb_UI_DISCLOSURE_01` — LE COMPOSANT ÉTAIT RECOPIÉ DANS UN ATTRIBUT.
+     Ce `style=` en ligne portait `min-height:44px; display:flex;
+     align-items:center; justify-content:space-between; gap:…` — c'est-à-dire
+     la définition de `.disclosure__summary`, dupliquée à la main. Le rendu
+     était correct et la dette invisible : une copie dans un attribut ne suit
+     aucune évolution du composant, et rien ne signale qu'elle existe.
+
+     ⚠ `padding` et `color` du composant ne s'appliquaient PAS ici — la carte
+     porte déjà son propre rembourrage et le titre sa couleur. C'est pourquoi
+     le libellé garde ses `<span>` et leurs styles propres : on adopte la
+     géométrie du composant, pas sa peau. #}
+  <details class="disclosure">
+    <summary class="disclosure__summary" style="padding:0;font-size:14px;">
       <span class="card__title" style="margin:0;color:var(--warn);">État du jour · non renseigné</span>
       <span class="text-dim" style="font-size:11px;font-weight:400;">Saisir · 30 sec</span>
     </summary>

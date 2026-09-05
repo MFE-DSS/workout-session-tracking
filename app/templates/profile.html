@@ -186,8 +186,19 @@
 
          Ce qui change dès maintenant : il ne constitue plus la page. Il
          s'ouvre par un geste, et sa lecture vit en tête. #}
-      <details class="pstate__edit" id="measurements">
-      <summary>Mettre à jour mes mesures <span class="pstate__legacy">saisie complète</span></summary>
+      {# `Sb_UI_DISCLOSURE_01` — LE COMPOSANT EXISTAIT, CETTE SURFACE NE S'EN
+         SERVAIT PAS. `.pstate__edit` n'avait PAS UNE LIGNE de CSS : ce dépliant
+         rendait le marqueur natif du navigateur, sans chevron, sans état de
+         focus, et surtout à 38 px de haut — sous le standard de 44 px du
+         produit (`UIV3_TARGETS_44_01`). Son voisin plus bas tombait à 21 px.
+         `interaction.css` définit `.disclosure` depuis longtemps, et
+         `_macros.html` en offre même une macro.
+         L'`id` est conservé : c'est une cible d'ancrage. #}
+      <details class="disclosure pstate__edit" id="measurements">
+      <summary class="disclosure__summary">
+        <span>Mettre à jour mes mesures <span class="pstate__legacy">saisie complète</span></span>
+        <span class="disclosure__chevron" aria-hidden="true">▾</span>
+      </summary>
       <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
           <label for="measured_at">Date</label>
@@ -311,8 +322,12 @@
          l'ACQUISITION, pas sur la donnée. Et `profile_body_submit` n'assigne
          plus ces colonnes, sans quoi retirer le champ les aurait effacées au
          prochain enregistrement. #}
-      <details class="pstate__edit" id="reference_data">
-      <summary>Modifier mes données de référence</summary>
+      {# `Sb_UI_DISCLOSURE_01` — mesuré à 21 px de haut avant. #}
+      <details class="disclosure pstate__edit" id="reference_data">
+      <summary class="disclosure__summary">
+        <span>Modifier mes données de référence</span>
+        <span class="disclosure__chevron" aria-hidden="true">▾</span>
+      </summary>
       <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
         <div class="body-profile__field" style="grid-column:1/-1;">
           <label for="email">Email</label>
