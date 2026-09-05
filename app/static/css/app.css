@@ -124,7 +124,333 @@
        libellé et d'une hachure — jamais distingué par la couleur
        seule (`Sx_UIV3_00 §7`). */
   --t-unknown:     #828E9E;  /* 4,29 */
+
+  /* ==========================================================
+     `AUREN_UI_U1_ROLE_TOKENS` — LA COUCHE DE RÔLES
+     Socle : `AUREN_VISUAL_BACKBONE §3.1`
+     ----------------------------------------------------------
+     POURQUOI CETTE COUCHE EXISTE
+
+     La palette cockpit ci-dessus nomme des VALEURS (`--t-amber`,
+     `--t-blue-fg`). Elle ne nomme pas des EMPLOIS. Conséquence
+     mesurable : `--t-amber` est documenté « action utilisateur ·
+     objet actif » — DEUX emplois sous un seul nom. Le jour où
+     l'objet actif doit cesser de ressembler à un bouton, aucun
+     sélecteur ne permet de les séparer, parce que le CSS n'a
+     jamais su lesquels étaient lesquels.
+
+     Cette couche déclare l'EMPLOI, aliasé sur la valeur en place.
+     `RÔLE → TOKEN → VALEUR`, jamais « ambre = action ».
+
+     ⚠ CETTE TRANCHE NE RECÂBLE AUCUN CONSOMMATEUR. Elle ajoute des
+     noms. Le rendu est identique avant/après, et c'est le résultat
+     attendu : la migration des consommateurs est une tranche à
+     part, qui passera par une exposition (`CLAUDE.md §5.1`).
+
+     ⚠ TROIS RÔLES PARTAGENT AUJOURD'HUI LA MÊME VALEUR AMBRE
+     (`action-primary`, `state-active`, `focus`). C'est voulu et
+     c'est tout l'objet : des tokens distincts qui aliasent la même
+     valeur peuvent DIVERGER un jour ; une valeur unique employée à
+     trois fins ne le peut pas.
+     ========================================================== */
+
+  /* — SURFACE · l'échelle L0→L3 reçoit ses emplois produit.
+       Les quatre niveaux de `AUREN_VISUAL_BACKBONE §2` ne sont pas
+       une échelle neuve : ce sont ces quatre fonds, déjà mesurés,
+       auxquels la structure produit donne enfin un sens.
+
+       ⚠ Le 4e niveau produit — « en vol », l'objet actif — n'est
+       PAS un 5e fond : c'est `--role-state-active` posé sur l'un
+       de ces quatre. Une profondeur de plus aurait été inventée
+       pour rien. */
+  --role-surface-chassis:     var(--t-void);     /* L0 · le sol du cockpit */
+  --role-surface-canvas:      var(--t-base);     /* L1 · le champ */
+  --role-surface-group:       var(--t-surface);  /* L2 · le logement */
+  --role-surface-instrument:  var(--t-raised);   /* L3 · la plaque */
+
+  /* — TEXTE · seuil 4,5:1 sur le pire fond réel (L3). */
+  --role-text-primary:        var(--t-fg);        /* 12,02 */
+  --role-text-secondary:      var(--t-fg-2);      /*  6,50 */
+  --role-text-muted:          var(--t-fg-muted);  /*  4,64 */
+  --role-text-on-action:      var(--t-on-amber);  /*  8,14 sur ambre */
+
+  /* — STRUCTURE · ne portent aucun sens, exempts du seuil 4:1. */
+  --role-border-subtle:       var(--t-line);
+  --role-border-emphasis:     var(--t-line-strong);
+  /* NON-TEXTE UNIQUEMENT (3,27 sur L3). Séparateurs et glyphes. */
+  --role-glyph-decorative:    var(--t-fg-faint);
+
+  /* — ACTION ET INTERACTION.
+       `action-terminal` est déclaré et aliasé sur l'ambre FAUTE DE
+       DÉCISION : `S-09` (registre d'une action irréversible) n'est
+       pas tranché. Le rôle existe pour que la décision ait un
+       endroit où atterrir, pas parce que sa valeur est arrêtée. */
+  --role-action-primary:      var(--t-amber);        /* 5,93 */
+  --role-action-hover:        var(--t-amber-hover);  /* 7,19 */
+  --role-action-terminal:     var(--t-amber);        /* ⚠ provisoire — `S-09` */
+  --role-action-dim:          var(--t-amber-dim);    /* 3,18 — NON-TEXTE */
+  --role-state-active:        var(--t-amber);        /* ⚠ même valeur, autre emploi */
+  --role-focus:               var(--t-amber);        /* ⚠ idem — cf. `:focus-visible` */
+
+  /* — PROVENANCE · ce que le MOTEUR produit. Jamais une action.
+       Distinct de `support-information` : une provenance n'est pas
+       une nature de retour. */
+  --role-origin-system:       var(--t-blue-fg);    /* 8,57 — texte */
+  --role-origin-system-data:  var(--t-blue-mid);   /* 5,46 — trait de donnée */
+  --role-origin-system-line:  var(--t-blue-line);  /* 4,39 — filet porteur */
+
+  /* — DONNÉE ABSENTE · ni action, ni production du système.
+       Toujours accompagnée d'un libellé et d'une hachure. */
+  --role-data-unknown:        var(--t-unknown);    /* 4,29 */
+
+  /* — SUPPORT · retour d'OPÉRATION (formulaire, erreur, succès).
+       ⛔ JAMAIS pour encoder une récupération : `Sx_UIV3_00 §4`
+       interdit le feu tricolore sur les bandes, et `Sx_UIV3_04 §3`
+       interdit l'ambre sur un état de récupération. Ces quatre
+       rôles servent ce que l'UTILISATEUR vient de faire, jamais ce
+       que son CORPS est.
+
+       ⚠ TROIS VALEURS SONT CORRIGÉES ICI, ET LE DÉFAUT ÉTAIT RÉEL.
+       Elles viennent de la génération héritée (`--ok` `--warn`
+       `--danger` `--info`), mesurées à l'époque sur `--bg` seul.
+       Sur le pire fond réel (L3 `--t-raised`) :
+
+           --danger #B85C5C → 3,21:1   ⛔ sous 4,0, très loin de 4,5
+           --info   #6E8FA8 → 4,19:1   ⛔ sous 4,5 (texte)
+           --warn   #C77B54 → 4,35:1   ⛔ sous 4,5 (texte)
+           --ok     #6E9E7A → 4,65:1   ✅ conforme, repris tel quel
+
+       C'est EXACTEMENT le défaut `--t-blue-line` (#4A7FB5, conforme
+       sur base, 3,40 sur L3) reproduit une génération plus tard.
+       Un message d'erreur est du TEXTE : 3,21:1 est illisible.
+
+       Corrections à teinte ET saturation constantes — seule la
+       luminosité monte, la couleur reste la même famille.
+       Les valeurs héritées ne sont PAS touchées : leurs
+       consommateurs actuels gardent leur rendu (`§5.3`). */
+  --role-support-success:     #6E9E7A;  /* 4,65 — inchangé */
+  --role-support-warning:     #C97F59;  /* 4,53 — corrigé de #C77B54 (4,35) */
+  --role-support-error:       #C67D7D;  /* 4,51 — corrigé de #B85C5C (3,21) */
+  --role-support-information: #7695AD;  /* 4,54 — corrigé de #6E8FA8 (4,19) */
+
+  /* ==========================================================
+     `AUREN_UI_U2_CHASSIS` — LE RELIEF
+     Arbitrages opérateur du 2026-09-04 : `Q1=C` · `Q2=A` · `Q4=B`
+     ----------------------------------------------------------
+     POURQUOI LE RELIEF, ET PAS PLUS DE CONTRASTE
+
+     `Q1=C` demandait « le fond dit où on est, le délimiteur dit
+     qu'on change ». En mesurant la marge disponible, la moitié
+     « fond » s'est révélée VIDE :
+
+       · L1 est la référence et ne bouge pas ;
+       · L3 est PLAFONNÉ à sa valeur actuelle — `support-error`
+         (#C67D7D) y vaut 4,51 pour un seuil de 4,5, soit **0,01
+         de marge**. Monter L3 d'un cran casse un message d'erreur ;
+       · L0 poussé au NOIR PUR ne gagne que 1,065 → 1,127.
+
+     La plage de luminance est donc épuisée. Ce n'est pas que le
+     délimiteur aide le contraste : **le délimiteur fait le
+     travail que le contraste ne peut plus faire.**
+
+     LA DICHOTOMIE (`Q2=A`, précisée par le code)
+
+     `--t-void` (L0) n'a qu'UN SEUL consommateur dans tout le
+     produit : le fond du champ de saisie d'une série
+     (`session_focus.css .setline__field`). Ce n'est pas un sol de
+     cockpit — c'est un PUITS.
+
+     D'où le modèle réel, qui n'est pas une échelle à quatre
+     degrés mais **trois élévations et un creux** :
+
+       L1 champ      ce qui ne change jamais pendant la séance
+       L2 logement   ce qui change entre deux séances
+       L3 plaque     ce qui change PENDANT la séance
+       L0 puits      ce dans quoi on SAISIT — creusé, pas empilé
+
+     L'élévation encode donc la VOLATILITÉ (`Q2=A`), et le puits
+     est **orthogonal** : il est taillé dans le niveau où il se
+     trouve, jamais un cinquième degré.
+
+     Règle mécanique qui en découle, et qui décide sans goût :
+     « cet objet change-t-il pendant une séance ? » → L3.
+     « entre deux séances ? » → L2. « jamais ? » → L1.
+     « on y saisit une valeur ? » → puits.
+     ========================================================== */
+
+  /* — ARÊTES. Une arête physique se lit à DEUX traits : le côté
+       qui reçoit la lumière et celui qui est dans l'ombre.
+       **L'ordre des deux décide du sens** — c'est toute la
+       dichotomie, et elle survit au niveaux de gris.
+
+       Valeurs en alpha, pas en hex : une arête doit fonctionner
+       sur les quatre fonds sans être remesurée à chaque fois.
+       Elles ne portent aucun texte, donc aucun seuil de lisibilité
+       ne s'y applique (`Sx_UIV3_04 §5`). */
+  --role-edge-lit:            rgba(255, 255, 255, 0.055);
+  --role-edge-shadow:         rgba(0, 0, 0, 0.50);
+
+  /* — RELIEF COMPOSÉ. Deux valeurs, deux sens opposés. */
+  --relief-raised:  inset 0 1px 0 var(--role-edge-lit),
+                    0 1px 2px var(--role-edge-shadow);
+  --relief-carved:  inset 0 1px 2px var(--role-edge-shadow),
+                    inset 0 -1px 0 var(--role-edge-lit);
+
+  /* — GRAIN. `Q3=A` tranché sur rendu le 2026-09-04 : le grain est
+       une PROPRIÉTÉ DU NIVEAU, de densité DÉCROISSANTE avec
+       l'élévation. C'est la seule des trois options qui rende la
+       profondeur lisible **sans la couleur** — donc la seule qui
+       réponde à la demande « au-delà de la couleur », et la seule
+       qui tienne encore en niveaux de gris.
+
+       `--texture-grain` est un MULTIPLICATEUR RÉEL, pas une
+       étiquette : chaque densité passe par
+       `calc(var(--texture-grain) * …)`. Le mettre à 0 éteint
+       vraiment la texture partout. Un token qui ne commanderait
+       rien serait une variable décorative — la forme de garde
+       creuse que ce dépôt a déjà payée trois fois. */
+  --texture-grain: 1;
+
+  /* Densités par niveau. Plus l'objet est BAS, plus il est granuleux :
+     ce qui est proche de vous est net. */
+  --grain-field:   0.17;   /* L1 · le champ */
+  --grain-housing: 0.10;   /* L2 · le logement */
+  --grain-plate:   0.05;   /* L3 · la plaque */
 }
+
+/* Le grain RÉDUIT le contraste. Sous `prefers-contrast: more`, il
+   s'éteint — ce n'est pas une préférence de mouvement, donc
+   `prefers-reduced-motion` ne s'applique pas ici et ne doit pas
+   servir d'alibi. */
+@media (prefers-contrast: more) {
+  :root { --texture-grain: 0; }
+}
+
+/* ==========================================================
+   `AUREN_UI_U2_CHASSIS` — LA PRIMITIVE
+   ----------------------------------------------------------
+   ⚠ CONSTRUITE ET EXPOSÉE, PAS ENCORE APPLIQUÉE. Aucun template
+   n'utilise ces classes dans cette tranche. L'application
+   surface par surface est `U3` et suivantes, chacune avec sa
+   propre exposition.
+
+   Ces règles consomment des RÔLES, jamais des `--t-*` bruts.
+   C'est l'invariant que garde `test_ui_chassis_primitive`.
+   ========================================================== */
+
+/* Le champ — ce qui ne change jamais pendant la séance. Pas de
+   relief : on ne surélève pas le sol, on pose dessus. */
+.lvl-field {
+  background: var(--role-surface-canvas);
+}
+
+/* Le logement — ce qui change entre deux séances. */
+.lvl-housing {
+  background: var(--role-surface-group);
+  box-shadow: var(--relief-raised);
+  border-radius: var(--radius);
+}
+
+/* La plaque — ce qui change PENDANT la séance. Seul niveau
+   autorisé à porter `state-active`. */
+.lvl-plate {
+  background: var(--role-surface-instrument);
+  box-shadow: var(--relief-raised);
+  border-radius: var(--radius);
+}
+
+/* Le puits — ce dans quoi on saisit. Creusé dans son parent,
+   quel qu'il soit : le relief est inversé, pas le fond empilé. */
+.lvl-well {
+  background: var(--role-surface-chassis);
+  box-shadow: var(--relief-carved);
+  border-radius: var(--radius-sm);
+}
+
+/* L'objet en vol. `state-active` n'est pas un niveau : c'est un
+   état posé sur un niveau (`BACKBONE §2`). Il ne déplace donc
+   aucun fond — il allume une arête. */
+.lvl-plate.is-live {
+  box-shadow: inset 0 0 0 1px var(--role-state-active),
+              var(--relief-raised);
+}
+
+/* ---- GRAIN PAR NIVEAU (`Q3=A`) ----
+   Deux couches : un bruit fractal (data-URI, zéro asset externe) et des
+   scanlines. Les deux passent par `--texture-grain`, donc s'éteignent
+   ensemble.
+
+   ⚠ PAS de `overflow: hidden` sur les niveaux. Le clip est obtenu par
+   `border-radius: inherit` sur la surcouche. Poser `overflow: hidden`
+   sur un conteneur de produit rognerait les enfants `position: sticky`
+   — dont le CTA collant du mode séance. */
+.lvl-field,
+.lvl-housing,
+.lvl-plate {
+  position: relative;
+  isolation: isolate;
+}
+
+.lvl-field::before,
+.lvl-housing::before,
+.lvl-plate::before,
+.lvl-field::after,
+.lvl-housing::after,
+.lvl-plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* bruit */
+.lvl-field::before,
+.lvl-housing::before,
+.lvl-plate::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+/* scanlines */
+.lvl-field::after,
+.lvl-housing::after,
+.lvl-plate::after {
+  background: repeating-linear-gradient(
+    to bottom, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px
+  );
+}
+
+/* Densité décroissante avec l'élévation. `--texture-grain` multiplie
+   chaque valeur : le mettre à 0 éteint réellement les six couches. */
+.lvl-field::before  { opacity: calc(var(--texture-grain) * var(--grain-field)); }
+.lvl-housing::before{ opacity: calc(var(--texture-grain) * var(--grain-housing)); }
+.lvl-plate::before  { opacity: calc(var(--texture-grain) * var(--grain-plate)); }
+
+.lvl-field::after   { opacity: calc(var(--texture-grain) * 0.85); }
+.lvl-housing::after { opacity: calc(var(--texture-grain) * 0.55); }
+.lvl-plate::after   { opacity: calc(var(--texture-grain) * 0.30); }
+
+/* Le contenu passe AU-DESSUS du grain. Sans cela le texte serait
+   recouvert par les scanlines et la contrainte de premier rang —
+   « le texte doit rester très simple et lisible » — serait perdue
+   par un défaut d'empilement, pas par un choix. */
+.lvl-field > *,
+.lvl-housing > *,
+.lvl-plate > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Le puits ne reçoit pas de grain : il est petit, il porte une valeur
+   saisie, et le texturer coûterait de la lisibilité là où elle vaut le
+   plus cher. C'est un choix, pas un oubli.
+
+   Le relief est une information, pas une animation : rien à désarmer
+   sous `prefers-reduced-motion`. Le grain, lui, s'éteint sous
+   `prefers-contrast: more` — voir `:root` ci-dessus. */
 
 /* ---- Reset + Base ---- */
 

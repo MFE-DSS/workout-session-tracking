@@ -80,12 +80,40 @@
      Contrastes AA vérifiés sur base #0F1318 (identiques au Home).
      ============================================================ */
 
-  /* --- Surfaces graphite (séparation par luminosité, pas d'ombre) --- */
-  --color-bg-base:       #0F1318;
-  --color-bg-elevated:   #151A21;
-  --color-surface:       #151A21;
-  --color-surface-alt:   #1B2029;
-  --color-surface-sunken:#0B0E13;
+  /* --- Surfaces : ALIAS SUR LES RÔLES, plus de valeurs propres ---
+     `AUREN_UI_U3_SESSION` — trois défauts mesurés, tous invisibles au dépôt.
+
+     1. LA SÉANCE ÉTAIT RESTÉE SUR L'ANCIENNE ÉCHELLE.
+        `UIV3_COCKPIT_LADDER_01` a corrigé la profondeur dans `app.css` —
+        L2 de #151A21 à #191F27, L3 à #232B36, marches mesurées 1,124 et
+        1,161. Mais cette feuille déclarait SES PROPRES valeurs, restées
+        aux anciennes : marches **1,067 et 1,070**, sous le plancher de
+        perception de 1,120 que le dépôt s'est fixé.
+
+        La correction n'a donc jamais atteint la surface souveraine.
+        `test_session_css_still_declares_no_palette_token` ne l'a pas vu :
+        il vérifie que `--t-*` n'est pas redéclaré, et la divergence
+        passait par une génération `--color-*` entière, juste à côté.
+
+     2. L'ÉLÉVATION ÉTAIT INVERSÉE. La carte ACTIVE prenait
+        `--color-surface` (#151A21) et les cartes EN ATTENTE
+        `--color-surface-alt` (#1B2029), **plus clair**. Les exercices
+        qu'on ne fait pas flottaient au-dessus de celui qu'on fait.
+        `Q2=A` dit l'inverse : l'élévation encode la volatilité.
+
+     3. LES OMBRES ÉTAIENT NEUTRALISÉES À `none`, alors que trois règles
+        écrivent `box-shadow: var(--shadow-sm)` — dont l'en-tête collant
+        et la barre collante, qui doivent se détacher du contenu qui
+        défile dessous. Le code se lisait comme une intention et rendait
+        zéro. Voir plus bas.
+
+     Ces tokens deviennent des ALIAS. Une seule autorité (`app.css`), et
+     la séance suit désormais toute correction de l'échelle. */
+  --color-bg-base:       var(--role-surface-canvas);      /* L1 · le champ */
+  --color-bg-elevated:   var(--role-surface-group);       /* L2 · le logement */
+  --color-surface:       var(--role-surface-instrument);  /* L3 · la plaque — l'ACTIF monte */
+  --color-surface-alt:   var(--role-surface-group);       /* L2 · l'attente DESCEND */
+  --color-surface-sunken:var(--role-surface-chassis);     /* L0 · le puits */
 
   /* --- Foreground gris froids (AA sur base) --- */
   --color-fg-strong:     #E8ECEF;
@@ -93,10 +121,13 @@
   --color-fg-muted:      #A7B0BA;
   --color-fg-subtle:     #8A94A0;
 
-  /* --- Borders --- */
-  --color-border-subtle: #2A303A;
-  --color-border-default:#3A4250;
-  --color-border-strong: #4A5462;
+  /* --- Borders : alias sur les rôles structurels ---
+     Les filets de `app.css` sont plus clairs (#333D4B / #475365) que ceux
+     déclarés ici (#2A303A / #3A4250) : la séparation gagne exactement là
+     où l'opérateur la trouvait insuffisante. */
+  --color-border-subtle: var(--role-border-subtle);
+  --color-border-default:var(--role-border-emphasis);
+  --color-border-strong: var(--role-border-emphasis);
 
   /* --- Accent AMBRE unique (remplace teal, OQ-02b-A) --- */
   --color-accent-strong: #D7B45C;
@@ -130,9 +161,21 @@
   --radius-md: 6px;
   --radius-lg: 6px;
 
-  /* --- Shadows : neutralisées (séparation par 1px line + luminosité) --- */
-  --shadow-sm: none;
-  --shadow-md: none;
+  /* --- Relief : les ombres cessent d'être `none` ---
+     Elles étaient neutralisées au nom de « séparation par 1px line +
+     luminosité ». Or la luminosité, on vient de le mesurer, ne séparait
+     pas : 1,067 et 1,070, sous le plancher. La séparation reposait donc
+     sur **un filet de 1 px, seul**.
+
+     Trois règles écrivent `box-shadow: var(--shadow-sm)` — l'en-tête
+     collant, la barre collante, la carte active — et rendaient toutes
+     `none`. Une déclaration qui se lit comme une intention et rend zéro
+     est pire qu'une absence : personne ne la cherche.
+
+     `--relief-raised` porte la lumière en haut et l'ombre en bas :
+     l'arête est une information, pas un effet. */
+  --shadow-sm: var(--relief-raised);
+  --shadow-md: var(--relief-raised);
 
   /* --- Typographie : TOUT-MONO système, zéro webfont.
      --font-family-sans est remappé sur le stack mono pour que tout le
@@ -1230,6 +1273,80 @@
   padding: var(--space-2) var(--space-3);
 }
 
+/* ============================================================
+   `AUREN_UI_U3_SESSION` — LE GRAIN PAR NIVEAU (`Q3=A`)
+   ------------------------------------------------------------
+   Densité DÉCROISSANTE avec l'élévation : ce qui est proche est net.
+   Les densités et le multiplicateur viennent de `app.css` — cette
+   feuille n'en déclare aucune, sinon elle recréerait la divergence
+   que cette tranche vient de fermer.
+
+   Aucun `overflow: hidden` : il rognerait la barre collante et
+   l'en-tête collant, tous deux `position: sticky` dans cette page.
+   Le clip passe par `border-radius: inherit` sur la surcouche.
+   ============================================================ */
+.session-focus,
+.session-focus__cockpit .session-focus__card {
+  position: relative;
+  isolation: isolate;
+}
+
+.session-focus::before,
+.session-focus::after,
+.session-focus__cockpit .session-focus__card::before,
+.session-focus__cockpit .session-focus__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.session-focus::before,
+.session-focus__cockpit .session-focus__card::before {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+.session-focus::after,
+.session-focus__cockpit .session-focus__card::after {
+  background: repeating-linear-gradient(
+    to bottom, rgba(0, 0, 0, 0.16) 0 1px, transparent 1px 3px
+  );
+}
+
+/* L1 — le champ */
+.session-focus::before { opacity: calc(var(--texture-grain) * var(--grain-field)); }
+.session-focus::after  { opacity: calc(var(--texture-grain) * 0.85); }
+
+/* L2 — les logements : les exercices qu'on ne fait pas */
+.session-focus__cockpit .session-focus__card:not(.session-focus__card--active)::before {
+  opacity: calc(var(--texture-grain) * var(--grain-housing));
+}
+.session-focus__cockpit .session-focus__card:not(.session-focus__card--active)::after {
+  opacity: calc(var(--texture-grain) * 0.55);
+}
+
+/* L3 — la plaque : l'exercice en vol, le plus net */
+.session-focus__cockpit .session-focus__card--active::before {
+  opacity: calc(var(--texture-grain) * var(--grain-plate));
+}
+.session-focus__cockpit .session-focus__card--active::after {
+  opacity: calc(var(--texture-grain) * 0.30);
+}
+
+/* Le contenu passe AU-DESSUS du grain. Sans cet empilement, les
+   scanlines recouvriraient le readout et la contrainte de premier rang
+   — « le texte doit rester très simple et lisible » — serait perdue par
+   un défaut de z-index, pas par un choix. */
+.session-focus > *,
+.session-focus__cockpit .session-focus__card > * {
+  position: relative;
+  z-index: 1;
+}
+
 /* -------- Cockpit hero interne (§18) : intent + worked area + cues.
    Bloc dense mais lisible, sous le head de la carte active. -------- */
 /* Sb_UIV2_SESSION_FOCUS_02 — le hero ne porte plus qu'une LIGNE de cible ;
@@ -2235,10 +2352,16 @@ body.is-session-focus-mode .foot {
   font-size: 22px;
   font-variant-numeric: tabular-nums;
   text-align: center;
-  color: var(--t-fg);
-  background: var(--t-void);
-  border: 1px solid var(--t-line-strong);
+  color: var(--role-text-primary);
+  /* LE PUITS. `--t-void` n'a qu'un consommateur dans tout le produit, et
+     c'est celui-ci : ce niveau n'est pas un sol de cockpit, c'est ce dans
+     quoi on saisit. Le relief est donc CREUSÉ, jamais surélevé — c'est la
+     dichotomie de `U2`, et elle survit aux niveaux de gris parce qu'elle
+     tient à l'ordre des deux traits de l'arête. */
+  background: var(--role-surface-chassis);
+  border: 1px solid var(--role-border-emphasis);
   border-radius: 5px;
+  box-shadow: var(--relief-carved);
 }
 .setline__field::placeholder { color: var(--t-fg-faint); font-size: 15px; }
 .setline__field:focus {
@@ -2694,12 +2817,24 @@ body.is-session-focus-mode .foot {
    jouer ». Il devient un rail de 2 px.
    Sélecteur descendant plutôt que `!important` : la spécificité suffit et
    ne redéclare pas un sélecteur déjà utilisé plus haut. */
+/* `AUREN_UI_U3_SESSION` — LA DÉCISION EST TENUE, SA COLLATÉRALE EST RÉPARÉE.
+
+   Ce que la règle ci-dessus protégeait : « deux ambres pleins sur un écran, et
+   l'ambre cesse de vouloir dire c'est à toi de jouer ». **Ce motif reste vrai
+   et le rail de 2 px reste.**
+
+   Ce qu'elle a emporté au passage : `background: transparent`, `box-shadow:
+   none`, `border-radius: 0`. L'exercice ACTIF — l'objet qui change pendant la
+   séance, donc la PLAQUE de `Q2=A` — se retrouvait sans aucune surface.
+
+   C'est la source concrète de « l'interface plate » : le retrait visait le
+   CADRE AMBRE, pas la surface. On rend la surface sans rendre le cadre. */
 .session-focus .session-focus__card--active {
   border: 0;
   border-left: 2px solid var(--t-amber-dim);
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  border-radius: var(--radius-md);
+  background: var(--role-surface-instrument);  /* L3 · la plaque */
+  box-shadow: var(--relief-raised);
   padding-left: 12px;
 }
 .exercise-card__compact--active .exercise-card__code {
