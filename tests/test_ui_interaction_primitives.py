@@ -316,7 +316,25 @@ def test_the_family_stays_small():
     #: pas destinées à être réutilisées ailleurs et ne comptent donc pas comme
     #: des variantes de la famille. Elles restent listées explicitement pour
     #: que leur ajout soit un geste conscient.
-    layout = {"prefs-form", "prefs-block", "prefs-fallback"}
+    #:
+    #: `plan-*` — AJOUTÉES PAR `Sb_UI_PLAN_01`, et rangées ICI plutôt qu'en
+    #: primitives, délibérément.
+    #:
+    #: Elles transposent la grammaire du viseur à « Mon plan » : une séquence
+    #: (`plan-seq`), un souverain (`plan-hero`), un fil (`plan-thread`), un
+    #: tiroir de manque (`plan-gap`). C'est un AGENCEMENT d'écran, pas un
+    #: vocabulaire réutilisable — rien d'autre dans le produit n'a une semaine
+    #: à montrer.
+    #:
+    #: Le jour où une deuxième surface aurait besoin de « montrer une suite
+    #: d'étapes dont une est promue », ce serait le moment d'en faire une
+    #: primitive — et de venir le défendre ici, comme `input-shell` l'a été.
+    #: Les promouvoir maintenant, pour un seul emploi, serait exactement la
+    #: prolifération que ce plafond combat.
+    layout = {
+        "prefs-form", "prefs-block", "prefs-fallback",
+        "plan-seq", "plan-hero", "plan-thread", "plan-gap",
+    }
     #: Composant HISTORIQUE réparé depuis ce fichier, pas une primitive neuve.
     #: `Sb_UI_SESSION_CHOICES_DISCLOSURES_01` y corrige le `display:none` qui
     #: retirait le radio natif du clavier ; la règle vit ici parce que le

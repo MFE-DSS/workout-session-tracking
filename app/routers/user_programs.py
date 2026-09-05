@@ -400,6 +400,15 @@ def _weekly_plan_proposal(db, user_id: int) -> dict | None:
             "sessions": readiness.sessions,
             "exercises": readiness.exercises,
             "planned_sets": readiness.planned_sets,
+            # `Sb_UI_PLAN_01` — LES SÉANCES, PAS SEULEMENT LEUR NOMBRE.
+            #
+            # Cette route recevait quatre séances construites, avec leurs
+            # créneaux et leurs doses, et n'en transmettait que le compte. Le
+            # gabarit ne pouvait donc écrire que « 4 séances/semaine » : il
+            # n'avait pas de quoi en dire plus.
+            #
+            # `sessions` reste, inchangé, pour ses consommateurs actuels.
+            "session_summaries": readiness.session_summaries,
             "status": readiness.status.value,
             "priorities": [
                 RADAR_AXES[axis]["label"]
