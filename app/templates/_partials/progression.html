@@ -22,8 +22,61 @@
    gabarit est rendu comme PROVENANCE lorsqu'un exercice en a franchi
    plusieurs — jamais comme séparateur. #}
 
+{# LE RELEVÉ SOUVERAIN — `AUREN_VISUAL_BACKBONE §4`, patron validé sur rendu.
+
+   Mesuré avant : les cinq plus grosses typographies de cet écran étaient des
+   COMPTAGES (« 3 zones touchées » à 34 px ; « 3 », « 10 », « 100 % », « 4 » à
+   28 px), et la progression — ce que l'écran nomme — tenait en 13 px, son
+   écart en 11 px, le plus petit texte de la page.
+
+   L'ordre du patron est suivi : méta · titre · readout · trace · référence.
+
+   * la référence (`avant 24`) porte `origin-system-data` — « la dernière fois,
+     en bleu système ». Elle n'est pas une action, et le bleu la distingue de
+     la valeur en cours sans lui opposer une couleur de verdict ;
+   * l'affordance de rang 2 vit SUR LE TITRE (règle 4.2/5), pas dans un lien
+     concurrent posé dessous ;
+   * la trace rend les six occurrences que le service retenait déjà et jetait.
+
+   AUCUN JUGEMENT N'EST AJOUTÉ. La trace est une suite de charges dans l'ordre
+   où elles ont été notées : ni seuil, ni tendance nommée, ni couleur. Le
+   dernier segment est marqué par une BORDURE, pas par une teinte —
+   `no-color-only-state`. #}
 {% if progression.any %}
 <h2 class="section-header">Progression par exercice</h2>
+
+{% if progression.lead %}
+{% set L = progression.lead %}
+<div class="lead">
+  <p class="lead__meta">Le dernier mouvement</p>
+  <a class="lead__title" href="{{ L.href }}">{{ L.name }}</a>
+
+  <div class="lead__wells">
+    <div class="lead__well">
+      <span class="lead__unit">kg</span>
+      <span class="lead__value">{{ L.latest_weight }}</span>
+      <span class="lead__ref">avant {{ L.previous_weight }}</span>
+      {% if L.delta_weight %}<span class="lead__delta">{{ L.delta_weight }}</span>{% endif %}
+    </div>
+    <div class="lead__well">
+      <span class="lead__unit">reps</span>
+      <span class="lead__value">{{ L.latest_reps }}</span>
+      <span class="lead__ref">avant {{ L.previous_reps }}</span>
+      {% if L.delta_reps %}<span class="lead__delta">{{ L.delta_reps }}</span>{% endif %}
+    </div>
+  </div>
+
+  {% if L.trace | length > 1 %}
+  <ol class="lead__trace" aria-label="Charges des séances retenues, de la plus ancienne à la plus récente">
+    {% for t in L.trace %}
+      <li class="lead__occ{% if loop.last %} is-latest{% endif %}">{{ t }}</li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+
+  {% if L.provenance %}<p class="lead__prov">{{ L.provenance }}</p>{% endif %}
+</div>
+{% endif %}
 
 {% if progression.rows %}
 <ul class="prog">

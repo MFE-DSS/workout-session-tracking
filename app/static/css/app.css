@@ -2668,6 +2668,136 @@ input, button, textarea, select {
  * correctif de TRAIN1-A avait été posé en amont de la définition d'origine et
  * s'était fait écraser en silence, même spécificité, la dernière gagne.
  */
+
+/* ── LE RELEVÉ SOUVERAIN — patron d'instrument `AUREN_VISUAL_BACKBONE §4`.
+ *
+ * Mesuré avant : les cinq plus grosses typographies de cet écran étaient des
+ * COMPTAGES, entre 28 et 34 px ; la progression tenait en 13 px et son écart
+ * en 11 px, le plus petit texte de la page. Le readout souverain rétablit
+ * l'ordre — une seule valeur très grande, et c'est la valeur.
+ *
+ * PROFONDEUR : les puits sont des MODULES (`§2`, niveau 3 — « plaque
+ * encastrée dans le logement »), donc `surface-instrument`, encastrés. Pas
+ * une carte bordée : `Q5` réserve la carte au rang ACTIONNABLE, et lire sa
+ * progression n'est pas agir. « Le châssis remplace la carte » (`§4.2`).
+ *
+ * COULEUR : aucune valeur neuve, que des rôles déjà mesurés.
+ */
+.lead { margin: 0 0 var(--space-md); }
+
+.lead__meta {
+  margin: 0 0 2px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+/* `§4.2` règle 5 — le rang 2 vit SUR LE TITRE, jamais dans un bouton
+ * concurrent posé dessous. Le titre EST le lien vers l'historique. */
+.lead__title {
+  display: block;
+  min-height: 44px;
+  padding: 6px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--role-text-primary);
+  text-decoration: none;
+}
+
+.lead__title:hover,
+.lead__title:focus-visible { border-bottom: 1px solid var(--accent); }
+
+.lead__wells { display: flex; gap: var(--space-sm); }
+
+.lead__well {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md, 10px);
+  background: var(--role-surface-instrument);
+}
+
+.lead__unit {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+/* La valeur souveraine. 32 px = `--font-size-metric-lg` du viseur : le même
+ * rang typographique pour le même rôle, d'une surface à l'autre. */
+.lead__value {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  color: var(--role-text-primary);
+}
+
+/* LA RÉFÉRENCE — « la dernière fois, en bleu système » (`§4.1`). Le bleu dit
+ * la PROVENANCE, pas un verdict : `origin-system-data` est le trait de
+ * donnée, mesuré 5,46. Le distinguer de la valeur en cours par la teinte plutôt
+ * que par la seule taille évite de faire lire « avant » comme « moins bien ». */
+.lead__ref {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--role-origin-system-data);
+}
+
+.lead__delta {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--role-text-muted);
+}
+
+/* LA TRACE — les six occurrences retenues, du plus ancien au plus récent.
+ * Ce n'est pas une jauge à verdict : aucun segment ne vaut mieux qu'un autre,
+ * donc aucune teinte ne les sépare. Le plus récent se distingue par une
+ * BORDURE et un texte plus contrasté — forme d'abord (`no-color-only-state`). */
+.lead__trace {
+  display: flex;
+  gap: 4px;
+  margin: var(--space-sm) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lead__occ {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 2px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--role-surface-instrument);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  color: var(--role-text-muted);
+}
+
+.lead__occ.is-latest {
+  border-color: var(--role-border-emphasis);
+  color: var(--role-text-primary);
+}
+
+.lead__prov {
+  margin: var(--space-sm) 0 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--role-text-muted);
+}
+
 .prog {
   list-style: none;
   margin: 0 0 var(--space-md);
@@ -2898,8 +3028,13 @@ input, button, textarea, select {
 
 .ze__read { display: flex; flex-direction: column; gap: 1px; }
 
+/* 34 px → 22 px. Ce compte était la PLUS GROSSE typographie de l'écran, sur
+ * une page nommée « Progression » où la progression tenait en 13 px. Il reste
+ * — retirer un fait pour en promouvoir un autre serait une soustraction
+ * (`CLAUDE.md §5.3`) — mais il cesse de dominer ce qu'il annote. 22 px est le
+ * rang `heading-2` du socle, sous les 32 px du readout souverain. */
 .ze__n {
-  font-size: 34px;
+  font-size: 22px;
   line-height: 0.9;
   font-weight: 600;
   color: var(--fg);
@@ -2911,10 +3046,15 @@ input, button, textarea, select {
 .ze__n--muted { color: var(--fg-dim); font-weight: 400; }
 
 /* PARTIEL — un mot, pas un chiffre. Mettre « 2 » en grand donnerait à un
- * minimum observé le poids d'un compte exhaustif, ce qu'il n'est pas. */
-.ze__n--partial { font-size: 20px; font-weight: 400; color: var(--fg-muted);
+ * minimum observé le poids d'un compte exhaustif, ce qu'il n'est pas.
+ *
+ * ⚠ Ces deux-là descendent AVEC le compte, et pas pour l'esthétique : leur
+ * rôle est d'être visiblement plus petits que lui. À 34/20 l'écart portait le
+ * sens ; laisser 20 sous un compte redescendu à 22 l'aurait effacé, et un
+ * minimum observé aurait repris le poids d'un compte exhaustif. */
+.ze__n--partial { font-size: 16px; font-weight: 400; color: var(--fg-muted);
   font-style: italic; }
-.ze__n--unknown { font-size: 20px; font-weight: 400; color: var(--fg-dim);
+.ze__n--unknown { font-size: 16px; font-weight: 400; color: var(--fg-dim);
   font-style: italic; }
 
 .ze__k { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
@@ -3031,9 +3171,13 @@ input, button, textarea, select {
   text-align: center;
 }
 
+/* 28 px → 20 px. Quatre comptages à 28 px disputaient le premier regard à la
+ * progression, rendue en 13 px sur la même page. Ils restent lisibles et
+ * gardent leur rang de carte ; ils ne sont simplement plus ce que l'œil
+ * trouve en premier sur un écran nommé « Progression ». */
 .kpi-card__value {
   font-family: var(--font-mono);
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
