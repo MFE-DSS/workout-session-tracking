@@ -81,7 +81,10 @@ def test_the_french_formatter_actually_produces_french():
     # 2026-09-05 est un samedi.
     assert format_date_short(datetime(2026, 9, 5, 7, 54)) == "Sam 05/09"
     assert set(WEEKDAY_SHORT) == {1, 2, 3, 4, 5, 6, 7}
-    assert WEEKDAY_SHORT[1] == "Lun" and WEEKDAY_SHORT[7] == "Dim"
+    # `python:S9073` — deux assertions plutôt qu'un `and` : sur un échec, un
+    # `and` ne dit pas LEQUEL des deux jours est faux.
+    assert WEEKDAY_SHORT[1] == "Lun"
+    assert WEEKDAY_SHORT[7] == "Dim"
 
 
 def test_the_short_labels_are_derived_not_copied():
@@ -114,6 +117,12 @@ def test_the_history_screen_renders_a_french_day(client):
     )
     assert not anglais, f"jours anglais rendus dans une date : {sorted(set(anglais))}"
     # Et le pendant : la page n'est pas simplement devenue muette.
-    assert any(j in body for j in WEEKDAY_SHORT.values()) or "Aucune séance" in body, (
-        "aucun jour français rendu — le formateur a-t-il cessé de dire le jour ?"
-    )
+    # `python:S9073` — le `or` est éclaté : sur un échec, il ne disait pas si la
+    # page n'avait aucun jour OU si elle était simplement vide de séances.
+    jours_rendus = [j for j in WEEKDAY_SHORT.values() if j in body]
+    page_vide = "Aucune séance" in body
+    if not page_vide:
+        assert jours_rendus, (
+            "aucun jour français rendu sur une page qui contient des séances — "
+            "le formateur a-t-il cessé de dire le jour ?"
+        )
