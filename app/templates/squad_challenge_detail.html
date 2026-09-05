@@ -4,6 +4,8 @@
 
 <p>
   <strong>Métrique :</strong> {{ metric_labels.get(challenge.metric, challenge.metric) }} &middot;
+  {# ⛔ PAS de `| local` : colonnes `Date`, pas `DateTime`. Cf. la même note
+     dans `squad_challenges.html`. #}
   <strong>Du</strong> {{ challenge.starts_at.strftime('%d/%m/%Y') }}
   <strong>au</strong> {{ challenge.ends_at.strftime('%d/%m/%Y') }} &middot;
   {% if challenge.ends_at < today %}

@@ -46,13 +46,13 @@
     {% if first_started %}
       <li>
         <span>Première séance</span>
-        <b>{{ first_started.strftime('%d/%m/%Y') }}</b>
+        <b>{{ (first_started | local).strftime('%d/%m/%Y') }}</b>
       </li>
     {% endif %}
     {% if last_started %}
       <li>
         <span>Dernière séance</span>
-        <b>{{ last_started.strftime('%d/%m/%Y') }}</b>
+        <b>{{ (last_started | local).strftime('%d/%m/%Y') }}</b>
       </li>
     {% endif %}
     <li>
@@ -99,6 +99,13 @@
         <span>Dernier fichier</span>
         <b>{{ last_backup.name }}</b>
       </li>
+      {# ⛔ PAS de `| local` ICI, et ce n'est pas un oubli.
+         `modified_at` vient de `datetime.fromtimestamp(stat.st_mtime)`
+         (`backup_inspector.py`) — SANS `tz`, donc déjà en heure système
+         locale et naïf. Le filtre `local` suppose de l'UTC : l'appliquer
+         décalerait cette heure d'une ou deux heures vers l'avant.
+         Les deux dates de séance ci-dessus, elles, sortent de colonnes
+         `DateTime(timezone=True)` et DOIVENT être localisées. #}
       <li>
         <span>Modifié</span>
         <b>{{ last_backup.modified_at.strftime('%d/%m %H:%M') }}{% if backup_age_label %} · {{ backup_age_label }}{% endif %}</b>

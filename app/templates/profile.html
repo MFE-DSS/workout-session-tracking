@@ -114,7 +114,7 @@
         <li><span>Email</span>
           {% if user.email %}<b>{{ user.email }}</b>
           {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
-        <li><span>Inscrit le</span><b>{{ user.created_at.strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
+        <li><span>Inscrit le</span><b>{{ (user.created_at | local).strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
         <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
       </ul>
     </section>

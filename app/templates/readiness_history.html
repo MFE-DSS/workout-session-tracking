@@ -9,6 +9,8 @@
     {% for entry in entries %}
     <div class="card" style="margin-bottom:var(--space-sm);">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-xs);">
+        {# ⛔ PAS de `| local` : `recorded_on` est une colonne `Date`. Un état
+           du jour est rattaché à un JOUR, pas à un instant. #}
         <b style="font-size:14px;">{{ entry.recorded_on.strftime('%d/%m/%Y') }}</b>
         {% for field in readiness_scale_fields %}
           {% set val = entry[field] %}
