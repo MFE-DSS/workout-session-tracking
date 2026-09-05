@@ -5,70 +5,74 @@
 <h1 class="page-title">{{ program.title }}</h1>
 
 {% if error %}
-  <p style="color:var(--danger); margin-bottom:1rem;">{{ error }}</p>
+  <p class="pd-error">{{ error }}</p>
 {% endif %}
 
-<div class="card" style="max-width:40rem;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
-    <strong>{{ program.title }}</strong>
-    <span class="badge">{{ status_label(program.status) }}</span>
-  </div>
-  <dl class="text-dim" style="margin-top:.5rem; display:grid; grid-template-columns:auto 1fr; gap:.2rem .75rem;">
-    <dt>Version</dt><dd>{{ program.current_version }}</dd>
+{# L'EN-TÊTE NE RÉPÈTE PLUS LE TITRE.
+   `{{ program.title }}` était rendu deux fois — en `<h1>` et dans cette carte,
+   à 24 px d'écart. Le statut, lui, rejoint la ligne « Version » : c'est là
+   qu'il a du sens, et la carte perd la ligne vide qu'il laissait seul. #}
+<div class="card pd-page">
+  <dl class="text-dim pd-head__facts">
+    <dt>Version</dt><dd>{{ program.current_version }} · <span class="badge">{{ status_label(program.status) }}</span></dd>
     <dt>Séances</dt><dd>{{ session_count }}</dd>
     <dt>Exercices</dt><dd>{{ exercise_count }}</dd>
   </dl>
   {% if program.status == 'validated' %}
-    <p class="text-dim" style="margin-top:.5rem;">Éditer ce programme validé le repassera en brouillon.</p>
+    <p class="text-dim pd-note">Éditer ce programme validé le repassera en brouillon.</p>
     {# PUBLICATION_01 — a validated program is the only publishable state. #}
-    <p style="margin-top:.75rem;">
+    <p class="pd-action">
       <a class="btn btn--primary" href="{{ url_for('user_program_publish_form', program_id=program.id) }}">Publier ce programme</a>
     </p>
   {% elif program.status == 'published' %}
-    <p class="text-dim" style="margin-top:.5rem;">Programme publié — ses séances sont disponibles dans vos modèles.</p>
+    <p class="text-dim pd-note">Programme publié — ses séances sont disponibles dans vos modèles.</p>
     {# PUBLICATION_02 — start a new edit cycle: the same program returns to draft (v+1).
        The published version stays available; only a published program shows this. #}
-    <p style="margin-top:.75rem; display:flex; flex-wrap:wrap; gap:.5rem;">
+    <p class="pd-actions--wrap">
       <a class="btn btn--ghost" href="{{ url_for('user_program_publish_form', program_id=program.id) }}">Voir la publication</a>
-      <form method="post" action="{{ url_for('user_program_new_version', program_id=program.id) }}" style="display:inline;">
+      <form method="post" action="{{ url_for('user_program_new_version', program_id=program.id) }}" class="pd-inline">
         <button type="submit" class="btn btn--primary">Créer une nouvelle version modifiable</button>
       </form>
     </p>
-    <p class="text-dim" style="margin-top:.5rem; font-size:.9em;">Repasse ce programme en brouillon (version suivante) pour le modifier ; la version publiée reste disponible.</p>
+    <p class="text-dim pd-note pd-note--small">Repasse ce programme en brouillon (version suivante) pour le modifier ; la version publiée reste disponible.</p>
   {% elif not editable %}
-    <p class="text-dim" style="margin-top:.5rem;">Ce programme n'est plus éditable ici.</p>
+    <p class="text-dim pd-note">Ce programme n'est plus éditable ici.</p>
   {% endif %}
 </div>
 
 {% if program.sessions|length == 0 %}
-  <p class="text-dim" style="margin-top:1.5rem;">Ce programme est vide. Génère une base ci-dessous, ou ajoute une première séance à la main.</p>
+  <p class="text-dim pd-section">Ce programme est vide. Génère une base ci-dessous, ou ajoute une première séance à la main.</p>
   {% if editable %}
-    <p style="margin-top:.75rem;">
+    <p class="pd-action">
       <a class="btn btn--primary" href="{{ url_for('user_program_generate_form', program_id=program.id) }}">Générer une base de programme</a>
     </p>
   {% endif %}
 {% else %}
-  <div style="display:flex; flex-direction:column; gap:1rem; margin-top:1.5rem;">
+  <div class="pd-sessions">
     {% for session in program.sessions %}
       <div class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div class="pd-head__row">
           <strong>{{ session.position }}. {{ session.name }}</strong>
           {% if editable %}
-            <form method="post" action="{{ url_for('user_program_delete_session', program_id=program.id, position=session.position) }}" style="display:inline;">
-              <button type="submit" class="btn btn--ghost">Supprimer la séance</button>
+            {# SUPPRESSION AU RANG DU TEXTE. C'était un bouton encadré de la
+               taille du nom de séance qu'il jouxte. Une action destructive n'a
+               pas à dominer ce qu'elle détruit ; elle reste reconnaissable par
+               le soulignement et garde ses 44 px de cible. #}
+            <form method="post" action="{{ url_for('user_program_delete_session', program_id=program.id, position=session.position) }}" class="pd-inline">
+              <button type="submit" class="btn pd-destroy">Supprimer la séance</button>
             </form>
           {% endif %}
         </div>
 
         {% if session.exercises|length == 0 %}
-          <p class="text-dim" style="margin-top:.25rem;">Aucun exercice.</p>
+          <p class="text-dim pd-empty">Aucun exercice.</p>
         {% else %}
-          <ul style="margin-top:.5rem; padding-left:1rem; list-style:none;">
+          <ul class="pd-exercises">
             {% for exercise in session.exercises %}
-              <li style="display:flex; justify-content:space-between; align-items:center; gap:.5rem; margin-bottom:.25rem;">
+              <li>
                 <span>{{ exercise.exercise_name }} — <span class="text-dim">{{ exercise.set_scheme }}</span></span>
                 {% if editable %}
-                  <form method="post" action="{{ url_for('user_program_delete_exercise', program_id=program.id, session_position=session.position, exercise_position=exercise.position) }}" style="display:inline;">
+                  <form method="post" action="{{ url_for('user_program_delete_exercise', program_id=program.id, session_position=session.position, exercise_position=exercise.position) }}" class="pd-inline">
                     <button type="submit" class="btn btn--ghost" aria-label="Supprimer l'exercice">×</button>
                   </form>
                 {% endif %}
@@ -78,31 +82,43 @@
         {% endif %}
 
         {% if editable %}
-          <form method="post" action="{{ url_for('user_program_add_exercise', program_id=program.id, position=session.position) }}" style="margin-top:.5rem; display:flex; flex-wrap:wrap; gap:.5rem; align-items:end;">
-            <div class="field" style="flex:1 1 12rem;">
-              <label class="field__label" for="ex-{{ session.position }}">Exercice</label>
-              <input type="text" id="ex-{{ session.position }}" name="exercise_name" list="ekb-exercises" required maxlength="255" class="field__input" placeholder="Développé couché haltères" />
-            </div>
-            <div class="field">
-              <label class="field__label" for="sets-{{ session.position }}">Séries</label>
-              <input type="number" id="sets-{{ session.position }}" name="sets" value="3" min="1" max="6" required class="field__input" style="width:5rem;" />
-            </div>
-            <div class="field">
-              <label class="field__label" for="min-{{ session.position }}">Rép. min</label>
-              <input type="number" id="min-{{ session.position }}" name="min_reps" value="8" min="1" max="50" required class="field__input" style="width:5rem;" />
-            </div>
-            <div class="field">
-              <label class="field__label" for="max-{{ session.position }}">Rép. max</label>
-              <input type="number" id="max-{{ session.position }}" name="max_reps" value="12" min="1" max="50" required class="field__input" style="width:5rem;" />
-            </div>
-            <button type="submit" class="btn btn--primary">Ajouter l'exercice</button>
-          </form>
+          {# LE FORMULAIRE D'AJOUT SE REPLIE.
+             Mesuré : ce même formulaire, avec ses quatre champs et son
+             placeholder identique, était rendu OUVERT sous chacune des trois
+             séances — treize champs ouverts en permanence, occupant plus de
+             place que le contenu auquel ils ajoutent.
+
+             Sans JavaScript : `<details>` natif, invariant `§5` du socle. #}
+          <details class="pd-drawer">
+            <summary>Ajouter un exercice</summary>
+            <form method="post" action="{{ url_for('user_program_add_exercise', program_id=program.id, position=session.position) }}" class="pd-form">
+              <div class="field pd-form__wide">
+                <label class="field__label" for="ex-{{ session.position }}">Exercice</label>
+                <input type="text" id="ex-{{ session.position }}" name="exercise_name" list="ekb-exercises" required maxlength="255" class="field__input" placeholder="Développé couché haltères" />
+              </div>
+              <div class="field">
+                <label class="field__label" for="sets-{{ session.position }}">Séries</label>
+                <input type="number" id="sets-{{ session.position }}" name="sets" value="3" min="1" max="6" required class="field__input pd-form__num" />
+              </div>
+              <div class="field">
+                <label class="field__label" for="min-{{ session.position }}">Rép. min</label>
+                <input type="number" id="min-{{ session.position }}" name="min_reps" value="8" min="1" max="50" required class="field__input pd-form__num" />
+              </div>
+              <div class="field">
+                <label class="field__label" for="max-{{ session.position }}">Rép. max</label>
+                <input type="number" id="max-{{ session.position }}" name="max_reps" value="12" min="1" max="50" required class="field__input pd-form__num" />
+              </div>
+              {# Rang 2 : un trait, pas un aplat. L'aplat ambre est réservé à la
+                 commande souveraine de l'écran — « Valider le brouillon ». #}
+              <button type="submit" class="btn pd-rank2">Ajouter l'exercice</button>
+            </form>
+          </details>
         {% endif %}
 
         {# PUBLICATION_03 — launch a published session (owned context only). Shown only when the
            program is published, not archived, and this session is linked to its template. #}
         {% if program.status == 'published' and program.archived_at is none and session.published_template_id %}
-          <form method="post" action="{{ url_for('user_program_start_session', program_id=program.id, session_id=session.id) }}" style="margin-top:.5rem;">
+          <form method="post" action="{{ url_for('user_program_start_session', program_id=program.id, session_id=session.id) }}" class="pd-action">
             <button type="submit" class="btn btn--primary">Démarrer cette séance</button>
           </form>
         {% endif %}
@@ -112,20 +128,25 @@
 {% endif %}
 
 {% if editable %}
-  <form method="post" action="{{ url_for('user_program_add_session', program_id=program.id) }}" class="card" style="margin-top:1.5rem; max-width:32rem;">
+  <form method="post" action="{{ url_for('user_program_add_session', program_id=program.id) }}" class="card pd-newsession">
     <div class="field">
       <label class="field__label" for="session-name">Nouvelle séance</label>
       <input type="text" id="session-name" name="name" required maxlength="128" class="field__input" placeholder="Push A" />
     </div>
-    <button type="submit" class="btn btn--primary" style="margin-top:.75rem;">Ajouter une séance</button>
+    {# Rang 2. Ajouter une séance est une opération d'édition ; ce que l'écran
+       attend, c'est la validation du brouillon. #}
+    <button type="submit" class="btn pd-rank2 pd-action">Ajouter une séance</button>
   </form>
 
-  <form method="post" action="{{ url_for('user_program_validate', program_id=program.id) }}" style="margin-top:1rem;">
+  {# LA COMMANDE SOUVERAINE, ET LA SEULE À APLAT AMBRE.
+     L'écran en portait cinq. Répété cinq fois, l'ambre ne désigne plus rien —
+     il redevient un fond parmi d'autres. #}
+  <form method="post" action="{{ url_for('user_program_validate', program_id=program.id) }}" class="pd-block">
     <button type="submit" class="btn btn--primary">Valider le brouillon</button>
   </form>
 
   {% if exercise_count > 0 %}
-    <p style="margin-top:1rem;">
+    <p class="pd-block">
       <a class="btn btn--ghost" href="{{ url_for('user_program_quality', program_id=program.id) }}">Voir la qualité du brouillon</a>
     </p>
   {% endif %}
@@ -142,7 +163,7 @@
   {% endfor %}
 </datalist>
 
-<p style="margin-top:1.5rem;">
+<p class="pd-section">
   <a class="btn btn--ghost" href="{{ url_for('user_programs_list') }}">← Mes programmes</a>
 </p>
 {% endblock %}
