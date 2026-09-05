@@ -493,6 +493,76 @@ input, button, textarea, select {
   padding: 0 var(--space-md);
 }
 
+/* ════════════════════════════════════════════════════════════════════════
+   `AUREN_UI_SEUILS` — LES SURFACES DE SEUIL. `T-02` · `T-03`.
+
+   Ce sont les PREMIÈRES vues par un nouvel utilisateur, et les seules où le
+   produit ne dit pas son nom. Mesuré : « Auren » n'apparaissait que dans le
+   `<title>` — alors que le commentaire d'en-tête de `login.html` affirme
+   « nom PRODUIT VISIBLE = Auren ». La prose décrivait une visibilité qui
+   n'existait pas.
+
+   `T-02 = C` — le nom est une MARQUE D'INSTRUMENT, gravée sur le châssis :
+   pas un titre qui concurrence « Connexion », une signature discrète au-dessus.
+   Un cockpit porte son nom sur sa coque.
+
+   Les styles en ligne de ces trois gabarits sont repris ici. Il y en avait
+   huit sur le seul login — une concentration de la dette que le census a
+   mesurée à 373 déclarations, dont 703 sur 708 statiques.
+   ════════════════════════════════════════════════════════════════════════ */
+.auth-container--threshold {
+  margin-top: 64px;
+}
+
+.auth-mark {
+  display: block;
+  margin: 0 0 4px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.42em;      /* gravé, pas écrit */
+  text-indent: 0.42em;         /* compense l'interlettre finale */
+  color: var(--role-action-primary);
+}
+
+.auth-container .page-title {
+  text-align: center;
+}
+
+/* Les sorties du seuil : un rang, pas trois poids égaux (`T-03`). */
+.auth-exits {
+  margin: 18px 0 0;
+  text-align: center;
+}
+.auth-exit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 8px;
+  color: var(--role-text-muted);
+  font-size: 13px;
+}
+.auth-exit--minor { font-size: 12px; }
+.auth-exit:hover,
+.auth-exit:focus-visible { color: var(--role-text-primary); }
+
+.card__actions--auth { margin-top: var(--space-md); }
+
+.auth-lede {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
+.auth-notice {
+  border-left: 3px solid var(--role-support-success);
+}
+.auth-notice__text {
+  font-size: 14px;
+  color: var(--role-text-muted);
+}
+
 /* ---- Topbar ---- */
 
 .topbar {
@@ -4160,7 +4230,12 @@ details.exercise-card[open] .card__actions--exercise {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.exercise-card__chip--cardio { color: #38b2ac; }
+/* ⚠ Portait `#38b2ac` — le TEAL RETIRÉ par `Sb_UI_02b` / `OQ-02b-A`, en dur.
+   Il désignait le cardio ici, tandis que la légende du graphique de
+   Progression désigne le même cardio par `--fg-muted`. Deux couleurs pour une
+   notion, dont une officiellement supprimée.
+   On adopte le token de la légende : une seule notion, un seul rôle. */
+.exercise-card__chip--cardio { color: var(--role-text-muted); }
 
 /* Peek preparing the next exercise, rendered at the bottom of the
    active card only. Discreet by design — dashed border, soft background,

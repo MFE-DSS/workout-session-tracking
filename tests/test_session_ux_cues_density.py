@@ -88,12 +88,15 @@ def _body(client, n=2):
 def test_cues_rendered_in_details(client):
     """MIGRÉ — `TECHNIQUE`, `ADAPTER` et `HISTORIQUE` sont désormais TROIS FRÈRES sur UNE ligne L3, aucun déplié par défaut. L'ordre entre eux n'est plus une hiérarchie mais un rangement de gauche à droite ; l'invariant qui compte — tout le L3 vient APRÈS la console — est vérifié séparément."""
     body = _body(client)
-    assert '<details class="l3__item session-focus__cues">' in body
+    # ⚠ Cherchait la chaîne d'attributs EXACTE. `R9` a ajouté `l3__item--reco`
+    # et la garde est tombée sur un ajout de classe, pas sur une régression.
+    # On vérifie ce qui compte : un `<details>` porte le panneau de cues.
+    assert re.search(r'<details[^>]*class="[^"]*session-focus__cues[^"]*"', body)
 
 
 def test_cues_details_not_open(client):
     body = _body(client)
-    m = re.search(r'<details class="l3__item session-focus__cues"[^>]*>', body)
+    m = re.search(r'<details[^>]*class="[^"]*session-focus__cues[^"]*"[^>]*>', body)
     assert m is not None
     assert " open" not in m.group(0), (
         "aucune disclosure L3 ne s'ouvre par défaut (budget de densité)"
@@ -122,7 +125,9 @@ def test_cues_content_classes_preserved():
 
 def test_cues_rendered_once(client):
     body = _body(client)
-    assert body.count('<details class="l3__item session-focus__cues">') == 1
+    assert len(re.findall(
+        r'<details[^>]*class="[^"]*session-focus__cues[^"]*"', body
+    )) == 1
 
 
 # ───────── order invariants (01.2 / 01.2b preserved) ─────────

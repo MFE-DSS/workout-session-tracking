@@ -79,7 +79,20 @@ def test_sparkline_returns_svg_with_enough_data():
     assert svg is not None
     assert "<svg" in svg
     assert "polyline" in svg
-    assert "#f25f3a" in svg
+    # ⚠ ASSERTAIT `#f25f3a` — L'ACCENT RETIRÉ. La garde épinglait donc dans le
+    # produit une couleur que `Sb_UI_02b` déclare supprimée depuis des mois
+    # (« Accent AMBRE unique (remplace l'orange #f25f3a) »).
+    #
+    # C'est le quatrième test de ce dépôt trouvé en train de conserver le
+    # défaut qu'il aurait dû empêcher. Le motif compte plus que le cas : une
+    # assertion sur une VALEUR fige une décision, une assertion sur un TOKEN
+    # la laisse évoluer.
+    #
+    # Ce qui est gardé — le tracé est coloré, pas invisible — ne change pas.
+    assert "var(--accent)" in svg, (
+        "la sparkline n'emploie plus le token d'accent : elle a soit perdu sa "
+        "couleur, soit recopié une valeur qui divergera de la légende"
+    )
 
 
 def test_sparkline_is_compact():

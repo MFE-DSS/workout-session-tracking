@@ -137,8 +137,14 @@ def test_the_dominant_command_says_the_type_in_words():
     warm = command_for(build_console_state(_exercise(), next_code=None))
     work = command_for(
         build_console_state(_exercise(warmups_done=1), next_code=None))
-    assert warm["label"] == "VALIDER ÉCHAUFFEMENT 1", warm
-    assert work["label"] == "VALIDER SÉRIE 1", work
+    # `R5`/`R6` — les libellés changent, L'INVARIANT DE `D3` NE CHANGE PAS :
+    # la commande nomme le TYPE en toutes lettres. Épingler la chaîne exacte
+    # protégeait une formulation ; ce qui compte est que le mot y soit.
+    #
+    # « VALIDER » a disparu parce que la saisie valide d'elle-même : le mot
+    # annonçait une étape qui n'existe plus.
+    assert "ÉCHAUFFEMENT" in warm["label"] or "SÉRIES" in warm["label"], warm
+    assert "SÉRIE" in work["label"], work
 
 
 def test_no_letter_code_survives_in_any_dominant_command():
@@ -163,13 +169,21 @@ def test_no_letter_code_survives_in_any_dominant_command():
 
 
 def test_no_commit_on_typing_or_blur():
-    """`D9`, préservé à l'identique. Valider au remplissage enregistrerait
-    « 7 » pendant qu'on tape « 70 » ; le `blur` part quand le clavier se
-    referme, ce qui n'est pas une intention."""
+    """`D9` — le MOTIF est préservé, le déclencheur est amendé (`R5 = C`).
+
+    Ce qui reste interdit, et pour les raisons d'origine : `input` partirait
+    en cours de frappe — il enregistrerait « 7 » pendant qu'on tape « 70 » —
+    et `blur` part quand le clavier se referme, ce qui n'est pas une
+    intention.
+
+    Ce qui est admis : `change`, qui **ne part que si la valeur a changé**.
+    Relire ne le déclenche pas. Il dit « j'ai fini de saisir ce champ »,
+    c'est-à-dire exactement l'intention que `D9` protégeait.
+    """
     js = (ROOT / "app/static/js/session_focus.js").read_text(encoding="utf-8")
     stripped = re.sub(r"/\*[\s\S]*?\*/", " ", js)
     stripped = re.sub(r"(?m)^\s*//.*$", " ", stripped)
-    for forbidden in ('"blur"', "'blur'", '"input"', "'input'", '"change"', "'change'"):
+    for forbidden in ('"blur"', "'blur'", '"input"', "'input'"):
         assert forbidden not in stripped, (
             f"la validation implicite écoute {forbidden} — `D9` l'interdit"
         )

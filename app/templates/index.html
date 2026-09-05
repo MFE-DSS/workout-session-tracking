@@ -367,17 +367,23 @@
         <div class="tile__hint">Choisir un programme</div>
       </a>
       {% endif %}
+      {# `N-02 = B` — DEUX TUILES SUR CINQ DOUBLAIENT LA COQUE.
+
+         « Progression » et « Programmes » sont DÉJÀ dans la barre de
+         navigation basse, visible en permanence sur ce même écran. La grille
+         les répétait à trois centimètres de distance, en plus gros.
+
+         Ce n'est pas une soustraction (`§5.3`) : les deux destinations
+         restent atteignables, au même endroit qu'ailleurs dans le produit,
+         et par le chemin que l'utilisateur emprunte déjà partout. Ce qui est
+         retiré, c'est la RÉPÉTITION — pas l'accès.
+
+         Les trois qui restent ne sont nulle part ailleurs : lancer une autre
+         séance, l'historique, la science. C'est ce que `N-02` appelle
+         « promouvoir ce qui sert ». #}
       <a class="tile" href="{{ url_for('history') }}">
         <div class="tile__label">Historique</div>
         <div class="tile__hint">Séances passées</div>
-      </a>
-      <a class="tile" href="{{ url_for('progress') }}">
-        <div class="tile__label">Progression</div>
-        <div class="tile__hint">KPI et tendances</div>
-      </a>
-      <a class="tile" href="{{ url_for('library') }}">
-        <div class="tile__label">Programmes</div>
-        <div class="tile__hint">Tous les programmes</div>
       </a>
       <a class="tile" href="{{ url_for('science_page') }}">
         <div class="tile__label">Science</div>

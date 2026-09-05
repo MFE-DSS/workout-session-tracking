@@ -587,7 +587,10 @@
    Desktop — hero large, action en ligne
    ============================================================ */
 @media (min-width: 900px) {
-  .today-home__hero { min-height: 300px; padding: 28px 28px; }
+  /* `min-height: 300px` retiré pour la même raison qu'en mobile : réserver
+   * une hauteur produit du vide dès que le contenu est court, et le contenu
+   * de ce hero EST court — c'est tout l'objet de `Q5`. Le padding reste. */
+  .today-home__hero { padding: 28px 28px; }
   .today-home__title { font-size: 26px; }
   /* `POST_CONVERGENCE_INTEGRITY_01` / A — LE DÉBORDEMENT DE 39 px.
    *
@@ -628,6 +631,27 @@
    Mobile 360×640 — hero domine, CTA pleine largeur
    ============================================================ */
 @media (max-width: 400px) {
-  .today-home__hero { min-height: 50vh; padding: 18px 16px; }
+  /* ⚠ `min-height: 50vh` RETIRÉ ICI — 2026-09-05, trouvé sur rendu.
+   *
+   * `Sx_UIV3_01 Q5` avait retiré le `min-height` du hero, et sa prose, plus
+   * haut dans cette feuille, le dit : « il réservait 44vh et n'en remplissait
+   * pas les trois quarts : 422 px dont 115 vides… plus de min-height ».
+   *
+   * La règle de base a bien été corrigée. **Celle-ci, non.** Et c'est la
+   * seule qui s'applique à la cible mesurée : à 390 px de large,
+   * `50vh` de 844 vaut exactement 422 px.
+   *
+   * Deux conséquences, toutes deux mesurées au navigateur :
+   *   · la correction n'a jamais atteint le viewport qu'elle citait ;
+   *   · le vide a AUGMENTÉ — 50vh > 44vh —, de 115 à **152 px**, soit
+   *     36 % de la surface la plus chère du produit.
+   *
+   * C'est la deuxième fois dans ce dépôt qu'un bloc scopé conserve en
+   * silence ce que la règle universelle a retiré (cf. le bloc
+   * `prefers-reduced-motion` qui désarmait une garde universelle). Une
+   * garde le pinne désormais.
+   *
+   * Le hero fait la hauteur de ce qu'il contient. */
+  .today-home__hero { padding: 18px 16px; }
   .today-home__title { font-size: 22px; }
 }

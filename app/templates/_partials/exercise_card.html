@@ -623,9 +623,43 @@
               {% for s in secondaries %}
                 {% if s.kind == 'skip' %}
                   {# Q2 — un exercice incomplet peut être quitté à tout
-                     moment. Le produit ne force jamais la complétion. #}
+                     moment. Le produit ne force jamais la complétion.
+
+                     `R4` — le libellé nomme l'INTENTION, la sous-ligne la
+                     DESTINATION. Un `<button>` peut contenir deux lignes ;
+                     un nom d'exercice dans le libellé, non. #}
                   <button type="submit" name="nav" value="next"
-                          class="dock__alt">{{ s.label }}</button>
+                          class="dock__alt dock__alt--named">
+                    <span class="dock__alt-label">{{ s.label }}</span>
+                    {% if s.sub %}<span class="dock__alt-sub">{{ s.sub }}</span>{% endif %}
+                  </button>
+                {% elif s.kind == 'skip_warmup' %}
+                  {# `Q-C` — PURE NAVIGATION, et c'est tout l'arbitrage.
+
+                     Un LIEN, pas une soumission : sauter l'échauffement
+                     n'écrit rien. Marquer les échauffements comme faits
+                     fabriquerait des données d'entraînement que
+                     l'utilisateur n'a pas produites — un échauffement sauté
+                     n'est pas un échauffement fait.
+
+                     `skipwarm=1` est à portée de requête, comme `rest=1` et
+                     `fix=` : il ne survit pas au rechargement suivant, donc
+                     l'échauffement reste accessible en retirant le
+                     paramètre. #}
+                  {# Le libellé est enveloppé, et ce n'est pas cosmétique.
+                     `Web:LinksIdenticalTextsDifferentTargetsCheck` signalait
+                     ce lien et celui d'« annuler » : deux `<a>` dont le texte
+                     SOURCE est littéralement `{{ s.label }}`, pour deux
+                     destinations différentes.
+
+                     Les deux branches sont exclusives — `skip_warmup` n'existe
+                     qu'en `WARMUP`, `cancel` qu'en `CORRECTION` — donc le
+                     rendu ne les montre jamais ensemble. Mais si l'analyseur
+                     ne peut pas les distinguer, un lecteur pressé non plus.
+                     On les distingue à la source plutôt que d'adjuger le
+                     signalement. #}
+                  <a class="dock__alt dock__alt--skip-warmup"
+                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}&skipwarm=1#exercise-{{ se.id }}"><span class="dock__alt-label">{{ s.label }}</span></a>
                 {% elif s.kind == 'remove' %}
                   {# Q3 — rend INTENTIONNEL ce qui n'était qu'un effet de
                      bord : vider les deux champs dé-complétait déjà la
@@ -669,9 +703,36 @@
         {% set total_grouped = grouped.get('N1', []) | length + grouped.get('N2', []) | length + grouped.get('N3', []) | length %}
 
         <div class="l3">
-          <details class="l3__item session-focus__cues">
-            <summary class="l3__trigger session-focus__cues-title session-focus__tap-target">Technique</summary>
+          {# `R9` / `Q-A = C` — UN SEUL PANNEAU : RECOMMANDATION.
+
+             Ce panneau contenait DÉJÀ les deux moitiés — ce que le moteur
+             propose (« Guidance de progression ») et comment bien exécuter
+             (points d'exécution, erreurs fréquentes, zone travaillée). Il
+             n'annonçait que la seconde, et la première était tout en bas.
+
+             Trois corrections, aucune addition de contenu :
+               · il porte le nom de ce qu'il contient VRAIMENT ;
+               · la guidance passe EN TÊTE — un panneau nommé
+                 « recommandation » qui commence par autre chose ment sur son
+                 ordre ;
+               · le déclencheur devient OPÉRABLE. Il était du texte nu :
+                 marqueur natif masqué, aucun cadre, aucun chevron. Rien ne
+                 disait qu'il s'ouvrait — c'est le retour exact de
+                 l'opérateur. #}
+          <details class="l3__item l3__item--reco session-focus__cues">
+            <summary class="l3__trigger session-focus__cues-title session-focus__tap-target">
+              <span class="l3__label">Recommandation</span>
+            </summary>
             <div class="l3__body machine-panel__body">
+              {# La guidance de surcharge EN TÊTE : c'est la recommandation.
+                 Lecture SYSTÈME, donc bleue (`D2` badge d'origine). #}
+              {% set hint = overload_hints.get(se.id) %}
+              {% if hint %}
+                <div class="session-focus__guidance" aria-label="Guidance de progression">
+                  <span class="session-focus__guidance-label">Guidance de progression</span>
+                  {% include "_partials/overload_hint.html" %}
+                </div>
+              {% endif %}
               {% if _machine_top %}
                 {# Le nom de la machine est une information, pas une
                    étiquette : « Comment bien exécuter Incline Smith Press »
@@ -747,14 +808,9 @@
                 <p class="session-focus__worked-area-note">Estimation indicative, non médicale.</p>
               </div>
 
-              {# Guidance de surcharge — lecture SYSTÈME, donc bleue. #}
-              {% set hint = overload_hints.get(se.id) %}
-              {% if hint %}
-                <div class="session-focus__guidance" aria-label="Guidance de progression">
-                  <span class="session-focus__guidance-label">Guidance de progression</span>
-                  {% include "_partials/overload_hint.html" %}
-                </div>
-              {% endif %}
+              {# La guidance vivait ICI, en dernier. Elle est remontée en tête
+                 du panneau (`R9`) : elle n'est pas déplacée deux fois, elle
+                 n'apparaît plus qu'une seule. #}
             </div>
           </details>
 

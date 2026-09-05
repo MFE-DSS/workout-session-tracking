@@ -330,7 +330,16 @@ def test_the_dominant_command_has_an_accessible_name(client):
         r'<button[^>]*class="dock__cmd"[^>]*>(.*?)</button>', body, re.DOTALL,
     )
     assert match, "dominant command not rendered"
-    assert "VALIDER" in match.group(1), match.group(1)
+    # ⚠ `R5`/`R6` — la garde cherchait « VALIDER ». Depuis que la saisie valide
+    # d'elle-même, ce mot est proscrit (`test_no_dominant_command_still_says_valider`).
+    # Ce qui est gardé ici reste l'invariant d'origine, et il ne périme pas :
+    # la commande porte un NOM lisible, pas seulement une couleur ou un glyphe.
+    label = re.sub(r"<[^>]+>", " ", match.group(1))
+    label = " ".join(label.split())
+    assert len(label) >= 6, f"commande sans libellé lisible : {label!r}"
+    assert re.search(r"[A-ZÀ-Ÿ]{3}", label), (
+        f"commande sans nom en capitales : {label!r}"
+    )
 
 
 def test_set_inputs_keep_their_accessible_names(client):

@@ -271,24 +271,68 @@ def _pick_top_anomaly(
             anomalies = compute_anomalies(s)
         except Exception:  # noqa: S112 — per-session anomaly failure is non-fatal
             continue
-        if anomalies:
-            first = anomalies[0]
-            # Find the exercise this anomaly applies to (rule helpers attach
-            # `session_exercise_id`).
-            se_name = None
-            se_id = getattr(first, "session_exercise_id", None)
-            if se_id is not None:
-                for se in s.session_exercises:
-                    if se.id == se_id:
-                        se_name = se.exercise_name_snapshot
-                        break
-            return {
-                "code": getattr(first, "code", None),
-                "label": getattr(first, "label", None) or getattr(first, "code", None),
-                "session_id": s.id,
-                "session_template": s.template_name_snapshot,
-                "exercise_name": se_name,
-            }
+        if not anomalies:
+            continue
+        first = anomalies[0]
+
+        # ════════════════════════════════════════════════════════════════
+        # ⚠ CETTE FONCTION LISAIT QUATRE ATTRIBUTS QUI N'EXISTENT PAS.
+        #
+        # Elle demandait `first.code`, `first.label` et
+        # `first.session_exercise_id`. `Anomaly` porte `exercise_code`,
+        # `rule_code`, `severity`, `message` et `context` — et rien d'autre.
+        #
+        # Les `getattr(..., None)` rendaient l'absence SILENCIEUSE : aucune
+        # exception, un dict bien formé, et le gabarit qui fait
+        # `{{ label or code }}` imprimait `None or None`, c'est-à-dire la
+        # chaîne « None ». Toute anomalie affichée sur `/progress` l'a donc
+        # été sous le nom « Anomalie None », et l'utilisateur ne pouvait
+        # jamais savoir laquelle.
+        #
+        # C'est exactement le motif que ce dépôt a déjà nommé ailleurs : un
+        # repli défensif sur un contexte manquant produit un objet vert et
+        # sans comportement. Trouvé en REGARDANT l'écran, pas en lisant le
+        # code — aucune garde ne comparait le rendu à un mot lisible.
+        #
+        # On lit désormais les VRAIS champs. `message` est déjà écrit pour
+        # être lu par un humain (« +25% de charge vs dernière fois.
+        # Volontaire ? ») ; `rule_code` est un identifiant de règle, gardé
+        # comme repli technique mais jamais comme libellé principal.
+        # ════════════════════════════════════════════════════════════════
+        code = getattr(first, "rule_code", None)
+        label = getattr(first, "message", None)
+        if not label and not code:
+            # Une anomalie qu'on ne sait pas NOMMER n'est pas une
+            # information : la taire vaut mieux que d'afficher un objet vide.
+            continue
+
+        return {
+            "code": code,
+            "label": label or code,
+            "session_id": s.id,
+            "session_template": s.template_name_snapshot,
+            "exercise_name": _exercise_name_for(s, first),
+        }
+    return None
+
+
+def _exercise_name_for(session, anomaly) -> str | None:
+    """Nom de l'exercice visé par une anomalie, ou `None`.
+
+    Le lien passe par `exercise_code` — le SEUL que les règles produisent
+    réellement. La version précédente cherchait `session_exercise_id`, qui
+    n'existe pas sur `Anomaly` : la boucle ne s'exécutait jamais et le nom
+    était toujours absent.
+
+    Le nom SUBSTITUÉ prime : si l'utilisateur a remplacé l'exercice,
+    l'anomalie porte sur ce qu'il a réellement fait.
+    """
+    code = getattr(anomaly, "exercise_code", None)
+    if not code:
+        return None
+    for se in session.session_exercises:
+        if se.exercise_code_snapshot == code:
+            return se.substituted_name or se.exercise_name_snapshot
     return None
 
 

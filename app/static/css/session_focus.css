@@ -1502,10 +1502,28 @@
    l'état repliable lisible (curseur + chevron natif conservé), sans nouvelle
    couleur ni JS. `display:block` sur cues-title masquerait le marker natif →
    on force list-item pour garder l'indicateur repliable. */
+/* ⚠ SUPERSÉDÉ PAR `R9`. Cette règle forçait `display: list-item` pour une
+   raison qui était juste à l'époque : `.session-focus__cues-title` pose
+   `display: block`, ce qui masque le marqueur natif du `<details>`, et il
+   n'existait alors AUCUN autre indicateur de repli.
+
+   Depuis `R9`, le déclencheur porte son propre chevron (`.l3__trigger::after`,
+   qui pivote à l'ouverture). Garder `list-item` afficherait DEUX marqueurs sur
+   un même contrôle — le natif et le nôtre.
+
+   Mesuré au navigateur, pas déduit : ce déclencheur rendait
+   `display: list-item` là où son frère `HISTORIQUE` rendait `flex`. Les deux
+   se ressemblaient à l'œil sans être le même objet. */
 details.session-focus__cues > summary.session-focus__cues-title {
   cursor: pointer;
-  display: list-item;
-  list-style-position: inside;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  list-style: none;
+}
+details.session-focus__cues > summary.session-focus__cues-title::marker {
+  content: "";
 }
 details.session-focus__cues[open] > summary.session-focus__cues-title {
   margin-bottom: var(--space-1);
@@ -2246,13 +2264,24 @@ body.is-session-focus-mode .foot {
 }
 
 /* ── La bande : trois positions temporelles ─────────────────────────── */
+/* `AUREN_UI_U4_VISEUR` — la bande devient une JAUGE HORIZONTALE.
+   Passée de `column` à `row` + `flex-wrap` : on lit l'avancement d'un
+   coup d'œil au lieu de parcourir une liste. Le détail de chaque
+   segment est plus bas, avec le reste du viseur.
+
+   Modifié ICI et non redéclaré plus bas : `css:S4666` — deux règles
+   pour un même sélecteur laissent croire à deux composants, et la
+   seconde gagne en silence sur toute propriété commune. Ce fichier
+   s'est déjà fait reprendre là-dessus, à raison. */
 .console__band {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 6px;
 }
 
 .setline {
@@ -2499,6 +2528,28 @@ body.is-session-focus-mode .foot {
 .dock__alt:active { background: var(--t-raised); }
 .dock__alt--remove { color: var(--t-fg-muted); }
 
+/* `R4` — la sortie d'exercice nomme sa destination.
+   Deux lignes : l'INTENTION au-dessus, la DESTINATION en dessous. Un nom
+   comme « Neutral Grip Shoulder Press machine » ne tient pas dans un libellé
+   et devient illisible tronqué ; il tient sur une seconde ligne. */
+.dock__alt--named {
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+}
+.dock__alt-label {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+}
+.dock__alt-sub {
+  font-size: 11px;
+  color: var(--role-text-muted);
+  /* Un nom long se replie plutôt que de déborder : la commande garde sa
+     largeur, et deux lignes de nom valent mieux qu'un nom coupé. */
+  text-align: center;
+  line-height: 1.25;
+}
+
 /* ── Up next réduit à une ligne (`§7.7`), au seul moment où la question se
    pose : la fin d'exercice. Scopé sous `.console__next` pour ne pas
    redéclarer les sélecteurs legacy `.session-focus__up-next*`. ── */
@@ -2704,17 +2755,48 @@ body.is-session-focus-mode .foot {
   line-height: 1.25;
   letter-spacing: 0.01em;
   color: var(--t-fg-muted);
-  /* DEUX lignes, pas une ellipse au premier mot coupé. Le nom court
-     n'existe pas en base et le fabriquer en découpant la chaîne longue
-     inventerait une donnée ; en revanche rien n'oblige à n'en montrer
-     qu'une ligne. `title` ne s'ouvre pas au doigt — il ne peut pas être le
-     seul chemin vers le nom complet. */
+  /* ⚠ CE RAISONNEMENT EST SUPERSÉDÉ — `Q-E`, opérateur, 2026-09-04.
+     Il disait : « le nom court n'existe pas en base et le fabriquer en
+     découpant la chaîne longue inventerait une donnée », d'où deux lignes
+     plutôt qu'une ellipse.
+
+     L'objection était juste sur un point — découper une chaîne est une
+     dérivation, pas une lecture — et l'arbitrage la lève pour une raison
+     qui n'avait pas été posée : « Push A — Pecs épaisseur + Delts +
+     Triceps » est un nom de GABARIT. Il décrit ce que le programme
+     CONTIENT, pas ce qu'on travaille MAINTENANT. Le bandeau garde donc le
+     code + la ZONE DOMINANTE, qui est une vraie donnée du moteur.
+
+     Ce qui reste vrai de l'objection, et qui est tenu : le nom complet
+     n'est pas perdu. Il vit dans `title` ET dans le panneau `⋯` — deux
+     chemins, dont un tactile. `§5.3` : le nom change de rang, il ne
+     disparaît pas.
+
+     Les deux lignes restent, pour les gabarits sans séparateur : la
+     dérivation rend alors le nom entier, et il doit tenir. */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   overflow-wrap: anywhere;
+}
+
+/* Le code porte l'identité, la zone porte le travail du moment. Deux rangs
+   typographiques, pas deux couleurs : la zone vient du moteur mais elle
+   n'est pas une ACTION, donc pas d'ambre ; et elle n'est pas non plus une
+   recommandation, donc pas de bleu système. Le rang suffit. */
+.session-head .session-head__code {
+  color: var(--role-text-secondary);
+  font-weight: 600;
+}
+.session-head .session-head__sep {
+  color: var(--role-glyph-decorative);   /* non-texte : séparateur */
+  margin: 0 4px;
+}
+.session-head .session-head__zone {
+  color: var(--role-text-muted);
+  letter-spacing: 0.06em;
 }
 
 .session-head__more { justify-self: end; }
@@ -2940,24 +3022,67 @@ body.is-session-focus-mode .foot {
   border-top: 1px solid var(--t-line);
 }
 .l3__item { min-width: 0; }
+/* `R9` — LE DÉCLENCHEUR DEVIENT OPÉRABLE.
+
+   Il était du TEXTE NU : marqueur natif masqué, aucun cadre, aucun chevron,
+   couleur atténuée. « On ne comprend pas que c'est opérable » — et c'était
+   exact, rien ne le disait.
+
+   Ce qu'il reçoit : un cadre, un fond, et un chevron qui pivote à
+   l'ouverture. Ce qu'il ne reçoit PAS : d'ambre. C'est un contrôle de rang 2,
+   il ne doit pas concurrencer la réglette — la seule commande dominante de
+   l'écran. La masse suffit à le rendre lisible ; la couleur reste réservée. */
 .l3__trigger {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 44px;
+  padding: 0 12px;
   cursor: pointer;
   list-style: none;
+  border: 1px solid var(--role-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--role-surface-group);
   font-family: var(--font-mono, ui-monospace, monospace);
   font-size: 11.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--t-fg-muted);
+  color: var(--role-text-secondary);
   text-decoration: none;
 }
 .l3__trigger::-webkit-details-marker { display: none; }
+
+/* Le chevron dit « ça s'ouvre », et sa rotation dit « c'est ouvert ». Deux
+   états, deux FORMES — la couleur ne porte rien ici (`§7`). */
+.l3__trigger::after {
+  content: "›";
+  font-size: 17px;
+  line-height: 1;
+  color: var(--role-text-muted);
+  transform: rotate(90deg);
+  transition: transform 120ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .l3__trigger::after { transition: none; }
+}
+.l3__item[open] > .l3__trigger::after { transform: rotate(-90deg); }
+
 .l3__trigger:hover,
-.l3__trigger:focus-visible { color: var(--t-fg-2); }
-.l3__item[open] > .l3__trigger { color: var(--t-fg); }
+.l3__trigger:focus-visible {
+  color: var(--role-text-primary);
+  border-color: var(--role-border-emphasis);
+}
+.l3__item[open] > .l3__trigger {
+  color: var(--role-text-primary);
+  border-color: var(--role-border-emphasis);
+}
+
+/* La RECOMMANDATION porte une marque d'origine système : ce qu'elle contient
+   est produit par le moteur (`D2` — badge d'origine). Un filet bleu, pas un
+   fond : le bleu affirme la PROVENANCE, il n'appelle pas à l'action. */
+.l3__item--reco > .l3__trigger {
+  box-shadow: inset 2px 0 0 var(--role-origin-system-line);
+}
 .l3__body {
   flex: 1 1 100%;
   margin-top: 4px;
@@ -3052,6 +3177,20 @@ body.is-session-focus-mode .foot {
   font-size: 46px;
   line-height: 1.05;
   letter-spacing: -0.02em;
+  /* `AUREN_UI_U4_VISEUR` — MÊME INSTRUMENT, AUTRE PHOSPHORE.
+     Pendant le repos, le champ de saisie n'existe pas : le minuteur devient
+     le readout de cet état, et c'est LUI qui change de couleur.
+
+     Bleu système, pas un ambre atténué : **un décompte est produit par le
+     moteur, pas par l'utilisateur.** L'ambre veut dire « à toi de jouer » ;
+     pendant 90 secondes, ce n'est précisément pas le cas.
+
+     `§7 no-color-only-state` tient sans effort : l'état change aussi de
+     FORME — deux champs de saisie deviennent un cadran. La couleur confirme,
+     elle ne porte pas seule.
+
+     Écrit ICI et non dans une seconde règle : `css:S4666`. */
+  color: var(--role-origin-system);
 }
 .console[data-state="rest"] .rest-readout__label {
   grid-area: label;
@@ -3243,3 +3382,295 @@ body.is-session-focus-mode .foot {
   padding: 0 var(--space-md, 12px);
   font-size: 12px;
 }
+
+/* ════════════════════════════════════════════════════════════════════════
+   `Q-D = B` / `R7` — LE FIL D'ÉTAT.
+
+   Six exercices en attente occupaient six CARTES pleines, empilées sous
+   l'instrument. Chacune répétait la mise en page d'un objet actionnable pour
+   dire quatre faits courts : où j'en suis, quoi, combien, quand.
+
+   ⚠ CE N'EST PAS UNE SOUSTRACTION, et c'est vérifiable plutôt qu'affirmé :
+   AUCUNE donnée ne quitte le DOM. Code, nom, avancement, récapitulatif,
+   puce de briefing, « dernière fois » et delta étaient déjà tous rendus dans
+   la carte repliée — c'est la MISE EN PAGE qui était une carte. `§5.3` est
+   donc satisfait par construction, pas par compensation : le fil reprend
+   exactement ce que les cartes portaient.
+
+   Ce qui change : chaque exercice devient une RANGÉE d'instrument. La carte
+   redevient un signal (`Q5`, trois rangs de surfaces) — elle est réservée à
+   ce qui est actionnable maintenant, c'est-à-dire l'exercice en vol.
+
+   La cible tactile reste la rangée ENTIÈRE, bien au-delà de 44 px.
+   ════════════════════════════════════════════════════════════════════════ */
+.session-focus__cockpit .exercise-card--activate {
+  padding: 8px 0;
+  border-radius: var(--radius-sm);
+  opacity: 1;                 /* le retrait vient du RANG, pas d'un voile */
+}
+
+/* La ligne d'identité : code · nom · avancement, alignés en rangée. */
+.session-focus__cockpit .exercise-card__compact--activate {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: baseline;
+  gap: 10px;
+  padding: 0 var(--space-md, 12px);
+  /* Ni `min-height` ni cible tactile ICI : c'est la RANGÉE entière qui est
+     le lien, donc la cible. La poser sur la ligne d'identité ajoutait 14 px
+     par exercice — 84 px sur une séance de sept — pour une garantie que le
+     parent offrait déjà. */
+  min-height: 0;
+  line-height: 1.2;
+}
+.session-focus__cockpit .exercise-card--activate .exercise-card__code {
+  min-height: 0;
+  padding: 2px 6px;
+}
+
+.session-focus__cockpit .exercise-card--activate .exercise-card__name {
+  font-size: 14px;
+  line-height: 1.3;
+  /* Deux lignes au plus : « Neutral Grip Shoulder Press machine » ne tient
+     pas sur une, et une ellipse au premier mot coupé ne dit plus quoi. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.session-focus__cockpit .exercise-card--activate .exercise-card__progress {
+  font-size: 12px;
+  color: var(--role-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* « Dernière fois » et la puce passent en seconde ligne, au rang méta. Elles
+   restent LUES d'un coup d'œil — c'est ce qui justifiait leur remontée dans
+   la carte repliée — mais cessent d'occuper la place d'un paragraphe. */
+/* La méta se replie sur deux lignes courtes plutôt qu'en paragraphe : on
+   garde les trois faits — « dernière fois », quand, ce qui a été saisi — et
+   on leur retire l'interligne d'un corps de texte. */
+.session-focus__cockpit .exercise-card--activate .last-time--compact {
+  margin-top: 2px;
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--role-text-muted);
+  gap: 5px;
+}
+.session-focus__cockpit .exercise-card--activate .exercise-card__chip {
+  font-size: 10.5px;
+}
+.session-focus__cockpit .exercise-card--activate .delta--collapsed {
+  padding: 0 var(--space-md, 12px);
+  font-size: 11px;
+}
+
+/* ============================================================
+   `AUREN_UI_U4_VISEUR` — L'INSTRUMENT DE SÉANCE
+   Métaphore validée par l'opérateur sur rendu (P-03), trois états.
+   ------------------------------------------------------------
+   ⚠ AUCUN CHANGEMENT DE GABARIT. C'est délibéré, et ce n'est pas de la
+   prudence de principe : `_persist_set_values` boucle sur TOUTES les
+   séries de l'exercice et écrit `None` pour un champ absent du POST.
+   Déplacer un `input` hors du formulaire, ou en oublier un dans une
+   recomposition, EFFACE des séries enregistrées. Le contrat est gardé
+   par `test_session_set_preservation`, qui rejoue chaque formulaire
+   comme le ferait le navigateur.
+
+   La bonne nouvelle : le viseur ne demandait pas de nouveau DOM. Les
+   trois éléments que l'opérateur a retenus — readout souverain, jauge
+   à verdict, commande en trait — se posent sur la structure existante.
+
+   CE QUI CHANGE
+     · la bande verticale de lignes devient une JAUGE HORIZONTALE ;
+     · la série courante devient le READOUT SOUVERAIN, en phosphore ;
+     · la commande dominante devient un TRAIT, plus un aplat.
+
+   CE QUI NE CHANGE PAS
+     · tous les champs restent dans le formulaire, visibles ou cachés ;
+     · les trois marqueurs `✓ ● ○` restent — la forme porte l'état,
+       jamais la couleur seule (`§7 no-color-only-state`) ;
+     · aucune cible tactile ne descend sous 44 px ;
+     · aucun JavaScript.
+   ============================================================ */
+
+/* ── LA JAUGE ─────────────────────────────────────────────────
+   Le passage de `column` à `row` est fait sur la règle d'origine
+   (`css:S4666`). Ici, seuls les SEGMENTS.
+
+   `flex-wrap` et non une grille fixe : le nombre de séries varie, et
+   une grille à N colonnes écraserait les segments dès la sixième.
+
+   Segments — passé et futur. Compacts, alignés, lisibles de loin. */
+.console__band > .setline--past,
+.console__band > .setline--future {
+  flex: 0 0 auto;
+  grid-template-columns: auto auto;
+  gap: 6px;
+  min-height: 44px;          /* cible tactile conservée : `corriger` vit ici */
+  padding: 4px 10px;
+  background: var(--role-surface-canvas);
+  box-shadow: var(--relief-carved);
+  border-radius: var(--radius-sm);
+}
+
+/* Le verdict porte FORME et couleur, jamais la couleur seule.
+   `✓` validé · `●` en cours · `○` à venir — déjà dans le gabarit. */
+.console__band > .setline--past .setline__done,
+.console__band > .setline--future .setline__pending {
+  font-size: 12px;
+}
+.console__band > .setline--future {
+  opacity: 0.7;
+}
+
+/* La série courante prend TOUTE la largeur : c'est le readout, pas un
+   segment. `flex: 1 0 100%` la sort de la rangée de segments sans
+   qu'aucun ordre de DOM ne change. */
+.console__band > .setline--current {
+  flex: 1 0 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 2px;
+  padding: 0;
+}
+
+/* ── LE READOUT SOUVERAIN ─────────────────────────────────────
+   Le champ de saisie EST le readout. Rien n'est déplacé, rien n'est
+   dupliqué : sans JS, un champ texte est déjà de la manipulation
+   directe, et en faire un affichage séparé aurait exigé un second
+   porteur de la même valeur — donc deux vérités. */
+.console__band > .setline--current .setline__inputs {
+  flex: 1 0 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.console__band > .setline--current .setline__field {
+  min-height: 68px;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--role-state-active);   /* phosphore — l'objet en vol */
+  background: var(--role-surface-chassis);
+  border-color: var(--role-border-emphasis);
+  box-shadow: var(--relief-carved);  /* le puits : ce dans quoi on saisit */
+}
+
+/* La charge domine, les répétitions accompagnent. Deux valeurs de rang
+   différent ne prennent pas la même place. */
+.console__band > .setline--current .setline__field--weight { flex: 2 1 0; }
+.console__band > .setline--current .setline__field--reps   { flex: 1 1 0; }
+
+/* ── LA CHARGE SUGGÉRÉE, RENDUE VISIBLE ──────────────────────
+   Le moteur de surcharge alimente déjà ce placeholder (« 102.5 », « 6-10 ») —
+   une SUGGESTION, jamais un préremplissage, et cette distinction est un
+   contrat (`Sb_30.next.placeholder`).
+
+   Deux défauts introduits par la première version du readout, tous deux
+   corrigés ici :
+
+     · 15 px dans un puits de 68 px : la suggestion du moteur devenait
+       illisible au moment précis où elle sert — l'instrument proposait une
+       charge que plus personne ne voyait ;
+     · `--role-glyph-decorative` est documenté NON-TEXTE UNIQUEMENT (3,27 sur
+       L3, sous le seuil 4,5). Un placeholder EST du texte.
+
+   Elle se lit désormais comme une valeur fantôme à l'échelle du readout :
+   c'est ce que l'instrument propose, pas ce qui est enregistré. */
+.console__band > .setline--current .setline__field::placeholder {
+  font-size: 26px;
+  font-weight: 400;
+  color: var(--role-text-muted);   /* 6,45 sur L0 — lisible, secondaire */
+  opacity: 1;                      /* Firefox applique 0.54 par défaut */
+}
+
+/* Le phosphore du repos est posé sur la règle d'origine du minuteur
+   (`css:S4666`), plus haut dans cette feuille. */
+
+/* Correction (`S-11`) — variante de la série en cours, distinguée par
+   une FORME (le liseré) et non par une couleur seule. Corriger, c'est
+   ressaisir : un quatrième phosphore diluerait les trois états validés. */
+.console__band > .setline--current.setline--correcting .setline__field {
+  box-shadow: var(--relief-carved), inset 0 0 0 2px var(--role-origin-system-line);
+}
+
+/* ── LA RÉGLETTE D'INSTRUMENT (`R1 = C`) ──────────────────────
+   Le trait a été rejeté par l'opérateur — « c'est moche, ça ne sert à
+   rien ». Ce qui le rendait faible : un contour de 1 px est le chrome
+   d'un bouton web, pas d'un instrument. Il n'appartenait à aucune des
+   deux familles du châssis.
+
+   La réglette en est une : **encastrée**, comme un contrôle physique
+   logé dans une console.
+
+   ⚠ DEUX OBJETS CREUSÉS VOISINS PEUVENT CESSER DE SE DISTINGUER.
+   Le puits de saisie est creusé sur L0 ; la réglette l'est sur L2. La
+   différence de fond est de 1,124 — au-dessus du plancher de perception
+   que le dépôt s'est fixé. Elle n'est pas supposée, elle est mesurée.
+
+   Ce qui la rend VIVE et non inerte : une arête gauche allumée en
+   ambre. Un contrôle encastré sans lumière se lit comme désactivé —
+   c'est le piège de cette forme, et c'est ce que l'arête écarte.
+
+   L'aplat n'est toujours pas nécessaire à la domination : la cible
+   tactile, si. Pleine largeur, ≥ 56 px.
+
+   Effet de bord conservé du trait : il n'y a toujours qu'UN aplat ambre
+   sur l'écran de séance, et c'est « TERMINER LA SÉANCE ». */
+.console .dock__cmd {
+  position: relative;
+  background: var(--role-surface-group);
+  color: var(--role-action-primary);
+  border: 0;
+  border-radius: var(--radius-md);
+  min-height: 56px;
+  padding-right: 34px;                 /* la place du chevron */
+  box-shadow:
+    var(--relief-carved),
+    inset 3px 0 0 var(--role-action-primary);   /* l'arête allumée */
+}
+
+/* Le chevron dit la DIRECTION : cette commande fait avancer la séance.
+   `::after` et non un glyphe dans le gabarit — c'est du chrome, il n'a
+   rien à faire dans le contenu, et un lecteur d'écran n'a pas à
+   l'annoncer. */
+.console .dock__cmd::after {
+  content: "›";
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 22px;
+  line-height: 1;
+  color: var(--role-action-primary);
+}
+
+.console .dock__cmd:hover {
+  background: var(--role-surface-instrument);
+  color: var(--role-action-hover);
+}
+/* Enfoncée : le relief s'approfondit. C'est la seule « animation » de la
+   commande, et c'en est à peine une — un contrôle physique s'enfonce. */
+.console .dock__cmd:active {
+  box-shadow:
+    inset 0 2px 4px var(--role-edge-shadow),
+    inset 3px 0 0 var(--role-action-hover);
+}
+.console .dock__cmd:focus-visible {
+  outline: 2px solid var(--role-focus);
+  outline-offset: 2px;
+}
+
+/* La sortie de repos garde son registre atténué : elle n'est pas
+   l'action de l'utilisateur, elle l'interrompt. */
+.console .dock__cmd--muted {
+  color: var(--role-text-secondary);
+  box-shadow: var(--relief-carved), inset 3px 0 0 var(--role-border-emphasis);
+}
+.console .dock__cmd--muted::after { color: var(--role-text-muted); }

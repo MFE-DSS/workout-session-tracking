@@ -99,10 +99,25 @@ def test_progress_keeps_weekly_loop_and_kpis(client):
     assert "kpi-card" in html
     # readability section header added
     assert "Rythme récent" in html
-    # the KPI labels are preserved (kept « sessions » so the existing
-    # test_kpis textual assertions stay valid — see report §limits)
-    assert "sessions cette semaine" in html
-    assert "sessions terminées (30 j)" in html
+    # ⚠ CE COMMENTAIRE DISAIT LE DÉFAUT ET LE GARDAIT.
+    #
+    # Il lisait : « the KPI labels are preserved (kept "sessions" so the
+    # existing test_kpis textual assertions stay valid — see report §limits) ».
+    # Autrement dit : un ANGLICISME a survécu dans le produit PARCE QU'UN TEST
+    # L'ÉPINGLAIT, et la chose a été consignée comme une limite plutôt que
+    # corrigée. La coque dit « Séance », la commande dit « TERMINER LA
+    # SÉANCE », et la sous-ligne de la carte voisine disait déjà « séance » :
+    # deux mots pour une chose dans la même carte.
+    #
+    # S'y ajoutait un défaut d'accord — « 1 sessions » était à l'écran.
+    #
+    # Ce qui est gardé — la grille de KPI existe, nomme sa fenêtre et son
+    # objet — est inchangé.
+    assert "cette semaine" in html
+    assert "(30 j)" in html
+    assert "session" not in html.lower().split("kpi-grid", 1)[-1][:600], (
+        "l'anglicisme est revenu dans la grille de KPI"
+    )
 
 
 def test_progress_keeps_per_program_and_replaces_recent_activity(client):

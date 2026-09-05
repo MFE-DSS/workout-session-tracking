@@ -25,10 +25,38 @@ class TimelinePoint:
     kind: str | None = None  # "strength" | "cardio" | None (Sb_09)
 
 
-# Sb_09 — canonical palette for session-kind dispatch in timeline dots.
+# ⚠ L'ORANGE #f25f3a ET LE TEAL #38b2ac SONT DES ACCENTS RETIRÉS.
+#
+# `Sb_UI_02b` déclare l'un et l'autre remplacés — « Accent AMBRE unique
+# (remplace l'orange #f25f3a) », « Ancien accent teal retiré ». La déclaration
+# est dans `app.css`, en commentaire. LA MIGRATION N'A JAMAIS ÉTÉ FINIE : les
+# deux couleurs continuaient d'être rendues ici.
+#
+# Le défaut visible qui en résultait est pire qu'une couleur périmée : la
+# LÉGENDE de ce graphique, dans `progress.html`, emploie déjà
+# `--accent` (ambre) et `--fg-muted` (gris). **Le produit affichait donc une
+# légende qui ne décrivait pas son propre graphique** — « Musculation » en
+# ambre dans la légende, en orange dans la courbe.
+#
+# On consomme désormais LES TOKENS DE LA LÉGENDE, et non une copie de leur
+# valeur : deux hex identiques divergent au premier changement de palette, deux
+# `var()` non. Le SVG est inliné dans la page (`|safe`), donc les variables CSS
+# y résolvent.
+#
+# Mesuré au passage : l'ambre contraste MIEUX que l'orange sur les quatre fonds
+# réels (7,24 contre 5,37 sur #161a22). Le remplacement n'est pas un compromis.
+# `python:S1192` — CINQ copies de `"var(--accent)"` vivaient dans ce fichier.
+# La règle a raison, et elle a raison ICI PLUS QU'AILLEURS : le défaut que ce
+# module vient de corriger — une légende qui ne décrivait pas son graphique —
+# est né exactement de ça, d'une valeur recopiée à un endroit et changée à
+# l'autre. Corriger la couleur sans corriger la duplication, c'était réarmer
+# la cause en désarmant l'effet.
+_ACCENT = "var(--accent)"
+_MUTED = "var(--fg-muted)"
+
 KIND_COLORS: dict[str, str] = {
-    "strength": "#f25f3a",
-    "cardio": "#38b2ac",
+    "strength": _ACCENT,
+    "cardio": _MUTED,
 }
 KIND_LABELS: dict[str, str] = {
     "strength": "musculation",
@@ -73,7 +101,7 @@ def _build_svg(
     y_max: float,
     height: int = 220,
     width: int = 600,
-    color: str = "#f25f3a",
+    color: str = _ACCENT,
     dot_radius: float = 4.5,
     title: str = "",
     area_fill: bool = True,
@@ -264,7 +292,7 @@ def build_quality_timeline_svg(
         points,
         y_min=0,
         y_max=100,
-        color="#f25f3a",
+        color=_ACCENT,
         title="Qualité de séance",
     )
 
@@ -294,7 +322,7 @@ def build_sparkline_svg(
     *,
     width: int = 200,
     height: int = 40,
-    color: str = "#f25f3a",
+    color: str = _ACCENT,
     kinds: list[str | None] | None = None,
 ) -> str | None:
     """Build a compact sparkline SVG (no axes, no labels).
@@ -369,7 +397,7 @@ def build_measurement_timeline_svg(
         points,
         y_min=lo,
         y_max=hi,
-        color="#f25f3a",
+        color=_ACCENT,
         title=title,
         height=220,
         interactive=True,
