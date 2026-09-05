@@ -344,3 +344,118 @@ en propre.
 * **Les décisions de NOMMAGE** : « squad », « Challenges », « template »,
   « Session courte — Full upper 45 min ». Ce sont des noms de produit, pas des
   fautes.
+
+---
+
+## 9. La journée — six objets, et un diagnostic qui se répète
+
+Passe guidée avec l'opérateur disponible : constat mesuré → planche → arbitrage
+→ construction → vérification → merge. Six tranches, toutes mergées avec la
+porte complète et la **CI canonique de push verte**.
+
+| PR | Objet | Le défaut central | Merge |
+|---|---|---|---|
+| `#192` | Classement | deux souverains sur une ligne, donc aucun ; une moyenne identique pour les trois classés | `0a0693e` |
+| `#193` | Bibliothèque | un signal personnalisé noyé dans sa propre redite | `b09fc53` |
+| `#194` | Dépliants | un composant trop cher à adopter, donc jamais adopté | `cf241a9` |
+| `#195` | Historique | le jour de la semaine en anglais, sur trois écrans | `86e9cda` |
+| `#196` | Formulaires | quatre manques rendant une coque canonique inadoptable | `ffb4f62` |
+
+### 9.1 Le diagnostic, neuf fois
+
+Le produit **ne manque presque jamais de décision**. Il manque de **moyens
+d'appliquer** ses décisions. Chaque objet a révélé la même forme : un composant,
+une table de vocabulaire ou une règle **existait**, et une surface l'ignorait.
+
+| Ce qui existait | Ce qui l'ignorait |
+|---|---|
+| `OPERATOR_DECISION D7` | 4 surfaces sociales |
+| l'accent ambre (`Sb_UI_02b`) | 5 fichiers, dont la légende du graphique |
+| `RADAR_AXES` en français | le profil public (`arms`, `pecs` bruts) |
+| le composant `.disclosure` | 11 dépliants |
+| `WEEKDAY_LABELS` + filtre `local_weekday` | 3 écrans, en anglais |
+| la coque `select_shell` | 7 `<select>` écrits à la main |
+
+**Et la tranche formulaires a expliqué POURQUOI ce n'était pas de la
+négligence.** En convertissant les sept `<select>`, quatre raisons distinctes
+sont apparues, chacune suffisante : `required` absent de la macro · un
+`onchange` impossible à passer · l'incapacité à lire une liste d'objets (Jinja
+n'a pas de `zip`) · une option vide forcée à `value=""` là où la route attend
+`"0"`.
+
+> Un composant qui ne couvre pas les attributs de ses appelants et ne consomme
+> pas la donnée qu'ils ont n'est pas adopté. Le défaut est dans le composant,
+> pas dans les surfaces.
+
+C'est un diagnostic actionnable : il dit **quoi réparer**.
+
+### 9.2 Trois gardes du dépôt m'ont arrêté
+
+Et chacune sur une chose que j'avais ratée :
+
+* **le cliquet des `<summary>`** (`test_ui_surface_guards`) — j'avais écrit une
+  garde universelle sur les dépliants **sans chercher si le dépôt en avait déjà
+  une**. Il en avait une, avec un inventaire de décisions. Les deux ne font pas
+  doublon — elles tirent en sens opposés, l'une interdit de RETIRER le marqueur
+  sans décision, l'autre de le LAISSER — et je l'ai inscrit dans le fichier
+  plutôt que de laisser un relecteur le deviner ;
+* **le plafond des primitives** (`len(primitives) == 6`) — ce n'est pas un
+  compteur, c'est un **ralentisseur**. Il m'a forcé à venir défendre une
+  septième primitive devant l'opérateur au lieu de la glisser dans un diff ;
+* **la porte de couverture** (`new_coverage: 0.0`) — j'avais changé la logique
+  d'un handler et vérifié le résultat **à la main, dans un navigateur**. Aucun
+  test ne l'exerçait. Or ce changement apporte une propriété d'INTÉGRITÉ : un
+  client ne peut plus faire dire à une recommandation un nom qui ne correspond
+  pas au gabarit. Une propriété pareille sans test n'est pas une propriété.
+
+### 9.3 Mes propres dispositifs qui ne gardaient rien
+
+Sur mes seules tranches, en une journée :
+
+* une regex CSS **aveugle aux `:where()`** et aux sélecteurs groupés →
+  **3 faux positifs**, retirés avant livraison ;
+* la sous-chaîne `Mon ` qui **accusait la navigation** — le produit a un écran
+  nommé « Mon plan » ;
+* **deux tentatives** de garder statiquement le style des champs, deux fois du
+  code sain accusé (16 gabarits, puis les 18 champs du profil) ;
+* **deux plantations qui ne plantaient rien** — les deux passaient au vert et
+  j'ai failli conclure « la garde ne mord pas » ;
+* un **`noqa` décoratif** : vérifié en le retirant, ruff ne signalait rien. Il
+  aurait fait taire un vrai signal un jour.
+
+Une garde qui ment vaut moins que pas de garde : **elle apprend à ignorer les
+rouges.**
+
+### 9.4 `/science` — 45 % du texte long sans un seul accent
+
+Mesuré par bloc, sans dictionnaire :
+
+| Blocs de 12 mots ou plus | Nombre | Mots |
+|---|---|---|
+| avec au moins un accent | 12 | 323 |
+| **sans aucun accent** | **9** | **271** |
+
+Ce ne sont pas des coquilles mais des paragraphes entiers — « La **memoire**
+subjective… les bonnes **seances** », « ta **seance** devient une **donnee** »,
+« **Ameliorer** la **tolerance** au volume ». Et le `<h2>` « **Methode**
+d'entrainement » surplombe des `<h3>` correctement accentués.
+
+⚠ **Écarté par honnêteté** : une première mesure comptait 8 mots sous deux
+formes. Quatre sont des faux positifs — `entrainement` est une graphie valide
+depuis 1990, et `affiche`, `mesure`, `prive` sont des mots français à part
+entière. D'où la mesure par bloc.
+
+**Bonne nouvelle** : c'est du GABARIT, pas du catalogue. Aucun re-semis, aucun
+`template_id` touché. Livrable directement — **en attente de l'arbitrage**
+opérateur : réaccentuer mécaniquement, ou relecture éditoriale.
+
+### 9.5 Ce qui reste ouvert
+
+* **Le rendu des contrôles de formulaire** — aucune garde ne vérifie qu'un champ
+  ne rend pas le blanc du navigateur. Seul un rendu le peut, et le dépôt a le
+  harnais (`UIV3_VISUAL_BASELINE_01`, dimension `A11Y`). **Dette nommée**, pas
+  oubli.
+* **Les 88 couleurs hors token** — inchangé depuis la nuit.
+* **Le catalogue** — inchangé : la correction déclenche l'effacement-réinsertion.
+* **Non revus** : `/export`, le dashboard.
+* **Le cleanup** — 14 branches, 8 worktrees. Aucun supprimé.
