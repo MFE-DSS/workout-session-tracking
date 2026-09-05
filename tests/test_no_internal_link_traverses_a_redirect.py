@@ -104,18 +104,37 @@ def test_the_traversal_exemptions_do_not_rot():
     )
 
 
+#: Chemin réel de chaque route héritée. On interroge le SERVEUR, pas la table
+#: de routage : voir la docstring ci-dessous.
+LEGACY_PATHS = {"dashboard": "/dashboard", "rules_page": "/rules"}
+
+
 @pytest.mark.parametrize("name", sorted(LEGACY_ROUTE_NAMES))
-def test_the_legacy_routes_still_exist(name):
+def test_the_legacy_routes_still_answer(name, client):
     """Elles ne sont PAS supprimées, et c'est délibéré.
 
     Un signet externe vers `/rules` doit continuer d'atterrir. Cette garde
-    empêche qu'on « nettoie » la route en croyant bien faire — ce qui
-    casserait des liens que le produit ne contrôle pas.
-    """
-    from app.main import app
+    empêche qu'on « nettoie » la route en croyant bien faire — ce qui casserait
+    des liens que le produit ne contrôle pas.
 
-    routes = {getattr(r, "name", None) for r in app.routes}
-    assert name in routes, (
-        f"la route héritée `{name}` a disparu — les signets externes qui la "
-        "visent tombent désormais en 404"
+    ⚠ PREMIÈRE ÉCRITURE FAUSSE, ET INTÉRESSANTE. Elle faisait
+    `from app.main import app` puis lisait `app.routes`. Elle passait en local
+    et tombait en CI : le fixture `client` **purge tous les modules `app.*` de
+    `sys.modules`** avant de reconstruire l'application, si bien qu'un import
+    direct rend une application dont les routeurs métier ne sont pas montés —
+    `{'openapi', 'static', 'swagger_ui_html', …}` et rien d'autre.
+
+    Le verdict dépendait donc de l'ORDRE DES TESTS. C'est précisément ce que
+    `scripts/check_test_isolation.py` existe pour attraper.
+
+    La réécriture interroge le serveur : une redirection prouve que la route
+    répond, ce qui est de toute façon la propriété qui compte. Une table de
+    routage peut contenir un nom sans que rien ne réponde.
+    """
+    r = client.get(LEGACY_PATHS[name], follow_redirects=False)
+    assert r.status_code in (301, 302, 303, 307, 308), (
+        f"la route héritée `{name}` ({LEGACY_PATHS[name]}) répond "
+        f"{r.status_code} au lieu de rediriger — les signets externes qui la "
+        "visent ne retombent plus sur rien"
     )
+    assert r.headers.get("location"), "redirection sans destination"
