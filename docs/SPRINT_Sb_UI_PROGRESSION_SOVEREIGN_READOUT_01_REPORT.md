@@ -199,3 +199,19 @@ Aucun des trois n'était un défaut du produit :
 C'eût été la **troisième fois** qu'un labo non représentatif me fait conclure
 faux. Le labo a été resemé avec des noms réels et des charges qui bougent
 **avant** de regarder l'écran.
+
+## Verdict
+
+**LIVRÉ.** Sur `/progress`, le relevé souverain (32 px) est désormais le seul
+objet de son rang ; les comptages sont redescendus à 22 et 20 px, et la
+progression — ce que l'écran nomme — a cessé d'être son plus petit texte.
+
+Six occurrences sur six atteignent l'écran, contre deux auparavant. Aucun
+seuil, aucune comparaison entre exercices, aucune couleur de jugement : les
+trois interdits du contrat `TRAIN1-B` tiennent, et la promotion repose sur la
+seule chronologie.
+
+**Ce qui reste ouvert** — l'ordre des sections. `EXPOSITION · 14 J` précède
+toujours `PROGRESSION PAR EXERCICE`. L'arbitrage opérateur portait sur la
+taille ; déplacer une section a ses propres conséquences de lecture et attend
+son propre arbitrage.
