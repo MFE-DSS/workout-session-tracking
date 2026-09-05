@@ -22,6 +22,25 @@ LEVEL_HIGH = "eleve"
 LEVEL_MID = "moyen"
 LEVEL_LOW = "faible"
 
+#: ⚠ CES TROIS VALEURS SONT DES IDENTIFIANTS, PAS DES LIBELLÉS.
+#:
+#: Elles partent telles quelles dans l'export JSON et CSV
+#: (`export_builder.py`, colonne `confidence_level`) : les renommer casserait
+#: un contrat de données déjà livré. `eleve` reste donc `eleve`, sans accent,
+#: parce que c'est une clé et non du français.
+#:
+#: Le récap de séance les rendait pourtant DIRECTEMENT à l'écran : « Confiance
+#: du logging — eleve (90) ». Un utilisateur y lisait une clé de programme,
+#: sans accent, sur une interface française.
+#:
+#: La table de libellés vit ICI, à côté des valeurs qu'elle traduit : les
+#: séparer dans deux modules, c'est garantir qu'elles divergeront.
+LEVEL_LABELS: dict[str, str] = {
+    LEVEL_HIGH: "élevée",
+    LEVEL_MID: "moyenne",
+    LEVEL_LOW: "faible",
+}
+
 
 def level_for(score: int) -> str:
     if score >= 80:
