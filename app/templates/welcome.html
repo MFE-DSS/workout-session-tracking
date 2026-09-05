@@ -22,8 +22,15 @@
     <main class="container" style="padding-top: 40px; padding-bottom: 60px;">
       <div class="auth-container" style="margin-bottom: var(--space-xl); text-align: center;">
         <h1 class="page-title" style="font-size: 32px; letter-spacing: 0.08em; text-align: center; margin-bottom: var(--space-xs);">Auren</h1>
-        <p class="lede" style="text-align: center; margin-bottom: var(--space-lg);">
-          Private bodybuilding tracking cockpit.
+        {# ⚠ « Private bodybuilding tracking cockpit. » — LA PREMIÈRE PHRASE
+           QU'UN INCONNU LIT ÉTAIT EN ANGLAIS, sur un produit dont chaque autre
+           écran est en français. C'est le quatrième anglicisme trouvé cette
+           nuit, et le plus exposé : c'est l'accroche.
+
+           La traduction garde le mot « cockpit », qui est le mot du produit —
+           `L-01`, `PH-01` — et non un anglicisme de commodité. #}
+        <p class="lede auth-lede">
+          Le cockpit privé de ton entraînement.
         </p>
         <a class="btn btn--primary btn--wide" href="{{ url_for('login_page') }}">
           Connexion
@@ -36,7 +43,7 @@
       {# === Tracking journey — representation produit === #}
       <section style="max-width: 720px; margin: 0 auto;">
         <h2 class="section-header" style="text-align: center; margin-bottom: var(--space-md);">
-          Bodybuilding · data end-to-end
+          Musculation · de la série à la synthèse
         </h2>
         <p class="text-dim" style="font-size: 13px; text-align: center; max-width: 480px; margin: 0 auto var(--space-lg);">
           Journal de suivi simple. Transformation des séances en synthèse.
@@ -56,7 +63,7 @@
             <defs>
               <marker id="arr-main" viewBox="0 0 10 10" refX="9" refY="5"
                       markerWidth="7" markerHeight="7" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f25f3a" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)" />
               </marker>
               <marker id="arr-dim" viewBox="0 0 10 10" refX="9" refY="5"
                       markerWidth="7" markerHeight="7" orient="auto">
@@ -68,7 +75,7 @@
             <!-- Étape 1 : Série -->
             <g>
               <rect x="20" y="20" width="150" height="60" rx="10"
-                    fill="#161a22" stroke="#f25f3a" stroke-width="2" />
+                    fill="#161a22" stroke="var(--accent)" stroke-width="2" />
               <text x="95" y="44" text-anchor="middle" fill="#e8ecf1"
                     font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">Série</text>
               <text x="95" y="62" text-anchor="middle" fill="#9aa3ad"
@@ -78,7 +85,7 @@
             <!-- Étape 2 : Séance -->
             <g>
               <rect x="220" y="20" width="150" height="60" rx="10"
-                    fill="#161a22" stroke="#f25f3a" stroke-width="2" />
+                    fill="#161a22" stroke="var(--accent)" stroke-width="2" />
               <text x="295" y="44" text-anchor="middle" fill="#e8ecf1"
                     font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">Séance</text>
               <text x="295" y="62" text-anchor="middle" fill="#9aa3ad"
@@ -88,7 +95,7 @@
             <!-- Étape 3 : Historique -->
             <g>
               <rect x="420" y="20" width="150" height="60" rx="10"
-                    fill="#161a22" stroke="#f25f3a" stroke-width="2" />
+                    fill="#161a22" stroke="var(--accent)" stroke-width="2" />
               <text x="495" y="44" text-anchor="middle" fill="#e8ecf1"
                     font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">Historique</text>
               <text x="495" y="62" text-anchor="middle" fill="#9aa3ad"
@@ -98,7 +105,7 @@
             <!-- Étape 4 : Synthèse -->
             <g>
               <rect x="620" y="20" width="140" height="60" rx="10"
-                    fill="#161a22" stroke="#f25f3a" stroke-width="2" />
+                    fill="#161a22" stroke="var(--accent)" stroke-width="2" />
               <text x="690" y="44" text-anchor="middle" fill="#e8ecf1"
                     font-family="JetBrains Mono, monospace" font-size="13" font-weight="600">Synthèse</text>
               <text x="690" y="62" text-anchor="middle" fill="#9aa3ad"
@@ -106,9 +113,9 @@
             </g>
 
             <!-- Flèches principales horizontales -->
-            <line x1="170" y1="50" x2="220" y2="50" stroke="#f25f3a" stroke-width="2" marker-end="url(#arr-main)" />
-            <line x1="370" y1="50" x2="420" y2="50" stroke="#f25f3a" stroke-width="2" marker-end="url(#arr-main)" />
-            <line x1="570" y1="50" x2="620" y2="50" stroke="#f25f3a" stroke-width="2" marker-end="url(#arr-main)" />
+            <line x1="170" y1="50" x2="220" y2="50" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr-main)" />
+            <line x1="370" y1="50" x2="420" y2="50" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr-main)" />
+            <line x1="570" y1="50" x2="620" y2="50" stroke="var(--accent)" stroke-width="2" marker-end="url(#arr-main)" />
 
             <!-- Branches secondaires -->
             <!-- Mesures → Physique -->
@@ -160,7 +167,7 @@
 
             <!-- Légende produit -->
             <g transform="translate(20, 290)">
-              <circle cx="6" cy="4" r="5" fill="#f25f3a" />
+              <circle cx="6" cy="4" r="5" fill="var(--accent)" />
               <text x="18" y="8" fill="#e8ecf1" font-family="Inter, sans-serif" font-size="11">
                 logging
               </text>

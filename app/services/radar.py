@@ -61,8 +61,8 @@ def build_radar_svg(axes: list, size: int = 300, compact: bool = False) -> str:
         score_pts.append(f"{polar(angle, r)[0]:.1f},{polar(angle, r)[1]:.1f}")
     parts.append(
         f'<polygon points="{" ".join(score_pts)}" '
-        f'fill="#f25f3a" fill-opacity="0.15" '
-        f'stroke="#f25f3a" stroke-width="2" stroke-linejoin="round"/>'
+        f'fill="var(--accent)" fill-opacity="0.15" '
+        f'stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>'
     )
 
     # Interactive data points (full size only — compact mode is silent)
@@ -76,7 +76,7 @@ def build_radar_svg(axes: list, size: int = 300, compact: bool = False) -> str:
             lx, ly = polar(angle, label_r)
             parts.append('<g class="chart-point">')
             parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="14" fill="transparent" class="chart-point__hit"/>')
-            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="#f25f3a" class="chart-point__dot"/>')
+            parts.append(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="4.5" fill="var(--accent)" class="chart-point__dot"/>')
             parts.append(
                 f'<text x="{lx:.1f}" y="{ly:.1f}" text-anchor="middle" dominant-baseline="middle" '
                 f'fill="#e8ecf1" font-size="11" font-weight="600" '

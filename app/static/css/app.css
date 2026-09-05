@@ -550,6 +550,11 @@ input, button, textarea, select {
 
 .card__actions--auth { margin-top: var(--space-md); }
 
+.auth-lede {
+  text-align: center;
+  margin-bottom: var(--space-lg);
+}
+
 .auth-notice {
   border-left: 3px solid var(--role-support-success);
 }
@@ -4225,7 +4230,12 @@ details.exercise-card[open] .card__actions--exercise {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.exercise-card__chip--cardio { color: #38b2ac; }
+/* ⚠ Portait `#38b2ac` — le TEAL RETIRÉ par `Sb_UI_02b` / `OQ-02b-A`, en dur.
+   Il désignait le cardio ici, tandis que la légende du graphique de
+   Progression désigne le même cardio par `--fg-muted`. Deux couleurs pour une
+   notion, dont une officiellement supprimée.
+   On adopte le token de la légende : une seule notion, un seul rôle. */
+.exercise-card__chip--cardio { color: var(--role-text-muted); }
 
 /* Peek preparing the next exercise, rendered at the bottom of the
    active card only. Discreet by design — dashed border, soft background,
