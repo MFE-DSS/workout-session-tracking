@@ -38,6 +38,11 @@ import pytest
 TEMPLATES = Path(__file__).resolve().parents[1] / "app" / "templates"
 SERVICES = Path(__file__).resolve().parents[1] / "app" / "services"
 
+#: `python:S1192` — quatre copies suffisent à déclencher la règle, et ce
+#: dépôt trébuche dessus assez souvent pour que l'éviter coûte moins cher
+#: que la diagnostiquer.
+_ENC = "utf-8"
+
 
 def _uncommented(src: str) -> str:
     """Retire les commentaires Jinja.
@@ -75,7 +80,7 @@ def test_no_template_renders_a_daily_streak(tpl: Path):
     Universel par construction : la liste est le résultat d'un `rglob`, pas une
     énumération. Un gabarit ajouté demain est couvert sans rien éditer ici.
     """
-    visible = _visible_text(tpl.read_text(encoding="utf-8")).lower()
+    visible = _visible_text(tpl.read_text(encoding=_ENC)).lower()
     for banned in ("streak", "jours de série", "série en cours", "🔥"):
         assert banned not in visible, (
             f"{tpl.name} rend « {banned} » — `OPERATOR_DECISION D7` a retiré le "
@@ -90,7 +95,7 @@ def test_no_template_reads_a_streak_attribute(tpl: Path):
     Une garde qui n'interdit que le libellé laisse passer une colonne renommée
     « Constance » qui rendrait la même valeur.
     """
-    src = _uncommented(tpl.read_text(encoding="utf-8"))
+    src = _uncommented(tpl.read_text(encoding=_ENC))
     assert not re.search(r"\.streak\b", src), (
         f"{tpl.name} lit encore un attribut `streak` — D7 retire la MÉTRIQUE, "
         f"pas seulement son libellé"
@@ -107,7 +112,7 @@ def test_only_the_behavioral_engine_still_computes_a_streak():
     """
     producers = []
     for py in sorted(SERVICES.rglob("*.py")):
-        tree = ast.parse(py.read_text(encoding="utf-8"))
+        tree = ast.parse(py.read_text(encoding=_ENC))
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 if "streak" in node.name.lower():
@@ -145,7 +150,7 @@ def test_no_template_labels_a_count_in_english(tpl: Path):
     Progression » — deux lignes sous un libellé « Sessions 30j ». Écrire qu'on a
     aligné le vocabulaire ne l'aligne pas.
     """
-    visible = _visible_text(tpl.read_text(encoding="utf-8"))
+    visible = _visible_text(tpl.read_text(encoding=_ENC))
     offenders = re.findall(r"\b[Ss]essions?\b(?!\s*/)", visible)
     assert not offenders, (
         f"{tpl.name} rend {offenders} — le produit dit « séance », "
