@@ -110,7 +110,43 @@ def test_history_session_card_link_and_badges(client):
     assert "/sessions/" in html
     # status badge + exos badge present
     assert "badge" in html
-    assert "terminée" in html
+    # `Sb_UI_HISTORIQUE_01` — MIGRÉE : ON MARQUE L'EXCEPTION, PAS LA NORME.
+    #
+    # Cette garde exigeait le chip « terminée ». Sur un HISTORIQUE, terminée est
+    # la norme : le chip était présent sur dix cartes sur dix, seule chose
+    # colorée de chacune, et il redisait l'onglet de filtre actif ET le mot
+    # « durée » du chip voisin (une séance en cours dit « depuis »).
+    #
+    # Ce qu'elle protégeait vraiment — « la carte dit dans quel état est la
+    # séance » — n'est pas abandonné : il est vérifié dans les DEUX sens juste
+    # en dessous, ce que l'assertion d'origine ne faisait pas. Une garde qui ne
+    # teste qu'une présence laisse passer un état qui ne se distingue plus.
+    assert "en cours" not in html, (
+        "une séance terminée est annoncée « en cours »"
+    )
+    assert "durée" in html, (
+        "la carte ne dit plus la durée : sans elle ET sans chip, plus rien ne "
+        "distingue une séance terminée d'une séance en cours"
+    )
+
+
+def test_an_unfinished_session_is_the_one_that_gets_marked(client):
+    """Le pendant de la garde ci-dessus, et la raison pour laquelle elle tient.
+
+    `Sb_UI_HISTORIQUE_01` retire le chip de la NORME. La distinction ne survit
+    que si l'EXCEPTION, elle, reste marquée — deux fois plutôt qu'une : par le
+    chip, et par « depuis » au lieu de « durée ».
+    """
+    from app.database import SessionLocal
+
+    with SessionLocal() as db:
+        _seed_session(db, _uid(db), status="in_progress", excluded=False)
+    html = _render(client)
+    assert "en cours" in html, "une séance en cours n'est plus signalée"
+    assert "depuis" in html, (
+        "le chip de durée dit « durée » sur une séance en cours : le mot ne "
+        "distingue plus les deux états"
+    )
 
 
 def test_history_management_details_and_post_actions_preserved(client):

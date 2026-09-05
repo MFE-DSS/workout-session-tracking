@@ -7,7 +7,7 @@
     <div class="session-done__badge">✓ Séance terminée</div>
     <h1 class="page-title session-done__title">{{ recap.header.template_name }}</h1>
     <div class="session-done__meta text-dim">
-      {{ (recap.header.started_at | local).strftime('%a %d/%m %H:%M') }}
+      {{ recap.header.started_at | datetime_fr }}
       {% if recap.header.ended_at %}
         → {{ (recap.header.ended_at | local).strftime('%H:%M') }}
       {% endif %}

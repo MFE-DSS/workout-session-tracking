@@ -16,7 +16,7 @@ from fastapi.templating import Jinja2Templates
 
 from app.config import BASE_DIR, DEFAULT_TIMEZONE
 from app.services.static_assets import asset_url
-
+from app.services.time_format import format_date_short, format_datetime_short
 
 _DEFAULT_TZ = ZoneInfo(DEFAULT_TIMEZONE)
 
@@ -44,8 +44,39 @@ def local_weekday_iso(dt: datetime | None) -> int | None:
 
 
 templates = Jinja2Templates(directory=str(BASE_DIR / "app" / "templates"))
+def date_fr(dt: datetime | None) -> str:
+    """« Sam 05/09 » — la date d'un coup d'œil, en français.
+
+    `Sb_UI_HISTORIQUE_01` — L'HISTORIQUE RENDAIT SES JOURS EN ANGLAIS.
+    Il appelait `strftime('%a %d/%m %H:%M')`, et `%a` rend l'abréviation de la
+    locale du PROCESSUS : « Sat 05/09 07:54 », dix fois par écran, dans une
+    interface française.
+
+    Les pièces existaient pourtant toutes les deux — le filtre `local_weekday`
+    juste au-dessus, et la table `WEEKDAY_LABELS`. Aucune n'était atteignable
+    depuis un gabarit sans les connaître. Ce filtre les réunit pour que la
+    prochaine surface n'ait plus de raison d'écrire sa propre version.
+
+    Localise avant de formater : formater un UTC brut décalerait le jour de la
+    semaine d'un cran une nuit sur deux.
+    """
+    return format_date_short(to_local(dt))
+
+
+def datetime_fr(dt: datetime | None) -> str:
+    """« Sam 05/09 07:54 » — quand l'heure borne quelque chose.
+
+    Distincte de `date_fr` pour une raison de sens, pas de commodité : sur le
+    récap d'une séance, l'heure de début borne la séance avec celle de fin.
+    Sur une liste d'historique, elle n'est jamais relue.
+    """
+    return format_datetime_short(to_local(dt))
+
+
 templates.env.filters["local"] = to_local
 templates.env.filters["local_weekday"] = local_weekday_iso
+templates.env.filters["date_fr"] = date_fr
+templates.env.filters["datetime_fr"] = datetime_fr
 
 # `STATIC_ASSET_COHERENCE_01` — L'AUTORITÉ D'URL DES ASSETS MUTABLES.
 #
