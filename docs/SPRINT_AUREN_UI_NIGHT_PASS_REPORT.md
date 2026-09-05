@@ -251,10 +251,24 @@ un autre code que celui de la branche.
 | `#185` | profondeur de la séance | — | idem |
 | `#187` | docs de stratégie | — | docs-only |
 | **`#186`** | **U4–U8** : viseur, réglette, validation implicite, panneau RECOMMANDATION, fil, accueil, progression, seuils, liens, doctrine d'icônes, accents retirés | `5f8ed10` | 6 checks verts · Sonar `OK` · 0 fil · `CLEAN` · **CI canonique de push : succès** |
-| **`#188`** | les trois trouvailles ci-dessus | `0818080` | **docs-only** — CI de push légitimement skippée par `paths-ignore: docs/**` (`CLAUDE.md §2`). **Ce n'est pas un `[skip ci]` manuel** ; la source de vérité est la CI de la PR. |
+| **`#188`** | les trois trouvailles ci-dessus | `0818080` | **docs-only** — CI de push légitimement skippée par `paths-ignore: docs/**` (`CLAUDE.md §2`). **Ce n'est pas un `[skip ci]` manuel** ; la source de vérité est la CI de la PR, qui a bien tourné en entier (10 checks). |
+| **`#189`** | **la tranche `D7`** — un producteur au lieu de trois, 4 surfaces sociales, 9 anglicismes, garde universelle | `4807346` | 10 checks verts · Sonar `OK` · 0 fil · `CLEAN` · **CI canonique de push : succès** |
+| **`#190`** | ce closeout | `8fe8cdb` | 9 checks verts · Sonar `OK` · 0 fil · `CLEAN` |
 
 Head épinglé à chaque merge. **Aucun squash, aucun `--admin`, aucune branche ni
 worktree supprimé** — le cleanup reste une décision séparée, et elle est vôtre.
+
+⚠ **Précision sur le `paths-ignore`**, vérifiée plutôt que supposée : il
+s'applique au **push**, pas aux PR. Les PR docs reçoivent la CI complète
+(`#188` : 10 checks) ; c'est le run de push sur le commit de merge qui est
+absent — **0 run** relevé sur `0818080`. La formule « CI skippée » ne vaut donc
+que pour le push.
+
+⚠ **Deux dispatches CI bloqués**, sur `#187` puis `#190` : PR ouverte,
+`mergeable CLEAN`, et **aucun run**. Ce n'est pas le motif « conflit rend
+`refs/pull/N/merge` inconstructible » — la mergeabilité était bonne les deux
+fois. Un `synchronize` (un commit poussé) a débloqué les deux. Sur `#190` le
+commit en question corrigeait une vraie erreur, pas un commit vide.
 
 ### Deux incidents Sonar sur `#186`, et ce qu'ils ont appris
 
@@ -304,6 +318,26 @@ en propre.
   Plus les worktrees correspondants sur le poste. Supprimer une branche ou un
   worktree reste une action **humaine** (`CLAUDE.md §4`), y compris sous
   `GO MERGE`.
+
+  **Six worktrees viennent de cette nuit**, tous vérifiés propres (`git status`
+  vide) au moment d'écrire :
+
+  ```
+  workout-session-tracking-ui-tokens    workout-session-tracking-ui-viseur
+  workout-session-tracking-ui-chassis   workout-session-tracking-docs
+  workout-session-tracking-ui-session   workout-session-tracking-d7
+  ```
+
+* **Six documents non suivis traînent dans le worktree canonique** — des
+  brouillons que j'y avais écrits en début de nuit avant de basculer sur le
+  worktree docs. Ils empêcheront un `git pull` de passer.
+
+  **Vérifié avant de le dire** : ce sont des **sous-ensembles stricts** des
+  versions mergées — `diff` compte **zéro ligne** présente en local et absente
+  du distant, sur les six. Les supprimer localement ne perd rien.
+
+  ⚠ **`AGENTS.md` est aussi non suivi et doit le rester** — je ne l'ai pas
+  touché.
 * **Les 88 couleurs hors token** — recensées, non corrigées, pour les raisons
   dites en §7.3.
 * **Les 353 styles en ligne** sur 39 gabarits — mesurés, non touchés.
