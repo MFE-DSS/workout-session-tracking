@@ -32,7 +32,10 @@ def leaderboard_page(
         request,
         "leaderboard.html",
         {
-            "page_title": "Leaderboard",
+            # L'écran s'appelle « Classement » depuis son `<h1>` ; son titre de
+            # document disait « Leaderboard ». C'est le nom que voit l'onglet,
+            # l'historique et le partage.
+            "page_title": "Classement",
             "entries": entries,
             "current_username": user.username,
             "active_session": latest_open_session(db, user.id),

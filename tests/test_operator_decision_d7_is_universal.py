@@ -55,8 +55,39 @@ def _uncommented(src: str) -> str:
 
 
 def _visible_text(src: str) -> str:
-    """Le texte réellement rendu entre balises, hors commentaires."""
-    return " ".join(re.findall(r">([^<>{}]+)<", _uncommented(src)))
+    """Le texte réellement rendu entre balises, hors commentaires.
+
+    ⚠ CETTE FONCTION AVAIT UN ANGLE MORT, ET IL A COÛTÉ UNE OCCURRENCE.
+
+    Elle extrayait avec `>([^<>{}]+)<`, c'est-à-dire en EXCLUANT les accolades
+    du jeu de caractères. Conséquence : toute phrase visible **coupée par une
+    expression Jinja** devenait invisible à la garde, puisque le motif ne
+    pouvait plus atteindre le `<` suivant.
+
+    Le cas trouvé, sur le classement :
+
+        Dernière session : {{ e.last_session_score ... }}/100<br>
+
+    « session » est rendu à l'écran, dans une infobulle, et la garde ne le
+    voyait pas. Mesuré sur tout le dépôt : l'angle mort ne coûtait qu'UNE
+    occurrence — mais c'est la même faute que celles que ce fichier traque,
+    commise dans le fichier qui les traque : **borner ce qu'on a pensé à
+    regarder**.
+
+    La correction ne consiste pas à élargir le jeu de caractères — il faut
+    NEUTRALISER Jinja d'abord, puis extraire :
+
+    * `{% … %}` devient un saut de ligne : un bloc de contrôle COUPE
+      réellement le texte rendu, le remplacer par du vide souderait deux
+      phrases qui ne se touchent jamais à l'écran ;
+    * `{{ … }}` devient `·` : une expression rend quelque chose, donc elle ne
+      coupe pas la phrase — la remplacer par du vide ferait apparaître des mots
+      collés qui n'existent pas.
+    """
+    src = _uncommented(src)
+    src = re.sub(r"\{%.*?%\}", "\n", src, flags=re.DOTALL)
+    src = re.sub(r"\{\{.*?\}\}", "·", src, flags=re.DOTALL)
+    return " ".join(re.findall(r">([^<>]+)<", src))
 
 
 ALL_TEMPLATES = sorted(TEMPLATES.rglob("*.html"))
