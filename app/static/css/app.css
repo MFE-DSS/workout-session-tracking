@@ -751,12 +751,24 @@ input, button, textarea, select {
   text-align: center;
 }
 
+/* Rang SECTION de l'échelle maison — 22 px (AUREN_VISUAL_BACKBONE §3.2).
+ *
+ * Ce sélecteur valait 13 px, SOUS le corps qu'il introduit (15 px) : c'est
+ * exactement le défaut que le socle documente sur 101 usages. Il vit sur onze
+ * gabarits ; il est promu pour les onze À LA FOIS, parce qu'une décision
+ * appliquée à la seule surface commode est le mode d'échec relevé.
+ *
+ * Mesuré sur 17 titres / 4 surfaces avant promotion : aucun ne passe à deux
+ * lignes, et la page la plus longue (/science, 10 écrans) grandit de 2,5 %.
+ * Le crénage descend avec la taille — 0,5 px tenait pour une capitale de 13 px,
+ * il écarterait trop à 22.
+ */
 .section-header {
   font-family: var(--font);
-  font-size: 13px;
+  font-size: 22px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
   color: var(--fg-muted);
   margin: 0 0 12px;
 }
