@@ -31,12 +31,36 @@
   --accent-muted: #8A7538;
   --on-accent: #0A0C0F;
 
-  /* États sémantiques désaturés graphite-compatibles */
+  /* États sémantiques désaturés graphite-compatibles.
+   *
+   * Chaque état a un COUPLE : sa couleur de texte et son voile de fond, ce
+   * dernier dérivé du premier à alpha 0.14. `--ok-soft` était seul à exister ;
+   * ses deux frères étaient invoqués avec un repli en dur venant d'une
+   * génération antérieure de la palette (un ambre `#e0a030` sous un texte
+   * terracotta). Le fond et le texte ne se répondaient plus.
+   *
+   * Contrastes mesurés sur la surface réelle `--surface: #151A21` :
+   *   --ok     sur --ok-soft     → 4,67:1   (AA)
+   *   --warn   sur --warn-soft   → 4,41:1   ⚠ sous AA — voir le rapport
+   *   --danger sur --danger-soft → 3,42:1   ⚠ sous AA — voir le rapport
+   *
+   * Les deux derniers ÉTAIENT PIRES avant cette tranche (3,85 et 3,21) : la
+   * dérivation les améliore sans les sauver. Atteindre AA demande d'éclaircir
+   * `--warn` et `--danger` eux-mêmes, qui servent aussi de FOND ailleurs —
+   * c'est un arbitrage de palette, pas un réglage de tranche.
+   */
   --ok: #6E9E7A;
   --ok-soft: rgba(110, 158, 122, 0.14);
   --warn: #C77B54;
+  --warn-soft: rgba(199, 123, 84, 0.14);
   --danger: #B85C5C;
+  --danger-soft: rgba(184, 92, 92, 0.14);
   --info: #6E8FA8;
+
+  /* Voile neutre d'un demi-niveau, pour un bloc qui doit se détacher sans
+   * monter d'un rang dans l'échelle de profondeur. Il était invoqué trois fois
+   * avec son repli en dur et n'a jamais existé comme token. */
+  --bg-soft: rgba(255, 255, 255, 0.02);
 
   /* Typo : TOUT-MONO système, zéro webfont. --font remappé sur mono
      pour que toute la coque passe en terminal sans réécrire chaque
@@ -1151,8 +1175,10 @@ input, button, textarea, select {
 .profile-preview__kpi li { display: flex; justify-content: space-between; }
 .profile-preview__kpi-label { color: var(--fg-dim); }
 .profile-preview__kpi b { color: var(--fg); font-size: 13px; }
-.trend--up { color: var(--good, #4ade80); }
-.trend--down { color: var(--warn, #f59e0b); }
+/* `--good` n'a jamais existé : c'est `#4ade80` — un vert vif d'une autre
+ * palette — qui était peint. L'état « bon » du produit s'appelle `--ok`. */
+.trend--up { color: var(--ok); }
+.trend--down { color: var(--warn); }
 .profile-preview__cta {
   display: block;
   margin-top: var(--space-xs);
@@ -4125,7 +4151,7 @@ details.exercise-card[open] .card__actions--exercise {
   margin-bottom: var(--space-sm);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--bg-soft, rgba(255,255,255,0.02));
+  background: var(--bg-soft);
 }
 .machine-panel__summary {
   list-style: none;
@@ -4159,7 +4185,7 @@ details.exercise-card[open] .card__actions--exercise {
 }
 .machine-panel__list { margin: 0; padding-left: 1.1em; }
 .machine-panel__list li { margin: 2px 0; line-height: 1.35; }
-.machine-panel__list--warn li { color: var(--warn, #e0a030); }
+.machine-panel__list--warn li { color: var(--warn); }
 .machine-panel__meta {
   margin: var(--space-xs) 0 0;
   font-size: 12px;
@@ -4172,7 +4198,7 @@ details.exercise-card[open] .card__actions--exercise {
   margin-bottom: var(--space-sm);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: var(--bg-soft, rgba(255,255,255,0.02));
+  background: var(--bg-soft);
 }
 .substitute-picker__summary {
   list-style: none;
@@ -4317,7 +4343,7 @@ details.exercise-card[open] .card__actions--exercise {
 }
 .atlas-machine__list { margin: 0; padding-left: 1.1em; font-size: 13px; }
 .atlas-machine__list li { margin: 2px 0; line-height: 1.35; }
-.atlas-machine__list--warn li { color: var(--warn, #e0a030); }
+.atlas-machine__list--warn li { color: var(--warn); }
 .atlas-machine__meta {
   margin-top: var(--space-sm);
   font-size: 12px;
@@ -4336,8 +4362,8 @@ details.exercise-card[open] .card__actions--exercise {
   font-weight: 500;
 }
 .confidence-badge--eleve { background: var(--ok-soft, rgba(60,200,120,0.18)); color: var(--ok, #3cc878); }
-.confidence-badge--moyen { background: var(--warn-soft, rgba(224,160,48,0.18)); color: var(--warn, #e0a030); }
-.confidence-badge--faible { background: var(--danger-soft, rgba(230,80,80,0.18)); color: var(--danger, #e65050); }
+.confidence-badge--moyen { background: var(--warn-soft); color: var(--warn); }
+.confidence-badge--faible { background: var(--danger-soft); color: var(--danger); }
 
 .session-done__top-progression .top-progression__line {
   display: flex;
@@ -4381,7 +4407,7 @@ details.exercise-card[open] .card__actions--exercise {
   line-height: 1.35;
   font-size: 13px;
 }
-.anomaly__icon { color: var(--warn, #e0a030); font-weight: 700; flex: 0 0 auto; }
+.anomaly__icon { color: var(--warn); font-weight: 700; flex: 0 0 auto; }
 
 /* Active card hints */
 .exercise-card__hints {
@@ -4496,7 +4522,7 @@ details.exercise-card[open] .card__actions--exercise {
   padding: var(--space-sm);
   border: 1px dashed var(--border);
   border-radius: var(--radius-sm);
-  background: var(--bg-soft, rgba(255,255,255,0.02));
+  background: var(--bg-soft);
 }
 .card-peek__head {
   display: flex;

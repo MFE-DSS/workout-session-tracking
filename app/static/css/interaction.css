@@ -573,7 +573,9 @@
   color: var(--fg-dim);
 }
 
-.plan-thread__row b { color: var(--fg-2, var(--fg)); font-weight: 600; }
+/* `--fg-2` n'existe pas ; son repli était déjà `var(--fg)`. Sans dégât, mais
+ * l'indirection laissait croire à un second rang de premier plan. */
+.plan-thread__row b { color: var(--fg); font-weight: 600; }
 .plan-thread__dose { white-space: nowrap; font-variant-numeric: tabular-nums; }
 
 .plan-gap { margin-top: var(--space-sm); }
