@@ -655,3 +655,52 @@
   .today-home__hero { padding: 18px 16px; }
   .today-home__title { font-size: 22px; }
 }
+
+/* ── LA CARTE « SEMAINE PLANIFIÉE » ────────────────────────────────────────
+ *
+ * Sa ligne souveraine était un COMPTAGE — « 4 séances proposées » à 16 px —
+ * pendant que les six créneaux, déjà présents dans la charge utile, tenaient
+ * en 13 px dessous. Même inversion que sur `/plan`, un rang plus bas : le
+ * produit avait la substance et rendait le nombre.
+ *
+ * Ces règles remplacent SIX attributs `style` statiques, retirés du gabarit
+ * avec la refonte plutôt que dans une tranche de nettoyage séparée
+ * (`AUREN_VISUAL_BACKBONE §5`, cliquet `tests/inline_style_baseline.json`).
+ *
+ * 17 px et non 22 : cette carte est du CONTEXTE, elle ne doit pas disputer le
+ * hero qui porte la décision du jour, à 24 px juste au-dessus.
+ */
+.home-wk__label {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.home-wk__zones {
+  margin: 4px 0 0;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Le reste des zones, COMPTÉ plutôt que nommé. Les nommer toutes portait la
+ * ligne souveraine à trois lignes — mesuré au rendu, pas supposé. */
+.home-wk__plus {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--role-text-muted);
+}
+
+.home-wk__dose {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--role-text-muted);
+}
+
+.home-wk__gap { margin-top: var(--space-sm); }
