@@ -149,6 +149,58 @@ def axe_fr(cle: str | None) -> str:
     if not cle:
         return ""
     return RADAR_AXES.get(cle, {}).get("label", cle)
+def nombre_fr(valeur: float | int | None, decimales: int | None = None) -> str:
+    """« 586,0 » devient « 586 » · « 75.63 » devient « 75,6 » · `None` devient « — ».
+
+    POURQUOI UN FILTRE, ENCORE
+
+    Même histoire que `pluriel` juste au-dessus, et cette fois **j'en suis
+    l'auteur**. Le produit avait tranché d'écrire les nombres en français, et
+    trois gabarits l'appliquaient avec trois orthographes différentes :
+
+        {{ x | string | replace(".", ",") }}
+        {{ "%.1f" | format(x) | replace('.', ',') }}
+        {{ x | round(1) | string | replace(".", ",") }}
+
+    Deux de ces trois viennent de `Sb_UI_SESSION_DONE_01`, écrites par moi.
+    Une quatrième surface — le classement de squad — n'avait rien du tout et
+    affichait « 586.0 pts » à côté d'un « 75,6 kg » correct.
+
+    La décision existait. Le moyen de l'appliquer n'existait pas, donc chacun
+    l'a réinventé, et le quatrième a oublié.
+
+    ⚠ LE ZÉRO DÉCIMAL DISPARAÎT PAR DÉFAUT. « 586,0 pts » promet une précision
+    au dixième que le score n'a pas. Passer `decimales` force le contraire
+    quand la précision est réelle — un poids de corps s'écrit « 75,0 kg »,
+    parce que le dixième y a été mesuré.
+    """
+    if valeur is None:
+        return "—"
+    if decimales is None:
+        arrondi = round(float(valeur), 1)
+        texte = f"{arrondi:g}"
+    else:
+        texte = f"{float(valeur):.{decimales}f}"
+    return texte.replace(".", ",")
+
+
+def role_squad(cle: str | None) -> str:
+    """« owner » devient « Propriétaire ». La clé reste la clé.
+
+    `role` est un identifiant : il vit en base, et trois gabarits comparent
+    dessus (`membership.role == 'owner'`). Le renommer casserait l'autorisation.
+    Ce filtre ne traduit que l'AFFICHAGE.
+
+    Le repli rend la clé plutôt que d'escamoter la ligne : si un rôle apparaît
+    sans libellé, il faut le VOIR. C'est le comportement qui a révélé, sur le
+    récap de séance, qu'une valeur d'énumération semée par mon labo n'existait
+    pas dans le produit.
+    """
+    from app.models.squad import SQUAD_ROLE_LABELS
+
+    if cle is None:
+        return ""
+    return SQUAD_ROLE_LABELS.get(cle, cle)
 
 
 templates.env.filters["local"] = to_local
@@ -157,6 +209,8 @@ templates.env.filters["date_fr"] = date_fr
 templates.env.filters["datetime_fr"] = datetime_fr
 templates.env.filters["pluriel"] = pluriel
 templates.env.filters["axe_fr"] = axe_fr
+templates.env.filters["nombre_fr"] = nombre_fr
+templates.env.filters["role_squad"] = role_squad
 
 # `STATIC_ASSET_COHERENCE_01` — L'AUTORITÉ D'URL DES ASSETS MUTABLES.
 #

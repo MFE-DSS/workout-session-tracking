@@ -48,9 +48,9 @@
     </h2>
     <p class="coach-block__line">
       {% if report.identity.height_cm %}{{ report.identity.height_cm }} cm{% else %}taille — <em>Non déductible</em>{% endif %}
-      {% if report.identity.weight_kg %} · {{ "%.1f"|format(report.identity.weight_kg)|replace('.', ',') }} kg{% endif %}
+      {% if report.identity.weight_kg %} · {{ report.identity.weight_kg | nombre_fr(1) }} kg{% endif %}
       {% if report.identity.weight_trend_kg_90d is not none %}
-        ({% if report.identity.weight_trend_kg_90d > 0 %}+{% endif %}{{ "%.1f"|format(report.identity.weight_trend_kg_90d)|replace('.', ',') }} kg /90j <span class="coach-tag coach-tag--inferred">Inféré</span>)
+        ({% if report.identity.weight_trend_kg_90d > 0 %}+{% endif %}{{ report.identity.weight_trend_kg_90d | nombre_fr(1) }} kg /90j <span class="coach-tag coach-tag--inferred">Inféré</span>)
       {% endif %}
       {% if report.identity.waist_cm %} · taille {{ "%.0f"|format(report.identity.waist_cm) }} cm{% endif %}
       {% if report.identity.resting_hr %} · FC {{ report.identity.resting_hr }}{% endif %}
