@@ -218,8 +218,14 @@ commande            un TRAIT, pas un aplat
 
 * **`no-color-only-state`** (`§7`) — un état porte toujours une forme.
 * **Cible tactile 44 px** — standard produit, pas le seuil WCAG de 24.
-* **Sans JavaScript** (`§10`) — démarrer, saisir, enregistrer, naviguer,
-  terminer fonctionnent sans JS.
+* ~~**Sans JavaScript** (`§10`)~~ — **SUPERSÉDÉ le 2026-09-06.** Voir `§5bis`.
+* **`SSR is the functional baseline`** — le rendu serveur reste la ligne de
+  base fonctionnelle. L'enrichissement JavaScript est autorisé pour la
+  manipulation directe, l'édition en place, les minuteurs vivants, les
+  transitions de focus, l'état local de dépliage et l'interaction optimiste.
+* **`A critical training write must remain recoverable if JS fails`** — aucune
+  écriture d'entraînement ne dépend du client pour survivre. Déjà vrai, et
+  déjà **gardé** (`test_df_b_session_flow.py:69`). Voir `§5bis`.
 * **Contraste = contrat de COUPLE**, jamais propriété d'un token seul. Chaque
   couple `avant-plan / arrière-plan` déclare son minimum et sa mesure.
 * **Aucune sémantique de cible** dans `zone_exposure` — garde vivante.
@@ -230,6 +236,123 @@ commande            un TRAIT, pas un aplat
   `D9`/`D10`).
 * **Aucun style inline statique non contracté** — l'inline ne survit que pour
   une valeur réellement dynamique, allowlistée. Mesuré : **5 sur 708**.
+
+---
+
+## 5bis. Le mode de rendu — amendement du 2026-09-06
+
+**L'invariant « sans JavaScript » est remplacé par la doctrine suivante, dans
+les termes de l'opérateur :**
+
+```
+SSR IS THE FUNCTIONAL BASELINE.
+
+JavaScript progressive enhancement is allowed for:
+  - direct manipulation      - inline editing
+  - live timers              - focus transitions
+  - local disclosure state   - optimistic interaction
+
+A critical training write must remain recoverable if JS fails.
+```
+
+### ⚠ Ce n'est PAS une levée d'invariant. C'est une mise à jour du constat.
+
+Le socle décrivait un produit sans JavaScript. **Le produit en a déjà**, et
+depuis longtemps :
+
+| Fichier | Lignes | Rôle | Nature |
+|---|---|---|---|
+| `app/static/js/session_focus.js` | 267 | minuteur de repos à échéance · validation de série sur `Entrée` | enrichissement |
+| `app/static/js/preview.js` | 138 | carte-aperçu au survol du classement | enrichissement |
+| `app/static/js/prefs_focus_rank.js` | 106 | boutons classés synchronisés sur trois `<select>` natifs | enrichissement |
+
+Tous chargés en `defer`, tous en fin de `<body>`, **aucun `<script>` inline,
+aucun attribut `on*=`** dans les 63 gabarits.
+
+**Et la seconde moitié de la doctrine est déjà implémentée ET gardée.**
+`session_focus.js` valide la série par :
+
+```js
+form.requestSubmit(submitter);   // session_focus.js:234
+```
+
+— exactement la soumission qu'un appui sur le bouton aurait produite, sur le
+même `<form method="post">`. **Aucun `fetch`, aucun `XMLHttpRequest`, aucun
+`sendBeacon`**, et cette absence n'est pas une convention : elle est **testée**.
+`tests/test_df_b_session_flow.py:69` bannit tout point d'écriture parallèle.
+
+> *A critical training write must remain recoverable if JS fails* décrit donc
+> l'architecture actuelle, pas une cible.
+
+### Ce que l'amendement autorise réellement
+
+Ce qui change n'est pas la permission d'écrire du JavaScript — elle était déjà
+prise en pratique. Ce qui change, c'est **l'ambition** : l'enrichissement cesse
+d'être une exception tolérée pour devenir le moyen assumé de l'édition en
+place, de l'état conservé entre les gestes, et des transitions de focus.
+
+Ce que ça n'autorise pas :
+* qu'une **écriture d'entraînement** dépende du client ;
+* qu'une surface **cesse de rendre** son état initial côté serveur ;
+* un **framework** — « zéro framework » est une décision **distincte**, non
+  levée par celle-ci.
+
+### Le verrou réel, et il tient en une ligne
+
+`tests/test_home_decision_hero.py:344` :
+
+```python
+assert js_files == ["prefs_focus_rank.js", "preview.js", "session_focus.js"]
+```
+
+Un **inventaire exact du répertoire** : tout quatrième fichier fait échouer la
+suite. Le commentaire du test (l. 346-357) reconnaît lui-même le défaut —
+« écrite comme un inventaire exact du répertoire, elle a transformé une
+garantie historique de tranche en **interdiction permanente de toute
+amélioration progressive future** ».
+
+Il est à requalifier en garde de **capacité** — *aucun script n'écrit en
+parallèle du serveur* — forme que `test_df_b_session_flow.py:69` sait déjà
+tenir.
+
+### Le coût à provisionner, mesuré
+
+**84 mentions de « sans JS » dans 48 fichiers de tests.** Triées :
+
+| Nature | Nombre | Ce qu'elles font |
+|---|---|---|
+| **MOYEN** | ~24 | lisent une chaîne dans un fichier source (`"<script" not in src`) |
+| **CAPACITÉ** | 9 | exercent le produit — requête, POST, état persisté relu |
+| mixte | 5 | |
+
+**Aucune n'affirme littéralement « la séance s'enregistre sans script ».** La
+capacité la plus nette du dépôt — `test_ui_profile_preferences.py:157` — porte
+sur les **préférences du profil** : POST réel du repli natif, `303`, puis
+relecture en base.
+
+Quatre gardes de la coque sont **quasi identiques** sur le même fichier
+(`test_app_shell_hardening`, `_navigation`, `_desktop_rail`,
+`test_active_navigation_semantics`).
+
+Basculer une surface ne demande donc pas de « casser 48 fichiers » : cela
+demande de **trier ses gardes**, de conserver les capacités, et de réécrire les
+moyens **en capacités** quand la surface change de mode de rendu.
+
+### Ce que ça casse, et qu'il faut refaire
+
+* **Les gardes qui lisent le HTML servi cessent de mesurer** sur une surface
+  dont l'interaction vit côté client. C'est la forme la plus dangereuse de
+  « garde qui ne garde rien » — verte, et aveugle ;
+* **le harnais de capture** devra piloter des **états**, pas des routes ;
+* **`CLAUDE.md §5.1`** — l'exposition au rendu avant commit — devient *plus*
+  nécessaire, pas moins : c'est la seule garde qui continue de voir juste.
+
+### Ce qui ne change pas
+
+Tous les autres invariants du `§5` restent entiers : cible tactile 44 px,
+`no-color-only-state`, contraste comme contrat de couple, validation implicite,
+aucune revendication d'activation musculaire, aucune sémantique de cible dans
+`zone_exposure`. **Aucun ne dépendait du mode de rendu.**
 
 ---
 
