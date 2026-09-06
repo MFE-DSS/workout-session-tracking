@@ -14,6 +14,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from tests.helpers import css_sans_commentaires
+
 ROOT = Path(__file__).resolve().parent.parent
 BASE_TPL = ROOT / "app" / "templates" / "base.html"
 APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
@@ -280,10 +282,46 @@ def test_css_focus_mode_tightened_desktop():
 
 
 def test_css_rail_no_new_hex_color():
+    """Aucune couleur en dur — `CLAUDE.md §5.4`.
+
+    ⚠ DEUX PRÉCISIONS, APRÈS UNE FAUSSE ACCUSATION.
+
+    **La sonde lisait les commentaires.** Elle a rougi sur `#2e7d32` écrit dans
+    une prose qui documentait précisément le retrait de ce hex
+    (`Sb_UI_PHANTOM_TOKENS_01`). Un hexadécimal entre `/* */` ne peint rien :
+    la garde condamnait la documentation d'un défaut corrigé. Huitième
+    occurrence relevée dans ce dépôt d'une sonde qui prend la prose pour du
+    code — la précédente lisait la balise `<details>` comme le mot « détails ».
+
+    **Sa portée n'est pas celle que son nom annonce.** `css[index:]` prend
+    TOUT ce qui suit le marqueur du rail, jusqu'à la fin du fichier — soit
+    plusieurs milliers de lignes écrites depuis. C'est accidentel et c'est
+    UTILE : cette largeur garde chaque bloc ajouté après le rail. Elle est donc
+    conservée, et c'est le message qui est corrigé pour cesser de mentir.
+    """
     css = _css()
-    block = css[css.index("Sb_UI_03.2 — Desktop Rail"):]
-    assert not re.search(r"#[0-9a-fA-F]{3,6}", block), "raw hex in rail CSS"
-    assert "var(--accent)" in block
+    bloc = css[css.index("Sb_UI_03.2 — Desktop Rail"):]
+    code = css_sans_commentaires(bloc)
+    trouve = re.search(r"#[0-9a-fA-F]{3,6}", code)
+    assert not trouve, (
+        f"couleur en dur « {trouve.group(0) if trouve else ''} » dans le CSS "
+        "écrit après le marqueur du rail — cette garde couvre tout ce qui suit, "
+        "pas seulement le rail. Passer par un token de la palette."
+    )
+    assert "var(--accent)" in bloc
+
+
+def test_la_sonde_a_hex_voit_encore_le_code():
+    """Garde de la garde : retirer les commentaires ne l'a pas aveuglée.
+
+    Une garde assouplie pour laisser passer un cas légitime doit prouver
+    qu'elle mord encore sur le cas illégitime — sinon l'assouplissement est un
+    désarmement.
+    """
+    faux = "/* jadis #2e7d32 était peint ici */\n.a { color: #ff0000; }"
+    code = css_sans_commentaires(faux)
+    assert "#2e7d32" not in code, "le commentaire n'est pas retiré"
+    assert re.search(r"#[0-9a-fA-F]{3,6}", code), "la sonde ne voit plus le code"
 
 
 def test_css_rail_active_not_color_only():

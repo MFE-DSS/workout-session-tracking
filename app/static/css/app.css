@@ -5560,6 +5560,80 @@ summary:focus-visible,
 .pd-block { margin-top: var(--space-md); }
 .pd-inline { display: inline; }
 
+/* ── La famille couvre désormais l'ÉDITEUR ENTIER, pas sa seule page de détail.
+ *
+ * Ses quatre pages sœurs — qualité, publication, génération, plan — écrivaient
+ * en attributs `style` des règles que ce bloc portait déjà, `.pd-page` et son
+ * `max-width: 40rem` en tête. Le préfixe `pd-` reste : le renommer coûterait
+ * un diff sur cinq gabarits pour ne rien dire de plus.
+ *
+ * Les espacements passent tous par `--space-*` (4 / 8 / 16 / 24 / 32). Deux
+ * valeurs écrites en dur n'étaient sur aucune grille et descendent d'un cran,
+ * suivant l'arbitrage « les espacements de 12 px s'alignent sur 8 » :
+ *   `.35rem` (5,6 px) → 4 px   ·   `.75rem` (12 px) → 8 px
+ */
+.pd-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+}
+.pd-row--wide { gap: var(--space-md); }
+
+/* Le grade d'un brouillon est le relevé souverain de sa page. Il valait
+ * 1.5rem — 24 px, une valeur hors de l'échelle maison ; il rejoint le rang
+ * SECTION à 22 px (`DESIGN_DECISIONS_UIV2_SURFACES` Q6). */
+.pd-grade { font-size: 22px; font-weight: 700; }
+
+/* Une pile de cartes. Distincte de `.pd-sessions`, qui porte en plus un
+ * `margin-top` et un `gap` plus large — la réutiliser ici rejouerait la
+ * commodité de valeur contre laquelle `.pd-section` a déjà été écrite. */
+.pd-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.pd-note--tight { margin-top: var(--space-xs); }
+.pd-list { margin-top: var(--space-sm); padding-left: var(--space-md); }
+.pd-aside { margin-top: var(--space-lg); font-style: italic; }
+
+/* Le pendant vert de `.pd-error`, qui existait seul. Il pointe sur `--ok`,
+ * l'état « bon » du produit à 5,69:1 — la ligne l'écrivait en dur avec un
+ * `var(--success, #2e7d32)` dont le token n'a jamais existé (voir
+ * `Sb_UI_PHANTOM_TOKENS_01`). */
+.pd-success { color: var(--ok); margin-bottom: var(--space-md); }
+.pd-danger { color: var(--danger); }
+
+/* La liste des séances d'une publication — des lignes, pas des cartes. */
+.pd-rows {
+  margin-top: var(--space-sm);
+  padding: var(--space-md);
+  list-style: none;
+}
+
+.pd-rows li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-xs) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Le slug est de la provenance technique : rang META. Il valait `.85em`,
+ * une taille relative que personne ne pouvait lire dans la feuille. */
+.pd-slug { font-size: 12px; }
+
+/* Un avis qui n'est pas une erreur — il n'emprunte donc pas sa couleur.
+ * `.pd-error` porte la sienne ; celui-ci ne porte que l'espace. */
+.pd-notice { margin-bottom: var(--space-md); }
+
+/* La colonne étroite du tunnel de génération. `.pd-page` vaut 40rem pour une
+ * page de lecture ; un formulaire court se tient à 36. */
+.pd-page--narrow { max-width: 36rem; }
+
+.pd-num { width: 6rem; }
+
 /* ⚠ 9,17 px SUR TOUTES LES PAGES — le nom du produit, en pied de page.
  *
  * `.foot` vaut 11 px, et le `<small>` qu'il contient y applique le `smaller`

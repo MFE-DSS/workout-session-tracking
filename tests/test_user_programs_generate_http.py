@@ -521,6 +521,33 @@ def test_a_duplicated_confirmation_field_cannot_smuggle_consent(client):
     assert _session_count(pid) == 1
 
 
+def _regle_css(selecteur: str) -> str:
+    """Rend le corps de la règle `app.css` portant EXACTEMENT ce sélecteur.
+
+    ⚠ `Sb_UI_PROGRAM_EDITOR_STYLES_01` — CETTE PAIRE DE TESTS ÉPINGLAIT
+    `"color:var(--danger)" in r.text`, c'est-à-dire l'ATTRIBUT `style` en dur.
+
+    L'invariant qu'elle protège est réel et subtil : seule une vraie erreur de
+    saisie porte la couleur de danger, jamais une étape que l'utilisateur n'a
+    pas encore franchie. Mais épingler l'écriture interdisait de sortir le
+    style du gabarit **sans rien garantir de plus** — remplacer l'attribut par
+    une classe grise l'aurait laissée verte.
+
+    Les tests vérifient désormais la PROPRIÉTÉ : la bonne classe est posée, et
+    cette classe porte (ou ne porte pas) `--danger` dans la feuille.
+    """
+    import pathlib
+    import re
+
+    css = (
+        pathlib.Path(__file__).resolve().parents[1]
+        / "app/static/css/app.css"
+    ).read_text(encoding="utf-8")
+    m = re.search(rf"(?m)^{re.escape(selecteur)}\s*\{{([^{{}}]*)\}}", css)
+    assert m is not None, f"« {selecteur} » n'existe plus dans app.css"
+    return m.group(1)
+
+
 def test_the_unconfirmed_page_is_not_presented_as_an_error(client):
     """An unconfirmed replacement is a step not yet taken, not a mistake made.
 
@@ -536,7 +563,10 @@ def test_the_unconfirmed_page_is_not_presented_as_an_error(client):
     )
     assert r.status_code == 200
     assert "Cochez la confirmation" in r.text
-    assert "color:var(--danger)\">Ce programme contient déjà" not in r.text
+    assert 'class="pd-notice"' in r.text
+    assert "--danger" not in _regle_css(".pd-notice"), (
+        "l'avis d'étape non franchie a pris la couleur réservée aux erreurs"
+    )
 
 
 def test_a_real_error_is_still_rendered_as_an_error(client):
@@ -548,7 +578,10 @@ def test_a_real_error_is_still_rendered_as_an_error(client):
         follow_redirects=False,
     )
     assert r.status_code == 200
-    assert "color:var(--danger)" in r.text
+    assert 'class="pd-error"' in r.text
+    assert "--danger" in _regle_css(".pd-error"), (
+        "la classe d'erreur ne porte plus la couleur de danger"
+    )
     assert _session_count(pid) == 0
 
 
