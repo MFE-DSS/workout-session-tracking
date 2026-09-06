@@ -147,3 +147,23 @@ résolu ; à défaut de tout, elle dit `<aucune réf résolue>` plutôt qu'un bl
   comme le fait la description actuelle.
 * Elle ne touche pas `actions/checkout@v4`, dont le runner signale la dépréciation
   Node 20. Une PR dependabot ouverte le couvre.
+
+---
+
+## Verdict
+
+**LIVRÉ.** Le rapport d'échec du déploiement ne prononce plus aucune phrase sur
+l'état de la production qu'il n'ait pas lue dans l'issue d'une étape.
+
+Le défaut corrigé n'était pas une imprécision de rédaction : c'était une **alarme
+dont la véracité ne dépendait pas de ce qu'elle observait**. Elle prescrivait
+d'ouvrir une session SSH sur la production pour enquêter sur une panne inexistante,
+au moment précis où on la lit de la manière la moins critique.
+
+Cinq gardes tiennent désormais la distinction, et elles ont vu le défaut d'origine
+rougir avant d'être livrées.
+
+Reste ouvert, et nommé : **l'entrée `ref` accepte toujours un SHA court sans le
+valider** — la cause du dispatch raté. La corriger demande de trancher si un nom de
+branche reste accepté, comme la description de l'entrée le promet aujourd'hui.
+C'est une décision, pas un oubli.
