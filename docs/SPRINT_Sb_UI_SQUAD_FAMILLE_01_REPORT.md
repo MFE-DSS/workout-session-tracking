@@ -171,6 +171,51 @@ de statut :
 Et un **test de fumée sur 28 routes**, des deux côtés : `28/28` en 200, zéro
 erreur JavaScript, styles inline cumulés **87 → 47**.
 
+## 5quinquies. Le rang META n'avait pas de classe
+
+En finissant les six petits gabarits restants — `contact`, `reset_password`,
+`password_change`, `launcher`, `science`, `export` —, le motif dominant n'était
+plus l'espacement : c'était **`font-size: 12px` recopié en attribut**, quatre
+fois sur le seul `/science`.
+
+`Q6` fixe quatre rangs — 32 / 22 / 15 / 12 — et le relevé de décisions les a
+écrits **cette nuit**. Deux seulement avaient une classe : `.section-header`
+porte SECTION depuis `#208`, et **rien ne portait META**. `.text-dim` et
+`.text-muted`, les deux voisines évidentes, ne posent qu'une **couleur** —
+les prendre pour un rang de taille était la confusion offerte.
+
+C'est le diagnostic du programme appliqué à une décision d'hier soir : **prise,
+écrite, mergée, et sans moyen de l'appliquer.** `.text-meta` existe désormais.
+
+### Trois styles ne faisaient que répéter leur propre classe
+
+```html
+<div class="card__actions" style="margin-top: 16px;">
+```
+
+`.card__actions` pose déjà `margin-top: var(--space-md)` — **soit 16 px**.
+L'attribut ne changeait rien.
+
+Pire : `.card__actions--auth`, **que j'avais créé dans `Sb_UI_AUTH_01` pour
+remplacer exactement cet attribut** sur trois AUTRES gabarits, redéclarait la
+même valeur. Un modificateur sans effet, né d'une conversion qui n'avait pas
+vérifié ce que la classe porteuse donnait déjà.
+
+Les deux formes disparaissent — six gabarits, zéro pixel de mouvement. Il en
+reste **deux instances** sur des surfaces que cette tranche ne touche pas
+(`profile`, en attente d'arbitrage ; `measurement_form`, en 404).
+
+### Mesure
+
+| Route | Hauteur avant → après | Styles inline dans `main` |
+|---|---|---|
+| `/contact` · `/profile/password` | **932 → 932 px** | 3 → 0 chacune |
+| `/launcher` · `/science` · `/export` | **inchangées** | 7, 4, 2 → 0 |
+| `/plan` | 1250 → 1251 px (compté) | 2 → 0 |
+
+Sur **quinze routes comparées**, un seul écart de hauteur — celui de `/plan`,
+déjà expliqué. Zéro erreur JavaScript des deux côtés.
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
@@ -186,7 +231,7 @@ erreur JavaScript, styles inline cumulés **87 → 47**.
 ## 7. Vérifications
 
 `check_scope` **SHARED_CODE** · broad sweep ciblé : **162 tests** · cliquet des
-styles inline resserré **174 → 116** (20 gabarits) · ruff OK.
+styles inline resserré **174 → 89** (14 gabarits) · ruff OK.
 
 Rendu exposé (`§5.1`) depuis deux serveurs, sur les **cinq** routes
 atteignables de la famille :

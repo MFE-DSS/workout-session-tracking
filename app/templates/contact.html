@@ -4,8 +4,8 @@
   <h1 class="page-title">Contact</h1>
 
   {% if success %}
-    <div class="card" style="border-left: 3px solid var(--ok);">
-      <p style="font-size: 14px; color: var(--fg-muted);">
+    <div class="card form-notice">
+      <p class="form-notice__hint">
         Message envoyé. Merci pour ton retour.
       </p>
     </div>
@@ -23,14 +23,14 @@
         <span class="field__label">Message</span>
         <textarea name="message" rows="6" required placeholder="Décris ton problème ou ta suggestion..."></textarea>
       </label>
-      <div class="card__actions" style="margin-top: 16px;">
+      <div class="card__actions">
         <button type="submit" class="btn btn--primary btn--wide">Envoyer</button>
       </div>
     </form>
   {% endif %}
 
-  <p style="text-align: center; margin-top: 16px;">
-    <a href="{{ url_for('home') }}" style="color: var(--fg-dim); font-size: 13px;">
+  <p class="form-back">
+    <a class="link-quiet" href="{{ url_for('home') }}">
       ← Retour à l'accueil
     </a>
   </p>

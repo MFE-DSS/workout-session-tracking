@@ -20,7 +20,7 @@
       </a>
     {% endfor %}
   </div>
-  <p style="margin-top:var(--space-lg);">
+  <p class="launcher-lead">
     <a class="text-muted" href="{{ url_for('library') }}">Voir tous les programmes →</a>
   </p>
 
@@ -34,10 +34,10 @@
       </a>
     {% endfor %}
   </div>
-  <p style="margin-top:var(--space-md);">
+  <p class="launcher-note">
     <a class="text-muted" href="{{ url_for('launcher') }}">← Retour</a>
   </p>
-  <p style="margin-top:var(--space-md);">
+  <p class="launcher-note">
     <a class="text-muted" href="{{ url_for('library') }}">Voir tous les programmes →</a>
   </p>
 
@@ -66,19 +66,19 @@
              principale d'une surface est une erreur de variante. #}
           <button type="submit" class="btn btn--primary">Démarrer</button>
         </form>
-        <div style="margin-top:var(--space-xs);">
-          <a class="text-muted" href="{{ url_for('template_detail', slug=tpl.slug) }}" style="font-size:13px;">Détails →</a>
+        <div class="launcher-detail">
+          <a class="text-muted link-quiet" href="{{ url_for('template_detail', slug=tpl.slug) }}">Détails →</a>
         </div>
       </li>
     {% endfor %}
   </ul>
-  <p style="margin-top:var(--space-md);display:flex;gap:var(--space-md);flex-wrap:wrap;">
+  <p class="launcher-actions">
     {% if type_key in ['standard', 'short'] %}
       <a class="text-muted" href="{{ url_for('launcher') }}?type={{ type_key }}">← Autre zone</a>
     {% endif %}
     <a class="text-muted" href="{{ url_for('launcher') }}">← Autre type</a>
   </p>
-  <p style="margin-top:var(--space-md);">
+  <p class="launcher-note">
     <a class="text-muted" href="{{ url_for('library') }}">Voir tous les programmes →</a>
   </p>
 {% endif %}

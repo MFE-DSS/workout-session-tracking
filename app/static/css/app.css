@@ -617,8 +617,6 @@ input, button, textarea, select {
 .auth-exit:hover,
 .auth-exit:focus-visible { color: var(--role-text-primary); }
 
-.card__actions--auth { margin-top: var(--space-md); }
-
 .auth-lede {
   text-align: center;
   margin-bottom: var(--space-lg);
@@ -783,6 +781,28 @@ input, button, textarea, select {
 .text-muted { color: var(--fg-muted); }
 .text-dim   { color: var(--fg-dim); }
 .text-mono  { font-family: var(--font-mono); }
+
+/* ── LE RANG META DE L'ÉCHELLE MAISON, enfin atteignable.
+ *
+ * `Q6` fixe quatre rangs — 32 / 22 / 15 / 12 — et le relevé de décisions les
+ * a écrits cette nuit. Deux seulement avaient une classe : `.section-header`
+ * porte SECTION, et rien ne portait META. Résultat, `font-size: 12px` était
+ * recopié en attribut `style` — quatre fois sur le seul `/science`.
+ *
+ * `.text-dim` et `.text-muted` juste au-dessus ne posent qu'une COULEUR :
+ * les prendre pour un rang de taille était la confusion possible.
+ *
+ * C'est le diagnostic du programme appliqué à une décision d'hier soir : elle
+ * est prise, écrite, mergée — et le moyen de l'appliquer manque. */
+.text-meta { font-size: 12px; }
+
+/* Un lien de repli discret en bas de page — « retour à la connexion »,
+ * « détails ». ⚠ 13 px est HORS ÉCHELLE (entre META 12 et BODY 15) : la
+ * valeur est transposée telle quelle depuis six gabarits, pas décidée ici. */
+.link-quiet {
+  color: var(--fg-dim);
+  font-size: 13px;
+}
 
 /* ---- Spacing Utilities ---- */
 .mt-xs { margin-top: var(--space-xs); }
@@ -5731,6 +5751,50 @@ summary:focus-visible,
 .plan-meta { font-size: 12px; margin: 0 0 var(--space-sm); }
 .plan-meta--ok { font-size: 12px; color: var(--ok); }
 .plan-meta--warn { font-size: 12px; color: var(--warn); }
+
+/* ── LES PAGES DE FORMULAIRE SIMPLE — `contact`, `reset_password`,
+ * `password_change`. Trois gabarits, la MÊME forme répétée en attributs :
+ * une carte d'avis bordée à gauche, un bloc d'actions, un paragraphe centré
+ * de retour, un lien discret. Le vocabulaire n'existait pas.
+ *
+ * ⚠ Trois des styles retirés ne faisaient QUE RÉPÉTER LEUR PROPRE CLASSE :
+ * `<div class="card__actions" style="margin-top:16px">`, alors que
+ * `.card__actions` pose déjà `margin-top: var(--space-md)`, soit 16 px.
+ * Le modificateur `.card__actions--auth`, que j'avais créé pour remplacer
+ * exactement cet attribut sur trois AUTRES gabarits, redéclarait lui aussi la
+ * même valeur : un modificateur sans effet. Les deux formes disparaissent. */
+.form-notice {
+  border-left: 3px solid var(--ok);
+  margin-bottom: var(--space-md);
+}
+.form-notice__text { color: var(--ok); font-weight: 700; }
+.form-notice__hint { font-size: 14px; color: var(--fg-muted); }
+
+.form-back {
+  margin-top: var(--space-md);
+  text-align: center;
+}
+
+/* ── Le lanceur de séance. */
+.launcher-note { margin-top: var(--space-md); }
+.launcher-lead { margin-top: var(--space-lg); }
+.launcher-actions {
+  margin-top: var(--space-md);
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.launcher-detail { margin-top: var(--space-xs); }
+
+/* ── `/export` : deux espacements propres à ses cartes. */
+.export-actions { margin-top: var(--space-sm); }
+.export-card__hint--spaced { margin-top: var(--space-sm); }
+
+/* ── `/science` : une légende de figure, sous son illustration. */
+.science-caption {
+  text-align: center;
+  margin-top: var(--space-sm);
+}
 
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
