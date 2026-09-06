@@ -65,7 +65,7 @@
     <p class="user-profile__meta-line">
       {% if target.height_cm %}{{ target.height_cm }} cm{% endif %}
       {% if target.height_cm and target.weight_kg %} · {% endif %}
-      {% if target.weight_kg %}{{ "%.1f"|format(target.weight_kg)|replace('.', ',') }} kg{% endif %}
+      {% if target.weight_kg %}{{ target.weight_kg | nombre_fr(1) }} kg{% endif %}
     </p>
   </div>
   {% endif %}

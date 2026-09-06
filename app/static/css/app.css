@@ -5560,6 +5560,89 @@ summary:focus-visible,
 .pd-block { margin-top: var(--space-md); }
 .pd-inline { display: inline; }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   `Sb_UI_SQUAD_READABILITY_01` — LA SURFACE SOCIALE.
+
+   ── Le fil d'activité était de la PROSE dans une grille clé/valeur.
+
+   `.stats-list li` vaut `display:flex; justify-content:space-between` : c'est
+   une ligne « étiquette à gauche, valeur à droite », et son `span:first-child`
+   en sourdine le dit. Le fil d'activité l'empruntait pour une PHRASE —
+   « <strong>marin</strong> recommande <em>Push A</em> ». Flex a fait de chaque
+   fragment un élément de flux : les espaces entre eux ont disparu et
+   `space-between` les a poussés en colonnes.
+
+   Rendu servi : « marinrecommandePush A — Pecs… ». Le gabarit, lui, contient
+   bien les espaces. Ce n'est pas une faute de frappe, c'est une classe de
+   MISE EN PAGE empruntée pour une forme de contenu qu'elle ne sert pas.
+
+   Sur les dix usages de `.stats-list`, un seul était ce détournement — les
+   autres sont bien des lignes clé/valeur, vérifiées une par une au rendu.
+   ══════════════════════════════════════════════════════════════════════════ */
+.activity-feed {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-feed > li {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.5;
+}
+
+.activity-feed > li:last-child { border-bottom: none; }
+
+/* La liste des exercices d'une séance partagée : une énumération indentée,
+ * pas une seconde grille. */
+.activity-feed ul {
+  list-style: none;
+  margin: var(--space-xs) 0 0;
+  padding-left: var(--space-md);
+}
+
+/* ── Le reste de la surface squad, sorti des attributs `style`. ─────────── */
+.sq-scroll { overflow-x: auto; }
+.sq-table { width: 100%; }
+.sq-me { font-weight: 600; }
+.sq-section { margin-top: var(--space-xl); }
+.sq-sub { margin-top: var(--space-lg); }
+.sq-form { max-width: 24rem; }
+.sq-field { margin-bottom: var(--space-sm); }
+.sq-action { margin-top: var(--space-sm); }
+.sq-back { margin-top: var(--space-lg); }
+
+/* Un badge d'état « actif » — vert plein. Le texte y était `#fff`, mesuré à
+ * **3,07:1** sur `--ok` : sous AA. Le produit possède déjà la couleur du texte
+ * posé sur un aplat, `--on-accent`, qui rend **6,37:1** sur le même fond. */
+.badge--actif { background: var(--ok); color: var(--on-accent); }
+
+/* La suppression est un texte de rang 3, pas un bouton de commande. */
+.sq-destroy { color: var(--danger); }
+
+/* ── La liste des squads. Le gabarit était déjà touché par cette tranche
+ * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
+ * commodité que la tranche reproche ailleurs. */
+.sq-toolbar {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.sq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Une carte entièrement cliquable : elle ne se peint pas comme un lien. */
+.sq-card { text-decoration: none; color: inherit; }
+.sq-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sq-card__meta { margin-top: var(--space-xs); }
 /* ── La famille couvre désormais l'ÉDITEUR ENTIER, pas sa seule page de détail.
  *
  * Ses quatre pages sœurs — qualité, publication, génération, plan — écrivaient

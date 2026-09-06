@@ -38,7 +38,7 @@
         {% if session_review.quality.score is not none %}
           {# Virgule décimale : le produit est en français, et « 55.0 » détonne à
              côté du « 75,6 kg » rendu deux blocs plus bas. #}
-          <span><strong>Qualité :</strong> {{ session_review.quality.score | string | replace(".", ",") }}</span>
+          <span><strong>Qualité :</strong> {{ session_review.quality.score | nombre_fr }}</span>
         {% elif session_review.quality.note %}
           <span class="sr-facts__muted"><strong>Qualité :</strong> {{ session_review.quality.note }}</span>
         {% endif %}
