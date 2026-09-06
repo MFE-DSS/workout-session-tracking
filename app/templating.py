@@ -130,11 +130,33 @@ def pluriel(mot: str, n: int) -> str:
     return f"{mot}s" if n > 1 else mot
 
 
+def axe_fr(cle: str | None) -> str:
+    """« back_width » devient « Dos largeur ». La clé reste la clé.
+
+    `ZoneRanking.zone` porte une clé d'**axe radar**, pas de zone détaillée :
+    `profile_metrics` projette chaque zone fine sur son axe avant de compter.
+    La table est donc `RADAR_AXES`, et elle porte déjà le libellé français —
+    `pecs` y vaut « Pectoraux », `back_width` « Dos largeur ».
+
+    Le profil PUBLIC affichait ces clés telles quelles, lisibles par les autres
+    membres d'une squad. Le moyen existait dans le module que ce service
+    importe déjà.
+
+    Le repli rend la clé : une clé sans libellé doit se VOIR, pas disparaître.
+    """
+    from app.services.muscle_mapping import RADAR_AXES
+
+    if not cle:
+        return ""
+    return RADAR_AXES.get(cle, {}).get("label", cle)
+
+
 templates.env.filters["local"] = to_local
 templates.env.filters["local_weekday"] = local_weekday_iso
 templates.env.filters["date_fr"] = date_fr
 templates.env.filters["datetime_fr"] = datetime_fr
 templates.env.filters["pluriel"] = pluriel
+templates.env.filters["axe_fr"] = axe_fr
 
 # `STATIC_ASSET_COHERENCE_01` — L'AUTORITÉ D'URL DES ASSETS MUTABLES.
 #
