@@ -1,6 +1,8 @@
 """Shared test utilities."""
 from __future__ import annotations
 
+import re
+
 # Sb_CI_02_2 — auth fast path contract, shared by conftest and its pinning tests.
 #
 # TEST-ONLY bcrypt hash of the literal password "testpass" (passlib, $2b$, cost 12 — the
@@ -60,3 +62,30 @@ def module_code_only(module) -> str:
         ):
             body.pop(0)
     return ast.unparse(tree)
+
+
+#: Un commentaire CSS. Ce qu'il contient ne peint rien.
+_COMMENTAIRE_CSS = re.compile(r"/\*.*?\*/", re.DOTALL)
+
+
+def css_sans_commentaires(css: str) -> str:
+    """Retire les commentaires d'une feuille avant de la sonder.
+
+    ⚠ TROIS GARDES PARTAGEAIENT LE MÊME TROU, ET ONT ROUGI ENSEMBLE.
+
+    `test_app_shell_navigation`, `test_app_shell_hardening` et
+    `test_app_shell_desktop_rail` cherchent chacune une couleur en dur dans
+    `app.css` — et lisaient les COMMENTAIRES comme du code. Un commentaire qui
+    documentait le retrait de `#2e7d32` (`Sb_UI_PHANTOM_TOKENS_01`) les a
+    toutes les trois fait échouer, dans trois shards différents.
+
+    Un hexadécimal entre `/* */` ne peint rien : la garde condamnait la
+    documentation d'un défaut corrigé. C'est la huitième occurrence relevée
+    dans ce dépôt d'une sonde qui prend la prose pour du code — la précédente
+    lisait la balise `<details>` comme le mot « détails ».
+
+    La sonde est ICI, en un seul endroit, et non recopiée trois fois : trois
+    copies d'une même sonde divergent, et c'est exactement le mode d'échec
+    qu'elle corrige.
+    """
+    return _COMMENTAIRE_CSS.sub(" ", css)

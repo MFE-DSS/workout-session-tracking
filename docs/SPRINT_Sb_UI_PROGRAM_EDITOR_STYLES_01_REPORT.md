@@ -83,6 +83,43 @@ porte — ou ne porte pas — `--danger` dans la feuille.
 `color: var(--danger)` à `.pd-notice`. L'ancienne garde serait restée verte ;
 la nouvelle **mord**.
 
+## 5bis. Trois gardes, un seul trou, trois shards rouges
+
+La CI de cette PR est passée au rouge sur **les trois shards à la fois**. Ce
+n'était pas le bruit de runner de la veille : une vraie panne, systématique.
+
+La cause : un commentaire CSS que j'ai écrit dans cette tranche cite `#2e7d32`
+— le hexadécimal fantôme retiré par `Sb_UI_PHANTOM_TOKENS_01` — pour expliquer
+ce que `.pd-success` remplace. **Trois gardes ont lu cette prose comme du
+code** :
+
+```python
+block = css[css.index("Sb_UI_03.1 — Mobile Bottom Navigation"):]
+assert not re.search(r"#[0-9a-fA-F]{3,6}", block)   # ← lit aussi les commentaires
+```
+
+`test_app_shell_navigation` · `test_app_shell_hardening` ·
+`test_app_shell_desktop_rail`. Trois copies du même idiome, dans trois shards
+différents. **Huitième occurrence relevée dans ce dépôt d'une sonde qui prend
+la prose pour du code** — la précédente lisait la balise `<details>` comme le
+mot « détails ».
+
+Un hexadécimal entre `/* */` ne peint rien : la garde condamnait la
+documentation d'un défaut corrigé. La sonde retire désormais les commentaires,
+et elle vit **en un seul exemplaire** dans `tests/helpers.py` — trois copies
+d'une même sonde divergent, ce qui est exactement le mode d'échec qu'elle
+corrige.
+
+**Ce que je n'ai PAS fait** : réduire leur portée. `css[index:]` prend tout ce
+qui suit le marqueur, jusqu'à la fin du fichier — plusieurs milliers de lignes.
+Le nom dit « rail CSS », la réalité dit « tout ce qui a été écrit depuis ».
+C'est accidentel, et c'est **utile** : cette largeur garde chaque bloc ajouté
+depuis. Elle est conservée telle quelle ; ce sont les **messages** qui cessent
+de mentir sur la portée.
+
+**Vérifié de bout en bout** : un `#ff0000` planté dans le CODE fait tomber les
+trois ; le même hexadécimal dans un commentaire les laisse vertes.
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
