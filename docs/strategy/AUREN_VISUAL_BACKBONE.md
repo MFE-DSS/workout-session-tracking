@@ -219,9 +219,13 @@ commande            un TRAIT, pas un aplat
 * **`no-color-only-state`** (`§7`) — un état porte toujours une forme.
 * **Cible tactile 44 px** — standard produit, pas le seuil WCAG de 24.
 * ~~**Sans JavaScript** (`§10`)~~ — **SUPERSÉDÉ le 2026-09-06.** Voir `§5bis`.
-* **Le client possède l'interaction, le serveur possède la vérité** — la
-  couche cliente peut porter l'état d'un écran ; **aucune donnée d'entraînement
-  ne dépend d'elle pour survivre.** Voir `§5bis`.
+* **`SSR is the functional baseline`** — le rendu serveur reste la ligne de
+  base fonctionnelle. L'enrichissement JavaScript est autorisé pour la
+  manipulation directe, l'édition en place, les minuteurs vivants, les
+  transitions de focus, l'état local de dépliage et l'interaction optimiste.
+* **`A critical training write must remain recoverable if JS fails`** — aucune
+  écriture d'entraînement ne dépend du client pour survivre. Déjà vrai, et
+  déjà **gardé** (`test_df_b_session_flow.py:69`). Voir `§5bis`.
 * **Contraste = contrat de COUPLE**, jamais propriété d'un token seul. Chaque
   couple `avant-plan / arrière-plan` déclare son minimum et sa mesure.
 * **Aucune sémantique de cible** dans `zone_exposure` — garde vivante.
@@ -235,93 +239,120 @@ commande            un TRAIT, pas un aplat
 
 ---
 
-## 5bis. La couche cliente — amendement du 2026-09-06
+## 5bis. Le mode de rendu — amendement du 2026-09-06
 
-**Décision de l'opérateur, prise explicitement.** L'invariant « sans
-JavaScript » est levé au profit d'une **couche cliente structurée** : état
-partagé entre objets, composants réutilisables, éventuellement une petite
-bibliothèque.
+**L'invariant « sans JavaScript » est remplacé par la doctrine suivante, dans
+les termes de l'opérateur :**
 
-### Pourquoi il est levé
+```
+SSR IS THE FUNCTIONAL BASELINE.
 
-Il n'a pas échoué — il a **plafonné**. Le programme UI a montré, objet après
-objet, des défauts que le rendu serveur seul ne peut pas résoudre : un profil
-qui affiche les données groupées par domaine et les fait éditer groupées par
-stockage, avec **cinq liens vers quatre ancres de la même page** ; des tiroirs
-qui perdent leur état à chaque soumission ; une saisie qui reposte l'écran
-entier pour changer un nombre.
+JavaScript progressive enhancement is allowed for:
+  - direct manipulation      - inline editing
+  - live timers              - focus transitions
+  - local disclosure state   - optimistic interaction
 
-Ces défauts sont **structurels au rendu par page**, pas à l'écriture des
-gabarits. C'est le motif que l'opérateur nomme « step two ».
+A critical training write must remain recoverable if JS fails.
+```
 
-### Ce qui devient possible
+### ⚠ Ce n'est PAS une levée d'invariant. C'est une mise à jour du constat.
 
-* un objet **cohérent** là où il y a aujourd'hui six blocs qui se renvoient
-  les uns aux autres ;
-* l'**édition en place**, sans rechargement ni saut d'ancre ;
-* un **état partagé** entre objets d'un même écran ;
-* des **composants** réutilisables, au lieu d'une classe CSS par forme.
+Le socle décrivait un produit sans JavaScript. **Le produit en a déjà**, et
+depuis longtemps :
 
-### La frontière, et elle est dure
+| Fichier | Lignes | Rôle | Nature |
+|---|---|---|---|
+| `app/static/js/session_focus.js` | 267 | minuteur de repos à échéance · validation de série sur `Entrée` | enrichissement |
+| `app/static/js/preview.js` | 138 | carte-aperçu au survol du classement | enrichissement |
+| `app/static/js/prefs_focus_rank.js` | 106 | boutons classés synchronisés sur trois `<select>` natifs | enrichissement |
 
-> **Le client possède l'interaction. Le serveur possède la vérité.**
+Tous chargés en `defer`, tous en fin de `<body>`, **aucun `<script>` inline,
+aucun attribut `on*=`** dans les 63 gabarits.
 
-Une séance en cours est un **enregistrement d'entraînement** : si le navigateur
-meurt entre deux séries, ce qui a été saisi ne disparaît pas. Aucune donnée ne
-vit uniquement dans la mémoire du client. C'est la seule limite que cet
-amendement pose à la décision, et elle protège l'objet même du produit.
+**Et la seconde moitié de la doctrine est déjà implémentée ET gardée.**
+`session_focus.js` valide la série par :
 
-⚠ *Cette frontière est ma proposition à l'intérieur de la décision de
-l'opérateur, pas sa formulation. Elle est écrite pour être contestée, pas pour
-être supposée.*
+```js
+form.requestSubmit(submitter);   // session_focus.js:234
+```
 
-### ⚠ L'invariant n'est pas une phrase — il est tenu par 48 fichiers de tests
+— exactement la soumission qu'un appui sur le bouton aurait produite, sur le
+même `<form method="post">`. **Aucun `fetch`, aucun `XMLHttpRequest`, aucun
+`sendBeacon`**, et cette absence n'est pas une convention : elle est **testée**.
+`tests/test_df_b_session_flow.py:69` bannit tout point d'écriture parallèle.
 
-**Mesuré le 2026-09-06 : 84 mentions de « sans JS » / « sans JavaScript » /
-« repli sans » dans 48 fichiers de `tests/`.**
+> *A critical training write must remain recoverable if JS fails* décrit donc
+> l'architecture actuelle, pas une cible.
 
-Lever la phrase de ce document est une ligne. L'invariant, lui, est **exécuté**
-— sur le flux de séance (`test_df_b_session_flow`), le héros de décision
-(`test_home_decision_hero`), le minuteur de repos, la carte corporelle, la
-coque, les préférences d'entraînement, l'installabilité PWA.
+### Ce que l'amendement autorise réellement
 
-Ces gardes ne tombent pas d'elles-mêmes : elles ne mordront que sur les
-surfaces **qui basculent**. Mais chaque bascule les rencontrera, et il faudra à
-chaque fois **décider** — la garde protège-t-elle une capacité que le produit
-garde (« la séance s'enregistre même sans script »), ou seulement le moyen
-d'hier ? Les deux réponses existent dans ce lot, et elles ne se devinent pas
-en masse.
+Ce qui change n'est pas la permission d'écrire du JavaScript — elle était déjà
+prise en pratique. Ce qui change, c'est **l'ambition** : l'enrichissement cesse
+d'être une exception tolérée pour devenir le moyen assumé de l'édition en
+place, de l'état conservé entre les gestes, et des transitions de focus.
 
-C'est le chiffre à provisionner, pas la ligne du `§5`.
+Ce que ça n'autorise pas :
+* qu'une **écriture d'entraînement** dépende du client ;
+* qu'une surface **cesse de rendre** son état initial côté serveur ;
+* un **framework** — « zéro framework » est une décision **distincte**, non
+  levée par celle-ci.
 
-### Ce que ça CASSE, et qu'il faut refaire
+### Le verrou réel, et il tient en une ligne
 
-Ce point n'est pas une réserve : c'est un coût à provisionner.
+`tests/test_home_decision_hero.py:344` :
 
-* **Les gardes de rendu cessent de mesurer.** Une bonne partie des gardes UI
-  lisent le HTML **servi**. Sur une surface dont l'interaction vit côté client,
-  ce HTML ne décrit plus l'écran — la garde reste verte et ne garde rien. C'est
-  la forme la plus dangereuse du défaut relevé dans
-  `guards-that-guard-nothing`, appliquée d'un coup à une famille entière.
-* **Le harnais de capture doit être refait.** Il photographie un rendu initial.
-  Il devra piloter des **états**, pas des routes.
+```python
+assert js_files == ["prefs_focus_rank.js", "preview.js", "session_focus.js"]
+```
+
+Un **inventaire exact du répertoire** : tout quatrième fichier fait échouer la
+suite. Le commentaire du test (l. 346-357) reconnaît lui-même le défaut —
+« écrite comme un inventaire exact du répertoire, elle a transformé une
+garantie historique de tranche en **interdiction permanente de toute
+amélioration progressive future** ».
+
+Il est à requalifier en garde de **capacité** — *aucun script n'écrit en
+parallèle du serveur* — forme que `test_df_b_session_flow.py:69` sait déjà
+tenir.
+
+### Le coût à provisionner, mesuré
+
+**84 mentions de « sans JS » dans 48 fichiers de tests.** Triées :
+
+| Nature | Nombre | Ce qu'elles font |
+|---|---|---|
+| **MOYEN** | ~24 | lisent une chaîne dans un fichier source (`"<script" not in src`) |
+| **CAPACITÉ** | 9 | exercent le produit — requête, POST, état persisté relu |
+| mixte | 5 | |
+
+**Aucune n'affirme littéralement « la séance s'enregistre sans script ».** La
+capacité la plus nette du dépôt — `test_ui_profile_preferences.py:157` — porte
+sur les **préférences du profil** : POST réel du repli natif, `303`, puis
+relecture en base.
+
+Quatre gardes de la coque sont **quasi identiques** sur le même fichier
+(`test_app_shell_hardening`, `_navigation`, `_desktop_rail`,
+`test_active_navigation_semantics`).
+
+Basculer une surface ne demande donc pas de « casser 48 fichiers » : cela
+demande de **trier ses gardes**, de conserver les capacités, et de réécrire les
+moyens **en capacités** quand la surface change de mode de rendu.
+
+### Ce que ça casse, et qu'il faut refaire
+
+* **Les gardes qui lisent le HTML servi cessent de mesurer** sur une surface
+  dont l'interaction vit côté client. C'est la forme la plus dangereuse de
+  « garde qui ne garde rien » — verte, et aveugle ;
+* **le harnais de capture** devra piloter des **états**, pas des routes ;
 * **`CLAUDE.md §5.1`** — l'exposition au rendu avant commit — devient *plus*
   nécessaire, pas moins : c'est la seule garde qui continue de voir juste.
-
-### Ce qui n'est PAS décidé
-
-* **quelles surfaces basculent, et dans quel ordre** — l'opérateur a nommé
-  `/profile` comme première ;
-* **quelle bibliothèque, s'il y en a une** — « zéro framework » était une
-  décision distincte, elle n'est pas levée par celle-ci ;
-* **le sort des surfaces servies** qui n'ont aucune raison de basculer.
 
 ### Ce qui ne change pas
 
 Tous les autres invariants du `§5` restent entiers : cible tactile 44 px,
 `no-color-only-state`, contraste comme contrat de couple, validation implicite,
 aucune revendication d'activation musculaire, aucune sémantique de cible dans
-`zone_exposure`. Aucun d'eux ne dépendait du mode de rendu.
+`zone_exposure`. **Aucun ne dépendait du mode de rendu.**
 
 ---
 
