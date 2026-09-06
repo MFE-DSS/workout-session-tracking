@@ -343,24 +343,19 @@ def test_router_does_not_recompute_business():
 
 def test_no_new_js_file_introduced():
     """Sb_31.2 ne doit introduire AUCUN nouveau fichier JS."""
-    js_dir = ROOT / "app" / "static" / "js"
-    existing = {p.name for p in js_dir.glob("*.js")}
-    # preview.js + session_focus.js sont les seuls autorisés (héritage Sx_29).
-    # Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — inventaire JS versionné.
+    # Sb_UI_JS_CAPACITY_GUARD_01 — l'inventaire devient une PROPRIÉTÉ.
     #
-    # Cette assertion prouvait à l'origine que CETTE tranche n'ajoutait
-    # aucun JS. Écrite comme un inventaire exact du répertoire, elle a
-    # transformé une garantie historique de tranche en interdiction
-    # permanente de toute amélioration progressive future — ce n'était
-    # pas le contrat produit visé.
+    # Le commentaire qui vivait ici reconnaissait déjà que cette assertion
+    # « a transformé une garantie historique de tranche en interdiction
+    # permanente de toute amélioration progressive future ». Il était recopié
+    # mot pour mot dans QUATORZE fichiers, et suivi d'effet dans aucun.
     #
-    # L'inventaire JS courant de l'application est désormais versionné
-    # explicitement ; `prefs_focus_rank.js` est autorisé par l'opérateur
-    # au titre de AUREN_INTERACTION_REFINEMENT_01. Le caractère EXACT est
-    # conservé : un quatrième fichier JS inattendu fait toujours échouer.
-    assert existing <= {"prefs_focus_rank.js", "preview.js", "session_focus.js"}, (
-        f"unexpected JS files: {existing}"
-    )
+    # `AUREN_VISUAL_BACKBONE §5bis` tranche — ce que le produit garde n'est
+    # pas un NOMBRE de fichiers mais une PROPRIÉTÉ : aucun script n'écrit en
+    # parallèle du serveur.
+    from tests.helpers import assert_aucune_ecriture_parallele
+
+    assert_aucune_ecriture_parallele()
 
 
 def test_no_new_migration_introduced():

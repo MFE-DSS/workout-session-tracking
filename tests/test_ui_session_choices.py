@@ -307,8 +307,15 @@ def test_the_disclosures_remain_native_details():
 
 
 def test_no_new_js_file_was_added_by_this_slice():
-    names = sorted(p.name for p in (REPO_ROOT / "app" / "static" / "js").glob("*.js"))
-    assert names == ["prefs_focus_rank.js", "preview.js", "session_focus.js"]
+    # Sb_UI_JS_CAPACITY_GUARD_01 — l'inventaire devient une PROPRIÉTÉ.
+    #
+    # Quatorze fichiers portaient la même comparaison de liste, et un
+    # quatrième script les faisait toutes échouer. Ce que le produit garde
+    # n'est pas un NOMBRE de fichiers mais une PROPRIÉTÉ, `§5bis` : aucun
+    # script n'écrit en parallèle du serveur.
+    from tests.helpers import assert_aucune_ecriture_parallele
+
+    assert_aucune_ecriture_parallele()
 
 
 def test_the_open_disclosure_is_not_repainted_amber():
