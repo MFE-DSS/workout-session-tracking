@@ -11,6 +11,38 @@
 >
 > Compagnon obligatoire : `AUREN_VISUAL_BACKBONE` — en particulier `§5bis`
 > (mode de rendu) et `§3` (le langage).
+>
+> ---
+>
+> ⚠ **RELU CONTRE LE CODE LE 2026-09-06, ET IL AVAIT TORT.**
+> `Sb_INSTRUMENTS_FACTS_CORRECTION_01`
+>
+> Les **60 affirmations factuelles** de la première rédaction ont été revérifiées
+> une par une dans le code, chaque réfutation étant elle-même contestée par un
+> second lecteur chargé de la démolir. Résultat : **29 corrections, dont 11
+> réfutations franches.** Les passages corrigés portent la mention
+> *« (corrigé) »*.
+>
+> Ce que cette passe apprend vaut d'être écrit ici, en tête, plutôt que dans un
+> rapport de sprint : **la moitié de ce qu'une exploration de code produit en
+> une nuit est inexact ou périmé.** Trois causes, chacune vue plusieurs fois :
+>
+> * **la dette déjà remboursée.** Le gâchis de `build_weekly_loop` sur
+>   `/progress` était corrigé depuis `TRAIN1-C` ; `/physique` et `/dashboard`
+>   ne lisent plus rien depuis la même tranche. J'accusais un état passé.
+> * **le compte fait de mémoire.** 20 champs au lieu de 18, 14 clés au lieu de
+>   15, 4 dataclasses au lieu de 3, 3 échelles de confiance au lieu de 7, une
+>   trace « à 6 points » qui en compte de 2 à 6.
+> * **le « toutes » et le « aucune ».** *« Les routes `/body/*` vérifient toutes
+>   le consentement »* : deux sur huit. *« La Home n'affiche aucune alternative
+>   écartée »* : elle les affiche, dans un repli de niveau 3. Un quantificateur
+>   universel écrit sans le vérifier est le plus coûteux des raccourcis — et
+>   dans le cas du consentement, il **masquait un trou plus grave** que celui
+>   que je signalais.
+>
+> **Règle qui en découle, pour ce document comme pour les suivants : aucun
+> nombre, aucun « toutes », aucun « aucune » sans la ligne de code qui le
+> prouve.**
 
 ---
 
@@ -348,8 +380,8 @@ Ce tableau existe pour qu'aucune maquette n'affiche un nombre qui n'existe pas.
 | Trou | Bloque | État réel |
 |---|---|---|
 | **durée d'une séance** | MISSION · LOADOUT_BAY | **Aucune colonne** sur `WorkoutTemplate`, et rien ne l'estime. `UserProgramSession.duration_target_minutes` est une **cible déclarée**, jamais calculée ni vérifiée |
-| **fenêtre 28 j** | BodyMap de FLIGHT_RECORDER | `zone_exposure.WINDOW_DAYS` est **fixe à 14**. Les fenêtres 24 h / 7 j / 14 j **par zone** sont calculées dans `recommendation._compute_signals` et **jamais rendues** |
-| **programme ACTIF** | LOADOUT_BAY | Notion **inexistante**. `MAX_ACTIVE_PROGRAMS` veut dire « non archivé ». Un index DB la **prévoit en commentaire**, rien ne l'implémente |
+| **fenêtre 28 j** | BodyMap de FLIGHT_RECORDER | `zone_exposure.WINDOW_DAYS` est **fixe à 14** (`zone_exposure.py:50`). Les agrégats **par zone** sont bien calculés dans `recommendation._compute_signals` — 7 j (`hard_sets_by_zone_recent`, l. 288-294), 24 h (`hard_sets_by_zone_24h`, l. 296-302), 14 j (`hard_sets_14d_by_zone`, l. 304-314) — et **aucun ne sort du module** : le payload de `recommend_next_session` ne porte que `template` / `score` / `phrase` / `primary_zones` et un `context` de 4 clés. *(Noms corrigés : ni `hard_sets_by_zone_7j` ni `hard_sets_by_zone_14j` n'existent.)* |
+| **programme ACTIF** *(corrigé)* | LOADOUT_BAY | Ce qui manque n'est pas la liste, c'est la **distinction**. `GET /programs` (`user_programs.py:427-447`) existe, est montée et atteignable sous « Mes programmes » ; `list_drafts` rend les programmes **non archivés** — soit exactement ce que `MAX_ACTIVE_PROGRAMS` appelle « actifs ». Ce qui n'existe pas, c'est la notion d'**un** programme *actuellement suivi*, distinct des autres non archivés. Le triptyque `ACTIF / MIENS / CATALOGUE` bute là, pas sur l'absence de liste |
 | **progression intra-séance** | MISSION à l'état `LIVE` | `latest_open_session` rend l'entité ORM entière ; « X/Y séries » exige de charger `session_exercises → set_logs` |
 | **fraîcheur d'une donnée corporelle** | BODY_LEDGER | N'existe pas pour le corps. Patron réutilisable : `recovery_contract.Sufficiency` + `readiness_sufficiency_for_age` |
 | **règle de dérivation de l'état** | le retrait de `accueil-etat`, donc MISSION | ⚠ **décision produit non prise** |
@@ -361,11 +393,59 @@ Ce tableau existe pour qu'aucune maquette n'affiche un nombre qui n'existe pas.
 marche. **Une capture guidée « une valeur à la fois » casserait ce contrat** :
 chaque étape effacerait les autres mesures.
 
-**`/profile` écrit des mesures sans consentement ni drapeau.** Les routes
-`/body/*` vérifient toutes `has_active_consent` ; `POST /profile/measurements`
-ne le vérifie pas. Cinq autres surfaces lisent aussi les mesures sans vérifier.
+**Sept échelles de confiance concurrentes, sans une seule constante partagée.**
+Un `BODY_LEDGER` qui affiche une confiance doit d'abord en choisir une :
+
+| Échelle | Niveaux | Où |
+|---|---|---|
+| `MorphologyDescriptor.confidence` | 4 — `measured` / `derived` / `inferred` / `not_deductible` | `morphology_profile.py:36-39` |
+| `RatioResult.confidence` | 3 — `ok` / `proxy` / `none` | `body_profile.py:165` |
+| `ZoneScore.confidence` | 3, **en français** — élevée / moyenne / faible | `muscle_scoring.py:39` |
+| `AxisScore.confidence` | 4, en français **aussi, mais pas les mêmes** — + insuffisante | `dashboard.py:43` |
+| `recovery_contract.Confidence` | 4 — `high` / `medium` / `low` / `none` | `recovery_contract.py:62-68` |
+| `confidence.py` | 3 — ⚠ **homonyme** : mesure la qualité du *logging d'une séance*, pas la confiance dans une donnée corporelle | `services/confidence.py` |
+| `recommendation_explainer` | son propre `confidence` | — |
+
+Deux d'entre elles sont en français et ne partagent pas leurs niveaux ; une
+septième porte le mot sans parler de la même chose. **Le ledger doit en élire
+une et absorber les autres** — c'est une décision, pas un refactor.
+
+**Le consentement corporel ne garde presque rien** *(corrigé — la première
+rédaction disait que `/body/*` vérifiait « toutes », et sous-estimait de
+beaucoup le trou réel).*
+
+`has_active_consent` n'est appelé qu'en **trois points de tout le dépôt**, tous
+dans `app/routers/body.py` — et l'un des trois ne garde rien : l. 43 conditionne
+seulement un affichage, la route rend 200 avec ou sans consentement. Sur les
+**8 routes** du fichier, **deux** sont réellement gardées : `GET /body/measurements/new`
+(l. 81) et `POST /body/measurements` (l. 90).
+
+**Quatre routes modifient, suppriment ou exportent des mesures sans aucun
+contrôle de consentement** :
+
+| Route | Ce qu'elle fait | Ce qu'elle vérifie |
+|---|---|---|
+| `GET /body/measurements/{id}/edit` (l. 105) | affiche | propriété seule |
+| `POST /body/measurements/{id}/edit` (l. 128) | **écrit** | propriété seule |
+| `POST /body/measurements/{id}/delete` (l. 155) | **supprime** | propriété seule |
+| `GET /body/export.json` (l. 172) | **exporte tout** | rien |
+
+Vérifié au runtime, consentement retiré : le POST d'édition écrit bien la
+nouvelle valeur, la suppression supprime.
+
+Côté lecture, **quatre** surfaces lisent les mesures sans vérifier —
+`/profile` (`auth_routes.py:462, 464, 474`), `/body/export.json`,
+`/body/intelligence` et `/coach-report`. Deux d'entre elles sont au moins
+derrière un drapeau de fonctionnalité ; `/profile` n'a **ni consentement ni
+drapeau**, et c'est la surface corporelle la plus exposée du produit.
+
+⚠ **`/physique` et `/dashboard` sortent de cette liste** : depuis `TRAIN1-C` ce
+sont de simples redirections 303 vers `/progress` (`pages.py:966`, `:997`) et
+elles ne lisent plus aucune mesure. Le compte est de **quatre**, pas cinq.
+
 Ce n'est pas une question de cockpit — c'est une **décision produit sur le
-périmètre du consentement**.
+périmètre du consentement**, et l'état actuel (gardé sur la création, ouvert sur
+l'édition, la suppression et l'export) est le seul qui ne se défende pas.
 
 ---
 
@@ -379,19 +459,42 @@ substantielle des instruments peut être bâtie en branchant l'existant.**
 |---|---|---|
 | la **raison** de la recommandation, ≤ 140 car. | `recommendation.py:642-751` | rendue |
 | les **alternatives écartées avec leur zone limitante** | `pages._home_causal_context` | rendues |
-| l'exposition 14 j, **4 états sémantiques** + provenance | `zone_exposure.py:209` | rendue |
-| `lead` / `rows` / `trace`, ordre de **pratique** | `progression_view.py:197` | rendu |
+| l'exposition 14 j — **4 états d'instrument** (`known` · `zero` · `partial` · `unknown`, **un seul scalaire pour toute la fenêtre**) et **3 états par macro-région** sur la silhouette (`on` · `zero` · `unknown`, 6 régions pour 11 zones), + provenance | `zone_exposure.py:52-68` · `:265-282` · `:322-326` | rendue |
+| `lead` / `rows` / `trace`, ordre de **pratique** — 7 clés en tout ; `TOP_N = 5` donc `rows` en porte 4 au plus, le `lead` en étant extrait | `progression_view.py:197` | rendu |
+| la **trace** — de **2 à 6 points**, jamais une longueur fixe : 6 est un plafond (`KEEP_OCCURRENCES`), 2 un plancher (le `delta` exige deux occurrences) | `progression_view.py:120` | rendue **pour le `lead` seul**, sous `L.trace \| length > 1` |
 | 4 diagnostics + **4 manquants nommés**, jamais notés 0 | `program_quality_engine.py:394` | rendus |
 | la **provenance** d'une donnée corporelle | `FactProvenance` | calculée, **non rendue** |
 | l'**horodatage** d'une mesure | `FactRow.measured_at` | calculé, transporté, **jeté au gabarit** |
 
 Et le cas extrême, à connaître : **`app/services/adaptive_replan.py` — 387
-lignes, `replan()` complet, 5 déclencheurs nommés — n'est importé par aucun
-routeur et aucun service.** La décision existe en entier ; le moyen de
+lignes, trois dataclasses, `replan()` complet (l. 286-373) — n'est importé par
+aucun routeur et aucun service, et il est pourtant couvert par trois fichiers de
+tests.** La décision existe en entier, elle est testée, et le moyen de
 l'appliquer n'existe pas du tout.
 
-Même famille : `WeeklyPlan.zone_coverage` porte 20 champs par zone dont la Home
-lit deux clés · `build_weekly_loop` produit 14 clés, `/progress` en lit 2.
+Son `DivergenceKind` déclare 5 déclencheurs, **dont 4 seulement sont émis** :
+`detect_divergences` (l. 183-222) construit `MISSED_SESSION`,
+`SHORTENED_SESSION`, `CONSTRAINT_CHANGE` et `LIMITING_RECOVERY`.
+`INCOMPLETE_SESSION` (l. 100) n'est construit nulle part — ni par son nom, ni
+par sa valeur `"materially_incomplete_session"` — dans `app/` comme dans
+`tests/`. Du code mort **à l'intérieur** du code mort.
+
+Même famille, deux cas voisins et un démenti :
+
+* **`WeeklyPlan.zone_coverage` porte 18 champs par zone** (`weekly_planner.py:173-202`,
+  plus 4 propriétés dérivées) — et la Home n'en lit **aucun**.
+  `_build_weekly_plan` (`home.py:76-113`) ne touche jamais `plan.zone_coverage` :
+  ses deux clés viennent des `zone_label` des créneaux (donc de `PlannedSlot`) et
+  de `unmet_constraints[0]`. Le seul lecteur de `zone_coverage` est
+  `decision_analytics.py`, plus `adaptive_replan.py` — qui est mort.
+* **`build_weekly_loop` produit 15 clés**, pas 14 : les 14 de `_compose` plus
+  `narrative` (16 sur le chemin dégradé).
+* ⚠ **Le gâchis de `/progress` est déjà corrigé** *(mon affirmation était
+  périmée).* Depuis `TRAIN1-C`, `/progress` n'appelle plus `build_weekly_loop` :
+  il appelle `build_progress_week` (`pages.py:795-797`), un producteur étroit qui
+  ne calcule que les deux clés réellement rendues. `build_weekly_loop` n'est plus
+  appelé par aucun routeur — seulement par des tests. La docstring de
+  `build_progress_week` documente le gâchis **au passé**, comme sa raison d'être.
 
 ---
 
