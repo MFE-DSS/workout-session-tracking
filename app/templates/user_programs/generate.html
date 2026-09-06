@@ -9,19 +9,19 @@
 <h1 class="page-title">Générer une base de programme</h1>
 
 {% if error %}
-  <p style="color:var(--danger); margin-bottom:1rem;">{{ error }}</p>
+  <p class="pd-error">{{ error }}</p>
 {% endif %}
 
 {% if notice %}
   {# Not the danger colour: an unconfirmed replacement is a step the user has not taken
      yet, not a mistake they made. The wording carries the meaning on its own, so the
      message stays understandable without relying on colour. #}
-  <p style="margin-bottom:1rem;"><strong>{{ notice }}</strong></p>
+  <p class="pd-notice"><strong>{{ notice }}</strong></p>
 {% endif %}
 
-<div class="card" style="max-width:36rem;">
+<div class="card pd-page--narrow">
   <p><strong>{{ program.title }}</strong></p>
-  <p class="text-dim" style="margin-top:.5rem;">
+  <p class="text-dim pd-note">
     La génération assemble une base de programme à partir de séances de référence
     curées — <strong>déterministe et reproductible</strong> (mêmes choix, même
     résultat). Le programme généré reste <strong>entièrement éditable</strong>
@@ -30,12 +30,12 @@
   {% if has_existing_tree %}
     {# WIZARD_06 — the exact scale of what a regeneration destroys. "This will overwrite
        your program" is not informed consent; these three numbers are. #}
-    <p style="color:var(--danger); margin-top:.75rem;">
+    <p class="pd-note pd-danger">
       <strong>Attention : ce programme n'est pas vide.</strong>
       Générer une nouvelle base <strong>remplacera intégralement</strong> l'arbre
       actuel. Cette action est irréversible.
     </p>
-    <p style="margin-top:.5rem;">
+    <p class="pd-note">
       Contenu qui sera remplacé :
       <strong>{{ existing_session_count }}</strong>
       séance{{ 's' if existing_session_count > 1 else '' }},
@@ -48,29 +48,29 @@
 </div>
 
 {% if editable %}
-<form method="post" action="{{ url_for('user_program_generate', program_id=program.id) }}" class="card" style="margin-top:1.5rem; max-width:36rem;">
+<form method="post" action="{{ url_for('user_program_generate', program_id=program.id) }}" class="card pd-page--narrow pd-section">
   <div class="field">
     <label class="field__label" for="split">Style de split</label>
     {{ select_shell("split", split_labels.items() | list,
                     select_id="split", required=True) }}
   </div>
-  <div class="field" style="margin-top:.75rem;">
+  <div class="field pd-note">
     <label class="field__label" for="sessions">Nombre de séances</label>
-    <input type="number" id="sessions" name="sessions" value="3" min="1" max="{{ max_sessions }}" required class="field__input" style="width:6rem;" />
+    <input type="number" id="sessions" name="sessions" value="3" min="1" max="{{ max_sessions }}" required class="field__input pd-num" />
   </div>
   {% if has_existing_tree %}
     {# Unchecked by default, and deliberately NOT `required`: an unconfirmed submit must
        reach the server and come back with the summary, rather than being stopped by the
        browser with a tooltip. No JavaScript is involved — the guarantee is the
        server-side check, and the checkbox is only how the user expresses consent. #}
-    <div class="field" style="margin-top:1rem;">
+    <div class="field pd-block">
       <label class="field__label" for="confirm_replace">
         <input type="checkbox" id="confirm_replace" name="confirm_replace" value="true" />
         Je confirme le remplacement de l'arbre existant
       </label>
     </div>
   {% endif %}
-  <button type="submit" class="btn btn--primary" style="margin-top:1rem;">
+  <button type="submit" class="btn btn--primary pd-block">
     {% if has_existing_tree %}Remplacer et générer{% else %}Générer la base{% endif %}
   </button>
 </form>
@@ -78,14 +78,14 @@
   {# A locked programme keeps its summary — the user should still see what it holds — but
      is offered no control, because a confirmed POST would be refused by the service.
      Showing a button that can only ever fail is worse than showing none. #}
-  <p class="card" style="margin-top:1.5rem; max-width:36rem;">
+  <p class="card pd-page--narrow pd-section">
     Ce programme n'est plus modifiable
     ({% if program.archived_at is not none %}archivé{% else %}{{ status_label(program.status) }}{% endif %}) :
     la génération n'est pas disponible.
   </p>
 {% endif %}
 
-<p style="margin-top:1.5rem;">
+<p class="pd-section">
   <a class="btn btn--ghost" href="{{ url_for('user_program_detail', program_id=program.id) }}">← Éditeur</a>
 </p>
 {% endblock %}
