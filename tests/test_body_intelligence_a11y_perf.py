@@ -355,20 +355,21 @@ def test_coach_report_service_still_unchanged_by_sb_31_4():
 
 
 def test_no_new_js_file_by_sb_31_4():
-    existing = {p.name for p in (ROOT / "app" / "static" / "js").glob("*.js")}
-    # Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — inventaire JS versionné.
+    # Sb_UI_JS_CAPACITY_GUARD_01 — l'inventaire devient une PROPRIÉTÉ.
     #
-    # Cette assertion prouvait à l'origine que CETTE tranche n'ajoutait
-    # aucun JS. Écrite comme un inventaire exact du répertoire, elle a
-    # transformé une garantie historique de tranche en interdiction
-    # permanente de toute amélioration progressive future — ce n'était
-    # pas le contrat produit visé.
+    # Le commentaire qui vivait ici reconnaissait déjà que cette assertion
+    # « a transformé une garantie historique de tranche en interdiction
+    # permanente de toute amélioration progressive future ». Il était recopié
+    # mot pour mot dans QUATORZE fichiers, et suivi d'effet dans aucun : on
+    # se contentait d'ajouter le nouveau nom aux quatorze listes.
     #
-    # L'inventaire JS courant de l'application est désormais versionné
-    # explicitement ; `prefs_focus_rank.js` est autorisé par l'opérateur
-    # au titre de AUREN_INTERACTION_REFINEMENT_01. Le caractère EXACT est
-    # conservé : un quatrième fichier JS inattendu fait toujours échouer.
-    assert existing <= {"prefs_focus_rank.js", "preview.js", "session_focus.js"}
+    # `AUREN_VISUAL_BACKBONE §5bis` tranche — ce que le produit garde n'est
+    # pas un NOMBRE de fichiers mais une PROPRIÉTÉ : aucun script n'écrit en
+    # parallèle du serveur. La garantie de tranche n'est pas perdue, elle est
+    # énoncée sur ce qui compte, et implémentée une seule fois.
+    from tests.helpers import assert_aucune_ecriture_parallele
+
+    assert_aucune_ecriture_parallele()
 
 
 def test_no_new_migration_mentions_a11y_perf():

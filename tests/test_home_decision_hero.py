@@ -35,6 +35,9 @@ HOME_CSS = ROOT / "app" / "static" / "css" / "home.css"
 APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
 INDEX = ROOT / "app" / "templates" / "index.html"
 JS_DIR = ROOT / "app" / "static" / "js"
+#: La suite elle-même — balayée par `Sb_UI_JS_CAPACITY_GUARD_01` pour vérifier
+#: qu'aucune garde ne réintroduit un inventaire du répertoire JS.
+TESTS_DIR = ROOT / "tests"
 
 
 def _uncommented(path: Path) -> str:
@@ -369,23 +372,182 @@ class TestNoFramework:
         )
         assert anchor is not None or form_button
 
-    def test_no_new_js_file(self):
-        js_files = sorted(p.name for p in JS_DIR.glob("*.js"))
-        # Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — inventaire JS versionné.
-        #
-        # Cette assertion prouvait à l'origine que CETTE tranche n'ajoutait
-        # aucun JS. Écrite comme un inventaire exact du répertoire, elle a
-        # transformé une garantie historique de tranche en interdiction
-        # permanente de toute amélioration progressive future — ce n'était
-        # pas le contrat produit visé.
-        #
-        # L'inventaire JS courant de l'application est désormais versionné
-        # explicitement ; `prefs_focus_rank.js` est autorisé par l'opérateur
-        # au titre de AUREN_INTERACTION_REFINEMENT_01. Le caractère EXACT est
-        # conservé : un quatrième fichier JS inattendu fait toujours échouer.
-        assert js_files == ["prefs_focus_rank.js", "preview.js", "session_focus.js"], (
-            f"Sb_UI_05.1 must add no JS: {js_files}"
+    def test_no_script_writes_in_parallel_of_the_server(self):
+        """LE SERVEUR RESTE L'UNIQUE AUTORITÉ D'ÉCRITURE — sur TOUT le répertoire.
+
+        ⚠ CETTE GARDE ÉTAIT UN INVENTAIRE EXACT DU RÉPERTOIRE :
+
+            assert js_files == ["prefs_focus_rank.js", "preview.js",
+                                "session_focus.js"]
+
+        Son propre commentaire reconnaissait déjà le défaut — « écrite comme un
+        inventaire exact du répertoire, elle a transformé une garantie
+        historique de tranche en **interdiction permanente de toute
+        amélioration progressive future** » — et le conservait quand même.
+
+        `AUREN_VISUAL_BACKBONE §5bis` a depuis fixé la doctrine :
+        *SSR is the functional baseline · a critical training write must remain
+        recoverable if JS fails.* Ce que le produit doit garder n'est pas un
+        NOMBRE de fichiers, c'est une PROPRIÉTÉ : aucun script n'écrit en
+        parallèle du serveur.
+
+        La garde épingle donc la propriété, et sur **tout** le répertoire —
+        `test_df_b_session_flow.py:69` fait de même pour un seul fichier. Un
+        quatrième script est désormais permis ; un script qui persisterait
+        derrière le dos du serveur ne l'est pas, et ne l'a jamais été.
+
+        ⚠ CE N'EST PAS « AUCUN `fetch` ». Mon premier jet bannissait `fetch(`
+        en bloc et a fait rougir `preview.js`, qui LIT une carte-aperçu en GET
+        — il ne persiste rien. Bannir la lecture aurait interdit
+        l'enrichissement que la doctrine autorise explicitement.
+
+        L'invariant est **la mutation**, pas la requête.
+
+        ⚠ L'implémentation vit dans `tests/helpers.py`, pas ici. Elle était
+        recopiée dans QUATORZE fichiers sous sa forme d'inventaire ; la
+        remplacer par quatorze copies de la nouvelle forme reproduirait
+        exactement le défaut — quatorze copies d'une sonde divergent.
+        """
+        from tests.helpers import assert_aucune_ecriture_parallele
+
+        assert_aucune_ecriture_parallele()
+
+class TestGuardOfTheGuard:
+    """Chaque contrôle des deux gardes partagées doit MORDRE sur son défaut.
+
+    Une garde qui n'a jamais vu échouer son propre motif ne prouve rien. Le
+    dépôt s'est déjà fait prendre : un contrôle d'URL rendu muet par un filtre
+    de commentaires est passé pour une protection pendant tout le temps où il
+    n'en était pas une.
+
+    On plante donc le défaut D'ORIGINE, EN ENTIER, et on exige l'échec.
+
+    ⚠ Ces tests exercent les MOTIFS RÉELS de `tests/helpers.py`, importés, et
+    non des copies. Une copie ici garderait le souvenir de la garde, pas la
+    garde — et c'est précisément le défaut que la tranche corrige.
+    """
+
+    def test_le_controle_de_mutation_mord(self):
+        from tests.helpers import (
+            _CANAUX_ECRITURE,
+            _VERBE_MUTANT,
+            js_sans_commentaires,
         )
+
+        for defaut in (
+            "fetch('/x', {method: 'POST'})",
+            'fetch("/x", { method : "delete" })',
+            "navigator.sendBeacon('/x', d)",
+            "const w = new WebSocket('/ws')",
+            "new XMLHttpRequest()",
+            "EventSource('/flux')",
+        ):
+            src = js_sans_commentaires(defaut)
+            mord = bool(_VERBE_MUTANT.search(src)) or any(
+                c in src for c in _CANAUX_ECRITURE
+            )
+            assert mord, f"le contrôle de mutation laisse passer : {defaut}"
+
+    def test_le_controle_de_mutation_epargne_une_lecture(self):
+        """`preview.js` LIT en GET. Bannir la requête, c'est bannir la doctrine.
+
+        Mon premier jet interdisait `fetch(` en bloc et faisait rougir un
+        script qui ne persiste rien. L'invariant est la MUTATION.
+        """
+        from tests.helpers import _VERBE_MUTANT, js_sans_commentaires
+
+        src = js_sans_commentaires("const r = await fetch(`/preview/${id}`);")
+        assert not _VERBE_MUTANT.search(src)
+
+    def test_le_controle_d_url_mord_malgre_le_filtre_de_commentaires(self):
+        """Le défaut EXACT qui rendait la garde muette, replanté en entier."""
+        from tests.helpers import _URL_CHARGEE, js_sans_blocs, js_sans_commentaires
+
+        defaut = 'const s = "https://cdn.example.com/react.production.min.js";'
+        assert "https://" not in js_sans_commentaires(defaut), (
+            "le filtre a changé — relire pourquoi cette garde lit la source brute"
+        )
+        assert _URL_CHARGEE.search(js_sans_blocs(defaut)), (
+            "le contrôle d'URL ne mord pas sur un CDN en clair"
+        )
+
+    def test_le_controle_d_url_epargne_une_url_en_commentaire(self):
+        """Citer une URL dans une phrase n'est pas charger une dépendance."""
+        from tests.helpers import _URL_CHARGEE, js_sans_blocs
+
+        cite = "// voir https://developer.mozilla.org/fetch pour le détail"
+        assert not _URL_CHARGEE.search(js_sans_blocs(cite))
+
+    def test_le_controle_d_import_mord(self):
+        from tests.helpers import _IMPORT_MODULE, js_sans_blocs
+
+        for defaut in (
+            "import { h } from 'preact';",
+            "const x = require('lodash');",
+            "import 'chart.js';",
+        ):
+            assert _IMPORT_MODULE.search(js_sans_blocs(defaut)), (
+                f"import non vu : {defaut}"
+            )
+
+    def test_plus_aucune_garde_du_depot_n_epingle_l_inventaire_js(self):
+        """LA FAMILLE ENTIÈRE, ou la tranche n'a rien levé.
+
+        Quatorze fichiers portaient la comparaison de liste. En corriger UN
+        laissait treize verrous en place et un rapport qui annonçait le
+        contraire — le mode d'échec « famille aux deux tiers », dans sa forme
+        la plus nette : le commentaire du défaut était lui-même recopié
+        quatorze fois.
+
+        La garde balaye par CLASSE (tout `tests/*.py`), jamais par
+        énumération : une liste écrite à la main reproduirait l'oubli.
+        """
+        import ast
+
+        coupables = []
+        for f in sorted(TESTS_DIR.rglob("test_*.py")):
+            txt = f.read_text(encoding="utf-8")
+            if 'glob("*.js")' not in txt:
+                continue
+            for n in ast.walk(ast.parse(txt)):
+                if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    continue
+                seg = ast.get_source_segment(txt, n) or ""
+                if 'glob("*.js")' not in seg:
+                    continue
+                # Un inventaire compare la LISTE ou l'ENSEMBLE des noms de
+                # fichiers à une constante. Une garde de propriété, non.
+                for a in ast.walk(n):
+                    if not isinstance(a, ast.Compare):
+                        continue
+                    if not any(
+                        isinstance(o, (ast.Eq, ast.LtE, ast.Lt)) for o in a.ops
+                    ):
+                        continue
+                    cible = ast.unparse(a)
+                    if any(
+                        js in cible
+                        for js in ("preview.js", "session_focus.js",
+                                   "prefs_focus_rank.js")
+                    ):
+                        coupables.append(f"{f.name}::{n.name} — {cible[:70]}")
+
+        assert not coupables, (
+            "des gardes épinglent encore l'INVENTAIRE du répertoire JS au lieu "
+            "de la propriété :\n  " + "\n  ".join(coupables)
+        )
+
+
+class TestNoFrameworkVendored:
+    def test_no_framework_is_vendored(self):
+        """« Zéro framework » est une décision DISTINCTE de la doctrine JS.
+
+        `§5bis` lève « sans JavaScript » ; il ne lève pas celle-ci.
+        Implémentation partagée — voir `tests/helpers.py`.
+        """
+        from tests.helpers import assert_aucun_framework
+
+        assert_aucun_framework()
 
     def test_no_react_marker(self, client):
         body = _home(client)

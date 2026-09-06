@@ -309,11 +309,22 @@ def test_the_script_only_reads_state_from_the_native_selects():
 
 
 def test_the_canonical_js_inventory_is_exactly_three_files():
-    import pathlib
+    """Sb_UI_JS_CAPACITY_GUARD_01 — l'inventaire devient une PROPRIÉTÉ.
 
-    root = pathlib.Path(__file__).resolve().parent.parent
-    names = sorted(p.name for p in (root / "app" / "static" / "js").glob("*.js"))
-    assert names == ["prefs_focus_rank.js", "preview.js", "session_focus.js"]
+    Cette garde-ci se présentait comme l'inventaire CANONIQUE, celui dont les
+    quinze autres n'étaient que des copies. C'était le meilleur candidat à
+    conserver — et c'est justement celui qui montre pourquoi aucun ne tient :
+    un nombre de fichiers ne dit rien de ce que ces fichiers FONT.
+
+    `AUREN_VISUAL_BACKBONE §5bis` autorise l'enrichissement progressif et
+    exige qu'une écriture d'entraînement survive à l'absence de JS. Ce qui est
+    canonique, c'est donc la propriété : aucun script n'écrit en parallèle du
+    serveur, et aucun n'embarque de framework.
+    """
+    from tests.helpers import assert_aucun_framework, assert_aucune_ecriture_parallele
+
+    assert_aucune_ecriture_parallele()
+    assert_aucun_framework()
 
 
 def test_the_fallback_and_enhanced_paths_post_the_same_payload(client):
