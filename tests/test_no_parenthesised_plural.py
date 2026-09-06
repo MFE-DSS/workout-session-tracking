@@ -126,3 +126,53 @@ def test_every_word_the_product_pluralises_is_regular():
     for mot in sorted(mots):
         # Ne doit pas lever.
         assert pluriel(mot, 2) == f"{mot}s", mot
+
+
+#: Le seuil ANGLAIS de pluralisation, dans un gabarit.
+#:
+#: `{% if n != 1 %}s{% endif %}` — c'est la règle anglaise. En français le
+#: pluriel commence à **deux** : « 0 séance », « 1 séance », « 2 séances ».
+#: Le seuil `!= 1` rend donc « 0 séances », et c'est faux dès que le compte
+#: tombe à zéro — exactement l'état vide qu'un produit affiche le plus souvent.
+SEUIL_ANGLAIS = re.compile(r"\{%\s*if\s+[^%]*?!=\s*1\s*%\}\s*e?s\s*\{%\s*endif\s*%\}")
+
+
+def test_aucun_gabarit_nutilise_le_seuil_anglais():
+    """La docstring de `pluriel` nomme ce défaut. Il vivait sept fois.
+
+    ⚠ CE N'EST PAS UN DÉTAIL D'ORTHOGRAPHE. `!= 1` et `> 1` ne diffèrent que
+    sur **zéro** — et zéro est le cas que le produit rend le plus souvent, sur
+    chaque état vide. Sept occurrences, dans `coach_report` et `user_profile`,
+    écrivaient « 0 séances ».
+
+    Le filtre `pluriel` porte le bon seuil depuis `Sb_UI_PLURIEL_01`. La règle
+    était écrite ; ces sept endroits ne l'atteignaient pas.
+    """
+    fautifs = {
+        p.relative_to(TEMPLATES).as_posix(): len(m)
+        for p in sorted(TEMPLATES.rglob("*.html"))
+        if (m := SEUIL_ANGLAIS.findall(JINJA_COMMENT.sub(" ", p.read_text(encoding="utf-8"))))
+    }
+    assert not fautifs, (
+        "des gabarits pluralisent au seuil ANGLAIS (`!= 1`) : ils rendent "
+        "« 0 séances » là où le français écrit « 0 séance ». Passer par "
+        f"`| pluriel(n)` : {fautifs}"
+    )
+
+
+def test_la_sonde_du_seuil_reconnait_ses_deux_ecritures():
+    """Garde de la garde, sur les formes réellement rencontrées."""
+    for original in (
+        "séance{% if report.ratio.strength_sessions != 1 %}s{% endif %}",
+        "exercice{% if _is.total_labeled_exercises != 1 %}s{% endif %}",
+    ):
+        assert SEUIL_ANGLAIS.search(original), f"forme non reconnue : {original}"
+    # Le seuil FRANÇAIS ne doit pas être accusé.
+    assert not SEUIL_ANGLAIS.search("séance{% if n > 1 %}s{% endif %}")
+
+
+def test_le_filtre_porte_bien_le_seuil_francais():
+    """Zéro est au singulier en français. C'est tout l'écart entre les deux."""
+    assert pluriel("séance", 0) == "séance"
+    assert pluriel("séance", 1) == "séance"
+    assert pluriel("séance", 2) == "séances"

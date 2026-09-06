@@ -104,15 +104,15 @@
       <div class="coach-ratio">
         <div class="coach-ratio__bar">
           <div class="coach-ratio__strength" style="width: {{ report.ratio.strength_pct }}%;">
-            Strength {{ report.ratio.strength_pct }}%
+            Musculation {{ report.ratio.strength_pct }}%
           </div>
           <div class="coach-ratio__cardio" style="width: {{ report.ratio.cardio_pct }}%;">
             Cardio {{ report.ratio.cardio_pct }}%
           </div>
         </div>
         <p class="text-dim coach-block__hint">
-          {{ report.ratio.strength_sessions }} séance{% if report.ratio.strength_sessions != 1 %}s{% endif %} strength ·
-          {{ report.ratio.cardio_sessions }} séance{% if report.ratio.cardio_sessions != 1 %}s{% endif %} cardio
+          {{ report.ratio.strength_sessions }} {{ "séance" | pluriel(report.ratio.strength_sessions) }} de musculation ·
+          {{ report.ratio.cardio_sessions }} {{ "séance" | pluriel(report.ratio.cardio_sessions) }} de cardio
         </p>
       </div>
     {% endif %}
@@ -221,7 +221,7 @@
       </p>
     {% else %}
       <p class="text-dim coach-block__hint">
-        Sur {{ _is.total_labeled_exercises }} exercice{% if _is.total_labeled_exercises != 1 %}s{% endif %} labellé{% if _is.total_labeled_exercises != 1 %}s{% endif %} dans la fenêtre.
+        Sur {{ _is.total_labeled_exercises }} {{ "exercice" | pluriel(_is.total_labeled_exercises) }} {{ "labellisé" | pluriel(_is.total_labeled_exercises) }} dans la fenêtre.
         Dominant : <b>{{ _is.dominant[1] }}</b>.
       </p>
       <ul class="coach-patterns">

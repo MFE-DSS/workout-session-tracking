@@ -77,16 +77,16 @@
     <ul class="user-profile__activity">
       {% if page.top_zone and page.top_zone.sessions > 0 %}
       <li>
-        <span class="user-profile__activity-label">Top zone</span>
-        <b>{{ page.top_zone.zone }}</b>
-        <span class="text-dim">({{ page.top_zone.sessions }} séance{% if page.top_zone.sessions != 1 %}s{% endif %})</span>
+        <span class="user-profile__activity-label">Zone la plus travaillée</span>
+        <b>{{ page.top_zone.zone | axe_fr }}</b>
+        <span class="text-dim">({{ page.top_zone.sessions }} {{ "séance" | pluriel(page.top_zone.sessions) }})</span>
       </li>
       {% endif %}
       {% if page.neglected_zone %}
       <li>
         <span class="user-profile__activity-label">Zone négligée</span>
-        <b>{{ page.neglected_zone.zone }}</b>
-        <span class="text-dim">({{ page.neglected_zone.sessions }} séance{% if page.neglected_zone.sessions != 1 %}s{% endif %})</span>
+        <b>{{ page.neglected_zone.zone | axe_fr }}</b>
+        <span class="text-dim">({{ page.neglected_zone.sessions }} {{ "séance" | pluriel(page.neglected_zone.sessions) }})</span>
       </li>
       {% endif %}
       {% if page.dominant_pattern %}
