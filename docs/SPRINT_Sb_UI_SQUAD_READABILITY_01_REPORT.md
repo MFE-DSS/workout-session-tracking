@@ -75,6 +75,20 @@ trouvé **six, sur cinq gabarits** : `coach_report.html` (×2) et
 C'est le bon sens de l'erreur — une garde qui trouve plus que son auteur est
 une garde qui sert. Les six passent désormais par `nombre_fr`.
 
+### Le zéro décimal disparaît, sauf là où il a été mesuré
+
+Le filtre distingue deux cas, et le rendu le confirme sur le récap :
+
+| | avant | après |
+|---|---|---|
+| poids de corps | `75,6 kg` | `75,6 kg` — **inchangé** |
+| delta de charge | `+57,0 kg` | `+57 kg` |
+| qualité de séance | `55,0` | `55` |
+
+Un poids de corps s'écrit avec `nombre_fr(1)` : le dixième y a été **mesuré**,
+il ne s'escamote pas. Un delta calculé qui tombe juste n'a pas de dixième à
+montrer — « +57,0 » promettait une précision que la soustraction n'a pas.
+
 ## 4. Un texte blanc sur un aplat vert
 
 `style="background:var(--ok); color:#fff"` — un hexadécimal en dur, mesuré à
