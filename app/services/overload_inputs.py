@@ -177,6 +177,21 @@ def _history_signals_for_code(
                 reps=int(first_set.reps or 0),
                 quality_score=q,
                 fatigue_signal=fatigue,
+                # `CP-1` — LA LIGNÉE, TRANSPORTÉE ET NON CALCULÉE.
+                #
+                # Les trois champs sont lus tels quels sur des colonnes qui
+                # existent déjà : aucune migration, aucun calcul, aucun seuil.
+                # La requête ci-dessus trie DÉJÀ par `started_at.desc()` — le
+                # temps décidait de l'ordre sans jamais accompagner la valeur.
+                #
+                # `substituted_name` est indispensable au seul cas que la
+                # mesure a démontré ambigu : au retour sur un mouvement
+                # prescrit, la politique saute les occurrences substituées et
+                # remonte au dernier prescrit — mesuré à 93 jours plus vieux
+                # que le dernier entraînement réel de l'utilisateur.
+                performed_at=s.started_at,
+                source_session_id=s.id,
+                substituted_name=match.substituted_name,
             )
         )
     # Sb_30.bugfix.history-identity-guard — défense en profondeur : si
