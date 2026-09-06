@@ -70,6 +70,7 @@ jobs:
           chmod 600 ~/.ssh/id_deploy ~/.ssh/known_hosts
 
       - name: Run deploy_from_github_actions.sh on VPS
+        id: push_to_vps
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_SSH_USER }}
@@ -84,6 +85,7 @@ jobs:
             "sudo /opt/workout-session-tracking/scripts/deploy_from_github_actions.sh $FULL_SHA"
 
       - name: Run smoke_deploy.sh on VPS
+        id: smoke
         if: ${{ inputs.skip_smoke == false }}
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_SSH_HOST }}
@@ -111,11 +113,69 @@ jobs:
           git push origin "$TAG"
           echo "::notice title=Deploy tagged::$TAG"
 
+      # Sb_OPS_DEPLOY_FAILURE_HONESTY_01 — un rapport d'échec ne DÉDUIT pas
+      # l'état de la production, il le LIT dans le résultat des étapes.
+      #
+      # ⚠ CE QUI S'EST PASSÉ, ET QUI A MOTIVÉ CETTE TRANCHE.
+      #
+      # Le 2026-09-06, un dispatch a échoué au CHECKOUT — un SHA court là où
+      # l'entrée exige 40 caractères. Les étapes SSH ont été `skipped` : le VPS
+      # n'a jamais été contacté. Le rapport a pourtant annoncé :
+      #
+      #     X SHA  — VPS left in partial state, investigate via SSH.
+      #
+      # Deux mensonges dans une seule ligne. Il affirmait un état partiel de la
+      # PRODUCTION alors qu'aucun octet n'avait quitté le runner, et il
+      # imprimait un SHA VIDE parce que `steps.sha` n'avait pas tourné. Une
+      # personne qui lit ça de bonne foi ouvre une session SSH sur la prod pour
+      # enquêter sur une panne qui n'existe pas — au pire moment, celui où elle
+      # croit une livraison à moitié posée.
+      #
+      # Un rapport d'échec est lu quand la confiance est déjà entamée. C'est
+      # exactement là qu'il ne doit rien inventer.
+      #
+      # Les trois cas sont désormais distingués par le RÉSULTAT des étapes,
+      # jamais par une hypothèse :
+      #   · le poussage n'a pas eu lieu   → la production est INTACTE
+      #   · le poussage a échoué          → elle peut être à moitié posée
+      #   · le poussage a réussi, le smoke a échoué → le code EST en place et
+      #     ne répond pas : c'est le seul cas où le rollback presse.
       - name: Report failure
         if: ${{ failure() }}
         env:
           FULL_SHA: ${{ steps.sha.outputs.full }}
+          REF_DEMANDE: ${{ inputs.ref }}
+          POUSSAGE: ${{ steps.push_to_vps.outcome }}
+          SMOKE: ${{ steps.smoke.outcome }}
         run: |
-          echo "::error title=Deploy failed::SHA $FULL_SHA — VPS left in partial state, investigate via SSH."
-          echo "Rollback: re-run this workflow with ref=<previous-sha>."
+          # `steps.sha` peut n'avoir jamais tourné : on retombe sur la réf
+          # demandée plutôt que d'imprimer un blanc.
+          CIBLE="${FULL_SHA:-$REF_DEMANDE}"
+          CIBLE="${CIBLE:-<aucune réf résolue>}"
+
+          case "$POUSSAGE" in
+            success)
+              if [ "$SMOKE" = "failure" ]; then
+                ETAT="le code EST déployé sur le VPS et le smoke test a échoué — la production répond mal"
+                SUITE="Rollback URGENT : relancer ce workflow avec ref=<SHA-précédent-complet>."
+              else
+                ETAT="le poussage a réussi ; l'échec est postérieur (marquage du tag)"
+                SUITE="La production tourne sur $CIBLE. Aucun rollback requis pour cet échec."
+              fi
+              ;;
+            failure)
+              ETAT="le poussage sur le VPS a ÉCHOUÉ EN COURS — la production peut être à moitié posée"
+              SUITE="Vérifier via SSH, puis rollback avec ref=<SHA-précédent-complet> si nécessaire."
+              ;;
+            *)
+              # Une étape jamais atteinte rend une issue VIDE, pas « skipped ».
+              # Sans ce repli le message affichait « étape «  » », qui donne
+              # l'air d'un bogue là où l'on veut inspirer confiance.
+              ETAT="le VPS n'a JAMAIS été contacté (étape « ${POUSSAGE:-jamais atteinte} ») — la production est INTACTE"
+              SUITE="Rien à réparer côté production. Corriger le dispatch et relancer. Rappel : l'entrée « ref » attend un SHA COMPLET de 40 caractères."
+              ;;
+          esac
+
+          echo "::error title=Deploy failed::$CIBLE — $ETAT"
+          echo "$SUITE"
           exit 1
