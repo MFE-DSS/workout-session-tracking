@@ -3,24 +3,24 @@
 {% block content %}
 <h1 class="page-title">Qualité du brouillon</h1>
 
-<div class="card" style="max-width:40rem;">
-  <div style="display:flex; justify-content:space-between; align-items:center;">
+<div class="card pd-page">
+  <div class="pd-row">
     <strong>{{ program.title }}</strong>
     <span class="badge">{{ status_label(program.status) }}</span>
   </div>
-  <p class="text-dim" style="margin-top:.5rem;">
+  <p class="text-dim pd-note">
     Lecture <strong>indicative</strong> de ton brouillon — elle t'aide à te
     situer, elle ne bloque rien et n'est pas enregistrée.
   </p>
 </div>
 
 {% if not scorable %}
-  <p class="text-dim" style="margin-top:1.5rem;">
+  <p class="text-dim pd-section">
     Cette version ne se prévisualise pas ici — la qualité s'affiche pour les
     brouillons en cours d'édition.
   </p>
 {% elif is_empty %}
-  <p class="text-dim" style="margin-top:1.5rem;">
+  <p class="text-dim pd-section">
     Ce brouillon ne contient pas encore d'exercice. Ajoute des séances dans
     l'éditeur, ou génère une base, pour voir une lecture de sa qualité.
   </p>
@@ -29,36 +29,36 @@
   {% set f = preview.feedback %}
   {% set level_labels = {'warning': 'À regarder', 'tip': 'Piste', 'info': 'Info'} %}
 
-  <div class="card" style="max-width:40rem; margin-top:1.5rem;">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
-      <span style="font-size:1.5rem; font-weight:700;">Grade {{ r.grade }}</span>
+  <div class="card pd-page pd-section">
+    <div class="pd-row pd-row--wide">
+      <span class="pd-grade">Grade {{ r.grade }}</span>
       {% if r.global_score is not none %}
         <span class="text-dim">Score global {{ r.global_score }}/100</span>
       {% endif %}
     </div>
-    <p style="margin-top:.5rem;">{{ f.headline }}</p>
-    <p class="text-dim" style="margin-top:.5rem;">{{ f.confidence_note }}</p>
-    <p class="text-dim" style="margin-top:.25rem;">
+    <p class="pd-note">{{ f.headline }}</p>
+    <p class="text-dim pd-note">{{ f.confidence_note }}</p>
+    <p class="text-dim pd-note--tight">
       Couverture : {{ (r.coverage_ratio * 100) | round | int }} % des exercices reconnus.
     </p>
     {% if f.grade_note %}
-      <p class="text-dim" style="margin-top:.5rem;">{{ f.grade_note }}</p>
+      <p class="text-dim pd-note">{{ f.grade_note }}</p>
     {% endif %}
   </div>
 
   {% if f.items %}
-    <div style="display:flex; flex-direction:column; gap:.75rem; margin-top:1.5rem;">
+    <div class="pd-stack pd-section">
       {% for item in f.items %}
         <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:.5rem;">
+          <div class="pd-row">
             <strong>{{ item.title }}</strong>
             <span class="badge">{{ level_labels.get(item.level, item.level) }}</span>
           </div>
           {% if item.message %}
-            <p style="margin-top:.35rem;">{{ item.message }}</p>
+            <p class="pd-note--tight">{{ item.message }}</p>
           {% endif %}
           {% if item.action %}
-            <p class="text-dim" style="margin-top:.25rem;">{{ item.action }}</p>
+            <p class="text-dim pd-note--tight">{{ item.action }}</p>
           {% endif %}
         </div>
       {% endfor %}
@@ -66,9 +66,9 @@
   {% endif %}
 
   {% if f.limitations %}
-    <div class="card" style="max-width:40rem; margin-top:1.5rem;">
+    <div class="card pd-page pd-section">
       <strong>Dimensions pas encore mesurables</strong>
-      <ul class="text-dim" style="margin-top:.5rem; padding-left:1.1rem;">
+      <ul class="text-dim pd-list">
         {% for limit in f.limitations %}
           <li>{{ limit }}</li>
         {% endfor %}
@@ -76,10 +76,10 @@
     </div>
   {% endif %}
 
-  <p class="text-dim" style="margin-top:1.5rem; font-style:italic;">{{ f.disclaimer }}</p>
+  <p class="text-dim pd-aside">{{ f.disclaimer }}</p>
 {% endif %}
 
-<p style="margin-top:1.5rem;">
+<p class="pd-section">
   <a class="btn btn--ghost" href="{{ url_for('user_program_detail', program_id=program.id) }}">← Éditeur</a>
 </p>
 {% endblock %}

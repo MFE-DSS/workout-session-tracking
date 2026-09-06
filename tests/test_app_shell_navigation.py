@@ -15,6 +15,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from tests.helpers import css_sans_commentaires
+
 ROOT = Path(__file__).resolve().parent.parent
 BASE_TPL = ROOT / "app" / "templates" / "base.html"
 APP_CSS = ROOT / "app" / "static" / "css" / "app.css"
@@ -243,12 +245,28 @@ def test_css_hidden_on_desktop():
 
 
 def test_css_no_new_hex_color():
-    """No new hex color introduced by this sprint; accent via existing token."""
+    """Aucune couleur en dur — `CLAUDE.md §5.4`.
+
+    Cette garde partageait un trou avec ses deux sœurs (`..._desktop_rail`,
+    `..._hardening`) : elle lisait les COMMENTAIRES comme du code. Les trois
+    ont rougi ensemble, dans trois shards différents, sur un `#2e7d32` écrit
+    dans une prose qui documentait le retrait de ce hex. Voir
+    `tests/helpers.css_sans_commentaires`, où la sonde vit désormais en un
+    seul exemplaire.
+
+    ⚠ SA PORTÉE N'EST PAS CELLE QUE SON NOM ANNONCE : `css[index:]` prend tout
+    ce qui suit le marqueur, jusqu'à la fin du fichier. C'est accidentel et
+    utile — conservé tel quel, message corrigé.
+    """
     css = APP_CSS.read_text(encoding="utf-8")
-    block = css[css.index("Sb_UI_03.1 — Mobile Bottom Navigation"):]
-    # no raw hex in the bottom-nav block — colors come from var(--...)
-    assert not re.search(r"#[0-9a-fA-F]{3,6}", block), "raw hex in bottom-nav CSS"
-    assert "var(--accent)" in block
+    bloc = css[css.index("Sb_UI_03.1 — Mobile Bottom Navigation"):]
+    trouve = re.search(r"#[0-9a-fA-F]{3,6}", css_sans_commentaires(bloc))
+    assert not trouve, (
+        f"couleur en dur « {trouve.group(0) if trouve else ''} » dans le CSS "
+        "écrit après le marqueur de la barre du bas — cette garde couvre tout "
+        "ce qui suit. Passer par un token de la palette."
+    )
+    assert "var(--accent)" in bloc
 
 
 def test_css_focus_visible_present():

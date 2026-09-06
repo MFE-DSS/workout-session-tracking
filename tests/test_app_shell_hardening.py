@@ -19,6 +19,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from tests.helpers import css_sans_commentaires
+
 ROOT = Path(__file__).resolve().parent.parent
 BASE_TPL = ROOT / "app" / "templates" / "base.html"
 INDEX_TPL = ROOT / "app" / "templates" / "index.html"
@@ -188,9 +190,20 @@ def test_skip_link_css_hidden_then_focus_visible():
 
 
 def test_skip_link_no_new_hex():
+    """Aucune couleur en dur — `CLAUDE.md §5.4`.
+
+    Troisième de la fratrie qui lisait les commentaires comme du code : voir
+    `tests/helpers.css_sans_commentaires`. Sa portée va du marqueur à la fin du
+    fichier, ce que son nom ne dit pas ; conservée, message corrigé.
+    """
     css = APP_CSS.read_text(encoding="utf-8")
-    block = css[css.index("Sb_UI_03.3 — App Shell Hardening"):]
-    assert not re.search(r"#[0-9a-fA-F]{3,6}", block), "raw hex in hardening CSS"
+    bloc = css[css.index("Sb_UI_03.3 — App Shell Hardening"):]
+    trouve = re.search(r"#[0-9a-fA-F]{3,6}", css_sans_commentaires(bloc))
+    assert not trouve, (
+        f"couleur en dur « {trouve.group(0) if trouve else ''} » dans le CSS "
+        "écrit après le marqueur de durcissement — cette garde couvre tout ce "
+        "qui suit. Passer par un token de la palette."
+    )
 
 
 # ───────── CSS cleanup / no-animation ─────────
