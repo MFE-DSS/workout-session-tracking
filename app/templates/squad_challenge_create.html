@@ -4,31 +4,31 @@
 <h1 class="page-title">Nouveau challenge &middot; {{ squad.name }}</h1>
 
 {% if error %}
-  <p style="color:var(--danger); font-weight:600;">{{ error }}</p>
+  <p class="sq-error--strong">{{ error }}</p>
 {% endif %}
 
-<form method="post" action="{{ url_for('squad_challenge_create_post', squad_id=squad.id) }}" class="card" style="max-width:28rem;">
-  <div style="margin-bottom:1rem;">
+<form method="post" action="{{ url_for('squad_challenge_create_post', squad_id=squad.id) }}" class="card form-panel">
+  <div class="sq-field">
     <label for="title"><strong>Titre</strong></label><br>
     {{ input_shell("title", input_id="title", required=True) }}
   </div>
-  <div style="margin-bottom:1rem;">
+  <div class="sq-field">
     <label for="metric"><strong>Métrique</strong></label><br>
     {{ select_shell("metric", metric_labels.items() | list,
                     select_id="metric", required=True) }}
   </div>
-  <div style="margin-bottom:1rem;">
+  <div class="sq-field">
     <label for="starts_at"><strong>Date de début</strong></label><br>
     {{ input_shell("starts_at", input_id="starts_at", input_type="date", required=True) }}
   </div>
-  <div style="margin-bottom:1rem;">
+  <div class="sq-field">
     <label for="ends_at"><strong>Date de fin</strong></label><br>
     {{ input_shell("ends_at", input_id="ends_at", input_type="date", required=True) }}
   </div>
   <button type="submit" class="btn btn--primary">Créer le challenge</button>
 </form>
 
-<p style="margin-top:1.5rem;">
+<p class="page-back">
   <a class="btn btn--ghost" href="{{ url_for('squad_challenges', squad_id=squad.id) }}">&larr; Retour aux challenges</a>
 </p>
 {% endblock %}

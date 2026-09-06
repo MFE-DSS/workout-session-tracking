@@ -11,8 +11,8 @@
 {% if challenges|length == 0 %}
   <p class="text-dim">Aucun challenge pour le moment.</p>
 {% else %}
-  <div style="overflow-x:auto;">
-    <table class="stats-list" style="width:100%;">
+  <div class="sq-scroll">
+    <table class="stats-list sq-table">
       <thead>
         <tr>
           <th>Titre</th>
@@ -37,7 +37,7 @@
               {% if c.ends_at < today %}
                 <span class="badge">Terminé</span>
               {% else %}
-                <span class="badge" style="background:var(--ok); color:#fff;">actif</span>
+                <span class="badge badge--actif">actif</span>
               {% endif %}
             </td>
           </tr>
@@ -47,7 +47,7 @@
   </div>
 {% endif %}
 
-<p style="margin-top:1.5rem;">
+<p class="page-back">
   <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour à la squad</a>
 </p>
 {% endblock %}

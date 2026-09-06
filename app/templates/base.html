@@ -159,7 +159,7 @@
           <a class="topbar__link {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
           <a class="topbar__link {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
           <a class="topbar__link" href="{{ url_for('contact_page') }}">Contact</a>
-          <form method="post" action="{{ url_for('logout') }}" style="display:inline;">
+          <form class="inline-form" method="post" action="{{ url_for('logout') }}">
             <button type="submit" class="topbar__link topbar__link--btn">Déconnexion</button>
           </form>
         </nav>

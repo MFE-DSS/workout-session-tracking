@@ -3,15 +3,15 @@
 {% block content %}
 <h1 class="page-title">Comparer &middot; {{ squad.name }}</h1>
 
-<form method="get" action="{{ url_for('squad_compare', squad_id=squad.id) }}" class="card" style="max-width:32rem;">
-  <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:end;">
-    <div style="flex:1; min-width:8rem;">
+<form method="get" action="{{ url_for('squad_compare', squad_id=squad.id) }}" class="card form-panel--wide">
+  <div class="sq-row-form">
+    <div class="sq-row-form__col">
       <label for="a"><strong>Membre A</strong></label><br>
       {{ select_shell("a", members, selected=selected_a, empty_label="--",
                       empty_value="0", select_id="a", required=True,
                       value_attr="user_id", label_attr="username") }}
     </div>
-    <div style="flex:1; min-width:8rem;">
+    <div class="sq-row-form__col">
       <label for="b"><strong>Membre B</strong></label><br>
       {{ select_shell("b", members, selected=selected_b, empty_label="--",
                       empty_value="0", select_id="b", required=True,
@@ -24,8 +24,8 @@
 </form>
 
 {% if comparison %}
-  <div style="overflow-x:auto; margin-top:1.5rem;">
-    <table class="stats-list" style="width:100%;">
+  <div class="sq-scroll page-back">
+    <table class="stats-list sq-table">
       <thead>
         <tr>
           <th></th>
@@ -50,7 +50,7 @@
   </div>
 {% endif %}
 
-<p style="margin-top:1.5rem;">
+<p class="page-back">
   <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour à la squad</a>
 </p>
 {% endblock %}

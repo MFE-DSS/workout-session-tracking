@@ -73,7 +73,7 @@
       Télécharger JSON
     </a>
   </div>
-  <div class="card__actions" style="margin-top: 8px;">
+  <div class="card__actions export-actions">
     <a class="btn btn--wide" href="{{ url_for('export_sessions_csv') }}">
       Télécharger CSV
     </a>
@@ -147,7 +147,7 @@
         </ul>
       </div>
     {% endif %}
-    <p class="export-card__hint" style="margin-top: 10px;">
+    <p class="export-card__hint export-card__hint--spaced">
       Dossier : <code>{{ backup_dir }}</code>
     </p>
 </div>

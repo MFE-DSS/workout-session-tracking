@@ -617,8 +617,6 @@ input, button, textarea, select {
 .auth-exit:hover,
 .auth-exit:focus-visible { color: var(--role-text-primary); }
 
-.card__actions--auth { margin-top: var(--space-md); }
-
 .auth-lede {
   text-align: center;
   margin-bottom: var(--space-lg);
@@ -783,6 +781,28 @@ input, button, textarea, select {
 .text-muted { color: var(--fg-muted); }
 .text-dim   { color: var(--fg-dim); }
 .text-mono  { font-family: var(--font-mono); }
+
+/* ── LE RANG META DE L'ÉCHELLE MAISON, enfin atteignable.
+ *
+ * `Q6` fixe quatre rangs — 32 / 22 / 15 / 12 — et le relevé de décisions les
+ * a écrits cette nuit. Deux seulement avaient une classe : `.section-header`
+ * porte SECTION, et rien ne portait META. Résultat, `font-size: 12px` était
+ * recopié en attribut `style` — quatre fois sur le seul `/science`.
+ *
+ * `.text-dim` et `.text-muted` juste au-dessus ne posent qu'une COULEUR :
+ * les prendre pour un rang de taille était la confusion possible.
+ *
+ * C'est le diagnostic du programme appliqué à une décision d'hier soir : elle
+ * est prise, écrite, mergée — et le moyen de l'appliquer manque. */
+.text-meta { font-size: 12px; }
+
+/* Un lien de repli discret en bas de page — « retour à la connexion »,
+ * « détails ». ⚠ 13 px est HORS ÉCHELLE (entre META 12 et BODY 15) : la
+ * valeur est transposée telle quelle depuis six gabarits, pas décidée ici. */
+.link-quiet {
+  color: var(--fg-dim);
+  font-size: 13px;
+}
 
 /* ---- Spacing Utilities ---- */
 .mt-xs { margin-top: var(--space-xs); }
@@ -1098,6 +1118,8 @@ input, button, textarea, select {
 }
 .user-profile__notice {
   text-align: center;
+  font-size: 12px;                /* rang META */
+  margin-top: var(--space-md);
 }
 
 /* Sb_22b v2 — L3 profile page additions. */
@@ -5610,7 +5632,7 @@ summary:focus-visible,
 .sq-form { max-width: 24rem; }
 .sq-field { margin-bottom: var(--space-sm); }
 .sq-action { margin-top: var(--space-sm); }
-.sq-back { margin-top: var(--space-lg); }
+.page-back { margin-top: var(--space-lg); }
 
 /* Un badge d'état « actif » — vert plein. Le texte y était `#fff`, mesuré à
  * **3,07:1** sur `--ok` : sous AA. Le produit possède déjà la couleur du texte
@@ -5620,29 +5642,214 @@ summary:focus-visible,
 /* La suppression est un texte de rang 3, pas un bouton de commande. */
 .sq-destroy { color: var(--danger); }
 
+/* ── Le RESTE de la famille squad — six gabarits laissés de côté par
+ * `Sb_UI_SQUAD_READABILITY_01`, qui n'avait traité que le détail et la liste.
+ *
+ * S'arrêter là aurait été la commodité que cette tranche-là reprochait : le
+ * badge « actif » y écrivait `color:#fff` sur `--ok`, mesuré à **3,07:1**, et
+ * je l'ai corrigé sur UNE surface sur trois. Les deux autres l'ont gardé six
+ * heures de plus. C'est le mode d'échec « une décision appliquée là où c'était
+ * commode », commis sur ma propre correction.
+ */
+.form-panel { max-width: 28rem; }
+.form-panel--wide { max-width: 32rem; }
+
+/* Un message d'erreur sans espacement propre — il vit déjà dans un bloc qui
+ * l'espace. Distinct de `.pd-error`, qui porte sa marge basse. */
+.sq-error--strong { color: var(--danger); font-weight: 600; }
+
+/* Deux sélecteurs côte à côte qui se partagent la largeur, et passent à la
+ * ligne plutôt que de se comprimer sous 8rem. */
+.sq-row-form {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  align-items: end;
+}
+.sq-row-form__col { flex: 1; min-width: 8rem; }
+
+/* Un code d'invitation se saisit en capitales quoi qu'on tape. La casse est
+ * une propriété du CODE, pas du clavier. */
+.sq-code { text-transform: uppercase; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL NON AUTHENTIFIÉ — la « vraie première impression ».
+
+   `Sb_UI_AUTH_01` avait traité `login` et `register` ; `welcome` est resté
+   avec ses neuf attributs `style`. Troisième fois cette nuit qu'une famille
+   est traitée aux deux tiers.
+
+   ⚠ AUCUNE VALEUR N'EST RÉGLÉE ICI, et c'est délibéré. Deux d'entre elles
+   sont hors de l'échelle et hors grille — le lede à **13 px** (entre les rangs
+   BODY 15 et META 12) et le rembourrage bas à **60 px** (7,5 × 8). Les
+   corriger serait re-régler une surface que l'opérateur a nommée comme sa
+   première impression : c'est son arbitrage, pas une dette mécanique. Elles
+   sont donc transposées **à l'identique**, et signalées.
+   ══════════════════════════════════════════════════════════════════════════ */
+.welcome-page { padding-top: 40px; padding-bottom: 60px; }
+
+.welcome-head {
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+/* Le nom du produit, en capitales espacées : c'est une marque, pas un titre. */
+.welcome-mark {
+  font-size: 32px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-bottom: var(--space-xs);
+}
+
+.welcome-alt { margin-top: var(--space-sm); }
+
+.welcome-section { max-width: 720px; margin: 0 auto; }
+
+.welcome-section__title {
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.welcome-lede {
+  font-size: 13px;          /* hors échelle — voir l'avertissement ci-dessus */
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto var(--space-lg);
+}
+
+.welcome-figure {
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.welcome-figure img {
+  width: 100%;
+  height: auto;
+  max-width: 780px;
+  display: block;
+  margin: 0 auto;
+}
+
+/* ── « Mon plan » — la TROISIÈME famille laissée aux deux tiers.
+ *
+ * `Sb_UI_PROGRAM_EDITOR_STYLES_01` a traité qualité, publication et
+ * génération, et a **différé `plan.html` en le disant** : une autre tranche
+ * touchait la même ligne au même moment. La raison était bonne ; elle a cessé
+ * de l'être quand cette tranche a mergé, et le gabarit est resté.
+ *
+ * Trois familles traitées aux deux tiers en une nuit — squad, auth, éditeur.
+ * Ce n'est plus un oubli, c'est un MODE : une tranche s'arrête à ce qu'elle
+ * avait ouvert, et la sœur restante n'a plus de propriétaire.
+ */
+.plan-note { margin-bottom: var(--space-sm); }
+.plan-sub { margin: var(--space-sm) 0 0; font-size: .9em; }
+.plan-sub--block { display: block; }
+.plan-list { margin: var(--space-xs) 0 var(--space-sm) var(--space-lg); }
+.plan-list li { margin-bottom: var(--space-xs); }
+.plan-meta { font-size: 12px; margin: 0 0 var(--space-sm); }
+.plan-meta--ok { font-size: 12px; color: var(--ok); }
+.plan-meta--warn { font-size: 12px; color: var(--warn); }
+
+/* ── LES PAGES DE FORMULAIRE SIMPLE — `contact`, `reset_password`,
+ * `password_change`. Trois gabarits, la MÊME forme répétée en attributs :
+ * une carte d'avis bordée à gauche, un bloc d'actions, un paragraphe centré
+ * de retour, un lien discret. Le vocabulaire n'existait pas.
+ *
+ * ⚠ Trois des styles retirés ne faisaient QUE RÉPÉTER LEUR PROPRE CLASSE :
+ * `<div class="card__actions" style="margin-top:16px">`, alors que
+ * `.card__actions` pose déjà `margin-top: var(--space-md)`, soit 16 px.
+ * Le modificateur `.card__actions--auth`, que j'avais créé pour remplacer
+ * exactement cet attribut sur trois AUTRES gabarits, redéclarait lui aussi la
+ * même valeur : un modificateur sans effet. Les deux formes disparaissent. */
+.form-notice {
+  border-left: 3px solid var(--ok);
+  margin-bottom: var(--space-md);
+}
+.form-notice__text { color: var(--ok); font-weight: 700; }
+.form-notice__hint { font-size: 14px; color: var(--fg-muted); }
+
+.form-back {
+  margin-top: var(--space-md);
+  text-align: center;
+}
+
+/* ── Le lanceur de séance. */
+.launcher-note { margin-top: var(--space-md); }
+.launcher-lead { margin-top: var(--space-lg); }
+.launcher-actions {
+  margin-top: var(--space-md);
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+.launcher-detail { margin-top: var(--space-xs); }
+
+/* ── `/export` : deux espacements propres à ses cartes. */
+.export-actions { margin-top: var(--space-sm); }
+.export-card__hint--spaced { margin-top: var(--space-sm); }
+
+/* ── `/science` : une légende de figure, sous son illustration. */
+.science-caption {
+  text-align: center;
+  margin-top: var(--space-sm);
+}
+
+/* ── LES HUIT DERNIERS. Ce qui reste après cette tranche n'est plus
+ * actionnable : 60 attributs vivent sur des surfaces en 404 ou
+ * décommissionnées, 17 sur `/profile` en attente d'arbitrage, 4 dans le viseur
+ * interdit. Ceux-ci sont les derniers qu'on pouvait prendre. */
+
+/* Un porte-sprite SVG : présent dans le flux, invisible et hors mise en page. */
+.svg-sprite { position: absolute; }
+
+/* Un formulaire réduit à son bouton, posé dans une ligne de texte. */
+.inline-form { display: inline; }
+
+/* La version de l'atlas, en pied de page. */
+.atlas-version {
+  font-size: 12px;                /* rang META */
+  text-align: center;
+  margin-top: var(--space-lg);
+}
+
+/* Une carte de profil public, détachée de ce qui la précède. */
+.user-profile--v2 { margin-top: var(--space-md); }
+
+/* Une section de la bibliothèque, séparée de la suivante. */
+.library-section { margin-bottom: var(--space-xl); }
+
+/* Une note de bas de bloc du rapport coach.
+ * ⚠ Elle valait 13 px — hors échelle. Elle rejoint META (12), le rang que
+ * `Q6` prévoit pour une note de provenance. */
+.coach-note { font-size: 12px; margin: var(--space-xs) 0 0; }
+
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
  * commodité que la tranche reproche ailleurs. */
-.sq-toolbar {
+.page-toolbar {
   display: flex;
   gap: var(--space-sm);
   margin-bottom: var(--space-lg);
 }
 
-.sq-list {
+.card-stack {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
 /* Une carte entièrement cliquable : elle ne se peint pas comme un lien. */
-.sq-card { text-decoration: none; color: inherit; }
-.sq-card__head {
+.card--link { text-decoration: none; color: inherit; }
+.card__head {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.sq-card__meta { margin-top: var(--space-xs); }
+.card__meta { margin-top: var(--space-xs); }
 /* ── La famille couvre désormais l'ÉDITEUR ENTIER, pas sa seule page de détail.
  *
  * Ses quatre pages sœurs — qualité, publication, génération, plan — écrivaient
