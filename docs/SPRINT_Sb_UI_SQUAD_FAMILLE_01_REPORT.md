@@ -292,6 +292,40 @@ du rapport coach, qui sont légitimes.
 
 **328 → 81, dont 0 actionnable.**
 
+## 5octies. Le chantier suivant, chiffré — l'échelle dans les CLASSES
+
+Le cliquet des styles inline arrive à zéro actionnable. Il ne mesure pourtant
+**qu'une des deux dettes typographiques** : celle des attributs. Les valeurs
+hors échelle qui vivent dans des **classes** lui sont invisibles — `/coach-report`
+en garde deux à 13 px, et il a fallu une sonde de rendu pour les voir.
+
+Mesuré sur les six feuilles du produit, commentaires retirés :
+
+| | déclarations `font-size` | hors échelle E3 |
+|---|---|---|
+| **`session_focus.css`** — le viseur | 95 | 63 (66 %) — **mais il porte sa propre échelle, validée au rendu par l'opérateur.** Ce n'est pas de la dette |
+| **reste du produit** | **385** | **240 — 62 %** |
+
+**Vingt-deux tailles distinctes** coexistent, dont quinze à des **demi-pixels**
+(`10.5`, `11.5`, `12.5`, `13.5`).
+
+Hors viseur, **quatre valeurs font 89 % du hors-échelle** :
+
+| Valeur | × | Où elle irait sur E3 |
+|---|---|---|
+| **13 px** | 95 | entre BODY 15 et META 12 — la question est laquelle |
+| **14 px** | 51 | c'est la taille du `body`, donc BODY devrait valoir 14 **ou** le corps monter à 15 |
+| **11 px** | 49 | sous META — donc META 12 |
+| **10 px** | 18 | idem |
+
+Le chantier n'est donc pas « 240 corrections » : c'est **deux décisions**
+— *où passe la frontière BODY / META*, et *le corps du produit vaut-il 14 ou
+15* — puis un balayage mécanique.
+
+**Ce n'est pas livrable par une tranche.** C'est un arbitrage de rang, sur
+toutes les surfaces à la fois, exactement comme l'a été `.section-header` dans
+`#208` — mais sur quatre valeurs au lieu d'une.
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
