@@ -19,6 +19,7 @@ Aucune dépendance sur ``recommendation.py``, ``quality_score.py``,
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Literal
 
 OVERLOAD_ENGINE_VERSION = 1
@@ -59,12 +60,41 @@ class HistoricalSetSignal:
     ``quality_score`` : 0.0 → 1.0 (None si non mesuré ; ignoré pour
     progress/deload trigger).
     ``fatigue_signal`` : True si l'implicit signal indique fatigue.
+
+    ⚠ `CP-1` — LES TROIS DERNIERS CHAMPS NE SONT PAS LUS PAR LE MOTEUR.
+
+    Ils transportent la LIGNÉE du signal, pas une entrée de calcul. Le moteur
+    ne lit que quatre attributs — `weight_kg` (l. 174, 195, 220, 240), `reps`
+    (l. 126, 294, 302), `quality_score` (l. 133), `fatigue_signal` (l. 295) —
+    et aucun chemin de code n'en lit un cinquième. Ajouter ces champs ne peut
+    donc pas modifier une prescription : c'est une impossibilité structurelle,
+    pas une intention. `test_cp1_temporal_lineage` la vérifie mécaniquement.
+
+    POURQUOI ILS EXISTENT. Une recommandation doit pouvoir dire SUR QUOI elle
+    s'appuie et QUAND cet événement a eu lieu. Mesuré avant `CP-1` : deux
+    historiques dont la seule différence est l'existence de séances
+    substituées produisent une charge utile **identique champ par champ** —
+    l'un s'était entraîné il y a 7 jours, l'autre pas depuis 100.
+
+    ⚠ `substituted_name` est une CHAÎNE LIBRE, normalisée seulement à la
+    comparaison (`exercise_identity.identity_key`). Ce n'est pas un
+    identifiant stable, et le contrat ne prétend pas le contraire.
+
+    ⚠ AUCUN SEUIL. `performed_at` est un FAIT. Décider qu'un âge doit changer
+    une prescription est une hypothèse de domaine — elle n'appartient pas à
+    `CP-1` et n'est adossée à aucune preuve dans ce dépôt.
     """
 
     weight_kg: float
     reps: int
     quality_score: float | None = None
     fatigue_signal: bool = False
+    #: Quand la série de référence a été RÉELLEMENT exécutée.
+    performed_at: datetime | None = None
+    #: La séance d'où elle vient — rend le repère vérifiable.
+    source_session_id: int | None = None
+    #: `None` = occurrence prescrite. Sinon, le nom du mouvement substitué.
+    substituted_name: str | None = None
 
 
 @dataclass(frozen=True)
@@ -94,6 +124,18 @@ class OverloadHint:
     target_reps_min: int | None
     target_reps_max: int | None
     reasons: tuple[str, ...] = field(default_factory=tuple)
+    #: `CP-1` — SUR QUOI CETTE RECOMMANDATION S'APPUIE.
+    #:
+    #: `None` pour l'état `unknown`, qui n'a par définition aucun historique.
+    #: Pour tous les autres, c'est l'occurrence retenue — celle dont
+    #: `target_weight_kg` dérive. `engine_version` juste au-dessus dit COMMENT
+    #: le calcul a été fait ; ce champ dit SUR QUOI.
+    #:
+    #: ⚠ Aucun consommateur ne le lit encore. Il est ajouté parce que la
+    #: traçabilité de la recommandation EST l'objet de `CP-1` — pas « au cas
+    #: où ». Un champ sans besoin démontré n'entre pas dans ce contrat :
+    #: `computed_at` a été proposé puis écarté pour cette raison.
+    reference_signal: HistoricalSetSignal | None = None
 
 
 # ──────────────────────────── internals ────────────────────────────
@@ -181,6 +223,7 @@ def _hint_deload(
         reasons=_truncate_reasons(
             triggers + [f"charge réduite à {new_kg:g} kg"]
         ),
+        reference_signal=last,
     )
 
 
@@ -204,6 +247,7 @@ def _hint_progress(
         target_reps_min=target_min,
         target_reps_max=target_max,
         reasons=_truncate_reasons(reasons),
+        reference_signal=last,
     )
 
 
@@ -226,6 +270,7 @@ def _hint_top_range(
                 "mêmes kg, viser au moins le bas de range",
             ]
         ),
+        reference_signal=last,
     )
 
 
@@ -246,6 +291,7 @@ def _hint_consolidate(
                 f"viser {target_max} reps avant d'augmenter la charge",
             ]
         ),
+        reference_signal=last,
     )
 
 
