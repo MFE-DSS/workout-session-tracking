@@ -138,6 +138,31 @@ et le badge à 3,07 : 1 ne survit nulle part. Une couleur en dur de plus est
 localisée, mesurée et **non livrée** — avec la raison, et avec le trou de garde
 qui l'avait laissée passer.
 
+## 7bis. Le viseur, prouvé intact sur toute la nuit
+
+Le viseur intra-séance était **interdit par le mandat**, et la nuit a pourtant
+beaucoup touché `app.css` — tokens sémantiques, rang SECTION, familles `.pd-*`,
+`.sq-*`, `.welcome-*`. Une garde par lecture de gabarit ne suffit pas à le
+prouver : une règle partagée peut l'atteindre sans le nommer.
+
+Vérifié par **comparaison de rendu**, entre la canonique d'avant la nuit
+(`ffb4f62`) et celle d'aujourd'hui, servies simultanément :
+
+| | avant la nuit | maintenant |
+|---|---|---|
+| `main` du viseur | **1772 px** | **1772 px** |
+| signature typographique (taille + couleur + graisse, **67 éléments**) | `dc926c1cd4b5a859` | `dc926c1cd4b5a859` |
+| pied de page **partagé** | 76 px | 79 px |
+| `<small>` du pied | **9,17 px** | **11 px** |
+
+**Le contenu du viseur est identique au pixel.** Les trois pixels d'écart de la
+page entière viennent du **pied de page partagé**, hors du viseur, où
+`Sb_UI_PROGRAM_DETAIL_01` a retiré le `smaller` que le **navigateur** imposait :
+`.foot` vaut 11 px, et le `<small>` qu'il contient y appliquait un ratio de
+0,833 — soit **9,17 px que personne n'avait décidés**, sur toutes les pages.
+
+C'est une correction, elle est partagée, et elle n'entre pas dans le viseur.
+
 ## 8. Ce qui reste ouvert
 
 * **`profile.html` — `var(--color-danger, #c0392b)`**, à 3,21 : 1. Le token
