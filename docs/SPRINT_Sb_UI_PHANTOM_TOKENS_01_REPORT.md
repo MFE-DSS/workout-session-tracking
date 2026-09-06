@@ -38,14 +38,19 @@ et la troisième interdit de traiter le lot comme un lot :
 couleur, c'est qu'elle n'existait nulle part : *la palette cible est ce qui est
 écrit et mesuré dans la feuille de style, pas un souvenir* (`§5.4`).
 
-**Une non-violation.** `--mf-frames` n'est pas une couleur :
-`calc(var(--mf-frames, 1) * 100%)` est le **compteur de cadres** du filmstrip
-BodyMap, et `1` est le bon défaut. La condamner aurait cassé le socle
-multi-cadres pour satisfaire une règle qui ne la visait pas.
+**Une fausse accusation — la mienne.** `--mf-frames` figurait dans ma première
+liste de fantômes. Il n'en est pas un : il est **déclaré quatre fois**, lignes
+5061 à 5064, `.muscle-focus__plate-area--frames-2 { --mf-frames: 2; }` — sur la
+**même ligne que son sélecteur**, et ma sonde exigeait un début de ligne.
+
+Ce n'est pas une couleur non plus : `calc(var(--mf-frames, 1) * 100%)` est le
+**compteur de cadres** du filmstrip BodyMap, et `1` est le bon défaut. La
+condamner aurait cassé le socle multi-cadres pour satisfaire une règle qui ne
+la visait pas.
 
 C'est, à l'envers, la leçon consignée sur les findings jumelles : *jamais
 adjuger un lot sans lire chacune*. Sur seize « violations évidentes », **deux
-étaient des défauts, une n'en était pas une du tout.**
+étaient des défauts, et une n'en était pas une du tout.**
 
 ## 2. Le moyen existait — quatorzième occurrence
 
@@ -104,23 +109,50 @@ une recherche.
 
 ## 5. Le viseur, deux fois
 
-Quatre des seize replis vivants sont dans `session_focus.css` — la feuille du
-**viseur intra-séance**, interdit par le mandat. Ils sont **exemptés avec leur
-raison écrite**, pas ignorés.
+Cinq usages fantômes sont dans `session_focus.css` — la feuille du **viseur
+intra-séance**, interdit par le mandat. Ils sont **exemptés avec leur raison
+écrite**, pas ignorés. L'un d'eux, `var(--color-fg)`, est de la **forme grave**
+— sans repli, donc sans couleur du tout. Signalé, non touché.
 
 Et le rendu l'a confirmé plutôt que supposé : en injectant le CSS de la tranche
 sur une séance en cours, **le viseur ne bouge pas d'un pixel** — aucun des
 sélecteurs touchés n'y vit.
 
-## 6. La garde
+## 6. La garde, et ses trois trous — trouvés en la testant contre le réel
 
 Elle traque **uniquement les tokens fantômes**. Compter les 150 replis morts
 comme des fautes noierait les deux défauts réels dans cent-cinquante
 broutilles.
 
-Quatre tests : aucun fantôme non exempté · la sonde reconnaît les deux
-écritures de repli (hexadécimal et `var()` imbriqué) · aucune exemption
-périmée · chaque exemption porte une raison lisible.
+Son premier jet est parti avec **trois défauts**, tous du même genre : une
+sonde qui croit regarder le produit et regarde autre chose. Ils ont été trouvés
+en la promenant sur des fichiers qu'elle n'avait pas servi à écrire — pas en la
+relisant.
+
+**1. Elle ne voyait pas la forme grave.** Elle ne cherchait que
+`var(--fantome, repli)`. Or `var(--fantome)` **tout court** rend la déclaration
+**invalide au calcul** : la propriété n'est pas appliquée du tout.
+
+Vu en vrai, deux lignes plus loin — `plan.html` écrivait
+`color: var(--good)` sur « Préférences enregistrées ». La confirmation restait
+**grise**. La couleur n'était pas fausse, elle était **absente**, et personne
+ne l'avait remarqué parce que rien ne casse.
+
+**2. Elle accusait un token sain.** Sa détection des déclarations exigeait un
+début de ligne. Les quatre `--mf-frames` sont écrits sur la ligne de leur
+sélecteur — elle les manquait et déclarait fantôme un token défini. *Une garde
+qui se trompe de côté accuse le sain et laisse passer le malade.*
+
+**3. Elle s'accusait elle-même.** Son propre fichier **cite** `--success` en le
+documentant, et le commentaire CSS que j'ai ajouté dans `app.css` le cite
+aussi. La sonde comptait la citation comme un usage. Même mode d'échec que la
+sonde d'accents qui lisait la balise `<details>` comme le mot « détails » —
+septième occurrence relevée d'*une sonde qui prend la prose pour du code*.
+
+**Six tests** désormais : aucun fantôme non exempté · la sonde voit les **trois**
+écritures d'usage · elle ne prend pas un commentaire pour du code · une
+déclaration sur la ligne de son sélecteur compte · aucune exemption périmée ·
+chaque exemption porte une raison lisible.
 
 Les deux derniers existent parce qu'une liste d'exemptions sans entretien
 devient un cimetière : elle grossit, plus personne ne sait lesquelles mordent
@@ -149,10 +181,16 @@ avant/après, et la non-régression du viseur constatée au rendu.
 
 ## Verdict
 
-**LIVRÉ.** Neuf tokens fantômes : deux défauts visuels corrigés en pointant
-vers le token qui existait déjà, quatre couleurs justes enfin déclarées avec
-leur contraste, une fausse violation épargnée, trois exemptions écrites avec
-leur raison. Et un arbitrage de palette posé, chiffré, prêt à trancher.
+**LIVRÉ.** Huit tokens fantômes avec repli, deux sans : **trois défauts
+visuels** corrigés en pointant vers le token qui existait déjà — dont une
+couleur qui n'était pas fausse mais **absente** —, quatre couleurs justes
+enfin déclarées avec leur contraste, une fausse accusation retirée, trois
+exemptions écrites avec leur raison. Et un arbitrage de palette posé, chiffré,
+prêt à trancher.
+
+La garde, elle, est partie avec trois trous et n'a merged qu'après les avoir
+tous montrés. C'est le seul ordre acceptable : une garde se teste **contre le
+dépôt**, pas contre l'intention de qui l'écrit.
 
 ## 9. Ce qui reste ouvert
 
