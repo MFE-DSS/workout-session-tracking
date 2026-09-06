@@ -26,7 +26,6 @@
     "session_done.html": 1,
     "user_profile.html": 2,
     "user_programs/list.html": 5,
-    "user_programs/new.html": 4,
-    "user_programs/plan.html": 9
+    "user_programs/new.html": 4
   }
 }

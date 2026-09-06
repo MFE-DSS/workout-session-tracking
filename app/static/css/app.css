@@ -5712,6 +5712,26 @@ summary:focus-visible,
   margin: 0 auto;
 }
 
+/* ── « Mon plan » — la TROISIÈME famille laissée aux deux tiers.
+ *
+ * `Sb_UI_PROGRAM_EDITOR_STYLES_01` a traité qualité, publication et
+ * génération, et a **différé `plan.html` en le disant** : une autre tranche
+ * touchait la même ligne au même moment. La raison était bonne ; elle a cessé
+ * de l'être quand cette tranche a mergé, et le gabarit est resté.
+ *
+ * Trois familles traitées aux deux tiers en une nuit — squad, auth, éditeur.
+ * Ce n'est plus un oubli, c'est un MODE : une tranche s'arrête à ce qu'elle
+ * avait ouvert, et la sœur restante n'a plus de propriétaire.
+ */
+.plan-note { margin-bottom: var(--space-sm); }
+.plan-sub { margin: var(--space-sm) 0 0; font-size: .9em; }
+.plan-sub--block { display: block; }
+.plan-list { margin: var(--space-xs) 0 var(--space-sm) var(--space-lg); }
+.plan-list li { margin-bottom: var(--space-xs); }
+.plan-meta { font-size: 12px; margin: 0 0 var(--space-sm); }
+.plan-meta--ok { font-size: 12px; color: var(--ok); }
+.plan-meta--warn { font-size: 12px; color: var(--warn); }
+
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
  * commodité que la tranche reproche ailleurs. */

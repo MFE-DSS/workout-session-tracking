@@ -106,6 +106,27 @@ plus exposée. Signalée.
 Rendu : **932 px avant, 932 px après** · marque à `32px / 2.56px / center`
 inchangée · styles inline **9 → 0**.
 
+## 5ter. Et une TROISIÈME — ce n'est plus un oubli, c'est un mode
+
+`Sb_UI_PROGRAM_EDITOR_STYLES_01` a traité qualité, publication et génération,
+et a **différé `plan.html` en le disant** : une autre tranche touchait la même
+ligne au même moment. La raison était bonne. Elle a cessé de l'être quand cette
+tranche a mergé — et le gabarit est resté.
+
+**Trois familles traitées aux deux tiers en une nuit : squad, auth, éditeur.**
+Le motif est le même à chaque fois : une tranche s'arrête à ce qu'elle avait
+ouvert, et la sœur restante n'a plus de propriétaire. Un « différé, dit
+explicitement » n'est pas une garde — c'est une note dans un rapport que
+personne ne relit.
+
+Neuf attributs `style` → 0. Rendu : `/plan` passe de **1250 à 1251 px**, sept
+tailles de corps inchangées. Le pixel vient de l'alignement des marges sur la
+grille (`.75rem` → 8 px, retrait de liste `1.25rem` → 24 px).
+
+⚠ Une valeur reste hors échelle et est **transposée telle quelle** : `.9em`,
+soit **12,6 px** sur un corps de 14. Comme pour `welcome`, régler l'échelle
+d'une surface est un arbitrage, pas une dette mécanique.
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
@@ -121,7 +142,7 @@ inchangée · styles inline **9 → 0**.
 ## 7. Vérifications
 
 `check_scope` **SHARED_CODE** · broad sweep ciblé : **162 tests** · cliquet des
-styles inline resserré **174 → 134** (23 gabarits) · ruff OK.
+styles inline resserré **174 → 125** (22 gabarits) · ruff OK.
 
 Rendu exposé (`§5.1`) depuis deux serveurs, sur les **cinq** routes
 atteignables de la famille :
