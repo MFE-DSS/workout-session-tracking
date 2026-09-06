@@ -218,8 +218,10 @@ commande            un TRAIT, pas un aplat
 
 * **`no-color-only-state`** (`§7`) — un état porte toujours une forme.
 * **Cible tactile 44 px** — standard produit, pas le seuil WCAG de 24.
-* **Sans JavaScript** (`§10`) — démarrer, saisir, enregistrer, naviguer,
-  terminer fonctionnent sans JS.
+* ~~**Sans JavaScript** (`§10`)~~ — **SUPERSÉDÉ le 2026-09-06.** Voir `§5bis`.
+* **Le client possède l'interaction, le serveur possède la vérité** — la
+  couche cliente peut porter l'état d'un écran ; **aucune donnée d'entraînement
+  ne dépend d'elle pour survivre.** Voir `§5bis`.
 * **Contraste = contrat de COUPLE**, jamais propriété d'un token seul. Chaque
   couple `avant-plan / arrière-plan` déclare son minimum et sa mesure.
 * **Aucune sémantique de cible** dans `zone_exposure` — garde vivante.
@@ -230,6 +232,96 @@ commande            un TRAIT, pas un aplat
   `D9`/`D10`).
 * **Aucun style inline statique non contracté** — l'inline ne survit que pour
   une valeur réellement dynamique, allowlistée. Mesuré : **5 sur 708**.
+
+---
+
+## 5bis. La couche cliente — amendement du 2026-09-06
+
+**Décision de l'opérateur, prise explicitement.** L'invariant « sans
+JavaScript » est levé au profit d'une **couche cliente structurée** : état
+partagé entre objets, composants réutilisables, éventuellement une petite
+bibliothèque.
+
+### Pourquoi il est levé
+
+Il n'a pas échoué — il a **plafonné**. Le programme UI a montré, objet après
+objet, des défauts que le rendu serveur seul ne peut pas résoudre : un profil
+qui affiche les données groupées par domaine et les fait éditer groupées par
+stockage, avec **cinq liens vers quatre ancres de la même page** ; des tiroirs
+qui perdent leur état à chaque soumission ; une saisie qui reposte l'écran
+entier pour changer un nombre.
+
+Ces défauts sont **structurels au rendu par page**, pas à l'écriture des
+gabarits. C'est le motif que l'opérateur nomme « step two ».
+
+### Ce qui devient possible
+
+* un objet **cohérent** là où il y a aujourd'hui six blocs qui se renvoient
+  les uns aux autres ;
+* l'**édition en place**, sans rechargement ni saut d'ancre ;
+* un **état partagé** entre objets d'un même écran ;
+* des **composants** réutilisables, au lieu d'une classe CSS par forme.
+
+### La frontière, et elle est dure
+
+> **Le client possède l'interaction. Le serveur possède la vérité.**
+
+Une séance en cours est un **enregistrement d'entraînement** : si le navigateur
+meurt entre deux séries, ce qui a été saisi ne disparaît pas. Aucune donnée ne
+vit uniquement dans la mémoire du client. C'est la seule limite que cet
+amendement pose à la décision, et elle protège l'objet même du produit.
+
+⚠ *Cette frontière est ma proposition à l'intérieur de la décision de
+l'opérateur, pas sa formulation. Elle est écrite pour être contestée, pas pour
+être supposée.*
+
+### ⚠ L'invariant n'est pas une phrase — il est tenu par 48 fichiers de tests
+
+**Mesuré le 2026-09-06 : 84 mentions de « sans JS » / « sans JavaScript » /
+« repli sans » dans 48 fichiers de `tests/`.**
+
+Lever la phrase de ce document est une ligne. L'invariant, lui, est **exécuté**
+— sur le flux de séance (`test_df_b_session_flow`), le héros de décision
+(`test_home_decision_hero`), le minuteur de repos, la carte corporelle, la
+coque, les préférences d'entraînement, l'installabilité PWA.
+
+Ces gardes ne tombent pas d'elles-mêmes : elles ne mordront que sur les
+surfaces **qui basculent**. Mais chaque bascule les rencontrera, et il faudra à
+chaque fois **décider** — la garde protège-t-elle une capacité que le produit
+garde (« la séance s'enregistre même sans script »), ou seulement le moyen
+d'hier ? Les deux réponses existent dans ce lot, et elles ne se devinent pas
+en masse.
+
+C'est le chiffre à provisionner, pas la ligne du `§5`.
+
+### Ce que ça CASSE, et qu'il faut refaire
+
+Ce point n'est pas une réserve : c'est un coût à provisionner.
+
+* **Les gardes de rendu cessent de mesurer.** Une bonne partie des gardes UI
+  lisent le HTML **servi**. Sur une surface dont l'interaction vit côté client,
+  ce HTML ne décrit plus l'écran — la garde reste verte et ne garde rien. C'est
+  la forme la plus dangereuse du défaut relevé dans
+  `guards-that-guard-nothing`, appliquée d'un coup à une famille entière.
+* **Le harnais de capture doit être refait.** Il photographie un rendu initial.
+  Il devra piloter des **états**, pas des routes.
+* **`CLAUDE.md §5.1`** — l'exposition au rendu avant commit — devient *plus*
+  nécessaire, pas moins : c'est la seule garde qui continue de voir juste.
+
+### Ce qui n'est PAS décidé
+
+* **quelles surfaces basculent, et dans quel ordre** — l'opérateur a nommé
+  `/profile` comme première ;
+* **quelle bibliothèque, s'il y en a une** — « zéro framework » était une
+  décision distincte, elle n'est pas levée par celle-ci ;
+* **le sort des surfaces servies** qui n'ont aucune raison de basculer.
+
+### Ce qui ne change pas
+
+Tous les autres invariants du `§5` restent entiers : cible tactile 44 px,
+`no-color-only-state`, contraste comme contrat de couple, validation implicite,
+aucune revendication d'activation musculaire, aucune sémantique de cible dans
+`zone_exposure`. Aucun d'eux ne dépendait du mode de rendu.
 
 ---
 
