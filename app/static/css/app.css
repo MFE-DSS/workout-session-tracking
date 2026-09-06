@@ -5620,6 +5620,30 @@ summary:focus-visible,
 /* La suppression est un texte de rang 3, pas un bouton de commande. */
 .sq-destroy { color: var(--danger); }
 
+/* ── La liste des squads. Le gabarit était déjà touché par cette tranche
+ * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
+ * commodité que la tranche reproche ailleurs. */
+.sq-toolbar {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.sq-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* Une carte entièrement cliquable : elle ne se peint pas comme un lien. */
+.sq-card { text-decoration: none; color: inherit; }
+.sq-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.sq-card__meta { margin-top: var(--space-xs); }
+
 /* ⚠ 9,17 px SUR TOUTES LES PAGES — le nom du produit, en pied de page.
  *
  * `.foot` vaut 11 px, et le `<small>` qu'il contient y applique le `smaller`

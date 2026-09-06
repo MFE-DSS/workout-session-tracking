@@ -143,8 +143,14 @@ Deux tranches indépendantes, la même nuit, sur le même trou. Le correctif
 ## 8. Vérifications
 
 `check_scope` **SHARED_CODE** · broad sweep ciblé · gardes de la tranche
-**5 vertes** · cliquet des styles inline resserré **20 → 0** sur
-`squad_detail.html` · ruff OK.
+**5 vertes** · cliquet des styles inline resserré sur les **deux** gabarits
+touchés — `squad_detail.html` **20 → 0**, `squads_list.html` **5 → 0** ·
+ruff OK.
+
+`squads_list.html` n'était pas au périmètre initial. Il y est entré parce que
+la tranche l'avait déjà édité — pour le libellé de rôle et le pluriel — et
+qu'y laisser cinq attributs `style` aurait été exactement la commodité que ce
+rapport reproche ailleurs. Rendu vérifié : **1,00 → 1,00 écran**, à l'identique.
 
 Rendu exposé (`§5.1`) avant/après sur `/squads/1`, avec les trois corrections
 lues dans le DOM plutôt que jugées à l'œil :
@@ -162,7 +168,7 @@ Hauteur **2,37 → 2,39 écrans** (+0,8 %).
 **LIVRÉ.** Un fil d'activité redevenu lisible, deux valeurs d'énumération
 sorties de l'écran, six conversions décimales artisanales remplacées par un
 filtre nommé, un texte remonté de 3,07 à 6,37 : 1, et vingt attributs `style`
-résorbés. Une violation de `Q7` constatée au rendu et portée à l'arbitrage
+résorbés sur deux gabarits. Une violation de `Q7` constatée au rendu et portée à l'arbitrage
 plutôt que devinée.
 
 ## 9. Ce qui reste ouvert
@@ -170,9 +176,6 @@ plutôt que devinée.
 * **les quatre aplats ambre** — arbitrage, voir `§5` ;
 * **l'échelle typographique de cet écran** — `<h2>` à 21 px hors de la classe
   promue ; demande de décider ce qu'est un `<h2>` de page ;
-* **`squads_list.html`** garde 5 attributs `style` : ils n'étaient pas dans le
-  périmètre mesuré de cette tranche, et les traiter au passage aurait élargi le
-  diff sans rendu de contrôle ;
 * **le tableau de classement est à l'étroit**, vu au rendu : « 586 pts » passe
   sur deux lignes, l'en-tête « Séances 14 j » aussi, et la colonne Grade rend
   une phrase de trois lignes. Six colonnes sur un écran de téléphone. Retirer
