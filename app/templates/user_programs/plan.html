@@ -250,7 +250,11 @@
   </p>
 
   {% if pref_saved %}
-  <p class="text-dim" style="font-size:12px;color:var(--good);">Préférences enregistrées.</p>
+  {# `--good` n'a jamais existé, et l'usage est NU : la déclaration devient
+     invalide au calcul, donc la confirmation restait grise — la couleur
+     n'était pas seulement fausse, elle était absente. L'état « bon » du
+     produit s'appelle `--ok`, à 5,69:1 sur la surface. #}
+  <p class="text-dim" style="font-size:12px;color:var(--ok);">Préférences enregistrées.</p>
   {% endif %}
   {% if pref_error %}
   <p class="text-dim" style="font-size:12px;color:var(--warn);">

@@ -4,6 +4,11 @@
 <h1 class="page-title">Publier — {{ program.title }}</h1>
 
 {% if success %}
+  {# `Sb_UI_PHANTOM_TOKENS_01` avait corrigé la COULEUR ici : `--success`
+     n'existe pas, c'est `#2e7d32` qui était peint, à 3,41:1 sur la surface —
+     sous AA. L'état « bon » du produit s'appelle `--ok`, et il mesure 5,69:1.
+     `.pd-success` porte désormais ce même `--ok` depuis la feuille, ce qui
+     retire aussi le dernier attribut `style` de ce gabarit. #}
   <p class="pd-success">{{ success }}</p>
 {% endif %}
 {% if error %}
