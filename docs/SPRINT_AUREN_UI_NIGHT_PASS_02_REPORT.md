@@ -114,7 +114,7 @@ diagnostiqué plutôt que « corrigé ». `CLAUDE.md §2` demande de distinguer 
 
 | | début | fin |
 |---|---|---|
-| attributs `style` statiques | **328** | **174** sur 30 gabarits |
+| attributs `style` statiques | **328** | **174** sur 30 gabarits — dont **119 seulement** sur une surface atteignable, voir `§8` |
 | pluriels au seuil anglais | 7 | **0**, gardés |
 | clés de programme rendues à l'écran | 6 relevées | **1** — `push_horizontal`, qui demande une taxonomie |
 | tokens fantômes peignant un repli | 16 sur 9 tokens | **0 hors viseur**, 5 exemptés avec leur raison |
@@ -169,13 +169,23 @@ la page**, seule façon de juger une échelle sur trois écrans et demi :
 
 ## 8. Ce qui reste ouvert, sans arbitrage requis
 
-* **174 attributs `style`** sur 30 gabarits. Les plus gros :
-  `body_overview` (21), `profile` (17), `dashboard` (13), `index` (13) ;
-* **`dashboard.html` n'est rendu par aucune route** — `/dashboard` redirige
-  vers `/progress` depuis `Sb_27.6`. Ses 13 attributs `style` sont de la dette
-  **morte** : les nettoyer déplacerait un cliquet sans améliorer un pixel, et
-  `§5.1` serait insatisfiable faute de rendu. La vraie question est s'il doit
-  être supprimé ;
+* **174 attributs `style`** — mais le nombre brut ment. Classés par
+  **atteignabilité**, ce qui change ce qu'il faut en faire :
+
+  | | |
+  |---|---|
+  | **30** | derrière un drapeau à `false` — `body_assessment/*`, dont le routeur rend **404** |
+  | **12** | `dashboard.html`, qu'**aucune route ne rend** : `/dashboard` redirige vers `/progress` depuis `Sb_27.6` |
+  | **13** | `index.html` — **les treize sont dans le widget « État du jour »**, décommissionné par l'amendement `Q3` |
+  | **119** | **réellement atteignable**, sur 26 gabarits |
+
+  Les 55 premiers ne se nettoient pas : `§5.1` y est insatisfiable faute de
+  rendu, et polir un widget qui part est du travail contre soi. Les vraies
+  questions sont ailleurs — faut-il **supprimer** `dashboard.html`, et le
+  drapeau `BODY_ASSESSMENT_ENABLED` a-t-il vocation à s'ouvrir ?
+
+  Sur les 119 atteignables, le plus gros poste est `profile.html` (**17**) —
+  précisément la surface en attente d'arbitrage ;
 * **150 replis de tokens décoratifs** — le token existe, le repli ne part
   jamais. Dette de style, pas défaut visuel : à résorber au fil des tranches ;
 * **les accents du catalogue** — `templates[10]`, trois chaînes. La garde de
