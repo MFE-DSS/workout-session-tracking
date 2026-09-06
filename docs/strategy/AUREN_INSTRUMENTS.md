@@ -341,14 +341,68 @@ suppressions sur quatre laissaient un trou et deviennent `DEFER` :**
 
 | Suppression | Verdict | Pourquoi |
 |---|---|---|
-| `accueil-etat` | **DEFER** | Une **lecture d'état dérivée** a été annoncée — des performances et des déclarations de fin de séance. Le produit perdrait quelque chose de **promis** |
+| `accueil-etat` | ~~DEFER~~ → **RETIRÉ** | **Clos par l'opérateur le 2026-09-06** — voir `§6.2bis` |
 | `social-partage` | **DEFER** | Part avec le lien d'invitation / partage système |
 | `profil-reference` | **DELETE confirmé** | Rien n'est perdu : le contenu est **redistribué** |
 | grade composite | **REMOVE confirmé** | Les diagnostics restent. Seule la **fausse précision** disparaît |
 
-**Conséquence de séquencement, à connaître avant de planifier MISSION :** la
-**règle de dérivation de l'état** n'est pas décidée, et elle est désormais un
-**prérequis** du retrait de `accueil-etat`.
+### 6.2bis Quatre questions CLOSES — arbitrage opérateur du 2026-09-06
+
+> **Ces quatre décisions ne se rouvrent pas.** Elles étaient présentées comme
+> des blocages dans les versions précédentes de ce document ; elles ont été
+> tranchées. Un document qui les dit encore ouvertes invite à les re-litiger.
+
+#### 1 · État global de l'utilisateur — **CLOS**
+
+`accueil-etat` **sort de l'ontologie cible de MISSION**, et il n'y a **pas** de
+score de préparation de remplacement à inventer.
+
+MISSION expose d'abord : **les faits pertinents · l'action suivante · la raison
+de la recommandation · l'incertitude quand elle est matérielle.**
+
+Un état global synthétique ne pourra revenir **que si un modèle validé est
+explicitement conçu**. *« Ne pas remplacer une abstraction faible par une
+autre. »* La « règle de dérivation de l'état » cesse donc d'être un prérequis :
+elle n'a plus d'objet.
+
+#### 2 · Consentement corporel — **CLOS, POLITIQUE PRODUIT**
+
+| Consentement actif **exigé** | Consentement actif **non exigé** |
+|---|---|
+| collecte · import · modification · traitement dérivé · usage dans les recommandations | **accès de l'utilisateur à ses données déjà détenues** · **export** · **suppression** |
+
+Le retrait du consentement **arrête les traitements et usages nouveaux ; il ne
+séquestre pas les données existantes de l'utilisateur.**
+
+⚠ La validation **juridique / vie privée** est signalée **séparément** et reste
+ouverte. La sémantique produit, elle, est tranchée.
+
+*(Le relevé de `§7.1` reste valide comme **constat d'écart** entre cette
+politique et le code : quatre routes modifient, suppriment ou exportent des
+mesures sans contrôle. L'écart est désormais mesurable contre une règle.)*
+
+#### 3 · Durée d'une séance — **CLOS**
+
+**Ne pas inventer de durée planifiée.** La durée **écoulée réelle** peut être
+exposée **uniquement** si de vrais horodatages de début et de fin la portent.
+
+Pour une séance **future** : **AUCUNE ESTIMATION**, tant qu'un estimateur validé
+n'existe pas. MISSION peut à la place utiliser le **nombre d'exercices**, le
+**nombre de séries de travail**, la **structure de charge**.
+
+> **La précision ne doit pas dépasser le modèle.**
+
+#### 4 · Programme actif — **CLOS**
+
+**« non archivé » n'est PAS « actif ».** Le triptyque `ACTIF / MIENS /
+CATALOGUE` **ne s'expose pas** avec la sémantique actuelle.
+
+Pour l'instant : **`MIENS` · `CATALOGUE`.**
+
+Si l'orchestration produit exige plus tard **un** programme gouvernant, il
+faudra introduire un `CURRENT_PROGRAM` / `SELECTED_PROGRAM` **explicite**, avec
+sa persistance et sa sémantique de propriété. **Ne pas aliaser un champ ancien
+dans le concept neuf.**
 
 ### 6.3 Les cinquante gabarits qui n'étaient pas dans l'inventaire
 
@@ -379,12 +433,12 @@ Ce tableau existe pour qu'aucune maquette n'affiche un nombre qui n'existe pas.
 
 | Trou | Bloque | État réel |
 |---|---|---|
-| **durée d'une séance** | MISSION · LOADOUT_BAY | **Aucune colonne** sur `WorkoutTemplate`, et rien ne l'estime. `UserProgramSession.duration_target_minutes` est une **cible déclarée**, jamais calculée ni vérifiée |
+| **durée d'une séance** *(clos — `§6.2bis`)* | MISSION · LOADOUT_BAY | **Aucune colonne** sur `WorkoutTemplate`, et rien ne l'estime. **Décision : aucune estimation** pour une séance future ; la durée écoulée réelle seulement si de vrais horodatages la portent. MISSION utilise le nombre d'exercices, de séries de travail, la structure de charge. *La précision ne doit pas dépasser le modèle.* |
 | **fenêtre 28 j** | BodyMap de FLIGHT_RECORDER | `zone_exposure.WINDOW_DAYS` est **fixe à 14** (`zone_exposure.py:50`). Les agrégats **par zone** sont bien calculés dans `recommendation._compute_signals` — 7 j (`hard_sets_by_zone_recent`, l. 288-294), 24 h (`hard_sets_by_zone_24h`, l. 296-302), 14 j (`hard_sets_14d_by_zone`, l. 304-314) — et **aucun ne sort du module** : le payload de `recommend_next_session` ne porte que `template` / `score` / `phrase` / `primary_zones` et un `context` de 4 clés. *(Noms corrigés : ni `hard_sets_by_zone_7j` ni `hard_sets_by_zone_14j` n'existent.)* |
-| **programme ACTIF** *(corrigé)* | LOADOUT_BAY | Ce qui manque n'est pas la liste, c'est la **distinction**. `GET /programs` (`user_programs.py:427-447`) existe, est montée et atteignable sous « Mes programmes » ; `list_drafts` rend les programmes **non archivés** — soit exactement ce que `MAX_ACTIVE_PROGRAMS` appelle « actifs ». Ce qui n'existe pas, c'est la notion d'**un** programme *actuellement suivi*, distinct des autres non archivés. Le triptyque `ACTIF / MIENS / CATALOGUE` bute là, pas sur l'absence de liste |
+| **programme ACTIF** *(clos — `§6.2bis`)* | LOADOUT_BAY | Ce qui manque n'est pas la liste, c'est la **distinction**. `GET /programs` existe et `list_drafts` rend les programmes **non archivés** — ce que `MAX_ACTIVE_PROGRAMS` appelle « actifs ». **Décision : « non archivé » n'est PAS « actif ».** Le triptyque ne s'expose pas ; on rend **`MIENS` · `CATALOGUE`**. Un `CURRENT_PROGRAM` explicite, persisté, viendra si l'orchestration l'exige — **sans aliaser un champ ancien** |
 | **progression intra-séance** | MISSION à l'état `LIVE` | `latest_open_session` rend l'entité ORM entière ; « X/Y séries » exige de charger `session_exercises → set_logs` |
 | **fraîcheur d'une donnée corporelle** | BODY_LEDGER | N'existe pas pour le corps. Patron réutilisable : `recovery_contract.Sufficiency` + `readiness_sufficiency_for_age` |
-| **règle de dérivation de l'état** | le retrait de `accueil-etat`, donc MISSION | ⚠ **décision produit non prise** |
+| ~~**règle de dérivation de l'état**~~ | ~~le retrait de `accueil-etat`~~ | ✅ **SANS OBJET — clos le 2026-09-06.** `accueil-etat` sort de l'ontologie cible et **aucun score de remplacement n'est à inventer**. Ce n'est plus un prérequis. Voir `§6.2bis` |
 
 ### 7.1 Deux contraintes dures sur BODY_LEDGER
 
