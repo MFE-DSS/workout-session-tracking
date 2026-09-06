@@ -10,8 +10,8 @@
     {% if leaderboard|length == 0 %}
       <p class="text-dim">Aucune séance terminée dans cette squad.</p>
     {% else %}
-      <div style="overflow-x:auto;">
-        <table class="stats-list" style="width:100%;">
+      <div class="sq-scroll">
+        <table class="stats-list sq-table">
           <thead>
             <tr>
               <th>#</th>
@@ -28,10 +28,10 @@
           </thead>
           <tbody>
             {% for e in leaderboard %}
-              <tr{% if e.username == current_username %} style="font-weight:600;"{% endif %}>
+              <tr{% if e.username == current_username %} class="sq-me"{% endif %}>
                 <td>{{ e.rank }}</td>
                 <td>{{ e.username }}</td>
-                <td>{{ e.total_points }} pts</td>
+                <td>{{ e.total_points | nombre_fr }} pts</td>
                 <td>{{ e.session_count }}</td>
                 <td><span class="grade-badge grade-badge--{{ e.grade|lower }}">{{ e.grade }}</span> {{ e.grade_label }}</td>
                 <td>{{ e.sessions_14d }}</td>
@@ -42,7 +42,7 @@
       </div>
     {% endif %}
     <!-- Challenges section -->
-    <h2 style="margin-top:2rem;">Challenges</h2>
+    <h2 class="sq-section">Challenges</h2>
     {% if challenges|length == 0 %}
       <p class="text-dim">Aucun challenge actif.</p>
     {% else %}
@@ -51,7 +51,7 @@
           {% if c.ends_at >= today %}
             <li>
               <a href="{{ url_for('squad_challenge_detail', squad_id=squad.id, challenge_id=c.id) }}">{{ c.title }}</a>
-              <span class="badge" style="background:var(--ok); color:#fff;">actif</span>
+              <span class="badge badge--actif">actif</span>
             </li>
           {% endif %}
         {% endfor %}
@@ -65,16 +65,16 @@
     </p>
 
     <!-- Compare link -->
-    <p style="margin-top:1rem;">
+    <p class="sq-action">
       <a class="btn btn--ghost" href="{{ url_for('squad_compare', squad_id=squad.id) }}">Comparer deux membres</a>
     </p>
 
     <!-- Activity feed -->
-    <h2 style="margin-top:2rem;">Activité</h2>
+    <h2 class="sq-section">Activité</h2>
     {% if activity|length == 0 %}
       <p class="text-dim">Aucune activité récente.</p>
     {% else %}
-      <ul class="stats-list">
+      <ul class="activity-feed">
         {% for item in activity %}
           {% if item.type == 'recommendation' %}
             <li>
@@ -98,9 +98,9 @@
     {% endif %}
 
     <!-- Recommend form -->
-    <h2 style="margin-top:2rem;">Recommander un template</h2>
-    <form method="post" action="{{ url_for('squad_recommend', squad_id=squad.id) }}" class="card" style="max-width:24rem;">
-      <div style="margin-bottom:.75rem;">
+    <h2 class="sq-section">Recommander un template</h2>
+    <form method="post" action="{{ url_for('squad_recommend', squad_id=squad.id) }}" class="card sq-form">
+      <div class="sq-field">
         <label for="rec-template"><strong>Template</strong></label><br>
         {# `Sb_UI_FORMULAIRES_01` — LE CHAMP CACHÉ ET SON JS DISPARAISSENT.
            Un `onchange` inline recopiait le TEXTE de l'option dans un champ
@@ -111,7 +111,7 @@
                         select_id="rec-template", required=True,
                         value_attr="slug", label_attr="name") }}
       </div>
-      <div style="margin-bottom:.75rem;">
+      <div class="sq-field">
         <label for="rec-note"><strong>Note (optionnel)</strong></label><br>
         {{ input_shell("note", input_id="rec-note") }}
       </div>
@@ -119,12 +119,12 @@
     </form>
 
     <!-- Share session form -->
-    <h2 style="margin-top:2rem;">Partager une séance</h2>
+    <h2 class="sq-section">Partager une séance</h2>
     {% if user_sessions|length == 0 %}
       <p class="text-dim">Aucune séance terminée à partager.</p>
     {% else %}
-      <form method="post" action="{{ url_for('squad_share_session', squad_id=squad.id) }}" class="card" style="max-width:24rem;">
-        <div style="margin-bottom:.75rem;">
+      <form method="post" action="{{ url_for('squad_share_session', squad_id=squad.id) }}" class="card sq-form">
+        <div class="sq-field">
           <label for="share-session"><strong>Séance</strong></label><br>
           {{ select_shell("session_id", user_sessions, select_id="share-session",
                           required=True, value_attr="id",
@@ -139,12 +139,12 @@
     <h2>Membres</h2>
     <ul class="stats-list">
       {% for m in members %}
-        <li>{{ m.username }} <span class="badge">{{ m.role }}</span></li>
+        <li>{{ m.username }} <span class="badge">{{ m.role | role_squad }}</span></li>
       {% endfor %}
     </ul>
 
     {% if membership and membership.role == 'owner' %}
-      <h3 style="margin-top:1.5rem;">Invitation</h3>
+      <h3 class="sq-sub">Invitation</h3>
       {% if latest_code %}
         <p>
           Code actif : <strong>{{ latest_code.code }}</strong><br>
@@ -154,16 +154,16 @@
         <p class="text-dim">Aucun code actif.</p>
       {% endif %}
       <form method="post" action="{{ url_for('squad_invite', squad_id=squad.id) }}">
-        <button type="submit" class="btn btn--primary" style="margin-top:.5rem;">Générer un code</button>
+        <button type="submit" class="btn btn--primary sq-action">Générer un code</button>
       </form>
 
-      <h3 style="margin-top:1.5rem;">Zone danger</h3>
+      <h3 class="sq-sub">Zone danger</h3>
       <form method="post" action="{{ url_for('squad_delete', squad_id=squad.id) }}"
             onsubmit="return confirm('Supprimer cette squad ? Cette action est irréversible.');">
-        <button type="submit" class="btn btn--ghost" style="color:var(--danger);">Supprimer la squad</button>
+        <button type="submit" class="btn btn--ghost sq-destroy">Supprimer la squad</button>
       </form>
     {% else %}
-      <form method="post" action="{{ url_for('squad_leave', squad_id=squad.id) }}" style="margin-top:1.5rem;"
+      <form method="post" action="{{ url_for('squad_leave', squad_id=squad.id) }}" class="sq-sub"
             onsubmit="return confirm('Quitter cette squad ?');">
         <button type="submit" class="btn btn--ghost">Quitter la squad</button>
       </form>
@@ -171,7 +171,7 @@
   </aside>
 </div>
 
-<p style="margin-top:1.5rem;">
+<p class="sq-back">
   <a class="btn btn--ghost" href="{{ url_for('squads_list') }}">← Retour aux squads</a>
 </p>
 {% endblock %}
