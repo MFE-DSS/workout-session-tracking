@@ -5,35 +5,12 @@
     "dashboard.html": 1
   },
   "static_debt": {
-    "_partials/zone_exposure.html": 1,
-    "atlas.html": 1,
-    "base.html": 1,
     "body_assessment/body_overview.html": 21,
     "body_assessment/measurement_form.html": 9,
-    "coach_report.html": 1,
-    "contact.html": 5,
     "dashboard.html": 12,
-    "export.html": 2,
     "index.html": 13,
-    "launcher.html": 7,
-    "library.html": 1,
-    "password_change.html": 5,
     "profile.html": 17,
     "readiness_history.html": 5,
-    "reset_password.html": 4,
-    "science.html": 4,
-    "session_detail.html": 4,
-    "session_done.html": 1,
-    "squad_challenge_create.html": 7,
-    "squad_challenge_detail.html": 4,
-    "squad_challenges.html": 4,
-    "squad_compare.html": 7,
-    "squad_create.html": 4,
-    "squad_join.html": 5,
-    "user_profile.html": 2,
-    "user_programs/list.html": 5,
-    "user_programs/new.html": 4,
-    "user_programs/plan.html": 9,
-    "welcome.html": 9
+    "session_detail.html": 4
   }
 }

@@ -106,7 +106,7 @@
       </p>
     {% else %}
       {# Repli : le compte, faute de mieux — jamais un cadre vide (`A4`). #}
-      <p class="text-dim" style="margin-bottom:.75rem;">
+      <p class="text-dim plan-note">
         {{ p.sessions }} séance{{ 's' if p.sessions > 1 }}/semaine ·
         {{ p.exercises }} exercice{{ 's' if p.exercises > 1 }} ·
         {{ p.planned_sets }} série{{ 's' if p.planned_sets > 1 }} planifiée{{ 's' if p.planned_sets > 1 }}
@@ -147,7 +147,7 @@
     <form method="post" action="{{ url_for('user_program_from_weekly_plan') }}">
       <button type="submit" class="btn btn--primary">Créer le programme proposé</button>
     </form>
-    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
+    <p class="text-dim plan-sub">
       Crée un <strong>brouillon</strong> modifiable. Rien n'est publié ni lancé sans ton accord.
     </p>
 
@@ -193,17 +193,17 @@
 {% if plan_explanation and plan_explanation.available %}
   <details class="why-plan">
     <summary class="why-plan__summary">Pourquoi ce plan ?</summary>
-    <ul style="margin:.25rem 0 .75rem 1.25rem;">
+    <ul class="plan-list">
       {% for item in plan_explanation.items %}
-        <li style="margin-bottom:.4rem;">
+        <li>
           {{ item.text }}
-          <span class="text-dim" style="display:block; font-size:.9em;">
+          <span class="text-dim plan-sub plan-sub--block">
             {{ item.source_label }}{% if item.detail %} — {{ item.detail }}{% endif %}{% if item.confidence_label %} ({{ item.confidence_label }}){% endif %}
           </span>
         </li>
       {% endfor %}
     </ul>
-    <p class="text-dim" style="margin:.5rem 0 0; font-size:.9em;">
+    <p class="text-dim plan-sub">
       {{ plan_explanation.notice }}
     </p>
   </details>
@@ -242,7 +242,7 @@
      compte vierge, la phrase pointait vers la ligne « Aucun plan proposé » :
      elle promettait un objet en montrant son absence. Vu à l'écran, pas dans
      le gabarit — un rendu vaut mieux qu'une relecture (`CLAUDE.md §5.1`). #}
-  <p class="text-dim" style="font-size:12px;margin:0 0 var(--space-sm);">
+  <p class="text-dim plan-meta">
     Ce que tu déclares ici — et rien d'autre —
     {% if weekly_plan_proposal %}produit le plan ci-dessus.
     {% else %}produira le plan proposé.{% endif %}
@@ -254,10 +254,10 @@
      invalide au calcul, donc la confirmation restait grise — la couleur
      n'était pas seulement fausse, elle était absente. L'état « bon » du
      produit s'appelle `--ok`, à 5,69:1 sur la surface. #}
-  <p class="text-dim" style="font-size:12px;color:var(--ok);">Préférences enregistrées.</p>
+  <p class="text-dim plan-meta--ok">Préférences enregistrées.</p>
   {% endif %}
   {% if pref_error %}
-  <p class="text-dim" style="font-size:12px;color:var(--warn);">
+  <p class="text-dim plan-meta--warn">
     Enregistrement refusé : une priorité est en double ou une valeur est hors liste.
   </p>
   {% endif %}

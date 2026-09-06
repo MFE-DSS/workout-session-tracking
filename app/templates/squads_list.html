@@ -2,7 +2,7 @@
 {% block content %}
 <h1 class="page-title">Squads</h1>
 
-<div class="sq-toolbar">
+<div class="page-toolbar">
   <a class="btn btn--primary" href="{{ url_for('squad_create') }}">Créer une squad</a>
   <a class="btn btn--ghost" href="{{ url_for('squad_join') }}">Rejoindre avec un code</a>
 </div>
@@ -10,14 +10,14 @@
 {% if squad_data|length == 0 %}
   <p class="text-dim">Vous n'êtes membre d'aucune squad.</p>
 {% else %}
-  <div class="sq-list">
+  <div class="card-stack">
     {% for item in squad_data %}
-      <a class="card sq-card" href="{{ url_for('squad_detail', squad_id=item.squad.id) }}">
-        <div class="sq-card__head">
+      <a class="card card--link" href="{{ url_for('squad_detail', squad_id=item.squad.id) }}">
+        <div class="card__head">
           <strong>{{ item.squad.name }}</strong>
           <span class="badge">{{ item.role | role_squad }}</span>
         </div>
-        <div class="text-dim sq-card__meta">
+        <div class="text-dim card__meta">
           {{ item.member_count }} {{ "membre" | pluriel(item.member_count) }}
           · créée le {{ (item.squad.created_at | local).strftime('%d/%m/%Y') }}
         </div>
