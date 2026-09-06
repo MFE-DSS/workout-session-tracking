@@ -5,17 +5,15 @@ Private: /logout, /profile, /profile/password
 """
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlalchemy import func, select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import select
 
 from app.config import get_settings
 from app.deps import CurrentUser, DbSession
-from app.models.session import SessionExercise, WorkoutSession
 from app.models.user import User
 from app.services.auth import (
     clear_session_cookie,
@@ -32,9 +30,7 @@ from app.services.password_policy import (
     is_password_too_long,
     validate_password_policy,
 )
-from app.services.quality_score import compute_session_quality
 from app.services.session_state import latest_open_session
-from app.services.timeline import TimelinePoint, build_quality_timeline_svg
 from app.templating import templates
 
 router = APIRouter(tags=["auth"])
@@ -355,66 +351,6 @@ def profile_page(
     db: DbSession,
     user: CurrentUser,
 ) -> HTMLResponse:
-    session_count = db.execute(
-        select(func.count(WorkoutSession.id))
-        .where(WorkoutSession.user_id == user.id)
-    ).scalar_one() or 0
-    completed_count = db.execute(
-        select(func.count(WorkoutSession.id))
-        .where(WorkoutSession.user_id == user.id)
-        .where(WorkoutSession.status == "completed")
-    ).scalar_one() or 0
-
-    # 30-day quality timeline
-    now = datetime.now(UTC)
-    window_30 = now - timedelta(days=30)
-    window_60 = now - timedelta(days=60)
-
-    sessions_30d = db.execute(
-        select(WorkoutSession)
-        .where(WorkoutSession.user_id == user.id)
-        .where(WorkoutSession.status == "completed")
-        .where(WorkoutSession.excluded_from_stats.is_(False))
-        .where(WorkoutSession.started_at >= window_30)
-        .order_by(WorkoutSession.started_at.asc())
-        .options(
-            selectinload(WorkoutSession.session_exercises)
-            .selectinload(SessionExercise.set_logs)
-        )
-    ).scalars().all()
-
-    from app.services.quality_score import session_kind as _session_kind
-    quality_points = [
-        TimelinePoint(
-            label=s.started_at.strftime("%d/%m"),
-            value=compute_session_quality(s),
-            kind=_session_kind(s),
-        )
-        for s in sessions_30d
-    ]
-    quality_svg = build_quality_timeline_svg(quality_points)
-    sessions_30d_count = len(sessions_30d)
-
-    # Trend: compare 30d count vs previous 30d
-    prev_30d_count = db.execute(
-        select(func.count(WorkoutSession.id))
-        .where(WorkoutSession.user_id == user.id)
-        .where(WorkoutSession.status == "completed")
-        .where(WorkoutSession.excluded_from_stats.is_(False))
-        .where(WorkoutSession.started_at >= window_60)
-        .where(WorkoutSession.started_at < window_30)
-    ).scalar_one() or 0
-
-    if sessions_30d_count > prev_30d_count:
-        trend = "up"
-        trend_label = "\u2191 en hausse"
-    elif sessions_30d_count < prev_30d_count:
-        trend = "down"
-        trend_label = "\u2193 en baisse"
-    else:
-        trend = "stable"
-        trend_label = "\u2192 stable"
-
     # `UX4_03B` — L'ÉTAT COMPORTEMENTAL N'EST PLUS CALCULÉ ICI.
     #
     # `UX4_01` a retiré les modules analytiques du Profil sans retirer le calcul
@@ -427,7 +363,20 @@ def profile_page(
     # quand le compte est vide — pouvait ressortir à l'écran par un simple
     # accès d'attribut depuis le gabarit. Couper l'alimentation ferme le risque
     # sans toucher au moteur, qui est gelé.
-    from app.models.catalog import WorkoutTemplate
+    #
+    # `CP-0` — LE MÊME OUBLI, SUR LA MÊME ROUTE, UNE SECONDE FOIS.
+    #
+    # Le paragraphe ci-dessus décrit `UX4_01` : des modules analytiques retirés
+    # de l'écran sans retirer le calcul qui les alimentait. Exactement le même
+    # défaut est réapparu depuis, sur dix autres clés de contexte — compteurs,
+    # timeline de qualité, tendance, dix courbes SVG par champ de mesure, et un
+    # chargement complet de la table des templates.
+    #
+    # Mesuré avant retrait : **22 requêtes SQL sur 27** servaient des clés
+    # qu'aucun gabarit ne lisait, et **aucun test du dépôt ne les observait**.
+    # C'est pourquoi le retrait part avec un cliquet de requêtes
+    # (`tests/test_profile_query_budget.py`) : la prose n'a pas suffi la
+    # première fois.
 
     # Body measurements.
     #
@@ -438,20 +387,15 @@ def profile_page(
     # form is allowed to persist. Rendering the form from anything else would
     # let it post a key the writer silently ignores.
     #
-    # `MEASUREMENT_FIELDS` stays the *display* set for charts and history, and
-    # it still contains the legacy `calf_cm`. New entries no longer write that
-    # column, but users who have years of it must keep seeing their curve —
-    # "historical data remains readable exactly as it is".
+    # ⚠ `MEASUREMENT_FIELDS` reste le jeu d'AFFICHAGE, et il porte encore le
+    # `calf_cm` historique — « historical data remains readable exactly as it
+    # is ». Seul son usage a rétréci : les dix courbes SVG et les templates
+    # liés qui le parcouraient n'atteignaient aucun œil.
     from app.services import body_profile as bp
     from app.services.measurements import (
         MEASUREMENT_FIELDS,
-        MEASUREMENT_LABELS,
-        MEASUREMENT_UNITS,
-        find_related_templates,
         get_latest_measurement,
-        get_measurement_series,
     )
-    from app.services.timeline import build_measurement_timeline_svg
 
     capture_fields = [(s.key, s.label) for s in bp.BODY_MEASUREMENT_FIELDS]
 
@@ -468,28 +412,6 @@ def profile_page(
             val = getattr(latest_measurement, field, None)
             latest_values[field] = str(val) if val is not None else ""
 
-    # Build per-field SVG charts
-    measurement_charts: dict[str, str] = {}
-    for field in MEASUREMENT_FIELDS:
-        series = get_measurement_series(db, user.id, field)
-        points = [
-            TimelinePoint(label=dt.strftime("%d/%m"), value=val)
-            for dt, val in series
-        ]
-        measurement_charts[field] = build_measurement_timeline_svg(
-            points, title=MEASUREMENT_LABELS[field],
-            unit=MEASUREMENT_UNITS.get(field, ""),
-        )
-
-    # Related templates per field
-    all_templates = list(db.execute(
-        select(WorkoutTemplate).order_by(WorkoutTemplate.slug)
-    ).scalars().all())
-    related_templates: dict[str, list[str]] = {
-        field: find_related_templates(field, all_templates)
-        for field in MEASUREMENT_FIELDS
-    }
-
     return templates.TemplateResponse(
         request, "profile.html",
         {
@@ -503,17 +425,7 @@ def profile_page(
             "measure_error": request.query_params.get("measure_error") == "1",
             "capture_fields": capture_fields,
             "morpho": morpho,
-            "session_count": session_count,
-            "completed_count": completed_count,
-            "quality_svg": quality_svg,
-            "sessions_30d_count": sessions_30d_count,
-            "trend": trend,
-            "trend_label": trend_label,
             "latest_values": latest_values,
-            "measurement_charts": measurement_charts,
-            "measurement_labels": MEASUREMENT_LABELS,
-            "measurement_fields": MEASUREMENT_FIELDS,
-            "related_templates": related_templates,
             "active_session": latest_open_session(db, user.id),
             # Sb_31.X — gate the Body Intelligence v2 discovery link.
             "body_intelligence_enabled": get_settings().body_intelligence_enabled,
