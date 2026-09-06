@@ -76,7 +76,11 @@
   border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
   border-left: 3px solid var(--fg-dim, #6b7280);
   border-radius: 6px;
-  background: var(--bg-elev, rgba(0, 0, 0, 0.02));
+  /* `--bg-elev` n'existe pas : c'est le repli qui peignait, et il est NOIR.
+   * Sur un produit sombre, un voile noir rend l'élément plus sombre que sa
+   * surface — l'élévation ne se produit pas. `--bg-soft` est le même voile,
+   * en blanc, dans le bon sens. */
+  background: var(--bg-soft);
 }
 
 .bi-priority--info { border-left-color: var(--accent, #2563eb); }
@@ -172,7 +176,10 @@
   font-weight: 500;
   padding: 2px 6px;
   border-radius: 4px;
-  background: var(--bg-elev, rgba(0, 0, 0, 0.04));
+  /* Même token fantôme, même voile noir. Les 2 % d'écart avec les cartes
+   * (0.04 contre 0.02) valent un ou deux points de RGB : ils ne justifient
+   * pas un second token. */
+  background: var(--bg-soft);
   color: var(--fg-dim, #6b7280);
 }
 .bi-block__classification--measured::before { content: "● "; }
@@ -310,7 +317,11 @@
   padding: 10px 12px;
   border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
   border-radius: 8px;
-  background: var(--bg-elev, rgba(0, 0, 0, 0.02));
+  /* `--bg-elev` n'existe pas : c'est le repli qui peignait, et il est NOIR.
+   * Sur un produit sombre, un voile noir rend l'élément plus sombre que sa
+   * surface — l'élévation ne se produit pas. `--bg-soft` est le même voile,
+   * en blanc, dans le bon sens. */
+  background: var(--bg-soft);
 }
 
 .zone-card__head {

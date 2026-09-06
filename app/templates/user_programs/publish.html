@@ -4,7 +4,10 @@
 <h1 class="page-title">Publier — {{ program.title }}</h1>
 
 {% if success %}
-  <p style="color:var(--success, #2e7d32); font-weight:600; margin-bottom:1rem;">{{ success }}</p>
+  {# `--success` n'existe pas : c'est `#2e7d32` qui était peint, à 3,41:1 sur
+     la surface — sous AA. L'état « bon » du produit s'appelle `--ok`, et il
+     mesure 5,69:1. Le moyen existait ; personne ne l'atteignait. #}
+  <p style="color:var(--ok); font-weight:600; margin-bottom:1rem;">{{ success }}</p>
 {% endif %}
 {% if error %}
   <p style="color:var(--danger); margin-bottom:1rem;">{{ error }}</p>
