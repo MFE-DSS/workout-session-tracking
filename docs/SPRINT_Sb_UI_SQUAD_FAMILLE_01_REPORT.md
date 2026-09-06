@@ -83,6 +83,29 @@ Le balayage de portée trouve **trois** cas au total. Les deux autres —
 et prennent le token dedans. Ce ne sont pas des défauts. *Sur trois
 accusations, une seule tenait.*
 
+## 5bis. Et une deuxième famille traitée aux deux tiers
+
+Le même constat, sur l'autre famille de la nuit. `Sb_UI_AUTH_01` avait traité
+`login` et `register` ; **`welcome` est resté** avec ses neuf attributs
+`style` — et sans l'accroche `Q1` que portent ses deux sœurs.
+
+C'est l'accueil **non authentifié**, celui que l'opérateur a nommé « la vraie
+première impression ».
+
+**Les neuf attributs partent. Aucune valeur n'est réglée**, et c'est délibéré :
+deux d'entre elles sont hors échelle et hors grille — le lede à **13 px**
+(entre BODY 15 et META 12) et le rembourrage bas à **60 px** (7,5 × 8). Les
+corriger serait re-régler une surface dont l'échelle est un arbitrage
+d'opérateur, pas une dette mécanique. Elles sont transposées **à l'identique**,
+avec l'avertissement écrit dans la feuille.
+
+**L'accroche manquante n'est pas ajoutée non plus** : mettre du texte sur la
+première impression du produit est une décision de contenu sur la surface la
+plus exposée. Signalée.
+
+Rendu : **932 px avant, 932 px après** · marque à `32px / 2.56px / center`
+inchangée · styles inline **9 → 0**.
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
@@ -98,7 +121,7 @@ accusations, une seule tenait.*
 ## 7. Vérifications
 
 `check_scope` **SHARED_CODE** · broad sweep ciblé : **162 tests** · cliquet des
-styles inline resserré **174 → 143** (24 gabarits) · ruff OK.
+styles inline resserré **174 → 134** (23 gabarits) · ruff OK.
 
 Rendu exposé (`§5.1`) depuis deux serveurs, sur les **cinq** routes
 atteignables de la famille :
@@ -126,4 +149,9 @@ qui l'avait laissée passer.
   dont un seul est un défaut ;
 * **`body_assessment/*`** — deux couleurs sous AA (`#a33` à 2,69, `#222` à
   1,10) sur des surfaces en 404. Ni livrables ni vérifiables tant que le
-  drapeau est fermé.
+  drapeau est fermé ;
+* **`welcome.html` n'a pas l'accroche `Q1`** que portent `login` et
+  `register`. Ajouter du texte à la première impression du produit est une
+  décision de contenu — signalée, pas prise ;
+* **deux valeurs hors échelle sur `welcome`** — lede 13 px, rembourrage bas
+  60 px — transposées à l'identique et documentées dans la feuille.

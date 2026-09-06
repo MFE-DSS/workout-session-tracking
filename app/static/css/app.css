@@ -5650,6 +5650,68 @@ summary:focus-visible,
  * une propriété du CODE, pas du clavier. */
 .sq-code { text-transform: uppercase; }
 
+/* ══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL NON AUTHENTIFIÉ — la « vraie première impression ».
+
+   `Sb_UI_AUTH_01` avait traité `login` et `register` ; `welcome` est resté
+   avec ses neuf attributs `style`. Troisième fois cette nuit qu'une famille
+   est traitée aux deux tiers.
+
+   ⚠ AUCUNE VALEUR N'EST RÉGLÉE ICI, et c'est délibéré. Deux d'entre elles
+   sont hors de l'échelle et hors grille — le lede à **13 px** (entre les rangs
+   BODY 15 et META 12) et le rembourrage bas à **60 px** (7,5 × 8). Les
+   corriger serait re-régler une surface que l'opérateur a nommée comme sa
+   première impression : c'est son arbitrage, pas une dette mécanique. Elles
+   sont donc transposées **à l'identique**, et signalées.
+   ══════════════════════════════════════════════════════════════════════════ */
+.welcome-page { padding-top: 40px; padding-bottom: 60px; }
+
+.welcome-head {
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+/* Le nom du produit, en capitales espacées : c'est une marque, pas un titre. */
+.welcome-mark {
+  font-size: 32px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  margin-bottom: var(--space-xs);
+}
+
+.welcome-alt { margin-top: var(--space-sm); }
+
+.welcome-section { max-width: 720px; margin: 0 auto; }
+
+.welcome-section__title {
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.welcome-lede {
+  font-size: 13px;          /* hors échelle — voir l'avertissement ci-dessus */
+  text-align: center;
+  max-width: 480px;
+  margin: 0 auto var(--space-lg);
+}
+
+.welcome-figure {
+  margin: 0;
+  padding: var(--space-md);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.welcome-figure img {
+  width: 100%;
+  height: auto;
+  max-width: 780px;
+  display: block;
+  margin: 0 auto;
+}
+
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
  * commodité que la tranche reproche ailleurs. */
