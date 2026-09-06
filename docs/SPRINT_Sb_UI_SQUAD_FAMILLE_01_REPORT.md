@@ -127,6 +127,50 @@ grille (`.75rem` → 8 px, retrait de liste `1.25rem` → 24 px).
 soit **12,6 px** sur un corps de 14. Comme pour `welcome`, régler l'échelle
 d'une surface est un arbitrage, pas une dette mécanique.
 
+## 5quater. La discipline s'est appliquée à moi une quatrième fois
+
+En écrivant `§5ter`, j'ai affirmé que la famille `user_programs/*` était close.
+**Elle ne l'était pas** : `list.html` (5) et `new.html` (4) en font partie.
+
+J'allais livrer un rapport qui déclare complète une famille qui ne l'est pas,
+**dans la tranche même qui dénonce ce mode**. Trouvé en listant le cliquet, pas
+en relisant ma prose.
+
+### Le second consommateur prouve que la classe est générique
+
+Les neuf attributs correspondaient **exactement** à des classes écrites deux
+heures plus tôt pour `squads_list` et `squad_create` : mêmes barres d'outils,
+mêmes piles de cartes cliquables, mêmes panneaux de formulaire. Deux
+fonctionnalités sans rapport, la même forme de page.
+
+Leur préfixe disait pourtant `sq-`. Plutôt que de coller « squad » sur une page
+de programmes — ce que j'ai assumé pour `.pd-*`, faute d'un second
+consommateur —, elles sont **renommées**, parce que cette fois la preuve
+existe :
+
+| Avant | Après |
+|---|---|
+| `.sq-toolbar` | `.page-toolbar` |
+| `.sq-list` | `.card-stack` |
+| `.sq-card` | `.card--link` |
+| `.sq-card__head` · `.sq-card__meta` | `.card__head` · `.card__meta` |
+| `.sq-panel` · `.sq-panel--wide` | `.form-panel` · `.form-panel--wide` |
+| `.sq-back` | `.page-back` |
+
+Neuf fichiers touchés par le renommage. **Un renommage manqué d'un côté rend
+une page non stylée en HTTP 200** — donc vérifié au style calculé, pas au code
+de statut :
+
+| Sonde | avant | après |
+|---|---|---|
+| carte cliquable `/squads` | `block/none/398px` | `block/none/398px` |
+| pile `/squads` | `flex/none/398px` | `flex/none/398px` |
+| carte cliquable `/programs` | `block/none/398px` | `block/none/398px` |
+| panneau `/squads/create` | `392px` | `392px` |
+
+Et un **test de fumée sur 28 routes**, des deux côtés : `28/28` en 200, zéro
+erreur JavaScript, styles inline cumulés **87 → 47**.
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
@@ -142,7 +186,7 @@ d'une surface est un arbitrage, pas une dette mécanique.
 ## 7. Vérifications
 
 `check_scope` **SHARED_CODE** · broad sweep ciblé : **162 tests** · cliquet des
-styles inline resserré **174 → 125** (22 gabarits) · ruff OK.
+styles inline resserré **174 → 116** (20 gabarits) · ruff OK.
 
 Rendu exposé (`§5.1`) depuis deux serveurs, sur les **cinq** routes
 atteignables de la famille :

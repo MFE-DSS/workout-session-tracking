@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="page-title">Comparer &middot; {{ squad.name }}</h1>
 
-<form method="get" action="{{ url_for('squad_compare', squad_id=squad.id) }}" class="card sq-panel--wide">
+<form method="get" action="{{ url_for('squad_compare', squad_id=squad.id) }}" class="card form-panel--wide">
   <div class="sq-row-form">
     <div class="sq-row-form__col">
       <label for="a"><strong>Membre A</strong></label><br>
@@ -24,7 +24,7 @@
 </form>
 
 {% if comparison %}
-  <div class="sq-scroll sq-back">
+  <div class="sq-scroll page-back">
     <table class="stats-list sq-table">
       <thead>
         <tr>
@@ -50,7 +50,7 @@
   </div>
 {% endif %}
 
-<p class="sq-back">
+<p class="page-back">
   <a class="btn btn--ghost" href="{{ url_for('squad_detail', squad_id=squad.id) }}">&larr; Retour à la squad</a>
 </p>
 {% endblock %}

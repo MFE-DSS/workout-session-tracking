@@ -5610,7 +5610,7 @@ summary:focus-visible,
 .sq-form { max-width: 24rem; }
 .sq-field { margin-bottom: var(--space-sm); }
 .sq-action { margin-top: var(--space-sm); }
-.sq-back { margin-top: var(--space-lg); }
+.page-back { margin-top: var(--space-lg); }
 
 /* Un badge d'état « actif » — vert plein. Le texte y était `#fff`, mesuré à
  * **3,07:1** sur `--ok` : sous AA. Le produit possède déjà la couleur du texte
@@ -5629,8 +5629,8 @@ summary:focus-visible,
  * heures de plus. C'est le mode d'échec « une décision appliquée là où c'était
  * commode », commis sur ma propre correction.
  */
-.sq-panel { max-width: 28rem; }
-.sq-panel--wide { max-width: 32rem; }
+.form-panel { max-width: 28rem; }
+.form-panel--wide { max-width: 32rem; }
 
 /* Un message d'erreur sans espacement propre — il vit déjà dans un bloc qui
  * l'espace. Distinct de `.pd-error`, qui porte sa marge basse. */
@@ -5735,26 +5735,26 @@ summary:focus-visible,
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
  * commodité que la tranche reproche ailleurs. */
-.sq-toolbar {
+.page-toolbar {
   display: flex;
   gap: var(--space-sm);
   margin-bottom: var(--space-lg);
 }
 
-.sq-list {
+.card-stack {
   display: flex;
   flex-direction: column;
   gap: var(--space-md);
 }
 
 /* Une carte entièrement cliquable : elle ne se peint pas comme un lien. */
-.sq-card { text-decoration: none; color: inherit; }
-.sq-card__head {
+.card--link { text-decoration: none; color: inherit; }
+.card__head {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.sq-card__meta { margin-top: var(--space-xs); }
+.card__meta { margin-top: var(--space-xs); }
 /* ── La famille couvre désormais l'ÉDITEUR ENTIER, pas sa seule page de détail.
  *
  * Ses quatre pages sœurs — qualité, publication, génération, plan — écrivaient

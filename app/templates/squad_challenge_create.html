@@ -7,7 +7,7 @@
   <p class="sq-error--strong">{{ error }}</p>
 {% endif %}
 
-<form method="post" action="{{ url_for('squad_challenge_create_post', squad_id=squad.id) }}" class="card sq-panel">
+<form method="post" action="{{ url_for('squad_challenge_create_post', squad_id=squad.id) }}" class="card form-panel">
   <div class="sq-field">
     <label for="title"><strong>Titre</strong></label><br>
     {{ input_shell("title", input_id="title", required=True) }}
@@ -28,7 +28,7 @@
   <button type="submit" class="btn btn--primary">Créer le challenge</button>
 </form>
 
-<p class="sq-back">
+<p class="page-back">
   <a class="btn btn--ghost" href="{{ url_for('squad_challenges', squad_id=squad.id) }}">&larr; Retour aux challenges</a>
 </p>
 {% endblock %}

@@ -6,7 +6,7 @@
   <p class="pd-error">{{ error }}</p>
 {% endif %}
 
-<form method="post" action="{{ url_for('squad_join_post') }}" class="card sq-panel">
+<form method="post" action="{{ url_for('squad_join_post') }}" class="card form-panel">
   <div class="field">
     <label class="field__label" for="code">Code d'invitation</label>
     <input type="text" id="code" name="code" required placeholder="SPGN-XXXX" class="field__input sq-code" />
@@ -14,7 +14,7 @@
   <button type="submit" class="btn btn--primary pd-block">Rejoindre</button>
 </form>
 
-<p class="sq-back">
+<p class="page-back">
   <a class="btn btn--ghost" href="{{ url_for('squads_list') }}">← Retour</a>
 </p>
 {% endblock %}
