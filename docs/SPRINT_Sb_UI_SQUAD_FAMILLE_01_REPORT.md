@@ -216,6 +216,26 @@ reste **deux instances** sur des surfaces que cette tranche ne touche pas
 Sur **quinze routes comparées**, un seul écart de hauteur — celui de `/plan`,
 déjà expliqué. Zéro erreur JavaScript des deux côtés.
 
+## 5sexies. Où en est la dette, une fois classée honnêtement
+
+**Cliquet : 174 → 89** sur 14 gabarits. Le nombre brut ment toujours ; classé
+par ce qu'on peut réellement en faire :
+
+| | |
+|---|---|
+| **60** | surfaces en **404** derrière un drapeau, ou **décommissionnées** — `body_assessment/*` (30), `dashboard` (12), le widget « État du jour » d'`index` (13) et son historique `readiness_history` (5) |
+| **17** | `profile.html` — en attente d'arbitrage |
+| **4** | `session_detail.html` — le viseur, interdit |
+| **8** | **réellement actionnables**, sur 7 gabarits : `user_profile` (2) et six singletons |
+
+⚠ **J'ai d'abord annoncé treize.** `readiness_history` rend le barème 1-à-5 de
+l'« État du jour », et son unique point d'entrée est le widget que
+l'amendement `Q3` décommissionne. Il part avec lui. Vérifié après avoir publié
+le chiffre — *le classement par atteignabilité vaut d'être refait, pas
+recopié.*
+
+Depuis le début du programme : **328 → 8 actionnables.**
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
