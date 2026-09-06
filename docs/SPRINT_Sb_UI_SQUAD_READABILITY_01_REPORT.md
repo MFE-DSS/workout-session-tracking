@@ -173,6 +173,12 @@ plutôt que devinée.
 * **`squads_list.html`** garde 5 attributs `style` : ils n'étaient pas dans le
   périmètre mesuré de cette tranche, et les traiter au passage aurait élargi le
   diff sans rendu de contrôle ;
+* **le tableau de classement est à l'étroit**, vu au rendu : « 586 pts » passe
+  sur deux lignes, l'en-tête « Séances 14 j » aussi, et la colonne Grade rend
+  une phrase de trois lignes. Six colonnes sur un écran de téléphone. Retirer
+  le zéro décimal l'a marginalement soulagé, **ça ne le résout pas** — c'est un
+  problème de nombre de colonnes, donc une décision sur ce que le classement
+  doit montrer ;
 * **le cliquet ambre ne juge pas ce qu'il gèle.** Son commentaire le dit ; son
   nom ne le dit pas. Une garde qui compte par gabarit ne remplacera jamais un
   regard sur l'écran — et c'est précisément ce que `CLAUDE.md §5.1` exige.
