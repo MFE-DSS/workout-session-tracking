@@ -236,6 +236,62 @@ recopié.*
 
 Depuis le début du programme : **328 → 8 actionnables.**
 
+## 5septies. Les huit derniers — la dette actionnable tombe à zéro
+
+Après le classement du `§5sexies`, huit attributs restaient prenables. Ils le
+sont.
+
+Quatre d'entre eux **portaient déjà une classe** qui n'avait pas leurs
+propriétés — `.atlas-version`, `.user-profile__notice`, `.user-profile--v2` :
+la classe existait, la déclaration vivait à côté. Les autres reçoivent une
+classe nommée : `.svg-sprite`, `.inline-form`, `.library-section`,
+`.coach-note`.
+
+Deux restes hors échelle, tous deux manqués par **mes propres tranches** :
+
+* `session_done.html` rendait « (indicatif) » à **11 px**, sous le rang META —
+  alors que `Sb_UI_SESSION_DONE_01` avait mis cet écran à l'échelle E3 ;
+* `coach_report.html` avait une note à **13 px**, entre META et BODY.
+
+Les deux rejoignent META (12). Le second explique l'unique écart de hauteur
+inattendu du balayage final : `/coach-report` perd **4 px**, parce que ce
+paragraphe court sur trois lignes.
+
+### Ce que la mesure a révélé au passage
+
+**Deux autres paragraphes de `/coach-report` restent à 13 px** — dans des
+classes, pas des attributs. Le cliquet ne les voit pas : *il compte des
+attributs, pas des valeurs hors échelle.* Retirer les styles inline ne met pas
+une surface à l'échelle ; ce sont deux chantiers distincts, et seul le premier
+a un cliquet.
+
+### Balayage final, 31 routes
+
+| | avant | après |
+|---|---|---|
+| routes en 200 | **30/31** | **30/31** |
+| styles inline rendus, cumulés | **123** | **34** |
+| erreurs JavaScript | aucune | aucune |
+| écarts de hauteur sur 30 routes | — | **2**, tous deux comptés (`/plan` +1, `/coach-report` −4) |
+
+Les 34 restants sont exactement : `/profile` (17, en attente d'arbitrage), le
+widget décommissionné de l'accueil (13), et **4 largeurs de barre dynamiques**
+du rapport coach, qui sont légitimes.
+
+### La dette, à la fin
+
+**81 attributs sur 7 gabarits — et aucun n'est actionnable :**
+
+| | |
+|---|---|
+| **30** | `body_assessment/*` — routeur en **404** derrière `BODY_ASSESSMENT_ENABLED` |
+| **18** | `index` + `readiness_history` — la fonctionnalité **décommissionnée** par `Q3` |
+| **17** | `profile.html` — **ton arbitrage** |
+| **12** | `dashboard.html` — **aucune route ne le rend** |
+| **4** | `session_detail.html` — **le viseur, interdit** |
+
+**328 → 81, dont 0 actionnable.**
+
 ## 6. Relecture du relevé de décisions (`CLAUDE.md §5.2`)
 
 | Décision | Verdict |
@@ -251,7 +307,7 @@ Depuis le début du programme : **328 → 8 actionnables.**
 ## 7. Vérifications
 
 `check_scope` **SHARED_CODE** · broad sweep ciblé : **162 tests** · cliquet des
-styles inline resserré **174 → 89** (14 gabarits) · ruff OK.
+styles inline resserré **174 → 81** (7 gabarits, tous bloqués) · ruff OK.
 
 Rendu exposé (`§5.1`) depuis deux serveurs, sur les **cinq** routes
 atteignables de la famille :

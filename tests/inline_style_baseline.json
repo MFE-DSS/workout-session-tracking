@@ -5,19 +5,12 @@
     "dashboard.html": 1
   },
   "static_debt": {
-    "_partials/zone_exposure.html": 1,
-    "atlas.html": 1,
-    "base.html": 1,
     "body_assessment/body_overview.html": 21,
     "body_assessment/measurement_form.html": 9,
-    "coach_report.html": 1,
     "dashboard.html": 12,
     "index.html": 13,
-    "library.html": 1,
     "profile.html": 17,
     "readiness_history.html": 5,
-    "session_detail.html": 4,
-    "session_done.html": 1,
-    "user_profile.html": 2
+    "session_detail.html": 4
   }
 }

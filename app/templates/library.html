@@ -69,7 +69,7 @@
 
 {% for section_key, section_label in sections %}
   {% if section_key in grouped %}
-  <section style="margin-bottom: var(--space-xl);">
+  <section class="library-section">
     <h2 class="section-header">{{ section_label }}</h2>
     <ul class="template-list">
       {% for tpl in grouped[section_key] %}

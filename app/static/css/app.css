@@ -1118,6 +1118,8 @@ input, button, textarea, select {
 }
 .user-profile__notice {
   text-align: center;
+  font-size: 12px;                /* rang META */
+  margin-top: var(--space-md);
 }
 
 /* Sb_22b v2 — L3 profile page additions. */
@@ -5795,6 +5797,35 @@ summary:focus-visible,
   text-align: center;
   margin-top: var(--space-sm);
 }
+
+/* ── LES HUIT DERNIERS. Ce qui reste après cette tranche n'est plus
+ * actionnable : 60 attributs vivent sur des surfaces en 404 ou
+ * décommissionnées, 17 sur `/profile` en attente d'arbitrage, 4 dans le viseur
+ * interdit. Ceux-ci sont les derniers qu'on pouvait prendre. */
+
+/* Un porte-sprite SVG : présent dans le flux, invisible et hors mise en page. */
+.svg-sprite { position: absolute; }
+
+/* Un formulaire réduit à son bouton, posé dans une ligne de texte. */
+.inline-form { display: inline; }
+
+/* La version de l'atlas, en pied de page. */
+.atlas-version {
+  font-size: 12px;                /* rang META */
+  text-align: center;
+  margin-top: var(--space-lg);
+}
+
+/* Une carte de profil public, détachée de ce qui la précède. */
+.user-profile--v2 { margin-top: var(--space-md); }
+
+/* Une section de la bibliothèque, séparée de la suivante. */
+.library-section { margin-bottom: var(--space-xl); }
+
+/* Une note de bas de bloc du rapport coach.
+ * ⚠ Elle valait 13 px — hors échelle. Elle rejoint META (12), le rang que
+ * `Q6` prévoit pour une note de provenance. */
+.coach-note { font-size: 12px; margin: var(--space-xs) 0 0; }
 
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la

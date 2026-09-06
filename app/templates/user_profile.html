@@ -8,7 +8,7 @@
 
 <a class="text-muted" href="{{ url_for('leaderboard_page') }}">← Retour au classement</a>
 
-<div class="card user-profile user-profile--v2" style="margin-top:var(--space-md);">
+<div class="card user-profile user-profile--v2">
   <header class="user-profile__head">
     <h1 class="user-profile__name">@{{ target.username }}</h1>
     <span class="grade-badge grade-badge--{{ grade|lower }}">{{ grade }}</span>
@@ -116,7 +116,7 @@
   </div>
   {% endif %}
 
-  <p class="text-dim user-profile__notice" style="font-size:12px;margin-top:var(--space-md);">
+  <p class="text-dim user-profile__notice">
     Profil public · activité agrégée uniquement · aucune donnée par séance
   </p>
 </div>
