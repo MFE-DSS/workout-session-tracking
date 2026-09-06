@@ -11,15 +11,15 @@
   {% if challenge.ends_at < today %}
     <span class="badge">Terminé</span>
   {% else %}
-    <span class="badge" style="background:var(--ok); color:#fff;">actif</span>
+    <span class="badge badge--actif">actif</span>
   {% endif %}
 </p>
 
 {% if standings|length == 0 %}
   <p class="text-dim">Aucune donnée pour ce challenge.</p>
 {% else %}
-  <div style="overflow-x:auto;">
-    <table class="stats-list" style="width:100%;">
+  <div class="sq-scroll">
+    <table class="stats-list sq-table">
       <thead>
         <tr>
           <th>#</th>
@@ -40,7 +40,7 @@
   </div>
 {% endif %}
 
-<p style="margin-top:1.5rem;">
+<p class="sq-back">
   <a class="btn btn--ghost" href="{{ url_for('squad_challenges', squad_id=squad.id) }}">&larr; Retour aux challenges</a>
 </p>
 {% endblock %}

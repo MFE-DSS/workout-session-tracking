@@ -5620,6 +5620,36 @@ summary:focus-visible,
 /* La suppression est un texte de rang 3, pas un bouton de commande. */
 .sq-destroy { color: var(--danger); }
 
+/* ── Le RESTE de la famille squad — six gabarits laissés de côté par
+ * `Sb_UI_SQUAD_READABILITY_01`, qui n'avait traité que le détail et la liste.
+ *
+ * S'arrêter là aurait été la commodité que cette tranche-là reprochait : le
+ * badge « actif » y écrivait `color:#fff` sur `--ok`, mesuré à **3,07:1**, et
+ * je l'ai corrigé sur UNE surface sur trois. Les deux autres l'ont gardé six
+ * heures de plus. C'est le mode d'échec « une décision appliquée là où c'était
+ * commode », commis sur ma propre correction.
+ */
+.sq-panel { max-width: 28rem; }
+.sq-panel--wide { max-width: 32rem; }
+
+/* Un message d'erreur sans espacement propre — il vit déjà dans un bloc qui
+ * l'espace. Distinct de `.pd-error`, qui porte sa marge basse. */
+.sq-error--strong { color: var(--danger); font-weight: 600; }
+
+/* Deux sélecteurs côte à côte qui se partagent la largeur, et passent à la
+ * ligne plutôt que de se comprimer sous 8rem. */
+.sq-row-form {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  align-items: end;
+}
+.sq-row-form__col { flex: 1; min-width: 8rem; }
+
+/* Un code d'invitation se saisit en capitales quoi qu'on tape. La casse est
+ * une propriété du CODE, pas du clavier. */
+.sq-code { text-transform: uppercase; }
+
 /* ── La liste des squads. Le gabarit était déjà touché par cette tranche
  * (libellé de rôle, pluriel) : y laisser cinq attributs `style` aurait été la
  * commodité que la tranche reproche ailleurs. */
