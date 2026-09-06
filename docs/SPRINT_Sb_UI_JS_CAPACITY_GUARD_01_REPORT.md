@@ -244,3 +244,63 @@ suppression part sans confirmation et le bouton « Imprimer » est un contrôle
 mort — pas dégradé, mort. Aucun n'est une garde de sécurité : la propriété est
 vérifiée côté serveur. C'est une tranche à part, et elle demande de trancher ce
 qu'on fait d'un bouton d'impression sans script.
+
+---
+
+## Appendice de clôture — post-merge
+
+| | |
+|---|---|
+| **PR** | [#219](https://github.com/MFE-DSS/workout-session-tracking/pull/219) |
+| **Méthode** | `--merge`, `--match-head-commit 837eb2d` — pas de squash, pas de `--admin`, pas de force |
+| **Commit de merge** | `7a37092` |
+| **CI de PR** | 7/7 verts — shards à 8 min 22, 9 min 42 et 8 min 28 |
+| **Gate Sonar** | `OK` — 0 bug, 0 code smell, 0 vulnérabilité, **duplication 0,0 %** sur le code neuf |
+| **Fils de revue non résolus** | 0 |
+| **Sweep large** — les 64 consommateurs de `tests/helpers.py` | couvert par la CI de PR (3 shards sur la suite entière) |
+
+### ⚠ La CI canonique de ce merge a été ANNULÉE — et c'est normal
+
+Le run sur `7a37092` porte la conclusion **`cancelled`**, pas `success`. Ce n'est
+pas un échec : le merge de la PR #218 est arrivé quelques secondes plus tard, et le
+groupe de concurrence du workflow annule le run en cours au profit du plus récent.
+
+**La source de vérité est le run sur `793be86`** —
+[`run 34029186636`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/34029186636),
+**success**, et ce commit **contient** `7a37092`. Vérifié, pas supposé.
+
+C'est exactement la distinction que `CLAUDE.md §2` demande de faire : *une annulation
+d'infrastructure n'est pas un échec de test*. Un `cancelled` lu trop vite aurait
+déclenché une cascade de fixes sur une tranche saine.
+
+### Ce que la tranche a réellement livré
+
+| | |
+|---|---|
+| Gardes converties | **16**, dans 16 fichiers, sous 4 formes d'assertion |
+| Implémentations | **1** — `tests/helpers.py` |
+| Tests perdus | **0** |
+| Fichiers d'application touchés | **0** |
+| Quatrième script bénin planté | **391 passés** — le verrou est levé |
+| Quatrième script fautif planté | **16 échecs** — les seize mordent |
+
+### Ce qui reste ouvert, et qui appelle une décision
+
+**Les 5 attributs `on*=`, recomptés à la main :**
+
+| Gabarit | Handler | Sans JS |
+|---|---|---|
+| `squad_detail.html:162` | `onsubmit="return confirm('Supprimer cette squad ?…')"` | **supprime sans confirmer** |
+| `squad_detail.html:167` | `onsubmit="return confirm('Quitter cette squad ?')"` | **quitte sans confirmer** |
+| `history.html:113` | `onsubmit="return confirm('Supprimer définitivement…')"` | **supprime sans confirmer** |
+| `admin_sessions.html:42` | idem — hors produit utilisateur | idem |
+| `coach_report.html:17` | `onclick="window.print()"` | **bouton mort**, pas dégradé |
+
+Trois **actions destructives** perdent leur confirmation, et un bouton devient inerte.
+Aucun n'est une garde de sécurité — la propriété est vérifiée côté serveur. Mais
+`AUREN_VISUAL_BACKBONE §5bis` dit que le SSR est la ligne de base fonctionnelle : un
+bouton qui ne fait rien sans script n'est pas une amélioration progressive, c'est un
+contrôle cassé. **Tranche à part, décision à prendre.**
+
+**Branche `sb/js-capacity-guard` : NON supprimée.** `CLAUDE.md §2` réserve la
+suppression de branche/worktree à une action humaine.

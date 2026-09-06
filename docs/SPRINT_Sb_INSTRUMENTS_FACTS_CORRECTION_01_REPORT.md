@@ -181,3 +181,35 @@ Reste ouvert, et nommé : **le périmètre du consentement corporel** est
 maintenant décrit exactement, et il appelle une décision produit — édition,
 suppression et export de mesures sont ouverts alors que la création est gardée.
 C'est le seul état qui ne se défende pas.
+
+---
+
+## Appendice de clôture — post-merge
+
+| | |
+|---|---|
+| **PR** | [#220](https://github.com/MFE-DSS/workout-session-tracking/pull/220) |
+| **Méthode** | `--merge`, `--match-head-commit 70182f4` |
+| **Commit de merge** | `f712786` |
+| **CI de PR** | 10/10 verts |
+| **Gate Sonar** | `OK` |
+| **Fils de revue non résolus** | 0 |
+| **CI canonique** | tranche 100 % `docs/` — la CI au push est **légitimement skippée** par `paths-ignore: ['docs/**']`. Ce n'est pas un `[skip ci]` manuel (`CLAUDE.md §2`). Source de vérité : la CI de PR, 10/10 |
+
+### Un écart de pratique à signaler, que je n'ai pas comblé seul
+
+`docs/strategy/SPEC_REGISTRY.md §8` demande que le registry soit mis à jour
+**« à la fermeture d'un sprint », « dans le même commit que le sprint report »**.
+
+Relevé : **aucune des ~15 dernières tranches du programme UI n'y figure** — ni
+`Sb_UI_SQUAD_FAMILLE_01`, ni `Sb_UI_PHANTOM_TOKENS_01`, ni les autres. La pratique
+a cessé sans être abrogée.
+
+Je ne l'ai **pas ravivée pour mes trois tranches seules** : inscrire trois sprints
+dans un registre qui en ignore quinze produirait un registre plus trompeur que
+vide — il donnerait l'impression que les quinze autres n'existent pas. C'est la
+même erreur de forme que la « famille aux deux tiers ».
+
+**C'est une décision d'opérateur** : soit le registry est réanimé et rattrapé sur
+les quinze, soit `§8` est amendé pour dire ce qui est réellement pratiqué. Les deux
+se défendent ; l'état actuel — une règle écrite que rien n'applique — ne se défend pas.
