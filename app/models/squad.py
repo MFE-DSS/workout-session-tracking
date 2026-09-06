@@ -14,6 +14,18 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
+#: Les rôles tels que l'utilisateur les LIT. Les clés restent `owner` et
+#: `member` : elles vivent en base et le code compare dessus
+#: (`membership.role == 'owner'`). Ce sont des identifiants, pas des mots.
+#:
+#: La table vit ICI, dans le module qui déclare la colonne. Les séparer
+#: garantirait qu'elles divergent — c'est la raison écrite dans
+#: `Sb_UI_SESSION_DONE_01` pour `LEVEL_LABELS`, et elle vaut autant ici.
+SQUAD_ROLE_LABELS: dict[str, str] = {
+    "owner": "Propriétaire",
+    "member": "Membre",
+}
+
 
 class Squad(Base):
     __tablename__ = "squads"

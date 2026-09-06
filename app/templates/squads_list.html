@@ -15,10 +15,10 @@
       <a class="card" href="{{ url_for('squad_detail', squad_id=item.squad.id) }}" style="text-decoration:none; color:inherit;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <strong>{{ item.squad.name }}</strong>
-          <span class="badge">{{ item.role }}</span>
+          <span class="badge">{{ item.role | role_squad }}</span>
         </div>
         <div class="text-dim" style="margin-top:.25rem;">
-          {{ item.member_count }} membre{% if item.member_count > 1 %}s{% endif %}
+          {{ item.member_count }} {{ "membre" | pluriel(item.member_count) }}
           · créée le {{ (item.squad.created_at | local).strftime('%d/%m/%Y') }}
         </div>
       </a>

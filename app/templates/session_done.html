@@ -45,7 +45,9 @@
              reste de la ligne était déjà en français, y compris la virgule
              décimale — seul le nom du champ avait échappé à la traduction. #}
           <span>Poids de corps</span>
-          <b>{{ "%.1f"|format(recap.summary.bodyweight_kg)|replace('.', ',') }} kg</b>
+          {# `nombre_fr(1)` et non le défaut : le dixième d'un poids de corps a
+             été MESURÉ, il ne s'escamote pas. « 75,0 kg » est une lecture. #}
+          <b>{{ recap.summary.bodyweight_kg | nombre_fr(1) }} kg</b>
         </li>
       {% endif %}
       {# ⚠ CES DEUX LIGNES RENDAIENT DES CLÉS DE PROGRAMME.
@@ -102,7 +104,7 @@
         <span class="top-progression__name">{{ tp.name }}</span>
         {% if tp.weight_delta is not none and tp.weight_delta > 0 %}
           {# Même virgule : « +57.0 kg » sur un écran qui écrit « 75,6 kg ». #}
-          <span class="top-progression__delta">+{{ tp.weight_delta | round(1) | string | replace(".", ",") }} kg</span>
+          <span class="top-progression__delta">+{{ tp.weight_delta | nombre_fr }} kg</span>
         {% endif %}
         {% if tp.reps_delta is not none and tp.reps_delta > 0 %}
           <span class="top-progression__delta">+{{ tp.reps_delta }} reps</span>
