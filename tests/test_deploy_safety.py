@@ -296,3 +296,102 @@ def test_workflow_stays_dispatch_only_with_production_approval():
     trigger_block = src[: src.index("permissions:")]
     assert "\n  push:" not in trigger_block
     assert "\n  schedule:" not in trigger_block
+
+
+# ───────── 4. Le rapport d'échec ne ment pas sur l'état de la prod ─────────
+#
+# Sb_OPS_DEPLOY_FAILURE_HONESTY_01.
+#
+# Le 2026-09-06, un dispatch a échoué au CHECKOUT — un SHA court là où l'entrée
+# exige 40 caractères. Les étapes SSH sont restées `skipped` : aucun octet n'a
+# quitté le runner. Le rapport annonçait pourtant, mot pour mot :
+#
+#     X SHA  — VPS left in partial state, investigate via SSH.
+#
+# Il affirmait un état de la PRODUCTION qu'il n'avait aucun moyen de connaître,
+# et imprimait un SHA vide. Lu de bonne foi, il envoie ouvrir une session SSH
+# sur la production pour enquêter sur une panne inexistante.
+#
+# Ces gardes exécutent LE script réellement embarqué dans le YAML — pas une
+# copie de sa logique. Trois sondes recopiées ont déjà divergé dans ce dépôt ;
+# une quatrième copie ici garderait le souvenir du script, pas le script.
+
+
+def _bloc_run(nom_etape: str) -> str:
+    """Le `run:` de l'étape nommée, extrait du workflow réel."""
+    import yaml
+
+    doc = yaml.safe_load(_src(_WORKFLOW))
+    etape = next(
+        s for s in doc["jobs"]["deploy"]["steps"] if s["name"] == nom_etape
+    )
+    return etape["run"]
+
+
+def _rapporter(**etat: str) -> str:
+    """Exécute le rapport d'échec sous un état d'étapes donné."""
+    import tempfile
+
+    script = _bloc_run("Report failure")
+    assert "${{" not in script, (
+        "le bloc `run` porte une expression Actions non résolue : elle ne "
+        "serait évaluée que sur le runner, donc jamais gardée ici"
+    )
+    with tempfile.NamedTemporaryFile("w", suffix=".sh", delete=False) as f:
+        f.write(script)
+        chemin = f.name
+    base = {"FULL_SHA": "", "REF_DEMANDE": "", "POUSSAGE": "", "SMOKE": ""}
+    r = subprocess.run(
+        ["bash", chemin],
+        env={"PATH": "/usr/bin:/bin", **base, **etat},
+        capture_output=True,
+        text=True,
+    )
+    assert r.returncode == 1, "un rapport d'échec doit toujours sortir en échec"
+    return r.stdout + r.stderr
+
+
+def test_les_etapes_ssh_sont_identifiables_par_le_rapport():
+    """Sans `id`, le rapport ne peut RIEN lire — il ne peut que supposer."""
+    import yaml
+
+    doc = yaml.safe_load(_src(_WORKFLOW))
+    ids = {s.get("id") for s in doc["jobs"]["deploy"]["steps"]}
+    assert "push_to_vps" in ids
+    assert "smoke" in ids
+
+
+def test_un_checkout_rate_declare_la_production_intacte():
+    """Le défaut d'origine, replanté en entier."""
+    sortie = _rapporter(REF_DEMANDE="91fe01d", POUSSAGE="")
+    assert "INTACTE" in sortie
+    assert "partial state" not in sortie
+    # La réf demandée remplace le SHA vide : « SHA  — » ne doit plus exister.
+    assert "91fe01d" in sortie
+    assert "::error title=Deploy failed:: —" not in sortie
+
+
+def test_un_poussage_interrompu_avoue_l_etat_partiel():
+    sortie = _rapporter(FULL_SHA="a" * 40, POUSSAGE="failure")
+    assert "à moitié posée" in sortie
+    assert "INTACTE" not in sortie
+
+
+def test_un_smoke_rouge_apres_poussage_reussi_presse_le_rollback():
+    """Le seul cas où la production est vraiment en danger."""
+    sortie = _rapporter(FULL_SHA="a" * 40, POUSSAGE="success", SMOKE="failure")
+    assert "EST déployé" in sortie
+    assert "URGENT" in sortie
+    assert "INTACTE" not in sortie
+
+
+def test_un_echec_apres_le_smoke_ne_reclame_aucun_rollback():
+    sortie = _rapporter(FULL_SHA="a" * 40, POUSSAGE="success", SMOKE="success")
+    assert "Aucun rollback requis" in sortie
+    assert "URGENT" not in sortie
+
+
+def test_le_rapport_n_imprime_jamais_une_cible_vide():
+    """Ni SHA résolu, ni réf demandée : il le DIT au lieu d'afficher un blanc."""
+    sortie = _rapporter(POUSSAGE="skipped")
+    assert "aucune réf résolue" in sortie
