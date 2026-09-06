@@ -14,10 +14,14 @@ vérifiée verte** à chaque fois.
 | `#210` | Tokens fantômes | deux couleurs jamais choisies, une **jamais peinte du tout** | `b5109f1` |
 | `#197` | Closeout de la veille | ouvert depuis 16 h, vert, propre, jamais mergé | `cae3c72` |
 | `#211` | Éditeur de programmes | cinquante attributs `style` alors que le vocabulaire existait | `61d7393` |
-| `#212` | Surface sociale | un fil d'activité **rendu en colonnes sans espaces** | *(en vol)* |
+| `#212` | Surface sociale | un fil d'activité **rendu en colonnes sans espaces** | `1009001` |
+| `#213` | Seuil de pluriel | « 0 séance**s** » sept fois, et trois clés de programme sur un **profil public** | *(en vol)* |
 
 Plus les tranches de la première moitié de nuit (`#198`–`#206`), couvertes par
 leurs rapports respectifs.
+
+**Smoke test final** : 21 routes rendues, **21 en 200**, zéro erreur
+JavaScript.
 
 ## 2. Le diagnostic, seizième à vingtième occurrence
 
@@ -32,6 +36,8 @@ l'appliquer.*
 | « 586.0 pts » | la décision existait, appliquée en **trois orthographes** et oubliée sur la quatrième surface |
 | `owner` / `member` bruts | le patron `LEVEL_LABELS` venait d'être posé — **là où je regardais** |
 | `color:#fff` sur un aplat vert, **3,07 : 1** | `--on-accent`, **6,37 : 1** sur le même fond |
+| « 0 séance**s** », sept fois | le filtre `pluriel` **documente ce défaut dans sa propre docstring** |
+| `pecs` / `back_width` sur un profil **public** | `RADAR_AXES` porte les libellés, dans le module que le service **importe déjà** |
 
 ### Deux formes plus vicieuses que l'absence
 
@@ -109,6 +115,8 @@ diagnostiqué plutôt que « corrigé ». `CLAUDE.md §2` demande de distinguer 
 | | début | fin |
 |---|---|---|
 | attributs `style` statiques | **328** | **174** sur 30 gabarits |
+| pluriels au seuil anglais | 7 | **0**, gardés |
+| clés de programme rendues à l'écran | 6 relevées | **1** — `push_horizontal`, qui demande une taxonomie |
 | tokens fantômes peignant un repli | 16 sur 9 tokens | **0 hors viseur**, 5 exemptés avec leur raison |
 | titres de bloc sous leur propre corps | 101 usages documentés | **0** — `.section-header` promu au rang SECTION sur 11 gabarits |
 | orthographes de la virgule décimale | 3, plus une surface sans rien | **1 filtre** |
@@ -177,11 +185,19 @@ la page**, seule façon de juger une échelle sur trois écrans et demi :
 * **`/body/intelligence` répond 404** derrière son drapeau : le correctif
   `--bg-elev` y est écrit et mesuré mais **non vérifié au rendu** ;
 * **le tableau de classement squad** — six colonnes sur un téléphone ;
-* **`.btn` à 14 px** — primitive partagée, à trancher globalement.
+* **`.btn` à 14 px** — primitive partagée, à trancher globalement ;
+* **`push_horizontal` sur un profil public** — pas de table de libellés, et
+  l'espace de clés mélange patterns, familles d'exercices et variantes
+  d'isolation sur **dix-neuf chaînes**. En créer une demande de trancher une
+  taxonomie, pas de traduire un mot ;
+* **aucune garde ne surveille les anglicismes en général**, et c'est
+  volontaire : la liste étroite de `#213` est extensible, une garde large
+  accuserait « squad », « template » et « Challenges » — des noms de produit
+  que l'opérateur a choisi de garder.
 
 ## Verdict
 
-**LIVRÉ.** Sept tranches mergées cette nuit avec la porte complète, une en vol.
+**LIVRÉ.** Huit tranches mergées cette nuit avec la porte complète, une en vol.
 La dette d'attributs `style` a perdu **47 %**. Le défaut le plus cité du socle
 visuel est fermé **en classe**, sur onze gabarits à la fois plutôt que sur la
 surface commode.
