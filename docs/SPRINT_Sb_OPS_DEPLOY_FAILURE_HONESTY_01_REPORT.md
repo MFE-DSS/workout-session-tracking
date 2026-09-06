@@ -167,3 +167,38 @@ Reste ouvert, et nommé : **l'entrée `ref` accepte toujours un SHA court sans l
 valider** — la cause du dispatch raté. La corriger demande de trancher si un nom de
 branche reste accepté, comme la description de l'entrée le promet aujourd'hui.
 C'est une décision, pas un oubli.
+
+---
+
+## Appendice de clôture — post-merge
+
+| | |
+|---|---|
+| **PR** | [#218](https://github.com/MFE-DSS/workout-session-tracking/pull/218) |
+| **Méthode** | `--merge`, `--match-head-commit a3254ca` — pas de squash, pas de `--admin`, pas de force |
+| **Commit de merge** | `793be86` |
+| **CI de PR** | 7/7 verts (3 shards · QA · lint · attestation · Gitar) |
+| **Gate Sonar** | `OK` — 0 bug, 0 code smell, 0 vulnérabilité sur le code neuf |
+| **Fils de revue non résolus** | 0 |
+| **CI canonique** | [`run 34029186636`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/34029186636) sur `793be86` — **success** |
+| **Full sweep local** (exigé par le tier `CI_INFRA`) | **81 lots verts · 324/324 fichiers · pic 2309 Mo sur un budget de 2619** |
+
+### Un incident de parcours, pour mémoire
+
+La PR a d'abord rougi sur `spec protocol check` : la section **Verdict** manquait au
+rapport. Cause exacte — j'avais lancé `check_spec_protocol.py` **avant** d'écrire le
+rapport, donc sur un dépôt qui n'avait pas encore le fichier. Le contrôle passait sur
+une absence.
+
+*Leçon d'ordonnancement : les contrôles se lancent après que TOUS les fichiers de la
+tranche sont écrits, jamais entre deux.* Corrigé par `a3254ca`.
+
+### Ce qui reste ouvert
+
+L'entrée `ref` du workflow accepte toujours un **SHA court** sans le valider — c'est
+la cause du dispatch raté qui a révélé ce défaut. Le message d'échec le rappelle
+désormais, mais la validation au dispatch demande de trancher si un **nom de branche**
+reste accepté, comme la description de l'entrée le promet aujourd'hui.
+
+**Branche `sb/deploy-failure-honesty` et worktree `-dep` : NON supprimés.**
+`CLAUDE.md §2` réserve la suppression de branche/worktree à une action humaine.
