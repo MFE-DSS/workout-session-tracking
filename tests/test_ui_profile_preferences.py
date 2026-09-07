@@ -175,9 +175,28 @@ def test_the_enhancement_script_is_deferred_and_dependency_free():
         encoding="utf-8")
     for banned in ("import ", "require(", "from '", 'from "', "http://", "https://"):
         assert banned not in js
-    tpl = (root / "app" / "templates" / "profile.html").read_text(encoding="utf-8")
+    # ⚠ `UI-CP1` — CETTE GARDE ÉPINGLAIT LE MAUVAIS GABARIT, ET RESTAIT VERTE.
+    #
+    # Elle vérifiait le script sur `profile.html`. Or `UX4_02` / TRAIN 2 a
+    # déplacé l'éditeur de préférences vers **Mon plan** et n'a PAS emmené le
+    # script : mesuré au moment de la refonte du Profil, les TROIS points
+    # d'accroche du script — `data-prefs-form`, `data-prefs-ranked`,
+    # `data-focus-key` — vivent dans `user_programs/plan.html`, qui ne le
+    # chargeait pas, tandis que `profile.html` le chargeait sans en porter un
+    # seul. L'amélioration progressive était donc INERTE depuis TRAIN 2, et
+    # cette garde n'a rien vu parce qu'elle observait un gabarit sans rapport.
+    #
+    # Une garde doit regarder là où la capacité vit, pas là où elle vivait.
+    tpl = (root / "app" / "templates" / "user_programs" / "plan.html").read_text(
+        encoding="utf-8")
     assert "defer" in tpl
     assert "prefs_focus_rank.js" in tpl
+    # Et le gabarit chargé est bien celui qui porte les points d'accroche :
+    # sans cette vérification, la garde pourrait de nouveau dériver en silence.
+    for accroche in ("data-prefs-form", "data-prefs-ranked", "data-focus-key"):
+        assert accroche in tpl, (
+            f"le script est chargé sur un gabarit sans {accroche}"
+        )
 
 
 def test_the_script_only_writes_into_the_native_selects():

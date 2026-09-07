@@ -156,17 +156,33 @@ def _uncommented(src: str) -> str:
 def test_the_profile_opens_on_what_auren_knows(client):
     """L'état lisible précède l'édition. C'est ce qui remplace la
     soustraction : le Profil répond « qu'est-ce qu'AUREN sait de moi ? » avant
-    de proposer de le modifier."""
+    de proposer de le modifier.
+
+    `UI-CP1` — CETTE GARDE ENCODAIT L'ANCIENNE ONTOLOGIE, ET IL FAUT LE DIRE.
+
+    Elle exigeait `body.count('class="pstate') >= 3` : **trois domaines**, à
+    savoir Corps, Entraînement et Compte. C'était le comptage d'un MOYEN — une
+    classe — et il gravait dans un test la structure même que BODY_LEDGER
+    défait : un instrument répond à UNE question, et le compte n'y est plus au
+    repos. Laisser cette garde aurait interdit la direction que l'opérateur a
+    approuvée, sans protéger l'invariant qu'elle prétendait tenir.
+
+    L'INVARIANT, lui, ne bouge pas : **la page répond avant de demander**. Il
+    est désormais vérifié directement sur l'ordre du document, ce qui ne
+    dépend d'aucune convention de classe et vaut sur les trois états de
+    données — y compris le profil vide, où la réponse est « non pesé ».
+    """
     body = client.get("/profile").text
-    assert "pstate" in body, "aucun bloc d'état lisible rendu"
-    # Trois domaines, pas un bloc unique : Corps, Entraînement, Compte.
-    #
-    # ⚠ Le message d'échec passait par une f-string avec échappement et
-    # réutilisation du guillemet extérieur : valide en 3.12+, SYNTAXE INVALIDE
-    # sur le Python 3.11 de la CI. Le poste tourne en 3.14, donc les tests
-    # passaient en local et la CI aurait cassé à la collecte.
-    domains = body.count('class="pstate')
-    assert domains >= 3, f"seulement {domains} domaine(s) d'état lisible"
+    assert 'class="body-ledger"' in body, "aucun instrument corporel rendu"
+    # ⚠ SCOPÉ À L'INSTRUMENT. La coque rend un `form` de déconnexion AVANT
+    # `main` : mesuré ici même, la première écriture de cette garde comparait
+    # la réponse primaire à ce formulaire-là et accusait le cockpit d'un
+    # défaut appartenant au rail de navigation.
+    instrument = body[body.index('class="body-ledger"'):]
+    assert "bl-answer__readout" in instrument, "aucune réponse primaire rendue"
+    assert instrument.index("bl-answer__readout") < instrument.index("<form"), (
+        "un formulaire précède la lecture — la page demande avant de répondre"
+    )
 
 
 def test_every_acquisition_form_sits_behind_an_explicit_update(client):
@@ -185,25 +201,52 @@ def test_every_acquisition_form_sits_behind_an_explicit_update(client):
     #
     # C'est la faute que ce dépôt paie en boucle : épingler une ÉCRITURE au lieu
     # d'une PROPRIÉTÉ interdit le refactoring sans rien garder de plus.
-    disclosures = len(re.findall(r'class="[^"]*\bpstate__edit\b', src))
-    # `UX4_02` / TRAIN 2 — le seuil passe de 3 à 2 : l'éditeur de préférences a
-    # quitté le Profil pour **Mon plan**. Ce n'est PAS un assouplissement de la
-    # règle — la règle est l'invariant `disclosures >= acquisition` juste en
-    # dessous, inchangé, et il vaut aussi sur `/plan` (garde jumelle dans
-    # `test_train2_mon_plan`). Le seuil, lui, reste un cliquet : il interdit
-    # qu'un formulaire disparaisse en silence du Profil.
+    # ⚠ `UI-CP1` — LE COMPTAGE NE TENAIT PAS L'INVARIANT QU'IL ANNONÇAIT, et
+    # c'est une PLANTATION DU DÉFAUT qui l'a montré, pas une relecture.
+    #
+    # L'invariant était `disclosures >= acquisition`. Il compare deux TOTAUX,
+    # donc il ne dit rien sur l'imbrication : un tiroir SANS formulaire — le
+    # tiroir « Compte », arrivé avec BODY_LEDGER — gonfle le membre de gauche
+    # et paie pour un formulaire resté à découvert. Mesuré : en sortant le
+    # formulaire de données de référence de son tiroir, le compte tombait de
+    # 3 à 2 pour 2 formulaires, et la garde restait VERTE.
+    #
+    # La propriété réelle est l'IMBRICATION. On la vérifie en suivant la
+    # profondeur des `details` : tout formulaire d'acquisition doit s'ouvrir
+    # à une profondeur d'au moins un.
+    profondeur = 0
+    decouverts = []
+    for m in re.finditer(r"<details\b|</details>|<form\b[^>]*>", src):
+        jeton = m.group(0)
+        if jeton == "<details":
+            profondeur += 1
+        elif jeton == "</details>":
+            profondeur = max(profondeur - 1, 0)
+        elif 'class="quicklog"' not in jeton and profondeur == 0:
+            decouverts.append(src[m.start():m.start() + 80].replace("\n", " "))
     assert acquisition >= 2, f"seulement {acquisition} formulaires d'acquisition"
-    assert disclosures >= acquisition, (
-        f"{acquisition} formulaires pour {disclosures} déclencheurs — un "
-        "formulaire est resté à découvert"
+    assert not decouverts, (
+        f"{len(decouverts)} formulaire(s) d'acquisition hors tiroir : {decouverts}"
     )
 
 
 def test_no_acquisition_form_is_open_by_default(client):
-    """Un `<details open>` rendrait le regroupement décoratif."""
+    """Un `details` ouvert rendrait le regroupement décoratif.
+
+    `UI-CP1` — la garde cherchait deux ÉCRITURES exactes autour du jeton
+    `pstate__edit`. Ce jeton ayant disparu avec la refonte, elle serait
+    devenue verte pour la mauvaise raison : elle n'aurait plus rien trouvé,
+    donc plus rien gardé. C'est la quatorzième forme relevée dans ce dépôt de
+    « garde qui ne garde rien ».
+
+    Elle interdit désormais TOUT `details` ouvert sur la surface, quelle que
+    soit la classe et quel que soit l'ordre des attributs — ce qui est à la
+    fois plus large et exactement la règle du cockpit : l'édition n'apparaît
+    qu'après une intention explicite.
+    """
     body = client.get("/profile").text
-    assert "pstate__edit\" open" not in body
-    assert 'open class="pstate__edit"' not in body
+    ouverts = re.findall(r"<details[^>]*\sopen[\s>]", body)
+    assert not ouverts, f"{len(ouverts)} tiroir(s) ouvert(s) au repos : {ouverts}"
 
 
 def test_nothing_was_removed_except_the_decided_field(client):
@@ -367,9 +410,19 @@ def test_no_boxed_region_is_a_pure_grouping(client):
 
 
 def test_every_state_section_is_flat(client):
-    """Un état sans contrôle ne mérite pas de boîte."""
+    """Un état sans contrôle ne mérite pas de boîte.
+
+    `UI-CP1` — la garde tolérait UNE carte d'état (`class="card pstate"`) et
+    interdisait les suivantes. BODY_LEDGER n'en garde aucune : la structure
+    est faite de bandes, de filets et de blanc, et « un cockpit ne doit pas
+    devenir une grande carte contenant de petites cartes ».
+
+    Le seuil descend donc de « au plus une » à « aucune ». Une garde qui se
+    resserre n'est pas une garde qu'on affaiblit.
+    """
     body = client.get("/profile").text
-    assert "pstate--flat" in body
-    assert 'class="card pstate' not in body.replace('class="card pstate"', "", 1), (
-        "plus d'un état lisible porte encore un cadre"
+    encadrees = re.findall(r'class="card[ "]', body)
+    assert not encadrees, (
+        f"{len(encadrees)} région(s) encadrée(s) sur un instrument qui n'en "
+        "prévoit aucune"
     )

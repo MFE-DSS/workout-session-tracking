@@ -98,13 +98,18 @@ def test_no_forbidden_wording_on_profile_around_body_intel_card(client):
     """Scan la carte Body Intelligence du profil pour les wordings
     interdits du brief Sb_31.next.profile-link."""
     body = client.get("/profile").text.lower()
-    m = re.search(
-        r'<div class="card profile-body-intel-link">.*?</div>',
-        body,
-        re.DOTALL,
-    )
-    assert m is not None, "profile-body-intel-link card not found"
-    block = m.group(0)
+    # `UI-CP1` — LE PÉRIMÈTRE PASSE DE LA CARTE À LA PAGE, ET C'EST PLUS DUR.
+    #
+    # La garde découpait `<div class="card profile-body-intel-link">…</div>`.
+    # BODY_LEDGER dissout les cartes : le lien de découverte est une bande de
+    # l'instrument. Rescoper sur la nouvelle classe aurait reproduit le même
+    # défaut — une garde qui ne regarde qu'un cadre.
+    #
+    # La CAPACITÉ est « AUREN n'affirme jamais un diagnostic sur le profil ».
+    # Elle vaut pour la page entière, pas pour un bloc : une formulation
+    # interdite qui aurait migré vers la bande voisine échappait à l'ancien
+    # découpage. Le nouveau l'attrape.
+    block = body
     forbidden = (
         "ton physique est",
         "analyse morphologique",

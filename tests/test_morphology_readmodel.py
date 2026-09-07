@@ -16,6 +16,12 @@ import pytest
 PROFILE_URL = "/profile"
 MORPHO_TITLE = "Mesures morphologiques"
 WINGSPAN_MISSING = "Envergure non renseignée"
+#: `UI-CP1` — la morphologie n'a plus de carte à elle : elle est une bande du
+#: relevé corporel. C'est l'instrument entier qui sert de périmètre
+#: d'inspection, et il est nommé par sa classe racine plutôt que par un titre
+#: de carte — un titre est une formulation, une racine d'instrument est une
+#: structure.
+LEDGER_ANCHOR = 'class="body-ledger"'
 
 
 @pytest.fixture(autouse=True)
@@ -66,9 +72,27 @@ def _readmodel():
 
 
 def _section(client) -> str:
-    """The morphology card only, so neighbouring copy cannot mask a defect."""
+    """L'INSTRUMENT CORPOREL ENTIER — successeur de la carte morphologique.
+
+    `UI-CP1` — CE QUI A CHANGÉ, ET POURQUOI CE N'EST PAS UN AFFAIBLISSEMENT.
+
+    Cette fonction découpait la page à partir du titre « Mesures
+    morphologiques », c'est-à-dire à partir d'une CARTE. BODY_LEDGER dissout
+    cette carte par conception : la morphologie n'est plus un bloc à côté des
+    autres, c'est une bande du relevé corporel. Le point d'ancrage devait donc
+    suivre l'objet, sinon trente et une gardes tombaient d'un coup en accusant
+    un défaut qui n'existe pas.
+
+    La docstring d'origine justifiait le découpage par « pour que la prose
+    voisine ne masque pas un défaut ». Élargir à l'instrument entier ne peut
+    RIEN masquer : c'est un sur-ensemble strict de ce qui était inspecté. Une
+    formulation interdite qui aurait migré vers une bande voisine est
+    désormais attrapée, alors qu'elle échappait à l'ancien découpage.
+
+    La garde est donc plus large qu'avant, pas plus permissive.
+    """
     page = client.get(PROFILE_URL).text
-    start = page.index(MORPHO_TITLE)
+    start = page.index(LEDGER_ANCHOR)
     return page[start:page.index("</section>", start)]
 
 
@@ -82,6 +106,24 @@ def _visible_text(client) -> str:
     import re
 
     return re.sub(r"<[^>]+>", " ", _section(client))
+
+
+def _readouts(client) -> str:
+    """Les BANDES DE RELEVÉ seules — sans le rail de tiroirs.
+
+    `UI-CP1` — l'invariant « aucune valeur inventée » porte sur ce que
+    l'instrument AFFIRME du corps, pas sur tout ce que la page contient. En
+    élargissant le périmètre d'inspection à l'instrument entier, la date
+    d'inscription du compte — un fait réel, ni corporel ni inventé — entrait
+    dans le champ d'un test qui interdit tout chiffre à l'état vide.
+
+    Découper avant le rail garde la garde exactement sur son objet.
+    """
+    import re
+
+    section = _section(client)
+    bandes = section.split('class="bl-drawers"', 1)[0]
+    return re.sub(r"<[^>]+>", " ", bandes)
 
 
 # ── États de données ─────────────────────────────────────────────────────────
@@ -103,9 +145,10 @@ def test_a_new_user_sees_the_surface_without_inventing_a_single_value(client):
     """
     section = _section(client)
     assert "Aucune mesure morphologique" in section
-    # Aucune valeur inventée : pas un seul chiffre dans l'état vide.
+    # Aucune valeur inventée : pas un seul chiffre dans les RELEVÉS à l'état
+    # vide. Le rail de tiroirs est hors champ — voir `_readouts`.
     import re
-    assert not re.search(r"\d", _visible_text(client)), (
+    assert not re.search(r"\d", _readouts(client)), (
         "un nombre apparaît alors qu'aucune mesure n'existe"
     )
 
@@ -311,7 +354,19 @@ def test_the_surface_promises_no_planner_effect(client, promise):
 
 
 def test_the_surface_lives_on_the_existing_profile_page(client):
-    assert MORPHO_TITLE in client.get(PROFILE_URL).text
+    """Aucune route dédiée : la morphologie se lit sur `/profile`.
+
+    `UI-CP1` — la garde vérifiait la présence d'un TITRE DE CARTE. Le titre a
+    disparu avec la carte ; le fait, lui, doit toujours être rendu là. On
+    vérifie donc le FAIT et non son cadre : un tour de taille saisi doit
+    apparaître avec sa valeur sur la page du profil.
+    """
+    with _session() as db:
+        _add(db, _uid(), waist_cm=80.0)
+    page = client.get(PROFILE_URL).text
+    assert LEDGER_ANCHOR in page, "l'instrument corporel n'est pas rendu"
+    assert "Tour de taille" in page
+    assert "80.0" in page, "la valeur mesurée n'atteint pas l'écran"
 
 
 def test_no_dedicated_morphology_route_is_added(client):
@@ -320,18 +375,51 @@ def test_no_dedicated_morphology_route_is_added(client):
 
 
 def test_the_section_is_labelled_for_assistive_technology(client):
+    """L'instrument et chacune de ses bandes portent un nom accessible.
+
+    `UI-CP1` — la garde épinglait `aria-labelledby="morpho-title"`, l'écriture
+    exacte d'UNE carte. La CAPACITÉ — un lecteur d'écran sait ce qu'il lit —
+    est vérifiée ici sur l'instrument ET sur ses relevés, donc sur davantage
+    de choses qu'avant.
+    """
+    with _session() as db:
+        _add(db, _uid(), waist_cm=80.0)
     page = client.get(PROFILE_URL).text
-    assert 'aria-labelledby="morpho-title"' in page
-    assert 'id="morpho-title"' in page
+    assert 'aria-label="Ce qu\'AUREN sait de ton corps"' in page, (
+        "l'instrument n'a pas de nom accessible"
+    )
+    for ancre in ('aria-labelledby="bl-measured"', 'id="bl-measured"'):
+        assert ancre in page, f"la bande de relevé n'est pas nommée : {ancre}"
 
 
-def test_the_table_has_scoped_headers_and_a_caption(client):
+def test_each_measured_fact_is_associated_with_its_value(client):
+    """LA CAPACITÉ QUE LE TABLEAU PORTAIT, ET QU'IL FALLAIT REMPLACER.
+
+    Le relevé était un `<table>` avec `scope="row"` / `scope="col"` et une
+    `<caption>` : une vraie capacité d'accessibilité, pas un ornement. Ce
+    tableau a été retiré parce que ses trois colonnes cassaient leurs cellules
+    à 390 px — mesuré au rendu, pas supposé.
+
+    Le retirer SANS remplacer son association libellé↔valeur aurait été une
+    régression invisible : les tests seraient restés verts, et un lecteur
+    d'écran aurait perdu le lien entre « Tour de taille » et « 80,0 cm ».
+    `<dt>` / `<dd>` rend cette association NATIVE.
+
+    ⚠ Cette garde vérifie l'ASSOCIATION, pas le choix de balise : elle exige
+    que la valeur soit décrite par son libellé, ce qu'un `<dl>` fait et qu'une
+    pile de `<span>` ne fait pas.
+    """
+    import re
+
     with _session() as db:
         _add(db, _uid(), waist_cm=80.0)
     section = _section(client)
-    assert "<caption" in section
-    assert 'scope="col"' in section
-    assert 'scope="row"' in section
+    paires = re.findall(r"<dt[^>]*>(.*?)</dt>\s*<dd[^>]*>(.*?)</dd>",
+                        section, re.S)
+    assert paires, "aucun couple libellé/valeur associé dans le relevé"
+    aplati = [(re.sub(r"\s+", " ", t).strip(), re.sub(r"\s+", " ", v).strip())
+              for t, v in paires]
+    assert ("Tour de taille", "80.0 cm") in aplati, aplati
 
 
 # ── Isolation du planificateur ───────────────────────────────────────────────
