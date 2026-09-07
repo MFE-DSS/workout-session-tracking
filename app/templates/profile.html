@@ -1,400 +1,429 @@
 {% extends "base.html" %}
 {% block content %}
+{# ═══════════════════════════════════════════════════════════════════════════
+   BODY_LEDGER — `UI-CP1`, le premier cockpit de production d'AUREN
+
+   QUESTION SOUVERAINE, une seule : « QUE SAIT AUREN DE MON CORPS ? »
+
+   Ce gabarit rendait HUIT régions perçues répondant à trois questions
+   différentes — le corps, le compte, et la manière de saisir des données —
+   dont trois cartes empilées et un tableau à trois colonnes qui jetait
+   l'horodatage qu'il recevait. L'instrument n'en garde qu'une, et range les
+   deux autres derrière un geste.
+
+   LA HIÉRARCHIE, dans cet ordre et sans exception :
+
+     1. RÉPONSE PRIMAIRE   le poids, avec son âge
+     2. RELEVÉ             ce qui est mesuré · ce qui est absent
+     3. CONTEXTE           dates mêlées · portée · lectures
+     4. APPROFONDISSEMENT  saisie · référence · compte — derrière un geste
+
+   ⚠ AUCUNE CARTE, ET C'EST LA CONTRAINTE CENTRALE. « Un cockpit ne doit pas
+   devenir une grande carte contenant de petites cartes. » Ce gabarit ne pose
+   plus une seule `class="card"` : la structure est faite de BANDES, de FILETS
+   et de BLANC.
+
+   ⚠ AUCUN COMPTE N'EST RENDU AU REPOS. Constat qui décide la composition : la
+   coque n'a AUCUNE destination « compte » — `/profile` EST cette destination,
+   4ᵉ item du rail de navigation. ACCOUNT ne peut donc pas déménager ailleurs ;
+   il sort de l'INSTRUMENT et devient un tiroir du bas de page. Rien n'est
+   perdu, `CLAUDE.md §5.3` est tenu : la soustraction et son remplacement
+   partent dans la même livraison.
+
+   ⚠ LE CONTRAT DE CONFIANCE. Chaque fait porte sa VALEUR, sa SOURCE et son
+   ÂGE — et rien de plus, parce qu'on n'affiche que ce qui change
+   l'interprétation. Trois régimes, distingués parce qu'ils ne veulent pas dire
+   la même chose :
+
+     OBSERVATION          poids, tours morphologiques → l'âge est affiché
+     RÉFÉRENCE STABLE     la taille → aucun âge, elle ne périme pas
+     INCONNU              la FC repos → `users.resting_hr` N'A PAS de colonne
+                          de date. L'ignorance est dite, pas maquillée.
+
+   ⚠ L'ÂGE N'EST PAS UN VERDICT. Aucune couleur d'alerte ne se pose sur une
+   donnée ancienne : aucun seuil de péremption corporelle n'existe dans ce
+   dépôt, et emprunter ceux de `recovery_contract` — qui portent sur la
+   RÉCUPÉRATION D'ENTRAÎNEMENT — serait inventer une règle en la déguisant en
+   réemploi. L'âge est un fait, rendu comme les autres.
+
+   ⚠ UN SEUL PROPRIÉTAIRE D'ACTION. L'ambre plein ne se pose que sur « Noter ».
+   Deux ambres pleins sur un écran, et l'ambre cesse de vouloir dire « c'est à
+   toi de jouer ».
+   ═══════════════════════════════════════════════════════════════════════════ #}
 <h1 class="page-title">Profil</h1>
 
-<div class="cockpit-grid">
-  <div class="cockpit-main">
-    {# ── `UX4_01` — L'ÉTAT LISIBLE, avant toute édition ──────────────────────
-       Le Profil mesurait 6,6 écrans, 641 mots, 39 contrôles : quatre
-       formulaires empilés, soit une interface d'ADMINISTRATION DE DONNÉES.
+<section class="body-ledger" aria-label="Ce qu'AUREN sait de ton corps">
 
-       Il répond désormais d'abord à « qu'est-ce qu'AUREN sait de moi ? », et
-       ne propose de modifier qu'ensuite. Aucune donnée n'est perdue : les
-       faits d'identité vivent ici, les formulaires vivent derrière leur
-       déclencheur.
+  {# Le retour de la dernière écriture, en tête de l'instrument : c'est le
+     résultat de l'action, il précède donc la lecture qu'il vient de changer.
+     `output` plutôt que `role="status"` — l'élément natif porte le même rôle
+     ARIA et son support est meilleur sur les technologies d'assistance. #}
+  {% if measure_error %}
+  <output class="bl-note bl-flash">
+    Mesure non enregistrée : une valeur est hors de la plage plausible.
+    Corrige-la et réessaie — rien n'a été modifié.
+  </output>
+  {% elif measure_saved %}
+  <output class="bl-note bl-flash">
+    Mesure enregistrée. Chaque envoi ajoute une mesure datée ; les mesures
+    précédentes sont conservées.
+  </output>
+  {% endif %}
 
-       `CLAUDE.md §5.3` — c'est ce bloc qui accompagne le retrait de la
-       tension artérielle. Une soustraction ne part jamais seule.
+  {# ── 1. RÉPONSE PRIMAIRE ──────────────────────────────────────────────────
+     Le poids, et lui seul. C'est la seule donnée corporelle VOLATILE que
+     l'entraînement consomme — la seule dont l'ancienneté change ce qu'on doit
+     en conclure au point de mériter le rang DISPLAY.
 
-       Ce qui est rendu est ce qu'AUREN POSSÈDE. « — » n'est pas un vide de
-       mise en page : c'est « non mesuré », et il se lit comme tel. #}
-    {# `TRAIN1-D` / C2 — UN CHAMP VIDE ET SAISISSABLE N'EST PAS UN TIRET.
+     Affiché sans son âge, ce n'était pas une donnée mais un SOUVENIR :
+     « 78,4 kg » de ce matin et « 78,4 kg » de mars se rendaient exactement
+     pareil. `weight_age_label` est la seule clé que cette tranche ajoute au
+     contexte, et elle ne coûte AUCUNE requête — la ligne de mesure était déjà
+     chargée pour peupler le formulaire.
 
-       Le Profil rendait SIX `—` à l'échelle d'une valeur : Poids, Taille,
-       FC repos, et les trois lignes d'entraînement. Le commentaire ci-dessus
-       affirmait que « — » se lit « non mesuré » ; mesuré au rendu, il se lit
-       surtout comme une case cassée.
-
-       La différence avec Progression est décisive et change le correctif :
-       là-bas un dénominateur absent est un FAIT sur lequel personne ne peut
-       agir, donc la carte disparaît. Ici la donnée manque parce que personne
-       ne l'a saisie, et la saisie est à un clic. L'état vide doit donc porter
-       l'action, pas le constat.
-
-       « Ajouter » est une affordance, pas un ordre : il nomme ce qui se
-       passera. Rien n'est ajouté à l'écran — le tiret devient le lien.
-
-       MORPHOLOGIE — « 0 / 13 mesures » posait un dénominateur comme un score
-       à remplir, dans un produit qui vient de retirer les scores. Les treize
-       champs ne sont pas un objectif : ce sont les cases disponibles. L'état
-       zéro se dit donc « À compléter », et le compte n'apparaît qu'à partir
-       du moment où il y a quelque chose à compter. #}
-    {% set morpho_known = capture_fields | selectattr('0', 'in', latest_values) | list | length %}
-    {% set morpho_href = url_for('profile_page') ~ '#measurements' %}
-    <div class="card pstate">
-      <h2 class="card__title">Corps</h2>
-      <ul class="stats-list">
-        <li><span>Poids</span>
-          {% if latest_values.get('weight_kg') %}<b>{{ latest_values.get('weight_kg') }} kg</b>
-          {% else %}<b><a class="stat-add" href="#quicklog_weight">Ajouter</a></b>{% endif %}</li>
-        <li><span>Taille</span>
-          {% if user.height_cm %}<b>{{ user.height_cm }} cm</b>
-          {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
-        <li><span>Morphologie</span>
-          {% if morpho_known %}<b>{{ morpho_known }} mesure{% if morpho_known > 1 %}s{% endif %}</b>
-          {% else %}<b><a class="stat-add" href="{{ morpho_href }}">À compléter</a></b>{% endif %}</li>
-        <li><span>FC repos</span>
-          {% if user.resting_hr %}<b>{{ user.resting_hr }} bpm</b>
-          {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
-      </ul>
-
-      {# ── `UX4_01` — POIDS : `QUICK_LOG` ────────────────────────────────────
-         `OPERATOR_DECISION` : le poids est volatil et consommé par
-         l'entraînement et la progression. Il ne doit pas exiger d'ouvrir un
-         formulaire de morphométrie complet.
-
-         Saisie compacte, **manuelle**, au même endroit que sa lecture. Elle
-         poste vers la MÊME route canonique que la mesure complète — aucun
-         second écrivain sur `body_measurements`, la leçon de
-         `Sb_MORPHO_PROFILE_RUNTIME_01` tient.
-
-         `CONNECTED_FUTURE` est une DIRECTION, pas une implémentation : aucune
-         permission santé n'est demandée ici, et l'architecture ne suppose
-         simplement plus que le grand formulaire soit le canal permanent. #}
-      <form method="post" action="{{ url_for('profile_measurements_submit') }}"
-            class="quicklog">
-        <label class="quicklog__label" for="quicklog_weight">Poids du jour</label>
-        <input class="quicklog__input" type="number" step="0.1" min="30" max="300"
-               id="quicklog_weight" name="weight_kg"
-               placeholder="{{ latest_values.get('weight_kg') or 'kg' }}">
-        <button type="submit" class="btn btn--ghost">Noter</button>
-      </form>
-    </div>
-
-    {# `TRAIN1-D` / C2 — LA CONFIGURATION D'ENTRAÎNEMENT QUITTE LE NIVEAU 1.
-
-       Elle rendait trois lignes en lecture seule — Cadence souhaitée,
-       Priorités, Équipement — dont les trois valaient `—` sur un compte neuf.
-       Trois des six tirets de cette page venaient d'ici.
-
-       CE N'EST PAS UNE SUPPRESSION, et il faut être précis : ces valeurs SONT
-       consommées. `weekly_planner` lit `sessions_per_week`,
-       `focus_priorities` et `available_equipment` ; `user_programs` aussi. Le
-       formulaire qui les renseigne reste donc en place, au niveau 2, derrière
-       « Modifier mes préférences ».
-
-       CE QUI PART EST LEUR PLACE AU PREMIER PLAN. Le Profil répond à « que
-       sait AUREN de moi ? » ; une configuration de plan répond à « comment je
-       veux m'entraîner », qui est la question de **Mon plan**. La page le
-       disait déjà elle-même, en toutes lettres, plus bas :
-       « Emplacement transitionnel — ces réglages rejoindront Programmes. »
-
-       `TRAIN2` leur donne leur domicile. D'ici là elles sont éditables, pas
-       exposées : personne ne perd la main dessus, et le niveau 1 cesse
-       d'annoncer trois absences sur lesquelles il n'agit pas. #}
-    <section class="pstate pstate--flat">
-      <h2 class="section-header">Compte</h2>
-      <ul class="stats-list">
-        <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
-        {# `TRAIN1-D` / C2 — l'e-mail aussi. Il est saisissable dans « Données
-           de référence », donc il relève de la même règle que le poids ou la
-           taille : un fait vide sur lequel on peut agir porte l'action. Et ce
-           n'est pas cosmétique — sans e-mail, la réinitialisation de mot de
-           passe est impossible, et le tiret ne le disait pas. #}
-        <li><span>Email</span>
-          {% if user.email %}<b>{{ user.email }}</b>
-          {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
-        <li><span>Inscrit le</span><b>{{ (user.created_at | local).strftime('%d/%m/%Y') if user.created_at else '—' }}</b></li>
-        <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
-      </ul>
-    </section>
-
-    {# Sb_31.next.profile-link — Découvrabilité Body Intelligence v2.
-       Lien sobre vers /body/intelligence ; aucune réimplémentation
-       de la lecture corporelle ici (pas de duplication des 7 blocs).
-       Sx_31 OQ-G livrée.
-       Sb_31.X — affiché uniquement quand BODY_INTELLIGENCE_ENABLED est ON
-       (sinon aucun lien/navigation Body Intelligence ne doit apparaître). #}
-    {% if body_intelligence_enabled %}
-    <div class="card profile-body-intel-link">
-      <h2 class="card__title">Lecture corporelle</h2>
-      <p class="text-dim" style="font-size:13px;margin:0 0 var(--space-sm);">
-        Basé sur les séances loggées.
-      </p>
-      <p style="margin:0;">
-        <a class="link" href="{{ url_for('body_intelligence') }}">
-          Voir Body Intelligence <span aria-hidden="true">→</span>
-        </a>
-      </p>
-    </div>
+     Le QUICK_LOG reste AU REPOS, hors tiroir. Ce n'est pas un oubli face à
+     « l'édition n'apparaît qu'après une intention explicite » : c'est une
+     décision opérateur antérieure et toujours en vigueur — une donnée volatile
+     qu'on doit pouvoir corriger vite ne se note pas derrière un geste de plus.
+     Ce que la règle interdit, c'est le GRAND FORMULAIRE et la MATRICE DE
+     CHAMPS ; un champ unique n'est ni l'un ni l'autre. #}
+  <div class="bl-answer">
+    <p class="bl-answer__label">Poids</p>
+    {% if latest_values.get('weight_kg') %}
+    <p class="bl-answer__readout">{{ latest_values.get('weight_kg') }}<span class="bl-answer__unit">kg</span></p>
+    {% if weight_age_label %}
+    <p class="bl-answer__age">Pesé {{ weight_age_label }}</p>
+    {% else %}
+    {# La ligne existe mais n'est pas horodatée : le dire, plutôt que de
+       laisser croire à une pesée du jour. #}
+    <p class="bl-answer__age">Date de pesée inconnue</p>
+    {% endif %}
+    {% else %}
+    {# INCONNU est un ÉTAT LÉGITIME, pas un état vide cassé. Il se dit en
+       toutes lettres : un « — » à l'échelle d'une valeur se lit comme une case
+       défectueuse, ce qui a été mesuré au rendu et corrigé une première fois
+       en `TRAIN1-D`. #}
+    <p class="bl-answer__readout bl-answer__readout--unknown">Non pesé</p>
+    <p class="bl-answer__age">Aucune pesée enregistrée.</p>
     {% endif %}
 
-    {# ── `UX4_01` — « MES 30 DERNIERS JOURS » A QUITTÉ LE PROFIL ─────────────
-       Le Profil répond à DEUX questions, et à deux seulement :
-       « que sait AUREN de moi ? » et « que puis-je changer volontairement ? ».
-
-       Ce bloc répondait à une troisième — « comment est-ce que je
-       progresse ? » — qui appartient à `PROGRESSION`, laquelle EXISTE déjà.
-
-       Et il rendait `0` comme une valeur mesurée : fatigue 0, régularité 0,
-       série 0, avec une tendance « en baisse ». Un zéro dérivé d'aucune
-       observation n'est pas une mesure, c'est une absence de mesure. La
-       décision opérateur l'interdit explicitement.
-
-       Aucun lien de remplacement ici : `Progression` est déjà une destination
-       de premier rang du rail de navigation. Y renvoyer depuis le Profil
-       dupliquerait la navigation au lieu de la clarifier. #}
+    {# Le quick-log poste vers la MÊME route canonique que la mesure complète.
+       Un second écrivain sur `body_measurements` a déjà coûté une tranche
+       entière (`Sb_MORPHO_PROFILE_RUNTIME_01` : deux écrivains, une table,
+       deux contrats temporels). #}
+    <form method="post" action="{{ url_for('profile_measurements_submit') }}"
+          class="quicklog">
+      <label class="quicklog__label" for="quicklog_weight">Poids du jour</label>
+      <input class="quicklog__input" type="number" step="0.1" min="30" max="300"
+             id="quicklog_weight" name="weight_kg"
+             placeholder="{{ latest_values.get('weight_kg') or 'kg' }}">
+      <button type="submit" class="btn btn--primary">Noter</button>
+    </form>
   </div>
 
-  <div class="cockpit-side">
-    <div class="card">
-      <h2 class="card__title">Nouvelle mesure</h2>
-      <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);">
-        Mesurer le matin, à jeun, mêmes conditions. Tape à plat, muscle relâché.
-        Entrer les deux côtés même si similaires. Fréquence idéale : 1x/semaine.
-      </p>
-      {% if measure_error %}
-      <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);color:var(--color-danger,#c0392b);">
-        Mesure non enregistrée : une valeur est hors de la plage plausible.
-        Corrige-la et réessaie — rien n'a été modifié.
-      </p>
-      {% elif measure_saved %}
-      <p class="text-dim" style="font-size:12px;margin-bottom:var(--space-sm);">
-        Mesure enregistrée. Chaque envoi ajoute une mesure datée ; les mesures
-        précédentes sont conservées.
-      </p>
+  {# ── 2. RELEVÉ — MESURÉ ───────────────────────────────────────────────────
+     `FactRow.measured_at` traversait TOUTE la chaîne — calculé par
+     `morphology_runtime`, transporté intact par `morphology_readmodel` — et
+     MOURAIT À CE GABARIT, qui rendait Mesure / Valeur / Base. L'horodatage
+     arrivait jusqu'à la porte et personne ne l'ouvrait.
+
+     Ce n'est plus un tableau. Un tableau à trois colonnes impose sa grille à
+     390 px et casse ses cellules ; une ligne de relevé pose le libellé à
+     gauche, la valeur à droite, et la PROVENANCE AVEC L'ÂGE dessous — parce
+     que d'où vient une valeur et de quand elle date sont UN SEUL FAIT :
+     « mesure directe · il y a 7 j ». #}
+  {# ⚠ UNE LISTE DE DÉFINITIONS, PAS UNE PILE DE `span`. Le tableau qui vivait
+     ici portait `scope="row"` et `scope="col"` : une CAPACITÉ d'accessibilité,
+     pas un ornement. Le retirer sans la remplacer aurait fait perdre à un
+     lecteur d'écran l'association entre un libellé et sa valeur — une
+     régression que la suppression du tableau rendait invisible. `dt` / `dd`
+     rend cette association NATIVE, sans imposer la grille d'un tableau qui
+     cassait ses cellules à 390 px. Un terme peut porter deux descriptions :
+     la valeur, puis sa provenance. #}
+  {% if morpho.facts or morpho.ape_index or user.resting_hr %}
+  <div class="bl-band">
+    <h2 class="bl-band__title" id="bl-measured">Mesuré</h2>
+    <dl class="bl-rows" aria-labelledby="bl-measured">
+
+    {% for f in morpho.facts %}
+      <dt class="bl-row__label">{{ f.label }}</dt>
+      <dd class="bl-row__value">{{ f.value }} {{ f.unit }}</dd>
+      {% if f.source_label == 'profil' %}
+      {# RÉFÉRENCE STABLE — la taille d'un adulte ne périme pas. Lui coller un
+         âge suggérerait qu'elle doit être reprise, ce qui est faux, et
+         noierait les âges qui, eux, comptent. #}
+      <dd class="bl-row__meta">Donnée de référence · profil</dd>
+      {% elif f.age_label %}
+      <dd class="bl-row__meta">{{ f.basis }} · {{ f.age_label }}</dd>
+      {% else %}
+      {# Jamais la couleur seule : le libellé porte l'information, l'italique
+         la double sans introduire de teinte.
+
+         ⚠ PAS D'INFOBULLE avec la date exacte, et c'est délibéré. Le filtre
+         `date_fr` rend « Jeu 03/09 » SANS ANNÉE : sur une mesure de plus d'un
+         an elle serait ambiguë, donc pire que rien. Et un `title` ne s'ouvre
+         pas au doigt — cette surface se lit sur un téléphone. #}
+      <dd class="bl-row__meta bl-row__meta--unknown">{{ f.basis }} · date inconnue</dd>
       {% endif %}
-      {# ── `UX4_01` — MORPHOMÉTRIE : MÉCANISME DE REPLI, PAS ARCHITECTURE CIBLE
-         `OPERATOR_DECISION` : la morphométrie est `ONCE_SETUP` +
-         `GUIDED_CAPTURE`. Ce grand formulaire est un **mécanisme d'acquisition
-         hérité**, conservé parce qu'il fonctionne — pas parce qu'il est la
-         cible.
+    {% endfor %}
 
-         L'assistant guidé n'est PAS construit ici : il sort du périmètre
-         approuvé de cette tranche, et l'opérateur l'interdit explicitement
-         tant qu'il n'y entre pas.
+    {% if morpho.ape_index %}
+      <dt class="bl-row__label">{{ morpho.ape_index.label }}</dt>
+      <dd class="bl-row__value">{{ morpho.ape_index.value }} {{ morpho.ape_index.unit }}</dd>
+      {# Un dérivé n'a pas d'âge PROPRE : il vaut celui de ses deux sources, et
+         le dire « non daté » serait faux. Il dit ce qu'il est. #}
+      <dd class="bl-row__meta bl-row__meta--unknown">{{ morpho.ape_index.basis }} · dérivé</dd>
+    {% endif %}
 
-         Ce qui change dès maintenant : il ne constitue plus la page. Il
-         s'ouvre par un geste, et sa lecture vit en tête. #}
-      {# `Sb_UI_DISCLOSURE_01` — LE COMPOSANT EXISTAIT, CETTE SURFACE NE S'EN
-         SERVAIT PAS. `.pstate__edit` n'avait PAS UNE LIGNE de CSS : ce dépliant
-         rendait le marqueur natif du navigateur, sans chevron, sans état de
-         focus, et surtout à 38 px de haut — sous le standard de 44 px du
-         produit (`UIV3_TARGETS_44_01`). Son voisin plus bas tombait à 21 px.
-         `interaction.css` définit `.disclosure` depuis longtemps, et
-         `_macros.html` en offre même une macro.
-         L'`id` est conservé : c'est une cible d'ancrage. #}
-      <details class="disclosure pstate__edit" id="measurements">
+    {% if user.resting_hr %}
+      <dt class="bl-row__label">FC repos</dt>
+      <dd class="bl-row__value">{{ user.resting_hr }} bpm</dd>
+      {# INCONNU DIT COMME TEL, et vérifié dans le modèle : `users.resting_hr`
+         est un `Integer` nu, sans colonne de date. Ce n'est pas une donnée
+         qu'on aurait oublié d'horodater — le schéma ne le permet pas. Une
+         fraîcheur inventée ici serait une fabrication ; l'ignorance est un
+         état légitime et se dit. #}
+      <dd class="bl-row__meta bl-row__meta--unknown">profil · date inconnue</dd>
+    {% endif %}
+    </dl>
+  </div>
+  {% endif %}
+
+  {# ── 2bis. RELEVÉ — ABSENT ────────────────────────────────────────────────
+     Un fait manquant est affiché COMME MANQUANT — jamais remplacé par une
+     valeur neutre. C'est la règle de la chaîne P0.4, et elle vaut ici comme
+     dans le moteur.
+
+     L'ACTION EST AU PIED DE LA BANDE, PAS SUR CHAQUE LIGNE. Six « Ajouter »
+     empilés seraient exactement les « CTA d'édition répétés » que la doctrine
+     du cockpit interdit. Deux destinations existent réellement — la
+     morphométrie et les données de référence — donc au plus deux liens, et
+     seulement ceux qui ont quelque chose à recevoir. #}
+  {% set reference_missing = (not user.height_cm) or (not user.resting_hr) %}
+  {% set morpho_missing = morpho.missing_rows | rejectattr('key', 'equalto', 'height_cm') | list %}
+  {% if morpho.missing_rows or not user.resting_hr %}
+  <div class="bl-band">
+    <h2 class="bl-band__title" id="bl-absent">Absent</h2>
+    {# ⚠ UN PROFIL ENTIÈREMENT VIDE NE S'ÉNUMÈRE PAS.
+       La décision opérateur du 2026-08-20 est explicite et toujours en
+       vigueur : *un état vide représente le domaine et donne AU PLUS un
+       prochain pas véridique*. Le Profil listait alors « Envergure non
+       renseignée · Tour de taille non renseigné · … » — sept façons de dire
+       la même absence, et la liste s'allongeait à chaque champ ajouté au
+       modèle. La première écriture de cette bande refaisait exactement ça.
+
+       L'énumération n'a de valeur que quand elle DISCRIMINE : sur un profil
+       partiel, voir lesquelles des six manquent est une information ; sur un
+       profil vide, c'est la même phrase répétée. La bande bascule donc sur
+       `morpho.facts` — rien de mesuré, une seule phrase. #}
+    {% if morpho.facts %}
+    <dl class="bl-rows" aria-labelledby="bl-absent">
+    {% for m in morpho.missing_rows %}
+      <dt class="bl-row__label">{{ m.label }}</dt>
+      <dd class="bl-row__value bl-row__value--absent">Non renseigné</dd>
+    {% endfor %}
+    {% if not user.resting_hr %}
+      <dt class="bl-row__label">FC repos</dt>
+      <dd class="bl-row__value bl-row__value--absent">Non renseigné</dd>
+    {% endif %}
+    </dl>
+    {% else %}
+    <p class="bl-note">Aucune mesure morphologique enregistrée.</p>
+    {% endif %}
+
+    <p class="bl-note">
+      {% if morpho_missing %}
+      <a class="stat-add" href="#measurements">À compléter</a>{% if reference_missing %} · {% endif %}
+      {% endif %}
+      {% if reference_missing %}
+      <a class="stat-add" href="#reference_data">Ajouter mes données de référence</a>
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+  {# ── 3. CONTEXTE ──────────────────────────────────────────────────────────
+     Ce qui change la lecture du relevé, et rien d'autre. Le garde-fou brut du
+     moteur n'est PAS rendu : c'est un démenti (« aucune posture, aucun
+     diagnostic ») et l'afficher mettrait le cadre médical sous les yeux du
+     lecteur sans rien lui apprendre. Il reste disponible pour l'audit. #}
+  {# ⚠ CETTE BANDE EST INCONDITIONNELLE, et ce n'est pas un oubli de garde.
+     `morpho.notice` — « ces éléments ne modifient pas encore automatiquement
+     ton programme » — est la LIMITE QUE LE PRODUIT S'IMPOSE. La rendre
+     seulement quand il y a des mesures reviendrait à ne poser la limite
+     qu'après que l'utilisateur a saisi treize champs, c'est-à-dire trop tard.
+     Sur un profil vide, elle fixe l'attente AVANT l'effort. #}
+  <div class="bl-band">
+    <h2 class="bl-band__title">Portée</h2>
+
+    {% if morpho.is_mixed_date %}
+    <p class="bl-note">{{ morpho.mixed_date_notice }}</p>
+    {% endif %}
+
+    {% if morpho.interpretations %}
+    <ul class="bl-readings">
+      {% for i in morpho.interpretations %}
+      <li>
+        {{ i.rationale }}
+        <span class="text-dim">
+          — {{ i.layer_label }}, {{ i.confidence_label }}{% if i.is_proxy %}, indicateur indirect{% endif %}
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <p class="bl-note">{{ morpho.notice }}</p>
+  </div>
+
+  {# Sb_31.X — la découverte de Body Intelligence, affichée uniquement quand
+     `BODY_INTELLIGENCE_ENABLED` est ON. Aucune réimplémentation de la lecture
+     corporelle ici : c'est un lien vers une destination, pas une duplication
+     de ses sept blocs. #}
+  {% if body_intelligence_enabled %}
+  <div class="bl-band">
+    <h2 class="bl-band__title">Lecture corporelle</h2>
+    <p class="bl-note">Basé sur les séances loggées.</p>
+    <p class="bl-note">
+      <a class="link" href="{{ url_for('body_intelligence') }}">
+        Voir Body Intelligence <span aria-hidden="true">→</span>
+      </a>
+    </p>
+  </div>
+  {% endif %}
+
+  {# ── 4. APPROFONDISSEMENT ─────────────────────────────────────────────────
+     Trois tiroirs, un rail, aucune carte. `.disclosure` fournit déjà la
+     géométrie complète — 44 px, chevron, état de focus — et l'adopter coûte
+     UNE classe sur le `details` depuis `Sb_UI_DISCLOSURE_01`. Un composant
+     qu'on n'adopte pas parce qu'il coûte trop cher à adopter n'est pas un
+     composant : c'est une intention. #}
+  <div class="bl-drawers">
+
+    {# La morphométrie est un MÉCANISME D'ACQUISITION HÉRITÉ, conservé parce
+       qu'il fonctionne — pas parce qu'il est la cible. L'assistant guidé
+       n'est PAS construit ici : il sort du périmètre approuvé de cette
+       tranche. Ce qui change, c'est qu'il ne constitue plus la page.
+       L'`id` est conservé : c'est une cible d'ancrage. #}
+    <details class="disclosure" id="measurements">
       <summary class="disclosure__summary">
         <span>Mettre à jour mes mesures <span class="pstate__legacy">saisie complète</span></span>
         <span class="disclosure__chevron" aria-hidden="true">▾</span>
       </summary>
-      <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
-        <div class="body-profile__field" style="grid-column:1/-1;">
-          <label for="measured_at">Date</label>
-          <input type="date" id="measured_at" name="measured_at">
-        </div>
-        {% for field, label in capture_fields %}
-        <div class="body-profile__field">
-          <label for="{{ field }}">{{ label }}</label>
-          <input type="number" id="{{ field }}" name="{{ field }}" step="0.1"
-                 value="{{ latest_values.get(field, '') }}"
-                 placeholder="—"
-                 {% if field == 'wingspan_cm' %}aria-describedby="wingspan_cm_help"{% endif %}>
-          {% if field == 'wingspan_cm' %}
-          <span id="wingspan_cm_help" class="text-dim" style="font-size:11px;display:block;">
-            Bras écartés à l'horizontale, du bout du majeur gauche au bout du
-            majeur droit, dos au mur. Toujours le même protocole d'une fois sur
-            l'autre. Laisse vide si tu ne l'as pas mesurée.
-          </span>
-          {% endif %}
-        </div>
-        {% endfor %}
-        <button type="submit" class="btn btn--primary">Enregistrer la mesure</button>
-      </form>
-      </details>
-    </div>
-
-    {# Sb_MORPHO_PROFILE_READMODEL_01 — lecture seule. Le guardrail brut du
-       moteur n'est PAS rendu : c'est un démenti ("aucune posture, aucun
-       diagnostic") et l'afficher mettrait le cadre médical sous les yeux du
-       lecteur sans rien lui apprendre. Il reste disponible pour l'audit. #}
-    {# `UX4_01` — état PUR, cadre retiré (audit de nécessité). #}
-    <div class="pstate pstate--flat">
-      <h2 class="section-header" id="morpho-title">Mesures morphologiques</h2>
-      <section aria-labelledby="morpho-title">
-      {% if morpho.has_anything %}
-        {% if morpho.is_mixed_date %}
-        <p class="text-dim" style="font-size:12px;">{{ morpho.mixed_date_notice }}</p>
-        {% endif %}
-
-        <table style="width:100%;font-size:13px;border-collapse:collapse;text-align:left;">
-          <caption class="sr-only">Derniers faits morphologiques connus</caption>
-          <thead>
-            <tr><th scope="col">Mesure</th><th scope="col">Valeur</th><th scope="col">Base</th></tr>
-          </thead>
-          <tbody>
-            {% for f in morpho.facts %}
-            <tr>
-              <th scope="row">{{ f.label }}</th>
-              <td>{{ f.value }} {{ f.unit }}</td>
-              <td class="text-dim">{{ f.basis }}</td>
-            </tr>
-            {% endfor %}
-            {% if morpho.ape_index %}
-            <tr>
-              <th scope="row">{{ morpho.ape_index.label }}</th>
-              <td>{{ morpho.ape_index.value }} {{ morpho.ape_index.unit }}</td>
-              <td class="text-dim">{{ morpho.ape_index.basis }}</td>
-            </tr>
-            {% endif %}
-          </tbody>
-        </table>
-
-        {% if morpho.missing %}
-        <p class="text-dim" style="font-size:12px;margin-top:var(--space-sm);">
-          {{ morpho.missing | join(' · ') }}
+      <div class="bl-drawer__body">
+        <p class="bl-note">
+          Mesurer le matin, à jeun, mêmes conditions. Tape à plat, muscle
+          relâché. Entrer les deux côtés même si similaires. Fréquence
+          idéale : 1x/semaine.
         </p>
-        {% endif %}
-
-        {% if morpho.interpretations %}
-        <h3 style="font-size:13px;margin-top:var(--space-md);">Lectures</h3>
-        <ul style="font-size:13px;padding-left:1.1em;">
-          {% for i in morpho.interpretations %}
-          <li style="margin-bottom:var(--space-xs);">
-            {{ i.rationale }}
-            <span class="text-dim">
-              — {{ i.layer_label }}, {{ i.confidence_label }}{% if i.is_proxy %}, indicateur indirect{% endif %}
+        <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
+          <div class="body-profile__field body-profile__field--wide">
+            <label for="measured_at">Date</label>
+            <input type="date" id="measured_at" name="measured_at">
+          </div>
+          {% for field, label in capture_fields %}
+          <div class="body-profile__field">
+            <label for="{{ field }}">{{ label }}</label>
+            <input type="number" id="{{ field }}" name="{{ field }}" step="0.1"
+                   value="{{ latest_values.get(field, '') }}"
+                   placeholder="—"
+                   {% if field == 'wingspan_cm' %}aria-describedby="wingspan_cm_help"{% endif %}>
+            {% if field == 'wingspan_cm' %}
+            <span id="wingspan_cm_help" class="bl-note">
+              Bras écartés à l'horizontale, du bout du majeur gauche au bout du
+              majeur droit, dos au mur. Toujours le même protocole d'une fois
+              sur l'autre. Laisse vide si tu ne l'as pas mesurée.
             </span>
-          </li>
+            {% endif %}
+          </div>
           {% endfor %}
-        </ul>
-        {% endif %}
-      {% else %}
-        {# `UX4_01`, décision n°5 — UN état vide représente le domaine, et donne
-           AU PLUS un prochain pas véridique.
+          <button type="submit" class="btn btn--ghost">Enregistrer la mesure</button>
+        </form>
+      </div>
+    </details>
 
-           Le bloc énumérait chaque champ absent : « Taille non renseignée ·
-           Envergure non renseignée · Tour de taille non renseigné · … ». Sept
-           façons de dire la même chose, et la liste devient plus longue à
-           chaque champ ajouté au modèle. L'état vide s'écrit une fois. #}
-        {# Aucun chiffre ici : le décompte vit UNE FOIS, dans « Corps ».
-           La première écriture annonçait « 6 mesures attendues » alors que
-           l'état lisible disait « 0 / 13 » — deux modèles distincts de la
-           morphologie (`morpho.missing` vs `BODY_MEASUREMENT_FIELDS`), donc
-           deux comptes contradictoires pour la même chose, à trois écrans
-           d'intervalle. #}
-        <p class="text-dim" style="font-size:13px;">
-          Aucune mesure morphologique enregistrée.
-        </p>
-      {% endif %}
-        <p class="text-dim" style="font-size:12px;margin-top:var(--space-sm);">
-          {{ morpho.notice }}
-        </p>
-      </section>
-    </div>
-
-    <div class="card">
-      <h2 class="card__title">Données de référence</h2>
-      {# `UX4_01` — LA TENSION ARTÉRIELLE N'EST PLUS DEMANDÉE ICI.
-
-         Décision opérateur (`AUREN_UI_BLUEPRINT §5ter`) : `REMOVE_NO_ASK` de
-         l'acquisition courante, **données existantes préservées**, aucune
-         permission connectée tant qu'un consommateur produit n'est pas
-         démontré.
-
-         Mesuré : la donnée traversait `providers.py` et `coach_report.py`
-         jusqu'à un gabarit, sans jamais atteindre `recommendation.py` ni
-         `zone_recovery.py`. Affichée, jamais décisionnelle — la justification
-         de la demander était faible et non démontrée.
-
-         Le rapport coach continue de la rendre : `REMOVE_NO_ASK` porte sur
-         l'ACQUISITION, pas sur la donnée. Et `profile_body_submit` n'assigne
-         plus ces colonnes, sans quoi retirer le champ les aurait effacées au
-         prochain enregistrement. #}
-      {# `Sb_UI_DISCLOSURE_01` — mesuré à 21 px de haut avant. #}
-      <details class="disclosure pstate__edit" id="reference_data">
+    {# `UX4_01` — LA TENSION ARTÉRIELLE N'EST PLUS DEMANDÉE ICI.
+       Décision opérateur (`AUREN_UI_BLUEPRINT §5ter`) : `REMOVE_NO_ASK` de
+       l'acquisition courante, données existantes préservées. Mesuré : la
+       donnée traversait `providers.py` et `coach_report.py` jusqu'à un
+       gabarit, sans jamais atteindre `recommendation.py` ni
+       `zone_recovery.py`. Affichée, jamais décisionnelle.
+       `profile_body_submit` n'assigne plus ces colonnes, sans quoi retirer le
+       champ les aurait effacées au prochain enregistrement. #}
+    <details class="disclosure" id="reference_data">
       <summary class="disclosure__summary">
-        <span>Modifier mes données de référence</span>
+        <span>Données de référence</span>
         <span class="disclosure__chevron" aria-hidden="true">▾</span>
       </summary>
-      <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
-        <div class="body-profile__field" style="grid-column:1/-1;">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email"
-                 value="{{ user.email or '' }}" placeholder="optionnel">
-        </div>
-        <div class="body-profile__field">
-          <label for="height_cm">Taille (cm)</label>
-          <input type="number" id="height_cm" name="height_cm"
-                 value="{{ user.height_cm or '' }}" min="100" max="250" placeholder="175">
-        </div>
-        <div class="body-profile__field">
-          <label for="resting_hr">FC repos (bpm)</label>
-          <input type="number" id="resting_hr" name="resting_hr"
-                 value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
-        </div>
-        <button type="submit" class="btn btn--ghost">Enregistrer</button>
-      </form>
-      </details>
-    </div>
+      <div class="bl-drawer__body">
+        <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
+          <div class="body-profile__field body-profile__field--wide">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email"
+                   value="{{ user.email or '' }}" placeholder="optionnel">
+          </div>
+          <div class="body-profile__field">
+            <label for="height_cm">Taille (cm)</label>
+            <input type="number" id="height_cm" name="height_cm"
+                   value="{{ user.height_cm or '' }}" min="100" max="250" placeholder="175">
+          </div>
+          <div class="body-profile__field">
+            <label for="resting_hr">FC repos (bpm)</label>
+            <input type="number" id="resting_hr" name="resting_hr"
+                   value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
+          </div>
+          <button type="submit" class="btn btn--ghost">Enregistrer</button>
+        </form>
+      </div>
+    </details>
 
-    {# `UX4_02` / TRAIN 2 — LES PRÉFÉRENCES D'ENTRAÎNEMENT ONT DÉMÉNAGÉ.
+    {# ── LE COMPTE QUITTE L'INSTRUMENT ────────────────────────────────────
+       Il ne répond PAS à « que sait AUREN de mon corps ? », et il occupait
+       pourtant une carte de premier plan, avec un `h2.section-header`
+       à 22 px — typographiquement PLUS FORT que le titre de la carte « Corps »
+       juste au-dessus. L'identité criait plus fort que le corps sur la surface
+       corporelle du produit.
 
-       Elles vivent désormais sur **Mon plan** (`/plan`), avec le plan qu'elles
-       produisent et l'explication de ce plan. C'est ce que cet emplacement
-       annonçait lui-même depuis `Sb_TRAINING_PREFERENCES_01` :
+       Il ne déménage pas ailleurs, et c'est mesuré : la coque n'a AUCUNE
+       destination « compte » — `/profile` EST cette destination, 4ᵉ item du
+       rail. Il devient donc un résident discret du bas de page. Aucune
+       capacité n'est perdue : `CLAUDE.md §5.3` est tenu dans la même
+       livraison. #}
+    <details class="disclosure" id="account">
+      <summary class="disclosure__summary">
+        <span>Compte</span>
+        <span class="disclosure__chevron" aria-hidden="true">▾</span>
+      </summary>
+      <div class="bl-drawer__body">
+        <ul class="stats-list">
+          <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
+          {# Un e-mail vide n'est pas cosmétique : sans lui, la
+             réinitialisation de mot de passe est impossible, et le tiret ne le
+             disait pas. Le fait vide porte donc l'action. #}
+          <li><span>Email</span>
+            {% if user.email %}<b>{{ user.email }}</b>
+            {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
+          <li><span>Inscrit le</span><b>{{ (user.created_at | local).strftime('%d/%m/%Y') if user.created_at else 'Date inconnue' }}</b></li>
+          <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
+        </ul>
+        <p class="bl-note">
+          <a class="link" href="{{ url_for('password_change_page') }}">Changer le mot de passe</a>
+        </p>
+      </div>
+    </details>
 
-         « `UX4_02 LIBRARY_WORKOUT_DISCOVERY` doit accueillir cet éditeur.
-           Tant que ce n'est pas fait, cet emplacement est TRANSITIONNEL et ne
-           vaut pas architecture cible. »
-
-       Le formulaire n'est pas dupliqué — il n'existe toujours qu'à UN endroit,
-       et la route de soumission (`/profile/preferences`) ainsi que les noms de
-       champs sont INCHANGÉS : ce sont des contrats, pas des détails de page.
-       Seule la redirection suit le formulaire.
-
-       `TRAIN1-D` avait déjà retiré leur LECTURE du niveau 1 du Profil ; c'est
-       l'édition qui part maintenant, et le Profil ne répond plus qu'à « que
-       sait AUREN de moi ? ». #}
-
-    <div class="card__actions" style="margin-top:var(--space-md);">
-      <a class="btn" href="{{ url_for('password_change_page') }}">Changer le mot de passe</a>
-    </div>
   </div>
-</div>
+</section>
 
-{# ── `UX4_01` — « ÉVOLUTION CORPORELLE » A QUITTÉ LE PROFIL ─────────────────
-   `OPERATOR_DECISION` du 2026-08-20 : l'analytique corporelle appartient à
-   `PROGRESSION / BODY`, en `SECONDARY_DESTINATION`. Elle ne répond pas à la
-   question du Profil (« que sait AUREN de moi ? · que puis-je changer ? »)
-   mais à « comment est-ce que je progresse ? ».
+{# ── CE QUI A QUITTÉ CETTE SURFACE, ET OÙ C'EST PARTI ───────────────────────
+   « Mes 30 derniers jours » et « Évolution corporelle » répondaient à
+   « comment est-ce que je progresse ? », qui appartient à `PROGRESSION`. Aucun
+   lien de remplacement : `Progression` est déjà une destination de premier
+   rang du rail, et `/progress/body` n'a pas de route — poser un lien vers elle
+   serait une promesse fausse.
 
-   Mesuré avant retrait : **neuf cartes encadrées, toutes disant « pas encore
-   de données »**, chacune suivie de son paragraphe de programmes associés —
-   soit environ deux des 4,2 écrans du Profil. Un cadre par module futur, pour
-   zéro information.
-
-   AUCUN LIEN N'EST POSÉ À LA PLACE. La destination `PROGRESSION / BODY`
-   **n'existe pas encore** : `/progress/body` n'a pas de route. Poser un lien
-   vers elle serait une promesse fausse, et l'opérateur l'interdit
-   explicitement. Le domaine reste représenté par UN état, en tête de page.
-
-   Ce bloc n'est pas « supprimé » au sens de `§5.3` : il est **déplacé**, et
-   sa destination est inscrite au registre avec sa dépendance. #}
-{# Sb_UI_PROFILE_PREFERENCES_REDESIGN_01 — amélioration progressive.
-   `defer` : le script s'exécute après le parsing, donc le formulaire natif est
-   déjà utilisable avant même qu'il ne tourne. S'il ne tourne jamais, les trois
-   menus natifs restent visibles et le formulaire fonctionne. #}
-<script defer src="{{ asset_url('js/prefs_focus_rank.js') }}"></script>
+   Les préférences d'entraînement vivent sur **Mon plan** (`/plan`), avec le
+   plan qu'elles produisent. Le formulaire n'est pas dupliqué : il n'existe
+   qu'à UN endroit, et la route de soumission comme les noms de champs sont
+   INCHANGÉS — ce sont des contrats, pas des détails de page. #}
 {% endblock %}

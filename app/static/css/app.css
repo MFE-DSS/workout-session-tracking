@@ -799,6 +799,58 @@ input, button, textarea, select {
 /* Un lien de repli discret en bas de page — « retour à la connexion »,
  * « détails ». ⚠ 13 px est HORS ÉCHELLE (entre META 12 et BODY 15) : la
  * valeur est transposée telle quelle depuis six gabarits, pas décidée ici. */
+/* ── `UI-CP1` — DEUX CLASSES NOMMÉES QUI NE RENDAIENT RIEN ──────────────────
+ *
+ * `RUNTIME_MEASURED` sur la capture à 390 px du relevé corporel : « Voir Body
+ * Intelligence → » et « À compléter » se rendaient en TEXTE ORDINAIRE, sans
+ * couleur, sans soulignement, indiscernables de la prose autour.
+ *
+ * Cause vérifiée par balayage de la feuille entière : `a` vaut
+ * `color: inherit; text-decoration: none`, et **`.link` n'avait AUCUNE règle
+ * dans ce fichier** — la classe était posée sur trois gabarits depuis
+ * longtemps et n'a jamais eu de style. `.stat-add`, lui, n'existait que sous
+ * `.stats-list li a.stat-add` : posé ailleurs, il ne rendait ni ambre, ni
+ * soulignement, ni cible de 44 px.
+ *
+ * C'est le diagnostic du programme, deux fois de suite : la décision est
+ * prise, la classe est écrite, le moyen de l'appliquer manque.
+ *
+ * PARTAGE DES RÔLES CHROMATIQUES, dérivé de la grammaire du viseur :
+ *
+ *   ambre PLEIN     la commande dominante, et rien d'autre  (`btn--primary`)
+ *   ambre PONCTUEL  une action posée dans le texte          (`.stat-add`)
+ *   soulignement    une NAVIGATION — pas une action         (`.link`)
+ *
+ * Une navigation n'est pas une action : la peindre en ambre diluerait le seul
+ * signal qui veut dire « c'est à toi de jouer ». Elle se signale donc par son
+ * soulignement, qui ne dépend d'aucune couleur.
+ *
+ * Contrastes sur les trois fonds réels — `--fg` 15,69 / 14,71 / 13,75 et
+ * `--accent` 7,74 / 7,26 / 6,79 (`--bg` / `--surface` / `--surface-2`).
+ * Les six passent AA. */
+.link {
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.link:hover { text-decoration-thickness: 2px; }
+
+/* L'état vide d'un fait saisissable, HORS de `.stats-list`. Même traitement
+ * qu'en liste, à l'identique : une même classe ne peut pas vouloir dire deux
+ * choses selon son voisinage. Le remplissage négatif porte la cible tactile à
+ * 44 px — le STANDARD PRODUIT AUREN — sans changer d'un pixel la hauteur de la
+ * ligne : la zone déborde, le chrome visible non. */
+.stat-add {
+  display: inline-block;
+  padding: 12px 4px;
+  margin: -12px -4px;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+}
+.stat-add:hover { text-decoration-thickness: 2px; }
+
 .link-quiet {
   color: var(--fg-dim);
   font-size: 13px;
@@ -3627,6 +3679,282 @@ input, button, textarea, select {
   font-size: 13px;
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * BODY_LEDGER — `UI-CP1`, le premier cockpit de production
+ *
+ * QUESTION SOUVERAINE : « que sait AUREN de mon corps ? »
+ *
+ * HIÉRARCHIE, dans cet ordre et sans exception :
+ *   RÉPONSE PRIMAIRE  le poids, avec son âge — la seule donnée corporelle
+ *                     volatile que l'entraînement consomme
+ *   RELEVÉ            ce qui est mesuré, ce qui est absent
+ *   CONTEXTE          dates mêlées, portée, lectures
+ *   APPROFONDISSEMENT saisie, référence, compte — derrière un geste
+ *
+ * ⚠ AUCUNE CARTE. Ce bloc n'a ni `background`, ni `border`, ni `radius` :
+ * l'instrument est posé à même le fond de page et sa structure est faite de
+ * BANDES, de FILETS et de BLANC. C'est la contrainte explicite de la
+ * directive — « un cockpit ne doit pas devenir une grande carte contenant de
+ * petites cartes » — et c'est ce que le Profil était : huit régions encadrées,
+ * dont trois cartes empilées répondant à trois questions différentes.
+ *
+ * ⚠ AUCUNE COULEUR NEUVE. Les quatre encres viennent de `:root`. L'ambre
+ * `--accent` ne se pose QUE sur la commande dominante — ici « Noter » — et
+ * nulle part ailleurs sur cette surface : deux ambres pleins sur un écran, et
+ * l'ambre cesse de vouloir dire « c'est à toi de jouer ».
+ *
+ * ⚠ L'ÂGE N'EST PAS UN VERDICT. Aucune teinte d'alerte ne se pose sur une
+ * donnée ancienne : aucun seuil de péremption corporelle n'existe dans ce
+ * dépôt, et les seuils de `recovery_contract` portent sur la récupération
+ * d'entraînement — les reprendre ici par commodité serait inventer une règle
+ * en la déguisant en réemploi. L'âge est un FAIT, rendu comme les autres.
+ *
+ * CONTRASTES CALCULÉS SUR LES FONDS RÉELS de cette surface (`CLAUDE.md §5.4`
+ * interdit de transposer un ratio mesuré ailleurs — la doc de `--t-amber`
+ * annonce 5,93, mesuré sur un fond de cockpit qui n'existe pas ici) :
+ *
+ *                              --bg        --surface     --surface-2
+ *                            #0F1318       #151A21        #1B2029
+ *   --fg       #E8ECEF        15,69         14,71          13,75
+ *   --fg-muted #A7B0BA         8,49          7,96           7,44
+ *   --fg-dim   #8A94A0         6,06          5,68           5,31
+ *   --accent   #C8A24B         7,74          7,26           6,79
+ *
+ * Les douze valeurs passent AA (4,5). Le relevé vit sur `--bg` ; les deux
+ * autres colonnes couvrent les champs de saisie, qui sont sur `--surface-2`.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+.body-ledger {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  /* ⚠ MESURÉ EN DESKTOP, PAS DÉDUIT. Sans plafond, une ligne de relevé s'étire
+   * sur ~1400 px au rail ouvert : le libellé est à gauche, sa valeur à
+   * l'autre bout de l'écran, et l'œil perd l'appariement. Un relevé est un
+   * instrument de LECTURE — il obéit à la justification, pas à la largeur
+   * disponible. 760 px tient la ligne la plus longue de la surface
+   * (« moyenne gauche + droite · il y a 28 j ») sans la casser. */
+  max-width: 760px;
+}
+
+/* ── RÉPONSE PRIMAIRE ──────────────────────────────────────────────────────
+ * Pas de cadre, pas de fond : c'est la TAILLE qui porte la hiérarchie. 32 px
+ * est le rang DISPLAY de l'échelle maison (`Q6` : 32 / 22 / 15 / 12), et
+ * c'est le seul 32 de la page. Rien d'autre n'a besoin de crier. */
+.bl-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bl-answer__label {
+  margin: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+.bl-answer__readout {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+}
+
+.bl-answer__unit {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--fg-muted);
+  margin-left: 0.35em;
+}
+
+/* UNKNOWN est un ÉTAT LÉGITIME, pas un vide de mise en page. Il se dit en
+ * toutes lettres et garde le rang typographique de la valeur qu'il remplace —
+ * un « — » à cette échelle se lit comme une case cassée, mesuré au rendu. */
+.bl-answer__readout--unknown {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--fg-muted);
+}
+
+.bl-answer__age {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── BANDE DE RELEVÉ ───────────────────────────────────────────────────────
+ * Un titre de bande n'est pas un titre de section : il ÉTIQUETTE un groupe de
+ * lignes. 12 px capitales espacées, le rang META — l'idiome de libellé du
+ * viseur, dont c'est la grammaire qu'on dérive. */
+.bl-band {
+  display: flex;
+  flex-direction: column;
+}
+
+.bl-band__title {
+  margin: 0 0 var(--space-xs);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-dim);
+}
+
+/* ── LIGNE DE RELEVÉ ───────────────────────────────────────────────────────
+ * Libellé à gauche, valeur alignée à droite, et la PROVENANCE + L'ÂGE sur une
+ * seconde ligne pleine largeur.
+ *
+ * ⚠ PAS UNE QUATRIÈME COLONNE, et ce n'est pas un choix d'esthète : le premier
+ * jet en ajoutait une au tableau morphologique, et le rendu à 390 px l'a
+ * réfutée — « 179.0 / cm », « mesure / directe » et « Tour de / poitrine »
+ * cassaient sur deux lignes chacune. Les tests étaient verts ; seul le rendu
+ * l'a dit.
+ *
+ * D'où vient une valeur et de quand elle date sont UN SEUL FAIT — « mesure
+ * directe · il y a 7 j » — pas deux informations à mettre en colonnes. */
+/* ⚠ LA GRILLE EST SUR LE `<dl>`, PAS SUR UN `<div>` DE LIGNE. Envelopper
+ * chaque paire dans un `<div>` est valide en HTML5 depuis 5.2 — mais le
+ * linter du gate de merge le refuse, et le gate est l'autorité. Poser la
+ * grille sur la liste elle-même évite l'arbitrage tout en gardant
+ * l'association `<dt>` / `<dd>` NATIVE, qui est ce qu'on doit au lecteur
+ * d'écran depuis que le tableau à en-têtes portés a disparu.
+ *
+ * Le filet de séparation est porté par le `<dt>` et sa valeur (bord SUPÉRIEUR)
+ * plutôt que par la fin de ligne : une ligne peut avoir une provenance ou pas,
+ * et un bord haut se pose correctement dans les deux cas. */
+/* ⚠ `column-gap: 0`, ET C'EST LE RENDU QUI L'A IMPOSÉ. Avec une gouttière, les
+ * deux bords supérieurs qui composent le filet de ligne ne se touchent pas :
+ * le séparateur se lit comme DEUX TRAITS CASSÉS avec un trou au milieu. Le
+ * gabarit ne le montre pas, les tests non plus — seule la capture à 390 px l'a
+ * dit. L'écart entre libellé et valeur est donc porté par un `padding-right`
+ * sur le libellé, qui laisse les filets se rejoindre. */
+.bl-rows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.bl-row__label {
+  grid-column: 1;
+  padding-right: var(--space-md);
+  font-size: 15px;
+  color: var(--fg-muted);
+}
+
+.bl-row__value {
+  grid-column: 2;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.bl-row__label,
+.bl-row__value {
+  margin: 10px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* La première ligne suit immédiatement le titre de bande, qui porte déjà son
+ * propre filet : un second trait ferait un double filet. */
+.bl-rows > dt:first-child,
+.bl-rows > dt:first-child + dd {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+/* La provenance et l'âge, sur leur propre ligne, à gauche : un méta aligné à
+ * droite qui passe à la ligne se lit en escalier. */
+.bl-row__meta {
+  grid-column: 1 / -1;
+  /* ⚠ `margin: 0` n'est pas cosmétique : la feuille de style du NAVIGATEUR
+   * pose `margin-left: 40px` sur tout `<dd>`. Sans cette remise à zéro, la
+   * provenance se retrouve décalée de 40 px sous sa valeur — un défaut que le
+   * gabarit ne montre pas et que seul le rendu révèle. */
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Une donnée sans horodatage POSSIBLE (`users.resting_hr` n'a pas de colonne
+ * de date) et un dérivé sans âge propre se distinguent par l'ITALIQUE, jamais
+ * par une teinte seule : la couleur ne doit jamais porter une information à
+ * elle seule. */
+.bl-row__meta--unknown { font-style: italic; }
+
+/* L'absence garde le rang de la valeur qu'elle remplace, en plus discret. */
+.bl-row__value--absent {
+  font-weight: 400;
+  color: var(--fg-dim);
+}
+
+/* ── CONTEXTE ──────────────────────────────────────────────────────────────
+ * La portée de l'instrument et ses réserves. Rang META, jamais encadré. */
+.bl-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+/* `output` est `display: inline` par défaut : sans ce bloc, le retour de la
+ * dernière écriture se collerait au titre de page au lieu de tenir sa ligne. */
+.bl-flash { display: block; }
+
+/* Une note qui SUIT un relevé doit s'en détacher. Sans cet écart, la ligne
+ * d'actions de la bande ABSENT se collait au filet de la dernière ligne et se
+ * lisait comme SA provenance — mesuré au rendu, pas déduit du gabarit. */
+.bl-rows + .bl-note { margin-top: var(--space-md); }
+
+.bl-readings {
+  margin: 0;
+  padding-left: 1.1em;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+/* L'avertissement de dates mêlées et les lectures sont deux choses : sans cet
+ * écart, l'avertissement se lisait comme l'introduction de la liste. */
+.bl-note + .bl-readings,
+.bl-readings + .bl-note { margin-top: var(--space-sm); }
+
+.bl-readings li { margin-bottom: var(--space-xs); }
+.bl-readings li:last-child { margin-bottom: 0; }
+
+/* ── APPROFONDISSEMENT ─────────────────────────────────────────────────────
+ * Le rail de tiroirs. `.disclosure` fournit déjà la géométrie (44 px, chevron,
+ * focus) : ce bloc ne fait que les empiler en une seule pile, sans carte
+ * autour de chacun. Adopter le composant coûte UNE classe sur le `<details>` —
+ * c'est ce qui a été refermé le 2026-09-04 pour que personne n'ait plus de
+ * raison de le réécrire. */
+.bl-drawers {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border);
+}
+
+.bl-drawers .disclosure > summary,
+.bl-drawers .disclosure__summary { padding-left: 0; padding-right: 0; }
+
+.bl-drawers .disclosure__summary:hover { background: transparent; color: var(--fg); }
+
+.bl-drawer__body {
+  padding: 0 0 var(--space-md);
+}
+
 /* ---- Body Profile Form ---- */
 
 .body-profile {
@@ -3698,6 +4026,12 @@ input, button, textarea, select {
   flex-direction: column;
   gap: 4px;
 }
+
+/* Un champ qui prend les deux colonnes — la date, l'e-mail. C'était
+ * `style="grid-column:1/-1;"` recopié à la main sur deux champs : le cliquet
+ * `test_no_new_inline_style` comptait la dette, personne n'offrait le moyen de
+ * la rembourser. */
+.body-profile__field--wide { grid-column: 1 / -1; }
 
 .body-profile__field label {
   font-size: 12px;

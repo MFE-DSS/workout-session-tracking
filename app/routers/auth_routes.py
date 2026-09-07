@@ -31,6 +31,7 @@ from app.services.password_policy import (
     validate_password_policy,
 )
 from app.services.session_state import latest_open_session
+from app.services.time_format import relative_hours_ago
 from app.templating import templates
 
 router = APIRouter(tags=["auth"])
@@ -412,6 +413,29 @@ def profile_page(
             val = getattr(latest_measurement, field, None)
             latest_values[field] = str(val) if val is not None else ""
 
+    # `UI-CP1` — L'ÂGE DU POIDS, LA SEULE CLÉ AJOUTÉE PAR CETTE TRANCHE.
+    #
+    # Le poids est la donnée la plus volatile du corps et la seule que
+    # l'entraînement consomme. Affiché sans son ancienneté, ce n'est pas une
+    # donnée, c'est un souvenir : « 78,4 kg » de ce matin et « 78,4 kg » de
+    # mars se rendaient EXACTEMENT PAREIL.
+    #
+    # ⚠ ZÉRO REQUÊTE AJOUTÉE. `latest_measurement` est déjà chargé deux lignes
+    # plus haut pour peupler `latest_values` ; seule sa colonne `measured_at`
+    # est lue en plus. Le cliquet `test_profile_query_budget` reste à 5, strict
+    # dans les deux sens — c'est lui qui le prouve, pas cette phrase.
+    #
+    # La valeur affichée vient de CE relevé : si `weight_kg` y est nul, le
+    # gabarit n'affiche aucun poids, donc jamais un âge qui parlerait d'une
+    # autre ligne que celle qu'on lit.
+    weight_age_label = (
+        relative_hours_ago(datetime.now(UTC), latest_measurement.measured_at)
+        if latest_measurement is not None
+        and latest_measurement.measured_at is not None
+        and latest_values.get("weight_kg")
+        else None
+    )
+
     return templates.TemplateResponse(
         request, "profile.html",
         {
@@ -426,6 +450,7 @@ def profile_page(
             "capture_fields": capture_fields,
             "morpho": morpho,
             "latest_values": latest_values,
+            "weight_age_label": weight_age_label,
             "active_session": latest_open_session(db, user.id),
             # Sb_31.X — gate the Body Intelligence v2 discovery link.
             "body_intelligence_enabled": get_settings().body_intelligence_enabled,

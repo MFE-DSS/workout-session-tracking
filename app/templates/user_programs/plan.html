@@ -355,4 +355,19 @@
   </details>
 </div>
 </div>
+{# `UI-CP1` — LE SCRIPT REJOINT ENFIN LE FORMULAIRE QU'IL AMÉLIORE.
+   `Sb_UI_PROFILE_PREFERENCES_REDESIGN_01` l'avait posé sur `profile.html`.
+   `UX4_02` / TRAIN 2 a déplacé l'éditeur de préférences ici — et le script
+   est resté là-bas. Résultat mesuré : les TROIS points d'accroche du script
+   (`data-prefs-form`, `data-prefs-ranked`, `data-focus-key`) vivent dans ce
+   gabarit, qui ne le chargeait pas ; `profile.html` le chargeait sans en
+   porter un seul. L'amélioration progressive était INERTE depuis TRAIN2, et
+   la garde censée la protéger épinglait le mauvais gabarit — donc restait
+   verte. C'est la tranche BODY_LEDGER qui l'a découvert en retirant la
+   balise morte, et `CLAUDE.md §5.3` interdit de la retirer sans la replacer.
+
+   `defer` : le script s'exécute après le parsing, donc le formulaire natif est
+   déjà utilisable avant même qu'il ne tourne. S'il ne tourne jamais, les
+   contrôles natifs restent visibles et le formulaire fonctionne. #}
+<script defer src="{{ asset_url('js/prefs_focus_rank.js') }}"></script>
 {% endblock %}

@@ -17,7 +17,7 @@ croire à un effet inexistant est une forme de fabrication.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy.orm import Session
 
@@ -32,6 +32,7 @@ from app.services.morphology_runtime import (
     PROFILE_LATEST_KNOWN_FACTS,
     build_morphology_facts,
 )
+from app.services.time_format import relative_hours_ago
 
 MORPHOLOGY_READMODEL_VERSION = 1
 
@@ -95,6 +96,37 @@ class FactRow:
     basis: str
     source_label: str
     measured_at: datetime | None
+    #: `UI-CP1` — « il y a 28 j », ou `None` quand le fait n'est pas horodaté.
+    #:
+    #: `measured_at` traversait toute la chaîne et **mourait au gabarit** :
+    #: `profile.html` rendait Mesure / Valeur / Base, jamais la date. Le champ
+    #: était calculé, transporté, puis jeté à la dernière ligne.
+    #:
+    #: Le formatage n'est PAS écrit ici : `time_format.relative_hours_ago` sert
+    #: déjà `/export` et `/healthz` avec la voix française du produit (« à
+    #: l'instant », « hier », « il y a 2 mois »). Le corps est la dernière
+    #: surface à en profiter, et la seule où l'âge d'une donnée change ce qu'on
+    #: doit en conclure.
+    age_label: str | None = None
+
+
+@dataclass(frozen=True)
+class MissingRow:
+    """Un fait absent, avec de quoi le renseigner.
+
+    `missing` porte des PHRASES (« Envergure non renseignée ») : lisibles, mais
+    inexploitables par une interface qui doit poser l'action à côté du manque.
+    Le libellé court et la clé permettent au gabarit de router chaque absence
+    vers le bon formulaire — la taille vers les données de référence, le reste
+    vers la saisie morphométrique.
+
+    C'est le diagnostic répété de ce programme : *le produit a la décision, pas
+    le moyen de l'appliquer*. `missing` décidait déjà quoi dire ; il manquait
+    de quoi agir.
+    """
+
+    key: str
+    label: str
 
 
 @dataclass(frozen=True)
@@ -118,10 +150,44 @@ class MorphologyReadModel:
     notice: str = PLANNER_INFLUENCE_NOTICE
     mixed_date_notice: str = MIXED_DATE_NOTICE
     version: int = MORPHOLOGY_READMODEL_VERSION
+    #: Les mêmes absences que `missing`, dans le même ordre, mais exploitables.
+    #: `missing` reste inchangé : c'est un contrat lu ailleurs, et le remplacer
+    #: aurait été une soustraction déguisée en amélioration.
+    #:
+    #: ⚠ Ce champ est **en dernier**, après les trois défauts existants : glissé
+    #: avant eux, il aurait décalé toute construction POSITIONNELLE de cette
+    #: dataclass sans qu'aucun nom de champ ne change — le genre de rupture
+    #: qu'un test qui passe ne rattrape pas.
+    missing_rows: tuple[MissingRow, ...] = ()
 
     @property
     def has_anything(self) -> bool:
         return bool(self.facts or self.interpretations)
+
+
+def _age(mesure_le: datetime | None, as_of: datetime | None) -> str | None:
+    """« il y a 28 j » — l'ancienneté d'un fait, ou `None` s'il n'a pas de date.
+
+    ⚠ TROIS PIÈGES, DEUX MESURÉS DANS CE DÉPÔT.
+
+    **La colonne ment sur son propre type.** `BodyMeasurement.measured_at` est
+    déclarée `DateTime(timezone=True)` et **SQLite rend un datetime NAÏF** —
+    vérifié en base. Soustraire un `datetime.now(UTC)` d'un naïf lève
+    `TypeError`. `relative_hours_ago` absorbe l'écart ; c'est la raison
+    principale de l'appeler plutôt que de soustraire ici.
+
+    **Le formatage existait déjà**, et il est en service sur deux surfaces.
+    En écrire un second ici aurait été la sixième copie d'un motif que ce dépôt
+    duplique déjà cinq fois.
+
+    **`as_of` n'est pas « maintenant ».** Il **borne la lecture dans le passé**
+    (rejouer un profil tel qu'il était). Quand il est fourni, c'est donc lui la
+    référence : un profil rejoué au 1er août ne doit pas afficher l'ancienneté
+    d'aujourd'hui.
+    """
+    if mesure_le is None:
+        return None
+    return relative_hours_ago(as_of or datetime.now(UTC), mesure_le)
 
 
 def _ape_index(facts) -> FactRow | None:
@@ -152,12 +218,15 @@ def build_morphology_readmodel(
 
     rows: list[FactRow] = []
     missing: list[str] = []
+    missing_rows: list[MissingRow] = []
     for key, label in FACT_LABELS.items():
         value = getattr(facts, key, None)
         if value is None:
             missing.append(MISSING_LABELS[key])
+            missing_rows.append(MissingRow(key=key, label=label))
             continue
         p = bundle.provenance_for(key)
+        mesure_le = p.measured_at if p else None
         rows.append(FactRow(
             key=key,
             label=label,
@@ -165,7 +234,8 @@ def build_morphology_readmodel(
             unit="cm",
             basis=BASIS_LABELS.get(p.basis if p else "", "mesure directe"),
             source_label="profil" if key == "height_cm" else "mesure",
-            measured_at=p.measured_at if p else None,
+            measured_at=mesure_le,
+            age_label=_age(mesure_le, as_of),
         ))
 
     ape = _ape_index(facts)
@@ -192,4 +262,5 @@ def build_morphology_readmodel(
         missing=tuple(missing),
         interpretations=interpretations,
         is_mixed_date=bundle.profile_kind == PROFILE_LATEST_KNOWN_FACTS,
+        missing_rows=tuple(missing_rows),
     )
