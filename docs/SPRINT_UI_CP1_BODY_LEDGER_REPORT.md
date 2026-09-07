@@ -264,3 +264,52 @@ n'est inventé.
   Renommer l'entrée du rail est un changement de coque, hors périmètre.
 * **`.link` n'est écrite que maintenant** : son troisième usage, hors de cette
   surface, en bénéficie aussi.
+
+---
+
+## 11. Closeout
+
+**Mergé** — PR **#226**, méthode `--merge` épinglée sur son head
+(`--match-head-commit de0cfdce`), le 2026-09-07 à 13:10 UTC.
+
+| | |
+|---|---|
+| commit de merge | `cd4a04ce654f50f36757e0bb1d07fb95bb6dee4b` |
+| canonique | `d378937` → **`cd4a04c`** |
+| checks PR | **10/10 `pass`**, dont le gate externe requis `SonarCloud Code Analysis` |
+| gate Sonar (autorité) | **`OK`** sur ses cinq conditions |
+| threads de revue non résolus | **0** |
+| `mergeable` / `mergeStateStatus` | `MERGEABLE` / `CLEAN` au moment de l'appel |
+| **CI canonique** (source de vérité) | run `34125868186` sur `cd4a04c` — **`success`, 7/7 jobs** : lint · attestation · 3 shards pytest · pytest+QA · SonarCloud |
+
+### Gate Sonar, condition par condition
+
+| Métrique | Seuil | Mesuré |
+|---|---|---|
+| `new_coverage` | ≥ 80 | **100,0** |
+| `new_duplicated_lines_density` | ≤ 3 | **0,0** |
+| `new_bugs_severity` | ≤ 9 | **0** |
+| `new_code_smells_severity` | ≤ 14 | **0** |
+| `new_vulnerabilities_severity` | ≤ 9 | **0** |
+
+Le gate est vert **sur ses cinq conditions**, pas seulement « pas rouge ». La
+couverture du nouveau code à 100 % reflète que la tranche part avec ses gardes
+plutôt qu'après.
+
+### Exposition visuelle — ordre non conforme, dit explicitement
+
+`CLAUDE.md §5.1` exige le rendu **avant tout commit** touchant un gabarit ou
+une feuille de style. Les rendus ont bien été produits — trois états × deux
+tailles, au runtime — et ils ont trouvé **six des onze défauts** de la §7. Mais
+ils ont été soumis à l'opérateur **après le commit local**, avant le push et le
+merge. L'arbitrage a donc eu lieu, l'ordre non. Consigné plutôt que lissé.
+
+### Nettoyage — NON fait, et c'est volontaire
+
+La suppression de branche et de worktree est une action **humaine**
+(`CLAUDE.md §2`). `sb/ui-cp1-body-ledger` et le worktree
+`workout-session-tracking-ledger` restent en place.
+
+### Suite
+
+**UI-CP2 SESSION_TRUST** — non commencé, conformément à la directive.
