@@ -458,28 +458,41 @@
 
              Ce qui vient de se passer n'est pas perdu — il devient UNE ligne
              de preuve, juste en dessous. #}
-        {% if not cs.is_resting and not cs.is_finished %}
-        <ol class="console__band">
+        {# ── `UI-CP2.1` · L'ÉCHAUFFEMENT, DISPONIBLE ET JAMAIS BLOQUANT ─────
+             L'exercice s'ouvre sur sa première série de TRAVAIL. Les
+             échauffements vivent au-dessus, repliés, en UNE ligne.
 
-          {% set _warm_done = cs.warmup_total > 0 and cs.warmup_done == cs.warmup_total %}
-          {% if not _warm_done %}
-            {# Échauffement EN COURS : il EST la série courante, donc il est
-               en tête de bande (`§7.3`). #}
-            {% for sl in cs.warmup_sets %}
-              {% if sl.completed %}
-                {{ past_line(sl, 'É', None) }}
-              {% elif cs.current_set and sl.id == cs.current_set.id %}
-                <li class="setline setline--current" id="set-{{ sl.id }}">
-                  <span class="setline__marker setline__marker--current" aria-hidden="true">●</span>
-                  <span class="sr-only">Échauffement {{ sl.set_index }} — en cours</span>
+             CE QUE ÇA RETIRE, et ce n'est pas rien : il n'y a plus de valeur
+             à saisir pour avancer. L'utilisateur ne se voit plus imposer le
+             choix entre fabriquer des chiffres et rebondir sur un écran qu'il
+             a déjà quitté — constaté en usage réel, c'est ce qui a décidé
+             cette tranche.
+
+             Le tiroir se rend MÊME quand rien n'est fait : c'est là qu'on
+             s'échauffe. Il ne se rend pas pendant le repos ni sur un exercice
+             fini — à ces instants ce n'est pas la question. #}
+        {% if cs.warmup_total > 0 and not cs.is_resting and not cs.is_finished %}
+          <details class="warmup-recap warmup-recap--band">
+            <summary class="warmup-recap__summary">
+              <span class="setline__marker" aria-hidden="true">{{ '✓' if cs.warmup_done == cs.warmup_total else '○' }}</span>
+              <span class="setline__code">Échauffement</span>
+              <span class="warmup-recap__count">{{ cs.warmup_done }}/{{ cs.warmup_total }}</span>
+            </summary>
+            <ul class="warmup-recap__list">
+              {% for sl in cs.warmup_sets %}
+                <li class="setline setline--warmup-done" id="set-{{ sl.id }}">
+                  <span class="setline__marker" aria-hidden="true">{{ '✓' if sl.completed else '○' }}</span>
+                  <span class="sr-only">Échauffement {{ sl.set_index }} — {{ 'validé' if sl.completed else 'facultatif' }}</span>
                   <span class="setline__code">{{ set_glyph('warmup') }}{{ sl.set_index }}</span>
                   {{ set_inputs(sl, 'échauffement', None) }}
                 </li>
-              {% else %}
-                {{ future_line(sl, 'É') }}
-              {% endif %}
-            {% endfor %}
-          {% endif %}
+              {% endfor %}
+            </ul>
+          </details>
+        {% endif %}
+
+        {% if not cs.is_resting and not cs.is_finished %}
+        <ol class="console__band">
 
           {% for sl in cs.past_sets %}
             {% if not (cs.current_set and sl.id == cs.current_set.id) %}
@@ -532,38 +545,6 @@
             {{ future_line(sl, 'S') }}
           {% endfor %}
 
-          {% if _warm_done %}
-            {# Échauffement TERMINÉ : `§7.3` le dit lui-même — « c'est du L3
-               une fois fait ». Le laisser EN TÊTE poussait le `SetInstrument`
-               à 309 px pour un budget de 300, et faisait précéder la série
-               courante par de l'historique. Il descend donc SOUS la bande
-               vive, sans rien perdre : une ligne, dépliable, et les champs
-               restent saisissables et postés. #}
-            <li class="setline setline--warmup-recap">
-              <details class="warmup-recap">
-                <summary class="warmup-recap__summary">
-                  <span class="setline__marker" aria-hidden="true">✓</span>
-                  <span class="setline__code">Échauffement</span>
-                  <span class="warmup-recap__count">{{ cs.warmup_done }}/{{ cs.warmup_total }}</span>
-                </summary>
-                <ul class="warmup-recap__list">
-                  {% for sl in cs.warmup_sets %}
-                    {# Le nom accessible est NÉCESSAIRE ici, pas décoratif :
-                       le glyphe est `aria-hidden`, donc sans lui cette ligne
-                       ne s'annoncerait plus que « 1 ». Elle disait « É1 »
-                       avant la substitution — retirer le code sans rendre le
-                       mot aurait appauvri la ligne au lieu de la traduire. #}
-                    <li class="setline setline--warmup-done" id="set-{{ sl.id }}">
-                      <span class="setline__marker" aria-hidden="true">✓</span>
-                      <span class="sr-only">Échauffement {{ sl.set_index }} — validé</span>
-                      <span class="setline__code">{{ set_glyph('warmup') }}{{ sl.set_index }}</span>
-                      {{ set_inputs(sl, 'échauffement', None) }}
-                    </li>
-                  {% endfor %}
-                </ul>
-              </details>
-            </li>
-          {% endif %}
         </ol>
         {% endif %}
 
@@ -684,33 +665,6 @@
                     <span class="dock__alt-label">{{ s.label }}</span>
                     {% if s.sub %}<span class="dock__alt-sub">{{ s.sub }}</span>{% endif %}
                   </button>
-                {% elif s.kind == 'skip_warmup' %}
-                  {# `Q-C` — PURE NAVIGATION, et c'est tout l'arbitrage.
-
-                     Un LIEN, pas une soumission : sauter l'échauffement
-                     n'écrit rien. Marquer les échauffements comme faits
-                     fabriquerait des données d'entraînement que
-                     l'utilisateur n'a pas produites — un échauffement sauté
-                     n'est pas un échauffement fait.
-
-                     `skipwarm=1` est à portée de requête, comme `rest=1` et
-                     `fix=` : il ne survit pas au rechargement suivant, donc
-                     l'échauffement reste accessible en retirant le
-                     paramètre. #}
-                  {# Le libellé est enveloppé, et ce n'est pas cosmétique.
-                     `Web:LinksIdenticalTextsDifferentTargetsCheck` signalait
-                     ce lien et celui d'« annuler » : deux `<a>` dont le texte
-                     SOURCE est littéralement `{{ s.label }}`, pour deux
-                     destinations différentes.
-
-                     Les deux branches sont exclusives — `skip_warmup` n'existe
-                     qu'en `WARMUP`, `cancel` qu'en `CORRECTION` — donc le
-                     rendu ne les montre jamais ensemble. Mais si l'analyseur
-                     ne peut pas les distinguer, un lecteur pressé non plus.
-                     On les distingue à la source plutôt que d'adjuger le
-                     signalement. #}
-                  <a class="dock__alt dock__alt--skip-warmup"
-                     href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}&skipwarm=1#exercise-{{ se.id }}"><span class="dock__alt-label">{{ s.label }}</span></a>
                 {% elif s.kind == 'remove' %}
                   {# Q3 — rend INTENTIONNEL ce qui n'était qu'un effet de
                      bord : vider les deux champs dé-complétait déjà la

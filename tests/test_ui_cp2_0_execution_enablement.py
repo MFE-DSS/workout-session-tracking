@@ -43,66 +43,164 @@ def _exercice(warmups, works):
     return SimpleNamespace(set_logs=logs)
 
 
-def _etat(warmups, works, *, rest=False, skip=False, suivant="E2"):
+def _etat(warmups, works, *, rest=False, suivant="E2"):
     from app.services.console_state import build_console_state
 
     return build_console_state(
         _exercice(warmups, works),
         next_code=suivant,
         rest_signal=rest,
-        skip_warmup=skip,
     )
 
 
 #: LA TABLE DE VÉRITÉ, ligne à ligne.
 #:
 #: Colonnes : échauffements (validés ?) · travail (validé ?) · `?rest=1` ·
-#: `?skipwarm=1` · exercice suivant · ÉTAT ATTENDU
+#: exercice suivant · ÉTAT ATTENDU
 #:
-#: Les lignes marquées `F1` / `F2` sont celles qui RÉGRESSENT sous l'ancien
-#: ordre de branches. Les autres figent le comportement qui ne doit pas bouger.
+#: ⚠ `UI-CP2.1` A CHANGÉ LA MACHINE, ET CETTE TABLE EN EST LA SPÉCIFICATION.
+#: L'échauffement n'est plus une porte : il ne peut plus retenir un exercice
+#: qui a du travail à faire. Les lignes marquées `CP2.1` sont celles dont
+#: l'attendu a CHANGÉ — elles rendaient `warmup`, elles rendent désormais
+#: l'état du travail.
+#:
+#: La colonne `skipwarm` a disparu avec le paramètre : il n'y a plus rien à
+#: sauter.
 TABLE = [
-    # ── rien de commencé : l'échauffement est souverain ──────────────────
-    ("neuf", [False, False], [False, False, False], False, False, "E2", "warmup"),
-    ("echauffement entame", [True, False], [False, False, False], False, False, "E2", "warmup"),
-    # ── `skipwarm` : navigation pure, l'affichage avance, rien n'est écrit ─
-    ("skipwarm", [False, False], [False, False, False], False, True, "E2", "current_set"),
-    # ── le travail a commencé : l'échauffement CESSE d'être souverain ────
-    ("F2 · travail commence + repos", [False, False], [True, False, False], True, False, "E2", "rest"),
-    ("travail commence sans repos", [False, False], [True, False, False], False, False, "E2", "current_set"),
-    ("travail commence, echauffement fait", [True, True], [True, False, False], False, False, "E2", "current_set"),
-    # ── le travail est fini : l'exercice est fini ────────────────────────
-    ("F1 · travail fini, echauffement en attente", [False, False], [True, True, True], False, False, "E2", "exercise_complete"),
-    ("F1 · idem sur le DERNIER exercice", [False, False], [True, True, True], False, False, None, "last_exercise_complete"),
-    ("travail fini, tout fait", [True, True], [True, True, True], False, False, "E2", "exercise_complete"),
-    ("F1 · travail fini + signal de repos", [False, False], [True, True, True], True, False, "E2", "exercise_complete"),
-    # ── exercice SANS série de travail : ses échauffements SONT son travail
-    ("sans travail, echauffement en attente", [False], [], False, False, "E2", "warmup"),
-    ("sans travail, echauffement fait", [True], [], False, False, "E2", "exercise_complete"),
-    ("sans travail, skipwarm ne le termine pas", [False], [], False, True, "E2", "exercise_complete"),
-    # ── repos : il n'existe que s'il reste quelque chose après ───────────
-    ("repos au milieu du travail", [True], [True, False, False], True, False, "E2", "rest"),
+    # ── un exercice s'ouvre sur son TRAVAIL, quel que soit l'échauffement ──
+    ("CP2.1 · neuf", [False, False], [False, False, False], False, "E2", "current_set"),
+    ("CP2.1 · echauffement entame", [True, False], [False, False, False], False, "E2", "current_set"),
+    ("CP2.1 · echauffement fait", [True, True], [False, False, False], False, "E2", "current_set"),
+    # ── le travail et son repos ────────────────────────────────────────────
+    ("travail commence + repos", [False, False], [True, False, False], True, "E2", "rest"),
+    ("travail commence sans repos", [False, False], [True, False, False], False, "E2", "current_set"),
+    ("repos au milieu du travail", [True, True], [True, False, False], True, "E2", "rest"),
+    # ── le travail fini termine l'exercice ────────────────────────────────
+    ("travail fini, echauffement en attente", [False, False], [True, True, True], False, "E2", "exercise_complete"),
+    ("travail fini, sur le DERNIER exercice", [False, False], [True, True, True], False, None, "last_exercise_complete"),
+    ("travail fini, tout fait", [True, True], [True, True, True], False, "E2", "exercise_complete"),
+    ("travail fini + signal de repos", [False, False], [True, True, True], True, "E2", "exercise_complete"),
+    # ── LE SEUL CAS OÙ L'ÉCHAUFFEMENT RESTE SOUVERAIN ─────────────────────
+    #    Un exercice sans AUCUNE série de travail : ses échauffements SONT son
+    #    travail. Sans cette branche il n'aurait pas d'état.
+    ("sans travail, echauffement en attente", [False], [], False, "E2", "warmup"),
+    ("sans travail, echauffement fait", [True], [], False, "E2", "exercise_complete"),
+    ("sans travail ni echauffement", [], [], False, "E2", "exercise_complete"),
 ]
 
 
 @pytest.mark.parametrize(
-    ("nom", "warmups", "works", "rest", "skip", "suivant", "attendu"),
+    ("nom", "warmups", "works", "rest", "suivant", "attendu"),
     TABLE,
     ids=[t[0] for t in TABLE],
 )
-def test_table_de_verite_des_transitions(nom, warmups, works, rest, skip,
-                                         suivant, attendu):
-    """Chaque ligne de la table, vérifiée sur le moteur pur.
+def test_table_de_verite_des_transitions(nom, warmups, works, rest, suivant,
+                                         attendu):
+    """Chaque ligne de la table, vérifiée sur le moteur pur."""
+    assert _etat(warmups, works, rest=rest, suivant=suivant).state == attendu
 
-    ⚠ « sans travail, skipwarm ne le termine pas » mérite un mot : le nom dit
-    l'intention, et l'assertion dit `exercise_complete`. Ce n'est pas une
-    contradiction — `skip_warmup` fait sortir de la souveraineté de
-    l'échauffement, et un exercice sans travail n'a alors plus rien à faire.
-    C'est le comportement de l'ANCIEN code aussi : la ligne fige un acquis, elle
-    ne réclame rien de neuf.
+
+def test_l_echauffement_ne_retient_jamais_un_exercice_qui_a_du_travail():
+    """L'INVARIANT DE `UI-CP2.1`, énoncé une fois plutôt qu'illustré.
+
+    Constaté par l'opérateur en usage réel : le seul moyen DURABLE de sortir
+    de l'échauffement était d'y saisir des valeurs, puisque « fait » se dérive
+    de la présence d'un poids ou de répétitions. Le produit imposait donc de
+    fabriquer des chiffres ou de rebondir.
+
+    Cette garde balaie la table entière : dès qu'un exercice a la moindre
+    série de travail, aucun chemin ne peut rendre `warmup`.
     """
-    assert _etat(warmups, works, rest=rest, skip=skip,
-                 suivant=suivant).state == attendu
+    regressions = []
+    for nom, warmups, works, rest, suivant, _ in TABLE:
+        if not works:
+            continue
+        if _etat(warmups, works, rest=rest, suivant=suivant).state == "warmup":
+            regressions.append(nom)
+    assert not regressions, (
+        f"l'échauffement retient encore un exercice qui a du travail : {regressions}"
+    )
+
+
+def test_aucune_valeur_d_echauffement_n_est_requise_pour_avancer():
+    """LA PLAINTE DE L'OPÉRATEUR, prise au mot.
+
+    « la redondance que les valeurs doivent être obligatoirement remplies sur
+    les échauffements ». Un exercice dont AUCUN échauffement n'est renseigné
+    doit pouvoir être exécuté et terminé de bout en bout.
+    """
+    from app.services.console_state import command_for
+
+    # Rien n'est fait : on peut commencer à travailler.
+    depart = _etat([False, False], [False, False, False])
+    assert depart.state == "current_set"
+    assert depart.warmup_done == 0
+
+    # Tout le travail est fait, toujours aucun échauffement renseigné :
+    # l'exercice se termine, et la commande mène ailleurs.
+    fin = _etat([False, False], [True, True, True])
+    assert fin.state == "exercise_complete"
+    assert fin.warmup_done == 0
+    assert command_for(fin)["label"] == "CONTINUER → E2"
+
+
+def test_l_echauffement_reste_souverain_quand_il_EST_le_travail():
+    """LA GARDE DE LA GARDE — l'inverse doit tenir aussi.
+
+    Retirer purement la souveraineté de l'échauffement aurait laissé sans état
+    un exercice qui n'a QUE des échauffements. La garde précédente serait alors
+    satisfaite par un moteur qui n'affiche jamais `warmup`.
+    """
+    etat = _etat([False, False], [])
+    assert etat.state == "warmup"
+    assert etat.current_set is not None
+
+
+def test_plus_aucune_sortie_ne_propose_de_sauter_l_echauffement():
+    """`§5.3` — LA SOUSTRACTION PART AVEC SON REMPLAÇANT.
+
+    « SAUTER L'ÉCHAUFFEMENT » existait parce que l'échauffement RETENAIT
+    l'exercice, et elle ne tenait pas sa promesse : `?skipwarm=1` vivait dans
+    l'URL, donc le saut ne survivait pas au rechargement — « le CTA ne va nulle
+    part », constaté en usage.
+
+    Ce qui la remplace n'est pas un autre bouton : il n'y a plus de porte. Une
+    commande dont l'objet a disparu se retire, elle ne se remplace pas.
+    """
+    from app.services.console_state import secondary_for
+
+    for warmups, works in (([False, False], [False, False, False]),
+                           ([True, False], [False, False, False]),
+                           ([False], [])):
+        sorties = secondary_for(_etat(warmups, works))
+        libelles = [s["label"] for s in sorties]
+        assert not any("ÉCHAUFFEMENT" in lab.upper() for lab in libelles), (
+            f"une sortie propose encore de sauter l'échauffement : {libelles}"
+        )
+        assert not any(s.get("kind") == "skip_warmup" for s in sorties)
+
+
+# ⚠ TROIS GARDES DE `UI-CP2.0` SONT SUPERSÉDÉES PAR `UI-CP2.1`, PAS RETIRÉES.
+#
+#   `test_l_invariant_de_monotonie_tient_sur_toute_la_table`
+#       tenait « une fois le travail commencé, plus jamais `warmup` ».
+#       → remplacée par `test_l_echauffement_ne_retient_jamais_un_exercice_
+#         qui_a_du_travail`, qui n'attend plus que le travail COMMENCE :
+#         l'échauffement ne retient rien, dès la première seconde.
+#
+#   `test_l_echauffement_reste_souverain_tant_que_rien_n_a_commence`
+#       tenait exactement la propriété que `UI-CP2.1` RETIRE. La garder aurait
+#       interdit la décision de l'opérateur.
+#       → remplacée par `test_l_echauffement_reste_souverain_quand_il_EST_le_
+#         travail`, qui garde le seul cas où la souveraineté a encore un sens.
+#
+#   `test_skipwarm_n_ecrit_toujours_rien`
+#       gardait qu'un paramètre n'écrivait rien. Le paramètre n'existe plus.
+#       → remplacée par `test_aucune_valeur_d_echauffement_n_est_requise_pour_
+#         avancer`, qui tient la propriété d'usage plutôt que le moyen.
+#
+# Chacune est donc remplacée par une garde plus forte, dans le même fichier et
+# la même livraison.
 
 
 def test_f1_la_commande_dominante_cesse_de_mentir():
@@ -119,52 +217,6 @@ def test_f1_la_commande_dominante_cesse_de_mentir():
     assert etat.work_done == etat.work_total == 3
     assert etat.state == "exercise_complete"
     assert command_for(etat)["label"] == "CONTINUER → E2"
-
-
-def test_l_invariant_de_monotonie_tient_sur_toute_la_table():
-    """**LA PROGRESSION EST MONOTONE** — l'invariant, pas ses instances.
-
-    Dès qu'une série de travail est validée, aucun chemin ne peut ramener la
-    console à `WARMUP`. Cette garde balaie la table entière plutôt que de
-    citer un cas : une garde qui n'épingle qu'un exemple ne tient pas un
-    invariant.
-    """
-    regressions = []
-    for nom, warmups, works, rest, skip, suivant, _ in TABLE:
-        if not any(works):
-            continue
-        etat = _etat(warmups, works, rest=rest, skip=skip, suivant=suivant)
-        if etat.state == "warmup":
-            regressions.append(nom)
-    assert not regressions, (
-        f"la console retombe en échauffement après du travail validé : {regressions}"
-    )
-
-
-def test_l_echauffement_reste_souverain_tant_que_rien_n_a_commence():
-    """LA GARDE DE LA GARDE — l'inverse doit tenir aussi.
-
-    Corriger F1 en retirant purement la souveraineté de l'échauffement aurait
-    « réglé » le défaut en cassant le produit : un exercice neuf DOIT proposer
-    son échauffement. Sans cette garde, la précédente serait satisfaite par un
-    moteur qui n'affiche jamais `WARMUP`.
-    """
-    for warmups in ([False], [False, False], [True, False]):
-        etat = _etat(warmups, [False, False, False])
-        assert etat.state == "warmup", warmups
-
-
-def test_skipwarm_n_ecrit_toujours_rien():
-    """`Q-C` — sauter l'échauffement est une PURE NAVIGATION.
-
-    Marquer les échauffements faits fabriquerait des données d'entraînement que
-    l'utilisateur n'a pas produites. `UI-CP2.0` ne touche pas à cette décision :
-    l'état avance, les séries d'échauffement restent non validées.
-    """
-    etat = _etat([False, False], [False, False, False], skip=True)
-    assert etat.state == "current_set"
-    assert etat.warmup_done == 0
-    assert all(not sl.completed for sl in etat.warmup_sets)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -391,9 +443,13 @@ def test_f3_les_echauffements_ne_sont_pas_emportes(client):
 def test_f1_f2_et_f3_ensemble_sur_une_seance_reelle(client):
     """LE CHEMIN ORDINAIRE, DE BOUT EN BOUT.
 
-    Sauter l'échauffement (qui n'écrit rien), enregistrer les trois séries de
-    travail **une par une** — ce que l'instrument A+ fera — et vérifier que
-    l'exercice se termine réellement.
+    Enregistrer les trois séries de travail **une par une**, sans jamais
+    renseigner un échauffement, et vérifier que l'exercice se termine
+    réellement.
+
+    ⚠ `UI-CP2.1` — il n'y a plus rien à sauter : l'exercice s'ouvre sur son
+    travail. Ce chemin est donc devenu le chemin PAR DÉFAUT, plus un
+    contournement.
 
     Aucun des trois défauts pris isolément ne rend ce chemin possible : F3
     conserve les séries, F1 laisse l'exercice se terminer, F2 autorise le repos
@@ -425,7 +481,7 @@ def test_f1_f2_et_f3_ensemble_sur_une_seance_reelle(client):
             select(SessionExercise).where(SessionExercise.id == se_id)
             .options(selectinload(SessionExercise.set_logs))
         ).scalar_one()
-        etat = build_console_state(se, next_code="E2", skip_warmup=True)
+        etat = build_console_state(se, next_code="E2")
 
     assert etat.state == "exercise_complete", (
         "l'exercice ne se termine pas alors que tout son travail est fait"
