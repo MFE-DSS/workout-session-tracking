@@ -9,8 +9,15 @@ POURQUOI CETTE GARDE EXISTE
     sl.reps      = to_int(form.get(f"set_{sl.id}_reps"))
     sl.completed = (new_weight is not None) or (new_reps is not None)
 
-**Un champ absent du DOM renvoie `None` : la série est effacée et
+**Un champ absent du DOM renvoyait `None` : la série était effacée et
 dé-complétée.** Silencieusement, au premier enregistrement suivant.
+
+⚠ **`UI-CP2.0` A FERMÉ CE DÉFAUT À LA SOURCE** (2026-09-08). Une série absente
+du formulaire est désormais **INCHANGÉE** ; seul un champ soumis VIDE efface,
+et l'effacement nommé (`clear_set`) reste explicite. Ce fichier ne surveille
+donc plus une perte imminente : il **fige l'acquis**, et vérifie que la
+composition reste auto-suffisante. Le libellé ci-dessus est conservé au passé
+parce que la raison d'être de la suite se lit dans son histoire.
 
 Le dépôt gardait déjà cet invariant — mais en lisant le **source du gabarit** :
 présence de la macro `set_values`, appelée par `past_line` et `future_line`.
@@ -157,8 +164,10 @@ def test_every_form_carries_all_the_sets_it_will_overwrite(client):
             ]
     assert missing == [], (
         f"{len(missing)} champ(s) absent(s) : {missing[:6]}. "
-        "`_persist_set_values` écrit `None` pour un champ absent — ces séries "
-        "seront EFFACÉES au prochain enregistrement de leur exercice."
+        "Le formulaire d'exercice doit rester AUTO-SUFFISANT : il porte toutes "
+        "ses séries, donc un aller-retour restitue l'état complet. Depuis "
+        "`UI-CP2.0` un champ absent n'efface plus rien — cette garde tient "
+        "désormais la COMPOSITION, plus la perte de données."
     )
 
 
@@ -193,17 +202,72 @@ def test_replaying_a_form_unchanged_loses_nothing(session_with_a_logged_set, cli
 
 
 def test_the_probe_would_notice_a_missing_field(session_with_a_logged_set, client):
-    """Garde de la garde.
+    """Garde de la garde — **RÉÉCRITE PAR `UI-CP2.0`, SUR SA PROPRE CONSIGNE**.
 
-    Sans elle, les deux tests ci-dessus passeraient à vide si le routeur
-    cessait d'écraser. On retire délibérément les champs de la série
-    enregistrée et on vérifie que la perte se produit **bel et bien**.
+    Son écriture d'origine retirait deux champs du formulaire et vérifiait que
+    la série était **bel et bien effacée** : c'est ainsi qu'elle prouvait que
+    les deux gardes ci-dessus ne passaient pas à vide.
 
-    Si ce test cesse d'échouer à l'effacement, c'est que `_persist_set_values`
-    a changé de comportement — et que les gardes de préservation ne prouvent
-    plus rien. Les réécrire avant de continuer.
+    Elle portait aussi son propre mode d'emploi : *« si ce test cesse d'échouer
+    à l'effacement, c'est que `_persist_set_values` a changé de comportement —
+    les réécrire avant de continuer »*. C'est exactement ce qui vient
+    d'arriver : `UI-CP2.0` a fait d'une série absente une série **INCHANGÉE**,
+    et la sonde a perdu son objet. Elle est donc réécrite, pas assouplie.
+
+    CE QUI POURRAIT ENCORE RENDRE LES GARDES CI-DESSUS CREUSES : un routeur qui
+    n'écrirait plus RIEN. « Aucune série perdue » serait alors trivialement
+    vrai. La sonde prouve donc les deux moitiés du contrat :
+
+      1. l'écrivain est VIVANT — une valeur soumise et modifiée est persistée ;
+      2. le chemin destructeur reste ATTEIGNABLE — un champ soumis VIDE efface
+         toujours, ce qui est la sémantique `Sx_24 §E` et une capacité réelle.
+
+    Sans la moitié 2, « préservation » serait satisfaite par un écrivain inerte.
     """
     session_id, se_id, target = session_with_a_logged_set
+
+    # 1 — L'ÉCRIVAIN EST VIVANT.
+    forms = _exercise_forms(client.get(f"/sessions/{session_id}").text)
+    data = dict(forms[se_id])
+    data[f"set_{target}_weight_kg"] = "91"
+    data[f"set_{target}_reps"] = "5"
+    data["nav"] = "stay_norest"
+    client.post(
+        f"/sessions/{session_id}/exercises/{se_id}", data=data, follow_redirects=False
+    )
+    row = _sets_of(session_id)[target]
+    assert row[1] == 91, "une valeur soumise n'est pas écrite — l'écrivain est mort"
+    assert row[2] == 5, "les répétitions soumises ne sont pas écrites"
+
+    # 2 — LE CHEMIN DESTRUCTEUR RESTE ATTEIGNABLE, par un champ VIDE et non
+    #     par une clé absente.
+    forms = _exercise_forms(client.get(f"/sessions/{session_id}").text)
+    data = dict(forms[se_id])
+    data[f"set_{target}_weight_kg"] = ""
+    data[f"set_{target}_reps"] = ""
+    data["nav"] = "stay_norest"
+    client.post(
+        f"/sessions/{session_id}/exercises/{se_id}", data=data, follow_redirects=False
+    )
+    row = _sets_of(session_id)[target]
+    assert row[1] is None, "un champ vidé n'efface plus la charge"
+    assert row[2] is None, "un champ vidé n'efface plus les répétitions"
+    assert row[3] is False, "la série reste marquée faite après un vidage"
+
+
+def test_an_absent_field_no_longer_erases(session_with_a_logged_set, client):
+    """`UI-CP2.0` — le défaut que la suite entière surveillait est FERMÉ.
+
+    Ce fichier existait parce qu'un champ absent du DOM effaçait sa série au
+    prochain enregistrement. La composition devait donc porter tous ses champs,
+    faute de quoi elle détruisait des données d'entraînement.
+
+    Le contrat d'écriture a changé : **absent veut désormais dire inchangé**.
+    Cette garde fige l'acquis, pour qu'un retour au contrat tout-ou-rien ne
+    puisse pas passer inaperçu.
+    """
+    session_id, se_id, target = session_with_a_logged_set
+    avant = _sets_of(session_id)[target]
 
     forms = _exercise_forms(client.get(f"/sessions/{session_id}").text)
     data = dict(forms[se_id])
@@ -214,6 +278,7 @@ def test_the_probe_would_notice_a_missing_field(session_with_a_logged_set, clien
         f"/sessions/{session_id}/exercises/{se_id}", data=data, follow_redirects=False
     )
 
-    row = _sets_of(session_id)[target]
-    assert row[1] is None, "la charge a survécu à un champ retiré"
-    assert row[2] is None, "les répétitions ont survécu à un champ retiré"
+    apres = _sets_of(session_id)[target]
+    assert apres[1] == avant[1], "une série absente du formulaire a perdu sa charge"
+    assert apres[2] == avant[2], "une série absente a perdu ses répétitions"
+    assert apres[3] is True, "une série absente a été dé-complétée"
