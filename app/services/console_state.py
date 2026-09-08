@@ -214,14 +214,52 @@ def build_console_state(
             **common,
         )
 
-    # `Q-C` — SAUTER L'ÉCHAUFFEMENT. Signal de requête, jamais un état écrit :
-    # on n'entre dans cette branche que s'il reste une série de TRAVAIL à
-    # faire. Sans ce garde, sauter l'échauffement d'un exercice dont le travail
-    # est terminé afficherait `CURRENT_SET` sans série courante.
+    # ═══════════════════════════════════════════════════════════════════════
+    # `UI-CP2.0` — LA PROGRESSION EST MONOTONE.
     #
-    # Les échauffements restent `pending` en base : ils ne sont pas marqués
-    # faits, et l'utilisateur peut y revenir en rechargeant sans le paramètre.
-    if pending_warmups and not (skip_warmup and pending_works):
+    # L'ordre des branches ci-dessous EST le contrat. L'ancien ordre plaçait
+    # l'échauffement en premier, sans condition, et produisait deux défauts
+    # mesurés au labo sur une séance réelle :
+    #
+    #   F1  Un exercice dont les TROIS séries de travail étaient faites, mais
+    #       dont un échauffement n'était pas coché, rendait `WARMUP` avec la
+    #       commande dominante « PASSER AUX SÉRIES » — vers des séries déjà
+    #       faites. `EXERCISE_COMPLETE` n'était JAMAIS atteint, et
+    #       « CONTINUER → E2 » n'apparaissait jamais.
+    #
+    #   F2  Le même verrou avalait `?rest=1` : on pouvait enregistrer une
+    #       série de travail et voir l'instrument réclamer l'échauffement.
+    #
+    # Le chemin est ordinaire, pas exotique : sauter l'échauffement — qui, par
+    # décision produit `Q-C`, **n'écrit rien** — puis faire ses séries.
+    #
+    # ⚠ CE N'EST PAS UN SIMPLE RÉORDONNANCEMENT. L'invariant ajouté est que
+    # **l'échauffement cesse d'être souverain dès que le travail a commencé**,
+    # et la preuve du départ est une donnée d'entraînement réelle
+    # (`work_done > 0`), pas un paramètre d'URL. `skip_warmup` reste une pure
+    # navigation à portée de requête : il fait avancer l'affichage, il n'écrit
+    # toujours rien, et il ne survit pas au rechargement.
+    # ═══════════════════════════════════════════════════════════════════════
+    #: Preuve que l'utilisateur a dépassé l'échauffement. `work_done` est une
+    #: donnée persistée ; `skip_warmup` est une intention de navigation. Les
+    #: deux valent départ, mais seule la première survit au rechargement.
+    progressed = work_done > 0 or skip_warmup
+
+    # 1 — L'EXERCICE EST FINI QUAND SON TRAVAIL EST FINI.
+    #     Un échauffement non coché ne retient pas un exercice terminé.
+    #     Garde : un exercice SANS série de travail n'a que ses échauffements —
+    #     ils sont alors son travail, et cette branche ne doit pas le déclarer
+    #     fini avant qu'ils le soient.
+    if not pending_works and works:
+        return ConsoleState(
+            state=EXERCISE_COMPLETE if next_code else LAST_EXERCISE_COMPLETE,
+            current_set=None,
+            future_sets=[],
+            **common,
+        )
+
+    # 2 — L'ÉCHAUFFEMENT N'EST SOUVERAIN QUE TANT QUE RIEN N'A COMMENCÉ.
+    if pending_warmups and not progressed:
         return ConsoleState(
             state=WARMUP,
             current_set=pending_warmups[0],
@@ -229,11 +267,13 @@ def build_console_state(
             **common,
         )
 
+    # 3 — LE TRAVAIL, ET SON REPOS.
+    #     `REST` n'existe que s'il reste quelque chose à faire après : afficher
+    #     « repos » quand l'exercice est fini annoncerait une série qui n'existe
+    #     pas. Une série de travail fraîchement validée produit désormais un
+    #     repos légitime MÊME si un échauffement reste non résolu.
     if pending_works:
         current, rest = pending_works[0], pending_works[1:]
-        # `REST` n'existe que s'il reste quelque chose à faire après : afficher
-        # « repos » quand l'exercice est fini annoncerait une série qui n'existe
-        # pas.
         return ConsoleState(
             state=REST if rest_signal else CURRENT_SET,
             current_set=current,
@@ -241,6 +281,8 @@ def build_console_state(
             **common,
         )
 
+    # 4 — Reste le cas d'un exercice sans travail, dont les échauffements sont
+    #     tous faits : il est fini.
     return ConsoleState(
         state=EXERCISE_COMPLETE if next_code else LAST_EXERCISE_COMPLETE,
         current_set=None,

@@ -274,8 +274,38 @@ def _persist_set_values(se, form) -> None:
             new_weight = new_reps = None
         else:
             p = f"set_{sl.id}_"
-            new_weight = to_float(form.get(p + "weight_kg"))
-            new_reps = to_int(form.get(p + "reps"))
+            champ_poids, champ_reps = p + "weight_kg", p + "reps"
+            presente = champ_poids in form or champ_reps in form
+            # ═══════════════════════════════════════════════════════════════
+            # `UI-CP2.0` — F3 : UNE SÉRIE ABSENTE DU FORMULAIRE EST INCHANGÉE.
+            #
+            # Cette boucle écrivait TOUTES les séries de l'exercice depuis le
+            # formulaire : une série non postée recevait `None`, donc
+            # `completed = False`. Le contrat était **tout-ou-rien à l'échelle
+            # de l'exercice**.
+            #
+            # Mesuré au labo sur une séance réelle : trois séries postées une
+            # à une, **une seule survivait** — chaque envoi effaçait le
+            # précédent. Invisible aujourd'hui parce que le formulaire rendu
+            # porte toujours toutes les séries ; mortel pour un instrument
+            # d'exécution qui envoie une série à la fois.
+            #
+            # ⚠ « ABSENT » N'EST PAS « VIDE ». Un champ posté vide reste un
+            # effacement EXPLICITE — c'est la sémantique `Sx_24 §E`, et deux
+            # gardes existantes en dépendent (`test_empty_values_yield_
+            # completed_false`, `test_multiple_sets_independent`) : elles
+            # postent des chaînes vides, pas des clés manquantes. Seule
+            # l'ABSENCE de la clé devient neutre.
+            #
+            # Le formulaire complet d'aujourd'hui poste toutes ses séries :
+            # son comportement ne change donc pas d'un iota.
+            # ═══════════════════════════════════════════════════════════════
+            if not presente:
+                continue
+            new_weight = (to_float(form.get(champ_poids))
+                          if champ_poids in form else sl.weight_kg)
+            new_reps = (to_int(form.get(champ_reps))
+                        if champ_reps in form else sl.reps)
         sl.weight_kg = new_weight
         sl.reps = new_reps
         sl.completed = (new_weight is not None) or (new_reps is not None)
