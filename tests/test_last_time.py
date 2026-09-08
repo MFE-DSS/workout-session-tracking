@@ -22,6 +22,42 @@ def _new_session(client, slug: str = "push-a") -> int:
     return int(m.group(1))
 
 
+def _render_exercise(client, session_id: int, code: str) -> str:
+    """La page de séance AVEC l'exercice `code` actif.
+
+    ⚠ `UI-CP2` — POURQUOI CES GARDES NAVIGUENT MAINTENANT.
+
+    Elles lisaient le bloc « Dernière fois » sur les cartes REPLIÉES des
+    exercices inactifs. A+ ne rend plus que l'exercice ACTIF : l'instrument
+    répond à « que fais-je maintenant », et sept performances passées
+    empilées ne servaient pas cette question.
+
+    La capacité n'est pas perdue, elle est DÉPLACÉE AU POINT DE DÉCISION :
+    la référence de l'exercice s'affiche quand on l'exécute. `?active=` est
+    une sélection SERVEUR — pas une ancre — et elle existait déjà.
+
+    Ces gardes vérifient donc la même chose qu'avant : que la performance
+    précédente atteint l'utilisateur. Elles la cherchent là où elle est
+    désormais utile.
+    """
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise
+
+    with SessionLocal() as db:
+        se_id = db.execute(
+            select(SessionExercise.id).where(
+                SessionExercise.session_id == session_id,
+                SessionExercise.exercise_code_snapshot == code,
+            )
+        ).scalars().first()
+    assert se_id is not None, f"aucun exercice {code} dans la séance {session_id}"
+    r = client.get(f"/sessions/{session_id}?active={se_id}")
+    assert r.status_code == 200, r.text[:300]
+    return r.text
+
+
 def _manually_insert_prior_session(
     client,
     *,
@@ -78,7 +114,13 @@ def test_last_time_is_absent_when_no_prior_session(client):
     # ACTIVE card (its previous-load info lives in the console « Référence
     # précédente »). It still renders on every NON-active card, so the empty
     # state shows for the 6 non-active exercises (7 total − 1 active).
-    assert body.count("Aucune séance précédente") >= 6
+    # ⚠ `UI-CP2` — CE COMPTAGE DÉCRIVAIT LA LISTE, PAS LA CAPACITÉ.
+    # « au moins six » supposait que les six exercices INACTIFS soient rendus.
+    # A+ ne rend que l'actif : compter les autres reviendrait à exiger la
+    # composition que la refonte retire. Ce qui doit tenir, c'est qu'AUCUNE
+    # performance ne soit INVENTÉE là où il n'y en a pas.
+    assert "Aucune référence prescrite" in body
+    assert "Réf." not in body, "une référence apparaît sans séance précédente"
 
 
 def test_last_time_shows_weights_and_reps_when_prior_exists(client):
@@ -95,12 +137,14 @@ def test_last_time_shows_weights_and_reps_when_prior_exists(client):
         ],
     )
     sid = _new_session(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
+    body = _render_exercise(client, sid, "E2")
     # Our compact format: "60 / 62.5 / 55 kg · 10 / 8 / 12 reps"
     # (HTML escaping may apply to the middle dot but "kg" and "reps" are ASCII).
     assert "60 / 62.5 / 55 kg" in body
-    assert "10 / 8 / 12 reps" in body
+    # `UI-CP2` — le format de la CONSOLE est `… kg × …`, celui de la carte
+    # repliée était `… kg · … reps`. La donnée est la même ; seule
+    # l'écriture change, et c'est celle qui atteint désormais l'œil.
+    assert "10 / 8 / 12" in body
 
 
 def test_current_session_is_excluded_from_its_own_last_time(client):
@@ -131,8 +175,7 @@ def test_current_session_is_excluded_from_its_own_last_time(client):
         data[f"set_{set_id}_completed"] = "1"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
 
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
+    body = _render_exercise(client, sid, "E1")
 
     # Current session is excluded from its own last-time lookup: every
     # NON-active card still shows the empty state. Sx_UI_06 D1 : the active
@@ -142,7 +185,13 @@ def test_current_session_is_excluded_from_its_own_last_time(client):
     # NB: the just-saved values DO legitimately appear in this session's own
     # compact recap (.exercise-card__recap) — that is the CURRENT session, not
     # a previous-load — so we do not assert their global absence here.
-    assert body.count("Aucune séance précédente") >= 6
+    # ⚠ `UI-CP2` — CE COMPTAGE DÉCRIVAIT LA LISTE, PAS LA CAPACITÉ.
+    # « au moins six » supposait que les six exercices INACTIFS soient rendus.
+    # A+ ne rend que l'actif : compter les autres reviendrait à exiger la
+    # composition que la refonte retire. Ce qui doit tenir, c'est qu'AUCUNE
+    # performance ne soit INVENTÉE là où il n'y en a pas.
+    assert "Aucune référence prescrite" in body
+    assert "Réf." not in body, "une référence apparaît sans séance précédente"
 
 
 def test_last_time_uses_only_completed_work_sets(client):
@@ -161,10 +210,9 @@ def test_last_time_uses_only_completed_work_sets(client):
         ],
     )
     sid = _new_session(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
+    body = _render_exercise(client, sid, "E2")
     assert "60 / 62.5 kg" in body
-    assert "10 / 8 reps" in body
+    assert "10 / 8" in body
     # The dropped (incomplete) third set must NOT have leaked "— kg" noise.
     assert "60 / 62.5 / —" not in body
 
@@ -180,8 +228,7 @@ def test_last_time_is_template_scoped(client):
         work_sets=[{"weight_kg": 70.0, "reps": 6}],
     )
     sid = _new_session(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
+    body = _render_exercise(client, sid, "E2")
     # The Pull B values must not leak onto the Push A page
     assert "70 kg" not in body
 
@@ -200,6 +247,7 @@ def test_last_time_with_prior_but_no_completed_data(client):
         ],
     )
     sid = _new_session(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
-    assert "aucune donnée saisie" in body
+    body = _render_exercise(client, sid, "E2")
+    # La console nomme l'absence de référence PRESCRITE ; « aucune donnée
+    # saisie » était le vocabulaire du bloc replié, qui n'existe plus.
+    assert "Aucune référence prescrite" in body

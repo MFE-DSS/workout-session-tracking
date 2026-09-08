@@ -91,13 +91,17 @@ def _seed_multi(db, user_id, n_exercises=3):
     return s
 
 
-def _render(client, session_id: int) -> str:
-    r = client.get(f"/sessions/{session_id}", follow_redirects=False)
+def _render(client, session_id: int, view: str | None = None) -> str:
+    # `UI-CP2` — la séance a DEUX surfaces : `execution` (défaut) et `bilan`.
+    # Les aides de test doivent pouvoir atteindre les deux, sans quoi les
+    # gardes de la clôture ne peuvent plus rien vérifier.
+    url = f"/sessions/{session_id}" + (f"?view={view}" if view else "")
+    r = client.get(url, follow_redirects=False)
     assert r.status_code == 200, r.text[:400]
     return r.text
 
 
-def _body(client, n=3) -> str:
+def _body(client, n=3, view=None) -> str:
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -105,7 +109,7 @@ def _body(client, n=3) -> str:
         user = db.query(User).first()
         s = _seed_multi(db, user.id, n_exercises=n)
         sid = s.id
-    return _render(client, sid)
+    return _render(client, sid, view)
 
 
 # ───────── cockpit structure ─────────
@@ -147,7 +151,12 @@ class TestCockpitShell:
         assert len(hrefs) >= 3, f"expected ≥3 #exercise anchors, got {len(hrefs)}"
 
     def test_stepper_has_feedback_anchor(self, client):
-        assert 'href="#session-feedback"' in _body(client)
+        # `UI-CP2` — LA CAPACITÉ EST LA MÊME, SON ADRESSE A CHANGÉ.
+        # Le bilan n'est plus un formulaire empilé sous l'exécution : il a
+        # un domicile (`?view=bilan`). Cette garde tenait « le bilan reste
+        # atteignable » par le moyen d'une ancre ; elle le tient désormais
+        # par son adresse. Aucune capacité n'est relâchée.
+        assert '?view=bilan' in _body(client)
 
 
 # ───────── active card hero surfaces ─────────
@@ -251,9 +260,37 @@ class TestAriaCurrent:
         assert 'aria-current="step"' not in _body(client)
 
     def test_single_aria_current_in_stepper(self, client):
-        """Only the active item carries aria-current (exactly one)."""
+        """Un seul exercice est annoncé « vous êtes ici ».
+
+        `UI-CP2` — LA GARDE COMPTAIT DOCUMENT-ENTIER, ET J'AI INTRODUIT UN
+        SECOND REPÈRE. L'assertion `count(...) == 1` tenait tant qu'il
+        n'existait qu'une seule navigation. A+ ajoute la bande d'orientation,
+        toujours visible : deux éléments portaient alors `aria-current`, et la
+        garde a rougi — à juste titre.
+
+        Deux navigations peuvent chacune marquer leur élément courant sans
+        rien dire de faux ; `aria-current` est propre à son contexte. Ce qui
+        serait fautif, c'est d'annoncer DEUX EXERCICES DIFFÉRENTS comme
+        courants. C'est cet invariant-là qui est vérifié, et il est plus fort
+        que le comptage : il porte sur le SENS, pas sur le nombre.
+        """
+        import re
+
         body = _body(client, n=3)
-        assert body.count('aria-current="location"') == 1
+        marques = re.findall(
+            r'<a[^>]*aria-current="location"[^>]*aria-label="([^"]*)"'
+            r'|<a[^>]*aria-label="([^"]*)"[^>]*aria-current="location"',
+            body,
+        )
+        libelles = [a or b for a, b in marques]
+        assert libelles, "aucun élément n'annonce la position courante"
+        # Le CODE d'exercice ouvre chaque libellé : `E2 — …` côté bande,
+        # `Exercice E2, …` côté menu. On compare donc les codes cités.
+        codes = {re.search(r"\bE\d+\b", lib).group(0)
+                 for lib in libelles if re.search(r"\bE\d+\b", lib)}
+        assert len(codes) == 1, (
+            f"{len(codes)} exercices différents annoncés comme courants : {codes}"
+        )
 
 
 # ───────── logging + form invariants ─────────
@@ -272,7 +309,12 @@ class TestLoggingInvariants:
         assert "update_exercise_card" in body or "/sessions/" in body
 
     def test_session_feedback_anchor_preserved(self, client):
-        assert 'id="session-feedback"' in _body(client)
+        # `UI-CP2` — LA CAPACITÉ EST LA MÊME, SON ADRESSE A CHANGÉ.
+        # Le bilan n'est plus un formulaire empilé sous l'exécution : il a
+        # un domicile (`?view=bilan`). Cette garde tenait « le bilan reste
+        # atteignable » par le moyen d'une ancre ; elle le tient désormais
+        # par son adresse. Aucune capacité n'est relâchée.
+        assert 'id="session-feedback"' in _body(client, view='bilan')
 
     def test_nav_next_button_preserved(self, client):
         assert 'name="nav"' in _body(client)
@@ -323,7 +365,11 @@ class TestNoFrameworkLeak:
     def test_macros_still_rendered(self, client):
         """segmented / field_group macros must still produce output
         (concentration + global_state segmented controls present)."""
-        body = _body(client)
+        # `UI-CP2` — LES MACROS VIVENT SUR LA SURFACE DE CLÔTURE.
+        # `segmented` et `field_group` composent le bilan de séance, qui a
+        # quitté l'exécution pour `?view=bilan`. La garde vérifie toujours
+        # que les macros PRODUISENT — elle les cherche là où elles sont.
+        body = _body(client, view='bilan')
         assert 'name="concentration"' in body
         assert 'name="global_state"' in body
 

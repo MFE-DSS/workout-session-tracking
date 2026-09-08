@@ -247,7 +247,10 @@ def test_session_level_form_action_preserved(client):
         session = _create_in_progress_session(db, user.id)
         session_id = session.id
 
-    body = client.get(f"/sessions/{session_id}").text
+    # `UI-CP2` — le formulaire de séance vit sur la SURFACE DE CLÔTURE.
+    # Il n'est plus empilé sous l'exécution ; son action, son ancre et son
+    # libellé sont inchangés, seule son adresse a changé.
+    body = client.get(f"/sessions/{session_id}?view=bilan").text
     assert f"/sessions/{session_id}" in body
     # session-level form still has its own anchor
     assert 'id="session-feedback"' in body

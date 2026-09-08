@@ -110,7 +110,7 @@ def test_s2_substituted_current_shows_no_contaminated_load(client):
     db.close()
     # console reference falls back to the empty state, not the prescribed 60 kg
     assert "60 kg × 10" not in html
-    assert "Première fois" in html
+    assert "Aucune référence prescrite" in html
 
 
 # S3 recent substitution + older prescribed → prescribed current: only the
@@ -136,7 +136,7 @@ def test_s5_other_substitution_only_is_silent(client):
     html = _render_current(client, current.id)
     db.close()
     assert "90 kg × 8" not in html
-    assert "Première fois" in html
+    assert "Aucune référence prescrite" in html
 
 
 # S1 prescribed → prescribed still shows the reference.
@@ -166,7 +166,27 @@ def test_no_new_microcopy_no_repere_in_template():
     from pathlib import Path
 
     card = Path(__file__).resolve().parent.parent / "app" / "templates" / "_partials" / "exercise_card.html"
+    import re
+
     src = card.read_text(encoding="utf-8")
-    assert "Repère" not in src and "repère" not in src
-    # the empty-state microcopy stays the existing one
-    assert "Première fois" in src
+    # ⚠ `UI-CP2` — LA GARDE LIT DÉSORMAIS LE BALISAGE, PAS LA PROSE.
+    #
+    # Elle balayait le fichier ENTIER, commentaires Jinja compris. Expliquer
+    # dans un commentaire pourquoi le mot « repère » a été écarté au profit de
+    # « référence » la faisait donc rougir — elle interdisait qu'on PARLE du
+    # mot autant que qu'on l'AFFICHE.
+    #
+    # C'est le mode d'échec que ce dépôt catalogue — « une garde qui lit la
+    # prose comme du code » — et il a son remède ici même : retirer les
+    # commentaires avant de chercher. La garde ne s'assouplit pas ; elle cesse
+    # de mordre sur ce qu'aucun utilisateur ne verra jamais.
+    src = re.sub(r"\{#.*?#\}", " ", src, flags=re.S)
+    assert "Repère" not in src, "un vocabulaire concurrent de `Réf.` est réapparu"
+    assert "repère" not in src, "un vocabulaire concurrent de `Réf.` est réapparu"
+    # ⚠ `UI-CP2` — « PREMIÈRE FOIS » EST RETIRÉ SUR DÉCISION OPÉRATEUR.
+    # L'absence de référence PRESCRITE ne prouve pas que l'utilisateur n'a
+    # jamais fait le mouvement : la politique de sélection saute les
+    # occurrences substituées. C'était une inférence sur la personne, et elle
+    # était fausse. L'état d'absence est toujours DIT — autrement.
+    assert "Aucune référence prescrite" in src
+    assert "Première fois" not in src

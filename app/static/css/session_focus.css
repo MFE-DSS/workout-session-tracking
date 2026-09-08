@@ -1,3 +1,65 @@
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * `UI-CP2` — A+ · BANDE D'ORIENTATION
+ *
+ * Une pastille par exercice, `?active=` en lien. Elle ORIENTE et permet d'en
+ * changer, sans devenir la carte de séance permanente du concept B — qui est
+ * explicitement écartée.
+ *
+ * ⚠ POIDS VISUEL MINIMAL, ET C'EST LE CONTRAT. 3 px de haut, aucune étiquette,
+ * aucun chiffre. Elle ne peut pas rivaliser avec l'instrument parce qu'elle
+ * n'a rien à lire — seulement une position à voir.
+ *
+ * ⚠ CIBLE TACTILE. Les pastilles font 3 px de haut VISIBLES, mais leur zone
+ * tactile est portée à 44 px par un remplissage vertical : la zone déborde, le
+ * chrome visible non. C'est le standard produit AUREN, appliqué comme sur
+ * `.stat-add`. `background-clip: content-box` empêche le remplissage de se
+ * peindre — sans lui, la pastille ferait 43 px de haut à l'écran.
+ *
+ * L'ambre marque l'exercice COURANT — c'est l'objet d'attention, pas une
+ * action. Aucune commande n'est ambre dans cette bande.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+.xc-strip {
+  /* La bande centre ses pastilles de 44 px : sa hauteur visible reste celle
+     de la barre, son encombrement est celui de la cible. */
+  align-items: center;
+  display: flex;
+  gap: 3px;
+  margin: 0 0 var(--space-md);
+}
+
+/* ⚠ LA CIBLE TACTILE EST PORTÉE PAR LA HAUTEUR, PAS PAR DES MARGES NÉGATIVES.
+ *
+ * Première écriture : `height: 5px` + `padding: 19px 0` + `margin: -19px 0`.
+ * Mesurée au navigateur : **38 px**, pas 44 — les marges négatives se
+ * résorbaient dans le conteneur flex, et la bande introduisait à elle seule
+ * SEPT cibles sous le standard produit. Elle prétendait le contraire dans son
+ * propre commentaire.
+ *
+ * La pastille est donc une boîte de 44 px qui CENTRE une barre de 5 px,
+ * dessinée en `::before`. La zone est réelle, le chrome visible reste fin. */
+.xc-strip__pip {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.xc-strip__pip::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 5px;
+  border-radius: 3px;
+  background-color: var(--border);
+}
+
+.xc-strip__pip--done::before    { background-color: var(--fg-dim); }
+.xc-strip__pip--partial::before { background-color: var(--fg-muted); }
+.xc-strip__pip--active::before  { background-color: var(--accent); }
+
+.xc-strip__pip:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
 /* ============================================================
    session_focus.css — Sx_29 Mobile Session Focus Mode (extracted)
    ============================================================
@@ -3163,7 +3225,29 @@ body.is-session-focus-mode .foot {
 }
 .console__insight-mark { color: var(--t-blue-mid); }
 
-/* ── REST · l'écran se tait, le minuteur EST l'écran ───────────────── */
+/* ── REST · l'écran se tait, le minuteur EST l'écran ─────────────────
+ *
+ * ⚠ `UI-CP2` — LE CADRE TOMBE, ET CE N'EST PAS DU GOÛT.
+ *
+ * `.session-focus__rest-timer` pose un fond, une bordure et un rayon : à
+ * l'état repos, le minuteur devenait donc **une carte de minuteur** posée
+ * dans l'écran. La directive l'interdit nommément — l'instrument doit
+ * DEVENIR temps-dominant, il ne doit pas recevoir un composant de plus.
+ *
+ * Mesuré au rendu à 390 px avant correction : le cadran vivait dans un
+ * encadré, sous une bande de séries qui continuait de réclamer l'attention.
+ *
+ * Le cadre n'est retiré QU'À CET ÉTAT. Hors repos — le repli « Repos
+ * suggéré : 90 s » sans JavaScript — l'encadré garde son sens : là, le
+ * minuteur est bien un élément parmi d'autres. */
+.console[data-state="rest"] .session-focus__rest-timer {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 0;
+}
+
 .console[data-state="rest"] .rest-readout {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3674,3 +3758,29 @@ body.is-session-focus-mode .foot {
   box-shadow: var(--relief-carved), inset 3px 0 0 var(--role-border-emphasis);
 }
 .console .dock__cmd--muted::after { color: var(--role-text-muted); }
+
+
+/* ── `UI-CP2` · CE QUI VIENT DE SE PASSER, pendant le repos ─────────────────
+ *
+ * La bande de séries ne se rend plus à cet état : la question du repos est le
+ * TEMPS. Mais « qu'est-ce que je viens d'enregistrer » reste utile pour se
+ * préparer — une ligne suffit là où douze lignes de rail répétaient l'état
+ * complet de l'exercice.
+ *
+ * BLEU, jamais ambre : c'est le système qui rappelle un fait, pas une action
+ * offerte à l'utilisateur. */
+.console__just-done {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-family-mono);
+  font-size: 11.5px;
+  color: var(--t-fg-dim, #8A94A0);
+}
+.console__just-done-mark { color: var(--role-origin-system); }
+.console__just-done-value {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--t-fg-muted, #A7B0BA);
+}

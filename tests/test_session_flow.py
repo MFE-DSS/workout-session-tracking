@@ -132,23 +132,38 @@ def test_create_session_with_unknown_template_returns_404(client):
 
 
 def test_session_detail_renders_full_tree(client):
+    """⚠ `UI-CP2` — « L'ARBRE ENTIER » ÉTAIT L'ANCIENNE ONTOLOGIE.
+
+    Cette garde exigeait les SEPT cartes d'exercice, le bilan et le rappel
+    méthode sur une seule page. C'est exactement la composition que A+ retire :
+    l'instrument d'exécution répond à « que fais-je maintenant », et seize des
+    vingt-trois commandes de cette page appartenaient à un autre état.
+
+    Ce qui doit tenir n'est pas l'empilement, c'est que RIEN NE DEVIENNE
+    INATTEIGNABLE. La séance s'identifie, chaque exercice se rejoint, et la
+    clôture porte ce qui la concerne — chacun sur sa surface.
+    """
     sid = _start_session(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    assert r.status_code == 200
-    body = r.text
+    body = client.get(f"/sessions/{sid}").text
     assert "Push A" in body
-    # Weekday label derived from started_at
-    assert any(d in body for d in ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"])
-    # All 7 exercise cards are rendered (v10)
-    for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
-        assert code in body
-    # Session feedback form present
-    assert 'name="concentration"' in body
-    assert 'name="global_state"' in body
-    assert 'name="bodyweight_kg"' in body
+    # L'exercice ACTIF est rendu, et les six autres restent atteignables par
+    # `?active=` — une sélection serveur, qui marche sans JavaScript.
+    import re
+
+    assert len(re.findall(r'[?&]active=\d+', body)) >= 7, (
+        "des exercices sont devenus inatteignables"
+    )
     assert "En cours" in body
-    # Method reminder present
-    assert "Rappel méthode" in body
+
+    bilan = client.get(f"/sessions/{sid}?view=bilan").text
+    assert any(d in bilan for d in ["Lundi", "Mardi", "Mercredi", "Jeudi",
+                                    "Vendredi", "Samedi", "Dimanche"])
+    assert 'name="concentration"' in bilan
+    assert 'name="global_state"' in bilan
+    assert 'name="bodyweight_kg"' in bilan
+    # Le rappel méthode est un DOCUMENT de référence : il accompagne la
+    # clôture, où l'on a le temps de lire.
+    assert "Rappel méthode" in bilan
 
 
 def test_session_detail_for_unknown_id_returns_404(client):
@@ -327,7 +342,10 @@ def test_values_are_preserved_after_reload_via_http(client):
         },
         follow_redirects=False,
     )
-    r = client.get(f"/sessions/{sid}")
+    # `UI-CP2` — les valeurs de séance se relisent où elles se saisissent :
+    # la surface de clôture. Le contrat — ce qui est écrit revient — est
+    # inchangé.
+    r = client.get(f"/sessions/{sid}?view=bilan")
     assert r.status_code == 200
     body = r.text
     # The bodyweight_kg value must be echoed back
@@ -396,9 +414,15 @@ def test_science_page_renders_seeded_rules(client):
 
 
 def test_session_detail_shows_inline_method_reminder_link(client):
+    """`UI-CP2` — le rappel méthode est un DOCUMENT, pas un instrument.
+
+    Il ne se rend plus pendant l'exécution : entre deux séries, ce n'est pas
+    la question, et ses trois dépliants comptaient parmi les seize commandes
+    hors état de l'ancienne page. Il accompagne la clôture, où l'on a le temps
+    de lire, et sa destination complète (`/science`) est inchangée.
+    """
     sid = _start_session(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
+    body = client.get(f"/sessions/{sid}?view=bilan").text
     assert "Voir toutes les règles" in body
     # ⚠ Assertait `/rules`, qui répond **301** vers `/science` depuis que la
     # surface des règles a fusionné avec Science. La garde épinglait donc le

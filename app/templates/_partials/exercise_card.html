@@ -393,7 +393,25 @@
                 <span class="console__delta-label">Réf.</span>
                 <span class="console__delta-value">{{ _ref_line }}</span>
               {% else %}
-                <span class="console__delta-first">Première fois</span>
+                {# ⚠ `UI-CP2` — « PREMIÈRE FOIS » ÉTAIT UNE AFFIRMATION FAUSSE.
+
+                   L'absence de RÉFÉRENCE PRESCRITE ne prouve pas que
+                   l'utilisateur n'a jamais fait le mouvement. La politique de
+                   sélection saute les occurrences substituées : quelqu'un qui
+                   a fait cet exercice il y a sept jours avec un substitut se
+                   voyait annoncer « Première fois ». Ce n'était pas une
+                   information manquante, c'était une inférence, et elle était
+                   fausse.
+
+                   L'état sémantique est donc nommé pour ce qu'il est.
+
+                   ⚠ LE MOT SUIT LE VOCABULAIRE DU PRODUIT. Ma première
+                   écriture disait « repère » — un mot concurrent de `Réf.`,
+                   qui est l'étiquette employée deux lignes plus haut, et que
+                   `test_no_repere_wording_added_to_card` interdit précisément
+                   pour cette raison. « Référence » est le mot dont `Réf.` est
+                   l'abréviation : aucun vocabulaire n'est inventé. #}
+                <span class="console__delta-first">Aucune référence prescrite</span>
               {% endif %}
             </span>
           {% endif %}
@@ -425,7 +443,22 @@
           </p>
         {% endif %}
 
-        {# ── L1 · la bande : ✓ passé · ● courant · ○ futur ── #}
+        {# ── L1 · la bande : ✓ passé · ● courant · ○ futur ──────────────────
+             ⚠ `UI-CP2` — ELLE NE SE REND PLUS À TOUS LES ÉTATS.
+
+             Pendant le REPOS, la question est « combien de temps me
+             reste-t-il », pas « où en suis-je dans mes séries ». La bande y
+             posait un second propriétaire d'action — le lien « Commencer S2 »
+             en ambre — face à la sortie du dock : deux affordances pour une
+             seule intention, exactement le défaut `DF-B`, réapparu parce que
+             la composition autour a changé.
+
+             À l'EXERCICE TERMINÉ, le récapitulatif dit déjà `3 / 3` : la bande
+             répétait la même chose en douze lignes.
+
+             Ce qui vient de se passer n'est pas perdu — il devient UNE ligne
+             de preuve, juste en dessous. #}
+        {% if not cs.is_resting and not cs.is_finished %}
         <ol class="console__band">
 
           {% set _warm_done = cs.warmup_total > 0 and cs.warmup_done == cs.warmup_total %}
@@ -532,6 +565,24 @@
             </li>
           {% endif %}
         </ol>
+        {% endif %}
+
+        {# ── CE QUI VIENT DE SE PASSER · une ligne, pas une bande ───────────
+             Pendant le repos, la série qu'on vient d'enregistrer est la seule
+             information utile du passé. Elle est rendue par le SYSTÈME, donc
+             en bleu — jamais en ambre : ce n'est pas une action. #}
+        {% if cs.is_resting and cs.past_sets %}
+          {% set _last = cs.past_sets[-1] %}
+          <p class="console__just-done">
+            <span class="console__just-done-mark" aria-hidden="true">✓</span>
+            <span class="console__just-done-label">S{{ _last.set_index }} enregistrée</span>
+            <span class="console__just-done-value">
+              {%- if _last.weight_kg is not none %}{{ '%g' % _last.weight_kg }} kg{% endif -%}
+              {%- if _last.weight_kg is not none and _last.reps is not none %} × {% endif -%}
+              {%- if _last.reps is not none %}{{ _last.reps }}{% endif -%}
+            </span>
+          </p>
+        {% endif %}
 
         {# ── REST · le minuteur EST l'écran. Rien d'autre au premier
              niveau : c'est tout l'intérêt d'une machine à états, elle

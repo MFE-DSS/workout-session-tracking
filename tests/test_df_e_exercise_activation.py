@@ -38,7 +38,17 @@ ANCHOR_A = r"<a\b[^>]*\b"
 SESSIONS = "/sessions"
 LOCATION = "location"
 
-ACTIVATE = "exercise-card--activate"
+# ⚠ `UI-CP2` — LE PORTEUR DE L'ACTIVATION A CHANGÉ, PAS LA CAPACITÉ.
+#
+# `DF-E` avait fait des exercices non actifs des LIENS d'activation plutôt que
+# des `details` ouvrables côté client : c'était déjà le bon invariant, et il
+# reste entier. A+ va au bout de la même idée — les exercices non actifs ne
+# sont plus des cartes du tout, et leur activation vit sur la BANDE
+# D'ORIENTATION, toujours visible, en plus du sélecteur d'en-tête.
+#
+# Ce que ces gardes protègent est inchangé : chaque autre exercice est
+# atteignable par une activation SERVEUR, avec un `href`, sans JavaScript.
+ACTIVATE = "xc-strip__pip"
 FLAT_LIST = "set-list--compact"
 LEGACY_KIND = "set-row__kind"
 
@@ -88,8 +98,15 @@ def test_every_other_exercise_is_an_activation_link(client):
     sid = _session(client)
     body = _page(client, sid)
     links = re.findall(rf'{ANCHOR_A}{ACTIVATE}\b[^>]*>', body)
-    assert len(links) == len(_exercises(sid)) - 1, (
-        f"{len(links)} liens d'activation pour {len(_exercises(sid))} exercices"
+    # `UI-CP2` — la bande porte UNE pastille par exercice, l'actif compris :
+    # y revenir est inoffensif, et l'exclure aurait fait un trou dans la
+    # progression. Ce qui compte est que les AUTRES soient tous atteignables.
+    assert len(links) == len(_exercises(sid)), (
+        f"{len(links)} pastilles pour {len(_exercises(sid))} exercices"
+    )
+    autres = [lien for lien in links if "--active" not in lien]
+    assert len(autres) == len(_exercises(sid)) - 1, (
+        f"{len(autres)} exercices non actifs atteignables"
     )
 
 
@@ -283,6 +300,18 @@ def test_the_activation_link_says_what_it_does(client):
     sans dire ce que le lien fait."""
     body = _page(client, _session(client))
     first = body.split(ACTIVATE, 1)[1].split("</a>", 1)[0]
-    assert '<span class="sr-only">' in first, (
-        "le lien d'activation ne nomme pas son action"
+    # `UI-CP2` — le nom accessible est porté par `aria-label` plutôt que par un
+    # `sr-only` : la pastille n'a AUCUN contenu visible — c'est une barre de
+    # 5 px — donc rien à masquer, et un texte caché à l'intérieur n'aurait pas
+    # de nœud à décrire. Ce que la garde exige est inchangé : le lien DIT
+    # quel exercice il active et où il en est.
+    import re as _re
+
+    m = _re.search(r'aria-label="([^"]+)"', first)
+    assert m, "la pastille d'activation ne nomme pas sa destination"
+    assert _re.search(r"\bE\d+\b", m.group(1)), (
+        f"le nom accessible ne cite pas l'exercice : {m.group(1)!r}"
+    )
+    assert "séries" in m.group(1), (
+        f"le nom accessible ne dit pas l'avancement : {m.group(1)!r}"
     )

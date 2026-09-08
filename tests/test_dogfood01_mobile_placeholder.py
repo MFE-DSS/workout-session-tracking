@@ -227,5 +227,20 @@ def test_no_approx_prefix_in_rendered_placeholders(client):
 
 def test_no_repere_wording_added_to_card():
     """Sb_DOGFOOD_01.3 n'introduit aucune occurrence "Repère"/"repère"."""
+    import re
+
     src = CARD.read_text(encoding="utf-8")
-    assert "Repère" not in src and "repère" not in src
+    # ⚠ `UI-CP2` — LA GARDE LIT DÉSORMAIS LE BALISAGE, PAS LA PROSE.
+    #
+    # Elle balayait le fichier ENTIER, commentaires Jinja compris. Expliquer
+    # dans un commentaire pourquoi le mot « repère » a été écarté au profit de
+    # « référence » la faisait donc rougir — elle interdisait qu'on PARLE du
+    # mot autant que qu'on l'AFFICHE.
+    #
+    # C'est le mode d'échec que ce dépôt catalogue — « une garde qui lit la
+    # prose comme du code » — et il a son remède ici même : retirer les
+    # commentaires avant de chercher. La garde ne s'assouplit pas ; elle cesse
+    # de mordre sur ce qu'aucun utilisateur ne verra jamais.
+    src = re.sub(r"\{#.*?#\}", " ", src, flags=re.S)
+    assert "Repère" not in src, "un vocabulaire concurrent de `Réf.` est réapparu"
+    assert "repère" not in src, "un vocabulaire concurrent de `Réf.` est réapparu"

@@ -74,8 +74,10 @@ def test_the_home_no_longer_carries_the_sparkline(client):
 def test_session_note_wrapped_in_details(client):
     """Session-level free_note is inside <details class="session-feedback__note">."""
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
+    # `UI-CP2` — LE BILAN A UN DOMICILE. Il n'est plus empilé sous
+    # l'exécution : son contenu, son ancre et son formulaire sont
+    # inchangés, seule son adresse a changé (`?view=bilan`).
+    body = client.get(f"/sessions/{sid}?view=bilan").text
     assert 'session-feedback__note' in body
     assert 'Note séance (optionnel)' in body
     # The <details> must wrap the textarea (not render it bare).
@@ -93,7 +95,8 @@ def test_session_note_details_open_when_filled(client):
         s.free_note = "Ressenti moyen aujourd'hui"
         db.commit()
 
-    r = client.get(f"/sessions/{sid}")
+    # `UI-CP2` — la note de séance vit sur la surface de clôture.
+    r = client.get(f"/sessions/{sid}?view=bilan")
     body = r.text
     # Jinja renders `open` when free_note is truthy.
     assert '<details class="session-feedback__note" open>' in body
@@ -102,7 +105,8 @@ def test_session_note_details_open_when_filled(client):
 def test_session_note_details_collapsed_when_empty(client):
     """Empty note → <details> with no `open` attribute (collapsed by default)."""
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
+    # `UI-CP2` — la note de séance vit sur la surface de clôture.
+    r = client.get(f"/sessions/{sid}?view=bilan")
     body = r.text
     # No `open` attribute on the details wrapper.
     assert '<details class="session-feedback__note" >' in body or \

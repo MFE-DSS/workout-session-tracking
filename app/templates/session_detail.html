@@ -27,35 +27,88 @@
    CSS scoped (.session-focus__card--active) ; les non-actifs sont
    compactés en surface secondaire. Aucun JS ajouté, aucun carousel :
    cockpit SSR/CSS pur. #}
-{% if session.session_exercises|length > 0 %}
-<div class="session-focus__cockpit">
+{# ═══════════════════════════════════════════════════════════════════════════
+   `UI-CP2` — A+ · L'INSTRUMENT D'EXÉCUTION
 
-  {# -------- Orientation cockpit (Sx_UI_04 §18.A) --------
-     Compteur exercice courant / total + restants. Données déjà
-     calculées côté router (jump_states, stats) — aucune logique
-     backend ajoutée. #}
-  {% set _ex_total = session.session_exercises|length %}
-  {% set _ex_counts = namespace(done=0, position=0) %}
-  {% for se in session.session_exercises %}
-    {% if jump_states[se.id] == 'done' %}{% set _ex_counts.done = _ex_counts.done + 1 %}{% endif %}
-    {% if jump_states[se.id] == 'active' %}{% set _ex_counts.position = loop.index %}{% endif %}
-  {% endfor %}
-  {% set _ex_remaining = _ex_total - _ex_counts.done %}
-  {# La position `E1 / 7` a rejoint la ligne d'en-tête : elle y coûte 0 px
-     de hauteur supplémentaire. Le nombre d'exercices restants vit dans le
-     panneau `⋯` avec le reste de la méta de séance. #}
+   QUESTION SOUVERAINE, une seule : « QUE FAIS-JE MAINTENANT ? »
 
-  {# -------- Exercise cards (one <details> per card) --------------
-     Sb_29.1 : rendering extrait en partial. Sb_UI_04.3 : la carte
-     active est promue en hero cockpit via CSS ; les non-actives
-     sont compactées mais restent dans le DOM (anchors + no-JS). #}
+   ⚠ CE QUI CHANGE, ET POURQUOI CE N'EST PAS COSMÉTIQUE.
+
+   Cette page rendait les SEPT exercices, le bilan de séance complet et le
+   rappel méthode, dans TOUS les états de la console. Mesuré au labo sur une
+   séance réelle, aux six états : entre 3,07 et 3,50 écrans, 20 à 26 commandes
+   — et **seize commandes visibles appartenaient à un AUTRE état**, identiques
+   d'un état à l'autre. L'état le plus lourd était `EXERCISE_COMPLETE`, celui
+   où l'on a le moins à faire.
+
+   La surface primaire se recompose désormais avec l'état. Seul l'exercice
+   ACTIF est rendu.
+
+   ⚠ AUCUNE CAPACITÉ N'EST PERDUE, et la navigation existait déjà.
+   `?active=<id>` sélectionne l'exercice **côté serveur** — ce n'est pas une
+   ancre — et l'en-tête porte déjà cette liste. Les six autres exercices
+   restent donc atteignables, sans JavaScript, par le même chemin qu'avant.
+
+   ⚠ CE N'EST PAS LA CARTE DE SÉANCE PERMANENTE du concept B. L'orientation
+   reste à poids visuel faible : identité, `E1/7`, progression, position de
+   série. Elle oriente, elle n'est pas le modèle d'interaction.
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% set _view = view | default('execution') %}
+
+{% if _view != 'bilan' and session.session_exercises|length > 0 %}
+<div class="session-focus__cockpit xc">
+
+  {# ── ORIENTATION · progression de séance, poids visuel minimal ───────────
+     Une pastille par exercice, `?active=` en lien : la bande oriente ET
+     permet d'en changer, sans devenir une carte de séance. #}
+  <nav class="xc-strip" aria-label="Progression de la séance">
+    {% for _se in session.session_exercises %}
+      {% set _st = jump_states[_se.id] %}
+      {% set _d, _t = stats.per_exercise[_se.id] %}
+      <a class="xc-strip__pip xc-strip__pip--{{ _st }}"
+         href="{{ url_for('session_detail', session_id=session.id) }}?active={{ _se.id }}"
+         {% if _st == 'active' %}aria-current="location"{% endif %}
+         aria-label="{{ _se.exercise_code_snapshot }} — {{ _se.substituted_name or _se.exercise_name_snapshot }}, {{ _d }} sur {{ _t }} séries"></a>
+    {% endfor %}
+  </nav>
+
+  {# ── L'INSTRUMENT · l'exercice actif, et lui seul ───────────────────────
+     ⚠ `is_active` est calculé DANS le partiel à partir de `active_exercise_id`.
+     On ne peut donc pas se contenter de filtrer ici sans que le partiel
+     retombe sur sa branche « carte compacte » : la boucle sélectionne
+     l'exercice actif, et le partiel le reconnaît comme tel. #}
   {% for se in session.session_exercises %}
-    {% include "_partials/exercise_card.html" %}
+    {% if se.id == active_exercise_id %}
+      {% include "_partials/exercise_card.html" %}
+    {% endif %}
   {% endfor %}
 
 </div>
 {% endif %}
 
+{# ═══════════════════════════════════════════════════════════════════════════
+   LA SURFACE DE CLÔTURE — elle QUITTE l'exécution, elle ne quitte pas le
+   produit.
+
+   Le bilan complet et « TERMINER LA SÉANCE » occupaient la page pendant
+   TOUTE l'exécution : l'ambre plein le plus fort de l'écran terminait la
+   séance alors qu'on était à la série 1 sur 21. Deux propriétaires d'action
+   se disputaient la même page.
+
+   Ils vivent désormais derrière `?view=bilan`. Ce n'est pas une suppression
+   (`CLAUDE.md §5.3`) : la capacité est intacte, elle a un domicile. Elle est
+   atteinte depuis `LAST_EXERCISE_COMPLETE`, qui y CONDUIT, et reste joignable
+   à tout moment depuis le panneau `⋯` de l'en-tête — un utilisateur peut
+   toujours clore une séance incomplète, ce que `Q2` garantit.
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{# ⚠ UNE SÉANCE SANS EXERCICE EST DÉJÀ À SA CLÔTURE.
+   Une séance cardio (`liss-only`) n'a AUCUNE série à exécuter : sa seule
+   saisie est la durée, le BPM et la machine, qui vivent dans ce bloc. Sans
+   cette condition, elle rendait une page VIDE — le cockpit ne s'affiche pas
+   faute d'exercice, et le bilan pas davantage faute de `?view=bilan`.
+   Régression introduite par A+, trouvée par `test_cardio_capture`. #}
+{% if _view == 'bilan' or session.status != 'in_progress'
+      or session.session_exercises|length == 0 %}
 {# -------- Session-level feedback (dedicated form) ---------- #}
 {# Q4 (opérateur, 2026-08-19) — SESSION REVIEW.
    La première transition après la dernière série amène ici, et
@@ -199,6 +252,11 @@
   </p>
 </aside>
 {% endif %}
+{% endif %}
+
+{# Le rappel méthode est un DOCUMENT de référence, pas un instrument. Il ne
+   se rend plus pendant l'exécution : il accompagne la clôture, où l'on a le
+   temps de lire, et sa destination complète (`/science`) est inchangée. #}
 
 </div>
 {# Sb_29.4 — Rest timer progressive enhancement (vanilla JS, no framework,

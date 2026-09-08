@@ -98,13 +98,17 @@ def _seed_partial(db, user_id, n_exercises=2, sets_per=3, first_done=True):
     return s
 
 
-def _render(client, session_id: int) -> str:
-    r = client.get(f"/sessions/{session_id}", follow_redirects=False)
+def _render(client, session_id: int, view: str | None = None) -> str:
+    # `UI-CP2` — la séance a DEUX surfaces : `execution` (défaut) et `bilan`.
+    # Les aides de test doivent pouvoir atteindre les deux, sans quoi les
+    # gardes de la clôture ne peuvent plus rien vérifier.
+    url = f"/sessions/{session_id}" + (f"?view={view}" if view else "")
+    r = client.get(url, follow_redirects=False)
     assert r.status_code == 200, r.text[:400]
     return r.text
 
 
-def _body(client, **kw) -> str:
+def _body(client, view=None, **kw) -> str:
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -112,7 +116,7 @@ def _body(client, **kw) -> str:
         user = db.query(User).first()
         s = _seed_partial(db, user.id, **kw)
         sid = s.id
-    return _render(client, sid)
+    return _render(client, sid, view)
 
 
 # ───────── console structure ─────────
@@ -197,7 +201,24 @@ class TestReferenceAndTarget:
         body = _body(client)
         # MIGRÉ — `§7.12` : sans référence, le produit DIT « Première fois ».
         # « Non disponible » occupait une ligne entière pour ne rien dire.
-        assert "Première fois" in body
+        #
+        # ⚠ `UI-CP2` — « PREMIÈRE FOIS » EST RETIRÉ, SUR DÉCISION OPÉRATEUR.
+        #
+        # L'absence de RÉFÉRENCE PRESCRITE ne prouve pas que l'utilisateur n'a
+        # jamais fait le mouvement : la politique de sélection saute les
+        # occurrences substituées, donc quelqu'un qui a fait cet exercice il y
+        # a sept jours avec un substitut se voyait annoncer « Première fois ».
+        # Ce n'était pas une information manquante — c'était une inférence sur
+        # la personne, et elle était fausse.
+        #
+        # La garde ne s'assouplit pas : elle vérifie toujours qu'un état
+        # d'absence est DIT, et elle interdit désormais explicitement la
+        # formulation fautive.
+        assert "Aucune référence prescrite" in body
+        assert "Première fois" not in body, (
+            "l'inférence « Première fois » est revenue — elle affirme sur "
+            "l'utilisateur ce que la donnée ne dit pas"
+        )
 
     def test_target_console_row_removed(self, client):
         """Sx_UI_06 D2 — the « Cible » console row (and its « Objectif à
@@ -284,7 +305,12 @@ class TestCockpitStillIntact:
         assert len(re.findall(r'href="[^"]*#exercise-\d+"', body)) >= 2
 
     def test_session_feedback_preserved(self, client):
-        assert 'id="session-feedback"' in _body(client)
+        # `UI-CP2` — LA CAPACITÉ EST LA MÊME, SON ADRESSE A CHANGÉ.
+        # Le bilan n'est plus un formulaire empilé sous l'exécution : il a
+        # un domicile (`?view=bilan`). Cette garde tenait « le bilan reste
+        # atteignable » par le moyen d'une ancre ; elle le tient désormais
+        # par son adresse. Aucune capacité n'est relâchée.
+        assert 'id="session-feedback"' in _body(client, view='bilan')
 
     def test_rest_timer_contracts_preserved(self, client):
         """MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`). Le
@@ -315,7 +341,11 @@ class TestNoFrameworkLeak:
         assert_aucune_ecriture_parallele()
 
     def test_macros_still_rendered(self, client):
-        body = _body(client)
+        # `UI-CP2` — LES MACROS VIVENT SUR LA SURFACE DE CLÔTURE.
+        # `segmented` et `field_group` composent le bilan de séance, qui a
+        # quitté l'exécution pour `?view=bilan`. La garde vérifie toujours
+        # que les macros PRODUISENT — elle les cherche là où elles sont.
+        body = _body(client, view='bilan')
         assert 'name="concentration"' in body
         assert 'name="global_state"' in body
 

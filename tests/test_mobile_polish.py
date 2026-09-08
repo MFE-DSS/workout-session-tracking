@@ -54,8 +54,11 @@ def test_jump_bar_renders_one_item_per_exercise(client):
     assert "ex-jump" in body
     for code in ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]:
         assert f'>{code}</span>' in body
-    # FB shortcut to #session-feedback
-    assert "#session-feedback" in body
+    # `UI-CP2` — le raccourci vers le bilan demande sa SURFACE au serveur.
+    # Le bilan n'est plus un formulaire empilé sous l'exécution ; il a un
+    # domicile. La capacité — le bilan reste joignable à tout moment, donc
+    # une séance incomplète reste closable — est inchangée.
+    assert "view=bilan" in body
     assert "FB" in body
     # Default progress 0/2 ... 0/3 etc.
     assert ">0/2<" in body or ">0/3<" in body
@@ -100,7 +103,13 @@ def test_exercise_card_gets_done_class_when_all_work_sets_completed(client):
         data[f"set_{wid}_completed"] = "1"
     client.post(f"/sessions/{sid}/exercises/{se_id}", data=data, follow_redirects=False)
 
-    body = client.get(f"/sessions/{sid}").text
+    # ⚠ `UI-CP2` — L'ÉTAT « TERMINÉ » SE LIT SUR L'EXERCICE, PAS SUR LA LISTE.
+    #
+    # La garde cherchait le modificateur `exercise-card--done` sur la carte
+    # REPLIÉE de E2. A+ ne rend que l'exercice actif : il faut donc demander
+    # E2 pour lire son état — ce qui est la même capacité, au même endroit que
+    # la décision.
+    body = client.get(f"/sessions/{sid}?active={se_id}").text
     # The form for E2 must carry the exercise-card--done modifier
     pattern = (
         r'class="[^"]*exercise-card--done[^"]*"[^>]*id="exercise-'
@@ -176,7 +185,10 @@ def test_save_last_exercise_card_redirects_to_session_feedback(client):
         follow_redirects=False,
     )
     assert r.status_code == 303
-    assert "#session-feedback" in r.headers["location"]
+    # `UI-CP2` — la dernière série conduit à la SURFACE DE CLÔTURE, pas à une
+    # ancre vers un formulaire empilé. `LAST_EXERCISE_COMPLETE` y CONDUIT ; il
+    # ne contient pas le bilan.
+    assert "view=bilan" in r.headers["location"]
 
 
 # ---------------------------------------------------------------------------

@@ -61,15 +61,34 @@ def test_active_card_has_no_last_time_block(client):
     """
     body = _body(client)
     assert "console__delta" in body
-    assert "Réf. dernière" in body or "Première fois" in body
+    # `UI-CP2` — l'état d'absence est nommé pour ce qu'il est. « Première
+    # fois » affirmait sur l'utilisateur ce que la donnée ne dit pas.
+    assert "Réf." in body or "Aucune référence prescrite" in body
 
 
 def test_last_time_block_still_present_on_non_active_cards(client):
-    """No info loss: non-active cards keep « Dernière fois » (they have no
-    console). A fresh session has 1 active + N-1 non-active cards, so the
-    block still renders at least once."""
+    """AUCUNE PERTE D'INFORMATION — mais elle a changé de place.
+
+    ⚠ `UI-CP2` — CETTE GARDE DÉCRIVAIT LA LISTE, PAS LA CAPACITÉ.
+
+    Elle exigeait que les cartes NON ACTIVES portent « Dernière fois », parce
+    qu'elles n'avaient pas de console. A+ ne rend plus que l'exercice actif :
+    il n'existe plus de carte non active, donc plus de bloc à y placer.
+
+    L'information n'est pas perdue — elle est au POINT DE DÉCISION. La
+    référence d'un exercice s'affiche quand on l'exécute, dans sa console, et
+    chaque exercice reste atteignable par `?active=`. Ce que la garde doit
+    tenir, c'est qu'aucun exercice ne devienne inaccessible.
+    """
     body = _body(client)
-    assert "Dernière fois" in body  # non-active cards keep it
+    assert "console__delta" in body, "l'exercice actif n'expose pas sa référence"
+    import re
+
+    autres = re.findall(r'href="[^"]*[?&]active=\d+"', body)
+    assert len(autres) >= 2, (
+        f"seulement {len(autres)} exercices atteignables — la référence des "
+        "autres deviendrait inaccessible"
+    )
 
 
 def test_previous_load_not_duplicated_on_active_card(client):

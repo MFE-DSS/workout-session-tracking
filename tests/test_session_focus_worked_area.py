@@ -81,13 +81,17 @@ def _seed(db, user_id, n_exercises=2):
     return s
 
 
-def _render(client, session_id: int) -> str:
-    r = client.get(f"/sessions/{session_id}", follow_redirects=False)
+def _render(client, session_id: int, view: str | None = None) -> str:
+    # `UI-CP2` — la séance a DEUX surfaces : `execution` (défaut) et `bilan`.
+    # Les aides de test doivent pouvoir atteindre les deux, sans quoi les
+    # gardes de la clôture ne peuvent plus rien vérifier.
+    url = f"/sessions/{session_id}" + (f"?view={view}" if view else "")
+    r = client.get(url, follow_redirects=False)
     assert r.status_code == 200, r.text[:400]
     return r.text
 
 
-def _body(client, n=2) -> str:
+def _body(client, n=2, view=None) -> str:
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -95,7 +99,7 @@ def _body(client, n=2) -> str:
         user = db.query(User).first()
         s = _seed(db, user.id, n_exercises=n)
         sid = s.id
-    return _render(client, sid)
+    return _render(client, sid, view)
 
 
 # ───────── worked area visual slot ─────────
@@ -257,7 +261,12 @@ class TestInvariantsIntact:
         assert len(re.findall(r'href="[^"]*#exercise-\d+"', body)) >= 2
 
     def test_session_feedback_preserved(self, client):
-        assert 'id="session-feedback"' in _body(client)
+        # `UI-CP2` — LA CAPACITÉ EST LA MÊME, SON ADRESSE A CHANGÉ.
+        # Le bilan n'est plus un formulaire empilé sous l'exécution : il a
+        # un domicile (`?view=bilan`). Cette garde tenait « le bilan reste
+        # atteignable » par le moyen d'une ancre ; elle le tient désormais
+        # par son adresse. Aucune capacité n'est relâchée.
+        assert 'id="session-feedback"' in _body(client, view='bilan')
 
     def test_rest_timer_contracts_preserved(self, client):
         """MIGRÉ par `UIV3_SESSION_EXECUTION_CONSOLE_01` : le minuteur n'existe plus que dans l'état `REST` (`Sx_UIV3_02 §7.2`). Le rendre en permanence est précisément ce qui a masqué le défaut `D3` — le bloc était là, non démarré, et le JS partait quand même. Le contrat conservé est que le minuteur n'est JAMAIS requis pour enregistrer."""
@@ -287,7 +296,11 @@ class TestNoFrameworkLeak:
         assert_aucune_ecriture_parallele()
 
     def test_macros_still_rendered(self, client):
-        body = _body(client)
+        # `UI-CP2` — LES MACROS VIVENT SUR LA SURFACE DE CLÔTURE.
+        # `segmented` et `field_group` composent le bilan de séance, qui a
+        # quitté l'exécution pour `?view=bilan`. La garde vérifie toujours
+        # que les macros PRODUISENT — elle les cherche là où elles sont.
+        body = _body(client, view='bilan')
         assert 'name="concentration"' in body
         assert 'name="global_state"' in body
 

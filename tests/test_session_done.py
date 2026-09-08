@@ -146,7 +146,10 @@ def test_get_session_in_progress_renders_normally(client):
         s.ended_at = None
         db.commit()
 
-    r = client.get(f"/sessions/{sid}")
+    # `UI-CP2` — « éditable » se vérifie sur la surface qui porte l'édition.
+    # Le formulaire de séance a quitté l'exécution pour la clôture ; la
+    # capacité — une séance rouverte reste modifiable — est inchangée.
+    r = client.get(f"/sessions/{sid}?view=bilan")
     assert r.status_code == 200
     # Editable = session-feedback form visible on the page
     assert "session-feedback" in r.text

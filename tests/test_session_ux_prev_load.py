@@ -97,7 +97,10 @@ def test_prev_load_hint_absent_when_no_data(client):
     sid = _new_session(client, "push-a")
     body = client.get(f"/sessions/{sid}").text
     assert "console__delta-value" not in body
-    assert "Première fois" in body, (
+    # `UI-CP2` — l'absence est toujours DITE, mais elle porte sur la DONNÉE
+    # et non sur l'utilisateur : l'absence de référence prescrite ne prouve
+    # pas qu'il n'a jamais fait le mouvement.
+    assert "Aucune référence prescrite" in body, (
         "sans référence, le produit le dit — il ne laisse pas un vide"
     )
 
