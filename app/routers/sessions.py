@@ -650,6 +650,25 @@ def session_detail(
             "exercise_summaries": exercise_summaries,
             "deltas": delta_labels,
             "active_exercise_id": active_exercise_id,
+            # `UI-CP2` — QUELLE SURFACE DE LA SÉANCE EST RENDUE.
+            #
+            # `execution` (défaut) : l'instrument de série, recomposé par
+            # l'état de la console. `bilan` : la surface de clôture — ressenti,
+            # poids du corps, note, et la seule commande qui termine la séance.
+            #
+            # Les deux vivaient EMPILÉES sur la même page : le bilan complet et
+            # « TERMINER LA SÉANCE » restaient rendus pendant toute
+            # l'exécution, et l'ambre le plus fort de l'écran terminait la
+            # séance alors qu'on en était à la première série.
+            #
+            # ⚠ Portée REQUÊTE, jamais écrite — même discipline que `rest`,
+            # `fix` et `skipwarm`. Aucune colonne, aucune migration, et le
+            # repli sans JavaScript est naturel puisque ce sont des liens.
+            "view": (
+                "bilan"
+                if request.query_params.get("view") == "bilan"
+                else "execution"
+            ),
             "substitution_data": substitution_data,
             "atlas_data": atlas_data,
             "body_map_data": body_map_data,
@@ -907,8 +926,19 @@ def stay_redirect_target(
         # ou une correction ne déclenchent pas de repos. Mesuré au navigateur :
         # sans cette distinction, le décompte démarrait avant la première
         # série de travail.
-        rest = "&rest=1" if start_rest else ""
-        return f"/sessions/{session_id}?active={se.id}{rest}#set-{pending[0].id}"
+        if start_rest:
+            # ⚠ `UI-CP2` — AUCUN FRAGMENT VERS LE REPOS.
+            #
+            # La destination portait `#set-<prochaine>`. En A+, l'état `REST`
+            # ne rend plus la bande de séries — la question du repos est le
+            # TEMPS — donc cette ancre ne résout plus. Un fragment qui ne
+            # trouve pas sa cible ramène silencieusement en haut de page :
+            # c'est une promesse que l'URL ne tient pas.
+            #
+            # L'écran de repos tient dans un écran. Il n'a pas besoin d'ancre,
+            # et ne pas en poser est plus honnête que d'en poser une morte.
+            return f"/sessions/{session_id}?active={se.id}&rest=1"
+        return f"/sessions/{session_id}?active={se.id}#set-{pending[0].id}"
     if is_last_exercise:
         return f"/sessions/{session_id}#session-feedback"
     # Exercice fini, d'autres restent : pas de repos à annoncer — la commande
@@ -1048,7 +1078,13 @@ async def update_exercise_card(
     if next_se is not None:
         target = f"/sessions/{session_id}?active={next_se.id}#exercise-{next_se.id}"
     else:
-        target = f"/sessions/{session_id}#session-feedback"
+        # `UI-CP2` — LE DERNIER EXERCICE CONDUIT À LA SURFACE DE CLÔTURE.
+        #
+        # La destination était `#session-feedback` : une ancre vers un
+        # formulaire empilé sous l'exécution, sur la même page. Le bilan a
+        # désormais un domicile, donc une adresse. `LAST_EXERCISE_COMPLETE`
+        # y CONDUIT — il ne contient pas le bilan.
+        target = f"/sessions/{session_id}?view=bilan"
     return RedirectResponse(url=target, status_code=303)
 
 

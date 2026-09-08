@@ -372,11 +372,26 @@ def command_for(state: ConsoleState) -> dict:
         # Le LIBELLÉ ne bouge pas : trois gardes l'épinglent, et le changer
         # serait un choix d'écriture que personne n'a demandé. Seul le TON
         # change — c'est la compétition visuelle qu'on retire, pas la sortie.
+        # ⚠ `UI-CP2` — LE TON REDEVIENT DOMINANT, ET LA PRÉMISSE A CHANGÉ.
+        #
+        # `DF-B` avait rendu cette sortie SECONDAIRE pour une raison exacte :
+        # l'écran portait alors DEUX affordances ambre pour une seule
+        # intention — « Commencer S{n} » sur la ligne de la série, et ce
+        # bouton pleine largeur juste en dessous. La ligne devenait la
+        # commande, celle-ci cessait de rivaliser.
+        #
+        # A+ retire la bande de séries pendant le repos : la question de cet
+        # état est le TEMPS, pas la position dans l'exercice. **Il n'y a donc
+        # plus de ligne pour porter la commande**, et un état sans propriétaire
+        # d'action dominant n'existe pas dans ce cockpit.
+        #
+        # La raison de `DF-B` n'est pas contredite — elle est devenue sans
+        # objet. Le LIBELLÉ, lui, ne bouge pas : trois gardes l'épinglent, et
+        # le changer serait un choix d'écriture que personne n'a demandé.
         return {
             "label": "PASSER LE REPOS",
             "sub": f"S{sl.set_index} →",
             "nav": None,  # lien, pas soumission : rien à enregistrer
-            "tone": "muted",
         }
     if kind == CORRECTION:
         # Corriger une série passée n'est pas exécuter une série : aucun repos

@@ -103,7 +103,7 @@ def test_stay_returns_to_the_same_exercise(client):
 def test_stay_anchors_on_the_next_incomplete_set(client):
     sid = _start(client)
     se_id, sets = _first_exercise(sid)
-    first_id, second_id = sets[0][0], sets[1][0]
+    first_id = sets[0][0]
 
     r = client.post(
         f"/sessions/{sid}/exercises/{se_id}",
@@ -111,8 +111,23 @@ def test_stay_anchors_on_the_next_incomplete_set(client):
               "nav": "stay"},
         follow_redirects=False,
     )
-    assert r.headers["location"].endswith(f"#set-{second_id}"), (
-        "after saving set 1 the user must land on set 2, not at the top"
+    # ⚠ `UI-CP2` — LA DESTINATION EST L'ÉTAT DE REPOS, QUI N'A PAS D'ANCRE.
+    #
+    # `nav=stay` sur une série de TRAVAIL déclenche le repos. A+ ne rend plus
+    # la bande de séries à cet état — la question du repos est le temps — donc
+    # `#set-<suivante>` ne résoudrait plus, et un fragment qui ne trouve pas sa
+    # cible ramène silencieusement en haut de page.
+    #
+    # L'invariant qui compte — « après avoir enregistré, l'utilisateur arrive
+    # là où l'action continue » — est tenu autrement : l'écran de repos tient
+    # dans un écran, et la série suivante est nommée par la commande dominante.
+    # La garde vérifie donc que la destination est bien l'exercice, à l'état
+    # repos.
+    lieu = r.headers["location"]
+    assert f"active={se_id}" in lieu, f"on quitte l'exercice : {lieu!r}"
+    assert "rest=1" in lieu, f"l'action de série ne déclenche pas le repos : {lieu!r}"
+    assert "#" not in lieu, (
+        f"une ancre morte est posée vers un état qui n'en rend pas : {lieu!r}"
     )
 
 

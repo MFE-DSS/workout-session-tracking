@@ -74,8 +74,14 @@ def _render(client, session_id) -> str:
 
 
 def test_only_active_card_is_open_by_default(client):
-    """Exactly one <details ... open> with class exercise-card on a
-    freshly created session: the active (first) one."""
+    """Un seul exercice est ouvert — et depuis A+, un seul est RENDU.
+
+    ⚠ `UI-CP2` — la garde comptait les `details` ouverts parmi N cartes. A+
+    n'en rend qu'une : l'invariant « exactement un exercice ouvert » devient
+    trivialement vrai par la composition, ce qui est un renforcement, pas un
+    relâchement. On vérifie donc les deux moitiés : qu'il y a bien UNE carte,
+    et qu'elle est ouverte.
+    """
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -115,9 +121,20 @@ def test_only_active_card_is_open_by_default(client):
     )
     assert re.search(r"\bopen\b", cards[0]), "la carte active n'est pas ouverte"
 
-    activate = re.findall(r'<a\b[^>]*\bexercise-card--activate\b[^>]*>', body)
-    assert len(activate) == 2, (
-        f"les 2 exercices non actifs doivent être des liens d'activation, {len(activate)} trouvés"
+    # ⚠ `UI-CP2` — LES LIENS D'ACTIVATION ONT CHANGÉ DE PORTEUR.
+    #
+    # `DF-E` avait fait des exercices non actifs des LIENS plutôt que des
+    # `details` : c'était déjà le bon invariant. A+ va au bout — ils ne sont
+    # plus des cartes du tout, et leur activation vit sur la bande
+    # d'orientation et dans le sélecteur d'en-tête.
+    #
+    # Ce qui doit tenir est inchangé : les deux autres exercices restent
+    # atteignables, par une activation SERVEUR et sans JavaScript.
+    autres = {m for m in re.findall(r'href="[^"]*[?&]active=(\d+)', body)}
+    actif = set(re.findall(r'id="exercise-(\d+)"', body))
+    assert len(autres - actif) == 2, (
+        f"les 2 exercices non actifs doivent rester atteignables, "
+        f"{len(autres - actif)} le sont"
     )
 
 
@@ -251,10 +268,20 @@ def test_jump_bar_anchors_match_exercise_anchors(client):
     # La garde épinglait `href="#exercise-N"` : la FORME, pas la propriété.
     # Elle interdisait donc mécaniquement d'ajouter `?active=` — c'est-à-dire
     # la seule chose qui rendait ce lien capable de tenir sa promesse.
-    hrefs = set(re.findall(r'href="[^"]*#exercise-(\d+)"', body))
+    # ⚠ `UI-CP2` — L'ANCRE NE PEUT PLUS ÊTRE LE CRITÈRE.
+    # A+ ne rend que l'exercice ACTIF : `id="exercise-N"` n'existe donc que
+    # pour lui, tandis que le sélecteur vise les sept. Exiger l'égalité des
+    # deux ensembles reviendrait à exiger que la page rende de nouveau tous
+    # les exercices — la composition que la refonte retire.
+    #
+    # La propriété qui compte est intacte et se vérifie mieux : chaque entrée
+    # du sélecteur DEMANDE UNE ACTIVATION SERVEUR, et l'exercice actif porte
+    # bien son ancre.
+    hrefs = set(re.findall(r'href="[^"]*[?&]active=(\d+)', body))
     anchors = set(re.findall(r'id="exercise-(\d+)"', body))
-    assert hrefs == anchors, (
-        f"jump bar hrefs ({hrefs}) and anchors ({anchors}) diverge"
+    assert anchors, "l'exercice actif ne porte pas son ancre"
+    assert anchors <= hrefs, (
+        f"l'exercice rendu ({anchors}) n'est pas dans le sélecteur ({hrefs})"
     )
 
     # ET la propriété neuve, qui est le cœur de `DF-E` : chaque entrée du
@@ -262,7 +289,7 @@ def test_jump_bar_anchors_match_exercise_anchors(client):
     # activer — c'est le défaut que cette tranche ferme.
     jump = re.findall(r'<a\b[^>]*\bex-jump__item\b[^>]*href="([^"]+)"', body) \
         or re.findall(r'<a\b[^>]*href="([^"]+)"[^>]*\bex-jump__item\b', body)
-    targeted = [h for h in jump if "#exercise-" in h]
+    targeted = [h for h in jump if "active=" in h]
     assert targeted, "aucune entrée du sélecteur ne vise un exercice"
     for href in targeted:
         assert "active=" in href, f"entrée de sélecteur sans activation : {href!r}"

@@ -89,11 +89,21 @@ def test_the_previous_performance_values_stay_on_collapsed_cards(client):
     """Décision explicite : les VALEURS restent, le LIEN part. La puce résume
     le schéma et la date ; ce bloc porte les charges et les répétitions — ce
     ne sont pas les mêmes informations."""
+    # ⚠ `UI-CP2` — IL N'Y A PLUS DE CARTE REPLIÉE.
+    #
+    # La décision que cette garde tenait — « les VALEURS restent, le LIEN
+    # part » — portait sur la composition en liste : chaque exercice inactif
+    # affichait ses charges. A+ ne rend que l'exercice ACTIF, donc ni puce ni
+    # bloc replié n'existent plus.
+    #
+    # Ce qui doit tenir, et qui est la substance de la décision : les valeurs
+    # de la performance précédente atteignent l'utilisateur, sans lien
+    # décoratif. Elles l'atteignent désormais dans la console de l'exercice
+    # qu'il exécute — au point de décision.
     body = _page(client, _session(client))
-    assert "last-time--compact" in body, (
-        "« Dernière fois » a disparu des cartes repliées"
+    assert "console__delta" in body, (
+        "la performance précédente n'atteint plus l'utilisateur"
     )
-    assert "exercise-card__chip" in body, "la puce a disparu"
 
 
 # ═════════ D2 — LA PUCE CESSE D'ÉNONCER QUELQUE CHOSE DE FAUX ═════════

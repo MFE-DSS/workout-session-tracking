@@ -78,7 +78,8 @@ def _seed(db, user_id, n=3):
     return s
 
 
-def _body(client, n=3) -> str:
+def _body(client, n=3, view=None) -> str:
+    # `UI-CP2` — la séance a DEUX surfaces : `execution` (défaut) et `bilan`.
     from app.database import SessionLocal
     from app.models.user import User
 
@@ -86,7 +87,8 @@ def _body(client, n=3) -> str:
         user = db.query(User).first()
         s = _seed(db, user.id, n=n)
         sid = s.id
-    r = client.get(f"/sessions/{sid}", follow_redirects=False)
+    url = f"/sessions/{sid}" + (f"?view={view}" if view else "")
+    r = client.get(url, follow_redirects=False)
     assert r.status_code == 200, r.text[:300]
     return r.text
 
@@ -218,9 +220,19 @@ class TestTerminalMarkerAndContracts:
         assert 'name="nav"' in body, "enregistrer ne dépend pas du minuteur"
 
     def test_anchors_and_feedback_preserved(self, client):
+        """`UI-CP2` — LES DEUX CAPACITÉS TIENNENT, SUR DEUX SURFACES.
+
+        Cette garde vérifiait deux choses dans un seul rendu : que chaque
+        exercice reste atteignable, et que le bilan existe. Depuis A+ ils ne
+        vivent plus sur la même surface — l'exécution rend l'instrument, la
+        clôture rend le bilan. Chaque capacité est vérifiée là où elle vit ;
+        aucune n'est relâchée.
+        """
         body = _body(client, n=3)
-        assert len(re.findall(r'href="[^"]*#exercise-\d+"', body)) >= 3
-        assert 'id="session-feedback"' in body
+        assert len(re.findall(r'href="[^"]*[?&]active=\d+"', body)) >= 3, (
+            "les autres exercices ne sont plus atteignables"
+        )
+        assert 'id="session-feedback"' in _body(client, n=3, view="bilan")
 
     def test_aria_current_location_only(self, client):
         body = _body(client)

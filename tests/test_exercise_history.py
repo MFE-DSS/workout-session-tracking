@@ -212,7 +212,10 @@ def test_session_detail_shows_delta_when_prior_exists(client):
         data=data,
         follow_redirects=False,
     )
-    body = client.get(f"/sessions/{sid}").text
+    # `UI-CP2` — le Delta vit dans la console de l'exercice qu'il qualifie.
+    # A+ ne rend que l'exercice actif : on demande donc E2, ce qui est le
+    # point de décision où le Delta informe la charge.
+    body = client.get(f"/sessions/{sid}?active={se_id}").text
     assert "Delta" in body
     assert "+2.5 kg" in body
     assert "+4 reps" in body

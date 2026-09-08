@@ -125,8 +125,15 @@
           <span class="ex-jump__prog session-focus__stepper-prog">{{ d }}/{{ t }}</span>
         </a>
       {% endfor %}
+      {# `UI-CP2` — LE BILAN A UN DOMICILE, DONC UNE ADRESSE.
+         Ce lien visait `#session-feedback`, une ancre vers un formulaire
+         empilé sous l'exécution. Le bilan est désormais une surface de
+         clôture : le lien la demande au serveur. Il marche sans JavaScript,
+         et il garantit qu'une séance incomplète reste closable à tout
+         moment — la capacité `Q2`, préservée. #}
       <a class="ex-jump__item session-focus__stepper-item ex-jump__item--feedback session-focus__tap-target"
-         href="#session-feedback" aria-label="Aller au bilan de séance">
+         href="{{ url_for('session_detail', session_id=session.id) }}?view=bilan"
+         aria-label="Aller au bilan de séance">
         <span class="ex-jump__code session-focus__stepper-code">FB</span>
         <span class="ex-jump__name">Bilan de la séance</span>
       </a>

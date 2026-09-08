@@ -509,7 +509,9 @@ def test_arbitrary_exercise_navigation_is_preserved():
     header = _uncommented(HEADER.read_text(encoding="utf-8"))
     assert 'class="session-head__nav ex-nav"' in header
     assert "#exercise-{{ se.id }}" in header
-    assert "#session-feedback" in header
+    # `UI-CP2` — le bilan a un domicile : le sélecteur demande sa SURFACE au
+    # serveur au lieu d'ancrer vers un formulaire empilé sous l'exécution.
+    assert "view=bilan" in header
     assert "session-pos__current" in header, (
         "la position doit être le déclencheur, pas un libellé inerte"
     )
@@ -645,12 +647,23 @@ def test_set_anchors_are_unique_in_every_rendered_state(client):
         db.commit()
         first_done = work[0].id
 
-    for label, url in (
-        ("current_set", f"/sessions/{sid}?active={se_id}"),
-        ("rest", f"/sessions/{sid}?active={se_id}&rest=1"),
-        ("correction", f"/sessions/{sid}?active={se_id}&fix={first_done}"),
+    # ⚠ `UI-CP2` — `REST` NE REND PLUS D'ANCRE DE SÉRIE, ET C'EST VOULU.
+    #
+    # La bande de séries ne se rend plus pendant le repos : la question de cet
+    # état est le TEMPS. Il n'y a donc plus d'`id="set-N"` à cet état — et la
+    # redirection qui y mène a cessé, dans la même livraison, de poser un
+    # fragment qui ne résoudrait pas.
+    #
+    # L'invariant gardé — AUCUNE ancre dupliquée — vaut toujours pour les
+    # trois états ; l'exigence « au moins une ancre » ne vaut que là où des
+    # séries sont rendues.
+    for label, url, attend_des_ancres in (
+        ("current_set", f"/sessions/{sid}?active={se_id}", True),
+        ("rest", f"/sessions/{sid}?active={se_id}&rest=1", False),
+        ("correction", f"/sessions/{sid}?active={se_id}&fix={first_done}", True),
     ):
         ids = _rendered_ids(client.get(url).text)
         duplicates = {i for i in ids if ids.count(i) > 1}
         assert duplicates == set(), f"{label} : ancres dupliquées {duplicates}"
-        assert ids, f"{label} : aucune ancre rendue — la garde ne garderait rien"
+        if attend_des_ancres:
+            assert ids, f"{label} : aucune ancre rendue — la garde ne garderait rien"
