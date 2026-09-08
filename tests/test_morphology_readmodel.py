@@ -468,3 +468,245 @@ def test_reading_the_profile_does_not_move_the_weekly_plan(client):
 
     after = build_weekly_plan(prefs)
     assert after.fingerprint == before.fingerprint
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LA FRAÎCHEUR D'UNE DONNÉE CORPORELLE — les gardes que `UI-CP1` a OUBLIÉES
+#
+# ⚠ POURQUOI CE BLOC EXISTE, dit sans enjoliver. `UI-CP1` (PR #226) a livré la
+# fraîcheur corporelle — `FactRow.age_label`, `weight_age_label`, les trois
+# régimes de confiance — et **n'a porté AUCUNE garde de sa substance**. Ses
+# tests vérifiaient la STRUCTURE (association `dt`/`dd`, zéro carte, zéro
+# tiroir ouvert, la réponse avant le formulaire) et rien de ce que la tranche
+# apportait réellement. Le trou a été trouvé au nettoyage, en inspectant ce
+# qu'un worktree contenait avant de le supprimer.
+#
+# C'est exactement le mode d'échec que ce dépôt catalogue depuis des semaines,
+# commis sur la tranche qui le documentait.
+#
+# CES GARDES EXERCENT LE PRODUIT. Chercher `age_label` dans le read-model
+# prouverait que le champ existe, pas qu'il atteint un œil.
+# ═══════════════════════════════════════════════════════════════════════════
+
+
+def test_l_age_d_un_fait_atteint_la_page(client):
+    """Le geste central de la tranche, vérifié par le TEXTE VISIBLE.
+
+    `FactRow.measured_at` était peuplé, transporté intact jusqu'au gabarit, et
+    jeté à la dernière ligne. La phrase juste au-dessus avouait pourtant que
+    les valeurs sont « prises à des dates différentes » : l'écran reconnaissait
+    la mêlée et refusait de la chiffrer.
+    """
+    with _session() as db:
+        _add(db, _uid(), days_ago=7, waist_cm=81.0)
+
+    vu = _visible_text(client)
+    assert "Tour de taille" in vu
+    assert "il y a 7 j" in vu, (
+        f"l'ancienneté n'atteint pas la page — vu : {vu[:400]}"
+    )
+
+
+def test_le_poids_porte_son_age(client):
+    """La RÉPONSE PRIMAIRE de l'instrument, et la seule clé que `UI-CP1` a
+    ajoutée au contexte de la route — non gardée jusqu'ici.
+
+    Le poids est la donnée corporelle la plus volatile et la seule que
+    l'entraînement consomme. Sans son âge, « 78,4 kg » de ce matin et
+    « 78,4 kg » de mars se rendent EXACTEMENT PAREIL : ce n'est plus une
+    donnée, c'est un souvenir.
+    """
+    with _session() as db:
+        _add(db, _uid(), days_ago=3, weight_kg=78.4)
+
+    vu = _visible_text(client)
+    assert "78.4" in vu, f"le poids n'atteint pas la page — vu : {vu[:400]}"
+    assert "il y a 3 j" in vu, (
+        f"le poids est affiché SANS son âge — vu : {vu[:400]}"
+    )
+
+
+def test_les_trois_regimes_de_confiance_ne_se_confondent_pas(client):
+    """LE CŒUR DU CONTRAT, et il ne tient que si les régimes DIFFÈRENT.
+
+    `UI-CP1` a décidé que la fraîcheur ne s'applique pas uniformément :
+
+      OBSERVATION       le tour de taille → porte son âge
+      RÉFÉRENCE STABLE  la taille → n'en porte PAS. Une taille d'adulte ne
+                        périme pas ; lui coller un âge suggérerait qu'elle
+                        doit être reprise, et noierait les âges qui comptent
+      INCONNU           la FC repos → `users.resting_hr` est un `Integer` nu,
+                        le schéma N'A PAS de colonne de date. L'ignorance se
+                        dit, elle ne se maquille pas
+
+    Une garde qui vérifierait seulement « il y a un âge quelque part »
+    laisserait passer la régression la plus probable : appliquer le même
+    traitement aux trois, ce qui détruit l'information que la tranche apporte.
+    """
+    with _session() as db:
+        uid = _uid()
+        _set_height(db, uid, 179)
+        _add(db, uid, days_ago=12, waist_cm=81.0)
+        from sqlalchemy import select
+
+        from app.models.user import User
+
+        db.execute(select(User).where(User.id == uid)).scalar_one().resting_hr = 58
+        db.commit()
+
+    vu = _visible_text(client)
+
+    # OBSERVATION — l'âge est chiffré.
+    assert "il y a 12 j" in vu, f"observation sans âge — vu : {vu[:500]}"
+
+    # RÉFÉRENCE STABLE — nommée comme telle, et SANS ancienneté.
+    assert "Donnée de référence" in vu, (
+        f"la taille ne se déclare pas référence stable — vu : {vu[:500]}"
+    )
+
+    # INCONNU — dit en toutes lettres.
+    assert "date inconnue" in vu, (
+        f"la FC repos passe pour datée — vu : {vu[:500]}"
+    )
+
+
+def test_aucune_couleur_d_alerte_ne_se_pose_sur_l_anciennete(client):
+    """⚠ UNE DÉCISION OPÉRATEUR QUE RIEN NE GARDAIT.
+
+    Une implémentation de référence antérieure peignait en AMBRE la ligne la
+    plus ancienne. L'opérateur l'a interdit : une sémantique d'avertissement
+    sur l'âge suppose une POLITIQUE DE DOMAINE, et **aucun seuil de validité
+    corporelle n'existe dans ce dépôt**. Emprunter ceux de `recovery_contract`
+    — qui portent sur la récupération d'entraînement — aurait été inventer une
+    règle en la déguisant en réemploi.
+
+    L'ambre est réservé au propriétaire d'action dominant. L'âge est un FAIT,
+    rendu comme les autres.
+
+    Cette garde empêche qu'une tranche future le réintroduise « par confort de
+    lecture », ce qui est exactement la forme sous laquelle il était arrivé.
+    """
+    import re
+
+    with _session() as db:
+        uid = _uid()
+        _add(db, uid, days_ago=40, chest_cm=104.0)
+        _add(db, uid, days_ago=2, waist_cm=81.0)
+
+    rm = _readmodel()
+    assert rm.is_mixed_date, "prémisse invalide : les dates doivent être mêlées"
+
+    section = _section(client)
+    # La provenance et l'âge vivent dans `.bl-row__meta`. Aucune de ces cellules
+    # ne doit porter une classe modificatrice autre que celles décidées.
+    metas = re.findall(r'class="bl-row__meta([^"]*)"', section)
+    assert metas, "aucune ligne de provenance rendue — prémisse invalide"
+    autorises = {"", " bl-row__meta--unknown"}
+    inattendus = sorted({m for m in metas if m not in autorises})
+    assert not inattendus, (
+        f"une classe non décidée peint l'ancienneté : {inattendus}. L'âge est "
+        "un fait, pas un verdict — aucun seuil corporel n'existe ici."
+    )
+
+
+def test_le_derive_ne_se_dit_pas_non_date(client):
+    """L'ape index n'a pas d'âge PROPRE : il vaut celui de ses deux sources.
+
+    Le dire « date inconnue » serait faux — il est daté, deux fois, et pas
+    forcément du même jour. Le mot juste est « dérivé ».
+    """
+    with _session() as db:
+        uid = _uid()
+        _set_height(db, uid, 180)
+        _add(db, uid, wingspan_cm=188.0)
+
+    rm = _readmodel()
+    assert rm.ape_index is not None, "prémisse invalide : pas d'ape index"
+    vu = _visible_text(client)
+    assert "dérivé" in vu, f"le dérivé ne se nomme pas — vu : {vu[:400]}"
+
+
+def test_un_horodatage_naif_ne_fait_pas_exploser_la_page(client):
+    """LE PIÈGE MESURÉ : la colonne ment sur son propre type.
+
+    `BodyMeasurement.measured_at` est déclarée `DateTime(timezone=True)` et
+    **SQLite rend un datetime NAÏF** — vérifié en base. Soustraire un
+    `datetime.now(UTC)` d'un naïf lève `TypeError`, et la page entière tombe
+    en 500. `relative_hours_ago` absorbe l'écart ; c'est la raison principale
+    de l'appeler plutôt que de soustraire à la main.
+
+    ⚠ DEUX NIVEAUX, délibérément. L'unitaire plante le naïf explicitement,
+    sans dépendre du hasard du pilote de base ; le second vérifie que la PAGE
+    tient — parce que c'est la page qui tombait.
+    """
+    from datetime import datetime as _dt
+
+    from app.services.morphology_readmodel import _age
+
+    naif = _dt(2026, 8, 9, 7, 30)              # aucun tzinfo, comme SQLite
+    assert naif.tzinfo is None, "prémisse du test invalide"
+    rendu = _age(naif, None)                    # référence = maintenant, aware
+    assert rendu and "il y a" in rendu, f"attendu une ancienneté, vu {rendu!r}"
+
+    with _session() as db:
+        _add(db, _uid(), days_ago=5, waist_cm=81.0)
+    assert client.get(PROFILE_URL).status_code == 200
+
+
+def test_as_of_gouverne_l_anciennete_affichee():
+    """`as_of` borne la lecture dans le PASSÉ — il est donc la référence.
+
+    Un profil rejoué au 1er août ne doit pas afficher l'ancienneté
+    d'aujourd'hui, sans quoi « rejouer le profil tel qu'il était » ment sur la
+    seule chose que la tranche ajoute.
+
+    ⚠ La première écriture de cette garde assertait
+    `_age(...) == "hier" or "j" in _age(...)`. La seconde branche est vraie
+    pour « il y a 2 j », « il y a 30 j » ET « il y a 3 mois » — donc la
+    disjonction ne pouvait pratiquement pas échouer. Les valeurs sont
+    désormais exactes.
+    """
+    from datetime import datetime as _dt
+
+    from app.services.morphology_readmodel import _age
+
+    mesure = _dt(2026, 8, 1, 12, 0, tzinfo=UTC)
+    assert _age(mesure, _dt(2026, 8, 2, 12, 0, tzinfo=UTC)) == "hier"
+    assert _age(mesure, _dt(2026, 8, 3, 12, 0, tzinfo=UTC)) == "il y a 2 j"
+    assert _age(mesure, _dt(2026, 12, 1, 12, 0, tzinfo=UTC)) == "il y a 4 mois"
+
+
+def test_la_provenance_et_l_age_restent_UN_SEUL_fait(client):
+    """LA DÉCISION DE DENSITÉ, épinglée — parce que le RENDU l'a imposée.
+
+    Le premier jet rendait le relevé en tableau et ajoutait une QUATRIÈME
+    colonne pour la date. Les tests étaient verts ; le rendu à 390 px l'a
+    réfutée : « 179.0 / cm », « mesure / directe » et « Tour de / poitrine »
+    passaient chacun sur deux lignes. Seul l'œil l'a dit (`CLAUDE.md §5.1`).
+
+    D'où vient une valeur et de quand elle date sont **un seul fait** —
+    « mesure directe · il y a 7 j » — pas deux informations à mettre en
+    colonnes. Chaque ligne porte donc AU PLUS UNE cellule de provenance.
+
+    Cette garde empêche qu'une tranche future rouvre la quatrième colonne sans
+    repasser par un rendu.
+    """
+    import re
+
+    with _session() as db:
+        uid = _uid()
+        _set_height(db, uid, 180)
+        _add(db, uid, days_ago=3, waist_cm=81.0, chest_cm=104.0)
+
+    section = _section(client)
+    # Un « bloc de ligne » = un `dt` et tout ce qui le suit jusqu'au `dt`
+    # suivant. Chacun doit contenir exactement une valeur et au plus une
+    # provenance.
+    blocs = re.split(r"<dt\b", section)[1:]
+    assert blocs, "aucune ligne de relevé rendue — prémisse invalide"
+    for bloc in blocs:
+        provenances = len(re.findall(r'class="bl-row__meta', bloc))
+        assert provenances <= 1, (
+            f"une ligne porte {provenances} cellules de provenance — la "
+            "quatrième colonne a été réfutée par le rendu à 390 px"
+        )
