@@ -144,7 +144,17 @@ def test_the_dominant_command_says_the_type_in_words():
     from app.services.console_state import build_console_state, command_for
     from tests.test_uiv3_session_console import _exercise
 
-    warm = command_for(build_console_state(_exercise(), next_code=None))
+    # ⚠ `UI-CP2.1` — LE MONTAGE CHANGE, LA PROPRIÉTÉ NON.
+    #
+    # `_exercise()` ne rendait plus `WARMUP` : depuis que l'échauffement n'est
+    # plus une porte, un exercice qui a des séries de travail les montre. Cette
+    # garde observait donc DEUX FOIS la commande de travail et croyait tenir
+    # `D3` sur l'échauffement.
+    #
+    # Le seul état d'échauffement qui subsiste est celui où l'échauffement EST
+    # le travail — c'est là qu'on l'observe. Deux échauffements, parce que le
+    # dernier nomme la fin de l'exercice, pas son type.
+    warm = command_for(build_console_state(_exercise(warmups=2, works=0), next_code=None))
     work = command_for(
         build_console_state(_exercise(warmups_done=1), next_code=None))
     # `R5`/`R6` — les libellés changent, L'INVARIANT DE `D3` NE CHANGE PAS :
@@ -153,7 +163,7 @@ def test_the_dominant_command_says_the_type_in_words():
     #
     # « VALIDER » a disparu parce que la saisie valide d'elle-même : le mot
     # annonçait une étape qui n'existe plus.
-    assert "ÉCHAUFFEMENT" in warm["label"] or "SÉRIES" in warm["label"], warm
+    assert "ÉCHAUFFEMENT" in warm["label"], warm
     assert "SÉRIE" in work["label"], work
 
 

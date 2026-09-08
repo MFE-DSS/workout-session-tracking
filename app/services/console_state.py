@@ -363,9 +363,23 @@ def command_for(state: ConsoleState) -> dict:
         # ⚠ `Sx_UIV3_02 §4` (amendement B) FIGEAIT ces deux libellés. Ils sont
         # superséde par `R5`/`R6`, arbitrés sur rendu. La garde qui les
         # épinglait est mise à jour dans la même livraison, pas contournée.
+        # ⚠ `UI-CP2.1` — « PASSER AUX SÉRIES » DÉSIGNAIT UNE DESTINATION QUI
+        # N'EXISTE PLUS.
+        #
+        # Depuis que l'échauffement n'est plus une porte, un exercice n'atteint
+        # `WARMUP` que s'il n'a AUCUNE série de travail (branches 1 et 2 :
+        # toute série de travail, faite ou non, l'emporte). L'échauffement EST
+        # alors le travail — et il n'y a par construction aucune série vers
+        # laquelle passer.
+        #
+        # C'est exactement le défaut `F1` que `UI-CP2.0` avait corrigé côté
+        # ÉTAT, laissé intact côté LIBELLÉ : une commande qui annonce une
+        # destination inexistante. Le dernier échauffement termine l'exercice,
+        # et le dit avec le mot que `CURRENT_SET` emploie déjà pour la même
+        # situation — aucun vocabulaire n'est inventé.
         return {
             "label": (
-                "PASSER AUX SÉRIES" if state.warmup_done + 1 >= state.warmup_total
+                "EXERCICE TERMINÉ" if state.warmup_done + 1 >= state.warmup_total
                 else "ÉCHAUFFEMENT SUIVANT"
             ),
             "sub": None,
