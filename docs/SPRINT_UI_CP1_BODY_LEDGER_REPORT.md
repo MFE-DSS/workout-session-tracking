@@ -304,11 +304,76 @@ tailles, au runtime — et ils ont trouvé **six des onze défauts** de la §7. 
 ils ont été soumis à l'opérateur **après le commit local**, avant le push et le
 merge. L'arbitrage a donc eu lieu, l'ordre non. Consigné plutôt que lissé.
 
-### Nettoyage — NON fait, et c'est volontaire
+### Nettoyage
 
-La suppression de branche et de worktree est une action **humaine**
-(`CLAUDE.md §2`). `sb/ui-cp1-body-ledger` et le worktree
-`workout-session-tracking-ledger` restent en place.
+Fait sur `GO CLEANUP` opérateur. **10 worktrees mergés et propres supprimés**
+avec leurs branches locales, plus la branche distante du sprint. L'arbre
+principal, resté **20+ commits en retard**, a été remis sur le canonique — le
+piège que ce dépôt paie en boucle.
+
+Deux branches ont refusé `-d` pour cette raison même ; vérifiées par
+`merge-base --is-ancestor` contre le canonique **réel** avant tout `-D`.
+
+⚠ **Le nettoyage a failli détruire `AUREN_CRITICAL_PASS.md`** — 483 lignes,
+statut `NORMATIF`, écrites sur direction d'opérateur, non commitées depuis une
+journée. Versionné avant suppression du worktree, avec un état d'exécution
+daté. Zéro ligne perdue, vérifié par diff.
+
+---
+
+## 12. ⚠ Ce que cette tranche a livré SANS ses gardes — corrigé par #227
+
+**Trouvé au nettoyage, pas à la relecture.** En inspectant `-fresh` avant de
+le supprimer, j'ai constaté que le canonique ne contenait **aucun test** de la
+substance livrée ici.
+
+Les gardes d'`UI-CP1` vérifiaient la **structure** — association `dt`/`dd`,
+zéro carte, zéro tiroir ouvert, la réponse avant le formulaire. **Aucune** ne
+vérifiait que l'âge atteint un œil, que l'inconnu se dit, que l'horodatage
+naïf de SQLite ne fait pas tomber la page, ni que `as_of` gouverne
+l'ancienneté.
+
+C'est le mode d'échec que ce dépôt catalogue depuis des semaines, commis sur
+la tranche qui le documentait.
+
+**PR #227 — huit gardes**, toutes exerçant le produit :
+
+| Garde | Ce qu'elle empêche |
+|---|---|
+| l'âge d'un fait atteint la page | le retour du défaut d'origine |
+| le poids porte le sien | la seule clé ajoutée à la route, la moins gardée |
+| **les trois régimes ne se confondent pas** | traiter observation, référence stable et inconnu à l'identique — ce qui détruit l'information apportée |
+| **aucune couleur d'alerte sur l'ancienneté** | le retour de l'ambre-sur-la-plus-vieille, interdit faute de seuil corporel |
+| le dérivé se dit dérivé | « date inconnue » sur l'ape index serait faux |
+| l'horodatage naïf | la page tombait en 500 — gardé au niveau unitaire **et** page |
+| `as_of` gouverne | un profil rejoué mentirait sur la seule chose ajoutée |
+| provenance et âge = **un seul fait** | la quatrième colonne, réfutée par le rendu à 390 px |
+
+**Une garde héritée était fausse** : `assert _age(...) == "hier" or "j" in
+_age(...)`, dont la seconde branche est vraie pour « il y a 2 j », « il y a
+30 j » **et** « il y a 3 mois ». Elle ne pouvait pratiquement pas échouer.
+Valeurs exactes désormais.
+
+### Le gate Sonar rouge, et ce qu'il a appris
+
+Première passe : **`new_code_smells_severity` 15 contre un seuil de 14**, dix
+autres checks verts. Une seule finding — `python:S9073` MAJOR, et **un MAJOR
+pèse 15** : il dépassait le seuil à lui seul.
+
+`assert rendu and "il y a" in rendu` ne disait pas, à l'échec, si l'ancienneté
+était **absente** ou **mal formatée** — les deux défauts que la garde prétend
+distinguer. Sonar avait raison sur le fond, pas seulement sur la forme.
+
+La ligne venait de l'implémentation de référence, **reprise sans être relue**,
+et le pré-balayage AST que ce dépôt prescrit pour S9073 / S5863 / S1192 n'avait
+pas tourné. Il tourne désormais avant push.
+
+| | |
+|---|---|
+| merge | `29e8deead470727b0eb4cfd4e0a8f973a44eb05d` |
+| checks | **9/9 pass**, gate Sonar `OK`, `new_code_smells_severity` **15 → 0** |
+| CI canonique | run `34226508102` — **success, 7/7** |
+| replantation | **8 défauts → 8 gardes rouges**, avant ET après le correctif Sonar |
 
 ### Suite
 
