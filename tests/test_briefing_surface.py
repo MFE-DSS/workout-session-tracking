@@ -55,15 +55,24 @@ def _get_exercise_ids(sid: int) -> list[int]:
 
 
 def test_chip_present_on_future_card_summary(client):
-    """A fresh session has E1 active and E2+ future → chips on E2+."""
+    """⚠ `UI-CP2` — LA PUCE VIVAIT SUR LES CARTES À VENIR, QUI N'EXISTENT PLUS.
+
+    A+ ne rend que l'exercice ACTIF : il n'y a plus de résumé d'exercice futur
+    sur lequel poser une puce. Ce que la puce portait — le schéma de séries et
+    la dernière fois — n'est pas perdu : c'est ce que la CONSOLE de l'exercice
+    affiche quand on l'exécute, au point de décision.
+
+    La garde vérifie donc que le briefing atteint l'utilisateur là où il
+    décide, et que rien n'est inventé quand il n'y a pas d'antécédent.
+    """
     sid = _start(client, "push-a")
-    r = client.get(f"/sessions/{sid}")
-    body = r.text
-    assert 'exercise-card__chip' in body
-    # The chip carries the rep scheme and last-time.
-    # Push A E1 is '3x 6-10' but E1 is active so we look at another card.
-    # Any chip suffices — we just verify the markup class is rendered.
-    assert 'première fois' in body or 'dernière fois' in body
+    ex_ids = _get_exercise_ids(sid)
+    # On demande le DEUXIÈME exercice : celui qui portait une puce « à venir ».
+    body = client.get(f"/sessions/{sid}?active={ex_ids[1]}").text
+    assert "console__delta" in body, (
+        "le briefing de l'exercice n'atteint plus l'utilisateur"
+    )
+    assert "Réf." in body or "Aucune référence prescrite" in body
 
 
 def test_chip_absent_on_active_card(client):
@@ -103,8 +112,11 @@ def test_chip_absent_on_completed_card(client):
                 sl.reps = 10
         db.commit()
 
-    # Now open the session on E2 so E1 is not the active card.
-    r = client.get(f"/sessions/{sid}?active={ex_ids[1]}")
+    # ⚠ `UI-CP2` — E1 N'EST PLUS RENDU QUAND E2 EST ACTIF.
+    # La propriété gardée — « une carte terminée porte le récapitulatif, pas
+    # la puce » — se vérifie donc SUR E1, en le demandant. C'est le même fait,
+    # au même endroit que la décision.
+    r = client.get(f"/sessions/{sid}?active={ex_ids[0]}")
     body = r.text
     # Isolate E1's card markup and assert no chip.
     # `DF-E` — une carte non active n'est plus un `<details>` mais un LIEN
@@ -128,8 +140,15 @@ def test_chip_absent_on_completed_card(client):
     assert m, "expected E1 card in DOM"
     e1_summary = m.group(0)
     assert 'exercise-card__chip' not in e1_summary
-    # Recap line should be there instead.
-    assert 'exercise-card__recap' in e1_summary
+    # ⚠ `UI-CP2` — LE RÉCAPITULATIF A CHANGÉ DE PORTEUR.
+    # Il vivait dans la ligne d'identité de la carte repliée. A+ rend
+    # l'exercice terminé comme un ÉTAT — `EXERCISE_COMPLETE` — et son
+    # récapitulatif est le contenu principal de cet écran, pas une mention
+    # dans un résumé. La propriété tient : une puce est remplacée par un
+    # récapitulatif, jamais par du vide.
+    assert "console__recap" in body, (
+        "un exercice terminé ne porte plus son récapitulatif"
+    )
 
 
 

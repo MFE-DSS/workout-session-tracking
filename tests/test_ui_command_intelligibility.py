@@ -290,9 +290,22 @@ def test_the_thread_keeps_every_fact_the_cards_carried(client):
             missing.append(f"nom {name}")
     assert missing == [], f"le fil a perdu : {missing}"
 
-    # « Dernière fois » et l'avancement : présents pour le fil entier.
-    assert "last-time--compact" in body, "« dernière fois » a quitté le fil"
-    assert "exercise-card__progress" in body, "l'avancement a quitté le fil"
+    # ⚠ `UI-CP2` — LE FIL N'EXISTE PLUS, ET C'EST LE CŒUR DE LA REFONTE.
+    #
+    # `Q-D` avait compacté six cartes en six rangées, et exigeait à juste
+    # titre que la compaction ne soit pas une soustraction. A+ va au bout : la
+    # surface primaire se recompose avec l'ÉTAT, et six performances passées
+    # empilées ne servent pas la question « que fais-je maintenant ».
+    #
+    # `§5.3` tient toujours, et c'est ce qui est vérifié : l'avancement de
+    # chaque exercice reste porté — par le nom accessible des pastilles
+    # d'orientation — et sa « dernière fois » l'atteint dans SA console, au
+    # point de décision, en un lien.
+    for _se_id, code, _name in exercises[1:]:
+        assert f'aria-label="{code} —' in body, (
+            f"l'avancement de {code} n'est plus annoncé"
+        )
+    assert "séries" in body, "l'avancement a quitté l'orientation"
 
 
 def test_the_thread_row_is_still_a_whole_target(client):
@@ -304,9 +317,13 @@ def test_the_thread_row_is_still_a_whole_target(client):
     """
     session_id = _start(client)
     body = client.get(f"/sessions/{session_id}").text
+    # `UI-CP2` — le porteur change, la propriété reste : l'accès à un autre
+    # exercice est un LIEN, et sa cible tactile est portée par la boîte de
+    # 44 px de la pastille (vérifié sur la feuille de style dans
+    # `test_ui_cp2_execution_aplus`).
     assert re.search(
-        r'<a[^>]*class="[^"]*exercise-card--activate', body
-    ), "la rangée du fil n'est plus un lien — la cible tactile a disparu"
+        r'<a[^>]*class="[^"]*xc-strip__pip', body
+    ), "l'accès aux autres exercices n'est plus un lien"
 
 
 # ───────────────── `R9` — le panneau dit ce qu'il contient ─────────────────
