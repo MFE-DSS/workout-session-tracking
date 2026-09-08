@@ -646,7 +646,12 @@ def test_un_horodatage_naif_ne_fait_pas_exploser_la_page(client):
     naif = _dt(2026, 8, 9, 7, 30)              # aucun tzinfo, comme SQLite
     assert naif.tzinfo is None, "prémisse du test invalide"
     rendu = _age(naif, None)                    # référence = maintenant, aware
-    assert rendu and "il y a" in rendu, f"attendu une ancienneté, vu {rendu!r}"
+    # ⚠ DEUX ASSERTIONS, PAS UNE COMPOSITE (`python:S9073`). Écrite
+    # `assert rendu and "il y a" in rendu`, elle ne disait pas, à l'échec, si
+    # l'ancienneté était ABSENTE ou seulement MAL FORMATÉE — soit les deux
+    # défauts qu'elle prétend distinguer.
+    assert rendu is not None, "aucune ancienneté rendue pour un horodatage naïf"
+    assert "il y a" in rendu, f"format d'ancienneté inattendu, vu {rendu!r}"
 
     with _session() as db:
         _add(db, _uid(), days_ago=5, waist_cm=81.0)
