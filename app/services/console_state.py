@@ -154,21 +154,48 @@ def build_console_state(
     prev_code: str | None = None,
     rest_signal: bool = False,
     fix_set_id: int | None = None,
-    skip_warmup: bool = False,
 ) -> ConsoleState:
     """Dérive l'état de la console pour un exercice.
 
     `rest_signal` vient de `?rest=1`, posé par le serveur après un `nav=stay`.
-    `fix_set_id` vient de `?fix=<id>`, posé par le lien de correction.
-    `skip_warmup` vient de `?skipwarm=1`, posé par la sortie « SAUTER
-    L'ÉCHAUFFEMENT ». **Les trois sont à portée de requête et ne survivent pas
-    au rechargement suivant — c'est voulu.**
+    `fix_set_id` vient de `?fix=<id>`, posé par le lien de correction. **Les
+    deux sont à portée de requête et ne survivent pas au rechargement suivant
+    — c'est voulu.**
 
-    `Q-C` (opérateur, 2026-09-04) — sauter l'échauffement est une **pure
-    navigation** : elle amène à la première série de travail et **n'écrit
-    rien**. Marquer les échauffements comme faits fabriquerait des données
-    d'entraînement que l'utilisateur n'a pas produites, et un échauffement
-    sauté n'est pas un échauffement fait.
+    ═══════════════════════════════════════════════════════════════════════
+    `UI-CP2.1` — L'ÉCHAUFFEMENT CESSE D'ÊTRE UNE PORTE.
+
+    CE QUE L'OPÉRATEUR A VÉCU, en usage réel, et qui a décidé cette tranche :
+
+        « je clique sur sauter l'échauffement, ça passe à la première série ;
+          mais si je valide la première série, ça retourne sur l'échauffement.
+          Et ça désactive le timer. »
+
+    `UI-CP2.0` avait déjà rendu la progression monotone, ce qui refermait ce
+    symptôme précis. **Le fond restait ouvert** : l'échauffement gardait le
+    pouvoir de retenir l'exercice, et le seul moyen DURABLE d'en sortir était
+    d'y saisir des valeurs — puisque `completed` se dérive de la présence d'un
+    poids ou de répétitions.
+
+    L'utilisateur était donc devant un choix que le produit n'a pas à imposer :
+    **fabriquer des chiffres, ou rebondir**. Et `SAUTER L'ÉCHAUFFEMENT`, à
+    portée de requête, ne survivait pas au rechargement — un bouton qui ne
+    tient pas sa promesse.
+
+    LE REMÈDE N'EST PAS DE PERSISTER LE SAUT, C'EST DE RETIRER LA PORTE.
+    L'exercice s'ouvre sur sa première série de TRAVAIL. Les échauffements
+    restent disponibles et saisissables, jamais bloquants. Il n'y a plus rien
+    à sauter — donc plus de bouton pour le faire, et plus jamais de valeur
+    obligatoire.
+
+    `Q-C` n'est pas contredite, elle devient **sans objet** : rien n'est
+    écrit, parce qu'il n'y a plus d'obstacle à contourner.
+
+    ⚠ `WARMUP` SURVIT, POUR UN SEUL CAS. Un exercice qui n'a QUE des
+    échauffements — `work_total == 0` — n'a pas d'autre travail : ses
+    échauffements SONT son travail, et l'état reste souverain pour lui. Le
+    retirer complètement aurait laissé cet exercice sans état.
+    ═══════════════════════════════════════════════════════════════════════
     """
     warmups, works = _split_sets(session_exercise)
 
@@ -233,17 +260,14 @@ def build_console_state(
     # Le chemin est ordinaire, pas exotique : sauter l'échauffement — qui, par
     # décision produit `Q-C`, **n'écrit rien** — puis faire ses séries.
     #
-    # ⚠ CE N'EST PAS UN SIMPLE RÉORDONNANCEMENT. L'invariant ajouté est que
-    # **l'échauffement cesse d'être souverain dès que le travail a commencé**,
-    # et la preuve du départ est une donnée d'entraînement réelle
-    # (`work_done > 0`), pas un paramètre d'URL. `skip_warmup` reste une pure
-    # navigation à portée de requête : il fait avancer l'affichage, il n'écrit
-    # toujours rien, et il ne survit pas au rechargement.
+    # ⚠ CE N'EST PAS UN SIMPLE RÉORDONNANCEMENT. `UI-CP2.0` avait rendu la
+    # progression monotone : l'échauffement cessait d'être souverain dès que le
+    # travail avait commencé.
+    #
+    # `UI-CP2.1` va au bout, sur constat d'usage réel : **l'échauffement n'est
+    # plus jamais une porte**. Il ne retient plus rien, donc il n'y a plus rien
+    # à sauter — et plus aucune valeur à saisir pour en sortir.
     # ═══════════════════════════════════════════════════════════════════════
-    #: Preuve que l'utilisateur a dépassé l'échauffement. `work_done` est une
-    #: donnée persistée ; `skip_warmup` est une intention de navigation. Les
-    #: deux valent départ, mais seule la première survit au rechargement.
-    progressed = work_done > 0 or skip_warmup
 
     # 1 — L'EXERCICE EST FINI QUAND SON TRAVAIL EST FINI.
     #     Un échauffement non coché ne retient pas un exercice terminé.
@@ -258,16 +282,7 @@ def build_console_state(
             **common,
         )
 
-    # 2 — L'ÉCHAUFFEMENT N'EST SOUVERAIN QUE TANT QUE RIEN N'A COMMENCÉ.
-    if pending_warmups and not progressed:
-        return ConsoleState(
-            state=WARMUP,
-            current_set=pending_warmups[0],
-            future_sets=pending_works,
-            **common,
-        )
-
-    # 3 — LE TRAVAIL, ET SON REPOS.
+    # 2 — LE TRAVAIL PASSE AVANT L'ÉCHAUFFEMENT, TOUJOURS.
     #     `REST` n'existe que s'il reste quelque chose à faire après : afficher
     #     « repos » quand l'exercice est fini annoncerait une série qui n'existe
     #     pas. Une série de travail fraîchement validée produit désormais un
@@ -281,8 +296,18 @@ def build_console_state(
             **common,
         )
 
-    # 4 — Reste le cas d'un exercice sans travail, dont les échauffements sont
-    #     tous faits : il est fini.
+    # 3 — LE SEUL CAS OÙ L'ÉCHAUFFEMENT EST ENCORE SOUVERAIN.
+    #     Un exercice sans AUCUNE série de travail n'a que ses échauffements :
+    #     ils SONT son travail. Sans cette branche, il n'aurait pas d'état.
+    if pending_warmups:
+        return ConsoleState(
+            state=WARMUP,
+            current_set=pending_warmups[0],
+            future_sets=[],
+            **common,
+        )
+
+    # 4 — Ni travail restant, ni échauffement restant : l'exercice est fini.
     return ConsoleState(
         state=EXERCISE_COMPLETE if next_code else LAST_EXERCISE_COMPLETE,
         current_set=None,
@@ -338,9 +363,23 @@ def command_for(state: ConsoleState) -> dict:
         # ⚠ `Sx_UIV3_02 §4` (amendement B) FIGEAIT ces deux libellés. Ils sont
         # superséde par `R5`/`R6`, arbitrés sur rendu. La garde qui les
         # épinglait est mise à jour dans la même livraison, pas contournée.
+        # ⚠ `UI-CP2.1` — « PASSER AUX SÉRIES » DÉSIGNAIT UNE DESTINATION QUI
+        # N'EXISTE PLUS.
+        #
+        # Depuis que l'échauffement n'est plus une porte, un exercice n'atteint
+        # `WARMUP` que s'il n'a AUCUNE série de travail (branches 1 et 2 :
+        # toute série de travail, faite ou non, l'emporte). L'échauffement EST
+        # alors le travail — et il n'y a par construction aucune série vers
+        # laquelle passer.
+        #
+        # C'est exactement le défaut `F1` que `UI-CP2.0` avait corrigé côté
+        # ÉTAT, laissé intact côté LIBELLÉ : une commande qui annonce une
+        # destination inexistante. Le dernier échauffement termine l'exercice,
+        # et le dit avec le mot que `CURRENT_SET` emploie déjà pour la même
+        # situation — aucun vocabulaire n'est inventé.
         return {
             "label": (
-                "PASSER AUX SÉRIES" if state.warmup_done + 1 >= state.warmup_total
+                "EXERCICE TERMINÉ" if state.warmup_done + 1 >= state.warmup_total
                 else "ÉCHAUFFEMENT SUIVANT"
             ),
             "sub": None,
@@ -447,11 +486,20 @@ def secondary_for(state: ConsoleState) -> list[dict]:
         ]
     # `WARMUP` et `CURRENT_SET` : l'exercice est incomplet, la sortie existe.
     out = []
-    # `Q-C` — la sortie d'échauffement précède la sortie d'exercice : quand on
-    # est en échauffement, « je ne m'échauffe pas ici » est bien plus fréquent
-    # que « je saute tout l'exercice ».
-    if kind == WARMUP and state.work_done < state.work_total:
-        out.append({"label": "SAUTER L'ÉCHAUFFEMENT", "kind": "skip_warmup"})
+    # ⚠ `UI-CP2.1` — « SAUTER L'ÉCHAUFFEMENT » EST RETIRÉ, ET SON REMPLAÇANT
+    # PART DANS LA MÊME LIVRAISON (`CLAUDE.md §5.3`).
+    #
+    # Cette sortie existait parce que l'échauffement RETENAIT l'exercice. Elle
+    # ne tenait d'ailleurs pas sa promesse : `?skipwarm=1` vivait dans l'URL,
+    # donc le saut ne survivait pas au rechargement — constaté en usage réel
+    # par l'opérateur, « le CTA ne va nulle part ».
+    #
+    # Ce qui la remplace n'est pas un autre bouton : **il n'y a plus de porte**.
+    # L'exercice s'ouvre sur sa première série de travail, les échauffements
+    # restent disponibles au-dessus, et aucune valeur n'est jamais requise pour
+    # avancer. Une commande dont l'objet a disparu ne se remplace pas, elle se
+    # retire — c'est une commande de moins dans un cockpit qui en comptait
+    # treize de trop.
     if state.next_code:
         # `R4` / `Q-B` — « PASSER À E2 » ne dit pas ce qu'on va faire. Le
         # libellé nomme l'INTENTION, la sous-ligne nomme la DESTINATION : un

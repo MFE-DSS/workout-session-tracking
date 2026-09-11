@@ -7,11 +7,16 @@ libellé qui décrit une position n'est pas une information.**
 
 * `R4` — « PASSER À E2 » ne dit pas ce qu'on va faire. Le code de position est
   connu du produit, pas de l'utilisateur.
-* `Q-C` — « sauter l'échauffement » manquait, et doit être une **pure
-  navigation** : marquer les échauffements comme faits fabriquerait des
-  données d'entraînement que personne n'a produites. Un échauffement sauté
-  n'est pas un échauffement fait — et c'est la garde la plus importante de ce
+* `Q-C` — marquer les échauffements comme faits fabriquerait des données
+  d'entraînement que personne n'a produites. Un échauffement non fait n'est
+  pas un échauffement fait — et c'est la garde la plus importante de ce
   fichier, parce que l'erreur inverse serait invisible et définitive.
+
+  ⚠ `UI-CP2.1` a rendu `Q-C` **sans objet plutôt que contredite** : elle
+  encadrait la sortie d'échauffement, et il n'y a plus de sortie parce qu'il
+  n'y a plus de porte. Rien n'est écrit, parce qu'il n'y a plus d'obstacle à
+  contourner. L'interdiction d'écrire, elle, survit intacte — recentrée sur
+  la traversée ordinaire de l'exercice.
 * `Q-E` — « Push A — Pecs épaisseur + Delts + Triceps » est un nom de
   GABARIT : il décrit ce que le programme contient, pas ce qu'on travaille.
 
@@ -95,14 +100,20 @@ def test_the_exit_label_no_longer_carries_a_position_code():
 
 
 def _warmup_state_stub():
-    """État minimal en `WARMUP`, sans base : on teste le libellé, pas le flux."""
+    """État minimal en `WARMUP`, sans base : on teste le libellé, pas le flux.
+
+    ⚠ `UI-CP2.1` — le montage portait `[warmup, work]` et ne rendait donc plus
+    `WARMUP` du tout : la garde restait verte en observant un état de travail,
+    ce que son nom démentait. Le seul échauffement souverain qui subsiste est
+    celui d'un exercice sans série de travail.
+    """
     class _SL:
         def __init__(self, kind, idx, completed=False):
             self.kind, self.set_index, self.completed = kind, idx, completed
             self.id, self.weight_kg, self.reps = idx, None, None
 
     class _SE:
-        set_logs = [_SL("warmup", 1), _SL("work", 1)]
+        set_logs = [_SL("warmup", 1)]
         template_exercise = None
 
     return build_console_state(
@@ -113,22 +124,25 @@ def _warmup_state_stub():
 # ───────────────── `Q-C` — sauter n'écrit RIEN ─────────────────
 
 
-def test_skipping_the_warmup_writes_nothing(client):
-    """Le CHEMIN de saut n'écrit rien.
+def test_traversing_the_exercise_writes_no_warmup(client):
+    """⚠ RECIBLÉE par `UI-CP2.1` — elle observait un paramètre supprimé.
+
+    Elle passait encore, et ne mesurait plus rien : `?skipwarm=1` n'existe
+    plus, et un paramètre inconnu est ignoré. Une garde qui interroge un
+    objet disparu rend vert par construction — c'est la forme la plus
+    silencieuse de garde qui ne garde rien.
+
+    L'enjeu, lui, n'a pas bougé et il est le cœur de `Q-C` : **un échauffement
+    non fait n'est pas un échauffement fait.** Il est même plus exposé
+    qu'avant — puisque l'utilisateur traverse désormais tout l'exercice sans
+    jamais toucher le tiroir, rien ne doit s'y écrire en son nom.
 
     ⚠ Portée exacte, parce que la surestimer serait le défaut que ce fichier
-    combat : ce test vérifie que **la requête `?skipwarm=1` est inerte**. Il
-    ne peut pas, à lui seul, prouver que le CONTRÔLE l'est — un `GET` n'écrit
-    jamais, quel que soit le bouton qui l'a produit.
-
-    C'est `test_the_skip_is_a_link_not_a_submission` qui porte cette
-    seconde moitié, et il la porte **par construction** : un lien ne
-    sérialise aucun formulaire. Les deux ensemble tiennent l'invariant ;
-    séparément, aucun ne suffit.
-
-    L'enjeu : un échauffement sauté n'est pas un échauffement fait. Une
-    sortie qui écrirait fabriquerait des séries que personne n'a exécutées,
-    et le produit afficherait exactement ce qu'on attendait de lui.
+    combat : on vérifie que **la consultation est inerte**. Un `GET` n'écrit
+    jamais, quel que soit le contrôle qui l'a produit ; c'est
+    `test_the_warmup_drawer_carries_no_submit_control` qui tient l'autre
+    moitié, et il la tient par construction. Les deux ensemble tiennent
+    l'invariant ; séparément, aucun ne suffit.
     """
     from app.database import SessionLocal
     from app.models.session import SessionExercise, SetLog
@@ -151,40 +165,60 @@ def test_skipping_the_warmup_writes_nothing(client):
     before = snapshot()
     assert before, "aucune série — la garde tournerait à vide"
 
-    r = client.get(f"/sessions/{session_id}?active={se_id}&skipwarm=1")
+    r = client.get(f"/sessions/{session_id}?active={se_id}")
     assert r.status_code == 200
 
     assert snapshot() == before, (
-        "sauter l'échauffement a MODIFIÉ des séries — c'est une pure "
-        "navigation, elle ne doit rien écrire"
+        "consulter l'exercice a MODIFIÉ des séries — un échauffement non fait "
+        "ne doit jamais devenir un échauffement fait"
     )
 
 
-def test_skipping_the_warmup_moves_the_instrument_to_the_work_set(client):
-    """Sans effet visible, le paramètre serait décoratif."""
+def test_the_instrument_opens_on_the_work_set_with_no_parameter_at_all(client):
+    """⚠ SUPERSÈDE `test_skipping_the_warmup_moves_the_instrument_to_the_work_set`.
+
+    L'ancienne garde exigeait que `?skipwarm=1` ait un effet visible. Elle
+    tenait donc l'existence même de la porte — or `UI-CP2.1` retire la porte,
+    sur constat d'usage : le saut ne survivait pas au rechargement, parce que
+    l'intention vivait dans l'URL et que `Q-C` interdit de l'écrire en base.
+
+    La remplaçante est **plus forte, et c'est la plainte de l'opérateur prise
+    au mot** : il ne faut plus AUCUN paramètre. L'exercice s'ouvre sur sa
+    première série de travail, et un rechargement nu n'y renvoie pas
+    l'échauffement.
+    """
     session_id = _start(client)
     se_id = _exercises(session_id)[0][0]
 
-    plain = client.get(f"/sessions/{session_id}?active={se_id}").text
-    skipped = client.get(f"/sessions/{session_id}?active={se_id}&skipwarm=1").text
+    nu = client.get(f"/sessions/{session_id}?active={se_id}").text
+    assert 'data-console-state="warmup"' not in nu, (
+        "l'exercice s'ouvre encore sur l'échauffement — c'est la porte que "
+        "`UI-CP2.1` retire"
+    )
+    assert 'data-console-state="current_set"' in nu, nu[:0]
 
-    assert 'data-console-state="warmup"' in plain, plain[:0]
-    assert 'data-console-state="warmup"' not in skipped, (
-        "`skipwarm=1` n'a pas déplacé l'instrument — le paramètre ne fait rien"
+    # Et le rechargement — le geste exact qui ramenait l'échauffement.
+    encore = client.get(f"/sessions/{session_id}?active={se_id}").text
+    assert 'data-console-state="warmup"' not in encore, (
+        "un simple rechargement a ramené l'échauffement"
     )
 
 
-def test_the_skip_is_a_link_not_a_submission():
-    """**La moitié qui prouve vraiment quelque chose.**
+def test_the_warmup_drawer_carries_no_submit_control():
+    """⚠ SUPERSÈDE `test_the_skip_is_a_link_not_a_submission`.
 
-    Un lien ne sérialise aucun formulaire : il ne peut PAS écrire, par
-    construction. Un `<button type="submit">` au même endroit soumettrait la
-    carte entière au passage — et `_persist_set_values` écrase alors toutes
-    les séries de l'exercice avec ce que porte le DOM.
+    Le risque que l'ancienne garde tenait est intact, seul son porteur a
+    changé. Un `<button type="submit">` **à l'emplacement de l'échauffement**
+    soumettrait la carte entière au passage — et `_persist_set_values` écrit
+    alors les séries que porte le DOM. L'ancienne garde le tenait pour le
+    bouton de saut ; le tiroir d'échauffement occupe désormais cette place.
 
-    C'est structurel et non comportemental, et c'est assumé : le
-    comportement se teste sur une requête, or ici le risque vit dans le
-    CONTRÔLE qui la produit.
+    Le tiroir reste SAISISSABLE — c'est là qu'on s'échauffe, et `UI-CP2.1`
+    n'a retiré que son caractère obligatoire. Ce qu'il ne doit pas porter,
+    c'est une commande qui enregistre : elle serait une porte déguisée.
+
+    Structurel et non comportemental, et c'est assumé : le risque vit dans le
+    CONTRÔLE, pas dans la requête qu'il produit.
     """
     from pathlib import Path
 
@@ -193,12 +227,15 @@ def test_the_skip_is_a_link_not_a_submission():
         / "app/templates/_partials/exercise_card.html"
     )
     markup = re.sub(r"\{#.*?#\}", "", card.read_text(encoding="utf-8"), flags=re.DOTALL)
-    m = re.search(r"s\.kind == 'skip_warmup'.*?\{% elif", markup, re.DOTALL)
-    assert m, "la branche `skip_warmup` a disparu du gabarit"
-    branch = m.group(0)
-    assert "<a " in branch, "la sortie d'échauffement doit être un LIEN"
-    assert "type=\"submit\"" not in branch, (
-        "un submit enregistrerait le formulaire — la sortie doit être inerte"
+    m = re.search(r"<details class=\"warmup-recap.*?</details>", markup, re.DOTALL)
+    assert m, "le tiroir d'échauffement a disparu du gabarit"
+    drawer = m.group(0)
+    assert "type=\"submit\"" not in drawer, (
+        "un submit dans le tiroir enregistrerait la carte entière"
+    )
+    assert "<button" not in drawer, (
+        "aucune commande dans le tiroir : l'échauffement n'est plus une étape "
+        "qu'on franchit"
     )
 
 

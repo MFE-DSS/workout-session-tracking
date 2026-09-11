@@ -349,7 +349,6 @@ def _console_context(
     last_time: dict,
     rest_signal: bool,
     fix_set_id: int | None,
-    skip_warmup: bool = False,
 ) -> dict[str, dict]:
     """État, commande dominante et sorties secondaires, par exercice.
 
@@ -367,10 +366,6 @@ def _console_context(
             prev_code=prev_code_by_exercise[se.id],
             rest_signal=rest_signal and is_active,
             fix_set_id=fix_set_id if is_active else None,
-            # Comme `rest` et `fix` : honoré sur la carte ACTIVE seulement.
-            # Sauter l'échauffement d'une carte repliée changerait un état que
-            # l'utilisateur ne voit pas.
-            skip_warmup=skip_warmup and is_active,
         )
         states[se.id] = st
         commands[se.id] = command_for(st)
@@ -625,7 +620,11 @@ def session_detail(
         last_time=last_time,
         rest_signal=request.query_params.get("rest") == "1",
         fix_set_id=_positive_int(request.query_params.get("fix")),
-        skip_warmup=request.query_params.get("skipwarm") == "1",
+        # ⚠ `UI-CP2.1` — `skipwarm` EST RETIRÉ, PAS RENDU INERTE.
+        # L'échauffement ne retient plus l'exercice : il n'y a plus rien à
+        # sauter. Garder le paramètre en le lisant sans effet aurait été
+        # exactement le calcul mort que `CP-0` a passé une tranche à retirer
+        # de ce dépôt.
     )
 
     return templates.TemplateResponse(
@@ -662,7 +661,7 @@ def session_detail(
             # séance alors qu'on en était à la première série.
             #
             # ⚠ Portée REQUÊTE, jamais écrite — même discipline que `rest`,
-            # `fix` et `skipwarm`. Aucune colonne, aucune migration, et le
+            # `fix`. Aucune colonne, aucune migration, et le
             # repli sans JavaScript est naturel puisque ce sont des liens.
             "view": (
                 "bilan"

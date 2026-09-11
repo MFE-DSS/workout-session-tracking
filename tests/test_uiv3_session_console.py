@@ -63,12 +63,37 @@ def _exercise(warmups=1, works=3, works_done=0, warmups_done=0):
     return _Exercise(sets)
 
 
-def test_pending_warmup_wins_over_everything():
-    from app.services.console_state import WARMUP, build_console_state
+def test_pending_warmup_wins_only_when_it_IS_the_work():
+    """⚠ SUPERSÈDE `test_pending_warmup_wins_over_everything` (`UI-CP2.1`).
 
-    st = build_console_state(_exercise(), next_code="E2")
-    assert st.state == WARMUP
-    assert st.current_set.kind == "warmup"
+    L'ancienne garde tenait EXACTEMENT ce que la tranche retire : un
+    échauffement en attente l'emportait sur tout, y compris sur les séries de
+    travail. C'est le défaut vécu par l'opérateur — valider une série renvoyait
+    à l'échauffement, et aucun moyen d'en sortir sinon y saisir des chiffres.
+
+    Elle n'est pas supprimée sans remplaçante : la souveraineté de
+    l'échauffement survit pour le seul cas où elle a un sens — un exercice
+    **sans aucune série de travail**, dont les échauffements SONT le travail.
+    Le retirer là aurait laissé cet exercice sans état.
+
+    Sœur de `test_l_echauffement_reste_souverain_quand_il_EST_le_travail`
+    (`test_ui_cp2_0_execution_enablement.py`), dans un autre fichier — c'est
+    précisément la sœur restée sans propriétaire qui a rendu la CI rouge.
+    """
+    from app.services.console_state import (
+        CURRENT_SET,
+        WARMUP,
+        build_console_state,
+    )
+
+    seul = build_console_state(_exercise(works=0), next_code="E2")
+    assert seul.state == WARMUP
+    assert seul.current_set.kind == "warmup"
+
+    # Le même échauffement en attente, mais l'exercice a du travail : il perd.
+    avec_travail = build_console_state(_exercise(), next_code="E2")
+    assert avec_travail.state == CURRENT_SET
+    assert avec_travail.current_set.kind == "work"
 
 
 def test_work_set_becomes_current_once_warmups_are_done():
@@ -209,9 +234,17 @@ def test_exactly_one_dominant_command_per_state():
     """
     from app.services.console_state import build_console_state, command_for
 
+    # ⚠ `UI-CP2.1` — « PASSER AUX SÉRIES » EST RETIRÉ, PAS RENOMMÉ PAR CONFORT.
+    #
+    # Le libellé nommait une destination qui n'existe plus : `WARMUP` n'est
+    # atteint que par un exercice SANS série de travail. Le dernier
+    # échauffement d'un tel exercice le termine, et le dit avec le mot que
+    # `CURRENT_SET` emploie déjà pour la dernière série de travail.
     cases = [
-        # dernier échauffement : la destination n'est pas « le suivant »
-        (_exercise(), None, "PASSER AUX SÉRIES"),
+        # dernier échauffement d'un exercice qui n'a QUE des échauffements
+        (_exercise(works=0), None, "EXERCICE TERMINÉ"),
+        # échauffement non terminal : la destination est bien le suivant
+        (_exercise(warmups=2, works=0), None, "ÉCHAUFFEMENT SUIVANT"),
         (_exercise(warmups_done=1), None, "SÉRIE SUIVANTE"),
         (_exercise(warmups_done=1, works_done=3), "E2", "CONTINUER → E2"),
         (_exercise(warmups_done=1, works_done=3), None, "ALLER AU BILAN"),
@@ -295,8 +328,11 @@ def test_warmup_and_correction_do_not_start_a_rest():
     faisait démarrer le décompte AVANT la première série de travail."""
     from app.services.console_state import build_console_state, command_for
 
+    # `UI-CP2.1` — l'échauffement ne s'observe plus que là où il subsiste :
+    # un exercice qui n'a que des échauffements. La propriété est inchangée —
+    # aucun repos ne suit un échauffement — seul le montage l'atteint encore.
     assert command_for(
-        build_console_state(_exercise(), next_code="E2")
+        build_console_state(_exercise(works=0), next_code="E2")
     )["nav"] == "stay_norest"
     assert command_for(
         build_console_state(
