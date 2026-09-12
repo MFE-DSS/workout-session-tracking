@@ -259,3 +259,47 @@ l'outil et gardé le geste : filtrer avant de lire.
 | lignes `FAILED` / `ERROR` | **0** sur le journal entier (`grep -c`, pas `tail`) |
 | pic mémoire | 1 745 Mo (budget 1 937) |
 | sortie | **0, du script lui-même** — aucun pipe pour la falsifier |
+
+---
+
+## 10. Closeout
+
+| | |
+|---|---|
+| PR | **#230**, mergée le 2026-09-11 |
+| Méthode | `--merge`, épinglée sur `--match-head-commit 39dc9ba` — pas de squash, pas de `--admin`, pas de force |
+| Head mergée | `39dc9ba3685418bff1fc4da3d9667dd69902e268` |
+| Commit de merge | **`e898fee69813b0d07da6ecd93ada0e6ef612d348`** |
+| Portail revérifié **avant** l'appel | 9 checks `pass` · Sonar gate `OK` · 0 thread non résolu · `MERGEABLE` / `CLEAN` |
+| Sonar (autorité) | `new_code_smells_severity` **0** (seuil 14) · couverture nouveau code **100 %** · 0 bug · 0 vulnérabilité · 0 duplication |
+| CI canonique | run `34656035272` sur le commit de merge |
+
+### Ce que la tranche laisse derrière elle
+
+* l'échauffement n'est plus jamais une porte — état, routeur, gabarit ;
+* `skipwarm` **retiré**, pas rendu inerte ;
+* 9 gardes touchées : 4 supersédées avec remplaçante nommée, 3 montages
+  réparés, 2 gardes vertes qui ne mesuraient plus rien et qui mesurent à
+  nouveau ;
+* un libellé qui désignait une destination inexistante.
+
+### Ce que la tranche a coûté, et pourquoi
+
+**Deux CI rouges pour une même cause de fond** : une vérification dont on lit le
+résultat sans vérifier qu'elle porte sur l'objet livré. D'abord un filtre `-k`
+pris pour un sweep, puis un sweep réel dont la sortie a été filtrée avant
+lecture. J'avais corrigé l'outil et gardé le geste.
+
+La contre-mesure est écrite au **§9** et tient en une phrase : **un rapport vert
+exige la présence de la phrase de succès, jamais l'absence de phrases d'échec.**
+
+### Reste ouvert, hors périmètre de cette tranche
+
+* `docs/strategy/AUREN_UI_CRITICAL_PATH.md` décrit un état de départ du
+  2026-09-04 (`4549d8f`) — **périmé de plusieurs tranches**. Il n'est pas
+  réécrit ici : ce serait un changement de périmètre, pas un closeout ;
+* consentement sur `POST /profile/measurements` — décision produit ;
+* `update_measurement` remet à NULL les champs absents — contrainte dure sur la
+  capture guidée ;
+* branches distantes mergées à élaguer — **suppression réservée à l'humain**
+  (`CLAUDE.md §2`).
