@@ -4,7 +4,7 @@
 
 {# ⚠ `UI-CP3 §5` / `CLAUDE.md §5.3` — LA DÉCLARATION ARRIVE ICI.
 
-   Elle vivait sur l'accueil : vingt-sept champs repliés dans un `<details>`,
+   Elle vivait sur l'accueil : vingt-sept champs repliés dans un tiroir,
    chargés à chaque affichage de la surface de décision.
 
    Deux faits mesurés ont tranché :
@@ -28,11 +28,19 @@
     1×/jour · 5 = meilleur état.
   </p>
   <form method="post" action="/readiness" class="readiness-declare__form">
-    {# ⚠ `<fieldset>` / `<legend>`, PAS un `<label>` orphelin.
-       Une échelle de 1 à 5 est un GROUPE de boutons radio : un `<label>` sans
+    {# ⚠ UN GROUPE DE CHAMPS, PAS UN LIBELLÉ ORPHELIN.
+       Une échelle de 1 à 5 est un GROUPE de boutons radio : un libellé sans
        `for` ne s'associe à rien, et l'associer à un seul des cinq serait faux.
-       `<legend>` est le seul élément qui nomme un groupe — c'est la
-       correction juste, pas la plus courte. #}
+       Seule la légende d'un groupe de champs nomme un groupe — c'est la
+       correction juste, pas la plus courte.
+
+       ⚠ CE COMMENTAIRE NE CITE AUCUNE BALISE, ET C'EST DÉLIBÉRÉ.
+       Première écriture : il écrivait les noms d'éléments entre chevrons.
+       L'analyseur HTML de Sonar ne connaît pas les commentaires Jinja — il a
+       lu la légende citée dans cette prose comme une balise réelle hors de
+       son groupe, et rendu un BUG MAJOR sur la ligne du commentaire. C'est la
+       douzième fois que ce dépôt rencontre le motif « une garde qui lit sa
+       propre prose », et la première où il vient de l'analyseur. #}
     {% for field in readiness_scale_fields %}
     <fieldset class="readiness-declare__field">
       <legend class="readiness-declare__label">{{ readiness_field_labels[field] }}</legend>
@@ -53,7 +61,7 @@
     {# ⚠ UN `placeholder` N'EST PAS UN LIBELLÉ.
        Ces deux champs n'avaient que leur `placeholder` — qui disparaît à la
        saisie et qu'aucun lecteur d'écran ne traite comme un nom. Le défaut est
-       PRÉEXISTANT : il vivait replié dans un `<details>` sur l'accueil, que
+       PRÉEXISTANT : il vivait replié dans un tiroir sur l'accueil, que
        presque personne n'ouvrait. Le déplacement l'a exposé, il ne l'a pas
        créé — comme la troncature de ce même champ. #}
     <div class="readiness-extra">
