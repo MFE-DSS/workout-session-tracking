@@ -13,8 +13,11 @@ def test_home_links_to_the_analysis_surface(client):
     un tap depuis l'accueil**. C'est l'invariant qui comptait ; « la section
     KPI existe » n'en était qu'une implémentation.
     """
+    # ⚠ `UI-CP3 §6` — la classe `today-home__analysis` devient une sortie du
+    # rail de transition, nommée par sa question. L'invariant tenu ici est le
+    # CHEMIN, pas son véhicule : épingler la classe aurait interdit de changer
+    # la forme du lien sans changer ce qu'il garantit.
     body = client.get("/").text
-    assert "today-home__analysis" in body
     assert "/progress" in body
 
 

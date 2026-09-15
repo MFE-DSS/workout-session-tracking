@@ -1,6 +1,64 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Historique état</h1>
+<h1 class="page-title">État du jour</h1>
+
+{# ⚠ `UI-CP3 §5` / `CLAUDE.md §5.3` — LA DÉCLARATION ARRIVE ICI.
+
+   Elle vivait sur l'accueil : vingt-sept champs repliés dans un `<details>`,
+   chargés à chaque affichage de la surface de décision.
+
+   Deux faits mesurés ont tranché :
+
+     · `recommendation.py` ne lit la readiness **nulle part** — zéro
+       occurrence. Elle ne change aucune recommandation, donc elle n'est pas
+       une preuve de MISSION ;
+     · cette page portait déjà la LECTURE, et n'était atteignable que depuis
+       l'accueil, et seulement une fois l'état du jour déjà déclaré — donc
+       invisible exactement à qui ne l'avait pas encore rempli.
+
+   Réunir la déclaration et l'historique referme les deux trous d'un coup.
+   La capacité n'est pas préservée « ailleurs » au sens vague : elle est
+   réunie avec sa lecture, et la porte est dans BODY_LEDGER.
+
+   Aucune invention (`§5`) : pas de score, pas de feu tricolore, pas d'état
+   global de synthèse. Les mêmes cinq échelles, la même FC, la même note. #}
+{% if not today_entry %}
+<section class="readiness-declare" aria-label="Déclarer l'état du jour">
+  <p class="text-dim readiness-declare__hint">
+    1×/jour · 5 = meilleur état.
+  </p>
+  <form method="post" action="/readiness" class="readiness-declare__form">
+    {% for field in readiness_scale_fields %}
+    <div class="readiness-declare__field">
+      <label class="readiness-declare__label">{{ readiness_field_labels[field] }}</label>
+      <div class="segmented">
+        {% for val in [1, 2, 3, 4, 5] %}
+        <label class="segmented__option">
+          <input type="radio" name="{{ field }}" value="{{ val }}" {% if val == 3 %}checked{% endif %}>
+          <span title="{{ readiness_labels[field][val] }}">{{ val }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="readiness-scale__ends">
+        <span>1 · {{ readiness_labels[field][1] }}</span>
+        <span>5 · {{ readiness_labels[field][5] }}</span>
+      </div>
+    </div>
+    {% endfor %}
+    <div class="readiness-extra">
+      <input class="input" type="number" name="resting_hr" placeholder="FC repos (bpm)" min="30" max="200">
+      <input class="input" type="text" name="note" placeholder="Note (optionnel)">
+    </div>
+    <button type="submit" class="btn btn--primary readiness-declare__submit">Enregistrer mon état</button>
+  </form>
+</section>
+{% else %}
+<p class="text-dim readiness-declare__done">
+  Déjà renseigné aujourd'hui.
+</p>
+{% endif %}
+
+<h2 class="readiness-declare__past">90 derniers jours</h2>
 
 {% if not entries %}
   <p class="text-dim">Aucune entrée pour les 90 derniers jours.</p>

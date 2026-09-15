@@ -278,17 +278,49 @@ def test_home_route_returns_200(client):
     assert r.status_code == 200
 
 
-def test_home_route_renders_coaching_loop_section(client):
-    """The new coaching-loop section must appear in the rendered HTML."""
-    r = client.get("/")
+def test_the_home_payload_still_reaches_mission(client):
+    """⚠ SUPERSÈDE `test_home_route_renders_coaching_loop_section` (`UI-CP3`).
+
+    L'ancienne garde exigeait la SECTION « boucle de coaching » sur
+    l'accueil. `UI-CP3 §10` la retire : ses trois tuiles répondaient à des
+    questions que MISSION ne possède pas.
+
+    Ce qui survit, et que la remplaçante tient : la charge utile atteint
+    toujours le gabarit, parce que MISSION en consomme encore les raisons
+    secondaires de la recommandation. Si elle cessait d'arriver, la cause
+    perdrait la moitié de son texte sans qu'aucune garde ne bouge.
+
+    Elle observe le CONTEXTE, pas le HTML : une garde qui chercherait une
+    phrase de repli dans la page rendrait vert sur n'importe quelle page
+    contenant ce mot.
+    """
+    import app.routers.pages as pages
+
+    vus: dict = {}
+    vrai = pages.templates.TemplateResponse
+
+    def espion(request, name, context=None, *a, **k):
+        if name == "index.html":
+            vus.update(context or {})
+        return vrai(request, name, context, *a, **k)
+
+    pages.templates.TemplateResponse = espion
+    try:
+        r = client.get("/")
+    finally:
+        pages.templates.TemplateResponse = vrai
+
     assert r.status_code == 200
-    body = r.text
-    # Either the section label OR a fallback phrase from build_home_payload
-    assert (
-        "coaching-loop" in body
-        or "Aujourd'hui" in body
-        or "Pas encore" in body
-    )
+    assert vus.get("home") is not None, "la charge utile n'atteint plus MISSION"
+
+
+def test_mission_no_longer_renders_the_coaching_loop(client):
+    """L'autre moitié : le retrait est effectif.
+
+    On cherche le PORTEUR (`coaching-loop`), jamais un libellé : un titre peut
+    changer sans que le bloc parte.
+    """
+    assert "coaching-loop" not in client.get("/").text
 
 
 @pytest.mark.parametrize("path", ["/"])

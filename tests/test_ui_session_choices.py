@@ -21,10 +21,17 @@ INTERACTION_CSS = REPO_ROOT / "app" / "static" / "css" / "interaction.css"
 MACROS = REPO_ROOT / "app" / "templates" / "_macros.html"
 EXERCISE_CARD = REPO_ROOT / "app" / "templates" / "_partials" / "exercise_card.html"
 
-#: Inventaire complet issu du préflight — les cinq surfaces qui utilisent
-#: `.segmented`. Épinglé pour qu'un sixième consommateur soit un geste conscient.
+#: Inventaire complet issu du préflight — les surfaces qui utilisent
+#: `.segmented`. Épinglé pour qu'un consommateur de plus soit un geste conscient.
+#:
+#: ⚠ `UI-CP3` — L'ÉCHELLE A CHANGÉ DE SURFACE, ELLE N'A PAS DISPARU.
+#: La déclaration d'état du jour a quitté MISSION pour `/readiness/history` :
+#: `index.html` sort de l'inventaire, `readiness_history.html` y entre. Le
+#: nombre de consommateurs est inchangé — c'est le même formulaire.
+#: L'inventaire fait ici son travail : il a EXIGÉ que le déplacement soit
+#: déclaré, au lieu de le laisser passer inaperçu.
 SEGMENTED_CONSUMERS = {
-    "app/templates/index.html",                    # échelle de disponibilité
+    "app/templates/readiness_history.html",        # échelle de disponibilité
     "app/templates/_macros.html",                  # macro partagée
     "app/templates/session_detail.html",           # concentration + énergie
     "app/templates/_partials/exercise_card.html",  # sensation + alternatives

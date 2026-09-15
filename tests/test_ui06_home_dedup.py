@@ -70,10 +70,13 @@ def test_launcher_still_has_full_reco_block(client):
 
 
 def test_hero_readiness_teaser_removed(client):
+    # ⚠ `UI-CP3 §5` — le widget suit le teaser hors de MISSION. La capacité
+    # est tenue par `test_the_legacy_widget_capability_still_exists`
+    # (`test_recovery_home_consumer.py`), qui vérifie un chemin d'ÉCRITURE
+    # réel sur `/readiness/history` — plus fort qu'une présence de libellé.
     src = INDEX.read_text(encoding="utf-8")
     assert "today-home__readiness" not in src
-    # widget remains
-    assert "readiness-widget" in src
+    assert "readiness-widget" not in src
 
 
 # ───────── last-session compact (no ressenti / qualité) ─────────

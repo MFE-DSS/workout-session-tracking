@@ -353,17 +353,45 @@ class TestHomeConsumer:
             payload = build_home_payload(db, db.get(User, uid))
         assert payload["weekly_plan"]["planned_sessions"] == 3
 
-    def test_the_tile_renders_on_home(self, client):
-        import html
+    def test_the_plan_is_produced_even_though_mission_no_longer_shows_it(
+        self, client
+    ):
+        """⚠ SUPERSÈDE `test_the_tile_renders_on_home` (`UI-CP3 §10`).
 
+        L'ancienne garde exigeait la tuile « Semaine planifiée » SUR
+        L'ACCUEIL. MISSION ne possède plus cette question : elle répond à
+        « qu'est-ce que je fais maintenant ? », pas à « comment va ma
+        semaine ? ».
+
+        La remplaçante tient ce qui compte et ne pouvait pas être perdu sans
+        qu'on s'en aperçoive : **le plan est toujours CALCULÉ**. Une tranche
+        qui retire un affichage ne doit pas emporter son producteur en
+        silence — c'est précisément ce qu'une garde d'affichage ne sait pas
+        distinguer.
+        """
         from app.database import SessionLocal
+        from app.services.home import build_home_payload
+        from app.models.user import User
         from app.services.training_preferences import save_training_preferences
         from tests.helpers import get_test_user_id
+        from sqlalchemy import select
 
         with SessionLocal() as db:
             save_training_preferences(db, get_test_user_id(), sessions_per_week=3)
+        with SessionLocal() as db:
+            user = db.execute(select(User)).scalars().first()
+            payload = build_home_payload(db, user)
+        assert "weekly_plan" in payload, (
+            "le plan hebdomadaire n'est plus produit — le retirer de MISSION "
+            "ne devait pas supprimer son calcul"
+        )
+
+    def test_mission_does_not_show_the_weekly_plan(self, client):
+        """L'autre moitié : le retrait est effectif, pas seulement intentionnel."""
+        import html
+
         page = html.unescape(client.get("/").text)
-        assert "Semaine planifiée" in page
+        assert "Semaine planifiée" not in page
 
     def test_only_one_unmet_constraint_is_surfaced(self, client):
         from app.database import SessionLocal

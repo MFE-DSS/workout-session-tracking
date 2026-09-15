@@ -86,9 +86,19 @@
 
    L'ambre ne subsiste que là où il signifie une action : le CTA. */
 /* Séance active : la surface se distingue par luminosité + rail latéral. */
+/* ⚠ `UI-CP3 §2` — L'ÉTAT ACTIF CESSE D'ÊTRE UNE CARD.
+ *
+ * Cette règle portait `background: var(--t-raised)` et un liseré ambre : une
+ * CARD, quand l'état recommandé était une bande à rail. Même instrument, deux
+ * grammaires — et la card est précisément la primitive que le programme
+ * retire.
+ *
+ * La règle est VIDÉE ici plutôt qu'écrasée plus bas : une seconde déclaration
+ * du même sélecteur aurait laissé deux vérités dans le fichier, et Sonar a
+ * raison de le signaler (`css:S4666`). Le sélecteur survit parce que les
+ * règles suivantes s'appuient dessus pour distinguer les deux états. */
 .today-home__hero--active {
-  background: var(--t-raised);
-  border-left: 2px solid var(--t-amber);
+  background: none;
 }
 
 /* Eyebrow terminal : uppercase, mono, gris, préfixe de prompt. */
@@ -244,71 +254,17 @@
    seule, et jamais de feu tricolore vert/orange/rouge — c'est le vocabulaire de
    tout le marché, il ne survit pas au daltonisme et il suggère un jugement
    médical que le produit refuse. */
-.band {
-  display: inline-flex;
-  gap: 2px;
-  flex: none;
-}
-.band i {
-  width: 7px;
-  height: 14px;
-  border-radius: 1px;
-  background: var(--t-line);
-  display: block;
-}
-.band--likely_available .band__on { background: var(--t-fg); }
-.band--partially_recovered .band__on { background: var(--t-fg-muted); }
-.band--likely_fatigued .band__on { background: var(--t-fg-faint); }
+/* ⚠ `UI-CP3` — `.band` ET `.cockpit__tally` ONT DÉMÉNAGÉ DANS `app.css`.
 
-/* `unknown` n'est pas « zéro récupération » : c'est une autre NATURE de chose,
-   donc une autre FORME. Contour pointillé + hachure, JAMAIS rempli. Il ne peut
-   pas être confondu avec une zone chargée, qui est pleine à un segment. */
-.band--unknown i {
-  background: transparent;
-  border: 1px dashed var(--t-unknown);
-  background-image: repeating-linear-gradient(
-    45deg, var(--t-unknown) 0 1px, transparent 1px 3px);
-}
+   Le bilan 11 zones a quitté l'accueil pour `/progress` (`UI-CP3 §4`), et
+   `/progress` ne charge PAS cette feuille. Laisser le composant ici l'aurait
+   rendu sans style sur sa nouvelle surface — le défaut « le produit a la
+   décision, pas le moyen de l'appliquer », dans sa variante la plus banale :
+   une classe réutilisée dont le CSS n'est pas chargé.
 
-/* ══ ZONETALLY ══ les 11 zones en une ligne. */
-.cockpit__tally {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  align-items: center;
-  margin: 0;
-  padding: 14px 0;
-  border-top: 1px solid var(--t-line);
-  border-bottom: 1px solid var(--t-line);
-  font-size: 13px;
-  color: var(--t-fg-muted);
-}
-.cockpit__tally-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.cockpit__tally-item b {
-  color: var(--t-fg-2);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ⚠ LE LIBELLÉ DEVIENT VISIBLE — le lecteur d'écran en savait plus que l'œil.
- *
- * Ce bilan ne rendait qu'un glyphe hachuré et un nombre ; le nom de l'état
- * n'existait que dans le texte hors écran de `band(named=true)`. Mesuré sur un
- * compte neuf, où les onze zones partagent le même état, la ligne entière se
- * réduisait à « ▨▨▨ 11 » : illisible pour qui regarde, parfaitement clair pour
- * qui écoute.
- *
- * Le `sr-only` de la macro est retiré du même geste (`band(t)` au lieu de
- * `band(t, named=true)`) : le libellé rendu sert désormais tout le monde, et
- * le conserver aurait fait entendre le nom deux fois. */
-.cockpit__tally-label {
-  color: var(--t-fg-muted);
-  white-space: nowrap;
-}
+   Un composant qui sert DEUX surfaces appartient à la feuille partagée. La
+   cause causale de l'accueil continue d'utiliser `.band` — depuis `app.css`,
+   comme tout le monde. */
 
 /* ══ ÉCARTÉ — ET POURQUOI ══ niveau 3.
 
@@ -918,4 +874,137 @@
 .today-home .coaching-loop > *:first-child {
   border-top: none;
   padding-top: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   `UI-CP3` — MISSION : UNE GRAMMAIRE, DEUX ÉTATS
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* Le rail de l'état ACTIF est GRAPHITE, pas bleu.
+ *
+ * Le bleu signale une ORIGINE SYSTÈME : sur l'état recommandé, il relie la
+ * cause à la prescription parce que le moteur les a produites. Une séance
+ * déjà ouverte n'est l'affirmation de personne — c'est le travail de
+ * l'utilisateur, en cours. La peindre en bleu ferait revendiquer au produit
+ * une décision qu'il n'a pas prise.
+ *
+ * Le rail reste donc structurel, et l'ambre n'apparaît qu'à la commande :
+ * un seul propriétaire d'action dominante sur l'écran. */
+.today-home__hero--active .cockpit__cause::before,
+.today-home__hero--active .cockpit__effect::before {
+  background: var(--t-line);
+}
+.today-home__hero--active .cockpit__join {
+  color: var(--t-fg-muted);
+}
+.today-home__hero--active .cockpit__join::before {
+  background: repeating-linear-gradient(
+    180deg, var(--t-line) 0 4px, transparent 4px 8px);
+}
+
+/* ══ POSITION ══ des COMPTES, jamais un pourcentage.
+ *
+ * « depuis 37 min » ne dit pas où reprendre. Ce readout dit l'exercice et les
+ * séries — des faits comptés. Aucun pourcentage, aucune estimation de temps
+ * restant : la précision ne doit pas dépasser le modèle. */
+.mission-pos {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 15px;
+  color: var(--t-fg-2);
+}
+/* En large, les deux unités tiennent côte à côte — mais c'est la DISPOSITION
+   qui les sépare, jamais une ponctuation. Un « · » entre les deux restait
+   orphelin en fin de ligne dès que le flex passait à la ligne : mesuré au
+   rendu à 390 px, pas supposé. */
+@media (min-width: 420px) {
+  .mission-pos {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 22px;
+  }
+}
+.mission-pos b {
+  color: var(--t-fg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  font-size: 19px;
+}
+.mission-pos__where {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--t-fg-2);
+}
+/* La durée descend au rang de contexte : elle reste lisible, elle cesse
+   d'être le fait principal. */
+.mission-pos__since {
+  margin: 8px 0 18px;
+  font-size: 12px;
+  color: var(--t-fg-muted);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   `UI-CP3 §6` — LE RAIL DE TRANSITION. **DATÉ.**
+
+   Ce n'est pas une primitive de cockpit AUREN : c'est un pont vers les
+   instruments qui n'existent pas encore. Il porte son critère de retrait —
+   quand FLIGHT_RECORDER existe (`UI-CP5`), ce bloc est réévalué et retiré.
+
+   Il ne contient que des SORTIES de faible emphase, nommées par la QUESTION
+   qu'elles vont servir. Aucune métrique n'a le droit d'y entrer : une sortie
+   nommée par sa question n'est pas un tableau de bord, et c'est ce qui
+   l'empêche de redevenir l'empilement qu'on vient de retirer.
+   ══════════════════════════════════════════════════════════════════════ */
+.mission-bridge {
+  display: flex;
+  flex-direction: column;
+  margin-top: 28px;
+  border-top: 1px solid var(--t-line);
+}
+.mission-bridge__exit {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  /* Plancher tactile : 44 px de zone, mesurés sur la zone RÉELLE et non sur
+     le chrome visible — la leçon de `target_closure`. */
+  min-height: 44px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--t-line);
+  color: var(--t-fg-2);
+  text-decoration: none;
+  font-size: 13px;
+}
+.mission-bridge__exit:hover,
+.mission-bridge__exit:focus-visible { color: var(--t-fg); }
+.mission-bridge__q { letter-spacing: 0.01em; }
+/* ⚠ `--t-fg-muted`, PAS `--t-fg-faint`. Première écriture fautive, attrapée
+ * par `test_faint_is_no_longer_a_body_text_token`.
+ *
+ * J'ai traité la flèche comme de la décoration parce qu'elle est
+ * `aria-hidden`. Elle reste du TEXTE rendu, et `--t-fg-faint` ne peut plus en
+ * porter depuis l'échelle de profondeur : le masquer aux lecteurs d'écran ne
+ * le dispense pas d'être lisible à l'œil. */
+.mission-bridge__go { color: var(--t-fg-muted); }
+
+/* ══════════════════════════════════════════════════════════════════════
+   `UI-CP3 §9` — LARGEUR DE LECTURE DE L'INSTRUMENT
+
+   Mesuré à 1280 px : « Core / Abdos » et sa valeur « non mesurée » étaient
+   séparées par près de 1 400 px. L'œil ne relie plus une clé à sa valeur
+   au-delà d'une certaine distance, quelle que soit la place disponible.
+
+   La correction n'est PAS un rustine par ligne — c'est une largeur de
+   lecture pour l'instrument entier. La largeur excédentaire reste vide :
+   c'est un choix, pas un oubli. Un cockpit n'étire pas une relation
+   clé/valeur simplement parce que le viewport le permet.
+   ══════════════════════════════════════════════════════════════════════ */
+@media (min-width: 900px) {
+  .today-home__hero,
+  .mission-bridge,
+  .rejected {
+    max-width: 62ch;
+  }
 }

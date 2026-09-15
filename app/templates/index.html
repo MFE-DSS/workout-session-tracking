@@ -47,31 +47,73 @@
 <div class="today-home today-home--terminal">
 
 {# ============================================================
-   Hero Decision Surface (Sx_UI_05 §8 — Today Decision Model)
+   `UI-CP3` — MISSION. UNE GRAMMAIRE, DEUX ÉTATS.
    ------------------------------------------------------------
-   Une seule CTA primaire, résolue par l'état :
-   1. open_session   → « Reprendre » (domine)
-   2. sinon           → « Démarrer une séance »
-   Readiness (si présente) = readout qualitatif, jamais un score médical.
-   Données déjà en contexte uniquement ; aucune inventée.
+   Arbitrage opérateur, `§2` : RECO et LIVE partagent la MÊME grammaire
+   cognitive. L'état LIVE était une `card` encadrée quand RECO était une
+   bande à rail — même instrument, deux langages, et la card est
+   précisément la primitive que le programme retire.
+
+       NOW        ce dont il s'agit
+       POSITION   où l'on en est          (LIVE seulement)
+       EVIDENCE   pourquoi                 (RECO : la cause ;
+                                            LIVE : la position EST la preuve)
+       ACTION     la commande dominante, une seule
+       ESCAPE     la sortie minimale
+
+   Ce que MISSION ne porte plus : l'analyse historique, l'état du corps,
+   la progression, le compte. Ils ne sont pas supprimés — ils rejoignent
+   leur instrument, ou un renvoi nommé par leur question (`§6`, `§10`).
    ============================================================ #}
-<section class="today-home__hero {% if open_session %}today-home__hero--active{% else %}today-home__hero--next{% endif %}"
+<section class="today-home__hero today-home__hero--{% if open_session %}active{% else %}next{% endif %}"
          aria-label="Décision du jour">
-  {# `Sx_UIV3_01` — « Aujourd'hui » n'est rendu QUE pour l'état « séance
-     active ». Sur la branche recommandée, la section porte déjà son propre
-     intitulé (« Ce que disent tes séances »), et deux eyebrows empilés ne
-     disent qu'une chose : que personne n'a relu les deux ensemble. #}
-  {% if open_session %}
-    <p class="today-home__eyebrow">Aujourd'hui</p>
-  {% endif %}
 
   {% if open_session %}
-    {# 1. Séance active domine. #}
-    <span class="today-home__status">Séance active</span>
-    <h1 class="today-home__title">{{ open_session.template_name_snapshot }}</h1>
-    <p class="today-home__meta">
-      {% if open_since %}En cours <span class="today-home__meta-sep" aria-hidden="true">·</span> depuis {{ open_since }}{% else %}Reprends là où tu t'es arrêté{% endif %}
-    </p>
+    {# ══ NOW ══ #}
+    <div class="cockpit__cause">
+      <p class="cockpit__key">Séance active</p>
+      <h1 class="today-home__title">{{ open_session.template_name_snapshot }}</h1>
+    </div>
+
+    {# ══ POSITION ══ `§2`/`§3` — LE FAIT, PAS LA DURÉE.
+       « depuis 37 min » ne dit pas où reprendre. La durée descend au rang de
+       contexte secondaire ; la position monte au rang de fait.
+
+       Aucun pourcentage, aucune estimation de temps restant : des comptes.
+       La précision ne doit pas dépasser le modèle. #}
+    {% if position %}
+    <p class="cockpit__join">tu en es</p>
+    <div class="cockpit__effect">
+      {# ⚠ AUCUN SÉPARATEUR ENTRE LES DEUX UNITÉS.
+         Première écriture : un « · » entre elles. Mesuré au rendu à 390 px —
+         les deux unités passent à la ligne et le séparateur reste ORPHELIN en
+         fin de première ligne, pendu dans le vide. Une ponctuation qui ne
+         sépare plus rien est un défaut, pas un détail.
+         Deux unités, deux lignes en étroit, côte à côte en large : la
+         disposition sépare, la ponctuation n'a rien à faire là. #}
+      <p class="mission-pos">
+        <span class="mission-pos__unit">Exercice <b>{{ position.exercise_index }}</b> sur {{ position.exercise_total }}</span>
+        <span class="mission-pos__unit"><b>{{ position.sets_done }}</b> série{{ 's' if position.sets_done > 1 }} sur {{ position.sets_total }}</span>
+      </p>
+      {% if position.exercise_name %}
+      <p class="mission-pos__where">
+        {# `série&nbsp;N` — insécable. Mesuré au rendu : le nom d'exercice long
+           poussait le chiffre SEUL sur la ligne suivante. Un nombre orphelin
+           n'est plus un readout, c'est un débris. #}
+        {{ position.exercise_name }}{% if position.set_index %} <span class="today-home__meta-sep" aria-hidden="true">·</span> série&nbsp;{{ position.set_index }}{% endif %}
+      </p>
+      {% endif %}
+      {% if open_since %}
+      <p class="mission-pos__since">depuis {{ open_since }}</p>
+      {% endif %}
+    </div>
+    {% elif open_since %}
+    <div class="cockpit__effect">
+      <p class="mission-pos__since">En cours <span class="today-home__meta-sep" aria-hidden="true">·</span> depuis {{ open_since }}</p>
+    </div>
+    {% endif %}
+
+    {# ══ ACTION + ESCAPE ══ #}
     <div class="today-home__action">
       <a class="today-home__cta" href="{{ url_for('session_detail', session_id=open_session.id) }}">
         Reprendre <span aria-hidden="true">→</span>
@@ -190,38 +232,24 @@
      widget unique plus bas. #}
 </section>
 
-{# ══ LE BILAN ══ `Sx_UIV3_01 §5` — les 11 zones en une ligne.
+{# ══ LE BILAN 11 ZONES A QUITTÉ CETTE SURFACE ══ `UI-CP3 §4`.
 
-   Referme le trou du Causal Cockpit, qui ne montre que les zones VISÉES.
-   Coûte 60 px là où onze barres en coûtaient 150, pour une information qu'on
-   ne consulte pas quotidiennement.
+   Arbitrage opérateur : « 3 disponible / 4 partielle / 4 non mesurée » décrit
+   la COUVERTURE DU CORPS, pas la décision du moment. *« Une donnée peut
+   paraître parce qu'elle explique la décision. Elle ne doit pas paraître
+   simplement parce qu'elle existe. »*
 
-   Le comptage est DÉRIVÉ de `build_zone_recovery`, jamais écrit à la main —
-   une première version de la maquette totalisait 12 zones sur 11. Une garde
-   pinne le total.
+   Ce qui subsiste ici, et qui n'est pas la même chose : les zones qui
+   EXPLIQUENT la recommandation, rendues plus haut comme sa cause. Une zone a
+   le droit d'être dans MISSION quand elle est une preuve.
 
-   Ici le glyphe paraît sans libellé visible : il porte le sens, donc il reçoit
-   un nom accessible (`band(t, named=true)`). #}
-{# ⚠ LE LECTEUR D'ÉCRAN EN SAVAIT PLUS QUE L'ŒIL.
+   ⚠ CE N'EST PAS UNE SOUSTRACTION SÈCHE (`CLAUDE.md §5.3`). Le bilan est
+   rendu par `/progress` dans la MÊME livraison — et pas par défaut : cette
+   page porte déjà « 11 zones suivies » via `zone_exposure`. Mais l'exposition
+   compte des SÉRIES quand ce bilan dit la RÉCUPÉRATION. Les réunir les rend
+   comparables pour la première fois, ce que l'accueil ne permettait pas.
 
-   Ce bilan rendait, pour chaque état, un glyphe hachuré et un nombre. Le nom
-   de l'état — « non mesurée », « récupérée » — n'existait QUE dans le texte
-   hors écran. Sur un compte neuf, où les onze zones partagent le même état,
-   la ligne se réduisait à « ▨▨▨ 11 » : un utilisateur voyant n'avait aucun
-   moyen de savoir de quoi on parle, quand un lecteur d'écran, lui, l'entendait.
-
-   Le libellé devient VISIBLE. Le texte hors écran de `band(named=true)`
-   deviendrait alors un doublon pour les lecteurs d'écran : on repasse donc en
-   `named=false`, et c'est le libellé rendu qui porte le sens pour tout le
-   monde. #}
-{% if causal.tally %}
-<p class="cockpit__tally">
-  <span class="sr-only">État des {{ causal.tally_total }} zones :</span>
-  {%- for t in causal.tally %}
-  <span class="cockpit__tally-item">{{ band(t) }}<b>{{ t.count }}</b><span class="cockpit__tally-label">{{ t.band_label }}</span></span>
-  {%- endfor %}
-</p>
-{% endif %}
+   La macro `band()` reste utilisée par la cause ci-dessus. #}
 
 {# ══ CE QUI A ÉTÉ ÉCARTÉ ══ `Sx_UIV3_01 §8` — le différenciateur produit.
 
@@ -263,191 +291,56 @@
 {% endif %}
 
 {# ============================================================
-   Surfaces secondaires — l'information existante conservée mais
-   dé-priorisée sous le hero. Aucun bloc supprimé. En-tête « Résumé »
-   marque la bascule décision → readouts.
+   `UI-CP3 §6` — LE RAIL DE TRANSITION. **IL EST DATÉ.**
+   ------------------------------------------------------------
+   Ce rail n'est PAS une primitive de cockpit AUREN. C'est un pont, et il
+   porte son propre critère de retrait, écrit ici pour que personne n'ait à
+   le redécouvrir :
+
+       QUAND FLIGHT_RECORDER EXISTE (UI-CP5), CE RAIL EST RÉÉVALUÉ
+       ET RETIRÉ. La cible est A : décision · cause · commande ·
+       alternative minimale. Rien d'autre.
+
+   Ce qu'il a le droit de contenir : des SORTIES de faible emphase vers les
+   questions que MISSION ne possède plus. Rien d'autre — pas de mini-métrique,
+   pas de readout, pas de vignette. Une sortie nommée par sa question n'est
+   pas un tableau de bord.
+
+   `CLAUDE.md §5.3` — CE QUI PART, ET OÙ IL VA :
+
+     Boucle de coaching        « Dernière séance » et « Semaine planifiée »
+     (home_coaching_loop)      répondent à « qu'est-ce qui a changé ? ».
+                               Destination : /progress et /history, atteints
+                               par la sortie ci-dessous. « État
+                               d'entraînement » décrivait l'état du corps :
+                               BODY_LEDGER possède cette question.
+
+     Readiness (27 champs)     la DÉCLARATION déménage sur
+                               /readiness/history, qui possédait déjà la
+                               lecture. Mesuré avant de décider :
+                               `recommendation.py` ne lit la readiness NULLE
+                               PART — elle ne change aucune recommandation,
+                               donc elle n'est pas une preuve de MISSION.
+                               La porte vit désormais dans BODY_LEDGER.
+
+     Tuiles Nouvelle séance /  « Nouvelle séance » doublait la sortie
+     Historique                secondaire du bloc actif, à trois centimètres.
+                               « Historique » est absorbé par la sortie
+                               « qu'est-ce qui a changé ? ».
+
+     Lien Progression          devient cette même sortie, nommée par sa
+                               QUESTION plutôt que par sa destination.
    ============================================================ #}
-<div class="today-home__secondary-zone">
-{# « RÉSUMÉ · INDICATEURS ET NAVIGATION » est retiré : il décrivait la
-   STRUCTURE du document, pas son contenu. Personne n'ouvre AUREN pour chercher
-   « des indicateurs ». Ce que la bascule décision → contexte doit marquer,
-   c'est le rang visuel — et depuis cette tranche, c'est le cadre du hero qui
-   le fait, seul objet encadré de l'écran. Un intertitre n'y ajoutait rien
-   qu'un mot de plus à lire. #}
+<nav class="mission-bridge" aria-label="Questions hors mission">
+  <a class="mission-bridge__exit" href="{{ url_for('progress') }}">
+    <span class="mission-bridge__q">Qu'est-ce qui a changé&nbsp;?</span>
+    <span class="mission-bridge__go" aria-hidden="true">&rarr;</span>
+  </a>
+  <a class="mission-bridge__exit" href="{{ url_for('profile_page') }}">
+    <span class="mission-bridge__q">O&ugrave; en est mon corps&nbsp;?</span>
+    <span class="mission-bridge__go" aria-hidden="true">&rarr;</span>
+  </a>
+</nav>
 
-{# Sb_27.1 — Coaching loop tiles (Today / Last / Week) #}
-{% include "_partials/home_coaching_loop.html" %}
-
-{# Sx_UI_06 Sb_UI_06.3 — le bloc « Prochaine séance suggérée » est retiré de
-   la home : le CTA hero démarre désormais directement la reco (une seule
-   décision, plus de double CTA). Le détail reco + alternatives reste dans le
-   launcher (où next_session_reco.html est aussi inclus). #}
-
-{# === Readiness widget (self-report, existant) — conservé, dé-priorisé.
-   Sb_UI_05.1 : le build complet Readiness/Recovery est réservé à
-   Sb_UI_05.3 ; ici on préserve le widget existant. === #}
-{% if readiness_today %}
-<div class="card readiness-widget" style="margin-bottom:var(--space-md);">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-sm);flex-wrap:wrap;">
-    <span class="card__title" style="margin:0;font-size:14px;">État du jour</span>
-    {% for field in readiness_scale_fields %}
-      {% set val = readiness_today[field] %}
-      <span class="badge badge--{% if val >= 4 %}good{% elif val >= 3 %}neutral{% else %}warn{% endif %}"
-            title="{{ readiness_field_labels[field] }}: {{ readiness_labels[field][val] }}">
-        {{ readiness_field_labels[field][:3] }} {{ val }}
-      </span>
-    {% endfor %}
-    {% if readiness_today.resting_hr %}
-      <span class="badge" title="FC repos">{{ readiness_today.resting_hr }} bpm</span>
-    {% endif %}
-    <a href="/readiness/history" class="text-muted" style="font-size:12px;">Historique →</a>
-  </div>
-</div>
-{% else %}
-{# `Sx_UIV3_01 §7` — Q3-A : le formulaire d'état du jour se REPLIE.
-
-   Il occupait **629 px mesurés**, cinq lignes de cinq boutons, devant la
-   décision. C'est une saisie de trente secondes qui alimente la synthèse ;
-   ce n'est pas l'objet principal d'un cockpit.
-
-   Rien n'est supprimé : `<details>` sans `open`. Un pli est légitime ici —
-   c'est une SAISIE secondaire, pas la cause d'une décision (`Sx_UIV3_00 §6`).
-   Les champs restent dans le DOM, donc la soumission sans JS est identique. #}
-<div class="card readiness-widget" style="margin-bottom:var(--space-md);border-left:3px solid var(--warn);">
-  {# `Sb_UI_DISCLOSURE_01` — LE COMPOSANT ÉTAIT RECOPIÉ DANS UN ATTRIBUT.
-     Ce `style=` en ligne portait `min-height:44px; display:flex;
-     align-items:center; justify-content:space-between; gap:…` — c'est-à-dire
-     la définition de `.disclosure__summary`, dupliquée à la main. Le rendu
-     était correct et la dette invisible : une copie dans un attribut ne suit
-     aucune évolution du composant, et rien ne signale qu'elle existe.
-
-     ⚠ `padding` et `color` du composant ne s'appliquaient PAS ici — la carte
-     porte déjà son propre rembourrage et le titre sa couleur. C'est pourquoi
-     le libellé garde ses `<span>` et leurs styles propres : on adopte la
-     géométrie du composant, pas sa peau. #}
-  <details class="disclosure">
-    <summary class="disclosure__summary" style="padding:0;font-size:14px;">
-      <span class="card__title" style="margin:0;color:var(--warn);">État du jour · non renseigné</span>
-      <span class="text-dim" style="font-size:11px;font-weight:400;">Saisir · 30 sec</span>
-    </summary>
-    <p class="text-dim" style="font-size:12px;margin:var(--space-sm) 0;">
-      1×/jour · 5 = meilleur état. Alimente la synthèse.
-    </p>
-    <form method="post" action="/readiness" style="margin-top:var(--space-sm);">
-      {% for field in readiness_scale_fields %}
-      <div style="margin-bottom:var(--space-sm);">
-        <label style="font-size:13px;display:block;margin-bottom:4px;">{{ readiness_field_labels[field] }}</label>
-        <div class="segmented">
-          {% for val in [1, 2, 3, 4, 5] %}
-          <label class="segmented__option">
-            <input type="radio" name="{{ field }}" value="{{ val }}" {% if val == 3 %}checked{% endif %}>
-            <span title="{{ readiness_labels[field][val] }}">{{ val }}</span>
-          </label>
-          {% endfor %}
-        </div>
-        <div class="readiness-scale__ends">
-          <span>1 · {{ readiness_labels[field][1] }}</span>
-          <span>5 · {{ readiness_labels[field][5] }}</span>
-        </div>
-      </div>
-      {% endfor %}
-      <div class="readiness-extra">
-        <input class="input" type="number" name="resting_hr" placeholder="FC repos (bpm)" min="30" max="200">
-        <input class="input" type="text" name="note" placeholder="Note (optionnel)">
-      </div>
-      <button type="submit" class="btn btn--primary" style="margin-top:var(--space-sm);width:100%;">Enregistrer mon état</button>
-    </form>
-  </details>
-</div>
-{% endif %}
-
-<div class="cockpit-grid">
-  <div class="cockpit-main">
-    {# `Sx_UIV3_01 §7` — CE QUI QUITTE L'ACCUEIL.
-
-       BLOCKER-1, tranché par l'opérateur : **OUI**.
-
-       « Disponibilité » était un score 0–100 — le plus gros chiffre de la
-       page — affiché à côté de « État du jour » (déclaré, 1–5) et de « État
-       d'entraînement » (inféré, 4 bandes). **Trois échelles concurrentes pour
-       une seule question**, dont aucune ne s'accorde avec les autres.
-
-       Pire : il exprime en pourcentage exactement ce que `zone_recovery`
-       refuse d'exprimer ainsi. Sa définition vivait derrière un ⓘ.
-
-       Il n'est PAS supprimé — `compute_behavioral_state` continue de le
-       calculer et `/dashboard` de le montrer. Il quitte la surface de
-       DÉCISION pour la surface d'ANALYSE (D8). Home = décider. Progression =
-       analyser.
-
-       Idem pour la sparkline et « séances cette sem. » : de l'analytique, à
-       sa place dans /progress. Le lien y mène, il ne disparaît pas.
-
-       §5.3 — aucune de ces soustractions ne part seule : elles sont dans la
-       même livraison que la cause causale, le bilan 11 zones et « écarté, et
-       pourquoi » qui les remplacent au-dessus. #}
-    {# Le libellé décrit ce que la destination CONTIENT réellement, vérifié
-       page ouverte : rythme récent, par programme, activité par exercice,
-       qualité des séances, poids corporel.
-
-       Première rédaction : « disponibilité, tendances, historique ». Or la
-       disponibilité vit sur `/dashboard`, pas sur `/progress` — le lien
-       promettait ce que la destination ne tient pas. C'est la même faute que
-       le badge « Recommandé » qui n'expliquait rien : un libellé qui
-       revendique plus que ce qu'il sert. #}
-    <a class="today-home__analysis" href="{{ url_for('progress') }}">
-      <span>Progression</span>
-      <span class="today-home__analysis-hint">rythme, volume, qualité des séances</span>
-    </a>
-  </div>
-
-  <div class="cockpit-side">
-    <div class="tile-grid">
-      {% if open_session %}
-      <a class="tile tile--primary" href="{{ url_for('launcher') }}">
-        <div class="tile__label">Nouvelle séance</div>
-        <div class="tile__hint">Choisir un programme</div>
-      </a>
-      {% endif %}
-      {# `N-02 = B` — DEUX TUILES SUR CINQ DOUBLAIENT LA COQUE.
-
-         « Progression » et « Programmes » sont DÉJÀ dans la barre de
-         navigation basse, visible en permanence sur ce même écran. La grille
-         les répétait à trois centimètres de distance, en plus gros.
-
-         Ce n'est pas une soustraction (`§5.3`) : les deux destinations
-         restent atteignables, au même endroit qu'ailleurs dans le produit,
-         et par le chemin que l'utilisateur emprunte déjà partout. Ce qui est
-         retiré, c'est la RÉPÉTITION — pas l'accès.
-
-         Les deux qui restent ne sont nulle part ailleurs : lancer une autre
-         séance, et l'historique. C'est ce que `N-02` appelle « promouvoir ce
-         qui sert ».
-
-         ⚠ SCIENCE QUITTE L'ACCUEIL — arbitrage opérateur du 2026-09-06.
-
-         `/science` n'est pas une destination qu'on choisit depuis un cockpit :
-         c'est une zone d'ARCHIVE et de DOCUMENTATION, qu'on atteint depuis
-         l'endroit où la question se pose. Le produit le fait déjà, à quatre
-         endroits, et trois pointent vers une règle précise :
-
-             progress.html      → #rule-plages-repetitions  « Comment c'est calculé → »
-             coach_report.html  → #rule-carnet-progression
-             coach_report.html  → #section-method
-             session_detail.html                            « Voir toutes les règles → »
-
-         La tuile de l'accueil était le SEUL lien sans contexte — elle envoyait
-         vers la page entière depuis un écran qui ne parle pas de méthode. La
-         retirer n'orpheline rien : les quatre entrées qui arrivent AVEC une
-         question restent en place. #}
-      <a class="tile" href="{{ url_for('history') }}">
-        <div class="tile__label">Historique</div>
-        <div class="tile__hint">Séances passées</div>
-      </a>
-    </div>
-  </div>
-</div>
-
-</div>{# /today-home__secondary-zone #}
 </div>{# /today-home #}
 {% endblock %}

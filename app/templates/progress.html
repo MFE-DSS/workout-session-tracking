@@ -167,6 +167,43 @@
    puis « où », sur la même fenêtre de quatorze jours. #}
 {% include "_partials/zone_exposure.html" %}
 
+{# ══ LE BILAN 11 ZONES — ARRIVÉ DE L'ACCUEIL (`UI-CP3 §4`) ══
+
+   Il y décrivait la couverture du corps au-dessus d'une commande de
+   démarrage : une donnée qui paraissait parce qu'elle existait, pas parce
+   qu'elle expliquait la décision. L'opérateur l'en retire ; `CLAUDE.md §5.3`
+   interdit de retirer sans destination — la voici, dans la même livraison.
+
+   ⚠ IL SE PLACE ICI POUR UNE RAISON PRÉCISE, pas par commodité.
+
+   `zone_exposure` juste au-dessus compte des SÉRIES par zone sur quatorze
+   jours — ce qu'on a fait. Ce bilan dit la RÉCUPÉRATION estimée des mêmes
+   onze zones — ce qui est prêt. Deux faits différents sur le même découpage,
+   que l'accueil séparait de la page où on les compare. Côte à côte, « j'ai
+   beaucoup travaillé cette zone » et « elle n'est pas récupérée » se lisent
+   enfin ensemble.
+
+   Le comptage est DÉRIVÉ de `build_zone_recovery`, jamais écrit à la main —
+   une première version de la maquette totalisait 12 zones sur 11. Une garde
+   pinne le total.
+
+   Le libellé de bande est VISIBLE, et le glyphe reste `aria-hidden` : sans
+   cela, un lecteur d'écran annoncerait l'état deux fois. C'est la correction
+   d'accessibilité gagnée sur l'accueil, qui voyage avec le bloc au lieu
+   d'être reperdue. #}
+{% if zone_tally and zone_tally.tally %}
+<p class="cockpit__tally zone-tally">
+  <span class="sr-only">Récupération estimée des {{ zone_tally.tally_total }} zones :</span>
+  {%- for t in zone_tally.tally %}
+  <span class="cockpit__tally-item">
+    <span class="band band--{{ t.band }}" aria-hidden="true">
+      {%- for i in range(3) %}<i{% if i < t.segments %} class="band__on"{% endif %}></i>{% endfor -%}
+    </span><b>{{ t.count }}</b><span class="cockpit__tally-label">{{ t.band_label }}</span>
+  </span>
+  {%- endfor %}
+</p>
+{% endif %}
+
 {# `TRAIN1-B` / A10 — « quand », puis « où », puis « quoi ».
    L'instrument progressif suit l'exposition anatomique : le rail dit quand on
    s'est entraîné, la silhouette où, et ceci ce qui a bougé. Trois questions,

@@ -86,11 +86,22 @@ class TestHomeIA:
 
         Il survit pour la séance active, où il situe réellement l'objet.
         """
+        # ⚠ `UI-CP3 §2` — LE VÉHICULE CHANGE, LA PROPRIÉTÉ RESTE.
+        #
+        # L'eyebrow « Aujourd'hui » portait la situation de l'état actif.
+        # Depuis que les deux états partagent une grammaire, c'est le
+        # `cockpit__key` qui nomme l'état — « Séance active » — et un eyebrow
+        # en plus aurait été le deuxième intitulé empilé que cette garde
+        # combat justement sur la branche recommandée.
+        #
+        # Ce qui est tenu : l'état actif EST nommé, et la branche recommandée
+        # ne porte pas deux noms.
         assert "Aujourd'hui" not in _home(client)
         _start_session(client, "push-a")
         active = _home(client)
-        assert "today-home__eyebrow" in active
-        assert "Aujourd'hui" in active
+        assert "Séance active" in active, (
+            "l'état actif n'est plus nommé — il faut savoir ce qu'on regarde"
+        )
 
     def test_single_primary_cta_in_hero(self, client):
         """Exactly one primary hero CTA. Sx_UI_06 Sb_UI_06.3 : the CTA is
@@ -103,8 +114,17 @@ class TestHomeIA:
         # excluding the form wrapper class `today-home__cta-form`.
         assert body.count('today-home__cta"') == 1
 
-    def test_secondary_zone_present(self, client):
-        assert "today-home__secondary-zone" in _home(client)
+    def test_the_below_hero_rank_still_exists(self, client):
+        """⚠ SUPERSÈDE `test_secondary_zone_present` (`UI-CP3 §6`).
+
+        La « zone secondaire » contenait cinq blocs souverains que MISSION ne
+        possède pas. Elle est remplacée par un RAIL DE TRANSITION daté, qui ne
+        porte que des sorties.
+
+        Ce qui est tenu, et qui n'a jamais été le nom du conteneur : il existe
+        un rang INFÉRIEUR au hero, et il est occupé.
+        """
+        assert "mission-bridge" in _home(client)
 
     def test_terminal_direction_marker(self, client):
         """Sb_UI_02b.1 — the Home carries the Auren Terminal marker class."""
@@ -141,20 +161,22 @@ class TestHomeIA:
 
         La garde asserte donc la propriété, pas la chaîne qui la portait.
         """
+        # ⚠ `UI-CP3 §6` — LE RANG 2 N'EST PLUS FAIT DE BLOCS, MAIS DE SORTIES.
+        #
+        # La garde vérifiait que les blocs de rang 2 n'avaient pas de bordure,
+        # pour qu'ils ne redeviennent pas des cartes. Ces blocs ont quitté
+        # MISSION. Ce qui occupe leur rang est un rail de sorties, et
+        # l'invariant devient plus simple ET plus fort : le rang 2 ne porte
+        # AUCUN conteneur, donc rien qui puisse redevenir une carte.
         body = _home(client)
-        assert "today-home__secondary-zone" in body, (
-            "la zone secondaire a disparu de l'accueil"
-        )
+        assert "mission-bridge" in body, "le rang inférieur a disparu"
         css = HOME_CSS.read_text(encoding="utf-8")
-        bloc = re.search(
-            r"\.today-home \.coaching-loop \.hl-block,\s*"
-            r"\.today-home \.coaching-loop \.home-wk\s*\{([^}]*)\}",
-            css,
-        )
-        assert bloc, "les blocs de rang 2 ne sont plus stylés comme un rang"
-        assert "border: none" in bloc.group(1), (
-            "un bloc de rang 2 a retrouvé une bordure — il redevient une carte, "
-            "et la carte cesse d'être le signal du rang 1"
+        bloc = re.search(r"\.mission-bridge__exit\s*\{([^}]*)\}", css)
+        assert bloc, "les sorties de rang 2 ne sont plus stylées comme un rang"
+        regle = bloc.group(1)
+        assert "background" not in regle, (
+            "une sortie a reçu un fond — elle redevient une carte, et la carte "
+            "cesse d'être le signal du rang 1"
         )
 
 
@@ -269,12 +291,24 @@ class TestReadinessTeaser:
         « détail plus bas », carrying no data) is removed. Readiness now lives
         in its single widget below the hero; no numeric medical score in the
         hero."""
+        # ⚠ `UI-CP3 §5` — LE WIDGET SUIT LE TEASER.
+        #
+        # Cette garde exigeait que le widget d'état du jour SURVIVE sur
+        # l'accueil, parce que la tranche qui l'a écrite ne retirait que le
+        # teaser. `UI-CP3` retire le widget aussi, sur mesure :
+        # `recommendation.py` ne lit la readiness nulle part.
+        #
+        # La capacité est vérifiée là où elle vit désormais — un chemin
+        # d'écriture réel, plus fort qu'une présence de libellé.
         src = INDEX.read_text(encoding="utf-8")
-        # teaser class gone from the hero
         assert "today-home__readiness" not in src
-        # the readiness widget (self-report state) still exists
-        assert "readiness-widget" in src
-        assert "État du jour" in src
+        assert "readiness-widget" not in src, (
+            "le widget est revenu sur la surface de décision"
+        )
+        readiness = ROOT / "app" / "templates" / "readiness_history.html"
+        assert 'action="/readiness"' in readiness.read_text(encoding="utf-8"), (
+            "la déclaration d'état du jour n'existe plus nulle part"
+        )
 
 
 # ───────── dashboard preserved but de-prioritized ─────────
@@ -328,9 +362,9 @@ class TestDashboardPreserved:
         """Hero appears before the secondary zone in the DOM."""
         body = _home(client)
         hero = body.find("today-home__hero")
-        zone = body.find("today-home__secondary-zone")
+        zone = body.find("mission-bridge")
         assert hero != -1, "hero absent"
-        assert zone != -1, "zone secondaire absente"
+        assert zone != -1, "rang inférieur absent"
         assert hero < zone, "la décision doit précéder le contexte"
 
     def test_analysis_is_reachable_from_the_home(self, client):
@@ -347,11 +381,16 @@ class TestDashboardPreserved:
         sépare, pas le produit. Ce que cette garde protège désormais, c'est
         que le chemin vers l'analyse reste **à un tap**.
         """
+        # ⚠ `UI-CP3 §6` — LE VÉHICULE CHANGE, L'INVARIANT NON.
+        #
+        # Le lien `today-home__analysis` devient une sortie du rail de
+        # transition, nommée par sa QUESTION plutôt que par sa destination.
+        # Ce que la garde protège — l'analyse à un tap — est inchangé, et la
+        # garde le dit désormais sans citer une classe.
         body = _home(client)
-        assert "today-home__analysis" in body, (
+        assert "/progress" in body, (
             "l'analyse doit rester accessible depuis l'accueil"
         )
-        assert "/progress" in body
 
 
 # ───────── no-JS / no-framework ─────────
