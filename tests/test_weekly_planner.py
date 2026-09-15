@@ -369,12 +369,13 @@ class TestHomeConsumer:
         silence — c'est précisément ce qu'une garde d'affichage ne sait pas
         distinguer.
         """
+        from sqlalchemy import select
+
         from app.database import SessionLocal
-        from app.services.home import build_home_payload
         from app.models.user import User
+        from app.services.home import build_home_payload
         from app.services.training_preferences import save_training_preferences
         from tests.helpers import get_test_user_id
-        from sqlalchemy import select
 
         with SessionLocal() as db:
             save_training_preferences(db, get_test_user_id(), sessions_per_week=3)

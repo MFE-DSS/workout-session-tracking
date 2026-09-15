@@ -1738,24 +1738,47 @@ input, button, textarea, select {
 }
 .readiness-scale__ends span:last-child { text-align: right; }
 
-/* ⚠ `UI-CP3` — LE CHAMP ÉTAIT PLUS ÉTROIT QUE SON PROPRE LIBELLÉ.
+/* ⚠ `UI-CP3` — LE PLACEHOLDER SERVAIT DE LIBELLÉ, ET IL ÉTAIT TRONQUÉ.
  *
- * `max-width: 150px` tronquait « FC repos (bpm) » en « FC repos (l » à
- * 390 px, en fonte mono. Le défaut est PRÉEXISTANT — il vivait sur l'accueil,
- * replié dans un `<details>` que presque personne n'ouvrait. Le déplacement de
- * la déclaration vers sa page l'a mis en pleine lumière, il ne l'a pas créé.
+ * Deux défauts sur le même objet, tous deux PRÉEXISTANTS : ces champs
+ * n'avaient que leur `placeholder` — qu'aucun lecteur d'écran ne traite comme
+ * un nom et qui disparaît à la saisie — et `max-width: 150px` le coupait en
+ * « FC repos (l » à 390 px en fonte mono.
  *
- * Un placeholder tronqué ne demande rien : il montre qu'on a dimensionné le
- * champ sans regarder ce qu'il contient. La largeur suit désormais le
- * contenu, et les deux champs s'empilent quand la ligne ne tient plus. */
+ * Ils vivaient repliés dans un `<details>` sur l'accueil, que presque personne
+ * n'ouvrait. Le déplacement de la déclaration vers sa propre page les a
+ * exposés, il ne les a pas créés.
+ *
+ * La correction est la même pour les deux : un VRAI libellé, hors du champ,
+ * associé par `for`/`id`. Le placeholder disparaît — le dupliquer n'aurait
+ * fait que répéter. */
 .readiness-extra {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
   margin-top: var(--space-sm);
 }
-.readiness-extra .input:first-child { flex: 1 1 15ch; }
-.readiness-extra .input:last-child  { flex: 2 1 20ch; }
+.readiness-extra__pair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  flex: 1 1 16ch;
+}
+.readiness-extra__label {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+/* `<fieldset>` porte une bordure et des marges par défaut dans tous les
+   navigateurs. Une échelle de 1 à 5 est un groupe SÉMANTIQUE, pas un encadré :
+   on prend la sémantique, pas la peau. */
+.readiness-declare__field {
+  border: 0;
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  min-width: 0;
+}
 
 /* Baseline dark input for ad-hoc form fields */
 .input {

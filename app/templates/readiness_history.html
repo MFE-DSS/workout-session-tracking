@@ -28,9 +28,14 @@
     1×/jour · 5 = meilleur état.
   </p>
   <form method="post" action="/readiness" class="readiness-declare__form">
+    {# ⚠ `<fieldset>` / `<legend>`, PAS un `<label>` orphelin.
+       Une échelle de 1 à 5 est un GROUPE de boutons radio : un `<label>` sans
+       `for` ne s'associe à rien, et l'associer à un seul des cinq serait faux.
+       `<legend>` est le seul élément qui nomme un groupe — c'est la
+       correction juste, pas la plus courte. #}
     {% for field in readiness_scale_fields %}
-    <div class="readiness-declare__field">
-      <label class="readiness-declare__label">{{ readiness_field_labels[field] }}</label>
+    <fieldset class="readiness-declare__field">
+      <legend class="readiness-declare__label">{{ readiness_field_labels[field] }}</legend>
       <div class="segmented">
         {% for val in [1, 2, 3, 4, 5] %}
         <label class="segmented__option">
@@ -43,11 +48,24 @@
         <span>1 · {{ readiness_labels[field][1] }}</span>
         <span>5 · {{ readiness_labels[field][5] }}</span>
       </div>
-    </div>
+    </fieldset>
     {% endfor %}
+    {# ⚠ UN `placeholder` N'EST PAS UN LIBELLÉ.
+       Ces deux champs n'avaient que leur `placeholder` — qui disparaît à la
+       saisie et qu'aucun lecteur d'écran ne traite comme un nom. Le défaut est
+       PRÉEXISTANT : il vivait replié dans un `<details>` sur l'accueil, que
+       presque personne n'ouvrait. Le déplacement l'a exposé, il ne l'a pas
+       créé — comme la troncature de ce même champ. #}
     <div class="readiness-extra">
-      <input class="input" type="number" name="resting_hr" placeholder="FC repos (bpm)" min="30" max="200">
-      <input class="input" type="text" name="note" placeholder="Note (optionnel)">
+      <p class="readiness-extra__pair">
+        <label class="readiness-extra__label" for="readiness-resting-hr">FC repos (bpm)</label>
+        <input class="input" id="readiness-resting-hr" type="number" name="resting_hr"
+               min="30" max="200">
+      </p>
+      <p class="readiness-extra__pair">
+        <label class="readiness-extra__label" for="readiness-note">Note (optionnel)</label>
+        <input class="input" id="readiness-note" type="text" name="note">
+      </p>
     </div>
     <button type="submit" class="btn btn--primary readiness-declare__submit">Enregistrer mon état</button>
   </form>
