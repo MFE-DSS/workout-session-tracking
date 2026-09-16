@@ -45,6 +45,7 @@ peut rendre le système plus prudent, jamais plus agressif.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from typing import cast
 
 from app.services.weekly_volume_budget import WeeklyVolumeBudget
 
@@ -192,7 +193,21 @@ def apply_to_budget(
         )
         for z in budget.zones
     ]
-    return replace(budget, zones=tuple(zones))
+    # ⚠ `cast`, ET ON GARDE `replace`.
+    #
+    # `dataclasses.replace` rend bien un `WeeklyVolumeBudget` à l'exécution,
+    # mais son stub le type `DataclassInstance` : l'annotation de retour était
+    # donc fausse au sens du type, et Sonar a raison de le dire
+    # (`python:S5886`).
+    #
+    # Reconstruire le budget champ par champ corrigerait le type ET
+    # introduirait un vrai risque : `WeeklyVolumeBudget` porte aussi
+    # `policy_version`, `sessions_per_week` et `basis`, et le jour où il en
+    # gagne un de plus, une construction explicite le perdrait en silence.
+    # `replace` préserve ce qu'il ne connaît pas — c'est exactement pourquoi
+    # il est le bon outil ici. Le `cast` dit que c'est le STUB qui est lâche,
+    # pas le code.
+    return cast(WeeklyVolumeBudget, replace(budget, zones=tuple(zones)))
 
 
 def build_effective_plan(preferences, adaptations: tuple[Adaptation, ...]):
