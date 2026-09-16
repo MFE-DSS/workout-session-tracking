@@ -115,20 +115,27 @@ def test_progress_stub_renders(client):
 
 
 def test_library_page_uses_programmes_vocabulary(client):
-    """`OPERATOR_DECISION` NAMING — le domaine s'appelle **Programmes** ; cette
-    surface est l'un de ses trois enfants et s'appelle **Explorer**.
+    """`UI-CP4 LOADOUT` — la surface EST le domaine, et porte son nom.
 
-    « Programmes de séance » confondait l'enfant avec le domaine. La garde
-    suit la décision au lieu de la refuser, et elle vérifie EN PLUS que
-    l'ancienne appellation ne subsiste pas : deux noms pour une surface, c'est
-    le défaut qu'on vient de retirer.
+    Elle s'appelait « Explorer », l'un des trois enfants du domaine
+    « Programmes ». Elle absorbe « Mes programmes » : deux surfaces qui ne
+    posaient qu'une question n'en font plus qu'une, et l'onglet primaire y mène
+    directement.
+
+    Le défaut que « Explorer » évitait — trois niveaux pour le même mot — ne
+    revient pas : les rangs disent « Mes programmes » et « Séances… », jamais
+    « Programmes » une seconde fois.
+
+    ⚠ Les interdits de vocabulaire, eux, ne bougent pas : ce sont des décisions
+    de produit, pas des descriptions de contenu.
     """
     r = client.get("/library")
     body = r.text
-    assert "Explorer" in body
+    assert "Programmes" in body
+    assert "Mes programmes" in body
+    assert "catalogue complet" in body.lower()
     assert "Programmes de séance" not in body
     assert "Bibliothèque" not in body
-    assert "Catalogue complet" in body
 
 
 def test_strength_template_hides_cardio_note(client):

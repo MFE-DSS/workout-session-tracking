@@ -380,8 +380,23 @@ def test_library_does_not_expose_the_dogfood_program(client):
 
     response = client.get("/library")
     assert response.status_code == 200
+    # LA PROPRIÉTÉ GARDÉE EST LA NON-FUITE DANS LE CORPUS COMMUN, pas
+    # l'invisibilité absolue.
+    #
+    # ⚠ REPOINTÉE PAR `UI-CP4 LOADOUT`. La surface contient désormais AUSSI les
+    # programmes du propriétaire, lus par `list_drafts(db, user.id)` — borné au
+    # propriétaire. Qu'un utilisateur voie son propre programme publié n'est pas
+    # une fuite : c'est la tranche. Ce qui reste interdit, et que cette garde
+    # vérifie, c'est que le gabarit `catalog_section="user"` n'apparaisse jamais
+    # comme une ligne du CATALOGUE — le corpus que tout le monde partage.
+    assert "loadout=t-martin-morpho-lib" not in response.text
     assert "martin-morpho-lib" not in response.text
-    assert martin_program.MARTIN_PROGRAM_TITLE not in response.text
+    for section in ("Séances principales", "Séances utilitaires",
+                    "Séances de spécialisation"):
+        bloc = response.text.split(section, 1)[-1]
+        assert martin_program.MARTIN_PROGRAM_TITLE not in bloc, (
+            "le programme privé a fuité dans une section du catalogue commun"
+        )
 
 
 def test_library_slug_detail_is_404_for_the_dogfood_template(client):

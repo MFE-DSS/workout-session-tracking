@@ -85,6 +85,10 @@ def test_launcher_step3_form_carries_launcher_source(client):
 
 
 def test_library_form_carries_library_source(client):
-    r = client.get("/library")
-    body = r.text
+    """`UI-CP4 LOADOUT` — la commande vit dans le DÉPLI, pas sur la page fermée.
+
+    Une ligne du registre sélectionne ; elle ne démarre pas. Le contrat de
+    télémétrie, lui, est inchangé : le formulaire porte toujours sa source.
+    """
+    body = client.get("/library?loadout=t-push-a").text
     assert 'value="library"' in body

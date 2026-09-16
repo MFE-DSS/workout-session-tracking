@@ -88,13 +88,17 @@
        non actifs ne portent AUCUN aria-current (jamais "false"). #}
     {% set _p = request.url.path if request else '' %}
     {% set is_home = _p == '/' or _p.startswith('/home') %}
-    {# `UX4_02` / TRAIN 2 — L'ONGLET PROGRAMMES GROUPE SES TROIS DESTINATIONS.
+    {# `UI-CP4 LOADOUT` — L'ONGLET PROGRAMMES MÈNE AU REGISTRE.
 
-       `OPERATOR_DECISION` C8 les nomme : **Mon plan** (comment je veux
-       m'entraîner), **Mes programmes** (ce que j'ai créé), **Explorer** (le
-       corpus commun). Elles répondaient déjà à trois questions distinctes,
-       mais l'une vivait sous Profil et l'autre nulle part — l'onglet les
-       réunit sans en inventer une quatrième. #}
+       `UX4_02` le groupait en trois destinations : **Mon plan** (comment je
+       veux m'entraîner), **Mes programmes** (ce que j'ai créé), **Explorer**
+       (le corpus commun). Les deux dernières ne posaient en réalité qu'une
+       seule question — « avec quoi puis-je m'entraîner ? » — et l'onglet
+       nommé « Programmes » menait au CATALOGUE pendant que les programmes de
+       l'utilisateur étaient à deux gestes derrière un hamburger.
+
+       Elles n'en font plus qu'une, et l'onglet y mène directement. Reste
+       **Mon plan**, qui répond à une question distincte. #}
     {% set is_plan = _p.startswith('/plan') %}
     {% set is_programs = _p.startswith('/library') or _p.startswith('/launcher')
                          or _p.startswith('/programs') or is_plan %}
@@ -109,9 +113,11 @@
     {% set is_progress = _p.startswith('/progress') %}
     {% set is_leaderboard = _p.startswith('/leaderboard') %}
     {% set is_squads = _p.startswith('/squads') %}
-    {% set is_my_programs = _p.startswith('/programs') %}
-    {# `OPERATOR_DECISION` NAMING — « Explorer », troisième enfant du domaine. #}
-    {% set is_library = _p.startswith('/library') %}
+    {# `UI-CP4 LOADOUT` — `is_my_programs` et `is_library` sont retirés avec les
+       deux liens secondaires qu'ils soulignaient. Une variable qui ne décide
+       plus rien n'est pas neutre : la suivante qui cherchera « comment marque-
+       t-on la sous-destination active » les trouvera et croira à un oubli de
+       câblage. `is_programs` ci-dessus couvre toujours les deux chemins. #}
     {% set is_profile = _p.startswith('/profile') %}
     {% set is_coach = _p.startswith('/coach') %}
     {# `TRAIN1-D` — `/export` n'était liée depuis AUCUN gabarit : la route
@@ -150,9 +156,15 @@
       <details class="topbar__menu">
         <summary class="topbar__toggle" aria-label="Navigation secondaire">☰</summary>
         <nav class="topbar__nav" aria-label="Navigation secondaire">
+          {# `UI-CP4 LOADOUT` — DEUX ENTRÉES PARTENT, ET RIEN NE SE PERD.
+             « Mes programmes » et « Explorer » menaient à deux surfaces qui
+             répondaient à la même question. Elles n'en font plus qu'une, et
+             l'onglet primaire « Programmes » y mène déjà — un lien secondaire
+             qui double une destination primaire est précisément ce que la
+             règle ci-dessus interdit. Les programmes de l'utilisateur, la
+             création d'un programme et le catalogue sont tous atteignables
+             depuis le registre. Aucune route n'est supprimée. #}
           <a class="topbar__link {% if is_plan %}is-subactive{% endif %}" href="{{ url_for('user_plan') }}">Mon plan</a>
-          <a class="topbar__link {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
-          <a class="topbar__link {% if is_library %}is-subactive{% endif %}" href="{{ url_for('library') }}">Explorer</a>
           <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
           <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
           <a class="topbar__link {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>
@@ -199,13 +211,13 @@
       <details class="app-rail__secondary">
         <summary class="app-rail__secondary-toggle">Plus</summary>
         <nav class="app-rail__secondary-nav" aria-label="Navigation secondaire">
-          {# `OPERATOR_DECISION` NAMING — les TROIS enfants du domaine
-             « Programmes » sont nommés ici. « Explorer » manquait : l'onglet
-             du domaine y menait sans que le mot existe nulle part, si bien
-             qu'aucun des trois n'était désignable par son nom. #}
+          {# `UI-CP4 LOADOUT` — le domaine « Programmes » n'a plus que DEUX
+             enfants, et le second est l'onglet lui-même. « Mes programmes » et
+             « Explorer » ont fusionné en un registre unique ; les y renvoyer
+             par deux liens différents nommerait deux surfaces qui n'existent
+             plus. Il reste « Mon plan », qui répond à une autre question :
+             comment je veux m'entraîner. #}
           <a class="app-rail__sublink {% if is_plan %}is-subactive{% endif %}" href="{{ url_for('user_plan') }}">Mon plan</a>
-          <a class="app-rail__sublink {% if is_my_programs %}is-subactive{% endif %}" href="{{ url_for('user_programs_list') }}">Mes programmes</a>
-          <a class="app-rail__sublink {% if is_library %}is-subactive{% endif %}" href="{{ url_for('library') }}">Explorer</a>
           <a class="app-rail__sublink {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
           <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
           <a class="app-rail__sublink {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>

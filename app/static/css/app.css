@@ -6519,3 +6519,230 @@ summary:focus-visible,
   color: var(--t-fg-muted);
   white-space: nowrap;
 }
+
+/* ==========================================================================
+   `UI-CP4 LOADOUT` — LE REGISTRE TYPÉ
+   --------------------------------------------------------------------------
+   POURQUOI IL N'Y A PAS DE CARTE ICI.
+
+   Treize cartes à bord ambre, chacune portant son propre bouton, répondaient
+   à « voici des objets » quand la question posée est « lequel je choisis ».
+   Mesuré sur un compte représentatif : 4,14 écrans, 26 conteneurs, 28
+   commandes visibles, 13 formulaires de démarrage — et 53 occurrences d'ambre
+   dans trois rôles (0 aplat, 11 bordures, 42 textes). L'ambre ne désignait
+   plus une décision, il coloriait une catégorie.
+
+   Une ligne n'est pas une carte allégée : c'est un objet de comparaison. Les
+   lignes se lisent en colonne, partagent une ligne de base, et ne demandent
+   aucun cadre pour se distinguer — un filet suffit.
+
+   L'AMBRE N'EST ICI QUE SUR LA COMMANDE DOMINANTE. Pas « un seul pixel
+   ambre » : **un seul propriétaire d'action**. Une ligne dépliée à la fois,
+   donc une commande à la fois.
+   ========================================================================== */
+
+.loadout {
+  list-style: none;
+  margin: 0 0 26px;
+  padding: 0;
+}
+
+.loadout__row {
+  border-bottom: 1px solid var(--t-line);
+}
+.loadout__row:last-child { border-bottom: 0; }
+
+/* La poignée SÉLECTIONNE — elle n'exécute pas. Le geste supplémentaire avant
+ * de démarrer est le prix assumé de l'interdiction du démarrage accidentel :
+ * aujourd'hui un pouce qui glisse sur « Démarrer » lance une séance.
+ *
+ * Hauteur : 14+14 de marge intérieure autour de deux lignes de texte — mesuré
+ * à 62 px, au-dessus du plancher produit de 44 (`UIV3_TARGETS_44_01`,
+ * catégorie FREQUENT_SEQUENTIAL). */
+.loadout__handle {
+  display: block;
+  padding: 14px 2px;
+  text-decoration: none;
+  color: inherit;
+}
+.loadout__handle:hover .loadout__name { color: var(--t-fg); }
+
+.loadout__name {
+  display: block;
+  font-size: 15px;
+  color: var(--t-fg-2);
+  font-weight: 600;
+  line-height: 1.34;
+  text-wrap: balance;
+}
+.is-open > .loadout__handle .loadout__name { color: var(--t-fg); }
+
+/* La seconde ligne : le genre, l'état, et LA CHARGE. Elle porte le seul
+ * discriminant que le nom ne dit pas. Mesuré sur le catalogue réel : « Legs A »
+ * et « Legs B » ont rigoureusement les mêmes quatre zones, « Push A » et
+ * « Push B » aussi — seul le volume les sépare, de 0 à 24 séries, et il
+ * n'était affiché nulle part. */
+.loadout__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--t-fg-muted);
+}
+
+/* ⚠ LE GENRE SE DISTINGUE SANS QUITTER L'ÉCHELLE. Première écriture : 10 px,
+ * puis 11,5 et 12,5 ailleurs — trois rangs typographiques inventés à côté de
+ * l'échelle décidée (`Q6` : 32 / 22 / 15 / 12). Une échelle à laquelle on ajoute
+ * un barreau par besoin n'est plus une échelle.
+ *
+ * L'étiquette reste donc au rang META et se distingue par l'INTERLETTRAGE et la
+ * COULEUR, qui ne coûtent aucun rang. */
+.loadout__type {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--t-fg-faint);
+}
+
+/* L'état de cycle de vie d'un programme : un brouillon ne se démarre pas, et
+ * cela doit se voir avant le dépli. Un filet, jamais un aplat — un aplat
+ * réclamerait une décision que l'état n'est pas. */
+.loadout__status {
+  padding: 1px 6px;
+  border: 1px solid var(--t-line);
+  border-radius: 2px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--t-fg-2);
+}
+
+.loadout__shape {
+  font-variant-numeric: tabular-nums;
+}
+
+/* LE DÉPLI — une marche de profondeur, pas une boîte. Il occupe toute la
+ * largeur du rang (marges négatives compensées) pour que la marche se lise
+ * comme un changement de NIVEAU et non comme un encadré posé dessus. */
+.loadout__open {
+  margin: 0 -14px;
+  padding: 2px 14px 14px;
+  background: var(--t-surface);
+}
+
+.loadout__lead {
+  margin: 10px 0 2px;
+  font-size: 12px;
+  color: var(--t-fg-muted);
+}
+
+/* Les séances d'un programme. Un programme n'a AUCUNE commande de démarrage —
+ * le domaine n'en expose aucune : on démarre l'une de ses séances. */
+.loadout--nested {
+  margin: 0;
+  border-top: 1px solid var(--t-line);
+}
+.loadout--nested .loadout__open {
+  margin: 0 -14px;
+  background: var(--t-raised);
+}
+
+.loadout__zones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ⚠ UNE ZONE DÉCLARÉE N'EST PAS EN AMBRE, et c'est un changement de doctrine
+ * assumé. `--t-amber` est documenté « action utilisateur · objet actif ». Une
+ * priorité déclarée n'est ni l'un ni l'autre : c'est un RAPPEL de ce que
+ * l'utilisateur a dit. La colorier en ambre est précisément ce qui a produit
+ * 42 textes ambre sur un seul écran.
+ *
+ * Elle se distingue par le POIDS et par un SOULIGNÉ — deux canaux non
+ * colorimétriques — et son sens complet est dit hors écran. */
+.loadout__zone {
+  padding: 3px 8px;
+  border: 1px solid var(--t-line);
+  border-radius: 2px;
+  font-size: 12px;
+  color: var(--t-fg-muted);
+}
+.loadout__zone.is-declared {
+  border-color: var(--t-line-strong);
+  border-bottom-width: 2px;
+  color: var(--t-fg-2);
+  font-weight: 650;
+}
+
+/* LES TROIS ABSENCES NE SE CONFONDENT PAS. « Aucune zone prescrite » est une
+ * CONNAISSANCE ; « zones non cartographiées » est un TROU. La seconde porte
+ * `--t-unknown` et un filet pointillé — jamais distinguée par la couleur
+ * seule (`Sx_UIV3_00 §7`) ; la première est une phrase ordinaire, parce
+ * qu'elle n'annonce aucun manque. */
+.loadout__note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--t-fg-muted);
+}
+.loadout__note--unknown {
+  padding-left: 10px;
+  border-left: 2px dotted var(--t-unknown);
+  color: var(--t-unknown);
+}
+
+.loadout__exit {
+  margin: 12px 0 0;
+  font-size: 15px;
+}
+
+/* LA COMMANDE DOMINANTE — le seul aplat ambre du registre, et il n'y en a
+ * qu'un à la fois parce qu'une seule ligne est dépliée à la fois. */
+.loadout__command {
+  margin: 14px 0 0;
+}
+.btn.loadout__go {
+  display: block;
+  width: 100%;
+  padding: 13px 16px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--t-amber);
+  color: var(--t-on-amber);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-decoration: none;
+}
+.btn.loadout__go:hover { background: var(--t-amber-hover); }
+
+/* Au-delà du pouce, la ligne cesse de s'étirer jusqu'aux bords : un nom de
+ * séance sur 1200 px de large sépare son titre de sa charge par un couloir
+ * vide que l'œil doit traverser. Le registre garde une mesure lisible, et la
+ * charge vient se poser au bout du nom plutôt qu'au bout de l'écran. */
+@media (min-width: 720px) {
+  .loadout { max-width: 720px; }
+  .loadout__handle {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .loadout__name { flex: 1 1 auto; }
+  .loadout__line { margin-top: 0; flex: 0 0 auto; justify-content: flex-end; }
+  /* Le plein-cadre du dépli est un geste de POUCE : sur un écran étroit, la
+   * marche de profondeur doit toucher les bords pour se lire comme un niveau.
+   * En large elle débordait de 14 px à droite des lignes — un décalage que
+   * rien ne justifie, et que seul le rendu montre. Le dépli s'aligne donc
+   * exactement sur le registre, et l'indentation vient de la marge intérieure. */
+  .loadout__open,
+  .loadout--nested .loadout__open {
+    margin: 0;
+    max-width: 720px;
+  }
+  .btn.loadout__go { width: auto; min-width: 220px; }
+}
