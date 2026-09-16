@@ -440,6 +440,17 @@ class TestUserSurface:
         def _boom(*_args, **_kwargs):
             raise RuntimeError("planner down")
 
+        # ⚠ `UI-CP3.5` — LA CIBLE DU PATCH CHANGE, PAS LA PROPRIÉTÉ.
+        #
+        # Cette garde patchait `build_weekly_plan_for_user`. Depuis que
+        # l'aperçu passe par le plan EFFECTIF, la chaîne appelle la primitive
+        # pure `build_weekly_plan` — et le patch ne l'interceptait plus. La
+        # garde rendait vert sans plus rien exercer.
+        #
+        # Elle vise désormais la COUTURE que les deux chemins partagent : quel
+        # que soit le composeur, tout plan passe par là. Épingler un nom
+        # d'appelant, c'était épingler une écriture plutôt qu'une propriété.
+        monkeypatch.setattr(weekly_planner, "build_weekly_plan", _boom)
         monkeypatch.setattr(weekly_planner, "build_weekly_plan_for_user", _boom)
         response = client.get(self.PLAN_URL)
         assert response.status_code == 200

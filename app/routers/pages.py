@@ -260,6 +260,78 @@ def _zone_tally(db, user_id: int) -> dict:
     return {"tally": tally, "tally_total": total}
 
 
+def _mission_continuity(db, user_id: int) -> dict | None:
+    """`UI-CP3.5` — ce que MISSION dit d'une adaptation, ou rien.
+
+    Rend `None` quand aucune adaptation active ne s'applique au contexte de
+    plan courant. **Le silence est valide** : un bloc de continuité permanent
+    ne serait plus de la mémoire, ce serait du décor.
+
+    ⚠ VOCABULAIRE. Des COMPTES, jamais une imputation. Ni « manqué », ni « en
+    retard » : sans instance planifiée datée, ces mots affirment une faute que
+    le modèle ne peut pas prouver. Une garde de vocabulaire le tient.
+
+    ⚠ LECTURE SEULE. Aucune écriture, aucun marquage de supersession — la
+    supersession se DÉRIVE, et la dériver pendant un `GET` est gratuit ; la
+    persister ne le serait pas.
+    """
+    try:
+        from app.services.plan_adaptation import applicable
+        from app.services.plan_adaptation_store import active_adaptations
+        from app.services.training_preferences import get_training_preferences
+        from app.services.weekly_planner import build_weekly_plan_for_user
+
+        adaptations = active_adaptations(db, user_id)
+        if not adaptations:
+            return None
+
+        prefs = get_training_preferences(db, user_id)
+        if not prefs.sessions_per_week:
+            return None
+
+        base = build_weekly_plan_for_user(db, user_id)
+        vivante = next(
+            (a for a in adaptations if applicable(a, base.fingerprint)), None)
+        if vivante is None:
+            # Toutes supersédées par un changement de contexte. L'historique
+            # survit ; le comportement, non.
+            return None
+
+        from app.services.muscle_mapping import ZONE_LABELS
+
+        # ⚠ UNE ZONE, PAS QUATRE. MESURÉ AU RENDU.
+        #
+        # Première écriture : toutes les zones reportées, une ligne chacune.
+        # Sur une séance abandonnée, cela rendait QUATRE lignes — « Deltoïdes
+        # latéraux 12 → 0 · Deltoïdes postérieurs 8 → 0 · Pectoraux 12 → 1 ·
+        # Triceps 4 → 0 ». Un flux, précisément ce que MISSION ne doit pas
+        # devenir, et un écran qui se lit comme « ta semaine est annulée ».
+        #
+        # On montre la zone la plus MATÉRIELLE, et on compte les autres. Rien
+        # n'est caché : le total des séries reportées est dit.
+        reports = sorted(
+            (d for d in vivante.deferrals if d.sets_deferred > 0),
+            key=lambda d: d.sets_deferred, reverse=True)
+        if not reports:
+            return None
+        tete = reports[0]
+
+        return {
+            "decision_id": vivante.decision_id,
+            "decided_at": vivante.decided_at,
+            "done": vivante.done,
+            "total": vivante.total,
+            "zone_label": ZONE_LABELS.get(tete.zone_code, tete.zone_code),
+            "sets_before": tete.sets_before,
+            "sets_after": tete.sets_after,
+            "autres_zones": len(reports) - 1,
+            "sets_reportes": sum(d.sets_deferred for d in reports),
+        }
+    except Exception:
+        # Un readout non critique ne fait jamais tomber la surface de décision.
+        return None
+
+
 def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
     """Tout ce dont le Causal Cockpit a besoin, en UNE lecture de `zone_recovery`.
 
@@ -405,6 +477,18 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
 
     home_payload = build_home_payload(db, user)
 
+    # ── `UI-CP3.5` — LA CONTINUITÉ ─────────────────────────────────────────
+    # MISSION lit une décision PRISE ailleurs, à la clôture d'une séance. Elle
+    # n'en prend aucune : ce `GET` n'écrit rien, jamais.
+    #
+    # ⚠ ON NE LIT QUE L'ADAPTATION, PAS LE PLAN EFFECTIF.
+    # Composer le plan ici coûterait deux constructions de plan sur la route
+    # la plus chaude du produit, pour une information que MISSION ne rend
+    # pas — exactement les cinq calculs morts que `UI-CP3` vient de retirer.
+    # Le plan effectif est consommé par les surfaces qui le RENDENT (`/plan`,
+    # matérialisation).
+    continuity = _mission_continuity(db, user.id)
+
     return templates.TemplateResponse(
         request,
         "index.html",
@@ -430,6 +514,8 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             # recommandation sont sa preuve.
             "causal": _home_causal_context(db, user.id, _reco),
             "home": home_payload,
+            # `UI-CP3.5` — `None` quand rien n'a changé. Le silence est valide.
+            "continuity": continuity,
         },
     )
 

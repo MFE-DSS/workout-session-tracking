@@ -175,6 +175,47 @@ def _work_sets(se) -> int:
     return sum(1 for sl in se.set_logs if sl.kind == "work" and sl.completed)
 
 
+def work_sets_by_zone(db: Session, session) -> dict[str, int]:
+    """Séries de travail **validées** d'UNE séance, réparties par zone.
+
+    ⚠ `UI-CP3.5` — EXPOSÉ ICI, ET PAS RÉÉCRIT AILLEURS.
+
+    Ce module porte l'avertissement le plus important du sujet : deux fenêtres
+    ou **deux résolveurs** mettraient « deux attributions contradictoires sur
+    un seul écran ». La continuité a besoin de la même répartition que
+    l'exposition ; elle emprunte donc `resolve_zone` et `_work_sets`, au lieu
+    d'en écrire une seconde version qui divergerait au premier correctif.
+
+    Ce qui DIFFÈRE de `_tally`, et pourquoi c'est une fonction distincte :
+    `_tally` dédoublonne les zones par séance pour compter des JOURS
+    d'exposition. Ici on ne veut que les séries, sur une seule séance — le
+    dédoublonnage n'aurait aucun objet.
+
+    ⚠ DEUX ABSENCES DIFFÉRENTES, ET IL FALLAIT LES DISTINGUER.
+
+    Un exercice que le résolveur **ne sait pas classer** est omis : on ignore
+    ce qu'il a sollicité, et le compter pour zéro serait conclure d'une
+    ignorance.
+
+    Un exercice classé qui a livré **zéro série** est présent, avec zéro. Ce
+    n'est pas une ignorance, c'est un fait.
+
+    Première écriture : la fonction omettait aussi les zéros (`if fait:`).
+    Conséquence mesurée au rendu — une séance **entièrement abandonnée**
+    (0 série sur 21) ne produisait AUCUN report, quand une séance à une seule
+    série en produisait un. Exactement à l'envers, et invisible pour les
+    gardes unitaires qui n'exerçaient que des séances partiellement faites.
+    """
+    par_zone: dict[str, int] = {}
+    for se in session.session_exercises:
+        res = resolve_zone(
+            db, se.substituted_name or se.exercise_name_snapshot or "")
+        if not res.mapped:
+            continue
+        par_zone[res.zone] = par_zone.get(res.zone, 0) + _work_sets(se)
+    return par_zone
+
+
 def _tally(db: Session, sessions) -> _Tally:
     """Une séance compte **au plus une fois par zone** — d'où le `set` par
     séance : la question est « ce jour-là, oui ou non », pas « combien ».
@@ -381,4 +422,5 @@ __all__ = [
     "ZoneExposure",
     "build_zone_exposure",
     "build_zone_exposure_view",
+    "work_sets_by_zone",
 ]

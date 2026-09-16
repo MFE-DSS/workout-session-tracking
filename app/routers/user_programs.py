@@ -382,17 +382,18 @@ def _weekly_plan_proposal(db, user_id: int) -> dict | None:
     ce n'est jamais une raison de casser la bibliothèque existante.
     """
     try:
+        # `UI-CP3.5` — l'aperçu montre ce qui serait RÉELLEMENT matérialisé.
         from app.services.muscle_mapping import RADAR_AXES
+        from app.services.plan_adaptation_store import effective_plan_for_user
         from app.services.training_preferences import get_training_preferences
         from app.services.weekly_plan_materialization import (
             assess_materialization,
         )
-        from app.services.weekly_planner import build_weekly_plan_for_user
 
         preferences = get_training_preferences(db, user_id)
         if preferences is None or not preferences.sessions_per_week:
             return None
-        plan = build_weekly_plan_for_user(db, user_id)
+        _, plan = effective_plan_for_user(db, user_id)
         readiness = assess_materialization(plan)
         if not readiness.can_materialize:
             return None
@@ -559,14 +560,19 @@ def user_program_from_weekly_plan(
     la page suivante est l'éditeur de brouillon habituel, où la validation puis
     la publication restent des gestes séparés.
     """
+    # `UI-CP3.5` — LE PLAN EFFECTIF, PAS LE PLAN DE BASE.
+    #
+    # C'est ici que le plan devient un programme réel : si l'adaptation ne
+    # s'appliquait pas à ce point, MISSION annoncerait « ajusté » pendant que
+    # le produit matérialiserait le plan d'avant. Le mot serait faux.
+    from app.services.plan_adaptation_store import effective_plan_for_user
     from app.services.weekly_plan_materialization import (
         DEFAULT_PROGRAM_TITLE,
         materialize_weekly_plan,
     )
-    from app.services.weekly_planner import build_weekly_plan_for_user
 
     try:
-        plan = build_weekly_plan_for_user(db, user.id)
+        _, plan = effective_plan_for_user(db, user.id)
         program, _ = materialize_weekly_plan(
             db, user.id, plan,
             title=DEFAULT_PROGRAM_TITLE,
