@@ -187,8 +187,7 @@ catégorique**, et le log de production l'a corrigé.
 
 ## Verdict
 
-**En cours.** Le sweep local complet et la validation sur CI réelle — les deux
-exigences du tier `CI_INFRA` — sont inscrits ici quand ils ont rendu.
+**LIVRÉE.** Les deux exigences du tier `CI_INFRA` sont tenues et mesurées.
 
 | Contrôle | Résultat |
 |---|---|
@@ -200,10 +199,68 @@ exigences du tier `CI_INFRA` — sont inscrits ici quand ils ont rendu.
 | `actionlint` local (1.7.12) | aucune erreur — un `SC2046` **warning** préexistant, non bloquant |
 | Mutation de la garde de runtime | défaut planté, garde rouge, arbre restauré |
 | Sweep local complet | **`tous les lots sont verts.`** — 332/332 fichiers, 98 lots, pic 1712 Mo / budget 2100, aucun fichier sauté, **arbre gelé** |
-| **CI réelle** — impérative à ce tier | *(inscrit au closeout)* |
+| **CI réelle** — impérative à ce tier | **VERTE 7/7 sur la canonique** — voir le closeout |
 
 ⚠ **L'arbre a été gelé avant ce sweep, et c'est une correction de méthode.** Les
 deux sweeps précédents de la session ont mesuré un arbre qui bougeait, et le
 premier de cette tranche a dû être **interrompu** parce que je l'avais modifié
 en cours de route. Un sweep sert à certifier ; il ne certifie que ce qui ne
 bouge pas.
+
+---
+
+## Closeout — post-merge
+
+| | |
+|---|---|
+| PR | **#235**, mergée le 2026-09-16 |
+| Méthode | `--merge` avec `--match-head-commit` — aucun squash, aucun `--admin` |
+| Head de PR | `23bcc04` |
+| Commit de merge | **`2b8411d`** |
+| Gate Sonar (PR) | **OK** 4/4 |
+| Threads de revue non résolus | **0** |
+
+### La preuve que la tranche demandait — sur CI réelle
+
+**Le job `lint`, 18 étapes sur 18 en succès**, avec le **même `actionlint`
+1.75.0** qui faisait échouer la canonique :
+
+| Étape | Avant (`6c53cf3`) | Après (`2b8411d`) |
+|---|---|---|
+| 9 · `actionlint` | **failure** | **success** |
+| 10 · `shellcheck` | skipped | **success** |
+| 11 · `pip-audit` | skipped | **success** |
+| 12 · **`gitleaks`** | skipped | **success** |
+| 13 · protocole de spec | skipped | **success** |
+| 14 · matrice de portée d'auth | skipped | **success** |
+| 15 · dérive du lock | skipped | **success** |
+
+**CI canonique sur `2b8411d` : 7 jobs sur 7 verts**, dont **`SonarCloud`**, qui
+était `skipped` depuis que `lint` échouait — le septième contrôle perdu est
+revenu.
+
+Les quatre familles d'actions montées ont **réellement tourné** :
+`checkout@v5` et `setup-python@v6` (tous les jobs), `upload-artifact@v6`
+(*Upload coverage artifact*), `download-artifact@v7` (*Download shard coverage
+data*, *Download coverage report*, *Download linter reports*), `gitleaks@v3`
+(étape 12). Aucune n'a été validée par raisonnement seul.
+
+### Cinq PR dependabot fermées
+
+`#1` `#2` `#3` `#5` `#6` proposaient les mêmes bumps depuis des mois, jamais
+traitées. Fermées avec leur motif : la tranche fait le même travail avec des
+versions **mesurées** — et leurs cibles différaient (`checkout@v7`,
+`download-artifact@v8`) de la politique du majeur le plus bas déjà en node24 —
+tout en ajoutant ce qu'aucune PR dependabot ne peut apporter : **la garde**.
+
+⚠ `#7` (bcrypt) **reste ouverte**, conformément à la contrainte opérateur
+permanente : `bcrypt 5` est incompatible avec `passlib`.
+
+### Ce qui reste ouvert
+
+* **`reviewdog/action-actionlint@v1` reste flottante** — délibérément : c'est
+  elle qui a rendu l'échéance visible, et l'épingler l'aurait masquée. Le vrai
+  garde-fou est désormais la garde de runtime, qui ne dépend d'aucun analyseur
+  tiers.
+* **`SC2046`** (`ci.yml`) — warning `shellcheck`, non bloquant, consigné.
+* **Le tri humain** des 6 branches de juin–juillet et des worktrees.
