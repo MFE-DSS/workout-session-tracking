@@ -1,10 +1,21 @@
-"""Sx_LIB_01 — Library Card Action Semantics.
+"""Sx_LIB_01 → `UI-CP4 LOADOUT` — la sémantique d'action du registre.
 
-The library template cards had the start `<form>` nested INSIDE the detail
-`<a>` link (invalid HTML → onclick/onkeydown stopPropagation hacks). This
-sprint moves the form OUT of the link (sibling in the <li>), removing the JS
-hacks. Behaviour unchanged: card click → detail, "Démarrer" → create_session
-(creation_source=library). Template-only, no route/service/data change.
+CE QUE CE FICHIER GARDAIT, ET CE QU'IL GARDE ENCORE
+----------------------------------------------------
+`Sx_LIB_01` avait sorti le formulaire de démarrage de l'intérieur du lien de
+détail : imbriquer l'un dans l'autre est du HTML invalide, et les hacks
+`stopPropagation` qui en découlaient étaient la rançon de cette faute.
+
+`UI-CP4` supprime les cartes de cette surface. **La propriété protégée, elle,
+ne change pas** — elle se renforce : sur un registre, aucun formulaire n'est
+imbriqué dans un lien parce qu'aucun formulaire ne partage sa ligne avec un
+lien de navigation. Les gardes sont donc REPOINTÉES sur la propriété, pas
+supprimées avec l'écriture qu'elles épinglaient.
+
+⚠ LE CONTRAT DE DÉMARRAGE NE VIT PLUS SUR LA PAGE FERMÉE. Une ligne sélectionne
+et ne démarre pas ; la commande n'apparaît que dans le dépli. Les gardes du
+contrat déplient donc explicitement une ligne — les écrire sur la page fermée
+les rendrait vertes sur un écran qui ne contient plus rien à vérifier.
 """
 from __future__ import annotations
 
@@ -15,111 +26,109 @@ ROOT = Path(__file__).resolve().parent.parent
 LIBRARY_TPL = ROOT / "app" / "templates" / "library.html"
 PAGES_ROUTER = ROOT / "app" / "routers" / "pages.py"
 
+#: La clé de dépli d'un gabarit de catalogue — `app.services.loadout.session_key`.
+PUSH_A = "t-push-a"
 
-def _render(client):
-    r = client.get("/library", follow_redirects=False)
+
+def _render(client, query: str = ""):
+    r = client.get("/library" + query, follow_redirects=False)
     assert r.status_code == 200, r.text[:300]
     return r.text
 
 
-# ───────── 1. cards render with detail link + start form ─────────
+# ───────── 1. le registre rend des lignes, et AUCUNE carte ─────────
 
 
-def test_library_renders_cards(client):
+def test_loadout_renders_rows(client):
     html = _render(client)
-    assert "template-card" in html
-    assert "template-card__link" in html
+    assert "loadout__row" in html
+    assert "loadout__handle" in html
 
 
-def test_each_card_has_detail_link(client):
+def test_no_card_survives_on_loadout(client):
+    """La carte n'est pas allégée : elle n'existe plus sur cette surface.
+
+    Elle reste vivante ailleurs (`launcher`, `template_detail`) — c'est bien
+    une tranche de surface, pas une migration globale de composants.
+    """
     html = _render(client)
-    # detail links present (href to template_detail resolves to /library/<slug>)
-    assert "/library/push-a" in html or "template-card__link" in html
+    assert "template-card" not in html
+    assert "card-stack" not in html
 
 
-# ───────── 2. THE FIX: form is no longer nested inside the <a> ─────────
+def test_each_row_reaches_its_detail(client):
+    """Voir le détail reste atteignable — depuis le dépli, pas depuis la ligne."""
+    html = _render(client, f"?loadout={PUSH_A}")
+    assert "/library/push-a" in html
 
 
-def test_form_not_nested_inside_link(client):
-    """No <form> must appear inside a template-card__link <a>…</a>."""
-    html = _render(client)
-    links = re.findall(
-        r'<a class="template-card__link".*?</a>', html, re.DOTALL
-    )
-    assert links, "no template-card__link found"
+# ───────── 2. LA PROPRIÉTÉ HISTORIQUE : aucun formulaire dans un lien ─────────
+
+
+def test_no_form_nested_inside_any_link(client):
+    """Élargie : plus seulement « pas dans une carte », mais dans AUCUN lien.
+
+    L'ancienne garde ne regardait que `template-card__link`. Sur une surface
+    qui n'a plus de carte, elle serait passée au vert sans rien observer — la
+    forme exacte d'une garde qui ne garde plus rien.
+    """
+    html = _render(client, f"?loadout={PUSH_A}")
+    links = re.findall(r"<a\b.*?</a>", html, re.DOTALL)
+    assert links, "aucun lien rendu — la garde n'observerait rien"
     for link in links:
-        assert "<form" not in link, "form still nested inside the detail link"
+        assert "<form" not in link, "un formulaire est imbriqué dans un lien"
 
 
 def test_stop_propagation_hacks_removed(client):
-    """The onclick/onkeydown stopPropagation hacks must be gone from the render."""
-    html = _render(client)
+    """Les hacks `stopPropagation` restent absents du rendu."""
+    html = _render(client, f"?loadout={PUSH_A}")
     assert "stopPropagation" not in html
     assert "onclick=" not in html
     assert "onkeydown=" not in html
 
 
-def test_source_template_has_no_stop_propagation():
+def test_source_template_has_no_inline_handlers():
     src = LIBRARY_TPL.read_text(encoding="utf-8")
-    # only allowed in a comment; the code lines must not carry the handlers
     for line in src.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("{#") or "hacks stopPropagation" in line:
+        if line.strip().startswith("{#"):
             continue
         assert "onclick=" not in line
         assert "onkeydown=" not in line
-        assert 'stopPropagation();' not in line
+        assert "stopPropagation();" not in line
 
 
-# ───────── 3. start form contract preserved ─────────
+# ───────── 3. le contrat de démarrage est préservé ─────────
 
 
 def test_start_form_contract_preserved(client):
-    html = _render(client)
-    assert "create_session" in html.lower() or "/sessions" in html
+    """`template_slug` + `creation_source=library` — un contrat, pas un détail."""
+    html = _render(client, f"?loadout={PUSH_A}")
     assert 'name="template_slug"' in html
     assert 'name="creation_source"' in html
     assert 'value="library"' in html
     assert ">Démarrer<" in html
-    # ghost button preserved
-    assert "btn--ghost" in html
 
 
-def test_form_and_link_are_siblings(client):
-    """After the fix, form and link are siblings inside the <li>: the </a>
-    closes before the <form>."""
+def test_the_closed_register_offers_no_start_at_all(client):
+    """LE DÉMARRAGE ACCIDENTEL EST STRUCTURELLEMENT IMPOSSIBLE.
+
+    Treize boutons « Démarrer » étaient visibles d'un coup ; un pouce qui
+    glissait lançait une séance. Le registre fermé n'en expose aucun.
+    """
     html = _render(client)
-    # find a card block: link then form, with </a> before <form
-    m = re.search(
-        r'<a class="template-card__link".*?</a>\s*<form',
-        html,
-        re.DOTALL,
-    )
-    assert m, "expected </a> immediately followed by the start <form> (siblings)"
+    assert ">Démarrer<" not in html
+    assert 'name="template_slug"' not in html
 
 
-# ───────── 4. non-regression: asserted texts + no route/service change ─────────
+def test_exactly_one_start_command_when_one_row_is_open(client):
+    """Un seul propriétaire d'action sur l'écran, jamais deux."""
+    html = _render(client, f"?loadout={PUSH_A}")
+    assert html.count('name="template_slug"') == 1
 
 
-def test_library_vocabulary_preserved(client):
-    html = _render(client)
-    # `OPERATOR_DECISION` NAMING — « Explorer », enfant du domaine
-    # « Programmes ». L'ancien titre confondait l'enfant et le domaine.
-    assert "Explorer" in html
-    assert "Programmes de séance" not in html
-    assert "Catalogue complet" in html
-    assert "Bibliothèque" not in html
-
-
-def test_pages_router_not_modified():
-    src = PAGES_ROUTER.read_text(encoding="utf-8")
-    assert "Sx_LIB_01" not in src  # sentinel: no marker leaked into the router
-
-
-def test_no_js_or_new_wording_added():
+def test_no_js_added():
     src = LIBRARY_TPL.read_text(encoding="utf-8")
     assert "<script" not in src
-    # end-to-end: the start form still creates a session (creation_source=library)
 
 
 def test_cta_still_creates_session(client):
@@ -129,3 +138,19 @@ def test_cta_still_creates_session(client):
         follow_redirects=False,
     )
     assert r.status_code in (200, 303), r.text[:200]
+
+
+# ───────── 4. vocabulaire ─────────
+
+
+def test_loadout_vocabulary(client):
+    html = _render(client)
+    # La page absorbe « Mes programmes » ; elle EST le domaine et porte son nom.
+    assert "Programmes" in html
+    assert "Programmes de séance" not in html
+    assert "Bibliothèque" not in html
+
+
+def test_pages_router_carries_no_sprint_marker():
+    src = PAGES_ROUTER.read_text(encoding="utf-8")
+    assert "Sx_LIB_01" not in src

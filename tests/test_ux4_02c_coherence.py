@@ -205,36 +205,64 @@ def test_the_disclosure_trigger_is_a_reachable_target():
     assert "min-height: 44px" in rule
 
 
-# ═════════ NAMING — UN DOMAINE, TROIS ENFANTS NOMMÉS ═════════
+# ═════════ NAMING — LE DOMAINE ET CE QU'IL CONTIENT ═════════
+#
+# ⚠ REPOINTÉ PAR `UI-CP4 LOADOUT`. `UX4_02C` nommait TROIS enfants — Mon plan,
+# Mes programmes, Explorer. « Mes programmes » et « Explorer » ne posaient en
+# réalité qu'une seule question — « avec quoi puis-je m'entraîner ? » — et
+# l'onglet nommé « Programmes » menait au CATALOGUE pendant que les programmes
+# de l'utilisateur étaient à deux gestes derrière un hamburger.
+#
+# Ils ont fusionné en un registre unique, et l'onglet primaire y mène. Ce que
+# `UX4_02C` protégeait tient toujours, et ces gardes le vérifient encore :
+#
+#   * ce qui est NOMMÉ doit MENER quelque part (nommer sans mener est pire) ;
+#   * un enfant n'est jamais nommé deux fois dans le même menu ;
+#   * aucun nom anglais dans l'interface française ;
+#   * l'enfant ne porte pas le nom du domaine **de façon ambiguë**.
+#
+# Le dernier point change de forme : la surface EST désormais le domaine et
+# porte son nom, ce qui est légitime parce qu'il n'y a plus deux objets à
+# distinguer. Les rangs internes disent « Mes programmes » et « Séances… »,
+# jamais « Programmes » une seconde fois.
 
 
-def test_the_child_surface_is_called_explorer(client):
+def test_the_surface_is_named_and_the_old_child_name_is_gone(client):
     body = client.get(LIBRARY_URL).text
-    assert "Explorer" in body
+    assert "Programmes" in body
+    # Y COMPRIS DANS LE TITRE D'ONGLET. Laissé à « Explorer », il faisait passer
+    # cette garde pour la bonne raison apparente — la chaîne était bien dans la
+    # page — alors que la surface ne s'appelait plus ainsi nulle part à l'écran.
+    assert "Explorer" not in body
 
 
-def test_the_child_no_longer_wears_the_domain_name(client):
-    """« Programmes de séance » confondait l'enfant et le domaine : l'onglet du
-    domaine menait à une page portant presque son nom."""
+def test_the_child_no_longer_wears_the_domain_name_ambiguously(client):
+    """« Programmes de séance » confondait l'enfant et le domaine."""
     assert "Programmes de séance" not in client.get(LIBRARY_URL).text
 
 
-def test_the_three_children_are_all_named_in_the_shell(client):
-    """Avant, « Explorer » n'existait comme mot NULLE PART : l'onglet y menait
-    sans le nommer, donc aucun des trois enfants n'était désignable."""
+def test_every_named_child_is_still_named_in_the_shell(client):
     body = client.get("/").text
-    for child in ("Mon plan", "Mes programmes", "Explorer"):
+    for child in ("Mon plan", "Programmes"):
         assert child in body, f"enfant non nommé dans la coque : {child}"
 
 
 def test_each_child_link_leads_to_its_own_surface(client):
     """Nommer sans mener serait pire que ne pas nommer."""
     body = client.get("/").text
-    for child, url in (("Mon plan", "/plan"),
-                       ("Mes programmes", "/programs"),
-                       ("Explorer", "/library")):
-        pattern = rf'href="[^"]*{re.escape(url)}"[^>]*>{re.escape(child)}<'
-        assert re.search(pattern, body), f"« {child} » ne mène pas à {url}"
+    pattern = r'href="[^"]*/plan"[^>]*>Mon plan<'
+    assert re.search(pattern, body), "« Mon plan » ne mène pas à /plan"
+    # L'onglet primaire mène au registre.
+    assert re.search(r'href="[^"]*/library"', body), "l'onglet ne mène nulle part"
+
+
+def test_the_merged_children_left_no_dead_link(client):
+    """Les deux liens secondaires partent ; AUCUNE route n'est supprimée, et
+    tout ce qu'ils atteignaient reste atteignable."""
+    assert client.get("/programs", follow_redirects=False).status_code == 200
+    registre = client.get(LIBRARY_URL).text
+    assert "Mes programmes" in registre, "le rang absorbé a disparu"
+    assert "Créer un programme" in registre, "créer est devenu inatteignable"
 
 
 def test_the_domain_label_is_unchanged(client):
@@ -255,7 +283,15 @@ def test_the_shell_names_the_children_without_duplicating_them(client):
     body = _uncommented(BASE_TPL.read_text(encoding="utf-8"))
     for nav_class in ("topbar__link", "app-rail__sublink"):
         links = re.findall(rf'class="{nav_class}[^"]*"[^>]*>([^<]+)<', body)
-        for child in ("Mon plan", "Mes programmes", "Explorer"):
-            assert links.count(child) == 1, (
-                f"« {child} » apparaît {links.count(child)} fois dans {nav_class}"
+        assert links.count("Mon plan") == 1, (
+            f"« Mon plan » apparaît {links.count('Mon plan')} fois dans {nav_class}"
+        )
+        # Les deux enfants fusionnés ne doivent plus être nommés du tout dans un
+        # menu secondaire : leur destination est l'onglet PRIMAIRE, et un lien
+        # secondaire qui double une destination primaire est ce que la règle du
+        # menu interdisait déjà.
+        for parti in ("Mes programmes", "Explorer"):
+            assert links.count(parti) == 0, (
+                f"« {parti} » subsiste dans {nav_class} alors que sa surface a "
+                f"fusionné avec l'onglet primaire"
             )

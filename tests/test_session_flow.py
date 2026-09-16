@@ -47,15 +47,32 @@ def _get_set_log_ids(client: TestClient, session_id: int) -> list[int]:
 # ---------------------------------------------------------------------------
 
 
-def test_library_renders_start_forms_for_every_template(client):
-    r = client.get("/library")
-    assert r.status_code == 200
-    body = r.text
-    for slug in ["push-a", "pull-a", "push-b", "pull-b", "legs-a", "liss-abs"]:
-        assert f'value="{slug}"' in body, f"missing start form for {slug}"
-    # Starlette's url_for emits absolute URLs under TestClient.
-    assert body.count('/sessions"') >= 6
-    assert body.count("Démarrer") >= 6
+def test_library_offers_every_template_and_each_one_starts(client):
+    """`UI-CP4 LOADOUT` — chaque gabarit reste ATTEIGNABLE et DÉMARRABLE.
+
+    L'ancienne écriture exigeait treize formulaires de démarrage visibles d'un
+    coup. C'est précisément ce que la tranche supprime : un pouce qui glissait
+    lançait une séance. La propriété gardée ne change pas — aucun gabarit ne
+    devient inaccessible — mais elle se vérifie ligne par ligne.
+    """
+    body = client.get("/library").text
+    slugs = ["push-a", "pull-a", "push-b", "pull-b", "legs-a", "liss-abs"]
+    for slug in slugs:
+        assert f"loadout=t-{slug}" in body, f"gabarit absent du registre : {slug}"
+
+    # Le registre fermé n'expose AUCUNE commande — c'est l'objet de la tranche.
+    assert "Démarrer" not in body
+
+    # Et chacun démarre depuis son propre dépli.
+    #
+    # ⚠ On compte le BOUTON (`>Démarrer<`), pas la chaîne : elle apparaît aussi
+    # dans le nom accessible (`aria-label="Démarrer <nom>"`), ce qui donne deux
+    # occurrences pour une seule commande. Compter la chaîne aurait fait dire à
+    # la garde qu'il y a deux commandes là où il n'y en a qu'une.
+    for slug in slugs:
+        open_body = client.get(f"/library?loadout=t-{slug}").text
+        assert f'value="{slug}"' in open_body, f"gabarit non démarrable : {slug}"
+        assert open_body.count(">Démarrer<") == 1
 
 
 # ---------------------------------------------------------------------------

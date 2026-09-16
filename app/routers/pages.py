@@ -628,39 +628,63 @@ def launcher(
 
 @router.get("/library", response_class=HTMLResponse)
 def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
-    """`UX4_02` / TRAIN 2 tranche B — le corpus commun, contextualisé.
+    """`UI-CP4 LOADOUT` — le registre typé des configurations d'entraînement.
 
-    `OPERATOR_DECISION` C8 : **aucun moteur de recommandation opaque, contexte
-    de plan explicite uniquement**. Concrètement, ici :
+    La question possédée : **avec quoi puis-je m'entraîner, quelle
+    configuration je choisis ?** Une seule destination y répond désormais — les
+    programmes de l'utilisateur et le catalogue commun, dans le même registre.
+    Ils étaient sur deux surfaces, dont l'une était à deux gestes derrière un
+    hamburger pendant que l'autre occupait un onglet primaire **sous son nom**.
 
-    * le corpus reste **commun et entier** — mêmes 13 gabarits, même ordre
-      d'affichage (`display_order`). Rien n'est classé, noté ni masqué par le
-      produit ;
-    * chaque gabarit dit **ce qu'il travaille**, fait résolu par l'autorité
-      canonique, et **ce que l'utilisateur en a déclaré**, rappel de sa propre
-      parole ;
-    * le seul filtrage est **demandé par l'utilisateur** (`?zone=`), explicite
-      dans l'URL, et toujours accompagné du moyen de revenir au corpus entier.
-      Un filtre qu'on choisit n'est pas une recommandation qu'on subit.
+    `OPERATOR_DECISION` C8 tient toujours, et rien ici ne l'entame : **aucun
+    moteur de recommandation opaque**. Le corpus reste commun et entier, dans
+    son ordre d'affichage ; rien n'est classé, noté ni masqué par le produit ;
+    le seul filtrage est **demandé** (`?zone=`), explicite dans l'URL, et le
+    retour au tout est toujours à un geste.
+
+    ⚠ `?loadout=` est un état de PRÉSENTATION, jamais de domaine : il dit quelle
+    ligne est dépliée, rien de plus. Aucune écriture, aucune persistance, aucune
+    notion de « configuration active » — le domaine n'en a pas, et en inventer
+    une ici serait créer une sémantique que rien ne soutient. Le patron est
+    celui qu'EXECUTION emploie déjà (`?active=`, `?rest=`), et il permet le
+    dépli **sans JavaScript**, ce que le socle SSR exige.
     """
+    from app.services.loadout import (
+        LoadoutGroup,
+        build_program_row,
+        build_session_row,
+        row_matches_zone,
+    )
     from app.services.muscle_mapping import RADAR_AXES, ZONE_LABELS
-    from app.services.template_zone_context import annotate_templates
+    from app.services.template_zone_context import priority_zones
     from app.services.training_preferences import get_training_preferences
+    from app.services.user_program_drafts import list_drafts
 
     all_templates = _load_templates(db)
     visible = [
         tpl for tpl in all_templates
         # archived: retired from the catalog. user: published custom programs
-        # (PUBLICATION_01) — owner-private, they live under "Mes programmes",
-        # never in the shared library.
+        # (PUBLICATION_01) — owner-private. Elles ne sont PAS des lignes de
+        # premier rang : elles vivent DANS leur programme, qui est leur
+        # composition réelle. Les rendre aussi en haut du registre les
+        # dupliquerait sans raison de décision (§10).
         if getattr(tpl, "catalog_section", "core") not in ("archived", "user")
     ]
 
     preferences = get_training_preferences(db, user.id)
-    zones_by_template = annotate_templates(
-        db, visible,
-        preferences.focus_priorities if preferences else None,
-    )
+    declared = priority_zones(preferences.focus_priorities if preferences else None)
+    seen: dict[str, str | None] = {}
+
+    all_programs = [build_program_row(db, p, declared, seen)
+                    for p in list_drafts(db, user.id)]
+    # La section de catalogue voyage AVEC la ligne : la retrouver plus tard en
+    # ré-indexant par clé serait une seconde source de vérité pour un fait que
+    # le gabarit porte déjà.
+    all_sessions = [
+        (getattr(tpl, "catalog_section", "core"),
+         build_session_row(db, tpl, declared, seen))
+        for tpl in visible
+    ]
 
     # Le filtre est une DEMANDE, pas une décision du produit. Une valeur hors
     # vocabulaire est ignorée plutôt que rendue : elle ne peut venir que d'une
@@ -668,41 +692,88 @@ def library(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
     # l'apparence d'une zone qui existe.
     requested = request.query_params.get("zone")
     active_zone = requested if requested in ZONE_LABELS else None
+    programs = all_programs
+    sessions = all_sessions
     if active_zone:
-        shown = [t for t in visible
-                 if any(z.code == active_zone
-                        for z in zones_by_template[t.id].zones)]
-    else:
-        shown = visible
+        programs = [p for p in programs if row_matches_zone(p, active_zone)]
+        sessions = [(s, r) for s, r in sessions if row_matches_zone(r, active_zone)]
 
-    grouped: dict[str, list] = {}
-    for tpl in shown:
-        grouped.setdefault(getattr(tpl, "catalog_section", "core"), []).append(tpl)
+    # ─── LE RANG DU REGISTRE (§3) ────────────────────────────────────────
+    #
+    # L'arbitrage demande de grouper par SÉMANTIQUE DE DÉCISION, pas par
+    # l'architecture de stockage, et de vérifier que le rang choisi n'est pas
+    # un réflexe. Trois axes candidats ont été confrontés aux données réelles :
+    #
+    #   * TYPE — programme / séance ;
+    #   * PROVENANCE — à moi / catalogue ;
+    #   * EXÉCUTABLE MAINTENANT — démarrable / non démarrable.
+    #
+    # ⚠ Sur le domaine actuel, les trois axes **coïncident** : tout programme
+    # appartient à l'utilisateur, tout gabarit du catalogue est commun, et un
+    # programme n'est jamais directement démarrable là où une séance l'est
+    # toujours. Ce n'est donc pas un arbitrage entre trois rangs, c'est un seul
+    # rang que trois raisons justifient — et il faut le dire ainsi plutôt que
+    # de prétendre avoir tranché.
+    #
+    # Les trois sections du catalogue survivent : `core` / `utility` /
+    # `specialization` sont une sémantique de décision réelle et déjà en base.
+    # Les effacer aurait été une soustraction sans remplacement (`§5.3`).
+    by_section: dict[str, list] = {}
+    for section, row in sessions:
+        by_section.setdefault(section, []).append(row)
 
-    # Une zone ne s'offre au filtrage que si un gabarit la travaille — proposer
-    # un filtre qui ne peut rien rendre est une impasse construite exprès.
+    # ⚠ LE RANG « MES PROGRAMMES » SURVIT À SON PROPRE VIDE, et ce n'est pas
+    # cosmétique. L'entrée de coque « Mes programmes » disparaît avec cette
+    # tranche ; si le rang s'effaçait faute de programme, **créer un programme
+    # deviendrait inatteignable** pour exactement l'utilisateur qui en a le plus
+    # besoin — celui qui n'en a aucun. Une soustraction sans son remplacement
+    # (`CLAUDE.md §5.3`), et la plus vicieuse : invisible sur un compte peuplé.
+    #
+    # Sous filtre de zone, il s'efface en revanche comme les autres : « aucun
+    # programme ne travaille cette zone » est une réponse au filtre, et y
+    # afficher « aucun programme personnel » mentirait sur la cause du vide.
+    groups = [LoadoutGroup(key, label, tuple(by_section.get(key, ())))
+              for key, label in CATALOG_SECTIONS]
+    groups = [g for g in groups if g]
+    program_group = LoadoutGroup("programs", "Mes programmes", tuple(programs))
+    if program_group or not active_zone:
+        groups.insert(0, program_group)
+
+    # Une zone ne s'offre au filtrage que si une configuration la travaille —
+    # proposer un filtre qui ne peut rien rendre est une impasse construite
+    # exprès. Calculé sur le corpus ENTIER, jamais sur le corpus déjà filtré :
+    # sinon choisir une zone effacerait toutes les autres puces.
     filterable = [
         (code, ZONE_LABELS[code])
         for code in ZONE_LABELS
-        if any(z.code == code for tz in zones_by_template.values()
-               for z in tz.zones)
+        if any(row_matches_zone(r, code) for r in all_programs)
+        or any(row_matches_zone(r, code) for _, r in all_sessions)
     ]
+
+    shown_rows = [r for g in groups for r in g.rows]
+    requested_key = request.query_params.get("loadout")
+    open_key = requested_key if any(
+        r.key == requested_key or (r.is_program and requested_key
+                                   and requested_key.startswith(r.key + "-s"))
+        for r in shown_rows
+    ) else None
 
     return templates.TemplateResponse(
         request,
         "library.html",
         {
-            # `OPERATOR_DECISION` NAMING — enfant « Explorer » du domaine
-            # « Programmes ». Voir le commentaire de `library.html`.
-            "page_title": "Explorer",
-            "sections": CATALOG_SECTIONS,
-            "grouped": grouped,
-            "zones_by_template": zones_by_template,
+            # ⚠ Le titre d'ONGLET aussi. Laissé à « Explorer », il faisait
+            # passer une garde de nommage pour la bonne raison apparente — la
+            # chaîne était bien dans la page, dans le `<title>` — alors que la
+            # surface ne s'appelait plus ainsi nulle part à l'écran.
+            "page_title": "Programmes",
+            "groups": groups,
+            "open_key": open_key,
             "filterable_zones": filterable,
             "active_zone": active_zone,
             "active_zone_label": ZONE_LABELS.get(active_zone or ""),
-            "shown_count": len(shown),
-            "total_count": len(visible),
+            "shown_count": len(shown_rows),
+            "total_count": len(all_programs) + len(all_sessions),
             # Les axes DÉCLARÉS, dans l'ordre où l'utilisateur les a posés —
             # c'est un rang qu'il a choisi, le réordonner effacerait son
             # intention.

@@ -26,25 +26,40 @@ def _render(client, path):
 # ───────── 1. /library — enriched lede, preserved contract ─────────
 
 
-def test_library_title_and_enriched_lede(client):
+def test_library_title_and_lede(client):
+    """`UI-CP4 LOADOUT` — LE LEDE CHANGE PARCE QUE LA PAGE A CHANGÉ.
+
+    « Catalogue complet des séances, classées par usage » décrivait exactement
+    ce que la surface était : un catalogue. Elle contient désormais AUSSI les
+    programmes de l'utilisateur, et garder l'ancienne phrase reviendrait à
+    annoncer la moitié de la page. Le titre « Explorer » tombe pour la même
+    raison — la page absorbe « Mes programmes » et porte le nom du domaine.
+
+    Le vocabulaire INTERDIT, lui, ne bouge pas : c'est une décision de produit,
+    pas une description de contenu.
+    """
     html = _render(client, "/library")
-    # `OPERATOR_DECISION` NAMING — l'enfant s'appelle « Explorer », le domaine
-    # « Programmes ». L'ancien titre confondait les deux.
-    assert "Explorer" in html                      # titre décidé
+    assert "Programmes" in html
+    assert "catalogue complet" in html.lower()
+    assert "Tes programmes" in html
     assert "Programmes de séance" not in html      # l'ancien ne subsiste pas
-    assert "Catalogue complet" in html             # substring preserved (asserted)
-    assert "classées par usage" in html            # new enriched part
-    assert "Bibliothèque" not in html              # forbidden vocab (asserted)
+    assert "Bibliothèque" not in html              # vocabulaire interdit (asserted)
 
 
 def test_library_keeps_start_form_and_creation_source(client):
-    html = _render(client, "/library")
+    """Le contrat de démarrage survit — dans le DÉPLI, pas sur la page fermée.
+
+    Une ligne sélectionne et ne démarre pas : écrire cette garde sur la page
+    fermée la rendrait rouge pour la bonne raison, puis verte pour la mauvaise
+    si on la « réparait » en remettant treize boutons.
+    """
+    html = _render(client, "/library?loadout=t-push-a")
     assert 'name="template_slug"' in html
     assert 'name="creation_source"' in html
     assert 'value="library"' in html
     assert "Démarrer" in html
-    # link to template detail preserved
-    assert "template_detail" in html or "/library/" in html or "slug=" in html
+    # le chemin vers le détail du gabarit reste atteignable
+    assert "/library/" in html
 
 
 # ───────── 2. /launcher — explicit step ledes, preserved flow ─────────
@@ -138,7 +153,11 @@ def test_creation_source_hidden_inputs_intact():
     lau = LAUNCHER_TPL.read_text(encoding="utf-8")
     assert 'name="creation_source" value="library"' in lib
     assert 'name="creation_source" value="launcher"' in lau
-    assert "create_session" in lib and "create_session" in lau
+    # Deux assertions plutôt qu'une conjonction : laquelle des deux surfaces a
+    # perdu son contrat est l'information utile, et `python:S9073` pèse 15 à
+    # lui seul — assez pour faire rougir un gate à lui tout seul.
+    assert "create_session" in lib
+    assert "create_session" in lau
     assert "next_session_reco" in lau
 
 

@@ -1,35 +1,65 @@
 {% extends "base.html" %}
+{% from "user_programs/_status.html" import status_label %}
+
+{# `UI-CP4 LOADOUT` — LE REGISTRE TYPÉ.
+
+   La question possédée : « avec quoi puis-je m'entraîner, quelle configuration
+   je choisis ? » Une seule destination y répond — mes programmes ET le
+   catalogue, dans le même registre.
+
+   `OPERATOR_DECISION` NAMING, CONSÉQUENCE. La page s'appelait « Explorer »,
+   enfant du domaine « Programmes ». Elle absorbe « Mes programmes » ; elle EST
+   désormais le domaine, et porte son nom. Le défaut que l'ancien nom évitait —
+   trois niveaux pour le même mot — ne revient pas : les rangs disent « Mes
+   programmes » et « Séances ... », jamais « Programmes » une seconde fois.
+
+   CE QUI N'EST PAS UNE CARTE, ET POURQUOI. Treize cartes à bord ambre, chacune
+   avec son bouton imbriqué, répondaient à « voici des objets » quand la
+   question est « lequel je choisis ». On ne compare pas des rectangles, on
+   compare des lignes. Une ligne SÉLECTIONNE ; elle ne démarre pas. #}
+
+{# LES TROIS ABSENCES NE SE CONFONDENT PAS (§7 de l'arbitrage).
+
+   Avant CP4 elles rendaient toutes le même vide : une séance cardio sans
+   exercice, une séance dont aucune zone n'intéresse l'utilisateur, et une
+   séance aux exercices non reconnus se ressemblaient parfaitement.
+
+   ⚠ `KNOWN / INFERRED / UNKNOWN` est une grammaire de PREUVE, pas un
+   remplaçant des états de domaine. Deux de ces trois états sont parfaitement
+   CONNUS — c'est la correction que l'opérateur a portée sur ma proposition.
+
+   « Aucune priorité » ne s'écrit nulle part : les zones sont rendues, sans
+   marque, et leur présence dit l'absence mieux qu'une phrase. L'écrire en
+   ferait un reproche (`A4`).
+
+   ⚠ La macro est déclarée AVANT le bloc qui l'emploie. Dans un gabarit qui en
+   étend un autre, l'ordre du module n'est pas celui du rendu, et une macro
+   déclarée plus bas est un pari sur l'implémentation. #}
+{% macro zone_evidence(row) %}
+  {% if row.zones.state == 'MAPPED' %}
+    <ul class="loadout__zones">
+      {% for z in row.zones.zones %}
+        <li class="loadout__zone{% if z.is_declared %} is-declared{% endif %}">
+          {{ z.label }}{% if z.is_declared %}<span class="sr-only"> — ta priorité déclarée : {{ z.declared_as }}</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% elif row.zones.state == 'NO_ZONES_DEFINED' %}
+    <p class="loadout__note">Aucune zone prescrite — cette séance ne cible aucun groupe musculaire cartographié.</p>
+  {% else %}
+    <p class="loadout__note loadout__note--unknown">Zones non cartographiées — les exercices de cette séance ne sont pas reconnus par le référentiel.</p>
+  {% endif %}
+{% endmacro %}
+
 {% block content %}
-{# `OPERATOR_DECISION` NAMING — le domaine s'appelle **Programmes** ; cette
-   surface est l'un de ses trois enfants et s'appelle **Explorer**.
-   « Programmes de séance » confondait les deux : l'onglet du domaine menait à
-   une page portant presque le nom du domaine, et « Explorer » n'existait
-   comme mot nulle part dans l'interface.
+<h1 class="page-title">Programmes</h1>
+<p class="lede">Tes programmes et le catalogue complet des séances.</p>
 
-   En français, pas « Explore » : l'ordre est explicite. #}
-<h1 class="page-title">Explorer</h1>
-{# Sx_UI_07.3 — lede enrichi (additif). Conserve la sous-chaîne « Catalogue
-   complet » (test asservi) ; aucune section, carte, form POST ni
-   creation_source touché. #}
-<p class="lede">Catalogue complet des séances disponibles, classées par usage.</p>
-
-{# `UX4_02` / TRAIN 2 tranche B — FILTRE DEMANDÉ, JAMAIS SUBI.
-
-   Le corpus reste commun et entier ; c'est l'utilisateur qui restreint, par
-   une URL explicite, et le retour au tout est toujours à un geste. Un filtre
-   qu'on choisit n'est pas une recommandation qu'on subit (`OPERATOR_DECISION`
-   C8 : aucun moteur opaque).
-
-   Les zones proposées sont celles qu'au moins un gabarit travaille — offrir un
-   filtre qui ne peut rien rendre serait une impasse construite exprès. #}
-{# ⚠ LES PUCES SONT REPLIÉES, ET C'EST UNE MESURE, PAS UN GOÛT. Déployées, les
-   douze puces occupaient SIX rangs — près d'un écran entier de 390 px avant le
-   premier gabarit. Un outil de tri qui repousse hors de vue ce qu'il sert à
-   trier coûte plus qu'il ne rend. Vu au rendu ; les chiffres seuls disaient
-   « +1 écran » sans dire d'où.
-
-   Le repli s'OUVRE quand un filtre est actif : replier l'état courant
-   laisserait un catalogue amputé sans dire pourquoi. #}
+{# LE FILTRE EST DEMANDÉ, JAMAIS SUBI (`OPERATOR_DECISION` C8 : aucun moteur
+   opaque). Les puces restent repliées, et c'est une mesure : déployées, elles
+   occupaient six rangs avant la première configuration. Le repli s'ouvre quand
+   un filtre est actif — replier l'état courant laisserait un registre amputé
+   sans dire pourquoi. #}
 <details class="zone-filter"{% if active_zone %} open{% endif %}>
   <summary class="zone-filter__summary">
     Filtrer par zone
@@ -49,169 +79,181 @@
 
 {% if active_zone %}
   <p class="zone-filter__state">
-    {{ shown_count }} séance{{ 's' if shown_count > 1 }} sur {{ total_count }}
+    {{ shown_count }} {{ "configuration" | pluriel(shown_count) }} sur {{ total_count }}
     travaille{{ 'nt' if shown_count > 1 }} <b>{{ active_zone_label }}</b>
   </p>
 {% endif %}
 
 {# La marque des priorités s'explique UNE FOIS, ici, et nomme les axes tels que
-   l'utilisateur les a déclarés. Répéter l'explication sur chaque carte
-   reviendrait à poser un badge sur plus de la moitié du corpus — ce qui n'est
-   plus un signal. Sans déclaration, cette ligne n'existe pas : elle
-   n'annoncerait qu'un vide. #}
+   l'utilisateur les a déclarés. Sans déclaration, cette ligne n'existe pas :
+   elle n'annoncerait qu'un vide. #}
 {% if declared_axes %}
   <p class="zone-filter__legend">
     Tes priorités déclarées — <b>{{ declared_axes | join(', ') }}</b> —
-    sont marquées sur les séances qui les travaillent.
+    sont marquées sur les configurations qui les travaillent.
     <a class="inline-target" href="{{ url_for('user_plan') }}">Modifier</a>
   </p>
 {% endif %}
 
-{% for section_key, section_label in sections %}
-  {% if section_key in grouped %}
-  <section class="library-section">
-    <h2 class="section-header">{{ section_label }}</h2>
-    <ul class="template-list">
-      {% for tpl in grouped[section_key] %}
-        {# Sx_LIB_01 — semantic cleanup : le <form> de démarrage était imbriqué
-           DANS le lien <a> (HTML invalide → hacks stopPropagation). On sort le
-           form comme frère du lien dans le <li> : structure valide, plus de JS
-           inline, comportement inchangé (lien détail + POST create_session). #}
-        <li class="template-card template-card--{{ tpl.kind }}">
-          <a class="template-card__link" href="{{ url_for('template_detail', slug=tpl.slug) }}">
-            {# `Sb_UI_BIBLIO_01` — LA NATURE PASSE AU-DESSUS DU NOM.
-               Elle flottait à droite, dans une rangée flex partagée avec le
-               titre. Or les titres passent à la ligne — « Push A — Pecs
-               épaisseur + Delts + Triceps » en occupe deux — et l'étiquette
-               atterrissait ENTRE les deux lignes, ni en haut ni en bas.
-               Vu au rendu ; le gabarit, lui, avait l'air correct.
+{# L'URL de base du registre : elle emporte le filtre en cours, pour que
+   déplier une ligne n'efface pas la zone demandée. #}
+{% set base = url_for('library') %}
+{% set keep = 'zone=' ~ active_zone ~ '&' if active_zone else '' %}
+{% set close_href = base ~ ('?zone=' ~ active_zone if active_zone else '') %}
 
-               Elle devient une étiquette de tête, sur sa propre ligne. Ordre
-               DOM changé plutôt qu'un `order:` CSS : ce qui se lit en premier
-               doit venir en premier dans le document, pour la voix comme pour
-               l'œil. #}
-            <div class="template-card__row">
-              {# `{{ tpl.kind|upper }}` remontait la valeur BRUTE de la base à
-                 l'écran : `strength` devenait « STRENGTH », un anglicisme au
-                 milieu d'une interface française — treize fois sur cette
-                 seule page. `cardio` passait en français par hasard, ce qui
-                 rendait le défaut d'autant plus discret.
+{% for group in groups %}
+  <section class="loadout-group">
+    <h2 class="section-header">{{ group.label }}</h2>
+    {% if group.key == 'programs' %}
+      {# CRÉER RESTE ATTEIGNABLE DEPUIS LE REGISTRE. L'entrée de coque « Mes
+         programmes » part avec cette tranche ; sans ce lien, l'utilisateur qui
+         n'a aucun programme n'aurait plus aucun chemin pour en créer un. #}
+      {% if not group.rows %}
+        <p class="empty-line">Aucun programme personnel</p>
+      {% endif %}
+      <p class="loadout__exit">
+        <a class="inline-target" href="{{ url_for('user_program_new') }}">Créer un programme</a>
+      </p>
+    {% endif %}
+    <ul class="loadout">
+      {% for row in group.rows %}
+        {% set is_open = open_key == row.key or (row.is_program and open_key and open_key.startswith(row.key ~ '-s')) %}
+        <li class="loadout__row{% if is_open %} is-open{% endif %}">
 
-                 La donnée n'est PAS touchée : `kind` reste `strength` en base,
-                 c'est un identifiant technique. Seul l'affichage est traduit,
-                 et le repli rend la valeur brute plutôt que de la taire — une
-                 étiquette manquante serait pire qu'une étiquette anglaise. #}
-              {% set _kinds = {'strength': 'FORCE', 'cardio': 'CARDIO'} %}
-              <span class="template-card__kind">{{ _kinds.get(tpl.kind, tpl.kind|upper) }}</span>
-              <span class="template-card__name">{{ tpl.name }}</span>
-            </div>
-            {# ⚠ LA LIGNE `focus` NE S'AFFICHE QUE FAUTE DE MIEUX, et ce n'est
-               pas un retrait déguisé (`§5.3`) — c'est une SUBSTITUTION dans la
-               même livraison, décidée en regardant l'écran.
+          {# LA POIGNÉE — elle sélectionne, elle n'exécute pas.
+             Le geste supplémentaire avant de démarrer est ASSUMÉ : il est le
+             prix de l'interdiction du démarrage accidentel. Aujourd'hui un
+             pouce qui glisse sur « Démarrer » lance une séance. #}
+          {# ⚠ `aria-current`, PAS `aria-expanded`. La poignée est un lien qui
+             NAVIGUE : la page se recharge avec la ligne ouverte. `aria-expanded`
+             promet un dépli sur place qui n'a pas lieu — il ferait attendre à
+             une synthèse vocale un comportement que le socle SSR ne produit pas.
 
-               Rendues côte à côte, les deux lignes disaient deux fois la même
-               chose en deux vocabulaires : Push A affichait « Pectoraux,
-               Deltoïdes, Triceps » (texte libre saisi à la main) puis
-               « Pectoraux · Deltoïdes latéraux · Deltoïdes postérieurs ·
-               Triceps » (fait résolu par le référentiel). La seconde est plus
-               précise, porte la marque des priorités déclarées et partage le
-               vocabulaire du filtre ; la première ne peut rien de tout cela.
+             `aria-current="true"` dit la vérité : « c'est l'élément courant de
+             cet ensemble ». C'est le mot qu'emploient déjà les puces de filtre
+             juste au-dessus, et il ne collisionne pas avec l'`aria-current="page"`
+             de la navigation primaire, que sa garde compte séparément.
 
-               `focus` reste la seule source pour les gabarits SANS zone
-               résolue — le LISS pur n'a aucun exercice — et il reste intact
-               sur la page de détail, où il est un texte éditorial et non un
-               doublon. #}
-            {% if not zones_by_template.get(tpl.id) %}
-              <div class="template-card__focus">{{ tpl.focus }}</div>
-            {% endif %}
-            {% if tpl.kind == 'cardio' and tpl.cardio_note %}
-              <div class="template-card__cardio">{{ tpl.cardio_note }}</div>
-            {% endif %}
-            {% if tpl.suggested_label %}
-              <div class="template-card__hint">{{ tpl.suggested_label }}</div>
-            {% endif %}
-            {# CE QUE LE GABARIT TRAVAILLE — un FAIT, résolu par l'autorité
-               canonique (`ExerciseMuscleMapping`), pas une paraphrase du champ
-               `focus`, qui est du texte libre et ne dit pas la même chose.
-
-               Une zone DÉCLARÉE en priorité est marquée sur place plutôt que
-               par un badge à part : sur le corpus réel, plus de la moitié des
-               gabarits en portent une, et un badge sur sept cartes sur treize
-               n'est plus un signal. Le rappel nomme l'axe que l'utilisateur a
-               déclaré (« Bras »), pas la zone (« Biceps ») — lui renvoyer un
-               mot qu'il n'a pas employé serait lui prêter sa déclaration.
-
-               Rien si le gabarit ne résout aucune zone (le LISS pur n'a aucun
-               exercice) : pas de ligne vide, pas de « aucune zone » (A4). #}
-            {# `Sb_UI_BIBLIO_01` — SEULES LES ZONES DÉCLARÉES SUBSISTENT.
-
-               Les quatre pastilles d'une carte redisaient très largement son
-               titre : « Pecs épaisseur + Delts + Triceps » face à
-               « Pectoraux · Deltoïdes latéraux · Deltoïdes postérieurs ·
-               Triceps ». Trois grises pour une ambre — le signal se noyait
-               dans sa propre redite.
-
-               Ce qu'elles ajoutent VRAIMENT au titre, c'est la correspondance
-               avec une priorité déclarée. Mesuré sur deux priorités : 10
-               pastilles marquées sur 40, sur 7 cartes sur 13. En n'affichant
-               que celles-là, le signal cesse d'être noyé et devient l'unique
-               objet coloré de la carte.
-
-               ⚠ Les 6 cartes sans correspondance perdent la ligne entière, et
-               c'est voulu : une carte sans correspondance n'est pas mauvaise,
-               c'est une carte dont on n'a rien de personnalisé à dire. Écrire
-               « aucune priorité » en ferait un reproche (`A4`).
-
-               Sans aucune priorité déclarée ET sans filtre, aucune carte ne
-               porte de pastille : elle n'apparaît que lorsqu'elle veut dire
-               quelque chose.
-
-               ⚠ LA ZONE FILTRÉE RESTE, ET C'EST UNE GARDE QUI ME L'A APPRIS.
-               Ma première écriture n'affichait QUE les zones déclarées. Elle a
-               fait tomber
-               `test_every_template_kept_by_the_filter_really_works_that_zone`,
-               dont le commentaire dit exactement le défaut : « un filtre qui
-               garde un gabarit sans la zone demandée ment deux fois ». En
-               filtrant sur « Dos largeur », huit cartes restaient et aucune ne
-               disait pourquoi. Le filtre doit se justifier sur chaque carte
-               qu'il garde. #}
-            {% set tz = zones_by_template.get(tpl.id) %}
-            {% set marquees = tz.shown(active_zone) if tz else [] %}
-            {% if marquees %}
-              <ul class="template-card__zones">
-                {% for z in marquees %}
-                  <li class="template-card__zone{% if z.is_declared %} is-declared{% endif %}">
-                    {{ z.label }}{% if z.is_declared %}<span class="sr-only"> — ta priorité déclarée : {{ z.declared_as }}</span>{% endif %}
-                  </li>
-                {% endfor %}
-              </ul>
-            {% endif %}
+             Les lignes non sélectionnées n'en portent AUCUN — jamais « false »,
+             convention du dépôt. #}
+          <a class="loadout__handle"
+             href="{% if is_open %}{{ close_href }}{% else %}{{ base }}?{{ keep }}loadout={{ row.key }}{% endif %}"
+             {% if is_open %}aria-current="true"{% endif %}>
+            {# LE NOM VIENT EN PREMIER, dans le document comme à l'œil : c'est
+               l'identité, et c'est ce qu'un lecteur d'écran doit annoncer avant
+               toute étiquette de genre. #}
+            <span class="loadout__name">{{ row.name }}</span>
+            <span class="loadout__line">
+              {% if row.is_program %}
+                <span class="loadout__type">PROGRAMME</span>
+                <span class="loadout__status">{{ status_label(row.status) }}</span>
+              {% else %}
+                {# La valeur brute de la base ne remonte pas à l'écran :
+                   `strength` deviendrait « STRENGTH », un anglicisme au milieu
+                   d'une interface française. Le repli rend la valeur brute
+                   plutôt que de la taire. #}
+                {% set kinds = {'strength': 'FORCE', 'cardio': 'CARDIO'} %}
+                <span class="loadout__type">{{ kinds.get(row.kind, row.kind|upper) }}</span>
+              {% endif %}
+              {# LA CHARGE — le seul discriminant que le nom ne porte pas.
+                 Mesuré sur le catalogue réel : « Legs A » et « Legs B » ont
+                 rigoureusement les mêmes quatre zones, « Push A » et « Push B »
+                 aussi. Les zones ne les séparent pas ; le volume va de 0 à 24
+                 séries et n'était affiché nulle part. #}
+              <span class="loadout__shape">{{ row.load_shape }}</span>
+              {# LE FILTRE SE JUSTIFIE SUR CHAQUE LIGNE QU'IL GARDE.
+                 Les zones vivent au dépli — sauf celle qu'on filtre. Sans elle,
+                 un registre filtré garderait huit lignes sans dire pourquoi, et
+                 la garde `test_every_row_kept_by_the_filter_says_why` le
+                 formule mieux : un filtre qui garde une configuration sans la
+                 zone demandée ment deux fois. #}
+              {% if active_zone %}
+                <span class="loadout__zone is-filtered">{{ active_zone_label }}</span>
+              {% endif %}
+            </span>
           </a>
-          <form
-            method="post"
-            action="{{ url_for('create_session') }}"
-            class="template-card__start"
-          >
-            <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
-            {# Sb_13 telemetry: library CTA. #}
-            <input type="hidden" name="creation_source" value="library" />
-            {# `UIV3_TARGETS_44_01` — `btn--sm` retiré. C'est la variante des
-               actions RARES et denses ; « Démarrer » est l'action principale
-               de cette surface, répétée une fois par gabarit. Mesurée à
-               26,8 px de haut, catégorie `FREQUENT_SEQUENTIAL`. #}
-            {# `Sb_UI_BIBLIO_01` — LE NOM ACCESSIBLE NOMME CE QU'ON DÉMARRE.
-               Mesuré : `Counter({'Démarrer': 13})`. En navigation par liste de
-               boutons — ce que fait un lecteur d'écran — treize entrées
-               identiques, et le contexte de la carte ne voyage pas avec elles.
-               Le libellé VISIBLE ne change pas : c'est le nom accessible qu'on
-               complète, pas la colonne qu'on allonge. #}
-            <button type="submit" class="btn btn--ghost"
-                    aria-label="Démarrer {{ tpl.name }}">Démarrer</button>
-          </form>
+
+          {% if is_open %}
+            <div class="loadout__open">
+              {% if row.is_program %}
+                {# UN PROGRAMME N'A PAS DE DÉMARRAGE, et ce n'est pas un oubli :
+                   le domaine n'en expose aucun. On démarre UNE de ses séances.
+                   Lui inventer une commande unique serait promettre une
+                   exécution que rien derrière ne sait honorer. #}
+                {% if row.sessions %}
+                  <p class="loadout__lead">
+                    {% if row.startable %}Choisis la séance à démarrer.
+                    {% else %}Composition du programme. Aucune séance n'est encore démarrable.{% endif %}
+                  </p>
+                  <ul class="loadout loadout--nested">
+                    {% for seance in row.sessions %}
+                      {% set seance_open = open_key == seance.key %}
+                      <li class="loadout__row{% if seance_open %} is-open{% endif %}">
+                        <a class="loadout__handle"
+                           href="{% if seance_open %}{{ base }}?{{ keep }}loadout={{ row.key }}{% else %}{{ base }}?{{ keep }}loadout={{ seance.key }}{% endif %}"
+                           {% if seance_open %}aria-current="true"{% endif %}>
+                          <span class="loadout__name">{{ seance.name }}</span>
+                          <span class="loadout__line">
+                            <span class="loadout__shape">{{ seance.load_shape }}</span>
+                          </span>
+                        </a>
+                        {% if seance_open %}
+                          <div class="loadout__open">
+                            {{ zone_evidence(seance) }}
+                            {% if seance.is_startable %}
+                              <form method="post"
+                                    action="{{ url_for('user_program_start_session', program_id=seance.program_id, session_id=seance.session_id) }}"
+                                    class="loadout__command">
+                                <button type="submit" class="btn loadout__go"
+                                        aria-label="Démarrer {{ seance.name }}">Démarrer</button>
+                              </form>
+                            {% else %}
+                              {# AUCUNE COMMANDE, ET LA RAISON PLUTÔT QU'UN VIDE.
+                                 Une séance non matérialisée n'est pas un défaut
+                                 du programme : c'est son état, et le dire évite
+                                 de laisser croire à une panne. #}
+                              <p class="loadout__note">
+                                Cette séance sera démarrable une fois le programme publié.
+                              </p>
+                            {% endif %}
+                          </div>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+
+                <p class="loadout__exit">
+                  {# L'aplat ambre revient au programme SEULEMENT quand aucune
+                     de ses séances ne peut le porter : un écran garde un
+                     propriétaire d'action dominant, jamais deux. #}
+                  <a class="{{ 'inline-target' if row.startable else 'btn loadout__go' }}"
+                     href="{{ url_for('user_program_detail', program_id=row.program_id) }}">
+                    Ouvrir le programme</a>
+                </p>
+
+              {% else %}
+                {{ zone_evidence(row) }}
+                <p class="loadout__exit">
+                  <a class="inline-target" href="{{ url_for('template_detail', slug=row.slug) }}">Voir le détail</a>
+                </p>
+                <form method="post" action="{{ url_for('create_session') }}" class="loadout__command">
+                  <input type="hidden" name="template_slug" value="{{ row.slug }}" />
+                  {# Sb_13 telemetry: library CTA — contrat inchangé. #}
+                  <input type="hidden" name="creation_source" value="library" />
+                  {# Le nom accessible nomme CE QU'ON DÉMARRE. En navigation par
+                     liste de boutons, treize entrées « Démarrer » identiques ne
+                     disent rien, et le contexte de la ligne ne voyage pas avec
+                     elles. Le libellé VISIBLE ne change pas. #}
+                  <button type="submit" class="btn loadout__go"
+                          aria-label="Démarrer {{ row.name }}">Démarrer</button>
+                </form>
+              {% endif %}
+            </div>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>
   </section>
-  {% endif %}
 {% endfor %}
 {% endblock %}

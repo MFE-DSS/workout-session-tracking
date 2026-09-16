@@ -49,31 +49,60 @@ def _executable(src: str) -> str:
     return "\n".join(line.split("#", 1)[0] for line in body.splitlines())
 
 
-def _cards(html: str) -> list[str]:
-    """Une carte = du marqueur d'ouverture au marqueur suivant.
+def _keys(html: str) -> list[str]:
+    """Clés de ligne du registre, dans l'ORDRE DE RENDU.
 
-    ⚠ PAS une expression jusqu'au premier `</li>`. Les zones sont rendues dans
-    une liste IMBRIQUÉE : une telle expression coupait la carte avant ses
-    zones, et deux gardes passaient alors pour la mauvaise raison — l'une
-    constatait l'absence du texte libre dans un fragment tronqué avant lui.
-    Trouvé parce qu'une troisième garde, elle, a échoué.
+    ⚠ MIGRÉE PAR `UI-CP4 LOADOUT`. L'ancienne écriture relevait les `href` vers
+    `/library/<slug>` — le lien de détail de la carte. Il n'y a plus de carte,
+    et le lien de détail ne vit plus que dans le dépli : relever cela sur un
+    registre fermé aurait rendu une liste vide, et trois gardes auraient
+    constaté « rien n'a changé » en ne mesurant rien.
+
+    L'identité d'une ligne est sa CLÉ DE DÉPLI. C'est la seule chose que la
+    ligne porte toujours, ouverte comme fermée.
     """
-    # ⚠ Le marqueur inclut la variante de type. `<li class="template-card`
-    # seul attrapait AUSSI les `template-card__zone` — les éléments de zone que
-    # cette tranche vient d'ajouter — et découpait des fragments qui n'étaient
-    # pas des cartes. Un préfixe de classe n'est pas un sélecteur.
-    marker = '<li class="template-card template-card--'
-    end = "</form>"
-    out = []
-    for part in html.split(marker)[1:]:
-        assert end in part, "carte sans formulaire de démarrage — borne caduque"
-        out.append(marker + part.split(end, 1)[0] + end)
-    return out
+    # ⚠ PAS `[?&]loadout=`. Sous filtre, l'URL porte `?zone=...&loadout=...`, et
+    # Jinja échappe l'esperluette en `&amp;` — la classe de caractères voyait
+    # alors « ; » et ne matchait plus rien. Le registre filtré paraissait vide
+    # alors qu'il rendait ses lignes : la garde accusait le produit de son
+    # propre défaut d'écriture.
+    return re.findall(r"loadout=([a-z0-9-]+)\"", html)
 
 
 def _slugs(html: str) -> list[str]:
-    """Slugs dans l'ORDRE DE RENDU — l'ordre est ce qu'on garde."""
-    return re.findall(r'href="[^"]*/library/([a-z0-9-]+)"', html)
+    """Slugs de CATALOGUE dans l'ordre de rendu.
+
+    Le registre contient deux types de ligne ; le préfixe les sépare
+    (`app.services.loadout.session_key` / `program_key`).
+    """
+    return [k[2:] for k in _keys(html) if k.startswith("t-")]
+
+
+def _disclosure(client, key: str) -> str:
+    """Le DÉPLI d'une ligne — là où vivent désormais zones et commande.
+
+    Une garde de contenu écrite sur le registre fermé serait verte par vacuité :
+    elle observerait un écran qui, par conception, ne contient pas ce qu'elle
+    prétend vérifier.
+
+    ⚠ LA BORNE N'EST PAS `</li>`, et ce fichier avait déjà écrit pourquoi à
+    propos des cartes : les zones sont rendues dans une liste IMBRIQUÉE, donc
+    le premier `</li>` rencontré ferme une ZONE, pas le dépli. Borné ainsi, le
+    fragment s'arrêtait après la première pastille et trois gardes accusaient
+    le produit de ne pas marquer ce qu'il marquait. J'ai reproduit le défaut que
+    ce fichier documentait.
+
+    La borne est la POIGNÉE SUIVANTE : un dépli finit là où la ligne d'après
+    commence. Vrai pour une ligne de catalogue ; un dépli de programme, lui,
+    contient des poignées imbriquées et demanderait une autre borne.
+    """
+    body = client.get(f"{LIBRARY_URL}?loadout={key}").text
+    assert 'class="loadout__open"' in body, f"la ligne « {key} » ne s'est pas dépliée"
+    after = body.split('class="loadout__open"', 1)[1]
+    assert 'class="loadout__handle"' in after, (
+        f"« {key} » est la dernière ligne : la borne ne tiendrait pas"
+    )
+    return after.split('class="loadout__handle"', 1)[0]
 
 
 def _declare(uid, **kw):
@@ -172,47 +201,48 @@ def test_every_rendered_zone_label_is_canonical(client):
     from app.services.muscle_mapping import ZONE_LABELS
 
     _declare(_uid(), sessions_per_week=4, focus_priorities=[AXIS])
-    body = client.get(LIBRARY_URL).text
+    open_push = _disclosure(client, "t-push-a")
     rendered = re.findall(
-        r'<li class="template-card__zone[^"]*">\s*([^<]+?)\s*(?:<|$)', body)
+        r'<li class="loadout__zone[^"]*">\s*([^<]+?)\s*(?:<|$)', open_push)
     assert rendered, "aucune zone rendue — la garde ne mesurerait rien"
     unknown = sorted(set(rendered) - set(ZONE_LABELS.values()))
     assert not unknown, f"zones hors vocabulaire canonique : {unknown}"
 
 
-def test_a_template_without_resolvable_zones_renders_no_empty_list(client):
-    """Le LISS pur n'a aucun exercice. Doctrine A4 : pas de module vide, pas de
-    « aucune zone ». Il garde son texte libre, qui est tout ce qu'il a."""
-    body = client.get(LIBRARY_URL).text
-    assert '<ul class="template-card__zones">\n              </ul>' not in body
-    liss = [c for c in _cards(body) if "liss-only" in c]
-    assert len(liss) == 1, "le gabarit témoin a disparu du catalogue"
-    assert "template-card__zones" not in liss[0]
-    assert "Cardio faible intensite" in liss[0], (
-        "sans zones ET sans texte libre, la carte ne dit plus rien"
-    )
+def test_a_template_without_resolvable_zones_says_so_rather_than_nothing(client):
+    """LE LISS PUR N'A AUCUN EXERCICE — ET LE PRODUIT LE SAIT.
+
+    ⚠ RETOURNÉE PAR `UI-CP4 LOADOUT §7`, et c'est un changement de doctrine
+    assumé. L'ancienne garde exigeait qu'il ne soit **rien** rendu : pas de
+    module vide, pas de « aucune zone » (A4). Mais rendre le même vide pour
+    « aucun exercice » et pour « des exercices qu'on ne reconnaît pas »
+    confondait une CONNAISSANCE avec un TROU.
+
+    La doctrine A4 interdit le module vide et le reproche ; elle n'a jamais
+    demandé de taire un fait. Ce que le produit sait, il le dit.
+    """
+    open_liss = _disclosure(client, "t-liss-only")
+    assert 'class="loadout__zones"' not in open_liss, "liste de zones vide rendue"
+    assert "Aucune zone prescrite" in open_liss
+    # Et surtout : PAS le vocabulaire de l'inconnu, qui serait faux ici.
+    assert "non cartographiées" not in open_liss
 
 
 def test_the_free_text_line_is_replaced_not_duplicated(client):
-    """La substitution décidée AU RENDU : les deux lignes disaient deux fois la
-    même chose en deux vocabulaires. Une carte qui a des zones ne rend plus son
-    texte libre — et le détail, lui, le garde.
+    """La substitution : les deux lignes disaient deux fois la même chose en
+    deux vocabulaires. Le texte libre `focus` ne remonte pas sur le registre —
+    et le détail, lui, le garde.
 
-    ⚠ MIGRÉE PAR `Sb_UI_BIBLIO_01`. La garde vérifiait la présence de
-    `template-card__zones` comme PREUVE que le gabarit résout des zones. Ce
-    n'était qu'un proxy, et il a cessé d'être vrai : les pastilles ne se
-    rendent plus que si elles disent quelque chose.
-
-    L'invariant gardé n'a pas changé — un gabarit qui résout des zones ne rend
-    pas en plus son texte libre — mais il se vérifie désormais à la source
-    (`zones_by_template`) plutôt qu'à travers un rendu conditionnel.
+    ⚠ MIGRÉE PAR `UI-CP4`. `focus` ne survit plus nulle part sur cette surface,
+    pour aucun gabarit : la ligne porte le NOM et la CHARGE, le dépli porte les
+    zones. La garde se durcit donc — elle ne vérifie plus une substitution
+    conditionnelle mais une absence totale.
     """
     from app.services.template_zone_context import annotate_templates
 
     body = client.get(LIBRARY_URL).text
-    push = [c for c in _cards(body) if "push-a" in c]
-    assert len(push) == 1
-    assert "template-card__focus" not in push[0], "doublon de vocabulaire rendu"
+    assert "template-card__focus" not in body, "doublon de vocabulaire rendu"
+    assert "Pectoraux, Deltoïdes, Triceps" not in body, "texte libre remonté"
     assert "Pectoraux, Deltoïdes, Triceps" in client.get("/library/push-a").text
 
     # La prémisse elle-même, mesurée : ce gabarit résout bien des zones.
@@ -244,10 +274,11 @@ def test_the_declared_axis_is_marked_on_the_zones_it_covers(client):
     """Le pendant : une garde qui ne teste que l'absence laisserait passer une
     surface qui ne marque jamais rien."""
     _declare(_uid(), sessions_per_week=4, focus_priorities=[AXIS])
-    body = client.get(LIBRARY_URL).text
-    assert "is-declared" in body
+    # `pull-a` travaille « Dos largeur » : c'est le témoin de l'axe déclaré.
+    open_pull = _disclosure(client, "t-pull-a")
+    assert "is-declared" in open_pull
     marked = re.findall(
-        r'<li class="template-card__zone is-declared">\s*([^<]+?)\s*<', body)
+        r'<li class="loadout__zone is-declared">\s*([^<]+?)\s*<', open_pull)
     assert marked, "aucune zone marquée alors qu'une priorité est déclarée"
     assert set(marked) == {ZONE_LABEL}, (
         f"marques hors de l'axe déclaré : {sorted(set(marked))}"
@@ -269,9 +300,10 @@ def test_the_zone_mark_carries_the_axis_word_for_assistive_tech(client):
     à une synthèse vocale. Le texte de rechange doit donc porter l'information,
     et porter le mot que l'utilisateur a employé — l'AXE, pas la zone."""
     _declare(_uid(), sessions_per_week=4, focus_priorities=["arms"])
-    body = client.get(LIBRARY_URL).text
+    # `pull-b` travaille les Biceps, couverts par l'axe déclaré « Bras ».
+    open_pull_b = _disclosure(client, "t-pull-b")
     hidden = re.findall(r'<span class="sr-only">\s*([^<]*priorité[^<]*)</span>',
-                        body)
+                        open_pull_b)
     assert hidden, "la marque n'est perceptible que visuellement"
     assert all("Bras" in h for h in hidden), hidden
     assert not any("Biceps" in h or "Triceps" in h for h in hidden), hidden
@@ -285,9 +317,14 @@ def test_core_carries_no_declared_mark_because_it_has_no_axis(client):
 
     every_axis = list(RADAR_AXES)
     _declare(_uid(), sessions_per_week=4, focus_priorities=every_axis[:3])
-    body = client.get(LIBRARY_URL).text
+    # `legs-a` est le gabarit qui travaille le core : si une déclaration
+    # pouvait le marquer, c'est là qu'on le verrait.
+    open_legs = _disclosure(client, "t-legs-a")
+    assert "Core / Abdos" in open_legs, (
+        "le témoin ne travaille plus le core — la garde ne mesurerait rien"
+    )
     marked = re.findall(
-        r'<li class="template-card__zone is-declared">\s*([^<]+?)\s*<', body)
+        r'<li class="loadout__zone is-declared">\s*([^<]+?)\s*<', open_legs)
     assert "Core / Abdos" not in marked
 
 
@@ -303,16 +340,29 @@ def test_an_asked_filter_restricts_and_says_so(client):
     body = client.get(f"{LIBRARY_URL}?zone={ZONE}").text
     slugs = _slugs(body)
     assert 0 < len(slugs) < 13
-    assert f"{len(slugs)} séance" in body
+    # « configuration » et non « séance » : le registre contient aussi des
+    # programmes, et le décompte porte sur les deux.
+    assert f"{len(_keys(body))} configuration" in body
     assert "sur 13" in body, "le total disparu, l'utilisateur ne sait plus"
     assert ZONE_LABEL in body
 
 
-def test_every_template_kept_by_the_filter_really_works_that_zone(client):
-    """Un filtre qui garde un gabarit sans la zone demandée ment deux fois."""
+def test_every_row_kept_by_the_filter_says_why(client):
+    """Un filtre qui garde une configuration sans la zone demandée ment deux fois.
+
+    ⚠ CETTE GARDE A CHANGÉ LE PRODUIT, pour la seconde fois. `Sb_UI_BIBLIO_01`
+    l'avait déjà arrêté une fois : la première écriture n'affichait que les
+    zones déclarées, et huit cartes restaient sans dire pourquoi.
+
+    `UI-CP4` a failli refaire la même chose en sens inverse — les zones passant
+    au dépli, un registre filtré ne justifiait plus AUCUNE de ses lignes. La
+    zone filtrée reste donc sur la ligne, seule de toutes les zones.
+    """
     body = client.get(f"{LIBRARY_URL}?zone={ZONE}").text
-    for card in _cards(body):
-        assert ZONE_LABEL in card, f"gabarit sans {ZONE_LABEL} retenu : {card[:80]}"
+    rows = re.findall(r'<a class="loadout__handle"[\s\S]*?</a>', body)
+    assert rows, "aucune ligne rendue — la garde ne mesurerait rien"
+    for row in rows:
+        assert ZONE_LABEL in row, f"ligne sans {ZONE_LABEL} retenue : {row[:120]}"
 
 
 def test_the_way_back_to_the_whole_corpus_is_always_there(client):
