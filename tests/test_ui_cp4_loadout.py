@@ -63,14 +63,29 @@ def test_a_program_row_cannot_carry_a_start_command_at_all():
 
     Une garde de rendu aurait vérifié qu'on ne l'affiche pas aujourd'hui ; celle
     -ci vérifie qu'on ne *peut pas* l'afficher demain.
+
+    ⚠ `dataclasses.fields()`, PAS `__dataclass_fields__`. Le second inclut les
+    pseudo-champs `ClassVar` ; le premier les filtre et rend les vrais champs.
+    Ma première écriture interrogeait le second et me faisait conclure
+    qu'`is_program: ClassVar[bool]` était devenu une donnée d'instance — une
+    fausse alerte que seule la lecture de `fields()` a levée.
     """
+    import dataclasses
+
     from app.services.loadout import ProgramRow
 
-    champs = set(ProgramRow.__dataclass_fields__)
+    champs = {f.name for f in dataclasses.fields(ProgramRow)}
     for interdit in ("slug", "session_id", "template_slug"):
         assert interdit not in champs, (
             f"`ProgramRow` porte « {interdit} » : le type ne protège plus rien"
         )
+
+    # Et la marque de type reste une marque de TYPE : l'annoter en champ
+    # laisserait une instance se déclarer programme.
+    assert "is_program" not in champs, (
+        "`is_program` est devenu un champ : une instance pourrait mentir sur "
+        "son propre type"
+    )
 
 
 def test_the_two_row_types_are_two_classes_not_a_flag():

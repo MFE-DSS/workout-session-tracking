@@ -56,6 +56,7 @@ l'appelant qui porte cette différence, pas le résolveur.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import ClassVar
 
 from sqlalchemy.orm import Session
 
@@ -118,7 +119,16 @@ class SessionRow:
     program_id: int | None = None
     session_id: int | None = None
 
-    is_program = False
+    #: ⚠ `ClassVar`, et c'est porteur de sens — pas une formalité de typage.
+    #:
+    #: Sans annotation, `python:S8514` a raison de signaler un piège : dans une
+    #: dataclass, un attribut de classe nu se lit comme un champ oublié. Mais
+    #: l'annoter naïvement (`bool`) en ferait **vraiment** un champ — donc une
+    #: valeur que chaque instance pourrait porter, et un `SessionRow` pourrait
+    #: alors se déclarer programme. `ClassVar` dit l'inverse : c'est la marque
+    #: du TYPE, pas une donnée de la ligne, et elle n'est pas négociable
+    #: instance par instance.
+    is_program: ClassVar[bool] = False
 
     @property
     def is_startable(self) -> bool:
@@ -159,7 +169,8 @@ class ProgramRow:
     sessions: tuple[SessionRow, ...] = ()
     exercises: int = 0
 
-    is_program = True
+    #: Voir `SessionRow.is_program` : marque de TYPE, jamais un champ.
+    is_program: ClassVar[bool] = True
 
     @property
     def session_count(self) -> int:
