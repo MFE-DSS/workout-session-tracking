@@ -79,14 +79,14 @@ jobs:
       attested_run_id: ${{ steps.attest.outputs.attested_run_id }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # L'attestation compare des objets ARBRE et remonte aux parents du
           # merge : elle a besoin de l'historique.
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -123,7 +123,7 @@ jobs:
       # devenu canonique. On ne déduit plus : on conserve ce qui a été testé.
       - name: Upload the PR attestation
         if: github.event_name == 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: pr-attestation
           path: pr_attestation.json
@@ -164,14 +164,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Sb_CI_02_1 — full history so the change-scope classifier can diff against the
           # PR base / previous push commit. Mirrors the lint and sonar jobs.
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
@@ -251,7 +251,7 @@ jobs:
         # combined downstream into ONE authoritative report.
         env:
           CI_PYTEST_WORKERS: ${{ vars.CI_PYTEST_WORKERS }}
-          # NOT a dotfile: actions/upload-artifact@v4 silently skips hidden
+          # NOT a dotfile: actions/upload-artifact@v6 silently skips hidden
           # files, so `.coverage.shard-N` uploaded nothing and the combine step
           # found no data. A visible name removes the whole class of problem.
           COVERAGE_FILE: coverage-shard-${{ matrix.shard }}.data
@@ -290,7 +290,7 @@ jobs:
 
       - name: Upload shard coverage data
         if: always() && steps.scope.outputs.runtime == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-data-${{ matrix.shard }}
           path: coverage-shard-${{ matrix.shard }}.data
@@ -331,14 +331,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Sb_CI_02_1 — full history so the change-scope classifier can diff against the
           # PR base / previous push commit. Mirrors the lint and sonar jobs.
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
@@ -408,7 +408,7 @@ jobs:
         # couverture. L'entrée de Sonar est rigoureusement identique à celle
         # d'un run complet.
         if: env.REUSE == 'true' && steps.scope.outputs.runtime == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: coverage-xml
           run-id: ${{ needs.canonical-attestation.outputs.attested_run_id }}
@@ -433,7 +433,7 @@ jobs:
 
       - name: Download shard coverage data
         if: env.REUSE != 'true' && steps.scope.outputs.runtime == 'true'
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           pattern: coverage-data-*
           merge-multiple: true
@@ -467,7 +467,7 @@ jobs:
 
       - name: Upload coverage artifact
         if: always() && steps.scope.outputs.runtime == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: coverage-xml
           path: coverage.xml
@@ -564,7 +564,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Sb_CI_01 — full history required for gitleaks-action in
           # pull_request context. The action diff-scans the PR commit
@@ -575,7 +575,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: "pip"
@@ -662,7 +662,7 @@ jobs:
       # Required on PR / push. Full-history scan is documented as a
       # one-shot manual op (cf. docs/SECURITY_BASELINE.md §6).
       - name: gitleaks scan (required — Sb_26.4)
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_UPLOAD_ARTIFACT: false
@@ -705,7 +705,7 @@ jobs:
 
       - name: Upload linter reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linter-reports
           path: |
@@ -728,7 +728,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Sonar needs full history for blame / new-code detection.
           fetch-depth: 0
@@ -741,14 +741,14 @@ jobs:
         # (verified on PR #69 and #70, whose gates reported four conditions and no
         # coverage condition). Behaviour on runtime changes is unchanged.
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: coverage-xml
           path: .
 
       - name: Download linter reports
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: linter-reports
           path: .

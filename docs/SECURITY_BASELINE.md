@@ -166,7 +166,13 @@ Elle compare les épingles aux specs déclarées, **hors ligne**. Elle ne vérif
 
 ### 6.1 Gate CI
 
-`.github/workflows/ci.yml` job `lint` : `gitleaks/gitleaks-action@v2` required sur PR + push. Scan le diff + working tree.
+`.github/workflows/ci.yml` job `lint` : `gitleaks/gitleaks-action@v3` required sur PR + push. Scan le diff + working tree.
+
+⚠ **`@v2` → `@v3` le 2026-09-16** (`Sb_CI_NODE24_RUNTIME_01`). La v2 tourne sur
+`node20`, retiré des runners GitHub : **le scan de secrets aurait cessé de
+partir**, et il était déjà *sauté* depuis que `actionlint` faisait échouer le
+job en amont. La v3 ne change ni entrées, ni sorties, ni comportement — seul le
+runtime bouge.
 
 ### 6.2 Full-history scan one-shot
 

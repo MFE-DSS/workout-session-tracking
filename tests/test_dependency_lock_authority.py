@@ -323,14 +323,36 @@ def test_a10_the_bcrypt_ceiling_states_its_reason_in_the_source_spec():
 
 # ───────────── A8 / A9 — scope ─────────────
 
-def test_a8_no_ci_action_version_was_touched():
-    """upload/download-artifact and gitleaks-action are explicitly out of scope."""
+def test_a8_the_ci_still_installs_from_the_lock():
+    """A8 — CE QUE CETTE GARDE PROTÉGEAIT, ET CE QU'ELLE ÉPINGLAIT.
+
+    ⚠ RETIRÉE ET REMPLACÉE PAR `Sb_CI_NODE24_RUNTIME_01`, 2026-09-16.
+
+    Son écriture d'origine figeait cinq chaînes de version — `checkout@v4`,
+    `setup-python@v5`, `upload-artifact@v4`, `download-artifact@v4`,
+    `gitleaks-action@v2` — pour exprimer une seule idée : *le sprint « autorité
+    du lock » n'a pas touché aux versions d'actions*.
+
+    C'est une sentinelle de PÉRIMÈTRE, pas une propriété du produit. Ce sprint
+    est mergé depuis le 2026-08-18 : son périmètre est immuable et ne peut plus
+    régresser. La garde ne protégeait donc plus rien — mais elle **interdisait**
+    la montée des actions imposée par le retrait de node20 des runners GitHub.
+    Elle a bloqué la correction avant de bloquer la panne.
+
+    C'est la forme classique déjà recensée dans ce dépôt : **une garde épinglée
+    à une ÉCRITURE plutôt qu'à une PROPRIÉTÉ**. La propriété qui compte
+    vraiment — aucune action ne tourne sur un runtime retiré — vit désormais
+    dans `tests/test_ci_action_runtime.py`, et elle est vérifiée par mesure, pas
+    par une liste gelée.
+
+    Ce qui reste ici est le VRAI sujet du fichier : la CI installe depuis le
+    lock, et c'est ce que A8 aurait dû dire depuis le début.
+    """
     ci = CI.read_text(encoding="utf-8")
-    assert "actions/checkout@v4" in ci
-    assert "actions/setup-python@v5" in ci
-    assert "actions/upload-artifact@v4" in ci
-    assert "actions/download-artifact@v4" in ci
-    assert "gitleaks/gitleaks-action@v2" in ci
+    assert "requirements-lock.txt" in ci, (
+        "la CI n'installe plus depuis le lock — c'est le contrat que ce "
+        "fichier entier existe pour tenir"
+    )
 
 
 def test_a9_the_source_spec_is_unchanged_in_substance():
