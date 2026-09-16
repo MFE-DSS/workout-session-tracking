@@ -1,5 +1,5 @@
 {
-  "_comment": "Cliquet d'invariant — voir tests/test_no_new_inline_style.py",
+  "_comment": "Cliquet d'invariant — voir tests/test_no_new_inline_style.py ⚠ `UI-CP3` — index.html 13 → 0. Le cliquet est strict DANS LES DEUX SENS et il a exigé ce resserrement : un gabarit qui s'améliore ne conserve pas sa marge, sinon la dette peut revenir sans qu'aucune garde ne bouge. Les treize vivaient dans les blocs de readiness et les tuiles retirés de MISSION ; le formulaire déplacé a été réécrit en classes, donc readiness_history.html reste à 5 au lieu d'hériter de la dette.",
   "dynamic_allowlist": {
     "coach_report.html": 4,
     "dashboard.html": 1
@@ -8,7 +8,7 @@
     "body_assessment/body_overview.html": 21,
     "body_assessment/measurement_form.html": 9,
     "dashboard.html": 12,
-    "index.html": 13,
+    "index.html": 0,
     "profile.html": 0,
     "readiness_history.html": 5,
     "session_detail.html": 4

@@ -209,6 +209,57 @@ def _zone_row(code: str, by_zone: dict, labels: dict) -> dict:
     }
 
 
+def _tally_from_rows(rows: list[dict]) -> tuple[list[dict], int]:
+    """Les 11 zones comptées par bande.
+
+    — G3. Le total DOIT valoir 11 : une garde le pinne. Les bandes vides sont
+    omises à l'AFFICHAGE, jamais du comptage.
+
+    ⚠ `UI-CP3` — extrait de `_home_causal_context` parce qu'il a désormais
+    DEUX appelants. Le bilan quitte l'accueil pour `/progress`, qui n'a pas de
+    recommandation à fournir : le laisser enfermé dans le contexte causal
+    aurait obligé à le recopier. Une deuxième écriture du même comptage est
+    exactement ce qui fait diverger deux surfaces.
+    """
+    counts: dict[str, int] = {}
+    for row in rows:
+        counts[row["band"]] = counts.get(row["band"], 0) + 1
+    tally = [
+        {
+            "band": band,
+            "count": counts[band],
+            "segments": _BAND_SEGMENTS[band],
+            "band_label": _BAND_LABELS[band],
+        }
+        for band in _BAND_SEGMENTS
+        if counts.get(band)
+    ]
+    return tally, sum(counts.values())
+
+
+def _zone_tally(db, user_id: int) -> dict:
+    """Le bilan 11 zones, SANS recommandation — pour `/progress`.
+
+    Même lecture, même comptage, même vocabulaire que sur l'accueil d'hier :
+    ce n'est pas un readout neuf, c'est le même qui a changé de propriétaire.
+    """
+    from datetime import datetime
+
+    from app.services.muscle_mapping import ZONE_LABELS
+    from app.services.zone_recovery import build_zone_recovery
+
+    try:
+        estimates = build_zone_recovery(db, user_id, now=datetime.now(UTC))
+    except Exception:
+        # Readout non critique : la page ne tombe jamais pour une estimation.
+        return {"tally": [], "tally_total": 0}
+
+    by_zone = {e.zone_code: e for e in estimates}
+    rows = [_zone_row(e.zone_code, by_zone, ZONE_LABELS) for e in estimates]
+    tally, total = _tally_from_rows(rows)
+    return {"tally": tally, "tally_total": total}
+
+
 def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
     """Tout ce dont le Causal Cockpit a besoin, en UNE lecture de `zone_recovery`.
 
@@ -243,21 +294,7 @@ def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
     by_zone = {e.zone_code: e for e in estimates}
     rows = [_zone_row(e.zone_code, by_zone, ZONE_LABELS) for e in estimates]
 
-    # — G3. Le total DOIT valoir 11 : une garde le pinne. Les bandes vides sont
-    #   omises à l'affichage, jamais du comptage.
-    counts: dict[str, int] = {}
-    for row in rows:
-        counts[row["band"]] = counts.get(row["band"], 0) + 1
-    tally = [
-        {
-            "band": band,
-            "count": counts[band],
-            "segments": _BAND_SEGMENTS[band],
-            "band_label": _BAND_LABELS[band],
-        }
-        for band in _BAND_SEGMENTS
-        if counts.get(band)
-    ]
+    tally, tally_total = _tally_from_rows(rows)
 
     top = reco.get("top") or {}
     targeted = [
@@ -268,7 +305,7 @@ def _home_causal_context(db, user_id: int, reco: dict | None) -> dict:
     return {
         "zones": targeted,
         "tally": tally,
-        "tally_total": sum(counts.values()),
+        "tally_total": tally_total,
         # — G1 + G2. Extrait dans son propre helper : Sonar a mesuré la
         #   complexité cognitive de la fonction à 16 pour 15 autorisés, et
         #   c'est ce bloc qui la portait. Le sortir la ramène sous le seuil ET
@@ -315,76 +352,51 @@ def _rejected_alternatives(reco: dict, by_zone: dict, labels: dict) -> list[dict
 
 @router.get("/", response_class=HTMLResponse)
 def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
-    from datetime import datetime, timedelta
+    """`UI-CP3` — MISSION. Une seule question : **qu'est-ce que je fais
+    maintenant ?**
 
-    from app.services.performance import compute_composite_score
-    from app.services.timeline import build_sparkline_svg
+    ⚠ CINQ CALCULS SONT RETIRÉS ICI, ET AUCUN N'ÉTAIT RENDU.
 
+    Relevé sur les gabarits, pas de mémoire : `kpis`, `sparkline_svg`,
+    `sparkline_has_mixed_kinds`, `behavioral` et `reco_zone_state` étaient
+    calculés à **chaque** affichage de l'accueil et consommés par **rien**.
+    `kpis` sert bien à `/progress` — mais `/progress` le calcule lui-même ;
+    dans `index.html`, son unique occurrence était un COMMENTAIRE.
+
+    Le plus cher des cinq chargeait quatorze jours de séances avec
+    `session_exercises → set_logs` pour en tirer un score composite par
+    séance. C'est exactement le coût que `AUREN_INSTRUMENTS` attribuait à la
+    position intra-séance — déjà payé, pour un rendu inexistant.
+
+    Les services ne sont pas supprimés : `compute_global_kpis`,
+    `build_sparkline_svg`, `compute_behavioral_state` et `_reco_zone_state`
+    restent, et leurs autres appelants aussi. C'est l'appel MORT sur cette
+    route qui part.
+    """
     open_session = latest_open_session(db, user.id)
     # Bound once: the badge needs both the recommendation and its set count.
     _reco = _build_reco_context(db, user.id, open_session)
+
+    # ── `UI-CP3 §2/§3` — LA POSITION, PAS LA DURÉE ──────────────────────────
+    # « En cours · depuis 37 min » ne dit pas où reprendre. La durée devient
+    # un contexte SECONDAIRE ; la position devient le fait.
+    #
+    # Une seule requête d'agrégation, pas le chargement de l'arbre : MISSION
+    # n'importe pas l'instrument d'exécution, elle emprunte le strict
+    # nécessaire pour reprendre.
     open_since: str | None = None
+    position = None
     if open_session is not None:
         open_since = format_duration_short(
             session_duration(open_session.started_at, end=None)
         )
+        from app.services.mission_position import open_session_position
 
-    # Board KPIs
-    global_kpis = compute_global_kpis(db, user_id=user.id)
-
-    # Sparkline: composite scores for last 14 days
-    window_start = datetime.now(UTC) - timedelta(days=14)
-    sparkline_stmt = (
-        select(WorkoutSession)
-        .where(WorkoutSession.user_id == user.id)
-        .where(WorkoutSession.status == "completed")
-        .where(WorkoutSession.excluded_from_stats.is_(False))
-        .where(WorkoutSession.started_at >= window_start)
-        .order_by(WorkoutSession.started_at.asc())
-        .options(
-            selectinload(WorkoutSession.session_exercises)
-            .selectinload(SessionExercise.set_logs)
-        )
-    )
-    recent_sessions = list(db.execute(sparkline_stmt).scalars().all())
-
-    from app.services.quality_score import session_kind as _session_kind
-    sparkline_points = []
-    sparkline_kinds: list[str | None] = []
-    for s in recent_sessions:
-        quality = compute_session_quality(s)
-        total_work = sum(
-            1 for se in s.session_exercises
-            for sl in se.set_logs if sl.kind == "work"
-        )
-        done_work = sum(
-            1 for se in s.session_exercises
-            for sl in se.set_logs if sl.kind == "work" and sl.completed
-        )
-        cr = done_work / total_work if total_work > 0 else 0.0
-        composite = compute_composite_score(quality, cr)
-        sparkline_points.append((composite,))
-        sparkline_kinds.append(_session_kind(s))
-
-    sparkline_svg = build_sparkline_svg(sparkline_points, kinds=sparkline_kinds)
-    # Sb_10 G1 — show the kind legend on the home sparkline only when
-    # the 14-day window actually mixes strength and cardio sessions,
-    # otherwise it adds noise.
-    sparkline_has_mixed_kinds = (
-        "strength" in sparkline_kinds and "cardio" in sparkline_kinds
-    )
-
-    from app.services.behavioral import compute_behavioral_state
-
-    behavioral = compute_behavioral_state(db, user.id)
-
-    from app.services.readiness import (
-        READINESS_FIELD_LABELS,
-        READINESS_LABELS,
-        SCALE_FIELDS,
-        get_today_readiness,
-    )
-    readiness_today = get_today_readiness(db, user.id)
+        position = open_session_position(db, open_session.id)
+        if position is not None and not position.is_meaningful:
+            # Une séance sans série de travail prescrite — un cardio — n'a pas
+            # de position à annoncer. Se taire vaut mieux qu'un « 1 sur 0 ».
+            position = None
 
     # Sb_27.1 — coaching loop home payload. Composed read-only on top of
     # existing services (recommendation, quality_score, session columns).
@@ -400,9 +412,7 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
             "page_title": "Accueil",
             "open_session": open_session,
             "open_since": open_since,
-            "kpis": global_kpis,
-            "sparkline_svg": sparkline_svg,
-            "sparkline_has_mixed_kinds": sparkline_has_mixed_kinds,
+            "position": position,
             "reco": _reco,
             # D2 — volume shown beside the badge. None when there is no
             # recommendation; the template then omits the figure rather than
@@ -411,19 +421,14 @@ def home(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse:
                 _template_work_set_count(db, _reco["top"]["template"].id)
                 if _reco and _reco.get("top") else None
             ),
-            # D6 — pourquoi CETTE séance : l'état des zones qu'elle vise.
-            "reco_zone_state": (
-                _reco_zone_state(db, user.id, _reco["top"].get("primary_zones"))
-                if _reco and _reco.get("top") else []
-            ),
-            # `Sx_UIV3_01` — la cause, le bilan 11 zones et les options
-            # écartées. Une seule lecture de `zone_recovery` pour les trois.
+            # `Sx_UIV3_01` — la cause et les options écartées.
+            # ⚠ `UI-CP3 §4` — le BILAN 11 ZONES ne se rend plus ici : il décrit
+            # la couverture du corps, pas la décision du moment. Il n'est pas
+            # perdu pour autant (`§5.3`) — il est rendu par `/progress`, la
+            # destination que le rail de transition désigne. Le contexte
+            # causal reste, lui, dans la mission : les zones qui EXPLIQUENT la
+            # recommandation sont sa preuve.
             "causal": _home_causal_context(db, user.id, _reco),
-            "behavioral": behavioral,
-            "readiness_today": readiness_today,
-            "readiness_labels": READINESS_LABELS,
-            "readiness_field_labels": READINESS_FIELD_LABELS,
-            "readiness_scale_fields": SCALE_FIELDS,
             "home": home_payload,
         },
     )
@@ -914,6 +919,19 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             "rail_days": rail_days,
             "has_traces": has_traces,
             "exposure": exposure,
+            # ⚠ `UI-CP3 §4` / `§5.3` — LE BILAN 11 ZONES ARRIVE ICI, IL N'EST
+            # PAS SUPPRIMÉ.
+            #
+            # Il vivait sur l'accueil, où il décrivait la couverture du corps
+            # au lieu de la décision du moment. L'opérateur l'en retire ; le
+            # contrat de dépôt interdit de retirer sans destination.
+            #
+            # `/progress` est cette destination, et pas par défaut : la page
+            # rend déjà « 11 zones suivies » via `zone_exposure`. Mais
+            # l'exposition compte des SÉRIES, quand ce bilan dit la
+            # RÉCUPÉRATION — deux faits distincts sur le même découpage. Les
+            # réunir ici les rend comparables pour la première fois.
+            "zone_tally": _zone_tally(db, user.id),
             "progression": progression,
             "cardio": cardio,
         },
@@ -1006,14 +1024,20 @@ def readiness_history(
         READINESS_LABELS,
         SCALE_FIELDS,
         get_readiness_history,
+        get_today_readiness,
     )
     entries = get_readiness_history(db, user.id, days=90)
     return templates.TemplateResponse(
         request,
         "readiness_history.html",
         {
-            "page_title": "Historique Readiness",
+            "page_title": "État du jour",
             "entries": entries,
+            # `UI-CP3 §5` — la DÉCLARATION quitte MISSION pour la page qui
+            # portait déjà la lecture. Le formulaire ne se rend que si l'état
+            # du jour n'est pas encore donné : c'est la règle qu'appliquait
+            # l'accueil, déplacée avec lui plutôt que réinventée.
+            "today_entry": get_today_readiness(db, user.id),
             "readiness_labels": READINESS_LABELS,
             "readiness_field_labels": READINESS_FIELD_LABELS,
             "readiness_scale_fields": SCALE_FIELDS,

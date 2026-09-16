@@ -1,6 +1,90 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Historique état</h1>
+<h1 class="page-title">État du jour</h1>
+
+{# ⚠ `UI-CP3 §5` / `CLAUDE.md §5.3` — LA DÉCLARATION ARRIVE ICI.
+
+   Elle vivait sur l'accueil : vingt-sept champs repliés dans un tiroir,
+   chargés à chaque affichage de la surface de décision.
+
+   Deux faits mesurés ont tranché :
+
+     · `recommendation.py` ne lit la readiness **nulle part** — zéro
+       occurrence. Elle ne change aucune recommandation, donc elle n'est pas
+       une preuve de MISSION ;
+     · cette page portait déjà la LECTURE, et n'était atteignable que depuis
+       l'accueil, et seulement une fois l'état du jour déjà déclaré — donc
+       invisible exactement à qui ne l'avait pas encore rempli.
+
+   Réunir la déclaration et l'historique referme les deux trous d'un coup.
+   La capacité n'est pas préservée « ailleurs » au sens vague : elle est
+   réunie avec sa lecture, et la porte est dans BODY_LEDGER.
+
+   Aucune invention (`§5`) : pas de score, pas de feu tricolore, pas d'état
+   global de synthèse. Les mêmes cinq échelles, la même FC, la même note. #}
+{% if not today_entry %}
+<section class="readiness-declare" aria-label="Déclarer l'état du jour">
+  <p class="text-dim readiness-declare__hint">
+    1×/jour · 5 = meilleur état.
+  </p>
+  <form method="post" action="/readiness" class="readiness-declare__form">
+    {# ⚠ UN GROUPE DE CHAMPS, PAS UN LIBELLÉ ORPHELIN.
+       Une échelle de 1 à 5 est un GROUPE de boutons radio : un libellé sans
+       `for` ne s'associe à rien, et l'associer à un seul des cinq serait faux.
+       Seule la légende d'un groupe de champs nomme un groupe — c'est la
+       correction juste, pas la plus courte.
+
+       ⚠ CE COMMENTAIRE NE CITE AUCUNE BALISE, ET C'EST DÉLIBÉRÉ.
+       Première écriture : il écrivait les noms d'éléments entre chevrons.
+       L'analyseur HTML de Sonar ne connaît pas les commentaires Jinja — il a
+       lu la légende citée dans cette prose comme une balise réelle hors de
+       son groupe, et rendu un BUG MAJOR sur la ligne du commentaire. C'est la
+       douzième fois que ce dépôt rencontre le motif « une garde qui lit sa
+       propre prose », et la première où il vient de l'analyseur. #}
+    {% for field in readiness_scale_fields %}
+    <fieldset class="readiness-declare__field">
+      <legend class="readiness-declare__label">{{ readiness_field_labels[field] }}</legend>
+      <div class="segmented">
+        {% for val in [1, 2, 3, 4, 5] %}
+        <label class="segmented__option">
+          <input type="radio" name="{{ field }}" value="{{ val }}" {% if val == 3 %}checked{% endif %}>
+          <span title="{{ readiness_labels[field][val] }}">{{ val }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="readiness-scale__ends">
+        <span>1 · {{ readiness_labels[field][1] }}</span>
+        <span>5 · {{ readiness_labels[field][5] }}</span>
+      </div>
+    </fieldset>
+    {% endfor %}
+    {# ⚠ UN `placeholder` N'EST PAS UN LIBELLÉ.
+       Ces deux champs n'avaient que leur `placeholder` — qui disparaît à la
+       saisie et qu'aucun lecteur d'écran ne traite comme un nom. Le défaut est
+       PRÉEXISTANT : il vivait replié dans un tiroir sur l'accueil, que
+       presque personne n'ouvrait. Le déplacement l'a exposé, il ne l'a pas
+       créé — comme la troncature de ce même champ. #}
+    <div class="readiness-extra">
+      <p class="readiness-extra__pair">
+        <label class="readiness-extra__label" for="readiness-resting-hr">FC repos (bpm)</label>
+        <input class="input" id="readiness-resting-hr" type="number" name="resting_hr"
+               min="30" max="200">
+      </p>
+      <p class="readiness-extra__pair">
+        <label class="readiness-extra__label" for="readiness-note">Note (optionnel)</label>
+        <input class="input" id="readiness-note" type="text" name="note">
+      </p>
+    </div>
+    <button type="submit" class="btn btn--primary readiness-declare__submit">Enregistrer mon état</button>
+  </form>
+</section>
+{% else %}
+<p class="text-dim readiness-declare__done">
+  Déjà renseigné aujourd'hui.
+</p>
+{% endif %}
+
+<h2 class="readiness-declare__past">90 derniers jours</h2>
 
 {% if not entries %}
   <p class="text-dim">Aucune entrée pour les 90 derniers jours.</p>

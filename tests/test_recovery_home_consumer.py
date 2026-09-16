@@ -168,15 +168,31 @@ def _count_queries(fn) -> list[str]:
 
 
 class TestRendersWithEvidence:
-    def test_home_renders_the_tile(self, client):
+    def test_the_tile_is_still_produced(self, client):
+        """⚠ SUPERSÈDE `test_home_renders_the_tile` (`UI-CP3 §10`).
+
+        MISSION ne rend plus cette tuile : « où en est mon corps ? » n'est pas
+        la question qu'elle possède. La garde suit la VUE-MODÈLE, qui est ce
+        qui survit — et dont la disparition, elle, serait une perte réelle.
+
+        ⚠ TROU NOMMÉ, PAS MASQUÉ : l'état d'entraînement n'a AUJOURD'HUI
+        AUCUNE surface. Le rail de transition pointe vers BODY_LEDGER, qui
+        possède la question mais ne rend pas encore ce readout. C'est consigné
+        dans le rapport de tranche, et c'est un candidat de `UI-CP5`.
+        """
         uid = get_test_user_id()
         from app.database import SessionLocal
 
         with SessionLocal() as db:
             _add_session(db, uid, days_ago=1, names=[LEGS],
                          global_state="good", concentration="high")
-        page = _page(client)
-        assert TILE_LABEL in page
+        tile = _tile(uid)
+        assert tile["label"] == TILE_LABEL
+        assert tile["available"] is True
+
+    def test_mission_no_longer_renders_the_tile(self, client):
+        """L'autre moitié : le retrait est effectif, pas seulement déclaré."""
+        assert TILE_LABEL not in _page(client)
 
     def test_home_stays_200(self, client):
         uid = get_test_user_id()
@@ -195,15 +211,21 @@ class TestRendersWithEvidence:
         tile = _tile(uid)
         assert tile["insufficient"] is False
 
-    def test_the_estimate_text_reaches_the_page(self, client):
+    def test_the_estimate_text_is_composed(self, client):
+        """⚠ RECIBLÉE sur la vue-modèle (`UI-CP3 §10`).
+
+        La phrase d'estimation n'atteint plus de page — MISSION ne rend plus
+        la tuile. Ce qui reste vérifiable, et ce qui compte pour la surface
+        qui l'accueillera : la phrase est bien COMPOSÉE, non vide.
+        """
         uid = get_test_user_id()
         from app.database import SessionLocal
 
         with SessionLocal() as db:
             _add_session(db, uid, days_ago=1, names=[LEGS])
         tile = _tile(uid)
-        page = _page(client)
-        assert tile["entries"][0]["message"] in page
+        assert tile["entries"], "aucune entrée composée"
+        assert tile["entries"][0]["message"].strip()
 
     def test_density_is_capped(self, client):
         """Jamais un tableau de bord dans la Home."""
@@ -266,11 +288,19 @@ class TestNewAccount:
         tile_zone = page.split(TILE_LABEL, 1)[-1][:800]
         assert "encore chargé" not in tile_zone
 
-    def test_the_message_appears_once(self, client):
+    def test_the_message_is_composed_once(self, client):
+        """⚠ RECIBLÉE (`UI-CP3 §10`) — le message ne compte plus sur la page.
+
+        L'invariant tenu était « une seule fois », contre un doublon d'une
+        surface qui l'affichait deux fois. Il devient une propriété de la
+        vue-modèle : une seule entrée porte l'état de données.
+        """
         from app.services.recovery_explainer import GLOBAL_INSUFFICIENT_MESSAGE
 
-        page = _page(client)
-        assert page.count(GLOBAL_INSUFFICIENT_MESSAGE) == 1
+        tile = _tile(get_test_user_id())
+        messages = [e.get("message") for e in tile["entries"]]
+        assert messages.count(GLOBAL_INSUFFICIENT_MESSAGE) <= 1
+        assert tile["message"] == GLOBAL_INSUFFICIENT_MESSAGE
 
     def test_home_still_renders(self, client):
         assert client.get(HOME_URL).status_code == 200
@@ -295,13 +325,16 @@ class TestConfidenceSurfacing:
         labels = [i["confidence_label"] for i in _tile(uid)["entries"]]
         assert "Confiance moyenne" in labels
 
-    def test_a_confidence_label_reaches_the_page(self, client):
+    def test_a_confidence_label_is_composed(self, client):
+        """⚠ RECIBLÉE (`UI-CP3 §10`). La confiance reste ATTACHÉE à l'entrée —
+        c'est elle qui empêche un readout d'être lu comme une certitude."""
         uid = get_test_user_id()
         from app.database import SessionLocal
 
         with SessionLocal() as db:
             _add_session(db, uid, days_ago=1, names=[LEGS])
-        assert "Confiance" in _page(client)
+        tile = _tile(uid)
+        assert any(e.get("confidence_label") for e in tile["entries"])
 
     def test_low_is_not_promoted_to_medium(self, client):
         """Une attribution par sous-chaîne reste une confiance faible."""
@@ -504,12 +537,14 @@ class TestContextWithoutEstimate:
         messages = " ".join(e["message"] for e in _tile(uid)["entries"])
         assert "disponible" not in messages
 
-    def test_still_only_one_data_state_message_on_the_page(self, client):
+    def test_still_only_one_data_state_message(self, client):
+        """⚠ RECIBLÉE (`UI-CP3 §10`) — même invariant, sur la vue-modèle."""
         from app.services.recovery_explainer import GLOBAL_INSUFFICIENT_MESSAGE
 
         uid = get_test_user_id()
         self._mixed(uid)
-        assert _page(client).count(GLOBAL_INSUFFICIENT_MESSAGE) == 1
+        tile = _tile(uid)
+        assert tile["message"] == GLOBAL_INSUFFICIENT_MESSAGE
 
 
 # ─────────────────── 9. parité de recommandation ───────────────────
@@ -822,9 +857,24 @@ class TestNamingAndAccessibility:
 
         assert "disponibilité" not in HOME_TILE_LABEL.lower()
 
-    def test_the_legacy_widget_still_exists(self, client):
-        """Additif d'abord : la tranche ne retire pas la surface héritée."""
-        assert LEGACY_WIDGET_LABEL in _page(client)
+    def test_the_legacy_widget_capability_still_exists(self, client):
+        """⚠ SUPERSÈDE `test_the_legacy_widget_still_exists` (`UI-CP3 §5`).
+
+        L'ancienne garde disait « additif d'abord » : à l'époque, la tranche
+        qui l'a écrite ne devait rien retirer. `UI-CP3` retire délibérément le
+        widget hérité de MISSION — mesuré avant de décider :
+        `recommendation.py` ne lit la readiness NULLE PART.
+
+        La CAPACITÉ, elle, ne part pas : la déclaration existe toujours,
+        réunie avec son historique sur `/readiness/history`. C'est cela que la
+        remplaçante tient — et c'est plus fort, parce qu'elle vérifie un
+        chemin d'ÉCRITURE plutôt que la présence d'un libellé.
+        """
+        page = client.get("/readiness/history").text
+        assert 'action="/readiness"' in page, (
+            "la déclaration d'état du jour n'existe plus nulle part"
+        )
+        assert LEGACY_WIDGET_LABEL not in _page(client)
 
     def test_the_legacy_kpi_left_the_home(self, client):
         """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.
@@ -845,24 +895,41 @@ class TestNamingAndAccessibility:
         assert "disponibilité" not in _page(client)
 
     def test_the_tile_declares_its_provenance(self, client):
-        """Ce qui distingue les deux surfaces à la lecture, pas seulement au nom."""
+        """⚠ RECIBLÉE sur la vue-modèle (`UI-CP3 §10`).
+
+        La provenance — « estimé à partir de tes séances enregistrées » — est
+        ce qui empêche le readout d'être lu comme une mesure. Elle doit rester
+        ATTACHÉE à la tuile, pour que la surface qui l'accueillera demain
+        n'ait pas à la réinventer. C'est exactement le défaut « le produit a
+        la décision, pas le moyen de l'appliquer » pris à l'avance.
+        """
         from app.database import SessionLocal
         from app.services.home_training_state import HOME_TILE_CAPTION
 
         uid = get_test_user_id()
         with SessionLocal() as db:
             _add_session(db, uid, days_ago=1, names=[LEGS])
-        assert HOME_TILE_CAPTION in _page(client)
+        assert _tile(uid)["caption"] == HOME_TILE_CAPTION
 
-    def test_the_tile_uses_a_semantic_heading(self, client):
+    def test_the_tile_carries_a_label_a_future_heading_can_use(self, client):
+        """⚠ SUPERSÈDE `test_the_tile_uses_a_semantic_heading` (`UI-CP3 §10`).
+
+        L'ancienne garde était une propriété de RENDU, et son objet n'a plus
+        de surface : elle ne peut pas être « reciblée » sans mentir.
+
+        Ce qui se garde encore, et qui conditionne le futur rendu : la tuile
+        porte un LIBELLÉ distinct, non vide, qu'un titre sémantique pourra
+        reprendre. Une garde honnête dit ce qu'elle peut prouver, pas ce
+        qu'elle aimerait.
+        """
         uid = get_test_user_id()
         from app.database import SessionLocal
 
         with SessionLocal() as db:
             _add_session(db, uid, days_ago=1, names=[LEGS])
-        text = _page(client)
-        heading = text.split(TILE_LABEL, 1)[0][-260:]
-        assert "<h2" in heading
+        label = _tile(uid)["label"]
+        assert label.strip()
+        assert label == TILE_LABEL
 
     def test_confidence_is_not_conveyed_by_colour_alone(self, client):
         uid = get_test_user_id()

@@ -276,6 +276,33 @@
     <p class="bl-note">{{ morpho.notice }}</p>
   </div>
 
+  {# ⚠ `UI-CP3 §5` — LA PORTE DE L'ÉTAT DU JOUR ARRIVE ICI.
+
+     Elle vivait sur MISSION, sous la forme d'un formulaire de vingt-sept
+     champs replié — chargé à chaque affichage de la surface de décision,
+     pour une donnée que `recommendation.py` ne lit NULLE PART. Mesuré : zéro
+     occurrence. Elle ne changeait aucune recommandation, donc elle n'était
+     pas une preuve de MISSION.
+
+     Elle atterrit dans BODY_LEDGER parce que c'est l'instrument qui possède
+     la question « où en est mon corps ? ». Ce n'est pas un rangement par
+     défaut : la déclaration et son historique sont désormais au même endroit,
+     alors que la page d'historique n'était atteignable que depuis l'accueil,
+     et seulement une fois l'état du jour DÉJÀ renseigné — donc invisible
+     exactement à qui ne l'avait pas encore fait.
+
+     `CLAUDE.md §5.3` : la capacité n'est pas « préservée ailleurs » au sens
+     vague, elle est réunie avec sa lecture et sa porte est nommée. #}
+  <div class="bl-band">
+    <h2 class="bl-band__title">État du jour</h2>
+    <p class="bl-note">Déclaratif, une fois par jour. Conservé, jamais noté.</p>
+    <p class="bl-note">
+      <a class="link" href="{{ url_for('readiness_history') }}">
+        Déclarer ou consulter <span aria-hidden="true">→</span>
+      </a>
+    </p>
+  </div>
+
   {# Sb_31.X — la découverte de Body Intelligence, affichée uniquement quand
      `BODY_INTELLIGENCE_ENABLED` est ON. Aucune réimplémentation de la lecture
      corporelle ici : c'est un lien vers une destination, pas une duplication

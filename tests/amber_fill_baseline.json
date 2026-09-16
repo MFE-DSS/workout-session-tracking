@@ -1,5 +1,5 @@
 {
-  "_comment": "Occurrences de la classe d'aplat ambre PAR GABARIT — ce n'est PAS un compte d'écran. Un gabarit peut porter plusieurs occurrences dans des BRANCHES Jinja mutuellement exclusives (index.html : 4 occurrences, 1 seule rendue, mesuré au navigateur) ou dans des <details> fermés (user_programs/detail.html). La règle « un aplat par écran » n'est pas décidable ici : elle appartient à un harnais de rendu. Ce fichier gèle la dérive, il ne la valide pas.",
+  "_comment": "Occurrences de la classe d'aplat ambre PAR GABARIT — ce n'est PAS un compte d'écran. Un gabarit peut porter plusieurs occurrences dans des BRANCHES Jinja mutuellement exclusives (index.html : 4 occurrences, 1 seule rendue, mesuré au navigateur) ou dans des <details> fermés (user_programs/detail.html). La règle « un aplat par écran » n'est pas décidable ici : elle appartient à un harnais de rendu. Ce fichier gèle la dérive, il ne la valide pas. ⚠ `UI-CP3` — index.html 5→4 et readiness_history.html 0→1 : c'est le MÊME bouton « Enregistrer mon état » qui a changé de page, pas un aplat de plus. Le total du produit est inchangé. Sur sa nouvelle surface il est l'action dominante UNIQUE, ce que la doctrine demande ; sur l'accueil il était le second aplat d'un écran de décision, ce qu'elle interdit. Le cliquet est resserré sur index.html dans le même geste — un gabarit qui s'améliore ne garde pas sa marge.",
   "per_template": {
     "_partials/next_session_reco.html": 1,
     "body_assessment/body_overview.html": 2,
@@ -7,11 +7,12 @@
     "contact.html": 1,
     "export.html": 1,
     "forgot_password.html": 1,
-    "index.html": 5,
+    "index.html": 4,
     "launcher.html": 1,
     "login.html": 1,
     "password_change.html": 1,
     "profile.html": 1,
+    "readiness_history.html": 1,
     "register.html": 1,
     "reset_password.html": 1,
     "science.html": 1,

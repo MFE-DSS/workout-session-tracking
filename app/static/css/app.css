@@ -1738,13 +1738,47 @@ input, button, textarea, select {
 }
 .readiness-scale__ends span:last-child { text-align: right; }
 
+/* ⚠ `UI-CP3` — LE PLACEHOLDER SERVAIT DE LIBELLÉ, ET IL ÉTAIT TRONQUÉ.
+ *
+ * Deux défauts sur le même objet, tous deux PRÉEXISTANTS : ces champs
+ * n'avaient que leur `placeholder` — qu'aucun lecteur d'écran ne traite comme
+ * un nom et qui disparaît à la saisie — et `max-width: 150px` le coupait en
+ * « FC repos (l » à 390 px en fonte mono.
+ *
+ * Ils vivaient repliés dans un `<details>` sur l'accueil, que presque personne
+ * n'ouvrait. Le déplacement de la déclaration vers sa propre page les a
+ * exposés, il ne les a pas créés.
+ *
+ * La correction est la même pour les deux : un VRAI libellé, hors du champ,
+ * associé par `for`/`id`. Le placeholder disparaît — le dupliquer n'aurait
+ * fait que répéter. */
 .readiness-extra {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-sm);
   margin-top: var(--space-sm);
 }
-.readiness-extra .input:first-child { flex: 1; max-width: 150px; }
-.readiness-extra .input:last-child  { flex: 2; }
+.readiness-extra__pair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  flex: 1 1 16ch;
+}
+.readiness-extra__label {
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+/* `<fieldset>` porte une bordure et des marges par défaut dans tous les
+   navigateurs. Une échelle de 1 à 5 est un groupe SÉMANTIQUE, pas un encadré :
+   on prend la sémantique, pas la peau. */
+.readiness-declare__field {
+  border: 0;
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  min-width: 0;
+}
 
 /* Baseline dark input for ad-hoc form fields */
 .input {
@@ -6411,3 +6445,77 @@ summary:focus-visible,
 .session-done .session-done__stats li { font-size: 15px; }
 .session-done .session-done__anomalies-list li { font-size: 12px; }
 .session-done .top-progression__delta { font-size: 12px; }
+
+/* ══════════════════════════════════════════════════════════════════════
+   RECOVERYBAND + ZONETALLY — composant PARTAGÉ (`UI-CP3`)
+   ----------------------------------------------------------------------
+   Venu de `home.css`, où il a vécu tant qu'une seule surface l'employait.
+   Depuis que le bilan 11 zones est rendu par `/progress` — qui ne charge
+   pas `home.css` — le composant a deux propriétaires et appartient donc
+   ici.
+   ══════════════════════════════════════════════════════════════════════ */
+.band {
+  display: inline-flex;
+  gap: 2px;
+  flex: none;
+}
+.band i {
+  width: 7px;
+  height: 14px;
+  border-radius: 1px;
+  background: var(--t-line);
+  display: block;
+}
+.band--likely_available .band__on { background: var(--t-fg); }
+.band--partially_recovered .band__on { background: var(--t-fg-muted); }
+.band--likely_fatigued .band__on { background: var(--t-fg-faint); }
+
+/* `unknown` n'est pas « zéro récupération » : c'est une autre NATURE de chose,
+   donc une autre FORME. Contour pointillé + hachure, JAMAIS rempli. Il ne peut
+   pas être confondu avec une zone chargée, qui est pleine à un segment. */
+.band--unknown i {
+  background: transparent;
+  border: 1px dashed var(--t-unknown);
+  background-image: repeating-linear-gradient(
+    45deg, var(--t-unknown) 0 1px, transparent 1px 3px);
+}
+
+/* ══ ZONETALLY ══ les 11 zones en une ligne. */
+.cockpit__tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  align-items: center;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid var(--t-line);
+  border-bottom: 1px solid var(--t-line);
+  font-size: 13px;
+  color: var(--t-fg-muted);
+}
+.cockpit__tally-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cockpit__tally-item b {
+  color: var(--t-fg-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ⚠ LE LIBELLÉ DEVIENT VISIBLE — le lecteur d'écran en savait plus que l'œil.
+ *
+ * Ce bilan ne rendait qu'un glyphe hachuré et un nombre ; le nom de l'état
+ * n'existait que dans le texte hors écran de `band(named=true)`. Mesuré sur un
+ * compte neuf, où les onze zones partagent le même état, la ligne entière se
+ * réduisait à « ▨▨▨ 11 » : illisible pour qui regarde, parfaitement clair pour
+ * qui écoute.
+ *
+ * Le `sr-only` de la macro est retiré du même geste (`band(t)` au lieu de
+ * `band(t, named=true)`) : le libellé rendu sert désormais tout le monde, et
+ * le conserver aurait fait entendre le nom deux fois. */
+.cockpit__tally-label {
+  color: var(--t-fg-muted);
+  white-space: nowrap;
+}

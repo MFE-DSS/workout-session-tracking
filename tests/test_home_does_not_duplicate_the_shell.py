@@ -44,48 +44,119 @@ def _shell_routes() -> set[str]:
     return _routes_in(m.group(1))
 
 
-def _tile_routes() -> set[str]:
+def _shell_labels() -> list[str]:
+    """Les NOMS visibles de la barre basse — « Séance », « Progression »…
+
+    Nécessaires parce que la règle affinée porte sur le LIBELLÉ : une sortie
+    qui reprend le nom d'un onglet est un doublon de navigation, même si elle
+    se termine par un point d'interrogation.
+    """
+    src = re.sub(
+        r"\{#.*?#\}", "", (TEMPLATES / "base.html").read_text(encoding="utf-8"),
+        flags=re.DOTALL,
+    )
+    m = re.search(
+        r'<nav[^>]*class="[^"]*app-bottom-nav[^"]*"(.*?)</nav>', src, re.DOTALL)
+    assert m, "la barre de navigation basse est introuvable dans base.html"
+    noms = re.findall(
+        r'class="app-bottom-nav__label"[^>]*>([^<]+)<', m.group(1))
+    assert noms, "aucun libellé d'onglet lu — la sonde ne mesure rien"
+    return [n.strip() for n in noms]
+
+
+def _exits() -> list[tuple[str, str]]:
+    """Les sorties de l'accueil : (libellé visible, route).
+
+    ⚠ `UI-CP3` — la grille de tuiles a disparu ; l'accueil porte désormais un
+    RAIL DE TRANSITION daté. La sonde suit l'objet, pas son ancien nom : une
+    sonde qui continuerait de chercher `tile-grid` échouerait sur son propre
+    `assert`, ce qui ressemble à une garde vivante et n'en est plus une.
+    """
     src = re.sub(
         r"\{#.*?#\}", "", (TEMPLATES / "index.html").read_text(encoding="utf-8"),
         flags=re.DOTALL,
     )
-    m = re.search(r'<div class="tile-grid">(.*?)</div>\s*</div>', src, re.DOTALL)
-    assert m, "la grille de tuiles est introuvable dans index.html"
-    return _routes_in(m.group(1))
+    m = re.search(
+        r'<nav class="mission-bridge".*?</nav>', src, re.DOTALL)
+    assert m, "le rail de transition est introuvable dans index.html"
+    sorties = []
+    for bloc in re.findall(r"<a\s[^>]*>.*?</a>", m.group(0), re.DOTALL):
+        route = _routes_in(bloc)
+        libelle = re.sub(r"<[^>]+>", " ", bloc)
+        libelle = re.sub(r"\s+", " ", libelle).replace("\xa0", " ").strip()
+        for r in route:
+            sorties.append((libelle, r))
+    assert sorties, "aucune sortie lue dans le rail"
+    return sorties
+
+
+def _exit_routes() -> set[str]:
+    return {route for _, route in _exits()}
 
 
 def test_the_probe_finds_both_surfaces():
     """Garde de la garde : deux ensembles vides se croiseraient sans conflit,
     et le test passerait en annonçant l'absence de doublon."""
-    shell, tiles = _shell_routes(), _tile_routes()
+    shell, sorties = _shell_routes(), _exit_routes()
     assert len(shell) >= 3, f"seulement {len(shell)} destinations de coque lues"
-    assert len(tiles) >= 2, f"seulement {len(tiles)} tuiles lues"
+    assert len(sorties) >= 2, f"seulement {len(sorties)} sorties lues"
 
 
-def test_no_home_tile_leads_where_the_shell_already_leads():
-    """L'INVARIANT. Pas « trois tuiles » — aucune répétition.
+def test_no_home_exit_repeats_the_shell_by_name():
+    """⚠ L'INVARIANT EST RAFFINÉ PAR `UI-CP3 §6`, PAS LEVÉ.
 
-    Épingler un nombre aurait interdit d'ajouter une destination utile ; ce
-    qui est interdit, c'est de doubler un chemin qui existe déjà à l'écran.
+    Ce que la mesure d'origine a établi, et qui reste vrai : deux tuiles
+    nommées « Progression » et « Programmes » répétaient, en plus gros et à
+    trois centimètres, ce que la barre basse montrait déjà. Elles
+    n'ajoutaient pas un accès, elles ajoutaient du bruit.
+
+    Ce que `UI-CP3` change : MISSION ne possède plus « qu'est-ce qui a
+    changé ? » ni « où en est mon corps ? ». Les blocs qui y répondaient
+    QUITTENT la surface, et laissent une adresse de réexpédition. Cette
+    adresse mène forcément vers une destination de la coque — c'est là que
+    vit la réponse.
+
+    La règle affinée, et testable : une sortie de l'accueil peut partager une
+    destination de la coque **à condition d'être nommée par la QUESTION**
+    qu'elle sert, jamais par le nom de la destination. « Progression » est un
+    doublon de navigation ; « Qu'est-ce qui a changé ? » est un renvoi de
+    contenu.
+
+    ⚠ SIGNALÉ À L'OPÉRATEUR : cette garde reposait sur une MESURE, et
+    l'affiner est un arbitrage, pas une évidence. Consigné dans le rapport de
+    tranche.
     """
-    doublons = sorted(_tile_routes() & _shell_routes())
-    assert doublons == [], (
-        f"l'accueil répète la coque : {doublons}. Ces destinations sont déjà "
-        "dans la barre basse, visible sur le même écran — la tuile n'ajoute "
-        "pas un accès, elle ajoute une répétition."
-    )
+    for libelle, route in _exits():
+        if route not in _shell_routes():
+            continue
+        assert "?" in libelle, (
+            f"« {libelle} » mène vers {route}, déjà dans la barre basse, et "
+            "n'est pas nommée par une question — c'est un doublon de "
+            "navigation, pas un renvoi de contenu."
+        )
+        for nom_coque in _shell_labels():
+            assert nom_coque.lower() not in libelle.lower(), (
+                f"« {libelle} » reprend le nom de la coque « {nom_coque} » : "
+                "un renvoi se nomme par sa question, pas par sa destination."
+            )
 
 
-def test_the_remaining_tiles_are_reachable_nowhere_else_in_the_shell():
+def test_every_remaining_exit_answers_a_question():
     """Ce qui reste doit MÉRITER sa place.
 
-    Une tuile qui survit parce qu'on ne l'a pas regardée est le prochain
-    doublon. Chacune doit mener quelque part que la coque n'atteint pas.
+    Une sortie qui survit parce qu'on ne l'a pas regardée est le prochain
+    doublon. Chacune doit désigner une question que MISSION ne possède plus —
+    et c'est le point d'arrêt du pont : quand `FLIGHT_RECORDER` répondra à
+    « qu'est-ce qui a changé ? », la sortie n'aura plus de raison d'être.
     """
-    tiles = _tile_routes()
-    assert tiles, "toutes les tuiles ont disparu — c'est une soustraction, pas un tri"
-    for route in sorted(tiles):
-        assert route not in _shell_routes(), route
+    sorties = _exits()
+    assert sorties, (
+        "toutes les sorties ont disparu — c'est une soustraction, pas un tri"
+    )
+    for libelle, _ in sorties:
+        assert "?" in libelle, (
+            f"« {libelle} » ne pose pas de question : elle redevient une tuile"
+        )
 
 
 def test_the_removed_destinations_are_still_reachable(client):
