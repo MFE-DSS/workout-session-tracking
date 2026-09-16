@@ -359,3 +359,443 @@ def test_une_completion_est_un_couple_de_comptes_pas_un_score():
     `done` et `total` — la précision ne doit pas dépasser le modèle."""
     champs = set(SessionCompletion.__dataclass_fields__)
     assert champs == {"done", "total"}
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  Les preuves d'ÉVÉNEMENT — elles exigent une base
+# ══════════════════════════════════════════════════════════════════════
+
+
+def _demarre(client, slug: str = "push-a") -> int:
+    import re as _re
+
+    r = client.post("/sessions", data={"template_slug": slug},
+                    follow_redirects=False)
+    assert r.status_code in (302, 303), r.status_code
+    return int(_re.match(r"/sessions/(\d+)", r.headers["location"]).group(1))
+
+
+def _cadence(uid: int, n: int = 4) -> None:
+    from app.database import SessionLocal
+    from app.services.training_preferences import save_training_preferences
+
+    with SessionLocal() as db:
+        save_training_preferences(db, uid, sessions_per_week=n)
+
+
+def _remplit(session_id: int, proportion: float) -> None:
+    """Coche une PART des séries de travail. Écrit directement — on prépare un
+    état, on ne teste pas le formulaire ici."""
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog
+
+    with SessionLocal() as db:
+        travail = db.execute(
+            select(SetLog)
+            .join(SessionExercise,
+                  SetLog.session_exercise_id == SessionExercise.id)
+            .where(SessionExercise.session_id == session_id)
+            .where(SetLog.kind == "work")
+            .order_by(SetLog.id.asc())
+        ).scalars().all()
+        assert travail, "le montage ne discrimine rien : aucune série de travail"
+        combien = int(len(travail) * proportion)
+        for sl in travail[:combien]:
+            sl.weight_kg, sl.reps, sl.completed = 60.0, 8, True
+        db.commit()
+
+
+def _traces(uid: int) -> list:
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.decision_trace import DecisionTrace
+    from app.services.decision_analytics import REPLAN_DELTA
+
+    with SessionLocal() as db:
+        return list(db.execute(
+            select(DecisionTrace)
+            .where(DecisionTrace.user_id == uid)
+            .where(DecisionTrace.decision_type == REPLAN_DELTA)
+        ).scalars().all())
+
+
+def test_preuve_A_une_cloture_qualifiante_cree_UNE_decision(client):
+    """Une seule, et seulement quand la séance le justifie."""
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    assert len(_traces(uid)) == 1, "zéro ou plusieurs décisions pour une clôture"
+
+
+def test_preuve_A_bis_une_seance_assez_complete_ne_cree_RIEN(client):
+    """⚠ LA MOITIÉ QUI EMPÊCHE LA PRÉCÉDENTE D'ÊTRE VIDE.
+
+    Sans elle, un déclencheur qui se déclenche TOUJOURS passerait la preuve A.
+    Le silence est la moitié du contrat.
+    """
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.9)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    assert _traces(uid) == []
+
+
+def test_preuve_B_des_GET_repetes_n_ecrivent_RIEN(client):
+    """⚠ LA PREUVE QUI SÉPARE UNE MÉMOIRE D'UNE RECOMPUTATION.
+
+    On compte les lignes avant et après plusieurs affichages de l'accueil. Une
+    continuité qui s'écrirait au rendu produirait une ligne par visite — et
+    citerait une date différente à chaque fois.
+    """
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    avant = len(_traces(uid))
+    assert avant == 1, "le montage ne discrimine rien"
+
+    for _ in range(4):
+        assert client.get("/").status_code == 200
+        assert client.get("/progress").status_code == 200
+
+    assert len(_traces(uid)) == avant, (
+        "un affichage a écrit une décision — c'est une recomputation, pas une "
+        "mémoire"
+    )
+
+
+def test_preuve_C_des_GET_repetes_exposent_la_meme_decision(client):
+    """Même identité, même date, même delta. C'est cela, se souvenir."""
+    from app.database import SessionLocal
+    from app.services.plan_adaptation_store import active_adaptations
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    lectures = []
+    for _ in range(3):
+        client.get("/")
+        with SessionLocal() as db:
+            (a,) = active_adaptations(db, uid)
+            lectures.append((a.decision_id, a.decided_at,
+                             tuple((d.zone_code, d.sets_after)
+                                   for d in a.deferrals)))
+
+    assert len(set(lectures)) == 1, f"la décision a bougé entre deux lectures : {lectures}"
+
+
+def test_preuve_F_l_ecartement_retire_l_effet_et_garde_l_histoire(client):
+    from app.database import SessionLocal
+    from app.services.plan_adaptation_store import active_adaptations, dismiss
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    with SessionLocal() as db:
+        (a,) = active_adaptations(db, uid)
+        assert dismiss(db, uid, a.decision_id)
+        db.commit()
+
+    with SessionLocal() as db:
+        assert active_adaptations(db, uid) == (), "l'effet subsiste"
+
+    assert len(_traces(uid)) == 1, (
+        "la trace historique a été supprimée — on écarte un EFFET, pas une preuve"
+    )
+
+
+def test_ecarter_deux_fois_est_le_meme_fait(client):
+    from app.database import SessionLocal
+    from app.services.plan_adaptation_store import active_adaptations, dismiss
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    with SessionLocal() as db:
+        (a,) = active_adaptations(db, uid)
+        assert dismiss(db, uid, a.decision_id) is True
+        db.commit()
+    with SessionLocal() as db:
+        assert dismiss(db, uid, a.decision_id) is False
+        db.commit()
+
+
+def test_une_trace_d_adaptation_est_immuable(client):
+    """⚠ PREUVE E — la décision ne peut pas être réécrite.
+
+    L'écouteur `before_update` de `decision_traces` lève. Cette garde vérifie
+    que la protection s'applique bien à NOS lignes, pas seulement en théorie.
+    """
+    import pytest
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.decision_trace import (
+        DecisionTrace,
+        DecisionTraceImmutableError,
+    )
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    with SessionLocal() as db:
+        ligne = db.execute(select(DecisionTrace)).scalars().first()
+        assert ligne is not None
+        ligne.basis = "[]"
+        with pytest.raises(DecisionTraceImmutableError):
+            db.commit()
+
+
+def test_une_seance_cardio_ne_declenche_jamais_a_la_cloture(client):
+    """Bout en bout, pas seulement sur la vue-modèle."""
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    # Aucune série cochée, et on force zéro travail prescrit en les retirant.
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise, SetLog
+
+    with SessionLocal() as db:
+        for sl in db.execute(
+            select(SetLog)
+            .join(SessionExercise,
+                  SetLog.session_exercise_id == SessionExercise.id)
+            .where(SessionExercise.session_id == sid)
+        ).scalars().all():
+            db.delete(sl)
+        db.commit()
+
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+    assert _traces(uid) == []
+
+
+def test_la_continuite_ne_coute_jamais_la_cloture(client, monkeypatch):
+    """⚠ « LE BROUILLON PRIME SUR SA TRACE ».
+
+    Une séance terminée est un fait de l'utilisateur ; la trace est un service
+    que le produit se rend à lui-même. Si la seconde explose, la première doit
+    rester — l'inverse serait une régression grave pour un enrichissement.
+    """
+    import app.routers.sessions as routeur
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    _remplit(sid, 0.3)
+
+    def explose(*a, **k):
+        raise RuntimeError("panne simulée de la continuité")
+
+    monkeypatch.setattr(
+        "app.services.plan_adaptation_store.record_adaptation", explose)
+
+    r = client.post(f"/sessions/{sid}", data={"action": "end"},
+                    follow_redirects=False)
+    assert r.status_code in (302, 303)
+
+    with SessionLocal() as db:
+        s = db.get(WorkoutSession, sid)
+        assert s.status == "completed", "la clôture a été emportée par la trace"
+        assert s.ended_at is not None
+    assert routeur is not None
+
+
+def test_une_seance_entierement_abandonnee_declenche_AUSSI(client):
+    """⚠ TROUVÉ PAR LE RENDU, PAS PAR LES GARDES UNITAIRES.
+
+    Une séance à 0 série sur 21 ne produisait AUCUN report, quand une séance à
+    une seule série en produisait un. Cause : la répartition par zone omettait
+    les zones à zéro, donc une séance entièrement abandonnée paraissait
+    « aucune zone touchée ».
+
+    Les deux absences ne sont pas la même : un exercice que le résolveur ne
+    sait pas classer est une IGNORANCE ; un exercice classé qui a livré zéro
+    est un FAIT.
+    """
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    # Rien n'est coché : la séance est ouverte puis close, telle quelle.
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    assert len(_traces(uid)) == 1, (
+        "une séance entièrement abandonnée ne produit aucune adaptation"
+    )
+
+
+def test_un_exercice_non_classe_reste_omis(client):
+    """L'autre moitié : la correction ci-dessus ne doit PAS transformer une
+    ignorance en zéro."""
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+    from app.services.zone_exposure import work_sets_by_zone
+
+    sid = _demarre(client)
+    with SessionLocal() as db:
+        s = db.execute(
+            select(WorkoutSession).where(WorkoutSession.id == sid)
+        ).scalars().first()
+        for se in s.session_exercises:
+            se.substituted_name = "Exercice totalement inconnu du résolveur"
+        db.commit()
+    with SessionLocal() as db:
+        s = db.execute(
+            select(WorkoutSession).where(WorkoutSession.id == sid)
+        ).scalars().first()
+        assert work_sets_by_zone(db, s) == {}, (
+            "un exercice non classé a été compté pour zéro"
+        )
+
+
+# ══════════════════════════════════════════════════════════════════════
+#  VOCABULAIRE — exigé par `Sx_RECOVERY_READINESS_01_SPEC §8.4`
+# ══════════════════════════════════════════════════════════════════════
+
+#: `§8.2` — formulations interdites, plus les deux mots que `UI-CP3.5 §10`
+#: proscrit spécifiquement. Sans instance planifiée datée, « manqué » et « en
+#: retard » affirment une faute que le modèle ne peut pas prouver.
+_INTERDITS = (
+    "physiologiquement récupéré",
+    "récupération musculaire mesurée",
+    "manqué",
+    "manquée",
+    "en retard",
+    "raté",
+    "ratée",
+)
+
+
+def test_la_continuite_n_emploie_aucun_mot_interdit(client):
+    """⚠ `§8.4` EXIGE CE TEST, et il vit dans le code, pas dans un document.
+
+    On lit le HTML RENDU, pas le gabarit : un libellé assemblé à deux endroits
+    diverge, et c'est ce qui rendait une garde de source insuffisante.
+    """
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    page = client.get("/").text
+    assert "mission-change" in page, (
+        "le bloc de continuité ne se rend pas — la garde tournerait à vide"
+    )
+
+    bas = page.lower()
+    fautifs = [m for m in _INTERDITS if m in bas]
+    assert fautifs == [], (
+        f"vocabulaire interdit rendu par MISSION : {fautifs}. Sans instance "
+        "planifiée datée, ces mots imputent une faute que le modèle ne peut "
+        "pas prouver."
+    )
+
+
+def test_la_continuite_dit_des_comptes_et_une_date(client):
+    """L'autre moitié : proscrire des mots ne suffit pas si la surface ne dit
+    plus rien. Elle doit porter les comptes ET la date de la décision."""
+    import re as _re
+
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    page = client.get("/").text
+    bloc = _re.search(r'<section class="mission-change".*?</section>',
+                      page, _re.DOTALL)
+    assert bloc, "bloc de continuité introuvable"
+    txt = bloc.group(0)
+    assert _re.search(r"Ajusté\s+\w+\s+\d{2}/\d{2}", txt), (
+        "la décision ne cite pas sa date — sans elle, rien ne distingue une "
+        "mémoire d'un recalcul"
+    )
+    assert _re.search(r"<b>\d+ → \d+</b>", txt), "aucun compte de séries rendu"
+    assert "reportées" in txt, (
+        "le mot qui empêche de lire une SUPPRESSION a disparu"
+    )
+
+
+def test_aucune_liste_de_zones_sur_mission(client):
+    """⚠ `§11` — MISSION n'est pas un flux d'historique.
+
+    Mesuré au rendu : sur une séance abandonnée, détailler chaque zone
+    produisait QUATRE lignes de report. On montre la plus matérielle, on compte
+    les autres, et on dit le total — rien n'est caché, seule l'énumération
+    disparaît.
+    """
+    import re as _re
+
+    from tests.helpers import get_test_user_id
+
+    uid = get_test_user_id()
+    _cadence(uid)
+    sid = _demarre(client)
+    client.post(f"/sessions/{sid}", data={"action": "end"},
+                follow_redirects=False)
+
+    page = client.get("/").text
+    bloc = _re.search(r'<section class="mission-change".*?</section>',
+                      page, _re.DOTALL)
+    assert bloc, "bloc de continuité introuvable"
+    lignes = len(_re.findall(r'class="mission-change__delta"', bloc.group(0)))
+    assert lignes == 1, (
+        f"{lignes} lignes de report : MISSION redevient un flux"
+    )

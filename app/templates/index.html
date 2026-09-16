@@ -65,6 +65,62 @@
    la progression, le compte. Ils ne sont pas supprimés — ils rejoignent
    leur instrument, ou un renvoi nommé par leur question (`§6`, `§10`).
    ============================================================ #}
+{# ══ `UI-CP3.5` — LA CONTINUITÉ. CHANGE · CONSEQUENCE · NOW ══
+
+   Rendue UNIQUEMENT quand une adaptation active s'applique au contexte de
+   plan courant. Sinon : aucun bloc. **Le silence est valide** — un bandeau
+   permanent ne serait plus de la mémoire, ce serait du décor.
+
+   Ce bloc cite une décision PRISE à la clôture d'une séance. Il ne recalcule
+   rien : la date et les comptes viennent d'une ligne immuable. C'est ce qui
+   fait qu'un second affichage dit exactement la même chose.
+
+   ⚠ VOCABULAIRE : des comptes, jamais une imputation. Ni « manqué », ni « en
+   retard » — sans instance planifiée datée, ces mots affirment une faute que
+   le modèle ne peut pas prouver. Une garde de vocabulaire le tient.
+
+   Le rail est GRAPHITE : ce n'est ni une commande (ambre) ni une affirmation
+   du moteur sur la séance à venir (bleu). C'est un fait constaté. #}
+{% if continuity %}
+<section class="mission-change" aria-label="Ce qui a changé">
+  <div class="cockpit__cause mission-change__body">
+    {# `date_fr` EXISTE DÉJÀ — « Sam 05/09 ». Écrire un filtre de plus pour la
+       même chose est le défaut que ce dépôt a payé seize fois : chercher la
+       pièce avant d'en fabriquer une. #}
+    <p class="cockpit__key">
+      Ajusté {{ continuity.decided_at | date_fr }}
+    </p>
+    <p class="mission-change__what">
+      Séance terminée à {{ continuity.done }}&nbsp;{{ "série" | pluriel(continuity.done) }}
+      sur {{ continuity.total }}
+    </p>
+    {# UNE zone — la plus matérielle. Les autres sont comptées, pas listées :
+       quatre lignes de report feraient de MISSION un flux. #}
+    <p class="mission-change__delta">
+      <span class="mission-change__zone">{{ continuity.zone_label }}</span>
+      <span class="mission-change__sets"><b>{{ continuity.sets_before }} → {{ continuity.sets_after }}</b>
+        {{ "série" | pluriel(continuity.sets_before) }}</span>
+      <span class="mission-change__tag">reportées</span>
+    </p>
+    {% if continuity.autres_zones %}
+    <p class="mission-change__more">
+      et {{ continuity.autres_zones }} autre{{ 's' if continuity.autres_zones > 1 }}
+      zone{{ 's' if continuity.autres_zones > 1 }} —
+      {{ continuity.sets_reportes }} {{ "série" | pluriel(continuity.sets_reportes) }}
+      reportées au total
+    </p>
+    {% endif %}
+  </div>
+  {# Un geste, pas un dialogue. L'adaptation est CONSULTATIVE au sens où elle
+     n'oblige à rien — mais elle a un effet réel, et l'écarter le retire. #}
+  <form method="post" action="{{ url_for('dismiss_adaptation') }}"
+        class="mission-change__dismiss-form">
+    <input type="hidden" name="decision_id" value="{{ continuity.decision_id }}">
+    <button type="submit" class="mission-change__dismiss">Écarter cet ajustement</button>
+  </form>
+</section>
+{% endif %}
+
 <section class="today-home__hero today-home__hero--{% if open_session %}active{% else %}next{% endif %}"
          aria-label="Décision du jour">
 

@@ -1008,3 +1008,84 @@
     max-width: 62ch;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   `UI-CP3.5` — CONTINUITÉ : CHANGE · CONSEQUENCE
+
+   Ce bloc précède la mission et lui est SUBORDONNÉ : il dit ce qui a
+   changé, pas ce qu'il faut faire. Sa hiérarchie visuelle le montre —
+   rail graphite, pas de titre de rang 1, aucune commande ambre.
+
+   Le rail n'est ni ambre (ce n'est pas une action) ni bleu (ce n'est pas
+   une affirmation du moteur sur la séance à venir) : c'est un FAIT
+   CONSTATÉ, donc structurel.
+   ══════════════════════════════════════════════════════════════════════ */
+.mission-change {
+  font-family: var(--t-mono);
+  padding: 4px 2px 0;
+}
+.mission-change__body {
+  padding-left: 18px;
+}
+/* Le rail du bloc de changement ne relie rien à une prescription : il
+   marque un constat. Il s'arrête donc à son propre bloc, là où celui de
+   la cause causale déborde pour rejoindre le « donc ». */
+.mission-change .cockpit__cause::before {
+  background: var(--t-line);
+  bottom: 6px;
+}
+.mission-change__what {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--t-fg-2);
+}
+.mission-change__delta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 4px;
+  font-size: 13px;
+  color: var(--t-fg-2);
+}
+.mission-change__zone { color: var(--t-fg); }
+.mission-change__sets b {
+  color: var(--t-fg);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* « reportées » est le mot qui empêche de lire une suppression. Il est
+   discret, jamais absent. */
+.mission-change__tag {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  color: var(--t-fg-muted);
+}
+.mission-change__dismiss-form { margin: 10px 0 0 18px; }
+/* Une sortie, pas une commande : aucun aplat, aucune bordure. L'ambre de
+   l'écran reste la propriété de la seule décision dominante. */
+.mission-change__dismiss {
+  background: none;
+  border: 0;
+  padding: 10px 2px;
+  min-height: 44px;
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--t-fg-muted);
+  cursor: pointer;
+  text-align: left;
+}
+.mission-change__dismiss:hover,
+.mission-change__dismiss:focus-visible { color: var(--t-fg-2); }
+
+@media (min-width: 900px) {
+  .mission-change { max-width: 62ch; }
+}
+/* Les zones non détaillées sont COMPTÉES, jamais listées : quatre lignes de
+   report feraient de MISSION un flux d'historique. Le total est dit, donc
+   rien n'est caché — seule l'énumération disparaît. */
+.mission-change__more {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--t-fg-muted);
+}

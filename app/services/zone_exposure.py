@@ -191,9 +191,20 @@ def work_sets_by_zone(db: Session, session) -> dict[str, int]:
     d'exposition. Ici on ne veut que les séries, sur une seule séance — le
     dédoublonnage n'aurait aucun objet.
 
-    Les exercices non attribuables sont **omis**, jamais comptés en zéro : on
-    ignore ce qu'ils ont sollicité. Une zone absente du résultat n'est donc pas
-    une zone à zéro.
+    ⚠ DEUX ABSENCES DIFFÉRENTES, ET IL FALLAIT LES DISTINGUER.
+
+    Un exercice que le résolveur **ne sait pas classer** est omis : on ignore
+    ce qu'il a sollicité, et le compter pour zéro serait conclure d'une
+    ignorance.
+
+    Un exercice classé qui a livré **zéro série** est présent, avec zéro. Ce
+    n'est pas une ignorance, c'est un fait.
+
+    Première écriture : la fonction omettait aussi les zéros (`if fait:`).
+    Conséquence mesurée au rendu — une séance **entièrement abandonnée**
+    (0 série sur 21) ne produisait AUCUN report, quand une séance à une seule
+    série en produisait un. Exactement à l'envers, et invisible pour les
+    gardes unitaires qui n'exerçaient que des séances partiellement faites.
     """
     par_zone: dict[str, int] = {}
     for se in session.session_exercises:
@@ -201,9 +212,7 @@ def work_sets_by_zone(db: Session, session) -> dict[str, int]:
             db, se.substituted_name or se.exercise_name_snapshot or "")
         if not res.mapped:
             continue
-        fait = _work_sets(se)
-        if fait:
-            par_zone[res.zone] = par_zone.get(res.zone, 0) + fait
+        par_zone[res.zone] = par_zone.get(res.zone, 0) + _work_sets(se)
     return par_zone
 
 

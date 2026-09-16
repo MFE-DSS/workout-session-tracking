@@ -13,6 +13,7 @@ from app.models import (  # noqa: F401
     exercise_muscle_mapping,
     measurement,
     muscle,
+    plan_adaptation_dismissal,
     readiness,
     session,
     sharing,

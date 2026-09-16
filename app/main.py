@@ -32,6 +32,7 @@ from app.routers import (
     health,
     leaderboard,
     pages,
+    plan_adaptation,
     readiness,
     sessions,
     squads,
@@ -306,6 +307,8 @@ def create_app() -> FastAPI:
     app.include_router(admin.router)
     app.include_router(leaderboard.router)
     app.include_router(readiness.router)
+    # `UI-CP3.5` — une seule route : écarter un ajustement.
+    app.include_router(plan_adaptation.router)
     app.include_router(squads.router)
     app.include_router(coach_report.router)
     # Sb_CUSTOM_PROGRAM_WIZARD_01 — Custom Program creation entry flow

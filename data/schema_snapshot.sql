@@ -28,6 +28,9 @@ CREATE INDEX ix_exercise_muscle_mapping_zone ON exercise_muscle_mappings (body_z
 -- index: ix_exercises_name
 CREATE INDEX ix_exercises_name ON exercises (name);
 
+-- index: ix_plan_adapt_dismissal_user
+CREATE INDEX ix_plan_adapt_dismissal_user ON plan_adaptation_dismissals (user_id);
+
 -- index: ix_session_exercises_session_id
 CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
 
@@ -96,6 +99,9 @@ CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, posi
 
 -- table: muscles
 CREATE TABLE muscles ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, name VARCHAR(128) NOT NULL, body_zone_code VARCHAR(64), category VARCHAR(32), is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), UNIQUE (code), FOREIGN KEY(body_zone_code) REFERENCES body_zones (code) ON DELETE SET NULL );
+
+-- table: plan_adaptation_dismissals
+CREATE TABLE plan_adaptation_dismissals ( id INTEGER NOT NULL, decision_id VARCHAR(64) NOT NULL, user_id INTEGER NOT NULL, dismissed_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_plan_adapt_dismissal_decision_id UNIQUE (decision_id) );
 
 -- table: readiness_entries
 CREATE TABLE readiness_entries ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, recorded_on DATE NOT NULL, sleep_quality INTEGER NOT NULL, fatigue_level INTEGER NOT NULL, soreness_level INTEGER NOT NULL, stress_level INTEGER NOT NULL, motivation_level INTEGER NOT NULL, resting_hr INTEGER, note TEXT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_readiness_user_day UNIQUE (user_id, recorded_on) );

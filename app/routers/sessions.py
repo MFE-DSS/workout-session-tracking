@@ -16,6 +16,7 @@ touching this router.
 """
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Annotated
 
@@ -66,6 +67,8 @@ from app.services.stats import (
 from app.services.time_format import WEEKDAY_LABELS
 from app.services.user_program_launch import is_owned_published_template
 from app.templating import local_weekday_iso, templates
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["sessions"])
 
@@ -178,6 +181,67 @@ def _persist_implicit_labels_on_completion(session: WorkoutSession) -> None:
     # Bump the scoring version (never downgrade).
     if session.scoring_version < 2:
         session.scoring_version = 2
+
+
+def _record_continuity_on_completion(db, session, user_id: int) -> None:
+    """`UI-CP3.5` — décide et persiste une adaptation, si la séance en appelle une.
+
+    ⚠ NE LÈVE JAMAIS.
+
+    Patron repris de `observe_plan_generation` : *« le brouillon prime sur sa
+    trace »*. Une séance terminée est un fait de l'utilisateur ; une trace
+    d'adaptation est un service que le produit se rend à lui-même. Si la
+    seconde échoue, la première reste. L'inverse serait une régression grave
+    pour un enrichissement.
+
+    Le `rollback` est **imbriqué** : il annule ce que cette fonction a tenté,
+    pas la clôture, que l'appelant committera derrière.
+    """
+    try:
+        from app.services.plan_adaptation import deferrals_for
+        from app.services.plan_adaptation_store import record_adaptation
+        from app.services.session_completion import completion_of
+        from app.services.training_preferences import get_training_preferences
+        from app.services.weekly_planner import build_weekly_plan_for_user
+        from app.services.zone_exposure import work_sets_by_zone
+
+        etat = completion_of(session)
+        if not etat.is_materially_incomplete:
+            return
+
+        prefs = get_training_preferences(db, user_id)
+        if not prefs.sessions_per_week:
+            # Sans cadence déclarée, il n'y a pas de plan — donc rien dont
+            # reporter quoi que ce soit. Se taire, plutôt qu'inventer un plan.
+            return
+
+        plan = build_weekly_plan_for_user(db, user_id)
+        prevu = {c.zone_code: c.planned_sets for c in plan.zone_coverage}
+        reports = deferrals_for(work_sets_by_zone(db, session), prevu)
+        if not reports:
+            return
+
+        record_adaptation(
+            db, user_id,
+            plan_fingerprint=plan.fingerprint,
+            deferrals=reports,
+            done=etat.done,
+            total=etat.total,
+            # Le motif est FACTUEL : des comptes, jamais une imputation.
+            # Ni « manqué », ni « en retard » — sans instance planifiée datée,
+            # ces mots affirment une faute que le modèle ne peut pas prouver.
+            basis=(
+                f"séance terminée à {etat.done} séries sur {etat.total}",
+                "travail reporté, non supprimé",
+            ),
+        )
+        db.commit()
+    except Exception:
+        logger.exception("continuité : adaptation non enregistrée")
+        try:
+            db.rollback()
+        except Exception:
+            logger.exception("continuité : rollback impossible")
 
 
 def _session_stats(session: WorkoutSession) -> dict:
@@ -861,6 +925,26 @@ async def update_session(
         session.status = SessionStatus.IN_PROGRESS
 
     db.commit()
+
+    if action == "end":
+        # `UI-CP3.5` — LA CONTINUITÉ NAÎT ICI, ET APRÈS LE COMMIT.
+        #
+        # C'est le seul endroit du produit où une séance devient un fait
+        # passé : une adaptation décidée pendant un rendu ne serait pas une
+        # mémoire mais une recomputation déguisée.
+        #
+        # ⚠ APRÈS `db.commit()`, ET CE N'EST PAS UN DÉTAIL D'ORDRE.
+        #
+        # Première écriture : l'appel était AVANT, dans la branche `end`. Une
+        # garde l'a attrapé — la panne simulée de la trace faisait `rollback`
+        # de la transaction entière, donc de la CLÔTURE, et la séance restait
+        # `in_progress`. La trace emportait le fait qu'elle devait décrire.
+        #
+        # Le précédent du dépôt le fait dans cet ordre pour cette raison
+        # exacte : *« le brouillon prime sur sa trace »*
+        # (`user_programs.py`, `observe_plan_generation`). Committée d'abord,
+        # la séance ne peut plus être emportée par rien.
+        _record_continuity_on_completion(db, session, user.id)
 
     if action == "end":
         return RedirectResponse(
