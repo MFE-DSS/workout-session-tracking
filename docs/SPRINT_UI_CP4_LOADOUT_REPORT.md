@@ -514,3 +514,80 @@ enfreinte deux fois, et l'avoir rattrapée par une mesure ne l'excuse pas.
 | Mutation | 2 défauts plantés, 2 gardes rouges, arbre restauré |
 | Sweep local complet, chemin absolu, **sans pipe** | **`tous les lots sont verts.`** — 331/331 fichiers, 98 lots, pic 2023 Mo / budget 2256, aucun fichier sauté |
 | Rendu exposé à l'opérateur avant tout commit de gabarit (`§5.1`) | **fait** — 5 captures, 8 états |
+
+---
+
+## 14. Closeout — post-merge
+
+| | |
+|---|---|
+| PR | **#234**, mergée le 2026-09-16 |
+| Méthode | `--merge` avec `--match-head-commit` — aucun squash, aucun `--admin`, aucun force |
+| Head de PR | `eb799017` |
+| Commit de merge | **`6c53cf3`** |
+| Contrôles CI de PR | **9 verts** — lint (dont `actionlint`), attestation canonique, 3 shards pytest, `pytest + QA scripts`, Gitar, SonarCloud |
+| Gate Sonar | **OK** sur 5/5 · couverture du code neuf **97,6 %** |
+| Threads de revue non résolus | **0** |
+| CI canonique sur `6c53cf3` | **tout ce qui teste CP4 est vert** — voir ci-dessous |
+| **Déployée en production** | **oui** — `deploy/prod/2026-09-16-1503-6c53cf3`, 18 contrôles smoke PASS, `check_alembic_drift` OK |
+
+### CI canonique — le rouge n'appartient pas à CP4
+
+| Job | Verdict |
+|---|---|
+| attestation canonique | **success** |
+| pytest shard 1 · 2 · 3 | **success** |
+| `pytest + QA scripts` | **success** |
+| `lint` | **failure** — `actionlint` / node20, **préexistant** (déjà rouge sur `41c89bc`, avant CP4) |
+| `SonarCloud` | **skipped** — il déclare `needs: [test, lint]` |
+
+⚠ **Un septième contrôle perdu, que je n'avais pas compté.** J'avais annoncé
+« six contrôles requis sautés ». L'analyse **SonarCloud canonique** l'est aussi,
+par dépendance de job. Le coût réel de cette dette d'infra est donc plus élevé
+que ce que j'avais rapporté.
+
+Traité par la tranche `Sb_CI_NODE24_RUNTIME_01`, ouverte immédiatement après.
+
+### La production n'avait pas DEUX tranches
+
+Relevé au moment du déploiement : production était restée à `d475773`. Lui
+manquaient **`#233 UI-CP3.5 CONTINUITÉ`** *et* **`#234 UI-CP4 LOADOUT`**. Les
+deux sont parties ensemble dans le déploiement ci-dessus.
+
+Le déploiement a été **découplé** de la tranche `ci_infra` en cours : celle-ci
+ne touche que des fichiers de workflow et n'a aucun effet sur l'application.
+Attendre l'aurait retardé sans rien y ajouter.
+
+### L'incident Sonar, et pourquoi le correctif évident aurait cassé la tranche
+
+Gate **ERROR** au premier passage : `new_code_smells_severity` = 15 pour un
+seuil de 14. Localisé plutôt que deviné — deux `python:S8514` sur
+`is_program = False` / `= True`, les marques de type des deux dataclasses.
+
+**Sonar avait raison**, et le correctif évident aurait détruit l'invariant
+central de CP4 : `is_program: bool` en aurait fait un **vrai champ de
+dataclass**, donc une valeur portée par chaque instance — et un `SessionRow`
+aurait pu se déclarer programme. `ClassVar[bool]` dit l'inverse : marque du
+TYPE, pas donnée de la ligne, non négociable instance par instance.
+
+⚠ **Et ma propre garde interrogeait la mauvaise vue.**
+`__dataclass_fields__` inclut les pseudo-champs `ClassVar` ;
+`dataclasses.fields()` les filtre et rend les champs réels. J'ai conclu un
+instant que `ClassVar` était sans effet — **fausse alerte de mon compteur, pas
+défaut du code**. C'est la même famille d'erreur que les huit formes déjà
+recensées de « mesurer le mauvais objet », ici en une ligne d'introspection.
+
+La garde lit désormais `fields()` **et** vérifie qu'`is_program` n'y figure
+pas : une instance ne doit pas pouvoir mentir sur son type. Revérifiée par
+mutation.
+
+### Ce qui reste ouvert après cette tranche
+
+* **PROGRAM_LIFECYCLE** — créer / éditer / archiver / restaurer — responsabilité
+  distincte, hors LOADOUT. Le cul-de-sac d'archivage (service sans route,
+  message de quota promettant un archivage inatteignable) **reste ouvert**.
+* **Dette `actionlint @v1`** — l'étiquette flotte toujours. Elle n'a pas mordu
+  sur cette PR, mais elle a rougi la CI canonique sur `41c89bc`. Tranche
+  `ci_infra` requise.
+* **Trois occurrences d'ambre sous filtre** — puce de filtre active, style
+  préexistant, hors périmètre CP4.
