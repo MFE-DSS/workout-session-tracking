@@ -331,6 +331,20 @@ def test_alembic_head_unchanged():
     # `exercises` et `exercise_aliases`, **aucune clé étrangère posée sur
     # `template_exercises` ni `session_exercises`** — remplir une colonne neuve
     # sur ces tables resterait un UPDATE de lignes historiques ; la résolution
-    # se fait à la lecture, par la table d'alias).
+    # se fait à la lecture, par la table d'alias),
+    # puis UI-CP3.5 (`u2v7p3q4s15` : table additive
+    # `plan_adaptation_dismissals`, deux colonnes et une date, aucun backfill —
+    # aucune adaptation n'a jamais été proposée, donc aucune n'a jamais été
+    # écartée ; fabriquer des lignes affirmerait un geste que personne n'a
+    # fait. Aucune colonne ajoutée ailleurs : le reste de la décision vit dans
+    # `decision_traces`, qui existait déjà et dont l'immuabilité interdit d'y
+    # poser un cycle de vie).
     # Cette sentinelle suit le head courant.
-    assert script.get_current_head() == "t1u6o2p3r14"
+    #
+    # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
+    # `alembic.ini` porte `script_location = migrations`, un chemin RELATIF :
+    # il se résout contre le `cwd`, pas contre l'emplacement du fichier. Lancer
+    # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
+    # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
+    # c'est pourquoi lui seul a vu ce head changer.
+    assert script.get_current_head() == "u2v7p3q4s15"
