@@ -134,7 +134,6 @@ def test_the_instrument_carries_no_command_whatever_the_session_count(client):
     de lecture porte ZÉRO commande, quel que soit le nombre de séances.
     """
     from app.database import SessionLocal
-
     from tests.test_anomalies import _mk_session_for_anomalies
 
     for _ in range(3):
