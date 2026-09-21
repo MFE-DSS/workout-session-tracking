@@ -761,7 +761,7 @@ jobs:
         # now rejected by SonarQube Cloud) to the current
         # `sonarqube-scan-action@v7.1.0` which ships a Java 21 scanner.
         # No setup-java needed: the v7 action bundles its own runtime.
-        uses: SonarSource/sonarqube-scan-action@v7.1.0
+        uses: SonarSource/sonarqube-scan-action@v8.2.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
