@@ -267,8 +267,12 @@ def test_progress_page_renders_with_real_data(client):
     r = client.get("/progress")
     assert r.status_code == 200
     body = r.text
-    # KPI card values render
-    assert "work sets validés" in body
+    # ⚠ `UI-CP5 §7` — les tuiles sont retirées comme objet ; le fait survit sur
+    # la ligne de contexte, et il y est dit en ENTIER plutôt qu'en taux :
+    # un pourcentage cache son dénominateur, or c'est lui qui décide si la
+    # mesure existe.
+    assert "work sets cochés" in body
+    assert "prescrits" in body
     assert "Push A" in body
     # ⚠ Assertait « sessions terminées ». Le libellé dit désormais
     # « séance(s) terminée(s) » : « session » était un ANGLICISME au milieu

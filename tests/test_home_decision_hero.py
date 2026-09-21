@@ -121,10 +121,22 @@ class TestHomeIA:
         possède pas. Elle est remplacée par un RAIL DE TRANSITION daté, qui ne
         porte que des sorties.
 
-        Ce qui est tenu, et qui n'a jamais été le nom du conteneur : il existe
-        un rang INFÉRIEUR au hero, et il est occupé.
+        ⚠ INVERSÉE PAR `UI-CP5`, ET C'EST LE SEUL ENDROIT OÙ CETTE TRANCHE
+        VIDE UN RANG AU LIEU DE LE DÉPLACER.
+
+        Le rail portait sa date de péremption ; elle est atteinte. Ses deux
+        sorties menaient aux onglets PRIMAIRES « Progression » et « Profil »,
+        et les deux questions qu'elles nommaient ont désormais leur instrument.
+        La cible `A` d'`UI-CP3 §6` est explicite : *décision · cause ·
+        commande · alternative minimale. Rien d'autre.*
+
+        Ce qui est tenu n'a jamais été le nom du conteneur, ni même son
+        existence : c'est que **la décision reste seule au premier rang**. La
+        garde le vérifie désormais directement.
         """
-        assert "mission-bridge" in _home(client)
+        body = _home(client)
+        assert "mission-bridge" not in body, "le pont daté est revenu"
+        assert "today-home__hero" in body, "la décision a disparu du premier rang"
 
     def test_terminal_direction_marker(self, client):
         """Sb_UI_02b.1 — the Home carries the Auren Terminal marker class."""
@@ -168,16 +180,24 @@ class TestHomeIA:
         # MISSION. Ce qui occupe leur rang est un rail de sorties, et
         # l'invariant devient plus simple ET plus fort : le rang 2 ne porte
         # AUCUN conteneur, donc rien qui puisse redevenir une carte.
+        # ⚠ `UI-CP5` — LE RANG 2 EST VIDE, DONC L'INVARIANT SE DURCIT ENCORE.
+        #
+        # ⚠ ET MA PREMIÈRE RÉÉCRITURE ÉTAIT FAUSSE : elle exigeait un `background`
+        # sur le héros. `UI-CP3 §2` a précisément CESSÉ d'en faire une carte —
+        # le rang 1 se signale par le rail causal vertical, pas par un aplat.
+        # Une garde qui réclame le fond réclamerait le retour de la primitive
+        # que le programme retire.
+        #
+        # Ce qui reste vrai et vérifiable : rien, sur l'accueil, ne porte de
+        # conteneur de carte. C'est l'invariant que la zone de rang 2 servait
+        # à protéger, désormais énoncé sur la page entière.
         body = _home(client)
-        assert "mission-bridge" in body, "le rang inférieur a disparu"
-        css = HOME_CSS.read_text(encoding="utf-8")
-        bloc = re.search(r"\.mission-bridge__exit\s*\{([^}]*)\}", css)
-        assert bloc, "les sorties de rang 2 ne sont plus stylées comme un rang"
-        regle = bloc.group(1)
-        assert "background" not in regle, (
-            "une sortie a reçu un fond — elle redevient une carte, et la carte "
-            "cesse d'être le signal du rang 1"
+        assert "mission-bridge" not in body
+        principal = body.split("<main", 1)[-1].split("</main", 1)[0]
+        assert 'class="card' not in principal, (
+            "une carte est réapparue sur l'accueil"
         )
+        assert "today-home__hero" in principal
 
 
 # ───────── Auren Terminal visual system (graphite / mono / amber) ─────────
@@ -358,14 +378,26 @@ class TestDashboardPreserved:
         for label in ("Historique", "Progression", "Programmes"):
             assert label in body
 
-    def test_dashboard_below_hero(self, client):
-        """Hero appears before the secondary zone in the DOM."""
+    def test_the_decision_is_the_first_object_of_the_home(self, client):
+        """⚠ REPOINTÉE PAR `UI-CP5`. La garde comparait deux positions dans le
+        DOM ; le second objet n'existe plus. Ce qu'elle protégeait — **la
+        décision vient en premier** — se vérifie sans lui, et mieux : aucun
+        titre de section ne la précède.
+        """
         body = _home(client)
-        hero = body.find("today-home__hero")
-        zone = body.find("mission-bridge")
+        principal = body.split("<main", 1)[-1].split("</main", 1)[0]
+        hero = principal.find("today-home__hero")
         assert hero != -1, "hero absent"
-        assert zone != -1, "rang inférieur absent"
-        assert hero < zone, "la décision doit précéder le contexte"
+        for avant in ("<h2", 'class="band', "kpi-card"):
+            pos = principal.find(avant)
+            if pos == -1:
+                continue  # absent de la page : il ne précède rien
+            # `python:S9073` — une conjonction ici cacherait laquelle des deux
+            # grandeurs a décidé de l'échec. L'absence se traite AVANT, et
+            # l'assertion ne porte plus que sur la comparaison de positions.
+            assert pos > hero, (
+                f"« {avant} » précède la décision sur l'accueil"
+            )
 
     def test_analysis_is_reachable_from_the_home(self, client):
         """Tier **T4** — `Sx_UIV3_01 §7`, BLOCKER-1 tranché : **OUI**.

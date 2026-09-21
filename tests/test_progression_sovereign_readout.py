@@ -72,6 +72,51 @@ def _font_size(selector: str) -> int:
     return int(f.group(1))
 
 
+def _declarations_de_taille() -> list[tuple[str, int]]:
+    """Toutes les tailles déclarées dans `app.css`, avec LEUR sélecteur.
+
+    Énumérer les seules VALEURS rend un `[24]` qui n'apprend rien : il faut
+    savoir qui les porte pour décider si c'est un défaut ou une dette nommée.
+
+    On ne découpe pas la feuille en règles — un `@media` imbrique des
+    accolades et une regex naïve rendrait le bloc entier comme sélecteur. On
+    part de chaque `font-size` et on remonte : l'accolade ouvrante qui le
+    précède, puis le séparateur d'avant (`{`, `}` ou le début du fichier). Ce
+    qui reste entre les deux est la liste de sélecteurs, y compris à
+    l'intérieur d'un `@media`.
+    """
+    src = re.sub(r"/\*[\s\S]*?\*/", " ", CSS.read_text(encoding="utf-8"))
+    trouvees: list[tuple[str, int]] = []
+    for m in re.finditer(r"font-size:\s*(\d+)px", src):
+        ouvrante = src.rfind("{", 0, m.start())
+        if ouvrante == -1:
+            continue
+        debut = max(src.rfind("{", 0, ouvrante), src.rfind("}", 0, ouvrante))
+        selecteur = " ".join(src[debut + 1:ouvrante].split())
+        trouvees.append((selecteur, int(m.group(1))))
+    assert trouvees, "aucune taille lue — la sonde ne mesure rien"
+    return trouvees
+
+
+#: Les tailles HORS ÉCHELLE tolérées, chacune avec la raison qui la tolère.
+#:
+#: Ce n'est pas une liste d'exemptions ouverte : elle est **fermée** par
+#: `test_no_count_reaches_the_rank_below_the_sovereign_readout`, qui exige que
+#: tout intrus y figure déjà. Y ajouter une entrée est donc un acte délibéré,
+#: visible en revue, qui oblige à écrire pourquoi.
+DETTE_HORS_ECHELLE = {
+    ".user-profile__name": (
+        "Le `<h1>` du profil PUBLIC — « @martin ». C'est un NOM, pas un "
+        "comptage : il ne dispute pas le premier regard à un relevé, il "
+        "désigne de qui l'écran parle. La règle que cette garde tient porte "
+        "sur les comptages, et `user_profile` est par ailleurs une surface "
+        "TRANSITIONAL, hors du périmètre de `UI-CP5` (§14). La descendre à 22 "
+        "px serait une retouche de surface sociale déguisée en correction de "
+        "hiérarchie sur Progression."
+    ),
+}
+
+
 # ───────────── la hiérarchie, qui EST la décision ─────────────
 
 #: Le rang `SECTION` du socle typographique (`§3.2`), déclaré 22 px. Un
@@ -94,16 +139,72 @@ def test_no_count_reaches_the_rank_below_the_sovereign_readout():
     l'écrasement, qui produit le même défaut. Le seuil est donc accroché à
     l'échelle documentée plutôt qu'à une comparaison relative : il n'est pas
     négociable par un pixel.
+
+    ⚠ `UI-CP5` — ELLE EST GÉNÉRALISÉE, ET C'EST LE BON MOMENT POUR LE FAIRE.
+
+    `.kpi-card__value` disparaît avec « Rythme récent » (§7), et une garde qui
+    nomme ses sélecteurs un par un doit être remise à jour à chaque tranche —
+    donc elle finit par ne plus couvrir ce qu'on vient d'ajouter. Elle énumère
+    désormais TOUTES les tailles déclarées dans la feuille et exige qu'aucune
+    ne tombe dans l'intervalle interdit. Le rang se ferme par construction.
+
+    ⚠ LA GÉNÉRALISATION A MORDU IMMÉDIATEMENT, SUR DU CODE QUE PERSONNE NE
+    REGARDAIT — et c'est la preuve qu'elle valait d'être écrite.
+
+    Elle a rendu `[24]` au premier lancement : `.kpi__value`, à 24 px, dans une
+    famille `.kpi*` SANS AUCUN consommateur de gabarit. Un rang intermédiaire
+    dormant, prêt à être réemployé par la prochaine tranche qui aurait cherché
+    « une classe de valeur qui existe déjà ». Elle est retirée avec sa stèle.
+
+    Elle a aussi rendu `.user-profile__name`, et c'est un cas DIFFÉRENT qu'il
+    aurait été malhonnête de traiter pareil : un nom d'utilisateur n'est pas un
+    comptage. Il est inscrit dans `DETTE_HORS_ECHELLE` avec sa raison, et la
+    garde vérifie que l'ensemble des intrus reste INCLUS dans ce registre —
+    donc le registre ne peut pas grossir sans qu'on l'écrive.
     """
     readout = _font_size(".lead__value")
-    for compteur in (".kpi-card__value", ".ze__n"):
-        taille = _font_size(compteur)
-        assert taille <= RANG_SECTION_PX, (
-            f"{compteur} vaut {taille}px : entre le rang SECTION "
-            f"({RANG_SECTION_PX}px) et le relevé souverain ({readout}px), "
-            f"il n'y a pas de rang — le comptage redispute le premier regard"
-        )
-        assert readout > taille, f"{compteur} dépasse le relevé souverain"
+    assert readout > RANG_SECTION_PX, "le relevé souverain a quitté son rang"
+
+    intrus = {
+        selecteur: taille
+        for selecteur, taille in _declarations_de_taille()
+        if RANG_SECTION_PX < taille < readout
+    }
+    non_inscrits = sorted(set(intrus) - set(DETTE_HORS_ECHELLE))
+    assert not non_inscrits, (
+        f"tailles déclarées entre le rang SECTION ({RANG_SECTION_PX}px) et le "
+        f"relevé souverain ({readout}px) : "
+        f"{ {s: intrus[s] for s in non_inscrits} }. Entre les deux il n'y a "
+        "pas de rang — ce qui s'y installe redispute le premier regard. Si "
+        "c'est une dette assumée et non un comptage, l'inscrire dans "
+        "`DETTE_HORS_ECHELLE` avec sa raison."
+    )
+
+    # Et le pendant, sur le seul comptage qui subsiste à l'écran.
+    taille = _font_size(".ze__n")
+    assert taille <= RANG_SECTION_PX, f".ze__n vaut {taille}px"
+    assert readout > taille, ".ze__n dépasse le relevé souverain"
+
+
+def test_the_off_scale_register_holds_no_expired_entry():
+    """LE PENDANT DU REGISTRE, et il compte autant que lui.
+
+    Une exemption qui survit à ce qu'elle exemptait est pire qu'absente : elle
+    ne protège plus rien et ré-autorise silencieusement le sélecteur le jour où
+    quelqu'un le remet à 24 px. Le registre doit donc se vider tout seul —
+    corriger une dette oblige à retirer sa ligne dans le même commit.
+    """
+    readout = _font_size(".lead__value")
+    encore_intrus = {
+        selecteur for selecteur, taille in _declarations_de_taille()
+        if RANG_SECTION_PX < taille < readout
+    }
+    perimees = sorted(set(DETTE_HORS_ECHELLE) - encore_intrus)
+    assert not perimees, (
+        f"inscrits dans `DETTE_HORS_ECHELLE` sans plus rien déclarer entre "
+        f"{RANG_SECTION_PX} et {readout} px : {perimees}. La dette est "
+        "remboursée — retirer la ligne, sinon l'exemption reste ouverte."
+    )
 
 
 def test_the_partial_marker_stays_smaller_than_the_count_it_qualifies():

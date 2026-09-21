@@ -531,21 +531,22 @@
   color: var(--t-fg);
   font-family: var(--t-mono);
 }
-.today-home .kpi__value,
-.today-home .kpi__label,
 .today-home .tile__label,
 .today-home .tile__hint,
 .today-home .card__title {
   font-family: var(--t-mono);
   color: var(--t-fg);
 }
-.today-home .kpi__value { font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
-.today-home .kpi__label,
 .today-home .tile__hint,
 .today-home .card__title { color: var(--t-fg-2); }
-/* L'ancien accent orange (kpi--accent, badges) est neutralisé en ambre
-   ou gris dans la zone Home — le teal/orange legacy ne doit pas fuir. */
-.today-home .kpi--accent .kpi__value { color: var(--t-amber); }
+/* `UI-CP5` — LA NEUTRALISATION DE `.kpi*` PART AVEC `.kpi*`.
+   Quatre règles vivaient ici pour empêcher l'accent orange legacy de fuir
+   dans la zone Home : `.today-home .kpi__value`, `.kpi__label`, leur reprise
+   en `--t-fg-2`, et `.kpi--accent .kpi__value` en ambre. La famille qu'elles
+   corrigeaient est retirée d'`app.css` (voir la stèle « KPI » là-bas), et une
+   correction sans objet à corriger n'est plus une protection : c'est une
+   règle qui attend le retour de ce qu'elle bornait. Ce que le bloc garde —
+   `.tile*`, `.card__title` — n'a pas bougé. */
 .today-home .tile:hover { border-color: var(--t-line-strong); }
 .today-home .text-muted,
 .today-home .text-dim { color: var(--t-fg-muted); }
@@ -946,48 +947,29 @@
 }
 
 /* ══════════════════════════════════════════════════════════════════════
-   `UI-CP3 §6` — LE RAIL DE TRANSITION. **DATÉ.**
+   `UI-CP3 §6` — LE RAIL DE TRANSITION : RETIRÉ LE 2026-09-21.
 
-   Ce n'est pas une primitive de cockpit AUREN : c'est un pont vers les
-   instruments qui n'existent pas encore. Il porte son critère de retrait —
-   quand FLIGHT_RECORDER existe (`UI-CP5`), ce bloc est réévalué et retiré.
+   ⚠ CETTE STÈLE REMPLACE SES RÈGLES, ET ELLE N'EST PAS DÉCORATIVE.
 
-   Il ne contient que des SORTIES de faible emphase, nommées par la QUESTION
-   qu'elles vont servir. Aucune métrique n'a le droit d'y entrer : une sortie
-   nommée par sa question n'est pas un tableau de bord, et c'est ce qui
-   l'empêche de redevenir l'empilement qu'on vient de retirer.
+   `UI-CP3` avait livré ce pont avec son propre critère de retrait écrit noir
+   sur blanc — « quand FLIGHT_RECORDER existe (`UI-CP5`), ce bloc est réévalué
+   et retiré » — parce qu'un pont sans date devient une fondation. `UI-CP5`
+   est la tranche qui a honoré ce critère ; effacer le raisonnement en même
+   temps que les règles aurait perdu la seule chose qui vaille d'être gardée.
+
+   LA RAISON DU RETRAIT EST MESURÉE. Les deux sorties — « Qu'est-ce qui a
+   changé ? » et « Où en est mon corps ? » — menaient à `/progress` et
+   `/profile`, c'est-à-dire aux onglets PRIMAIRES de la barre basse. Un lien
+   secondaire qui double une destination primaire est le défaut qu'`UI-CP4`
+   venait de retirer de la coque.
+
+   Et les deux questions ont désormais leur instrument : FLIGHT_RECORDER
+   répond à la première en tête de `/progress`, BODY_LEDGER à la seconde.
+
+   ⚠ `.mission-bridge` SORT AUSSI DE LA LARGEUR DE LECTURE ci-dessous. Une
+   règle qui vise un sélecteur mort ne protège rien et fait croire à une
+   couverture qu'elle n'a plus.
    ══════════════════════════════════════════════════════════════════════ */
-.mission-bridge {
-  display: flex;
-  flex-direction: column;
-  margin-top: 28px;
-  border-top: 1px solid var(--t-line);
-}
-.mission-bridge__exit {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  /* Plancher tactile : 44 px de zone, mesurés sur la zone RÉELLE et non sur
-     le chrome visible — la leçon de `target_closure`. */
-  min-height: 44px;
-  padding: 12px 2px;
-  border-bottom: 1px solid var(--t-line);
-  color: var(--t-fg-2);
-  text-decoration: none;
-  font-size: 13px;
-}
-.mission-bridge__exit:hover,
-.mission-bridge__exit:focus-visible { color: var(--t-fg); }
-.mission-bridge__q { letter-spacing: 0.01em; }
-/* ⚠ `--t-fg-muted`, PAS `--t-fg-faint`. Première écriture fautive, attrapée
- * par `test_faint_is_no_longer_a_body_text_token`.
- *
- * J'ai traité la flèche comme de la décoration parce qu'elle est
- * `aria-hidden`. Elle reste du TEXTE rendu, et `--t-fg-faint` ne peut plus en
- * porter depuis l'échelle de profondeur : le masquer aux lecteurs d'écran ne
- * le dispense pas d'être lisible à l'œil. */
-.mission-bridge__go { color: var(--t-fg-muted); }
 
 /* ══════════════════════════════════════════════════════════════════════
    `UI-CP3 §9` — LARGEUR DE LECTURE DE L'INSTRUMENT
@@ -1003,7 +985,6 @@
    ══════════════════════════════════════════════════════════════════════ */
 @media (min-width: 900px) {
   .today-home__hero,
-  .mission-bridge,
   .rejected {
     max-width: 62ch;
   }

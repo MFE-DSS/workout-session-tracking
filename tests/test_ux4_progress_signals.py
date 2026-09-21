@@ -479,11 +479,21 @@ def test_the_surface_does_not_grow_a_frozen_decision_engine():
 
 def test_one_shared_disclosure_replaces_the_three_notes(client):
     """Le verdict opérateur interdit les ~77 mots supplémentaires d'`UX4_03`.
-    Trois notes disaient trois fois la même chose : d'où vient le chiffre."""
+    Trois notes disaient trois fois la même chose : d'où vient le chiffre.
+
+    ⚠ `UI-CP5` — la garde épinglait le LIBELLÉ du repli. Il a changé : la
+    divulgation explique désormais d'abord COMMENT le signal de tête est
+    choisi, parce qu'un verdict L1 inexpliqué est ce qu'`UX4_03B` interdit.
+    La propriété gardée — UNE divulgation partagée, jamais une par signal —
+    n'a pas bougé d'un iota.
+    """
     section = _signals_section(client)
-    assert section.count("signals__how") >= 1
-    assert "Comment AUREN calcule ces signaux" in section
+    assert section.count("signals__how") == 1, (
+        "il doit y avoir exactement une divulgation partagée"
+    )
     assert "signal__note" not in section, "les notes par signal sont revenues"
+    # Elle explique une PROVENANCE ; le mot exact est libre.
+    assert "Comment AUREN" in section
 
 
 def test_the_disclosure_costs_one_line_when_closed(client):
@@ -568,10 +578,19 @@ def test_no_body_map_or_anatomical_asset_was_added():
 def test_the_page_promises_only_what_it_shows(client):
     """Le chapeau annonçait « la régularité », un mot auquel plus aucun libellé
     ne répond. Une promesse invisible déplacée d'un cran resterait une promesse
-    invisible — c'est exactement ce qu'`UX4_03` devait fermer."""
-    body = client.get("/progress").text
-    lede = body[body.index('class="lede"'):][:220]
-    assert "régularité" not in lede.lower()
+    invisible — c'est exactement ce qu'`UX4_03` devait fermer.
+
+    ⚠ ÉLARGIE PAR `UI-CP5`, qui a RETIRÉ le chapeau. La garde découpait les 220
+    premiers caractères après `class="lede"` et levait `ValueError` une fois le
+    chapeau parti — elle ne protégeait donc plus rien, et elle le faisait
+    bruyamment. La promesse ne se juge pas sur un bloc : elle se juge sur la
+    PAGE. C'est plus strict, pas moins.
+    """
+    body = client.get("/progress").text.lower()
+    for promesse in ("régularité", "ta cadence", "ton rythme"):
+        assert promesse not in body, (
+            f"la page promet « {promesse} » sans qu'aucun libellé n'y réponde"
+        )
 
 
 # ───────── outillage ─────────
@@ -615,10 +634,26 @@ def _with_traces(client, uid: int = 1):
 def _signals_section(client) -> str:
     """La section des signaux seule — le reste de Progression contient des
     jauges et des pourcentages légitimes qui ne relèvent pas de cette tranche.
+
+    ⚠ REPOINTÉE PAR `UI-CP5`. Les deux bornes étaient `class="signals"` et le
+    littéral « Rythme récent ». La seconde a disparu avec l'objet que le §7
+    retire, et la découpe LEVAIT `ValueError` au lieu d'échouer proprement —
+    quatre gardes tombaient d'un coup sans rien dire de ce qu'elles
+    protégeaient.
+
+    Les bornes sont désormais la ligne de contexte de confiance, qui a absorbé
+    les deux faits survivants, et son suivant immédiat. Chacune est vérifiée
+    AVANT la découpe : une garde qui lève n'est pas une garde qui échoue.
     """
     body = _with_traces(client).get("/progress").text
+    assert 'class="signals"' in body, (
+        "la section des signaux a disparu — la garde n'observerait rien"
+    )
     start = body.index('class="signals"')
-    return body[start:body.index("Rythme récent")]
+    for borne in ('class="kpi-note"', "</main>"):
+        if borne in body[start:]:
+            return body[start:body.index(borne, start)]
+    return body[start:]
 
 
 # ── `UX4_03D` — les décisions d'architecture d'information ───────────────────
@@ -711,23 +746,43 @@ def test_no_behavioural_verdict_prose_at_the_first_level(client):
         assert verdict not in body, f"verdict en prose rendu : « {verdict} »"
 
 
-def test_the_unique_weekly_objects_survive():
+def test_the_unique_weekly_objects_survive(client):
     """Le pendant : `weekly_loop` est RECOMPOSÉ, pas supprimé (`§5.3`).
     Dominantes et anomalie sont des objets réels et restent.
 
     ⚠ `TRAIN1-C` — CETTE GARDE LISAIT UN GABARIT QUE PLUS RIEN NE RENDAIT.
     Elle vérifiait la survie des deux faits dans `_partials/weekly_loop.html`,
     orphelin depuis que `TRAIN1-A` a retiré son `include`. Elle était donc
-    verte quoi qu'il arrive à la vraie page — la treizième garde de cette
-    famille. Le partiel est supprimé ; elle lit désormais la SURFACE, là où
-    les deux faits ont réellement atterri.
+    verte quoi qu'il arrive à la vraie page.
+
+    ⚠ `UI-CP5` — ET ELLE LISAIT ENCORE UN NOM DE VARIABLE. `top_anomaly` a
+    quitté le contexte : l'anomalie est désormais le premier rang du
+    DEBRIEFING, sur la dernière séance au lieu de la semaine ISO. Une garde
+    qui épingle le nom d'une clé interdit de la renommer sans rien protéger
+    de plus.
+
+    Elle lit maintenant la PAGE RENDUE, sur un compte qui porte réellement une
+    anomalie — ce que la version précédente ne faisait pas, et c'est
+    strictement plus strict.
     """
-    body = _uncommented(TEMPLATE.read_text(encoding="utf-8"))
+    from tests.test_anomalies import _mk_session_for_anomalies
+
     # la dominance hebdomadaire, absorbée dans « Par programme »
-    assert "tk.week_count" in body
-    assert "cette sem." in body
-    # l'anomalie, absorbée en ligne de l'instrument temporel
-    assert "top_anomaly" in body
+    source = _uncommented(TEMPLATE.read_text(encoding="utf-8"))
+    assert "tk.week_count" in source
+    assert "cette sem." in source
+
+    # l'anomalie, absorbée par le rang L1 du debriefing — vérifiée au RENDU.
+    _mk_session_for_anomalies(exercises=[{
+        "code": "AN1", "name": "Exercice à vérifier", "success_score": 100,
+        "rep_targets": [{"min_reps": 8, "max_reps": 10}],
+        "work_sets": [{"weight_kg": 60, "reps": 3, "completed": True}],
+    }])
+    body = client.get("/progress").text
+    assert "À vérifier" in body, "l'anomalie ne remonte plus nulle part"
+    assert "Exercice à vérifier" in body, (
+        "l'anomalie est rendue sans nommer l'exercice concerné"
+    )
 
 
 def test_coexisting_counts_of_the_same_entity_state_their_window():

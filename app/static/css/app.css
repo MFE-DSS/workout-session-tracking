@@ -906,40 +906,28 @@ input, button, textarea, select {
 .card--metric { padding: var(--space-sm) var(--space-md); }
 .card--evidence { background: var(--bg); border-color: var(--border); }
 
-/* ---- KPI ---- */
-
-.kpi-row {
-  display: flex;
-  gap: var(--space-md);
-}
-
-.kpi {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  text-align: center;
-}
-
-.kpi__value {
-  font-family: var(--font-mono);
-  font-size: 24px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.2;
-  color: var(--fg);
-}
-
-.kpi__label {
-  font-family: var(--font);
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--fg-muted);
-  margin-top: 2px;
-}
-
-.kpi--accent .kpi__value { color: var(--accent); }
+/* ---- KPI ---- (RETIRÉ — `UI-CP5 FLIGHT_RECORDER`)
+ *
+ * `.kpi-row` / `.kpi` / `.kpi__value` / `.kpi__label` / `.kpi--accent`.
+ *
+ * Cette famille n'avait plus AUCUN consommateur de gabarit — vérifié classe
+ * par classe sur l'arbre `app/templates`. Les occurrences qui ressemblent à un
+ * appel n'en sont pas : `kpi-absent` (clause de provenance de Progression),
+ * `kpi-note` (la note de bas de page, quatre surfaces) et
+ * `user-profile__kpi-row`, qui porte son propre préfixe et ses propres règles.
+ *
+ * Elle n'est pas retirée pour faire du rangement. `.kpi__value` déclarait
+ * **24 px**, c'est-à-dire un rang situé ENTRE `SECTION` (22 px) et le relevé
+ * souverain (32 px) — l'intervalle que `UI-CP5` ferme par construction. La
+ * garde qui énumère désormais toutes les tailles de cette feuille
+ * (`test_progression_sovereign_readout.py`) l'a trouvée du premier coup,
+ * alors que la version précédente, qui nommait ses sélecteurs un par un, ne
+ * l'avait jamais vue. C'est précisément ce que la généralisation devait
+ * produire.
+ *
+ * La règle `.insight .kpi__value { font-size: 32px; }` partait avec elle :
+ * elle ne désignait plus rien.
+ */
 
 /* ---- Insight Block ---- */
 
@@ -948,8 +936,6 @@ input, button, textarea, select {
   padding-left: var(--space-md);
   margin-bottom: var(--space-lg);
 }
-
-.insight .kpi__value { font-size: 32px; }
 
 .insight__reco {
   font-size: 13px;
@@ -3348,42 +3334,24 @@ input, button, textarea, select {
   color: var(--fg-muted);
 }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-sm);
-}
-
-.kpi-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-md);
-  text-align: center;
-}
-
-/* 28 px → 20 px. Quatre comptages à 28 px disputaient le premier regard à la
- * progression, rendue en 13 px sur la même page. Ils restent lisibles et
- * gardent leur rang de carte ; ils ne sont simplement plus ce que l'œil
- * trouve en premier sur un écran nommé « Progression ». */
-.kpi-card__value {
-  font-family: var(--font-mono);
-  font-size: 20px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.kpi-card__label {
-  font-size: 12px;
-  color: var(--fg-muted);
-  margin-top: 4px;
-}
-
-.kpi-card__sub {
-  font-size: 11px;
-  color: var(--fg-dim);
-  margin-top: 2px;
-}
+/* ⚠ `.kpi-grid` ET `.kpi-card*` ONT ÉTÉ RETIRÉS PAR `UI-CP5 §7`, LE 2026-09-21.
+ *
+ * Les quatre tuiles de « Rythme récent » portaient `0`, `13`, `100 %`, `82` :
+ * des COMPTAGES en 28 px sur une page qui doit dire ce qui a CHANGÉ. « 0 séance
+ * cette semaine » en très gros est un reproche, pas une lecture.
+ *
+ * `CLAUDE.md §5.3` — les faits qui SOUTIENNENT une interprétation survivent sur
+ * la ligne `.ctx` (contexte de confiance) : le dénominateur sur 30 jours et le
+ * taux de work sets cochés, qui qualifie la provenance de la comparaison. Le
+ * score moyen d'exercices, lui, ne survit pas ici — c'est un score, et
+ * `TRAIN1-C` puis `TRAIN1-E` ont passé deux tranches à retirer la doctrine de
+ * score de cette page.
+ *
+ * ⚠ `.kpi-card__value` était l'un des deux sélecteurs que la garde de rang
+ * typographique comparait au relevé souverain. Elle a été GÉNÉRALISÉE dans la
+ * même livraison : elle énumère désormais toutes les tailles de cette feuille
+ * entre 23 et 31 px et exige l'ensemble vide — le rang se ferme par
+ * construction plutôt que par une liste de sélecteurs à tenir à jour. */
 
 /* ---- Template KPI / Activity (progress page) ---- */
 
@@ -3591,43 +3559,17 @@ input, button, textarea, select {
 
 /* ---- Session Card (history page) ---- */
 
-.session-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
 
-.session-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-md);
-  margin-bottom: var(--space-sm);
-}
 
-.session-card__row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-}
 
-.session-card__name {
-  font-weight: 600;
-  font-size: 15px;
-}
 
-.session-card__date {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--fg-muted);
-}
 
-.session-card__meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin-top: var(--space-sm);
-}
+
+
+
+
+
+
 
 /* ---- Admin ---- */
 
@@ -6745,4 +6687,326 @@ summary:focus-visible,
     max-width: 720px;
   }
   .btn.loadout__go { width: auto; min-width: 220px; }
+}
+
+/* ==========================================================================
+   `UI-CP5 FLIGHT_RECORDER` — LE RANG L1, LE DEBRIEFING
+   --------------------------------------------------------------------------
+   POURQUOI IL N'Y A PAS DE NOUVEAU RELEVÉ SOUVERAIN ICI.
+
+   `.lead__value` vaut 32 px et il est épinglé INTER-SURFACE à
+   `--font-size-metric-lg` de `session_focus.css` — une garde compare les deux
+   valeurs. Créer un second relevé à 32 px aurait cassé cet épinglage et donné
+   DEUX rangs souverains sur un écran qui n'en tolère qu'un.
+
+   Le debriefing RÉUTILISE donc `.lead__*` quand il promeut un mouvement
+   comparable. Ce qui change n'est pas le véhicule, c'est qui l'occupe.
+
+   ⚠ ET SUR L'ÉTAT CREUX, LA PHRASE PREND LE RANG SECTION.
+   Mesuré avant cette tranche : à deux séances le plus gros objet de l'écran
+   devenait un *titre de section*, parce que le relevé disparaissait faute de
+   comparaison. Si la réponse du debriefing restait au rang du corps de texte,
+   l'inversion se reproduirait à l'identique. La première cause — celle qui EST
+   la réponse — monte donc au rang SECTION ; les suivantes restent au corps.
+
+   ⚠ AUCUN APLAT, AUCUNE COULEUR DE VERDICT. `--t-amber` appartient à l'action
+   de l'utilisateur (`Sx_UIV3_04 §3`) et il n'y a aucune action ici : le contrat
+   dit `ACTION : aucune. C'est une lecture.` L'état est porté par un LIBELLÉ,
+   jamais par la couleur seule (`no-color-only-state`).
+   ========================================================================== */
+
+.debrief {
+  margin: 0 0 28px;
+}
+
+/* Le libellé de classe — `À vérifier` / `Changé` / `Comparaison pas encore
+ * possible`. Rang META, comme `.lead__meta` juste au-dessus de lui : c'est
+ * une étiquette, pas la réponse. */
+.debrief__etiquette {
+  margin: 10px 0 2px;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+/* L'OBJET de l'attention — un nom d'exercice. Rang SECTION : c'est la réponse
+ * à « quoi ? », et elle doit primer sur tout titre de section de la page. */
+.debrief__objet {
+  margin: 0 0 4px;
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 650;
+  color: var(--role-text-primary);
+  text-wrap: balance;
+}
+
+/* La phrase du détecteur, reprise telle quelle. Rang corps : elle EXPLIQUE
+ * l'objet, elle ne le remplace pas. */
+.debrief__claim {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--role-text-secondary);
+}
+
+/* Un COMPTE des autres points de la même séance. Jamais un rang, jamais un
+ * lien : dire qu'il y en a d'autres suffit, les classer serait un moteur. */
+.debrief__reste {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+
+/* La ou les raisons pour lesquelles la comparaison n'est pas encore possible.
+ * La PREMIÈRE porte le rang SECTION parce qu'elle est la réponse de l'écran ;
+ * les suivantes complètent. `:first-of-type` évite un balisage conditionnel —
+ * la hiérarchie se déclare, elle ne se calcule pas dans le gabarit. */
+.debrief__causes .debrief__cause {
+  margin: 0 0 6px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--role-text-secondary);
+}
+.debrief__causes .debrief__cause:first-of-type {
+  font-size: 22px;
+  line-height: 1.25;
+  color: var(--role-text-primary);
+  text-wrap: balance;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   LE CONTEXTE DE CONFIANCE — ce qui QUALIFIE la réponse, sans la concurrencer
+   --------------------------------------------------------------------------
+   Remplace les quatre tuiles de « Rythme récent ». Les faits qui soutiennent
+   une interprétation survivent ; ils ne possèdent plus de bloc, plus de
+   grille, et surtout plus 28 px de hauteur de chiffre.
+
+   ⚠ Rang META strict. Un compteur qui remonterait entre 23 et 31 px occuperait
+   la marche réservée au relevé souverain — une garde énumère désormais toutes
+   les tailles de cette feuille dans cet intervalle et exige l'ensemble vide.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.ctx {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+.ctx__fact {
+  font-variant-numeric: tabular-nums;
+}
+.ctx__win,
+.ctx__sep {
+  color: var(--role-glyph-decorative);
+}
+
+/* ==========================================================================
+   `UI-CP5 FLIGHT_RECORDER` — LA BANDE DE TEMPS, ET LE RÔLE
+   --------------------------------------------------------------------------
+   ⚠ PRÉFIXE `tband`, PAS `band`. `.band` est déjà pris par les jauges de
+   récupération, qui vivent dans DEUX feuilles avec un test qui explique
+   pourquoi. Réemployer le nom aurait rendu le bilan 11 zones sans style sur sa
+   surface d'arrivée — le défaut exact que cette garde surveille.
+
+   ⚠ AUCUN AXE Y, ET AUCUNE GÉOMÉTRIE EN LIGNE.
+   Tous les marqueurs sont identiques : ni hauteur, ni largeur, ni aire
+   n'encode quoi que ce soit. La seule dimension est l'ORDRE chronologique, et
+   elle est ordinale — pas proportionnelle. Une position proportionnelle
+   exigerait un `style="left:N%"` par marqueur, or `history.html` est épinglé à
+   ZÉRO style en ligne, cliquet strict dans les deux sens. La contrainte a donc
+   décidé la forme, et non l'inverse.
+
+   ZONE TACTILE 44 px, MARQUEUR VISIBLE PLUS PETIT. Zone tactile ≠ chrome
+   visible : c'est le standard produit AUREN, pas le seuil WCAG de 24.
+   ========================================================================== */
+
+.tband {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 10px 0 2px;
+  padding: 0;
+  list-style: none;
+}
+.tband__slot {
+  display: block;
+}
+
+/* La cible : 44 px de côté, pleine et régulière. Le marqueur qu'on VOIT est
+ * au centre, plus petit — un chrome de 44 px par séance ferait de la bande un
+ * damier, pas une frise. */
+.tband__hit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 2px;
+  text-decoration: none;
+}
+.tband__hit:hover .tband__mark { border-color: var(--role-border-emphasis); }
+
+/* ⚠ LA SÉLECTION EST UNE BORDURE, jamais une teinte seule
+ * (`no-color-only-state`). Même dispositif que `.lead__occ.is-latest`. */
+/* ⚠ `box-shadow` PLUTÔT QU'UNE BORDURE. Une bordure aurait exigé une bordure
+ * transparente au repos pour réserver la place — 21 éléments bordés qui ne
+ * dessinent rien, et un compteur de conteneurs qui rend 90 sur un écran
+ * visiblement plus léger qu'avant. L'ombre intérieure ne déplace rien. */
+.tband__hit.is-selected {
+  box-shadow: inset 0 0 0 1px var(--role-border-emphasis);
+}
+
+.tband__mark {
+  display: inline-block;
+  width: 10px;
+  height: 22px;
+  border: 1px solid var(--role-border-subtle);
+  border-radius: 1px;
+}
+
+/* TROIS ÉTATS, TROIS FORMES — et chacun est nommé en toutes lettres dans la
+ * légende juste au-dessous, parce qu'une trame sans libellé n'est pas un
+ * état, c'est une décoration. */
+.tband__mark--faite {
+  background: var(--role-border-emphasis);
+  border-color: var(--role-border-emphasis);
+}
+.tband__mark--encours {
+  background: transparent;
+  border-color: var(--role-border-emphasis);
+  border-style: dashed;
+}
+.tband__mark--exclue {
+  border-color: var(--t-unknown);
+  background: repeating-linear-gradient(
+    45deg, var(--t-unknown), var(--t-unknown) 1px,
+    transparent 1px, transparent 4px
+  );
+}
+
+.tband__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 8px 0 22px;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+/* ⚠ LA LÉGENDE RESPIRE. Vus au rendu, les trois témoins étaient collés à
+ * leur mot et la trame hachurée se lisait comme un artefact. Une trame qu'on
+ * ne distingue pas n'est pas un encodage redondant — c'est de la décoration,
+ * et l'état retombe alors sur la couleur seule. */
+.tband__legend .tband__mark {
+  height: 14px;
+  width: 8px;
+  margin-right: 4px;
+  vertical-align: -3px;
+}
+.tband__legend .tband__mark--exclue {
+  background: repeating-linear-gradient(
+    45deg, var(--t-unknown), var(--t-unknown) 1.5px,
+    transparent 1.5px, transparent 4px
+  );
+}
+
+/* L'événement inspecté. Une marche de profondeur, pas une carte : le §12
+ * interdit de faire de chaque couche un conteneur bordé. */
+.tband__detail {
+  margin: 0 0 24px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--role-border-subtle);
+}
+.tband__detail-name {
+  margin: 0 0 3px;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--role-text-primary);
+}
+.tband__detail-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+.tband__detail-go {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 16px;
+  margin: 10px 0 0;
+  font-size: 15px;
+}
+
+/* ⚠ L'ENTRÉE VERS LA GESTION EST DISCRÈTE, ET C'EST LE §10 À LA LETTRE :
+ * « a session detail may expose a low-emphasis entry to management ». Un LIEN,
+ * jamais un formulaire, et jamais au rang de « Ouvrir la séance ». */
+.tband__manage {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   LE RÔLE — une LIGNE par séance, ce qui remplace les 21 rectangles
+   --------------------------------------------------------------------------
+   Aucun fond, aucun cadre, aucune commande. Un filet sépare, la ligne entière
+   mène à la séance. Mesuré avant : 87 conteneurs sur cet écran.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.hroster {
+  margin: 0 0 22px;
+  padding: 0;
+  list-style: none;
+}
+.hroster__row {
+  border-bottom: 1px solid var(--role-border-subtle);
+}
+.hroster__row:last-child { border-bottom: 0; }
+.hroster__row.is-selected .hroster__name { color: var(--role-text-primary); }
+
+.hroster__link {
+  display: block;
+  min-height: 44px;
+  padding: 12px 2px;
+  text-decoration: none;
+  color: inherit;
+}
+.hroster__name {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.34;
+  color: var(--role-text-secondary);
+  text-wrap: balance;
+}
+.hroster__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+.hroster__date { font-variant-numeric: tabular-nums; }
+
+/* Au-delà du pouce, la ligne cesse de s'étirer jusqu'aux bords : un nom de
+ * séance sur 1200 px sépare son titre de ses badges par un couloir vide. */
+@media (min-width: 720px) {
+  .hroster { max-width: 720px; }
+  .tband { max-width: 720px; }
+  .hroster__link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .hroster__name { flex: 1 1 auto; }
+  .hroster__line { margin-top: 0; flex: 0 0 auto; }
 }

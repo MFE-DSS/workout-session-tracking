@@ -114,13 +114,23 @@ def test_cannot_exclude_other_user_session(client):
 
 
 def test_history_does_not_show_other_user_sessions(client):
+    """⚠ REPOINTÉE PAR `UI-CP5`, ET C'EST LE CAS LE PLUS IMPORTANT DE LA SÉRIE.
+
+    L'ancre était `session-card__name` — la carte que `FLIGHT_RECORDER` a
+    remplacée par une ligne de rôle. La garde est tombée en sweep, et elle
+    avait **entièrement raison de tomber** : elle ne pouvait plus voir la seule
+    chose qu'elle protège, à savoir qu'une séance d'autrui n'apparaît pas.
+
+    Ce qu'elle vérifie n'a pas changé d'un pouce ; seul le nom du porteur a
+    bougé. On compte donc dans `hroster__name`, et le compte exact reste **1** :
+    zéro dirait aussi bien « rien ne fuit » que « la sonde ne lit plus rien ».
+    """
     _create_other_user_session()
     _start(client, "push-a")  # own session
 
     body = client.get("/history").text
-    # Only own session should appear (Push A from _start), not the other's
     import re
-    assert len(re.findall(r'session-card__name[^>]*>Push A', body)) == 1
+    assert len(re.findall(r'hroster__name[^>]*>Push A', body)) == 1
 
 
 def test_export_json_does_not_contain_other_user_data(client):

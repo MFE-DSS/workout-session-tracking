@@ -1,0 +1,108 @@
+{# `UI-CP5 FLIGHT_RECORDER` — LE RANG L1, LE DEBRIEFING.
+
+   La question possédée : « qu'est-ce qui vient réellement de changer ? »
+   Le contrat fixait `L1 le debrief · L2 le dernier mouvement · SHEET le
+   détail`, et L1 n'existait nulle part.
+
+   ⚠ CE PARTIEL RÉUTILISE LE VOCABULAIRE `.lead__*`, ET C'EST DÉLIBÉRÉ.
+   `.lead__value` vaut 32 px et il est épinglé INTER-SURFACE à
+   `--font-size-metric-lg` de `session_focus.css` — une garde compare les deux.
+   Créer un second relevé à 32 px aurait cassé cet épinglage et donné DEUX
+   rangs souverains sur un écran qui n'en tolère qu'un.
+
+   Ce qui change n'est donc pas le véhicule, c'est QUI L'OCCUPE. C'est la
+   mécanique que `test_the_promoted_row_leaves_the_list` encode déjà un niveau
+   plus bas : l'objet promu quitte sa liste pour que la promotion ne se lise
+   jamais comme une duplication.
+
+   ⚠ AUCUNE COMMANDE ICI. `ACTION : aucune. C'est une lecture.` #}
+
+<section class="debrief" aria-labelledby="debrief-titre">
+  <p class="lead__meta" id="debrief-titre">Depuis ta dernière séance</p>
+
+  {% if debrief.signal == 'attention' %}
+    {# ── À VÉRIFIER ────────────────────────────────────────────────────────
+       Le rang 1. La phrase vient du détecteur, déjà écrite pour être lue ;
+       on ne la reformule pas.
+
+       ⚠ L'ÉTAT EST PORTÉ PAR UN LIBELLÉ TEXTE, jamais par la couleur seule
+       (`no-color-only-state`). Et aucun aplat : `--t-amber` appartient à
+       l'action de l'utilisateur, et il n'y a pas d'action ici. #}
+    <p class="debrief__etiquette">{{ debrief.libelle }}</p>
+    <p class="debrief__objet">{{ debrief.exercice or "Un exercice" }}</p>
+    <p class="debrief__claim">{{ debrief.message }}</p>
+    {% if debrief.autres %}
+      {# Un COMPTE, pas un rang. Il dit qu'il y a d'autres points sans
+         prétendre que celui-ci serait « le plus » quoi que ce soit. #}
+      <p class="debrief__reste">
+        {{ debrief.autres }} autre{{ 's' if debrief.autres > 1 }} point{{ 's' if debrief.autres > 1 }} sur cette séance
+      </p>
+    {% endif %}
+
+  {% elif debrief.signal == 'mouvement' %}
+    {# ── CHANGÉ ────────────────────────────────────────────────────────────
+       Le relevé souverain, occupé par le dernier mouvement comparable.
+       Structure identique à `_partials/progression.html` — même classes, même
+       ordre `méta · titre · puits · trace` — parce que c'est LE MÊME OBJET,
+       simplement promu d'un rang.
+
+       Quand ce rang est occupé ici, `progression.lead` ne se rend plus plus
+       bas : la page ne montre jamais deux fois le même relevé. #}
+    <p class="debrief__etiquette">{{ debrief.libelle }}</p>
+    <a class="lead__title" href="{{ debrief.href }}">{{ debrief.nom }}</a>
+
+    <div class="lead__wells">
+      <div class="lead__well">
+        <span class="lead__unit">kg</span>
+        <span class="lead__value">{{ debrief.dernier_poids }}</span>
+        <span class="lead__ref">avant {{ debrief.precedent_poids }}</span>
+        {% if debrief.ecart_poids %}<span class="lead__delta">{{ debrief.ecart_poids }}</span>{% endif %}
+      </div>
+      <div class="lead__well">
+        <span class="lead__unit">reps</span>
+        <span class="lead__value">{{ debrief.dernier_reps }}</span>
+        <span class="lead__ref">avant {{ debrief.precedent_reps }}</span>
+        {% if debrief.ecart_reps %}<span class="lead__delta">{{ debrief.ecart_reps }}</span>{% endif %}
+      </div>
+    </div>
+
+    {% if debrief.trace | length > 1 %}
+    <ol class="lead__trace" aria-label="Charges des séances retenues, de la plus ancienne à la plus récente">
+      {% for t in debrief.trace %}
+        <li class="lead__occ{% if loop.last %} is-latest{% endif %}">{{ t }}</li>
+      {% endfor %}
+    </ol>
+    {% endif %}
+
+  {% else %}
+    {# ── COMPARAISON PAS ENCORE POSSIBLE ──────────────────────────────────
+       ⚠ CAS D'ACCEPTATION OBLIGATOIRE, pas une arrière-pensée.
+
+       La fente souveraine reste VIDE : ni nombre, ni `—`. Un tiret au rang
+       relevé donnerait à une absence l'apparence d'une mesure, et c'est
+       exactement le défaut que `TRAIN1-C` a retiré des tuiles.
+
+       Mais l'instrument PARLE : il dit que la comparaison n'est pas encore
+       possible, et POURQUOI, avec le vocabulaire que la surface emploie déjà.
+       Avant cette tranche, un compte neuf voyait le partiel entier supprimé —
+       l'instrument parlait d'autant moins qu'il avait moins à dire.
+
+       Aucun appel à démarrer ici : l'Accueil possède cette commande. #}
+    <p class="debrief__etiquette">{{ debrief.libelle }}</p>
+    {# ⚠ LES CAUSES ONT LEUR PROPRE CONTENEUR, et ce n'est pas décoratif.
+       La première cause EST la réponse de l'écran et porte le rang SECTION,
+       sinon un titre de section redevient le plus gros objet sur un compte
+       creux — l'inversion exacte que cette tranche corrige.
+
+       Sans ce conteneur, `:first-of-type` désignait l'ÉTIQUETTE : le sélecteur
+       parle du premier `<p>` entre frères, pas de la première cause. Mesuré au
+       rendu sur un compte neuf — « Exposition · 14 j » gagnait. #}
+    <div class="debrief__causes">
+      {% for cause in debrief.causes %}
+        <p class="debrief__cause">{{ cause.libelle }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <span class="sr-only">{{ debrief.sr }}</span>
+</section>

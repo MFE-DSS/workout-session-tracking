@@ -280,22 +280,28 @@ def test_aucun_objet_etranger_ne_subsiste_sous_la_mission(client):
 # ══════════════════════════════════════════════════════════════════════
 
 
-def test_le_rail_de_transition_ne_porte_que_des_sorties(client):
-    """Pas de mini-métrique. Une sortie nommée par sa question n'est pas un
-    tableau de bord — et c'est ce qui l'empêche de redevenir l'empilement
-    qu'on vient de retirer."""
+def test_le_rang_sous_le_heros_est_vide(client):
+    """⚠ INVERSÉE PAR `UI-CP5`, PAS SUPPRIMÉE — et elle en devient plus forte.
+
+    Elle gardait un rail de TRANSITION contre sa propre dérive : pas de
+    mini-métrique, pas de readout, seulement des sorties nommées par leur
+    question. Ce rail portait sa date de péremption, et `UI-CP5` l'a atteinte.
+
+    Ce que `UI-CP3 §6` visait est la cible **A** : *décision · cause ·
+    commande · alternative minimale. RIEN D'AUTRE.* Tant que le pont existait,
+    la garde surveillait ce qu'il avait le droit de contenir ; maintenant elle
+    peut surveiller la cible elle-même — le rang sous le héros ne contient
+    plus RIEN. C'est une assertion strictement plus dure que l'ancienne.
+    """
     corps = _sans_commentaires(client.get("/").text)
-    m = re.search(r'<nav class="mission-bridge".*?</nav>', corps, re.DOTALL)
-    assert m, "le rail de transition a disparu"
-    rail = m.group(0)
-    assert "<b>" not in rail, "une valeur chiffrée s'est glissée dans le rail"
-    assert "band" not in rail, "un readout s'est glissé dans le rail"
-    # Chaque sortie pose une QUESTION : c'est la forme qui la maintient
-    # subordonnée à MISSION.
-    assert rail.count("mission-bridge__exit") >= 2
-    assert rail.count("?") >= 2, (
-        "une sortie ne pose plus de question — elle redevient une tuile"
-    )
+    assert "mission-bridge" not in corps, "le pont de transition est revenu"
+
+    principal = corps.split("<main", 1)[-1].split("</main", 1)[0]
+    apres_heros = principal.split("</div>", 1)[-1] if "today-home__hero" in principal else principal
+    for interdit in ("<b>", 'class="band', "lead__value", "kpi-card"):
+        assert interdit not in apres_heros, (
+            f"un readout est réapparu sous le héros : « {interdit} »"
+        )
 
 
 def test_le_pont_porte_son_critere_de_retrait():
@@ -332,7 +338,12 @@ def test_l_instrument_a_une_largeur_de_lecture():
     bloc = home_css.split("LARGEUR DE LECTURE")[-1]
     assert "max-width" in bloc
     assert ".today-home__hero" in bloc
-    assert ".mission-bridge" in bloc
+    # ⚠ `.mission-bridge` EST SORTI DE CETTE RÈGLE avec l'objet qu'il visait
+    # (`UI-CP5`). Une règle qui vise un sélecteur mort ne protège rien et fait
+    # croire à une couverture qu'elle n'a plus.
+    assert ".mission-bridge" not in bloc, (
+        "la largeur de lecture vise encore un sélecteur supprimé"
+    )
 
 
 # ══════════════════════════════════════════════════════════════════════

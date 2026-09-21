@@ -110,18 +110,43 @@ def test_the_history_row_is_the_primary_action(client):
     # Troisième garde de cette session à épingler la forme exacte d'un attribut
     # de classe. Le motif est assez fréquent pour être nommé : une garde qui
     # exige une ÉCRITURE interdit le refactoring sans rien protéger de plus.
-    assert re.search(r'<a class="[^"]*\bsession-card\b[^"]*"', body), (
+    # ⚠ `UI-CP5` — l'ancre suit l'objet : la carte devient une ligne, et c'est
+    # toujours la LIGNE ENTIÈRE qui est l'action primaire. Le commentaire
+    # ci-dessus reste vrai mot pour mot : on cherche un jeton de classe, jamais
+    # une écriture exacte.
+    assert re.search(r'<a class="[^"]*\bhroster__link\b[^"]*"', body), (
         "la ligne n'est plus une carte-lien"
     )
     assert "url_for('session_detail'" in body
 
 
-def test_the_management_actions_stay_behind_one_disclosure():
-    body = _uncommented((TEMPLATES / "history.html").read_text(encoding="utf-8"))
-    assert body.count('<details class="history-item__actions">') == 1
-    row = body.split('<details class="history-item__actions">', 1)[1]
-    assert "toggle_exclude" in row
-    assert "delete_session" in row
+def test_the_instrument_carries_no_command_whatever_the_session_count(client):
+    """⚠ REPOINTÉE PAR `UI-CP5 §10`, ET C'EST UN INVARIANT DE COMPTE.
+
+    L'ancienne comptait `<details class="history-item__actions">` dans la
+    SOURCE et exigeait exactement 1. Elle comptait donc le corps d'une boucle,
+    pas l'écran : à l'exécution, l'écran en portait **une par séance** — 21
+    divulgations et 42 formulaires. Une garde qui lit un gabarit ne peut pas
+    voir ce qu'une boucle multiplie.
+
+    Ce qu'elle voulait dire — « la gestion est rare, elle ne se répète pas par
+    ligne » — devient une propriété observable et bien plus forte : l'instrument
+    de lecture porte ZÉRO commande, quel que soit le nombre de séances.
+    """
+    from app.database import SessionLocal
+
+    from tests.test_anomalies import _mk_session_for_anomalies
+
+    for _ in range(3):
+        _mk_session_for_anomalies(exercises=[{"code": "M", "name": "Séance"}])
+    with SessionLocal():
+        pass
+
+    main = client.get("/history").text.split("<main", 1)[-1].split("</main", 1)[0]
+    assert 'method="post"' not in main, "une commande est revenue sur l'instrument"
+    assert "history-item__actions" not in main
+    # Et le chemin vers la gestion existe toujours — la capacité n'a pas bougé.
+    assert "/admin/sessions" in main
 
 
 def test_every_history_control_declares_44px():
@@ -131,9 +156,21 @@ def test_every_history_control_declares_44px():
     voisine des boutons. Trouvé en plantant le défaut.
 
     Les deux sélecteurs sont donc extraits séparément et vérifiés chacun.
+
+    ⚠ `UI-CP5` — LES SÉLECTEURS SUIVENT LES CONTRÔLES.
+
+    `.history-item__toggle` et `.history-item__btn` n'existent plus : la
+    divulgation par ligne est partie avec les 42 formulaires qu'elle cachait.
+    Les contrôles qui lui succèdent vivent dans `app.css`, avec le reste de
+    leur apparence — les séparer aurait mis la hauteur de cible dans une
+    feuille et la forme dans une autre.
+
+    L'extraction UNE PAR UNE, elle, ne bouge pas : c'est la leçon payée ici.
     """
-    css = CLOSURE_CSS.read_text(encoding="utf-8")
-    for selector in (".history-item__toggle", ".history-item__btn"):
+    from pathlib import Path
+
+    css = (Path(CLOSURE_CSS).parent / "app.css").read_text(encoding="utf-8")
+    for selector in (".tband__hit", ".hroster__link", ".tband__manage"):
         m = re.search(re.escape(selector) + r"\s*\{([^}]*)\}", css)
         assert m, f"règle absente : {selector}"
         assert "min-height: 44px" in m.group(1), (

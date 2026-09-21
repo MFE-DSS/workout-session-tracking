@@ -319,92 +319,32 @@ a.text-muted::after,
  * retrait et le rayon de la carte vivaient dans un attribut `style=`, que
  * rien ne peut surcharger proprement. Sortir les styles en ligne n'était pas
  * du rangement, c'était la condition du correctif. */
-.history-item__card {
-  display: block;
-  margin-bottom: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  border-bottom: none;
-}
-
-.history-item__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-sm);
-  margin-bottom: var(--space-xs);
-}
-
-.history-item__date {
-  font-size: 12px;
-  color: var(--fg-dim);
-  white-space: nowrap;
-}
-
-.history-item__badges {
-  display: flex;
-  gap: var(--space-xs);
-  flex-wrap: wrap;
-}
-
-.history-item {
-  display: block;
-  margin-bottom: var(--space-md);
-}
-
-.history-item__actions {
-  margin: 0;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-top: 1px solid var(--border);
-  border-radius: 0 0 var(--radius) var(--radius);
-}
-
-/* Le déclencheur devient un contrôle à part entière : 44 px de haut, pleine
- * largeur, et sa zone ne déborde sur rien puisqu'elle est sa propre hauteur. */
-.history-item__toggle {
-  display: flex;
-  align-items: center;
-  /* `Sb_UI_HISTORIQUE_01` — le déclencheur vit désormais DANS la bande, donc
-     il prend le retrait horizontal de la carte, et un chevron dit qu'il
-     s'ouvre. Sans lui, une bande grise sous une carte ne s'annonce pas
-     comme un contrôle. La hauteur de 44 px ne bouge pas. */
-  justify-content: space-between;
-  padding: 0 var(--space-md);
-  min-height: 44px;
-  cursor: pointer;
-  font-size: 12px;
-  color: var(--fg-dim);
-}
-
-.history-item__toggle::after {
-  content: "\25BE";
-  font-size: 11px;
-  color: var(--fg-dim);
-  transition: transform 0.15s ease;
-}
-
-.history-item__actions[open] > .history-item__toggle::after {
-  transform: rotate(180deg);
-}
-
-/* Les boutons ne sont tapables que la divulgation ouverte — c'est là qu'il
- * faut leur donner leurs 44 px, et l'espace existe alors. `gap` sépare les
- * zones : deux cibles de 44 px collées se toucheraient sans se recouvrir,
- * mais un pouce n'a pas cette précision. */
-.history-item__buttons {
-  display: flex;
-  gap: var(--space-sm);
-  margin-top: var(--space-xs);
-  flex-wrap: wrap;
-}
-
-.history-item__btn {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  font-size: 12px;
-}
+/* ⚠ LA FAMILLE `.history-item` A ÉTÉ RETIRÉE PAR `UI-CP5 FLIGHT_RECORDER`,
+ * LE 2026-09-21 — ET LA PROSE CI-DESSUS RESTE PARCE QU'ELLE EXPLIQUE POURQUOI.
+ *
+ * `TRAIN1-E` / C6 avait fermé ces cibles en donnant à l'historique la forme
+ * « la LIGNE est l'action primaire, la gestion est rare et vit derrière une
+ * divulgation ». La moitié JUSTE de son raisonnement — fermer ces cibles
+ * demande de l'ESPACE, donc un changement structurel — tient toujours, mot
+ * pour mot. C'est la seconde moitié qui a expiré à son tour.
+ *
+ * CE QUI A CHANGÉ : `UI-CP5` a constaté que l'instrument portait QUARANTE-DEUX
+ * formulaires — deux par séance, exclure des KPI et supprimer — alors que son
+ * contrat dit `ACTION : aucune. C'est une lecture.` La divulgation par ligne
+ * n'était pas trop petite : elle n'avait rien à faire là. Le cycle de vie de
+ * la donnée est parti sur `SESSION_LIFECYCLE`, et l'historique ne commande
+ * plus rien.
+ *
+ * LES CONTRÔLES QUI LUI SUCCÈDENT déclarent leurs 44 px CHACUN DANS LEUR
+ * PROPRE RÈGLE, dans `app.css` avec le reste de leur apparence —
+ * `.tband__hit`, `.hroster__link`, `.tband__manage`. La garde les y lit, et
+ * elle continue de les extraire une par une : chercher « 44 px quelque part
+ * dans la section » laissait passer un seul sélecteur abaissé, et c'est une
+ * leçon payée ici même.
+ *
+ * Le standard reste le STANDARD PRODUIT AUREN de 44 px, et non le seuil WCAG
+ * 2.2 de 24×24 avec exception d'espacement — qui était déjà satisfait avant
+ * `UIV3_TARGETS_44_01`. */
 
 /* Un lien DANS une phrase : sa zone doit atteindre 44 px sans casser
  * l'interligne du paragraphe qui l'entoure. Le remplissage l'étend, la marge

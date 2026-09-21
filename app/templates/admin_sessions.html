@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
+{# `SESSION_LIFECYCLE` — la responsabilité que `UI-CP5` a nommée.
+
+   Cette surface existait déjà et rendait déjà les deux mêmes formulaires.
+   Ce qui change : elle cesse d'être dupliquée quarante-deux fois sur
+   l'instrument de lecture, et elle dit ce qu'elle possède. #}
 <h1 class="page-title">Gestion des séances</h1>
-<p class="lede">Supprimer · exclure des KPI.</p>
+<p class="lede">Exclure des KPI · supprimer. L'historique se lit ailleurs.</p>
 
 {% if rows|length == 0 %}
   <p class="empty">Aucune séance enregistrée.</p>
@@ -34,14 +39,23 @@
         </a>
         <div class="admin-row__actions">
           <form method="post" action="{{ url_for('toggle_exclude', session_id=s.id) }}">
+            {# La destination est DÉCLARÉE et vérifiée contre une liste close,
+               plus devinée dans l'en-tête `Referer` — que l'appelant contrôle
+               et que `Referrer-Policy: no-referrer` supprime. #}
+            <input type="hidden" name="next" value="/admin/sessions" />
             <button type="submit" class="btn btn--ghost btn--sm">
-              {% if s.excluded_from_stats %}Inclure{% else %}Exclure{% endif %}
+              {% if s.excluded_from_stats %}Inclure dans KPI{% else %}Exclure des KPI{% endif %}
             </button>
           </form>
-          <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}"
-                onsubmit="return confirm('Supprimer définitivement cette séance ?');">
-            <button type="submit" class="btn btn--ghost btn--sm btn--danger">Supprimer</button>
-          </form>
+          {# ⚠ UN LIEN, PAS UN FORMULAIRE. La suppression passe par une vue de
+             confirmation qui nomme et CHIFFRE ce qui disparaît en cascade, et
+             le POST exige un champ que seule cette vue produit.
+
+             L'ancien `onsubmit="return confirm(...)"` ne protégeait que les
+             navigateurs coopératifs : côté serveur, rien ne l'appliquait. Et
+             c'était du JavaScript sur une surface gardée contre le JavaScript. #}
+          <a class="btn btn--ghost btn--sm btn--danger"
+             href="{{ url_for('confirm_delete_session', session_id=s.id) }}?next=/admin/sessions">Supprimer</a>
         </div>
       </li>
     {% endfor %}

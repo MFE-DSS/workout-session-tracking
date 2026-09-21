@@ -41,7 +41,6 @@
     "session_focus.css::.warmup-recap__summary::display:grid",
     "session_focus.css:::where(.session-feedback__note, .rule) > summary::display:flex",
     "session_focus.css::details.session-focus__cues > summary.session-focus__cues-title::display:inline-flex",
-    "target_closure.css::.history-item__toggle::display:flex",
     "target_closure.css:::where(.topbar__toggle)::display:flex"
   ]
 }

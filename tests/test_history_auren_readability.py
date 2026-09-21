@@ -76,8 +76,12 @@ def _render(client, status="all"):
 def test_history_status_title_and_lede(client):
     html = _render(client)
     assert "Historique" in html
-    # new additive lede
-    assert "Séances enregistrées, reprises possibles" in html
+    # ⚠ `UI-CP5 §8` — LE CHAPEAU DIT MAINTENANT CE QUE LA SURFACE EST.
+    # « Séances enregistrées, reprises possibles » décrivait une seconde
+    # réponse à « qu'est-ce qui a changé ? ». L'historique est le DÉTAIL de
+    # FLIGHT_RECORDER : il le dit, et il nomme où la réponse se lit.
+    assert "détail temporel" in html.lower()
+    assert "Progression" in html
 
 
 def test_history_keeps_filter_bar_and_choices(client):
@@ -105,9 +109,12 @@ def test_history_session_card_link_and_badges(client):
     with SessionLocal() as db:
         _seed_session(db, _uid(db), status="completed", excluded=False)
     html = _render(client)
-    # card links to session_detail
-    assert "session-card" in html
-    assert "/sessions/" in html
+    # ⚠ `UI-CP5` — LA CARTE DEVIENT UNE LIGNE. Ce que cette garde protège est
+    # que la ligne entière MÈNE quelque part, pas qu'elle soit une carte : 21
+    # rectangles identiques donnaient le même poids à la séance d'il y a une
+    # heure et à celle d'il y a six semaines.
+    assert "hroster__link" in html
+    assert "session=" in html
     # status badge + exos badge present
     assert "badge" in html
     # `Sb_UI_HISTORIQUE_01` — MIGRÉE : ON MARQUE L'EXCEPTION, PAS LA NORME.
@@ -149,22 +156,37 @@ def test_an_unfinished_session_is_the_one_that_gets_marked(client):
     )
 
 
-def test_history_management_details_and_post_actions_preserved(client):
+def test_history_leads_to_management_without_carrying_it(client):
+    """⚠ SCINDÉE ET RETOURNÉE PAR `UI-CP5 §10`.
+
+    Elle exigeait les deux formulaires POST et le `confirm()` DANS
+    `history.html`. Or l'instrument de lecture porte un contrat explicite —
+    `ACTION : aucune. C'est une lecture.` — et il en portait QUARANTE-DEUX.
+
+    Ce qu'elle protégeait vraiment est la CAPACITÉ, et la capacité est
+    intacte : elle vit sur `SESSION_LIFECYCLE`, et l'événement inspecté y mène
+    par une entrée discrète. Ce que la garde vérifie maintenant, c'est les
+    deux moitiés — le chemin existe, et les contrôles ne sont plus là.
+    """
     from app.database import SessionLocal
 
     with SessionLocal() as db:
         _seed_session(db, _uid(db), status="completed", excluded=True)
     html = _render(client)
-    # <details> management block + preserved wording
-    assert "<details" in html
-    assert "Gérer cette séance" in html
-    # both POST forms preserved
-    assert "toggle_exclude" in html or "/toggle" in html or 'method="post"' in html
-    assert "Supprimer" in html
-    # delete confirm preserved (no JS added, existing inline confirm kept)
-    assert "confirm(" in html
-    # excluded badge preserved
+
+    # Le CHEMIN existe.
+    assert "/admin/sessions" in html, "plus aucun chemin vers la gestion"
+    # Le badge d'exception reste — c'est une lecture, pas une commande.
     assert "exclu des KPI" in html
+
+    # Et les CONTRÔLES ne sont plus sur l'instrument.
+    assert 'method="post"' not in html.split("<main", 1)[-1].split("</main", 1)[0], (
+        "un formulaire de gestion est revenu sur l'instrument de lecture"
+    )
+    assert "confirm(" not in html, (
+        "le confirm JavaScript est revenu — il ne protégeait que les "
+        "navigateurs coopératifs, et la protection est désormais serveur"
+    )
 
 
 def test_history_indicative_note_present_with_data(client):
@@ -213,15 +235,23 @@ def test_no_bi_or_physique_link_added_this_sprint():
     assert "/physique" not in src
 
 
-def test_post_forms_and_confirm_intact_in_template():
-    """The two POST actions and the delete confirm must remain in the template."""
+def test_the_reading_instrument_carries_no_command():
+    """⚠ RETOURNÉE PAR `UI-CP5 §10` — et c'est l'inverse exact de l'ancienne.
+
+    Elle exigeait `toggle_exclude`, `delete_session` et la phrase de `confirm()`
+    dans ce gabarit. C'était la garde qui INTERDISAIT le plus directement de
+    retirer le fardeau de commande d'un instrument dont le contrat dit
+    « aucune action ».
+
+    La capacité est vérifiée ailleurs, contre la surface qui la possède
+    désormais (`tests/test_session_management.py`). Ici on garde la propriété
+    qui compte pour CETTE surface : elle ne commande rien.
+    """
     src = HISTORY_TPL.read_text(encoding="utf-8")
-    assert "toggle_exclude" in src
-    assert "delete_session" in src
-    assert "confirm('Supprimer définitivement cette séance ?')" in src
-    # preserved management wording
-    assert "Gérer cette séance" in src
-    assert "Supprimer" in src
+    assert "toggle_exclude" not in src
+    assert "delete_session" not in src
+    assert "confirm(" not in src
+    assert 'method="post"' not in src
 
 
 def test_no_forbidden_wording_in_history():
