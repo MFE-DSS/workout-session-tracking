@@ -380,7 +380,7 @@ héros.
 | `/progress` — écrans, **creux** | — | **1,08** |
 | `/history` — écrans, peuplé | 4,72 | **3,02** |
 | **`/history` — formulaires** | **42** | **0** |
-| `/history` — cibles < 44 px | — | **0** |
+| cibles < 44 px, `/progress` **et** `/history` | — | **0** (3 comptes, après correction — voir §11) |
 | styles en ligne, les deux gabarits | 0 | **0** (strict, cliquet tenu) |
 | aplats ambre par écran | — | **0** |
 | débordement horizontal (390) | — | **aucun** |
@@ -555,6 +555,28 @@ précisément celle qui déclenche le « reps sous la cible » que le L1 rend.
 
 *Deux tranches de suite, c'est une garde du dépôt — pas ma relecture — qui a vu
 la soustraction.*
+
+#### Et le remplacement a introduit son propre défaut, qu'AUCUNE garde ne voit
+
+En vérifiant une affirmation de ma propre PR — « cibles < 44 px : **0** » — j'ai
+mesuré `/progress` et trouvé **une** cible à **18 px** : le lien vers `/science`
+que je venais d'ajouter.
+
+**Aucune garde du dépôt ne pouvait le voir** : l'inventaire
+`ui_surface_inventory.json` se dérive de la **feuille de style**, pas de la
+géométrie rendue, et un lien en prose n'y apparaît pas. Le sweep était vert, et
+il avait raison de l'être.
+
+Le lien vit seul dans son paragraphe : il reçoit le plancher de 44 px
+(`.rule-entry`), qui ne coûte rien à la lecture. Mesuré après : **0** cible sous
+44 px sur `/progress` **et** `/history`, sur trois comptes.
+
+⚠ **Et le premier nom de cette classe était fautif.** Je l'avais appelée
+`.signals__how-rule` — un nom qui contient la sous-chaîne `signals__how`, si
+bien qu'une garde comptant les divulgations partagées en a vu **deux** : « il
+doit y avoir exactement une divulgation partagée ». La garde avait raison de
+compter ; c'est le nom qui rendait le compte indécidable. Un modificateur qui
+préfixe le nom d'un autre objet est illisible pour tout compteur textuel.
 
 ### Gardes neuves — 22, dont trois vérifiées par **mutation**
 

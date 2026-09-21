@@ -3334,6 +3334,34 @@ input, button, textarea, select {
   color: var(--fg-muted);
 }
 
+/* L'ENTRÉE VERS LA RÈGLE — `UI-CP5`.
+ *
+ * ⚠ ELLE NAÎT AVEC SON PLANCHER, ET C'EST UNE CORRECTION.
+ *
+ * `/progress` portait UNE entrée vers `/science`, accrochée à la tuile de
+ * score que cette tranche retire. Je l'ai replacée ici (voir le gabarit), et
+ * la mesure au rendu l'a rendue à **18 px de haut** : une cible tactile sous
+ * le standard produit AUREN de 44 px, que **aucune garde du dépôt ne voit** —
+ * l'inventaire `ui_surface_inventory.json` se dérive de la FEUILLE, pas de la
+ * géométrie rendue, et un lien en prose n'y apparaît pas.
+ *
+ * Le lien vit seul dans son paragraphe : lui donner le plancher ne coûte rien
+ * à la lecture. 44 px est le standard PRODUIT, pas le seuil WCAG 2.2 AA
+ * (24×24 avec exception d'espacement), qui était déjà satisfait.
+ *
+ * ⚠ ELLE NE S'APPELLE PAS `.signals__how-rule`, ET C'EST UNE LEÇON.
+ *
+ * Ce nom-là contenait la sous-chaîne `signals__how`, et une garde qui compte
+ * les divulgations partagées en a vu DEUX — « il doit y avoir exactement une
+ * divulgation partagée ». La garde avait raison de compter ; c'est le nom qui
+ * était fautif. Un modificateur qui préfixe le nom d'un autre objet rend
+ * indécidable, pour tout compteur textuel, lequel des deux il désigne. */
+.rule-entry {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* ⚠ `.kpi-grid` ET `.kpi-card*` ONT ÉTÉ RETIRÉS PAR `UI-CP5 §7`, LE 2026-09-21.
  *
  * Les quatre tuiles de « Rythme récent » portaient `0`, `13`, `100 %`, `82` :
