@@ -76,17 +76,24 @@ def _exits() -> list[tuple[str, str]]:
         r"\{#.*?#\}", "", (TEMPLATES / "index.html").read_text(encoding="utf-8"),
         flags=re.DOTALL,
     )
-    m = re.search(
-        r'<nav class="mission-bridge".*?</nav>', src, re.DOTALL)
-    assert m, "le rail de transition est introuvable dans index.html"
+    # ⚠ `UI-CP5` — LE RAIL A ATTEINT SON POINT D'ARRÊT.
+    #
+    # La sonde cherchait `<nav class="mission-bridge">` et s'auto-assertait :
+    # une fois le pont retiré, elle aurait LEVÉ au lieu d'échouer, et huit
+    # gardes seraient tombées sans dire ce qu'elles protégeaient.
+    #
+    # Elle lit désormais TOUS les liens de l'accueil hors du héros. L'ensemble
+    # est vide, et c'est exactement le résultat que
+    # `test_every_remaining_exit_answers_a_question` annonçait.
+    m = re.search(r'<nav class="mission-bridge".*?</nav>', src, re.DOTALL)
+    zone = m.group(0) if m else src.split("</div>")[-1]
     sorties = []
-    for bloc in re.findall(r"<a\s[^>]*>.*?</a>", m.group(0), re.DOTALL):
+    for bloc in re.findall(r"<a\s[^>]*>.*?</a>", zone, re.DOTALL):
         route = _routes_in(bloc)
         libelle = re.sub(r"<[^>]+>", " ", bloc)
         libelle = re.sub(r"\s+", " ", libelle).replace("\xa0", " ").strip()
         for r in route:
             sorties.append((libelle, r))
-    assert sorties, "aucune sortie lue dans le rail"
     return sorties
 
 
@@ -97,9 +104,17 @@ def _exit_routes() -> set[str]:
 def test_the_probe_finds_both_surfaces():
     """Garde de la garde : deux ensembles vides se croiseraient sans conflit,
     et le test passerait en annonçant l'absence de doublon."""
-    shell, sorties = _shell_routes(), _exit_routes()
+    shell = _shell_routes()
     assert len(shell) >= 3, f"seulement {len(shell)} destinations de coque lues"
-    assert len(sorties) >= 2, f"seulement {len(sorties)} sorties lues"
+    # ⚠ L'ENSEMBLE DES SORTIES EST DÉSORMAIS VIDE, et c'est le résultat
+    # attendu, pas une sonde cassée : le pont a atteint son critère de retrait.
+    # Ce que cette garde-de-la-garde doit continuer d'empêcher est qu'on
+    # conclue « aucun doublon » en n'ayant rien lu DU TOUT — donc c'est la
+    # lecture de la COQUE qui doit rester prouvée.
+    assert _exit_routes() == set(), (
+        "des sorties sont réapparues sous le héros — la cible A dit « rien "
+        "d'autre »"
+    )
 
 
 def test_no_home_exit_repeats_the_shell_by_name():
@@ -148,15 +163,19 @@ def test_every_remaining_exit_answers_a_question():
     doublon. Chacune doit désigner une question que MISSION ne possède plus —
     et c'est le point d'arrêt du pont : quand `FLIGHT_RECORDER` répondra à
     « qu'est-ce qui a changé ? », la sortie n'aura plus de raison d'être.
+
+    ⚠ LE POINT D'ARRÊT EST ATTEINT, ET CETTE GARDE L'AVAIT ÉCRIT.
+
+    Sa propre docstring disait : « quand `FLIGHT_RECORDER` répondra à
+    "qu'est-ce qui a changé ?", la sortie n'aura plus de raison d'être. »
+    `UI-CP5` est cette tranche. La garde ne devient donc pas fausse — elle
+    devient la vérification que la soustraction a bien été un TRI : plus
+    aucune sortie, et chaque destination toujours atteignable par la coque.
     """
-    sorties = _exits()
-    assert sorties, (
-        "toutes les sorties ont disparu — c'est une soustraction, pas un tri"
+    assert _exits() == [], (
+        "une sortie est réapparue sous le héros alors que les deux questions "
+        "ont leur instrument"
     )
-    for libelle, _ in sorties:
-        assert "?" in libelle, (
-            f"« {libelle} » ne pose pas de question : elle redevient une tuile"
-        )
 
 
 def test_the_removed_destinations_are_still_reachable(client):

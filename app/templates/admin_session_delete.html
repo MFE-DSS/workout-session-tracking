@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+{# `SESSION_LIFECYCLE` — LA CONFIRMATION, APPLIQUÉE PAR LE SERVEUR.
+
+   Elle remplace un `onsubmit="return confirm(...)"` qui vivait côté client
+   seulement : contournable par n'importe quelle requête directe, et du
+   JavaScript sur une surface que le dépôt garde contre le JavaScript.
+
+   ⚠ CE N'EST PAS UNE PROTECTION CSRF. Aucune machinerie CSRF n'existe dans
+   cette application. Ceci protège d'un geste accidentel, pas d'une requête
+   forgée — et le rapport de tranche le dit noir sur blanc pour que personne
+   ne le lise autrement.
+
+   ⚠ ELLE CHIFFRE CE QUI DISPARAÎT. Une cascade qu'on n'a pas comptée n'est
+   pas un consentement éclairé : la séance emporte ses exercices et toutes ses
+   séries, et il n'existe aucune colonne de suppression douce, donc aucun
+   retour en arrière.
+
+   ⚠ ELLE OFFRE L'ALTERNATIVE RÉVERSIBLE. « Exclure des KPI » retire la séance
+   de tous les agrégats sans rien détruire, et se re-bascule. Proposer la
+   commande la plus destructive seule reviendrait à ne pas en proposer. #}
+<h1 class="page-title">Supprimer cette séance&nbsp;?</h1>
+
+<p class="lede">
+  <strong>{{ session.template_name_snapshot }}</strong> ·
+  {{ (session.started_at | local).strftime('%d/%m/%Y %H:%M') }}
+</p>
+
+<p class="delete-scope">
+  Cette suppression est <strong>définitive</strong> et emporte, avec la séance,
+  {{ exercices }} exercice{{ 's' if exercices > 1 }}
+  et {{ series }} série{{ 's' if series > 1 }} enregistrée{{ 's' if series > 1 }}.
+  Rien n'est conservé, et il n'existe aucun moyen de revenir en arrière.
+</p>
+
+<form method="post" action="{{ url_for('delete_session', session_id=session.id) }}"
+      class="delete-confirm">
+  {# Le champ que seule cette vue produit. Sans lui, la route renvoie ici
+     plutôt que de supprimer : la confirmation est une propriété du serveur. #}
+  <input type="hidden" name="confirmation" value="oui" />
+  <input type="hidden" name="next" value="{{ retour }}" />
+  <button type="submit" class="btn btn--danger delete-confirm__go">
+    Supprimer définitivement
+  </button>
+</form>
+
+<p class="delete-alt">
+  <a class="inline-target" href="{{ retour }}">Annuler</a>
+</p>
+
+{# L'alternative réversible, dans le même écran, à égalité de lisibilité avec
+   le renoncement — et jamais au rang de la commande destructive. #}
+<form method="post" action="{{ url_for('toggle_exclude', session_id=session.id) }}"
+      class="delete-alt">
+  <input type="hidden" name="next" value="{{ retour }}" />
+  <button type="submit" class="btn btn--ghost">
+    {% if session.excluded_from_stats %}
+      Inclure de nouveau dans les KPI
+    {% else %}
+      Plutôt l'exclure des KPI — réversible, rien n'est supprimé
+    {% endif %}
+  </button>
+</form>
+{% endblock %}

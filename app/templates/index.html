@@ -386,17 +386,39 @@
 
      Lien Progression          devient cette même sortie, nommée par sa
                                QUESTION plutôt que par sa destination.
+
+   ────────────────────────────────────────────────────────────
+   ⚠ LE PONT A ÉTÉ RETIRÉ LE 2026-09-21, PAR `UI-CP5 FLIGHT_RECORDER`,
+   SELON LE CRITÈRE QU'IL PORTAIT LUI-MÊME.
+
+   Ce bloc n'est pas conservé par nostalgie : `UI-CP3` l'avait écrit pour que
+   personne n'ait à redécouvrir la date de péremption d'un objet transitoire.
+   Un pont sans date devient une fondation. Voici donc ce qui s'est passé,
+   plutôt qu'une promesse qu'on croirait encore à tenir.
+
+   LA RAISON DU RETRAIT EST MESURÉE, PAS PRÉFÉRÉE. Les deux sorties menaient à
+   `/progress` et `/profile` — c'est-à-dire aux onglets primaires
+   « Progression » et « Profil » de la barre basse. Un lien secondaire qui
+   double une destination primaire est exactement le défaut qu'`UI-CP4` venait
+   de retirer de la coque ; le laisser ici l'aurait simplement déplacé.
+
+   ET LES DEUX QUESTIONS ONT MAINTENANT LEUR INSTRUMENT :
+
+     « Qu'est-ce qui a changé ? »   FLIGHT_RECORDER, rang L1 de /progress.
+                                    Une sortie nommée par une question à
+                                    laquelle un instrument répond désormais
+                                    en tête d'écran n'est plus un pont : c'est
+                                    une redite.
+
+     « Où en est mon corps ? »      BODY_LEDGER, onglet Profil.
+
+   RIEN N'EST DEVENU INATTEIGNABLE, et c'est vérifié avant le retrait :
+   /progress et /library sont dans la barre basse, l'Historique dans le menu
+   et dans le rail, le Profil est un onglet.
+
+   La cible `A` est donc atteinte : décision · cause · commande · alternative
+   minimale. Rien d'autre sous le héros.
    ============================================================ #}
-<nav class="mission-bridge" aria-label="Questions hors mission">
-  <a class="mission-bridge__exit" href="{{ url_for('progress') }}">
-    <span class="mission-bridge__q">Qu'est-ce qui a changé&nbsp;?</span>
-    <span class="mission-bridge__go" aria-hidden="true">&rarr;</span>
-  </a>
-  <a class="mission-bridge__exit" href="{{ url_for('profile_page') }}">
-    <span class="mission-bridge__q">O&ugrave; en est mon corps&nbsp;?</span>
-    <span class="mission-bridge__go" aria-hidden="true">&rarr;</span>
-  </a>
-</nav>
 
 </div>{# /today-home #}
 {% endblock %}

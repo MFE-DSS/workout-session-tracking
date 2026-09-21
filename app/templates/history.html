@@ -1,17 +1,34 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Historique</h1>
-{# Sx_UI_07.2 — readability pass : lede sobre + aria-label plus explicite.
-   Additif uniquement ; wording des filtres, badges, actions et confirm
-   conservé à l'identique (comportement métier + tests inchangés). #}
-<p class="lede">Séances enregistrées, reprises possibles et séances exclues des indicateurs.</p>
+{# ══ `UI-CP5 §8` — L'HISTORIQUE EST LE DÉTAIL DE FLIGHT_RECORDER ══
 
+   Il répondait à « qu'est-ce qui a changé ? » comme une SECONDE surface, et il
+   y répondait mal : 21 rectangles rigoureusement identiques, où la séance
+   d'il y a une heure pesait exactement autant que celle d'il y a six semaines.
+   Mesuré à 390×844 : 4,72 écrans, 87 conteneurs, et la plus grosse
+   typographie de l'écran était le TITRE DE LA PAGE.
+
+   Il porte désormais trois objets, et aucun n'est une carte :
+
+       la BANDE            la forme de l'historique
+       l'ÉVÉNEMENT inspecté le détail de ce qu'on a sélectionné
+       le RÔLE             une ligne par séance, sans chrome
+
+   ⚠ ZÉRO FORMULAIRE ICI. Les 42 qu'il portait — exclure des KPI, supprimer —
+   sont du CYCLE DE VIE de la donnée, pas de la lecture. Ils vivent sur
+   `SESSION_LIFECYCLE`, et l'événement inspecté y mène par une entrée discrète.
+   « Preserve capability. Remove command burden. » #}
+<h1 class="page-title">Historique</h1>
+<p class="lede">Le détail temporel de tes séances. Ce qui a changé se lit sur
+  <a class="inline-target" href="{{ url_for('progress') }}">Progression</a>.</p>
+
+{# Le filtre est une DEMANDE, jamais une décision du produit. Une valeur hors
+   vocabulaire est ramenée à « Tout » côté route plutôt que rendue. #}
 <nav class="filter-bar" aria-label="Filtrer l'historique par statut">
   {% for choice in status_choices %}
-    <a
-      class="filter-bar__item {% if status_filter == choice %}is-active{% endif %}"
-      href="{{ url_for('history') }}?status={{ choice }}"
-    >
+    <a class="filter-bar__item {% if status_filter == choice %}is-active{% endif %}"
+       href="{{ url_for('history') }}{% if choice != 'all' %}?status={{ choice }}{% endif %}"
+       {% if status_filter == choice %}aria-current="true"{% endif %}>
       {% if choice == 'all' %}Tout{% elif choice == 'in_progress' %}En cours{% else %}Terminées{% endif %}
     </a>
   {% endfor %}
@@ -25,103 +42,145 @@
     {% elif status_filter == 'completed' %}
       Aucune séance terminée pour l'instant.
     {% else %}
-      {# `TRAIN1-E` / C6 — le seul lien de l'état vide relève du même standard
-         que le reste de la surface. Mesuré à 160×16 px ; la classe lui donne
-         sa zone sans changer la hauteur de la phrase. #}
       Aucune séance enregistrée. Commence par
       <a class="inline-target" href="{{ url_for('library') }}">choisir un template</a>.
     {% endif %}
   </p>
 {% else %}
-  <ul class="session-list">
-    {% for s in sessions %}
-      {% set stats = session_stats[s.id] %}
-      <li class="history-item {% if s.excluded_from_stats %}history-item--excluded{% endif %}">
-        {# `Sb_UI_HISTORIQUE_01` — LES STYLES EN LIGNE SORTENT DE LA CARTE.
-           Fond, retrait, rayon et les deux rangées flex étaient écrits dans des
-           attributs `style=`. Rien de visible n'en souffrait — et c'est le
-           problème : aucune classe ne portait l'apparence de cet objet, donc
-           rien ne pouvait la faire évoluer, ni la souder à sa commande.
-           C'est ce qui bloquait la correction demandée. #}
-        <a class="session-card history-item__card" href="{{ url_for('session_detail', session_id=s.id) }}">
-          <div class="history-item__head">
-            <span class="session-card__name">{{ s.template_name_snapshot }}</span>
-            <span class="history-item__date">
-              {# `Sb_UI_HISTORIQUE_01` — `strftime('%a …')` RENDAIT L'ANGLAIS.
-                 `%a` prend l'abréviation de la locale du PROCESSUS, pas celle
-                 du produit : « Sat 05/09 07:54 », dix fois par écran. Le filtre
-                 `date_fr` réunit `local` et la table française qui existaient
-                 déjà séparément. L'heure de début part avec : sur une liste
-                 d'historique, la minute ne se relit jamais. #}
-              {{ s.started_at | date_fr }}
+
+{# ══ LA BANDE DE TEMPS ══
+
+   ⚠ AUCUN AXE Y. Aucune hauteur, aucune largeur, aucune aire n'encode quoi
+   que ce soit : tous les marqueurs sont identiques. Le §9 est explicite —
+   « toute dimension graphique doit avoir une variable nommée et vraie », et
+   encoder « la quantité de changement » par une hauteur serait exactement le
+   pseudo-axe de signification qu'il interdit.
+
+   LA SEULE dimension est l'ORDRE dans le temps, du plus ancien au plus récent.
+   C'est une variable nommée — le rang chronologique — et elle est vraie.
+   Elle n'est pas PROPORTIONNELLE au temps, et c'est délibéré : une position
+   proportionnelle exigerait une géométrie écrite dans un attribut `style`, or
+   ce gabarit est épinglé à **zéro style en ligne**, cliquet strict dans les
+   deux sens. L'axe nomme donc ses deux bornes, et rien entre elles ne prétend
+   à une échelle.
+
+   L'ÉTAT EST PORTÉ PAR LA FORME ET LE LIBELLÉ, jamais par la couleur seule
+   (`no-color-only-state`) : plein pour terminée, contour pour en cours,
+   hachuré pour exclue des KPI — la même trame que `zone_exposure` emploie
+   pour « non mesurée ».
+
+   La ZONE TACTILE fait 44 px, le marqueur visible est plus petit et centré :
+   zone tactile ≠ chrome visible, c'est le standard produit AUREN et non une
+   dérogation WCAG. #}
+{# ⚠ LE TITRE NE NOMME PAS UNE FENÊTRE, et c'est une correction.
+   Ma première écriture disait « Six dernières semaines » — vrai sur le compte
+   de labo, FAUX partout ailleurs : la bande rend ce que la requête ramène,
+   jusqu'à cent séances, sur la durée que l'utilisateur a réellement. Un titre
+   qui affirme une fenêtre que la donnée ne garantit pas est exactement la
+   promesse sans réponse que ce train ferme depuis `UX4_03`.
+
+   Les deux bornes de l'axe, elles, sont LUES dans les données. #}
+<h2 class="section-header">Frise des séances</h2>
+<ol class="tband" aria-label="Séances, de la plus ancienne à la plus récente">
+  {% for s in sessions | reverse %}
+    {% set etat = 'encours' if s.status == 'in_progress'
+                  else ('exclue' if s.excluded_from_stats else 'faite') %}
+    <li class="tband__slot">
+      <a class="tband__hit{% if selection and selection.id == s.id %} is-selected{% endif %}"
+         href="{{ url_for('history') }}?status={{ status_filter }}&session={{ s.id }}">
+        <span class="tband__mark tband__mark--{{ etat }}" aria-hidden="true"></span>
+        <span class="sr-only">
+          {{ s.template_name_snapshot }}, {{ s.started_at | date_fr }},
+          {% if etat == 'encours' %}en cours{% elif etat == 'exclue' %}exclue des KPI{% else %}terminée{% endif %}
+        </span>
+      </a>
+    </li>
+  {% endfor %}
+</ol>
+<div class="rail__axis">
+  <span>{{ (sessions | last).started_at | date_fr }}</span>
+  <span>aujourd'hui</span>
+</div>
+{# ⚠ LA LÉGENDE NE NOMME QUE LES ÉTATS PRÉSENTS.
+
+   Ma première écriture listait les trois en toutes circonstances. Deux torts :
+   elle annonçait « en cours » sur un historique qui n'en contient aucune —
+   une clé de lecture pour une forme absente n'aide pas, elle encombre — et
+   elle a fait tomber une garde qui vérifie qu'une séance terminée n'est
+   jamais annoncée « en cours ». La garde avait raison sur le fond : ces mots
+   ne doivent apparaître que là où l'état existe. #}
+{% set a_encours = sessions | selectattr('status', 'equalto', 'in_progress') | list | length %}
+{% set a_exclues = sessions | selectattr('excluded_from_stats') | list | length %}
+{% set a_faites = sessions | rejectattr('status', 'equalto', 'in_progress') | rejectattr('excluded_from_stats') | list | length %}
+<p class="tband__legend">
+  {% if a_faites %}<span class="tband__mark tband__mark--faite" aria-hidden="true"></span>terminée{% endif %}
+  {% if a_encours %}<span class="tband__mark tband__mark--encours" aria-hidden="true"></span>en cours{% endif %}
+  {% if a_exclues %}<span class="tband__mark tband__mark--exclue" aria-hidden="true"></span>exclue des KPI{% endif %}
+</p>
+
+{# ══ L'ÉVÉNEMENT INSPECTÉ ══
+   Rendu seulement quand il y en a un. Un cadre vide en attente de sélection
+   serait un objet qui occupe une place sans rien dire. #}
+{% if selection %}
+  {% set stats = session_stats[selection.id] %}
+  <h2 class="section-header">La séance sélectionnée</h2>
+  <div class="tband__detail">
+    <p class="tband__detail-name">{{ selection.template_name_snapshot }}</p>
+    <p class="tband__detail-meta">
+      {{ selection.started_at | date_fr }}
+      {% if stats.total > 0 %} · {{ stats.done }}/{{ stats.total }} exos{% endif %}
+      {% if durations[selection.id] %}
+        · {% if selection.status == 'in_progress' %}depuis{% else %}durée{% endif %} {{ durations[selection.id] }}
+      {% endif %}
+      {% if selection.excluded_from_stats %} · exclue des KPI{% endif %}
+    </p>
+    <p class="tband__detail-go">
+      <a class="inline-target" href="{{ url_for('session_detail', session_id=selection.id) }}">Ouvrir la séance</a>
+      {# ⚠ UNE ENTRÉE DISCRÈTE, PAS DES CONTRÔLES. Le §10 autorise exactement
+         ceci : un détail de séance peut MENER à la gestion. Il ne l'expose pas. #}
+      <a class="tband__manage" href="{{ url_for('admin_sessions') }}">Gérer cette séance</a>
+    </p>
+  </div>
+{% endif %}
+
+{# ══ LE RÔLE — une LIGNE par séance, pas un rectangle ══
+   Ce qui remplace les 21 cartes. Aucun fond, aucun cadre, aucune commande :
+   un filet les sépare, et la ligne entière mène à la séance. #}
+<h2 class="section-header">Toutes les séances</h2>
+<ul class="hroster">
+  {% for s in sessions %}
+    {% set stats = session_stats[s.id] %}
+    <li class="hroster__row{% if selection and selection.id == s.id %} is-selected{% endif %}">
+      <a class="hroster__link" href="{{ url_for('history') }}?status={{ status_filter }}&session={{ s.id }}">
+        <span class="hroster__name">{{ s.template_name_snapshot }}</span>
+        <span class="hroster__line">
+          <span class="hroster__date">{{ s.started_at | date_fr }}</span>
+          {% if s.status == 'in_progress' %}
+            <span class="badge badge--in_progress">en cours</span>
+          {% endif %}
+          {% if stats.total > 0 %}
+            <span class="badge badge--neutral">{{ stats.done }}/{{ stats.total }} exos</span>
+          {% endif %}
+          {% if durations[s.id] %}
+            <span class="badge badge--neutral">
+              {% if s.status == 'in_progress' %}depuis{% else %}durée{% endif %}
+              {{ durations[s.id] }}
             </span>
-          </div>
-          <div class="history-item__badges">
-            {# `Sb_UI_HISTORIQUE_01` — ON MARQUE L'EXCEPTION, PAS LA NORME.
-               Le chip « terminée » était la seule chose colorée de la carte, et
-               il redisait deux fois ce que la carte disait déjà : l'onglet de
-               filtre actif, et le mot « durée » du chip voisin (une séance en
-               cours dit « depuis »). Sur un historique, terminée EST la norme.
-               « en cours » reste, parce que c'est l'exception. #}
-            {% if s.status == 'in_progress' %}
-              <span class="badge badge--in_progress">en cours</span>
-            {% endif %}
-            {% if stats.total > 0 %}
-              <span class="badge badge--neutral">{{ stats.done }}/{{ stats.total }} exos</span>
-            {% endif %}
-            {% if durations[s.id] %}
-              <span class="badge badge--neutral">
-                {% if s.status == 'in_progress' %}depuis{% else %}durée{% endif %}
-                {{ durations[s.id] }}
-              </span>
-            {% endif %}
-            {% if s.excluded_from_stats %}
-              <span class="badge badge--excluded">exclu des KPI</span>
-            {% endif %}
-          </div>
-        </a>
-        {# `TRAIN1-E` / C6 — LA LIGNE EST L'ACTION PRIMAIRE, LA GESTION EST RARE.
+          {% endif %}
+          {% if s.excluded_from_stats %}
+            <span class="badge badge--excluded">exclu des KPI</span>
+          {% endif %}
+        </span>
+      </a>
+    </li>
+  {% endfor %}
+</ul>
 
-           Les deux moitiés de la décision étaient déjà en place : la carte est
-           un `<a>` de 358×101 px, et les deux actions de gestion vivent déjà
-           derrière une divulgation. Ce qui manquait était l'ESPACE.
-
-           `UIV3_TARGETS_44_01` avait déféré ces cibles pour une raison
-           PHYSIQUE, et elle avait raison : à 8 px au-dessus et 4 px en dessous,
-           un `<summary>` de 26 px ne peut pas recevoir 44 px de zone sans
-           chevaucher la carte ou les boutons. Une zone qui se recouvre est pire
-           que pas de zone — elle déplace le défaut et le rend invisible à la
-           mesure. C6 autorise le changement structurel qui manquait.
-
-           CE QUE LA MESURE A CORRIGÉ DANS MON PROPRE RELEVÉ. Je comptais 18
-           cibles sous 44 px ici. Faux : replié, les deux boutons rendent
-           `checkVisibility() === false` et `elementFromPoint` à leur centre
-           renvoie la CARTE. Ils ne sont pas tapables. Le vrai chiffre par
-           défaut est **une** cible par ligne — le `<summary>`.
-
-           Les styles en ligne partent avec : rien ne pouvait être visé tant
-           que tout était écrit dans l'attribut `style`. #}
-        <details class="history-item__actions">
-          <summary class="history-item__toggle">Gérer cette séance</summary>
-          <div class="history-item__buttons">
-            <form method="post" action="{{ url_for('toggle_exclude', session_id=s.id) }}">
-              <button type="submit" class="btn btn--ghost history-item__btn">
-                {% if s.excluded_from_stats %}Inclure dans KPI{% else %}Exclure des KPI{% endif %}
-              </button>
-            </form>
-            <form method="post" action="{{ url_for('delete_session', session_id=s.id) }}"
-                  onsubmit="return confirm('Supprimer définitivement cette séance ?');">
-              <button type="submit" class="btn btn--ghost btn--danger history-item__btn">Supprimer</button>
-            </form>
-          </div>
-        </details>
-      </li>
-    {% endfor %}
-  </ul>
-  {# Sx_UI_07.2 — note indicative sobre (additive). Aucun calcul, aucune
-     action ; rappelle simplement le rôle de l'exclusion KPI. #}
+  {# Sx_UI_07.2 — note indicative sobre. Aucun calcul, aucune action ;
+     rappelle le rôle de l'exclusion KPI, qui se pilote ailleurs. #}
   <p class="kpi-note">
-    Lecture indicative · les séances exclues ne comptent pas dans les KPI.
+    Lecture indicative · les séances exclues ne comptent pas dans les KPI ·
+    <a class="inline-target" href="{{ url_for('admin_sessions') }}">gérer les séances</a>.
   </p>
 {% endif %}
 {% endblock %}

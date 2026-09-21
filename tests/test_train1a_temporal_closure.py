@@ -131,10 +131,29 @@ def test_the_duplicated_cadence_wording_is_gone_from_the_surface():
     assert "volume_signal" not in src
 
 
-def test_the_anomaly_survives_the_container():
+def test_the_anomaly_survives_the_container(client):
     """§5.3 — une soustraction ne part jamais seule. L'anomalie est le fait
-    UNIQUE de `weekly_loop` : aucun autre bloc ne la porte."""
-    assert "top_anomaly" in _uncommented(PROGRESS.read_text(encoding="utf-8"))
+    UNIQUE de `weekly_loop` : aucun autre bloc ne la porte.
+
+    ⚠ REPOINTÉE PAR `UI-CP5`, ET RENFORCÉE. Elle cherchait le nom de variable
+    `top_anomaly` dans la source du gabarit — donc elle serait restée verte
+    devant un `{% if top_anomaly %}` que rien n'alimente, et elle interdisait
+    de renommer la clé sans rien protéger de plus.
+
+    L'anomalie est désormais le premier rang du DEBRIEFING, et sur une
+    meilleure fenêtre : la dernière séance au lieu de la semaine ISO, qui se
+    taisait le lundi matin et choisissait la séance la plus ANCIENNE de la
+    semaine. La garde l'observe au RENDU, sur un compte qui en porte une.
+    """
+    from tests.test_anomalies import _mk_session_for_anomalies
+
+    _mk_session_for_anomalies(exercises=[{
+        "code": "SURV", "name": "Exercice surveillé", "success_score": 100,
+        "rep_targets": [{"min_reps": 8, "max_reps": 10}],
+        "work_sets": [{"weight_kg": 50, "reps": 2, "completed": True}],
+    }])
+    body = client.get("/progress").text
+    assert "Exercice surveillé" in body, "le fait unique de weekly_loop est perdu"
 
 
 def test_the_weekly_dominance_survives_inside_per_programme():

@@ -136,8 +136,15 @@ def test_admin_sessions_shows_quality_for_completed(client):
 
 
 def test_delete_session_removes_it(client):
+    """⚠ LA CONFIRMATION EST DÉSORMAIS APPLIQUÉE PAR LE SERVEUR.
+
+    `SESSION_LIFECYCLE` (`UI-CP5`) remplace un `confirm()` JavaScript — côté
+    client seulement, donc contournable par cette requête même — par un champ
+    que seule la vue de confirmation produit. Le POST le porte maintenant.
+    """
     sid = _start(client, "push-a")
-    r = client.post(f"/admin/sessions/{sid}/delete", follow_redirects=False)
+    r = client.post(f"/admin/sessions/{sid}/delete",
+                    data={"confirmation": "oui"}, follow_redirects=False)
     assert r.status_code == 303
 
     from app.database import SessionLocal
@@ -145,6 +152,56 @@ def test_delete_session_removes_it(client):
 
     with SessionLocal() as db:
         assert db.get(WorkoutSession, sid) is None
+
+
+def test_une_suppression_sans_confirmation_ne_supprime_rien(client):
+    """LA PROTECTION EST UNE PROPRIÉTÉ DU SERVEUR, plus une chaîne dans un
+    gabarit.
+
+    Avant `UI-CP5`, cette requête exacte supprimait : le `confirm()` vivait
+    dans `onsubmit` et ne protégeait que les navigateurs coopératifs.
+    """
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+
+    sid = _start(client, "push-a")
+    r = client.post(f"/admin/sessions/{sid}/delete", follow_redirects=False)
+    assert r.status_code == 303
+    assert f"/admin/sessions/{sid}/delete" in r.headers["location"], (
+        "l'utilisateur doit atterrir sur la confirmation, pas sur un échec"
+    )
+    with SessionLocal() as db:
+        assert db.get(WorkoutSession, sid) is not None, "supprimée sans confirmation"
+
+
+def test_la_confirmation_chiffre_ce_qui_disparait(client):
+    """Une cascade qu'on n'a pas comptée n'est pas un consentement éclairé."""
+    sid = _start(client, "push-a")
+    body = client.get(f"/admin/sessions/{sid}/delete").text
+    assert "définitive" in body
+    # Deux assertions plutôt qu'une conjonction : laquelle des deux grandeurs a
+    # disparu du décompte est l'information utile (`python:S9073`).
+    assert "exercice" in body
+    assert "série" in body
+    # L'alternative RÉVERSIBLE est offerte dans le même écran.
+    assert "exclure des kpi" in body.lower()
+    assert "réversible" in body.lower()
+
+
+def test_la_destination_de_retour_est_close(client):
+    """Une destination hors liste est ignorée, jamais suivie.
+
+    Elle remplace un reniflage de l'en-tête `Referer` — que l'appelant
+    contrôle, et que `Referrer-Policy: no-referrer` supprime.
+    """
+    sid = _start(client, "push-a")
+    r = client.post(f"/admin/sessions/{sid}/exclude",
+                    data={"next": "//evil.example/"}, follow_redirects=False)
+    assert r.headers["location"] == "/admin/sessions"
+
+    r = client.post(f"/admin/sessions/{sid}/exclude",
+                    data={"next": "/history"}, follow_redirects=False)
+    assert r.headers["location"] == "/history"
 
 
 def test_delete_unknown_session_returns_404(client):
@@ -212,14 +269,35 @@ def test_progress_shows_no_timeline_when_no_data(client):
     assert "timeline-chart" not in body
 
 
-def test_progress_shows_quality_timeline_when_data_exists(client):
+def test_une_seance_terminee_alimente_les_agregats_de_progression(client):
+    """⚠ REPOINTÉE PAR `UI-CP5 §9` — la courbe « Qualité des séances » est
+    retirée, et la propriété gardée n'était pas elle.
+
+    Son axe Y était `compute_session_quality`, un SCORE COMPOSITE tracé en
+    hauteur : « toute dimension graphique doit avoir une variable nommée et
+    vraie ». Le score par séance reste lisible sur la surface de cycle de vie,
+    et par programme sur `/progress`.
+
+    Ce que cette garde protégeait vraiment : **une séance terminée COMPTE**.
+    Elle l'observe désormais sur l'agrégat, qui est le fait, plutôt que sur un
+    graphique, qui n'en était qu'un rendu.
+    """
+    from app.database import SessionLocal
+    from app.services.kpis import compute_global_kpis
+    from tests.helpers import get_test_user_id
+
     sid = _start(client, "push-a")
     _fill_e2_and_complete(client, sid)
+
+    with SessionLocal() as db:
+        kpis = compute_global_kpis(db, user_id=get_test_user_id())
+    assert kpis.completed_last_30 >= 1
+
     body = client.get("/progress").text
-    assert "Qualité de séance" in body
-    # Sb_UI_03.1 — target the timeline chart container, not any "<svg"
-    # (bottom-nav icons now add unrelated SVGs to the shell).
-    assert "timeline-chart" in body
+    assert "séance" in body.lower()
+    assert "Qualité des séances" not in body, (
+        "la courbe au score composite est revenue"
+    )
 
 
 def test_progress_shows_bodyweight_timeline_when_bodyweight_present(client):
@@ -232,20 +310,37 @@ def test_progress_shows_bodyweight_timeline_when_bodyweight_present(client):
     assert "Poids corporel" in body
 
 
-def test_excluded_sessions_not_in_timelines(client):
+def test_excluded_sessions_leave_the_aggregates(client):
+    """⚠ REPOINTÉE PAR `UI-CP5 §9`, et RENFORCÉE.
+
+    L'ancienne observait la disparition d'un graphique. Elle observe désormais
+    la disparition du FAIT — dans les deux sens, et sur l'agrégat lui-même.
+    Exclure une séance doit la retirer de ce que la page affirme, pas seulement
+    d'un rendu.
+    """
+    from app.database import SessionLocal
+    from app.services.kpis import compute_global_kpis
+    from tests.helpers import get_test_user_id
+
     sid = _start(client, "push-a")
     _fill_e2_and_complete(client, sid)
 
-    # Before exclude: timeline exists
-    body_before = client.get("/progress").text
-    assert "Qualité de séance" in body_before
+    with SessionLocal() as db:
+        avant = compute_global_kpis(db, user_id=get_test_user_id()).completed_last_30
+    assert avant >= 1, "prémisse : la séance doit compter avant d'être exclue"
 
-    # Exclude
-    client.post(f"/admin/sessions/{sid}/exclude", follow_redirects=False)
+    client.post(f"/admin/sessions/{sid}/exclude", data={"next": "/history"},
+                follow_redirects=False)
+    with SessionLocal() as db:
+        apres = compute_global_kpis(db, user_id=get_test_user_id()).completed_last_30
+    assert apres == avant - 1, "la séance exclue pèse encore"
 
-    # After exclude: timeline should vanish (only one session, now excluded)
-    body_after = client.get("/progress").text
-    assert "Qualité de séance" not in body_after
+    # Et la bascule inverse la restitue — une exclusion est réversible.
+    client.post(f"/admin/sessions/{sid}/exclude", data={"next": "/history"},
+                follow_redirects=False)
+    with SessionLocal() as db:
+        retour = compute_global_kpis(db, user_id=get_test_user_id()).completed_last_30
+    assert retour == avant
 
 
 def test_deleted_sessions_not_in_timelines(client):
@@ -258,19 +353,56 @@ def test_deleted_sessions_not_in_timelines(client):
 
 
 # ---------------------------------------------------------------------------
-# History page has management actions (merged from old Gestion tile)
+# SESSION_LIFECYCLE — la capacité est préservée, le fardeau de commande non
 # ---------------------------------------------------------------------------
 
 
-def test_history_has_management_actions(client):
-    """After merging Gestion into Historique, each session has
-    exclude/delete actions in a collapsible <details> block."""
-    # Create a session to have something in history
+def test_the_lifecycle_capability_is_intact(client):
+    """⚠ REPOINTÉE PAR `UI-CP5`, ET C'EST LA MOITIÉ QUI COMPTE LE PLUS.
+
+    Elle s'appelait `test_history_has_management_actions` et exigeait que
+    CHAQUE séance de `/history` porte ses commandes dans un `<details>`. C'est
+    exactement ce que la tranche retire : `FLIGHT_RECORDER` est un instrument
+    de lecture — son contrat dit `ACTION : aucune` — et l'écran portait
+    **42 formulaires**, deux par séance.
+
+    Mais retirer la garde aurait laissé la capacité sans gardien, et c'est
+    précisément ainsi qu'une capacité disparaît sans que personne le voie. Elle
+    est donc **déplacée avec son objet** : les trois affordances sont vérifiées
+    là où elles vivent maintenant, sur `/admin/sessions`.
+
+    Une conjonction `a or b` cachait en plus laquelle des deux étiquettes on
+    exige (`python:S9073`, MAJOR) — et les deux sont légitimes : l'étiquette
+    bascule selon l'état de la séance. On vérifie donc la bascule elle-même.
+    """
     client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
-    body = client.get("/history").text
-    assert "Gérer cette séance" in body
-    assert "Exclure des KPI" in body or "Inclure dans KPI" in body
-    assert "Supprimer" in body
+    body = client.get("/admin/sessions").text
+
+    assert "Supprimer" in body, "la suppression n'est plus offerte nulle part"
+    # L'étiquette de la bascule dépend de l'état ; on exige la bascule, pas un
+    # de ses deux mots.
+    bascule = ("Exclure des KPI" in body) + ("Inclure dans KPI" in body)
+    assert bascule >= 1, "la bascule d'exclusion des KPI a disparu"
+
+
+def test_history_exposes_the_path_without_exposing_the_controls(client):
+    """LE PENDANT, et sans lui la garde ci-dessus autoriserait un cul-de-sac.
+
+    `« Preserve capability. Remove command burden. »` a deux moitiés. La
+    première est tenue au-dessus. La seconde est ici : l'instrument de lecture
+    ne porte **aucune** commande, et il mène quand même à celle qui existe.
+
+    Un chemin sans commandes, pas des commandes sans chemin.
+    """
+    client.post("/sessions", data={"template_slug": "push-a"}, follow_redirects=False)
+    principal = client.get("/history").text.split("<main", 1)[-1].split("</main", 1)[0]
+
+    assert 'method="post"' not in principal, (
+        "une commande est revenue sur l'instrument de lecture"
+    )
+    assert "/admin/sessions" in principal, (
+        "la capacité n'est plus atteignable depuis l'historique"
+    )
 
 
 # ---------------------------------------------------------------------------

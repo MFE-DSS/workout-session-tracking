@@ -59,7 +59,11 @@ PAGES = ROOT / "app/routers/pages.py"
 NOW = datetime.now(UTC).replace(hour=12, minute=0, second=0, microsecond=0)
 
 PROGRESS_URL = "/progress"
-KPI_VALUE = "kpi-card__value"
+#: ⚠ REPOINTÉ PAR `UI-CP5 §7`. Les quatre tuiles `.kpi-card` sont retirées
+#: comme OBJET ; les faits qui soutiennent une interprétation survivent sur la
+#: ligne de contexte de confiance. L'ancre change, la propriété gardée — aucun
+#: `—` nu au rang relevé, et un vrai 0 reste rendu — ne bouge pas.
+KPI_VALUE = "ctx__fact"
 # `python:S1192` mord à partir de trois occurrences — y compris dans les tests,
 # et c'est le trou qui a laissé passer une MAJEURE sur la PR #82.
 BENCH = "Développé couché"
@@ -372,8 +376,14 @@ def test_a_cardio_only_account_reads_no_naked_dash(client):
 
     r = client.get(PROGRESS_URL)
     values = re.findall(rf'{KPI_VALUE}">\s*([^<]*?)\s*<', r.text)
-    assert values, "aucune carte de KPI rendue — la garde ne mesure rien"
+    assert values, "aucun fait de contexte rendu — la garde ne mesure rien"
     assert "—" not in "".join(values)
+    # ⚠ ÉLARGIE : plus aucun `—` nu ne doit atteindre le RANG RELEVÉ, quel que
+    # soit le conteneur. C'est la propriété, et elle vaut désormais pour tout
+    # l'écran, pas pour une famille de cartes.
+    for rang in ("lead__value", "debrief__objet"):
+        for v in re.findall(rf'{rang}">\s*([^<]*?)\s*<', r.text):
+            assert v.strip() != "—", f"un tiret nu au rang {rang}"
 
 
 def test_a_cardio_only_account_is_told_why_the_measures_are_absent(client):
@@ -410,8 +420,14 @@ def test_a_real_zero_percent_is_still_rendered(client):
             (BENCH, [("work", False), ("work", False)])])
 
     r = client.get(PROGRESS_URL)
-    values = re.findall(rf'{KPI_VALUE}">\s*([^<]*?)\s*<', r.text)
-    assert "0%" in values
+    values = " ".join(re.findall(rf'{KPI_VALUE}">\s*([^<]*?)\s*<', r.text))
+    assert values, "aucun fait de contexte rendu — la garde ne mesure rien"
+    # ⚠ Le fait est désormais dit en ENTIER — « 0 work sets cochés sur 2
+    # prescrits » — plutôt qu'en pourcentage. C'est le même fait, moins
+    # dérivé : un taux cache son dénominateur, et c'est précisément le
+    # dénominateur qui décide si la mesure existe.
+    assert "0 work sets cochés" in values
+    assert "2 prescrits" in values
     assert NO_PRESCRIBED not in r.text
 
 

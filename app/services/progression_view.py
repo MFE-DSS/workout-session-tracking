@@ -174,6 +174,17 @@ def build_progression_rows(facts: ProgressionFacts) -> list[dict[str, Any]]:
     return rows
 
 
+#: Les DEUX raisons pour lesquelles un exercice pratiqué n'est pas comparable.
+#:
+#: ⚠ Promues en constantes par `UI-CP5 FLIGHT_RECORDER`, sans changer une
+#: lettre de leur valeur. Le debriefing doit énoncer POURQUOI la comparaison
+#: n'est pas encore possible, et il doit le faire avec le vocabulaire que cette
+#: surface emploie déjà. Recopier ces deux phrases ailleurs aurait créé un
+#: second vocabulaire qui aurait dérivé au premier changement de formulation.
+RAISON_UNE_SEULE_SEANCE = "une seule séance"
+RAISON_AUCUNE_SERIE = "aucune série notée"
+
+
 def build_awaiting_rows(facts: ProgressionFacts) -> list[dict[str, Any]]:
     """Pratiqués, mais rien à comparer **encore**.
 
@@ -188,8 +199,8 @@ def build_awaiting_rows(facts: ProgressionFacts) -> list[dict[str, Any]]:
             "name": p.name,
             "latest": (format_performance(latest.weight, latest.reps)
                        if latest else NO_VALUE),
-            "reason": ("une seule séance" if len(p.occurrences) < 2
-                       else "aucune série notée"),
+            "reason": (RAISON_UNE_SEULE_SEANCE if len(p.occurrences) < 2
+                       else RAISON_AUCUNE_SERIE),
         })
     return rows
 

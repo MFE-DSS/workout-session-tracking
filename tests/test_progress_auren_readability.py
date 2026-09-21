@@ -84,21 +84,40 @@ def test_progress_status_title_and_lede(client):
         _seed(db, _uid(db))
     html = _render(client)
     assert "Progression" in html
-    # new, more useful lede
-    assert "Lecture des séances terminées" in html
+    # ⚠ `UI-CP5` — LE CHAPEAU EST RETIRÉ, ET C'EST LE SUJET DE LA TRANCHE.
+    # Il annonçait ce que la page montre — une quatrième ligne de prose entre
+    # le titre et la seule chose qui RÉPOND, au prix de ~40 px de défilement
+    # avant la réponse. Ce que cette garde protégeait est que la page NOMME
+    # ce qu'elle est ; le titre le fait, et le périmètre vit dans la note de
+    # pied et la divulgation.
+    assert "Lecture indicative" in html
+    assert "séances terminées" in html
 
 
-def test_progress_keeps_weekly_loop_and_kpis(client):
+def test_progress_counts_name_their_window(client):
+    """⚠ REPOINTÉE PAR `UI-CP5 §7` — « Rythme récent » est RETIRÉ COMME OBJET.
+
+    La garde épinglait `kpi-grid`, `kpi-card` et le littéral « Rythme récent ».
+    Ce qu'elle protégeait vraiment — établi par `UX4_03D` /
+    `OPERATOR_DECISION 3` — est que **tout compte nomme sa fenêtre** : deux
+    nombres de la même entité sur deux fenêtres muettes étaient le défaut
+    d'origine.
+
+    Elle lit donc désormais la page RENDUE et exige qu'aucun compte ne flotte
+    sans sa fenêtre, quel que soit le conteneur qui le porte. Le conteneur
+    pouvait changer ; la règle, non.
+    """
     from app.database import SessionLocal
 
     with SessionLocal() as db:
         _seed(db, _uid(db))
     html = _render(client)
-    # weekly loop partial + kpi grid still present
-    assert "kpi-grid" in html
-    assert "kpi-card" in html
-    # readability section header added
-    assert "Rythme récent" in html
+    assert "Rythme récent" not in html, "l'objet retiré est revenu"
+    assert "kpi-grid" not in html, "la grille de tuiles est revenue"
+    # Les fenêtres restent nommées, partout où un compte est affirmé.
+    assert "30 j" in html
+    assert "14 j" in html
+    assert "historique" in html
     # ⚠ CE COMMENTAIRE DISAIT LE DÉFAUT ET LE GARDAIT.
     #
     # Il lisait : « the KPI labels are preserved (kept "sessions" so the
@@ -113,10 +132,16 @@ def test_progress_keeps_weekly_loop_and_kpis(client):
     #
     # Ce qui est gardé — la grille de KPI existe, nomme sa fenêtre et son
     # objet — est inchangé.
-    assert "cette semaine" in html
-    assert "(30 j)" in html
-    assert "session" not in html.lower().split("kpi-grid", 1)[-1][:600], (
-        "l'anglicisme est revenu dans la grille de KPI"
+    # L'anglicisme reste interdit — sur la page entière plutôt que dans un
+    # bloc qui n'existe plus. C'est plus strict, pas moins.
+    #
+    # ⚠ `session` apparaît légitimement dans les URL (`?session=`) et les noms
+    # de classe : on interdit le MOT rendu, pas la sous-chaîne.
+    import re
+
+    visible = re.sub(r"<[^>]+>", " ", html)
+    assert not re.search(r"\bsessions?\b", visible, re.I), (
+        "l'anglicisme « session » est revenu dans le texte rendu"
     )
 
 

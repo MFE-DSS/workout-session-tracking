@@ -351,6 +351,19 @@ def test_progress_route_no_longer_renders_the_weekly_container(client):
     plus strict : le conteneur doit être ABSENT, et ses deux faits uniques
     présents ailleurs — l'anomalie dans l'instrument temporel, la dominance
     hebdomadaire dans « Par programme ».
+
+    ⚠ `UI-CP5` — LE PORTEUR DE L'ANOMALIE CHANGE, L'INVARIANT NON.
+
+    La garde cherchait le jeton `top_anomaly` dans `progress.html`. Ce n'est
+    plus lui qui porte l'anomalie jusqu'à la surface : `FLIGHT_RECORDER` la rend
+    au rang **L1**, par `_partials/debrief_signal.html`, et pour une raison
+    mesurée — `top_anomaly` est borné à la semaine ISO courante et rend la
+    séance la **plus ancienne** qui porte un signal, deux défauts que le
+    debriefing ne reproduit pas.
+
+    Épingler le nom de l'ancien porteur reviendrait à exiger qu'il revienne.
+    On épingle donc la PROPRIÉTÉ — l'anomalie a un porteur sur cette page — en
+    nommant celui d'aujourd'hui.
     """
     r = client.get("/progress", follow_redirects=False)
     assert r.status_code == 200
@@ -361,7 +374,9 @@ def test_progress_route_no_longer_renders_the_weekly_container(client):
         / "app/templates/progress.html"
     ).read_text(encoding="utf-8")
     template = re.sub(r"\{#.*?#\}", " ", template, flags=re.S)
-    assert "top_anomaly" in template
+    assert "debrief_signal.html" in template, (
+        "plus aucun porteur d'anomalie sur `/progress`"
+    )
     assert "tk.week_count" in template
 
 

@@ -26,13 +26,16 @@ def test_history_status_filter_in_progress(client):
 
     # The "active session banner" added in Sprint 5 may surface the
     # in-progress template name in the page header even when
-    # the filter excludes it. We assert against the session-card list
-    # specifically by looking at the session-card__name marker.
+    # the filter excludes it. We assert against the roster list specifically.
+    #
+    # ⚠ `UI-CP5` — l'ancre passe de `session-card__name` à `hroster__name` :
+    # les 21 rectangles deviennent 21 LIGNES. La propriété gardée — le filtre
+    # agit sur la LISTE, pas sur la bannière de coque — est inchangée.
     def _in_list(html: str, name_prefix: str) -> bool:
         # The session card name span has class + inline style.
         # Check for the class marker near the name in the session list.
         import re
-        return bool(re.search(rf'session-card__name[^>]*>{name_prefix}', html))
+        return bool(re.search(rf'hroster__name[^>]*>\s*{name_prefix}', html))
 
     r_all = client.get("/history?status=all").text
     assert _in_list(r_all, "Push A") and _in_list(r_all, "Legs A")

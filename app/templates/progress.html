@@ -1,80 +1,110 @@
 {% extends "base.html" %}
 {% block content %}
+{# ══ `UI-CP5 FLIGHT_RECORDER` — LA PAGE RÉPOND AVANT DE DÉCRIRE ══
+
+   Cette page empilait DOUZE blocs, et celui qui répondait vraiment à
+   « qu'est-ce qui vient de changer ? » arrivait en troisième. Mesuré à
+   390×844 : 3,74 écrans, 26 conteneurs, six niveaux de fond pour une échelle
+   de profondeur qui en compte quatre.
+
+   L'ordre est désormais celui du contrat d'instrument :
+
+       L1   le DEBRIEFING            ← une réponse, en tête, sans titre au-dessus
+       L2   le dernier mouvement     ← et les changements secondaires
+            l'exposition, et le contexte qui la qualifie
+            la divulgation
+            le DÉTAIL temporel       ← l'entrée vers l'historique
+
+   ⚠ AUCUNE COUCHE N'EST UNE CARTE. Empiler six `.card` avec une autre
+   typographie aurait reproduit la pile qu'on défait. Le rang se lit par la
+   TAILLE et l'ORDRE, pas par des boîtes. #}
 <h1 class="page-title">Progression</h1>
-{# Le chapeau promettait « la régularité », un mot auquel plus aucun libellé ne
-   répond depuis que le score sur 100 a été retiré. Il annonce désormais ce que
-   la page montre vraiment — sinon la promesse invisible que `UX4_03` devait
-   fermer se rouvrirait, déplacée d'un cran. #}
-{# `UX4_03D` — le chapeau promettait « ta cadence récente », un objet que la
-   décision 2 vient de retirer. Une promesse sans réponse à l'écran est
-   exactement ce qu'`UX4_03` devait fermer ; la laisser la rouvrirait. Il
-   annonce désormais ce que la page montre : les séances, leur empreinte, et
-   ce qui a été déclaré. #}
-<p class="lede">Lecture des séances terminées, de leur empreinte sur quatorze jours et de ce que tu as déclaré.</p>
 
-{# `TRAIN1-A` / A11 — LE CONTENEUR `weekly_loop` A ÉTÉ RETIRÉ D'ICI.
-   Il rendait trois cartes en tête de page. Mesuré sur un compte peuplé :
-   « 3 séances cette semaine » + « Semaine précédente : 2 (+1) » répétaient ce
-   que la ligne « Séances » et les quatorze cellules du rail disent déjà —
-   précisément la cadence qu'`UX4_03D` déclarait absorbée par le rail, et qui
-   survivait dans ce bloc. Sur un compte vide, la même phrase « Pas encore
-   assez de données cette semaine » s'affichait DEUX FOIS dans la même carte.
+{# ⚠ LE CHAPEAU EST RETIRÉ. Il annonçait ce que la page montre — une quatrième
+   ligne de prose entre le titre et la réponse, qui coûtait ~40 px de
+   défilement avant le seul objet qui répond. Son périmètre (« séances
+   terminées uniquement ») vit dans la divulgation plus bas et dans la note de
+   pied, là où on le cherche vraiment. #}
 
-   Ses deux faits uniques partent dans la MÊME livraison (`CLAUDE.md §5.3`) :
-   la dominance hebdomadaire rejoint « Par programme » en seconde colonne,
-   l'anomalie devient une ligne de l'instrument temporel ci-dessous. Le service
-   `build_weekly_loop` n'est pas supprimé — la décision porte sur le conteneur,
-   pas sur les producteurs. #}
+{# ══ L1 — LE DEBRIEFING. ZÉRO `<h2>` AU-DESSUS, ET C'EST LA RÈGLE.
+   Un titre de section avant la réponse la repousse d'un rang et d'une hauteur
+   de ligne. Sur un historique mince, c'est même un titre de section qui
+   devenait le plus gros objet de l'écran. #}
+{% include "_partials/debrief_signal.html" %}
 
-{# ── `UX4_03B` — L'INSTRUMENT DES SIGNAUX, APRÈS L'AUDIT SÉMANTIQUE ──────────
-   `UX4_03` rendait trois valeurs sur 100 avec leur jauge. L'audit
-   `UX4_03A` a mesuré que les trois habillaient une donnée absente en mesure :
+{# ══ L2 — LE DERNIER MOUVEMENT, ET LES CHANGEMENTS SECONDAIRES.
 
-     · « Charge 45/100 »    → 45,0 est le DÉFAUT rendu quand rien n'est déclaré
-     · « Régularité 0/100 » → le /100 pose UNE SÉANCE PAR JOUR comme la cible,
-                              donc 3 séances sur 14 jours s'affichaient 21/100
-     · « Continuité stable »→ `compute_trend(0, 0)` rend « stable », donc
-                              quelqu'un qui n'a jamais rien fait lisait que son
-                              rythme était stable
+   `TRAIN1-B` / A10 — l'instrument progressif rend ce qui a bougé, exercice par
+   exercice. Il remonte au-dessus de l'exposition parce que l'ordre des
+   questions a changé : on demande d'abord CE QUI A CHANGÉ, puis OÙ le corps a
+   été exposé. L'exposition est le contexte de la réponse, pas la réponse.
 
-   Le dépôt avait déjà écrit la règle, dans `recovery_contract` :
-   « the user told us nothing » is not a measurement and must not be dressed up
-   as a neutral reading.
+   ⚠ Quand le debriefing a déjà promu le dernier mouvement comparable au rang
+   L1, ce partiel ne le rend plus une seconde fois : c'est la route qui tranche
+   (`progression["lead"] = None`), pas le gabarit qui devine. #}
+{% include "_partials/progression.html" %}
 
-   LE GABARIT NE VOIT PLUS L'ÉTAT BRUT. Il reçoit `signals`, une vue-modèle
-   pure (`progress_signals`), et n'a donc plus accès aux trois champs écartés :
-   la correction est structurelle, pas typographique.
+{# ══ EXPOSITION, ET LE CONTEXTE QUI LA QUALIFIE ══
 
-   `streak_days` N'EST PAS RENDU — `OPERATOR_DECISION / DO_NOT_SURFACE`.
-   Il compte des jours calendaires consécutifs : un jour de repos correctement
-   pris le remet à zéro. La cadence compare deux fenêtres de sept jours, ce qui
-   décrit le rythme réel sans le transformer en chaîne à ne pas rompre.
+   `UX4_03D` — l'instrument anatomique répond à « où ? » sur la même fenêtre de
+   quatorze jours que le détail temporel. #}
+{% include "_partials/zone_exposure.html" %}
 
-   VOCABULAIRE. `test_no_forbidden_wording_in_progress` interdit certains mots
-   dans CE FICHIER, commentaires compris. Cette garde est plus stricte que
-   celle que j'avais écrite, et elle a raison : un démenti reste une
-   occurrence. Les libellés d'état ci-dessous ne sont pas réécrits — ce sont
-   ceux du formulaire de fin de séance, cités tels quels. #}
-{# `UX4_03D` — LA CADENCE A DISPARU, LE RAIL L'ABSORBE.
-   Elle rendait « 3 → 2 » : les séances des sept jours précédents puis des
-   sept derniers. Le rail rend les quatorze jours un par un, donc la densité
-   de sa moitié droite contre sa moitié gauche EST cette comparaison. Deux
-   nombres remplacés par les quatorze jours qui les composent — la preuve part
-   dans la même livraison que le retrait (`CLAUDE.md §5.3`). #}
-{# `TRAIN1-A` / A4 — L'ÉTAT VIDE N'EST PAS L'INSTRUMENT AVEC DES BLANCS.
-   Sans une seule trace dans la fenêtre, l'instrument n'instrumente rien :
-   deux lignes de signaux, quatorze cellules identiques, un axe et une carte
-   d'exposition, pour un écran qui n'apprend rien. Il se réduit donc à UNE
-   ligne — un fait vrai, la fenêtre nommée, rien d'autre.
+{# ══ LE BILAN 11 ZONES — ARRIVÉ DE L'ACCUEIL (`UI-CP3 §4`) ══
 
-   Pas de CTA ici. L'Accueil porte déjà l'appel à démarrer une séance, et
-   `home_training_state` a explicitement refusé de le dupliquer ; le rouvrir
-   sur Progression rejouerait la duplication que cette tranche ferme. #}
-{% if not has_traces %}
-<h2 class="section-header">Signaux d'entraînement</h2>
-<p class="empty-line">Aucune séance <span class="empty-line__win">· 14 j</span></p>
-{% else %}
-<h2 class="section-header">Signaux d'entraînement</h2>
+   ⚠ IL RESTE COLLÉ À `zone_exposure`, et son adjacence EST sa justification.
+
+   `zone_exposure` compte des SÉRIES par zone sur quatorze jours — ce qu'on a
+   fait. Ce bilan dit la RÉCUPÉRATION estimée des mêmes onze zones — ce qui est
+   prêt. Deux faits différents sur le même découpage, que l'accueil séparait de
+   la page où on les compare.
+
+   Le comptage est DÉRIVÉ de `build_zone_recovery`, jamais écrit à la main —
+   une première version de la maquette totalisait 12 zones sur 11. Une garde
+   pinne le total.
+
+   Le libellé de bande est VISIBLE et le glyphe reste `aria-hidden` : sans
+   cela, un lecteur d'écran annoncerait l'état deux fois. #}
+{% if zone_tally and zone_tally.tally %}
+<p class="cockpit__tally zone-tally">
+  <span class="sr-only">Récupération estimée des {{ zone_tally.tally_total }} zones :</span>
+  {%- for t in zone_tally.tally %}
+  <span class="cockpit__tally-item">
+    <span class="band band--{{ t.band }}" aria-hidden="true">
+      {%- for i in range(3) %}<i{% if i < t.segments %} class="band__on"{% endif %}></i>{% endfor -%}
+    </span><b>{{ t.count }}</b><span class="cockpit__tally-label">{{ t.band_label }}</span>
+  </span>
+  {%- endfor %}
+</p>
+{% endif %}
+
+{# ══ LE CONTEXTE DE CONFIANCE ══
+
+   ⚠ `UI-CP5 §7` — « RYTHME RÉCENT » EST RETIRÉ COMME OBJET, pas rétréci ni
+   déplacé. Quatre tuiles portaient `0`, `13`, `100 %`, `82` : des COMPTAGES,
+   en très gros, là où la page doit dire ce qui a CHANGÉ. « 0 séance cette
+   semaine » en 28 px est un reproche, pas une lecture.
+
+   `CLAUDE.md §5.3` interdit la soustraction seule. Les faits qui SOUTIENNENT
+   une interprétation survivent donc ici, sur une ligne, sans posséder de bloc :
+
+     · le nombre de séances terminées sur 30 j — c'est le DÉNOMINATEUR de tout
+       ce que la page affirme sur cette fenêtre ;
+     · le taux de work sets validés — il qualifie la PROVENANCE de la
+       comparaison : « ce que je compare repose sur N séries réellement
+       cochées sur M prescrites » ;
+     · `absent_measures`, qui dit POURQUOI une mesure manque au lieu de rendre
+       un tiret géant (`TRAIN1-C`).
+
+   ⚠ Le score moyen d'exercices (`82`) ne survit PAS ici. C'est un score, et
+   `TRAIN1-C` puis `TRAIN1-E` ont passé deux tranches à retirer la doctrine de
+   score de cette page et des surfaces sociales. Il reste rendu par programme
+   juste en dessous, où il qualifie un objet précis.
+
+   ⚠ Le ressenti déclaré et le compte de séances sur 14 j descendent ici
+   depuis « Signaux d'entraînement » : ce sont des ÉTATS, pas des changements.
+   Ils qualifient la réponse ; ils ne la remplacent pas. #}
+{% if has_traces %}
 <dl class="signals">
   {% for s in signals %}
     <div class="signal{% if not s.known %} signal--unknown{% endif %}">
@@ -84,36 +114,133 @@
     </div>
   {% endfor %}
 </dl>
+{% endif %}
 
-{# Le rail est UN objet, pas quatorze. Quatorze cibles de ~25 px passeraient
-   l'exception d'espacement WCAG 2.2 mais violeraient quatorze fois le standard
-   produit AUREN de 44 px : un instrument neuf ne se bâtit pas sur des
-   dérogations. Les traces portent leur `title` pour le survol et un texte hors
-   écran pour la synthèse ; l'inspection détaillée est une tranche à venir. #}
-{# `aria-hidden` — et c'est la bonne réponse, pas une concession.
-   Le rail portait d'abord `role="img"` + `aria-label`, ce que `Web:S6819` a
-   signalé. La règle a raison pour la MÊME raison que sur les jauges
-   d'`UX4_03` : le compte « 5 séances · 14 derniers jours » est déjà rendu en
-   texte juste au-dessus, donc l'étiquette le répétait à l'oreille.
+{% if kpis.completed_last_30 %}
+<p class="ctx">
+  <span class="ctx__fact">{{ kpis.completed_last_30 }} séance{% if kpis.completed_last_30 > 1 %}s{% endif %} terminée{% if kpis.completed_last_30 > 1 %}s{% endif %}</span>
+  <span class="ctx__win">· 30 j</span>
+  {% if kpis.completion_rate_30d is not none %}
+    <span class="ctx__sep">·</span>
+    <span class="ctx__fact">{{ kpis.work_sets_done_30d }} work sets cochés sur {{ kpis.work_sets_total_30d }} prescrits</span>
+  {% endif %}
+</p>
+{% endif %}
+{% if absent_measures %}
+<p class="kpi-absent">Non calculable <span class="kpi-absent__win">· 30 j</span>
+  — {{ absent_measures | join(', ') }}</p>
+{% endif %}
 
-   Le rail ne peut rester masqué QUE parce qu'un équivalent textuel existe :
-   il porte plus que le compte — la répartition des jours, la distinction
-   terminée / en cours, la couverture de l'historique et le type de séance.
-   Masquer un objet dont l'information n'existe nulle part ailleurs le rendrait
-   visuel-seulement. `build_rail_summary` le rédige à partir des MÊMES
-   `facts.days`, côté serveur, sans recalcul et sans une ligne de script. #}
-{# `TRAIN1-A` / A5 — LE RAIL DEVIENT INSPECTABLE, SANS NOUVELLE ROUTE.
-   Le détail jour par jour n'était atteignable par personne : ni à l'œil (les
-   `title` ne s'annoncent pas de façon fiable), ni au lecteur d'écran (la
-   synthèse donne le compte, pas la ligne). Le rail reste UN objet — quatorze
-   cibles de 25 px violeraient quatorze fois le standard produit de 44 px — et
-   c'est le `<summary>`, une cible pleine largeur, qui l'ouvre.
+{# `TRAIN1-C` / A4 — « PAR PROGRAMME » DISPARAÎT QUAND ELLE N'A RIEN À DIRE.
 
-   `<details>` est le socle SSR, pas un pis-aller : il fonctionne sans une
-   ligne de script, et un enrichissement interactif viendra par-dessus, jamais
-   à sa place. La cible visée reste *rail inspectable → détail temporel →
-   séance concernée* : la troisième marche est le lien ci-dessous, qui pointe
-   vers la surface de séance DÉJÀ EXISTANTE. #}
+   `template_kpis` est vide ⟺ aucune séance terminée non exclue, jamais. Une
+   phrase d'absence de plus dirait ce que la ligne ci-dessus dit déjà.
+
+   ⚠ `UI-CP5` — LE CONTENEUR `.card` PART, LA LISTE RESTE. Envelopper une
+   couche dans une carte est exactement ce que le §12 interdit ; et la liste,
+   elle, porte deux fenêtres distinctes sur le même programme, ce qui est un
+   fait utile. #}
+{% if template_kpis %}
+<h2 class="section-header">Par programme</h2>
+<ul class="template-kpi-list">
+  {% for tk in template_kpis %}
+    <li class="template-kpi">
+      <div class="template-kpi__row">
+        <span class="template-kpi__name">{{ tk.name }}</span>
+        {# `TRAIN1-A` / A11 — LES DEUX FENÊTRES SUR UNE SEULE LIGNE.
+           « Séances dominantes · cette semaine » vivait dans `weekly_loop` et
+           disait le même fait sur une autre fenêtre. Une ligne, deux comptes,
+           aucun fait perdu. #}
+        <span class="template-kpi__count">
+          {% if tk.week_count %}<span class="template-kpi__week">{{ tk.week_count }}× cette sem.</span>{% endif %}
+          <span>{{ tk.n_completed }} séance{% if tk.n_completed > 1 %}s{% endif %}</span>
+        </span>
+      </div>
+      <div class="template-kpi__meta">
+        {# `UX4_03D` — fenêtre explicite, sur la ligne de métadonnées et non à
+           côté du nombre : inline, elle repliait la ligne à 390 px. #}
+        <span>historique</span>
+        {% if tk.last_done_at %}
+          <span>· dernière : {{ (tk.last_done_at | local).strftime('%d/%m') }}</span>
+        {% endif %}
+        {% if tk.avg_success_score is not none %}
+          <span>· score moy. {{ tk.avg_success_score | round(0, 'floor') | int }}</span>
+        {% endif %}
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{# ══ LA DIVULGATION — APRÈS la réponse, jamais avant ══
+
+   UNE SEULE pour toutes les provenances. `UX4_03` en écrivait une par signal —
+   77 mots pour dire trois fois d'où vient le chiffre.
+
+   `TRAIN1-A` — ELLE SUIT L'INSTRUMENT : sur un compte sans séance, elle
+   proposait d'expliquer le calcul de signaux qui n'étaient pas affichés.
+
+   ⚠ `UI-CP5` — elle gagne le paragraphe qui manquait le plus : COMMENT le
+   signal de tête est choisi. Un verdict L1 inexpliqué est précisément ce que
+   `UX4_03B` interdit. #}
+{% if has_traces %}
+<details class="disclosure signals__how">
+  <summary>Comment AUREN choisit ce qu'il montre en premier</summary>
+  <p><strong>Le signal de tête</strong> — AUREN suit un ordre fixe, écrit une
+  fois pour toutes, et <strong>ne calcule aucune note de « ce qui compte le
+  plus »</strong> : s'il y a un point à vérifier sur ta dernière séance, il le
+  dit ; sinon il montre le dernier mouvement qu'il peut comparer ; sinon il
+  dit que la comparaison n'est pas encore possible, et pourquoi. Trois cas,
+  dans cet ordre, quels que soient les chiffres.</p>
+  <p><strong>Ressenti général</strong> — le mot que tu as choisi en répondant
+  « Comment te sentais-tu pendant la séance ? », sur la dernière séance où tu
+  y as répondu. AUREN le cite ; il ne le convertit en aucune note.</p>
+  <p><strong>Séances</strong> — le nombre de séances terminées sur quatorze
+  jours. Un comptage, pas une note : aucun objectif hebdomadaire n'est supposé.</p>
+  <p><strong>Les quatorze traces</strong> — un jour par trace, du plus ancien
+  au plus récent. Une trace pleine est une séance terminée, un trait fin un
+  jour de repos, un pointillé un jour antérieur à ton compte.
+  <strong>Un jour de repos ne casse rien</strong> : aucune série de jours n'est
+  comptée.</p>
+  {# ⚠ `UI-CP5` — L'ENTRÉE VERS LA RÈGLE SUIT LA QUESTION, ET ELLE A FAILLI
+     SE PERDRE.
+
+     `/progress` portait UNE entrée vers `/science`, accrochée à la tuile
+     « score moyen exercices (30 j) » — « Comment c'est calculé → ». La tuile
+     part avec « Rythme récent » (§7) : c'est un score, et deux tranches ont
+     été passées à retirer la doctrine de score de cette page.
+
+     Retirer la tuile emportait donc l'entrée, et `test_science_page.py` l'a
+     vu en sweep : « une zone d'archive sans entrée contextuelle est une page
+     orpheline ». Elle avait raison, et c'est `§5.3` — jamais une soustraction
+     seule.
+
+     L'entrée revient ici, et **mieux placée** : la garde exige qu'on atteigne
+     `/science` « depuis l'endroit où la question se pose ». Une tuile de score
+     ne posait aucune question ; ce paragraphe explique comment le signal de
+     tête est choisi, et la règle des plages de répétitions est précisément
+     celle qui déclenche le « reps sous la cible » que le L1 rend. #}
+  <p><a class="text-muted rule-entry" href="{{ url_for('science_page') }}#rule-plages-repetitions">La règle des plages de répétitions →</a></p>
+</details>
+{% endif %}
+
+{# ══ LE DÉTAIL TEMPOREL — LE DERNIER RANG, ET L'ENTRÉE VERS L'HISTORIQUE ══
+
+   `TRAIN1-A` / A5 — le rail reste UN objet : quatorze cibles de 25 px
+   violeraient quatorze fois le standard produit de 44 px, et c'est le
+   `<summary>` pleine largeur qui l'ouvre. `<details>` est le socle SSR, pas un
+   pis-aller.
+
+   `aria-hidden` sur le rail est la bonne réponse, pas une concession
+   (`Web:S6819`) : le compte est déjà rendu en texte, et `build_rail_summary`
+   rédige l'équivalent complet côté serveur — répartition des jours,
+   terminée/en cours, couverture, type de séance.
+
+   ⚠ `UI-CP5 §8` — la cible *rail → détail temporel → séance* trouve enfin sa
+   troisième marche : l'historique n'est plus une seconde réponse à la même
+   question, c'est LE DÉTAIL de cet instrument, et on y entre ici. #}
+{% if has_traces %}
+<h2 class="section-header">Détail temporel</h2>
 <details class="rail-l2">
   <summary class="rail-l2__summary">
     <div class="rail" aria-hidden="true">
@@ -144,267 +271,41 @@
   <span>{{ rail[0].label }}</span>
   <span>aujourd'hui</span>
 </div>
-
-{# `TRAIN1-A` / A11 — L'ANOMALIE, ABSORBÉE, ET SEULEMENT QUAND ELLE EXISTE.
-   Elle occupait une carte entière qui, sans anomalie, rendait « Aucune
-   anomalie détectée » : un objet de pleine hauteur pour dire qu'il n'y a rien
-   à dire. C'est un fait UNIQUE — aucun autre bloc ne le porte — donc il est
-   conservé, mais comme une ligne de l'instrument temporel, et absente quand
-   il n'y a rien. #}
-{% if top_anomaly %}
-<p class="anomaly">
-  <span class="anomaly__tag">Anomalie</span>
-  {% if top_anomaly.exercise_name %}<strong>{{ top_anomaly.exercise_name }}</strong> — {% endif %}
-  {{ top_anomaly.label or top_anomaly.code }}
-  {% if top_anomaly.session_id %}
-    <a class="anomaly__link" href="/sessions/{{ top_anomaly.session_id }}/done">voir la séance</a>
-  {% endif %}
+<p class="ctx">
+  <a class="inline-target" href="{{ url_for('history') }}">Tout l'historique</a>
 </p>
-{% endif %}
-{% endif %}
-
-{# `UX4_03D` — l'instrument anatomique suit immédiatement le rail : « quand »
-   puis « où », sur la même fenêtre de quatorze jours. #}
-{% include "_partials/zone_exposure.html" %}
-
-{# ══ LE BILAN 11 ZONES — ARRIVÉ DE L'ACCUEIL (`UI-CP3 §4`) ══
-
-   Il y décrivait la couverture du corps au-dessus d'une commande de
-   démarrage : une donnée qui paraissait parce qu'elle existait, pas parce
-   qu'elle expliquait la décision. L'opérateur l'en retire ; `CLAUDE.md §5.3`
-   interdit de retirer sans destination — la voici, dans la même livraison.
-
-   ⚠ IL SE PLACE ICI POUR UNE RAISON PRÉCISE, pas par commodité.
-
-   `zone_exposure` juste au-dessus compte des SÉRIES par zone sur quatorze
-   jours — ce qu'on a fait. Ce bilan dit la RÉCUPÉRATION estimée des mêmes
-   onze zones — ce qui est prêt. Deux faits différents sur le même découpage,
-   que l'accueil séparait de la page où on les compare. Côte à côte, « j'ai
-   beaucoup travaillé cette zone » et « elle n'est pas récupérée » se lisent
-   enfin ensemble.
-
-   Le comptage est DÉRIVÉ de `build_zone_recovery`, jamais écrit à la main —
-   une première version de la maquette totalisait 12 zones sur 11. Une garde
-   pinne le total.
-
-   Le libellé de bande est VISIBLE, et le glyphe reste `aria-hidden` : sans
-   cela, un lecteur d'écran annoncerait l'état deux fois. C'est la correction
-   d'accessibilité gagnée sur l'accueil, qui voyage avec le bloc au lieu
-   d'être reperdue. #}
-{% if zone_tally and zone_tally.tally %}
-<p class="cockpit__tally zone-tally">
-  <span class="sr-only">Récupération estimée des {{ zone_tally.tally_total }} zones :</span>
-  {%- for t in zone_tally.tally %}
-  <span class="cockpit__tally-item">
-    <span class="band band--{{ t.band }}" aria-hidden="true">
-      {%- for i in range(3) %}<i{% if i < t.segments %} class="band__on"{% endif %}></i>{% endfor -%}
-    </span><b>{{ t.count }}</b><span class="cockpit__tally-label">{{ t.band_label }}</span>
-  </span>
-  {%- endfor %}
-</p>
-{% endif %}
-
-{# `TRAIN1-B` / A10 — « quand », puis « où », puis « quoi ».
-   L'instrument progressif suit l'exposition anatomique : le rail dit quand on
-   s'est entraîné, la silhouette où, et ceci ce qui a bougé. Trois questions,
-   trois instruments, dans l'ordre où on se les pose. #}
-{% include "_partials/progression.html" %}
-
-{# UNE SEULE divulgation pour les trois provenances. `UX4_03` en écrivait une
-   par signal — 77 mots pour dire trois fois la même chose : d'où vient le
-   chiffre. Repliée, elle ne coûte qu'une ligne.
-
-   `TRAIN1-A` — ELLE SUIT L'INSTRUMENT. Vu au rendu réel : sur un compte sans
-   séance, elle proposait d'expliquer le calcul de signaux qui n'étaient pas
-   affichés. Une explication sans objet est le symétrique de la promesse sans
-   réponse qu'`UX4_03` devait fermer. #}
-{% if has_traces %}
-<details class="disclosure signals__how">
-  <summary>Comment AUREN calcule ces signaux</summary>
-  <p><strong>Ressenti général</strong> — le mot que tu as choisi en répondant
-  « Comment te sentais-tu pendant la séance ? », sur la dernière séance où tu
-  y as répondu. AUREN le cite ; il ne le convertit en aucune note. Si cette
-  réponse n'est pas celle de ta dernière séance, sa date est affichée.</p>
-  <p><strong>Séances</strong> — le nombre de séances terminées sur quatorze
-  jours. Un comptage, pas une note : aucun objectif hebdomadaire n'est supposé.</p>
-  {# `TRAIN1-A` — CE PARAGRAPHE DÉCRIVAIT « CADENCE 7 J », RETIRÉ PAR
-     `UX4_03D`. La divulgation documentait donc un signal absent de l'écran
-     depuis deux tranches. Elle décrit maintenant ce qui l'a remplacé. #}
-  <p><strong>Les quatorze traces</strong> — un jour par trace, du plus ancien
-  au plus récent. Une trace pleine est une séance terminée, un trait fin un
-  jour de repos, un pointillé un jour antérieur à ton compte.
-  <strong>Un jour de repos ne casse rien</strong> : aucune série de jours n'est
-  comptée. Ouvre le rail pour lire le détail jour par jour.</p>
-</details>
-{% endif %}
-
-{# Sx_UI_07.1 — readability pass : les KPI existants sont regroupés sous une
-   section « Rythme récent » (lecture d'entraînement, pas cockpit). Aucune
-   valeur/calcul changé — seuls le regroupement et la microcopy évoluent. #}
-{# `TRAIN1-A` / A4 — MÊME RÈGLE, MÊME ÉCRAN.
-   Mesuré au rendu réel : sur un compte sans séance, deux `kpi-card__value`
-   affichaient encore `—`. L'ordre opérateur dit « sans compteurs — », et la
-   règle vaut pour l'écran, pas pour un bloc choisi : un tiret est le rendu de
-   « rien à diviser », pas une mesure. Quatre cartes pour dire qu'il n'y a rien
-   à dire, c'est le même défaut que celui qu'on vient de retirer plus haut.
-
-   La fenêtre est ici de TRENTE jours, pas quatorze : le prédicat est donc
-   `completed_last_30`, pas `has_traces`. Confondre les deux rendrait la
-   section vide alors qu'elle a quelque chose à montrer. #}
-{# `TRAIN1-C` — UN DÉNOMINATEUR ABSENT N'EST PAS UN ZÉRO, NI UN TIRET.
-   Deux des quatre cartes rendaient un `—` en grand, dans une carte de la même
-   taille que les autres. Un compte qui ne fait que du cardio les voyait toutes
-   les deux : des séances terminées, aucune série prescrite, aucun exercice
-   noté — deux tirets géants présentés comme des résultats.
-
-   La carte d'une mesure incalculable disparaît ; sa RAISON reste, sur une
-   ligne, nommée par la sémantique du producteur (`kpis.absent_measures`).
-   Retirer les deux en silence laisserait croire que la page n'a jamais eu ces
-   mesures. Le lien « comment c'est calculé » suit son score : la provenance
-   d'un objet absent n'a rien à expliquer. #}
-{% if not kpis.completed_last_30 %}
-<h2 class="section-header">Rythme récent</h2>
-<p class="empty-line">Aucune séance terminée <span class="empty-line__win">· 30 j</span></p>
 {% else %}
-<h2 class="section-header">Rythme récent</h2>
-<div class="kpi-grid">
-  <div class="kpi-card">
-    <div class="kpi-card__value">{{ kpis.sessions_this_week }}</div>
-    {# Accord ET vocabulaire. « 1 sessions » se lisait à l'écran, et le mot
-       « session » est un anglicisme : la coque dit « Séance », la commande
-       dit « TERMINER LA SÉANCE », et la sous-ligne de la carte voisine disait
-       déjà « séance ». Deux mots pour une chose dans la même carte. #}
-    <div class="kpi-card__label">séance{% if kpis.sessions_this_week > 1 %}s{% endif %} cette semaine</div>
-  </div>
-  <div class="kpi-card">
-    <div class="kpi-card__value">{{ kpis.completed_last_30 }}</div>
-    <div class="kpi-card__label">séance{% if kpis.completed_last_30 > 1 %}s{% endif %} terminée{% if kpis.completed_last_30 > 1 %}s{% endif %} (30 j)</div>
-  </div>
-  {% if kpis.completion_rate_30d is not none %}
-  <div class="kpi-card">
-    <div class="kpi-card__value">{{ (kpis.completion_rate_30d * 100) | round(0, 'floor') | int }}%</div>
-    <div class="kpi-card__label">work sets validés (30 j)</div>
-    <div class="kpi-card__sub">
-      {{ kpis.work_sets_done_30d }} cochés / {{ kpis.work_sets_total_30d }} prescrits sur {{ kpis.completed_last_30 }} séance{% if kpis.completed_last_30 > 1 %}s{% endif %}
-    </div>
-  </div>
-  {% endif %}
-  {% if kpis.avg_success_score_30d is not none %}
-  <div class="kpi-card">
-    <div class="kpi-card__value">{{ kpis.avg_success_score_30d | round(0, 'floor') | int }}</div>
-    <div class="kpi-card__label">score moyen exercices (30 j)</div>
-    <div class="kpi-card__sub">
-      <a class="text-muted" href="{{ url_for('science_page') }}#rule-plages-repetitions">Comment c'est calculé →</a>
-    </div>
-  </div>
-  {% endif %}
-</div>
-{% if absent_measures %}
-<p class="kpi-absent">Non calculable <span class="kpi-absent__win">· 30 j</span>
-  — {{ absent_measures | join(', ') }}</p>
-{% endif %}
+<h2 class="section-header">Détail temporel</h2>
+<p class="empty-line">Aucune séance <span class="empty-line__win">· 14 j</span></p>
 {% endif %}
 
-{# `TRAIN1-C` / A4 — « PAR PROGRAMME » DISPARAÎT QUAND ELLE N'A RIEN À DIRE.
+{# ⚠ `UI-CP5 §9` — « QUALITÉ DES SÉANCES » EST RETIRÉE.
 
-   Elle instanciait une carte pleine pour porter « Aucune session terminée pour
-   l'instant. » — le défaut que `TRAIN1-A` a retiré partout ailleurs sur cette
-   page, resté ici.
+   Son axe Y était `compute_session_quality`, un SCORE COMPOSITE tracé en
+   hauteur. Le §9 est explicite : « toute dimension graphique doit avoir une
+   variable nommée et vraie » ; une hauteur qui agrège plusieurs grandeurs n'en
+   est pas une. C'est aussi ce que le §7 refuse quand il interdit un score
+   composite de remplacement.
 
-   ELLE EST MASQUÉE, PAS RÉDUITE À UNE LIGNE, et l'implication le justifie :
-   `template_kpis` est vide ⟺ **aucune séance terminée non exclue, jamais**.
-   Ce qui force `completed_last_30 = 0`, donc « Aucune séance terminée · 30 j »
-   est déjà à l'écran, et « Aucune séance · 14 j » aussi. Une troisième phrase
-   dirait la même absence une troisième fois.
+   `CLAUDE.md §5.3` — ce n'est pas une soustraction seule : le score par
+   séance reste lisible par programme juste au-dessus (`score moy.`) et par
+   séance sur la surface de cycle de vie. Le producteur
+   (`build_quality_timeline_svg`) n'est pas supprimé.
 
-   `cockpit-grid` PART AVEC ELLE. Ce conteneur vaut `3fr 2fr` au-delà de
-   1024 px ; depuis que `TRAIN1-B` en a retiré le second enfant, il réservait
-   40 % de la largeur à une colonne vide. Une carte seule n'a pas besoin d'une
-   grille à deux colonnes. #}
-{% if template_kpis %}
-  <div class="card">
-    <h2 class="card__title">Par programme</h2>
-      <ul class="template-kpi-list">
-        {% for tk in template_kpis %}
-          <li class="template-kpi">
-            <div class="template-kpi__row">
-              <span class="template-kpi__name">{{ tk.name }}</span>
-              {# `TRAIN1-A` / A11 — LES DEUX FENÊTRES SUR UNE SEULE LIGNE.
-                 « Séances dominantes · cette semaine » vivait plus haut, dans
-                 `weekly_loop`, et disait le même fait sur une autre fenêtre.
-                 `UX4_03D` avait rendu les deux explicites — le correctif le
-                 moins cher — sans supprimer la seconde lecture. Une ligne,
-                 deux comptes, aucun fait perdu, un bloc de moins. #}
-              <span class="template-kpi__count">
-                {% if tk.week_count %}<span class="template-kpi__week">{{ tk.week_count }}× cette sem.</span>{% endif %}
-                <span>{{ tk.n_completed }} séance{% if tk.n_completed > 1 %}s{% endif %}</span>
-              </span>
-            </div>
-            <div class="template-kpi__meta">
-              {# `UX4_03D` — fenêtre explicite (`OPERATOR_DECISION` 3), placée
-                 sur la ligne de métadonnées et non à côté du nombre : inline,
-                 elle repliait la ligne à 390 px. Ce compte porte sur TOUT
-                 l'historique, là où « Séances dominantes » porte sur la
-                 semaine — deux nombres du même programme, deux fenêtres. #}
-              <span>historique</span>
-              {% if tk.last_done_at %}
-                <span>· dernière : {{ (tk.last_done_at | local).strftime('%d/%m') }}</span>
-              {% endif %}
-              {% if tk.avg_success_score is not none %}
-                <span>· score moy. {{ tk.avg_success_score | round(0, 'floor') | int }}</span>
-              {% endif %}
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-  </div>
-{% endif %}
-
-  {# `TRAIN1-B` / A10 — « ACTIVITÉ RÉCENTE PAR EXERCICE » EST RETIRÉE.
-
-     Elle listait, par exercice, la dernière charge et les dernières reps sur
-     trente jours. L'instrument progressif ci-dessus rend les MÊMES faits et
-     va plus loin : il les COMPARE à l'occurrence précédente.
-
-     Elle était en outre clavetée sur l'identité HÉRITÉE
-     `(gabarit, code d'exercice)`. Vu au rendu, sur un compte de test :
-     « Chest Press machine » y apparaissait DEUX FOIS, une par gabarit — la
-     fragmentation même qu'`A1` corrige, affichée comme deux exercices
-     distincts. Et son lien menait vers l'historique partiel de l'un des deux.
-
-     Ce n'est pas une soustraction seule (`CLAUDE.md §5.3`) : le remplacement
-     part dans la MÊME livraison, et il est strictement plus riche — même
-     faits, identité entière, écart calculé, drill-down convergé. La route
-     héritée reste servie pour les liens existants. #}
-
-{% if quality_svg %}
-  <div class="card">
-    <h2 class="card__title">Qualité des séances</h2>
-    <div class="timeline-chart">{{ quality_svg|safe }}</div>
-    <p class="timeline-legend">
-      <span class="timeline-legend__dot timeline-legend__dot--strength"></span> Musculation
-      <span class="timeline-legend__dot timeline-legend__dot--cardio"></span> Cardio
-    </p>
-  </div>
-{% endif %}
-
+   Le poids corporel RESTE : son axe est des kilogrammes — nommé, mesuré,
+   vrai. C'est exactement la distinction que le §9 demande de faire. #}
 {% if bodyweight_svg %}
-  <div class="card">
-    <h2 class="card__title">Poids corporel</h2>
-    <div class="timeline-chart">{{ bodyweight_svg|safe }}</div>
-  </div>
+  <h2 class="section-header">Poids corporel</h2>
+  <div class="timeline-chart">{{ bodyweight_svg|safe }}</div>
 {% endif %}
 
 {# `TRAIN1-C` — LA NOTE N'EXPLIQUE QUE CE QUI EST À L'ÉCRAN.
 
-   Vu au rendu réel sur le compte vide : elle définissait « prescrits = nombre
-   de work sets définis par les programmes que tu as choisis » sous un écran
-   où le mot « prescrits » n'apparaissait nulle part — la carte qui l'emploie
-   venait d'être supprimée faute de dénominateur.
+   Elle définissait « prescrits » sous un écran où le mot n'apparaissait nulle
+   part. C'est la promesse sans réponse, retournée : une réponse sans question.
 
-   C'est la promesse sans réponse, retournée : une réponse sans question. Même
-   famille de défaut que tout ce train ferme, et invisible autrement qu'en
-   regardant l'écran. #}
+   ⚠ `UI-CP5` — le mot « prescrits » reste à l'écran tant que la ligne de
+   contexte le porte, donc sa définition reste conditionnée au même prédicat. #}
 <p class="kpi-note">
   Lecture indicative · séances terminées uniquement{% if kpis.completed_last_30 %} · warmup exclus{% endif %}{% if kpis.completion_rate_30d is not none %} · prescrits = nombre de work sets définis par les programmes que tu as choisis{% endif %}.
 </p>

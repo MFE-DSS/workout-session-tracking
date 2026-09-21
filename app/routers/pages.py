@@ -825,7 +825,24 @@ def history(
     db: DbSession,
     user: CurrentUser,
     status: str = Query("all"),
+    session: int | None = Query(default=None),
 ) -> HTMLResponse:
+    """`UI-CP5 §8` — L'HISTORIQUE EST LE DÉTAIL DE FLIGHT_RECORDER.
+
+    Il cessait d'être une seconde réponse à « qu'est-ce qui a changé ? » : il
+    énumérait 21 rectangles rigoureusement identiques — la séance d'il y a une
+    heure pesant exactement autant que celle d'il y a six semaines — et portait
+    **42 formulaires** sur un instrument dont le contrat dit *aucune action*.
+
+    Il garde sa route (cible de lien profond) et devient la COUCHE DE DÉTAIL :
+    une bande de temps, l'événement inspecté, et un rôle compact.
+
+    ⚠ `?session=` est un état de PRÉSENTATION, jamais de domaine. Il dit quel
+    événement est inspecté, rien de plus : aucune écriture, aucune persistance,
+    aucune notion de « séance courante ». Même patron que `?loadout=` sur
+    LOADOUT et `?active=` sur EXECUTION, et il permet la sélection **sans une
+    ligne de JavaScript**.
+    """
     status = status if status in _HISTORY_STATUS_CHOICES else "all"
 
     stmt = (
@@ -880,6 +897,14 @@ def history(
             session_duration(s.started_at, end=s.ended_at)
         )
 
+    # L'événement INSPECTÉ, validé contre ce que la page rend déjà. Une clé
+    # hors de cet ensemble ne peut venir que d'une URL bricolée : elle est
+    # ignorée plutôt que rendue, comme `?zone=` sur LOADOUT — afficher
+    # « séance introuvable » donnerait à une valeur inventée l'apparence d'un
+    # objet qui existe.
+    par_id = {s.id: s for s in sessions}
+    selection = par_id.get(session) if session is not None else None
+
     return templates.TemplateResponse(
         request,
         "history.html",
@@ -890,9 +915,55 @@ def history(
             "durations": durations,
             "status_filter": status,
             "status_choices": _HISTORY_STATUS_CHOICES,
+            "selection": selection,
             "active_session": latest_open_session(db, user.id),
         },
     )
+
+
+def _demettre_le_releve_de_progression(progression: dict, signal: str) -> dict:
+    """Le rang souverain appartient au L1 — quoi que le L1 porte.
+
+    ⚠ CE N'EST PAS LA PREMIÈRE ÉCRITURE DE CETTE RÈGLE, ET LA PREMIÈRE ÉTAIT
+    FAUSSE SUR UNE BRANCHE ENTIÈRE.
+
+    Elle ne vidait `lead` que sur le signal `mouvement`. Mesuré au rendu sur le
+    compte de labo `pilote-anomalie` : le L1 annonçait « À VÉRIFIER · Rowing
+    machine chest-supported » à 22 px, et le relevé de progression gardait ses
+    **32 px** juste en dessous. Le plus gros objet de l'écran était donc un
+    « 37,5 » sans rapport avec la réponse — très exactement l'inversion de
+    hiérarchie que cette tranche existe pour fermer, revenue par la branche
+    qu'on avait le moins regardée.
+
+    Aucune taille déclarée n'était fautive : c'est leur COEXISTENCE sur un même
+    écran qui l'était. Les gardes qui comparent des tailles dans la feuille ne
+    pouvaient pas la voir — seul le rendu le pouvait.
+
+    La règle a deux moitiés, et les deux comptent :
+
+      · `lead` est vidé **sans condition**. Un `if` sur le signal est la porte
+        par laquelle le défaut est entré la première fois ;
+      · sur `mouvement`, le L1 EST ce mouvement : le remettre dans la liste
+        ferait lire la promotion comme une duplication — la mécanique de
+        `test_the_promoted_row_leaves_the_list`, un rang au-dessus ;
+      · sur tout autre signal, le L1 parle d'AUTRE CHOSE : le mouvement
+        redescend en tête de liste. Il perd son rang, pas son existence.
+        `build_progression_view` l'avait SORTI de `rows` en le promouvant, et
+        se contenter de le vider le ferait disparaître de la page — `§5.3`,
+        jamais une soustraction seule.
+
+    Le view-model tranche ; le gabarit ne devine pas.
+    """
+    from app.services.flight_recorder import SIGNAL_MOUVEMENT
+
+    demis = progression.get("lead")
+    if signal == SIGNAL_MOUVEMENT:
+        demis = None
+    return {
+        **progression,
+        "lead": None,
+        "rows": [demis, *progression["rows"]] if demis else progression["rows"],
+    }
 
 
 @router.get("/progress", response_class=HTMLResponse)
@@ -1023,6 +1094,27 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     progression = build_progression_view(build_progression_facts(db, user.id))
     cardio = build_cardio_view(build_cardio_facts(db, user.id))
 
+    # ═══ `UI-CP5 FLIGHT_RECORDER` — LE RANG L1, QUI N'EXISTAIT NULLE PART ═══
+    #
+    # Le contrat d'instrument fixe `L1 le debrief · L2 le dernier mouvement ·
+    # SHEET le détail`, et seul L1 manquait : la page empilait douze blocs dont
+    # celui qui répond vraiment arrivait en troisième.
+    #
+    # ⚠ CE N'EST PAS `weekly_loop.top_anomaly` QUI ALIMENTE CE RANG, et la
+    # différence n'est pas cosmétique. Cette fenêtre-là est la semaine ISO
+    # courante, et elle CHOISIT LA PLUS ANCIENNE séance qui porte un signal
+    # (`started_at.asc()` puis premier gagnant). Le lundi matin elle se tait
+    # alors que la dernière séance date de la veille. Le debriefing possède
+    # donc son propre sélecteur — borné à UNE séance, la dernière exploitable.
+    from app.services.flight_recorder import construire_debriefing
+    from app.services.flight_recorder_inputs import derniere_seance_exploitable
+
+    debrief = construire_debriefing(
+        derniere_seance_exploitable(db, user.id), progression
+    )
+
+    progression = _demettre_le_releve_de_progression(progression, debrief.signal)
+
     # `TRAIN1-A` / A11 — LA DOMINANCE HEBDOMADAIRE REJOINT « PAR PROGRAMME ».
     #
     # Deux blocs disaient le même fait sur deux fenêtres : « Séances
@@ -1067,9 +1159,17 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
             # même carte.
             #
             # Les producteurs ne sont pas supprimés : `build_weekly_loop` reste
-            # appelé, et ses deux faits UNIQUES sont absorbés — l'anomalie
-            # ci-dessous, la dominance hebdomadaire dans « Par programme ».
-            "top_anomaly": weekly.get("top_anomaly"),
+            # appelé, et ses deux faits UNIQUES sont absorbés — la dominance
+            # hebdomadaire dans « Par programme », et l'anomalie par le
+            # DEBRIEFING ci-dessous.
+            #
+            # ⚠ `top_anomaly` NE FIGURE PLUS ICI, et son remplaçant part dans la
+            # même livraison (`CLAUDE.md §5.3`). Garder les deux aurait affiché
+            # la même anomalie sur DEUX fenêtres contradictoires — la semaine
+            # ISO d'un côté, la dernière séance de l'autre — soit exactement la
+            # duplication de fenêtres qu'`UX4_03D` puis `TRAIN1-A` ont fermée
+            # sur cette page.
+            "debrief": debrief,
             "signals": signals,
             "rail": rail,
             "rail_summary": rail_summary,
