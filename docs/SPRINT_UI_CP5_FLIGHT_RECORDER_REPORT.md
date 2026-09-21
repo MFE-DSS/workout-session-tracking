@@ -637,3 +637,70 @@ sujet, **et dit**.
    (§2). Le plan annonçait l'inverse ; deux gardes l'empêchent dans ce
    périmètre. À résorber dans une tranche qui possède le contrat de
    `weekly_loop` et son consommateur `narrative.py`.
+
+---
+
+## AVENANT POST-MERGE — closeout
+
+**Mergée le 2026-09-21.** PR **#240**, méthode `--merge` avec SHA de tête
+épinglé (`bb6f500`), commit de merge **`21e74d0`**. Aucun squash, aucun
+`--admin`, aucun force.
+
+### Les six portes, revérifiées juste avant le merge
+
+| Porte | État |
+|---|---|
+| SHA de tête connu et inchangé | `bb6f5002a2e1365b4066d10981617f740476a405` |
+| Tous les contrôles requis | **9/9 pass**, dont le gate **externe** `SonarCloud Code Analysis` |
+| Gate Sonar, par API | **`status: OK`**, 5/5 conditions |
+| Threads de revue non résolus | **0** |
+| `mergeable` / `mergeStateStatus` | `MERGEABLE` / `CLEAN` |
+| Dérive de périmètre | aucune |
+
+### CI canonique sur le commit de merge — la source de vérité
+
+Run **35641762351**, `conclusion: success`, **7/7** :
+`canonical attestation` · `lint` · `pytest shard 1/2/3` · `pytest + QA scripts`
+· `SonarCloud`.
+
+Aucun rouge d'infrastructure cette fois — contrairement au closeout de `UI-CP4`,
+où sept contrôles étaient sautés derrière la dette `actionlint` / node20. Cette
+dette a été fermée par `Sb_CI_NODE24_RUNTIME_01` (PR #235).
+
+### Qualité du nouveau code
+
+| Condition | Valeur | Seuil |
+|---|---|---|
+| `new_coverage` | **98,2 %** | ≥ 80 |
+| `new_duplicated_lines_density` | **0,0 %** | ≤ 3 |
+| `new_bugs_severity` | **0** | ≤ 9 |
+| `new_code_smells_severity` | **0** | ≤ 14 |
+| `new_vulnerabilities_severity` | **0** | ≤ 9 |
+
+### L'incident Sonar, et ce qu'il dit de ma méthode
+
+Le gate a été **rouge au premier passage**, sur `new_code_smells_severity = 15`
+pour un seuil de 14. L'arithmétique tranchait avant toute recherche — MAJOR pèse
+15 — donc **une** finding, et une seule : `external_ruff:I001` sur
+`tests/test_train1e_surface_hygiene.py:136`, une ligne vide qui coupait un bloc
+d'imports en deux.
+
+⚠ **La faute est en amont, et elle est de méthode.** J'avais lancé `ruff` sur une
+**liste de fichiers écrite à la main** — ceux que je croyais avoir touchés —
+plutôt que sur le diff. Ce fichier n'y figurait pas. La commande juste dérive sa
+liste de `git diff --name-only`, et c'est celle qui a vérifié le correctif.
+
+⚠ **Et le job interne `SonarCloud` passait pendant que le gate externe
+échouait.** Les deux ne disent pas la même chose ; c'est l'**externe** qui est
+l'autorité de merge. Un closeout qui ne regarderait que le job interne
+conclurait faux.
+
+### Ce que cette tranche laisse derrière elle
+
+Rien de bloquant. Quatre points sont consignés au §14 ci-dessus, dont **un
+arbitrage qui appartient à l'opérateur** — le rang de la réponse sur l'état
+`ATTENTION` — et **une dette de coût nommée**, la double exécution du détecteur
+d'anomalies sur `/progress`.
+
+**Déploiement en production : non fait dans ce closeout.** Il reste une décision
+séparée.
