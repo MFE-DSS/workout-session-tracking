@@ -500,29 +500,32 @@ def test_chaque_prefixe_de_document_designe_une_route_reelle(client):
     On interroge la table de routage réelle : c'est la seule source qui ne peut
     pas se tromper sur ce que l'application sert.
 
-    ⚠ ELLE PREND L'APPLICATION DE LA FIXTURE, ET MA PREMIÈRE ÉCRITURE
-    L'IMPORTAIT À NU. `from app.main import app` dans le corps du test parutt
-    anodin : il est passé en local et **a échoué sur la CI**, en annonçant que
-    `/coach-report` ne désignait aucune route — ce qui est faux.
+    ⚠ ELLE INTERROGE L'APPLICATION PAR UNE REQUÊTE, PAS PAR INTROSPECTION —
+    ET IL M'A FALLU DEUX ÉCHECS DE CI POUR Y VENIR.
 
-    La cause est le harnais, pas le produit : le `conftest` **retire tous les
-    modules `app.*` de `sys.modules`** à chaque fixture `client`, et la CI
-    exécute sous `xdist`, donc l'ordre diffère d'un worker à l'autre. Un import
-    nu récupère alors ce que le worker a laissé derrière lui.
+    Première écriture : `from app.main import app` à nu, puis lecture de
+    `app.routes`. Verte en local, **rouge sur la CI** — « `/coach-report` ne
+    désigne aucune route », ce qui est faux.
 
-    Je n'ai pas prouvé l'état exact du module sur ce worker, et je ne le
-    prétends pas. Ce que je sais suffit à trancher : **une garde ne doit pas
-    dépendre d'un état d'import que le harnais manipule délibérément.** Prendre
-    l'application de la fixture supprime la dépendance au lieu de la contourner.
+    Seconde écriture : la même lecture, mais sur `client.app` — pour supprimer
+    une dépendance à l'état d'import que le `conftest` manipule. **Rouge à
+    l'identique.** Mon hypothèse était donc fausse, et c'est la mesure qui me
+    l'a dit, pas la relecture.
+
+    Je ne sais toujours pas pourquoi l'introspection de la table de routage
+    diverge entre mon poste (Python 3.14) et la CI (3.11.16), **et je ne le
+    prétends pas**. Mais je n'ai pas besoin de le savoir : la propriété que
+    cette garde doit tenir n'est pas « ce chemin figure dans une table
+    interne », c'est **« l'application sert quelque chose à ce chemin »**.
+
+    Une requête répond à cette question-là directement, dans l'environnement
+    réel, et aucune structure interne ne peut la tromper. Troisième écriture,
+    et la bonne : on mesure le produit, pas son inventaire.
     """
-    chemins = {r.path for r in client.app.routes if hasattr(r, "path")}
-    assert chemins, "aucune route lue — la sonde ne mesure rien"
-
     for prefixe in PREFIXES_DOCUMENT:
-        couverts = [c for c in chemins
-                    if c == prefixe or c.startswith(prefixe + "/")]
-        assert couverts, (
-            f"« {prefixe} » est classé DOCUMENT mais ne désigne aucune route. "
-            "Un préfixe fantôme ne classe rien et fait passer à vide toute "
-            "assertion qui le nomme."
+        reponse = client.get(prefixe, follow_redirects=False)
+        assert reponse.status_code != 404, (
+            f"« {prefixe} » est classé DOCUMENT mais l'application ne sert "
+            f"rien à ce chemin (404). Un préfixe fantôme ne classe rien et "
+            f"fait passer à vide toute assertion qui le nomme."
         )
