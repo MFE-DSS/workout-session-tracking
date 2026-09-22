@@ -62,21 +62,37 @@
      destinations, sans JS) et « Terminer la séance ». Aucun nouvel
      affordance, aucun nouveau cycle de vie.
      ============================================================ #}
-  {% set shell_focus_mode = session is defined and session and session.status == 'in_progress' %}
-  {# `shell_bare` — LA COQUE SE RETIRE POUR UNE SECONDE RAISON.
-     `Sb_UI_HOME_COCKPIT_01`, 2026-09-06.
+  {# ============================================================
+     `UI-CP6 SHELL` — LA COQUE A QUATRE MODES, ET UN SEUL ENDROIT QUI DÉCIDE.
+     ------------------------------------------------------------
+     Avant cette tranche, deux drapeaux se partageaient le travail et
+     **aucun des deux ne couvrait sa propre intention** :
 
-     `shell_focus_mode` dit « une séance est en cours » : il retire la
-     navigation ET pose `is-session-focus-mode` sur le `<body>`. Un SEUIL veut
-     la première moitié et surtout pas la seconde — du style de séance sur une
-     page de connexion n'aurait aucun sens.
+       · `shell_focus_mode` masquait la barre basse, mais laissait la topbar
+         (69 px) et le pied (79 px) pendant une séance active ;
+       · `shell_bare` disait « seuil » et ne retirait que le pied et la barre
+         basse. Mesuré : `/forgot-password` rendait **huit** destinations
+         authentifiées sur mobile et **onze** sur desktop — et c'était le seul
+         gabarit qui posait ce drapeau.
 
-     Les deux idées reçoivent donc deux noms. Réutiliser le premier pour le
-     second aurait été choisir un drapeau pour la commodité d'une de ses
-     valeurs, pas pour son sens.
+     Un drapeau qui ne couvre pas son intention n'est pas un drapeau : c'est
+     une coïncidence qui tient tant que personne ne regarde.
 
-     Un gabarit de seuil pose `{% set shell_bare = true %}` avant son bloc. #}
-  {% set shell_bare = shell_bare | default(false) %}
+     Les deux sont remplacés par UN mode, calculé en Python
+     (`app/services/shell.py`), où la précédence est écrite et gardée :
+
+         GUEST  >  FOCUS  >  DOCUMENT  >  INSTRUMENT
+
+     `shell_focus_mode` SURVIT, dérivé du mode : la classe
+     `is-session-focus-mode` du `<body>` est une garantie de style épinglée par
+     une garde, et elle n'a aucune raison de bouger. Ce qui change est ce qui
+     la produit, pas ce qu'elle vaut.
+     ============================================================ #}
+  {% set shell_mode = mode_de_coque(
+       request.url.path if request else '',
+       seance_en_cours=(session is defined and session and session.status == 'in_progress')
+     ) %}
+  {% set shell_focus_mode = shell_mode == MODE_FOCUS %}
   <body{% if shell_focus_mode %} class="is-session-focus-mode"{% endif %}>
     {# Sb_UI_03.3 — skip link : premier élément interactif du body, masqué
        hors écran au repos, visible au focus clavier. SSR/no-JS, tokens Auren
@@ -144,7 +160,38 @@
        quotidienne non. #}
     {% set is_prog = is_progress or is_history or is_body_intel %}
     {% set is_prof = is_profile or is_squads or is_leaderboard %}
+    {# `UI-CP6` — LE DRAPEAU D'ACTIVATION DE CHAQUE DESTINATION SECONDAIRE.
+       Le contrat (`app/services/shell.py`) porte le NOM du drapeau ; cette
+       table porte sa VALEUR. La séparation est le prix de la pureté du module :
+       `is_plan` & co. sont dérivés de `request.url.path` ici même, et les
+       remonter en Python obligerait à reconstruire tout le mapping `is_*` —
+       ce que le `§12` de l'arbitrage interdit explicitement.
+
+       Une garde de RENDU vérifie que chaque destination du contrat reçoit bien
+       son soulignement quand on est sur sa route : une clé oubliée ici se voit
+       à l'écran, pas seulement dans ce dictionnaire. #}
+    {% set _actifs = {
+         'is_plan': is_plan, 'is_history': is_history, 'is_coach': is_coach,
+         'is_export': is_export, 'is_squads': is_squads,
+         'is_leaderboard': is_leaderboard,
+       } %}
+    {% if shell_mode in MODES_AVEC_TOPBAR %}
+    {# `UI-CP6 Q1` — LA TOPBAR PASSE DE 69 À 44 px, ELLE NE DISPARAÎT PAS.
+       Arbitrage rendu : garder l'identité de produit et l'affordance de menu
+       secondaire, dans une barre de 44 px. Le chevron NE descend PAS en 5ᵉ
+       onglet — la barre basse porte des destinations de premier rang, et
+       « Plus » n'est pas une cinquième aire souveraine du produit. #}
     <header class="topbar">
+      {# `UI-CP6 Q2` — `IDENTITY_HOME_EXCEPTION`, décision d'opérateur.
+
+         Le mot-marque MÈNE à `/`, et l'onglet « Séance » aussi : deux chemins
+         vers la même destination, visibles en même temps. C'est la forme que
+         `UI-CP3` et `UI-CP4` ont retirée ailleurs, et l'exception est ici
+         **rendue explicite plutôt que tacite** : l'identité de produit sert
+         l'ORIENTATION et l'échappée vers l'accueil, elle n'est pas une tuile
+         de navigation concurrente.
+
+         ⚠ NE PAS RETIRER CE LIEN DANS UNE PASSE DE DÉDUPLICATION FUTURE. #}
       <a class="topbar__brand" href="{{ url_for('home') }}">Auren</a>
       {# Sb_UI_03.3 — topbar rétrogradée en navigation SECONDAIRE uniquement.
          Les 4 destinations primaires (Accueil/Programmes/Progression/Profil)
@@ -164,19 +211,24 @@
              règle ci-dessus interdit. Les programmes de l'utilisateur, la
              création d'un programme et le catalogue sont tous atteignables
              depuis le registre. Aucune route n'est supprimée. #}
-          <a class="topbar__link {% if is_plan %}is-subactive{% endif %}" href="{{ url_for('user_plan') }}">Mon plan</a>
-          <a class="topbar__link {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
-          <a class="topbar__link {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
-          <a class="topbar__link {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>
-          <a class="topbar__link {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
-          <a class="topbar__link {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
-          <a class="topbar__link" href="{{ url_for('contact_page') }}">Contact</a>
+          {# `UI-CP6 Q4` — RENDU MOBILE DU CONTRAT. La liste n'est plus écrite
+             ici : elle vient de `NAVIGATION_SECONDAIRE`. Le balisage, lui,
+             reste propre à ce rendu — c'est le sens de l'arbitrage. #}
+          {% for d in NAVIGATION_SECONDAIRE %}
+          <a class="topbar__link {% if _actifs[d.drapeau_actif] %}is-subactive{% endif %}" href="{{ url_for(d.route) }}">{{ d.libelle }}</a>
+          {% endfor %}
+          {# `CONTACT` est dans le menu ici, en pied de rail sur desktop.
+             Exception de PLACEMENT encodée dans le contrat, pas tolérée en
+             silence : la garde de parité l'attend dans l'ensemble des
+             destinations sans exiger la même position. #}
+          <a class="topbar__link" href="{{ url_for(CONTACT.route) }}">{{ CONTACT.libelle }}</a>
           <form class="inline-form" method="post" action="{{ url_for('logout') }}">
             <button type="submit" class="topbar__link topbar__link--btn">Déconnexion</button>
           </form>
         </nav>
       </details>
     </header>
+    {% endif %}
     {# Sb_UI_03.2 — Desktop Rail / Secondary Shell (Sx_UI_03). Rail latéral
        gauche persistant, visible ≥1024px (masqué en dessous ; la bottom nav
        Sb_UI_03.1 couvre mobile + tablette portrait). Mêmes 4 destinations que
@@ -186,7 +238,10 @@
        POST en pied de rail. Aucune route/donnée touchée. Rétrogradation
        destructive des entrées topbar + intégration active-session = différées
        à Sb_UI_03.3. #}
+    {% if shell_mode in MODES_AVEC_NAV_PRIMAIRE %}
     <aside class="app-rail" aria-label="Navigation latérale">
+      {# `IDENTITY_HOME_EXCEPTION` — voir la topbar. Même décision, même
+         raison : orientation et échappée, pas une tuile concurrente. #}
       <a class="app-rail__brand" href="{{ url_for('home') }}">Auren</a>
       <nav class="app-rail__primary" aria-label="Navigation principale (desktop)">
         <a class="app-rail__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
@@ -217,21 +272,25 @@
              par deux liens différents nommerait deux surfaces qui n'existent
              plus. Il reste « Mon plan », qui répond à une autre question :
              comment je veux m'entraîner. #}
-          <a class="app-rail__sublink {% if is_plan %}is-subactive{% endif %}" href="{{ url_for('user_plan') }}">Mon plan</a>
-          <a class="app-rail__sublink {% if is_history %}is-subactive{% endif %}" href="{{ url_for('history') }}">Historique</a>
-          <a class="app-rail__sublink {% if is_coach %}is-subactive{% endif %}" href="{{ url_for('coach_report') }}">Coach Report</a>
-          <a class="app-rail__sublink {% if is_export %}is-subactive{% endif %}" href="{{ url_for('export_landing') }}">Sauvegarde</a>
-          <a class="app-rail__sublink {% if is_squads %}is-subactive{% endif %}" href="{{ url_for('squads_list') }}">Squads</a>
-          <a class="app-rail__sublink {% if is_leaderboard %}is-subactive{% endif %}" href="{{ url_for('leaderboard_page') }}">Classement</a>
+          {# `UI-CP6 Q4` — RENDU DESKTOP DU MÊME CONTRAT, balisage distinct.
+             Six liens écrits deux fois, c'est ce que cette tranche ferme :
+             `UI-CP4` avait dû éditer les deux blocs, et les deux ne sont
+             jamais rendus en même temps — donc aucun test de page ne pouvait
+             les comparer. Une garde compare désormais le HTML SERVI aux deux
+             ruptures. #}
+          {% for d in NAVIGATION_SECONDAIRE %}
+          <a class="app-rail__sublink {% if _actifs[d.drapeau_actif] %}is-subactive{% endif %}" href="{{ url_for(d.route) }}">{{ d.libelle }}</a>
+          {% endfor %}
         </nav>
       </details>
       <div class="app-rail__footer">
-        <a class="app-rail__sublink" href="{{ url_for('contact_page') }}">Contact</a>
+        <a class="app-rail__sublink" href="{{ url_for(CONTACT.route) }}">{{ CONTACT.libelle }}</a>
         <form method="post" action="{{ url_for('logout') }}">
           <button type="submit" class="app-rail__logout">Déconnexion</button>
         </form>
       </div>
     </aside>
+    {% endif %}
     {# Sb_UI_03.3 — bannière globale de séance active SUPPRIMÉE. Le hero Home
        (index.html) reste l'unique surface directe « Reprendre » ; sur les
        autres pages, l'état actif est porté par l'onglet Séance de la bottom
@@ -240,10 +299,24 @@
     <main id="main-content" class="container">
       {% block content %}{% endblock %}
     </main>
-    {% if not shell_bare %}
+    {# `UI-CP6 Q3` — PLUS DE PIED DE PAGE SUR LES SURFACES D'INSTRUMENT.
+
+       Il coûtait **135 px sur mobile** pour porter un mot-marque et un lien
+       que la navigation secondaire offre déjà. Et il coûtait plus que des
+       pixels : `AUREN_INSTRUMENTS §2bis` sépare le COCKPIT du DOCUMENT et
+       exige que la frontière soit perceptible — un pied de page est un objet
+       de document, et en coiffer un instrument brouille exactement cette
+       frontière.
+
+       « Contact » n'est perdu nulle part : il reste dans la navigation
+       secondaire, aux deux ruptures.
+
+       Les DOCUMENTS le gardent, temporairement et sur instruction explicite :
+       la refonte du pied de document appartient à `UI-CP7 REFERENCE`. #}
+    {% if shell_mode in MODES_AVEC_PIED %}
     <footer class="foot">
       <small>Auren</small>
-      <a href="{{ url_for('contact_page') }}" class="foot__contact">Contact</a>
+      <a href="{{ url_for(CONTACT.route) }}" class="foot__contact">{{ CONTACT.libelle }}</a>
     </footer>
     {% endif %}
     {# Sb_UI_03.1 — Mobile Bottom Navigation (Sx_UI_03). Shell app-like
@@ -255,7 +328,7 @@
        (Historique/Coach/Classement/Squads/Déconnexion) préservées
        dans le menu topbar. `TRAIN1-C` a retiré « Physique » de cette liste —
        la surface n'existe plus, sa route redirige. #}
-    {% if not shell_focus_mode and not shell_bare %}
+    {% if shell_mode in MODES_AVEC_NAV_PRIMAIRE %}
     <nav class="app-bottom-nav" aria-label="Navigation principale">
       <a class="app-bottom-nav__item {% if is_sess %}is-active{% endif %}{% if active_session %} has-active-session{% endif %}" href="{{ url_for('home') }}"{% if is_sess %} aria-current="page"{% endif %}>
         <svg class="app-bottom-nav__icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12 12 4l8 8"/><path d="M6 10v9h12v-9"/></svg>
