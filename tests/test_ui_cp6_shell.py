@@ -488,7 +488,7 @@ def test_les_prefixes_de_document_suivent_le_contrat_des_instruments():
         assert mode_de_coque(chemin) == MODE_DOCUMENT, chemin
 
 
-def test_chaque_prefixe_de_document_designe_une_route_reelle():
+def test_chaque_prefixe_de_document_designe_une_route_reelle(client):
     """⚠ LA GARDE QUI FERME LA CLASSE, PAS SEULEMENT LES DEUX CAS TROUVÉS.
 
     Un préfixe qui ne matche aucune route ne classe rien : il est inoffensif
@@ -499,10 +499,25 @@ def test_chaque_prefixe_de_document_designe_une_route_reelle():
 
     On interroge la table de routage réelle : c'est la seule source qui ne peut
     pas se tromper sur ce que l'application sert.
-    """
-    from app.main import app
 
-    chemins = {r.path for r in app.routes if hasattr(r, "path")}
+    ⚠ ELLE PREND L'APPLICATION DE LA FIXTURE, ET MA PREMIÈRE ÉCRITURE
+    L'IMPORTAIT À NU. `from app.main import app` dans le corps du test parutt
+    anodin : il est passé en local et **a échoué sur la CI**, en annonçant que
+    `/coach-report` ne désignait aucune route — ce qui est faux.
+
+    La cause est le harnais, pas le produit : le `conftest` **retire tous les
+    modules `app.*` de `sys.modules`** à chaque fixture `client`, et la CI
+    exécute sous `xdist`, donc l'ordre diffère d'un worker à l'autre. Un import
+    nu récupère alors ce que le worker a laissé derrière lui.
+
+    Je n'ai pas prouvé l'état exact du module sur ce worker, et je ne le
+    prétends pas. Ce que je sais suffit à trancher : **une garde ne doit pas
+    dépendre d'un état d'import que le harnais manipule délibérément.** Prendre
+    l'application de la fixture supprime la dépendance au lieu de la contourner.
+    """
+    chemins = {r.path for r in client.app.routes if hasattr(r, "path")}
+    assert chemins, "aucune route lue — la sonde ne mesure rien"
+
     for prefixe in PREFIXES_DOCUMENT:
         couverts = [c for c in chemins
                     if c == prefixe or c.startswith(prefixe + "/")]
