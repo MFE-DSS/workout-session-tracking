@@ -365,3 +365,83 @@ périmètre est de la dérive, et le budget confirme l'absence de régression.
 `UI-CP9 SQUAD / SOCIAL ARBITRATION`.
 
 **Ne pas avancer automatiquement.**
+
+---
+
+## AVENANT POST-MERGE — closeout
+
+**Mergée le 2026-09-22.** PR **#241**, méthode `--merge` avec SHA de tête
+épinglé (`15c9329`), commit de merge **`81f9c01`**. Aucun squash, aucun
+`--admin`, aucun force.
+
+### Les six portes, revérifiées juste avant le merge
+
+| Porte | État |
+|---|---|
+| SHA de tête connu et inchangé | `15c93290f2d7933acbc5e9d7622c88de09bc6199` |
+| Tous les contrôles requis | **10/10 pass**, dont le gate **externe** `SonarCloud Code Analysis` |
+| Gate Sonar, par API | **`status: OK`**, 5/5 conditions |
+| Threads de revue non résolus | **0** |
+| `mergeable` / `mergeStateStatus` | `MERGEABLE` / `CLEAN` |
+| Dérive de périmètre | aucune |
+
+### CI canonique sur le commit de merge — la source de vérité
+
+Run **35738241348**, `conclusion: success`, **7/7** :
+`canonical attestation` · `lint` · `pytest shard 1/2/3` · `pytest + QA scripts`
+· `SonarCloud`.
+
+### Qualité du nouveau code
+
+| Condition | Valeur | Seuil |
+|---|---|---|
+| `new_coverage` | **100,0 %** | ≥ 80 |
+| `new_duplicated_lines_density` | **0,0 %** | ≤ 3 |
+| `new_bugs_severity` | **0** | ≤ 9 |
+| `new_code_smells_severity` | **0** | ≤ 14 |
+| `new_vulnerabilities_severity` | **0** | ≤ 9 |
+
+**Aucune finding Sonar au premier passage**, contrairement à `UI-CP5`. La
+différence tient à une seule chose : la liste ruff a été **dérivée de
+`git diff --name-only`** au lieu d'être écrite à la main. C'est exactement la
+faute qui avait coûté un cycle sur la tranche précédente.
+
+### ⚠ Un défaut de cette tranche, trouvé en ouvrant la suivante
+
+`PREFIXES_DOCUMENT` contenait **deux préfixes qui ne désignent aucune route** :
+`/atlas` (l'atlas vit à `/science/atlas`) et `/coach-body-snapshot` (c'est un
+**partiel** inclus dans `coach_report.html`, pas une page).
+
+**Cause** : `AUREN_INSTRUMENTS §2bis` nomme des **surfaces** — « coach_report +
+coach_body_snapshot », « atlas » — et j'en avais fait des **chemins d'URL**.
+
+Inoffensif à l'exécution — un préfixe qui ne matche rien ne classe rien — mais
+**ma propre garde l'assertait à vide** : « `/atlas` est un DOCUMENT » passait
+sans que `/atlas` existe. C'est la forme la plus coûteuse d'un faux vert :
+celle qui *a l'air* de protéger.
+
+Trouvé en interrogeant `app.routes` plutôt qu'en relisant mon propre code.
+Corrigé en **PR #242**, avec une garde qui ferme la classe.
+
+⚠ **Et cette garde a échoué sur la CI à son premier passage**, en annonçant que
+`/coach-report` ne désignait aucune route — ce qui est faux. La cause est le
+harnais, pas le produit : le `conftest` retire tous les modules `app.*` de
+`sys.modules` à chaque fixture `client`, et la CI exécute sous `xdist`. Un
+`from app.main import app` écrit à nu récupère ce que le worker a laissé
+derrière lui. **Je n'ai pas prouvé l'état exact du module sur ce worker et je
+ne le prétends pas** — ce que je sais suffit : une garde ne doit pas dépendre
+d'un état d'import que le harnais manipule. Elle prend désormais l'application
+de la fixture, ce qui supprime la dépendance au lieu de la contourner.
+
+*Troisième garde de ma main, en deux tranches, à mesurer le mauvais objet. Ici
+l'objet mesuré était une application à moitié assemblée.*
+
+### Ce que cette tranche laisse derrière elle
+
+* le **paysage** reste à 79 px de défilement avant la réponse souveraine —
+  conséquence assumée de l'arbitrage `Q1`, pas un oubli ;
+* la **sortie de `FOCUS`** reste une flèche nue, avec sa raison mesurée ;
+* une finding `external_ruff:UP017` **pré-existante** dans `app/templating.py`,
+  hors du nouveau code.
+
+**Déploiement en production : non fait dans ce closeout.** Décision séparée.
