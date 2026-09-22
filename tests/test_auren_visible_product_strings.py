@@ -47,8 +47,37 @@ def test_topbar_brand_shows_auren(client):
 
 
 def test_footer_shows_auren(client):
-    html = _get(client)
-    assert "<small>Auren</small>" in html
+    """⚠ REPOINTÉE PAR `UI-CP6 SHELL` — LE PORTEUR CHANGE, LA PROPRIÉTÉ NON.
+
+    Cette garde lisait `<small>Auren</small>` dans le pied de page de
+    l'accueil. `UI-CP6 Q3` retire le pied générique des surfaces d'INSTRUMENT :
+    il coûtait 135 px sur mobile pour un mot-marque et un lien que la
+    navigation secondaire offre déjà, et un pied de page est un objet de
+    DOCUMENT — l'avoir sur un instrument brouille la frontière que
+    `AUREN_INSTRUMENTS §2bis` demande de rendre perceptible.
+
+    Ce que la garde protège — **le nom produit visible est « Auren »** — n'a
+    pas bougé d'un pouce. Il est simplement porté ailleurs sur un instrument,
+    par le mot-marque de la topbar, et le pied le porte toujours là où il
+    subsiste : sur les documents.
+
+    Les deux moitiés sont donc vérifiées, chacune là où elle vit. Épingler le
+    pied sur l'accueil reviendrait à exiger son retour.
+    """
+    # Sur un DOCUMENT, le pied survit — et il nomme le produit.
+    document = _get(client, "/export")
+    assert "<small>Auren</small>" in document, (
+        "le pied du document ne nomme plus le produit"
+    )
+
+    # Sur un INSTRUMENT, il n'y a plus de pied — et le nom reste visible.
+    instrument = _get(client)
+    assert 'class="foot"' not in instrument, (
+        "le pied générique est revenu sur une surface d'instrument"
+    )
+    assert re.search(r'<a class="topbar__brand"[^>]*>Auren</a>', instrument), (
+        "plus aucun porteur du nom produit sur un instrument"
+    )
 
 
 # ───────── SPIGNOS no longer visible in the shell ─────────

@@ -279,10 +279,30 @@ def test_no_english_name_enters_the_french_interface(client):
 
 
 def test_the_shell_names_the_children_without_duplicating_them(client):
-    """Un enfant nommé deux fois dans le même menu redevient ambigu."""
-    body = _uncommented(BASE_TPL.read_text(encoding="utf-8"))
+    """Un enfant nommé deux fois dans le même menu redevient ambigu.
+
+    ⚠ REPOINTÉE PAR `UI-CP6 SHELL` — DE L'ÉCRITURE VERS LE RENDU.
+
+    Elle lisait la SOURCE de `base.html` et y comptait des libellés
+    littéraux. `UI-CP6` retire ces littéraux du gabarit : les six destinations
+    secondaires étaient écrites DEUX FOIS — une par rendu — et viennent
+    désormais d'un contrat unique (`app/services/shell.py`). La source ne
+    contient plus que `{{ d.libelle }}`.
+
+    La garde tombait donc sur une boucle, pas sur un défaut. Et elle serait
+    devenue **pire que fausse** si on l'avait laissée verte par accident : un
+    `count(...) == 0` sur une source qui ne contient plus aucun libellé passe
+    tout seul.
+
+    Ce qu'elle protège — « un enfant nommé une seule fois par menu » — se
+    vérifie mieux sur le HTML SERVI, qui contient les DEUX rendus. C'est même
+    plus strict : elle voit maintenant ce que le gabarit produit, pas ce qu'il
+    a l'air de produire.
+    """
+    body = client.get("/progress", follow_redirects=True).text
     for nav_class in ("topbar__link", "app-rail__sublink"):
-        links = re.findall(rf'class="{nav_class}[^"]*"[^>]*>([^<]+)<', body)
+        links = re.findall(rf'class="{nav_class}[^"]*"[^>]*>\s*([^<]+?)\s*<', body)
+        assert links, f"aucun lien lu pour {nav_class} — la sonde ne mesure rien"
         assert links.count("Mon plan") == 1, (
             f"« Mon plan » apparaît {links.count('Mon plan')} fois dans {nav_class}"
         )

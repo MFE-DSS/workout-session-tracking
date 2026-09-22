@@ -15,6 +15,7 @@ from zoneinfo import ZoneInfo
 from fastapi.templating import Jinja2Templates
 
 from app.config import BASE_DIR, DEFAULT_TIMEZONE
+from app.services import shell
 from app.services.static_assets import asset_url
 from app.services.time_format import format_date_short, format_datetime_short
 
@@ -220,3 +221,23 @@ templates.env.filters["role_squad"] = role_squad
 # pendant que le HTML arrive à jour. Ce couplage rompu a été REPRODUIT — il ne
 # reste pas une hypothèse (cf. `SPRINT_STATIC_ASSET_COHERENCE_01_REPORT`).
 templates.env.globals["asset_url"] = asset_url
+
+# `UI-CP6 SHELL` — LE CONTRAT DE COQUE ATTEINT LES GABARITS SANS TOUCHER UNE
+# SEULE ROUTE.
+#
+# `base.html` avait besoin de deux choses que seul Python peut tenir
+# honnêtement : le MODE dans lequel une surface est servie, et la liste
+# UNIQUE des destinations secondaires. Les passer par le contexte aurait exigé
+# de les ajouter à chaque `TemplateResponse` du dépôt — donc d'en oublier, et
+# une surface oubliée rend la coque du mauvais mode en silence.
+#
+# Un global les rend disponibles partout, y compris sur les gabarits qu'aucune
+# route de cette tranche ne touche.
+templates.env.globals["mode_de_coque"] = shell.mode_de_coque
+templates.env.globals["NAVIGATION_SECONDAIRE"] = shell.NAVIGATION_SECONDAIRE
+templates.env.globals["CONTACT"] = shell.CONTACT
+templates.env.globals["MODE_FOCUS"] = shell.MODE_FOCUS
+templates.env.globals["MODE_GUEST"] = shell.MODE_GUEST
+templates.env.globals["MODES_AVEC_TOPBAR"] = shell.MODES_AVEC_TOPBAR
+templates.env.globals["MODES_AVEC_NAV_PRIMAIRE"] = shell.MODES_AVEC_NAV_PRIMAIRE
+templates.env.globals["MODES_AVEC_PIED"] = shell.MODES_AVEC_PIED

@@ -632,6 +632,25 @@ input, button, textarea, select {
 
 /* ---- Topbar ---- */
 
+/* `UI-CP6 Q1` — LA TOPBAR PASSE DE 69 À 44 px.
+ *
+ * Arbitrage rendu : la garder et la réduire, **pas** la retirer ni descendre
+ * son chevron en cinquième onglet — la barre basse porte des destinations de
+ * premier rang, et « Plus » n'est pas une cinquième aire souveraine.
+ *
+ * Elle mesurait 69 px : 12 px de remplissage au-dessus et au-dessous d'un
+ * chevron qui fait déjà 44×44 (plancher de cible, `target_closure.css`). Le
+ * remplissage vertical était donc du vide ajouté autour d'une cible déjà
+ * conforme. Il part, et la barre vaut exactement la hauteur de sa cible.
+ *
+ * MESURÉ, et c'est ce qui justifie les 25 px : en paysage (844×390), la coque
+ * prenait 126 px sur 390 — **32 %** — et il fallait défiler 127 px avant la
+ * réponse souveraine de `/progress`, 172 px avant le héros de l'accueil. Ce
+ * n'est pas un quota de pourcentage, c'est un défaut de tâche.
+ *
+ * `env(safe-area-inset-top)` reste ajouté PAR-DESSUS les 44 px : sur un
+ * appareil à encoche, la barre doit descendre sous l'encoche, pas se
+ * comprimer dedans. */
 .topbar {
   position: sticky;
   top: 0;
@@ -639,7 +658,8 @@ input, button, textarea, select {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(env(safe-area-inset-top, 0px) + 12px) var(--space-md) 12px;
+  min-height: 44px;
+  padding: env(safe-area-inset-top, 0px) var(--space-md) 0;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
