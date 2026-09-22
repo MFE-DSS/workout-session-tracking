@@ -474,9 +474,40 @@ def test_les_prefixes_de_document_suivent_le_contrat_des_instruments():
     """`AUREN_INSTRUMENTS §2bis` nomme quatre surfaces qui ne sont pas des
     instruments. Elles doivent toutes être classées, sinon la frontière que ce
     contrat demande de rendre perceptible ne l'est qu'à moitié.
+
+    ⚠ ELLE ASSERTAIT `/atlas` À VIDE, ET C'EST MOI QUI L'AVAIS ÉCRITE.
+
+    `§2bis` nomme des SURFACES, pas des chemins d'URL. L'atlas vit à
+    `/science/atlas` — donc déjà sous `/science` — et il n'existe aucune route
+    `/atlas`. « `/atlas` est un DOCUMENT » passait sans rien observer.
+
+    On nomme donc les chemins RÉELS, et la garde suivante interdit qu'un
+    préfixe fantôme revienne.
     """
-    for chemin in ("/science", "/atlas", "/coach-report", "/export"):
+    for chemin in ("/science", "/science/atlas", "/coach-report", "/export"):
         assert mode_de_coque(chemin) == MODE_DOCUMENT, chemin
-    assert set(PREFIXES_DOCUMENT) >= {
-        "/science", "/atlas", "/coach-report", "/export",
-    }
+
+
+def test_chaque_prefixe_de_document_designe_une_route_reelle():
+    """⚠ LA GARDE QUI FERME LA CLASSE, PAS SEULEMENT LES DEUX CAS TROUVÉS.
+
+    Un préfixe qui ne matche aucune route ne classe rien : il est inoffensif
+    à l'exécution et **trompeur à la lecture**, et il rend vacuoles toutes les
+    assertions qui le nomment. Deux existaient — `/atlas` et
+    `/coach-body-snapshot`, ce dernier étant un PARTIEL inclus dans
+    `coach_report.html`, pas une page.
+
+    On interroge la table de routage réelle : c'est la seule source qui ne peut
+    pas se tromper sur ce que l'application sert.
+    """
+    from app.main import app
+
+    chemins = {r.path for r in app.routes if hasattr(r, "path")}
+    for prefixe in PREFIXES_DOCUMENT:
+        couverts = [c for c in chemins
+                    if c == prefixe or c.startswith(prefixe + "/")]
+        assert couverts, (
+            f"« {prefixe} » est classé DOCUMENT mais ne désigne aucune route. "
+            "Un préfixe fantôme ne classe rien et fait passer à vide toute "
+            "assertion qui le nomme."
+        )
