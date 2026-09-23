@@ -273,6 +273,13 @@ def test_the_recommendation_engine_may_be_corrected_but_never_grow():
         "hard_sets_by_zone_recent", "hard_sets_by_zone_24h", "kinds_recent",
         "days_since_last_cardio", "days_since_last_strength", "fatigue_score",
         "soft_restart", "median_hard_sets_14d", "hard_sets_14d_by_zone",
+        # `REC-CP0b` — AJOUT DÉCLARÉ, et c'est le dispositif qui fonctionne :
+        # la garde a rougi, et il a fallu venir l'écrire ici. Le champ dit que
+        # la fenêtre contenait un exercice illisible, donc que « cette zone n'a
+        # jamais été touchée » est une ignorance et non une mesure. Sans lui,
+        # une zone non vue recevait la fraîcheur MAXIMALE sur la plus grosse
+        # composante du score — un mécanisme d'épinglage, pas une imprécision.
+        "observation_partielle",
     }, "le contrat d'entrée du scoring a changé de forme — décision requise"
 
     public = {

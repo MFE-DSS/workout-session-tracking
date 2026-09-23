@@ -312,11 +312,38 @@ def test_only_the_authorised_consumer_reads_the_formal_contract():
     so it went green the moment the change was committed and asserted nothing in
     CI. This one reads the source and keeps biting forever.
 
-    The contract it now enforces: `muscle_scoring` reads the canonical
+    The contract it now enforces: the listed consumers read the canonical
     body-zone contract, and every other listed consumer still does not — a
     later migration must be a deliberate, reviewed step, not a drift.
+
+    ⚠ `REC-CP0b`, 2026-09-23 — **`recommendation.py` REJOINT LA LISTE MIGRÉE,
+    ET CETTE GARDE EST CE QUI M'A OBLIGÉ À VENIR L'ÉCRIRE.**
+
+    Elle a rougi au sweep complet, après que mes séries ciblées l'aient
+    manquée. C'est exactement le dispositif qu'elle annonce : la migration
+    devient une ligne qu'on ajoute sciemment, pas un import qui passe.
+
+    La raison de la migration, mesurée : le moteur était coupé en DEUX
+    ontologies **à l'intérieur de la même fonction**. Ses signaux de tonnage
+    lisaient déjà le contrat formel via `muscle_scoring` — donc la moitié de ce
+    fichier était migrée depuis `Sb_32.4` sans que la liste le dise — pendant
+    que ses zones de gabarit et sa carte du dernier travail lisaient le matcher
+    par sous-chaîne. Trois exercices du catalogue divergent entre les deux :
+    `Calf press leg press` comptait en `calves` pour la mesure et en `quads`
+    pour la décision.
+
+    L'équivalence des deux chemins sur le catalogue actuel est **mesurée**
+    (0 divergent sur 102, `build_parity_report`) et tenue par
+    `test_rec_cp0b_ontology.py::test_les_deux_autorites_ne_divergent_pas`.
+
+    La levée du gel de `recommendation.py` qui rend cette migration possible
+    est un arbitrage opérateur, consigné dans
+    `Sx_AUREN_ORCHESTRATOR_01_GAP_CONSOLIDATION_SPEC.md §6`.
     """
-    migrated = {"app/services/muscle_scoring.py"}
+    migrated = {
+        "app/services/muscle_scoring.py",
+        "app/services/recommendation.py",
+    }
     for rel in FORBIDDEN_CONSUMER_FILES:
         source = (ROOT / rel).read_text(encoding="utf-8")
         imports_contract = "body_zone_source" in source

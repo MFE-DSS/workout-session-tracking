@@ -39,7 +39,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import SessionExercise, SetLog, WorkoutSession
-from app.services.muscle_mapping import classify_exercise
+from app.services.body_zone_source import resolve_exercise_zones
 from app.services.muscle_scoring import _compute_tonnage_by_zone
 from app.services.substitution import actual_exercise_name
 
@@ -101,6 +101,17 @@ ZONE_FRESHNESS_BONUS_BASE = 15
 ZONE_FRESHNESS_BONUS_STEP = 6
 ZONE_FRESHNESS_BONUS_MIN = -6
 
+# `REC-CP0b` — DISPONIBILITÉ D'UNE ZONE DONT L'OBSERVATION EST PARTIELLE.
+#
+# Ce n'est pas une valeur nouvelle : c'est la convention que `_score_template`
+# applique déjà (`availability = 0.5  # inconnu → neutre`) quand un gabarit
+# n'a aucune zone. Elle est ici NOMMÉE et appliquée à l'autre moitié du même
+# problème, au lieu d'y écrire `1.0`.
+#
+# Neutre, pas pénalisant : ne pas savoir n'est pas une raison d'écarter une
+# zone, seulement de ne pas la déclarer fraîche.
+AVAILABILITY_INCONNUE = 0.5
+
 # Seuil hard_sets dans la fenêtre redundancy au-delà duquel la zone est exclue
 REDUNDANCY_HARD_SETS_CUTOFF = 4
 
@@ -159,6 +170,11 @@ class Signals:
     soft_restart: bool
     median_hard_sets_14d: float
     hard_sets_14d_by_zone: dict[str, int]
+    #: `REC-CP0b` — au moins un exercice de la fenêtre n'a pas pu être
+    #: classé, donc « cette zone n'a jamais été touchée » est une
+    #: IGNORANCE et non une mesure. Même sémantique que l'état `partial`
+    #: de `zone_exposure`, sans en créer un second système.
+    observation_partielle: bool
 
 
 @dataclass
@@ -175,12 +191,46 @@ class Candidate:
 
 
 def _primary_zones_of(exercise_names: tuple[str, ...]) -> list[str]:
-    """Core classification — extracted so the cache key is hashable."""
+    """Core classification — extracted so the cache key is hashable.
+
+    `REC-CP0b` — **UNE SEULE AUTORITÉ D'ONTOLOGIE POUR TOUT LE MOTEUR.**
+
+    Ce moteur était coupé en deux. Ses signaux de tonnage passaient par
+    `resolve_exercise_zones` (corrections relues + base + sous-chaîne) via
+    `muscle_scoring` ; ses zones de gabarit et sa carte du dernier travail
+    passaient par `classify_exercise(name)`, **sous-chaîne pure**.
+
+    Trois exercices du catalogue divergent de façon prouvée entre les deux —
+    `Calf press leg press` comptait en `calves` pour la mesure et en `quads`
+    pour la recommandation. Le produit mesurait l'exposition avec une ontologie
+    et recommandait la séance suivante avec une autre.
+
+    ⚠ `db=None` EST DÉLIBÉRÉ, ET C'EST MESURÉ, PAS ESPÉRÉ.
+
+    Cette fonction est `lru_cache`-ée par tuple de noms : une `Session` n'y a
+    pas sa place. Avant de choisir, la question « le chemin sans base
+    diverge-t-il du chemin avec base ? » a été posée à l'application, sur les
+    **102 exercices du catalogue** (`build_parity_report`, 2026-09-23) :
+
+        exact_matches            99
+        intentional_divergences   3   (les trois corrections relues)
+        unexplained_divergences   0
+        missing_formal_mapping    0
+        resolve(db, …) vs resolve(None, …)   →  0 divergent sur 102
+
+    Les corrections relues sont appliquées **avant** la base par
+    `resolve_exercise_zones`, et la graine écrit ces mêmes corrections dans la
+    table : les deux chemins ne peuvent pas diverger sur le catalogue actuel.
+
+    Cette équivalence est un fait daté, pas une propriété éternelle — un
+    exercice futur pourrait la rompre. Elle est donc tenue par une garde :
+    `test_rec_cp0b_ontology.py::test_les_deux_autorites_ne_divergent_pas`.
+    """
     counts: Counter[str] = Counter()
     for name in exercise_names:
-        primary, _secondary = classify_exercise(name)
-        if primary != "unknown":
-            counts[primary] += 1
+        resolu = resolve_exercise_zones(None, name)
+        if resolu.is_known:
+            counts[resolu.primary] += 1
     if not counts:
         return []
     # On garde les zones qui représentent >=25% des exos du template,
@@ -394,6 +444,10 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
     # Pour chaque zone, mémoriser le started_at le plus récent ayant un
     # hard set complété. None signifie "jamais dans la fenêtre" → la
     # zone est totalement disponible.
+    #: `REC-CP0b` — VRAI dès qu'un exercice de la fenêtre n'a pas pu être
+    #: classé. Reprend la sémantique `partial` de `zone_exposure` : « ce qu'on
+    #: compte est un MINIMUM OBSERVÉ, pas une mesure ».
+    observation_partielle = False
     last_hit_by_zone: dict[str, datetime | None] = {z: None for z in ZONE_LABELS}
     last_strength_session_zones: list[str] = []
     # Sb_24.next.reco — buffer FIFO des N dernières sessions strength
@@ -411,9 +465,17 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         # Zones de cette session
         zones_this_session: set[str] = set()
         for se in s.session_exercises:
-            primary, _sec = classify_exercise(actual_exercise_name(se))
-            if primary == "unknown":
+            resolu = resolve_exercise_zones(None, actual_exercise_name(se))
+            if not resolu.is_known:
+                # `REC-CP0b` — ON RETIENT L'IGNORANCE AU LIEU DE L'EFFACER.
+                #
+                # Un `continue` nu faisait disparaître l'exercice, et avec lui
+                # la seule trace du fait qu'on n'avait PAS tout observé. La
+                # substitution en texte libre est la source vivante de ce cas :
+                # `sessions.py` accepte un nom arbitraire que le matcher ignore.
+                observation_partielle = True
                 continue
+            primary = resolu.primary
             has_completed_work = any(
                 sl.kind == "work" and sl.completed for sl in se.set_logs
             )
@@ -439,8 +501,32 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
     for zone in ZONE_LABELS:
         last = last_hit_by_zone.get(zone)
         if last is None:
+            # ══════════════════════════════════════════════════════════════
+            # `REC-CP0b` — « JAMAIS VUE » ET « PAS SU LIRE » NE SONT PAS LA
+            # MÊME CHOSE. C'ÉTAIT LA PLUS GROSSE COMPOSANTE DU SCORE.
+            # ══════════════════════════════════════════════════════════════
+            #
+            # Cette branche écrivait `1.0` — fraîcheur MAXIMALE — dans les deux
+            # cas. Or `WEIGHT_AVAILABILITY = 35` en fait la plus grosse
+            # composante du score : un gabarit dont les zones échouent au
+            # classement marquait donc le maximum à CHAQUE décision. Ce n'est
+            # pas une imprécision, c'est un mécanisme d'ÉPINGLAGE.
+            #
+            # Le moteur connaissait pourtant déjà la bonne réponse. Vingt
+            # lignes plus bas, `_score_template` écrit :
+            #
+            #     availability = 0.5  # inconnu → neutre
+            #
+            # …quand un gabarit n'a aucune zone. La décision existait ; elle
+            # n'était simplement pas appliquée de ce côté-ci.
+            #
+            # On applique donc la convention du moteur lui-même. La sémantique
+            # est celle de `zone_exposure` : une observation PARTIELLE ne
+            # produit pas un zéro, elle produit une ignorance déclarée.
             hours_since_last_by_zone[zone] = 24 * 365  # "très loin" = jamais
-            availability_by_zone[zone] = 1.0
+            availability_by_zone[zone] = (
+                AVAILABILITY_INCONNUE if observation_partielle else 1.0
+            )
             continue
         delta = (now - last).total_seconds() / 3600.0
         hours_since_last_by_zone[zone] = delta
@@ -460,6 +546,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         fatigue_score = 0.0
 
     return Signals(
+        observation_partielle=observation_partielle,
         cold_start=cold_start,
         availability_by_zone=availability_by_zone,
         hours_since_last_by_zone=hours_since_last_by_zone,
