@@ -453,9 +453,35 @@ def test_the_resolver_reports_where_the_mapping_came_from(client):
 
 
 def test_the_decision_engines_never_import_the_resolver():
-    """`recommendation` et `substitution` sont GELÉS et consomment
-    `classify_exercise(name)`. Changer l'autorité sous eux modifierait des
-    décisions d'entraînement — le mandat l'interdit explicitement."""
+    """Les moteurs de décision n'importent pas le résolveur **analytique**.
+
+    ⚠ LA PROSE DE CETTE GARDE A ÉTÉ CORRIGÉE PAR `REC-CP0b`, PAS SON ASSERTION.
+
+    Elle affirmait : « `recommendation` et `substitution` sont GELÉS et
+    consomment `classify_exercise(name)`. Changer l'autorité sous eux
+    modifierait des décisions d'entraînement — le mandat l'interdit
+    explicitement. »
+
+    Les deux moitiés sont devenues fausses le 2026-09-23 :
+
+      · `recommendation` ne consomme plus `classify_exercise` — il passe par
+        `body_zone_source.resolve_exercise_zones`, la même autorité que la
+        moitié tonnage du même moteur employait déjà ;
+      · le mandat ne l'interdit plus — l'arbitrage opérateur de `REC-CP` l'a
+        explicitement demandé, parce que les deux ontologies se contredisaient
+        sur trois exercices du catalogue.
+
+    L'assertion, elle, ne bouge PAS et reste utile : `exercise_zone_resolver`
+    est le résolveur de l'**analytique**, avec sa propre `ZoneResolution` (des
+    champs différents, sans zones secondaires). Le laisser entrer dans un
+    moteur de décision mélangerait deux contrats qui se ressemblent sans être
+    interchangeables.
+
+    `substitution.py` reste gelé par diff, sans amendement.
+
+    Une garde dont la prose ment enseigne du faux à qui la lit ensuite ; c'est
+    pour cela qu'on la corrige au lieu de la laisser passer en silence.
+    """
     for module in ("app/services/recommendation.py",
                    "app/services/substitution.py"):
         src = (ROOT / module).read_text(encoding="utf-8")
