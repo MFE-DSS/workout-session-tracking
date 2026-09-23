@@ -63,17 +63,44 @@ class PhysiqueDashboard:
 
 
 def _compute_tonnage_by_zone(
-    db: Session, user_id: int, window_start: datetime
+    db: Session,
+    user_id: int,
+    window_start: datetime,
+    *,
+    until: datetime | None = None,
 ) -> dict[str, list[dict]]:
-    """Get per-session tonnage grouped by zone."""
+    """Get per-session tonnage grouped by zone.
+
+    `REC-CP0a` — **`until` BORNE LA FENÊTRE PAR LE HAUT, ET C'EST UNE
+    CORRECTION DE CAUSALITÉ, PAS UNE COMMODITÉ.**
+
+    Cette fonction n'acceptait qu'un `window_start`. Elle est appelée trois
+    fois par le moteur de recommandation, qui est lui-même rejoué à des
+    horodatages PASSÉS par `scripts/reco_calibration_report.py`. Sans borne
+    haute, une décision évaluée au 1er mars lisait les séances du 15 mars :
+    le rejeu historique voyait le futur, et les chiffres de calibration
+    produits jusqu'ici décrivent un moteur qui trichait.
+
+    `until` est **optionnel** pour que les deux autres appelants
+    (`muscle_scoring:283`, `dashboard:172`) restent inchangés : ils mesurent
+    « jusqu'à maintenant », ce qui est correct pour eux.
+
+    La borne est `< until`, exclusive, comme `weekly_loop._load_window_sessions`
+    — le seul chemin du dépôt qui était déjà correctement borné des deux côtés.
+    On copie sa convention plutôt que d'en inventer une seconde.
+    """
+    bornes = [
+        WorkoutSession.user_id == user_id,
+        WorkoutSession.status == "completed",
+        WorkoutSession.excluded_from_stats.is_(False),
+        WorkoutSession.started_at >= window_start,
+    ]
+    if until is not None:
+        bornes.append(WorkoutSession.started_at < until)
+
     sessions = db.execute(
         select(WorkoutSession)
-        .where(
-            WorkoutSession.user_id == user_id,
-            WorkoutSession.status == "completed",
-            WorkoutSession.excluded_from_stats.is_(False),
-            WorkoutSession.started_at >= window_start,
-        )
+        .where(*bornes)
         .order_by(WorkoutSession.started_at.asc())
         .options(
             selectinload(WorkoutSession.session_exercises)

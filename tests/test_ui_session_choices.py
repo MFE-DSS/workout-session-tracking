@@ -200,21 +200,92 @@ def test_no_decision_engine_was_touched():
     liste reviendrait à interdire le sprint qui l'a autorisé.
 
     L'invariant réel — « la présentation ne décide de rien » — est CONSERVÉ
-    et reste vérifié sur les trois moteurs qui le portent réellement :
-    substitution, recommandation, comportement. Aucun d'eux n'est touché.
+    et reste vérifié sur les moteurs qui le portent réellement.
 
     Le routeur, lui, est couvert par des gardes dédiées : `test_session_set_action`
     vérifie que `stay` sauvegarde, ancre et n'altère ni `prev` ni `next`, et
     qu'aucune sémantique de complétion n'est introduite.
+
+    ══════════════════════════════════════════════════════════════════════
+    **AMENDEMENT DU GEL — DÉCISION OPÉRATEUR, 2026-09-23 (`REC-CP`).**
+    ══════════════════════════════════════════════════════════════════════
+
+    `recommendation.py` **sort du gel par diff**. Ce n'est pas un relâchement,
+    et ce n'est pas une décision que je prends : l'opérateur l'a ordonnée
+    explicitement, dans les termes que la spec exigeait.
+
+    `Sx_AUREN_ORCHESTRATOR_01_GAP_CONSOLIDATION_SPEC.md:319-324` écrivait :
+    *« STOP : si la correction exige de toucher `recommendation.py` → STOP +
+    arbitrage. »* La directive de passe critique du 2026-09-23 EST cet
+    arbitrage : *« audit the CURRENT CANONICAL engine … Fix the root boundary
+    if violated. Do not merely patch the reporting script. »*
+
+    Ce que le gel ne pouvait pas empêcher, et qu'il a laissé vivre :
+
+      · **aucune** des douze requêtes du chemin n'était bornée par la date de
+        décision, donc tout rejeu historique lisait le futur ;
+      · `compute_behavioral_state` n'avait même pas de paramètre `now` ;
+      · le compte de démarrage à froid ignorait `excluded_from_stats` ;
+      · `max(0, …)` écrasait les deltas négatifs, masquant le tout.
+
+    C'est le même raisonnement que l'amendement `D6` juste en dessous, et il
+    est écrit là en toutes lettres : **« un gel qui empêche de nettoyer une
+    arme chargée protège mal. »** Ici il empêchait de corriger une fuite de
+    causalité.
+
+    Le diff est donc remplacé par **l'invariant que le gel visait vraiment** —
+    la garde d'API ci-dessous. `substitution.py` **reste gelé par diff** :
+    aucune décision ne l'a rouvert.
     """
     import subprocess
 
     out = subprocess.run(
         ["git", "diff", "--name-only", "e8614bd", "--",
-         "app/services/substitution.py",
-         "app/services/recommendation.py"],
+         "app/services/substitution.py"],
         cwd=str(REPO_ROOT), capture_output=True, text=True).stdout.strip()
     assert out == "", f"decision engine touched: {out}"
+
+
+def test_the_recommendation_engine_may_be_corrected_but_never_grow():
+    """Ce qui remplace le gel par diff de `recommendation.py`.
+
+    Le gel protégeait une chose vraie : **la présentation ne décide de rien**,
+    donc une tranche d'UI n'a aucune raison de faire grossir ce moteur. Il
+    protégeait aussi, par effet de bord, une fuite de causalité que personne ne
+    pouvait corriger sans le lever.
+
+    On épingle donc l'API publique — exactement comme `behavioral.py` depuis
+    `D6`. Un ajout rougit ; un retrait exige de modifier cette liste, donc de
+    le déclarer. La correction interne reste possible ; la croissance
+    silencieuse, non.
+
+    ⚠ `Signals` est inclus délibérément : c'est le contrat d'entrée du scoring.
+    Y ajouter un champ est le geste par lequel un signal non arbitré entrerait
+    dans la décision.
+    """
+    import dataclasses
+
+    import app.services.recommendation as reco
+
+    assert {f.name for f in dataclasses.fields(reco.Signals)} == {
+        "cold_start", "availability_by_zone", "hours_since_last_by_zone",
+        "last_strength_session_zones", "recent_strength_zones_by_session",
+        "hard_sets_by_zone_recent", "hard_sets_by_zone_24h", "kinds_recent",
+        "days_since_last_cardio", "days_since_last_strength", "fatigue_score",
+        "soft_restart", "median_hard_sets_14d", "hard_sets_14d_by_zone",
+    }, "le contrat d'entrée du scoring a changé de forme — décision requise"
+
+    public = {
+        n for n in vars(reco)
+        if not n.startswith("_")
+        and callable(getattr(reco, n))
+        and getattr(getattr(reco, n), "__module__", "") == reco.__name__
+    }
+    assert public == {
+        "Signals", "Candidate",
+        "recommend_next_session", "template_primary_zones",
+        "reset_template_zones_cache",
+    }, f"l'API du moteur de recommandation a changé — décision requise : {public}"
 
 
 def test_the_behavioural_engine_may_shrink_but_never_grow():

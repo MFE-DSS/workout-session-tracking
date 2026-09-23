@@ -30,11 +30,11 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from functools import lru_cache
 from typing import Any, Iterable
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from app.models.catalog import TemplateExercise, WorkoutTemplate
@@ -226,16 +226,56 @@ def _staleness_from_hard_sets(hard_sets: int) -> float:
 
 
 def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
-    """Gather all the signals scored templates will consult."""
+    """Gather all the signals scored templates will consult.
+
+    ══════════════════════════════════════════════════════════════════════
+    `REC-CP0a` — TOUTE REQUÊTE D'ICI EST BORNÉE PAR `now`. C'ÉTAIT FAUX.
+    ══════════════════════════════════════════════════════════════════════
+
+    Audit du 2026-09-23 : **zéro** des douze requêtes du chemin de
+    recommandation portait une borne supérieure sur `started_at`. Or
+    `recommend_next_session` accepte un `now` et `scripts/reco_calibration_report.py`
+    s'en sert pour rejouer le moteur à des horodatages PASSÉS.
+
+    Conséquence, prouvée par lecture : une décision évaluée au 1er mars lisait
+    les séances du 15 mars. La requête des cinq dernières séances était la
+    pire — `order_by desc limit 5` sans plafond rend les plus récentes de TOUTE
+    la table, donc systématiquement les mauvaises en rejeu.
+
+    Et le défaut était **invisible** : `max(0, (now - started).days)` écrasait
+    les deltas négatifs à zéro, si bien qu'une séance future se lisait
+    « aujourd'hui » au lieu de lever. Un clamp silencieux a caché le bug qu'il
+    aurait dû révéler — il est retiré ci-dessous, la borne le rend inutile.
+
+    Ce que cela invalide : les chiffres de
+    `docs/SPRINT_Sb_13_recommendation_telemetry_and_tuning_BUILD_REPORT.md`
+    décrivent un moteur qui lisait le futur. Ils ne sont pas une base de
+    comparaison.
+
+    La convention de borne est celle de `weekly_loop._load_window_sessions` —
+    `>= start` inclusif, `< end` exclusif — le seul chemin du dépôt qui était
+    déjà correct. On la copie plutôt que d'en inventer une seconde.
+    """
     # ── Lifetime total for cold start detection
-    lifetime_total = db.execute(
-        select(WorkoutSession)
-        .where(
-            WorkoutSession.user_id == user_id,
-            WorkoutSession.status == "completed",
-        )
-    ).scalars().all()
-    lifetime_count = len(lifetime_total)
+    #
+    # ⚠ DEUX CORRECTIONS ICI, ET LA SECONDE EST UNE FUITE.
+    #
+    # 1. La requête chargeait TOUTES les séances pour en prendre `len()`.
+    #    `func.count` fait le même travail sans rapatrier les lignes.
+    # 2. Elle ne filtrait PAS `excluded_from_stats` — seule requête du moteur
+    #    dans ce cas. Un utilisateur dont les trois seules séances sont
+    #    exclues des KPI sortait donc du démarrage à froid alors que tous les
+    #    autres signaux voyaient un historique vide.
+    lifetime_count = int(
+        db.execute(
+            select(func.count(WorkoutSession.id)).where(
+                WorkoutSession.user_id == user_id,
+                WorkoutSession.status == "completed",
+                WorkoutSession.excluded_from_stats.is_(False),
+                WorkoutSession.started_at < now,
+            )
+        ).scalar_one()
+    )
     cold_start = lifetime_count < COLD_START_LIFETIME_SESSIONS
 
     # ── Recent sessions (5 latest desc) — used for kinds + days_since_*
@@ -245,6 +285,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
             WorkoutSession.user_id == user_id,
             WorkoutSession.status == "completed",
             WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.started_at < now,
         )
         .order_by(WorkoutSession.started_at.desc())
         .limit(5)
@@ -275,7 +316,17 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
         k = "cardio" if (s.template and s.template.kind == "cardio") else "strength"
         kinds_recent.append(k)
         started = _as_aware(s.started_at)
-        delta_days = max(0, (now - started).days) if started else 0
+        # ⚠ LE `max(0, …)` EST RETIRÉ, ET C'EST DÉLIBÉRÉ.
+        #
+        # Il écrasait à zéro tout delta négatif, c'est-à-dire toute séance
+        # POSTÉRIEURE à la décision. Une séance du futur se lisait donc
+        # « aujourd'hui » au lieu de se signaler. C'est ce clamp qui a rendu
+        # la fuite de causalité invisible pendant tout ce temps.
+        #
+        # La requête est désormais bornée par `now` : `started` ne peut plus
+        # être postérieur, donc le clamp ne protégeait plus rien — il ne
+        # faisait que masquer le jour où la borne casserait.
+        delta_days = (now - started).days if started else 0
         if k == "cardio" and days_since_last_cardio is None:
             days_since_last_cardio = delta_days
         if k == "strength" and days_since_last_strength is None:
@@ -287,7 +338,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
 
     # ── Hard sets par zone — fenêtre 7j (staleness)
     window_7d_start = now - timedelta(days=STALENESS_WINDOW_DAYS)
-    zone_data_7d = _compute_tonnage_by_zone(db, user_id, window_7d_start)
+    zone_data_7d = _compute_tonnage_by_zone(db, user_id, window_7d_start, until=now)
     hard_sets_by_zone_recent = {
         zone: sum(int(e["hard_sets"]) for e in entries)
         for zone, entries in zone_data_7d.items()
@@ -295,7 +346,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
 
     # ── Hard sets par zone — fenêtre redundancy (V2: 24h)
     window_red_start = now - timedelta(hours=REDUNDANCY_WINDOW_HOURS)
-    zone_data_red = _compute_tonnage_by_zone(db, user_id, window_red_start)
+    zone_data_red = _compute_tonnage_by_zone(db, user_id, window_red_start, until=now)
     hard_sets_by_zone_24h = {
         zone: sum(int(e["hard_sets"]) for e in entries)
         for zone, entries in zone_data_red.items()
@@ -303,7 +354,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
 
     # ── Hard sets par zone — fenêtre 14j (spécialisation justifiée)
     window_14d_start = now - timedelta(days=SPECIALIZATION_WINDOW_DAYS)
-    zone_data_14d = _compute_tonnage_by_zone(db, user_id, window_14d_start)
+    zone_data_14d = _compute_tonnage_by_zone(db, user_id, window_14d_start, until=now)
     hard_sets_14d_by_zone = {
         zone: sum(int(e["hard_sets"]) for e in entries)
         for zone, entries in zone_data_14d.items()
@@ -327,6 +378,7 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
             WorkoutSession.status == "completed",
             WorkoutSession.excluded_from_stats.is_(False),
             WorkoutSession.started_at >= window_recent_start,
+            WorkoutSession.started_at < now,
         )
         .order_by(WorkoutSession.started_at.desc())
         .options(
@@ -398,7 +450,9 @@ def _compute_signals(db: Session, user_id: int, now: datetime) -> Signals:
     # ── Fatigue globale via behavioral
     from app.services.behavioral import compute_behavioral_state
     try:
-        state = compute_behavioral_state(db, user_id)
+        # `REC-CP0a` — `now` EST PASSÉ. Sans lui, la fatigue d'une décision
+        # rejouée au 1er mars était celle d'aujourd'hui.
+        state = compute_behavioral_state(db, user_id, now=now)
         fatigue_score = float(state.fatigue_score)
     except Exception:
         # Si pour une raison x behavioral échoue (tests limités), on dégrade
@@ -798,7 +852,20 @@ def recommend_next_session(
 ) -> dict[str, Any] | None:
     """Produce a {top, alternatives, context} dict or None when the user has
     an open session.
+
+    `REC-CP0a` — LE COURT-CIRCUIT EST BORNÉ, ET IL RENDAIT LE REJEU MUET.
+
+    Il cherchait une séance `in_progress` **sans aucune borne de temps** et
+    **avant même** que `now` soit résolu. En rejeu historique, une séance
+    ouverte aujourd'hui faisait donc rendre `None` à *tous* les horodatages
+    passés : l'échantillon de calibration se vidait en silence, et le rapport
+    affichait zéro phrase sans dire pourquoi.
+
+    La borne est `started_at < now` : une séance ouverte APRÈS la décision
+    rejouée n'existait pas au moment de cette décision.
     """
+    now = now or datetime.now(UTC)
+
     # Short-circuit when a session is open — the home view hides the
     # block in that case anyway.
     open_session = db.execute(
@@ -806,13 +873,13 @@ def recommend_next_session(
         .where(
             WorkoutSession.user_id == user_id,
             WorkoutSession.status == "in_progress",
+            WorkoutSession.started_at < now,
         )
         .limit(1)
     ).scalar_one_or_none()
     if open_session is not None:
         return None
 
-    now = now or datetime.now(timezone.utc)
     signals = _compute_signals(db, user_id, now)
     templates = _load_templates(db)
 

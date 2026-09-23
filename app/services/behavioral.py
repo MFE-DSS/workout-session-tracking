@@ -117,7 +117,7 @@ def compute_readiness(
 # honnêtes, pas sur celles-ci.
 
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
@@ -127,20 +127,42 @@ from app.services.performance import compute_composite_score
 from app.services.quality_score import compute_session_quality
 
 
-def compute_behavioral_state(db: Session, user_id: int) -> BehavioralState:
-    """Compute the full behavioral state for a user from DB data."""
-    now = datetime.now(timezone.utc)
+def compute_behavioral_state(
+    db: Session, user_id: int, *, now: datetime | None = None
+) -> BehavioralState:
+    """Compute the full behavioral state for a user from DB data.
+
+    `REC-CP0a` — **`now` EST DEVENU UN PARAMÈTRE, ET C'ÉTAIT LA FUITE LA PLUS
+    SILENCIEUSE DU CHEMIN DE RECOMMANDATION.**
+
+    Cette fonction lisait l'horloge murale, sans paramètre. Elle est pourtant
+    appelée par `recommendation._compute_signals`, qui reçoit un `now` et que
+    `scripts/reco_calibration_report.py` rejoue à des horodatages passés.
+    Résultat : la fatigue d'une décision rejouée au 1er mars était **toujours
+    celle d'aujourd'hui**, jamais celle du 1er mars.
+
+    Ce n'est pas un détail : `fatigue_score` porte le filtre
+    `_passes_fatigue_filter` et trois branches de phrase.
+
+    Le défaut par défaut reste l'horloge murale, donc les appelants qui
+    mesurent « maintenant » ne changent pas de comportement.
+
+    Les trois fenêtres sont bornées des deux côtés, convention
+    `weekly_loop._load_window_sessions` : `>= début`, `< fin`.
+    """
+    now = now or datetime.now(UTC)
     today = now.date()
 
     _uf = WorkoutSession.user_id == user_id
     _completed = WorkoutSession.status == "completed"
     _not_excluded = WorkoutSession.excluded_from_stats.is_(False)
+    _avant_decision = WorkoutSession.started_at < now
 
     # --- Last 3 completed sessions (for fatigue + performance) ---
     last_3 = list(
         db.execute(
             select(WorkoutSession)
-            .where(_uf, _completed, _not_excluded)
+            .where(_uf, _completed, _not_excluded, _avant_decision)
             .order_by(WorkoutSession.started_at.desc())
             .limit(3)
             .options(
@@ -179,7 +201,7 @@ def compute_behavioral_state(db: Session, user_id: int) -> BehavioralState:
     window_14 = now - timedelta(days=14)
     sessions_14d = db.execute(
         select(func.count(WorkoutSession.id))
-        .where(_uf, _completed, _not_excluded)
+        .where(_uf, _completed, _not_excluded, _avant_decision)
         .where(WorkoutSession.started_at >= window_14)
     ).scalar_one() or 0
     consistency = compute_consistency(sessions_14d)
@@ -193,7 +215,7 @@ def compute_behavioral_state(db: Session, user_id: int) -> BehavioralState:
     window_30 = now - timedelta(days=30)
     recent_dates_rows = db.execute(
         select(WorkoutSession.started_at)
-        .where(_uf)
+        .where(_uf, _avant_decision)
         .where(WorkoutSession.started_at >= window_30)
         .order_by(WorkoutSession.started_at.desc())
     ).scalars().all()
