@@ -173,7 +173,7 @@ def test_une_seance_posterieure_ne_change_pas_une_decision_passee(client):
     }
     assert not divergents, (
         "des séances POSTÉRIEURES à la décision ont changé ce que le moteur "
-        f"lit à T0 — il voit le futur.\n"
+        "lit à T0 — il voit le futur.\n"
         + "\n".join(f"  {c}: {a}  →  {b}" for c, (a, b) in divergents.items())
     )
 
