@@ -474,9 +474,58 @@ def test_les_prefixes_de_document_suivent_le_contrat_des_instruments():
     """`AUREN_INSTRUMENTS §2bis` nomme quatre surfaces qui ne sont pas des
     instruments. Elles doivent toutes être classées, sinon la frontière que ce
     contrat demande de rendre perceptible ne l'est qu'à moitié.
+
+    ⚠ ELLE ASSERTAIT `/atlas` À VIDE, ET C'EST MOI QUI L'AVAIS ÉCRITE.
+
+    `§2bis` nomme des SURFACES, pas des chemins d'URL. L'atlas vit à
+    `/science/atlas` — donc déjà sous `/science` — et il n'existe aucune route
+    `/atlas`. « `/atlas` est un DOCUMENT » passait sans rien observer.
+
+    On nomme donc les chemins RÉELS, et la garde suivante interdit qu'un
+    préfixe fantôme revienne.
     """
-    for chemin in ("/science", "/atlas", "/coach-report", "/export"):
+    for chemin in ("/science", "/science/atlas", "/coach-report", "/export"):
         assert mode_de_coque(chemin) == MODE_DOCUMENT, chemin
-    assert set(PREFIXES_DOCUMENT) >= {
-        "/science", "/atlas", "/coach-report", "/export",
-    }
+
+
+def test_chaque_prefixe_de_document_designe_une_route_reelle(client):
+    """⚠ LA GARDE QUI FERME LA CLASSE, PAS SEULEMENT LES DEUX CAS TROUVÉS.
+
+    Un préfixe qui ne matche aucune route ne classe rien : il est inoffensif
+    à l'exécution et **trompeur à la lecture**, et il rend vacuoles toutes les
+    assertions qui le nomment. Deux existaient — `/atlas` et
+    `/coach-body-snapshot`, ce dernier étant un PARTIEL inclus dans
+    `coach_report.html`, pas une page.
+
+    On interroge la table de routage réelle : c'est la seule source qui ne peut
+    pas se tromper sur ce que l'application sert.
+
+    ⚠ ELLE INTERROGE L'APPLICATION PAR UNE REQUÊTE, PAS PAR INTROSPECTION —
+    ET IL M'A FALLU DEUX ÉCHECS DE CI POUR Y VENIR.
+
+    Première écriture : `from app.main import app` à nu, puis lecture de
+    `app.routes`. Verte en local, **rouge sur la CI** — « `/coach-report` ne
+    désigne aucune route », ce qui est faux.
+
+    Seconde écriture : la même lecture, mais sur `client.app` — pour supprimer
+    une dépendance à l'état d'import que le `conftest` manipule. **Rouge à
+    l'identique.** Mon hypothèse était donc fausse, et c'est la mesure qui me
+    l'a dit, pas la relecture.
+
+    Je ne sais toujours pas pourquoi l'introspection de la table de routage
+    diverge entre mon poste (Python 3.14) et la CI (3.11.16), **et je ne le
+    prétends pas**. Mais je n'ai pas besoin de le savoir : la propriété que
+    cette garde doit tenir n'est pas « ce chemin figure dans une table
+    interne », c'est **« l'application sert quelque chose à ce chemin »**.
+
+    Une requête répond à cette question-là directement, dans l'environnement
+    réel, et aucune structure interne ne peut la tromper. Troisième écriture,
+    et la bonne : on mesure le produit, pas son inventaire.
+    """
+    for prefixe in PREFIXES_DOCUMENT:
+        reponse = client.get(prefixe, follow_redirects=False)
+        assert reponse.status_code != 404, (
+            f"« {prefixe} » est classé DOCUMENT mais l'application ne sert "
+            f"rien à ce chemin (404). Un préfixe fantôme ne classe rien et "
+            f"fait passer à vide toute assertion qui le nomme."
+        )

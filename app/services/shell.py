@@ -78,12 +78,26 @@ CHEMINS_INVITE = (
 #: `AUREN_INSTRUMENTS §2bis` — « quatre surfaces ne sont pas des instruments,
 #: et ce n'est pas un oubli » : le document destiné à un tiers, l'utilitaire de
 #: sauvegarde, la référence explicative, la référence anatomique.
+#:
+#: ⚠ CE SONT DES PRÉFIXES DE ROUTE, PAS DES NOMS DE SURFACE — ET MA PREMIÈRE
+#: ÉCRITURE CONFONDAIT LES DEUX.
+#:
+#: `§2bis` nomme des SURFACES : « coach_report + coach_body_snapshot »,
+#: « science + science_diagram », « atlas ». J'en ai fait des chemins d'URL, et
+#: deux d'entre eux ne désignaient **aucune route** :
+#:
+#:   · `coach_body_snapshot` est un PARTIEL inclus dans `coach_report.html`,
+#:     pas une page — c'est une section du document, pas un document ;
+#:   · l'atlas vit à `/science/atlas`, donc déjà sous `/science`.
+#:
+#: Le défaut était inoffensif — un préfixe qui ne matche rien ne classe rien —
+#: mais il mentait au lecteur suivant, et **ma propre garde l'assertait à
+#: vide** : « `/atlas` est un DOCUMENT » passait sans que `/atlas` existe.
+#: `test_chaque_prefixe_de_document_designe_une_route_reelle` ferme la classe.
 PREFIXES_DOCUMENT = (
     "/coach-report",
-    "/coach-body-snapshot",
     "/export",
     "/science",
-    "/atlas",
 )
 
 
