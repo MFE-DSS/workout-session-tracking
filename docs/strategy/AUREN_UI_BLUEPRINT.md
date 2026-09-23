@@ -566,6 +566,15 @@ comme **ancres visuelles canoniques**.
 · tout service métier. Une tranche UI qui en a besoin **bloque** et documente
 un `UI_DATA_GAP`.
 
+> ⚠ **CETTE INTERDICTION RESTE ENTIÈRE POUR LA QUEUE UI**, y compris pour
+> `recommendation.py`. L'arbitrage opérateur du 2026-09-23 a levé le gel de ce
+> fichier pour **`REC-CP`**, qui est une tranche de MOTEUR, pas d'UI — la
+> distinction est exactement ce que cette liste protège. Une tranche UI qui
+> voudrait s'en prévaloir bloque toujours et documente un `UI_DATA_GAP`.
+>
+> Détail de la levée et de la garde d'API qui remplace le gel par diff :
+> `Sx_AUREN_ORCHESTRATOR_01_GAP_CONSOLIDATION_SPEC.md §6`.
+
 ---
 
 ## 5bis. `AUREN_EXPERIENCE_ARCHITECTURE_V4` — après la fermeture UIV3

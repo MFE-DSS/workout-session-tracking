@@ -37,6 +37,34 @@ le blueprint opérateur, et les manques restants.
    pas être modifiés** (motif « wrapper externe », précédent `recommendation_explainer.py`). Cette
    règle **contraint la conception** de tout ce qui touche à la planification et à la récupération.
 
+   > ⚠️ **LEVÉE — ARBITRAGE OPÉRATEUR DU 2026-09-23 (`REC-CP`).**
+   >
+   > Cette contrainte est **levée pour le moteur de recommandation**. Elle
+   > reste en vigueur pour `substitution.py`.
+   >
+   > Le §P0.2 ci-dessous exigeait : *« STOP : si la correction exige de toucher
+   > `recommendation.py` → STOP + arbitrage. »* La directive de passe critique
+   > du 2026-09-23 est cet arbitrage, dans ses propres termes : *« audit the
+   > CURRENT CANONICAL engine … Fix the root boundary if violated. Do not
+   > merely patch the reporting script. »*
+   >
+   > **Ce que le gel a laissé vivre**, mesuré par lecture de code le même jour :
+   > aucune des douze requêtes du chemin de recommandation n'était bornée par
+   > la date de décision, `compute_behavioral_state` n'avait pas de paramètre
+   > `now`, le compte de démarrage à froid ignorait `excluded_from_stats`, et
+   > un `max(0, …)` masquait le tout. Tout rejeu historique lisait le futur —
+   > donc les chiffres de calibration produits sous ce gel décrivent un moteur
+   > qui trichait.
+   >
+   > Le motif « wrapper externe » ne pouvait pas corriger cela : une fuite de
+   > causalité vit dans les requêtes, pas à la frontière.
+   >
+   > **Le gel par diff est remplacé par une garde d'API**, même dispositif que
+   > l'amendement `D6` de `behavioral.py` :
+   > `tests/test_ui_session_choices.py::test_the_recommendation_engine_may_be_corrected_but_never_grow`.
+   > La correction interne est possible ; la croissance silencieuse ne l'est
+   > pas.
+
 ---
 
 ## A. CURRENT CAPABILITY MAP
