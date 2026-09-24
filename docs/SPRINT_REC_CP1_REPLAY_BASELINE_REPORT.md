@@ -294,3 +294,38 @@ La comparaison V2 vs V3 se fera sur **ce corpus**, avec ces agrégats. La varié
 ne sera pas retenue comme preuve de justesse.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+---
+
+## Closeout
+
+| | |
+|---|---|
+| PR | [#245](https://github.com/MFE-DSS/workout-session-tracking/pull/245) |
+| Merge | `abb362574cab9909c57ac2f63f120e8d1c232a3c` |
+| CI canonique | run `35982648659` — **7/7 verte** |
+| Sonar (PR) | gate `OK` — 0 bug, 0 code smell, 0 vulnérabilité, 0 % duplication |
+| Sweep local | 337/337 fichiers, `tous les lots sont verts.` |
+| Threads de revue | 0 |
+
+Aucun fichier applicatif modifié : la tranche n'ajoute qu'un harnais, des
+gardes et ce rapport. Les deux mutations citées au `§4` ont été appliquées
+**seule à seule** puis annulées, et l'arbre a été vérifié propre avant commit.
+
+### Ce que cette tranche a appris, au-delà de son objet
+
+Deux fois, la cause du défaut a été attribuée à tort — puis réfutée par une
+mesure et non par un raisonnement. Le harnais existe précisément pour rendre
+cette réfutation possible avant qu'une correction ne soit écrite.
+
+Et deux défauts appartenaient à l'instrument, pas au produit : un corpus qui
+partait de zéro mesurait le repli de démarrage à froid ; un helper de test
+empilait toutes les trajectoires sur le même utilisateur. La réserve du `§3bis`
+en signale un troisième, corrigé en `REC-CP2`.
+
+### Suite
+
+`REC-CP2` ([#246](https://github.com/MFE-DSS/workout-session-tracking/pull/246))
+corrige l'instrument, construit la politique V3 **en ombre** et re-mesure. Il
+révise le diagnostic de ce rapport sur un point important : en boucle fermée,
+V2 ne se bloque pas.
