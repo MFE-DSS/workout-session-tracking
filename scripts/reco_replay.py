@@ -193,7 +193,21 @@ def semer_seance(db, user_id: int, s: Seance, origine: datetime) -> int:
         global_state=s.ressenti,
         excluded_from_stats=s.exclue,
     )
-    for pos, ex in enumerate(sorted(tpl.exercises, key=lambda e: e.position)[:2],
+    # ⚠ TOUS LES EXERCICES DU GABARIT, PAS LES DEUX PREMIERS.
+    #
+    # `REC-CP2` — la première version en posait deux, et cela rendait le corpus
+    # incapable de juger une politique fondée sur la couverture.
+    #
+    # Mesuré : `legs-a` compte SEPT exercices, et les cinq ignorés portaient
+    # tout le travail de `core` et de `calves`. Le corpus ne servait donc que
+    # sept zones sur onze — `core`, `calves`, `delt_lat` et `delt_post`
+    # restaient à zéro quoi que fasse l'utilisateur. Or `liss-abs` a pour
+    # unique zone `core` : il était structurellement, et à jamais, « la zone la
+    # plus délaissée ».
+    #
+    # Une séance terminée pose les exercices de son gabarit. Tronquer, c'était
+    # fabriquer un déficit permanent puis le mesurer.
+    for pos, ex in enumerate(sorted(tpl.exercises, key=lambda e: e.position),
                              start=1):
         se = SessionExercise(
             exercise_code_snapshot=ex.code,
@@ -255,8 +269,80 @@ class Decision:
     observation_partielle: bool = False
 
 
+def _tranchee_par_le_catalogue(reco: dict, marge: int | None) -> bool:
+    """La décision a-t-elle été tranchée par l'ordre du catalogue ?
+
+    ⚠ LA MÉTRIQUE DOIT VOULOIR DIRE LA MÊME CHOSE DES DEUX CÔTÉS, sinon la
+    comparaison V2/V3 n'en est pas une.
+
+    V2 additionne six termes en un entier borné : deux candidats à score égal
+    n'ont pas été départagés par une preuve, mais par `display_order` puis
+    `slug`. V3 n'a pas de somme — il rend la réponse directement, en comparant
+    les clés lexicographiques privées de leurs deux derniers recours.
+
+    Les deux mesurent donc la même propriété, par le seul moyen dont chaque
+    politique dispose.
+    """
+    tranche = reco["context"].get("departage_par_catalogue")
+    if tranche is not None:
+        return bool(tranche)
+    return marge == 0
+
+
+def _decision_de(jour: int, reco: dict | None, signaux,
+                 vu_gabarit: dict, vu_famille: dict) -> Decision:
+    if reco is None:
+        return Decision(jour=jour, gagnant=None, famille=None, score=None)
+
+    top, alts = reco["top"], reco["alternatives"]
+    slug = top["template"].slug
+    fam = famille_de(slug)
+    marge = (top["score"] - alts[0]["score"]) if alts else None
+    return Decision(
+        jour=jour,
+        gagnant=slug,
+        famille=fam,
+        score=top["score"],
+        alternatives=tuple(a["template"].slug for a in alts),
+        marge=marge,
+        egalite_en_tete=_tranchee_par_le_catalogue(reco, marge),
+        phrase=top["phrase"],
+        repli=not alts,  # le repli ne rend JAMAIS d'alternative
+        demarrage_a_froid=bool(reco["context"].get("cold_start")),
+        jours_depuis_meme_gabarit=(
+            jour - vu_gabarit[slug] if slug in vu_gabarit else None),
+        jours_depuis_meme_famille=(
+            jour - vu_famille[fam] if fam in vu_famille else None),
+        expo_14j=dict(sorted(signaux.hard_sets_14d_by_zone.items())),
+        familles_recentes=tuple(
+            famille_de(z[0]) if z else None
+            for z in signaux.recent_strength_zones_by_session),
+        observation_partielle=signaux.observation_partielle,
+    )
+
+
+def politique(nom: str):
+    """La politique de recommandation à rejouer, par nom.
+
+    `REC-CP2` — le harnais devient un banc à deux politiques. Résolution
+    **paresseuse** : importer les moteurs au chargement du module casserait le
+    corpus sous pytest, dont le conftest purge `app.*` entre les tests.
+    """
+    if nom == "v2":
+        from app.services.recommendation import recommend_next_session
+        return recommend_next_session
+    if nom == "v3":
+        from app.services.recommendation_v3 import recommander_v3
+        return recommander_v3
+    raise ValueError(f"politique inconnue : {nom!r}")
+
+
+POLITIQUES = ("v2", "v3")
+
+
 def rejouer(db, user_id: int, traj: Trajectoire, *,
-            origine: datetime = ORIGINE) -> list[Decision]:
+            origine: datetime = ORIGINE,
+            nom_politique: str = "v2") -> list[Decision]:
     """Sème la trajectoire, puis décide à chaque instant de décision.
 
     Le semis est fait **en une fois**. C'est licite depuis `REC-CP0a` — et
@@ -265,9 +351,10 @@ def rejouer(db, user_id: int, traj: Trajectoire, *,
     """
     from app.services.recommendation import (
         _compute_signals,
-        recommend_next_session,
         reset_template_zones_cache,
     )
+
+    recommander = politique(nom_politique)
 
     for s in traj.echauffement:
         semer_seance(db, user_id, s, origine)
@@ -281,45 +368,75 @@ def rejouer(db, user_id: int, traj: Trajectoire, *,
     for s in traj.seances:
         quand = origine + timedelta(days=s.jour) + HEURE_DECISION
         reset_template_zones_cache()
-        reco = recommend_next_session(db, user_id, now=quand)
+        reco = recommander(db, user_id, now=quand)
         signaux = _compute_signals(db, user_id, quand)
-
-        if reco is None:
-            decisions.append(Decision(jour=s.jour, gagnant=None, famille=None,
-                                      score=None))
-        else:
-            top = reco["top"]
-            alts = reco["alternatives"]
-            slug = top["template"].slug
-            fam = famille_de(slug)
-            marge = (top["score"] - alts[0]["score"]) if alts else None
-            decisions.append(Decision(
-                jour=s.jour,
-                gagnant=slug,
-                famille=fam,
-                score=top["score"],
-                alternatives=tuple(a["template"].slug for a in alts),
-                marge=marge,
-                egalite_en_tete=(marge == 0),
-                phrase=top["phrase"],
-                repli=not alts,  # le repli ne rend JAMAIS d'alternative
-                demarrage_a_froid=bool(reco["context"].get("cold_start")),
-                jours_depuis_meme_gabarit=(
-                    s.jour - vu_gabarit[slug] if slug in vu_gabarit else None),
-                jours_depuis_meme_famille=(
-                    s.jour - vu_famille[fam] if fam in vu_famille else None),
-                expo_14j=dict(sorted(signaux.hard_sets_14d_by_zone.items())),
-                familles_recentes=tuple(
-                    famille_de(z[0]) if z else None
-                    for z in signaux.recent_strength_zones_by_session),
-                observation_partielle=signaux.observation_partielle,
-            ))
+        decisions.append(_decision_de(s.jour, reco, signaux,
+                                      vu_gabarit, vu_famille))
 
         # La séance de ce jour a eu lieu APRÈS la décision.
         vu_gabarit[s.slug] = s.jour
         f = famille_de(s.slug)
         if f:
             vu_famille[f] = s.jour
+
+    return decisions
+
+
+def rejouer_en_boucle(db, user_id: int, *, nom_politique: str = "v2",
+                      nb: int = 10, pas: int = 2,
+                      origine: datetime = ORIGINE,
+                      amorce: tuple[Seance, ...] = ECHAUFFEMENT
+                      ) -> list[Decision]:
+    """⚠ BOUCLE FERMÉE : L'UTILISATEUR **SUIT** LA RECOMMANDATION.
+
+    Pourquoi ce mode existe, et pourquoi son absence faussait la mesure.
+
+    Les dix-sept trajectoires sont en **boucle ouverte** : l'historique est
+    écrit d'avance et le conseil n'est jamais suivi. Elles mesurent donc une
+    seule chose — la sensibilité de la décision à l'histoire — et elles la
+    mesurent bien.
+
+    Mais elles ne peuvent pas mesurer la plainte de dogfood, qui porte sur
+    l'ÉVOLUTION : « la recommandation reste bloquée sur le même type de séance ».
+    Pire, elles la simulent artificiellement : un gabarit recommandé mais jamais
+    effectué reste éternellement « jamais fait », donc éternellement le plus
+    ancien au départage, donc éternellement gagnant. Le blocage observé était en
+    partie celui du corpus, pas celui de la politique.
+
+    Ici, chaque décision est **exécutée** avant la suivante. Une politique saine
+    doit alors se déplacer d'elle-même : la zone qu'elle vient de servir cesse
+    d'être la plus délaissée. Une politique qui répète encore en boucle fermée
+    répète pour de bon.
+    """
+    from app.services.recommendation import (
+        _compute_signals,
+        reset_template_zones_cache,
+    )
+
+    recommander = politique(nom_politique)
+    for s in amorce:
+        semer_seance(db, user_id, s, origine)
+
+    vu_gabarit: dict[str, int] = {}
+    vu_famille: dict[str, int] = {}
+    decisions: list[Decision] = []
+
+    for i in range(nb):
+        jour = i * pas
+        quand = origine + timedelta(days=jour) + HEURE_DECISION
+        reset_template_zones_cache()
+        reco = recommander(db, user_id, now=quand)
+        signaux = _compute_signals(db, user_id, quand)
+        d = _decision_de(jour, reco, signaux, vu_gabarit, vu_famille)
+        decisions.append(d)
+
+        if d.gagnant is None:
+            continue
+        # La séance a lieu APRÈS la décision, le même jour.
+        semer_seance(db, user_id, Seance(jour=jour, slug=d.gagnant), origine)
+        vu_gabarit[d.gagnant] = jour
+        if d.famille:
+            vu_famille[d.famille] = jour
 
     return decisions
 
@@ -376,6 +493,8 @@ def main() -> int:
     p.add_argument("--json", action="store_true",
                    help="sortie brute, décision par décision")
     p.add_argument("--trajectoire", help="n'en rejouer qu'une, par nom")
+    p.add_argument("--politique", choices=POLITIQUES, default="v2",
+                   help="moteur à rejouer (défaut : v2, celui de production)")
     args = p.parse_args()
 
     from app.database import SessionLocal
@@ -398,7 +517,8 @@ def main() -> int:
             db.commit()
             uid = u.id
         with SessionLocal() as db:
-            decisions = rejouer(db, uid, traj)
+            decisions = rejouer(db, uid, traj,
+                                nom_politique=args.politique)
         tout.append((traj, decisions))
 
     if args.json:

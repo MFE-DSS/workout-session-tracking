@@ -340,11 +340,32 @@ def compute_recent_exercise_activity(
     return out[:limit]
 
 
-def compute_template_kpis(db: Session, *, user_id: int | None = None) -> list[TemplateKPI]:
+def compute_template_kpis(
+    db: Session,
+    *,
+    user_id: int | None = None,
+    until: datetime | None = None,
+) -> list[TemplateKPI]:
     """Per-template summary: number of completed sessions, when the
     last one happened, and the average success score across all its
     logged exercises. Keyed on `template_slug_snapshot` so reseeded
     templates still show up coherently.
+
+    `REC-CP2` — **`until` BORNE LA FENÊTRE PAR LE HAUT.**
+
+    Cette fonction devient une entrée du moteur de recommandation : la spec
+    (`SPIGNOS_NEXT_SESSION_RECOMMENDATION_SPEC_v1.md:32`) la désigne depuis
+    l'origine comme la source de `last_done_at`, que le départage promet et
+    n'a jamais lu. Le moyen existait ; il n'était pas branché.
+
+    Mais le brancher tel quel rouvrirait exactement la fuite que `REC-CP0a` a
+    fermée : rejouée à une date passée, la fonction rendrait la dernière séance
+    **future**, et le départage par ancienneté trancherait sur le futur.
+
+    `until` est **optionnel** pour que les appelants d'affichage restent
+    inchangés — ils mesurent « jusqu'à maintenant », ce qui est correct pour
+    eux. La borne est `< until`, exclusive, comme partout ailleurs dans le
+    dépôt ; on copie la convention plutôt que d'en inventer une seconde.
     """
     stmt = (
         select(
@@ -360,6 +381,9 @@ def compute_template_kpis(db: Session, *, user_id: int | None = None) -> list[Te
         .where(WorkoutSession.user_id == user_id if user_id is not None else True)
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
+        .where(
+            WorkoutSession.started_at < until if until is not None else True
+        )
         .group_by(
             WorkoutSession.template_slug_snapshot,
             WorkoutSession.template_name_snapshot,
