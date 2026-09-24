@@ -244,22 +244,13 @@ def _depuis_la_trace(
     limitants = [_clean(r) for r in trace.get("facteurs_limitants") or ()]
     justification = _clean(trace.get("justification_repetition"))
 
-    raisons: list[str] = []
-    if consequence:
-        raisons.append(consequence)
-    phrase = _clean(top.get("phrase"))
-    if phrase:
-        raisons.append(phrase)
-    for r in gagnants:
-        # La phrase est déjà une lecture du premier facteur gagnant : la
-        # répéter mot pour mot ferait deux fois la même raison.
-        if r and not _dit_la_meme_chose(r, raisons):
-            raisons.append(_en_phrase(r))
+    raisons: list[str] = [
+        t for t in (consequence, _clean(top.get("phrase"))) if t
+    ]
+    _ajouter_sans_repeter(raisons, gagnants)
     if justification:
         raisons.append(justification)
-    for r in limitants:
-        if r and not _dit_la_meme_chose(r, raisons):
-            raisons.append(_en_phrase(r, prefixe="Mais "))
+    _ajouter_sans_repeter(raisons, limitants, prefixe="Mais ")
 
     partielle = trace.get("provenance") == "partielle"
     if not raisons:
@@ -274,6 +265,26 @@ def _depuis_la_trace(
         "confidence": "low" if partielle else "ok",
         "fallback_note": _NOTE_OBSERVATION_PARTIELLE if partielle else None,
     }
+
+
+def _ajouter_sans_repeter(
+    raisons: list[str], facteurs: list[str], *, prefixe: str = ""
+) -> None:
+    """Ajoute des facteurs, sans redire ce qui est déjà dit.
+
+    ⚠ EXTRAITE POUR CE QU'ELLE NOMME, PAS SEULEMENT POUR RÉDUIRE UN CHIFFRE.
+
+    Deux boucles identiques — gagnants, puis limitants — portaient la même
+    condition imbriquée dans le corps de `_depuis_la_trace`. Sonar l'a signalé
+    en complexité cognitive ; le vrai défaut était qu'une règle employée deux
+    fois n'avait pas de nom.
+
+    La phrase compacte est déjà une lecture du premier facteur gagnant : la
+    répéter mot pour mot ferait deux fois la même raison à l'écran.
+    """
+    for facteur in facteurs:
+        if facteur and not _dit_la_meme_chose(facteur, raisons):
+            raisons.append(_en_phrase(facteur, prefixe=prefixe))
 
 
 def _en_phrase(facteur: str, *, prefixe: str = "") -> str:
