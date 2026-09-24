@@ -184,3 +184,38 @@ est permis, mais porté par la couverture — jamais par une égalité, un
    catalogue relevé, non interprété.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+---
+
+## Closeout
+
+| | |
+|---|---|
+| PR | [#246](https://github.com/MFE-DSS/workout-session-tracking/pull/246) |
+| Merge | `242674b611a48b0517f014a163514f9323d0f632` |
+| CI canonique | run `35984153013` — **7/7 verte** |
+| Sonar (PR) | gate `OK` — couverture nouveau code **93,9 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Sweep local | 338/338 fichiers, `tous les lots sont verts.` |
+| Threads de revue | 0 |
+
+V3 est dans la canonique **en ombre**. La politique de production reste V2, et
+`test_la_politique_v3_ne_pilote_aucune_surface` le vérifie par balayage des
+importations réelles.
+
+### Ce que cette tranche a appris, au-delà de son objet
+
+Deux fois, l'instrument était en cause avant le produit. Le corpus tronquait
+chaque séance à deux exercices et ne servait que sept zones sur onze — il
+fabriquait le déficit permanent qu'il prétendait observer. Puis la boucle
+fermée a montré que V2 ne se bloque pas quand le conseil est suivi, ce qui a
+rétréci et précisé le diagnostic de `REC-CP1`.
+
+Une garde que j'avais écrite avait tort, pas le code : exiger que V3 ne répète
+jamais revenait à traiter la variété comme une preuve de justesse, ce que le
+`§11` proscrit explicitement.
+
+### Suite
+
+`REC-CP3` ([#247](https://github.com/MFE-DSS/workout-session-tracking/pull/247))
+donne à V3 son explication structurée — ce qui lève le blocage technique de la
+promotion, V3 rendant jusque-là une phrase vide.
