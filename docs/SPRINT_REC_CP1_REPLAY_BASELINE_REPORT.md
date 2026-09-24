@@ -94,6 +94,36 @@ Le blocage rapporté en dogfood est donc reproduit et chiffré.
 
 ---
 
+### ⚠ 3bis. Ce que ce baseline NE mesure PAS — réserve à lever en `REC-CP2`
+
+`semer_seance` ne pose que **les deux premiers exercices** de chaque gabarit.
+Mesuré : `legs-a` compte **sept** exercices ; les cinq ignorés contiennent le
+travail de `core` et de `calves`.
+
+Conséquence, relevée sur le corpus :
+
+```
+exposition 14 j = biceps 4 · lats 6 · pecs 12 · posterior 6 · quads 6
+                  triceps 4 · upper_back 6
+```
+
+**Sept zones sur onze.** `core`, `calves`, `delt_lat` et `delt_post` ne sont
+**jamais** travaillées par le corpus. Or `liss-abs` a pour unique zone `core`,
+et `catch-up-shoulders` a `delt_lat`/`delt_post` — ces gabarits sont donc
+structurellement, et à jamais, « la zone la plus délaissée ».
+
+Ce que cela n'affecte pas : le diagnostic. `dispo` est plate parce qu'elle
+sature, pas à cause du corpus ; les deux mutations portent sur des constantes ;
+et l'absence de lecteur pour la fenêtre 14 j est `CODE_TRACED`.
+
+Ce que cela affecte : **toute politique qui classerait par couverture ne peut
+pas être jugée sur ce corpus.** L'instrument doit d'abord semer des séances
+complètes. C'est le premier travail de `REC-CP2`, et ce baseline sera
+re-mesuré à cette occasion.
+
+(Relevé au passage, sans l'interpréter : `liss-only` n'a **aucun** exercice au
+catalogue, donc aucune zone. C'est un fait de catalogue, pas une conclusion.)
+
 ## 4. La réponse au `§6` — et deux attributions fausses de ma main
 
 J'ai attribué la cause deux fois, et deux fois à tort. Les deux réfutations sont
