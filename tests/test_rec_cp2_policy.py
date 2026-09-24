@@ -78,9 +78,16 @@ def test_la_politique_v3_ne_pilote_aucune_surface():
     import pathlib
 
     racine = pathlib.Path(__file__).resolve().parents[1]
+    # ⚠ LE REGISTRE UNIQUE DES LECTEURS AUTORISÉS DE V3.
+    #
+    # Il n'en existe pas de second : `REC-CP3` a d'abord écrit sa propre copie
+    # de cette liste, et deux registres du même fait divergent toujours. Un
+    # nouveau lecteur se déclare ICI, et la garde l'exige en rougissant.
     autorises = {
         "scripts/reco_replay.py",
         "tests/test_rec_cp2_policy.py",
+        # `REC-CP3` — lit la trace d'explication produite par V3.
+        "tests/test_rec_cp3_explication.py",
         "app/services/recommendation_v3.py",
     }
     coupables = []

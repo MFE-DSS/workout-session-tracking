@@ -100,6 +100,14 @@ _LOW_DATA_PHRASE = "Pas assez de données pour expliquer plus finement."
 _COLD_START_PHRASE = "Première séance — démarrage doux suggéré."
 _FALLBACK_NOTE = "Pas encore assez de données pour personnaliser."
 
+# `REC-CP3` — distinct de `_FALLBACK_NOTE` : « je n'ai pas assez d'historique »
+# et « je n'ai pas su lire un exercice de ton historique » ne disent pas la même
+# chose, et les confondre ferait passer une lacune de classement pour une
+# absence de données.
+_NOTE_OBSERVATION_PARTIELLE = (
+    "Un exercice de ton historique n'a pas pu être classé."
+)
+
 
 def explain_recommendation(reco_payload: Any) -> dict[str, Any]:
     """Produce an explanation dict for the home/launcher UI.
@@ -115,6 +123,19 @@ def explain_recommendation(reco_payload: Any) -> dict[str, Any]:
     context = reco_payload.get("context") or {}
     if not isinstance(top, dict) or not isinstance(context, dict):
         return _empty(available=False)
+
+    # ── `REC-CP3` — SI LE MOTEUR A TRANSMIS SA TRACE, ON LA LIT.
+    #
+    # Tout ce qui suit cette branche re-dérive des raisons depuis un contexte
+    # appauvri : quatre clés et la phrase déjà écrite. C'était le seul moyen
+    # disponible tant que le moteur ne disait pas ce qui avait décidé.
+    #
+    # Une politique qui transmet sa trace rend cette reconstruction non
+    # seulement inutile mais nuisible : deux logiques parallèles finissent par
+    # diverger, et c'est la reconstruction qui a tort, puisqu'elle devine.
+    trace = top.get("explication")
+    if isinstance(trace, dict):
+        return _depuis_la_trace(trace, top)
 
     reasons: list[str] = []
     confidence = "ok"
@@ -165,6 +186,76 @@ def explain_recommendation(reco_payload: Any) -> dict[str, Any]:
         "confidence": confidence,
         "fallback_note": fallback_note,
     }
+
+
+# ───────── `REC-CP3` — lecture de la trace ─────────
+
+
+def _depuis_la_trace(trace: dict, top: dict) -> dict[str, Any]:
+    """Construit l'explication **en lisant** ce que le moteur a décidé.
+
+    Aucune re-dérivation : les facteurs viennent du moteur, dans son ordre de
+    précédence. La seule chose que cette fonction décide est la mise en forme.
+
+    ⚠ Aucun nombre ne traverse. Ni score, ni déficit, ni jours. La trace n'en
+    contient pas, et cette fonction n'en fabrique pas : l'utilisateur reçoit
+    les raisons, pas la mécanique.
+    """
+    gagnants = [_clean(r) for r in trace.get("facteurs_gagnants") or ()]
+    limitants = [_clean(r) for r in trace.get("facteurs_limitants") or ()]
+    justification = _clean(trace.get("justification_repetition"))
+
+    raisons: list[str] = []
+    phrase = _clean(top.get("phrase"))
+    if phrase:
+        raisons.append(phrase)
+    for r in gagnants:
+        # La phrase est déjà une lecture du premier facteur gagnant : la
+        # répéter mot pour mot ferait deux fois la même raison.
+        if r and not _dit_la_meme_chose(r, raisons):
+            raisons.append(_en_phrase(r))
+    if justification:
+        raisons.append(justification)
+    for r in limitants:
+        if r and not _dit_la_meme_chose(r, raisons):
+            raisons.append(_en_phrase(r, prefixe="Mais "))
+
+    partielle = trace.get("provenance") == "partielle"
+    if not raisons:
+        raisons = [_FALLBACK_PHRASE]
+
+    return {
+        "available": True,
+        "primary_reason": raisons[0],
+        "reasons": raisons[:_MAX_REASONS],
+        # L'incertitude vient de l'observation, pas d'une heuristique locale :
+        # la même grammaire que `zone_exposure`, sans en créer une seconde.
+        "confidence": "low" if partielle else "ok",
+        "fallback_note": _NOTE_OBSERVATION_PARTIELLE if partielle else None,
+    }
+
+
+def _en_phrase(facteur: str, *, prefixe: str = "") -> str:
+    """Un facteur du moteur, présenté comme une raison autonome.
+
+    Les facteurs sont rédigés en minuscule et sans point, pour se composer dans
+    la phrase compacte. Affichés tels quels comme raisons séparées, ils rendent
+    « zones récupérées » — sans capitale ni ponctuation. Aucune garde de
+    structure ne voyait cela ; la garde de RENDU l'a attrapé au premier essai.
+
+    La mise en forme appartient bien ici : le moteur dit ce qui a décidé, ce
+    module décide comment ça se lit.
+    """
+    texte = prefixe + facteur
+    texte = texte[:1].upper() + texte[1:]
+    return texte if texte.endswith(".") else texte + "."
+
+
+def _dit_la_meme_chose(candidat: str, deja: list[str]) -> bool:
+    """La phrase compacte étant tirée du premier facteur gagnant, elle le
+    contient mot pour mot à la capitalisation et au point près."""
+    noyau = candidat.rstrip(".").lower()
+    return any(noyau in existant.rstrip(".").lower() for existant in deja)
 
 
 # ───────── helpers (pure, no side effects) ─────────
