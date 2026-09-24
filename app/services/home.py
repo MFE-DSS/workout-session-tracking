@@ -163,9 +163,18 @@ def _build_today(db: Session, user: User, now: datetime) -> dict[str, Any]:
         }
 
     try:
-        from app.services.recommendation import recommend_next_session
+        # `REC-CP4` — MÊME COMPOSITION QUE `pages._build_reco_context`.
+        #
+        # Deux chemins d'appel différents pour la même décision finiraient par
+        # diverger : Mission afficherait un gabarit et son bandeau de raisons
+        # en décrirait un autre. Un seul point d'entrée, donc.
+        from app.services import advice_memory
 
-        reco = recommend_next_session(db, user.id, now=now)
+        reco = advice_memory.recommander(
+            db, user.id, now=now,
+            politique=advice_memory.POLITIQUE_SERVIE,
+            avec_memoire=advice_memory.MEMOIRE_SERVIE,
+        )
     except Exception:
         reco = None
 

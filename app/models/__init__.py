@@ -15,6 +15,7 @@ from app.models import (  # noqa: F401
     muscle,
     plan_adaptation_dismissal,
     readiness,
+    recommendation_episode,
     session,
     sharing,
     squad,

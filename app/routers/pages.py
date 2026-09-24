@@ -96,8 +96,16 @@ def _build_reco_context(db, user_id: int, open_session) -> dict | None:
     if open_session is not None:
         return None
     try:
-        from app.services.recommendation import recommend_next_session
-        return recommend_next_session(db, user_id)
+        # `REC-CP4` — un seul point d'entrée pour les quatre systèmes comparés.
+        # Appeler `recommend_next_session` directement ici ferait servir une
+        # décision SANS empreinte de contexte : les formulaires ne pourraient
+        # plus identifier le conseil, et un refus deviendrait inobservable.
+        from app.services import advice_memory
+        return advice_memory.recommander(
+            db, user_id,
+            politique=advice_memory.POLITIQUE_SERVIE,
+            avec_memoire=advice_memory.MEMOIRE_SERVIE,
+        )
     except Exception:
         # Recommendation is a non-critical signal — never break the home
         # or launcher because of it.
@@ -529,6 +537,19 @@ def launcher(
     variant: str | None = Query(None),
 ) -> HTMLResponse:
     active_session = latest_open_session(db, user.id)
+    # `REC-CP4` — LA RECOMMANDATION EST CALCULÉE UNE FOIS, POUR TOUTES LES
+    # ÉTAPES.
+    #
+    # Elle n'était passée qu'à l'étape 1, où le bloc s'affiche. Mais le
+    # lanceur est un ASSISTANT : le vrai bouton « Démarrer » vit à l'étape 3,
+    # et l'identité de décision n'y arrivait pas. Démarrer autre chose depuis
+    # cette liste — le geste même que Mission propose sous « Choisir une autre
+    # séance » — n'était donc rattaché à aucun conseil, et le refus se perdait
+    # en silence.
+    #
+    # ⚠ AUCUN CHANGEMENT VISUEL : `launcher.html` n'inclut le bloc que sous
+    # `{% if step == 1 %}`. Les autres étapes ne gagnent que des champs cachés.
+    _reco = _build_reco_context(db, user.id, active_session)
 
     # Step 1: no type, or invalid type → list types.
     if type is None or type not in BRANCH_TREE:
@@ -563,6 +584,7 @@ def launcher(
                     "type_label": type_label,
                     "templates_list": templates_list,
                     "active_session": active_session,
+                    "reco": _reco,
                 },
             )
         # Fall through to step 1 if direct branch is empty.
@@ -575,6 +597,7 @@ def launcher(
                 "step": 1,
                 "types": types,
                 "active_session": active_session,
+                "reco": _reco,
             },
         )
 
@@ -591,6 +614,7 @@ def launcher(
                 "type_label": type_label,
                 "variants": variants,
                 "active_session": active_session,
+                "reco": _reco,
             },
         )
 
@@ -609,6 +633,7 @@ def launcher(
                 "type_label": type_label,
                 "variants": variants,
                 "active_session": active_session,
+                "reco": _reco,
             },
         )
 
@@ -622,6 +647,14 @@ def launcher(
             "type_label": type_label,
             "templates_list": templates_list,
             "active_session": active_session,
+            # ⚠ C'EST L'ÉTAPE QUI PORTE LE BOUTON « DÉMARRER ».
+            #
+            # Je l'avais manquée : mes trois autres retours recevaient `_reco`,
+            # pas celui-ci — et c'est le seul depuis lequel on démarre
+            # réellement une séance. Le dogfood au navigateur l'a montré en une
+            # fois : deux cartes affichées, zéro identité de décision, et
+            # AUCUN épisode écrit alors que l'utilisateur venait de décliner.
+            "reco": _reco,
         },
     )
 

@@ -94,11 +94,60 @@ _CREATION_SOURCE_ALLOWED = {
 }
 
 
+def _enregistrer_episode_de_conseil(
+    db, user_id: int, *, slug_demarre: str, session_id: int,
+    empreinte: str | None, politique: str | None,
+    top: str | None, alts: str | None,
+) -> None:
+    """`REC-CP4` — résout le conseil qui était affiché, s'il y en avait un.
+
+    ⚠ C'EST LA SEULE ÉCRITURE DE MÉMOIRE DE CONSEIL, ET ELLE EST SUR `POST`.
+
+    Un rendu de Mission n'écrit rien (`§10`). L'identité de la décision voyage
+    dans le formulaire jusqu'à ce qu'un geste réel la résolve — démarrer le
+    conseil, démarrer une alternative, ou démarrer autre chose.
+
+    ⚠ NE JAMAIS CASSER LA CRÉATION DE SÉANCE. La mémoire du conseil est un
+    signal ; démarrer une séance est le geste central du produit. Une écriture
+    de télémétrie ne doit pas pouvoir l'empêcher.
+    """
+    if not empreinte or not top:
+        return
+    from app.services import advice_memory
+    from app.services.recommendation import _compute_signals
+
+    try:
+        maintenant = datetime.now(UTC)
+        courante = advice_memory.empreinte_de_contexte(
+            _compute_signals(db, user_id, maintenant))
+        alternatives = tuple(s for s in (alts or "").split(",") if s)
+        advice_memory.enregistrer_episode(
+            db, user_id,
+            advice_memory.Proposition(
+                empreinte=empreinte,
+                politique=politique or "v2",
+                top=top,
+                alternatives=alternatives,
+                decidee_a=maintenant,
+            ),
+            issue=advice_memory.issue_de(slug_demarre, top, alternatives),
+            slug_choisi=slug_demarre,
+            session_id=session_id,
+            empreinte_courante=courante,
+        )
+    except Exception:  # pragma: no cover - la séance prime sur la télémétrie
+        db.rollback()
+
+
 @router.post("/sessions", responses={404: {"description": "Unknown template"}})
 def create_session(
     template_slug: Annotated[str, Form()],
     db: DbSession, user: CurrentUser,
     creation_source: Annotated[str | None, Form()] = None,
+    decision_fingerprint: Annotated[str | None, Form()] = None,
+    decision_policy: Annotated[str | None, Form()] = None,
+    decision_top: Annotated[str | None, Form()] = None,
+    decision_alts: Annotated[str | None, Form()] = None,
 ) -> RedirectResponse:
     tpl = db.execute(
         select(WorkoutTemplate)
@@ -126,6 +175,21 @@ def create_session(
         session.creation_source = creation_source
     db.commit()
     db.refresh(session)
+
+    # `REC-CP4` — la séance existe ; on peut maintenant dire ce que ce geste
+    # exprimait du conseil affiché. Après le commit, jamais avant : la séance
+    # ne dépend pas de la télémétrie.
+    _enregistrer_episode_de_conseil(
+        db, user.id,
+        slug_demarre=template_slug,
+        session_id=session.id,
+        empreinte=decision_fingerprint,
+        politique=decision_policy,
+        top=decision_top,
+        alts=decision_alts,
+    )
+    db.commit()
+
     return RedirectResponse(
         url=f"/sessions/{session.id}", status_code=303
     )

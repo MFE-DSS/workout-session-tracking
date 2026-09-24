@@ -66,14 +66,37 @@ def _par_nom(nom: str) -> Trajectoire:
 # ═══════════ 1. V3 NE PILOTE RIEN ═══════════
 
 
-def test_la_politique_v3_ne_pilote_aucune_surface():
-    """⚠ LA GARDE QUI TIENT L'INTERDIT DU `§12`.
+def test_la_politique_servie_est_declaree_en_un_seul_endroit():
+    """⚠ REPOINTÉE PAR `REC-CP4` — ON ÉPINGLE CE QUI SERT, PAS CE QUI S'IMPORTE.
 
-    « Interdit avant promotion : MISSION utilisant le candidat V3 · la création
-    de séance pilotée par V3 · un basculement silencieux de politique. »
+    Cette garde interdisait toute IMPORTATION de V3 hors du banc. C'était le
+    bon proxy tant qu'aucune composition n'existait : importer, c'était servir.
+
+    `REC-CP4` introduit un point d'entrée unique — `advice_memory.recommander`
+    — qui compose une politique et une mémoire. Il référence forcément les
+    deux politiques, et pourtant il n'en sert qu'une, nommée par une constante.
+
+    Épingler cette constante est **plus fort** que l'ancien proxy : un import
+    ne dit rien de ce qui arrive à l'utilisateur, une constante de service dit
+    tout. Le « basculement silencieux » que le `§12` interdit est devenu
+    impossible sans venir modifier cette ligne.
+    """
+    from app.services import advice_memory
+
+    assert advice_memory.POLITIQUE_SERVIE in advice_memory.POLITIQUES
+    assert advice_memory.POLITIQUE_SERVIE == "v2", (
+        "la politique servie a changé — c'est la porte de promotion du `§13`, "
+        "et elle doit être franchie explicitement, preuves à l'appui"
+    )
+
+
+def test_v3_n_est_reference_que_par_le_banc_et_la_composition():
+    """Le registre unique des lecteurs de V3.
 
     On cherche les IMPORTATIONS réelles, pas une impression de propreté. Le
-    harnais de mesure et ses tests sont les seuls lecteurs légitimes.
+    harnais de mesure, ses tests et le point de composition sont les seuls
+    lecteurs légitimes — et `advice_memory` n'en sert V3 que si la constante
+    ci-dessus le dit.
     """
     import pathlib
 
@@ -89,6 +112,12 @@ def test_la_politique_v3_ne_pilote_aucune_surface():
         # `REC-CP3` — lit la trace d'explication produite par V3.
         "tests/test_rec_cp3_explication.py",
         "app/services/recommendation_v3.py",
+        # `REC-CP4` — le point de composition unique. Il RÉFÉRENCE les deux
+        # politiques et n'en SERT qu'une, nommée par `POLITIQUE_SERVIE`, que
+        # la garde précédente épingle.
+        "app/services/advice_memory.py",
+        "tests/test_rec_cp4_comparaison.py",
+        "tests/test_rec_cp4_memoire_conseil.py",
     }
     coupables = []
     for f in list((racine / "app").rglob("*.py")) + \

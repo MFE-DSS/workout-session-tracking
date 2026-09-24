@@ -1,0 +1,27 @@
+{# `REC-CP4` — L'IDENTITÉ DE LA DÉCISION QUI A PRODUIT CE FORMULAIRE.
+
+   ⚠ POURQUOI DES CHAMPS CACHÉS PLUTÔT QU'UNE LIGNE EN BASE.
+
+   Le `§10` interdit d'écrire une ligne par rendu de Mission : un affichage
+   n'est pas une exposition significative, et une écriture pendant un `GET`
+   rendrait la sémantique d'événement ambiguë (rechargement, préchargement,
+   robot d'indexation).
+
+   On n'en a pas besoin. Le moteur est CAUSAL et DÉTERMINISTE depuis
+   `REC-CP0a` — `SAME_HISTORY => SAME_RECOMMENDATION` — donc une décision est
+   **identifiable** sans être enregistrée. Le formulaire porte cette identité
+   jusqu'à ce qu'un geste réel la résolve, et rien n'est écrit avant.
+
+   ⚠ CES CHAMPS NE SONT PAS CRUS SUR PAROLE. Le serveur recalcule l'empreinte
+   et refuse l'épisode si elle ne correspond plus : une page restée ouverte
+   pendant que le contexte changeait ne peut pas attribuer un refus à une
+   décision que l'utilisateur n'a jamais vue.
+
+   ⚠ AUCUN EFFET VISUEL. Quatre `<input type="hidden">` ne rendent aucun pixel.
+   Une garde le vérifie sur le HTML servi. #}
+{% if reco and reco.context and reco.context.empreinte_contexte %}
+<input type="hidden" name="decision_fingerprint" value="{{ reco.context.empreinte_contexte }}">
+<input type="hidden" name="decision_policy" value="{{ reco.context.politique or 'v2' }}">
+<input type="hidden" name="decision_top" value="{{ reco.top.template.slug }}">
+<input type="hidden" name="decision_alts" value="{{ reco.alternatives | map(attribute='template.slug') | join(',') }}">
+{% endif %}
