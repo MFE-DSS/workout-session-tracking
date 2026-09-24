@@ -342,6 +342,99 @@ def classer_candidats(
     return verdicts
 
 
+#: Ce que l'horizon de couverture EST. `§8` : « quatorze jours est une
+#: mémoire, pas une vérité physiologique ». La phrase le dit à l'utilisateur
+#: dans ces termes, plutôt que de laisser croire à un cycle biologique.
+HORIZON_OBSERVATION = "14 derniers jours"
+
+#: Libellés lisibles des zones, empruntés au référentiel du corps. On ne crée
+#: pas un second vocabulaire : `ZONE_LABELS` est déjà celui du produit.
+def _libelle_zone(zone: str) -> str:
+    from app.services.muscle_mapping import ZONE_LABELS
+
+    return ZONE_LABELS.get(zone, zone)
+
+
+def expliquer(verdict: Verdict, rang: int = 0) -> dict[str, Any]:
+    """La trace d'explication d'un candidat — **structurée, pas re-dérivée**.
+
+    ⚠ C'EST LE POINT DE `REC-CP3`.
+
+    `recommendation_explainer.py` reconstruit aujourd'hui ses raisons à partir
+    d'un contexte appauvri : quatre clés (`cold_start`, `fallback`,
+    `days_since_last_*`, `fatigue_score`) plus la phrase déjà écrite. Il
+    re-devine donc ce que le moteur savait déjà et n'a pas transmis — et deux
+    logiques parallèles finissent toujours par diverger.
+
+    Ici le moteur **dit** ce qui a décidé. Rien à re-dériver.
+
+    Aucun nombre n'en sort : ni score 0-100, ni déficit. Un utilisateur n'a pas
+    à recevoir la mécanique interne comme une vérité sur son corps.
+    """
+    f = verdict.facteurs
+    gagnants: list[str] = []
+    limitants: list[str] = []
+
+    zones = [_libelle_zone(z) for z in verdict.zones]
+    if f["deficit_couverture"] >= 0.75 and zones:
+        gagnants.append(
+            f"{', '.join(zones[:2])} : le moins servi sur {HORIZON_OBSERVATION}")
+    elif f["deficit_couverture"] <= 0.25 and zones:
+        limitants.append(
+            f"{', '.join(zones[:2])} : déjà bien servi sur "
+            f"{HORIZON_OBSERVATION}")
+
+    if f["recuperation"] == RECUPEREE:
+        gagnants.append("zones récupérées")
+    elif f["recuperation"] == INSUFFISANTE:
+        limitants.append("une zone n'a pas fini de récupérer")
+
+    if f["modalite_delaissee"]:
+        gagnants.append("la modalité la plus délaissée")
+
+    if f["dernier_passage"] is None:
+        gagnants.append("jamais fait")
+
+    justification = None
+    if f["repetition"] == MEME_GABARIT:
+        limitants.append("c'est la séance qui vient d'être faite")
+    elif f["repetition"] == MEME_FAMILLE:
+        limitants.append("même famille que la dernière séance")
+    elif f["repetition_justifiee"]:
+        justification = (
+            "Reproposé parce que ces zones restent les moins servies, "
+            "pas par défaut.")
+
+    return {
+        "facteurs_gagnants": tuple(gagnants),
+        "facteurs_limitants": tuple(limitants),
+        "horizon": HORIZON_OBSERVATION,
+        "famille": famille_de(verdict.slug),
+        "justification_repetition": justification,
+        # `REC-CP0b` — la même grammaire que `zone_exposure`, pas une seconde.
+        "provenance": "partielle" if f["observation_partielle"] else "mesurée",
+        "rang": rang,
+    }
+
+
+def phrase_de(explication: dict[str, Any]) -> str:
+    """La phrase compacte, dérivée de la trace — jamais écrite en parallèle.
+
+    Le `§` de `REC-CP3` conserve la phrase courte. Elle doit rester une
+    **lecture** de l'explication structurée : deux rédactions indépendantes
+    divergeraient, ce qui est exactement le défaut qu'on corrige.
+    """
+    gagnants = explication["facteurs_gagnants"]
+    if gagnants:
+        phrase = gagnants[0][:1].upper() + gagnants[0][1:] + "."
+    else:
+        phrase = "Aucun signal ne se détache — choix par ordre du catalogue."
+
+    if explication["provenance"] == "partielle":
+        phrase += " Lecture partielle : un exercice n'a pas pu être classé."
+    return phrase[:140]
+
+
 def recommander_v3(
     db: Session, user_id: int, now: datetime | None = None
 ) -> dict | None:
@@ -377,24 +470,25 @@ def recommander_v3(
         return None
 
     tete, *reste = verdicts
+
+    def _candidat(v: Verdict, rang: int) -> dict:
+        explication = expliquer(v, rang)
+        return {
+            "template": v.template,
+            # ⚠ `score` N'EST PAS UNE VÉRITÉ UTILISATEUR. Il n'existe que pour
+            # que la forme du dictionnaire reste comparable à celle de V2 dans
+            # le banc de mesure. Aucune surface ne le rend, et une garde de
+            # `REC-CP3` vérifie qu'aucun nombre ne traverse l'explication.
+            "score": int(round(v.facteurs["deficit_couverture"] * 100)),
+            "phrase": phrase_de(explication),
+            "primary_zones": list(v.zones),
+            "facteurs": v.facteurs,
+            "explication": explication,
+        }
+
     return {
-        "top": {
-            "template": tete.template,
-            "score": int(round(tete.facteurs["deficit_couverture"] * 100)),
-            "phrase": "",  # `REC-CP3` produit l'explication structurée
-            "primary_zones": list(tete.zones),
-            "facteurs": tete.facteurs,
-        },
-        "alternatives": [
-            {
-                "template": v.template,
-                "score": int(round(v.facteurs["deficit_couverture"] * 100)),
-                "phrase": "",
-                "primary_zones": list(v.zones),
-                "facteurs": v.facteurs,
-            }
-            for v in reste[:2]
-        ],
+        "top": _candidat(tete, 0),
+        "alternatives": [_candidat(v, i) for i, v in enumerate(reste[:2], 1)],
         "context": {
             "politique": "v3",
             "cold_start": signaux_froids(verdicts),
