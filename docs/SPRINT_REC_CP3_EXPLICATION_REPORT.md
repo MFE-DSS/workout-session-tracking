@@ -171,3 +171,47 @@ La promotion reste donc un geste séparé, explicite, et non inclus dans cette
 tranche.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+---
+
+## Closeout
+
+| | |
+|---|---|
+| PR | [#247](https://github.com/MFE-DSS/workout-session-tracking/pull/247) |
+| Merge | `4b91e6e52b12ea2e8a5d4b1af426e832f4ce4845` |
+| CI PR | **10/10 verte** — run `35985280759` |
+| Sonar (PR) | gate `OK` — couverture nouveau code **88,7 %**, 0 smell, 0 bug, 0 vulnérabilité |
+| Sweep local | 339/339 fichiers, `tous les lots sont verts.` (pic 1 720 Mo / budget 1 885 Mo) |
+| Threads de revue | 0 |
+
+### La chaîne `REC` est close
+
+| Tranche | Merge | Ce qu'elle a établi |
+|---|---|---|
+| `REC-CP0a` | `a90bad6` | causalité — douze requêtes bornées par la date de décision |
+| `REC-CP0b` | `6080559` | ontologie — « inconnu » cesse de se lire « frais » |
+| `REC-CP1` | `abb3625` | le harnais, le baseline, et le diagnostic `C` |
+| `REC-CP2` | `242674b` | V3 en ombre, et l'instrument réparé |
+| `REC-CP3` | `4b91e6e` | l'explication lue au lieu d'être re-dérivée |
+
+### Ce que la chaîne a appris, au-delà de son objet
+
+Trois diagnostics successifs ont été **réfutés par la mesure**, jamais par un
+raisonnement : le départage (0 % d'égalités), le bonus cardio (mutation sans
+effet), puis le blocage lui-même (la boucle fermée montre que V2 tourne quand le
+conseil est suivi).
+
+Et quatre défauts appartenaient à l'**instrument** avant d'appartenir au
+produit : un corpus partant de zéro qui mesurait le repli de démarrage à froid ;
+un helper empilant les trajectoires sur un seul utilisateur ; un semis tronqué à
+deux exercices qui fabriquait le déficit qu'il observait ; et une garde
+comparant des gagnants là où le gagnant ne bougeait jamais.
+
+### Ce qui reste ouvert, et qui n'est pas de mon ressort
+
+**La promotion de V3.** Elle est désormais techniquement possible — V3 rend une
+phrase et une explication — et trois défauts mesurés y gagnent. Mais le cas
+« conseil décliné » n'est traité par **aucune** des deux politiques, et c'est le
+vrai énoncé de la plainte de dogfood. Le traiter suppose de mémoriser ce qui a
+été **proposé**, donc une persistance nouvelle : hors du périmètre autorisé.
