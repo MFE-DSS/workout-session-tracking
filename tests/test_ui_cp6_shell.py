@@ -265,15 +265,33 @@ def test_aucun_pied_generique_sur_une_surface_d_instrument(client):
         assert 'class="foot"' not in corps, f"{chemin} rend encore le pied"
 
 
-def test_le_document_garde_son_pied_et_contact_reste_atteignable(client):
-    """LE PENDANT — `§5.3`, jamais une soustraction seule.
+def test_le_document_porte_sa_signature_et_contact_reste_atteignable(client):
+    """⚠ REPOINTÉE PAR `UI-CP7 REFERENCE` — LE PORTEUR CHANGE, LA PROPRIÉTÉ NON.
 
-    Le pied survit sur les DOCUMENTS, temporairement et sur instruction
-    explicite : sa refonte appartient à `UI-CP7 REFERENCE`. Et « Contact »
-    n'est perdu nulle part, puisqu'il vit dans la navigation secondaire.
+    `UI-CP6` laissait le pied générique aux documents « temporairement, sur
+    instruction explicite », en nommant `UI-CP7` comme son propriétaire. Il
+    l'est devenu, et le pied a disparu de partout.
+
+    Ce que cette garde protégeait tient en deux moitiés, et **aucune des deux
+    n'est abandonnée** :
+
+    1. `§5.3`, jamais une soustraction seule — le document ne perd pas le pied
+       sans contrepartie : il gagne une SIGNATURE, qui dit ce qu'un pied
+       générique ne disait pas (provenance, nom du document, version ou date
+       réelle). On exige donc la signature là où on exigeait le pied.
+    2. « Contact » reste atteignable depuis un instrument.
+
+    Épingler `class="foot"` reviendrait désormais à exiger le retour du pied.
     """
     corps = client.get("/export", follow_redirects=True).text
-    assert 'class="foot"' in corps, "le document a perdu son pied"
+    assert 'class="foot"' not in corps, (
+        "le pied générique est revenu sur un document — `UI-CP7` l'a remplacé "
+        "par une signature"
+    )
+    assert 'class="doc-sig"' in corps, (
+        "le document n'a plus ni pied ni signature : c'est la soustraction "
+        "nue que `§5.3` interdit"
+    )
 
     instrument = client.get("/progress", follow_redirects=True).text
     assert "/contact" in instrument, (
@@ -465,9 +483,20 @@ def test_les_modes_qui_rendent_quoi_sont_declares_et_coherents():
         assert mode not in MODES_AVEC_NAV_PRIMAIRE
         assert mode not in MODES_AVEC_PIED
 
-    # `Q3` — l'instrument n'a plus de pied ; le document le garde.
-    assert MODE_INSTRUMENT not in MODES_AVEC_PIED
-    assert MODE_DOCUMENT in MODES_AVEC_PIED
+    # `Q3` puis `UI-CP7` — le pied GÉNÉRIQUE n'existe plus nulle part.
+    #
+    # `UI-CP6` l'avait retiré des instruments et laissé aux documents, en
+    # nommant `UI-CP7 REFERENCE` comme son propriétaire. Celui-ci l'a remplacé
+    # par une SIGNATURE portée par chaque gabarit de document — quatre
+    # documents n'ont pas la même provenance, et un partiel unique aurait
+    # forcé à leur en inventer une commune.
+    #
+    # La table reste donc déclarée et vérifiée, simplement vide. On ne la
+    # supprime pas : une table absente ne dit plus qu'aucun mode n'a de pied,
+    # elle dit seulement que personne ne s'est posé la question.
+    assert MODES_AVEC_PIED == (), (
+        f"un mode a retrouvé le pied générique : {MODES_AVEC_PIED}"
+    )
 
 
 def test_les_prefixes_de_document_suivent_le_contrat_des_instruments():

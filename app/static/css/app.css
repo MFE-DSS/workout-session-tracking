@@ -1497,6 +1497,43 @@ input, button, textarea, select {
   .coach-tag--derived { background: #e8f1f8; color: #1e4b6e; border-color: #1e4b6e; }
   .coach-tag--reference { color: #555; border-color: #999; }
   .coach-tag--not-deductible { color: #555; border-color: #999; }
+
+  /* ── `UI-CP7 REFERENCE` — LES DOCUMENTS S'IMPRIMENT SAINEMENT ────────────
+   * `Q4`, réponse scindée : les règles d'impression valent pour les QUATRE
+   * documents, mais l'AFFORDANCE reste sur `coach-report` seul. Un atlas de
+   * quinze écrans n'est pas destiné au papier, et lui poser un bouton serait
+   * inventer une intention que rien n'établit.
+   *
+   * Ces lignes vivent dans le bloc d'impression EXISTANT, pas dans un second :
+   * deux blocs `@media print` dans la même feuille divergent. Et aucune
+   * couleur n'y est introduite — `body` au-dessus impose déjà fond clair et
+   * encre foncée, et le filet de la signature hérite de `currentColor`. */
+  .doc { max-width: none; }
+  .doc-print { display: none !important; }
+  /* ⚠ UNE LIMITE MESURÉE, PAS CONTOURNÉE.
+   *
+   * Un `<details>` fermé s'imprime AMPUTÉ : son contenu n'est pas rendu. J'ai
+   * essayé `display: block !important` puis `content-visibility: visible` sur
+   * le panneau. **Les deux échouent**, et c'est mesuré, pas supposé — hauteur
+   * du document sous `emulate_media(print)` : 2 771 px contre 3 293 à l'écran,
+   * 356 mots contre 441. Chromium masque le contenu d'un `<details>` fermé
+   * par un mécanisme que la feuille de l'auteur n'atteint pas.
+   *
+   * Je ne livre donc pas une règle qui prétend le déplier. La portée réelle de
+   * la limite est étroite et vérifiée : `coach-report`, le SEUL document
+   * porteur d'une affordance d'impression (`Q4`, réponse scindée), ne contient
+   * AUCUN `<details>` — mesuré à zéro. Les deux surfaces concernées,
+   * `/science` et l'atlas, n'ont pas de bouton Imprimer, précisément parce que
+   * rien n'établit qu'elles soient destinées au papier.
+   *
+   * Reste ouvert : un lecteur qui fait `Ctrl+P` sur l'atlas obtient les
+   * familles ouvertes seulement. `BLOCKED` sans arbitrage — le corriger
+   * supposerait soit de tout déplier par défaut (et de rendre les 15,5 écrans
+   * que cette tranche vient de ramener à 4), soit du JavaScript, que le
+   * périmètre exclut. */
+  .doc .disclosure > summary::after { display: none; }
+  .doc-head__title { font-size: 20pt; }
+  .doc-sig { border-top: 1px solid; break-inside: avoid; }
   .coach-legend dd { color: #444; }
   .coach-block--guardrails { border-left: 2px solid #d97706; }
   .coach-ratio__strength, .coach-ratio__cardio { color: white; }
@@ -4676,13 +4713,30 @@ details.exercise-card[open] .card__actions--exercise {
 .substitute-badge__prescribed { color: var(--fg-dim); margin-left: 4px; }
 
 /* ---------- Sb_07 — /science/atlas page ------------------------------- */
+/* `UI-CP7 REFERENCE` — LE SOMMAIRE PASSE EN GRILLE, ET SES CIBLES À 44 px.
+ *
+ * MESURÉ au runtime : les pastilles faisaient 28 px de haut. Ce sont des
+ * contrôles de navigation AUTONOMES — la catégorie que le plancher tactile
+ * produit vise — et non des liens en ligne dans la prose, qui relèvent d'une
+ * autre catégorie et ne sont pas touchés.
+ *
+ * ⚠ Les porter à 44 px a d'abord fait passer le sommaire à plus d'un
+ * demi-écran avant le moindre contenu : une régression que j'ai introduite et
+ * que seul le rendu montrait, les chiffres ne comptant que les cibles NON
+ * conformes. La grille récupère la hauteur sans rendre les 28 px. */
 .atlas-toc {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: var(--space-xs);
   margin: var(--space-md) 0 var(--space-lg);
+  align-items: stretch;
 }
 .atlas-toc__item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 44px;
+  width: 100%;
   font-size: 12px;
   padding: 4px 10px;
   border: 1px solid var(--border);
@@ -7058,3 +7112,189 @@ summary:focus-visible,
   .hroster__name { flex: 1 1 auto; }
   .hroster__line { margin-top: 0; flex: 0 0 auto; }
 }
+
+/* ═════════════════════════════════════════════════════════════════════════
+ * `UI-CP7 REFERENCE` — LA GRAMMAIRE DE DOCUMENT
+ *
+ * `AUREN_INSTRUMENTS §2bis`, mot pour mot :
+ *   « Un document ne doit jamais avoir l'air d'un instrument en panne. »
+ *   « La frontière doit être PERCEPTIBLE. »
+ *
+ * MESURÉ AVANT D'ÉCRIRE (390x844 et 1440x900, application en marche) :
+ *
+ *   surface           mots  écrans  cartes  details  titre  section
+ *   /science          1526    12,0      18        6  18 px    22 px
+ *   /science/atlas    2074    15,5      32        0  18 px    22 px
+ *   /coach-report      499     3,9       0        0  22 px    14 px
+ *   /export            100     1,5       3        0  18 px    13 px
+ *
+ * Deux défauts que seule la mesure a rendus visibles :
+ *
+ * 1. INVERSION DE HIÉRARCHIE sur les deux surfaces `/science` : le titre du
+ *    document (18 px, centré) est PLUS PETIT que ses propres titres de
+ *    section (22 px). Un document dont le titre chuchote et dont les sections
+ *    crient n'a pas de hiérarchie de lecture. L'échelle `Q6` réserve pourtant
+ *    le rang DISPLAY (32) au « relevé souverain OU titre d'écran » — la
+ *    seconde moitié n'était utilisée nulle part sur ces documents.
+ *
+ * 2. LIGNE DE 134 À 156 CARACTÈRES en desktop (mesurée avec les métriques de
+ *    glyphe réelles, pas une largeur supposée : 8,43 px à 14 px). La cible
+ *    typographique est ~65. Aucune des quatre surfaces ne borne sa colonne.
+ *
+ * CE QUE CE BLOC N'INTRODUIT PAS : aucune couleur, bordure ni fond propre aux
+ * documents. Ce serait un troisième dialecte visuel, et `AUREN_INSTRUMENTS`
+ * en accepte deux. La frontière se lit à la FORME du texte et au rang du
+ * titre, pas à un ornement.
+ * ═════════════════════════════════════════════════════════════════════════ */
+
+/* ── La colonne de lecture ────────────────────────────────────────────────
+ * Bornée en `ch`, l'unité qui suit la police : la colonne reste à ~68
+ * caractères quelle que soit la taille choisie, là où un `max-width` en px
+ * dériverait au premier changement d'échelle. */
+.doc {
+  max-width: 68ch;
+  margin-inline: auto;
+}
+
+/* ── La tête de document ──────────────────────────────────────────────────
+ * Ce qui rend un document PERCEPTIBLEMENT un document, avant tout défilement.
+ * Un instrument réserve le rang DISPLAY à un relevé MESURÉ ; ici il porte le
+ * titre — l'autre moitié de `Q6`, jamais employée. */
+.doc-head {
+  margin: 0 0 var(--space-lg);
+  padding-bottom: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.doc-head__title {
+  margin: 0;
+  /* Rang DISPLAY (`Q6` : 32 / 22 / 15 / 12). Un seul par écran — un document
+     n'a pas de relevé souverain, donc ce titre est ce seul DISPLAY. */
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.15;
+  /* Aligné à gauche : un titre centré est une grammaire d'écran d'accueil,
+     pas de document. C'est le premier signe qui distingue les deux. */
+  text-align: start;
+  text-wrap: balance;
+}
+
+.doc-head__lede {
+  margin: var(--space-sm) 0 0;
+  font-size: 15px;            /* rang BODY */
+  color: var(--fg-muted);
+  text-align: start;
+}
+
+/* La provenance. Un document dit d'où il vient ; un instrument n'en a pas
+   besoin, puisqu'il montre l'état courant. */
+.doc-head__meta {
+  margin: var(--space-sm) 0 0;
+  font-size: 12px;            /* rang META */
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Une entrée de document ───────────────────────────────────────────────
+ * REMPLACE `.card` sur les surfaces de référence. `.card` est le conteneur de
+ * rang 1 du socle (`Q5` : « séance recommandée, exercice actif, formulaire
+ * ouvert ») ; cinquante cartes de prose faisaient lire un tableau de bord là
+ * où il y a un texte.
+ *
+ * Un filet, pas un cadre : la séparation suffit à dire « entrée suivante »
+ * sans prétendre à un objet manipulable. */
+/* De la prose, et rien autour. `Q5` rang 3 : « aucun conteneur ».
+ *
+ * ⚠ CE N'EST PAS UNE SOUSTRACTION NUE (`CLAUDE.md §5.3`). Ce qui remplace la
+ * carte part dans la MÊME livraison : la colonne de lecture bornée, la tête de
+ * document, et le filet de section. Retirer le cadre sans eux aurait laissé
+ * 1 526 mots courir sur toute la largeur — plus pauvre qu'avant. */
+.doc-prose {
+  margin-bottom: var(--space-md);
+}
+
+.doc-prose > :first-child { margin-top: 0; }
+.doc-prose > :last-child { margin-bottom: 0; }
+
+.doc-entry {
+  padding: var(--space-md) 0;
+  border-top: 1px solid var(--border);
+}
+
+.doc-entry:first-of-type { border-top: 0; }
+
+.doc-entry__title {
+  margin: 0 0 var(--space-xs);
+  font-size: 15px;            /* rang BODY, en gras — pas un rang de plus */
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.doc-entry__body { margin: 0; }
+
+/* ── La signature de document ─────────────────────────────────────────────
+ * `UI-CP6 Q3` a laissé le pied générique sur les documents en nommant
+ * `UI-CP7` comme son propriétaire. Il coûtait 135 px pour un mot-marque et un
+ * lien que la navigation secondaire porte déjà.
+ *
+ * Il devient ce qu'un document doit dire et qu'aucune des quatre surfaces ne
+ * disait : d'où vient ce texte, et de quand il date. */
+.doc-sig {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+  font-size: 12px;            /* rang META */
+  color: var(--fg-dim);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  align-items: baseline;
+}
+
+.doc-sig__source { font-weight: 600; color: var(--fg-muted); }
+
+/* ── Le sommaire ancré ────────────────────────────────────────────────────
+ * ⚠ IL EXISTAIT DÉJÀ. Mon brief d'arbitrage affirmait que l'atlas n'a
+ * « AUCUNE navigation interne » — c'était faux, `atlas.html` porte un
+ * `<nav class="atlas-toc">` depuis `Sb_07`.
+ *
+ * Ce qui était vrai, et MESURÉ au runtime : ses pastilles font 28 px de haut.
+ * Ce sont des contrôles de navigation autonomes — la catégorie exacte que le
+ * plancher tactile produit de 44 px vise. (Les liens en ligne dans la prose
+ * relèvent d'une autre catégorie et ne sont pas touchés ici.) */
+/* ── Les familles repliables de l'atlas ───────────────────────────────────
+ * On ADOPTE `.disclosure`, on ne réécrit pas un repli. Le composant porte
+ * déjà la géométrie 44 px, le chevron et le focus, et son propre commentaire
+ * dit qu'il s'adopte « pour UNE classe sur le `<details>` ».
+ *
+ * Il est réglé pour une ligne de tiroir secondaire (13 px, atténué). Ici le
+ * libellé est un TITRE DE SECTION : on remonte le rang sans toucher à la
+ * géométrie, qui est précisément ce qu'on venait chercher. */
+.doc .disclosure > summary {
+  font-size: 22px;            /* rang SECTION */
+  font-weight: 600;
+  color: var(--fg);
+  padding-inline: 0;
+}
+
+.doc .disclosure > summary::after { font-size: 14px; }
+
+.doc .disclosure__panel {
+  padding-inline: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ── Impression ───────────────────────────────────────────────────────────
+ * ⚠ LES RÈGLES D'IMPRESSION NE SONT PAS ICI, ET C'EST VOULU.
+ *
+ * J'avais d'abord écrit un SECOND bloc `@media print` en fin de feuille. Deux
+ * gardes l'ont refusé pour une couleur en dur (`#999`), et elles avaient
+ * raison sur un point que je n'avais pas vu : le dépôt a déjà un bloc
+ * d'impression, et en ouvrir un second aurait mis deux implémentations du même
+ * sujet dans la même feuille — celle du `coach_report` et la mienne — vouées
+ * à diverger.
+ *
+ * Les règles de document ont donc rejoint le bloc existant (`@media print`,
+ * plus haut), qui gère déjà l'inversion fond clair / encre foncée. */

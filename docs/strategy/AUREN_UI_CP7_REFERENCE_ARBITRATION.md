@@ -58,11 +58,32 @@ de `UI-CP6` devait précéder cette tranche.
 
 ## 3. Ce qui coûte
 
-### F1 — `/science/atlas` fait 15,5 écrans et n'a AUCUNE navigation interne
+### F1 — `/science/atlas` fait 15,5 écrans et rien ne s'y replie
+
+> ⚠ **CORRECTION, 2026-09-24.** Cette section affirmait que l'atlas n'a
+> « AUCUNE navigation interne ». **C'est faux**, et je l'ai découvert en ouvrant
+> `atlas.html` au lieu de relire ma propre note.
+>
+> `atlas.html:6-10` porte un `<nav class="atlas-toc">` avec **une ancre par
+> famille**, et `app.css:4679` le rend en pastilles visibles. Le sommaire ancré
+> que la `Q3` propose de construire **existe déjà**.
+>
+> Ce qui manque réellement est le **repli** : `<details>` n'apparaît nulle part
+> dans l'atlas, donc les 2 074 mots restent dépliés en permanence.
+>
+> Conséquence sur l'arbitrage : `Q3 = A` reste la bonne réponse, mais **la
+> moitié du travail est faite**. La tranche ajoute le repli et corrige le
+> sommaire, elle ne le crée pas.
+>
+> ⚠ Relevé au passage, **à mesurer au runtime avant d'affirmer** :
+> `.atlas-toc__item` déclare `font-size: 12px` et `padding: 4px 10px`, ce qui
+> place sa hauteur bien sous le plancher tactile produit de 44 px établi par
+> `UI-CP5`. Une déclaration CSS n'est pas une géométrie rendue — c'est
+> exactement l'erreur que la cible de 18 px m'avait déjà value.
 
 2 074 mots, 105 conteneurs, **32 cartes**, et **zéro `<details>`** : tout est
-déplié en permanence. Une référence anatomique de quinze écrans sans sommaire
-ni repli ne se consulte pas, elle se subit.
+déplié en permanence. Une référence anatomique de quinze écrans qu'on ne peut
+pas replier ne se consulte pas, elle se subit.
 
 `/science` fait 12 écrans avec 6 divulgations — mieux, mais du même ordre.
 

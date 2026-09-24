@@ -1,12 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Science</h1>
-<p class="lede">Comment Auren transforme une série loguée en lecture de ta progression.</p>
+{# `UI-CP7 REFERENCE` — `/science` devient un DOCUMENT.
+
+   MESURÉ avant (390x844, puis 1440x900) : 1 526 mots, 12,0 écrans,
+   18 cartes de PROSE, titre à 18 px sous des titres de section à 22 px, et
+   une ligne de 134 caractères en desktop pour une cible de ~65. #}
+<div class="doc">
+
+  <header class="doc-head">
+    <h1 class="doc-head__title">Science</h1>
+    <p class="doc-head__lede">Comment Auren transforme une série loguée en lecture de ta progression.</p>
+    <p class="doc-head__meta">Référence · méthode et conventions</p>
+  </header>
 
 <!-- SECTION 1 — PRATIQUE -->
 <section class="science-section" id="section-journal">
   <h2 class="section-header">Pourquoi noter change la progression</h2>
-  <div class="card">
+  <div class="doc-prose">
     <p>La mémoire subjective est un mauvais outil de progression. Elle surestime les bonnes séances, oublie les stagnations, et fabrique des souvenirs qui arrangent le moment.</p>
     <p>Un carnet la remplace. La surcharge progressive suppose que tu saches ce que tu as fait la dernière fois. C'est tout. Sans trace, tu ne peux pas comparer. Sans comparaison, tu ne peux pas ajuster la charge, les reps, la fréquence.</p>
     <p>L'auto-illusion — croire qu'on progresse quand on stagne — est la première cause de stagnation réelle. Noter l'élimine. Pas par discipline morale, par lucidité.</p>
@@ -33,7 +43,7 @@
      épingle l'ensemble : renommer un slug casse silencieusement TOUS les
      liens profonds qui le visent, et rien à l'exécution ne le signalerait. #}
   {% for rule in rules %}
-  <article class="card rule-card" id="rule-{{ rule.slug }}">
+  <article class="doc-entry rule-card" id="rule-{{ rule.slug }}">
     <h3 class="card__title">{{ rule.title }}</h3>
     <p class="rule__body">{{ rule.body }}</p>
     <p class="rule__id">
@@ -48,7 +58,7 @@
 <!-- SECTION 3 — PRINCIPES : cardio -->
 <section class="science-section" id="section-cardio">
   <h2 class="section-header">Place du cardio</h2>
-  <div class="card">
+  <div class="doc-prose">
     <p>Le LISS (Low Intensity Steady State) n'est pas un outil de perte de gras magique. C'est un outil de discipline cardio-vasculaire et de récupération active.</p>
     <p>Dans un programme muscu, il a trois fonctions :</p>
     <ul>
@@ -86,7 +96,7 @@
      Aucun nombre n'a bougé. Aucune règle nouvelle n'a été inventée. Le texte
      dit désormais ce que le barème FAIT, pas ce que l'utilisateur DEVRAIT
      viser — et il nomme la distinction explicitement. #}
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Comment une séance est notée</h3>
     <p>Le barème dépend du type de séance. En musculation, il combine la complétion des séries de travail, le score d'exercice (reps vs plage), la concentration et l'état général. En cardio, il combine la durée, l'intensité mesurée par BPM lorsqu'elle existe, la complétion éventuelle des abdos, et le ressenti.</p>
     <p>Les paliers du barème cardio : la durée atteint son maximum à partir de 20 minutes, l'intensité au sien entre 115 et 135 bpm. Une séance LISS de 20 minutes dans cette zone totalise donc plus de 85 sur 100.</p>
@@ -97,7 +107,7 @@
 <!-- SECTION 3bis — Convention de charge -->
 <section class="science-section" id="section-load-convention">
   <h2 class="section-header">Convention de saisie des charges</h2>
-  <div class="card">
+  <div class="doc-prose">
     <p>Règle unique : saisir la charge <strong>telle qu'elle apparaît sur l'équipement</strong>. Pas de calcul mental.</p>
     <ul>
       <li><strong>Haltères</strong> : poids d'un seul haltère (deux haltères de 20 → tu saisis <code>20</code>).</li>
@@ -116,17 +126,17 @@
 <section class="science-section" id="section-manual">
   <h2 class="section-header">Comment Auren matérialise ces concepts</h2>
 
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Programmes et séances</h3>
     <p>Les programmes (Push A, Pull B, Legs A...) sont des modèles figés. Chaque version du catalogue a un numéro. Quand tu démarres une séance, Auren en fait une copie vivante que tu remplis. Même si le programme change plus tard, ta séance reste telle qu'elle a été loguée.</p>
   </div>
 
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Exercices et séries</h3>
     <p>Chaque exercice a des séries d'échauffement (1 ou 2) et des séries de travail. Tu entres pour chaque série : poids, reps, coche « fait ». Pas de case obligatoire en plus. <a href="#rule-plages-repetitions">Voir plages de reps</a>.</p>
   </div>
 
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Score dérivé</h3>
     {# Deux `a` → `à` ici : « à partir de » et « tu n'as pas à poser » sont des
        prépositions, pas le verbe avoir. Deux des cinq occurrences réellement
@@ -134,7 +144,7 @@
     <p>Le score d'un exercice est calculé automatiquement à partir des reps vs la plage prescrite, et du nombre de séries complétées. Tu n'as pas à poser un ressenti arbitraire — le chiffre vient de ce que tu as fait. La sensation musculaire, optionnelle, reste une note subjective.</p>
   </div>
 
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Historique</h3>
     {# `comparer a` → `comparer à` : préposition. Cinquième et dernière
        occurrence ambiguë. Les `a` de « elle a été » restent le verbe avoir. #}
@@ -163,14 +173,14 @@
      vraie entre-temps : une mesure sans dénominateur ne rend plus un tiret,
      elle disparaît en nommant sa cause. Elle est donc conservée, et pour la
      première fois elle décrit le produit au lieu de le promettre. #}
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Progression</h3>
     <p>Une seule surface d'analyse : <b>Progression</b>. Elle répond à trois questions dans l'ordre où on se les pose — <i>quand</i> me suis-je entraîné (les quatorze traces), <i>où</i> (l'exposition par zone), <i>quoi</i> (l'écart par exercice d'une séance à la suivante).</p>
     <p>Chaque niveau s'ouvre sur le suivant : un fait, l'instrument qui le porte, son inspection, et la provenance de l'attribution. Aucun score global, aucune note de physique.</p>
     <p>Tu ne vois jamais un chiffre qu'on ne peut pas calculer honnêtement : une mesure dont le dénominateur n'existe pas ne s'affiche pas en tiret — elle disparaît, et sa cause est nommée.</p>
   </div>
 
-  <div class="card">
+  <div class="doc-prose">
     <h3 class="card__title">Ce qui reste privé</h3>
     <p>Tes mesures corporelles, ta readiness, tes notes, tes poids par série : strictement privées. Même dans une squad (groupe privé), seule l'activité agrégée est partagée — jamais les détails.</p>
   </div>
@@ -179,7 +189,7 @@
 <!-- SECTION 4bis — ATLAS MACHINES -->
 <section class="science-section" id="section-atlas">
   <h2 class="section-header">Atlas des machines</h2>
-  <div class="card">
+  <div class="doc-prose">
     <p>Une fiche par machine : points d'exécution, erreurs fréquentes, convention de charge. Consultable hors séance.</p>
     <p><a class="btn btn--primary" href="{{ url_for('science_atlas') }}">Ouvrir l'atlas →</a></p>
   </div>
@@ -201,4 +211,13 @@
     </figcaption>
   </figure>
 </section>
+  {# Voir `atlas.html` : le produit d'abord, parce que l'impression masque
+     la topbar qui le portait. #}
+  <p class="doc-sig">
+    <span class="doc-sig__source">Auren</span>
+    <span>Science · méthode et conventions</span>
+    <span>Additif, informatif, non prescriptif.</span>
+  </p>
+
+</div>
 {% endblock %}

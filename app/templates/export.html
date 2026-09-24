@@ -1,7 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Sauvegarde</h1>
-<p class="lede">Ce que tu peux emporter hors d'AUREN : le journal, et la synthèse à présenter.</p>
+{# `UI-CP7 REFERENCE` — `Q1` et `Q4` seulement.
+
+   ⚠ `Q2` NE S'APPLIQUE PAS ICI, et c'est une décision, pas un oubli. Les
+   trois cartes de cette surface ne contiennent pas de la prose : ce sont des
+   blocs FONCTIONNELS — un menu d'actions, un relevé chiffré, deux boutons de
+   téléchargement. `Q5` réserve la carte au rang 1 « formulaire ouvert », ce
+   qu'elles sont. Les retirer aurait appliqué la règle là où elle ne dit rien.
+
+   MESURÉ avant : 156 caractères par ligne en desktop, titre à 18 px centré. #}
+<div class="doc">
+
+  <header class="doc-head">
+    <h1 class="doc-head__title">Sauvegarde</h1>
+    <p class="doc-head__lede">Ce que tu peux emporter hors d'AUREN : le journal, et la synthèse à présenter.</p>
+    <p class="doc-head__meta">Document · sortie de données</p>
+  </header>
 
 {# `TRAIN1-D` / C1 — LE COACH REPORT ATTERRIT ICI.
 
@@ -156,4 +170,11 @@
 <p class="kpi-note">
   Stockage local · télécharge régulièrement pour archiver.
 </p>
+  <p class="doc-sig">
+    <span class="doc-sig__source">Auren</span>
+    <span>Sauvegarde · sortie de données</span>
+    <span>Stockage local · télécharge régulièrement pour archiver.</span>
+  </p>
+
+</div>
 {% endblock %}

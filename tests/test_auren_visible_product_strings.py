@@ -63,11 +63,24 @@ def test_footer_shows_auren(client):
 
     Les deux moitiés sont donc vérifiées, chacune là où elle vit. Épingler le
     pied sur l'accueil reviendrait à exiger son retour.
+
+    ⚠ REPOINTÉE UNE SECONDE FOIS PAR `UI-CP7 REFERENCE`, et pour la même
+    raison : le pied générique a disparu des documents aussi, remplacé par une
+    **signature de document**.
+
+    La signature nomme le produit EN PREMIER, et ce n'est pas cosmétique : les
+    règles `@media print` masquent la topbar, donc sur une feuille remise à un
+    coach externe la signature est le SEUL porteur du nom. Sans elle, le
+    document imprimé ne dirait plus d'où il vient.
     """
-    # Sur un DOCUMENT, le pied survit — et il nomme le produit.
+    # Sur un DOCUMENT, la signature nomme le produit.
     document = _get(client, "/export")
-    assert "<small>Auren</small>" in document, (
-        "le pied du document ne nomme plus le produit"
+    assert re.search(
+        r'<span class="doc-sig__source">\s*Auren\s*</span>', document), (
+        "la signature du document ne nomme plus le produit"
+    )
+    assert 'class="foot"' not in document, (
+        "le pied générique est revenu sur un document"
     )
 
     # Sur un INSTRUMENT, il n'y a plus de pied — et le nom reste visible.
