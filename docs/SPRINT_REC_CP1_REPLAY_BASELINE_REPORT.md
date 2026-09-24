@@ -211,7 +211,41 @@ impose legs.
 
 ---
 
-## 6. Ce que `REC-CP2` doit traiter, dans cet ordre
+## 6. Pourquoi le classement ignore la trajectoire — `CODE_TRACED`
+
+La décomposition dit *que* le signal longitudinal est trop petit. Le relevé des
+consommateurs dit **pourquoi**.
+
+Le moteur calcule **trois** horizons d'exposition par zone. Voici qui les lit :
+
+| Signal | Horizon | Consommateur |
+|---|---|---|
+| `hard_sets_by_zone_24h` | 24 h | filtre de redondance + pénalité de score |
+| `hard_sets_by_zone_recent` | **7 j** | **aucun** — construit, assigné, jamais lu |
+| `hard_sets_14d_by_zone` | **14 j** | `_is_specialization_justified` **uniquement** |
+
+`median_hard_sets_14d` suit le même sort : un seul lecteur, la même fonction.
+Et `_is_specialization_justified` rend un **booléen** qui ne concerne que les
+gabarits `specialization` — il ne touche jamais le score d'un `push-*`,
+`pull-*` ou `legs-*`.
+
+Le seul apport longitudinal au classement des six gabarits du noyau est donc
+`_zone_freshness_bonus`, qui regarde les **trois dernières séances de force** —
+soit environ six jours.
+
+> **Le moteur mesure la couverture sur deux semaines et ne s'en sert pas pour
+> classer.** Une zone sous-travaillée depuis douze jours pèse exactement zéro
+> dans le score d'un gabarit du noyau.
+
+C'est l'énoncé précis de `B`. Il est meilleur que « le classement est
+insensible » : le classement n'est pas aveugle, il regarde une fenêtre de trois
+séances et **ignore la fenêtre de quatorze jours qu'il a déjà calculée**.
+
+⚠ `14 jours est un horizon de MÉMOIRE, pas une vérité physiologique` (`§8`).
+Le rendre lisible par le classement n'autorise pas à en faire un seuil
+biologique.
+
+## 7. Ce que `REC-CP2` doit traiter, dans cet ordre
 
 1. **Le classement primaire** — `dispo` (35 pts) doit discriminer, ou céder son
    poids à ce qui discrimine. L'écart de catégorie ne doit plus valoir quatre
