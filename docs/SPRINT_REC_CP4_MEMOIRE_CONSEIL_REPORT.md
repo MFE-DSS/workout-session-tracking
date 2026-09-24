@@ -317,3 +317,60 @@ l'exclut, et rien ne l'exige.
   l'interdit explicitement.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+---
+
+## Closeout
+
+| | |
+|---|---|
+| PR | [#249](https://github.com/MFE-DSS/workout-session-tracking/pull/249) |
+| Merge | `490e1eae4db8c4c46b058773aa598a8bcb72f772` |
+| CI PR | **9/9 verte** (après une relance, voir ci-dessous) |
+| Sonar | gate `OK` — code smells **20 → 0**, couverture nouveau code **93,7 %** |
+| Sweep local | 341/341 fichiers, `tous les lots sont verts.` |
+| Threads de revue | 0 |
+
+### Deux incidents de CI, traités différemment parce qu'ils diffèrent
+
+**Sonar rouge — une vraie finding.** `python:S3776` CRITICAL, complexité
+cognitive 16 > 15 sur `_depuis_la_trace`. Le chiffre signalait un défaut réel :
+deux boucles identiques portaient la **même condition imbriquée**, une règle
+employée deux fois sans nom. Corrigée en la nommant (`_ajouter_sans_repeter`),
+jamais en la suppressant. Rendu vérifié inchangé sur 28 gardes.
+
+**Test de performance rouge — variance de runner.** `/coach-report` p95 à
+4 947 ms contre 3 000 ms de budget. **Aucun correctif appliqué**, et trois
+preuves le justifient :
+
+1. le même test **passait 20 minutes plus tôt** sur cette même PR ;
+2. le seul diff depuis portait sur `recommendation_explainer.py`, que
+   `/coach-report` **n'importe pas** — graphe d'imports vérifié, seul
+   `app.models.recommendation_episode` est atteint, via le registre ;
+3. en local, les vingt tests de performance passent en **4,75 s au total**.
+
+Relance des seuls jobs échoués, sans nouveau commit — verte. Élargir le budget
+ou toucher `/coach-report` aurait été une cascade de fixes sur un défaut
+inexistant.
+
+### Ce que la tranche a appris, au-delà de son objet
+
+**La doctrine existait déjà.** `plan_adaptation_dismissals` (`UI-CP3.5`) portait
+mot pour mot la règle « absence de ligne / ligne / dérivé » et l'interdiction
+d'écrire pendant un `GET` : trois exigences de la directive, déjà tranchées
+dans un fichier qu'il suffisait d'ouvrir. Chercher la pièce ne suffit pas —
+chercher aussi le **raisonnement déjà tenu**.
+
+**Le navigateur a trouvé ce que les tests manquaient**, deux fois : une boucle
+de mesure qui rendait la métrique décisive vacue, et un refus qui se perdait en
+silence à l'étape 3 du lanceur.
+
+### Suite
+
+La chaîne `REC` est close de `CP0a` à `CP4`. Reste ouvert, et hors de mon
+périmètre :
+
+* **la promotion de V3** — elle tient à une constante, `POLITIQUE_SERVIE`, et
+  attend que son explication vaille celle de V2 ;
+* **`UI-CP7`** ([#248](https://github.com/MFE-DSS/workout-session-tracking/pull/248))
+  — verte, non mergée, en attente du portail visuel du `CLAUDE.md §5.1`.
