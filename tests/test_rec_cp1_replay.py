@@ -536,7 +536,10 @@ def test_le_semeur_est_unique_et_partage(client):
     celui que les tests emploient — sinon le corpus mesuré ne serait pas celui
     que le rapport décrit.
     """
+    from sqlalchemy import select
+
     from app.database import SessionLocal
+    from app.models.catalog import WorkoutTemplate
     from app.models.session import WorkoutSession
 
     with SessionLocal() as db:
@@ -545,5 +548,21 @@ def test_le_semeur_est_unique_et_partage(client):
         s = db.get(WorkoutSession, sid)
         assert s.status == "completed"
         assert s.template_slug_snapshot == "push-a"
-        assert len(s.session_exercises) == 2
         assert all(len(se.set_logs) == 3 for se in s.session_exercises)
+
+        # ⚠ TOUS LES EXERCICES DU GABARIT — CHANGEMENT DÉCLARÉ EN `REC-CP2`.
+        #
+        # Cette garde épinglait « exactement deux ». Elle a rougi, et c'est
+        # ainsi qu'elle devait fonctionner : le semis tronquait chaque séance à
+        # ses deux premiers exercices, et `legs-a` en compte sept. Les cinq
+        # ignorés portaient tout le travail de `core` et de `calves`, si bien
+        # que le corpus ne servait que sept zones sur onze — et qu'un gabarit
+        # dont l'unique zone est `core` était à jamais « le plus délaissé ».
+        #
+        # Une politique classée par couverture ne pouvait pas être jugée là.
+        tpl = db.execute(select(WorkoutTemplate).where(
+            WorkoutTemplate.slug == "push-a")).scalar_one()
+        assert len(s.session_exercises) == len(tpl.exercises) > 2, (
+            "le semeur ne pose plus la séance entière — le corpus fabriquerait "
+            "de nouveau un déficit de couverture permanent"
+        )
