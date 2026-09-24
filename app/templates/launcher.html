@@ -62,6 +62,18 @@
           <input type="hidden" name="template_slug" value="{{ tpl.slug }}" />
           {# Sb_13 telemetry: provenance "launcher" full picker. #}
           <input type="hidden" name="creation_source" value="launcher" />
+          {# `REC-CP4` — LE LANCEUR EST L'ENDROIT OÙ UN CONSEIL SE DÉCLINE.
+
+             Mission propose « Choisir une autre séance », qui mène ici, et
+             cette page rend elle-même la recommandation
+             (`next_session_reco.html`). Démarrer un gabarit de cette liste
+             alors qu'un conseil est affiché est donc un geste DÉLIBÉRÉ contre
+             ce conseil — pas une navigation.
+
+             Sans ces champs, ce geste ne serait rattaché à aucune décision et
+             `CHOSE_OTHER` resterait inobservable : `creation_source` dit
+             « launcher », jamais QUELLE recommandation était à l'écran. #}
+          {% include "_partials/_decision_identity.html" %}
           {# `UIV3_TARGETS_44_01` — voir `library.html` : `btn--sm` sur l'action
              principale d'une surface est une erreur de variante. #}
           <button type="submit" class="btn btn--primary">Démarrer</button>

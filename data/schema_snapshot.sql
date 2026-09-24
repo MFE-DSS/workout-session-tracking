@@ -31,6 +31,9 @@ CREATE INDEX ix_exercises_name ON exercises (name);
 -- index: ix_plan_adapt_dismissal_user
 CREATE INDEX ix_plan_adapt_dismissal_user ON plan_adaptation_dismissals (user_id);
 
+-- index: ix_reco_episode_user_context
+CREATE INDEX ix_reco_episode_user_context ON recommendation_episodes (user_id, context_fingerprint);
+
 -- index: ix_session_exercises_session_id
 CREATE INDEX ix_session_exercises_session_id ON session_exercises (session_id);
 
@@ -105,6 +108,9 @@ CREATE TABLE plan_adaptation_dismissals ( id INTEGER NOT NULL, decision_id VARCH
 
 -- table: readiness_entries
 CREATE TABLE readiness_entries ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, recorded_on DATE NOT NULL, sleep_quality INTEGER NOT NULL, fatigue_level INTEGER NOT NULL, soreness_level INTEGER NOT NULL, stress_level INTEGER NOT NULL, motivation_level INTEGER NOT NULL, resting_hr INTEGER, note TEXT, created_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_readiness_user_day UNIQUE (user_id, recorded_on) );
+
+-- table: recommendation_episodes
+CREATE TABLE recommendation_episodes ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, context_fingerprint VARCHAR(64) NOT NULL, policy_version VARCHAR(16) NOT NULL, decided_at DATETIME NOT NULL, resolved_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, proposed_top_slug VARCHAR(64) NOT NULL, proposed_alt_slugs VARCHAR(255) DEFAULT '' NOT NULL, outcome VARCHAR(32) NOT NULL, chosen_slug VARCHAR(64), session_id INTEGER, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_reco_episode_user_context UNIQUE (user_id, context_fingerprint) );
 
 -- table: reference_docs
 CREATE TABLE reference_docs ( id INTEGER NOT NULL, version VARCHAR(64) NOT NULL, title VARCHAR(255) NOT NULL, seeded_at DATETIME DEFAULT (CURRENT_TIMESTAMP) NOT NULL, PRIMARY KEY (id), UNIQUE (version) );

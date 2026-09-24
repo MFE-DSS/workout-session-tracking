@@ -441,6 +441,131 @@ def rejouer_en_boucle(db, user_id: int, *, nom_politique: str = "v2",
     return decisions
 
 
+@dataclass
+class DecisionDeclin(Decision):
+    """Une décision prise dans une boucle où l'utilisateur DÉCLINE le conseil."""
+
+    #: Le gabarit que l'utilisateur a démarré à la place.
+    fait_a_la_place: str | None = None
+    #: ⚠ LA MÉTRIQUE DÉCISIVE DU `§12` : ce conseil avait-il déjà été
+    #: explicitement écarté, dans un contexte matériellement inchangé ?
+    repropose_apres_refus: bool = False
+    #: Le `§7` autorise le retour d'un conseil écarté quand aucune alternative
+    #: valable n'existe. Ce cas ne doit PAS compter comme une répétition
+    #: fautive — d'où un compteur séparé plutôt qu'une exception muette.
+    sans_alternative: bool = False
+
+
+def rejouer_en_declinant(
+    db, user_id: int, *, politique: str = "v2", avec_memoire: bool = False,
+    nb: int = 8, pas: int = 2, origine: datetime = ORIGINE,
+    amorce: tuple[Seance, ...] = ECHAUFFEMENT,
+) -> list[DecisionDeclin]:
+    """⚠ LA BOUCLE QUI REPRODUIT LE GESTE RAPPORTÉ — ET LE PIÈGE QU'ELLE ÉVITE.
+
+    Les deux boucles existantes ne peuvent pas le mesurer : en boucle ouverte
+    le conseil n'est jamais explicitement écarté, en boucle fermée il est
+    toujours suivi.
+
+    ⚠ MA PREMIÈRE VERSION DE CETTE BOUCLE MESURAIT UNE MÉTRIQUE VACUE.
+
+    Elle faisait TERMINER la séance de substitution à chaque tour. Or terminer
+    une séance change l'exposition, donc l'empreinte, donc périme le refus —
+    correctement. `REPEATED_AFTER_EXPLICIT_DECLINE` valait alors zéro pour les
+    quatre systèmes, mémoire ou pas, et n'aurait rien discriminé.
+
+    Le cas réellement atteignable est plus étroit, et il faut le dire :
+    déclarer un refus suppose de démarrer autre chose, ce qui bloque les
+    recommandations jusqu'à la fin de cette séance. **Le même contexte ne
+    survit donc qu'à une séance NON terminée** — l'utilisateur lance autre
+    chose, ne va pas au bout, et revient sur Mission.
+
+    Chaque tour mesure donc deux choses :
+
+    1. `MÊME CONTEXTE` — on redemande la décision juste après le refus, sans
+       rien avoir terminé. C'est la métrique décisive du `§12`.
+    2. `CONTEXTE CHANGÉ` — on termine ensuite une séance, ce qui doit périmer
+       le refus. C'est la supersession du `§5`.
+    """
+    from app.services import advice_memory
+    from app.services.recommendation import (
+        _compute_signals,
+        reset_template_zones_cache,
+    )
+
+    for s in amorce:
+        semer_seance(db, user_id, s, origine)
+
+    vu_gabarit: dict[str, int] = {}
+    vu_famille: dict[str, int] = {}
+    decisions: list[DecisionDeclin] = []
+
+    for i in range(nb):
+        jour = i * pas
+        quand = origine + timedelta(days=jour) + HEURE_DECISION
+        reset_template_zones_cache()
+        reco = advice_memory.recommander(
+            db, user_id, now=quand,
+            politique=politique, avec_memoire=avec_memoire)
+        signaux = _compute_signals(db, user_id, quand)
+        base = _decision_de(jour, reco, signaux, vu_gabarit, vu_famille)
+
+        if reco is None or base.gagnant is None:
+            decisions.append(DecisionDeclin(**base.__dict__))
+            continue
+
+        empreinte = reco["context"]["empreinte_contexte"]
+        offerts = {base.gagnant} | set(base.alternatives)
+        a_la_place = next(
+            (s for s in ("push-b", "pull-b", "legs-b", "push-a", "pull-a")
+             if s not in offerts), None)
+
+        d = DecisionDeclin(**base.__dict__)
+        d.fait_a_la_place = a_la_place
+        decisions.append(d)
+        if a_la_place is None:
+            continue
+
+        # Le refus, enregistré exactement comme le ferait `POST /sessions`.
+        advice_memory.enregistrer_episode(
+            db, user_id,
+            advice_memory.Proposition(
+                empreinte=empreinte, politique=politique,
+                top=base.gagnant, alternatives=base.alternatives,
+                decidee_a=quand,
+            ),
+            issue=advice_memory.issue_de(
+                a_la_place, base.gagnant, base.alternatives),
+            slug_choisi=a_la_place,
+            empreinte_courante=empreinte,
+        )
+        db.commit()
+
+        # 1. MÊME CONTEXTE — rien n'a été terminé. Le conseil revient-il ?
+        reset_template_zones_cache()
+        rappel = advice_memory.recommander(
+            db, user_id, now=quand,
+            politique=politique, avec_memoire=avec_memoire)
+        if rappel is not None:
+            d.repropose_apres_refus = (
+                rappel["top"]["template"].slug == base.gagnant
+                and rappel["context"].get("sans_alternative") is not True
+            )
+            d.sans_alternative = bool(
+                rappel["context"].get("sans_alternative"))
+
+        # 2. CONTEXTE CHANGÉ — l'utilisateur s'entraîne, à autre chose. Sans
+        # cela la trajectoire n'avancerait pas et on mesurerait un utilisateur
+        # qui regarde son téléphone huit fois sans rien faire.
+        semer_seance(db, user_id, Seance(jour=jour, slug=a_la_place), origine)
+        vu_gabarit[a_la_place] = jour
+        f = famille_de(a_la_place)
+        if f:
+            vu_famille[f] = jour
+
+    return decisions
+
+
 # ═══════════════════════ 4. LES AGRÉGATS ═══════════════════════
 
 

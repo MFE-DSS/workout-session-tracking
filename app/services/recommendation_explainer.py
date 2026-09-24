@@ -124,6 +124,19 @@ def explain_recommendation(reco_payload: Any) -> dict[str, Any]:
     if not isinstance(top, dict) or not isinstance(context, dict):
         return _empty(available=False)
 
+    # ── `REC-CP4 §14` — LA CONSÉQUENCE D'UN REFUS, DITE UNE FOIS.
+    #
+    # Quand l'utilisateur a explicitement écarté un conseil, Mission a changé
+    # POUR CETTE RAISON. Ne pas le dire laisserait croire à une girouette : la
+    # veille il fallait faire du LISS, aujourd'hui plus — sans qu'on sache que
+    # c'est parce qu'on a dit non.
+    #
+    # ⚠ UNE LIGNE, ET SEULEMENT QUAND ELLE EXPLIQUE VRAIMENT UN CHANGEMENT.
+    # Pas de tableau de bord de rétroaction, pas de bavardage. Si le conseil
+    # écarté reste la recommandation faute d'alternative, on le dit AUSSI —
+    # c'est l'autre moitié de l'honnêteté (`§7`).
+    consequence = _consequence_du_refus(context)
+
     # ── `REC-CP3` — SI LE MOTEUR A TRANSMIS SA TRACE, ON LA LIT.
     #
     # Tout ce qui suit cette branche re-dérive des raisons depuis un contexte
@@ -135,9 +148,11 @@ def explain_recommendation(reco_payload: Any) -> dict[str, Any]:
     # diverger, et c'est la reconstruction qui a tort, puisqu'elle devine.
     trace = top.get("explication")
     if isinstance(trace, dict):
-        return _depuis_la_trace(trace, top)
+        return _depuis_la_trace(trace, top, consequence)
 
     reasons: list[str] = []
+    if consequence:
+        reasons.append(consequence)
     confidence = "ok"
     fallback_note: str | None = None
 
@@ -188,10 +203,34 @@ def explain_recommendation(reco_payload: Any) -> dict[str, Any]:
     }
 
 
+def _consequence_du_refus(context: dict) -> str | None:
+    """`§14` — ce qu'il faut dire quand un conseil a été écarté.
+
+    ⚠ ELLE N'INVENTE AUCUNE PRÉFÉRENCE. Elle constate un geste et son effet —
+    « tu as écarté X, voici l'option suivante » — jamais « tu n'aimes pas X ».
+    Un refus appartient à une décision, dans un contexte (`§8`).
+
+    ⚠ ELLE NE PARLE QUE SI ELLE EXPLIQUE UN CHANGEMENT. Sans refus dans ce
+    contexte, elle se tait : une ligne affichée à chaque visite cesserait
+    d'être une explication pour devenir du décor.
+    """
+    nom = _clean(context.get("conseil_ecarte_nom"))
+    if not nom:
+        return None
+    if context.get("sans_alternative"):
+        # `§7` — il revient, et il doit dire pourquoi.
+        return (
+            f"{nom} revient : aucune autre séance n'est éligible maintenant."
+        )
+    return f"{nom} écarté — voici l'option suivante."
+
+
 # ───────── `REC-CP3` — lecture de la trace ─────────
 
 
-def _depuis_la_trace(trace: dict, top: dict) -> dict[str, Any]:
+def _depuis_la_trace(
+    trace: dict, top: dict, consequence: str | None = None
+) -> dict[str, Any]:
     """Construit l'explication **en lisant** ce que le moteur a décidé.
 
     Aucune re-dérivation : les facteurs viennent du moteur, dans son ordre de
@@ -205,20 +244,13 @@ def _depuis_la_trace(trace: dict, top: dict) -> dict[str, Any]:
     limitants = [_clean(r) for r in trace.get("facteurs_limitants") or ()]
     justification = _clean(trace.get("justification_repetition"))
 
-    raisons: list[str] = []
-    phrase = _clean(top.get("phrase"))
-    if phrase:
-        raisons.append(phrase)
-    for r in gagnants:
-        # La phrase est déjà une lecture du premier facteur gagnant : la
-        # répéter mot pour mot ferait deux fois la même raison.
-        if r and not _dit_la_meme_chose(r, raisons):
-            raisons.append(_en_phrase(r))
+    raisons: list[str] = [
+        t for t in (consequence, _clean(top.get("phrase"))) if t
+    ]
+    _ajouter_sans_repeter(raisons, gagnants)
     if justification:
         raisons.append(justification)
-    for r in limitants:
-        if r and not _dit_la_meme_chose(r, raisons):
-            raisons.append(_en_phrase(r, prefixe="Mais "))
+    _ajouter_sans_repeter(raisons, limitants, prefixe="Mais ")
 
     partielle = trace.get("provenance") == "partielle"
     if not raisons:
@@ -233,6 +265,26 @@ def _depuis_la_trace(trace: dict, top: dict) -> dict[str, Any]:
         "confidence": "low" if partielle else "ok",
         "fallback_note": _NOTE_OBSERVATION_PARTIELLE if partielle else None,
     }
+
+
+def _ajouter_sans_repeter(
+    raisons: list[str], facteurs: list[str], *, prefixe: str = ""
+) -> None:
+    """Ajoute des facteurs, sans redire ce qui est déjà dit.
+
+    ⚠ EXTRAITE POUR CE QU'ELLE NOMME, PAS SEULEMENT POUR RÉDUIRE UN CHIFFRE.
+
+    Deux boucles identiques — gagnants, puis limitants — portaient la même
+    condition imbriquée dans le corps de `_depuis_la_trace`. Sonar l'a signalé
+    en complexité cognitive ; le vrai défaut était qu'une règle employée deux
+    fois n'avait pas de nom.
+
+    La phrase compacte est déjà une lecture du premier facteur gagnant : la
+    répéter mot pour mot ferait deux fois la même raison à l'écran.
+    """
+    for facteur in facteurs:
+        if facteur and not _dit_la_meme_chose(facteur, raisons):
+            raisons.append(_en_phrase(facteur, prefixe=prefixe))
 
 
 def _en_phrase(facteur: str, *, prefixe: str = "") -> str:
