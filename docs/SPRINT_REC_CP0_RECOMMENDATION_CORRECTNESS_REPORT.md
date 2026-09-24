@@ -236,4 +236,51 @@ rejeu, moteur actuel contre candidat V3. La variété n'est pas la justesse.
 | mutations des gardes neuves | **6/6** | **2/2** + API 1/1 |
 | budget ruff | 267 → **265** | **265** |
 | `check_spec_protocol` | vert | vert |
-| couverture du code neuf (Sonar) | **100 %** | — |
+| couverture du code neuf (Sonar) | **100 %** | **100 %** |
+
+---
+
+## AVENANT POST-MERGE — closeout
+
+| | `CP0a` | `CP0b` |
+|---|---|---|
+| PR | **#243** | **#244** |
+| SHA de tête épinglé | `92283b8` | `75b2ab8` |
+| commit de merge | **`a90bad6`** | **`6080559`** |
+| CI canonique | **7/7 success** | **7/7 success** |
+| gate Sonar (API) | **`OK`** 5/5 | **`OK`** 5/5 |
+| threads non résolus | 0 | 0 |
+
+Méthode `--merge`, SHA de tête épinglé, aucun squash, aucun `--admin`, aucun
+force. Branches et worktrees supprimés après preuve qu'ils ne contenaient ni
+commit unique ni fichier non suivi.
+
+### L'incident Sonar de `CP0a`, et ce qu'il a révélé de mon instrument
+
+Gate rouge au premier passage : `new_code_smells_severity = 15` pour un seuil
+de 14. L'arithmétique désignait **une** finding MAJOR — `external_ruff:F541`,
+une f-string sans placeholder, dans le fichier de test que je venais d'écrire.
+
+⚠ **J'avais pourtant vérifié.** Mon outil croisait chaque finding avec les
+lignes ajoutées par le diff et avait rendu « 0 finding sur mes lignes ». Il
+dérivait ces lignes de `git diff -U0 -- <fichier>` — qui **ne rend rien pour un
+fichier non suivi**. L'ensemble des lignes ajoutées était donc vide, et toutes
+les findings d'un fichier neuf tombaient dans « pré-existant ».
+
+C'est exactement la classe d'erreur que cet outil existe pour prévenir :
+**mesurer le mauvais objet**. Corrigé — un fichier neuf a **toutes** ses lignes
+ajoutées — et revérifié sur les deux worktrees avant `CP0b`, qui a passé le
+gate du premier coup.
+
+### Ce que `REC-CP0` laisse à la suite
+
+* **`P1` — l'épinglage par ordre de catalogue — n'est pas corrigé.** Il est
+  diagnostiqué, et sa preuve la plus directe est consignée au `§5` : les
+  entrées du moteur peuvent basculer complètement sans que sa sortie bouge.
+  `REC-CP1` doit le chiffrer, `REC-CP2` le corriger.
+* **Les chiffres de calibration antérieurs sont invalides** — ils décrivent un
+  moteur qui lisait le futur. `REC-CP1` doit produire sa propre base.
+* **Aucun écart comportemental n'est revendiqué** par `REC-CP0` : la correction
+  porte sur ce que le moteur a le droit de lire, pas sur sa façon de décider.
+
+**Déploiement en production : non fait.** Décision séparée.
