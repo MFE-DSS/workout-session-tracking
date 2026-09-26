@@ -1,63 +1,100 @@
 {% extends "base.html" %}
 {% block content %}
-<h1 class="page-title">Atlas machines</h1>
-<p class="lede">Comment bien exécuter les machines qui reviennent dans Auren. Organisé par famille, lisible hors séance.</p>
+{# `UI-CP7 REFERENCE` — l'atlas devient un DOCUMENT.
 
-<nav class="atlas-toc">
+   MESURÉ avant (390x844) : 2 074 mots, 15,5 écrans, 32 cartes, ZÉRO repli,
+   titre à 18 px sous des titres de section à 22 px, et 8 pastilles de
+   sommaire à 28 px.
+
+   ⚠ Le sommaire ancré EXISTAIT DÉJÀ (`Sb_07`). Mon brief d'arbitrage
+   affirmait le contraire ; je l'ai découvert en ouvrant ce fichier plutôt
+   qu'en relisant ma note. `Q3 = A` reste la bonne réponse, mais la moitié du
+   travail était faite : cette tranche ajoute le REPLI, elle ne crée pas le
+   sommaire. #}
+<div class="doc">
+
+  <header class="doc-head">
+    <h1 class="doc-head__title">Atlas machines</h1>
+    <p class="doc-head__lede">Comment bien exécuter les machines qui reviennent dans Auren. Organisé par famille, lisible hors séance.</p>
+    <p class="doc-head__meta">Référence · version {{ atlas_version }}</p>
+  </header>
+
+  <nav class="atlas-toc" aria-label="Familles de machines">
+    {% for fam in families %}
+    <a class="atlas-toc__item" href="#family-{{ fam.slug }}">{{ fam.name }}</a>
+    {% endfor %}
+  </nav>
+
+  {# ⚠ L'IDENTIFIANT RESTE SUR L'ÉLÉMENT REPLIABLE LUI-MÊME.
+
+     Les ancres `#family-<slug>` sont publiques depuis `Sb_07`. En les
+     déplaçant à l'intérieur du repli, un navigateur qui n'ouvre pas
+     automatiquement un `<details>` ciblé par un fragment ferait atterrir le
+     lecteur sur du contenu masqué. Porté par le `<details>`, le lien conduit
+     au moins toujours à son propre titre — un contrôle de 44 px, visible.
+
+     La PREMIÈRE famille reste ouverte. Neuf lignes repliées et rien d'autre
+     donneraient exactement ce que `§2bis` interdit : un document qui a l'air
+     d'un instrument vide. #}
   {% for fam in families %}
-  <a class="atlas-toc__item" href="#family-{{ fam.slug }}">{{ fam.name }}</a>
-  {% endfor %}
-</nav>
+  <details class="disclosure atlas-family" id="family-{{ fam.slug }}"
+           {% if loop.first %}open{% endif %}>
+    <summary>{{ fam.name }}</summary>
+    <div class="disclosure__panel">
+      {% if fam.description %}<p class="atlas-family__desc">{{ fam.description }}</p>{% endif %}
 
-{% for fam in families %}
-<section class="atlas-family" id="family-{{ fam.slug }}">
-  <h2 class="section-header">{{ fam.name }}</h2>
-  {% if fam.description %}<p class="atlas-family__desc">{{ fam.description }}</p>{% endif %}
+      {% for m in fam.machines %}
+      <article class="doc-entry atlas-machine" id="machine-{{ m.slug }}">
+        <header class="atlas-machine__head">
+          <h3 class="doc-entry__title atlas-machine__name">{{ m.name }}</h3>
+          <span class="atlas-machine__tag atlas-machine__tag--{{ m.equipment }}">{{ m.equipment }}</span>
+        </header>
 
-  {% for m in fam.machines %}
-  <article class="card atlas-machine" id="machine-{{ m.slug }}">
-    <header class="atlas-machine__head">
-      <h3 class="atlas-machine__name">{{ m.name }}</h3>
-      <span class="atlas-machine__tag atlas-machine__tag--{{ m.equipment }}">{{ m.equipment }}</span>
-    </header>
+        {% if m.aliases %}
+        <p class="atlas-machine__aliases"><em>Aussi connu comme :</em> {{ m.aliases|join(', ') }}</p>
+        {% endif %}
 
-    {% if m.aliases %}
-    <p class="atlas-machine__aliases"><em>Aussi connu comme :</em> {{ m.aliases|join(', ') }}</p>
-    {% endif %}
+        {% if m.variants %}
+        <p class="atlas-machine__variants"><strong>Variantes :</strong> {{ m.variants|join(' · ') }}</p>
+        {% endif %}
 
-    {% if m.variants %}
-    <p class="atlas-machine__variants"><strong>Variantes :</strong> {{ m.variants|join(' · ') }}</p>
-    {% endif %}
+        <div class="atlas-machine__grid">
+          {% if m.execution_cues %}
+          <div class="atlas-machine__section">
+            <h4 class="atlas-machine__heading">Points d'exécution</h4>
+            <ul class="atlas-machine__list">
+              {% for cue in m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          {% if m.common_mistakes %}
+          <div class="atlas-machine__section">
+            <h4 class="atlas-machine__heading">Erreurs fréquentes</h4>
+            <ul class="atlas-machine__list atlas-machine__list--warn">
+              {% for mistake in m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+        </div>
 
-    <div class="atlas-machine__grid">
-      {% if m.execution_cues %}
-      <div class="atlas-machine__section">
-        <h4 class="atlas-machine__heading">Points d'exécution</h4>
-        <ul class="atlas-machine__list">
-          {% for cue in m.execution_cues %}<li>{{ cue }}</li>{% endfor %}
-        </ul>
-      </div>
-      {% endif %}
-      {% if m.common_mistakes %}
-      <div class="atlas-machine__section">
-        <h4 class="atlas-machine__heading">Erreurs fréquentes</h4>
-        <ul class="atlas-machine__list atlas-machine__list--warn">
-          {% for mistake in m.common_mistakes %}<li>{{ mistake }}</li>{% endfor %}
-        </ul>
-      </div>
-      {% endif %}
+        <footer class="atlas-machine__meta">
+          Charge : {% if m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté{% endif %}
+          · Latéralité : {{ m.laterality }}
+        </footer>
+      </article>
+      {% endfor %}
     </div>
-
-    <footer class="atlas-machine__meta">
-      Charge : {% if m.load_semantics == 'total' %}totale affichée sur la machine{% else %}par côté{% endif %}
-      · Latéralité : {{ m.laterality }}
-    </footer>
-  </article>
+  </details>
   {% endfor %}
-</section>
-{% endfor %}
 
-<p class="atlas-version text-dim">
-  Atlas version {{ atlas_version }} · Additif, informatif, non prescriptif.
-</p>
+  {# La signature nomme le PRODUIT en premier. En impression la topbar est
+     masquée : sans cela, un document sorti sur papier ne dirait plus d'où il
+     vient — ce qui est précisément ce qu'une signature existe pour dire. #}
+  <p class="doc-sig">
+    <span class="doc-sig__source">Auren</span>
+    <span>Atlas machines · version {{ atlas_version }}</span>
+    <span>Additif, informatif, non prescriptif.</span>
+  </p>
+
+</div>
 {% endblock %}

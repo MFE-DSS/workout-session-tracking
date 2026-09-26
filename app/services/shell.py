@@ -154,9 +154,22 @@ MODES_AVEC_TOPBAR = (MODE_INSTRUMENT, MODE_DOCUMENT)
 #: frontière que `AUREN_INSTRUMENTS §2bis` demande de rendre perceptible.
 #: « Contact » n'est perdu nulle part : il reste dans la navigation secondaire.
 #:
-#: `DOCUMENT` le garde **temporairement**, sur instruction explicite : la
-#: refonte du pied de document appartient à `UI-CP7 REFERENCE`.
-MODES_AVEC_PIED = (MODE_DOCUMENT,)
+#: `UI-CP7 REFERENCE` — LE PIED GÉNÉRIQUE N'EXISTE PLUS NULLE PART.
+#:
+#: `UI-CP6 Q3` l'avait laissé aux documents « temporairement, sur instruction
+#: explicite », en nommant `UI-CP7` comme son propriétaire. Il l'est devenu.
+#:
+#: Ce n'est pas une soustraction seule (`CLAUDE.md §5.3`) : ce qui le remplace
+#: part dans la MÊME livraison. Chaque document porte désormais une
+#: **signature** — provenance, nom du document, version ou date réelle — c'est
+#: à dire ce qu'un document doit dire et qu'aucune des quatre surfaces ne
+#: disait. Le pied, lui, coûtait 135 px pour un mot-marque et un lien que la
+#: navigation secondaire offre déjà.
+#:
+#: La signature vit dans le gabarit du document, pas dans la coque : quatre
+#: documents n'ont pas la même provenance, et un partiel unique aurait forcé
+#: à leur inventer une provenance commune.
+MODES_AVEC_PIED: tuple[str, ...] = ()
 
 
 # ═══════════════ 2. LES DESTINATIONS SECONDAIRES, UNE SEULE FOIS ═══════════════

@@ -7,10 +7,15 @@
    morphologique, aucun verdict performance max, aucune comparaison
    inter-users. #}
 
-<div class="coach-report">
-  <header class="coach-report__head">
-    <h1 class="coach-report__title">Coach Report — @{{ report.identity.username }}</h1>
-    <p class="text-dim coach-report__date">Généré le {{ report.identity.report_date }}</p>
+{# `UI-CP7 REFERENCE` — `Q1` : colonne de lecture bornée et rang DISPLAY.
+   MESURÉ avant : 86 caractères par ligne en desktop pour une cible de ~65, et
+   un titre au rang SECTION (22 px) sur un document destiné à un TIERS.
+   Ce gabarit a déjà sa propre tête : on la PROMEUT, on n'en pose pas une
+   seconde à côté. #}
+<div class="doc coach-report">
+  <header class="doc-head coach-report__head">
+    <h1 class="doc-head__title coach-report__title">Coach Report — @{{ report.identity.username }}</h1>
+    <p class="doc-head__meta coach-report__date">Généré le {{ report.identity.report_date }}</p>
     <p class="coach-report__intent">
       Synthèse 2 min · à présenter à un coach externe ou à lire en bilan personnel.
     </p>
@@ -385,6 +390,15 @@
     </p>
   </section>
   {% endif %}
+
+  {# La provenance d'un document destiné à un tiers. En impression la topbar
+     est masquée : sans cette ligne, la feuille remise au coach ne dirait plus
+     d'où elle vient. #}
+  <p class="doc-sig">
+    <span class="doc-sig__source">Auren</span>
+    <span>Coach Report · @{{ report.identity.username }}</span>
+    <span>Généré le {{ report.identity.report_date }}</span>
+  </p>
 </div>
 
 {% endblock %}
