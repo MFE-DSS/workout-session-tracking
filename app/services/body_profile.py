@@ -398,11 +398,42 @@ def list_measurements(
 
 
 def update_measurement(
-    db: Session, m: BodyMeasurement, cleaned: dict[str, float]
+    db: Session,
+    m: BodyMeasurement,
+    cleaned: dict[str, float],
+    *,
+    champs_soumis: set[str] | None = None,
 ) -> BodyMeasurement:
-    """Replace the editable fields of an owned measurement. Fields absent
-    from ``cleaned`` are reset to NULL (the form submits the full set)."""
+    """Met à jour une mesure possédée. **Absent ≠ effacé.**
+
+    ⚠ `UI-CP7.5A` — LE CONTRAT D'ÉCRITURE CHANGE, ET C'EST LE PRÉALABLE À
+    TOUTE SAISIE GUIDÉE.
+
+    Jusqu'ici, tout champ absent de ``cleaned`` était remis à `NULL` : le
+    formulaire soumettait les treize champs à chaque fois, donc « absent »
+    voulait dire « vidé ». Cette sémantique de REMPLACEMENT rend la saisie
+    partielle **impossible sans perte** — corriger son tour de taille
+    effacerait son poids, ses bras et ses cuisses.
+
+    C'est pourquoi l'écran ne pouvait qu'afficher la matrice entière : ce
+    n'était pas un choix de mise en page, c'était la seule forme que le
+    contrat d'écriture autorisait.
+
+    Désormais :
+
+    * ``champs_soumis`` **fourni** → seuls ces champs sont écrits, les autres
+      restent **inchangés**. Un champ soumis vide est un **effacement
+      explicite**, ce qui reste un geste possible et voulu.
+    * ``champs_soumis`` **absent** (`None`) → ancien comportement de
+      remplacement intégral, conservé pour les appelants qui soumettent
+      réellement l'ensemble.
+
+    ⚠ Le défaut reste le comportement historique : changer la sémantique par
+    DÉFAUT ferait muter en silence des appelants qu'on n'a pas relus.
+    """
     for spec in BODY_MEASUREMENT_FIELDS:
+        if champs_soumis is not None and spec.key not in champs_soumis:
+            continue
         setattr(m, spec.key, cleaned.get(spec.key))
     db.commit()
     db.refresh(m)

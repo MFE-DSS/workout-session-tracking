@@ -139,7 +139,8 @@ async def measurement_update(
     m = bp.get_owned_measurement(db, user.id, measurement_id)
     if m is None:
         raise HTTPException(status_code=404)
-    raw = _form_to_raw(await request.form())
+    formulaire = await request.form()
+    raw = _form_to_raw(formulaire)
     try:
         cleaned = bp.parse_and_validate(raw)
     except ValueError as exc:
@@ -148,7 +149,22 @@ async def measurement_update(
             action_url=f"/body/measurements/{measurement_id}/edit",
             values=raw, edit_id=measurement_id, error=str(exc), status_code=400,
         )
-    bp.update_measurement(db, m, cleaned)
+    # `UI-CP7.5A` — SEULS LES CHAMPS RÉELLEMENT SOUMIS SONT ÉCRITS.
+    #
+    # `_form_to_raw` rend les treize clés quoi qu'il arrive, en substituant
+    # `""` aux absentes : le service ne pouvait donc pas distinguer « champ
+    # vidé » de « champ pas dans ce formulaire », et remettait tout à `NULL`.
+    #
+    # On lit la présence sur le formulaire BRUT, avant cette normalisation.
+    # C'est ce qui rend une saisie partielle possible sans perte — et donc ce
+    # qui rend une capture guidée concevable.
+    bp.update_measurement(
+        db, m, cleaned,
+        champs_soumis={
+            spec.key for spec in bp.BODY_MEASUREMENT_FIELDS
+            if spec.key in formulaire
+        },
+    )
     return RedirectResponse(url="/body", status_code=303)
 
 
