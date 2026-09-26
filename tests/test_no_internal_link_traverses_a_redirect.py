@@ -41,11 +41,18 @@ LEGACY_ROUTE_NAMES = {
 #: Dérogations, chacune avec sa raison et sa condition de sortie.
 #: Une dérogation sans date de péremption est une permission permanente.
 KNOWN_TRAVERSALS = {
-    ("session_done.html", "dashboard"): (
-        "`R-03` — la destination après une séance est un ARBITRAGE ouvert "
-        "(accueil ? progression ? aucune ?), pas un correctif. Sortir de "
-        "cette liste le jour où l'opérateur tranche."
-    ),
+    # `R-03` — DÉROGATION LEVÉE PAR `UI-CP7.5B`, et c'est bien l'arbitrage
+    # qu'elle attendait.
+    #
+    # Sa raison disait : « la destination après une séance est un ARBITRAGE
+    # ouvert (accueil ? progression ? aucune ?) … Sortir de cette liste le
+    # jour où l'opérateur tranche. » L'opérateur a tranché — une seule
+    # transition dominante, vers le débrief — et `session_done.html` ne
+    # pointe plus vers `/dashboard`.
+    #
+    # C'est cette garde qui l'a dit, pas moi : elle a rougi en « dérogation
+    # périmée » à la seconde où le lien a disparu. Un registre de dérogations
+    # qui ne se nettoie pas autorise d'avance le cas suivant.
     ("dashboard.html", "dashboard"): (
         "TROISIÈME OCCURRENCE, trouvée par cette garde même. C'est un "
         "auto-lien DANS le gabarit déprécié : `/dashboard` redirige, donc "

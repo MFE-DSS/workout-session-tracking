@@ -1,5 +1,77 @@
 {% extends "base.html" %}
 {% block content %}
+{# ⚠ UNE SEULE ÉCRITURE DE LA FEUILLE D'ACQUISITION, PAS DEUX.
+
+   Elle sert maintenant à DEUX endroits — la ligne d'un fait connu qu'on
+   corrige, et l'intention choisie dans l'entrée d'acquisition. La copier
+   aurait produit deux orthographes du même contrôle, qui divergeraient à la
+   première correction. C'est le défaut que `nombre_fr` a été créé pour tuer
+   ailleurs dans ce dépôt, et je l'ai déjà commis une fois cette nuit.
+
+   La feuille rend l'ÉTAPE DE CONSENTEMENT à la place des champs lorsque
+   l'autorisation manque (`§5`) : le consentement est une action explicite,
+   puis l'acquisition devient disponible. Il n'est jamais empaqueté dans
+   « Enregistrer ». #}
+{% macro feuille_de_saisie(l, a_consenti) %}
+  {% if l.route == 'profile_measurements_submit' and not a_consenti %}
+  <p class="bl-feuille__consent">
+    Pour enregistrer et conserver tes mesures corporelles, AUREN a besoin de
+    ton autorisation. Elles restent lisibles, exportables et supprimables
+    sans elle.
+  </p>
+  <form method="post" action="{{ url_for('profile_consent_submit') }}">
+    <input type="hidden" name="granted" value="1">
+    <input type="hidden" name="retour" value="fait-{{ l.cle }}">
+    <button type="submit" class="btn btn--ghost">
+      J'autorise l'enregistrement de mes mesures
+    </button>
+  </form>
+  {% else %}
+  <form method="post" action="{{ url_for(l.route) }}" class="bl-feuille__form">
+    {% for c in l.champs %}
+    <div class="bl-feuille__champ">
+      <label for="saisie-{{ c.cle }}">{{ c.libelle }}</label>
+      <input type="number" id="saisie-{{ c.cle }}" name="{{ c.cle }}"
+             step="{{ c.pas }}" min="{{ c.min }}" max="{{ c.max }}"
+             inputmode="decimal"
+             placeholder="{{ l.valeur if l.connue else '—' }}"
+             {% if c.cle == 'wingspan_cm' %}aria-describedby="wingspan_cm_help"{% endif %}>
+    </div>
+    {% endfor %}
+    {% if l.cle == 'wingspan_cm' %}
+    {# ⚠ LE PROTOCOLE D'ENVERGURE SUIT SON CHAMP, IL NE MEURT PAS AVEC LE
+       FORMULAIRE. C'est la seule mesure dont le geste n'est pas évident, et
+       trois gardes de `Sx_MORPHO_CAPTURE_01` l'exigent nommément : le
+       majeur, le même protocole d'une fois sur l'autre, et « laisse vide »
+       plutôt qu'une estimation. #}
+    <p id="wingspan_cm_help" class="bl-feuille__protocole">
+      Bras écartés à l'horizontale, du bout du majeur gauche au bout du
+      majeur droit, dos au mur. Toujours le même protocole d'une fois sur
+      l'autre. Laisse vide si tu ne l'as pas mesurée.
+    </p>
+    {% endif %}
+    {% if l.route == 'profile_measurements_submit' %}
+    {# La date reste saisissable : le formulaire complet la portait, et
+       antidater une mesure prise hier est un geste réel. Vide = maintenant. #}
+    <div class="bl-feuille__champ bl-feuille__champ--date">
+      <label for="date-{{ l.cle }}">Date</label>
+      <input type="date" id="date-{{ l.cle }}" name="measured_at">
+    </div>
+    {% endif %}
+    <button type="submit" class="btn btn--ghost bl-feuille__valider">
+      Enregistrer
+    </button>
+  </form>
+  {# ⚠ AUCUN CHAMP CACHÉ NE VOYAGE AVEC CETTE FEUILLE, et c'est le point.
+     `profile_body_submit` écrivait email + taille + FC repos
+     INCONDITIONNELLEMENT : poster la seule taille aurait effacé les deux
+     autres. J'ai d'abord voulu faire voyager les voisines en
+     `<input type="hidden">` — une rustine qui aurait transporté l'email de
+     l'utilisateur dans chaque feuille, et laissé le défaut intact pour le
+     prochain appelant. La route applique désormais le contrat d'écriture
+     partiel : la feuille poste UN champ, un seul est écrit. #}
+  {% endif %}
+{% endmacro %}
 {# ═══════════════════════════════════════════════════════════════════════════
    BODY_LEDGER — `UI-CP1`, le premier cockpit de production d'AUREN
 
@@ -68,6 +140,20 @@
     Mesure enregistrée. Chaque envoi ajoute une mesure datée ; les mesures
     précédentes sont conservées.
   </output>
+  {% elif consent_required %}
+  {# ⚠ LE REFUS SERVEUR A UNE VOIX. Le garde de consentement renvoie ici ;
+     sans ce retour, une tentative d'écriture sans autorisation aurait
+     simplement l'air de n'avoir rien fait. #}
+  <output class="bl-note bl-flash">
+    Mesure non enregistrée : l'enregistrement de mesures corporelles demande
+    ton autorisation. Ouvre le fait que tu veux noter — elle y est demandée.
+  </output>
+  {% elif consent_saved %}
+  <output class="bl-note bl-flash">
+    {% if a_consenti %}Autorisation accordée. Tu peux enregistrer tes mesures.
+    {% else %}Autorisation retirée. Tes mesures restent lisibles, exportables
+    et supprimables.{% endif %}
+  </output>
   {% endif %}
 
   {# ── 1. RÉPONSE PRIMAIRE ──────────────────────────────────────────────────
@@ -87,12 +173,21 @@
      qu'on doit pouvoir corriger vite ne se note pas derrière un geste de plus.
      Ce que la règle interdit, c'est le GRAND FORMULAIRE et la MATRICE DE
      CHAMPS ; un champ unique n'est ni l'un ni l'autre. #}
+  {# ⚠ `UI-CP7.5A` — LA RÉPONSE PRIMAIRE ET LA LIGNE « POIDS » DU RELEVÉ SONT
+     DÉSORMAIS LA MÊME RÉSOLUTION.
+
+     Elle lisait `latest_values`, c'est-à-dire la dernière LIGNE de mesure.
+     Dès qu'une feuille écrit un fait isolé — noter son tour de taille crée
+     une ligne où le poids est nul — cette lecture aurait affiché « Non pesé »
+     pendant que le relevé, deux centimètres plus bas, affichait le poids.
+     Deux lectures contradictoires de la même donnée sur le même écran, et
+     c'est l'acquisition par ligne qui les aurait rendues atteignables. #}
   <div class="bl-answer">
     <p class="bl-answer__label">Poids</p>
-    {% if latest_values.get('weight_kg') %}
-    <p class="bl-answer__readout">{{ latest_values.get('weight_kg') }}<span class="bl-answer__unit">kg</span></p>
-    {% if weight_age_label %}
-    <p class="bl-answer__age">Pesé {{ weight_age_label }}</p>
+    {% if ligne_poids and ligne_poids.connue %}
+    <p class="bl-answer__readout">{{ ligne_poids.valeur }}<span class="bl-answer__unit">kg</span></p>
+    {% if ligne_poids.age %}
+    <p class="bl-answer__age">Pesé {{ ligne_poids.age }}</p>
     {% else %}
     {# La ligne existe mais n'est pas horodatée : le dire, plutôt que de
        laisser croire à une pesée du jour. #}
@@ -116,131 +211,220 @@
       <label class="quicklog__label" for="quicklog_weight">Poids du jour</label>
       <input class="quicklog__input" type="number" step="0.1" min="30" max="300"
              id="quicklog_weight" name="weight_kg"
-             placeholder="{{ latest_values.get('weight_kg') or 'kg' }}">
+             placeholder="{{ ligne_poids.valeur if ligne_poids and ligne_poids.connue else 'kg' }}">
       <button type="submit" class="btn btn--primary">Noter</button>
     </form>
   </div>
 
-  {# ── 2. RELEVÉ — MESURÉ ───────────────────────────────────────────────────
-     `FactRow.measured_at` traversait TOUTE la chaîne — calculé par
-     `morphology_runtime`, transporté intact par `morphology_readmodel` — et
-     MOURAIT À CE GABARIT, qui rendait Mesure / Valeur / Base. L'horodatage
-     arrivait jusqu'à la porte et personne ne l'ouvrait.
+  {# ═══════════════════════════════════════════════════════════════════════
+     `UI-CP7.5A` — LE RELEVÉ DEVIENT LA PORTE DE SA PROPRE ÉCRITURE
 
-     Ce n'est plus un tableau. Un tableau à trois colonnes impose sa grille à
-     390 px et casse ses cellules ; une ligne de relevé pose le libellé à
-     gauche, la valeur à droite, et la PROVENANCE AVEC L'ÂGE dessous — parce
-     que d'où vient une valeur et de quand elle date sont UN SEUL FAIT :
-     « mesure directe · il y a 7 j ». #}
-  {# ⚠ UNE LISTE DE DÉFINITIONS, PAS UNE PILE DE `span`. Le tableau qui vivait
-     ici portait `scope="row"` et `scope="col"` : une CAPACITÉ d'accessibilité,
-     pas un ornement. Le retirer sans la remplacer aurait fait perdre à un
-     lecteur d'écran l'association entre un libellé et sa valeur — une
-     régression que la suppression du tableau rendait invisible. `dt` / `dd`
-     rend cette association NATIVE, sans imposer la grille d'un tableau qui
-     cassait ses cellules à 390 px. Un terme peut porter deux descriptions :
-     la valeur, puis sa provenance. #}
-  {% if morpho.facts or morpho.ape_index or user.resting_hr %}
+     ⚠ CE N'EST PAS LE FORMULAIRE DE QUATORZE CHAMPS DÉPLACÉ SOUS UN AUTRE
+     TITRE. Il DISPARAÎT, et ce qu'on ouvre n'a jamais plus de deux valeurs.
+
+     CE QUI N'ALLAIT PAS, ET C'ÉTAIT STRUCTUREL. Le relevé se lisait ici, et
+     s'écrivait trois écrans plus bas, dans un tiroir dont le libellé —
+     « Mettre à jour mes mesures · saisie complète » — demandait de
+     comprendre le mot « mesures » pour corriger un tour de taille. Il n'y
+     avait AUCUN chemin entre le fait qu'on regarde et le champ qui l'écrit.
+
+     ⚠ ET LE RELEVÉ NE LISAIT QUE SIX FAITS SUR TREIZE.
+     Cou, hanches, largeur d'épaules, bras, et les côtés gauche/droit des
+     cuisses et mollets étaient saisissables et **jamais relus**.
+     `body_ledger` les résout tous, champ par champ.
+
+     ═══ LE MODÈLE D'ÉTAT, TRANCHÉ PAR L'OPÉRATEUR (`D4` · `D5`) ═══
+
+       FAIT CONNU     → une ligne du relevé, directement manipulable
+       FAIT ABSENT    → PAS de ligne ; il s'acquiert par UNE entrée unique
+
+     ⚠ J'AVAIS RENVERSÉ LA DÉCISION DU 2026-08-20. L'OPÉRATEUR A REFUSÉ.
+
+     J'avais rendu les onze faits absents en lignes permanentes, au motif
+     qu'une ligne n'est plus un constat mais une porte. Mesuré : **+404 px
+     sur un profil vide**, onze rangées « Non renseigné » à la file. Le
+     verdict est net — « An empty profile must NOT permanently enumerate 11
+     "Non renseigné" rows » — et la décision d'origine tient :
+
+         un état vide REPRÉSENTE LE DOMAINE
+         et expose AU PLUS UN prochain pas d'acquisition véridique.
+
+     Ce que mon renversement avait raison de viser, c'était l'IMPASSE : un
+     utilisateur neuf ne pouvait enregistrer que son poids, et le lien de
+     l'état vide pointait vers une ancre inexistante. L'impasse disparaît
+     sans l'énumération — par l'entrée d'acquisition unique ci-dessous.
+
+     LA PORTE D'UN FAIT CONNU EST SA LIGNE. Un `<details>` natif : le
+     `<summary>` EST la rangée, annoncé comme un bouton avec son état
+     déplié. L'affordance ne dépend donc pas du style (`§7`), et aucun
+     bouton « Éditer » n'est répété.
+
+     ⚠ LE CHAMP EST VIDE, LA VALEUR ACTUELLE EST EN PLACEHOLDER.
+     La série est APPEND-ONLY : pré-remplir inviterait à renvoyer une valeur
+     inchangée, qui s'enregistrerait comme une mesure du jour — on
+     fabriquerait une pesée qui n'a pas eu lieu.
+     ═══════════════════════════════════════════════════════════════════════ #}
+  {% set _connus = releve | selectattr('connue') | rejectattr('cle', 'equalto', 'weight_kg') | list %}
+  {% set _absents = releve | rejectattr('connue') | rejectattr('derive') | rejectattr('cle', 'equalto', 'weight_kg') | list %}
   <div class="bl-band">
-    <h2 class="bl-band__title" id="bl-measured">Mesuré</h2>
-    <dl class="bl-rows" aria-labelledby="bl-measured">
+    <h2 class="bl-band__title" id="bl-releve">Relevé</h2>
 
-    {% for f in morpho.facts %}
-      <dt class="bl-row__label">{{ f.label }}</dt>
-      <dd class="bl-row__value">{{ f.value }} {{ f.unit }}</dd>
-      {% if f.source_label == 'profil' %}
-      {# RÉFÉRENCE STABLE — la taille d'un adulte ne périme pas. Lui coller un
-         âge suggérerait qu'elle doit être reprise, ce qui est faux, et
-         noierait les âges qui, eux, comptent. #}
-      <dd class="bl-row__meta">Donnée de référence · profil</dd>
-      {% elif f.age_label %}
-      <dd class="bl-row__meta">{{ f.basis }} · {{ f.age_label }}</dd>
-      {% else %}
-      {# Jamais la couleur seule : le libellé porte l'information, l'italique
-         la double sans introduire de teinte.
+    {% if not a_consenti and _connus %}
+    {# ⚠ PAS DE GRAND PANNEAU DE CONSENTEMENT AU REPOS (`§3` · `§5`). Une
+       seule ligne de fait ; le geste explicite vit dans la feuille qu'on
+       essaie d'ouvrir — là où l'intention naît.
 
-         ⚠ PAS D'INFOBULLE avec la date exacte, et c'est délibéré. Le filtre
-         `date_fr` rend « Jeu 03/09 » SANS ANNÉE : sur une mesure de plus d'un
-         an elle serait ambiguë, donc pire que rien. Et un `title` ne s'ouvre
-         pas au doigt — cette surface se lit sur un téléphone. #}
-      <dd class="bl-row__meta bl-row__meta--unknown">{{ f.basis }} · date inconnue</dd>
-      {% endif %}
-    {% endfor %}
-
-    {% if morpho.ape_index %}
-      <dt class="bl-row__label">{{ morpho.ape_index.label }}</dt>
-      <dd class="bl-row__value">{{ morpho.ape_index.value }} {{ morpho.ape_index.unit }}</dd>
-      {# Un dérivé n'a pas d'âge PROPRE : il vaut celui de ses deux sources, et
-         le dire « non daté » serait faux. Il dit ce qu'il est. #}
-      <dd class="bl-row__meta bl-row__meta--unknown">{{ morpho.ape_index.basis }} · dérivé</dd>
-    {% endif %}
-
-    {% if user.resting_hr %}
-      <dt class="bl-row__label">FC repos</dt>
-      <dd class="bl-row__value">{{ user.resting_hr }} bpm</dd>
-      {# INCONNU DIT COMME TEL, et vérifié dans le modèle : `users.resting_hr`
-         est un `Integer` nu, sans colonne de date. Ce n'est pas une donnée
-         qu'on aurait oublié d'horodater — le schéma ne le permet pas. Une
-         fraîcheur inventée ici serait une fabrication ; l'ignorance est un
-         état légitime et se dit. #}
-      <dd class="bl-row__meta bl-row__meta--unknown">profil · date inconnue</dd>
-    {% endif %}
-    </dl>
-  </div>
-  {% endif %}
-
-  {# ── 2bis. RELEVÉ — ABSENT ────────────────────────────────────────────────
-     Un fait manquant est affiché COMME MANQUANT — jamais remplacé par une
-     valeur neutre. C'est la règle de la chaîne P0.4, et elle vaut ici comme
-     dans le moteur.
-
-     L'ACTION EST AU PIED DE LA BANDE, PAS SUR CHAQUE LIGNE. Six « Ajouter »
-     empilés seraient exactement les « CTA d'édition répétés » que la doctrine
-     du cockpit interdit. Deux destinations existent réellement — la
-     morphométrie et les données de référence — donc au plus deux liens, et
-     seulement ceux qui ont quelque chose à recevoir. #}
-  {% set reference_missing = (not user.height_cm) or (not user.resting_hr) %}
-  {% set morpho_missing = morpho.missing_rows | rejectattr('key', 'equalto', 'height_cm') | list %}
-  {% if morpho.missing_rows or not user.resting_hr %}
-  <div class="bl-band">
-    <h2 class="bl-band__title" id="bl-absent">Absent</h2>
-    {# ⚠ UN PROFIL ENTIÈREMENT VIDE NE S'ÉNUMÈRE PAS.
-       La décision opérateur du 2026-08-20 est explicite et toujours en
-       vigueur : *un état vide représente le domaine et donne AU PLUS un
-       prochain pas véridique*. Le Profil listait alors « Envergure non
-       renseignée · Tour de taille non renseigné · … » — sept façons de dire
-       la même absence, et la liste s'allongeait à chaque champ ajouté au
-       modèle. La première écriture de cette bande refaisait exactement ça.
-
-       L'énumération n'a de valeur que quand elle DISCRIMINE : sur un profil
-       partiel, voir lesquelles des six manquent est une information ; sur un
-       profil vide, c'est la même phrase répétée. La bande bascule donc sur
-       `morpho.facts` — rien de mesuré, une seule phrase. #}
-    {% if morpho.facts %}
-    <dl class="bl-rows" aria-labelledby="bl-absent">
-    {% for m in morpho.missing_rows %}
-      <dt class="bl-row__label">{{ m.label }}</dt>
-      <dd class="bl-row__value bl-row__value--absent">Non renseigné</dd>
-    {% endfor %}
-    {% if not user.resting_hr %}
-      <dt class="bl-row__label">FC repos</dt>
-      <dd class="bl-row__value bl-row__value--absent">Non renseigné</dd>
-    {% endif %}
-    </dl>
-    {% else %}
-    <p class="bl-note">Aucune mesure morphologique enregistrée.</p>
-    {% endif %}
-
-    <p class="bl-note">
-      {% if morpho_missing %}
-      <a class="stat-add" href="#measurements">À compléter</a>{% if reference_missing %} · {% endif %}
-      {% endif %}
-      {% if reference_missing %}
-      <a class="stat-add" href="#reference_data">Ajouter mes données de référence</a>
-      {% endif %}
+       ⚠ ET RIEN DU TOUT SUR UN PROFIL VIDE. Mesuré au rendu : cette note et
+       la phrase d'état vide se collaient en un pavé de six lignes. « Lecture
+       seule » ne veut d'ailleurs rien dire quand il n'y a rien à lire — la
+       demande d'autorisation arrive à son heure, dans la feuille ouverte par
+       « Commencer à mesurer ». #}
+    <p class="bl-note bl-note--consent">
+      Lecture seule : l'enregistrement de nouvelles mesures demande ton
+      autorisation. Elle est demandée au moment où tu notes un fait.
     </p>
+    {% endif %}
+
+    {% if _connus %}
+    {# Le protocole de mesure, UNE fois pour le relevé entier. Il vivait en
+       tête du tiroir de treize champs ; le répéter dans dix feuilles serait
+       dix fois la même phrase.
+
+       ⚠ Il ne paraît pas sans consentement : mesuré au rendu, les deux notes
+       se collaient en un pavé disant à la fois « tu ne peux pas encore
+       enregistrer » et « mesure le matin à jeun ». Une consigne de protocole
+       n'a de sens que pour qui peut s'en servir. #}
+    {% if a_consenti %}
+    <p class="bl-note">
+      Mesurer le matin, à jeun, mêmes conditions. Mètre à plat, muscle
+      relâché.
+    </p>
+    {% endif %}
+
+    <div class="bl-faits" aria-labelledby="bl-releve">
+      {# ⚠ LE POIDS N'A PAS DE LIGNE, ET LE RENDU L'A EXIGÉ.
+         Mesuré à 390 px : « 78,4 kg » paraissait DEUX FOIS à trois lignes
+         d'écart — une fois au rang DISPLAY dans la réponse primaire, une
+         fois en tête du relevé. Le même fait, lu deux fois.
+
+         Sa porte existe déjà au repos, hors tiroir : le quick-log, qu'une
+         décision opérateur garde là parce qu'une donnée volatile qu'on doit
+         corriger vite ne se note pas derrière un geste de plus. Le poids est
+         donc le seul fait dont la ligne serait un doublon pur — et c'est
+         aussi pourquoi il ne figure pas dans l'entrée d'acquisition. #}
+      {% for l in _connus %}
+      {% if l.editable %}
+      <details class="bl-fait" id="fait-{{ l.cle }}">
+        <summary class="bl-fait__ligne">
+          <span class="bl-fait__label">{{ l.libelle }}</span>
+          <span class="bl-fait__valeur">
+            {{- l.valeur }}<span class="bl-fait__unite">{{ l.unite }}</span>
+          </span>
+          {% if l.provenance %}
+          {# ⚠ LA PROVENANCE ET L'ÂGE SONT **UN SEUL FAIT**, UNE SEULE CELLULE.
+             Le premier jet en faisait deux colonnes ; le rendu à 390 px l'a
+             réfuté — « mesure / directe » passait sur deux lignes. D'où vient
+             une valeur et de quand elle date se lisent ensemble.
+
+             `--unknown` met en ITALIQUE ce qui ne peut PAS être daté (la FC
+             repos n'a pas de colonne de date) : jamais une teinte seule. #}
+          <span class="bl-fait__meta{% if 'date inconnue' in l.provenance %} bl-fait__meta--unknown{% endif %}">
+            {{ l.provenance }}{% if l.age %} · {{ l.age }}{% endif %}
+          </span>
+          {% endif %}
+        </summary>
+        <div class="bl-feuille">
+          {{ feuille_de_saisie(l, a_consenti) }}
+        </div>
+      </details>
+      {% else %}
+      {# Un dérivé ne s'écrit pas : il vaut ses sources. Pas de porte, donc
+         pas de `<details>` — une ligne qui s'ouvre sur rien serait un
+         instrument en panne. #}
+      <div class="bl-fait bl-fait--derive">
+        <div class="bl-fait__ligne">
+          <span class="bl-fait__label">{{ l.libelle }}</span>
+          <span class="bl-fait__valeur">
+            {{- l.valeur }}<span class="bl-fait__unite">{{ l.unite }}</span>
+          </span>
+          {# « dérivé », jamais « date inconnue » : un dérivé EST daté, deux
+             fois, et pas forcément du même jour. Le dire non daté serait
+             faux. #}
+          <span class="bl-fait__meta bl-fait__meta--unknown">{{ l.provenance }} · dérivé</span>
+        </div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+    {% else %}
+    {# ═══ ÉTAT VIDE — LE DOMAINE, ET UN SEUL PROCHAIN PAS ═══
+       Décision opérateur du 2026-08-20, CONFIRMÉE le 2026-09-26 : l'état
+       vide représente le domaine et expose au plus UN pas d'acquisition
+       véridique. Il ne l'énumère pas.
+
+       La phrase nomme ce que l'instrument sait suivre — c'est ça,
+       « représenter le domaine » — et l'entrée d'acquisition juste dessous
+       EST le prochain pas. Aucun lien d'ancrage vers un formulaire
+       lointain : c'était l'impasse de la version précédente. #}
+    <p class="bl-note">
+      Aucune mesure corporelle enregistrée. Tours, largeurs et envergure se
+      notent une par une, quand tu les as prises.
+    </p>
+    {% endif %}
+
+    {# ═══ L'ENTRÉE D'ACQUISITION UNIQUE (`D4` · `§3`) ═══════════════════════
+       UNE commande, dans les trois états. Elle ouvre la SÉLECTION D'UNE
+       INTENTION — quel fait veux-tu noter — et rien d'autre : pas un
+       tableau de bord, pas la matrice de quatorze champs.
+
+       Chaque intention ouvre à son tour sa feuille : un fait, ou une paire
+       naturellement comprise ensemble, plus la date. Deux niveaux de
+       `<details>` natifs, zéro JavaScript.
+
+       ⚠ Elle disparaît quand il n'y a plus rien à acquérir — une commande
+       qui ouvrirait une liste vide serait un instrument en panne. #}
+    {% if _absents %}
+    <details class="bl-acquisition" id="ajouter-mesure">
+      <summary class="bl-acquisition__commande">
+        <span class="bl-acquisition__plus" aria-hidden="true">+</span>
+        <span>{{ "Noter une mesure" if _connus else "Commencer à mesurer" }}</span>
+      </summary>
+      <div class="bl-acquisition__panneau">
+        <p class="bl-note">Choisis ce que tu viens de mesurer.</p>
+        {% for l in _absents %}
+        <details class="bl-fait bl-fait--neuf" id="fait-{{ l.cle }}">
+          <summary class="bl-fait__ligne">
+            <span class="bl-fait__label">{{ l.libelle }}</span>
+          </summary>
+          <div class="bl-feuille">
+            {{ feuille_de_saisie(l, a_consenti) }}
+          </div>
+        </details>
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
   </div>
-  {% endif %}
+
+  {# ⚠ LES DEUX BANDES « MESURÉ » ET « ABSENT » ONT DISPARU, ET C'EST UNE
+     FUSION, PAS UNE SUPPRESSION.
+
+     Elles séparaient les faits selon qu'on les connaissait — deux listes de
+     définitions, deux titres, et au pied de la seconde deux liens d'ancrage
+     vers des formulaires lointains (« À compléter », « Ajouter mes données
+     de référence »). Le corps n'est pas deux choses selon qu'on l'a mesuré.
+
+     Le relevé ci-dessus les remplace toutes les deux : une ligne par fait,
+     connue ou non, chacune portant sa propre porte. Un fait absent n'a plus
+     besoin qu'on l'énumère ailleurs pour être atteignable — sa ligne EST
+     l'action. Les deux liens d'ancrage meurent avec les formulaires qu'ils
+     visaient.
+
+     Ce qui NE change pas : un fait manquant reste affiché COMME MANQUANT
+     (chaîne `P0.4`), et un profil entièrement vide ne s'énumère toujours
+     pas — la branche `{% raw %}{% else %}{% endraw %}` du relevé tient la
+     décision opérateur du 2026-08-20. #}
+
 
   {# ── 3. CONTEXTE ──────────────────────────────────────────────────────────
      Ce qui change la lecture du relevé, et rien d'autre. Le garde-fou brut du
@@ -327,82 +511,33 @@
      composant : c'est une intention. #}
   <div class="bl-drawers">
 
-    {# La morphométrie est un MÉCANISME D'ACQUISITION HÉRITÉ, conservé parce
-       qu'il fonctionne — pas parce qu'il est la cible. L'assistant guidé
-       n'est PAS construit ici : il sort du périmètre approuvé de cette
-       tranche. Ce qui change, c'est qu'il ne constitue plus la page.
-       L'`id` est conservé : c'est une cible d'ancrage. #}
-    <details class="disclosure" id="measurements">
-      <summary class="disclosure__summary">
-        <span>Mettre à jour mes mesures <span class="pstate__legacy">saisie complète</span></span>
-        <span class="disclosure__chevron" aria-hidden="true">▾</span>
-      </summary>
-      <div class="bl-drawer__body">
-        <p class="bl-note">
-          Mesurer le matin, à jeun, mêmes conditions. Tape à plat, muscle
-          relâché. Entrer les deux côtés même si similaires. Fréquence
-          idéale : 1x/semaine.
-        </p>
-        <form method="post" action="{{ url_for('profile_measurements_submit') }}" class="body-profile">
-          <div class="body-profile__field body-profile__field--wide">
-            <label for="measured_at">Date</label>
-            <input type="date" id="measured_at" name="measured_at">
-          </div>
-          {% for field, label in capture_fields %}
-          <div class="body-profile__field">
-            <label for="{{ field }}">{{ label }}</label>
-            <input type="number" id="{{ field }}" name="{{ field }}" step="0.1"
-                   value="{{ latest_values.get(field, '') }}"
-                   placeholder="—"
-                   {% if field == 'wingspan_cm' %}aria-describedby="wingspan_cm_help"{% endif %}>
-            {% if field == 'wingspan_cm' %}
-            <span id="wingspan_cm_help" class="bl-note">
-              Bras écartés à l'horizontale, du bout du majeur gauche au bout du
-              majeur droit, dos au mur. Toujours le même protocole d'une fois
-              sur l'autre. Laisse vide si tu ne l'as pas mesurée.
-            </span>
-            {% endif %}
-          </div>
-          {% endfor %}
-          <button type="submit" class="btn btn--ghost">Enregistrer la mesure</button>
-        </form>
-      </div>
-    </details>
+    {# ⚠ LE TIROIR DE QUATORZE CHAMPS EST PARTI, ET SON REMPLAÇANT EST
+       AU-DESSUS.
 
-    {# `UX4_01` — LA TENSION ARTÉRIELLE N'EST PLUS DEMANDÉE ICI.
-       Décision opérateur (`AUREN_UI_BLUEPRINT §5ter`) : `REMOVE_NO_ASK` de
-       l'acquisition courante, données existantes préservées. Mesuré : la
-       donnée traversait `providers.py` et `coach_report.py` jusqu'à un
-       gabarit, sans jamais atteindre `recommendation.py` ni
-       `zone_recovery.py`. Affichée, jamais décisionnelle.
-       `profile_body_submit` n'assigne plus ces colonnes, sans quoi retirer le
-       champ les aurait effacées au prochain enregistrement. #}
-    <details class="disclosure" id="reference_data">
-      <summary class="disclosure__summary">
-        <span>Données de référence</span>
-        <span class="disclosure__chevron" aria-hidden="true">▾</span>
-      </summary>
-      <div class="bl-drawer__body">
-        <form method="post" action="{{ url_for('profile_body_submit') }}" class="body-profile">
-          <div class="body-profile__field body-profile__field--wide">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email"
-                   value="{{ user.email or '' }}" placeholder="optionnel">
-          </div>
-          <div class="body-profile__field">
-            <label for="height_cm">Taille (cm)</label>
-            <input type="number" id="height_cm" name="height_cm"
-                   value="{{ user.height_cm or '' }}" min="100" max="250" placeholder="175">
-          </div>
-          <div class="body-profile__field">
-            <label for="resting_hr">FC repos (bpm)</label>
-            <input type="number" id="resting_hr" name="resting_hr"
-                   value="{{ user.resting_hr or '' }}" min="30" max="220" placeholder="60">
-          </div>
-          <button type="submit" class="btn btn--ghost">Enregistrer</button>
-        </form>
-      </div>
-    </details>
+       « Mettre à jour mes mesures · saisie complète » ouvrait treize `input`
+       plus une date. Un utilisateur qui voulait corriger son tour de taille
+       devait comprendre le mot « mesures », descendre trois écrans, trouver
+       son champ parmi treize, et ignorer les douze autres. C'est la
+       « matrice de champs » que l'arbitrage interdit, et c'était le seul
+       chemin d'écriture existant.
+
+       Les treize champs sont tous joignables, un ou deux à la fois, depuis
+       la ligne du relevé qui les porte. `CLAUDE.md §5.3` est tenu : la
+       soustraction et son remplacement partent dans la même livraison, et
+       le remplacement est mesurable — 13 faits écrivables avant, 13 après,
+       contre 6 faits LISIBLES avant et 13 après.
+
+       ⚠ « DONNÉES DE RÉFÉRENCE » DISPARAÎT AUSSI.
+       Il ne restait de ce tiroir que la taille, la FC repos — qui ont
+       désormais leur ligne — et l'email, qui n'est pas une donnée de
+       référence corporelle mais une donnée d'identité. L'email rejoint donc
+       le tiroir « Compte », où il était déjà AFFICHÉ sans pouvoir y être
+       modifié : la lecture et l'écriture d'un même fait se retrouvent au
+       même endroit.
+
+       Un utilisateur n'a plus à savoir que « taille » et « tour de taille »
+       vivent dans deux tables pour corriger l'une ou l'autre. #}
+
 
     {# ── LE COMPTE QUITTE L'INSTRUMENT ────────────────────────────────────
        Il ne répond PAS à « que sait AUREN de mon corps ? », et il occupait
@@ -424,15 +559,32 @@
       <div class="bl-drawer__body">
         <ul class="stats-list">
           <li><span>Utilisateur</span><b>{{ user.username }}</b></li>
-          {# Un e-mail vide n'est pas cosmétique : sans lui, la
-             réinitialisation de mot de passe est impossible, et le tiret ne le
-             disait pas. Le fait vide porte donc l'action. #}
-          <li><span>Email</span>
-            {% if user.email %}<b>{{ user.email }}</b>
-            {% else %}<b><a class="stat-add" href="#reference_data">Ajouter</a></b>{% endif %}</li>
           <li><span>Inscrit le</span><b>{{ (user.created_at | local).strftime('%d/%m/%Y') if user.created_at else 'Date inconnue' }}</b></li>
           <li><span>Statut</span><b>{% if user.is_active %}Actif{% else %}Inactif{% endif %}</b></li>
         </ul>
+
+        {# ⚠ L'EMAIL SE LISAIT ICI ET S'ÉCRIVAIT AILLEURS.
+           Il figurait dans cette liste, et quand il manquait, la ligne
+           portait un lien « Ajouter » qui envoyait vers le tiroir « Données
+           de référence » — un autre tiroir, sous un titre corporel, pour une
+           donnée d'identité. Un e-mail vide n'est pas cosmétique : sans lui
+           la réinitialisation de mot de passe est impossible.
+
+           Lecture et écriture sont désormais au même endroit, et la route
+           est la même — elle applique le contrat d'écriture partiel, donc
+           poster le seul e-mail ne touche ni la taille ni la FC repos. #}
+        <form method="post" action="{{ url_for('profile_body_submit') }}"
+              class="bl-feuille__form">
+          <div class="bl-feuille__champ bl-feuille__champ--date">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email"
+                   value="{{ user.email or '' }}" placeholder="optionnel">
+          </div>
+          <button type="submit" class="btn btn--ghost bl-feuille__valider">
+            Enregistrer
+          </button>
+        </form>
+
         <p class="bl-note">
           <a class="link" href="{{ url_for('password_change_page') }}">Changer le mot de passe</a>
         </p>

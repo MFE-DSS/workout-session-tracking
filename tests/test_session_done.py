@@ -156,27 +156,49 @@ def test_get_session_in_progress_renders_normally(client):
 
 
 def test_done_page_shows_summary_block(client):
+    """⚠ `UI-CP7.5B` — REPOINTÉE FAIT PAR FAIT, PAS RELÂCHÉE.
+
+    Cette garde épinglait la composition de l'ancien empilement. Chaque
+    littéral est repris ci-dessous avec ce qu'il est devenu, pour qu'on ne
+    puisse pas confondre un déménagement avec un abandon.
+
+        « Work sets »      → « séries ». Le libellé anglais partait de toute
+                             façon ; le fait de complétion reste, en tête.
+        « 2 / 3 »          → inchangé, c'est LE fait de la page.
+        poids de corps     → `BODY_LEDGER` (`CP7.5A`). Il reste collecté sur
+                             le bilan de séance, il n'est plus RENDU ici.
+        ligne par exercice → descendue dans le tiroir de cycle de vie.
+                             Vérifié : aucune autre surface ne la porte.
+        `href="/history"`  → la coque persistante. Quatre sorties de page
+                             sur cinq partent, celle-là comprise.
+        rouvrir            → inchangé, dans la profondeur.
+    """
     sid = _mk_completed_session()
     r = client.get(f"/sessions/{sid}/done")
     assert r.status_code == 200
     body = r.text
-    # Summary: factory creates 1 exo × 3 sets with 2/3 completed.
-    assert "Work sets" in body
-    assert "2 / 3" in body
-    assert "79,4" in body or "79.4" in body  # bodyweight
-    # Per-exercise line
+
+    # Le fait de complétion, en tête. Le compte fait est en `<strong>`, donc
+    # la comparaison se fait sur le TEXTE rendu : chercher « 2 / 3 » dans le
+    # HTML brut échouerait sur un balisage, pas sur une absence.
+    texte_brut = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", body))
+    assert "2 / 3 séries" in texte_brut
+
+    # Le relevé par exercice survit, dans la profondeur.
     assert "E1" in body
     assert "Incline Smith Press" in body
     assert "2/3" in body
-    # CTAs
-    # Sb_27.6 — /dashboard deprecated → no more dashboard CTA on /done.
-    # The session review now exposes its own CTAs (Retour Accueil /
-    # Nouvelle séance) plus the existing Historique link in nav.
-    assert 'href="/history"' in body or "Historique" in body
-    # Reopen form (discreet)
+
+    # L'administration de séance survit, démotée.
     assert "Rouvrir" in body
     assert f"/sessions/{sid}" in body
     assert 'name="action" value="reopen"' in body
+
+    # Et ce qui part est parti pour de bon.
+    corps = body[body.index('class="closeout"'):]
+    assert "79,4" not in corps, (
+        "le poids de corps est rendu au closeout — il appartient à BODY_LEDGER"
+    )
 
 
 def _mk_completed_cardio_session(
@@ -225,14 +247,20 @@ def test_done_page_shows_cardio_recap_for_cardio_kind(client):
     r = client.get(f"/sessions/{sid}/done")
     assert r.status_code == 200
     body = r.text
-    # Cardio block rendered
-    assert "Cardio" in body
-    assert "45" in body and "min" in body.lower()
-    assert "132" in body
-    assert "bpm" in body.lower()
+    # ⚠ `UI-CP7.5B` — les faits cardio montent en TÊTE, là où l'ancien écran
+    # ouvrait par « Work sets 0 / 0 » et rangeait la durée réelle six cartes
+    # plus bas. La mesure de complétion dépend désormais du type de séance.
+    corps = body[body.index('class="closeout"'):]
+    assert "45" in corps
+    assert "min" in corps.lower()
+    assert "132" in corps
+    assert "bpm" in corps.lower()
+    assert "stairmaster" in corps
+    # Les calories machine restent lisibles, mais dans le relevé : le produit
+    # les qualifie lui-même d'« indicatif », elles ne mesurent pas la séance.
     assert "410" in body
-    assert "stairmaster" in body
-    # Strength table must NOT render
+    # Aucun compte de séries de travail sur une séance qui n'en a pas.
+    assert "0 / 0" not in corps
     assert "Par exercice" not in body
 
 
@@ -253,9 +281,30 @@ def test_done_page_shows_substitution_arrow(client):
 
 
 def test_done_page_shows_confidence_badge(client):
-    """La fiabilité de la saisie est rendue, avec son libellé FRANÇAIS.
+    """⚠ `UI-CP7.5B` — LE SCORE NE SURVIT PAS, ET LA GARDE LE PROUVE.
 
-    ⚠ `Sb_UI_SESSION_DONE_01` — CETTE GARDE ÉPINGLAIT « Confiance du logging ».
+    Elle exigeait la présence du badge de fiabilité ; elle exige désormais
+    son absence. L'arbitrage est explicite : *« QUALITY / CONFIDENCE : neither
+    numeric score survives in closeout. A qualitative trust warning may appear
+    ONLY when trust materially changes interpretation. »*
+
+    Deux nombres cohabitaient — « Qualité 92 » et « Fiabilité 90 » — sans que
+    rien ne dise ce qu'ils décidaient, ni pourquoi il en fallait deux. `§15`
+    demandait à tout score encore rendu de prouver quelle décision il sert ;
+    aucun des deux ne le pouvait.
+
+    Ce qui les remplace n'est PAS un troisième nombre : une phrase de
+    conséquence, rendue uniquement quand un signal consommé par le moteur
+    manque, et qui dit l'effet réel — « la prochaine recommandation lira cette
+    séance sans savoir ce qu'elle t'a coûté ». Son contrat est gardé dans
+    `test_ui_cp75b_instrument_de_transition.py`.
+
+    `compute_confidence_score` n'est PAS supprimé : il reste calculé et part
+    dans l'export JSON/CSV, où `confidence_level` est un contrat de données
+    déjà livré. C'est son AFFICHAGE qui part.
+
+    ─── mémoire de la garde précédente ────────────────────────────────────
+    ⚠ `Sb_UI_SESSION_DONE_01` — ELLE ÉPINGLAIT « Confiance du logging ».
 
     « logging » est de l'anglais de développeur, et le badge affichait en plus
     la clé brute `eleve` — un identifiant sans accent, parce que c'en est un :
@@ -269,9 +318,12 @@ def test_done_page_shows_confidence_badge(client):
     r = client.get(f"/sessions/{sid}/done")
     assert r.status_code == 200
     body = r.text
-    assert "Fiabilité de la saisie" in body
-    assert "confidence-badge" in body
-    # La clé pilote la classe ; elle ne doit pas être le texte rendu.
+    # ⚠ `UI-CP7.5B` — ARBITRAGE OPÉRATEUR : « neither numeric score survives
+    # in closeout ». Le badge de fiabilité ET le score de qualité partent.
+    # Voir la docstring mise à jour ci-dessus.
+    assert "Fiabilité de la saisie" not in body
+    assert "confidence-badge" not in body
+    # La clé ne doit toujours pas atteindre l'écran — a fortiori maintenant.
     texte = re.sub(r"<[^>]+>", " ", body)
     for cle in ("eleve", "logging"):
         assert cle not in texte, (
@@ -280,12 +332,32 @@ def test_done_page_shows_confidence_badge(client):
         )
 
 
-def test_done_page_shows_zones_block(client):
-    """Incline Smith Press + Chest Press machine → zone pecs detected."""
+def test_les_zones_sollicitees_appartiennent_au_flight_recorder(client):
+    """⚠ `UI-CP7.5B` — DÉMÉNAGEMENT, ET LE PROPRIÉTAIRE EST VÉRIFIÉ.
+
+    « Zones sollicitées » quitte le closeout : c'est de l'analyse, et
+    `FLIGHT_RECORDER` la possède. La garde ne se contente PAS de constater
+    l'absence — une garde qui vérifie qu'une chose a disparu sans vérifier
+    qu'elle est arrivée ailleurs certifie une soustraction (`§5.3`).
+
+    Le propriétaire est `_partials/zone_exposure.html`, inclus par
+    `/progress` : le comptage de séries par zone sur quatorze jours. La
+    commande dominante du closeout y mène.
+    """
+    import pathlib
+
     sid = _mk_completed_session()
-    r = client.get(f"/sessions/{sid}/done")
-    assert "Zones sollicitées" in r.text
-    assert "Pectoraux" in r.text
+    body = client.get(f"/sessions/{sid}/done").text
+    corps = body[body.index('class="closeout"'):]
+    assert "Zones sollicitées" not in corps
+
+    racine = pathlib.Path(__file__).resolve().parent.parent
+    progress = (racine / "app/templates/progress.html").read_text(
+        encoding="utf-8")
+    assert "zone_exposure" in progress, (
+        "le closeout a cédé les zones à FLIGHT_RECORDER, qui ne les rend plus"
+    )
+    assert (racine / "app/templates/_partials/zone_exposure.html").exists()
 
 
 def test_done_page_shows_anomalies_when_present(client):
@@ -309,5 +381,10 @@ def test_done_page_shows_anomalies_when_present(client):
 
     r = client.get(f"/sessions/{sid}/done")
     body = r.text
-    assert "À vérifier" in body
+    # ⚠ `UI-CP7.5B` — l'anomalie n'a plus sa carte « À vérifier » ; elle est
+    # l'ÉTIQUETTE du tiroir de cycle de vie, parce que rouvrir pour corriger
+    # est la seule conséquence qu'elle ait jamais eue. Le message intégral
+    # reste rendu, dans la profondeur.
+    assert "à vérifier" in body
+    assert "closeout__alerte" in body
     assert "sans reps ni charge" in body

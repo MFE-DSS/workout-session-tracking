@@ -249,21 +249,66 @@ def test_the_progression_level_one_carries_no_epistemic_badge(client):
 def test_an_empty_actionable_fact_offers_to_add_it(client):
     """Six `—` à l'échelle d'une valeur. Ici la donnée manque parce que
     personne ne l'a saisie, et la saisie est à un clic : l'état vide doit
-    porter l'action, pas le constat."""
+    porter l'action, pas le constat.
+
+    ⚠ `UI-CP7.5A` — L'ACTION N'EST PLUS UN LIEN « Ajouter », MAIS ELLE N'EST
+    PAS NON PLUS UNE LIGNE PAR ABSENCE.
+
+    La garde cherchait le mot « Ajouter » : l'affordance de l'époque, un lien
+    d'ancrage posé à côté du manque, qui envoyait vers un formulaire lointain
+    de treize champs.
+
+    J'ai d'abord remplacé chaque absence par sa propre ligne ouvrable.
+    L'opérateur l'a refusé (`D4`) : onze rangées « Non renseigné » sur un
+    profil vide sont la même énumération qu'avant, en plus haute. La
+    décision du 2026-08-20 tient — *un état vide représente le domaine et
+    expose AU PLUS UN prochain pas véridique*.
+
+    La propriété que cette garde défend — *ce qui manque est atteignable,
+    sans impasse* — est tenue par l'ENTRÉE D'ACQUISITION UNIQUE. C'est elle
+    qu'on épingle, et on épingle aussi qu'elle ne mène PAS à un cul-de-sac :
+    la version d'avant pointait vers une ancre inexistante.
+    """
     r = client.get(PROFILE_URL)
     assert r.status_code == 200
     values = re.findall(r"<b>(.*?)</b>", r.text, flags=re.S)
     naked = [v for v in values if v.strip() == "—"]
     assert not naked, f"{len(naked)} tiret(s) nu(s) subsistent"
-    assert "Ajouter" in r.text
+
+    # UNE entrée d'acquisition, et une seule.
+    entrees = re.findall(r'class="bl-acquisition"', r.text)
+    assert len(entrees) == 1, (
+        f"{len(entrees)} entrées d'acquisition — `D4` en veut exactement une"
+    )
+
+    # Et elle ouvre sur des intentions réelles, pas sur le vide.
+    #
+    # ⚠ Borné par une CLASSE, pas par une découpe sur des espaces : ma
+    # première version cherchait `"</details>\n  </div>"` littéralement et
+    # cassait au premier changement d'indentation. `bl-fait--neuf` n'existe
+    # QUE dans ce panneau, donc sa présence après l'entrée le prouve.
+    debut = r.text.index("bl-acquisition__panneau")
+    intentions = re.findall(r'class="bl-fait bl-fait--neuf" id="fait-([\w]+)"',
+                            r.text[debut:])
+    assert intentions, (
+        "l'entrée d'acquisition n'ouvre aucune intention — c'est le "
+        "cul-de-sac que la version précédente avait déjà"
+    )
 
 
 def test_morphology_says_what_is_left_to_do_not_a_score(client):
     """« 0 / 13 mesures » posait un dénominateur comme un score à remplir,
-    dans un produit qui vient de retirer les scores."""
+    dans un produit qui vient de retirer les scores.
+
+    ⚠ `UI-CP7.5A` — « À compléter » disparaît avec le lien qui le portait.
+    Ce que la garde refuse — un dénominateur présenté comme un score —
+    reste refusé, et c'est la moitié qui comptait.
+    """
     r = client.get(PROFILE_URL)
     assert "/ 13 mesures" not in r.text
-    assert "À compléter" in r.text
+    assert re.search(r"\d+\s*/\s*1[23]\b", r.text) is None, (
+        "un compteur de complétude corporelle est réapparu"
+    )
 
 
 def test_the_add_affordances_land_on_a_real_anchor(client):

@@ -27,9 +27,23 @@ def test_the_30d_reading_exists_on_progression(client):
 
 
 def test_profile_shows_body_form(client):
+    """⚠ `UI-CP7.5A` — REPOINTÉE : le tiroir « Données de référence » n'existe
+    plus, la capacité qu'il portait si.
+
+    Il ne contenait que la taille, la FC repos — qui ont désormais leur ligne
+    dans le relevé, avec leur propre feuille — et l'email, qui n'est pas une
+    donnée de référence corporelle et a rejoint le tiroir « Compte », où il
+    était déjà AFFICHÉ sans pouvoir y être modifié.
+
+    La propriété défendue est : depuis `/profile`, la taille se lit ET
+    s'écrit. Elle est plus vraie qu'avant — l'utilisateur n'a plus à savoir
+    que « taille » et « tour de taille » vivent dans deux tables.
+    """
     body = client.get("/profile").text
-    assert "Données de référence" in body or "référence" in body
     assert "Taille" in body
+    # La porte d'écriture existe, et elle est sur la ligne du fait.
+    assert 'id="fait-height_cm"' in body
+    assert 'name="height_cm"' in body
 
 
 def test_profile_body_submit(client):
