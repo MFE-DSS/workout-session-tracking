@@ -467,6 +467,43 @@ def profile_page(
     )
 
 
+def _entier_borne(v: str, lo: int, hi: int) -> int | None:
+    """Un entier dans ses bornes, ou `None` — jamais une valeur tronquée."""
+    v = v.strip()
+    if not v:
+        return None
+    try:
+        n = int(v)
+    except ValueError:
+        return None
+    return n if lo <= n <= hi else None
+
+
+def _appliquer_email(db, user, brut: str) -> None:
+    """Écrit l'e-mail soumis, ou l'efface si le champ est soumis à vide.
+
+    ⚠ EXTRAIT POUR LUI-MÊME, PAS POUR UN COMPTEUR. `Sonar S3776` a signalé
+    la complexité de `profile_body_submit` (22 > 15) après que le contrat
+    d'écriture partiel y a ajouté trois conditions de présence. La branche
+    e-mail est la plus profonde — validation, unicité, effacement explicite —
+    et elle se lisait déjà comme un paragraphe à part : trois questions
+    imbriquées qui ne parlent que d'e-mail.
+    """
+    propre = brut.strip().lower() if brut.strip() else None
+    if not propre:
+        # Champ soumis à vide = effacement EXPLICITE, pas un oubli.
+        user.email = None
+        return
+    # Sb_20.3 — strict regex same as registration.
+    if not EMAIL_REGEX.match(propre):
+        return
+    deja_pris = db.execute(
+        select(User).where(User.email == propre, User.id != user.id)
+    ).scalar_one_or_none()
+    if deja_pris is None:
+        user.email = propre
+
+
 @router.post("/profile/body", response_model=None)
 async def profile_body_submit(
     request: Request,
@@ -518,41 +555,16 @@ async def profile_body_submit(
     Le formulaire complet des données de référence poste toujours les trois,
     donc son comportement ne change pas d'un iota.
     """
-    def _int_or_none(v: str, lo: int, hi: int) -> int | None:
-        v = v.strip()
-        if not v:
-            return None
-        try:
-            n = int(v)
-        except ValueError:
-            return None
-        if n < lo or n > hi:
-            return None
-        return n
-
     # La présence se lit sur le formulaire BRUT : les paramètres typés ont un
     # défaut à `""`, donc ils ne distinguent pas « absent » de « vidé ».
     soumis = await request.form()
 
     if "height_cm" in soumis:
-        user.height_cm = _int_or_none(height_cm, 100, 250)
+        user.height_cm = _entier_borne(height_cm, 100, 250)
     if "resting_hr" in soumis:
-        user.resting_hr = _int_or_none(resting_hr, 30, 220)
-
+        user.resting_hr = _entier_borne(resting_hr, 30, 220)
     if "email" in soumis:
-        email_clean = email.strip().lower() if email.strip() else None
-        if email_clean:
-            # Sb_20.3 — strict regex same as registration.
-            if EMAIL_REGEX.match(email_clean):
-                existing = db.execute(
-                    select(User).where(
-                        User.email == email_clean, User.id != user.id
-                    )
-                ).scalar_one_or_none()
-                if existing is None:
-                    user.email = email_clean
-        else:
-            user.email = None
+        _appliquer_email(db, user, email)
 
     db.commit()
 
