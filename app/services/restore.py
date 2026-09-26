@@ -146,6 +146,19 @@ def restore_from_json_payload(
                     execution_quality=set_data.get("execution_quality"),
                     reps_target=set_data.get("reps_target"),
                     completed=bool(set_data.get("completed", False)),
+                    # `UI-CP8R` — restaurées QUAND ELLES SONT LÀ.
+                    #
+                    # Un export d'avant la migration n'a pas ces clés :
+                    # `.get` rend `None`, `_parse_datetime(None)` rend
+                    # `None`, et la série restaurée dit « faite, heure
+                    # inconnue » — exactement ce qu'elle était. Aucune
+                    # branche de compatibilité, aucun numéro de version :
+                    # l'absence et le `null` se traitent pareil parce
+                    # qu'ils signifient la même chose.
+                    completed_at=_parse_datetime(set_data.get("completed_at")),
+                    rest_dismissed_at=_parse_datetime(
+                        set_data.get("rest_dismissed_at")
+                    ),
                 )
                 se.set_logs.append(sl)
                 result.sets_restored += 1

@@ -170,18 +170,41 @@ def test_a_correction_is_never_auto_committed():
 # ═════════ 3. LE REPOS EST UN ÉTAT, PAS UNE PORTE ═════════
 
 
-def test_the_next_set_row_is_a_real_link_during_rest():
-    """Sans JS aussi : c'est un `<a>` vers la même page sans `rest=1`, donc
-    `console_state` dérive `CURRENT_SET` et la série redevient saisissable.
-    Rien n'est persisté au passage."""
+def test_the_next_set_row_works_without_js_during_rest():
+    """La reprise fonctionne sans JavaScript — c'est ça, l'invariant.
+
+    ⚠ `UI-CP8R` — CETTE GARDE EXIGEAIT UN `<a>`, ET C'EST LA FORME, PAS LA
+    PROPRIÉTÉ. Elle s'appelait `..._is_a_real_link_during_rest`.
+
+    Le lien tenait parce que reprendre n'écrivait rien : c'était un GET vers
+    la même page sans `rest=1`, et le saut ne survivait au rechargement que
+    parce que l'URL rechargée perdait le paramètre. En rendant le repos
+    dérivable de `completed_at`, ne rien écrire ferait réapparaître le repos
+    au rendu suivant — donc reprendre DOIT écrire, donc ce ne peut plus être
+    un GET.
+
+    Ce que la garde protégeait vraiment — **aucune dépendance au
+    JavaScript** — est intact et vérifié plus strictement qu'avant : une
+    soumission native, sans `onclick`, sans `fetch`, déviée par
+    `formaction` (pas de `<form>` imbriqué, qui serait invalide).
+    """
     card = _card()
     assert RESUME_MARKER in card
+    avant = card.split(RESUME_MARKER, 1)[0][-400:]
     resume = card.split(RESUME_MARKER, 1)[1][:400]
-    assert "<a" in card.split(RESUME_MARKER, 1)[0][-200:], (
-        "l'affordance de reprise n'est pas un lien"
+    assert '<button type="submit"' in avant, (
+        "l'affordance de reprise n'est plus une soumission native"
     )
+    assert "formaction=" in avant + resume, (
+        "sans `formaction`, la reprise posterait sur la route d'exercice et "
+        "écrirait les valeurs de série"
+    )
+    for js_only in ("onclick", "hx-post", "data-js-only"):
+        assert js_only not in avant + resume, (
+            f"la reprise dépend du JavaScript via {js_only!r}"
+        )
     assert "rest=1" not in resume, (
-        "le lien de reprise reconduirait à l'état de repos"
+        "la reprise reconduirait à l'état de repos"
     )
 
 
@@ -193,8 +216,15 @@ def test_the_manual_skip_remains_available():
         set_index = 2
     cmd = command_for(ConsoleState(state="rest", current_set=_Set()))
     assert cmd["label"], "la commande de sortie de repos a disparu"
+    # `UI-CP8R` — `nav is None` garde toujours la même chose, et le
+    # commentaire d'origine (« c'est un lien ») a cessé d'être la raison.
+    # La sortie de repos SOUMET désormais, vers `dismiss_rest` via
+    # `formaction`. Ce qu'elle ne doit toujours pas faire, c'est envoyer un
+    # `nav` : ce serait la route d'exercice, donc une écriture des valeurs
+    # de série au moment où l'utilisateur n'a fait qu'écourter un repos.
     assert cmd["nav"] is None, (
-        "la sortie de repos ne doit rien soumettre : c'est un lien"
+        "la sortie de repos ne doit porter aucun `nav` : elle déclencherait "
+        "la persistance des séries"
     )
 
 

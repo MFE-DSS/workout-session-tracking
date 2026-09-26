@@ -108,10 +108,18 @@ def test_aria_current_step_on_active_jump_item(client):
 def _rest_body(client, session_id) -> str:
     """La page dans l'état `REST` — le seul où le minuteur existe.
 
-    `REST` se dérive d'un signal serveur ET d'une série de travail restante :
+    `REST` se dérive d'un FAIT DURABLE — la série de travail complétée et
+    l'heure à laquelle elle l'a été — et d'une série de travail restante :
     les échauffements doivent donc être terminés, sinon l'état courant est
     `WARMUP` et le repos n'a rien à annoncer.
+
+    ⚠ `UI-CP8R` — poser `completed = True` SANS `completed_at` ne produit
+    plus aucun repos, et c'est délibéré : c'est la forme exacte d'une ligne
+    d'avant la migration, « faite, heure inconnue ». Ce montage doit donc
+    dater la complétion, comme le fera la vraie soumission.
     """
+    from datetime import UTC, datetime
+
     from sqlalchemy import select
     from sqlalchemy.orm import selectinload
 
@@ -138,13 +146,33 @@ def _rest_body(client, session_id) -> str:
             .options(selectinload(WorkoutSession.session_exercises)
                      .selectinload(SessionExercise.set_logs))
         ).scalar_one()
+        # ⚠ `UI-CP8R` — LE LABO NE POUVAIT PAS PORTER L'ÉTAT QU'IL MESURAIT.
+        #
+        # `_seed` ne pose QU'UNE série de travail par exercice, et la
+        # condition d'origine était `if len(work) >= 2` : elle n'a donc
+        # jamais complété quoi que ce soit. La garde atteignait quand même
+        # `REST` parce que `?rest=1` l'imposait — sur un exercice où aucune
+        # série n'avait été faite et où, la seule série étant la courante,
+        # aucun repos ne pouvait exister. L'état mesuré était impossible.
+        #
+        # On construit maintenant la situation réelle : une série faite,
+        # datée, et une série en attente derrière elle.
+        from app.models.session import SetLog as _SetLog
+
         for se in sess2.session_exercises:
             work = sorted((sl for sl in se.set_logs if sl.kind == "work"),
                           key=lambda sl: sl.set_index)
-            if len(work) >= 2:
-                work[0].completed, work[0].weight_kg, work[0].reps = True, 60.0, 10
+            if not work:
+                continue
+            if len(work) == 1:
+                se.set_logs.append(_SetLog(
+                    kind="work", set_index=work[0].set_index + 1,
+                    weight_kg=None, reps=None, completed=False,
+                ))
+            work[0].completed, work[0].weight_kg, work[0].reps = True, 60.0, 10
+            work[0].completed_at = datetime.now(UTC)
         db.commit()
-    r = client.get(f"/sessions/{session_id}?rest=1")
+    r = client.get(f"/sessions/{session_id}")
     assert r.status_code == 200, r.text[:300]
     assert "rest-readout" in r.text, "l'état REST n'est pas atteint"
     return r.text
@@ -161,11 +189,27 @@ def test_rest_timer_has_aria_live_polite(client):
 
     # MIGRÉ — le minuteur n'existe QUE dans l'état `REST` (`§7.2`), ce qui est exactement la correction du défaut `D3`. Les gardes de repos conduisent donc la séance jusqu'à cet état.
     body = _rest_body(client, session_id)
+    # ⚠ `UI-CP8R` — LA PROPRIÉTÉ EST « C'EST ANNONCÉ », PAS « IL Y A CET
+    # ATTRIBUT ». Le conteneur était `<div role="status" aria-live="polite">`.
+    # `Web:S6819` (MAJOR) le signalait depuis des mois : `role="status"`
+    # n'est pas restitué de façon fiable par tous les lecteurs d'écran.
+    # C'est désormais `<output>`, qui porte NATIVEMENT `role="status"` et
+    # une politesse `polite` — répéter les deux attributs n'ajoutait rien.
+    #
+    # La garde vérifie donc l'élément annonceur, et refuse explicitement le
+    # retour en arrière vers un `<div>` nu.
     pattern = re.compile(
-        r'<div\b[^>]*\bclass="[^"]*rest-readout[^"]*"[^>]*\baria-live="polite"',
+        r'<output\b[^>]*\bclass="[^"]*rest-readout[^"]*"',
         re.IGNORECASE | re.DOTALL,
     )
-    assert pattern.search(body), "le RestReadout n'annonce pas aria-live=polite"
+    assert pattern.search(body), (
+        "le RestReadout n'est pas un élément annonceur natif"
+    )
+    regression = re.compile(
+        r'<div\b[^>]*\bclass="[^"]*rest-readout[^"]*"', re.IGNORECASE | re.DOTALL)
+    assert not regression.search(body), (
+        "le RestReadout est redevenu un <div> — l'annonce n'est plus native"
+    )
 
 
 # ───────── button types (no-JS contract) ─────────

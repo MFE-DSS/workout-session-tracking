@@ -14,8 +14,15 @@ fichier tandis que le HTML, lui, arrivait à jour.
 `9b41fa3` servi contre le HTML actuel reproduit **exactement** les deux
 symptômes relevés en dogfood — compteur figé sur `1:30` et boutons `±15 s`
 jamais révélés. La cause est structurelle : l'ancien script cherchait
-`[data-start-rest]`, le HTML n'émet plus que `[data-rest-started]`, donc zéro
-racine et une sortie silencieuse.
+`[data-start-rest]`, le HTML de l'époque n'émettait plus que
+`[data-rest-started]`, donc zéro racine et une sortie silencieuse.
+
+⚠ `UI-CP8R` a fait tourner ce contrat une fois de plus : la racine est
+désormais `[data-rest-remaining]`, et le script d'hier ne trouverait pas
+davantage la sienne. C'est précisément l'échéance pour laquelle ce module
+existe — l'empreinte de contenu rend l'ancien fichier inatteignable, donc la
+rotation d'attribut ne peut pas échouer en silence chez un client au cache
+tiède.
 
 Le défaut n'appartient pas au minuteur. Il appartient au **couplage HTML ↔
 asset** : toute évolution de contrat entre les deux échoue en silence chez qui

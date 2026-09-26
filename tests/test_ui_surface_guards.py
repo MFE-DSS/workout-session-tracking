@@ -189,6 +189,17 @@ def test_the_summary_inventory_does_not_rot():
 # ═════════ GARDE 3 — un script ne lit pas un attribut que le HTML n'émet pas ═════
 
 
+def _sans_commentaires_js(src: str) -> str:
+    """Retire `/* … */` et `// …`. Une prose n'est pas une lecture d'attribut."""
+    src = re.sub(r"/\*.*?\*/", "", src, flags=re.DOTALL)
+    return re.sub(r"(?m)^\s*//.*$", "", src)
+
+
+def _sans_commentaires_jinja(src: str) -> str:
+    """Retire `{# … #}`. Un gabarit qui NOMME un attribut ne l'ÉMET pas."""
+    return re.sub(r"\{#.*?#\}", "", src, flags=re.DOTALL)
+
+
 def test_every_selector_a_script_reads_exists_in_a_template():
     """LE VERSANT ENCORE OUVERT DE `DF-03`.
 
@@ -202,12 +213,25 @@ def test_every_selector_a_script_reads_exists_in_a_template():
     mesuré, renommer un attribut dans le script ne fait rougir aucun des 293
     fichiers de test.
     """
+    # ⚠ `UI-CP8R` — CETTE GARDE LISAIT LES COMMENTAIRES COMME DU CODE.
+    #
+    # Elle accusait `session_focus.js` de lire `[data-start-rest]` alors que
+    # le script ne le lit plus depuis longtemps : il le NOMME, dans le
+    # commentaire d'en-tête qui raconte l'incident `DF-03`. Un fichier qui
+    # documente l'attribut qu'il a cessé de lire se faisait donc accuser de
+    # le lire encore — et le remède naturel (retirer l'explication) aurait
+    # coûté la mémoire de l'incident pour satisfaire l'outil.
+    #
+    # Le biais existe dans les deux sens : un commentaire Jinja qui nomme un
+    # attribut retiré aurait DISCULPÉ un script réellement orphelin. On
+    # retire donc les commentaires des deux côtés avant de comparer.
     templates = "\n".join(
-        p.read_text(encoding="utf-8", errors=_ERR) for p in TPL_DIR.rglob("*.html")
+        _sans_commentaires_jinja(p.read_text(encoding="utf-8", errors=_ERR))
+        for p in TPL_DIR.rglob("*.html")
     )
     orphans = []
     for js in sorted(JS_DIR.rglob("*.js")):
-        src = js.read_text(encoding="utf-8", errors=_ERR)
+        src = _sans_commentaires_js(js.read_text(encoding="utf-8", errors=_ERR))
         for attr in sorted(set(_DATA_ATTR.findall(src))):
             if attr not in templates:
                 orphans.append(f"{js.name} lit [{attr}]")
@@ -231,3 +255,27 @@ def test_this_guard_would_have_caught_the_dogfood_incident():
     assert not all(a in html_actuel for a in attrs), (
         "la garde ne verrait PAS la divergence qui a causé `DF-03`"
     )
+
+
+def test_le_depoussierage_des_commentaires_ne_desarme_pas_la_garde():
+    """⚠ Rendre une garde moins bavarde peut la rendre aveugle.
+
+    `UI-CP8R` lui fait ignorer les commentaires, parce qu'elle accusait un
+    script qui se contentait de NOMMER un attribut retiré. Le risque
+    symétrique est immédiat : si le filtre mangeait aussi le code, la garde
+    deviendrait verte en toutes circonstances — le pire des états.
+
+    On prouve donc les deux sens sur le même couple.
+    """
+    js = (
+        "/* jadis on lisait [data-start-rest] */\n"
+        "// et aussi [data-vieux-truc]\n"
+        "document.querySelectorAll('[data-rest-remaining]');\n"
+    )
+    attrs = set(_DATA_ATTR.findall(_sans_commentaires_js(js)))
+    assert attrs == {"data-rest-remaining"}, attrs
+
+    tpl = "{# on n'émet plus data-start-rest #}\n<div data-rest-remaining='9'></div>"
+    propre = _sans_commentaires_jinja(tpl)
+    assert "data-rest-remaining" in propre
+    assert "data-start-rest" not in propre

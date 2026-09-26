@@ -15,11 +15,18 @@
  * chaîne dans le HTML — ni l'un ni l'autre n'exerçait le comportement. Le
  * contrat était écrit, publié, gardé, et inopérant.
  *
- * LE CONTRAT MAINTENANT
- * ---------------------
- * - Le décompte ne démarre QUE si le serveur a posé `data-rest-started`.
+ * LE CONTRAT MAINTENANT (révisé par `UI-CP8R`)
+ * --------------------------------------------
+ * - Le décompte ne démarre QUE si le serveur a posé `data-rest-remaining`,
+ *   et il démarre à CETTE valeur. L'attribut précédent,
+ *   `data-rest-started`, était un booléen : il disait qu'un repos courait,
+ *   pas depuis quand, et le décompte repartait donc de 90 s à chaque
+ *   rendu. Le serveur dérive maintenant le restant de `SetLog.completed_at`.
+ * - **Ce fichier ne décide de rien.** Il n'y a plus de repos « démarré par
+ *   le client » : le client peint un état que le serveur a déjà tranché.
  * - `±15 s` ajuste l'affichage, **rien n'est persisté** : la durée est un
- *   repli de présentation, pas une prescription (amendement C).
+ *   repli de présentation, pas une prescription (amendement C). Un
+ *   rechargement revient donc à la base serveur, et c'est voulu.
  * - Aucune action critique n'en dépend : sans JS, l'utilisateur lit
  *   « Repos suggéré · 1:30 » et `PASSER LE REPOS` reste un lien fonctionnel.
  * - Aucun réseau, aucun framework, aucun bundler, aucune dépendance.
@@ -32,8 +39,21 @@
   var FLOOR_SECONDS = 0;
   var CEILING_SECONDS = 600;
 
-  function parseDuration(el) {
-    var n = parseInt(el.getAttribute("data-rest-duration"), 10);
+  /* `UI-CP8R` — ON LIT CE QUI RESTE, PLUS CE QUE ÇA DURE.
+
+     L'attribut précédent, `data-rest-duration`, portait la durée NOMINALE
+     (90 s). Le décompte repartait donc de 90 à chaque rendu : repos à 1:30,
+     attendre 3 s, recharger, 1:30 de nouveau. Le défaut n'était pas ici —
+     ce fichier faisait exactement ce qu'on lui donnait — mais le serveur
+     n'avait aucune origine de temps à lui donner.
+
+     `data-rest-remaining` est dérivé côté serveur de `SetLog.completed_at`.
+     Le client ne décide plus s'il y a repos ni depuis quand : il peint une
+     valeur déjà tranchée. `FALLBACK_SECONDS` reste le repli si l'attribut
+     manque ou n'est pas lisible — un décompte faux vaut mieux qu'une page
+     cassée, et le rechargement suivant remettra la vérité serveur. */
+  function parseRemaining(el) {
+    var n = parseInt(el.getAttribute("data-rest-remaining"), 10);
     if (!isFinite(n) || n <= 0) {
       return FALLBACK_SECONDS;
     }
@@ -68,7 +88,17 @@
       return;
     }
 
-    var deadline = Date.now() + parseDuration(root) * 1000;
+    /* `UI-CP8R §6` — `Date.now()`, PAS `performance.now()`, ET C'EST
+       DÉLIBÉRÉ. `performance.now()` n'avance pas de façon fiable au travers
+       d'une mise en veille de l'OS ou du navigateur sur WebKit : un
+       téléphone verrouillé pendant le repos rendrait un décompte figé.
+
+       `Date.now()` n'est PAS une vérité de domaine pour autant — c'est une
+       horloge d'AFFICHAGE, valable entre deux rendus serveur. Au
+       rechargement, le serveur re-dérive tout depuis `completed_at`, et
+       cette échéance locale est jetée. Aucun horodatage client n'est jamais
+       persisté. */
+    var deadline = Date.now() + parseRemaining(root) * 1000;
     var resumeUrl = root.getAttribute("data-rest-resume-url");
     var intervalId = null;
     var done = false;
@@ -288,16 +318,20 @@
   }
 
   function init() {
-    /* LA CORRECTION : `data-rest-started` — posé par le serveur uniquement
-       après une série réellement enregistrée — et non `[data-start-rest]`,
-       qui était rendu sur toute carte active. */
+    /* `UI-CP8R` — LA RACINE EST `[data-rest-remaining]`.
+
+       C'était `[data-rest-started]`, un drapeau booléen posé depuis
+       `?rest=1`. Il répondait « oui il y a un repos », jamais « depuis
+       quand ». L'attribut qui le remplace porte la réponse dérivée par le
+       serveur, donc il sert à la fois de déclencheur ET d'origine — un seul
+       attribut, une seule source. */
     /* `DF-B` — l'auto-validation ne dépend PAS du repos : elle vit sur la
        série courante, c'est-à-dire précisément quand il n'y a pas de repos.
        La brancher après le `return` ci-dessous l'aurait rendue inopérante
        dans le seul état où elle sert. */
     initAutoCommit();
 
-    var roots = document.querySelectorAll("[data-rest-started]");
+    var roots = document.querySelectorAll("[data-rest-remaining]");
     if (!roots || roots.length === 0) {
       return;   /* aucune racine : rien à faire, et surtout aucune erreur */
     }

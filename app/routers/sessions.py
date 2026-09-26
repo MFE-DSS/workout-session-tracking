@@ -42,7 +42,9 @@ from app.services.console_state import (
     build_console_state,
     command_for,
     condense_reference,
+    rest_remaining_seconds,
     secondary_for,
+    serie_portant_le_repos,
 )
 from app.services.delta import compute_delta, format_delta
 from app.services.exercise_history import get_exercise_history
@@ -380,8 +382,13 @@ def _positive_int(raw: str | None) -> int | None:
     return value if value > 0 else None
 
 
-def _persist_set_values(se, form) -> None:
+def _persist_set_values(se, form, *, maintenant) -> None:
     """Écrit les valeurs de série postées. `completed` reste dérivé serveur.
+
+    `maintenant` (`UI-CP8R`) est l'heure SERVEUR de la requête, injectée par
+    l'appelant plutôt que lue ici : un test doit pouvoir placer une série
+    dans le passé sans déplacer l'horloge du processus, et l'horloge du
+    client n'entre jamais dans cette écriture.
 
     Sx_24 §E : vide = non fait, weight **ou** reps renseigné = fait. Aucune
     checkbox, jamais.
@@ -434,9 +441,41 @@ def _persist_set_values(se, form) -> None:
                           if champ_poids in form else sl.weight_kg)
             new_reps = (to_int(form.get(champ_reps))
                         if champ_reps in form else sl.reps)
+        etait_complete = bool(sl.completed)
         sl.weight_kg = new_weight
         sl.reps = new_reps
         sl.completed = (new_weight is not None) or (new_reps is not None)
+        _appliquer_episode_de_completion(sl, etait_complete, maintenant)
+
+
+def _appliquer_episode_de_completion(sl, etait_complete: bool, maintenant) -> None:
+    """`UI-CP8R` — les quatre transitions de l'ÉPISODE de complétion.
+
+        INCOMPLÈTE → COMPLÈTE     completed_at = maintenant · dismissal effacé
+        COMPLÈTE   → COMPLÈTE     les DEUX préservés
+        COMPLÈTE   → INCOMPLÈTE   les DEUX effacés
+        INCOMPLÈTE → COMPLÈTE(2)  nouvel horodatage · dismissal effacé
+
+    LA PROPRIÉTÉ QUI PORTE LES TROIS AUTRES : **une décision de saut prise
+    sur une exécution passée ne survit JAMAIS dans une exécution neuve.**
+    Sans l'effacement à l'entrée, retirer une série puis la refaire aurait
+    ressuscité un `rest_dismissed_at` vieux de l'épisode précédent, et la
+    série refaite n'aurait pas eu de repos — un état que l'utilisateur
+    n'aurait pu ni voir venir ni expliquer.
+
+    LA PRÉSERVATION SUR COMPLÈTE → COMPLÈTE n'est pas une commodité : c'est
+    elle qui fait qu'une correction ne relance pas de repos. L'horodatage
+    reste ancien, donc `maintenant − completed_at > D`, donc `restant = 0`.
+    La règle de correction n'a besoin d'aucune branche spéciale — elle tombe
+    de la préservation. (`§11`, cas « correction de S1 pendant S3 ».)
+    """
+    if sl.completed and not etait_complete:
+        sl.completed_at = maintenant
+        sl.rest_dismissed_at = None
+    elif not sl.completed and etait_complete:
+        sl.completed_at = None
+        sl.rest_dismissed_at = None
+    # COMPLÈTE → COMPLÈTE et INCOMPLÈTE → INCOMPLÈTE : on ne touche à rien.
 
 
 #: Séparateurs de gabarit — « Push A — Pecs épaisseur + … », « Push A - … ».
@@ -475,14 +514,21 @@ def _console_context(
     next_name_by_exercise: dict[int, str | None],
     prev_code_by_exercise: dict[int, str | None],
     last_time: dict,
-    rest_signal: bool,
+    maintenant,
     fix_set_id: int | None,
 ) -> dict[str, dict]:
     """État, commande dominante et sorties secondaires, par exercice.
 
-    `rest` et `fix` ne sont honorés que sur la carte ACTIVE. Un état de repos
-    ou de correction sur une carte repliée serait un état d'édition invisible :
-    l'utilisateur ne verrait ni la cause ni le moyen d'en sortir.
+    Le repos et `fix` ne sont honorés que sur la carte ACTIVE. Un état de
+    repos ou de correction sur une carte repliée serait un état d'édition
+    invisible : l'utilisateur ne verrait ni la cause ni le moyen d'en sortir.
+
+    ⚠ `UI-CP8R` — c'est ICI que se ferme « un exercice terminé ne vole pas le
+    repos de l'exercice actif » (`§9`). La dérivation n'est faite QUE pour la
+    carte active ; les autres reçoivent `0`, quoi que disent leurs propres
+    `completed_at`. Le paramètre s'appelait `rest_signal: bool` et venait de
+    `?rest=1` : il est remplacé par l'heure serveur, dont la dérivation a
+    besoin.
     """
     states, commands, secondaries, refs = {}, {}, {}, {}
     for se in ordered:
@@ -492,7 +538,9 @@ def _console_context(
             next_code=next_code_by_exercise[se.id],
             next_name=next_name_by_exercise[se.id],
             prev_code=prev_code_by_exercise[se.id],
-            rest_signal=rest_signal and is_active,
+            rest_remaining=(
+                rest_remaining_seconds(se, now=maintenant) if is_active else 0
+            ),
             fix_set_id=fix_set_id if is_active else None,
         )
         states[se.id] = st
@@ -801,7 +849,17 @@ def session_detail(
         next_name_by_exercise=next_name_by_exercise,
         prev_code_by_exercise=prev_code_by_exercise,
         last_time=last_time,
-        rest_signal=request.query_params.get("rest") == "1",
+        # ⚠ `UI-CP8R` — `?rest=1` N'EST PLUS LU. Il ne l'est nulle part.
+        #
+        # C'était la ligne `rest_signal=request.query_params.get("rest") ==
+        # "1"`. Le paramètre reste syntaxiquement possible dans une URL
+        # ancienne (un signet, un historique de navigateur, un retour
+        # arrière), et il est désormais **inerte** : rien ne le lit, donc il
+        # ne peut ni fabriquer un repos que les faits démentent, ni en
+        # supprimer un qu'ils affirment. C'est la forme la plus sûre de
+        # l'extinction — pas de branche de compatibilité à maintenir, pas de
+        # second système de vérité en parallèle du premier.
+        maintenant=datetime.now(UTC),
         fix_set_id=_positive_int(request.query_params.get("fix")),
         # ⚠ `UI-CP2.1` — `skipwarm` EST RETIRÉ, PAS RENDU INERTE.
         # L'échauffement ne retient plus l'exercice : il n'y a plus rien à
@@ -816,13 +874,17 @@ def session_detail(
         {
             "page_title": session.template_name_snapshot,
             "session": session,
-            # Sb_SESSION_SET_ACTION_01 — signal de repos ÉMIS PAR LE SERVEUR
-            # après un enregistrement de série (`nav=stay`). Ce n'est ni une
-            # durée persistée ni une valeur de confiance : juste « le repos
-            # vient de commencer ». Avec JS le compte à rebours démarre de
-            # là ; sans JS l'utilisateur lit un texte et continue — la
-            # sauvegarde n'en dépend jamais.
-            "rest_active": request.query_params.get("rest") == "1",
+            # ⚠ `UI-CP8R` — `rest_active` EST RETIRÉ DU CONTEXTE, PAS RENDU
+            # INERTE. Il valait `?rest=1`, et le gabarit en faisait
+            # `data-rest-started`, un DRAPEAU BOOLÉEN : « un repos est en
+            # cours », sans depuis quand. Le décompte repartait donc de sa
+            # durée pleine à chaque rendu.
+            #
+            # Ce qui le remplace n'est pas un autre drapeau de page mais une
+            # valeur PAR EXERCICE, portée par l'état de la console :
+            # `cs.rest_remaining_seconds`. Le repos appartient à une
+            # transition de série, pas à une page — un booléen global ne
+            # pouvait pas dire de QUELLE série il parlait.
             "weekday_label": WEEKDAY_LABELS[local_weekday_iso(session.started_at) or session.weekday_iso],
             "stats": stats,
             "rules": rules,
@@ -1081,10 +1143,27 @@ def stay_redirect_target(
       la dernière série ouvre la surface de bilan, et `TERMINER LA SÉANCE`
       n'est émise que de là. Renvoyer sur la carte laisserait l'utilisateur
       devant un exercice fini sans lui dire où aller ;
-    * **`rest=1` est un signal de DÉPART émis par le serveur**, pas une
-      durée persistée. Le repos n'est pas historisé ici : un tracé durable
-      exigerait une migration, donc un sprint séparé
-      (`Sb_REST_EVENT_TRACE_01`).
+    * **la destination n'annonce plus le repos — elle ne le peut plus.**
+
+      ⚠ `UI-CP8R` — `&rest=1` A DISPARU D'ICI, ET C'ÉTAIT LE DÉFAUT.
+
+      Cette fonction émettait `?rest=1`, et le commentaire qu'elle portait
+      disait déjà pourquoi c'était insuffisant : « le repos n'est pas
+      historisé ici : un tracé durable exigerait une migration, donc un
+      sprint séparé (`Sb_REST_EVENT_TRACE_01`) ». **Ce sprint est celui-ci.**
+
+      Un paramètre d'URL ne peut affirmer que « un repos vient de démarrer
+      sur CETTE requête ». Il ne porte aucune origine de temps : recharger
+      trois secondes plus tard réaffichait `1:30`. Le signal est remplacé
+      par un FAIT — `SetLog.completed_at`, écrit juste avant cet aiguillage
+      par la boucle de persistance commune. Le repos se dérive de ce fait à
+      chaque rendu, donc il est juste au premier affichage comme au
+      dixième rechargement.
+
+      `start_rest` survit, et ne décide plus du repos : il ne décide plus
+      que de l'ANCRE. Une série de travail mène à l'écran de repos, qui n'a
+      pas d'ancre ; un échauffement ou une correction mènent à la série,
+      qui en a une.
 
     Aucune sémantique de complétion n'est introduite : `completed` reste
     dérivé côté serveur de la présence de weight/reps (Sx_24 §E), écrit par
@@ -1095,11 +1174,16 @@ def stay_redirect_target(
     ]
     pending.sort(key=lambda sl: sl.set_index)
     if pending:
-        # Il reste une série : on la vise. `rest=1` seulement si ce qui vient
-        # d'être enregistré est une série de TRAVAIL — un échauffement validé
-        # ou une correction ne déclenchent pas de repos. Mesuré au navigateur :
-        # sans cette distinction, le décompte démarrait avant la première
-        # série de travail.
+        # Il reste une série : on la vise. L'ANCRE dépend de ce qui vient
+        # d'être enregistré — une série de TRAVAIL mène à l'écran de repos,
+        # qui n'a pas d'ancre ; un échauffement validé ou une correction
+        # mènent à la série, qui en a une. Mesuré au navigateur : sans cette
+        # distinction, le décompte démarrait avant la première série de
+        # travail.
+        #
+        # ⚠ `UI-CP8R` — `start_rest` NE DÉCLENCHE PLUS LE REPOS, il n'en
+        # choisit plus que la destination. Le repos est déclenché par
+        # l'écriture de `completed_at`, plus haut, et par elle seule.
         if start_rest:
             # ⚠ `UI-CP2` — AUCUN FRAGMENT VERS LE REPOS.
             #
@@ -1111,7 +1195,13 @@ def stay_redirect_target(
             #
             # L'écran de repos tient dans un écran. Il n'a pas besoin d'ancre,
             # et ne pas en poser est plus honnête que d'en poser une morte.
-            return f"/sessions/{session_id}?active={se.id}&rest=1"
+            #
+            # ⚠ `UI-CP8R` — ET PLUS AUCUN `&rest=1` NON PLUS. La destination
+            # ne PORTE plus le repos, elle y ARRIVE : le rendu dérivera
+            # `REST` de `completed_at`, qui vient d'être écrit. L'URL est
+            # désormais la même qu'un rechargement ordinaire — ce qui est
+            # exactement la propriété recherchée.
+            return f"/sessions/{session_id}?active={se.id}"
         return f"/sessions/{session_id}?active={se.id}#set-{pending[0].id}"
     if is_last_exercise:
         return f"/sessions/{session_id}#session-feedback"
@@ -1164,7 +1254,7 @@ async def update_exercise_card(
     # UI. Spec Sx_24 §E : vide = non fait, weight or reps renseigné =
     # fait. This change ONLY affects new POSTs. Historic rows keep
     # their existing `completed` value untouched (no migration).
-    _persist_set_values(se, form)
+    _persist_set_values(se, form, maintenant=datetime.now(UTC))
 
     # Derive success_score from set data (Sb_01)
     from app.services.feedback import compute_success_score
@@ -1193,14 +1283,20 @@ async def update_exercise_card(
     # page — sinon l'action de série annulerait les 867 px gagnés par
     # Sb_UIV2_SESSION_FOCUS_02.
     #
-    # `rest=1` est un SIGNAL DE DÉPART émis par le serveur, pas une durée
+    # ⚠ `UI-CP8R` — CE BLOC ANNONÇAIT SA PROPRE ÉCHÉANCE. Il disait :
+    # « `rest=1` est un SIGNAL DE DÉPART émis par le serveur, pas une durée
     # persistée : le repos n'est pas historisé dans cette tranche (un tracé
-    # durable demanderait une migration → Sb_REST_EVENT_TRACE_01).
-    # `stay` — l'action de série, qui démarre le repos (contrat
-    # `Sb_SESSION_SET_ACTION_01`, inchangé).
-    # `stay_norest` — même destination, aucun repos : validation d'un
-    # échauffement ou enregistrement d'une correction. Ce ne sont pas des
-    # séries de travail exécutées.
+    # durable demanderait une migration → `Sb_REST_EVENT_TRACE_01`) ».
+    # La migration est faite. Le repos est historisé par `completed_at`,
+    # écrit par `_persist_set_values` quelques lignes plus haut.
+    #
+    # `stay` — l'action de série. Elle ne « démarre » plus le repos : le
+    # repos découle de l'écriture. Elle choisit la destination sans ancre.
+    # `stay_norest` — même destination, ancrée sur la série : validation
+    # d'un échauffement ou enregistrement d'une correction. Ce ne sont pas
+    # des séries de travail exécutées, et aucune des deux ne produit de
+    # repos — l'échauffement parce que la dérivation ne regarde que le
+    # travail, la correction parce que `completed_at` y est PRÉSERVÉ.
     if nav_direction in ("stay", "stay_norest"):
         # Q4 — la dernière série du dernier exercice ouvre le bilan. Il faut
         # donc savoir s'il existe un exercice après celui-ci.
@@ -1260,6 +1356,82 @@ async def update_exercise_card(
         # y CONDUIT — il ne contient pas le bilan.
         target = f"/sessions/{session_id}?view=bilan"
     return RedirectResponse(url=target, status_code=303)
+
+
+#: `python:S8415` — la 404 de cette route est DOCUMENTÉE, suivant la
+#: convention déjà posée par `user_programs.py` (`responses={404: …}`). Les
+#: trois autres `HTTPException(404)` de ce fichier ne le sont pas : c'est de
+#: la dette ancienne, tolérée parce qu'elle n'est plus du « code nouveau ».
+#: Les convertir au passage serait une dérive de périmètre.
+_CARTE_INTROUVABLE = "Exercise card not found"
+
+
+@router.post(
+    "/sessions/{session_id}/exercises/{session_exercise_id}/rest/skip",
+    name="dismiss_rest",
+    responses={404: {"description": _CARTE_INTROUVABLE}},
+)
+async def dismiss_rest(
+    session_id: int,
+    session_exercise_id: int,
+    db: DbSession, user: CurrentUser,
+) -> RedirectResponse:
+    """`UI-CP8R` — passer le repos écrit un FAIT. C'est pourquoi c'est un POST.
+
+    ═══════════════════════════════════════════════════════════════════════
+    POURQUOI CETTE ROUTE EXISTE
+
+    Passer le repos était un **lien GET vers la même page sans `rest=1`**, et
+    le gabarit l'affirmait mot pour mot : « aucune donnée persistée, aucun
+    état écrit ». Ça survivait au rechargement pour une unique raison —
+    l'URL rechargée ne portait plus le paramètre.
+
+    En retirant au paramètre son autorité, `UI-CP8R` retire au saut son seul
+    mécanisme : sans écriture, le rendu suivant re-dériverait `REPOS` depuis
+    `completed_at` et **annulerait la décision de l'utilisateur**. Le saut
+    doit donc devenir durable, et un GET qui écrit est interdit par le
+    contrat du dépôt.
+
+    IDEMPOTENCE APPLICATIVE. Un double tap, un renvoi de formulaire, un
+    re-POST après un réseau capricieux : la seconde écriture **préserve**
+    l'horodatage de la première. Réécrire déplacerait un instant déjà vécu —
+    une réémission ne récrit pas l'histoire.
+
+    SANS JAVASCRIPT. Le déclencheur est un `<button type="submit">` du
+    formulaire de la carte, dévié ici par `formaction`. Pas de `<form>`
+    imbriqué (invalide), pas de `fetch`, pas de dépendance au script : le
+    navigateur poste, le serveur écrit, la redirection rend l'état suivant.
+
+    Les valeurs de série sérialisées au passage par le formulaire de la
+    carte sont **délibérément ignorées** : cette route n'a qu'un seul droit
+    d'écriture, et l'élargir en ferait un second point de persistance des
+    séries — la classe de défaut que `UI-CP2.0` a déjà payée.
+    ═══════════════════════════════════════════════════════════════════════
+    """
+    get_owned_session_or_404(db, session_id, user.id)
+    se = db.execute(
+        select(SessionExercise)
+        .where(
+            SessionExercise.id == session_exercise_id,
+            SessionExercise.session_id == session_id,
+        )
+        .options(selectinload(SessionExercise.set_logs))
+    ).scalar_one_or_none()
+    if se is None:
+        raise HTTPException(status_code=404, detail=_CARTE_INTROUVABLE)
+
+    # La série qui POSSÈDE ce repos — la même que celle dont la dérivation
+    # part. La nommer deux fois différemment ferait diverger l'écriture de
+    # la lecture ; on réutilise donc la sélection du service.
+    cible = serie_portant_le_repos(se)
+    if cible is not None and cible.rest_dismissed_at is None:
+        cible.rest_dismissed_at = datetime.now(UTC)
+        db.commit()
+
+    return RedirectResponse(
+        url=stay_redirect_target(session_id, se, start_rest=False),
+        status_code=303,
+    )
 
 
 # ----------------------------------------------------------------------

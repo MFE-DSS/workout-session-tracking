@@ -1,4 +1,4 @@
-{# `RestReadout` — `Sx_UIV3_02 §7.5` + amendement C.
+{# `RestReadout` — `Sx_UIV3_02 §7.5` + amendement C, refondu par `UI-CP8R`.
 
    CE QUE CE BLOC AFFIRME, ET CE QU'IL N'AFFIRME PAS
    -------------------------------------------------
@@ -9,49 +9,85 @@
    l'objectif. Un `rest_target_seconds` par exercice serait une prescription,
    donc une feature métier séparée — pas un glissement dans ce chantier UI.
 
-   L'ajustement `±15 s` **ne persiste pas**.
+   L'ajustement `±15 s` **ne persiste toujours pas**. Un rechargement revient
+   à la base serveur. C'est délibéré : `UI-CP8R` rend durable l'ORIGINE DE
+   TEMPS du repos, jamais la consigne — persister l'ajustement ferait de la
+   durée une affirmation du produit alors qu'elle est une suggestion.
 
-   `data-rest-started` est posé par le serveur (`rest=1`, émis après un
-   `nav=stay`), et c'est LE SEUL déclencheur du décompte. La version
-   précédente démarrait sur `data-start-rest`, rendu inconditionnellement :
-   le minuteur tournait pendant la série (`Sx_UIV3_02B §D3`).
+   ⚠ `UI-CP8R` — `data-rest-started` EST REMPLACÉ, PAS RENOMMÉ.
+   -----------------------------------------------------------
+   L'attribut précédent était un DRAPEAU BOOLÉEN posé depuis `?rest=1` : il
+   disait « un repos est en cours », jamais depuis quand. Le décompte
+   repartait donc de `data-rest-duration` — la durée PLEINE — à chaque
+   rendu. Mesuré : repos à 1:30, attendre 3 s, recharger, 1:30 de nouveau.
 
-   Sans JS : le texte statique est lu, `PASSER LE REPOS` reste un lien
-   fonctionnel dans le `CommandDock`, et la sauvegarde n'a jamais dépendu de
-   ce bloc.
+   `data-rest-remaining` porte ce que le serveur a DÉRIVÉ des faits durables
+   (`SetLog.completed_at`, `SetLog.rest_dismissed_at`). Il est juste au
+   premier rendu comme au dixième rechargement, et il est juste **sans
+   JavaScript** : la valeur statique ci-dessous est la vraie valeur restante,
+   pas une durée nominale.
+
+   Sans JS : le texte est lu, `PASSER LE REPOS` reste une commande
+   fonctionnelle du `CommandDock` (un bouton de formulaire, désormais — il
+   écrit un fait), et la sauvegarde n'a jamais dépendu de ce bloc.
 #}
-{% set rest_seconds = rest_seconds | default(90) %}
-{% set rest_started = rest_active | default(false) %}
-{% set _m = rest_seconds // 60 %}
-{% set _s = rest_seconds % 60 %}
+{% set rest_remaining = rest_remaining | default(0) %}
+{% set _m = rest_remaining // 60 %}
+{% set _s = rest_remaining % 60 %}
 {# `DF-B` — `data-rest-resume-url` : la SORTIE AUTOMATIQUE à T=0.
 
    Rester sur « terminé » avec la série encore verrouillée imposerait un tap
-   de plus pour rien. À zéro, le JS suit cette URL — la même que celle du lien
-   sur la ligne de la série, donc les deux chemins mènent au même état :
+   de plus pour rien. À zéro, le JS suit cette URL.
 
-       REST --minuteur 0--> CURRENT_SET
-       REST --tap S2------> CURRENT_SET
+   ⚠ `UI-CP8R` — CETTE SORTIE-LÀ N'ÉCRIT RIEN, ET C'EST CORRECT. Une
+   expiration NATURELLE n'est pas une décision : le repos est simplement
+   écoulé, et le serveur le dérivera tout seul au prochain rendu puisque
+   `maintenant − completed_at ≥ D`. Seul le saut EXPLICITE écrit
+   `rest_dismissed_at`, parce que lui seul contredit le temps.
 
-   Sans JS, il n'y a pas de sortie automatique : le lien de la ligne et le
-   repli du dock restent les deux sorties, et elles suffisent. #}
-<div
+   Sans JS, il n'y a pas de sortie automatique : le rechargement suivant
+   suffit, et `PASSER LE REPOS` reste la sortie immédiate. #}
+{# UN ÉLÉMENT ANNONCEUR NATIF, PAS UNE DIVISION AVEC UN RÔLE POSÉ À LA MAIN.
+
+   ⚠ NE PAS ÉCRIRE DE BALISE NI D'ATTRIBUT LITTÉRAL DANS CETTE PROSE. Le
+   parseur HTML de Sonar ne connaît pas les commentaires Jinja : il a lu la
+   première version de ce commentaire comme du balisage vivant et a signalé
+   `Web:S6819` sur une explication qui disait justement que le défaut était
+   corrigé. `exercise_card.html` porte le même avertissement, pour la même
+   raison — c'est un piège du dépôt, pas un accident.
+
+   `Web:S6819` (MAJOR) signalait ce bloc depuis des mois : le rôle posé à la
+   main n'est pas restitué de façon fiable par tous les lecteurs d'écran, là
+   où l'élément natif porte ce rôle — et c'est littéralement l'élément prévu
+   pour « le résultat d'un calcul affiché à l'utilisateur ».
+
+   Corrigé ICI plutôt qu'ailleurs parce que cette tranche réécrit ce bloc :
+   la dette tombait dans le code neuf, et la faire adjuger « acceptée » pour
+   verdir une porte aurait enregistré l'analyseur comme ayant tort alors
+   qu'il a raison. Les trois autres occurrences du dépôt ne sont PAS
+   touchées : elles vivent dans des gabarits que `UI-CP8R` n'ouvre pas, et
+   les corriger au passage serait une dérive de périmètre.
+
+   La politesse d'annonce disparaît avec lui : c'est le défaut implicite de
+   `<output>`, et le répéter n'ajoute rien. La mise en page ne bouge pas —
+   `.rest-readout` pose `display: flex`, et `.console[data-state="rest"]`
+   pose `display: grid` : l'affichage en ligne par défaut d'`<output>` est
+   écrasé dans les deux cas. #}
+<output
   class="session-focus__rest-timer rest-readout"
-  data-rest-duration="{{ rest_seconds }}"
-  {% if rest_started %}data-rest-started="1"{% endif %}
-  {% if rest_started and rest_resume_url %}data-rest-resume-url="{{ rest_resume_url }}"{% endif %}
-  role="status"
-  aria-live="polite"
+  data-rest-remaining="{{ rest_remaining }}"
+  {% if rest_resume_url %}data-rest-resume-url="{{ rest_resume_url }}"{% endif %}
 >
-  <span class="rest-readout__label">{% if rest_started %}Repos en cours{% else %}Repos suggéré{% endif %}</span>
+  <span class="rest-readout__label">Repos en cours</span>
   <span
     class="rest-readout__value session-focus__rest-timer__countdown"
     data-rest-display
   >{{ _m }}:{{ '%02d' % _s }}</span>
   {# Révélés par le JS. Sans JS il n'y a rien à ajuster : la valeur affichée
-     est statique, et les masquer évite un contrôle qui ne ferait rien. #}
+     est la valeur serveur, et les masquer évite un contrôle qui ne ferait
+     rien. #}
   <button type="button" class="rest-readout__step" data-rest-step="-15"
           hidden aria-label="−15 s de repos">−15 s</button>
   <button type="button" class="rest-readout__step" data-rest-step="15"
           hidden aria-label="+15 s de repos">+15 s</button>
-</div>
+</output>

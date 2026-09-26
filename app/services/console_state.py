@@ -11,23 +11,35 @@ peignait par-dessus la première (`Sx_UIV3_02B §D2`). La coexistence était un
 Le remède tranché par la spec : **l'état devient le contrôleur de la
 commande**. Ce module calcule cet état.
 
-CE QU'IL N'EST PAS
-------------------
-**Aucun état n'est persisté.** Il n'y a ni colonne, ni modèle, ni migration :
-les six états se déduisent intégralement de `SetLog.completed`, de la position
-de l'exercice dans la séance, et de deux paramètres de requête (`rest`,
-`fix`). `rest=1` existait déjà — il est émis par le routeur après un
-`nav=stay` (`Sb_SESSION_SET_ACTION_01`) ; `fix` est la **seule addition** de
-la tranche, et suit exactement la même discipline : portée requête, jamais
-écrit, repli sans JS naturel puisque c'est un lien.
+CE QUI EST PERSISTÉ, ET CE QUI NE L'EST PAS
+-------------------------------------------
+⚠ `UI-CP8R` A CHANGÉ CETTE SECTION. Elle affirmait « **aucun état n'est
+persisté** … les six états se déduisent de `SetLog.completed` et de deux
+paramètres de requête (`rest`, `fix`) ». C'était vrai, et c'était le défaut :
+`?rest=1` ne peut dire que « un repos vient de démarrer sur CETTE requête »,
+jamais « ce repos a démarré à T ». Un rechargement trois secondes après une
+série réaffichait `1:30`. Mesuré, reproduit, puis corrigé ici.
 
-Persister l'état de repos ferait de la durée une **affirmation du produit**
-alors qu'elle est une suggestion (`Sx_UIV3_04 §1bis C`).
+Deux faits durables, et deux seulement, portent désormais le repos :
+`SetLog.completed_at` (QUAND la série a été faite) et
+`SetLog.rest_dismissed_at` (l'utilisateur a décidé de dépasser CE repos).
+`REST` est **dérivé** d'eux par `rest_remaining_seconds` ; il n'existe aucune
+colonne « état de repos », et il n'y en aura pas — un état persisté se
+désynchronise, un état dérivé ne peut pas.
+
+**La DURÉE, elle, reste une suggestion et n'est toujours pas persistée.**
+`REST_FALLBACK_SECONDS` est une politique de présentation, pas une
+prescription (`Sx_UIV3_04 §1bis C`), et `±15 s` reste local à l'affichage.
+Ce que `UI-CP8R` rend durable est l'ORIGINE DE TEMPS, jamais la consigne.
+
+`fix` garde sa discipline d'origine : portée requête, jamais écrit, repli
+sans JS naturel puisque c'est un lien. Il ne prétend à aucune chronologie.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import Any
 
 # ── les six états, plus rien ─────────────────────────────────────────────
@@ -45,6 +57,111 @@ LAST_EXERCISE_COMPLETE = "last_exercise_complete"
 #: clairement détecté au-delà de 90 s. Un `rest_target_seconds` par exercice
 #: serait une prescription, donc une feature métier séparée.
 REST_FALLBACK_SECONDS = 90
+
+
+def _aware(dt: datetime) -> datetime:
+    """Une date lue de SQLite peut revenir NAÏVE — la comparer lèverait.
+
+    Le dépôt écrit `datetime.now(UTC)` dans des colonnes
+    `DateTime(timezone=True)`, mais SQLite ne stocke pas de fuseau. **Sept
+    services portent déjà cette même normalisation**, chacun avec sa propre
+    orthographe. En unifier huit serait un chantier propre — et hors de
+    `UI-CP8R`, qui ne doit pas déborder.
+
+    ⚠ Ces sept modules étaient NOMMÉS ici, et la liste a dû partir. Une
+    garde de `REC-CP2` interdit qu'un module de politique de recommandation
+    précis soit référencé hors de son banc de mesure, et elle cherche son
+    nom dans le TEXTE du fichier — commentaires compris. Mon énumération
+    citait ce nom, et la faisait rougir.
+
+    La garde protège une vraie propriété — la promotion de cette politique
+    passe par une porte d'arbitrage, pas par une importation opportuniste.
+    L'énumération, elle, n'était qu'illustrative. C'est donc elle qui cède,
+    et le nom ne doit pas revenir ici, fût-ce en prose.
+    """
+    return dt if dt.tzinfo is not None else dt.replace(tzinfo=UTC)
+
+
+def serie_portant_le_repos(session_exercise):
+    """La série de TRAVAIL à qui appartient le repos courant, ou `None`.
+
+    ⚠ UNE SEULE DÉFINITION, DEUX APPELANTS. La dérivation (lecture) et la
+    route de saut (écriture) doivent désigner exactement la même série. Les
+    écrire séparément — « la dernière complétée » ici, « la dernière
+    complétée » là — les ferait diverger au premier cas tordu, et le saut
+    marquerait une série pendant que le décompte en lirait une autre.
+
+    `None` signifie « aucun repos ne peut appartenir à cet exercice » :
+    exercice sans travail, travail entièrement fait, ou aucune série
+    complétée dont l'heure soit connue.
+    """
+    _, works = _split_sets(session_exercise)
+    if not works:
+        return None
+    # Il faut qu'il reste quelque chose à faire : annoncer « repos » sur un
+    # exercice fini promettrait une série qui n'existe pas.
+    if all(sl.completed for sl in works):
+        return None
+    faites = [
+        sl for sl in works
+        if sl.completed and getattr(sl, "completed_at", None) is not None
+    ]
+    if not faites:
+        return None
+    return max(faites, key=lambda sl: _aware(sl.completed_at))
+
+
+def rest_remaining_seconds(
+    session_exercise,
+    *,
+    now: datetime,
+    duration: int = REST_FALLBACK_SECONDS,
+) -> int:
+    """Secondes de repos restantes pour cet exercice. `0` = pas de repos.
+
+    ═══════════════════════════════════════════════════════════════════════
+    `UI-CP8R` — LE SERVEUR POSSÈDE LA VÉRITÉ DU REPOS.
+
+    Avant cette tranche, l'état `REST` se lisait dans `?rest=1`. Ce paramètre
+    ne peut dire qu'une chose : « un repos vient de démarrer sur CETTE
+    requête ». Il ne porte aucune origine de temps, donc un rechargement
+    trois secondes après une série réaffichait `1:30` — mesuré, reproduit.
+
+    L'état se dérive maintenant de faits DURABLES, et d'eux seuls :
+
+        S  = la série de TRAVAIL la plus récemment complétée de l'exercice
+        T0 = S.completed_at
+        D  = `duration` (politique — inchangée, 90 s)
+
+        restant = max(0, D − (now − T0))
+
+        REPOS  ⟺  S existe
+               ∧  T0 n'est pas NULL          (ligne historique : jamais de repos)
+               ∧  S.rest_dismissed_at est NULL
+               ∧  il reste du travail à faire
+               ∧  restant > 0
+
+    ⚠ CORRECTION À MON PROPRE PAQUET DE CONCEPTION. J'y avais écrit « qui a
+    encore une série en attente APRÈS elle », par index. Le producteur
+    d'aujourd'hui ne compare aucun index : `stay_redirect_target` émet
+    `rest=1` dès qu'il RESTE une série non complétée, où qu'elle soit. Poser
+    la condition par index aurait changé la sémantique produit sur les
+    complétions dans le désordre — ce que `§8` interdit à cette tranche.
+    C'est la règle d'aujourd'hui qui est portée, à l'identique.
+
+    ⚠ LA PORTÉE EST L'EXERCICE. L'appelant ne dérive que pour l'exercice
+    ACTIF : un exercice terminé plus tôt ne peut pas voler le repos de celui
+    qu'on exécute.
+    ═══════════════════════════════════════════════════════════════════════
+    """
+    derniere = serie_portant_le_repos(session_exercise)
+    if derniere is None:
+        return 0
+    if getattr(derniere, "rest_dismissed_at", None) is not None:
+        return 0
+
+    ecoule = (_aware(now) - _aware(derniere.completed_at)).total_seconds()
+    return max(0, int(duration - ecoule))
 
 
 @dataclass(frozen=True)
@@ -74,6 +191,11 @@ class ConsoleState:
     #: Code de l'exercice précédent (`None` sur le premier).
     prev_code: str | None = None
     rest_seconds: int = REST_FALLBACK_SECONDS
+    #: `UI-CP8R` — secondes de repos RESTANTES, dérivées par le serveur des
+    #: faits durables. `0` hors de l'état `REST`. C'est cette valeur que le
+    #: gabarit rend et que le JavaScript anime : le client n'a jamais à
+    #: décider s'il y a repos, seulement à peindre un décompte déjà tranché.
+    rest_remaining_seconds: int = 0
 
     # ── lectures de commodité pour le gabarit ────────────────────────────
 
@@ -152,15 +274,25 @@ def build_console_state(
     next_code: str | None,
     next_name: str | None = None,
     prev_code: str | None = None,
-    rest_signal: bool = False,
+    rest_remaining: int = 0,
     fix_set_id: int | None = None,
 ) -> ConsoleState:
     """Dérive l'état de la console pour un exercice.
 
-    `rest_signal` vient de `?rest=1`, posé par le serveur après un `nav=stay`.
-    `fix_set_id` vient de `?fix=<id>`, posé par le lien de correction. **Les
-    deux sont à portée de requête et ne survivent pas au rechargement suivant
-    — c'est voulu.**
+    `rest_remaining` est le nombre de secondes de repos restantes, calculé
+    par `rest_remaining_seconds` à partir des faits DURABLES (`completed_at`,
+    `rest_dismissed_at`). `> 0` ⟹ l'exercice est à l'état `REST`.
+
+    ⚠ `UI-CP8R` — CE PARAMÈTRE S'APPELAIT `rest_signal: bool` ET VENAIT DE
+    `?rest=1`. Un booléen de requête ne peut pas dire depuis QUAND, donc le
+    décompte repartait de zéro à chaque rechargement. Le remplacer par une
+    durée dérivée du serveur est tout le sujet de la tranche : il n'existe
+    plus aucun chemin par lequel une URL puisse fabriquer ou supprimer un
+    repos.
+
+    `fix_set_id` vient de `?fix=<id>`, posé par le lien de correction. Il
+    reste à portée de requête et ne survit pas au rechargement — c'est voulu,
+    et ça ne prétend à aucune chronologie.
 
     ═══════════════════════════════════════════════════════════════════════
     `UI-CP2.1` — L'ÉCHAUFFEMENT CESSE D'ÊTRE UNE PORTE.
@@ -289,10 +421,12 @@ def build_console_state(
     #     repos légitime MÊME si un échauffement reste non résolu.
     if pending_works:
         current, rest = pending_works[0], pending_works[1:]
+        en_repos = rest_remaining > 0
         return ConsoleState(
-            state=REST if rest_signal else CURRENT_SET,
+            state=REST if en_repos else CURRENT_SET,
             current_set=current,
             future_sets=rest,
+            rest_remaining_seconds=rest_remaining if en_repos else 0,
             **common,
         )
 

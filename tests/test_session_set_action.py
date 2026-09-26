@@ -50,6 +50,18 @@ def _first_exercise(session_id: int):
         return se.id, [(s.id, s.set_index) for s in sets]
 
 
+def _est_au_repos(client, session_id: int, se_id: int) -> bool:
+    """L'ÉTAT RENDU, pas un paramètre d'URL.
+
+    `UI-CP8R` — les gardes lisaient `rest=1` dans l'en-tête `Location`,
+    c'est-à-dire le signal supposé produire l'état plutôt que l'état. Ce
+    signal n'existe plus ; et même du temps où il existait, le lire ne
+    prouvait pas que la page rendait un repos.
+    """
+    body = client.get(f"/sessions/{session_id}?active={se_id}").text
+    return "data-rest-remaining=" in body
+
+
 def _set_state(set_id: int):
     from sqlalchemy import select
 
@@ -125,9 +137,17 @@ def test_stay_anchors_on_the_next_incomplete_set(client):
     # repos.
     lieu = r.headers["location"]
     assert f"active={se_id}" in lieu, f"on quitte l'exercice : {lieu!r}"
-    assert "rest=1" in lieu, f"l'action de série ne déclenche pas le repos : {lieu!r}"
     assert "#" not in lieu, (
         f"une ancre morte est posée vers un état qui n'en rend pas : {lieu!r}"
+    )
+    # ⚠ `UI-CP8R` — ON VÉRIFIE L'ÉTAT ATTEINT, PAS LE PARAMÈTRE QUI LE
+    # PRÉTENDAIT. La ligne retirée était `assert "rest=1" in lieu` : elle
+    # lisait la CAUSE supposée dans l'en-tête plutôt que l'EFFET dans la
+    # page. Le paramètre n'existe plus, et la destination est désormais une
+    # URL d'exercice ordinaire — c'est justement la propriété recherchée,
+    # puisqu'un rechargement de cette même URL doit rendre le même état.
+    assert _est_au_repos(client, sid, se_id), (
+        f"l'action de série ne mène pas à l'état de repos : {lieu!r}"
     )
 
 
@@ -148,17 +168,57 @@ def test_stay_anchors_on_the_card_when_every_work_set_is_done(client):
 
 
 def test_the_anchor_target_exists_in_the_rendered_page(client):
-    """Une ancre qui ne correspond à aucun `id` ramène en haut de page —
-    exactement le défaut que cette tranche doit éviter."""
+    """Une ancre qui ne correspond à aucun `id` ramène en haut de page.
+
+    ⚠ `UI-CP8R` — CETTE GARDE NE VISITAIT PAS LA DESTINATION.
+
+    Elle postait, puis chargeait `/sessions/{sid}` **nu** — en jetant l'URL
+    que la redirection venait de produire. Elle vérifiait donc qu'une ancre
+    résolvait dans une page où l'utilisateur n'arrivait jamais. Tant que
+    l'état de repos dépendait de `?rest=1`, la page nue rendait la bande de
+    séries et la garde passait, par accident.
+
+    Elle suit maintenant la redirection réelle, et n'exige la résolution
+    d'une ancre que lorsque la redirection en porte une — l'état de repos
+    n'en pose délibérément aucune.
+    """
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SetLog
+
     sid = _start(client)
-    se_id, sets = _first_exercise(sid)
-    client.post(
+    se_id, _sets = _first_exercise(sid)
+    # ⚠ UN ÉCHAUFFEMENT, PAS `sets[0]`. `_first_exercise` filtre sur
+    # `kind == "work"` : valider sa première entrée COMPLÈTE une série de
+    # travail, donc déclenche un repos, donc retire la bande de séries —
+    # et l'ancre ne résoudrait pas, pour une raison qui n'a rien à voir
+    # avec la propriété gardée. C'est exactement l'erreur que la version
+    # précédente de ce module faisait ailleurs.
+    with SessionLocal() as db:
+        warmups = db.execute(
+            select(SetLog)
+            .where(SetLog.session_exercise_id == se_id, SetLog.kind == "warmup")
+            .order_by(SetLog.set_index.asc())
+        ).scalars().all()
+        warmup_id = warmups[0].id if warmups else None
+    assert warmup_id is not None, "labo non représentatif : aucun échauffement"
+
+    # Chemin SANS repos : un échauffement validé ancre sur la série courante.
+    r = client.post(
         f"/sessions/{sid}/exercises/{se_id}",
-        data={f"set_{sets[0][0]}_weight_kg": "60", "nav": "stay"},
+        data={f"set_{warmup_id}_weight_kg": "20",
+              f"set_{warmup_id}_reps": "12", "nav": "stay_norest"},
         follow_redirects=False,
     )
-    body = client.get(f"/sessions/{sid}").text
-    assert f'id="set-{sets[1][0]}"' in body
+    lieu = r.headers["location"]
+    assert "#" in lieu, f"ce chemin doit poser une ancre : {lieu!r}"
+    chemin, ancre = lieu.split("#", 1)
+    body = client.get(chemin).text
+    assert f'id="{ancre}"' in body, (
+        f"l'ancre {ancre!r} ne résout pas dans {chemin!r} — un fragment "
+        "orphelin ramène silencieusement en haut de page"
+    )
 
 
 # ───────── A2 — prev / next intacts ─────────
@@ -280,24 +340,114 @@ def test_rest_is_not_started_before_any_set_is_saved(client):
 
 
 def test_rest_starts_only_after_a_saved_work_set(client):
-    """Un échauffement validé ne démarre PAS de repos — mesuré au
-    navigateur, `nav=stay` sur le dernier échauffement faisait partir le
-    décompte avant la première série de travail."""
-    sid = _start(client)
-    se_id, sets = _first_exercise(sid)
-    r = client.post(
-        f"/sessions/{sid}/exercises/{se_id}",
-        data={f"set_{sets[0][0]}_weight_kg": "60", "nav": "stay"},
-        follow_redirects=False,
-    )
-    assert "rest=1" in r.headers["location"]
+    """Un échauffement validé ne démarre PAS de repos.
 
-    warm = client.post(
+    ⚠ `UI-CP8R` — CETTE GARDE MESURAIT LE MAUVAIS OBJET, DEPUIS LE DÉBUT.
+
+    Son titre parle d'échauffement ; son corps postait `sets[0]`, que
+    `_first_exercise` filtre sur `kind == "work"`. Elle ne comparait donc
+    pas deux KINDS mais deux valeurs du drapeau `nav`, sur la même série de
+    travail. La propriété annoncée n'a jamais été vérifiée.
+
+    Elle lisait en plus `rest=1` dans l'en-tête `Location`, c'est-à-dire la
+    CAUSE supposée plutôt que l'EFFET. Ce paramètre n'existe plus : le repos
+    se dérive de `completed_at`. La garde lit maintenant l'ÉTAT RENDU, et
+    sépare vraiment l'échauffement de la série de travail.
+    """
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SetLog
+
+    sid = _start(client)
+    se_id, works = _first_exercise(sid)
+    with SessionLocal() as db:
+        warmups = db.execute(
+            select(SetLog)
+            .where(SetLog.session_exercise_id == se_id, SetLog.kind == "warmup")
+            .order_by(SetLog.set_index.asc())
+        ).scalars().all()
+        warmup_ids = [w.id for w in warmups]
+    assert warmup_ids, "labo non représentatif : cet exercice n'a aucun échauffement"
+
+    # 1 — UN ÉCHAUFFEMENT VALIDÉ NE PRODUIT AUCUN REPOS.
+    client.post(
         f"/sessions/{sid}/exercises/{se_id}",
-        data={f"set_{sets[0][0]}_weight_kg": "60", "nav": "stay_norest"},
+        data={f"set_{warmup_ids[0]}_weight_kg": "20",
+              f"set_{warmup_ids[0]}_reps": "12", "nav": "stay_norest"},
         follow_redirects=False,
     )
-    assert "rest=1" not in warm.headers["location"]
+    assert not _est_au_repos(client, sid, se_id), (
+        "un échauffement n'est pas une série exécutée : aucun repos ne lui "
+        "appartient, et la dérivation ne regarde que le travail"
+    )
+
+    # 2 — UNE SÉRIE DE TRAVAIL VALIDÉE EN PRODUIT UN.
+    client.post(
+        f"/sessions/{sid}/exercises/{se_id}",
+        data={f"set_{works[0][0]}_weight_kg": "60",
+              f"set_{works[0][0]}_reps": "8", "nav": "stay"},
+        follow_redirects=False,
+    )
+    assert _est_au_repos(client, sid, se_id)
+
+
+def test_une_correction_ne_relance_aucun_repos(client):
+    """`UI-CP8R §11` — corriger une vieille série ne ressuscite pas un repos.
+
+    C'est la garde du seul autre chemin réel qui poste `stay_norest`. Elle
+    tient **par construction** et non par une branche spéciale : une
+    transition COMPLÈTE → COMPLÈTE préserve `completed_at`, donc le temps
+    écoulé reste celui de l'exécution d'origine.
+
+    On place l'exécution d'origine hors de la fenêtre de repos, puis on
+    corrige. Sans la préservation, la correction poserait un horodatage
+    neuf et l'utilisateur qui rectifie une faute de frappe se verrait
+    imposer 90 secondes.
+    """
+    from datetime import UTC, datetime, timedelta
+
+    from sqlalchemy import select
+
+    from app.database import SessionLocal
+    from app.models.session import SetLog
+
+    sid = _start(client)
+    se_id, works = _first_exercise(sid)
+    first_id = works[0][0]
+
+    client.post(
+        f"/sessions/{sid}/exercises/{se_id}",
+        data={f"set_{first_id}_weight_kg": "60", f"set_{first_id}_reps": "8",
+              "nav": "stay"},
+        follow_redirects=False,
+    )
+    assert _est_au_repos(client, sid, se_id), "labo non représentatif"
+
+    # Le repos de cette série est écoulé depuis longtemps.
+    ancien = datetime.now(UTC) - timedelta(minutes=30)
+    with SessionLocal() as db:
+        sl = db.execute(select(SetLog).where(SetLog.id == first_id)).scalar_one()
+        sl.completed_at = ancien
+        db.commit()
+    assert not _est_au_repos(client, sid, se_id)
+
+    # Correction : même série, nouvelle valeur, `stay_norest`.
+    client.post(
+        f"/sessions/{sid}/exercises/{se_id}",
+        data={f"set_{first_id}_weight_kg": "62.5", f"set_{first_id}_reps": "8",
+              "nav": "stay_norest"},
+        follow_redirects=False,
+    )
+    with SessionLocal() as db:
+        sl = db.execute(select(SetLog).where(SetLog.id == first_id)).scalar_one()
+        assert sl.weight_kg == 62.5, "la correction doit bien être enregistrée"
+        garde = sl.completed_at
+    assert garde is not None
+    assert abs((garde.replace(tzinfo=UTC) - ancien).total_seconds()) < 2, (
+        "`completed_at` a été réécrit par une correction"
+    )
+    assert not _est_au_repos(client, sid, se_id)
 
 
 def test_saving_never_depends_on_the_timer(client):
@@ -323,11 +473,47 @@ def test_saving_never_depends_on_the_timer(client):
 
 
 def test_rest_state_is_not_persisted():
-    """Le repos est un signal de rendu, pas une donnée. Une persistance
-    durable exigerait une migration → Sb_REST_EVENT_TRACE_01."""
+    """Ni durée, ni objet « repos » : on ne persiste que des FAITS.
+
+    ⚠ `UI-CP8R` — CETTE GARDE ÉTAIT VERTE ET SA PROSE ÉTAIT FAUSSE.
+
+    Elle disait « le repos est un signal de rendu, pas une donnée ; une
+    persistance durable exigerait une migration → `Sb_REST_EVENT_TRACE_01` ».
+    Cette migration est faite. Laissée telle quelle, la garde aurait continué
+    de passer en affirmant le contraire du produit — et aurait laissé croire
+    qu'elle protégeait encore quelque chose.
+
+    Les trois noms interdits le RESTENT, et pour des raisons intactes :
+
+    * `rest_started_at` — ce serait une SECONDE source pour l'instant de
+      départ, à côté de `completed_at`, avec la divergence garantie qui va
+      avec. La série complétée EST le départ du repos ;
+    * `rest_duration_s` — persister la durée ferait de 90 s une
+      **prescription** du produit alors que c'est une suggestion
+      (`Sx_UIV3_04 §1bis C`), et l'ajustement `±15 s` deviendrait une donnée ;
+    * `RestEvent` — un objet « repos » serait un état stocké, donc
+      désynchronisable. L'état reste DÉRIVÉ.
+
+    Ce qui est persisté, et seulement cela : QUAND une série a été faite, et
+    SI l'utilisateur a décidé de dépasser ce repos-là.
+    """
     router = ROUTER.read_text(encoding="utf-8")
+    code = "\n".join(
+        ligne for ligne in router.splitlines()
+        if not ligne.lstrip().startswith("#")
+    )
     for forbidden in ("rest_started_at", "rest_duration_s", "RestEvent"):
-        assert forbidden not in router
+        assert forbidden not in code
+
+    from app.models.session import SetLog
+
+    colonnes = set(SetLog.__table__.columns.keys())
+    for interdite in ("rest_seconds", "rest_duration", "rest_until",
+                      "rest_started_at", "resting", "rest_state"):
+        assert interdite not in colonnes, (
+            f"`{interdite}` ferait du repos un état ou une consigne stockée"
+        )
+    assert {"completed_at", "rest_dismissed_at"} <= colonnes
 
 
 # ───────── A7 — noms accessibles ─────────
@@ -395,15 +581,35 @@ def test_set_inputs_keep_their_accessible_names(client):
     from app.database import SessionLocal
     from app.models.session import SetLog
 
-    se_id, works = _first_exercise(sid)
+    se_id, _works = _first_exercise(sid)
     with SessionLocal() as db:
         warm = db.execute(
             select(SetLog)
             .where(SetLog.session_exercise_id == se_id, SetLog.kind != "work")
             .order_by(SetLog.set_index.asc())
         ).scalars().all()
-        ordered = [s.id for s in warm] + [w[0] for w in works[:1]]
+        ordered = [s.id for s in warm]
 
+    # ⚠ `UI-CP8R` — ON NE REMPLIT PLUS LA PREMIÈRE SÉRIE DE TRAVAIL ICI.
+    #
+    # La version précédente postait les échauffements ET la première série
+    # de travail sous `nav=stay_norest`, puis exigeait que les champs de
+    # cette série soient encore VISIBLES. Aucun écran du produit ne produit
+    # cette combinaison : `stay_norest` n'est émis que par la validation
+    # d'échauffement et par la correction — et la correction ne porte que
+    # sur une série DÉJÀ complétée (`_resolve_correction` exige
+    # `sl.completed`).
+    #
+    # Le drapeau `nav` ne suffit plus à empêcher un repos : c'est le FAIT
+    # d'avoir complété une série de travail qui le déclenche. Remplir la
+    # série puis exiger de la voir saisissable demandait au produit d'être
+    # dans deux états à la fois.
+    #
+    # Le chemin RÉEL donne le même écran : valider les échauffements amène
+    # la première série de travail à l'état courant, champs visibles. La
+    # propriété gardée — tout champ de série rendu nomme son type et son
+    # rang — ne bouge pas.
+    assert ordered, "labo non représentatif : aucun échauffement à valider"
     data: dict[str, str] = {"nav": "stay_norest"}
     for set_id in ordered:
         data[f"set_{set_id}_weight_kg"] = "40"
