@@ -44,12 +44,24 @@ def _exercice(warmups, works):
 
 
 def _etat(warmups, works, *, rest=False, suivant="E2"):
-    from app.services.console_state import build_console_state
+    """⚠ `UI-CP8R` — `rest` N'EST PLUS UN PARAMÈTRE DE REQUÊTE.
+
+    La colonne booléenne de la table signifiait « `?rest=1` est dans
+    l'URL ». Elle signifie maintenant « le serveur a dérivé du temps de
+    repos restant à partir de `completed_at` ». La table de vérité des
+    TRANSITIONS D'ÉTAT ne change pas d'une ligne : ce qui change est
+    l'origine du signal, pas la machine qu'il pilote — et c'est exactement
+    ce que la table est là pour prouver.
+    """
+    from app.services.console_state import (
+        REST_FALLBACK_SECONDS,
+        build_console_state,
+    )
 
     return build_console_state(
         _exercice(warmups, works),
         next_code=suivant,
-        rest_signal=rest,
+        rest_remaining=REST_FALLBACK_SECONDS if rest else 0,
     )
 
 

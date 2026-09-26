@@ -85,6 +85,20 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
                         "execution_quality": sl.execution_quality,
                         "reps_target": sl.reps_target,
                         "completed": sl.completed,
+                        # `UI-CP8R` — la chronologie fine part dans la
+                        # sauvegarde. Un export qui se dit sauvegarde et
+                        # laisse tomber l'heure d'exécution rendrait toute
+                        # restauration muette sur le temps.
+                        #
+                        # `None` y est une valeur SIGNIFIANTE : « faite,
+                        # heure inconnue » — ce que dit aussi une ligne
+                        # d'avant la migration. Le format n'est pas
+                        # versionné : deux clés optionnelles de plus dans un
+                        # objet JSON restent lisibles par tout ce qui lisait
+                        # l'ancien, et la restauration traite l'absence
+                        # exactement comme `null`.
+                        "completed_at": _iso(sl.completed_at),
+                        "rest_dismissed_at": _iso(sl.rest_dismissed_at),
                     }
                     for sl in sorted(
                         se.set_logs,
@@ -165,6 +179,12 @@ CSV_HEADERS = [
     "execution_quality",
     "reps_target",
     "completed",
+    # `UI-CP8R` — deux colonnes APPENDUES, jamais insérées. Un consommateur
+    # qui lit par index n'est pas cassé ; un consommateur qui lit par nom
+    # d'en-tête voit deux colonnes de plus. Vides pour toute série d'avant
+    # la migration : « faite, heure inconnue ».
+    "completed_at",
+    "rest_dismissed_at",
 ]
 
 
@@ -239,6 +259,8 @@ def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
                         _opt(sl.execution_quality),
                         _opt(sl.reps_target),
                         _opt(sl.completed),
+                        _opt(_iso(sl.completed_at)),
+                        _opt(_iso(sl.rest_dismissed_at)),
                     ]
                 )
 

@@ -522,19 +522,33 @@
                    reprendre est « je commence cette série », pas « j'exécute
                    d'abord une opération administrative ».
 
-                   C'est un LIEN NATIF vers la même page SANS `rest=1` :
-                   `console_state` dérive alors `CURRENT_SET` et la série
-                   redevient saisissable. Donc **aucune donnée persistée**,
-                   **aucun état écrit**, et **ça marche sans JS**.
+                   ⚠ `UI-CP8R` — C'ÉTAIT UN LIEN, C'EST UN BOUTON, PARCE QUE
+                   LE GESTE A CHANGÉ DE NATURE.
 
-                   Le repli `PASSER LE REPOS` du dock reste disponible : c'est
-                   la même destination, conservée comme sortie explicite. #}
-                <a class="setline__resume"
-                   data-rest-resume
-                   href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#set-{{ _c.id }}">
+                   Ce commentaire disait, mot pour mot : « LIEN NATIF vers la
+                   même page SANS `rest=1` … aucune donnée persistée, aucun
+                   état écrit ». C'était vrai, et c'était le mécanisme
+                   entier : le saut ne survivait au rechargement que parce
+                   que l'URL rechargée ne portait plus le paramètre.
+
+                   Le repos se dérivant maintenant de `completed_at`,
+                   recharger re-dériverait REPOS et **annulerait la décision
+                   de l'utilisateur**. Passer le repos doit donc écrire un
+                   fait — et un GET n'écrit pas dans ce dépôt.
+
+                   `formaction` dévie CE bouton vers la route de saut sans
+                   imbriquer de `<form>` (ce qui serait invalide) : le
+                   formulaire de la carte reste l'unique formulaire, et le
+                   repli sans JavaScript est intact — c'est une soumission
+                   native. Les valeurs sérialisées au passage sont ignorées
+                   par la route, qui n'écrit qu'un horodatage. #}
+                <button type="submit"
+                        class="setline__resume"
+                        data-rest-resume
+                        formaction="{{ url_for('dismiss_rest', session_id=session.id, session_exercise_id=se.id) }}">
                   <span class="setline__resume-label">Commencer S{{ _c.set_index }}</span>
-                  <span class="sr-only">— interrompt le repos, aucune donnée n'est enregistrée</span>
-                </a>
+                  <span class="sr-only">— termine le repos maintenant</span>
+                </button>
               {% else %}
                 {{ set_inputs(_c, 'série', _ph) }}
               {% endif %}
@@ -574,8 +588,15 @@
              les deux chemins : le lien de la ligne de série et la sortie
              automatique à T=0. Les faire diverger produirait deux
              destinations pour une seule intention. #}
+          {# ⚠ `UI-CP8R` — CETTE URL SERT DÉSORMAIS À UNE SEULE CHOSE :
+             l'expiration NATURELLE à T=0, qui n'écrit rien et n'a rien à
+             écrire. Le serveur dérivera `CURRENT_SET` puisque le temps sera
+             écoulé. Les sorties EXPLICITES (la ligne de série, la commande
+             du dock) postent, elles, vers `dismiss_rest`. Deux chemins, deux
+             natures : l'un constate, l'autre décide. #}
           {% set rest_resume_url = url_for('session_detail', session_id=session.id)
                                    ~ '?active=' ~ se.id ~ '#set-' ~ cs.current_set.id %}
+          {% set rest_remaining = cs.rest_remaining_seconds %}
           {% include "_partials/rest_timer.html" %}
         {% endif %}
 
@@ -627,17 +648,31 @@
         {# ── L1 · CommandDock — UNE commande dominante ── #}
         <div class="dock">
           {% if cs.is_resting %}
-            {# Lien, pas soumission : il n'y a rien à enregistrer, et
-               soumettre marquerait « complétée » une série à peine
-               commencée. Repli sans JS naturel. #}
-            {# `DF-B` — `dock__cmd--muted` : la sortie de repos reste
-               disponible mais cesse de rivaliser avec la ligne de la série,
-               qui porte désormais la même intention là où le regard est. #}
-            <a class="dock__cmd dock__cmd--link{% if cmd.tone == 'muted' %} dock__cmd--muted{% endif %}"
-               href="{{ url_for('session_detail', session_id=session.id) }}?active={{ se.id }}#set-{{ cs.current_set.id }}">
+            {# ⚠ `UI-CP8R` — CETTE SORTIE ÉTAIT UN LIEN. ELLE ÉCRIT
+               MAINTENANT, DONC ELLE POSTE.
+
+               Le commentaire d'origine disait : « Lien, pas soumission : il
+               n'y a rien à enregistrer ». C'était exact, et c'était le
+               défaut — le saut ne tenait que parce que l'URL rechargée
+               perdait `rest=1`. Avec un repos dérivé de `completed_at`, ne
+               rien écrire ferait réapparaître le repos au rechargement
+               suivant.
+
+               La crainte d'origine reste honorée : soumettre ne doit pas
+               marquer « complétée » une série à peine commencée. C'est
+               pourquoi `formaction` dévie vers une route dont le SEUL droit
+               d'écriture est `rest_dismissed_at` — elle ignore
+               délibérément les valeurs de série que le formulaire
+               sérialise. Aucun `nav` n'est envoyé, donc aucune persistance
+               de série n'est déclenchée.
+
+               Repli sans JS intact : c'est une soumission native. #}
+            <button type="submit"
+                    class="dock__cmd{% if cmd.tone == 'muted' %} dock__cmd--muted{% endif %}"
+                    formaction="{{ url_for('dismiss_rest', session_id=session.id, session_exercise_id=se.id) }}">
               <span class="dock__label">{{ cmd.label }}</span>
               {% if cmd.sub %}<span class="dock__sub">{{ cmd.sub }}</span>{% endif %}
-            </a>
+            </button>
           {% else %}
             {# `DF-B` — `data-dominant-submit` désigne LE soumetteur que
                l'auto-validation doit employer. Sans soumetteur explicite,

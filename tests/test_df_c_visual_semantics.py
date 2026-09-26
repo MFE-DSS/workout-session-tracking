@@ -361,5 +361,22 @@ def _advanced_session(client) -> int:
         data[f"set_{set_id}_reps"] = "10"
         client.post(f"/sessions/{sid}/exercises/{se_id}", data=dict(data),
                     follow_redirects=False)
+
+    # ⚠ `UI-CP8R` — ET ON SORT DU REPOS, SINON IL N'Y A PLUS DE LIGNES.
+    #
+    # Compléter une série de TRAVAIL produit désormais un repos dérivé de
+    # `completed_at` — le drapeau `nav=stay_norest` n'y suffit plus, c'est le
+    # FAIT qui déclenche. Or l'état `REST` ne rend pas la bande de séries
+    # (`UI-CP2` : « la question du repos est le TEMPS »). Les trois gardes de
+    # ce module cherchaient donc des `<li class="setline">` sur un écran qui
+    # n'en a aucun, et leurs propres garde-fous « la garde ne mesure rien »
+    # ont correctement rougi.
+    #
+    # Les trois états que ce montage doit faire coexister — passée, courante,
+    # future — n'existent QUE hors repos. On passe donc le repos, par le
+    # geste réel du produit : un POST vers `dismiss_rest`. C'est ce que fait
+    # un utilisateur qui enchaîne sans attendre.
+    client.post(f"/sessions/{sid}/exercises/{se_id}/rest/skip",
+                follow_redirects=False)
     return sid
 

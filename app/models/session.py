@@ -252,10 +252,52 @@ class SetLog(Base):
     execution_quality: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
     reps_target: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
 
-    # Explicit "done" flag: distinguishes "not yet attempted" (the row
-    # was pre-rendered by the session builder but the user didn't touch
-    # it) from "performed" (the user ticked it off, even if weight/reps
-    # were not entered).
+    # Distingue « pas encore tentée » (la ligne a été pré-rendue par le
+    # constructeur de séance, l'utilisateur n'y a pas touché) de « exécutée ».
+    #
+    # ⚠ `UI-CP8R` — CE COMMENTAIRE DÉCRIVAIT UN PRODUIT QUI N'EXISTE PLUS.
+    # Il parlait d'un drapeau « explicite » que l'utilisateur « cocherait ».
+    # La case a été retirée par `Sb_24.4` : `completed` est DÉRIVÉ côté
+    # serveur de la présence d'un poids OU de répétitions (`Sx_24 §E`), dans
+    # `_persist_set_values`. Le comportement n'est pas touché ici — c'est la
+    # prose qui est alignée sur lui, jamais l'inverse.
     completed: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+
+    # ── `UI-CP8R` · LA VÉRITÉ TEMPORELLE ────────────────────────────────
+    #
+    # QUAND la série a été exécutée. C'est la seule origine de temps durable
+    # du repos : avant cette colonne, `?rest=1` disait « un repos vient de
+    # démarrer sur CETTE requête » et ne pouvait rien dire de plus — un
+    # rechargement trois secondes plus tard réaffichait 1:30.
+    #
+    # `NULL` sur une ligne `completed = True` signifie **heure inconnue**,
+    # pas « jamais faite » : aucun backfill n'était honnête (voir la
+    # migration `w4x9r5s6u17`). Une telle ligne ne produit jamais de repos.
+    #
+    # Contrat d'écriture (`_persist_set_values`) : posée à la transition
+    # INCOMPLÈTE → COMPLÈTE, **préservée** quand une série déjà complète est
+    # corrigée — sinon rectifier une faute de frappe ressusciterait un repos
+    # vieux d'une heure — et effacée quand la série est dé-complétée.
+    completed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+    # QUAND l'utilisateur a décidé de dépasser le repos de CETTE série.
+    #
+    # Portée par SÉRIE, pas par séance : la décision appartient à la
+    # transition qui l'a produite. Portée séance, corriger une vieille série
+    # effacerait la décision prise sur la série courante.
+    #
+    # Elle appartient aussi à l'ÉPISODE de complétion courant : dé-compléter
+    # puis refaire la série la remet à `NULL`. Un saut décidé sur une
+    # exécution passée ne peut pas survivre dans une exécution neuve.
+    #
+    # Avant `UI-CP8R`, passer le repos n'écrivait RIEN : c'était un GET vers
+    # la même URL sans `rest=1`, et ça ne survivait au rechargement que parce
+    # que l'URL rechargée ne portait plus le paramètre. En retirant au
+    # paramètre son autorité, on retirait au saut son unique mécanisme.
+    rest_dismissed_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
 
     session_exercise: Mapped[SessionExercise] = relationship(back_populates="set_logs")

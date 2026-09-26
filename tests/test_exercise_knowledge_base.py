@@ -347,7 +347,22 @@ def test_alembic_head_unchanged():
     # `u2v7p3q4s15` : `UNRESOLVED` est l'absence de ligne, `RESOLVED` est la
     # ligne, `SUPERSEDED` est DÉRIVÉ de l'empreinte de contexte — d'où
     # l'absence délibérée de colonne de cycle de vie, qui serait la seule
-    # source possible d'un état périmé).
+    # source possible d'un état périmé),
+    # puis UI-CP8R (`w4x9r5s6u17` : DEUX colonnes additives nullables sur
+    # `set_logs` — `completed_at` et `rest_dismissed_at` —, aucun backfill.
+    # C'est la PREMIÈRE migration de cette série à ajouter des colonnes à
+    # une table existante plutôt qu'une table neuve, et la doctrine tient
+    # quand même : `NULL` sur une ligne `completed = 1` signifie « faite,
+    # heure inconnue », pas « jamais faite ». Rien ne permettait de
+    # reconstituer cette heure — ni `session.started_at`, ni l'ordre des
+    # séries, ni la durée de séance, ni un repos estimé — et la fabriquer
+    # aurait fait dériver un état `REPOS` de temps imaginaires sur des
+    # séances vieilles de plusieurs mois.
+    # DEUX colonnes et non une : `completed_at` est un FAIT,
+    # `rest_dismissed_at` une DÉCISION. Les fondre en une échéance
+    # `rest_until` aurait rendu l'heure d'exécution déductible seulement à
+    # travers `REST_FALLBACK_SECONDS`, donc toute la chronologie
+    # historique aurait glissé le jour où la politique change).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -356,4 +371,4 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "v3w8q4r5t16"
+    assert script.get_current_head() == "w4x9r5s6u17"

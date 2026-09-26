@@ -105,13 +105,26 @@ def test_work_set_becomes_current_once_warmups_are_done():
     assert [s.set_index for s in st.future_sets] == [2, 3]
 
 
-def test_rest_is_a_request_scoped_presentation_state():
-    """`G4` — jamais persisté, jamais un champ, jamais un modèle.
+def test_rest_is_a_derived_state_never_a_stored_one():
+    """`G4`, amendé par `UI-CP8R` — DÉRIVÉ, et toujours pas un champ d'état.
 
-    Il n'existe que parce qu'un paramètre de requête le dit, et il disparaît
-    au rechargement suivant. Le persister ferait de la durée de repos une
-    affirmation du produit alors qu'elle est une suggestion.
+    ⚠ CETTE GARDE S'APPELAIT `test_rest_is_a_request_scoped_presentation_
+    state` ET SA PRÉMISSE EST TOMBÉE. Elle affirmait que le repos « n'existe
+    que parce qu'un paramètre de requête le dit, et disparaît au
+    rechargement suivant ». C'était vrai, et c'était le défaut : disparaître
+    au rechargement est exactement ce que `UI-CP8R` corrige.
+
+    LE CŒUR DE LA GARDE SURVIT INTACT, et c'est lui qui comptait : **aucune
+    colonne d'état de repos**. `REST` reste calculé, jamais stocké. Ce qui
+    est persisté n'est pas l'état mais deux FAITS — quand la série a été
+    faite, et si l'utilisateur a décidé de passer. L'état s'en déduit à
+    chaque rendu, donc il ne peut pas se désynchroniser.
+
+    La distinction est celle que la spec voulait protéger : persister la
+    DURÉE ferait du repos une affirmation du produit alors qu'elle est une
+    suggestion. La durée n'est toujours pas persistée.
     """
+    from app.models.session import SetLog
     from app.services.console_state import (
         CURRENT_SET,
         REST,
@@ -121,8 +134,22 @@ def test_rest_is_a_request_scoped_presentation_state():
     ex = _exercise(warmups_done=1, works_done=1)
     assert build_console_state(ex, next_code="E2").state == CURRENT_SET
     assert build_console_state(
-        ex, next_code="E2", rest_signal=True
+        ex, next_code="E2", rest_remaining=90
     ).state == REST
+    # Zéro seconde restante n'est PAS un repos : le temps écoulé sort de
+    # l'état tout seul, sans que personne ait à l'annoncer.
+    assert build_console_state(
+        ex, next_code="E2", rest_remaining=0
+    ).state == CURRENT_SET
+
+    # Et surtout : aucune colonne ne dit « cette série est en repos ».
+    colonnes = set(SetLog.__table__.columns.keys())
+    assert "rest_state" not in colonnes
+    assert "resting" not in colonnes
+    assert "rest_seconds" not in colonnes
+    assert "rest_until" not in colonnes
+    # Les deux seuls faits neufs sont des HORODATAGES, pas des états.
+    assert {"completed_at", "rest_dismissed_at"} <= colonnes
 
 
 def test_rest_never_survives_the_last_set():
@@ -131,7 +158,7 @@ def test_rest_never_survives_the_last_set():
     from app.services.console_state import EXERCISE_COMPLETE, build_console_state
 
     ex = _exercise(warmups_done=1, works=3, works_done=3)
-    st = build_console_state(ex, next_code="E2", rest_signal=True)
+    st = build_console_state(ex, next_code="E2", rest_remaining=90)
     assert st.state == EXERCISE_COMPLETE
 
 
@@ -471,7 +498,12 @@ def test_the_countdown_is_gated_on_the_server_signal():
     roots = re.findall(
         r"roots\s*=\s*document\.querySelectorAll\(\s*\"(\[[^\"]+\])\"", js)
     assert roots, "aucune sélection de racine de minuteur trouvée"
-    assert roots == ["[data-rest-started]"], roots
+    # `UI-CP8R` — la racine est l'attribut qui porte le RESTANT dérivé par
+    # le serveur. Le drapeau booléen `[data-rest-started]` disait qu'un
+    # repos courait sans dire depuis quand : le décompte repartait donc de
+    # sa durée pleine à chaque rendu. Un seul attribut sert désormais de
+    # déclencheur ET d'origine, donc les deux ne peuvent plus diverger.
+    assert roots == ["[data-rest-remaining]"], roots
 
 
 def test_the_unconditional_start_attribute_is_gone():
