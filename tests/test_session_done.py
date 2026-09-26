@@ -127,11 +127,22 @@ def test_action_reopen_redirects_to_editable_session(client):
     assert r.headers["location"] == f"/sessions/{sid}"
 
 
-def test_get_session_completed_redirects_to_done(client):
+def test_get_session_completed_renders_its_durable_record(client):
+    """⚠ `UI-CP8D` — CETTE ROUTE NE REDIRIGE PLUS, ET C'ÉTAIT LE DÉFAUT.
+
+    Elle renvoyait toute séance terminée vers le closeout — une surface de
+    TRANSITION. Trois liens du produit prétendaient pourtant « ouvrir la
+    séance » et atterrissaient là : `history`, `exercise_history`,
+    `admin_sessions`. `JOURNEY C` s'y terminait en cul-de-sac.
+
+    La propriété que cette garde défend — « `/sessions/{id}` mène quelque
+    part de cohérent pour une séance terminée » — est plus vraie qu'avant :
+    elle mène au relevé durable de cette séance.
+    """
     sid = _mk_completed_session()
     r = client.get(f"/sessions/{sid}", follow_redirects=False)
-    assert r.status_code == 303
-    assert r.headers["location"] == f"/sessions/{sid}/done"
+    assert r.status_code == 200
+    assert "record__titre" in r.text
 
 
 def test_get_session_in_progress_renders_normally(client):
@@ -172,6 +183,11 @@ def test_done_page_shows_summary_block(client):
         `href="/history"`  → la coque persistante. Quatre sorties de page
                              sur cinq partent, celle-là comprise.
         rouvrir            → inchangé, dans la profondeur.
+
+    ⚠ `UI-CP8D` — LE RELEVÉ PAR EXERCICE A QUITTÉ LA PROFONDEUR.
+    `CP7.5` l'y gardait faute de propriétaire, avec son critère de sortie
+    écrit. `session_record` existe : le relevé y est allé, et les
+    assertions qui le cherchaient ici le cherchent là-bas.
     """
     sid = _mk_completed_session()
     r = client.get(f"/sessions/{sid}/done")
@@ -184,10 +200,11 @@ def test_done_page_shows_summary_block(client):
     texte_brut = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", body))
     assert "2 / 3 séries" in texte_brut
 
-    # Le relevé par exercice survit, dans la profondeur.
-    assert "E1" in body
-    assert "Incline Smith Press" in body
-    assert "2/3" in body
+    # Le relevé par exercice survit — sur son propriétaire DURABLE.
+    releve = client.get(f"/sessions/{sid}").text
+    assert "E1" in releve
+    assert "Incline Smith Press" in releve
+    assert "2/3" in releve
 
     # L'administration de séance survit, démotée.
     assert "Rouvrir" in body
@@ -256,9 +273,10 @@ def test_done_page_shows_cardio_recap_for_cardio_kind(client):
     assert "132" in corps
     assert "bpm" in corps.lower()
     assert "stairmaster" in corps
-    # Les calories machine restent lisibles, mais dans le relevé : le produit
-    # les qualifie lui-même d'« indicatif », elles ne mesurent pas la séance.
-    assert "410" in body
+    # ⚠ `UI-CP8D` — les calories machine ont suivi le relevé sur son
+    # propriétaire durable. Le produit les qualifie d'« indicatif » : elles
+    # appartiennent à l'archive, pas au fait de complétion.
+    assert "410" in client.get(f"/sessions/{sid}").text
     # Aucun compte de séries de travail sur une séance qui n'en a pas.
     assert "0 / 0" not in corps
     assert "Par exercice" not in body
@@ -274,10 +292,14 @@ def test_done_page_shows_substitution_arrow(client):
         session.session_exercises[0].substituted_name = "Développé couché haltères"
         db.commit()
 
-    r = client.get(f"/sessions/{sid}/done")
+    # ⚠ `UI-CP8D` — la lignée de substitution vit sur le RELEVÉ DURABLE.
+    # Le closeout est une transition ; il ne porte plus le détail. La
+    # propriété est plus forte ici : on vérifie le PRESCRIT *et* l'EXÉCUTÉ,
+    # là où le closeout ne montrait qu'une flèche.
+    r = client.get(f"/sessions/{sid}")
     assert r.status_code == 200
     assert "Développé couché haltères" in r.text
-    assert "→" in r.text
+    assert "au lieu de" in r.text
 
 
 def test_done_page_shows_confidence_badge(client):

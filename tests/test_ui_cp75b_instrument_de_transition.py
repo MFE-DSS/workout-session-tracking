@@ -120,7 +120,19 @@ def test_une_seule_commande_dominante_et_elle_mene_au_debrief(client):
     assert _compter_classe(corps, "closeout__commande") == 1, (
         "il doit y avoir exactement UNE commande dominante"
     )
-    assert "/progress" in corps, "la commande dominante doit mener au débrief"
+
+    # ⚠ ON LIT LE `href` DE LA COMMANDE, PAS LA PAGE.
+    # L'assertion précédente cherchait `"/progress" in corps` — et `corps`
+    # court jusqu'au bas du document, donc elle était satisfaite par
+    # l'onglet « Progression » de la NAV BASSE. Elle a continué de passer
+    # quand `UI-CP8D` a repointé la commande vers le relevé : une garde
+    # verte pour une raison qui n'était pas la sienne.
+    href = re.search(r'<a class="closeout__commande"[^>]*href="([^"]+)"', corps)
+    assert href is not None
+    assert href.group(1).endswith(f"/sessions/{sid}"), (
+        f"la commande dominante mène à {href.group(1)!r} et non au relevé "
+        "de cette séance"
+    )
     assert "/dashboard" not in corps, (
         "le closeout promeut à nouveau /dashboard, surface dépréciée"
     )
@@ -181,43 +193,38 @@ def test_la_prose_de_consigne_ne_revient_pas():
         )
 
 
-def test_le_releve_descend_dans_la_profondeur_sans_disparaitre(client):
-    """`CLAUDE.md §5.3` — jamais une soustraction seule.
+def test_le_releve_a_quitte_le_closeout_pour_son_proprietaire_durable(client):
+    """⚠ DEUX GARDES DE `CP7.5` SONT MORTES ICI, ET ELLES ONT FAIT LEUR
+    TRAVAIL EN MOURANT.
 
-    ⚠ MESURÉ : `/sessions/{id}` rend un 303 vers cette page pour toute séance
-    terminée, et `/history` n'est qu'une liste. Le closeout est donc la SEULE
-    lecture possible de ce qu'on vient d'enregistrer. Le relevé change de
-    RANG, il ne change pas de propriétaire — faute de second propriétaire.
+    Elles disaient :
+
+      · `…releve_descend_dans_la_profondeur_sans_disparaitre` — le relevé
+        reste dans le tiroir du closeout, faute de propriétaire ;
+      · `…la_redirection_qui_fait_du_closeout_le_seul_proprietaire` — et
+        elle épinglait le 303 de `session_detail` en avertissant :
+        « le jour où cette route cesse de rediriger, une surface de détail
+        existe peut-être désormais, et le relevé du closeout mérite d'y
+        déménager. »
+
+    Ce jour est `UI-CP8D`. Les deux ont rougi, exactement quand il le
+    fallait, et elles sont remplacées par leur conséquence : le closeout
+    n'est plus qu'une TRANSITION, et le relevé vit sur `session_record`.
+
+    C'est le cycle de vie normal d'un cliquet qui garde une PRÉMISSE. Il ne
+    se supprime pas, il se retourne — et il dit pourquoi.
     """
     sid = _demarrer(client)
     body = _clore(client, sid, concentration="high", global_state="good")
 
-    assert "closeout__releve" in body, (
-        "le relevé par exercice a disparu sans remplaçant"
+    assert "closeout__releve" not in body, (
+        "le relevé est revenu dans la profondeur du closeout"
     )
-    # Et il est bien DANS la profondeur, pas au repos.
-    tiroir = body[body.index("closeout__cycle"):]
-    assert "closeout__releve" in tiroir, (
-        "le relevé est au repos au lieu d'être dans le tiroir de cycle de vie"
+    # Et il n'a pas disparu : son propriétaire durable le porte.
+    assert "record__exercices" in client.get(f"/sessions/{sid}").text, (
+        "le relevé a quitté le closeout sans arriver nulle part — c'est la "
+        "soustraction sans remplaçant que `§5.3` interdit"
     )
-
-
-def test_la_redirection_qui_fait_du_closeout_le_seul_proprietaire(client):
-    """PRÉMISSE de la garde ci-dessus, épinglée séparément.
-
-    Si un jour `/sessions/{id}` cesse de rediriger, le relevé a un meilleur
-    domicile et cette décision doit être reconsidérée. La garde le dira.
-    """
-    sid = _demarrer(client)
-    client.post(f"/sessions/{sid}", data={"action": "end"},
-                follow_redirects=False)
-    r = client.get(f"/sessions/{sid}", follow_redirects=False)
-    assert r.status_code == 303, (
-        "`/sessions/{id}` ne redirige plus une séance terminée : une surface "
-        "de détail existe peut-être désormais, et le relevé du closeout "
-        "mérite d'y déménager"
-    )
-    assert r.headers["location"].endswith("/done")
 
 
 # ───────── AXE 4 · LA MESURE DE COMPLÉTION DÉPEND DU TYPE ─────────
@@ -235,8 +242,13 @@ def test_une_seance_cardio_ne_rend_pas_zero_serie(client):
                   cardio_machine_type="rameur")
     corps = body[body.index('class="closeout"'):]
 
-    assert "0 séries" not in corps and "0 / 0" not in corps, (
+    # `Sonar S9073` — une assertion composite masque laquelle des deux a
+    # cédé. Deux assertions, deux messages.
+    assert "0 séries" not in corps, (
         "une séance cardio rend un compte de séries de travail"
+    )
+    assert "0 / 0" not in corps, (
+        "une séance cardio rend « 0 / 0 » comme mesure de complétion"
     )
     assert "42" in corps, "la durée réelle du cardio n'est pas rendue"
 

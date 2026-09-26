@@ -7783,3 +7783,253 @@ summary:focus-visible,
   line-height: 1.5;
   color: var(--role-text-muted);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   `UI-CP8D` — LE RELEVÉ DURABLE D'UNE SÉANCE (`session_record`)
+
+   ⚠ CE N'EST NI LE CLOSEOUT NI `/progress`, et sa grammaire le dit.
+
+   Le closeout est une TRANSITION : un fait, une commande pleine, rien
+   d'autre. `/progress` est un AGRÉGAT. Ce relevé-ci est une ARCHIVE qu'on
+   relit — donc des rubriques nommées, une densité assumée, et aucune
+   commande ambre : on ne décide rien ici, on se souvient.
+
+   Aucune carte. La structure vient des rubriques et des filets, comme
+   `BODY_LEDGER` — c'est le même geste de lecture.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.record {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  max-width: 34rem;
+  margin-inline: auto;
+  padding-block: var(--space-lg) var(--space-2xl);
+}
+
+/* ── 1. Identité de la séance ─────────────────────────────────────────── */
+
+.record__tete {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.record__quand {
+  margin: 0;
+  font-size: 12px;                       /* rang META */
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+.record__titre {
+  margin: 0;
+  font-size: 32px;                       /* rang DISPLAY, le seul de l'écran */
+  line-height: 1.15;
+  font-weight: 600;
+  color: var(--role-text-primary);
+  text-wrap: balance;
+}
+
+.record__mesures {
+  margin: var(--space-xs) 0 0;
+  font-size: 15px;                       /* rang BODY */
+  line-height: 1.6;
+  color: var(--role-text-secondary);
+}
+
+.record__mesure + .record__mesure::before {
+  content: "·";
+  margin-inline: var(--space-sm);
+  color: var(--role-glyph-decorative);
+}
+
+.record__mesure strong {
+  font-weight: 600;
+  color: var(--role-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 2. Provenance ────────────────────────────────────────────────────────
+ * Le filet bleu est la couleur de PROVENANCE du socle — « ce que le MOTEUR
+ * produit », distincte de l'ambre qui appartient à l'action. C'est
+ * exactement son emploi ici : cette phrase vient du moteur de
+ * recommandation, elle n'est pas une action et n'en propose aucune. */
+.record__provenance {
+  margin: 0;
+  padding-left: var(--space-md);
+  border-left: 2px solid var(--role-origin-system-line);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--role-text-secondary);
+  text-wrap: pretty;
+}
+
+/* ── 3-6. Les rubriques ──────────────────────────────────────────────── */
+
+.record__bloc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--role-border-subtle);
+}
+
+.record__rubrique {
+  margin: 0;
+  font-size: 12px;                       /* rang META — une étiquette, pas un titre */
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--role-text-muted);
+}
+
+.record__progression {
+  margin: 0;
+  font-size: 15px;
+  color: var(--role-text-secondary);
+}
+
+.record__progression strong {
+  margin-left: var(--space-xs);
+  color: var(--role-action-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.record__zones { margin: 0; font-size: 13px; color: var(--role-text-muted); }
+
+.record__zone + .record__zone::before {
+  content: "·";
+  margin-inline: var(--space-xs);
+  color: var(--role-glyph-decorative);
+}
+
+.record__zone b {
+  color: var(--role-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Le relevé par exercice : une grille, pas un tableau — trois colonnes qui
+ * cassent leurs cellules à 390 px, ce dépôt l'a déjà mesuré une fois. */
+.record__exercices {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.record__exercice {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  gap: 2px var(--space-sm);
+  align-items: baseline;
+  padding-block: var(--space-sm);
+  border-bottom: 1px solid var(--role-border-subtle);
+  font-size: 14px;
+}
+
+.record__code {
+  color: var(--role-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.record__nom { color: var(--role-text-primary); }
+
+/* La lignée de substitution : ce qui était prescrit reste lisible, en
+ * retrait. Un remplacement sans son origine n'est pas une lignée. */
+.record__prescrit {
+  display: block;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+
+.record__series {
+  color: var(--role-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.record__charges,
+.record__ressenti,
+.record__note {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--role-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.record__declare { margin: 0; font-size: 15px; color: var(--role-text-secondary); }
+
+.record__etiquette {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+.record__indicatif {
+  margin: 0;
+  font-size: 13px;
+  color: var(--role-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.record__note-seance {
+  margin: 0;
+  padding-left: var(--space-sm);
+  border-left: 2px solid var(--role-border-subtle);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--role-text-secondary);
+}
+
+.record__anomalies {
+  margin: 0;
+  padding-left: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 13px;
+  color: var(--role-text-secondary);
+}
+
+.record__anomalies b { color: var(--role-text-primary); }
+
+/* ── 7. La chaîne causale ─────────────────────────────────────────────────
+ * Deux sorties NOMMÉES, en arrière et en avant. Ni l'une ni l'autre n'est
+ * un aplat : cette page n'a pas de décision à porter, et un ambre y
+ * volerait son sens à celui de MISSION. */
+.record__suite {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--role-border-subtle);
+}
+
+.record__lien {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 14px;
+  color: var(--role-text-secondary);
+  text-decoration: none;
+}
+
+.record__lien:hover,
+.record__lien:focus-visible { color: var(--role-text-primary); }
+
+/* ── 8. Cycle de vie ──────────────────────────────────────────────────── */
+
+.record__cycle > summary { padding-inline: 0; }
+
+.record__cycle-note {
+  margin: 0 0 var(--space-md);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--role-text-muted);
+}

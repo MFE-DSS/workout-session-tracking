@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% block content %}
+{# ═══════════════════════════════════════════════════════════════════════════
+   `UI-CP8D` — LE RELEVÉ DURABLE D'UNE SÉANCE TERMINÉE
+
+   QUESTION SOUVERAINE, une seule :
+
+       QU'EST-CE QUI S'EST PASSÉ DANS CETTE SÉANCE,
+       ET QU'EST-CE QUE ÇA A CHANGÉ ?
+
+   ⚠ CE QUE CETTE SURFACE RÉPARE, ET C'ÉTAIT MESURÉ.
+
+   `JOURNEY C` était rompu. Après une séance, « Voir le débrief » menait à
+   `/progress` — un tableau de bord de 2,39 écrans — et depuis là il n'y
+   avait **aucun chemin de retour vers la séance qu'on venait de terminer**.
+   Pire : les trois liens du produit qui prétendaient l'ouvrir —
+   « Ouvrir la séance » de l'historique, le lien de `exercise_history`, celui
+   de l'admin — pointaient tous vers `session_detail`, qui **redirigeait en
+   303 vers le closeout**. La navigation existait ; sa destination était une
+   surface de transition.
+
+   Le relevé durable devient donc la destination de `session_detail` pour
+   toute séance terminée. Trois liens cassés depuis des mois se réparent sans
+   qu'on en ajoute un seul.
+
+   ⚠ CE N'EST PAS UN SECOND `/progress`.
+   `/progress` agrège : « 17 exercices pratiqués une seule fois », exposition
+   sur 14 jours, poids corporel. Cette page-ci est un FAIT DATÉ : une séance,
+   ce qu'elle a produit, ce qu'elle a changé. L'agrégat se rejoint DEPUIS
+   elle, jamais l'inverse.
+
+   ⚠ LA PROVENANCE EST LA PIÈCE NEUVE, ET ELLE EXISTAIT DÉJÀ.
+   `recommendation_episodes` sait depuis `REC-CP4` ce qui avait été conseillé
+   et ce que l'utilisateur en a fait. Personne ne le rendait. C'est pourtant
+   la seule chose qui relie une séance à la décision qui l'a précédée — donc
+   la continuité causale que `§6` réclame.
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% set _est_cardio = recap.header.kind == 'cardio' %}
+{% set _anomalies = recap.summary.anomalies or [] %}
+<div class="record">
+
+  {# ══ 1. QUELLE SÉANCE, QUAND ═════════════════════════════════════════════ #}
+  <header class="record__tete">
+    <p class="record__quand">{{ recap.header.started_at | datetime_fr }}</p>
+    <h1 class="record__titre">{{ recap.header.template_name }}</h1>
+    {# ⚠ LES MESURES S'ADDITIONNENT, ELLES NE S'EXCLUENT PAS.
+       Écrit d'abord en `if cardio / else musculation`, et le rendu l'a
+       réfuté : `liss-abs` — « LISS cardio + abdos » — est de type cardio ET
+       porte quatre exercices d'abdos. Sans données cardio saisies, la ligne
+       de mesures sortait VIDE alors que la séance avait douze séries.
+       Un type de séance n'est pas une partition de ses faits. #}
+    {% set _c = recap.summary.cardio or {} %}
+    <p class="record__mesures">
+      {%- if _est_cardio and _c.duration_min %}<span class="record__mesure"><strong>{{ _c.duration_min }}</strong> min</span>{% endif -%}
+      {%- if _est_cardio and _c.bpm_avg %}<span class="record__mesure">{{ _c.bpm_avg }} bpm</span>{% endif -%}
+      {%- if _est_cardio and _c.machine_type %}<span class="record__mesure">{{ _c.machine_type }}</span>{% endif -%}
+      {%- if recap.summary.work_sets_total %}<span class="record__mesure"><strong>{{ recap.summary.work_sets_done }}</strong> / {{ recap.summary.work_sets_total }} séries</span>{% endif -%}
+      {%- if recap.header.duration_label %}<span class="record__mesure">{{ recap.header.duration_label }}</span>{% endif -%}
+      {%- if recap.summary.substitution_count %}<span class="record__mesure">{{ recap.summary.substitution_count }} substitution{{ 's' if recap.summary.substitution_count > 1 }}</span>{% endif -%}
+    </p>
+    {# Les calories machine sont une donnée ENREGISTRÉE, pas une mesure de la
+       séance : le produit les qualifie lui-même d'« indicatif » depuis leur
+       livraison. Elles ont leur place dans une archive, sur leur propre
+       ligne, jamais dans le fait de complétion. #}
+    {% if _est_cardio and _c.calories %}
+    <p class="record__indicatif">
+      {{ _c.calories }} kcal <span class="record__prescrit">estimation machine</span>
+    </p>
+    {% endif %}
+  </header>
+
+  {# ══ 2. D'OÙ VIENT CETTE SÉANCE ══════════════════════════════════════════
+     ⚠ RENDU SEULEMENT S'IL Y A UN ÉPISODE. Les séances antérieures à
+     `REC-CP4`, et toute séance démarrée hors d'un conseil, n'en ont pas —
+     l'absence est un état légitime, et elle se tait. On ne fabrique pas une
+     provenance pour faire joli. #}
+  {% if provenance %}
+  <p class="record__provenance record__provenance--{{ provenance.issue | lower }}">
+    {{ provenance.recit }}
+  </p>
+  {% endif %}
+
+  {# ══ 3. CE QUE ÇA A CHANGÉ ═══════════════════════════════════════════════
+     La moitié de la question souveraine que `/progress` noyait dans un
+     agrégat. Ici c'est daté, attribué à CETTE séance, et silencieux quand il
+     n'y a rien à dire — une progression inventée serait pire que son
+     absence. #}
+  {% if recap.summary.top_progression or recap.summary.zones_touched %}
+  <section class="record__bloc">
+    <h2 class="record__rubrique">Ce que ça a changé</h2>
+
+    {% if recap.summary.top_progression %}
+    {% set tp = recap.summary.top_progression %}
+    <p class="record__progression">
+      <span class="record__code">{{ tp.code }}</span>
+      {{ tp.name }}
+      {%- if tp.weight_delta is not none and tp.weight_delta > 0 %}
+      <strong>+{{ tp.weight_delta | nombre_fr }} kg</strong>{% endif -%}
+      {%- if tp.reps_delta is not none and tp.reps_delta > 0 %}
+      <strong>+{{ tp.reps_delta }} reps</strong>{% endif -%}
+    </p>
+    {% endif %}
+
+    {% if recap.summary.zones_touched %}
+    <p class="record__zones">
+      {%- for z in recap.summary.zones_touched -%}
+      <span class="record__zone">{{ z.label }} <b>{{ z.sets }}</b></span>
+      {%- endfor -%}
+    </p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {# ══ 4. CE QUI A ÉTÉ FAIT ════════════════════════════════════════════════
+     Le relevé, avec la LIGNÉE DE SUBSTITUTION : prescrit contre exécuté.
+     C'est ce qui quitte la profondeur du closeout (`§5`) pour venir ici, où
+     il est durable et atteignable, au lieu d'être un locataire de passage
+     dans une surface de transition. #}
+  {% if recap.exercises %}
+  <section class="record__bloc">
+    <h2 class="record__rubrique">Ce qui a été fait</h2>
+    <ul class="record__exercices">
+      {% for ex in recap.exercises %}
+      <li class="record__exercice">
+        <span class="record__code">{{ ex.code }}</span>
+        <span class="record__nom">
+          {%- if ex.substituted_name -%}
+            {{ ex.substituted_name }}
+            <span class="record__prescrit">au lieu de {{ ex.name }}</span>
+          {%- else -%}
+            {{ ex.name }}
+          {%- endif -%}
+        </span>
+        <span class="record__series">{{ ex.done }}/{{ ex.total }}</span>
+        {% if ex.weights_str or ex.reps_str %}
+        <span class="record__charges">
+          {{- ex.weights_str }}{% if ex.weights_str and ex.reps_str %} · {% endif %}{{ ex.reps_str -}}
+        </span>
+        {% endif %}
+        {% if ex.muscle_sensation %}
+        <span class="record__ressenti">{{ ex.muscle_sensation }}</span>
+        {% endif %}
+        {% if ex.note %}<span class="record__note">{{ ex.note }}</span>{% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {# ══ 5. CE QUE TU AS DÉCLARÉ ═════════════════════════════════════════════ #}
+  {% if recap.summary.concentration or recap.summary.global_state or recap.summary.note %}
+  <section class="record__bloc">
+    <h2 class="record__rubrique">Ce que tu as déclaré</h2>
+    <p class="record__declare">
+      {%- if recap.summary.concentration %}<span class="record__mesure">{{ recap.summary.concentration_label or recap.summary.concentration }}</span>{% endif -%}
+      {%- if recap.summary.global_state %}<span class="record__mesure">{{ recap.summary.global_state_label or recap.summary.global_state }}</span>{% endif -%}
+    </p>
+    {% if recap.summary.note %}
+    <p class="record__note-seance">
+      <span class="record__etiquette">Note de séance</span>
+      {{ recap.summary.note }}
+    </p>
+    {% endif %}
+  </section>
+  {% endif %}
+
+  {# ══ 6. À VÉRIFIER ═══════════════════════════════════════════════════════
+     Les anomalies sont ici plutôt que dans le closeout parce qu'elles
+     survivent à la transition : elles décrivent la QUALITÉ de ce relevé, et
+     c'est le relevé qu'on relit. Le closeout en garde le COMPTE, parce que
+     c'est là qu'on décide de rouvrir tout de suite. #}
+  {% if _anomalies %}
+  <section class="record__bloc">
+    <h2 class="record__rubrique">À vérifier</h2>
+    <ul class="record__anomalies">
+      {% for a in _anomalies %}
+      <li>{% if a.exercise_code %}<b>{{ a.exercise_code }}</b> · {% endif %}{{ a.message }}</li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {# ══ 7. LA CHAÎNE CAUSALE, DANS LES DEUX SENS ════════════════════════════
+     `§6` : on doit pouvoir remonter et redescendre la chaîne sans
+     archéologie de routes. Deux sorties nommées, pas une navigation globale
+     dupliquée. #}
+  <nav class="record__suite" aria-label="Suite">
+    <a class="record__lien" href="{{ url_for('history') }}">
+      <span aria-hidden="true">←</span> Toutes mes séances
+    </a>
+    <a class="record__lien" href="{{ url_for('progress') }}">
+      Progression <span aria-hidden="true">→</span>
+    </a>
+  </nav>
+
+  {# ══ 8. CYCLE DE VIE — PROFONDEUR DISCRÈTE ═══════════════════════════════ #}
+  <details class="disclosure record__cycle">
+    <summary>Gérer cette séance</summary>
+    <div class="disclosure__panel">
+      <p class="record__cycle-note">
+        Rouvrir remet la séance en cours : les séries et le bilan
+        redeviennent modifiables.
+      </p>
+      <form method="post"
+            action="{{ url_for('update_session', session_id=session.id) }}">
+        <input type="hidden" name="action" value="reopen">
+        <button type="submit" class="btn btn--ghost">Rouvrir pour éditer</button>
+      </form>
+    </div>
+  </details>
+
+</div>
+{% endblock %}
