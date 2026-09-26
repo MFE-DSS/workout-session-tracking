@@ -3963,6 +3963,230 @@ input, button, textarea, select {
   color: var(--fg-dim);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   `UI-CP7.5A` — LA LIGNE DU RELEVÉ EST SA PROPRE PORTE
+
+   La géométrie reprend celle de `.bl-rows` ci-dessus, délibérément : le
+   relevé ne doit pas CHANGER D'APPARENCE en devenant manipulable. Ce qui
+   change est ce qu'on peut en faire, pas ce à quoi il ressemble au repos.
+   Libellé à gauche, valeur à droite, provenance et âge dessous — mêmes rangs,
+   mêmes tokens, même filet.
+
+   ⚠ AUCUN BOUTON « ÉDITER » N'EST RÉPÉTÉ DOUZE FOIS. Le `<summary>` porte
+   nativement le rôle de bouton et son état déplié ; l'affordance existe donc
+   pour un lecteur d'écran même si le chevron n'était pas rendu. `§7` exige
+   exactement ça : « the fact that a row is editable must not depend on visual
+   styling alone ».
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.bl-faits {
+  display: flex;
+  flex-direction: column;
+}
+
+.bl-fait > summary,
+.bl-fait__ligne {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: baseline;
+  column-gap: var(--space-sm);
+  /* Plancher tactile produit : la rangée ENTIÈRE est la cible, pas un
+     chevron de 11 px posé à son extrémité. */
+  min-height: 44px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  list-style: none;
+}
+
+.bl-faits > .bl-fait:first-child > summary,
+.bl-faits > .bl-fait:first-child .bl-fait__ligne { border-top: none; }
+
+.bl-fait > summary::-webkit-details-marker { display: none; }
+
+/* Le chevron, en `::after`, PLACÉ EXPLICITEMENT.
+ *
+ * ⚠ SANS `grid-row: 1`, LE RENDU LE METTAIT À LA LIGNE. `.bl-fait__meta`
+ * occupe `1 / -1`, donc le placement automatique poussait le chevron —
+ * dernier élément de grille — sur une TROISIÈME rangée, colonne 1 : un petit
+ * triangle orphelin sous la provenance, aligné à gauche. Invisible dans le
+ * gabarit, invisible aux tests, visible à la première capture. */
+.bl-fait > summary::after {
+  content: "\25BE";
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  font-size: 11px;
+  color: var(--fg-dim);
+  transition: transform 0.15s ease;
+}
+.bl-fait[open] > summary::after { transform: rotate(180deg); }
+
+.bl-fait > summary:hover .bl-fait__label { color: var(--fg); }
+
+.bl-fait > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.bl-fait__label {
+  grid-column: 1;
+  font-size: 15px;
+  color: var(--fg-muted);
+}
+
+.bl-fait__valeur {
+  grid-column: 2;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.bl-fait__valeur--absent { font-weight: 400; color: var(--fg-dim); }
+
+.bl-fait__unite {
+  margin-left: 2px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--fg-dim);
+}
+
+.bl-fait__meta {
+  grid-column: 1 / -1;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--fg-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Une donnée sans horodatage POSSIBLE et un dérivé sans âge propre se
+   distinguent par l'ITALIQUE, jamais par une teinte seule. Même règle que
+   `.bl-row__meta--unknown`, dont cette classe prend la suite. */
+.bl-fait__meta--unknown { font-style: italic; }
+
+/* Un dérivé n'a pas de porte : pas de curseur, pas de chevron, et sa
+   troisième colonne reste vide pour que sa valeur s'aligne avec les autres.
+   Une ligne qui s'ouvrirait sur rien serait un instrument en panne. */
+.bl-fait--derive .bl-fait__ligne { cursor: default; }
+.bl-fait--derive .bl-fait__ligne::after { content: ""; }
+
+/* ── LA FEUILLE D'ACQUISITION ──────────────────────────────────────────────
+ * UN objet concentré, jamais une grille. Deux champs au plus, donc deux
+ * colonnes au plus — et le rail à gauche dit que ce panneau appartient à la
+ * ligne du dessus, sans l'encadrer. */
+.bl-feuille {
+  padding: var(--space-sm) 0 var(--space-md) var(--space-md);
+  border-left: 2px solid var(--accent-muted);
+  margin-bottom: var(--space-sm);
+}
+
+.bl-feuille__form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-sm);
+}
+
+.bl-feuille__champ {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1 1 7rem;
+  min-width: 6rem;
+}
+
+.bl-feuille__champ label {
+  font-size: 12px;
+  color: var(--fg-dim);
+}
+
+.bl-feuille__champ input {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-xs) var(--space-sm);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+}
+
+.bl-feuille__champ input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+/* La date est une précision, pas une valeur : elle ne concourt pas avec les
+   mesures pour la largeur. */
+.bl-feuille__champ--date { flex: 1 1 100%; }
+
+.bl-feuille__valider { flex: 0 0 auto; }
+
+/* ── L'ENTRÉE D'ACQUISITION UNIQUE (`D4`) ─────────────────────────────────
+ * UNE commande, dans les trois états du relevé. Elle n'est pas une carte et
+ * pas un second ambre plein : l'ambre plein appartient à « Noter », seul
+ * propriétaire d'action de l'instrument. Elle se distingue par son FILET et
+ * son `+`, pas par un fond.
+ */
+.bl-acquisition {
+  margin-top: var(--space-md);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.bl-acquisition__commande {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  list-style: none;
+  font-size: 15px;
+  color: var(--role-text-secondary);
+}
+
+.bl-acquisition__commande::-webkit-details-marker { display: none; }
+
+.bl-acquisition[open] > .bl-acquisition__commande {
+  color: var(--role-text-primary);
+  border-bottom: 1px solid var(--border);
+}
+
+.bl-acquisition__commande:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.bl-acquisition__plus {
+  font-size: 18px;
+  line-height: 1;
+  color: var(--accent);
+}
+
+.bl-acquisition[open] .bl-acquisition__plus { transform: rotate(45deg); }
+
+.bl-acquisition__panneau { padding: var(--space-sm) var(--space-md) var(--space-sm); }
+
+/* Une intention dans la liste de choix : le libellé seul, sans valeur ni
+ * provenance — il n'y en a pas, c'est ce qu'on vient noter. La grille de
+ * `.bl-fait__ligne` reste, donc le chevron garde sa colonne. */
+.bl-fait--neuf > summary { min-height: 44px; }
+.bl-fait--neuf:first-of-type > summary { border-top: none; }
+
+/* L'étape de consentement, DANS la feuille — jamais un panneau au repos. */
+.bl-feuille__consent {
+  margin: 0 0 var(--space-sm);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+.bl-note--consent { margin-bottom: var(--space-sm); }
+
 /* ── CONTEXTE ──────────────────────────────────────────────────────────────
  * La portée de l'instrument et ses réserves. Rang META, jamais encadré. */
 .bl-note {
@@ -7298,3 +7522,264 @@ summary:focus-visible,
  *
  * Les règles de document ont donc rejoint le bloc existant (`@media print`,
  * plus haut), qui gère déjà l'inversion fond clair / encre foncée. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   `UI-CP7.5B` — L'INSTRUMENT DE TRANSITION (`session_done`)
+
+   ⚠ CETTE SECTION NE CONTIENT AUCUNE CARTE, ET C'EST LE POINT.
+
+   La surface précédente empilait huit `.card` de même poids. Le relief ne
+   distinguait donc rien : tout était également saillant, donc rien ne
+   l'était. Ici la hiérarchie est portée par le RYTHME et par UN seul objet
+   plein — la commande — sur un champ nu.
+
+   Rangs de type (`Q6`) : `DISPLAY 32` pour le nom de la séance, et un seul
+   par écran ; `BODY 15` pour la conséquence ; `META 12` pour le kicker et le
+   tiroir. Aucun rang `SECTION 22` : il n'y a plus de sections concurrentes à
+   titrer. C'est la mesure de la recomposition, pas une omission.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ L'INSTRUMENT EST COMPACT ET ANCRÉ EN HAUT — ARBITRAGE OPÉRATEUR `D3`.
+   « REJECT forced viewport occupation. Remove artificial minimum-height /
+   spacer behaviour whose only purpose is to push lifecycle depth to the
+   bottom. Do NOT fill empty space merely to look "cockpit-like". »
+
+   J'avais essayé les deux formes que cette décision rejette : d'abord
+   `justify-content: center` — rendu, un trou de 400 px AU-DESSUS du titre,
+   un écran qui a l'air de n'avoir pas fini de charger — puis un
+   `min-height: 100dvh` avec le tiroir poussé au pied par `margin-top: auto`.
+   La seconde était plus présentable, et restait du remplissage : la hauteur
+   ne venait pas du contenu.
+
+   Ce qui tient l'écran n'est donc pas son occupation, c'est sa HIÉRARCHIE :
+   le fait, la commande pleine, puis une séparation franche avant la
+   profondeur. Le vide sous l'instrument est le vide d'un écran qui a fini. */
+.closeout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  max-width: 34rem;
+  margin-inline: auto;
+  padding-block: var(--space-lg) var(--space-2xl);
+}
+
+/* ── 1. LE FAIT ─────────────────────────────────────────────────────────── */
+
+.closeout__fait {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.closeout__kicker {
+  margin: 0;
+  font-size: 12px;                        /* rang META */
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+/* Le SEUL rang `DISPLAY` de l'écran. */
+.closeout__titre {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.15;
+  font-weight: 600;
+  color: var(--role-text-primary);
+  text-wrap: balance;
+}
+
+/* Les mesures de complétion : une LIGNE DE TEXTE, pas une liste clé/valeur.
+   Le séparateur est une puce médiane posée en `::before`, donc elle vit dans
+   le flux du texte et se replie avec lui.
+
+   ⚠ J'AVAIS D'ABORD MIS UN FILET VERTICAL (`border-left`), ET LE RENDU L'A
+   REFUSÉ. Un `flex` qui se replie emporte la bordure avec l'élément : à
+   390 px, « 1 substitution » passait à la ligne et son filet se retrouvait
+   PENDU en tête de ligne, comme une barre orpheline. Une bordure ne sait pas
+   qu'elle sépare ; un caractère, si. */
+.closeout__mesures {
+  margin: var(--space-xs) 0 0;
+  font-size: 15px;                        /* rang BODY */
+  line-height: 1.6;
+  color: var(--role-text-secondary);
+}
+
+.closeout__mesure + .closeout__mesure::before {
+  content: "·";
+  margin-inline: var(--space-sm);
+  color: var(--role-glyph-decorative);
+}
+
+.closeout__mesure strong {
+  font-weight: 600;
+  color: var(--role-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 2. CE QUI MANQUE ENCORE ────────────────────────────────────────────── */
+
+/* ⚠ CE BLOC N'EXISTE QUE QUAND IL A QUELQUE CHOSE À DEMANDER.
+   Il n'est donc pas un formulaire au repos : le gabarit ne l'émet pas
+   lorsque les deux signaux sont déjà déclarés.
+
+   ⚠ IL N'EST PAS NON PLUS UN OBJET VISUEL — ARBITRAGE OPÉRATEUR `D2`.
+   Il portait un filet ambre de 2 px sur toute sa hauteur, ce qui en faisait
+   une boîte de plus sur une page qui vient d'en supprimer huit. Les
+   contrôles se posent dans le flux ; rien ne les encadre. */
+.closeout__declaration {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* La conséquence est une INFORMATION DE SOUTIEN, pas un bloc de contenu :
+   rang META, sous les contrôles qu'elle explique, et en une ligne.
+   `D2` : « expose a short consequence adjacent to the missing-signal
+   controls … not a new content block ». */
+.closeout__consequence {
+  margin: calc(var(--space-md) * -1 + var(--space-xs)) 0 0;
+  font-size: 12px;                        /* rang META */
+  line-height: 1.5;
+  color: var(--role-text-muted);
+  text-wrap: pretty;
+}
+
+.closeout__declarer { align-self: flex-start; }
+
+/* ── 3. LA COMMANDE DOMINANTE ───────────────────────────────────────────── */
+
+/* Le seul objet PLEIN de l'écran. C'est ce qui le rend dominant — pas sa
+   taille de police, qui reste au rang `BODY`. */
+.closeout__commande {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: 56px;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius);
+  background: var(--role-action-primary);
+  color: var(--role-text-on-action);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.closeout__commande:hover,
+.closeout__commande:focus-visible {
+  background: var(--role-action-hover);
+  color: var(--role-text-on-action);
+}
+
+.closeout__commande-fleche { font-size: 18px; }
+
+/* ── 4. CYCLE DE VIE ────────────────────────────────────────────────────── */
+
+/* On ADOPTE `.disclosure` : il porte déjà les 44 px, le chevron et le focus.
+   Seul le filet supérieur est retiré — la commande pleine sépare déjà, et un
+   second trait à 24 px d'elle aurait redoublé la coupure. */
+/* Le filet supérieur vient de `.disclosure` et n'est pas redéfini : le
+   composant sait déjà se séparer de ce qui le précède.
+   `margin-top: auto` est RETIRÉ (`D3`) : il ne servait qu'à pousser la
+   profondeur au pied d'une hauteur imposée. La séparation est portée par
+   le `gap` de l'instrument et par le filet du composant. */
+
+.closeout__cycle > summary { padding-inline: 0; }
+
+/* Le compte d'anomalies est visible TIROIR FERMÉ : c'est ce qui donne au
+   tiroir une raison d'être ouvert. Sans lui, « Gérer cette séance » ne
+   promet rien et personne ne l'ouvre. */
+.closeout__alerte {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-right: var(--space-sm);
+  font-size: 12px;                        /* rang META */
+  color: var(--role-support-warning);
+}
+
+.closeout__anomalies {
+  margin: 0 0 var(--space-md);
+  padding-left: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 13px;
+  color: var(--role-text-secondary);
+}
+
+.closeout__anomalies b { color: var(--role-text-primary); }
+
+/* Le relevé : une ligne par exercice, alignée en grille pour que les
+   fractions de séries se lisent en colonne. Pas de tableau encadré — c'est
+   un relevé, pas un rapport. */
+.closeout__releve {
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 13px;
+}
+
+.closeout__releve-ligne {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr auto;
+  gap: var(--space-xs) var(--space-sm);
+  align-items: baseline;
+  padding-block: var(--space-xs);
+  border-bottom: 1px solid var(--role-border-subtle);
+}
+
+.closeout__releve-code {
+  color: var(--role-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.closeout__releve-nom { color: var(--role-text-primary); }
+
+.closeout__releve-sub {
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+
+.closeout__releve-series {
+  color: var(--role-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Ressenti et note passent sous le nom, sur toute la largeur utile : les
+   forcer dans la grille aurait écrasé le nom de l'exercice. */
+.closeout__releve-ressenti,
+.closeout__releve-note {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--role-text-muted);
+}
+
+.closeout__releve-etiquette {
+  display: block;
+  font-size: 12px;                        /* rang META */
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--role-text-muted);
+}
+
+.closeout__releve-seance {
+  margin: 0 0 var(--space-md);
+  padding-left: var(--space-sm);
+  border-left: 2px solid var(--role-border-subtle);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--role-text-secondary);
+}
+
+.closeout__cycle-note {
+  margin: 0 0 var(--space-md);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--role-text-muted);
+}

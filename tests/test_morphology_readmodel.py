@@ -142,14 +142,64 @@ def test_a_new_user_sees_the_surface_without_inventing_a_single_value(client):
     inventer.** Il est conservé et durci : aucun chiffre ne doit apparaître
     dans l'état vide. Le read-model, lui, continue de nommer chaque manque —
     les gardes sur `rm.missing` sont inchangées.
+
+    ═══ `UI-CP7.5A` — LA DÉCISION DE 2026-08-20 EST RÉAFFIRMÉE, ET DURCIE ═══
+
+    ⚠ J'AVAIS RENVERSÉ CETTE DÉCISION. L'OPÉRATEUR A REFUSÉ (`D4`).
+
+    Mon raisonnement : depuis que chaque ligne est la PORTE de son écriture,
+    une ligne absente n'est plus un constat. J'ai donc rendu les onze faits
+    absents en lignes permanentes. **Mesuré : +404 px sur un profil vide**,
+    onze rangées « Non renseigné » à la file — la même énumération qu'avant,
+    en plus haute. *« An empty profile must NOT permanently enumerate 11
+    "Non renseigné" rows. »*
+
+    Ce que mon renversement visait juste, c'était l'IMPASSE : un utilisateur
+    neuf ne pouvait enregistrer que son poids, et le lien de l'état vide
+    pointait vers une ancre inexistante. Elle disparaît sans l'énumération,
+    par l'entrée d'acquisition unique.
+
+    La garde tient donc TROIS choses au lieu d'une :
+      · aucune valeur inventée — l'invariant d'origine ;
+      · aucune énumération d'absences au repos — la décision réaffirmée ;
+      · une porte d'acquisition qui existe et ne mène pas au vide.
     """
-    section = _section(client)
-    assert "Aucune mesure morphologique" in section
-    # Aucune valeur inventée : pas un seul chiffre dans les RELEVÉS à l'état
-    # vide. Le rail de tiroirs est hors champ — voir `_readouts`.
     import re
-    assert not re.search(r"\d", _readouts(client)), (
-        "un nombre apparaît alors qu'aucune mesure n'existe"
+
+    section = _section(client)
+
+    # ⚠ L'ÉTAT VIDE N'ÉNUMÈRE PAS. C'est la décision, et c'est ce que j'avais
+    # cassé : sur un profil sans aucune mesure, pas une seule rangée
+    # « Non renseigné ».
+    assert "Non renseigné" not in section, (
+        "un profil vide énumère à nouveau ses absences — `D4` l'interdit"
+    )
+    assert "Aucune mesure corporelle" in section, (
+        "l'état vide ne représente plus le domaine"
+    )
+
+    # ⚠ ET IL N'EST PAS UNE IMPASSE : exactement UN pas d'acquisition.
+    assert section.count('class="bl-acquisition"') == 1, (
+        "l'état vide n'expose pas exactement une entrée d'acquisition"
+    )
+
+    # ⚠ AUCUNE VALEUR INVENTÉE — sur le TEXTE RÉELLEMENT AFFICHÉ.
+    #
+    # Deux faux positifs ont été écartés en mesurant, pas en supposant :
+    #
+    #   · les bornes des feuilles d'acquisition (`min="40" max="200"`) sont
+    #     des contraintes de SAISIE, pas des affirmations sur un corps — d'où
+    #     le retrait des balises ;
+    #   · « Largeur d&#39;épaules » contient les chiffres 3 et 9. L'entité
+    #     HTML d'une apostrophe s'AFFICHE comme une apostrophe : la compter
+    #     comme un nombre accuserait un gabarit sain, le mode d'échec inverse
+    #     déjà payé cinq fois dans ce dépôt.
+    import html as _html
+
+    visible = _html.unescape(re.sub(r"<[^>]+>", " ", _readouts(client)))
+    apercu = re.sub(r"\s+", " ", visible)[:300]
+    assert not re.search(r"\d", visible), (
+        f"un nombre est AFFICHÉ alors qu'aucune mesure n'existe : {apercu}"
     )
 
 
@@ -366,7 +416,7 @@ def test_the_surface_lives_on_the_existing_profile_page(client):
     page = client.get(PROFILE_URL).text
     assert LEDGER_ANCHOR in page, "l'instrument corporel n'est pas rendu"
     assert "Tour de taille" in page
-    assert "80.0" in page, "la valeur mesurée n'atteint pas l'écran"
+    assert "80,0" in page, "la valeur mesurée n'atteint pas l'écran"
 
 
 def test_no_dedicated_morphology_route_is_added(client):
@@ -388,7 +438,7 @@ def test_the_section_is_labelled_for_assistive_technology(client):
     assert 'aria-label="Ce qu\'AUREN sait de ton corps"' in page, (
         "l'instrument n'a pas de nom accessible"
     )
-    for ancre in ('aria-labelledby="bl-measured"', 'id="bl-measured"'):
+    for ancre in ('aria-labelledby="bl-releve"', 'id="bl-releve"'):
         assert ancre in page, f"la bande de relevé n'est pas nommée : {ancre}"
 
 
@@ -408,18 +458,60 @@ def test_each_measured_fact_is_associated_with_its_value(client):
     ⚠ Cette garde vérifie l'ASSOCIATION, pas le choix de balise : elle exige
     que la valeur soit décrite par son libellé, ce qu'un `<dl>` fait et qu'une
     pile de `<span>` ne fait pas.
+
+    ═══ `UI-CP7.5A` — LA BALISE CHANGE, ET IL FAUT LE JUSTIFIER ═══
+
+    Le `<dl>` cède la place à un `<details>` dont le `<summary>` EST la
+    rangée, parce que la ligne doit devenir la PORTE de son écriture. Un
+    `<dl>` ne peut pas accueillir un `<details>` : son modèle de contenu
+    n'admet que des `dt`/`dd`, éventuellement groupés en `div`.
+
+    L'association n'est pas perdue — elle change de mécanisme, et le nouveau
+    est au moins aussi fort :
+
+      `<dl>`        l'association est STRUCTURELLE (terme → description) et
+                    se lit en parcourant la liste.
+      `<summary>`   les trois fragments forment le NOM ACCESSIBLE d'un seul
+                    contrôle. Une technologie d'assistance annonce
+                    « Tour de taille 80,0 cm mesure directe · il y a 9 j,
+                    bouton, réduit » — en une fois, sans navigation.
+
+    Ce que la garde exige donc désormais : les trois fragments d'un fait
+    vivent dans le MÊME `<summary>`, dans l'ordre libellé → valeur →
+    provenance, sans contrôle interactif entre eux qui couperait le nom
+    accessible en deux.
     """
     import re
 
     with _session() as db:
         _add(db, _uid(), waist_cm=80.0)
     section = _section(client)
-    paires = re.findall(r"<dt[^>]*>(.*?)</dt>\s*<dd[^>]*>(.*?)</dd>",
-                        section, re.S)
-    assert paires, "aucun couple libellé/valeur associé dans le relevé"
-    aplati = [(re.sub(r"\s+", " ", t).strip(), re.sub(r"\s+", " ", v).strip())
-              for t, v in paires]
-    assert ("Tour de taille", "80.0 cm") in aplati, aplati
+
+    sommaires = re.findall(r"<summary class=\"bl-fait__ligne\">(.*?)</summary>",
+                           section, re.S)
+    assert sommaires, "aucune ligne de relevé n'est un contrôle nommé"
+
+    trouve = None
+    for s in sommaires:
+        libelle = re.search(r'class="bl-fait__label">(.*?)</span>', s, re.S)
+        valeur = re.search(r'class="bl-fait__valeur[^"]*">(.*?)</span>', s, re.S)
+        if libelle and "Tour de taille" in libelle.group(1):
+            trouve = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", s)).strip()
+            assert valeur is not None, (
+                "le libellé et la valeur ne sont pas dans le même sommaire — "
+                "le nom accessible du contrôle est coupé"
+            )
+            break
+
+    assert trouve is not None, "le tour de taille n'a pas de ligne"
+    assert "Tour de taille" in trouve
+    assert "80,0" in trouve
+    assert "cm" in trouve
+    # Aucun contrôle interactif ne coupe le nom accessible en deux.
+    for s in sommaires:
+        assert "<button" not in s
+        assert "<input" not in s
+        assert "<a " not in s
 
 
 # ── Isolation du planificateur ───────────────────────────────────────────────
@@ -520,7 +612,7 @@ def test_le_poids_porte_son_age(client):
         _add(db, _uid(), days_ago=3, weight_kg=78.4)
 
     vu = _visible_text(client)
-    assert "78.4" in vu, f"le poids n'atteint pas la page — vu : {vu[:400]}"
+    assert "78,4" in vu, f"le poids n'atteint pas la page — vu : {vu[:400]}"
     assert "il y a 3 j" in vu, (
         f"le poids est affiché SANS son âge — vu : {vu[:400]}"
     )
@@ -599,9 +691,9 @@ def test_aucune_couleur_d_alerte_ne_se_pose_sur_l_anciennete(client):
     section = _section(client)
     # La provenance et l'âge vivent dans `.bl-row__meta`. Aucune de ces cellules
     # ne doit porter une classe modificatrice autre que celles décidées.
-    metas = re.findall(r'class="bl-row__meta([^"]*)"', section)
+    metas = re.findall(r'class="bl-fait__meta([^"]*)"', section)
     assert metas, "aucune ligne de provenance rendue — prémisse invalide"
-    autorises = {"", " bl-row__meta--unknown"}
+    autorises = {"", " bl-fait__meta--unknown"}
     inattendus = sorted({m for m in metas if m not in autorises})
     assert not inattendus, (
         f"une classe non décidée peint l'ancienneté : {inattendus}. L'âge est "
@@ -704,13 +796,14 @@ def test_la_provenance_et_l_age_restent_UN_SEUL_fait(client):
         _add(db, uid, days_ago=3, waist_cm=81.0, chest_cm=104.0)
 
     section = _section(client)
-    # Un « bloc de ligne » = un `dt` et tout ce qui le suit jusqu'au `dt`
-    # suivant. Chacun doit contenir exactement une valeur et au plus une
-    # provenance.
-    blocs = re.split(r"<dt\b", section)[1:]
+    # ⚠ `UI-CP7.5A` — un « bloc de ligne » est désormais le `<summary>` de la
+    # ligne, et non plus un `dt` et sa suite. Même propriété, même comptage :
+    # AU PLUS UNE cellule de provenance par fait.
+    blocs = re.findall(r"<summary class=\"bl-fait__ligne\">(.*?)</summary>",
+                       section, re.S)
     assert blocs, "aucune ligne de relevé rendue — prémisse invalide"
     for bloc in blocs:
-        provenances = len(re.findall(r'class="bl-row__meta', bloc))
+        provenances = len(re.findall(r'class="bl-fait__meta', bloc))
         assert provenances <= 1, (
             f"une ligne porte {provenances} cellules de provenance — la "
             "quatrième colonne a été réfutée par le rendu à 390 px"

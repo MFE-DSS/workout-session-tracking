@@ -35,7 +35,33 @@ MEASURED_AT = "measured_at"
 
 @pytest.fixture(autouse=True)
 def _app_db(client):
-    """Bind every test here to the fixture-owned database and test user."""
+    """Bind every test here to the fixture-owned database and test user.
+
+    ⚠ `UI-CP7.5A` — LE CONSENTEMENT EST ACCORDÉ ICI, ET CE N'EST PAS UN
+    CONTOURNEMENT DE GARDE.
+
+    L'acquisition de mesures corporelles exige désormais un consentement
+    actif, côté serveur comme côté interface (`arbitrage §3` : « Active
+    consent remains required for collection »). Elle ne l'exigeait PAS
+    auparavant sur cette route — le seul contrôle vivait dans `/body`, surface
+    rendue 404 en production.
+
+    Ces tests portent sur l'ÉCRITURE et sur la SURFACE D'ACQUISITION. Un
+    utilisateur sans consentement n'a ni l'une ni l'autre : la feuille rend
+    l'étape de consentement à la place des champs, et la route refuse. La
+    fixture représente donc l'utilisateur dont ces tests parlent.
+
+    Le contrat inverse — sans consentement, pas d'acquisition — n'est pas
+    perdu pour autant : il est épinglé par ses propres gardes dans
+    `tests/test_ui_cp75a_consentement_a_l_intention.py`.
+    """
+    from app.services import body_profile as bp
+    from app.database import SessionLocal
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        uid = db.query(User).first().id
+        bp.set_consent(db, uid, True)
     return client
 
 
@@ -525,28 +551,37 @@ def test_the_capture_whitelist_admits_no_forbidden_field(banned):
 
 
 def _capture_form(client) -> str:
-    """The measurement form only — not the whole profile page.
+    """La SURFACE D'ACQUISITION CORPORELLE — pas la page de profil entière.
 
     Scoped deliberately. The page also renders workout-template names, and the
     catalog happens to contain one called "full body — morphotype priority".
     That string is a pre-existing catalog label, not a capture prompt, and it
     is outside this slice's perimeter; asserting against the entire page would
     make this guard fail for a reason it is not designed to catch.
+
+    ⚠ `UI-CP7.5A` — L'ANCRAGE CHANGE POUR LA DEUXIÈME FOIS, ET IL DIT
+    POURQUOI.
+
+    Il visait `class="body-profile"` : le formulaire de treize champs. Ce
+    formulaire n'existe plus — chaque fait s'acquiert depuis la ligne du
+    relevé qui le porte. L'acquisition n'est donc plus UN élément, c'est
+    l'ensemble des feuilles.
+
+    Ce que ces gardes défendent est INCHANGÉ et reste entièrement vrai : la
+    surface d'acquisition ne demande aucun fait interdit, n'offre ni fichier
+    ni image, dit « laisse vide » plutôt que d'inviter à estimer, et énonce le
+    protocole d'envergure. On lit maintenant TOUTES les feuilles, ce qui est
+    strictement plus large que l'ancien ancrage : un fait interdit glissé dans
+    n'importe laquelle sera vu.
+
+    ⚠ La bande du relevé est incluse elle aussi, parce que le protocole
+    général (« mesurer le matin, à jeun… laisse vide ce que tu n'as pas
+    mesuré ») s'y trouve UNE fois au lieu d'être répété dix fois.
     """
     page = client.get("/profile").text
-    # `url_for` renders an absolute URL (http://testserver/...), so anchor on
-    # the path's tail rather than on `action="/profile/measurements"`.
-    #
-    # ⚠ `UX4_01` — s'ancrer sur la PREMIÈRE occurrence de cette URL ne suffit
-    # plus : le quick-log de poids poste vers la MÊME route canonique et vient
-    # avant dans la page. La garde lisait donc un formulaire à un champ et
-    # concluait que le protocole d'envergure avait disparu.
-    #
-    # L'intention de ce helper — « le formulaire de mesure SEULEMENT » — était
-    # juste ; c'est son ancrage qui ne l'était plus. On vise la classe qui
-    # identifie la saisie complète.
-    start = page.index('class="body-profile"')
-    return page[start:page.index("</form>", start)].lower()
+    debut = page.index('id="bl-releve"')
+    fin = page.index("</section>", debut)
+    return page[debut:fin].lower()
 
 
 @pytest.mark.parametrize(

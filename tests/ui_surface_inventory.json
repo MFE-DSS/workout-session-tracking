@@ -1,7 +1,7 @@
 {
   "_doc": "Inventaire GELÉ des écarts UI existants — motif `.ruff-budget.json`. Ce fichier n'autorise PAS les écarts : il enregistre ceux qui préexistent, pour que rien de NOUVEAU ne passe en silence. Toute entrée ajoutée est une décision, jamais un accident.",
   "_floor_doc": "44 px est le standard PRODUIT d'AUREN, pas le seuil WCAG 2.2 AA (24 px avec exception d'espacement). Certaines entrées ci-dessous ne sont PAS des cibles tactiles — une barre, une ligne, du chrome. Les distinguer relève de la taxonomie A–E (`AUREN_UIUX_V3_FOUNDATION_CONTRACT §3.2`), pas de cette garde.",
-  "_summary_doc": "Un `<summary>` en `display: flex` PERD son marqueur natif. Ces entrées sont recensées telles qu'elles existent ; la garde interdit d'en créer une nouvelle sans décision. · 2026-09-05 `R9` : le déclencheur du panneau RECOMMANDATION perd `display: list-item`, et c'est DÉCIDÉ, pas subi — il porte désormais un chevron explicite (`.l3__trigger::after`) qui pivote à l'ouverture. Deux marqueurs sur un même contrôle valaient moins qu'un seul, choisi. Le cliquet ne peut pas voir un `::after` : l'entrée est donc inscrite plutôt que le marqueur natif restitué.",
+  "_summary_doc": "Un `<summary>` en `display: flex` PERD son marqueur natif. Ces entrées sont recensées telles qu'elles existent ; la garde interdit d'en créer une nouvelle sans décision. · 2026-09-05 `R9` : le déclencheur du panneau RECOMMANDATION perd `display: list-item`, et c'est DÉCIDÉ, pas subi — il porte désormais un chevron explicite (`.l3__trigger::after`) qui pivote à l'ouverture. Deux marqueurs sur un même contrôle valaient moins qu'un seul, choisi. Le cliquet ne peut pas voir un `::after` : l'entrée est donc inscrite plutôt que le marqueur natif restitué. · 2026-09-26 `UI-CP7.5A` : les DEUX déclencheurs du relevé corporel perdent `display: list-item`, et c'est DÉCIDÉ. `.bl-fait > summary` est une RANGÉE de relevé — libellé à gauche, valeur à droite, provenance dessous — donc une grille à trois colonnes, dont la troisième est occupée par un chevron explicite (`.bl-fait > summary::after`, qui pivote à l'ouverture). Un marqueur natif s'y ajouterait en quatrième glyphe sans rien dire de plus. `.bl-acquisition__commande` porte, elle, un `+` explicite qui devient `×` à l'ouverture. Même raison qu'en `R9` : le cliquet ne peut pas voir un `::after`, donc on inscrit l'entrée plutôt que de restituer un second marqueur. L'affordance reste NATIVE — c'est un `<summary>`, annoncé comme bouton avec son état déplié — ce que `UI-CP7.5 §7` exige explicitement.",
   "under_floor": [
     "app.css::.app-rail__sublink::min-height: 40px",
     "app.css::.coach-ratio__cardio::min-width: 24px",
@@ -14,6 +14,8 @@
     "session_focus.css::.setline::min-height: 34px"
   ],
   "summary_display": [
+    "app.css::.bl-acquisition__commande::display:flex",
+    "app.css::.bl-fait > summary, .bl-fait__ligne::display:grid",
     "app.css::.machine-panel__summary::display:flex",
     "app.css::.pd-drawer > summary::display:flex",
     "app.css::.prog__more > summary::display:flex",

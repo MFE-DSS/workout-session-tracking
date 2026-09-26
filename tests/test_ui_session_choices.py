@@ -35,6 +35,11 @@ SEGMENTED_CONSUMERS = {
     "app/templates/_macros.html",                  # macro partagée
     "app/templates/session_detail.html",           # concentration + énergie
     "app/templates/_partials/exercise_card.html",  # sensation + alternatives
+    # `UI-CP7.5B` — le closeout réclame concentration et énergie LORSQU'ELLES
+    # MANQUENT. Il adopte la macro plutôt que d'écrire une troisième
+    # orthographe des mêmes contrôles : c'est précisément ce que ce registre
+    # rend visible, et il a rougi à la seconde où le consommateur est apparu.
+    "app/templates/session_done.html",             # réparation de signal
 }
 
 

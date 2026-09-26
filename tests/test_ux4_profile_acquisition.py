@@ -211,22 +211,70 @@ def test_every_acquisition_form_sits_behind_an_explicit_update(client):
     # formulaire de données de référence de son tiroir, le compte tombait de
     # 3 à 2 pour 2 formulaires, et la garde restait VERTE.
     #
-    # La propriété réelle est l'IMBRICATION. On la vérifie en suivant la
-    # profondeur des `details` : tout formulaire d'acquisition doit s'ouvrir
-    # à une profondeur d'au moins un.
+    # La propriété réelle est l'IMBRICATION.
+    #
+    # ⚠ `UI-CP7.5A` — ET ON NE PEUT PLUS LA LIRE DANS LA SOURCE.
+    #
+    # Le comptage de profondeur `<details>` sur le TEXTE du gabarit était déjà
+    # la bonne idée. Il vient de tomber sur un gabarit parfaitement sain : la
+    # feuille d'acquisition est désormais une MACRO, définie une seule fois
+    # (elle sert deux points d'appel — la ligne d'un fait connu, et
+    # l'intention choisie dans l'entrée d'acquisition). Une macro est écrite à
+    # la profondeur ZÉRO du fichier, même si chacun de ses appels est imbriqué
+    # dans deux `<details>`.
+    #
+    # C'est le mode d'échec INVERSE que ce dépôt a déjà payé cinq fois : une
+    # garde statique qui accuse du code sain. La propriété se vérifie donc sur
+    # le RENDU — ce qui est strictement plus fort, puisque c'est l'état au
+    # repos que voit l'utilisateur, et non une approximation textuelle.
+    assert acquisition >= 2, f"seulement {acquisition} formulaires d'acquisition"
+
+    # ⚠ PRÉMISSE — SANS ELLE LA GARDE EST VIDE, ET ELLE L'A ÉTÉ.
+    #
+    # Vérifié par mutation : en sortant délibérément une feuille de son
+    # tiroir, la garde restait VERTE. L'utilisateur de la fixture n'a aucune
+    # mesure, donc aucun fait connu, donc la boucle des lignes ne rend RIEN —
+    # elle n'observait que l'état vide. Il faut un fait connu pour que la
+    # ligne manipulable existe, et un fait absent pour l'entrée d'acquisition.
+    from datetime import UTC, datetime
+
+    from app.database import SessionLocal
+    from app.models.measurement import BodyMeasurement
+    from app.models.user import User
+    from app.services import body_profile as bp
+
+    with SessionLocal() as db:
+        uid = db.query(User).first().id
+        bp.set_consent(db, uid, True)
+        db.add(BodyMeasurement(user_id=uid, measured_at=datetime.now(UTC),
+                               waist_cm=84.5))
+        db.commit()
+
+    page = client.get("/profile").text
+    instrument = page[page.index('class="body-ledger"'):page.index("</section>")]
+    assert 'id="fait-waist_cm"' in instrument, (
+        "prémisse rompue : aucune ligne de fait connu à observer"
+    )
+    assert 'class="bl-acquisition"' in instrument, (
+        "prémisse rompue : aucune entrée d'acquisition à observer"
+    )
+
+    # Aucun `<form>` ne doit être ATTEINT sans ouvrir un `<details>`, sauf le
+    # quick-log, hors tiroir par décision opérateur.
     profondeur = 0
     decouverts = []
-    for m in re.finditer(r"<details\b|</details>|<form\b[^>]*>", src):
+    for m in re.finditer(r"<details\b|</details>|<form\b[^>]*>", instrument):
         jeton = m.group(0)
         if jeton == "<details":
             profondeur += 1
         elif jeton == "</details>":
             profondeur = max(profondeur - 1, 0)
         elif 'class="quicklog"' not in jeton and profondeur == 0:
-            decouverts.append(src[m.start():m.start() + 80].replace("\n", " "))
-    assert acquisition >= 2, f"seulement {acquisition} formulaires d'acquisition"
+            decouverts.append(
+                instrument[m.start():m.start() + 90].replace("\n", " "))
     assert not decouverts, (
-        f"{len(decouverts)} formulaire(s) d'acquisition hors tiroir : {decouverts}"
+        f"{len(decouverts)} formulaire(s) d'acquisition hors tiroir AU RENDU : "
+        f"{decouverts}"
     )
 
 
@@ -378,13 +426,29 @@ def test_no_connected_health_channel_is_implemented(client):
         assert banned not in body, f"canal connecté annoncé : {banned}"
 
 
-def test_morphometry_is_labelled_as_a_fallback(client):
-    """**4 — MORPHOMETRY.** Le grand formulaire est un mécanisme de repli
-    hérité, pas l'architecture cible. L'assistant guidé n'est PAS construit."""
+def test_la_morphometrie_n_est_plus_un_grand_formulaire(client):
+    """**4 — MORPHOMETRY.** ⚠ `UI-CP7.5A` — LE REPLI EST DEVENU LA CIBLE.
+
+    Cette garde exigeait que le grand formulaire soit ÉTIQUETÉ « saisie
+    complète », parce qu'il était un mécanisme de repli hérité assumé comme
+    tel : *« L'assistant guidé n'est PAS construit ici : il sort du périmètre
+    approuvé de cette tranche. »*
+
+    `CP7.5A` est la tranche où il entre dans le périmètre. Le grand
+    formulaire ne se signale plus comme repli : il n'existe plus. Chaque fait
+    s'acquiert depuis sa propre ligne, une ou deux valeurs à la fois.
+
+    Ce que la garde continue de défendre, mot pour mot : AUCUN assistant
+    guidé multi-étapes n'a été construit. Une feuille par fait n'est pas un
+    wizard — il n'y a ni séquence, ni étape, ni état à traverser.
+    """
     body = client.get("/profile").text
-    assert "saisie complète" in body, (
-        "le formulaire hérité n'est pas signalé comme mécanisme de repli"
+    assert 'class="body-profile"' not in body, (
+        "le grand formulaire de treize champs est revenu"
     )
+    assert "saisie complète" not in body
+    # L'acquisition existe, portée par les lignes.
+    assert "bl-feuille__form" in body
     for wizard in ("étape 1", "wizard", 'data-step="'):
         assert wizard not in body, f"assistant guidé construit hors périmètre : {wizard}"
 

@@ -31,7 +31,6 @@ from app.services.password_policy import (
     validate_password_policy,
 )
 from app.services.session_state import latest_open_session
-from app.services.time_format import relative_hours_ago
 from app.templating import templates
 
 router = APIRouter(tags=["auth"])
@@ -381,37 +380,26 @@ def profile_page(
 
     # Body measurements.
     #
-    # Sb_MORPHO_PROFILE_RUNTIME_01 — capture and display are deliberately two
-    # different field sets, because they answer two different questions.
+    # ⚠ `UI-CP7.5A` — `capture_fields` ET `latest_values` ONT DISPARU D'ICI.
     #
-    # `capture_fields` is the canonical writer's whitelist: exactly what this
-    # form is allowed to persist. Rendering the form from anything else would
-    # let it post a key the writer silently ignores.
+    # `capture_fields` existait pour rendre le formulaire de treize champs à
+    # partir de la liste blanche de l'écrivain — « rendering the form from
+    # anything else would let it post a key the writer silently ignores ». Ce
+    # formulaire n'existe plus : chaque champ est joignable depuis la ligne
+    # du relevé qui le porte, et `body_ledger` lit cette même liste blanche
+    # pour construire ses feuilles. La règle survit, son consommateur a
+    # changé.
     #
-    # ⚠ `MEASUREMENT_FIELDS` reste le jeu d'AFFICHAGE, et il porte encore le
-    # `calf_cm` historique — « historical data remains readable exactly as it
-    # is ». Seul son usage a rétréci : les dix courbes SVG et les templates
-    # liés qui le parcouraient n'atteignaient aucun œil.
+    # `MEASUREMENT_FIELDS` et `get_latest_measurement` ne sont plus lus par
+    # cette route : le relevé résout champ par champ. Le module
+    # `measurements` reste, il sert les séries corporelles ailleurs.
     from app.services import body_profile as bp
-    from app.services.measurements import (
-        MEASUREMENT_FIELDS,
-        get_latest_measurement,
-    )
-
-    capture_fields = [(s.key, s.label) for s in bp.BODY_MEASUREMENT_FIELDS]
 
     # Sb_MORPHO_PROFILE_READMODEL_01 — read-only. Owner-scoped like every other
     # read on this page; no planner consumer reads this value.
     from app.services.morphology_readmodel import build_morphology_readmodel
 
     morpho = build_morphology_readmodel(db, user.id)
-
-    latest_measurement = get_latest_measurement(db, user.id)
-    latest_values: dict[str, str] = {}
-    if latest_measurement:
-        for field in {*MEASUREMENT_FIELDS, *(k for k, _ in capture_fields)}:
-            val = getattr(latest_measurement, field, None)
-            latest_values[field] = str(val) if val is not None else ""
 
     # `UI-CP1` — L'ÂGE DU POIDS, LA SEULE CLÉ AJOUTÉE PAR CETTE TRANCHE.
     #
@@ -428,13 +416,29 @@ def profile_page(
     # La valeur affichée vient de CE relevé : si `weight_kg` y est nul, le
     # gabarit n'affiche aucun poids, donc jamais un âge qui parlerait d'une
     # autre ligne que celle qu'on lit.
-    weight_age_label = (
-        relative_hours_ago(datetime.now(UTC), latest_measurement.measured_at)
-        if latest_measurement is not None
-        and latest_measurement.measured_at is not None
-        and latest_values.get("weight_kg")
-        else None
-    )
+    # ── `UI-CP7.5A` — LE RELEVÉ MANIPULABLE ────────────────────────────────
+    #
+    # ⚠ IL REMPLACE `latest_values` / `get_latest_measurement`, il ne s'y
+    # AJOUTE PAS — et ce n'est pas une économie de requête, c'est une
+    # correction.
+    #
+    # `get_latest_measurement` rendait la dernière LIGNE ; le relevé résout
+    # CHAMP PAR CHAMP. Tant que le seul écrivain postait les treize champs
+    # d'un coup, les deux coïncidaient. Dès qu'une ligne écrit un seul fait —
+    # noter son tour de taille crée une ligne où le poids est nul — ils
+    # divergent : la réponse primaire aurait affiché « Non pesé » pendant que
+    # le relevé, deux centimètres plus bas, affichait le poids. Deux lectures
+    # contradictoires de la même donnée sur le même écran.
+    #
+    # Une seule requête remplace l'autre. `weight_age_label` disparaît avec
+    # elle : la ligne « Poids » du relevé porte déjà sa valeur ET son âge, et
+    # les deux viennent désormais de la même résolution.
+    from app.services.body_ledger import construire_releve
+
+    a_consenti = bp.has_active_consent(db, user.id)
+    releve = construire_releve(db, user.id, user)
+    ligne_poids = next(
+        (x for x in releve if x.cle == "weight_kg"), None)
 
     return templates.TemplateResponse(
         request, "profile.html",
@@ -447,10 +451,15 @@ def profile_page(
             # aurait coûté une requête par affichage du Profil, pour rien.
             "measure_saved": request.query_params.get("measure_saved") == "1",
             "measure_error": request.query_params.get("measure_error") == "1",
-            "capture_fields": capture_fields,
+            # `UI-CP7.5A` — l'intention d'écrire sans consentement, et son
+            # obtention. Deux retours distincts : l'un est un refus, l'autre
+            # une confirmation.
+            "consent_required": request.query_params.get("consent_required") == "1",
+            "consent_saved": request.query_params.get("consent_saved") == "1",
+            "a_consenti": a_consenti,
+            "releve": releve,
+            "ligne_poids": ligne_poids,
             "morpho": morpho,
-            "latest_values": latest_values,
-            "weight_age_label": weight_age_label,
             "active_session": latest_open_session(db, user.id),
             # Sb_31.X — gate the Body Intelligence v2 discovery link.
             "body_intelligence_enabled": get_settings().body_intelligence_enabled,
@@ -484,6 +493,30 @@ async def profile_body_submit(
     effacer la valeur stockée au prochain enregistrement** — le piège de
     sérialisation déjà payé sur la console de séance. Une garde le prouve en
     enregistrant, pas en le lisant.
+
+    ⚠ `UI-CP7.5A` — LA MÊME SÉMANTIQUE DE REMPLACEMENT VIVAIT ENCORE ICI.
+
+    Le paragraphe ci-dessus avait nommé le piège et l'avait désamorcé pour
+    DEUX colonnes, en les retirant. Les trois qui restaient — email, taille,
+    FC repos — gardaient exactement le défaut : un défaut de formulaire à
+    `""`, une écriture inconditionnelle. Tant que le seul écrivain était un
+    formulaire qui postait les trois ensemble, ça ne se voyait pas.
+
+    Une feuille d'acquisition par ligne rend le défaut ATTEIGNABLE : corriger
+    sa taille depuis la ligne « Taille » aurait effacé son email et sa FC
+    repos. C'est la TROISIÈME instance de cette classe dans ce programme —
+    après `update_measurement` et `update_session`, où elle perdait des
+    données en production.
+
+    Le contrat est désormais le même que ses deux sœurs, et c'est celui que
+    `§5` impose de propager :
+
+        soumis            → écrit
+        absent            → inchangé
+        soumis à vide     → effacement EXPLICITE
+
+    Le formulaire complet des données de référence poste toujours les trois,
+    donc son comportement ne change pas d'un iota.
     """
     def _int_or_none(v: str, lo: int, hi: int) -> int | None:
         v = v.strip()
@@ -497,20 +530,29 @@ async def profile_body_submit(
             return None
         return n
 
-    user.height_cm = _int_or_none(height_cm, 100, 250)
-    user.resting_hr = _int_or_none(resting_hr, 30, 220)
+    # La présence se lit sur le formulaire BRUT : les paramètres typés ont un
+    # défaut à `""`, donc ils ne distinguent pas « absent » de « vidé ».
+    soumis = await request.form()
 
-    email_clean = email.strip().lower() if email.strip() else None
-    if email_clean:
-        # Sb_20.3 — strict regex same as registration.
-        if EMAIL_REGEX.match(email_clean):
-            existing = db.execute(
-                select(User).where(User.email == email_clean, User.id != user.id)
-            ).scalar_one_or_none()
-            if existing is None:
-                user.email = email_clean
-    elif not email.strip():
-        user.email = None
+    if "height_cm" in soumis:
+        user.height_cm = _int_or_none(height_cm, 100, 250)
+    if "resting_hr" in soumis:
+        user.resting_hr = _int_or_none(resting_hr, 30, 220)
+
+    if "email" in soumis:
+        email_clean = email.strip().lower() if email.strip() else None
+        if email_clean:
+            # Sb_20.3 — strict regex same as registration.
+            if EMAIL_REGEX.match(email_clean):
+                existing = db.execute(
+                    select(User).where(
+                        User.email == email_clean, User.id != user.id
+                    )
+                ).scalar_one_or_none()
+                if existing is None:
+                    user.email = email_clean
+        else:
+            user.email = None
 
     db.commit()
 
@@ -613,6 +655,21 @@ async def profile_measurements_submit(
     """
     from app.services import body_profile as bp
 
+    # ⚠ `UI-CP7.5A` — LA PORTE DE CONSENTEMENT ÉTAIT OUVERTE CÔTÉ SERVEUR.
+    #
+    # `§3` dit que le consentement « remains required » pour la collecte. Il
+    # ne l'était pas ici : cette route écrivait `body_measurements` sans
+    # jamais interroger `has_active_consent`. Le seul contrôle vivait dans
+    # `/body`, surface désactivée en production (404 mesuré).
+    #
+    # Sans ce garde, router l'intention vers une étape de consentement dans
+    # l'interface aurait été du théâtre : le formulaire masqué, l'endpoint
+    # ouvert. Le refus est SILENCIEUX pour l'utilisateur au sens où il ne
+    # perd rien — il est renvoyé sur le relevé, qui reste lisible (`§3` :
+    # « BODY_LEDGER remains readable »), avec la demande de consentement.
+    if not bp.has_active_consent(db, user.id):
+        return RedirectResponse(url="/profile?consent_required=1", status_code=303)
+
     form = await request.form()
 
     # Parse date — fallback to today if empty/invalid.
@@ -650,6 +707,55 @@ async def profile_measurements_submit(
     bp.create_measurement(db, user.id, cleaned, measured_at=dt)
 
     return RedirectResponse(url="/profile?measure_saved=1", status_code=303)
+
+
+# ---------------------------------------------------------------------------
+# `UI-CP7.5A` — LE CONSENTEMENT VIT À L'INTENTION
+# ---------------------------------------------------------------------------
+
+
+@router.post("/profile/consent", response_model=None, name="profile_consent_submit")
+async def profile_consent_submit(
+    request: Request,
+    db: DbSession = None,
+    user: CurrentUser = None,
+):
+    """Accorder ou retirer le consentement à l'enregistrement des mesures.
+
+    ⚠ POURQUOI UNE ROUTE DE PLUS, ALORS QUE `/body/consent` EXISTE.
+
+    Elle existe, et elle est **injoignable** : mesuré en production,
+    `/body` et `/body/measurements/new` rendent 404 — le drapeau
+    `body_assessment_enabled` est OFF. Le consentement n'avait donc aucune
+    porte atteignable, alors que l'écriture des mesures, elle, en avait une.
+
+    L'arbitrage `§2` interdit de rallumer `/body` pour récupérer sa page :
+    ce serait une seconde destination utilisateur pour le corps. La sémantique
+    du service est réutilisée telle quelle — `body_profile.set_consent`, même
+    table, même versionnement, mêmes horodatages — et seule la PORTE est
+    replacée dans le parcours canonique.
+
+    `retour` ramène à la ligne qu'on essayait d'éditer : consentir ne doit pas
+    faire perdre l'intention qui l'a déclenché.
+    """
+    from app.services import body_profile as bp
+
+    form = await request.form()
+    accorde = (form.get("granted") or "") == "1"
+    bp.set_consent(db, user.id, accorde)
+
+    # L'ancre est bornée à un identifiant de ligne connu : un fragment libre
+    # venu du formulaire serait un paramètre de redirection contrôlé par le
+    # client.
+    from app.services.body_ledger import PLAN_DU_RELEVE
+
+    ancres = {f"fait-{cle}" for cle, _, _, _ in PLAN_DU_RELEVE}
+    retour = (form.get("retour") or "").lstrip("#")
+    fragment = f"#{retour}" if retour in ancres else ""
+
+    return RedirectResponse(
+        url=f"/profile?consent_saved=1{fragment}", status_code=303
+    )
 
 
 # ---------------------------------------------------------------------------

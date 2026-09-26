@@ -64,13 +64,50 @@ def test_done_page_200_basic(client):
     assert r.status_code == 200
 
 
-def test_done_page_shows_pastille_when_label_present(client):
+def test_la_pastille_de_label_ne_revient_pas(client):
+    """⚠ `UI-CP7.5B` — GARDE RETOURNÉE PAR ARBITRAGE, ET C'EST CONSIGNÉ.
+
+    Cette garde exigeait la pastille ; elle exige maintenant son absence.
+    Le retournement n'est pas une commodité : il est écrit noir sur blanc
+    dans la directive de clôture.
+
+        « Do not reintroduce weak composite scoring through the back door.
+          Any score / confidence / breakdown still rendered must prove:
+          what decision it supports, why the user needs it at closeout,
+          why Flight Recorder is not its better owner.
+          Otherwise demote/remove it. »
+
+    La pastille ne pouvait rien prouver de tel : son infobulle disait
+    « Contribution au score V2 : 90/100 » — un interne de calcul, pour un
+    score que le même arbitrage retire de cette surface.
+
+    ⚠ LE LABEL LUI-MÊME N'EST PAS SUPPRIMÉ DU PRODUIT.
+    `implicit_label` continue d'être calculé et persisté à la clôture, et
+    `body_intelligence_block` en rend la distribution sur 30 jours via
+    `coach_report._LABEL_DISPLAY_30D`. Ce qui part est son AFFICHAGE PAR
+    EXERCICE sur le closeout, pas la donnée ni sa lecture agrégée.
+    """
     sid = _create_and_complete_strength(client, with_pattern=True)
-    r = client.get(f"/sessions/{sid}/done")
-    body = r.text
-    assert "implicit-pill" in body
-    # Le display name "Cohérente" doit apparaître
-    assert "Cohérente" in body
+    body = client.get(f"/sessions/{sid}/done").text
+    assert "implicit-pill" not in body, (
+        "la pastille de label implicite est revenue sur le closeout"
+    )
+
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise
+
+    # PRÉMISSE : le label existe bien, il n'est simplement plus rendu ICI.
+    # Sans cette assertion, la garde passerait aussi le jour où le calcul
+    # disparaîtrait — elle prouverait alors l'absence d'une absence.
+    with SessionLocal() as db:
+        labels = db.execute(
+            select(SessionExercise.implicit_label)
+            .where(SessionExercise.session_id == sid)
+        ).scalars().all()
+    assert any(x for x in labels), (
+        "prémisse rompue : plus aucun `implicit_label` n'est calculé — cette "
+        "garde ne prouve plus rien sur le rendu"
+    )
 
 
 def test_done_page_no_pastille_when_no_label(client):
@@ -83,14 +120,18 @@ def test_done_page_no_pastille_when_no_label(client):
     assert "implicit-pill--" not in body
 
 
-def test_done_page_shows_score_breakdown_for_v2_with_label(client):
-    """scoring_version=2 + au moins un label → bloc Décomposition visible."""
+def test_la_ventilation_du_score_ne_revient_pas(client):
+    """Même retournement, même raison — voir la garde de la pastille.
+
+    « Composante classique (V1) × 0,7 · Moyenne des labels implicites × 0,3 »
+    expliquait comment un nombre était fabriqué, sur une page d'où ce nombre
+    est retiré. Il ne restait qu'une arithmétique sans objet.
+    """
     sid = _create_and_complete_strength(client, with_pattern=True)
-    r = client.get(f"/sessions/{sid}/done")
-    body = r.text
-    assert "Décomposition du score" in body
-    assert "Composante classique" in body
-    assert "Moyenne des labels implicites" in body
+    body = client.get(f"/sessions/{sid}/done").text
+    for interne in ("Décomposition du score", "Composante classique",
+                    "Moyenne des labels implicites", "score-breakdown"):
+        assert interne not in body, f"{interne!r} est revenu sur le closeout"
 
 
 def test_done_page_no_breakdown_when_no_label(client):
@@ -117,11 +158,16 @@ def test_done_page_handles_v1_session_without_breakdown(client):
     assert "Décomposition du score" not in r.text
 
 
-def test_done_page_pastille_has_contribution_tooltip(client):
-    """La pastille porte un title= avec la contribution numérique
-    (transparence sur le scoring)."""
+def test_aucune_contribution_numerique_n_est_exposee(client):
+    """L'infobulle « Contribution au score V2 : 90/100 » part avec sa pastille.
+
+    ⚠ Et elle ne pouvait pas être lue au doigt : un `title=` ne s'ouvre pas
+    sur un écran tactile. Cette surface se lit sur un téléphone — la
+    « transparence » que l'infobulle prétendait offrir n'atteignait personne.
+    """
     sid = _create_and_complete_strength(client, with_pattern=True)
-    r = client.get(f"/sessions/{sid}/done")
-    body = r.text
-    # 90 = LABEL_SCORE_CONTRIBUTION[trajectoire_coherente]
-    assert 'title="Contribution au score V2 : 90/100"' in body
+    body = client.get(f"/sessions/{sid}/done").text
+    assert "Contribution au score" not in body
+    assert "/100" not in body, (
+        "une contribution ou un score sur 100 est rendu au closeout"
+    )

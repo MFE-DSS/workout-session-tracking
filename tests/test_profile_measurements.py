@@ -1,13 +1,50 @@
-"""Tests for measurement integration on profile page."""
+"""Tests for measurement integration on profile page.
+
+⚠ `UI-CP7.5A` — L'ACQUISITION EXIGE UN CONSENTEMENT ACTIF.
+
+Ces tests écrivent des mesures. Depuis l'arbitrage `§3` (« Active consent
+remains required for collection »), la route refuse une écriture sans
+consentement — elle ne le vérifiait PAS auparavant, le seul contrôle vivant
+dans `/body`, surface rendue 404 en production.
+
+Le consentement est donc accordé dans la fixture : ces tests parlent d'un
+utilisateur qui acquiert. Le contrat inverse a ses propres gardes dans
+`tests/test_ui_cp75a_consentement_a_l_intention.py`.
+"""
 from __future__ import annotations
 
 from datetime import UTC
 
+import pytest
+
+
+@pytest.fixture(autouse=True)
+def _consentement(client):
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.services import body_profile as bp
+
+    with SessionLocal() as db:
+        bp.set_consent(db, db.query(User).first().id, True)
+    return client
+
 
 def test_profile_shows_measurement_form(client):
+    """⚠ REPOINTÉE — l'acquisition n'est plus UN formulaire, ce sont des
+    feuilles portées par les lignes du relevé.
+
+    La propriété défendue est inchangée : depuis `/profile`, on peut
+    enregistrer une mesure datée. Ce qui change est qu'on n'ouvre plus
+    treize champs pour en corriger un.
+    """
     body = client.get("/profile").text
-    assert "measured_at" in body
+    assert "measured_at" in body, "aucune feuille n'offre de date de mesure"
     assert "mesure" in body.lower()
+    # Et l'acquisition est bien portée par des lignes, pas par une grille.
+    assert "bl-feuille__form" in body
+    assert 'class="body-profile"' not in body, (
+        "le formulaire de treize champs est revenu"
+    )
 
 
 def test_profile_measurement_submit(client):

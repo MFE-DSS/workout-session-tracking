@@ -1,283 +1,306 @@
 {% extends "base.html" %}
+{% from "_macros.html" import segmented %}
 {% block content %}
-<div class="session-done">
+{# ═══════════════════════════════════════════════════════════════════════════
+   `UI-CP7.5B` — L'INSTRUMENT DE TRANSITION
 
-  {# ─── Header ─── #}
-  <header class="session-done__header card">
-    <div class="session-done__badge">✓ Séance terminée</div>
-    <h1 class="page-title session-done__title">{{ recap.header.template_name }}</h1>
-    <div class="session-done__meta text-dim">
-      {{ recap.header.started_at | datetime_fr }}
-      {% if recap.header.ended_at %}
-        → {{ (recap.header.ended_at | local).strftime('%H:%M') }}
-      {% endif %}
-      {% if recap.header.duration_label %}
-        · {{ recap.header.duration_label }}
-      {% endif %}
-    </div>
+   QUESTION SOUVERAINE, une seule :
+
+       QUE DOIT-IL SE PASSER ENTRE LA FIN DE L'EXÉCUTION
+       ET LA LECTURE DU DÉBRIEF ?
+
+   ⚠ CE N'EST PAS UN NETTOYAGE DE LA PILE PRÉCÉDENTE, C'EST UNE RECOMPOSITION.
+
+   Huit objets encartés se disputaient la page — en-tête, récap de revue,
+   mouvements remarquables, prochaine action, résumé, top progression, zones,
+   détail par exercice — plus CINQ sorties au même rang, dont la dominante
+   (`btn--primary`, « Voir la synthèse ») pointait vers `/dashboard`, la
+   surface que `test_navigation_does_not_promote_dashboard` déclare dépréciée.
+   Aucun objet ne dominait, et celui qui dominait visuellement menait au
+   mauvais endroit.
+
+   TROIS RESPONSABILITÉS, HIÉRARCHISÉES AU LIEU D'ÊTRE CO-SOUVERAINES :
+
+     A. ce qui reste à DÉCLARER      → ici, et seulement si ça manque
+     B. ce qui a CHANGÉ              → `FLIGHT_RECORDER` (la transition)
+     C. comment ADMINISTRER la séance → `SESSION_LIFECYCLE` (la profondeur)
+
+   ⚠ L'AUDIT DE §13 A CORRIGÉ MA PREMIÈRE COMPOSITION.
+   J'allais poser un bilan de ressenti permanent ici. Or `session_detail.html`
+   collecte DÉJÀ `concentration` et `global_state`, juste au-dessus du bouton
+   « TERMINER LA SÉANCE » : un second formulaire au repos aurait créé un
+   deuxième point de collecte pour les mêmes colonnes — exactement ce que
+   `Sb_SESSION_REVIEW_SIGNAL_01` interdit, et à raison.
+
+   Le closeout ne demande donc QUE CE QUI MANQUE, et disparaît quand rien ne
+   manque. C'est aussi ce qui remplace la prose « Pense à indiquer ton
+   ressenti sur les prochaines séances » : un contrôle ici et maintenant, à la
+   place d'une consigne sur un futur.
+
+   ⚠ CE QUI PART, ET CHEZ QUI (§14, fait par fait).
+
+     top progression · zones sollicitées   → `FLIGHT_RECORDER` (`/progress`)
+     poids de corps                        → `BODY_LEDGER` (`CP7.5A`)
+     anomalies                             → conservées, mais rattachées au
+                                             cycle de vie : elles sont la
+                                             RAISON de rouvrir, pas un bloc
+     relevé par exercice, ressenti, notes  → descendus dans la profondeur de
+                                             cycle de vie. ⚠ MESURÉ : aucune
+                                             autre surface ne les porte —
+                                             `/sessions/{id}` REDIRIGE vers
+                                             cette page, `/history` n'est
+                                             qu'une liste. Les renvoyer
+                                             ailleurs aurait été les
+                                             supprimer (`§5.3`)
+     qualité 92 · fiabilité 90 · ventilation du score
+                                           → retirées (§15) : aucune ne peut
+                                             dire quelle décision elle sert
+     pastille de label implicite           → même banc : c'est l'interne du
+                                             score V2 que §15 évacue
+     4 sorties sur 5                       → la coque persistante les porte
+                                             (Séance · Programmes ·
+                                             Progression · Profil)
+
+   Aucune capacité n'est perdue sans domicile nommé ; rien n'est rendu deux
+   fois.
+   ═══════════════════════════════════════════════════════════════════════════ #}
+{% set _est_cardio = recap.header.kind == 'cardio' %}
+{% set _anomalies = recap.summary.anomalies or [] %}
+<div class="closeout">
+
+  {# ══ 1. LE FAIT ══════════════════════════════════════════════════════════
+     La séance est close, et voici la seule mesure qui le confirme. Pas un
+     tableau de récapitulation : la mesure de complétion DÉPEND DU TYPE.
+
+     ⚠ Une séance cardio n'a aucune série de travail. L'ancien écran lui
+     rendait quand même « Work sets 0 / 0 » en tête de son résumé, puis la
+     durée réelle six cartes plus bas. Ici la ligne de fait porte ce qui
+     mesure RÉELLEMENT la séance qu'on vient de faire. #}
+  <header class="closeout__fait">
+    <p class="closeout__kicker">Séance terminée</p>
+    <h1 class="closeout__titre">{{ recap.header.template_name }}</h1>
+    {# ⚠ Les `<span>` sont écrits SANS espace intérieur : la puce de
+       séparation est posée en `::before`, donc tout blanc de gabarit
+       deviendrait un blanc rendu juste avant elle. #}
+    <p class="closeout__mesures">
+      {%- if _est_cardio -%}
+        {%- set _cardio = recap.summary.cardio or {} -%}
+        {%- if _cardio.duration_min %}<span class="closeout__mesure"><strong>{{ _cardio.duration_min }}</strong> min</span>{% endif -%}
+        {%- if _cardio.bpm_avg %}<span class="closeout__mesure">{{ _cardio.bpm_avg }} bpm moyen</span>{% endif -%}
+        {%- if _cardio.machine_type %}<span class="closeout__mesure">{{ _cardio.machine_type }}</span>{% endif -%}
+      {%- else -%}
+        <span class="closeout__mesure"><strong>{{ recap.summary.work_sets_done }}</strong> / {{ recap.summary.work_sets_total }} séries</span>
+        {%- if recap.header.duration_label %}<span class="closeout__mesure">{{ recap.header.duration_label }}</span>{% endif -%}
+        {# Seulement s'il y en a : « 0 substitution » n'apprend rien. #}
+        {%- if recap.summary.substitution_count %}<span class="closeout__mesure">{{ recap.summary.substitution_count }} substitution{{ 's' if recap.summary.substitution_count > 1 }}</span>{% endif -%}
+      {%- endif -%}
+    </p>
   </header>
 
-  {# Sb_27.2 — Session Review V1 tile (quality, ressenti, mouvements remarquables, prochaine action) #}
-  {% include "_partials/session_review.html" %}
+  {# ══ 2. CE QUI MANQUE ENCORE ═════════════════════════════════════════════
+     ⚠ AUCUN SCORE NUMÉRIQUE ICI, ET C'EST UNE DÉCISION.
 
-  {# ─── Résumé ─── #}
-  <section class="card session-done__summary">
-    <h2 class="card__title">Résumé</h2>
-    <ul class="session-done__stats">
-      <li>
-        <span>Work sets</span>
-        <b>
-          {{ recap.summary.work_sets_done }} / {{ recap.summary.work_sets_total }}
-          {% if recap.summary.completion_pct is not none %}
-            ({{ recap.summary.completion_pct }}%)
-          {% endif %}
-        </b>
-      </li>
-      {% if recap.summary.substitution_count > 0 %}
-        <li>
-          <span>Substitutions</span>
-          <b>{{ recap.summary.substitution_count }}</b>
-        </li>
-      {% endif %}
-      {% if recap.summary.bodyweight_kg %}
-        <li>
-          {# « Bodyweight » : un libellé anglais sur un écran français. Le
-             reste de la ligne était déjà en français, y compris la virgule
-             décimale — seul le nom du champ avait échappé à la traduction. #}
-          <span>Poids de corps</span>
-          {# `nombre_fr(1)` et non le défaut : le dixième d'un poids de corps a
-             été MESURÉ, il ne s'escamote pas. « 75,0 kg » est une lecture. #}
-          <b>{{ recap.summary.bodyweight_kg | nombre_fr(1) }} kg</b>
-        </li>
-      {% endif %}
-      {# ⚠ CES DEUX LIGNES RENDAIENT DES CLÉS DE PROGRAMME.
-         « Concentration — low », « État — tired » : les valeurs brutes du
-         modèle, en anglais, sur une interface française.
+     « Qualité 92 » et « Fiabilité 90 » cohabitaient sans que rien ne dise ce
+     qu'ils décidaient, ni pourquoi il en fallait deux. Ils ne sont pas
+     remplacés par un troisième nombre.
 
-         Les libellés existaient : l'utilisateur les a lus au moment même de
-         répondre — « Focalisé · Correct · Distrait » et « En forme · Moyen ·
-         Fatigué ». Le récap ne faisait que ne pas les atteindre.
+     Ce qui subsiste est un avertissement de confiance QUALITATIF, et il n'a
+     le droit de paraître que lorsqu'il change réellement la lecture. La
+     condition est vérifiable ET actionnable : `concentration` et
+     `global_state` alimentent `behavioral.compute_session_fatigue`, donc le
+     `fatigue_score`, donc **le moteur de recommandation**. Absents, la
+     prochaine décision se prend sans eux — et c'est la seule phrase que
+     cette section prononce.
 
-         Le repli garde la clé : mieux vaut afficher une valeur inattendue que
-         faire disparaître une déclaration réelle. #}
-      {% if recap.summary.concentration %}
-        <li>
-          <span>Concentration</span>
-          <b>{{ recap.summary.concentration_label or recap.summary.concentration }}</b>
-        </li>
-      {% endif %}
-      {% if recap.summary.global_state %}
-        <li>
-          <span>Énergie générale</span>
-          <b>{{ recap.summary.global_state_label or recap.summary.global_state }}</b>
-        </li>
-      {% endif %}
-      {# Sb_SESSION_REVIEW_SIGNAL_01 — la note de séance était saisie puis
-         jamais relue. Silence si vide : pas de ligne vide, pas de « — ». #}
-      {% if recap.summary.note %}
-        <li>
-          <span>Note de séance</span>
-          <b class="session-done__note">{{ recap.summary.note }}</b>
-        </li>
-      {% endif %}
-      {% if recap.summary.confidence_score is not none %}
-        <li>
-          {# « logging » est de l'anglais de développeur, et `eleve` une clé
-             sans accent. Le badge garde la CLÉ dans sa classe — c'est elle qui
-             porte la couleur — et affiche le LIBELLÉ. #}
-          <span>Fiabilité de la saisie</span>
-          <b class="confidence-badge confidence-badge--{{ recap.summary.confidence_level }}">
-            {{ recap.summary.confidence_label or recap.summary.confidence_level }} ({{ recap.summary.confidence_score }})
-          </b>
-        </li>
-      {% endif %}
-    </ul>
-  </section>
+     `bodyweight_kg` n'est PAS réclamé ici, bien que son champ existe et que
+     `confidence` lui donne 10 points : réclamer une donnée au seul motif
+     qu'un champ existe est précisément ce que §13 interdit, et
+     `BODY_LEDGER` en est le propriétaire depuis `CP7.5A`. #}
+  {% set _manque_concentration = not session.concentration %}
+  {% set _manque_etat = not session.global_state %}
+  {% if _manque_concentration or _manque_etat %}
+  <form class="closeout__declaration" method="post"
+        action="{{ url_for('update_session', session_id=session.id) }}">
+    {# `.field-block` / `.field__label` et la macro `segmented` sont la
+       grammaire que `session_detail.html` emploie déjà pour CES DEUX MÊMES
+       champs. On l'adopte telle quelle : une troisième orthographe du même
+       contrôle ne dirait rien de plus, et les libellés d'options restent mot
+       pour mot ceux du point de collecte principal. #}
+    {% if _manque_concentration %}
+    <div class="field-block">
+      <span class="field__label">Concentration mentale</span>
+      {{ segmented("concentration",
+                   [("high", "Focalisé"), ("medium", "Correct"),
+                    ("low", "Distrait")],
+                   session.concentration) }}
+    </div>
+    {% endif %}
 
-  {# ─── Top progression ─── #}
-  {% if recap.summary.top_progression %}
-    {% set tp = recap.summary.top_progression %}
-    <section class="card session-done__top-progression">
-      <h2 class="card__title">Top progression</h2>
-      <p class="top-progression__line">
-        <span class="top-progression__code">{{ tp.code }}</span>
-        <span class="top-progression__name">{{ tp.name }}</span>
-        {% if tp.weight_delta is not none and tp.weight_delta > 0 %}
-          {# Même virgule : « +57.0 kg » sur un écran qui écrit « 75,6 kg ». #}
-          <span class="top-progression__delta">+{{ tp.weight_delta | nombre_fr }} kg</span>
-        {% endif %}
-        {% if tp.reps_delta is not none and tp.reps_delta > 0 %}
-          <span class="top-progression__delta">+{{ tp.reps_delta }} reps</span>
-        {% endif %}
-        {% if tp.score_trend == 'up' %}<span class="top-progression__trend">score en hausse</span>{% endif %}
-      </p>
-    </section>
-  {% endif %}
+    {% if _manque_etat %}
+    <div class="field-block">
+      <span class="field__label">Énergie générale</span>
+      {{ segmented("global_state",
+                   [("good", "En forme"), ("flat", "Moyen"),
+                    ("fatigued", "Fatigué")],
+                   session.global_state) }}
+    </div>
+    {% endif %}
 
-  {# ─── Zones sollicitées ─── #}
-  {% if recap.summary.zones_touched %}
-    <section class="card session-done__zones">
-      <h2 class="card__title">Zones sollicitées</h2>
-      <ul class="session-done__zones-list">
-        {% for z in recap.summary.zones_touched %}
-          <li>
-            <span>{{ z.label }}</span>
-            <b>{{ z.sets }} sets</b>
-          </li>
-        {% endfor %}
-      </ul>
-    </section>
-  {% endif %}
+    {# ⚠ LA CONSÉQUENCE EST UNE INFORMATION DE SOUTIEN, PAS UN BLOC.
+       Elle ouvrait la section en rang `BODY`, sur deux lignes, derrière un
+       filet ambre : un objet visuel de plus sur une page qui vient d'en
+       retirer huit. `D2` la veut courte et ADJACENTE aux contrôles qu'elle
+       explique — elle les suit donc, en rang `META`.
 
-  {# ─── À vérifier (anomalies) ─── #}
-  {% if recap.summary.anomalies %}
-    <section class="card session-done__anomalies">
-      <h2 class="card__title">À vérifier</h2>
-      <ul class="session-done__anomalies-list">
-        {% for a in recap.summary.anomalies %}
-          <li>
-            <span class="anomaly__icon" aria-hidden="true">⚠</span>
-            {% if a.exercise_code %}<b>{{ a.exercise_code }}</b> · {% endif %}
-            {{ a.message }}
-          </li>
-        {% endfor %}
-      </ul>
-    </section>
-  {% endif %}
+       Le fait sémantique est intact, et c'est lui qu'il fallait garder :
+       `concentration` et `global_state` alimentent
+       `behavioral.compute_session_fatigue`, donc le `fatigue_score`, donc le
+       moteur. Absents, la décision suivante se prend avec moins de contexte.
+       Aucun nombre ne le dit à leur place. #}
+    <p class="closeout__consequence">
+      Sans eux, la prochaine recommandation aura moins de contexte.
+    </p>
 
-  {# ─── Cardio (kind=cardio uniquement) ─── #}
-  {% if recap.header.kind == 'cardio' and recap.summary.cardio %}
-    <section class="card session-done__cardio">
-      <h2 class="card__title">Cardio</h2>
-      <ul class="session-done__stats">
-        {% if recap.summary.cardio.duration_min %}
-          <li><span>Durée</span><b>{{ recap.summary.cardio.duration_min }} min</b></li>
-        {% endif %}
-        {% if recap.summary.cardio.bpm_avg %}
-          <li><span>BPM moyen</span><b>{{ recap.summary.cardio.bpm_avg }} bpm</b></li>
-        {% endif %}
-        {% if recap.summary.cardio.calories %}
-          <li>
-            <span>Calories machine</span>
-            <b>{{ recap.summary.cardio.calories }}
-              <span class="text-dim text-meta">(indicatif)</span></b>
-          </li>
-        {% endif %}
-        {% if recap.summary.cardio.machine_type %}
-          <li><span>Machine</span><b>{{ recap.summary.cardio.machine_type }}</b></li>
-        {% endif %}
-      </ul>
-    </section>
-  {% endif %}
-
-  {# ─── Par exercice (kind != cardio) ─── #}
-  {% if recap.header.kind != 'cardio' %}
-    <section class="card session-done__exercises">
-      <h2 class="card__title">Par exercice</h2>
-      <ul class="session-done__exlist">
-        {% for ex in recap.exercises %}
-          {% set _il = implicit_by_se.get(ex.se_id) %}
-          <li class="session-done__exrow">
-            <span class="session-done__code">{{ ex.code }}</span>
-            <span class="session-done__name">
-              {% if ex.substituted_name %}
-                → {{ ex.substituted_name }}
-              {% else %}
-                {{ ex.name }}
-              {% endif %}
-              {% if _il %}
-                {# Sb_24.6 — pastille label implicite, sobre. Le tooltip
-                   donne la contribution numérique pour la transparence. #}
-                <span class="implicit-pill implicit-pill--{{ _il.label }}"
-                      title="Contribution au score V2 : {{ _il.contribution }}/100">
-                  {{ _il.label_display }}
-                </span>
-              {% endif %}
-            </span>
-            <span class="session-done__prog">{{ ex.done }}/{{ ex.total }}</span>
-            {% if ex.score is not none %}
-              <span class="session-done__score">{{ ex.score }}</span>
-            {% endif %}
-            {# Sb_SESSION_REVIEW_SIGNAL_01 — RESTITUTION. Le ressenti et la
-               note étaient saisis pendant la séance et n'étaient jamais
-               rendus ici : on demandait sans jamais rendre.
-
-               Silence honnête quand rien n'a été saisi — un ressenti absent
-               se lit « non mesuré », jamais « neutre ». Aucun texte de
-               remplacement, aucune valeur par défaut. #}
-            {# La valeur brute est rendue telle quelle, comme le fait déjà
-               `exercise_history.html`. Introduire ici une table de libellés
-               français dupliquerait le vocabulaire du widget de saisie et
-               créerait une deuxième source de vérité — le genre de doublon
-               que Sb_FEEDBACK_SIGNAL_AUDIT_01 vient de recenser. Traduire
-               ces valeurs est une décision produit à part entière, notée
-               comme limite. #}
-            {% if ex.muscle_sensation %}
-              <span class="session-done__sensation session-done__sensation--{{ ex.muscle_sensation }}">
-                {{ ex.muscle_sensation }}
-              </span>
-            {% endif %}
-            {% if ex.note %}
-              <span class="session-done__exnote">{{ ex.note }}</span>
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-
-      {% if breakdown %}
-        {# Sb_24.6 — score ventilé (uniquement scoring_version >= 2). Affiché
-           sobre, en bas du bloc, pour expliquer comment le score final
-           se décompose. Cache si pas de label (breakdown vaut None côté
-           handler dans ce cas). #}
-        <div class="score-breakdown">
-          <h4 class="score-breakdown__title">Décomposition du score</h4>
-          <ul class="score-breakdown__list">
-            <li>
-              <span>Composante classique (V1)</span>
-              <b>{{ breakdown.v1 }}</b>
-              <span class="text-dim">× {{ breakdown.weight_v1 }}</span>
-            </li>
-            {% if breakdown.implicit_avg is not none %}
-            <li>
-              <span>Moyenne des labels implicites</span>
-              <b>{{ breakdown.implicit_avg }}</b>
-              <span class="text-dim">× {{ breakdown.weight_implicit }}</span>
-            </li>
-            {% endif %}
-            <li class="score-breakdown__final">
-              <span>Score affiché</span>
-              <b>{{ breakdown.final }}</b>
-              {% if breakdown.delta != 0 %}
-                <span class="score-breakdown__delta score-breakdown__delta--{% if breakdown.delta > 0 %}up{% else %}down{% endif %}">
-                  {% if breakdown.delta > 0 %}+{% endif %}{{ breakdown.delta }} vs V1
-                </span>
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-      {% endif %}
-    </section>
-  {% endif %}
-
-  {# ─── CTA principaux ─── #}
-  <div class="session-done__cta">
-    <a class="btn btn--primary btn--wide" href="{{ url_for('dashboard') }}">
-      Voir la synthèse →
-    </a>
-    <a class="btn btn--wide" href="{{ url_for('history') }}">
-      Historique →
-    </a>
-  </div>
-
-  {# ─── Rouvrir (discret) ─── #}
-  <form method="post"
-        action="{{ url_for('update_session', session_id=session.id) }}"
-        class="session-done__reopen">
-    <input type="hidden" name="action" value="reopen">
-    <button type="submit" class="btn btn--ghost btn--sm">
-      Rouvrir pour éditer
+    <button type="submit" class="btn btn--ghost closeout__declarer">
+      Enregistrer
     </button>
   </form>
+  {% endif %}
+
+  {# ══ 3. UNE SEULE TRANSITION DOMINANTE ═══════════════════════════════════
+     Cinq sorties de même rang ne sont pas un choix, c'est une hésitation.
+     Le débrief est la suite du produit ; il POSSÈDE l'analyse que cette page
+     rendait en double. #}
+  <a class="closeout__commande" href="{{ url_for('progress') }}">
+    Voir le débrief
+    <span class="closeout__commande-fleche" aria-hidden="true">→</span>
+  </a>
+
+  {# ══ 4. CYCLE DE VIE — PROFONDEUR DISCRÈTE ═══════════════════════════════
+     « Rouvrir pour éditer » est de l'administration de séance, pas la
+     transition. Elle survit, elle ne concourt plus.
+
+     ⚠ LES ANOMALIES VIVENT ICI, ET C'EST LEUR PLACE.
+     « B3 · charge 40 % sous la dernière fois » n'est pas de l'analyse — le
+     débrief n'en a que faire — c'est le MOTIF de rouvrir. Les rattacher au
+     tiroir qu'elles justifient leur donne la seule conséquence qu'elles
+     aient jamais eue, et donne au tiroir une raison d'être visible fermé.
+
+     ⚠ Ce formulaire ne portait que `action=reopen`, et `update_session`
+     écrivait les six champs déclarés inconditionnellement : rouvrir EFFAÇAIT
+     concentration, état, poids de corps et note. Mesuré sur la vraie route,
+     corrigé dans `CP7.5B`, épinglé par
+     `tests/test_ui_cp75b_contrat_ecriture_seance.py`. #}
+  <details class="disclosure closeout__cycle">
+    <summary>
+      <span>Gérer cette séance</span>
+      {% if _anomalies %}
+      <span class="closeout__alerte">
+        {{ _anomalies | length }} point{{ 's' if _anomalies | length > 1 }} à vérifier
+      </span>
+      {% endif %}
+    </summary>
+    <div class="disclosure__panel">
+      {% if _anomalies %}
+      <ul class="closeout__anomalies">
+        {% for a in _anomalies %}
+        <li>
+          {% if a.exercise_code %}<b>{{ a.exercise_code }}</b> · {% endif %}
+          {{ a.message }}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {# ⚠ LE RELEVÉ RESTE ICI PARCE QUE PERSONNE D'AUTRE NE LE PORTE.
+         Je l'avais d'abord renvoyé à `FLIGHT_RECORDER` avec le reste de
+         l'analyse. **Mesuré ensuite, et c'était faux** :
+         `session_detail` REDIRIGE (303) toute séance terminée vers cette
+         page, et `/history` n'est qu'une liste — ni le ressenti, ni la note
+         d'exercice, ni même le nom d'un exercice n'y figurent.
+
+             /sessions/{id}      → 303 /sessions/{id}/done
+             /history            → note d'exercice : absente
+                                   note de séance  : absente
+
+         Retirer le relevé aurait donc supprimé la SEULE lecture possible de
+         ce qu'on vient d'enregistrer — une soustraction sans remplaçant, que
+         `CLAUDE.md §5.3` interdit, et un `Sb_SESSION_REVIEW_SIGNAL_01`
+         défait six semaines après avoir été livré.
+
+         Il descend donc dans la profondeur au lieu de disparaître : c'est le
+         RELEVÉ de la séance, et il vit à côté de l'action qui le corrige.
+         Ce qui ne revient pas, c'est l'interne de score — pastille de label
+         implicite et note d'exercice sur 100 (§15).
+
+         ⚠⚠ ACCEPTÉ **TEMPORAIREMENT** — ARBITRAGE OPÉRATEUR `D1`.
+         Ce n'est PAS l'ontologie définitive, et le critère de sortie est
+         écrit :
+
+             UI-CP8 · SESSION_LIFECYCLE fait de la surface de détail d'une
+             séance terminée son propriétaire DURABLE.
+
+             Dès que ce propriétaire existe :
+                 ce relevé QUITTE la profondeur du closeout.
+
+         La garde `test_la_redirection_qui_fait_du_closeout_le_seul_
+         proprietaire` épingle la prémisse : le jour où `/sessions/{id}`
+         cesse de rediriger une séance terminée, elle rougit et rappelle
+         que ce bloc a désormais un meilleur domicile. #}
+      {% if recap.exercises %}
+      <ul class="closeout__releve">
+        {% for ex in recap.exercises %}
+        <li class="closeout__releve-ligne">
+          <span class="closeout__releve-code">{{ ex.code }}</span>
+          <span class="closeout__releve-nom">
+            {{ ex.substituted_name or ex.name }}
+            {%- if ex.substituted_name %} <span class="closeout__releve-sub">remplacé</span>{% endif %}
+          </span>
+          <span class="closeout__releve-series">{{ ex.done }}/{{ ex.total }}</span>
+          {% if ex.muscle_sensation %}
+          {# Valeur brute, comme `exercise_history` : dupliquer ici la table
+             de libellés du widget de saisie créerait une deuxième source de
+             vérité. #}
+          <span class="closeout__releve-ressenti">{{ ex.muscle_sensation }}</span>
+          {% endif %}
+          {% if ex.note %}
+          <span class="closeout__releve-note">{{ ex.note }}</span>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      {# Les calories machine sont lisibles ici et nulle part en tête.
+         Le produit les qualifie lui-même d'« indicatif » depuis leur
+         livraison : elles ne mesurent pas la séance, elles font partie de ce
+         qui a été enregistré. C'est exactement la distinction entre le FAIT
+         de complétion et le RELEVÉ. #}
+      {% if _est_cardio and recap.summary.cardio and recap.summary.cardio.calories %}
+      <p class="closeout__releve-seance">
+        <span class="closeout__releve-etiquette">Calories machine</span>
+        {{ recap.summary.cardio.calories }} <span class="closeout__releve-sub">indicatif</span>
+      </p>
+      {% endif %}
+
+      {% if recap.summary.note %}
+      <p class="closeout__releve-seance">
+        <span class="closeout__releve-etiquette">Note de séance</span>
+        {{ recap.summary.note }}
+      </p>
+      {% endif %}
+
+      <p class="closeout__cycle-note">
+        Rouvrir remet la séance en cours : les séries et le bilan
+        redeviennent modifiables.
+      </p>
+      <form method="post"
+            action="{{ url_for('update_session', session_id=session.id) }}">
+        <input type="hidden" name="action" value="reopen">
+        <button type="submit" class="btn btn--ghost">Rouvrir pour éditer</button>
+      </form>
+    </div>
+  </details>
 
 </div>
 {% endblock %}

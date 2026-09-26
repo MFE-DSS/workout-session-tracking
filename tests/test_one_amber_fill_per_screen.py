@@ -47,15 +47,43 @@ BASELINE = pathlib.Path(__file__).parent / "amber_fill_baseline.json"
 
 #: Les classes qui posent un APLAT ambre. Le CONTOUR ambre (`pd-rank2`) est
 #: explicitement permis au rang 2 — c'est un trait, pas un aplat.
-APLAT = re.compile(r'class="[^"]*\b(?:btn--primary|today-home__cta)\b')
+#:
+#: ⚠ `UI-CP7.5B` — `closeout__commande` EST AJOUTÉE, ET C'EST UNE CORRECTION
+#: DE DÉTECTEUR, PAS UN ASSOUPLISSEMENT.
+#:
+#: Le closeout a remplacé son `btn--primary` (« Voir la synthèse → », qui
+#: pointait vers `/dashboard`) par une commande dominante portant son propre
+#: aplat : `.closeout__commande { background: var(--role-action-primary) }`.
+#: Le nombre d'aplats RÉELS n'a pas bougé — il vaut toujours un — mais cette
+#: expression ne le voyait plus, et la ligne de base tombait de 1 à 0.
+#:
+#: Laisser faire aurait désarmé le cliquet sur ce gabarit : un second aplat
+#: y serait ensuite passé sans un mot. C'est exactement la classe « garde qui
+#: ne garde rien » que ce dépôt a recensée seize fois.
+APLAT = frozenset({"btn--primary", "today-home__cta", "closeout__commande"})
 
+CLASSES = re.compile(r'class="([^"]*)"')
 JINJA_COMMENT = re.compile(r"\{#.*?#\}", re.S)
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.S)
 
 
 def _compte(f: pathlib.Path) -> int:
+    """Compte les éléments porteurs d'un aplat, par JETON de classe.
+
+    ⚠ UNE SOUS-CHAÎNE N'EST PAS UN JETON, et la version précédente le
+    supposait : `\\bcloseout__commande\\b` matchait aussi
+    `closeout__commande-fleche` — le `<span>` de la flèche à l'intérieur du
+    bouton — et comptait DEUX aplats là où l'écran n'en peint qu'un.
+
+    Le même défaut dormait sur les deux autres noms : `btn--primary-xxx`
+    aurait été compté. C'est la troisième fois que ce dépôt paie la
+    confusion sous-chaîne / jeton ; on découpe donc l'attribut.
+    """
     src = HTML_COMMENT.sub(" ", JINJA_COMMENT.sub(" ", f.read_text(encoding="utf-8")))
-    return len(APLAT.findall(src))
+    return sum(
+        1 for attr in CLASSES.findall(src)
+        if APLAT & set(attr.split())
+    )
 
 
 def _recense() -> dict[str, int]:

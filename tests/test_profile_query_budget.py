@@ -60,7 +60,33 @@ PROFILE_URL = "/profile"
 #: **Relever ce nombre est une décision, pas un ajustement.** Une requête neuve
 #: et légitime met à jour cette ligne DANS LE MÊME COMMIT, avec sa raison. Le
 #: pire cas mesuré avant `CP-0` était **27**.
-BUDGET_PROFILE = 5
+#:
+#: ─── `UI-CP7.5A` : 5 → 6, ET VOICI LA DÉCISION ────────────────────────────
+#:
+#: Le décompte n'est pas « +1 pour le relevé ». Mesuré, c'est **−1 +1 +1** :
+#:
+#:   −1  `get_latest_measurement` DISPARAÎT. Elle rendait la dernière LIGNE de
+#:       mesure, et c'est devenu faux : avec une acquisition fait par fait,
+#:       noter un tour de taille crée une ligne où le poids est nul, et la
+#:       réponse primaire aurait affiché « Non pesé » pendant que le relevé
+#:       affichait le poids. Ce n'est pas une économie, c'est une correction.
+#:
+#:   +1  `body_ledger._mesures` la remplace : les mêmes lignes, résolues
+#:       CHAMP PAR CHAMP. Une requête pour une autre.
+#:
+#:   +1  `has_active_consent` est la SEULE requête réellement neuve. Elle
+#:       porte l'arbitrage `§3` : sans elle, l'interface ne peut pas router
+#:       l'intention d'écrire vers l'étape de consentement, et le relevé
+#:       serait obligé de proposer une acquisition que le serveur refuse.
+#:
+#: Les 6 qui restent :
+#:   · la session d'authentification              (`services/auth.py`)
+#:   · le read-model morphologique                (`build_morphology_readmodel`, ×2)
+#:   · les mesures du propriétaire                (`body_ledger._mesures`)
+#:   · le consentement corporel                   (`has_active_consent`)
+#:   · la séance ouverte                          (`latest_open_session`, lue
+#:                                                  par `base.html`)
+BUDGET_PROFILE = 6
 
 
 def _compter_requetes(fn) -> list[str]:

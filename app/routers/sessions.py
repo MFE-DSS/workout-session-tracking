@@ -857,61 +857,22 @@ def session_done(
 
     recap = build_recap(session, prior_weight_by_code=prior_weight_by_code)
 
-    # Sb_24.6 — build a small per-exercise label payload for the review
-    # pastilles, and a session-level "score breakdown" when scoring_version
-    # >= 2. Both stay None for sessions that have no implicit_label at
-    # all (e.g. session courte < 3 sets partout), so the template can
-    # conditionally render.
-    from app.services.implicit_signal import LABEL_SCORE_CONTRIBUTION, ImplicitLabel
-    from app.services.quality_score import (
-        W_IMPLICIT,
-        W_V1,
-        _implicit_signal_avg,
-        compute_session_quality,
-        compute_session_quality_strength,
-    )
-
-    valid_labels = {label.value for label in ImplicitLabel}
-    implicit_by_se: dict[int, dict] = {}
-    for se in session.session_exercises:
-        label_value = getattr(se, "implicit_label", None)
-        if label_value in valid_labels:
-            label_enum = ImplicitLabel(label_value)
-            implicit_by_se[se.id] = {
-                "label": label_enum.value,
-                "label_display": _LABEL_DISPLAY.get(label_enum.value, label_enum.value),
-                "contribution": LABEL_SCORE_CONTRIBUTION[label_enum],
-            }
-
-    breakdown: dict | None = None
-    if (
-        (getattr(session, "scoring_version", 1) or 1) >= 2
-        and _session_is_strength(session)
-    ):
-        avg = _implicit_signal_avg(session)
-        # Sb_24.6 — only show the breakdown when the session actually has
-        # something to ventilate. No label → V2 falls back to V1 → no
-        # decomposition to display (it would just say "V1 → V1").
-        if avg is not None:
-            v1 = compute_session_quality_strength(session)
-            final = compute_session_quality(session)
-            breakdown = {
-                "v1": v1,
-                "implicit_avg": round(avg),
-                "weight_v1": W_V1,
-                "weight_implicit": W_IMPLICIT,
-                "final": final,
-                "delta": final - v1,
-            }
-
-    # Sb_27.2 — Session Review V1 payload. Composes summary, quality,
-    # implicit_signal aggregate, notable_movements (max 3, deterministic
-    # rules), and a next_hint phrase. Read-only on top of existing
-    # services. Never touches scoring/implicit_signal/quality_score.
-    from app.services.session_review import build_session_review
-
-    session_review = build_session_review(db, session)
-
+    # ⚠ `UI-CP7.5B` — TROIS CHARGES UTILES SONT PARTIES AVEC LEURS BLOCS.
+    #
+    # `implicit_by_se` (pastilles de label), `breakdown` (ventilation du score
+    # V1/V2) et `session_review` (`Sb_27.2` : qualité, ressenti agrégé,
+    # mouvements remarquables, prochaine action) n'étaient calculés QUE pour
+    # cette page, et les blocs qu'ils alimentaient n'y sont plus.
+    #
+    # Les deux premiers sont de l'interne de score : §15 leur demandait de
+    # prouver quelle décision ils servaient, et ni l'un ni l'autre ne le
+    # pouvait. Le troisième dupliquait le récap en le surchargeant de deux
+    # sorties de navigation supplémentaires.
+    #
+    # Les SERVICES restent intacts et testés — `build_session_review` et
+    # `narrate_session_review` gardent leurs appelants de test et leur
+    # contrat. Ce qui disparaît est leur rendu sur CETTE surface, pas leur
+    # capacité.
     return templates.TemplateResponse(
         request,
         "session_done.html",
@@ -919,31 +880,17 @@ def session_done(
             "page_title": session.template_name_snapshot,
             "session": session,
             "recap": recap,
-            "implicit_by_se": implicit_by_se,
-            "breakdown": breakdown,
-            "session_review": session_review,
         },
     )
 
 
-# Sb_24.6 — display labels for the review surface. Keep them short
-# (≤ 14 chars) so they fit in the pastille badge.
-_LABEL_DISPLAY = {
-    "trajectoire_coherente": "Cohérente",
-    "reserve_probable": "Réserve probable",
-    "pyramidal_ascendant": "Pyramide ↑",
-    "pyramidal_descendant": "Pyramide ↓",
-    "incoherent": "Incohérente",
-}
-
-
-def _session_is_strength(session) -> bool:
-    """Lazy check — avoid importing from quality_score module-level."""
-    try:
-        kind = session.template.kind if session.template else None
-    except Exception:
-        kind = None
-    return kind != "cardio"
+# ⚠ `UI-CP7.5B` — `_LABEL_DISPLAY` et `_session_is_strength` sont partis avec
+# la pastille de label implicite et la ventilation du score : ils n'avaient
+# qu'un appelant chacun, dans le bloc retiré juste au-dessus. Les laisser
+# aurait été du code mort qu'aucune garde ne réclame.
+#
+# Le vocabulaire des labels n'est pas perdu : `coach_report._LABEL_DISPLAY_30D`
+# en porte la copie vivante, et c'est elle que rend `body_intelligence_block`.
 
 
 # ----------------------------------------------------------------------
@@ -959,20 +906,45 @@ async def update_session(
 
     form = await request.form()
 
-    session.concentration = enum_str(form.get("concentration"), _CONCENTRATION)
-    session.global_state = enum_str(form.get("global_state"), _GLOBAL_STATE)
-    session.bodyweight_kg = to_float(form.get("bodyweight_kg"))
-    session.free_note = clean_str(form.get("free_note"), max_length=280)
+    # ⚠ `UI-CP7.5B` — ABSENT N'EST PLUS EFFACÉ, ET C'ÉTAIT UNE PERTE DE
+    # DONNÉES RÉELLE EN PRODUCTION.
+    #
+    # Ces six champs étaient écrits INCONDITIONNELLEMENT depuis le
+    # formulaire : absent → `None`. Or le bouton « Rouvrir pour éditer » du
+    # closeout poste un formulaire qui ne porte QUE `action=reopen`.
+    #
+    # Mesuré avant correction, sur la vraie route :
+    #
+    #     avant rouverture : ('high', 'good', 78.5, 'bonne séance')
+    #     après rouverture : (None, None, None, None)
+    #
+    # Rouvrir une séance effaçait donc concentration, ressenti, poids de corps
+    # et note — des signaux que `behavioral` consomme pour produire le
+    # `fatigue_score`, donc que le MOTEUR DE RECOMMANDATION consomme à son
+    # tour. La séance rouverte dégradait silencieusement la décision suivante.
+    #
+    # Même correction que le contrat d'écriture corporel (`CP7.5A`) : on
+    # n'écrit que ce qui est SOUMIS. Un champ soumis vide efface toujours —
+    # c'est un geste légitime ; c'est l'effacement par ABSENCE qui n'était le
+    # geste de personne.
+    #
+    # Le formulaire complet de saisie continue de tout soumettre : son
+    # comportement ne change pas.
+    def _si_soumis(nom: str, convertir) -> None:
+        if nom in form:
+            setattr(session, nom, convertir(form.get(nom)))
+
+    _si_soumis("concentration", lambda v: enum_str(v, _CONCENTRATION))
+    _si_soumis("global_state", lambda v: enum_str(v, _GLOBAL_STATE))
+    _si_soumis("bodyweight_kg", to_float)
+    _si_soumis("free_note", lambda v: clean_str(v, max_length=280))
 
     # Cardio capture (Sb_cardio_capture) — only meaningful for kind=cardio
-    # sessions but we parse unconditionally. Non-cardio sessions won't have
-    # these fields in the form, resulting in None.
-    session.cardio_duration_min = to_int(form.get("cardio_duration_min"))
-    session.cardio_bpm_avg = to_int(form.get("cardio_bpm_avg"))
-    session.cardio_machine_calories = to_int(form.get("cardio_machine_calories"))
-    session.cardio_machine_type = clean_str(
-        form.get("cardio_machine_type"), max_length=32
-    )
+    # sessions. Same rule: a form that does not carry them leaves them alone.
+    _si_soumis("cardio_duration_min", to_int)
+    _si_soumis("cardio_bpm_avg", to_int)
+    _si_soumis("cardio_machine_calories", to_int)
+    _si_soumis("cardio_machine_type", lambda v: clean_str(v, max_length=32))
 
     action = form.get("action")
     if action == "end":
