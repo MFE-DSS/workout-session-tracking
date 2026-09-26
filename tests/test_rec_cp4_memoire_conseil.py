@@ -513,24 +513,21 @@ def test_ce_qui_sert_est_declare_et_correspond_aux_preuves():
       V2 comme pour V3. Confirmé au navigateur : conseil `liss-abs` écarté,
       empreinte inchangée, Mission propose `pull-b` et le dit.
 
-    * **`POLITIQUE_SERVIE = "v2"`** — V3 franchit pourtant les sept conditions
-      mesurées du `§13`, et son avantage est robuste (dépendance à l'ordre du
-      catalogue 0,40 → 0,20, meilleure sur 5 histoires sur 5).
+    * **`POLITIQUE_SERVIE = "v3"`** — PROMU par `REC-CP5`.
 
-      Il n'est pas promu pour une raison qui ne se voyait qu'au RENDU. Sur le
-      même compte, avec le même historique, V3 rend **la même recommandation
-      avec une explication plus pauvre** :
+      `REC-CP4` l'avait retenu pour une raison qui ne se voyait qu'au RENDU :
+      sur le même compte, V3 rendait la même recommandation avec une
+      explication plus pauvre — « La modalité la plus délaissée. » et
+      « Jamais fait. »
 
-          V2 : « Core 3 j sans muscu — frais à travailler. »
-               « Niveau de fatigue bas — bon moment pour pousser. »
-          V3 : « La modalité la plus délaissée. » · « Jamais fait. »
+      La cause n'était pas le classement mais l'ÉNONCÉ. La couverture,
+      critère primaire du rang, se taisait dans sa bande médiane ; et
+      « jamais fait » parlait sans avoir rien départagé. `REC-CP5` corrige
+      les deux **sans toucher au classement**, et la parité est mesurée sur
+      données identiques : trois facteurs contre trois, même recommandation.
 
-      Le bénéfice mesuré de V3 est **invisible pour l'utilisateur** — personne
-      ne perçoit qu'une décision a été tranchée par preuve plutôt que par
-      ordre de catalogue. Son coût, lui, se lit à l'écran.
-
-      Le `§13` est explicite : « ne pas promouvoir V3 au seul motif qu'il est
-      plus récent. Rendre les preuves. » Elles sont rendues.
+      La porte est donc franchie sur ses sept conditions, et le basculement
+      est écrit ici plutôt que subi.
     """
     from app.services import advice_memory
 
@@ -538,9 +535,9 @@ def test_ce_qui_sert_est_declare_et_correspond_aux_preuves():
         "la mémoire du conseil a été débranchée — c'est elle qui corrige le "
         "défaut rapporté en dogfood"
     )
-    assert advice_memory.POLITIQUE_SERVIE == "v2", (
-        "V3 a été promu. Ce n'est pas interdit — il franchit la porte mesurée "
-        "— mais cela doit être une décision, prise sur un RENDU, pas une "
+    assert advice_memory.POLITIQUE_SERVIE == "v3", (
+        "la politique servie a changé. Ce n'est pas interdit — mais cela doit "
+        "être une décision, prise sur un RENDU et sur des preuves, pas une "
         "dérive de constante"
     )
 

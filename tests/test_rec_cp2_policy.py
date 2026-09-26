@@ -84,9 +84,9 @@ def test_la_politique_servie_est_declaree_en_un_seul_endroit():
     from app.services import advice_memory
 
     assert advice_memory.POLITIQUE_SERVIE in advice_memory.POLITIQUES
-    assert advice_memory.POLITIQUE_SERVIE == "v2", (
-        "la politique servie a changé — c'est la porte de promotion du `§13`, "
-        "et elle doit être franchie explicitement, preuves à l'appui"
+    assert advice_memory.POLITIQUE_SERVIE == "v3", (
+        "la politique servie a changé — c'est la porte de promotion, et elle "
+        "doit être franchie explicitement, preuves à l'appui"
     )
 
 
@@ -118,6 +118,9 @@ def test_v3_n_est_reference_que_par_le_banc_et_la_composition():
         "app/services/advice_memory.py",
         "tests/test_rec_cp4_comparaison.py",
         "tests/test_rec_cp4_memoire_conseil.py",
+        # `REC-CP5` — parité d'explication. Lit la trace de V3, ne touche
+        # jamais son classement : une garde de ce module l'épingle.
+        "tests/test_rec_cp5_parite_explication.py",
     }
     coupables = []
     for f in list((racine / "app").rglob("*.py")) + \

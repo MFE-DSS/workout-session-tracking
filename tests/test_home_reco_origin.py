@@ -51,15 +51,33 @@ def _without_jinja_comments(path: Path) -> str:
 
 
 def _reco(client):
+    """La recommandation **telle que Mission la sert**.
+
+    ⚠ REPOINTÉ PAR `REC-CP5` — LE MOTEUR N'EST PLUS UNE CONSTANTE.
+
+    Cette aide appelait `recommend_next_session` en dur, donc V2. Depuis la
+    promotion, Mission est servie par la composition `advice_memory` : la
+    garde comparait une phrase de V2 à une page rendue par V3, et rougissait
+    sur un écart qui n'existait pas.
+
+    La propriété protégée — **la phrase du moteur est visible, pas repliée** —
+    n'a pas bougé d'un pouce. Ce qui change est l'endroit où on lit « la
+    phrase du moteur », et l'interroger via le point de service la rend
+    insensible à la prochaine promotion.
+    """
     from sqlalchemy import select
 
     from app.database import SessionLocal
     from app.models.user import User
-    from app.services.recommendation import recommend_next_session
+    from app.services import advice_memory
 
     with SessionLocal() as db:
         user = db.execute(select(User)).scalars().first()
-        return recommend_next_session(db, user.id)
+        return advice_memory.recommander(
+            db, user.id,
+            politique=advice_memory.POLITIQUE_SERVIE,
+            avec_memoire=advice_memory.MEMOIRE_SERVIE,
+        )
 
 
 # ───────── LA GARDE CENTRALE — la cause ne se replie pas ─────────
