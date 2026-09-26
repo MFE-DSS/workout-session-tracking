@@ -311,4 +311,36 @@ produit avant de capturer.
 | `/body` reste éteint ; consentement, export et suppression à réunir | `UI-CP8 BODY_DATA_CONTROL` |
 | le quick-log du poids s'offre sans consentement et rebondit sur le refus serveur, qui l'explique | à trancher, non bloquant |
 
+---
+
+## Closeout
+
+| | |
+|---|---|
+| **PR** | [#251](https://github.com/MFE-DSS/workout-session-tracking/pull/251) |
+| **Merge** | `d6931efdf932c3247156aa472456b663940855c6` |
+| **Méthode** | `--merge` avec `--match-head-commit` — pas de squash, pas de `--admin`, pas de force |
+| **CI canonique** | run [`36262255243`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36262255243) — **7/7 verts** |
+| **Sonar** | `OK` après correction des quatre findings de la PR |
+| **Threads de revue** | 0 non résolu |
+| **Migration** | aucune |
+
+### Les quatre findings Sonar, et leur cause commune
+
+Commit `4fc3535`. La cause racine n'était pas quatre oublis distincts :
+**j'avais lancé `ruff` sur une liste de fichiers choisie à la main plutôt que
+sur le diff.** La commande correcte est consignée dans le message de commit :
+
+```bash
+ruff check $(git diff --name-only <base>...HEAD | grep '\.py$')
+```
+
+### Suivi du critère de sortie `D1`
+
+Le résidu principal du §8 — *« une séance terminée n'a pas de surface de
+détail durable »* — a été **levé par `UI-CP8D`** (merge `fb42535`) : le
+relevé par exercice a quitté la profondeur du closeout pour le relevé
+durable, dans la même livraison que son remplaçant. Le compromis noté ici
+comme « NON permanent » ne l'aura tenu qu'une tranche.
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
