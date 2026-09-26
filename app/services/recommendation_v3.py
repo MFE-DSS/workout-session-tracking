@@ -355,7 +355,119 @@ def _libelle_zone(zone: str) -> str:
     return ZONE_LABELS.get(zone, zone)
 
 
-def expliquer(verdict: Verdict, rang: int = 0) -> dict[str, Any]:
+#: ⚠ LES LIBELLÉS DE FACTEUR SONT DES CONSTANTES, ET CE N'EST PAS COSMÉTIQUE.
+#:
+#: Ils sont ÉCRITS par `expliquer` et RECONNUS par `_en_tete`, qui remonte en
+#: première position celui qui a décidé. Deux orthographes du même facteur
+#: casseraient cette remontée **en silence** : l'explication resterait
+#: plausible, simplement dans le mauvais ordre.
+FACTEUR_NOUVEAUTE = "jamais fait"
+FACTEUR_MODALITE = "la modalité la plus délaissée"
+FACTEUR_RECUPERATION = "zones récupérées"
+
+#: Les composantes de la clé lexicographique, dans l'ordre exact où
+#: `classer_candidats` les range. ⚠ Cette table ne décide de RIEN : elle NOMME
+#: ce que le rang a déjà décidé. La modifier sans modifier la clé ferait dire
+#: à l'explication le contraire de ce que le moteur a fait.
+CRITERES_DU_RANG = (
+    "recuperation",
+    "couverture",
+    "repetition",
+    "modalite",
+    "recence_gabarit",
+    "recence_famille",
+    "ordre_catalogue",
+    "slug",
+)
+
+#: Tolérance de comparaison du déficit, qui est un flottant. Les déficits sont
+#: arrondis à trois décimales dans `facteurs` ; on compare au même grain.
+_EPSILON = 1e-9
+
+
+def _en_tete(gagnants: list[str], decisif: str | None,
+             zones: list[str]) -> list[str]:
+    """Remonte en première position le facteur qui a réellement décidé.
+
+    ⚠ ON NE RÉÉCRIT RIEN, ON RÉORDONNE. Le `§3` demande que la cause la plus
+    forte vienne d'abord ; il n'autorise pas à fabriquer une cause. Si le
+    critère décisif n'a pas de facteur énoncé — l'ordre du catalogue, par
+    exemple, qui n'est pas une raison — l'ordre naturel reste.
+    """
+    if not decisif or len(gagnants) < 2:
+        return gagnants
+    reperes = {
+        "couverture": ", ".join(zones[:2]),
+        "modalite": FACTEUR_MODALITE,
+        "recence_gabarit": FACTEUR_NOUVEAUTE,
+        "recence_famille": FACTEUR_NOUVEAUTE,
+        "recuperation": FACTEUR_RECUPERATION,
+    }
+    repere = reperes.get(decisif)
+    if not repere:
+        return gagnants
+    for i, facteur in enumerate(gagnants):
+        if repere in facteur:
+            return [facteur, *gagnants[:i], *gagnants[i + 1:]]
+    return gagnants
+
+
+def critere_decisif(gagnant: Verdict, dauphin: Verdict | None) -> str | None:
+    """Le premier critère qui a réellement séparé le gagnant de son dauphin.
+
+    ⚠ `REC-CP5` — CE N'EST PAS UNE HEURISTIQUE D'EXPLICATION, C'EST UNE
+    LECTURE DU RANG.
+
+    V3 range par précédence lexicographique. Le critère qui décide est donc,
+    littéralement, **le premier rang où les deux clés diffèrent**. On ne
+    devine pas ce qui « a dû » compter : on lit ce qui a compté.
+
+    C'est ce qui permet au `§3` d'être tenu sans inventer de pondération —
+    « jamais fait » ne devient une raison que s'il a effectivement départagé,
+    et jamais quand une preuve plus forte l'a précédé.
+    """
+    if dauphin is None:
+        return None
+    # `strict=True` : deux clés de rang de longueurs différentes seraient un
+    # défaut de construction, pas un cas à traiter en silence.
+    for i, (a, b) in enumerate(zip(gagnant.rang, dauphin.rang, strict=True)):
+        if isinstance(a, float) and isinstance(b, float):
+            if abs(a - b) > _EPSILON:
+                return CRITERES_DU_RANG[i]
+            continue
+        if a != b:
+            return CRITERES_DU_RANG[i]
+    return None
+
+
+def _facteur_de_couverture(deficit: float, zones: list[str]) -> tuple[str, bool]:
+    """La couverture, TOUJOURS dite, graduée.
+
+    ⚠ LE DÉFAUT QUE `REC-CP5` CORRIGE, ET IL ÉTAIT DANS CETTE FONCTION.
+
+    La couverture est le critère PRIMAIRE du classement de V3. Elle n'était
+    pourtant énoncée qu'aux deux extrêmes — au-dessus de 0,75 ou en dessous de
+    0,25 — donc **muette dans toute la bande médiane**, qui est la plus
+    fréquente. Mesuré sur un compte réel de huit séances : V3 rendait la même
+    recommandation que V2 en n'expliquant plus que « La modalité la plus
+    délaissée. » et « Jamais fait. »
+
+    Le classement n'est pas touché : seul l'énoncé l'est. Rendre `True` en
+    second signifie « c'est un facteur GAGNANT », `False` « limitant ».
+    """
+    libelles = ", ".join(zones[:2])
+    if deficit >= 0.75:
+        return f"{libelles} : le moins servi sur {HORIZON_OBSERVATION}", True
+    if deficit >= 0.5:
+        return f"{libelles} : peu servi sur {HORIZON_OBSERVATION}", True
+    if deficit > 0.25:
+        return (f"{libelles} : servi moins que la moyenne sur "
+                f"{HORIZON_OBSERVATION}"), True
+    return f"{libelles} : déjà bien servi sur {HORIZON_OBSERVATION}", False
+
+
+def expliquer(verdict: Verdict, rang: int = 0,
+              decisif: str | None = None) -> dict[str, Any]:
     """La trace d'explication d'un candidat — **structurée, pas re-dérivée**.
 
     ⚠ C'EST LE POINT DE `REC-CP3`.
@@ -375,25 +487,40 @@ def expliquer(verdict: Verdict, rang: int = 0) -> dict[str, Any]:
     gagnants: list[str] = []
     limitants: list[str] = []
 
+    # ── 1. LA CAUSE LA PLUS FORTE D'ABORD (`§3`).
+    #
+    # La couverture est le critère primaire du classement : elle parle
+    # toujours, graduée, et elle passe en tête quand c'est elle qui a décidé.
     zones = [_libelle_zone(z) for z in verdict.zones]
-    if f["deficit_couverture"] >= 0.75 and zones:
-        gagnants.append(
-            f"{', '.join(zones[:2])} : le moins servi sur {HORIZON_OBSERVATION}")
-    elif f["deficit_couverture"] <= 0.25 and zones:
-        limitants.append(
-            f"{', '.join(zones[:2])} : déjà bien servi sur "
-            f"{HORIZON_OBSERVATION}")
+    if zones:
+        texte, gagnant = _facteur_de_couverture(f["deficit_couverture"], zones)
+        (gagnants if gagnant else limitants).append(texte)
 
+    # ── 2. LA CONTRAINTE MATÉRIELLE / RÉCUPÉRATION.
     if f["recuperation"] == RECUPEREE:
-        gagnants.append("zones récupérées")
+        gagnants.append(FACTEUR_RECUPERATION)
     elif f["recuperation"] == INSUFFISANTE:
         limitants.append("une zone n'a pas fini de récupérer")
 
     if f["modalite_delaissee"]:
-        gagnants.append("la modalité la plus délaissée")
+        gagnants.append(FACTEUR_MODALITE)
 
-    if f["dernier_passage"] is None:
-        gagnants.append("jamais fait")
+    # ── 3. LA NOUVEAUTÉ — SEULEMENT SI ELLE A MATÉRIELLEMENT CONTRIBUÉ.
+    #
+    # ⚠ « Jamais fait » était ajouté à CHAQUE candidat jamais effectué, qu'il
+    # ait départagé ou non. Sur un compte où la couverture se taisait, il
+    # devenait l'explication ENTIÈRE d'une décision qu'il n'avait pas prise —
+    # exactement ce que le `§3` proscrit.
+    #
+    # Il ne parle plus que lorsque le rang montre qu'il a séparé le gagnant de
+    # son dauphin, ou qu'aucune autre preuve n'existe.
+    if f["dernier_passage"] is None and (
+            decisif in ("recence_gabarit", "recence_famille")
+            or not gagnants):
+        gagnants.append(FACTEUR_NOUVEAUTE)
+
+    # L'ordre d'énonciation suit le critère qui a réellement décidé.
+    gagnants = _en_tete(gagnants, decisif, zones)
 
     justification = None
     if f["repetition"] == MEME_GABARIT:
@@ -472,7 +599,13 @@ def recommander_v3(
     tete, *reste = verdicts
 
     def _candidat(v: Verdict, rang: int) -> dict:
-        explication = expliquer(v, rang)
+        # `REC-CP5` — chaque candidat est expliqué par rapport à CELUI QUI LE
+        # SUIT. Pour la tête c'est le dauphin ; pour une alternative, le
+        # candidat suivant. Comparer tout le monde au dauphin de la tête
+        # ferait dire à une alternative pourquoi ELLE N'A PAS gagné, ce qui
+        # n'est pas ce qu'on lui demande d'expliquer.
+        suivant = verdicts[rang + 1] if rang + 1 < len(verdicts) else None
+        explication = expliquer(v, rang, critere_decisif(v, suivant))
         return {
             "template": v.template,
             # ⚠ `score` N'EST PAS UNE VÉRITÉ UTILISATEUR. Il n'existe que pour

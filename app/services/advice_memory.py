@@ -56,7 +56,25 @@ POLITIQUES = ("v2", "v3")
 #
 # Une garde épingle ces valeurs contre les conclusions du rapport de tranche :
 # elles ne peuvent pas dériver sans que quelqu'un vienne l'écrire.
-POLITIQUE_SERVIE = "v2"
+#
+# ⚠ `REC-CP5` — V3 EST PROMU. La porte du `§4` est franchie sur ses sept
+# conditions, et le blocage qui l'avait retenu en `REC-CP4` est levé :
+#
+#   invariants REC ............. 76 gardes vertes, CP0a → CP5
+#   mémoire du conseil ......... verte
+#   répétition après refus ..... 0/8 (8/8 sans mémoire)
+#   répétition légitime ........ toujours possible
+#   ordre de catalogue ......... 0,10 contre 0,40 pour V2
+#   explication ................ parité mesurée, 3 facteurs contre 3, sur
+#                                données IDENTIQUES et même recommandation
+#   Mission au runtime ......... rendue et lisible
+#
+# Ce qui bloquait était un défaut d'ÉNONCÉ, pas de classement : la couverture,
+# critère primaire du rang, se taisait dans sa bande médiane, et « jamais
+# fait » parlait sans avoir rien départagé. `REC-CP5` corrige les deux sans
+# toucher au classement — une garde vérifie que l'ordre des candidats est
+# rigoureusement inchangé.
+POLITIQUE_SERVIE = "v3"
 MEMOIRE_SERVIE = True
 
 #: Au plus deux alternatives sont proposées ; on borne l'écriture en dur pour
