@@ -265,6 +265,7 @@
         <form method="post" action="/sessions" class="today-home__cta-form">
           <input type="hidden" name="template_slug" value="{{ _top.template.slug }}">
           <input type="hidden" name="creation_source" value="reco_top">
+          {% include "_partials/_decision_identity.html" %}
           <button type="submit" class="today-home__cta">
             Démarrer <span aria-hidden="true">→</span>
           </button>

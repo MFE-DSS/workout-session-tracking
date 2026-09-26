@@ -338,7 +338,16 @@ def test_alembic_head_unchanged():
     # écartée ; fabriquer des lignes affirmerait un geste que personne n'a
     # fait. Aucune colonne ajoutée ailleurs : le reste de la décision vit dans
     # `decision_traces`, qui existait déjà et dont l'immuabilité interdit d'y
-    # poser un cycle de vie).
+    # poser un cycle de vie),
+    # puis REC-CP4 (`v3w8q4r5t16` : table additive `recommendation_episodes`,
+    # aucune colonne ajoutée ailleurs, aucun backfill — `creation_source` dit
+    # d'où vient une séance CRÉÉE, jamais quelle recommandation était affichée
+    # à ce moment-là, donc aucun épisode historique n'est reconstituable sans
+    # affirmer une présentation que personne n'a observée. Même doctrine que
+    # `u2v7p3q4s15` : `UNRESOLVED` est l'absence de ligne, `RESOLVED` est la
+    # ligne, `SUPERSEDED` est DÉRIVÉ de l'empreinte de contexte — d'où
+    # l'absence délibérée de colonne de cycle de vie, qui serait la seule
+    # source possible d'un état périmé).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -347,4 +356,4 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "u2v7p3q4s15"
+    assert script.get_current_head() == "v3w8q4r5t16"
