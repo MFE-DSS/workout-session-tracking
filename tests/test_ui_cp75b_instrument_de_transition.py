@@ -235,8 +235,13 @@ def test_une_seance_cardio_ne_rend_pas_zero_serie(client):
                   cardio_machine_type="rameur")
     corps = body[body.index('class="closeout"'):]
 
-    assert "0 séries" not in corps and "0 / 0" not in corps, (
+    # `Sonar S9073` — une assertion composite masque laquelle des deux a
+    # cédé. Deux assertions, deux messages.
+    assert "0 séries" not in corps, (
         "une séance cardio rend un compte de séries de travail"
+    )
+    assert "0 / 0" not in corps, (
+        "une séance cardio rend « 0 / 0 » comme mesure de complétion"
     )
     assert "42" in corps, "la durée réelle du cardio n'est pas rendue"
 

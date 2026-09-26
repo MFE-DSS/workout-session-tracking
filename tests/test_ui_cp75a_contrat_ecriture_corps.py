@@ -204,7 +204,16 @@ def test_sans_champs_soumis_le_remplacement_integral_survit(client):
     )
 
 
-def test_la_route_d_edition_ne_perd_plus_les_champs_non_soumis(body_client):
+def test_la_route_d_edition_ne_perd_plus_les_champs_non_soumis(
+    # ⚠ FAUX POSITIF ASSUMÉ, PAS UNE SUPPRESSION DE CONFORT.
+    # `ruff` lit « redéfinition » là où pytest lit « injection de fixture ».
+    # Le fichier importe `body_client` (ligne 29, déjà `noqa: F401` pour la
+    # moitié symétrique du même idiome) puis le reçoit en paramètre : c'est
+    # la façon canonique de réutiliser une fixture d'un autre module, et
+    # l'alternative — recopier la fixture — créerait la seconde source de
+    # vérité que l'import existe précisément pour éviter.
+    body_client,  # noqa: F811
+):
     """⚠ LA PREUVE SUR LA VRAIE ROUTE, PAS SUR LE SERVICE.
 
     Le service peut tenir le contrat pendant que la route le contourne :

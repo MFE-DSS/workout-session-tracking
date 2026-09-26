@@ -55,9 +55,9 @@ def _app_db(client):
     perdu pour autant : il est épinglé par ses propres gardes dans
     `tests/test_ui_cp75a_consentement_a_l_intention.py`.
     """
-    from app.services import body_profile as bp
     from app.database import SessionLocal
     from app.models.user import User
+    from app.services import body_profile as bp
 
     with SessionLocal() as db:
         uid = db.query(User).first().id
