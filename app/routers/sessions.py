@@ -557,6 +557,42 @@ def _console_context(
     }
 
 
+def _releve_de_seance(request: Request, db, session) -> HTMLResponse:
+    """`UI-CP8D` — le relevé DURABLE d'une séance terminée.
+
+    ⚠ IL RÉUTILISE `build_recap`, LE MÊME QUE LE CLOSEOUT, et ce n'est pas
+    une économie : deux lectures concurrentes de la même séance finiraient
+    par dire deux choses différentes du même fait. Ce dépôt a déjà payé
+    « deux écrivains, une table, deux contrats temporels ».
+
+    Ce que le relevé ajoute et que le closeout n'avait pas : la PROVENANCE.
+    `recommendation_episodes` sait depuis `REC-CP4` ce qui avait été
+    conseillé et ce que l'utilisateur en a fait — et aucune surface ne le
+    lisait. C'est la seule donnée qui relie une séance à la décision qui
+    l'a précédée, donc la continuité causale de `JOURNEY C`.
+    """
+    from app.services.session_provenance import provenance_de
+
+    prior_summary_map = last_time_by_exercise_code(db, session, datetime.now(UTC))
+    prior_weight_by_code: dict[str, float | None] = {}
+    for code, prior in prior_summary_map.items():
+        fs = prior.get("first_set") if prior else None
+        prior_weight_by_code[code] = fs.get("weight_kg") if fs else None
+    for se in session.session_exercises:
+        se._prior_summary = prior_summary_map.get(se.exercise_code_snapshot)
+
+    return templates.TemplateResponse(
+        request,
+        "session_record.html",
+        {
+            "page_title": session.template_name_snapshot,
+            "session": session,
+            "recap": build_recap(session, prior_weight_by_code=prior_weight_by_code),
+            "provenance": provenance_de(db, session),
+        },
+    )
+
+
 @router.get(
     "/sessions/{session_id}",
     response_class=HTMLResponse,
@@ -569,10 +605,29 @@ def session_detail(
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
 
+    # ⚠ `UI-CP8D` — UNE SÉANCE TERMINÉE A ENFIN UNE SURFACE À ELLE.
+    #
+    # Cette route REDIRIGEAIT (303) toute séance terminée vers le closeout.
+    # Trois liens du produit prétendaient pourtant « ouvrir la séance » et
+    # atterrissaient donc sur une surface de TRANSITION :
+    #
+    #     history.html            « Ouvrir la séance »
+    #     exercise_history.html   le lien vers la séance d'un exercice
+    #     admin_sessions.html     la ligne d'administration
+    #
+    # `JOURNEY C` était rompu par là : après le closeout, « Voir le débrief »
+    # menait à `/progress` — un agrégat de 2,4 écrans — et plus rien ne
+    # ramenait à la séance qu'on venait de terminer. Mesuré, pas supposé.
+    #
+    # La navigation existait ; sa destination était fausse. Trois liens se
+    # réparent sans qu'on en ajoute un seul.
+    #
+    # ⚠ RIEN N'EST PERDU : le bilan (`?view=bilan`) était DÉJÀ inatteignable
+    # pour une séance terminée — la redirection le précédait. Mesuré :
+    # `/sessions/7?view=bilan` → 303. Rouvrir reste la porte d'édition, et
+    # elle est sur le relevé.
     if session.status == SessionStatus.COMPLETED:
-        return RedirectResponse(
-            url=f"/sessions/{session_id}/done", status_code=303
-        )
+        return _releve_de_seance(request, db, session)
 
     stats = _session_stats(session)
     rules = db.execute(

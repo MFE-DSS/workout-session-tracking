@@ -171,7 +171,16 @@
      Cinq sorties de même rang ne sont pas un choix, c'est une hésitation.
      Le débrief est la suite du produit ; il POSSÈDE l'analyse que cette page
      rendait en double. #}
-  <a class="closeout__commande" href="{{ url_for('progress') }}">
+  {# ⚠ `UI-CP8D` — LA COMMANDE MÈNE AU RELEVÉ DE **CETTE** SÉANCE.
+     Elle menait à `/progress`, un agrégat de 2,4 écrans — « 17 exercices
+     pratiqués une seule fois », exposition sur 14 jours, poids corporel —
+     d'où RIEN ne ramenait à la séance qu'on venait de terminer. Mesuré :
+     `JOURNEY C` s'y terminait en cul-de-sac causal.
+
+     Le débrief d'une séance, c'est ce qu'elle a produit et ce qu'elle a
+     changé. L'agrégat se rejoint DEPUIS le relevé, jamais à sa place. #}
+  <a class="closeout__commande"
+     href="{{ url_for('session_detail', session_id=session.id) }}">
     Voir le débrief
     <span class="closeout__commande-fleche" aria-hidden="true">→</span>
   </a>
@@ -212,84 +221,23 @@
       </ul>
       {% endif %}
 
-      {# ⚠ LE RELEVÉ RESTE ICI PARCE QUE PERSONNE D'AUTRE NE LE PORTE.
-         Je l'avais d'abord renvoyé à `FLIGHT_RECORDER` avec le reste de
-         l'analyse. **Mesuré ensuite, et c'était faux** :
-         `session_detail` REDIRIGE (303) toute séance terminée vers cette
-         page, et `/history` n'est qu'une liste — ni le ressenti, ni la note
-         d'exercice, ni même le nom d'un exercice n'y figurent.
+      {# ⚠ `UI-CP8D` — LE RELEVÉ A QUITTÉ CETTE PROFONDEUR, ET C'ÉTAIT ÉCRIT.
 
-             /sessions/{id}      → 303 /sessions/{id}/done
-             /history            → note d'exercice : absente
-                                   note de séance  : absente
+         `CP7.5` l'avait gardé ici faute de propriétaire : `session_detail`
+         redirigeait toute séance terminée vers ce closeout, et `/history`
+         n'était qu'une liste. Le retirer aurait supprimé la seule lecture
+         possible de ce qu'on venait d'enregistrer.
 
-         Retirer le relevé aurait donc supprimé la SEULE lecture possible de
-         ce qu'on vient d'enregistrer — une soustraction sans remplaçant, que
-         `CLAUDE.md §5.3` interdit, et un `Sb_SESSION_REVIEW_SIGNAL_01`
-         défait six semaines après avoir été livré.
+         L'arbitrage `D1` l'a accepté **temporairement**, avec son critère de
+         sortie : « dès que SESSION_LIFECYCLE possède une surface de détail
+         durable, le relevé quitte la profondeur du closeout ». Ce
+         propriétaire existe — `session_record`, servi par `session_detail`
+         pour toute séance terminée — donc le relevé s'en va.
 
-         Il descend donc dans la profondeur au lieu de disparaître : c'est le
-         RELEVÉ de la séance, et il vit à côté de l'action qui le corrige.
-         Ce qui ne revient pas, c'est l'interne de score — pastille de label
-         implicite et note d'exercice sur 100 (§15).
-
-         ⚠⚠ ACCEPTÉ **TEMPORAIREMENT** — ARBITRAGE OPÉRATEUR `D1`.
-         Ce n'est PAS l'ontologie définitive, et le critère de sortie est
-         écrit :
-
-             UI-CP8 · SESSION_LIFECYCLE fait de la surface de détail d'une
-             séance terminée son propriétaire DURABLE.
-
-             Dès que ce propriétaire existe :
-                 ce relevé QUITTE la profondeur du closeout.
-
-         La garde `test_la_redirection_qui_fait_du_closeout_le_seul_
-         proprietaire` épingle la prémisse : le jour où `/sessions/{id}`
-         cesse de rediriger une séance terminée, elle rougit et rappelle
-         que ce bloc a désormais un meilleur domicile. #}
-      {% if recap.exercises %}
-      <ul class="closeout__releve">
-        {% for ex in recap.exercises %}
-        <li class="closeout__releve-ligne">
-          <span class="closeout__releve-code">{{ ex.code }}</span>
-          <span class="closeout__releve-nom">
-            {{ ex.substituted_name or ex.name }}
-            {%- if ex.substituted_name %} <span class="closeout__releve-sub">remplacé</span>{% endif %}
-          </span>
-          <span class="closeout__releve-series">{{ ex.done }}/{{ ex.total }}</span>
-          {% if ex.muscle_sensation %}
-          {# Valeur brute, comme `exercise_history` : dupliquer ici la table
-             de libellés du widget de saisie créerait une deuxième source de
-             vérité. #}
-          <span class="closeout__releve-ressenti">{{ ex.muscle_sensation }}</span>
-          {% endif %}
-          {% if ex.note %}
-          <span class="closeout__releve-note">{{ ex.note }}</span>
-          {% endif %}
-        </li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-
-      {# Les calories machine sont lisibles ici et nulle part en tête.
-         Le produit les qualifie lui-même d'« indicatif » depuis leur
-         livraison : elles ne mesurent pas la séance, elles font partie de ce
-         qui a été enregistré. C'est exactement la distinction entre le FAIT
-         de complétion et le RELEVÉ. #}
-      {% if _est_cardio and recap.summary.cardio and recap.summary.cardio.calories %}
-      <p class="closeout__releve-seance">
-        <span class="closeout__releve-etiquette">Calories machine</span>
-        {{ recap.summary.cardio.calories }} <span class="closeout__releve-sub">indicatif</span>
-      </p>
-      {% endif %}
-
-      {% if recap.summary.note %}
-      <p class="closeout__releve-seance">
-        <span class="closeout__releve-etiquette">Note de séance</span>
-        {{ recap.summary.note }}
-      </p>
-      {% endif %}
-
+         Ce qui reste ici est la TRANSITION : le fait de complétion, la
+         déclaration manquante s'il en manque une, la commande vers le
+         relevé, et l'administration de séance. Le closeout est un passage ;
+         le relevé est la mémoire. #}
       <p class="closeout__cycle-note">
         Rouvrir remet la séance en cours : les séries et le bilan
         redeviennent modifiables.

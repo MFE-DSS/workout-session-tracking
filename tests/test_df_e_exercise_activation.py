@@ -266,11 +266,26 @@ def test_a_completed_session_goes_to_its_own_recap(client):
         s.status = "completed"
         db.commit()
 
+    # ⚠ `UI-CP8D` — LA PROPRIÉTÉ EST INCHANGÉE, SON MÉCANISME A CHANGÉ.
+    #
+    # La docstring ci-dessus dit exactement ce qui compte : « si cette
+    # redirection disparaissait, une séance terminée retomberait sur la page
+    # d'exécution — où tout serait activable alors qu'il n'y a plus rien à
+    # exécuter. » C'était le VRAI risque, et il n'est pas réalisé : la route
+    # ne redirige plus, elle rend le RELEVÉ DURABLE.
+    #
+    # On épingle donc la crainte elle-même — pas d'exécution sur une séance
+    # terminée — plutôt que le 303 qui n'en était qu'un moyen.
     r = client.get(f"{SESSIONS}/{sid}", follow_redirects=False)
-    assert r.status_code == 303, f"séance terminée : {r.status_code}, pas 303"
-    assert r.headers[LOCATION].endswith("/done"), r.headers[LOCATION]
-    assert ACTIVATE not in _page(client, sid), (
+    assert r.status_code == 200, f"séance terminée : {r.status_code}"
+    assert "record__titre" in r.text, (
+        "une séance terminée ne rend pas sa surface de relecture"
+    )
+    assert ACTIVATE not in r.text, (
         "une séance terminée n'a rien à activer"
+    )
+    assert "xc-strip" not in r.text, (
+        "la séance terminée est retombée sur le cockpit d'exécution"
     )
 
 

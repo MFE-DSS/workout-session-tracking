@@ -86,8 +86,11 @@
     {% set etat = 'encours' if s.status == 'in_progress'
                   else ('exclue' if s.excluded_from_stats else 'faite') %}
     <li class="tband__slot">
-      <a class="tband__hit{% if selection and selection.id == s.id %} is-selected{% endif %}"
-         href="{{ url_for('history') }}?status={{ status_filter }}&session={{ s.id }}">
+      {# `UI-CP8D` — le marqueur de la frise ouvre la séance, comme la ligne
+         du bas. Deux affordances vers le même objet ne doivent pas mener à
+         deux endroits différents. #}
+      <a class="tband__hit"
+         href="{{ url_for('session_detail', session_id=s.id) }}">
         <span class="tband__mark tband__mark--{{ etat }}" aria-hidden="true"></span>
         <span class="sr-only">
           {{ s.template_name_snapshot }}, {{ s.started_at | date_fr }},
@@ -118,30 +121,21 @@
   {% if a_exclues %}<span class="tband__mark tband__mark--exclue" aria-hidden="true"></span>exclue des KPI{% endif %}
 </p>
 
-{# ══ L'ÉVÉNEMENT INSPECTÉ ══
-   Rendu seulement quand il y en a un. Un cadre vide en attente de sélection
-   serait un objet qui occupe une place sans rien dire. #}
-{% if selection %}
-  {% set stats = session_stats[selection.id] %}
-  <h2 class="section-header">La séance sélectionnée</h2>
-  <div class="tband__detail">
-    <p class="tband__detail-name">{{ selection.template_name_snapshot }}</p>
-    <p class="tband__detail-meta">
-      {{ selection.started_at | date_fr }}
-      {% if stats.total > 0 %} · {{ stats.done }}/{{ stats.total }} exos{% endif %}
-      {% if durations[selection.id] %}
-        · {% if selection.status == 'in_progress' %}depuis{% else %}durée{% endif %} {{ durations[selection.id] }}
-      {% endif %}
-      {% if selection.excluded_from_stats %} · exclue des KPI{% endif %}
-    </p>
-    <p class="tband__detail-go">
-      <a class="inline-target" href="{{ url_for('session_detail', session_id=selection.id) }}">Ouvrir la séance</a>
-      {# ⚠ UNE ENTRÉE DISCRÈTE, PAS DES CONTRÔLES. Le §10 autorise exactement
-         ceci : un détail de séance peut MENER à la gestion. Il ne l'expose pas. #}
-      <a class="tband__manage" href="{{ url_for('admin_sessions') }}">Gérer cette séance</a>
-    </p>
-  </div>
-{% endif %}
+{# ⚠ `UI-CP8D` — LE BLOC « LA SÉANCE SÉLECTIONNÉE » A DISPARU.
+
+   Il rendait, pour une séance choisie dans la liste, son nom, sa date, son
+   compte d'exercices, sa durée, son exclusion KPI éventuelle — puis DEUX
+   liens : « Ouvrir la séance » et « Gérer cette séance ».
+
+   C'était un aperçu de secours : `session_detail` redirigeait vers le
+   closeout, donc « ouvrir » ne menait nulle part d'utile et il fallait bien
+   montrer quelque chose sur place. Le relevé durable rend tout cela, et
+   davantage — lignée de substitution, provenance de la recommandation, ce
+   que la séance a changé.
+
+   `CLAUDE.md §5.3` est tenu : la soustraction et son remplacement partent
+   dans la même livraison, et le remplaçant est strictement plus riche. Un
+   état de sélection dans l'URL disparaît aussi du modèle mental. #}
 
 {# ══ LE RÔLE — une LIGNE par séance, pas un rectangle ══
    Ce qui remplace les 21 cartes. Aucun fond, aucun cadre, aucune commande :
@@ -150,8 +144,25 @@
 <ul class="hroster">
   {% for s in sessions %}
     {% set stats = session_stats[s.id] %}
-    <li class="hroster__row{% if selection and selection.id == s.id %} is-selected{% endif %}">
-      <a class="hroster__link" href="{{ url_for('history') }}?status={{ status_filter }}&session={{ s.id }}">
+    <li class="hroster__row">
+      {# ⚠ `UI-CP8D` — LA LIGNE OUVRE LA SÉANCE, ELLE NE LA « SÉLECTIONNE »
+         PLUS.
+
+         Elle pointait vers `?session={{ s.id }}` : un rechargement de CETTE
+         page, qui faisait apparaître un bloc « La séance sélectionnée »
+         portant un second lien, « Ouvrir la séance ». Deux gestes pour
+         atteindre une séance, et un état de sélection dans l'URL.
+
+         Cette indirection n'existait que parce que `session_detail`
+         REDIRIGEAIT vers le closeout : ouvrir ne montrait rien d'utile, donc
+         la page montrait un résumé sur place. Le relevé durable existe
+         maintenant — la ligne y va directement.
+
+         Mesuré avant : `/history` ne rendait AUCUN lien vers une séance tant
+         qu'aucune sélection n'était faite. Le journal ne pouvait atteindre
+         aucune séance. #}
+      <a class="hroster__link"
+         href="{{ url_for('session_detail', session_id=s.id) }}">
         <span class="hroster__name">{{ s.template_name_snapshot }}</span>
         <span class="hroster__line">
           <span class="hroster__date">{{ s.started_at | date_fr }}</span>
