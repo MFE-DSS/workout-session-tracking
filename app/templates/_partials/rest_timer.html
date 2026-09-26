@@ -47,12 +47,19 @@
 
    Sans JS, il n'y a pas de sortie automatique : le rechargement suivant
    suffit, et `PASSER LE REPOS` reste la sortie immédiate. #}
-{# `<output>`, PAS `<div role="status">`.
+{# UN ÉLÉMENT ANNONCEUR NATIF, PAS UNE DIVISION AVEC UN RÔLE POSÉ À LA MAIN.
 
-   `Web:S6819` (MAJOR) signalait ce bloc depuis des mois : `role="status"`
-   n'est pas restitué de façon fiable par tous les lecteurs d'écran, là où
-   `<output>` porte ce rôle nativement — et c'est littéralement l'élément
-   prévu pour « le résultat d'un calcul affiché à l'utilisateur ».
+   ⚠ NE PAS ÉCRIRE DE BALISE NI D'ATTRIBUT LITTÉRAL DANS CETTE PROSE. Le
+   parseur HTML de Sonar ne connaît pas les commentaires Jinja : il a lu la
+   première version de ce commentaire comme du balisage vivant et a signalé
+   `Web:S6819` sur une explication qui disait justement que le défaut était
+   corrigé. `exercise_card.html` porte le même avertissement, pour la même
+   raison — c'est un piège du dépôt, pas un accident.
+
+   `Web:S6819` (MAJOR) signalait ce bloc depuis des mois : le rôle posé à la
+   main n'est pas restitué de façon fiable par tous les lecteurs d'écran, là
+   où l'élément natif porte ce rôle — et c'est littéralement l'élément prévu
+   pour « le résultat d'un calcul affiché à l'utilisateur ».
 
    Corrigé ICI plutôt qu'ailleurs parce que cette tranche réécrit ce bloc :
    la dette tombait dans le code neuf, et la faire adjuger « acceptée » pour
@@ -61,7 +68,7 @@
    touchées : elles vivent dans des gabarits que `UI-CP8R` n'ouvre pas, et
    les corriger au passage serait une dérive de périmètre.
 
-   `aria-live="polite"` disparaît avec lui : c'est le défaut implicite de
+   La politesse d'annonce disparaît avec lui : c'est le défaut implicite de
    `<output>`, et le répéter n'ajoute rien. La mise en page ne bouge pas —
    `.rest-readout` pose `display: flex`, et `.console[data-state="rest"]`
    pose `display: grid` : l'affichage en ligne par défaut d'`<output>` est

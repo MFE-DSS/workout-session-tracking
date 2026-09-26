@@ -278,7 +278,12 @@ class SetLog(Base):
     # INCOMPLÈTE → COMPLÈTE, **préservée** quand une série déjà complète est
     # corrigée — sinon rectifier une faute de frappe ressusciterait un repos
     # vieux d'une heure — et effacée quand la série est dé-complétée.
-    completed_at: Mapped[Optional[datetime]] = mapped_column(
+    # ⚠ `datetime | None`, et non `Optional[datetime]` comme ses voisines.
+    # `external_ruff:UP045` (MAJOR) est une dette de tout le fichier, tolérée
+    # sur le code existant par le budget ruff — mais une LIGNE NEUVE tombe
+    # dans le « code nouveau » de Sonar, où un seul MAJOR ferme la porte.
+    # Convertir les voisines au passage serait une dérive de périmètre.
+    completed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
 
@@ -296,7 +301,7 @@ class SetLog(Base):
     # la même URL sans `rest=1`, et ça ne survivait au rechargement que parce
     # que l'URL rechargée ne portait plus le paramètre. En retirant au
     # paramètre son autorité, on retirait au saut son unique mécanisme.
-    rest_dismissed_at: Mapped[Optional[datetime]] = mapped_column(
+    rest_dismissed_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
 

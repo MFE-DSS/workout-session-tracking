@@ -1358,9 +1358,18 @@ async def update_exercise_card(
     return RedirectResponse(url=target, status_code=303)
 
 
+#: `python:S8415` — la 404 de cette route est DOCUMENTÉE, suivant la
+#: convention déjà posée par `user_programs.py` (`responses={404: …}`). Les
+#: trois autres `HTTPException(404)` de ce fichier ne le sont pas : c'est de
+#: la dette ancienne, tolérée parce qu'elle n'est plus du « code nouveau ».
+#: Les convertir au passage serait une dérive de périmètre.
+_CARTE_INTROUVABLE = "Exercise card not found"
+
+
 @router.post(
     "/sessions/{session_id}/exercises/{session_exercise_id}/rest/skip",
     name="dismiss_rest",
+    responses={404: {"description": _CARTE_INTROUVABLE}},
 )
 async def dismiss_rest(
     session_id: int,
@@ -1409,7 +1418,7 @@ async def dismiss_rest(
         .options(selectinload(SessionExercise.set_logs))
     ).scalar_one_or_none()
     if se is None:
-        raise HTTPException(status_code=404, detail="Exercise card not found")
+        raise HTTPException(status_code=404, detail=_CARTE_INTROUVABLE)
 
     # La série qui POSSÈDE ce repos — la même que celle dont la dérivation
     # part. La nommer deux fois différemment ferait diverger l'écriture de
