@@ -226,8 +226,28 @@ def test_resume_banner_only_shows_own_sessions(client):
         )
         db.add(s)
         db.commit()
+        s_id = s.id
 
     # Our home should NOT show a resume tile for the other user's session
+    #
+    # ⚠ REPOINTÉE PAR `REC-CP5` — UNE SOUS-CHAÎNE N'EST PAS UN OBJET.
+    #
+    # Cette garde cherchait le texte nu « Pull A » n'importe où dans la page.
+    # Depuis que V3 sert, Mission peut légitimement RECOMMANDER Pull A, et son
+    # nom de catalogue — « Pull A — Dos largeur + Delts postérieurs » —
+    # contient cette sous-chaîne. La garde accusait donc une fuite de
+    # propriété là où il n'y avait qu'une collision de texte.
+    #
+    # Vérifié avant de la toucher : « Reprendre » était bien absent, et la
+    # chaîne trouvée portait le SUFFIXE de catalogue, que le snapshot de la
+    # séance étrangère (« Pull A » tout court) n'a pas.
+    #
+    # On épingle désormais la propriété RÉELLE, et elle est plus forte qu'un
+    # nom : aucune affordance de reprise, et **aucun lien vers la séance d'un
+    # autre**. Un identifiant ne peut pas entrer en collision avec un libellé.
     body = client.get("/").text
-    assert "Reprendre" not in body
-    assert "Pull A" not in body
+    assert "Reprendre" not in body, "une affordance de reprise est offerte"
+    assert f"/sessions/{s_id}" not in body, (
+        f"la page pointe vers la séance {s_id}, qui appartient à un autre "
+        "utilisateur"
+    )
