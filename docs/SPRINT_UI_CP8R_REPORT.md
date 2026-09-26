@@ -1,7 +1,7 @@
 # `UI-CP8R` — La vérité temporelle du repos
 
-**Statut** : livré · migration `w4x9r5s6u17` appliquée · PR ouverte
-**Branche** : `sb/ui-cp8r-verite-temporelle` sur canonique `d6931ef`
+**Statut** : `MERGÉ` · PR #253 · merge `58b9e29` · migration `w4x9r5s6u17` appliquée
+**Branche** : `sb/ui-cp8r-verite-temporelle`, ouverte sur `d6931ef`, canonique `fb42535` (CP8D) fusionnée dedans avant la PR
 **Tier `check_scope`** : `MIGRATION`
 **Rendus soumis à l'opérateur** (`CLAUDE.md §5.1`) : artifact publié avant
 tout commit de gabarit.
@@ -389,3 +389,49 @@ l'indépendance aux rappels. **Chromium n'est pas une preuve pour Safari iOS.**
 
 Le serveur re-dérive à chaque rendu, donc le risque résiduel est un
 **affichage** figé entre deux rendus, jamais un état faux.
+
+---
+
+## 18. Closeout
+
+| | |
+|---|---|
+| **PR** | [#253](https://github.com/MFE-DSS/workout-session-tracking/pull/253) |
+| **Merge** | `58b9e29f5eab658dd32f60fbdc0804ff4541e682` |
+| **Méthode** | `--merge` avec `--match-head-commit 80ecb4e` — pas de squash, pas de `--admin`, pas de force |
+| **CI de PR** | 9/9 verts |
+| **CI canonique** | run [`36273576860`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36273576860) — **7/7 verts** |
+| **Sonar (PR)** | `OK` — couverture nouveau code **95,9 %**, 0 bug, **0 code smell pondéré**, 0 duplication |
+| **Threads de revue** | 0 non résolu |
+| **Migration** | `w4x9r5s6u17` — appliquée, additive, sans backfill |
+| **Sweep local** | `tous les lots sont verts.` sur l'arbre committé |
+
+### Les quatre findings Sonar, et celui que j'ai causé moi-même
+
+Premier passage : `new_code_smells_severity = 15` pour un seuil de 14 — un
+seul MAJOR ferme la porte. Corrigés en `80ecb4e`.
+
+* **`Web:S6819` était un faux positif de MA prose.** Le parseur HTML de
+  Sonar ne connaît pas les commentaires Jinja : il a lu une balise écrite
+  dans mon explication comme du balisage **vivant**. L'analyseur signalait
+  donc une phrase qui disait que le défaut était corrigé — alors qu'il
+  l'était. `exercise_card.html` porte **exactement le même avertissement**,
+  dans ces termes. Le piège était écrit dans le dépôt et j'y suis tombé.
+* **`external_ruff:UP045` ×2** — les deux colonnes neuves suivaient le style
+  `Optional[...]` de leurs voisines. La dette couvre tout le fichier et le
+  budget la tolère sur l'existant ; une **ligne neuve** tombe dans le code
+  nouveau. Converties, voisines laissées en place (dérive de périmètre).
+* **`python:S8415`** — la 404 de `dismiss_rest` est documentée suivant la
+  convention déjà posée par `user_programs.py`, plutôt qu'une inventée.
+
+### Ce qui reste ouvert après `CP8R`
+
+| résidu | destination |
+|---|---|
+| valeurs saisies non validées perdues au rechargement (**P1**) | **`CP8I`** |
+| iPhone Safari, écran verrouillé pendant le repos | `CP11` — `NEEDS_OPERATOR_DEVICE` |
+| sept orthographes de la normalisation naïf/aware | non planifié, hors périmètre |
+| `ACCOUNT`, `PROGRAM_LIFECYCLE`, `BODY_DATA_CONTROL` | `UI-CP8` (suite) |
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
