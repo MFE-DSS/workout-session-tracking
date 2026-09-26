@@ -114,7 +114,14 @@ def test_history_session_card_link_and_badges(client):
     # rectangles identiques donnaient le même poids à la séance d'il y a une
     # heure et à celle d'il y a six semaines.
     assert "hroster__link" in html
-    assert "session=" in html
+    # ⚠ `UI-CP8D` — la ligne OUVRE la séance, elle ne la « sélectionne » plus.
+    # `?session=N` rechargeait l'historique pour faire paraître un bloc
+    # portant un SECOND lien. Ce que cette garde protège — « la ligne entière
+    # mène quelque part » — est plus vrai : elle mène à la séance elle-même.
+    assert "/sessions/" in html, "la ligne ne mène à aucune séance"
+    assert "session=" not in html, (
+        "la sélection en place est revenue : deux gestes pour ouvrir"
+    )
     # status badge + exos badge present
     assert "badge" in html
     # `Sb_UI_HISTORIQUE_01` — MIGRÉE : ON MARQUE L'EXCEPTION, PAS LA NORME.

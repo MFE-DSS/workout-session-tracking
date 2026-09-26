@@ -41,6 +41,34 @@ def _first_exercise_id(session_id: int) -> int:
 
 
 def _finish(client, session_id: int, **fields) -> str:
+    """Clôt la séance et rend LA SURFACE QUI RESTITUE.
+
+    ⚠ `UI-CP8D` — CE N'EST PLUS LE CLOSEOUT, ET C'EST UN PROGRÈS.
+
+    `Sb_SESSION_REVIEW_SIGNAL_01` a établi que trois signaux saisis pendant
+    la séance n'étaient jamais rendus. La correction les avait posés sur
+    `/done`, faute de mieux : une séance terminée n'avait aucune surface à
+    elle.
+
+    Elle en a une. La restitution vit donc sur le relevé DURABLE, qu'on peut
+    rouvrir des semaines plus tard — au lieu d'une surface de transition
+    qu'on ne revoit jamais. La propriété est la même, sa portée est plus
+    longue.
+    """
+    data = {"action": "end"}
+    data.update(fields)
+    client.post(f"/sessions/{session_id}", data=data, follow_redirects=True)
+    return client.get(f"/sessions/{session_id}").text
+
+
+def _closeout(client, session_id: int, **fields) -> str:
+    """La surface de TRANSITION — distincte du relevé depuis `UI-CP8D`.
+
+    ⚠ Un helper partagé qui change de cible désarme les gardes de ses
+    appelants sans le dire. En repointant `_finish` vers le relevé, j'ai
+    emporté avec lui une garde qui parle du closeout. Les deux surfaces ont
+    donc chacune leur accès, nommé.
+    """
     data = {"action": "end"}
     data.update(fields)
     client.post(f"/sessions/{session_id}", data=data, follow_redirects=True)
@@ -95,7 +123,7 @@ def test_a_recorded_sensation_comes_back_in_the_review(client):
     )
     body = _finish(client, sid)
     assert "strong" in body, "the sensation never came back"
-    assert "closeout__releve-ressenti" in body, (
+    assert "record__ressenti" in body, (
         "the sensation is rendered but not as a sensation — it must stay "
         "identifiable, not merely present somewhere in the markup"
     )
@@ -132,7 +160,7 @@ def test_nothing_recorded_means_nothing_shown(client):
     """
     sid = _start(client)
     body = _finish(client, sid)
-    assert "closeout__releve-ressenti" not in body
+    assert "record__ressenti" not in body
     assert "Note de séance" not in body
 
 
@@ -209,7 +237,7 @@ def test_la_collecte_de_closeout_est_conditionnelle(client):
     """
     # a) séance close SANS ressenti → les contrôles paraissent.
     sid = _start(client)
-    creux = _finish(client, sid)
+    creux = _closeout(client, sid)
     assert 'name="concentration"' in creux, (
         "un signal consommé par le moteur manque, et le closeout ne l'a pas "
         "demandé"
@@ -218,7 +246,7 @@ def test_la_collecte_de_closeout_est_conditionnelle(client):
 
     # b) séance close AVEC ressenti → plus rien à demander.
     sid2 = _start(client)
-    complet = _finish(client, sid2, concentration="high", global_state="good")
+    complet = _closeout(client, sid2, concentration="high", global_state="good")
     assert 'name="concentration"' not in complet, (
         "le closeout redemande un signal DÉJÀ déclaré — c'est un second "
         "formulaire au repos, ce que `Sb_SESSION_REVIEW_SIGNAL_01` interdit"

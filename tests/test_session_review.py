@@ -443,6 +443,11 @@ def test_done_route_returns_200_for_owner_with_review(client):
     r = client.get(f"/sessions/{session_id}/done", follow_redirects=False)
     assert r.status_code == 200
     body = r.text
-    # The template must include the section we added (looked up via a
-    # robust marker — text or class — that's hard to remove by accident).
-    assert "session-review" in body or "Bench Press" in body
+    # ⚠ `UI-CP8D` — le détail par exercice a un propriétaire DURABLE.
+    # Le closeout est une transition ; il porte le fait de complétion et la
+    # commande qui mène au relevé. Le nom de l'exercice se relit là-bas, et
+    # cette fois des semaines plus tard.
+    assert "closeout__commande" in body, "la transition a disparu"
+    assert "Bench Press" in client.get(f"/sessions/{session_id}").text, (
+        "le détail par exercice n'est nulle part"
+    )
