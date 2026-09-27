@@ -43,7 +43,7 @@ pytestmark = pytest.mark.usefixtures("client")
 def test_sans_charge_observee_est_non_limitant():
     """`§1` — aucune preuve ne doit écarter ce candidat."""
     from app.services.recovery_contract import RecoveryBand
-    from app.services.zone_recovery import NON_LIMITANT, _DECISION_PAR_BANDE
+    from app.services.zone_recovery import _DECISION_PAR_BANDE, NON_LIMITANT
 
     assert _DECISION_PAR_BANDE[RecoveryBand.UNKNOWN.value] == NON_LIMITANT
     assert _DECISION_PAR_BANDE[RecoveryBand.LIKELY_AVAILABLE.value] == NON_LIMITANT
@@ -56,10 +56,13 @@ def test_sans_charge_observee_n_est_pas_une_preuve():
     pareil, et l'explication ne le peut pas.
     """
     from app.services.recovery_contract import (
-        Confidence, RecoveryBand, ZoneRecoveryEstimate,
+        Confidence,
+        RecoveryBand,
+        ZoneRecoveryEstimate,
     )
     from app.services.zone_recovery import (
-        decision_de_recuperation, preuve_positive_de_recuperation,
+        decision_de_recuperation,
+        preuve_positive_de_recuperation,
     )
 
     inconnue = ZoneRecoveryEstimate(
@@ -77,7 +80,9 @@ def test_sans_charge_observee_n_est_pas_une_preuve():
 def test_la_fatigue_connue_reste_limitante():
     """Une migration qui cesserait de limiter serait pire que le défaut."""
     from app.services.recovery_contract import (
-        Confidence, RecoveryBand, ZoneRecoveryEstimate,
+        Confidence,
+        RecoveryBand,
+        ZoneRecoveryEstimate,
     )
     from app.services.zone_recovery import LIMITANT, decision_de_recuperation
 
@@ -145,10 +150,10 @@ def test_une_carte_absente_ne_vaut_pas_une_autorisation():
     Une indisponibilité technique ne doit pas se lire comme un feu vert.
     """
     from app.services.recommendation_v3 import (
-        PARTIELLE, _bande_de_recuperation,
+        PARTIELLE,
+        RecuperationCanonique,
+        _bande_de_recuperation,
     )
-
-    from app.services.recommendation_v3 import RecuperationCanonique
 
     assert _bande_de_recuperation(
         ("pecs",), RecuperationCanonique()) == PARTIELLE
@@ -161,11 +166,11 @@ def test_une_seule_zone_limitante_suffit():
     fraîche — et le gabarit passerait.
     """
     from app.services.recommendation_v3 import (
-        INSUFFISANTE, _bande_de_recuperation,
+        INSUFFISANTE,
+        RecuperationCanonique,
+        _bande_de_recuperation,
     )
     from app.services.zone_recovery import LIMITANT, NON_LIMITANT
-
-    from app.services.recommendation_v3 import RecuperationCanonique
 
     recup = RecuperationCanonique(
         decision={"pecs": NON_LIMITANT, "quads": LIMITANT})
@@ -185,7 +190,9 @@ def test_sans_charge_observee_ne_dit_jamais_zones_recuperees():
     chargée, toutes sont non limitantes, et le produit ne sait rien.
     """
     from app.services.recommendation_v3 import (
-        FACTEUR_RECUPERATION, RECUPEREE, expliquer,
+        FACTEUR_RECUPERATION,
+        RECUPEREE,
+        expliquer,
     )
 
     class _T:
@@ -222,7 +229,9 @@ def test_une_preuve_reelle_autorise_la_phrase():
     """Le versant complémentaire : sans lui, la garde ci-dessus serait
     satisfaite par une explication qui ne parle JAMAIS de récupération."""
     from app.services.recommendation_v3 import (
-        FACTEUR_RECUPERATION, RECUPEREE, expliquer,
+        FACTEUR_RECUPERATION,
+        RECUPEREE,
+        expliquer,
     )
 
     class _T:
@@ -256,11 +265,11 @@ def test_l_inconnu_ne_devient_pas_limitant():
     changerait 9 gagnants sur 10.
     """
     from app.services.recommendation_v3 import (
-        RECUPEREE, _bande_de_recuperation,
+        RECUPEREE,
+        RecuperationCanonique,
+        _bande_de_recuperation,
     )
     from app.services.zone_recovery import NON_LIMITANT
-
-    from app.services.recommendation_v3 import RecuperationCanonique
 
     recup = RecuperationCanonique(decision={"pecs": NON_LIMITANT},
                                   preuve={"pecs": False})
@@ -325,7 +334,8 @@ def test_un_utilisateur_neuf_ne_s_entend_pas_dire_qu_il_est_recupere(client):
             politique=advice_memory.POLITIQUE_SERVIE,
             avec_memoire=advice_memory.MEMOIRE_SERVIE)
 
-    assert reco and reco.get("top")
+    assert reco is not None
+    assert reco.get("top")
     facteurs = " ".join(reco["top"].get("facteurs") or [])
     assert FACTEUR_RECUPERATION not in facteurs
 
