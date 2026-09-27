@@ -346,11 +346,25 @@
 
      ⚠ Ce formulaire SÉRIALISE TOUTES LES VALEURS de la carte. Un mini-POST
      parallèle qui n'enverrait que la série courante EFFACERAIT les autres. #}
+  {# `UI-CP8I` — LES SÉRIES DÉJÀ ENREGISTRÉES, DITES PAR LE SERVEUR.
+
+     Le tampon de récupération jette un brouillon dès que la vérité serveur
+     a bougé, en comparant la valeur canonique rendue. Mais à l'état REPOS
+     la bande de séries n'est PAS rendue (`UI-CP2` : « la question du repos
+     est le TEMPS ») : aucun champ, donc rien à comparer, donc le brouillon
+     de la série qu'on vient d'enregistrer survivait à son propre POST.
+     Mesuré — deux preuves de `§14` rouges.
+
+     Cette liste est le fait minimal qui manquait : une série enregistrée ne
+     peut plus avoir de brouillon, quel que soit l'état de l'écran. Elle ne
+     contient que des identifiants déjà présents dans la page, jamais de
+     valeur — `§12`, minimisation. #}
   <form
     method="post"
     action="{{ url_for('update_exercise_card', session_id=session.id, session_exercise_id=se.id) }}"
     class="exercise-card__form"
     data-session-form
+    data-sets-enregistrees="{{ se.set_logs | selectattr('completed') | map(attribute='id') | join(',') }}"
   >
 
     {% if session.status == 'completed' and summary %}

@@ -118,10 +118,32 @@ def test_the_commit_never_listens_to_typing_or_blur():
     trois autres interdits restent, et un temporisateur reste proscrit : il
     ferait dépendre l'enregistrement d'une durée plutôt que d'un geste.
     """
+    # ⚠ `UI-CP8I` — LA GARDE VISE L'AUTO-VALIDATION, PAS LE FICHIER.
+    #
+    # Elle balayait `session_focus.js` ENTIER. Le tampon de récupération de
+    # `CP8I` écoute légitimement `input` — pour écrire un brouillon
+    # d'affichage, jamais pour valider — et la faisait rougir sans que la
+    # propriété protégée bouge d'un iota.
+    #
+    # C'est exactement le rétrécissement que `DF-B` a déjà fait subir à sa
+    # garde sœur (`test_the_countdown_is_gated_on_the_server_signal`),
+    # quand l'auto-validation a eu besoin de sa propre racine : on vise ce
+    # qu'on a toujours voulu protéger — la RÉGION de l'auto-validation —
+    # et on reste insensible aux voisins.
+    #
+    # Le tampon est gardé séparément, et plus strictement : une garde de
+    # `test_ui_cp8i_resilience_saisie.py` exige que la restauration
+    # n'émette AUCUN événement, donc qu'elle ne puisse jamais valider.
     js = _js()
+    debut = js.find("function currentFields")
+    fin = js.find("var PREFIXE")
+    assert debut != -1, "la région d'auto-validation est introuvable"
+    assert fin > debut, "la frontière de la région a bougé"
+    region = js[debut:fin]
+
     for banned in ('"blur"', "'blur'", '"input"', "'input'",
                    "focusout", "setTimeout("):
-        assert banned not in js, (
+        assert banned not in region, (
             f"l'auto-validation écoute « {banned} » : ce n'est pas une "
             f"transition explicite"
         )

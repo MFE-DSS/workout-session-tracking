@@ -317,7 +317,280 @@
     }
   }
 
+  /* ════════════════════════════════════════════════════════════════════
+     `UI-CP8I` — TAMPON DE RÉCUPÉRATION, PAS UNE PERSISTANCE.
+
+     LE DÉFAUT, MESURÉ. Une valeur tapée dans la série courante et non
+     validée était PERDUE — au rechargement, en naviguant ailleurs dans
+     AUREN et en revenant, en changeant d'exercice, et par le bouton retour
+     du navigateur. Quatre chemins ordinaires, quatre pertes.
+
+     CE QUE CE TAMPON N'EST PAS. Il n'est pas de la donnée d'entraînement.
+     Le serveur reste la SEULE source durable : rien ici ne touche
+     `completed`, ni `completed_at`, ni `rest_dismissed_at`, ni le repos,
+     ni la recommandation, ni les analyses. Une valeur restaurée n'est
+     qu'une valeur AFFICHÉE ; elle n'existe pour le domaine qu'après le
+     POST normal, inchangé.
+
+     POURQUOI `sessionStorage` ET NON L'AUTRE. Mesuré : le tampon survit au
+     rechargement, à la navigation dans l'onglet et au bouton retour —
+     exactement les quatre pertes — et il meurt à la fermeture de l'onglet,
+     où le produit ne promet rien. Un stockage qui survivrait au navigateur
+     entier promettrait une continuité que la mesure n'a jamais montrée, et
+     demanderait une politique d'expiration à inventer.
+
+     PROTECTION CONTRE LE BROUILLON PÉRIMÉ. Un brouillon ne doit JAMAIS
+     écraser une vérité serveur plus récente. Chaque entrée mémorise donc
+     la valeur CANONIQUE au moment de la saisie :
+
+         base == canonique rendue  →  restaurer dans les champs
+         base != canonique rendue  →  le serveur a bougé, on JETTE
+
+     ISOLATION. La clé porte l'identité de la séance et de la série. Une
+     séance appartient à un compte et le serveur refuse les autres : un
+     autre utilisateur ne peut pas rendre la page, donc ne peut jamais lire
+     l'entrée. Le stockage est en plus borné à l'onglet, ce qui donne
+     l'indépendance entre onglets sans une ligne de code.
+     ════════════════════════════════════════════════════════════════════ */
+
+  var PREFIXE = "auren:d:";
+
+  function _ss() {
+    /* Un navigateur en navigation privée stricte, ou un réglage qui bloque
+       le stockage, fait LEVER l'accès lui-même. Sans ce garde, la page
+       entière casserait pour une commodité. */
+    try {
+      var s = window.sessionStorage;
+      s.getItem(PREFIXE + "probe");
+      return s;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function _champs(form, setId) {
+    return {
+      w: form.querySelector('[name="set_' + setId + '_weight_kg"]'),
+      r: form.querySelector('[name="set_' + setId + '_reps"]')
+    };
+  }
+
+  /* L'identité de la séance vient de l'ACTION du formulaire, pas de l'URL :
+     c'est le serveur qui l'a écrite, et elle ne dépend d'aucun paramètre. */
+  function _sessionId(form) {
+    var m = (form.getAttribute("action") || "").match(/\/sessions\/(\d+)\//);
+    return m ? m[1] : null;
+  }
+
+  function _cle(sessionId, setId) {
+    return PREFIXE + sessionId + ":" + setId;
+  }
+
+  function _ligneCourante(form) {
+    return form.querySelector(".setline--current:not(.setline--resting)");
+  }
+
+  function _setIdDe(ligne) {
+    var m = (ligne.getAttribute("id") || "").match(/^set-(\d+)$/);
+    return m ? m[1] : null;
+  }
+
+  function sauverBrouillon(store, form, setId) {
+    var c = _champs(form, setId);
+    if (!c.w || !c.r) {
+      return;
+    }
+    var w = c.w.value.trim();
+    var r = c.r.value.trim();
+    var cle = _cle(_sessionId(form), setId);
+    /* DEUX CHAMPS VIDES N'EST PAS UN BROUILLON. Mémoriser le vide créerait
+       une entrée qui ne récupère rien et qui, restaurée, ferait croire à
+       une saisie. On efface plutôt. */
+    if (w === "" && r === "") {
+      try { store.removeItem(cle); } catch (e) { /* plein : tant pis */ }
+      return;
+    }
+    try {
+      store.setItem(cle, JSON.stringify({
+        w: w,
+        r: r,
+        b: [c.w.defaultValue, c.r.defaultValue],
+        t: Date.now()
+      }));
+    } catch (e) {
+      /* Quota atteint ou stockage refusé : la saisie en cours reste dans le
+         DOM, on perd seulement la récupération. Jamais une erreur visible
+         pour une commodité. */
+    }
+  }
+
+  /* Les séries que le SERVEUR déclare enregistrées, toutes cartes
+     confondues. Indispensable à l'état REPOS, où la bande de séries n'est
+     pas rendue : sans cette liste, le brouillon de la série qu'on vient
+     d'enregistrer survivait à son propre POST, faute de champ à comparer. */
+  function _setsEnregistrees() {
+    var vues = {};
+    var formes = document.querySelectorAll("[data-sets-enregistrees]");
+    for (var i = 0; i < formes.length; i++) {
+      var ids = (formes[i].getAttribute("data-sets-enregistrees") || "")
+          .split(",");
+      for (var j = 0; j < ids.length; j++) {
+        var id = ids[j].trim();
+        if (id) {
+          vues[id] = true;
+        }
+      }
+    }
+    return vues;
+  }
+
+  /* ⚠ `defaultValue` EST LA VALEUR CANONIQUE, `value` EST CE QUI EST TAPÉ.
+     Le serveur rend `value="..."` dans le HTML ; le navigateur en fait
+     `defaultValue`, que la frappe ne modifie PAS. Comparer `value` aurait
+     comparé le brouillon à lui-même — la garde n'aurait jamais rien vu. */
+  function restaurerBrouillons(store, form) {
+    var sessionId = _sessionId(form);
+    if (!sessionId) {
+      return;
+    }
+    var enregistrees = _setsEnregistrees();
+    var prefixe = PREFIXE + sessionId + ":";
+    var cles = [];
+    for (var i = 0; i < store.length; i++) {
+      var k = store.key(i);
+      if (k && k.indexOf(prefixe) === 0) {
+        cles.push(k);
+      }
+    }
+    for (var j = 0; j < cles.length; j++) {
+      var cle = cles[j];
+      var setId = cle.slice(prefixe.length);
+      var c = _champs(form, setId);
+      if (!c.w || !c.r) {
+        /* AUCUN CHAMP RENDU — on ne peut pas comparer. Deux cas, et ils ne
+           se traitent pas pareil :
+
+           · la série est déclarée ENREGISTRÉE par le serveur ⇒ son
+             brouillon n'a plus d'objet, on l'efface. C'est ce qui réalise
+             l'effacement après un POST confirmé, y compris à l'état REPOS,
+             où la bande de séries n'existe pas et où le brouillon
+             survivait sinon à son propre POST ;
+
+           · sinon, on ne conclut RIEN et on garde. Effacer ici jetterait
+             le brouillon d'un exercice simplement replié. */
+        if (enregistrees[setId]) {
+          try { store.removeItem(cle); } catch (e) { /* rien à faire */ }
+        }
+        continue;
+      }
+      var brouillon = null;
+      try {
+        brouillon = JSON.parse(store.getItem(cle));
+      } catch (e) {
+        brouillon = null;
+      }
+      if (!brouillon || !brouillon.b) {
+        try { store.removeItem(cle); } catch (e) { /* rien à faire */ }
+        continue;
+      }
+      var perime = brouillon.b[0] !== c.w.defaultValue ||
+                   brouillon.b[1] !== c.r.defaultValue;
+      if (perime) {
+        /* Le serveur a bougé depuis la saisie — un POST réussi, une
+           correction depuis un autre onglet. La vérité serveur gagne
+           toujours, sans exception et sans question. */
+        try { store.removeItem(cle); } catch (e) { /* rien à faire */ }
+        continue;
+      }
+      /* Champs masqués : la série n'est pas en saisie. On garde l'entrée
+         sans rien peindre. */
+      if (c.w.type === "hidden" || c.r.type === "hidden") {
+        continue;
+      }
+      c.w.value = brouillon.w;
+      c.r.value = brouillon.r;
+      /* ⚠ ON NE DÉCLENCHE AUCUN ÉVÉNEMENT. Un `change` synthétique ici
+         réveillerait l'auto-validation de `DF-B` et SOUMETTRAIT la série :
+         une récupération d'affichage deviendrait un événement de domaine,
+         exactement ce que cette tranche a pour mandat d'éviter. */
+    }
+  }
+
+  function initBrouillons() {
+    var store = _ss();
+    if (!store) {
+      return;
+    }
+    var form = document.querySelector("[data-session-form]");
+    if (!form) {
+      return;
+    }
+    restaurerBrouillons(store, form);
+
+    var ligne = _ligneCourante(form);
+    if (!ligne) {
+      return;
+    }
+    var setId = _setIdDe(ligne);
+    if (!setId) {
+      return;
+    }
+    var c = _champs(form, setId);
+    if (!c.w || !c.r || c.w.type === "hidden") {
+      return;
+    }
+    /* ON ÉCRIT À LA FRAPPE, PAS À LA SORTIE DE PAGE.
+       `unload` / `beforeunload` ne se déclenchent pas de façon fiable sur
+       mobile : un onglet évincé par l'OS ne les voit jamais. La charge est
+       minuscule, l'écrire à chaque frappe coûte moins qu'un mécanisme qui
+       rate. `visibilitychange` reste un filet, jamais l'unique occasion. */
+    function sauver() {
+      sauverBrouillon(store, form, setId);
+    }
+    c.w.addEventListener("input", sauver);
+    c.r.addEventListener("input", sauver);
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        sauver();
+      }
+    });
+  }
+
+  /* LA DÉCONNEXION EMPORTE LES BROUILLONS.
+     Portée honnête : ce module ne tourne que sur la console de séance,
+     donc ce nettoyage couvre la déconnexion DEPUIS cette surface. Ailleurs,
+     l'isolation reste structurelle — le stockage meurt avec l'onglet, et un
+     autre compte ne peut pas rendre la séance, donc ne peut jamais lire
+     l'entrée. Les pages d'authentification portent un contrat « aucun
+     script » qu'une garde épingle : on ne l'ouvre pas pour ça. */
+  function initPurgeDeconnexion() {
+    var store = _ss();
+    if (!store) {
+      return;
+    }
+    var formes = document.querySelectorAll('form[action$="/logout"]');
+    for (var i = 0; i < formes.length; i++) {
+      formes[i].addEventListener("submit", function () {
+        var aJeter = [];
+        for (var j = 0; j < store.length; j++) {
+          var k = store.key(j);
+          if (k && k.indexOf(PREFIXE) === 0) {
+            aJeter.push(k);
+          }
+        }
+        for (var m = 0; m < aJeter.length; m++) {
+          try { store.removeItem(aJeter[m]); } catch (e) { /* rien à faire */ }
+        }
+      });
+    }
+  }
+
   function init() {
+    /* `UI-CP8I` — avant tout le reste : une valeur récupérée doit être
+       visible dès le premier rendu. */
+    initBrouillons();
+    initPurgeDeconnexion();
+
     /* `UI-CP8R` — LA RACINE EST `[data-rest-remaining]`.
 
        C'était `[data-rest-started]`, un drapeau booléen posé depuis

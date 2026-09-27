@@ -200,14 +200,34 @@ def test_no_commit_on_typing_or_blur():
     Relire ne le déclenche pas. Il dit « j'ai fini de saisir ce champ »,
     c'est-à-dire exactement l'intention que `D9` protégeait.
     """
+    # ⚠ `UI-CP8I` — LA GARDE VISE L'AUTO-VALIDATION, PAS LE FICHIER ENTIER.
+    #
+    # Elle balayait `session_focus.js` complet. Le tampon de récupération de
+    # `CP8I` écoute légitimement `input` — pour écrire un brouillon
+    # D'AFFICHAGE, jamais pour valider — et la faisait rougir sans que `D9`
+    # perde un pouce de terrain.
+    #
+    # ⚠⚠ ET C'EST LA TROISIÈME SŒUR. La même propriété est gardée dans
+    # `test_df_b_session_flow.py` et `test_uiv3_session_console.py`. J'ai
+    # corrigé les deux premières en croyant la famille close ; le sweep
+    # complet a trouvé celle-ci. Une décision appliquée « là où c'était
+    # commode » laisse toujours une sœur sans propriétaire — la famille se
+    # cherche par BALAYAGE, pas de mémoire.
     js = (ROOT / "app/static/js/session_focus.js").read_text(encoding="utf-8")
     stripped = re.sub(r"/\*[\s\S]*?\*/", " ", js)
     stripped = re.sub(r"(?m)^\s*//.*$", " ", stripped)
+
+    debut = stripped.find("function currentFields")
+    fin = stripped.find("var PREFIXE")
+    assert debut != -1, "la région d'auto-validation est introuvable"
+    assert fin > debut, "la frontière de la région a bougé"
+    region = stripped[debut:fin]
+
     for forbidden in ('"blur"', "'blur'", '"input"', "'input'"):
-        assert forbidden not in stripped, (
+        assert forbidden not in region, (
             f"la validation implicite écoute {forbidden} — `D9` l'interdit"
         )
-    assert "keydown" in stripped, "la transition explicite a disparu"
+    assert "keydown" in region, "la transition explicite a disparu"
 
 
 def test_no_extra_exercise_exit_during_rest():
