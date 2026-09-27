@@ -61,6 +61,7 @@ from app.services.recommendation import (
     _passes_redundancy_filter,
     template_primary_zones,
 )
+from app.services.zone_recovery import LIMITANT, NON_LIMITANT, PARTIEL
 
 #: Un gabarit jamais effectué est, pour le départage par ancienneté, le plus
 #: ancien de tous. Ce n'est pas une valeur magique : c'est la borne inférieure
@@ -159,24 +160,127 @@ def _deficit_de_couverture(
     return total / len(zones)
 
 
-def _bande_de_recuperation(zones: tuple[str, ...], signaux: Signals) -> int:
-    """Discrétise la disponibilité que V2 calcule déjà.
+#: `TRAIN A` — la décision canonique, rangée dans les trois bandes que ce
+#: classement utilise déjà. Correspondance exacte, aucune granularité neuve.
+_BANDE_PAR_DECISION = {
+    NON_LIMITANT: RECUPEREE,
+    PARTIEL: PARTIELLE,
+    LIMITANT: INSUFFISANTE,
+}
 
-    On prend le **minimum** sur les zones : un gabarit n'est pas récupéré si
+
+@dataclass(frozen=True)
+class RecuperationCanonique:
+    """Les deux cartes que la politique servie lit — décision et preuve.
+
+    ═══════════════════════════════════════════════════════════════════════
+    `TRAIN A` — POURQUOI CE CALCUL VIT ICI ET NON DANS `recommendation.py`.
+
+    Première écriture : les deux cartes étaient des champs de `Signals`, et
+    `_compute_signals` appelait le contrat canonique. **Deux gardes de gel
+    ont rougi**, et elles avaient raison sur les deux points.
+
+    `test_recommendation_py_is_not_modified` interdit à
+    `recommendation.py` de connaître `zone_recovery` : la dépendance va du
+    contrat VERS le moteur hérité, jamais l'inverse, sinon les deux
+    modèles se referment l'un sur l'autre.
+
+    `test_the_recommendation_engine_may_be_corrected_but_never_grow`
+    épingle les champs de `Signals` — le contrat d'ENTRÉE du scoring, que
+    `V2` partage. Y ajouter des champs que seul `V3` lit aurait fait
+    grossir un contrat commun pour un besoin qui ne l'est pas.
+
+    Les deux gardes pointaient la même chose : **c'est la POLITIQUE SERVIE
+    qui migre, pas le socle de signaux.** Le calcul appartient donc à ce
+    module. `recommendation.py` n'est pas touché d'une ligne.
+    ═══════════════════════════════════════════════════════════════════════
+    """
+
+    #: `{zone: non_limitant | partiel | limitant}` — ce que le rang lit.
+    decision: dict[str, str] = field(default_factory=dict)
+    #: `{zone: bool}` — preuve POSITIVE de récupération. Ce que
+    #: l'explication lit, et que le rang ignore délibérément.
+    preuve: dict[str, bool] = field(default_factory=dict)
+
+
+#: Repli neutre : aucune carte. Utilisé quand la chaîne d'évidence est
+#: indisponible — une panne ne doit pas se lire comme une autorisation.
+_SANS_RECUPERATION = RecuperationCanonique()
+
+
+def recuperation_canonique(db: Session, user_id: int,
+                           now: datetime) -> RecuperationCanonique:
+    """Lit le contrat canonique. Dégrade en silence, jamais en faveur.
+
+    L'import est différé : le contrat tire toute la chaîne d'évidence, et
+    ce module est sur un chemin chaud.
+    """
+    try:
+        from app.services.zone_recovery import (
+            build_zone_recovery,
+            decisions_par_zone,
+            preuves_par_zone,
+        )
+        estimations = build_zone_recovery(db, user_id, now=now)
+        return RecuperationCanonique(
+            decision=decisions_par_zone(estimations),
+            preuve=preuves_par_zone(estimations),
+        )
+    except Exception:
+        return _SANS_RECUPERATION
+
+
+def _preuve_de_recuperation(zones: tuple[str, ...],
+                            recup: RecuperationCanonique) -> bool:
+    """Y a-t-il une preuve POSITIVE que toutes ces zones sont récupérées ?
+
+    `False` dès qu'UNE zone n'en fournit pas — une seule inconnue suffit à
+    retirer le droit d'affirmer. Et `False` quand la carte est absente : une
+    panne de la chaîne d'évidence ne crée pas une preuve.
+    """
+    if not zones or not recup.preuve:
+        return False
+    return all(recup.preuve.get(z, False) for z in zones)
+
+
+def _bande_de_recuperation(zones: tuple[str, ...],
+                           recup: RecuperationCanonique) -> int:
+    """La bande de récupération d'un gabarit, depuis le contrat CANONIQUE.
+
+    On prend le **pire** sur les zones : un gabarit n'est pas récupéré si
     une seule de ses zones ne l'est pas. La moyenne, elle, laisserait une zone
     à plat se faire compenser par une zone fraîche.
+
+    ═══════════════════════════════════════════════════════════════════════
+    `TRAIN A` — CETTE FONCTION LISAIT `availability_by_zone`, UN RATIO 0–1.
+
+    Le ratio portait un défaut d'une seule ligne : une zone **jamais
+    entraînée** y valait `1.0`, donc `RECUPEREE` — le classement affirmait
+    une récupération pleine là où il n'avait aucune observation. Le contrat
+    canonique dit `UNKNOWN / confiance NONE` sur ce même cas.
+
+    ⚠ ET POURTANT LA BANDE NE CHANGE PAS POUR CE CAS, DÉLIBÉRÉMENT.
+    L'arbitrage opérateur a tranché : « sans charge observée » est NON
+    LIMITANT — il n'y a aucune preuve qui doive écarter ce candidat. Il
+    occupe donc le même RANG qu'une zone connue disponible, sans partager sa
+    PREUVE. La distinction vit dans `recovery_evidence_by_zone`, que
+    l'explication lit et que le classement ignore.
+
+    Mesuré avant d'écrire : pénaliser le « sans charge observée » aurait
+    changé **9 gagnants sur 10**. Migrer l'autorité en le gardant non
+    limitant en change **0 sur 60**.
+
+    ⚠ REPLI. Carte absente — récupération canonique indisponible — on rend
+    `PARTIELLE`, le neutre. Jamais `RECUPEREE` : une panne de la chaîne
+    d'évidence ne doit pas se lire comme une autorisation.
+    ═══════════════════════════════════════════════════════════════════════
     """
-    if not zones:
+    if not zones or not recup.decision:
         return PARTIELLE
-    mini = min(
-        signaux.availability_by_zone.get(z, AVAILABILITY_INCONNUE)
+    return max(
+        _BANDE_PAR_DECISION.get(recup.decision.get(z, PARTIEL), PARTIELLE)
         for z in zones
     )
-    if mini >= 1.0:
-        return RECUPEREE
-    if mini >= 0.5:
-        return PARTIELLE
-    return INSUFFISANTE
 
 
 def _penalite_de_repetition(
@@ -298,6 +402,10 @@ def classer_candidats(
     6. **ordre de catalogue** — dernier recours déterministe. Aucun aléatoire.
     """
     signaux = _compute_signals(db, user_id, now)
+    # `TRAIN A` — la récupération CANONIQUE, lue une fois pour tout le
+    # classement. C'est la politique servie qui migre ; `recommendation.py`
+    # n'est pas touché (voir `RecuperationCanonique`).
+    recup = recuperation_canonique(db, user_id, now)
     dernier_passage, passage_famille, dernier_slug = _derniers_passages(
         db, user_id, now)
     eligibles = _eligibles(db, signaux)
@@ -317,7 +425,7 @@ def classer_candidats(
         if justifiee:
             repetition = NOUVEAU
 
-        recuperation = _bande_de_recuperation(zones, signaux)
+        recuperation = _bande_de_recuperation(zones, recup)
         modalite = _bande_de_modalite(t, signaux)
         vu_gabarit = dernier_passage.get(t.slug, JAMAIS)
         vu_famille = passage_famille.get(famille_de(t.slug) or "", JAMAIS)
@@ -329,6 +437,19 @@ def classer_candidats(
                   vu_gabarit, vu_famille, t.display_order, t.slug),
             facteurs={
                 "recuperation": recuperation,
+                # `TRAIN A §2` — LE RANG NE SUFFIT PAS À AUTORISER LA PHRASE.
+                #
+                # `recuperation == RECUPEREE` signifie « aucune preuve ne
+                # limite ce candidat ». Cela couvre DEUX états très
+                # différents : une zone connue disponible, et une zone dont
+                # on ne sait rien. Dire « zones récupérées » sur la seconde
+                # serait une affirmation physiologique inventée — le défaut
+                # même que la migration d'autorité corrige.
+                #
+                # Ce booléen est donc la CONDITION de la phrase, et il est
+                # séparé du rang exprès : le classement les traite pareil,
+                # l'explication ne le peut pas.
+                "preuve_recuperation": _preuve_de_recuperation(zones, recup),
                 "deficit_couverture": round(deficit, 3),
                 "repetition": repetition,
                 "repetition_justifiee": justifiee,
@@ -497,7 +618,14 @@ def expliquer(verdict: Verdict, rang: int = 0,
         (gagnants if gagnant else limitants).append(texte)
 
     # ── 2. LA CONTRAINTE MATÉRIELLE / RÉCUPÉRATION.
-    if f["recuperation"] == RECUPEREE:
+    #
+    # ⚠ `TRAIN A §2` — LA PREUVE CONDITIONNE LA PHRASE, PAS LE RANG.
+    #
+    # `RECUPEREE` veut dire « rien ne limite ce candidat ». Sur une zone
+    # jamais chargée, c'est vrai ET sans preuve : l'affirmation « zones
+    # récupérées » y serait inventée. Le silence est la seule sortie
+    # honnête — et il est explicitement autorisé.
+    if f["recuperation"] == RECUPEREE and f.get("preuve_recuperation"):
         gagnants.append(FACTEUR_RECUPERATION)
     elif f["recuperation"] == INSUFFISANTE:
         limitants.append("une zone n'a pas fini de récupérer")

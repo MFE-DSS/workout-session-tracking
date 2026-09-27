@@ -188,6 +188,19 @@ def test_la_nouveaute_parle_quand_elle_a_reellement_departage(client):
             "recuperation": 0, "deficit_couverture": 0.5, "repetition": 0,
             "repetition_justifiee": False, "modalite_delaissee": False,
             "dernier_passage": None, "observation_partielle": False,
+            # ⚠ `TRAIN A` — CLÉ AJOUTÉE, ET ELLE RESTAURE LE CAS TESTÉ.
+            #
+            # « zones récupérées » exige désormais une PREUVE positive, pas
+            # seulement un bon rang : sur une zone jamais chargée, le rang
+            # est bon et le produit ne sait rien.
+            #
+            # Sans cette clé, ce double n'a plus AUCUN facteur gagnant, et
+            # « jamais fait » s'énonce alors légitimement — par la clause
+            # de dernier recours `or not gagnants`. La garde rougissait
+            # donc sur un état qu'elle n'avait jamais voulu construire.
+            # On lui rend une preuve de récupération : il existe bien un
+            # autre facteur, et la nouveauté doit se taire.
+            "preuve_recuperation": True,
         }
 
     avec = expliquer(_V(), 0, "recence_gabarit")

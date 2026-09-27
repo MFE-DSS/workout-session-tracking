@@ -303,14 +303,87 @@ LEGACY_DIVERGENCES: tuple[tuple[str, str, str], ...] = (
 )
 
 
+# ══════════════════════════════════════════════════════════════════════
+#  `TRAIN A` — L'ADAPTATEUR DE DÉCISION
+# ══════════════════════════════════════════════════════════════════════
+#
+# LA DISTINCTION QUE CET ADAPTATEUR EXISTE POUR TENIR.
+#
+# Une PREUVE de récupération et une DÉCISION de récupération ne sont pas la
+# même chose. Le critère de décision répond à une seule question :
+#
+#     « ai-je une preuve qui doit LIMITER ce candidat ? »
+#
+# Une zone jamais chargée n'en fournit aucune. Elle est donc NON LIMITANTE —
+# et ce n'est **pas** une preuve de fraîcheur. Les deux états partagent un
+# rang et ne partagent pas une preuve.
+#
+# ⚠ POURQUOI PAS UN NOMBRE. Le chemin hérité portait un ratio 0–1, et son
+# défaut tenait entier dans une ligne : une zone jamais entraînée valait
+# `1.0`, c'est-à-dire « pleinement récupérée » — une affirmation
+# physiologique que rien n'appuyait. Traduire la bande canonique en flottant
+# pour satisfaire l'ancienne clé aurait reconduit exactement ce mensonge,
+# avec une couche de respectabilité en plus. L'adaptateur est donc
+# CATÉGORIEL, et le type l'interdit.
+
+#: Les trois décisions de récupération. Trois, comme les trois bandes que le
+#: classement utilise déjà — on n'invente pas une quatrième granularité.
+NON_LIMITANT = "non_limitant"
+PARTIEL = "partiel"
+LIMITANT = "limitant"
+
+_DECISION_PAR_BANDE: dict[str, str] = {
+    RecoveryBand.LIKELY_AVAILABLE.value: NON_LIMITANT,
+    # ⚠ MÊME RANG QUE CI-DESSUS, PREUVE DIFFÉRENTE. Voir
+    # `preuve_positive_de_recuperation` : l'explication doit pouvoir les
+    # distinguer même quand le classement ne le fait pas.
+    RecoveryBand.UNKNOWN.value: NON_LIMITANT,
+    RecoveryBand.PARTIALLY_RECOVERED.value: PARTIEL,
+    RecoveryBand.LIKELY_FATIGUED.value: LIMITANT,
+}
+
+
+def decision_de_recuperation(estimate: ZoneRecoveryEstimate) -> str:
+    """La bande de DÉCISION d'une estimation canonique."""
+    return _DECISION_PAR_BANDE[estimate.band.value]
+
+
+def preuve_positive_de_recuperation(estimate: ZoneRecoveryEstimate) -> bool:
+    """Y a-t-il une preuve POSITIVE que cette zone est récupérée ?
+
+    `False` pour une zone sans charge observée, alors même que sa décision
+    est NON LIMITANTE. C'est ce booléen qui interdit à l'explication de dire
+    « récupérée » là où le produit ne sait rien.
+    """
+    return estimate.band == RecoveryBand.LIKELY_AVAILABLE
+
+
+def decisions_par_zone(estimations) -> dict[str, str]:
+    """`{zone: décision}` — la carte que le classement consomme."""
+    return {e.zone_code: decision_de_recuperation(e) for e in estimations}
+
+
+def preuves_par_zone(estimations) -> dict[str, bool]:
+    """`{zone: preuve positive ?}` — la carte que l'explication consomme."""
+    return {e.zone_code: preuve_positive_de_recuperation(e)
+            for e in estimations}
+
+
 __all__ = [
     "DEFAULT_RECOVERY_POLICY",
     "LEGACY_DIVERGENCES",
+    "LIMITANT",
+    "NON_LIMITANT",
+    "PARTIEL",
     "RECOVERY_POLICY_VERSION",
     "RecoveryPolicy",
     "build_macro_recovery",
     "build_zone_recovery",
     "build_zone_recovery_from_evidence",
     "canonical_zone_codes",
+    "decision_de_recuperation",
+    "decisions_par_zone",
     "estimate_for_zone",
+    "preuve_positive_de_recuperation",
+    "preuves_par_zone",
 ]
