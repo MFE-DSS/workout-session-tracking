@@ -1,6 +1,6 @@
 # `UI-CP8I` — Une saisie interrompue n'est plus perdue
 
-**Statut** : construit, vérifié, PR ouverte
+**Statut** : `MERGÉ` · PR #255 · merge `eeff9de`
 **Branche** : `sb/ui-cp8i-resilience-saisie` sur canonique `eb6e890`
 **Tier `check_scope`** : `ISOLATED` — **traité en `shared_code`**, voir §9
 **Migration** : aucune. **Aucune colonne, aucune table, aucune route.**
@@ -243,5 +243,39 @@ s'applique pas — rien de visuel n'est à arbitrer.
 | déconnexion depuis une page hors séance | le tampon meurt avec l'onglet ; isolation structurelle |
 
 **Aucune dérive hors ligne / PWA** (`§18`) — une garde l'épingle.
+
+---
+
+## 12. Closeout
+
+| | |
+|---|---|
+| **PR** | [#255](https://github.com/MFE-DSS/workout-session-tracking/pull/255) |
+| **Merge** | `eeff9def1fdffe9eb7bccf6dc4161633e5fd1464` |
+| **Méthode** | `--merge` avec `--match-head-commit 1c3131f` — pas de squash, pas de `--admin`, pas de force |
+| **CI de PR** | 10/10 verts |
+| **CI canonique** | run [`36306266072`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36306266072) — **7/7 verts** |
+| **Sonar** | `OK` — **0 code smell pondéré**, 0 bug, 0 vulnérabilité, 0 duplication |
+| **Threads de revue** | 0 non résolu |
+| **Migration** | aucune — et c'est le résultat, pas un raccourci |
+| **Sweep local** | `tous les lots sont verts.` sur l'arbre committé |
+
+**Zéro finding Sonar au premier passage.** Les quatre règles qui avaient
+mordu sur `CP8R` — `Web:S6819` sur une balise citée en prose,
+`external_ruff:UP045` sur une ligne neuve, `python:S8415` sur une 404 —
+ont été évitées en amont plutôt que corrigées après coup.
+
+### Ce que la tranche laisse derrière elle
+
+| résidu | destination |
+|---|---|
+| Safari iOS, processus tué par l'OS | `CP11` — `NEEDS_OPERATOR_DEVICE` |
+| onglet fermé ⇒ saisie perdue | frontière assumée, non mesurée comme insuffisante |
+| déconnexion hors surface de séance | le tampon meurt avec l'onglet ; isolation structurelle |
+
+`CP8I` clôt le constat ouvert par la matrice d'interruption de `CP8R`.
+Suite du chemin critique : `CP8N` (navigation / propriété), `CP8U` (cycle
+de vie), `CP9` (arbitrage social), `CP10` (convergence), `CP11` (dogfood
+sur appareil réel).
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
