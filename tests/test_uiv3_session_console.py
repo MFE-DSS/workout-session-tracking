@@ -526,11 +526,42 @@ def test_the_rest_readout_only_exists_in_the_rest_state():
 def test_the_rest_adjustment_never_persists():
     """Amendement C — 90 s est un repli de PRÉSENTATION. Un
     `rest_target_seconds` par exercice serait une prescription, donc une
-    feature métier séparée."""
-    js = JS.read_text(encoding="utf-8")
-    for forbidden in ("localStorage", "sessionStorage", "fetch(",
-                      "XMLHttpRequest", "navigator.sendBeacon"):
-        assert forbidden not in js, forbidden
+    feature métier séparée.
+
+    ⚠ `UI-CP8I` — LA GARDE VISE LE MINUTEUR, PAS LE FICHIER ENTIER.
+
+    Elle interdisait TOUT stockage dans `session_focus.js`. `CP8I` y
+    ajoute un tampon de récupération de saisie en `sessionStorage` — un
+    objet différent, borné à l'onglet, qui ne touche pas à la durée de
+    repos. La propriété protégée ici est que **l'ajustement ±15 s ne
+    survit pas** ; elle se vérifie dans la région du minuteur.
+
+    Deux interdits restent GLOBAUX, et pour de bonnes raisons : aucun
+    appel réseau (ni le minuteur ni le tampon n'ont à en faire), et
+    `localStorage` nulle part — `CP8I` a choisi `sessionStorage` parce que
+    la mesure a montré que la frontière utile est l'onglet, et retomber
+    sur `localStorage` promettrait une continuité jamais mesurée.
+    """
+    brut = JS.read_text(encoding="utf-8")
+    # La prose de ce fichier EXPLIQUE quels stockages sont refusés et
+    # pourquoi : elle les nomme. Chercher dans le texte brut accuserait
+    # l'explication qui les écarte.
+    code = re.sub(r"/\*.*?\*/", "", brut, flags=re.DOTALL)
+    code = re.sub(r"(?m)^\s*//.*$", "", code)
+
+    debut = code.find("function startTimer")
+    fin = code.find("function currentFields")
+    assert debut != -1, "la région du minuteur est introuvable"
+    assert fin > debut, "la frontière de la région a bougé"
+    minuteur = code[debut:fin]
+    for forbidden in ("localStorage", "sessionStorage"):
+        assert forbidden not in minuteur, (
+            f"le minuteur persiste son ajustement via {forbidden}"
+        )
+
+    for forbidden in ("localStorage", "fetch(", "XMLHttpRequest",
+                      "navigator.sendBeacon"):
+        assert forbidden not in code, forbidden
 
 
 def test_skip_rest_speaks_french():
