@@ -1,5 +1,6 @@
 # `TRAIN A` — Le modèle d'environnement : objets, capacités, exigences
 
+**Statut** : `MERGÉ` · PR #260 · merge `dfcd3bf`
 **Branche** : `sb/train-a-environment-model` sur canonique `456519c`
 **Tier `check_scope`** : `MIGRATION` — full sweep exécuté
 **Migration** : une colonne additive nullable, **zéro backfill**
@@ -369,5 +370,46 @@ tranche de migration.
 La récupération reste **close**. Les substitutions restent gelées.
 
 ---
+
+## 17. Closeout
+
+| | |
+|---|---|
+| **PR** | [#260](https://github.com/MFE-DSS/workout-session-tracking/pull/260) |
+| **Merge** | `dfcd3bf66b989036c3e64ac5648318337dd4ed3a` |
+| **Méthode** | `--merge` avec `--match-head-commit c86e86a` — pas de squash, pas de `--admin`, pas de force |
+| **CI canonique** | run [`36416478850`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36416478850) — **7/7 verts** |
+| **Sonar** | `OK` — 0 bug, 0 code smell, couverture nouveau code **100 %** |
+| **Threads de revue** | 0 non résolu |
+| **Migration** | `x5y0s6t7v18` — additive, nullable, zéro backfill |
+
+### Déploiement en production
+
+| | |
+|---|---|
+| **Run** | [`36418056397`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36418056397) — `success` |
+| **SHA déployé** | `dfcd3bf` — **le SHA exact validé par la CI canonique**, closeout docs exclu |
+| **Tag** | `deploy/prod/2026-09-28-1150-dfcd3bf` |
+| **Sauvegarde préalable** | `var/backups/workout_pre_deploy_20260928_115036.db` |
+| **Smoke VPS** | 17 contrôles, **tous `PASS`**, dont `check_alembic_drift returns OK` |
+| **Smoke externe** | `spignos.com/healthz` · `/healthz/strict` · `/welcome` → **200** |
+
+**Deux migrations ont été appliquées, pas une.** La production était restée
+sur `v3w8q4r5t16` : elle a reçu `w4x9r5s6u17` (`UI-CP8R`, la vérité temporelle
+du repos, mergée mais jamais déployée) **puis** `x5y0s6t7v18`. Les deux sont
+additives et sans backfill, et la sauvegarde précède les deux.
+
+Le `check_alembic_drift` de la production rend `OK` **après** migration : c'est
+la preuve que la colonne existe réellement là-bas et non seulement dans le
+modèle.
+
+### Ce qui reste à l'arbitrage de l'opérateur
+
+| question | effet si tranchée |
+|---|---|
+| le niveau de preuve `IDENTITE_AUREN` (13 lignes) | refusé ⇒ **40 connus / 28 inconnus** |
+| les trois défauts de dépôt (`machine_slug` absent) | 3 INCONNUS résolus |
+| le conflit `Relevés mollets debout` | 1 INCONNU résolu |
+| le périmètre des **66 substituts**, absent du `§13` | élargit la porte du filtre dur |
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
