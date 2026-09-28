@@ -118,7 +118,11 @@ def test_additive_only_existing_staples_unchanged():
     by_slug = {t["slug"]: t for t in CATALOG["templates"]}
     # the new program is additive, not a rename of an existing staple
     assert SLUG in by_slug
-    assert len(by_slug) == 17  # 16 originals + 1
+    # 16 originaux + le programme morphotype + `no-equipment-full-body`
+    # (Sb_TRAIN_A_ENV_03, porte G4). Les deux ajouts sont ADDITIFS : les
+    # vérifications ponctuelles ci-dessous prouvent que les piliers
+    # existants gardent leur forme.
+    assert len(by_slug) == 18
     # spot-check untouched staples keep their known shape
     assert len(by_slug["push-a"]["exercises"]) == 7
     assert by_slug["push-a"]["catalog_section"] == "core"

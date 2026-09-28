@@ -33,8 +33,8 @@ def test_catalog_is_non_empty():
     assert _catalog().picker_options()
 
 
-def test_exact_count_is_103():
-    assert len(_catalog().picker_options()) == 103
+def test_exact_count_is_107():
+    assert len(_catalog().picker_options()) == 107
 
 
 def test_options_are_deterministically_sorted():
@@ -114,7 +114,7 @@ def test_callers_cannot_mutate_cached_data():
     options.append({"name": "INJECTED"})
     fresh = cat.picker_options()
     assert all(o["name"] != "MUTATED" for o in fresh)
-    assert len(fresh) == 103
+    assert len(fresh) == 107
 
     enriched = cat.enrich("Adduction assise")
     enriched["variant_key"] = "MUTATED"
