@@ -254,7 +254,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells"
+      ]
     },
     "Curl incliné haltères": {
       "canonical_name": "Curl incliné haltères",
@@ -382,7 +385,8 @@
       "confidence": "measured",
       "curation_note": null,
       "equipment_requirements": [
-        "cable_anchor_low"
+        "cable_anchor_low",
+        "cable_attachment_straight_bar"
       ]
     },
     "Curl prise neutre câble": {
@@ -431,10 +435,7 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null,
-      "equipment_requirements": [
-        "dip_station"
-      ]
+      "curation_note": null
     },
     "Développé couché haltères": {
       "canonical_name": "Développé couché haltères",
@@ -527,7 +528,8 @@
       "confidence": "measured",
       "curation_note": null,
       "equipment_requirements": [
-        "cable_anchor_high"
+        "cable_anchor_high",
+        "cable_attachment_rope"
       ]
     },
     "Good morning haltères": {
@@ -755,7 +757,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_leg_press"
+      ]
     },
     "Leg curls allongé": {
       "canonical_name": "Leg curls allongé",
@@ -898,7 +903,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "todo",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_standing_calf_raise"
+      ]
     },
     "Neutral Grip Shoulder Press machine": {
       "canonical_name": "Neutral Grip Shoulder Press machine",
@@ -1078,7 +1086,7 @@
       "confidence": "derived",
       "curation_note": null,
       "equipment_requirements": [
-        "overhead_hang_bar"
+        "overhead_hang_support"
       ]
     },
     "Relevés mollets debout": {
@@ -1090,12 +1098,13 @@
       "zone_primary": "calves",
       "zone_macro": "lower",
       "chain": "isolation",
-      "machine_slug": "standing-calf-raise",
-      "machine_family": "legs-posterior-calves",
+      "machine_slug": null,
+      "machine_family": null,
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": []
     },
     "Relevés mollets debout machine": {
       "canonical_name": "Relevés mollets debout machine",
@@ -1146,7 +1155,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_rear_delt_fly"
+      ]
     },
     "Romanian Deadlift barre": {
       "canonical_name": "Romanian Deadlift barre",
@@ -1164,7 +1176,7 @@
       "confidence": "measured",
       "curation_note": null,
       "equipment_requirements": [
-        "barbell_straight"
+        "barbell"
       ]
     },
     "Romanian Deadlift haltères": {
@@ -1238,7 +1250,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_chest_supported_row"
+      ]
     },
     "Rowing câble assis prise large": {
       "canonical_name": "Rowing câble assis prise large",
@@ -1311,7 +1326,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells"
+      ]
     },
     "Rowing haltère un bras (banc)": {
       "canonical_name": "Rowing haltère un bras (banc)",
@@ -1366,7 +1384,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "seated_support"
+      ]
     },
     "Shrugs barre": {
       "canonical_name": "Shrugs barre",
@@ -1485,7 +1507,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "smith_rack"
+      ]
     },
     "Squat Smith machine (pieds avancés)": {
       "canonical_name": "Squat Smith machine (pieds avancés)",
@@ -1609,7 +1634,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_assisted_pull_up"
+      ]
     },
     "Traction assistée unilatérale": {
       "canonical_name": "Traction assistée unilatérale",
@@ -1643,7 +1671,8 @@
       "confidence": "measured",
       "curation_note": null,
       "equipment_requirements": [
-        "cable_anchor_high"
+        "cable_anchor_high",
+        "cable_attachment_rope"
       ]
     },
     "Triceps pushdown barre": {
@@ -1676,7 +1705,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_high",
+        "cable_attachment_rope"
+      ]
     },
     "Upright row câble": {
       "canonical_name": "Upright row câble",
@@ -1740,7 +1773,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_any"
+      ]
     },
     "Écarté pec aux câbles (incliné bas→haut)": {
       "canonical_name": "Écarté pec aux câbles (incliné bas→haut)",
