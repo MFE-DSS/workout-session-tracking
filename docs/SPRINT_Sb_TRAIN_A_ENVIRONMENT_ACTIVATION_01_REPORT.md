@@ -360,4 +360,60 @@ environnements modestes tant que 39 identités restent `UNKNOWN`. Ce n'est
 pas un défaut du résolveur ; c'est une décision produit qui revient à
 l'opérateur.
 
+---
+
+## 12. Closeout
+
+| | |
+|---|---|
+| **PR** | [#264](https://github.com/MFE-DSS/workout-session-tracking/pull/264) |
+| **Merge** | `be19736881f367e75f58b5a7e4d6fd456e46f988` |
+| **Méthode** | `--merge` avec `--match-head-commit e866476` — pas de squash, pas d'`--admin`, pas de force |
+| **CI canonique** | run [`36480604452`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36480604452) — **7/7 verts** |
+| **Sonar (gate de PR, autorité de merge)** | `OK` — 0 bug, 0 code smell, 0 vulnérabilité, duplication 0 %, couverture nouveau code **90,3 %** · **0 issue ouverte sur la PR** |
+| **Threads de revue** | 0 |
+| **Migration** | aucune |
+
+Les totaux projet (6 bugs, 6 vulnérabilités, 431 code smells, couverture
+93,6 %) sont la dette préexistante consignée sous `SONAR-AUDIT-01`. Le zéro
+**cadré sur la PR** prouve que cette tranche n'y a rien ajouté ; je ne
+confonds pas les deux mesures.
+
+### Gate visuel — accepté par l'opérateur
+
+Quatre états rendus en localhost authentifié, écran entier, 390 et 1280 px,
+**soumis avant tout commit** conformément au `CLAUDE.md §5.1`, puis
+acceptés. Un seul gabarit touché, **aucune feuille de style**.
+
+### Ce que ce merge ne fait PAS
+
+| | vérifié |
+|---|---|
+| filtre servi sur environnement **non déclaré** | **inerte** — garde dédiée |
+| 7 alias d'atlas en attente | non appliqués |
+| graphe de substitution | non élargi — `exercise_properties` à **69** |
+| `pattern_motor` | inchangé |
+| Bibliothèque · Accueil · Séance | non redessinés |
+| Gym Profiles | aucun — l'état bloqué mène à `/plan#declaration`, existant |
+| migration | **aucune** |
+| seconde politique de recommandation | **aucune** |
+
+### Registre et roadmap
+
+**Aucune mise à jour requise.** Le protocole appliqué à ce train fait le
+closeout en annexe du rapport de sprint : les closeouts `456519c` (#259),
+`337a4a0` (#261) et `fb0a66e` (#263) n'ont touché que leur propre rapport,
+vérifié sur leur diff.
+
+### Ce qui reste ouvert, et qui n'est pas de mon ressort
+
+1. **Aucune surface n'écrit `available_equipment_items`** — l'activation est
+   inerte en production tant que la gestion d'équipement n'existe pas. Le
+   `§8` interdisait de la créer dans cette tranche.
+2. **Les 39 identités `UNKNOWN`** font gagner le gabarit sans matériel dès
+   qu'aucun autre n'est *prouvé*. Les 7 alias vérifiés de `TRAIN A` en
+   fermeraient 7 d'un mot.
+3. **`NO_SERVABLE_CANDIDATE` restera inatteignable** tant qu'un gabarit
+   inconditionnellement servable existe — c'est une propriété voulue.
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
