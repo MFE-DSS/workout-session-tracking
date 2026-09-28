@@ -34,6 +34,7 @@ EXPECTED_GAPS = [
     "Cable cross-over (bas→haut)",
     "Crunch câble à genoux",
     "Decline crunch",
+    "Fente avant",
     "Good morning haltères",
     "Hack Squat machine",
     "Hanging knee raise",
@@ -45,6 +46,8 @@ EXPECTED_GAPS = [
     "Machine crunch",
     "Mollets debout machine",
     "Pallof press câble",
+    "Pompes",
+    "Pont fessier",
     "Pullover câble (bras tendus)",
     "Pullover câble (bras tendus, poulie haute)",
     "Pullover machine",
@@ -60,6 +63,7 @@ EXPECTED_GAPS = [
     "Sissy squat machine",
     "Skull crushers EZ-bar",
     "Squat Smith machine (pieds avancés)",
+    "Squat au poids du corps",
     "Tirage front câble (prise large)",
     "Upright row câble",
     "Upright row haltères",
@@ -88,10 +92,10 @@ def test_live_extraction_matches_committed_snapshot():
     assert snapshot["source_version"] == report["source_version"]
 
 
-def test_exactly_103_unique_canonical_names():
+def test_exactly_107_unique_canonical_names():
     report = run_audit()
-    assert report["canonical_count"] == 103
-    assert len(report["canonical_names"]) == 103
+    assert report["canonical_count"] == 107
+    assert len(report["canonical_names"]) == 107
 
 
 def test_exactly_68_prescribed_and_66_substitutes():
@@ -100,11 +104,15 @@ def test_exactly_68_prescribed_and_66_substitutes():
     # +1 template "full-body-morphotype-priority-v1" (specialization, 8 slots) reusing
     # existing EKB names only — the canonical set stays 103 (no new name), while the
     # prescribed/substitute category counts and the template/slot totals grow.
-    assert len(extraction["prescribed"]) == 68
-    assert len(extraction["substitutes"]) == 66
-    # 68 + 66 − 31 (overlap) = 103 — la somme est cohérente par construction
-    assert extraction["templates"] == 17
-    assert extraction["slots"] == 106
+    # `Sb_TRAIN_A_ENV_03` ajoute `no-equipment-full-body` : 4 créneaux, 4
+    # identités neuves, 2 substituts intra-gabarit. Le graphe de
+    # substitution EXISTANT est intouché — mesuré : N2 reste à 142 arcs et
+    # 52 identités, exactement comme avant.
+    assert len(extraction["prescribed"]) == 72
+    assert len(extraction["substitutes"]) == 68
+    # 72 + 68 − 33 (overlap) = 107 — la somme reste cohérente par construction
+    assert extraction["templates"] == 18
+    assert extraction["slots"] == 110
 
 
 def test_names_are_unique_sorted_and_byte_exact():
@@ -118,10 +126,12 @@ def test_names_are_unique_sorted_and_byte_exact():
 # ───────── couverture properties ─────────
 
 
-def test_gaps_are_exactly_the_52_known_missing_names():
+def test_gaps_are_exactly_the_40_known_missing_names():
     report = run_audit()
     assert report["gaps"] == EXPECTED_GAPS
-    assert len(report["gaps"]) == 36
+    # 36 → 40 : les quatre identités sans matériel restent des `gap`,
+    # le registre de substitution n'ayant pas été touché (§10).
+    assert len(report["gaps"]) == 40
     assert report["covered_count"] == 67
     assert report["properties_count"] == 69
 
@@ -180,7 +190,7 @@ def test_script_never_mutates_its_sources(capsys):
 def test_exit_code_zero_on_current_tree_and_output_readable(capsys):
     assert main([]) == 0
     out = capsys.readouterr().out
-    assert "RÉFÉRENTIEL CANONIQUE: 103 noms uniques" in out
+    assert "RÉFÉRENTIEL CANONIQUE: 107 noms uniques" in out
     assert "OK: toutes les invariances tiennent." in out
 
 

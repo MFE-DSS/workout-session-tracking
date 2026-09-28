@@ -107,12 +107,17 @@ def test_the_module_generation_trap_is_real_and_this_file_avoids_it(client):
     assert frais.equipment_items is not equipment_items
 
 
-def test_the_thirteen_machine_identities_stay_distinct():
+def test_the_machine_identities_stay_distinct():
     """§10 — deux machines ne partagent jamais une capacité ; sans quoi
-    déclarer une presse à cuisses rendrait faisable un hack squat."""
+    déclarer une presse à cuisses rendrait faisable un hack squat.
+
+    Quinze et non treize depuis la remesure : l'atlas se résout **aussi par
+    alias déclaré**, ce qui rend atteignables `assisted-pull-up` et
+    `lateral-raise-machine`. Le compte suit la donnée, pas l'inverse.
+    """
     machines = [i for i in equipment_items().values()
                 if any(c.startswith("machine_") for c in i.capabilities)]
-    assert len(machines) == 13
+    assert len(machines) == 15
     vues: set[str] = set()
     for item in machines:
         assert not (item.capabilities & vues), item.item_id
@@ -192,7 +197,32 @@ def test_face_pull_does_not_require_an_attachment():
 
 
 def test_an_uncurated_exercise_yields_none_not_an_empty_tuple():
-    assert requirements_for_exercise("Triceps pushdown corde") is None
+    assert requirements_for_exercise("Pallof press câble") is None
+
+
+def test_an_exercise_with_no_external_requirement_yields_an_empty_tuple():
+    """§8 — la modalité poids du corps assumée. `()` n'est pas `None` :
+    « rien à posséder » est une exigence établie, pas une ignorance."""
+    assert requirements_for_exercise("Relevés mollets debout") == ()
+
+
+def test_a_declared_alias_resolves_to_the_canonical_requirements():
+    """Le moteur de substitution lit `exercise_properties` et peut proposer
+    une orthographe absente des 103. Sans résolution d'alias, une exécution
+    parfaitement définie rendrait UNKNOWN pour une raison d'orthographe."""
+    canonique = requirements_for_exercise("Développé incliné haltères 30°")
+    assert canonique is not None
+    for alias in ("Incline DB Press 30°", "Incline Dumbbell Press"):
+        assert requirements_for_exercise(alias) == canonique
+
+
+def test_alias_resolution_reads_a_declared_map_not_a_resemblance():
+    from app.services.equipment_model import declared_aliases
+
+    assert set(declared_aliases()) == {
+        "Incline DB Press 30°", "Incline Dumbbell Press"}
+    assert requirements_for_exercise("Incline Chest Press Machine Thing") \
+        is None
 
 
 def test_an_exercise_absent_from_the_ekb_yields_none():
@@ -373,9 +403,18 @@ def _prescrits() -> list[str]:
     return sorted({e["name"] for t in split["templates"] for e in t["exercises"]})
 
 
-def test_the_curation_table_covers_exactly_the_prescribed_exercises():
-    assert sorted(curation_rows()) == _prescrits()
-    assert len(_prescrits()) == 68
+def test_the_curation_table_covers_the_whole_reachable_closure():
+    """§11 — la couverture se mesure sur ce qui est ATTEIGNABLE, pas sur les
+    seules prescriptions. Un substitut autorisé est un chemin d'exécution
+    servi : l'ignorer laisserait 37 identités sans exigence tout en les
+    proposant à l'utilisateur."""
+    lignes = curation_rows()
+    # 68 → 72 prescrits et 105 → 109 identités atteignables : le gabarit
+    # `no-equipment-full-body` ajoute quatre identités. Le graphe de
+    # substitution EXISTANT est intouché — mesuré, N2 reste à 142 arcs.
+    assert len(_prescrits()) == 72
+    assert set(_prescrits()) <= set(lignes)
+    assert len(lignes) == 109
 
 
 def test_every_curated_requirement_agrees_with_the_ekb():
@@ -425,7 +464,12 @@ def test_an_external_row_that_renames_the_movement_documents_the_mapping():
 #: DÉCLARATION, pas la couche de DÉCISION : elle ne rend aucun verdict de
 #: faisabilité et n'appelle ni `feasibility` ni `requirements_for_exercise`.
 #: Tout nouvel importeur doit se déclarer ici avec son motif.
-_IMPORTEURS_AUTORISES = {"training_preferences.py"}
+#:
+#: `environment_resolution` est la couche de RÉSOLUTION : elle rend des
+#: verdicts, mais **personne ne l'appelle** — une seconde garde vérifie
+#: qu'elle reste elle aussi sans consommateur tant que la dernière porte
+#: n'est pas ouverte.
+_IMPORTEURS_AUTORISES = {"training_preferences.py", "environment_resolution.py"}
 
 
 def test_only_the_declaration_layer_imports_the_equipment_model():
@@ -463,6 +507,25 @@ def test_the_declaration_layer_never_renders_a_feasibility_verdict():
         ):
             importes |= {a.name for a in noeud.names}
     assert importes <= {"capability_vocabulary", "equipment_item_vocabulary"}
+
+
+def test_the_resolution_layer_itself_has_no_consumer():
+    """§13, §18 — le résolveur est bâti, jamais branché. Le filtre servi
+    reste éteint tant que les neuf portes ne sont pas franchies."""
+    coupables = []
+    for chemin in sorted(_SERVICES.glob("*.py")):
+        if chemin.name == "environment_resolution.py":
+            continue
+        arbre = ast.parse(chemin.read_text(encoding="utf-8"))
+        for noeud in ast.walk(arbre):
+            cible = ""
+            if isinstance(noeud, ast.ImportFrom):
+                cible = noeud.module or ""
+            elif isinstance(noeud, ast.Import):
+                cible = " ".join(a.name for a in noeud.names)
+            if "environment_resolution" in cible:
+                coupables.append(chemin.name)
+    assert coupables == []
 
 
 def test_the_import_guard_can_actually_fail(tmp_path):

@@ -333,7 +333,10 @@ def test_core_carries_no_declared_mark_because_it_has_no_axis(client):
 
 def test_no_filter_is_applied_unless_asked(client):
     _declare(_uid(), sessions_per_week=4, focus_priorities=[AXIS])
-    assert len(_slugs(client.get(LIBRARY_URL).text)) == 13
+    # 13 → 14 : `no-equipment-full-body` entre en SÉANCES UTILITAIRES.
+    # Rendu réel soumis à l'opérateur (CLAUDE.md §5.1) — même grammaire
+    # de carte, aucun élément visuel neuf.
+    assert len(_slugs(client.get(LIBRARY_URL).text)) == 14
 
 
 def test_an_asked_filter_restricts_and_says_so(client):
@@ -343,7 +346,7 @@ def test_an_asked_filter_restricts_and_says_so(client):
     # « configuration » et non « séance » : le registre contient aussi des
     # programmes, et le décompte porte sur les deux.
     assert f"{len(_keys(body))} configuration" in body
-    assert "sur 13" in body, "le total disparu, l'utilisateur ne sait plus"
+    assert "sur 14" in body, "le total disparu, l'utilisateur ne sait plus"
     assert ZONE_LABEL in body
 
 
@@ -394,7 +397,7 @@ def test_an_unknown_zone_is_ignored_rather_than_rendered(client):
     Afficher « 0 résultat pour <valeur> » lui donnerait l'apparence d'une zone
     qui existe."""
     body = client.get(f"{LIBRARY_URL}?zone=pas_une_zone").text
-    assert len(_slugs(body)) == 13
+    assert len(_slugs(body)) == 14
     assert "pas_une_zone" not in body
 
 

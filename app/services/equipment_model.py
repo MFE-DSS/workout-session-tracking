@@ -139,8 +139,23 @@ def capabilities_for_items(item_ids) -> frozenset[str]:
 
 
 @lru_cache(maxsize=1)
+def _ekb_document() -> dict:
+    return json.loads(_EKB_PATH.read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=1)
 def _ekb_exercises() -> dict:
-    return json.loads(_EKB_PATH.read_text(encoding="utf-8"))["exercises"]
+    return _ekb_document()["exercises"]
+
+
+@lru_cache(maxsize=1)
+def _ekb_aliases() -> dict[str, str]:
+    """Orthographes non canoniques **déclarées par l'EKB**, vers leur nom.
+
+    Ce n'est pas un rapprochement approximatif : c'est une correspondance
+    que la donnée énonce.
+    """
+    return dict(_ekb_document().get("_aliases", {}))
 
 
 def requirements_for_exercise(name: str) -> tuple[str, ...] | None:
@@ -149,8 +164,18 @@ def requirements_for_exercise(name: str) -> tuple[str, ...] | None:
     `None` et `()` sont deux faits différents et le restent : `()` dit « cet
     exercice n'exige aucun matériel externe », `None` dit « on ne sait pas ».
     Un exercice absent de l'EKB rend `None` — l'absence n'affirme rien.
+
+    **Les alias déclarés sont résolus d'abord.** Le moteur de substitution
+    lit `exercise_properties`, qui porte deux orthographes absentes des 103
+    noms canoniques : il peut donc proposer un nom que l'EKB ne connaît pas.
+    Sans cette résolution, une exécution parfaitement définie rendrait
+    `UNKNOWN` pour une raison d'orthographe. Une garde a trouvé ce trou.
     """
     entry = _ekb_exercises().get(name)
+    if entry is None:
+        canonical = _ekb_aliases().get(name)
+        if canonical is not None:
+            entry = _ekb_exercises().get(canonical)
     if entry is None:
         return None
     value = entry.get(EKB_REQUIREMENTS_KEY)
@@ -204,6 +229,11 @@ def missing_capabilities(
     return tuple(sorted(set(requirements or ()) - derived))
 
 
+def declared_aliases() -> dict[str, str]:
+    """Correspondances d'orthographe déclarées par l'EKB. Lecture seule."""
+    return dict(_ekb_aliases())
+
+
 __all__ = [
     "EKB_REQUIREMENTS_KEY",
     "FEASIBLE",
@@ -214,6 +244,7 @@ __all__ = [
     "capabilities_for_items",
     "capability_vocabulary",
     "curation_rows",
+    "declared_aliases",
     "equipment_item_vocabulary",
     "equipment_items",
     "feasibility",

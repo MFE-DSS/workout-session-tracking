@@ -1,34 +1,38 @@
 {
-  "version": "Sb_TRAIN_A_ENV_01",
+  "version": "Sb_TRAIN_A_ENV_02",
   "doc": "Registre versionné des objets d'équipement et des capacités internes. Les objets sont ce que l'utilisateur déclare ; les capacités sont l'affordance interne que le moteur consomme. Le vocabulaire des capacités n'est JAMAIS exposé.",
   "capabilities": {
     "ab_wheel": "une roulette abdominale",
+    "barbell": "une barre chargeable et ses disques",
     "barbell_ez": "une barre EZ (coudée) et ses disques",
-    "barbell_straight": "une barre droite et ses disques",
     "cable_anchor_adjustable": "un ancrage dont la hauteur se règle librement",
-    "cable_anchor_high": "un point d'ancrage de câble en position haute",
-    "cable_anchor_low": "un point d'ancrage de câble en position basse",
+    "cable_anchor_any": "un point d'ancrage de câble librement positionnable, hauteur indifférente. N'est PAS accordé par une station dédiée : on ne fait pas un écarté arrière sur un tirage vertical assis",
+    "cable_anchor_high": "un ancrage de câble en position haute",
+    "cable_anchor_low": "un ancrage de câble en position basse",
+    "cable_attachment_rope": "une corde à fixer sur une poulie",
+    "cable_attachment_straight_bar": "une barre droite à fixer sur une poulie",
     "cable_bilateral_independent": "deux colonnes de câble chargées indépendamment, utilisables ensemble",
-    "dip_station": "barres parallèles supportant le corps suspendu bras tendus",
     "dumbbells": "une paire d'haltères",
-    "flat_bench_support": "banc horizontal supportant un torse allongé",
-    "incline_bench_support": "banc dont le dossier s'incline",
+    "flat_bench_support": "un banc horizontal supportant un torse allongé",
+    "incline_bench_support": "un banc dont le dossier s'incline",
+    "machine_assisted_pull_up": "la fonction machine « Traction assistée »",
     "machine_butterfly": "la fonction machine « Butterfly / pec deck »",
     "machine_chest_press": "la fonction machine « Chest press »",
     "machine_chest_supported_row": "la fonction machine « Rowing à appui pectoral »",
     "machine_hack_squat": "la fonction machine « Hack squat »",
+    "machine_lateral_raise": "la fonction machine « Élévations latérales »",
     "machine_leg_extension": "la fonction machine « Leg extension »",
     "machine_leg_press": "la fonction machine « Presse à cuisses »",
     "machine_lying_leg_curl": "la fonction machine « Leg curl allongé »",
     "machine_pullover": "la fonction machine « Pullover machine »",
-    "machine_rear_delt_fly": "la fonction machine « Rear delt fly / pec deck inversé »",
+    "machine_rear_delt_fly": "la fonction machine « Pec fly / rear deltoid »",
     "machine_seated_calf_raise": "la fonction machine « Mollets assis »",
     "machine_seated_leg_curl": "la fonction machine « Leg curl assis »",
     "machine_shoulder_press": "la fonction machine « Shoulder press »",
     "machine_standing_calf_raise": "la fonction machine « Mollets debout »",
-    "overhead_hang_bar": "une barre haute permettant une suspension complète",
-    "pulldown_seated_station": "station de tirage vertical assis avec cale-cuisses dédiée",
-    "row_seated_station": "station de tirage horizontal assis avec cale-pieds dédiée",
+    "overhead_hang_support": "un appui haut permettant une suspension complète du corps — barre de traction, cadre, anneaux : l'affordance, pas un objet précis",
+    "pulldown_seated_station": "une station de tirage vertical assis avec cale-cuisses dédiée",
+    "row_seated_station": "une station de tirage horizontal assis avec cale-pieds dédiée",
     "seated_support": "une assise permettant d'exécuter le mouvement assis",
     "smith_rack": "un rack à barre guidée (Smith)"
   },
@@ -49,15 +53,23 @@
         "incline_bench_support",
         "seated_support"
       ],
-      "provenance": "ACE #25 Incline Chest Press — Equipment « Bench, Dumbbells »"
+      "provenance": "ACE #25 Incline Chest Press — « Bench, Dumbbells »"
+    },
+    {
+      "item_id": "assisted_pull_up",
+      "label": "Traction assistée",
+      "capabilities": [
+        "machine_assisted_pull_up"
+      ],
+      "provenance": "machine_atlas : slug `assisted-pull-up`"
     },
     {
       "item_id": "barbell_and_plates",
-      "label": "Barre droite et disques",
+      "label": "Barre et disques",
       "capabilities": [
-        "barbell_straight"
+        "barbell"
       ],
-      "provenance": "atlas/EKB: famille `barbell`"
+      "provenance": "EKB : famille `barbell`"
     },
     {
       "item_id": "butterfly_machine",
@@ -65,7 +77,23 @@
       "capabilities": [
         "machine_butterfly"
       ],
-      "provenance": "machine_atlas: slug `butterfly-machine`, modalité `machine`"
+      "provenance": "machine_atlas : slug `butterfly-machine`"
+    },
+    {
+      "item_id": "cable_rope",
+      "label": "Corde de poulie",
+      "capabilities": [
+        "cable_attachment_rope"
+      ],
+      "provenance": "accessoire, déclarable séparément (§4 : une station ne possède pas forcément tous les accessoires)"
+    },
+    {
+      "item_id": "cable_straight_bar",
+      "label": "Barre de poulie",
+      "capabilities": [
+        "cable_attachment_straight_bar"
+      ],
+      "provenance": "accessoire, déclarable séparément (§4)"
     },
     {
       "item_id": "chest_press_machine",
@@ -73,7 +101,7 @@
       "capabilities": [
         "machine_chest_press"
       ],
-      "provenance": "machine_atlas: slug `chest-press-machine`, modalité `machine`"
+      "provenance": "machine_atlas : slug `chest-press-machine`"
     },
     {
       "item_id": "chest_supported_row",
@@ -81,26 +109,21 @@
       "capabilities": [
         "machine_chest_supported_row"
       ],
-      "provenance": "machine_atlas: slug `chest-supported-row`, modalité `machine`"
-    },
-    {
-      "item_id": "dip_station",
-      "label": "Barres à dips",
-      "capabilities": [
-        "dip_station"
-      ],
-      "provenance": "identité canonique AUREN (« Dips »)"
+      "provenance": "machine_atlas : slug `chest-supported-row`"
     },
     {
       "item_id": "dual_adjustable_pulley",
       "label": "Poulie double réglable",
       "capabilities": [
+        "cable_anchor_any",
         "cable_anchor_low",
         "cable_anchor_high",
         "cable_anchor_adjustable",
-        "cable_bilateral_independent"
+        "cable_bilateral_independent",
+        "cable_attachment_rope",
+        "cable_attachment_straight_bar"
       ],
-      "provenance": "Life Fitness Signature Series Dual Adjustable Pulley — 22 réglages de hauteur, deux colonnes de 390 lb indépendantes, accessoires corde/barre/poignées fournis"
+      "provenance": "Life Fitness Signature Series Dual Adjustable Pulley — 22 réglages de hauteur, deux colonnes de 390 lb indépendantes ; corde triceps, barre longue et poignées LIVRÉES avec l'appareil"
     },
     {
       "item_id": "dumbbells",
@@ -108,7 +131,7 @@
       "capabilities": [
         "dumbbells"
       ],
-      "provenance": "atlas: modalité `haltere`"
+      "provenance": "atlas : modalité `haltere`"
     },
     {
       "item_id": "ez_bar",
@@ -116,7 +139,7 @@
       "capabilities": [
         "barbell_ez"
       ],
-      "provenance": "identité canonique AUREN (« EZ-bar »)"
+      "provenance": "identité canonique AUREN (« EZ-bar »), toujours qualifiée"
     },
     {
       "item_id": "flat_bench",
@@ -133,7 +156,7 @@
       "capabilities": [
         "machine_hack_squat"
       ],
-      "provenance": "machine_atlas: slug `hack-squat-machine`, modalité `machine`"
+      "provenance": "machine_atlas : slug `hack-squat-machine`"
     },
     {
       "item_id": "lat_pulldown_station",
@@ -144,12 +167,20 @@
       "provenance": "Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb"
     },
     {
+      "item_id": "lateral_raise_machine",
+      "label": "Élévations latérales",
+      "capabilities": [
+        "machine_lateral_raise"
+      ],
+      "provenance": "machine_atlas : slug `lateral-raise-machine`"
+    },
+    {
       "item_id": "leg_extension",
       "label": "Leg extension",
       "capabilities": [
         "machine_leg_extension"
       ],
-      "provenance": "machine_atlas: slug `leg-extension`, modalité `machine`"
+      "provenance": "machine_atlas : slug `leg-extension`"
     },
     {
       "item_id": "leg_press",
@@ -157,11 +188,11 @@
       "capabilities": [
         "machine_leg_press"
       ],
-      "provenance": "machine_atlas: slug `leg-press`, modalité `machine`"
+      "provenance": "machine_atlas : slug `leg-press`"
     },
     {
       "item_id": "low_row_station",
-      "label": "Station de tirage horizontal assis",
+      "label": "Station de tirage horizontal",
       "capabilities": [
         "row_seated_station"
       ],
@@ -173,15 +204,15 @@
       "capabilities": [
         "machine_lying_leg_curl"
       ],
-      "provenance": "machine_atlas: slug `lying-leg-curl`, modalité `machine`"
+      "provenance": "machine_atlas : slug `lying-leg-curl`"
     },
     {
       "item_id": "pull_up_bar",
       "label": "Barre de traction",
       "capabilities": [
-        "overhead_hang_bar"
+        "overhead_hang_support"
       ],
-      "provenance": "identité canonique AUREN (« suspendu »)"
+      "provenance": "objet concret accordant l'affordance de suspension (§2)"
     },
     {
       "item_id": "pullover_machine",
@@ -189,15 +220,15 @@
       "capabilities": [
         "machine_pullover"
       ],
-      "provenance": "machine_atlas: slug `pullover-machine`, modalité `machine`"
+      "provenance": "machine_atlas : slug `pullover-machine`"
     },
     {
       "item_id": "rear_delt_fly_machine",
-      "label": "Rear delt fly / pec deck inversé",
+      "label": "Pec fly / rear deltoid",
       "capabilities": [
         "machine_rear_delt_fly"
       ],
-      "provenance": "machine_atlas: slug `rear-delt-fly-machine`, modalité `machine`"
+      "provenance": "machine_atlas : slug `rear-delt-fly-machine`"
     },
     {
       "item_id": "seated_calf_raise",
@@ -205,7 +236,7 @@
       "capabilities": [
         "machine_seated_calf_raise"
       ],
-      "provenance": "machine_atlas: slug `seated-calf-raise`, modalité `machine`"
+      "provenance": "machine_atlas : slug `seated-calf-raise`"
     },
     {
       "item_id": "seated_leg_curl",
@@ -213,7 +244,7 @@
       "capabilities": [
         "machine_seated_leg_curl"
       ],
-      "provenance": "machine_atlas: slug `seated-leg-curl`, modalité `machine`"
+      "provenance": "machine_atlas : slug `seated-leg-curl`"
     },
     {
       "item_id": "shoulder_press_machine",
@@ -221,17 +252,18 @@
       "capabilities": [
         "machine_shoulder_press"
       ],
-      "provenance": "machine_atlas: slug `shoulder-press-machine`, modalité `machine`"
+      "provenance": "machine_atlas : slug `shoulder-press-machine`"
     },
     {
       "item_id": "single_adjustable_pulley",
       "label": "Poulie réglable simple",
       "capabilities": [
+        "cable_anchor_any",
         "cable_anchor_low",
         "cable_anchor_high",
         "cable_anchor_adjustable"
       ],
-      "provenance": "Life Fitness Signature Series Dual Adjustable Pulley — 22 réglages de hauteur, deux colonnes de 390 lb indépendantes, accessoires corde/barre/poignées fournis — variante à une seule colonne"
+      "provenance": "Life Fitness Signature Series Dual Adjustable Pulley — 22 réglages de hauteur, deux colonnes de 390 lb indépendantes ; corde triceps, barre longue et poignées LIVRÉES avec l'appareil — variante à une colonne, accessoires déclarés séparément"
     },
     {
       "item_id": "smith_machine",
@@ -239,7 +271,7 @@
       "capabilities": [
         "smith_rack"
       ],
-      "provenance": "atlas: modalité `smith`, un seul appareil physique (§10)"
+      "provenance": "atlas : 4 slugs `smith`, aucun matériel propre déclaré"
     },
     {
       "item_id": "standing_calf_raise",
@@ -247,7 +279,7 @@
       "capabilities": [
         "machine_standing_calf_raise"
       ],
-      "provenance": "machine_atlas: slug `standing-calf-raise`, modalité `machine`"
+      "provenance": "machine_atlas : slug `standing-calf-raise`"
     }
   ]
 }

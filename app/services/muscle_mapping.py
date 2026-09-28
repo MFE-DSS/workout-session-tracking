@@ -106,6 +106,10 @@ _EXERCISE_PATTERNS: list[tuple[list[str], str, list[str]]] = [
     (["chest press", "presse pectorale", "butterfly", "écarté pec",
       "développé couché", "développé incliné", "incline smith",
       "dips pec", "dips pectora", "pec deck", "cable cross",
+      # `Sb_TRAIN_A_ENV_03` — contenu sans matériel. Vérifié : aucun autre
+      # nom du référentiel ne contient ces sous-chaînes, donc aucune zone
+      # existante ne bouge.
+      "pompe",
       "cross-over"], "pecs", ["triceps"]),
     (["shoulder press", "presse épaule", "presse à épaule",
       "élévation latérale", "lateral raise", "élévations latérales",
@@ -120,13 +124,14 @@ _EXERCISE_PATTERNS: list[tuple[list[str], str, list[str]]] = [
     (["leg curl", "rdl", "romanian", "hip thrust",
       "deadlift", "good morning", "adduction",
       "back extension", "hip extension", "hyperextension",
-      "glute bridge"], "posterior", []),
+      "glute bridge", "pont fessier"], "posterior", []),
     (["curl", "biceps"], "biceps", []),
     (["triceps", "skull", "skull crusher",
       "extension overhead", "pushdown", "kickback",
       "extension poulie"], "triceps", []),
     (["hack squat", "leg press", "leg extension",
       "squat", "leg ext", "knee extension",
+      "fente", "lunge",
       "reverse nordic", "sissy"], "quads", []),
     (["mollet", "calf", "relevé", "relevés mollet"], "calves", []),
     (["abdo", "crunch", "roulette", "ab wheel", "pallof",

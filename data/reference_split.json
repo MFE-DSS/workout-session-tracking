@@ -1,5 +1,5 @@
 {
-  "version": "2026-04-21.v14",
+  "version": "2026-09-28.v15",
   "title": "Programmes de séance",
   "global_notes": [
     "30 min d'escalier après chaque séance de musculation",
@@ -2842,6 +2842,114 @@
       ],
       "catalog_section": "specialization",
       "display_order": 23
+    },
+    {
+      "slug": "no-equipment-full-body",
+      "name": "Sans matériel — corps entier",
+      "kind": "strength",
+      "focus": "Pectoraux, Quadriceps, Chaîne postérieure",
+      "suggested_label": "Aucun matériel : le corps entier, là où vous êtes.",
+      "catalog_section": "utility",
+      "display_order": 12,
+      "exercises": [
+        {
+          "position": 1,
+          "code": "E1",
+          "name": "Pompes",
+          "set_scheme": "3x 8-15",
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 15
+            }
+          ],
+          "substitutes": [],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 2,
+          "code": "E2",
+          "name": "Squat au poids du corps",
+          "set_scheme": "3x 12-20",
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ],
+          "substitutes": [
+            "Fente avant"
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 3,
+          "code": "E3",
+          "name": "Fente avant",
+          "set_scheme": "3x 10-12",
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ],
+          "substitutes": [
+            "Squat au poids du corps"
+          ],
+          "machine_slug": null,
+          "machine_family": null
+        },
+        {
+          "position": 4,
+          "code": "E4",
+          "name": "Pont fessier",
+          "set_scheme": "3x 12-20",
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ],
+          "substitutes": [],
+          "machine_slug": null,
+          "machine_family": null
+        }
+      ],
+      "notes": "Aucun mouvement de tirage : aucun tirage au poids du corps sans barre n'a été inventé pour l'équilibre visuel (§17)."
     }
   ]
 }

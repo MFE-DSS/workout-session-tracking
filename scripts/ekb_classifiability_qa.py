@@ -34,9 +34,14 @@ BRIDGES_FILE = PROJECT_ROOT / "data" / "cross_pattern_substitutions.json"
 # Compteurs figés. Toute dérive = erreur.
 # Sb_MORPHO_POOL_COVERAGE_01 : +16 exercices morphotype (E4-E8) couverts → covered 51→67,
 # gap 52→36, dont 7 anciens trous noirs couverts → blackholes 19→12.
-EXPECTED_TOTAL = 103
+#: 103 → 107 avec `Sb_TRAIN_A_ENV_03` : quatre identités sans matériel,
+#: prescrites par le gabarit `no-equipment-full-body`. Le référentiel est
+#: DÉRIVÉ du catalogue, donc une identité non prescrite n'y entre pas.
+EXPECTED_TOTAL = 107
 EXPECTED_COVERED = 67
-EXPECTED_GAP = 36
+#: 36 → 40 : les quatre identités sans matériel restent des `gap`, le
+#: registre de substitution n'ayant pas été touché (§10).
+EXPECTED_GAP = 40
 EXPECTED_BLACKHOLES = 12
 
 # 11 zones fines réconciliées (RADAR_AXES) — vocabulaire fermé.
