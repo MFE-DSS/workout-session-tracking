@@ -278,7 +278,12 @@ Aucune couleur introduite. Les deux états réutilisent `today-home__cta` et
 
 * `check_scope` : `SHARED_CODE`. **Full sweep exécuté quand même** — le `§9`
   de la directive l'exige pour une décision servie, et ce dépôt a déjà payé
-  l'excès de confiance dans le classifieur
+  l'excès de confiance dans le classifieur. Verdict sur arbre gelé :
+  **`tous les lots sont verts.`** (356 fichiers, aucun sauté)
+* `check_spec_protocol` : `OK` — après l'avoir oublié une première fois,
+  voir `§10.4`
+* **CI de PR : 9/9 verte** · Sonar `OK` — 0 bug, 0 code smell,
+  0 vulnérabilité, duplication 0 %, couverture nouveau code **90,3 %**
 * `ruff` sur **tous** les fichiers Python du diff : propre. Deux `I001` de ma
   main corrigés — la classe exacte qui a rougi Sonar deux fois. Le `C901` de
   `session_detail` est **préexistant**, vérifié en remisant la tranche
