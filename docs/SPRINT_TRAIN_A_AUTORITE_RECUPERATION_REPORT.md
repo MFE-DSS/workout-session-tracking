@@ -1,6 +1,6 @@
 # `TRAIN A` — L'autorité canonique de récupération
 
-**Statut** : PR ouverte
+**Statut** : `MERGÉ` · PR #257 · merge `3476e1a`
 **Branche** : `sb/train-a-recovery-authority` sur canonique `bd02c4f`
 **Tier `check_scope`** : `SHARED_CODE` — **full sweep exécuté quand même**
 **Migration** : aucune. **`recommendation.py` n'est pas touché d'une ligne.**
@@ -182,5 +182,49 @@ vocabulaire actuel — roulette abdominale, relevé suspendu, barre EZ.
 
 `sessions_per_week`, `focus_priorities`, morphologie et retours par
 exercice restent hors du classement.
+
+---
+
+## 11. Closeout
+
+| | |
+|---|---|
+| **PR** | [#257](https://github.com/MFE-DSS/workout-session-tracking/pull/257) |
+| **Merge** | `3476e1ac9d69692c1a23b6b90c89da1bec02c59f` |
+| **Méthode** | `--merge` avec `--match-head-commit 2659d6e` — pas de squash, pas de `--admin`, pas de force |
+| **CI canonique** | run [`36399789712`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36399789712) — **7/7 verts** |
+| **Sonar** | `OK` — 0 code smell, 0 bug, couverture nouveau code **94,4 %** |
+| **Threads de revue** | 0 non résolu |
+| **Migration** | aucune |
+
+### Les neuf findings Sonar, et la cause qui s'est répétée
+
+Premier passage : `new_code_smells_severity = 15` pour un seuil de 14.
+Neuf MAJOR, **tous dans le fichier de gardes neuf** — huit
+`external_ruff:I001` et un `python:S9073`.
+
+**La cause racine est celle de `UI-CP7.5`, à l'identique** : `ruff` lancé
+sur les fichiers applicatifs que je venais de modifier, pas sur le
+**diff**. Le fichier de tests neuf n'a jamais été scanné en local. Le
+commit `4fc3535` avait déjà consigné la commande correcte plusieurs
+tranches plus tôt.
+
+Elle est désormais appliquée, avec en plus un scan `S9073` par AST :
+
+```bash
+ruff check $(git diff --name-only <base>...HEAD -- '*.py')
+```
+
+### Ce que la tranche laisse derrière elle
+
+| résidu | destination |
+|---|---|
+| granularité des capacités câble — une ou cinq | **arbitrage opérateur** |
+| 35 exercices sans source de prérequis | curation sourcée (`E2`) |
+| dimension `equipment_requirements` | `E3`, après gel du vocabulaire |
+| contenu de force sans matériel | `E4`, 5 mouvements ACE sourcés, 0 intégré |
+| activation du filtre dur | `G1`…`G8`, dernière porte |
+
+La piste RÉCUPÉRATION est **close**. La piste ENVIRONNEMENT continue.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
