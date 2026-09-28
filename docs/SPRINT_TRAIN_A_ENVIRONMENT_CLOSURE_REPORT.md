@@ -477,4 +477,72 @@ et il s'est reproduit exactement comme consigné.
 
 ---
 
+## 13. Closeout
+
+| | |
+|---|---|
+| **PR** | [#262](https://github.com/MFE-DSS/workout-session-tracking/pull/262) |
+| **Merge** | `d1595cb12e89bcdeb539b3748ec674ab8a920935` |
+| **Méthode** | `--merge` avec `--match-head-commit 3784faa` — pas de squash, pas d'`--admin`, pas de force |
+| **CI canonique** | run [`36445277190`](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/36445277190) — **7/7 verts** |
+| **Sonar (autorité de merge : le gate de PR)** | `OK` — **0 issue ouverte sur la PR**, 0 bug, 0 code smell, 0 vulnérabilité, duplication 0 %, couverture nouveau code **100 %** |
+| **Threads de revue** | 0, résolu ou non |
+| **Migration** | aucune |
+
+### Gate visuel — accepté par l'opérateur
+
+La seule conséquence visible est la Bibliothèque passant de **13 à 14
+lignes**. Elle a été soumise en rendu **réel**, authentifié, écran entier,
+aux deux points de rupture, avec un **avant/après** produit depuis deux
+worktrees distincts servis séparément.
+
+L'opérateur a **accepté**. Ce que la revue a mesuré plutôt qu'affirmé :
+
+| | avant `337a4a0` | après |
+|---|---|---|
+| lignes de Bibliothèque | 13 | **14** |
+| sections | 4 | **4, identiques** |
+| débordement horizontal à 390 px | 0 px | **0 px** |
+| textes rognés | 0 | **0** |
+| poignées sous 44 px | 0 / 13 | **0 / 14** |
+| aplats ambre | 1 | **1** |
+
+Diff structurel du DOM rendu, origine normalisée : **une ligne ajoutée,
+zéro retirée**, et les trois autres groupes **identiques octet pour
+octet**. Classe de ligne `loadout__row` de part et d'autre.
+
+`DESIGN_DECISIONS_UIV2_SURFACES.md` relu décision par décision :
+**Q5 · Q6 · Q7 · Q8 respectées**, Q1–Q4 et le reste non concernés,
+**aucune violée**.
+
+⚠ Un faux vert attrapé pendant ce gate : mon premier diff structurel
+comparait **deux pages de connexion** — un `username` de test à deux
+caractères contre `minlength="3"` — et rendait « identiques : True » sur du
+vide. Une preuve d'identité de page précède désormais toute comparaison.
+
+### Ce que ce merge ne fait PAS
+
+| | |
+|---|---|
+| filtre d'environnement servi | **ÉTEINT** — vérifié par AST au HEAD mergé : `environment_resolution` a **zéro importeur** |
+| les 7 alias vérifiés | **non appliqués** |
+| graphe de substitution | **non élargi** — `exercise_properties` reste à 69 entrées |
+| `pattern_motor` | **inchangé** |
+| Bibliothèque | **non redessinée** — aucun gabarit, aucune CSS au diff |
+| `G6` · `G8` | **documentés comme travail d'activation**, pas implémentés en silence |
+
+### Registre et roadmap
+
+**Aucune mise à jour requise.** Le protocole appliqué à ce train fait le
+closeout en **annexe du rapport de sprint** : les deux closeouts précédents
+— `456519c` (#259) et `337a4a0` (#261) — n'ont touché que leur rapport,
+aucun `SPEC_REGISTRY` ni `ROADMAP`. Vérifié sur le diff de chacun.
+
+### Portes restantes
+
+`G4` est franchie. **`G6` et `G8` restent ouvertes** et ne demandent plus de
+conception : un branchement sur `session_builder` et un écran soumis au
+`§5.1`. Elles sont le point de départ du sprint d'activation, qui n'est pas
+ouvert ici.
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
