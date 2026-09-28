@@ -121,6 +121,12 @@ def test_v3_n_est_reference_que_par_le_banc_et_la_composition():
         # `REC-CP5` — parité d'explication. Lit la trace de V3, ne touche
         # jamais son classement : une garde de ce module l'épingle.
         "tests/test_rec_cp5_parite_explication.py",
+        # `TRAIN A` — AJOUT DÉCLARÉ, et c'est le dispositif qui fonctionne :
+        # la garde a rougi, et il a fallu venir l'écrire ici. Ce module
+        # vérifie que la politique SERVIE lit le contrat canonique de
+        # récupération et non le ratio hérité. Il exerce V3 ; il ne le
+        # promeut pas et n'étend pas son classement.
+        "tests/test_train_a_autorite_recuperation.py",
     }
     coupables = []
     for f in list((racine / "app").rglob("*.py")) + \
@@ -320,30 +326,33 @@ def test_une_zone_a_plat_n_est_pas_compensee_par_une_zone_fraiche(client):
     Une moyenne laisserait un gabarit dont une zone est à plat passer pour prêt
     grâce à ses autres zones — ce qui est précisément le cas qu'un filtre de
     récupération existe pour attraper.
+
+    ⚠ `TRAIN A` — L'ENTRÉE A CHANGÉ, LA PROPRIÉTÉ NON.
+
+    Cette garde construisait un `Signals` et y posait des ratios 0–1. La
+    politique servie ne lit plus ce ratio : elle lit la DÉCISION canonique
+    (`non_limitant` / `partiel` / `limitant`). Laisser l'ancien montage
+    aurait rendu la garde muette — elle serait passée sur le repli neutre
+    sans jamais exercer la règle qu'elle protège.
+
+    La règle, elle, est identique au mot près : le PIRE sur les zones,
+    jamais la moyenne.
     """
-    from app.services.recommendation import Signals
     from app.services.recommendation_v3 import (
         INSUFFISANTE,
         RECUPEREE,
+        RecuperationCanonique,
         _bande_de_recuperation,
     )
-
-    def _s(dispo):
-        return Signals(
-            cold_start=False, availability_by_zone=dispo,
-            hours_since_last_by_zone={}, last_strength_session_zones=[],
-            recent_strength_zones_by_session=[], hard_sets_by_zone_recent={},
-            hard_sets_by_zone_24h={}, kinds_recent=[],
-            days_since_last_cardio=None, days_since_last_strength=None,
-            fatigue_score=0.0, soft_restart=False, median_hard_sets_14d=0.0,
-            hard_sets_14d_by_zone={}, observation_partielle=False,
-        )
+    from app.services.zone_recovery import LIMITANT, NON_LIMITANT
 
     zones = ("pecs", "triceps")
-    assert _bande_de_recuperation(
-        zones, _s({"pecs": 1.0, "triceps": 1.0})) == RECUPEREE
-    assert _bande_de_recuperation(
-        zones, _s({"pecs": 0.0, "triceps": 1.0})) == INSUFFISANTE, (
+    assert _bande_de_recuperation(zones, RecuperationCanonique(
+        decision={"pecs": NON_LIMITANT, "triceps": NON_LIMITANT},
+    )) == RECUPEREE
+    assert _bande_de_recuperation(zones, RecuperationCanonique(
+        decision={"pecs": LIMITANT, "triceps": NON_LIMITANT},
+    )) == INSUFFISANTE, (
         "une zone à plat a été compensée par une zone fraîche"
     )
 
