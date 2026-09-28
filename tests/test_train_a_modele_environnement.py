@@ -66,20 +66,45 @@ def test_every_item_carries_a_provenance():
 
 def test_an_item_declaring_an_unknown_capability_is_refused(monkeypatch):
     """Sans cette levée, une capacité mal orthographiée disparaîtrait en
-    silence et l'objet cesserait d'établir ce qu'il établit."""
+    silence et l'objet cesserait d'établir ce qu'il établit.
+
+    ⚠ Tout passe par **un seul** objet-module résolu ici, et non par les
+    noms importés en tête de fichier. La fixture `client` purge
+    `sys.modules["app.*"]`, donc dès qu'un test l'a utilisée il existe deux
+    générations du module : les noms importés en tête pointent la première,
+    et un `monkeypatch.setattr("app.services.equipment_model…")` ré-importe
+    et patche la seconde. La garde passait alors sans rien mesurer — verte
+    en local où l'ordre la plaçait avant, rouge en CI où il la plaçait
+    après.
+    """
+    import app.services.equipment_model as em
+
     faux = {
-        "capabilities": dict(capability_vocabulary()),
+        "capabilities": dict(em.capability_vocabulary()),
         "items": [{"item_id": "x", "label": "X",
                    "capabilities": ["capacite_inexistante"], "provenance": "p"}],
     }
-    monkeypatch.setattr(
-        "app.services.equipment_model._registry", lambda: faux)
-    equipment_items.cache_clear()
-    capability_vocabulary.cache_clear()
-    with pytest.raises(EquipmentModelError):
-        equipment_items()
-    equipment_items.cache_clear()
-    capability_vocabulary.cache_clear()
+    monkeypatch.setattr(em, "_registry", lambda: faux)
+    em.equipment_items.cache_clear()
+    em.capability_vocabulary.cache_clear()
+    try:
+        with pytest.raises(em.EquipmentModelError):
+            em.equipment_items()
+    finally:
+        em.equipment_items.cache_clear()
+        em.capability_vocabulary.cache_clear()
+
+
+def test_the_module_generation_trap_is_real_and_this_file_avoids_it(client):
+    """La garde ci-dessus ne vaut que si la prémisse tient. On la mesure.
+
+    Après un test qui utilise `client`, le module fraîchement résolu n'est
+    plus celui dont ce fichier a importé les noms. Un test qui l'ignore
+    patche un objet que personne n'appelle.
+    """
+    import app.services.equipment_model as frais
+
+    assert frais.equipment_items is not equipment_items
 
 
 def test_the_thirteen_machine_identities_stay_distinct():

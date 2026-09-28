@@ -311,7 +311,34 @@ faisable.
   permission, le banc fabriqué par les haltères, le banc du hip thrust rendu
   obligatoire — toutes attrapées, dont la liaison provenance ↔ contrat servi
 * 237 tests ciblés verts sur les contrats touchés
-* sweep local complet — verdict reporté au closeout
+* **sweep local complet : `tous les lots sont verts.`** — 353 fichiers, aucun
+  sauté, pic 1 472 Mo
+
+### Une garde verte qui ne mesurait rien — attrapée par la CI
+
+Le sweep local était vert et la CI a rendu **un** rouge, dans mon propre
+fichier neuf : `test_an_item_declaring_an_unknown_capability_is_refused`,
+`DID NOT RAISE`.
+
+La cause est un défaut déjà consigné dans ce dépôt, sous une forme nouvelle.
+La fixture `client` **purge `sys.modules["app.*"]**`. Les noms importés en
+tête d'un fichier de tests sont liés à la **première** génération du module ;
+dès qu'un test a utilisé `client`, un
+`monkeypatch.setattr("app.services.equipment_model…")` ré-importe et patche
+la **seconde**. La garde appelait alors une fonction que personne n'avait
+patchée, ne levait rien, et passait.
+
+Pourquoi verte en local : la collecte importe tout, puis les tests s'exécutent
+dans l'ordre du fichier, et cette garde y précède tous les tests à `client`.
+En CI, le découpage en shards la plaçait après. **Ce n'est pas un aléa de
+parallélisme : c'est un ordre, et c'est la CI qui avait raison.**
+
+Corrigé en résolvant **un seul** objet-module dans le test et en ne passant
+que par lui. Le défaut d'origine a été **replanté tel quel** dans un fichier
+jetable pour vérifier qu'il reproduit le message exact de la CI — il le
+reproduit. Et une garde neuve mesure désormais la **prémisse** :
+après un test à `client`, le module fraîchement résolu n'est plus celui dont
+le fichier a importé les noms.
 
 ---
 
