@@ -1,0 +1,671 @@
+{
+  "version": "Sb_TRAIN_A_ENV_01",
+  "doc": "Provenance des exigences d'équipement des 68 exercices prescrits par les 17 gabarits servis. Une ligne par exercice. `requirements: null` = INCONNU, jamais « aucune exigence ».",
+  "evidence_levels": {
+    "ATLAS": "appareil désigné par machine_atlas.json (interne)",
+    "EXTERNE": "source externe autoritaire (ACE, manufacturier)",
+    "IDENTITE_AUREN": "implément ou hauteur ÉCRIT dans le nom canonique AUREN et concordant avec equipment_family ; ni source externe ni inférence par ressemblance de noms"
+  },
+  "rows": {
+    "Adduction assise": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "famille `machine` sans slug d'atlas : l'identité de l'appareil n'est pas résolue et aucune source externe exacte n'a été trouvée",
+      "identity_correspondence": ""
+    },
+    "Butterfly pec machine": {
+      "requirements": [
+        "machine_butterfly"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#butterfly-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Cable cross-over (bas→haut)": {
+      "requirements": [
+        "cable_anchor_adjustable",
+        "cable_bilateral_independent"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#cable-crossover",
+      "note": "`laterality: bilateral` + `load_semantics: per_side` : deux colonnes chargées en même temps ; les trois variantes couvrent trois hauteurs, donc l'ancrage doit être réglable",
+      "identity_correspondence": ""
+    },
+    "Chest Press machine": {
+      "requirements": [
+        "machine_chest_press"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#chest-press-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Crunch câble à genoux": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur d'ancrage non écrite et non sourcée",
+      "identity_correspondence": ""
+    },
+    "Curl EZ-bar debout": {
+      "requirements": [
+        "barbell_ez"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« EZ-bar », famille `barbell`)",
+      "note": "debout : aucun support",
+      "identity_correspondence": ""
+    },
+    "Curl incliné haltères": {
+      "requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« incliné » / « banc 45° », famille `dumbbell`)",
+      "note": "le dossier incliné EST le mouvement : sans lui l'exercice n'est plus lui-même. ⚠ non corroboré par une source externe exacte — ACE « Seated Biceps Curl » est un AUTRE mouvement et n'est pas assimilé",
+      "identity_correspondence": ""
+    },
+    "Curl incliné haltères (banc 45°)": {
+      "requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« incliné » / « banc 45° », famille `dumbbell`)",
+      "note": "le dossier incliné EST le mouvement : sans lui l'exercice n'est plus lui-même. ⚠ non corroboré par une source externe exacte — ACE « Seated Biceps Curl » est un AUTRE mouvement et n'est pas assimilé",
+      "identity_correspondence": ""
+    },
+    "Curl marteau câble (corde)": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur d'ancrage non écrite et non sourcée",
+      "identity_correspondence": ""
+    },
+    "Curl marteau haltères": {
+      "requirements": [
+        "dumbbells"
+      ],
+      "evidence_level": "EXTERNE",
+      "evidence_kind": "REQUIRED",
+      "source": "ACE Exercise Library #10 Hammer Curl — Equipment « Dumbbells » — https://www.acefitness.org/resources/everyone/exercise-library/10/hammer-curl/",
+      "note": "debout, aucun support",
+      "identity_correspondence": "ACE « Hammer Curl » ↔ AUREN « Curl marteau haltères » — même mouvement, prise neutre, haltères"
+    },
+    "Curl poulie basse": {
+      "requirements": [
+        "cable_anchor_low"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« poulie basse », famille `cable`)",
+      "note": "la HAUTEUR d'ancrage est écrite dans le nom canonique",
+      "identity_correspondence": ""
+    },
+    "Curl poulie basse (barre)": {
+      "requirements": [
+        "cable_anchor_low"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« poulie basse », famille `cable`)",
+      "note": "la HAUTEUR d'ancrage est écrite dans le nom canonique",
+      "identity_correspondence": ""
+    },
+    "Dips pectoraux (buste penché)": {
+      "requirements": [
+        "dip_station"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« Dips », famille `bodyweight`)",
+      "note": "⚠ aucune source externe exacte trouvée ; ACE n'a pas d'entrée dips pectoraux aux barres parallèles",
+      "identity_correspondence": ""
+    },
+    "Développé couché haltères": {
+      "requirements": [
+        "dumbbells",
+        "flat_bench_support"
+      ],
+      "evidence_level": "EXTERNE",
+      "evidence_kind": "REQUIRED",
+      "source": "ACE Exercise Library #19 Chest Press — Equipment « Bench, Dumbbells » — https://www.acefitness.org/resources/everyone/exercise-library/19/chest-press/",
+      "note": "banc REQUIRED : l'exécution ACE est allongée sur banc plat",
+      "identity_correspondence": "ACE « Chest Press (Dumbbells) » ↔ AUREN « Développé couché haltères » — même exécution (décubitus dorsal, banc plat, deux haltères)"
+    },
+    "Développé incliné haltères 30°": {
+      "requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ],
+      "evidence_level": "EXTERNE",
+      "evidence_kind": "REQUIRED",
+      "source": "ACE Exercise Library #25 Incline Chest Press — Equipment « Bench, Dumbbells » — https://www.acefitness.org/resources/everyone/exercise-library/25/incline-chest-press/",
+      "note": "banc inclinable REQUIRED",
+      "identity_correspondence": "ACE « Incline Chest Press » (45–60°) ↔ AUREN « Développé incliné haltères 30° » — l'ANGLE diffère, l'exigence de banc inclinable non. L'EKB porte déjà l'alias « Incline Dumbbell Press » vers ce nom"
+    },
+    "Extension overhead câble (corde)": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "s'exécute d'une poulie basse OU haute selon les références ; aucune source autoritaire exacte pour trancher",
+      "identity_correspondence": ""
+    },
+    "Face pull câble": {
+      "requirements": [
+        "cable_anchor_high"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#face-pull-cable",
+      "note": "variantes `corde` et `barre en V` : deux accessoires ALTERNATIFS, donc aucun des deux n'entre dans une exigence conjonctive",
+      "identity_correspondence": ""
+    },
+    "Face pull câble (corde)": {
+      "requirements": [
+        "cable_anchor_high"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#face-pull-cable",
+      "note": "variantes `corde` et `barre en V` : deux accessoires ALTERNATIFS, donc aucun des deux n'entre dans une exigence conjonctive",
+      "identity_correspondence": ""
+    },
+    "Hack Squat machine": {
+      "requirements": [
+        "machine_hack_squat"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#hack-squat-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Hip thrust Smith": {
+      "requirements": [
+        "smith_rack"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#hip-thrust-smith",
+      "note": "variantes `dos banc` ET `sol` : le banc est une ALTERNATIVE documentée, donc PAS une exigence — c'est le cas nommé au §5",
+      "identity_correspondence": ""
+    },
+    "Hip thrust Smith machine": {
+      "requirements": [
+        "smith_rack"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#hip-thrust-smith",
+      "note": "variantes `dos banc` ET `sol` : le banc est une ALTERNATIVE documentée, donc PAS une exigence — c'est le cas nommé au §5",
+      "identity_correspondence": ""
+    },
+    "Incline Smith Press": {
+      "requirements": [
+        "smith_rack",
+        "incline_bench_support"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#incline-smith-press",
+      "note": "les deux variantes de l'atlas sont `banc 30°` et `banc 45°`, et la consigne impose un angle de banc : aucune exécution sans banc n'est documentée, donc le banc est REQUIRED",
+      "identity_correspondence": ""
+    },
+    "Kickback câble": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur d'ancrage non écrite et non sourcée",
+      "identity_correspondence": ""
+    },
+    "Leg Press (pieds bas)": {
+      "requirements": [
+        "machine_leg_press"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#leg-press",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Leg Press (pieds bas, serrés)": {
+      "requirements": [
+        "machine_leg_press"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#leg-press",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Leg Press (pieds hauts, écartés)": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "DÉFAUT DE DÉPÔT : `equipment_family` ET `machine_slug` sont tous deux NULL alors que « Leg Press (pieds bas) » porte le slug `leg-press`. Très probablement le même appareil — mais l'affirmer serait inférer par le nom. Correction d'EKB à arbitrer",
+      "identity_correspondence": ""
+    },
+    "Leg curls allongé": {
+      "requirements": [
+        "machine_lying_leg_curl"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#lying-leg-curl",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Leg curls assis": {
+      "requirements": [
+        "machine_seated_leg_curl"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#seated-leg-curl",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Leg extensions assises": {
+      "requirements": [
+        "machine_leg_extension"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#leg-extension",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Machine shoulder press": {
+      "requirements": [
+        "machine_shoulder_press"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#shoulder-press-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Mollets assis machine": {
+      "requirements": [
+        "machine_seated_calf_raise"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#seated-calf-raise",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Neutral Grip Shoulder Press machine": {
+      "requirements": [
+        "machine_shoulder_press"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#shoulder-press-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Pallof press câble": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "ancrage à hauteur de torse — ni « haut » ni « bas » dans le vocabulaire actuel ; aucune source exacte",
+      "identity_correspondence": ""
+    },
+    "Pullover câble (bras tendus)": {
+      "requirements": [
+        "machine_pullover"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#pullover-machine",
+      "note": "⚠ divergence NOM/CHAMPS consignée : le nom canonique dit « câble » et « poulie haute », mais `equipment_family` ET la modalité de l'atlas disent tous deux `machine`. Deux champs structurés concordants l'emportent sur un nom libre — trancher dans l'autre sens serait exactement l'inférence par le nom que le §12 interdit. La divergence reste à arbitrer côté nommage, pas côté exigence",
+      "identity_correspondence": ""
+    },
+    "Pullover câble (bras tendus, poulie haute)": {
+      "requirements": [
+        "machine_pullover"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#pullover-machine",
+      "note": "⚠ divergence NOM/CHAMPS consignée : le nom canonique dit « câble » et « poulie haute », mais `equipment_family` ET la modalité de l'atlas disent tous deux `machine`. Deux champs structurés concordants l'emportent sur un nom libre — trancher dans l'autre sens serait exactement l'inférence par le nom que le §12 interdit. La divergence reste à arbitrer côté nommage, pas côté exigence",
+      "identity_correspondence": ""
+    },
+    "Pullover machine": {
+      "requirements": [
+        "machine_pullover"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#pullover-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Rear delt fly machine": {
+      "requirements": [
+        "machine_rear_delt_fly"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#rear-delt-fly-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Rear delt fly machine (pec deck inversé)": {
+      "requirements": [
+        "machine_rear_delt_fly"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#rear-delt-fly-machine",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Relevé de jambes suspendu": {
+      "requirements": [
+        "overhead_hang_bar"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« suspendu »)",
+      "note": "⚠ la chaise romaine est une exécution alternative non modélisée ici",
+      "identity_correspondence": ""
+    },
+    "Relevés mollets debout": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "CONFLIT DE CHAMPS : `equipment_family = bodyweight` mais `machine_slug = standing-calf-raise`, dont l'atlas donne `equipment: machine`. Deux déclarations structurées se contredisent — c'est le SEUL désaccord famille/modalité des 39 exercices à slug, mesuré. Sa sœur « Relevés mollets debout machine » porte le même slug avec `family = machine` et reste, elle, résolue. Arbitrage requis",
+      "identity_correspondence": ""
+    },
+    "Relevés mollets debout machine": {
+      "requirements": [
+        "machine_standing_calf_raise"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#standing-calf-raise",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Reverse fly machine": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "DÉFAUT DE DÉPÔT : famille `machine`, slug NULL, alors que « Rear delt fly machine » porte `rear-delt-fly-machine`. Correspondance à arbitrer",
+      "identity_correspondence": ""
+    },
+    "Romanian Deadlift barre": {
+      "requirements": [
+        "barbell_straight"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« barre », famille `barbell`)",
+      "note": "aucun rack établi comme obligatoire — même raisonnement qu'au §8 pour la version haltères",
+      "identity_correspondence": ""
+    },
+    "Romanian Deadlift haltères": {
+      "requirements": [
+        "dumbbells"
+      ],
+      "evidence_level": "EXTERNE",
+      "evidence_kind": "REQUIRED",
+      "source": "arbitrage opérateur §8 — « dumbbells required ; rack/support is not established as mandatory »",
+      "note": "aucun support n'est établi comme obligatoire ; ne rien ajouter",
+      "identity_correspondence": ""
+    },
+    "Roulette abdominale": {
+      "requirements": [
+        "ab_wheel"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« roulette abdominale »)",
+      "note": "l'implément est l'exercice",
+      "identity_correspondence": ""
+    },
+    "Roulette abdominale (ab wheel rollout)": {
+      "requirements": [
+        "ab_wheel"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« roulette abdominale »)",
+      "note": "l'implément est l'exercice",
+      "identity_correspondence": ""
+    },
+    "Rowing chest-supported": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "DÉFAUT DE DÉPÔT : famille `machine`, slug NULL, alors que « Rowing machine chest-supported » porte `chest-supported-row`. À arbitrer",
+      "identity_correspondence": ""
+    },
+    "Rowing câble assis prise large": {
+      "requirements": [
+        "row_seated_station"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#seated-cable-row ; Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb",
+      "note": "station dédiée, pas une poulie basse quelconque",
+      "identity_correspondence": ""
+    },
+    "Rowing câble assis prise neutre": {
+      "requirements": [
+        "row_seated_station"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#seated-cable-row ; Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb",
+      "note": "station dédiée, pas une poulie basse quelconque",
+      "identity_correspondence": ""
+    },
+    "Rowing câble assis prise serrée": {
+      "requirements": [
+        "row_seated_station"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#seated-cable-row ; Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb",
+      "note": "station dédiée, pas une poulie basse quelconque",
+      "identity_correspondence": ""
+    },
+    "Rowing haltère un bras (banc)": {
+      "requirements": [
+        "dumbbells",
+        "flat_bench_support"
+      ],
+      "evidence_level": "EXTERNE",
+      "evidence_kind": "REQUIRED",
+      "source": "ACE Exercise Library #126 Single Arm Row — Equipment « Bench, Dumbbells » — https://www.acefitness.org/resources/everyone/exercise-library/126/single-arm-row/",
+      "note": "genou et main en appui sur le banc : support REQUIRED",
+      "identity_correspondence": "ACE « Single Arm Row » ↔ AUREN « Rowing haltère un bras (banc) » — exécution identique, le nom AUREN nomme déjà le banc"
+    },
+    "Rowing machine chest-supported": {
+      "requirements": [
+        "machine_chest_supported_row"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#chest-supported-row",
+      "note": "l'appareil EST l'exigence ; aucun support supplémentaire dérivé",
+      "identity_correspondence": ""
+    },
+    "Shrugs haltères": {
+      "requirements": [
+        "dumbbells"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« haltères »)",
+      "note": "debout : aucun support",
+      "identity_correspondence": ""
+    },
+    "Skull crushers EZ-bar": {
+      "requirements": [
+        "barbell_ez",
+        "flat_bench_support"
+      ],
+      "evidence_level": "EXTERNE",
+      "evidence_kind": "REQUIRED",
+      "source": "ACE Exercise Library #36 Lying Barbell Triceps Extensions — Equipment « Barbell, Bench » — https://www.acefitness.org/resources/everyone/exercise-library/36/lying-barbell-triceps-extensions/",
+      "note": "le banc vient d'ACE (REQUIRED) ; la barre EZ vient de l'identité AUREN, ACE documentant une barre droite",
+      "identity_correspondence": "ACE « Lying Barbell Triceps Extensions » ↔ AUREN « Skull crushers EZ-bar » — même mouvement allongé ; l'IMPLÉMENT diffère (droite vs EZ), l'exigence de banc non"
+    },
+    "Squat Smith machine (pieds avancés)": {
+      "requirements": [
+        "smith_rack"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#smith-squat",
+      "note": "aucun support additionnel documenté",
+      "identity_correspondence": ""
+    },
+    "Straight-arm pulldown câble": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur haute très probable mais non écrite et non sourcée",
+      "identity_correspondence": ""
+    },
+    "Tirage front câble (prise large)": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "CONFLIT D'IDENTITÉ : très proche de « Tirage poulie haute prise large » (slug `lat-pulldown`) mais l'EKB ne porte ni slug ni alias. Les assimiler serait exactement ce que le §7 interdit",
+      "identity_correspondence": ""
+    },
+    "Tirage poulie haute prise large": {
+      "requirements": [
+        "pulldown_seated_station"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#lat-pulldown ; Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb",
+      "note": "station dédiée, pas une poulie haute quelconque",
+      "identity_correspondence": ""
+    },
+    "Tirage poulie haute prise neutre": {
+      "requirements": [
+        "pulldown_seated_station"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#lat-pulldown ; Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb",
+      "note": "station dédiée, pas une poulie haute quelconque",
+      "identity_correspondence": ""
+    },
+    "Tirage vertical unilatéral câble": {
+      "requirements": [
+        "pulldown_seated_station"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#lat-pulldown ; Life Fitness Signature Series MJ4 Multi-Jungle — le « Dual Pulley Lat Pulldown » et le « Single Pulley Low Row » y sont deux stations sélectorisées distinctes, chacune avec sa propre colonne de 260 lb",
+      "note": "⚠ divergence constatée : l'atlas donne `laterality: bilateral` pour ce slug alors que l'exercice est unilatéral. L'exigence de station n'en dépend pas, mais la divergence est consignée",
+      "identity_correspondence": ""
+    },
+    "Triceps extension poulie haute (corde)": {
+      "requirements": [
+        "cable_anchor_high"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« poulie haute », famille `cable`)",
+      "note": "la hauteur est écrite ; la corde est un accessoire standard de toute colonne, pas un objet d'équipement distinct",
+      "identity_correspondence": ""
+    },
+    "Triceps pushdown barre": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur d'ancrage non écrite et non sourcée",
+      "identity_correspondence": ""
+    },
+    "Triceps pushdown corde": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur d'ancrage non écrite et non sourcée",
+      "identity_correspondence": ""
+    },
+    "Écarté arrière d'épaule câble": {
+      "requirements": null,
+      "evidence_level": null,
+      "evidence_kind": "INSUFFICIENT",
+      "source": "",
+      "note": "hauteur d'ancrage et nombre de colonnes non écrits et non sourcés",
+      "identity_correspondence": ""
+    },
+    "Écarté pec aux câbles (incliné bas→haut)": {
+      "requirements": [
+        "cable_anchor_adjustable",
+        "cable_bilateral_independent"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#cable-crossover",
+      "note": "`laterality: bilateral` + `load_semantics: per_side` : deux colonnes chargées en même temps ; les trois variantes couvrent trois hauteurs, donc l'ancrage doit être réglable",
+      "identity_correspondence": ""
+    },
+    "Élévations latérales câble": {
+      "requirements": [
+        "cable_anchor_low"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#cable-lateral-raise",
+      "note": "`laterality: unilateral` : une seule colonne ; les deux variantes sont des positions de corps, pas des hauteurs d'ancrage",
+      "identity_correspondence": ""
+    },
+    "Élévations latérales câble (derrière le dos)": {
+      "requirements": [
+        "cable_anchor_low"
+      ],
+      "evidence_level": "ATLAS",
+      "evidence_kind": "REQUIRED",
+      "source": "machine_atlas.json#cable-lateral-raise",
+      "note": "`laterality: unilateral` : une seule colonne ; les deux variantes sont des positions de corps, pas des hauteurs d'ancrage",
+      "identity_correspondence": ""
+    },
+    "Élévations latérales haltères assis": {
+      "requirements": [
+        "dumbbells",
+        "seated_support"
+      ],
+      "evidence_level": "IDENTITE_AUREN",
+      "evidence_kind": "REQUIRED",
+      "source": "identité canonique AUREN + `equipment_family` concordante (« assis », famille `dumbbell`)",
+      "note": "⚠ `seated_support` et non `flat_bench_support` : une assise suffit",
+      "identity_correspondence": ""
+    }
+  }
+}

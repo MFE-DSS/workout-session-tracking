@@ -129,7 +129,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_butterfly"
+      ]
     },
     "Cable cross-over (bas→haut)": {
       "canonical_name": "Cable cross-over (bas→haut)",
@@ -145,7 +148,11 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_adjustable",
+        "cable_bilateral_independent"
+      ]
     },
     "Calf press leg press": {
       "canonical_name": "Calf press leg press",
@@ -177,7 +184,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_chest_press"
+      ]
     },
     "Crunch câble à genoux": {
       "canonical_name": "Crunch câble à genoux",
@@ -209,7 +219,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "barbell_ez"
+      ]
     },
     "Curl câble basse": {
       "canonical_name": "Curl câble basse",
@@ -257,7 +270,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ]
     },
     "Curl incliné haltères (banc 45°)": {
       "canonical_name": "Curl incliné haltères (banc 45°)",
@@ -273,7 +290,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ]
     },
     "Curl marteau câble (corde)": {
       "canonical_name": "Curl marteau câble (corde)",
@@ -321,7 +342,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells"
+      ]
     },
     "Curl poulie basse": {
       "canonical_name": "Curl poulie basse",
@@ -337,7 +361,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_low"
+      ]
     },
     "Curl poulie basse (barre)": {
       "canonical_name": "Curl poulie basse (barre)",
@@ -353,7 +380,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_low"
+      ]
     },
     "Curl prise neutre câble": {
       "canonical_name": "Curl prise neutre câble",
@@ -401,7 +431,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dip_station"
+      ]
     },
     "Développé couché haltères": {
       "canonical_name": "Développé couché haltères",
@@ -417,7 +450,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "flat_bench_support"
+      ]
     },
     "Développé incliné haltères 30°": {
       "canonical_name": "Développé incliné haltères 30°",
@@ -433,7 +470,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ]
     },
     "Extension overhead câble (corde)": {
       "canonical_name": "Extension overhead câble (corde)",
@@ -465,7 +506,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_high"
+      ]
     },
     "Face pull câble (corde)": {
       "canonical_name": "Face pull câble (corde)",
@@ -481,7 +525,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_high"
+      ]
     },
     "Good morning haltères": {
       "canonical_name": "Good morning haltères",
@@ -513,7 +560,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_hack_squat"
+      ]
     },
     "Hanging knee raise": {
       "canonical_name": "Hanging knee raise",
@@ -545,7 +595,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "smith_rack"
+      ]
     },
     "Hip thrust Smith machine": {
       "canonical_name": "Hip thrust Smith machine",
@@ -561,7 +614,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "smith_rack"
+      ]
     },
     "Hip thrust haltères": {
       "canonical_name": "Hip thrust haltères",
@@ -593,7 +649,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "incline_bench_support",
+        "smith_rack"
+      ]
     },
     "Kickback câble": {
       "canonical_name": "Kickback câble",
@@ -657,7 +717,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_leg_press"
+      ]
     },
     "Leg Press (pieds bas, serrés)": {
       "canonical_name": "Leg Press (pieds bas, serrés)",
@@ -673,7 +736,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_leg_press"
+      ]
     },
     "Leg Press (pieds hauts, écartés)": {
       "canonical_name": "Leg Press (pieds hauts, écartés)",
@@ -705,7 +771,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_lying_leg_curl"
+      ]
     },
     "Leg curls assis": {
       "canonical_name": "Leg curls assis",
@@ -721,7 +790,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_seated_leg_curl"
+      ]
     },
     "Leg extension câble unilatéral": {
       "canonical_name": "Leg extension câble unilatéral",
@@ -753,7 +825,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_leg_extension"
+      ]
     },
     "Machine crunch": {
       "canonical_name": "Machine crunch",
@@ -785,7 +860,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_shoulder_press"
+      ]
     },
     "Mollets assis machine": {
       "canonical_name": "Mollets assis machine",
@@ -801,7 +879,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_seated_calf_raise"
+      ]
     },
     "Mollets debout machine": {
       "canonical_name": "Mollets debout machine",
@@ -833,7 +914,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_shoulder_press"
+      ]
     },
     "Pallof press câble": {
       "canonical_name": "Pallof press câble",
@@ -881,7 +965,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_pullover"
+      ]
     },
     "Pullover câble (bras tendus, poulie haute)": {
       "canonical_name": "Pullover câble (bras tendus, poulie haute)",
@@ -897,7 +984,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_pullover"
+      ]
     },
     "Pullover machine": {
       "canonical_name": "Pullover machine",
@@ -913,7 +1003,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_pullover"
+      ]
     },
     "Pushdown corde": {
       "canonical_name": "Pushdown corde",
@@ -945,7 +1038,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_rear_delt_fly"
+      ]
     },
     "Rear delt fly machine (pec deck inversé)": {
       "canonical_name": "Rear delt fly machine (pec deck inversé)",
@@ -961,7 +1057,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_rear_delt_fly"
+      ]
     },
     "Relevé de jambes suspendu": {
       "canonical_name": "Relevé de jambes suspendu",
@@ -977,7 +1076,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "overhead_hang_bar"
+      ]
     },
     "Relevés mollets debout": {
       "canonical_name": "Relevés mollets debout",
@@ -1009,7 +1111,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_standing_calf_raise"
+      ]
     },
     "Reverse Nordic": {
       "canonical_name": "Reverse Nordic",
@@ -1057,7 +1162,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "barbell_straight"
+      ]
     },
     "Romanian Deadlift haltères": {
       "canonical_name": "Romanian Deadlift haltères",
@@ -1073,7 +1181,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells"
+      ]
     },
     "Roulette abdominale": {
       "canonical_name": "Roulette abdominale",
@@ -1089,7 +1200,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "ab_wheel"
+      ]
     },
     "Roulette abdominale (ab wheel rollout)": {
       "canonical_name": "Roulette abdominale (ab wheel rollout)",
@@ -1105,7 +1219,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "ab_wheel"
+      ]
     },
     "Rowing chest-supported": {
       "canonical_name": "Rowing chest-supported",
@@ -1137,7 +1254,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "row_seated_station"
+      ]
     },
     "Rowing câble assis prise neutre": {
       "canonical_name": "Rowing câble assis prise neutre",
@@ -1153,7 +1273,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "row_seated_station"
+      ]
     },
     "Rowing câble assis prise serrée": {
       "canonical_name": "Rowing câble assis prise serrée",
@@ -1169,7 +1292,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "row_seated_station"
+      ]
     },
     "Rowing haltère un bras": {
       "canonical_name": "Rowing haltère un bras",
@@ -1201,7 +1327,11 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "flat_bench_support"
+      ]
     },
     "Rowing machine chest-supported": {
       "canonical_name": "Rowing machine chest-supported",
@@ -1217,7 +1347,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "machine_chest_supported_row"
+      ]
     },
     "Shoulder press haltères assis": {
       "canonical_name": "Shoulder press haltères assis",
@@ -1281,7 +1414,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells"
+      ]
     },
     "Sissy squat machine": {
       "canonical_name": "Sissy squat machine",
@@ -1313,7 +1449,11 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "barbell_ez",
+        "flat_bench_support"
+      ]
     },
     "Sliding leg curl": {
       "canonical_name": "Sliding leg curl",
@@ -1361,7 +1501,10 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "smith_rack"
+      ]
     },
     "Straight-arm pulldown câble": {
       "canonical_name": "Straight-arm pulldown câble",
@@ -1409,7 +1552,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "pulldown_seated_station"
+      ]
     },
     "Tirage poulie haute prise neutre": {
       "canonical_name": "Tirage poulie haute prise neutre",
@@ -1425,7 +1571,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "pulldown_seated_station"
+      ]
     },
     "Tirage vertical unilatéral câble": {
       "canonical_name": "Tirage vertical unilatéral câble",
@@ -1441,7 +1590,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "pulldown_seated_station"
+      ]
     },
     "Traction assistée machine": {
       "canonical_name": "Traction assistée machine",
@@ -1489,7 +1641,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_22a.v1.1",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_high"
+      ]
     },
     "Triceps pushdown barre": {
       "canonical_name": "Triceps pushdown barre",
@@ -1601,7 +1756,11 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_adjustable",
+        "cable_bilateral_independent"
+      ]
     },
     "Élévations latérales câble": {
       "canonical_name": "Élévations latérales câble",
@@ -1617,7 +1776,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_low"
+      ]
     },
     "Élévations latérales câble (derrière le dos)": {
       "canonical_name": "Élévations latérales câble (derrière le dos)",
@@ -1633,7 +1795,10 @@
       "coverage_status": "covered",
       "properties_source": "exercise_properties.json@Sb_MORPHO_POOL_COVERAGE_01",
       "confidence": "measured",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "cable_anchor_low"
+      ]
     },
     "Élévations latérales haltères": {
       "canonical_name": "Élévations latérales haltères",
@@ -1665,7 +1830,11 @@
       "coverage_status": "gap",
       "properties_source": null,
       "confidence": "derived",
-      "curation_note": null
+      "curation_note": null,
+      "equipment_requirements": [
+        "dumbbells",
+        "seated_support"
+      ]
     },
     "Élévations latérales machine": {
       "canonical_name": "Élévations latérales machine",
