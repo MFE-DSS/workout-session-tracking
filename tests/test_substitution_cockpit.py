@@ -156,6 +156,37 @@ def test_no_global_catalog_leaks_into_the_session(client):
 # ───────── A5 — prévu vs réalisé ─────────
 
 
+def _affectations_de(source: str, attribut: str) -> list[int]:
+    """Les lignes où `attribut` est réellement AFFECTÉ, par AST.
+
+    ⚠ CETTE GARDE CHERCHAIT UNE SOUS-CHAÎNE, ET ELLE A ACCUSÉ DU CODE SAIN.
+
+    Elle interdisait `"se.exercise_name_snapshot ="` dans le texte du
+    routeur. Or une COMPARAISON — `se.exercise_name_snapshot == prescrit` —
+    contient cette sous-chaîne. `Sb_TRAIN_A_ENV_ACT_01` compare le nom prévu
+    avant d'écrire une adaptation, précisément pour NE PAS écrire au mauvais
+    créneau, et s'est fait accuser d'écraser l'identité qu'il protège.
+
+    L'AST distingue ce que le texte confond : une affectation, une
+    affectation augmentée, une affectation multiple. Il est strictement plus
+    précis, jamais plus permissif.
+    """
+    import ast as _ast
+
+    lignes: list[int] = []
+    for noeud in _ast.walk(_ast.parse(source)):
+        cibles = []
+        if isinstance(noeud, _ast.Assign):
+            cibles = noeud.targets
+        elif isinstance(noeud, (_ast.AugAssign, _ast.AnnAssign)):
+            cibles = [noeud.target]
+        for cible in cibles:
+            for sous in _ast.walk(cible):
+                if isinstance(sous, _ast.Attribute) and sous.attr == attribut:
+                    lignes.append(noeud.lineno)
+    return sorted(set(lignes))
+
+
 def test_the_planned_identity_is_never_overwritten():
     """`substituted_name` est un champ SÉPARÉ ; le snapshot prévu reste.
 
@@ -164,9 +195,23 @@ def test_the_planned_identity_is_never_overwritten():
     """
     router = (ROOT / "app/routers/sessions.py").read_text(encoding="utf-8")
     assert "se.substituted_name = sub_name" in router
-    assert "se.exercise_name_snapshot =" not in router, (
+    assert _affectations_de(router, "exercise_name_snapshot") == [], (
         "the planned identity must never be reassigned at runtime"
     )
+
+
+def test_that_guard_still_catches_a_real_reassignment():
+    """La garde ne vaut que si elle sait accuser. On lui donne le défaut."""
+    faute = "def f(se):\n    se.exercise_name_snapshot = 'écrasé'\n"
+    assert _affectations_de(faute, "exercise_name_snapshot") == [2]
+    augmente = "def f(se):\n    se.exercise_name_snapshot += 'x'\n"
+    assert _affectations_de(augmente, "exercise_name_snapshot") == [2]
+
+
+def test_that_guard_no_longer_accuses_a_comparison():
+    """Le mode d'échec inverse, celui qui a coûté ce cycle de CI."""
+    sain = "def f(se, n):\n    return se.exercise_name_snapshot == n\n"
+    assert _affectations_de(sain, "exercise_name_snapshot") == []
 
 
 def test_the_card_shows_the_planned_name_on_the_prescribed_option():

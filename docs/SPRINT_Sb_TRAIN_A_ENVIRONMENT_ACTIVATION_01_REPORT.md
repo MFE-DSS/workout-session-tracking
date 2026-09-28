@@ -288,4 +288,71 @@ Aucune couleur introduite. Les deux états réutilisent `today-home__cta` et
 
 ---
 
+## 10. Quatre gardes rouges, et ce qu'elles disaient vraiment
+
+La CI et le sweep local ont trouvé **exactement les mêmes quatre**. Aucune
+n'a été affaiblie.
+
+### 10.1 — Une garde qui accusait une COMPARAISON
+
+`test_the_planned_identity_is_never_overwritten` interdisait la sous-chaîne
+`"se.exercise_name_snapshot ="` dans le routeur. Or une **comparaison** —
+`se.exercise_name_snapshot == prescrit` — la contient.
+
+La matérialisation compare le nom prévu avant d'écrire, précisément **pour
+ne pas écrire au mauvais créneau**. Elle s'est donc fait accuser d'écraser
+l'identité qu'elle protège.
+
+Réécrite **par AST** : affectation, affectation augmentée, affectation
+annotée. Strictement plus précise, jamais plus permissive. Et deux gardes
+neuves l'encadrent : l'une plante une vraie réaffectation (elle doit être
+vue), l'autre plante la comparaison (elle ne doit pas l'être). C'est la
+classe « garde statique qui accuse du code sain », sixième instance
+recensée.
+
+### 10.2 — Le cliquet ambre, et pourquoi la ligne monte légitimement
+
+`index.html` passe de **3 à 4** occurrences. Les quatre vivent dans des
+**branches Jinja mutuellement exclusives** : recommandation servie, état
+bloqué, repli générique. `Q7` prévoit exactement ce cas — *« un gabarit peut
+légitimement écrire plusieurs aplats dans des branches mutuellement
+exclusives »* — et désigne le **harnais de rendu** comme garde de vérité.
+
+Ce harnais a tranché : **un seul aplat ambre mesuré sur chacun des trois
+écrans rendus**. La ligne de base suit la mesure, pas l'inverse.
+
+### 10.3 — Ma propre garde de non-consommation
+
+`test_the_resolution_layer_itself_has_no_consumer` était juste : le
+résolveur a désormais **un** consommateur. C'était l'objet de la tranche.
+Renommée, et l'égalité reste **stricte** — un second consommateur
+échouerait.
+
+### 10.4 — Le protocole de spec
+
+Rapport sans section `Verdict`. **Je n'avais pas lancé
+`check_spec_protocol`**, que `check_scope` exigeait pourtant. Faute de
+méthode, pas de conception.
+
+---
+
+## 11. Verdict
+
+**Livré.** La frontière d'activation est en place et prouvée : point unique
+dans le chemin servi, matérialisation avant `START`, état bloqué nommé,
+empreinte environnementale à l'activation causale. **Aucune migration,
+aucun second moteur, aucun non-but franchi.**
+
+**Deux réserves, dites franchement.**
+
+L'activation est **inerte en production** tant qu'aucune surface n'écrit
+`available_equipment_items` — le `§8` interdisait de la créer ici. La
+gestion d'équipement est la suite naturelle, et elle est nommée.
+
+Et le `§1.A`, appliqué à une curation incomplète, **fait gagner le gabarit
+sans matériel** dès qu'aucun autre n'est *prouvé* — cas de la plupart des
+environnements modestes tant que 39 identités restent `UNKNOWN`. Ce n'est
+pas un défaut du résolveur ; c'est une décision produit qui revient à
+l'opérateur.
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
