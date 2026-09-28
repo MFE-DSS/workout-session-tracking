@@ -121,7 +121,10 @@ def test_positions_sequential_within_template():
 
 def test_template_slugs_unchanged():
     """The original 16 template slugs must be intact (no slug renamed) — plus the
-    additive 'full-body-morphotype-priority-v1' catalog program (specialization)."""
+    additive 'full-body-morphotype-priority-v1' catalog program (specialization)
+    and 'no-equipment-full-body' (Sb_TRAIN_A_ENV_03, utility) : le gabarit de
+    force sans matériel externe exigé par la porte G4. L'égalité reste STRICTE —
+    un renommage échouerait toujours."""
     slugs = {t["slug"] for t in _catalog()["templates"]}
     expected = {
         "push-a", "push-b", "pull-a", "pull-b", "legs-a", "legs-b",
@@ -129,5 +132,6 @@ def test_template_slugs_unchanged():
         "lower-posterior-bias", "liss-only", "liss-abs", "short-upper",
         "catch-up-shoulders", "catch-up-arms", "catch-up-back-width",
         "full-body-morphotype-priority-v1",
+        "no-equipment-full-body",
     }
     assert slugs == expected

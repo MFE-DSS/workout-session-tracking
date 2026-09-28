@@ -191,8 +191,113 @@ def resolve_template(
     return TemplateResolution(template_slug, etat, resolus)
 
 
+#: §G8 — l'état produit quand AUCUN gabarit n'est servable. Il est nommé
+#: plutôt que représenté par une liste vide : « rien à proposer » et « rien
+#: n'a été calculé » ne doivent pas se ressembler à l'écran.
+NO_SERVABLE_CANDIDATE = "no_servable_candidate"
+
+
+@dataclass(frozen=True)
+class CatalogueResolution:
+    """Ce que l'environnement rend du catalogue entier."""
+
+    servable: tuple[TemplateResolution, ...] = ()
+    unknown: tuple[TemplateResolution, ...] = ()
+    not_feasible: tuple[TemplateResolution, ...] = ()
+
+    @property
+    def state(self) -> str:
+        """`SERVABLE` · `TEMPLATE_UNKNOWN` · `NO_SERVABLE_CANDIDATE`."""
+        if self.servable:
+            return SERVABLE
+        if self.unknown:
+            return TEMPLATE_UNKNOWN
+        return NO_SERVABLE_CANDIDATE
+
+
+def resolve_catalogue(resolutions) -> CatalogueResolution:
+    """Répartit des gabarits déjà résolus. §G8.
+
+    `NO_SERVABLE_CANDIDATE` n'est atteint que si **aucun** gabarit n'est
+    servable **et** aucun n'est seulement inconnu : un doute laisse le
+    produit proposer, un refus généralisé doit se dire.
+    """
+    resolutions = tuple(resolutions)
+    return CatalogueResolution(
+        servable=tuple(r for r in resolutions if r.state == SERVABLE),
+        unknown=tuple(r for r in resolutions if r.state == TEMPLATE_UNKNOWN),
+        not_feasible=tuple(
+            r for r in resolutions if r.state == TEMPLATE_NOT_FEASIBLE),
+    )
+
+
+def materialization_plan(resolution: TemplateResolution):
+    """§14 — ce qu'il faut écrire AVANT `START`, pas pendant la séance.
+
+    Rend la suite des `(position, prescrit, exécuté)` à matérialiser. La
+    lignée reste entière : le prescrit n'est pas effacé, il est **porté à
+    côté** de l'exécuté, exactement comme une substitution manuelle.
+
+    La fonction ne matérialise rien elle-même : brancher ce plan sur
+    `session_builder` est l'étape d'**activation**, et elle attend les neuf
+    portes. Le plan existe pour que cette étape soit une pose, pas une
+    conception.
+    """
+    return tuple(
+        (position, s.prescribed, s.chosen)
+        for position, s in enumerate(resolution.slots, start=1)
+        if s.adapted and s.chosen
+    )
+
+
+def identite_materielle_environnement(resolutions) -> str:
+    """§16 / G9 — l'identité de l'environnement **telle qu'elle a compté**.
+
+    Ce n'est **pas** la liste du matériel déclaré. Deux environnements
+    différents qui produisent exactement les mêmes exécutions sont, du point
+    de vue de la décision, le même environnement : déclarer une machine
+    qu'aucun créneau n'utilise ne doit pas périmer un refus. C'est la même
+    doctrine que `empreinte_de_contexte`, qui quantifie en bandes plutôt que
+    de prendre des continus bruts.
+
+    Symétriquement, un changement qui **modifie une exécution servie**
+    change cette identité — et peut donc légitimement périmer un épisode non
+    résolu.
+
+    ⚠ Rien n'inclut encore ceci dans l'empreinte, et c'est voulu : le §16
+    l'interdit tant que le résolveur n'affecte pas le résultat servi. Une
+    garde vérifie que l'empreinte ignore l'environnement aujourd'hui.
+    """
+    import hashlib
+
+    pieces = []
+    for r in sorted(resolutions, key=lambda x: x.template_slug):
+        pieces.append(r.template_slug)
+        pieces.append(r.state)
+        for s in r.slots:
+            pieces.append(f"{s.prescribed}>{s.chosen or ''}")
+    brut = "|".join(pieces)
+    return hashlib.sha256(brut.encode("utf-8")).hexdigest()[:16]
+
+
+def adaptation_notice(resolution: TemplateResolution) -> str | None:
+    """§15 — un fait bref, ou rien.
+
+    Ni la liste des substitutions, ni un décompte : la lignée complète
+    `prescrit → réalisé` vit déjà dans le détail de séance. Mission n'en
+    porte que le fait, et seulement s'il a eu lieu.
+    """
+    return "Adapté à ton équipement." if resolution.adapted_slots else None
+
+
 __all__ = [
     "ADAPTABLE",
+    "NO_SERVABLE_CANDIDATE",
+    "CatalogueResolution",
+    "adaptation_notice",
+    "identite_materielle_environnement",
+    "materialization_plan",
+    "resolve_catalogue",
     "NATIVE_FEASIBLE",
     "NOT_FEASIBLE",
     "SERVABLE",

@@ -1,8 +1,8 @@
 {
-  "version": "Sb_TRAIN_A_ENV_02",
+  "version": "Sb_TRAIN_A_ENV_03",
   "doc": "Provenance des exigences d'équipement sur la CLÔTURE de substitution : les identités réellement atteignables depuis les 17 gabarits servis, prescriptions ET substituts autorisés. `requirements: null` = INCONNU, jamais « aucune exigence ».",
-  "closure_size": 105,
-  "prescribed_size": 68,
+  "closure_size": 109,
+  "prescribed_size": 72,
   "evidence_levels": {
     "ATLAS": "appareil désigné par machine_atlas.json, par slug ou par alias DÉCLARÉ",
     "EXTERNE": "source externe autoritaire (ACE, manufacturier) ou arbitrage opérateur explicite",
@@ -240,6 +240,13 @@
       "note": "variantes `corde` et `barre en V` : deux accessoires ALTERNATIFS, donc aucun n'entre dans une exigence conjonctive · l'appareil donne l'ancrage ; « (corde) » fixe l'accessoire de CETTE exécution exacte (§4), là où l'entrée nue garde les deux accessoires en alternative",
       "identity_correspondence": ""
     },
+    "Fente avant": {
+      "requirements": [],
+      "evidence_level": "EXTERNE",
+      "source": "ACE #94 Forward Lunge — « No Equipment » — https://www.acefitness.org/resources/everyone/exercise-library/94/forward-lunge/",
+      "note": "aucun matériel externe : faisable même sans environnement déclaré. `[]` est une exigence ÉTABLIE, pas une ignorance",
+      "identity_correspondence": "ACE « Forward Lunge » ↔ AUREN « Fente avant »"
+    },
     "Good morning haltères": {
       "requirements": null,
       "evidence_level": null,
@@ -449,6 +456,20 @@
       "source": "",
       "note": "ni modalité, ni slug, ni alias, ni libellé d'implément : rien à quoi rattacher une exigence",
       "identity_correspondence": ""
+    },
+    "Pompes": {
+      "requirements": [],
+      "evidence_level": "EXTERNE",
+      "source": "ACE #41 Push-Up — Equipment « No Equipment » — https://www.acefitness.org/resources/everyone/exercise-library/41/push-up/",
+      "note": "aucun matériel externe : faisable même sans environnement déclaré. `[]` est une exigence ÉTABLIE, pas une ignorance",
+      "identity_correspondence": "ACE « Push-Up » ↔ AUREN « Pompes »"
+    },
+    "Pont fessier": {
+      "requirements": [],
+      "evidence_level": "EXTERNE",
+      "source": "ACE #49 Glute Bridge — « No Equipment » — https://www.acefitness.org/resources/everyone/exercise-library/49/glute-bridge/",
+      "note": "aucun matériel externe : faisable même sans environnement déclaré. `[]` est une exigence ÉTABLIE, pas une ignorance",
+      "identity_correspondence": "ACE « Glute Bridge » ↔ AUREN « Pont fessier ». DISTINCT de « Hip thrust Smith » : épaules au sol, aucune charge externe — deux mouvements, pas deux orthographes"
     },
     "Preacher curl": {
       "requirements": null,
@@ -724,6 +745,13 @@
       "source": "machine_atlas.json#smith-squat (par slug)",
       "note": "aucun support additionnel documenté",
       "identity_correspondence": ""
+    },
+    "Squat au poids du corps": {
+      "requirements": [],
+      "evidence_level": "EXTERNE",
+      "source": "ACE #135 Bodyweight Squat — « No Equipment » — https://www.acefitness.org/resources/everyone/exercise-library/135/bodyweight-squat/",
+      "note": "aucun matériel externe : faisable même sans environnement déclaré. `[]` est une exigence ÉTABLIE, pas une ignorance",
+      "identity_correspondence": "ACE « Bodyweight Squat » ↔ AUREN « Squat au poids du corps »"
     },
     "Straight-arm pulldown câble": {
       "requirements": null,

@@ -5,9 +5,9 @@
 `data/machine_atlas.json`. Le commentaire vit dans
 `docs/SPRINT_TRAIN_A_ENVIRONMENT_CLOSURE_REPORT.md`.
 
-Clôture **105** identités atteignables · **66** avec
+Clôture **109** identités atteignables · **70** avec
 exigence établie · **39** `UNKNOWN` ·
-**68** prescrites.
+**72** prescrites.
 
 ## Capacités internes — 33
 
@@ -83,7 +83,7 @@ Jamais exposées à l'utilisateur.
 | `smith_machine` | Smith (barre guidée) | `smith_rack` | atlas : 4 slugs `smith`, aucun matériel propre déclaré |
 | `standing_calf_raise` | Mollets debout | `machine_standing_calf_raise` | machine_atlas : slug `standing-calf-raise` |
 
-## Couverture de la clôture — 105 identités
+## Couverture de la clôture — 109 identités
 
 | # | identité | rôle | exigences | preuve |
 |---|---|---|---|---|
@@ -115,83 +115,87 @@ Jamais exposées à l'utilisateur.
 | 26 | Extension overhead câble (corde) | prescrit | **INCONNU** | — |
 | 27 | Face pull câble | prescrit | `cable_anchor_high` | ATLAS |
 | 28 | Face pull câble (corde) | prescrit | `cable_anchor_high` · `cable_attachment_rope` | ATLAS |
-| 29 | Good morning haltères | substitut | **INCONNU** | — |
-| 30 | Hack Squat machine | prescrit | `machine_hack_squat` | ATLAS |
-| 31 | Hanging knee raise | substitut | **INCONNU** | — |
-| 32 | Hip thrust Smith | prescrit | `smith_rack` | ATLAS |
-| 33 | Hip thrust Smith machine | prescrit | `smith_rack` | ATLAS |
-| 34 | Hip thrust haltères | substitut | **INCONNU** | — |
-| 35 | Incline DB Press 30° | substitut | `dumbbells` · `incline_bench_support` | ATLAS |
-| 36 | Incline Dumbbell Press | substitut | `dumbbells` · `incline_bench_support` | ATLAS |
-| 37 | Incline Smith Press | prescrit | `incline_bench_support` · `smith_rack` | ATLAS |
-| 38 | Kickback câble | prescrit | **INCONNU** | — |
-| 39 | Lat pulldown prise large | substitut | **INCONNU** | — |
-| 40 | Lat pulldown prise neutre | substitut | **INCONNU** | — |
-| 41 | Leg Press (pieds bas) | prescrit | `machine_leg_press` | ATLAS |
-| 42 | Leg Press (pieds bas, serrés) | prescrit | `machine_leg_press` | ATLAS |
-| 43 | Leg Press (pieds hauts, écartés) | prescrit | `machine_leg_press` | EXTERNE |
-| 44 | Leg curls allongé | prescrit | `machine_lying_leg_curl` | ATLAS |
-| 45 | Leg curls assis | prescrit | `machine_seated_leg_curl` | ATLAS |
-| 46 | Leg extension câble unilatéral | substitut | **INCONNU** | — |
-| 47 | Leg extensions assises | prescrit | `machine_leg_extension` | ATLAS |
-| 48 | Machine crunch | substitut | **INCONNU** | — |
-| 49 | Machine shoulder press | prescrit | `machine_shoulder_press` | ATLAS |
-| 50 | Mollets assis machine | prescrit | `machine_seated_calf_raise` | ATLAS |
-| 51 | Mollets debout machine | substitut | `machine_standing_calf_raise` | ATLAS |
-| 52 | Neutral Grip Shoulder Press machine | prescrit | `machine_shoulder_press` | ATLAS |
-| 53 | Pallof press câble | prescrit | **INCONNU** | — |
-| 54 | Preacher curl | substitut | **INCONNU** | — |
-| 55 | Pullover câble (bras tendus) | prescrit | `machine_pullover` | ATLAS |
-| 56 | Pullover câble (bras tendus, poulie haute) | prescrit | `machine_pullover` | ATLAS |
-| 57 | Pullover machine | prescrit | `machine_pullover` | ATLAS |
-| 58 | Pushdown corde | substitut | **INCONNU** | — |
-| 59 | Rear delt fly machine | prescrit | `machine_rear_delt_fly` | ATLAS |
-| 60 | Rear delt fly machine (pec deck inversé) | prescrit | `machine_rear_delt_fly` | ATLAS |
-| 61 | Relevé de jambes suspendu | prescrit | `overhead_hang_support` | IDENTITE_AUREN |
-| 62 | Relevés mollets debout | prescrit | `[]` aucune | EXTERNE |
-| 63 | Relevés mollets debout machine | prescrit | `machine_standing_calf_raise` | ATLAS |
-| 64 | Reverse Nordic | substitut | **INCONNU** | — |
-| 65 | Reverse fly machine | prescrit | `machine_rear_delt_fly` | ATLAS |
-| 66 | Romanian Deadlift barre | prescrit | `barbell` | IDENTITE_AUREN |
-| 67 | Romanian Deadlift haltères | prescrit | `dumbbells` | ATLAS |
-| 68 | Roulette abdominale | prescrit | `ab_wheel` | IDENTITE_AUREN |
-| 69 | Roulette abdominale (ab wheel rollout) | prescrit | `ab_wheel` | IDENTITE_AUREN |
-| 70 | Rowing chest-supported | prescrit | `machine_chest_supported_row` | ATLAS |
-| 71 | Rowing câble assis prise large | prescrit | `row_seated_station` | ATLAS |
-| 72 | Rowing câble assis prise neutre | prescrit | `row_seated_station` | ATLAS |
-| 73 | Rowing câble assis prise serrée | prescrit | `row_seated_station` | ATLAS |
-| 74 | Rowing haltère un bras | substitut | `dumbbells` | ATLAS |
-| 75 | Rowing haltère un bras (banc) | prescrit | `dumbbells` · `flat_bench_support` | ATLAS |
-| 76 | Rowing machine chest-supported | prescrit | `machine_chest_supported_row` | ATLAS |
-| 77 | Shoulder press haltères assis | substitut | `dumbbells` · `seated_support` | ATLAS |
-| 78 | Shrugs barre | substitut | **INCONNU** | — |
-| 79 | Shrugs câble | substitut | **INCONNU** | — |
-| 80 | Shrugs haltères | prescrit | `dumbbells` | IDENTITE_AUREN |
-| 81 | Sissy squat machine | substitut | **INCONNU** | — |
-| 82 | Skull crushers EZ-bar | prescrit | `barbell_ez` · `flat_bench_support` | EXTERNE |
-| 83 | Sliding leg curl | substitut | **INCONNU** | — |
-| 84 | Smith shoulder press | substitut | `smith_rack` | ATLAS |
-| 85 | Squat Smith machine (pieds avancés) | prescrit | `smith_rack` | ATLAS |
-| 86 | Straight-arm pulldown câble | prescrit | **INCONNU** | — |
-| 87 | Tirage front câble (prise large) | prescrit | **INCONNU** | — |
-| 88 | Tirage poulie haute prise large | prescrit | `pulldown_seated_station` | ATLAS |
-| 89 | Tirage poulie haute prise neutre | prescrit | `pulldown_seated_station` | ATLAS |
-| 90 | Tirage vertical unilatéral câble | prescrit | `pulldown_seated_station` | ATLAS |
-| 91 | Traction assistée machine | substitut | `machine_assisted_pull_up` | ATLAS |
-| 92 | Traction assistée unilatérale | substitut | **INCONNU** | — |
-| 93 | Triceps extension poulie haute (corde) | prescrit | `cable_anchor_high` · `cable_attachment_rope` | ATLAS |
-| 94 | Triceps pushdown barre | prescrit | **INCONNU** | — |
-| 95 | Triceps pushdown corde | prescrit | `cable_anchor_high` · `cable_attachment_rope` | ATLAS |
-| 96 | Upright row câble | substitut | **INCONNU** | — |
-| 97 | Upright row haltères | substitut | **INCONNU** | — |
-| 98 | Y-raise haltère | substitut | **INCONNU** | — |
-| 99 | Écarté arrière d'épaule câble | prescrit | `cable_anchor_any` | ATLAS |
-| 100 | Écarté pec aux câbles (incliné bas→haut) | prescrit | `cable_anchor_adjustable` · `cable_bilateral_independent` | ATLAS |
-| 101 | Élévations latérales câble | prescrit | `cable_anchor_low` | ATLAS |
-| 102 | Élévations latérales câble (derrière le dos) | prescrit | `cable_anchor_low` | ATLAS |
-| 103 | Élévations latérales haltères | substitut | **INCONNU** | — |
-| 104 | Élévations latérales haltères assis | prescrit | `dumbbells` · `seated_support` | IDENTITE_AUREN |
-| 105 | Élévations latérales machine | substitut | **INCONNU** | — |
+| 29 | Fente avant | prescrit | `[]` aucune | EXTERNE |
+| 30 | Good morning haltères | substitut | **INCONNU** | — |
+| 31 | Hack Squat machine | prescrit | `machine_hack_squat` | ATLAS |
+| 32 | Hanging knee raise | substitut | **INCONNU** | — |
+| 33 | Hip thrust Smith | prescrit | `smith_rack` | ATLAS |
+| 34 | Hip thrust Smith machine | prescrit | `smith_rack` | ATLAS |
+| 35 | Hip thrust haltères | substitut | **INCONNU** | — |
+| 36 | Incline DB Press 30° | substitut | `dumbbells` · `incline_bench_support` | ATLAS |
+| 37 | Incline Dumbbell Press | substitut | `dumbbells` · `incline_bench_support` | ATLAS |
+| 38 | Incline Smith Press | prescrit | `incline_bench_support` · `smith_rack` | ATLAS |
+| 39 | Kickback câble | prescrit | **INCONNU** | — |
+| 40 | Lat pulldown prise large | substitut | **INCONNU** | — |
+| 41 | Lat pulldown prise neutre | substitut | **INCONNU** | — |
+| 42 | Leg Press (pieds bas) | prescrit | `machine_leg_press` | ATLAS |
+| 43 | Leg Press (pieds bas, serrés) | prescrit | `machine_leg_press` | ATLAS |
+| 44 | Leg Press (pieds hauts, écartés) | prescrit | `machine_leg_press` | EXTERNE |
+| 45 | Leg curls allongé | prescrit | `machine_lying_leg_curl` | ATLAS |
+| 46 | Leg curls assis | prescrit | `machine_seated_leg_curl` | ATLAS |
+| 47 | Leg extension câble unilatéral | substitut | **INCONNU** | — |
+| 48 | Leg extensions assises | prescrit | `machine_leg_extension` | ATLAS |
+| 49 | Machine crunch | substitut | **INCONNU** | — |
+| 50 | Machine shoulder press | prescrit | `machine_shoulder_press` | ATLAS |
+| 51 | Mollets assis machine | prescrit | `machine_seated_calf_raise` | ATLAS |
+| 52 | Mollets debout machine | substitut | `machine_standing_calf_raise` | ATLAS |
+| 53 | Neutral Grip Shoulder Press machine | prescrit | `machine_shoulder_press` | ATLAS |
+| 54 | Pallof press câble | prescrit | **INCONNU** | — |
+| 55 | Pompes | prescrit | `[]` aucune | EXTERNE |
+| 56 | Pont fessier | prescrit | `[]` aucune | EXTERNE |
+| 57 | Preacher curl | substitut | **INCONNU** | — |
+| 58 | Pullover câble (bras tendus) | prescrit | `machine_pullover` | ATLAS |
+| 59 | Pullover câble (bras tendus, poulie haute) | prescrit | `machine_pullover` | ATLAS |
+| 60 | Pullover machine | prescrit | `machine_pullover` | ATLAS |
+| 61 | Pushdown corde | substitut | **INCONNU** | — |
+| 62 | Rear delt fly machine | prescrit | `machine_rear_delt_fly` | ATLAS |
+| 63 | Rear delt fly machine (pec deck inversé) | prescrit | `machine_rear_delt_fly` | ATLAS |
+| 64 | Relevé de jambes suspendu | prescrit | `overhead_hang_support` | IDENTITE_AUREN |
+| 65 | Relevés mollets debout | prescrit | `[]` aucune | EXTERNE |
+| 66 | Relevés mollets debout machine | prescrit | `machine_standing_calf_raise` | ATLAS |
+| 67 | Reverse Nordic | substitut | **INCONNU** | — |
+| 68 | Reverse fly machine | prescrit | `machine_rear_delt_fly` | ATLAS |
+| 69 | Romanian Deadlift barre | prescrit | `barbell` | IDENTITE_AUREN |
+| 70 | Romanian Deadlift haltères | prescrit | `dumbbells` | ATLAS |
+| 71 | Roulette abdominale | prescrit | `ab_wheel` | IDENTITE_AUREN |
+| 72 | Roulette abdominale (ab wheel rollout) | prescrit | `ab_wheel` | IDENTITE_AUREN |
+| 73 | Rowing chest-supported | prescrit | `machine_chest_supported_row` | ATLAS |
+| 74 | Rowing câble assis prise large | prescrit | `row_seated_station` | ATLAS |
+| 75 | Rowing câble assis prise neutre | prescrit | `row_seated_station` | ATLAS |
+| 76 | Rowing câble assis prise serrée | prescrit | `row_seated_station` | ATLAS |
+| 77 | Rowing haltère un bras | substitut | `dumbbells` | ATLAS |
+| 78 | Rowing haltère un bras (banc) | prescrit | `dumbbells` · `flat_bench_support` | ATLAS |
+| 79 | Rowing machine chest-supported | prescrit | `machine_chest_supported_row` | ATLAS |
+| 80 | Shoulder press haltères assis | substitut | `dumbbells` · `seated_support` | ATLAS |
+| 81 | Shrugs barre | substitut | **INCONNU** | — |
+| 82 | Shrugs câble | substitut | **INCONNU** | — |
+| 83 | Shrugs haltères | prescrit | `dumbbells` | IDENTITE_AUREN |
+| 84 | Sissy squat machine | substitut | **INCONNU** | — |
+| 85 | Skull crushers EZ-bar | prescrit | `barbell_ez` · `flat_bench_support` | EXTERNE |
+| 86 | Sliding leg curl | substitut | **INCONNU** | — |
+| 87 | Smith shoulder press | substitut | `smith_rack` | ATLAS |
+| 88 | Squat Smith machine (pieds avancés) | prescrit | `smith_rack` | ATLAS |
+| 89 | Squat au poids du corps | prescrit | `[]` aucune | EXTERNE |
+| 90 | Straight-arm pulldown câble | prescrit | **INCONNU** | — |
+| 91 | Tirage front câble (prise large) | prescrit | **INCONNU** | — |
+| 92 | Tirage poulie haute prise large | prescrit | `pulldown_seated_station` | ATLAS |
+| 93 | Tirage poulie haute prise neutre | prescrit | `pulldown_seated_station` | ATLAS |
+| 94 | Tirage vertical unilatéral câble | prescrit | `pulldown_seated_station` | ATLAS |
+| 95 | Traction assistée machine | substitut | `machine_assisted_pull_up` | ATLAS |
+| 96 | Traction assistée unilatérale | substitut | **INCONNU** | — |
+| 97 | Triceps extension poulie haute (corde) | prescrit | `cable_anchor_high` · `cable_attachment_rope` | ATLAS |
+| 98 | Triceps pushdown barre | prescrit | **INCONNU** | — |
+| 99 | Triceps pushdown corde | prescrit | `cable_anchor_high` · `cable_attachment_rope` | ATLAS |
+| 100 | Upright row câble | substitut | **INCONNU** | — |
+| 101 | Upright row haltères | substitut | **INCONNU** | — |
+| 102 | Y-raise haltère | substitut | **INCONNU** | — |
+| 103 | Écarté arrière d'épaule câble | prescrit | `cable_anchor_any` | ATLAS |
+| 104 | Écarté pec aux câbles (incliné bas→haut) | prescrit | `cable_anchor_adjustable` · `cable_bilateral_independent` | ATLAS |
+| 105 | Élévations latérales câble | prescrit | `cable_anchor_low` | ATLAS |
+| 106 | Élévations latérales câble (derrière le dos) | prescrit | `cable_anchor_low` | ATLAS |
+| 107 | Élévations latérales haltères | substitut | **INCONNU** | — |
+| 108 | Élévations latérales haltères assis | prescrit | `dumbbells` · `seated_support` | IDENTITE_AUREN |
+| 109 | Élévations latérales machine | substitut | **INCONNU** | — |
 
 ## Les `UNKNOWN`, et pourquoi
 
@@ -237,9 +241,13 @@ Jamais exposées à l'utilisateur.
 
 ## Correspondances d'identité déclarées
 
+* **Fente avant** — ACE « Forward Lunge » ↔ AUREN « Fente avant »
 * **Incline DB Press 30°** — `_aliases` de l'EKB : « Incline DB Press 30° » → « Développé incliné haltères 30° »
 * **Incline Dumbbell Press** — `_aliases` de l'EKB : « Incline Dumbbell Press » → « Développé incliné haltères 30° »
 * **Leg Press (pieds hauts, écartés)** — Life Fitness Leg Press ↔ « Leg Press (pieds hauts, écartés) » — même appareil, placement de pieds différent
+* **Pompes** — ACE « Push-Up » ↔ AUREN « Pompes »
+* **Pont fessier** — ACE « Glute Bridge » ↔ AUREN « Pont fessier ». DISTINCT de « Hip thrust Smith » : épaules au sol, aucune charge externe — deux mouvements, pas deux orthographes
 * **Skull crushers EZ-bar** — ACE « Lying Barbell Triceps Extensions » ↔ AUREN « Skull crushers EZ-bar » — même mouvement allongé ; l'IMPLÉMENT diffère (droite vs EZ), l'exigence de banc non
+* **Squat au poids du corps** — ACE « Bodyweight Squat » ↔ AUREN « Squat au poids du corps »
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

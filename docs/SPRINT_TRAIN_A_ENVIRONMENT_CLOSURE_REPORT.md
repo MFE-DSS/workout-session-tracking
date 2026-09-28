@@ -135,7 +135,7 @@ vérifie que son exigence est `()` et non `None` — *rien à posséder* est un
 fait établi, pas une ignorance.
 
 Effet mesuré : dans un environnement `[]` (aucun matériel déclaré), c'est le
-**seul** créneau natif des 106.
+**seul** créneau natif — jusqu'à ce que le `§17` en ajoute quatre.
 
 ---
 
@@ -146,20 +146,26 @@ Mesurée sur les vrais objets : base semée comme le produit la sème, puis
 
 | | |
 |---|---|
-| gabarits servis | 17 |
-| identités **prescrites** | **68** |
-| identités atteintes en **substitut** | 82 |
-| **CLÔTURE (union, uniques)** | **105** |
+| gabarits servis | **18** |
+| identités **prescrites** | **72** |
+| identités atteintes en **substitut** | 84 |
+| **CLÔTURE (union, uniques)** | **109** |
 | dont substituts jamais prescrits | 37 |
-| arcs `N1` · `N2` · `N3` | 125 · 142 · 116 |
+| arcs `N1` · `N2` · `N3` | 127 · **142** · 116 |
 | entrées d'EKB **jamais atteignables** | **0** |
+
+**`N2` reste à 142 arcs et 52 identités, exactement comme avant le contenu
+sans matériel.** C'est la preuve MESURÉE que le `§10` est tenu : le graphe de
+substitution existant n'a pas bougé d'une arête. Seul `N1` monte de 125 à
+127, par les deux substituts internes au nouveau gabarit — qui n'affectent
+que ses propres créneaux.
 
 **La clôture est à UN saut, et c'est mesuré, pas supposé** : le seul
 appelant de `compute_suggestions` (`app/routers/sessions.py:700`) lui passe
 `se.template_exercise`, l'**origine** du gabarit — jamais le nom substitué.
 Re-substituer ré-offre donc le même ensemble.
 
-**105 et non 103.** Les deux de plus sont `Incline DB Press 30°` et
+**Au premier passage, 105 et non 103.** Les deux de plus sont `Incline DB Press 30°` et
 `Incline Dumbbell Press` : le moteur de substitution lit
 `exercise_properties`, qui porte deux orthographes absentes des 103 noms
 canoniques. **Le moteur peut donc proposer un nom que l'EKB ne connaît
@@ -173,12 +179,14 @@ parfaitement définie rendait `UNKNOWN` pour une raison d'orthographe.
 
 | | KNOWN | UNKNOWN |
 |---|---|---|
-| **clôture — 105 identités atteignables** | **66** | **39** |
-| dont les 68 prescrites | **58** | 10 |
+| **clôture — 109 identités atteignables** | **70** | **39** |
+| dont les 72 prescrites | **62** | 10 |
 | dont les 37 substituts seuls | 8 | 29 |
 
-Par classe de preuve : **50 `ATLAS`** · **3 `EXTERNE`** ·
-**13 `IDENTITE_AUREN`**.
+Par classe de preuve : **50 `ATLAS`** · **7 `EXTERNE`** ·
+**13 `IDENTITE_AUREN`**. Les quatre `EXTERNE` supplémentaires sont les
+identités sans matériel, dont l'exigence est `[]` — une exigence **établie**,
+pas une ignorance.
 
 Le détail ligne à ligne, avec motif pour chaque `UNKNOWN`, vit dans
 `data/equipment_curation.json` et dans
@@ -215,7 +223,7 @@ d'un mot, jamais à deviner :
 | `Traction assistée unilatérale` | `assisted-pull-up` | variante unilatérale |
 | `Calf press leg press` | `leg-press` | l'identité **nomme** l'appareil |
 
-Approuvées, elles feraient passer la clôture de **66/39** à **73/32**.
+Approuvées, elles feraient passer la clôture de **70/39** à **77/32**.
 
 ---
 
@@ -245,15 +253,21 @@ Trois gardes l'épinglent, dont une qui vérifie qu'un exercice faisable
 
 ## 7. Preuve produit (`§19`) — et un défaut qu'elle a trouvé
 
-Quatre environnements, les 17 gabarits réels, les vraies listes de
+Quatre environnements, les **18** gabarits réels, les vraies listes de
 substituts.
 
-| environnement | gabarits | créneaux (106) |
-|---|---|---|
-| **salle équipée** (25 objets) | 12 servables · 5 inconnus · **0 infaisables** | 89 natifs · 11 adaptés · 6 inconnus · 0 bloqués |
-| **salle privée** (8 objets) | 4 · 6 · 7 | 37 · 41 · 19 · 9 |
-| **maison** — haltères + banc (5) | 1 · 8 · 8 | 21 · 41 · 32 · 12 |
-| **`[]`** — aucun matériel | 1 · 7 · 9 | **1** · 1 · 88 · 16 |
+| environnement | catalogue | créneaux (110) | sans matériel |
+|---|---|---|---|
+| **salle équipée** (25 objets) | `servable` — 13 · 5 · **0** | 93 natifs · 11 adaptés · 6 inconnus · 0 bloqués | `servable` |
+| **salle privée** (8 objets) | `servable` — 5 · 6 · 7 | 41 · 41 · 19 · 9 | `servable` |
+| **maison** — haltères + banc (5) | `servable` — 2 · 8 · 8 | 25 · 41 · 32 · 12 | `servable` |
+| **`[]`** — aucun matériel | `servable` — **2** · 7 · 9 | **5** · 1 · 88 · 16 | **`servable`** |
+
+**La ligne décisive est la dernière.** Avec *rien du tout* de déclaré, le
+catalogue rend `servable` et le gabarit sans matériel passe **natif sur ses
+quatre créneaux**. Avant le `§17`, cet environnement n'avait qu'un seul
+créneau natif et aucun gabarit de force servable. C'est la porte `G4`, et
+elle sert à quelque chose.
 
 L'adaptation fonctionne et elle est lisible : en salle maison, `push-a`
 remplace `Incline Smith Press` (manque `smith_rack`) par
@@ -280,8 +294,8 @@ visible.
 |---|---|---|
 | salle équipée | 7 | **3** |
 | salle privée | 18 | **12** |
-| **maison** | 22 | **22** |
-| `[]` | 0 | 0 |
+| **maison** | 22 | **21** |
+| `[]` | 0 | **0** |
 
 **En salle maison la correction ne change rien** : il n'existe aucune
 alternative à proposer. Ce n'est pas un défaut de résolveur, c'est un
@@ -299,62 +313,114 @@ de chemin d'appel. Le `§16` sera tenu à l'activation, pas avant.
 
 ---
 
-## 8. Contenu sans matériel (`§17`) — **NON LIVRÉ**, et le coût exact
+## 8. Contenu sans matériel (`§17`) — **LIVRÉ**, avec deux limites nommées
 
-Les cinq identités sont résolues et dédoublonnées contre les 103
-(`Glute Bridge` ≠ `Hip thrust` : épaules surélevées et charge externe, deux
-mouvements). Leur exigence serait `[]`, donc faisable partout.
+Quatre identités canoniques neuves, sourcées ACE, exigence `[]` :
 
-**Ce que l'intégration coûte, mesuré :**
+| identité AUREN | source | dédoublonnage |
+|---|---|---|
+| `Pompes` | ACE #41 Push-Up | aucun homonyme |
+| `Squat au poids du corps` | ACE #135 | les trois « squat » existants sont appareillés |
+| `Fente avant` | ACE #94 | aucun homonyme |
+| `Pont fessier` | ACE #49 | **distinct** de `Hip thrust` : épaules au sol, aucune charge externe |
 
-| contrat touché | ce qu'il faut faire |
-|---|---|
-| `test_exactly_103_entries` | passe à 108 |
-| snapshot byte-exact des noms | régénéré |
-| `test_coverage_split_51_covered_52_gap` (67/36) | recalculé |
-| `exercise_properties.json` | 5 entrées neuves — zones, pattern, chaîne |
-| `test_blackholes_stay_visible_not_masked` (12) | vérifié |
-| `reference_split.json` | un gabarit neuf + ses sentinelles |
-| `test_exactly_68_prescribed_and_66_substitutes` | recalculé |
+Et un gabarit **vivant** : `no-equipment-full-body`, section `utility`,
+quatre créneaux, aucun matériel externe. Il rend `SERVABLE` dans les quatre
+environnements testés, y compris `[]`.
 
-Sept contrats de référence, dont quatre épinglés byte-à-byte. **Je ne l'ai
-pas fondu dans une tranche qui refait déjà la curation et livre un
-résolveur** : une tranche que personne ne peut relire est une tranche qui
-passe verte et casse ailleurs. C'est la porte **G4**, elle est nommée, et
-elle est prête à exécuter seule.
+**Aucun mouvement de tirage n'a été inventé** (`§17`), et le gabarit
+l'assume au lieu de combler pour la symétrie. Une garde vérifie qu'aucune
+de ses zones n'est `lats` ni `upper_back`.
 
-`§9` respecté sur son interdiction : **aucun mouvement de tirage au poids du
-corps n'a été inventé.**
+### Limite 1 — le `§10` interdit de rendre ce contenu substituable
+
+J'avais ajouté `Pompes` à `exercise_properties.json`, **mécaniquement
+nécessaire** pour qu'elle soit proposable en `N2`/`N3` : le moteur n'itère
+que ce registre. Une garde nommée *« le registre de substitution est
+intouché »* l'a refusée, et **elle a raison** — y écrire une entrée crée une
+arête pour TOUS les exercices de même pattern ou de même zone. C'est
+« broaden equivalence », que le `§10` interdit.
+
+Conséquence assumée : **le contenu sans matériel est atteignable par
+PRESCRIPTION, jamais comme substitut automatique d'un exercice appareillé.**
+C'est aussi pourquoi les 21 doublons en salle maison ne se corrigent pas par
+du contenu dans cette tranche. **Lever cette limite est un arbitrage
+opérateur**, pas une décision de résolveur.
+
+### Limite 2 — la planche frontale n'a pas de dose représentable
+
+`Front Plank` (ACE #32) est sourcée mais **non intégrée**, pour une raison
+structurelle : le référentiel canonique est **dérivé du catalogue**, donc une
+identité qu'aucun gabarit ne référence est comptée comme une **dérive** par
+l'audit. Or elle ne peut pas être prescrite : les 15 formats de `set_scheme`
+du catalogue sont tous en répétitions, et un gainage se dose en temps.
+Inventer un format serait un changement de schéma déguisé.
+
+### Ce que le vocabulaire fermé ne sait pas classer
+
+Les quatre identités entrent en `gap`, `movement_pattern = None` — comme
+`Hack Squat machine`, `Squat Smith machine`, `Leg Press` et
+`Crunch câble à genoux`. **Le vocabulaire fermé `pattern_motor` n'a ni jeton
+squat ni jeton core**, et il laisse déjà **36 entrées sur 103** sans pattern.
+Je n'en ai pas inventé. L'ouvrir reclasserait aussi les entrées existantes :
+c'est un arbitrage, pas un effet de bord.
 
 ---
 
-## 9. Portes d'activation (`§18`)
+## 9. `§14`, `§15`, `§16`, `G8` — bâtis au niveau service, non branchés
+
+| demande | livré |
+|---|---|
+| `§14` adaptation AVANT `START` | `materialization_plan()` — rend les `(position, prescrit, exécuté)` à poser. La lignée reste entière : le prescrit est porté **à côté** de l'exécuté, pas effacé |
+| `§15` explication | `adaptation_notice()` — rend `« Adapté à ton équipement. »`, et **rien** si rien n'a changé. Ni liste, ni décompte |
+| `G8` aucun candidat servable | `NO_SERVABLE_CANDIDATE`, un état **nommé** : « rien à proposer » et « rien n'a été calculé » ne doivent pas se ressembler. Un doute laisse le produit proposer ; seul un refus généralisé se dit |
+| `§16` / `G9` empreinte | **inchangée, et c'est le contrat** : une garde AST vérifie que `empreinte_de_contexte` ne lit ni l'équipement ni le résolveur. `identite_materielle_environnement()` est prête pour l'activation |
+
+**L'identité matérielle n'est pas la liste du matériel.** Deux
+environnements différents qui produisent les mêmes exécutions sont la même
+décision : déclarer une machine qu'aucun créneau n'utilise ne périme pas un
+refus. Deux gardes le mesurent — l'une prouve l'insensibilité au matériel
+inutile, l'autre prouve la sensibilité à une exécution qui change.
+
+⚠ `§15` ne touche **aucun gabarit** : afficher ce fait sur Mission est une
+surface visible, donc soumise au `CLAUDE.md §5.1` — un rendu réel soumis à
+l'opérateur **avant** tout commit. Le fait existe et est testé ; son
+affichage attend votre arbitrage.
+
+---
+
+## 10. Portes d'activation (`§18`)
 
 | | porte | état |
 |---|---|---|
-| **G1** | clôture exacte mesurée | ✅ **105**, à un saut, prouvé |
+| **G1** | clôture exacte mesurée | ✅ **109**, à un saut, prouvé |
 | **G2** | sémantique déterministe ou `UNKNOWN` explicitement traité | ✅ 4 états, `UNKNOWN` jamais `FEASIBLE`, 39 trous nommés |
 | **G3** | objet → capacité couvre toute exigence connue | ✅ garde : toute capacité curée est au vocabulaire |
-| **G4** | gabarit de force sans matériel vivant | ❌ **non livré** — `§8` ci-dessus |
-| **G5** | résolveur rend les quatre états correctement | ✅ 21 gardes, mutation jouée |
-| **G6** | adaptation matérialisée avant `START` | ❌ non ouvert — demande le branchement |
+| **G4** | gabarit de force sans matériel **vivant** | ✅ `no-equipment-full-body`, `SERVABLE` même avec `[]` |
+| **G5** | résolveur rend les quatre états correctement | ✅ 82 gardes, mutation jouée |
+| **G6** | adaptation matérialisée avant `START` | ⚠ **plan bâti et testé, non branché** — la pose sur `session_builder` EST l'activation |
 | **G7** | `NULL` hérité préserve le comportement | ✅ garde : `NULL` ⇒ `UNKNOWN`, jamais un refus |
-| **G8** | traitement produit de « aucun candidat servable » | ❌ non ouvert |
-| **G9** | empreinte environnement-consciente à l'activation causale | ❌ non ouvert, délibérément |
+| **G8** | traitement produit de « aucun candidat servable » | ⚠ **état nommé et testé au service** ; l'écran reste à arbitrer (`§5.1`) |
+| **G9** | empreinte environnement-consciente à l'activation causale | ✅ **absente aujourd'hui, prouvée par AST** ; identité matérielle prête |
 
-**Quatre portes restent fermées. Le filtre reste éteint.**
+**Sept portes franchies, deux à moitié.** `G6` et `G8` ne demandent plus de
+conception : elles demandent un **branchement** et un **écran**, c'est-à-dire
+précisément les deux gestes que l'activation recouvre. Le filtre servi reste
+éteint.
 
 ---
 
-## 10. Vérifications
+## 11. Vérifications
 
 * `check_scope` : `SHARED_CODE`. **Full sweep exécuté quand même** — l'EKB
   est une donnée partagée, et ce dépôt a déjà payé trois fois l'excès de
   confiance en `check_scope` sur ce fichier
 * `ruff` sur **tous** les fichiers Python du diff : propre ; scan `S9073`
   par AST : aucun
-* 68 gardes (47 + 21), mutations jouées
-* 287 tests ciblés verts sur le rayon d'impact EKB + substitution
+* **82 gardes** (47 + 35), mutations jouées — dont « l'inconnu devient
+  servable », attrapée
+* 261 tests ciblés verts sur le rayon d'impact EKB + substitution +
+  catalogue + identité
 
 ---
 

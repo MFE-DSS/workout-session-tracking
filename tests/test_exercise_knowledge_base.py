@@ -52,8 +52,11 @@ def _exercises() -> dict:
 # ───────── référentiel : 103 noms byte-à-byte ─────────
 
 
-def test_exactly_103_entries():
-    assert len(_exercises()) == 103
+def test_exactly_107_entries():
+    # 103 → 107 : `Sb_TRAIN_A_ENV_03` intègre quatre identités sans matériel
+    # (ACE #41 · #135 · #94 · #49). Le référentiel canonique est DÉRIVÉ du
+    # catalogue : les quatre sont prescrites par `no-equipment-full-body`.
+    assert len(_exercises()) == 107
 
 
 def test_keys_match_snapshot_byte_exact():
@@ -73,7 +76,7 @@ def test_variant_key_present_and_unique():
     exercises = _exercises()
     keys = [e["variant_key"] for e in exercises.values()]
     assert all(k for k in keys)
-    assert len(set(keys)) == 103
+    assert len(set(keys)) == 107
 
 
 # ───────── variant_group : null V1 ─────────
@@ -90,8 +93,13 @@ def test_coverage_split_51_covered_52_gap():
     exercises = _exercises()
     covered = [e for e in exercises.values() if e["coverage_status"] == "covered"]
     gaps = [e for e in exercises.values() if e["coverage_status"] == "gap"]
+    # `covered` est INCHANGÉ à 67 : les quatre neuves sont des `gap`,
+    # parce que `exercise_properties` — le registre de SUBSTITUTION — n'a
+    # pas été touché (§10 : ne pas élargir l'équivalence). Elles rejoignent
+    # `Hack Squat machine` et consorts, que le vocabulaire fermé
+    # `pattern_motor` ne sait pas non plus classer.
     assert len(covered) == 67
-    assert len(gaps) == 36
+    assert len(gaps) == 40
 
 
 def test_covered_entries_consistent_with_properties():
@@ -201,7 +209,7 @@ def test_ekb01_coverage_audit_still_green():
 
     report = run_audit()
     assert not report["errors"]
-    assert report["canonical_count"] == 103
+    assert report["canonical_count"] == 107
 
 
 # ───────── Sb_EKB_ORTHOGRAPHIC_ALIAS_01 — deux écritures, une vérité ─────────
@@ -287,7 +295,7 @@ def test_both_spellings_are_kept_history_is_not_rewritten():
     exercises = _exercises()
     assert "Curl marteau câble (corde)" in exercises
     assert "Curl marteau câble corde" in exercises
-    assert len(exercises) == 103
+    assert len(exercises) == 107
 
 
 def test_the_two_spellings_resolve_to_a_single_exercise_identity():
@@ -305,7 +313,11 @@ def test_the_two_spellings_resolve_to_a_single_exercise_identity():
     Base.metadata.create_all(engine)
     with sessionmaker(bind=engine)() as db:
         report = seed_exercise_identity(db)
-        assert report.total == 102
+        # 102 → 106 : quatre identités sans matériel entrent au
+        # catalogue. Le total d'identité reste inférieur au total EKB
+        # de 1, par la fusion des deux orthographes du curl marteau —
+        # invariant conservé, pas contourné.
+        assert report.total == 106
         canon = resolve_exercise(db, "Curl marteau câble (corde)")
         alias = resolve_exercise(db, "Curl marteau câble corde")
         assert canon.id == alias.id

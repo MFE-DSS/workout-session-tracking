@@ -409,9 +409,12 @@ def test_the_curation_table_covers_the_whole_reachable_closure():
     servi : l'ignorer laisserait 37 identités sans exigence tout en les
     proposant à l'utilisateur."""
     lignes = curation_rows()
-    assert len(_prescrits()) == 68
+    # 68 → 72 prescrits et 105 → 109 identités atteignables : le gabarit
+    # `no-equipment-full-body` ajoute quatre identités. Le graphe de
+    # substitution EXISTANT est intouché — mesuré, N2 reste à 142 arcs.
+    assert len(_prescrits()) == 72
     assert set(_prescrits()) <= set(lignes)
-    assert len(lignes) == 105
+    assert len(lignes) == 109
 
 
 def test_every_curated_requirement_agrees_with_the_ekb():

@@ -532,6 +532,23 @@
         "cable_attachment_rope"
       ]
     },
+    "Fente avant": {
+      "canonical_name": "Fente avant",
+      "variant_key": "fente-avant",
+      "variant_group": null,
+      "movement_pattern": null,
+      "equipment_family": "bodyweight",
+      "zone_primary": "quads",
+      "zone_macro": "lower",
+      "chain": null,
+      "machine_slug": null,
+      "machine_family": null,
+      "coverage_status": "gap",
+      "properties_source": null,
+      "confidence": "derived",
+      "curation_note": "ACE #94 Forward Lunge — « No Equipment ». https://www.acefitness.org/resources/everyone/exercise-library/94/forward-lunge/",
+      "equipment_requirements": []
+    },
     "Good morning haltères": {
       "canonical_name": "Good morning haltères",
       "variant_key": "good-morning-halteres",
@@ -942,6 +959,40 @@
       "properties_source": null,
       "confidence": "derived",
       "curation_note": null
+    },
+    "Pompes": {
+      "canonical_name": "Pompes",
+      "variant_key": "pompes",
+      "variant_group": null,
+      "movement_pattern": null,
+      "equipment_family": "bodyweight",
+      "zone_primary": "pecs",
+      "zone_macro": "pecs",
+      "chain": null,
+      "machine_slug": null,
+      "machine_family": null,
+      "coverage_status": "gap",
+      "properties_source": null,
+      "confidence": "derived",
+      "curation_note": "ACE #41 Push-Up — Equipment « No Equipment ». https://www.acefitness.org/resources/everyone/exercise-library/41/push-up/",
+      "equipment_requirements": []
+    },
+    "Pont fessier": {
+      "canonical_name": "Pont fessier",
+      "variant_key": "pont-fessier",
+      "variant_group": null,
+      "movement_pattern": null,
+      "equipment_family": "bodyweight",
+      "zone_primary": "posterior",
+      "zone_macro": "lower",
+      "chain": null,
+      "machine_slug": null,
+      "machine_family": null,
+      "coverage_status": "gap",
+      "properties_source": null,
+      "confidence": "derived",
+      "curation_note": "ACE #49 Glute Bridge — « No Equipment ». https://www.acefitness.org/resources/everyone/exercise-library/49/glute-bridge/. ⚠ DISTINCT du hip thrust : épaules au sol et aucune charge externe, là où « Hip thrust Smith » surélève les épaules et charge la barre",
+      "equipment_requirements": []
     },
     "Preacher curl": {
       "canonical_name": "Preacher curl",
@@ -1530,6 +1581,23 @@
       "equipment_requirements": [
         "smith_rack"
       ]
+    },
+    "Squat au poids du corps": {
+      "canonical_name": "Squat au poids du corps",
+      "variant_key": "squat-au-poids-du-corps",
+      "variant_group": null,
+      "movement_pattern": null,
+      "equipment_family": "bodyweight",
+      "zone_primary": "quads",
+      "zone_macro": "lower",
+      "chain": null,
+      "machine_slug": null,
+      "machine_family": null,
+      "coverage_status": "gap",
+      "properties_source": null,
+      "confidence": "derived",
+      "curation_note": "ACE #135 Bodyweight Squat — « No Equipment ». https://www.acefitness.org/resources/everyone/exercise-library/135/bodyweight-squat/",
+      "equipment_requirements": []
     },
     "Straight-arm pulldown câble": {
       "canonical_name": "Straight-arm pulldown câble",
