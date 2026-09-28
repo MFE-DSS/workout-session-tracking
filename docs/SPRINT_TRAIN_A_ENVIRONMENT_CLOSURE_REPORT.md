@@ -410,17 +410,70 @@ précisément les deux gestes que l'activation recouvre. Le filtre servi reste
 
 ---
 
-## 11. Vérifications
+## 11. Contrat de livraison UI (`CLAUDE.md §5`)
+
+Cette tranche ne touche **aucun gabarit ni aucune feuille de style**. Elle
+change quand même une surface visible : la Bibliothèque passe de **13 à 14
+cartes**, le gabarit sans matériel entrant en *SÉANCES UTILITAIRES*. Le §5
+s'applique donc, et il n'a pas été contourné.
+
+### 5.1 — exposition visuelle préalable
+
+Rendu **réel** capturé en localhost authentifié, **écran entier**, mobile
+390 px et desktop 1280 px, et **soumis à l'opérateur avant livraison**.
+Vérifier une chaîne dans le HTML ne vaut pas exposition ; un test vert non
+plus.
+
+### 5.2 — relecture du relevé, décision par décision
+
+`docs/DESIGN_DECISIONS_UIV2_SURFACES.md` :
+
+| décision | verdict |
+|---|---|
+| **Q5** — trois rangs de surface | **respectée** — la carte reprend le rang existant de sa section, aucun conteneur neuf |
+| **Q6** — échelle 32/22/15/12 | **non concernée** — aucun rang typographique introduit |
+| **Q7** — un seul aplat ambre par écran | **respectée** — la carte n'en porte aucun ; le rendu le montre |
+| **Q8** — aucune opacité décorative | **non concernée** — aucune couleur écrite |
+| **Q1 · Q2 · Q3 · Q4** | **non concernées** — connexion, accueil, séance |
+
+### 5.3 — jamais une soustraction seule
+
+Aucune soustraction : la tranche **ajoute** un gabarit.
+
+### 5.4 — toute couleur est un token
+
+**Aucune couleur introduite.** La carte hérite intégralement des tokens de
+sa section.
+
+---
+
+## 12. Vérifications
 
 * `check_scope` : `SHARED_CODE`. **Full sweep exécuté quand même** — l'EKB
   est une donnée partagée, et ce dépôt a déjà payé trois fois l'excès de
-  confiance en `check_scope` sur ce fichier
+  confiance en `check_scope` sur ce fichier. Verdict sur arbre gelé :
+  **`tous les lots sont verts.`** (354 fichiers, aucun sauté)
 * `ruff` sur **tous** les fichiers Python du diff : propre ; scan `S9073`
   par AST : aucun
 * **82 gardes** (47 + 35), mutations jouées — dont « l'inconnu devient
   servable », attrapée
 * 261 tests ciblés verts sur le rayon d'impact EKB + substitution +
   catalogue + identité
+* **CI de PR : 9/9 verte** · Sonar `OK`, 0 bug, 0 code smell, couverture
+  nouveau code **100 %**
+
+### Deux fautes de méthode, dites plutôt que lissées
+
+**J'ai édité l'arbre PENDANT un sweep.** Son verdict ne valait donc rien —
+les derniers lots lisaient un arbre que les premiers n'avaient pas vu. Le
+sweep retenu a été rejoué sur un arbre gelé.
+
+**J'ai corrigé deux gardes d'une même famille et laissé la troisième.**
+`test_full_body_morphotype_priority` épinglait aussi le compte de gabarits ;
+seule la CI l'a vue. Je l'ai ensuite cherchée **par classe**, en AST, sur
+toutes les comparaisons entières liées aux gabarits — il n'y en avait que
+deux, et les deux sont traitées. C'est le défaut « famille aux deux tiers »,
+et il s'est reproduit exactement comme consigné.
 
 ---
 
