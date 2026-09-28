@@ -141,6 +141,34 @@ def _enregistrer_episode_de_conseil(
         db.rollback()
 
 
+def _materialiser_adaptation_equipement(db, user_id: int, template, session) -> int:
+    """Pose le plan d'adaptation sur la séance qui vient d'être construite.
+
+    Rend le nombre de créneaux adaptés. Une exception ne doit jamais
+    empêcher de démarrer : l'environnement raffine l'exécution, il n'est pas
+    une condition d'accès à sa propre séance.
+    """
+    try:
+        from app.services.environment_activation import plan_pour_template
+
+        plan = plan_pour_template(db, user_id, template)
+        if not plan:
+            return 0
+        par_position = {se.position: se for se in session.session_exercises}
+        poses = 0
+        for position, prescrit, execute in plan:
+            se = par_position.get(position)
+            # La position ET le nom prescrit doivent concorder : sans cette
+            # seconde vérification, un décalage d'indice écrirait le
+            # substitut d'un créneau sur un autre.
+            if se is not None and se.exercise_name_snapshot == prescrit:
+                se.substituted_name = execute
+                poses += 1
+        return poses
+    except Exception:
+        return 0
+
+
 @router.post("/sessions", responses={404: {"description": "Unknown template"}})
 def create_session(
     template_slug: Annotated[str, Form()],
@@ -171,6 +199,23 @@ def create_session(
         raise HTTPException(status_code=404, detail="Unknown template")
 
     session = instantiate_session(db, tpl, datetime.now(UTC), user_id=user.id)
+
+    # `Sb_TRAIN_A_ENV_ACT_01` / `G6` — L'ADAPTATION SE MATÉRIALISE AVANT LE
+    # DÉMARRAGE, jamais pendant la séance. L'utilisateur ne doit pas
+    # découvrir dans la console qu'un exercice lui est impossible.
+    #
+    # On écrit `substituted_name`, exactement le champ de la substitution
+    # MANUELLE, par le même contrat : `exercise_name_snapshot` garde
+    # l'identité PRÉVUE, `substituted_name` porte l'identité RÉALISÉE. Rien
+    # n'est ajouté au schéma, et l'historique reste interprétable — une
+    # adaptation d'équipement est un fait de même nature qu'une
+    # substitution choisie.
+    #
+    # Le gabarit source n'est JAMAIS réécrit, et le prescrit n'est jamais
+    # effacé. Une fois écrit ici, plus rien n'est recalculé : un
+    # rechargement relit la séance, il ne rejoue pas la résolution.
+    _materialiser_adaptation_equipement(db, user.id, tpl, session)
+
     # Sb_13 — telemetry. Silently reject values outside the whitelist so
     # a typo never breaks session creation.
     if creation_source in _CREATION_SOURCE_ALLOWED:

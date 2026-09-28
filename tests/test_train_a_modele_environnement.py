@@ -469,7 +469,11 @@ def test_an_external_row_that_renames_the_movement_documents_the_mapping():
 #: verdicts, mais **personne ne l'appelle** — une seconde garde vérifie
 #: qu'elle reste elle aussi sans consommateur tant que la dernière porte
 #: n'est pas ouverte.
-_IMPORTEURS_AUTORISES = {"training_preferences.py", "environment_resolution.py"}
+#: ⚠ `environment_activation` n'est PAS ici, et c'est vérifié : elle passe
+#: par `environment_resolution`, jamais directement par le modèle. Je l'y
+#: avais ajoutée par réflexe ; l'égalité stricte l'a refusée, à raison.
+_IMPORTEURS_AUTORISES = {"training_preferences.py",
+                         "environment_resolution.py"}
 
 
 def test_only_the_declaration_layer_imports_the_equipment_model():
@@ -509,9 +513,14 @@ def test_the_declaration_layer_never_renders_a_feasibility_verdict():
     assert importes <= {"capability_vocabulary", "equipment_item_vocabulary"}
 
 
-def test_the_resolution_layer_itself_has_no_consumer():
-    """§13, §18 — le résolveur est bâti, jamais branché. Le filtre servi
-    reste éteint tant que les neuf portes ne sont pas franchies."""
+#: `Sb_TRAIN_A_ENV_ACT_01` — le résolveur a désormais UN consommateur, et
+#: un seul : la couche d'activation. C'était l'objet même de cette tranche.
+#: L'égalité reste STRICTE : un second consommateur échouerait.
+_CONSOMMATEURS_DU_RESOLVEUR = {"environment_activation.py"}
+
+
+def test_the_resolution_layer_has_exactly_one_consumer():
+    """Le résolveur est branché par UNE porte, nommée, et pas ailleurs."""
     coupables = []
     for chemin in sorted(_SERVICES.glob("*.py")):
         if chemin.name == "environment_resolution.py":
@@ -525,7 +534,7 @@ def test_the_resolution_layer_itself_has_no_consumer():
                 cible = " ".join(a.name for a in noeud.names)
             if "environment_resolution" in cible:
                 coupables.append(chemin.name)
-    assert coupables == []
+    assert set(coupables) == _CONSOMMATEURS_DU_RESOLVEUR
 
 
 def test_the_import_guard_can_actually_fail(tmp_path):
