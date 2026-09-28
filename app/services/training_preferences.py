@@ -131,10 +131,18 @@ class TrainingPreferencesData:
     sessions_per_week: int | None = None
     focus_priorities: tuple[str, ...] | None = None
     available_equipment: tuple[str, ...] | None = None
+    available_equipment_items: tuple[str, ...] | None = None
 
     @property
     def is_empty(self) -> bool:
-        """Aucune des trois dimensions n'a été déclarée."""
+        """Aucune des trois dimensions **héritées** n'a été déclarée.
+
+        L'environnement concret (`available_equipment_items`) est exclu de ce
+        calcul à dessein : il a son propre point d'écriture et son propre
+        moment d'acquisition. L'inclure changerait la signification d'une
+        propriété que des surfaces existantes lisent déjà pour décider
+        d'afficher « à déclarer ».
+        """
         return (
             self.sessions_per_week is None
             and self.focus_priorities is None
@@ -214,6 +222,51 @@ def validate_available_equipment(value: Any) -> tuple[str, ...] | None:
     return tuple(f for f in EQUIPMENT_FAMILY_VOCAB if f in present)
 
 
+def validate_available_equipment_items(value: Any) -> tuple[str, ...] | None:
+    """Objets d'équipement **physiques** déclarés. Vocabulaire fermé.
+
+    Trois valeurs distinctes, et elles le restent jusqu'au stockage :
+
+    * `None` — l'environnement concret n'est **pas déclaré** ;
+    * `()` — déclaration explicite « **aucun** matériel externe » ;
+    * `(...)` — des objets concrets sont présents.
+
+    Le vocabulaire admis est celui des **objets**, jamais celui des capacités
+    internes : une capacité est une affordance dérivée, pas une chose que
+    l'utilisateur possède. Persister une capacité rendrait la déclaration
+    dépendante d'un vocabulaire interne libre d'évoluer, et l'utilisateur
+    aurait alors « déclaré » quelque chose qu'il n'a jamais vu.
+
+    Comme pour les familles, l'ordre ne porte aucun sens : la sortie suit
+    l'ordre canonique du registre pour que la comparaison et le stockage
+    soient déterministes.
+    """
+    if value is None:
+        return None
+    from app.services.equipment_model import (
+        capability_vocabulary,
+        equipment_item_vocabulary,
+    )
+
+    vocabulary = equipment_item_vocabulary()
+    items = _as_string_list(value, "available_equipment_items")
+    unknown = [item for item in items if item not in vocabulary]
+    if unknown:
+        capabilities = sorted(set(unknown) & set(capability_vocabulary()))
+        if capabilities:
+            raise PreferenceValidationError(
+                f"{capabilities!r} sont des CAPACITÉS internes, pas des objets "
+                "déclarables — l'utilisateur déclare du matériel, le moteur "
+                "en dérive les affordances"
+            )
+        raise PreferenceValidationError(
+            f"objet d'équipement inconnu {unknown!r} — vocabulaire fermé : "
+            f"{list(vocabulary)}"
+        )
+    present = set(items)
+    return tuple(item for item in vocabulary if item in present)
+
+
 def _as_string_list(value: Any, field: str) -> list[str]:
     if isinstance(value, str) or not isinstance(value, (list, tuple)):
         raise PreferenceValidationError(
@@ -282,6 +335,9 @@ def get_training_preferences(db: Session, user_id: int) -> TrainingPreferencesDa
         sessions_per_week=row.sessions_per_week,
         focus_priorities=_load(row.focus_priorities, "focus_priorities"),
         available_equipment=_load(row.available_equipment, "available_equipment"),
+        available_equipment_items=_load(
+            row.available_equipment_items, "available_equipment_items"
+        ),
     )
 
 
@@ -326,7 +382,40 @@ def save_training_preferences(
         sessions_per_week=validated_sessions,
         focus_priorities=validated_focus,
         available_equipment=validated_equipment,
+        available_equipment_items=_load(
+            row.available_equipment_items, "available_equipment_items"
+        ),
     )
+
+
+def save_available_equipment_items(
+    db: Session, user_id: int, items: Any
+) -> TrainingPreferencesData:
+    """Écrit **uniquement** l'environnement concret. Point d'écriture séparé.
+
+    Il aurait été plus court d'ajouter un quatrième paramètre à
+    `save_training_preferences`. Ç'aurait aussi été un défaut connu de ce
+    dépôt : cette fonction **remplace l'état entier**, donc tout formulaire
+    hérité qui ne connaît pas le nouveau champ l'aurait remis à `NULL` à
+    chaque soumission — une déclaration effacée par une surface qui ne sait
+    même pas qu'elle existe. L'environnement concret a son propre moment
+    d'acquisition ; il a donc son propre point d'écriture, et les trois
+    champs hérités gardent leur contrat de remplacement intact.
+    """
+    validated = validate_available_equipment_items(items)
+
+    row = db.execute(
+        select(TrainingPreferences).where(TrainingPreferences.user_id == user_id)
+    ).scalar_one_or_none()
+    if row is None:
+        row = TrainingPreferences(user_id=user_id)
+        db.add(row)
+
+    row.available_equipment_items = _dump(validated)
+    row.updated_at = datetime.now(UTC)
+    db.commit()
+
+    return get_training_preferences(db, user_id)
 
 
 __all__ = [
@@ -342,8 +431,10 @@ __all__ = [
     "equipment_family_label",
     "focus_priority_label",
     "get_training_preferences",
+    "save_available_equipment_items",
     "save_training_preferences",
     "validate_available_equipment",
+    "validate_available_equipment_items",
     "validate_focus_priorities",
     "validate_sessions_per_week",
 ]

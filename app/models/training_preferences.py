@@ -27,6 +27,16 @@ supposé ». Aucune valeur non déclarée n'est convertie en fait stocké — pa
 | `focus_priorities = []` | **explicitement** aucune priorité particulière |
 | `available_equipment = NULL` | disponibilité inconnue / non contrainte |
 | `available_equipment = []` | **explicitement** aucun matériel externe |
+| `available_equipment_items = NULL` | environnement concret **non résolu** |
+| `available_equipment_items = []` | **explicitement** aucun matériel externe |
+
+**Deux colonnes, deux questions.** `available_equipment` porte des *familles*
+grossières (`cable`, `machine`) ; `available_equipment_items` porte des *objets
+physiques* (`adjustable_bench`, `dual_adjustable_pulley`). La seconde ne se
+déduit pas de la première : « poulie » ne dit pas laquelle, « haltères » ne dit
+pas « banc ». Une migration qui remplirait l'une depuis l'autre inventerait un
+matériel que l'utilisateur n'a jamais déclaré — c'est pourquoi il n'y a
+**aucun backfill**.
 
 **Stockage des listes** : JSON dans une colonne `Text`, la convention native du
 dépôt (`user_program.subscores_json`, `alerts_json`, `suggestions_json`). Jamais
@@ -68,6 +78,13 @@ class TrainingPreferences(Base):
     #: Liste JSON de familles d'équipement, normalisée en ensemble ordonné.
     #: `NULL` ≠ `[]`.
     available_equipment: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    #: Liste JSON d'**objets d'équipement physiques** (`equipment_registry`).
+    #: `NULL` ≠ `[]`, et `NULL` ne se dérive **jamais** de la colonne grossière
+    #: ci-dessus : posséder des haltères ne prouve pas posséder un banc.
+    available_equipment_items: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=lambda: datetime.now(UTC)

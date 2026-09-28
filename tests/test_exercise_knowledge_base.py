@@ -362,7 +362,18 @@ def test_alembic_head_unchanged():
     # `rest_dismissed_at` une DÉCISION. Les fondre en une échéance
     # `rest_until` aurait rendu l'heure d'exécution déductible seulement à
     # travers `REST_FALLBACK_SECONDS`, donc toute la chronologie
-    # historique aurait glissé le jour où la politique change).
+    # historique aurait glissé le jour où la politique change),
+    # puis TRAIN A ENV (`x5y0s6t7v18` : UNE colonne additive nullable
+    # `available_equipment_items` sur `training_preferences`, aucun backfill.
+    # La table portait déjà `available_equipment`, un ensemble de FAMILLES ;
+    # la colonne ajoutée porte des OBJETS PHYSIQUES. Remplir la seconde
+    # depuis la première inventerait du matériel : « du câble » ne dit pas
+    # lequel, et la documentation constructeur le prouve — sur un Life
+    # Fitness MJ4 le tirage vertical et le tirage bas sont deux stations
+    # sélectorisées distinctes, chacune avec sa colonne de charge, et la
+    # poulie double réglable est encore un autre produit. `NULL` signifie
+    # donc « environnement concret non résolu », et un environnement non
+    # résolu rend `UNKNOWN`, jamais un refus).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -371,4 +382,4 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "w4x9r5s6u17"
+    assert script.get_current_head() == "x5y0s6t7v18"
