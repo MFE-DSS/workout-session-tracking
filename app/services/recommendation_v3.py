@@ -724,6 +724,36 @@ def recommander_v3(
     if not verdicts:
         return None
 
+    # `Sb_TRAIN_A_ENV_ACT_01` — LA PORTE D'ENVIRONNEMENT, ici et nulle part
+    # ailleurs. C'est le seul endroit du graphe servi où la liste ORDONNÉE
+    # COMPLÈTE existe : filtrer plus loin porterait sur `top + 2`, et
+    # rendrait vide alors qu'un quatrième candidat était servable.
+    #
+    # Elle ne CLASSE pas. Elle retire les candidats prouvés infaisables et
+    # laisse l'ordre survivant intact — l'équipement est une faisabilité,
+    # pas une préférence, et en faire un signal de score le rendrait
+    # négociable. Sur environnement non déclaré, elle est inerte.
+    from app.services.environment_activation import appliquer
+
+    environnement = appliquer(db, user_id, verdicts)
+    verdicts = list(environnement.candidats)
+    if not verdicts:
+        # Aucun candidat servable ET aucun incertain : l'état produit est
+        # NOMMÉ par le contexte, il ne se déduit pas d'une absence.
+        return {
+            "top": None,
+            "alternatives": [],
+            "context": {
+                "politique": "v3",
+                "cold_start": False,
+                "departage_par_catalogue": False,
+                "environnement_actif": True,
+                "environnement_etat": environnement.etat_catalogue,
+                "environnement_identite": environnement.identite,
+                "environnement_adapte": False,
+            },
+        }
+
     tete, *reste = verdicts
 
     def _candidat(v: Verdict, rang: int) -> dict:
@@ -755,6 +785,14 @@ def recommander_v3(
             "cold_start": signaux_froids(verdicts),
             "departage_par_catalogue": bool(
                 reste and tete.rang_sans_catalogue == reste[0].rang_sans_catalogue
+            ),
+            "environnement_actif": environnement.actif,
+            "environnement_etat": environnement.etat_catalogue,
+            "environnement_identite": environnement.identite,
+            # Le FAIT, pas la liste : Mission n'énumère jamais les
+            # substitutions. La lignée complète vit dans le détail de séance.
+            "environnement_adapte": bool(
+                environnement.adaptations.get(tete.template.slug)
             ),
         },
     }

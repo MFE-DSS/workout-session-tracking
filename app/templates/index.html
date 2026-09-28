@@ -255,9 +255,26 @@
            Comparer la VALEUR ne suppose rien sur l'ordre. #}
         {% set _autres = home.today.reasons | reject('equalto', _top.phrase) | list
            if (home and home.today and home.today.reasons) else [] %}
-        {% if _autres %}
+        {# `Sb_TRAIN_A_ENV_ACT_01 §4` — LE FAIT, PAS LA LISTE.
+
+           Quand et seulement quand l'environnement a REELLEMENT change une
+           execution servie, un fait bref rejoint les raisons produites par
+           le moteur. Il est de la meme nature qu'elles : une sortie systeme,
+           rang 2 informatif.
+
+           Aucune carte neuve, aucune primitive neuve, aucune couleur neuve,
+           aucun second aplat ambre : la ligne reutilise `cockpit__reasons`
+           telle quelle. Mission n'enumere JAMAIS les substitutions — la
+           lignee prevu vers realise vit dans le detail de seance.
+
+           Rien du tout quand rien ne s'est adapte : pas de place reservee,
+           pas de texte vide. #}
+        {% set _adapte = reco.context.environnement_adapte
+           if (reco.context is defined and reco.context) else false %}
+        {% if _autres or _adapte %}
         <ul class="cockpit__reasons">
           {% for r in _autres %}<li>{{ r }}</li>{% endfor %}
+          {% if _adapte %}<li>Adapté à ton équipement.</li>{% endif %}
         </ul>
         {% endif %}
       </div>
@@ -271,6 +288,34 @@
           </button>
         </form>
         <a class="today-home__secondary" href="{{ url_for('launcher') }}">Choisir une autre séance</a>
+      </div>
+    {% elif reco and reco.context and reco.context.environnement_etat == 'no_servable_candidate' %}
+      {# `Sb_TRAIN_A_ENV_ACT_01 §3` — LE VRAI CAS BLOQUE, ET RIEN D'AUTRE.
+
+         Il ne se confond ni avec « aucun calcul » ni avec une erreur : il
+         est atteint uniquement quand AUCUN gabarit n'est servable ET
+         qu'aucun ne reste incertain. L'incertitude, elle, laisse le produit
+         proposer.
+
+         Ce que la phrase ne dit PAS, deliberement : aucune blessure, aucune
+         impreparation physiologique, aucun echec de l'utilisateur, aucun
+         risque medical, et surtout pas que les exercices inconnus seraient
+         impossibles. Elle dit ce qu'AUREN sait, et ou le corriger.
+
+         Meme grammaire que le repli ci-dessous : titre, meta, une commande
+         et une sortie secondaire. Aucune carte, aucune couleur, aucune
+         metaphore de feu tricolore, aucune impasse — la commande mene a la
+         surface de declaration qui EXISTE DEJA. #}
+      <h1 class="today-home__title">Aucune séance prouvable ici</h1>
+      <p class="today-home__meta">
+        Avec le matériel déclaré, AUREN ne peut prouver aucune séance
+        exécutable. Ajuste ton matériel, ou choisis une séance toi-même.
+      </p>
+      <div class="today-home__action">
+        <a class="today-home__cta" href="{{ url_for('user_plan') }}#declaration">
+          Ajuster mon matériel <span aria-hidden="true">→</span>
+        </a>
+        <a class="today-home__secondary" href="{{ url_for('launcher') }}">Choisir une séance</a>
       </div>
     {% else %}
       <h1 class="today-home__title">Prêt à t'entraîner&nbsp;?</h1>

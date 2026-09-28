@@ -383,6 +383,21 @@ def recommander(
 
     empreinte = empreinte_de_contexte(_compute_signals(db, user_id, now))
     contexte = dict(reco.get("context") or {})
+    # `Sb_TRAIN_A_ENV_ACT_01` / `G9` — L'EMPREINTE NE DEVIENT
+    # ENVIRONNEMENTALE QU'À L'ACTIVATION CAUSALE.
+    #
+    # `environnement_identite` n'est posée par la politique que si la porte
+    # a réellement tourné, c'est-à-dire si l'utilisateur a DÉCLARÉ un
+    # environnement concret. Sur `NULL` — tout le parc aujourd'hui — elle
+    # vaut `None` et l'empreinte est **inchangée au caractère près** : aucun
+    # refus déjà enregistré ne périme.
+    #
+    # Et ce n'est pas l'inventaire : l'identité ne bouge que si une
+    # EXÉCUTION SERVIE change. Déclarer une machine dont aucun créneau ne se
+    # sert ne périme donc rien.
+    identite_env = contexte.get("environnement_identite")
+    if identite_env:
+        empreinte = f"{empreinte}|env:{identite_env}"
     contexte["empreinte_contexte"] = empreinte
     contexte["politique"] = politique
     reco = {**reco, "context": contexte}
