@@ -51,6 +51,13 @@ from fastapi import APIRouter, Form, HTTPException, Path, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 
 from app.deps import CurrentUser, DbSession
+from app.routers.sessions import _demarrage_bloque, _poser_adaptations
+from app.services.environment_activation import (
+    ADAPTABLE,
+    REFUSE,
+    preparer_demarrage,
+)
+from app.services.equipment_model import equipment_groups
 from app.services.program_quality_reviews import SCORABLE_STATUSES
 from app.services.session_builder import instantiate_session
 from app.services.session_state import latest_open_session
@@ -448,6 +455,51 @@ def user_programs_list(request: Request, db: DbSession, user: CurrentUser):
     )
 
 
+@router.post("/plan/equipement", response_model=None,
+             name="user_plan_equipment_submit")
+async def user_plan_equipment_submit(
+    request: Request,
+    db: DbSession = None,
+    user: CurrentUser = None,
+) -> RedirectResponse:
+    """Écrit l'environnement CONCRET, et lui seul.
+
+    Point d'écriture **séparé** de `profile_preferences_submit` : celui-ci
+    remplace l'état entier des trois champs hérités, et y glisser
+    l'environnement l'aurait effacé à chaque soumission du formulaire de
+    familles. Ici on n'appelle que `save_available_equipment_items`.
+
+    Trois états, et l'intention est LUE, pas devinée :
+
+    * `raz=1`              → `None`, « je ne l'ai pas indiqué »
+    * marqueur sans case   → `[]`, « je m'entraîne sans matériel »
+    * cases cochées        → l'inventaire
+
+    Le marqueur caché est ce qui distingue une soumission volontairement
+    vide d'un formulaire qui n'a pas été rendu.
+    """
+    from app.services.training_preferences import (
+        PreferenceValidationError,
+        save_available_equipment_items,
+    )
+
+    form = await request.form()
+    if form.get("raz"):
+        objets = None
+    elif form.get("equipement_declared"):
+        objets = [str(v) for v in form.getlist("equipement")]
+    else:
+        return RedirectResponse(url="/plan#equipement", status_code=303)
+
+    try:
+        save_available_equipment_items(db, user.id, objets)
+    except PreferenceValidationError:
+        return RedirectResponse(url="/plan?equip_error=1#equipement",
+                                status_code=303)
+    return RedirectResponse(url="/plan?equip_saved=1#equipement",
+                            status_code=303)
+
+
 @router.get("/plan", response_class=HTMLResponse, name="user_plan")
 def user_plan(request: Request, db: DbSession, user: CurrentUser):
     """`UX4_02` / TRAIN 2 — **Mon plan**.
@@ -504,7 +556,17 @@ def user_plan(request: Request, db: DbSession, user: CurrentUser):
             # Sb_ORCHESTRATOR_EXPLAINER_01 — lecture seule, jamais bloquante.
             "plan_explanation": _plan_explanation(db, user.id),
             "active_session": latest_open_session(db, user.id),
-            "pref_saved": request.query_params.get("pref_saved") == "1",
+            # `Sb_TRAIN_A_ENV_EXP_01 §6` — le slug refusé au démarrage, pour
+        # que `/plan` puisse le dire calmement plutôt que de laisser
+        # l'utilisateur deviner pourquoi il a atterri ici.
+        "depart_bloque": request.query_params.get("depart_bloque") or None,
+        # `Sb_TRAIN_A_ENV_EXP_01` — l'environnement CONCRET, et les objets
+        # déclarables groupés pour l'affichage. Le vocabulaire interne
+        # (capacités, exigences, états du résolveur) ne traverse jamais.
+        "equipement_groupes": equipment_groups(),
+        "equipement_saved": request.query_params.get("equip_saved") == "1",
+        "equipement_error": request.query_params.get("equip_error") == "1",
+        "pref_saved": request.query_params.get("pref_saved") == "1",
             "pref_error": request.query_params.get("pref_error") == "1",
         },
     )
@@ -1094,7 +1156,21 @@ def user_program_start_session(
         template = resolve_owned_published_template(db, user.id, program_id, session_id)
     except LaunchNotFound as exc:
         raise HTTPException(status_code=404, detail=_NOT_FOUND) from exc
+    # `Sb_TRAIN_A_ENV_EXP_01` — CETTE ROUTE AUSSI. Elle créait une séance
+    # sans aucun préflight d'environnement ni matérialisation : un
+    # propriétaire de programme publié démarrait sans adaptation, même avec
+    # un environnement déclaré. La tranche d'activation n'avait câblé
+    # qu'une route de démarrage sur deux.
+    preparation = preparer_demarrage(db, user.id, template)
+    if preparation.etat == REFUSE:
+        return _demarrage_bloque(template.slug)
+
     session = instantiate_session(db, template, datetime.now(UTC), user_id=user.id)
+    if preparation.etat == ADAPTABLE:
+        # Partiel = échec, exactement comme sur `POST /sessions`.
+        if _poser_adaptations(session, preparation.plan) != preparation.attendu:
+            db.rollback()
+            return _demarrage_bloque(template.slug)
     db.commit()  # instantiate_session already stages the session (session_builder.py:82)
     db.refresh(session)
     return RedirectResponse(url=f"/sessions/{session.id}", status_code=303)

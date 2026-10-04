@@ -29,6 +29,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from app.services.environment_resolution import (
+    ADAPTABLE,
     NO_SERVABLE_CANDIDATE,
     SERVABLE,
     identite_materielle_environnement,
@@ -160,17 +161,27 @@ class _Vue:
     verdict: object = None
 
 
-def environnement_declare(db, user_id: int) -> tuple[str, ...] | None:
+def environnement_declare(
+    db, user_id: int, *, strict: bool = False
+) -> tuple[str, ...] | None:
     """L'environnement concret DÉCLARÉ, ou `None`.
 
     Lu par la frontière canonique des préférences, jamais par une requête
-    dispersée. Une lecture qui échoue rend `None` — non déclaré — et donc
-    une porte inerte : une panne de lecture ne doit jamais se transformer en
-    filtrage.
-    """
-    try:
-        from app.services.training_preferences import get_training_preferences
+    dispersée.
 
+    **Deux tolérances, parce qu'il y a deux rôles.** Lire l'environnement
+    pour CLASSER peut échouer sans conséquence : une recommandation dégradée
+    vaut mieux qu'un écran cassé, donc l'échec rend `None` et la porte
+    devient inerte. Lire l'environnement pour DÉCIDER DE CRÉER UNE SÉANCE ne
+    le peut pas : là, une panne qui se déguise en « non déclaré » ferait
+    démarrer une séance que l'utilisateur ne peut pas exécuter. `strict`
+    laisse alors remonter.
+    """
+    from app.services.training_preferences import get_training_preferences
+
+    if strict:
+        return get_training_preferences(db, user_id).available_equipment_items
+    try:
         return get_training_preferences(db, user_id).available_equipment_items
     except Exception:
         return None
@@ -238,7 +249,95 @@ def plan_pour_template(db, user_id: int, template) -> tuple[Adaptation, ...]:
     )
 
 
+# ---------------------------------------------------------------------------
+# La frontière de DÉMARRAGE — `Sb_TRAIN_A_ENV_EXP_01`
+# ---------------------------------------------------------------------------
+#
+# `plan_pour_template` ne savait pas refuser : `NO_SERVABLE_CANDIDATE` et
+# « rien à adapter » rendaient tous deux `()`. Le signal de refus était donc
+# jeté exactement à la frontière que la création de séance utilise.
+#
+# Cinq états nommés le remplacent. Aucun nombre, aucun booléen : un appelant
+# ne doit pas pouvoir confondre « rien à faire » et « ne pas faire ».
+
+#
+# ⚠ `ADAPTABLE` n'est PAS redéfini ici. Le résolveur le possède déjà, avec la
+# même valeur et le même sens — « exécutable via des substituts autorisés ».
+# En écrire une seconde copie dans ce module a fait rougir
+# `test_no_second_resolver_was_introduced`, et la garde avait raison : deux
+# définitions du même fait finissent toujours par diverger. Il est importé en
+# tête, et ré-exporté pour que les appelants du préflight lisent les cinq
+# états au même endroit.
+
+#: Environnement non déclaré. Chemin hérité, strictement rien.
+NON_APPLICABLE = "non_applicable"
+#: Prouvé exécutable tel quel.
+NATIF = "natif"
+#: §1.B — aucune voie prouvée, mais au moins une inconnue. Non bloquant.
+INCERTAIN = "incertain"
+#: Toutes les voies autorisées sont connues incompatibles.
+REFUSE = "refuse"
+
+
+@dataclass(frozen=True)
+class PreparationDemarrage:
+    """Ce que le préflight autorise, et à quelles conditions exactes."""
+
+    etat: str
+    slug: str | None = None
+    #: Les adaptations à poser. Vide sauf en `ADAPTABLE`.
+    plan: tuple[Adaptation, ...] = ()
+
+    @property
+    def attendu(self) -> int:
+        """Combien d'adaptations DOIVENT être posées.
+
+        L'appelant compare ce nombre à ce qu'il a réellement écrit. En poser
+        moins est un **échec**, jamais un demi-succès.
+        """
+        return len(self.plan)
+
+    @property
+    def autorise(self) -> bool:
+        return self.etat != REFUSE
+
+
+def preparer_demarrage(db, user_id: int, template) -> PreparationDemarrage:
+    """Décide, AVANT toute instanciation, si cette séance peut démarrer.
+
+    Appelée par **chaque** route qui crée une séance — une garde par AST
+    vérifie qu'aucun appelant d'`instantiate_session` ne s'en dispense. La
+    version précédente n'en câblait qu'une sur deux.
+
+    Lecture **stricte** de l'environnement : ici, une panne ne se déguise
+    pas en « non déclaré ».
+    """
+    objets = environnement_declare(db, user_id, strict=True)
+    if objets is None:
+        return PreparationDemarrage(NON_APPLICABLE, getattr(template, "slug", None))
+
+    slug = template.slug
+    vue = _Vue(slug, _creneaux_du_template(template), None)
+    resultat = filtrer_par_environnement([vue], tuple(objets))
+
+    if resultat.etat_catalogue == NO_SERVABLE_CANDIDATE:
+        return PreparationDemarrage(REFUSE, slug)
+    plan = resultat.adaptations.get(slug, ())
+    if plan:
+        return PreparationDemarrage(ADAPTABLE, slug, tuple(plan))
+    if resultat.etat_catalogue == SERVABLE:
+        return PreparationDemarrage(NATIF, slug)
+    return PreparationDemarrage(INCERTAIN, slug)
+
+
 __all__ = [
+    "ADAPTABLE",
+    "INCERTAIN",
+    "NATIF",
+    "NON_APPLICABLE",
+    "REFUSE",
+    "PreparationDemarrage",
+    "preparer_demarrage",
     "Adaptation",
     "CandidatsEnvironnement",
     "appliquer",
