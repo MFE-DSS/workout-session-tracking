@@ -45,10 +45,19 @@
     <li><span>Priorités</span>
       {% if preferences.focus_priorities %}<b>{{ priority_labels | join(', ') }}</b>
       {% else %}<b><a class="stat-add" href="#declaration">À déclarer</a></b>{% endif %}</li>
-    <li><span>Équipement</span>
+    {# `Sb_TRAIN_A_ENV_EXP_01` — DEUX FAITS, parce qu'il y a deux objets.
+       Les six familles ne décrivent pas l'équipement ; elles décrivent ce
+       qui construit le programme. L'inventaire concret est ce qui change la
+       séance du jour. Les confondre sur une seule ligne ferait croire que
+       déclarer des familles suffit. #}
+    <li><span>Matériel du plan</span>
       {% if preferences.available_equipment is none %}<b><a class="stat-add" href="#declaration">À déclarer</a></b>
       {% elif preferences.available_equipment %}<b>{{ preferences.available_equipment | length }} famille{% if preferences.available_equipment | length > 1 %}s{% endif %}</b>
       {% else %}<b>aucune déclarée</b>{% endif %}</li>
+    <li><span>Équipement sur place</span>
+      {% if preferences.available_equipment_items is none %}<b><a class="stat-add" href="#equipement">À déclarer</a></b>
+      {% elif preferences.available_equipment_items %}<b>{{ preferences.available_equipment_items | length }} équipement{% if preferences.available_equipment_items | length > 1 %}s{% endif %}</b>
+      {% else %}<b>sans matériel</b>{% endif %}</li>
   </ul>
 </section>
 
@@ -243,10 +252,11 @@
      elle promettait un objet en montrant son absence. Vu à l'écran, pas dans
      le gabarit — un rendu vaut mieux qu'une relecture (`CLAUDE.md §5.1`). #}
   <p class="text-dim plan-meta">
-    Ce que tu déclares ici — et rien d'autre —
-    {% if weekly_plan_proposal %}produit le plan ci-dessus.
-    {% else %}produira le plan proposé.{% endif %}
-    Ces informations ne modifient pas la séance recommandée aujourd'hui.
+    Ces familles — et rien d'autre —
+    {% if weekly_plan_proposal %}produisent le plan ci-dessus.
+    {% else %}produiront le plan proposé.{% endif %}
+    Elles ne modifient pas la séance recommandée aujourd'hui ; c'est
+    l'équipement présent là où tu t'entraînes qui le fait, plus bas.
   </p>
 
   {% if pref_saved %}
@@ -355,6 +365,89 @@
   </details>
 </div>
 </div>
+{# ══ L'ENVIRONNEMENT CONCRET ══ `Sb_TRAIN_A_ENV_EXP_01`
+
+   DEUX OBJETS, PAS DEUX QUESTIONNAIRES. Au-dessus, les six familles
+   construisent le PROGRAMME. Ici, les objets réellement présents décident
+   de ce que la séance du jour peut employer, et déclenchent la
+   substitution automatique. Le résumé en tête porte les deux faits.
+
+   Aucun mot interne ne traverse : ni capacité, ni exigence, ni état de
+   résolveur. L'utilisateur voit des objets et leurs noms.
+
+   Le formulaire poste sur une route SÉPARÉE. Le formulaire de familles
+   remplace l'état entier des trois champs hérités ; y glisser celui-ci
+   l'aurait effacé à chaque soumission. #}
+<div id="equipement">
+{% if depart_bloque %}
+{# §6 — le retour après un démarrage refusé. Ni erreur brute, ni
+   vocabulaire médical, ni métaphore de danger, et surtout : on ne dit
+   jamais qu'un exercice inconnu est impossible. #}
+<p class="text-dim plan-meta--warn">
+  Cette séance demande du matériel absent de ton équipement déclaré.
+  Ajuste-le ci-dessous, ou choisis une autre séance.
+</p>
+{% endif %}
+{% if equipement_saved %}<output class="empty-line">Équipement enregistré.</output>{% endif %}
+{% if equipement_error %}<p class="empty-line" role="alert">Équipement non reconnu.</p>{% endif %}
+<section class="pstate pstate--flat">
+  <h2 class="section-header">Équipement disponible ici</h2>
+  <p class="text-dim plan-meta">
+    {% if preferences.available_equipment_items is none %}
+      Tu ne l'as pas encore indiqué. Tant qu'il manque, AUREN propose
+      comme aujourd'hui, sans rien écarter.
+    {% elif preferences.available_equipment_items %}
+      {{ preferences.available_equipment_items | length }} équipement{% if preferences.available_equipment_items | length > 1 %}s{% endif %}
+      déclaré{% if preferences.available_equipment_items | length > 1 %}s{% endif %}.
+      La séance du jour s'y adapte.
+    {% else %}
+      Tu t'entraînes sans matériel. La séance du jour s'y adapte.
+    {% endif %}
+  </p>
+
+  <details class="disclosure pstate__edit">
+    <summary class="disclosure__summary">
+      <span>Déclarer mon équipement</span>
+      <span class="disclosure__chevron" aria-hidden="true">▾</span>
+    </summary>
+    <form method="post" action="{{ url_for('user_plan_equipment_submit') }}"
+          class="prefs-form">
+      {# Le marqueur distingue une soumission volontairement VIDE — « je
+         m'entraîne sans matériel » — d'un formulaire jamais rendu. Sans
+         lui, les deux arriveraient identiques. #}
+      <input type="hidden" name="equipement_declared" value="1">
+      {% for cle, titre, objets in equipement_groupes %}
+      <fieldset class="prefs-block">
+        <legend class="choice-group__legend">{{ titre }}</legend>
+        <div class="choice-group">
+          {% for objet in objets %}
+          {{ choice_row("equipement", objet.item_id, objet.label,
+                        kind="checkbox",
+                        checked=(preferences.available_equipment_items
+                                 and objet.item_id in preferences.available_equipment_items),
+                        input_id="equipement_%s") }}
+          {% endfor %}
+        </div>
+      </fieldset>
+      {% endfor %}
+      <p class="choice-group__hint">
+        Valider sans rien cocher enregistre « sans matériel ».
+      </p>
+      <button type="submit" class="btn btn--ghost prefs-form__submit">Enregistrer</button>
+    </form>
+    {% if preferences.available_equipment_items is not none %}
+    {# Le retour à « non indiqué ». Sans ce geste, une déclaration serait un
+       aller simple et l'état hérité deviendrait inatteignable. #}
+    <form method="post" action="{{ url_for('user_plan_equipment_submit') }}"
+          class="prefs-form">
+      <input type="hidden" name="raz" value="1">
+      <button type="submit" class="btn btn--ghost prefs-form__submit">Effacer ma déclaration</button>
+    </form>
+    {% endif %}
+  </details>
+</section>
+</div>
+
 {# `UI-CP1` — LE SCRIPT REJOINT ENFIN LE FORMULAIRE QU'IL AMÉLIORE.
    `Sb_UI_PROFILE_PREFERENCES_REDESIGN_01` l'avait posé sur `profile.html`.
    `UX4_02` / TRAIN 2 a déplacé l'éditeur de préférences ici — et le script

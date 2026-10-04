@@ -65,6 +65,8 @@ class EquipmentItem:
     label: str
     capabilities: frozenset[str]
     provenance: str
+    #: Groupe d'AFFICHAGE. Sans effet sur les capacités ni les verdicts.
+    group: str = "autre"
 
 
 @lru_cache(maxsize=1)
@@ -95,6 +97,7 @@ def equipment_items() -> dict[str, EquipmentItem]:
             label=raw["label"],
             capabilities=frozenset(raw["capabilities"]),
             provenance=raw["provenance"],
+            group=raw.get("group", "autre"),
         )
     return items
 
@@ -103,6 +106,33 @@ def equipment_items() -> dict[str, EquipmentItem]:
 def equipment_item_vocabulary() -> tuple[str, ...]:
     """Identifiants d'objets, ordre canonique — c'est ce qui est persisté."""
     return tuple(sorted(equipment_items()))
+
+
+@lru_cache(maxsize=1)
+def equipment_groups() -> tuple[tuple[str, str, tuple[EquipmentItem, ...]], ...]:
+    """Les objets déclarables, groupés **pour l'affichage seulement**.
+
+    `(cle, libellé, objets)` dans l'ordre du registre. Vingt-neuf cases à
+    cocher d'un seul tenant ne se lisent pas sur un téléphone ; ce
+    regroupement n'existe que pour ça. Il ne change aucune capacité, aucune
+    exigence, aucun verdict — une garde le vérifie.
+
+    Un objet dont le groupe est absent du registre tombe dans le dernier
+    groupe déclaré plutôt que de disparaître : une case manquante serait un
+    équipement que l'utilisateur ne peut plus déclarer.
+    """
+    libelles: dict[str, str] = dict(_registry().get("groups") or {})
+    if not libelles:
+        libelles = {"autre": "Équipement"}
+    par_groupe: dict[str, list[EquipmentItem]] = {k: [] for k in libelles}
+    defaut = next(reversed(libelles))
+    for item in equipment_items().values():
+        cle = getattr(item, "group", None) or defaut
+        par_groupe.setdefault(cle if cle in libelles else defaut, []).append(item)
+    return tuple(
+        (cle, libelles[cle], tuple(par_groupe[cle]))
+        for cle in libelles if par_groupe[cle]
+    )
 
 
 @lru_cache(maxsize=1)
@@ -245,6 +275,7 @@ __all__ = [
     "capability_vocabulary",
     "curation_rows",
     "declared_aliases",
+    "equipment_groups",
     "equipment_item_vocabulary",
     "equipment_items",
     "feasibility",

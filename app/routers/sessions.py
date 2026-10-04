@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 from typing import Annotated
+from urllib.parse import quote
 
 from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -47,6 +48,11 @@ from app.services.console_state import (
     serie_portant_le_repos,
 )
 from app.services.delta import compute_delta, format_delta
+from app.services.environment_activation import (
+    ADAPTABLE,
+    REFUSE,
+    preparer_demarrage,
+)
 from app.services.exercise_history import get_exercise_history
 from app.services.form_parsing import (
     clean_str,
@@ -141,32 +147,39 @@ def _enregistrer_episode_de_conseil(
         db.rollback()
 
 
-def _materialiser_adaptation_equipement(db, user_id: int, template, session) -> int:
-    """Pose le plan d'adaptation sur la séance qui vient d'être construite.
+def _poser_adaptations(session, plan) -> int:
+    """Écrit le plan sur la séance construite. Rend le nombre POSÉ.
 
-    Rend le nombre de créneaux adaptés. Une exception ne doit jamais
-    empêcher de démarrer : l'environnement raffine l'exécution, il n'est pas
-    une condition d'accès à sa propre séance.
+    La position ET le nom prescrit doivent concorder : `materialization_plan`
+    numérote par `enumerate(slots, start=1)` tandis que la séance porte
+    `TemplateExercise.position`. Sans la seconde vérification, un décalage
+    écrirait le substitut d'un créneau sur un autre.
+
+    ⚠ Aucun `except` ici, et c'est le cœur de la tranche. La version
+    précédente avalait tout et rendait `0` — le même `0` que « rien à
+    adapter ». Une séance jugée adaptable pouvait donc démarrer SANS
+    l'adaptation qui la rendait servable.
     """
-    try:
-        from app.services.environment_activation import plan_pour_template
+    par_position = {se.position: se for se in session.session_exercises}
+    poses = 0
+    for position, prescrit, execute in plan:
+        se = par_position.get(position)
+        if se is not None and se.exercise_name_snapshot == prescrit:
+            se.substituted_name = execute
+            poses += 1
+    return poses
 
-        plan = plan_pour_template(db, user_id, template)
-        if not plan:
-            return 0
-        par_position = {se.position: se for se in session.session_exercises}
-        poses = 0
-        for position, prescrit, execute in plan:
-            se = par_position.get(position)
-            # La position ET le nom prescrit doivent concorder : sans cette
-            # seconde vérification, un décalage d'indice écrirait le
-            # substitut d'un créneau sur un autre.
-            if se is not None and se.exercise_name_snapshot == prescrit:
-                se.substituted_name = execute
-                poses += 1
-        return poses
-    except Exception:
-        return 0
+
+def _demarrage_bloque(slug: str) -> RedirectResponse:
+    """§6 — retour calme vers la déclaration d'environnement CONCRET.
+
+    Pas vers `#declaration`, qui est le questionnaire de FAMILLES : celui-là
+    ne répare pas le problème, et le laisser croire serait pire que de ne
+    rien dire.
+    """
+    return RedirectResponse(
+        url=f"/plan?depart_bloque={quote(slug)}#equipement", status_code=303
+    )
 
 
 @router.post("/sessions", responses={404: {"description": "Unknown template"}})
@@ -198,23 +211,29 @@ def create_session(
     ):
         raise HTTPException(status_code=404, detail="Unknown template")
 
+    # `Sb_TRAIN_A_ENV_EXP_01` / `§1` — LE PRÉFLIGHT PRÉCÈDE L'INSTANCIATION.
+    #
+    # Refuser APRÈS avoir instancié laisserait une séance orpheline à la
+    # moindre fuite : `session_builder` pose déjà `db.add`. On décide donc
+    # avant que quoi que ce soit n'existe.
+    preparation = preparer_demarrage(db, user.id, tpl)
+    if preparation.etat == REFUSE:
+        return _demarrage_bloque(template_slug)
+
     session = instantiate_session(db, tpl, datetime.now(UTC), user_id=user.id)
 
-    # `Sb_TRAIN_A_ENV_ACT_01` / `G6` — L'ADAPTATION SE MATÉRIALISE AVANT LE
-    # DÉMARRAGE, jamais pendant la séance. L'utilisateur ne doit pas
-    # découvrir dans la console qu'un exercice lui est impossible.
+    # `G6` — l'adaptation se matérialise AVANT le démarrage, jamais pendant
+    # la séance. On écrit `substituted_name`, exactement le champ de la
+    # substitution manuelle : `exercise_name_snapshot` garde l'identité
+    # PRÉVUE, `substituted_name` porte la RÉALISÉE.
     #
-    # On écrit `substituted_name`, exactement le champ de la substitution
-    # MANUELLE, par le même contrat : `exercise_name_snapshot` garde
-    # l'identité PRÉVUE, `substituted_name` porte l'identité RÉALISÉE. Rien
-    # n'est ajouté au schéma, et l'historique reste interprétable — une
-    # adaptation d'équipement est un fait de même nature qu'une
-    # substitution choisie.
-    #
-    # Le gabarit source n'est JAMAIS réécrit, et le prescrit n'est jamais
-    # effacé. Une fois écrit ici, plus rien n'est recalculé : un
-    # rechargement relit la séance, il ne rejoue pas la résolution.
-    _materialiser_adaptation_equipement(db, user.id, tpl, session)
+    # ⚠ PARTIEL = ÉCHEC. Si TRAIN A a jugé N adaptations nécessaires, en
+    # poser N−1 produit une séance inexécutable que rien n'annonce.
+    if preparation.etat == ADAPTABLE:
+        poses = _poser_adaptations(session, preparation.plan)
+        if poses != preparation.attendu:
+            db.rollback()
+            return _demarrage_bloque(template_slug)
 
     # Sb_13 — telemetry. Silently reject values outside the whitelist so
     # a typo never breaks session creation.
