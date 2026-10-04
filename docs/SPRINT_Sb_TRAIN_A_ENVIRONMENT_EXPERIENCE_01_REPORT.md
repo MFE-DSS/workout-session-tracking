@@ -360,4 +360,59 @@ Aucun merge sans `GO MERGE`.
 
 ---
 
+---
+
+## Closeout — post-merge
+
+| fait | valeur |
+|---|---|
+| PR | [#266](https://github.com/MFE-DSS/workout-session-tracking/pull/266) |
+| méthode | `--merge`, head épinglée `92fd17f` — pas de squash, pas de `--admin` |
+| commit de merge | `1868445` |
+| mergée le | 2026-10-04 |
+| porte Sonar (PR) | `OK` — 0 bug, 0 code smell, 0 vulnérabilité en code neuf ; couverture neuve **83,1 %** (seuil 80) ; duplication **0,0 %** |
+| fils de revue non résolus | 0 |
+| CI de PR | 10/10 verts |
+| CI canonique sur `1868445` | `success` — **7 jobs / 7** (run `37205144479`) |
+
+### Incidents résolus dans le périmètre
+
+**Le premier full sweep local était rouge sur deux gardes du dépôt.** Les deux
+avaient raison, et aucune n'a été élargie pour laisser passer la tranche :
+
+1. `test_rec_cp2_policy::test_v3_n_est_reference_que_par_le_banc_et_la_composition`
+   — le fichier de preuves importait `recommander_v3` directement. Corrigé en
+   appelant le point de composition servi
+   (`advice_memory.recommander(..., POLITIQUE_SERVIE, MEMOIRE_SERVIE)`), ce qui
+   rend la preuve **plus fidèle** : elle mesure désormais la politique que le
+   produit sert, pas celle que le test avait choisie.
+2. `test_train_a_activation_environnement::test_no_second_resolver_was_introduced`
+   — `ADAPTABLE` était redéfini dans `environment_activation.py` alors que le
+   résolveur le possède déjà, avec la même valeur. Corrigé par un import.
+
+Deux erreurs de prémisse de l'agent, corrigées avant mesure : quatre slugs
+d'équipement inventés (`squat_rack`, `dip_station`, `cable_single_handle`,
+`cable_ankle_strap`) qui n'existent pas dans le registre — les environnements
+de test sont désormais **dérivés** de `equipment_item_vocabulary()` et ne
+peuvent plus diverger ; et une attente d'ordre de stockage fausse, alors que
+le contrat normalise sur l'ordre canonique du registre.
+
+### Reste ouvert, et appartient à l'opérateur
+
+| sujet | pourquoi il n'est pas ici |
+|---|---|
+| les 7 alias atlas vérifiés (couverture 70/39 → 77/32) | non-goal explicite du `§9` |
+| les 39 identités `UNKNOWN` | non-goal explicite du `§9` |
+| « Dips pectoraux » substitué même en salle complète | conséquence stricte du `§1.A` arbitrée « laisser tel quel » ; se ferme en **curation**, pas en code |
+| ouvrir le vocabulaire `pattern_motor` | décision produit non rendue |
+| lieux multiples / surcharge d'environnement par séance | capacités FUTURES, hors V1 |
+
+### État
+
+`Sb_TRAIN_A_ENVIRONMENT_EXPERIENCE_01` — **MERGED**.
+
+TRAIN A est désormais une boucle produit atteignable : l'utilisateur déclare
+son environnement, la recommandation en tient compte, et `START` refuse
+plutôt que de livrer une séance qu'il ne peut pas exécuter.
+
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
