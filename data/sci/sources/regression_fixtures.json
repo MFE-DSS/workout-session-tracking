@@ -1,0 +1,29 @@
+{
+  "doc": "Ruling 11 — known legacy data errors that must never re-enter the V2 catalogue. Each fixture is checked by validate_closure.py on every run; a violation is a format error.",
+  "fixtures": [
+    {
+      "id": "LEGACY_ERR_REVERSE_PEC_DECK_PECS",
+      "exercise_ids": ["rear-delt-fly-machine-paren-pec-deck-inverse", "rear-delt-fly-machine", "reverse-fly-machine"],
+      "legacy_error": "reverse pec deck tagged pecs",
+      "assert": {"zone_absent": ["pecs"], "primary_includes": ["rear_delts"]}
+    },
+    {
+      "id": "LEGACY_ERR_HANGING_LEG_RAISE_CALVES",
+      "exercise_ids": ["releve-de-jambes-suspendu", "hanging-knee-raise"],
+      "legacy_error": "hanging leg raise tagged calves",
+      "assert": {"zone_absent": ["calves"], "primary_includes": ["hip_flexors"]}
+    },
+    {
+      "id": "LEGACY_ERR_SEATED_ADDUCTION_POSTERIOR_CHAIN",
+      "exercise_ids": ["adduction-assise"],
+      "legacy_error": "seated adduction tagged posterior_chain",
+      "assert": {"zone_absent": ["hamstrings", "glutes"], "primary_includes": ["adductors"], "pattern_is": "hip_adduction"}
+    },
+    {
+      "id": "LEGACY_ERR_CABLE_PULLOVER_MACHINE_DESCRIPTION",
+      "exercise_ids": ["pullover-cable-paren-bras-tendus", "pullover-cable-paren-bras-tendus-poulie-haute"],
+      "legacy_error": "cable pullover carrying the pullover-machine description and requirement",
+      "assert": {"equipment_mode_is": "cable", "capability_absent": ["machine_pullover"], "capability_any_prefix": ["cable_anchor"]}
+    }
+  ]
+}

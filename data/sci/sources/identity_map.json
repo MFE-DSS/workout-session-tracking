@@ -1,0 +1,845 @@
+{
+  "adduction-assise": {
+    "scientific_identity_id": "seated_hip_adduction_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Adduction assise machine",
+    "reason": "Seated adductor machine; no other entry shares its name or machine (lying adduction is another machine)."
+  },
+  "adduction-couchee-machine": {
+    "scientific_identity_id": "lying_hip_adduction_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Adduction couchée machine",
+    "reason": "Lying adductor machine; distinct position and machine from the seated adduction."
+  },
+  "adduction-debout-cable": {
+    "scientific_identity_id": "standing_cable_hip_adduction",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Adduction debout câble",
+    "reason": "Only standing cable adduction in the catalogue."
+  },
+  "arnold-press": {
+    "scientific_identity_id": "dumbbell_arnold_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Arnold press",
+    "reason": "Only Arnold press; dumbbells."
+  },
+  "back-extension-45-paren-bias-ischios": {
+    "scientific_identity_id": "back_extension_45_hamstring_bias",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Extension lombaire 45° (accent ischios)",
+    "reason": "Only 45° back extension."
+  },
+  "butterfly-pec-machine": {
+    "scientific_identity_id": "pec_deck_fly_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Butterfly pec machine",
+    "reason": "Only pec deck (atlas 'Butterfly machine', machine_butterfly)."
+  },
+  "cable-cross-over-paren-bashaut": {
+    "scientific_identity_id": "low_to_high_cable_fly",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Écarté poulies vis-à-vis bas → haut",
+    "reason": "Canonical of G10: name equals the shared atlas card 'Cable cross-over'; requirements cable_anchor_adjustable + cable_bilateral_independent; template 'Câbles bas, croiser les mains en haut'."
+  },
+  "calf-press-leg-press": {
+    "scientific_identity_id": "leg_press_calf_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Mollets à la presse",
+    "reason": "Calf press on the leg press; no other entry uses that set-up."
+  },
+  "chest-press-machine": {
+    "scientific_identity_id": "machine_chest_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Chest press machine",
+    "reason": "Only machine chest press (machine_chest_press)."
+  },
+  "crunch-cable-a-genoux": {
+    "scientific_identity_id": "kneeling_cable_crunch",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Crunch câble à genoux",
+    "reason": "Only cable crunch."
+  },
+  "curl-cable-basse": {
+    "scientific_identity_id": "low_cable_biceps_curl",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "curl-poulie-basse",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G11: 'câble' = 'poulie', both 'basse'; requirements null, no attachment, cue or note distinguishes it from curl-poulie-basse."
+  },
+  "curl-debout-halteres": {
+    "scientific_identity_id": "standing_dumbbell_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Curl debout haltères",
+    "reason": "Only standing supinated dumbbell curl (hammer and incline curls are named variants)."
+  },
+  "curl-ez-bar-debout": {
+    "scientific_identity_id": "standing_ez_bar_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Curl barre EZ debout",
+    "reason": "Only EZ-bar curl (barbell_ez)."
+  },
+  "curl-incline-halteres": {
+    "scientific_identity_id": "incline_dumbbell_curl_45",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "curl-incline-halteres-paren-banc-45",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G15: its own template note says 'Banc à 45°, laisser les bras pendre'; same requirements dumbbells + incline_bench_support."
+  },
+  "curl-incline-halteres-paren-banc-45": {
+    "scientific_identity_id": "incline_dumbbell_curl_45",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Curl incliné haltères (banc 45°)",
+    "reason": "Canonical of G15: the name states the 45° bench; dumbbells + incline_bench_support; template 'bras pendants pour maximiser l'étirement du biceps'."
+  },
+  "curl-marteau-cable-corde": {
+    "scientific_identity_id": "cable_rope_hammer_curl",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "curl-marteau-cable-paren-corde",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G13: identical words ('Curl marteau câble corde' vs '(corde)'); both requirements null; no fact differs."
+  },
+  "curl-marteau-cable-paren-corde": {
+    "scientific_identity_id": "cable_rope_hammer_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Curl marteau câble (corde)",
+    "reason": "Canonical of G13: same name as curl-marteau-cable-corde with the attachment in parentheses; carries the template note 'Prise neutre pour cibler le brachial'."
+  },
+  "curl-marteau-halteres": {
+    "scientific_identity_id": "dumbbell_hammer_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Curl marteau haltères",
+    "reason": "Only dumbbell hammer curl."
+  },
+  "curl-poulie-basse": {
+    "scientific_identity_id": "low_cable_biceps_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Curl poulie basse",
+    "reason": "Canonical of G11: states its requirement cable_anchor_low; attachment unstated, as in curl-cable-basse."
+  },
+  "curl-poulie-basse-paren-barre": {
+    "scientific_identity_id": "low_cable_straight_bar_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Curl poulie basse (barre)",
+    "reason": "G12: states the straight bar; curl-poulie-basse (G11) states no attachment, so the facts cannot tell whether the generic is the bar curl or another attachment."
+  },
+  "curl-prise-neutre-cable": {
+    "scientific_identity_id": "cable_neutral_grip_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Curl prise neutre câble",
+    "reason": "G14: neutral grip = hammer grip as in G13, but its attachment (rope or handles) and anchor are unstated (requirements null, no note); cannot tell whether it is the rope hammer curl."
+  },
+  "decline-crunch": {
+    "scientific_identity_id": "decline_bench_crunch",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Crunch décliné",
+    "reason": "Only decline crunch."
+  },
+  "developpe-couche-halteres": {
+    "scientific_identity_id": "flat_dumbbell_bench_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Développé couché haltères",
+    "reason": "Only flat dumbbell press (flat_bench_support)."
+  },
+  "developpe-incline-halteres-30": {
+    "scientific_identity_id": "incline_dumbbell_press_30",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Développé incliné haltères 30°",
+    "reason": "Only 30° incline dumbbell press."
+  },
+  "dips-pectoraux-paren-buste-penche": {
+    "scientific_identity_id": "forward_lean_chest_dip",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Dips pectoraux (buste penché)",
+    "reason": "Only dip."
+  },
+  "ecarte-arriere-d-epaule-cable": {
+    "scientific_identity_id": "cable_rear_delt_fly",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Écarté arrière d'épaule câble",
+    "reason": "Cable rear-delt fly (cable_anchor_any); the rear-delt machines (G19) use another equipment."
+  },
+  "ecarte-pec-aux-cables-paren-incline-bashaut": {
+    "scientific_identity_id": "low_to_high_cable_fly",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "cable-cross-over-paren-bashaut",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G10: 'écarté pec aux câbles' = cable cross-over; same atlas card, same requirements (no bench: 'incliné' is the rising path), template 'Câbles bas, mouvement convergent vers le haut'."
+  },
+  "elevations-laterales-cable": {
+    "scientific_identity_id": "behind_back_cable_lateral_raise",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "elevations-laterales-cable-paren-derriere-le-dos",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G25: its own atlas card 'Élévations latérales câble' prescribes 'Position câble derrière le dos pour full stretch'; same cable_anchor_low, unilateral; nothing distinguishes it."
+  },
+  "elevations-laterales-cable-paren-derriere-le-dos": {
+    "scientific_identity_id": "behind_back_cable_lateral_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Élévations latérales câble (derrière le dos)",
+    "reason": "Canonical of G25: the name states the behind-the-back path; cable_anchor_low, atlas cue 'Position câble derrière le dos'."
+  },
+  "elevations-laterales-halteres": {
+    "scientific_identity_id": "standing_dumbbell_lateral_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Élévations latérales haltères",
+    "reason": "G26: generic dumbbell lateral raise (standing default, no seat requirement) vs the seated entry (seated_support + template 'Rester assis'): body position differs."
+  },
+  "elevations-laterales-halteres-assis": {
+    "scientific_identity_id": "seated_dumbbell_lateral_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Élévations latérales haltères assis",
+    "reason": "G26: seated (requirement seated_support, template 'Rester assis pour limiter la triche') vs the generic dumbbell lateral raise: body position differs."
+  },
+  "elevations-laterales-machine": {
+    "scientific_identity_id": "machine_lateral_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Élévations latérales machine",
+    "reason": "Only lateral-raise machine."
+  },
+  "extension-overhead-cable-paren-corde": {
+    "scientific_identity_id": "cable_rope_overhead_triceps_extension",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Extension overhead câble (corde)",
+    "reason": "G09: overhead position stated (name + template 'étirer le long chef en position haute') vs the arm-at-side pushdowns: shoulder position differs."
+  },
+  "face-pull-cable": {
+    "scientific_identity_id": "cable_rope_face_pull",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "face-pull-cable-paren-corde",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G20: own atlas card 'Face pull câble' (pull to the face, elbows high, external rotation thumbs back = split attachment), same high anchor, template 'Rotation externe en fin'; no fact separates it from the rope entry."
+  },
+  "face-pull-cable-paren-corde": {
+    "scientific_identity_id": "cable_rope_face_pull",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Face pull câble (corde)",
+    "reason": "Canonical of G20: states the attachment (cable_anchor_high + cable_attachment_rope); same atlas card 'Face pull câble'."
+  },
+  "fente-avant": {
+    "scientific_identity_id": "bodyweight_forward_lunge",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Fente avant",
+    "reason": "Only lunge."
+  },
+  "good-morning-halteres": {
+    "scientific_identity_id": "dumbbell_good_morning",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Good morning haltères",
+    "reason": "Only good morning."
+  },
+  "hack-squat-machine": {
+    "scientific_identity_id": "machine_hack_squat",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Hack squat machine",
+    "reason": "Only hack squat (machine_hack_squat)."
+  },
+  "hanging-knee-raise": {
+    "scientific_identity_id": "hanging_bent_knee_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Relevé de genoux suspendu",
+    "reason": "G30: name says knees (bent-leg); no description; releve-de-jambes-suspendu may be the same exercise, the facts cannot tell."
+  },
+  "hip-thrust-halteres": {
+    "scientific_identity_id": "dumbbell_hip_thrust",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Hip thrust haltères",
+    "reason": "G02: dumbbell load vs the Smith hip thrust (G01): different equipment and strength group."
+  },
+  "hip-thrust-smith": {
+    "scientific_identity_id": "smith_hip_thrust",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Hip thrust Smith",
+    "reason": "Canonical of G01: name equals the shared atlas card 'Hip thrust Smith'; same smith_rack requirement and cues as hip-thrust-smith-machine ('Smith' = 'Smith machine')."
+  },
+  "hip-thrust-smith-machine": {
+    "scientific_identity_id": "smith_hip_thrust",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "hip-thrust-smith",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G01: 'Smith machine' = 'Smith'; same atlas card 'Hip thrust Smith', same requirement smith_rack, template notes say the same thing (shoulders on bench, hips up, squeeze)."
+  },
+  "incline-smith-press": {
+    "scientific_identity_id": "smith_incline_press_30",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Développé incliné Smith 30°",
+    "reason": "Only Smith incline press."
+  },
+  "kickback-cable": {
+    "scientific_identity_id": "cable_triceps_kickback",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Kickback câble",
+    "reason": "Only kickback (template 'Bras parallèle au sol')."
+  },
+  "lat-pulldown-prise-large": {
+    "scientific_identity_id": "wide_grip_lat_pulldown",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "tirage-poulie-haute-prise-large",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G16: 'Lat pulldown' = 'Tirage poulie haute' (the canonical's atlas card is named 'Lat pulldown'); both state 'prise large'; requirements null, nothing differs."
+  },
+  "lat-pulldown-prise-neutre": {
+    "scientific_identity_id": "neutral_grip_lat_pulldown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Lat pulldown prise neutre",
+    "reason": "G17: translation of tirage-poulie-haute-prise-neutre, but grip width is unstated here while the other's template says 'Prise neutre serrée'; close V-handle and wide parallel handles are both neutral grips."
+  },
+  "leg-curls-allonge": {
+    "scientific_identity_id": "lying_leg_curl_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Leg curl allongé",
+    "reason": "Lying leg-curl machine (machine_lying_leg_curl); seated curl is another machine."
+  },
+  "leg-curls-assis": {
+    "scientific_identity_id": "seated_leg_curl_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Leg curl assis",
+    "reason": "Seated leg-curl machine (machine_seated_leg_curl)."
+  },
+  "leg-extension-cable-unilateral": {
+    "scientific_identity_id": "unilateral_cable_leg_extension",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Leg extension câble unilatéral",
+    "reason": "Only cable leg extension."
+  },
+  "leg-extensions-assises": {
+    "scientific_identity_id": "seated_leg_extension_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Leg extension assis machine",
+    "reason": "Only leg-extension machine."
+  },
+  "leg-press-paren-pieds-bas": {
+    "scientific_identity_id": "leg_press_low_feet",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Presse à cuisses (pieds bas)",
+    "reason": "G28: same 'Leg press' card and template intent (pieds bas, quadriceps) as the 'pieds bas, serrés' entry, but stance width is unstated here; cannot tell whether it is the same placement."
+  },
+  "leg-press-paren-pieds-bas-serres": {
+    "scientific_identity_id": "leg_press_low_narrow_feet",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Presse à cuisses (pieds bas, serrés)",
+    "reason": "G28: low and narrow stance stated in the name; leg-press-paren-pieds-bas states no width."
+  },
+  "leg-press-paren-pieds-hauts-ecartes": {
+    "scientific_identity_id": "leg_press_high_wide_feet",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Presse à cuisses (pieds hauts, écartés)",
+    "reason": "G29: high, wide feet (template 'cibler les fessiers et ischios') vs the low-foot entries (atlas 'pieds bas = quads ; pieds hauts = fessiers/ischios'): foot placement differs."
+  },
+  "machine-crunch": {
+    "scientific_identity_id": "ab_crunch_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Crunch machine",
+    "reason": "Only crunch machine."
+  },
+  "machine-shoulder-press": {
+    "scientific_identity_id": "machine_overhead_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Développé épaules machine",
+    "reason": "G32: generic machine press, atlas cue 'coudes à hauteur des épaules' vs the neutral-grip entry: grip/elbow plane differs."
+  },
+  "mollets-assis-machine": {
+    "scientific_identity_id": "seated_calf_raise_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Mollets assis machine",
+    "reason": "Seated calf machine (knee flexed, machine_seated_calf_raise); distinct from the standing entries."
+  },
+  "mollets-debout-machine": {
+    "scientific_identity_id": "standing_calf_raise_machine",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "releves-mollets-debout-machine",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G03: its name is the atlas card name of releves-mollets-debout-machine; same requirement machine_standing_calf_raise; 'relevés' adds no execution fact."
+  },
+  "neutral-grip-shoulder-press-machine": {
+    "scientific_identity_id": "neutral_grip_machine_overhead_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Développé épaules machine prise neutre",
+    "reason": "G32: neutral grip stated in the name (elbows forward, sagittal plane) vs the generic machine shoulder press: grip/plane differs."
+  },
+  "pallof-press-cable": {
+    "scientific_identity_id": "cable_pallof_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Pallof press câble",
+    "reason": "Only Pallof press."
+  },
+  "pompes": {
+    "scientific_identity_id": "push_up",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Pompes",
+    "reason": "Only push-up."
+  },
+  "pont-fessier": {
+    "scientific_identity_id": "bodyweight_glute_bridge",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Pont fessier",
+    "reason": "Floor bodyweight bridge; no bench or load, unlike the hip thrusts."
+  },
+  "preacher-curl": {
+    "scientific_identity_id": "preacher_biceps_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Curl pupitre",
+    "reason": "Only preacher curl."
+  },
+  "pullover-cable-paren-bras-tendus": {
+    "scientific_identity_id": "straight_arm_cable_pullover",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Pullover câble (bras tendus)",
+    "reason": "G22: anchor height unstated (standing high pulley vs lying low pulley) and source equipment conflicts (name câble vs requirement machine_pullover and 'Pullover machine' card); cannot be matched to G21 or to pullover-machine."
+  },
+  "pullover-cable-paren-bras-tendus-poulie-haute": {
+    "scientific_identity_id": "high_pulley_straight_arm_cable_pullover",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Pullover câble bras tendus (poulie haute)",
+    "reason": "G21: name = high-pulley straight-arm cable pullover, i.e. the straight-arm pulldown movement, but its source equipment says machine_pullover / 'Pullover machine' card (conflict) and its attachment is unstated vs the bar of straight-arm-pulldown-cable."
+  },
+  "pullover-machine": {
+    "scientific_identity_id": "machine_pullover",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Pullover machine",
+    "reason": "G23: the pullover machine named by its own name, requirement and atlas card, vs the two cable-named pullovers: equipment differs (if the cable names are right — see G22)."
+  },
+  "pushdown-corde": {
+    "scientific_identity_id": "cable_rope_triceps_pushdown",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "triceps-pushdown-corde",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G06: 'Pushdown corde' = 'Triceps pushdown corde' minus the muscle word; all its legacy fields are null, no fact differs."
+  },
+  "rear-delt-fly-machine": {
+    "scientific_identity_id": "reverse_pec_deck_fly",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Oiseau à la machine (pec deck inversé)",
+    "reason": "Canonical of G19: name equals the atlas card 'Rear delt fly machine'; requirement machine_rear_delt_fly shared by all three entries."
+  },
+  "rear-delt-fly-machine-paren-pec-deck-inverse": {
+    "scientific_identity_id": "reverse_pec_deck_fly",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "rear-delt-fly-machine",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G19: same atlas card and requirement machine_rear_delt_fly; 'pec deck inversé' names the same machine."
+  },
+  "releve-de-jambes-suspendu": {
+    "scientific_identity_id": "hanging_leg_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Relevé de jambes suspendu",
+    "reason": "G30: template 'monter les genoux au-dessus des hanches' does not say legs straight or bent; may be the same as hanging-knee-raise."
+  },
+  "releves-mollets-debout": {
+    "scientific_identity_id": "bodyweight_standing_calf_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Relevés mollets debout (poids du corps)",
+    "reason": "G04: requirements [] / family bodyweight vs machine_standing_calf_raise (G03): no machine, different load and strength group."
+  },
+  "releves-mollets-debout-machine": {
+    "scientific_identity_id": "standing_calf_raise_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Mollets debout machine",
+    "reason": "Canonical of G03: carries the atlas card (named 'Mollets debout machine') and template notes; same requirement machine_standing_calf_raise as mollets-debout-machine."
+  },
+  "reverse-fly-machine": {
+    "scientific_identity_id": "reverse_pec_deck_fly",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "rear-delt-fly-machine",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G19: 'reverse fly' = 'rear delt fly'; same requirement machine_rear_delt_fly; template 'mener avec les coudes' matches the atlas cues."
+  },
+  "reverse-nordic": {
+    "scientific_identity_id": "kneeling_reverse_nordic",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Reverse nordic",
+    "reason": "Only reverse nordic."
+  },
+  "romanian-deadlift-barre": {
+    "scientific_identity_id": "barbell_romanian_deadlift",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Soulevé de terre roumain barre",
+    "reason": "Barbell RDL; the dumbbell RDL is another equipment."
+  },
+  "romanian-deadlift-halteres": {
+    "scientific_identity_id": "dumbbell_romanian_deadlift",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Soulevé de terre roumain haltères",
+    "reason": "Dumbbell RDL (atlas card of its own)."
+  },
+  "roulette-abdominale": {
+    "scientific_identity_id": "kneeling_ab_wheel_rollout",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Roulette abdominale à genoux",
+    "reason": "Canonical of G05 (operator ruling R2): ab_wheel, template 'Genoux au sol, extension complète si possible' = kneeling rollout."
+  },
+  "roulette-abdominale-paren-ab-wheel-rollout": {
+    "scientific_identity_id": "kneeling_ab_wheel_rollout",
+    "identity_relation": "LEGACY_ALIAS",
+    "alias_of": "roulette-abdominale",
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "reason": "G05 (operator ruling R2): same ab_wheel requirement, template 'Genoux au sol pour débuter, extension complète si possible'; '(ab wheel rollout)' is the English name of the same exercise."
+  },
+  "rowing-cable-assis-prise-large": {
+    "scientific_identity_id": "seated_cable_row_wide_grip",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Rowing câble assis prise large",
+    "reason": "G33: wide pronated grip stated (name + template 'Prise large pronation') vs neutral and close grips on the same 'Rowing câble assis' card."
+  },
+  "rowing-cable-assis-prise-neutre": {
+    "scientific_identity_id": "seated_cable_row_neutral_grip",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Rowing câble assis prise neutre",
+    "reason": "G33: neutral grip stated in the name vs wide and close grips on the same 'Rowing câble assis' card."
+  },
+  "rowing-cable-assis-prise-serree": {
+    "scientific_identity_id": "seated_cable_row_close_grip",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Rowing câble assis prise serrée",
+    "reason": "G33: close grip stated in the name vs wide and neutral grips on the same 'Rowing câble assis' card."
+  },
+  "rowing-chest-supported": {
+    "scientific_identity_id": "chest_supported_row_elbows_open",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Rowing chest-supported (coudes ouverts)",
+    "reason": "G24: same requirement machine_chest_supported_row as rowing-machine-chest-supported, and the atlas card on the other entry bears this name, but this entry's template says 'coudes légèrement ouverts' while the card says 'coudes vers les hanches'."
+  },
+  "rowing-haltere-un-bras": {
+    "scientific_identity_id": "one_arm_dumbbell_row",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Rowing haltère un bras",
+    "reason": "G31: no support, cue or note stated; the bench-supported one-arm row is the common form, so it may be rowing-haltere-un-bras-paren-banc."
+  },
+  "rowing-haltere-un-bras-paren-banc": {
+    "scientific_identity_id": "bench_supported_one_arm_dumbbell_row",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Rowing haltère un bras (appui banc)",
+    "reason": "G31: knee and hand on the bench (atlas + template, flat_bench_support); the generic entry states no support, so the pair cannot be merged on the facts."
+  },
+  "rowing-machine-chest-supported": {
+    "scientific_identity_id": "chest_supported_row_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Rowing machine chest-supported",
+    "reason": "G24: atlas cue 'Tirer les coudes vers les hanches' contradicts the open-elbow template of rowing-chest-supported on the same machine; facts conflict, operator to decide."
+  },
+  "shoulder-press-halteres-assis": {
+    "scientific_identity_id": "seated_dumbbell_shoulder_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Développé épaules haltères assis",
+    "reason": "Only dumbbell shoulder press."
+  },
+  "shrugs-barre": {
+    "scientific_identity_id": "barbell_shrug",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Shrugs barre",
+    "reason": "Barbell shrug; cable and dumbbell shrugs are other equipment."
+  },
+  "shrugs-cable": {
+    "scientific_identity_id": "cable_shrug",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Shrugs câble",
+    "reason": "Cable shrug."
+  },
+  "shrugs-halteres": {
+    "scientific_identity_id": "dumbbell_shrug",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Shrugs haltères",
+    "reason": "Dumbbell shrug."
+  },
+  "sissy-squat-machine": {
+    "scientific_identity_id": "supported_sissy_squat",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Sissy squat machine",
+    "reason": "Only sissy squat."
+  },
+  "skull-crushers-ez-bar": {
+    "scientific_identity_id": "ez_bar_skull_crusher",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Barre au front EZ",
+    "reason": "Only skull crusher."
+  },
+  "sliding-leg-curl": {
+    "scientific_identity_id": "supine_slider_leg_curl",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Leg curl glissé",
+    "reason": "Only sliding leg curl."
+  },
+  "smith-shoulder-press": {
+    "scientific_identity_id": "smith_overhead_press",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Développé épaules Smith",
+    "reason": "Only Smith shoulder press."
+  },
+  "squat-au-poids-du-corps": {
+    "scientific_identity_id": "bodyweight_squat",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Squat au poids du corps",
+    "reason": "Only bodyweight squat."
+  },
+  "squat-smith-machine-paren-pieds-avances": {
+    "scientific_identity_id": "smith_squat_feet_forward",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Squat Smith (pieds avancés)",
+    "reason": "Only Smith squat."
+  },
+  "straight-arm-pulldown-cable": {
+    "scientific_identity_id": "straight_arm_cable_pulldown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Tirage bras tendus poulie haute",
+    "reason": "G21: template 'Poulie haute, coudes fixes' + 'tirer la barre vers les cuisses'; may be the same exercise as pullover-cable-paren-bras-tendus-poulie-haute, whose own equipment facts conflict."
+  },
+  "tirage-front-cable-paren-prise-large": {
+    "scientific_identity_id": "wide_grip_cable_upright_row",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Tirage menton câble — prise large",
+    "reason": "G27 (operator ruling R12): template 'Tirer vers le menton, coudes hauts' = upright-row family, wide grip stated; upright-row-cable states no grip width, so an exact duplicate cannot be shown."
+  },
+  "tirage-poulie-haute-prise-large": {
+    "scientific_identity_id": "wide_grip_lat_pulldown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Tirage poulie haute prise large",
+    "reason": "Canonical of G16: carries the atlas card 'Lat pulldown', requirement pulldown_seated_station and template 'Prise pronation large'."
+  },
+  "tirage-poulie-haute-prise-neutre": {
+    "scientific_identity_id": "close_neutral_grip_lat_pulldown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Tirage poulie haute prise neutre serrée",
+    "reason": "G17: template 'Prise neutre serrée, tirer vers le sternum'; lat-pulldown-prise-neutre states no width, so the pair cannot be merged on the source facts."
+  },
+  "tirage-vertical-unilateral-cable": {
+    "scientific_identity_id": "unilateral_cable_pulldown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Tirage vertical unilatéral câble",
+    "reason": "G18: one arm at a time (name + template 'Un bras à la fois') vs the bilateral pulldowns sharing the 'Lat pulldown' card: laterality differs."
+  },
+  "traction-assistee-machine": {
+    "scientific_identity_id": "assisted_pull_up_machine",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Traction assistée machine",
+    "reason": "G34: bilateral assisted pull-up (requirement machine_assisted_pull_up) vs the one-arm entry: laterality differs."
+  },
+  "traction-assistee-unilaterale": {
+    "scientific_identity_id": "unilateral_assisted_pull_up",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Traction assistée unilatérale",
+    "reason": "G34: one arm stated in the name vs the bilateral assisted pull-up: laterality differs."
+  },
+  "triceps-extension-poulie-haute-paren-corde": {
+    "scientific_identity_id": "high_pulley_rope_triceps_extension",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Extension triceps poulie haute (corde)",
+    "reason": "G08: same requirements as triceps-pushdown-corde (cable_anchor_high + rope) but the name can denote a rope pushdown or an overhead extension facing away from the pulley; no cue or template note decides."
+  },
+  "triceps-pushdown-barre": {
+    "scientific_identity_id": "cable_straight_bar_triceps_pushdown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "LEGITIMATE_VARIANT",
+    "canonical_display_name": "Triceps pushdown barre",
+    "reason": "G07: straight bar stated in the name vs the rope stated for G06: attachment differs."
+  },
+  "triceps-pushdown-corde": {
+    "scientific_identity_id": "cable_rope_triceps_pushdown",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "EXACT_CANONICAL_DUPLICATE",
+    "canonical_display_name": "Triceps pushdown corde",
+    "reason": "Canonical of G06: states its requirements (cable_anchor_high + cable_attachment_rope); pushdown-corde is the same name without 'Triceps'."
+  },
+  "upright-row-cable": {
+    "scientific_identity_id": "cable_upright_row",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNRESOLVED",
+    "canonical_display_name": "Tirage menton câble",
+    "reason": "G27: no description, all legacy fields null, grip width and attachment unstated; cannot be matched to the wide-grip tirage-front-cable-paren-prise-large."
+  },
+  "upright-row-halteres": {
+    "scientific_identity_id": "dumbbell_upright_row",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Tirage menton haltères",
+    "reason": "Dumbbell upright row; the cable upright rows (G27) are another equipment."
+  },
+  "y-raise-haltere": {
+    "scientific_identity_id": "prone_incline_y_raise",
+    "identity_relation": "CANONICAL",
+    "alias_of": null,
+    "group_classification": "UNIQUE",
+    "canonical_display_name": "Y-raise haltère allongé sur banc incliné",
+    "reason": "Only Y-raise; identity fixed by operator ruling R3 (prone incline Y-raise)."
+  }
+}

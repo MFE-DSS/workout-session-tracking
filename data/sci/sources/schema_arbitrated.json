@@ -1,0 +1,865 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "auren/exercise_utility_schema/v2-arbitrated-2026-10-23",
+  "title": "EXERCISE_UTILITY_SCHEMA",
+  "description": "Schéma d'utilité d'exercice AUREN V2, arbitré le 2026-10-23. Familles : exercise_science (catalogue), exercise_operational (catalogue), exercise_user (état par utilisateur x exercice, hors catalogue). Modèle à 15 zones atomiques ; posterior_chain n'est pas une zone. Les faits qui ne sont pas des vérités d'exercice (incrément de charge, classe de repos, classe de récupération, graphe de substitution, amplitude par défaut) sont interdits dans la fiche et placés ailleurs (x-placement).",
+  "type": "object",
+  "required": [
+    "exercise_id",
+    "schema_version",
+    "exercise_science",
+    "exercise_operational"
+  ],
+  "properties": {
+    "exercise_id": {
+      "type": "string",
+      "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+      "x-requirement": "REQUIRED",
+      "x-justification": "Identifiant technique existant ; tout historique de charge lui est rattaché (spécificité de la force)."
+    },
+    "schema_version": {
+      "type": "string",
+      "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+      "x-requirement": "REQUIRED",
+      "x-justification": "Versionner le schéma préserve l'invariance historique lors des révisions."
+    },
+    "exercise_science": {
+      "type": "object",
+      "required": [
+        "contributions",
+        "loaded_joint_actions",
+        "movement_pattern",
+        "joint_type",
+        "strength_specificity_group"
+      ],
+      "properties": {
+        "contributions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/contribution"
+          },
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Une entrée par zone ayant un rôle ; une zone absente = affirmation curée 'aucun rôle'. Une zone au plus une fois (contrôle de curation). Rôles fondés sur ROLE_AUTHORITY_PRECEDENCE, recoupés par Mannarino 2021, Kinoshita 2026, Plotkin 2023."
+        },
+        "loaded_joint_actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "knee_extension",
+              "knee_flexion",
+              "hip_extension",
+              "hip_flexion",
+              "hip_adduction",
+              "hip_abduction",
+              "plantar_flexion",
+              "shoulder_flexion",
+              "shoulder_extension",
+              "shoulder_abduction",
+              "shoulder_adduction",
+              "shoulder_horizontal_adduction",
+              "shoulder_horizontal_abduction",
+              "scapular_retraction",
+              "scapular_elevation",
+              "elbow_flexion",
+              "elbow_extension",
+              "trunk_flexion",
+              "posterior_pelvic_tilt",
+              "trunk_rotation",
+              "isometric_trunk_bracing"
+            ]
+          },
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Base déterministe de l'attribution des rôles quand aucune preuve longitudinale adaptée n'existe : le moteur principal de l'action qui résiste au moment externe est PRIMARY. Liste fermée, extensible par version du schéma."
+        },
+        "movement_pattern": {
+          "enum": [
+            "horizontal_push",
+            "vertical_push",
+            "horizontal_pull",
+            "vertical_pull",
+            "squat",
+            "hinge",
+            "lunge",
+            "knee_extension",
+            "knee_flexion",
+            "hip_extension_isolation",
+            "hip_flexion",
+            "hip_adduction",
+            "hip_abduction",
+            "elbow_flexion",
+            "elbow_extension",
+            "shoulder_abduction",
+            "shoulder_horizontal_abduction",
+            "shoulder_flexion",
+            "plantar_flexion",
+            "trunk_flexion",
+            "carry",
+            "cardio"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Descriptif ; sert à la nouveauté par variante proche et au graphe de substitution canonique, pas au classement d'utilité."
+        },
+        "joint_type": {
+          "enum": [
+            "single_joint",
+            "multi_joint"
+          ],
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Descriptif : hypertrophie globale similaire mono vs poly (Rosa 2023) ; jamais un multiplicateur d'utilité. Source unique de la classe de récupération dérivée (Korak 2015 ; Morán-Navarro 2017) et d'une entrée de la classe de repos dérivée."
+        },
+        "strength_specificity_group": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$",
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Force spécifique à la tâche et au mode (Saeterbakken 2025, Haugen 2023) : aucun kg ni e1RM transféré entre groupes."
+        },
+        "biarticular_position": {
+          "enum": [
+            "hip_flexed",
+            "hip_extended",
+            "shoulder_flexed_overhead",
+            "shoulder_neutral",
+            "knee_extended",
+            "knee_flexed",
+            "not_applicable"
+          ],
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Leg curl assis > couché, extension triceps overhead > neutre (Maeo 2021, 2023 ; ECR uniques) ; curé quand c'est directement pertinent ; départage seulement ; absence = aucun effet."
+        },
+        "resistance_profile": {
+          "enum": [
+            "hardest_lengthened",
+            "hardest_mid",
+            "hardest_shortened",
+            "unknown"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Jugement biomécanique ; effet moyen de la longueur trivial (Varovic 2025) : départage faible, jamais terme principal."
+        },
+        "eccentric_emphasis": {
+          "type": "boolean",
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Amplificateur de dommages mesuré pour excentriques maximaux, non quantifié en séries de salle ; true seulement sur décision explicite ; absence = aucun effet, rien n'est déduit du nom."
+        },
+        "e1rm_eligible": {
+          "type": "boolean",
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Exercices chargés à faibles répétitions seulement ; validité des équations inconnue sur machines et isolation ; à curer en priorité pour les lifts ancres potentiels ; absence = non éligible (signaux simples)."
+        },
+        "rep_profile_prior": {
+          "enum": [
+            "upper_free_weight_bench_like",
+            "lower_machine_leg_press_like",
+            "unknown"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Prior Nuzzo seulement pour bench et leg press ; absence = 'unknown', l'exercice apprend de l'historique."
+        },
+        "recovery_class": {
+          "not": {},
+          "x-evidence-label": "NOT_CATALOGUE_TRUTH",
+          "x-placement": "DERIVED_FROM:exercise_science.joint_type",
+          "x-justification": "Entièrement dérivable : single_joint -> single_joint_isolation, multi_joint -> multi_joint_compound. Le stocker créerait un second champ qui peut diverger du premier."
+        },
+        "rom_default": {
+          "not": {},
+          "x-evidence-label": "NOT_CATALOGUE_TRUTH",
+          "x-placement": "ENGINE_INVARIANT:GOAL_INVARIANTS",
+          "x-justification": "Amplitude complète par défaut pour tout exercice (Gschneidner 2025, Wolf 2025) : invariant moteur identique pour tous, pas un fait d'exercice."
+        },
+        "exposure_vector_complete": {
+          "not": {},
+          "x-evidence-label": "NOT_CATALOGUE_TRUTH",
+          "x-placement": "DERIVED_FROM:exercise_science.contributions (voir $defs/derived_exercise_view)",
+          "x-justification": "Faux dès qu'une contribution vaut UNKNOWN ; calculé, jamais saisi."
+        },
+        "emg_activation_pct": {
+          "not": {},
+          "x-evidence-label": "NOT_SUPPORTED",
+          "x-justification": "L'EMG n'est pas un prédicteur validé de l'hypertrophie (Vigotsky 2022 ; Collings 2025) ; interdit."
+        },
+        "recovery_hours_by_zone": {
+          "not": {},
+          "x-evidence-label": "NOT_SUPPORTED",
+          "x-justification": "Aucune étude ne classe la récupération par zone ; ordre AUREN partiellement contredit (Chen 2011) ; interdit."
+        },
+        "compound_priority_score": {
+          "not": {},
+          "x-evidence-label": "NOT_SUPPORTED",
+          "x-justification": "Pas de supériorité poly > mono pour l'hypertrophie globale (Rosa 2023) ; interdit."
+        },
+        "equipment_hypertrophy_multiplier": {
+          "not": {},
+          "x-evidence-label": "NOT_SUPPORTED",
+          "x-justification": "Machines et poids libres : hypertrophie identique (Haugen 2023) ; interdit."
+        }
+      },
+      "additionalProperties": false
+    },
+    "exercise_operational": {
+      "type": "object",
+      "required": [
+        "equipment_mode",
+        "equipment_required",
+        "unilateral",
+        "failure_safe",
+        "curation"
+      ],
+      "properties": {
+        "equipment_mode": {
+          "enum": [
+            "free_weight_barbell",
+            "free_weight_dumbbell",
+            "machine_selectorized",
+            "machine_plate",
+            "cable",
+            "smith",
+            "bodyweight",
+            "cardio_machine",
+            "none"
+          ],
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Propriété opérationnelle et de spécificité de force ; neutre pour l'hypertrophie (Haugen 2023). Clé de l'incrément de repli quand l'instance d'équipement est inconnue (EV-A8)."
+        },
+        "equipment_required": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          },
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Contrainte dure de niveau 1 et modes utilitaires ; tableau vide admis (poids du corps)."
+        },
+        "unilateral": {
+          "type": "boolean",
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Opérationnel (durée, comptage) ; aucune différence d'utilité soutenue."
+        },
+        "failure_safe": {
+          "type": "boolean",
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED",
+          "x-justification": "Autorise l'échec optionnel et les séries de référence RIR (machines/isolation sans risque d'écrasement) ; dérivé de la prudence ACSM 2026."
+        },
+        "setup_complexity": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Aucun essai ; utile pour le budget de temps et les débutants ; absence = aucune correction de transition."
+        },
+        "cardio_modality": {
+          "enum": [
+            "cycling",
+            "rowing",
+            "running",
+            "elliptical",
+            "walking",
+            "other"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "CONDITIONAL (requis si movement_pattern = cardio, absent sinon)",
+          "x-justification": "Préférence douce non-course avant jambes lourdes ; effet de modalité contesté (Wilson 2012 vs Schumann 2022)."
+        },
+        "curation": {
+          "type": "object",
+          "required": [
+            "status",
+            "curated_at"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "draft",
+                "reviewed",
+                "disputed"
+              ]
+            },
+            "curated_at": {
+              "type": "string",
+              "format": "date"
+            },
+            "curator": {
+              "type": "string"
+            },
+            "notes": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-requirement": "REQUIRED (status, curated_at) ; OPTIONAL (curator, notes)",
+          "x-justification": "Provenance de la curation ; seule une fiche 'reviewed' avec au moins un PRIMARY résolu est publiée ; 'draft' et 'disputed' ne le sont pas."
+        },
+        "load_increment": {
+          "not": {},
+          "x-evidence-label": "NOT_CATALOGUE_TRUTH",
+          "x-placement": "ENVIRONMENT:equipment_instance (voir $defs/environment_load_increment)",
+          "x-justification": "Le même exercice a des incréments différents selon la salle et l'appareil ; le pas appartient à l'instance d'équipement, avec un repli étiqueté (EV-A8)."
+        },
+        "rest_prior_class": {
+          "not": {},
+          "x-evidence-label": "NOT_CATALOGUE_TRUTH",
+          "x-placement": "PRESCRIPTION_TIME:REST_CLASS_DERIVED",
+          "x-justification": "La classe de repos dépend de joint_type, de la plage de répétitions prévue et de l'ancienneté (Singer 2024 ; Grgic 2018) : elle se dérive à la prescription, elle n'est pas une vérité d'exercice."
+        },
+        "substitution_links": {
+          "not": {},
+          "x-evidence-label": "NOT_CATALOGUE_TRUTH",
+          "x-placement": "CANONICAL_SUBSTITUTION_GRAPH (référencé par version au niveau du catalogue)",
+          "x-justification": "Un seul graphe de substitution canonique existe ; le recopier dans chaque fiche créerait deux sources qui divergent."
+        },
+        "starting_load_kg_table": {
+          "not": {},
+          "x-evidence-label": "NOT_SUPPORTED",
+          "x-justification": "Aucune table validée par sexe/expérience ; standards participatifs incohérents ; interdit."
+        }
+      },
+      "additionalProperties": false
+    },
+    "exercise_user": {
+      "type": "object",
+      "description": "État par utilisateur x exercice, calculé ; jamais stocké dans le catalogue.",
+      "properties": {
+        "history_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Plus d'expositions = référence de performance plus fiable (spécificité, bruit)."
+        },
+        "last_exposure_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-justification": "Temps depuis exposition = socle mesuré de la récupération (Morán-Navarro 2017)."
+        },
+        "novelty_state": {
+          "enum": [
+            "NOVEL",
+            "FAMILIARISING",
+            "FAMILIAR"
+          ],
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-justification": "Effet de répétition et apprentissage mesurés ; la fenêtre N=4-8 sem est une convention."
+        },
+        "preference": {
+          "enum": [
+            "liked",
+            "neutral",
+            "disliked",
+            "unknown"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Départage entre utilités égales (Rauch 2020, Baz-Valle 2019) ; ne supprime jamais une zone."
+        },
+        "repeated_discomfort_count": {
+          "type": "integer",
+          "minimum": 0,
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Exclusion après k signalements (k = paramètre produit) ; aucun diagnostic."
+        },
+        "reps_load_profile": {
+          "type": "object",
+          "properties": {
+            "n_points": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rep_band": {
+              "enum": [
+                "1_5",
+                "6_10",
+                "11_15",
+                "16_30"
+              ]
+            },
+            "source": {
+              "enum": [
+                "POPULATION_PRIOR",
+                "DERIVED_FROM_HISTORY",
+                "BLENDED"
+              ]
+            }
+          },
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-justification": "SD inter-individuelle 2,5-4,4 rép à %1RM fixe (Nuzzo) : le profil propre doit remplacer le prior."
+        },
+        "strength_trend": {
+          "$ref": "#/$defs/strength_trend"
+        },
+        "rir_confidence": {
+          "enum": [
+            "UNKNOWN",
+            "CALIBRATING",
+            "USABLE"
+          ],
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-justification": "Apprentissage en 4-6 séances (Wiedenmann 2026). La sous-estimation de population (~0,95 rép, Halperin 2022) informe la confiance seulement ; aucune correction numérique de population ; seul un biais personnel mesuré par calibrations propres peut corriger (USABLE)."
+        },
+        "rest_mode": {
+          "enum": [
+            "DEFAULT",
+            "USER_ADJUSTED",
+            "PERFORMANCE_EXTENDED"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Repos observable ; amplitude de perte de répétitions par repos inconnue, apprise par utilisateur."
+        },
+        "readiness_pct": {
+          "not": {},
+          "x-evidence-label": "NOT_SUPPORTED",
+          "x-justification": "Aucun pourcentage de readiness défendable ; interdit."
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "exercise_operational": {
+            "properties": {
+              "curation": {
+                "properties": {
+                  "status": {
+                    "const": "reviewed"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              }
+            },
+            "required": [
+              "curation"
+            ]
+          }
+        },
+        "required": [
+          "exercise_operational"
+        ]
+      },
+      "then": {
+        "properties": {
+          "exercise_science": {
+            "properties": {
+              "contributions": {
+                "contains": {
+                  "properties": {
+                    "role": {
+                      "const": "PRIMARY"
+                    },
+                    "role_basis": {
+                      "enum": [
+                        "longitudinal_trial",
+                        "joint_action_anatomy"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "role_basis"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      },
+      "x-justification": "PUBLICATION_RULE : une fiche 'reviewed' porte au moins un PRIMARY résolu. Les UNKNOWN restants ne bloquent que leur zone (ROLE_UNKNOWN_SCOPED)."
+    },
+    {
+      "if": {
+        "properties": {
+          "exercise_science": {
+            "properties": {
+              "movement_pattern": {
+                "const": "cardio"
+              }
+            },
+            "required": [
+              "movement_pattern"
+            ]
+          }
+        },
+        "required": [
+          "exercise_science"
+        ]
+      },
+      "then": {
+        "properties": {
+          "exercise_operational": {
+            "required": [
+              "cardio_modality"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "exercise_operational": {
+            "not": {
+              "required": [
+                "cardio_modality"
+              ]
+            }
+          }
+        }
+      },
+      "x-justification": "cardio_modality est conditionnel : requis pour le cardio, absent ailleurs."
+    }
+  ],
+  "$defs": {
+    "zone": {
+      "enum": [
+        "pecs",
+        "lats",
+        "upper_back",
+        "anterior_delts",
+        "lateral_delts",
+        "rear_delts",
+        "biceps",
+        "triceps",
+        "quads",
+        "hamstrings",
+        "glutes",
+        "adductors",
+        "calves",
+        "abs",
+        "hip_flexors"
+      ],
+      "x-justification": "15 zones atomiques (arbitrage 1). posterior_chain n'est pas une zone : regroupement d'affichage seulement."
+    },
+    "contribution": {
+      "type": "object",
+      "required": [
+        "zone",
+        "role",
+        "role_basis",
+        "evidence_refs"
+      ],
+      "properties": {
+        "zone": {
+          "$ref": "#/$defs/zone"
+        },
+        "role": {
+          "enum": [
+            "PRIMARY",
+            "SECONDARY",
+            "MINOR",
+            "UNKNOWN"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Binaire direct/indirect mesuré (Pelland) ; le 3e niveau MINOR est une convention, son crédit 0 une politique comptable versionnée. UNKNOWN ne bloque que l'usage PRIMARY de cette zone et rend le vecteur incomplet."
+        },
+        "role_basis": {
+          "enum": [
+            "longitudinal_trial",
+            "joint_action_anatomy",
+            "unresolved"
+          ],
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Ordre d'autorité : essai longitudinal d'hypertrophie adapté, puis action articulaire chargée + anatomie fonctionnelle, puis non résolu. L'EMG n'est jamais une base."
+        },
+        "evidence_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^EV-[0-9A-Z]+$"
+          },
+          "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+          "x-justification": "Lien vers le registre E0 pour l'explicabilité ; au moins une référence pour tout rôle résolu ; peut être vide pour UNKNOWN."
+        },
+        "sub_regions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sub_region_entry"
+          },
+          "x-evidence-label": "SCIENTIFICALLY_SUPPORTED",
+          "x-requirement": "OPTIONAL",
+          "x-justification": "Métadonnée clairsemée (arbitrage 2) : jamais requise pour publier ni pour un PRIMARY, jamais une contrainte ni une dimension du besoin ; départage de faible poids quand une preuve existe (ECR uniques, non entraînés)."
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "enum": [
+                  "PRIMARY",
+                  "SECONDARY",
+                  "MINOR"
+                ]
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "properties": {
+              "role_basis": {
+                "enum": [
+                  "longitudinal_trial",
+                  "joint_action_anatomy"
+                ]
+              },
+              "evidence_refs": {
+                "minItems": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "role": {
+                "const": "UNKNOWN"
+              }
+            },
+            "required": [
+              "role"
+            ]
+          },
+          "then": {
+            "properties": {
+              "role_basis": {
+                "const": "unresolved"
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "sub_region": {
+      "enum": [
+        "quads.rectus_femoris",
+        "quads.vasti",
+        "triceps.long_head",
+        "triceps.lateral_medial_heads",
+        "hamstrings.biarticular",
+        "hamstrings.short_head_biceps_femoris",
+        "calves.gastrocnemius",
+        "calves.soleus"
+      ],
+      "x-justification": "Le préfixe doit être la zone de la contribution qui porte la sous-région (contrôle de curation). glutes et adductors sont des zones et n'ont pas de sous-région en V2."
+    },
+    "sub_region_entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "basis",
+        "evidence_refs"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/sub_region"
+        },
+        "basis": {
+          "enum": [
+            "longitudinal_trial",
+            "joint_action_anatomy"
+          ]
+        },
+        "evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^EV-[0-9A-Z]+$"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "x-justification": "Chaque sous-région garde sa provenance ; une sous-région sans base n'est pas saisie (l'absence est neutre)."
+    },
+    "derived_exercise_view": {
+      "type": "object",
+      "description": "Vue calculée à la publication ou à la lecture à partir de la fiche ; jamais saisie par la curation.",
+      "properties": {
+        "recovery_class": {
+          "enum": [
+            "multi_joint_compound",
+            "single_joint_isolation"
+          ]
+        },
+        "resolved_primary_zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/zone"
+          }
+        },
+        "primary_blocked_zones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/zone"
+          }
+        },
+        "exposure_vector_complete": {
+          "type": "boolean"
+        },
+        "publishable": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+      "x-justification": "recovery_class = f(joint_type) ; primary_blocked_zones = zones de rôle UNKNOWN ; exposure_vector_complete = aucune contribution UNKNOWN ; publishable = PUBLICATION_RULE."
+    },
+    "environment_load_increment": {
+      "type": "object",
+      "description": "Défini ici pour référence ; stocké dans le modèle d'environnement (instance d'équipement d'une salle), jamais dans la fiche d'exercice.",
+      "required": [
+        "equipment_instance_id",
+        "equipment_mode",
+        "increment_type",
+        "min_step_kg",
+        "source"
+      ],
+      "properties": {
+        "equipment_instance_id": {
+          "type": "string"
+        },
+        "equipment_mode": {
+          "enum": [
+            "free_weight_barbell",
+            "free_weight_dumbbell",
+            "machine_selectorized",
+            "machine_plate",
+            "cable",
+            "smith",
+            "bodyweight",
+            "cardio_machine",
+            "none"
+          ]
+        },
+        "increment_type": {
+          "enum": [
+            "plate",
+            "stack",
+            "dumbbell_step",
+            "bodyweight_only",
+            "none"
+          ]
+        },
+        "min_step_kg": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "source": {
+          "enum": [
+            "USER_REPORTED",
+            "DERIVED_FROM_HISTORY",
+            "FALLBACK_ESTIMATE"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+      "x-justification": "Taille d'incrément optimale inconnue ; si le pas minimal dépasse ~10 % de la charge, progresser en répétitions. FALLBACK_ESTIMATE = table EV-A8, toujours signalée."
+    },
+    "strength_trend": {
+      "type": "object",
+      "required": [
+        "exercise_id",
+        "formula_id",
+        "formula_version",
+        "rep_band",
+        "n_comparable_exposures",
+        "trend_state",
+        "is_lower_bound"
+      ],
+      "properties": {
+        "exercise_id": {
+          "type": "string"
+        },
+        "equipment_variant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "formula_id": {
+          "enum": [
+            "epley",
+            "brzycki"
+          ]
+        },
+        "formula_version": {
+          "type": "string"
+        },
+        "rep_band": {
+          "enum": [
+            "1_5",
+            "6_10"
+          ]
+        },
+        "session_best_e1rm_kg": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "source_set_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "is_lower_bound": {
+          "type": "boolean"
+        },
+        "n_comparable_exposures": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "window_days": {
+          "type": "integer",
+          "minimum": 28,
+          "maximum": 56
+        },
+        "trend_state": {
+          "enum": [
+            "INSUFFICIENT_DATA",
+            "RISING",
+            "STABLE",
+            "FALLING"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "x-evidence-label": "DERIVED_PRODUCT_HEURISTIC",
+      "x-justification": "Statistique de tendance propre à l'exercice, jamais un vrai 1RM ni transférée ; formule fixe = convention."
+    }
+  },
+  "additionalProperties": false
+}

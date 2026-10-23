@@ -1,0 +1,201 @@
+{
+  "base_version": "Sb_TRAIN_A_ENV_03",
+  "delta_version": "Sb_SCI_V2_01",
+  "doc": "Delta du registre TRAIN A requis par le catalogue V2 curé. Même ontologie à trois couches (objet → capacité → exigence) ; aucune capacité sans objet réel qui l'accorde. Non appliqué au dépôt.",
+  "new_capabilities": {
+    "dip_support": "deux barres parallèles portant le corps en appui sur les bras tendus, buste libre de s'incliner (dips)",
+    "back_extension_45_support": "un banc à lombaires incliné à 45° qui cale les chevilles et soutient le bassin, buste en porte-à-faux",
+    "decline_bench_support": "un banc dont l'assise se règle en déclin, jambes calées, tête plus basse que les hanches. N'est PAS accordé par un banc inclinable ordinaire",
+    "preacher_curl_support": "un pupitre incliné (banc Larry Scott) sur lequel reposent les bras pendant une flexion du coude aux charges libres",
+    "machine_preacher_curl": "la fonction machine « Curl pupitre »",
+    "machine_seated_hip_adduction": "la fonction machine « Adduction assise »",
+    "machine_ab_crunch": "la fonction machine « Crunch abdominal »",
+    "machine_sissy_squat": "la fonction appareil « Sissy squat » : un cadre qui cale chevilles et tibias pendant la flexion du genou, résistance non précisée",
+    "cable_attachment_single_handle": "une poignée à une main (étrier / poignée D) à fixer sur une poulie",
+    "cable_attachment_ankle_cuff": "une sangle de cheville à fixer sur une poulie",
+    "cable_attachment_neutral_grip": "une poignée de tirage à prise neutre (poignées parallèles) à fixer sur une poulie ou une station de tirage",
+    "cable_attachment_close_neutral_row_handle": "une poignée de tirage horizontal à prise neutre serrée (poignée en V) à fixer sur une station de tirage horizontal. N'est PAS accordée par la station elle-même"
+  },
+  "new_items": [
+    {
+      "item_id": "dip_station",
+      "label": "Barres à dips",
+      "capabilities": [
+        "dip_support"
+      ],
+      "group": "charges_libres",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Dips pectoraux (buste penché) » : appui sur barres parallèles",
+      "reason": "Le dips buste penché (accent pectoral) se fait en suspension entre deux barres parallèles ; aucun objet du registre n'accorde cet appui (overhead_hang_support est une suspension par les mains au-dessus de la tête, pas un appui bras tendus)."
+    },
+    {
+      "item_id": "back_extension_bench_45",
+      "label": "Banc à lombaires 45°",
+      "capabilities": [
+        "back_extension_45_support"
+      ],
+      "group": "charges_libres",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Back extension 45° (bias ischios) »",
+      "reason": "L'angle 45° est écrit dans le nom ; un banc plat/inclinable ne cale pas les chevilles ni ne soutient le bassin en porte-à-faux. Capacité spécifique à 45° : un banc à lombaires horizontal (90°/GHD) change le profil de charge et n'est pas supposé l'accorder."
+    },
+    {
+      "item_id": "decline_bench",
+      "label": "Banc décliné",
+      "capabilities": [
+        "decline_bench_support"
+      ],
+      "group": "charges_libres",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Decline crunch »",
+      "reason": "Le crunch décliné exige un déclin jambes calées ; adjustable_bench (banc inclinable) n'accorde que plat/incliné/assise et ne reçoit PAS la capacité : tous les bancs inclinables ne déclinent pas."
+    },
+    {
+      "item_id": "adjustable_decline_bench",
+      "label": "Banc réglable incliné et décliné",
+      "capabilities": [
+        "flat_bench_support",
+        "incline_bench_support",
+        "seated_support",
+        "decline_bench_support"
+      ],
+      "group": "charges_libres",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — banc réglable à dossier inclinable ET assise déclinable (type FID), objet distinct du banc inclinable",
+      "reason": "Objet réel distinct de adjustable_bench : c'est lui, et non le banc inclinable générique, qui porte la capacité de déclin ; évite d'obliger son propriétaire à déclarer un banc décliné qu'il ne possède pas."
+    },
+    {
+      "item_id": "preacher_bench",
+      "label": "Pupitre à biceps (banc Larry Scott)",
+      "capabilities": [
+        "preacher_curl_support"
+      ],
+      "group": "charges_libres",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — demandé par l'opérateur (R6) ; variante charges libres du « Preacher curl »",
+      "reason": "Objet réel demandé par R6. Aucun enregistrement du catalogue ne le consomme encore : le seul « Preacher curl » porte la famille source `machine` (voir preacher_curl_machine). Prêt si l'opérateur tranche la variante charges libres."
+    },
+    {
+      "item_id": "preacher_curl_machine",
+      "label": "Curl pupitre (machine)",
+      "capabilities": [
+        "machine_preacher_curl"
+      ],
+      "group": "machines_haut",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Preacher curl », famille source `machine`",
+      "reason": "La famille d'équipement source de « Preacher curl » est `machine` : l'exigence suit la fonction machine, pas le pupitre à charges libres."
+    },
+    {
+      "item_id": "seated_adductor_machine",
+      "label": "Adducteurs assis (machine)",
+      "capabilities": [
+        "machine_seated_hip_adduction"
+      ],
+      "group": "machines_bas",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Adduction assise », famille source `machine`",
+      "reason": "Nom (« assise ») + famille source `machine` désignent la machine d'adduction assise ; aucun objet du registre n'accorde cette fonction. Une machine combinée abducteurs/adducteurs se déclare avec cet objet."
+    },
+    {
+      "item_id": "ab_crunch_machine",
+      "label": "Crunch abdominal (machine)",
+      "capabilities": [
+        "machine_ab_crunch"
+      ],
+      "group": "machines_haut",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Machine crunch »",
+      "reason": "« Machine crunch » désigne la machine à crunch ; aucun objet du registre n'accorde cette fonction. Groupe machines_haut : le tronc est présenté avec le haut du corps (métadonnée d'affichage seulement)."
+    },
+    {
+      "item_id": "sissy_squat_machine",
+      "label": "Sissy squat (appareil)",
+      "capabilities": [
+        "machine_sissy_squat"
+      ],
+      "group": "machines_bas",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — « Sissy squat machine »",
+      "reason": "Le nom désigne l'appareil ; un sissy squat libre n'est pas l'exercice curé. La capacité nomme la fonction (cale chevilles/tibias) sans présumer cadre poids du corps ou levier chargé."
+    },
+    {
+      "item_id": "cable_d_handle",
+      "label": "Poignée simple de poulie",
+      "capabilities": [
+        "cable_attachment_single_handle"
+      ],
+      "group": "poulies",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — accessoire déclarable séparément (§4 TRAIN A : une station ne possède pas forcément tous les accessoires)",
+      "reason": "Demandé par R6 ; requis par « Tirage vertical unilatéral câble » (une barre de tirage longue ne se tient pas à une main)."
+    },
+    {
+      "item_id": "cable_ankle_strap",
+      "label": "Sangle de cheville pour poulie",
+      "capabilities": [
+        "cable_attachment_ankle_cuff"
+      ],
+      "group": "poulies",
+      "provenance": "curation V2 Sb_V2_CATALOGUE_CLOSURE_01 — accessoire déclarable séparément (§4)",
+      "reason": "« Adduction debout câble » et « Leg extension câble unilatéral » transmettent la charge du câble à la cheville : sans sangle, l'exécution curée n'existe pas. Aucun objet du registre ne l'accorde (le Dual Adjustable Pulley est livré avec corde, barre et poignées, pas de sangle)."
+    },
+    {
+      "item_id": "cable_neutral_grip_handle",
+      "label": "Poignée de tirage prise neutre",
+      "capabilities": [
+        "cable_attachment_neutral_grip"
+      ],
+      "group": "poulies",
+      "provenance": "curation Sb_SCI_V2_01 — accessoire déclarable séparément (§4 TRAIN A)",
+      "reason": "G17 : le tirage vertical prise neutre exige cet accessoire ; une station de tirage générique ne le garantit pas. Accordé par aucun autre objet."
+    },
+    {
+      "item_id": "close_neutral_row_handle",
+      "label": "Poignée de rowing prise neutre serrée",
+      "capabilities": [
+        "cable_attachment_close_neutral_row_handle"
+      ],
+      "group": "poulies",
+      "provenance": "curation Sb_SCI_V2_01 — accessoire déclarable séparément (§4 TRAIN A)",
+      "reason": "Ruling opérateur Sb_SCI_V2_01 : les rowings câble assis prise neutre et prise serrée exigent cet accessoire amovible ; low_row_station ne l'accorde PAS — une station et son accessoire sont deux faits physiques distincts tant que le registre ne prouve pas ce lot exact."
+    }
+  ],
+  "item_capability_additions": [],
+  "not_added": [
+    {
+      "gap": "machine d'adduction couchée (adduction-couchee-machine)",
+      "reason": "Aucun fait source n'identifie l'appareil (pas de slug, pas d'alias d'atlas, pas de description, TRAIN A : « identité de l'appareil non résolue ») et je ne peux pas vérifier un objet commercial réel correspondant : l'ajouter reviendrait à inventer un objet depuis un nom. Exigence laissée UNKNOWN."
+    },
+    {
+      "gap": "cale / step pour relevés de mollets debout (releves-mollets-debout)",
+      "reason": "Confort d'amplitude, pas une condition d'exécution : arbitrage opérateur TRAIN A §8 a établi [] (poids du corps, aucun matériel obligatoire). Non requis, objet non ajouté."
+    },
+    {
+      "gap": "disques de glisse / sliders (sliding-leg-curl)",
+      "reason": "Substituables par une serviette ou des chaussettes sur sol lisse ; aucun objet de salle n'est nécessaire. Non requis, objet non ajouté."
+    },
+    {
+      "gap": "genouillère / tapis (reverse-nordic)",
+      "reason": "Confort pur ; l'exercice se fait à genoux au sol sans autre appui. Non requis, objet non ajouté."
+    },
+    {
+      "gap": "poignées de tirage par prise (barre large, poignée neutre, poignée V / triangle) pour rowing assis et tirage vertical",
+      "reason": "TRAIN A traite row_seated_station / pulldown_seated_station comme des stations dédiées, accessoires de prise compris (note curateur : « assumed part of the station ») ; une prise neutre ou serrée s'obtient avec plusieurs accessoires différents (triangle, barre neutre, deux poignées, corde), ce qui serait un OU au niveau objet sans capacité commune vérifiable. Exigence maintenue au niveau station ; risque résiduel signalé."
+    },
+    {
+      "gap": "poignée simple pour élévations latérales câble, kickback câble, écarté arrière câble, Pallof press",
+      "reason": "Objet ajouté (cable_d_handle) mais NON exigé ici : ces mouvements légers à une main se font aussi câble/bille tenu en main, sangle au poignet ou bout de corde — accessoires ALTERNATIFS, donc hors exigence conjonctive (règle TRAIN A du face pull nu). L'EKB des élévations latérales câble (niveau ATLAS) n'est pas démontré faux."
+    },
+    {
+      "gap": "banc pour hip thrust Smith (hip-thrust-smith, hip-thrust-smith-machine)",
+      "reason": "Le curateur listait flat_bench ; l'EKB TRAIN A ne l'exige pas par arbitrage opérateur (§5 du 2026-09-28 : l'atlas documente les variantes `dos banc` ET `sol`). L'exigence EKB est conservée."
+    },
+    {
+      "gap": "dip_support accordé par la machine de traction assistée",
+      "reason": "Certaines machines de traction assistée portent des poignées de dips, pas toutes : non supposé. assisted_pull_up ne reçoit pas dip_support."
+    },
+    {
+      "gap": "decline_bench_support accordé par adjustable_bench",
+      "reason": "Tous les bancs inclinables ne déclinent pas (R6) : capacité portée par decline_bench et adjustable_decline_bench seulement."
+    },
+    {
+      "gap": "banc pour pullover câble couché (pullover-cable-paren-bras-tendus)",
+      "reason": "La variante debout poulie haute ne demande aucun banc ; la variante couchée n'est pas établie par la source. Non exigé."
+    },
+    {
+      "what": "dual_adjustable_pulley + ['cable_attachment_single_handle']",
+      "reason": "Opérateur 2026-10-23 : une station accorde des ancrages, un accessoire accorde sa propre capacité. La provenance en prose (« poignées LIVRÉES ») n'est pas une définition de capacité de l'objet ; aucun accessoire n'est déduit. L'utilisateur déclare la poignée D (cable_d_handle)."
+    }
+  ]
+}

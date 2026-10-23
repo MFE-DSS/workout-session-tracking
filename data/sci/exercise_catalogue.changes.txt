@@ -1,0 +1,292 @@
+pallof-press-cable: abs PRIMARY — principal contributor to resisting the imposed rotational moment (loaded isometric action trunk_anti_rotation); abs = anterolateral abdominal wall. No Pallof hypertrophy trial is claimed: basis joint_action_anatomy (EV-71). Pattern carry → trunk_anti_rotation.
+pallof-press-cable: operator ruling 1 — dispute resolved, status reviewed
+roulette-abdominale: canonical movement kneeling_ab_wheel_rollout: abs PRIMARY (resisting lumbar extension, loaded isometric trunk_anti_extension), lats SECONDARY, hip_flexors MINOR; other zones kept as curated (honest UNKNOWNs stay UNKNOWN). Acute EMG is consistency evidence only, never role authority.
+roulette-abdominale: operator ruling 2 — dispute resolved, status reviewed
+roulette-abdominale-paren-ab-wheel-rollout: canonical movement kneeling_ab_wheel_rollout: abs PRIMARY (resisting lumbar extension, loaded isometric trunk_anti_extension), lats SECONDARY, hip_flexors MINOR; other zones kept as curated (honest UNKNOWNs stay UNKNOWN). Acute EMG is consistency evidence only, never role authority.
+roulette-abdominale-paren-ab-wheel-rollout: operator ruling 2 — dispute resolved, status reviewed
+y-raise-haltere: re-curated from the canonical prone_incline_y_raise (not from the old name): upper_back PRIMARY (lower trapezius drives the loaded scapular upward rotation with the chest supported), lateral and anterior delts SECONDARY (elevation in the scapular plane), rear_delts MINOR. No generic standing or cable Y-raise is inferred.
+y-raise-haltere: operator ruling 3 — dispute resolved, status reviewed
+rowing-chest-supported: generic variant, neither lat- nor rear-delt-biased: upper_back PRIMARY, lats and rear_delts SECONDARY. A lat-biased or high-elbow rear-delt variant must be a distinct exercise.
+rowing-chest-supported: operator ruling 4 — dispute resolved, status reviewed
+tirage-front-cable-paren-prise-large: upright-row family (notes: toward chin, elbows high), lateral_delts PRIMARY; remaining contributions re-derived from the loaded actions (upper_back SECONDARY via scapular elevation/upward rotation, biceps SECONDARY via elbow flexion, anterior_delts MINOR). Not front-delt work from the old French label.
+arnold-press: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+butterfly-pec-machine: pattern horizontal_push → chest_fly (horizontal adduction without elbow extension)
+cable-cross-over-paren-bashaut: pattern horizontal_push → chest_fly (horizontal adduction without elbow extension)
+ecarte-pec-aux-cables-paren-incline-bashaut: pattern horizontal_push → chest_fly (horizontal adduction without elbow extension)
+elevations-laterales-cable: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+elevations-laterales-cable-paren-derriere-le-dos: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+elevations-laterales-halteres: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+elevations-laterales-halteres-assis: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+elevations-laterales-machine: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+lat-pulldown-prise-large: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+lat-pulldown-prise-neutre: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+machine-shoulder-press: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+neutral-grip-shoulder-press-machine: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+pullover-cable-paren-bras-tendus: pattern → pullover (shoulder extension from overhead, elbows fixed)
+pullover-cable-paren-bras-tendus: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+pullover-cable-paren-bras-tendus-poulie-haute: pattern → pullover (shoulder extension from overhead, elbows fixed)
+pullover-cable-paren-bras-tendus-poulie-haute: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+pullover-machine: pattern → pullover (shoulder extension from overhead, elbows fixed)
+pullover-machine: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+shoulder-press-halteres-assis: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+shrugs-barre: pattern → shrug (scapular elevation)
+shrugs-cable: pattern → shrug (scapular elevation)
+shrugs-halteres: pattern → shrug (scapular elevation)
+smith-shoulder-press: loaded action + scapular_upward_rotation (the upper_back role rests on it)
+straight-arm-pulldown-cable: pattern → pullover (shoulder extension from overhead, elbows fixed)
+straight-arm-pulldown-cable: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+tirage-poulie-haute-prise-large: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+tirage-poulie-haute-prise-neutre: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+tirage-vertical-unilateral-cable: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+traction-assistee-machine: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+traction-assistee-unilaterale: loaded action + scapular_downward_rotation (the upper_back SECONDARY role rests on it)
+adduction-assise: equipment_mode machine_selectorized → machine_unspecified
+adduction-assise: equipment (derived): Seated hip-adduction machine: name ('assise') + source family 'machine'; new delta capability (was an equipment_gap, not 'no equipment'). Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+adduction-assise: strength_specificity_group seated_hip_adduction_machine_selectorized → seated_hip_adduction_machine_unspecified
+adduction-couchee-machine: equipment_mode machine_selectorized → machine_unspecified
+adduction-couchee-machine: equipment (unknown): Lying adductor machine: no slug, alias, description or verifiable real object; device identity not established, so no capability can be attached. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+adduction-couchee-machine: strength_specificity_group lying_hip_adduction_machine_selectorized → lying_hip_adduction_machine_unspecified
+adduction-debout-cable: equipment (derived): Standing cable hip adduction: load at the ankle from a low anchor (mechanics); ankle cuff is indispensable (new delta capability).
+arnold-press: equipment (derived): Dumbbells only: posture not stated and a standing Arnold press is a valid execution, so no support is required.
+back-extension-45-paren-bias-ischios: equipment (derived): 45° back-extension bench written in the name; new delta capability (was an equipment_gap).
+butterfly-pec-machine: equipment_mode machine_selectorized → machine_unspecified
+butterfly-pec-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+butterfly-pec-machine: strength_specificity_group pec_fly_machine_selectorized → pec_fly_machine_unspecified
+cable-cross-over-paren-bashaut: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+calf-press-leg-press: equipment_mode machine_plate → machine_unspecified
+calf-press-leg-press: equipment (derived): Calf press performed on the leg press: the leg-press function is the requirement (name). Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+calf-press-leg-press: strength_specificity_group calf_press_machine_plate → calf_press_machine_unspecified
+chest-press-machine: equipment_mode machine_selectorized → machine_unspecified
+chest-press-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+chest-press-machine: strength_specificity_group chest_press_machine_selectorized → chest_press_machine_unspecified
+crunch-cable-a-genoux: equipment (derived): Kneeling cable crunch pulls from a high anchor (mechanics); attachment unstated and alternative (rope, handles), so not required (TRAIN A face-pull rule).
+curl-cable-basse: equipment (derived): Low anchor written in the name ('basse'), same requirement as curl-poulie-basse; attachment unstated, not required.
+curl-debout-halteres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-ez-bar-debout: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-incline-halteres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-incline-halteres-paren-banc-45: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-marteau-cable-corde: equipment (derived): Rope named; cable elbow flexion is loaded from a low anchor (mechanics).
+curl-marteau-cable-paren-corde: equipment (derived): Rope named; cable elbow flexion is loaded from a low anchor (mechanics). Duplicate of curl-marteau-cable-corde.
+curl-marteau-halteres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-poulie-basse: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-poulie-basse-paren-barre: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+curl-prise-neutre-cable: equipment (derived): Cable curl loaded from a low anchor (mechanics); neutral grip obtainable with rope or handles (alternatives), so no attachment required.
+decline-crunch: equipment (derived): Decline written in the name; new delta capability granted by decline_bench / adjustable_decline_bench, NOT by adjustable_bench.
+developpe-couche-halteres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+developpe-incline-halteres-30: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+dips-pectoraux-paren-buste-penche: equipment (derived): Forward-lean chest dip is performed between parallel bars (bench dips cannot lean the trunk forward); new delta capability dip_support.
+ecarte-arriere-d-epaule-cable: equipment (EKB): EKB kept (ATLAS): any positionable anchor, single column.
+ecarte-pec-aux-cables-paren-incline-bashaut: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+elevations-laterales-cable: equipment (EKB): EKB kept (ATLAS): low anchor; single handle not required (alternative grips).
+elevations-laterales-cable-paren-derriere-le-dos: equipment (EKB): EKB kept (ATLAS): low anchor; single handle not required (alternative grips).
+elevations-laterales-halteres: equipment (derived): Standing dumbbell lateral raise: dumbbells only.
+elevations-laterales-halteres-assis: equipment (EKB): EKB kept: 'assis' -> seated_support (any seat), not specifically a flat bench.
+elevations-laterales-machine: equipment_mode machine_selectorized → machine_unspecified
+elevations-laterales-machine: equipment (derived): Lateral-raise machine function from the exercise identity (name + family 'machine'); existing capability. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+elevations-laterales-machine: strength_specificity_group lateral_raise_machine_selectorized → lateral_raise_machine_unspecified
+extension-overhead-cable-paren-corde: equipment (derived): Rope named; overhead extension works facing away from a high or low anchor, so any positionable anchor (not a dedicated station).
+face-pull-cable: equipment (EKB): EKB kept (ATLAS): high anchor; rope/V-bar are alternatives, none required.
+face-pull-cable-paren-corde: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+fente-avant: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+good-morning-halteres: equipment (derived): Standing dumbbell good morning: dumbbells only.
+hack-squat-machine: equipment_mode machine_plate → machine_unspecified
+hack-squat-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+hack-squat-machine: strength_specificity_group hack_squat_machine_plate → hack_squat_machine_unspecified
+hanging-knee-raise: equipment (derived): 'Hanging' = the suspension affordance, as in the EKB for releve-de-jambes-suspendu (not the pull_up_bar object).
+hip-thrust-halteres: equipment (derived): Hip thrust = upper back on a bench (distinct from the floor glute bridge); no atlas card documents a floor variant for the dumbbell entry, unlike the Smith one.
+hip-thrust-smith: equipment (EKB): EKB kept: bench NOT required by operator ruling (atlas variants 'dos banc' AND 'sol'); the curator's flat_bench is dropped.
+hip-thrust-smith-machine: equipment (EKB): EKB kept: bench NOT required by operator ruling (atlas variants 'dos banc' AND 'sol'); the curator's flat_bench is dropped.
+incline-smith-press: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+kickback-cable: equipment (derived): Bent-over kickback loaded from a low anchor (mechanics); single-hand grip has alternatives (handle, rope end, cable ball), so no attachment required.
+lat-pulldown-prise-large: equipment (derived): 'Lat pulldown' is the atlas name of the pulldown station: same requirement as tirage-poulie-haute-prise-large (EKB).
+lat-pulldown-prise-neutre: equipment (derived): Same station as tirage-poulie-haute-prise-neutre (EKB); grip attachments treated as part of the station (TRAIN A).
+leg-curls-allonge: equipment_mode machine_selectorized → machine_unspecified
+leg-curls-allonge: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+leg-curls-allonge: strength_specificity_group lying_leg_curl_machine_selectorized → lying_leg_curl_machine_unspecified
+leg-curls-assis: equipment_mode machine_selectorized → machine_unspecified
+leg-curls-assis: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+leg-curls-assis: strength_specificity_group seated_leg_curl_machine_selectorized → seated_leg_curl_machine_unspecified
+leg-extension-cable-unilateral: equipment (derived): Cable knee extension loads the ankle from a low anchor; ankle cuff indispensable (new delta capability).
+leg-extensions-assises: equipment_mode machine_selectorized → machine_unspecified
+leg-extensions-assises: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+leg-extensions-assises: strength_specificity_group leg_extension_machine_selectorized → leg_extension_machine_unspecified
+leg-press-paren-pieds-bas: equipment_mode machine_plate → machine_unspecified
+leg-press-paren-pieds-bas: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+leg-press-paren-pieds-bas: strength_specificity_group leg_press_machine_plate → leg_press_machine_unspecified
+leg-press-paren-pieds-bas-serres: equipment_mode machine_plate → machine_unspecified
+leg-press-paren-pieds-bas-serres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+leg-press-paren-pieds-bas-serres: strength_specificity_group leg_press_machine_plate → leg_press_machine_unspecified
+leg-press-paren-pieds-hauts-ecartes: equipment_mode machine_plate → machine_unspecified
+leg-press-paren-pieds-hauts-ecartes: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+leg-press-paren-pieds-hauts-ecartes: strength_specificity_group leg_press_machine_plate → leg_press_machine_unspecified
+machine-crunch: equipment_mode machine_selectorized → machine_unspecified
+machine-crunch: equipment (derived): Ab-crunch machine function (name); new delta capability (was an equipment_gap). Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+machine-crunch: strength_specificity_group machine_crunch_machine_selectorized → machine_crunch_machine_unspecified
+machine-shoulder-press: equipment_mode machine_selectorized → machine_unspecified
+machine-shoulder-press: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+machine-shoulder-press: strength_specificity_group shoulder_press_machine_selectorized → shoulder_press_machine_unspecified
+mollets-assis-machine: equipment_mode machine_plate → machine_unspecified
+mollets-assis-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+mollets-assis-machine: strength_specificity_group seated_calf_raise_machine_plate → seated_calf_raise_machine_unspecified
+mollets-debout-machine: equipment_mode machine_selectorized → machine_unspecified
+mollets-debout-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+mollets-debout-machine: strength_specificity_group standing_calf_raise_machine_selectorized → standing_calf_raise_machine_unspecified
+neutral-grip-shoulder-press-machine: equipment_mode machine_selectorized → machine_unspecified
+neutral-grip-shoulder-press-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+neutral-grip-shoulder-press-machine: strength_specificity_group shoulder_press_machine_selectorized → shoulder_press_machine_unspecified
+pallof-press-cable: equipment (derived): Chest-height anchor needed (mechanics of the anti-rotation press), i.e. a height-adjustable anchor; grip has alternatives, not required.
+pompes: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+pont-fessier: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+preacher-curl: equipment_mode machine_selectorized → machine_unspecified
+preacher-curl: equipment (derived): Source family 'machine' -> preacher-curl machine function (new delta). If the operator rules free-weight bench curl instead: preacher_curl_support + a free weight. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+preacher-curl: strength_specificity_group biceps_curl_machine_selectorized → biceps_curl_machine_unspecified
+pullover-cable-paren-bras-tendus: equipment (EKB_corrected): EKB machine_pullover is wrong (R11): the name says cable; standing high-pulley or lying low-pulley variant unstated, so any positionable anchor.
+pullover-cable-paren-bras-tendus-poulie-haute: equipment (EKB_corrected): EKB machine_pullover is wrong (R11): the name says cable and 'poulie haute'; attachment unstated, not required.
+pullover-machine: equipment_mode machine_selectorized → machine_unspecified
+pullover-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+pullover-machine: strength_specificity_group pullover_machine_selectorized → pullover_machine_unspecified
+pushdown-corde: equipment (derived): Duplicate of triceps-pushdown-corde: same EKB requirement (high anchor + rope).
+rear-delt-fly-machine: equipment_mode machine_selectorized → machine_unspecified
+rear-delt-fly-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+rear-delt-fly-machine: strength_specificity_group rear_delt_fly_machine_selectorized → rear_delt_fly_machine_unspecified
+rear-delt-fly-machine-paren-pec-deck-inverse: equipment_mode machine_selectorized → machine_unspecified
+rear-delt-fly-machine-paren-pec-deck-inverse: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+rear-delt-fly-machine-paren-pec-deck-inverse: strength_specificity_group rear_delt_fly_machine_selectorized → rear_delt_fly_machine_unspecified
+releve-de-jambes-suspendu: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+releves-mollets-debout: equipment (EKB): EKB kept: [] established by operator ruling §8 (step is optional).
+releves-mollets-debout-machine: equipment_mode machine_selectorized → machine_unspecified
+releves-mollets-debout-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+releves-mollets-debout-machine: strength_specificity_group standing_calf_raise_machine_selectorized → standing_calf_raise_machine_unspecified
+reverse-fly-machine: equipment_mode machine_selectorized → machine_unspecified
+reverse-fly-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+reverse-fly-machine: strength_specificity_group rear_delt_fly_machine_selectorized → rear_delt_fly_machine_unspecified
+reverse-nordic: equipment (derived): Kneeling on the floor, no external equipment; a mat is comfort only. Empty list = established no-equipment, not a vocabulary gap.
+romanian-deadlift-barre: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+romanian-deadlift-halteres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+roulette-abdominale: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+roulette-abdominale-paren-ab-wheel-rollout: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+rowing-cable-assis-prise-large: equipment (EKB): EKB kept: dedicated seated-row station, grip attachment part of the station.
+rowing-cable-assis-prise-neutre: equipment (EKB): EKB kept: dedicated seated-row station, grip attachment part of the station.
+rowing-cable-assis-prise-serree: equipment (EKB): EKB kept: dedicated seated-row station, grip attachment part of the station.
+rowing-chest-supported: equipment_mode machine_plate → machine_unspecified
+rowing-chest-supported: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+rowing-chest-supported: strength_specificity_group chest_supported_row_machine_plate → chest_supported_row_machine_unspecified
+rowing-haltere-un-bras: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+rowing-haltere-un-bras-paren-banc: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+rowing-machine-chest-supported: equipment_mode machine_plate → machine_unspecified
+rowing-machine-chest-supported: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+rowing-machine-chest-supported: strength_specificity_group chest_supported_row_machine_plate → chest_supported_row_machine_unspecified
+shoulder-press-halteres-assis: equipment (EKB): EKB kept: 'assis' -> seated_support (any seat).
+shrugs-barre: equipment (derived): 'Barre' -> barbell (same reading as romanian-deadlift-barre); standing, no support.
+shrugs-cable: equipment (derived): Cable shrug loaded from a low anchor (mechanics); attachment (bar or handles) unstated, not required.
+shrugs-halteres: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+sissy-squat-machine: equipment_mode bodyweight → machine_unspecified
+sissy-squat-machine: equipment (derived): Sissy-squat apparatus named; new delta capability (was an equipment_gap). Mode bodyweight -> machine_unspecified: the name says machine; frame (bodyweight) vs loaded lever not stated.
+sissy-squat-machine: strength_specificity_group sissy_squat_bodyweight → sissy_squat_machine_unspecified
+skull-crushers-ez-bar: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+sliding-leg-curl: equipment (derived): Floor exercise; sliders are substitutable by a towel or socks on a smooth floor, so no gym object is required.
+smith-shoulder-press: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+squat-au-poids-du-corps: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+squat-smith-machine-paren-pieds-avances: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+straight-arm-pulldown-cable: equipment (derived): Template notes fix the high pulley and 'la barre' pulled to the thighs.
+tirage-front-cable-paren-prise-large: equipment (derived): Wide-grip cable upright row (template notes): low anchor; a wide grip needs a bar.
+tirage-poulie-haute-prise-large: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+tirage-poulie-haute-prise-neutre: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+tirage-vertical-unilateral-cable: equipment (EKB_corrected): EKB pulldown_seated_station is incomplete: a one-arm pulldown cannot be done on the station's long bar, a single handle is required (new delta capability).
+traction-assistee-machine: equipment_mode machine_selectorized → machine_unspecified
+traction-assistee-machine: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+traction-assistee-machine: strength_specificity_group assisted_pull_up_machine_selectorized → assisted_pull_up_machine_unspecified
+traction-assistee-unilaterale: equipment_mode machine_selectorized → machine_unspecified
+traction-assistee-unilaterale: equipment (derived): Source family 'machine' + name -> assisted pull-up machine function (band-assisted reading has no source fact). Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption).
+traction-assistee-unilaterale: strength_specificity_group assisted_pull_up_unilateral_machine_selectorized → assisted_pull_up_unilateral_machine_unspecified
+triceps-extension-poulie-haute-paren-corde: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+triceps-pushdown-barre: equipment (derived): Pushdown = high anchor; 'barre' named fixes the straight bar.
+triceps-pushdown-corde: equipment (EKB): EKB requirement (TRAIN A) consistent with the curated record.
+upright-row-cable: equipment (derived): Cable upright row loaded from a low anchor (mechanics); attachment unstated (bar or rope), not required.
+upright-row-halteres: equipment (derived): Standing dumbbell upright row: dumbbells only.
+y-raise-haltere: equipment (derived): Record DISPUTED (variant from name only): standing/bent-over Y-raise needs only dumbbells; a prone-incline ruling would add incline_bench_support.
+y-raise-haltere: equipment set from the canonical execution: dumbbells + incline_bench_support
+rowing-chest-supported: identity chest_supported_row_elbows_open → chest_supported_row (ruling 4: generic, not rear-delt-biased)
+triceps-pushdown-corde: operator ruling G08: canonical cable_rope_triceps_pushdown « Triceps pushdown corde » — execution defined
+triceps-extension-poulie-haute-paren-corde: operator ruling G08: legacy alias of triceps-pushdown-corde by operator definition (product definition, not a claim that every historical execution is known)
+curl-poulie-basse-paren-barre: operator ruling G12: canonical low_cable_straight_bar_curl « Curl poulie basse (barre) » — execution defined
+curl-poulie-basse: operator ruling G12: legacy alias of curl-poulie-basse-paren-barre by operator definition (product definition, not a claim that every historical execution is known)
+curl-cable-basse: operator ruling G12: legacy alias of curl-poulie-basse-paren-barre by operator definition (product definition, not a claim that every historical execution is known)
+curl-marteau-cable-paren-corde: operator ruling G14: canonical cable_rope_hammer_curl « Curl marteau câble (corde) » — execution defined
+curl-prise-neutre-cable: operator ruling G14: legacy alias of curl-marteau-cable-paren-corde by operator definition (product definition, not a claim that every historical execution is known)
+tirage-poulie-haute-prise-neutre: equipment ['pulldown_seated_station'] → ['pulldown_seated_station', 'cable_attachment_neutral_grip'] (operator ruling G17)
+tirage-poulie-haute-prise-neutre: operator ruling G17: canonical neutral_grip_lat_pulldown « Tirage poulie haute prise neutre » — execution defined
+lat-pulldown-prise-neutre: operator ruling G17: legacy alias of tirage-poulie-haute-prise-neutre by operator definition (product definition, not a claim that every historical execution is known)
+pullover-cable-paren-bras-tendus-poulie-haute: equipment ['cable_anchor_high'] → ['cable_anchor_high', {'any_of': ['cable_attachment_rope', 'cable_attachment_straight_bar']}] (operator ruling G21/G22)
+pullover-cable-paren-bras-tendus-poulie-haute: operator ruling G21/G22: canonical straight_arm_cable_pullover « Pullover câble bras tendus (poulie haute) » — execution defined
+pullover-cable-paren-bras-tendus: operator ruling G21/G22: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute by operator definition (product definition, not a claim that every historical execution is known)
+straight-arm-pulldown-cable: operator ruling G21/G22: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute by operator definition (product definition, not a claim that every historical execution is known)
+rowing-chest-supported: operator ruling G24: canonical chest_supported_row « Rowing chest-supported » — execution defined
+rowing-machine-chest-supported: operator ruling G24: legacy alias of rowing-chest-supported by operator definition (product definition, not a claim that every historical execution is known)
+tirage-front-cable-paren-prise-large: operator ruling G27: canonical wide_grip_cable_upright_row « Tirage menton câble — prise large » — execution defined
+upright-row-cable: operator ruling G27: legacy alias of tirage-front-cable-paren-prise-large by operator definition (product definition, not a claim that every historical execution is known)
+leg-press-paren-pieds-bas: operator ruling G28: canonical leg_press_low_feet « Presse à cuisses (pieds bas) » — execution defined
+leg-press-paren-pieds-bas-serres: operator ruling G28: legacy alias of leg-press-paren-pieds-bas by operator definition (product definition, not a claim that every historical execution is known)
+releve-de-jambes-suspendu: operator ruling G30: canonical hanging_straight_leg_raise « Relevé de jambes suspendu (jambes tendues) » — execution defined
+hanging-knee-raise: operator ruling G30: canonical hanging_bent_knee_raise « Relevé de genoux suspendu » — execution defined
+rowing-haltere-un-bras-paren-banc: operator ruling G31: canonical bench_supported_one_arm_dumbbell_row « Rowing haltère un bras (appui banc) » — execution defined
+rowing-haltere-un-bras: operator ruling G31: legacy alias of rowing-haltere-un-bras-paren-banc by operator definition (product definition, not a claim that every historical execution is known)
+preacher-curl: operator ruling delegated: preacher curl: canonical machine_preacher_curl « Preacher curl machine » — execution defined
+hip-thrust-halteres: operator ruling delegated: dumbbell hip thrust: canonical dumbbell_hip_thrust « Hip thrust haltères » — execution defined
+tirage-vertical-unilateral-cable: equipment ['cable_attachment_single_handle', 'pulldown_seated_station'] → ['pulldown_seated_station', 'cable_attachment_single_handle'] (operator ruling delegated: unilateral vertical cable pull)
+tirage-vertical-unilateral-cable: operator ruling delegated: unilateral vertical cable pull: canonical unilateral_cable_pulldown « Tirage vertical unilatéral câble » — execution defined
+face-pull-cable-paren-corde: equipment ['cable_anchor_high', 'cable_attachment_rope'] → ['cable_anchor_adjustable', 'cable_attachment_rope'] (operator ruling delegated: face pull)
+face-pull-cable-paren-corde: operator ruling delegated: face pull: canonical cable_rope_face_pull « Face pull câble (corde) » — execution defined
+face-pull-cable: operator ruling delegated: face pull: legacy alias of face-pull-cable-paren-corde by operator definition (product definition, not a claim that every historical execution is known)
+rowing-cable-assis-prise-neutre: equipment ['row_seated_station'] → ['row_seated_station', 'cable_attachment_close_neutral_row_handle'] (operator ruling Sb_SCI_V2_01: close-neutral seated row)
+rowing-cable-assis-prise-neutre: operator ruling Sb_SCI_V2_01: close-neutral seated row: canonical seated_cable_row_neutral_grip « Rowing câble assis prise neutre » — requirement defined
+rowing-cable-assis-prise-serree: equipment ['row_seated_station'] → ['row_seated_station', 'cable_attachment_close_neutral_row_handle'] (operator ruling Sb_SCI_V2_01: close-neutral seated row)
+rowing-cable-assis-prise-serree: operator ruling Sb_SCI_V2_01: close-neutral seated row: canonical seated_cable_row_close_grip « Rowing câble assis prise serrée » — requirement defined
+curl-cable-basse: legacy alias of curl-poulie-basse-paren-barre: science aligned on the canonical record
+curl-cable-basse: legacy alias of curl-poulie-basse-paren-barre: operational facts aligned on the canonical record
+curl-cable-basse: legacy alias of curl-poulie-basse-paren-barre (operator_definition)
+curl-incline-halteres: legacy alias of curl-incline-halteres-paren-banc-45 (source_facts)
+curl-marteau-cable-corde: legacy alias of curl-marteau-cable-paren-corde: science aligned on the canonical record
+curl-marteau-cable-corde: legacy alias of curl-marteau-cable-paren-corde (source_facts)
+curl-poulie-basse: legacy alias of curl-poulie-basse-paren-barre: science aligned on the canonical record
+curl-poulie-basse: legacy alias of curl-poulie-basse-paren-barre: operational facts aligned on the canonical record
+curl-poulie-basse: legacy alias of curl-poulie-basse-paren-barre (operator_definition)
+curl-prise-neutre-cable: legacy alias of curl-marteau-cable-paren-corde: science aligned on the canonical record
+curl-prise-neutre-cable: legacy alias of curl-marteau-cable-paren-corde: operational facts aligned on the canonical record
+curl-prise-neutre-cable: legacy alias of curl-marteau-cable-paren-corde (operator_definition)
+ecarte-pec-aux-cables-paren-incline-bashaut: legacy alias of cable-cross-over-paren-bashaut (source_facts)
+elevations-laterales-cable: legacy alias of elevations-laterales-cable-paren-derriere-le-dos (source_facts)
+face-pull-cable: legacy alias of face-pull-cable-paren-corde: science aligned on the canonical record
+face-pull-cable: legacy alias of face-pull-cable-paren-corde: operational facts aligned on the canonical record
+face-pull-cable: legacy alias of face-pull-cable-paren-corde (operator_definition)
+hip-thrust-smith-machine: legacy alias of hip-thrust-smith (source_facts)
+lat-pulldown-prise-large: legacy alias of tirage-poulie-haute-prise-large (source_facts)
+lat-pulldown-prise-neutre: legacy alias of tirage-poulie-haute-prise-neutre: science aligned on the canonical record
+lat-pulldown-prise-neutre: legacy alias of tirage-poulie-haute-prise-neutre: operational facts aligned on the canonical record
+lat-pulldown-prise-neutre: legacy alias of tirage-poulie-haute-prise-neutre (operator_definition)
+leg-press-paren-pieds-bas-serres: legacy alias of leg-press-paren-pieds-bas: science aligned on the canonical record
+leg-press-paren-pieds-bas-serres: legacy alias of leg-press-paren-pieds-bas (operator_definition)
+mollets-debout-machine: legacy alias of releves-mollets-debout-machine (source_facts)
+pullover-cable-paren-bras-tendus: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute: science aligned on the canonical record
+pullover-cable-paren-bras-tendus: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute: operational facts aligned on the canonical record
+pullover-cable-paren-bras-tendus: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute (operator_definition)
+pushdown-corde: legacy alias of triceps-pushdown-corde: science aligned on the canonical record
+pushdown-corde: legacy alias of triceps-pushdown-corde (source_facts)
+rear-delt-fly-machine-paren-pec-deck-inverse: legacy alias of rear-delt-fly-machine (source_facts)
+reverse-fly-machine: legacy alias of rear-delt-fly-machine (source_facts)
+roulette-abdominale-paren-ab-wheel-rollout: legacy alias of roulette-abdominale (source_facts)
+rowing-haltere-un-bras: legacy alias of rowing-haltere-un-bras-paren-banc: science aligned on the canonical record
+rowing-haltere-un-bras: legacy alias of rowing-haltere-un-bras-paren-banc: operational facts aligned on the canonical record
+rowing-haltere-un-bras: legacy alias of rowing-haltere-un-bras-paren-banc (operator_definition)
+rowing-machine-chest-supported: legacy alias of rowing-chest-supported: science aligned on the canonical record
+rowing-machine-chest-supported: legacy alias of rowing-chest-supported (operator_definition)
+straight-arm-pulldown-cable: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute: science aligned on the canonical record
+straight-arm-pulldown-cable: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute: operational facts aligned on the canonical record
+straight-arm-pulldown-cable: legacy alias of pullover-cable-paren-bras-tendus-poulie-haute (operator_definition)
+triceps-extension-poulie-haute-paren-corde: legacy alias of triceps-pushdown-corde: science aligned on the canonical record
+triceps-extension-poulie-haute-paren-corde: legacy alias of triceps-pushdown-corde (operator_definition)
+upright-row-cable: legacy alias of tirage-front-cable-paren-prise-large: science aligned on the canonical record
+upright-row-cable: legacy alias of tirage-front-cable-paren-prise-large: operational facts aligned on the canonical record
+upright-row-cable: legacy alias of tirage-front-cable-paren-prise-large (operator_definition)
+releve-de-jambes-suspendu: content_alignment CONTENT_EXECUTION_MISMATCH recorded (GO BUILD Sb_SCI_V2_01)
+rowing-machine-chest-supported: content_alignment CONTENT_EXECUTION_MISMATCH recorded (GO BUILD Sb_SCI_V2_01)

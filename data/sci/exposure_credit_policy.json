@@ -1,0 +1,11 @@
+{
+  "policy_id": "sci-exposure-credit-v1",
+  "doc": "Politique de crédit d'exposition du moteur scientifique (Sx_SCI_V2_CATALOGUE_INTEGRATION_01 §7.2). Versionnée À PART des rôles bruts du catalogue : le catalogue garde PRIMARY / SECONDARY / MINOR / UNKNOWN, cette politique dit combien chaque rôle crédite, et s'applique à la lecture. Changer un crédit = une nouvelle policy_id, jamais une réécriture des rôles. UNKNOWN crédite UNKNOWN : ni 0, ni 0,5.",
+  "applies_to": "data/sci/exercise_catalogue.json — exercise_science.contributions[].role",
+  "credits": {
+    "PRIMARY": 1.0,
+    "SECONDARY": 0.5,
+    "MINOR": 0.0,
+    "UNKNOWN": "UNKNOWN"
+  }
+}
