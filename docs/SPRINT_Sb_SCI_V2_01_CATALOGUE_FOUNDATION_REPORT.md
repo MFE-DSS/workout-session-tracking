@@ -173,3 +173,39 @@ correction de contenu servi, aucune promotion. `app/services/sci_catalogue.py` n
 
 **Verdict :** `Sb_SCI_V2_01` est construite et vérifiée en local. Le statut final dépend de la CI
 réelle, impérative au tier CI_INFRA.
+
+## 4. Closeout — MERGÉE (2026-10-24)
+
+| Élément | Valeur |
+|---|---|
+| PR | #274, merge commit (sans squash ni `--admin`), tête épinglée `108633c` |
+| SHA canonique | `e6e425c` |
+| CI de PR | run `40028405233` sur `1ddb870` : tests 3/3 et lint verts, **porte Sonar rouge** ; run `40030290772` sur `108633c` : 9/9 verts |
+| CI canonique (push sur `e6e425c`) | run `40031682316`, **7/7 succès** |
+| Porte Sonar de la PR | **OK** : couverture du nouveau code 93,8 %, 0 bug, 0 code smell, 0 vulnérabilité, 0,0 % de duplication |
+| Autorisation | GO MERGE opérateur, puis STANDING GO MERGE pour les suites logiques (2026-10-23) |
+
+**Incident résolu dans le périmètre.** Au premier passage, la porte Sonar de la PR était rouge
+(`new_code_smells_severity` 15 pour un seuil de 14). Trois findings réels de la tranche, aucun
+faux positif :
+- `python:S5806` : une variable `credits` masquait un builtin dans `sci_catalogue.py` ;
+- `python:S5778` ×2 : deux tests d'exception enveloppaient deux appels susceptibles de lever.
+
+Corrigés en `108633c`. Aucune porte n'a été affaiblie, aucun finding n'a été adjugé.
+
+**Porte Sonar de la branche par défaut.** Elle est `ERROR` après le merge : bugs 25, code smells
+20, vulnérabilités 10, sur une période de nouveau code gelée au 2026-04-10. C'est la dette
+documentée par `SONAR-AUDIT-01`, antérieure à cette tranche. La porte de la PR, qui ne mesure
+que ce qu'elle apporte, rend **0** sur chacune de ces trois conditions.
+
+**Non fait, et pourquoi.**
+- Le nettoyage de la branche et du worktree reste une action séparée, selon le protocole de
+  livraison.
+- `ROADMAP_AND_NEXT_STEPS.md` n'est pas mise à jour : elle n'a pas été tenue depuis 2026-08-20,
+  et les closeouts récents ne la touchent pas. La position du programme vit dans le
+  `SPEC_REGISTRY`.
+
+**Suite** (spec §12) : `Sb_SCI_V2_02`, résolveur d'identité et registre d'exposition dérivé, sans
+consommateur servi. Elle part sur GO BUILD.
+
+**Verdict :** ✅ **MERGÉE** — `Sb_SCI_V2_01` CLOSED, canonique `e6e425c`, CI canonique 7/7.
