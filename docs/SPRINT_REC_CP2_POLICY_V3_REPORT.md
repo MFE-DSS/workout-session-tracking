@@ -93,6 +93,11 @@ aucune : il change la **forme** de la décision.
 | 5 | ancienneté du gabarit, puis de la famille | le départage que la spec promet depuis l'origine |
 | 6 | ordre de catalogue | dernier recours déterministe, aucun aléatoire |
 
+> **Critère 4 — SUPERSEDED** par `Sx_REC_ROLLOUT_01_RECOVERY_FIRST_SPEC` (opérateur, D14,
+> 2026-10-23) : il départageait des séances de force **récupérées** en faveur du cardio (64
+> décisions sur 78 du corpus). Remplacé par « à bande égale, la force passe avant le cardio »,
+> « le moins de zones en récupération » et « les muscles les plus reposés ».
+
 Ce que V3 **supprime** : `WEIGHT_ALTERNATION = 20`, accordé dès que les deux
 dernières séances étaient de la force — une condition **vraie en permanence**
 pour quiconque s'entraîne en force — et le `+10` cardio-absent sans expiration.

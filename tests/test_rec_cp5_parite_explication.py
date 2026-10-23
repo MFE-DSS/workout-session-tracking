@@ -91,10 +91,13 @@ def test_le_classement_de_v3_est_rigoureusement_inchange(client):
             "influencerait le classement"
         )
 
-    # Et la clé de rang reste celle que `REC-CP2` a posée.
+    # Et la clé de rang reste celle que `REC-CP2` a posée, amendée par
+    # `REC-ROLLOUT-01` (D14) : la modalité délaissée est retirée, le plan B,
+    # le moins sollicité et le repos entrent.
     assert v3.CRITERES_DU_RANG == (
-        "recuperation", "couverture", "repetition", "modalite",
-        "recence_gabarit", "recence_famille", "ordre_catalogue", "slug",
+        "recuperation", "plan_b", "zones_en_recuperation", "couverture",
+        "repetition", "repos", "recence_gabarit", "recence_famille",
+        "ordre_catalogue", "slug",
     ), "la table des critères ne décrit plus la clé réelle du classement"
 
 
@@ -225,17 +228,26 @@ def test_le_critere_decisif_est_lu_dans_le_rang_pas_devine(client):
         def __init__(self, rang):
             self.rang = rang
 
-    base = (0, -0.8, 0, 0, "a", "b", 3, "x")
+    #  rec  planB zones  déficit rép  repos    gabarit famille ordre slug
+    base = (0, 0, 0, -0.8, 0, -48.0, "a", "b", 3, "x")
+
+    def k(**diff):
+        noms = ("rec", "planb", "zones", "deficit", "rep", "repos",
+                "gabarit", "famille", "ordre", "slug")
+        return tuple(diff.get(n, v) for n, v in zip(noms, base, strict=True))
+
     assert critere_decisif(_V(base), None) is None
-    assert critere_decisif(
-        _V(base), _V((1, -0.8, 0, 0, "a", "b", 3, "x"))) == "recuperation"
-    assert critere_decisif(
-        _V(base), _V((0, -0.5, 0, 0, "a", "b", 3, "x"))) == "couverture"
-    assert critere_decisif(
-        _V(base), _V((0, -0.8, 0, 0, "z", "b", 3, "x"))) == "recence_gabarit"
-    assert critere_decisif(
-        _V(base), _V((0, -0.8, 0, 0, "a", "b", 9, "x"))) == "ordre_catalogue"
+    assert critere_decisif(_V(base), _V(k(rec=1))) == "recuperation"
+    assert critere_decisif(_V(base), _V(k(planb=1))) == "plan_b"
+    assert critere_decisif(_V(base), _V(k(zones=2))) == "zones_en_recuperation"
+    assert critere_decisif(_V(base), _V(k(deficit=-0.5))) == "couverture"
+    assert critere_decisif(_V(base), _V(k(repos=-24.0))) == "repos"
+    assert critere_decisif(_V(base), _V(k(gabarit="z"))) == "recence_gabarit"
+    assert critere_decisif(_V(base), _V(k(ordre=9))) == "ordre_catalogue"
     assert critere_decisif(_V(base), _V(base)) is None
+    # deux gabarits aux zones jamais chargées : repos égal (−inf), pas décisif
+    jamais = k(repos=float("-inf"))
+    assert critere_decisif(_V(jamais), _V(k(repos=float("-inf"), ordre=9))) == "ordre_catalogue"
 
 
 def test_le_facteur_qui_a_decide_est_enonce_en_premier(client):

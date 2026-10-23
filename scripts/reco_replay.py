@@ -258,6 +258,9 @@ class Decision:
     #: avaient-ils le MÊME score ? Si oui, ce n'est pas un signal qui a
     #: tranché, c'est `display_order` puis `slug`.
     egalite_en_tete: bool = False
+    #: `REC-ROLLOUT-01` — égalité de tête où aucun des deux candidats n'a
+    #: d'historique de charge sur ses zones : aucune preuve ne pouvait trancher.
+    egalite_sans_historique: bool = False
     phrase: str | None = None
     repli: bool = False
     demarrage_a_froid: bool = False
@@ -306,6 +309,7 @@ def _decision_de(jour: int, reco: dict | None, signaux,
         alternatives=tuple(a["template"].slug for a in alts),
         marge=marge,
         egalite_en_tete=_tranchee_par_le_catalogue(reco, marge),
+        egalite_sans_historique=bool(reco["context"].get("departage_sans_historique")),
         phrase=top["phrase"],
         repli=not alts,  # le repli ne rend JAMAIS d'alternative
         demarrage_a_froid=bool(reco["context"].get("cold_start")),
@@ -598,6 +602,9 @@ def resumer(nom: str, decisions: list[Decision]) -> dict:
             if gagnants else 0.0),
         "part_egalites": (
             round(sum(1 for d in prises if d.egalite_en_tete) / len(prises), 3)
+            if prises else 0.0),
+        "part_egalites_sans_historique": (
+            round(sum(1 for d in prises if d.egalite_sans_historique) / len(prises), 3)
             if prises else 0.0),
         "marge_mediane": statistics.median(marges) if marges else None,
         "marge_min": min(marges) if marges else None,
