@@ -157,11 +157,11 @@ def _credit_value(role: str, value: Any) -> float | _UnknownCredit:
 
 def load_credit_policy(path: Path = CREDIT_POLICY_PATH) -> CreditPolicy:
     doc = json.loads(path.read_text(encoding="utf-8"))
-    credits = doc.get("credits", {})
-    if set(credits) != ROLES:
+    table = doc.get("credits", {})
+    if set(table) != ROLES:
         raise SciCatalogueError(f"la politique doit créditer exactement {sorted(ROLES)}")
     policy_id = doc.get("policy_id")
     if not isinstance(policy_id, str) or not policy_id:
         raise SciCatalogueError("policy_id manquant")
     return CreditPolicy(policy_id=policy_id,
-                        credits=MappingProxyType({r: _credit_value(r, v) for r, v in credits.items()}))
+                        credits=MappingProxyType({r: _credit_value(r, v) for r, v in table.items()}))

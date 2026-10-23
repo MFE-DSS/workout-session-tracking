@@ -80,8 +80,9 @@ def test_loaded_records_are_read_only(catalogue):
     record = catalogue.record("pompes")
     with pytest.raises(TypeError):
         record["exercise_id"] = "x"  # type: ignore[index]
+    contributions = record["exercise_science"]["contributions"]
     with pytest.raises((TypeError, AttributeError)):
-        record["exercise_science"]["contributions"].append({})  # type: ignore[union-attr]
+        contributions.append({})  # type: ignore[union-attr]
 
 
 def test_machine_unspecified_is_kept_as_written(catalogue):
@@ -124,8 +125,9 @@ def test_unknown_role_credit_is_unknown_never_zero():
 
 
 def test_a_role_outside_the_vocabulary_is_refused():
+    policy = sc.load_credit_policy()
     with pytest.raises(ValueError):
-        sc.load_credit_policy().credit("HALF")
+        policy.credit("HALF")
 
 
 def test_a_policy_that_turns_unknown_into_a_number_is_refused(tmp_path):
@@ -174,5 +176,6 @@ def test_an_alias_pointing_to_a_missing_canonical_is_refused(tmp_path):
         alias = next(r for r in d["records"] if r["identity"]["identity_relation"] == "LEGACY_ALIAS")
         alias["identity"]["alias_of"] = "no-such-exercise"
 
+    path = _rewrite(tmp_path, mutate)
     with pytest.raises(sc.SciCatalogueError):
-        sc.load_catalogue(_rewrite(tmp_path, mutate))
+        sc.load_catalogue(path)
