@@ -66,8 +66,17 @@ branche (contrôle `app.__file__`), ruff, protocole de spec, CI.
 | Fichiers V3 ciblés (rec_cp2/3/4/5, train_a, rollout_01) | 58 + 19 verts, depuis l'arbre de la branche (`app.__file__` contrôlé) |
 | `ruff` (fichiers touchés) · budget | propre · 264 ≤ 548 |
 | `check_spec_protocol.py` | OK |
-| CI GitHub | au push |
+| CI GitHub (PR #272) | verte : 3 shards pytest, lint, attestation canonique, SonarCloud |
+
+## 7. Closeout
+
+- **PR #272** mergée le 2026-10-23 (GO MERGE opérateur), commit de merge `0c9e14b`, méthode
+  merge commit (convention du dépôt).
+- **CI canonique** sur `0c9e14b` (run `39980461729`) : 7/7 jobs verts, SonarCloud inclus.
+- **Suites** : zones des gabarits (seuil d'un quart) et séances utilitaires dans la rotation —
+  posées comme questions au chercheur du moteur scientifique V2 ; la règle D14 sera remplacée
+  par sa répartition par objectif.
 
 ## Verdict
 
-**Verdict :** `PR GREEN / MERGE PENDING` attendu après CI — décision de merge à l'opérateur.
+**Verdict :** `CLOSED` — mergé (`0c9e14b`), CI canonique verte.
