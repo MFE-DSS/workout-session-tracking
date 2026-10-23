@@ -127,6 +127,10 @@ def test_v3_n_est_reference_que_par_le_banc_et_la_composition():
         # récupération et non le ratio hérité. Il exerce V3 ; il ne le
         # promeut pas et n'étend pas son classement.
         "tests/test_train_a_autorite_recuperation.py",
+        # `REC-ROLLOUT-01` — AJOUT DÉCLARÉ. Tests d'acceptation de D14 (plan B,
+        # moins sollicité, repos) : ils exercent le classement de la politique
+        # servie sur de vrais nouveaux utilisateurs, sans rien promouvoir.
+        "tests/test_rec_rollout_01_recovery_first.py",
     }
     coupables = []
     for f in list((racine / "app").rglob("*.py")) + \
@@ -391,19 +395,42 @@ def test_comparaison_en_ombre_v2_contre_v3(client, capsys):
                       f"{r['part_egalites']:6.2f} "
                       f"{', '.join(f'{k}×{v}' for k, v in r['gagnants'].items())}")
 
-    # `A` — la part de décisions tranchées par l'ordre du catalogue.
-    def _part_catalogue(lignes):
+    # `A` — la part de décisions tranchées par l'ordre du catalogue ALORS QU'UN
+    # HISTORIQUE EXISTAIT.
+    #
+    # ⚠ `REC-ROLLOUT-01` (arbitrage opérateur, 2026-10-23) — POURQUOI LA GARDE
+    # NE COMPTE PLUS LES ÉGALITÉS SANS HISTORIQUE.
+    #
+    # Avant `REC-ROLLOUT-01`, cette part valait 0 % parce que « la modalité
+    # délaissée » départageait TOUTE égalité en faveur du cardio : le 0 % était
+    # produit par le défaut lui-même (cardio servi dans 64 décisions sur 78).
+    # Une fois ce critère retiré, 34 égalités sur 37 opposaient deux séances
+    # dont AUCUNE zone n'avait d'historique de charge : aucun fait ne peut les
+    # séparer, et l'ordre du catalogue y est le seul recours honnête. La garde
+    # mord donc là où elle a un sens — une égalité que la preuve AURAIT dû
+    # trancher — et la part sans historique est publiée, pas cachée.
+    def _part(lignes, cle):
         prises = sum(r["prises"] for r in lignes)
-        tranchees = sum(round(r["part_egalites"] * r["prises"])
-                        for r in lignes)
-        return tranchees / prises if prises else 0.0
+        n = sum(round(r[cle] * r["prises"]) for r in lignes)
+        return n / prises if prises else 0.0
 
-    part_v3 = _part_catalogue(resultats["v3"])
+    toutes = _part(resultats["v3"], "part_egalites")
+    sans_historique = _part(resultats["v3"], "part_egalites_sans_historique")
+    part_v3 = toutes - sans_historique
+    with capsys.disabled():
+        print(f"\nV3 — égalités tranchées par le catalogue : {toutes:.0%} au total, "
+              f"dont {sans_historique:.0%} sans aucun historique de charge "
+              f"→ {part_v3:.0%} là où un historique existait")
     assert part_v3 <= 0.15, (
         f"{part_v3:.0%} des décisions V3 sont tranchées par l'ordre du "
-        "catalogue — c'est le défaut `A` que `REC-CP1` a trouvé sous `B`, "
-        "et le corriger était la moitié du travail"
+        "catalogue alors qu'un historique existait — c'est le défaut `A` que "
+        "`REC-CP1` a trouvé sous `B`, et le corriger était la moitié du travail"
     )
+    # Une égalité sans historique reste une décision : elle doit se dire.
+    for traj in CORPUS:
+        for d in _rejouer(traj, "v3"):
+            if d.egalite_sans_historique:
+                assert d.phrase, f"{traj.nom} j{d.jour} : égalité sans historique muette"
 
     # `B` — trois histoires opposées ne doivent plus rendre la même séquence.
     sequences = {

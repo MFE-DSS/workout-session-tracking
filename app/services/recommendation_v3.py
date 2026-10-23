@@ -86,6 +86,11 @@ RECUPEREE, PARTIELLE, INSUFFISANTE = 0, 1, 2
 #: Pénalités de répétition, avant application de `REPEAT_REQUIRES_EVIDENCE`.
 NOUVEAU, MEME_FAMILLE, MEME_GABARIT = 0, 1, 2
 
+#: `REC-ROLLOUT-01` (D14) — à bande de récupération égale, la force passe avant
+#: le cardio. Le cardio est le PLAN B : il ne gagne que lorsqu'aucune séance de
+#: force n'est dans une bande au moins aussi bonne.
+FORCE, CARDIO = 0, 1
+
 #: Les familles de mouvement, lues dans la nomenclature du catalogue. Ce n'est
 #: pas une ontologie nouvelle — le dépôt en a déjà assez qui se ressemblent.
 PREFIXES_FAMILLE = ("push", "pull", "legs", "liss", "short", "catch-up",
@@ -201,6 +206,9 @@ class RecuperationCanonique:
     #: `{zone: bool}` — preuve POSITIVE de récupération. Ce que
     #: l'explication lit, et que le rang ignore délibérément.
     preuve: dict[str, bool] = field(default_factory=dict)
+    #: `REC-ROLLOUT-01` — `{zone: heures depuis la dernière charge}`, `None`
+    #: pour une zone jamais chargée. Un FAIT horodaté, pas l'estimation 0–1.
+    heures: dict[str, float | None] = field(default_factory=dict)
 
 
 #: Repli neutre : aucune carte. Utilisé quand la chaîne d'évidence est
@@ -225,6 +233,7 @@ def recuperation_canonique(db: Session, user_id: int,
         return RecuperationCanonique(
             decision=decisions_par_zone(estimations),
             preuve=preuves_par_zone(estimations),
+            heures={e.zone_code: e.hours_since_last_load for e in estimations},
         )
     except Exception:
         return _SANS_RECUPERATION
@@ -295,35 +304,63 @@ def _penalite_de_repetition(
     return NOUVEAU
 
 
-def _bande_de_modalite(
-    template: WorkoutTemplate, signaux: Signals
-) -> int:
-    """Préférer la modalité la moins récemment pratiquée.
+def _bande_de_plan_b(template: WorkoutTemplate) -> int:
+    """La force d'abord ; le cardio en plan B.
 
-    ⚠ CE CRITÈRE REMPLACE DEUX BONUS PERMANENTS DE V2, ET C'EST VOULU.
+    ⚠ `REC-ROLLOUT-01` (D14) — CE CRITÈRE REMPLACE « LA MODALITÉ DÉLAISSÉE ».
 
-    V2 accordait `WEIGHT_ALTERNATION = 20` dès que les deux dernières séances
-    étaient de la force — une condition **vraie en permanence** pour quiconque
-    s'entraîne en force — puis `+10` de plus si le cardio manquait depuis sept
-    jours, sans expiration. Ensemble : trente points constants offerts au
-    cardio, qui suffisent à lui faire gagner **toutes** les décisions du corpus.
+    Mesuré avant d'écrire : après une première séance `push-a`, cinq séances de
+    force étaient **pleinement récupérées** et égales sur la couverture et la
+    répétition ; la modalité délaissée les départageait toutes en faveur du
+    cardio. Pour qui n'a jamais fait de cardio, `days_since_last_cardio = None`
+    valait « le plus ancien de tous » : le cardio gagnait CHAQUE égalité.
 
-    Ici la modalité n'est plus un supplément : c'est la même règle de récence
-    que partout ailleurs, appliquée au couple force/cardio. Elle ne peut pas
-    s'installer, parce qu'elle s'annule dès que la modalité a été pratiquée.
+    La leçon de `REC-CP2` reste juste — V2 offrait trente points permanents au
+    cardio — et elle est tenue plus fermement : le cardio n'a plus de bonus du
+    tout. Placé juste après la récupération, ce critère ne départage qu'à bande
+    ÉGALE ; si toute la force récupère encore, le cardio gagne par la bande
+    elle-même. C'est le plan B voulu par l'opérateur.
     """
-    depuis_cardio = signaux.days_since_last_cardio
-    depuis_force = signaux.days_since_last_strength
-    if depuis_cardio is None and depuis_force is None:
+    return CARDIO if template.kind == "cardio" else FORCE
+
+
+def _zones_en_recuperation(zones: tuple[str, ...],
+                           recup: RecuperationCanonique) -> int:
+    """Combien de zones du gabarit récupèrent encore — moins, c'est mieux.
+
+    `REC-ROLLOUT-01` (D14) : « la deuxième séance la plus logique est celle où
+    il reste le moins de muscles à récupérer ». La bande ne lit que la PIRE
+    zone ; deux gabarits en `PARTIELLE` y sont égaux même si l'un n'a qu'une
+    zone à reprendre et l'autre quatre.
+
+    ⚠ UN COMPTE, PAS LA DISPONIBILITÉ FINE. L'estimation 0–1 du contrat est
+    une estimation, pas une mesure ; départager 0,85 et 1,0 serait une fausse
+    précision, et rendrait la couverture muette dans toute la bande récupérée.
+    Une zone sans charge observée est NON LIMITANTE (`TRAIN A`) : elle ne
+    compte pas. Carte absente : zéro, le neutre — jamais une pénalité inventée.
+    """
+    if not recup.decision:
         return 0
-    # `None` = jamais pratiquée, donc la plus ancienne de toutes.
-    c = float("inf") if depuis_cardio is None else depuis_cardio
-    f = float("inf") if depuis_force is None else depuis_force
-    if c == f:
-        return 0
-    delaissee = "cardio" if c > f else "strength"
-    kind = "cardio" if template.kind == "cardio" else "strength"
-    return 0 if kind == delaissee else 1
+    return sum(1 for z in zones if recup.decision.get(z, PARTIEL) != NON_LIMITANT)
+
+
+def _repos_minimal(zones: tuple[str, ...], recup: RecuperationCanonique) -> float:
+    """Depuis combien d'heures la zone la MOINS reposée du gabarit n'a pas été
+    chargée — plus, c'est mieux. Jamais chargée : `inf`, la plus reposée.
+
+    `REC-ROLLOUT-01` (D14) : « la séance la plus logique est celle où il n'a
+    sollicité aucun muscle ». C'est le départage qui manquait une fois la
+    modalité retirée — mesuré : sans lui, 67 % des décisions du corpus
+    tombaient sur l'ordre du catalogue.
+
+    ⚠ UN FAIT, PAS L'ESTIMATION. Des heures depuis une charge enregistrée, non
+    la disponibilité 0–1. Placé APRÈS la couverture : l'équilibre sur quatorze
+    jours décide d'abord, le repos départage ensuite.
+    Carte absente ou gabarit sans zone : `inf`, le neutre — aucune pénalité.
+    """
+    vus = [recup.heures.get(z) for z in zones]
+    connues = [h for h in vus if h is not None]
+    return min(connues) if connues else float("inf")
 
 
 def _en_utc(quand: datetime | None) -> datetime:
@@ -391,12 +428,18 @@ def classer_candidats(
        redondance 24 h). Un filtre de sécurité n'est pas une préférence.
     1. **récupération** — un gabarit dont une zone n'est pas récupérée passe
        après un gabarit prêt.
+    1 bis. **plan B** (`REC-ROLLOUT-01`) — à bande égale, la force passe avant
+       le cardio.
+    1 ter. **le moins sollicité** (`REC-ROLLOUT-01`) — moins de zones encore en
+       récupération d'abord.
     2. **couverture longitudinale** — le plus sous-servi d'abord. C'est le
        signal que le moteur calculait sans jamais le lire.
     3. **justification de répétition** — refaire le même gabarit, ou la même
        famille, passe après — **sauf** si la couverture le porte, auquel cas la
        répétition est justifiée et la pénalité tombe.
-    4. **modalité délaissée** — récence appliquée au couple force/cardio.
+    3 bis. **les muscles les plus reposés** (`REC-ROLLOUT-01`) — heures depuis
+       la dernière charge de la zone la moins reposée.
+    ~~4. modalité délaissée~~ — retirée par `REC-ROLLOUT-01`, remplacée par 1 bis.
     5. **ancienneté du gabarit**, puis **de la famille** — le départage que la
        spec promet depuis l'origine et que le code n'a jamais lu.
     6. **ordre de catalogue** — dernier recours déterministe. Aucun aléatoire.
@@ -417,6 +460,12 @@ def classer_candidats(
     # `display_order`, un `slug` ou une donnée manquante.
     deficit_max = max(deficits.values(), default=0.0)
 
+    bandes = {t.slug: _bande_de_recuperation(z, recup) for t, z in eligibles}
+    # `REC-ROLLOUT-01` — la meilleure bande qu'offre la force. Le cardio n'est
+    # le plan B que s'il fait strictement mieux : sinon, la force passe.
+    meilleure_force = min((bandes[t.slug] for t, _ in eligibles
+                           if _bande_de_plan_b(t) == FORCE), default=None)
+
     verdicts: list[Verdict] = []
     for t, zones in eligibles:
         deficit = deficits[t.slug]
@@ -425,16 +474,18 @@ def classer_candidats(
         if justifiee:
             repetition = NOUVEAU
 
-        recuperation = _bande_de_recuperation(zones, recup)
-        modalite = _bande_de_modalite(t, signaux)
+        recuperation = bandes[t.slug]
+        plan_b = _bande_de_plan_b(t)
+        en_recuperation = _zones_en_recuperation(zones, recup)
+        repos = _repos_minimal(zones, recup)
         vu_gabarit = dernier_passage.get(t.slug, JAMAIS)
         vu_famille = passage_famille.get(famille_de(t.slug) or "", JAMAIS)
 
         verdicts.append(Verdict(
             template=t,
             zones=zones,
-            rang=(recuperation, -deficit, repetition, modalite,
-                  vu_gabarit, vu_famille, t.display_order, t.slug),
+            rang=(recuperation, plan_b, en_recuperation, -deficit, repetition,
+                  -repos, vu_gabarit, vu_famille, t.display_order, t.slug),
             facteurs={
                 "recuperation": recuperation,
                 # `TRAIN A §2` — LE RANG NE SUFFIT PAS À AUTORISER LA PHRASE.
@@ -453,7 +504,11 @@ def classer_candidats(
                 "deficit_couverture": round(deficit, 3),
                 "repetition": repetition,
                 "repetition_justifiee": justifiee,
-                "modalite_delaissee": modalite == 0,
+                # vrai seulement quand le cardio sert parce que la force,
+                # elle, récupère encore — la phrase du plan B en dépend
+                "plan_b": plan_b == CARDIO and (
+                    meilleure_force is None or recuperation < meilleure_force),
+                "zones_en_recuperation": en_recuperation,
                 "dernier_passage": None if vu_gabarit is JAMAIS else vu_gabarit,
                 "observation_partielle": signaux.observation_partielle,
             },
@@ -483,8 +538,17 @@ def _libelle_zone(zone: str) -> str:
 #: casseraient cette remontée **en silence** : l'explication resterait
 #: plausible, simplement dans le mauvais ordre.
 FACTEUR_NOUVEAUTE = "jamais fait"
-FACTEUR_MODALITE = "la modalité la plus délaissée"
 FACTEUR_RECUPERATION = "zones récupérées"
+#: `REC-ROLLOUT-01` — vraies par construction : elles ne s'énoncent que quand le
+#: rang montre ce qu'elles disent.
+FACTEUR_PLAN_B = "tout le reste récupère encore : séance cardio"
+FACTEUR_MOINS_SOLLICITE = "le moins de zones encore en récupération"
+FACTEUR_REPOS = "les muscles les plus reposés"
+#: Les facteurs qui ne s'énoncent que lorsque le rang montre qu'ils ont décidé.
+_FACTEUR_SI_DECISIF = {
+    "zones_en_recuperation": (FACTEUR_MOINS_SOLLICITE,),
+    "repos": (FACTEUR_REPOS,),
+}
 
 #: Les composantes de la clé lexicographique, dans l'ordre exact où
 #: `classer_candidats` les range. ⚠ Cette table ne décide de RIEN : elle NOMME
@@ -492,9 +556,11 @@ FACTEUR_RECUPERATION = "zones récupérées"
 #: à l'explication le contraire de ce que le moteur a fait.
 CRITERES_DU_RANG = (
     "recuperation",
+    "plan_b",
+    "zones_en_recuperation",
     "couverture",
     "repetition",
-    "modalite",
+    "repos",
     "recence_gabarit",
     "recence_famille",
     "ordre_catalogue",
@@ -519,7 +585,9 @@ def _en_tete(gagnants: list[str], decisif: str | None,
         return gagnants
     reperes = {
         "couverture": ", ".join(zones[:2]),
-        "modalite": FACTEUR_MODALITE,
+        "plan_b": FACTEUR_PLAN_B,
+        "zones_en_recuperation": FACTEUR_MOINS_SOLLICITE,
+        "repos": FACTEUR_REPOS,
         "recence_gabarit": FACTEUR_NOUVEAUTE,
         "recence_famille": FACTEUR_NOUVEAUTE,
         "recuperation": FACTEUR_RECUPERATION,
@@ -630,8 +698,9 @@ def expliquer(verdict: Verdict, rang: int = 0,
     elif f["recuperation"] == INSUFFISANTE:
         limitants.append("une zone n'a pas fini de récupérer")
 
-    if f["modalite_delaissee"]:
-        gagnants.append(FACTEUR_MODALITE)
+    # `REC-ROLLOUT-01` — le moins sollicité et le repos ne se disent que s'ils
+    # ont départagé.
+    gagnants.extend(_FACTEUR_SI_DECISIF.get(decisif, ()))
 
     # ── 3. LA NOUVEAUTÉ — SEULEMENT SI ELLE A MATÉRIELLEMENT CONTRIBUÉ.
     #
@@ -649,6 +718,14 @@ def expliquer(verdict: Verdict, rang: int = 0,
 
     # L'ordre d'énonciation suit le critère qui a réellement décidé.
     gagnants = _en_tete(gagnants, decisif, zones)
+
+    # `REC-ROLLOUT-01` — LE PLAN B EST TOUJOURS LA PREMIÈRE RAISON.
+    #
+    # Un cardio servi en plan B l'est parce que la force récupère encore ; c'est
+    # la cause, quel que soit le critère qui le sépare d'un autre cardio. Dire
+    # d'abord « Core : le moins servi » laisserait croire à un choix de zone.
+    if f.get("plan_b"):
+        gagnants = [FACTEUR_PLAN_B, *gagnants]
 
     justification = None
     if f["repetition"] == MEME_GABARIT:
@@ -785,6 +862,15 @@ def recommander_v3(
             "cold_start": signaux_froids(verdicts),
             "departage_par_catalogue": bool(
                 reste and tete.rang_sans_catalogue == reste[0].rang_sans_catalogue
+            ),
+            # `REC-ROLLOUT-01` — égalité dont AUCUNE zone des deux candidats n'a
+            # d'historique de charge (repos infini des deux côtés) : aucun fait
+            # ne peut les séparer, l'ordre du catalogue est le seul recours
+            # honnête. Nommé pour que la mesure distingue ce cas d'une égalité
+            # que l'historique aurait dû trancher.
+            "departage_sans_historique": bool(
+                reste and tete.rang_sans_catalogue == reste[0].rang_sans_catalogue
+                and tete.rang[CRITERES_DU_RANG.index("repos")] == float("-inf")
             ),
             "environnement_actif": environnement.actif,
             "environnement_etat": environnement.etat_catalogue,
