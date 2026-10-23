@@ -1,0 +1,1728 @@
+{
+  "catalogue_version": "auren-exercise-catalogue-v2-closure-2",
+  "catalogue_digest": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+  "metrics": {
+    "source_records": "107/107",
+    "format_errors": 0,
+    "status": {
+      "reviewed": 107
+    },
+    "publishable": 107,
+    "compiler_candidates": 84,
+    "canonical_identities": 84,
+    "legacy_aliases": 23,
+    "canonical_by_classification": {
+      "UNIQUE": 48,
+      "EXACT_CANONICAL_DUPLICATE": 18,
+      "LEGITIMATE_VARIANT": 18,
+      "UNRESOLVED": 0
+    },
+    "aliases_by_merge_basis": {
+      "source_facts": 11,
+      "operator_definition": 12
+    },
+    "incomplete_exposure_vectors": 28,
+    "equipment_requirements_unknown": 1,
+    "machine_unspecified": 29,
+    "true_any_of_requirements": 1,
+    "content_execution_mismatches": 2,
+    "regression_fixtures": 4
+  },
+  "format_errors": [],
+  "records": [
+    {
+      "exercise_id": "adduction-assise",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "adductors"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "adduction-couchee-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "adductors"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "adduction-debout-cable",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "adductors"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "arnold-press",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "anterior_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "lateral_delts",
+        "triceps",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "back-extension-45-paren-bias-ischios",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "hamstrings"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "butterfly-pec-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "cable-cross-over-paren-bashaut",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "calf-press-leg-press",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "calves"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "calves"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "chest-press-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs",
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "crunch-cable-a-genoux",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "abs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "abs"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-cable-basse",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-debout-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-ez-bar-debout",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-incline-halteres",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-incline-halteres-paren-banc-45",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-marteau-cable-corde",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-marteau-cable-paren-corde",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-marteau-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-poulie-basse",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-poulie-basse-paren-barre",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "curl-prise-neutre-cable",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "decline-crunch",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "abs"
+      ],
+      "primary_blocked_zones": [
+        "hip_flexors"
+      ],
+      "coverage_zones": [
+        "abs"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "developpe-couche-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs",
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "developpe-incline-halteres-30",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs",
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "dips-pectoraux-paren-buste-penche",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs",
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "ecarte-arriere-d-epaule-cable",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "rear_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "ecarte-pec-aux-cables-paren-incline-bashaut",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "elevations-laterales-cable",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "elevations-laterales-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "elevations-laterales-halteres-assis",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "elevations-laterales-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "extension-overhead-cable-paren-corde",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "face-pull-cable",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "rear_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "face-pull-cable-paren-corde",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "rear_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "fente-avant",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "good-morning-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [
+        "upper_back"
+      ],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "hamstrings"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "hack-squat-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "hanging-knee-raise",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hip_flexors"
+      ],
+      "primary_blocked_zones": [
+        "abs"
+      ],
+      "coverage_zones": [
+        "hip_flexors"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "hip-thrust-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "glutes"
+      ],
+      "primary_blocked_zones": [
+        "hamstrings"
+      ],
+      "coverage_zones": [
+        "adductors",
+        "glutes"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "hip-thrust-smith",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "glutes"
+      ],
+      "primary_blocked_zones": [
+        "hamstrings"
+      ],
+      "coverage_zones": [
+        "adductors",
+        "glutes"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "hip-thrust-smith-machine",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "glutes"
+      ],
+      "primary_blocked_zones": [
+        "hamstrings"
+      ],
+      "coverage_zones": [
+        "adductors",
+        "glutes"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "incline-smith-press",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs",
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "kickback-cable",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "lat-pulldown-prise-large",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "lat-pulldown-prise-neutre",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-curls-allonge",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "hamstrings"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-curls-assis",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "hamstrings"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-extension-cable-unilateral",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [
+        "hip_flexors"
+      ],
+      "coverage_zones": [
+        "quads"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-extensions-assises",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-press-paren-pieds-bas",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-press-paren-pieds-bas-serres",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "leg-press-paren-pieds-hauts-ecartes",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "glutes",
+        "quads"
+      ],
+      "primary_blocked_zones": [
+        "hamstrings"
+      ],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "machine-crunch",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "abs"
+      ],
+      "primary_blocked_zones": [
+        "hip_flexors",
+        "lats"
+      ],
+      "coverage_zones": [
+        "abs"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "machine-shoulder-press",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "anterior_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "lateral_delts",
+        "triceps",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "mollets-assis-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "calves"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "calves"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "mollets-debout-machine",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "calves"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "calves"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "neutral-grip-shoulder-press-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "anterior_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "triceps",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pallof-press-cable",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "abs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "abs"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pompes",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "pecs"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "pecs",
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pont-fessier",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "glutes"
+      ],
+      "primary_blocked_zones": [
+        "hamstrings"
+      ],
+      "coverage_zones": [
+        "adductors",
+        "glutes"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "preacher-curl",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "biceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pullover-cable-paren-bras-tendus",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "triceps"
+      ],
+      "coverage_zones": [
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pullover-cable-paren-bras-tendus-poulie-haute",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "triceps"
+      ],
+      "coverage_zones": [
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pullover-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "triceps"
+      ],
+      "coverage_zones": [
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "pushdown-corde",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rear-delt-fly-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "rear_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rear-delt-fly-machine-paren-pec-deck-inverse",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "rear_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "releve-de-jambes-suspendu",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hip_flexors"
+      ],
+      "primary_blocked_zones": [
+        "abs"
+      ],
+      "coverage_zones": [
+        "hip_flexors"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "releves-mollets-debout",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "calves"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "calves"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "releves-mollets-debout-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "calves"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "calves"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "reverse-fly-machine",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "rear_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "reverse-nordic",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "romanian-deadlift-barre",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "hamstrings"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "romanian-deadlift-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "hamstrings"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "roulette-abdominale",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "abs"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts",
+        "triceps"
+      ],
+      "coverage_zones": [
+        "abs",
+        "lats"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "roulette-abdominale-paren-ab-wheel-rollout",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "abs"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts",
+        "triceps"
+      ],
+      "coverage_zones": [
+        "abs",
+        "lats"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-cable-assis-prise-large",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "rear_delts",
+        "upper_back"
+      ],
+      "primary_blocked_zones": [
+        "lats"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-cable-assis-prise-neutre",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats",
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-cable-assis-prise-serree",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats",
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-chest-supported",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-haltere-un-bras",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lats",
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-haltere-un-bras-paren-banc",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats",
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "rowing-machine-chest-supported",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "shoulder-press-halteres-assis",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "anterior_delts"
+      ],
+      "primary_blocked_zones": [
+        "lateral_delts"
+      ],
+      "coverage_zones": [
+        "anterior_delts",
+        "triceps",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "shrugs-barre",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "shrugs-cable",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "shrugs-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "sissy-squat-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "skull-crushers-ez-bar",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "sliding-leg-curl",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "hamstrings"
+      ],
+      "primary_blocked_zones": [
+        "glutes"
+      ],
+      "coverage_zones": [
+        "hamstrings"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "smith-shoulder-press",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "anterior_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "lateral_delts",
+        "triceps",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "squat-au-poids-du-corps",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "squat-smith-machine-paren-pieds-avances",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "quads"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "adductors",
+        "glutes",
+        "quads"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "straight-arm-pulldown-cable",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "triceps"
+      ],
+      "coverage_zones": [
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "tirage-front-cable-paren-prise-large",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "tirage-poulie-haute-prise-large",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "tirage-poulie-haute-prise-neutre",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "rear_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "tirage-vertical-unilateral-cable",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "traction-assistee-machine",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "traction-assistee-unilaterale",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lats"
+      ],
+      "primary_blocked_zones": [
+        "pecs",
+        "rear_delts"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lats",
+        "upper_back"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "triceps-extension-poulie-haute-paren-corde",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "triceps-pushdown-barre",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "triceps-pushdown-corde",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "triceps"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "triceps"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "upright-row-cable",
+      "publishable": true,
+      "compiler_candidate": false,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "biceps",
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "upright-row-halteres",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "lateral_delts"
+      ],
+      "primary_blocked_zones": [
+        "upper_back"
+      ],
+      "coverage_zones": [
+        "biceps",
+        "lateral_delts"
+      ],
+      "exposure_vector_complete": false,
+      "blocking_reasons": []
+    },
+    {
+      "exercise_id": "y-raise-haltere",
+      "publishable": true,
+      "compiler_candidate": true,
+      "resolved_primary_zones": [
+        "upper_back"
+      ],
+      "primary_blocked_zones": [],
+      "coverage_zones": [
+        "anterior_delts",
+        "lateral_delts",
+        "upper_back"
+      ],
+      "exposure_vector_complete": true,
+      "blocking_reasons": []
+    }
+  ]
+}

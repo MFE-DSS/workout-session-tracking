@@ -1,0 +1,386 @@
+{
+  "EV-01": {
+    "claim": "Plus de séries hebdomadaires donne plus d'hypertrophie, avec des rendements décroissants (meilleur ajustement en racine carrée) et sans plateau clair dans la plage étudiée. Pente 0,24 % par série fractionnaire (IC crédible 0,15–0,33), mesurée autour de ~12 séries/sem.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE | Pelland, Remmert, Robinson, Hinson, Zourdos 2026, *Sports Med* 56(2):481–505, [doi 10.1007/s40279-025-02344-w](https://doi.org/10.1007/s40279-025-02344-w) ; [préprint SportRxiv 460](https://sportrxiv.org/index.php/server/preprint/view/460) | Préprint v2 lu en entier ; version publiée : résumé seulement (paywall)"
+  },
+  "EV-02": {
+    "claim": "Paliers d'efficacité pour l'hypertrophie : 4 séries = dose minimale ; puis 5–10, 11–18, 19–29, 30–42 ; au-delà de 43, incertain. Peu d'études au-delà de ~25 séries fractionnaires/sem.",
+    "row": "STUDY_MEASURED (préprint) | POPULATION_PRIOR | LOW | [Pelland préprint](https://sportrxiv.org/index.php/server/preprint/view/460) | Préprint. Les chiffres publiés peuvent différer : Remmert cite « ~31 séries »."
+  },
+  "EV-03": {
+    "claim": "Force : rendements fortement décroissants. Dose minimale efficace : 1 série fractionnaire/sem. Plus d'incrément détectable au-delà de ~4 séries (préprint) ou ~3 (version publiée, selon Remmert).",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW–MODERATE | Pelland (EV-01) ; [Remmert 2025 préprint](https://sportrxiv.org/index.php/server/preprint/view/537) | Préprint + citation croisée"
+  },
+  "EV-04": {
+    "claim": "Hypertrophie favorisée par ≥ 10 séries/sem (dose-réponse ; 5 revues, n = 2 267, QoE 50 %). Force : 2–3 séries par séance (QoE 71 %) et ≥ 2 séances/sem (QoE 69 %).",
+    "row": "STUDY_MEASURED (umbrella) | POPULATION_PRIOR | MODERATE | Currier … Phillips 2026, ACSM Position Stand, *MSSE* 58(4):851–872, [doi 10.1249/MSS.0000000000003897](https://pmc.ncbi.nlm.nih.gov/articles/PMC12965823) | Texte intégral PMC lu en partie (tableaux de résultats incomplets)"
+  },
+  "EV-05": {
+    "claim": "L'heuristique « 10+ séries » provient d'une tendance catégorielle **non significative** (p = 0,074) ; pente +0,37 % par série, populations surtout non entraînées.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW | Schoenfeld, Ogborn, Krieger 2017, *J Sports Sci* 35(11):1073–1082, [texte intégral](https://paulogentil.com/pdf/Dose-response%20relationship%20between%20weekly%20resistance%20training%20volume%20and%20increases%20in%20muscle%20mass%20-%20A%20systematic%20review%20and%20metaanalysis.pdf) | Texte intégral"
+  },
+  "EV-06": {
+    "claim": "12–20 séries « dures »/sem chez des hommes jeunes entraînés, sans bénéfice au-delà de 20 pour quadriceps et biceps. Comptage total : les séries polyarticulaires sont comptées pour biceps et triceps.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW | Baz-Valle et al. 2022, *J Hum Kinet* 81:199–210, [PMC8884877](https://pmc.ncbi.nlm.nih.gov/articles/PMC8884877/) | Texte intégral. L'IC du triceps est incohérent avec la valeur de p."
+  },
+  "EV-07": {
+    "claim": "Un volume 1,5× plus élevé ne donne aucun gain d'hypertrophie ni de force chez des athlètes entraînés (7 sem).",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW | Räntilä & Ahtiainen 2026, *J Sci Sport Exerc*, [lien](https://journal.hep.com.cn/josisae/EN/10.1007/s42978-026-00387-7) | Résumé"
+  },
+  "EV-08": {
+    "claim": "Le comptage fractionnaire (indirect = 0,5) est mieux soutenu que le comptage total (indirect = 1) et que le comptage direct seul (indirect = 0). 2×log Bayes factor : 9,5 à 54,8.",
+    "row": "STUDY_MEASURED (comparaison relative) | POPULATION_PRIOR | MODERATE | Pelland (EV-01) | Préprint en entier + résumé publié"
+  },
+  "EV-09": {
+    "claim": "Poids indirect « optimal » exploratoire : ~0,39 (force, hebdomadaire), ~0,16 (force, par séance), ~0,32 (hypertrophie, par séance).",
+    "row": "STUDY_MEASURED (exploratoire) | POPULATION_PRIOR | VERY_LOW | [Remmert 2025 préprint](https://sportrxiv.org/index.php/server/preprint/view/537) | Préprint lu ; fichiers OSF non ouverts"
+  },
+  "EV-10": {
+    "claim": "**Politique de crédit V2 adoptée (`credit_policy_v2`, arbitrage 8)** : PRIMARY = 1,0 / SECONDARY = 0,5 / MINOR = 0 / UNKNOWN = non crédité (et vecteur marqué incomplet). 0,5 est le meilleur des trois poids discrets testés (EV-08) ; ce n'est pas une vérité physiologique. La règle direct/indirect est mesurée, son application à 3 niveaux est conventionnelle ; MINOR = 0 est une politique comptable, le",
+    "row": "CONVENTION posée sur un binaire STUDY_MEASURED | POPULATION_PRIOR | LOW–MODERATE (choix de 0,5 parmi les options testées) / LOW (mapping à 3 niveaux) | Dérivé de EV-08 ; EV-09 pour la limite | —"
+  },
+  "EV-11": {
+    "claim": "À volume égal, la fréquence a un effet négligeable sur l'hypertrophie (β 0,32 %/séance, IC −0,14 à 0,82) et un effet positif décroissant sur la force (β 3,27 %/séance ; 12,7 % de gain à 1×/sem contre 17,3 % à 2×/sem).",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE | Pelland ; Schoenfeld, Grgic, Krieger 2019, *J Sports Sci* 37(11), [notice](https://lida.sport-iat.de/ta/Record/4052540?lng=en) ; ACSM 2026 | Préprint ; résumé ; texte partiel"
+  },
+  "EV-12": {
+    "claim": "Volume par séance : point de supériorité indétectable (PUOS) à ~11 séries fractionnaires pour l'hypertrophie et ~2 séries directes pour la force. Les auteurs précisent que ce **ne sont pas des limites**.",
+    "row": "STUDY_MEASURED (préprint) | POPULATION_PRIOR | LOW | [Remmert 2025 préprint](https://sportrxiv.org/index.php/server/preprint/view/537) | Préprint non relu par des pairs"
+  },
+  "EV-13": {
+    "claim": "Le choix d'une fenêtre hebdomadaire est « arbitraire ». Aucune étude ne compare des fenêtres de 7, 14 ou 28 j.",
+    "row": "UNKNOWN → les fenêtres sont une CONVENTION | N/A | — | [Pelland préprint](https://sportrxiv.org/index.php/server/preprint/view/460) | Préprint"
+  },
+  "EV-14": {
+    "claim": "Hypertrophie plus forte quand les séries finissent près de l'échec (~−0,48 % par RIR supplémentaire, préprint) ; force quasi insensible au RIR. RIR **estimé** à partir des descriptions d'études.",
+    "row": "STUDY_MEASURED (exploratoire) | POPULATION_PRIOR | LOW–MODERATE | Robinson et al. 2024, *Sports Med* 54(9):2209–2231, [doi 10.1007/s40279-024-02069-2](https://doi.org/10.1007/s40279-024-02069-2) ; [préprint 295](https://sportrxiv.org/index.php/server/preprint/view/295) | Préprint (version nov. 2023) en entier ; version publiée : résumé"
+  },
+  "EV-15": {
+    "claim": "Échec contre non-échec : avantage trivial (ES 0,19, IC 0,00–0,37) toutes définitions confondues ; échec momentané ES 0,12 n.s. Les auteurs évoquent une relation non linéaire.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE | Refalo, Helms, Trexler, Hamilton, Fyfe 2023, *Sports Med* 53(3):649–665, [PMC9935748](https://pmc.ncbi.nlm.nih.gov/articles/PMC9935748/) | Résumé / texte PMC"
+  },
+  "EV-16": {
+    "claim": "L'échec n'améliore ni la force, ni l'hypertrophie, ni la puissance ; 2–3 RIR suffisent ; « preuves insuffisantes pour quantifier des cibles RIR exactes ».",
+    "row": "STUDY_MEASURED (umbrella) ; la cible est une CONVENTION | POPULATION_PRIOR | MODERATE | ACSM 2026 (EV-04) | Texte partiel"
+  },
+  "EV-17": {
+    "claim": "Le statut d'entraînement n'apparaît pas comme modérateur robuste de la dose-réponse. Les données sont dominées par des hommes jeunes.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW–MODERATE | Pelland ; Swinton, Schoenfeld, Murphy 2024, *Sports Med* 54(6), [PMC11239729](https://pmc.ncbi.nlm.nih.gov/articles/PMC11239729/) ; ACSM 2026 | Préprint ; PMC ; partiel"
+  },
+  "EV-18": {
+    "claim": "Forte hétérogénéité individuelle (R² marginal 22 %). Une recommandation moyenne peut être inadaptée pour un individu. **Conséquence V2 (arbitrage 6)** : un prior de population initialise et borne un plan, il ne mesure pas un déficit individuel.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Pelland ; Robinson | Préprints"
+  },
+  "EV-20": {
+    "claim": "La performance objective revient en ~6 h après un travail non mené à l'échec. Après un travail polyarticulaire à l'échec, il faut 48 h (vitesse) à 72 h (CMJ). Vitesse au squat réduite jusqu'à 72 h ; aucune baisse après soulevé de terre.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR (valeur) · USER_OBSERVED (temps écoulé) | MODERATE (petits n) | Morán-Navarro et al. 2017, *EJAP* 117:2387–2399, [PubMed](https://pubmed.ncbi.nlm.nih.gov/28965198/) ; Belcher et al. 2019, *APNM* 44(10), [PubMed](https://pubmed.ncbi.nlm.nih.gov/30779596/) | Morán-Navarro : texte intégral (incohérence interne 48 h / 72 h) ; Belcher : résumé"
+  },
+  "EV-21": {
+    "claim": "À 24 h, les exercices polyarticulaires ont perdu −1,7 rép contre −0,5 rép pour les monoarticulaires. Pas de différence haut / bas du corps. À 48 h, le développé couché et le soulevé de terre sont les plus lents.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW | Korak, Green, O'Neal 2015, *IJES* 8(1):85–96, [lien](https://digitalcommons.wku.edu/ijes/vol8/iss1/10) | Résumé"
+  },
+  "EV-22": {
+    "claim": "Les bras sont plus sensibles aux dommages excentriques que les jambes ; les extenseurs du genou le sont le moins.",
+    "row": "STUDY_MEASURED (excentriques maximaux isocinétiques, sujets sédentaires) | POPULATION_PRIOR | LOW | Chen, Lin, Chen, Lin, Nosaka 2011, *EJAP* 111(2):211–223, [doi](https://doi.org/10.1007/s00421-010-1648-7) | Notice + résumé"
+  },
+  "EV-23": {
+    "claim": "Fenêtres AUREN actuelles (**modèle historique à 11 zones**, conservé comme entrée datée) : quadriceps / chaîne postérieure 72 h, pectoraux / dos 48 h, deltoïdes / bras / mollets 36 h, abdominaux 24 h. La « chaîne postérieure » de cette entrée n'est plus une zone en V2 (arbitrage 1).",
+    "row": "CONVENTION | POPULATION_PRIOR | VERY_LOW | Aucune source. Ordre partiellement contredit par EV-22 et Belcher (EV-20). | —"
+  },
+  "EV-24": {
+    "claim": "Aller à l'échec retarde la récupération de ~24–48 h. Doubler le volume sans échec (3×5 → 6×5) ne la change pas. Perte de vitesse à 24 h : −3 % (échec et 1 RIR) contre +2 % (3 RIR) ; aucune différence à 48 h.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR (valeur) · USER_REPORTED (RIR) | MODERATE | Morán-Navarro 2017 ; Refalo et al. 2023, *Sports Med Open* 9:10, [PMC9908800](https://pmc.ncbi.nlm.nih.gov/articles/PMC9908800) | Textes intégraux"
+  },
+  "EV-25": {
+    "claim": "Effet de répétition : une seule exposition protège pendant des semaines à des mois.",
+    "row": "STUDY_MEASURED (revue) | DERIVED_FROM_HISTORY | LOW–MODERATE | Nosaka & Aoki 2011, [ECU](https://ro.ecu.edu.au/ecuworks2011/697) | Notice"
+  },
+  "EV-26": {
+    "claim": "Fenêtre de nouveauté : un exercice est « nouveau » s'il est absent depuis N = 4–8 semaines, pour ses 1–2 premières séances.",
+    "row": "CONVENTION (bornée par la plage 3 sem – 6 mois de l'effet de répétition) | DERIVED_FROM_HISTORY | VERY_LOW | Dérivé de EV-25 | —"
+  },
+  "EV-27": {
+    "claim": "L'âge n'est pas associé à une perte de fonction plus forte après un exercice dommageable. Les jeunes déclarent plus de courbatures.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE | Fernandes et al. 2025, *J Aging Phys Act* 33(6):606–624, [notice](https://pure.cardiffmet.ac.uk/en/publications/advancing-age-is-not-associated-with-greater-exercise-induced-mus/) | Résumé (contredit en direction par Fernandes 2019, petit n)"
+  },
+  "EV-28": {
+    "claim": "Manque de sommeil aigu : force −2,85 % ; force maximale SMD −0,24 ; RPE +0,51. L'effet porte **sur le jour**, pas sur la récupération d'un muscle.",
+    "row": "STUDY_MEASURED | USER_REPORTED | MODERATE | Craven et al. 2022, *Sports Med* 52(11), [PMC9584849](https://pmc.ncbi.nlm.nih.gov/articles/PMC9584849/) ; Kong et al. 2025, *Front Physiol* 16, [lien](https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2025.1544286/full) | Textes intégraux. Kong contient des estimations implausibles."
+  },
+  "EV-29": {
+    "claim": "Les courbatures (DOMS) sont dissociées de l'ampleur des dommages et de la récupération fonctionnelle.",
+    "row": "STUDY_MEASURED | USER_REPORTED | MODERATE | Nosaka, Newton, Sacco 2002 via [revue PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC8431437/) ; Refalo 2023 ; Fernandes 2025 | Nosaka : citation secondaire"
+  },
+  "EV-30": {
+    "claim": "La HRV est systémique, pas spécifique à un muscle. Un entraînement guidé par la HRV n'est pas supérieur pour la force ou l'hypertrophie. Limites de validité des capteurs PPG.",
+    "row": "Revue narrative (STUDY_MEASURED rapporté) | USER_OBSERVED (wearable) | LOW | Addleman et al. 2024, *JFMK* 9(2):93, [PMC11204851](https://pmc.ncbi.nlm.nih.gov/articles/PMC11204851/) | Texte intégral"
+  },
+  "EV-31": {
+    "claim": "Bruit séance-à-séance à charge fixe : SEM de 0,7 rép (90 % et 80 % 1RM) et 1,1 rép (70 %) ; CV intra-sujet de 15,9 / 9,2 / 8,8 % ; 1RM : CV 1,8 %. Dérive d'apprentissage de +0,2 à +0,7 rép.",
+    "row": "STUDY_MEASURED (développé couché, laboratoire, 24 sujets entraînés) | USER_OBSERVED | MODERATE pour le développé couché, LOW pour les autres exercices | Mitter et al. 2022, *PLoS ONE*, [PMC9070879](https://pmc.ncbi.nlm.nih.gov/articles/PMC9070879/) | Texte intégral"
+  },
+  "EV-32": {
+    "claim": "MDC95 ≈ 2,77 × SEM, soit ~1,9 rép (charges lourdes) et ~3,0 rép (70 %) sur une comparaison isolée. Le seuil se divise par ~√k quand k expositions concordent.",
+    "row": "DERIVED (calcul de l'auteur des notes, pas de Mitter) | DERIVED_FROM_HISTORY | LOW | Dérivé de EV-31 | —"
+  },
+  "EV-33": {
+    "claim": "Effet de l'heure de la journée : 2,8–7,3 % sur la performance neuromusculaire.",
+    "row": "STUDY_MEASURED (cité) | USER_OBSERVED | LOW | Morán-Navarro 2017, discussion | Citation interne"
+  },
+  "EV-34": {
+    "claim": "Une semaine d'arrêt complet chez des pratiquants entraînés : aucun bénéfice en hypertrophie ; force du bas du corps probablement un peu moindre (P(favorise continu) 0,85–0,92). **Financement Renaissance Periodization.**",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW | Coleman et al. 2024, *PeerJ* 12:e16777, [PMC10809978](https://pmc.ncbi.nlm.nih.gov/articles/PMC10809978/) | Texte intégral"
+  },
+  "EV-35": {
+    "claim": "Décharge par réduction du volume et de la fréquence chez des non-entraînés : hypertrophie et force-endurance similaires à un entraînement continu ; puissance insuffisante pour exclure un petit coût.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW | Pancar et al. 2026, *Sci Rep*, [PMC13031491](https://pmc.ncbi.nlm.nih.gov/articles/PMC13031491/) | Texte intégral"
+  },
+  "EV-36": {
+    "claim": "Paramètres de décharge de consensus : tous les 4–8 sem si planifiée, 5–7 j, volume −25 à −90 % selon le besoin, fréquence conservée, charge −10 % ou +1–3 RIR. « Absence claire de recherche expérimentale de qualité. »",
+    "row": "CONVENTION | N/A | VERY_LOW | Bell, Darragh, Travis, Rogerson, Nolan, *Strength Cond J* (accepté 2025), [manuscrit accepté](https://shura.shu.ac.uk/35313/3/Bell-APracticalApproach(AM).pdf) | Manuscrit accepté lu en entier ; pagination vol 48(4) non vérifiée"
+  },
+  "EV-37": {
+    "claim": "Désentraînement : effet dose-réponse avec la durée de l'arrêt, plus marqué après 65 ans. La force peut baisser dès ~5 j ; la taille musculaire baisse lentement.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW–MODERATE | Bosquet et al. 2013, *SJMSS* 23(3), [notice](https://lida.sport-iat.de/ta/Record/4060183?lng=de) ; Travis 2022 via Bell | Résumé ; citation secondaire"
+  },
+  "EV-40": {
+    "claim": "Les pratiquants sous-estiment leur RIR de 0,95 rép (IC 0,17–1,73). La précision est meilleure près de l'échec et sur les séries courtes. **Usage V2 (arbitrage 7)** : cette moyenne de population informe uniquement la **confiance** et l'incertitude affichée ; elle n'est jamais appliquée comme correction numérique d'un RIR individuel.",
+    "row": "STUDY_MEASURED | USER_REPORTED | MODERATE | Halperin et al. 2022, *Sports Med* 52(2):377–390, [PubMed](https://pubmed.ncbi.nlm.nih.gov/34542869/) | Résumé"
+  },
+  "EV-41": {
+    "claim": "Développé couché à 75 % 1RM, sujets entraînés : erreur de 0,65 ± 0,78 rép.",
+    "row": "STUDY_MEASURED | USER_REPORTED | LOW | Refalo et al. 2024, *JSCR* 38(3), figures via [arXiv 2603.17495](https://arxiv.org/pdf/2603.17495) | **Citation secondaire seulement**"
+  },
+  "EV-42": {
+    "claim": "Le RIR s'apprend en 4–6 séances, chez les jeunes comme chez les âgés. 2 RIR est plus précis que 4 RIR (~1 rép) ; le développé couché plus que la presse à cuisses (~1,4 rép). Erreur systématiquement dans le sens de la sous-estimation.",
+    "row": "STUDY_MEASURED | USER_REPORTED | LOW–MODERATE | Wiedenmann et al. 2026, *BMC Sports Sci Med Rehabil* 18:375, [PMC13499321](https://pmc.ncbi.nlm.nih.gov/articles/PMC13499321/) | Texte intégral"
+  },
+  "EV-43": {
+    "claim": "Adultes âgés (68 ans) : sous-estimation de −2,1 rép à RIR-2 ; précision correcte à RIR-6.",
+    "row": "STUDY_MEASURED | USER_REPORTED | LOW | Gómez-Redondo et al. 2025, *Exp Gerontol* 210, [notice](https://ariasmontano.uhu.es/entities/publication/3b305a20-2201-4a49-9aac-d1a7f01af30e) | Résumé"
+  },
+  "EV-44": {
+    "claim": "La charge choisie pour une cible de 1 RIR est fiable (CV 2,7–6,2 %).",
+    "row": "STUDY_MEASURED | USER_OBSERVED | LOW | Lovegrove et al. 2022, *JSCR*, [PubMed](https://pubmed.ncbi.nlm.nih.gov/36135029/) | Résumé"
+  },
+  "EV-45": {
+    "claim": "Relation %1RM–répétitions : ~15 rép à 70 % (modèle général) contre 11 dans les tables classiques. Écart-type inter-individuel de 2,5 rép (80 %) à 4,4 rép (60 %). Presse à cuisses très au-dessus du développé couché. Machine et poids libre non séparés.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE | Nuzzo, Pinto, Nosaka, Steele 2023/24, *Sports Med*, [PMC10933212](https://pmc.ncbi.nlm.nih.gov/articles/PMC10933212/) | Texte lu ; figures non lues"
+  },
+  "EV-46": {
+    "claim": "Les équations d'e1RM conviennent pour peu de répétitions mais sous-estiment le soulevé de terre de 9–14 %. Les séries de 4–6 RM prédisent mieux que celles de 7–10 RM.",
+    "row": "STUDY_MEASURED | DERIVED_FROM_HISTORY | LOW | [JSSM 8(4):567](https://jssm.org/08-4-567.p_d_f) ; [Redalyc](https://www.redalyc.org/pdf/2730/273019708005.pdf) | Résumés de recherche, PDF non ouverts"
+  },
+  "EV-47": {
+    "claim": "Seuil « e1RM fiable jusqu'à 10 rép ».",
+    "row": "CONVENTION | N/A | VERY_LOW | Blogs de calculateurs ([Arvo](https://arvo.guru/resources/one-rep-max-formulas)) | —"
+  },
+  "EV-48": {
+    "claim": "Équation dépendante du poids, ajustée sur 303 494 séries proches de l'échec. Validée seulement sur sa cohérence interne, sans 1RM mesuré.",
+    "row": "STUDY_MEASURED (préprint) | N/A | VERY_LOW | Marzagao 2026, [arXiv 2603.17495](https://arxiv.org/abs/2603.17495) | Résumé, préprint"
+  },
+  "EV-49": {
+    "claim": "Charge autorégulée et charge standardisée donnent des gains de force similaires (MD 2,07 kg, p = 0,09).",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Hickmott et al. 2022, *Sports Med Open* 8:9, [PMC8762534](https://pmc.ncbi.nlm.nih.gov/articles/PMC8762534/) | Texte PMC"
+  },
+  "EV-50": {
+    "claim": "APRE classé premier en SUCRA, mais pas d'effet modéré ou large au squat.",
+    "row": "STUDY_MEASURED | N/A | LOW | Huang et al. 2025, *J Exerc Sci Fit* 23(4), [notice](https://lida.sport-iat.de/ta/Record/4094556) | Résumé"
+  },
+  "EV-51": {
+    "claim": "Progression par la charge ou par les répétitions : hypertrophie similaire ; léger avantage en force pour la charge (+2,0 kg, d'intérêt pratique discutable).",
+    "row": "STUDY_MEASURED | N/A | LOW | Plotkin et al. 2022, *PeerJ* 10:e14142, [lien](https://peerj.com/articles/14142) | Résumé"
+  },
+  "EV-52": {
+    "claim": "Augmenter la charge de 2–10 % quand on dépasse la cible de 1–2 rép.",
+    "row": "CONVENTION | N/A | VERY_LOW | ACSM 2009, [PDF](https://sfu.ca/~ryand/kin343/ACSMresistance.pdf) | —"
+  },
+  "EV-53": {
+    "claim": "Pyramides et drop sets : pas d'avantage constant sur les séries classiques.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | ACSM 2026 ; *IJSM* 2022 43(1):55–60, [Thieme](https://www.thieme-connect.com/products/ejournals/abstract/10.1055/a-1493-3121) | Partiel ; résumé"
+  },
+  "EV-54": {
+    "claim": "Repos > 60 s : petit bénéfice d'hypertrophie, tous les IC croisant 0 ; aucune différence appréciable au-delà de ~90 s. La perte de volume-charge se stabilise entre 120 et 180 s.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR (valeur) · USER_OBSERVED (horodatage) | LOW–MODERATE | Singer et al. 2024, *Front Sports Act Living* 6:1429789, [PMC11349676](https://pmc.ncbi.nlm.nih.gov/articles/PMC11349676/) | Texte PMC"
+  },
+  "EV-55": {
+    "claim": "Force : plus de 2 min de repos chez les entraînés, 60–120 s chez les non-entraînés.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW–MODERATE | Grgic et al. 2018, *Sports Med* 48(1):137–151, [notice](https://lida.sport-iat.de/ta/Record/4047011) | Résumé via index"
+  },
+  "EV-56": {
+    "claim": "Force non affectée par un repos < 1 min contre > 1 min ; ACSM ne fait pas de recommandation précise.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | ACSM 2026 | Partiel"
+  },
+  "EV-57": {
+    "claim": "Aucune table validée de charges de départ par sexe et expérience ; les « standards » participatifs sont incohérents entre eux.",
+    "row": "UNKNOWN | N/A | — | [Sensai](https://www.sensai.fit/blog/strength-standards-by-age-bodyweight) ; [Arvo](https://arvo.guru/resources/strength-standards) | Pages commerciales"
+  },
+  "EV-58": {
+    "claim": "Coefficient de transfert de charge entre deux exercices. **Conséquence V2 (arbitrage 10)** : aucune fraction de transfert générique n'est utilisée, même entre exercices de même pattern et de même famille d'équipement. Seule une relation directement validée et curée pour un couple précis d'exercices/équipements pourrait l'être ; aucune n'existe en V2.",
+    "row": "UNKNOWN | N/A | — | Aucune source trouvée | —"
+  },
+  "EV-59": {
+    "claim": "Les charges auto-sélectionnées sont trop légères (~53 % 1RM).",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Steele et al. 2022, *Sports Med*, [doi](https://doi.org/10.1007/s40279-022-01717-9) | Résumé"
+  },
+  "EV-60": {
+    "claim": "Machines et poids libres : hypertrophie identique (SMD −0,055, n.s.) ; la force est spécifique au mode.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Haugen et al. 2023, *BMC SSMR* 15:103, [DOAJ](https://doaj.org/article/a7282dba5e674176bde2a8239832d2f7) ; Hernández-Belmonte et al. 2023, *MSSE* 55(12) | Résumés. Le signe du SMD poids libres est à vérifier."
+  },
+  "EV-61": {
+    "claim": "Smith machine et poids libres ne sont pas interchangeables en charge : profils charge-vitesse propres à chaque appareil, 1RM au Smith plus élevé.",
+    "row": "STUDY_MEASURED | N/A | LOW | Hernández-Belmonte 2023 *JSCR*, [doi](https://doi.org/10.1519/jsc.0000000000004480) ; Tsoukos & Bogdanis 2025, [doi](https://doi.org/10.3390/jfmk10020178) | Résumés"
+  },
+  "EV-62": {
+    "claim": "Mono- et polyarticulaire : hypertrophie globale du muscle similaire. Le monoarticulaire atteint des sous-régions : droit fémoral +13,2 % en extension de jambes contre +1,1 % à la presse. **Usage V2 (arbitrage 2)** : fonde des métadonnées de sous-région optionnelles et un départage de faible poids, jamais une exigence.",
+    "row": "STUDY_MEASURED | N/A | LOW–MODERATE | Rosa et al. 2023, *SCJ*, [notice](https://lida.sport-iat.de/ta/Record/4082423?lng=en) ; Kinoshita, Maeo et al. 2026, *MSSE* 58(7), [doi](https://doi.org/10.1249/mss.0000000000003957) | Notice ; résumé"
+  },
+  "EV-63": {
+    "claim": "Rowing → fléchisseurs du coude +5,16 % contre +11,06 % avec le curl.",
+    "row": "STUDY_MEASURED | N/A | LOW | Mannarino et al. 2021, *JSCR* 35(10), [doi](https://doi.org/10.1519/JSC.0000000000003234) | Résumé"
+  },
+  "EV-64": {
+    "claim": "Squat et presse à cuisses font croître les fessiers à peu près comme le hip thrust (+15,4 % à la presse). La presse fait aussi croître les adducteurs (grand adducteur +6,2 %, Kinoshita 2026, selon les notes de sélection).",
+    "row": "STUDY_MEASURED | N/A | LOW | Plotkin et al. 2023, *Front Physiol* 14, [doi](https://doi.org/10.3389/fphys.2023.1279170) ; Kinoshita 2026 | Résumés"
+  },
+  "EV-65": {
+    "claim": "Longueur musculaire longue : effet régional moyen trivial ; équivalence avec l'amplitude complète chez les entraînés.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Varovic et al. 2025, *IJSM* 46(14), [doi](https://doi.org/10.1055/a-2615-4935) ; Gschneidner et al. 2025, [doi](https://doi.org/10.1080/02640414.2025.2567805) ; Wolf et al. 2025, [PeerJ](https://doi.org/10.7717/peerj.18904) | Résumés"
+  },
+  "EV-66": {
+    "claim": "Têtes biarticulaires : leg curl assis > leg curl couché (biceps fémoral long +14,4 % contre +6,5 %) ; extension triceps au-dessus de la tête > bras neutre (~1,4×). **Usage V2 (arbitrage 2)** : `biarticular_position` optionnel, curé quand il est directement pertinent.",
+    "row": "STUDY_MEASURED (ECR uniques, non-entraînés) | N/A | LOW | Maeo et al. 2021, *MSSE* 53(4), [PMC7969179](https://pmc.ncbi.nlm.nih.gov/articles/PMC7969179/) ; Maeo et al. 2023, *EJSS* 23(7), [PubMed](https://pubmed.ncbi.nlm.nih.gov/35819335/) | Texte intégral ; résumé"
+  },
+  "EV-67": {
+    "claim": "Ordre des exercices : aucun effet sur l'hypertrophie (ES 0,03) ; la force progresse davantage sur l'exercice placé en premier (QoE 88 %).",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Nunes et al. 2021, *EJSS* 21(2), [VU](https://vuir.vu.edu.au/44202/) ; ACSM 2026 | Résumé ; partiel"
+  },
+  "EV-68": {
+    "claim": "Faire varier les exercices : ni gain ni perte jusqu'à ~10 sem. Une variation excessive ou aléatoire peut nuire. La variation augmente la motivation intrinsèque.",
+    "row": "STUDY_MEASURED | N/A | LOW | Kassiano et al. 2022, *JSCR*, [notice](https://lida.sport-iat.de/ta/Record/4077216?lng=en) ; Kassiano 2025, [doi](https://doi.org/10.1080/02701367.2024.2409961) ; Baz-Valle 2019, [doi](https://doi.org/10.1371/journal.pone.0226989) | Résumés"
+  },
+  "EV-69": {
+    "claim": "La force est spécifique à la tâche : le transfert vaut environ la moitié du gain (SMD 0,98 sur la tâche entraînée contre 0,42 en isométrique).",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Saeterbakken et al. 2025, *Sports Med* 55(7), [doi](https://doi.org/10.1007/s40279-025-02225-2) ; Monte 2026, [doi](https://doi.org/10.1007/s00421-026-06391-7) | Résumés"
+  },
+  "EV-70": {
+    "claim": "L'EMG n'est pas un prédicteur validé de l'hypertrophie ; corrélation de rang EMG–force de 0,29 à 0,51. **Usage V2 (arbitrage 3)** : l'amplitude EMG ne peut jamais fonder un rôle PRIMARY.",
+    "row": "STUDY_MEASURED (résultat négatif) | N/A | MODERATE | Vigotsky et al. 2022, [IRIS](https://iris.polito.it/handle/11583/2957257) ; Collings et al. 2025, *MSSE* 57(9), [doi](https://doi.org/10.1249/mss.0000000000003733) | Notice ; résumé"
+  },
+  "EV-71": {
+    "claim": "Rôles PRIMARY/SECONDARY/MINOR attribués, **à défaut de preuve longitudinale adaptée**, par l'action articulaire chargée (moteur principal contre synergiste ou stabilisateur). Ordre d'autorité V2 (arbitrage 3) : (1) preuve longitudinale d'hypertrophie adaptée ; (2) action articulaire chargée + anatomie fonctionnelle ; (3) UNKNOWN.",
+    "row": "DERIVED (anatomie fonctionnelle, recoupée par EV-63 et EV-64) | POPULATION_PRIOR | LOW–MODERATE | Dérivé ; critère de Pelland (« principal générateur de force ») | —"
+  },
+  "EV-72": {
+    "claim": "Laisser choisir les exercices augmente le volume-charge et donne de petits gains de masse maigre.",
+    "row": "STUDY_MEASURED | USER_REPORTED | LOW | Rauch et al. 2020, *JSCR* 34(4), [notice](https://eurekamag.com/research/059/430/059430159.php) | Notice ; chiffres non vérifiés"
+  },
+  "EV-73": {
+    "claim": "Hanging leg raise : les moteurs principaux de la flexion de hanche sont les fléchisseurs de hanche (ilio-psoas, droit fémoral) ; le droit de l'abdomen est fortement sollicité selon une modélisation EMG (> 130 % MVC). L'EMG confirme une implication, il ne fonde aucun PRIMARY (EV-70).",
+    "row": "DERIVED (anatomie fonctionnelle) ; STUDY_MEASURED pour la modélisation EMG | N/A | LOW | McGill 2015, cité par les notes de sélection (§8) | **Citation des notes seulement ; source non ouverte**"
+  },
+  "EV-80": {
+    "claim": "Charge ≥ 80 % 1RM favorable à la force (6 revues, n = 6 574, QoE 79 %). Hypertrophie similaire de ~30 à ~100 % 1RM.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE–HIGH | ACSM 2026 ; Lopez et al. 2021, *MSSE* 53(6) ; Schoenfeld et al. 2017, *JSCR* 31(12) ([Europe PMC](https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=(TITLE%3A%22Strength%20and%20Hypertrophy%20Adaptations%20Between%20Low-%20vs.%20High-Load%20Resistance%20Training%22)%20OR%20(TITLE%3A%22Resistance%20Training%20Load%20Effects%20on%20Muscl"
+  },
+  "EV-81": {
+    "claim": "Entraînement concurrent : force maximale (SMD −0,06) et hypertrophie (−0,01) non affectées. Force explosive : SMD −0,28, plus marqué dans la même séance ; plus d'effet si les deux sont séparés de ≥ 3 h.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | MODERATE | Schumann et al. 2022, *Sports Med* 52(3) ; Held et al. 2026, *Sports Med* 56(6), [doi 10.1007/s40279-026-02401-y](https://www.ebi.ac.uk/europepmc/webservices/rest/search?query=DOI%3A10.1007%2Fs40279-026-02401-y&resultType=core&format=json) | Résumés (Held sous paywall)"
+  },
+  "EV-82": {
+    "claim": "La course (pas le vélo) dégrade hypertrophie et force ; la fréquence et la durée de l'endurance sont corrélées négativement aux résultats (r −0,26 à −0,75).",
+    "row": "STUDY_MEASURED (ancien ; contredit par Schumann sur la modalité) | POPULATION_PRIOR | LOW | Wilson et al. 2012, *JSCR* 26(8) | Résumé"
+  },
+  "EV-83": {
+    "claim": "Tendance en faveur de la musculation avant l'endurance pour la force.",
+    "row": "STUDY_MEASURED (statistiques du résumé incohérentes) | N/A | LOW | Held 2026 | Résumé"
+  },
+  "EV-85": {
+    "claim": "En déficit énergétique, le gain de masse maigre est freiné (ES −0,57) mais la force progresse autant.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW–MODERATE | Murphy & Koehler 2022, *SJMSS* 32(1) | Résumé"
+  },
+  "EV-86": {
+    "claim": "La musculation compense 93,5 % de la perte de masse maigre en restriction calorique, chez des personnes âgées obèses.",
+    "row": "STUDY_MEASURED | POPULATION_PRIOR | LOW (population spécifique) | Sardeli et al. 2018, *Nutrients* 10(4):423 | Résumé"
+  },
+  "EV-87": {
+    "claim": "Maintien : 1 séance/sem × 1 série par exercice si l'intensité relative est conservée (jeunes) ; jusqu'à 2 séances/sem et 2–3 séries (âgés). « L'intensité semble être la variable clé. »",
+    "row": "STUDY_MEASURED (revue narrative ; en équilibre énergétique) | POPULATION_PRIOR | LOW | Spiering et al. 2021, *JSCR* 35(5) | Résumé"
+  },
+  "EV-88": {
+    "claim": "OMS : 150–300 min/sem d'aérobie modérée (ou 75–150 min vigoureuse) + renforcement de tous les grands groupes ≥ 2 j/sem. ≥ 65 ans : travail multicomposante ≥ 3 j/sem. « Un peu vaut mieux que rien. » **Usage V2 (arbitrage 9)** : le plancher aérobie est une exigence de premier rang pour GENERAL_FITNESS seulement ; il n'est pas imposé à FAT_LOSS au seul motif de la perte de graisse.",
+    "row": "STUDY_MEASURED (recommandation, certitude modérée) ; l'équivalence 1 min vigoureuse = 2 min modérées est une CONVENTION | POPULATION_PRIOR | MODERATE | Bull et al. 2020, *BJSM* 54(24), [texte intégral](https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7719906/fullTextXML) | Texte intégral"
+  },
+  "EV-89": {
+    "claim": "Gains relatifs de taille musculaire similaires entre les sexes.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Refalo et al. 2025, *PeerJ* 13:e19042, [lien](https://peerj.com/articles/19042) | Résumé"
+  },
+  "EV-90": {
+    "claim": "Femmes : gains de force similaires avant et après la ménopause (SMD 1,50 contre 1,46) ; pas d'association avec l'âge.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Isenmann et al. 2026, *JSAMS* 29(10) | Résumé"
+  },
+  "EV-91": {
+    "claim": "Périodiser selon la phase du cycle menstruel n'apporte rien (p ≥ 0,17).",
+    "row": "STUDY_MEASURED | N/A | LOW (n = 24) | D'Souza et al. 2026, *MSSE*, [notice](https://eprints.ncl.ac.uk/312484) | Notice"
+  },
+  "EV-92": {
+    "claim": "Aller à l'échec « peut être déconseillé » chez les personnes âgées.",
+    "row": "CONVENTION (avis d'experts) | N/A | VERY_LOW | ACSM 2026 | Partiel"
+  },
+  "EV-95": {
+    "claim": "Gamification : effet g = 0,42 qui retombe à 0,15 au suivi ; 0,23 contre un contrôle actif.",
+    "row": "STUDY_MEASURED | N/A | MODERATE | Mazeas et al. 2022, *JMIR* 24(1):e26779 | Résumé"
+  },
+  "EV-96": {
+    "claim": "Une série (streak) cassée réduit l'engagement ultérieur ; la possibilité de la réparer atténue l'effet.",
+    "row": "STUDY_MEASURED | N/A | LOW–MODERATE | Silverman & Barasch 2023, *J Consum Res* 49(6), [UDSpace](https://udspace.udel.edu/handle/19716/34160) | Résumé"
+  },
+  "EV-97": {
+    "claim": "Le suivi fitness est associé, en transversal, aux troubles alimentaires et à l'exercice compulsif ; pas de causalité expérimentale démontrée.",
+    "row": "STUDY_MEASURED | N/A | LOW | Moody et al. 2025, *Eur Eat Disord Rev* 33(6) | Résumé"
+  },
+  "EV-98": {
+    "claim": "Le tonnage n'est pas une cible universelle valide : l'hypertrophie est indépendante de la charge et la force plafonne avec le volume.",
+    "row": "DERIVED | N/A | LOW–MODERATE | Dérivé de EV-80 et EV-03 | —"
+  },
+  "EV-99": {
+    "claim": "L'adhérence est « d'importance primordiale ».",
+    "row": "Synthèse d'experts | N/A | MODERATE | ACSM 2026 | Partiel"
+  },
+  "EV-A1": {
+    "claim": "Crédit indirect de 0,3 (arrondi) à un endroit, 0,5 à un autre",
+    "row": "CONVENTION | POPULATION_PRIOR | VERY_LOW | 0,3 est proche du poids exploratoire par séance (~0,32, EV-09) mais n'a pas de source propre. Le défaut tenait à l'**incohérence** des deux valeurs, pas au chiffre. **Résolu** : `credit_policy_v2` adopte 0,5 (EV-10, arbitrage 8). L'ancienne valeur reste une entrée historique datée. | "
+  },
+  "EV-A2": {
+    "claim": "Couverture sur 14 j relative à la médiane propre de l'utilisateur",
+    "row": "CONVENTION | DERIVED_FROM_HISTORY | VERY_LOW | Une zone jamais entraînée a une médiane de 0 et n'est donc jamais signalée. Aucune base pour 14 j (EV-13). **Remplacée** par le plan de prescription versionné (C.1), et non par une borne de population. | "
+  },
+  "EV-A3": {
+    "claim": "Zones du template = zones primaires présentes dans ≥ 1/4 des exercices",
+    "row": "CONVENTION | N/A | VERY_LOW | Défaut démontré : un full-body se réduit à « mollets ». Remplacée par `LEDGER_TEMPLATE_ZONES`. | "
+  },
+  "EV-A4": {
+    "claim": "Repos fixe de 90 s",
+    "row": "DERIVED pour l'isolation (EV-54) ; non soutenu pour les polyarticulaires lourds (EV-55) | POPULATION_PRIOR | LOW | À garder comme défaut pour la classe de repos dérivée « isolation » uniquement (F.7). | "
+  },
+  "EV-A5": {
+    "claim": "Score de séance volume 40 / cibles 40 (par série 100/80/50) / progression 20",
+    "row": "CONVENTION | N/A | VERY_LOW | La part volume récompense le tonnage et les séries (EV-98). **Supprimé** (arbitrage 11) : entrée historique seulement. | "
+  },
+  "EV-A6": {
+    "claim": "Cardio en « plan B », force avant cardio",
+    "row": "CONVENTION produit | N/A | VERY_LOW pour la sélection hebdomadaire ; LOW–MODERATE pour l'ordre intra-journée (EV-81, EV-83) | Voir C.3. | "
+  },
+  "EV-A7": {
+    "claim": "**Démarrage à froid équilibré** (V2) : chaque zone à exigence de planification par défaut reçoit le bas de la fourchette de l'objectif, réparti sur ≥ 2 séances distinctes de la semaine quand le plan en compte ≥ 2 ; adductors et hip_flexors suivies sans budget par défaut",
+    "row": "CONVENTION (heuristique de planification) | POPULATION_PRIOR (bas de fourchette) | VERY_LOW | Arbitrage 6. N'affirme **pas** que chaque muscle requiert scientifiquement 2 expositions sur 7 j : à volume égal, la fréquence est neutre pour l'hypertrophie (EV-11). Le « ≥ 2 j/sem » de l'OMS (EV-88) vise l'ensemble des grands groupes, pas chaque muscle. | "
+  },
+  "EV-A8": {
+    "claim": "**Incrément de repli par mode d'équipement** quand l'instance d'équipement est inconnue : barre libre, Smith et machine à disques 2,5 kg ; haltères 2 kg par haltère ; pile et poulie 5 kg ; poids du corps : progression en répétitions",
+    "row": "CONVENTION | POPULATION_PRIOR | VERY_LOW | Arbitrage 5. Valeur toujours marquée `FALLBACK_ESTIMATE` et remplacée dès que l'utilisateur déclare l'incrément ou que son propre log révèle le plus petit écart de charge de cette instance. | "
+  },
+  "EV-A9": {
+    "claim": "**Cardio planifié pour FAT_LOSS_WITH_MUSCLE_RETENTION** : composante hebdomadaire de premier rang dont la dose est fixée par le plan (budget de temps, préférence), sans plancher OMS imposé au seul motif de la perte de graisse",
+    "row": "CONVENTION produit | USER_REPORTED (budget, préférence) | VERY_LOW (dose) | Arbitrage 9. Aucun essai du registre ne fixe une dose de cardio pour la perte de graisse avec maintien musculaire ; les règles de séquence (EV-81, EV-83) s'appliquent. | "
+  }
+}

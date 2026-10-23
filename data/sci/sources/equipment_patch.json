@@ -1,0 +1,975 @@
+{
+  "adduction-assise": {
+    "equipment_requirements": [
+      "machine_seated_hip_adduction"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Seated hip-adduction machine: name ('assise') + source family 'machine'; new delta capability (was an equipment_gap, not 'no equipment'). Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "adduction-couchee-machine": {
+    "equipment_requirements": null,
+    "equipment_requirement_status": "UNKNOWN",
+    "equipment_mode": "machine_unspecified",
+    "basis": "unknown",
+    "note": "Lying adductor machine: no slug, alias, description or verifiable real object; device identity not established, so no capability can be attached. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "adduction-debout-cable": {
+    "equipment_requirements": [
+      "cable_anchor_low",
+      "cable_attachment_ankle_cuff"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Standing cable hip adduction: load at the ankle from a low anchor (mechanics); ankle cuff is indispensable (new delta capability)."
+  },
+  "arnold-press": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "derived",
+    "note": "Dumbbells only: posture not stated and a standing Arnold press is a valid execution, so no support is required."
+  },
+  "back-extension-45-paren-bias-ischios": {
+    "equipment_requirements": [
+      "back_extension_45_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "derived",
+    "note": "45° back-extension bench written in the name; new delta capability (was an equipment_gap)."
+  },
+  "butterfly-pec-machine": {
+    "equipment_requirements": [
+      "machine_butterfly"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "cable-cross-over-paren-bashaut": {
+    "equipment_requirements": [
+      "cable_anchor_adjustable",
+      "cable_bilateral_independent"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "calf-press-leg-press": {
+    "equipment_requirements": [
+      "machine_leg_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Calf press performed on the leg press: the leg-press function is the requirement (name). Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "chest-press-machine": {
+    "equipment_requirements": [
+      "machine_chest_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "crunch-cable-a-genoux": {
+    "equipment_requirements": [
+      "cable_anchor_high"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Kneeling cable crunch pulls from a high anchor (mechanics); attachment unstated and alternative (rope, handles), so not required (TRAIN A face-pull rule)."
+  },
+  "curl-cable-basse": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Low anchor written in the name ('basse'), same requirement as curl-poulie-basse; attachment unstated, not required."
+  },
+  "curl-debout-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-ez-bar-debout": {
+    "equipment_requirements": [
+      "barbell_ez"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_barbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-incline-halteres": {
+    "equipment_requirements": [
+      "dumbbells",
+      "incline_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-incline-halteres-paren-banc-45": {
+    "equipment_requirements": [
+      "dumbbells",
+      "incline_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-marteau-cable-corde": {
+    "equipment_requirements": [
+      "cable_anchor_low",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Rope named; cable elbow flexion is loaded from a low anchor (mechanics)."
+  },
+  "curl-marteau-cable-paren-corde": {
+    "equipment_requirements": [
+      "cable_anchor_low",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Rope named; cable elbow flexion is loaded from a low anchor (mechanics). Duplicate of curl-marteau-cable-corde."
+  },
+  "curl-marteau-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-poulie-basse": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-poulie-basse-paren-barre": {
+    "equipment_requirements": [
+      "cable_anchor_low",
+      "cable_attachment_straight_bar"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "curl-prise-neutre-cable": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Cable curl loaded from a low anchor (mechanics); neutral grip obtainable with rope or handles (alternatives), so no attachment required."
+  },
+  "decline-crunch": {
+    "equipment_requirements": [
+      "decline_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "derived",
+    "note": "Decline written in the name; new delta capability granted by decline_bench / adjustable_decline_bench, NOT by adjustable_bench."
+  },
+  "developpe-couche-halteres": {
+    "equipment_requirements": [
+      "dumbbells",
+      "flat_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "developpe-incline-halteres-30": {
+    "equipment_requirements": [
+      "dumbbells",
+      "incline_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "dips-pectoraux-paren-buste-penche": {
+    "equipment_requirements": [
+      "dip_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "derived",
+    "note": "Forward-lean chest dip is performed between parallel bars (bench dips cannot lean the trunk forward); new delta capability dip_support."
+  },
+  "ecarte-arriere-d-epaule-cable": {
+    "equipment_requirements": [
+      "cable_anchor_any"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept (ATLAS): any positionable anchor, single column."
+  },
+  "ecarte-pec-aux-cables-paren-incline-bashaut": {
+    "equipment_requirements": [
+      "cable_anchor_adjustable",
+      "cable_bilateral_independent"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "elevations-laterales-cable": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept (ATLAS): low anchor; single handle not required (alternative grips)."
+  },
+  "elevations-laterales-cable-paren-derriere-le-dos": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept (ATLAS): low anchor; single handle not required (alternative grips)."
+  },
+  "elevations-laterales-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "derived",
+    "note": "Standing dumbbell lateral raise: dumbbells only."
+  },
+  "elevations-laterales-halteres-assis": {
+    "equipment_requirements": [
+      "dumbbells",
+      "seated_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB kept: 'assis' -> seated_support (any seat), not specifically a flat bench."
+  },
+  "elevations-laterales-machine": {
+    "equipment_requirements": [
+      "machine_lateral_raise"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Lateral-raise machine function from the exercise identity (name + family 'machine'); existing capability. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "extension-overhead-cable-paren-corde": {
+    "equipment_requirements": [
+      "cable_anchor_any",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Rope named; overhead extension works facing away from a high or low anchor, so any positionable anchor (not a dedicated station)."
+  },
+  "face-pull-cable": {
+    "equipment_requirements": [
+      "cable_anchor_high"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept (ATLAS): high anchor; rope/V-bar are alternatives, none required."
+  },
+  "face-pull-cable-paren-corde": {
+    "equipment_requirements": [
+      "cable_anchor_high",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "fente-avant": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "good-morning-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "derived",
+    "note": "Standing dumbbell good morning: dumbbells only."
+  },
+  "hack-squat-machine": {
+    "equipment_requirements": [
+      "machine_hack_squat"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "hanging-knee-raise": {
+    "equipment_requirements": [
+      "overhead_hang_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "derived",
+    "note": "'Hanging' = the suspension affordance, as in the EKB for releve-de-jambes-suspendu (not the pull_up_bar object)."
+  },
+  "hip-thrust-halteres": {
+    "equipment_requirements": [
+      "dumbbells",
+      "flat_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "derived",
+    "note": "Hip thrust = upper back on a bench (distinct from the floor glute bridge); no atlas card documents a floor variant for the dumbbell entry, unlike the Smith one."
+  },
+  "hip-thrust-smith": {
+    "equipment_requirements": [
+      "smith_rack"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "smith",
+    "basis": "EKB",
+    "note": "EKB kept: bench NOT required by operator ruling (atlas variants 'dos banc' AND 'sol'); the curator's flat_bench is dropped."
+  },
+  "hip-thrust-smith-machine": {
+    "equipment_requirements": [
+      "smith_rack"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "smith",
+    "basis": "EKB",
+    "note": "EKB kept: bench NOT required by operator ruling (atlas variants 'dos banc' AND 'sol'); the curator's flat_bench is dropped."
+  },
+  "incline-smith-press": {
+    "equipment_requirements": [
+      "incline_bench_support",
+      "smith_rack"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "smith",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "kickback-cable": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Bent-over kickback loaded from a low anchor (mechanics); single-hand grip has alternatives (handle, rope end, cable ball), so no attachment required."
+  },
+  "lat-pulldown-prise-large": {
+    "equipment_requirements": [
+      "pulldown_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "'Lat pulldown' is the atlas name of the pulldown station: same requirement as tirage-poulie-haute-prise-large (EKB)."
+  },
+  "lat-pulldown-prise-neutre": {
+    "equipment_requirements": [
+      "pulldown_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Same station as tirage-poulie-haute-prise-neutre (EKB); grip attachments treated as part of the station (TRAIN A)."
+  },
+  "leg-curls-allonge": {
+    "equipment_requirements": [
+      "machine_lying_leg_curl"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "leg-curls-assis": {
+    "equipment_requirements": [
+      "machine_seated_leg_curl"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "leg-extension-cable-unilateral": {
+    "equipment_requirements": [
+      "cable_anchor_low",
+      "cable_attachment_ankle_cuff"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Cable knee extension loads the ankle from a low anchor; ankle cuff indispensable (new delta capability)."
+  },
+  "leg-extensions-assises": {
+    "equipment_requirements": [
+      "machine_leg_extension"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "leg-press-paren-pieds-bas": {
+    "equipment_requirements": [
+      "machine_leg_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "leg-press-paren-pieds-bas-serres": {
+    "equipment_requirements": [
+      "machine_leg_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "leg-press-paren-pieds-hauts-ecartes": {
+    "equipment_requirements": [
+      "machine_leg_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "machine-crunch": {
+    "equipment_requirements": [
+      "machine_ab_crunch"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Ab-crunch machine function (name); new delta capability (was an equipment_gap). Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "machine-shoulder-press": {
+    "equipment_requirements": [
+      "machine_shoulder_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "mollets-assis-machine": {
+    "equipment_requirements": [
+      "machine_seated_calf_raise"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "mollets-debout-machine": {
+    "equipment_requirements": [
+      "machine_standing_calf_raise"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "neutral-grip-shoulder-press-machine": {
+    "equipment_requirements": [
+      "machine_shoulder_press"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "pallof-press-cable": {
+    "equipment_requirements": [
+      "cable_anchor_adjustable"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Chest-height anchor needed (mechanics of the anti-rotation press), i.e. a height-adjustable anchor; grip has alternatives, not required."
+  },
+  "pompes": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "pont-fessier": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "preacher-curl": {
+    "equipment_requirements": [
+      "machine_preacher_curl"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Source family 'machine' -> preacher-curl machine function (new delta). If the operator rules free-weight bench curl instead: preacher_curl_support + a free weight. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "pullover-cable-paren-bras-tendus": {
+    "equipment_requirements": [
+      "cable_anchor_any"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB_corrected",
+    "note": "EKB machine_pullover is wrong (R11): the name says cable; standing high-pulley or lying low-pulley variant unstated, so any positionable anchor."
+  },
+  "pullover-cable-paren-bras-tendus-poulie-haute": {
+    "equipment_requirements": [
+      "cable_anchor_high"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB_corrected",
+    "note": "EKB machine_pullover is wrong (R11): the name says cable and 'poulie haute'; attachment unstated, not required."
+  },
+  "pullover-machine": {
+    "equipment_requirements": [
+      "machine_pullover"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "pushdown-corde": {
+    "equipment_requirements": [
+      "cable_anchor_high",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Duplicate of triceps-pushdown-corde: same EKB requirement (high anchor + rope)."
+  },
+  "rear-delt-fly-machine": {
+    "equipment_requirements": [
+      "machine_rear_delt_fly"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "rear-delt-fly-machine-paren-pec-deck-inverse": {
+    "equipment_requirements": [
+      "machine_rear_delt_fly"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "releve-de-jambes-suspendu": {
+    "equipment_requirements": [
+      "overhead_hang_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "releves-mollets-debout": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB kept: [] established by operator ruling §8 (step is optional)."
+  },
+  "releves-mollets-debout-machine": {
+    "equipment_requirements": [
+      "machine_standing_calf_raise"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "reverse-fly-machine": {
+    "equipment_requirements": [
+      "machine_rear_delt_fly"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "reverse-nordic": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "derived",
+    "note": "Kneeling on the floor, no external equipment; a mat is comfort only. Empty list = established no-equipment, not a vocabulary gap."
+  },
+  "romanian-deadlift-barre": {
+    "equipment_requirements": [
+      "barbell"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_barbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "romanian-deadlift-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "roulette-abdominale": {
+    "equipment_requirements": [
+      "ab_wheel"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "roulette-abdominale-paren-ab-wheel-rollout": {
+    "equipment_requirements": [
+      "ab_wheel"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "rowing-cable-assis-prise-large": {
+    "equipment_requirements": [
+      "row_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept: dedicated seated-row station, grip attachment part of the station."
+  },
+  "rowing-cable-assis-prise-neutre": {
+    "equipment_requirements": [
+      "row_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept: dedicated seated-row station, grip attachment part of the station."
+  },
+  "rowing-cable-assis-prise-serree": {
+    "equipment_requirements": [
+      "row_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB kept: dedicated seated-row station, grip attachment part of the station."
+  },
+  "rowing-chest-supported": {
+    "equipment_requirements": [
+      "machine_chest_supported_row"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "rowing-haltere-un-bras": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "rowing-haltere-un-bras-paren-banc": {
+    "equipment_requirements": [
+      "dumbbells",
+      "flat_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "rowing-machine-chest-supported": {
+    "equipment_requirements": [
+      "machine_chest_supported_row"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_plate -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "shoulder-press-halteres-assis": {
+    "equipment_requirements": [
+      "dumbbells",
+      "seated_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB kept: 'assis' -> seated_support (any seat)."
+  },
+  "shrugs-barre": {
+    "equipment_requirements": [
+      "barbell"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_barbell",
+    "basis": "derived",
+    "note": "'Barre' -> barbell (same reading as romanian-deadlift-barre); standing, no support."
+  },
+  "shrugs-cable": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Cable shrug loaded from a low anchor (mechanics); attachment (bar or handles) unstated, not required."
+  },
+  "shrugs-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "sissy-squat-machine": {
+    "equipment_requirements": [
+      "machine_sissy_squat"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Sissy-squat apparatus named; new delta capability (was an equipment_gap). Mode bodyweight -> machine_unspecified: the name says machine; frame (bodyweight) vs loaded lever not stated."
+  },
+  "skull-crushers-ez-bar": {
+    "equipment_requirements": [
+      "barbell_ez",
+      "flat_bench_support"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_barbell",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "sliding-leg-curl": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "derived",
+    "note": "Floor exercise; sliders are substitutable by a towel or socks on a smooth floor, so no gym object is required."
+  },
+  "smith-shoulder-press": {
+    "equipment_requirements": [
+      "smith_rack"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "smith",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "squat-au-poids-du-corps": {
+    "equipment_requirements": [],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "bodyweight",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "squat-smith-machine-paren-pieds-avances": {
+    "equipment_requirements": [
+      "smith_rack"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "smith",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "straight-arm-pulldown-cable": {
+    "equipment_requirements": [
+      "cable_anchor_high",
+      "cable_attachment_straight_bar"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Template notes fix the high pulley and 'la barre' pulled to the thighs."
+  },
+  "tirage-front-cable-paren-prise-large": {
+    "equipment_requirements": [
+      "cable_anchor_low",
+      "cable_attachment_straight_bar"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Wide-grip cable upright row (template notes): low anchor; a wide grip needs a bar."
+  },
+  "tirage-poulie-haute-prise-large": {
+    "equipment_requirements": [
+      "pulldown_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "tirage-poulie-haute-prise-neutre": {
+    "equipment_requirements": [
+      "pulldown_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "tirage-vertical-unilateral-cable": {
+    "equipment_requirements": [
+      "cable_attachment_single_handle",
+      "pulldown_seated_station"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB_corrected",
+    "note": "EKB pulldown_seated_station is incomplete: a one-arm pulldown cannot be done on the station's long bar, a single handle is required (new delta capability)."
+  },
+  "traction-assistee-machine": {
+    "equipment_requirements": [
+      "machine_assisted_pull_up"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record. Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "traction-assistee-unilaterale": {
+    "equipment_requirements": [
+      "machine_assisted_pull_up"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "machine_unspecified",
+    "basis": "derived",
+    "note": "Source family 'machine' + name -> assisted pull-up machine function (band-assisted reading has no source fact). Mode machine_selectorized -> machine_unspecified: no source fact states stack vs plate (curator assumption)."
+  },
+  "triceps-extension-poulie-haute-paren-corde": {
+    "equipment_requirements": [
+      "cable_anchor_high",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "triceps-pushdown-barre": {
+    "equipment_requirements": [
+      "cable_anchor_high",
+      "cable_attachment_straight_bar"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Pushdown = high anchor; 'barre' named fixes the straight bar."
+  },
+  "triceps-pushdown-corde": {
+    "equipment_requirements": [
+      "cable_anchor_high",
+      "cable_attachment_rope"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "EKB",
+    "note": "EKB requirement (TRAIN A) consistent with the curated record."
+  },
+  "upright-row-cable": {
+    "equipment_requirements": [
+      "cable_anchor_low"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "cable",
+    "basis": "derived",
+    "note": "Cable upright row loaded from a low anchor (mechanics); attachment unstated (bar or rope), not required."
+  },
+  "upright-row-halteres": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "derived",
+    "note": "Standing dumbbell upright row: dumbbells only."
+  },
+  "y-raise-haltere": {
+    "equipment_requirements": [
+      "dumbbells"
+    ],
+    "equipment_requirement_status": "RESOLVED",
+    "equipment_mode": "free_weight_dumbbell",
+    "basis": "derived",
+    "note": "Record DISPUTED (variant from name only): standing/bent-over Y-raise needs only dumbbells; a prone-incline ruling would add incline_bench_support."
+  }
+}
