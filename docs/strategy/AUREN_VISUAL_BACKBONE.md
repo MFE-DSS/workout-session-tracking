@@ -255,6 +255,13 @@ JavaScript progressive enhancement is allowed for:
 A critical training write must remain recoverable if JS fails.
 ```
 
+> ⚠ **AMENDEMENT 2026-10-23 — client mobile vNext.** Autorité :
+> `ADR_AUREN_VNEXT_01` **ACCEPTED — C2** (D1, D2). Pour `clients/mobile/`
+> (React Native + Expo) : ~~SSR IS THE FUNCTIONAL BASELINE~~ et ~~« zéro
+> framework »~~ ne s'appliquent pas ; l'invariant de remplacement est **« aucune
+> écriture d'entraînement ne peut être perdue en silence »**, le legacy web restant
+> le repli. Tout ce qui suit reste **entier pour le web**.
+
 ### ⚠ Ce n'est PAS une levée d'invariant. C'est une mise à jour du constat.
 
 Le socle décrivait un produit sans JavaScript. **Le produit en a déjà**, et
@@ -369,6 +376,20 @@ aucune revendication d'activation musculaire, aucune sémantique de cible dans
 
 `FOUNDATION_CONTRACT §7` (no-color-only-state), **`§9` (density budget)** et
 `§10` (no-JS) sont **confirmés, non superseded**.
+
+**Ajout du 2026-10-23 — `ADR_AUREN_VNEXT_01` ACCEPTED — C2** (portée : client mobile seulement) :
+
+| Contrat ancien | Remplacé par | Condition |
+|---|---|---|
+| §5bis SSR base fonctionnelle · « zéro framework » | invariant « aucune écriture perdue en silence » ; legacy web = repli | ✅ appliqué (mobile) |
+| §2 échelle à 4 niveaux · §3.1 **valeurs** · §3.5 textures · §4 patron `P-03` | `LEGACY_VISUAL_REFERENCE` ; direction « instrumentation athlétique » du labo N0 | ✅ appliqué (mobile) |
+| `FOUNDATION_CONTRACT §10` no-JS | `§10bis` | ✅ appliqué (mobile) |
+
+**`RETAINED_INVARIANT` sur le mobile** : §1 `PH-01` (allocation, pas suffisance) ·
+§3.1 **rôles** (action ≠ système ≠ donnée ; provenance ≠ feedback) · §3.4 mouvement
+subordonné à l'état · §4.3 lecture en deux coups d'œil · §5 invariants (cible 44,
+aucun état par la couleur seule, contraste de couple, aucune revendication
+d'activation musculaire, validation implicite).
 
 ---
 

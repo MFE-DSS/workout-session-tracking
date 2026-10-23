@@ -1,5 +1,7 @@
 # Sx_UI_11 — Screenshot Regression Baseline Spec
 
+> ⚠ **`LEGACY_VISUAL_REFERENCE` — 2026-10-23** (`ADR_AUREN_VNEXT_01` ACCEPTED — C2, D8). Référence historique du web ; ne gouverne pas le client mobile.
+
 **Spec ID :** `Sx_UI_11_SCREENSHOT_REGRESSION_BASELINE_SPEC`
 **Cycle :** `Sx_UI` — Auren Visual & Product Transformation
 **Date d'ouverture :** 2026-07-02

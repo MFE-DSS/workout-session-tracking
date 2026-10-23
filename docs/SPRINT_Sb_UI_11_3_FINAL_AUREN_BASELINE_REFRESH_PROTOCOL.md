@@ -1,5 +1,7 @@
 # Sb_UI_11.3 — Final Auren Baseline Refresh — PROTOCOLE
 
+> ⚠ **`LEGACY_VISUAL_REFERENCE` — 2026-10-23** (`ADR_AUREN_VNEXT_01` ACCEPTED — C2, D8). Référence historique du web ; ne gouverne pas le client mobile.
+
 **Statut** : 🟡 **BASELINE REFRESH READY / OPERATOR CAPTURE PENDING**
 **Type** : protocole de capture — docs-only (aucun PNG committé, aucun code touché)
 **Date** : 2026-07-19

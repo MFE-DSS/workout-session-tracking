@@ -7,6 +7,10 @@ amendements opérateur consignés.
 `B — microcopy Session finale` (§1bis).
 **Portée : UI/UX uniquement.** Aucun build, aucun fichier `app/` modifié.
 
+> ⚠ **AMENDEMENT 2026-10-23.** Autorité : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2**
+> (D8). Libellés figés, plancher « 360 px fait foi » et gouttières →
+> `LEGACY_VISUAL_REFERENCE` pour le client mobile ; ils gouvernent toujours le web.
+
 **Objet.** Ce document ne crée aucune direction artistique. Il démontre que la
 Home Causal Cockpit et l'Active Exercise Future Console parlent **une seule
 langue**, et il **tranche les conflits** entre les specs amont. Aucun conflit

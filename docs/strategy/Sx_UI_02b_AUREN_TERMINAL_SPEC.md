@@ -1,5 +1,7 @@
 # Sx_UI_02b — Auren Terminal Design Tokens Spec (Direction Revision)
 
+> ⚠ **`LEGACY_VISUAL_REFERENCE` — 2026-10-23** (`ADR_AUREN_VNEXT_01` ACCEPTED — C2, D8). Direction « terminal » du web ; ne gouverne pas le client mobile.
+
 **Spec ID :** `Sx_UI_02b_AUREN_TERMINAL_SPEC`
 **Cycle :** `Sx_UI` — Auren Visual & Product Transformation
 **Type :** SPEC ONLY (docs-only) — **révision de direction visuelle** (amendement de `Sx_UI_02`)

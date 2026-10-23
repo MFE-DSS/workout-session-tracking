@@ -247,6 +247,18 @@
 |---|---|---|---|---|
 | Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01 | Invariants I1–I9 du contrat de jeton web + tests de régression §3 ; une colonne additive | ✅ MERGÉE + DÉPLOYÉE (`ff4239d`) | [`SPRINT_Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01_REPORT.md`](../SPRINT_Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01_REPORT.md) | tier `migration` ; spec et correctif dans la même PR |
 
+## 1quaterdecies. Sx_AUREN_MOBILE_EXPERIENCE_VNEXT — réinitialisation de la couche de présentation (SPEC + LAB D'ARCHITECTURE)
+
+**Spec :** `docs/strategy/Sx_AUREN_MOBILE_EXPERIENCE_VNEXT_SPEC.md`
+**ADR :** `docs/strategy/ADR_AUREN_VNEXT_01_PRESENTATION_ARCHITECTURE.md` (**`ACCEPTED — C2`**, opérateur 2026-10-23)
+**Cadres :** `docs/assets/vnext/AUREN_VNEXT_REFERENCE_FRAMES.html` (`VNEXT_INTERACTION_REFERENCE_FRAME` depuis r2 — hiérarchie/état/action, pas la forme ; PNG non versionnés, garde `test_auren_muscle_focus_source_policy`)
+**Statut spec :** 🔵 **`C2 ACCEPTED / SPEC GOVERNANCE UPDATED`** (arbitrage opérateur 2026-10-23 : A0 P0, D1–D5/D7/D8 acceptés, D6 labo seulement, D9 après A0, D10 amendé, D11 avec amendement d'intégrité ; G-NOTIF scindé ; « chemin nominal hors-ligne » + `REQUIRES_SYNC`). Marqueurs de supersession posés dans 17 documents (portée mobile ; le web legacy garde leurs contrats) + amendement D11 en tête de `SPRINT_UI_CP8R_REPORT.md`. *Historique : r1 recommandait B ; r2 `ARCHITECTURE DECISION REQUIRED — C2 RECOMMENDED`.* Décisions D1–D11 (spec `§0`) + prérequis de sécurité **A0** (`§0ter`) ; lève des décisions figées (`Sx_UIV3_00A §9`, `AUREN_VISUAL_BACKBONE §5bis`, `Sx_UIV3_02 §4`, doctrine `UI-CP8R`).
+**Hard contracts :** 0 code de production · 0 migration · 0 suppression d'UI · moteur inchangé · supersession **par surface** (`LEGACY_VISUAL_REFERENCE`), table `§4.3` préparée **non appliquée**.
+
+| Sprint | Domaine | Statut | Rapport | Notes |
+|---|---|---|---|---|
+| Sx_AUREN_MOBILE_EXPERIENCE_VNEXT (spec) | Diagnostic mesuré (VALIDER → REPOS = 27,8 ms serveur, le reste est réseau ; `exercise_complete` sans repos 6/6) · carte KEEP/ADAPT/REBUILD/RETIRE · options A/B/C1/C2 (matrice pondérée r2 : 57 / 70 / 117 / 116,5 sur 135) · **r2 : recommandation C2 React Native + Expo** (r1 : B) · contrats `MISSION`/`EXECUTION` + commandes par série + plan de séance à table de transitions serveur · journal/outbox Expo SQLite · auth mobile par jetons révocables · portes G1–G8, G-VAL/NET/LOCAL/KILL/NOTIF/NAV/A11Y/TYPE/MOTION · 5 cadres 390×844 mesurés | ⏳ | — | Plan r2 : **A0** (sécurité, indépendant) → **N0** labo de design natif (fixtures réelles, appareil réel) → L0 → L1/L1a → L2 → L3 → L4 ; extensions E1/E2. Rien n'ouvre avant ADR `ACCEPTED` |
+
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 
 **Specs :** `docs/strategy/SPIGNOS_BODY_SIGNAL_MODEL_BRAINSTORMING.md`, `SPIGNOS_BODY_INTELLIGENCE_ROADMAP.md`, `SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md`, `SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC.md`, `SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md`.

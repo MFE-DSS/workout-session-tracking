@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AUREN vNext — cadres de référence</title>
+<!--
+  Sx_AUREN_MOBILE_EXPERIENCE_VNEXT §11.4 — VNEXT_INTERACTION_REFERENCE_FRAME (r2).
+
+  STATUT : VNEXT_INTERACTION_REFERENCE_FRAME — ACCEPTÉ par l'opérateur le
+  2026-10-23 (D8) comme référence d'INTERACTION, pas de forme native. Ces cadres
+  ne deviennent pas une baseline. Aucun code de production ne les importe.
+
+  Ils GOUVERNENT : hiérarchie d'information, état, action souveraine, géométrie
+  de base, zéro tableau de bord en séance.
+  Ils NE FIGENT PAS : typographie, mise en page exacte, forme des composants,
+  plaques, iconographie, palette, mouvement, chrome de navigation, haptique,
+  feuilles natives, saisie numérique. Le labo natif N0 peut faire mieux.
+
+  Données : uniquement ce que le produit calcule déjà, relevé le 2026-10-23
+  sur une base de labo semée (gabarit `push-a` du catalogue réel, phrases au
+  format exact de `recommendation_v3.expliquer` / `phrase_de`, libellés exacts
+  de `overload_explainer`). Aucune durée estimée (AUREN_INSTRUMENTS §6.2bis-3).
+
+  Contrastes mesurés (WCAG 2.x, couple avant-plan / fond réel) — voir la spec §11.3.
+  Rendus PNG : NON versionnés (garde test_auren_muscle_focus_source_policy) ;
+  capturer chaque `.device` à 390×844 au moment de l'exposition.
+-->
+<style>
+:root {
+  --field-work: #0B0C0E;   /* fond EXECUTION/MISSION */
+  --field-rest: #06141C;   /* fond REST — 1,05:1 vs work : JAMAIS porteur seul de l'état */
+  --plate: #1B1E23;        /* 1,17:1 sur field-work (plancher 1,12) */
+  --plate-rest: #10293A;   /* 1,25:1 sur field-rest */
+  --line: #2A2E35;         /* 1,44:1, non-texte */
+  --ink: #F4F1EA;          /* 17,35:1 field-work · 14,82:1 plate · 13,29:1 plate-rest */
+  --ink-2: #B4B8BF;        /* 9,83:1 field-work · 8,40:1 plate · 7,53:1 plate-rest */
+  --ink-3: #8A9099;        /* 6,08:1 field-work · 5,20:1 plate · 4,66:1 plate-rest */
+  --signal: #FFB238;       /* « à toi de jouer » — 10,88:1 field-work */
+  --on-signal: #0B0C0E;    /* 10,88:1 sur signal */
+  --system: #7CCBF5;       /* ce qu'AUREN produit / le temps — 10,92:1 field-work · 8,37:1 plate-rest */
+  --gutter: 16px;
+  --cmd-h: 68px;
+  --pad: 56px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #2B2F36;
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding: 32px;
+}
+.board { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
+.caption { width: 390px; margin-top: 10px; font-size: 13px; color: #C9CDD3; line-height: 1.4; }
+.caption b { color: #fff; }
+
+/* ── le cadre : 390 × 844, rien ne déborde ─────────────────────────────── */
+.device {
+  width: 390px; height: 844px; overflow: hidden; position: relative;
+  background: var(--field-work); border-radius: 44px;
+  display: flex; flex-direction: column;
+  padding: 54px var(--gutter) 34px;
+}
+.device.rest { background: var(--field-rest); }
+.num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.meta { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; }
+.statusbar { position: absolute; top: 16px; left: 32px; right: 32px; display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; color: var(--ink); }
+
+/* rail de position : un segment par exercice — forme ET couleur */
+.rail { display: flex; gap: 4px; margin-bottom: 18px; }
+.rail i { flex: 1; height: 4px; border-radius: 2px; background: var(--line); }
+.rail i.done { background: var(--ink-2); }
+.rail i.now { background: var(--signal); height: 6px; margin-top: -1px; }
+.rest .rail i.now { background: var(--system); }
+.topline { display: flex; justify-content: space-between; align-items: center; min-height: 44px; }
+.iconbtn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 22px; color: var(--ink-2); font-size: 22px; border: 1px solid var(--line); background: transparent; }
+
+/* commande souveraine : zone du pouce, une seule par état */
+.cmd { margin-top: auto; }
+.cmd button {
+  width: 100%; height: var(--cmd-h); border-radius: 18px; border: 0;
+  background: var(--signal); color: var(--on-signal);
+  font: inherit; font-size: 19px; font-weight: 800; letter-spacing: .06em;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.cmd button small { font-size: 13px; font-weight: 600; letter-spacing: 0; opacity: .8; }
+.cmd button.trait { background: transparent; color: var(--system); border: 2px solid var(--system); }
+.secondary { display: flex; gap: 8px; margin-bottom: 12px; }
+.secondary button {
+  flex: 1; min-height: 48px; border-radius: 14px; background: transparent; color: var(--ink);
+  border: 1px solid var(--line); font: inherit; font-size: 15px; font-weight: 600;
+}
+.rest .secondary button { border-color: #24465C; }
+
+/* ── 1 MISSION ─────────────────────────────────────────────────────────── */
+.m-date { color: var(--ink-2); font-size: 15px; margin: 14px 0 28px; }
+.m-title { font-size: 52px; line-height: 1; font-weight: 800; letter-spacing: -.02em; }
+.m-sub { font-size: 18px; color: var(--ink-2); margin-top: 8px; }
+.why { margin-top: 28px; padding-left: 14px; border-left: 3px solid var(--system); }
+.why p { font-size: 19px; line-height: 1.35; }
+.why p + p { color: var(--ink-2); font-size: 16px; margin-top: 6px; }
+.why .meta { margin-top: 10px; color: var(--system); letter-spacing: .08em; }
+.scope { display: flex; gap: 24px; margin-top: 32px; }
+.scope div { font-size: 34px; font-weight: 700; }
+.scope span { display: block; font-size: 13px; color: var(--ink-3); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; }
+.first { margin-top: 28px; background: var(--plate); border-radius: 16px; padding: 14px 16px; border: 1px solid var(--line); }
+.first .meta { margin-bottom: 6px; }
+.first p { font-size: 17px; }
+.first p span { color: var(--ink-2); }
+.disclose { display: flex; justify-content: space-between; align-items: center; min-height: 48px; color: var(--ink-2); font-size: 15px; border-top: 1px solid var(--line); margin-top: 18px; }
+
+/* ── 2 EXECUTION ───────────────────────────────────────────────────────── */
+.x-name { font-size: 30px; font-weight: 800; line-height: 1.1; letter-spacing: -.01em; margin-top: 6px; }
+.x-set { font-size: 16px; color: var(--ink-2); margin-top: 6px; }
+.x-set b { color: var(--ink); }
+.sets { display: flex; gap: 8px; margin-top: 16px; }
+.sets div { flex: 1; border-radius: 12px; border: 1px solid var(--line); padding: 8px 10px; min-height: 52px; }
+.sets div .meta { font-size: 11px; }
+.sets div p { font-size: 15px; margin-top: 2px; color: var(--ink-2); }
+.sets .done p::before { content: "✓ "; color: var(--ink); }
+.sets .now { border: 2px solid var(--signal); background: var(--plate); }
+.sets .now p { color: var(--ink); font-weight: 700; }
+.sets .now p::before { content: "● "; color: var(--signal); }
+.sets .next p::before { content: "○ "; }
+.guide { margin-top: 18px; padding-left: 12px; border-left: 3px solid var(--system); }
+.guide p { font-size: 16px; color: var(--system); font-weight: 600; }
+.guide p + p { color: var(--ink-2); font-weight: 400; font-size: 15px; margin-top: 3px; }
+.prev { margin-top: 12px; font-size: 15px; color: var(--ink-2); }
+.prev b { color: var(--ink); font-weight: 600; }
+.entry { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.dial { background: var(--plate); border: 1px solid var(--line); border-radius: 20px; padding: 12px 10px 10px; text-align: center; }
+.dial .v { font-size: 56px; font-weight: 800; line-height: 1.05; letter-spacing: -.02em; }
+.dial .v small { font-size: 18px; font-weight: 600; color: var(--ink-2); margin-left: 2px; }
+.dial .steps { display: flex; gap: 8px; margin-top: 8px; }
+.dial .steps button { flex: 1; height: 52px; border-radius: 14px; border: 1px solid var(--line); background: var(--field-work); color: var(--ink); font: inherit; font-size: 22px; font-weight: 700; }
+
+/* ── 3/4 REST ──────────────────────────────────────────────────────────── */
+.saved { display: flex; align-items: center; gap: 10px; font-size: 15px; color: var(--ink-2); margin-top: 4px; }
+.saved b { color: var(--ink); }
+.saved .tick { width: 22px; height: 22px; border-radius: 11px; border: 2px solid var(--ink-2); display: grid; place-items: center; font-size: 12px; color: var(--ink); }
+.clock { position: relative; width: 268px; height: 268px; margin: 26px auto 0; }
+.clock svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+.clock .t { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.clock .t .meta { color: var(--system); letter-spacing: .2em; }
+.clock .t div { font-size: 84px; font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-top: 6px; }
+.clock .t span { font-size: 13px; color: var(--ink-3); margin-top: 8px; }
+.clock.small { width: 168px; height: 168px; margin-top: 14px; }
+.clock.small .t div { font-size: 52px; }
+.up { margin-top: 22px; background: var(--plate-rest); border-radius: 16px; padding: 14px 16px; border: 1px solid #24465C; }
+.up .meta { color: var(--ink-3); }
+.up p { font-size: 20px; font-weight: 700; margin-top: 4px; }
+.up p span { color: var(--ink-2); font-weight: 500; font-size: 16px; }
+.up p.meta { font-size: 12px; font-weight: 600; margin-top: 0; color: var(--ink-3); }
+.up p.nx-name { font-size: 26px; font-weight: 800; margin-top: 6px; line-height: 1.1; }
+.up p.nx-meta { font-size: 15px; font-weight: 500; color: var(--ink-2); margin-top: 6px; }
+.up p.nx-guide { font-size: 15px; color: var(--system); font-weight: 600; margin-top: 10px; }
+.nw, .up p .nw { white-space: nowrap; color: inherit; font-weight: inherit; font-size: inherit; }
+.swap { display: flex; justify-content: space-between; align-items: center; min-height: 48px; margin-top: 8px; border-top: 1px solid #24465C; color: var(--ink); font-size: 15px; }
+.swap span { color: var(--ink-2); }
+
+/* ── 5 COMPLETE ────────────────────────────────────────────────────────── */
+.c-mark { width: 64px; height: 64px; border-radius: 32px; border: 3px solid var(--ink); display: grid; place-items: center; font-size: 30px; margin-top: 26px; }
+.c-title { font-size: 40px; font-weight: 800; margin-top: 18px; letter-spacing: -.02em; }
+.c-sub { font-size: 17px; color: var(--ink-2); margin-top: 6px; }
+.ledger { margin-top: 26px; border-top: 1px solid var(--line); }
+.ledger div { display: flex; justify-content: space-between; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: 16px; color: var(--ink-2); }
+.ledger div b { font-size: 22px; color: var(--ink); font-weight: 700; }
+.ledger div b.sys { color: var(--system); }
+.zones { margin-top: 18px; font-size: 15px; color: var(--ink-2); line-height: 1.5; }
+.zones .meta { display: block; margin-bottom: 4px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .device { transition: background-color 240ms ease-out; }
+}
+</style>
+</head>
+<body>
+<div class="board">
+
+<!-- ═════════════ 1 · MISSION / READY ═════════════ -->
+<figure>
+<div class="device" data-frame="mission-ready">
+  <div class="statusbar"><span class="num">9:41</span><span>●●● ▮</span></div>
+  <div class="topline"><span class="meta">AUREN · Mission</span><button class="iconbtn" aria-label="Menu">≡</button></div>
+  <p class="m-date">jeudi 23 octobre</p>
+  <h1 class="m-title">Push A</h1>
+  <p class="m-sub">Pecs épaisseur + Delts + Triceps</p>
+  <div class="why">
+    <p>Pectoraux, Deltoïdes latéraux : le moins servi sur 14 derniers jours.</p>
+    <p>Zones récupérées.</p>
+    <p class="meta">Mesurée · 14 derniers jours</p>
+  </div>
+  <div class="scope num">
+    <div>7<span>exercices</span></div>
+    <div>21<span>séries de travail</span></div>
+  </div>
+  <div class="first">
+    <p class="meta">On commence par</p>
+    <p>Incline Smith Press <span class="num">· 3 × 6–10</span></p>
+  </div>
+  <div class="disclose"><span>Pourquoi celle-ci · autres séances</span><span aria-hidden="true">›</span></div>
+  <div class="cmd"><button>DÉMARRER<small>Push A</small></button></div>
+</div>
+<figcaption class="caption"><b>1 · MISSION / READY</b> — une question, une action. Raison au format exact de <code>phrase_de</code> + facteurs de <code>expliquer</code>. Pas de durée : décision close §6.2bis-3. Alternatives derrière la seule ligne de divulgation.</figcaption>
+</figure>
+
+<!-- ═════════════ 2 · EXECUTION / CURRENT SET ═════════════ -->
+<figure>
+<div class="device" data-frame="execution-current-set">
+  <div class="statusbar"><span class="num">9:52</span><span>●●● ▮</span></div>
+  <div class="rail" aria-label="Exercice 1 sur 7"><i class="now"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="topline"><span class="meta num">Exercice 1 / 7</span><button class="iconbtn" aria-label="Options de l'exercice">⋯</button></div>
+  <h1 class="x-name">Incline Smith Press</h1>
+  <p class="x-set num"><b>Série 2 sur 3</b> · cible 6–10 reps</p>
+  <div class="sets num">
+    <div class="done"><span class="meta">S1</span><p>47,5 × 9</p></div>
+    <div class="now"><span class="meta">S2</span><p>en cours</p></div>
+    <div class="next"><span class="meta">S3</span><p>à venir</p></div>
+  </div>
+  <div class="guide num">
+    <p>Consolider la charge actuelle · <span class="nw">47,5 kg · 6–10 reps</span></p>
+    <p>viser 10 reps avant d'augmenter la charge</p>
+  </div>
+  <p class="prev num">Dernière fois <b>47,5 × 9 · 9 · 8</b></p>
+  <div class="entry num">
+    <div class="dial"><span class="meta">Charge</span><div class="v">47,5<small>kg</small></div>
+      <div class="steps"><button aria-label="Moins 2,5 kilos">−</button><button aria-label="Plus 2,5 kilos">+</button></div></div>
+    <div class="dial"><span class="meta">Reps</span><div class="v">10</div>
+      <div class="steps"><button aria-label="Une rep de moins">−</button><button aria-label="Une rep de plus">+</button></div></div>
+  </div>
+  <div class="cmd"><button>VALIDER LA SÉRIE<small class="num">47,5 kg × 10</small></button></div>
+</div>
+<figcaption class="caption"><b>2 · EXECUTION / SÉRIE</b> — l'exercice et la série se comprennent sans scroll. Guidage = <code>explain_overload_hint</code> mot pour mot. Valeurs proposées, modifiables d'un geste ; <b>VALIDER</b> confirme ce qui est affiché (décision D6).</figcaption>
+</figure>
+
+<!-- ═════════════ 3 · EXECUTION / REST ═════════════ -->
+<figure>
+<div class="device rest" data-frame="execution-rest">
+  <div class="statusbar"><span class="num">9:53</span><span>●●● ▮</span></div>
+  <div class="rail" aria-label="Exercice 1 sur 7"><i class="now"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="topline"><span class="meta num">Exercice 1 / 7 · Incline Smith Press</span></div>
+  <p class="saved num"><span class="tick">✓</span><span>Série 2 enregistrée · <b>47,5 × 10</b></span></p>
+  <div class="clock num">
+    <svg viewBox="0 0 268 268" aria-hidden="true">
+      <circle cx="134" cy="134" r="124" fill="none" stroke="#24465C" stroke-width="8"/>
+      <circle cx="134" cy="134" r="124" fill="none" stroke="#7CCBF5" stroke-width="8" stroke-linecap="round"
+              stroke-dasharray="779" stroke-dashoffset="156"/>
+    </svg>
+    <div class="t"><span class="meta">Repos</span><div>1:12</div><span>90 s par défaut</span></div>
+  </div>
+  <div class="up num">
+    <p class="meta">Ensuite · automatiquement</p>
+    <p>Série 3 sur 3 <span>· 47,5 kg × 10</span></p>
+  </div>
+  <div class="cmd">
+    <div class="secondary num"><button>−15 s</button><button>+15 s</button></div>
+    <button class="trait">PASSER LE REPOS<small class="num">S3 maintenant</small></button>
+  </div>
+</div>
+<figcaption class="caption"><b>3 · EXECUTION / REPOS</b> — même instrument, autre état : l'état se lit par la <b>forme</b> (anneau, compte à rebours, libellé), jamais par le seul fond (1,05:1). Pas d'ambre : ce n'est pas au pratiquant de jouer. À zéro, S3 s'ouvre seule.</figcaption>
+</figure>
+
+<!-- ═════════════ 4 · EXECUTION / NEXT EXERCISE ═════════════ -->
+<figure>
+<div class="device rest" data-frame="execution-next-exercise">
+  <div class="statusbar"><span class="num">9:56</span><span>●●● ▮</span></div>
+  <div class="rail" aria-label="Exercice 2 sur 7"><i class="done"></i><i class="now"></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="topline"><span class="meta num">Exercice 1 terminé · 3 / 3 séries</span></div>
+  <div class="clock small num">
+    <svg viewBox="0 0 168 168" aria-hidden="true">
+      <circle cx="84" cy="84" r="78" fill="none" stroke="#24465C" stroke-width="6"/>
+      <circle cx="84" cy="84" r="78" fill="none" stroke="#7CCBF5" stroke-width="6" stroke-linecap="round"
+              stroke-dasharray="490" stroke-dashoffset="267"/>
+    </svg>
+    <div class="t"><span class="meta">Repos</span><div>0:41</div></div>
+  </div>
+  <div class="up num">
+    <p class="meta">Exercice suivant · 2 / 7</p>
+    <p class="nx-name">Chest Press machine</p>
+    <p class="nx-meta">3 × 8–12 · dernière fois <span class="nw">47,5 × 11 · 10 · 10</span></p>
+    <p class="nx-guide">Consolider la charge actuelle · <span class="nw">47,5 kg · 8–12 reps</span></p>
+    <div class="swap"><span>Machine prise&nbsp;?</span><b>Remplacer ›</b></div>
+  </div>
+  <div class="cmd"><button class="trait">COMMENCER MAINTENANT<small>Chest Press machine</small></button></div>
+</div>
+<figcaption class="caption"><b>4 · EXECUTION / EXERCICE SUIVANT</b> — la dernière série ouvre un repos dont le sujet est l'exercice suivant, puis l'ouvre seul (amendement D5). Remplacer reste possible tant qu'aucune série de travail n'est faite (<code>can_substitute</code>).</figcaption>
+</figure>
+
+<!-- ═════════════ 5 · SESSION COMPLETE ═════════════ -->
+<figure>
+<div class="device" data-frame="session-complete">
+  <div class="statusbar"><span class="num">10:38</span><span>●●● ▮</span></div>
+  <div class="topline"><span class="meta">Séance terminée</span></div>
+  <div class="c-mark" aria-hidden="true">✓</div>
+  <h1 class="c-title">Push A</h1>
+  <p class="c-sub num">9:44 → 10:37 · 53 min réelles</p>
+  <div class="ledger num">
+    <div>Séries de travail<b>21 / 21</b></div>
+    <div>Substitutions<b>0</b></div>
+  </div>
+  <p class="zones num"><span class="meta">Séries par zone</span>Pectoraux 9 · Deltoïdes latéraux 6 · Deltoïdes postérieurs 3 · Triceps 3</p>
+  <div class="cmd">
+    <div class="secondary"><button>Ajouter un ressenti</button></div>
+    <button>FERMER</button>
+  </div>
+</div>
+<figcaption class="caption"><b>5 · SÉANCE TERMINÉE</b> — un relevé, pas un tableau de bord. Champs de <code>build_recap</code> uniquement, valeurs relevées sur une push-a complète au labo (durée réelle depuis les horodatages, <code>work_sets_done/total</code>, <code>substitution_count</code>, <code>zones_touched</code>). <code>top_progression</code> n'apparaît que s'il existe. Le détail rejoint FLIGHT_RECORDER.</figcaption>
+</figure>
+
+</div>
+</body>
+</html>

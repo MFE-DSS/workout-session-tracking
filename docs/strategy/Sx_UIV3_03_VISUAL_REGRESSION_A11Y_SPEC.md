@@ -4,6 +4,14 @@
 **Dépend de** `Sx_UIV3_00`, `Sx_UIV3_01`, `Sx_UIV3_02`.
 **Portée : UI/UX uniquement.** Outillage de vérification, aucun code applicatif.
 
+> ⚠ **AMENDEMENT 2026-10-23 — `§6bis`.** Autorité : `ADR_AUREN_VNEXT_01`
+> **ACCEPTED — C2** (D8). Les 13 états dorés, leurs baselines et les règles de mise
+> à jour du §6 **ne s'appliquent pas** au client mobile React Native ; ils
+> continuent de garder le legacy web. Le mobile est jugé sur **appareil réel** par
+> les portes de `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT §10`. `RETAINED_INVARIANT` : la
+> table d'accessibilité du §8 (cible ≥ 44, nom accessible, aucun état par la couleur
+> seule, contraste sur fond réel, mouvement réduit).
+
 ---
 
 ## 1. Pourquoi cette spec existe

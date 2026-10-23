@@ -299,6 +299,24 @@ CSS/SSR** : elle exige ActivityKit/WidgetKit et des vues SwiftUI. C'est une
 porte V4, et Capacitor y serait le premier candidat étudié — pas une réécriture
 React Native par réflexe.
 
+### 9bis. Amendement opérateur du 2026-10-23 — client mobile vNext
+
+**Autorité :** `ADR_AUREN_VNEXT_01` **ACCEPTED — C2** (D1, D4) ; instruction de la
+porte d'admission : `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT §6.4`.
+
+| Couche | Décision 2026-08-18 | Décision 2026-10-23 (client mobile) |
+|---|---|---|
+| React Native | ~~REJECT pour tout UIV3~~ | **ADOPT** — React Native + Expo + TypeScript, `clients/mobile/` |
+| Capacitor / coquille native | ~~FUTURE GATE V4~~ | **sans objet** — la voie native passe par C2 et des modules Swift/Kotlin ciblés |
+| FastAPI | KEEP | **KEEP** — seule autorité du domaine et de l'historique |
+| FastAPI + Jinja SSR, HTML/CSS natif, JS d'enrichissement, View Transitions, Popover, Anchor Positioning, HTMX `EVALUATE` | — | **inchangés pour le web legacy** |
+
+Ce n'était pas « une réécriture React Native par réflexe » : les quatre conditions
+de la porte ont été instruites par écrit (défaut mesuré, View Transitions
+insuffisant, no-JS sans objet pour un client natif, coût de retrait écrit). La
+porte « framework only after measured need » **reste en vigueur** pour le web, et
+**à l'intérieur** du client mobile pour toute dépendance nouvelle.
+
 ---
 
 ## 10. Glanceability budget

@@ -1,5 +1,7 @@
 # Sx_UI_02 — Design Tokens Spec
 
+> ⚠ **`LEGACY_VISUAL_REFERENCE` — 2026-10-23** (`ADR_AUREN_VNEXT_01` ACCEPTED — C2, D8). Tokens du web ; ne gouvernent pas le client mobile. La méthode RÔLE → TOKEN → VALEUR reste retenue.
+
 **Spec ID :** `Sx_UI_02_DESIGN_TOKENS_SPEC`
 **Cycle :** `Sx_UI` — Auren Visual & Product Transformation
 **Date d'ouverture :** 2026-07-02

@@ -3,6 +3,12 @@
 **Statut : `DOCUMENTED — NOT BUILT`** · versionné par
 `DESIGN_DECISIONS_HOME_UIV2_01` le 2026-08-18, base `c2a2a45`.
 
+> ⚠ **AMENDEMENT — portée vNext mobile, 2026-10-23.** Autorité :
+> `ADR_AUREN_VNEXT_01` **ACCEPTED — C2** (D8). Pour le client mobile seulement :
+> D3 (couleurs), D4 (retraits), D5 (direction « descriptif → visuel ») →
+> `LEGACY_VISUAL_REFERENCE`. **RETENUS et applicables au mobile** : **D2** (aucune
+> revendication « IA » — le moteur est zero-ML) et **D9** (pas d'anticipation).
+
 Décisions **validées par l'opérateur** pendant le brainstorm visuel.
 **Toute maquette et toute implémentation ultérieure doit les porter en entier.**
 Une maquette qui en omet une est fausse, même si le reste est juste.
