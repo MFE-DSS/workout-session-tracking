@@ -584,9 +584,13 @@ def test_a_mobile_session_is_a_normal_web_session(client):
 
 
 def test_no_mobile_route_renders_html(client):
-    from app.main import app
-
-    mobiles = [r for r in app.routes if getattr(r, "path", "").startswith(API)]
-    assert mobiles, "prémisse : l'API est montée"
-    for r in mobiles:
-        assert "HTMLResponse" not in repr(getattr(r, "response_class", ""))
+    """Par le contrat publié (OpenAPI de l'application SERVIE), pas par `app.routes` :
+    la structure interne des routes a varié entre la version locale de FastAPI et
+    celle du lock — la garde lisait une liste vide en CI (0.141), pleine en local."""
+    paths = client.app.openapi()["paths"]
+    mobiles = {p: ops for p, ops in paths.items() if p.startswith(API)}
+    assert len(mobiles) >= 10, f"prémisse : l'API est montée ({sorted(mobiles)})"
+    for path, ops in mobiles.items():
+        for method, op in ops.items():
+            for code, resp in op.get("responses", {}).items():
+                assert "text/html" not in resp.get("content", {}), f"{method.upper()} {path} {code}"

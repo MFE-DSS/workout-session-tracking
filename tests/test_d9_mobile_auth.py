@@ -385,7 +385,22 @@ def test_the_device_auth_module_writes_no_log():
 # ───────── la connexion mobile partage le quota de la connexion web ─────────
 
 
-def test_mobile_login_is_rate_limited(client):
-    import app.main as main_mod
+def test_mobile_login_is_rate_limited(client, monkeypatch):
+    """Par le comportement, pas par la table : la 4ᵉ tentative refusée rend 429."""
+    from app import main as main_mod
+    from app.config import get_settings
 
-    assert main_mod._RATE_LIMIT_ROUTES[("POST", f"{API}/auth/login")] == "login"
+    monkeypatch.setenv("RATE_LIMIT_LOGIN_MAX", "3")
+    monkeypatch.setenv("RATE_LIMIT_LOGIN_WINDOW_SECONDS", "60")
+    get_settings.cache_clear()
+    main_mod._rate_limit_reset_for_tests()
+    try:
+        for _ in range(3):
+            r = client.post(f"{API}/auth/login", json={"username": "x", "password": "wrong"})
+            assert r.status_code == 401
+        r = client.post(f"{API}/auth/login", json={"username": "x", "password": "wrong"})
+        assert r.status_code == 429
+        assert "Retry-After" in r.headers
+    finally:
+        get_settings.cache_clear()
+        main_mod._rate_limit_reset_for_tests()
