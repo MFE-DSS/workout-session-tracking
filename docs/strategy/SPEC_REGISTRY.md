@@ -241,11 +241,11 @@
 ## 1quindecies. Sx_SEC_A0_SESSION_TOKEN_INTEGRITY — piste sécurité indépendante (P0)
 
 **Spec :** `docs/strategy/Sx_SEC_A0_SESSION_TOKEN_INTEGRITY_SPEC.md`
-**Statut spec :** 🟡 `ACCEPTÉE — BUILD EN PR` (choix opérateur 2026-10-24 : §2.1 forme **E**, §2.2 **T1**, déploiement immédiat après merge). Ouverte par `ADR_AUREN_VNEXT_01` §7 A0 (2026-10-23). Bloque D9 (auth mobile).
+**Statut spec :** ✅ `CLOSED — MERGÉE ET DÉPLOYÉE` 2026-10-24 (choix opérateur : §2.1 forme **E**, §2.2 **T1**). PR #280, canonique et production `ff4239d` (CI canonique `40086199645` 7/7, déploiement `40087180522`, tag `deploy/prod/2026-10-24-1046-ff4239d`). Ouverte par `ADR_AUREN_VNEXT_01` §7 A0. **D9 (auth mobile) désormais ouvrable.**
 
 | Sprint | Domaine | Statut | Rapport | Notes |
 |---|---|---|---|---|
-| Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01 | Invariants I1–I9 du contrat de jeton web + tests de régression §3 ; une colonne additive | 🟡 EN PR | [`SPRINT_Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01_REPORT.md`](../SPRINT_Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01_REPORT.md) | tier `migration` ; spec et correctif dans la même PR |
+| Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01 | Invariants I1–I9 du contrat de jeton web + tests de régression §3 ; une colonne additive | ✅ MERGÉE + DÉPLOYÉE (`ff4239d`) | [`SPRINT_Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01_REPORT.md`](../SPRINT_Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01_REPORT.md) | tier `migration` ; spec et correctif dans la même PR |
 
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 

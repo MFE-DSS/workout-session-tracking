@@ -113,3 +113,22 @@ L'échec du sweep venait bien de l'arbre de travail non commité. Le fichier lit
 **Verdict :** `Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01` est construite et vérifiée en local
 (tier MIGRATION). Le statut final dépend de la CI réelle. Le déploiement suivra le merge sur
 choix opérateur, après confirmation de ce qu'il embarque.
+
+## 4. Closeout — MERGÉE ET DÉPLOYÉE (2026-10-24)
+
+| Élément | Valeur |
+|---|---|
+| PR | #280, merge commit (sans squash ni `--admin`), tête épinglée `c62d2d0` ; spec et correctif dans la même PR |
+| SHA canonique | `ff4239d` |
+| CI de PR | 10/10 verts au premier passage |
+| CI canonique (push sur `ff4239d`) | run `40086199645`, **7/7 succès** |
+| Porte Sonar de la PR | **OK** : couverture du nouveau code 97,1 %, 0 bug, 0 code smell, 0 vulnérabilité |
+| Déploiement production | run `40087180522` sur le SHA complet `ff4239d…`, après confirmation explicite de l'opérateur : poussée sur le VPS, smoke et tag **verts**. Tag `deploy/prod/2026-10-24-1046-ff4239d`. |
+| Contenu du déploiement | la production passe de `dfcd3bf` (2026-09-28) à `ff4239d`. Elle reçoit A0 et les merges #261 à #279 : TRAIN A environnement concret, D14, tranches SCI. Une seule migration est appliquée, `y6z1t7u8w19`. |
+| Effet visible | reconnexion forcée unique de chaque utilisateur (T1) ; « se déconnecter » ferme toutes les sessions web (forme E) |
+
+**D9 (authentification mobile) devient ouvrable** : c'était la condition posée par la spec A0 et
+par `ADR_AUREN_VNEXT_01`.
+
+**Verdict :** ✅ **MERGÉE + DÉPLOYÉE** — `Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01` CLOSED, canonique et
+production `ff4239d`, CI canonique 7/7, smoke de production vert.
