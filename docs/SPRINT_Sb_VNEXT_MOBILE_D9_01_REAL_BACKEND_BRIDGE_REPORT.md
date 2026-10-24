@@ -131,7 +131,8 @@ Aucune route HTML n'a changé ; aucune route de cette API ne rend de HTML (garde
 | Tests D9 backend | `test_d9_mobile_auth.py` + `test_d9_mobile_sessions.py` — **76 verts** |
 | Mutations (arbre jetable, `app` vérifié résolu dans cet arbre) | **16/16 détectées**. Premier passage 12/14 : les deux survivantes retiraient UNE de deux couches redondantes (condensat + `UPDATE` conditionnel ; usage + sel). Aucune faille, mais aucune garde ne tenait une couche seule : deux gardes ajoutées (usage lu sous le bon sel ; sel propre), mutation de réutilisation retirant les deux couches |
 | Client | `tsc` propre · **97 tests jest** (auth, outbox → routes, moteur de synchro, réconciliation, R16, labo) |
-| Sweep local complet (`run_local_sweep.sh`) | **369/369 fichiers, tous les lots verts**, aucun fichier sauté — lancé sur `5d6bfac` ; l'alignement D11 (`643c812`) est couvert par les 76 tests ciblés et les mutations |
+| Sweep local complet (`run_local_sweep.sh`) | **369/369 fichiers, tous les lots verts**, aucun fichier sauté — lancé sur le commit backend (`7e458b3`) ; l'alignement D11 (`8bab76d`) est couvert par les 76 tests ciblés et les mutations |
+| gitleaks | premier passage CI **rouge** : le mot de passe factice d'un test (`generic-api-key`, entropie 3,5) — pas un secret, mais la porte vaut pour tous. Corrigé à la convention du dépôt (`newpass123`) et **replié dans le commit d'origine** (branche non mergée réécrite, accord opérateur) : aucune exception ajoutée à la porte. Plage de la PR rescannée : 0 fuite |
 
 ## 6. Porte physique (§14) — iPhone 15 Plus, iOS 27.0.1, backend réel du Mac, compte dédié
 
@@ -178,7 +179,7 @@ client mobile est la spec vNext (`§0quater`, `§0quinquies`) :
 | D8 — mouvement réduit, haptique | **respectée**, inchangées |
 | D9 — accès court + rafraîchissement tournant révocable, coffre de l'appareil | **respectée** (écarts nommés `§8.10`) |
 | D10 — distribution (signature) | **non concernée** |
-| D11 — heure ancrée + bornes serveur | **respectée** (`§8.8bis`, aligné dans `643c812`) |
+| D11 — heure ancrée + bornes serveur | **respectée** (`§8.8bis`, aligné dans `8bab76d`) |
 | D12 — score de séance + récompense | **non concernée** (bilan inchangé) |
 | D13 — premier lancement / profil d'entrée | **non concernée** : l'app connectée part du compte existant ; l'accueil D13 reste dans le labo — **à reprendre** avec la refonte MISSION (R18–R20) |
 | D14 — récupération d'abord | **respectée** : la mission est celle du moteur servi, non recalculée |
