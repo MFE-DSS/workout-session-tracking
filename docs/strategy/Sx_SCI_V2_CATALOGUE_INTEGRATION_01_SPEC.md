@@ -2,7 +2,9 @@
 
 > **Statut :** SPEC **ACCEPTÉE** par l'opérateur (GO BUILD `Sb_SCI_V2_01`, 2026-10-23). Les
 > questions du §17 sont tranchées au §19. Aucune migration, aucune activation. · **Date :**
-> 2026-10-23 · **Version :** v2 (v1 + rulings du §19) ·
+> 2026-10-23 · **Version :** v3 (v1 + rulings du §19 + corrections déclarées de
+> `Sb_SCI_V2_02` : règle d'éligibilité §7.1, collisions et relevé des noms §6.2, exécution
+> incertaine §7.3) ·
 > **Dépend de :** `Sx_AUREN_SCIENTIFIC_ENGINE_V2_SPEC.md` (doctrine E0–E8, §4 bis) ·
 > **Code de référence :** `0c9e14b` (merge PR #272, recommandeur V3 servi, D14 en vigueur).
 
@@ -156,14 +158,37 @@ Résolution = {statut: RESOLVED | UNKNOWN_IDENTITY, étape: 1|2|3, entrée, vari
   l'historique.
 - **Concordance** : quand les étapes 2 et 3 résolvent toutes deux, elles doivent rendre la même
   fiche. Une garde le vérifie sur tout le corpus.
+- **Collision sous `normalize`** (v3) : deux noms EKB qui se normalisent à l'identique ne sont
+  admis que s'ils désignent la **même identité scientifique**. Ils se résolvent alors vers la fiche
+  canonique : c'est le cas, mesuré, de « Curl marteau câble (corde) » et « Curl marteau câble
+  corde ». Deux identités distinctes sous une même forme normalisée sont une erreur de donnée,
+  refusée au chargement.
+- **Relevé des noms** (v3) : la garde de renommage a besoin de se souvenir des noms passés, ce
+  qu'aucun index dérivé ne peut faire. `data/sci/legacy_name_ledger.json` relève, une fois pour
+  toutes, les noms EKB (canoniques et `_aliases`) sous lesquels chaque fiche a été curée. C'est un
+  **outil de test, jamais lu à l'exécution** : le résolveur reste dérivé de l'EKB (§15). La garde
+  exige que chaque nom relevé se résolve toujours vers sa fiche, et que tout nom EKB nouveau soit
+  ajouté au relevé.
 
 ## 7. Entrée au registre d'exposition
 
 ### 7.1 Ligne de registre (dérivée, recalculable, non persistée)
 
-Une ligne par **série de travail réalisée**. L'éligibilité est la même règle que celle de
-`set_contribution` aujourd'hui, citée à l'identique lors du build. Il y a une ligne par zone
-contributrice.
+Une ligne par **série de travail réalisée**, et par zone contributrice.
+
+**Correction déclarée (v3, `Sb_SCI_V2_02`).** La v1 attribuait la règle d'éligibilité à
+`set_contribution`. C'était faux : ce module ne compte que des séries **planifiées**
+(`planned_sets`) et n'a aucune règle pour les séries exécutées. La règle qui fait foi dans le
+dépôt est celle de l'exposition existante :
+- **série** : `kind == "work"` et `completed`, définition de `zone_exposure._work_sets`, « même
+  définition que `kpis.work_sets_done_30d` — le dépôt n'a besoin que d'une seule notion de série
+  faite » ;
+- **séance** : `status == "completed"`, `excluded_from_stats` faux, `started_at` dans
+  `[début, fin)`, borne de fin exclusive comme `muscle_scoring` et `weekly_loop`.
+
+L'horodatage d'une ligne est le `started_at` de la séance, comme dans les comptes existants. Le
+nom exécuté est `actual_exercise_name`. Une garde de parité épingle la règle contre
+`zone_exposure._work_sets`.
 
 ```
 { session_id, session_exercise_id, set_log_id, performed_at,
@@ -201,6 +226,10 @@ exposition(zone, fenêtre) = { crédit_résolu: Σ crédits des rôles résolus,
 - Une série `UNKNOWN_IDENTITY` rend **toutes** les zones `MINIMUM` sur la fenêtre, puisqu'on ne
   sait pas ce qu'elle a travaillé.
 - Les 28 vecteurs incomplets produisent ces bornes ; aucun n'est complété par défaut.
+- **Exécution incertaine** (v3, §19.5). Une série faite sur une fiche en
+  `CONTENT_EXECUTION_MISMATCH` est comptée normalement. Elle est aussi décomptée en
+  `séries_exécution_incertaine`. Une zone n'est une preuve **exacte** que si sa borne est `EXACT`
+  **et** si ce décompte est nul : c'est ce que lira `Sb_SCI_V2_04`.
 - Le registre SCI ne remplace **ni** `muscle_scoring` **ni** `set_contribution` pendant l'ombre.
   Il est calculé à côté.
 
