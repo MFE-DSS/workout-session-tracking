@@ -295,6 +295,10 @@ repos · stable     travail · ↑
 **Pas de flamme. Pas de streak. Pas de « 12 semaines consécutives ».**
 Une trajectoire, pas une mécanique de récompense.
 
+> **SUPERSEDED pour le vNext mobile** (opérateur, 2026-10-23) — **D12** de
+> `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT_SPEC` §0quinquies : score de séance assumé, complété par
+> une mécanique de récompense. Le web legacy garde cette règle jusqu'à sa bascule.
+
 #### Body Ledger — enfant de Progression, pas destination principale
 
 `/progress/body`, nom produit **« État des zones »**. La `ZoneTally` de

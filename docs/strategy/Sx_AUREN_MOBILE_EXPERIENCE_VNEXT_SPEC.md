@@ -172,6 +172,104 @@ lisible comme l'instruction qui les a précédées.
 
 ---
 
+## 0quinquies. Arbitrage opérateur du 2026-10-23, après le premier essai physique N0 — D12, D13
+
+Ces deux décisions viennent de l'opérateur, téléphone en main (rapport N0 §6bis). Elles
+**renversent** des décisions versionnées antérieures, listées ci-dessous : ce n'est pas un
+amendement silencieux.
+
+| # | Verdict opérateur | Contenu |
+|---|---|---|
+| **D12** | **ACCEPTED — SCORE ASSUMÉ, COMPLÉTÉ PAR UNE MÉCANIQUE DE RÉCOMPENSE** | les séries sont **scorées** ; un **score de séance** est affiché et **explique** ce qui a été fait — c'est l'exigence première (« que le score explique bien les choses ») ; il tient compte de ce qui a été **fait** et de ce qui a été **substitué** ; la **gamification complète le score** : mécanique de récompense assumée, agent **expressif** dans l'expérience (mouvement, haptique, voix du produit), objectif d'usage répété ; concret avant tout |
+| **D13** | **ACCEPTED — PARCOURS DE PREMIER LANCEMENT** | « Tu es sur le cockpit AUREN. Une seule chose à faire : choisir ta première séance » ; l'utilisateur choisit un **objectif** (les champs réels de la pratique) et une **famille** — haut du corps / bas du corps / corps entier — **jamais** un nom de gabarit (« Push A ») ; une séance est proposée depuis le catalogue existant, adaptée au matériel ; **un tutoriel court** avant de lancer (ce qui est à gauche, en bas, à droite) ; puis l'explication de ce qui suit : le moteur lit les séries et prépare la séance suivante, en rotation, pour une progression continue. C'est l'un des seuls moments où l'utilisateur choisit sa séance |
+
+**D14 (opérateur, même jour) — la séance suivante se choisit par la récupération ; le cardio
+est le plan B.** La plus logique est celle dont aucun muscle n'a été sollicité, puis celle où il
+en reste le moins à récupérer ; chaque muscle a son temps de récupération ; cardio + abdos ne
+vient que lorsque tous les autres groupes récupèrent. Mesure et règle :
+`Sx_REC_ROLLOUT_01_RECOVERY_FIRST_SPEC` — un seul critère en cause (« modalité délaissée »).
+**Requalifiée le même jour** après la revue scientifique : **règle produit provisoire** pour un
+objectif muscle / force, pas une règle scientifique générale ; elle sera remplacée par la
+répartition par objectif de `Sx_AUREN_SCIENTIFIC_ENGINE_V2_SPEC` (le cardio y est un stimulus de
+premier rang pour la remise en forme).
+
+**D13, précision du même jour** : la première séance se choisit **parmi les gabarits existants**
+du catalogue — présentés par les muscles qu'ils travaillent, pas par leur nom.
+
+**D13, amendement du même jour — le profil d'entrée.** Le récit d'accueil dit que l'utilisateur
+n'a qu'à faire ses séances : AUREN gère la suite, séance après séance, jusqu'à son plein
+potentiel. **Avant la première séance**, il renseigne son profil : taille, poids, âge, sexe,
+activité quotidienne et les autres mesures biologiques qu'il connaît facilement. Ces données
+entrent dans la chaîne (proposition de la première séance, charges de départ, lectures
+corporelles) et vivent ensuite dans son profil.
+
+État du domaine, relevé dans le code le 2026-10-23 :
+
+| Donnée | Existe ? | Déjà consommée par |
+|---|---|---|
+| taille, poids | ✅ `users.height_cm`, `users.weight_kg` (+ `body_measurements`) | morphologie, registre corporel, surcharge |
+| tour de taille, FC repos, tension | ✅ `users.waist_cm`, `resting_hr`, `bp_*` | lectures corporelles |
+| mensurations (bras, cuisse, épaules, envergure…) | ✅ `body_measurements` | morphologie |
+| âge | ❌ — `coach_report` prévoit `year_of_birth` (« column doesn't exist ») | personne ; `coach_inference` dit aujourd'hui à l'utilisateur « AUREN ne connaît ni ton âge ni ton état de santé » |
+| sexe | ❌ | personne |
+| activité quotidienne / professionnelle | ❌ | personne |
+| ancienneté d'entraînement | ❌ | personne |
+
+**Règles du profil d'entrée** (contrat, pas goût) :
+1. **Chaque champ demandé a un consommateur nommé** — une donnée qu'aucun calcul ne lit
+   n'est pas demandée. Un champ nouveau arrive **avec** le calcul qui le lit.
+2. **Chaque champ dit pourquoi il est demandé**, en une ligne, au moment où il l'est.
+3. **Tout est passable**, et l'utilisateur peut corriger ensuite. Un champ absent rend le
+   calcul qui en dépend **moins précis et le dit** ; il ne bloque jamais la première séance.
+4. Les champs nouveaux (âge, sexe, activité, ancienneté) sont une **migration additive** :
+   tranche métier, `CLAUDE.md §2`.
+
+**D12 — AMENDÉ le même jour par l'arbitrage scientifique (ruling 11 du moteur V2).** Le
+**score unique /100 est retiré**. La mécanique de récompense reste, sans note : trois concepts
+séparés — la trace de décision (interne, jamais une note pour l'utilisateur), la
+**performance** (chaque exercice contre l'historique personnel comparable : progrès, repères,
+records réels) et l'**assiduité** au programme convenu, repos prévu compris (semaines
+tenues). Aucune récompense pour des séances ou séries en plus, le tonnage ou un entraînement
+pendant un repos prévu. Le labo N0 applique cet amendement ; la liste ci-dessous reste vraie
+pour la part « gamification ».
+
+**Ce que D12 superséde, pour le vNext** (le web legacy garde son état jusqu'à sa bascule) :
+`AUREN_UI_BLUEPRINT` D7 (« Pas de flamme. Pas de streak. […] pas une mécanique de
+récompense ») · `Sx_27` (« Pas de gamification type badges/streaks ») · `Sx_UI_05`
+(« pas de badges/streaks gamifiés ») · `app/templates/session_done.html` (« AUCUN SCORE
+NUMÉRIQUE ICI ») · le non-goal « aucun **score global** » du §15 de cette spec.
+
+**Ce que D12 ne superséde PAS** : le **score de préparation** reste interdit (§11.6) — un
+score de séance mesure ce qui a été fait, un score de préparation prétendrait mesurer le
+corps. Aucune revendication d'activation musculaire.
+
+**Une raison du retrait d'origine est conservée, parce qu'elle était juste** : « Qualité 92 »
+et « Fiabilité 90 » cohabitaient sans que rien ne dise ce qu'ils décidaient. D'où, pour D12 :
+**un** score de séance, dont **chaque point se lit** (quel fait l'a produit) — jamais deux
+nombres concurrents sans explication.
+
+**Arbitrage des points ouverts (opérateur, 2026-10-23, même jour)** :
+
+| # | Verdict opérateur | Note de l'agent |
+|---|---|---|
+| O1 | **marketer AUREN comme une intelligence artificielle** — produit B2C, grand public, pratiquants de musculation en France | aujourd'hui l'allégation est **inexacte** : moteur déterministe, zéro ML ; risque d'allégation trompeuse auprès de consommateurs, et un système fondé sur des règles écrites par des humains est, sous réserve, hors de la définition de l'AI Act (considérant 12) — à faire valider. **Chemin qui la rend vraie** : tranche « agent IA », voix de l'agent (réactions, explications, compte-rendu) produite par un modèle de langage **ancré sur les faits du moteur** (`SPIGNOS_COACH_REPORT_LLM_NARRATIVE_SPEC_v2` existe) — à livrer **avant toute sortie publique**. Le labo N0, privé, emploie le mot dès maintenant |
+| O2 | **les deux** — régularité du programme en principal, série de jours en secondaire | la série de jours ne doit pas rompre sur un jour de repos **prévu** par le programme, sinon elle récompense l'entraînement pendant la récupération que le moteur protège ; **moteur V2** : la longueur de série est une récompense affichée, **jamais** un objectif d'optimisation du moteur |
+| — | **mécaniques de récompense retenues : toutes** — records personnels · niveaux / paliers · objectifs de semaine · réaction de l'agent | un record n'est annoncé que s'il dépasse le meilleur **enregistré** ; jamais un record inventé |
+| N0 | **`PROMISING — ITERATE N0`** | itération 1 : accueil + fin de séance scorée, sur fixtures |
+
+**Points ouverts — à trancher par l'opérateur avant la tranche concernée :**
+
+| # | Question | Pourquoi elle se pose | Proposition |
+|---|---|---|---|
+| O1 | Dire « l'IA » dans l'accueil ? | le moteur est déterministe, **zéro ML** (`DESIGN_DECISIONS_HOME_UIV2` D2, gardé par test) : « l'IA » serait **faux**, pas seulement déconseillé | « AUREN lit tes séries et prépare la suivante » — ce que le moteur fait réellement |
+| O2 | Récompenser la régularité par jours consécutifs ? | une série de jours consécutifs récompense l'entraînement **pendant** la récupération que le moteur protège | régularité comptée **sur le programme** (séances prévues tenues), jamais pénalisée par un jour de repos prévu |
+| O3 | Un score juste après substitution | `compute_success_score` juge contre la cible de l'exercice **prescrit** ; deux specs se contredisent (`SPIGNOS_EXERCISE_SUBSTITUTION_GRAPH_SPEC_FINAL` §9.7 / `SPIGNOS_EXERCISE_SYSTEM_CONSOLIDATION_SPEC` §5.3) | score calculé sur l'exercice **réellement fait** — tranche métier, spec + tests |
+| O4 | Taxonomie des objectifs | dépend de ce que le domaine porte déjà (inventaire en cours) | réutiliser les objectifs existants avant d'en créer |
+| O5 | Quelles mesures biologiques demander | le meilleur prédicteur de la charge de départ et du rythme de progression est l'**ancienneté d'entraînement**, que l'opérateur n'a pas citée ; l'activité professionnelle prédit peu | taille · poids · année de naissance · sexe (avec « je préfère ne pas répondre ») · **ancienneté d'entraînement** · activité quotidienne en trois niveaux ; tour de taille et FC repos en option, déjà stockés |
+| O6 | Consentement | âge, sexe, poids, tension sont des données personnelles, certaines relèvent de la santé | consentement explicite à l'accueil, finalité dite champ par champ, effacement possible ; à valider avant la tranche qui stocke les champs nouveaux |
+
+---
+
 ## 1. Diagnostic de l'état actuel
 
 ### 1.1 Ce que le produit est, mesuré
@@ -1133,6 +1231,36 @@ Ordre recommandé **après** le lab : (1) PWA + Wake Lock, (2) Capacitor + hapti
 notification locale, (3) Live Activity. Chaque étape est un **amendement** de
 `Sx_UIV3_00A §9` (« Capacitor = FUTURE GATE V4 »), pas une implicite.
 
+## 12bis. Portabilité iOS — préparation de la distribution *(notes, 2026-10-24)*
+
+**Finalité produit (opérateur, 2026-10-24).** AUREN est une **application mobile que les gens
+téléchargent pour faire leur séance**. Le site web n'est qu'un relais, pour la continuité
+d'usage. Le dogfooding passe par l'app : elle est construite et servie depuis le Mac (Metro,
+build de développement), puis utilisée sur l'iPhone.
+
+**État mesuré du labo** (`clients/mobile`, non commité) :
+- Expo SDK 58, React Native 0.88, build de développement (`expo-dev-client`) ;
+- bundle `dev.auren.vnext.lab`, nom « AUREN Lab », portrait, iPhone seul (`supportsTablet: false`) ;
+- signature par une **équipe Apple personnelle gratuite**, lue dans l'environnement au build ;
+  aucun identifiant personnel n'est versionné ;
+- notifications **locales** seulement (`enableRemoteNotifications: false`) ;
+- données de démonstration : **aucune** connexion au backend.
+
+| Sujet | Ce qu'il faut préparer | Quand |
+|---|---|---|
+| **Expiration de la signature** | un profil de signature d'équipe personnelle expire au bout de **7 jours** : le build installé le 2026-10-23 cessera de s'ouvrir vers le **2026-10-30**. Le réinstaller depuis le Mac le relance pour 7 jours. Le seul remède durable est l'Apple Developer Program. | avant chaque session de dogfooding, tant qu'il n'y a pas de compte payant |
+| **Compte Apple Developer Program** (payant, annuel) | requis pour TestFlight, l'App Store et les notifications distantes | **D10**, à décider avant toute distribution hors de l'iPhone de l'opérateur |
+| **Identité de l'app** | bundle et nom de production, distincts du labo (`dev.auren.vnext.lab` reste le labo), icône, écran de lancement, numérotation de version et de build | tranche de distribution |
+| **Chaîne de build** | archive Xcode locale, ou service de build et de soumission cloud ; App Store Connect ; **TestFlight** (testeurs internes sans revue, testeurs externes après revue bêta) ; puis revue App Store | **L3 / D10** |
+| **Connexion au backend** | **D9**, ouvrable depuis le déploiement d'A0 (2026-10-24, `ff4239d`) : sessions d'appareil, jeton dans le Keychain (SecureStore), lecture de mission et d'exécution (§8.1–8.3), outbox rejouée (§8.7) | D9, puis L1 |
+| **Exigences App Store à anticiper** | **manifeste de confidentialité** de l'app et étiquette « confidentialité » d'App Store Connect (taille, poids, âge, sexe, séances : catégories santé et forme) ; **suppression du compte depuis l'app**, obligatoire dès qu'on peut créer un compte ; pas d'allégation médicale ni de « score de préparation » (règle produit déjà en vigueur) ; classification d'âge | avant la première soumission TestFlight externe |
+| **Notifications distantes** | désactivées aujourd'hui, compatibles avec l'équipe gratuite. Les activer exige le compte payant, une clé APNs et une décision de produit. | après D10 |
+| **Android** | même base de code (`dev.auren.vnext.lab` déclaré). Ni build ni dogfooding pour l'instant. | après iOS |
+
+**Les points à vérifier au moment de la tranche de distribution** sont dans ce tableau. Les règles
+de l'App Store, les noms de modules et les durées sont ceux connus au 2026-10-24. Ils sont à
+reconfirmer, version épinglée, à l'ouverture de cette tranche.
+
 ---
 
 ## 13. Migration étrangleuse
@@ -1197,7 +1325,8 @@ notification locale, (3) Live Activity. Chaque étape est un **amendement** de
   `console_state`, `overload_*`, `environment_*`, `session_builder`).
 - Aucun **chatbot** comme interface primaire ; l'explication est à la demande.
 - Aucune **prescription de repos** inventée ; aucune **durée** de séance estimée ;
-  aucun **score global** ; aucune revendication d'activation musculaire.
+  ~~aucun **score global**~~ (superséde par **D12**, §0quinquies) ; aucune revendication
+  d'activation musculaire.
 - ~~r1 : React Native hors tranche~~ → r2 : **aucun projet Expo / React Native
   créé dans cette mission** ; aucun Expo en production ; aucun écran natif construit.
 - **Aucun jeton d'authentification ajouté**, aucune route modifiée, aucune

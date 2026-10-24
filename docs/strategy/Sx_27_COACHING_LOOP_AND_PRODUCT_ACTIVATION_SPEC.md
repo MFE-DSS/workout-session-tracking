@@ -116,6 +116,8 @@ Sx_27 doit explicitement **réutiliser** (et pas ré-implémenter) :
 - ❌ Pas de **modification du scoring** core (`quality_score`, `implicit_signal`, `recommendation`). On consomme, on ne ré-arbitre pas.
 - ❌ Pas de **modification du flow auth**, du rate limiter, des observability/security/perf gates Sx_26.
 - ❌ Pas de **gamification** type badges/streaks dans Sx_27 — option ultérieure si dogfood le réclame.
+  > **Le dogfood l'a réclamée** (2026-10-23) : **D12** de
+  > `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT_SPEC` §0quinquies, portée vNext mobile.
 - ❌ Pas de **notifications push / email actives** — l'utilisateur ouvre l'app, pas l'inverse.
 - ❌ Pas de **partage social** au-delà des squads existants (Sx_22).
 - ❌ Pas de **suppression** de surfaces existantes (history, leaderboard, science) — elles restent accessibles mais ne sont plus le point d'entrée.

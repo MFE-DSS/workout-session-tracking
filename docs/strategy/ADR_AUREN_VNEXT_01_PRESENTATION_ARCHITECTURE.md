@@ -177,3 +177,20 @@ hors-ligne » → **chemin nominal d'une séance déjà matérialisée** hors-li
 
 *(Avant l'arbitrage, ce tableau portait la colonne « Recommandé » et des cases à
 cocher ; il est conservé dans l'historique git de ce fichier.)*
+
+## 8. Décisions produit portées par le vNext — 2026-10-23, après le premier essai physique
+
+L'architecture C2 ne change pas. Ces deux décisions fixent **ce que** le client mobile
+doit rendre, et renversent des décisions produit antérieures. Détail, état du domaine et
+points ouverts : spec `§0quinquies`.
+
+| # | Décision | Verdict opérateur |
+|---|---|---|
+| **D12** | score de séance et gamification | **ACCEPTED** — séries scorées ; **un** score de séance qui explique ce qui a été fait et substitué ; mécanique de récompense assumée, agent expressif. Superséde pour le vNext `AUREN_UI_BLUEPRINT` D7, `Sx_27`, `Sx_UI_05`, le « aucun score » de `session_done.html`. Le score de préparation reste interdit. **Amendé le même jour (moteur V2, ruling 11)** : plus de score unique /100 — performance par exercice, assiduité au programme et trace de décision restent séparées |
+| **D13** | parcours de premier lancement | **ACCEPTED** — objectif + famille (haut / bas / corps entier, jamais un nom de gabarit) → séance proposée depuis le catalogue, adaptée au matériel → **profil d'entrée** (taille, poids, âge, sexe, activité, mesures connues ; chaque champ a un consommateur et dit pourquoi il est demandé ; tout est passable) → tutoriel court → séance ; puis le récit de la suite : le moteur prépare les séances suivantes, en rotation |
+
+**Conséquences pour l'architecture :** D12 et D13 exigent des **tranches métier** côté
+FastAPI (score calculé sur l'exercice réellement fait ; proposition d'une première séance
+sans historique ; charges de départ ; colonnes de profil nouvelles par **migration
+additive**). Le client mobile les **rend**, il ne les calcule pas : D3 et la règle « le
+domaine reste au serveur » tiennent.
