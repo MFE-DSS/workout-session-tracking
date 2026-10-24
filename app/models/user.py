@@ -29,6 +29,11 @@ class User(Base):
     # Email (optional, for password reset)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True, unique=True)
 
+    # A0 — époque de session. Chaque jeton porte l'époque de son émission ; l'incrémenter
+    # révoque côté serveur tous les jetons déjà émis (mot de passe changé ou réinitialisé,
+    # déconnexion). Voir `Sx_SEC_A0_SESSION_TOKEN_INTEGRITY` I4–I7.
+    session_epoch: Mapped[int] = mapped_column(Integer, nullable=False, default=0, server_default="0")
+
     # Physical profile (optional, decoupled from session flow)
     height_cm: Mapped[int | None] = mapped_column(Integer, nullable=True)
     weight_kg: Mapped[float | None] = mapped_column(Float, nullable=True)

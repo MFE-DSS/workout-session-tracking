@@ -385,7 +385,12 @@ def test_alembic_head_unchanged():
     # sélectorisées distinctes, chacune avec sa colonne de charge, et la
     # poulie double réglable est encore un autre produit. `NULL` signifie
     # donc « environnement concret non résolu », et un environnement non
-    # résolu rend `UNKNOWN`, jamais un refus).
+    # résolu rend `UNKNOWN`, jamais un refus),
+    # puis A0 (`y6z1t7u8w19` : UNE colonne additive NON nulle de défaut 0,
+    # `session_epoch` sur `users`. Le défaut n'est pas un backfill : il ne dit
+    # rien du passé, puisque la transition T1 refuse de toute façon tout jeton
+    # émis avant ce contrat. L'époque est l'état serveur qui rend révocables
+    # des jetons déjà émis).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -394,4 +399,4 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "x5y0s6t7v18"
+    assert script.get_current_head() == "y6z1t7u8w19"
