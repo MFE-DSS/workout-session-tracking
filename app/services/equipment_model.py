@@ -219,8 +219,65 @@ def requirements_for_exercise(name: str) -> tuple[str, ...] | None:
 # ---------------------------------------------------------------------------
 
 
+@dataclass(frozen=True)
+class AnyOf:
+    """Groupe d'alternatives (`Sb_SCI_V2_03`, grammaire V1 de `Sx_SCI_V2_CATALOGUE_INTEGRATION_01`).
+
+    Satisfait si **au moins une** capacité de `options` est établie. Au moins deux options,
+    toutes **atomiques** : un groupe ne contient jamais un groupe. La grammaire reste une
+    conjonction de membres, chaque membre étant une capacité ou un groupe — aucun arbre booléen.
+
+    Seul le catalogue scientifique en porte. Aucune entrée de l'EKB n'en a, une garde le
+    vérifie : le chemin servi ne voit que des capacités atomiques.
+    """
+
+    options: frozenset[str]
+
+    def __post_init__(self) -> None:
+        if len(self.options) < 2 or not all(isinstance(o, str) and o for o in self.options):
+            raise EquipmentModelError(
+                f"any_of exige au moins deux capacités atomiques : {sorted(map(str, self.options))}")
+
+    def label(self) -> str:
+        return "any_of(" + "|".join(sorted(self.options)) + ")"
+
+
+Requirement = str | AnyOf
+
+
+def parse_requirements(raw) -> tuple[Requirement, ...]:
+    """Exigence du catalogue scientifique (JSON) → membres. Stricte : hors grammaire, elle lève."""
+    members: list[Requirement] = []
+    for member in raw:
+        if isinstance(member, str):
+            members.append(member)
+        elif isinstance(member, dict) and set(member) == {"any_of"} and isinstance(member["any_of"], list) \
+                and all(isinstance(o, str) for o in member["any_of"]):
+            members.append(AnyOf(frozenset(member["any_of"])))
+        else:
+            raise EquipmentModelError(f"membre d'exigence hors grammaire : {member!r}")
+    return tuple(members)
+
+
+def _member_verdict(member: Requirement, derived: frozenset[str], vocabulary) -> str:
+    """Un membre : possédé, manquant, ou indécidable faute de vocabulaire servi."""
+    if isinstance(member, AnyOf):
+        if member.options & derived:
+            return FEASIBLE
+        return UNKNOWN if member.options - set(vocabulary) else NOT_FEASIBLE
+    if member not in vocabulary:
+        return UNKNOWN
+    return FEASIBLE if member in derived else NOT_FEASIBLE
+
+
+def _member_verdicts(requirements, declared_items) -> list[tuple[Requirement, str]]:
+    derived = capabilities_for_items(declared_items)
+    vocabulary = capability_vocabulary()
+    return [(m, _member_verdict(m, derived, vocabulary)) for m in requirements]
+
+
 def feasibility(
-    requirements: tuple[str, ...] | None,
+    requirements: tuple[Requirement, ...] | None,
     declared_items: tuple[str, ...] | None,
 ) -> str:
     """`FEASIBLE` · `NOT_FEASIBLE` · `UNKNOWN`.
@@ -243,20 +300,27 @@ def feasibility(
         return FEASIBLE
     if declared_items is None:
         return UNKNOWN
-    derived = capabilities_for_items(declared_items)
-    return FEASIBLE if set(requirements) <= derived else NOT_FEASIBLE
+    # `Sb_SCI_V2_03` — composition membre à membre. Un membre CONNU et manquant refuse ; à défaut,
+    # un membre indécidable (capacité absente du vocabulaire servi) laisse `UNKNOWN`. Pour une
+    # exigence de l'EKB, toute atomique et toute connue, c'est exactement l'inclusion d'avant.
+    verdicts = {v for _, v in _member_verdicts(requirements, declared_items)}
+    if NOT_FEASIBLE in verdicts:
+        return NOT_FEASIBLE
+    return UNKNOWN if UNKNOWN in verdicts else FEASIBLE
 
 
 def missing_capabilities(
-    requirements: tuple[str, ...] | None,
+    requirements: tuple[Requirement, ...] | None,
     declared_items: tuple[str, ...] | None,
 ) -> tuple[str, ...]:
     """Ce qui manque, pour expliquer un refus. Vide si le verdict n'est pas
-    `NOT_FEASIBLE` — on n'énumère pas un manque qu'on n'a pas constaté."""
+    `NOT_FEASIBLE` — on n'énumère pas un manque qu'on n'a pas constaté.
+
+    Un groupe non satisfait se nomme `any_of(a|b)` : une seule de ses options suffirait."""
     if feasibility(requirements, declared_items) != NOT_FEASIBLE:
         return ()
-    derived = capabilities_for_items(declared_items or ())
-    return tuple(sorted(set(requirements or ()) - derived))
+    return tuple(sorted(m.label() if isinstance(m, AnyOf) else m
+                        for m, v in _member_verdicts(requirements, declared_items or ()) if v == NOT_FEASIBLE))
 
 
 def declared_aliases() -> dict[str, str]:
@@ -269,6 +333,7 @@ __all__ = [
     "FEASIBLE",
     "NOT_FEASIBLE",
     "UNKNOWN",
+    "AnyOf",
     "EquipmentItem",
     "EquipmentModelError",
     "capabilities_for_items",
@@ -280,5 +345,6 @@ __all__ = [
     "equipment_items",
     "feasibility",
     "missing_capabilities",
+    "parse_requirements",
     "requirements_for_exercise",
 ]
