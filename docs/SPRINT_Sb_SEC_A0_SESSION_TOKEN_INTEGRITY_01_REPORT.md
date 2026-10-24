@@ -106,6 +106,10 @@ ajoutée, et elle mord.
 
 ### 3.5 Après commit
 
-_(rempli après le commit)_
+`tests/test_worked_area_descriptor.py`, rejoué après le commit `063846a` : **14/14 passés**.
+L'échec du sweep venait bien de l'arbre de travail non commité. Le fichier lit
+`git diff --name-only HEAD`, qui est vide après le commit comme sur le checkout propre de la CI.
 
-**Verdict :** _(à la fin de la tranche)_
+**Verdict :** `Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01` est construite et vérifiée en local
+(tier MIGRATION). Le statut final dépend de la CI réelle. Le déploiement suivra le merge sur
+choix opérateur, après confirmation de ce qu'il embarque.
