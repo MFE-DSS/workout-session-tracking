@@ -17,15 +17,16 @@ OAuth, no external provider — just a simple server-side session
 cookie for an SSR app.
 
 Cookie name: `session_token`
-Cookie content: itsdangerous-signed JSON `{"user_id": <int>}`
-Cookie flags: httponly, samesite=lax, secure in production
+Cookie content: itsdangerous-signed JSON `{"purpose": "session", "user_id": <int>, "epoch": <int>}`
+under a per-purpose salt (Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01)
+Cookie flags: httponly, samesite=strict, secure in production
 """
 from __future__ import annotations
 
 from typing import Optional
 
 import bcrypt
-from itsdangerous import BadSignature, URLSafeTimedSerializer
+from itsdangerous import BadData, URLSafeTimedSerializer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from starlette.requests import Request
@@ -82,13 +83,60 @@ def verify_password(plain: str, hashed: str) -> bool:
     return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
 
 
-def _serializer() -> URLSafeTimedSerializer:
-    return URLSafeTimedSerializer(get_settings().app_secret_key)
+# ---------------------------------------------------------------------------
+# Jetons typés (Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01, invariants I1–I9)
+# ---------------------------------------------------------------------------
+#
+# Un jeton porte un USAGE, et cet usage est tenu deux fois : par un SEL DE SIGNATURE propre à
+# l'usage — un jeton d'un usage ne se vérifie même pas sous l'autre — et par un champ `purpose`
+# relu. Il porte aussi l'ÉPOQUE de l'utilisateur à son émission : `users.session_epoch`,
+# incrémentée au changement et à la réinitialisation du mot de passe et à la déconnexion, révoque
+# côté serveur tout jeton déjà émis (forme E de la spec). Les sels sont neufs : tout jeton signé
+# avant ce contrat ne se vérifie plus, et chacun se reconnecte une fois (transition T1).
+
+PURPOSE_SESSION = "session"
+PURPOSE_RESET = "reset"
+SESSION_SALT = "auren.auth.session.v2"
+RESET_SALT = "auren.auth.reset.v2"
+_SALTS = {PURPOSE_SESSION: SESSION_SALT, PURPOSE_RESET: RESET_SALT}
 
 
-def create_session_cookie(response: Response, user_id: int) -> None:
-    """Sign user_id into a cookie and set it on the response."""
-    token = _serializer().dumps({"user_id": user_id})
+def _serializer(purpose: str = PURPOSE_SESSION) -> URLSafeTimedSerializer:
+    return URLSafeTimedSerializer(get_settings().app_secret_key, salt=_SALTS[purpose])
+
+
+def _sign(purpose: str, user_id: int, epoch: int) -> str:
+    return _serializer(purpose).dumps({"purpose": purpose, "user_id": user_id, "epoch": epoch})
+
+
+def _read(token: str, purpose: str, max_age: int) -> tuple[int, int] | None:
+    """(user_id, époque) d'un jeton de CET usage, ou None. Horloge serveur seule (I9)."""
+    try:
+        payload = _serializer(purpose).loads(token, max_age=max_age)
+    except BadData:  # signature, expiration, charge illisible : toutes refusent
+        return None
+    if not isinstance(payload, dict) or payload.get("purpose") != purpose:
+        return None
+    user_id, epoch = payload.get("user_id"), payload.get("epoch")
+    if not isinstance(user_id, int) or isinstance(user_id, bool):
+        return None
+    if not isinstance(epoch, int) or isinstance(epoch, bool):
+        return None
+    return user_id, epoch
+
+
+def revoke_sessions(user: User) -> None:
+    """Rend invalides tous les jetons déjà émis pour cet utilisateur. L'appelant commite."""
+    user.session_epoch = (user.session_epoch or 0) + 1
+
+
+def create_session_cookie(response: Response, user_id: int, session_epoch: int = 0) -> None:
+    """Signe une session (usage + époque) dans le cookie.
+
+    `session_epoch` doit être l'époque COURANTE de l'utilisateur. Le défaut 0 échoue fermé : un
+    appelant qui l'oublierait émettrait un jeton refusé dès la première révocation.
+    """
+    token = _sign(PURPOSE_SESSION, user_id, session_epoch)
     settings = get_settings()
     is_prod = settings.app_env == "production"
     response.set_cookie(
@@ -106,47 +154,76 @@ def clear_session_cookie(response: Response) -> None:
     response.delete_cookie(key=SESSION_COOKIE, path="/")
 
 
-def get_user_id_from_cookie(request: Request) -> Optional[int]:
-    """Read and validate the session cookie. Returns the user_id
-    or None if the cookie is missing / expired / tampered."""
+def _session_claim(request: Request) -> tuple[int, int] | None:
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
-    try:
-        payload = _serializer().loads(token, max_age=SESSION_MAX_AGE)
-        return payload.get("user_id")
-    except (BadSignature, Exception):
-        return None
+    return _read(token, PURPOSE_SESSION, SESSION_MAX_AGE)
+
+
+def get_user_id_from_cookie(request: Request) -> Optional[int]:
+    """L'identifiant porté par un cookie de session bien formé, ou None.
+
+    Ne DÉCIDE pas l'authentification : l'époque n'y est pas confrontée à la base. Le seul
+    lecteur qui fait autorité est :func:`get_current_user`.
+    """
+    claim = _session_claim(request)
+    return None if claim is None else claim[0]
 
 
 def get_current_user(request: Request, db: Session) -> Optional[User]:
-    """Full user lookup from the cookie. Returns the User object
-    or None. Used by the auth dependency."""
-    user_id = get_user_id_from_cookie(request)
-    if user_id is None:
+    """L'utilisateur authentifié, ou None. Seul lecteur qui fait autorité (via `deps`).
+
+    Exige un jeton de SESSION valide, un compte actif (I8) et l'époque courante du compte :
+    un jeton émis avant une révocation est refusé (I4–I7).
+    """
+    claim = _session_claim(request)
+    if claim is None:
         return None
+    user_id, epoch = claim
     user = db.execute(
         select(User).where(User.id == user_id, User.is_active.is_(True))
     ).scalar_one_or_none()
+    if user is None or (user.session_epoch or 0) != epoch:
+        return None
     return user
 
 
 RESET_TOKEN_MAX_AGE = 3600  # 1 hour
 
 
-def create_reset_token(user_id: int) -> str:
-    """Create a signed, time-limited token for password reset."""
-    return _serializer().dumps({"user_id": user_id, "purpose": "reset"})
+def create_reset_token(user_id: int, session_epoch: int = 0) -> str:
+    """Lien de réinitialisation : usage `reset`, époque courante de l'utilisateur.
+
+    L'époque le rend à usage unique : la réinitialisation l'incrémente, le lien ne se résout plus.
+    """
+    return _sign(PURPOSE_RESET, user_id, session_epoch)
 
 
 def verify_reset_token(token: str, max_age: int = RESET_TOKEN_MAX_AGE) -> int | None:
-    """Verify a reset token. Returns user_id if valid, None otherwise."""
+    """L'identifiant d'un jeton de RÉINITIALISATION bien formé, ou None.
+
+    Ne vérifie pas l'usage unique : les routes passent par :func:`resolve_reset_user`.
+    """
     if max_age <= 0:
         return None
-    try:
-        payload = _serializer().loads(token, max_age=max_age)
-        if payload.get("purpose") != "reset":
-            return None
-        return payload.get("user_id")
-    except (BadSignature, Exception):
+    claim = _read(token, PURPOSE_RESET, max_age)
+    return None if claim is None else claim[0]
+
+
+def resolve_reset_user(db: Session, token: str, max_age: int = RESET_TOKEN_MAX_AGE) -> User | None:
+    """L'utilisateur que ce lien autorise à réinitialiser, ou None (I3, I6).
+
+    Refuse un jeton d'un autre usage, un lien expiré, et un lien déjà utilisé : son époque n'est
+    plus celle du compte.
+    """
+    if max_age <= 0:
         return None
+    claim = _read(token, PURPOSE_RESET, max_age)
+    if claim is None:
+        return None
+    user_id, epoch = claim
+    user = db.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
+    if user is None or (user.session_epoch or 0) != epoch:
+        return None
+    return user

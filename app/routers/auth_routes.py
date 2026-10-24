@@ -21,8 +21,9 @@ from app.services.auth import (
     create_session_cookie,
     get_current_user,
     hash_password,
+    resolve_reset_user,
+    revoke_sessions,
     verify_password,
-    verify_reset_token,
 )
 from app.services.email import send_email
 from app.services.password_policy import (
@@ -135,12 +136,18 @@ async def login_submit(
         )
 
     response = RedirectResponse(url="/", status_code=303)
-    create_session_cookie(response, user.id)
+    create_session_cookie(response, user.id, user.session_epoch)
     return response
 
 
 @router.post("/logout")
-def logout(request: Request) -> RedirectResponse:
+def logout(request: Request, db: DbSession) -> RedirectResponse:
+    """A0 I7 — la déconnexion révoque côté serveur. Forme E : toutes les sessions web de
+    l'utilisateur sont fermées ; supprimer le cookie du navigateur ne suffirait pas."""
+    user = get_current_user(request, db)
+    if user is not None:
+        revoke_sessions(user)
+        db.commit()
     response = RedirectResponse(url="/welcome", status_code=303)
     clear_session_cookie(response)
     return response
@@ -171,7 +178,7 @@ async def forgot_password_submit(
             select(User).where(User.email == email_clean)
         ).scalar_one_or_none()
         if user is not None:
-            token = create_reset_token(user.id)
+            token = create_reset_token(user.id, user.session_epoch)
             settings = get_settings()
             reset_url = f"{settings.app_base_url}/reset/{token}"
             send_email(
@@ -194,14 +201,14 @@ async def forgot_password_submit(
 
 
 @router.get("/reset/{token}", response_class=HTMLResponse)
-def reset_password_page(token: str, request: Request) -> HTMLResponse:
-    user_id = verify_reset_token(token)
+def reset_password_page(token: str, request: Request, db: DbSession) -> HTMLResponse:
+    user = resolve_reset_user(db, token)
     return templates.TemplateResponse(
         request, "reset_password.html",
         {
             "page_title": "R\u00e9initialiser le mot de passe",
             "token": token,
-            "valid": user_id is not None,
+            "valid": user is not None,
             "error": None,
         },
     )
@@ -215,8 +222,9 @@ async def reset_password_submit(
     new_password_confirm: Annotated[str, Form()],
     db: DbSession,
 ):
-    user_id = verify_reset_token(token)
-    if user_id is None:
+    # A0 I3 / I6 — un jeton d'un autre usage, expiré ou déjà utilisé ne se résout pas.
+    user = resolve_reset_user(db, token)
+    if user is None:
         return templates.TemplateResponse(
             request, "reset_password.html",
             {
@@ -241,19 +249,9 @@ async def reset_password_submit(
             status_code=400,
         )
 
-    user = db.execute(select(User).where(User.id == user_id)).scalar_one_or_none()
-    if user is None:
-        return templates.TemplateResponse(
-            request, "reset_password.html",
-            {
-                "page_title": "R\u00e9initialiser le mot de passe",
-                "token": token, "valid": False,
-                "error": "Utilisateur introuvable.",
-            },
-            status_code=400,
-        )
-
     user.password_hash = hash_password(new_password)
+    # A0 I6 \u2014 toutes les sessions ant\u00e9rieures sont r\u00e9voqu\u00e9es, et le lien utilis\u00e9 ne se r\u00e9sout plus.
+    revoke_sessions(user)
     db.commit()
     return RedirectResponse(url="/login?success=password_reset", status_code=303)
 
@@ -336,7 +334,7 @@ async def register_submit(
 
     # Auto-login after registration.
     response = RedirectResponse(url="/", status_code=303)
-    create_session_cookie(response, user.id)
+    create_session_cookie(response, user.id, user.session_epoch)
     return response
 
 
@@ -821,12 +819,17 @@ async def password_change_submit(
         )
 
     user.password_hash = hash_password(new_password)
+    # A0 I5 — toute session émise avant est révoquée ; celle de l'utilisateur qui vient de
+    # changer son mot de passe est ré-émise à la nouvelle époque.
+    revoke_sessions(user)
     db.commit()
 
-    return templates.TemplateResponse(
+    response = templates.TemplateResponse(
         request, "password_change.html",
         {"page_title": "Changer le mot de passe", "error": None, "success": True},
     )
+    create_session_cookie(response, user.id, user.session_epoch)
+    return response
 
 
 # ---------------------------------------------------------------------------
