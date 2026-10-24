@@ -147,3 +147,23 @@ Rien n'est servi, aucun module du produit n'appelle la couche. `muscle_scoring`,
 
 **Verdict :** `Sb_SCI_V2_02` est construite et vérifiée en local. Le statut final dépend de la CI
 réelle.
+
+## 4. Closeout — MERGÉE (2026-10-24)
+
+| Élément | Valeur |
+|---|---|
+| PR | #276, merge commit (sans squash ni `--admin`), tête épinglée `804b0cd` |
+| SHA canonique | `28d21f6` |
+| CI de PR | 10/10 verts au premier passage |
+| CI canonique (push sur `28d21f6`) | run `40076812752`, **7/7 succès** |
+| Porte Sonar de la PR | **OK** : couverture du nouveau code 97,6 %, 0 bug, 0 code smell, 0 vulnérabilité, 0,0 % de duplication |
+| Autorisation | STANDING GO MERGE (opérateur, 2026-10-23), sur GO BUILD « continue » |
+
+Aucun incident en CI. Le pré-scan Sonar avant push a écarté les règles qui avaient rougi
+`Sb_SCI_V2_01` (S5778, S5806, S9073, S5863).
+
+**Suite** (spec §12) : `Sb_SCI_V2_03` applique le delta TRAIN A, ajoute `any_of` dans
+`equipment_model` et rend déclarables les nouveaux objets. C'est une tranche **UI** : le rendu
+doit être exposé à l'opérateur avant tout commit (CLAUDE.md §5.1).
+
+**Verdict :** ✅ **MERGÉE** — `Sb_SCI_V2_02` CLOSED, canonique `28d21f6`, CI canonique 7/7.
