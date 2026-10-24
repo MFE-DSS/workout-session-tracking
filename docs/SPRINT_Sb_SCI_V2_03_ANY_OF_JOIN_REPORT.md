@@ -114,3 +114,20 @@ intacts.
 
 **Verdict :** `Sb_SCI_V2_03` (v4, backend seul) est construite et vérifiée en local. Le statut
 final dépend de la CI réelle.
+
+## 4. Closeout — MERGÉE (2026-10-24)
+
+| Élément | Valeur |
+|---|---|
+| PR | #278, merge commit (sans squash ni `--admin`), tête épinglée `7666baa` |
+| SHA canonique | `ee92a29` |
+| CI de PR | 10/10 verts au premier passage |
+| CI canonique (push sur `ee92a29`) | run `40083443065`, **7/7 succès** |
+| Porte Sonar de la PR | **OK** : couverture du nouveau code **100 %**, 0 bug, 0 code smell, 0 vulnérabilité |
+| Autorisation | STANDING GO MERGE (opérateur, 2026-10-23), sur choix « 03 backend, puis A0 » (2026-10-24) |
+
+**Suite :** la correction A0 (`Sb_SEC_A0_SESSION_TOKEN_INTEGRITY_01`), première marche de la
+piste mobile. Le delta TRAIN A et l'écran « mon matériel » viendront dans l'app, une fois
+celle-ci reliée au backend.
+
+**Verdict :** ✅ **MERGÉE** — `Sb_SCI_V2_03` CLOSED, canonique `ee92a29`, CI canonique 7/7.
