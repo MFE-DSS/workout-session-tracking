@@ -16,6 +16,9 @@ CREATE INDEX ix_decision_traces_group ON decision_traces (trace_group_id);
 -- index: ix_decision_traces_user_created
 CREATE INDEX ix_decision_traces_user_created ON decision_traces (user_id, created_at);
 
+-- index: ix_device_sessions_user_id
+CREATE INDEX ix_device_sessions_user_id ON device_sessions (user_id);
+
 -- index: ix_exercise_aliases_exercise
 CREATE INDEX ix_exercise_aliases_exercise ON exercise_aliases (exercise_id);
 
@@ -87,6 +90,9 @@ CREATE TABLE body_zones ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, label 
 
 -- table: decision_traces
 CREATE TABLE decision_traces ( id INTEGER NOT NULL, decision_id VARCHAR(64) NOT NULL, trace_group_id VARCHAR(64) NOT NULL, user_id INTEGER NOT NULL, decision_type VARCHAR(48) NOT NULL, policy_version VARCHAR(48) NOT NULL, decision_fingerprint VARCHAR(64) NOT NULL, upstream_decision_ids TEXT NOT NULL, constraint_sources TEXT NOT NULL, preference_sources TEXT NOT NULL, morphology_sources TEXT NOT NULL, recovery_sources TEXT NOT NULL, selected_output TEXT NOT NULL, rejected_alternatives TEXT NOT NULL, basis TEXT NOT NULL, confidence VARCHAR(32), plan_fingerprint VARCHAR(64), program_id INTEGER, program_version INTEGER, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_decision_traces_decision_id UNIQUE (decision_id) );
+
+-- table: device_sessions
+CREATE TABLE device_sessions ( id VARCHAR(32) NOT NULL, user_id INTEGER NOT NULL, refresh_hash VARCHAR(64) NOT NULL, session_epoch INTEGER NOT NULL, device_label VARCHAR(64), created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, last_used_at DATETIME NOT NULL, revoked_at DATETIME, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
 
 -- table: exercise_aliases
 CREATE TABLE exercise_aliases ( id INTEGER NOT NULL, exercise_id INTEGER NOT NULL, alias VARCHAR(255) NOT NULL, normalized VARCHAR(255) NOT NULL, source VARCHAR(16) NOT NULL, PRIMARY KEY (id), FOREIGN KEY(exercise_id) REFERENCES exercises (id) ON DELETE CASCADE, CONSTRAINT uq_exercise_aliases_normalized UNIQUE (normalized) );

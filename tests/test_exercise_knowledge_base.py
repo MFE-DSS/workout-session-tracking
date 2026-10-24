@@ -390,7 +390,11 @@ def test_alembic_head_unchanged():
     # `session_epoch` sur `users`. Le défaut n'est pas un backfill : il ne dit
     # rien du passé, puisque la transition T1 refuse de toute façon tout jeton
     # émis avant ce contrat. L'époque est l'état serveur qui rend révocables
-    # des jetons déjà émis).
+    # des jetons déjà émis),
+    # puis D9 (`z7a2u8v9x20` : UNE table additive neuve, `device_sessions`,
+    # née vide. Révoquer UN appareil et refuser un jeton de rafraîchissement
+    # déjà échangé exigent un état serveur par appareil, que l'époque par
+    # compte ne peut pas porter).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -399,4 +403,4 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "y6z1t7u8w19"
+    assert script.get_current_head() == "z7a2u8v9x20"
