@@ -100,8 +100,12 @@ def _dummy_hash() -> str:
     return bcrypt.hashpw(secrets.token_bytes(16), bcrypt.gensalt(12)).decode("utf-8")
 
 
+#: Le schéma d'authentification HTTP (RFC 6750), pas un secret.
+AUTH_SCHEME = "Bearer"
+
+
 def _tokens(issued: device_auth.IssuedTokens) -> dict[str, Any]:
-    return {"token_type": "Bearer", "access_token": issued.access_token,
+    return {"token_type": AUTH_SCHEME, "access_token": issued.access_token,
             "access_expires_in": issued.access_expires_in,
             "refresh_token": issued.refresh_token,
             "server_now": datetime.now(UTC).isoformat()}
