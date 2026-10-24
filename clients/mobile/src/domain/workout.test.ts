@@ -143,6 +143,32 @@ describe('refusals and boundaries', () => {
   });
 });
 
+describe('R16 — TERMINER MAINTENANT', () => {
+  const plan = fixture.plans['push-a'];
+  const first = plan.sets[0].set_id;
+
+  test('keeps what was done and fabricates nothing', () => {
+    const s = run(start(plan), { type: 'VALIDATED', setId: first, performedAt: at(T0), nowMs: T0 },
+      { type: 'SET_VALUE', setId: plan.sets[1].set_id, field: 'reps', value: 12 },
+      { type: 'FINISH_NOW', nowMs: T0 + 60_000 });
+    expect(s.phase).toBe('COMPLETE');
+    expect(Object.keys(s.done)).toEqual([String(first)]);
+    expect(s.drafts).toEqual({});
+    expect(s.rest).toBeNull();
+    expect(s.completedMs).toBe(T0 + 60_000);
+  });
+
+  test('works from a rest as well as from a set', () => {
+    const resting = run(start(plan), { type: 'VALIDATED', setId: first, performedAt: at(T0), nowMs: T0 });
+    expect(resting.phase).toBe('REST');
+    expect(reduce(resting, { type: 'FINISH_NOW', nowMs: T0 }).phase).toBe('COMPLETE');
+  });
+
+  test('means nothing outside a workout', () => {
+    expect(reduce(initialState, { type: 'FINISH_NOW', nowMs: T0 })).toBe(initialState);
+  });
+});
+
 describe('the fixture is canonical output, not invention', () => {
   test('no duration estimate is carried (AUREN_INSTRUMENTS §6.2bis-3)', () => {
     expect(fixture.mission.duration_estimate).toBeNull();

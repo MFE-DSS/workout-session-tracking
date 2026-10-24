@@ -41,8 +41,12 @@ const TREND: Record<Trend, { glyph: string; word: string; tone: string }> = {
 export function CompleteScreen(props: {
   state: WorkoutState;
   performance: SessionPerformance;
-  /** sessions done BEFORE this one (this one is added here) */
-  history: DoneSession[];
+  /**
+   * sessions done BEFORE this one (this one is added here). `null` = not known
+   * on this device (D9: the history lives on the server and no read model
+   * carries it yet) — the programme card is then omitted, never shown as 1/N.
+   */
+  history: DoneSession[] | null;
   sessionsPerWeek: number | null;
   next: Mission | null;
   reducedMotion: boolean;
@@ -56,7 +60,7 @@ export function CompleteScreen(props: {
   const ended = state.completedMs ?? started;
   const pending = Object.values(state.done).filter((d) => d.local !== 'saved_local').length;
 
-  const after = useMemo(() => [...props.history, { atMs: ended, slug: plan.template_slug }], [props.history, ended, plan.template_slug]);
+  const after = useMemo(() => [...(props.history ?? []), { atMs: ended, slug: plan.template_slug }], [props.history, ended, plan.template_slug]);
   const target = props.sessionsPerWeek ?? DEFAULT_SESSIONS_PER_WEEK;
   const week = sessionsThisWeek(after, ended);
   const held = weeksHeld(after, ended, target);
@@ -104,6 +108,7 @@ export function CompleteScreen(props: {
           <Text style={[type.small, { marginTop: 8 }]}>{`${perf.setsDone} séries sur ${perf.setsPlanned} prévues`}</Text>
         </View>
 
+        {props.history === null ? null : (
         <View style={styles.card} accessible accessibilityLabel={`Programme de la semaine : ${week} séances sur ${target}. ${held} semaines tenues.`}>
           <Text style={type.eyebrow}>Ton programme</Text>
           <View style={styles.pair}>
@@ -121,6 +126,7 @@ export function CompleteScreen(props: {
           </View>
           <Text style={[type.small, { marginTop: 8 }]}>Le repos prévu fait partie du programme : il ne casse rien.</Text>
         </View>
+        )}
 
         {zones.length ? (
           <View style={styles.card}>

@@ -27,6 +27,50 @@ export type SetCommand = {
   };
 };
 
+/**
+ * D9 — the session-level commands of R16 (TERMINER / ABANDONNER) and the
+ * REQUIRES_SYNC substitution. They travel through the SAME outbox as the sets,
+ * in order: a session is never closed on the server before its sets arrive.
+ */
+export type CloseCommand = {
+  op_id: string;
+  kind: 'SESSION_FINISH' | 'SESSION_ABANDON';
+  target: string;
+  payload: { session_id: number; at: string };
+};
+
+export type SubstituteCommand = {
+  op_id: string;
+  kind: 'SUBSTITUTE';
+  target: string;
+  payload: { session_id: number; se_id: number; name: string };
+};
+
+export type Command = SetCommand | CloseCommand | SubstituteCommand;
+
+export function closeCommand(
+  opId: string,
+  kind: CloseCommand['kind'],
+  sessionId: number,
+  atMs: number,
+): CloseCommand {
+  return {
+    op_id: opId,
+    kind,
+    target: `session/${sessionId}`,
+    payload: { session_id: sessionId, at: new Date(atMs).toISOString() },
+  };
+}
+
+export function substituteCommand(opId: string, sessionId: number, seId: number, name: string): SubstituteCommand {
+  return {
+    op_id: opId,
+    kind: 'SUBSTITUTE',
+    target: `exercise/${seId}`,
+    payload: { session_id: sessionId, se_id: seId, name },
+  };
+}
+
 export type OutboxRow = {
   op_id: string;
   kind: string;

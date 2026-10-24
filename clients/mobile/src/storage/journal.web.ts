@@ -5,9 +5,9 @@
  */
 import type { WorkoutState } from '../domain/workout';
 import type { Journal, LabKey, Metric, Restored } from './journalTypes';
-import type { JournalRow, OutboxRow, SetCommand } from './outbox';
+import type { Command, JournalRow, OutboxRow, SetCommand } from './outbox';
 
-export async function openJournal(): Promise<Journal> {
+export async function openJournal(_name?: string): Promise<Journal> {
   let snapshot: WorkoutState | null = null;
   let sets: JournalRow[] = [];
   let outbox: OutboxRow[] = [];
@@ -30,6 +30,21 @@ export async function openJournal(): Promise<Journal> {
     },
     async saveSnapshot(s: WorkoutState): Promise<void> {
       snapshot = s;
+    },
+    async enqueue(c: Command, s: WorkoutState): Promise<void> {
+      if (!outbox.some((o) => o.op_id === c.op_id)) {
+        outbox = [...outbox, {
+          op_id: c.op_id, kind: c.kind, target: c.target, payload: JSON.stringify(c.payload),
+          created_at_ms: Date.now(), attempts: 0, state: 'pending',
+        }];
+      }
+      snapshot = s;
+    },
+    async outboxRows(): Promise<OutboxRow[]> {
+      return outbox.filter((o) => o.state !== 'acked');
+    },
+    async markOutbox(opId: string, state: OutboxRow['state'], attempts: number): Promise<void> {
+      outbox = outbox.map((o) => (o.op_id === opId ? { ...o, state, attempts } : o));
     },
     async recordMetric(name: string, value: number): Promise<void> {
       metrics = [...metrics, { name, value, at_ms: Date.now() }];

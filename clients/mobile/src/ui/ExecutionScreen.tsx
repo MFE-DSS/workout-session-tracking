@@ -41,6 +41,15 @@ export type ExecutionHandlers = {
   onRestPainted: () => void;
   /** Lab evidence: a secondary sheet is a navigation decision (target: none on the nominal path). */
   onSecondaryOpened: () => void;
+  /** R16 — the ONE workout-level secondary action: leave the session (D9 connected app). */
+  onExitRequested?: () => void;
+  /** D9 — a quiet secondary state (offline, to check). `null` on the nominal path. */
+  statusNote?: { text: string; alert: boolean } | null;
+  /**
+   * D9 §8.7 — what the SERVER says of a set: acknowledged, refused, or nothing yet
+   * (still « enregistrée sur l'appareil »). Absent in the lab, which has no server.
+   */
+  serverStateOf?: (setId: number) => 'synced' | 'refused' | null;
 };
 
 /**
@@ -78,7 +87,17 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
     <View style={[styles.root, resting && styles.rootRest, { paddingTop: insets.top + 10, paddingBottom: insets.bottom + 12 }]}>
       <ExerciseRail count={exerciseCount} index={exerciseIndex} resting={resting} />
       <View style={styles.head}>
-        <Text style={type.eyebrow} numberOfLines={1}>
+        {props.onExitRequested ? (
+          <IconButton
+            glyph="✕"
+            label="Quitter la séance"
+            onPress={() => {
+              props.onExitRequested?.();
+              props.onSecondaryOpened();
+            }}
+          />
+        ) : null}
+        <Text style={[type.eyebrow, props.onExitRequested && styles.headCentered]} numberOfLines={1}>
           {`Exercice ${exerciseIndex + 1} / ${exerciseCount}${resting ? ' · repos' : ''}`}
         </Text>
         <IconButton
@@ -90,6 +109,15 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
           }}
         />
       </View>
+      {props.statusNote ? (
+        <Text
+          style={[styles.status, props.statusNote.alert && { color: color.alert }]}
+          accessibilityLiveRegion="polite"
+          numberOfLines={1}
+        >
+          {props.statusNote.text}
+        </Text>
+      ) : null}
 
       <Animated.View style={[styles.body, { opacity: appear, transform: [{ translateY: shiftY }] }]}>
         {resting ? (
@@ -107,15 +135,26 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
       </Animated.View>
 
       <Sheet visible={menu} title={exercise.executed_name} onClose={() => setMenu(false)}>
+        {setsOf(plan, exercise.se_id).some((s) => state.done[s.set_id]) ? (
+          // the server's rule (`can_substitute`): no swap once a work set is done —
+          // say it here rather than send a command it will refuse
+          <SheetRow title="Remplacer cet exercice" detail="Plus possible : une série de cet exercice est déjà enregistrée." />
+        ) : (
+          <SheetRow
+            title="Remplacer cet exercice"
+            detail="Le remplacement est validé par AUREN dès que la connexion revient."
+            onPress={() => {
+              setMenu(false);
+              setSwapFor(exercise.se_id);
+            }}
+          />
+        )}
         <SheetRow
-          title="Remplacer cet exercice"
-          detail="Le remplacement est validé par AUREN dès que la connexion revient."
+          title={props.onExitRequested ? 'Journal de l’appareil' : 'Journal local du labo'}
+          detail={props.onExitRequested
+            ? 'Ce qui est enregistré ici, ce qui est déjà sur AUREN, ce qui attend la connexion.'
+            : 'Séries enregistrées sur l’appareil, commandes en attente, mesures.'}
           onPress={() => {
-            setMenu(false);
-            setSwapFor(exercise.se_id);
-          }}
-        />
-        <SheetRow title="Journal local du labo" detail="Séries enregistrées sur l’appareil, commandes en attente, mesures." onPress={() => {
           setMenu(false);
           props.onOpenLab();
         }} />
@@ -269,16 +308,21 @@ function RestBody(props: { state: WorkoutState; nowMs: number; exercise: PlanExe
   const planned = restSecondsFor(plan, from.se_id);
   const shifted = rest.deadlineMs - rest.startedMs !== planned * 1000;
 
-  const saved =
-    done?.local === 'saved_local' ? 'enregistrée sur l’appareil' : done?.local === 'not_saved' ? 'NON enregistrée — réessaie depuis le journal' : 'enregistrement…';
+  const server = props.serverStateOf?.(rest.fromSetId) ?? null;
+  const alert = done?.local === 'not_saved' || server === 'refused';
+  let saved = 'enregistrement…';
+  if (done?.local === 'not_saved') saved = 'NON enregistrée — réessaie depuis le journal';
+  else if (server === 'refused') saved = 'refusée par AUREN — gardée sur l’appareil';
+  else if (server === 'synced') saved = 'enregistrée sur AUREN';
+  else if (done?.local === 'saved_local') saved = 'enregistrée sur l’appareil';
 
   return (
     <View style={{ flex: 1 }} onLayout={props.onRestPainted}>
       <View style={styles.savedRow} accessible accessibilityLabel={`Série ${from.index} ${saved}`}>
-        <View style={[styles.tick, done?.local === 'not_saved' && { borderColor: color.alert }]}>
-          <Text style={[styles.tickGlyph, done?.local === 'not_saved' && { color: color.alert }]}>{done?.local === 'not_saved' ? '!' : '✓'}</Text>
+        <View style={[styles.tick, alert && { borderColor: color.alert }]}>
+          <Text style={[styles.tickGlyph, alert && { color: color.alert }]}>{alert ? '!' : '✓'}</Text>
         </View>
-        <Text style={[type.small, { flex: 1, color: done?.local === 'not_saved' ? color.alert : color.ink2 }]}>
+        <Text style={[type.small, { flex: 1, color: alert ? color.alert : color.ink2 }]}>
           <Text style={{ color: color.ink, fontWeight: '700' }}>{`Série ${from.index}${done ? ` · ${kg(done.weight)} kg × ${done.reps}` : ''}`}</Text>
           {`  ${saved}`}
         </Text>
@@ -398,6 +442,8 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.field, paddingHorizontal: space.gutter },
   rootRest: { backgroundColor: color.fieldRest },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 6 },
+  headCentered: { flex: 1, textAlign: 'center' },
+  status: { ...type.small, color: color.ink3, textAlign: 'center', marginTop: -2, marginBottom: 4 },
   body: { flex: 1 },
   setLine: { marginTop: 8, fontVariant: ['tabular-nums'] },
   chips: { flexDirection: 'row', gap: 8, marginTop: 16 },

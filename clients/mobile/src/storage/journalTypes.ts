@@ -1,5 +1,5 @@
 import type { WorkoutState } from '../domain/workout';
-import type { JournalRow, OutboxRow, SetCommand } from './outbox';
+import type { Command, JournalRow, OutboxRow, SetCommand } from './outbox';
 
 export type Metric = { name: string; value: number; at_ms: number };
 
@@ -19,6 +19,15 @@ export interface Journal {
    */
   commitValidation(row: JournalRow, command: SetCommand, snapshot: WorkoutState): Promise<number>;
   saveSnapshot(snapshot: WorkoutState): Promise<void>;
+  /**
+   * D9 — a session-level command (R16, substitution) and the snapshot that
+   * reflects it, in ONE transaction: the decision and its command survive a
+   * force-kill together, or not at all.
+   */
+  enqueue(command: Command, snapshot: WorkoutState): Promise<void>;
+  /** D9 — every command not yet acknowledged, in the order it was decided. */
+  outboxRows(): Promise<OutboxRow[]>;
+  markOutbox(opId: string, state: OutboxRow['state'], attempts: number): Promise<void>;
   recordMetric(name: string, value: number): Promise<void>;
   metrics(): Promise<Metric[]>;
   /** Lab-only device state (profile, persona, sessions done) — JSON by key. */

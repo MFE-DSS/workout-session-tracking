@@ -58,6 +58,7 @@ export type Event =
   | { type: 'REST_SHIFT'; deltaMs: number; nowMs: number }
   | { type: 'REST_END'; nowMs: number }
   | { type: 'REQUEST_SUBSTITUTE'; seId: number; substitute: string }
+  | { type: 'FINISH_NOW'; nowMs: number }
   | { type: 'RESTORE'; state: WorkoutState }
   | { type: 'RESET' };
 
@@ -200,6 +201,12 @@ export function reduce(state: WorkoutState, event: Event): WorkoutState {
         ...state,
         requiresSync: { ...state.requiresSync, [event.seId]: { substitute: event.substitute } },
       };
+
+    case 'FINISH_NOW':
+      // R16 TERMINER MAINTENANT — what is done stays done, nothing is added:
+      // the drafts of the sets not performed are dropped, never validated.
+      if (state.phase !== 'SET' && state.phase !== 'REST') return state;
+      return { ...state, phase: 'COMPLETE', rest: null, cursorSetId: null, drafts: {}, completedMs: event.nowMs };
 
     case 'RESTORE':
       return event.state;

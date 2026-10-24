@@ -81,6 +81,13 @@ export function buildEvidence(i: EvidenceInput) {
       commit_failures: count(i.metrics, 'COMMIT-FAILED'),
       force_kill_observation: null,
     },
+    // D9 — the connected app: decided on the device → acknowledged by the server
+    sync: {
+      g_sync_ms: stats(of(i.metrics, 'G-SYNC')),
+      acknowledged: count(i.metrics, 'SYNC-ACK'),
+      already_present_on_server: count(i.metrics, 'SYNC-ACK-DUPLICATE'),
+      requires_attention: i.outbox.filter((o) => o.state === 'failed').length,
+    },
     timer: {
       foreground_end_lateness_ms: fg,
       foreground_within_threshold: fg.worst === null ? null : fg.worst <= THRESHOLDS.timer_drift_ms,

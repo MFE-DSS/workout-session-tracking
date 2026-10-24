@@ -289,10 +289,12 @@ function delegate(argv) {
   });
 }
 
-// An existing native project generated before the team was known carries no
-// DEVELOPMENT_TEAM: regenerate it once (Expo's prebuild), so signing is set.
-if (chosen.platform === 'ios' && ios.checks.team_id && exists(join(MOBILE, 'ios'))) {
-  const pbx = readdirSync(join(MOBILE, 'ios')).find((f) => f.endsWith('.xcodeproj'));
+// No native project yet (a fresh checkout: `/ios` is gitignored), or one
+// generated before the team was known (no DEVELOPMENT_TEAM): generate it with
+// Expo's prebuild, so signing is set and new native modules are linked.
+if (chosen.platform === 'ios' && ios.checks.team_id) {
+  const hasIos = exists(join(MOBILE, 'ios'));
+  const pbx = hasIos ? readdirSync(join(MOBILE, 'ios')).find((f) => f.endsWith('.xcodeproj')) : undefined;
   const project = pbx ? readFileSync(join(MOBILE, 'ios', pbx, 'project.pbxproj'), 'utf8') : '';
   if (!project.includes('DEVELOPMENT_TEAM')) {
     const code = await delegate(['expo', 'prebuild', '--platform', 'ios']);

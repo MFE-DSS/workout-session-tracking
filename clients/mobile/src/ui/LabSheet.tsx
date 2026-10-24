@@ -22,9 +22,15 @@ export function LabSheet(props: {
   plannedSets: number | null;
   reduceMotionEnabled: boolean;
   onClose: () => void;
-  onReset: () => void;
-  onSeeded: () => void;
+  /** lab only — the connected app (D9) never erases its journal */
+  onReset?: () => void;
+  onSeeded?: () => void;
+  /** D9 — connected app: who is signed in, and how to revoke THIS device */
+  account?: string | null;
+  attention?: number;
+  onSignOut?: () => void;
 }) {
+  const connected = props.onSignOut !== undefined;
   const [data, setData] = useState<Restored | null>(null);
   const [metrics, setMetrics] = useState<Metric[]>([]);
   useEffect(() => {
@@ -46,12 +52,20 @@ export function LabSheet(props: {
   const d = evidence.device;
 
   return (
-    <Sheet visible={props.visible} title="Journal local du labo" onClose={props.onClose}>
+    <Sheet visible={props.visible} title={connected ? 'Journal local' : 'Journal local du labo'} onClose={props.onClose}>
       <Text style={[type.small, { marginBottom: 8 }]}>
-        {props.journal?.kind === 'sqlite'
-          ? 'Expo SQLite sur l’appareil. Pas d’API dans N0 : les commandes restent en attente, c’est attendu.'
-          : 'Aperçu web : journal EN MÉMOIRE — il ne prouve aucune durabilité.'}
+        {props.journal?.kind !== 'sqlite'
+          ? 'Aperçu web : journal EN MÉMOIRE — il ne prouve aucune durabilité.'
+          : connected
+            ? 'Expo SQLite sur l’appareil. Chaque série y est écrite d’abord, puis envoyée à AUREN.'
+            : 'Expo SQLite sur l’appareil. Pas d’API dans N0 : les commandes restent en attente, c’est attendu.'}
       </Text>
+      {connected ? (
+        <SheetRow
+          title={props.account ? `Connecté : ${props.account}` : 'Non connecté'}
+          detail={props.attention ? `${props.attention} enregistrement(s) refusé(s) par AUREN — gardé(s) ici, à vérifier` : 'Aucun enregistrement à vérifier'}
+        />
+      ) : null}
       <SheetRow
         title={`${d.platform} · ${d.model ?? '?'} · OS ${d.os_version ?? '?'}`}
         detail={d.physical ? 'appareil PHYSIQUE — compte pour la porte' : 'simulateur / émulateur — ne compte PAS pour la porte'}
@@ -59,6 +73,9 @@ export function LabSheet(props: {
       <SheetRow title={`${evidence.persistence.journal_sets} série(s) au journal`} detail={`${evidence.persistence.outbox_pending} commande(s) en attente · relances restaurées : ${evidence.persistence.relaunch_restores} · échecs d’enregistrement : ${evidence.persistence.commit_failures}`} />
       <SheetRow title="Valider → repos visible (G-VAL)" detail={line(evidence.ux.g_val_ms)} />
       <SheetRow title="Commit local journal + outbox (G-LOCAL)" detail={line(evidence.ux.g_local_ms)} />
+      {connected ? (
+        <SheetRow title="Série décidée → acquittée par AUREN (G-SYNC)" detail={line(evidence.sync.g_sync_ms)} />
+      ) : null}
       <SheetRow title="Fin de repos détectée — app au premier plan" detail={line(evidence.timer.foreground_end_lateness_ms)} />
       <SheetRow title="Fin de repos détectée — au retour dans l’app" detail={line(evidence.timer.resume_end_lateness_ms)} />
       <SheetRow title="Notification de fin de repos — retard OS (mesure)" detail={`${evidence.native_feedback.rest_notifications_requested} demandée(s) · ${line(evidence.native_feedback.rest_notification_delay_ms)}`} />
@@ -74,8 +91,15 @@ export function LabSheet(props: {
         <Text style={[type.small, { color: color.ink3 }]}>
           Preuve de durabilité : valide une série, attends « enregistrée sur l’appareil », force la fermeture de l’app, rouvre-la. La série doit être là.
         </Text>
-        <PrimaryAction tone="quiet" label="Rejouer le premier lancement" sublabel="Efface tout : profil, séances, journal" onPress={props.onReset} />
-        <PrimaryAction tone="quiet" label="Passer à l’utilisateur avec historique" sublabel="Deux semaines de séances semées" onPress={props.onSeeded} />
+        {props.onReset ? (
+          <PrimaryAction tone="quiet" label="Rejouer le premier lancement" sublabel="Efface tout : profil, séances, journal" onPress={props.onReset} />
+        ) : null}
+        {props.onSeeded ? (
+          <PrimaryAction tone="quiet" label="Passer à l’utilisateur avec historique" sublabel="Deux semaines de séances semées" onPress={props.onSeeded} />
+        ) : null}
+        {props.onSignOut ? (
+          <PrimaryAction tone="quiet" label="Se déconnecter de cet appareil" sublabel="Les autres appareils et le site restent connectés" onPress={props.onSignOut} />
+        ) : null}
       </View>
     </Sheet>
   );

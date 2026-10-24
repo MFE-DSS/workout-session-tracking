@@ -30,6 +30,7 @@
     },
     "plugins": [
       "expo-sqlite",
+      "expo-secure-store",
       ["expo-notifications", { "enableRemoteNotifications": false }]
     ]
   }

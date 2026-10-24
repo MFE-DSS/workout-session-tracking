@@ -10,7 +10,7 @@ import * as SQLite from 'expo-sqlite';
 
 import type { WorkoutState } from '../domain/workout';
 import type { Journal, LabKey, Metric, Restored } from './journalTypes';
-import type { JournalRow, OutboxRow, SetCommand } from './outbox';
+import type { Command, JournalRow, OutboxRow, SetCommand } from './outbox';
 import { createSerialQueue, withRetry } from './serial';
 
 const SCHEMA = `
@@ -56,9 +56,16 @@ const UPSERT_SNAPSHOT =
   'INSERT INTO active_session (id, snapshot, updated_at_ms) VALUES (1, ?, ?) ' +
   'ON CONFLICT(id) DO UPDATE SET snapshot = excluded.snapshot, updated_at_ms = excluded.updated_at_ms';
 
-export async function openJournal(): Promise<Journal> {
-  const db = await SQLite.openDatabaseAsync('auren-n0-lab.db');
+/**
+ * `name`: the lab keeps its own file; the connected app (D9) uses another, so a
+ * lab command aimed at a fixture session can never reach the real server.
+ */
+export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
+  const db = await SQLite.openDatabaseAsync(name);
   await db.execAsync(SCHEMA);
+  // a command caught in flight by a force-kill has an unknown outcome: send it
+  // again — the server acknowledges a fact it already holds (§10)
+  await db.runAsync("UPDATE outbox SET state = 'pending' WHERE state = 'inflight'");
   // every write, on any connection, goes through one queue (see serial.ts)
   const serial = createSerialQueue();
 
@@ -99,6 +106,30 @@ export async function openJournal(): Promise<Journal> {
     saveSnapshot: (snapshot: WorkoutState): Promise<void> =>
       serial(async () => {
         await db.runAsync(UPSERT_SNAPSHOT, [JSON.stringify(snapshot), Date.now()]);
+      }),
+
+    enqueue: (c: Command, snapshot: WorkoutState): Promise<void> =>
+      serial(() => withRetry(async () => {
+        const now = Date.now();
+        await db.withExclusiveTransactionAsync(async (txn) => {
+          await txn.runAsync(
+            'INSERT OR IGNORE INTO outbox (op_id, kind, target, payload, created_at_ms, attempts, state) ' +
+              "VALUES (?, ?, ?, ?, ?, 0, 'pending')",
+            [c.op_id, c.kind, c.target, JSON.stringify(c.payload), now],
+          );
+          await txn.runAsync(UPSERT_SNAPSHOT, [JSON.stringify(snapshot), now]);
+        });
+      })),
+
+    async outboxRows(): Promise<OutboxRow[]> {
+      return db.getAllAsync<OutboxRow>(
+        "SELECT * FROM outbox WHERE state != 'acked' ORDER BY created_at_ms, rowid",
+      );
+    },
+
+    markOutbox: (opId: string, state: OutboxRow['state'], attempts: number): Promise<void> =>
+      serial(async () => {
+        await db.runAsync('UPDATE outbox SET state = ?, attempts = ? WHERE op_id = ?', [state, attempts, opId]);
       }),
 
     recordMetric: (name: string, value: number): Promise<void> =>
