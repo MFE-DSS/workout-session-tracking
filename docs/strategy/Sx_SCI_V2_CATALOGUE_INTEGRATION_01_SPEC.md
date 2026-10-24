@@ -2,9 +2,9 @@
 
 > **Statut :** SPEC **ACCEPTÉE** par l'opérateur (GO BUILD `Sb_SCI_V2_01`, 2026-10-23). Les
 > questions du §17 sont tranchées au §19. Aucune migration, aucune activation. · **Date :**
-> 2026-10-23 · **Version :** v3 (v1 + rulings du §19 + corrections déclarées de
+> 2026-10-23 · **Version :** v4 (v1 + rulings du §19 + corrections déclarées de
 > `Sb_SCI_V2_02` : règle d'éligibilité §7.1, collisions et relevé des noms §6.2, exécution
-> incertaine §7.3) ·
+> incertaine §7.3 ; v4 : ruling mobile du 2026-10-24, §8.2 et §12) ·
 > **Dépend de :** `Sx_AUREN_SCIENTIFIC_ENGINE_V2_SPEC.md` (doctrine E0–E8, §4 bis) ·
 > **Code de référence :** `0c9e14b` (merge PR #272, recommandeur V3 servi, D14 en vigueur).
 
@@ -264,9 +264,16 @@ objet déclaré (training_preferences.available_equipment_items)
 ### 8.2 Application du delta TRAIN A
 
 Ajouter des objets au registre les rend **déclarables** dans l'interface : c'est un changement
-de surface visible. Le delta part donc dans une tranche à lui (§12, `Sb_SCI_V2_03`), avec
-exposition d'un rendu à l'opérateur (CLAUDE.md §5.1). Jusque-là, l'ombre traite les capacités
-neuves comme absentes du registre, donc `UNKNOWN`, sans couche de surcharge.
+de surface visible. Jusque-là, l'ombre traite les capacités neuves comme absentes du registre,
+donc `UNKNOWN`, sans couche de surcharge.
+
+**Ruling opérateur (2026-10-24, v4) : tout nouvel écran vise l'app mobile.** Appliquer le delta au
+registre servi aurait fait apparaître 13 cases sur la page web *Mon plan*, la surface que le
+produit quitte. Ces cases n'auraient eu **aucun effet** pour l'utilisateur, puisque V3 ne lit pas
+ces capacités. L'application du delta et l'écran « mon matériel » partent donc ensemble dans la
+**piste mobile** (`clients/mobile`, rendu §5.1 dans Auren Lab), une fois l'app reliée au backend.
+Ce lien exige la correction A0. Le delta reste d'ici là une proposition versionnée
+(`data/sci/train_a_delta_proposal.json`).
 
 ### 8.3 Divergences d'exigence entre V3 servi et SCI (mesurées)
 
@@ -361,7 +368,8 @@ ajoutée parce qu'un champ JSON existe. Toute persistance future demande un beso
 |---|---|---|---|
 | `Sb_SCI_V2_01` | `data/sci/*` (catalogue, schéma, preuves, politique de crédit), chargeur, validateur en CI, rapport régénéré | aucune | isolated |
 | `Sb_SCI_V2_02` | résolveur d'identité (§6) + registre d'exposition dérivé (§7), sans consommateur servi | aucune | shared_code (lit `exercise_identity`) |
-| `Sb_SCI_V2_03` | delta TRAIN A appliqué + `any_of` dans `equipment_model` + déclaration des nouveaux objets | **UI** : §5.1 obligatoire | shared_code |
+| `Sb_SCI_V2_03` (v4) | `any_of` et capacité hors vocabulaire ⇒ `UNKNOWN` dans `equipment_model`, grammaire V1, parité exacte avec V3 sur tout l'EKB. **Ni registre servi ni web modifiés** | aucune | shared_code |
+| piste mobile (après A0) | delta TRAIN A appliqué + écran « mon matériel » dans l'app | **UI mobile** : §5.1 dans Auren Lab | à classer |
 | `Sb_SCI_V2_04` | comparateur d'ombre hors ligne (S1) et rapport de preuve (§10) | aucune | isolated |
 | `Sb_SCI_V2_05` | ombre en processus (S2) | aucune | shared_code ; GO séparé, seulement si S1 le réclame |
 
