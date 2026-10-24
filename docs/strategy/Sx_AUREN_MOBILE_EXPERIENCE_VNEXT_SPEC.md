@@ -929,6 +929,26 @@ bcrypt coût 12. *(Le docstring du module dit encore `samesite=lax` ; le code po
   produit (fichiers d'association servis par FastAPI) pour « reprendre la
   séance » ; la réinitialisation de mot de passe **reste** un flux web.
 
+### 8.10 *(2026-10-24, `Sb_VNEXT_MOBILE_D9_01`)* Ce que D9 a livré — amendements nommés
+
+Les §8.1–8.9 restent la référence. Ce qui suit dit **où la livraison s'en écarte, et
+pourquoi** ; aucun autre écart n'existe.
+
+| Point | Spec | Livré | Motif |
+|---|---|---|---|
+| Préfixe | `/api/vnext/*` (noms de travail, §8) | **`/api/mobile/v1/*`** | surface versionnée exigée par le GO BUILD ; `vnext` désignait le chantier, pas un contrat |
+| `device_sessions` | colonne `family_id` | **pas de `family_id`** ; la ligne EST la famille, le condensat tourne en place | une ligne par rotation n'apportait que de la croissance ; la détection de réutilisation est identique (secret ≠ courant ⇒ révocation de la ligne) |
+| `device_sessions` | — | **+ `session_epoch`** (époque A0 recopiée à l'émission) | changement / réinitialisation du mot de passe et déconnexion web ferment l'application **sans** qu'aucun appelant de `revoke_sessions` ait à connaître la table |
+| D11, hors bornes | « le serveur garde son heure de réception et **marque** la série » | heure de réception gardée ; la marque est dans la **réponse** (`performed_at_adjusted`), pas en base | une marque persistée est une colonne, que §8.6 interdit ; l'ACK la porte jusqu'au client |
+| D11, tolérance | `≤ now_serveur` | `≤ réception + 120 s`, **écrit** `min(t, réception)` | un léger décalage d'horloge n'est pas une anomalie ; aucune date future n'est jamais écrite |
+| `SET_COMPLETION` | réponse `200 {execution}` | réponse **`ACKNOWLEDGED`** `{op_id, set_id, applied, performed_at, performed_at_adjusted}` | le client n'a besoin que de l'acquittement ; il relit l'exécution à la reprise. `applied: false` = le fait existait déjà (§10) |
+| `SUBSTITUTE` | `PUT …/substitution {name \| null}` | `POST …/exercises/{se_id}/substitute {op_id, name}` ; validé contre `compute_suggestions` (tous niveaux) ; pas d'effacement | le labo n'offre pas de retour à l'exercice prévu ; l'effacement viendra avec son geste |
+| États de MISSION | `READY · RESUME · BLOCKED · NO_RECO` | `READY · RESUME · NO_MISSION` ; un refus TRAIN A au démarrage rend `409 start_blocked` | `DECLARE_EQUIPMENT` n'a pas encore d'écran mobile (hors périmètre) |
+| R16 — fin de séance | — | **TERMINER** = la clôture du web (`completed`, continuité si incomplète) · **PAUSE** = aucune écriture, la séance reste `in_progress` donc `RESUME` · **ABANDONNER** = `completed` + `excluded_from_stats` | aucun état neuf : l'abandon est l'état canonique existant (« exclue » dans l'historique web, rebasculable par l'administration) ; rien n'est effacé |
+| Schéma local §8.7 | `read_models`, `next_attempt_at`, `last_error`, `journal.local_state ∈ synced/rejected` | schéma N0 conservé ; l'état serveur d'une série se lit dans l'outbox (`acked` / `failed`) ; le backoff vit en mémoire | le labo accepté est adopté tel quel ; la mission hors ligne sans séance ouverte n'est pas mise en cache (écran « Hors ligne ») |
+| Non livrés | `SET_CLEAR`, `REST_SKIP` serveur, `next`, `secondary` | — | `REST_SKIP` reste local (D7) ; le plan de séance porte déjà `next` et les substituts |
+| Rotation | — | un jeton déjà échangé est refusé **sans délai de grâce** | conséquence assumée : une réponse de rafraîchissement perdue en route impose une reconnexion |
+
 ---
 
 ## 9. Le lab — une tranche verticale, isolée, sous drapeau

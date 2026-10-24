@@ -258,6 +258,8 @@
 | Sprint | Domaine | Statut | Rapport | Notes |
 |---|---|---|---|---|
 | Sx_AUREN_MOBILE_EXPERIENCE_VNEXT (spec) | Diagnostic mesuré (VALIDER → REPOS = 27,8 ms serveur, le reste est réseau ; `exercise_complete` sans repos 6/6) · carte KEEP/ADAPT/REBUILD/RETIRE · options A/B/C1/C2 (matrice pondérée r2 : 57 / 70 / 117 / 116,5 sur 135) · **r2 : recommandation C2 React Native + Expo** (r1 : B) · contrats `MISSION`/`EXECUTION` + commandes par série + plan de séance à table de transitions serveur · journal/outbox Expo SQLite · auth mobile par jetons révocables · portes G1–G8, G-VAL/NET/LOCAL/KILL/NOTIF/NAV/A11Y/TYPE/MOTION · 5 cadres 390×844 mesurés | ⏳ | — | Plan r2 : **A0** (sécurité, indépendant) → **N0** labo de design natif (fixtures réelles, appareil réel) → L0 → L1/L1a → L2 → L3 → L4 ; extensions E1/E2. Rien n'ouvre avant ADR `ACCEPTED` |
+| Sb_VNEXT_NATIVE_N0 | Labo de design natif (Expo, fixtures canoniques, iPhone réel) — dogfood R1–R16, verdict « on garde le modèle et on itère » | ✅ adopté dans la canonique par D9 | `SPRINT_Sb_VNEXT_NATIVE_N0_EXPERIENCE_LAB_REPORT.md` | `clients/mobile/` |
+| Sb_VNEXT_MOBILE_D9_01 | **Pont vers le vrai backend** : sessions d'appareil (accès court + rafraîchissement tournant révocable, Keychain), `/api/mobile/v1` (auth, mission, start, série, substitution, fin/abandon), outbox → FastAPI, reprise, R16. **Migration additive `device_sessions`** (exception nommée `§8.6`). Écarts nommés : `§8.10` | 🟡 build | `SPRINT_Sb_VNEXT_MOBILE_D9_01_REAL_BACKEND_BRIDGE_REPORT.md` | porte physique §14 + rendu iPhone R16 avant commit UI |
 
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 

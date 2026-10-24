@@ -165,6 +165,37 @@ def test_a_web_session_cookie_value_is_not_an_access_token(client):
     assert _me(client, cookie_value).status_code == 401
 
 
+def _forge(salt: str, payload: dict) -> str:
+    from itsdangerous import URLSafeTimedSerializer
+
+    return URLSafeTimedSerializer("test-secret-key-for-signing", salt=salt).dumps(payload)
+
+
+def _claims(dsid: str) -> dict:
+    from app.database import SessionLocal
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        u = db.get(User, _uid())
+        return {"user_id": u.id, "epoch": u.session_epoch or 0, "dsid": dsid}
+
+
+def test_the_access_purpose_is_read_not_only_the_salt(client):
+    """Couche 1 seule : la bonne signature, le mauvais usage, est refusée."""
+    t = _mint()
+    forged = _forge("auren.auth.access.v1", {"purpose": "refresh", **_claims(t["dsid"])})
+    assert _me(client, forged).status_code == 401
+    genuine = _forge("auren.auth.access.v1", {"purpose": "access", **_claims(t["dsid"])})
+    assert _me(client, genuine).status_code == 200, "prémisse : la forge reproduit le contrat"
+
+
+def test_the_access_salt_is_its_own_not_the_web_one(client):
+    """Couche 2 seule : le bon usage, signé sous le sel du cookie web, est refusé."""
+    t = _mint()
+    forged = _forge("auren.auth.session.v2", {"purpose": "access", **_claims(t["dsid"])})
+    assert _me(client, forged).status_code == 401
+
+
 def test_the_three_signing_salts_are_distinct():
     import importlib
 

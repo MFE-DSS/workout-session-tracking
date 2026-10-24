@@ -256,19 +256,19 @@ class SetCompletionBody(BaseModel):
 def _bounded_performed_at(
     body: SetCompletionBody, *, floor: datetime, now: datetime,
 ) -> tuple[datetime, bool]:
-    """`D11` — `plancher ≤ performed_at ≤ réception + tolérance`.
+    """`D11` (`§8.8bis`) — rend `(heure retenue, hors bornes ?)`.
 
-    Une heure ANCRÉE au serveur hors bornes est une incohérence : refusée. Une
-    heure ESTIMÉE (horloge murale après un redémarrage) est ramenée dans les
-    bornes, plutôt que de perdre un fait réel pour une horloge d'appareil.
+    Accepté si `plancher ≤ performed_at ≤ réception + tolérance` — le plancher est
+    le début de séance, ou la série précédente du même exercice (ordre). Aucune
+    date future n'est écrite : une heure dans la tolérance est ramenée à la
+    réception. Hors bornes, ancrée ou estimée, le serveur garde son heure de
+    réception et le DIT dans la réponse — un fait réel n'est jamais refusé pour
+    une horloge d'appareil, et jamais réordonné en silence.
     """
     at = _aware(body.performed_at)
-    ceiling = now + PERFORMED_AT_TOLERANCE
-    if floor <= at <= ceiling:
-        return at, False
-    if not body.performed_at_estimated:
-        raise _err(422, "performed_at_out_of_bounds")
-    return min(max(at, floor), now), True
+    if floor <= at <= now + PERFORMED_AT_TOLERANCE:
+        return min(at, now), False
+    return now, True
 
 
 @router.put("/sessions/{session_id}/sets/{set_id}")

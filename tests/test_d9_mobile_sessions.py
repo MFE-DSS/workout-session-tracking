@@ -388,37 +388,61 @@ def test_no_substitution_once_a_work_set_is_done(client):
 # ───────── D11 — le temps ─────────
 
 
-def test_an_anchored_time_in_the_future_is_refused(client):
+def _kept_receive_time(client, h, sid, set_id, at, **kw):
+    """§8.8bis : hors bornes ⇒ le fait est gardé, à l'heure de RÉCEPTION, et c'est dit."""
+    before = datetime.now(UTC)
+    r = _put(client, h, sid, set_id, at=at, **kw)
+    after = datetime.now(UTC)
+    assert r.status_code == 200, r.text
+    assert r.json()["performed_at_adjusted"] is True
+    stored = _aware(_set_rows(sid)[set_id][4])
+    assert before - timedelta(seconds=1) <= stored <= after
+    return stored
+
+
+def test_a_future_time_is_never_written(client):
     h = _token()
     sid, sets = _first_set(client, h)
-    r = _put(client, h, sid, sets[0]["set_id"], at=datetime.now(UTC) + timedelta(minutes=10))
-    assert r.status_code == 422
-    assert r.json()["detail"] == {"error": "performed_at_out_of_bounds"}
+    _kept_receive_time(client, h, sid, sets[0]["set_id"], datetime.now(UTC) + timedelta(minutes=10))
 
 
-def test_an_anchored_time_before_the_start_is_refused(client):
+def test_a_time_before_the_start_takes_the_receive_time(client):
     h = _token()
     sid, sets = _first_set(client, h)
-    r = _put(client, h, sid, sets[0]["set_id"], at=datetime.now(UTC) - timedelta(hours=2))
-    assert r.status_code == 422
+    _kept_receive_time(client, h, sid, sets[0]["set_id"], datetime.now(UTC) - timedelta(hours=2))
 
 
-def test_the_tolerance_admits_a_small_clock_skew(client):
+def test_an_estimated_time_out_of_bounds_is_kept_not_lost(client):
+    h = _token()
+    sid, sets = _first_set(client, h)
+    _kept_receive_time(client, h, sid, sets[0]["set_id"], datetime.now(UTC) + timedelta(days=3),
+                       estimated=True)
+
+
+def test_the_tolerance_admits_a_small_clock_skew_without_writing_the_future(client):
     h = _token()
     sid, sets = _first_set(client, h)
     r = _put(client, h, sid, sets[0]["set_id"], at=datetime.now(UTC) + timedelta(seconds=60))
     assert r.status_code == 200
+    assert r.json()["performed_at_adjusted"] is False
+    assert _aware(_set_rows(sid)[sets[0]["set_id"]][4]) <= datetime.now(UTC)
 
 
-def test_an_estimated_time_is_clamped_not_lost(client):
+def test_an_in_bounds_time_is_kept_exactly(client):
+    """Le cœur de D11 : une série synchronisée en retard garde l'heure où elle a été FAITE."""
+    from app.database import SessionLocal
+    from app.models.session import WorkoutSession
+
     h = _token()
     sid, sets = _first_set(client, h)
-    r = _put(client, h, sid, sets[0]["set_id"], estimated=True,
-             at=datetime.now(UTC) + timedelta(days=3))
-    assert r.status_code == 200
-    assert r.json()["performed_at_adjusted"] is True
-    stored = _aware(_set_rows(sid)[sets[0]["set_id"]][4])
-    assert stored <= datetime.now(UTC)
+    with SessionLocal() as db:
+        s = db.get(WorkoutSession, sid)
+        s.started_at = _aware(s.started_at) - timedelta(minutes=30)
+        db.commit()
+    done_at = datetime.now(UTC) - timedelta(minutes=20)
+    r = _put(client, h, sid, sets[0]["set_id"], at=done_at)
+    assert r.json()["performed_at_adjusted"] is False
+    assert abs((_aware(_set_rows(sid)[sets[0]["set_id"]][4]) - done_at).total_seconds()) < 1
 
 
 def test_sets_of_an_exercise_cannot_go_back_in_time(client):
@@ -435,11 +459,11 @@ def test_sets_of_an_exercise_cannot_go_back_in_time(client):
     assert a["se_id"] == b["se_id"], "prémisse : deux séries du même exercice"
     now = datetime.now(UTC)
     _put(client, h, sid, a["set_id"], op="op-order-01", at=now - timedelta(minutes=1))
-    # Après le début, mais AVANT la série précédente : seul l'ordre la refuse.
-    r = _put(client, h, sid, b["set_id"], op="op-order-02", at=now - timedelta(minutes=5))
-    assert r.status_code == 422
-    ok = _put(client, h, sid, b["set_id"], op="op-order-03", at=now)
-    assert ok.status_code == 200
+    # Après le début, mais AVANT la série précédente : seul l'ordre la met hors bornes —
+    # elle prend l'heure de réception, jamais une place avant sa voisine.
+    stored = _kept_receive_time(client, h, sid, b["set_id"], now - timedelta(minutes=5),
+                                op="op-order-02")
+    assert stored >= _aware(_set_rows(sid)[a["set_id"]][4])
 
 
 # ───────── LECTURE D'EXÉCUTION ─────────
