@@ -1,6 +1,6 @@
 # Sb_DA_02_4B_1_SOVEREIGN_READOUT — lecture souveraine au-dessus du rail
 
-**Statut** : build — tier `isolated` (`check_scope`) · **Branche** : `sb/da-02-4b-1-sovereign-readout`
+**Statut** : ✅ MERGÉE (`45f014e`, closeout en annexe) — tier `isolated` (`check_scope`) · **Branche** : `sb/da-02-4b-1-sovereign-readout`
 **Base** : canonique `4a0255e` · **Commande** : `GO BUILD — DA-02.4B.1 — SOVEREIGN READOUT ABOVE CALIBRATION LINE` (opérateur, 2026-10-25)
 **Gate visuel** : **« ACCEPT — LOCK B.1 »** (opérateur, 2026-10-25)
 **Autorité** : `docs/strategy/AUREN_VISUAL_CONTRACT.md` (`CALIBRATION-LINE-V1`, `FRAME-C-V1`), gabarit `docs/templates/VISUAL_SPRINT_TEMPLATE.md`
@@ -160,3 +160,17 @@ Ordre proposé : B.2 (déjà prévue), puis R4, R2, R3, puis R1, l'intégration 
 - Frame C est désormais gardé à vide.
 - Les six compositions sont des baselines identiques à l'octet à ce que l'opérateur a vu.
 - Prochaine étape : **DA-02.4B.2 — divulgation progressive**.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #293, mergée par `--merge --match-head-commit` (head `7a5ad9e`) sous GO MERGE permanent, après « ACCEPT — LOCK B.1 » |
+| Commit de merge | `45f014e16ae1e2f4c7f6f2c65d6872c4e67b5821` |
+| CI de la PR | tous les jobs verts, dont `visual contract (DA-GOV-01)` sur les 12 baselines |
+| CI canonique (push) | run `40210144920` : 8 jobs sur 8 verts |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | débordement attrapé par la mesure et corrigé avant le gate (§6) ; installation intermittente du conteneur, hors périmètre |
+| Nettoyage | worktree `workout-session-tracking-b41` et branche `sb/da-02-4b-1-sovereign-readout` supprimés après ce closeout |
