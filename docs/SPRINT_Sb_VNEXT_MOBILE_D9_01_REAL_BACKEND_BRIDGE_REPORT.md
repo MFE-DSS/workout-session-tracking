@@ -1,6 +1,6 @@
 # Sb_VNEXT_MOBILE_D9_01 — le pont vers le vrai backend
 
-**Statut** : build · **Branche** : `sb/vnext-mobile-d9-01-real-backend-bridge` · **Base** : canonique `07c0eea`
+**Statut** : ✅ MERGÉE (PR #282, `bca942d`) · **Branche** : `sb/vnext-mobile-d9-01-real-backend-bridge` · **Base** : canonique `07c0eea`
 **Spec** : `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT_SPEC.md` §8 (contrats), §8.9 (D9), §8.10 (écarts nommés de cette tranche)
 
 Le labo `N0` accepté devient la première tranche verticale **connectée** :
@@ -146,7 +146,7 @@ FastAPI sur le réseau local, base SQLite dédiée, compte de test `dogfood_d9`.
 | C — un démarrage, une séance | un appui sur Démarrer | **exactement 1** séance (`push-a`, `in_progress`) |
 | D — séries | série confirmée, REPOS immédiat | série `5,0 kg × 6` en base, `completed_at` = l'heure **ancrée** de l'appareil (ms près) — D11 tenu |
 | R16 — rendu | ✕ en haut à gauche → feuille système « Terminer maintenant / Mettre en pause / Abandonner / Annuler » | **validé par l'opérateur** (« il est très bien ce truc ») |
-| E, F, G | _en cours avec l'opérateur_ | — |
+| E, F, G | **non jouées sur appareil** — hors ligne + arrêt forcé, reprise, TERMINER / ABANDONNER sur iPhone | couvertes par les tests (outbox, rejeu, réconciliation, fin, abandon) ; merge sur décision explicite de l'opérateur (« GO MERGE ») avant ces trois portes |
 
 Incident de porte, corrigé dans la tranche : l'écran de connexion envoyait **deux** requêtes
 par appui (le « go » du clavier et le bouton, avant que l'état `busy` n'arrive) — garde par
@@ -185,4 +185,29 @@ client mobile est la spec vNext (`§0quater`, `§0quinquies`) :
 | D14 — récupération d'abord | **respectée** : la mission est celle du moteur servi, non recalculée |
 | O1 — « l'IA » | **non concernée** par cette tranche (texte du bilan hérité du labo, inchangé) |
 
-**Verdict :** _en attente de la porte physique._
+**Verdict :** pont livré et mergé. L'app connectée tient le parcours réel de bout en bout sur iPhone (portes A–D et rendu R16 observés). Les portes E–F–G restent à jouer sur appareil ; elles le seront au premier dogfood en salle de la tranche suivante.
+
+---
+
+## Closeout
+
+| | |
+|---|---|
+| PR | [#282](https://github.com/MFE-DSS/workout-session-tracking/pull/282) — merge commit, tête épinglée `47dbd60` |
+| Merge | `bca942d493fa8abdc66cb25040a39a87873c9fb9` |
+| CI canonique | run `40170553004` sur `bca942d` — **verte** |
+| Sonar (PR) | gate **OK** — couverture du nouveau code 96,9 %, 0 bug, 0 smell, 0 vulnérabilité |
+| Threads de revue | 0 |
+| Migration en production | `z7a2u8v9x20` (`device_sessions`) — **non déployée** : la production n'a pas encore de client mobile ; le déploiement suit la distribution (L3, D10) |
+
+### Incidents résolus dans le périmètre
+
+1. **gitleaks** — le mot de passe factice d'un test pris pour une clé. Remplacé par la convention du dépôt et replié dans le commit d'origine (réécriture de la branche non mergée, accord opérateur) : la porte n'a reçu aucune exception.
+2. **Shard 1** — la garde « aucune route mobile ne rend de HTML » lisait `app.main.app.routes` : liste vide en CI (FastAPI 0.141 du lock), pleine en local (0.135). Elle lit désormais l'OpenAPI de l'application servie, et mord.
+3. **bandit B105** importé par Sonar (CRITICAL côté vulnérabilités) — `"token_type": "Bearer"` lu comme un mot de passe. Le schéma est une constante nommée ; aucune adjudication.
+
+### Ce qui reste ouvert
+
+- Portes E–F–G sur appareil.
+- Notes de dogfooding R6, R8–R14 (tranche suivante, exécution) ; R18–R20 (refonte MISSION) ; R1, R2, R4, R5, R7 (assets — cahier des charges remis à l'opérateur le 2026-10-25).
+- L3 distribution : programme Apple Developer payant (D10), décision opérateur.
