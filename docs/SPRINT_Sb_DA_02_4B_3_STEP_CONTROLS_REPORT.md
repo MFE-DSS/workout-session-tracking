@@ -1,6 +1,6 @@
 # Sb_DA_02_4B_3_STEP_CONTROLS — les commandes − / +
 
-**Statut** : build — tier `isolated` · **Branche** : `sb/da-02-4b-3-step-controls`
+**Statut** : ✅ MERGÉE (`453453a`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-4b-3-step-controls`
 **Base** : canonique `a8cd2a9` · **Commande** : brief opérateur `DA-02.4B.3 — STEP CONTROLS` (2026-10-25)
 **Gate visuel** : **« ACCEPT »** (opérateur, 2026-10-25), boutons gardés tels que définis ; allure cockpit différée
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` (`CALIBRATION-LINE-V1`, `FRAME-C-V1`, `INSTRUMENT-SURFACE-B1`, `-B2`)
@@ -119,3 +119,17 @@ Choisi par l'opérateur sur le tableau de croquis (P1), puis ajusté par lui :
 - Dimensions en pixels du manifeste écrites de tête, puis corrigées en lisant les en-têtes PNG (414 × 320, 344 × 278).
 
 **Verdict :** DA-02.4B.3 est livrée et **verrouillée par l'opérateur**. L'instrument se règle au doigt sur le rail ou par deux gros boutons sous le cadre ; un appui prend exactement le pas voisin fourni par le domaine et réveille l'échelle comme un glissé. Les 15 baselines précédentes sont intactes. Suite : R4 (exploration prête), R2, R1 ; R5 en finition.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #297, mergée par `--merge --match-head-commit` (head `b097aef`) sous GO MERGE permanent, après « ACCEPT » |
+| Commit de merge | `453453a9f32a22e2768e717767e9c9badbfe573e` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 27 baselines |
+| CI canonique (push) | run `40227684323` : 8 jobs sur 8 verts |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | collision de casse et dimensions du manifeste, corrigées avant le commit (§6) |
+| Nettoyage | worktree `workout-session-tracking-b43` et branche `sb/da-02-4b-3-step-controls` supprimés après ce closeout |
