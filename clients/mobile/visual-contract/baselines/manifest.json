@@ -165,6 +165,45 @@
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
       "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
       "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-390x220-target-rest",
+      "file": "surface-390x220-target-rest.png",
+      "visual_id": "INSTRUMENT-SURFACE-B2",
+      "fixture": "?fixture=surface-390x220-target-rest",
+      "width": 390,
+      "scenario": "TARGET at REST (70 kg, prescription 70 kg) — printed scale and zone names hidden",
+      "pixels": "414x244",
+      "sha256": "5be3fa050b8b246f59f63cdc298c0a36d980d905a7c34ce03591c8458a8c2d96",
+      "authority": "DA-02.4B.2; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-390x220-push-rest",
+      "file": "surface-390x220-push-rest.png",
+      "visual_id": "INSTRUMENT-SURFACE-B2",
+      "fixture": "?fixture=surface-390x220-push-rest",
+      "width": 390,
+      "scenario": "PUSH at REST (75 kg, prescription 70 kg)",
+      "pixels": "414x244",
+      "sha256": "c8bd85a4eb38a76b976a818ff12a23f9c77fd484fa5208f81d4f6ab94af0044a",
+      "authority": "DA-02.4B.2; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-390x220-high-cost-rest",
+      "file": "surface-390x220-high-cost-rest.png",
+      "visual_id": "INSTRUMENT-SURFACE-B2",
+      "fixture": "?fixture=surface-390x220-high-cost-rest",
+      "width": 390,
+      "scenario": "HIGH COST at REST (82,5 kg, prescription 70 kg)",
+      "pixels": "414x244",
+      "sha256": "f7eae16ab312423206e5c75f01bd04d06de38e032bfc2780ee935e405c12d230",
+      "authority": "DA-02.4B.2; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »",
+      "approved_on": "2026-10-25"
     }
   ]
 }
