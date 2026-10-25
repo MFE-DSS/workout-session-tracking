@@ -3,6 +3,8 @@
 #
 #   bash clients/mobile/visual-contract/run.sh test      # compare to the approved baselines
 #   bash clients/mobile/visual-contract/run.sh approve   # OPERATOR ONLY: rewrite the baselines
+#   bash clients/mobile/visual-contract/run.sh review    # capture the CANDIDATE fixtures for review
+#                                                        # (review-output/, never compared, never a baseline)
 #
 # `approve` is the explicit operator action of docs/strategy/AUREN_VISUAL_CONTRACT.md §5:
 # it rewrites the PNGs; the manifest must then be updated (sha256, approver, date)
@@ -11,10 +13,12 @@ set -euo pipefail
 
 IMAGE="mcr.microsoft.com/playwright:v1.63.0-noble@sha256:bc6ab0d6d44ff4826e4cb8c1e6d801e185bfc42bb0753f8e2a30efc70db054c7"
 MODE="${1:-test}"
+CONFIG="visual-contract/playwright.config.ts"
 case "$MODE" in
   test) EXTRA="" ;;
   approve) EXTRA="--update-snapshots=all" ;;
-  *) echo "usage: $0 test|approve" >&2; exit 2 ;;
+  review) EXTRA="" ; CONFIG="visual-contract/review.config.ts" ;;
+  *) echo "usage: $0 test|approve|review" >&2; exit 2 ;;
 esac
 
 REPO="$(cd "$(dirname "$0")/../../.." && pwd)"
@@ -27,4 +31,4 @@ docker run --rm --platform linux/amd64 \
   "$IMAGE" \
   bash -c "npm ci --no-audit --no-fund \
     && npx expo export --platform web --output-dir dist-contract \
-    && npx playwright test -c visual-contract/playwright.config.ts $EXTRA"
+    && npx playwright test -c $CONFIG $EXTRA"

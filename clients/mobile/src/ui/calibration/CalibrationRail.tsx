@@ -41,8 +41,18 @@ export type CalibrationRailProps = Boundaries & {
   /** assistive technologies: one step up / down */
   onIncrement?: () => void;
   onDecrement?: () => void;
+  /**
+   * Presentation only (DA-02.4B.1, P1): `false` leaves out the readout under the rail,
+   * for a caller that shows the value itself. Default: shown, the locked rendering.
+   */
+  showReadout?: boolean;
   testID?: string;
 };
+
+/** Which blocks sit under the rail's drawing: the density decides, a caller may only opt out. */
+export function railBlocks(density: Density, p: { showReadout?: boolean }): { zoneLabels: boolean; readout: boolean } {
+  return { zoneLabels: density === 'expanded', readout: density !== 'compact' && p.showReadout !== false };
+}
 
 /** AUREN_CALIBRATION_SYSTEM §3 — the range colours; the cursor stays `signal` in every zone. */
 const ZONE_COLOR: Record<Zone, string> = {
@@ -180,6 +190,7 @@ function Rail(props: CalibrationRailProps & { width: number }) {
     [],
   );
 
+  const blocks = railBlocks(l.density, props);
   const u = l.u;
   const band = l.band;
   const active = l.selectedZone;
@@ -331,8 +342,8 @@ function Rail(props: CalibrationRailProps & { width: number }) {
         </Animated.View>
       </View>
 
-      {l.density === 'expanded' ? <ZoneLabels l={l} /> : null}
-      {l.density !== 'compact' ? <Readout {...props} zone={l.selectedZone} /> : null}
+      {blocks.zoneLabels ? <ZoneLabels l={l} /> : null}
+      {blocks.readout ? <Readout {...props} zone={l.selectedZone} /> : null}
     </View>
   );
 }

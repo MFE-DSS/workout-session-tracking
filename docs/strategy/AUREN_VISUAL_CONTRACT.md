@@ -38,7 +38,8 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `FRAME-C-V1` | **LOCKED** (structure) ; composition intérieure **non verrouillée** | le module d'instrument | DA-02.3 (PR #287) — `clients/mobile/src/ui/instrument/frameGeometry.ts` (`rail`) |
 | `SEMANTIC-TOKENS-V1` | **LOCKED** (sens) | `signal` = curseur / action de l'opérateur · `system` = prescription / calcul d'AUREN · `perfBelow` EASY · `ink` TARGET · `perfAbove` PUSH · `alert` HIGH COST (« coût », jamais « danger ») | `clients/mobile/src/ui/theme.ts`, `AUREN_CALIBRATION_SYSTEM §3` |
 | `CALIBRATION-FIELD-V1` | **EXPLORATION**, hors chemin critique | rail vertical « en champ » : visualisation secondaire possible (plein écran, analyse), **jamais le contrôle de charge principal** | DA-02.3 ; décision opérateur DA-02.4 n° 4 |
-| `INSTRUMENT-SURFACE` | **EXPLORATION** | composition Frame C + rail + lecture | à refaire en **DA-02.4B** à partir de `CALIBRATION-LINE-V1` |
+| `INSTRUMENT-SURFACE-B1` | **LOCKED** (2026-10-25, « ACCEPT — LOCK B.1 ») | Frame C + rail en ligne pleine largeur + valeur souveraine au-dessus + chiffre prescrit sous le bloc du rail | DA-02.4B.1 — `clients/mobile/src/ui/instrument/HorizontalInstrumentSurface.tsx` (§8) |
+| `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` |
 
 ---
 
@@ -87,7 +88,7 @@ Tout changement de ce type fait quand même rougir le gate : il passe par une ap
 |---|---|---|---|---|
 | `REFERENCE-MARKER-V1` | 6u × 4u ; fente de 1u = un index ; paroi de 2,5u ; encoche de 1u × 0,6u ; angles droits ; posé sous la ligne | sa couleur seulement via le token `system` | arrondi, flèche, pin, triangle ; couleur codée en dur | couvert par les 4 baselines de `CALIBRATION-LINE-V1` ; fixture isolée à ajouter |
 | `ACTIVE-CURSOR-V1` | 6u × 10u ; même fente, même paroi, même largeur que le repère ; seul porteur du `signal` plein | — | pastille ronde, poignée SaaS, flèche ; perte de la fente | couvert par les 4 baselines ; fixture isolée à ajouter |
-| `FRAME-C-V1` | rectiligne ; bord bas = rail de montage d'1u ; deux marques de registration d'1u ; trait secondaire de 0,35u ; marge ≥ 2u | la composition intérieure (DA-02.4B) | arrondi générique, ombre, dégradé, texture, décor | **baseline à enregistrer** (320 × 180, 390 × 220, à vide) |
+| `FRAME-C-V1` | rectiligne ; bord bas = rail de montage d'1u ; deux marques de registration d'1u ; trait secondaire de 0,35u ; marge ≥ 2u | la composition intérieure (DA-02.4B) | arrondi générique, ombre, dégradé, texture, décor | `frame-c-390x220-empty` (u = 4), `frame-c-320x180-empty` (u = 3) — approuvées le 2026-10-25 (G2), avant toute composition |
 | `SEMANTIC-TOKENS-V1` | le **sens** de chaque rôle (§2) | une valeur, **seulement** avec une mesure de contraste (`CLAUDE.md §5.4`) | un rôle détourné : `alert` = interdit, `signal` hors action de l'opérateur | — |
 
 ## 5. Protocole de test visuel
@@ -121,3 +122,50 @@ Pour chaque composant protégé :
 7. DA-02.4 est **rejeté**. On ne garde que le **principe** REST / ADJUSTING / COMMITTED, le **correctif des noms de zone** et les **mesures** ; la composition, jamais. Le code retenu sera revu à part.
 
 **Chemin critique** : DA-GOV-01 Visual Contract → DA-02.4B Horizontal Instrument Surface → Recessed Window → Numeric Readout system → Logo.
+
+## 7. Décisions de l'opérateur sur DA-02.4B.1 (2026-10-25)
+
+| # | Décision |
+|---|---|
+| G1 | Les 4 baselines `calibration-line-*` sont **approuvées explicitement**. Elles font autorité pour le rail DA-02.2 **seul**. La collision « 70 » et les doublons verbal-visuels qu'elles contiennent sont des propriétés **connues** du rail autonome, pas des qualités voulues |
+| G2 | Frame C vide est gardé (`frame-c-*-empty`) **avant** toute composition dedans |
+| G3 | Les doublons se résolvent **par la composition**, jamais en changeant le rendu par défaut du rail |
+| P1 | `CalibrationRail.tsx` reçoit des props de **présentation** opt-out (`showReadout` en B.1). Défaut = rendu verrouillé, aucune sémantique ni géométrie touchée, aucune connaissance de la surface |
+| P2 | Le « 2× » de DA-02.3 ne s'applique pas au rail en ligne : `u` suit la densité (4 à 390, 3 à 320) |
+| D-A | Le delta chiffré est **retiré** de la surface : l'écart curseur → repère le montre |
+| D-B | Le chiffre prescrit s'écrit **sous** le repère, sans mot. À 390, il passe sous la rangée des noms de zone (option (i)), seule place qui respecte à la fois D-B et la rangée gardée en B.1 |
+| — | Le double « 70 » (échelle chiffrée + chiffre prescrit) en PUSH et HIGH COST à 390 est **accepté jusqu'à B.2**, qui masquera l'échelle au repos |
+| Gate | **« ACCEPT — LOCK B.1 »** : les six compositions deviennent les baselines de `INSTRUMENT-SURFACE-B1` |
+
+## 8. `INSTRUMENT-SURFACE-B1` — fiche
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | LOCKED |
+| **Rôle sémantique** | la décision de charge en un regard : la valeur choisie d'abord, puis sa relation à la prescription sur le rail |
+| **Source d'autorité** | DA-02.4B.1. Code : `HorizontalInstrumentSurface.tsx`, plus `CalibrationRail.tsx` (`showReadout={false}`) et `InstrumentFrame` (`rail`), inchangés |
+| **Baselines approuvées** | `surface-390x220-target`, `surface-390x220-push`, `surface-390x220-high-cost`, `surface-320x180-target`, `surface-320x180-push`, `surface-320x180-high-cost` |
+| **Largeurs requises** | 390 × 220 (u = 4), 320 × 180 (u = 3) |
+
+**MUST PRESERVE**
+- tout `CALIBRATION-LINE-V1` et tout `FRAME-C-V1` ;
+- le rail prend **toute** la largeur du champ de contenu ; rien ne se pose à côté ;
+- la valeur choisie au-dessus, souveraine (`type.readout` à 390, `type.figure` à 320), avec son unité, tirée de `selectedValue` et `unit` seulement ;
+- le chiffre prescrit sous le bloc du rail, centré sur le repère, en `system`, sans mot ;
+- une information, une seule fois : pas de « PRESCRIT », pas de « ±0 · TARGET », pas de delta chiffré.
+
+**MUST NEVER**
+- réintroduire la lecture interne du rail dans la surface ;
+- laisser un élément sortir du champ de contenu du cadre (la capture de revue le mesure et échoue).
+
+## 9. Itérations suivantes demandées par l'opérateur (2026-10-25, à l'acceptation de B.1)
+
+Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent un élément LOCKED passent par une baseline approuvée.
+
+| # | Demande (mots de l'opérateur, résumés) | Touche | Tranche |
+|---|---|---|---|
+| R1 | dans la séance, la surface **centrée au milieu de la carte**, en plus grand | intégration produit (écran séance) | intégration séance, après B.2 |
+| R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `CALIBRATION-LINE-V1` (LOCKED) → nouvelle baseline | itération dédiée |
+| R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | itération dédiée |
+| R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | itération dédiée |
+| B.2 | divulgation progressive REST / ADJUSTING (déjà prévue) | `INSTRUMENT-SURFACE` + props `showScale` / `showZoneLabels` | DA-02.4B.2 |

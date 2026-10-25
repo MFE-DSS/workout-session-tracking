@@ -32,7 +32,8 @@ FIXTURES_TS = (MOBILE / "src" / "ui" / "contract" / "fixtures.ts").read_text(enc
 PACKAGE = json.loads((MOBILE / "package.json").read_text(encoding="utf-8"))
 
 IMAGE = MANIFEST["renderer"]["image"]
-LOCKED_IDS = ("CALIBRATION-LINE-V1", "REFERENCE-MARKER-V1", "ACTIVE-CURSOR-V1", "FRAME-C-V1", "SEMANTIC-TOKENS-V1")
+LOCKED_IDS = ("CALIBRATION-LINE-V1", "REFERENCE-MARKER-V1", "ACTIVE-CURSOR-V1", "FRAME-C-V1", "SEMANTIC-TOKENS-V1",
+              "INSTRUMENT-SURFACE-B1")
 
 
 def _fixture_ids() -> set[str]:
@@ -105,6 +106,19 @@ def test_the_contract_names_every_baseline_and_every_locked_id():
         assert vid in CONTRACT, vid
     for word in ("LOCKED", "CONSTRAINED", "EXPLORATION", "MUST PRESERVE", "MUST NEVER", "MAY CHANGE"):
         assert word in CONTRACT, word
+
+
+def test_a_candidate_is_reviewed_never_compared_until_the_operator_approves_it():
+    """DA-02.4B.1 — a candidate (candidates.ts) is captured for review, never gated, never a baseline."""
+    candidates_ts = (MOBILE / "src" / "ui" / "contract" / "candidates.ts").read_text(encoding="utf-8")
+    kinds = set(re.findall(r"candidate: '([A-Z0-9-]+)'", candidates_ts))
+    assert kinds, "no candidate parsed from candidates.ts"
+    assert not kinds & set(LOCKED_IDS), "a LOCKED element is governed by a baseline, never left as a candidate"
+    assert "candidates" not in (GATE / "visual.spec.ts").read_text(encoding="utf-8")
+    review_spec = (GATE / "review.spec.ts").read_text(encoding="utf-8")
+    assert ".toHaveScreenshot(" not in review_spec, "a review capture compares nothing"
+    assert "'baselines'" not in review_spec, "a review capture never writes under baselines/"
+    assert 'review) EXTRA="" ; CONFIG="visual-contract/review.config.ts"' in RUN_SH
 
 
 def test_no_raster_baseline_lives_under_design_auren():
