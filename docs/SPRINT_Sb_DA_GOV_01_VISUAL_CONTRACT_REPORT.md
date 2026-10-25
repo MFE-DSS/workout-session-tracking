@@ -1,6 +1,6 @@
 # Sb_DA_GOV_01_VISUAL_CONTRACT — contrat visuel et gate de régression
 
-**Statut** : build — tier `ci_infra` (le pipeline change) · **Branche** : `sb/da-gov-01-visual-contract`
+**Statut** : ✅ MERGÉE (`9c65f7e`, closeout en annexe) — tier `ci_infra` (le pipeline change) · **Branche** : `sb/da-gov-01-visual-contract`
 **Base** : canonique `2c12ee8` · **Commande** : brief opérateur `DA-GOV-01 — VISUAL CONTRACT & REGRESSION GATE` (2026-10-25)
 **Autorité produite** : `docs/strategy/AUREN_VISUAL_CONTRACT.md`
 
@@ -97,3 +97,17 @@ Conformément au §9 du brief et à la décision n° 7 de l'opérateur :
 | Reproductibilité local ↔ CI | comparaison des journaux | les **mêmes nombres de pixels** différents en local et en CI : l'environnement est neutre, seul le changement visuel compte |
 
 **Verdict :** DA-GOV-01 est livré. Le contrat visuel existe, avec `CALIBRATION-LINE-V1` et quatre autres éléments LOCKED. Les baselines DA-02.2 sont enregistrées avec leur provenance. Le gate de comparaison au pixel s'exécute en CI dans une image épinglée identique au local, et il **échoue sur une mutation volontaire, prouvé en local et sur la CI réelle**. Une baseline ne change que par une action explicite de l'opérateur (`run.sh approve` + manifeste, gardés par test). Aucun écran produit ni composant verrouillé n'a été modifié. Prochaine étape du chemin critique : **DA-02.4B**, sous ce contrat.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #290, mergée par `--merge --match-head-commit` (head `6fd18e8`) sous GO MERGE permanent |
+| Commit de merge | `9c65f7e0756b7714f84f70b071f5ed0e95984877` |
+| CI canonique (push) | run `40192480512` : lint, attestation, **visual contract (DA-GOV-01)**, 3 shards pytest, tous verts. Premier passage canonique du gate |
+| Sonar | gate PR `OK`, 0 fil de revue non résolu |
+| Sonde de mutation | PR #291 fermée sans merge, branche supprimée |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktree et branche `sb/da-gov-01-visual-contract` supprimés après ce closeout |
