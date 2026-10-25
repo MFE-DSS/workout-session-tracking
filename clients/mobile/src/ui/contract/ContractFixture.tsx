@@ -4,15 +4,31 @@ import { Text, View } from 'react-native';
 import { CalibrationRail } from '../calibration/CalibrationRail';
 import { HorizontalInstrumentSurface } from '../instrument/HorizontalInstrumentSurface';
 import { InstrumentFrame } from '../instrument/InstrumentFrame';
+import { InstrumentWithStepControls } from '../instrument/InstrumentWithStepControls';
 import { color, type } from '../theme';
 import { candidateById } from './candidates';
 import { CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
 
 /** Fixed frame around the component: the same in every baseline. */
 const PAD = 12;
+/** A still fixture's controls look enabled (they would be in the product); a press does nothing here. */
+const NOOP = () => undefined;
 
 function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
+  if (f.contract === 'INSTRUMENT-CONTROLS-B3') {
+    return (
+      <InstrumentWithStepControls
+        {...CALIBRATION_LINE_DEMO}
+        width={f.width}
+        height={f.height}
+        selectedPosition={selectedPositionOf(f)}
+        selectedValue={f.selectedValue}
+        presentation={f.presentation}
+        onSelectPosition={NOOP}
+      />
+    );
+  }
   if (f.contract === 'INSTRUMENT-SURFACE-B1' || f.contract === 'INSTRUMENT-SURFACE-B2') {
     return (
       <HorizontalInstrumentSurface
@@ -52,13 +68,14 @@ export function ContractFixtureScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: color.field, alignItems: 'flex-start' }}>
         <View testID="contract-candidate" style={{ padding: PAD, backgroundColor: color.field }}>
-          <HorizontalInstrumentSurface
+          <InstrumentWithStepControls
             {...CALIBRATION_LINE_DEMO}
             width={candidate.width}
             height={candidate.height}
             selectedPosition={selectedPositionOf(candidate)}
             selectedValue={candidate.selectedValue}
             presentation={candidate.presentation}
+            onSelectPosition={NOOP}
           />
         </View>
       </View>

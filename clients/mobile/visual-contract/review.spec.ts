@@ -66,7 +66,19 @@ for (const f of CANDIDATE_FIXTURES) {
       referenceOverlapsTarget: overlaps(measured.reference, measured.targetLabel),
       railFullContentWidth: measured.rail ? Math.abs(measured.rail.w - Math.floor(c.w)) < 0.5 : false,
     };
-    writeFileSync(path.join(OUT, `${f.id}.json`), JSON.stringify({ ...measured, verdict }, null, 2));
+    // DA-02.4B.3 — the − / + controls: under the frame, thumb-sized, apart from each other
+    const minus = rel(await box(fixture.getByTestId('step-decrement')));
+    const plus = rel(await box(fixture.getByTestId('step-increment')));
+    const frameBottom = PAD + f.height;
+    const controls = minus || plus ? { minus, plus } : null;
+    const controlsVerdict = controls
+      ? {
+          controlsUnderFrame: [minus, plus].every((b) => b !== null && b.y >= frameBottom - 0.5),
+          controlsThumbSized: [minus, plus].every((b) => b !== null && b.w >= 44 && b.h >= 44),
+          controlsApart: !overlaps(minus, plus),
+        }
+      : {};
+    writeFileSync(path.join(OUT, `${f.id}.json`), JSON.stringify({ ...measured, controls, verdict: { ...verdict, ...controlsVerdict } }, null, 2));
     expect(verdict, `${f.id}: content must stay inside the frame and the rail keep its full width`).toEqual({
       valueInside: true,
       railInside: true,
@@ -74,5 +86,12 @@ for (const f of CANDIDATE_FIXTURES) {
       referenceOverlapsTarget: false,
       railFullContentWidth: true,
     });
+    if (controls) {
+      expect(controlsVerdict, `${f.id}: the controls stay under the frame, thumb-sized and apart`).toEqual({
+        controlsUnderFrame: true,
+        controlsThumbSized: true,
+        controlsApart: true,
+      });
+    }
   });
 }

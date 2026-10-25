@@ -6,6 +6,7 @@ import { CALIBRATION_LINE_DEMO, SURFACE_B1_FIXTURES, SURFACE_B2_FIXTURES } from 
 import { color, space, type } from '../theme';
 import { useDisclosure } from './disclosure';
 import { HorizontalInstrumentSurface } from './HorizontalInstrumentSurface';
+import { InstrumentWithStepControls } from './InstrumentWithStepControls';
 
 /**
  * DA-02.4B.1 — the device bench (EXPO_PUBLIC_GALLERY=surface-b1): the composed surface
@@ -41,8 +42,8 @@ function Bench() {
         <Text style={[type.small, { marginTop: 4 }]}>Valeurs de démonstration : aucune ne vient du moteur.</Text>
       </View>
 
-      <Block label={`Glisser · ${live.width} × ${live.height}`}>
-        <HorizontalInstrumentSurface
+      <Block label={`Glisser ou − / + · ${live.width} × ${live.height}`}>
+        <InstrumentWithStepControls
           {...CALIBRATION_LINE_DEMO}
           width={live.width}
           height={live.height}

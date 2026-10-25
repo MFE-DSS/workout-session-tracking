@@ -465,7 +465,8 @@ langage de l'instrument existe, pas l'inverse.
 | `DA-GOV-01` | **Visual Contract & Regression Gate** | ✅ **mergé** (PR #290, `9c65f7e`) : `AUREN_VISUAL_CONTRACT.md`, baselines DA-02.2, job CI `visual-contract` |
 | `DA-02.4B.1` | **Lecture souveraine au-dessus du rail** : rail en ligne DA-02.2 pleine largeur dans Frame C ; valeur choisie au-dessus ; chiffre prescrit sous le repère, sans mot | ✅ **acceptée** (« ACCEPT — LOCK B.1 », 2026-10-25) : `INSTRUMENT-SURFACE-B1` LOCKED, 6 baselines ; Frame C vide gardé (2 baselines) |
 | `DA-02.4B.2` | **Divulgation progressive** REST / ADJUSTING : échelle chiffrée et noms de zone masqués au repos | ✅ **acceptée** (2026-10-25) : `INSTRUMENT-SURFACE-B2` LOCKED, 3 baselines au repos ; le « 70 » ne bouge pas ; retour au repos 1,5 s après le dernier geste |
-| `R1–R4` | demandes de l'opérateur à l'acceptation de B.1 (`AUREN_VISUAL_CONTRACT §9`) : surface centrée et plus grande en séance · rail plus haut et plus bas · boutons + / − · surbrillance de zone plus contrastée | → **prochaines**, une itération chacune (ordre proposé : R4, R2, R3, R1) |
+| `DA-02.4B.3` | **Commandes − / +** sous le cadre (R3) | ✅ **acceptée** (2026-10-25) : `INSTRUMENT-CONTROLS-B3` LOCKED, 12 baselines ; allure cockpit différée (R5) |
+| `R1, R2, R4, R5` | demandes restantes de l'opérateur (`AUREN_VISUAL_CONTRACT §9`) : surface centrée et plus grande en séance · rail plus haut et plus bas · surbrillance de zone plus contrastée · boutons plus cockpit | → R4 (exploration prête, non committée), R2, R1 ; R5 en finition |
 | — | Recessed Window → Numeric Readout system | → |
 | `DA-03` | Manufacturer Mark (logo) | → |
 | — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |

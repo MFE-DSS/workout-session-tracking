@@ -6,15 +6,15 @@
  * does it move to `CONTRACT_FIXTURES` (fixtures.ts) and get its baseline through
  * `run.sh approve` + the manifest (docs/strategy/AUREN_VISUAL_CONTRACT.md §5).
  *
- * Empty between two iterations: B.2's REST renders were approved (« ACCEPT — LOCK B.2 »)
- * and moved to fixtures.ts. The next iteration adds its own candidates here.
+ * Empty between two iterations: B.3's renders were approved (« ACCEPT — LOCK B.3 ») and
+ * moved to fixtures.ts. The next iteration adds its own candidates here.
  */
 import type { Presentation } from '../instrument/disclosure';
 
 export type CandidateFixture = {
   /** `<visual id>-<width>x<height>-<scenario>-<state>` */
   id: string;
-  candidate: 'INSTRUMENT-SURFACE';
+  candidate: 'INSTRUMENT-CONTROLS';
   width: number;
   height: number;
   scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
