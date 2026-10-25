@@ -49,6 +49,37 @@ for (const f of CANDIDATE_FIXTURES) {
       b && origin ? { x: b.x - origin.x, y: b.y - origin.y, w: b.width, h: b.height } : null;
     const c = frameGeometry('rail', f.width, f.height, UNIT[densityFor(f.width)]).content;
     const content: Box = { x: PAD + c.x, y: PAD + c.y, w: c.w, h: c.h };
+    const within = (b: Box | null, outer: Box) =>
+      !b || (b.x >= outer.x - 0.5 && b.y >= outer.y - 0.5 && b.x + b.w <= outer.x + outer.w + 0.5 && b.y + b.h <= outer.y + outer.h + 0.5);
+    const all = async (id: string) =>
+      Promise.all((await fixture.getByTestId(id).all()).map(async (l) => rel(await l.boundingBox())));
+
+    // DA-02.5 — Recessed Window candidates: inside Frame C, apart, every content inside its window
+    const windows = (await all('recessed-window')).filter((b): b is Box => b !== null);
+    if (windows.length) {
+      const fields = (await all('recessed-content')).filter((b): b is Box => b !== null);
+      const items = [...(await all('window-text')), ...(await all('window-value')), ...(await all('window-bodymap'))].filter(
+        (b): b is Box => b !== null,
+      );
+      // a value pushed to its largest size must never be cut (ellipsis or clipping)
+      const cut = await fixture
+        .getByTestId('window-value')
+        .evaluateAll((els) => els.filter((e) => e.scrollWidth > e.clientWidth + 1).length);
+      const windowVerdict = {
+        windowsInsideFrame: windows.every((w) => within(w, content)),
+        windowsApart: windows.every((a, i) => windows.every((b, j) => i === j || !overlaps(a, b))),
+        contentInsideItsWindow: items.every((it) => fields.some((fl) => within(it, fl))),
+        valuesNotCut: cut === 0,
+      };
+      writeFileSync(path.join(OUT, `${f.id}.json`), JSON.stringify({ id: f.id, content, windows, fields, items, verdict: windowVerdict }, null, 2));
+      expect(windowVerdict, `${f.id}: windows inside Frame C, apart, their content inside them, no value cut`).toEqual({
+        windowsInsideFrame: true,
+        windowsApart: true,
+        contentInsideItsWindow: true,
+        valuesNotCut: true,
+      });
+      return;
+    }
     const measured = {
       id: f.id,
       content,

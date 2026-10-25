@@ -9,6 +9,7 @@
  * baseline: it is a contract change, not a refactor.
  */
 import type { Boundaries } from '../calibration/layout';
+import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 
 const LOW_KG = 52.5;
 const HIGH_KG = 87.5;
@@ -77,6 +78,14 @@ export type ContractFixture =
       scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
       selectedValue: number;
       presentation: 'rest' | 'adjusting';
+    }
+  | {
+      /** the baseline id: `window-<width>x<height>-<fixture>` — Recessed Window(s) in Frame C (DA-02.5) */
+      id: string;
+      contract: 'RECESSED-WINDOW-V1';
+      width: number;
+      height: number;
+      fixture: WindowFixture;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -113,6 +122,16 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'controls-320x180-target-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'TARGET', selectedValue: 72.5, presentation: 'adjusting' },
   { id: 'controls-320x180-push-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'PUSH', selectedValue: 77.5, presentation: 'adjusting' },
   { id: 'controls-320x180-high-cost-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'HIGH_COST', selectedValue: 85, presentation: 'adjusting' },
+  // DA-02.5 — « ACCEPT — LOCK W1 » by the operator on 2026-10-25: the Recessed Window (W1 · Inset),
+  // values as large as they fit, F1 text / figure · F2 BodyMap placeholder · F3 pair and 60/40
+  { id: 'window-390x220-f1', contract: 'RECESSED-WINDOW-V1', width: 390, height: 220, fixture: 'f1' },
+  { id: 'window-390x220-f2', contract: 'RECESSED-WINDOW-V1', width: 390, height: 220, fixture: 'f2' },
+  { id: 'window-390x220-f3-pair', contract: 'RECESSED-WINDOW-V1', width: 390, height: 220, fixture: 'f3-pair' },
+  { id: 'window-390x220-f3-split', contract: 'RECESSED-WINDOW-V1', width: 390, height: 220, fixture: 'f3-split' },
+  { id: 'window-320x180-f1', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f1' },
+  { id: 'window-320x180-f2', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f2' },
+  { id: 'window-320x180-f3-pair', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f3-pair' },
+  { id: 'window-320x180-f3-split', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f3-split' },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */
