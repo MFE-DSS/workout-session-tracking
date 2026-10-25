@@ -367,6 +367,36 @@ def test_a_proposed_substitute_is_applied_and_only_that(client):
     assert again.json()["applied"] is False
 
 
+def test_substitute_options_are_ranked_by_the_engine_with_their_level(client):
+    """R11 — la liste classée N1 → N3, avec le libellé du moteur, telle qu'il la rend."""
+    from app.database import SessionLocal
+    from app.models.session import SessionExercise
+    from app.services.substitution import compute_suggestions
+
+    h = _token()
+    plan = _start(client, h).json()
+    ex = _with_substitutes(plan)
+    options = ex["substitute_options"]
+    assert options, "prémisse : un exercice avec des remplaçants"
+    levels = [o["level"] for o in options]
+    assert levels == sorted(levels), "N1 avant N2 avant N3"
+    assert {o["badge"] for o in options} <= {"Équivalent", "Proche", "Élargi"}
+    with SessionLocal() as db:
+        te = db.get(SessionExercise, ex["se_id"]).template_exercise
+        engine = [(sg.name, sg.level) for lvl in ("N1", "N2", "N3")
+                  for sg in compute_suggestions(te).get(lvl, [])]
+    assert [(o["name"], o["level"]) for o in options] == engine, "l'ordre est celui du moteur"
+
+
+def test_every_ranked_option_is_accepted_by_the_substitute_command(client):
+    h = _token()
+    plan = _start(client, h).json()
+    ex = _with_substitutes(plan)
+    last = ex["substitute_options"][-1]["name"]
+    r = _sub(client, h, plan["session_id"], ex["se_id"], last)
+    assert r.status_code == 200, "un remplaçant proposé, même N3, est accepté"
+
+
 def test_a_substitute_the_server_never_proposed_is_refused(client):
     h = _token()
     plan = _start(client, h).json()

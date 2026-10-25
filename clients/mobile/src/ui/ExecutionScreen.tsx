@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, Easing, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { frenchSummary, kg, scheme } from '../domain/format';
 import { formatClock, remainingFraction, remainingMs } from '../domain/timer';
-import type { PlanExercise } from '../domain/types';
+import type { PlanExercise, SubstituteLevel } from '../domain/types';
 import {
   canValidate,
   currentExercise,
+  DoneSet,
   Draft,
   draftFor,
   exerciseById,
@@ -50,6 +51,12 @@ export type ExecutionHandlers = {
    * (still « enregistrée sur l'appareil »). Absent in the lab, which has no server.
    */
   serverStateOf?: (setId: number) => 'synced' | 'refused' | null;
+  /** R10 — leave the current set undone (nothing is written). */
+  onSkipSet?: (setId: number) => void;
+  /** R12 — leave the rest of the current exercise undone. */
+  onSkipExercise?: () => void;
+  /** R10 / R12 — a few seconds to take a skip back. `null` otherwise. */
+  undo?: { text: string; onUndo: () => void } | null;
 };
 
 /**
@@ -118,6 +125,12 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
           {props.statusNote.text}
         </Text>
       ) : null}
+      {props.undo ? (
+        <View style={styles.undo} accessibilityLiveRegion="polite">
+          <Text style={[type.small, { flex: 1, color: color.ink2 }]}>{props.undo.text}</Text>
+          <SecondaryButton label="Annuler" onPress={props.undo.onUndo} style={styles.undoButton} />
+        </View>
+      ) : null}
 
       <Animated.View style={[styles.body, { opacity: appear, transform: [{ translateY: shiftY }] }]}>
         {resting ? (
@@ -130,37 +143,47 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
             }}
           />
         ) : (
-          <SetBody {...props} exercise={exercise} onEdit={(setId, field) => setEdit({ setId, field })} />
-        )}
-      </Animated.View>
-
-      <Sheet visible={menu} title={exercise.executed_name} onClose={() => setMenu(false)}>
-        {setsOf(plan, exercise.se_id).some((s) => state.done[s.set_id]) ? (
-          // the server's rule (`can_substitute`): no swap once a work set is done —
-          // say it here rather than send a command it will refuse
-          <SheetRow title="Remplacer cet exercice" detail="Plus possible : une série de cet exercice est déjà enregistrée." />
-        ) : (
-          <SheetRow
-            title="Remplacer cet exercice"
-            detail="Le remplacement est validé par AUREN dès que la connexion revient."
-            onPress={() => {
-              setMenu(false);
-              setSwapFor(exercise.se_id);
+          <SetBody
+            {...props}
+            exercise={exercise}
+            onEdit={(setId, field) => setEdit({ setId, field })}
+            onSwap={(seId) => {
+              setSwapFor(seId);
+              props.onSecondaryOpened();
             }}
           />
         )}
-        <SheetRow
-          title={props.onExitRequested ? 'Journal de l’appareil' : 'Journal local du labo'}
-          detail={props.onExitRequested
-            ? 'Ce qui est enregistré ici, ce qui est déjà sur AUREN, ce qui attend la connexion.'
-            : 'Séries enregistrées sur l’appareil, commandes en attente, mesures.'}
-          onPress={() => {
-          setMenu(false);
-          props.onOpenLab();
-        }} />
+      </Animated.View>
+
+      {/* R8 — the ⋯ holds the EXERCISE gestures; replacing has its own icon (⇄) next to the name */}
+      <Sheet visible={menu} title={exercise.executed_name} onClose={() => setMenu(false)}>
+        {props.onSkipExercise && !resting ? (
+          <SheetRow
+            title="Passer cet exercice"
+            detail="Ses séries restantes ne seront pas comptées. Tu pourras annuler quelques secondes."
+            onPress={() => {
+              setMenu(false);
+              props.onSkipExercise?.();
+            }}
+          />
+        ) : null}
+        {/* R9 — the journal is instrumentation: development builds only, in the connected app */}
+        {!props.onExitRequested || __DEV__ ? (
+          <SheetRow
+            title={props.onExitRequested ? 'Journal de l’appareil' : 'Journal local du labo'}
+            detail={props.onExitRequested
+              ? 'Diagnostic : ce qui est enregistré ici, ce qui est déjà sur AUREN, ce qui attend la connexion.'
+              : 'Séries enregistrées sur l’appareil, commandes en attente, mesures.'}
+            onPress={() => {
+              setMenu(false);
+              props.onOpenLab();
+            }}
+          />
+        ) : null}
       </Sheet>
 
       <SwapSheet
+        locked={swapFor !== null && setsOf(plan, swapFor).some((s) => state.done[s.set_id])}
         exercise={swapFor === null ? null : exerciseById(plan, swapFor) ?? null}
         onClose={() => setSwapFor(null)}
         onPick={(name) => {
@@ -175,7 +198,24 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
 
 // ── CURRENT_SET ──────────────────────────────────────────────────────────────
 
-function SetBody(props: { state: WorkoutState; exercise: PlanExercise; onEdit: (setId: number, field: keyof Draft) => void } & ExecutionHandlers) {
+function chipLabel(done: DoneSet | undefined, skipped: boolean, current: boolean): string {
+  if (done) return `✓ ${kg(done.weight)}×${done.reps}`;
+  if (skipped) return '— passée';
+  return current ? '● en cours' : '○';
+}
+
+function chipA11y(index: number, done: DoneSet | undefined, skipped: boolean, current: boolean): string {
+  if (done) return `série ${index} faite, ${kg(done.weight)} kilos, ${done.reps} reps`;
+  if (skipped) return `série ${index} passée`;
+  return current ? `série ${index} en cours` : `série ${index} à venir`;
+}
+
+function SetBody(props: {
+  state: WorkoutState;
+  exercise: PlanExercise;
+  onEdit: (setId: number, field: keyof Draft) => void;
+  onSwap: (seId: number) => void;
+} & ExecutionHandlers) {
   const { state, exercise } = props;
   const setId = state.cursorSetId!;
   const set = setById(state.plan!, setId)!;
@@ -183,29 +223,34 @@ function SetBody(props: { state: WorkoutState; exercise: PlanExercise; onEdit: (
   const draft = draftFor(state, setId);
   const valid = canValidate(draft);
   const pending = state.requiresSync[exercise.se_id];
+  const skipped = state.skipped ?? {};
 
   return (
     <View style={{ flex: 1 }}>
-      <Text style={type.exercise} accessibilityRole="header" maxFontSizeMultiplier={1.3}>
-        {exercise.executed_name}
-      </Text>
+      <View style={styles.nameRow}>
+        <Text style={[type.exercise, { flex: 1 }]} accessibilityRole="header" maxFontSizeMultiplier={1.3}>
+          {exercise.executed_name}
+        </Text>
+        {/* R8 — replacing is one tap away at every set, never hidden in the ⋯ */}
+        <IconButton glyph="⇄" label="Remplacer cet exercice" onPress={() => props.onSwap(exercise.se_id)} />
+      </View>
       <Text style={[type.body, styles.setLine]}>
         <Text style={type.bodyStrong}>{`Série ${set.index} sur ${sets.length}`}</Text>
         {exercise.rep_range ? `  ·  objectif ${exercise.rep_range.min}–${exercise.rep_range.max} reps` : ''}
       </Text>
 
-      <View style={styles.chips} accessible accessibilityLabel={sets.map((s) => {
-        const d = state.done[s.set_id];
-        return d ? `série ${s.index} faite, ${kg(d.weight)} kilos, ${d.reps} reps` : s.set_id === setId ? `série ${s.index} en cours` : `série ${s.index} à venir`;
-      }).join(', ')}>
+      <View
+        style={styles.chips}
+        accessible
+        accessibilityLabel={sets.map((s) => chipA11y(s.index, state.done[s.set_id], Boolean(skipped[s.set_id]), s.set_id === setId)).join(', ')}
+      >
         {sets.map((s) => {
-          const d = state.done[s.set_id];
           const now = s.set_id === setId;
           return (
             <View key={s.set_id} style={[styles.chip, now && styles.chipNow]}>
               <Text style={styles.chipIndex}>{`S${s.index}`}</Text>
               <Text style={[styles.chipValue, now && { color: color.ink }]} numberOfLines={1}>
-                {d ? `✓ ${kg(d.weight)}×${d.reps}` : now ? '● en cours' : '○'}
+                {chipLabel(state.done[s.set_id], Boolean(skipped[s.set_id]), now)}
               </Text>
             </View>
           );
@@ -260,6 +305,19 @@ function SetBody(props: { state: WorkoutState; exercise: PlanExercise; onEdit: (
           }}
         />
       )}
+      {props.onSkipSet ? (
+        // R10 — secondary, grey, set apart from « Valider » so the thumb does not hit it by accident
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Passer la série ${set.index}`}
+          accessibilityHint="La série ne sera pas comptée. Tu pourras annuler quelques secondes."
+          hitSlop={8}
+          onPress={() => props.onSkipSet?.(setId)}
+          style={({ pressed }) => [styles.skip, pressed && { opacity: 0.6 }]}
+        >
+          <Text style={styles.skipText}>Passer cette série</Text>
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -278,6 +336,10 @@ function Guidance(props: { exercise: PlanExercise }) {
       ) : (
         <Text style={[type.body, { color: color.ink2 }]}>{g?.intent_label ?? 'Pas encore de référence'}</Text>
       )}
+      {/* R6 — a first time is not a gap: it is where the reference is set */}
+      {!prev && (!g || g.is_silent) ? (
+        <Text style={[type.small, { marginTop: 4 }]}>Première fois : la charge que tu valides devient ta référence.</Text>
+      ) : null}
       {prev ? <Text style={[type.small, { marginTop: 8 }]}>{`La dernière fois · ${prev.relative} · ${previousLine(prev)}`}</Text> : null}
     </View>
   );
@@ -384,18 +446,51 @@ function RestBody(props: { state: WorkoutState; nowMs: number; exercise: PlanExe
 
 // ── secondary sheets ─────────────────────────────────────────────────────────
 
-function SwapSheet(props: { exercise: PlanExercise | null; onClose: () => void; onPick: (name: string) => void }) {
+const LEVEL_TONE: Record<SubstituteLevel, string> = { N1: color.subN1, N2: color.subN2, N3: color.subN3 };
+
+/** The engine's ranked list when the server sends it; the lab's flat list otherwise. */
+function optionsOf(ex: PlanExercise): { name: string; level: SubstituteLevel | null; badge: string | null; rationale: string | null }[] {
+  if (ex.substitute_options?.length) return ex.substitute_options;
+  return ex.substitutes.map((name) => ({ name, level: null, badge: null, rationale: null }));
+}
+
+function SwapSheet(props: { exercise: PlanExercise | null; locked: boolean; onClose: () => void; onPick: (name: string) => void }) {
   const ex = props.exercise;
+  const options = ex ? optionsOf(ex) : [];
+  let body: React.ReactNode;
+  if (props.locked) {
+    // the server's rule (`can_substitute`): a session holds ONE executed name per
+    // exercise — once a set is done, a swap would rename sets already performed
+    body = <SheetRow title="Plus possible pour cet exercice" detail="Une série est déjà enregistrée sous ce nom : la remplacer changerait le nom des séries déjà faites." />;
+  } else if (options.length === 0) {
+    body = <SheetRow title="Aucun remplaçant proposé pour cet exercice" />;
+  } else {
+    body = options.map((o) => (
+      <Pressable
+        key={o.name}
+        accessibilityRole="button"
+        accessibilityLabel={o.badge ? `${o.name}, ${o.badge}` : o.name}
+        onPress={() => props.onPick(o.name)}
+        style={({ pressed }) => [styles.option, o.level && { borderLeftColor: LEVEL_TONE[o.level] }, pressed && { opacity: 0.72 }]}
+      >
+        <View style={{ flex: 1 }}>
+          <Text style={type.bodyStrong}>{o.name}</Text>
+          {o.rationale ? <Text style={[type.small, { marginTop: 2 }]}>{o.rationale}</Text> : null}
+        </View>
+        {o.badge && o.level ? (
+          <Text style={[styles.badge, { color: LEVEL_TONE[o.level], borderColor: LEVEL_TONE[o.level] }]}>{o.badge}</Text>
+        ) : null}
+      </Pressable>
+    ));
+  }
   return (
     <Sheet visible={ex !== null} title="Remplacer l’exercice" onClose={props.onClose}>
-      <Text style={[type.small, { marginBottom: 6 }]}>
-        Les remplaçants viennent d’AUREN. Le changement est confirmé par le serveur : d’ici là, l’exercice est marqué « en attente ».
-      </Text>
-      {ex && ex.substitutes.length ? (
-        ex.substitutes.map((s) => <SheetRow key={s} title={s} onPress={() => props.onPick(s)} />)
-      ) : (
-        <SheetRow title="Aucun remplaçant proposé pour cet exercice" />
+      {props.locked ? null : (
+        <Text style={[type.small, { marginBottom: 6 }]}>
+          Du plus proche au plus éloigné, selon AUREN. Le changement est confirmé par le serveur : d’ici là, l’exercice est marqué « en attente ».
+        </Text>
       )}
+      {body}
     </Sheet>
   );
 }
@@ -443,6 +538,13 @@ const styles = StyleSheet.create({
   rootRest: { backgroundColor: color.fieldRest },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 6 },
   headCentered: { flex: 1, textAlign: 'center' },
+  nameRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  skip: { alignSelf: 'center', marginTop: 14, minHeight: 44, justifyContent: 'center', paddingHorizontal: 16 },
+  skipText: { color: color.ink3, fontSize: 15, fontWeight: '600' },
+  undo: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: color.plate, borderRadius: 14, borderWidth: 1, borderColor: color.line, paddingLeft: 14, marginBottom: 6 },
+  undoButton: { minHeight: 44, borderWidth: 0 },
+  option: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 12, paddingLeft: 12, borderLeftWidth: 4, borderLeftColor: color.line, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.line },
+  badge: { fontSize: 12, fontWeight: '800', letterSpacing: 0.4, borderWidth: 1, borderRadius: 10, paddingHorizontal: 8, paddingVertical: 3, overflow: 'hidden' },
   status: { ...type.small, color: color.ink3, textAlign: 'center', marginTop: -2, marginBottom: 4 },
   body: { flex: 1 },
   setLine: { marginTop: 8, fontVariant: ['tabular-nums'] },

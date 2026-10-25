@@ -20,6 +20,15 @@ export type Prefill = {
   origin: 'OVERLOAD_TARGET' | 'LAST_SET' | 'NONE';
 };
 
+export type SubstituteLevel = 'N1' | 'N2' | 'N3';
+
+export type SubstituteOption = {
+  name: string;
+  level: SubstituteLevel;
+  badge: string;
+  rationale: string | null;
+};
+
 export type PlanExercise = {
   se_id: number;
   code: string;
@@ -31,6 +40,11 @@ export type PlanExercise = {
   previous: { relative: string; weights: string; reps: string } | null;
   prefill: Prefill;
   substitutes: string[];
+  /**
+   * R11 — the same substitutes, RANKED by the substitution engine (N1 « Équivalent »
+   * → N2 « Proche » → N3 « Élargi »), with its own label. Absent in the lab fixture.
+   */
+  substitute_options?: SubstituteOption[];
   /**
    * Primary zone, by the server recap's own rule (`session_recap._zones_touched`).
    * The id is OPAQUE to the client: legacy codes today, the 15 canonical zones of

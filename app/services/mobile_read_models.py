@@ -213,6 +213,13 @@ def _exercise(db: Session, s: WorkoutSession, se: SessionExercise, last: dict) -
                       "reps": prev.get("reps_str")} if prev.get("has_data") else None),
         "prefill": _prefill(hint, prev.get("first_set") or {}, rng),
         "substitutes": [sg.name for lvl in ("N1", "N2") for sg in suggestions.get(lvl, [])][:4],
+        # R11 — la liste classée du plus logique au moins logique, avec le niveau et
+        # le libellé du moteur de substitution (N1 « Équivalent », N2 « Proche »,
+        # N3 « Élargi »). L'ordre est celui du moteur ; l'appareil ne le recalcule pas.
+        "substitute_options": [
+            {"name": sg.name, "level": sg.level, "badge": sg.badge, "rationale": sg.rationale}
+            for lvl in ("N1", "N2", "N3") for sg in suggestions.get(lvl, [])
+        ],
         "zone": None if primary == "unknown" else {"zone": primary,
                                                     "label": _ZONE_LABELS.get(primary, primary)},
         "rest_seconds": None,
