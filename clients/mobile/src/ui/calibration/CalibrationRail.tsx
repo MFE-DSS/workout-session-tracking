@@ -237,7 +237,7 @@ function Rail(props: CalibrationRailProps & { width: number }) {
               ))
             : null}
           {/* baseline: the structure, affirmed, then the ranges over it */}
-          <Line x1={l.trackStart} y1={l.baselineY} x2={l.trackEnd} y2={l.baselineY} stroke={color.ink2} strokeWidth={2} />
+          <Line x1={l.trackStart} y1={l.baselineY} x2={l.trackEnd} y2={l.baselineY} stroke={color.ink2} strokeWidth={3} />
           {l.segments.map((s) => (
             <Line
               key={s.zone}
