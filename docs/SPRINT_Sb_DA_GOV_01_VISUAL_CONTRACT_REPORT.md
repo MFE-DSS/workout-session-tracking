@@ -88,8 +88,12 @@ Conformément au §9 du brief et à la décision n° 7 de l'opérateur :
   largeur du nom, bords vérifiés) et les mesures compactes. Ils restent sur la branche locale `sb/da-02-4-instrument-surface`, à
   extraire dans DA-02.4B.
 
-## 5. Preuves sur CI réelle
+## 5. Preuves sur CI réelle (exigence `ci_infra`)
 
-*(complété après exécution de la CI de la PR)*
+| Preuve | Où | Résultat |
+|---|---|---|
+| Le gate s'exécute en CI et passe sur le rendu approuvé | PR #290, commit `f35a16a`, job `visual contract (DA-GOV-01)` | ✅ **vert**. Les baselines faites en local (image épinglée, émulation amd64) correspondent au rendu de la CI **au pixel** |
+| Le gate rougit sur une mutation d'un élément LOCKED | PR de sonde #291 (brouillon, fermée sans merge, branche supprimée) : ligne de base du rail 2 → 3 px | ✅ **rouge à l'étape de comparaison**, 4 fixtures sur 4 (32 / 28 / 21 / 16 pixels). Installation et build verts, diffs publiées en artefact |
+| Reproductibilité local ↔ CI | comparaison des journaux | les **mêmes nombres de pixels** différents en local et en CI : l'environnement est neutre, seul le changement visuel compte |
 
-**Verdict :** à rendre après la CI réelle (exigence `ci_infra`).
+**Verdict :** DA-GOV-01 est livré. Le contrat visuel existe, avec `CALIBRATION-LINE-V1` et quatre autres éléments LOCKED. Les baselines DA-02.2 sont enregistrées avec leur provenance. Le gate de comparaison au pixel s'exécute en CI dans une image épinglée identique au local, et il **échoue sur une mutation volontaire, prouvé en local et sur la CI réelle**. Une baseline ne change que par une action explicite de l'opérateur (`run.sh approve` + manifeste, gardés par test). Aucun écran produit ni composant verrouillé n'a été modifié. Prochaine étape du chemin critique : **DA-02.4B**, sous ce contrat.
