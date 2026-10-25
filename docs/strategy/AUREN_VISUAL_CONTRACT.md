@@ -40,7 +40,8 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `CALIBRATION-FIELD-V1` | **EXPLORATION**, hors chemin critique | rail vertical « en champ » : visualisation secondaire possible (plein écran, analyse), **jamais le contrôle de charge principal** | DA-02.3 ; décision opérateur DA-02.4 n° 4 |
 | `INSTRUMENT-SURFACE-B1` | **LOCKED** (2026-10-25, « ACCEPT — LOCK B.1 ») | Frame C + rail en ligne pleine largeur + valeur souveraine au-dessus + chiffre prescrit sous le bloc du rail | DA-02.4B.1 — `clients/mobile/src/ui/instrument/HorizontalInstrumentSurface.tsx` (§8) |
 | `INSTRUMENT-SURFACE-B2` | **LOCKED** (2026-10-25, « ACCEPT » B.2) | la même surface **au repos** : échelle chiffrée et noms de zone masqués ; l'état réglage est `INSTRUMENT-SURFACE-B1` | DA-02.4B.2 — `HorizontalInstrumentSurface` (`presentation`), `disclosure.ts` (§10) |
-| `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` |
+| `INSTRUMENT-CONTROLS-B3` | **LOCKED** (2026-10-25, « ACCEPT » B.3) | les commandes − / + sous le cadre (P1) : second moyen de régler, sans précision de glissé | DA-02.4B.3 — `StepControls.tsx`, `stepModel.ts`, `InstrumentWithStepControls.tsx` (§11) |
+| `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
 
@@ -167,7 +168,8 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 |---|---|---|---|
 | R1 | dans la séance, la surface **centrée au milieu de la carte**, en plus grand | intégration produit (écran séance) | intégration séance, après B.2 |
 | R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `CALIBRATION-LINE-V1` (LOCKED) → nouvelle baseline | itération dédiée |
-| R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | itération dédiée |
+| R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | ✅ DA-02.4B.3, acceptée (§11) |
+| R5 | les boutons − / + **plus « cockpit »**, dans la DA de l'instrument (opérateur, à l'acceptation de B.3) | `INSTRUMENT-CONTROLS-B3` (LOCKED) → nouvelle baseline | **finition différée**, avec les derniers détails ; B.3 reste la définition en vigueur |
 | R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | itération dédiée |
 | B.2 | divulgation progressive REST / ADJUSTING (déjà prévue) | `INSTRUMENT-SURFACE` + props `showScale` / `showZoneLabels` | ✅ DA-02.4B.2, acceptée (§10) |
 
@@ -186,3 +188,18 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 **MUST PRESERVE** : tout `INSTRUMENT-SURFACE-B1` ; au repos, la ligne, la bande, le curseur, le repère et le chiffre prescrit ; aucune position ne change entre les deux états.
 **MUST NEVER** : retirer la ligne ou la bande au repos ; faire bouger la valeur, le rail ou le chiffre prescrit quand l'échelle apparaît ; décrire l'état autrement à l'accessibilité (même libellé dans les deux états).
+
+## 11. `INSTRUMENT-CONTROLS-B3` — commandes − / + (2026-10-25)
+
+**Décisions de l'opérateur** : placement **P1, sous le cadre** ; boutons **beaucoup plus gros**, **rapprochés du centre**, **grisés** pour dire qu'on peut appuyer ; « − 2,5 » / « + 2,5 ». Accepté tel quel ; l'allure plus cockpit est une finition différée (§9, R5).
+
+| Champ | Valeur |
+|---|---|
+| **Baselines approuvées** (12 ; `adjusting` = juste après « + », un pas au-dessus) | `controls-390x220-target-rest`, `controls-390x220-push-rest`, `controls-390x220-high-cost-rest`, `controls-390x220-target-adjusting`, `controls-390x220-push-adjusting`, `controls-390x220-high-cost-adjusting`, `controls-320x180-target-rest`, `controls-320x180-push-rest`, `controls-320x180-high-cost-rest`, `controls-320x180-target-adjusting`, `controls-320x180-push-adjusting`, `controls-320x180-high-cost-adjusting` |
+| **Géométrie** | sous le cadre, à 2u ; hauteur `ACTION_HEIGHT` (68) ; largeur 35 % du module chacun ; écart 4u ; paire centrée. 390 : 137 × 68 en x 62 / 215 ; 320 : 112 × 68 en x 54 / 178. **Ne dépend que de la largeur** |
+| **Traitement** | fond `line`, trait `ink3` au poids secondaire de Frame C ; appui : fond `plate`, trait `ink` ; glyphe `ink` (12,1 : 1 sur `line`), pas affiché en `ink2` (7,2 : 1) ; inactif aux bornes : `ink3`, sans pas affiché. Aucun `signal` |
+| **Comportement** | − / + = index précédent / suivant des `steps` fournis (`stepModel.neighborStep`), rien n'est calculé ; l'appui passe par `onSelectPosition`, le même rappel que le glissé, donc la divulgation se réveille et le délai de 1,5 s repart sans seconde minuterie |
+| **Accessibilité** | boutons « Diminuer de 2,5 kilos » / « Augmenter de 2,5 kilos », inactifs aux bornes ; le rail garde son rôle ajustable et dit seul la valeur |
+
+**MUST PRESERVE** : tout `INSTRUMENT-SURFACE-B1` / `-B2` au-dessus, inchangé ; le rail à pleine largeur ; rien à gauche ni à droite du rail ; la position des boutons dans tous les états.
+**MUST NEVER** : un bouton en `signal` ; un pas calculé côté client ; un second chemin de sélection ou une seconde minuterie.

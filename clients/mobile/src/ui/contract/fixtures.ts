@@ -67,6 +67,16 @@ export type ContractFixture =
       height: number;
       scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
       selectedValue: number;
+    }
+  | {
+      /** the baseline id: `controls-<width>x<height>-<scenario>-<state>` — the instrument with its − / + (B.3) */
+      id: string;
+      contract: 'INSTRUMENT-CONTROLS-B3';
+      width: number;
+      height: number;
+      scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
+      selectedValue: number;
+      presentation: 'rest' | 'adjusting';
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -89,6 +99,20 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'surface-390x220-target-rest', contract: 'INSTRUMENT-SURFACE-B2', width: 390, height: 220, scenario: 'TARGET', selectedValue: 70 },
   { id: 'surface-390x220-push-rest', contract: 'INSTRUMENT-SURFACE-B2', width: 390, height: 220, scenario: 'PUSH', selectedValue: 75 },
   { id: 'surface-390x220-high-cost-rest', contract: 'INSTRUMENT-SURFACE-B2', width: 390, height: 220, scenario: 'HIGH_COST', selectedValue: 82.5 },
+  // DA-02.4B.3 — « ACCEPT — LOCK B.3 » by the operator on 2026-10-25: the − / + under the frame (P1),
+  // at REST on the locked value and right after a press on + (ADJUSTING, one step up)
+  { id: 'controls-390x220-target-rest', contract: 'INSTRUMENT-CONTROLS-B3', width: 390, height: 220, scenario: 'TARGET', selectedValue: 70, presentation: 'rest' },
+  { id: 'controls-390x220-push-rest', contract: 'INSTRUMENT-CONTROLS-B3', width: 390, height: 220, scenario: 'PUSH', selectedValue: 75, presentation: 'rest' },
+  { id: 'controls-390x220-high-cost-rest', contract: 'INSTRUMENT-CONTROLS-B3', width: 390, height: 220, scenario: 'HIGH_COST', selectedValue: 82.5, presentation: 'rest' },
+  { id: 'controls-390x220-target-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 390, height: 220, scenario: 'TARGET', selectedValue: 72.5, presentation: 'adjusting' },
+  { id: 'controls-390x220-push-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 390, height: 220, scenario: 'PUSH', selectedValue: 77.5, presentation: 'adjusting' },
+  { id: 'controls-390x220-high-cost-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 390, height: 220, scenario: 'HIGH_COST', selectedValue: 85, presentation: 'adjusting' },
+  { id: 'controls-320x180-target-rest', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'TARGET', selectedValue: 70, presentation: 'rest' },
+  { id: 'controls-320x180-push-rest', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'PUSH', selectedValue: 75, presentation: 'rest' },
+  { id: 'controls-320x180-high-cost-rest', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'HIGH_COST', selectedValue: 82.5, presentation: 'rest' },
+  { id: 'controls-320x180-target-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'TARGET', selectedValue: 72.5, presentation: 'adjusting' },
+  { id: 'controls-320x180-push-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'PUSH', selectedValue: 77.5, presentation: 'adjusting' },
+  { id: 'controls-320x180-high-cost-adjusting', contract: 'INSTRUMENT-CONTROLS-B3', width: 320, height: 180, scenario: 'HIGH_COST', selectedValue: 85, presentation: 'adjusting' },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */
