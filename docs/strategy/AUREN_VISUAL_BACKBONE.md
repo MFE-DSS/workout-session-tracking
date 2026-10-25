@@ -462,8 +462,8 @@ langage de l'instrument existe, pas l'inverse.
 | `DA-02.2` | Active Cursor + Reference Marker (+ rail en ligne) | ✅ mergé (PR #286) — **le rail en ligne porte l'ADN** : pleine largeur, barres horizontales, curseur au-dessus / repère dessous (profondeur) |
 | `DA-02.3` | Instrument Frame | ✅ mergé (PR #287) — **Frame C (`rail`) = structure verrouillée ; composition intérieure non verrouillée** ; rail en champ ajouté |
 | `DA-02.4` | **Instrument Surface** (fusion de « Recessed Window » et « Readout », opérateur 2026-10-25) | ❌ premier rendu **rejeté** (bâti sur le rail en champ, ADN perdu) ; décisions de l'opérateur consignées dans `AUREN_VISUAL_CONTRACT §6` |
-| `DA-GOV-01` | **Visual Contract & Regression Gate** | → **en cours** : `AUREN_VISUAL_CONTRACT.md`, baselines DA-02.2, job CI `visual-contract` |
-| `DA-02.4B` | **Horizontal Instrument Surface** : rail en ligne DA-02.2 pleine largeur dans Frame C ; valeur au-dessus sans prendre de largeur au rail ; REST garde ligne + bande | → après DA-GOV-01 |
+| `DA-GOV-01` | **Visual Contract & Regression Gate** | ✅ **mergé** (PR #290, `9c65f7e`) : `AUREN_VISUAL_CONTRACT.md`, baselines DA-02.2, job CI `visual-contract` |
+| `DA-02.4B` | **Horizontal Instrument Surface** : rail en ligne DA-02.2 pleine largeur dans Frame C ; valeur au-dessus sans prendre de largeur au rail ; REST garde ligne + bande | → **prochaine** (gabarit `VISUAL_SPRINT_TEMPLATE.md`, pré-vol d'abord) |
 | — | Recessed Window → Numeric Readout system | → |
 | `DA-03` | Manufacturer Mark (logo) | → |
 | — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
