@@ -459,10 +459,10 @@ langage de l'instrument existe, pas l'inverse.
 |---|---|---|
 | `DA-01` | Visual DNA (direction Allocator, §8.1–8.2) | ✅ |
 | `DA-02.1` | **Calibration Rail** | 🔒 **LOCKED v1** — `AUREN_CALIBRATION_SYSTEM.md` |
-| `DA-02.2` | Active Cursor + Reference Marker | → suivant |
-| `DA-02.3` | Instrument Frame | → |
-| `DA-02.4` | Recessed Window | → |
-| `DA-02.5` | Readout | → |
+| `DA-02.2` | Active Cursor + Reference Marker (+ rail en ligne) | ✅ mergé (PR #286) — **le rail en ligne porte l'ADN** : pleine largeur, barres horizontales, curseur au-dessus / repère dessous (profondeur) |
+| `DA-02.3` | Instrument Frame | ✅ mergé (PR #287) — **Frame C (`rail`) = structure verrouillée ; composition intérieure non verrouillée** ; rail en champ ajouté |
+| `DA-02.4` | **Instrument Surface** (fusion de « Recessed Window » et « Readout », opérateur 2026-10-25) | ❌ premier rendu **rejeté** (bâti sur le rail en champ, ADN perdu) — décision renvoyée à l'agent design de l'opérateur |
+| `DA-02.5` | (absorbé par DA-02.4) | — |
 | `DA-03` | Manufacturer Mark (logo) | → |
 | — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
 
