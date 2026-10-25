@@ -244,5 +244,33 @@ evidence: chest sha256 7a4167ea… (18811 B) · shoulders sha256 5eb7bedf… (33
 status: technical-intake-accepted-human-review-pending
 ```
 **Aucune entrée `approved`/`verified`/`legally-cleared`.** `ai_usage: none` (géométrie jamais générée par IA).
+
+## Calibration System — références visuelles (DA-02.2, 2026-10-25)
+```
+asset_id: auren.calibration.reference.{reference-marker,active-cursor}.trace-v1
+files: design/auren/source/calibration/reference/finallockedcursor.svg (ReferenceMarker)
+       design/auren/source/calibration/reference/finlactivecursor.svg (ActiveCursor)
+author: operator-supplied (Martin Feldmann, via his designer agent) — exact authoring tool UNKNOWN
+owner: OPERATIONAL REPOSITORY OWNER
+ip_ownership_status: not-legally-reviewed
+source_project: NOT APPLICABLE
+source_version: NOT APPLICABLE
+source_type: reference-only
+access_date: 2026-10-25 (received)
+source_reference: operator message, 2026-10-25 — files kept byte for byte
+license_spdx: NOT APPLICABLE (not distributed; reference only)
+license_text_location: NOT APPLICABLE
+attribution_required: no
+usage_nature: reference-only — NEVER loaded at runtime
+modifications: none (kept as received: white 1024×1024 background, traced coordinates)
+tooling: UNKNOWN — MANUAL VERIFICATION REQUIRED (traced vector: non-integer coordinates, one curved notch)
+ai_usage: UNKNOWN — manual-verification-required
+reviewer: operator (concept LOCKED in AUREN_CALIBRATION_SYSTEM.md)
+review_date: 2026-10-25
+evidence: runtime geometry rebuilt on a normalized grid — clients/mobile/src/ui/calibration/geometry.ts
+status: reference-only
+```
+Aucune géométrie de ces tracés n'entre à l'exécution : la reconstruction normalisée est une œuvre du
+dépôt (`repository-authored`).
 Le review synthétique interne **n'est PAS** une revue anatomique professionnelle qualifiée et ne la revendique
 pas. **Aucune conclusion juridique ni médicale.**
