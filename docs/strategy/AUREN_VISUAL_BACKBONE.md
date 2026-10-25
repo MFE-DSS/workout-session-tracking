@@ -401,4 +401,51 @@ d'activation musculaire, validation implicite).
 * **L'illustration biomécanique professionnelle** — chantier reconnu,
   **parqué**, à brancher sur le programme d'assets existant (17 specs,
   3 plaques régionales produites). Le viseur est validé **avec un placeholder
-  assumé**.
+  assumé**. → **ouvert le 2026-10-25 par `DA-01`, §8.**
+
+---
+
+## 8. Direction de marque et système d'assets — `DA-01` (opérateur, 2026-10-25)
+
+Décision opérateur, issue du brainstorm de DA du 2026-10-25 et du cahier des charges des
+assets (app + site) remis le même jour. Portée : client mobile et site.
+
+### 8.1 Direction retenue — **A · ALLOCATOR**
+
+Le symbole AUREN ne représente plus un haltère : il représente **une ressource qu'on alloue**
+(`PH-01`). Deux rails, un curseur d'allocation, un « A » qui apparaît en négatif sans être
+dessiné. Directions écartées : B « Calibration » (risque d'imagerie militaire), C « Trace »
+(risque ECG / logo d'IA). Le haltère actuel (`static/brand/`) **n'est plus la marque finale** ;
+il peut survivre comme pictogramme générique « force ».
+
+Le mark se juge **en monochrome à 16 px**. S'il n'est reconnaissable qu'avec phosphore, ambre ou
+animation, il est raté. Trois constructions à comparer en noir et blanc avant tout effet :
+A1 Rail (préférée), A2 Gauge, A3 Gate.
+
+### 8.2 Ce qui est fermé
+
+| Sujet | Décision |
+|---|---|
+| BodyMap | le master `design/auren/source/bodymap/auren_bodymap_master.svg` est **gardé, jamais redessiné** ; tout dérivé en sort |
+| Triptyque d'une séance | **un cadrage par zone du master** (préréglage vue + recadrage), pas six mini-silhouettes face/dos |
+| Palette | les tokens actuels de `clients/mobile/src/ui/theme.ts` sont gardés ; aucune couleur neuve sans mesure (`CLAUDE.md §5.4`) |
+| Anatomie | BodyParts3D (CC BY 4.0) et Servier Medical Art (CC BY 4.0) comme références documentées ; **jamais d'IA comme source finale** (IA = moodboard) |
+| Petites icônes, familles | contrat Tabler : 24 × 24, trait 2, extrémités et jonctions arrondies, `fill="none"`, `stroke="currentColor"` ; la famille se reconnaît **par la forme**, dessinée d'abord en monochrome |
+| Textures cockpit | **paramètres de rendu** (lueur, scanlines, grain, hachure), jamais d'image de texture |
+| Mouvement riche | Rive (fond d'accueil, récompense) ; micro-transitions et jauges dans le code ; **le cockpit doit convaincre immobile** |
+| Exercices | un **mannequin vectoriel commun** articulé + une bibliothèque de matériel ; deux états début / fin au même cadrage |
+| Décor | **aucun décor anatomique gratuit** (le fantôme anatomique décoratif est retiré) |
+| Icône d'app | géométrie propre en couches (fond · rails · curseur), **aucun effet cuit** ; les apparences système (défaut, sombre, transparente, teintée) sont rendues par l'OS |
+
+### 8.3 Ordre de production — `DA-01` avant toute série
+
+Quatre objets jugent toute la bibliothèque, à quatre échelles (marque → OS → programme → action) :
+le mark Allocator · l'icône d'app qui en dérive · le triptyque Push A tiré du master · un écran
+d'exercice réel (Smith incliné). **Aucune série (familles, 58 mouvements, planches) avant que les
+cinq questions du gate `DA-01` soient à oui** : identifiable à 16 px · AUREN sans écrire AUREN ·
+instrument plutôt qu'app de fitness · BodyMap et exercice de la même machine · lisible sans
+lueur ni animation.
+
+Partage du travail : le mark, l'icône et l'illustration d'exercice reviennent à l'agent designer
+de l'opérateur ; **le triptyque tiré du master et l'écran cockpit se font dans le code** du
+client mobile (tranche MISSION).

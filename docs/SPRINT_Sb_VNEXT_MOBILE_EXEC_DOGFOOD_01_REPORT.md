@@ -1,6 +1,6 @@
 # Sb_VNEXT_MOBILE_EXEC_DOGFOOD_01 — les notes d'exécution du dogfood
 
-**Statut** : build · **Branche** : `sb/vnext-mobile-exec-dogfood-01` · **Base** : canonique `bca942d` (D9 mergée)
+**Statut** : ✅ mergée (PR #284, `8e71d03`) · **Branche** : `sb/vnext-mobile-exec-dogfood-01` · **Base** : canonique `bca942d` (D9 mergée)
 **Source** : retours de dogfood opérateur sur iPhone, `SPRINT_Sb_VNEXT_NATIVE_N0_EXPERIENCE_LAB_REPORT.md §6quater` (R1–R16) et `SPRINT_Sb_VNEXT_MOBILE_D9_01_REAL_BACKEND_BRIDGE_REPORT.md §6.1` (R17–R20).
 
 Ordre opérateur du 2026-10-25 : « go next step sur le critical path ». Les notes qui ne demandent
@@ -130,3 +130,28 @@ Relevé applicable : spec vNext (`§0quater`, `§0quinquies`) ; les relevés web
 **Verdict :** les six notes d'exécution sans asset sont livrées et validées sur iPhone ; aucun
 état neuf, aucune écriture neuve. Restent la refonte MISSION (R18–R20) et les notes qui attendent
 les assets (R1, R2, R4, R5, R7), ainsi que l'option B de R8 si l'opérateur la veut.
+
+---
+
+## Closeout
+
+| | |
+|---|---|
+| PR | [#284](https://github.com/MFE-DSS/workout-session-tracking/pull/284) — merge commit, tête épinglée `4c45b7a` (GO MERGE permanent) |
+| Merge | `8e71d030e320f6f84bcd712ff00cf5e13cb03c60` |
+| CI canonique | run `40173875266` sur `8e71d03` — **verte** |
+| Sonar (PR) | gate **OK** — 0 bug, 0 smell, 0 vulnérabilité, duplication 0 % ; la couverture du nouveau code n'est pas rapportée (le code neuf est surtout TypeScript, hors couverture Python ; il est couvert par les 107 tests jest) |
+| Threads de revue | 0 |
+| Migration | aucune |
+
+### Incidents
+
+Aucun : premier passage vert sur tous les jobs.
+
+### Ce qui reste ouvert
+
+- Refonte MISSION (R18–R20, R14) : demande un read model d'historique et la DA par famille.
+- Notes qui attendent les assets (R1, R2, R4, R5, R7) : cahier des charges et prompt designer remis
+  à l'opérateur le 2026-10-25.
+- R8 option B (changer de machine en cours d'exercice) : changement de modèle, arbitrage opérateur.
+- Portes E–F–G de D9 sur appareil ; L3 distribution (D10).
