@@ -20,6 +20,7 @@ export type CandidateFixture = {
   fixture: WindowFixture;
 };
 
+/** Empty: DA-02.6's measured windows were approved (« ACCEPT ») and became the RECESSED-WINDOW-V1 baselines. */
 export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = [];
 
 export function candidateById(id: string | null | undefined): CandidateFixture | undefined {

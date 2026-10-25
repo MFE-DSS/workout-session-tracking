@@ -14,6 +14,8 @@ for (const f of CONTRACT_FIXTURES) {
     const fixture = page.getByTestId('contract-fixture');
     await expect(fixture).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    // DA-02.6 — a fitted readout measures itself first: capture only once every measurer is gone
+    await expect(page.getByTestId('readout-measure')).toHaveCount(0);
     await expect(fixture).toHaveScreenshot(`${f.id}.png`);
   });
 }

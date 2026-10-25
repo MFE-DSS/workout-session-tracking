@@ -42,6 +42,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `INSTRUMENT-SURFACE-B2` | **LOCKED** (2026-10-25, « ACCEPT » B.2) | la même surface **au repos** : échelle chiffrée et noms de zone masqués ; l'état réglage est `INSTRUMENT-SURFACE-B1` | DA-02.4B.2 — `HorizontalInstrumentSurface` (`presentation`), `disclosure.ts` (§10) |
 | `INSTRUMENT-CONTROLS-B3` | **LOCKED** (2026-10-25, « ACCEPT » B.3) | les commandes − / + sous le cadre (P1) : second moyen de régler, sans précision de glissé | DA-02.4B.3 — `StepControls.tsx`, `stepModel.ts`, `InstrumentWithStepControls.tsx` (§11) |
 | `RECESSED-WINDOW-V1` | **LOCKED** (2026-10-25, W1 · Inset) | la sous-zone interne d'un instrument : un champ creusé dans Frame C, pas une carte | DA-02.5 — `RecessedWindow.tsx`, `recessedWindowGeometry.ts`, `windowContent.ts` (§12) |
+| `NUMERIC-READOUT-V1` | **LOCKED** (2026-10-25, « ACCEPT » DA-02.6) | une seule façon de poser un chiffre : rôle, unité, décimale, taille mesurée | DA-02.6 — `NumericReadout.tsx`, `readoutModel.ts` (§13) ; ses baselines sont celles des surfaces et des fenêtres qui l'utilisent |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -215,7 +216,24 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 | **Baselines approuvées** | `window-390x220-f1`, `window-390x220-f2`, `window-390x220-f3-pair`, `window-390x220-f3-split`, `window-320x180-f1`, `window-320x180-f2`, `window-320x180-f3-pair`, `window-320x180-f3-split` |
 | **Géométrie** (tout en `u`) | aplat `field` (plus sombre que la face `plate` du cadre) ; contour en `line` à 0,25u (Frame C : 0,35u en `ink3`) ; **une seule coupure** de 3u dans le bord haut, à 4u du bord droit ; une marque de registration d'1u × 1,6u en bas à gauche, en `ink3` ; marge intérieure 2u |
 | **Disposition** | `windowLayout` : une fenêtre, deux égales, ou 60/40 ; écart de 2u (le châssis reste visible entre deux fenêtres : une machine, pas deux cartes) |
-| **Valeurs** | le plus grand rôle existant qui tient (`readout` 68 → `figure` 40 → `exercise` 30, `windowContent.largestValueRole`) ; la capture de revue vérifie qu'aucune valeur n'est coupée |
+| **Valeurs** | le plus grand rôle existant qui tient, **mesuré** depuis DA-02.6 (`FittedReadout`, §13) ; la capture de revue vérifie qu'aucune valeur n'est coupée |
 
 **MUST PRESERVE** : plus calme que Frame C (trait plus fin, couleur plus sourde) ; lisible en monochrome ; contenu toujours dans le champ de la fenêtre ; fenêtres jamais superposées, toujours dans le champ de Frame C.
 **MUST NEVER** : arrondi, ombre, dégradé, lueur, texture ; une couleur sémantique (une fenêtre ne porte aucun état) ; modifier Frame C pour loger une fenêtre ; une taille de texte hors des rôles existants.
+
+## 13. `NUMERIC-READOUT-V1` — la lecture chiffrée (2026-10-25)
+
+**Décisions de l'opérateur** : l'unité **après** la valeur, en petit (actuel) ; la partie décimale **de la même taille** que l'entier (actuel). Gate DA-02.6 : **« ACCEPT »** sur la taille mesurée.
+
+| Règle | Valeur |
+|---|---|
+| **Rôles** | `readout` 68 · `figure` 40 · `exercise` 30 (`NUMERAL_ROLES`), du plus grand au plus petit ; **jamais une taille nouvelle** |
+| **Ligne** | boîte de ligne = 1,05 × la taille |
+| **Unité** | après la valeur, précédée d'une espace, à 0,4 × la taille, graisse 700, `ink2` ; sa boîte de ligne = sa taille : **elle n'agrandit jamais la ligne** (leçon DA-02.4B.1) |
+| **Décimale** | même taille que l'entier ; séparateur français (`formatValue`) |
+| **Chiffres** | tabulaires ; agrandissement d'accessibilité plafonné (`NUMERAL_FONT_SCALE_CAP`) |
+| **Taille dans un espace contraint** (`FittedReadout`) | la valeur est posée une fois dans chaque rôle, sans contrainte et invisible ; le plus grand rôle dont la largeur **mesurée** tient (et dont la ligne tient, étiquette comprise) l'emporte ; la valeur n'est montrée qu'une fois la mesure faite ; le gate attend la fin de la mesure |
+| **Qui l'utilise** | la valeur souveraine de l'instrument (`HorizontalInstrumentSurface`, rendu identique au pixel) ; les valeurs des Recessed Windows (taille mesurée) |
+
+**MUST PRESERVE** : une valeur n'est jamais coupée ; un même contenu dans des fenêtres voisines prend la même taille quand elle tient (mesure, pas estimation) ; aucune image à la mauvaise taille.
+**MUST NEVER** : une taille de chiffre hors des trois rôles ; une unité plus grosse que 0,4 × la valeur ; une décimale réduite ou surélevée ; une estimation de largeur à la place de la mesure.

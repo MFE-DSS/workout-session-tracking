@@ -7,7 +7,7 @@ import { frameGeometry } from './frameGeometry';
 import { InstrumentFrame } from './InstrumentFrame';
 import { RecessedWindow } from './RecessedWindow';
 import { recessedWindowGeometry, type WindowLayout, windowLayout } from './recessedWindowGeometry';
-import { largestValueRole, UNIT_SCALE, valueLineHeight } from './windowContent';
+import { FittedReadout } from './NumericReadout';
 
 /**
  * DA-02.5 — the three content fixtures of the brief, mounted in an unchanged Frame C:
@@ -64,18 +64,6 @@ function WindowContent({ content, width, height }: { content: Content; width: nu
       </View>
     );
   }
-  const role = largestValueRole(width, height, content.value, content.unit);
-  const unitSize = Math.round((role.fontSize ?? 40) * UNIT_SCALE);
-  return (
-    <View style={{ flex: 1, justifyContent: 'center' }}>
-      <Text testID="window-text" style={type.eyebrow}>
-        {content.label}
-      </Text>
-      <Text testID="window-value" style={[role, { marginTop: 4, lineHeight: valueLineHeight(role) }]} numberOfLines={1}>
-        {content.value}
-        {/* the unit's own line box stays inside the value's: it never makes the line taller (DA-02.4B.1) */}
-        <Text style={{ fontSize: unitSize, lineHeight: unitSize, fontWeight: '700', color: color.ink2 }}> {content.unit}</Text>
-      </Text>
-    </View>
-  );
+  // DA-02.6 — the largest numeral role that fits, MEASURED on the device (Numeric Readout)
+  return <FittedReadout label={content.label} value={content.value} unit={content.unit} width={width} height={height} />;
 }

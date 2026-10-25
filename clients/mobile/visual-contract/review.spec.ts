@@ -40,6 +40,8 @@ for (const f of CANDIDATE_FIXTURES) {
     const fixture = page.getByTestId('contract-candidate');
     await expect(fixture).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
+    // DA-02.6 — a fitted readout measures itself first: capture only once every measurer is gone
+    await expect(page.getByTestId('readout-measure')).toHaveCount(0);
     // same capture as toHaveScreenshot: css scale, no animation, no caret
     await fixture.screenshot({ path: path.join(OUT, `${f.id}.png`), scale: 'css', animations: 'disabled', caret: 'hide' });
     await fixture.screenshot({ path: path.join(OUT, `${f.id}@2x.png`), scale: 'device', animations: 'disabled', caret: 'hide' });
