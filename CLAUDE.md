@@ -182,7 +182,7 @@ protocole les **orchestre**, il ne les remplace pas.
 ## 5. Contrat de livraison UI (OBLIGATOIRE)
 
 Toute tranche modifiant une **surface visible par l'utilisateur** respecte les
-cinq règles suivantes. Elles sont **bloquantes**, au même titre que §1. Le §4
+neuf règles suivantes. Elles sont **bloquantes**, au même titre que §1. Le §4
 n'autorise **pas** à les contourner : une tranche UI n'atteint jamais
 `PR GREEN / MERGE PENDING` sans que 5.1 ait eu lieu.
 
@@ -236,3 +236,28 @@ réel**, exactement comme les tokens existants de `home.css`.
 Une décision **centrale et difficile** passe **devant** une décision
 périphérique et commode. Livrer d'abord ce qui est facile produit des PR vertes
 et un produit inchangé — c'est le mode d'échec observé, pas une hypothèse.
+
+### 5.6 à 5.9 — Les quatre garde-fous d'itération (opérateur, 2026-10-25)
+
+Protocole et gabarits : **`docs/strategy/AUREN_UI_ITERATION_PROTOCOL.md`**.
+Garde mécanique : `tests/test_ui_iteration_protocol.py`. Tout nouveau rapport de
+tranche UI sans les quatre sections fait rougir la CI.
+
+Ces règles existent parce que, le 2026-10-25, une tranche (DA-02.4) a réinterprété
+une composition au lieu de partir du rendu validé et en a perdu l'ADN. Le même jour,
+des doublons verbaux-visuels (« PRESCRIT » à côté du repère qui est la cible) ont été
+jugés systématiques par l'opérateur.
+
+- **5.6 — Croquis validé avant le code.** Toute itération qui change la
+  composition d'un écran part d'un croquis validé par l'opérateur (ASCII ou le
+  sien). Le code reproduit le croquis ; les propositions en plus sont séparées et
+  marquées.
+- **5.7 — Une information, une seule fois.** Inventaire élément par élément,
+  avec la **source dans le contrat de données** de chaque élément, avant tout
+  rendu soumis. Une information a un seul porteur, la marque ou le mot. Un mot ne
+  nomme jamais ce que sa marque est déjà. Une valeur vit dans un seul module.
+- **5.8 — Comparaison avec la référence validée.** Chaque rendu soumis est
+  montré à côté du dernier rendu validé de la même surface. Si l'ADN validé a
+  disparu, le rendu n'est pas montré.
+- **5.9 — Un changement par itération**, en avant / après, chaque demande de
+  l'opérateur citée mot pour mot. Une recomposition complète passe par 5.6.
