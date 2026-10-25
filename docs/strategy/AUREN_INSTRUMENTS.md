@@ -167,8 +167,8 @@ d'où vient la donnée, pas ce qu'il faudrait écrire.
 | Champ | Valeur |
 |---|---|
 | `QUESTION` | Qu'est-ce que je fais sur cette série ? |
-| `DATA` | exercice · cible · précédent · saisie courante · delta · repos |
-| `SOURCE` | `briefing.build_chip` / `build_peek` · `delta.compute_delta` · l'état de console |
+| `DATA` | exercice · cible · précédent · saisie courante · delta · repos · **calibration** *(2026-10-25 : écart de la décision à la prescription, §5.5)* |
+| `SOURCE` | `briefing.build_chip` / `build_peek` · `delta.compute_delta` · l'état de console · **calibration : le moteur seul** (`VNEXT §8.11`, couche E7, *pas encore produite*) |
 | `FRESHNESS` | temps réel |
 | `STATE` | `✓ passé` · `● courant` · `○ futur` · `resting` · `correcting` · `complete` |
 | `ACTION` | valider la série *(`Entrée` **ou** bouton — jamais l'un sans l'autre)* · ±15 s · passer le repos |
@@ -236,7 +236,7 @@ d'où vient la donnée, pas ce qu'il faudrait écrire.
 
 ---
 
-## 5. Les six primitives visuelles
+## 5. Les primitives visuelles — six, puis `CALIBRATION` (2026-10-25)
 
 > ⚠ **AMENDEMENT 2026-10-23.** Autorité : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2**
 > (D8). Les primitives et leurs **implémentations de référence CSS** ci-dessous →
@@ -255,6 +255,7 @@ visuellement, elle devient l'exception.
 | **`LEDGER`** | données stables + fraîcheur + provenance | *à construire* — `FactProvenance` en est la ligne |
 | **`SCOPE STRIP`** | choix de contexte : 7/14/28 j, zone, programme | *à construire* |
 | **`SHEET`** | **seule** couche d'édition complexe, de paramètres et d'explication | `<details>` natifs L3/L4 |
+| **`CALIBRATION`** *(2026-10-25)* | le coût relatif d'un écart à la prescription : rail, repère du moteur, curseur de l'utilisateur | `AUREN_CALIBRATION_SYSTEM.md` (🔒 LOCKED v1) — §5.5 |
 
 ### 5.1 `FOCUS FRAME` — trois signaux, jamais un seul
 
@@ -303,6 +304,28 @@ Le viseur est l'étalon de **grammaire de composition**, pas de typographie :
 2. **23 tailles de police distinctes**, dont 4 seulement passent par un token,
    avec des demi-pixels (10,5 · 11,5 · 12,5). C'est l'échelle la plus dispersée
    du dépôt.
+
+### 5.5 `CALIBRATION` — la primitive du coût d'un écart *(🔒 LOCKED v1, opérateur, 2026-10-25)*
+
+Autorité : `AUREN_CALIBRATION_SYSTEM.md`. Portée : la sémantique vaut pour tout client ; le
+dessin est celui du client mobile.
+
+**Ce qu'elle dit** : *une prescription existe ; l'utilisateur peut s'en écarter ; l'instrument
+lui montre immédiatement le coût relatif de cet écart.* C'est la forme native de `PH-01` sur une
+série : la ressource se décide, et son prix se lit.
+
+**Ce qu'elle n'est pas** : ni barre de progression, ni jauge de danger, ni score physiologique.
+
+| Règle produit | Conséquence |
+|---|---|
+| Trois objets, deux auteurs | `ReferenceMarker` = le moteur (`system`), `ActiveCursor` = l'utilisateur (`signal`), `CalibrationRail` = la structure. Le curseur et la zone sont **deux informations distinctes** |
+| Quatre zones | EASY · TARGET (**une plage**) · PUSH · HIGH COST. Aucune ne s'appelle échec, réussite ni danger |
+| AUREN montre le prix, il ne bloque pas | HIGH COST se choisit ; aucune confirmation, aucun refus, aucune écriture différente |
+| Le visuel ne déduit rien | position et zones viennent **du moteur** (`VNEXT §8.11`). Sans elles, **pas de rail** : l'absence n'est pas remplacée par une estimation |
+| Jamais la couleur seule | chaque zone a sa signature de graduation, de densité ou de hachure ; la paire repère / curseur se distingue en monochrome |
+
+Elle rejoint l'instrument **EXECUTION** (`§4.1`), à côté du `READOUT` : le readout dit la
+valeur, la calibration dit ce qu'elle coûte face à la prescription.
 
 ---
 

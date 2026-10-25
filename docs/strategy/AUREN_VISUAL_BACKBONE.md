@@ -401,4 +401,75 @@ d'activation musculaire, validation implicite).
 * **L'illustration biomécanique professionnelle** — chantier reconnu,
   **parqué**, à brancher sur le programme d'assets existant (17 specs,
   3 plaques régionales produites). Le viseur est validé **avec un placeholder
-  assumé**.
+  assumé**. → **ouvert le 2026-10-25 par `DA-01`, §8.**
+
+---
+
+## 8. Direction de marque et système d'assets — `DA-01` (opérateur, 2026-10-25)
+
+Décision opérateur, issue du brainstorm de DA du 2026-10-25 et du cahier des charges des
+assets (app + site) remis le même jour. Portée : client mobile et site.
+
+### 8.1 Direction retenue — **A · ALLOCATOR**
+
+Le symbole AUREN ne représente plus un haltère : il représente **une ressource qu'on alloue**
+(`PH-01`). Deux rails, un curseur d'allocation, un « A » qui apparaît en négatif sans être
+dessiné. Directions écartées : B « Calibration » (risque d'imagerie militaire), C « Trace »
+(risque ECG / logo d'IA). Le haltère actuel (`static/brand/`) **n'est plus la marque finale** ;
+il peut survivre comme pictogramme générique « force ».
+
+Le mark se juge **en monochrome à 16 px**. S'il n'est reconnaissable qu'avec phosphore, ambre ou
+animation, il est raté. Trois constructions à comparer en noir et blanc avant tout effet :
+A1 Rail (préférée), A2 Gauge, A3 Gate.
+
+### 8.2 Ce qui est fermé
+
+| Sujet | Décision |
+|---|---|
+| BodyMap | le master `design/auren/source/bodymap/auren_bodymap_master.svg` est **gardé, jamais redessiné** ; tout dérivé en sort |
+| Triptyque d'une séance | **un cadrage par zone du master** (préréglage vue + recadrage), pas six mini-silhouettes face/dos |
+| Palette | les tokens actuels de `clients/mobile/src/ui/theme.ts` sont gardés ; aucune couleur neuve sans mesure (`CLAUDE.md §5.4`) |
+| Anatomie | BodyParts3D (CC BY 4.0) et Servier Medical Art (CC BY 4.0) comme références documentées ; **jamais d'IA comme source finale** (IA = moodboard) |
+| Petites icônes, familles | contrat Tabler : 24 × 24, trait 2, extrémités et jonctions arrondies, `fill="none"`, `stroke="currentColor"` ; la famille se reconnaît **par la forme**, dessinée d'abord en monochrome |
+| Textures cockpit | **paramètres de rendu** (lueur, scanlines, grain, hachure), jamais d'image de texture |
+| Mouvement riche | Rive (fond d'accueil, récompense) ; micro-transitions et jauges dans le code ; **le cockpit doit convaincre immobile** |
+| Exercices | un **mannequin vectoriel commun** articulé + une bibliothèque de matériel ; deux états début / fin au même cadrage |
+| Décor | **aucun décor anatomique gratuit** (le fantôme anatomique décoratif est retiré) |
+| Icône d'app | géométrie propre en couches (fond · rails · curseur), **aucun effet cuit** ; les apparences système (défaut, sombre, transparente, teintée) sont rendues par l'OS |
+
+### 8.3 Ordre de production — `DA-01` avant toute série
+
+Quatre objets jugent toute la bibliothèque, à quatre échelles (marque → OS → programme → action) :
+le mark Allocator · l'icône d'app qui en dérive · le triptyque Push A tiré du master · un écran
+d'exercice réel (Smith incliné). **Aucune série (familles, 58 mouvements, planches) avant que les
+cinq questions du gate `DA-01` soient à oui** : identifiable à 16 px · AUREN sans écrire AUREN ·
+instrument plutôt qu'app de fitness · BodyMap et exercice de la même machine · lisible sans
+lueur ni animation.
+
+Partage du travail : le mark, l'icône et l'illustration d'exercice reviennent à l'agent designer
+de l'opérateur ; **le triptyque tiré du master et l'écran cockpit se font dans le code** du
+client mobile (tranche MISSION).
+
+### 8.4 Roadmap DA — amendée par l'opérateur le 2026-10-25 (supersède l'ordre du §8.3)
+
+Les **primitives d'instrument** passent avant la marque : le mark se dessine une fois que le
+langage de l'instrument existe, pas l'inverse.
+
+| Étape | Objet | État |
+|---|---|---|
+| `DA-01` | Visual DNA (direction Allocator, §8.1–8.2) | ✅ |
+| `DA-02.1` | **Calibration Rail** | 🔒 **LOCKED v1** — `AUREN_CALIBRATION_SYSTEM.md` |
+| `DA-02.2` | Active Cursor + Reference Marker | → suivant |
+| `DA-02.3` | Instrument Frame | → |
+| `DA-02.4` | Recessed Window | → |
+| `DA-02.5` | Readout | → |
+| `DA-03` | Manufacturer Mark (logo) | → |
+| — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
+
+Le gate `DA-01` du §8.3 (cinq questions) reste le critère de **chaque** étape ;
+`AUREN_CALIBRATION_SYSTEM §12` y ajoute ses huit conditions pour `DA-02.x`.
+
+**Conséquence sur le code déjà écrit** : la jauge de zone de l'écran MISSION
+(`Sb_VNEXT_MOBILE_MISSION_01`) est une lecture de **couverture**, pas une calibration. Elle ne
+porte ni référence ni curseur. Elle sera reprise dans le langage de `DA-02.3` à `DA-02.5`
+(Instrument Frame, Readout) dès qu'il existera, et ne doit jamais imiter le Calibration Rail.
