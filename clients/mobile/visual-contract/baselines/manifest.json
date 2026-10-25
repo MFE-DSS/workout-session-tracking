@@ -406,11 +406,11 @@
       "visual_id": "RECESSED-WINDOW-V1",
       "fixture": "?fixture=window-390x220-f3-split",
       "width": 390,
-      "scenario": "F3 — 60/40 pair in one Frame C (BodyMap placeholder · « Dernière 72,5 kg »)",
+      "scenario": "F3 — 60/40 pair in one Frame C (BodyMap placeholder · « Dernière 72,5 kg »); value size MEASURED (DA-02.6)",
       "pixels": "414x244",
-      "sha256": "716ea061fff712b7191168054454d1a405e19d35388733cef124b4958bacc719",
-      "authority": "DA-02.5 (W1 · Inset); byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.5 visual gate: « go » on « ACCEPT — LOCK W1 »",
+      "sha256": "129d522ea951ccc2b9b2ad9c179bd8220e74aa628b51bcedeea4fea5dd366bde",
+      "authority": "DA-02.5 (W1 · Inset) + DA-02.6 (Numeric Readout, measured fit); byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.5 « ACCEPT — LOCK W1 », then DA-02.6 visual gate « ACCEPT » (measured value size)",
       "approved_on": "2026-10-25"
     },
     {
@@ -445,11 +445,11 @@
       "visual_id": "RECESSED-WINDOW-V1",
       "fixture": "?fixture=window-320x180-f3-pair",
       "width": 320,
-      "scenario": "F3 — two equal windows in one Frame C",
+      "scenario": "F3 — two equal windows in one Frame C; value size MEASURED (DA-02.6): both values in the figure role",
       "pixels": "344x204",
-      "sha256": "bc3fc16c5e2ce23c6d8abf5e52e77b9b20805bba904a95853e8f97111f829a3c",
-      "authority": "DA-02.5 (W1 · Inset); byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.5 visual gate: « go » on « ACCEPT — LOCK W1 »",
+      "sha256": "2fe5ef1a1d59792c2208a6e12a126345acdf4c3b915dd8229d9d4e3a43c62404",
+      "authority": "DA-02.5 (W1 · Inset) + DA-02.6 (Numeric Readout, measured fit); byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.5 « ACCEPT — LOCK W1 », then DA-02.6 visual gate « ACCEPT » (measured value size)",
       "approved_on": "2026-10-25"
     },
     {
@@ -458,11 +458,11 @@
       "visual_id": "RECESSED-WINDOW-V1",
       "fixture": "?fixture=window-320x180-f3-split",
       "width": 320,
-      "scenario": "F3 — 60/40 pair in one Frame C",
+      "scenario": "F3 — 60/40 pair in one Frame C; value size MEASURED (DA-02.6)",
       "pixels": "344x204",
-      "sha256": "bb202707546dff6f056716e0030cc1ae5f8e5a5d0eb255c8a814b75758b8b263",
-      "authority": "DA-02.5 (W1 · Inset); byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.5 visual gate: « go » on « ACCEPT — LOCK W1 »",
+      "sha256": "ce35f2ba935dd55af43f3e5a488fa7b05682af14fe1e44a393bee6e22832e7ab",
+      "authority": "DA-02.5 (W1 · Inset) + DA-02.6 (Numeric Readout, measured fit); byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.5 « ACCEPT — LOCK W1 », then DA-02.6 visual gate « ACCEPT » (measured value size)",
       "approved_on": "2026-10-25"
     }
   ]

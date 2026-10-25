@@ -7,6 +7,8 @@ import { color, type } from '../theme';
 import type { Presentation } from './disclosure';
 import { frameGeometry } from './frameGeometry';
 import { InstrumentFrame } from './InstrumentFrame';
+import { NumericReadout } from './NumericReadout';
+import { readoutLineHeight } from './readoutModel';
 
 /**
  * DA-02.4B.1 — EXPLORATION. Frame C (unchanged) + the locked CalibrationRail at the
@@ -47,33 +49,30 @@ export function surfaceLayout(p: HorizontalInstrumentSurfaceProps) {
   // measured on the ADJUSTING rail in every state, so nothing jumps when the names appear
   const railBlockH = rail.height + (railBlocks(rail.density, { showReadout: false }).zoneLabels ? 16 : 0);
   const adjusting = (p.presentation ?? 'adjusting') === 'adjusting';
+  // the sovereign value: the readout role when expanded, the figure role below (DA-02.6 Numeric Readout)
   const value = rail.density === 'expanded' ? type.readout : type.figure;
-  const valueLineH = Math.round(value.fontSize! * 1.05);
-  const unitSize = Math.round(value.fontSize! * 0.4);
+  const valueLineH = readoutLineHeight(value);
   const referenceTop = railBlockH + REFERENCE_GAP_U * rail.u;
   const stackH = valueLineH + VALUE_GAP_U * rail.u + referenceTop + type.bodyStrong.lineHeight!;
   return {
-    u, frame, railWidth, rail, value, valueLineH, unitSize, referenceTop, stackH, adjusting,
+    u, frame, railWidth, rail, value, valueLineH, referenceTop, stackH, adjusting,
     fits: stackH <= frame.content.h,
   };
 }
 
 export function HorizontalInstrumentSurface(p: HorizontalInstrumentSurfaceProps) {
   const s = surfaceLayout(p);
-  const unit = p.unit ? ` ${p.unit}` : '';
   const top = Math.max(0, Math.floor((s.frame.content.h - s.stackH) / 2));
   return (
     <InstrumentFrame testID={p.testID} variant="rail" width={p.width} height={p.height} u={s.u}>
       <View style={{ paddingTop: top, width: s.railWidth }}>
-        <Text
+        <NumericReadout
           testID="surface-value"
-          style={[s.value, { lineHeight: s.valueLineH, textAlign: 'center' }]}
-          maxFontSizeMultiplier={1.25}
-        >
-          {p.selectedValue !== undefined ? formatValue(p.selectedValue) : '—'}
-          {/* the unit's own line box stays inside the value's: it never makes the line taller */}
-          <Text style={{ fontSize: s.unitSize, lineHeight: s.unitSize, fontWeight: '700', color: color.ink2 }}>{unit}</Text>
-        </Text>
+          value={p.selectedValue !== undefined ? formatValue(p.selectedValue) : '—'}
+          unit={p.unit}
+          role={s.value}
+          align="center"
+        />
         <View style={{ marginTop: VALUE_GAP_U * s.rail.u, width: s.railWidth }}>
           <CalibrationRail
             {...p}
