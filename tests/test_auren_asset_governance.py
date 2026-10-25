@@ -255,8 +255,19 @@ ALLOWED_MUSCLE_FOCUS_SVGS = {
     f"{_MF}/auren-plate-region-posterior.svg",
 }
 
-# Full SVG allowlist under design/auren/ = vendored icons + governed BodyMap + P0 Muscle Focus plates.
-ALLOWED_SVGS = ALLOWED_VENDOR_SVGS | ALLOWED_BODYMAP_SVGS | ALLOWED_MUSCLE_FOCUS_SVGS
+# DA-02.2 GOVERNED EVOLUTION: the two operator-supplied visual REFERENCES of the Calibration System
+# (ReferenceMarker / ActiveCursor), kept byte for byte. REFERENCE-ONLY — never loaded at runtime: the
+# runtime geometry is rebuilt on a normalized grid in clients/mobile/src/ui/calibration/geometry.ts.
+_CAL = "design/auren/source/calibration/reference"
+ALLOWED_CALIBRATION_REFERENCE_SVGS = {
+    f"{_CAL}/finallockedcursor.svg",
+    f"{_CAL}/finlactivecursor.svg",
+}
+
+# Full SVG allowlist under design/auren/ = vendored icons + governed BodyMap + P0 Muscle Focus plates
+# + Calibration System references.
+ALLOWED_SVGS = (ALLOWED_VENDOR_SVGS | ALLOWED_BODYMAP_SVGS | ALLOWED_MUSCLE_FOCUS_SVGS
+                | ALLOWED_CALIBRATION_REFERENCE_SVGS)
 
 # Structured contract files explicitly allowed (exact repo-relative paths).
 ALLOWED_STRUCTURED_FILES = {
