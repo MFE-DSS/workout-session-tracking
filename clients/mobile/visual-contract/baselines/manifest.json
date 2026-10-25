@@ -1,0 +1,66 @@
+{
+  "contract": "docs/strategy/AUREN_VISUAL_CONTRACT.md",
+  "renderer": {
+    "image": "mcr.microsoft.com/playwright:v1.63.0-noble@sha256:bc6ab0d6d44ff4826e4cb8c1e6d801e185bfc42bb0753f8e2a30efc70db054c7",
+    "platform": "linux/amd64",
+    "playwright": "1.63.0",
+    "viewport": "480x360",
+    "screenshot_scale": "css",
+    "reduced_motion": true,
+    "build": "EXPO_PUBLIC_GALLERY=contract npx expo export --platform web"
+  },
+  "baselines": [
+    {
+      "id": "calibration-line-320-target",
+      "file": "calibration-line-320-target.png",
+      "visual_id": "CALIBRATION-LINE-V1",
+      "fixture": "?fixture=calibration-line-320-target",
+      "width": 320,
+      "scenario": "TARGET (70 kg, prescription 70 kg)",
+      "pixels": "344x137",
+      "sha256": "8c8f9533f4d3b77678cf0a9a23aad795798f0cfc8d56d19548e0d0c61f169952",
+      "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "calibration-line-390-target",
+      "file": "calibration-line-390-target.png",
+      "visual_id": "CALIBRATION-LINE-V1",
+      "fixture": "?fixture=calibration-line-390-target",
+      "width": 390,
+      "scenario": "TARGET (70 kg, prescription 70 kg)",
+      "pixels": "414x168",
+      "sha256": "081a769595a1758b606b3fa40f31dfbddad23ad7fc427f7d38daa1823206ee77",
+      "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "calibration-line-390-push",
+      "file": "calibration-line-390-push.png",
+      "visual_id": "CALIBRATION-LINE-V1",
+      "fixture": "?fixture=calibration-line-390-push",
+      "width": 390,
+      "scenario": "PUSH (75 kg, prescription 70 kg)",
+      "pixels": "414x168",
+      "sha256": "f9e768935f74773d7971ab886016aa61c6344488829612bafba78a6c63d35292",
+      "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "calibration-line-390-high-cost",
+      "file": "calibration-line-390-high-cost.png",
+      "visual_id": "CALIBRATION-LINE-V1",
+      "fixture": "?fixture=calibration-line-390-high-cost",
+      "width": 390,
+      "scenario": "HIGH COST (82,5 kg, prescription 70 kg)",
+      "pixels": "414x168",
+      "sha256": "eafc6762d69fccdba5aa72923a2d222b764027fddb6f737ac0030518e98348f9",
+      "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_on": "2026-10-25"
+    }
+  ]
+}

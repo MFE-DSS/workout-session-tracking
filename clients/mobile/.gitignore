@@ -6,8 +6,12 @@ node_modules/
 # Expo
 .expo/
 dist/
+dist-contract/
 web-build/
 expo-env.d.ts
+
+# DA-GOV-01 visual gate: run outputs (diffs on failure); baselines ARE versioned
+visual-contract/test-results/
 
 # Native
 .kotlin/
