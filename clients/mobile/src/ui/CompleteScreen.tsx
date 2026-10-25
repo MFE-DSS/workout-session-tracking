@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DoneSession, sessionsThisWeek, weeksHeld } from '../domain/adherence';
 import { elapsedLabel, kg } from '../domain/format';
-import { ExerciseResult, headline, SessionPerformance, Trend } from '../domain/performance';
+import { ExerciseResult, headline, LineReading, lineReading, SessionPerformance, Trend } from '../domain/performance';
 import type { Mission } from '../domain/types';
 import type { WorkoutState } from '../domain/workout';
 import { DEFAULT_SESSIONS_PER_WEEK } from '../lab/profile';
@@ -162,15 +162,34 @@ export function CompleteScreen(props: {
   );
 }
 
+// R13 — the line's reading against the prescription: a mark AND a word, never colour alone
+const READING: Record<LineReading, { mark: string; word: string; tone: string } | null> = {
+  above: { mark: '▲', word: 'au-dessus de la cible', tone: color.perfAbove },
+  on: { mark: '●', word: 'conforme', tone: color.ink2 },
+  below: { mark: '▼', word: 'en dessous de la cible', tone: color.perfBelow },
+  first: { mark: '◆', word: 'repère posé', tone: color.ink3 },
+  free: null,
+};
+
 function ExerciseRow(props: { e: ExerciseResult }) {
   const { e } = props;
   const top = e.top!;
   const t = TREND[e.trend ?? 'first'];
   const before = e.previousTop ? `avant ${kg(e.previousTop.weight)} × ${e.previousTop.reps}` : t.word;
+  const reading = READING[lineReading(e)];
   return (
-    <View style={styles.row} accessible accessibilityLabel={`${e.name} : ${kg(top.weight)} kilos, ${top.reps} reps, ${t.word}`}>
+    <View
+      style={[styles.row, reading && { borderLeftWidth: 3, borderLeftColor: reading.tone, paddingLeft: 10 }]}
+      accessible
+      accessibilityLabel={`${e.name} : ${kg(top.weight)} kilos, ${top.reps} reps, ${t.word}${reading ? `, ${reading.word}` : ''}`}
+    >
       <Text style={[styles.trend, { color: t.tone }]}>{t.glyph}</Text>
-      <Text style={[type.bodyStrong, { flex: 1 }]} numberOfLines={2}>{e.name}</Text>
+      <View style={{ flex: 1 }}>
+        <Text style={type.bodyStrong} numberOfLines={2}>{e.name}</Text>
+        {reading ? (
+          <Text style={[type.small, { color: reading.tone, marginTop: 2 }]}>{`${reading.mark} ${reading.word}`}</Text>
+        ) : null}
+      </View>
       <View style={{ alignItems: 'flex-end' }}>
         <Text style={[type.bodyStrong, type.tabular]}>{`${kg(top.weight)} kg × ${top.reps}`}</Text>
         <Text style={type.small}>{e.replaced ? 'sur remplaçant' : before}</Text>

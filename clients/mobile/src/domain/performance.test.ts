@@ -1,4 +1,4 @@
-import { headline, previousTop, sessionPerformance, setVerdict } from './performance';
+import { ExerciseResult, headline, lineReading, previousTop, sessionPerformance, setVerdict } from './performance';
 import type { PlanExercise, SessionPlan } from './types';
 import type { DoneSet } from './workout';
 
@@ -67,5 +67,30 @@ describe('performance — what the session showed, never a grade', () => {
   test('the server’s previous strings are read as pairs', () => {
     expect(previousTop({ relative: '', weights: '47.5 / 50 / 50', reps: '10 / 8 / 9' })).toEqual({ weight: 50, reps: 9 });
     expect(previousTop(null)).toBeNull();
+  });
+});
+
+describe('R13 — la lecture d’une ligne du bilan, contre la prescription', () => {
+  const line = (sets: ExerciseResult['sets'], over: Partial<ExerciseResult> = {}): ExerciseResult => ({
+    se_id: 1, name: 'Ex', replaced: null, sets, top: { weight: 40, reps: 10 }, trend: 'held',
+    record: null, previousTop: null, previousBest: null, ...over,
+  });
+
+  test('toutes les séries au plafond de la fourchette : au-dessus', () => {
+    expect(lineReading(line(['top', 'top', 'top']))).toBe('above');
+  });
+  test('la plupart sous la fourchette : en dessous', () => {
+    expect(lineReading(line(['below', 'below', 'range']))).toBe('below');
+  });
+  test('sinon : conforme — une seule série faible ne fait pas une ligne faible', () => {
+    expect(lineReading(line(['top', 'range', 'below']))).toBe('on');
+    expect(lineReading(line(['below', 'top']))).toBe('on');
+  });
+  test('une première fois n’est jugée sur rien : repère posé', () => {
+    expect(lineReading(line(['below', 'below'], { trend: 'first' }))).toBe('first');
+  });
+  test('un exercice remplacé ou sans fourchette n’est pas lu', () => {
+    expect(lineReading(line(['top'], { replaced: 'Autre' }))).toBe('free');
+    expect(lineReading(line(['free', 'free']))).toBe('free');
   });
 });

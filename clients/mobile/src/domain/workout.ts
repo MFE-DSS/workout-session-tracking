@@ -33,6 +33,12 @@ export type WorkoutState = {
   done: Record<number, DoneSet>;
   rest: (RestClock & { after: Transition; fromSetId: number }) | null;
   requiresSync: Record<number, { substitute: string }>;
+  /**
+   * R10 / R12 — sets the user chose NOT to do. A skipped set is simply not done
+   * (the product's existing meaning of an unvalidated set): nothing is written.
+   * Optional: snapshots written before this field existed restore without it.
+   */
+  skipped?: Record<number, true>;
   startedMs: number | null;
   completedMs: number | null;
 };
@@ -45,6 +51,7 @@ export const initialState: WorkoutState = {
   done: {},
   rest: null,
   requiresSync: {},
+  skipped: {},
   startedMs: null,
   completedMs: null,
 };
@@ -59,6 +66,8 @@ export type Event =
   | { type: 'REST_END'; nowMs: number }
   | { type: 'REQUEST_SUBSTITUTE'; seId: number; substitute: string }
   | { type: 'FINISH_NOW'; nowMs: number }
+  | { type: 'SKIP_SET'; setId: number; nowMs: number }
+  | { type: 'SKIP_EXERCISE'; nowMs: number }
   | { type: 'RESTORE'; state: WorkoutState }
   | { type: 'RESET' };
 
@@ -120,6 +129,40 @@ function clampDraft(field: keyof Draft, value: number | null): number | null {
   if (value === null) return null;
   if (field === 'reps') return Math.max(1, Math.min(100, Math.round(value)));
   return Math.max(0, Math.min(1000, Math.round(value / 0.5) * 0.5));
+}
+
+/**
+ * The not-done sets of the current exercise, from the cursor on — found by
+ * following the SERVER's transitions while they stay in this exercise.
+ */
+export function remainingOfExercise(state: WorkoutState): number[] {
+  const plan = state.plan;
+  if (!plan || state.cursorSetId === null) return [];
+  const seId = setById(plan, state.cursorSetId)?.se_id;
+  const chain: number[] = [];
+  let id: number | null = state.cursorSetId;
+  while (id !== null && setById(plan, id)?.se_id === seId) {
+    if (!state.done[id]) chain.push(id);
+    const t: Transition = plan.on_complete[String(id)] ?? { kind: 'BILAN' };
+    id = t.kind === 'BILAN' ? null : t.set_id;
+  }
+  return chain;
+}
+
+/**
+ * Mark `setIds` as skipped and move the cursor where the server's table says
+ * the LAST of them leads — no rest: nothing was performed, nothing to recover.
+ */
+function skipThrough(state: WorkoutState, setIds: number[], nowMs: number): WorkoutState {
+  if (!state.plan || setIds.length === 0) return state;
+  const skipped = { ...(state.skipped ?? {}) };
+  for (const id of setIds) skipped[id] = true;
+  const last = setIds[setIds.length - 1];
+  const after: Transition = state.plan.on_complete[String(last)] ?? { kind: 'BILAN' };
+  if (after.kind === 'BILAN') {
+    return { ...state, skipped, phase: 'COMPLETE', rest: null, cursorSetId: null, completedMs: nowMs };
+  }
+  return { ...state, skipped, phase: 'SET', rest: null, cursorSetId: after.set_id };
 }
 
 // ── reducer ───────────────────────────────────────────────────────────────
@@ -201,6 +244,14 @@ export function reduce(state: WorkoutState, event: Event): WorkoutState {
         ...state,
         requiresSync: { ...state.requiresSync, [event.seId]: { substitute: event.substitute } },
       };
+
+    case 'SKIP_SET':
+      if (!state.plan || state.phase !== 'SET' || state.cursorSetId !== event.setId) return state;
+      return skipThrough(state, [event.setId], event.nowMs);
+
+    case 'SKIP_EXERCISE':
+      if (state.phase !== 'SET') return state;
+      return skipThrough(state, remainingOfExercise(state), event.nowMs);
 
     case 'FINISH_NOW':
       // R16 TERMINER MAINTENANT — what is done stays done, nothing is added:

@@ -143,6 +143,49 @@ describe('refusals and boundaries', () => {
   });
 });
 
+describe('R10 / R12 — passer une série, passer un exercice', () => {
+  const plan = fixture.plans['push-a'];
+  const [s1, s2] = plan.sets;
+  const firstExercise = plan.sets.filter((s) => s.se_id === s1.se_id);
+  const nextExerciseSet = plan.sets.find((s) => s.se_id !== s1.se_id)!;
+
+  test('passer une série : rien n’est fait, pas de repos, la série suivante du serveur', () => {
+    const s = reduce(start(plan), { type: 'SKIP_SET', setId: s1.set_id, nowMs: T0 });
+    expect(s.phase).toBe('SET');
+    expect(s.rest).toBeNull();
+    expect(s.cursorSetId).toBe(s2.set_id);
+    expect(s.done).toEqual({});
+    expect(s.skipped).toEqual({ [s1.set_id]: true });
+  });
+
+  test('on ne passe que la série en cours', () => {
+    const s = start(plan);
+    expect(reduce(s, { type: 'SKIP_SET', setId: s2.set_id, nowMs: T0 })).toBe(s);
+  });
+
+  test('passer un exercice : toutes ses séries restantes, puis le premier set de l’exercice suivant', () => {
+    const s = run(start(plan), { type: 'VALIDATED', setId: s1.set_id, performedAt: at(T0), nowMs: T0 },
+      { type: 'REST_END', nowMs: T0 }, { type: 'SKIP_EXERCISE', nowMs: T0 });
+    expect(s.cursorSetId).toBe(nextExerciseSet.set_id);
+    expect(Object.keys(s.done)).toEqual([String(s1.set_id)]);
+    expect(Object.keys(s.skipped ?? {}).map(Number).sort()).toEqual(
+      firstExercise.slice(1).map((x) => x.set_id).sort());
+  });
+
+  test('passer la toute dernière série mène au bilan', () => {
+    const last = plan.sets[plan.sets.length - 1];
+    const atLast = { ...start(plan), cursorSetId: last.set_id };
+    const s = reduce(atLast, { type: 'SKIP_SET', setId: last.set_id, nowMs: T0 + 5 });
+    expect(s.phase).toBe('COMPLETE');
+    expect(s.completedMs).toBe(T0 + 5);
+  });
+
+  test('rien ne se passe pendant un repos', () => {
+    const resting = run(start(plan), { type: 'VALIDATED', setId: s1.set_id, performedAt: at(T0), nowMs: T0 });
+    expect(reduce(resting, { type: 'SKIP_EXERCISE', nowMs: T0 })).toBe(resting);
+  });
+});
+
 describe('R16 — TERMINER MAINTENANT', () => {
   const plan = fixture.plans['push-a'];
   const first = plan.sets[0].set_id;

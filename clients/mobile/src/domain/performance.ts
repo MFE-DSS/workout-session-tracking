@@ -47,6 +47,26 @@ export function setVerdict(reps: number, range: { min: number; max: number } | n
   return 'below';
 }
 
+export type LineReading = 'above' | 'on' | 'below' | 'first' | 'free';
+
+/**
+ * R13 — one exercise line of the bilan, read against the PRESCRIPTION (its rep
+ * range), never against other people. A presentation of the per-set verdicts
+ * above, not a new judgement:
+ *   every prescribed set at the top of the range → above · most sets under it →
+ *   below · otherwise → on. A first time is « repère posé », judged on nothing;
+ *   a replaced exercise or one without a range is not read at all.
+ */
+export function lineReading(e: ExerciseResult): LineReading {
+  if (e.replaced || e.sets.length === 0) return 'free';
+  if (e.trend === 'first') return 'first';
+  const judged = e.sets.filter((v) => v !== 'free');
+  if (judged.length === 0) return 'free';
+  if (judged.every((v) => v === 'top')) return 'above';
+  if (judged.filter((v) => v === 'below').length * 2 > judged.length) return 'below';
+  return 'on';
+}
+
 export function better(a: Top, b: Top): boolean {
   return a.weight > b.weight || (a.weight === b.weight && a.reps > b.reps);
 }

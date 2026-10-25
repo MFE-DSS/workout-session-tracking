@@ -123,6 +123,9 @@ export default function ConnectedApp() {
   /** §8.7 — per set, what the server said: acknowledged or refused (absent = not yet). */
   const [serverSets, setServerSets] = useState<Record<number, 'synced' | 'refused'>>({});
   const [signOutBlocked, setSignOutBlocked] = useState<number | null>(null);
+  /** R10 / R12 — a skip can be taken back for a few seconds; nothing was written. */
+  const [undo, setUndo] = useState<{ text: string; prev: WorkoutState } | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const onStatus = useCallback((s: SyncStatus) => {
     setSync(s);
@@ -298,11 +301,13 @@ export default function ConnectedApp() {
   // ── BILAN reached (last set, or TERMINER): close the session on the server, once ──
   useEffect(() => {
     const s = stateRef.current;
+    // a skip that reached the bilan can still be undone: close only once the window has passed
+    if (undo) return;
     if (s.phase !== 'COMPLETE' || !s.plan || closedRef.current === s.plan.session_id) return;
     closedRef.current = s.plan.session_id;
     const cmd = closeCommand(Crypto.randomUUID(), 'SESSION_FINISH', s.plan.session_id, performedAt(anchorRef.current, performance.now(), PROCESS_ID, Date.now()).epochMs);
     void journalRef.current?.enqueue(cmd, s).then(() => engineRef.current?.kick()).catch(() => undefined);
-  }, [state.phase]);
+  }, [state.phase, undo]);
 
   // ── the deadline is the truth; the tick only redraws and detects the end ───
   const now = useNow(state.phase === 'REST' && !paused);
@@ -465,6 +470,27 @@ export default function ConnectedApp() {
     void journalRef.current?.enqueue(cmd, s).then(() => engineRef.current?.kick()).catch(() => undefined);
   }, [apply]);
 
+  // ── R10 / R12 — passer une série, passer un exercice (rien n'est écrit) ─────
+  const UNDO_MS = 5000;
+  const skipWith = useCallback((event: Event, text: string) => {
+    const before = stateRef.current;
+    const n = apply(event);
+    if (n === before) return;
+    feedback.step();
+    metric(event.type);
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    setUndo({ text, prev: before });
+    undoTimer.current = setTimeout(() => setUndo(null), UNDO_MS);
+  }, [apply, metric]);
+
+  const takeBack = useCallback(() => {
+    if (!undo) return;
+    if (undoTimer.current) clearTimeout(undoTimer.current);
+    apply({ type: 'RESTORE', state: undo.prev });
+    setUndo(null);
+    metric('SKIP-UNDONE');
+  }, [apply, metric, undo]);
+
   // ── R16 — TERMINER / PAUSE / ABANDONNER / ANNULER ─────────────────────────
   const onExitChoice = useCallback((choice: ExitChoice) => {
     setExitOpen(false);
@@ -590,6 +616,9 @@ export default function ConnectedApp() {
           onExitRequested={requestExit}
           statusNote={statusNote({ ...sync, offline: sync.offline || offline })}
           serverStateOf={(setId) => serverSets[setId] ?? null}
+          onSkipSet={(setId) => skipWith({ type: 'SKIP_SET', setId, nowMs: Date.now() }, 'Série passée — elle ne sera pas comptée.')}
+          onSkipExercise={() => skipWith({ type: 'SKIP_EXERCISE', nowMs: Date.now() }, 'Exercice passé — ses séries restantes ne seront pas comptées.')}
+          undo={undo ? { text: undo.text, onUndo: takeBack } : null}
         />
       );
     } else if (state.phase === 'COMPLETE' && showed) {

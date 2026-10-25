@@ -24,6 +24,16 @@ export const color = {
   onSignal: '#0A0B0D',
   system: '#7CCBF5',
   alert: '#FF8A7A',
+  // R11 — how close a substitute is (the engine's N1/N2/N3), green → orange.
+  // Measured 2026-10-25 (WCAG ratio on plate #191C22 · on field #0A0B0D · CIE76
+  // distance to the roles already taken). NEVER the only carrier: the engine's
+  // own badge (« Équivalent », « Proche », « Élargi ») always says it in words.
+  subN1: '#6FD69A', //  9.56 : 1 · 11.03 : 1 · ΔE signal 77, alert 87, system 57
+  subN2: '#C9D46B', // 10.66 : 1 · 12.29 : 1 · ΔE signal 41, alert 66
+  subN3: '#E8935F', //  7.13 : 1 ·  8.22 : 1 · ΔE signal 29, alert 20 — the closest; shown as a tint + badge, never a fill
+  // R13 — a set against its prescription. « conforme » is plain ink: no colour.
+  perfAbove: '#6FD69A', //  9.56 : 1 on plate
+  perfBelow: '#B7A3F0', //  7.73 : 1 on plate · ΔE alert 67: « below » is a reading, not an error
 } as const;
 
 const family = fontFamily.text;
