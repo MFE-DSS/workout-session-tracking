@@ -7,6 +7,15 @@ Ce relevé couvre les **trois surfaces** — connexion, accueil, séance — et 
 **motifs transverses**. Il complète `DESIGN_DECISIONS_HOME_UIV2.md` (D1–D9),
 qui reste en vigueur pour l'accueil.
 
+> ⚠ **AMENDEMENT — portée vNext mobile, 2026-10-23.**
+> **Autorité** : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2** (D8).
+> **Ce qui est supersédé, pour le client mobile seulement** : Q5 (trois rangs),
+> Q6 (échelle E3 32/22/15/12), Q7 (un ambre plein par écran comme valeur),
+> Q8 (opacité), et « `.btn` 14 px portées par le viseur » → `LEGACY_VISUAL_REFERENCE`.
+> **Retenu** : Q4 (la ligne de série est un instrument) comme sémantique ; le
+> principe d'**une seule** action souveraine par écran. Le legacy web garde ce
+> relevé entier.
+
 > **Comment ces décisions ont été prises.** Les trois pages ont été rendues à
 > 390 px sur un serveur local, capturées, et soumises à l'opérateur avec les
 > options et leurs coûts. Il a tranché question par question. C'est la

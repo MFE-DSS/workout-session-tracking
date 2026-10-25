@@ -31,6 +31,7 @@ from app.routers import (
     export,
     health,
     leaderboard,
+    mobile_api,
     pages,
     plan_adaptation,
     readiness,
@@ -188,6 +189,8 @@ _RATE_LIMIT_ROUTES: dict[tuple[str, str], str] = {
     ("POST", "/login"): "login",
     ("POST", "/register"): "register",
     ("POST", "/forgot-password"): "forgot",
+    # `D9` — la connexion mobile devine les mêmes mots de passe : même quota.
+    ("POST", "/api/mobile/v1/auth/login"): "login",
 }
 
 
@@ -329,6 +332,8 @@ def create_app() -> FastAPI:
     # before auth). Flag distinct des deux autres tracks Body. Shell
     # uniquement : aucun JS, aucune caméra, aucun stockage.
     app.include_router(body_capture.router)
+    # `D9` — l'API de l'application mobile (`/api/mobile/v1`), Bearer seul.
+    app.include_router(mobile_api.router)
 
     return app
 

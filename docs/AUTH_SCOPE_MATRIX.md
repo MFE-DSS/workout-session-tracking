@@ -57,6 +57,12 @@
 | `/squads` family (10 routes) | GET/POST | squad memberships | 🔒 OWNED via membership | `is_member(db, squad_id, user.id)` + scope par squad | tests/test_squads.py |
 | `/profile`, `/profile/body`, `/profile/measurements`, `/profile/password` | GET/POST | caller's profile + body data | 👤 SELF | `CurrentUser` | tests/test_auth.py, test_measurements.py |
 | `/contact` | GET/POST | static + form | 👤 SELF | `CurrentUser` | n/a |
+| `/api/mobile/v1/auth/login` | POST | user lookup (constant-time) + session d'appareil | 🆓 PUBLIC | rate limited (même quota que `/login`) | tests/test_d9_mobile_auth.py |
+| `/api/mobile/v1/auth/refresh` | POST | rotation du jeton de rafraîchissement | 🆓 PUBLIC (le jeton fait l'auth) | `device_auth.rotate_refresh` — réutilisation ⇒ révocation | **test_an_old_rotated_refresh_cannot_be_reused**, **test_reusing_an_old_refresh_revokes_the_whole_device** |
+| `/api/mobile/v1/auth/logout`, `/auth/me` | POST/GET | session d'appareil du caller | 👤 SELF | `ApiUser` (Bearer seul) | **test_mobile_logout_revokes_only_its_own_device** |
+| `/api/mobile/v1/mission` | GET | recommandation servie / séance ouverte | 👤 SELF | `ApiUser` + `mission_read_model(db, user.id)` | test_d9_mobile_sessions.py |
+| `/api/mobile/v1/sessions` | POST | create new session | 👤 SELF | `ApiUser` + composition de démarrage du web | **test_a_second_start_is_refused_while_one_is_open** |
+| `/api/mobile/v1/sessions/{id}/execution`, `/sets/{set_id}`, `/exercises/{se_id}/substitute`, `/finish`, `/abandon` | GET/PUT/POST | one session | 🔒 OWNED | `load_owned_session(db, id, user.id)` | **test_a_set_command_on_someone_elses_session_is_a_404** |
 
 ## 3. Helpers d'ownership
 
@@ -68,6 +74,7 @@
 | `CurrentUser` alias | `Annotated[User, Depends(require_user)]` — import dans tout router privé | usage massif |
 | `DbSession` alias | `Annotated[Session, Depends(get_db)]` | idem |
 | `_redirect_to_login` | sentinel exception catchée par handler global → 303 vers `/login` | n/a |
+| `require_api_user` / `ApiUser` | `D9` — `User` d'un jeton d'accès `Bearer` (usage, expiration serveur, époque A0, session d'appareil non révoquée), sinon **401** (jamais une redirection). Ne lit jamais le cookie. | tests/test_d9_mobile_auth.py |
 
 ### 3.2 `app/services/ownership.py`
 

@@ -70,6 +70,8 @@ Sx_UI_04 (clos) a livré le **cockpit d'exécution** de la séance. Le Home est 
 - **Contexte** : ouverture rapide avant/entre séances, souvent debout, une main, mobile 360×640, lumière variable (salle de sport).
 - **Besoin** : décision en quelques secondes, pas de lecture longue, pas de calcul mental.
 - **Anti-besoin** : pas de feed, pas de badges/streaks gamifiés, pas de graphes financiers, pas d'écran marketing.
+  > **SUPERSEDED pour le vNext mobile** sur la gamification (opérateur, 2026-10-23) — **D12** de
+  > `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT_SPEC` §0quinquies. Le reste de cette ligne tient.
 - **Fréquence** : plusieurs fois/jour les jours d'entraînement ; check rapide les jours de repos.
 
 ## §7. Information architecture V1

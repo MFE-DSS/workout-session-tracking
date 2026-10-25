@@ -1,5 +1,7 @@
 # SPIGNOS Visual Identity V2.1 — Private Body Engineering Cockpit
 
+> ⚠ **`LEGACY_VISUAL_REFERENCE` — 2026-10-23** (`ADR_AUREN_VNEXT_01` ACCEPTED — C2, D8). Historique ; ne gouverne aucune surface vNext.
+
 **Date:** 2026-04-14
 **Version:** V2.1 (corrigee suite revue prompt engineer)
 **Type:** Presentation-only refactor (zero backend/route/model changes)

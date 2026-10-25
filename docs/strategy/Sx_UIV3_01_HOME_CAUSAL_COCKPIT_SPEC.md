@@ -7,6 +7,11 @@
 **Direction retenue par l'opérateur** : `CAUSAL COCKPIT`, concept C du Design
 Lab Home × Recovery (67/80, le mieux noté).
 
+> ⚠ **AMENDEMENT 2026-10-23.** Autorité : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2**
+> (D8). La « structure — ordre vertical figé » du §3 → `LEGACY_VISUAL_REFERENCE`
+> pour MISSION dans le client mobile ; elle gouverne toujours l'accueil web.
+> `RETAINED_INVARIANT` : la cause avant l'action, la raison visible sans geste.
+
 ---
 
 ## 1. La question à laquelle cet écran répond

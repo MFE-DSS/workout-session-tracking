@@ -238,6 +238,12 @@ d'où vient la donnée, pas ce qu'il faudrait écrire.
 
 ## 5. Les six primitives visuelles
 
+> ⚠ **AMENDEMENT 2026-10-23.** Autorité : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2**
+> (D8). Les primitives et leurs **implémentations de référence CSS** ci-dessous →
+> `LEGACY_VISUAL_REFERENCE` pour le client mobile. **Restent la sémantique du
+> mobile** : §2 les sept instruments, §3 le test de survie, §4 le contrat d'objet,
+> §6.2bis les quatre questions closes, §7 ce que la donnée ne sait pas encore faire.
+
 **`card` cesse d'être une primitive souveraine.** Elle survit techniquement ;
 visuellement, elle devient l'exception.
 

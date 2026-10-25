@@ -42,6 +42,8 @@ SPIGNOS est une application web de suivi de séances de musculation et cardio, m
 
 **Principe directeur** : zéro client-state, zéro framework JS. Toute la logique métier est server-side, Jinja rend le HTML, aucun fetch métier post-load. L'unique JS (preview card sur leaderboard) reste cosmétique.
 
+> ⚠ **SUPERSÉDÉ le 2026-10-23 pour le client mobile** (`ADR_AUREN_VNEXT_01` **ACCEPTED — C2**, D1/D2) : ~~zéro client-state, zéro framework JS~~ ne s'applique pas à `clients/mobile/` (React Native + Expo, état local d'exécution). **Retenu** : toute la logique **métier** reste côté serveur. Le principe reste entier pour le web Jinja.
+
 ### B.2 — Structure du repo
 
 ```

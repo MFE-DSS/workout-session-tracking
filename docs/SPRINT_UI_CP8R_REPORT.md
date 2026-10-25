@@ -1,5 +1,7 @@
 # `UI-CP8R` — La vérité temporelle du repos
 
+> ⚠ **AMENDEMENT 2026-10-23 — D11** (`ADR_AUREN_VNEXT_01` ACCEPTED — C2). Pour la **future API mobile seulement**, l'heure d'exécution d'une série synchronisée en retard pourra être portée par le client, **jamais sur la seule horloge murale de l'appareil** : ancre de temps serveur + temps monotone écoulé + validation serveur bornée + invariants d'ordre (`Sx_AUREN_MOBILE_EXPERIENCE_VNEXT §8.8bis`). Le web legacy garde la doctrine de ce rapport : l'heure serveur seule. Aucune décision d'authentification ou de sécurité ne dépend jamais d'une heure fournie par le client.
+
 **Statut** : `MERGÉ` · PR #253 · merge `58b9e29` · migration `w4x9r5s6u17` appliquée
 **Branche** : `sb/ui-cp8r-verite-temporelle`, ouverte sur `d6931ef`, canonique `fb42535` (CP8D) fusionnée dedans avant la PR
 **Tier `check_scope`** : `MIGRATION`

@@ -9,6 +9,7 @@ from app.models import (  # noqa: F401
     catalog,
     challenge,
     decision_trace,
+    device_session,
     exercise,
     exercise_muscle_mapping,
     measurement,

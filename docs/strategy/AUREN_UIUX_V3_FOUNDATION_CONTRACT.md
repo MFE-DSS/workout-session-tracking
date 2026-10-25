@@ -8,6 +8,19 @@ Ce document est **transversal aux pages**. Les specs de surface
 (`Sx_UIV3_01` Home, `Sx_UIV3_02` Session) l'appliquent ; elles ne le
 redéfinissent pas.
 
+> ⚠ **AMENDEMENT 2026-10-23 (`§10bis` + marqueurs) — client mobile vNext.**
+> Autorité : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2** (D1, D2, D8).
+> * **`§10bis`** — pour le client mobile React Native, ~~le contrat no-JS~~ est
+>   remplacé par l'invariant **« aucune écriture d'entraînement ne peut être perdue
+>   en silence »** ; le legacy web reste le repli et **garde §10 intégralement**.
+> * ~~§4 valeurs de couleur, §8 typographie, §9 gouttières~~ →
+>   `LEGACY_VISUAL_REFERENCE` pour les surfaces mobiles ; ils gouvernent toujours le web.
+> * `RETAINED_INVARIANT` (s'appliquent au mobile) : **§1** hiérarchie L1/L2/L3 ·
+>   **§2** une action dominante par état · **§3** cible ≥ 44 (points natifs) ·
+>   **§5** encodage de la récupération (jamais `% récupéré`) · **§6** la cause ne se
+>   replie jamais · **§7** aucun état porté par la couleur seule · **§9** budget de
+>   densité (objectifs, pas tokens).
+
 ---
 
 ## 0. Pourquoi ce contrat existe

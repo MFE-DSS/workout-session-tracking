@@ -4,6 +4,15 @@
 **Dépend de** `Sx_UIV3_00` (Foundation Contract), qui prévaut en cas de conflit.
 **Portée : UI/UX uniquement.** Aucun changement de route, de modèle, de calcul.
 
+> ⚠ **AMENDEMENT 2026-10-23 — `§4bis`.** Autorité : `ADR_AUREN_VNEXT_01`
+> **ACCEPTED — C2** (D5, D8). Pour le client mobile React Native :
+> ~~libellés figés du §4~~ et ~~ordre figé SystemOrigin → DeltaReadout →
+> SetInstrument → CommandDock~~ → `LEGACY_VISUAL_REFERENCE` ; et **après la dernière
+> série d'un exercice, REPOS puis ouverture automatique de l'exercice suivant**
+> (aucun geste de navigation sur le chemin nominal). Le legacy web garde le §4 et
+> `CONTINUER → E2`. `RETAINED_INVARIANT` : les six états de console comme
+> vocabulaire de position ; le repos n'est jamais un état persisté.
+
 ---
 
 ## 1. Audit du runtime — mesuré, pas lu

@@ -8,6 +8,15 @@ Causal Cockpit (phase 1, PR #131).
 > images versionnées, pas seulement par des règles écrites. C'est le
 > garde-fou contre la dérive de style : on compare au screen, pas au souvenir.
 
+> ⚠ **AMENDEMENT 2026-10-23 — `LEGACY_VISUAL_REFERENCE` pour le client mobile vNext.**
+> Autorité : `ADR_AUREN_VNEXT_01` **ACCEPTED — C2** (opérateur, 2026-10-23, D1/D8).
+> ~~§2.3 référence visuelle canonique~~ et ~~GOLDEN / SOVEREIGN Home · Session~~ **ne
+> gouvernent plus la forme** des surfaces du client mobile React Native
+> (`clients/mobile/`). Ils **continuent de gouverner le legacy web** tant qu'il sert
+> une surface (supersession **surface par surface**, `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT §4`).
+> `RETAINED_INVARIANT` : §2.5 une question souveraine par surface ; ambre / couleur
+> d'action jamais sur un état de récupération ; contraste mesuré par couple.
+
 ---
 
 ## 0. À quoi sert ce document
@@ -285,6 +294,10 @@ repos · stable     travail · ↑
 
 **Pas de flamme. Pas de streak. Pas de « 12 semaines consécutives ».**
 Une trajectoire, pas une mécanique de récompense.
+
+> **SUPERSEDED pour le vNext mobile** (opérateur, 2026-10-23) — **D12** de
+> `Sx_AUREN_MOBILE_EXPERIENCE_VNEXT_SPEC` §0quinquies : score de séance assumé, complété par
+> une mécanique de récompense. Le web legacy garde cette règle jusqu'à sa bascule.
 
 #### Body Ledger — enfant de Progression, pas destination principale
 
