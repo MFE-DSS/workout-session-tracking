@@ -5,6 +5,7 @@ import { CalibrationRail } from '../calibration/CalibrationRail';
 import { HorizontalInstrumentSurface } from '../instrument/HorizontalInstrumentSurface';
 import { InstrumentFrame } from '../instrument/InstrumentFrame';
 import { InstrumentWithStepControls } from '../instrument/InstrumentWithStepControls';
+import { RecessedWindowFixture } from '../instrument/RecessedWindowFixture';
 import { color, type } from '../theme';
 import { candidateById } from './candidates';
 import { CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
@@ -16,6 +17,7 @@ const NOOP = () => undefined;
 
 function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
+  if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
   if (f.contract === 'INSTRUMENT-CONTROLS-B3') {
     return (
       <InstrumentWithStepControls
@@ -68,15 +70,7 @@ export function ContractFixtureScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: color.field, alignItems: 'flex-start' }}>
         <View testID="contract-candidate" style={{ padding: PAD, backgroundColor: color.field }}>
-          <InstrumentWithStepControls
-            {...CALIBRATION_LINE_DEMO}
-            width={candidate.width}
-            height={candidate.height}
-            selectedPosition={selectedPositionOf(candidate)}
-            selectedValue={candidate.selectedValue}
-            presentation={candidate.presentation}
-            onSelectPosition={NOOP}
-          />
+          <RecessedWindowFixture width={candidate.width} height={candidate.height} fixture={candidate.fixture} />
         </View>
       </View>
     );

@@ -467,7 +467,8 @@ langage de l'instrument existe, pas l'inverse.
 | `DA-02.4B.2` | **Divulgation progressive** REST / ADJUSTING : échelle chiffrée et noms de zone masqués au repos | ✅ **acceptée** (2026-10-25) : `INSTRUMENT-SURFACE-B2` LOCKED, 3 baselines au repos ; le « 70 » ne bouge pas ; retour au repos 1,5 s après le dernier geste |
 | `DA-02.4B.3` | **Commandes − / +** sous le cadre (R3) | ✅ **acceptée** (2026-10-25) : `INSTRUMENT-CONTROLS-B3` LOCKED, 12 baselines ; allure cockpit différée (R5) |
 | `R1, R2, R4, R5` | demandes restantes de l'opérateur (`AUREN_VISUAL_CONTRACT §9`) : surface centrée et plus grande en séance · rail plus haut et plus bas · surbrillance de zone plus contrastée · boutons plus cockpit | → R4 (exploration prête, non committée), R2, R1 ; R5 en finition |
-| — | Recessed Window → Numeric Readout system | → |
+| `DA-02.5` | **Recessed Window** : la sous-zone interne des instruments (W1 · Inset) | ✅ **acceptée** (2026-10-25) : `RECESSED-WINDOW-V1` LOCKED, 8 baselines ; valeurs au plus grand rôle qui tient |
+| — | Numeric Readout system → Logo | → **prochaine** : Numeric Readout system |
 | `DA-03` | Manufacturer Mark (logo) | → |
 | — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
 

@@ -41,6 +41,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `INSTRUMENT-SURFACE-B1` | **LOCKED** (2026-10-25, « ACCEPT — LOCK B.1 ») | Frame C + rail en ligne pleine largeur + valeur souveraine au-dessus + chiffre prescrit sous le bloc du rail | DA-02.4B.1 — `clients/mobile/src/ui/instrument/HorizontalInstrumentSurface.tsx` (§8) |
 | `INSTRUMENT-SURFACE-B2` | **LOCKED** (2026-10-25, « ACCEPT » B.2) | la même surface **au repos** : échelle chiffrée et noms de zone masqués ; l'état réglage est `INSTRUMENT-SURFACE-B1` | DA-02.4B.2 — `HorizontalInstrumentSurface` (`presentation`), `disclosure.ts` (§10) |
 | `INSTRUMENT-CONTROLS-B3` | **LOCKED** (2026-10-25, « ACCEPT » B.3) | les commandes − / + sous le cadre (P1) : second moyen de régler, sans précision de glissé | DA-02.4B.3 — `StepControls.tsx`, `stepModel.ts`, `InstrumentWithStepControls.tsx` (§11) |
+| `RECESSED-WINDOW-V1` | **LOCKED** (2026-10-25, W1 · Inset) | la sous-zone interne d'un instrument : un champ creusé dans Frame C, pas une carte | DA-02.5 — `RecessedWindow.tsx`, `recessedWindowGeometry.ts`, `windowContent.ts` (§12) |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -203,3 +204,18 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 **MUST PRESERVE** : tout `INSTRUMENT-SURFACE-B1` / `-B2` au-dessus, inchangé ; le rail à pleine largeur ; rien à gauche ni à droite du rail ; la position des boutons dans tous les états.
 **MUST NEVER** : un bouton en `signal` ; un pas calculé côté client ; un second chemin de sélection ou une seconde minuterie.
+
+## 12. `RECESSED-WINDOW-V1` — la sous-zone de l'instrument (2026-10-25)
+
+**Décision de l'opérateur** : parmi W1 · Inset, W2 · Slot et W3 · Rail recess (explorés sur F1 / F2 / F3 à 390 et 320), **W1** : le plus neutre, un contour fermé autour d'une information ; **les valeurs les plus grosses possibles**. W2 et W3 sont retirés du code.
+
+| Champ | Valeur |
+|---|---|
+| **Rôle** | une sous-zone montée dans un InstrumentFrame (BodyMap, performance précédente, cible, récupération, substitutions, métadonnées de série, lectures secondaires) ; **jamais une carte** |
+| **Baselines approuvées** | `window-390x220-f1`, `window-390x220-f2`, `window-390x220-f3-pair`, `window-390x220-f3-split`, `window-320x180-f1`, `window-320x180-f2`, `window-320x180-f3-pair`, `window-320x180-f3-split` |
+| **Géométrie** (tout en `u`) | aplat `field` (plus sombre que la face `plate` du cadre) ; contour en `line` à 0,25u (Frame C : 0,35u en `ink3`) ; **une seule coupure** de 3u dans le bord haut, à 4u du bord droit ; une marque de registration d'1u × 1,6u en bas à gauche, en `ink3` ; marge intérieure 2u |
+| **Disposition** | `windowLayout` : une fenêtre, deux égales, ou 60/40 ; écart de 2u (le châssis reste visible entre deux fenêtres : une machine, pas deux cartes) |
+| **Valeurs** | le plus grand rôle existant qui tient (`readout` 68 → `figure` 40 → `exercise` 30, `windowContent.largestValueRole`) ; la capture de revue vérifie qu'aucune valeur n'est coupée |
+
+**MUST PRESERVE** : plus calme que Frame C (trait plus fin, couleur plus sourde) ; lisible en monochrome ; contenu toujours dans le champ de la fenêtre ; fenêtres jamais superposées, toujours dans le champ de Frame C.
+**MUST NEVER** : arrondi, ombre, dégradé, lueur, texture ; une couleur sémantique (une fenêtre ne porte aucun état) ; modifier Frame C pour loger une fenêtre ; une taille de texte hors des rôles existants.

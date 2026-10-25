@@ -6,20 +6,18 @@
  * does it move to `CONTRACT_FIXTURES` (fixtures.ts) and get its baseline through
  * `run.sh approve` + the manifest (docs/strategy/AUREN_VISUAL_CONTRACT.md §5).
  *
- * Empty between two iterations: B.3's renders were approved (« ACCEPT — LOCK B.3 ») and
- * moved to fixtures.ts. The next iteration adds its own candidates here.
+ * Empty between two iterations: DA-02.5's W1 was approved (« ACCEPT — LOCK W1 ») and
+ * moved to fixtures.ts as RECESSED-WINDOW-V1. The next iteration adds its own candidates.
  */
-import type { Presentation } from '../instrument/disclosure';
+import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 
 export type CandidateFixture = {
-  /** `<visual id>-<width>x<height>-<scenario>-<state>` */
+  /** `window-<width>x<height>-<fixture>` */
   id: string;
-  candidate: 'INSTRUMENT-CONTROLS';
+  candidate: 'RECESSED-WINDOW';
   width: number;
   height: number;
-  scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
-  selectedValue: number;
-  presentation: Presentation;
+  fixture: WindowFixture;
 };
 
 export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = [];
