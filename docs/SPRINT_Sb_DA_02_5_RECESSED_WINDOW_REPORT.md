@@ -1,6 +1,6 @@
 # Sb_DA_02_5_RECESSED_WINDOW — la sous-zone de l'instrument
 
-**Statut** : build — tier `isolated` · **Branche** : `sb/da-02-5-recessed-window`
+**Statut** : ✅ MERGÉE (`88bb1de`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-5-recessed-window`
 **Base** : canonique `96a324e` · **Commande** : brief opérateur `DA-02.5 — RECESSED WINDOW` (2026-10-25)
 **Gate visuel** : **« ACCEPT — LOCK W1 »** (opérateur, 2026-10-25)
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` (tous les Visual IDs LOCKED inchangés)
@@ -120,3 +120,17 @@ Contenus de démonstration seulement : aucun écran produit ne monte encore de f
 - Aucun dans le périmètre.
 
 **Verdict :** DA-02.5 est livrée et **verrouillée par l'opérateur**. AUREN a sa sous-zone d'instrument : un champ creusé dans Frame C, plus calme que lui, qui accueille un chiffre, une BodyMap ou deux contenus côte à côte sans devenir une carte. Prochaine étape du chemin critique : **Numeric Readout system**.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #299, mergée par `--merge --match-head-commit` (head `cdad88c`) sous GO MERGE permanent, après « ACCEPT — LOCK W1 » |
+| Commit de merge | `88bb1de41f4c2db52ccd3cf0453431418f84eefb` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 35 baselines |
+| CI canonique (push) | run `40234344279` : 8 jobs sur 8 verts |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | aucun |
+| Nettoyage | worktree `workout-session-tracking-rw` et branche `sb/da-02-5-recessed-window` supprimés après ce closeout |
