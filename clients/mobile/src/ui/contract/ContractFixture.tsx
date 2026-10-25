@@ -13,7 +13,7 @@ const PAD = 12;
 
 function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
-  if (f.contract === 'INSTRUMENT-SURFACE-B1') {
+  if (f.contract === 'INSTRUMENT-SURFACE-B1' || f.contract === 'INSTRUMENT-SURFACE-B2') {
     return (
       <HorizontalInstrumentSurface
         {...CALIBRATION_LINE_DEMO}
@@ -21,6 +21,7 @@ function Governed({ f }: { f: ContractFixture }) {
         height={f.height}
         selectedPosition={selectedPositionOf(f)}
         selectedValue={f.selectedValue}
+        presentation={f.contract === 'INSTRUMENT-SURFACE-B2' ? 'rest' : 'adjusting'}
       />
     );
   }
@@ -57,6 +58,7 @@ export function ContractFixtureScreen() {
             height={candidate.height}
             selectedPosition={selectedPositionOf(candidate)}
             selectedValue={candidate.selectedValue}
+            presentation={candidate.presentation}
           />
         </View>
       </View>

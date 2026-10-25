@@ -4,6 +4,7 @@ import { Text, View } from 'react-native';
 import { CalibrationRail, railBlocks, type CalibrationRailProps } from '../calibration/CalibrationRail';
 import { densityFor, formatValue, railLayout, UNIT } from '../calibration/layout';
 import { color, type } from '../theme';
+import type { Presentation } from './disclosure';
 import { frameGeometry } from './frameGeometry';
 import { InstrumentFrame } from './InstrumentFrame';
 
@@ -16,9 +17,18 @@ import { InstrumentFrame } from './InstrumentFrame';
  * prescribed value is written under the rail's block, centred on the reference
  * marker, without a word (operator ruling D-B, option (i)).
  */
-export type HorizontalInstrumentSurfaceProps = Omit<CalibrationRailProps, 'width' | 'showReadout' | 'density'> & {
+export type HorizontalInstrumentSurfaceProps = Omit<
+  CalibrationRailProps,
+  'width' | 'showReadout' | 'showScale' | 'showZoneLabels' | 'density'
+> & {
   width: number;
   height: number;
+  /**
+   * DA-02.4B.2 — REST hides the printed scale and the zone names; ADJUSTING shows them.
+   * Default: ADJUSTING, the B.1 rendering (`INSTRUMENT-SURFACE-B1`). Nothing moves between
+   * the two: the prescribed value keeps its place (operator ruling « fixe, pas de saut »).
+   */
+  presentation?: Presentation;
   testID?: string;
 };
 
@@ -33,14 +43,19 @@ export function surfaceLayout(p: HorizontalInstrumentSurfaceProps) {
   const frame = frameGeometry('rail', p.width, p.height, u);
   const railWidth = Math.floor(frame.content.w);
   const rail = railLayout({ ...p, width: railWidth });
-  // what the rail draws under its own drawing (zone names when expanded), readout opted out
+  // what the rail draws under its own drawing (zone names when expanded), readout opted out —
+  // measured on the ADJUSTING rail in every state, so nothing jumps when the names appear
   const railBlockH = rail.height + (railBlocks(rail.density, { showReadout: false }).zoneLabels ? 16 : 0);
+  const adjusting = (p.presentation ?? 'adjusting') === 'adjusting';
   const value = rail.density === 'expanded' ? type.readout : type.figure;
   const valueLineH = Math.round(value.fontSize! * 1.05);
   const unitSize = Math.round(value.fontSize! * 0.4);
   const referenceTop = railBlockH + REFERENCE_GAP_U * rail.u;
   const stackH = valueLineH + VALUE_GAP_U * rail.u + referenceTop + type.bodyStrong.lineHeight!;
-  return { u, frame, railWidth, rail, value, valueLineH, unitSize, referenceTop, stackH, fits: stackH <= frame.content.h };
+  return {
+    u, frame, railWidth, rail, value, valueLineH, unitSize, referenceTop, stackH, adjusting,
+    fits: stackH <= frame.content.h,
+  };
 }
 
 export function HorizontalInstrumentSurface(p: HorizontalInstrumentSurfaceProps) {
@@ -60,7 +75,14 @@ export function HorizontalInstrumentSurface(p: HorizontalInstrumentSurfaceProps)
           <Text style={{ fontSize: s.unitSize, lineHeight: s.unitSize, fontWeight: '700', color: color.ink2 }}>{unit}</Text>
         </Text>
         <View style={{ marginTop: VALUE_GAP_U * s.rail.u, width: s.railWidth }}>
-          <CalibrationRail {...p} width={s.railWidth} showReadout={false} testID="surface-rail" />
+          <CalibrationRail
+            {...p}
+            width={s.railWidth}
+            showReadout={false}
+            showScale={s.adjusting}
+            showZoneLabels={s.adjusting}
+            testID="surface-rail"
+          />
           {p.referenceValue !== undefined ? (
             <Text
               testID="surface-reference"

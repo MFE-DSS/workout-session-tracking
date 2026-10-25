@@ -58,6 +58,15 @@ export type ContractFixture =
       height: number;
       scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
       selectedValue: number;
+    }
+  | {
+      /** the baseline id: `surface-<width>x<height>-<scenario>-rest` — the surface at REST (B.2) */
+      id: string;
+      contract: 'INSTRUMENT-SURFACE-B2';
+      width: number;
+      height: number;
+      scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
+      selectedValue: number;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -75,7 +84,17 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'surface-320x180-target', contract: 'INSTRUMENT-SURFACE-B1', width: 320, height: 180, scenario: 'TARGET', selectedValue: 70 },
   { id: 'surface-320x180-push', contract: 'INSTRUMENT-SURFACE-B1', width: 320, height: 180, scenario: 'PUSH', selectedValue: 75 },
   { id: 'surface-320x180-high-cost', contract: 'INSTRUMENT-SURFACE-B1', width: 320, height: 180, scenario: 'HIGH_COST', selectedValue: 82.5 },
+  // DA-02.4B.2 — « ACCEPT — LOCK B.2 » by the operator on 2026-10-25: the surface at REST.
+  // ADJUSTING is B.1 above; at 320 (regular) REST is byte-identical to B.1, so no fixture there.
+  { id: 'surface-390x220-target-rest', contract: 'INSTRUMENT-SURFACE-B2', width: 390, height: 220, scenario: 'TARGET', selectedValue: 70 },
+  { id: 'surface-390x220-push-rest', contract: 'INSTRUMENT-SURFACE-B2', width: 390, height: 220, scenario: 'PUSH', selectedValue: 75 },
+  { id: 'surface-390x220-high-cost-rest', contract: 'INSTRUMENT-SURFACE-B2', width: 390, height: 220, scenario: 'HIGH_COST', selectedValue: 82.5 },
 ];
+
+/** The governed B.2 surfaces (REST), for the device bench. */
+export const SURFACE_B2_FIXTURES = CONTRACT_FIXTURES.filter(
+  (f): f is Extract<ContractFixture, { contract: 'INSTRUMENT-SURFACE-B2' }> => f.contract === 'INSTRUMENT-SURFACE-B2',
+);
 
 /** The governed B.1 surfaces, for the device bench. */
 export const SURFACE_B1_FIXTURES = CONTRACT_FIXTURES.filter(

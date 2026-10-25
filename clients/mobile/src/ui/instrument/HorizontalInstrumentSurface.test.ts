@@ -37,6 +37,32 @@ describe('DA-02.4B.1 — the sovereign readout above the calibration line', () =
     expect(at(320).value).toBe(type.figure);
   });
 
+  it.each(SURFACE_B1_FIXTURES.map((f) => [f.id, f] as const))(
+    'B.2 %s: nothing moves between REST and ADJUSTING (« fixe, pas de saut »)',
+    (_, f) => {
+      const at = (presentation: 'rest' | 'adjusting') =>
+        surfaceLayout({
+          ...CALIBRATION_LINE_DEMO,
+          width: f.width,
+          height: f.height,
+          selectedPosition: selectedPositionOf(f),
+          selectedValue: f.selectedValue,
+          presentation,
+        });
+      const rest = at('rest');
+      const adjusting = at('adjusting');
+      expect(rest.adjusting).toBe(false);
+      expect(adjusting.adjusting).toBe(true);
+      expect(rest.referenceTop).toBe(adjusting.referenceTop);
+      expect(rest.stackH).toBe(adjusting.stackH);
+      expect(rest.railWidth).toBe(adjusting.railWidth);
+    },
+  );
+
+  it('B.2: the default presentation is ADJUSTING, the locked B.1 rendering', () => {
+    expect(layoutOf(SURFACE_B1_FIXTURES[0]).adjusting).toBe(true);
+  });
+
   it('D-B (i): the prescribed value sits under the whole rail block, zone names included', () => {
     const s390 = layoutOf(SURFACE_B1_FIXTURES.find((f) => f.width === 390)!);
     expect(s390.referenceTop).toBeGreaterThanOrEqual(s390.rail.height + 16);

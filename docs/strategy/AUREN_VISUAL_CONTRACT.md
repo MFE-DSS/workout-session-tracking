@@ -39,7 +39,8 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `SEMANTIC-TOKENS-V1` | **LOCKED** (sens) | `signal` = curseur / action de l'opérateur · `system` = prescription / calcul d'AUREN · `perfBelow` EASY · `ink` TARGET · `perfAbove` PUSH · `alert` HIGH COST (« coût », jamais « danger ») | `clients/mobile/src/ui/theme.ts`, `AUREN_CALIBRATION_SYSTEM §3` |
 | `CALIBRATION-FIELD-V1` | **EXPLORATION**, hors chemin critique | rail vertical « en champ » : visualisation secondaire possible (plein écran, analyse), **jamais le contrôle de charge principal** | DA-02.3 ; décision opérateur DA-02.4 n° 4 |
 | `INSTRUMENT-SURFACE-B1` | **LOCKED** (2026-10-25, « ACCEPT — LOCK B.1 ») | Frame C + rail en ligne pleine largeur + valeur souveraine au-dessus + chiffre prescrit sous le bloc du rail | DA-02.4B.1 — `clients/mobile/src/ui/instrument/HorizontalInstrumentSurface.tsx` (§8) |
-| `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` |
+| `INSTRUMENT-SURFACE-B2` | **LOCKED** (2026-10-25, « ACCEPT » B.2) | la même surface **au repos** : échelle chiffrée et noms de zone masqués ; l'état réglage est `INSTRUMENT-SURFACE-B1` | DA-02.4B.2 — `HorizontalInstrumentSurface` (`presentation`), `disclosure.ts` (§10) |
+| `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` |
 
 ---
 
@@ -168,4 +169,20 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 | R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `CALIBRATION-LINE-V1` (LOCKED) → nouvelle baseline | itération dédiée |
 | R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | itération dédiée |
 | R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | itération dédiée |
-| B.2 | divulgation progressive REST / ADJUSTING (déjà prévue) | `INSTRUMENT-SURFACE` + props `showScale` / `showZoneLabels` | DA-02.4B.2 |
+| B.2 | divulgation progressive REST / ADJUSTING (déjà prévue) | `INSTRUMENT-SURFACE` + props `showScale` / `showZoneLabels` | ✅ DA-02.4B.2, acceptée (§10) |
+
+## 10. `INSTRUMENT-SURFACE-B2` — divulgation progressive (2026-10-25)
+
+**Décisions de l'opérateur** (croquis validé avant le code) :
+- au repos, le chiffre prescrit **reste** ; seuls l'échelle chiffrée et les noms de zone se retirent ;
+- le « 70 » est **fixe** : même place dans les deux états, aucun saut sous le doigt ;
+- retour au repos **1,5 s après le dernier geste** ; chaque geste relance le délai.
+
+| Champ | Valeur |
+|---|---|
+| **Baselines approuvées** | `surface-390x220-target-rest`, `surface-390x220-push-rest`, `surface-390x220-high-cost-rest` (repos) ; l'état réglage reste gardé par les six `surface-*` de B.1 |
+| **320 × 180** | en densité regular, le rail n'a ni échelle ni noms : le repos y est **identique à l'octet** à B.1, aucune baseline de plus |
+| **Code** | `CalibrationRail.tsx` : props `showScale`, `showZoneLabels` (défaut = rendu verrouillé) ; `HorizontalInstrumentSurface` : `presentation` (défaut `adjusting` = B.1) ; `disclosure.ts` : contrôleur pur, minuterie injectée |
+
+**MUST PRESERVE** : tout `INSTRUMENT-SURFACE-B1` ; au repos, la ligne, la bande, le curseur, le repère et le chiffre prescrit ; aucune position ne change entre les deux états.
+**MUST NEVER** : retirer la ligne ou la bande au repos ; faire bouger la valeur, le rail ou le chiffre prescrit quand l'échelle apparaît ; décrire l'état autrement à l'accessibilité (même libellé dans les deux états).

@@ -46,12 +46,22 @@ export type CalibrationRailProps = Boundaries & {
    * for a caller that shows the value itself. Default: shown, the locked rendering.
    */
   showReadout?: boolean;
+  /** Presentation only (DA-02.4B.2): `false` leaves out the printed scale. Default: shown (expanded). */
+  showScale?: boolean;
+  /** Presentation only (DA-02.4B.2): `false` leaves out the zone names. Default: shown (expanded). */
+  showZoneLabels?: boolean;
   testID?: string;
 };
 
-/** Which blocks sit under the rail's drawing: the density decides, a caller may only opt out. */
-export function railBlocks(density: Density, p: { showReadout?: boolean }): { zoneLabels: boolean; readout: boolean } {
-  return { zoneLabels: density === 'expanded', readout: density !== 'compact' && p.showReadout !== false };
+type Shown = { showReadout?: boolean; showScale?: boolean; showZoneLabels?: boolean };
+
+/** What the rail draws besides its structure: the density decides, a caller may only opt out. */
+export function railBlocks(density: Density, p: Shown): { zoneLabels: boolean; readout: boolean; scale: boolean } {
+  return {
+    zoneLabels: density === 'expanded' && p.showZoneLabels !== false,
+    readout: density !== 'compact' && p.showReadout !== false,
+    scale: p.showScale !== false,
+  };
 }
 
 /** AUREN_CALIBRATION_SYSTEM §3 — the range colours; the cursor stays `signal` in every zone. */
@@ -261,7 +271,7 @@ function Rail(props: CalibrationRailProps & { width: number }) {
               strokeWidth={2}
             />
           ))}
-          {l.scale.map((sc) => (
+          {(blocks.scale ? l.scale : []).map((sc) => (
             <SvgText
               key={`sc-${sc.x.toFixed(2)}`}
               x={sc.x}
