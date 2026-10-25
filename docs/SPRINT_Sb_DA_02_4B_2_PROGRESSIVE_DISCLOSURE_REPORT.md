@@ -1,6 +1,6 @@
 # Sb_DA_02_4B_2_PROGRESSIVE_DISCLOSURE — l'instrument au repos
 
-**Statut** : build — tier `isolated` · **Branche** : `sb/da-02-4b-2-progressive-disclosure`
+**Statut** : ✅ MERGÉE (`3cd96e7`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-4b-2-progressive-disclosure`
 **Base** : canonique `347c81b` · **Commande** : « go » de l'opérateur sur DA-02.4B.2 (2026-10-25), périmètre fixé par le GO BUILD de B.1 (« B.2 IS EXPLICITLY OUT OF SCOPE » : la liste de ce qui revient à B.2)
 **Gate visuel** : **« ACCEPT »** (opérateur, 2026-10-25)
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` (`CALIBRATION-LINE-V1`, `FRAME-C-V1`, `INSTRUMENT-SURFACE-B1`)
@@ -119,3 +119,17 @@ REST                         ADJUSTING
 - Installation intermittente dans le conteneur du gate : connue, hors périmètre, aucune écriture quand elle échoue.
 
 **Verdict :** DA-02.4B.2 est livrée et **verrouillée par l'opérateur**. Au repos, l'instrument ne montre que la valeur, la ligne, la bande, les deux marqueurs et le chiffre prescrit ; un doigt fait apparaître l'échelle et les noms ; rien ne bouge entre les deux. Les 12 baselines précédentes sont intactes. Prochaines étapes : **R4, R2, R3, R1** (`AUREN_VISUAL_CONTRACT §9`), une itération chacune.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #295, mergée par `--merge --match-head-commit` (head `d0a2d43`) sous GO MERGE permanent, après « ACCEPT » |
+| Commit de merge | `3cd96e7d32246802db8a9cfbc343c4d96349e9bd` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 15 baselines |
+| CI canonique (push) | run `40216610496` : 8 jobs sur 8 verts |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktree `workout-session-tracking-b42` et branche `sb/da-02-4b-2-progressive-disclosure` supprimés après ce closeout |
