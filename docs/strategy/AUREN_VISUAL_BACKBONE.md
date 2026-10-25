@@ -449,3 +449,27 @@ lueur ni animation.
 Partage du travail : le mark, l'icône et l'illustration d'exercice reviennent à l'agent designer
 de l'opérateur ; **le triptyque tiré du master et l'écran cockpit se font dans le code** du
 client mobile (tranche MISSION).
+
+### 8.4 Roadmap DA — amendée par l'opérateur le 2026-10-25 (supersède l'ordre du §8.3)
+
+Les **primitives d'instrument** passent avant la marque : le mark se dessine une fois que le
+langage de l'instrument existe, pas l'inverse.
+
+| Étape | Objet | État |
+|---|---|---|
+| `DA-01` | Visual DNA (direction Allocator, §8.1–8.2) | ✅ |
+| `DA-02.1` | **Calibration Rail** | 🔒 **LOCKED v1** — `AUREN_CALIBRATION_SYSTEM.md` |
+| `DA-02.2` | Active Cursor + Reference Marker | → suivant |
+| `DA-02.3` | Instrument Frame | → |
+| `DA-02.4` | Recessed Window | → |
+| `DA-02.5` | Readout | → |
+| `DA-03` | Manufacturer Mark (logo) | → |
+| — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
+
+Le gate `DA-01` du §8.3 (cinq questions) reste le critère de **chaque** étape ;
+`AUREN_CALIBRATION_SYSTEM §12` y ajoute ses huit conditions pour `DA-02.x`.
+
+**Conséquence sur le code déjà écrit** : la jauge de zone de l'écran MISSION
+(`Sb_VNEXT_MOBILE_MISSION_01`) est une lecture de **couverture**, pas une calibration. Elle ne
+porte ni référence ni curseur. Elle sera reprise dans le langage de `DA-02.3` à `DA-02.5`
+(Instrument Frame, Readout) dès qu'il existera, et ne doit jamais imiter le Calibration Rail.

@@ -949,6 +949,38 @@ pourquoi** ; aucun autre écart n'existe.
 | Non livrés | `SET_CLEAR`, `REST_SKIP` serveur, `next`, `secondary` | — | `REST_SKIP` reste local (D7) ; le plan de séance porte déjà `next` et les substituts |
 | Rotation | — | un jeton déjà échangé est refusé **sans délai de grâce** | conséquence assumée : une réponse de rafraîchissement perdue en route impose une reconnexion |
 
+### 8.11 *(2026-10-25, `DA-02.1`)* Contrat de données du Calibration System
+
+Autorité de design : `AUREN_CALIBRATION_SYSTEM.md` (🔒 LOCKED v1). Ce paragraphe dit **ce que le
+serveur doit envoyer** pour que le client dessine le rail **sans rien décider** : le client
+interpole, il ne juge pas.
+
+**Où** : dans chaque exercice du plan de séance (`EXECUTION_READ_MODEL`, §8.2 et §8.8), un champ
+`calibration`, **par exercice**. Il doit voyager avec le plan : la charge change hors ligne, et la
+position du curseur ne peut pas attendre un aller-retour réseau.
+
+| Champ | Sens | Règle |
+|---|---|---|
+| `calibration` | absent ou `null` | **le rail n'est pas dessiné.** Jamais de rail de repli, jamais de seuils inventés côté client |
+| `axis` | la variable de décision | v1 : `"load_kg"`. Les répétitions restent dans le readout (`AUREN_CALIBRATION_SYSTEM §13`) |
+| `reference` `{weight_kg, reps}` | la prescription du moteur : la position du `ReferenceMarker` | ne change qu'avec une nouvelle prescription du serveur, jamais quand l'utilisateur modifie la charge |
+| `scale` `[{value, position}, …]` | la **normalisation du moteur** : points (charge → position normalisée dans `[-1, 1]`), croissants, la référence en `0` | le client **interpole linéairement** entre deux points et **borne** aux extrémités. C'est la seule fonction de position permise |
+| `zones` `[{kind, from, to}, …]` | `kind` ∈ `EASY · TARGET · PUSH · HIGH_COST`, bornes **en position normalisée** | contiguës, dans cet ordre, couvrent `[-1, 1]` ; TARGET contient `0` et n'est **jamais** un point (`from < to`) |
+| `model` `{version, provenance}` | quel modèle a produit l'échelle et les zones, et sur quelle base (`MEASURED` · `DERIVED` · `INFERRED`, grammaire de `epistemic.py`) | toujours présent quand `calibration` l'est. Une échelle sans provenance n'est pas servie |
+
+**Ce que le contrat exclut** : aucun libellé de risque, aucune interprétation médicale, aucune
+couleur. La zone est un `kind`, et la présentation lui associe token et motif
+(`AUREN_CALIBRATION_SYSTEM §2–3`). Aucune commande neuve : la décision de l'utilisateur reste
+l'écriture d'une série (`SET_COMPLETION`, D3). Le rail **montre un prix, il ne bloque rien** ;
+aucune validation serveur ne refuse une charge en HIGH COST.
+
+**Dépendance nommée — à ne pas contourner** : **aucun service ne produit `scale` ni `zones`
+aujourd'hui.** `overload_engine` rend une cible (`target_weight_kg`, `target_reps_max`) et cinq
+états, pas une enveloppe ni un coût. Les bornes et la normalisation appartiennent à la couche
+**E7 Autorégulation** du moteur scientifique (`Sx_AUREN_SCIENTIFIC_ENGINE_V2_SPEC`, livrable
+`LOAD_AUTOREGULATION_MODEL.md`). D'ici là, le champ reste absent, donc le rail n'est pas dessiné.
+Le design avance (`DA-02.x`) ; la donnée n'est pas inventée pour le remplir.
+
 ---
 
 ## 9. Le lab — une tranche verticale, isolée, sous drapeau
