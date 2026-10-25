@@ -463,7 +463,9 @@ langage de l'instrument existe, pas l'inverse.
 | `DA-02.3` | Instrument Frame | ✅ mergé (PR #287) — **Frame C (`rail`) = structure verrouillée ; composition intérieure non verrouillée** ; rail en champ ajouté |
 | `DA-02.4` | **Instrument Surface** (fusion de « Recessed Window » et « Readout », opérateur 2026-10-25) | ❌ premier rendu **rejeté** (bâti sur le rail en champ, ADN perdu) ; décisions de l'opérateur consignées dans `AUREN_VISUAL_CONTRACT §6` |
 | `DA-GOV-01` | **Visual Contract & Regression Gate** | ✅ **mergé** (PR #290, `9c65f7e`) : `AUREN_VISUAL_CONTRACT.md`, baselines DA-02.2, job CI `visual-contract` |
-| `DA-02.4B` | **Horizontal Instrument Surface** : rail en ligne DA-02.2 pleine largeur dans Frame C ; valeur au-dessus sans prendre de largeur au rail ; REST garde ligne + bande | → **prochaine** (gabarit `VISUAL_SPRINT_TEMPLATE.md`, pré-vol d'abord) |
+| `DA-02.4B.1` | **Lecture souveraine au-dessus du rail** : rail en ligne DA-02.2 pleine largeur dans Frame C ; valeur choisie au-dessus ; chiffre prescrit sous le repère, sans mot | ✅ **acceptée** (« ACCEPT — LOCK B.1 », 2026-10-25) : `INSTRUMENT-SURFACE-B1` LOCKED, 6 baselines ; Frame C vide gardé (2 baselines) |
+| `DA-02.4B.2` | **Divulgation progressive** REST / ADJUSTING : échelle chiffrée et noms de zone masqués au repos | → **prochaine** |
+| `R1–R4` | demandes de l'opérateur à l'acceptation de B.1 (`AUREN_VISUAL_CONTRACT §9`) : surface centrée et plus grande en séance · rail plus haut et plus bas · boutons + / − · surbrillance de zone plus contrastée | → une itération chacune, après B.2 |
 | — | Recessed Window → Numeric Readout system | → |
 | `DA-03` | Manufacturer Mark (logo) | → |
 | — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |

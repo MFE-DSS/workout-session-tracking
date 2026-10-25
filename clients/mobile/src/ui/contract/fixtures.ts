@@ -34,23 +34,55 @@ export const CALIBRATION_LINE_DEMO: Boundaries & {
   unit: 'kg',
 };
 
-export type ContractFixture = {
-  /** the baseline id: `<visual id>-<width>-<scenario>` */
-  id: string;
-  contract: 'CALIBRATION-LINE-V1';
-  width: number;
-  scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
-  selectedValue: number;
-};
+export type ContractFixture =
+  | {
+      /** the baseline id: `<visual id>-<width>-<scenario>` */
+      id: string;
+      contract: 'CALIBRATION-LINE-V1';
+      width: number;
+      scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
+      selectedValue: number;
+    }
+  | {
+      /** the baseline id: `<visual id>-<width>x<height>-empty` — the frame alone, nothing composed in it */
+      id: string;
+      contract: 'FRAME-C-V1';
+      width: number;
+      height: number;
+    }
+  | {
+      /** the baseline id: `surface-<width>x<height>-<scenario>` — Frame C + rail + sovereign readout */
+      id: string;
+      contract: 'INSTRUMENT-SURFACE-B1';
+      width: number;
+      height: number;
+      scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
+      selectedValue: number;
+    };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'calibration-line-320-target', contract: 'CALIBRATION-LINE-V1', width: 320, scenario: 'TARGET', selectedValue: 70 },
   { id: 'calibration-line-390-target', contract: 'CALIBRATION-LINE-V1', width: 390, scenario: 'TARGET', selectedValue: 70 },
   { id: 'calibration-line-390-push', contract: 'CALIBRATION-LINE-V1', width: 390, scenario: 'PUSH', selectedValue: 75 },
   { id: 'calibration-line-390-high-cost', contract: 'CALIBRATION-LINE-V1', width: 390, scenario: 'HIGH_COST', selectedValue: 82.5 },
+  // DA-02.4B.1 (G2) — approved by the operator on 2026-10-25, before anything is composed in the frame
+  { id: 'frame-c-390x220-empty', contract: 'FRAME-C-V1', width: 390, height: 220 },
+  { id: 'frame-c-320x180-empty', contract: 'FRAME-C-V1', width: 320, height: 180 },
+  // DA-02.4B.1 — « ACCEPT — LOCK B.1 » by the operator on 2026-10-25: the sovereign readout above the rail
+  { id: 'surface-390x220-target', contract: 'INSTRUMENT-SURFACE-B1', width: 390, height: 220, scenario: 'TARGET', selectedValue: 70 },
+  { id: 'surface-390x220-push', contract: 'INSTRUMENT-SURFACE-B1', width: 390, height: 220, scenario: 'PUSH', selectedValue: 75 },
+  { id: 'surface-390x220-high-cost', contract: 'INSTRUMENT-SURFACE-B1', width: 390, height: 220, scenario: 'HIGH_COST', selectedValue: 82.5 },
+  { id: 'surface-320x180-target', contract: 'INSTRUMENT-SURFACE-B1', width: 320, height: 180, scenario: 'TARGET', selectedValue: 70 },
+  { id: 'surface-320x180-push', contract: 'INSTRUMENT-SURFACE-B1', width: 320, height: 180, scenario: 'PUSH', selectedValue: 75 },
+  { id: 'surface-320x180-high-cost', contract: 'INSTRUMENT-SURFACE-B1', width: 320, height: 180, scenario: 'HIGH_COST', selectedValue: 82.5 },
 ];
 
-export function selectedPositionOf(f: ContractFixture): number {
+/** The governed B.1 surfaces, for the device bench. */
+export const SURFACE_B1_FIXTURES = CONTRACT_FIXTURES.filter(
+  (f): f is Extract<ContractFixture, { contract: 'INSTRUMENT-SURFACE-B1' }> => f.contract === 'INSTRUMENT-SURFACE-B1',
+);
+
+export function selectedPositionOf(f: { selectedValue: number }): number {
   return pos(f.selectedValue);
 }
 

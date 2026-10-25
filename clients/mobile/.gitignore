@@ -12,6 +12,9 @@ expo-env.d.ts
 
 # DA-GOV-01 visual gate: run outputs (diffs on failure); baselines ARE versioned
 visual-contract/test-results/
+# DA-02.4B.1 review captures: shown to the operator, never a baseline
+visual-contract/review-output/
+visual-contract/test-results-review/
 
 # Native
 .kotlin/

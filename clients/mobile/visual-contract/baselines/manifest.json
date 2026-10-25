@@ -20,7 +20,7 @@
       "pixels": "344x137",
       "sha256": "8c8f9533f4d3b77678cf0a9a23aad795798f0cfc8d56d19548e0d0c61f169952",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
       "approved_on": "2026-10-25"
     },
     {
@@ -33,7 +33,7 @@
       "pixels": "414x168",
       "sha256": "081a769595a1758b606b3fa40f31dfbddad23ad7fc427f7d38daa1823206ee77",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
       "approved_on": "2026-10-25"
     },
     {
@@ -46,7 +46,7 @@
       "pixels": "414x168",
       "sha256": "f9e768935f74773d7971ab886016aa61c6344488829612bafba78a6c63d35292",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
       "approved_on": "2026-10-25"
     },
     {
@@ -59,7 +59,111 @@
       "pixels": "414x168",
       "sha256": "eafc6762d69fccdba5aa72923a2d222b764027fddb6f737ac0030518e98348f9",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »",
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "frame-c-390x220-empty",
+      "file": "frame-c-390x220-empty.png",
+      "visual_id": "FRAME-C-V1",
+      "fixture": "?fixture=frame-c-390x220-empty",
+      "width": 390,
+      "scenario": "EMPTY (Frame C alone, u = 4)",
+      "pixels": "414x244",
+      "sha256": "e7db00c04aa3465988461e87d5332e9ca1b7d6d45320998de1c7462068f4b9b5",
+      "authority": "DA-02.3 (PR #287) Frame C structure; byte-identical to the render the operator reviewed in DA-02.4B.1",
+      "approved_by": "operator — ruling G2 (DA-02.4B.1) then explicit « APPROVE » of the reviewed render",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "frame-c-320x180-empty",
+      "file": "frame-c-320x180-empty.png",
+      "visual_id": "FRAME-C-V1",
+      "fixture": "?fixture=frame-c-320x180-empty",
+      "width": 320,
+      "scenario": "EMPTY (Frame C alone, u = 3)",
+      "pixels": "344x204",
+      "sha256": "5b288b15f4648f827754abf427151da526975953b2dd0e17b48a8a4662e0ae65",
+      "authority": "DA-02.3 (PR #287) Frame C structure; byte-identical to the render the operator reviewed in DA-02.4B.1",
+      "approved_by": "operator — ruling G2 (DA-02.4B.1) then explicit « APPROVE » of the reviewed render",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-390x220-target",
+      "file": "surface-390x220-target.png",
+      "visual_id": "INSTRUMENT-SURFACE-B1",
+      "fixture": "?fixture=surface-390x220-target",
+      "width": 390,
+      "scenario": "TARGET (70 kg, prescription 70 kg) — sovereign readout above, prescribed value under the rail block",
+      "pixels": "414x244",
+      "sha256": "cc00f23462ba4a43a546ab0faad0cf9bb8082704e1b030a879cd8400da4bed6c",
+      "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-390x220-push",
+      "file": "surface-390x220-push.png",
+      "visual_id": "INSTRUMENT-SURFACE-B1",
+      "fixture": "?fixture=surface-390x220-push",
+      "width": 390,
+      "scenario": "PUSH (75 kg, prescription 70 kg)",
+      "pixels": "414x244",
+      "sha256": "a71b96a3e3d65474c2a62c6d8d03ccb4cc0d090f30fb2efa61a19fbe2df37ae3",
+      "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-390x220-high-cost",
+      "file": "surface-390x220-high-cost.png",
+      "visual_id": "INSTRUMENT-SURFACE-B1",
+      "fixture": "?fixture=surface-390x220-high-cost",
+      "width": 390,
+      "scenario": "HIGH COST (82,5 kg, prescription 70 kg)",
+      "pixels": "414x244",
+      "sha256": "fb9f970b1df01fededc7802c53c331b6b0ba4cf4b12a336693c01e84aa60db50",
+      "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-320x180-target",
+      "file": "surface-320x180-target.png",
+      "visual_id": "INSTRUMENT-SURFACE-B1",
+      "fixture": "?fixture=surface-320x180-target",
+      "width": 320,
+      "scenario": "TARGET (70 kg, prescription 70 kg)",
+      "pixels": "344x204",
+      "sha256": "141d917583a1fdffc705caf438608c1bbbf9ff308269e43b9122ef2344e5350c",
+      "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-320x180-push",
+      "file": "surface-320x180-push.png",
+      "visual_id": "INSTRUMENT-SURFACE-B1",
+      "fixture": "?fixture=surface-320x180-push",
+      "width": 320,
+      "scenario": "PUSH (75 kg, prescription 70 kg)",
+      "pixels": "344x204",
+      "sha256": "5b6325a9d176a40846c05777830ea183f71d8a5033439bdb4eb197227531f6e4",
+      "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
+      "approved_on": "2026-10-25"
+    },
+    {
+      "id": "surface-320x180-high-cost",
+      "file": "surface-320x180-high-cost.png",
+      "visual_id": "INSTRUMENT-SURFACE-B1",
+      "fixture": "?fixture=surface-320x180-high-cost",
+      "width": 320,
+      "scenario": "HIGH COST (82,5 kg, prescription 70 kg)",
+      "pixels": "344x204",
+      "sha256": "60de6e1bd63adbb587ed3e13fed0e1d763d731f4cc5d4496a8e5c12ba7f9b897",
+      "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
       "approved_on": "2026-10-25"
     }
   ]
