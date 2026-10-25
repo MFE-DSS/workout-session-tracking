@@ -1,6 +1,6 @@
 # Sb_DA_02_6_NUMERIC_READOUT — la lecture chiffrée
 
-**Statut** : build — tier `isolated` · **Branche** : `sb/da-02-6-numeric-readout`
+**Statut** : ✅ MERGÉE (`bd6f508`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-6-numeric-readout`
 **Base** : canonique `88bb1de` · **Commande** : « go » de l'opérateur sur l'étape suivante du chemin critique (2026-10-25)
 **Gate visuel** : **« ACCEPT »** (opérateur, 2026-10-25)
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` (tous les Visual IDs LOCKED)
@@ -102,3 +102,17 @@ Validé par l'opérateur avant le code (questions à aperçu, 2026-10-25) :
 - Aucun dans le périmètre.
 
 **Verdict :** DA-02.6 est livrée et **verrouillée par l'opérateur**. AUREN pose désormais chaque chiffre d'une seule façon, et dans un espace contraint il prend la plus grande taille qui tient **réellement** sur l'appareil. Prochaine étape du chemin critique : **Logo**.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #301, mergée par `--merge --match-head-commit` (head `a94241d`) sous GO MERGE permanent, après « ACCEPT » |
+| Commit de merge | `bd6f508cdbaadbfd467dfa70787b9bd1207ec318` |
+| CI de la PR | 10 checks verts, dont `visual contract (DA-GOV-01)` sur les 35 baselines |
+| CI canonique (push) | run `40238735809` : 8 jobs sur 8 verts |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | conflit avec le closeout DA-02.5 dans le registre (aucune CI lancée) ; résolu par fusion de la canonique, CI ensuite verte |
+| Nettoyage | worktree `workout-session-tracking-nr` et branche `sb/da-02-6-numeric-readout` supprimés après ce closeout |
