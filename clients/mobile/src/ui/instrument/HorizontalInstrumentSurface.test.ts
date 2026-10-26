@@ -23,13 +23,24 @@ describe('DA-02.4B.1 — the sovereign readout above the calibration line', () =
     expect(s.rail.width).toBe(s.railWidth);
   });
 
-  it('P2: the rail scale follows the density, never the DA-02.3 2× field scale', () => {
+  it('R2 (option B): the rail is drawn on 1,5 × its density grid — never the DA-02.3 2× field scale', () => {
     const at = (w: number) => layoutOf(SURFACE_B1_FIXTURES.find((f) => f.width === w)!);
-    expect(at(390).rail.u).toBe(4);
+    expect(at(390).rail.u).toBe(6);
     expect(at(390).rail.density).toBe('expanded');
-    expect(at(320).rail.u).toBe(3);
+    expect(at(320).rail.u).toBe(4.5);
     expect(at(320).rail.density).toBe('regular');
+    // Frame C keeps its own grid
+    expect(at(390).u).toBe(4);
+    expect(at(320).u).toBe(3);
   });
+
+  it.each(SURFACE_B1_FIXTURES.map((f) => [f.id, f] as const))(
+    'R2 %s: the stack sits centred with at least 2 frame units above and below',
+    (_, f) => {
+      const s = layoutOf(f);
+      expect(s.frame.content.h - s.stackH).toBeGreaterThanOrEqual(4 * s.u);
+    },
+  );
 
   it('the value takes the approved role for the surface size', () => {
     const at = (w: number) => layoutOf(SURFACE_B1_FIXTURES.find((f) => f.width === w)!);

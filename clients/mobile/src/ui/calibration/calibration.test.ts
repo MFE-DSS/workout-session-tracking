@@ -101,6 +101,14 @@ describe('DA-02.2 — the rail places what it is given, at every width', () => {
     expect(refLeft + (REFERENCE_MARKER.width / 2) * l.u).toBe(curLeft + (ACTIVE_CURSOR.width / 2) * l.u);
   });
 
+  it('R2: a host may draw the rail on a larger grid; without one, the density grid (the locked rendering)', () => {
+    const at = (gridUnit?: number) => railLayout({ ...B, width: 390, referencePosition: REF, selectedPosition: REF, gridUnit });
+    expect(at().u).toBe(4);
+    expect(at(6).u).toBe(6);
+    expect(at(6).density).toBe('expanded');
+    expect(at(6).height / at().height).toBeCloseTo(1.5, 10);
+  });
+
   it.each(WIDTHS)('at %i px, the cursor slot spans exactly the tick band above the baseline', (w) => {
     const l = railLayout({ ...B, width: w, referencePosition: REF, selectedPosition: 0.62 });
     expect(l.baselineY - l.cursorTop).toBe(ACTIVE_CURSOR.slotDepth * l.u);

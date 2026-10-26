@@ -114,11 +114,16 @@ export type RailInput = Boundaries & {
   steps?: readonly number[];
   /** the value each step stands for, same order as `steps` — for the printed scale */
   stepValues?: readonly number[];
+  /**
+   * DA-02.7 R2 — the grid unit in px, for a host that draws the rail larger than its density's
+   * (the instrument surface). Default: the density's own (`UNIT`), the locked rendering.
+   */
+  gridUnit?: number;
 };
 
 export function railLayout(input: RailInput): RailLayout {
   const density = input.density ?? densityFor(input.width);
-  const u = UNIT[density];
+  const u = input.gridUnit ?? UNIT[density];
   // half the markers' width on each side, so a marker at 0 or 1 is never clipped
   const pad = (Math.max(REFERENCE_MARKER.width, ACTIVE_CURSOR.width) / 2) * u + 1;
   const trackStart = pad;

@@ -34,6 +34,8 @@ export type CalibrationRailProps = Boundaries & {
   unit?: string;
   /** forced density; otherwise derived from the laid-out width */
   density?: Density;
+  /** DA-02.7 R2 — the grid unit in px (a larger rail); default: the density's, the locked rendering */
+  gridUnit?: number;
   /** fixed width (tests, gallery); otherwise the rail measures itself */
   width?: number;
   /** a finger on the rail: the (snapped) position it points at — the caller decides what it means */

@@ -31,7 +31,8 @@ function Bench() {
   const [step, setStep] = useState(LOADS.indexOf(75));
   const { presentation, wake } = useDisclosure();
   const last = LOADS.length - 1;
-  const live = { width: Math.min(390, screen), height: screen >= 360 ? 220 : 180 };
+  // the governed module sizes (DA-02.7 R2: 390 × 290, 320 × 210)
+  const live = { width: Math.min(390, screen), height: screen >= 360 ? 290 : 210 };
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: color.field }}
