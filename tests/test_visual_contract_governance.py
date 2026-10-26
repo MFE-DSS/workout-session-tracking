@@ -94,6 +94,20 @@ def test_playwright_is_a_dev_only_dependency_at_the_image_version():
     assert MANIFEST["renderer"]["playwright"] == version
 
 
+def test_the_local_gate_verifies_its_dependencies_instead_of_trusting_npm():
+    """npm ci on the shared volume exited 0 with missing files one pass in two (2026-10-25).
+
+    The local gate must reuse only an install that matches the lock, verify every install with
+    `npm ls`, and retry from an emptied node_modules — never run npm ci unchecked again.
+    """
+    install = (GATE / "install-deps.sh").read_text(encoding="utf-8")
+    assert "bash visual-contract/install-deps.sh" in RUN_SH
+    assert "npm ci" not in RUN_SH, "the install goes through install-deps.sh only"
+    assert "cmp -s package-lock.json" in install
+    assert install.count("npm ls --depth=0") == 2, "both the reused and the fresh install are verified"
+    assert "for attempt in 1 2 3" in install
+
+
 def test_ci_runs_the_visual_gate():
     assert re.search(r"^  visual-contract:\n", CI, re.M), "CI job `visual-contract` missing"
     assert "npx playwright test -c visual-contract/playwright.config.ts" in CI
