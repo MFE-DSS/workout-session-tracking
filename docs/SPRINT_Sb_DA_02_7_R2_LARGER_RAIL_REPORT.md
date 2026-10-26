@@ -1,6 +1,6 @@
 # Sb_DA_02_7_R2_LARGER_RAIL — un rail plus grand, posé plus bas
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-02-7-r2-larger-rail`
+**Statut** : ✅ MERGÉE (`5e93699`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-7-r2-larger-rail`
 **Base** : R4 (`sb/da-02-7-r4-zone-emphasis`, PR #305) · **Commande** : « faire tous les R » (opérateur, 2026-10-25), puis « tu peux partir sur le B u6 sans hésiter » (2026-10-26)
 **Gate visuel** : option **B** retenue sur le tableau de revue (u = 6, module 390 × 290)
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` — `INSTRUMENT-SURFACE-B1` / `-B2`, `INSTRUMENT-CONTROLS-B3` (LOCKED) ; demande R2 (§9)
@@ -114,3 +114,17 @@ Aucun élément ajouté ni retiré : seules les tailles changent.
 - Collision de nom évitée : l'option s'appelait d'abord `unit`, déjà pris par l'unité de charge ; renommée `gridUnit` avant tout rendu.
 
 **Verdict :** R2 est livrée. Le rail de l'instrument est 1,5 × plus grand, posé plus bas, ses index se lisent mieux ; le rail seul et le cadre restent tels qu'approuvés. Suite : **R5** (boutons allure Rail), puis R1.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #306, mergée par `--merge --match-head-commit` (head `d030bc8`) sous GO MERGE permanent |
+| Commit de merge | `5e9369937913526fac21e1978e46700b65e731b5` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 35 baselines |
+| CI canonique (push) | run `40306228873` : **8 jobs sur 8 verts** (couvre aussi R4) |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | aucun dans le périmètre |
+| Closeout | plié dans la PR de R1 |
