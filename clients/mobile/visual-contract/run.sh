@@ -22,13 +22,14 @@ case "$MODE" in
 esac
 
 REPO="$(cd "$(dirname "$0")/../../.." && pwd)"
-# node_modules lives in a named volume: Linux binaries never land in the macOS tree
+# node_modules lives in a named volume: Linux binaries never land in the macOS tree.
+# install-deps.sh reuses an install that matches the lock and verifies every new one.
 docker run --rm --platform linux/amd64 \
   -v "$REPO":/work \
   -v auren-visual-contract-node-modules:/work/clients/mobile/node_modules \
   -w /work/clients/mobile \
   -e EXPO_PUBLIC_GALLERY=contract \
   "$IMAGE" \
-  bash -c "npm ci --no-audit --no-fund \
+  bash -c "bash visual-contract/install-deps.sh \
     && npx expo export --platform web --output-dir dist-contract \
     && npx playwright test -c $CONFIG $EXTRA"
