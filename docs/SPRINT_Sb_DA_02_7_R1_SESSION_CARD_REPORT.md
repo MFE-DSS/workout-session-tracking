@@ -1,6 +1,6 @@
 # Sb_DA_02_7_R1_SESSION_CARD — la carte de série verticale
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-02-7-r1-session-card`
+**Statut** : ✅ MERGÉE (`46d331c`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-7-r1-session-card`
 **Base** : R5 (`sb/da-02-7-r5-rail-keys`) · **Commande** : « faire tous les R » (opérateur, 2026-10-25), puis la précision du 2026-10-26 sur la carte verticale et « tu prends le recommandé et boucle »
 **Gate visuel** : composition décidée par l'opérateur en mots ; rendu montré dans le compte rendu final
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` — toutes les pièces LOCKED, réutilisées telles quelles ; nouvelle cible `SESSION-CARD-R1`
@@ -123,3 +123,17 @@ Décrit par l'opérateur le 2026-10-26 (« tout en bas de ce cadran rectangulair
 - Le libellé de l'emplacement, sur deux lignes, était aligné à gauche ; centré avant l'approbation (le BodyMap, sur une ligne, ne bouge pas).
 
 **Verdict :** R1 est livrée comme cible. La carte se lit de haut en bas et la décision de charge est sous le pouce ; elle sera montée sur l'écran de séance quand le moteur fournira les bornes de zone (E7). Toutes les demandes R de l'opérateur sont closes.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #308, mergée par `--merge --match-head-commit` (head `e635fbe`) sous GO MERGE permanent ; porte aussi le closeout de R4 et R2 |
+| Commit de merge | `46d331c88f4f8d7aa704df0069e65d5353846ccc` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 37 baselines |
+| CI canonique (push) | run `40310547617` : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktrees et branches des quatre tranches (R4, R2, R5, R1) supprimés, local et distant ; ce closeout est poussé seul, docs uniquement |

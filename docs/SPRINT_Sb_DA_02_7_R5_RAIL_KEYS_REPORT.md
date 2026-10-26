@@ -1,6 +1,6 @@
 # Sb_DA_02_7_R5_RAIL_KEYS — les touches − / + dans la grammaire de l'instrument
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-02-7-r5-rail-keys`
+**Statut** : ✅ MERGÉE (`a4a1113`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-7-r5-rail-keys`
 **Base** : R2 (`sb/da-02-7-r2-larger-rail`, PR #306) · **Commande** : « faire tous les R » (opérateur, 2026-10-25), puis « rail ou récède […] ce que tu recommanderais, fais-le » (2026-10-26)
 **Gate visuel** : allure **Rail** retenue sur le tableau de revue (rendus 2×, Rail · Recessed · Index)
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` — `INSTRUMENT-CONTROLS-B3` (LOCKED) ; demande R5 (§9)
@@ -98,3 +98,17 @@ Validé par l'opérateur sur le tableau de revue (allure « rail »), 2026-10-26
 - Aucun dans le périmètre.
 
 **Verdict :** R5 est livrée. Les touches appartiennent désormais à l'instrument : un petit Frame C monté sous le grand. Suite : **R1** (carte de séance verticale).
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #307, mergée par `--merge --match-head-commit` (head `021b639`) sous GO MERGE permanent |
+| Commit de merge | `a4a11132ceaebd7308e84d36b7b11eb8658d2d39` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` |
+| CI canonique (push) | run `40308737711` : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktree et branche `sb/da-02-7-r5-rail-keys` supprimés (local et distant) |
