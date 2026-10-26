@@ -21,7 +21,7 @@ import { readoutLineHeight } from './readoutModel';
  */
 export type HorizontalInstrumentSurfaceProps = Omit<
   CalibrationRailProps,
-  'width' | 'showReadout' | 'showScale' | 'showZoneLabels' | 'density'
+  'width' | 'showReadout' | 'showScale' | 'showZoneLabels' | 'density' | 'gridUnit'
 > & {
   width: number;
   height: number;
@@ -34,8 +34,13 @@ export type HorizontalInstrumentSurfaceProps = Omit<
   testID?: string;
 };
 
-/** Gaps of the stack, in grid units. */
-const VALUE_GAP_U = 3;
+/**
+ * DA-02.7 R2 (operator, option B) — the rail is drawn on a grid 1,5 × the frame's: taller
+ * indexes, bigger markers, lower in the module (u = 6 at 390). Frame C keeps its own grid.
+ */
+export const SURFACE_RAIL_SCALE = 1.5;
+/** Gaps of the stack, in rail grid units. */
+const VALUE_GAP_U = 4;
 const REFERENCE_GAP_U = 1;
 /** Box of the prescribed value, centred on the marker (wider than any value it writes). */
 const REFERENCE_BOX = 80;
@@ -44,7 +49,8 @@ export function surfaceLayout(p: HorizontalInstrumentSurfaceProps) {
   const u = UNIT[densityFor(p.width)];
   const frame = frameGeometry('rail', p.width, p.height, u);
   const railWidth = Math.floor(frame.content.w);
-  const rail = railLayout({ ...p, width: railWidth });
+  const gridUnit = SURFACE_RAIL_SCALE * UNIT[densityFor(railWidth)];
+  const rail = railLayout({ ...p, width: railWidth, gridUnit });
   // what the rail draws under its own drawing (zone names when expanded), readout opted out —
   // measured on the ADJUSTING rail in every state, so nothing jumps when the names appear
   const railBlockH = rail.height + (railBlocks(rail.density, { showReadout: false }).zoneLabels ? 16 : 0);
@@ -77,6 +83,7 @@ export function HorizontalInstrumentSurface(p: HorizontalInstrumentSurfaceProps)
           <CalibrationRail
             {...p}
             width={s.railWidth}
+            gridUnit={s.rail.u}
             showReadout={false}
             showScale={s.adjusting}
             showZoneLabels={s.adjusting}

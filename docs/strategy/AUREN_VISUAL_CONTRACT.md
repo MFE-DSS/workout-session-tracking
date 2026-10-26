@@ -148,8 +148,8 @@ Pour chaque composant protégé :
 | **Statut** | LOCKED |
 | **Rôle sémantique** | la décision de charge en un regard : la valeur choisie d'abord, puis sa relation à la prescription sur le rail |
 | **Source d'autorité** | DA-02.4B.1. Code : `HorizontalInstrumentSurface.tsx`, plus `CalibrationRail.tsx` (`showReadout={false}`) et `InstrumentFrame` (`rail`), inchangés |
-| **Baselines approuvées** | `surface-390x220-target`, `surface-390x220-push`, `surface-390x220-high-cost`, `surface-320x180-target`, `surface-320x180-push`, `surface-320x180-high-cost` |
-| **Largeurs requises** | 390 × 220 (u = 4), 320 × 180 (u = 3) |
+| **Baselines approuvées** | `surface-390x290-target`, `surface-390x290-push`, `surface-390x290-high-cost`, `surface-320x210-target`, `surface-320x210-push`, `surface-320x210-high-cost` |
+| **Largeurs requises** | 390 × 290 (cadre u = 4, rail u = 6), 320 × 210 (cadre u = 3, rail u = 4,5) — depuis R2 (§15) |
 
 **MUST PRESERVE**
 - tout `CALIBRATION-LINE-V1` et tout `FRAME-C-V1` ;
@@ -169,7 +169,7 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 | # | Demande (mots de l'opérateur, résumés) | Touche | Tranche |
 |---|---|---|---|
 | R1 | dans la séance, la surface **centrée au milieu de la carte**, en plus grand | intégration produit (écran séance) | intégration séance, après B.2 |
-| R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `CALIBRATION-LINE-V1` (LOCKED) → nouvelle baseline | itération dédiée |
+| R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `INSTRUMENT-SURFACE-B1` / `-B2`, `INSTRUMENT-CONTROLS-B3` → nouvelles baselines ; `CALIBRATION-LINE-V1` inchangé (option ajoutée, défaut intact) | ✅ DA-02.7 R2, option B retenue (§15) |
 | R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | ✅ DA-02.4B.3, acceptée (§11) |
 | R5 | les boutons − / + **plus « cockpit »**, dans la DA de l'instrument (opérateur, à l'acceptation de B.3) | `INSTRUMENT-CONTROLS-B3` (LOCKED) → nouvelle baseline | **finition différée**, avec les derniers détails ; B.3 reste la définition en vigueur |
 | R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | ✅ DA-02.7 R4, variante V1 retenue (§14) |
@@ -184,8 +184,8 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 | Champ | Valeur |
 |---|---|
-| **Baselines approuvées** | `surface-390x220-target-rest`, `surface-390x220-push-rest`, `surface-390x220-high-cost-rest` (repos) ; l'état réglage reste gardé par les six `surface-*` de B.1 |
-| **320 × 180** | en densité regular, le rail n'a ni échelle ni noms : le repos y est **identique à l'octet** à B.1, aucune baseline de plus |
+| **Baselines approuvées** | `surface-390x290-target-rest`, `surface-390x290-push-rest`, `surface-390x290-high-cost-rest` (repos) ; l'état réglage reste gardé par les six `surface-*` de B.1 |
+| **320 × 210** | en densité regular, le rail n'a ni échelle ni noms : le repos y est **identique à l'octet** à B.1, aucune baseline de plus |
 | **Code** | `CalibrationRail.tsx` : props `showScale`, `showZoneLabels` (défaut = rendu verrouillé) ; `HorizontalInstrumentSurface` : `presentation` (défaut `adjusting` = B.1) ; `disclosure.ts` : contrôleur pur, minuterie injectée |
 
 **MUST PRESERVE** : tout `INSTRUMENT-SURFACE-B1` ; au repos, la ligne, la bande, le curseur, le repère et le chiffre prescrit ; aucune position ne change entre les deux états.
@@ -197,7 +197,7 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 | Champ | Valeur |
 |---|---|
-| **Baselines approuvées** (12 ; `adjusting` = juste après « + », un pas au-dessus) | `controls-390x220-target-rest`, `controls-390x220-push-rest`, `controls-390x220-high-cost-rest`, `controls-390x220-target-adjusting`, `controls-390x220-push-adjusting`, `controls-390x220-high-cost-adjusting`, `controls-320x180-target-rest`, `controls-320x180-push-rest`, `controls-320x180-high-cost-rest`, `controls-320x180-target-adjusting`, `controls-320x180-push-adjusting`, `controls-320x180-high-cost-adjusting` |
+| **Baselines approuvées** (12 ; `adjusting` = juste après « + », un pas au-dessus) | `controls-390x290-target-rest`, `controls-390x290-push-rest`, `controls-390x290-high-cost-rest`, `controls-390x290-target-adjusting`, `controls-390x290-push-adjusting`, `controls-390x290-high-cost-adjusting`, `controls-320x210-target-rest`, `controls-320x210-push-rest`, `controls-320x210-high-cost-rest`, `controls-320x210-target-adjusting`, `controls-320x210-push-adjusting`, `controls-320x210-high-cost-adjusting` |
 | **Géométrie** | sous le cadre, à 2u ; hauteur `ACTION_HEIGHT` (68) ; largeur 35 % du module chacun ; écart 4u ; paire centrée. 390 : 137 × 68 en x 62 / 215 ; 320 : 112 × 68 en x 54 / 178. **Ne dépend que de la largeur** |
 | **Traitement** | fond `line`, trait `ink3` au poids secondaire de Frame C ; appui : fond `plate`, trait `ink` ; glyphe `ink` (12,1 : 1 sur `line`), pas affiché en `ink2` (7,2 : 1) ; inactif aux bornes : `ink3`, sans pas affiché. Aucun `signal` |
 | **Comportement** | − / + = index précédent / suivant des `steps` fournis (`stepModel.neighborStep`), rien n'est calculé ; l'appui passe par `onSelectPosition`, le même rappel que le glissé, donc la divulgation se réveille et le délai de 1,5 s repart sans seconde minuterie |
@@ -253,3 +253,20 @@ Aucune couleur neuve, aucun token modifié : seul l'écart entre la zone active 
 **Baselines ré-approuvées** (25) : les 4 de `CALIBRATION-LINE-V1`, les 9 de `INSTRUMENT-SURFACE-B1` / `-B2`, les 12 de `INSTRUMENT-CONTROLS-B3` — toutes portent le rail. `FRAME-C-V1` et `RECESSED-WINDOW-V1` ne bougent pas.
 
 **Noté pour plus tard (opérateur)** : les **proportions** des zones EASY / TARGET / PUSH / HIGH COST dépendent de l'incrément de charge de chaque exercice ; elles viendront du moteur, pas du dessin. Les fixtures gardent les bornes de démonstration (55–85 kg, pas de 2,5, prescription 70).
+
+## 15. R2 — un rail plus grand, posé plus bas (DA-02.7, 2026-10-26)
+
+**Décision de l'opérateur** : « le rail plus grand qui descend, oui, là, tu peux partir sur le B u6 sans hésiter ». Option **B** retenue parmi A (u = 5, module 260) et B (u = 6, module 290).
+
+| Règle | Avant (B.1) | Après (R2 B) |
+|---|---|---|
+| grille du rail dans la surface | celle de sa densité (4 à 390, 3 à 320) | **1,5 ×** celle-ci (`SURFACE_RAIL_SCALE`) : **6** à 390, **4,5** à 320 |
+| grille de Frame C | 4 / 3 | 4 / 3 (inchangée) |
+| écart valeur → rail | 3 unités du rail | **4** unités du rail |
+| module | 390 × 220 · 320 × 180 | **390 × 290 · 320 × 210** |
+
+Tout grandit avec la grille du rail — index, bande, curseur, repère — sans rien redessiner : les marqueurs gardent leurs proportions (6u × 10u, 6u × 4u). Le rail garde toute la largeur du champ.
+
+**`CALIBRATION-LINE-V1` inchangé** : le rail reçoit une option `gridUnit` dont le défaut est la grille de sa densité ; ses 4 baselines restent identiques à l'octet. `FRAME-C-V1` et `RECESSED-WINDOW-V1` aussi.
+
+**Baselines remplacées** (21) : les `surface-*` et `controls-*` passent de 390x220 / 320x180 à 390x290 / 320x210. À 320, la règle est la même (1,5 ×) ; la hauteur 210 laisse une respiration voisine de celle de 390 (≈ 17 px au-dessus et au-dessous, contre ≈ 15 px).
