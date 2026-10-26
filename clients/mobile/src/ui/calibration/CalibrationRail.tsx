@@ -109,6 +109,14 @@ function ZonePatterns({ u }: { u: number }) {
   );
 }
 
+/**
+ * DA-02.7 R4 — the zones the cursor is NOT in recede (operator, 2026-10-26: the zone you
+ * are in must read at a glance, while the rail and its indexes stay clearly visible).
+ * V1: band 0,35 · marks 0,30 (was 0,5 / 0,45) — active / inactive ≈ 4,2 : 1 on plate
+ * (was ≈ 3 : 1), inactive marks still 1,8 – 2,6 : 1. Colours and patterns unchanged.
+ */
+export const INACTIVE_ZONE_OPACITY = { band: 0.35, mark: 0.3 } as const;
+
 const MOTION_MS = 240;
 const ZONE_LABEL_MIN_WIDTH = 56;
 
@@ -204,7 +212,7 @@ function Rail(props: CalibrationRailProps & { width: number }) {
   const u = l.u;
   const band = l.band;
   const active = l.selectedZone;
-  const dim = (z: Zone | null) => (z && z === active ? 1 : 0.45);
+  const dim = (z: Zone | null) => (z && z === active ? 1 : INACTIVE_ZONE_OPACITY.mark);
   const segH = 0.8 * u;
   // the deviation, reference → cursor, on either side (AUREN_CALIBRATION_SYSTEM §6)
   const r = l.referenceX;
@@ -239,7 +247,7 @@ function Rail(props: CalibrationRailProps & { width: number }) {
                   width={s.x2 - s.x1}
                   height={band.height}
                   fill={`url(#${PATTERN_ID[s.zone]})`}
-                  opacity={s.zone === active ? 1 : 0.5}
+                  opacity={s.zone === active ? 1 : INACTIVE_ZONE_OPACITY.band}
                 />
               ))
             : null}
