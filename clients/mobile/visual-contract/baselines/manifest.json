@@ -213,9 +213,9 @@
       "width": 390,
       "scenario": "TARGET at REST (70 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x390",
-      "sha256": "e2f8513fd14602d143a7f08441e4cec7c9902c367601d0c40c46c4e375f6f3cc",
+      "sha256": "ef72c16135722ae7337c16987e399863e86199304a83065210f9cf5a272a4ce9",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 390x290: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -226,9 +226,9 @@
       "width": 390,
       "scenario": "PUSH at REST (75 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x390",
-      "sha256": "36ee07dbcf7be526aeae7b9085ded9b78255b4274f6de0fbe26706c5e2fdc8d1",
+      "sha256": "46511706083c69237f6c421bf7b49af69702d4e534512ebafb15b8249dfd7966",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 390x290: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -239,9 +239,9 @@
       "width": 390,
       "scenario": "HIGH COST at REST (82,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x390",
-      "sha256": "6ac26901de62970b208f3843aa3fc9ce10d90a38380e5b28b14c6d43216f335b",
+      "sha256": "97b7a12653681e0d011c570b3b45e6b6ea87ccab19cd5bd63cd0b847e4053508",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 390x290: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -252,9 +252,9 @@
       "width": 390,
       "scenario": "TARGET right after +, ADJUSTING (72,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x390",
-      "sha256": "c04b9db7ee8381f8ae422a5c1d6730eedeacdb4608eca22d1fc05af7694341cb",
+      "sha256": "2309e4c4234ff33bd57018e469db76daa99d9870cc99da48446eb562075e8af4",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 390x290: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -265,9 +265,9 @@
       "width": 390,
       "scenario": "PUSH right after +, ADJUSTING (77,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x390",
-      "sha256": "06a4f812c032e620ed4f9df77f844e91f80819ec7b28da7a7f152a3c06682aa0",
+      "sha256": "36dd57dd63e97d2952b08c3ff01fdc04e477b4764e9d9c8537b055e53d1dce24",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 390x290: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -278,9 +278,9 @@
       "width": 390,
       "scenario": "HIGH COST right after +, ADJUSTING (85 kg, prescription 70 kg) — − / + under the frame; + inert at the last step",
       "pixels": "414x390",
-      "sha256": "2791bc3bdeffdfcec4f3491dbc8ee480ea14ba1cc34682cbbeaeb589e450ccda",
+      "sha256": "7492f6f4610ef5f5d3d693beccc174cb3fff7fedde55bf32274749c34bc4b14d",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 390x290: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -291,9 +291,9 @@
       "width": 320,
       "scenario": "TARGET at REST (70 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x308",
-      "sha256": "35a180881e1ae8f0b81107abdd6c311864073b171e526f0046aa86cc473e310d",
+      "sha256": "045b6329aa785898b471b89461ba21effb27c4f91cd2b15b30c5a0a2db7b4aae",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 320x210: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -304,9 +304,9 @@
       "width": 320,
       "scenario": "PUSH at REST (75 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x308",
-      "sha256": "890596aa495c6525c8d78709c4af4e0d59b6573193ebea48a0275c1d48cb87a0",
+      "sha256": "5c39ae500f69bef4e7fee6115b1a163ca5de0906b6355722fe9d986535750bbc",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 320x210: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -317,9 +317,9 @@
       "width": 320,
       "scenario": "HIGH COST at REST (82,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x308",
-      "sha256": "f811cf1fd912bc57a0e8c50767f64dc9749791fbc2761ea676a66f88cfdcab2e",
+      "sha256": "182e4711468d7de86e5c2ae756ac28a569633417c76e1b7667178336ca375983",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 320x210: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -330,9 +330,9 @@
       "width": 320,
       "scenario": "TARGET right after +, ADJUSTING (72,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x308",
-      "sha256": "7f3ff7c7a02e42751fd72e47d5e6bf010a6c3735b104fa24bb25bdca248ff619",
+      "sha256": "755f0dadd367ed51ead5d0594be7a274bee5abc5e0d12e65703682fef7867417",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 320x210: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -343,9 +343,9 @@
       "width": 320,
       "scenario": "PUSH right after +, ADJUSTING (77,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x308",
-      "sha256": "574a927f361a46bf2801eca1ef71f5a69a51fa64b810ebe18b1244f11a9e5788",
+      "sha256": "d766d6a789cea56c0050919e1acd11b3f708a9ac32c2b5c60bc8c08a7193883f",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 320x210: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {
@@ -356,9 +356,9 @@
       "width": 320,
       "scenario": "HIGH COST right after +, ADJUSTING (85 kg, prescription 70 kg) — − / + under the frame; + inert at the last step",
       "pixels": "344x308",
-      "sha256": "a178ef29540e4dadc5f6bda9219ecc75dae866834653e0ace741975a3054752d",
+      "sha256": "537c6a35f24f259a66ea80b036a3e00938b953e2c47e4a3d67d358e3be9d4c00",
       "authority": "DA-02.4B.3 composition; DA-02.7 R2 — rail on a 1,5× grid, module 320x210: the reviewed option B with the R4 V1 opacity, so not byte-identical to any single reviewed render",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »",
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »; DA-02.7 R2 (option B, rail u = 6), operator 2026-10-26: « tu peux partir sur le B u6 sans hésiter »; DA-02.7 R5 (keys in the Rail look), operator 2026-10-26: « rail […] ce que tu recommanderais, fais-le »",
       "approved_on": "2026-10-26"
     },
     {

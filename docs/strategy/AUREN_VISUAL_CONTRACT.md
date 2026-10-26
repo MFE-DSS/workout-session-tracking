@@ -171,7 +171,7 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 | R1 | dans la séance, la surface **centrée au milieu de la carte**, en plus grand | intégration produit (écran séance) | intégration séance, après B.2 |
 | R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `INSTRUMENT-SURFACE-B1` / `-B2`, `INSTRUMENT-CONTROLS-B3` → nouvelles baselines ; `CALIBRATION-LINE-V1` inchangé (option ajoutée, défaut intact) | ✅ DA-02.7 R2, option B retenue (§15) |
 | R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | ✅ DA-02.4B.3, acceptée (§11) |
-| R5 | les boutons − / + **plus « cockpit »**, dans la DA de l'instrument (opérateur, à l'acceptation de B.3) | `INSTRUMENT-CONTROLS-B3` (LOCKED) → nouvelle baseline | **finition différée**, avec les derniers détails ; B.3 reste la définition en vigueur |
+| R5 | les boutons − / + **plus « cockpit »**, dans la DA de l'instrument (opérateur, à l'acceptation de B.3) | `INSTRUMENT-CONTROLS-B3` (LOCKED) → nouvelle baseline | ✅ DA-02.7 R5, allure **Rail** retenue (§16) |
 | R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | ✅ DA-02.7 R4, variante V1 retenue (§14) |
 | B.2 | divulgation progressive REST / ADJUSTING (déjà prévue) | `INSTRUMENT-SURFACE` + props `showScale` / `showZoneLabels` | ✅ DA-02.4B.2, acceptée (§10) |
 
@@ -193,13 +193,13 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 ## 11. `INSTRUMENT-CONTROLS-B3` — commandes − / + (2026-10-25)
 
-**Décisions de l'opérateur** : placement **P1, sous le cadre** ; boutons **beaucoup plus gros**, **rapprochés du centre**, **grisés** pour dire qu'on peut appuyer ; « − 2,5 » / « + 2,5 ». Accepté tel quel ; l'allure plus cockpit est une finition différée (§9, R5).
+**Décisions de l'opérateur** : placement **P1, sous le cadre** ; boutons **beaucoup plus gros**, **rapprochés du centre**, **grisés** pour dire qu'on peut appuyer ; « − 2,5 » / « + 2,5 ». Accepté tel quel ; l'allure plus cockpit est venue ensuite (R5, §16).
 
 | Champ | Valeur |
 |---|---|
 | **Baselines approuvées** (12 ; `adjusting` = juste après « + », un pas au-dessus) | `controls-390x290-target-rest`, `controls-390x290-push-rest`, `controls-390x290-high-cost-rest`, `controls-390x290-target-adjusting`, `controls-390x290-push-adjusting`, `controls-390x290-high-cost-adjusting`, `controls-320x210-target-rest`, `controls-320x210-push-rest`, `controls-320x210-high-cost-rest`, `controls-320x210-target-adjusting`, `controls-320x210-push-adjusting`, `controls-320x210-high-cost-adjusting` |
 | **Géométrie** | sous le cadre, à 2u ; hauteur `ACTION_HEIGHT` (68) ; largeur 35 % du module chacun ; écart 4u ; paire centrée. 390 : 137 × 68 en x 62 / 215 ; 320 : 112 × 68 en x 54 / 178. **Ne dépend que de la largeur** |
-| **Traitement** | fond `line`, trait `ink3` au poids secondaire de Frame C ; appui : fond `plate`, trait `ink` ; glyphe `ink` (12,1 : 1 sur `line`), pas affiché en `ink2` (7,2 : 1) ; inactif aux bornes : `ink3`, sans pas affiché. Aucun `signal` |
+| **Traitement** (depuis R5, §16) | chaque touche est un petit Frame C : face `plate`, trait `ink3` au poids secondaire de Frame C sur trois côtés, **rail de montage d'1u** en bas et **deux marques de registration d'1u × 1,6u** posées dessus, en `ink3` ; appui : la face descend en `field`, trait, rail et marques passent en `ink` ; glyphe `ink` (15,4 : 1 sur `plate`), pas affiché en `ink2` (9,1 : 1) ; inactif aux bornes : `ink3` (5,7 : 1), sans pas affiché. Aucun `signal` |
 | **Comportement** | − / + = index précédent / suivant des `steps` fournis (`stepModel.neighborStep`), rien n'est calculé ; l'appui passe par `onSelectPosition`, le même rappel que le glissé, donc la divulgation se réveille et le délai de 1,5 s repart sans seconde minuterie |
 | **Accessibilité** | boutons « Diminuer de 2,5 kilos » / « Augmenter de 2,5 kilos », inactifs aux bornes ; le rail garde son rôle ajustable et dit seul la valeur |
 
@@ -270,3 +270,19 @@ Tout grandit avec la grille du rail — index, bande, curseur, repère — sans 
 **`CALIBRATION-LINE-V1` inchangé** : le rail reçoit une option `gridUnit` dont le défaut est la grille de sa densité ; ses 4 baselines restent identiques à l'octet. `FRAME-C-V1` et `RECESSED-WINDOW-V1` aussi.
 
 **Baselines remplacées** (21) : les `surface-*` et `controls-*` passent de 390x220 / 320x180 à 390x290 / 320x210. À 320, la règle est la même (1,5 ×) ; la hauteur 210 laisse une respiration voisine de celle de 390 (≈ 17 px au-dessus et au-dessous, contre ≈ 15 px).
+
+## 16. R5 — les touches − / + dans la grammaire de l'instrument (DA-02.7, 2026-10-26)
+
+**Décision de l'opérateur** : « rail ou récède […] ou peut-être index […] ce que tu recommanderais, fais-le » ; « tout sauf le basique ». Allure **Rail** retenue parmi Rail · Recessed · Index (même place, même taille pour les trois).
+
+**Pourquoi Rail** : c'est la seule des trois qui reprend la pièce la plus reconnaissable de l'instrument — le rail de montage et les registrations de Frame C. La touche se lit comme un module monté sur la même machine, pas comme un bouton d'interface. Recessed aurait confondu une commande avec une fenêtre de lecture ; Index ajoutait une fente sans fonction.
+
+| Règle | Avant (B.3) | Après (R5 Rail) |
+|---|---|---|
+| face | `line` | `plate` (celle de Frame C) |
+| bord | trait `ink3` sur 4 côtés | trait `ink3` sur 3 côtés + rail d'1u en bas |
+| repères | — | 2 marques d'1u × 1,6u sur le rail, à 2u des bords |
+| appui | face `plate`, trait `ink` | face `field` (la touche s'enfonce), trait, rail et marques en `ink` |
+| contraste du glyphe | 12,1 : 1 | 15,4 : 1 |
+
+Géométrie, comportement et accessibilité **inchangés** (§11). **Baselines ré-approuvées** : les 12 `controls-*`. Les 23 autres restent identiques à l'octet.
