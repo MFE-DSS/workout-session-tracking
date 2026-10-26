@@ -172,7 +172,7 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 | R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `CALIBRATION-LINE-V1` (LOCKED) → nouvelle baseline | itération dédiée |
 | R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | ✅ DA-02.4B.3, acceptée (§11) |
 | R5 | les boutons − / + **plus « cockpit »**, dans la DA de l'instrument (opérateur, à l'acceptation de B.3) | `INSTRUMENT-CONTROLS-B3` (LOCKED) → nouvelle baseline | **finition différée**, avec les derniers détails ; B.3 reste la définition en vigueur |
-| R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | itération dédiée |
+| R4 | la **surbrillance de la zone** traversée plus contrastée, pour savoir où l'on est | `CALIBRATION-LINE-V1` (LOCKED : opacité des zones inactives) → nouvelle baseline | ✅ DA-02.7 R4, variante V1 retenue (§14) |
 | B.2 | divulgation progressive REST / ADJUSTING (déjà prévue) | `INSTRUMENT-SURFACE` + props `showScale` / `showZoneLabels` | ✅ DA-02.4B.2, acceptée (§10) |
 
 ## 10. `INSTRUMENT-SURFACE-B2` — divulgation progressive (2026-10-25)
@@ -237,3 +237,19 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 **MUST PRESERVE** : une valeur n'est jamais coupée ; un même contenu dans des fenêtres voisines prend la même taille quand elle tient (mesure, pas estimation) ; aucune image à la mauvaise taille.
 **MUST NEVER** : une taille de chiffre hors des trois rôles ; une unité plus grosse que 0,4 × la valeur ; une décimale réduite ou surélevée ; une estimation de largeur à la place de la mesure.
+
+## 14. R4 — la zone traversée se détache (DA-02.7, 2026-10-26)
+
+**Décision de l'opérateur** : « la surbrillance, je la trouve très légère […] l'idée, c'est vraiment qu'on voit très bien le rail, qu'on voit bien aussi les index […] on va dire que c'est OK » ; puis « tu prends le recommandé et boucle ». Variante retenue : **V1**.
+
+| Règle | Avant (DA-02.2) | Après (R4 V1) |
+|---|---|---|
+| bande d'une zone **inactive** | opacité 0,5 | opacité **0,35** (`INACTIVE_ZONE_OPACITY.band`) |
+| index et nom d'une zone **inactive** | opacité 0,45 | opacité **0,30** (`INACTIVE_ZONE_OPACITY.mark`) |
+| zone **active** (celle du curseur) | opacité 1 | opacité 1 (inchangé) |
+
+Aucune couleur neuve, aucun token modifié : seul l'écart entre la zone active et les autres grandit. La géométrie du rail, des marqueurs et de la bande est inchangée.
+
+**Baselines ré-approuvées** (25) : les 4 de `CALIBRATION-LINE-V1`, les 9 de `INSTRUMENT-SURFACE-B1` / `-B2`, les 12 de `INSTRUMENT-CONTROLS-B3` — toutes portent le rail. `FRAME-C-V1` et `RECESSED-WINDOW-V1` ne bougent pas.
+
+**Noté pour plus tard (opérateur)** : les **proportions** des zones EASY / TARGET / PUSH / HIGH COST dépendent de l'incrément de charge de chaque exercice ; elles viendront du moteur, pas du dessin. Les fixtures gardent les bornes de démonstration (55–85 kg, pas de 2,5, prescription 70).

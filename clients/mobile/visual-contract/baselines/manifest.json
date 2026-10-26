@@ -18,10 +18,10 @@
       "width": 320,
       "scenario": "TARGET (70 kg, prescription 70 kg)",
       "pixels": "344x137",
-      "sha256": "8c8f9533f4d3b77678cf0a9a23aad795798f0cfc8d56d19548e0d0c61f169952",
+      "sha256": "026cc756359a8147c1218169ea740cf0c27f0887acc3cb0f6a92f9925da77523",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "calibration-line-390-target",
@@ -31,10 +31,10 @@
       "width": 390,
       "scenario": "TARGET (70 kg, prescription 70 kg)",
       "pixels": "414x168",
-      "sha256": "081a769595a1758b606b3fa40f31dfbddad23ad7fc427f7d38daa1823206ee77",
+      "sha256": "6d94019a1c17eb5954773be325088e9294a0c4b8e8c092363dfb37c37d1a0af0",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "calibration-line-390-push",
@@ -44,10 +44,10 @@
       "width": 390,
       "scenario": "PUSH (75 kg, prescription 70 kg)",
       "pixels": "414x168",
-      "sha256": "f9e768935f74773d7971ab886016aa61c6344488829612bafba78a6c63d35292",
+      "sha256": "de00852293eeb63d48fa73cade4f04df4f8be5d569ad05a9dc84d455ec8d71ea",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "calibration-line-390-high-cost",
@@ -57,10 +57,10 @@
       "width": 390,
       "scenario": "HIGH COST (82,5 kg, prescription 70 kg)",
       "pixels": "414x168",
-      "sha256": "eafc6762d69fccdba5aa72923a2d222b764027fddb6f737ac0030518e98348f9",
+      "sha256": "550ec59faef03bba8da6694d404c9f67ce2a4669697c94f18b1c38e22df9888c",
       "authority": "DA-02.2 (PR #286), rendering approved by the operator on 2026-10-25",
-      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-GOV-01 brief: « use the DA-02.2 accepted rendering as the initial visual authority »; explicit ruling G1 (DA-02.4B.1): « The four existing baselines are explicitly approved by the operator »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "frame-c-390x220-empty",
@@ -96,10 +96,10 @@
       "width": 390,
       "scenario": "TARGET (70 kg, prescription 70 kg) — sovereign readout above, prescribed value under the rail block",
       "pixels": "414x244",
-      "sha256": "cc00f23462ba4a43a546ab0faad0cf9bb8082704e1b030a879cd8400da4bed6c",
+      "sha256": "df1ae0198438732506bfcd42e362137296a4ee16009971f9a8ac74ddfaf91344",
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-390x220-push",
@@ -109,10 +109,10 @@
       "width": 390,
       "scenario": "PUSH (75 kg, prescription 70 kg)",
       "pixels": "414x244",
-      "sha256": "a71b96a3e3d65474c2a62c6d8d03ccb4cc0d090f30fb2efa61a19fbe2df37ae3",
+      "sha256": "f85a00bb7fbd458d143daa3adc08f8cf614a3924b4d0efa179ac675a44126bd9",
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-390x220-high-cost",
@@ -122,10 +122,10 @@
       "width": 390,
       "scenario": "HIGH COST (82,5 kg, prescription 70 kg)",
       "pixels": "414x244",
-      "sha256": "fb9f970b1df01fededc7802c53c331b6b0ba4cf4b12a336693c01e84aa60db50",
+      "sha256": "6a9bffd3dbdada045a43a96a39f783121f7ebafe68cffd9514d15cc0dd1b02d9",
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-320x180-target",
@@ -135,10 +135,10 @@
       "width": 320,
       "scenario": "TARGET (70 kg, prescription 70 kg)",
       "pixels": "344x204",
-      "sha256": "141d917583a1fdffc705caf438608c1bbbf9ff308269e43b9122ef2344e5350c",
+      "sha256": "eb686edbaf3ecc23888e1d5caa0010acdd7f5a68eb01b82159f48f2fefad3a14",
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-320x180-push",
@@ -148,10 +148,10 @@
       "width": 320,
       "scenario": "PUSH (75 kg, prescription 70 kg)",
       "pixels": "344x204",
-      "sha256": "5b6325a9d176a40846c05777830ea183f71d8a5033439bdb4eb197227531f6e4",
+      "sha256": "7244da99444ebb748bbc672d1c2ddaf2c7f17aadc1cf7be1ede78b3311ef8576",
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-320x180-high-cost",
@@ -161,10 +161,10 @@
       "width": 320,
       "scenario": "HIGH COST (82,5 kg, prescription 70 kg)",
       "pixels": "344x204",
-      "sha256": "60de6e1bd63adbb587ed3e13fed0e1d763d731f4cc5d4496a8e5c12ba7f9b897",
+      "sha256": "bb3ab83e4a0ea3ab5a68488522e459d863bf06317fd82f871de23ee856dc906f",
       "authority": "DA-02.4B.1; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.1 visual gate: « ACCEPT — LOCK B.1 »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-390x220-target-rest",
@@ -174,10 +174,10 @@
       "width": 390,
       "scenario": "TARGET at REST (70 kg, prescription 70 kg) — printed scale and zone names hidden",
       "pixels": "414x244",
-      "sha256": "5be3fa050b8b246f59f63cdc298c0a36d980d905a7c34ce03591c8458a8c2d96",
+      "sha256": "96525b1f02c659138ca8ee3324004fd890883e973562d884c7a853951c09c2cb",
       "authority": "DA-02.4B.2; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-390x220-push-rest",
@@ -187,10 +187,10 @@
       "width": 390,
       "scenario": "PUSH at REST (75 kg, prescription 70 kg)",
       "pixels": "414x244",
-      "sha256": "c8bd85a4eb38a76b976a818ff12a23f9c77fd484fa5208f81d4f6ab94af0044a",
+      "sha256": "ccba64e05d1f74f0052de282a93e3b9012bd2c14e63172fc6addaaee1514edec",
       "authority": "DA-02.4B.2; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "surface-390x220-high-cost-rest",
@@ -200,10 +200,10 @@
       "width": 390,
       "scenario": "HIGH COST at REST (82,5 kg, prescription 70 kg)",
       "pixels": "414x244",
-      "sha256": "f7eae16ab312423206e5c75f01bd04d06de38e032bfc2780ee935e405c12d230",
+      "sha256": "769a8ff0bb1f6d87a916e9802eb95853b22f50ee8ee2850e06f5fdf84720439e",
       "authority": "DA-02.4B.2; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.2 visual gate: « ACCEPT »; DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-390x220-target-rest",
@@ -213,10 +213,10 @@
       "width": 390,
       "scenario": "TARGET at REST (70 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x320",
-      "sha256": "fbaffd72b4812d467ecd4c5ab4820663597289b859af8dd822567601526796b3",
+      "sha256": "45157bd4d500b10f8496f9498b05e5df87ba8c5c240abd34a896cbbe478e080d",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-390x220-push-rest",
@@ -226,10 +226,10 @@
       "width": 390,
       "scenario": "PUSH at REST (75 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x320",
-      "sha256": "f2f144a2bff249d4b9c058c079631466f6ed80c127da2cab7d82afa70a77d2e2",
+      "sha256": "7b50aff08af7bc05ff6c10b0260fb5883f3006471d5c669bbea1fbf5ee26cdd7",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-390x220-high-cost-rest",
@@ -239,10 +239,10 @@
       "width": 390,
       "scenario": "HIGH COST at REST (82,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x320",
-      "sha256": "70b42b1d5c2b8c5a5a0dc3e8f1cf19970792fb494cc60d232a7c9aad3476701e",
+      "sha256": "d3f0482a83e111113d14783d37f15269c79ff13d99455f311edc638443019bd7",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-390x220-target-adjusting",
@@ -252,10 +252,10 @@
       "width": 390,
       "scenario": "TARGET right after +, ADJUSTING (72,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x320",
-      "sha256": "c524b63976956649c4611a6bb4ed41fab8e5080eddbee0168aa70691969815db",
+      "sha256": "aebcc5717ea4e1a30dcba71f32bf9ec836449205a61676218bcfce6d1189cbf8",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-390x220-push-adjusting",
@@ -265,10 +265,10 @@
       "width": 390,
       "scenario": "PUSH right after +, ADJUSTING (77,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "414x320",
-      "sha256": "fd6852b4d0060ad36073086f7fcb4468cfc96bb22a4a9389925f6bc934fe9602",
+      "sha256": "19a48ea2f9b5eb35af73b41dd94857d7050a64ab76988136c61e56173a0317a0",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-390x220-high-cost-adjusting",
@@ -278,10 +278,10 @@
       "width": 390,
       "scenario": "HIGH COST right after +, ADJUSTING (85 kg, prescription 70 kg) — − / + under the frame; + inert at the last step",
       "pixels": "414x320",
-      "sha256": "7f54665ce3d9af65dd933602696acbfff340115ed3bd02e4f87b7d15bb71c42d",
+      "sha256": "b97f961358f6893feeb8afddbef786e4d6bf4bf67982bfd14a2f26b645386de6",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-320x180-target-rest",
@@ -291,10 +291,10 @@
       "width": 320,
       "scenario": "TARGET at REST (70 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x278",
-      "sha256": "dcb039b70f238d78fc4551611c1de9b0ddad2caa641c52843193d5b250008905",
+      "sha256": "54e1264ac8224d7493587125f51f472d4c8be03dabb679634c54d1b7e69ca690",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-320x180-push-rest",
@@ -304,10 +304,10 @@
       "width": 320,
       "scenario": "PUSH at REST (75 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x278",
-      "sha256": "fc659da6166ef03370373b92d7e1745352b87b28b9a3cd78c27133967b69ff73",
+      "sha256": "a3aff7fcf17eeab53a81bb2ab55b3d667aabdf2db98d14ca7c705f3354b23806",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-320x180-high-cost-rest",
@@ -317,10 +317,10 @@
       "width": 320,
       "scenario": "HIGH COST at REST (82,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x278",
-      "sha256": "28a6e5c868031e9bcbcf583bc2b9f2c67ce7c3793334d936974d3cc046eca417",
+      "sha256": "9fcb7a69f9de818f32f2a723d72862f7b7295be0c62f9e8dfae7c81632ef8052",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-320x180-target-adjusting",
@@ -330,10 +330,10 @@
       "width": 320,
       "scenario": "TARGET right after +, ADJUSTING (72,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x278",
-      "sha256": "beb09ccc42cbba93aec664c829a72fb010240ee6bde1d496f79bb6f2740ab038",
+      "sha256": "27a71b5d4f9b8302a0f9a6051e2fb98e596141e36b572d318343c0473d381c03",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-320x180-push-adjusting",
@@ -343,10 +343,10 @@
       "width": 320,
       "scenario": "PUSH right after +, ADJUSTING (77,5 kg, prescription 70 kg) — − / + under the frame",
       "pixels": "344x278",
-      "sha256": "fb61afeb0e97d9e754d31b679ed74867e95298f8f941fe392a94eb4d8a3ba984",
+      "sha256": "35b04d92c7b577cddde6bbc50a2d355d7ed82896475c9697e65e380e28420f07",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "controls-320x180-high-cost-adjusting",
@@ -356,10 +356,10 @@
       "width": 320,
       "scenario": "HIGH COST right after +, ADJUSTING (85 kg, prescription 70 kg) — − / + under the frame; + inert at the last step",
       "pixels": "344x278",
-      "sha256": "aa1f341ded63a4db94bee3107398b4469f3043482f2aca7fd4584661130ad9ec",
+      "sha256": "b8675624d468a65bcf73722cdb3403530e28bfbdfed1b69749f11c7d29952aac",
       "authority": "DA-02.4B.3; byte-identical to the render the operator reviewed",
-      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred)",
-      "approved_on": "2026-10-25"
+      "approved_by": "operator — DA-02.4B.3 visual gate: « ACCEPT », controls kept as defined (cockpit styling deferred); DA-02.7 R4 (zone emphasis V1), operator 2026-10-26: « tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     },
     {
       "id": "window-390x220-f1",
