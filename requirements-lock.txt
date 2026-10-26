@@ -28,9 +28,9 @@ itsdangerous==2.2.0
     # via -r requirements.txt
 jinja2==3.1.6
     # via -r requirements.txt
-mako==1.4.1
+mako==1.4.3
     # via alembic
-markupsafe==3.0.3
+markupsafe==3.0.4
     # via
     #   jinja2
     #   mako
@@ -45,7 +45,7 @@ pydantic-core==2.46.4
     # via pydantic
 pydantic-settings==2.15.0
     # via -r requirements.txt
-python-dotenv==1.2.3
+python-dotenv==1.2.4
     # via
     #   pydantic-settings
     #   uvicorn
