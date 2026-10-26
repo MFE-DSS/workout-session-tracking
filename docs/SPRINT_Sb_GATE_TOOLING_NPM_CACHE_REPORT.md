@@ -1,6 +1,6 @@
 # Sb_GATE_TOOLING_NPM_CACHE — un gate local qui ne tombe plus une passe sur deux
 
-**Statut** : build · **Branche** : `sb/gate-tooling-npm-cache`
+**Statut** : ✅ MERGÉE (`62d0367`, closeout en annexe) · **Branche** : `sb/gate-tooling-npm-cache`
 **Base** : canonique `8263ea0` · **Commande** : opérateur, 2026-10-26 (« faire tous les R + l'outillage du gate »)
 **Périmètre** : outillage LOCAL du gate visuel (`clients/mobile/visual-contract/run.sh`). Le job CI `visual-contract` n'est pas touché.
 
@@ -61,3 +61,17 @@ Sans objet : **aucune surface visible n'est créée ni modifiée**. La tranche n
 | gardes Python | contrat visuel + voisines |
 
 **Verdict :** le gate local ne dépend plus d'un `npm ci` qui ment ; il réutilise ce qui est sain, vérifie ce qu'il installe et répare ce qui ne l'est pas.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #303, mergée par `--merge --match-head-commit` (head `d8d8705`) sous GO MERGE permanent |
+| Commit de merge | `62d03671854358d240b0c9441b0410ea346e6e48` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` |
+| CI canonique (push) | run `40294150299` : 8 jobs sur 8 verts |
+| Sonar | gate PR `OK`, 0 fil de revue non résolu |
+| Incidents | aucun (la commande de suivi des checks a échoué une fois sans que la CI échoue) |
+| Nettoyage | worktree `workout-session-tracking-tool` et branche `sb/gate-tooling-npm-cache` supprimés après ce closeout |
