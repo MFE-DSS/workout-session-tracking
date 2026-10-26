@@ -6,6 +6,7 @@ import { HorizontalInstrumentSurface } from '../instrument/HorizontalInstrumentS
 import { InstrumentFrame } from '../instrument/InstrumentFrame';
 import { InstrumentWithStepControls } from '../instrument/InstrumentWithStepControls';
 import { RecessedWindowFixture } from '../instrument/RecessedWindowFixture';
+import { SessionSetCard } from '../instrument/SessionSetCard';
 import { color, type } from '../theme';
 import { candidateById } from './candidates';
 import { CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
@@ -18,6 +19,9 @@ const NOOP = () => undefined;
 function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
   if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
+  if (f.contract === 'SESSION-CARD-R1') {
+    return <SessionSetCard screenWidth={f.width} screenHeight={f.height} selectedValue={f.selectedValue} presentation={f.presentation} />;
+  }
   if (f.contract === 'INSTRUMENT-CONTROLS-B3') {
     return (
       <InstrumentWithStepControls

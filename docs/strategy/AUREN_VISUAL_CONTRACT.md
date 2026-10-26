@@ -43,6 +43,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `INSTRUMENT-CONTROLS-B3` | **LOCKED** (2026-10-25, « ACCEPT » B.3) | les commandes − / + sous le cadre (P1) : second moyen de régler, sans précision de glissé | DA-02.4B.3 — `StepControls.tsx`, `stepModel.ts`, `InstrumentWithStepControls.tsx` (§11) |
 | `RECESSED-WINDOW-V1` | **LOCKED** (2026-10-25, W1 · Inset) | la sous-zone interne d'un instrument : un champ creusé dans Frame C, pas une carte | DA-02.5 — `RecessedWindow.tsx`, `recessedWindowGeometry.ts`, `windowContent.ts` (§12) |
 | `NUMERIC-READOUT-V1` | **LOCKED** (2026-10-25, « ACCEPT » DA-02.6) | une seule façon de poser un chiffre : rôle, unité, décimale, taille mesurée | DA-02.6 — `NumericReadout.tsx`, `readoutModel.ts` (§13) ; ses baselines sont celles des surfaces et des fenêtres qui l'utilisent |
+| `SESSION-CARD-R1` | **LOCKED** (cible, banc seulement — 2026-10-26) | la carte de série verticale : l'exercice, ses fenêtres d'information, et **tout en bas** l'instrument de charge avec ses touches | DA-02.7 R1 — `SessionSetCard.tsx` (§17) ; jamais monté sur l'écran de séance tant que le moteur ne fournit pas les bornes de zone (E7) |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -168,7 +169,7 @@ Chacune est **une** itération, avec son propre gate visuel. Celles qui touchent
 
 | # | Demande (mots de l'opérateur, résumés) | Touche | Tranche |
 |---|---|---|---|
-| R1 | dans la séance, la surface **centrée au milieu de la carte**, en plus grand | intégration produit (écran séance) | intégration séance, après B.2 |
+| R1 | dans la séance, la surface **centrée au milieu de la carte**, en plus grand ; précisé le 2026-10-26 : le poids et les boutons **tout en bas** d'une carte verticale, l'exercice et ses pièces d'information au-dessus | nouvelle cible `SESSION-CARD-R1` (banc) ; l'intégration produit attend E7 | ✅ DA-02.7 R1, composition cible (§17) |
 | R2 | le rail **un peu plus haut**, posé **plus bas**, pour mieux voir ses index | `INSTRUMENT-SURFACE-B1` / `-B2`, `INSTRUMENT-CONTROLS-B3` → nouvelles baselines ; `CALIBRATION-LINE-V1` inchangé (option ajoutée, défaut intact) | ✅ DA-02.7 R2, option B retenue (§15) |
 | R3 | des boutons **+ / −** comme second moyen de régler, en plus du glissé | `INSTRUMENT-SURFACE` (élément ajouté) ; le rail porte déjà `onIncrement` / `onDecrement` | ✅ DA-02.4B.3, acceptée (§11) |
 | R5 | les boutons − / + **plus « cockpit »**, dans la DA de l'instrument (opérateur, à l'acceptation de B.3) | `INSTRUMENT-CONTROLS-B3` (LOCKED) → nouvelle baseline | ✅ DA-02.7 R5, allure **Rail** retenue (§16) |
@@ -286,3 +287,19 @@ Tout grandit avec la grille du rail — index, bande, curseur, repère — sans 
 | contraste du glyphe | 12,1 : 1 | 15,4 : 1 |
 
 Géométrie, comportement et accessibilité **inchangés** (§11). **Baselines ré-approuvées** : les 12 `controls-*`. Les 23 autres restent identiques à l'octet.
+
+## 17. `SESSION-CARD-R1` — la carte de série verticale (DA-02.7, 2026-10-26)
+
+**Décision de l'opérateur** : « la partie avec le poids et les boutons, c'est tout en bas de ce cadran rectangulaire vertical, car entre, on va mettre l'exercice, les infos de l'exercice, du cockpit sur comment bien le faire, d'autres pièces avec ce même design » ; « tu prends le recommandé et boucle ».
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | LOCKED comme **cible** ; banc seulement : l'écran de séance ne dessine pas le rail sans les bornes de zone du moteur (E7) |
+| **Baselines approuvées** | `session-card-390x844-push-rest`, `session-card-390x844-push-adjusting` |
+| **Lecture, de haut en bas** | en-tête (série, répétitions, exercice) · module 60/40 (BodyMap · « Dernière ») · module en paire (« Repos » · consigne d'exécution) · **instrument** (`INSTRUMENT-SURFACE-B1` / `-B2`, 390 × 290) · **touches** (`INSTRUMENT-CONTROLS-B3`) |
+| **Géométrie** (`sessionCardLayout`) | barre d'état 48 · en-tête 72 · écart 8 entre modules · paire 120 · instrument 290 + touches · indicateur d'accueil 34 ; le premier module prend le reste (188 à 844) : **aucun vide non voulu** |
+| **Largeur** | pleine largeur : avec des marges de 20 px, l'instrument tomberait à 350, sous la densité expanded (360) |
+| **Pièces non dessinées** | la consigne d'exécution est un **emplacement nommé** en pointillé, comme le BodyMap : jamais un faux contenu |
+
+**MUST PRESERVE** : l'instrument et ses touches **en bas**, sous le pouce ; les pièces d'information **au-dessus**, en Recessed Windows dans Frame C ; chaque pièce verrouillée telle quelle (aucune n'est redessinée pour la carte) ; une information une seule fois (la charge choisie n'est dite que par l'instrument ; « Dernière » est la performance précédente, pas la décision).
+**MUST NEVER** : monter la carte sur l'écran de séance avec des bornes inventées ; une marge latérale qui fait passer l'instrument sous 360 ; un emplacement en pointillé présenté comme une fonction livrée.
