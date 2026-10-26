@@ -1,6 +1,6 @@
 # Sb_DA_02_7_R4_ZONE_EMPHASIS — la zone traversée se détache
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-02-7-r4-zone-emphasis`
+**Statut** : ✅ MERGÉE (`86ac917`, closeout en annexe) — tier `isolated` · **Branche** : `sb/da-02-7-r4-zone-emphasis`
 **Base** : canonique `4d0e469` · **Commande** : « faire tous les R » (opérateur, 2026-10-25), puis « tout ça, c'est validé, tu prends le recommandé et boucle qu'on avance » (2026-10-26)
 **Gate visuel** : variante **V1** retenue sur le tableau de revue (opérateur : « on va dire que c'est OK » ; « tu prends le recommandé »)
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` — `CALIBRATION-LINE-V1` (LOCKED) ; demande R4 (§9)
@@ -103,3 +103,17 @@ Aucun élément ajouté ni retiré : seule l'opacité change.
 **Note de l'opérateur pour plus tard** : les proportions des zones EASY / TARGET / PUSH / HIGH COST dépendent de l'incrément de charge de chaque exercice ; elles viendront du moteur. Les fixtures gardent les bornes de démonstration.
 
 **Verdict :** R4 est livrée. La zone où tombe le choix se lit d'un coup d'œil, le rail et ses index restent visibles. Suite : **R2** (rail plus grand, u = 6), puis R5 et R1.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #305, mergée par `--merge --match-head-commit` (head `3fff2e4`) sous GO MERGE permanent |
+| Commit de merge | `86ac917a9e15989169a261e0bcdc3c4c89d137c7` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 35 baselines |
+| CI canonique (push) | run `40304357300` : 7 jobs verts (tests, gate visuel, lint, attestation) ; job `SonarCloud` **annulé** par le push suivant sur la branche (merge de R2, même groupe de concurrence). La preuve canonique complète est le run `40306228873` sur `5e93699` (merge R2, qui contient R4) : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK`, 0 issue, 0 fil de revue non résolu |
+| Incidents | aucun dans le périmètre |
+| Closeout | plié dans la PR de R1 (les PR R2 et R5 étaient déjà en CI) |

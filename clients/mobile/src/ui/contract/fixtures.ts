@@ -86,6 +86,16 @@ export type ContractFixture =
       width: number;
       height: number;
       fixture: WindowFixture;
+    }
+  | {
+      /** the baseline id: `session-card-<width>x<height>-<scenario>-<state>` — the set card's target composition (R1) */
+      id: string;
+      contract: 'SESSION-CARD-R1';
+      width: number;
+      height: number;
+      scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
+      selectedValue: number;
+      presentation: 'rest' | 'adjusting';
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -133,6 +143,10 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'window-320x180-f2', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f2' },
   { id: 'window-320x180-f3-pair', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f3-pair' },
   { id: 'window-320x180-f3-split', contract: 'RECESSED-WINDOW-V1', width: 320, height: 180, fixture: 'f3-split' },
+  // DA-02.7 R1 — the set card's target composition (operator, 2026-10-26: « tu prends le recommandé et boucle »):
+  // the exercise, its windows, and the instrument with its keys at the bottom. Bench only (E7).
+  { id: 'session-card-390x844-push-rest', contract: 'SESSION-CARD-R1', width: 390, height: 844, scenario: 'PUSH', selectedValue: 75, presentation: 'rest' },
+  { id: 'session-card-390x844-push-adjusting', contract: 'SESSION-CARD-R1', width: 390, height: 844, scenario: 'PUSH', selectedValue: 77.5, presentation: 'adjusting' },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */

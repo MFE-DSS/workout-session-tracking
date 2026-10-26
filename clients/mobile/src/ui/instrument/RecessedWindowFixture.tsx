@@ -16,11 +16,19 @@ import { FittedReadout } from './NumericReadout';
  */
 export type WindowFixture = 'f1' | 'f2' | 'f3-pair' | 'f3-split';
 
-type Content = { kind: 'figure'; label: string; value: string; unit: string } | { kind: 'bodymap' };
+/**
+ * What a window shows. `slot` (DA-02.7 R1) is a NAMED placeholder for a piece not designed
+ * yet (an execution cue…): drawn like the BodyMap placeholder, never as real content.
+ */
+export type WindowContentSpec =
+  | { kind: 'figure'; label: string; value: string; unit: string }
+  | { kind: 'bodymap' }
+  | { kind: 'slot'; label: string };
+type Content = WindowContentSpec;
 
-const LAST: Content = { kind: 'figure', label: 'Dernière', value: '72,5', unit: 'kg' };
-const REST: Content = { kind: 'figure', label: 'Repos', value: '2:30', unit: 'min' };
-const BODYMAP: Content = { kind: 'bodymap' };
+export const LAST: Content = { kind: 'figure', label: 'Dernière', value: '72,5', unit: 'kg' };
+export const REST: Content = { kind: 'figure', label: 'Repos', value: '2:30', unit: 'min' };
+export const BODYMAP: Content = { kind: 'bodymap' };
 
 export const WINDOW_FIXTURES: Record<WindowFixture, { layout: WindowLayout; contents: Content[] }> = {
   f1: { layout: 'single', contents: [LAST] },
@@ -30,9 +38,15 @@ export const WINDOW_FIXTURES: Record<WindowFixture, { layout: WindowLayout; cont
 };
 
 export function RecessedWindowFixture(p: { width: number; height: number; fixture: WindowFixture }) {
+  const { layout, contents } = WINDOW_FIXTURES[p.fixture];
+  return <WindowModule width={p.width} height={p.height} layout={layout} contents={contents} />;
+}
+
+/** One Frame C holding one, two equal or a 60/40 pair of Recessed Windows. */
+export function WindowModule(p: { width: number; height: number; layout: WindowLayout; contents: readonly Content[] }) {
   const u = UNIT[densityFor(p.width)];
   const frame = frameGeometry('rail', p.width, p.height, u);
-  const { layout, contents } = WINDOW_FIXTURES[p.fixture];
+  const { layout, contents } = p;
   const boxes = windowLayout(layout, { x: 0, y: 0, w: frame.content.w, h: frame.content.h }, u);
   return (
     <InstrumentFrame variant="rail" width={p.width} height={p.height} u={u}>
@@ -53,17 +67,23 @@ export function RecessedWindowFixture(p: { width: number; height: number; fixtur
 function WindowContent({ content, width, height }: { content: Content; width: number; height: number }) {
   if (content.kind === 'bodymap') {
     // a neutral placeholder: a silhouette-sized rectangle, never the real BodyMap
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <View
-          testID="window-bodymap"
-          style={{ width: '42%', height: '86%', borderWidth: 1, borderColor: color.ink3, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' }}
-        >
-          <Text style={[type.eyebrow, { fontSize: 10 }]}>BodyMap</Text>
-        </View>
-      </View>
-    );
+    return <Placeholder testID="window-bodymap" label="BodyMap" width="42%" height="86%" />;
   }
+  if (content.kind === 'slot') return <Placeholder testID="window-slot" label={content.label} width="86%" height="72%" />;
   // DA-02.6 — the largest numeral role that fits, MEASURED on the device (Numeric Readout)
   return <FittedReadout label={content.label} value={content.value} unit={content.unit} width={width} height={height} />;
+}
+
+/** A dashed, labelled box: says « a piece goes here », never pretends to be the piece. */
+function Placeholder(p: { testID: string; label: string; width: `${number}%`; height: `${number}%` }) {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <View
+        testID={p.testID}
+        style={{ width: p.width, height: p.height, borderWidth: 1, borderColor: color.ink3, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' }}
+      >
+        <Text style={[type.eyebrow, { fontSize: 10, textAlign: 'center' }]}>{p.label}</Text>
+      </View>
+    </View>
+  );
 }

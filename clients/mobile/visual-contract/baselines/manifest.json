@@ -464,6 +464,32 @@
       "authority": "DA-02.5 (W1 · Inset) + DA-02.6 (Numeric Readout, measured fit); byte-identical to the render the operator reviewed",
       "approved_by": "operator — DA-02.5 « ACCEPT — LOCK W1 », then DA-02.6 visual gate « ACCEPT » (measured value size)",
       "approved_on": "2026-10-25"
+    },
+    {
+      "id": "session-card-390x844-push-rest",
+      "file": "session-card-390x844-push-rest.png",
+      "visual_id": "SESSION-CARD-R1",
+      "fixture": "?fixture=session-card-390x844-push-rest",
+      "width": 390,
+      "scenario": "PUSH at REST (75 kg, prescription 70 kg) — exercise, windows (BodyMap · Dernière ; Repos · execution-cue placeholder), instrument and keys at the bottom",
+      "pixels": "414x868",
+      "sha256": "55440e95b23a27063ec9a2f504dd715a63846e86aaa2076cf7d9908b9799ab86",
+      "authority": "DA-02.7 R1 — the set card's target composition (bench only, E7), built from the locked pieces; the operator's layout ruling, not a reviewed render",
+      "approved_by": "operator — DA-02.7 R1, 2026-10-26: « la partie avec le poids et les boutons, c'est tout en bas de ce cadran rectangulaire vertical […] tout ça, c'est validé, tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
+    },
+    {
+      "id": "session-card-390x844-push-adjusting",
+      "file": "session-card-390x844-push-adjusting.png",
+      "visual_id": "SESSION-CARD-R1",
+      "fixture": "?fixture=session-card-390x844-push-adjusting",
+      "width": 390,
+      "scenario": "PUSH right after +, ADJUSTING (77,5 kg, prescription 70 kg) — the same card while adjusting",
+      "pixels": "414x868",
+      "sha256": "bfc056d6d47d36287cebd2062db83e72acda063b76b93cf4a65e1b3dc6b312a0",
+      "authority": "DA-02.7 R1 — the set card's target composition (bench only, E7), built from the locked pieces; the operator's layout ruling, not a reviewed render",
+      "approved_by": "operator — DA-02.7 R1, 2026-10-26: « la partie avec le poids et les boutons, c'est tout en bas de ce cadran rectangulaire vertical […] tout ça, c'est validé, tu prends le recommandé et boucle »",
+      "approved_on": "2026-10-26"
     }
   ]
 }

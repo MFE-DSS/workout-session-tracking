@@ -34,7 +34,7 @@ PACKAGE = json.loads((MOBILE / "package.json").read_text(encoding="utf-8"))
 IMAGE = MANIFEST["renderer"]["image"]
 LOCKED_IDS = ("CALIBRATION-LINE-V1", "REFERENCE-MARKER-V1", "ACTIVE-CURSOR-V1", "FRAME-C-V1", "SEMANTIC-TOKENS-V1",
               "INSTRUMENT-SURFACE-B1", "INSTRUMENT-SURFACE-B2", "INSTRUMENT-CONTROLS-B3", "RECESSED-WINDOW-V1",
-              "NUMERIC-READOUT-V1")
+              "NUMERIC-READOUT-V1", "SESSION-CARD-R1")
 
 
 def _fixture_ids() -> set[str]:
