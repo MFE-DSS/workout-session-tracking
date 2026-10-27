@@ -100,9 +100,13 @@ production.
 | `auren.runtime.pwa.icon.512` | `app/static/icons/icon-512.png` | pwa-icon | provisional | png | NOT YET PRODUCED |
 | `auren.runtime.pwa.maskable.512` | `app/static/icons/icon-maskable-512.png` | maskable-icon | provisional | png | NOT YET PRODUCED |
 
-- **provenance** : recolorés/générés par `Sb_UI_10.2` (glyphe haltère existant recoloré `#f25f3a`→`#C8A24B`,
-  PNG rasterisés via `sips`). `license: NOT APPLICABLE` (repository-authored). `review.legal: NOT YET
-  REVIEWED` (nom Auren brand-bearing).
+- **provenance** : **DA-03.3 (2026-10-27)** — le glyphe haltère n'est plus la marque. Le pack porte
+  `AUREN-APP-ICON-V1` (curseur `signal` sur repère `system`, sur `field`), rendu à plat par un
+  rasteriseur stdlib depuis la géométrie de `AUREN-MARK-V1` ; `favicon.svg` porte la marque à son dessin
+  de 16 px ; `auren-mark.svg` est l'expression monochrome. *Historique* : `Sb_UI_10.2` avait recoloré
+  l'haltère `#f25f3a`→`#C8A24B` (PNG via `sips`) — sa géométrie est conservée dans
+  `AUREN_ASSET_PROVENANCE.md` et interdite de retour par `tests/test_auren_pwa_assets.py`.
+  `license: NOT APPLICABLE` (repository-authored). `review.legal: NOT YET REVIEWED` (nom Auren brand-bearing).
 - **surfaces** : `pwa`, `head`, `manifest`. `accessibility.role: decorative` (favicon/mark) ; l'apple-touch
   et les PNG portent le nom via le manifest.
 - **Note** : il n'existe **pas** de `maskable-192` dans le runtime (seulement maskable-512) — non inventé.
@@ -248,8 +252,31 @@ deprecated_by: NONE
 ```
 Le traitement deux couleurs (curseur `signal`, repère `system`) est une expression contextuelle
 d'icône / de marque, jamais la géométrie canonique : la source est monochrome (`currentColor`).
-L'ancien glyphe PWA (`auren.runtime.pwa.mark`, haltère recoloré) **reste en place** : le remplacer
-relève de l'icône d'application (DA-03.3) et de l'asset integration gate.
+*(DA-03.3 : l'ancien glyphe PWA haltère a été remplacé — voir §5quinquies.)*
+
+## 5quinquies. AUREN-APP-ICON-V1 — l'icône de l'app (DA-03.3)
+```yaml
+id: auren.brand.app-icon.v1
+version: 1.0.0
+type: pwa-icon                   # + iOS Icon Composer document
+status: provisional              # design LOCKED (AUREN_VISUAL_CONTRACT §19) ; name clearance open
+format: icon (Icon Composer) + png (flat fallbacks) + svg (favicon)
+source_file: clients/mobile/assets/AurenAppIcon.icon      # icon.json + Assets/{cursor,marker}.svg
+runtime_file: >
+  iOS: app.json ios.icon → AurenAppIcon (Assets.car) ; Android: clients/mobile/assets/android-icon-*.png ;
+  Expo root/web: clients/mobile/assets/{icon,favicon}.png ; web PWA: app/static/icons/*
+semantic_contract: >
+  AUREN-MARK-V1 at 54 % of the height, +16 px optical lift, cursor `signal` over marker `system`
+  on `field`; masking, Liquid Glass and appearances belong to the system. Valid in one ink.
+surfaces: [ios-home-screen, android-launcher, pwa, head]
+accessibility: { role: decorative, rule: "the app name is said by the system" }
+license: NOT APPLICABLE (repository-authored)
+provenance: AUREN_ASSET_PROVENANCE.md — « AUREN-APP-ICON-V1 »
+review: { product: operator ACCEPT 2026-10-27, technical: tests/test_auren_app_icon_v1.py + scripts/check_app_icon.py, legal: NOT YET REVIEWED, mobile: NOT YET REVIEWED (device install pending a native build) }
+budgets: { groups: 2, effects_in_source: 0 }
+consumers: [clients/mobile/app.json, app/static/manifest.webmanifest, app/templates heads]
+deprecated_by: NONE
+```
 
 ## 6. Gate & nom
 `ASSET INTEGRATION GATE: BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS`. Nom Auren =

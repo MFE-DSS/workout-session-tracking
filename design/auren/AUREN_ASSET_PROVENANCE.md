@@ -305,5 +305,37 @@ status: provisional
 Brand-bearing : reste `provisional` tant que la clearance externe du nom Auren est ouverte. L'origine
 générative des directions (Midjourney) est à porter à la revue juridique de la marque. **Aucune
 conclusion juridique.**
+
+## AUREN-APP-ICON-V1 — l'icône de l'app (DA-03.3, 2026-10-27)
+```
+asset_id: auren.brand.app-icon.v1
+files: clients/mobile/assets/AurenAppIcon.icon (icon.json + Assets/cursor.svg + Assets/marker.svg)
+       flat fallbacks: clients/mobile/assets/{icon,favicon,android-icon-*}.png,
+       app/static/icons/{icon-192,icon-512,icon-maskable-512,apple-touch-icon}.png, favicon.svg, auren-mark.svg
+author: repository-authored — composition by the AI coding agent (Claude) on the operator's brief
+owner: OPERATIONAL REPOSITORY OWNER
+ip_ownership_status: not-legally-reviewed
+source_project: NOT APPLICABLE
+source_version: NOT APPLICABLE
+source_type: repository-authored
+access_date: 2026-10-27
+source_reference: operator decision « ACCEPT I2 — SEMANTIC » (DA-03.3), on the DA-03.3 review board
+license_spdx: NOT APPLICABLE (repository-authored)
+license_text_location: NOT APPLICABLE
+attribution_required: no
+usage_nature: application icon (iOS Icon Composer document + flat fallbacks)
+modifications: NOT APPLICABLE (original composition of AUREN-MARK-V1)
+tooling: hand-written layer SVGs; Apple ictool 1.2 (renders only, nothing baked); a stdlib rasterizer for the flat PNGs
+ai_usage: composition by the AI coding agent; the mark inside it is AUREN-MARK-V1 (see the entry above)
+reviewer: operator (design: LOCKED in AUREN_VISUAL_CONTRACT.md §19) — legal: NOT YET REVIEWED
+review_date: 2026-10-27
+evidence: tests/test_auren_app_icon_v1.py ; scripts/check_app_icon.py (10/10 byte-identical)
+status: provisional
+```
+**Retiré comme marque — historique conservé** : le glyphe haltère de `Sb_UI_10.2` (fond `#0f1115`,
+encre `#C8A24B`, viewBox 64) avait pour géométrie
+`M14 26h4v12h-4zM18 30h6v4h-6zM24 22h4v20h-4zM28 30h8v4h-8zM36 22h4v20h-4zM40 30h6v4h-6zM46 26h4v12h-4z`.
+Il ne représente plus AUREN ; le dépôt garde son historique git. Aucun pictogramme haltère n'a été remplacé là où il
+voudrait dire « exercice » ou « équipement » : il n'en existe aucun dans l'interface (inventaire DA-03.3).
 Le review synthétique interne **n'est PAS** une revue anatomique professionnelle qualifiée et ne la revendique
 pas. **Aucune conclusion juridique ni médicale.**

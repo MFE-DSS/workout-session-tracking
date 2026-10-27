@@ -344,8 +344,10 @@ def test_no_brand_master_files_exist():
     """Brand masters remain forbidden outside a governed intake. The BodyMap master
     came in by Sb_ASSET_03.2 (tests/test_auren_bodymap_master.py). DA-03.2 brought the
     MARK in, as the three governed drawings of AUREN-MARK-V1 (allowlisted above) — and
-    only those: under source/brand/ nothing else may exist. Wordmark and app icon are
-    still unproduced and forbidden."""
+    only those: under source/brand/ nothing else may exist. The app icon (DA-03.3) is an
+    Icon Composer document that lives with its consumer, clients/mobile/assets/AurenAppIcon.icon
+    (tests/test_auren_app_icon_v1.py) — never a design/auren master. The wordmark is still
+    unproduced and forbidden."""
     for master in ("source/brand/auren_mark_master.svg",
                    "source/brand/auren_wordmark_master.svg",
                    "source/brand/auren_app_icon_master.svg"):

@@ -1,0 +1,42 @@
+{
+  "fill": {
+    "solid": "srgb:0.03922,0.04314,0.05098,1.00000"
+  },
+  "groups": [
+    {
+      "layers": [
+        {
+          "image-name": "cursor.svg",
+          "name": "cursor"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.35
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "layers": [
+        {
+          "image-name": "marker.svg",
+          "name": "marker"
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.35
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}

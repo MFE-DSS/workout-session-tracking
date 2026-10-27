@@ -1,0 +1,28 @@
+{
+  "contract": "docs/strategy/AUREN_VISUAL_CONTRACT.md",
+  "visual_id": "AUREN-APP-ICON-V1",
+  "document": "clients/mobile/assets/AurenAppIcon.icon",
+  "renderer": {
+    "tool": "ictool (Xcode → Icon Composer), Apple's own renderer",
+    "ictool": "1.2",
+    "platform": "iOS",
+    "tint": "--tint-color 0.58 --tint-strength 0.75 (Tinted appearances only)",
+    "deterministic": "same document + same ictool version → same bytes (verified 2026-10-27)",
+    "gate": "python3 scripts/check_app_icon.py check (macOS + Xcode only)"
+  },
+  "approved_by": "operator — DA-03.3: « ACCEPT I2 — SEMANTIC », I2 becomes AUREN-APP-ICON-V1, with the baseline list it named",
+  "approved_on": "2026-10-27",
+  "authority": "byte-identical to the I2 renders of the DA-03.3 review board",
+  "baselines": [
+    { "id": "app-icon-v1-default", "file": "app-icon-v1-default.png", "rendition": "Default", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "645559f03f651212f8299d60de3d25969b9c2f37e9b1720d217348c88bf027b9" },
+    { "id": "app-icon-v1-dark", "file": "app-icon-v1-dark.png", "rendition": "Dark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "6e8d84f59e0509815a51cb61daa90ab0323e9a90d20253e58a843fbb1cfdb456" },
+    { "id": "app-icon-v1-mono", "file": "app-icon-v1-mono.png", "rendition": "Mono", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "2d4f855827f296d99e7226c6cddc25aa0f4dbd133fb2038a1a122bdfad9f0835", "note": "byte-identical to Clear light with ictool 1.2" },
+    { "id": "app-icon-v1-clear-light", "file": "app-icon-v1-clear-light.png", "rendition": "ClearLight", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "2d4f855827f296d99e7226c6cddc25aa0f4dbd133fb2038a1a122bdfad9f0835", "note": "rendered on a neutral backdrop, no wallpaper" },
+    { "id": "app-icon-v1-clear-dark", "file": "app-icon-v1-clear-dark.png", "rendition": "ClearDark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "67370fe6ed0ff7976666309c32184eaf1777f4323bf9e737a8a56fabbb151258", "note": "rendered on a neutral backdrop, no wallpaper" },
+    { "id": "app-icon-v1-tinted-light", "file": "app-icon-v1-tinted-light.png", "rendition": "TintedLight", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "f09d4ff583cafd787e1d3ff31692bd06339e6f2ac2658540c70100c813dcf5a9" },
+    { "id": "app-icon-v1-tinted-dark", "file": "app-icon-v1-tinted-dark.png", "rendition": "TintedDark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "7e1df2a1f700f300c7120c61f3117422e01f0aea2913653ce459f171d7f2cac7" },
+    { "id": "app-icon-v1-default-60pt", "file": "app-icon-v1-default-60pt.png", "rendition": "Default", "points": 60, "scale": 3, "pixels": "180x180", "sha256": "ca6f7b1f82bdbdc45246c627b272432037eaa1fa1c321f8f438a3509fd72feb3", "note": "Home Screen" },
+    { "id": "app-icon-v1-default-40pt", "file": "app-icon-v1-default-40pt.png", "rendition": "Default", "points": 40, "scale": 3, "pixels": "120x120", "sha256": "9fe52eb79be96d96aeda09fe0c656ade415fee6e3ba30602a2c3cd13637b7f7c", "note": "Spotlight" },
+    { "id": "app-icon-v1-default-29pt", "file": "app-icon-v1-default-29pt.png", "rendition": "Default", "points": 29, "scale": 3, "pixels": "87x87", "sha256": "9aa26956abef849967674925d824ccaa8f6bc9fb372209fafc56d511b0eb1e05", "note": "Settings" }
+  ]
+}
