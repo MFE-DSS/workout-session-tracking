@@ -1,10 +1,12 @@
-"""Sb_UI_10.2 — PWA Manifest + App Icons Auren.
+"""Sb_UI_10.2 — PWA Manifest + App Icons Auren; DA-03.3 — the icons are AUREN-APP-ICON-V1.
 
-The approved Auren glyph (the existing dumbbell pictogram, recolored
-#f25f3a → #C8A24B on a graphite #0f1115 canvas) is shipped as a PNG icon
-pack, the manifest migrates its product name to Auren, and the standalone
-auth heads gain an apple-touch-icon. String/asset/head only — no route,
-service, model, migration, data, CSS, JS or service-worker change.
+Sb_UI_10.2 shipped the dumbbell pictogram (recolored #C8A24B on #0f1115) as the
+Auren glyph. DA-03.3 (operator, 2026-10-27): the dumbbell is no longer the brand.
+The PNG pack carries AUREN-APP-ICON-V1 (the cursor over the reference marker,
+`signal` over `system`, on `field`), the favicon carries AUREN-MARK-V1 in its
+16 px drawing (the mark is never rendered under 12 px, so the full icon is never
+shrunk into a browser tab), and auren-mark.svg is the monochrome brand expression.
+The manifest and the heads are unchanged. String/asset/head only.
 
 PNG dimensions are read from the IHDR chunk with the stdlib (no Pillow
 dependency, so this runs in CI unchanged).
@@ -110,35 +112,45 @@ def test_pngs_are_pngs():
         assert data[:8] == b"\x89PNG\r\n\x1a\n"
 
 
-# ───────── favicon SVG: palette + canonical path ─────────
+# ───────── favicon / brand SVGs: AUREN-MARK-V1, never the dumbbell again ─────────
 
-CANONICAL_PATH = (
+# The retired Sb_UI_10.2 dumbbell glyph — kept here only so it can never come back.
+LEGACY_DUMBBELL_PATH = (
     "M14 26h4v12h-4zM18 30h6v4h-6zM24 22h4v20h-4zM28 30h8v4h-8z"
     "M36 22h4v20h-4zM40 30h6v4h-6zM46 26h4v12h-4z"
 )
+MARK = ROOT / "design" / "auren" / "source" / "brand" / "mark"
 
 
-def test_favicon_palette_and_path():
+def _mark_paths(drawing: str) -> list[str]:
+    """The two pieces of AUREN-MARK-V1 (cursor, marker) from the governed source."""
+    import re
+    d = re.search(r' d="([^"]+)"', (MARK / f"mark-{drawing}.svg").read_text(encoding="utf-8")).group(1)
+    return ["M" + p.strip() for p in d.split("M") if p.strip()]
+
+
+def test_favicon_is_the_mark_at_its_16px_drawing():
     svg = (ICONS / "favicon.svg").read_text(encoding="utf-8")
-    assert "#0f1115" in svg
-    assert "#C8A24B" in svg
-    assert "#f25f3a" not in svg  # legacy orange gone
-    assert CANONICAL_PATH in svg  # glyph geometry unchanged
-    assert 'viewBox="0 0 64 64"' in svg
-    assert 'rx="14"' in svg  # rounded container preserved
+    cursor, marker = _mark_paths("compact")
+    assert 'viewBox="0 0 16 16"' in svg
+    assert f'd="{cursor}" fill="#FFB23E"' in svg  # signal: the operator's cursor
+    assert f'd="{marker}" fill="#7CCBF5"' in svg  # system: the reference marker
+    assert 'fill="#0A0B0D"' in svg  # field
 
 
-def test_auren_mark_source():
+def test_auren_mark_is_the_monochrome_brand_expression():
     svg = (ICONS / "auren-mark.svg").read_text(encoding="utf-8")
-    assert "#0f1115" in svg and "#C8A24B" in svg
-    assert "#f25f3a" not in svg
-    assert CANONICAL_PATH in svg
-    assert 'viewBox="0 0 64 64"' in svg
+    cursor, marker = _mark_paths("primary")
+    assert 'viewBox="0 0 32 32"' in svg
+    assert f'd="{cursor} {marker}" fill="#F5F3EE"' in svg  # ink, one colour
+    assert 'fill="#0A0B0D"' in svg
 
 
-def test_no_legacy_orange_or_orion_in_svgs():
+def test_the_dumbbell_is_retired_from_the_brand_svgs():
     for name in ("favicon.svg", "auren-mark.svg"):
         svg = (ICONS / name).read_text(encoding="utf-8")
+        assert LEGACY_DUMBBELL_PATH not in svg, f"the retired dumbbell is back in {name}"
+        assert "c8a24b" not in svg.lower(), f"the retired gold is back in {name}"
         assert "f25f3a" not in svg.lower()
         assert "orion" not in svg.lower()
 
