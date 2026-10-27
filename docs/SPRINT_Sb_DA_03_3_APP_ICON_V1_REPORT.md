@@ -1,6 +1,6 @@
 # Sb_DA_03_3_APP_ICON_V1 — l'icône de l'app, verrouillée et intégrée
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-03-3-app-icon-v1`
+**Statut** : ✅ MERGÉE (`56773af`, closeout en annexe) — DA-03.3 **CLOSED** — tier `isolated` · **Branche** : `sb/da-03-3-app-icon-v1`
 **Base** : canonique `7b32d29` · **Commande** : décision opérateur DA-03.3, « ACCEPT I2 — SEMANTIC » (2026-10-27)
 **Gate visuel** : planche DA-03.3 revue par l'opérateur (rendus Icon Composer) ; **« ACCEPT I2 »**
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` §18 (`AUREN-MARK-V1`) et §19 (neuf)
@@ -136,3 +136,19 @@ Validé par l'opérateur sur la planche DA-03.3 (rendus `ictool`), 2026-10-27 :
 - Le script du gate, d'abord à côté des baselines, aurait porté deux `S603` jusqu'à Sonar ; déplacé dans `scripts/`, où la convention du dépôt couvre les sous-processus.
 
 **Verdict :** `AUREN-APP-ICON-V1` est verrouillée et branchée : iOS par Icon Composer, Android et web par des replis fidèles. L'haltère ne représente plus AUREN, et rien de ce qui voulait dire « exercice » n'a été touché.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #312, mergée par `--merge --match-head-commit` (head `49bfb61`) sous GO MERGE permanent, après « ACCEPT I2 » |
+| Commit de merge | `56773af549b8b8162d2faab8e60cbf061cc29bc7` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 46 baselines du contrat |
+| CI canonique (push) | run `40490441312` : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK`, **0 issue**, 0 fil de revue non résolu |
+| Gate icône (macOS) | `scripts/check_app_icon.py check` : 10 / 10 identiques avant merge ; la CI Linux ne peut pas le jouer, elle vérifie le document et les empreintes |
+| Reste à faire | installer l'icône sur l'iPhone : nouveau build natif (`expo prebuild` + build signé) |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktree et branche `sb/da-03-3-app-icon-v1` supprimés |
