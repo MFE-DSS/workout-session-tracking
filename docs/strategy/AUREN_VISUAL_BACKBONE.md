@@ -469,8 +469,9 @@ langage de l'instrument existe, pas l'inverse.
 | `R1, R2, R4, R5` | demandes restantes de l'opérateur (`AUREN_VISUAL_CONTRACT §9`) : surface centrée et plus grande en séance · rail plus haut et plus bas · surbrillance de zone plus contrastée · boutons plus cockpit | R4 ✅ variante V1 (zones inactives 0,35 / 0,30, `AUREN_VISUAL_CONTRACT §14`) ; R2 ✅ option B (rail u = 6, module 390 × 290, §15) ; R5 ✅ allure Rail (§16) ; R1 ✅ carte verticale `SESSION-CARD-R1`, banc (§17) — tranchés par l'opérateur le 2026-10-26 ; montage en séance après E7 |
 | `DA-02.5` | **Recessed Window** : la sous-zone interne des instruments (W1 · Inset) | ✅ **acceptée** (2026-10-25) : `RECESSED-WINDOW-V1` LOCKED, 8 baselines ; valeurs au plus grand rôle qui tient |
 | `DA-02.6` | **Numeric Readout system** : une seule façon de poser un chiffre (rôles 68 / 40 / 30, unité après à 0,4, décimale même taille) ; taille mesurée dans les fenêtres | ✅ **acceptée** (2026-10-25) : `NUMERIC-READOUT-V1` LOCKED ; 3 baselines de fenêtre réapprouvées, 32 inchangées |
-| — | Logo | → **prochaine** |
-| `DA-03` | Manufacturer Mark (logo) | → |
+| `DA-03.1` | Manufacturer Mark — exploration (cinq marques à la règle) | ✅ tranchée (2026-10-26) : D primaire, A2 secours |
+| `DA-03.2` | **Mark hardening** → `AUREN-MARK-V1` | ✅ **acceptée** (2026-10-27) : `AUREN-MARK-V1` LOCKED (`AUREN_VISUAL_CONTRACT §18`), trois dessins optiques, 9 baselines ; A2 retiré |
+| `DA-03.3` | App icon | → **prochaine** |
 | — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
 
 Le gate `DA-01` du §8.3 (cinq questions) reste le critère de **chaque** étape ;

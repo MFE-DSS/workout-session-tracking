@@ -44,6 +44,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `RECESSED-WINDOW-V1` | **LOCKED** (2026-10-25, W1 · Inset) | la sous-zone interne d'un instrument : un champ creusé dans Frame C, pas une carte | DA-02.5 — `RecessedWindow.tsx`, `recessedWindowGeometry.ts`, `windowContent.ts` (§12) |
 | `NUMERIC-READOUT-V1` | **LOCKED** (2026-10-25, « ACCEPT » DA-02.6) | une seule façon de poser un chiffre : rôle, unité, décimale, taille mesurée | DA-02.6 — `NumericReadout.tsx`, `readoutModel.ts` (§13) ; ses baselines sont celles des surfaces et des fenêtres qui l'utilisent |
 | `SESSION-CARD-R1` | **LOCKED** (cible, banc seulement — 2026-10-26) | la carte de série verticale : l'exercice, ses fenêtres d'information, et **tout en bas** l'instrument de charge avec ses touches | DA-02.7 R1 — `SessionSetCard.tsx` (§17) ; jamais monté sur l'écran de séance tant que le moteur ne fournit pas les bornes de zone (E7) |
+| `AUREN-MARK-V1` | **LOCKED** (2026-10-27, « ACCEPT » DA-03.2) | la marque du fabricant : le curseur de l'opérateur au-dessus du repère du système, un axe de visée, le vide entre eux | DA-03.2 — `design/auren/source/brand/mark/`, `AurenMark.tsx`, `markGeometry.ts` (§18) ; asset `provisional` tant que le nom n'est pas dégagé |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -303,3 +304,39 @@ Géométrie, comportement et accessibilité **inchangés** (§11). **Baselines r
 
 **MUST PRESERVE** : l'instrument et ses touches **en bas**, sous le pouce ; les pièces d'information **au-dessus**, en Recessed Windows dans Frame C ; chaque pièce verrouillée telle quelle (aucune n'est redessinée pour la carte) ; une information une seule fois (la charge choisie n'est dite que par l'instrument ; « Dernière » est la performance précédente, pas la décision).
 **MUST NEVER** : monter la carte sur l'écran de séance avec des bornes inventées ; une marge latérale qui fait passer l'instrument sous 360 ; un emplacement en pointillé présenté comme une fonction livrée.
+
+## 18. `AUREN-MARK-V1` — la marque (DA-03.2, 2026-10-27)
+
+**Décision de l'opérateur** : « ACCEPT — `MARK-D-HYBRID` becomes `AUREN-MARK-V1` » ; A2 retiré du chemin critique (historique d'exploration seulement) ; « do not redesign the geometry ».
+
+**Ce qui la forme** — et pourquoi : la marque est faite des deux pièces que le produit a déjà approuvées, avec leur sens.
+- en haut, le **curseur actif** (`ACTIVE-CURSOR-V1`) : ce que tient l'opérateur, sa décision ;
+- en bas, le **repère de référence** (`REFERENCE-MARKER-V1`) : ce que pose le système, la prescription ;
+- **un seul axe de visée** : les deux fentes alignées, la décision juste au-dessus de la prescription ;
+- **le vide entre eux**, haut d'une fente. **Le rail n'est pas dessiné** : il est ce vide.
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | LOCKED (géométrie) · asset `provisional` (`AUREN_VISUAL_ASSET_MANIFEST` §5quater : clearance du nom ouverte) · monté sur **aucun** écran produit |
+| **Sources** | `design/auren/source/brand/mark/mark-primary.svg` (grille 32), `mark-compact.svg` (grille 16), `mark-micro.svg` (grille 12) ; sans couleur (`currentColor`) |
+| **Exécution** | `AurenMark` (`clients/mobile/src/ui/brand/AurenMark.tsx`) : l'appelant donne une taille et une encre, **jamais** le dessin ; `markDrawingFor` choisit |
+| **Baselines approuvées** | `mark-v1-128-paper`, `mark-v1-128-inverse`, `mark-v1-12-micro`, `mark-v1-16-compact`, `mark-v1-32-primary`, `mark-v1-64-primary`, `mark-v1-frame-c-390x290`, `mark-v1-session-card-390x844`, `mark-v1-splash-390x844` |
+| **Garde** | `tests/test_auren_mark_v1.py` (sources = géométrie d'exécution, aucune couleur, grille entière, règle de taille) ; `markGeometry.test.ts` (sélection, axe, écart, proportions) |
+
+**Règle de taille optique** — trois tailles d'**une seule** marque, pas trois marques :
+
+| Taille rendue | Dessin | Exact au pixel à |
+|---|---|---|
+| **20 px et plus** | `mark-primary` | 32 · 64 · 128 |
+| **16 à 19 px** | `mark-compact` | 16 |
+| **12 à 15 px** | `mark-micro` | 12 |
+| **moins de 12 px** | **rien n'est rendu** | — |
+
+Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. Le dessin de grille 32 forcé à 16 px perd ses fentes ; forcé à 12 px, ses deux pièces se soudent et l'écart disparaît (audit au pixel, DA-03.2). Chaque dessin est donc recalé sur sa propre grille ; à 16 px la marque fait 7 px de large et son axe se décale d'un demi-pixel (correction d'asymétrie permise).
+
+**Géométrie verrouillée** (grille 32) : murs : fente = **2,5 : 1** (celui d'`ActiveCursor`) ; les deux pièces ont **la même largeur** et **le même axe** ; écart = **une fente** ; fentes à 6 / 14 et 3 / 7 de leur pièce (même proportion) ; **deux primitives**.
+
+**Couleur** : monochrome d'abord. Toute encre est un token existant passé à l'exécution. Le traitement deux couleurs — **curseur en `signal`, repère en `system`** — est une **expression de marque / d'icône d'application**, contextuelle : ce n'est ni la géométrie canonique ni un traitement obligatoire.
+
+**MUST PRESERVE** : l'écart, les proportions des fentes, le rapport mur / fente, l'alignement, la silhouette, le nombre de primitives — **aucun ne change sans un nouvel arbitrage explicite de l'opérateur** ; la règle de taille ; la marque sans texte adjacent n'a pas de nom (rôle décoratif, le nom est dit par le texte).
+**MUST NEVER** : rendre la marque sous 12 px ; laisser l'appelant choisir le dessin ; ajouter un rail, un cercle, un écusson, une lettre ; inscrire une couleur dans la géométrie ; présenter le traitement deux couleurs comme la marque canonique ; un dégradé, une ombre, une lueur, un relief.

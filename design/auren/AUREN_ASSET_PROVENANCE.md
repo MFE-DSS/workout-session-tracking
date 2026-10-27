@@ -272,5 +272,38 @@ status: reference-only
 ```
 Aucune géométrie de ces tracés n'entre à l'exécution : la reconstruction normalisée est une œuvre du
 dépôt (`repository-authored`).
+
+## AUREN-MARK-V1 — la marque (DA-03.2, 2026-10-27)
+```
+asset_id: auren.brand.mark.v1
+files: design/auren/source/brand/mark/mark-primary.svg (grid 32, 20 px and up)
+       design/auren/source/brand/mark/mark-compact.svg (grid 16, 16–19 px)
+       design/auren/source/brand/mark/mark-micro.svg (grid 12, 12–15 px)
+author: repository-authored — geometry written by the AI coding agent (Claude) on the operator's brief
+owner: OPERATIONAL REPOSITORY OWNER
+ip_ownership_status: not-legally-reviewed
+source_project: NOT APPLICABLE
+source_version: NOT APPLICABLE
+source_type: repository-authored
+access_date: 2026-10-27
+source_reference: operator decision « ACCEPT — AUREN-MARK-V1 » (DA-03.2), on the DA-03.1 / DA-03.2 review boards
+license_spdx: NOT APPLICABLE (repository-authored)
+license_text_location: NOT APPLICABLE
+attribution_required: no
+usage_nature: brand mark — design source; runtime component clients/mobile/src/ui/brand/AurenMark.tsx (bench fixtures only)
+modifications: NOT APPLICABLE (original drawing)
+tooling: hand-written path data on integer grids; pixel audit by a stdlib script (no vector tool)
+ai_usage: concept DIRECTIONS came from operator-supplied images generated with Midjourney and traced to
+          SVG by the operator (DA-03.1 inputs, not kept in the repository); NO traced coordinate was
+          kept — the geometry was rebuilt from scratch by the AI coding agent from the LOCKED
+          ActiveCursor / ReferenceMarker proportions (clients/mobile/src/ui/calibration/geometry.ts)
+reviewer: operator (design: LOCKED in AUREN_VISUAL_CONTRACT.md §18) — legal: NOT YET REVIEWED
+review_date: 2026-10-27
+evidence: tests/test_auren_mark_v1.py (sources = runtime geometry, no colour, integer grid)
+status: provisional
+```
+Brand-bearing : reste `provisional` tant que la clearance externe du nom Auren est ouverte. L'origine
+générative des directions (Midjourney) est à porter à la revue juridique de la marque. **Aucune
+conclusion juridique.**
 Le review synthétique interne **n'est PAS** une revue anatomique professionnelle qualifiée et ne la revendique
 pas. **Aucune conclusion juridique ni médicale.**
