@@ -1,6 +1,6 @@
 # Sb_DA_03_2_AUREN_MARK_V1 — la marque, verrouillée
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-03-2-auren-mark-v1`
+**Statut** : ✅ MERGÉE (`734f069`, closeout en annexe) — DA-03.2 **CLOSED** — tier `isolated` · **Branche** : `sb/da-03-2-auren-mark-v1`
 **Base** : canonique `14a6e3a` · **Commande** : décision opérateur DA-03.2, « ACCEPT — `MARK-D-HYBRID` becomes `AUREN-MARK-V1` » (2026-10-27), puis « reprends le travail »
 **Gate visuel** : planches DA-03.1 et DA-03.2 revues par l'opérateur ; **« ACCEPT »** sur D
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` §18 (neuf) ; `ACTIVE-CURSOR-V1`, `REFERENCE-MARKER-V1` (géométrie d'origine)
@@ -121,3 +121,17 @@ Aucune donnée n'est affichée par la marque ; elle n'ajoute aucune information 
 - La règle de taille codée pour la planche (12 px seul en micro) différait de celle de l'opérateur (12–15 px) ; le code suit la décision.
 
 **Verdict :** `AUREN-MARK-V1` est verrouillée : une marque faite des deux pièces du produit, exacte au pixel de 12 à 128 px, sans couleur inscrite. Suite du chemin critique : **DA-03.3 — App icon**.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #310, mergée par `--merge --match-head-commit` (head `431921f`) sous GO MERGE permanent, après « ACCEPT » |
+| Commit de merge | `734f069be63757c439b84fe57b64dc53209895d1` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` sur les 46 baselines |
+| CI canonique (push) | run `40481538817` : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK`, **0 issue**, 0 fil de revue non résolu |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktree et branche `sb/da-03-2-auren-mark-v1` supprimés ; worktree d'exploration de la planche supprimé ; A2 reste dans l'historique d'exploration (planche DA-03.2), hors dépôt |
