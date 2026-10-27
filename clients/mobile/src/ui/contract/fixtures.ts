@@ -8,6 +8,7 @@
  * renders exactly what the operator approved. Changing a value here changes a
  * baseline: it is a contract change, not a refactor.
  */
+import type { MarkFixture } from '../brand/MarkPlacementFixture';
 import type { Boundaries } from '../calibration/layout';
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 
@@ -96,6 +97,12 @@ export type ContractFixture =
       scenario: 'TARGET' | 'PUSH' | 'HIGH_COST';
       selectedValue: number;
       presentation: 'rest' | 'adjusting';
+    }
+  | {
+      /** the baseline id: `mark-v1-<size or placement>` — AUREN-MARK-V1 (DA-03.2) */
+      id: string;
+      contract: 'AUREN-MARK-V1';
+      mark: MarkFixture;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -147,6 +154,17 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   // the exercise, its windows, and the instrument with its keys at the bottom. Bench only (E7).
   { id: 'session-card-390x844-push-rest', contract: 'SESSION-CARD-R1', width: 390, height: 844, scenario: 'PUSH', selectedValue: 75, presentation: 'rest' },
   { id: 'session-card-390x844-push-adjusting', contract: 'SESSION-CARD-R1', width: 390, height: 844, scenario: 'PUSH', selectedValue: 77.5, presentation: 'adjusting' },
+  // DA-03.2 — « ACCEPT », AUREN-MARK-V1 (operator, 2026-10-27): the master in both inks, each optical
+  // drawing at a size where it is pixel-exact, and the three placements on the approved components
+  { id: 'mark-v1-128-paper', contract: 'AUREN-MARK-V1', mark: { kind: 'swatch', size: 128, on: 'paper' } },
+  { id: 'mark-v1-128-inverse', contract: 'AUREN-MARK-V1', mark: { kind: 'swatch', size: 128, on: 'field' } },
+  { id: 'mark-v1-12-micro', contract: 'AUREN-MARK-V1', mark: { kind: 'swatch', size: 12, on: 'field' } },
+  { id: 'mark-v1-16-compact', contract: 'AUREN-MARK-V1', mark: { kind: 'swatch', size: 16, on: 'field' } },
+  { id: 'mark-v1-32-primary', contract: 'AUREN-MARK-V1', mark: { kind: 'swatch', size: 32, on: 'field' } },
+  { id: 'mark-v1-64-primary', contract: 'AUREN-MARK-V1', mark: { kind: 'swatch', size: 64, on: 'field' } },
+  { id: 'mark-v1-frame-c-390x290', contract: 'AUREN-MARK-V1', mark: { kind: 'frame-c' } },
+  { id: 'mark-v1-session-card-390x844', contract: 'AUREN-MARK-V1', mark: { kind: 'session-card' } },
+  { id: 'mark-v1-splash-390x844', contract: 'AUREN-MARK-V1', mark: { kind: 'splash' } },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */

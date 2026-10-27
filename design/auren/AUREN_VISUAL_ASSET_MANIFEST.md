@@ -133,11 +133,12 @@ note: >
 | id (futur) | type | statut d'entrée | produit par |
 |---|---|---|---|
 | `auren.bodymap.master` | anatomical-map-master | `NOT YET PRODUCED` → `anatomical-review-required` | `OPERATOR_ASSET_03.1` + `Sb_ASSET_03.2` |
+| `auren.brand.mark.v1` | brand-mark | **PRODUIT (DA-03.2)** → voir §5quater (`provisional`, non `approved`) | `DA-03.2` ✅ |
 | `auren.brand.wordmark` | wordmark | `NOT YET PRODUCED` — brand-bearing, provisional until clearance | build futur conditionnel au nom |
 | `auren.icons.vendor.tabler.<name>` | functional-icon | **INGÉRÉ (Sb_ASSET_02.1)** → voir §5ter (`legal-review-required`, non `approved`) | `Sb_ASSET_02.1` ✅ |
 
-**Aucun** de ces fichiers n'existe (pas de faux master). Le champ `status: approved` **n'apparaît sur
-aucune entrée** de ce manifest initial.
+Hors les intakes gouvernés marqués ✅, **aucun** de ces fichiers n'existe (pas de faux master). Le champ
+`status: approved` **n'apparaît sur aucune entrée** de ce manifest.
 
 ## 5bis. Governance and semantic contracts (Sb_ASSET_01.2)
 Ces objets sont des **contrats**, pas des assets graphiques : ils **ne comptent pas** dans l'inventaire des
@@ -222,6 +223,33 @@ Descripteurs machine-lisibles + shas + contraintes owner (C1–C5 / S1–S5 / P1
 (`d402ef64…`) + décision owner (`eea8b683…`, Martin, `ACCEPT_WITH_CONSTRAINTS`).
 `professional_anatomical_review: not-claimed` · `legal_review: required` · **0 entrée `approved`**.
 **NOT AUTHORIZED FOR APP INTEGRATION.**
+
+## 5quater. AUREN-MARK-V1 — la marque (DA-03.2 — design-source intake)
+```yaml
+id: auren.brand.mark.v1
+version: 1.0.0
+type: brand-mark
+status: provisional              # design LOCKED (AUREN_VISUAL_CONTRACT §18) ; name clearance open
+format: svg
+source_file: design/auren/source/brand/mark/{mark-primary,mark-compact,mark-micro}.svg
+runtime_file: clients/mobile/src/ui/brand/AurenMark.tsx   # bench fixtures only — no product screen
+semantic_contract: >
+  the operator-owned ActiveCursor over the system-owned ReferenceMarker, one targeting axis,
+  the negative space between them; no rail. Three optical drawings of ONE mark:
+  12–15 px micro · 16–19 px compact · 20 px+ primary · not rendered under 12 px.
+surfaces: [mobile-bench]
+accessibility: { role: decorative, rule: "the name is always said by adjacent text" }
+license: NOT APPLICABLE (repository-authored)
+provenance: AUREN_ASSET_PROVENANCE.md — « AUREN-MARK-V1 »
+review: { product: operator ACCEPT 2026-10-27, technical: tests/test_auren_mark_v1.py, legal: NOT YET REVIEWED, mobile: NOT YET REVIEWED }
+budgets: { primitives: 2, colours_in_source: 0 }
+consumers: [clients/mobile/src/ui/contract (visual contract fixtures)]
+deprecated_by: NONE
+```
+Le traitement deux couleurs (curseur `signal`, repère `system`) est une expression contextuelle
+d'icône / de marque, jamais la géométrie canonique : la source est monochrome (`currentColor`).
+L'ancien glyphe PWA (`auren.runtime.pwa.mark`, haltère recoloré) **reste en place** : le remplacer
+relève de l'icône d'application (DA-03.3) et de l'asset integration gate.
 
 ## 6. Gate & nom
 `ASSET INTEGRATION GATE: BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS`. Nom Auren =

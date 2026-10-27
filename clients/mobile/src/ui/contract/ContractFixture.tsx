@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
+import { MarkPlacementFixture } from '../brand/MarkPlacementFixture';
 import { CalibrationRail } from '../calibration/CalibrationRail';
 import { HorizontalInstrumentSurface } from '../instrument/HorizontalInstrumentSurface';
 import { InstrumentFrame } from '../instrument/InstrumentFrame';
@@ -19,6 +20,7 @@ const NOOP = () => undefined;
 function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
   if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
+  if (f.contract === 'AUREN-MARK-V1') return <MarkPlacementFixture f={f.mark} />;
   if (f.contract === 'SESSION-CARD-R1') {
     return <SessionSetCard screenWidth={f.width} screenHeight={f.height} selectedValue={f.selectedValue} presentation={f.presentation} />;
   }

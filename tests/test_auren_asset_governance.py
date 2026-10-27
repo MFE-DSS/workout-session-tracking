@@ -264,10 +264,21 @@ ALLOWED_CALIBRATION_REFERENCE_SVGS = {
     f"{_CAL}/finlactivecursor.svg",
 }
 
+# DA-03.2 GOVERNED EVOLUTION: AUREN-MARK-V1, the brand mark, LOCKED by the operator on 2026-10-27
+# (« ACCEPT »). Three optical drawings of ONE repository-authored mark, colourless (`currentColor`).
+# Asset status stays `provisional` while the Auren name clearance is open; mounted on no product
+# screen. Detailed guard (sources = runtime geometry): tests/test_auren_mark_v1.py.
+_MARK = "design/auren/source/brand/mark"
+ALLOWED_BRAND_MARK_SVGS = {
+    f"{_MARK}/mark-primary.svg",
+    f"{_MARK}/mark-compact.svg",
+    f"{_MARK}/mark-micro.svg",
+}
+
 # Full SVG allowlist under design/auren/ = vendored icons + governed BodyMap + P0 Muscle Focus plates
-# + Calibration System references.
+# + Calibration System references + AUREN-MARK-V1.
 ALLOWED_SVGS = (ALLOWED_VENDOR_SVGS | ALLOWED_BODYMAP_SVGS | ALLOWED_MUSCLE_FOCUS_SVGS
-                | ALLOWED_CALIBRATION_REFERENCE_SVGS)
+                | ALLOWED_CALIBRATION_REFERENCE_SVGS | ALLOWED_BRAND_MARK_SVGS)
 
 # Structured contract files explicitly allowed (exact repo-relative paths).
 ALLOWED_STRUCTURED_FILES = {
@@ -330,14 +341,17 @@ def test_allowlisted_files_present_and_correct_kind():
 
 
 def test_no_brand_master_files_exist():
-    """Brand masters remain forbidden. The BodyMap master is NO LONGER here:
-    Sb_ASSET_03.2 introduced it by governed intake (allowlisted above,
-    guarded by tests/test_auren_bodymap_master.py). Brand identity masters
-    (mark/wordmark/app-icon) are still unproduced and forbidden."""
+    """Brand masters remain forbidden outside a governed intake. The BodyMap master
+    came in by Sb_ASSET_03.2 (tests/test_auren_bodymap_master.py). DA-03.2 brought the
+    MARK in, as the three governed drawings of AUREN-MARK-V1 (allowlisted above) — and
+    only those: under source/brand/ nothing else may exist. Wordmark and app icon are
+    still unproduced and forbidden."""
     for master in ("source/brand/auren_mark_master.svg",
                    "source/brand/auren_wordmark_master.svg",
                    "source/brand/auren_app_icon_master.svg"):
         assert not (AUREN / master).exists(), f"forbidden brand master present: {master}"
+    brand = {str(p.relative_to(ROOT)) for p in (AUREN / "source" / "brand").rglob("*") if p.is_file()}
+    assert brand == ALLOWED_BRAND_MARK_SVGS | {f"{_MARK}/README.md"}, f"brand source drift: {brand}"
 
 
 def test_style_rules_and_intake_have_content():
