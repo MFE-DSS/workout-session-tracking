@@ -83,8 +83,21 @@ régénération IA du master.
 
 ## 5. Vérification
 
-Voir l'annexe de clôture.
+- `check_scope` : `ISOLATED` (15 fichiers).
+- Tests ciblés : 198 / 198 (BodyMap, contrat de zones, planches, gouvernance, identité, atlas, taxonomie,
+  protocole UI) ; balayage élargi des tests qui lisent ces documents : 197 / 197.
+- `check_spec_protocol` OK ; ruff OK ; budget ruff 264 ≤ 548.
 
 **Verdict :** décision du propriétaire inscrite — **AUTHORIZED FOR AUREN INTERNAL BUILDS WITH CONSTRAINTS /
 PUBLIC RELEASE NOT AUTHORIZED** ; deux vérités de gouvernance corrigées ; écart d'exposition web consigné pour
 l'opérateur. DA-04.1 peut commencer.
+
+## Annexe de clôture (2026-10-28)
+
+- **GO MERGE** de l'opérateur (« oui bien GO MERGE »). Gate vérifié juste avant : tête `711a58d`, 11 / 11 checks
+  verts, Sonar PR `OK` (0 sur toutes les conditions), 0 fil de revue ouvert, `CLEAN`.
+- PR #317 fusionnée en `--merge --match-head-commit` : **`64f1d6e`**.
+- **CI canonique** sur le push : run `40706972496`, **verte**.
+- Aucun incident. Reste ouvert, à décider par l'opérateur : l'exposition des planches Muscle Focus avec
+  l'inscription web ouverte.
+- DA-04.1 démarré dans la foulée : rendus de revue publiés, code non commité jusqu'au choix T1 / T2.
