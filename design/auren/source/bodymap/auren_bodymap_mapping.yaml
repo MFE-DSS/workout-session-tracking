@@ -136,13 +136,16 @@
   "surfaces_note": "integration reflects ONLY what the repository audit demonstrates at Sb_ASSET_01.2. This contract does NOT claim that every surface already consumes the BodyMap.",
 
   "body_variants": [
-    {"code": "male_neutral_v1",     "available": false},
+    {"code": "male_neutral_v1",     "available": true, "availability_scope": "internal-builds-with-constraints"},
     {"code": "female_neutral_v1",   "available": false},
     {"code": "neutral_abstract_v1", "available": false}
   ],
-  "body_variants_note": "Compatibility contract only. No variant is produced. The human V1 may start with male_neutral_v1, BUT: no business code depends on any variant; no gender is encoded in zone codes; the eleven SVG ids are identical across variants; no variant is marked available today.",
+  "body_variants_note": "Compatibility contract. male_neutral_v1 is produced (Sb_ASSET_03.2, auren_bodymap_master.svg) and available to AUREN internal mobile builds only, under the constraints of auren_bodymap_source.yaml (DA-04.0b). The other two variants are not produced. No business code depends on any variant; no gender is encoded in zone codes; the eleven SVG ids are identical across variants.",
 
-  "geometry_status": "NOT YET PRODUCED",
+  "geometry_status": "PRODUCED_AS_DESIGN_SOURCE",
+  "runtime_status": "RUNTIME_INTERNAL_P0_AUTHORIZED_WITH_CONSTRAINTS",
+  "public_release_status": "PUBLIC_RELEASE_NOT_AUTHORIZED",
+  "status_amended_by": "DA-04.0b (operator decision, 2026-10-28) - was NOT YET PRODUCED until then",
   "geometry_note": "This contract carries NO geometry: no path, no polygon, no coordinates, no activation, no percentage, no EMG. Geometry and anatomical validation belong to human production (OPERATOR_ASSET_03.1) and technical intake (Sb_ASSET_03.2). A semantic contract is NOT an anatomical validation.",
 
   "invariants": [

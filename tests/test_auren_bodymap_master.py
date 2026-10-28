@@ -164,7 +164,8 @@ def test_registry_hashes_and_status():
     assert r["source_master_sha256"] == MASTER_SHA
     assert r["compact_sha256"] == COMPACT_SHA
     assert r["status"] == "technical-intake-accepted-human-review-pending"
-    assert r["runtime_authorization"] == "blocked"
+    assert r["runtime_authorization"] == INTERNAL_RUNTIME
+    assert r["public_release_authorization"] == "blocked"
     assert r["ai_usage"] == "none"
     assert r["professional_anatomical_review"] == "not-claimed"
     assert r["legal_review"] == "required"
@@ -288,8 +289,25 @@ README = ROOT / "design/auren/source/bodymap/README.md"
 CHECKLIST = ROOT / "design/auren/AUREN_ASSET_INTAKE_CHECKLIST.md"
 PROVENANCE = ROOT / "design/auren/AUREN_ASSET_PROVENANCE.md"
 NOT_AUTHORIZED = "NOT AUTHORIZED FOR APP INTEGRATION"
+INTERNAL = "AUTHORIZED FOR AUREN INTERNAL BUILDS WITH CONSTRAINTS"
+PUBLIC_BLOCKED = "PUBLIC RELEASE NOT AUTHORIZED"
 AUTHORIZED = "AUTHORIZED FOR AUREN MOBILE INTEGRATION"
+INTERNAL_RUNTIME = "internal-builds-with-constraints"
 STALE_NO_MASTER = "Aucun master anatomique n'est présent"
+
+
+def _internal_registry_gaps(registry):
+    """DA-04.0b: an internal authorization names its decision, scope and constraints."""
+    errs = []
+    if registry.get("owner_decision") != "ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS":
+        errs.append("registry-decision-unnamed")
+    if registry.get("public_release_authorization") != "blocked":
+        errs.append("registry-public-release-open")
+    for field in ("owner_decision_date", "authorization_scope", "runtime_constraints",
+                  "attribution_fr", "non_medical_notice_fr", "missing_for_public_release"):
+        if not registry.get(field):
+            errs.append(f"registry-{field}-missing")
+    return errs
 
 
 def authorization_inconsistencies(registry, readme, checklist, provenance):
@@ -298,7 +316,8 @@ def authorization_inconsistencies(registry, readme, checklist, provenance):
     if STALE_NO_MASTER in readme:
         errs.append("readme-says-no-master")
     current = readme.split("## Historique")[0]  # history may quote the past; the current state may not
-    if registry["runtime_authorization"] == "blocked":
+    state = registry["runtime_authorization"]
+    if state == "blocked":
         if NOT_AUTHORIZED not in current:
             errs.append("readme-not-blocked")
         if not registry.get("gate_resolution", "").startswith("DA-04.0 OUTCOME B"):
@@ -308,6 +327,13 @@ def authorization_inconsistencies(registry, readme, checklist, provenance):
         for name, text in (("checklist", checklist), ("provenance", provenance)):
             if "DA-04.0" not in text or NOT_AUTHORIZED not in text:
                 errs.append(f"{name}-not-blocked")
+    elif state == INTERNAL_RUNTIME:
+        if INTERNAL not in current or PUBLIC_BLOCKED not in current or NOT_AUTHORIZED in current:
+            errs.append("readme-not-internal")
+        errs.extend(_internal_registry_gaps(registry))
+        for name, text in (("checklist", checklist), ("provenance", provenance)):
+            if "DA-04.0b" not in text or INTERNAL not in text:
+                errs.append(f"{name}-not-internal")
     else:
         if AUTHORIZED not in current or NOT_AUTHORIZED in current:
             errs.append("readme-not-authorized")
@@ -338,6 +364,26 @@ def test_negative_registry_authorized_alone():
     errs = authorization_inconsistencies(promoted, readme, checklist, provenance)
     assert "readme-not-authorized" in errs
     assert "checklist-not-authorized" in errs
+
+
+def test_negative_registry_blocked_while_docs_say_internal():
+    registry, readme, checklist, provenance = _docs()
+    reverted = {**registry, "runtime_authorization": "blocked"}
+    assert "readme-not-blocked" in authorization_inconsistencies(reverted, readme, checklist, provenance)
+
+
+def test_negative_internal_without_constraints_or_with_public_release():
+    registry, readme, checklist, provenance = _docs()
+    loose = {**registry, "runtime_constraints": [], "public_release_authorization": "authorized"}
+    errs = authorization_inconsistencies(loose, readme, checklist, provenance)
+    assert "registry-runtime_constraints-missing" in errs
+    assert "registry-public-release-open" in errs
+
+
+def test_negative_readme_drops_public_block():
+    registry, readme, checklist, provenance = _docs()
+    opened = readme.replace(PUBLIC_BLOCKED, "PUBLIC RELEASE PENDING")
+    assert "readme-not-internal" in authorization_inconsistencies(registry, opened, checklist, provenance)
 
 
 # ───────── DA-04.0: the subset react-native-svg renders unchanged ─────────

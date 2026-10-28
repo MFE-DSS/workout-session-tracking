@@ -11,7 +11,7 @@ PyYAML) against itself AND against runtime truth:
   - macro mapping identical to _WA_ZONE_TO_REGION (parity, ast.literal_eval);
   - compact macros are explicitly NOT RADAR_AXES; RADAR_AXES/ORDER untouched;
   - stable SVG ids (one per zone, no zone-unknown, no gendered id, unique);
-  - exactly five presentation states; exactly three body variants (none produced);
+  - exactly five presentation states; exactly three body variants (one produced, internal builds only);
   - NO geometry (path/polygon/coordinates/activation/percentage/EMG) in data;
   - owner IP ownership is not presented as legally proven;
   - the descriptor still yields only the eleven known codes or `unknown`.
@@ -209,13 +209,20 @@ def test_exactly_five_presentation_states():
 # ───────── 22.7 body variants ─────────
 
 
-def test_exactly_three_body_variants_none_available():
+def test_exactly_three_body_variants_only_the_produced_one_internal():
+    """DA-04.0b (operator, 2026-10-28): male_neutral_v1 exists and is authorized
+    for internal builds only; the two others are not produced. Public release
+    stays closed, and the contract no longer says the geometry is absent."""
     variants = _contract()["body_variants"]
     assert [v["code"] for v in variants] == [
         "male_neutral_v1", "female_neutral_v1", "neutral_abstract_v1",
     ]
-    assert all(v["available"] is False for v in variants)
-    assert _contract()["geometry_status"] == "NOT YET PRODUCED"
+    available = {v["code"]: v for v in variants if v["available"] is True}
+    assert list(available) == ["male_neutral_v1"]
+    assert available["male_neutral_v1"]["availability_scope"] == "internal-builds-with-constraints"
+    assert _contract()["geometry_status"] == "PRODUCED_AS_DESIGN_SOURCE"
+    assert _contract()["runtime_status"] == "RUNTIME_INTERNAL_P0_AUTHORIZED_WITH_CONSTRAINTS"
+    assert _contract()["public_release_status"] == "PUBLIC_RELEASE_NOT_AUTHORIZED"
 
 
 # ───────── 22.8 no geometry ─────────

@@ -4,8 +4,10 @@
 # set; the manifest (AUREN_VISUAL_ASSET_MANIFEST.md) and provenance (AUREN_ASSET_PROVENANCE.md) are the
 # human-facing companions. Guarded by tests/test_auren_muscle_focus_plates.py.
 #
-# NOT AUTHORIZED FOR APP INTEGRATION. Internal synthetic review only — NOT a qualified professional
-# anatomical review, NOT professionally/legally cleared. ai_usage: NONE (geometry never AI-generated).
+# INTERNAL P0 RUNTIME WITH CONSTRAINTS (owner decision 2026-07-30, served on /science since PR #49;
+# registry reconciled with that reality by DA-04.0b, 2026-10-28). Internal synthetic review only — NOT a
+# qualified professional anatomical review, NOT professionally/legally cleared. Public release not
+# authorized. ai_usage: NONE (geometry never AI-generated).
 
 contract_version: "0.2.0"          # AUREN_MUSCLE_FOCUS_ID_CONTRACT.md
 schema_version: "0.2.0"            # AUREN_MUSCLE_FOCUS_DESCRIPTOR_SCHEMA.md
@@ -28,7 +30,10 @@ review_status:
   professional_anatomical_review: "NOT_PERFORMED_NOT_CLAIMED"
   professional_legal_clearance: "NOT_PERFORMED_NOT_CLAIMED"
   medical_validation: "NOT_CLAIMED"
-  asset_integration_gate: "BLOCKED"
+  asset_integration_gate: "INTERNAL_P0_WITH_CONSTRAINTS"
+  public_release: "NOT_AUTHORIZED"
+  runtime_mount: "web /science (app/services/bodymap_frames.py), attribution + non-medical notice in _partials/muscle_focus.html"
+  runtime_exposure_open_point: "/science requires a session but web registration is open (/register): exposure wider than internal - operator decision pending"
 
 id_scheme: "p0-pipeline"           # ID Contract §3bis (v0.2.0) — prefix-isolated descriptive scheme; geom-* remains the authoring target.
 ai_usage: "NONE"
