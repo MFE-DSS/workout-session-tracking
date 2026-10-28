@@ -82,3 +82,18 @@ Master + compact acceptés : contrat SVG validé indépendamment (viewBox `0 0 2
 **reproductibilité vérifiée indépendamment** (package v2 déterministe `f45e0dbf…`), provenance CC BY 4.0
 double (BodyParts3D + Servier) avec notices d'attribution, `ai_usage: none`, revue anatomique professionnelle
 **non revendiquée**, gardes automatisés (`tests/test_auren_bodymap_master.py`). Statut initial **≠ approved**.
+
+## Gate runtime statué — BodyMap master (DA-04.0, 2026-10-28)
+```
+OUTCOME B — NOT AUTHORIZED FOR APP INTEGRATION
+```
+| Revue (§6) | État | Preuve |
+|---|---|---|
+| technical | **faite, passe** | `svg`/`g`/`path` seulement, `currentColor`, 0 raster / police / URL / transformation ; garde du sous-ensemble `react-native-svg` |
+| anatomical | **manquante** | `professional_anatomical_review: not-claimed` ; provenance `reviewer: NOT YET REVIEWED` |
+| legal | **manquante** | `legal_review: required` |
+| attribution (surface) | **manquante** | `attribution_surface: not-yet-implemented` ; aucune mention dans l'app mobile |
+| product · accessibility · mobile 360 px | non statuées ici | relèvent de l'intégration (DA-04.1), après le gate |
+
+Rien n'a été promu. Le gate passe quand le registre porte une autorisation explicite (date, base de revue,
+hashes, contraintes) et que ce document, le README du dossier et la provenance la disent aussi.

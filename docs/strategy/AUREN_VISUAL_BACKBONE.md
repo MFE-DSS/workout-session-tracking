@@ -473,7 +473,16 @@ langage de l'instrument existe, pas l'inverse.
 | `DA-03.2` | **Mark hardening** → `AUREN-MARK-V1` | ✅ **acceptée** (2026-10-27) : `AUREN-MARK-V1` LOCKED (`AUREN_VISUAL_CONTRACT §18`), trois dessins optiques, 9 baselines ; A2 retiré |
 | `DA-03.3` | **App icon** → `AUREN-APP-ICON-V1` | ✅ **acceptée** (2026-10-27) : I2 Semantic LOCKED (`AUREN_VISUAL_CONTRACT §19`), document Icon Composer intégré (`ios.icon`), l'haltère retiré comme marque |
 | `DA-03.3b` | **App icon en une encre** | ✅ **révisée** (2026-10-28, « le défaut proposé en monochrome ») : I1 remplace I2, même composition, `ink` sur `field` ; la paire `signal` / `system` quitte toute surface de marque (`AUREN_VISUAL_CONTRACT §18–19`) |
-| — | BodyMap → mannequin → équipements → Push A → les 58 exercices | → dans cet ordre |
+| `DA-04.0` | **BodyMap Intake Resolution** : une seule vérité sur le master — est-il autorisé dans le runtime mobile ? | ✅ statué (2026-10-28) : **OUTCOME B — NOT AUTHORIZED FOR APP INTEGRATION** ; technique passe ; manquent revue anatomique, revue juridique, surface d'attribution |
+| `DA-04.1` | **Triptyque Push A** : trois caméras sur le même master (`push-pecs`, `push-delt-lat`, `push-triceps`), viewBox déterministes, dans Frame C / Recessed Window ; une seule zone dominante, le reste diminué ; l'ambre = zone au premier plan, **jamais** une carte d'activation | ⛔ **bloqué** tant que `DA-04.0` n'est pas levé ; recadrages de design hors runtime permis |
+| `DA-05.0` | **Mannequin canonique** : face, dos, profil, ¾ face, ¾ dos ; puis articulation et matériel | en parallèle, chez le designer de l'opérateur (ne dépend pas du BodyMap runtime) |
+| `DA-05.1` | **Preuve Smith incliné** | après `DA-05.0` |
+| Gate `DA-01` final | les cinq questions, dont « BodyMap et exercice de la même machine » | ferme la DA initiale |
+| — | familles → les 7 Push A → équipements → autres plates → les 58 mouvements | ensuite seulement, dans cet ordre |
+
+**Roadmap corrigée par l'opérateur le 2026-10-28** : `DA-04.0` ferme d'abord la vérité sur le master BodyMap ;
+**MISSION ne passe pas avant** — une fois la marque finie, le gain différenciant vient de l'anatomie et du
+mouvement, pas d'un écran existant remis au nouveau style.
 
 Le gate `DA-01` du §8.3 (cinq questions) reste le critère de **chaque** étape ;
 `AUREN_CALIBRATION_SYSTEM §12` y ajoute ses huit conditions pour `DA-02.x`.

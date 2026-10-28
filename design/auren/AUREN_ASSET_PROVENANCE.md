@@ -217,6 +217,10 @@ status: technical-intake-accepted-human-review-pending
 **Aucune entrée `verified`/`approved`/`legally-cleared`.** Cross-check OpenStax 1ʳᵉ éd. + Sobotta 1909 =
 contrôle documentaire, aucune géométrie incorporée. **Aucune conclusion juridique.**
 
+**DA-04.0 (2026-10-28) — gate runtime statué : NOT AUTHORIZED FOR APP INTEGRATION.** Hashes vérifiés
+inchangés (`dbb57db3…` / `8024fd4c…`). Manquent : revue anatomique, revue juridique de l'œuvre dérivée,
+surface d'attribution dans le client. Aucun fait de provenance n'a été modifié pour faire passer le gate.
+
 ## Muscle Focus P0 Regional Plates — provenance (Sb_ASSET_03B.2R-D1, 2026-08-05)
 ```
 asset_id: auren.muscle-focus.region.{chest,shoulders,posterior}.v1

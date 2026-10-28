@@ -1,6 +1,6 @@
 # Sb_DA_03_3B_APP_ICON_MONO — l'icône de l'app en une encre
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-03-3b-app-icon-mono`
+**Statut** : ✅ MERGÉE (`bb539f8`, closeout en annexe) — DA-03.3b **CLOSED** — tier `isolated` · **Branche** : `sb/da-03-3b-app-icon-mono`
 **Base** : canonique `8b453b1` · **Commande** : révision opérateur de DA-03.3 (2026-10-28)
 **Gate visuel** : planche DA-03.3 (rendus Icon Composer), puis planche de comparaison I1 / I2 ; **« le défaut proposé en monochrome »**
 **Autorité** : `AUREN_VISUAL_CONTRACT.md` §18 (`AUREN-MARK-V1`) et §19 (`AUREN-APP-ICON-V1`, révisé)
@@ -122,3 +122,18 @@ proposé en monochrome ».
 - La garde `test_ui_iteration_protocol` a refusé l'en-tête abrégé de la table d'inventaire ; rétabli mot pour mot.
 
 **Verdict :** `AUREN-APP-ICON-V1` est en une encre, comme l'opérateur l'a choisi, sur iOS, Android et web. La géométrie est intacte, et le retour de l'orange et du bleu sur la marque est désormais gardé.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #314, mergée par `--merge --match-head-commit` (head `c8749c1`) sous GO MERGE permanent |
+| Commit de merge | `bb539f832eef333cc27377a58a3755745cd16390` |
+| CI de la PR | 11 checks verts, dont `visual contract (DA-GOV-01)` |
+| CI canonique (push) | run `40670535417` : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK` (0 sur toutes les conditions), 0 fil de revue non résolu |
+| iPhone | build natif depuis `bb539f8` : `expo prebuild` relancé d'abord (le script de build ne recopie pas un `.icon` modifié quand le projet a déjà son équipe), `pod install` avec `LANG=en_US.UTF-8` ; installé par `devicectl` ; le repli `AurenAppIcon60x60@2x` du binaire montre la marque en `ink` ; `CFBundleIcons › CFBundlePrimaryIcon › CFBundleIconName = AurenAppIcon` ; l'app joint le backend |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | worktree et branche `sb/da-03-3b-app-icon-mono` supprimés (local et distant) |
