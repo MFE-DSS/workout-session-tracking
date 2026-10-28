@@ -6,24 +6,8 @@
     {
       "layers": [
         {
-          "image-name": "cursor.svg",
-          "name": "cursor"
-        }
-      ],
-      "shadow": {
-        "kind": "neutral",
-        "opacity": 0.35
-      },
-      "translucency": {
-        "enabled": false,
-        "value": 0.5
-      }
-    },
-    {
-      "layers": [
-        {
-          "image-name": "marker.svg",
-          "name": "marker"
+          "image-name": "mark.svg",
+          "name": "mark"
         }
       ],
       "shadow": {

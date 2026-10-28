@@ -3,9 +3,10 @@
 Sb_UI_10.2 shipped the dumbbell pictogram (recolored #C8A24B on #0f1115) as the
 Auren glyph. DA-03.3 (operator, 2026-10-27): the dumbbell is no longer the brand.
 The PNG pack carries AUREN-APP-ICON-V1 (the cursor over the reference marker,
-`signal` over `system`, on `field`), the favicon carries AUREN-MARK-V1 in its
-16 px drawing (the mark is never rendered under 12 px, so the full icon is never
-shrunk into a browser tab), and auren-mark.svg is the monochrome brand expression.
+in one ink on `field` since DA-03.3b, 2026-10-28), the favicon carries
+AUREN-MARK-V1 in its 16 px drawing (the mark is never rendered under 12 px, so
+the full icon is never shrunk into a browser tab), and auren-mark.svg is the
+monochrome brand expression. The orange / blue pair is no longer the brand.
 The manifest and the heads are unchanged. String/asset/head only.
 
 PNG dimensions are read from the IHDR chunk with the stdlib (no Pillow
@@ -133,8 +134,8 @@ def test_favicon_is_the_mark_at_its_16px_drawing():
     svg = (ICONS / "favicon.svg").read_text(encoding="utf-8")
     cursor, marker = _mark_paths("compact")
     assert 'viewBox="0 0 16 16"' in svg
-    assert f'd="{cursor}" fill="#FFB23E"' in svg  # signal: the operator's cursor
-    assert f'd="{marker}" fill="#7CCBF5"' in svg  # system: the reference marker
+    assert f'd="{cursor}" fill="#F5F3EE"' in svg  # ink: the operator's cursor
+    assert f'd="{marker}" fill="#F5F3EE"' in svg  # ink: the reference marker, same ink (DA-03.3b)
     assert 'fill="#0A0B0D"' in svg  # field
 
 
@@ -153,6 +154,15 @@ def test_the_dumbbell_is_retired_from_the_brand_svgs():
         assert "c8a24b" not in svg.lower(), f"the retired gold is back in {name}"
         assert "f25f3a" not in svg.lower()
         assert "orion" not in svg.lower()
+
+
+def test_the_brand_svgs_are_one_ink():
+    """DA-03.3b (operator, 2026-10-28): no orange / blue pair on the brand — `signal` and
+    `system` keep their meaning inside the instrument, never on the logo."""
+    for name in ("favicon.svg", "auren-mark.svg"):
+        svg = (ICONS / name).read_text(encoding="utf-8").upper()
+        assert "#FFB23E" not in svg, f"`signal` is back on the brand in {name}"
+        assert "#7CCBF5" not in svg, f"`system` is back on the brand in {name}"
 
 
 # ───────── heads (source) ─────────

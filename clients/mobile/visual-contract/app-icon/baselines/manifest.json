@@ -7,22 +7,23 @@
     "ictool": "1.2",
     "platform": "iOS",
     "tint": "--tint-color 0.58 --tint-strength 0.75 (Tinted appearances only)",
-    "deterministic": "same document + same ictool version → same bytes (verified 2026-10-27)",
+    "deterministic": "same document + same ictool version → same bytes (verified 2026-10-27 and 2026-10-28)",
     "gate": "python3 scripts/check_app_icon.py check (macOS + Xcode only)"
   },
-  "approved_by": "operator — DA-03.3: « ACCEPT I2 — SEMANTIC », I2 becomes AUREN-APP-ICON-V1, with the baseline list it named",
-  "approved_on": "2026-10-27",
-  "authority": "byte-identical to the I2 renders of the DA-03.3 review board",
+  "approved_by": "operator — DA-03.3b: « je préfère la version contraste, sans la couleur orange-bleuâtre » ; on the I1 / I2 board: « ouais parfait […] le défaut proposé en monochrome » — I1 (one ink) replaces I2",
+  "approved_on": "2026-10-28",
+  "authority": "byte-identical, all 10, to the I1 renders of the DA-03.3 review board the operator chose from (scratchpad/da03-3/out/I1-*.png)",
+  "supersedes": "I2 Semantic (cursor `signal` over marker `system`), approved 2026-10-27, PR #312",
   "baselines": [
-    { "id": "app-icon-v1-default", "file": "app-icon-v1-default.png", "rendition": "Default", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "645559f03f651212f8299d60de3d25969b9c2f37e9b1720d217348c88bf027b9" },
-    { "id": "app-icon-v1-dark", "file": "app-icon-v1-dark.png", "rendition": "Dark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "6e8d84f59e0509815a51cb61daa90ab0323e9a90d20253e58a843fbb1cfdb456" },
-    { "id": "app-icon-v1-mono", "file": "app-icon-v1-mono.png", "rendition": "Mono", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "2d4f855827f296d99e7226c6cddc25aa0f4dbd133fb2038a1a122bdfad9f0835", "note": "byte-identical to Clear light with ictool 1.2" },
-    { "id": "app-icon-v1-clear-light", "file": "app-icon-v1-clear-light.png", "rendition": "ClearLight", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "2d4f855827f296d99e7226c6cddc25aa0f4dbd133fb2038a1a122bdfad9f0835", "note": "rendered on a neutral backdrop, no wallpaper" },
-    { "id": "app-icon-v1-clear-dark", "file": "app-icon-v1-clear-dark.png", "rendition": "ClearDark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "67370fe6ed0ff7976666309c32184eaf1777f4323bf9e737a8a56fabbb151258", "note": "rendered on a neutral backdrop, no wallpaper" },
-    { "id": "app-icon-v1-tinted-light", "file": "app-icon-v1-tinted-light.png", "rendition": "TintedLight", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "f09d4ff583cafd787e1d3ff31692bd06339e6f2ac2658540c70100c813dcf5a9" },
-    { "id": "app-icon-v1-tinted-dark", "file": "app-icon-v1-tinted-dark.png", "rendition": "TintedDark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "7e1df2a1f700f300c7120c61f3117422e01f0aea2913653ce459f171d7f2cac7" },
-    { "id": "app-icon-v1-default-60pt", "file": "app-icon-v1-default-60pt.png", "rendition": "Default", "points": 60, "scale": 3, "pixels": "180x180", "sha256": "ca6f7b1f82bdbdc45246c627b272432037eaa1fa1c321f8f438a3509fd72feb3", "note": "Home Screen" },
-    { "id": "app-icon-v1-default-40pt", "file": "app-icon-v1-default-40pt.png", "rendition": "Default", "points": 40, "scale": 3, "pixels": "120x120", "sha256": "9fe52eb79be96d96aeda09fe0c656ade415fee6e3ba30602a2c3cd13637b7f7c", "note": "Spotlight" },
-    { "id": "app-icon-v1-default-29pt", "file": "app-icon-v1-default-29pt.png", "rendition": "Default", "points": 29, "scale": 3, "pixels": "87x87", "sha256": "9aa26956abef849967674925d824ccaa8f6bc9fb372209fafc56d511b0eb1e05", "note": "Settings" }
+    { "id": "app-icon-v1-default", "file": "app-icon-v1-default.png", "rendition": "Default", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "b42fd8210a779ca9ba71be160c7ddf20f1adb32384f2e76906175fbc6345c572" },
+    { "id": "app-icon-v1-dark", "file": "app-icon-v1-dark.png", "rendition": "Dark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "ca397e6d9d0fcd7042a76a0df21874e1d37b5aaf12b80ec5d5340696fafa9a4b" },
+    { "id": "app-icon-v1-mono", "file": "app-icon-v1-mono.png", "rendition": "Mono", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "edfc4bb213d7f0bcb6bfc4a304aa5b22b28674d1baf60c83bc779dca5a6e9666", "note": "byte-identical to Clear light with ictool 1.2" },
+    { "id": "app-icon-v1-clear-light", "file": "app-icon-v1-clear-light.png", "rendition": "ClearLight", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "edfc4bb213d7f0bcb6bfc4a304aa5b22b28674d1baf60c83bc779dca5a6e9666", "note": "rendered on a neutral backdrop, no wallpaper" },
+    { "id": "app-icon-v1-clear-dark", "file": "app-icon-v1-clear-dark.png", "rendition": "ClearDark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "f87b691b60f13dcfa64989c13c666e1745d4ae4c195abab43ec3a43aef18e561", "note": "rendered on a neutral backdrop, no wallpaper" },
+    { "id": "app-icon-v1-tinted-light", "file": "app-icon-v1-tinted-light.png", "rendition": "TintedLight", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "f379e0994d825597bdcac50c8bf5363bec404c02b902fa1156096da3b6a8b68f" },
+    { "id": "app-icon-v1-tinted-dark", "file": "app-icon-v1-tinted-dark.png", "rendition": "TintedDark", "points": 1024, "scale": 1, "pixels": "1024x1024", "sha256": "aa738e72a38b3f8632367a461a11096c951f1cb8fd47b196c643baf7a177e87e" },
+    { "id": "app-icon-v1-default-60pt", "file": "app-icon-v1-default-60pt.png", "rendition": "Default", "points": 60, "scale": 3, "pixels": "180x180", "sha256": "6a1c388a487c660167ab769aebc2591b84fce064920a582ed9850416e575574d", "note": "Home Screen" },
+    { "id": "app-icon-v1-default-40pt", "file": "app-icon-v1-default-40pt.png", "rendition": "Default", "points": 40, "scale": 3, "pixels": "120x120", "sha256": "b7518e59d13410353780dcfd3d9c7418f4969c1081c8ffd4d7747b877dfc7ede", "note": "Spotlight" },
+    { "id": "app-icon-v1-default-29pt", "file": "app-icon-v1-default-29pt.png", "rendition": "Default", "points": 29, "scale": 3, "pixels": "87x87", "sha256": "161606d48246d771425713ff7a4dc9ac493da67e04214b4f57334e8e5797d45d", "note": "Settings" }
   ]
 }
