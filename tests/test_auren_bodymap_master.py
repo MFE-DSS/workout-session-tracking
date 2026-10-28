@@ -8,6 +8,11 @@ parity with the immutable zone taxonomy and macro mapping, strict separation
 from RADAR_AXES, presence of the CC BY 4.0 notices, and a BLOCKED runtime
 authorization.
 
+DA-04.0 (2026-10-28) adds: ONE authorization truth across the registry, the
+folder README, the intake checklist and the provenance (the README used to say
+both "no master present" and "master accepted"); the master stays inside the
+subset react-native-svg renders unchanged; each zone keeps its front/back side.
+
 Stdlib only. Includes NEGATIVE cases proving the guard fails on regressions.
 """
 import ast
@@ -275,6 +280,121 @@ def test_negative_compact_over_budget():
 def test_negative_business_colour(valid_master):
     broken = valid_master.replace('fill="currentColor"', 'fill="#C8A24B"', 1)
     assert "business-colour" in guard_svg(broken)
+
+
+# ───────── DA-04.0: one authorization truth ─────────
+
+README = ROOT / "design/auren/source/bodymap/README.md"
+CHECKLIST = ROOT / "design/auren/AUREN_ASSET_INTAKE_CHECKLIST.md"
+PROVENANCE = ROOT / "design/auren/AUREN_ASSET_PROVENANCE.md"
+NOT_AUTHORIZED = "NOT AUTHORIZED FOR APP INTEGRATION"
+AUTHORIZED = "AUTHORIZED FOR AUREN MOBILE INTEGRATION"
+STALE_NO_MASTER = "Aucun master anatomique n'est présent"
+
+
+def authorization_inconsistencies(registry, readme, checklist, provenance):
+    """Return the documents that contradict the registry's runtime authorization."""
+    errs = []
+    if STALE_NO_MASTER in readme:
+        errs.append("readme-says-no-master")
+    current = readme.split("## Historique")[0]  # history may quote the past; the current state may not
+    if registry["runtime_authorization"] == "blocked":
+        if NOT_AUTHORIZED not in current:
+            errs.append("readme-not-blocked")
+        if not registry.get("gate_resolution", "").startswith("DA-04.0 OUTCOME B"):
+            errs.append("registry-gate-unresolved")
+        if not registry.get("missing_for_runtime"):
+            errs.append("registry-missing-unnamed")
+        for name, text in (("checklist", checklist), ("provenance", provenance)):
+            if "DA-04.0" not in text or NOT_AUTHORIZED not in text:
+                errs.append(f"{name}-not-blocked")
+    else:
+        if AUTHORIZED not in current or NOT_AUTHORIZED in current:
+            errs.append("readme-not-authorized")
+        for name, text in (("checklist", checklist), ("provenance", provenance)):
+            if AUTHORIZED not in text:
+                errs.append(f"{name}-not-authorized")
+    return errs
+
+
+def _docs():
+    return (_registry(), README.read_text(encoding="utf-8"),
+            CHECKLIST.read_text(encoding="utf-8"), PROVENANCE.read_text(encoding="utf-8"))
+
+
+def test_authorization_is_one_truth():
+    assert authorization_inconsistencies(*_docs()) == []
+
+
+def test_negative_readme_back_to_no_master():
+    registry, readme, checklist, provenance = _docs()
+    stale = f"{STALE_NO_MASTER}.\n" + readme
+    assert "readme-says-no-master" in authorization_inconsistencies(registry, stale, checklist, provenance)
+
+
+def test_negative_registry_authorized_alone():
+    registry, readme, checklist, provenance = _docs()
+    promoted = {**registry, "runtime_authorization": "authorized"}
+    errs = authorization_inconsistencies(promoted, readme, checklist, provenance)
+    assert "readme-not-authorized" in errs
+    assert "checklist-not-authorized" in errs
+
+
+# ───────── DA-04.0: the subset react-native-svg renders unchanged ─────────
+
+RN_SVG_TAGS = {"svg", "g", "path"}
+RN_SVG_ATTRS = {"id", "viewBox", "fill", "d"}
+PATH_COMMANDS = set("MmLlHhVvCcSsQqTtAaZz")
+
+
+def rn_svg_subset_violations(src):
+    """Elements, attributes and path commands outside Svg / G / Path as drawn today."""
+    errs = []
+    root = ET.fromstring(src)
+    for e in root.iter():
+        tag = e.tag.replace(f"{{{SVG}}}", "")
+        if tag not in RN_SVG_TAGS:
+            errs.append(f"tag:{tag}")
+        errs += [f"attr:{a}" for a in e.attrib if a not in RN_SVG_ATTRS]
+        cmds = set(re.findall(r"[A-Za-z]", e.get("d", "")))
+        errs += [f"command:{c}" for c in sorted(cmds - PATH_COMMANDS)]
+    return errs
+
+
+def test_master_is_in_the_react_native_svg_subset():
+    assert rn_svg_subset_violations(MASTER.read_text(encoding="utf-8")) == []
+
+
+def test_negative_clip_path_is_outside_the_subset(valid_master):
+    broken = valid_master.replace("</svg>", "<clipPath id=\"x\"><path d=\"M0 0 L1 1 Z\"/></clipPath></svg>")
+    assert "tag:clipPath" in rn_svg_subset_violations(broken)
+
+
+def test_negative_transform_is_outside_the_subset(valid_master):
+    broken = valid_master.replace('<g id="zone-pecs">', '<g id="zone-pecs" transform="scale(2)">', 1)
+    assert "attr:transform" in rn_svg_subset_violations(broken)
+
+
+# ───────── DA-04.0: each zone keeps its side ─────────
+
+EXPECTED_SIDES = {
+    "pecs": {"front"}, "delt_lat": {"front", "back"}, "delt_post": {"back"},
+    "lats": {"back"}, "upper_back": {"back"}, "biceps": {"front"},
+    "triceps": {"back"}, "quads": {"front"}, "posterior": {"back"},
+    "calves": {"front", "back"}, "core": {"front"},
+}
+
+
+def test_each_zone_keeps_its_front_back_side():
+    root = ET.fromstring(MASTER.read_text(encoding="utf-8"))
+    sides = {}
+    for g in root.iter(f"{{{SVG}}}g"):
+        gid = g.get("id") or ""
+        if gid.startswith("zone-"):
+            kids = [CHILD_RE.match(p.get("id") or "") for p in g.iter(f"{{{SVG}}}path")]
+            assert kids, f"{gid}: no geometry"
+            sides[gid[5:]] = {m.group(2) for m in kids if m}
+    assert sides == EXPECTED_SIDES
 
 
 # ───────── the guard module imports cleanly (self-check) ─────────

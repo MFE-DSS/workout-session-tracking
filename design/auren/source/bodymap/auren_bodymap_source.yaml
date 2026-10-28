@@ -34,6 +34,12 @@
   "legal_review": "required",
   "attribution_surface": "not-yet-implemented",
   "runtime_authorization": "blocked",
+  "gate_resolution": "DA-04.0 OUTCOME B - NOT AUTHORIZED FOR APP INTEGRATION",
+  "gate_resolution_date": "2026-10-28",
+  "gate_technical_review": "passed - svg/g/path only, currentColor, no raster/font/url/transform; react-native-svg renders it unchanged",
+  "missing_for_runtime": ["anatomical review (professional, or an explicit owner decision with constraints)",
+    "legal review of the CC BY 4.0 derivative work",
+    "attribution surface in the client that displays it"],
 
   "reproducibility": "independently-verified-package-v2",
   "intake_date": "2026-07-23",
