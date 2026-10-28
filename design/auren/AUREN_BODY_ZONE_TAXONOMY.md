@@ -100,7 +100,7 @@ Intelligence.**
 | 11 codes, labels FR, 6 macros, mapping | géométrie SVG, paths, coordonnées |
 | IDs SVG stables (API) | vues anatomiques détaillées par zone |
 | états sémantiques, invariants | variantes corporelles produites |
-| `geometry_status: NOT YET PRODUCED` | master anatomique validé |
+| `geometry_status: PRODUCED_AS_DESIGN_SOURCE` (DA-04.0b ; `NOT YET PRODUCED` jusqu'au 2026-10-28) | master anatomique (`auren_bodymap_master.svg`), autorisé en builds internes avec contraintes ; revue professionnelle non réalisée |
 
 Le master humain (Layer B) appartient à `OPERATOR_ASSET_03.1` ; l'intake technique à `Sb_ASSET_03.2` ;
 l'intégration runtime à `Sb_ASSET_04.1` **après** franchissement de l'`ASSET INTEGRATION GATE`.

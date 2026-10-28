@@ -221,6 +221,14 @@ contrôle documentaire, aucune géométrie incorporée. **Aucune conclusion juri
 inchangés (`dbb57db3…` / `8024fd4c…`). Manquent : revue anatomique, revue juridique de l'œuvre dérivée,
 surface d'attribution dans le client. Aucun fait de provenance n'a été modifié pour faire passer le gate.
 
+**DA-04.0b (2026-10-28) — décision du propriétaire : AUTHORIZED FOR AUREN INTERNAL BUILDS WITH CONSTRAINTS.**
+`ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS` (Martin Feldmann), voie (b) du rapport DA-04.0. **PUBLIC RELEASE NOT
+AUTHORIZED** tant que manquent une revue anatomique professionnelle et une revue juridique externe. Les faits
+ci-dessus sont inchangés : `reviewer` reste `NOT YET REVIEWED` pour la revue professionnelle, car la décision
+du propriétaire n'en est pas une. Attribution à afficher, chaque source marquée **adaptée** (CC BY 4.0 §3(a)(1)(B)) :
+« Anatomie adaptée de BodyParts3D, © The Database Center for Life Science, sous licence CC BY 4.0. » et
+« Dorsaux et sangle abdominale adaptés de Servier Medical Art, sous licence CC BY 4.0. »
+
 ## Muscle Focus P0 Regional Plates — provenance (Sb_ASSET_03B.2R-D1, 2026-08-05)
 ```
 asset_id: auren.muscle-focus.region.{chest,shoulders,posterior}.v1
@@ -234,7 +242,7 @@ primary_source: BodyParts3D (DBCLS) — license_spdx: CC-BY-4.0 — access_date:
   license_text_location: design/auren/LICENSES/CC-BY-4.0.txt + LICENSES/bodyparts3d-NOTICE.md
   source_reference: exact-FMA-curated meshes (parts_list_e / element_parts / inclusion_relation), 0 arterial
   attribution_required: yes — "BodyParts3D, © The Database Center for Life Science licensed under CC Attribution 4.0 International"
-usage_nature: design-source only — NOT AUTHORIZED FOR APP INTEGRATION
+usage_nature: design-source, then runtime by owner decision (C5 / P5, 2026-07-30) — see the DA-04.0b note below
 modifications: orthographic projection from a camera-only body frame (meshes UNCHANGED, no mirror/scale),
   painter's-algorithm rasterization, potrace vectorization (frozen args), deterministic SVG assembly.
   chest partition (clavicular/sternocostal) EXCLUDED (REVIEW_PARTITION_UNRESOLVED, not accepted).
@@ -248,6 +256,19 @@ evidence: chest sha256 7a4167ea… (18811 B) · shoulders sha256 5eb7bedf… (33
 status: technical-intake-accepted-human-review-pending
 ```
 **Aucune entrée `approved`/`verified`/`legally-cleared`.** `ai_usage: none` (géométrie jamais générée par IA).
+
+**DA-04.0b (2026-10-28) — réconciliation avec le runtime réel.** Ce bloc disait « NOT AUTHORIZED FOR APP
+INTEGRATION » alors que les trois planches sont **servies** depuis le 2026-08-07 (PR #49) : page `/science`,
+`app/services/bodymap_frames.py` → `_partials/muscle_focus_plate_*.svg`, avec l'attribution BodyParts3D et la
+mention non médicale dans `_partials/muscle_focus.html`. Ce montage reposait déjà sur la décision du propriétaire
+du 2026-07-30 (`ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS` pour chest et posterior, `ACCEPT_INTERNAL_P0` pour
+shoulders ; C5 / P5 : « may proceed to P0 intake and controlled runtime integration »). Le registre porte
+désormais `asset_integration_gate: INTERNAL_P0_WITH_CONSTRAINTS` ; revue anatomique et juridique
+professionnelles toujours **non réalisées**.
+
+**Écart ouvert, consigné et non corrigé ici** : `/science` exige une session, mais l'inscription web est
+**ouverte** (`/register`). L'exposition réelle est donc plus large qu'« interne contrôlé ». Fermer l'inscription,
+masquer les planches derrière un drapeau, ou accepter l'exposition : décision de l'opérateur.
 
 ## Calibration System — références visuelles (DA-02.2, 2026-10-25)
 ```

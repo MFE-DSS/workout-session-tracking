@@ -237,8 +237,9 @@ ALLOWED_VENDOR_SVGS = {
 
 # Sb_ASSET_03.2 GOVERNED EVOLUTION: the BodyMap design-source master + compact,
 # derived from BodyParts3D (CC BY 4.0) + Servier Medical Art (CC BY 4.0),
-# technically validated and independently reproduced (package v2). NOT AUTHORIZED
-# FOR APP INTEGRATION. Detailed guard: tests/test_auren_bodymap_master.py.
+# technically validated and independently reproduced (package v2). Since DA-04.0b
+# (2026-10-28): AUTHORIZED FOR AUREN INTERNAL BUILDS WITH CONSTRAINTS, public release
+# not authorized. Detailed guard: tests/test_auren_bodymap_master.py.
 ALLOWED_BODYMAP_SVGS = {
     "design/auren/source/bodymap/auren_bodymap_master.svg",
     "design/auren/exports/svg/auren_bodymap_compact.svg",
@@ -246,7 +247,8 @@ ALLOWED_BODYMAP_SVGS = {
 
 # Sb_ASSET_03B.2R-D1 GOVERNED EVOLUTION: the three frozen P0 Muscle Focus Regional Plate candidates,
 # derived from BodyParts3D 4.0 (CC BY 4.0), internal-synthetic-review-accepted + owner-decided
-# (ACCEPT_WITH_CONSTRAINTS). NOT AUTHORIZED FOR APP INTEGRATION; NOT a professional anatomical review.
+# (ACCEPT_WITH_CONSTRAINTS). Served on /science as internal P0 with constraints (registry reconciled
+# by DA-04.0b); public release not authorized; NOT a professional anatomical review.
 # Detailed guard: tests/test_auren_muscle_focus_plates.py.
 _MF = "design/auren/source/muscle-focus"
 ALLOWED_MUSCLE_FOCUS_SVGS = {

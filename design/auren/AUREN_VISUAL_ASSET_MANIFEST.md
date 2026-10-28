@@ -136,7 +136,7 @@ note: >
 ## 5. Masters futurs (documentés, NON créés)
 | id (futur) | type | statut d'entrée | produit par |
 |---|---|---|---|
-| `auren.bodymap.master` | anatomical-map-master | `NOT YET PRODUCED` → `anatomical-review-required` | `OPERATOR_ASSET_03.1` + `Sb_ASSET_03.2` |
+| `auren.bodymap.master` | anatomical-map-master | **PRODUIT (Sb_ASSET_03.2)** → builds internes avec contraintes (DA-04.0b), diffusion publique non autorisée ; voir `source/bodymap/auren_bodymap_source.yaml` | `OPERATOR_ASSET_03.1` + `Sb_ASSET_03.2` ✅ |
 | `auren.brand.mark.v1` | brand-mark | **PRODUIT (DA-03.2)** → voir §5quater (`provisional`, non `approved`) | `DA-03.2` ✅ |
 | `auren.brand.wordmark` | wordmark | `NOT YET PRODUCED` — brand-bearing, provisional until clearance | build futur conditionnel au nom |
 | `auren.icons.vendor.tabler.<name>` | functional-icon | **INGÉRÉ (Sb_ASSET_02.1)** → voir §5ter (`legal-review-required`, non `approved`) | `Sb_ASSET_02.1` ✅ |
@@ -157,7 +157,7 @@ assets visuels produits (0 SVG/PNG). Statut `provisional` (jamais `approved`).
   `runtime_file` (ils ne sont **pas** servis par l'app) ni de géométrie.
 - **`BODYMAP COMPACT MACROS ARE NOT RADAR_AXES`** : le contrat documente explicitement la séparation
   présentation (6 macros) vs analytics (`RADAR_AXES`), non modifiés.
-- Aucun master futur n'est passé `source_file: existing` — les masters restent `NOT YET PRODUCED` (§5).
+- Aucun master futur n'est passé `source_file: existing` par ces contrats — les masters non produits restent `NOT YET PRODUCED` (§5) ; le master BodyMap est produit (§5, DA-04.0b).
 
 ## 5ter. Functional icon subset — Tabler P0 (Sb_ASSET_02.1)
 

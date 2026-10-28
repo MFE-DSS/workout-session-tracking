@@ -97,3 +97,22 @@ OUTCOME B — NOT AUTHORIZED FOR APP INTEGRATION
 
 Rien n'a été promu. Le gate passe quand le registre porte une autorisation explicite (date, base de revue,
 hashes, contraintes) et que ce document, le README du dossier et la provenance la disent aussi.
+
+## Décision du propriétaire — BodyMap master (DA-04.0b, 2026-10-28)
+```
+ACCEPT_INTERNAL_P0_WITH_CONSTRAINTS
+AUTHORIZED FOR AUREN INTERNAL BUILDS WITH CONSTRAINTS
+PUBLIC RELEASE NOT AUTHORIZED
+```
+L'opérateur choisit la voie (b) du rapport DA-04.0. Les deux sources sont sous CC BY 4.0 (adaptation
+autorisée sous attribution) ; c'est un compromis de gouvernance, pas un avis juridique.
+
+| Revue (§6) | État après décision | Preuve |
+|---|---|---|
+| technical | faite, passe | inchangé depuis DA-04.0 |
+| anatomical | **tenue par la décision du propriétaire**, professionnelle non réalisée | `owner_decision`, `professional_anatomical_review: not-claimed` |
+| legal | requise **pour la diffusion publique** | `legal_review: required`, `public_release_authorization: blocked` |
+| attribution (surface) | **à livrer** avant tout montage produit (`DA-04.1`) | `missing_for_runtime` |
+
+Portée : builds internes de l'app mobile. Jamais le runtime web, jamais un store public. Contraintes et
+texte d'attribution exacts : `source/bodymap/auren_bodymap_source.yaml`.

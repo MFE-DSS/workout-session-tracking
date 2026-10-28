@@ -209,9 +209,13 @@ def test_no_lying_or_measurement_tokens_in_registry():
         )
 
 
-def test_registry_declares_gate_blocked_and_review_not_claimed():
+def test_registry_declares_internal_gate_and_review_not_claimed():
+    """DA-04.0b: the plates are served on /science by owner decision (C5/P5); the
+    registry says so, keeps public release closed and names the open exposure."""
     r = _registry()
-    assert r["review_status"]["asset_integration_gate"] == "BLOCKED"
+    assert r["review_status"]["asset_integration_gate"] == "INTERNAL_P0_WITH_CONSTRAINTS"
+    assert r["review_status"]["public_release"] == "NOT_AUTHORIZED"
+    assert "/register" in r["review_status"]["runtime_exposure_open_point"]
     assert r["review_status"]["professional_anatomical_review"] == "NOT_PERFORMED_NOT_CLAIMED"
     assert r["review_status"]["professional_legal_clearance"] == "NOT_PERFORMED_NOT_CLAIMED"
     for d in _plates().values():
