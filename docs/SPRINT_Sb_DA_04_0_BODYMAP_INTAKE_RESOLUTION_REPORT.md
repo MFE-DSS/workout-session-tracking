@@ -1,6 +1,6 @@
 # Sb_DA_04_0_BODYMAP_INTAKE_RESOLUTION — une seule vérité sur le master BodyMap
 
-**Statut** : 🟡 PR ouverte — tier `isolated` · **Branche** : `sb/da-04-0-bodymap-intake-resolution`
+**Statut** : ✅ MERGÉE (`45e2eff`, closeout en annexe) — gate **statué**, en attente de l'opérateur — tier `isolated` · **Branche** : `sb/da-04-0-bodymap-intake-resolution`
 **Base** : canonique `bb539f8` · **Commande** : opérateur, 2026-10-28, « DA-04.0 — BodyMap Intake Resolution »
 **Nature** : micro-tranche de **gouvernance**. Aucune exploration graphique, aucune intégration produit, aucune géométrie touchée.
 **Verdict** : **OUTCOME B — NOT AUTHORIZED FOR APP INTEGRATION**
@@ -127,3 +127,18 @@ En attendant : des recadrages et galeries de **design** à partir du master, hor
 | `check_scope` | `ISOLATED` |
 
 **Verdict :** le master BodyMap n'a plus qu'un état écrit. Il est techniquement prêt pour l'app mobile et **n'y est pas autorisé** : il manque une revue anatomique, une revue juridique et une surface d'attribution. La décision revient à l'opérateur.
+
+---
+
+## Annexe — closeout post-merge
+
+| Élément | Valeur |
+|---|---|
+| PR | #315, mergée par `--merge --match-head-commit` (head `c71d83e`) sous GO MERGE permanent ; inclut le closeout de DA-03.3b |
+| Commit de merge | `45e2eff616f0e0f10f9c91f57e56105c82f184c4` |
+| CI de la PR | 11 checks verts |
+| CI canonique (push) | run `40675186842` : **8 jobs sur 8 verts** |
+| Sonar | gate PR `OK` (0 sur toutes les conditions), 0 fil de revue non résolu |
+| Gate BodyMap | **OUTCOME B** inscrit ; **DA-04.1 non démarré** — en attente de la décision de l'opérateur (§7) |
+| Incidents | aucun dans le périmètre |
+| Nettoyage | branche `sb/da-04-0-bodymap-intake-resolution` supprimée (local et distant) |
