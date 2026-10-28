@@ -24,7 +24,7 @@ BodyMap design source   : master + compact ingested / human review pending (Sb_A
                           reproducibility independently verified (package v2 f45e0dbf…)
 Brand mark              : AUREN-MARK-V1 — design LOCKED (DA-03.2, 2026-10-27), asset provisional
                           source/brand/mark/ : 3 optical drawings, colourless
-App icon                : AUREN-APP-ICON-V1 — design LOCKED (DA-03.3, 2026-10-27), asset provisional
+App icon                : AUREN-APP-ICON-V1 — design LOCKED (DA-03.3, 2026-10-27 ; one ink since DA-03.3b, 2026-10-28), asset provisional
                           clients/mobile/assets/AurenAppIcon.icon (Icon Composer) ; the dumbbell is retired
 Runtime integration     : not started / blocked
 Asset integration gate  : BLOCKED PENDING HUMAN / ANATOMICAL / LEGAL / MOBILE APPROVALS

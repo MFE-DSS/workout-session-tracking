@@ -45,7 +45,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `NUMERIC-READOUT-V1` | **LOCKED** (2026-10-25, « ACCEPT » DA-02.6) | une seule façon de poser un chiffre : rôle, unité, décimale, taille mesurée | DA-02.6 — `NumericReadout.tsx`, `readoutModel.ts` (§13) ; ses baselines sont celles des surfaces et des fenêtres qui l'utilisent |
 | `SESSION-CARD-R1` | **LOCKED** (cible, banc seulement — 2026-10-26) | la carte de série verticale : l'exercice, ses fenêtres d'information, et **tout en bas** l'instrument de charge avec ses touches | DA-02.7 R1 — `SessionSetCard.tsx` (§17) ; jamais monté sur l'écran de séance tant que le moteur ne fournit pas les bornes de zone (E7) |
 | `AUREN-MARK-V1` | **LOCKED** (2026-10-27, « ACCEPT » DA-03.2) | la marque du fabricant : le curseur de l'opérateur au-dessus du repère du système, un axe de visée, le vide entre eux | DA-03.2 — `design/auren/source/brand/mark/`, `AurenMark.tsx`, `markGeometry.ts` (§18) ; asset `provisional` tant que le nom n'est pas dégagé |
-| `AUREN-APP-ICON-V1` | **LOCKED** (2026-10-27, « ACCEPT I2 — SEMANTIC ») | l'icône de l'app : `AUREN-MARK-V1` à 54 %, curseur `signal` sur repère `system`, sur `field` ; le verre et les apparences sont ceux du système | DA-03.3 — `clients/mobile/assets/AurenAppIcon.icon` (Icon Composer), gate `visual-contract/app-icon/` (§19) |
+| `AUREN-APP-ICON-V1` | **LOCKED** (2026-10-27 ; révisée le 2026-10-28, DA-03.3b : « le défaut proposé en monochrome ») | l'icône de l'app : `AUREN-MARK-V1` à 54 %, en une seule encre `ink` sur `field` ; le verre et les apparences sont ceux du système | DA-03.3 — `clients/mobile/assets/AurenAppIcon.icon` (Icon Composer), gate `visual-contract/app-icon/` (§19) |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -337,39 +337,42 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **Géométrie verrouillée** (grille 32) : murs : fente = **2,5 : 1** (celui d'`ActiveCursor`) ; les deux pièces ont **la même largeur** et **le même axe** ; écart = **une fente** ; fentes à 6 / 14 et 3 / 7 de leur pièce (même proportion) ; **deux primitives**.
 
-**Couleur** : monochrome d'abord. Toute encre est un token existant passé à l'exécution. Le traitement deux couleurs — **curseur en `signal`, repère en `system`** — est une **expression de marque / d'icône d'application**, contextuelle : ce n'est ni la géométrie canonique ni un traitement obligatoire.
+**Couleur** : monochrome. Toute encre est un token existant passé à l'exécution. Le traitement deux couleurs — curseur en `signal`, repère en `system` — n'est employé sur **aucune** surface de marque depuis le 2026-10-28 (DA-03.3b, l'opérateur : « je préfère la version contraste, sans la couleur orange-bleuâtre »). Dans l'instrument, `signal` et `system` gardent leur sens (`SEMANTIC-TOKENS-V1`) : là, ce n'est pas de la marque, c'est la lecture.
 
 **MUST PRESERVE** : l'écart, les proportions des fentes, le rapport mur / fente, l'alignement, la silhouette, le nombre de primitives — **aucun ne change sans un nouvel arbitrage explicite de l'opérateur** ; la règle de taille ; la marque sans texte adjacent n'a pas de nom (rôle décoratif, le nom est dit par le texte).
-**MUST NEVER** : rendre la marque sous 12 px ; laisser l'appelant choisir le dessin ; ajouter un rail, un cercle, un écusson, une lettre ; inscrire une couleur dans la géométrie ; présenter le traitement deux couleurs comme la marque canonique ; un dégradé, une ombre, une lueur, un relief.
+**MUST NEVER** : rendre la marque sous 12 px ; laisser l'appelant choisir le dessin ; ajouter un rail, un cercle, un écusson, une lettre ; inscrire une couleur dans la géométrie ; remettre le traitement deux couleurs sur une surface de marque sans nouvel arbitrage ; un dégradé, une ombre, une lueur, un relief.
 
-## 19. `AUREN-APP-ICON-V1` — l'icône de l'app (DA-03.3, 2026-10-27)
+## 19. `AUREN-APP-ICON-V1` — l'icône de l'app (DA-03.3, 2026-10-27 ; révisée DA-03.3b, 2026-10-28)
 
-**Décision de l'opérateur** : « ACCEPT I2 — SEMANTIC » ; I1 n'est pas une autre icône (seulement l'expression de marque monochrome : `field` + marque en une encre) ; I3 retiré.
+**Décision de l'opérateur** :
+- le 2026-10-27, « ACCEPT I2 — SEMANTIC » (curseur `signal` sur repère `system`) ; I3 retiré ;
+- **révisée le 2026-10-28 (DA-03.3b)**, avant le partage du compte rendu final : « je préfère la version contraste, sans la couleur orange-bleuâtre », puis, devant la planche I1 / I2, « ouais parfait […] le défaut proposé en monochrome ».
+
+**I1 remplace I2** : la même marque, à la même échelle et au même centrage, en une seule encre. I2 reste dans l'historique (PR #312), il n'est pas une icône concurrente.
 
 **Composition** — la marque n'est jamais redessinée pour remplir le carré :
 
 | Couche | Contenu | Token |
 |---|---|---|
 | 0 | le fond | `field` |
-| 1 | le repère de référence | `system` |
-| 2 | le curseur actif (devant) | `signal` |
+| 1 | la marque : curseur actif au-dessus du repère de référence, une seule couche | `ink` |
 
 `AUREN-MARK-V1` `mark-primary`, **24 px par unité de grille sur 1024** (marque à **54 %** de la hauteur), jamais étirée, centrée horizontalement, **remontée de 16 px** (centre optique). Le large vide latéral est **voulu**. Aucun repère de registration, aucun rail, aucune géométrie décorative.
 
 | Champ | Valeur |
 |---|---|
-| **Source** | `clients/mobile/assets/AurenAppIcon.icon` — document Icon Composer : `icon.json` + deux couches SVG plates, opaques, sans effet |
+| **Source** | `clients/mobile/assets/AurenAppIcon.icon` — document Icon Composer : `icon.json` (un groupe) + une couche SVG plate `mark.svg` (deux pièces en `ink`), opaque, sans effet |
 | **Matière** | retenue : ombre neutre à 0,35, aucune translucidité ajoutée ; masque, Liquid Glass, ombres, reflets et apparences sont **rendus par le système**, jamais inscrits dans les SVG |
 | **Intégration** | `app.json` → `ios.icon` ; Expo prebuild copie le document et règle `ASSETCATALOG_COMPILER_APPICON_NAME = AurenAppIcon` ; `actool` le compile (`CFBundleIconName = AurenAppIcon`, repli PNG pour les iOS antérieurs) |
 | **Replis plats** (même composition, sans verre) | Android adaptatif (avant-plan, fond, monochrome : marque à 54 % de la zone **visible**), icône racine Expo, favicon Expo, pack PWA web |
-| **Baselines approuvées** (rendues par `ictool`, identiques à l'octet aux rendus I2 de la planche) | `app-icon-v1-default`, `app-icon-v1-dark`, `app-icon-v1-mono`, `app-icon-v1-clear-light`, `app-icon-v1-clear-dark`, `app-icon-v1-tinted-light`, `app-icon-v1-tinted-dark` (1024) ; `app-icon-v1-default-60pt`, `app-icon-v1-default-40pt`, `app-icon-v1-default-29pt` (@3x) |
+| **Baselines approuvées** (rendues par `ictool`, identiques à l'octet aux rendus I1 de la planche DA-03.3 ; réapprouvées le 2026-10-28) | `app-icon-v1-default`, `app-icon-v1-dark`, `app-icon-v1-mono`, `app-icon-v1-clear-light`, `app-icon-v1-clear-dark`, `app-icon-v1-tinted-light`, `app-icon-v1-tinted-dark` (1024) ; `app-icon-v1-default-60pt`, `app-icon-v1-default-40pt`, `app-icon-v1-default-29pt` (@3x) |
 | **Gate** | `python3 scripts/check_app_icon.py check` : le moteur d'Apple, tolérance **zéro pixel** (rendu déterministe), **macOS + Xcode seulement** — ailleurs il refuse au lieu de passer ; `tests/test_auren_app_icon_v1.py` (CI) vérifie le document, la configuration et les empreintes |
 
-**Comportement monochrome** (autoritaire) : quand le système fond les couleurs en une encre (Mono, Clear, Tinted), le curseur et le repère restent **deux pièces distinctes par la seule géométrie** — fentes alignées, écart central visible.
+**Comportement monochrome** (autoritaire) : l'icône est en une encre dans toutes les apparences ; le curseur et le repère restent **deux pièces distinctes par la seule géométrie** — fentes alignées, écart central visible. Les apparences sombre, mono, clear et teintée sont recolorées par le système ; seule l'apparence par défaut porte le choix de l'opérateur au pixel.
 
 **Limites de l'outil, dites** : avec `ictool` 1.2, Mono est identique à l'octet à Clear light ; Clear est rendu sur un fond neutre, sans fond d'écran.
 
-**Web — le favicon** : dans un onglet de 16 px, l'icône entière réduite mettrait la marque sous 12 px (interdit). Le favicon porte donc **la marque à son dessin de 16 px** (`mark-compact`) sur `field`, en `signal` / `system` : la même marque, à sa taille optique.
+**Web — le favicon** : dans un onglet de 16 px, l'icône entière réduite mettrait la marque sous 12 px (interdit). Le favicon porte donc **la marque à son dessin de 16 px** (`mark-compact`) sur `field`, en `ink` : la même marque, à sa taille optique.
 
-**MUST PRESERVE** : la géométrie de `AUREN-MARK-V1` ; l'échelle 54 % et le décalage optique ; le comportement monochrome ; les effets côté système.
-**MUST NEVER** : remplir le vide latéral pour le remplir ; ajouter des repères, un rail, un cadre ; inscrire du verre, une ombre, un flou ou un reflet dans les couches ; maintenir I1 comme icône concurrente.
+**MUST PRESERVE** : la géométrie de `AUREN-MARK-V1` ; l'échelle 54 % et le décalage optique ; une seule encre ; les effets côté système.
+**MUST NEVER** : remplir le vide latéral pour le remplir ; ajouter des repères, un rail, un cadre ; inscrire du verre, une ombre, un flou ou un reflet dans les couches ; remettre `signal` / `system` dans l'icône ou ses replis (garde `test_the_icon_carries_no_signal_or_system`) ; maintenir I2 comme icône concurrente.

@@ -257,23 +257,24 @@ d'icône / de marque, jamais la géométrie canonique : la source est monochrome
 ## 5quinquies. AUREN-APP-ICON-V1 — l'icône de l'app (DA-03.3)
 ```yaml
 id: auren.brand.app-icon.v1
-version: 1.0.0
+version: 1.1.0                   # DA-03.3b (2026-10-28): I1, one ink — supersedes I2 (1.0.0)
 type: pwa-icon                   # + iOS Icon Composer document
 status: provisional              # design LOCKED (AUREN_VISUAL_CONTRACT §19) ; name clearance open
 format: icon (Icon Composer) + png (flat fallbacks) + svg (favicon)
-source_file: clients/mobile/assets/AurenAppIcon.icon      # icon.json + Assets/{cursor,marker}.svg
+source_file: clients/mobile/assets/AurenAppIcon.icon      # icon.json + Assets/mark.svg
 runtime_file: >
   iOS: app.json ios.icon → AurenAppIcon (Assets.car) ; Android: clients/mobile/assets/android-icon-*.png ;
   Expo root/web: clients/mobile/assets/{icon,favicon}.png ; web PWA: app/static/icons/*
 semantic_contract: >
-  AUREN-MARK-V1 at 54 % of the height, +16 px optical lift, cursor `signal` over marker `system`
-  on `field`; masking, Liquid Glass and appearances belong to the system. Valid in one ink.
+  AUREN-MARK-V1 at 54 % of the height, +16 px optical lift, cursor over marker in one ink (`ink`)
+  on `field`; masking, Liquid Glass and appearances belong to the system. No `signal` / `system`
+  pair on the brand since DA-03.3b (operator, 2026-10-28).
 surfaces: [ios-home-screen, android-launcher, pwa, head]
 accessibility: { role: decorative, rule: "the app name is said by the system" }
 license: NOT APPLICABLE (repository-authored)
 provenance: AUREN_ASSET_PROVENANCE.md — « AUREN-APP-ICON-V1 »
-review: { product: operator ACCEPT 2026-10-27, technical: tests/test_auren_app_icon_v1.py + scripts/check_app_icon.py, legal: NOT YET REVIEWED, mobile: NOT YET REVIEWED (device install pending a native build) }
-budgets: { groups: 2, effects_in_source: 0 }
+review: { product: operator ACCEPT 2026-10-27 (I2), revised 2026-10-28 (I1, one ink), technical: tests/test_auren_app_icon_v1.py + scripts/check_app_icon.py, legal: NOT YET REVIEWED, mobile: I2 installed on the operator's iPhone 2026-10-27 — I1 pending a native build }
+budgets: { groups: 1, inks: 1, effects_in_source: 0 }
 consumers: [clients/mobile/app.json, app/static/manifest.webmanifest, app/templates heads]
 deprecated_by: NONE
 ```

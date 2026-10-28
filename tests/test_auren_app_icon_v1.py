@@ -1,11 +1,12 @@
-"""DA-03.3 — AUREN-APP-ICON-V1 guard (LOCKED, operator 2026-10-27: « ACCEPT I2 — SEMANTIC »).
+"""DA-03.3 — AUREN-APP-ICON-V1 guard (LOCKED, operator 2026-10-27; revised 2026-10-28, DA-03.3b:
+« le défaut proposé en monochrome » — I1, one ink, replaces I2's `signal` / `system` pair).
 
 The pixels of the app icon are Apple's (Icon Composer), so they are gated on macOS by
 scripts/check_app_icon.py. This guard runs everywhere (CI is Linux)
 and checks what does not need Apple's renderer:
   - the .icon document is exactly the approved composition: the AUREN-MARK-V1 primary
-    drawing, 24 px per grid unit on 1024 (54 %), centred, lifted 16 px — cursor `signal`
-    over marker `system` on `field`, two groups, restrained material, nothing else;
+    drawing, 24 px per grid unit on 1024 (54 %), centred, lifted 16 px — cursor over
+    marker, both `ink`, on `field`, one group, restrained material, nothing else;
   - the app is configured to use it;
   - the recorded baselines are complete and untouched.
 Standard library only.
@@ -39,7 +40,7 @@ def _srgb(hexcolor: str) -> str:
     return f"srgb:{r:.5f},{g:.5f},{b:.5f},1.00000"
 
 
-def _expected_layers() -> dict[str, str]:
+def _expected_pieces() -> list[str]:
     """The mark's two pieces, placed exactly as approved: integer px per unit, box centred, lifted."""
     d = re.search(r' d="([^"]+)"', MARK.read_text(encoding="utf-8")).group(1)
     pieces = [p.strip() for p in d.split("M") if p.strip()]
@@ -51,37 +52,41 @@ def _expected_layers() -> dict[str, str]:
         pts = re.findall(r"(\d+) (\d+)", piece)
         return "M" + " L".join(f"{int(x) * SCALE + dx} {int(y) * SCALE + dy}" for x, y in pts) + " Z"
 
-    return {"cursor": place(pieces[0]), "marker": place(pieces[1])}
+    return [place(pieces[0]), place(pieces[1])]  # cursor, then marker
 
 
-def _layer(name: str) -> tuple[str, str]:
-    svg = (DOCUMENT / "Assets" / f"{name}.svg").read_text(encoding="utf-8")
-    paths = re.findall(r'<path fill="(#[0-9A-Fa-f]{6})" d="([^"]+)"/>', svg)
-    assert len(paths) == 1, f"{name}: exactly one piece per layer"
-    return paths[0][0].upper(), paths[0][1]
+def _mark_layer() -> str:
+    return (DOCUMENT / "Assets" / "mark.svg").read_text(encoding="utf-8")
 
 
 def test_the_document_is_the_approved_composition():
-    expected = _expected_layers()
-    for name, role in (("cursor", "signal"), ("marker", "system")):
-        colour, d = _layer(name)
-        assert d == expected[name], f"{name}: not AUREN-MARK-V1 at 24 px / unit, centred, +16 px"
-        assert colour == _token(role), f"{name}: must be `{role}`"
-        svg = (DOCUMENT / "Assets" / f"{name}.svg").read_text(encoding="utf-8")
-        assert 'viewBox="0 0 1024 1024"' in svg
-        assert not re.search(r"filter|gradient|blur|opacity|stroke|<text|<image", svg), f"{name}: no baked effect"
+    svg = _mark_layer()
+    paths = re.findall(r'<path fill="(#[0-9A-Fa-f]{6})" d="([^"]+)"/>', svg)
+    assert [d for _, d in paths] == _expected_pieces(), "not AUREN-MARK-V1 at 24 px / unit, centred, +16 px"
+    assert {colour.upper() for colour, _ in paths} == {_token("ink")}, "both pieces in one ink: `ink`"
+    assert 'viewBox="0 0 1024 1024"' in svg
+    assert not re.search(r"filter|gradient|blur|opacity|stroke|<text|<image", svg), "no baked effect"
 
 
-def test_the_document_is_flat_two_groups_restrained_material():
+def test_the_icon_carries_no_signal_or_system():
+    """DA-03.3b: the orange / blue pair is retired from the brand; its return must be seen."""
+    for path in [DOCUMENT / "icon.json", *(DOCUMENT / "Assets").iterdir()]:
+        text = path.read_text(encoding="utf-8").upper()
+        for role in ("signal", "system"):
+            assert _token(role) not in text, f"`{role}` is back in {path.name}"
+            assert _srgb(_token(role)).upper() not in text, f"`{role}` is back in {path.name}"
+
+
+def test_the_document_is_flat_one_group_restrained_material():
     doc = json.loads((DOCUMENT / "icon.json").read_text(encoding="utf-8"))
     assert doc["fill"] == {"solid": _srgb(_token("field"))}
-    assert [g["layers"][0]["name"] for g in doc["groups"]] == ["cursor", "marker"]  # cursor in front
+    assert [g["layers"][0]["name"] for g in doc["groups"]] == ["mark"]
     for group in doc["groups"]:
         assert len(group["layers"]) == 1
         assert set(group) == {"layers", "shadow", "translucency"}, "no extra material effect"
         assert group["shadow"] == {"kind": "neutral", "opacity": 0.35}
         assert group["translucency"]["enabled"] is False
-    assert sorted(p.name for p in (DOCUMENT / "Assets").iterdir()) == ["cursor.svg", "marker.svg"]
+    assert sorted(p.name for p in (DOCUMENT / "Assets").iterdir()) == ["mark.svg"]
 
 
 def test_the_app_uses_the_icon_document():
