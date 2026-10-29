@@ -607,6 +607,71 @@
       "authority": "DA-03.2 — the hardened geometry of the DA-03.2 review board, rendered by AurenMark; not a byte copy of a board capture (the board was 2x)",
       "approved_by": "operator — DA-03.2: « ACCEPT — MARK-D-HYBRID becomes AUREN-MARK-V1 », with the baseline list it named",
       "approved_on": "2026-10-27"
+    },
+    {
+      "id": "bodymap-t1-390x180",
+      "file": "bodymap-t1-390x180.png",
+      "visual_id": "PUSH-A-BODYMAP-TRIPTYCH-V1",
+      "fixture": "?fixture=bodymap-t1-390x180",
+      "width": 390,
+      "scenario": "T1: pecs (front) · lateral deltoids (front) · triceps (back), three equal Recessed Windows in Frame C",
+      "pixels": "414x204",
+      "sha256": "85fe1848967a8085232a32a33a248750a27b1e6f3aba8338349935b451467a5c",
+      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
+      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
+      "approved_on": "2026-10-29"
+    },
+    {
+      "id": "bodymap-crop-390x188-push-pecs",
+      "file": "bodymap-crop-390x188-push-pecs.png",
+      "visual_id": "PUSH-A-BODYMAP-TRIPTYCH-V1",
+      "fixture": "?fixture=bodymap-crop-390x188-push-pecs",
+      "width": 390,
+      "scenario": "push-pecs in the session card's BodyMap window (60/40 module, beside « Dernière »)",
+      "pixels": "414x212",
+      "sha256": "27fecd6e65c65f295f089e6ad0c5df53777bce3f67120751c6e17c14f1f64ef1",
+      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
+      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
+      "approved_on": "2026-10-29"
+    },
+    {
+      "id": "bodymap-crop-390x188-push-delt-lat",
+      "file": "bodymap-crop-390x188-push-delt-lat.png",
+      "visual_id": "PUSH-A-BODYMAP-TRIPTYCH-V1",
+      "fixture": "?fixture=bodymap-crop-390x188-push-delt-lat",
+      "width": 390,
+      "scenario": "push-delt-lat in the session card's BodyMap window (60/40 module, beside « Dernière »)",
+      "pixels": "414x212",
+      "sha256": "c7eb688e2aa078951fa0459e6b9e86fee252bf4af72f1212ae2e9ba5593cca89",
+      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
+      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
+      "approved_on": "2026-10-29"
+    },
+    {
+      "id": "bodymap-crop-390x188-push-triceps",
+      "file": "bodymap-crop-390x188-push-triceps.png",
+      "visual_id": "PUSH-A-BODYMAP-TRIPTYCH-V1",
+      "fixture": "?fixture=bodymap-crop-390x188-push-triceps",
+      "width": 390,
+      "scenario": "push-triceps in the session card's BodyMap window (60/40 module, beside « Dernière »)",
+      "pixels": "414x212",
+      "sha256": "d024b5557774fab9fcf7189b23948bbb8956beda968769af17de730972493043",
+      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
+      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
+      "approved_on": "2026-10-29"
+    },
+    {
+      "id": "bodymap-context-390-push-pecs",
+      "file": "bodymap-context-390-push-pecs.png",
+      "visual_id": "PUSH-A-BODYMAP-TRIPTYCH-V1",
+      "fixture": "?fixture=bodymap-context-390-push-pecs",
+      "width": 390,
+      "scenario": "the push-pecs module above the locked load instrument at REST (75 kg, prescription 70)",
+      "pixels": "414x586",
+      "sha256": "bf05df27f7c61c8b2ad46ab4079f2e1bd6c62f245e54ef951e325f4bb858ec16",
+      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
+      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
+      "approved_on": "2026-10-29"
     }
   ]
 }

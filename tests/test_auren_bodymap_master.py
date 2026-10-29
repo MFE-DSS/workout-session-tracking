@@ -169,7 +169,7 @@ def test_registry_hashes_and_status():
     assert r["ai_usage"] == "none"
     assert r["professional_anatomical_review"] == "not-claimed"
     assert r["legal_review"] == "required"
-    assert r["attribution_surface"] == "not-yet-implemented"
+    assert r["attribution_surface"] == "implemented-mobile-journal-sheet"  # DA-04.1
 
 
 def test_registry_status_never_approved():

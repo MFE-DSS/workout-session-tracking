@@ -67,11 +67,15 @@ for (const f of CANDIDATE_FIXTURES) {
       const cut = await fixture
         .getByTestId('window-value')
         .evaluateAll((els) => els.filter((e) => e.scrollWidth > e.clientWidth + 1).length);
+      // DA-04.1 — a zone label is clamped to two lines: it must fit them, never be cut
+      const labelsCut = await fixture
+        .getByTestId('window-text')
+        .evaluateAll((els) => els.filter((e) => e.scrollHeight > e.clientHeight + 1 || e.scrollWidth > e.clientWidth + 1).length);
       const windowVerdict = {
         windowsInsideFrame: windows.every((w) => within(w, content)),
         windowsApart: windows.every((a, i) => windows.every((b, j) => i === j || !overlaps(a, b))),
         contentInsideItsWindow: items.every((it) => fields.some((fl) => within(it, fl))),
-        valuesNotCut: cut === 0,
+        valuesNotCut: cut === 0 && labelsCut === 0,
       };
       writeFileSync(path.join(OUT, `${f.id}.json`), JSON.stringify({ id: f.id, content, windows, fields, items, verdict: windowVerdict }, null, 2));
       expect(windowVerdict, `${f.id}: windows inside Frame C, apart, their content inside them, no value cut`).toEqual({

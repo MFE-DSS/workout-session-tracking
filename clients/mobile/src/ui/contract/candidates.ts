@@ -6,8 +6,8 @@
  * does it move to `CONTRACT_FIXTURES` (fixtures.ts) and get its baseline through
  * `run.sh approve` + the manifest (docs/strategy/AUREN_VISUAL_CONTRACT.md §5).
  *
- * Empty between two iterations: DA-02.5's W1 was approved (« ACCEPT — LOCK W1 ») and
- * moved to fixtures.ts as RECESSED-WINDOW-V1. The next iteration adds its own candidates.
+ * Empty between two iterations: DA-04.1's five BodyMap renders were approved (« oui go »)
+ * and moved to fixtures.ts as PUSH-A-BODYMAP-TRIPTYCH-V1. The next iteration adds its own.
  */
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 
@@ -20,7 +20,6 @@ export type CandidateFixture = {
   fixture: WindowFixture;
 };
 
-/** Empty: DA-02.6's measured windows were approved (« ACCEPT ») and became the RECESSED-WINDOW-V1 baselines. */
 export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = [];
 
 export function candidateById(id: string | null | undefined): CandidateFixture | undefined {
