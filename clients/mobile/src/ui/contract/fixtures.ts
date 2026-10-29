@@ -8,6 +8,8 @@
  * renders exactly what the operator approved. Changing a value here changes a
  * baseline: it is a contract change, not a refactor.
  */
+import type { ZoneCode } from '../bodymap/masterGeometry';
+import { zoneGridHeight } from '../bodymap/triptychLayout';
 import type { BodyMapViewPresetId } from '../bodymap/viewPresets';
 import type { MarkFixture } from '../brand/MarkPlacementFixture';
 import type { Boundaries } from '../calibration/layout';
@@ -41,7 +43,9 @@ export const CALIBRATION_LINE_DEMO: Boundaries & {
 export type BodyMapFixture =
   | { kind: 'triptych' }
   | { kind: 'crop'; preset: BodyMapViewPresetId }
-  | { kind: 'context'; preset: BodyMapViewPresetId };
+  | { kind: 'context'; preset: BodyMapViewPresetId }
+  /** DA-04.2 — a session's panel, DERIVED from its exercises' primary zones (never composed by hand) */
+  | { kind: 'session'; zones: readonly ZoneCode[] };
 
 export type ContractFixture =
   | {
@@ -118,6 +122,14 @@ export type ContractFixture =
       width: number;
       height: number;
       bodymap: BodyMapFixture;
+    }
+  | {
+      /** the baseline id: `bodymap-crop-390x188-<zone>` or `bodymap-session-<slug>` — BODYMAP-ZONES-V1 (DA-04.2) */
+      id: string;
+      contract: 'BODYMAP-ZONES-V1';
+      width: number;
+      height: number;
+      bodymap: BodyMapFixture;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -188,6 +200,22 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'bodymap-crop-390x188-push-delt-lat', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'push-delt-lat' } },
   { id: 'bodymap-crop-390x188-push-triceps', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'push-triceps' } },
   { id: 'bodymap-context-390-push-pecs', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 562, bodymap: { kind: 'context', preset: 'push-pecs' } },
+  // DA-04.2 — « Ok, très bien » (operator, 2026-10-29), BODYMAP-ZONES-V1: one camera per zone, agnostic of
+  // any program (zone → image); a session's panel is derived from its exercises (exercise → zones), here
+  // one example per grid shape: 1, 2, 4, 6 and 7 zones (3 is the locked T1)
+  { id: 'bodymap-crop-390x188-delt-post', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-delt-post' } },
+  { id: 'bodymap-crop-390x188-lats', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-lats' } },
+  { id: 'bodymap-crop-390x188-upper-back', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-upper-back' } },
+  { id: 'bodymap-crop-390x188-biceps', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-biceps' } },
+  { id: 'bodymap-crop-390x188-quads', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-quads' } },
+  { id: 'bodymap-crop-390x188-posterior', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-posterior' } },
+  { id: 'bodymap-crop-390x188-calves', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-calves' } },
+  { id: 'bodymap-crop-390x188-core', contract: 'BODYMAP-ZONES-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'zone-core' } },
+  { id: 'bodymap-session-liss-abs', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(1), bodymap: { kind: 'session', zones: ['core'] } },
+  { id: 'bodymap-session-pull-a', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(2), bodymap: { kind: 'session', zones: ['lats', 'delt_post'] } },
+  { id: 'bodymap-session-push-a', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(4), bodymap: { kind: 'session', zones: ['pecs', 'delt_lat', 'delt_post', 'triceps'] } },
+  { id: 'bodymap-session-short-upper', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(6), bodymap: { kind: 'session', zones: ['pecs', 'lats', 'delt_lat', 'biceps', 'triceps', 'delt_post'] } },
+  { id: 'bodymap-session-full-body-morphotype-priority-v1', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(7), bodymap: { kind: 'session', zones: ['pecs', 'upper_back', 'quads', 'posterior', 'delt_lat', 'delt_post', 'calves'] } },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */

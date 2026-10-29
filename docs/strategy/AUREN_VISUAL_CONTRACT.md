@@ -47,6 +47,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `AUREN-MARK-V1` | **LOCKED** (2026-10-27, « ACCEPT » DA-03.2) | la marque du fabricant : le curseur de l'opérateur au-dessus du repère du système, un axe de visée, le vide entre eux | DA-03.2 — `design/auren/source/brand/mark/`, `AurenMark.tsx`, `markGeometry.ts` (§18) ; asset `provisional` tant que le nom n'est pas dégagé |
 | `AUREN-APP-ICON-V1` | **LOCKED** (2026-10-27 ; révisée le 2026-10-28, DA-03.3b : « le défaut proposé en monochrome ») | l'icône de l'app : `AUREN-MARK-V1` à 54 %, en une seule encre `ink` sur `field` ; le verre et les apparences sont ceux du système | DA-03.3 — `clients/mobile/assets/AurenAppIcon.icon` (Icon Composer), gate `visual-contract/app-icon/` (§19) |
 | `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
+| `BODYMAP-ZONES-V1` | **LOCKED** (2026-10-29, « Ok, très bien ») | une caméra par zone, **agnostique de tout programme** (zone → image) ; le panneau d'une séance se **déduit** de ses exercices (exercice → zones) | DA-04.2 — `clients/mobile/src/ui/bodymap/` (§21) ; banc seulement |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -402,3 +403,26 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **MUST PRESERVE** : un seul master, des caméras seulement ; la zone en `system`, seule couleur ; le contexte en ossature silencieuse ; l'ordre « zone > contexte > châssis » ; l'orientation avant le pourcentage.
 **MUST NEVER** : `signal` (ou tout ambre) sur l'anatomie ; un pourcentage, une intensité, une carte d'activation, une revendication EMG, de récupération, de blessure ou d'efficacité ; redessiner, simplifier ou régénérer un chemin ; serrer une caméra pour atteindre un chiffre ; monter le BodyMap dans le runtime web ; afficher le BodyMap sans la section Licences dans l'app qui le porte.
+
+## 21. `BODYMAP-ZONES-V1` — une image par zone, des séances qui s'en déduisent (DA-04.2, 2026-10-29)
+
+**Décision de l'opérateur** : « de manière agnostique, tu associes les images à des zones de travail. Ces zones de travail sont après exploitées par des exercices comme muscles principaux ou secondaires […] Et après, les exercices sont ajoutés dans les programmes » ; sur la planche : « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones ».
+
+**La chaîne, dans cet ordre** :
+
+1. **zone → image** : une caméra par zone de la taxonomie (11), sur le même master, même règle que §20 (boîte gardée visible, élargie au format, jamais coupée). Aucune caméra ne connaît un programme.
+2. **exercice → zones** : un exercice exploite une zone principale et, le cas échéant, des zones secondaires — données par le résolveur canonique (`resolve_exercise_zones`), jamais choisies par l'écran.
+3. **séance → panneau** : le panneau d'une séance est **dérivé** de ses exercices (`sessionZones`) — leurs zones principales, dans l'ordre de première apparition. Il n'est **jamais** composé à la main.
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | LOCKED · banc seulement : monté sur **aucun** écran produit |
+| **Caméras ajoutées** (`viewPresets.ts`) | deltoïdes postérieurs, dos largeur, dos épaisseur, ischios / fessiers, mollets : **dos** ; biceps, quadriceps, core / abdos : **face** ; ischios / fessiers gardent la taille, les mollets gardent les genoux. Les trois de §20 restent telles quelles |
+| **Grille** (`zoneGridLayout`) | fenêtres **égales**, **trois par ligne au plus** (jamais plus larges qu'en T1, donc la géométrie n'est jamais agrandie au-delà de T1), lignes équilibrées, dernière ligne incomplète alignée à gauche ; 3 zones = **exactement** T1 ; 1 · 2 · 4 (2 × 2) · 5 (3 + 2) · 6 (3 + 3) · 7 (3 + 3 + 1) |
+| **Baselines approuvées** | `bodymap-crop-390x188-delt-post`, `bodymap-crop-390x188-lats`, `bodymap-crop-390x188-upper-back`, `bodymap-crop-390x188-biceps`, `bodymap-crop-390x188-quads`, `bodymap-crop-390x188-posterior`, `bodymap-crop-390x188-calves`, `bodymap-crop-390x188-core` ; panneaux dérivés (un par forme de grille) `bodymap-session-liss-abs`, `bodymap-session-pull-a`, `bodymap-session-push-a`, `bodymap-session-short-upper`, `bodymap-session-full-body-morphotype-priority-v1` |
+| **Gardes** | `tests/test_auren_bodymap_runtime.py` (une caméra par zone, libellés du contrat) ; `viewPresets.test.ts` (une caméra par zone, 3 zones = T1, forme de grille, fenêtres égales) |
+
+**Dette `ANATOMY-V2` ajoutée** : dos largeur (Servier), zone source presque rectangulaire — elle localise, elle ne décrit pas les dorsaux.
+
+**MUST PRESERVE** : une caméra par zone, indépendante des programmes ; le panneau de séance dérivé des exercices ; des fenêtres égales, trois par ligne au plus ; tout ce que §20 préserve.
+**MUST NEVER** : une image propre à un programme ; un panneau composé à la main ; une zone devinée pour un exercice sans zone connue (il n'ajoute rien) ; une fenêtre plus large qu'en T1 ; tout ce que §20 interdit.
