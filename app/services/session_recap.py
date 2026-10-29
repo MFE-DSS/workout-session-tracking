@@ -11,8 +11,8 @@ from typing import Any
 
 from app.models.session import WorkoutSession
 from app.services.anomalies import compute_anomalies
+from app.services.body_zone_source import resolve_exercise_zones
 from app.services.confidence import LEVEL_LABELS, compute_confidence_score, level_for
-from app.services.muscle_mapping import classify_exercise
 from app.services.progress_signals import (
     DECLARED_CONCENTRATION_LABELS,
     DECLARED_STATE_LABELS,
@@ -127,7 +127,10 @@ def _zones_touched(session: WorkoutSession) -> list[dict[str, Any]]:
     counts: dict[str, int] = {}
     for se in session.session_exercises:
         name = actual_exercise_name(se)
-        primary, _ = classify_exercise(name)
+        # Zones agnostiques (opérateur, 2026-10-29) : le contrat canonique, corrections
+        # revues comprises — le même que le plan mobile, pour que le relevé et la carte
+        # de séance nomment la même zone pour le même exercice.
+        primary = resolve_exercise_zones(None, name).primary
         if primary == "unknown":
             continue
         done_work = sum(
