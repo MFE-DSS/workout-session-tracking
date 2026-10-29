@@ -270,6 +270,22 @@ professionnelles toujours **non réalisées**.
 **ouverte** (`/register`). L'exposition réelle est donc plus large qu'« interne contrôlé ». Fermer l'inscription,
 masquer les planches derrière un drapeau, ou accepter l'exposition : décision de l'opérateur.
 
+## Mannequin canonique V1 — provenance (DA-05.0, 2026-10-29)
+```
+asset_id: auren.mannequin.canonical.v1 (front, profile, three-quarter-front, three-quarter-back, back)
+author: operator (Martin Feldmann), generated with Midjourney; views selected and approved by the operator
+owner: OPERATIONAL REPOSITORY OWNER
+ip_ownership_status: not-legally-reviewed (Midjourney terms of the operator's plan to verify)
+source_type: ai-generated-reference
+ai_usage: midjourney-generated — REFERENCE ONLY, never the final source (AUREN_VISUAL_BACKBONE §8.2)
+files: NOT in the repository (no raster under design/auren/, public repository); identified by sha256 in
+  design/auren/source/mannequin/auren_mannequin_v1_source.yaml
+production_asset: vector reconstruction — NOT YET PRODUCED
+status: canonical-visual-reference-accepted · runtime_authorization: blocked · legal_review: required
+```
+**Aucune entrée `approved`/`legally-cleared`.** La référence fixe l'apparence ; seule la reconstruction vectorielle
+pourra entrer dans l'app, après revue juridique et décision de l'opérateur.
+
 ## Calibration System — références visuelles (DA-02.2, 2026-10-25)
 ```
 asset_id: auren.calibration.reference.{reference-marker,active-cursor}.trace-v1

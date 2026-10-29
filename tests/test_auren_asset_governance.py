@@ -289,6 +289,9 @@ ALLOWED_STRUCTURED_FILES = {
     "design/auren/source/icons/auren_icon_subset.yaml",
     # Sb_ASSET_03B.2R-D1 — P0 Muscle Focus plate descriptor registry (governed evolution).
     "design/auren/source/muscle-focus/auren_muscle_focus_registry.yaml",
+    # DA-05.0 — canonical mannequin V1 registry: five AI-generated views identified by hash, reference only
+    # (the rasters stay out of the repository). Detailed guard: tests/test_auren_mannequin_v1.py.
+    "design/auren/source/mannequin/auren_mannequin_v1_source.yaml",
 }
 
 STRUCTURED_SUFFIXES = {".yaml", ".yml", ".json"}
