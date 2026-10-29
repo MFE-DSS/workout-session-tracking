@@ -52,6 +52,11 @@ export type PlanExercise = {
    */
   zone: { zone: string; label: string } | null;
   /**
+   * The secondary zones the exercise also uses (e.g. triceps for a press), from the same
+   * canonical resolver as `zone`. Optional: a payload from before 2026-10-29 has none.
+   */
+  secondary_zones?: { zone: string; label: string }[];
+  /**
    * Rest after a set of this exercise, supplied by the read model (engine V2
    * derives it at prescription time). Absent → the plan's default. The client
    * never hardcodes a rest duration.

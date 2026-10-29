@@ -26,9 +26,9 @@ from sqlalchemy.orm import Session, selectinload
 
 from app.enums import SessionStatus
 from app.models.session import SessionExercise, SetLog, WorkoutSession
+from app.services.body_zone_source import resolve_exercise_zones
 from app.services.console_state import REST_FALLBACK_SECONDS
 from app.services.mission_position import open_session_position
-from app.services.muscle_mapping import classify_exercise
 from app.services.overload_engine import compute_overload_hint
 from app.services.overload_explainer import explain_overload_hint
 from app.services.overload_inputs import build_overload_input_for_exercise
@@ -202,8 +202,11 @@ def _exercise(db: Session, s: WorkoutSession, se: SessionExercise, last: dict) -
     rng = _rep_range(se)
     te = se.template_exercise
     suggestions = compute_suggestions(te) if te else {}
-    # même règle que le relevé serveur (`session_recap._zones_touched`)
-    primary, _ = classify_exercise(actual_exercise_name(se))
+    # Zones agnostiques (opérateur, 2026-10-29) : une image par zone, des exercices qui
+    # exploitent une zone principale et des secondaires. Le contrat canonique (corrections
+    # revues → mapping formel → repli) ; même autorité que le relevé (`_zones_touched`).
+    zones = resolve_exercise_zones(db, actual_exercise_name(se))
+    primary = zones.primary
     return {
         SE_ID: se.id, "code": se.exercise_code_snapshot,
         "prescribed_name": se.exercise_name_snapshot, "executed_name": actual_exercise_name(se),
@@ -222,6 +225,7 @@ def _exercise(db: Session, s: WorkoutSession, se: SessionExercise, last: dict) -
         ],
         "zone": None if primary == "unknown" else {"zone": primary,
                                                     "label": _ZONE_LABELS.get(primary, primary)},
+        "secondary_zones": [{"zone": z, "label": _ZONE_LABELS.get(z, z)} for z in zones.secondary],
         "rest_seconds": None,
         "best": _best(db, s, se.exercise_code_snapshot),
     }

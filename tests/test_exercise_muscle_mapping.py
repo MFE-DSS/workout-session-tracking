@@ -47,6 +47,8 @@ FORBIDDEN_CONSUMER_FILES = [
     "app/services/recommendation.py",
     "app/services/profile_metrics.py",
     "app/services/session_recap.py",
+    # 2026-10-29 — the mobile plan was a consumer the list did not name
+    "app/services/mobile_read_models.py",
 ]
 
 
@@ -343,6 +345,12 @@ def test_only_the_authorised_consumer_reads_the_formal_contract():
     migrated = {
         "app/services/muscle_scoring.py",
         "app/services/recommendation.py",
+        # Zones agnostiques, décision de l'opérateur (2026-10-29) : « tu associes les images à des
+        # zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires
+        # […] de manière agnostique pour résoudre les zones ». Le plan et le relevé servis à l'app
+        # nomment la même zone, corrections revues comprises (`test_mobile_zones_canonical.py`).
+        "app/services/mobile_read_models.py",
+        "app/services/session_recap.py",
     }
     for rel in FORBIDDEN_CONSUMER_FILES:
         source = (ROOT / rel).read_text(encoding="utf-8")
