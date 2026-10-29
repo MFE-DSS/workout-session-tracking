@@ -97,8 +97,10 @@ def test_presets_name_existing_zones_with_product_labels():
     mapping = json.loads(MAPPING.read_text(encoding="utf-8"))
     labels = {z["code"]: z["label_fr"] for z in mapping["zones"]}
     src = PRESETS_TS.read_text(encoding="utf-8")
-    presets = re.findall(r"id: '(push-[a-z-]+)', zone: '([a-z_]+)', side: '(front|back)'.*?label: '([^']+)'", src)
-    assert [p[0] for p in presets] == ["push-pecs", "push-delt-lat", "push-triceps"]
+    presets = re.findall(r"id: '((?:push|zone)-[a-z-]+)', zone: '([a-z_]+)', side: '(front|back)'.*?label: '([^']+)'", src)
+    assert [p[0] for p in presets][:3] == ["push-pecs", "push-delt-lat", "push-triceps"]
+    # DA-04.2 — exactly one camera per zone of the taxonomy
+    assert sorted(p[1] for p in presets) == sorted(labels)
     for _id, zone, _side, label in presets:
         assert labels[zone] == label
 
