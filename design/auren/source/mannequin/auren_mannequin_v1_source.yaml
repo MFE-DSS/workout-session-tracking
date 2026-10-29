@@ -1,0 +1,51 @@
+{
+  "_doc": "AUREN canonical exercise mannequin V1 - source registry (DA-05.0 intake). YAML 1.2 / JSON-compatible, read by tests/test_auren_mannequin_v1.py. Spec: docs/strategy/AUREN_CANONICAL_MANNEQUIN_V1_SPEC.md. The rasters are NOT in the repository (no raster under design/auren/, public repository): they are identified here by sha256 and kept in operator storage.",
+  "asset_id": "auren.mannequin.canonical.v1",
+  "version": "1.0.0",
+  "intake_sprint": "DA-05.0",
+  "intake_date": "2026-10-29",
+
+  "status": "canonical-visual-reference-accepted",
+  "role": "canonical VISUAL REFERENCE of the one articulable human of AUREN; the production asset is its vector reconstruction (not yet produced)",
+  "production_asset_status": "vector-reconstruction-required",
+  "runtime_authorization": "blocked",
+  "legal_review": "waived-by-operator",
+  "usage_rights": "operator-declared complete (2026-10-29): « le droit d'usage est complet, c'est généré par moi-même »",
+  "professional_anatomical_review": "not-claimed",
+
+  "ai_usage": "midjourney-generated (operator, 2026-10-29) - reference only, never the final source (AUREN_VISUAL_BACKBONE 8.2: IA = moodboard)",
+  "approved_by": "operator, 2026-10-29: « Treat the approved 5-view pack as the canonical visual source », « Do not redesign the mannequin »",
+
+  "canvas": [1024, 1024],
+  "color_mode": "RGB",
+  "views": [
+    {"view": "front", "file": "auren_mannequin_v1_front.png", "operator_file": "mannequin_front_v1.png",
+     "facing": "viewer", "sha256": "ee18ffc5a629d8c1b1e6d20984277e8b6aac9be96eff006e107c7940b732893c", "bytes": 589170,
+     "body_bbox": [250, 38, 774, 980], "body_height_px": 942, "bbox_center_offset_px": 0},
+    {"view": "profile", "file": "auren_mannequin_v1_profile.png", "operator_file": "mannequin_profile_v1.png",
+     "facing": "image-left", "sha256": "60898614ed9692d655b733d66c7dba71b59fad95231c35f5e9c40c0d7eb23257", "bytes": 888603,
+     "body_bbox": [362, 40, 622, 980], "body_height_px": 940, "bbox_center_offset_px": -20},
+    {"view": "three-quarter-front", "file": "auren_mannequin_v1_three_quarter_front.png", "operator_file": "mannequin_3q_front_v1.png",
+     "facing": "image-right", "sha256": "033f6ec9da38594adffe57059f027e1caf998479a499f2e92b1a4b04ddd5a047", "bytes": 967840,
+     "body_bbox": [314, 40, 730, 978], "body_height_px": 938, "bbox_center_offset_px": 10},
+    {"view": "three-quarter-back", "file": "auren_mannequin_v1_three_quarter_back.png", "operator_file": "mannequin_3q_back_v1.png",
+     "facing": "away, image-right", "sha256": "5b63df7ef6d7198b5feef4a51325ee0e2f045a45c636f06cdaef028b08da5b13", "bytes": 895651,
+     "body_bbox": [266, 40, 736, 980], "body_height_px": 940, "bbox_center_offset_px": -11},
+    {"view": "back", "file": "auren_mannequin_v1_back.png", "operator_file": "mannequin_back_v1.png",
+     "facing": "away", "sha256": "c2ced218f377a72cf3172c1146ef16e1787b24a5ad4309a472ac330e57a5f2a8", "bytes": 907496,
+     "body_bbox": [250, 40, 774, 980], "body_height_px": 940, "bbox_center_offset_px": 0}
+  ],
+  "back_selection_note": "the straight back view is mannequin_back_v1.png - pixel-identical to the back image the operator attached; the near-identical candidate mannequin-dos-2.png is NOT selected",
+
+  "measured_framing": {
+    "head_top_y_px": [38, 40],
+    "feet_y_px": [978, 980],
+    "body_height_px": [938, 942],
+    "body_height_pct_of_canvas": 91.8,
+    "bbox_center_offset_px": [-20, 10],
+    "background_rgb_measured": ["#F0F2F6", "#F1F4F7", "#F2F5F8", "#F0F4F6", "#F0F3F6"],
+    "body_tone_rgb_median": "#1A1E24"
+  },
+
+  "zone_compatibility": "the vector reconstruction carries the eleven BodyMap zone codes of auren_bodymap_mapping.yaml as named mass groups (no new zone, no new code)"
+}
