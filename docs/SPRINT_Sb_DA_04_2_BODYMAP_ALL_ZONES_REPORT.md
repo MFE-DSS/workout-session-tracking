@@ -110,5 +110,13 @@ classifieur, sans les corrections revues : « Rear delt fly machine (pec deck in
 agnostique pour résoudre les zones ») appelle le résolveur canonique, principale et secondaires : tranche serveur
 séparée.
 
+## Annexe de clôture (2026-10-29)
+
+- Gate vérifié avant fusion : tête `7863f3f`, 11 / 11 checks verts (contrat visuel : 64 baselines identiques au
+  pixel en CI), Sonar PR `OK`, 0 fil ouvert, `CLEAN`.
+- PR #321 fusionnée en `--merge --match-head-commit` : **`176e2d0`** ; CI canonique `40880892913` **verte**.
+- Le constat du §6 est corrigé par PR #322 (`7a3c17e`) : le plan mobile et le relevé résolvent les zones par le
+  contrat canonique.
+
 **Verdict :** `BODYMAP-ZONES-V1` **LOCKED** — 11 caméras agnostiques, panneau de séance dérivé, 13 baselines
 approuvées par l'opérateur ; aucun écran produit ne le monte encore.
