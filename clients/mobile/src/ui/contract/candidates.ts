@@ -6,8 +6,8 @@
  * does it move to `CONTRACT_FIXTURES` (fixtures.ts) and get its baseline through
  * `run.sh approve` + the manifest (docs/strategy/AUREN_VISUAL_CONTRACT.md §5).
  *
- * Empty between two iterations: DA-04.1's five BodyMap renders were approved (« oui go »)
- * and moved to fixtures.ts as PUSH-A-BODYMAP-TRIPTYCH-V1. The next iteration adds its own.
+ * Empty between two iterations: DA-04.2's zone cameras and session panels were approved
+ * (« Ok, très bien ») and moved to fixtures.ts as BODYMAP-ZONES-V1. The next iteration adds its own.
  */
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 

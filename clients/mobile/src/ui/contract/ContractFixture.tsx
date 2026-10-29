@@ -1,8 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { BodyMapTriptych } from '../bodymap/BodyMapTriptych';
-import { presetById, PUSH_A_PRESETS } from '../bodymap/viewPresets';
+import { BodyMapTriptych, SessionBodyMap } from '../bodymap/BodyMapTriptych';
+import { type BodyMapViewPreset, presetById, presetForZone, PUSH_A_PRESETS } from '../bodymap/viewPresets';
 import { MarkPlacementFixture } from '../brand/MarkPlacementFixture';
 import { CalibrationRail } from '../calibration/CalibrationRail';
 import { HorizontalInstrumentSurface } from '../instrument/HorizontalInstrumentSurface';
@@ -23,7 +23,9 @@ function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
   if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
   if (f.contract === 'AUREN-MARK-V1') return <MarkPlacementFixture f={f.mark} />;
-  if (f.contract === 'PUSH-A-BODYMAP-TRIPTYCH-V1') return <BodyMapGoverned width={f.width} height={f.height} bodymap={f.bodymap} />;
+  if (f.contract === 'PUSH-A-BODYMAP-TRIPTYCH-V1' || f.contract === 'BODYMAP-ZONES-V1') {
+    return <BodyMapGoverned width={f.width} height={f.height} bodymap={f.bodymap} />;
+  }
   if (f.contract === 'SESSION-CARD-R1') {
     return <SessionSetCard screenWidth={f.width} screenHeight={f.height} selectedValue={f.selectedValue} presentation={f.presentation} />;
   }
@@ -69,6 +71,10 @@ function Governed({ f }: { f: ContractFixture }) {
  */
 function BodyMapGoverned({ width, height, bodymap }: { width: number; height: number; bodymap: BodyMapFixture }) {
   if (bodymap.kind === 'triptych') return <BodyMapTriptych width={width} height={height} presets={PUSH_A_PRESETS} />;
+  if (bodymap.kind === 'session') {
+    const presets = bodymap.zones.map((z) => presetForZone(z)).filter((p): p is BodyMapViewPreset => p !== undefined);
+    return <SessionBodyMap width={width} presets={presets} />;
+  }
   const module = (
     <WindowModule width={width} height={188} layout="split-60-40" contents={[{ kind: 'bodymap-view', preset: presetById(bodymap.preset) }, LAST]} />
   );

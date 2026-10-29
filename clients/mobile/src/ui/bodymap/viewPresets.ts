@@ -13,7 +13,18 @@ import type { BodySide, ZoneCode } from './masterGeometry';
 
 export type Box = { x: number; y: number; w: number; h: number };
 
-export type BodyMapViewPresetId = 'push-pecs' | 'push-delt-lat' | 'push-triceps';
+export type BodyMapViewPresetId =
+  | 'push-pecs'
+  | 'push-delt-lat'
+  | 'push-triceps'
+  | 'zone-delt-post'
+  | 'zone-lats'
+  | 'zone-upper-back'
+  | 'zone-biceps'
+  | 'zone-quads'
+  | 'zone-posterior'
+  | 'zone-calves'
+  | 'zone-core';
 
 export type BodyMapViewPreset = {
   id: BodyMapViewPresetId;
@@ -37,10 +48,35 @@ export const PUSH_A_PRESETS: readonly BodyMapViewPreset[] = [
   { id: 'push-triceps', zone: 'triceps', side: 'back', frame: { x: 152, y: 40, w: 56, h: 40 }, label: 'Triceps' },
 ];
 
+/**
+ * DA-04.2 — one camera per zone for the other eight, same rule. Views: the deltoïde postérieur,
+ * the back, the posterior chain and the calves from the BACK; biceps, quadriceps and core from
+ * the FRONT. The posterior chain keeps the waist and the calves keep the knees in frame, so
+ * the legs never float.
+ */
+const OTHER_ZONE_PRESETS: readonly BodyMapViewPreset[] = [
+  { id: 'zone-delt-post', zone: 'delt_post', side: 'back', frame: { x: 154, y: 36, w: 52, h: 30 }, label: 'Deltoïdes postérieurs' },
+  { id: 'zone-lats', zone: 'lats', side: 'back', frame: { x: 152, y: 44, w: 56, h: 62 }, label: 'Dos largeur' },
+  { id: 'zone-upper-back', zone: 'upper_back', side: 'back', frame: { x: 152, y: 24, w: 56, h: 54 }, label: 'Dos épaisseur' },
+  { id: 'zone-biceps', zone: 'biceps', side: 'front', frame: { x: 32, y: 40, w: 56, h: 42 }, label: 'Biceps' },
+  { id: 'zone-quads', zone: 'quads', side: 'front', frame: { x: 38, y: 86, w: 44, h: 64 }, label: 'Quadriceps' },
+  { id: 'zone-posterior', zone: 'posterior', side: 'back', frame: { x: 156, y: 74, w: 48, h: 78 }, label: 'Ischios / Fessiers' },
+  { id: 'zone-calves', zone: 'calves', side: 'back', frame: { x: 160, y: 118, w: 40, h: 60 }, label: 'Mollets' },
+  { id: 'zone-core', zone: 'core', side: 'front', frame: { x: 40, y: 60, w: 40, h: 46 }, label: 'Core / Abdos' },
+];
+
+/** Every camera, one per zone of the taxonomy (the Push A three keep their locked names). */
+export const ZONE_PRESETS: readonly BodyMapViewPreset[] = [...PUSH_A_PRESETS, ...OTHER_ZONE_PRESETS];
+
 export function presetById(id: BodyMapViewPresetId): BodyMapViewPreset {
-  const p = PUSH_A_PRESETS.find((q) => q.id === id);
+  const p = ZONE_PRESETS.find((q) => q.id === id);
   if (!p) throw new Error(`unknown BodyMap preset: ${id}`);
   return p;
+}
+
+/** The camera of a zone; `undefined` for a code outside the taxonomy (« unknown » shows nothing). */
+export function presetForZone(zone: string): BodyMapViewPreset | undefined {
+  return ZONE_PRESETS.find((p) => p.zone === zone);
 }
 
 const HALF: Record<BodySide, { lo: number; hi: number }> = { front: { lo: 0, hi: 120 }, back: { lo: 120, hi: 240 } };

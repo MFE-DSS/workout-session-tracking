@@ -8,8 +8,8 @@ import { RecessedWindow } from '../instrument/RecessedWindow';
 import { recessedWindowGeometry } from '../instrument/recessedWindowGeometry';
 import { type as typeRole } from '../theme';
 import { BodyMapView } from './BodyMapView';
-import { triptychLayout } from './triptychLayout';
-import type { BodyMapViewPreset } from './viewPresets';
+import { zoneGridHeight, zoneGridLayout } from './triptychLayout';
+import { type BodyMapViewPreset, presetForZone } from './viewPresets';
 
 /**
  * DA-04.1 — the Push A triptych (T1, operator 2026-10-29): three cameras over the same
@@ -39,7 +39,7 @@ export function BodyMapWindowContent(p: { preset: BodyMapViewPreset; width: numb
 export function BodyMapTriptych(p: { width: number; height: number; presets: readonly BodyMapViewPreset[] }) {
   const u = UNIT[densityFor(p.width)];
   const frame = frameGeometry('rail', p.width, p.height, u);
-  const boxes = triptychLayout({ x: 0, y: 0, w: frame.content.w, h: frame.content.h }, u);
+  const boxes = zoneGridLayout(p.presets.length, { x: 0, y: 0, w: frame.content.w, h: frame.content.h }, u);
   return (
     <InstrumentFrame variant="rail" width={p.width} height={p.height} u={u} testID="bodymap-triptych">
       {boxes.map((b, i) => {
@@ -54,4 +54,24 @@ export function BodyMapTriptych(p: { width: number; height: number; presets: rea
       })}
     </InstrumentFrame>
   );
+}
+
+/**
+ * DA-04.2 — the zones a session trains, in order of first appearance, from its exercises' primary
+ * zone (the plan's `zone` field). An exercise without a known zone adds nothing: absence is not
+ * drawn as a guess.
+ */
+export function sessionZones(exercises: readonly { zone: { zone: string } | null }[]): BodyMapViewPreset[] {
+  const out: BodyMapViewPreset[] = [];
+  for (const e of exercises) {
+    const p = e.zone ? presetForZone(e.zone.zone) : undefined;
+    if (p && !out.includes(p)) out.push(p);
+  }
+  return out;
+}
+
+/** The session's BodyMap: every zone it trains, one equal window each, in one Frame C. */
+export function SessionBodyMap(p: { width: number; presets: readonly BodyMapViewPreset[] }) {
+  if (p.presets.length === 0) return null;
+  return <BodyMapTriptych width={p.width} height={zoneGridHeight(p.presets.length)} presets={p.presets} />;
 }
