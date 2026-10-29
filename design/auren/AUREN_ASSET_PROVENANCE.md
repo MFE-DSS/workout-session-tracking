@@ -275,16 +275,17 @@ masquer les planches derrière un drapeau, ou accepter l'exposition : décision 
 asset_id: auren.mannequin.canonical.v1 (front, profile, three-quarter-front, three-quarter-back, back)
 author: operator (Martin Feldmann), generated with Midjourney; views selected and approved by the operator
 owner: OPERATIONAL REPOSITORY OWNER
-ip_ownership_status: not-legally-reviewed (Midjourney terms of the operator's plan to verify)
+ip_ownership_status: not-legally-reviewed (no external review) — usage rights DECLARED COMPLETE by the operator,
+  who generated the views himself (2026-10-29): « le droit d'usage est complet, c'est généré par moi-même »
 source_type: ai-generated-reference
 ai_usage: midjourney-generated — REFERENCE ONLY, never the final source (AUREN_VISUAL_BACKBONE §8.2)
 files: NOT in the repository (no raster under design/auren/, public repository); identified by sha256 in
   design/auren/source/mannequin/auren_mannequin_v1_source.yaml
 production_asset: vector reconstruction — NOT YET PRODUCED
-status: canonical-visual-reference-accepted · runtime_authorization: blocked · legal_review: required
+status: canonical-visual-reference-accepted · runtime_authorization: blocked · legal_review: waived-by-operator
 ```
 **Aucune entrée `approved`/`legally-cleared`.** La référence fixe l'apparence ; seule la reconstruction vectorielle
-pourra entrer dans l'app, après revue juridique et décision de l'opérateur.
+pourra entrer dans l'app, sur décision de l'opérateur.
 
 ## Calibration System — références visuelles (DA-02.2, 2026-10-25)
 ```

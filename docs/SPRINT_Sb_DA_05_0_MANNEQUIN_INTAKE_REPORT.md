@@ -29,7 +29,8 @@ source finale, c'est un amendement explicite de `§8.2`.
 les cinq fichiers sont identifiés par **sha256** dans le registre et restent chez l'opérateur.
 
 **Risques** : dos ambigu (deux candidats proches) → retenu celui identique au pixel à l'image jointe
-(`mannequin_back_v1.png`), l'autre nommé et écarté ; droits d'usage des sorties IA → `legal_review: required` ;
+(`mannequin_back_v1.png`), l'autre nommé et écarté ; droits d'usage des sorties IA → déclarés complets par l'opérateur, qui les a générées lui-même
+(« le droit d'usage est complet, c'est généré par moi-même ») : `legal_review: waived-by-operator` ;
 mesures fausses dans la spec → seules les mesures robustes sont publiées (toile, crâne, sol, hauteur, centrage,
 entrejambe) ; un repère d'épaule calculé contredisait l'image (les bras en A faussaient la largeur) et n'a pas été
 retenu.

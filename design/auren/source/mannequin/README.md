@@ -25,5 +25,6 @@ NOT AUTHORIZED FOR APP INTEGRATION
 
 ## Règle
 
-La présence d'une référence n'autorise **aucune** intégration. L'intégration exige la reconstruction vectorielle,
-une revue juridique des sorties IA et une décision de l'opérateur, consignées dans le registre.
+La présence d'une référence n'autorise **aucune** intégration. L'intégration exige la reconstruction vectorielle et
+une décision de l'opérateur, consignées dans le registre. Les droits d'usage des cinq vues sont déclarés complets
+par l'opérateur, qui les a générées lui-même (2026-10-29).

@@ -4,7 +4,8 @@ The five approved views are an AI-generated (Midjourney) VISUAL REFERENCE. AUREN
 « jamais d'IA comme source finale (IA = moodboard) » and « un mannequin vectoriel commun articulé ». So:
 
 * the registry names exactly five views, by sha256, with their orientation and measured framing;
-* the reference is never a runtime asset (blocked), its AI provenance is declared, legal review stays required;
+* the reference is never a runtime asset (blocked), its AI provenance is declared, and the operator's own
+  declaration of complete usage rights is recorded as such (never as an external legal clearance);
 * the production asset is a vector reconstruction carrying the eleven BodyMap zone codes — no new code;
 * no raster ever enters design/auren/ (the existing permanent guard), the rasters live in operator storage.
 Stdlib only.
@@ -57,7 +58,9 @@ def test_a_reference_never_crosses_into_the_runtime():
     assert r["status"] == "canonical-visual-reference-accepted"
     assert r["production_asset_status"] == "vector-reconstruction-required"
     assert r["runtime_authorization"] == "blocked"
-    assert r["legal_review"] == "required"
+    # the operator generated the views and declared the usage rights complete (2026-10-29)
+    assert r["legal_review"] == "waived-by-operator"
+    assert "généré par moi-même" in r["usage_rights"]
     assert r["professional_anatomical_review"] == "not-claimed"
     for f in ("status", "runtime_authorization", "legal_review", "production_asset_status"):
         assert r[f] not in {"approved", "legally-cleared", "runtime-integrated"}, f

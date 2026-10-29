@@ -20,8 +20,8 @@
 | **Ce qui n'entre pas dans le dépôt** | les rasters : aucun raster n'est permis sous `design/auren/`, et le dépôt est public. Ils sont identifiés par sha256 dans le registre. |
 
 Statuts : `canonical-visual-reference-accepted` · `vector-reconstruction-required` · `runtime_authorization: blocked` ·
-`legal_review: required` (droits d'usage des sorties Midjourney selon l'abonnement — ce document n'est pas un avis
-juridique) · `professional_anatomical_review: not-claimed`.
+`legal_review: waived-by-operator` — droits d'usage **déclarés complets par l'opérateur**, qui a généré les vues
+lui-même (2026-10-29) · `professional_anatomical_review: not-claimed`.
 
 ---
 

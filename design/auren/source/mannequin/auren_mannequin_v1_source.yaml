@@ -9,7 +9,8 @@
   "role": "canonical VISUAL REFERENCE of the one articulable human of AUREN; the production asset is its vector reconstruction (not yet produced)",
   "production_asset_status": "vector-reconstruction-required",
   "runtime_authorization": "blocked",
-  "legal_review": "required",
+  "legal_review": "waived-by-operator",
+  "usage_rights": "operator-declared complete (2026-10-29): « le droit d'usage est complet, c'est généré par moi-même »",
   "professional_anatomical_review": "not-claimed",
 
   "ai_usage": "midjourney-generated (operator, 2026-10-29) - reference only, never the final source (AUREN_VISUAL_BACKBONE 8.2: IA = moodboard)",
