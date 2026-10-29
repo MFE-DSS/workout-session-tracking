@@ -60,7 +60,15 @@ retenu.
 
 ## 4. Vérification
 
-Voir l'annexe de clôture.
+- `check_scope` : `ISOLATED` ; 138 tests ciblés verts (dont 8 neufs) ; protocole de spec et ruff OK.
+- Les cinq vues du paquet canonique de l'opérateur ont été recopiées sous leurs noms canoniques ; chaque sha256
+  correspond au registre.
+
+## Annexe de clôture (2026-10-29)
+
+- Gate vérifié avant fusion : tête `51ffd4a` (la déclaration de droits de l'opérateur ajoutée), 10 checks verts —
+  Gitar, bot non requis, n'a pas reposté —, Sonar PR `OK`, 0 fil ouvert, `CLEAN`.
+- PR #324 fusionnée en `--merge --match-head-commit` : **`12fbdfa`** ; CI canonique `40936833333` **verte**.
 
 **Verdict :** pack de cinq vues accepté comme **référence visuelle canonique** du mannequin V1 ; spécification de
 production écrite ; reconstruction vectorielle requise avant toute intégration ; décision `§8.2` respectée.
