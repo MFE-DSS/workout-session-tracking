@@ -150,5 +150,14 @@ et le torse symétrique oriente l'œil. **Deux côtés** pour les trois caméras
 - Docker recrée un dossier `node_modules` vide après chaque passage : un lien posé ensuite atterrit **dedans**.
   Retiré et reposé au bon endroit (piège déjà connu).
 
+## Annexe de clôture (2026-10-29)
+
+- Gate vérifié juste avant fusion : tête `93879d1`, 11 / 11 checks verts (dont le contrat visuel : 51 baselines
+  identiques au pixel en CI), Sonar PR `OK` (0 sur toutes les conditions), 0 fil ouvert, `CLEAN`.
+- PR #319 fusionnée en `--merge --match-head-commit` (GO MERGE permanent, tranche commandée) : **`13cfefa`**.
+- **CI canonique** sur le push : run `40871507944`, **verte**.
+- Suite ouverte dans la foulée : DA-04.2 (les 11 zones, un panneau par séance), en revue chez l'opérateur, non
+  commitée. Constat à trancher : le modèle de lecture mobile classe encore les zones par l'ancien classifieur.
+
 **Verdict :** `PUSH-A-BODYMAP-TRIPTYCH-V1` **LOCKED** — T1, zone en `system`, cinq baselines approuvées par
 l'opérateur, master intouché, attribution livrée ; aucun écran produit ne le monte encore.
