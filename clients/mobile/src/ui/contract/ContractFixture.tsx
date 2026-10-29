@@ -1,16 +1,18 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
+import { BodyMapTriptych } from '../bodymap/BodyMapTriptych';
+import { presetById, PUSH_A_PRESETS } from '../bodymap/viewPresets';
 import { MarkPlacementFixture } from '../brand/MarkPlacementFixture';
 import { CalibrationRail } from '../calibration/CalibrationRail';
 import { HorizontalInstrumentSurface } from '../instrument/HorizontalInstrumentSurface';
 import { InstrumentFrame } from '../instrument/InstrumentFrame';
 import { InstrumentWithStepControls } from '../instrument/InstrumentWithStepControls';
-import { RecessedWindowFixture } from '../instrument/RecessedWindowFixture';
+import { LAST, RecessedWindowFixture, WindowModule } from '../instrument/RecessedWindowFixture';
 import { SessionSetCard } from '../instrument/SessionSetCard';
 import { color, type } from '../theme';
 import { candidateById } from './candidates';
-import { CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
+import { type BodyMapFixture, CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
 
 /** Fixed frame around the component: the same in every baseline. */
 const PAD = 12;
@@ -21,6 +23,7 @@ function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
   if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
   if (f.contract === 'AUREN-MARK-V1') return <MarkPlacementFixture f={f.mark} />;
+  if (f.contract === 'PUSH-A-BODYMAP-TRIPTYCH-V1') return <BodyMapGoverned width={f.width} height={f.height} bodymap={f.bodymap} />;
   if (f.contract === 'SESSION-CARD-R1') {
     return <SessionSetCard screenWidth={f.width} screenHeight={f.height} selectedValue={f.selectedValue} presentation={f.presentation} />;
   }
@@ -56,6 +59,33 @@ function Governed({ f }: { f: ContractFixture }) {
       selectedPosition={selectedPositionOf(f)}
       selectedValue={f.selectedValue}
     />
+  );
+}
+
+/**
+ * DA-04.1 — PUSH-A-BODYMAP-TRIPTYCH-V1: the T1 triptych, one camera in the session card's
+ * first module (60/40, 188 high at 390), or that module above the locked load instrument.
+ * A bench composition: the real session card is not modified.
+ */
+function BodyMapGoverned({ width, height, bodymap }: { width: number; height: number; bodymap: BodyMapFixture }) {
+  if (bodymap.kind === 'triptych') return <BodyMapTriptych width={width} height={height} presets={PUSH_A_PRESETS} />;
+  const module = (
+    <WindowModule width={width} height={188} layout="split-60-40" contents={[{ kind: 'bodymap-view', preset: presetById(bodymap.preset) }, LAST]} />
+  );
+  if (bodymap.kind === 'crop') return module;
+  return (
+    <View style={{ width, gap: 8 }}>
+      {module}
+      <InstrumentWithStepControls
+        {...CALIBRATION_LINE_DEMO}
+        width={width}
+        height={290}
+        selectedPosition={selectedPositionOf({ selectedValue: 75 })}
+        selectedValue={75}
+        presentation="rest"
+        onSelectPosition={NOOP}
+      />
+    </View>
   );
 }
 

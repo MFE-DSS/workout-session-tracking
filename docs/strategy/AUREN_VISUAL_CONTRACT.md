@@ -36,7 +36,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `REFERENCE-MARKER-V1` | **LOCKED** | la prescription du moteur | DA-02.2 — `clients/mobile/src/ui/calibration/geometry.ts` |
 | `ACTIVE-CURSOR-V1` | **LOCKED** | la décision de l'opérateur | DA-02.2 — `clients/mobile/src/ui/calibration/geometry.ts` |
 | `FRAME-C-V1` | **LOCKED** (structure) ; composition intérieure **non verrouillée** | le module d'instrument | DA-02.3 (PR #287) — `clients/mobile/src/ui/instrument/frameGeometry.ts` (`rail`) |
-| `SEMANTIC-TOKENS-V1` | **LOCKED** (sens) | `signal` = curseur / action de l'opérateur · `system` = prescription / calcul d'AUREN · `perfBelow` EASY · `ink` TARGET · `perfAbove` PUSH · `alert` HIGH COST (« coût », jamais « danger ») | `clients/mobile/src/ui/theme.ts`, `AUREN_CALIBRATION_SYSTEM §3` |
+| `SEMANTIC-TOKENS-V1` | **LOCKED** (sens) | `signal` = curseur / action de l'opérateur · `system` = prescription / calcul d'AUREN, information fournie par AUREN (dont la zone BodyMap mise en avant, DA-04.1 — **jamais** `signal`) · `perfBelow` EASY · `ink` TARGET · `perfAbove` PUSH · `alert` HIGH COST (« coût », jamais « danger ») | `clients/mobile/src/ui/theme.ts`, `AUREN_CALIBRATION_SYSTEM §3` |
 | `CALIBRATION-FIELD-V1` | **EXPLORATION**, hors chemin critique | rail vertical « en champ » : visualisation secondaire possible (plein écran, analyse), **jamais le contrôle de charge principal** | DA-02.3 ; décision opérateur DA-02.4 n° 4 |
 | `INSTRUMENT-SURFACE-B1` | **LOCKED** (2026-10-25, « ACCEPT — LOCK B.1 ») | Frame C + rail en ligne pleine largeur + valeur souveraine au-dessus + chiffre prescrit sous le bloc du rail | DA-02.4B.1 — `clients/mobile/src/ui/instrument/HorizontalInstrumentSurface.tsx` (§8) |
 | `INSTRUMENT-SURFACE-B2` | **LOCKED** (2026-10-25, « ACCEPT » B.2) | la même surface **au repos** : échelle chiffrée et noms de zone masqués ; l'état réglage est `INSTRUMENT-SURFACE-B1` | DA-02.4B.2 — `HorizontalInstrumentSurface` (`presentation`), `disclosure.ts` (§10) |
@@ -46,6 +46,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `SESSION-CARD-R1` | **LOCKED** (cible, banc seulement — 2026-10-26) | la carte de série verticale : l'exercice, ses fenêtres d'information, et **tout en bas** l'instrument de charge avec ses touches | DA-02.7 R1 — `SessionSetCard.tsx` (§17) ; jamais monté sur l'écran de séance tant que le moteur ne fournit pas les bornes de zone (E7) |
 | `AUREN-MARK-V1` | **LOCKED** (2026-10-27, « ACCEPT » DA-03.2) | la marque du fabricant : le curseur de l'opérateur au-dessus du repère du système, un axe de visée, le vide entre eux | DA-03.2 — `design/auren/source/brand/mark/`, `AurenMark.tsx`, `markGeometry.ts` (§18) ; asset `provisional` tant que le nom n'est pas dégagé |
 | `AUREN-APP-ICON-V1` | **LOCKED** (2026-10-27 ; révisée le 2026-10-28, DA-03.3b : « le défaut proposé en monochrome ») | l'icône de l'app : `AUREN-MARK-V1` à 54 %, en une seule encre `ink` sur `field` ; le verre et les apparences sont ceux du système | DA-03.3 — `clients/mobile/assets/AurenAppIcon.icon` (Icon Composer), gate `visual-contract/app-icon/` (§19) |
+| `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -376,3 +377,28 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **MUST PRESERVE** : la géométrie de `AUREN-MARK-V1` ; l'échelle 54 % et le décalage optique ; une seule encre ; les effets côté système.
 **MUST NEVER** : remplir le vide latéral pour le remplir ; ajouter des repères, un rail, un cadre ; inscrire du verre, une ombre, un flou ou un reflet dans les couches ; remettre `signal` / `system` dans l'icône ou ses replis (garde `test_the_icon_carries_no_signal_or_system`) ; maintenir I2 comme icône concurrente.
+
+## 20. `PUSH-A-BODYMAP-TRIPTYCH-V1` — la localisation des zones de Push A (DA-04.1, 2026-10-29)
+
+**Décision de l'opérateur** : « ACCEPT T1 — THREE EQUAL WINDOWS » ; « Do NOT extend `signal` to anatomical localisation […] Use `system` for the foreground BodyMap zone » ; « Orientation takes precedence over active-zone percentage » ; gate final : « oui go ».
+
+**Ce que c'est** : trois **caméras** sur le **même** master BodyMap (`design/auren/source/bodymap/auren_bodymap_master.svg`, autorisé en builds internes, DA-04.0b), jamais une seconde anatomie. Le BodyMap V1 est une **localisation fonctionnelle** : où se situe principalement la famille musculaire, jamais quelle structure travaille ni dans quelle proportion.
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | LOCKED · banc seulement : monté sur **aucun** écran produit, ni dans la vraie carte de séance |
+| **Caméras** (`viewPresets.ts`) | `push-pecs` face, boîte 38 · 38 · 44 × 34 · `push-delt-lat` face, 34 · 36 · 52 × 30 (de dos, le deltoïde postérieur du master le recouvre) · `push-triceps` dos, 152 · 40 · 56 × 40 ; unités du master (viewBox `0 0 240 200`) |
+| **Règle de caméra** (`cameraFor`) | la boîte est élargie au format de la fenêtre, **jamais coupée**, et reste dans sa moitié du master (face x 0–120, dos x 120–240) ; déterministe |
+| **Composition** (`triptychLayout`) | T1 : trois Recessed Windows égales dans un Frame C, 2u d'écart ; 390 × 180 ; libellé produit (`label_fr`) en tête de fenêtre, deux lignes au plus, jamais dans le SVG |
+| **Traitement** (`BodyMapView`) | zone mise en avant : `system` plein, peinte en dernier (aucun chemin modifié) ; silhouette `ink3` à 0,16 ; autres zones : remplissage `ink3` à 0,06 + filet `ink3` à 0,45, 0,75 px |
+| **Contrastes mesurés** (sur `field`) | zone / silhouette **8,99 : 1** · filet / remplissage 2,1 : 1 · silhouette / fond 1,22 : 1 |
+| **Part de la zone** (préférence 35–50 %, l'orientation prime) | pectoraux 49–58 % des zones visibles ; deltoïdes latéraux 15–21 % ; triceps 17–22 % — **acceptés** |
+| **Attribution** | centrale, dans la feuille « Journal local » (section Licences), texte du registre mot pour mot ; jamais répétée dans les fenêtres |
+| **Baselines approuvées** | `bodymap-t1-390x180`, `bodymap-crop-390x188-push-pecs`, `bodymap-crop-390x188-push-delt-lat`, `bodymap-crop-390x188-push-triceps`, `bodymap-context-390-push-pecs` |
+| **Gardes** | `tests/test_auren_bodymap_runtime.py` (CI : module = master au caractère près, attribution = registre, préréglages = zones et libellés du contrat, rien dans le runtime web) ; `viewPresets.test.ts` (caméras, disposition) |
+| **T2** | exploré (une dominante + deux secondaires), **non retenu** : la dominante agrandissait la géométrie source au-delà de son échelle utile |
+
+**Dette `ANATOMY-V2` consignée** (master intouché) : pectoraux, petites crêtes au bord supérieur en fort agrandissement ; deltoïde latéral, se lit d'abord comme « épaule » (accepté) ; triceps, encoche en haut visible à la taille de la carte ; dorsaux et sangle abdominale (contexte, Servier), contours dentelés dans la caméra de dos.
+
+**MUST PRESERVE** : un seul master, des caméras seulement ; la zone en `system`, seule couleur ; le contexte en ossature silencieuse ; l'ordre « zone > contexte > châssis » ; l'orientation avant le pourcentage.
+**MUST NEVER** : `signal` (ou tout ambre) sur l'anatomie ; un pourcentage, une intensité, une carte d'activation, une revendication EMG, de récupération, de blessure ou d'efficacité ; redessiner, simplifier ou régénérer un chemin ; serrer une caméra pour atteindre un chiffre ; monter le BodyMap dans le runtime web ; afficher le BodyMap sans la section Licences dans l'app qui le porte.

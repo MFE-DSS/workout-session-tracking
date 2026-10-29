@@ -1,6 +1,8 @@
 import React from 'react';
 import { Text, View } from 'react-native';
 
+import { BodyMapWindowContent } from '../bodymap/BodyMapTriptych';
+import type { BodyMapViewPreset } from '../bodymap/viewPresets';
 import { densityFor, UNIT } from '../calibration/layout';
 import { color, type } from '../theme';
 import { frameGeometry } from './frameGeometry';
@@ -23,6 +25,8 @@ export type WindowFixture = 'f1' | 'f2' | 'f3-pair' | 'f3-split';
 export type WindowContentSpec =
   | { kind: 'figure'; label: string; value: string; unit: string }
   | { kind: 'bodymap' }
+  /** DA-04.1 — a real camera over the BodyMap master (review only until accepted) */
+  | { kind: 'bodymap-view'; preset: BodyMapViewPreset }
   | { kind: 'slot'; label: string };
 type Content = WindowContentSpec;
 
@@ -69,6 +73,7 @@ function WindowContent({ content, width, height }: { content: Content; width: nu
     // a neutral placeholder: a silhouette-sized rectangle, never the real BodyMap
     return <Placeholder testID="window-bodymap" label="BodyMap" width="42%" height="86%" />;
   }
+  if (content.kind === 'bodymap-view') return <BodyMapWindowContent preset={content.preset} width={width} height={height} />;
   if (content.kind === 'slot') return <Placeholder testID="window-slot" label={content.label} width="86%" height="72%" />;
   // DA-02.6 — the largest numeral role that fits, MEASURED on the device (Numeric Readout)
   return <FittedReadout label={content.label} value={content.value} unit={content.unit} width={width} height={height} />;

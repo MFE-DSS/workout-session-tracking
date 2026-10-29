@@ -32,7 +32,8 @@
   "professional_anatomical_review": "not-claimed",
   "multi_source_consistency_review": "recorded",
   "legal_review": "required",
-  "attribution_surface": "not-yet-implemented",
+  "attribution_surface": "implemented-mobile-journal-sheet",
+  "attribution_surface_location": "clients/mobile/src/ui/bodymap/attribution.tsx (LicencesSection), mounted in LabSheet - DA-04.1",
   "runtime_authorization": "internal-builds-with-constraints",
   "gate_resolution": "DA-04.0 OUTCOME B - NOT AUTHORIZED FOR APP INTEGRATION",
   "gate_resolution_date": "2026-10-28",
@@ -59,7 +60,7 @@
   ],
   "non_medical_notice_fr": "Visualisation non médicale — revue anatomique professionnelle non réalisée.",
   "license_url": "https://creativecommons.org/licenses/by/4.0/",
-  "missing_for_runtime": ["attribution surface in the mobile client (About / Licences) before any product mount"],
+  "missing_for_runtime": [],
   "missing_for_public_release": ["professional anatomical review",
     "external legal review of the CC BY 4.0 derivative work"],
 

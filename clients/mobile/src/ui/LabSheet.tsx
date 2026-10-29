@@ -4,6 +4,7 @@ import { Share, Text, View } from 'react-native';
 import { buildEvidence, Evidence } from '../lab/evidence';
 import { buildIdentity, deviceIdentity } from '../native/deviceInfo';
 import type { Journal, Metric, Restored } from '../storage/journalTypes';
+import { LicencesSection } from './bodymap/attribution';
 import { PrimaryAction, Sheet, SheetRow } from './components';
 import { color, space, type } from './theme';
 
@@ -100,6 +101,9 @@ export function LabSheet(props: {
         {props.onSignOut ? (
           <PrimaryAction tone="quiet" label="Se déconnecter de cet appareil" sublabel="Les autres appareils et le site restent connectés" onPress={props.onSignOut} />
         ) : null}
+      </View>
+      <View style={{ marginTop: space.l }}>
+        <LicencesSection />
       </View>
     </Sheet>
   );

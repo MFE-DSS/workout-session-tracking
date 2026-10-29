@@ -39,8 +39,10 @@ attribution. C'est un compromis de gouvernance, **pas un avis juridique**.
 5. **Diffusion publique bloquée** jusqu'à une revue anatomique professionnelle et une revue juridique
    externe (`missing_for_public_release`).
 
-Reste à faire avant tout montage dans un écran produit : la **surface d'attribution** du client mobile
-(`attribution_surface: not-yet-implemented`, `missing_for_runtime`). Elle est livrée avec `DA-04.1`.
+**Surface d'attribution** : livrée par `DA-04.1` — section « Licences » de la feuille « Journal local » de l'app
+mobile (`clients/mobile/src/ui/bodymap/attribution.tsx`), texte du registre mot pour mot (garde
+`tests/test_auren_bodymap_runtime.py`). **Usage runtime** : `PUSH-A-BODYMAP-TRIPTYCH-V1`
+(`AUREN_VISUAL_CONTRACT §20`), trois caméras sur ce master, zone mise en avant en `system`.
 
 ## Rôle du BodyMap V1 (verrouillé par l'opérateur, 2026-10-28)
 

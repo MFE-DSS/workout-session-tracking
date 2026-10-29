@@ -8,6 +8,7 @@
  * renders exactly what the operator approved. Changing a value here changes a
  * baseline: it is a contract change, not a refactor.
  */
+import type { BodyMapViewPresetId } from '../bodymap/viewPresets';
 import type { MarkFixture } from '../brand/MarkPlacementFixture';
 import type { Boundaries } from '../calibration/layout';
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
@@ -35,6 +36,12 @@ export const CALIBRATION_LINE_DEMO: Boundaries & {
   referenceValue: 70,
   unit: 'kg',
 };
+
+/** DA-04.1 — the T1 triptych, one camera in the session card's 60/40 module, or that module above the instrument. */
+export type BodyMapFixture =
+  | { kind: 'triptych' }
+  | { kind: 'crop'; preset: BodyMapViewPresetId }
+  | { kind: 'context'; preset: BodyMapViewPresetId };
 
 export type ContractFixture =
   | {
@@ -103,6 +110,14 @@ export type ContractFixture =
       id: string;
       contract: 'AUREN-MARK-V1';
       mark: MarkFixture;
+    }
+  | {
+      /** the baseline id: `bodymap-<view>-<width>x<height>[-<preset>]` — PUSH-A-BODYMAP-TRIPTYCH-V1 (DA-04.1) */
+      id: string;
+      contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1';
+      width: number;
+      height: number;
+      bodymap: BodyMapFixture;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -165,6 +180,14 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'mark-v1-frame-c-390x290', contract: 'AUREN-MARK-V1', mark: { kind: 'frame-c' } },
   { id: 'mark-v1-session-card-390x844', contract: 'AUREN-MARK-V1', mark: { kind: 'session-card' } },
   { id: 'mark-v1-splash-390x844', contract: 'AUREN-MARK-V1', mark: { kind: 'splash' } },
+  // DA-04.1 — « oui go » on the final gate board, PUSH-A-BODYMAP-TRIPTYCH-V1 (operator, 2026-10-29):
+  // T1, the zone in `system`; each camera at the session card's BodyMap window; the module above
+  // the locked load instrument
+  { id: 'bodymap-t1-390x180', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 180, bodymap: { kind: 'triptych' } },
+  { id: 'bodymap-crop-390x188-push-pecs', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'push-pecs' } },
+  { id: 'bodymap-crop-390x188-push-delt-lat', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'push-delt-lat' } },
+  { id: 'bodymap-crop-390x188-push-triceps', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 188, bodymap: { kind: 'crop', preset: 'push-triceps' } },
+  { id: 'bodymap-context-390-push-pecs', contract: 'PUSH-A-BODYMAP-TRIPTYCH-V1', width: 390, height: 562, bodymap: { kind: 'context', preset: 'push-pecs' } },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */
