@@ -59,6 +59,13 @@ sur le reste du catalogue, mesurée par `build_parity_report`) ; casser la forme
 Leur migration est une décision par consommateur (gardes d'invariance propres), à prendre si l'opérateur veut
 l'unification complète.
 
+## Annexe de clôture (2026-10-29)
+
+- Gate vérifié avant fusion : tête `04b830e` (fusion du canonique, conflit de registre résolu en gardant les deux
+  lignes), 10 checks verts — Gitar, bot de revue non requis, n'a pas reposté sur le commit de fusion —, Sonar PR
+  `OK` (couverture du nouveau code 100 %), 0 fil ouvert, `CLEAN`.
+- PR #322 fusionnée en `--merge --match-head-commit` : **`7a3c17e`** ; CI canonique `40884710540` **verte**.
+
 **Verdict :** le plan servi à l'app et le relevé résolvent les zones par le contrat canonique — principale et
 secondaires —, conformément à la règle agnostique de l'opérateur ; deux erreurs d'attribution visibles sur le
 téléphone corrigées.
