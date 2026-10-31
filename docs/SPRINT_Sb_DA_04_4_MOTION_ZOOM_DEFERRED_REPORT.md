@@ -66,5 +66,11 @@ bloquer le chemin critique (→ DA-05.0 en sort, DA-05.1 redéfinie).
 | `docs/strategy/AUREN_VISUAL_BACKBONE.md` | §8.4 : `DA-04.4`, `DA-05.0`, `DA-05.1`, backlog `MOTION-V2`, convergence |
 | `docs/strategy/SPEC_REGISTRY.md` | ligne de la tranche |
 
+## Annexe de clôture (2026-10-31)
+
+- Gate vérifié avant fusion : tête `91943b1`, 11 / 11 checks verts, Sonar PR `OK`, 0 fil ouvert, `CLEAN`.
+- PR #328 fusionnée en `--merge --match-head-commit` : **`fec77bb`**. Docs seulement : la CI de push est
+  légitimement sautée par `paths-ignore: docs/**` (`CLAUDE.md §2`) ; la CI de la PR fait foi.
+
 **Verdict :** `MOTION-ZOOM` **DIFFÉRÉ** — rien de livré, tout ce qui a été appris est versionné ; le chemin critique
 reprend par `DA-05.1`.
