@@ -28,9 +28,9 @@ export function MissionScreen(props: {
   return (
     <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
       <View style={styles.top}>
-        <View style={{ width: 48 }} />
+        <View style={{ width: 44 }} />
         <Text style={type.eyebrow}>AUREN · Aujourd’hui</Text>
-        <IconButton glyph="⋯" label="Journal du labo" onPress={props.onOpenLab} />
+        <IconButton icon="more" label="Journal du labo" onPress={props.onOpenLab} />
       </View>
       <Text style={[type.small, styles.date]}>{DAY.format(new Date())}</Text>
 

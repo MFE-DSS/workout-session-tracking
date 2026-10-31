@@ -841,6 +841,84 @@
       "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
       "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
       "approved_on": "2026-10-31"
+    },
+    {
+      "id": "execution-set-390x844-push-a-e0",
+      "file": "execution-set-390x844-push-a-e0.png",
+      "visual_id": "EXECUTION-SCREEN-V1",
+      "fixture": "?fixture=execution-set-390x844-push-a-e0",
+      "width": 390,
+      "scenario": "set 1 of Incline Smith Press (Push A lab plan): intention only, last time hidden (dial = last load), the zone in the freed room",
+      "pixels": "414x868",
+      "sha256": "d034f0fe68c5071d030505d05a791eb8cb834c2958b2117a3f9a57eee5965ab6",
+      "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
+      "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "execution-set-390x844-push-a-e6",
+      "file": "execution-set-390x844-push-a-e6.png",
+      "visual_id": "EXECUTION-SCREEN-V1",
+      "fixture": "?fixture=execution-set-390x844-push-a-e6",
+      "width": 390,
+      "scenario": "set 1 of a two-line exercise name (triceps, back view)",
+      "pixels": "414x868",
+      "sha256": "eb9aedcc3f53a56d96b6c1b508e3c884ae12552808d32f08aea9d8f8df9e325b",
+      "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
+      "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "execution-set-390x844-catch-up-shoulders-e0",
+      "file": "execution-set-390x844-catch-up-shoulders-e0.png",
+      "visual_id": "EXECUTION-SCREEN-V1",
+      "fixture": "?fixture=execution-set-390x844-catch-up-shoulders-e0",
+      "width": 390,
+      "scenario": "set 1 of a first time: one « Première fois » sentence, the zone window at the room left",
+      "pixels": "414x868",
+      "sha256": "9b3b37b6ed96548413a180339d87d8d6946665296097998c25a5f3adb683d949",
+      "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
+      "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "execution-rest-next-390x844-push-a-e0",
+      "file": "execution-rest-next-390x844-push-a-e0.png",
+      "visual_id": "EXECUTION-SCREEN-V1",
+      "fixture": "?fixture=execution-rest-next-390x844-push-a-e0",
+      "width": 390,
+      "scenario": "rest before Chest Press: its zone (pecs) and its last load, 60/40, under a 140 ring",
+      "pixels": "414x868",
+      "sha256": "cd09b949ac9e9730e3639fbda6a5d80b52bdd6873f364b11fdedc30a26782157",
+      "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
+      "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "execution-rest-next-390x844-push-a-e2",
+      "file": "execution-rest-next-390x844-push-a-e2.png",
+      "visual_id": "EXECUTION-SCREEN-V1",
+      "fixture": "?fixture=execution-rest-next-390x844-push-a-e2",
+      "width": 390,
+      "scenario": "rest before a two-line next exercise (lateral deltoids)",
+      "pixels": "414x868",
+      "sha256": "a7e7565d0da68b37cd12656be7f3244e15113bf6a698a86cee97a88057163991",
+      "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
+      "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "execution-rest-next-390x844-catch-up-shoulders-e0",
+      "file": "execution-rest-next-390x844-catch-up-shoulders-e0.png",
+      "visual_id": "EXECUTION-SCREEN-V1",
+      "fixture": "?fixture=execution-rest-next-390x844-catch-up-shoulders-e0",
+      "width": 390,
+      "scenario": "rest before a first time: zone window alone, no « Dernière »",
+      "pixels": "414x868",
+      "sha256": "5fbaaf730a5824a3c31a010404297894524683a5016c7b4e4f81142f789fddd4",
+      "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
+      "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
+      "approved_on": "2026-10-31"
     }
   ]
 }

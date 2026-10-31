@@ -9,7 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import Svg, { Circle, Path } from 'react-native-svg';
 
 import { nativeSheet } from '../native/platformUi';
 import { ACTION_HEIGHT, color, NUMERAL_FONT_SCALE_CAP, space, type } from './theme';
@@ -72,7 +72,29 @@ export function SecondaryButton(props: { label: string; onPress: () => void; sty
   );
 }
 
-export function IconButton(props: { glyph: string; label: string; onPress: () => void }) {
+/**
+ * DA-05.1 — the screen's secondary gestures as DRAWN icons, one stroke family on a 24 grid (operator,
+ * 2026-10-31: the glyph buttons were « médiocres »): a text glyph carries its font's metrics and sits
+ * off-centre; a path does not. No ring around them — a quiet `ink2` mark on a 44 pt target.
+ */
+export type IconName = 'close' | 'more' | 'swap';
+
+const ICON_STROKE = 2;
+
+function IconGlyph({ name }: { name: IconName }) {
+  const s = { stroke: color.ink2, strokeWidth: ICON_STROKE, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
+  return (
+    <Svg width={24} height={24} viewBox="0 0 24 24">
+      {name === 'close' ? <Path d="M6 6L18 18M18 6L6 18" {...s} /> : null}
+      {name === 'more'
+        ? [5, 12, 19].map((x) => <Circle key={x} cx={x} cy={12} r={1.9} fill={color.ink2} />)
+        : null}
+      {name === 'swap' ? <Path d="M4 8.5H18M14.5 5L18 8.5L14.5 12M20 15.5H6M9.5 12L6 15.5L9.5 19" {...s} /> : null}
+    </Svg>
+  );
+}
+
+export function IconButton(props: { icon: IconName; label: string; onPress: () => void }) {
   return (
     <Pressable
       accessibilityRole="button"
@@ -81,9 +103,7 @@ export function IconButton(props: { glyph: string; label: string; onPress: () =>
       onPress={props.onPress}
       style={({ pressed }) => [styles.icon, pressed && styles.pressed]}
     >
-      <Text style={styles.iconGlyph} maxFontSizeMultiplier={1.2}>
-        {props.glyph}
-      </Text>
+      <IconGlyph name={props.icon} />
     </Pressable>
   );
 }
@@ -159,11 +179,12 @@ export function ValueDial(props: {
  * at every load — `adjustsFontSizeToFit` alone does not exist on every platform.
  */
 function readoutSize(value: string, withUnit: boolean): number {
+  // DA-05.1 — one step smaller (operator, 2026-10-31: « les cases avec le poids, tu peux réduire un peu »)
   const chars = value.length + (withUnit ? 1.5 : 0);
-  if (chars <= 3) return 68;
-  if (chars <= 4.5) return 60;
-  if (chars <= 5.5) return 50;
-  return 42;
+  if (chars <= 3) return 56;
+  if (chars <= 4.5) return 50;
+  if (chars <= 5.5) return 42;
+  return 36;
 }
 
 function Pad(props: { glyph: string; label: string; onPress: () => void }) {
@@ -276,16 +297,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: space.m,
   },
-  icon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: color.line,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconGlyph: { color: color.ink2, fontSize: 22, fontWeight: '700', marginTop: -2 },
+  icon: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   rail: { flexDirection: 'row', gap: 4, height: 6, alignItems: 'center' },
   railSeg: { flex: 1, height: 4, borderRadius: 2, backgroundColor: color.line },
   railDone: { backgroundColor: color.ink3 },
@@ -296,17 +308,17 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     borderColor: color.line,
-    paddingTop: 14,
+    paddingTop: 10,
     paddingHorizontal: 12,
-    paddingBottom: 12,
+    paddingBottom: 10,
     alignItems: 'center',
   },
-  dialValueRow: { flexDirection: 'row', alignItems: 'flex-end', minHeight: 84, paddingHorizontal: 4 },
-  unit: { color: color.ink2, fontSize: 20, fontWeight: '700', marginBottom: 14, marginLeft: 4 },
-  pads: { flexDirection: 'row', gap: 8, alignSelf: 'stretch', marginTop: 6 },
+  dialValueRow: { flexDirection: 'row', alignItems: 'flex-end', minHeight: 66, paddingHorizontal: 4 },
+  unit: { color: color.ink2, fontSize: 18, fontWeight: '700', marginBottom: 11, marginLeft: 4 },
+  pads: { flexDirection: 'row', gap: 8, alignSelf: 'stretch', marginTop: 4 },
   pad: {
     flex: 1,
-    height: 60,
+    height: 52,
     borderRadius: 18,
     backgroundColor: color.field,
     borderWidth: 1,

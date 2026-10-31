@@ -31,9 +31,9 @@ export function ResumeScreen(props: {
   return (
     <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
       <View style={styles.top}>
-        <View style={{ width: 48 }} />
+        <View style={{ width: 44 }} />
         <Text style={type.eyebrow}>AUREN · Séance en pause</Text>
-        <IconButton glyph="⋯" label="Journal local" onPress={props.onOpenJournal} />
+        <IconButton icon="more" label="Journal local" onPress={props.onOpenJournal} />
       </View>
       <Text style={styles.name} accessibilityRole="header" maxFontSizeMultiplier={1.3}>
         {props.name}
