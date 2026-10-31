@@ -50,6 +50,12 @@ tranché).
 - **Tables** contre les `__tablename__` : **4 corrections** (`body_consents`, `exercise_muscle_mappings`, les deux
   tables de partage de squad, `user_program_rep_targets` oubliée).
 - Mutation de bout en bout : `GET /launcher` retirée de l'inventaire → la garde échoue en la nommant ; restaurée → verte.
+- **Incident CI (premier push)** : la garde était verte en local et rouge en CI (`'_IncludedRouter' object has no
+  attribute 'path'`). Cause : le venv local porte **FastAPI 0.135.3**, la CI installe le lock **0.141.1**, qui ne
+  met plus à plat les routeurs inclus dans `app.routes`. Correctif : lecture récursive (`original_router` +
+  `include_context.prefix`), plus un test d'un routeur inclus non aplati. Vérifié : mêmes 114 entrées sous les deux
+  versions, garde verte dans un environnement installé depuis `requirements-lock.txt`. Le venv local n'est pas aligné
+  sur le lock : tout test local sensible à la version de FastAPI peut mentir.
 
 ## 4. Ce que l'inventaire révèle
 

@@ -39,12 +39,29 @@ def _inventory() -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def route_key(route) -> str:
+def route_key(route, prefix: str = "") -> str:
     """`METHOD /path` for a route, `MOUNT /path` for a mount — HEAD is implied by GET."""
     if isinstance(route, Mount):
-        return f"MOUNT {route.path}"
+        return f"MOUNT {prefix}{route.path}"
     methods = sorted((getattr(route, "methods", None) or set()) - {"HEAD"})
-    return f"{' '.join(methods)} {route.path}"
+    return f"{' '.join(methods)} {prefix}{route.path}"
+
+
+def mounted_routes(routes, prefix: str = "") -> set[str]:
+    """Every mounted route, whatever the FastAPI version.
+
+    FastAPI 0.135 flattens `include_router` into `app.routes`; the locked 0.141 keeps
+    each included router as one entry (`original_router` + `include_context.prefix`).
+    Reading only the top level passed locally and failed in CI (PR #339).
+    """
+    keys: set[str] = set()
+    for route in routes:
+        inner = getattr(route, "original_router", None)
+        if inner is not None:
+            keys |= mounted_routes(inner.routes, prefix + route.include_context.prefix)
+        else:
+            keys.add(route_key(route, prefix))
+    return keys
 
 
 def shape_errors(feature: dict) -> list[str]:
@@ -83,7 +100,7 @@ def test_entry_ids_are_unique():
 
 
 def test_every_mounted_route_is_inventoried_exactly_once(client):
-    gaps = coverage_gaps({route_key(r) for r in client.app.routes}, _inventory())
+    gaps = coverage_gaps(mounted_routes(client.app.routes), _inventory())
     assert not any(gaps.values()), gaps
 
 
@@ -128,6 +145,28 @@ def test_a_route_listed_twice_is_caught():
 def test_a_stale_exclusion_is_caught():
     inv = {"features": [{"routes": ["GET /a"]}], "excluded_routes": ["GET /docs-gone"]}
     assert coverage_gaps({"GET /a"}, inv)["stale_exclusions"] == ["GET /docs-gone"]
+
+
+def test_routes_of_an_unflattened_included_router_are_read():
+    """The locked FastAPI keeps included routers whole: their routes must still be counted."""
+
+    class _Route:
+        def __init__(self, methods, path):
+            self.methods, self.path = methods, path
+
+    class _Router:
+        routes = [_Route({"GET"}, "/mission"), _Route({"POST"}, "/sessions")]
+
+    class _Context:
+        prefix = "/api/mobile/v1"
+
+    class _Included:
+        original_router = _Router()
+        include_context = _Context()
+
+    assert mounted_routes([_Route({"GET", "HEAD"}, "/healthz"), _Included()]) == {
+        "GET /healthz", "GET /api/mobile/v1/mission", "POST /api/mobile/v1/sessions",
+    }
 
 
 @pytest.mark.parametrize("path", ["/openapi.json", "/api/docs"])
