@@ -293,6 +293,21 @@
 | Sb_DA_04_4_MOTION_ZOOM_DEFERRED | Zoom biomécanique (le muscle pendant la répétition) : prototype dessiné, recherche de ressources ouvertes (3 axes, licences lues à la source), essai sur le modèle thoraco-scapulaire (CC BY 4.0) | ⏸ **DIFFÉRÉ** (opérateur, 2026-10-31 : « mets tout ça de côté […] c'est à faire ») — consigné par PR #328 (`fec77bb`) ; rien de livré ; consigné `AUREN_VISUAL_CONTRACT §23`, backlog `MOTION-V2` | `SPRINT_Sb_DA_04_4_MOTION_ZOOM_DEFERRED_REPORT.md` | docs seulement ; DA-05.0 sort du chemin critique ; DA-05.1 redéfinie (écran d'exercice réel) |
 | Sb_DA_04_3_BODYMAP_MIT_BODY | Le BodyMap mobile dessine le corps de `react-native-body-highlighter` 3.2.0 (MIT) : `LICENSE` + `body.json` vendorisés, `bodyGeometry.ts` généré (chemins au caractère près), onze zones → parties, caméras recentrées à la hauteur validée ; crédit MIT dans l'app ; le master reste source de conception | ✅ MERGÉE (PR #326, `c55e359`, CI canonique `41192283954` verte) — `BODYMAP-MIT-BODY-V1` LOCKED (opérateur, 2026-10-31 : « ouais go on va se satisfaire de cela pour l'instant ») | `SPRINT_Sb_DA_04_3_BODYMAP_MIT_BODY_REPORT.md` | 18 baselines refaites, identiques à l'octet aux rendus revus ; 47 inchangées |
 
+## 1sexdecies. OpenSpec — couche de gouvernance des changements (GOV-01, actif)
+
+**Outil :** OpenSpec (`@fission-ai/openspec` **1.14.3**, schéma `spec-driven`) — `openspec/config.yaml` (pilotage AUREN), `openspec/specs/` (specs vivantes), `openspec/changes/` (un dossier par change, archivé après merge).
+**Statut :** 🟡 introduit par GOV-01 (opérateur, 2026-10-31 : quatre workstreams A Visual Assets · B Native Product · C Product Intelligence · D Platform/Business ; « OpenSpec devient la couche de gouvernance au-dessus »).
+**Préséance :** `CLAUDE.md` > contrats canoniques versionnés (`AUREN_VISUAL_CONTRACT` et baselines, contrats de domaine et scientifiques, provenance d'assets, ce registre) > changes OpenSpec. Un change en conflit avec un contrat canonique = conflit de spec (`CLAUDE.md §4`). La documentation historique n'est pas migrée.
+**Règle de registre :** chaque change OpenSpec a une ligne ici dès sa proposal ; son statut suit le cycle (proposal → revue opérateur → apply → PR → MERGÉE → archivé).
+
+| Change / sprint | Domaine | Statut | Rapport | Notes |
+|---|---|---|---|---|
+| Sb_GOV_01_OPENSPEC_BOOTSTRAP | Installation et initialisation d'OpenSpec (Claude Code : 6 skills, 6 commandes `/opsx:*`), pilotage AUREN dans `config.yaml`, `CLAUDE.md §6`, cette section | 🟡 PR ouverte | `SPRINT_Sb_GOV_01_OPENSPEC_BOOTSTRAP_REPORT.md` | aucun code produit ; aucun `AGENTS.md` |
+| `android-pilot-readiness` (PLAT-01) | Un testeur Android distant joue le parcours connexion → MISSION → séance → bilan sur le backend de production | ⚪ à proposer | — | décisions opérateur : déploiement `spignos.com`, EAS Build, émulateur + testeur, revue de la proposal avant apply |
+| `native-feature-migration-map` (MOB-00) | Inventaire exhaustif du web (110 routes) classé KEEP_DOMAIN / REWRITE_NATIVE / WEB_ONLY / DEPRECATE / BLOCKED — devient le backlog produit | ⚪ à proposer | — | — |
+| `native-navigation-shell` (MOB-01) | Mini-ADR : navigation actuelle vs Expo Router NativeTabs ; hypothèse MISSION · SÉANCE · PROGRÈS · PROFIL non verrouillée | ⏳ après MOB-00 | — | — |
+| `session-native-integration` (MOB-02) | Les trois écrans de séance verrouillés sur les vraies données, hors chemin heureux compris | ⏳ après MOB-01 | — | — |
+
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 
 **Specs :** `docs/strategy/SPIGNOS_BODY_SIGNAL_MODEL_BRAINSTORMING.md`, `SPIGNOS_BODY_INTELLIGENCE_ROADMAP.md`, `SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md`, `SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC.md`, `SPIGNOS_BODY_MANUAL_PROFILE_BUILD_SPEC.md`.
