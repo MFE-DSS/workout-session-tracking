@@ -102,6 +102,11 @@ export type Mission = {
     work_set_count: number;
     first_exercise: { name: string; set_scheme: string | null };
   };
+  /**
+   * The zones the session trains — each exercise's primary zone, in order of first appearance, derived by
+   * the server (`mobile_read_models.session_zones`). Optional: a payload from before 2026-10-31 has none.
+   */
+  zones?: { zone: string; label: string }[];
   duration_estimate: null;
 };
 

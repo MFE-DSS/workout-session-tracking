@@ -50,8 +50,9 @@ from app.models.session import SessionExercise, SetLog, WorkoutSession  # noqa: 
 from app.models.user import User  # noqa: E402
 from app.services import advice_memory  # noqa: E402
 from app.services.auth import create_session_cookie  # noqa: E402
+from app.services.body_zone_source import resolve_exercise_zones  # noqa: E402
 from app.services.console_state import REST_FALLBACK_SECONDS  # noqa: E402
-from app.services.muscle_mapping import classify_exercise  # noqa: E402
+from app.services.mobile_read_models import session_zones  # noqa: E402
 from app.services.overload_engine import compute_overload_hint  # noqa: E402
 from app.services.overload_explainer import explain_overload_hint  # noqa: E402
 from app.services.overload_inputs import build_overload_input_for_exercise  # noqa: E402
@@ -193,6 +194,8 @@ def _mission(db, uid: int) -> dict:
         "scope": {"exercise_count": len(tpl.exercises),
                   "work_set_count": sum(len(te.rep_targets) for te in tpl.exercises),
                   "first_exercise": {"name": first.name, "set_scheme": first.set_scheme}},
+        # the server's own derivation, never a second one here
+        "zones": session_zones(db, [te.name for te in sorted(tpl.exercises, key=lambda te: te.position)]),
         "decision_identity": {"fingerprint": reco["context"]["empreinte_contexte"],
                               "policy": reco["context"]["politique"]},
         "duration_estimate": None,
@@ -247,8 +250,10 @@ def _exercise(db, s: WorkoutSession, se: SessionExercise, last: dict) -> dict:
     rng = _rep_range(se)
     te = se.template_exercise
     suggestions = compute_suggestions(te) if te else {}
-    # même règle que le relevé serveur (`session_recap._zones_touched`)
-    primary, _ = classify_exercise(actual_exercise_name(se))
+    # the server plan's rule (`mobile_read_models._exercise`): the canonical contract, primary +
+    # secondaries — never the legacy classifier, which the server stopped using in PR #322
+    zones = resolve_exercise_zones(db, actual_exercise_name(se))
+    primary = zones.primary
     return {
         "se_id": se.id, "code": se.exercise_code_snapshot,
         "prescribed_name": se.exercise_name_snapshot, "executed_name": actual_exercise_name(se),
@@ -261,6 +266,7 @@ def _exercise(db, s: WorkoutSession, se: SessionExercise, last: dict) -> dict:
         "substitutes": [sg.name for lvl in ("N1", "N2") for sg in suggestions.get(lvl, [])][:4],
         "zone": None if primary == "unknown" else {"zone": primary,
                                                     "label": _ZONE_LABELS.get(primary, primary)},
+        "secondary_zones": [{"zone": z, "label": _ZONE_LABELS.get(z, z)} for z in zones.secondary],
         "best": _best(db, s, se.exercise_code_snapshot),
     }
 

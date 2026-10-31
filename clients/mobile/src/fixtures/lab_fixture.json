@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-24T11:01:16+00:00",
+  "generated_at": "2026-10-31T14:35:39+00:00",
   "source": "canonical services on a throwaway SQLite (generate_fixtures.py)",
   "history_seeded": [
     "push-a (J-15)",
@@ -54,6 +54,16 @@
         "set_scheme": "3x 8-12"
       }
     },
+    "zones": [
+      {
+        "zone": "delt_lat",
+        "label": "Deltoïdes latéraux"
+      },
+      {
+        "zone": "delt_post",
+        "label": "Deltoïdes postérieurs"
+      }
+    ],
     "decision_identity": {
       "fingerprint": "30b048d4692ce1b7c69c02995137a76a",
       "policy": "v3"
@@ -65,7 +75,7 @@
       "session_id": 9,
       "template_slug": "catch-up-shoulders",
       "template_name": "Rattrapage épaules",
-      "server_now": "2026-10-24T11:01:17.462066+00:00",
+      "server_now": "2026-10-31T14:35:40.298432+00:00",
       "rest_default_seconds": 90,
       "exercises": [
         {
@@ -103,6 +113,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -140,6 +151,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -175,6 +187,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -210,6 +223,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -242,6 +256,7 @@
             "zone": "delt_post",
             "label": "Deltoïdes postérieurs"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -279,6 +294,7 @@
             "zone": "delt_post",
             "label": "Deltoïdes postérieurs"
           },
+          "secondary_zones": [],
           "best": null
         }
       ],
@@ -466,7 +482,7 @@
       "session_id": 10,
       "template_slug": "push-b",
       "template_name": "Push B — Pecs largeur/stretch + Delts latéraux + Triceps",
-      "server_now": "2026-10-24T11:01:17.479085+00:00",
+      "server_now": "2026-10-31T14:35:40.315020+00:00",
       "rest_default_seconds": 90,
       "exercises": [
         {
@@ -499,6 +515,12 @@
             "zone": "pecs",
             "label": "Pectoraux"
           },
+          "secondary_zones": [
+            {
+              "zone": "triceps",
+              "label": "Triceps"
+            }
+          ],
           "best": null
         },
         {
@@ -536,6 +558,12 @@
             "zone": "pecs",
             "label": "Pectoraux"
           },
+          "secondary_zones": [
+            {
+              "zone": "triceps",
+              "label": "Triceps"
+            }
+          ],
           "best": null
         },
         {
@@ -568,6 +596,12 @@
             "zone": "pecs",
             "label": "Pectoraux"
           },
+          "secondary_zones": [
+            {
+              "zone": "triceps",
+              "label": "Triceps"
+            }
+          ],
           "best": null
         },
         {
@@ -603,6 +637,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -638,6 +673,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -675,6 +711,7 @@
             "zone": "delt_post",
             "label": "Deltoïdes postérieurs"
           },
+          "secondary_zones": [],
           "best": null
         },
         {
@@ -712,6 +749,7 @@
             "zone": "triceps",
             "label": "Triceps"
           },
+          "secondary_zones": [],
           "best": null
         }
       ],
@@ -927,7 +965,7 @@
       "session_id": 11,
       "template_slug": "push-a",
       "template_name": "Push A — Pecs épaisseur + Delts + Triceps",
-      "server_now": "2026-10-24T11:01:17.493036+00:00",
+      "server_now": "2026-10-31T14:35:40.328751+00:00",
       "rest_default_seconds": 90,
       "exercises": [
         {
@@ -970,6 +1008,12 @@
             "zone": "pecs",
             "label": "Pectoraux"
           },
+          "secondary_zones": [
+            {
+              "zone": "triceps",
+              "label": "Triceps"
+            }
+          ],
           "best": {
             "weight_kg": 52.5,
             "reps": 11
@@ -1015,6 +1059,12 @@
             "zone": "pecs",
             "label": "Pectoraux"
           },
+          "secondary_zones": [
+            {
+              "zone": "triceps",
+              "label": "Triceps"
+            }
+          ],
           "best": {
             "weight_kg": 57.5,
             "reps": 11
@@ -1060,6 +1110,12 @@
             "zone": "pecs",
             "label": "Pectoraux"
           },
+          "secondary_zones": [
+            {
+              "zone": "triceps",
+              "label": "Triceps"
+            }
+          ],
           "best": {
             "weight_kg": 10.0,
             "reps": 11
@@ -1105,6 +1161,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": {
             "weight_kg": 42.5,
             "reps": 11
@@ -1150,6 +1207,7 @@
             "zone": "delt_lat",
             "label": "Deltoïdes latéraux"
           },
+          "secondary_zones": [],
           "best": {
             "weight_kg": 7.5,
             "reps": 11
@@ -1195,6 +1253,7 @@
             "zone": "delt_post",
             "label": "Deltoïdes postérieurs"
           },
+          "secondary_zones": [],
           "best": {
             "weight_kg": 10.0,
             "reps": 11
@@ -1240,6 +1299,7 @@
             "zone": "triceps",
             "label": "Triceps"
           },
+          "secondary_zones": [],
           "best": {
             "weight_kg": 25.0,
             "reps": 11
@@ -1532,7 +1592,7 @@
               "session_id": 15,
               "template_slug": "push-a",
               "template_name": "Push A — Pecs épaisseur + Delts + Triceps",
-              "server_now": "2026-10-24T11:01:17.631241+00:00",
+              "server_now": "2026-10-31T14:35:40.465214+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -1570,6 +1630,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -1607,6 +1673,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -1644,6 +1716,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -1681,6 +1759,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -1718,6 +1797,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -1755,6 +1835,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -1792,6 +1873,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -2033,6 +2115,16 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "upper_back",
+                  "label": "Dos — épaisseur"
+                },
+                {
+                  "zone": "biceps",
+                  "label": "Biceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "599001306597824c6e25894935891cec",
                 "policy": "v3"
@@ -2043,7 +2135,7 @@
               "session_id": 17,
               "template_slug": "pull-b",
               "template_name": "Pull B — Dos épaisseur + Biceps",
-              "server_now": "2026-10-24T11:01:17.698441+00:00",
+              "server_now": "2026-10-31T14:35:40.528819+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -2081,6 +2173,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2118,6 +2216,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2155,6 +2259,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2190,6 +2300,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2227,6 +2343,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -2264,6 +2381,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -2301,6 +2419,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -2503,7 +2622,7 @@
               "session_id": 18,
               "template_slug": "push-b",
               "template_name": "Push B — Pecs largeur/stretch + Delts latéraux + Triceps",
-              "server_now": "2026-10-24T11:01:17.714169+00:00",
+              "server_now": "2026-10-31T14:35:40.543676+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -2536,6 +2655,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2573,6 +2698,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2605,6 +2736,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -2640,6 +2777,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -2675,6 +2813,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -2712,6 +2851,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -2749,6 +2889,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -2999,6 +3140,16 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "upper_back",
+                  "label": "Dos — épaisseur"
+                },
+                {
+                  "zone": "biceps",
+                  "label": "Biceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "afcba520d4fd0eb19fd6343aff52a71b",
                 "policy": "v3"
@@ -3009,7 +3160,7 @@
               "session_id": 20,
               "template_slug": "pull-b",
               "template_name": "Pull B — Dos épaisseur + Biceps",
-              "server_now": "2026-10-24T11:01:17.782140+00:00",
+              "server_now": "2026-10-31T14:35:40.608545+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -3047,6 +3198,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3084,6 +3241,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3121,6 +3284,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3156,6 +3325,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3193,6 +3368,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -3230,6 +3406,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -3267,6 +3444,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -3469,7 +3647,7 @@
               "session_id": 21,
               "template_slug": "pull-a",
               "template_name": "Pull A — Dos largeur + Delts postérieurs",
-              "server_now": "2026-10-24T11:01:17.796632+00:00",
+              "server_now": "2026-10-31T14:35:40.623700+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -3507,6 +3685,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3544,6 +3728,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3579,6 +3769,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3611,9 +3807,10 @@
                     "Face pull câble"
                   ],
                   "zone": {
-                    "zone": "pecs",
-                    "label": "Pectoraux"
+                    "zone": "delt_post",
+                    "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -3651,6 +3848,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -3686,6 +3884,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -3721,6 +3925,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 }
               ],
@@ -3953,6 +4163,24 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "quads",
+                  "label": "Quadriceps"
+                },
+                {
+                  "zone": "posterior",
+                  "label": "Chaîne postérieure"
+                },
+                {
+                  "zone": "calves",
+                  "label": "Mollets"
+                },
+                {
+                  "zone": "core",
+                  "label": "Core"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "fa0e40e3b76bfd5adbb22fedcd3f8dc7",
                 "policy": "v3"
@@ -3963,7 +4191,7 @@
               "session_id": 23,
               "template_slug": "legs-a",
               "template_name": "Legs A — Quad dominant",
-              "server_now": "2026-10-24T11:01:17.862413+00:00",
+              "server_now": "2026-10-31T14:35:40.687557+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -3999,6 +4227,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4033,6 +4262,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4070,6 +4300,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4107,6 +4338,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4144,6 +4376,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4181,6 +4414,7 @@
                     "zone": "calves",
                     "label": "Mollets"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4213,6 +4447,7 @@
                     "zone": "core",
                     "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -4433,7 +4668,7 @@
               "session_id": 24,
               "template_slug": "pull-b",
               "template_name": "Pull B — Dos épaisseur + Biceps",
-              "server_now": "2026-10-24T11:01:17.877077+00:00",
+              "server_now": "2026-10-31T14:35:40.702643+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -4471,6 +4706,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -4508,6 +4749,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -4545,6 +4792,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -4580,6 +4833,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -4617,6 +4876,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4654,6 +4914,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -4691,6 +4952,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -4923,6 +5185,24 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "pecs",
+                  "label": "Pectoraux"
+                },
+                {
+                  "zone": "delt_lat",
+                  "label": "Deltoïdes latéraux"
+                },
+                {
+                  "zone": "delt_post",
+                  "label": "Deltoïdes postérieurs"
+                },
+                {
+                  "zone": "triceps",
+                  "label": "Triceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "52199794fceae4df5eb016eff6139a5b",
                 "policy": "v3"
@@ -4933,7 +5213,7 @@
               "session_id": 26,
               "template_slug": "push-a",
               "template_name": "Push A — Pecs épaisseur + Delts + Triceps",
-              "server_now": "2026-10-24T11:01:17.942147+00:00",
+              "server_now": "2026-10-31T14:35:40.766538+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -4971,6 +5251,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -5008,6 +5294,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -5045,6 +5337,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -5082,6 +5380,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5119,6 +5418,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5156,6 +5456,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5193,6 +5494,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -5404,7 +5706,7 @@
               "session_id": 27,
               "template_slug": "catch-up-shoulders",
               "template_name": "Rattrapage épaules",
-              "server_now": "2026-10-24T11:01:17.956179+00:00",
+              "server_now": "2026-10-31T14:35:40.781341+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -5442,6 +5744,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5479,6 +5782,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5514,6 +5818,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5549,6 +5854,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5581,6 +5887,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -5618,6 +5925,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -5840,6 +6148,16 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "upper_back",
+                  "label": "Dos — épaisseur"
+                },
+                {
+                  "zone": "biceps",
+                  "label": "Biceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "359b7f1d46c10f08ddf5f70894b8a09a",
                 "policy": "v3"
@@ -5850,7 +6168,7 @@
               "session_id": 29,
               "template_slug": "pull-b",
               "template_name": "Pull B — Dos épaisseur + Biceps",
-              "server_now": "2026-10-24T11:01:18.016313+00:00",
+              "server_now": "2026-10-31T14:35:40.839227+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -5888,6 +6206,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -5925,6 +6249,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -5962,6 +6292,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -5997,6 +6333,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -6034,6 +6376,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6071,6 +6414,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6108,6 +6452,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -6310,7 +6655,7 @@
               "session_id": 30,
               "template_slug": "catch-up-arms",
               "template_name": "Rattrapage bras",
-              "server_now": "2026-10-24T11:01:18.030881+00:00",
+              "server_now": "2026-10-31T14:35:40.854052+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -6348,6 +6693,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6385,6 +6731,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6422,6 +6769,7 @@
                     "zone": "biceps",
                     "label": "Biceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6459,6 +6807,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6494,6 +6843,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6531,6 +6881,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6568,6 +6919,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -6800,6 +7152,16 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "lats",
+                  "label": "Dos — largeur"
+                },
+                {
+                  "zone": "delt_post",
+                  "label": "Deltoïdes postérieurs"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "433ab086c7894f01a97e47c4e8dc67da",
                 "policy": "v3"
@@ -6810,7 +7172,7 @@
               "session_id": 32,
               "template_slug": "pull-a",
               "template_name": "Pull A — Dos largeur + Delts postérieurs",
-              "server_now": "2026-10-24T11:01:18.096790+00:00",
+              "server_now": "2026-10-31T14:35:40.924086+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -6848,6 +7210,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -6885,6 +7253,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -6920,6 +7294,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -6952,9 +7332,10 @@
                     "Face pull câble"
                   ],
                   "zone": {
-                    "zone": "pecs",
-                    "label": "Pectoraux"
+                    "zone": "delt_post",
+                    "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -6992,6 +7373,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -7027,6 +7409,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7062,6 +7450,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 }
               ],
@@ -7264,7 +7658,7 @@
               "session_id": 33,
               "template_slug": "catch-up-back-width",
               "template_name": "Rattrapage dos largeur",
-              "server_now": "2026-10-24T11:01:18.111669+00:00",
+              "server_now": "2026-10-31T14:35:40.938485+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -7302,6 +7696,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7339,6 +7739,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7376,6 +7782,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7411,6 +7823,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7448,6 +7866,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7480,6 +7904,12 @@
                     "zone": "lats",
                     "label": "Dos — largeur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 }
               ],
@@ -7693,6 +8123,24 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "pecs",
+                  "label": "Pectoraux"
+                },
+                {
+                  "zone": "delt_lat",
+                  "label": "Deltoïdes latéraux"
+                },
+                {
+                  "zone": "delt_post",
+                  "label": "Deltoïdes postérieurs"
+                },
+                {
+                  "zone": "triceps",
+                  "label": "Triceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "7c9129933aadda0ada3e9df38b5d7fda",
                 "policy": "v3"
@@ -7703,7 +8151,7 @@
               "session_id": 35,
               "template_slug": "push-a",
               "template_name": "Push A — Pecs épaisseur + Delts + Triceps",
-              "server_now": "2026-10-24T11:01:18.172319+00:00",
+              "server_now": "2026-10-31T14:35:40.997076+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -7741,6 +8189,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7778,6 +8232,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7815,6 +8275,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -7852,6 +8318,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -7889,6 +8356,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -7926,6 +8394,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -7963,6 +8432,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -8179,7 +8649,7 @@
               "session_id": 36,
               "template_slug": "legs-a",
               "template_name": "Legs A — Quad dominant",
-              "server_now": "2026-10-24T11:01:18.192996+00:00",
+              "server_now": "2026-10-31T14:35:41.016470+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -8215,6 +8685,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8249,6 +8720,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8286,6 +8758,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8323,6 +8796,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8360,6 +8834,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8397,6 +8872,7 @@
                     "zone": "calves",
                     "label": "Mollets"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8429,6 +8905,7 @@
                     "zone": "core",
                     "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -8679,6 +9156,24 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "pecs",
+                  "label": "Pectoraux"
+                },
+                {
+                  "zone": "delt_lat",
+                  "label": "Deltoïdes latéraux"
+                },
+                {
+                  "zone": "delt_post",
+                  "label": "Deltoïdes postérieurs"
+                },
+                {
+                  "zone": "triceps",
+                  "label": "Triceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "de0d037e6b88e967c1a5f05bb5f67ceb",
                 "policy": "v3"
@@ -8689,7 +9184,7 @@
               "session_id": 38,
               "template_slug": "push-a",
               "template_name": "Push A — Pecs épaisseur + Delts + Triceps",
-              "server_now": "2026-10-24T11:01:18.264434+00:00",
+              "server_now": "2026-10-31T14:35:41.080329+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -8727,6 +9222,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -8764,6 +9265,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -8801,6 +9308,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -8838,6 +9351,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8875,6 +9389,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8912,6 +9427,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -8949,6 +9465,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -9160,7 +9677,7 @@
               "session_id": 39,
               "template_slug": "legs-b",
               "template_name": "Legs B — Postérieur dominant",
-              "server_now": "2026-10-24T11:01:18.279793+00:00",
+              "server_now": "2026-10-31T14:35:41.094990+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -9198,6 +9715,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9235,6 +9753,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9267,6 +9786,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9301,6 +9821,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9338,6 +9859,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9375,6 +9897,7 @@
                     "zone": "calves",
                     "label": "Mollets"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9411,6 +9934,7 @@
                     "zone": "core",
                     "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -9661,6 +10185,24 @@
                   "set_scheme": "3x 6-10"
                 }
               },
+              "zones": [
+                {
+                  "zone": "pecs",
+                  "label": "Pectoraux"
+                },
+                {
+                  "zone": "delt_lat",
+                  "label": "Deltoïdes latéraux"
+                },
+                {
+                  "zone": "delt_post",
+                  "label": "Deltoïdes postérieurs"
+                },
+                {
+                  "zone": "triceps",
+                  "label": "Triceps"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "9d9b9139aab9e9e2fc5df1653d14716d",
                 "policy": "v3"
@@ -9671,7 +10213,7 @@
               "session_id": 41,
               "template_slug": "push-a",
               "template_name": "Push A — Pecs épaisseur + Delts + Triceps",
-              "server_now": "2026-10-24T11:01:18.347642+00:00",
+              "server_now": "2026-10-31T14:35:41.160634+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -9709,6 +10251,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -9746,6 +10294,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -9783,6 +10337,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -9820,6 +10380,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9857,6 +10418,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9894,6 +10456,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -9931,6 +10494,7 @@
                     "zone": "triceps",
                     "label": "Triceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -10147,7 +10711,7 @@
               "session_id": 42,
               "template_slug": "full-body-morphotype-priority-v1",
               "template_name": "Full Body — Morphotype Priority",
-              "server_now": "2026-10-24T11:01:18.367607+00:00",
+              "server_now": "2026-10-31T14:35:41.181467+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -10185,6 +10749,12 @@
                     "zone": "pecs",
                     "label": "Pectoraux"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "triceps",
+                      "label": "Triceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -10222,6 +10792,12 @@
                     "zone": "upper_back",
                     "label": "Dos — épaisseur"
                   },
+                  "secondary_zones": [
+                    {
+                      "zone": "biceps",
+                      "label": "Biceps"
+                    }
+                  ],
                   "best": null
                 },
                 {
@@ -10257,6 +10833,7 @@
                     "zone": "quads",
                     "label": "Quadriceps"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10293,6 +10870,7 @@
                     "zone": "posterior",
                     "label": "Chaîne postérieure"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10330,6 +10908,7 @@
                     "zone": "delt_lat",
                     "label": "Deltoïdes latéraux"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10367,6 +10946,7 @@
                     "zone": "delt_post",
                     "label": "Deltoïdes postérieurs"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10404,6 +10984,7 @@
                     "zone": "calves",
                     "label": "Mollets"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10441,6 +11022,7 @@
                     "zone": "calves",
                     "label": "Mollets"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],
@@ -10712,6 +11294,12 @@
                   "set_scheme": "3x 10-15"
                 }
               },
+              "zones": [
+                {
+                  "zone": "core",
+                  "label": "Core"
+                }
+              ],
               "decision_identity": {
                 "fingerprint": "93c8876022c3e88705d3a05cbfa59252",
                 "policy": "v3"
@@ -10722,7 +11310,7 @@
               "session_id": 44,
               "template_slug": "liss-abs",
               "template_name": "LISS cardio + abdos",
-              "server_now": "2026-10-24T11:01:18.441813+00:00",
+              "server_now": "2026-10-31T14:35:41.252191+00:00",
               "rest_default_seconds": 90,
               "exercises": [
                 {
@@ -10755,6 +11343,7 @@
                     "zone": "core",
                     "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10791,6 +11380,7 @@
                     "zone": "core",
                     "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10820,9 +11410,10 @@
                   },
                   "substitutes": [],
                   "zone": {
-                    "zone": "calves",
-                    "label": "Mollets"
+                    "zone": "core",
+                    "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 },
                 {
@@ -10855,6 +11446,7 @@
                     "zone": "core",
                     "label": "Core"
                   },
+                  "secondary_zones": [],
                   "best": null
                 }
               ],

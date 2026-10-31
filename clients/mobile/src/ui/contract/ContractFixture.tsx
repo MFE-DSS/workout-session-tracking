@@ -11,8 +11,9 @@ import { InstrumentWithStepControls } from '../instrument/InstrumentWithStepCont
 import { LAST, RecessedWindowFixture, WindowModule } from '../instrument/RecessedWindowFixture';
 import { SessionSetCard } from '../instrument/SessionSetCard';
 import { color, type } from '../theme';
-import { candidateById } from './candidates';
+import { type CandidateFixture, candidateById } from './candidates';
 import { ExecutionScreenFixture } from './ExecutionScreenFixture';
+import { MissionScreenFixture } from './MissionScreenFixture';
 import { type BodyMapFixture, CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
 
 /** Fixed frame around the component: the same in every baseline. */
@@ -24,6 +25,7 @@ function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'FRAME-C-V1') return <InstrumentFrame variant="rail" width={f.width} height={f.height} />;
   if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
   if (f.contract === 'AUREN-MARK-V1') return <MarkPlacementFixture f={f.mark} />;
+  if (f.contract === 'MISSION-SCREEN-V1') return <MissionScreenFixture width={f.width} height={f.height} source={f.source} />;
   if (f.contract === 'EXECUTION-SCREEN-V1') {
     return <ExecutionScreenFixture width={f.width} height={f.height} plan={f.plan} exercise={f.exercise} phase={f.phase} />;
   }
@@ -99,6 +101,24 @@ function BodyMapGoverned({ width, height, bodymap }: { width: number; height: nu
   );
 }
 
+function CandidateBody({ candidate }: { candidate: CandidateFixture }) {
+  if (candidate.candidate === 'EXECUTION-SCREEN') {
+    return (
+      <ExecutionScreenFixture
+        width={candidate.width}
+        height={candidate.height}
+        plan={candidate.plan}
+        exercise={candidate.exercise}
+        phase={candidate.phase}
+      />
+    );
+  }
+  if (candidate.candidate === 'MISSION-SCREEN') {
+    return <MissionScreenFixture width={candidate.width} height={candidate.height} source={candidate.source} />;
+  }
+  return <RecessedWindowFixture width={candidate.width} height={candidate.height} fixture={candidate.fixture} />;
+}
+
 /**
  * DA-GOV-01 — renders ONE governed fixture, chosen by `?fixture=<id>`, on the
  * field, at its exact width, nothing else on the page: what the visual gate
@@ -116,17 +136,7 @@ export function ContractFixtureScreen() {
     return (
       <View style={{ flex: 1, backgroundColor: color.field, alignItems: 'flex-start' }}>
         <View testID="contract-candidate" style={{ padding: PAD, backgroundColor: color.field }}>
-          {candidate.candidate === 'EXECUTION-SCREEN' ? (
-            <ExecutionScreenFixture
-              width={candidate.width}
-              height={candidate.height}
-              plan={candidate.plan}
-              exercise={candidate.exercise}
-              phase={candidate.phase}
-            />
-          ) : (
-            <RecessedWindowFixture width={candidate.width} height={candidate.height} fixture={candidate.fixture} />
-          )}
+          <CandidateBody candidate={candidate} />
         </View>
       </View>
     );

@@ -56,23 +56,27 @@ for (const f of CANDIDATE_FIXTURES) {
     const all = async (id: string) =>
       Promise.all((await fixture.getByTestId(id).all()).map(async (l) => rel(await l.boundingBox())));
 
-    // DA-05.1 — a whole screen: the set's actions must stay on it, above the home indicator
-    if (f.candidate === 'EXECUTION-SCREEN') {
+    // DA-05.1 — a whole screen: its actions must stay on it, above the home indicator
+    if (f.candidate === 'EXECUTION-SCREEN' || f.candidate === 'MISSION-SCREEN') {
       const homeIndicator = 34;
+      const screenId = f.candidate === 'EXECUTION-SCREEN' ? 'execution-screen' : 'mission-screen';
+      // each screen's own paddings: the phone's insets plus its margin (execution 10 / 12, mission 8 / 12)
+      const expectedTop = 47 + (f.candidate === 'EXECUTION-SCREEN' ? 10 : 8);
       // the screen's own paddings must be the phone's insets, or nothing below is measured on a phone
       // (a SafeAreaProvider re-measured them against the browser window: a 496 px home indicator)
-      const pads = await fixture.getByTestId('execution-screen').evaluate((el) => {
+      const pads = await fixture.getByTestId(screenId).evaluate((el) => {
         const s = getComputedStyle(el.firstElementChild as HTMLElement);
         return { top: Number.parseFloat(s.paddingTop), bottom: Number.parseFloat(s.paddingBottom) };
       });
-      // the actions of the state: a set's « Valider » and « Passer cette série », a rest's « Commencer maintenant »
-      const actions =
-        f.phase !== 'rest-next'
-          ? [rel(await box(fixture.getByTestId('validate'))), rel(await box(fixture.getByText('Passer cette série', { exact: true })))]
-          : [rel(await box(fixture.getByTestId('skip')))];
+      // the actions of the state: a set's « Valider » and « Passer cette série », a rest's « Commencer maintenant »,
+      // the mission's « Démarrer »
+      let actions: (Box | null)[];
+      if (f.candidate === 'MISSION-SCREEN') actions = [rel(await box(fixture.getByTestId('start')))];
+      else if (f.phase === 'rest-next') actions = [rel(await box(fixture.getByTestId('skip')))];
+      else actions = [rel(await box(fixture.getByTestId('validate'))), rel(await box(fixture.getByText('Passer cette série', { exact: true })))];
       const bottom = PAD + f.height - homeIndicator + 0.5;
       const screenVerdict = {
-        phoneInsets: pads.top === 47 + 10 && pads.bottom === homeIndicator + 12,
+        phoneInsets: pads.top === expectedTop && pads.bottom === homeIndicator + 12,
         actionsOnScreen: actions.every((a) => a !== null && a.y + a.h <= bottom),
       };
       writeFileSync(path.join(OUT, `${f.id}.json`), JSON.stringify({ id: f.id, pads, actions, bottom, verdict: screenVerdict }, null, 2));

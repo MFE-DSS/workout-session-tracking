@@ -919,6 +919,58 @@
       "authority": "DA-05.1 — byte-identical to the 1x capture of the review board (EXECUTION-SCREEN candidates) approved by the operator",
       "approved_by": "operator — DA-05.1: chose the recommendation « BodyMap on the rest screen for the next exercise », asked for less text, better-inserted ⇄ / ⋯, smaller dials (« quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien. Mais bon, go. »); on the board's two options (set screen with / without its zone, recommended: with): « go »",
       "approved_on": "2026-10-31"
+    },
+    {
+      "id": "mission-390x844-catch-up-shoulders",
+      "file": "mission-390x844-catch-up-shoulders.png",
+      "visual_id": "MISSION-SCREEN-V1",
+      "fixture": "?fixture=mission-390x844-catch-up-shoulders",
+      "width": 390,
+      "scenario": "the lab's mission (Rattrapage épaules): its 2 zones, derived by the server",
+      "pixels": "414x868",
+      "sha256": "2ab8dc4f504837349eb94cc89a6296aea98c37357aee4bf891b29dcf2f5f30da",
+      "authority": "byte-identical to the 1x capture of the MISSION review board approved by the operator",
+      "approved_by": "operator — gate DA-01 « oui à tout », then on the MISSION board (the session's BodyMap derived by the server; subtitle, « On commence par » and the start sublabel stepped aside): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "mission-390x844-push-a",
+      "file": "mission-390x844-push-a.png",
+      "visual_id": "MISSION-SCREEN-V1",
+      "fixture": "?fixture=mission-390x844-push-a",
+      "width": 390,
+      "scenario": "Push A: 4 zones in a 2 × 2 panel, the subtitle and « On commence par » stepped aside",
+      "pixels": "414x868",
+      "sha256": "6d2bb3f35325b497738258a38441b9f94253eb615339d8aa5697536fe3abe589",
+      "authority": "byte-identical to the 1x capture of the MISSION review board approved by the operator",
+      "approved_by": "operator — gate DA-01 « oui à tout », then on the MISSION board (the session's BodyMap derived by the server; subtitle, « On commence par » and the start sublabel stepped aside): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "mission-390x844-liss-abs",
+      "file": "mission-390x844-liss-abs.png",
+      "visual_id": "MISSION-SCREEN-V1",
+      "fixture": "?fixture=mission-390x844-liss-abs",
+      "width": 390,
+      "scenario": "LISS abdos: 1 zone",
+      "pixels": "414x868",
+      "sha256": "d7eaa188e94dab134fe229d7d941f27f1fdada75cf98145b2d4a5fd49a44d08e",
+      "authority": "byte-identical to the 1x capture of the MISSION review board approved by the operator",
+      "approved_by": "operator — gate DA-01 « oui à tout », then on the MISSION board (the session's BodyMap derived by the server; subtitle, « On commence par » and the start sublabel stepped aside): « go »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "mission-390x844-legs-a",
+      "file": "mission-390x844-legs-a.png",
+      "visual_id": "MISSION-SCREEN-V1",
+      "fixture": "?fixture=mission-390x844-legs-a",
+      "width": 390,
+      "scenario": "Legs A: 4 zones, lower body",
+      "pixels": "414x868",
+      "sha256": "c998f08e34d2757c81f216975ffaf387e0f7c9d7f45728a47922e3b78a11378f",
+      "authority": "byte-identical to the 1x capture of the MISSION review board approved by the operator",
+      "approved_by": "operator — gate DA-01 « oui à tout », then on the MISSION board (the session's BodyMap derived by the server; subtitle, « On commence par » and the start sublabel stepped aside): « go »",
+      "approved_on": "2026-10-31"
     }
   ]
 }

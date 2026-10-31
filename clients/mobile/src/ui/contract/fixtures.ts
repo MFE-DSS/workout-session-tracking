@@ -15,6 +15,7 @@ import type { MarkFixture } from '../brand/MarkPlacementFixture';
 import type { Boundaries } from '../calibration/layout';
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 import type { ScreenPhase } from './ExecutionScreenFixture';
+import type { MissionSource } from './MissionScreenFixture';
 
 const LOW_KG = 52.5;
 const HIGH_KG = 87.5;
@@ -144,6 +145,15 @@ export type ContractFixture =
       plan: string;
       exercise: number;
       phase: ScreenPhase;
+    }
+  | {
+      /** the baseline id: `mission-<width>x<height>-<slug>` — MISSION-SCREEN-V1: the REAL mission screen with its session's BodyMap */
+      id: string;
+      contract: 'MISSION-SCREEN-V1';
+      width: number;
+      height: number;
+      /** `main` or `<family>:<session index>` (MissionScreenFixture) */
+      source: MissionSource;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -237,6 +247,11 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'execution-rest-next-390x844-push-a-e0', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'push-a', exercise: 0, phase: 'rest-next' },
   { id: 'execution-rest-next-390x844-push-a-e2', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'push-a', exercise: 2, phase: 'rest-next' },
   { id: 'execution-rest-next-390x844-catch-up-shoulders-e0', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'catch-up-shoulders', exercise: 0, phase: 'rest-next' },
+  // MISSION-SCREEN-V1 (operator, 2026-10-31: « go »): the session's BodyMap, derived by the server — 2, 4, 1 and lower-body 4 zones
+  { id: 'mission-390x844-catch-up-shoulders', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'main' },
+  { id: 'mission-390x844-push-a', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'upper:3' },
+  { id: 'mission-390x844-liss-abs', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'full:0' },
+  { id: 'mission-390x844-legs-a', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'upper:2' },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */

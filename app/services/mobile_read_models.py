@@ -82,6 +82,22 @@ def _resume(db: Session, s: WorkoutSession) -> dict[str, Any]:
     }
 
 
+def session_zones(db: Session, exercise_names: list[str]) -> list[dict[str, str]]:
+    """Les zones qu'une séance travaille : la zone PRINCIPALE de chaque exercice, dans l'ordre
+    de première apparition, chacune une fois (opérateur, 2026-10-29 : image → zone, exercice →
+    zones, programme → exercices). Même autorité que le plan (`_exercise`) et le relevé : le
+    contrat canonique. Un exercice sans zone connue n'ajoute rien — l'absence n'est pas devinée.
+    """
+    out: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for name in dict.fromkeys(exercise_names):
+        primary = resolve_exercise_zones(db, name).primary
+        if primary != "unknown" and primary not in seen:
+            seen.add(primary)
+            out.append({"zone": primary, "label": _ZONE_LABELS.get(primary, primary)})
+    return out
+
+
 def _candidate(c: dict[str, Any]) -> dict[str, Any]:
     tpl = c[TEMPLATE]
     return {"slug": tpl.slug, "name": _split_name(tpl.name)[0], PHRASE: c[PHRASE],
@@ -123,6 +139,9 @@ def mission_read_model(db: Session, user_id: int) -> dict[str, Any]:
                   "first_exercise": ({"name": exercises[0].name,
                                       "set_scheme": exercises[0].set_scheme}
                                      if exercises else None)},
+        # Le panneau BodyMap de la séance se DÉDUIT de ses exercices (DA-04.2) : l'appareil
+        # ne choisit aucune zone, il dessine celles-ci.
+        "zones": session_zones(db, [te.name for te in exercises]),
         "executable": bool(exercises),
         # L'identité de la décision voyage jusqu'au démarrage, qui seul l'écrit
         # (`REC-CP4`) — exactement les quatre champs cachés du formulaire web.
