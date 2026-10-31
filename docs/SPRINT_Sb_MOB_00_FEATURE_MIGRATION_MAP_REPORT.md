@@ -93,3 +93,17 @@ Aucun code produit, aucune route modifiée, aucun écran ; aucune décision de n
 
 **MOB-00 LIVRÉ EN PR** — inventaire exhaustif par construction (110 / 110), gardé par la CI, arbitré par l'opérateur
 (4 fonctions restent web, le social migre). Suite : `native-navigation-shell` (MOB-01), qui part de cette matrice.
+
+## Annexe — closeout (2026-10-31)
+
+- **Merge** : PR #339, `--merge --match-head-commit a88e1e6` → `bab0914`. Barrière : tous les checks verts, gate Sonar
+  `OK`, 0 fil ouvert, `CLEAN`.
+- **Incidents de CI, résolus dans le périmètre** : (1) garde rouge en CI seulement — FastAPI 0.141 du lock n'aplatit
+  plus les routeurs inclus, corrigé (§3) ; (2) deux conflits du registre après les merges de PLAT-01 et de son
+  closeout — canonique réintégré, lignes des deux changes conservées ; (3) un run devenu obsolète annulé pour libérer la
+  file.
+- **CI canonique** : run `41239923542` sur `bab0914`, vérifiée verte avant le push de ce closeout.
+- **Change OpenSpec** : à archiver (`openspec archive native-feature-migration-map`) — l'inventaire et la spec vivante
+  passent sous `openspec/specs/mobile/feature-migration-map/` ; la garde lit déjà les deux emplacements.
+
+**Verdict final : MOB-00 MERGÉE — l'inventaire est le backlog de la migration native.**
