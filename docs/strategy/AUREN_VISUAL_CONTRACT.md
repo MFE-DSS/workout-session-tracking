@@ -48,6 +48,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `AUREN-APP-ICON-V1` | **LOCKED** (2026-10-27 ; révisée le 2026-10-28, DA-03.3b : « le défaut proposé en monochrome ») | l'icône de l'app : `AUREN-MARK-V1` à 54 %, en une seule encre `ink` sur `field` ; le verre et les apparences sont ceux du système | DA-03.3 — `clients/mobile/assets/AurenAppIcon.icon` (Icon Composer), gate `visual-contract/app-icon/` (§19) |
 | `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
 | `BODYMAP-ZONES-V1` | **LOCKED** (2026-10-29, « Ok, très bien ») | une caméra par zone, **agnostique de tout programme** (zone → image) ; le panneau d'une séance se **déduit** de ses exercices (exercice → zones) | DA-04.2 — `clients/mobile/src/ui/bodymap/` (§21) ; banc seulement |
+| `MOTION-ZOOM` | ⏸ **DIFFÉRÉ** (2026-10-31, « mets tout ça de côté […] c'est à faire ») | le zoom biomécanique : le muscle pendant la répétition | DA-04.4 — rien de livré ; recherche, sources et pièges consignés (§23) ; backlog `MOTION-V2` |
 | `BODYMAP-MIT-BODY-V1` | **LOCKED** (2026-10-31, « ouais go on va se satisfaire de cela pour l'instant ») | le corps que dessinent §20 et §21 : `react-native-body-highlighter` 3.2.0 (MIT) vendorisé, chemins intouchés, crédit dans l'app ; remplace le master dans le runtime, le master reste source de conception | DA-04.3 — `clients/mobile/vendor/react-native-body-highlighter/`, `bodyGeometry.ts` (§22) ; les 18 baselines de §20 et §21 refaites |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
@@ -453,3 +454,32 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **MUST PRESERVE** : les chemins du paquet tels quels ; le crédit MIT dans l'app qui dessine ce corps ; tout ce que §20 et §21 préservent hors géométrie.
 **MUST NEVER** : éditer `bodyGeometry.ts` à la main ; retoucher, simplifier ou régénérer un chemin du paquet ; retirer `LICENSE` ou le crédit ; tout ce que §20 et §21 interdisent.
+
+## 23. `MOTION-ZOOM` — le zoom biomécanique, DIFFÉRÉ (DA-04.4, 2026-10-31)
+
+**Décision de l'opérateur** : « le prototype, globalement, est moche. Donc, le cadran et tout, j'aime pas trop […] mets tout ça de côté, que c'est des choses qui seront à faire plus tard dans l'amélioration continue du software, de fournir une représentation 3D pertinente des faisceaux, des pectoraux, comment ils sont mis en place. J'utiliserai Midjourney […] mets-le de côté dans le data contract, c'est à faire. »
+
+**Statut** : ⏸ **DIFFÉRÉ** — rien n'est livré, aucune baseline. Backlog `MOTION-V2` (`AUREN_VISUAL_BACKBONE §8.4`).
+
+**Le besoin, dans les mots de l'opérateur** : « un zoom biomécanique de la zone […] où on voit la fibre contractée, se décontracter, comprendre les zones de risque […] un zoom technico-fonctionnel » ; demain : « une représentation 3D pertinente des faisceaux ».
+
+**Ce qui a été essayé et pourquoi ce n'est pas retenu**
+
+| Essai | Résultat | Verdict |
+|---|---|---|
+| Prototype dessiné : fibres en éventail dans le pectoral MIT, stries qui se serrent / s'ouvrent selon le tempo ; cadran de l'épaule vu de dessus ; piste de tempo | fonctionnel, déterministe, animations réduites respectées | **rejeté** (« moche », cadran non aimé) — non committé ; patch conservé hors dépôt |
+| Images d'exercice RepDB (offre gratuite) | style dessin animé ; licence interdisant toute dérivation par IA | **rejeté** (« extrêmement moche ») |
+| Pectoral MIT **déformé** par le modèle thoraco-scapulaire (ci-dessous) | la mécanique est juste et différenciée par faisceau | **source retenue pour plus tard** ; le rendu reste à concevoir |
+
+**Ce que la recherche a établi** (licences lues à la source, 2026-10-31)
+
+- **Aucune ressource ouverte ne montre déjà un muscle en mouvement pendant un exercice** : le mouvement est à produire.
+- **Source de la mécanique — modèle thoraco-scapulaire** (Seth, Dong, Matias, Delp 2019, Stanford, simtk.org/projects/thoracoscapular) : **CC BY 4.0** (« Adapt … even commercially » ; crédit, lien vers la licence, mention « modifié »). Grand pectoral en **trois faisceaux** (claviculaire, thoracique moyen, thoracique inférieur), deltoïdes, dentelé, dorsal, coiffe, omoplate libre ; trajet et longueur de chaque faisceau à chaque instant. Moteur de calcul **OpenSim** (Apache-2.0), **hors app** : seules des données dérivées seraient embarquées.
+- **Mesuré sur le développé incliné** (deux poses extrêmes écrites d'après les amplitudes publiées — Schütz et al. 2022, CC BY : coude ~95° → ~15°) : longueur de fibre normalisée, bas → haut — claviculaire **1,01 → 0,49**, moyen **0,95 → 0,73**, inférieur **0,85 → 0,74** ; bras vu de dessus **7° → 90°**. Calage sur le corps MIT de face : x = 365,5 − z × 825, y = 312 − (y − 0,008) × 825 ; l'insertion calculée tombe sous le deltoïde (x ≈ 221–252).
+- **Pièges du modèle** : le coude est **verrouillé** dans le fichier publié (déverrouiller **avant** de construire le système, contrôler chaque valeur tenue) ; sa **longue portion du triceps s'allonge quand le coude s'étend — c'est faux** : n'en prendre que les muscles de l'épaule, et contrôler le sens de chaque muscle (il se raccourcit quand il travaille).
+- **Autres sources utilisables** : modèle membre supérieur Stanford-VA (BSD-3) ; Rajagopal (MIT, jambes seulement) ; BodyParts3D (CC BY 4.0 depuis le 2025-02-27) ; InjuryMap (CC BY 4.0 sur son site, JPG ; le vecteur sur Commons est en CC BY-SA 4.0) ; Gray's Anatomy 1918 (domaine public) ; TogoTV (CC BY 4.0, sarcomère).
+- **Exclus** : non commerciaux — MoBL-ARMS, MyoArm (MoBL en amont), AMASS, Fit3D, FLEX (contient pourtant le développé incliné), Human3.6M, OpenPose / OpenCap, OpenStax A&P **2ᵉ éd.** (désormais BY-NC-SA) ; origine inconnue — free-exercise-db ; fichiers bruts non redistribuables — Mixamo.
+
+**Pour reprendre** : (1) l'opérateur fixe le rendu (référence Midjourney, vue 3D ou ¾) ; (2) un générateur hors app (OpenSim + modèle thoraco-scapulaire) écrit, par exercice, les images-clés du muscle — environ 3 à 5 jours pour le premier, puis ~1 jour par exercice d'épaule / poitrine / dos ; (3) l'app les joue ; animations réduites = image fixe. Le geste reste **un modèle, pas une mesure**, et le dit.
+
+**MUST NEVER** (dès la reprise) : une revendication d'activation, d'intensité, d'efficacité ou de blessure ; une « zone de risque » au sens blessure (repère de technique seulement) ; une donnée de mouvement sous licence non commerciale ; une image régénérée pour contourner une licence.
