@@ -59,6 +59,20 @@ L'exécution (et sa reprise) est poussée au-dessus des onglets ; elle garde `Ex
 - **D2 — barre système, icônes AUREN.** NativeTabs teintée aux couleurs AUREN, icônes dessinées dans la DA (images),
   rendu iOS et Android montré avant commit.
 
+## Résultats de la pointe (2026-10-31, worktree jetable `spike/mob-01-router`, jamais poussé)
+
+- **Export web : ✅** — `index.ts` reste l'entrée ; `ExpoRoot` + `require.context('../routes')` se résolvent (983 modules,
+  feuille `native-tabs` incluse). Les galeries et la gate visuelle gardent leur chemin.
+- **Build Android natif (EAS `c0d0332c`) : ✅** — NativeTabs compile et s'affiche en barre Material 3 du système ;
+  changer d'onglet fonctionne.
+- **⚠ Sans icônes, la barre Android est inutilisable** : avec 4 onglets, Material n'affiche le libellé que de l'onglet
+  sélectionné, et l'indicateur reste figé sur le premier emplacement quand aucun onglet n'a d'icône. → les icônes
+  AUREN (D2) sont **obligatoires**, et `labelVisibilityMode="labeled"` sur Android.
+- **Dépendances** : `expo-router` 58.0.29 exige `expo-constants` ≥ 58.0.14 (le projet épingle 58.0.13) → montée
+  mineure ; le plugin `expo-router` (avec `root: ./src/routes`) se déclare dans `app.json` (la config dynamique
+  `app.config.js` ne peut pas être écrite par `expo install`).
+- **Reste à vérifier** : build iOS (barre système iOS) — au moment de la passe iPhone de la tranche.
+
 ## Open Questions
 
 - Libellés exacts des onglets (casse, accents dans la barre système) — sans effet sur la structure.
