@@ -89,4 +89,10 @@ graduée) ; compter des séries non faites (→ `zonesDone` ne lit que `done`, t
 - 75 baselines inchangées ; 2 neuves, identiques à l'octet aux captures revues.
 - 407 tests mobiles verts (dont 4 neufs).
 
+## Annexe de clôture (2026-10-31)
+
+- Gate vérifié avant fusion : tête `c8eccda`, 11 / 11 checks verts (contrat visuel : 77 baselines identiques au
+  pixel en CI), Sonar PR `OK`, 0 fil ouvert, `CLEAN`.
+- PR #334 fusionnée en `--merge --match-head-commit` : **`73eef87`** ; CI canonique `41216948228` **verte**.
+
 **Verdict :** `COMPLETE-SCREEN-V1` **LOCKED** — les trois écrans d'une séance parlent le même langage.
