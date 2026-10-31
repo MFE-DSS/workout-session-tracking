@@ -106,5 +106,11 @@ inchangées au pixel) ; un panneau écrasé (→ non dessiné sous 96 par ligne)
 - Constat corrigé au passage : le générateur du labo gardait l'ancien classifieur (la moitié restante de la
   correction #322) ; la garde de module le couvre désormais.
 
+## Annexe de clôture (2026-10-31)
+
+- Gate vérifié avant fusion : tête `f582b95`, 11 / 11 checks verts (contrat visuel : 75 baselines identiques au
+  pixel en CI ; shards pytest complets), Sonar PR `OK` (couverture du code neuf 100 %), 0 fil ouvert, `CLEAN`.
+- PR #332 fusionnée en `--merge --match-head-commit` : **`ce1b45c`** ; CI canonique `41213219210` **verte**.
+
 **Verdict :** `MISSION-SCREEN-V1` **LOCKED** et gate `DA-01` **passé** — la séance proposée porte son BodyMap,
 dérivé par le serveur ; la direction artistique initiale est close.
