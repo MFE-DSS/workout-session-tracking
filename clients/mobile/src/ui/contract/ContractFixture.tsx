@@ -12,6 +12,7 @@ import { LAST, RecessedWindowFixture, WindowModule } from '../instrument/Recesse
 import { SessionSetCard } from '../instrument/SessionSetCard';
 import { color, type } from '../theme';
 import { type CandidateFixture, candidateById } from './candidates';
+import { CompleteScreenFixture } from './CompleteScreenFixture';
 import { ExecutionScreenFixture } from './ExecutionScreenFixture';
 import { MissionScreenFixture } from './MissionScreenFixture';
 import { type BodyMapFixture, CALIBRATION_LINE_DEMO, type ContractFixture, fixtureById, selectedPositionOf } from './fixtures';
@@ -26,6 +27,7 @@ function Governed({ f }: { f: ContractFixture }) {
   if (f.contract === 'RECESSED-WINDOW-V1') return <RecessedWindowFixture width={f.width} height={f.height} fixture={f.fixture} />;
   if (f.contract === 'AUREN-MARK-V1') return <MarkPlacementFixture f={f.mark} />;
   if (f.contract === 'MISSION-SCREEN-V1') return <MissionScreenFixture width={f.width} height={f.height} source={f.source} />;
+  if (f.contract === 'COMPLETE-SCREEN-V1') return <CompleteScreenFixture width={f.width} height={f.height} plan={f.plan} />;
   if (f.contract === 'EXECUTION-SCREEN-V1') {
     return <ExecutionScreenFixture width={f.width} height={f.height} plan={f.plan} exercise={f.exercise} phase={f.phase} />;
   }
@@ -115,6 +117,9 @@ function CandidateBody({ candidate }: { candidate: CandidateFixture }) {
   }
   if (candidate.candidate === 'MISSION-SCREEN') {
     return <MissionScreenFixture width={candidate.width} height={candidate.height} source={candidate.source} />;
+  }
+  if (candidate.candidate === 'COMPLETE-SCREEN') {
+    return <CompleteScreenFixture width={candidate.width} height={candidate.height} plan={candidate.plan} />;
   }
   return <RecessedWindowFixture width={candidate.width} height={candidate.height} fixture={candidate.fixture} />;
 }

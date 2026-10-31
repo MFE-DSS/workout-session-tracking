@@ -56,6 +56,8 @@ for (const f of CANDIDATE_FIXTURES) {
     const all = async (id: string) =>
       Promise.all((await fixture.getByTestId(id).all()).map(async (l) => rel(await l.boundingBox())));
 
+    // a scrolling screen, framed tall to be seen whole: captured, nothing to measure against a phone's height
+    if (f.candidate === 'COMPLETE-SCREEN') return;
     // DA-05.1 — a whole screen: its actions must stay on it, above the home indicator
     if (f.candidate === 'EXECUTION-SCREEN' || f.candidate === 'MISSION-SCREEN') {
       const homeIndicator = 34;

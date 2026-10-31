@@ -154,6 +154,15 @@ export type ContractFixture =
       height: number;
       /** `main` or `<family>:<session index>` (MissionScreenFixture) */
       source: MissionSource;
+    }
+  | {
+      /** the baseline id: `complete-<width>x<height>-<plan>` — COMPLETE-SCREEN-V1: the REAL completion screen, framed tall (it scrolls) */
+      id: string;
+      contract: 'COMPLETE-SCREEN-V1';
+      width: number;
+      height: number;
+      /** a plan of the lab fixture, played to its end (CompleteScreenFixture) */
+      plan: string;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -252,6 +261,9 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'mission-390x844-push-a', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'upper:3' },
   { id: 'mission-390x844-liss-abs', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'full:0' },
   { id: 'mission-390x844-legs-a', contract: 'MISSION-SCREEN-V1', width: 390, height: 844, source: 'upper:2' },
+  // COMPLETE-SCREEN-V1 (operator, 2026-10-31: « OK »): the zones worked as the session's BodyMap, sets done per zone
+  { id: 'complete-390x2200-push-a', contract: 'COMPLETE-SCREEN-V1', width: 390, height: 2200, plan: 'push-a' },
+  { id: 'complete-390x2000-catch-up-shoulders', contract: 'COMPLETE-SCREEN-V1', width: 390, height: 2000, plan: 'catch-up-shoulders' },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */

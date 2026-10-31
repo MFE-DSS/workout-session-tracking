@@ -49,6 +49,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
 | `BODYMAP-ZONES-V1` | **LOCKED** (2026-10-29, « Ok, très bien ») | une caméra par zone, **agnostique de tout programme** (zone → image) ; le panneau d'une séance se **déduit** de ses exercices (exercice → zones) | DA-04.2 — `clients/mobile/src/ui/bodymap/` (§21) ; banc seulement |
 | `MOTION-ZOOM` | ⏸ **DIFFÉRÉ** (2026-10-31, « mets tout ça de côté […] c'est à faire ») | le zoom biomécanique : le muscle pendant la répétition | DA-04.4 — rien de livré ; recherche, sources et pièges consignés (§23) ; backlog `MOTION-V2` |
+| `COMPLETE-SCREEN-V1` | **LOCKED** (2026-10-31, « OK ») | la fin de séance : les zones travaillées en BodyMap, séries faites par zone | `CompleteScreen.tsx`, `zonesDone.ts` (§26) ; 2 baselines d'écran entier (cadre haut) |
 | `MISSION-SCREEN-V1` | **LOCKED** (2026-10-31, « go ») | la séance proposée avec son BodyMap, dérivé par le serveur ; moins de texte | `MissionScreen.tsx`, `mobile_read_models.session_zones` (§25) ; 4 baselines d'écran entier |
 | `EXECUTION-SCREEN-V1` | **LOCKED** (2026-10-31, « go ») | l'écran d'exercice réel : la zone de l'exercice en série, la zone de l'exercice suivant au repos, moins de texte, icônes dessinées, cadrans réduits | DA-05.1 — `ExecutionScreen.tsx`, `components.tsx` (§24) ; 6 baselines d'écran entier |
 | `BODYMAP-MIT-BODY-V1` | **LOCKED** (2026-10-31, « ouais go on va se satisfaire de cela pour l'instant ») | le corps que dessinent §20 et §21 : `react-native-body-highlighter` 3.2.0 (MIT) vendorisé, chemins intouchés, crédit dans l'app ; remplace le master dans le runtime, le master reste source de conception | DA-04.3 — `clients/mobile/vendor/react-native-body-highlighter/`, `bodyGeometry.ts` (§22) ; les 18 baselines de §20 et §21 refaites |
@@ -523,3 +524,20 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **MUST PRESERVE** : les zones viennent du serveur, dérivées des exercices ; une zone une fois ; « Démarrer » toujours à l'écran ; la raison du moteur dans ses propres mots.
 **MUST NEVER** : un panneau composé par l'écran ; une zone devinée pour un exercice sans zone connue ; un panneau écrasé ; le nom de la séance répété dans l'action ; tout ce que §21 interdit.
+
+## 26. `COMPLETE-SCREEN-V1` — la fin de séance, avec les zones travaillées (2026-10-31)
+
+**Décision de l'opérateur** : sur la planche COMPLETE (« Séries par zone » en pastilles → le BodyMap de la séance) : « OK ».
+
+**Ce que c'est** : l'écran de fin de séance **du produit** (`CompleteScreen.tsx`). Il défile sur le téléphone : il est gouverné au pixel dans un cadre **haut** (390 × 2200 / 2000) pour être vu entier, après une séance du labo jouée série par série dans le réducteur (heures fixes).
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | **LOCKED** (2026-10-31, « OK ») · monté dans l'app |
+| **Les zones** | `zonesDone` (`src/ui/bodymap/zonesDone.ts`) : les séries **faites**, comptées par zone principale de l'exercice (règle du relevé serveur), de la plus travaillée à la moins travaillée |
+| **Le panneau** | `BODYMAP-ZONES-V1` pleine largeur sous « Séries par zone » ; chaque fenêtre nomme sa zone et son **nombre de séries faites** (« PECTORAUX · 9 ») — un fait de la séance, jamais une intensité ni un effet ; zone hors taxonomie : pas de fenêtre |
+| **Le reste de l'écran** | inchangé (records, comparaison à soi-même, programme, registre, prochaine séance) |
+| **Baselines approuvées** | `complete-390x2200-push-a`, `complete-390x2000-catch-up-shoulders` — identiques à l'octet aux captures de la planche |
+
+**MUST PRESERVE** : des séries faites, comptées, jamais estimées ; une zone une fois ; tout ce que §21 préserve.
+**MUST NEVER** : une intensité, un pourcentage, une couleur graduée par le volume ; une zone devinée ; tout ce que §21 interdit.
