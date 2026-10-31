@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   GestureResponderEvent,
+  KeyboardAvoidingView,
   Modal,
   Pressable,
   ScrollView,
@@ -11,7 +12,7 @@ import {
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 
-import { nativeSheet } from '../native/platformUi';
+import { keyboardAvoidance, nativeSheet } from '../native/platformUi';
 import { ACTION_HEIGHT, color, NUMERAL_FONT_SCALE_CAP, space, type } from './theme';
 
 // ── the one sovereign action ─────────────────────────────────────────────────
@@ -242,17 +243,21 @@ export function Sheet(props: { visible: boolean; title: string; onClose: () => v
       transparent={own}
       onRequestClose={props.onClose}
     >
-      <View style={own ? styles.sheetBackdrop : styles.sheetIos}>
+      {/* the drawn panel rises above the keyboard (PLAT-01); the iOS page sheet is the system's */}
+      <KeyboardAvoidingView enabled={own} behavior={keyboardAvoidance.behavior} style={own ? styles.sheetBackdrop : styles.sheetIos}>
         <View style={own ? styles.sheetBody : styles.sheetBodyIos}>
           <View style={styles.sheetHead}>
-            <Text style={[type.bodyStrong, { fontSize: 19 }]} accessibilityRole="header">
+            <Text style={[type.bodyStrong, styles.sheetTitle]} accessibilityRole="header">
               {props.title}
             </Text>
             <SecondaryButton label="Fermer" onPress={props.onClose} style={styles.sheetClose} />
           </View>
-          <ScrollView contentContainerStyle={{ paddingBottom: space.xl }}>{props.children}</ScrollView>
+          {/* a tap on an action while the keyboard is up must act, not only close the keyboard (PLAT-01) */}
+          <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: space.xl }}>
+            {props.children}
+          </ScrollView>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -340,6 +345,8 @@ const styles = StyleSheet.create({
     paddingTop: space.m,
   },
   sheetHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.s },
+  // a long exercise name wraps instead of running into « Fermer » (PLAT-01, measured on Android)
+  sheetTitle: { fontSize: 19, flexShrink: 1, marginRight: space.s },
   sheetClose: { minHeight: 44, paddingHorizontal: 14 },
   sheetRow: { paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: color.line },
 });
