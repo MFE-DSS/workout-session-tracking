@@ -1,0 +1,75 @@
+schema: spec-driven
+
+# Pilotage AUREN (GOV-01, 2026-10-31). Ce contexte est injecté dans chaque
+# instruction d'artefact OpenSpec. Il ne remplace AUCUNE règle de CLAUDE.md
+# (contrat de repo, prioritaire) ni aucun contrat canonique listé ci-dessous.
+context: |
+  Language: fr
+  All artifacts must be written in fr.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  ## Produit
+  AUREN est un orchestrateur d'entraînement personnel, mobile d'abord.
+  L'application web existante (FastAPI + Jinja, `app/`) est une source de
+  comportement de domaine, de contrats de données et de capacités utilisateur
+  existantes. Elle n'est PAS un gabarit d'interface pour le mobile.
+
+  ## Cibles mobiles
+  Primaires : iOS et Android. Code React Native / Expo partagé préféré
+  (`clients/mobile`). Un comportement propre à une plateforme est permis quand
+  les conventions natives diffèrent réellement ; chaque divergence est consignée
+  explicitement dans le change.
+
+  ## Autorité visuelle
+  Toute interface utilise le langage visuel AUREN verrouillé :
+  `docs/strategy/AUREN_VISUAL_CONTRACT.md` (souverain pour le pixel),
+  `docs/strategy/AUREN_VISUAL_BACKBONE.md`, baselines de
+  `clients/mobile/visual-contract/`. Aucun agent ne redessine une primitive
+  LOCKED. Toute nouvelle surface visuelle suit : exploration → revue opérateur
+  → ACCEPT → baseline → intégration produit (CLAUDE.md §5 : rendu exposé à
+  l'opérateur AVANT tout commit UI). Une baseline n'est approuvée que par
+  l'opérateur.
+
+  ## Autorité de domaine
+  Ne jamais inventer : bornes de calibration, valeurs de récupération,
+  revendications anatomiques, mappings d'exercices, scores, recommandations,
+  quand les données de domaine ne les fournissent pas. Aucune revendication
+  d'activation, d'intensité, d'EMG, d'efficacité ou de blessure. Les zones
+  viennent du résolveur canonique (`resolve_exercise_zones`).
+
+  ## Règle de migration web → natif
+  Chaque fonction web héritée est classée : KEEP_DOMAIN (le domaine serveur
+  reste, l'interface est réécrite) · REWRITE_NATIVE · WEB_ONLY · DEPRECATE ·
+  BLOCKED (dépendance non résolue, nommée). Ne jamais copier de markup web dans
+  React Native.
+
+  ## Ce qu'OpenSpec ne remplace pas
+  AUREN_VISUAL_CONTRACT et ses baselines, les tests de domaine canoniques, la
+  provenance d'assets (`design/auren/`), les contrats scientifiques et de
+  domaine, `docs/strategy/SPEC_REGISTRY.md`. La documentation historique reste
+  autoritaire et n'est pas migrée dans OpenSpec.
+
+  ## Cycle obligatoire d'un changement substantiel
+  explore → propose → revue de l'opérateur (proposal + specs) → apply → tests
+  → verify → revue visuelle si applicable → PR → archive après merge. Aucune
+  grande fonctionnalité n'est implémentée directement depuis une consigne de
+  conversation. Un change = une PR ; deux changes ne sont jamais combinés.
+
+  ## Garde-fous du dépôt (CLAUDE.md, rappel)
+  `python scripts/check_scope.py` avant les vérifications locales ; CI réelle
+  = source de vérité ; migrations additive-only ; merge, squash, `--admin`,
+  suppression de branche/worktree = décisions humaines ; jamais `AGENTS.md`
+  commité ; dépôt public : aucun secret.
+
+rules:
+  proposal:
+    - Énoncer explicitement le hors-périmètre (non-goals).
+    - Pour toute surface visible, nommer les primitives LOCKED réutilisées et ce qui doit passer en revue opérateur (§5.1).
+    - Nommer les dépendances bloquantes (backend, données de domaine, assets, décisions opérateur).
+  design:
+    - Distinguer ce qui est observé dans le code de ce qui est proposé.
+    - Consigner chaque divergence iOS / Android et sa raison.
+  tasks:
+    - Inclure l'exécution de `python scripts/check_scope.py` et les vérifications locales qu'il exige.
+    - Toute tâche UI inclut un rendu exposé à l'opérateur avant commit.
+    - Aucune tâche ne modifie une baseline sans approbation explicite de l'opérateur.

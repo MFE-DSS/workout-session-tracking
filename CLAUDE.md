@@ -261,3 +261,26 @@ jugés systématiques par l'opérateur.
   disparu, le rendu n'est pas montré.
 - **5.9 — Un changement par itération**, en avant / après, chaque demande de
   l'opérateur citée mot pour mot. Une recomposition complète passe par 5.6.
+
+---
+
+## 6. OpenSpec — couche de gouvernance des changements (GOV-01, 2026-10-31)
+
+Les **nouveaux changements substantiels** (migration mobile, fonctions produit,
+plateforme) passent par **OpenSpec** (`openspec/`, CLI `openspec` 1.14.3) :
+`explore → propose → revue de l'opérateur → apply → tests → verify → revue
+visuelle si applicable → PR → archive après merge`. **Un change = une PR.**
+Aucune grande fonctionnalité n'est implémentée directement depuis une consigne
+de conversation.
+
+- Le pilotage AUREN est dans `openspec/config.yaml` (produit, cibles iOS et
+  Android, autorité visuelle, autorité de domaine, règle de migration
+  `KEEP_DOMAIN / REWRITE_NATIVE / WEB_ONLY / DEPRECATE / BLOCKED`).
+- OpenSpec gouverne le **quoi / pourquoi / données / comportement / périmètre**.
+  Il **ne remplace pas** `AUREN_VISUAL_CONTRACT` (souverain pour le pixel) ni
+  ses baselines, les tests de domaine, la provenance d'assets, les contrats
+  scientifiques, ni `docs/strategy/SPEC_REGISTRY.md`, qui recense chaque change.
+- **Préséance** : ce fichier > contrats canoniques versionnés > changes OpenSpec.
+  Un change en conflit avec un contrat canonique est un **conflit de spec** (§4,
+  arrêt dur), jamais une permission.
+- Les §1 à §5 restent intégralement en vigueur ; OpenSpec n'en réduit aucun.
