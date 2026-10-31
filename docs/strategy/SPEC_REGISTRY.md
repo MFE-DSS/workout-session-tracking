@@ -304,7 +304,7 @@
 |---|---|---|---|---|
 | Sb_GOV_01_OPENSPEC_BOOTSTRAP | Installation et initialisation d'OpenSpec (Claude Code : 6 skills, 6 commandes `/opsx:*`), pilotage AUREN dans `config.yaml`, `CLAUDE.md §6`, cette section | ✅ MERGÉE (PR #336, `d6d2272`, CI canonique `41225920266` verte) | `SPRINT_Sb_GOV_01_OPENSPEC_BOOTSTRAP_REPORT.md` | aucun code produit ; aucun `AGENTS.md` |
 | `android-pilot-readiness` (PLAT-01) | Un testeur Android distant joue le parcours connexion → MISSION → séance → bilan sur le backend de production | ⚪ à proposer | — | décisions opérateur : déploiement `spignos.com`, EAS Build, émulateur + testeur, revue de la proposal avant apply |
-| `native-feature-migration-map` (MOB-00) | Inventaire exhaustif du web (110 routes) classé KEEP_DOMAIN / REWRITE_NATIVE / WEB_ONLY / DEPRECATE / BLOCKED — devient le backlog produit | ⚪ à proposer | — | — |
+| `native-feature-migration-map` (MOB-00) | Inventaire exhaustif du web (110 routes) classé KEEP_DOMAIN / REWRITE_NATIVE / WEB_ONLY / DEPRECATE / BLOCKED — devient le backlog produit | ⚪ proposal en revue opérateur (`openspec/changes/native-feature-migration-map/`, validée `--strict`) | — | 110 routes d'API lues dans `app.routes` à `36b971a` |
 | `native-navigation-shell` (MOB-01) | Mini-ADR : navigation actuelle vs Expo Router NativeTabs ; hypothèse MISSION · SÉANCE · PROGRÈS · PROFIL non verrouillée | ⏳ après MOB-00 | — | — |
 | `session-native-integration` (MOB-02) | Les trois écrans de séance verrouillés sur les vraies données, hors chemin heureux compris | ⏳ après MOB-01 | — | — |
 
