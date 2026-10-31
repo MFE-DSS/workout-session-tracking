@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { keyboardAvoidance } from '../native/platformUi';
 import { PrimaryAction } from './components';
 import { color, space, type } from './theme';
 
@@ -31,66 +32,67 @@ export function LoginScreen(props: {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}
-    >
-      <Text style={[type.eyebrow, styles.centered]}>AUREN</Text>
-      <Text style={styles.title} accessibilityRole="header">Connexion</Text>
-      <Text style={[type.body, styles.centered, { marginTop: 6 }]}>Ton compte AUREN, le même que sur le site.</Text>
+    // the avoider's own padding replaces any paddingBottom set on it: the screen's margins live one view inside
+    <KeyboardAvoidingView behavior={keyboardAvoidance.behavior} style={styles.avoider}>
+      <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
+        <Text style={[type.eyebrow, styles.centered]}>AUREN</Text>
+        <Text style={styles.title} accessibilityRole="header">Connexion</Text>
+        <Text style={[type.body, styles.centered, { marginTop: 6 }]}>Ton compte AUREN, le même que sur le site.</Text>
 
-      <View style={styles.fields}>
-        <Text style={type.eyebrow}>Identifiant</Text>
-        <TextInput
-          value={username}
-          onChangeText={setUsername}
-          autoCapitalize="none"
-          autoCorrect={false}
-          spellCheck={false}
-          autoComplete="username"
-          textContentType="username"
-          returnKeyType="next"
-          onSubmitEditing={() => passwordRef.current?.focus()}
-          accessibilityLabel="Identifiant"
-          style={styles.input}
-          selectionColor={color.signal}
+        <View style={styles.fields}>
+          <Text style={type.eyebrow}>Identifiant</Text>
+          <TextInput
+            value={username}
+            onChangeText={setUsername}
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            autoComplete="username"
+            textContentType="username"
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            accessibilityLabel="Identifiant"
+            style={styles.input}
+            selectionColor={color.signal}
+          />
+          <Text style={[type.eyebrow, { marginTop: space.m }]}>Mot de passe</Text>
+          <TextInput
+            ref={passwordRef}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            spellCheck={false}
+            autoComplete="current-password"
+            textContentType="password"
+            returnKeyType="go"
+            onSubmitEditing={submit}
+            accessibilityLabel="Mot de passe"
+            style={styles.input}
+            selectionColor={color.signal}
+          />
+          {props.error ? (
+            <Text style={styles.error} accessibilityLiveRegion="polite">
+              {props.error === 'invalid' ? 'Identifiant ou mot de passe incorrect.' : 'AUREN est injoignable. Vérifie la connexion, puis réessaie.'}
+            </Text>
+          ) : null}
+        </View>
+
+        <View style={{ flex: 1 }} />
+        <PrimaryAction
+          testID="login"
+          tone={ready ? 'signal' : 'quiet'}
+          label={props.busy ? 'Connexion…' : 'Se connecter'}
+          onPress={submit}
         />
-        <Text style={[type.eyebrow, { marginTop: space.m }]}>Mot de passe</Text>
-        <TextInput
-          ref={passwordRef}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          autoCapitalize="none"
-          autoCorrect={false}
-          spellCheck={false}
-          autoComplete="current-password"
-          textContentType="password"
-          returnKeyType="go"
-          onSubmitEditing={submit}
-          accessibilityLabel="Mot de passe"
-          style={styles.input}
-          selectionColor={color.signal}
-        />
-        {props.error ? (
-          <Text style={styles.error} accessibilityLiveRegion="polite">
-            {props.error === 'invalid' ? 'Identifiant ou mot de passe incorrect.' : 'AUREN est injoignable. Vérifie la connexion, puis réessaie.'}
-          </Text>
-        ) : null}
       </View>
-
-      <View style={{ flex: 1 }} />
-      <PrimaryAction
-        testID="login"
-        tone={ready ? 'signal' : 'quiet'}
-        label={props.busy ? 'Connexion…' : 'Se connecter'}
-        onPress={submit}
-      />
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  avoider: { flex: 1, backgroundColor: color.field },
   root: { flex: 1, backgroundColor: color.field, paddingHorizontal: space.gutter },
   centered: { textAlign: 'center' },
   title: { ...type.title, fontSize: 40, lineHeight: 46, marginTop: 28, textAlign: 'center' },
