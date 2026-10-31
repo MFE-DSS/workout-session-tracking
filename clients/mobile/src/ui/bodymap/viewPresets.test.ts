@@ -1,13 +1,17 @@
-import { MASTER_ZONES } from './masterGeometry';
+import { BODY_PARTS, BODY_REGION, ZONE_SLUGS } from './bodyGeometry';
 import { triptychLayout, zoneGridHeight, zoneGridLayout, zoneGridShape } from './triptychLayout';
 import { cameraFor, presetById, presetForZone, PUSH_A_PRESETS, ZONE_PRESETS } from './viewPresets';
 
-const ASPECTS = [195 / 162, 96 / 106, 195 / 186, 124 / 66, 1, 0.5, 3];
+// the windows the app uses (session card 195 × 114, panel 96 × 106) and two extremes
+const ASPECTS = [195 / 114, 96 / 106, 1, 0.5];
 
 describe('DA-04.1 — BodyMap cameras', () => {
   it('names exactly the three Push A presets, each on an existing zone', () => {
     expect(PUSH_A_PRESETS.map((p) => p.id)).toEqual(['push-pecs', 'push-delt-lat', 'push-triceps']);
-    for (const p of PUSH_A_PRESETS) expect(MASTER_ZONES[p.zone].some((q) => q.side === p.side)).toBe(true);
+    for (const p of PUSH_A_PRESETS) {
+      const slugs = (ZONE_SLUGS[p.zone] as Partial<Record<string, readonly string[]>>)[p.side] ?? [];
+      expect(BODY_PARTS[p.side].some((part) => slugs.includes(part.slug))).toBe(true);
+    }
   });
 
   it('shows pecs and the lateral deltoid from the front, the triceps from the back', () => {
@@ -26,9 +30,9 @@ describe('DA-04.1 — BodyMap cameras', () => {
     }
   });
 
-  it('never cuts the preset box and never leaves its own half of the master', () => {
-    for (const p of PUSH_A_PRESETS) {
-      const lo = p.side === 'front' ? 0 : 120;
+  it('never cuts the preset box and never leaves its own half of the canvas', () => {
+    for (const p of ZONE_PRESETS) {
+      const { lo, hi } = BODY_REGION[p.side];
       for (const a of ASPECTS) {
         const c = cameraFor(p, a);
         expect(c.x).toBeLessThanOrEqual(p.frame.x + 1e-3);
@@ -36,7 +40,7 @@ describe('DA-04.1 — BodyMap cameras', () => {
         expect(c.x + c.w).toBeGreaterThanOrEqual(p.frame.x + p.frame.w - 1e-3);
         expect(c.y + c.h).toBeGreaterThanOrEqual(p.frame.y + p.frame.h - 1e-3);
         expect(c.x).toBeGreaterThanOrEqual(lo);
-        expect(c.x + c.w).toBeLessThanOrEqual(lo + 120 + 1e-3);
+        expect(c.x + c.w).toBeLessThanOrEqual(hi + 1e-3);
       }
     }
   });
@@ -66,8 +70,8 @@ describe('DA-04.1 — T1 triptych layout', () => {
 
 describe('DA-04.2 — every zone, every session', () => {
   it('one camera per zone of the master, each zone once', () => {
-    expect(ZONE_PRESETS.map((p) => p.zone).sort()).toEqual(Object.keys(MASTER_ZONES).sort());
-    for (const z of Object.keys(MASTER_ZONES)) expect(presetForZone(z)?.zone).toBe(z);
+    expect(ZONE_PRESETS.map((p) => p.zone).sort()).toEqual(Object.keys(ZONE_SLUGS).sort());
+    for (const z of Object.keys(ZONE_SLUGS)) expect(presetForZone(z)?.zone).toBe(z);
     expect(presetForZone('unknown')).toBeUndefined();
   });
 

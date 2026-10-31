@@ -2,19 +2,20 @@ import React from 'react';
 import { Text, View } from 'react-native';
 
 import { color, type } from '../theme';
+import { BODY_SOURCE } from './bodyGeometry';
 
 /**
- * DA-04.0b / DA-04.1 — the central attribution of the BodyMap, required before any
- * product mount. The text is the registry's (`auren_bodymap_source.yaml`: `attribution_fr`,
- * `non_medical_notice_fr`, `license_url`), word for word; tests/test_auren_bodymap_runtime.py
- * checks the parity. One central place (the journal sheet), not repeated in every card.
+ * DA-04.3 — the central credit of the body the BodyMap draws (react-native-body-highlighter,
+ * MIT): its copyright and licence, as the MIT terms ask, in one central place (the journal
+ * sheet), never repeated in the windows. The BodyParts3D / Servier master is no longer drawn
+ * by the app, so its credit is no longer shown here (it stays with the design source).
+ * tests/test_auren_bodymap_runtime.py checks this text against the vendored LICENSE.
  */
 export const BODYMAP_ATTRIBUTION = [
-  'Anatomie adaptée de BodyParts3D, © The Database Center for Life Science, sous licence CC BY 4.0.',
-  'Dorsaux et sangle abdominale adaptés de Servier Medical Art, sous licence CC BY 4.0.',
+  `Silhouette musculaire : ${BODY_SOURCE.package} ${BODY_SOURCE.version}, ${BODY_SOURCE.copyright}, licence ${BODY_SOURCE.license}.`,
 ] as const;
 export const BODYMAP_NON_MEDICAL = 'Visualisation non médicale — revue anatomique professionnelle non réalisée.';
-export const CC_BY_4_URL = 'https://creativecommons.org/licenses/by/4.0/';
+export const MIT_LICENSE_URL = 'https://opensource.org/license/mit';
 
 export function LicencesSection() {
   return (
@@ -26,7 +27,7 @@ export function LicencesSection() {
         </Text>
       ))}
       <Text style={type.small} selectable>
-        {CC_BY_4_URL}
+        {MIT_LICENSE_URL}
       </Text>
       <Text style={[type.small, { color: color.ink2 }]}>{BODYMAP_NON_MEDICAL}</Text>
     </View>
