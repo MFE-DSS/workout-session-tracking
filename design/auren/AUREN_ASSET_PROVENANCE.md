@@ -229,6 +229,40 @@ du propriétaire n'en est pas une. Attribution à afficher, chaque source marqu�
 « Anatomie adaptée de BodyParts3D, © The Database Center for Life Science, sous licence CC BY 4.0. » et
 « Dorsaux et sangle abdominale adaptés de Servier Medical Art, sous licence CC BY 4.0. »
 
+**DA-04.3 (2026-10-31) — l'app ne dessine plus ce master.** Le BodyMap mobile dessine désormais le corps MIT
+(entrée suivante). Le master reste la **source de conception**, fichiers et hashes intouchés ; l'autorisation
+DA-04.0b n'a plus d'usage runtime mobile.
+
+## BodyMap runtime — corps MIT (DA-04.3, 2026-10-31)
+```
+asset_id: auren.runtime.bodymap.mit-body.v1
+files: clients/mobile/vendor/react-native-body-highlighter/{LICENSE, body.json}
+       clients/mobile/src/ui/bodymap/bodyGeometry.ts (GENERATED from body.json, never edited by hand)
+author: third-party — react-native-body-highlighter 3.2.0, "Copyright (c) 2022 ELABBASSI Hicham"
+owner: third party (licensed to AUREN under MIT)
+ip_ownership_status: third-party-licensed
+source_project: react-native-body-highlighter (npm)
+source_version: 3.2.0 — tarball sha256 ffa9e4e2… (full value in body.json and BODY_SOURCE)
+source_type: third-party-open-source
+access_date: 2026-10-31
+source_reference: dist/assets/bodyFront.js (sha256 f5c82cdf…) and bodyBack.js (sha256 e5bc4efa…), read as TEXT, never executed
+license_spdx: MIT
+license_text_location: clients/mobile/vendor/react-native-body-highlighter/LICENSE (verbatim from the package)
+attribution_required: yes (MIT: copyright and permission notice travel with the work) — shown in the app's
+  « Journal local » sheet, Licences section: package, version, copyright, licence, link to the MIT text
+usage_nature: runtime — mobile BodyMap (bench fixtures only; mounted on no product screen)
+modifications: extraction of the male front/back `slug` + `d` strings only; paths UNCHANGED, character for character;
+  AUREN zone → part mapping and camera boxes are repository-authored, computed from the path bounds
+tooling: Python 3 stdlib generator (text extraction, path bounds)
+ai_usage: none in the geometry (the package's own paths)
+reviewer: operator (design: LOCKED in AUREN_VISUAL_CONTRACT.md §22) — professional anatomical review: NOT PERFORMED
+review_date: 2026-10-31
+evidence: tests/test_auren_bodymap_runtime.py (module = body.json, LICENSE, credit, zones) ; 18 baselines approved
+status: runtime-accepted-internal (operator, 2026-10-31)
+```
+Licence permissive, aucune clause non commerciale ni d'attribution visible obligatoire au-delà de la notice MIT,
+que l'app porte quand même. **Visualisation non médicale ; revue anatomique professionnelle non réalisée.**
+
 ## Muscle Focus P0 Regional Plates — provenance (Sb_ASSET_03B.2R-D1, 2026-08-05)
 ```
 asset_id: auren.muscle-focus.region.{chest,shoulders,posterior}.v1

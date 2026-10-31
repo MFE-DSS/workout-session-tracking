@@ -8,7 +8,7 @@
  * renders exactly what the operator approved. Changing a value here changes a
  * baseline: it is a contract change, not a refactor.
  */
-import type { ZoneCode } from '../bodymap/masterGeometry';
+import type { ZoneCode } from '../bodymap/bodyGeometry';
 import { zoneGridHeight } from '../bodymap/triptychLayout';
 import type { BodyMapViewPresetId } from '../bodymap/viewPresets';
 import type { MarkFixture } from '../brand/MarkPlacementFixture';

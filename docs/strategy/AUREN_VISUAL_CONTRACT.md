@@ -48,6 +48,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `AUREN-APP-ICON-V1` | **LOCKED** (2026-10-27 ; révisée le 2026-10-28, DA-03.3b : « le défaut proposé en monochrome ») | l'icône de l'app : `AUREN-MARK-V1` à 54 %, en une seule encre `ink` sur `field` ; le verre et les apparences sont ceux du système | DA-03.3 — `clients/mobile/assets/AurenAppIcon.icon` (Icon Composer), gate `visual-contract/app-icon/` (§19) |
 | `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
 | `BODYMAP-ZONES-V1` | **LOCKED** (2026-10-29, « Ok, très bien ») | une caméra par zone, **agnostique de tout programme** (zone → image) ; le panneau d'une séance se **déduit** de ses exercices (exercice → zones) | DA-04.2 — `clients/mobile/src/ui/bodymap/` (§21) ; banc seulement |
+| `BODYMAP-MIT-BODY-V1` | **LOCKED** (2026-10-31, « ouais go on va se satisfaire de cela pour l'instant ») | le corps que dessinent §20 et §21 : `react-native-body-highlighter` 3.2.0 (MIT) vendorisé, chemins intouchés, crédit dans l'app ; remplace le master dans le runtime, le master reste source de conception | DA-04.3 — `clients/mobile/vendor/react-native-body-highlighter/`, `bodyGeometry.ts` (§22) ; les 18 baselines de §20 et §21 refaites |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
 ---
@@ -383,6 +384,8 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **Décision de l'opérateur** : « ACCEPT T1 — THREE EQUAL WINDOWS » ; « Do NOT extend `signal` to anatomical localisation […] Use `system` for the foreground BodyMap zone » ; « Orientation takes precedence over active-zone percentage » ; gate final : « oui go ».
 
+> **DA-04.3 (2026-10-31)** : la géométrie, les caméras (boîtes), le traitement, les contrastes et l'attribution ci-dessous sont **remplacés par §22** (corps MIT). Le reste de cette section tient.
+
 **Ce que c'est** : trois **caméras** sur le **même** master BodyMap (`design/auren/source/bodymap/auren_bodymap_master.svg`, autorisé en builds internes, DA-04.0b), jamais une seconde anatomie. Le BodyMap V1 est une **localisation fonctionnelle** : où se situe principalement la famille musculaire, jamais quelle structure travaille ni dans quelle proportion.
 
 | Champ | Valeur |
@@ -426,3 +429,27 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **MUST PRESERVE** : une caméra par zone, indépendante des programmes ; le panneau de séance dérivé des exercices ; des fenêtres égales, trois par ligne au plus ; tout ce que §20 préserve.
 **MUST NEVER** : une image propre à un programme ; un panneau composé à la main ; une zone devinée pour un exercice sans zone connue (il n'ajoute rien) ; une fenêtre plus large qu'en T1 ; tout ce que §20 interdit.
+
+## 22. `BODYMAP-MIT-BODY-V1` — le BodyMap dessine le corps MIT (DA-04.3, 2026-10-31)
+
+**Décision de l'opérateur**, après l'essai côte à côte : « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; « restons là-dessus, on va pas s'entêter ».
+
+**Ce qui change** : la **géométrie** et le **traitement** de §20 et §21. Le corps dessiné n'est plus le master BodyParts3D / Servier mais celui de `react-native-body-highlighter` 3.2.0 (MIT, « Copyright (c) 2022 ELABBASSI Hicham »), vendorisé sous `clients/mobile/vendor/react-native-body-highlighter/` (`LICENSE` + `body.json` : chaînes `slug` et `d` lues comme texte, rien d'autre). `bodyGeometry.ts` en est **généré**, jamais édité à la main. Le master BodyParts3D reste la **source de conception** (`design/auren/source/bodymap/`, intouché) ; l'app ne le dessine plus.
+
+**Ce qui ne change pas** : identifiants et libellés des onze caméras ; règle de caméra (élargie, jamais coupée, dans sa moitié) ; grille et panneaux dérivés de §21 ; zone en `system`, jamais `signal` ; aucune revendication.
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | **LOCKED** (2026-10-31, « ouais go on va se satisfaire de cela pour l'instant ») · banc seulement : monté sur **aucun** écran produit |
+| **Correspondance zone → parties** (`ZONE_SLUGS`) | pectoraux `chest` · deltoïdes latéraux `deltoids` (face) · deltoïdes postérieurs `deltoids` (dos) · dos largeur `upper-back` · dos épaisseur `trapezius` · biceps `biceps` · triceps `triceps` · quadriceps `quadriceps` · ischios / fessiers `gluteal` + `hamstring` · mollets `calves` · core / abdos `abs` + `obliques` |
+| **Caméras** (`PRESET_FRAMES`) | centrées sur la boîte de la zone ; hauteur visible = fraction du corps (tête–plante, 1 244,2 u) validée dans la spec de cadrage : 0,26 (deltoïdes) · 0,30 (pectoraux, triceps, dos épaisseur, biceps, mollets, core) · 0,32 (dos largeur) · 0,36 (quadriceps, ischios / fessiers) ; largeur = 1,3 × la zone. Canevas : face x 0–724, dos x 724–1448, hauteur 1 448 |
+| **Traitement** (`BodyMapView`) | zone : `system` plein, peinte en dernier ; **toutes** les autres parties : un seul ton, `ink3` à 0,22 — les interstices entre parties dessinent les groupes ; aucun filet, aucune ombre, aucun dégradé ; aucun chemin modifié |
+| **Contrastes mesurés** (sur `field` `#0A0B0D`) | zone / corps (`#27292D`) **8,10 : 1** · zone / fond 10,99 : 1 · corps / fond 1,36 : 1 |
+| **Attribution** | centrale, feuille « Journal local » (section Licences) : paquet, version, copyright et licence lus de `BODY_SOURCE`, lien vers le texte MIT ; jamais dans les fenêtres. La mention non médicale reste |
+| **Baselines approuvées** | les 18 de §20 et §21 (ids inchangés), refaites sur ce corps, identiques à l'octet aux rendus de la planche avant / après revue par l'opérateur le 2026-10-31 ; les 47 autres fixtures sont restées identiques au pixel |
+| **Gardes** | `tests/test_auren_bodymap_runtime.py` (module = `body.json` au caractère près et même tarball ; LICENSE MIT avec le copyright ; crédit dans l'app ; onze zones, chaque partie présente sur son côté ; une caméra par zone ; rien dans le runtime web) ; `viewPresets.test.ts` (chaque caméra contient sa zone, reste dans sa moitié) |
+
+**Dette `ANATOMY-V2` de §20 / §21** : celles qui tenaient au dessin du master (crêtes des pectoraux, encoche du triceps, dorsaux rectangulaires, contours dentelés) **ne s'appliquent plus** au runtime ; elles restent vraies pour le master, source de conception. Reste de ce corps : un seul `deltoids` par vue (face = latéral / antérieur, dos = postérieur), pas de dorsal distinct du haut du dos.
+
+**MUST PRESERVE** : les chemins du paquet tels quels ; le crédit MIT dans l'app qui dessine ce corps ; tout ce que §20 et §21 préservent hors géométrie.
+**MUST NEVER** : éditer `bodyGeometry.ts` à la main ; retoucher, simplifier ou régénérer un chemin du paquet ; retirer `LICENSE` ou le crédit ; tout ce que §20 et §21 interdisent.

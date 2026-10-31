@@ -616,10 +616,10 @@
       "width": 390,
       "scenario": "T1: pecs (front) · lateral deltoids (front) · triceps (back), three equal Recessed Windows in Frame C",
       "pixels": "414x204",
-      "sha256": "85fe1848967a8085232a32a33a248750a27b1e6f3aba8338349935b451467a5c",
-      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
-      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
-      "approved_on": "2026-10-29"
+      "sha256": "ebe08e7985fdeb01e8464074971c4aaeec6e3ceca5b47254fbbd9f0913aac3a0",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-push-pecs",
@@ -629,10 +629,10 @@
       "width": 390,
       "scenario": "push-pecs in the session card's BodyMap window (60/40 module, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "27fecd6e65c65f295f089e6ad0c5df53777bce3f67120751c6e17c14f1f64ef1",
-      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
-      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
-      "approved_on": "2026-10-29"
+      "sha256": "615165d3b445cf32a6157a895e1ad56657d3af59f27732ca92c47faa42368d0c",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-push-delt-lat",
@@ -642,10 +642,10 @@
       "width": 390,
       "scenario": "push-delt-lat in the session card's BodyMap window (60/40 module, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "c7eb688e2aa078951fa0459e6b9e86fee252bf4af72f1212ae2e9ba5593cca89",
-      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
-      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
-      "approved_on": "2026-10-29"
+      "sha256": "fe6d1d29af07a6c4788e81ea0e4d104a331097f487ad29cdec9180a1b16e8912",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-push-triceps",
@@ -655,10 +655,10 @@
       "width": 390,
       "scenario": "push-triceps in the session card's BodyMap window (60/40 module, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "d024b5557774fab9fcf7189b23948bbb8956beda968769af17de730972493043",
-      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
-      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
-      "approved_on": "2026-10-29"
+      "sha256": "841be6474420e6bfd7ab1b98b9f8203a895a88bb52b3dd41854bf9029b3f199f",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-context-390-push-pecs",
@@ -668,10 +668,10 @@
       "width": 390,
       "scenario": "the push-pecs module above the locked load instrument at REST (75 kg, prescription 70)",
       "pixels": "414x586",
-      "sha256": "bf05df27f7c61c8b2ad46ab4079f2e1bd6c62f245e54ef951e325f4bb858ec16",
-      "authority": "DA-04.1 — byte-identical to the 1x capture of the final gate board (T1, foreground zone in `system`) reviewed by the operator",
-      "approved_by": "operator — DA-04.1 decision: « ACCEPT T1 », « Use `system` for the foreground BodyMap zone », baseline list « T1 full triptych; push-pecs / push-delt-lat / push-triceps at Session Card size; one context render above the locked Calibration Instrument »; final gate: « oui go »",
-      "approved_on": "2026-10-29"
+      "sha256": "e31ce73fef340801be397a34df13592bb98c92f3b09c1b5782c3ca8269e72915",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-delt-post",
@@ -681,10 +681,10 @@
       "width": 390,
       "scenario": "camera Deltoïdes postérieurs (back) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "701814e96f2d5e5eb1be3a715e9624242154a8990902da740113185af269f29a",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "9ba821e209630665c95a010fcdb407733abdac653d12d39f54802014cfcd3a94",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-lats",
@@ -694,10 +694,10 @@
       "width": 390,
       "scenario": "camera Dos largeur (back) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "561475954a90e9b8e788fba32cf09bfa26a120d6171a9d69354b4df0015b1b6b",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "80328cd9b7ba907e522923b6356c78ada65e8ca20da030ccf302a02c8d758519",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-upper-back",
@@ -707,10 +707,10 @@
       "width": 390,
       "scenario": "camera Dos épaisseur (back) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "97041ba57c822fa1aaa1db75388faf71b8309d6f0e97e56f4989a540a3ec4346",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "6fc16311fb294650c8190faf521a29c536713d9bb27be3c5c52ce8b7ae3237f5",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-biceps",
@@ -720,10 +720,10 @@
       "width": 390,
       "scenario": "camera Biceps (front) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "82012d7923a161207e83d98a9f804181f629d9d270a0b6854d241fdff42ae91e",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "9249374fc085495d76659c62265d01a2c80739363e43a074ff9c97f61a86108b",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-quads",
@@ -733,10 +733,10 @@
       "width": 390,
       "scenario": "camera Quadriceps (front) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "1f2554880cb6d018131c6c5606df9c82df9d9e41cecf0fd1ead47dddcca9bcca",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "1e7dd80ab46fd01b968d51456f1563b70ab2a796956ffc4662bf72a20b36da12",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-posterior",
@@ -746,10 +746,10 @@
       "width": 390,
       "scenario": "camera Ischios / Fessiers (back) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "0fe9c44b53b0d4e635851ebdcfd369782544a2c50e0a5dd0aa734b95b67dca56",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "5fcaf4595541cebee0dcae8f88485c85b8b106d7082606e4e5f0ac9a5b74780e",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-calves",
@@ -759,10 +759,10 @@
       "width": 390,
       "scenario": "camera Mollets (back) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "fb916381e8fc3dd8bf6da9f479212b5aa5820e986e1f78f8ebe6a6c97386a44b",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "d9e2b2c3e401ec6d57ff6c1cb90dba4a74ed79de1b72e1da6eb5abc6b30a8c4d",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-crop-390x188-core",
@@ -772,10 +772,10 @@
       "width": 390,
       "scenario": "camera Core / Abdos (front) in the session card's BodyMap window (60/40, beside « Dernière »)",
       "pixels": "414x212",
-      "sha256": "736ac1ec538b31e52c3b77a2d83187eba063f0ef81d2d34e9c67c9911517a796",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "c1e8d6819278d3f0bbcf963bbc0a696b84b1b4f4dc198505c22dcfe29ef5aaae",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-session-liss-abs",
@@ -785,10 +785,10 @@
       "width": 390,
       "scenario": "liss-abs panel derived from its exercises' primary zones: 1 zone",
       "pixels": "414x204",
-      "sha256": "aca15e67c34da8a125bbce08d720ee37ca89487d68f7d1e2bd80c550c739ac52",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "c4bfd28834f7480604277659cde3490bc1593e10cefe1d79ae327c15d065f107",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-session-pull-a",
@@ -798,10 +798,10 @@
       "width": 390,
       "scenario": "pull-a panel derived from its exercises' primary zones: 2 zones",
       "pixels": "414x204",
-      "sha256": "fb1dfc66b4aaa3ef13e00d33291df015445319d4eda893f3626adf27a19512e3",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "4c8a06fce0b125f51973d158d287bf349a7cb164877c8f5ce966039423dac2a9",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-session-push-a",
@@ -811,10 +811,10 @@
       "width": 390,
       "scenario": "push-a panel derived from its exercises' primary zones: 4 zones, 2 × 2",
       "pixels": "414x364",
-      "sha256": "3bd668ae90ce55056330a60f0b2296e633b00ef463b55ce0e0fe942923a35164",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "2fe393e45b095e1371202c16d3c0a290eb79efcf230d2c76e5f9bce0a596cc78",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-session-short-upper",
@@ -824,10 +824,10 @@
       "width": 390,
       "scenario": "short-upper panel derived from its exercises' primary zones: 6 zones, 3 + 3",
       "pixels": "414x364",
-      "sha256": "5947bb89fa2fc29ca2dbf618a6377596871d21bd62ac7f787c1534659ccff7c7",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "ebf5b87f9d9ec1ac1a86153e021c3cf25f765297966bcef3bdb0e6ec6b38fef6",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     },
     {
       "id": "bodymap-session-full-body-morphotype-priority-v1",
@@ -837,10 +837,10 @@
       "width": 390,
       "scenario": "full-body-morphotype-priority-v1 panel derived from its exercises' primary zones: 7 zones, 3 + 3 + 1",
       "pixels": "414x524",
-      "sha256": "658be2c70902ea49e3e7a5d41e0b6e303ab728122d64b98bec2c61565a6db763",
-      "authority": "DA-04.2 — byte-identical to the 1x capture of the DA-04.2 review board (11 zones, 13 sessions)",
-      "approved_by": "operator — DA-04.2 board: « Ok, très bien. Donc, push A, les 4 zones, full body, 7 zones », with the agnostic rule « tu associes les images à des zones de travail […] exploitées par des exercices comme muscles principaux ou secondaires […] ajoutés dans les programmes »",
-      "approved_on": "2026-10-29"
+      "sha256": "16e5b88b30e02dcf3c7d31f46ef2fb5c8a55d70abed3710e9e0f59018abf0006",
+      "authority": "DA-04.3 — re-rendered on the react-native-body-highlighter 3.2.0 body (MIT, contract §22); byte-identical to the 1x capture on the before/after board reviewed by the operator",
+      "approved_by": "operator — DA-04.3 (MIT body), on the static isolated-muscle zones: « pour tous les trucs isolés de muscles, c'est bon, là on statique, on va dire que ça c'est ok » ; on the 18-window before/after board: « ouais go on va se satisfaire de cela pour l'instant »",
+      "approved_on": "2026-10-31"
     }
   ]
 }
