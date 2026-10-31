@@ -12,6 +12,7 @@
  */
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
 import type { ScreenPhase } from './ExecutionScreenFixture';
+import type { MissionSource } from './MissionScreenFixture';
 
 export type CandidateFixture =
   | {
@@ -33,11 +34,20 @@ export type CandidateFixture =
       /** 0-based exercise of that plan (its first set, or the rest after its last set) */
       exercise: number;
       phase: ScreenPhase;
+    }
+  | {
+      /** `screen-mission-<width>x<height>-<slug>` */
+      id: string;
+      candidate: 'MISSION-SCREEN';
+      width: number;
+      height: number;
+      /** `main` or `<family>:<session index>` (MissionScreenFixture) */
+      source: MissionSource;
     };
 
 /**
- * Empty between two iterations: DA-05.1's screens were approved (« go », 2026-10-31) and moved to
- * fixtures.ts as EXECUTION-SCREEN-V1. The next iteration adds its own.
+ * Empty between two iterations: the MISSION screens were approved (« go », 2026-10-31) and moved to fixtures.ts
+ * as MISSION-SCREEN-V1. The next iteration adds its own.
  */
 export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = [];
 

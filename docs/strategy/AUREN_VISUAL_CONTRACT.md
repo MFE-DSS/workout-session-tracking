@@ -49,6 +49,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
 | `BODYMAP-ZONES-V1` | **LOCKED** (2026-10-29, « Ok, très bien ») | une caméra par zone, **agnostique de tout programme** (zone → image) ; le panneau d'une séance se **déduit** de ses exercices (exercice → zones) | DA-04.2 — `clients/mobile/src/ui/bodymap/` (§21) ; banc seulement |
 | `MOTION-ZOOM` | ⏸ **DIFFÉRÉ** (2026-10-31, « mets tout ça de côté […] c'est à faire ») | le zoom biomécanique : le muscle pendant la répétition | DA-04.4 — rien de livré ; recherche, sources et pièges consignés (§23) ; backlog `MOTION-V2` |
+| `MISSION-SCREEN-V1` | **LOCKED** (2026-10-31, « go ») | la séance proposée avec son BodyMap, dérivé par le serveur ; moins de texte | `MissionScreen.tsx`, `mobile_read_models.session_zones` (§25) ; 4 baselines d'écran entier |
 | `EXECUTION-SCREEN-V1` | **LOCKED** (2026-10-31, « go ») | l'écran d'exercice réel : la zone de l'exercice en série, la zone de l'exercice suivant au repos, moins de texte, icônes dessinées, cadrans réduits | DA-05.1 — `ExecutionScreen.tsx`, `components.tsx` (§24) ; 6 baselines d'écran entier |
 | `BODYMAP-MIT-BODY-V1` | **LOCKED** (2026-10-31, « ouais go on va se satisfaire de cela pour l'instant ») | le corps que dessinent §20 et §21 : `react-native-body-highlighter` 3.2.0 (MIT) vendorisé, chemins intouchés, crédit dans l'app ; remplace le master dans le runtime, le master reste source de conception | DA-04.3 — `clients/mobile/vendor/react-native-body-highlighter/`, `bodyGeometry.ts` (§22) ; les 18 baselines de §20 et §21 refaites |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
@@ -504,3 +505,21 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 
 **MUST PRESERVE** : la zone vient du plan (résolveur canonique), jamais choisie par l'écran ; un fait absent n'est pas dessiné (pas de zone connue → pas de fenêtre ; pas de dernière charge → pas de « Dernière ») ; une information une seule fois ; les actions au-dessus de l'indicateur d'accueil ; les cibles de 44 pt au moins.
 **MUST NEVER** : réintroduire la cible chiffrée ou la justification sous l'intention ; afficher « La dernière fois » quand le cadran porte déjà cette charge ; une fenêtre de zone écrasée sous 110 ; un glyphe de police pour une icône de geste ; tout ce que §20–§22 interdisent.
+
+## 25. `MISSION-SCREEN-V1` — la séance proposée, avec son BodyMap (2026-10-31)
+
+**Décision de l'opérateur** : gate `DA-01` final, « oui à tout » ; sur la planche MISSION : « go ».
+
+**Ce que c'est** : l'écran MISSION **du produit** (`MissionScreen.tsx`) — « qu'est-ce que je fais maintenant, et pourquoi » — avec le panneau BodyMap de la séance proposée. Gouverné au pixel sur un cadre d'iPhone 390 × 844, jour fixé, missions du labo.
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | **LOCKED** (2026-10-31, « go ») · monté dans l'app (labo et app connectée) |
+| **Les zones** | **dérivées par le serveur** : `mobile_read_models.session_zones` — la zone principale de chaque exercice, dans l'ordre de première apparition, une fois chacune, par le résolveur canonique ; un exercice sans zone connue n'ajoute rien. La mission les transporte (`zones`) ; l'app ne choisit rien |
+| **Le panneau** | `BODYMAP-ZONES-V1` (fenêtres égales, trois par ligne au plus), pleine largeur, prend la place restante jusqu'à sa hauteur gouvernée ; non dessiné si une ligne descendrait sous 96 |
+| **Une information une fois** | avec le panneau, le sous-titre (« Pecs épaisseur + Delts + Triceps ») et la boîte « On commence par » s'effacent ; « Démarrer » ne répète plus le nom de la séance, déjà en titre. Sans zone connue : l'écran d'avant, intact |
+| **Garde de banc** | insets du téléphone contrôlés ; « Démarrer » au-dessus de l'indicateur d'accueil (4 / 4) |
+| **Baselines approuvées** | `mission-390x844-catch-up-shoulders`, `mission-390x844-push-a`, `mission-390x844-liss-abs`, `mission-390x844-legs-a` — identiques à l'octet aux captures de la planche |
+
+**MUST PRESERVE** : les zones viennent du serveur, dérivées des exercices ; une zone une fois ; « Démarrer » toujours à l'écran ; la raison du moteur dans ses propres mots.
+**MUST NEVER** : un panneau composé par l'écran ; une zone devinée pour un exercice sans zone connue ; un panneau écrasé ; le nom de la séance répété dans l'action ; tout ce que §21 interdit.

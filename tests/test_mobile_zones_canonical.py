@@ -63,9 +63,52 @@ def test_the_recap_names_the_same_zone_as_the_plan():
     assert zones == {"delt_post": 1, "core": 1}
 
 
+def test_a_session_works_its_exercises_primary_zones_in_order_once():
+    """MISSION — le panneau BodyMap de la séance se déduit de ses exercices (DA-04.2) ; l'app n'en choisit aucun."""
+    from app.database import SessionLocal
+    from app.services.mobile_read_models import session_zones
+
+    with SessionLocal() as db:
+        zones = session_zones(db, ["Chest Press machine", REAR_DELT, "Chest Press machine", "Zzz exercice inconnu",
+                                   HANGING_LEG_RAISE])
+    assert [z["zone"] for z in zones] == ["pecs", "delt_post", "core"]
+    assert all(z["label"] for z in zones)
+
+
+def test_an_unknown_exercise_adds_no_zone():
+    from app.database import SessionLocal
+    from app.services.mobile_read_models import session_zones
+
+    with SessionLocal() as db:
+        assert session_zones(db, ["Zzz exercice inconnu"]) == []
+
+
+def test_the_mission_carries_the_zones_of_its_template(client):
+    from app.database import SessionLocal
+    from app.models.catalog import WorkoutTemplate
+    from app.services.body_zone_source import resolve_exercise_zones
+    from tests.test_d9_mobile_sessions import API
+
+    client.cookies.clear()
+    m = client.get(f"{API}/mission", headers=_token()).json()
+    assert m["state"] == "READY"
+    with SessionLocal() as db:
+        tpl = db.query(WorkoutTemplate).filter_by(slug=m["template"]["slug"]).first()
+        assert tpl is not None
+        expected = []
+        for te in sorted(tpl.exercises, key=lambda te: te.position):
+            z = resolve_exercise_zones(db, te.name).primary
+            if z != "unknown" and z not in expected:
+                expected.append(z)
+    assert [z["zone"] for z in m["zones"]] == expected
+    assert expected, "prémisse : la séance servie travaille au moins une zone connue"
+
+
 def test_no_mobile_payload_module_falls_back_to_the_old_classifier():
-    """Une classe, pas un fichier : tout ce qui construit le plan ou le relevé servis à l'app."""
-    for module in ("app/services/mobile_read_models.py", "app/services/session_recap.py"):
+    """Une classe, pas un fichier : tout ce qui construit le plan, le relevé ou la mission servis à l'app — et le
+    générateur du labo, qui en produit la copie figée (il classait encore à l'ancienne jusqu'au 2026-10-31)."""
+    for module in ("app/services/mobile_read_models.py", "app/services/session_recap.py",
+                   "clients/mobile/scripts/generate_fixtures.py"):
         src = (ROOT / module).read_text(encoding="utf-8")
         assert "classify_exercise" not in src, module
         assert "resolve_exercise_zones" in src, module
