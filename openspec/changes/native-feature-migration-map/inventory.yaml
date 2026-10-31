@@ -1,0 +1,659 @@
+# MOB-00 — inventaire des fonctions web et de leur destination native.
+#
+# Source des routes : `app.routes` à `36b971a` (110 routes d'API, 18 modules), jamais une mémoire.
+# Une entrée = une FONCTION UTILISATEUR ; chaque route montée appartient à exactement une entrée
+# (garde : tests/test_native_feature_migration_map.py).
+#
+# status : KEEP_DOMAIN (domaine serveur gardé, interface native déjà là ou réécrite)
+#        · REWRITE_NATIVE (à réécrire en natif sur le domaine existant)
+#        · WEB_ONLY (reste sur le web) · DEPRECATE (à retirer) · BLOCKED (dépendance nommée).
+# proposed: true = proposition de l'agent, à trancher par l'opérateur (DEPRECATE / WEB_ONLY).
+# native_destination : hypothèse de navigation MISSION · SÉANCE · PROGRÈS · PROFIL (non verrouillée,
+# décidée par MOB-01) ; « Compte » vit sous PROFIL.
+
+version: 1
+base_sha: 36b971a
+excluded_routes:  # montés par FastAPI, pas des fonctions utilisateur (désactivés en production)
+  - GET /openapi.json
+  - GET /api/docs
+  - GET /docs/oauth2-redirect
+  - MOUNT /static
+
+features:
+
+  # ── Séance (déjà native) ────────────────────────────────────────────────────
+  - id: mission-today
+    feature: MISSION — la séance du jour et sa raison
+    family: mission
+    routes: [GET /, GET /api/mobile/v1/mission]
+    legacy_location: "pages.index → index.html ; mobile_api.mission"
+    domain_owner: [recommendation_v3, home, mobile_read_models.mission_read_model, session_state]
+    api: "GET /api/mobile/v1/mission (existe)"
+    data: [workout_sessions, recommendation_episodes, decision_traces, training_preferences]
+    user_actions: [voir la séance proposée, lire la raison, choisir une alternative, démarrer]
+    native_destination: MISSION (MissionScreen, livré)
+    status: KEEP_DOMAIN
+    dependencies: []
+    visual_assets: [MISSION-SCREEN-V1, BODYMAP-ZONES-V1]
+    migration_risk: "faible — livré ; constat PLAT-01 : raison « déjà bien servi » affichée MESURÉE sur un compte sans séance"
+
+  - id: plan-adaptation-dismiss
+    feature: Écarter une adaptation de plan proposée
+    family: mission
+    routes: [POST /plan-adaptations/dismiss]
+    legacy_location: "plan_adaptation.dismiss → retour accueil"
+    domain_owner: [plan_adaptation_store]
+    api: "à créer (commande JSON)"
+    data: [plan_adaptation_dismissals]
+    user_actions: [écarter une adaptation]
+    native_destination: MISSION
+    status: REWRITE_NATIVE
+    dependencies: [MOB-04 Mission]
+    visual_assets: []
+    migration_risk: faible
+
+  - id: session-execution
+    feature: Exécuter une séance (démarrer, séries, repos, substitution, terminer, abandonner)
+    family: seance
+    routes:
+      - POST /sessions
+      - GET /sessions/{session_id}
+      - POST /sessions/{session_id}
+      - POST /sessions/{session_id}/exercises/{session_exercise_id}
+      - POST /sessions/{session_id}/exercises/{session_exercise_id}/rest/skip
+      - POST /api/mobile/v1/sessions
+      - GET /api/mobile/v1/sessions/{session_id}/execution
+      - PUT /api/mobile/v1/sessions/{session_id}/sets/{set_id}
+      - POST /api/mobile/v1/sessions/{session_id}/exercises/{se_id}/substitute
+      - POST /api/mobile/v1/sessions/{session_id}/finish
+      - POST /api/mobile/v1/sessions/{session_id}/abandon
+    legacy_location: "sessions.* → session_detail.html, _partials/exercise_card.html, rest_timer.html ; mobile_api.*"
+    domain_owner: [session_builder, console_state, substitution, overload_engine, environment_activation, mobile_read_models]
+    api: "/api/mobile/v1/sessions/* (existe)"
+    data: [workout_sessions, session_exercises, set_logs]
+    user_actions: [démarrer, saisir charge et répétitions, valider, repos, passer, remplacer, terminer, abandonner, reprendre]
+    native_destination: SÉANCE (ExecutionScreen, ResumeScreen, livrés)
+    status: KEEP_DOMAIN
+    dependencies: [MOB-02 intégration de séance (hors chemin heureux), E7 pour l'instrument de charge]
+    visual_assets: [EXECUTION-SCREEN-V1, SESSION-CARD-R1 (attend E7)]
+    migration_risk: "moyen — reprise, hors ligne et substitution à durcir (MOB-02)"
+
+  - id: session-recap
+    feature: Bilan de fin de séance
+    family: seance
+    routes: ["GET /sessions/{session_id}/done"]
+    legacy_location: "sessions.done → session_done.html"
+    domain_owner: [session_recap, stats, session_completion]
+    api: "partiel — le bilan natif se calcule sur l'appareil ; historique et rythme hebdomadaire absents (history=null)"
+    data: [workout_sessions, set_logs]
+    user_actions: [lire le bilan, voir la prochaine séance]
+    native_destination: SÉANCE (CompleteScreen, livré)
+    status: KEEP_DOMAIN
+    dependencies: [read model d'historique pour la comparaison « à toi-même »]
+    visual_assets: [COMPLETE-SCREEN-V1]
+    migration_risk: faible
+
+  # ── Compte ──────────────────────────────────────────────────────────────────
+  - id: auth-sign-in
+    feature: Se connecter, se déconnecter
+    family: compte
+    routes: [GET /login, POST /login, POST /logout, POST /api/mobile/v1/auth/login, POST /api/mobile/v1/auth/refresh, POST /api/mobile/v1/auth/logout, GET /api/mobile/v1/auth/me]
+    legacy_location: "auth_routes.login/logout ; mobile_api.auth"
+    domain_owner: [auth, device_auth, password_policy]
+    api: "/api/mobile/v1/auth/* (existe)"
+    data: [users, device_sessions]
+    user_actions: [se connecter, se déconnecter de cet appareil]
+    native_destination: Compte (LoginScreen, livré)
+    status: KEEP_DOMAIN
+    dependencies: []
+    visual_assets: []
+    migration_risk: faible
+
+  - id: auth-register
+    feature: Créer un compte
+    family: compte
+    routes: [GET /welcome, GET /register, POST /register]
+    legacy_location: "auth_routes.register → welcome.html, register.html"
+    domain_owner: [auth, password_policy]
+    api: "à créer (inscription mobile)"
+    data: [users]
+    user_actions: [créer un compte]
+    native_destination: Compte — entrée de l'onboarding
+    status: REWRITE_NATIVE
+    dependencies: [MOB-03 onboarding, limite de débit d'inscription côté API]
+    visual_assets: []
+    migration_risk: "moyen — aujourd'hui le testeur doit passer par le web"
+
+  - id: auth-password-reset
+    feature: Mot de passe oublié, réinitialisation par lien
+    family: compte
+    routes: ["GET /forgot-password", "POST /forgot-password", "GET /reset/{token}", "POST /reset/{token}"]
+    legacy_location: "auth_routes → forgot_password.html, reset_password.html"
+    domain_owner: [auth, email]
+    api: "web (le lien du courriel ouvre le site)"
+    data: [users]
+    user_actions: [demander un lien, choisir un nouveau mot de passe]
+    native_destination: "hors app — l'écran de connexion renvoie vers le site"
+    status: WEB_ONLY
+    proposed: true
+    dependencies: []
+    visual_assets: []
+    migration_risk: faible
+
+  - id: account-password-change
+    feature: Changer son mot de passe
+    family: compte
+    routes: [GET /profile/password, POST /profile/password]
+    legacy_location: "auth_routes → password_change.html"
+    domain_owner: [auth, password_policy]
+    api: "à créer"
+    data: [users]
+    user_actions: [changer son mot de passe]
+    native_destination: Compte
+    status: REWRITE_NATIVE
+    dependencies: [MOB-03 compte]
+    visual_assets: []
+    migration_risk: "faible — révocation par époque de session déjà en place"
+
+  - id: account-contact
+    feature: Écrire à l'administrateur
+    family: compte
+    routes: [GET /contact, POST /contact]
+    legacy_location: "auth_routes → contact.html"
+    domain_owner: [email]
+    api: web
+    data: []
+    user_actions: [envoyer un message]
+    native_destination: hors app (lien vers le site)
+    status: WEB_ONLY
+    proposed: true
+    dependencies: []
+    visual_assets: []
+    migration_risk: faible
+
+  - id: account-data-export
+    feature: Exporter son journal (JSON, CSV)
+    family: compte
+    routes: [GET /export, GET /export/sessions.json, GET /export/sessions.csv]
+    legacy_location: "export → export.html"
+    domain_owner: [export_builder, backup_inspector]
+    api: web
+    data: [workout_sessions, set_logs]
+    user_actions: [télécharger son journal]
+    native_destination: hors app (lien vers le site)
+    status: WEB_ONLY
+    proposed: true
+    dependencies: [suppression de compte dans l'app — exigence Store, inexistante]
+    visual_assets: []
+    migration_risk: "moyen — RGPD : suppression de compte à concevoir avant la diffusion publique"
+
+  # ── Profil ──────────────────────────────────────────────────────────────────
+  - id: profile-overview
+    feature: Profil — page de synthèse du compte
+    family: profil
+    routes: [GET /profile]
+    legacy_location: "auth_routes.profile → profile.html"
+    domain_owner: [profile_metrics, radar, session_state]
+    api: "à créer (read model profil)"
+    data: [users, training_preferences, body_measurements]
+    user_actions: [voir son profil, accéder aux réglages]
+    native_destination: PROFIL
+    status: REWRITE_NATIVE
+    dependencies: [UX-LAB PROFILE (axes de l'hexagone / octogone), MOB-11]
+    visual_assets: ["hexagone existant : radar.build_radar_svg (SVG serveur, profil public et Body Intelligence) — à revaloriser en DA AUREN"]
+    migration_risk: "élevé — surface centrale, modèle d'interaction hérité (TRANSITIONAL)"
+
+  - id: profile-physical
+    feature: Profil physique déclaré (taille, poids, FC de repos, tour de taille, tension)
+    family: profil
+    routes: [POST /profile/body]
+    legacy_location: "auth_routes.profile_body"
+    domain_owner: [body_profile]
+    api: "à créer"
+    data: [users.height_cm, users.weight_kg, users.resting_hr, users.waist_cm, users.bp_systolic, users.bp_diastolic]
+    user_actions: [déclarer ses données physiques]
+    native_destination: PROFIL / onboarding
+    status: REWRITE_NATIVE
+    dependencies: [MOB-03 onboarding, consentement explicite (spec vNext O6)]
+    visual_assets: []
+    migration_risk: "moyen — users.weight_kg écrasé en double de body_measurements.weight_kg : une seule source à choisir"
+
+  - id: profile-training-preferences
+    feature: Préférences d'entraînement déclarées (objectif, fréquence, durée…)
+    family: profil
+    routes: [POST /profile/preferences]
+    legacy_location: "auth_routes.profile_preferences"
+    domain_owner: [training_preferences]
+    api: "à créer"
+    data: [training_preferences]
+    user_actions: [déclarer objectif, fréquence, durée, environnement]
+    native_destination: PROFIL / onboarding
+    status: REWRITE_NATIVE
+    dependencies: [MOB-03 onboarding]
+    visual_assets: []
+    migration_risk: moyen
+
+  - id: body-measurements
+    feature: Mesures corporelles et poids, série temporelle datée
+    family: profil
+    routes:
+      - POST /profile/measurements
+      - GET /body
+      - GET /body/measurements/new
+      - POST /body/measurements
+      - GET /body/measurements/{measurement_id}/edit
+      - POST /body/measurements/{measurement_id}/edit
+      - POST /body/measurements/{measurement_id}/delete
+      - GET /body/export.json
+    legacy_location: "body.* → body_assessment/body_overview.html, measurement_form.html"
+    domain_owner: [measurements, body_ledger, body_profile]
+    api: "à créer (lecture + écriture JSON)"
+    data: ["body_measurements (measured_at, weight_kg, tours)"]
+    user_actions: [saisir son poids, saisir des mesures, corriger, supprimer, exporter]
+    native_destination: PROFIL (BODY_LEDGER)
+    status: REWRITE_NATIVE
+    dependencies: [consentement aux mesures (body_consent), choix de la source unique du poids]
+    visual_assets: [courbe de poids (code paramétrique)]
+    migration_risk: "moyen — la série temporelle EXISTE déjà (body_measurements) ; ne pas en créer une seconde"
+
+  - id: body-consent
+    feature: Consentement à l'enregistrement des mesures corporelles
+    family: profil
+    routes: [POST /profile/consent, POST /body/consent]
+    legacy_location: "auth_routes.profile_consent, body.consent"
+    domain_owner: [body_profile]
+    api: "à créer"
+    data: [body_consents]
+    user_actions: [accorder, retirer]
+    native_destination: PROFIL / onboarding
+    status: REWRITE_NATIVE
+    dependencies: [SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC]
+    visual_assets: []
+    migration_risk: "moyen — RGPD, retrait effectif"
+
+  - id: body-intelligence
+    feature: Lecture du corps (Body Intelligence)
+    family: profil
+    routes: [GET /body/intelligence]
+    legacy_location: "body_intelligence → body_intelligence.html"
+    domain_owner: [body_intelligence, body_intelligence_inputs, muscle_scoring, radar]
+    api: "à créer"
+    data: [body_measurements, workout_sessions]
+    user_actions: [lire sa synthèse corporelle]
+    native_destination: PROFIL
+    status: BLOCKED
+    dependencies: [UX-LAB PROFILE (axes de l'octogone), revue des revendications (aucune mesure inventée), body_assessment_enabled désactivé en production]
+    visual_assets: [octogone de profil (à concevoir)]
+    migration_risk: "élevé — frontière entre profil d'allocation mesurable et estimation physique"
+
+  - id: body-capture-quality
+    feature: Qualité de capture corporelle (coquille statique)
+    family: profil
+    routes: [GET /body/capture-quality]
+    legacy_location: "body_capture → body_capture_quality.html"
+    domain_owner: []
+    api: aucune
+    data: []
+    user_actions: [lire des consignes de capture]
+    native_destination: PROFIL — photos de progression
+    status: BLOCKED
+    dependencies: [photos de progression (conception, consentement, stockage privé)]
+    visual_assets: []
+    migration_risk: faible
+
+  - id: coach-report
+    feature: Rapport de coach (synthèse en 10 blocs)
+    family: progres
+    routes: [GET /coach-report]
+    legacy_location: "coach_report → coach_report.html"
+    domain_owner: [coach_report, coach_inference, body_intelligence, narrative]
+    api: "à créer"
+    data: [workout_sessions, body_measurements]
+    user_actions: [lire le rapport]
+    native_destination: PROGRÈS
+    status: BLOCKED
+    dependencies: [UX-LAB PROFILE / PROGRÈS, moteur scientifique V2 (couches E0–E8)]
+    visual_assets: []
+    migration_risk: "élevé — prose dense héritée, revendications à revoir"
+
+  # ── Progrès / historique ────────────────────────────────────────────────────
+  - id: history-journal
+    feature: Historique des séances (journal)
+    family: progres
+    routes: [GET /history]
+    legacy_location: "pages.history → history.html"
+    domain_owner: [flight_recorder, session_state]
+    api: "à créer (read model historique)"
+    data: [workout_sessions, set_logs]
+    user_actions: [parcourir ses séances, ouvrir une séance passée]
+    native_destination: PROGRÈS
+    status: REWRITE_NATIVE
+    dependencies: [MOB-05]
+    visual_assets: []
+    migration_risk: moyen
+
+  - id: exercise-history
+    feature: Historique d'un exercice
+    family: progres
+    routes: ["GET /exercise-history/{template_slug}/{exercise_code}", "GET /exercise-history/{slug}"]
+    legacy_location: "sessions.exercise_history → exercise_history.html"
+    domain_owner: [exercise_history]
+    api: "à créer"
+    data: [set_logs, exercises, exercise_aliases]
+    user_actions: [voir la progression d'un exercice]
+    native_destination: PROGRÈS (et depuis la séance)
+    status: REWRITE_NATIVE
+    dependencies: [MOB-05]
+    visual_assets: [courbe de charge (code paramétrique)]
+    migration_risk: faible
+
+  - id: progress
+    feature: Progrès (KPI, qualité, chronologie)
+    family: progres
+    routes: [GET /progress]
+    legacy_location: "pages.progress → progress.html"
+    domain_owner: [kpis, quality_score, timeline, progress_facts, progression_view]
+    api: "à créer"
+    data: [workout_sessions, set_logs]
+    user_actions: [lire ses indicateurs]
+    native_destination: PROGRÈS
+    status: REWRITE_NATIVE
+    dependencies: [MOB-05, UX-LAB PROGRÈS]
+    visual_assets: [graphiques (code paramétrique)]
+    migration_risk: moyen
+
+  - id: legacy-redirects
+    feature: Anciennes adresses redirigées (/physique, /dashboard, /rules)
+    family: progres
+    routes: [GET /physique, GET /dashboard, GET /rules]
+    legacy_location: "pages.physique, pages.dashboard, sessions.rules — redirections"
+    domain_owner: []
+    api: aucune
+    data: []
+    user_actions: []
+    native_destination: aucune
+    status: DEPRECATE
+    dependencies: []
+    visual_assets: []
+    migration_risk: "nul — déjà dépréciées dans le code"
+
+  # ── Récupération ────────────────────────────────────────────────────────────
+  - id: readiness
+    feature: Check-in de forme du jour et son historique
+    family: recuperation
+    routes: [POST /readiness, GET /readiness/history]
+    legacy_location: "readiness.save ; pages.readiness_history → readiness_history.html"
+    domain_owner: [readiness, recovery_contract, zone_recovery]
+    api: "à créer"
+    data: [readiness_entries]
+    user_actions: [déclarer sa forme, consulter l'historique]
+    native_destination: MISSION (check-in) / PROGRÈS (historique)
+    status: REWRITE_NATIVE
+    dependencies: [MOB-12 récupération, moteur scientifique V2 (aucune valeur de récupération inventée)]
+    visual_assets: []
+    migration_risk: moyen
+
+  # ── Programmes ──────────────────────────────────────────────────────────────
+  - id: template-library
+    feature: Bibliothèque des programmes modèles et lanceur
+    family: programmes
+    routes: ["GET /library", "GET /library/{slug}", "GET /launcher"]
+    legacy_location: "pages.library/template_detail/launcher → library.html, template_detail.html, launcher.html"
+    domain_owner: [launcher, loadout]
+    api: "à créer"
+    data: [workout_templates, template_exercises]
+    user_actions: [parcourir les modèles, voir un modèle, lancer une séance hors recommandation]
+    native_destination: SÉANCE ou PROFIL — selon MOB-01
+    status: REWRITE_NATIVE
+    dependencies: [MOB-06]
+    visual_assets: [planches de familles d'exercices (assets PO)]
+    migration_risk: "moyen — modèle d'interaction hérité (TRANSITIONAL)"
+
+  - id: custom-programs
+    feature: Programmes personnels (créer, éditer, générer, valider, publier, versionner, lancer)
+    family: programmes
+    routes:
+      - GET /programs
+      - GET /programs/new
+      - POST /programs
+      - GET /programs/{program_id}
+      - POST /programs/{program_id}/sessions
+      - POST /programs/{program_id}/sessions/{position}/delete
+      - POST /programs/{program_id}/sessions/{position}/exercises
+      - POST /programs/{program_id}/sessions/{session_position}/exercises/{exercise_position}/delete
+      - POST /programs/{program_id}/validate
+      - GET /programs/{program_id}/generate
+      - POST /programs/{program_id}/generate
+      - GET /programs/{program_id}/quality
+      - GET /programs/{program_id}/publish
+      - POST /programs/{program_id}/publish
+      - POST /programs/{program_id}/new-version
+      - POST /programs/{program_id}/sessions/{session_id}/start
+    legacy_location: "user_programs.* → user_programs/{list,new,detail,generate,publish,quality,_status}.html"
+    domain_owner: [user_program_drafts, user_program_generator, user_program_quality_preview, user_program_publish, user_program_versioning, user_program_launch]
+    api: "à créer"
+    data: [user_programs, user_program_sessions, user_program_exercises, user_program_rep_targets, user_program_quality_reviews]
+    user_actions: [choisir un modèle, dupliquer, modifier jours / séances / exercices / séries / reps / repos, générer, valider, publier, créer une version, lancer]
+    native_destination: PROFIL — Programmes (selon MOB-01)
+    status: REWRITE_NATIVE
+    dependencies: [MOB-06 bibliothèque, MOB-07 constructeur (V1 choisir → V4 créer de zéro), slots d'intention du domaine]
+    visual_assets: []
+    migration_risk: "élevé — 16 routes, éditeur riche ; découper en V1 → V4"
+
+  - id: weekly-plan
+    feature: Mon plan hebdomadaire et son matérialisation en brouillon
+    family: programmes
+    routes: [GET /plan, POST /programs/from-weekly-plan]
+    legacy_location: "user_programs.plan → user_programs/plan.html"
+    domain_owner: [weekly_planner, weekly_plan_materialization, planner_candidates]
+    api: "à créer"
+    data: [training_preferences, user_programs]
+    user_actions: [voir son plan, le transformer en programme]
+    native_destination: MISSION ou PROFIL — selon MOB-01
+    status: REWRITE_NATIVE
+    dependencies: [MOB-06]
+    visual_assets: []
+    migration_risk: moyen
+
+  - id: gym-equipment
+    feature: Environnement d'entraînement concret (salle, équipement)
+    family: programmes
+    routes: [POST /plan/equipement]
+    legacy_location: "user_programs.plan_equipment"
+    domain_owner: [equipment_model, environment_activation, environment_resolution]
+    api: "à créer"
+    data: [training_preferences (environnement concret)]
+    user_actions: [déclarer sa salle et son équipement]
+    native_destination: PROFIL / onboarding
+    status: REWRITE_NATIVE
+    dependencies: [MOB-09, planches d'équipement (assets PO)]
+    visual_assets: [primitives d'équipement (assets PO)]
+    migration_risk: "moyen — conditionne la faisabilité des séances (start_blocked)"
+
+  # ── Référence / science ─────────────────────────────────────────────────────
+  - id: science-muscle-focus
+    feature: Science — Muscle Focus et règles
+    family: reference
+    routes: [GET /science]
+    legacy_location: "sessions.science → science.html, _partials/muscle_focus*.svg"
+    domain_owner: [bodymap_frames, sci_*]
+    api: "à créer"
+    data: [muscles, body_zones]
+    user_actions: [lire les règles, explorer les planches musculaires]
+    native_destination: PROFIL ou référence — selon MOB-01
+    status: BLOCKED
+    dependencies: [planches BodyParts3D autorisées en interne seulement (diffusion publique bloquée), revue anatomique]
+    visual_assets: [planches Muscle Focus (internes), BodyMap MIT]
+    migration_risk: "moyen — licence et revue anatomique avant toute diffusion"
+
+  - id: machine-atlas
+    feature: Atlas des machines (catalogue d'exercices consultable)
+    family: reference
+    routes: [GET /science/atlas]
+    legacy_location: "sessions.atlas → atlas.html"
+    domain_owner: [machine_atlas]
+    api: "à créer"
+    data: [exercises, exercise_aliases, exercise_muscle_mappings]
+    user_actions: [chercher un exercice, voir ses zones]
+    native_destination: bibliothèque d'exercices (MOB-08)
+    status: REWRITE_NATIVE
+    dependencies: [MOB-08, illustrations d'exercices (assets PO)]
+    visual_assets: [illustrations d'exercices (58 mouvements, assets PO), BODYMAP-ZONES-V1]
+    migration_risk: moyen
+
+  # ── Social ──────────────────────────────────────────────────────────────────
+  - id: squads
+    feature: Squads (groupes, invitations, défis, comparaison, partage)
+    family: social
+    routes:
+      - GET /squads
+      - GET /squads/create
+      - POST /squads/create
+      - GET /squads/join
+      - POST /squads/join
+      - GET /squads/{squad_id}
+      - POST /squads/{squad_id}/invite
+      - POST /squads/{squad_id}/leave
+      - POST /squads/{squad_id}/delete
+      - GET /squads/{squad_id}/challenges
+      - GET /squads/{squad_id}/challenges/create
+      - POST /squads/{squad_id}/challenges/create
+      - GET /squads/{squad_id}/challenges/{challenge_id}
+      - GET /squads/{squad_id}/compare
+      - POST /squads/{squad_id}/recommend
+      - POST /squads/{squad_id}/share-session
+    legacy_location: "squads.* → squads_list.html, squad_*.html"
+    domain_owner: [squad, challenge, sharing, compare]
+    api: web
+    data: [squads, squad_memberships, squad_invite_codes, squad_challenges, squad_template_recommendations, squad_shared_sessions]
+    user_actions: [créer, rejoindre, inviter, défier, comparer, partager une séance]
+    native_destination: aucune décidée
+    status: WEB_ONLY
+    proposed: true
+    dependencies: ["décision produit : le social entre-t-il dans l'app ?"]
+    visual_assets: []
+    migration_risk: "moyen — 16 routes ; les surfaces sociales sont celles qu'on oublie (décision appliquée là où c'était commode)"
+
+  - id: leaderboard-public-profiles
+    feature: Classement et profils publics
+    family: social
+    routes: ["GET /leaderboard", "GET /users/{username}", "GET /users/{username}/preview"]
+    legacy_location: "leaderboard.* → leaderboard.html, user_profile.html, profile_preview.html"
+    domain_owner: [leaderboard, performance, profile_metrics, radar]
+    api: web
+    data: [users, workout_sessions]
+    user_actions: [voir le classement, voir le profil d'un autre]
+    native_destination: aucune décidée
+    status: WEB_ONLY
+    proposed: true
+    dependencies: [décision produit sur le social, confidentialité des profils publics]
+    visual_assets: []
+    migration_risk: moyen
+
+  # ── Exploitation ────────────────────────────────────────────────────────────
+  - id: ops-health
+    feature: Santé du service (sondes)
+    family: exploitation
+    routes: [GET /healthz, GET /healthz/strict]
+    legacy_location: "health.*"
+    domain_owner: [backup_verifier]
+    api: "JSON (sondes)"
+    data: []
+    user_actions: []
+    native_destination: aucune
+    status: WEB_ONLY
+    dependencies: []
+    visual_assets: []
+    migration_risk: nul
+
+  - id: ops-admin-sessions
+    feature: Administration des séances (lister, exclure, supprimer)
+    family: exploitation
+    routes: ["GET /admin/sessions", "GET /admin/sessions/{session_id}/delete", "POST /admin/sessions/{session_id}/delete", "POST /admin/sessions/{session_id}/exclude"]
+    legacy_location: "admin.* → admin_sessions.html, admin_session_delete.html"
+    domain_owner: [ownership, quality_score]
+    api: web
+    data: [workout_sessions]
+    user_actions: [exclure une séance des statistiques, supprimer une séance]
+    native_destination: aucune
+    status: WEB_ONLY
+    proposed: true
+    dependencies: []
+    visual_assets: []
+    migration_risk: faible
+
+  # ── Fonctions demandées, absentes du web ────────────────────────────────────
+  - id: onboarding
+    feature: Onboarding (compte, corps, entraînement, objectif)
+    family: compte
+    routes: []
+    legacy_location: "aucune — /welcome est une page d'accueil ; un OnboardingFlow existe dans le labo mobile seulement"
+    domain_owner: [training_preferences, body_profile, auth]
+    api: "à créer"
+    data: [users, training_preferences, body_measurements]
+    user_actions: [créer son compte, déclarer unités, taille, poids, ancienneté, fréquence, durée, salle, équipement, objectif]
+    native_destination: entrée de l'app
+    status: BLOCKED
+    dependencies: [UX-LAB ONBOARDING (ne demander que les données dont on sait l'usage), consentement explicite (vNext O6), inscription mobile]
+    visual_assets: []
+    migration_risk: élevé
+
+  - id: progress-photos
+    feature: Photos de progression (face, profil, dos), privées par défaut
+    family: profil
+    routes: []
+    legacy_location: "aucune — consentement photo_capture prévu dans body_consent, aucune capture"
+    domain_owner: [body_profile]
+    api: "à créer"
+    data: ["à créer (stockage privé des images)"]
+    user_actions: [prendre une photo, comparer dans le temps]
+    native_destination: PROFIL
+    status: BLOCKED
+    dependencies: [conception, consentement, stockage privé, chiffrement, aucune analyse physique avant un modèle validé]
+    visual_assets: []
+    migration_risk: "élevé — données sensibles"
+
+  - id: subscription
+    feature: Abonnement (gratuit / pro)
+    family: compte
+    routes: []
+    legacy_location: aucune
+    domain_owner: []
+    api: "à créer (droits d'accès)"
+    data: ["à créer (droits)"]
+    user_actions: [s'abonner, restaurer un achat]
+    native_destination: Compte
+    status: BLOCKED
+    dependencies: [définition de la valeur produit, compte Apple Developer et Google Play, fournisseur d'achats (RevenueCat à évaluer), build de développement]
+    visual_assets: []
+    migration_risk: élevé
+
+  - id: custom-exercise
+    feature: Exercice personnalisé de l'utilisateur
+    family: programmes
+    routes: []
+    legacy_location: "aucune — le catalogue est canonique (exercises, exercise_aliases)"
+    domain_owner: [exercise_identity]
+    api: "à créer"
+    data: ["à créer (exercice utilisateur : nom, équipement, zone principale, zones secondaires, famille de mouvement, notes)"]
+    user_actions: [créer un exercice, l'ajouter à un programme]
+    native_destination: bibliothèque d'exercices (MOB-08)
+    status: BLOCKED
+    dependencies: [MOB-08, "règle : pas de calibration, de substitution, d'illustration ni de biomécanique sans données"]
+    visual_assets: []
+    migration_risk: "moyen — exercise_properties est le registre de substitution : ne pas créer d'arêtes implicites"
+
+  - id: account-deletion
+    feature: Supprimer son compte depuis l'app
+    family: compte
+    routes: []
+    legacy_location: aucune
+    domain_owner: [auth]
+    api: "à créer"
+    data: [toutes les tables liées à users]
+    user_actions: [supprimer son compte et ses données]
+    native_destination: Compte
+    status: BLOCKED
+    dependencies: ["exigence Store (Apple, Google)", RGPD, "conception de l'effacement (dur vs exclusion)"]
+    visual_assets: []
+    migration_risk: "élevé — bloquant pour toute diffusion publique"
