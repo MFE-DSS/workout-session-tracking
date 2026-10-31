@@ -91,7 +91,8 @@ def test_the_vendored_licence_is_mit_with_the_package_copyright():
 def test_the_app_credit_carries_the_copyright_and_the_licence():
     src = ATTRIBUTION_TSX.read_text(encoding="utf-8")
     ts = GEOMETRY_TS.read_text(encoding="utf-8")
-    assert "BODY_SOURCE.copyright" in src and "BODY_SOURCE.license" in src
+    assert "BODY_SOURCE.copyright" in src
+    assert "BODY_SOURCE.license" in src
     assert _vendor()["source"]["copyright"] in ts
     assert json.loads(REGISTRY.read_text(encoding="utf-8"))["non_medical_notice_fr"] in src
 
