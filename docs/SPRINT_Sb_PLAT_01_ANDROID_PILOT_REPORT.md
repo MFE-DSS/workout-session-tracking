@@ -140,3 +140,19 @@ système ; étiquette d'appareil. Le clavier n'est **plus** une divergence : mê
 **PLAT-01 PRÊT AU MERGE** — parcours pilote vert sur la production depuis Android 16 (émulateur), deux défauts de
 clavier mesurés et corrigés avec l'accord de l'opérateur, aucune baseline modifiée. Restent : l'APK final sur le SHA
 mergé, puis la checklist rejouée par le testeur sur son téléphone (preuve physique).
+
+## Annexe — closeout (2026-10-31)
+
+- **Merge** : PR #337, `--merge --match-head-commit 5e5e8bd` → `baaaf21`. Barrière : tous les checks verts, gate Sonar
+  `OK`, 0 fil ouvert, `CLEAN`.
+- **Incident CI résolu sans commit** : premier run, shard 3 rouge sur `test_perf_coach_report_route_p95`
+  (`/coach-report` p95 5 063 ms > 3 000 ms) — test de temps sur le runner partagé, la PR ne touchant pas le serveur ;
+  relance des seuls jobs échoués → verte.
+- **CI canonique** : run `41234749599` sur `baaaf21`, **verte**.
+- **APK final** : build EAS `26d52f3b` sur `baaaf21` (APK interne, versionCode 1,
+  `EXPO_PUBLIC_API_URL=https://spignos.com`) ; code client identique au build mesuré (`git diff 1caaf30 baaaf21 --
+  clients/mobile` vide) ; installé sur l'émulateur : démarrage, connexion au clavier conforme. L'émulateur a ensuite
+  saturé (rendu logiciel) — sans effet sur le verdict. Lien remis à l'opérateur ; l'artefact expire vers le 2026-11-14.
+- **Reste** : checklist du testeur (§6, RAPPORTÉ), puis archive du change OpenSpec.
+
+**Verdict final : PLAT-01 MERGÉE — APK remis ; preuve physique attendue du testeur.**
