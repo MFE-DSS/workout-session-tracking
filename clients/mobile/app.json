@@ -18,6 +18,7 @@
     },
     "android": {
       "package": "dev.auren.vnext.lab",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#0A0B0D",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -32,7 +33,18 @@
     "plugins": [
       "expo-sqlite",
       "expo-secure-store",
-      ["expo-notifications", { "enableRemoteNotifications": false }]
-    ]
+      [
+        "expo-notifications",
+        {
+          "enableRemoteNotifications": false
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c7243bfc-29b3-4486-aafe-e69b9c904bbe"
+      }
+    },
+    "owner": "grimais"
   }
 }

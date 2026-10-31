@@ -16,7 +16,7 @@
 import * as Crypto from 'expo-crypto';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, StyleSheet, View } from 'react-native';
+import { AppState, BackHandler, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ApiFailure, createTransport } from './src/api/http';
@@ -28,6 +28,9 @@ import { sessionPerformance } from './src/domain/performance';
 import type { Mission } from './src/domain/types';
 import { isElapsed, remainingMs } from './src/domain/timer';
 import { Event, exerciseById, initialState, progress, reduce, setById, WorkoutState } from './src/domain/workout';
+import { backAction } from './src/native/backAction';
+import { deviceIdentity } from './src/native/deviceInfo';
+import { deviceLabel } from './src/native/deviceLabel';
 import { exitMessage, ExitChoice, EXIT_OPTIONS, showNativeExitSheet } from './src/native/exitSheet';
 import { feedback } from './src/native/feedback';
 import { keepAwake } from './src/native/keepAwake';
@@ -337,7 +340,7 @@ export default function ConnectedApp() {
   const login = useCallback(async (username: string, password: string) => {
     setBusy(true);
     setLoginError(null);
-    const outcome = await auth.login(username, password, 'iPhone AUREN');
+    const outcome = await auth.login(username, password, deviceLabel(deviceIdentity()));
     setBusy(false);
     if (outcome !== 'ok') {
       setLoginError(outcome);
@@ -525,6 +528,27 @@ export default function ConnectedApp() {
     const message = exitMessage(Object.keys(s.done).length, s.plan?.sets.length ?? 0);
     if (!showNativeExitSheet(message, onExitChoice)) setExitOpen(true);
   }, [onExitChoice]);
+
+  // ── PLAT-01 — Android hardware back: never leaves the app during a workout ──
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      const s = stateRef.current;
+      const action = backAction({
+        screen,
+        inWorkout: s.phase === 'SET' || s.phase === 'REST',
+        paused,
+        sheetOpen: exitOpen || lab || signOutBlocked !== null,
+      });
+      if (action === 'exit-sheet') requestExit();
+      if (action === 'close-sheet') {
+        if (exitOpen) onExitChoice('cancel');
+        setLab(false);
+        setSignOutBlocked(null);
+      }
+      return action !== 'system';
+    });
+    return () => sub.remove();
+  }, [screen, paused, exitOpen, lab, signOutBlocked, requestExit, onExitChoice]);
 
   const resume = useCallback(() => {
     setPaused(false);

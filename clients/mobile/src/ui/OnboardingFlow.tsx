@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 
@@ -18,6 +18,7 @@ import {
   WHY,
 } from '../lab/profile';
 import { feedback } from '../native/feedback';
+import { keyboardAvoidance } from '../native/platformUi';
 import { PrimaryAction, SecondaryButton } from './components';
 import { color, space, type } from './theme';
 
@@ -65,7 +66,7 @@ export function OnboardingFlow(props: {
   const chosen = family.sessions.find((s) => s.slug === profile.slug);
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.root}>
+    <KeyboardAvoidingView behavior={keyboardAvoidance.behavior} style={styles.root}>
       <View style={[styles.frame, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
         {step !== 'welcome' ? (
           <View style={styles.top}>
