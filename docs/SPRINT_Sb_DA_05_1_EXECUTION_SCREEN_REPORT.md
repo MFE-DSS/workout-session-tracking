@@ -115,5 +115,13 @@ reste sur le cadran, la fourchette sur la ligne de série, la dernière fois rev
 - Mesure fausse attrapée en route : un `SafeAreaProvider` dans le cadre de revue web re-mesurait les insets sur la
   fenêtre du navigateur (marge basse 508 px) ; corrigé par injection des contextes et contrôle des marges.
 
+## Annexe de clôture (2026-10-31)
+
+- Premier passage : PR `CONFLICTING` avec la clôture #329 (même ligne du registre) — aucune CI n'était partie ;
+  fusion du canonique dans la branche, conflit résolu en gardant les deux lignes (`6ea6070`).
+- Gate vérifié avant fusion : tête `6ea6070`, 10 / 10 checks verts (contrat visuel : 71 baselines identiques au
+  pixel en CI), Sonar PR `OK`, 0 fil ouvert, `CLEAN`.
+- PR #330 fusionnée en `--merge --match-head-commit` : **`d87f03b`** ; CI canonique `41208489688` **verte**.
+
 **Verdict :** `EXECUTION-SCREEN-V1` **LOCKED** — l'écran d'exercice réel porte sa zone en série et celle de
 l'exercice suivant au repos, avec moins de texte ; 6 baselines approuvées par l'opérateur.
