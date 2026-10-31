@@ -74,3 +74,17 @@ d'artefact ; les `rules` contraignent proposal, design et tasks). Préséance : 
 **GOV-01 LIVRÉ EN PR** — OpenSpec installé et initialisé, pilotage AUREN écrit, préséance fixée sous `CLAUDE.md`
 et les contrats canoniques. Suite : proposal `android-pilot-readiness`, soumise à la revue de l'opérateur avant
 tout apply.
+
+## Annexe — closeout (2026-10-31)
+
+- **Merge** : PR #336, `--merge --match-head-commit 0a88fcc` → commit de merge `d6d2272` (aucun squash, aucun
+  `--admin`). Barrière vérifiée avant le merge : tous les checks verts, gate Sonar `OK` (0 / 0 / 0), 0 fil de revue
+  ouvert, `CLEAN`.
+- **CI canonique** : run `41225920266` sur `d6d2272`, **verte**.
+- **Production** : `d6d2272` déployé le même jour pour PLAT-01 (run `41227342844`, tag
+  `deploy/prod/2026-10-31-1801-d6d2272`) — sauvegarde, migration additive `device_sessions`, smoke et contrôle de
+  dérive Alembic verts. GOV-01 n'y ajoute rien d'exécuté (docs et outillage).
+- **Suite** : la proposal `android-pilot-readiness` a été acceptée par l'opérateur (« ok donc parfait continue sur
+  ton critical path ») ; son apply est en PR #337.
+
+**Verdict final : GOV-01 CLOSED.**

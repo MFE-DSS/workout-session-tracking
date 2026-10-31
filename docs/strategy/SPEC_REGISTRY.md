@@ -241,7 +241,7 @@
 ## 1quindecies. Sx_SEC_A0_SESSION_TOKEN_INTEGRITY — piste sécurité indépendante (P0)
 
 **Spec :** `docs/strategy/Sx_SEC_A0_SESSION_TOKEN_INTEGRITY_SPEC.md`
-**Statut spec :** ✅ `CLOSED — MERGÉE ET DÉPLOYÉE` 2026-10-24 (choix opérateur : §2.1 forme **E**, §2.2 **T1**). PR #280, canonique et production `ff4239d` (CI canonique `40086199645` 7/7, déploiement `40087180522`, tag `deploy/prod/2026-10-24-1046-ff4239d`). Ouverte par `ADR_AUREN_VNEXT_01` §7 A0. **D9 (auth mobile) désormais ouvrable.**
+**Statut spec :** ✅ `CLOSED — MERGÉE ET DÉPLOYÉE` 2026-10-24 (choix opérateur : §2.1 forme **E**, §2.2 **T1**). PR #280, canonique et production `ff4239d` (production depuis passée à `d6d2272` le 2026-10-31 pour PLAT-01) (CI canonique `40086199645` 7/7, déploiement `40087180522`, tag `deploy/prod/2026-10-24-1046-ff4239d`). Ouverte par `ADR_AUREN_VNEXT_01` §7 A0. **D9 (auth mobile) désormais ouvrable.**
 
 | Sprint | Domaine | Statut | Rapport | Notes |
 |---|---|---|---|---|
@@ -296,13 +296,13 @@
 ## 1sexdecies. OpenSpec — couche de gouvernance des changements (GOV-01, actif)
 
 **Outil :** OpenSpec (`@fission-ai/openspec` **1.14.3**, schéma `spec-driven`) — `openspec/config.yaml` (pilotage AUREN), `openspec/specs/` (specs vivantes), `openspec/changes/` (un dossier par change, archivé après merge).
-**Statut :** 🟡 introduit par GOV-01 (opérateur, 2026-10-31 : quatre workstreams A Visual Assets · B Native Product · C Product Intelligence · D Platform/Business ; « OpenSpec devient la couche de gouvernance au-dessus »).
+**Statut :** 🟢 actif depuis GOV-01 (MERGÉE `d6d2272`) (opérateur, 2026-10-31 : quatre workstreams A Visual Assets · B Native Product · C Product Intelligence · D Platform/Business ; « OpenSpec devient la couche de gouvernance au-dessus »).
 **Préséance :** `CLAUDE.md` > contrats canoniques versionnés (`AUREN_VISUAL_CONTRACT` et baselines, contrats de domaine et scientifiques, provenance d'assets, ce registre) > changes OpenSpec. Un change en conflit avec un contrat canonique = conflit de spec (`CLAUDE.md §4`). La documentation historique n'est pas migrée.
 **Règle de registre :** chaque change OpenSpec a une ligne ici dès sa proposal ; son statut suit le cycle (proposal → revue opérateur → apply → PR → MERGÉE → archivé).
 
 | Change / sprint | Domaine | Statut | Rapport | Notes |
 |---|---|---|---|---|
-| Sb_GOV_01_OPENSPEC_BOOTSTRAP | Installation et initialisation d'OpenSpec (Claude Code : 6 skills, 6 commandes `/opsx:*`), pilotage AUREN dans `config.yaml`, `CLAUDE.md §6`, cette section | 🟡 PR ouverte | `SPRINT_Sb_GOV_01_OPENSPEC_BOOTSTRAP_REPORT.md` | aucun code produit ; aucun `AGENTS.md` |
+| Sb_GOV_01_OPENSPEC_BOOTSTRAP | Installation et initialisation d'OpenSpec (Claude Code : 6 skills, 6 commandes `/opsx:*`), pilotage AUREN dans `config.yaml`, `CLAUDE.md §6`, cette section | ✅ MERGÉE (PR #336, `d6d2272`, CI canonique `41225920266` verte) | `SPRINT_Sb_GOV_01_OPENSPEC_BOOTSTRAP_REPORT.md` | aucun code produit ; aucun `AGENTS.md` |
 | `android-pilot-readiness` (PLAT-01) | Un testeur Android distant joue le parcours connexion → MISSION → séance → bilan sur le backend de production | ⚪ à proposer | — | décisions opérateur : déploiement `spignos.com`, EAS Build, émulateur + testeur, revue de la proposal avant apply |
 | `native-feature-migration-map` (MOB-00) | Inventaire exhaustif du web (110 routes) classé KEEP_DOMAIN / REWRITE_NATIVE / WEB_ONLY / DEPRECATE / BLOCKED — devient le backlog produit | ⚪ à proposer | — | — |
 | `native-navigation-shell` (MOB-01) | Mini-ADR : navigation actuelle vs Expo Router NativeTabs ; hypothèse MISSION · SÉANCE · PROGRÈS · PROFIL non verrouillée | ⏳ après MOB-00 | — | — |
