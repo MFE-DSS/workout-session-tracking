@@ -56,6 +56,29 @@ for (const f of CANDIDATE_FIXTURES) {
     const all = async (id: string) =>
       Promise.all((await fixture.getByTestId(id).all()).map(async (l) => rel(await l.boundingBox())));
 
+    // DA-05.1 — a whole screen: the set's actions must stay on it, above the home indicator
+    if (f.candidate === 'EXECUTION-SCREEN') {
+      const homeIndicator = 34;
+      // the screen's own paddings must be the phone's insets, or nothing below is measured on a phone
+      // (a SafeAreaProvider re-measured them against the browser window: a 496 px home indicator)
+      const pads = await fixture.getByTestId('execution-screen').evaluate((el) => {
+        const s = getComputedStyle(el.firstElementChild as HTMLElement);
+        return { top: Number.parseFloat(s.paddingTop), bottom: Number.parseFloat(s.paddingBottom) };
+      });
+      // the actions of the state: a set's « Valider » and « Passer cette série », a rest's « Commencer maintenant »
+      const actions =
+        f.phase !== 'rest-next'
+          ? [rel(await box(fixture.getByTestId('validate'))), rel(await box(fixture.getByText('Passer cette série', { exact: true })))]
+          : [rel(await box(fixture.getByTestId('skip')))];
+      const bottom = PAD + f.height - homeIndicator + 0.5;
+      const screenVerdict = {
+        phoneInsets: pads.top === 47 + 10 && pads.bottom === homeIndicator + 12,
+        actionsOnScreen: actions.every((a) => a !== null && a.y + a.h <= bottom),
+      };
+      writeFileSync(path.join(OUT, `${f.id}.json`), JSON.stringify({ id: f.id, pads, actions, bottom, verdict: screenVerdict }, null, 2));
+      expect(screenVerdict, `${f.id}: phone insets, and the actions stay on screen`).toEqual({ phoneInsets: true, actionsOnScreen: true });
+      return;
+    }
     // DA-02.5 — Recessed Window candidates: inside Frame C, apart, every content inside its window
     const windows = (await all('recessed-window')).filter((b): b is Box => b !== null);
     if (windows.length) {

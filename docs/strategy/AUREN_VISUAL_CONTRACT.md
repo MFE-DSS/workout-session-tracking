@@ -49,6 +49,7 @@ Ce sont des **métadonnées de gouvernance** : aucun code ne les déduit.
 | `PUSH-A-BODYMAP-TRIPTYCH-V1` | **LOCKED** (2026-10-29, « ACCEPT T1 » puis « oui go ») | la localisation fonctionnelle des zones de Push A : trois caméras sur le **même** master BodyMap, la zone mise en avant en `system` | DA-04.1 — `clients/mobile/src/ui/bodymap/` (§20) ; banc seulement, monté sur **aucun** écran produit |
 | `BODYMAP-ZONES-V1` | **LOCKED** (2026-10-29, « Ok, très bien ») | une caméra par zone, **agnostique de tout programme** (zone → image) ; le panneau d'une séance se **déduit** de ses exercices (exercice → zones) | DA-04.2 — `clients/mobile/src/ui/bodymap/` (§21) ; banc seulement |
 | `MOTION-ZOOM` | ⏸ **DIFFÉRÉ** (2026-10-31, « mets tout ça de côté […] c'est à faire ») | le zoom biomécanique : le muscle pendant la répétition | DA-04.4 — rien de livré ; recherche, sources et pièges consignés (§23) ; backlog `MOTION-V2` |
+| `EXECUTION-SCREEN-V1` | **LOCKED** (2026-10-31, « go ») | l'écran d'exercice réel : la zone de l'exercice en série, la zone de l'exercice suivant au repos, moins de texte, icônes dessinées, cadrans réduits | DA-05.1 — `ExecutionScreen.tsx`, `components.tsx` (§24) ; 6 baselines d'écran entier |
 | `BODYMAP-MIT-BODY-V1` | **LOCKED** (2026-10-31, « ouais go on va se satisfaire de cela pour l'instant ») | le corps que dessinent §20 et §21 : `react-native-body-highlighter` 3.2.0 (MIT) vendorisé, chemins intouchés, crédit dans l'app ; remplace le master dans le runtime, le master reste source de conception | DA-04.3 — `clients/mobile/vendor/react-native-body-highlighter/`, `bodyGeometry.ts` (§22) ; les 18 baselines de §20 et §21 refaites |
 | `INSTRUMENT-SURFACE` | **EXPLORATION** | les itérations suivantes de la surface (§9) | partent de `INSTRUMENT-SURFACE-B1` / `-B2` / `INSTRUMENT-CONTROLS-B3` |
 
@@ -483,3 +484,23 @@ Pourquoi trois dessins : une fente d'un pixel centrée tombe sur un demi-pixel. 
 **Pour reprendre** : (1) l'opérateur fixe le rendu (référence Midjourney, vue 3D ou ¾) ; (2) un générateur hors app (OpenSim + modèle thoraco-scapulaire) écrit, par exercice, les images-clés du muscle — environ 3 à 5 jours pour le premier, puis ~1 jour par exercice d'épaule / poitrine / dos ; (3) l'app les joue ; animations réduites = image fixe. Le geste reste **un modèle, pas une mesure**, et le dit.
 
 **MUST NEVER** (dès la reprise) : une revendication d'activation, d'intensité, d'efficacité ou de blessure ; une « zone de risque » au sens blessure (repère de technique seulement) ; une donnée de mouvement sous licence non commerciale ; une image régénérée pour contourner une licence.
+
+## 24. `EXECUTION-SCREEN-V1` — l'écran d'exercice réel, avec sa zone (DA-05.1, 2026-10-31)
+
+**Décision de l'opérateur** : sur la première planche (le module ne tenait pas : ~95 px libres sur 390 × 844), « je vais prendre ta recommandation » — le BodyMap au repos, pour l'exercice suivant — avec : « il y a quand même beaucoup de textes […] La dernière fois […] l'afficher pour quand c'est nécessaire, pas systématique » ; « les deux flèches pour changer d'exercice, faudrait qu'il soit un peu mieux inséré. Les trois petits points […] un peu mieux aussi » ; « les cases avec le poids, je pense que tu peux réduire un peu » ; « quand tu insères le truc des pectoraux, voilà ça, ouais, c'est bien ». Sur la seconde planche (série avec / sans zone, recommandé : avec) : « go ».
+
+**Ce que c'est** : l'écran d'exécution **du produit** (`ExecutionScreen.tsx`), pas un banc. Gouverné au pixel sur un cadre d'iPhone 390 × 844 (barre d'état 47, indicateur d'accueil 34), plan Push A et plan « catch-up » du labo (`lab_fixture.json`).
+
+| Champ | Valeur |
+|---|---|
+| **Statut** | **LOCKED** (2026-10-31, « go ») · monté dans l'app (labo et app connectée) |
+| **Série** | nom + ⇄ · « Série n sur N · objectif a–b reps » · **zone de l'exercice** (fenêtre `BODYMAP-ZONES-V1` seule, pleine largeur, prend la place libre jusqu'à 150, **non dessinée sous 110**) · pastilles de série · **intention seule** · cadrans Charge / Reps · Valider · Passer |
+| **« La dernière fois »** | seulement quand la charge du cadran **diffère** de la dernière charge (`showsLastTime`, `src/domain/lastTime.ts`) ; première fois : **une** phrase (« Première fois : la charge que tu valides devient ta référence. ») |
+| **Repos avant un nouvel exercice** | anneau 140 · **zone de l'exercice suivant + « Dernière »** (module 60/40 verrouillé, 150) · panneau : rang, nom, schéma, « Machine prise ? Remplacer » · « Commencer maintenant » **sans** répéter le nom |
+| **Icônes** (`IconButton`) | ✕ · ⋯ · ⇄ **dessinées** (tracés sur grille 24, trait 2, `ink2`), sans anneau, cible 44 ; en-tête aligné optiquement sur la marge ; ⇄ centré sur la première ligne du nom. Les écrans MISSION, fin de séance, reprise et repos tranquille reçoivent le même ⋯ |
+| **Cadrans** (`ValueDial`) | chiffres d'un cran plus petits (56 / 50 / 42 / 36), ligne de valeur 66, touches 52 |
+| **Garde de banc** | le banc impose les insets du téléphone (contrôle des marges de la racine) et vérifie que les actions restent au-dessus de l'indicateur d'accueil — un `SafeAreaProvider` web re-mesurait les insets sur la fenêtre du navigateur (496 px) |
+| **Baselines approuvées** | `execution-set-390x844-push-a-e0`, `execution-set-390x844-push-a-e6`, `execution-set-390x844-catch-up-shoulders-e0`, `execution-rest-next-390x844-push-a-e0`, `execution-rest-next-390x844-push-a-e2`, `execution-rest-next-390x844-catch-up-shoulders-e0` — identiques à l'octet aux captures de la planche |
+
+**MUST PRESERVE** : la zone vient du plan (résolveur canonique), jamais choisie par l'écran ; un fait absent n'est pas dessiné (pas de zone connue → pas de fenêtre ; pas de dernière charge → pas de « Dernière ») ; une information une seule fois ; les actions au-dessus de l'indicateur d'accueil ; les cibles de 44 pt au moins.
+**MUST NEVER** : réintroduire la cible chiffrée ou la justification sous l'intention ; afficher « La dernière fois » quand le cadran porte déjà cette charge ; une fenêtre de zone écrasée sous 110 ; un glyphe de police pour une icône de geste ; tout ce que §20–§22 interdisent.

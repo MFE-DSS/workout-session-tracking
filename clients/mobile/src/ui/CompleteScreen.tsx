@@ -79,7 +79,7 @@ export function CompleteScreen(props: {
     <View style={[styles.root, { paddingTop: insets.top + 8 }]}>
       <View style={styles.top}>
         <Text style={type.eyebrow}>Séance terminée</Text>
-        <IconButton glyph="⋯" label="Journal du labo" onPress={props.onOpenLab} />
+        <IconButton icon="more" label="Journal du labo" onPress={props.onOpenLab} />
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false}>
         <View style={styles.mark} accessibilityElementsHidden>

@@ -21,9 +21,9 @@ export function QuietScreen(props: {
   return (
     <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
       <View style={styles.top}>
-        <View style={{ width: 48 }} />
+        <View style={{ width: 44 }} />
         <Text style={type.eyebrow}>AUREN · Aujourd’hui</Text>
-        <IconButton glyph="⋯" label="Journal local" onPress={props.onOpenJournal} />
+        <IconButton icon="more" label="Journal local" onPress={props.onOpenJournal} />
       </View>
       <Text style={styles.title} accessibilityRole="header">{props.title}</Text>
       <Text style={[type.body, styles.text]} accessibilityLiveRegion="polite">{props.text}</Text>

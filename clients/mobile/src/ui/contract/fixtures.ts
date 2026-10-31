@@ -14,6 +14,7 @@ import type { BodyMapViewPresetId } from '../bodymap/viewPresets';
 import type { MarkFixture } from '../brand/MarkPlacementFixture';
 import type { Boundaries } from '../calibration/layout';
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
+import type { ScreenPhase } from './ExecutionScreenFixture';
 
 const LOW_KG = 52.5;
 const HIGH_KG = 87.5;
@@ -130,6 +131,19 @@ export type ContractFixture =
       width: number;
       height: number;
       bodymap: BodyMapFixture;
+    }
+  | {
+      /**
+       * the baseline id: `execution-<phase>-<width>x<height>-<plan>-e<exercise>` — EXECUTION-SCREEN-V1 (DA-05.1):
+       * the REAL execution screen on a lab plan, on an iPhone frame with its insets
+       */
+      id: string;
+      contract: 'EXECUTION-SCREEN-V1';
+      width: number;
+      height: number;
+      plan: string;
+      exercise: number;
+      phase: ScreenPhase;
     };
 
 export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
@@ -216,6 +230,13 @@ export const CONTRACT_FIXTURES: readonly ContractFixture[] = [
   { id: 'bodymap-session-push-a', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(4), bodymap: { kind: 'session', zones: ['pecs', 'delt_lat', 'delt_post', 'triceps'] } },
   { id: 'bodymap-session-short-upper', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(6), bodymap: { kind: 'session', zones: ['pecs', 'lats', 'delt_lat', 'biceps', 'triceps', 'delt_post'] } },
   { id: 'bodymap-session-full-body-morphotype-priority-v1', contract: 'BODYMAP-ZONES-V1', width: 390, height: zoneGridHeight(7), bodymap: { kind: 'session', zones: ['pecs', 'upper_back', 'quads', 'posterior', 'delt_lat', 'delt_post', 'calves'] } },
+  // DA-05.1 — EXECUTION-SCREEN-V1 (operator, 2026-10-31: « go »): the set screen with its zone, the rest before the next exercise
+  { id: 'execution-set-390x844-push-a-e0', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'push-a', exercise: 0, phase: 'set' },
+  { id: 'execution-set-390x844-push-a-e6', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'push-a', exercise: 6, phase: 'set' },
+  { id: 'execution-set-390x844-catch-up-shoulders-e0', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'catch-up-shoulders', exercise: 0, phase: 'set' },
+  { id: 'execution-rest-next-390x844-push-a-e0', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'push-a', exercise: 0, phase: 'rest-next' },
+  { id: 'execution-rest-next-390x844-push-a-e2', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'push-a', exercise: 2, phase: 'rest-next' },
+  { id: 'execution-rest-next-390x844-catch-up-shoulders-e0', contract: 'EXECUTION-SCREEN-V1', width: 390, height: 844, plan: 'catch-up-shoulders', exercise: 0, phase: 'rest-next' },
 ];
 
 /** The governed B.2 surfaces (REST), for the device bench. */

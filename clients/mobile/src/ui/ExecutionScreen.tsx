@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { frenchSummary, kg, scheme } from '../domain/format';
+import { lastLoadKg, showsLastTime } from '../domain/lastTime';
 import { formatClock, remainingFraction, remainingMs } from '../domain/timer';
 import type { PlanExercise, SubstituteLevel } from '../domain/types';
 import {
@@ -18,6 +19,8 @@ import {
   setsOf,
   WorkoutState,
 } from '../domain/workout';
+import { presetForZone } from './bodymap/viewPresets';
+import { type WindowContentSpec, WindowModule } from './instrument/RecessedWindowFixture';
 import {
   ExerciseRail,
   IconButton,
@@ -96,7 +99,7 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
       <View style={styles.head}>
         {props.onExitRequested ? (
           <IconButton
-            glyph="✕"
+            icon="close"
             label="Quitter la séance"
             onPress={() => {
               props.onExitRequested?.();
@@ -108,7 +111,7 @@ export function ExecutionScreen(props: { state: WorkoutState; nowMs: number; red
           {`Exercice ${exerciseIndex + 1} / ${exerciseCount}${resting ? ' · repos' : ''}`}
         </Text>
         <IconButton
-          glyph="⋯"
+          icon="more"
           label="Options de l’exercice"
           onPress={() => {
             setMenu(true);
@@ -231,13 +234,16 @@ function SetBody(props: {
         <Text style={[type.exercise, { flex: 1 }]} accessibilityRole="header" maxFontSizeMultiplier={1.3}>
           {exercise.executed_name}
         </Text>
-        {/* R8 — replacing is one tap away at every set, never hidden in the ⋯ */}
-        <IconButton glyph="⇄" label="Remplacer cet exercice" onPress={() => props.onSwap(exercise.se_id)} />
+        {/* R8 — replacing is one tap away at every set, never hidden in the ⋯; centred on the name's first line */}
+        <View style={styles.swapIcon}>
+          <IconButton icon="swap" label="Remplacer cet exercice" onPress={() => props.onSwap(exercise.se_id)} />
+        </View>
       </View>
       <Text style={[type.body, styles.setLine]}>
         <Text style={type.bodyStrong}>{`Série ${set.index} sur ${sets.length}`}</Text>
         {exercise.rep_range ? `  ·  objectif ${exercise.rep_range.min}–${exercise.rep_range.max} reps` : ''}
       </Text>
+      <SetZone exercise={exercise} />
 
       <View
         style={styles.chips}
@@ -257,7 +263,7 @@ function SetBody(props: {
         })}
       </View>
 
-      <Guidance exercise={exercise} />
+      <Guidance exercise={exercise} currentLoad={draft.weight} />
       {pending ? (
         <Text style={styles.requiresSync}>{`Remplacement demandé : ${pending.substitute} — en attente de validation par AUREN`}</Text>
       ) : null}
@@ -322,25 +328,76 @@ function SetBody(props: {
   );
 }
 
-function Guidance(props: { exercise: PlanExercise }) {
+/**
+ * DA-05.1 (`EXECUTION-SCREEN-V1`, `AUREN_VISUAL_CONTRACT §24`) — the exercise's zone in the LOCKED module of
+ * the set card (`BODYMAP-ZONES-V1` window · `NUMERIC-READOUT-V1` figure, §21–22), full-bleed like the card:
+ * - on the SET screen, the current exercise's zone alone, in the room the text cut freed;
+ * - on the REST before a new exercise, the next exercise's zone and its last load (60/40) — where the next
+ *   machine is prepared.
+ * The zone comes from the plan (the canonical resolver), never chosen by the screen. No known zone → no
+ * module; no previous load → no « Dernière » window: an absent fact is not drawn.
+ */
+export const ZONE_MODULE_HEIGHT = 150;
+
+function ZoneModule(props: { exercise: PlanExercise; withLast?: boolean; height?: number }) {
+  // the screen's frame, not the window: the same on a device, exact in a review frame
+  const { width } = useSafeAreaFrame();
+  const preset = props.exercise.zone ? presetForZone(props.exercise.zone.zone) : undefined;
+  if (!preset) return null;
+  const last = props.withLast === false ? null : lastLoadKg(props.exercise.previous);
+  const contents: WindowContentSpec[] = [{ kind: 'bodymap-view', preset }];
+  if (last !== null) contents.push({ kind: 'figure', label: 'Dernière', value: kg(last), unit: 'kg' });
+  return (
+    <View testID="zone-module" style={styles.zoneModule}>
+      <WindowModule
+        width={width}
+        height={props.height ?? ZONE_MODULE_HEIGHT}
+        layout={last === null ? 'single' : 'split-60-40'}
+        contents={contents}
+      />
+    </View>
+  );
+}
+
+/** Under this a zone window is no longer read: the set screen draws no module rather than a crushed one. */
+const SET_ZONE_MIN = 110;
+const ZONE_MODULE_GAP = 14;
+
+/**
+ * The CURRENT exercise's zone on the set screen, in the room the text cut freed (the R1 rule: no unintended
+ * void), up to the module's height. The last load is not repeated here: it follows the « when it differs » rule.
+ */
+function SetZone(props: { exercise: PlanExercise }) {
+  const [room, setRoom] = useState(0);
+  const height = Math.min(ZONE_MODULE_HEIGHT, Math.floor(room) - ZONE_MODULE_GAP);
+  return (
+    <View style={styles.setZone} onLayout={(e) => setRoom(e.nativeEvent.layout.height)}>
+      {height >= SET_ZONE_MIN ? <ZoneModule exercise={props.exercise} withLast={false} height={height} /> : null}
+    </View>
+  );
+}
+
+/**
+ * The engine's intention, one line (operator, 2026-10-31: too much text — the target load is on the dial,
+ * the rep range on the set line). « La dernière fois » only when it TELLS something: when the load on the
+ * dial is not the one of last time (a change, or the athlete moving away from it).
+ */
+function Guidance(props: { exercise: PlanExercise; currentLoad: number | null }) {
   const g = props.exercise.guidance;
   const prev = props.exercise.previous;
+  const showPrevious = showsLastTime(prev, props.currentLoad);
+  const firstTime = !prev && (!g || g.is_silent);
+  let lead: React.ReactNode;
+  if (g && !g.is_silent) lead = <Text style={styles.guideLead}>{g.intent_label}</Text>;
+  // R6 — a first time is not a gap: it is where the reference is set (one sentence, not two « Première fois »)
+  else if (firstTime) lead = <Text style={[type.body, { color: color.ink2 }]}>Première fois : la charge que tu valides devient ta référence.</Text>;
+  else lead = <Text style={[type.body, { color: color.ink2 }]}>{g?.intent_label ?? 'Pas encore de référence'}</Text>;
   return (
     <View style={styles.guidance}>
-      {g && !g.is_silent ? (
-        <>
-          <Text style={styles.guideLead}>{g.intent_label}</Text>
-          {g.target_summary ? <Text style={styles.guideTarget}>{frenchSummary(g.target_summary)}</Text> : null}
-          {g.reasons[1] ? <Text style={[type.small, { marginTop: 3 }]}>{g.reasons[1]}</Text> : null}
-        </>
-      ) : (
-        <Text style={[type.body, { color: color.ink2 }]}>{g?.intent_label ?? 'Pas encore de référence'}</Text>
-      )}
-      {/* R6 — a first time is not a gap: it is where the reference is set */}
-      {!prev && (!g || g.is_silent) ? (
-        <Text style={[type.small, { marginTop: 4 }]}>Première fois : la charge que tu valides devient ta référence.</Text>
+      {lead}
+      {showPrevious && prev ? (
+        <Text style={[type.small, { marginTop: 6 }]}>{`La dernière fois · ${prev.relative} · ${previousLine(prev)}`}</Text>
       ) : null}
-      {prev ? <Text style={[type.small, { marginTop: 8 }]}>{`La dernière fois · ${prev.relative} · ${previousLine(prev)}`}</Text> : null}
     </View>
   );
 }
@@ -368,6 +425,12 @@ function RestBody(props: { state: WorkoutState; nowMs: number; exercise: PlanExe
   const nextDraft = nextSetId !== null ? draftFor(state, nextSetId) : null;
   const left = remainingMs(rest, nowMs);
   const planned = restSecondsFor(plan, from.se_id);
+  // DA-05.1 — before a new exercise, its zone module takes the room the ring gives up
+  const withModule = toNewExercise && nextEx?.zone != null && presetForZone(nextEx.zone.zone) !== undefined;
+  let ringSize = 272;
+  if (toNewExercise) ringSize = withModule ? 140 : 212;
+  // the next exercise's name is the panel's title: the action does not say it twice
+  const skipSublabel = !toNewExercise && nextSet ? `Série ${nextSet.index} maintenant` : undefined;
   const shifted = rest.deadlineMs - rest.startedMs !== planned * 1000;
 
   const server = props.serverStateOf?.(rest.fromSetId) ?? null;
@@ -390,11 +453,11 @@ function RestBody(props: { state: WorkoutState; nowMs: number; exercise: PlanExe
         </Text>
       </View>
 
-      <View style={styles.ringWrap}>
-        <RestRing size={toNewExercise ? 212 : 272} fraction={remainingFraction(rest, nowMs)}>
+      <View style={[styles.ringWrap, withModule && styles.ringWrapTight]}>
+        <RestRing size={ringSize} fraction={remainingFraction(rest, nowMs)}>
           <Text style={[type.eyebrow, { color: color.system, letterSpacing: 3 }]}>Repos</Text>
           <Text
-            style={[type.clock, toNewExercise && { fontSize: 76 }]}
+            style={[type.clock, toNewExercise && { fontSize: withModule ? 50 : 76 }]}
             maxFontSizeMultiplier={NUMERAL_FONT_SCALE_CAP}
             accessibilityLiveRegion="polite"
             accessibilityLabel={`${Math.ceil(left / 1000)} secondes de repos`}
@@ -407,15 +470,17 @@ function RestBody(props: { state: WorkoutState; nowMs: number; exercise: PlanExe
 
       {nextEx && nextSet ? (
         toNewExercise ? (
-          <View style={styles.next}>
-            <Text style={type.eyebrow}>{`Exercice suivant · ${plan.exercises.findIndex((e) => e.se_id === nextEx.se_id) + 1} / ${plan.exercises.length}`}</Text>
-            <Text style={[type.exercise, { fontSize: 25, lineHeight: 29, marginTop: 4 }]} maxFontSizeMultiplier={1.3}>
-              {nextEx.executed_name}
-            </Text>
-            <Text style={[type.small, { marginTop: 4 }]}>{scheme(nextEx.set_scheme)}</Text>
-            <Guidance exercise={nextEx} />
-            <SecondaryButton label="Machine prise ?  Remplacer ›" onPress={() => props.onSwap(nextEx.se_id)} style={styles.swap} />
-          </View>
+          <>
+            {withModule ? <ZoneModule exercise={nextEx} /> : null}
+            <View style={[styles.next, withModule && styles.nextTight]}>
+              <Text style={type.eyebrow}>{`Exercice suivant · ${plan.exercises.findIndex((e) => e.se_id === nextEx.se_id) + 1} / ${plan.exercises.length}`}</Text>
+              <Text style={[type.exercise, { fontSize: 25, lineHeight: 29, marginTop: 4 }]} maxFontSizeMultiplier={1.3}>
+                {nextEx.executed_name}
+              </Text>
+              <Text style={[type.small, { marginTop: 4 }]}>{scheme(nextEx.set_scheme)}</Text>
+              <SecondaryButton label="Machine prise ?  Remplacer ›" onPress={() => props.onSwap(nextEx.se_id)} style={styles.swap} />
+            </View>
+          </>
         ) : (
           <View style={styles.next}>
             <Text style={type.eyebrow}>Ensuite, automatiquement</Text>
@@ -437,7 +502,7 @@ function RestBody(props: { state: WorkoutState; nowMs: number; exercise: PlanExe
         testID="skip"
         tone="trace"
         label={toNewExercise ? 'Commencer maintenant' : 'Passer le repos'}
-        sublabel={toNewExercise ? nextEx?.executed_name : nextSet ? `Série ${nextSet.index} maintenant` : undefined}
+        sublabel={skipSublabel}
         onPress={props.onSkip}
       />
     </View>
@@ -536,7 +601,8 @@ function EntrySheet(props: {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.field, paddingHorizontal: space.gutter },
   rootRest: { backgroundColor: color.fieldRest },
-  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 6 },
+  // the drawn icons sit 10 pt inside their 44 pt targets: pull the row out so the marks align on the gutter
+  head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10, marginBottom: 6, marginHorizontal: -10 },
   headCentered: { flex: 1, textAlign: 'center' },
   nameRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   skip: { alignSelf: 'center', marginTop: 14, minHeight: 44, justifyContent: 'center', paddingHorizontal: 16 },
@@ -548,6 +614,11 @@ const styles = StyleSheet.create({
   status: { ...type.small, color: color.ink3, textAlign: 'center', marginTop: -2, marginBottom: 4 },
   body: { flex: 1 },
   setLine: { marginTop: 8, fontVariant: ['tabular-nums'] },
+  zoneModule: { marginHorizontal: -space.gutter, marginTop: 14 },
+  // takes the free room before the spacer does (grow 100 : 1), never more than the module
+  setZone: { flexGrow: 100, flexShrink: 1, flexBasis: 0, maxHeight: 150 + 14 },
+  // the 44 pt target centred on the name's first line (type.exercise: line height 34)
+  swapIcon: { marginTop: -5, marginRight: -10 },
   chips: { flexDirection: 'row', gap: 8, marginTop: 16 },
   chip: { flex: 1, borderRadius: 14, borderWidth: 1, borderColor: color.line, paddingVertical: 8, paddingHorizontal: 10, minHeight: 54 },
   chipNow: { borderWidth: 2, borderColor: color.signal, backgroundColor: color.plate },
@@ -562,6 +633,8 @@ const styles = StyleSheet.create({
   tick: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: color.ink2, alignItems: 'center', justifyContent: 'center' },
   tickGlyph: { color: color.ink, fontSize: 12, fontWeight: '800' },
   ringWrap: { alignItems: 'center', marginTop: 18 },
+  ringWrapTight: { marginTop: 10 },
+  nextTight: { marginTop: 10, paddingVertical: 12 },
   next: { marginTop: 18, backgroundColor: color.plateRest, borderRadius: 20, borderWidth: 1, borderColor: color.lineRest, padding: 16 },
   swap: { marginTop: 12, borderColor: color.lineRest, minHeight: 48 },
   restControls: { flexDirection: 'row', gap: 10 },
