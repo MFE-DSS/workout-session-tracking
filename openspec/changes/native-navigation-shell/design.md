@@ -51,6 +51,14 @@ L'exécution (et sa reprise) est poussée au-dessus des onglets ; elle garde `Ex
 
 1. Spike `require.context` + `ExpoRoot` sur une branche jetable. 2. Décisions D1/D2. 3. Coque + pile de séance. 4. Revue visuelle de la barre. 5. Passe émulateur + iPhone. 6. PR.
 
+## Décisions de l'opérateur (2026-10-31)
+
+- **D1 — onglets : AUJOURD'HUI · PROGRAMMES · PROGRÈS · PROFIL.** AUJOURD'HUI porte la MISSION ; la séance est un
+  parcours plein écran, pas un onglet ; PROGRAMMES regroupe modèles, programmes personnels, plan et équipement ; le
+  social (squads, classement, profils publics), que l'opérateur fait migrer (MOB-00), vit sous PROFIL.
+- **D2 — barre système, icônes AUREN.** NativeTabs teintée aux couleurs AUREN, icônes dessinées dans la DA (images),
+  rendu iOS et Android montré avant commit.
+
 ## Open Questions
 
-- Libellés exacts des onglets (après D1) — sans effet sur la structure.
+- Libellés exacts des onglets (casse, accents dans la barre système) — sans effet sur la structure.

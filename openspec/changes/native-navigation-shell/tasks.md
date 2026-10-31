@@ -2,7 +2,7 @@
 
 ## 1. Décisions et pointe technique
 
-- [ ] 1.1 Obtenir les décisions D1 (onglets) et D2 (apparence de la barre) de l'opérateur ; les consigner dans `design.md`
+- [x] 1.1 Obtenir les décisions D1 (onglets) et D2 (apparence de la barre) de l'opérateur ; les consigner dans `design.md`
 - [ ] 1.2 Pointe sur une branche jetable : installer `expo-router` 58.0.x et ses pairs, monter `ExpoRoot` avec `require.context('./src/routes')` sous `ConnectedApp` ; vérifier export web, build iOS de développement et build Android EAS ; consigner le résultat (ou basculer sur le repli `createNativeTabsProps`)
 
 ## 2. Coque

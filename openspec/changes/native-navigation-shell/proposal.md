@@ -12,7 +12,7 @@ L'app native n'a pas de navigation : `ConnectedApp.tsx` choisit un écran à la 
 - **Les espaces sans contenu migré** affichent leur état réel : ce qu'ils contiendront est listé dans l'inventaire, rien n'est inventé (règle « l'absence n'est pas une affordance » : au plus un pas).
 - **Aucun écran verrouillé ne change** (`MISSION-SCREEN-V1`, `EXECUTION-SCREEN-V1`, `COMPLETE-SCREEN-V1`) ; la barre d'onglets et ses icônes passent en revue visuelle (§5.1) avant tout commit.
 
-## Décisions demandées à l'opérateur (avant apply)
+## Décisions demandées à l'opérateur (avant apply) — tranchées le 2026-10-31 : D1 = AUJOURD'HUI · PROGRAMMES · PROGRÈS · PROFIL ; D2 = barre système, icônes AUREN
 
 - **D1 — les onglets.** Hypothèse de l'opérateur : MISSION · SÉANCE · PROGRÈS · PROFIL. Constat : la séance s'ouvre en plein écran depuis MISSION ; hors séance, un onglet SÉANCE n'aurait rien de propre à montrer. **Recommandé : AUJOURD'HUI (la MISSION) · PROGRAMMES · PROGRÈS · PROFIL**, la séance étant un parcours plein écran et non un onglet. Alternative : garder SÉANCE comme bibliothèque de séances (modèles + lanceur).
 - **D2 — l'apparence de la barre.** NativeTabs = la barre **du système** (verre liquide iOS, Material 3 Android) : on règle teintes, libellés et icônes, pas la forme. Options : (a) barre système teintée AUREN, icônes AUREN dessinées (images) ; (b) barre système, icônes SF Symbols / Material ; (c) barre entièrement dessinée par AUREN (onglets JS) — contrôle total, conventions natives perdues. **Recommandé : (a)**, rendu montré avant commit.
