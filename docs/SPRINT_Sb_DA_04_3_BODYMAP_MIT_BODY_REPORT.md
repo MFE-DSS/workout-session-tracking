@@ -111,5 +111,13 @@ côté) ; une caméra qui sort de sa moitié (→ test `viewPresets`) ; la dette
 Le mouvement : un zoom biomécanique de la zone (fibres qui se raccourcissent et s'allongent, angle articulaire),
 sans revendication de blessure — proposition séparée à l'opérateur.
 
+## Annexe de clôture (2026-10-31)
+
+- Premier passage : CI verte, gate Sonar **rouge** (`new_code_smells_severity` 15 > 14), une seule finding,
+  `python:S9073` (assertion composite) ligne 94 de la garde runtime — vraie, **corrigée** (`c45cc50`), jamais adjugée.
+- Gate vérifié avant fusion : tête `c45cc50`, 10 / 10 checks verts (contrat visuel : 65 baselines identiques au
+  pixel en CI), Sonar PR `OK`, 0 fil ouvert, `CLEAN`.
+- PR #326 fusionnée en `--merge --match-head-commit` : **`c55e359`** ; CI canonique `41192283954` **verte**.
+
 **Verdict :** `BODYMAP-MIT-BODY-V1` **LOCKED** — le BodyMap dessine le corps MIT, crédité, chemins intouchés ;
 18 baselines approuvées par l'opérateur ; aucun écran produit ne le monte encore.
