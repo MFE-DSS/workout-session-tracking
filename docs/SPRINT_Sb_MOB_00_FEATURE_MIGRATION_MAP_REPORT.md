@@ -72,12 +72,24 @@ tranché).
    `WEB_ONLY`, à trancher.
 5. **Programmes personnels** : 16 routes, l'éditeur le plus riche du web — à découper V1 → V4.
 
-## 5. Hors périmètre
+## 5. Arbitrages de l'opérateur (2026-10-31)
+
+Planche de revue : https://claude.ai/artifact/DsGo6zKv4djWg3egCBg7MG.
+
+- « Oui, les 6 restent web » et, pour le social, « À migrer dans l'app ». Lecture cohérente des deux réponses : la
+  réinitialisation du mot de passe, le contact, l'export et l'administration **restent web** (décidés, plus
+  proposés) ; **squads, classement et profils publics passent en `REWRITE_NATIVE`** (espace social sous PROFIL,
+  place exacte fixée après MOB-01).
+- Navigation retenue pour MOB-01 : AUJOURD'HUI (la MISSION) · PROGRAMMES · PROGRÈS · PROFIL ; barre système, icônes
+  AUREN.
+- Statuts après arbitrage : REWRITE_NATIVE 19 · BLOCKED 9 · WEB_ONLY 5 · KEEP_DOMAIN 4 · DEPRECATE 1 ; aucune
+  proposition ouverte.
+
+## 6. Hors périmètre
 
 Aucun code produit, aucune route modifiée, aucun écran ; aucune décision de navigation (MOB-01).
 
 ## Verdict
 
-**MOB-00 LIVRÉ EN PR** — inventaire exhaustif par construction (110 / 110), gardé par la CI. Reste à l'opérateur :
-trancher les 6 propositions `WEB_ONLY` et la place du social. Suite : `native-navigation-shell` (MOB-01), qui part de
-cette matrice.
+**MOB-00 LIVRÉ EN PR** — inventaire exhaustif par construction (110 / 110), gardé par la CI, arbitré par l'opérateur
+(4 fonctions restent web, le social migre). Suite : `native-navigation-shell` (MOB-01), qui part de cette matrice.

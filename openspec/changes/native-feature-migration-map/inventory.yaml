@@ -8,8 +8,10 @@
 #        · REWRITE_NATIVE (à réécrire en natif sur le domaine existant)
 #        · WEB_ONLY (reste sur le web) · DEPRECATE (à retirer) · BLOCKED (dépendance nommée).
 # proposed: true = proposition de l'agent, à trancher par l'opérateur (DEPRECATE / WEB_ONLY).
-# native_destination : hypothèse de navigation MISSION · SÉANCE · PROGRÈS · PROFIL (non verrouillée,
-# décidée par MOB-01) ; « Compte » vit sous PROFIL.
+# Arbitrages de l'opérateur (2026-10-31) : réinitialisation du mot de passe, contact, export et
+# administration RESTENT WEB ; le social (squads, classement, profils publics) MIGRE dans l'app.
+# native_destination : rédigée avec l'hypothèse MISSION · SÉANCE · PROGRÈS · PROFIL ; MOB-01 a retenu
+# AUJOURD'HUI (la MISSION) · PROGRAMMES · PROGRÈS · PROFIL. « Compte » vit sous PROFIL.
 
 version: 1
 base_sha: 36b971a
@@ -135,7 +137,6 @@ features:
     user_actions: [demander un lien, choisir un nouveau mot de passe]
     native_destination: "hors app — l'écran de connexion renvoie vers le site"
     status: WEB_ONLY
-    proposed: true
     dependencies: []
     visual_assets: []
     migration_risk: faible
@@ -166,7 +167,6 @@ features:
     user_actions: [envoyer un message]
     native_destination: hors app (lien vers le site)
     status: WEB_ONLY
-    proposed: true
     dependencies: []
     visual_assets: []
     migration_risk: faible
@@ -182,7 +182,6 @@ features:
     user_actions: [télécharger son journal]
     native_destination: hors app (lien vers le site)
     status: WEB_ONLY
-    proposed: true
     dependencies: [suppression de compte dans l'app — exigence Store, inexistante]
     visual_assets: []
     migration_risk: "moyen — RGPD : suppression de compte à concevoir avant la diffusion publique"
@@ -524,13 +523,12 @@ features:
       - POST /squads/{squad_id}/share-session
     legacy_location: "squads.* → squads_list.html, squad_*.html"
     domain_owner: [squad, challenge, sharing, compare]
-    api: web
+    api: "à créer"
     data: [squads, squad_memberships, squad_invite_codes, squad_challenges, squad_template_recommendations, squad_shared_sessions]
     user_actions: [créer, rejoindre, inviter, défier, comparer, partager une séance]
-    native_destination: aucune décidée
-    status: WEB_ONLY
-    proposed: true
-    dependencies: ["décision produit : le social entre-t-il dans l'app ?"]
+    native_destination: "PROFIL — espace social (place exacte fixée après MOB-01)"
+    status: REWRITE_NATIVE
+    dependencies: ["opérateur 2026-10-31 : le social migre dans l'app", MOB-01 coque, confidentialité des données partagées]
     visual_assets: []
     migration_risk: "moyen — 16 routes ; les surfaces sociales sont celles qu'on oublie (décision appliquée là où c'était commode)"
 
@@ -540,13 +538,12 @@ features:
     routes: ["GET /leaderboard", "GET /users/{username}", "GET /users/{username}/preview"]
     legacy_location: "leaderboard.* → leaderboard.html, user_profile.html, profile_preview.html"
     domain_owner: [leaderboard, performance, profile_metrics, radar]
-    api: web
+    api: "à créer"
     data: [users, workout_sessions]
     user_actions: [voir le classement, voir le profil d'un autre]
-    native_destination: aucune décidée
-    status: WEB_ONLY
-    proposed: true
-    dependencies: [décision produit sur le social, confidentialité des profils publics]
+    native_destination: "PROFIL — espace social (place exacte fixée après MOB-01)"
+    status: REWRITE_NATIVE
+    dependencies: ["opérateur 2026-10-31 : le social migre dans l'app", MOB-01 coque, confidentialité des profils publics]
     visual_assets: []
     migration_risk: moyen
 
@@ -577,7 +574,6 @@ features:
     user_actions: [exclure une séance des statistiques, supprimer une séance]
     native_destination: aucune
     status: WEB_ONLY
-    proposed: true
     dependencies: []
     visual_assets: []
     migration_risk: faible

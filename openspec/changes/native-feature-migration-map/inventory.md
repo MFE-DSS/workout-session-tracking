@@ -1,7 +1,7 @@
 # Inventaire des fonctions web → destination native (MOB-00)
 
 Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main.
-**38 fonctions**, **110 routes** rattachées, BLOCKED 9, DEPRECATE 1, KEEP_DOMAIN 4, REWRITE_NATIVE 17, WEB_ONLY 7.
+**38 fonctions**, **110 routes** rattachées, BLOCKED 9, DEPRECATE 1, KEEP_DOMAIN 4, REWRITE_NATIVE 19, WEB_ONLY 5.
 « (proposé) » = proposition de l'agent, à trancher par l'opérateur.
 
 ## Mission
@@ -24,10 +24,10 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 |---|---|---|---|---|---|---|
 | Se connecter, se déconnecter | KEEP_DOMAIN | Compte (LoginScreen, livré) | 7 | auth · device_auth · password_policy | — | faible |
 | Créer un compte | REWRITE_NATIVE | Compte — entrée de l'onboarding | 3 | auth · password_policy | MOB-03 onboarding · limite de débit d'inscription côté API | moyen — aujourd'hui le testeur doit passer par le web |
-| Mot de passe oublié, réinitialisation par lien | WEB_ONLY (proposé) | hors app — l'écran de connexion renvoie vers le site | 4 | auth · email | — | faible |
+| Mot de passe oublié, réinitialisation par lien | WEB_ONLY | hors app — l'écran de connexion renvoie vers le site | 4 | auth · email | — | faible |
 | Changer son mot de passe | REWRITE_NATIVE | Compte | 2 | auth · password_policy | MOB-03 compte | faible — révocation par époque de session déjà en place |
-| Écrire à l'administrateur | WEB_ONLY (proposé) | hors app (lien vers le site) | 2 | email | — | faible |
-| Exporter son journal (JSON, CSV) | WEB_ONLY (proposé) | hors app (lien vers le site) | 3 | export_builder · backup_inspector | suppression de compte dans l'app — exigence Store · inexistante | moyen — RGPD : suppression de compte à concevoir avant la diffusion publique |
+| Écrire à l'administrateur | WEB_ONLY | hors app (lien vers le site) | 2 | email | — | faible |
+| Exporter son journal (JSON, CSV) | WEB_ONLY | hors app (lien vers le site) | 3 | export_builder · backup_inspector | suppression de compte dans l'app — exigence Store · inexistante | moyen — RGPD : suppression de compte à concevoir avant la diffusion publique |
 | Onboarding (compte, corps, entraînement, objectif) | BLOCKED | entrée de l'app | 0 | training_preferences · body_profile · auth | UX-LAB ONBOARDING (ne demander que les données dont on sait l'usage) · consentement explicite (vNext O6) · inscription mobile | élevé |
 | Abonnement (gratuit / pro) | BLOCKED | Compte | 0 | — | définition de la valeur produit · compte Apple Developer et Google Play · fournisseur d'achats (RevenueCat à évaluer) · build de développement | élevé |
 | Supprimer son compte depuis l'app | BLOCKED | Compte | 0 | auth | exigence Store (Apple, Google) · RGPD · conception de l'effacement (dur vs exclusion) | élevé — bloquant pour toute diffusion publique |
@@ -82,12 +82,12 @@ Généré depuis `inventory.yaml` (base `36b971a`) — ne pas éditer à la main
 
 | Fonction | Statut | Destination native | Routes | Propriétaire du domaine | Dépendances | Risque |
 |---|---|---|---|---|---|---|
-| Squads (groupes, invitations, défis, comparaison, partage) | WEB_ONLY (proposé) | aucune décidée | 16 | squad · challenge · sharing · compare | décision produit : le social entre-t-il dans l'app ? | moyen — 16 routes ; les surfaces sociales sont celles qu'on oublie (décision appliquée là où c'était commode) |
-| Classement et profils publics | WEB_ONLY (proposé) | aucune décidée | 3 | leaderboard · performance · profile_metrics · radar | décision produit sur le social · confidentialité des profils publics | moyen |
+| Squads (groupes, invitations, défis, comparaison, partage) | REWRITE_NATIVE | PROFIL — espace social (place exacte fixée après MOB-01) | 16 | squad · challenge · sharing · compare | opérateur 2026-10-31 : le social migre dans l'app · MOB-01 coque · confidentialité des données partagées | moyen — 16 routes ; les surfaces sociales sont celles qu'on oublie (décision appliquée là où c'était commode) |
+| Classement et profils publics | REWRITE_NATIVE | PROFIL — espace social (place exacte fixée après MOB-01) | 3 | leaderboard · performance · profile_metrics · radar | opérateur 2026-10-31 : le social migre dans l'app · MOB-01 coque · confidentialité des profils publics | moyen |
 
 ## Exploitation
 
 | Fonction | Statut | Destination native | Routes | Propriétaire du domaine | Dépendances | Risque |
 |---|---|---|---|---|---|---|
 | Santé du service (sondes) | WEB_ONLY | aucune | 2 | backup_verifier | — | nul |
-| Administration des séances (lister, exclure, supprimer) | WEB_ONLY (proposé) | aucune | 4 | ownership · quality_score | — | faible |
+| Administration des séances (lister, exclure, supprimer) | WEB_ONLY | aucune | 4 | ownership · quality_score | — | faible |

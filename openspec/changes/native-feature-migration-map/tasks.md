@@ -16,7 +16,7 @@
 ## 3. Rendu et revue
 
 - [x] 3.1 Générer `inventory.md` (tableau par famille) depuis le YAML par un script du change ; vérifier qu'il correspond au YAML
-- [ ] 3.2 Publier le rendu à l'opérateur, statuts `DEPRECATE` / `WEB_ONLY` marqués comme propositions ; consigner ses arbitrages
+- [x] 3.2 Publier le rendu à l'opérateur, statuts `DEPRECATE` / `WEB_ONLY` marqués comme propositions ; consigner ses arbitrages
 - [ ] 3.3 Rapport de sprint (§3 Brainstorming / Options / Risques / Choix, échantillon vérifié, verdict) et ligne du registre
 
 ## Workflow follow-up
