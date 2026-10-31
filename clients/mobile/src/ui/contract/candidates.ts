@@ -43,11 +43,20 @@ export type CandidateFixture =
       height: number;
       /** `main` or `<family>:<session index>` (MissionScreenFixture) */
       source: MissionSource;
+    }
+  | {
+      /** `screen-complete-<width>x<height>-<plan>` — a scrolling screen, framed tall to be seen whole */
+      id: string;
+      candidate: 'COMPLETE-SCREEN';
+      width: number;
+      height: number;
+      /** a plan of the lab fixture, played to its end (CompleteScreenFixture) */
+      plan: string;
     };
 
 /**
- * Empty between two iterations: the MISSION screens were approved (« go », 2026-10-31) and moved to fixtures.ts
- * as MISSION-SCREEN-V1. The next iteration adds its own.
+ * Empty between two iterations: the COMPLETE screens were approved (« OK », 2026-10-31) and moved to fixtures.ts
+ * as COMPLETE-SCREEN-V1. The next iteration adds its own.
  */
 export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = [];
 

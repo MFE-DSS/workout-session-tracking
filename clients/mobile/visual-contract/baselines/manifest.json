@@ -971,6 +971,32 @@
       "authority": "byte-identical to the 1x capture of the MISSION review board approved by the operator",
       "approved_by": "operator — gate DA-01 « oui à tout », then on the MISSION board (the session's BodyMap derived by the server; subtitle, « On commence par » and the start sublabel stepped aside): « go »",
       "approved_on": "2026-10-31"
+    },
+    {
+      "id": "complete-390x2200-push-a",
+      "file": "complete-390x2200-push-a.png",
+      "visual_id": "COMPLETE-SCREEN-V1",
+      "fixture": "?fixture=complete-390x2200-push-a",
+      "width": 390,
+      "scenario": "Push A played to its end: the zones worked as the session's BodyMap — Pectoraux · 9, Deltoïdes latéraux · 6, Deltoïdes postérieurs · 3, Triceps · 3",
+      "pixels": "414x2224",
+      "sha256": "e52121ad2f084c5f1d96e3bbef2c41f2d7f753624f179ba613f74c9565b9045d",
+      "authority": "byte-identical to the 1x capture of the COMPLETE review board approved by the operator",
+      "approved_by": "operator — on the COMPLETE board (« Séries par zone » chips → the session's BodyMap with sets done per zone): « OK »",
+      "approved_on": "2026-10-31"
+    },
+    {
+      "id": "complete-390x2000-catch-up-shoulders",
+      "file": "complete-390x2000-catch-up-shoulders.png",
+      "visual_id": "COMPLETE-SCREEN-V1",
+      "fixture": "?fixture=complete-390x2000-catch-up-shoulders",
+      "width": 390,
+      "scenario": "Rattrapage épaules played to its end: 2 zones",
+      "pixels": "414x2024",
+      "sha256": "896028739e1fda0e5c42f40910b3612ad91406cf8adb2a4910181e125b432e2f",
+      "authority": "byte-identical to the 1x capture of the COMPLETE review board approved by the operator",
+      "approved_by": "operator — on the COMPLETE board (« Séries par zone » chips → the session's BodyMap with sets done per zone): « OK »",
+      "approved_on": "2026-10-31"
     }
   ]
 }

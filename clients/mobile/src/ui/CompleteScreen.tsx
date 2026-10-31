@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { DoneSession, sessionsThisWeek, weeksHeld } from '../domain/adherence';
 import { elapsedLabel, kg } from '../domain/format';
@@ -9,22 +9,13 @@ import type { Mission } from '../domain/types';
 import type { WorkoutState } from '../domain/workout';
 import { DEFAULT_SESSIONS_PER_WEEK } from '../lab/profile';
 import { feedback } from '../native/feedback';
+import { SessionBodyMap } from './bodymap/BodyMapTriptych';
+import { zonePanelPresets, zonesDone } from './bodymap/zonesDone';
 import { IconButton, PrimaryAction } from './components';
 import { color, space, type } from './theme';
 
 const TIME = new Intl.DateTimeFormat('fr-FR', { hour: '2-digit', minute: '2-digit' });
 
-/** Sets per zone, from the sets DONE on this device, by the server recap's own rule. */
-export function zonesDone(state: WorkoutState): { label: string; sets: number }[] {
-  const plan = state.plan!;
-  const counts = new Map<string, number>();
-  for (const s of plan.sets) {
-    if (!state.done[s.set_id]) continue;
-    const zone = plan.exercises.find((e) => e.se_id === s.se_id)?.zone;
-    if (zone) counts.set(zone.label, (counts.get(zone.label) ?? 0) + 1);
-  }
-  return [...counts.entries()].map(([label, sets]) => ({ label, sets })).sort((a, b) => b.sets - a.sets || a.label.localeCompare(b.label));
-}
 
 const TREND: Record<Trend, { glyph: string; word: string; tone: string }> = {
   up: { glyph: '↑', word: 'en progrès', tone: color.signal },
@@ -64,7 +55,9 @@ export function CompleteScreen(props: {
   const target = props.sessionsPerWeek ?? DEFAULT_SESSIONS_PER_WEEK;
   const week = sessionsThisWeek(after, ended);
   const held = weeksHeld(after, ended, target);
-  const zones = zonesDone(state);
+  const zonePresets = zonePanelPresets(zonesDone(state));
+  // the screen's frame, not the window: the same on a device, exact in a review frame
+  const { width } = useSafeAreaFrame();
   const worked = perf.exercises.filter((e) => e.top);
 
   const rewarded = useRef(false);
@@ -128,17 +121,10 @@ export function CompleteScreen(props: {
         </View>
         )}
 
-        {zones.length ? (
-          <View style={styles.card}>
-            <Text style={type.eyebrow}>Séries par zone</Text>
-            <View style={styles.zones}>
-              {zones.map((z) => (
-                <View key={z.label} style={styles.zone}>
-                  <Text style={styles.zoneText}>{z.label}</Text>
-                  <Text style={[styles.zoneText, type.tabular, { color: color.ink }]}>{z.sets}</Text>
-                </View>
-              ))}
-            </View>
+        {zonePresets.length ? (
+          <View testID="complete-zones" style={styles.zonePanel}>
+            <Text style={[type.eyebrow, styles.zonePanelTitle]}>Séries par zone</Text>
+            <SessionBodyMap width={width} presets={zonePresets} />
           </View>
         ) : null}
 
@@ -235,9 +221,9 @@ const styles = StyleSheet.create({
   trend: { width: 18, fontSize: 18, fontWeight: '800', textAlign: 'center' },
   pair: { flexDirection: 'row', gap: 12, marginTop: 6 },
   big: { fontSize: 36, fontWeight: '800', color: color.ink, fontVariant: ['tabular-nums'] },
-  zones: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
-  zone: { flexDirection: 'row', gap: 8, borderRadius: 14, borderWidth: 1, borderColor: color.lineRest, backgroundColor: color.plateRest, paddingHorizontal: 12, paddingVertical: 6 },
-  zoneText: { color: color.system, fontSize: 14, fontWeight: '700' },
+  // full-bleed, like every window module; the title stays on the gutter
+  zonePanel: { marginHorizontal: -space.gutter, marginTop: 18, gap: 8 },
+  zonePanelTitle: { paddingHorizontal: space.gutter },
   ledger: { flexDirection: 'row', marginTop: 18, paddingVertical: 12, borderTopWidth: StyleSheet.hairlineWidth, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: color.line },
   next: { borderColor: color.lineRest, backgroundColor: color.plateRest },
 });
