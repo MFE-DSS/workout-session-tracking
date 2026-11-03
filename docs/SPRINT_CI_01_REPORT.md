@@ -79,3 +79,19 @@ final vert sans les fichiers de preuve. Les mutations locales ci-dessus restent 
 ## Verdict
 
 **⏳ ATTENDRE — implémentation et contrôles locaux vérifiés ; preuves GitHub négatives/positives et GO MERGE encore requis.**
+
+## Preuve GitHub négative — réellement exécutée
+
+PR **#347**, run **`41679982474`**, job **`126070762071`**, commit de sondes **`f1a8712`**.
+Le code propre est livré dans le commit précédent **`eea4af1`**.
+
+- Installation verrouillée : success.
+- `Run mobile logic tests` : **failure**, assertion contrôlée `Expected: 2 / Received: 1`, 422 autres tests
+  passants, **exit 1**.
+- `Check mobile types` : **failure**, `ci01-type-probe.ts(2,14): TS2322`, **exit 2**.
+
+Les deux sondes ont des causes et des étapes distinctes dans le même run : cela prouve que le diagnostic de
+types s'exécute encore après le rouge Jest. Les logs du job ont été relus, pas seulement sa couleur.
+Le présent retrait remet le client exactement dans l'état propre vérifié localement ; aucun changement
+fonctionnel n'est apporté pour « réparer » ces échecs intentionnels.
+Le HEAD final doit maintenant obtenir une CI complète verte. Aucun merge autorisé.
