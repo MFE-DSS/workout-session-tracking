@@ -61,6 +61,15 @@ context: |
   suppression de branche/worktree = décisions humaines ; jamais `AGENTS.md`
   commité ; dépôt public : aucun secret.
 
+  ## Qualité temporaire (GOV-SONAR-01)
+  TEMPORARY — MVP DEVELOPMENT : SonarCloud ADVISORY / NON-BLOCKING.
+  Référence : docs/strategy/SONAR_TEMPORARY_MVP_POLICY.md.
+  Toujours relever le vrai résultat Sonar, dont ERROR ou indisponibilité.
+  Backend, Jest, TypeScript, visuel, OpenSpec strict, scope/spec protocol et
+  sécurité existante restent obligatoires ; une faille confirmée reste un STOP.
+  Revue sécurité/qualité avant bêta externe élargie, abonnements payants,
+  photos de progression/mesures physiques sensibles ou production.
+
 rules:
   proposal:
     - Énoncer explicitement le hors-périmètre (non-goals).

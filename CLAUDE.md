@@ -116,7 +116,7 @@ La politique des tiers est dans **`.check-policy.json`** (versionné). Toute
   `PR GREEN / MERGE PENDING` ; un `GO MERGE` autorise merge → closeout → cleanup.
   Merge, squash, bypass `--admin` et suppression de branche/worktree **restent
   toujours** des décisions/actions humaines.
-- Sur **CI rouge** : STOP, pas de cascade de fixes. Rapporter job / step /
+- Sur **contrôle obligatoire rouge** : STOP, pas de cascade de fixes. Rapporter job / step /
   message exact / hypothèse / patch minimal. Distinguer un échec de test d'une
   **annulation infra** (job `cancelled`, 0 step / 0 log) → un simple re-run des
   jobs échoués suffit souvent (sans nouveau commit).
@@ -155,7 +155,8 @@ périmètre** · pousser des commits de fix · **s'arrêter** à
 `PR GREEN / MERGE PENDING` ou à un `BLOCKED` (ambiguïté réelle, voir stops).
 
 **Après `GO MERGE`, l'agent PEUT en autonomie** : merger avec la **méthode
-approuvée** · vérifier la CI canonique · vérifier Sonar (issues + coverage) ·
+approuvée** · vérifier les contrôles obligatoires de la CI canonique · consigner
+Sonar (issues + coverage + gate, consultatif selon GOV-SONAR-01) ·
 rédiger le closeout · pousser le closeout **docs-only** · nettoyer branche/worktree ·
 **s'arrêter** à `CLOSED + CLEANED`.
 
@@ -169,9 +170,21 @@ destructif DB/données** sans approbation opérateur.
 **Conditions d'arrêt dur obligatoires** (STOP + rapport, jamais passer outre) :
 conflit de spec · ambiguïté de forme de migration · action destructive de données ·
 faille de sécurité · exposition de secret · credential de service externe requis ·
-thread de revue non résolu **exigeant un changement de code** · CI rouge **hors
+thread de revue non résolu **exigeant un changement de code** · contrôle obligatoire rouge **hors
 périmètre du sprint** · décision de merge · dérive de périmètre au-delà des fichiers
 autorisés.
+
+**GOV-SONAR-01 — TEMPORARY — MVP DEVELOPMENT.** SonarCloud est
+**ADVISORY / NON-BLOCKING** pendant le MVP natif ; son verdict réel reste
+consigné, y compris `Quality Gate ERROR`. Un rouge Sonar seul ne bloque pas la
+livraison sous cette politique. Les tests backend, Jest, TypeScript, le visuel,
+OpenSpec strict, scope/spec protocol et les contrôles sécurité existants
+(Bandit, Gitleaks, audit des dépendances applicables) restent obligatoires.
+Une faille de sécurité confirmée reste un arrêt dur. Aucun seuil Sonar ni état
+d'issue n'est modifié pour passer. Politique normative, incident et réévaluation
+avant bêta externe élargie, paiements, photos/mesures sensibles ou production :
+`docs/strategy/SONAR_TEMPORARY_MVP_POLICY.md`. Toute autre mention Sonar REQUIRED
+dans des commentaires/rapports historiques décrit la politique antérieure.
 
 Les §1 (check_scope), §2 (CI = source de vérité, additive-only, CI rouge = STOP),
 §3 (Brainstorming/Options/Risques/Choix) **restent intégralement en vigueur** — ce
