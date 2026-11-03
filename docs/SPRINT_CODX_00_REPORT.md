@@ -2,7 +2,8 @@
 
 Date : 2026-11-03. Branche : `sb/codx-00-codex-openspec`.
 Change : `openspec/changes/codex-openspec-adapter`.
-État : configuration locale réalisée, livraison et CI non engagées.
+État de livraison : **MERGÉE #346, archive dans cette clôture**. Les sections de préparation décrivent
+l'état initial ; l'annexe de livraison en fin de rapport porte le résultat le plus récent.
 
 ## 1. Commande opérateur et Brainstorming / Options / Risques / Choix retenu
 
@@ -159,3 +160,35 @@ La tâche 3.2 reste ouverte parce qu'elle inclut la CI réelle, pas seulement la
 
 La précédente limite Python a été résolue **dans le worktree CI-01 uniquement** : venv Python 3.11.14,
 FastAPI 0.141.1 installé depuis le lock. Le vieux venv partagé n'est pas modifié.
+
+### Résultat de livraison après GO PUSH explicite
+
+L'opérateur a ensuite donné « GO PUSH + PR pour CODX-00 et CI-01 ».
+Branche poussée au **`7d70c2f359bc5e41eb17947756a207d2716cfeed`** ;
+[PR #346](https://github.com/MFE-DSS/workout-session-tracking/pull/346) ouverte.
+[Run 41668162468](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/41668162468) :
+**8 jobs completed/success**. `gh pr checks` confirme aussi tous les checks externes verts, dont
+`SonarCloud Code Analysis`. Aucun merge et aucune archive effectués.
+
+**Verdict de livraison : PR GREEN / MERGE PENDING.** Les présents statuts de clôture sont préparés localement
+pour la suite du protocole après décision de merge ; ils ne modifient pas le HEAD déjà validé de la PR.
+
+## Livraison et archivage — relevé de clôture du 2026-11-03
+
+Les sections intermédiaires précédentes sont historiques. Les archives sont portées par cette clôture,
+livrée via PR protégée sans push direct ni bypass. Les SHA et CI de la clôture documentaire sont relevés
+dans la remise opérateur et les métadonnées de livraison après intégration. Aucun GO BUILD MOB-02 donné.
+
+CODX-00 #346 est mergée par `60bea5d` ; CI canonique `41691072708` : 8/8 jobs Actions réussis.
+Le Quality Gate Sonar ERROR réel a été consigné puis rendu consultatif par GOV-SONAR-01 #348 (`cc80ddd`),
+sans changement de seuil ni requalification automatique des issues.
+
+L’adaptateur officiel, les six skills et la roadmap sont livrés. Aucun code produit, baseline ou Spec Kit ajouté.
+Le change est archivé sous `openspec/changes/archive/2026-11-03-codex-openspec-adapter`, 7/7 tâches.
+Les quatre fichiers de l’archive sont identiques aux entrées contrôlées avant déplacement ; les specs vivantes
+sont inchangées. Les décisions MOB-02 sont sauvegardées, la proposition existante sera rebasée après clôture.
+
+Contrôle de la clôture : `check_scope` ISOLATED ; **142 tests ciblés/broad sweep passants**,
+budget Ruff264≤548, protocole documentaire et OpenSpec strict3/3 passent ; aucun Python neuf,
+Ruff nouveaux fichiers sans objet. Diff de code/workflow/baseline vide ; aucun full sweep local additionnel
+requis pour ce diff de clôture. Les archives et les cinq fichiers de specs vivantes ont été comparés par SHA-256.

@@ -14,10 +14,22 @@
 ## 3. Validation et livraison
 
 - [x] 3.1 Exécuter `python scripts/check_scope.py` puis son minimum, dont protocole documentaire et OpenSpec strict ; revue indépendante de la proposition complète (ISOLATED ; 139 tests, budget 264/548, OpenSpec 5/5 ; constat P2 documentaire corrigé).
-- [ ] 3.2 Soumettre le diff par PR propre à GOV-SONAR-01 ; relever son HEAD/CI et le GO MERGE distinct avant intégration.
-- [ ] 3.3 Relever la fin du sweep complet CI-01 sur son HEAD et sa base effectifs après intégration GOV, les checks PR et les steps sécurité ; le sweep 5d675b6/base 60bea5d ne vaut preuve finale que si cette base reste effective, sinon le conserver comme historique et revalider selon scope. Rapporter les blockers sans substituer les sweeps précédents.
+- [x] 3.2 Soumettre le diff par PR propre à GOV-SONAR-01 ; relever son HEAD/CI et le GO MERGE distinct avant intégration.
+- [x] 3.3 Relever la fin du sweep complet CI-01 sur son HEAD et sa base effectifs après intégration GOV, les checks PR et les steps sécurité ; le sweep 5d675b6/base 60bea5d ne vaut preuve finale que si cette base reste effective, sinon le conserver comme historique et revalider selon scope. Rapporter les blockers sans substituer les sweeps précédents.
 
 ## Workflow follow-up
 
 - Après GO MERGE GOV-SONAR-01, intégration vérifiée et application autorisée de la protection : reprendre #347 sous son GO acquis, vérifier la canonique puis closeout/archives et rebase MOB-02.
 - Aucun GO BUILD MOB-02 implicite. Archiver GOV-SONAR-01 après satisfaction de ses tâches et de sa livraison.
+
+## Relevé final avant archive
+
+PR #348 mergée `cc80ddd` sous GO explicite, CI canonique41706456907 :8/8 succès ; Sonar ERROR consultatif
+conservé. Protection phase A appliquée et relue. Revalidation finale CI-01 :8ff2808/basecc80ddd,7147 tests
+complets et CI PR41707470720 9/9 succès ; aucun sweep ancien substitué. Phase B mobile après vérification canonique.
+
+## Vérification canonique et protection finales
+
+CI-01 canonique `edd7351`, run41711441173 : tous les contrôles obligatoires hors Sonar réussis.
+Protection phase B appliquée puis relue : QA,lint,visuel et `mobile checks (Jest + TypeScript)` requis,
+app_id15368,strict=false ; Sonar consultatif,aucun autre réglage changé.

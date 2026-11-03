@@ -12,8 +12,8 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 | Livré | PLAT-01 | Pilote Android ; archive après retours testeur |
 | Livré | MOB-00 | Carte de migration web → natif, archivée |
 | Livré | MOB-01 | Coque native mergée ; passe iPhone connectée avant archive |
-| 1 | CODX-00 | Adaptateur Codex/OpenSpec et bonne base ; préparation locale en revue |
-| 2 | CI-01 | Jest + typecheck mobile en CI ; proposition séparée, pas encore appliquée |
+| 1 | CODX-00 | Mergée #346 (`60bea5d`), adaptateur officiel ; archive de clôture |
+| 2 | CI-01 | Mergée #347 (`edd7351`), Jest/types en CI et check mobile requis ; archive de clôture |
 | 3 | MOB-02 | Séance vraie dans les états dégradés ; D-MOB02-1=A et D-MOB02-2=marque seule acceptées |
 | 4 | MOB-03 | Onboarding et compte ; dépendances STORE-00, notamment suppression de compte |
 | 5 | MOB-04 | MISSION |
@@ -65,3 +65,11 @@ E7 ni d'anatomie inventés. Un asset validé sur banc n'est pas automatiquement 
 - Une branche et une PR par change ; pas de mélange CODX-00 / CI-01 / MOB-02.
 - Chaque compte rendu cite les SHA et distingue exécuté aujourd'hui / rapport historique / décision encore ouverte.
 - Une fin de tâche dans OpenSpec n'est ni une approbation visuelle ni une preuve appareil.
+
+## GOV-SONAR-01 — politique temporaire MVP
+
+PR #348 mergée `cc80ddd` : Sonar ADVISORY / NON-BLOCKING, vrai ERROR conservé. QA,lint,visuel et mobile
+sont requis après vérification API ; OpenSpec strict/scope/protocole et sécurité existante restent obligatoires.
+Référence : `SONAR_TEMPORARY_MVP_POLICY.md`. Revue sécurité/qualité avant bêta externe élargie,paiements,
+photos/mesures sensibles ou production. Aucun build MOB-02 ouvert par ces clôtures ;préflight final après
+intégration documentaire et rebase de la proposition existante.
