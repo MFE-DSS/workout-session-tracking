@@ -52,13 +52,13 @@ L'agent PEUT, sans nouveau GO :
 8. **Récupérer une seule fois** un dispatch CI bloqué (GitHub Actions qui ne crée aucun run) via **close/reopen** de la PR — jamais un 2ᵉ nudge ; si toujours rien → STOP « PERSISTENT ACTIONS TRIGGER FAILURE ».
 9. **Inspecter les logs CI** en cas de rouge.
 10. **Corriger les problèmes CI obligatoires dans le périmètre** et pousser des commits de fix ; relever Sonar à titre consultatif sans masquer ses erreurs.
-11. **S'arrêter** à `PR GREEN / MERGE PENDING` (tous les checks obligatoires de la policy verts + `mergeStateStatus CLEAN` ; Sonar consigné avec son vrai statut) **ou** à un `BLOCKED` (§5).
+11. **S'arrêter** à `PR GREEN / MERGE PENDING` (tous les checks obligatoires verts, PR `MERGEABLE`, aucun thread bloquant ; `mergeStateStatus CLEAN`, ou `UNSTABLE` uniquement dû aux checks Sonar consultatifs non requis). Tout autre contrôle non passant reste bloquant selon la policy. Consigner les états bruts GitHub et Sonar sans transformer `UNSTABLE` en `CLEAN` ni une gate ERROR en succès. **Ou** s'arrêter à un `BLOCKED` (§5).
 
 ## 4. Autonomie autorisée après `GO MERGE`
 
 L'agent PEUT, sans nouveau GO :
 
-1. **Merger avec la méthode approuvée** (celle indiquée par l'opérateur : typiquement `--merge`, no squash, **no `--admin`** quand le gate est `CLEAN`) avec garde `--match-head-commit`.
+1. **Merger avec la méthode approuvée** (celle indiquée par l'opérateur : typiquement `--merge`, no squash, **no `--admin`**) avec garde `--match-head-commit`, après les conditions de readiness du §3.11 ; aucun contournement des checks requis.
 2. **Vérifier les contrôles obligatoires de la CI canonique** sur le merge commit, selon la policy en vigueur ; ne pas déduire le verdict de leur seul nombre historique.
 3. **Consigner Sonar à titre consultatif** : delta issues, `new_coverage`, `coverage`, gate et révision analysée, ou indisponibilité explicite. Rapporter ERROR comme ERROR ; ni seuil changé, ni faux vert, ni auto-résolution. Une faille confirmée reste un arrêt dur.
 4. **Rédiger le closeout** (appendice post-merge au rapport de sprint + entrées registry/roadmap).

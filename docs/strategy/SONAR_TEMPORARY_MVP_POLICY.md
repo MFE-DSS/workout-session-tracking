@@ -33,6 +33,12 @@ avec patch/documentation explicites ; aucun changement de compte ou de licence n
 Les commentaires historiques REQUIRED du workflow ne sont pas une configuration de protection ; cette
 policy remplace leur ancienne règle de livraison sans modifier le résultat du scanner.
 
+GitHub peut afficher `mergeStateStatus=UNSTABLE` pour un scan Sonar encore en cours ou en échec malgré les
+checks requis réussis. Ce cas ne rétablit pas Sonar comme gate : une PR doit rester `MERGEABLE`, avoir tous
+ses contrôles obligatoires verts et aucun thread bloquant ; seul Sonar consultatif non requis peut expliquer
+les checks non passants. Consigner l’état `UNSTABLE` tel quel, sans le renommer `CLEAN`. Tout autre contrôle
+non passant reste bloquant selon la policy ; aucun `--admin` ou bypass ne peut satisfaire ces conditions.
+
 ## Protection proposée et vérification
 
 État observé : branche `claude/sprint-reporting-fitness-app-V7Qr6`, checks requis `pytest + QA scripts`
