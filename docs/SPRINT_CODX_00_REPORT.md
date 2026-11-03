@@ -147,3 +147,15 @@ locales et ignorées par Git ; elles ne font pas partie de cette PR.
 Revue indépendante (agent à contexte neuf) : aucun constat Important/Critical. Son unique remarque mineure
 sur la coexistence du verdict initial et de cette annexe est levée en datant explicitement le verdict initial.
 Contrôles rejoués sur cette reprise : scope ISOLATED, OpenSpec strict 4/4, spec protocol OK, diff --check vide.
+
+### Livraison locale et arrêt du push
+
+Commit de l'adaptateur : **`11ec97d`**, créé après contrôles et revue indépendante.
+La commande `git push -u origin sb/codx-00-codex-openspec` a été **refusée avant exécution par la revue
+automatique** : elle exige une autorisation PUSH distincte avant export du contenu au dépôt distant.
+Une demande explicite couvrant les branches CODX-00 et CI-01 et leurs PR, sans merge, a été envoyée à l'opérateur.
+Aucun push, aucune PR, aucun run CI nouveau ni merge n'a donc été réalisé à ce stade.
+La tâche 3.2 reste ouverte parce qu'elle inclut la CI réelle, pas seulement la soumission du diff.
+
+La précédente limite Python a été résolue **dans le worktree CI-01 uniquement** : venv Python 3.11.14,
+FastAPI 0.141.1 installé depuis le lock. Le vieux venv partagé n'est pas modifié.
