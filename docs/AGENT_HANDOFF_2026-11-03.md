@@ -16,6 +16,8 @@ document et le dépôt, **le dépôt fait foi** : vérifier avec `git` avant d'a
 5. `docs/strategy/AUREN_UI_ITERATION_PROTOCOL.md` — les quatre sections obligatoires d'un rapport de tranche UI
    (une garde CI les vérifie : `tests/test_ui_iteration_protocol.py`).
 6. `openspec/specs/mobile/feature-migration-map/inventory.md` — le backlog natif (MOB-00).
+7. `docs/strategy/AGENT_ONBOARDING_SPEC_DRIVEN.md` — pour un agent qui arrive sans mémoire : ordre des autorités de
+   spec, carte des contrats de données et des tests, leçons déjà payées, ce qui manque au spec-driven.
 
 ## 2. Règles dures (rappel — le détail est dans `CLAUDE.md`)
 
