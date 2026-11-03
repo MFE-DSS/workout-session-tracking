@@ -48,6 +48,9 @@ WORKFLOWS = ROOT / ".github" / "workflows"
 PLANCHER_NODE24 = {
     "actions/checkout": 5,
     "actions/setup-python": 6,
+    # CI-01 — action.yml@v6 checked on 2026-11-03: runs.using = node24.
+    # https://github.com/actions/setup-node/blob/v6/action.yml
+    "actions/setup-node": 6,
     "actions/upload-artifact": 6,
     "actions/download-artifact": 7,
     "gitleaks/gitleaks-action": 3,
