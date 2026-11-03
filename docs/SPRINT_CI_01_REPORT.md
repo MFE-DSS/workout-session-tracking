@@ -1,7 +1,7 @@
 # CI-01 — Jest et TypeScript mobiles dans la CI
 
 Date : 2026-11-03. Branche : `sb/ci-01-mobile-checks`. Base : `fcfbcd7`.
-Change OpenSpec : `mobile-ci-checks`. Statut : **BASE UPDATED / REVALIDATION PENDING** (PR #347, GO MERGE reçu).
+Change OpenSpec : `mobile-ci-checks`. Statut : **MERGÉE #347, contrôles canoniques obligatoires vérifiés ; archive dans cette clôture**.
 
 ## Brainstorming / Options / Risques / Choix retenu — avant le code
 
@@ -133,3 +133,30 @@ Le sweep 5d675b6/base60bea5d a terminé : **7147 tests, 378 fichiers, 149 lots, 
 4→2→1, aucun fichier sauté. Pic des lots réussis1471Mo, budget1600Mo ; tentatives interrompues par le garde
 à1779 puis1676Mo avant relecture des mêmes fichiers. Cette preuve complète reste historique : le candidat
 intégrant cc80ddd obtient son propre sweep complet et sa nouvelle CI avant merge.
+
+## Livraison et archivage — relevé de clôture du 2026-11-03
+
+Les sections intermédiaires précédentes sont historiques. Les archives sont portées par cette clôture,
+livrée via PR protégée sans push direct ni bypass. Les SHA et CI de la clôture documentaire sont relevés
+dans la remise opérateur et les métadonnées de livraison après intégration. Aucun GO BUILD MOB-02 donné.
+
+CI-01 #347 est mergée par `edd7351`, sous GO explicite, méthode merge sans squash, admin ni force-push.
+La canonique a le même arbre que le candidat validé `8ff2808`, base `cc80ddd`.
+
+Validation finale : **7147 tests Python, 378 fichiers, 149 lots, exit 0**. Deux adaptations mémoire 4→2→1,
+aucun fichier sauté ; pic des lots réussis 1546 Mo / budget 1600 Mo. Les tentatives à 1606 puis 1670 Mo ont
+été arrêtées par le garde avant relecture des mêmes fichiers. Aucun sweep précédent n’a remplacé cette preuve.
+**189 gardes CI, 422 tests mobiles, TypeScript et 77 tests visuels passent**. CI PR `41707470720` : 9/9 jobs
+réussis ; CI canonique `41711441173` : les huit jobs hors Sonar réussis. Bandit, Gitleaks, pip-audit,
+scope/protocole et les autres contrôles restent actifs.
+
+Sonar sur `edd7351` : **Quality Gate ERROR, consultatif**, analyse `4f5e161b-db46-48f4-802a-be71cdb904f1`.
+La protection a été appliquée et relue : QA, lint, visuel et mobile requis, app_id 15368, strict=false ;
+Sonar retiré des requis, autres réglages inchangés. Aucune évaluation exhaustive de sécurité revendiquée.
+Le change est archivé sous `openspec/changes/archive/2026-11-03-mobile-ci-checks`, 8/8 tâches ; aucun
+code produit, lock ou baseline modifié par la clôture. PLAT-01 et MOB-01 gardent leurs gates appareil.
+
+Contrôle de la clôture : `check_scope` ISOLATED ; **142 tests ciblés/broad sweep passants**,
+budget Ruff264≤548, protocole documentaire et OpenSpec strict3/3 passent ; aucun Python neuf,
+Ruff nouveaux fichiers sans objet. Diff de code/workflow/baseline vide ; aucun full sweep local additionnel
+requis pour ce diff de clôture. Les archives et les cinq fichiers de specs vivantes ont été comparés par SHA-256.
