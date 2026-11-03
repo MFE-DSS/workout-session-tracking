@@ -24,19 +24,24 @@ GO PATCH → CR → GO COMMIT → CR → GO PUSH → CR → GO PR → CR → GO 
 Coût : **fatigue opérateur**, latence, copier/coller répété, et un CR par étape qui n'apporte pas de décision. Or le repo dispose déjà de garde-fous suffisants pour rendre l'essentiel de cette chaîne **déterministe et vérifiable** :
 `check_scope` · `spec_protocol` · `ruff_budget` · migration QA (drift/snapshot/patterns/roundtrip) · CI xdist · coverage Sonar réparée · PR checks GitHub · validation Sonar API.
 
-## 2. La nouvelle boucle (deux GO humains, le reste autonome)
+## 2. La boucle active (GO BUILD + GO MERGE permanent)
 
 ```
 GO BUILD  ──►  [autonome : branche → patch → checks check_scope → fix in-scope → commit → push → PR
                 → recover CI dispatch ×1 si bloqué → fix CI obligatoire in-scope → push fix]
-          ──►  STOP à : PR GREEN / MERGE PENDING   (ou BLOCKED : voir §5)
+          ──►  PR GREEN / MERGE PENDING : vérifier readiness (ou BLOCKED : voir §5)
 
-GO MERGE  ──►  [autonome : merge (méthode approuvée) → vérif CI obligatoire canonique → relevé Sonar consultatif
-                → closeout docs → push closeout docs-only → cleanup branche/worktree]
+GO MERGE permanent  ──►  [autonome : merge (méthode approuvée) → vérif CI obligatoire canonique → relevé Sonar consultatif
+                → closeout docs → PR closeout docs-only → cleanup branche/worktree]
           ──►  STOP à : CLOSED + CLEANED
 ```
 
-**Deux GO humains** encadrent la livraison ; entre eux, l'agent progresse **seul** jusqu'à un point d'arrêt défini. Un CR est produit **aux points d'arrêt** (PR GREEN, CLOSED+CLEANED, ou BLOCKED), pas à chaque micro-étape.
+**GOV-MERGE-01, décision opérateur du 3 novembre 2026 :** le GO MERGE est
+permanent pour les PR du périmètre déjà autorisé, leurs corrections et leur closeout.
+Dès la readiness du §3.11 vérifiée, fusionner par commit de merge sans redemander
+un GO ponctuel. Le GO BUILD d'un nouveau périmètre reste requis.
+Conditions et limites : [STANDING_MERGE_AUTHORIZATION.md](STANDING_MERGE_AUTHORIZATION.md).
+Un CR est produit à CLOSED+CLEANED ou BLOCKED, pas à chaque micro-étape.
 
 ## 3. Autonomie autorisée après `GO BUILD`
 
@@ -52,18 +57,18 @@ L'agent PEUT, sans nouveau GO :
 8. **Récupérer une seule fois** un dispatch CI bloqué (GitHub Actions qui ne crée aucun run) via **close/reopen** de la PR — jamais un 2ᵉ nudge ; si toujours rien → STOP « PERSISTENT ACTIONS TRIGGER FAILURE ».
 9. **Inspecter les logs CI** en cas de rouge.
 10. **Corriger les problèmes CI obligatoires dans le périmètre** et pousser des commits de fix ; relever Sonar à titre consultatif sans masquer ses erreurs.
-11. **S'arrêter** à `PR GREEN / MERGE PENDING` (tous les checks obligatoires verts, PR `MERGEABLE`, aucun thread bloquant ; `mergeStateStatus CLEAN`, ou `UNSTABLE` uniquement dû aux checks Sonar consultatifs non requis). Tout autre contrôle non passant reste bloquant selon la policy. Consigner les états bruts GitHub et Sonar sans transformer `UNSTABLE` en `CLEAN` ni une gate ERROR en succès. **Ou** s'arrêter à un `BLOCKED` (§5).
+11. **Atteindre** `PR GREEN / MERGE PENDING` (tous les checks obligatoires verts, PR `MERGEABLE`, aucun thread bloquant ; `mergeStateStatus CLEAN`, ou `UNSTABLE` uniquement dû aux checks Sonar consultatifs non requis). Tout autre contrôle non passant reste bloquant selon la policy. Consigner les états bruts GitHub et Sonar sans transformer `UNSTABLE` en `CLEAN` ni une gate ERROR en succès. Sous le GO permanent, poursuivre au §4 sans nouvelle demande après vérification du HEAD final et de la base canonique actuelle. **Ou** s'arrêter à un `BLOCKED` (§5).
 
-## 4. Autonomie autorisée après `GO MERGE`
+## 4. Autonomie autorisée sous le `GO MERGE` permanent
 
 L'agent PEUT, sans nouveau GO :
 
-1. **Merger avec la méthode approuvée** (celle indiquée par l'opérateur : typiquement `--merge`, no squash, **no `--admin`**) avec garde `--match-head-commit`, après les conditions de readiness du §3.11 ; aucun contournement des checks requis.
+1. **Merger avec la méthode approuvée** (**commit de merge**, no squash, **no `--admin`**) avec garde `--match-head-commit`, après les conditions de readiness du §3.11 ; aucun contournement des checks requis.
 2. **Vérifier les contrôles obligatoires de la CI canonique** sur le merge commit, selon la policy en vigueur ; ne pas déduire le verdict de leur seul nombre historique.
 3. **Consigner Sonar à titre consultatif** : delta issues, `new_coverage`, `coverage`, gate et révision analysée, ou indisponibilité explicite. Rapporter ERROR comme ERROR ; ni seuil changé, ni faux vert, ni auto-résolution. Une faille confirmée reste un arrêt dur.
 4. **Rédiger le closeout** (appendice post-merge au rapport de sprint + entrées registry/roadmap).
-5. **Pousser le closeout docs-only** sur le canonique (`paths-ignore: docs/**` → CI légitimement non déclenchée ; **ce n'est pas un `[skip ci]`**).
-6. **Nettoyer** branche + worktree du sprint (seulement ceux du sprint ; jamais un worktree non lié).
+5. **Livrer le closeout docs-only via PR**, sous le même GO permanent et sans bypass. Les règles de déclenchement CI existantes restent applicables.
+6. **Nettoyer** branche + worktree du sprint après vérification qu'ils ne contiennent aucun travail unique (seulement ceux du sprint ; jamais un worktree non lié).
 7. **S'arrêter** à `CLOSED + CLEANED`.
 
 ## 5. Conditions d'arrêt dur (STOP + rapport, GO humain requis)
@@ -78,10 +83,10 @@ L'agent **DOIT s'arrêter** et rapporter (fichier/erreur exacts + plus petit fix
 - **credential de service externe requis** (token/MCP/API non fourni) ;
 - **thread de revue non résolu exigeant un changement de code** (un nit non bloquant, gate `CLEAN`, ne bloque pas — mais un thread qui **impose** une modif de code est un stop) ;
 - **contrôle obligatoire rouge hors périmètre du sprint** (régression dans un fichier non touché → ne pas « réparer en cascade » ; Sonar consultatif seul relève de GOV-SONAR-01) ;
-- **décision de merge** (merge, squash, `--admin`, choix de méthode) ;
+- **merge hors des conditions du GO permanent**, squash ou bypass `--admin` ;
 - **dérive de périmètre au-delà des fichiers autorisés**.
 
-**Jamais en autonomie** (même hors liste ci-dessus) : merge · squash · bypass `--admin` · suppression de branche/worktree · affaiblir un test/gate · éditer un secret · committer `AGENTS.md` sans autorisation explicite · toucher un worktree non lié · amender **silencieusement** une spec versionnée.
+**Jamais en autonomie** (même hors liste ci-dessus) : merge hors du GO permanent · squash · bypass `--admin` · suppression d'une branche/worktree contenant du travail unique ou non lié · affaiblir un test/gate · éditer un secret · committer `AGENTS.md` sans autorisation explicite · toucher un worktree non lié · amender **silencieusement** une spec versionnée.
 
 ## 6. CR requis (aux points d'arrêt seulement)
 
@@ -111,25 +116,25 @@ Un CR est produit **à un point d'arrêt**, pas à chaque micro-étape. Contenu 
 ## 9. Règles spéciales — specs docs-only
 
 - **`check_scope` = docs** → seul `check_spec_protocol` est requis en local ; le reste est overcheck (la CI est légitimement `paths-ignore`).
-- Un commit **100 % `docs/**`** ne déclenche pas la CI (`paths-ignore`) ; un push docs-only sur le canonique protégé affiche un « bypass required status checks » **attendu** (les checks requis n'existent pas faute de run) — **ce n'est pas un `[skip ci]` manuel**.
+- Un push **100 % `docs/**`** ne déclenche pas la CI (`paths-ignore`). Livrer via PR selon les checks applicables ; ne pas pousser directement sur le canonique protégé en contournant ses checks. **Ce n'est pas un `[skip ci]` manuel**.
 - **Attention** : `CLAUDE.md`, `.check-policy.json` et autres fichiers **hors `docs/**`** ne sont **pas** couverts par `paths-ignore` → un sprint qui les touche **déclenche la CI** (tier ≥ `isolated`/`ci_infra` selon le fichier) et se livre **via PR**, pas par push docs-only direct.
 - Toute nouvelle spec `Sx_*` doit porter un marqueur non-goals / « Périmètre interdit » (spec_protocol) ; tout nouveau rapport `SPRINT_Sb_*_REPORT.md` doit porter un marqueur de verdict.
 - **Ne jamais amender silencieusement une spec versionnée** : un amendement passe par un commit documenté et justifié.
 
 ## 10. Périmètre interdit (non-goals de ce protocole)
 
-- Ce protocole **n'autorise pas** merge/squash/`--admin`/suppression en autonomie (toujours GO/action humaine).
+- Le GO permanent autorise uniquement les merges et le nettoyage du §4 ; squash, `--admin`, travail unique et périmètres non autorisés restent exclus.
 - Il **ne réduit pas** la CI ni les gates ; il **ne remplace pas** `check_scope`/`spec_protocol`/migration QA.
 - Il ne modifie **aucun comportement produit** de l'app.
 - Il ne s'applique **jamais** pour passer outre une condition d'arrêt du §5.
 
 ---
 
-**Verdict :** 🟢 **AGENTIC DELIVERY PROTOCOL — DÉFINI.** Deux GO humains (`GO BUILD`, `GO MERGE`) encadrent une boucle autonome bornée par des garde-fous durs et des conditions d'arrêt explicites. Réduit les micro-GO sans réduire la sécurité. **Périmètre interdit** : §5 (arrêts durs) + §10 (non-goals).
+**Verdict :** 🟢 **AGENTIC DELIVERY PROTOCOL — DÉFINI.** Un GO BUILD et le GO MERGE permanent GOV-MERGE-01 encadrent une boucle autonome bornée par des garde-fous durs et des conditions d'arrêt explicites. Réduit les micro-GO sans réduire la sécurité. **Périmètre interdit** : §5 (arrêts durs) + §10 (non-goals).
 
 ---
 
-## Appendice — protocole ACTIF sur le canonique (2026-08-07)
+## Appendice historique — activation initiale sur le canonique (2026-08-07)
 
 Livré et **actif** via **Sb_OPS.agent-autonomy-01** :
 
