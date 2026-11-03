@@ -714,6 +714,39 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+  # CI-01 — the pixel gate cannot observe native logic or TypeScript errors.
+  mobile-checks:
+    name: mobile checks (Jest + TypeScript)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    defaults:
+      run:
+        working-directory: clients/mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: clients/mobile/package-lock.json
+
+      - name: Install the mobile client (lockfile, exact)
+        id: install
+        run: npm ci --no-audit --no-fund
+
+      - name: Run mobile logic tests
+        run: npm test -- --ci --runInBand
+
+      - name: Check mobile types
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: npm run typecheck
+
   visual-contract:
     # DA-GOV-01 — the visual regression gate (docs/strategy/AUREN_VISUAL_CONTRACT.md).
     #
