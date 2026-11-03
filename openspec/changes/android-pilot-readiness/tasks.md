@@ -19,7 +19,7 @@
 
 - [x] 3.1 Ajouter `clients/mobile/eas.json` (profil `pilot` : APK, distribution interne, `developmentClient: false`, `EXPO_PUBLIC_API_URL=https://spignos.com`) et `android.versionCode` dans `app.json` ; vérifier `npx expo config --type public` sans erreur
 - [x] 3.2 L'opérateur fait `eas login` ; `eas init` lie le projet (`extra.eas.projectId`) ; vérifier `eas project:info`
-- [ ] 3.3 Après merge du change, `eas build -p android --profile pilot` sur le SHA mergé ; vérifier un APK téléchargeable et noter sa référence (build id, SHA, versionCode)
+- [x] 3.3 Après merge du change, `eas build -p android --profile pilot` sur le SHA mergé ; vérifier un APK téléchargeable et noter sa référence (build id, SHA, versionCode)
 
 ## 4. Passe appareil
 
