@@ -43,15 +43,49 @@ tire `expo-font@58.0.11`, crash dyld au lancement iOS (→ `expo-font` épinglé
   `expo-symbols` 58.0.4, `react-native-screens` 4.30.1, `expo-constants` 58.0.14, `expo-font` 58.0.9. `app.json` :
   plugin `expo-router` (`root: ./src/routes`), `versionCode` 2.
 
+## Croquis validé
+
+Source : demandes de l'opérateur citées — D1 (2026-10-31) « AUJOURD'HUI · PROGRAMMES · PROGRÈS · PROFIL », la séance
+« parcours plein écran, pas un onglet » ; D2 « barre système, icônes AUREN » ; D4 jeu A « go » ; coque « oui go ».
+
+```
+┌──────────────────────────────┐   hors séance                 ┌──────────────────────────────┐   en séance
+│ AUREN · AUJOURD'HUI      ••• │                               │ ✕   EXERCICE 1 / 7       ••• │
+│                              │                               │                              │
+│  MISSION (écran verrouillé,  │                               │  EXÉCUTION (écran verrouillé,│
+│  inchangé) ou ses états      │                               │  inchangé) — aucune barre    │
+│  d'attente                   │                               │                              │
+├──────────────────────────────┤                               │                              │
+│ [marque] [pile] [tend.] [oct]│  ← barre SYSTÈME (NativeTabs) │                              │
+│ Aujourd'hui Programmes …     │                               │                              │
+└──────────────────────────────┘                               └──────────────────────────────┘
+```
+
 ## Inventaire — une information, une seule fois
 
-| Élément | Information | Source | Doublon ? |
+| Élément | Information | Source (contrat de données) | Doublon ? |
 |---|---|---|---|
 | Libellé d'onglet | nom de l'espace | statique (D1) | non |
 | Sur-titre d'un espace non migré « AUREN · Programmes » | où l'on est | statique | non — le titre ne répète pas le nom de l'espace |
 | Titre « Sur le site, pour l'instant » | état de l'espace | statique | non |
 | Texte | ce que l'espace contiendra | D1 + inventaire MOB-00 | non |
 | « Ouvrir sur le site » | la seule action | `EXPO_PUBLIC_API_URL` + route web | non |
+
+## Comparaison avec la référence validée
+
+| Référence validée | Tranche / date | Ce qui doit survivre | Survit ? |
+|---|---|---|---|
+| MISSION-SCREEN-V1 | AUREN_VISUAL_CONTRACT, 2026-10-31 | composition, raison mesurée, fenêtres BodyMap, « Démarrer » | oui — gate 77/77 ; dans l'onglet, au-dessus de la barre sans chevauchement (planche) |
+| EXECUTION-SCREEN-V1 | AUREN_VISUAL_CONTRACT, 2026-10-31 | plein écran, aucune barre pendant la série | oui — gate 77/77 ; passe émulateur |
+| COMPLETE-SCREEN-V1 | AUREN_VISUAL_CONTRACT, 2026-10-31 | plein écran au-dessus des onglets | oui — gate 77/77 ; rendu hors coque |
+| AUREN-MARK-V1 | DA-03.2, 2026-10-27 | dessin primaire non redessiné, compact sous 20 px | oui — icône AUJOURD'HUI = dessin primaire mis à l'échelle |
+
+## Changement unique de l'itération
+
+- Demande : « oui go pour la coque continue jusqu'au bout de ton critical path »
+- Changement : la barre d'onglets système entoure la MISSION hors séance ; la séance reste plein écran au-dessus.
+- Avant : MISSION plein écran sans barre (planche PLAT-01 https://claude.ai/artifact/Mfi2zWvJJWeKDfFfa6V6kr)   ·
+  Après : https://claude.ai/artifact/8vJtiTf7jcyBY1ypDT7orT
 
 ## 3. Passe appareil — MESURÉ (émulateur Android 16, Pixel 7, 1080×2400, API de production)
 
