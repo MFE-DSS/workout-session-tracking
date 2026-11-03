@@ -134,3 +134,13 @@ iOS : build simulateur (iPhone 17 Pro, iOS 26.3) lancé et ouvert sur la connexi
 **Coque fonctionnelle sur Android, prête pour la revue de l'opérateur.** Reste avant PR : l'arbitrage de la
 contradiction « pause », la passe iPhone, et l'ACCEPT de la barre (tâche 3.1) ; la baseline de la barre n'est ajoutée
 qu'après approbation (3.2).
+
+## Annexe post-merge (2026-11-03)
+
+- **Mergée** : PR #343, commit de merge `8a21657`, méthode `--merge --match-head-commit 0ba3a6b`.
+- **CI canonique** : run `41643223779` — 8 / 8 jobs verts (lint, attestation, contrat visuel, 3 shards pytest,
+  pytest + QA, SonarCloud). **Sonar** (porte de la PR) : OK, 0 constat nouveau.
+- **Incident résolu dans le périmètre** : premier run de PR rouge (`41638643728`, shard 2) — ce rapport n'avait pas
+  les quatre sections du protocole d'itération UI (`tests/test_ui_iteration_protocol.py`) ; ajoutées (`0ba3a6b`).
+- **Décisions de l'opérateur** : coque acceptée et amendement « pause » accepté (« oui go pour la coque »).
+- **Reste** : passe iPhone connectée (tâche 4.1b) avant l'archive du change.
