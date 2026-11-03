@@ -14,6 +14,7 @@
  * queue of commands that carries them.
  */
 import * as Crypto from 'expo-crypto';
+import { ExpoRoot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AppState, BackHandler, StyleSheet, View } from 'react-native';
@@ -36,6 +37,8 @@ import { feedback } from './src/native/feedback';
 import { keepAwake } from './src/native/keepAwake';
 import { announce, useReducedMotion } from './src/native/motion';
 import { restNotification } from './src/native/restNotification';
+import { initialSpace } from './src/native/shellNav';
+import { ShellProvider } from './src/shell/ShellContext';
 import { openJournal } from './src/storage/journal';
 import type { Journal } from './src/storage/journalTypes';
 import { closeCommand, OutboxRow, restoreState, setCommand, substituteCommand } from './src/storage/outbox';
@@ -57,6 +60,11 @@ const PROCESS_ID = Crypto.randomUUID();
 const transport = createTransport(API_URL);
 /** Before any server contact there is no anchor: every time claim is `estimated`. */
 const NO_ANCHOR: TimeAnchor = { serverMs: 0, monoMs: 0, processId: 'none' };
+/**
+ * MOB-01 ADR-2 — the router is mounted UNDER this entry (galleries, lab and the visual-contract fixture keep theirs).
+ * `require.context` is a Metro feature; the cast keeps TypeScript honest about it.
+ */
+const SHELL_ROUTES = (require as unknown as { context: (dir: string) => never }).context('./src/routes');
 
 type Screen = 'BOOT' | 'LOGIN' | 'APP';
 
@@ -602,7 +610,9 @@ export default function ConnectedApp() {
   // ── screens ────────────────────────────────────────────────────────────────
   const openJournalSheet = () => setLab(true);
   let body: React.ReactNode = null;
-  if (screen === 'LOGIN') {
+  // MOB-01 — login, resume priority and first space go through the tested rule (spec `mobile/navigation-shell`)
+  const opening = initialSpace({ authPending: screen === 'BOOT', signedIn: screen === 'APP', openWorkout: mission?.state === 'RESUME' });
+  if (opening === 'login') {
     body = <LoginScreen error={loginError} busy={busy} onSubmit={(u, p) => void login(u, p)} />;
   } else if (screen === 'APP') {
     const inWorkout = state.phase === 'SET' || state.phase === 'REST';
@@ -658,7 +668,7 @@ export default function ConnectedApp() {
           onOpenLab={openJournalSheet}
         />
       );
-    } else if (mission?.state === 'RESUME') {
+    } else if (opening === 'resume' && mission?.state === 'RESUME') {
       const p = mission.position;
       body = (
         <ResumeScreen
@@ -670,45 +680,54 @@ export default function ConnectedApp() {
           onOpenJournal={openJournalSheet}
         />
       );
-    } else if (isStartable(mission)) {
-      body = (
-        <View style={{ flex: 1 }}>
-          <MissionScreen
-            mission={mission as unknown as Mission}
-            onStart={(slug) => void start(slug)}
-            onOpenLab={openJournalSheet}
-            onSecondaryOpened={() => metric('SECONDARY-OPENED')}
-          />
-        </View>
-      );
-    } else if (mission?.state === 'READY') {
-      body = (
-        <QuietScreen
-          title={mission.template.name}
-          text={`${mission.reason.phrase} Cette séance ne se suit pas encore dans l’application.`}
-          choices={mission.alternatives.filter((a) => a.executable).map((a) => ({
-            key: a.slug, title: a.name, detail: a.phrase, onPress: () => void start(a.slug),
-          }))}
-          onOpenJournal={openJournalSheet}
-        />
-      );
-    } else if (mission?.state === 'NO_MISSION') {
-      body = (
-        <QuietScreen
-          title="Rien à proposer"
-          text="Aucune séance n’est faisable avec l’environnement déclaré aujourd’hui."
-          action={{ label: 'Actualiser', onPress: () => void loadMission() }}
-          onOpenJournal={openJournalSheet}
-        />
-      );
     } else {
+      // MOB-01 — outside a workout the native shell is on screen; AUJOURD'HUI holds the MISSION or its quiet states
+      let today: React.ReactNode;
+      if (isStartable(mission)) {
+        today = (
+          <View style={{ flex: 1 }}>
+            <MissionScreen
+              mission={mission as unknown as Mission}
+              onStart={(slug) => void start(slug)}
+              onOpenLab={openJournalSheet}
+              onSecondaryOpened={() => metric('SECONDARY-OPENED')}
+            />
+          </View>
+        );
+      } else if (mission?.state === 'READY') {
+        today = (
+          <QuietScreen
+            title={mission.template.name}
+            text={`${mission.reason.phrase} Cette séance ne se suit pas encore dans l’application.`}
+            choices={mission.alternatives.filter((a) => a.executable).map((a) => ({
+              key: a.slug, title: a.name, detail: a.phrase, onPress: () => void start(a.slug),
+            }))}
+            onOpenJournal={openJournalSheet}
+          />
+        );
+      } else if (mission?.state === 'NO_MISSION') {
+        today = (
+          <QuietScreen
+            title="Rien à proposer"
+            text="Aucune séance n’est faisable avec l’environnement déclaré aujourd’hui."
+            action={{ label: 'Actualiser', onPress: () => void loadMission() }}
+            onOpenJournal={openJournalSheet}
+          />
+        );
+      } else {
+        today = (
+          <QuietScreen
+            title={offline ? 'Hors ligne' : 'Un instant'}
+            text={notice ?? (offline ? 'La mission du jour arrive dès que la connexion revient. Rien de ce qui est enregistré ici n’est perdu.' : 'AUREN prépare la mission du jour.')}
+            action={{ label: 'Réessayer', onPress: () => void loadMission() }}
+            onOpenJournal={openJournalSheet}
+          />
+        );
+      }
       body = (
-        <QuietScreen
-          title={offline ? 'Hors ligne' : 'Un instant'}
-          text={notice ?? (offline ? 'La mission du jour arrive dès que la connexion revient. Rien de ce qui est enregistré ici n’est perdu.' : 'AUREN prépare la mission du jour.')}
-          action={{ label: 'Réessayer', onPress: () => void loadMission() }}
-          onOpenJournal={openJournalSheet}
-        />
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL }}>
+          <ExpoRoot context={SHELL_ROUTES} />
+        </ShellProvider>
       );
     }
   }

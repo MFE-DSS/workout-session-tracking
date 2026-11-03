@@ -233,6 +233,34 @@ du propriétaire n'en est pas une. Attribution à afficher, chaque source marqu�
 (entrée suivante). Le master reste la **source de conception**, fichiers et hashes intouchés ; l'autorisation
 DA-04.0b n'a plus d'usage runtime mobile.
 
+## Icônes d'onglets de la coque native (MOB-01 · D4, 2026-11-03)
+```
+asset_id: auren.runtime.tab-icons.v1 (today, programs, progress, profile × default, selected)
+files: clients/mobile/assets/tabs/source/*.svg (sources) + clients/mobile/assets/tabs/*_{default,selected}{,@2x,@3x}.png
+author: programs + progress — third-party geometry (Lucide Icons and Contributors), normalised in the repository ;
+  today — AUREN-MARK-V1 (auren.brand.mark.v1, scaled, never redrawn) ; profile — repository-authored
+owner: AUREN for today/profile ; third party (licensed to AUREN under ISC) for programs/progress
+ip_ownership_status: mixed — third-party-licensed (programs, progress) / repository-authored (today, profile)
+source_project: lucide-icons/lucide — npm package lucide-static (programs: file-stack ; progress: trending-up)
+source_version: lucide-static 1.66.0
+source_type: third-party-open-source
+access_date: 2026-11-03
+source_reference: https://unpkg.com/lucide-static@1.66.0/icons/{file-stack,trending-up}.svg (path data read as text)
+license_spdx: ISC
+license_text_location: clients/mobile/assets/tabs/LICENSE-lucide.txt (verbatim from the package LICENSE)
+attribution_required: yes (ISC: copyright and permission notice in all copies) — shown in the app's « Journal local »
+  sheet, Licences section (TAB_ICONS_ATTRIBUTION + ISC text link)
+usage_nature: runtime — native tab bar template images (tinted by the system bar)
+modifications: re-drawn on the orthogonal 24 grid, square caps and miter joins, stroke 2 ; selected = fill/closure only ;
+  neither glyph is in Lucide's Feather-derived (MIT) list
+tooling: Python 3 stdlib generator + Inkscape (PNG export)
+ai_usage: geometry written by the agent from the Lucide reference, reviewed on the operator's board
+reviewer: operator — D3 rejected, D4 set A accepted (« go », 2026-11-03), board https://claude.ai/artifact/HpJGvBW8azTfpmQgwPNyec
+review_date: 2026-11-03
+evidence: clients/mobile/assets/tabs/README.md ; Android 16 + iOS 26.3 native renders on the board
+status: runtime-accepted-internal (operator, 2026-11-03)
+```
+
 ## BodyMap runtime — corps MIT (DA-04.3, 2026-10-31)
 ```
 asset_id: auren.runtime.bodymap.mit-body.v1

@@ -16,6 +16,10 @@ export const BODYMAP_ATTRIBUTION = [
 ] as const;
 export const BODYMAP_NON_MEDICAL = 'Visualisation non médicale — revue anatomique professionnelle non réalisée.';
 export const MIT_LICENSE_URL = 'https://opensource.org/license/mit';
+/** MOB-01 · D4 — two tab icons are normalised from Lucide (ISC): the notice travels with the app, here, once. */
+export const TAB_ICONS_ATTRIBUTION =
+  'Icônes Programmes et Progrès : dérivées de Lucide 1.66.0 (file-stack, trending-up), © 2026 Lucide Icons and Contributors, licence ISC.';
+export const ISC_LICENSE_URL = 'https://opensource.org/license/isc-license-txt';
 
 export function LicencesSection() {
   return (
@@ -30,6 +34,10 @@ export function LicencesSection() {
         {MIT_LICENSE_URL}
       </Text>
       <Text style={[type.small, { color: color.ink2 }]}>{BODYMAP_NON_MEDICAL}</Text>
+      <Text style={type.small}>{TAB_ICONS_ATTRIBUTION}</Text>
+      <Text style={type.small} selectable>
+        {ISC_LICENSE_URL}
+      </Text>
     </View>
   );
 }
