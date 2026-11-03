@@ -1,7 +1,7 @@
 # CI-01 — Jest et TypeScript mobiles dans la CI
 
 Date : 2026-11-03. Branche : `sb/ci-01-mobile-checks`. Base : `fcfbcd7`.
-Change OpenSpec : `mobile-ci-checks`. Statut : BUILD LOCAL VÉRIFIÉ, validation GitHub à effectuer.
+Change OpenSpec : `mobile-ci-checks`. Statut : **BASE UPDATED / REVALIDATION PENDING** (PR #347, GO MERGE reçu).
 
 ## Brainstorming / Options / Risques / Choix retenu — avant le code
 
@@ -76,7 +76,7 @@ sans merge, avec 8 jobs CI et tous les checks externes verts (run `41668162468`)
 après observation des jobs réels. Le test du job doit inclure deux étapes négatives identifiables, puis un HEAD
 final vert sans les fichiers de preuve. Les mutations locales ci-dessus restent des preuves séparées.
 
-## Verdict
+## Verdict initial avant preuves GitHub (historique)
 
 **⏳ ATTENDRE — implémentation et contrôles locaux vérifiés ; preuves GitHub négatives/positives et GO MERGE encore requis.**
 
@@ -95,3 +95,29 @@ types s'exécute encore après le rouge Jest. Les logs du job ont été relus, p
 Le présent retrait remet le client exactement dans l'état propre vérifié localement ; aucun changement
 fonctionnel n'est apporté pour « réparer » ces échecs intentionnels.
 Le HEAD final doit maintenant obtenir une CI complète verte. Aucun merge autorisé.
+
+## État exact à la remise du CR architecte / PO
+
+- PR **#347**, prête pour revue après retrait du brouillon, HEAD final **`764b4520c5fcd007ea53c29dce3467ef175f2ca8`**.
+- Run final **`41680437230`** : **9/9 jobs completed/success**, dont le nouveau job mobile ; tous les checks
+  externes sont verts, dont SonarCloud Code Analysis (résultats relus avec `gh pr checks`).
+- Demande d'annulation de l'ancien run de sondes `41679982474` acceptée par GitHub après collecte des deux
+  preuves ; ce run n'est pas le candidat à livrer. Aucun rerun ni affaiblissement du pipeline.
+- Aucun thread de revue PR non résolu relevé ; revue indépendante du code sans constat important.
+- État : **PR GREEN / MERGE PENDING** ; preuves négatives et positives réelles acquises.
+- Le nom du check à proposer comme requis est **`mobile checks (Jest + TypeScript)`** ; les paramètres de
+  protection GitHub n'ont pas été modifiés. Son ajout reste une décision de l'opérateur.
+
+La PR et son descriptif sont prêts pour revue. L'intégration canonique de CODX-00 et CI-01 précède MOB-02 ;
+ces deux merges restent soumis au GO MERGE distinct, non reçu.
+Cette annexe de remise est locale et sera versionnée avec le suivi de livraison, sans changer le HEAD en cours
+de validation uniquement pour y ajouter des statuts documentaires.
+
+## Intégration séquentielle autorisée — nouvelle validation requise
+
+GO MERGE explicite reçu pour #346 puis #347 par commits de merge, closeout et rebase MOB-02, sans build MOB-02.
+CODX-00 intégrée par `60bea5d28eeaecc1eba1c71aefe7186793c4098a`. La branche CI-01 intègre cette canonique
+sans réécriture ; conflit documentaire du registre résolu en conservant les deux entrées. Les documents locaux
+ont été sauvegardés dans `/private/tmp/auren-closeout-backup-20261103` avant résolution.
+Le vert du HEAD précédent ne vaut pas validation de ce nouvel arbre : contrôles locaux selon scope puis CI PR
+réelle et qualité externe à relire avant le deuxième merge. La tâche 1.2 est désormais satisfaite.
