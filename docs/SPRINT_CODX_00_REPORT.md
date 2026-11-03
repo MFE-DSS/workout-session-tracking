@@ -1,7 +1,7 @@
 # CODX-00 — reprise Codex/OpenSpec et bonne base
 
 Date : 2026-11-03. Branche : `sb/codx-00-codex-openspec`.
-Change : `openspec/changes/codex-openspec-adapter`.
+Change archivé : `openspec/changes/archive/2026-11-03-codex-openspec-adapter`.
 État de livraison : **MERGÉE #346, archive dans cette clôture**. Les sections de préparation décrivent
 l'état initial ; l'annexe de livraison en fin de rapport porte le résultat le plus récent.
 
