@@ -121,3 +121,15 @@ sans réécriture ; conflit documentaire du registre résolu en conservant les d
 ont été sauvegardés dans `/private/tmp/auren-closeout-backup-20261103` avant résolution.
 Le vert du HEAD précédent ne vaut pas validation de ce nouvel arbre : contrôles locaux selon scope puis CI PR
 réelle et qualité externe à relire avant le deuxième merge. La tâche 1.2 est désormais satisfaite.
+
+## Base finale après GOV-SONAR-01 — nouvelle validation
+
+GOV-SONAR-01 #348 est intégrée par `cc80dddebe8f9b72a6302a54a5436153c7bc2561` sous GO MERGE explicite.
+Sonar est désormais consultatif ; la protection phase A conserve QA et exige lint/visuel, sans Sonar requis.
+Le job mobile deviendra requis après intégration CI-01 vérifiée. Le conflit du registre est résolu en
+conservant les trois entrées, sans changement de produit/workflow/baseline.
+
+Le sweep 5d675b6/base60bea5d a terminé : **7147 tests, 378 fichiers, 149 lots, exit0**, deux adaptations
+4→2→1, aucun fichier sauté. Pic des lots réussis1471Mo, budget1600Mo ; tentatives interrompues par le garde
+à1779 puis1676Mo avant relecture des mêmes fichiers. Cette preuve complète reste historique : le candidat
+intégrant cc80ddd obtient son propre sweep complet et sa nouvelle CI avant merge.
