@@ -1,0 +1,9 @@
+{
+  "strict": false,
+  "checks": [
+    {"context": "pytest + QA scripts", "app_id": 15368},
+    {"context": "lint (ruff budget + bandit + actionlint + shellcheck)", "app_id": 15368},
+    {"context": "visual contract (DA-GOV-01)", "app_id": 15368},
+    {"context": "mobile checks (Jest + TypeScript)", "app_id": 15368}
+  ]
+}

@@ -3,6 +3,12 @@
 **Statut :** NORMATIF · **Autorité :** `CLAUDE.md §4` (contrat versionné) — ce document en est le détail complet.
 **Objectif :** réduire le copier/coller opérateur et les micro-GO en formalisant une **boucle de livraison spec-driven autonome** — **sans affaiblir aucun garde-fou** (`CLAUDE.md §1–§3`, check_scope, spec_protocol, ruff_budget, migration QA, CI xdist, coverage Sonar réparée, PR checks GitHub, validation Sonar API).
 
+**GOV-SONAR-01 — TEMPORARY — MVP DEVELOPMENT :** SonarCloud est **ADVISORY / NON-BLOCKING**.
+La politique normative est [SONAR_TEMPORARY_MVP_POLICY.md](SONAR_TEMPORARY_MVP_POLICY.md).
+Conserver et rapporter les vrais verdicts Sonar ; une gate ERROR seule ne bloque pas la livraison.
+Tests fonctionnels, visuel, OpenSpec, scope/spec protocol et sécurité existante restent obligatoires.
+Les références historiques à Sonar obligatoire ci-dessous ne rétablissent pas cette ancienne condition.
+
 > Ce protocole **orchestre** les garde-fous existants ; il n'en supprime aucun. En cas de conflit entre ce document et `CLAUDE.md`, **`CLAUDE.md` prime** (contrat versionné).
 
 ---
@@ -22,10 +28,10 @@ Coût : **fatigue opérateur**, latence, copier/coller répété, et un CR par �
 
 ```
 GO BUILD  ──►  [autonome : branche → patch → checks check_scope → fix in-scope → commit → push → PR
-                → recover CI dispatch ×1 si bloqué → fix CI/Sonar in-scope → push fix]
+                → recover CI dispatch ×1 si bloqué → fix CI obligatoire in-scope → push fix]
           ──►  STOP à : PR GREEN / MERGE PENDING   (ou BLOCKED : voir §5)
 
-GO MERGE  ──►  [autonome : merge (méthode approuvée) → vérif CI canonique → vérif Sonar issues+coverage
+GO MERGE  ──►  [autonome : merge (méthode approuvée) → vérif CI obligatoire canonique → relevé Sonar consultatif
                 → closeout docs → push closeout docs-only → cleanup branche/worktree]
           ──►  STOP à : CLOSED + CLEANED
 ```
@@ -45,16 +51,16 @@ L'agent PEUT, sans nouveau GO :
 7. **Ouvrir la PR** (base = canonique).
 8. **Récupérer une seule fois** un dispatch CI bloqué (GitHub Actions qui ne crée aucun run) via **close/reopen** de la PR — jamais un 2ᵉ nudge ; si toujours rien → STOP « PERSISTENT ACTIONS TRIGGER FAILURE ».
 9. **Inspecter les logs CI** en cas de rouge.
-10. **Corriger les problèmes CI/Sonar dans le périmètre** et pousser des commits de fix.
-11. **S'arrêter** à `PR GREEN / MERGE PENDING` (5 checks verts + `mergeStateStatus CLEAN` + Sonar delta conforme) **ou** à un `BLOCKED` (§5).
+10. **Corriger les problèmes CI obligatoires dans le périmètre** et pousser des commits de fix ; relever Sonar à titre consultatif sans masquer ses erreurs.
+11. **S'arrêter** à `PR GREEN / MERGE PENDING` (tous les checks obligatoires de la policy verts + `mergeStateStatus CLEAN` ; Sonar consigné avec son vrai statut) **ou** à un `BLOCKED` (§5).
 
 ## 4. Autonomie autorisée après `GO MERGE`
 
 L'agent PEUT, sans nouveau GO :
 
 1. **Merger avec la méthode approuvée** (celle indiquée par l'opérateur : typiquement `--merge`, no squash, **no `--admin`** quand le gate est `CLEAN`) avec garde `--match-head-commit`.
-2. **Vérifier la CI canonique** (run push sur le merge commit → 3 jobs verts).
-3. **Vérifier Sonar** : delta issues (0 attendu), `new_coverage ≥ seuil`, `coverage > 0` (non-régression), gate.
+2. **Vérifier les contrôles obligatoires de la CI canonique** sur le merge commit, selon la policy en vigueur ; ne pas déduire le verdict de leur seul nombre historique.
+3. **Consigner Sonar à titre consultatif** : delta issues, `new_coverage`, `coverage`, gate et révision analysée, ou indisponibilité explicite. Rapporter ERROR comme ERROR ; ni seuil changé, ni faux vert, ni auto-résolution. Une faille confirmée reste un arrêt dur.
 4. **Rédiger le closeout** (appendice post-merge au rapport de sprint + entrées registry/roadmap).
 5. **Pousser le closeout docs-only** sur le canonique (`paths-ignore: docs/**` → CI légitimement non déclenchée ; **ce n'est pas un `[skip ci]`**).
 6. **Nettoyer** branche + worktree du sprint (seulement ceux du sprint ; jamais un worktree non lié).
@@ -71,7 +77,7 @@ L'agent **DOIT s'arrêter** et rapporter (fichier/erreur exacts + plus petit fix
 - **exposition de secret** (secret en clair, à committer, dans un log) ;
 - **credential de service externe requis** (token/MCP/API non fourni) ;
 - **thread de revue non résolu exigeant un changement de code** (un nit non bloquant, gate `CLEAN`, ne bloque pas — mais un thread qui **impose** une modif de code est un stop) ;
-- **CI rouge hors périmètre du sprint** (régression dans un fichier non touché → ne pas « réparer en cascade ») ;
+- **contrôle obligatoire rouge hors périmètre du sprint** (régression dans un fichier non touché → ne pas « réparer en cascade » ; Sonar consultatif seul relève de GOV-SONAR-01) ;
 - **décision de merge** (merge, squash, `--admin`, choix de méthode) ;
 - **dérive de périmètre au-delà des fichiers autorisés**.
 
