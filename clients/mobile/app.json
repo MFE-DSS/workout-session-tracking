@@ -18,7 +18,7 @@
     },
     "android": {
       "package": "dev.auren.vnext.lab",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "backgroundColor": "#0A0B0D",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -37,6 +37,12 @@
         "expo-notifications",
         {
           "enableRemoteNotifications": false
+        }
+      ],
+      [
+        "expo-router",
+        {
+          "root": "./src/routes"
         }
       ]
     ],

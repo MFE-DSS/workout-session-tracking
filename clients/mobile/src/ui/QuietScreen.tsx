@@ -11,6 +11,8 @@ import { color, space, type } from './theme';
  * line of fact, at most one way forward — never an invented mission.
  */
 export function QuietScreen(props: {
+  /** the space this screen speaks for — MISSION by default */
+  eyebrow?: string;
   title: string;
   text: string;
   action?: { label: string; onPress: () => void };
@@ -22,7 +24,7 @@ export function QuietScreen(props: {
     <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
       <View style={styles.top}>
         <View style={{ width: 44 }} />
-        <Text style={type.eyebrow}>AUREN · Aujourd’hui</Text>
+        <Text style={type.eyebrow}>{props.eyebrow ?? 'AUREN · Aujourd’hui'}</Text>
         <IconButton icon="more" label="Journal local" onPress={props.onOpenJournal} />
       </View>
       <Text style={styles.title} accessibilityRole="header">{props.title}</Text>

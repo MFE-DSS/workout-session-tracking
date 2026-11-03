@@ -14,7 +14,7 @@ Une fois connecté, l'utilisateur MUST atteindre chaque espace de premier niveau
 - **THEN** la MISSION du jour s'affiche, et l'état de l'espace PROFIL est conservé pour y revenir
 
 ### Requirement: La séance au-dessus des onglets
-Démarrer ou reprendre une séance MUST ouvrir l'exécution en plein écran, sans barre d'onglets ; terminer, abandonner ou mettre en pause MUST ramener à la coque.
+Démarrer ou reprendre une séance MUST ouvrir l'exécution en plein écran, sans barre d'onglets ; terminer ou abandonner MUST ramener à la coque ; mettre en pause MUST montrer la reprise, la séance restant ouverte (voir « Priorité de la reprise »).
 
 #### Scenario: Démarrer depuis la MISSION
 - **WHEN** l'utilisateur touche « Démarrer » sur la MISSION
@@ -23,6 +23,14 @@ Démarrer ou reprendre une séance MUST ouvrir l'exécution en plein écran, san
 #### Scenario: Fin de séance
 - **WHEN** l'utilisateur ferme le bilan
 - **THEN** la coque réapparaît sur l'espace de la MISSION
+
+#### Scenario: Abandon
+- **WHEN** l'utilisateur abandonne la séance
+- **THEN** la coque réapparaît sur l'espace de la MISSION
+
+#### Scenario: Pause
+- **WHEN** l'utilisateur met la séance en pause
+- **THEN** l'écran de reprise s'affiche en plein écran, sans barre d'onglets
 
 ### Requirement: Priorité de la reprise
 À l'ouverture de l'app, une séance ouverte (locale ou serveur) MUST être proposée en reprise avant tout espace, quel que soit l'onglet actif à la fermeture.

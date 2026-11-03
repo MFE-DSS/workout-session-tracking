@@ -73,6 +73,30 @@ L'exécution (et sa reprise) est poussée au-dessus des onglets ; elle garde `Ex
   `app.config.js` ne peut pas être écrite par `expo install`).
 - **Reste à vérifier** : build iOS (barre système iOS) — au moment de la passe iPhone de la tranche.
 
+## Mise en œuvre (2026-11-03)
+
+- **Écart assumé à l'ADR-3 (propriétaire unique, pas de déplacement).** L'état de séance reste dans `ConnectedApp`, qui
+  le **fournit** à la coque par `ShellProvider` (`src/shell/ShellContext.tsx`) au lieu d'être déplacé dans un nouveau
+  fichier. L'exigence de l'ADR — un seul propriétaire, pas deux copies — est tenue ; déplacer ~500 lignes de synchro,
+  journal et outbox n'apportait rien à cette tranche et faisait courir le risque de régression que l'ADR redoutait.
+- **La coque n'existe qu'hors séance.** `ConnectedApp` monte `ExpoRoot` (routes `src/routes`) seulement quand ni une
+  série, ni un repos, ni le bilan, ni une reprise serveur n'est à l'écran : la séance reste un parcours plein écran
+  au-dessus des onglets, et la fin de séance ramène à AUJOURD'HUI (la coque est remontée sur le premier espace).
+- **Retour Android dans la coque** : un `BackHandler` du layout applique `backInShell` (fonction pure testée) plutôt
+  que le comportement par défaut de la barre ; pendant une séance, `backAction` (PLAT-01) reste seul en jeu.
+- **Espaces non migrés** : `PendingSpace` réutilise `QuietScreen` (sur-titre rendu paramétrable, valeur par défaut
+  inchangée) ; au plus une action, la page web existante (`/library`, `/progress`, `/profile`, inventaire MOB-00).
+- **Icônes** : noms neutres (`assets/tabs/{today,programs,progress,profile}_{default,selected}.png`) — la décision
+  d'icônes de l'opérateur (D3 rejetée, D4 en revue) ne change que des fichiers.
+- **Dépendance figée** : `expo-symbols` tire `expo-font@58.0.11`, dont le binaire iOS référence un symbole absent de
+  `expo-modules-core@58.0.24` (crash dyld au lancement, mesuré 5 fois sur simulateur) → `expo-font` épinglé `58.0.9`.
+
 ## Open Questions
 
 - Libellés exacts des onglets (casse, accents dans la barre système) — sans effet sur la structure.
+- **Contradiction de la spec, mesurée le 2026-11-03 — TRANCHÉE.** « La séance au-dessus des onglets » exigeait que
+  *mettre en pause* ramène à la coque ; « Priorité de la reprise » exige qu'une séance ouverte passe avant tout
+  espace. Une séance en pause EST ouverte : l'app (comportement PLAT-01, inchangé) affiche la reprise en plein écran.
+  Amendement proposé à l'opérateur sur la planche §5.1 — « terminer ou abandonner ramène à la coque ; mettre en pause
+  montre la reprise » — accepté le 2026-11-03 (« oui go pour la coque ») ; spec amendée en conséquence (scénarios
+  « Abandon » et « Pause » ajoutés).
