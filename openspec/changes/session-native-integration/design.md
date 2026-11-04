@@ -55,3 +55,10 @@ absentes omises. Les paragraphes conditionnels précédents sont conservés comm
 La restauration doit lire les commandes acquittées persistées via `restore().outbox` ; `outboxRows()` les exclut.
 Les tests doivent traverser le consommateur réel `ConnectedApp` en plus des fonctions pures utiles.
 Le build attend CODX-00 puis CI-01 ; aucun changement produit dans cette consignation.
+
+## Suivi d’implémentation — inventaire des routes, 2026-11-04
+
+La garde exhaustive MOB-00 exige de classer toute nouvelle route dans le même change.
+Les deux lectures GET de MOB-02 sont ajoutées à `session-recap` dans l’inventaire vivant,
+avec `KEEP_DOMAIN` conservé. Ce rattachement sert uniquement le bilan ; il ne migre
+ni l’interface des préférences (MOB-03+) ni celle du journal (MOB-05). Aucune exclusion de garde.
