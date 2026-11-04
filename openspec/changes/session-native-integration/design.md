@@ -62,3 +62,50 @@ La garde exhaustive MOB-00 exige de classer toute nouvelle route dans le même c
 Les deux lectures GET de MOB-02 sont ajoutées à `session-recap` dans l’inventaire vivant,
 avec `KEEP_DOMAIN` conservé. Ce rattachement sert uniquement le bilan ; il ne migre
 ni l’interface des préférences (MOB-03+) ni celle du journal (MOB-05). Aucune exclusion de garde.
+
+## Arbitrage de finalisation — 2026-11-04
+
+La directive opérateur impose de poursuivre ce change et la seule PR #352.
+L’ordre applicable remplace le séquencement historique : implémentation mobile complète,
+rendu réel et décision visuelle avant commit UI, contrôles du HEAD publié complet,
+merge sous GO permanent si toutes les conditions sont réunies, autorisation de déploiement distincte,
+déploiement du canonique vérifié, recettes Android puis iPhone connecté, closeout/archive après preuves.
+Aucun déploiement ni résultat appareil n’est acquis par cette décision.
+
+La directive proposait D-MOB02-3 : une ligne factuelle facultative avec période explicite,
+source serveur seulement, sans transformer la fréquence déclarée en activité observée.
+La réponse opérateur reçue ensuite est « Conserver zéro ajout sous le bloc ».
+Le candidat conserve donc le bloc et n’ajoute aucune ligne dessous.
+Le devenir de cette ligne et la représentation de la réception serveur dans le bilan
+restent à arbitrer : la tâche 2.2 et son exigence de spec ne sont ni supprimées ni déclarées satisfaites.
+Aucune nouvelle carte, baseline ou fonctionnalité MOB-03+ n’est introduite.
+
+### Référence confirmée par l’opérateur
+
+À la demande de validation de la planche, l’opérateur répond « réfère toi à ma dernière prompt injection ».
+La directive MOB-02 FINALIZATION est donc appliquée : D-MOB02-3 accepte une ligne de contexte
+optionnelle sous le bloc conservé. Le refus de l’ancien croquis de compteurs de synchronisation
+ne sert pas à réintroduire ce croquis. Aucune validation finale du nouveau rendu n’est déduite.
+
+Choix technique borné : nombre de séances terminées dans le GET complet de l’utilisateur,
+du lundi UTC à la fin de la séance courante attestée par ce GET ; les deux bornes et UTC sont affichés.
+La fréquence déclarée n’entre pas dans ce calcul. Ni séance locale ajoutée, ni comparaison, ni jugement.
+Sans ligne courante attestée, complétude, dates valides et identifiants uniques, le contexte est omis.
+La ligne de contexte historique ne prouve pas l’accusé de chaque série ; le rendu de réception
+par série du bilan reste à résoudre pour 2.2, sans cocher cette tâche par simple transmission de props.
+
+## LAST MILE — détail des séries du bilan
+
+Inspection : aucune affordance de détail par exercice dans CompleteScreen ; les lignes sont de simples View.
+Le bouton « … » existant est réutilisé pour une Sheet secondaire avec SheetRow, groupée par exercice
+et limitée aux séries réalisées de cette séance. Le journal local préexistant reste accessible depuis cette feuille.
+Le bilan fermé n’ajoute aucun compteur ni carte et sa composition ne change pas. La nouvelle géométrie
+est soumise dans une seule revue finale, avant tout commit UI, selon le mandat opérateur.
+
+L’unique sélecteur serverStateFromOutbox conserve les états du dernier envoi persisté par série :
+acked → synced ; failed → refused ; pending/inflight → pending ; source absente/invérifiable → unknown.
+L’exécution adapte pending/unknown à son contrat antérieur sans les transformer en confirmation.
+Le bilan reçoit ce même modèle ; SessionSetDetails n’effectue aucune lecture et ne détient aucun cache.
+Les lectures obsolètes sont ignorées ; une indisponibilité du dernier journal invalide l’état autoritatif.
+La course identifiée en revue sur un ancien refus de substitution est corrigée par invalidation
+des lectures avant la mutation et à la fin de sa persistance, et garde pendant les écritures concurrentes.

@@ -77,7 +77,7 @@ export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
         'SELECT snapshot FROM active_session WHERE id = 1',
       );
       const sets = await db.getAllAsync<JournalRow>('SELECT * FROM journal_sets ORDER BY created_at_ms');
-      const outbox = await db.getAllAsync<OutboxRow>('SELECT * FROM outbox ORDER BY created_at_ms');
+      const outbox = await db.getAllAsync<OutboxRow>('SELECT * FROM outbox ORDER BY created_at_ms, rowid');
       return { snapshot: row ? (JSON.parse(row.snapshot) as WorkoutState) : null, sets, outbox };
     },
 

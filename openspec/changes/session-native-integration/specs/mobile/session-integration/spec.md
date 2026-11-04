@@ -9,7 +9,7 @@ attente, et l'origine de chaque valeur du bilan.
 ## ADDED Requirements
 
 ### Requirement: Vérité de synchronisation par série
-L'état affiché de chaque série validée MUST refléter ce que le serveur en a dit (acceptée, refusée, pas encore envoyée),
+L'état affiché de chaque série validée MUST refléter ce que le serveur en a dit (acceptée, refusée, en attente ou inconnue),
 y compris après une relance de l'app ; une série acceptée MUST NOT s'afficher comme gardée seulement sur l'appareil.
 
 #### Scenario: Relance après une série acceptée
@@ -19,6 +19,16 @@ y compris après une relance de l'app ; une série acceptée MUST NOT s'afficher
 #### Scenario: Série refusée
 - **WHEN** le serveur refuse une série
 - **THEN** la série est montrée comme à vérifier, gardée sur l'appareil, et le compteur d'attention l'inclut
+
+#### Scenario: Détail des séries depuis le bilan
+- **WHEN** l’utilisateur ouvre le bouton de détail existant du bilan
+- **THEN** les séries réalisées de cette séance sont accessibles par exercice avec leur dernier état persisté : reçue, en attente, refusée-à vérifier ou inconnu
+- **AND** une commande locale ou en file n’est jamais présentée comme confirmée
+
+#### Scenario: Retry, doublon ou source devenue indisponible
+- **WHEN** une nouvelle commande remplace un ancien accusé ou que le dernier journal n’est plus vérifiable
+- **THEN** le bilan reflète le dernier envoi, une seule fois par série, ou indique un état inconnu
+- **AND** une réponse tardive ne restaure pas une ancienne confirmation
 
 ### Requirement: Envoi unique d'un démarrage
 Toucher « Démarrer » ou « Reprendre » MUST montrer un état d'attente jusqu'à la réponse et MUST NOT envoyer une seconde
@@ -63,3 +73,18 @@ serveur comme pour la reprise locale, ce qui se passe hors ligne.
 #### Scenario: Une seule série
 - **WHEN** une seule série a été faite avant la pause
 - **THEN** la reprise affiche « 1 série faite »
+
+### Requirement: Contexte factuel optionnel du bilan (D-MOB02-3)
+Le bilan MAY afficher une seule ligne factuelle sous le bloc conservé, sans carte ni compteur empilé.
+Elle MUST utiliser uniquement les données serveur complètes et expliciter la période.
+Elle MUST NOT confondre fréquence déclarée et activité observée, ajouter une séance locale non attestée,
+inventer un défaut, une comparaison ou un jugement. Les détails restent réservés à MOB-05.
+
+#### Scenario: Historique complet attestant la séance courante
+- **WHEN** le GET authentifié renvoie un historique complet, des identifiants uniques, des dates valides et la séance courante terminée
+- **THEN** une ligne facultative compte les séances terminées de la semaine UTC jusqu’à cette fin attestée et indique les bornes
+- **AND** la préférence de fréquence ne modifie jamais ce nombre observé
+
+#### Scenario: Données manquantes ou incomplètes
+- **WHEN** la lecture échoue, la page est tronquée, la séance courante manque ou les données sont invalides
+- **THEN** cette ligne est omise et aucune activité par défaut n’est affichée

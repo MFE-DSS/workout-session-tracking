@@ -12,6 +12,7 @@ import { LAST, RecessedWindowFixture, WindowModule } from '../instrument/Recesse
 import { SessionSetCard } from '../instrument/SessionSetCard';
 import { color, type } from '../theme';
 import { type CandidateFixture, candidateById } from './candidates';
+import { SessionStatesFixture } from './SessionStatesFixture';
 import { CompleteScreenFixture } from './CompleteScreenFixture';
 import { ExecutionScreenFixture } from './ExecutionScreenFixture';
 import { MissionScreenFixture } from './MissionScreenFixture';
@@ -104,6 +105,7 @@ function BodyMapGoverned({ width, height, bodymap }: { width: number; height: nu
 }
 
 function CandidateBody({ candidate }: { candidate: CandidateFixture }) {
+  if (candidate.candidate === 'MOB02-STATE') return <SessionStatesFixture width={candidate.width} height={candidate.height} scenario={candidate.scenario} />;
   if (candidate.candidate === 'EXECUTION-SCREEN') {
     return (
       <ExecutionScreenFixture
@@ -140,7 +142,7 @@ export function ContractFixtureScreen() {
   if (candidate) {
     return (
       <View style={{ flex: 1, backgroundColor: color.field, alignItems: 'flex-start' }}>
-        <View testID="contract-candidate" style={{ padding: PAD, backgroundColor: color.field }}>
+        <View testID="contract-candidate" style={{ padding: candidate.candidate === 'MOB02-STATE' && candidate.scenario === 'bilan-details' ? 0 : PAD, backgroundColor: color.field }}>
           <CandidateBody candidate={candidate} />
         </View>
       </View>

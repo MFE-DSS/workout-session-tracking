@@ -63,3 +63,10 @@ export type TokenPair = {
 export function isStartable(m: ServerMission | null): m is ReadyMission & { scope: Mission['scope'] } {
   return m !== null && m.state === 'READY' && m.executable && m.scope.first_exercise !== null;
 }
+
+/** MOB-02 — lectures propriétaires, jamais des valeurs par défaut du labo. */
+export type TrainingPreferencesRead = { sessions_per_week?: number };
+export type SessionHistoryRead = {
+  sessions: { id: number; template_slug: string; started_at: string; ended_at: string }[];
+  has_more: boolean;
+};

@@ -19,6 +19,7 @@ const DAY = new Intl.DateTimeFormat('fr-FR', { weekday: 'long', day: 'numeric', 
  */
 export function MissionScreen(props: {
   mission: Mission;
+  busy?: boolean;
   onStart: (slug: string) => void;
   onOpenLab: () => void;
   onSecondaryOpened: () => void;
@@ -87,7 +88,8 @@ export function MissionScreen(props: {
       <View style={{ flex: withZones ? 0 : 1, minHeight: 16 }} />
       <PrimaryAction
         testID="start"
-        label="Démarrer"
+        label={props.busy ? 'Démarrage…' : 'Démarrer'}
+        busy={props.busy}
         hint="Démarre la séance recommandée"
         onPress={() => props.onStart(m.template.slug)}
       />

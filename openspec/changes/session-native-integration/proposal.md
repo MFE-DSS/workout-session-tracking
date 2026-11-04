@@ -85,3 +85,34 @@ Ces décisions lèvent les alternatives du bloc historique ci-dessus. La roadmap
 → MOB-02, avec STORE-00 et les assets en parallèle. Aucun code produit n'est ouvert par la remise à niveau Git.
 Preuves de build requises : restaurer les succès depuis `restore().outbox` (pas seulement `outboxRows()`),
 consommation par le vrai chemin `ConnectedApp`, états dégradés Android puis passe iPhone connectée avec l'opérateur.
+
+## Arbitrage de finalisation — 2026-11-04
+
+La directive opérateur impose de poursuivre ce change et la seule PR #352.
+L’ordre applicable remplace le séquencement historique : implémentation mobile complète,
+rendu réel et décision visuelle avant commit UI, contrôles du HEAD publié complet,
+merge sous GO permanent si toutes les conditions sont réunies, autorisation de déploiement distincte,
+déploiement du canonique vérifié, recettes Android puis iPhone connecté, closeout/archive après preuves.
+Aucun déploiement ni résultat appareil n’est acquis par cette décision.
+
+La directive proposait D-MOB02-3 : une ligne factuelle facultative avec période explicite,
+source serveur seulement, sans transformer la fréquence déclarée en activité observée.
+La réponse opérateur reçue ensuite est « Conserver zéro ajout sous le bloc ».
+Le candidat conserve donc le bloc et n’ajoute aucune ligne dessous.
+Le devenir de cette ligne et la représentation de la réception serveur dans le bilan
+restent à arbitrer : la tâche 2.2 et son exigence de spec ne sont ni supprimées ni déclarées satisfaites.
+Aucune nouvelle carte, baseline ou fonctionnalité MOB-03+ n’est introduite.
+
+### Référence confirmée par l’opérateur
+
+À la demande de validation de la planche, l’opérateur répond « réfère toi à ma dernière prompt injection ».
+La directive MOB-02 FINALIZATION est donc appliquée : D-MOB02-3 accepte une ligne de contexte
+optionnelle sous le bloc conservé. Le refus de l’ancien croquis de compteurs de synchronisation
+ne sert pas à réintroduire ce croquis. Aucune validation finale du nouveau rendu n’est déduite.
+
+Choix technique borné : nombre de séances terminées dans le GET complet de l’utilisateur,
+du lundi UTC à la fin de la séance courante attestée par ce GET ; les deux bornes et UTC sont affichés.
+La fréquence déclarée n’entre pas dans ce calcul. Ni séance locale ajoutée, ni comparaison, ni jugement.
+Sans ligne courante attestée, complétude, dates valides et identifiants uniques, le contexte est omis.
+La ligne de contexte historique ne prouve pas l’accusé de chaque série ; le rendu de réception
+par série du bilan reste à résoudre pour 2.2, sans cocher cette tâche par simple transmission de props.

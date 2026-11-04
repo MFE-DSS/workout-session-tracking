@@ -36,12 +36,32 @@ if (CANDIDATE_FIXTURES.length === 0) {
 
 for (const f of CANDIDATE_FIXTURES) {
   test(`${f.candidate} · ${f.id} (review)`, async ({ page }) => {
+    const disclosure = f.candidate === 'MOB02-STATE' && f.scenario === 'bilan-details';
+    if (disclosure) await page.setViewportSize({ width: f.width, height: f.height });
     await page.goto(`/?fixture=${f.id}`);
     const fixture = page.getByTestId('contract-candidate');
     await expect(fixture).toBeVisible();
     await page.evaluate(() => document.fonts.ready);
     // DA-02.6 — a fitted readout measures itself first: capture only once every measurer is gone
     await expect(page.getByTestId('readout-measure')).toHaveCount(0);
+    // Modal is a portal: capture the phone viewport, not its underlying fixture.
+    if (disclosure) {
+      await page.screenshot({ path: path.join(OUT, `${f.id}-normal.png`), scale: 'css', animations: 'disabled' });
+      if (process.env.EXPO_PUBLIC_MOB02_REVIEW_REVISION !== 'before') {
+        await page.getByRole('button', { name: 'Détails des séries', exact: true }).click();
+        await expect(page.getByText('Séries de la séance', { exact: true })).toBeVisible();
+        for (const label of ['Reçue par AUREN', 'En attente d’envoi ou de confirmation', 'À vérifier — refusée par AUREN', 'État serveur inconnu']) {
+          await expect(page.getByText(label, { exact: true }).first()).toBeVisible();
+        }
+      }
+      await page.screenshot({ path: path.join(OUT, `${f.id}.png`), scale: 'css', animations: 'disabled' });
+      if (process.env.EXPO_PUBLIC_MOB02_REVIEW_REVISION !== 'before') {
+        await page.getByRole('button', { name: 'Fermer', exact: true }).last().click();
+        await expect(page.getByText('Séries de la séance', { exact: true })).toHaveCount(0);
+        await expect(page.getByRole('button', { name: 'Détails des séries', exact: true })).toBeVisible();
+      }
+      return;
+    }
     // same capture as toHaveScreenshot: css scale, no animation, no caret
     await fixture.screenshot({ path: path.join(OUT, `${f.id}.png`), scale: 'css', animations: 'disabled', caret: 'hide' });
     await fixture.screenshot({ path: path.join(OUT, `${f.id}@2x.png`), scale: 'device', animations: 'disabled', caret: 'hide' });
@@ -55,6 +75,12 @@ for (const f of CANDIDATE_FIXTURES) {
       !b || (b.x >= outer.x - 0.5 && b.y >= outer.y - 0.5 && b.x + b.w <= outer.x + outer.w + 0.5 && b.y + b.h <= outer.y + outer.h + 0.5);
     const all = async (id: string) =>
       Promise.all((await fixture.getByTestId(id).all()).map(async (l) => rel(await l.boundingBox())));
+
+    // MOB-02 : candidats de données/états, aucun baseline approuvé par ce banc.
+    if (f.candidate === 'MOB02-STATE') {
+      await expect(fixture.getByTestId('mob02-state')).toBeVisible();
+      return;
+    }
 
     // a scrolling screen, framed tall to be seen whole: captured, nothing to measure against a phone's height
     if (f.candidate === 'COMPLETE-SCREEN') return;

@@ -23,6 +23,7 @@ export function ResumeScreen(props: {
   subtitle: string | null;
   position: ResumePosition | null;
   note: string | null;
+  busy?: boolean;
   onResume: () => void;
   onOpenJournal: () => void;
 }) {
@@ -41,18 +42,18 @@ export function ResumeScreen(props: {
       {props.subtitle ? <Text style={[type.body, styles.centered, { marginTop: 4 }]}>{props.subtitle}</Text> : null}
 
       {p ? (
-        <View style={styles.card} accessible accessibilityLabel={`Exercice ${p.exerciseIndex} sur ${p.exerciseTotal}, ${p.setsDone} séries faites sur ${p.setsTotal}`}>
+        <View style={styles.card} accessible accessibilityLabel={`Exercice ${p.exerciseIndex} sur ${p.exerciseTotal}, ${p.setsDone} ${p.setsDone === 1 ? 'série faite' : 'séries faites'} sur ${p.setsTotal}`}>
           <Text style={type.eyebrow}>On reprend à</Text>
           {p.exerciseName ? <Text style={[type.bodyStrong, styles.centered, { marginTop: 4 }]}>{p.exerciseName}</Text> : null}
           <Text style={[type.small, styles.centered, type.tabular, { marginTop: 4 }]}>
-            {`Exercice ${p.exerciseIndex} sur ${p.exerciseTotal} · ${p.setsDone} séries faites sur ${p.setsTotal}`}
+            {`Exercice ${p.exerciseIndex} sur ${p.exerciseTotal} · ${p.setsDone} ${p.setsDone === 1 ? 'série faite' : 'séries faites'} sur ${p.setsTotal}`}
           </Text>
         </View>
       ) : null}
       {props.note ? <Text style={[type.small, styles.centered, { marginTop: space.m }]}>{props.note}</Text> : null}
 
       <View style={{ flex: 1 }} />
-      <PrimaryAction testID="resume" label="Reprendre" sublabel={props.name} onPress={props.onResume} />
+      <PrimaryAction testID="resume" label={props.busy ? 'Reprise…' : 'Reprendre'} busy={props.busy} sublabel={props.name} onPress={props.onResume} />
     </View>
   );
 }

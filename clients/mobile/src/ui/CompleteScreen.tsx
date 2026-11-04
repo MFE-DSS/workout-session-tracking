@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaFrame, useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -7,7 +7,8 @@ import { elapsedLabel, kg } from '../domain/format';
 import { ExerciseResult, headline, LineReading, lineReading, SessionPerformance, Trend } from '../domain/performance';
 import type { Mission } from '../domain/types';
 import type { WorkoutState } from '../domain/workout';
-import { DEFAULT_SESSIONS_PER_WEEK } from '../lab/profile';
+import type { ServerSetState } from '../sync/serverState';
+import { SessionSetDetails } from './SessionSetDetails';
 import { feedback } from '../native/feedback';
 import { SessionBodyMap } from './bodymap/BodyMapTriptych';
 import { zonePanelPresets, zonesDone } from './bodymap/zonesDone';
@@ -39,11 +40,15 @@ export function CompleteScreen(props: {
    */
   history: DoneSession[] | null;
   sessionsPerWeek: number | null;
+  /** Optional observed activity context from a complete, owned server history (D-MOB02-3). */
+  contextLine?: string | null;
+  serverStateOf?: (setId: number) => ServerSetState;
   next: Mission | null;
   reducedMotion: boolean;
   onClose: () => void;
   onOpenLab: () => void;
 }) {
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const insets = useSafeAreaInsets();
   const { state, performance: perf } = props;
   const plan = state.plan!;
@@ -52,9 +57,9 @@ export function CompleteScreen(props: {
   const pending = Object.values(state.done).filter((d) => d.local !== 'saved_local').length;
 
   const after = useMemo(() => [...(props.history ?? []), { atMs: ended, slug: plan.template_slug }], [props.history, ended, plan.template_slug]);
-  const target = props.sessionsPerWeek ?? DEFAULT_SESSIONS_PER_WEEK;
+  const target = props.sessionsPerWeek;
   const week = sessionsThisWeek(after, ended);
-  const held = weeksHeld(after, ended, target);
+  const held = target === null ? 0 : weeksHeld(after, ended, target);
   const zonePresets = zonePanelPresets(zonesDone(state));
   // the screen's frame, not the window: the same on a device, exact in a review frame
   const { width } = useSafeAreaFrame();
@@ -72,7 +77,7 @@ export function CompleteScreen(props: {
     <View style={[styles.root, { paddingTop: insets.top + 8 }]}>
       <View style={styles.top}>
         <Text style={type.eyebrow}>Séance terminée</Text>
-        <IconButton icon="more" label="Journal du labo" onPress={props.onOpenLab} />
+        <IconButton icon="more" label="Détails des séries" onPress={() => setDetailsOpen(true)} />
       </View>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 24 }} showsVerticalScrollIndicator={false}>
         <View style={styles.mark} accessibilityElementsHidden>
@@ -101,7 +106,7 @@ export function CompleteScreen(props: {
           <Text style={[type.small, { marginTop: 8 }]}>{`${perf.setsDone} séries sur ${perf.setsPlanned} prévues`}</Text>
         </View>
 
-        {props.history === null ? null : (
+        {props.history === null || target === null ? null : (
         <View style={styles.card} accessible accessibilityLabel={`Programme de la semaine : ${week} séances sur ${target}. ${held} semaines tenues.`}>
           <Text style={type.eyebrow}>Ton programme</Text>
           <View style={styles.pair}>
@@ -110,7 +115,7 @@ export function CompleteScreen(props: {
                 {Math.min(week, target)}
                 <Text style={[type.body, { fontSize: 20 }]}>{` / ${target}`}</Text>
               </Text>
-              <Text style={type.small}>{`séances prévues cette semaine${props.sessionsPerWeek === null ? ' (par défaut)' : ''}`}</Text>
+              <Text style={type.small}>séances prévues cette semaine</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.big}>{held}</Text>
@@ -130,8 +135,10 @@ export function CompleteScreen(props: {
 
         <View style={styles.ledger}>
           <Ledger label="Sur l’appareil" value={pending ? `${perf.setsDone - pending} / ${perf.setsDone}` : 'toutes'} alert={pending > 0} />
-          <Ledger label="Remplacements" value={String(Object.keys(state.requiresSync).length)} />
+          <Ledger label="Remplacements" value={String(plan.exercises.filter((exercise) => exercise.executed_name !== exercise.prescribed_name).length)} />
         </View>
+
+        {props.contextLine ? <Text style={[type.small, styles.centered, { marginTop: space.s }]}>{props.contextLine}</Text> : null}
 
         {props.next ? (
           <View style={[styles.card, styles.next]}>
@@ -144,6 +151,8 @@ export function CompleteScreen(props: {
         <View style={{ height: space.l }} />
         <PrimaryAction label={props.next ? 'Voir ma prochaine séance' : 'Fermer'} onPress={props.onClose} />
       </ScrollView>
+      <SessionSetDetails visible={detailsOpen} state={state} serverStateOf={props.serverStateOf}
+        onClose={() => setDetailsOpen(false)} onOpenJournal={() => { setDetailsOpen(false); props.onOpenLab(); }} />
     </View>
   );
 }

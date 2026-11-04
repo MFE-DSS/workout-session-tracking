@@ -21,10 +21,11 @@ import { AppState, BackHandler, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ApiFailure, createTransport } from './src/api/http';
-import { ExecutionPlan, isStartable, ServerMission } from './src/api/types';
+import { ExecutionPlan, isStartable, ServerMission, SessionHistoryRead, TrainingPreferencesRead } from './src/api/types';
 import { AuthSession } from './src/auth/authSession';
 import { credentialStore } from './src/auth/credentialStore';
 import { performedAt, TimeAnchor } from './src/domain/performedAt';
+import type { DoneSession } from './src/domain/adherence';
 import { sessionPerformance } from './src/domain/performance';
 import type { Mission } from './src/domain/types';
 import { isElapsed, remainingMs } from './src/domain/timer';
@@ -39,10 +40,14 @@ import { announce, useReducedMotion } from './src/native/motion';
 import { restNotification } from './src/native/restNotification';
 import { initialSpace } from './src/native/shellNav';
 import { ShellProvider } from './src/shell/ShellContext';
+import { shellRoutes } from './src/shell/routeContext';
 import { openJournal } from './src/storage/journal';
 import type { Journal } from './src/storage/journalTypes';
-import { closeCommand, OutboxRow, restoreState, setCommand, substituteCommand } from './src/storage/outbox';
+import { closeCommand, OutboxRow, restoreState, retryDelayMs, setCommand, substituteCommand } from './src/storage/outbox';
 import { stateFromServer } from './src/sync/reconcile';
+import { serverStateFromOutbox } from './src/sync/serverState';
+import { summaryContext } from './src/sync/summaryContext';
+import { reconcileSubstitutions, substitutionStates } from './src/sync/substitutionState';
 import { routeFor } from './src/sync/routes';
 import { IDLE, SyncEngine, SyncStatus } from './src/sync/syncEngine';
 import { CompleteScreen } from './src/ui/CompleteScreen';
@@ -54,17 +59,14 @@ import { MissionScreen } from './src/ui/MissionScreen';
 import { QuietScreen } from './src/ui/QuietScreen';
 import { ResumePosition, ResumeScreen } from './src/ui/ResumeScreen';
 import { color } from './src/ui/theme';
+import { BootScreen } from './src/ui/BootScreen';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
 const PROCESS_ID = Crypto.randomUUID();
 const transport = createTransport(API_URL);
 /** Before any server contact there is no anchor: every time claim is `estimated`. */
 const NO_ANCHOR: TimeAnchor = { serverMs: 0, monoMs: 0, processId: 'none' };
-/**
- * MOB-01 ADR-2 — the router is mounted UNDER this entry (galleries, lab and the visual-contract fixture keep theirs).
- * `require.context` is a Metro feature; the cast keeps TypeScript honest about it.
- */
-const SHELL_ROUTES = (require as unknown as { context: (dir: string) => never }).context('./src/routes');
+const SUBSTITUTION_REFUSED = 'Le remplacement n’a pas été accepté.';
 
 type Screen = 'BOOT' | 'LOGIN' | 'APP';
 
@@ -123,33 +125,30 @@ export default function ConnectedApp() {
   const [account, setAccount] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<'invalid' | 'network' | null>(null);
   const [busy, setBusy] = useState(false);
+  const sessionActionInFlight = useRef(false);
   const [mission, setMission] = useState<ServerMission | null>(null);
   const [offline, setOffline] = useState(false);
   const [paused, setPaused] = useState(false);
   const [sync, setSync] = useState<SyncStatus>(IDLE);
   const [next, setNext] = useState<Mission | null>(null);
+  const [bilanContext, setBilanContext] = useState<{ sessionId: number; history: DoneSession[] | null; sessionsPerWeek: number | null; contextLine: string | null } | null>(null);
   const [exitOpen, setExitOpen] = useState(false);
   const [lab, setLab] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   /** §8.7 — per set, what the server said: acknowledged or refused (absent = not yet). */
-  const [serverSets, setServerSets] = useState<Record<number, 'synced' | 'refused'>>({});
+  const [substitutions, setSubstitutions] = useState<ReturnType<typeof substitutionStates>>({});
+  const [substitutionNotice, setSubstitutionNotice] = useState<string | null>(null);
+  const substitutionRefreshInFlight = useRef(false);
+  const substitutionRefreshAgain = useRef(false);
+  const substitutionRetryTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const substitutionRetryAttempt = useRef(0);
+  const appAlive = useRef(true);
+  const refreshJournalRef = useRef<() => Promise<void>>(async () => undefined);
+  const [serverSets, setServerSets] = useState<ReturnType<typeof serverStateFromOutbox>>({});
   const [signOutBlocked, setSignOutBlocked] = useState<number | null>(null);
   /** R10 / R12 — a skip can be taken back for a few seconds; nothing was written. */
   const [undo, setUndo] = useState<{ text: string; prev: WorkoutState } | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const onStatus = useCallback((s: SyncStatus) => {
-    setSync(s);
-    void journalRef.current?.outboxRows().then((rows) => {
-      const refused = rows.filter((r) => r.state === 'failed' && r.kind === 'SET_COMPLETION');
-      if (!refused.length) return;
-      setServerSets((prev) => {
-        const next = { ...prev };
-        for (const r of refused) next[Number(r.target.split('/')[1])] = 'refused';
-        return next;
-      });
-    }).catch(() => undefined);
-  }, []);
 
   const auth = useMemo(
     () => new AuthSession(transport, credentialStore, () => performance.now(), (iso, mono) => {
@@ -183,6 +182,88 @@ export default function ConnectedApp() {
     return plan;
   }, [api, anchorOn]);
 
+  const journalReadVersion = useRef(0);
+  const substitutionWritesInFlight = useRef(0);
+  const refreshServerSets = useCallback(async (): Promise<void> => {
+    if (!appAlive.current) return;
+    const current = journalRef.current;
+    if (!current) return;
+    const version = ++journalReadVersion.current;
+    const restored = await current.restore().catch((error) => {
+      if (appAlive.current && version === journalReadVersion.current) setServerSets({});
+      throw error;
+    });
+    if (!appAlive.current || version !== journalReadVersion.current || substitutionWritesInFlight.current > 0) return;
+    setServerSets(serverStateFromOutbox(restored.outbox));
+    const local = stateRef.current;
+    const statuses = substitutionStates(restored.outbox, local.plan?.session_id);
+    setSubstitutions(statuses);
+    const refused = Object.values(statuses).some((status) => status.state === 'failed');
+    setSubstitutionNotice((previous) => refused ? SUBSTITUTION_REFUSED : previous === SUBSTITUTION_REFUSED ? null : previous);
+    const resolved = reconcileSubstitutions(local, restored.outbox);
+    if (resolved !== local) apply({ type: 'RESTORE', state: resolved });
+    const acknowledged = Object.entries(statuses).filter(([key, status]) => status.state === 'acked'
+      && resolved.requiresSync[Number(key)]?.substitute === status.name);
+    if (!acknowledged.length || !resolved.plan) {
+      if (substitutionRetryTimer.current) clearTimeout(substitutionRetryTimer.current);
+      substitutionRetryTimer.current = null;
+      substitutionRetryAttempt.current = 0;
+      return;
+    }
+    if (substitutionRefreshInFlight.current) { substitutionRefreshAgain.current = true; return; }
+    if (substitutionRetryTimer.current) clearTimeout(substitutionRetryTimer.current);
+    substitutionRetryTimer.current = null;
+    substitutionRefreshInFlight.current = true;
+    const sessionId = resolved.plan.session_id;
+    let failedRead = false;
+    try {
+      const plan = await fetchExecution(sessionId);
+      const journal = await current.restore();
+      const latest = stateRef.current;
+      if (!appAlive.current || latest.plan?.session_id !== sessionId) return;
+      let merged = reconcileSubstitutions(stateFromServer(plan, latest, journal.sets, Date.now()), journal.outbox);
+      const latestStatuses = substitutionStates(journal.outbox, sessionId);
+      // Ce GET a démarré APRÈS ces accusés précis : le plan canonique prévaut,
+      // y compris si un autre appareil a depuis changé le nom exécuté.
+      for (const [key, status] of acknowledged) {
+        const id = Number(key);
+        if (latestStatuses[id]?.opId === status.opId && merged.requiresSync[id]?.substitute === status.name) {
+          const { [id]: _request, ...rest } = merged.requiresSync;
+          merged = { ...merged, requiresSync: rest };
+        }
+      }
+      apply({ type: 'RESTORE', state: merged });
+      setOffline(false);
+      substitutionRetryAttempt.current = 0;
+    } catch (error) {
+      failedRead = true;
+      if (!appAlive.current) return;
+      if (error instanceof ApiFailure && error.kind === 'http' && error.status === 401) {
+        setScreen('LOGIN');
+      } else if (error instanceof ApiFailure && (error.kind === 'network' || error.status >= 500 || error.status === 429 || error.status === 408)) {
+        if (error.kind === 'network') setOffline(true);
+        const delay = retryDelayMs(substitutionRetryAttempt.current++);
+        substitutionRetryTimer.current = setTimeout(() => {
+          substitutionRetryTimer.current = null;
+          void refreshJournalRef.current().catch(() => undefined);
+        }, delay);
+      } else {
+        setSubstitutionNotice('Plan indisponible ; données locales conservées.');
+      }
+    } finally {
+      substitutionRefreshInFlight.current = false;
+      const again = substitutionRefreshAgain.current;
+      substitutionRefreshAgain.current = false;
+      if (again && !failedRead && appAlive.current) void refreshJournalRef.current().catch(() => undefined);
+    }
+  }, [apply, fetchExecution]);
+  refreshJournalRef.current = refreshServerSets;
+
+  const onStatus = useCallback((s: SyncStatus) => {
+    setSync(s);
+    void refreshServerSets().catch(() => undefined);
+  }, [refreshServerSets]);
+
   // ── canonical state: the mission, and the open session if there is one ────
   const loadMission = useCallback(async () => {
     try {
@@ -192,8 +273,9 @@ export default function ConnectedApp() {
       const local = stateRef.current;
       if (m.state === 'RESUME') {
         const plan = await fetchExecution(m.session.id);
-        const rows = journalRef.current ? (await journalRef.current.restore()).sets : [];
-        apply({ type: 'RESTORE', state: stateFromServer(plan, local.phase === 'MISSION' ? null : local, rows, Date.now()) });
+        const restored = journalRef.current ? await journalRef.current.restore() : { sets: [], outbox: [] };
+        const latest = stateRef.current;
+        apply({ type: 'RESTORE', state: reconcileSubstitutions(stateFromServer(plan, latest.phase === 'MISSION' ? null : latest, restored.sets, Date.now()), restored.outbox) });
         setPaused(true);
       } else if (local.phase === 'SET' || local.phase === 'REST') {
         // the server holds no open session: it was closed elsewhere (web) or by a
@@ -214,9 +296,9 @@ export default function ConnectedApp() {
     metric('SYNC-ACK');
     metric('G-SYNC', Date.now() - row.created_at_ms);
     if ((response as { applied?: boolean } | null)?.applied === false) metric('SYNC-ACK-DUPLICATE');
-    if (row.kind === 'SET_COMPLETION') {
-      const setId = Number(row.target.split('/')[1]);
-      setServerSets((prev) => ({ ...prev, [setId]: 'synced' }));
+    setOffline(false);
+    if (row.kind === 'SET_COMPLETION' || row.kind === 'SUBSTITUTE') {
+      void refreshServerSets().catch(() => undefined);
     }
     if (row.kind === 'SESSION_FINISH' || row.kind === 'SESSION_ABANDON') {
       void api<ServerMission>('/mission').then((m) => {
@@ -224,23 +306,12 @@ export default function ConnectedApp() {
         if (stateRef.current.phase === 'MISSION') setMission(m);
       }).catch(() => undefined);
     }
-    if (row.kind === 'SUBSTITUTE') {
-      const p = JSON.parse(row.payload) as { session_id: number; se_id: number };
-      const s = stateRef.current;
-      if (s.plan?.session_id !== p.session_id) return;
-      void fetchExecution(p.session_id).then(async (plan) => {
-        const rows = journalRef.current ? (await journalRef.current.restore()).sets : [];
-        const cur = stateRef.current;
-        const merged = stateFromServer(plan, cur, rows, Date.now());
-        const { [p.se_id]: _done, ...rest } = merged.requiresSync;
-        apply({ type: 'RESTORE', state: { ...merged, requiresSync: rest } });
-      }).catch(() => undefined);
-    }
-  }, [api, apply, fetchExecution, metric]);
+  }, [api, metric, refreshServerSets]);
 
   // ── boot: journal first (the workout survives anything), then the server ──
   useEffect(() => {
     let alive = true;
+    appAlive.current = true;
     const boot = async () => {
       const j = await openJournal('auren.db');
       if (!alive) return;
@@ -252,8 +323,12 @@ export default function ConnectedApp() {
       };
       engineRef.current = new SyncEngine(j, send, onStatus, onAck);
       const r = await j.restore();
+      setServerSets(serverStateFromOutbox(r.outbox));
+      const statuses = substitutionStates(r.outbox, r.snapshot?.plan?.session_id);
+      setSubstitutions(statuses);
+      if (Object.values(statuses).some((status) => status.state === 'failed')) setSubstitutionNotice(SUBSTITUTION_REFUSED);
       if (r.snapshot && r.snapshot.phase !== 'MISSION') {
-        const restored = restoreState(r.snapshot, r.sets);
+        const restored = reconcileSubstitutions(restoreState(r.snapshot, r.sets), r.outbox);
         apply({ type: 'RESTORE', state: restored });
         if (restored.phase !== 'COMPLETE') setPaused(true);
         await j.recordMetric('RELAUNCH-RESTORED-SETS', Object.values(restored.done).filter((d) => d.local === 'saved_local').length);
@@ -262,12 +337,12 @@ export default function ConnectedApp() {
         setScreen('LOGIN');
         return;
       }
-      setScreen('APP');
       const outcome = await auth.refresh();
       if (outcome === 'invalid') {
         setScreen('LOGIN');
         return;
       }
+      setScreen('APP');
       if (outcome === 'network') {
         setOffline(true);
         return;
@@ -279,6 +354,9 @@ export default function ConnectedApp() {
     const stop = restNotification.onDelivery((late) => metric('NOTIF-LATENESS', late));
     return () => {
       alive = false;
+      appAlive.current = false;
+      if (substitutionRetryTimer.current) clearTimeout(substitutionRetryTimer.current);
+      substitutionRetryTimer.current = null;
       stop();
       engineRef.current?.stop();
     };
@@ -319,6 +397,28 @@ export default function ConnectedApp() {
     const cmd = closeCommand(Crypto.randomUUID(), 'SESSION_FINISH', s.plan.session_id, performedAt(anchorRef.current, performance.now(), PROCESS_ID, Date.now()).epochMs);
     void journalRef.current?.enqueue(cmd, s).then(() => engineRef.current?.kick()).catch(() => undefined);
   }, [state.phase, undo]);
+
+  // Les deux lectures sont indépendantes : une indisponibilité n’invente ni cadence ni historique.
+  useEffect(() => {
+    if (screen !== 'APP' || state.phase !== 'COMPLETE' || !state.plan) return;
+    let active = true;
+    const sessionId = state.plan.session_id;
+    setBilanContext({ sessionId, history: null, sessionsPerWeek: null, contextLine: null });
+    void api<TrainingPreferencesRead>('/me/training-preferences').then((value) => {
+      const declared = value.sessions_per_week;
+      if (active && Number.isInteger(declared) && declared! > 0) {
+        setBilanContext((current) => current?.sessionId === sessionId ? { ...current, sessionsPerWeek: declared! } : current);
+      }
+    }).catch(() => undefined);
+    void api<SessionHistoryRead>('/me/sessions?limit=500').then((value) => {
+      // Une page tronquée ne prouve pas une suite de semaines tenues.
+      if (!active || !Array.isArray(value.sessions) || value.has_more !== false || value.sessions.some((row) => !Number.isFinite(Date.parse(row.ended_at)))) return;
+      const history = value.sessions.filter((row) => row.id !== sessionId)
+        .map((row) => ({ slug: row.template_slug, atMs: Date.parse(row.ended_at) }));
+      setBilanContext((current) => current?.sessionId === sessionId ? { ...current, history, contextLine: summaryContext(value, sessionId) } : current);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [api, screen, state.phase, state.plan?.session_id]);
 
   // ── the deadline is the truth; the tick only redraws and detects the end ───
   const now = useNow(state.phase === 'REST' && !paused);
@@ -380,7 +480,8 @@ export default function ConnectedApp() {
   }, []);
 
   const start = useCallback(async (slug: string) => {
-    if (!mission || mission.state !== 'READY' || busy) return;
+    if (!mission || mission.state !== 'READY' || busy || sessionActionInFlight.current) return;
+    sessionActionInFlight.current = true;
     setBusy(true);
     setNotice(null);
     try {
@@ -403,12 +504,15 @@ export default function ConnectedApp() {
       else if (e instanceof ApiFailure && e.code === 'start_blocked') setNotice('Cette séance n’est pas faisable avec l’équipement déclaré.');
       else setNotice('AUREN est injoignable : le démarrage attend la connexion.');
     } finally {
+      sessionActionInFlight.current = false;
       setBusy(false);
     }
   }, [anchorOn, api, apply, busy, loadMission, mission]);
 
   const validate = useCallback((setId: number) => {
     const before = stateRef.current;
+    const currentSet = before.plan && setById(before.plan, setId);
+    if (currentSet && before.requiresSync[currentSet.se_id]) { feedback.refused(); return; }
     const at = performedAt(anchorRef.current, performance.now(), PROCESS_ID, Date.now());
     const nowMs = Date.now();
     const n = apply({ type: 'VALIDATED', setId, performedAt: at, nowMs });
@@ -474,11 +578,38 @@ export default function ConnectedApp() {
   }, [apply, cancelRestNotification, metric]);
 
   const requestSubstitute = useCallback((seId: number, name: string) => {
+    const before = stateRef.current;
+    if (!before.plan || before.requiresSync[seId]) return;
+    // Invalidate snapshots read before this mutation, including reads during its durable write.
+    substitutionWritesInFlight.current += 1;
+    journalReadVersion.current += 1;
     const s = apply({ type: 'REQUEST_SUBSTITUTE', seId, substitute: name });
     feedback.step();
-    if (!s.plan) return;
-    const cmd = substituteCommand(Crypto.randomUUID(), s.plan.session_id, seId, name);
-    void journalRef.current?.enqueue(cmd, s).then(() => engineRef.current?.kick()).catch(() => undefined);
+    setSubstitutionNotice(null);
+    const sessionId = before.plan.session_id;
+    const cmd = substituteCommand(Crypto.randomUUID(), sessionId, seId, name);
+    const finishWrite = () => {
+      substitutionWritesInFlight.current -= 1;
+      journalReadVersion.current += 1;
+      void refreshJournalRef.current().catch(() => undefined);
+    };
+    const failed = () => {
+      finishWrite();
+      const current = stateRef.current;
+      if (current.plan?.session_id !== sessionId || current.requiresSync[seId]?.substitute !== name) return;
+      const { [seId]: _request, ...rest } = current.requiresSync;
+      apply({ type: 'RESTORE', state: { ...current, requiresSync: rest } });
+      setSubstitutionNotice('Remplacement non enregistré sur l’appareil.');
+    };
+    const journal = journalRef.current;
+    if (!journal) { failed(); return; }
+    void journal.enqueue(cmd, s).then(() => {
+      finishWrite();
+      // Le fait est déjà durable : une panne du drain ne doit pas annuler sa demande.
+      void engineRef.current?.kick().catch(() => {
+        if (stateRef.current.plan?.session_id === sessionId) setSubstitutionNotice('Demande gardée, synchronisation en attente.');
+      });
+    }, failed);
   }, [apply]);
 
   // ── R10 / R12 — passer une série, passer un exercice (rien n'est écrit) ─────
@@ -565,15 +696,21 @@ export default function ConnectedApp() {
   }, [reschedule]);
 
   const resumeFromServer = useCallback(async () => {
-    if (mission?.state !== 'RESUME') return;
+    if (mission?.state !== 'RESUME' || sessionActionInFlight.current) return;
+    sessionActionInFlight.current = true;
+    setBusy(true);
     try {
       const plan = await fetchExecution(mission.session.id);
-      const rows = journalRef.current ? (await journalRef.current.restore()).sets : [];
+      const restored = journalRef.current ? await journalRef.current.restore() : { sets: [], outbox: [] };
       const local = stateRef.current;
-      apply({ type: 'RESTORE', state: stateFromServer(plan, local.phase === 'MISSION' ? null : local, rows, Date.now()) });
+      apply({ type: 'RESTORE', state: reconcileSubstitutions(stateFromServer(plan, local.phase === 'MISSION' ? null : local, restored.sets, Date.now()), restored.outbox) });
       setPaused(false);
+      setOffline(false);
     } catch {
       setOffline(true);
+    } finally {
+      sessionActionInFlight.current = false;
+      setBusy(false);
     }
   }, [apply, fetchExecution, mission]);
 
@@ -609,10 +746,13 @@ export default function ConnectedApp() {
 
   // ── screens ────────────────────────────────────────────────────────────────
   const openJournalSheet = () => setLab(true);
+  const currentBilan = bilanContext && bilanContext.sessionId === state.plan?.session_id ? bilanContext : null;
   let body: React.ReactNode = null;
   // MOB-01 — login, resume priority and first space go through the tested rule (spec `mobile/navigation-shell`)
   const opening = initialSpace({ authPending: screen === 'BOOT', signedIn: screen === 'APP', openWorkout: mission?.state === 'RESUME' });
-  if (opening === 'login') {
+  if (screen === 'BOOT') {
+    body = <BootScreen />;
+  } else if (opening === 'login') {
     body = <LoginScreen error={loginError} busy={busy} onSubmit={(u, p) => void login(u, p)} />;
   } else if (screen === 'APP') {
     const inWorkout = state.phase === 'SET' || state.phase === 'REST';
@@ -648,8 +788,10 @@ export default function ConnectedApp() {
           onRestPainted={onRestPainted}
           onSecondaryOpened={() => metric('SECONDARY-OPENED')}
           onExitRequested={requestExit}
-          statusNote={statusNote({ ...sync, offline: sync.offline || offline })}
-          serverStateOf={(setId) => serverSets[setId] ?? null}
+          offline={sync.offline || offline}
+          substitutionStateOf={(seId) => substitutions[seId]?.state ?? null}
+          statusNote={substitutionNotice ? { text: substitutionNotice, alert: true } : statusNote({ ...sync, offline: sync.offline || offline })}
+          serverStateOf={(setId) => serverSets[setId] === 'synced' || serverSets[setId] === 'refused' ? serverSets[setId] as 'synced' | 'refused' : null}
           onSkipSet={(setId) => skipWith({ type: 'SKIP_SET', setId, nowMs: Date.now() }, 'Série passée — elle ne sera pas comptée.')}
           onSkipExercise={() => skipWith({ type: 'SKIP_EXERCISE', nowMs: Date.now() }, 'Exercice passé — ses séries restantes ne seront pas comptées.')}
           undo={undo ? { text: undo.text, onUndo: takeBack } : null}
@@ -660,8 +802,10 @@ export default function ConnectedApp() {
         <CompleteScreen
           state={state}
           performance={showed}
-          history={null}
-          sessionsPerWeek={null}
+          serverStateOf={(setId) => serverSets[setId] ?? 'unknown'}
+          history={currentBilan?.history ?? null}
+          contextLine={currentBilan?.contextLine ?? null}
+          sessionsPerWeek={currentBilan?.sessionsPerWeek ?? null}
           next={next}
           reducedMotion={reducedMotion}
           onClose={closeBilan}
@@ -675,7 +819,8 @@ export default function ConnectedApp() {
           name={mission.session.name}
           subtitle={mission.session.subtitle}
           position={p ? { exerciseIndex: p.exercise_index, exerciseTotal: p.exercise_total, setsDone: p.sets_done, setsTotal: p.sets_total, exerciseName: p.exercise_name } : null}
-          note={null}
+          note={offline ? 'Hors ligne : la reprise attend la connexion. Les séries gardées sur l’appareil restent conservées.' : null}
+          busy={busy}
           onResume={() => void resumeFromServer()}
           onOpenJournal={openJournalSheet}
         />
@@ -688,6 +833,7 @@ export default function ConnectedApp() {
           <View style={{ flex: 1 }}>
             <MissionScreen
               mission={mission as unknown as Mission}
+              busy={busy}
               onStart={(slug) => void start(slug)}
               onOpenLab={openJournalSheet}
               onSecondaryOpened={() => metric('SECONDARY-OPENED')}
@@ -726,7 +872,7 @@ export default function ConnectedApp() {
       }
       body = (
         <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL }}>
-          <ExpoRoot context={SHELL_ROUTES} />
+          <ExpoRoot context={shellRoutes} />
         </ShellProvider>
       );
     }
