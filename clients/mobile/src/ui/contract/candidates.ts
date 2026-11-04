@@ -11,10 +11,12 @@
  * next exercise's zone is shown).
  */
 import type { WindowFixture } from '../instrument/RecessedWindowFixture';
+import type { SessionReviewState } from './SessionStatesFixture';
 import type { ScreenPhase } from './ExecutionScreenFixture';
 import type { MissionSource } from './MissionScreenFixture';
 
 export type CandidateFixture =
+  | { id: string; candidate: 'MOB02-STATE'; width: number; height: number; scenario: SessionReviewState }
   | {
       /** `window-<width>x<height>-<fixture>` */
       id: string;
@@ -58,7 +60,7 @@ export type CandidateFixture =
  * Empty between two iterations: the COMPLETE screens were approved (« OK », 2026-10-31) and moved to fixtures.ts
  * as COMPLETE-SCREEN-V1. The next iteration adds its own.
  */
-export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = [];
+export const CANDIDATE_FIXTURES: readonly CandidateFixture[] = (['boot', 'start-busy', 'resume-one', 'resume-busy', 'sub-pending', 'sub-refused', 'bilan-no-frequency', 'bilan-details'] as const).map((scenario) => ({ id: `mob02-${scenario}`, candidate: 'MOB02-STATE', width: 390, height: scenario === 'bilan-no-frequency' ? 2200 : 844, scenario }));
 
 export function candidateById(id: string | null | undefined): CandidateFixture | undefined {
   return CANDIDATE_FIXTURES.find((f) => f.id === id);

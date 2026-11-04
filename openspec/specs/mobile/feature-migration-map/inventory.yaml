@@ -1,6 +1,7 @@
 # MOB-00 — inventaire des fonctions web et de leur destination native.
 #
 # Source des routes : `app.routes` à `36b971a` (110 routes d'API, 18 modules), jamais une mémoire.
+# Évolution additive MOB-02 (2026-11-04) : deux lectures propriétaires pour le bilan, sans migration de la bibliothèque ou du journal.
 # Une entrée = une FONCTION UTILISATEUR ; chaque route montée appartient à exactement une entrée
 # (garde : tests/test_native_feature_migration_map.py).
 #
@@ -83,15 +84,18 @@ features:
   - id: session-recap
     feature: Bilan de fin de séance
     family: seance
-    routes: ["GET /sessions/{session_id}/done"]
+    routes:
+      - GET /sessions/{session_id}/done
+      - GET /api/mobile/v1/me/training-preferences
+      - GET /api/mobile/v1/me/sessions
     legacy_location: "sessions.done → session_done.html"
-    domain_owner: [session_recap, stats, session_completion]
-    api: "partiel — le bilan natif se calcule sur l'appareil ; historique et rythme hebdomadaire absents (history=null)"
-    data: [workout_sessions, set_logs]
+    domain_owner: [session_recap, stats, session_completion, training_preferences]
+    api: "lectures propriétaires fréquence/historique disponibles pour le bilan (MOB-02) ; câblage natif en cours"
+    data: [workout_sessions, set_logs, training_preferences]
     user_actions: [lire le bilan, voir la prochaine séance]
     native_destination: SÉANCE (CompleteScreen, livré)
     status: KEEP_DOMAIN
-    dependencies: [read model d'historique pour la comparaison « à toi-même »]
+    dependencies: [MOB-02 câblage et acceptation du bilan]
     visual_assets: [COMPLETE-SCREEN-V1]
     migration_risk: faible
 

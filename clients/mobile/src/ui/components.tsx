@@ -27,12 +27,15 @@ export function PrimaryAction(props: {
   onPressIn?: (e: GestureResponderEvent) => void;
   hint?: string;
   testID?: string;
+  busy?: boolean;
 }) {
   const tone = props.tone ?? 'signal';
   const fg = tone === 'signal' ? color.onSignal : tone === 'trace' ? color.system : color.ink;
   return (
     <Pressable
       testID={props.testID}
+      disabled={props.busy}
+      accessibilityState={{ busy: props.busy ?? false, disabled: props.busy ?? false }}
       accessibilityRole="button"
       accessibilityLabel={props.sublabel ? `${props.label}, ${props.sublabel}` : props.label}
       accessibilityHint={props.hint}

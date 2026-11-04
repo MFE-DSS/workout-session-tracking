@@ -49,6 +49,8 @@ export type ExecutionHandlers = {
   onExitRequested?: () => void;
   /** D9 — a quiet secondary state (offline, to check). `null` on the nominal path. */
   statusNote?: { text: string; alert: boolean } | null;
+  offline?: boolean;
+  substitutionStateOf?: (seId: number) => 'pending' | 'inflight' | 'acked' | 'failed' | null;
   /**
    * D9 §8.7 — what the SERVER says of a set: acknowledged, refused, or nothing yet
    * (still « enregistrée sur l'appareil »). Absent in the lab, which has no server.
@@ -265,7 +267,7 @@ function SetBody(props: {
 
       <Guidance exercise={exercise} currentLoad={draft.weight} />
       {pending ? (
-        <Text style={styles.requiresSync}>{`Remplacement demandé : ${pending.substitute} — en attente de validation par AUREN`}</Text>
+        <Text style={styles.requiresSync}>{`Remplacement demandé : ${pending.substitute} — ${props.substitutionStateOf?.(exercise.se_id) === 'acked' ? 'reçu par AUREN, mise à jour de l’exercice en attente' : props.offline ? 'sera envoyé au retour du réseau' : 'en attente de validation par AUREN'}`}</Text>
       ) : null}
 
       <View style={{ flex: 1, minHeight: 8 }} />
@@ -294,7 +296,8 @@ function SetBody(props: {
       {valid ? (
         <PrimaryAction
           testID="validate"
-          label="Valider la série"
+          label={pending ? 'Remplacement en attente' : 'Valider la série'}
+          busy={Boolean(pending)}
           sublabel={`${kg(draft.weight)} kg × ${draft.reps}`}
           onPressIn={props.onValidatePressIn}
           onPress={() => props.onValidate(setId)}
