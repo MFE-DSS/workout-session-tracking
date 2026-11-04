@@ -25,7 +25,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import bcrypt
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -154,6 +154,37 @@ def me(user: ApiUser) -> dict[str, Any]:
 
 
 # ── MISSION ──────────────────────────────────────────────────────────────
+
+
+# ── MOB-02 : lectures propriétaires du bilan, sans écriture ────────────────
+
+
+@router.get("/me/training-preferences")
+def training_preferences(user: ApiUser, db: DbSession) -> dict[str, Any]:
+    from app.services.training_preferences import get_training_preferences
+
+    declared = get_training_preferences(db, user.id).sessions_per_week
+    return {} if declared is None else {"sessions_per_week": declared}
+
+
+@router.get("/me/sessions")
+def completed_sessions(
+    user: ApiUser, db: DbSession, limit: int = Query(default=100, ge=1, le=500),
+) -> dict[str, Any]:
+    # Les faits canoniques : séances terminées et comptabilisables de cet utilisateur.
+    rows = list(db.execute(
+        select(WorkoutSession).where(
+            WorkoutSession.user_id == user.id,
+            WorkoutSession.status == SessionStatus.COMPLETED.value,
+            WorkoutSession.excluded_from_stats.is_(False),
+            WorkoutSession.ended_at.is_not(None),
+        ).order_by(WorkoutSession.ended_at.desc(), WorkoutSession.id.desc()).limit(limit + 1)
+    ).scalars())
+    return {"sessions": [
+        {"id": row.id, "template_slug": row.template_slug_snapshot,
+         "started_at": iso_utc(row.started_at), "ended_at": iso_utc(row.ended_at)}
+        for row in rows[:limit]
+    ], "has_more": len(rows) > limit}
 
 
 @router.get("/mission")

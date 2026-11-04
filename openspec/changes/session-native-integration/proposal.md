@@ -70,3 +70,18 @@ voit donc des faits faux sur ce qu'AUREN a reçu. Cette tranche rend la séance 
   alimenté ; tests jest des fonctions pures ajoutées.
 - `app/routers/mobile_api.py` (si D-MOB02-1 = a) : deux routes GET en lecture seule + leurs tests ; aucune écriture.
 - Passe appareil : émulateur Android (production) et iPhone ; captures des états hors chemin heureux.
+
+## Décisions opérateur acceptées — 2026-11-03
+
+L'artefact « AUREN — CODEX REPRISE / MOB-02 » transmis dans la session Codex accepte :
+
+- **D-MOB02-1 = A** : deux lectures GET mobiles pour la fréquence déclarée et l'historique requis par le bilan,
+  depuis les services/données canoniques, isolées par `user_id` authentifié ; aucune migration, aucune vérité
+  dupliquée ; une source absente est omise, sans valeur par défaut présentée comme déclarée ou mesurée.
+- **D-MOB02-2** : AUREN-MARK-V1 seule pendant la restauration de l'authentification ; aucun texte, nouveau logo,
+  redesign décoratif ni animation supplémentaire.
+
+Ces décisions lèvent les alternatives du bloc historique ci-dessus. La roadmap est désormais CODX-00 → CI-01
+→ MOB-02, avec STORE-00 et les assets en parallèle. Aucun code produit n'est ouvert par la remise à niveau Git.
+Preuves de build requises : restaurer les succès depuis `restore().outbox` (pas seulement `outboxRows()`),
+consommation par le vrai chemin `ConnectedApp`, états dégradés Android puis passe iPhone connectée avec l'opérateur.

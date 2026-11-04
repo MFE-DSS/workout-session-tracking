@@ -45,3 +45,13 @@ L'API mobile (`app/routers/mobile_api.py`) n'expose ni historique ni préférenc
 
 - La réponse d'un refus de substitution par le serveur porte-t-elle une raison affichable ? À lire dans
   `mobile_api.py` avant d'écrire la phrase (aucune raison inventée).
+
+## Décisions opérateur acceptées — 2026-11-03
+
+D-MOB02-1=A et D-MOB02-2=AUREN-MARK-V1 seule, sans texte ni animation nouvelle, sont acceptées par l'artefact
+de reprise. Les deux routes GET prévues en option (a) sont donc retenues, avec ownership serveur et données
+absentes omises. Les paragraphes conditionnels précédents sont conservés comme historique de conception.
+
+La restauration doit lire les commandes acquittées persistées via `restore().outbox` ; `outboxRows()` les exclut.
+Les tests doivent traverser le consommateur réel `ConnectedApp` en plus des fonctions pures utiles.
+Le build attend CODX-00 puis CI-01 ; aucun changement produit dans cette consignation.

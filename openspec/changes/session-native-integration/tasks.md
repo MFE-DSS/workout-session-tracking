@@ -2,7 +2,7 @@
 
 ## 1. Décisions
 
-- [ ] 1.1 Obtenir D-MOB02-1 (bilan : lectures serveur ou report) et D-MOB02-2 (écran de démarrage) ; les consigner dans `design.md`
+- [x] 1.1 D-MOB02-1=A et D-MOB02-2=AUREN-MARK-V1 seule acceptées le 2026-11-03 ; décisions consignées en annexe de `proposal.md` et `design.md`
 
 ## 2. Client
 
@@ -16,7 +16,7 @@
 
 ## 3. Serveur (si D-MOB02-1 = a)
 
-- [ ] 3.1 `GET /api/mobile/v1/me/training-preferences` et `GET /api/mobile/v1/me/sessions` en lecture seule, isolés par `user_id`, avec tests
+- [x] 3.1 `GET /api/mobile/v1/me/training-preferences` et `GET /api/mobile/v1/me/sessions` en lecture seule, isolés par `user_id`, avec tests
 - [ ] 3.2 Déploiement du canonique en production avant la passe appareil
 
 ## 4. Revue et passe appareil
