@@ -54,4 +54,6 @@ L’opérateur accepte : **« Valider ce rendu »**. Les captures et leurs empre
 
 ## Vérifications locales
 
-Nouveau delta : **54 suites / 676 tests mobiles**, TypeScript ; service isolé **17 tests** passants sur SQLite réel, **246 tests backend ciblés/broad** passants après la dernière garde ; Ruff fichiers neufs et budget **264≤548**, Bandit ciblé, protocole documentaire et OpenSpec strict **7/7**. Nouvelle lecture du tier avant les checks ; pas de full sweep local sur ce code sans migration appliquée. Revue indépendante et CI exacte restent à consigner avant merge.
+Nouveau delta : **54 suites / 676 tests mobiles**, TypeScript ; service isolé **18 tests** passants sur SQLite réel, **248 tests backend ciblés/broad** passants après la dernière garde ; Ruff fichiers neufs et budget **264≤548**, Bandit ciblé, protocole documentaire et OpenSpec strict **7/7**. Nouvelle lecture du tier avant les checks ; pas de full sweep local sur ce code sans migration appliquée. Revue indépendante et CI exacte restent à consigner avant merge.
+
+Revue indépendante du delta : un Important confirmé, correction du helper canonique de réauthentification sans réhydratation de l’objet principal avant validation. Deux régressions sur demande existante/tentatives répétées observées RED puis GREEN ; broad backend248, Jest676 et TypeScript repassés après correction. Aucun autre Important/Critical, aucune activation ou recette physique déduite. Tier final SHARED_CODE.

@@ -236,3 +236,20 @@ def test_equivalent_offset_cursors_have_identical_pages(client):
         b = bp.list_weight_measurements(db, user.id, before=(offset, boundary.id))
         assert [r.id for r in a] == [older.id]
         assert [r.id for r in b] == [older.id]
+
+
+def test_reauthentication_refusal_preserves_the_authenticated_principal_snapshot(client):
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.services.account_lifecycle import AccountRejected, reauthenticate_account
+
+    with SessionLocal() as old, SessionLocal() as changed:
+        user = old.query(User).filter_by(username="testuser").one()
+        epoch, hashed = user.session_epoch, user.password_hash
+        changed.execute(update(User).where(User.id == user.id).values(session_epoch=epoch + 1))
+        changed.commit()
+        for _ in range(2):
+            with pytest.raises(AccountRejected):
+                reauthenticate_account(old, user, current_password="testpass")
+            assert user.session_epoch == epoch
+            assert user.password_hash == hashed

@@ -318,3 +318,22 @@ def test_irreversible_status_cannot_be_recovered_by_active_identity_reuse(databa
             svc.read_status_capability(db, 7, receipt["request_id"], token, now=NOW)["state"]
             == "PENDING"
         )
+
+
+def test_refused_stale_principal_is_not_promoted_for_repeated_status_or_capability(database):
+    receipt = submit(database)
+    with Session(database) as old, Session(database) as other:
+        stale = old.get(User, 7)
+        expected_epoch = stale.session_epoch
+        expected_hash = stale.password_hash
+        other.execute(update(User).where(User.id == 7).values(session_epoch=1))
+        other.commit()
+        svc = service()
+        for _ in range(2):
+            with pytest.raises(AccountRejected):
+                svc.issue_status_capability(old, stale, receipt['request_id'], current_password='testpass', now=NOW)
+            assert stale.session_epoch == expected_epoch
+            assert stale.password_hash == expected_hash
+            with pytest.raises(StatusDenied):
+                svc.read(old, stale, receipt['request_id'])
+        assert old.execute(select(requests.c.capability_hash)).scalar_one() is None

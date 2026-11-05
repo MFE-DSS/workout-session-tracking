@@ -151,9 +151,9 @@ def reauthenticate_account(db: Session, user: User, *, current_password: str) ->
     expected_epoch, expected_hash = user.session_epoch or 0, user.password_hash
     with db.no_autoflush:
         current = db.execute(
-            select(User).where(User.id == user.id)
-            .execution_options(populate_existing=True)
-        ).scalar_one_or_none()
+            select(User.id, User.is_active, User.session_epoch, User.password_hash)
+            .where(User.id == user.id)
+        ).one_or_none()
     valid = (
         current is not None and current.is_active
         and (current.session_epoch or 0) == expected_epoch
@@ -162,7 +162,10 @@ def reauthenticate_account(db: Session, user: User, *, current_password: str) ->
     )
     if not valid or not verify_password(current_password, current.password_hash):
         raise AccountRejected("reauthentication_required", "Réauthentification nécessaire.")
-    return current
+    # Validation must not refresh/mutate the authenticated principal: a refused
+    # stale epoch must remain stale on every subsequent attempt. The caller uses
+    # its captured epoch/hash in the atomic mutation guard.
+    return user
 
 
 def revoke_account_sessions(db: Session, user: User, *, current_password: str) -> None:

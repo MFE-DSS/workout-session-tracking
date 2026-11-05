@@ -12,7 +12,7 @@ Périmètre courant approuvé par « Approuver cette scission traçable » (GOV-
 - [x] CORE-06 : FirstPlanClient et premier usage branchés ; états honnêtes, snapshot absent par défaut, aucune fixture READY servie ; résultat SCI sans handoff de séance encore indisponible, reprise prioritaire et préférences éditables ensuite.
 - [x] CORE-07 : croquis et rendu du nouveau passage acceptés : « Valider ce croquis ciblé », « Valider ce rendu » ; inventaire/avant-après/références et captures consignés.
 - [x] CORE-08 : compatibilité backend/client, plan appareil et rollback préparés ; aucun déploiement ou recette physique prétendus exécutés.
-- [ ] CORE-09 : revue indépendante finale, corrections dans le périmètre, check_scope et contrôles ciblés/broad, Jest/TypeScript, sécurité, protocole et OpenSpec strict réussis sur le delta final.
+- [x] CORE-09 : revue indépendante finale, corrections dans le périmètre, check_scope et contrôles ciblés/broad, Jest/TypeScript, sécurité, protocole et OpenSpec strict réussis sur le delta final.
 - [ ] CORE-10 : publier dans #353, vérifier tous les contrôles obligatoires du HEAD final et absence de revue bloquante ; consigner Sonar consultatif réel, merger par commit de merge sous GO permanent sans bypass.
 - [ ] CORE-11 : vérifier CI canonique du merge, closeout et archive du seul socle ; préparer MOB04 specs/fixtures sans intelligence inventée ni GO BUILD ; préserver les propositions DATA/PLAN/RELEASE ouvertes et les preuves QA.
 
