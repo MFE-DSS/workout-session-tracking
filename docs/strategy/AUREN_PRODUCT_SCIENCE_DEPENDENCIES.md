@@ -56,3 +56,8 @@ Surfaces à risque de collision : modèles/préférences, `mobile_read_models.py
 Le mobile peut déjà consommer les états et champs canoniques de MISSION/exécution ; aucune nouvelle garantie de validation scientifique globale n'est déduite de leur existence. Il attend le handoff S0 pour les écarts, les contrats futurs et leur ordre. À ne pas coder côté produit : volume optimal, taxonomie nouvelle, seuil de récupération, score de confiance, bornes E7, interprétation anthropométrique ou huit dimensions biologiques.
 
 À retourner pour chaque demande : statut, version, sources/fixtures acceptées, champs disponibles maintenant, champs en investigation, inconnues, compatibilité et prochain livrable. Aucune réception du handoff scientifique ni achèvement S0 n'est revendiqué à cette passe.
+
+
+## Précision opérateur — souhait déclaré et analyse, 5 novembre
+
+Les priorités choisies dans l'éditeur sont facultatives et expriment un souhait, sans être le déterminant unique attendu du futur moteur. Les points forts/faibles doivent résulter de l'interprétation justifiée des observations et de l'historique, selon les contrats scientifiques à livrer ; aucun rang déclaré n'est une mesure ou une faiblesse diagnostiquée. SCI-P01/P02 devront préciser la place de ce signal parmi les autres inputs et les états inconnus, sans coefficient arbitraire défini par l'UI. Cette précision ne modifie pas les règles opérationnelles historiques sans audit ni spec scientifique.

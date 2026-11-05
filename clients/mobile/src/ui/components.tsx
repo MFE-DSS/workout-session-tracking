@@ -61,9 +61,13 @@ export function PrimaryAction(props: {
   );
 }
 
-export function SecondaryButton(props: { label: string; onPress: () => void; style?: ViewStyle; a11y?: string }) {
+export function SecondaryButton(props: { label: string; onPress: () => void; style?: ViewStyle; a11y?: string; selected?: boolean; disabled?: boolean; testID?: string }) {
   return (
     <Pressable
+      testID={props.testID}
+      disabled={props.disabled}
+      accessibilityState={props.selected === undefined && props.disabled === undefined ? undefined : { selected: props.selected, disabled: props.disabled }}
+      aria-selected={props.selected}
       accessibilityRole="button"
       accessibilityLabel={props.a11y ?? props.label}
       onPress={props.onPress}

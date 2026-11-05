@@ -2,10 +2,10 @@
 
 Date : 5 novembre 2026. Auteur : agent de réalisation. Destinataires : opérateur, Product Owner designer, architecte.
 
-**Statut : diagnostic et propositions à arbitrer, pas une conception approuvée.**
+**Statut courant : compte V1 ajustée accepté ; extension des préférences acceptée, grille compacte revue par délégation ; Blueprint complet et autres surfaces encore à arbitrer.**
 **Actualisation après recadrage opérateur du 5 novembre :** lire le [recalage produit/science/artistique](strategy/AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md) et le [registre des dépendances scientifiques](strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md). Ils précisent les orientations reçues et les besoins encore ouverts. L'entrée composée est désormais la direction retenue ; le Blueprint en quatre moments est une cible à confronter au domaine, pas une maquette acceptée. Le [manifeste canonique v1.0](strategy/AUREN_MANIFESTO_V1.md) est désormais reçu et conservé intégralement ; il est distinct du mandat scientifique S0.
 Le mandat PRODUCT DELIVERY reçu ensuite ouvre l'exécution MOB-03 dans son change existant, avec approbations visuelles et contrats de domaine applicables. Les autres tranches ne sont pas ouvertes par ce brief.
-Base canonique de référence : `90da8461803e87897c3d8f48627c4b704b3cfcd6` ; socle API MOB-03 :
+Révisions historiques du diagnostic : base `90da8461803e87897c3d8f48627c4b704b3cfcd6` ; socle de compte MOB-03 :
 `da9b6a3e3328d4affbc59d69d57c1564585301d6`, PR draft [#353](https://github.com/MFE-DSS/workout-session-tracking/pull/353).
 Les constats ci-dessous résultent d'une lecture du dépôt, pas d'une nouvelle recette appareil ou d'un audit utilisateur.
 
@@ -58,13 +58,13 @@ Assets et implémentations à réutiliser :
 
 | Surface | Réalité dans le dépôt | Écart à traiter |
 |---|---|---|
-| Connexion | `LoginScreen.tsx` : texte AUREN, titre Connexion, identifiant/mot de passe, erreur et CTA ; pas de composant logo dans cet écran | Composition d'entrée, hiérarchie de marque, entrée inscription et récupération à concevoir |
+| Connexion | AurenMark existant, entrée V1 ajustée avec « AUREN AI », accroche unique et champs centrés ; rendu accepté | Recette appareil, clavier et accessibilité native à terminer |
 | Démarrage / reprise | Boot, reprise, journal et séance existent | Distinguer lancement, restauration, compte expiré et attribution du journal ; conserver les preuves hors ligne |
 | Aujourd'hui | Route branchée sur les états MISSION de `ConnectedApp` | MISSION visuellement LOCKED ; MOB-04 reste la tranche d'extension du parcours |
 | Programmes / Progrès / Profil | Routes présentes avec `PendingSpace` et ouverture du site | Coque réelle, fonctions principales pas encore migrées ; ne pas les présenter comme déjà natives |
 | Onboarding | `OnboardingFlow.tsx` utilise notamment `src/lab/profile` | Référence exploratoire ; champs, valeurs et étapes pas une décision pour le compte connecté |
 | Séance / repos / bilan | Surfaces existantes et contrats visuels ; recette MOB-02 partiellement acquise | Préserver ce parcours lors des nouveaux branchements, poursuivre la recette physique |
-| Inscription / changement de mot de passe | API construite, UI native nouvelle absente | Consommateur, garde propriétaire, composition et validation à réaliser |
+| Inscription / changement de mot de passe | API et consommateurs natifs raccordés, garde propriétaire testée, surfaces compte exposées et acceptées | Recettes appareil et déploiement compatible restent distincts |
 
 ## 5. Les deux accueils à distinguer
 
@@ -132,9 +132,9 @@ Le PO designer peut répondre dans ce tableau, avec une référence Figma ou un 
 
 | Décision | Réponse attendue | Qui tranche | État |
 |---|---|---|---|
-| P01 — entrée | Une seule connexion-accueil de marque ; accès inscription, pas de bienvenue répétée pour utilisateur reconnu | Direction transmise par l'opérateur | DIRECTION REÇUE ; rendu à valider |
-| P02 — message | « Ton entraînement, construit autour de toi. » | Proposition éditoriale reçue | À présenter dans le rendu |
-| P03 — composition | Hiérarchie fournie dans le recadrage ; vrai AurenMark, CTA et accès récupération/confidentialité | PO designer ; validation opérateur | HIÉRARCHIE REÇUE ; aucune maquette acceptée |
+| P01 — entrée | Une seule connexion-accueil de marque ; accès inscription, pas de bienvenue répétée pour utilisateur reconnu | Direction transmise par l'opérateur | V1 AJUSTÉE ACCEPTÉE |
+| P02 — message | « Ton entraînement, construit autour de toi. » | Proposition éditoriale reçue | ACCEPTÉE DANS LA V1 AJUSTÉE |
+| P03 — composition | Hiérarchie fournie dans le recadrage ; vrai AurenMark, CTA et accès récupération/confidentialité | PO designer ; validation opérateur | COMPTE V1 AJUSTÉE ACCEPTÉ ; autres surfaces selon leurs gates |
 | P04 — compte | Identifiant, mot de passe et confirmation à la création ; email non obligatoire artificiellement ; aide/récupération et placement changement à préciser | PO + architecte ; validation opérateur | DIRECTION REÇUE ; détails ouverts |
 | P05 — acquisitions | Blueprint cible en quatre moments ; pour chaque champ : usage consommateur, obligatoire/facultatif et stockage | PO + agent scientifique/architecte | CIBLE REÇUE ; D1/D4 partiellement ouverts |
 | P06 — poids | Mesure datée/historisable ; héritage sans date séparé ; chronologie et unités supportées à contractualiser | PO + architecte | PRINCIPES REÇUS ; D2 à finaliser |
@@ -181,3 +181,14 @@ L'opérateur a validé le croquis le 5 novembre : "Valider ce croquis pour la pl
 ## Validation du rendu V1 ajustée — 5 novembre
 
 Réponse opérateur : « Ouais, très bien, continue maintenant sur ton critical pass. On va dire que c'est validé. » La V1 ajustée est retenue : logo et accroche V1, sans grand titre d'entrée, champs centrés, « AUREN AI » uniquement à l'entrée. Le [rapport UI](SPRINT_MOB03_NATIVE_ACCOUNT_UI_REPORT.md) conserve l'avant/après et cette décision. Les mentions de candidat ci-dessus décrivent les étapes antérieures ; elles ne remettent pas cette acceptation en question. Les gaps Blueprint, la politique d'effacement et les preuves appareil restent distincts.
+
+## Suite demandée — visuels préparés puis alimentés par la science
+
+L'opérateur confirme le 5 novembre : poursuivre le critical path, puis enrichir la roadmap selon le manifeste par les composants, fonctionnalités visuelles et assets ; il fournira les prompts d'injection du moteur scientifique. Cette direction n'ouvre pas simultanément les autres tranches.
+
+- Priorité actuelle : rendre utilisables les déclarations existantes, conserver compte/journal/séance et finir leurs preuves, avec les blocages Blueprint/effacement explicités.
+- À l'ouverture des tranches suivantes : préparer les composants consommateurs et leurs états (donnée présente, absente, en attente, explication) avec fixtures de démonstration ; réserver les projections compacte et détaillée permises par les contrats. Aucun score, seuil, mensuration ou pourcentage décoratif.
+- Assets : suivre l'ordre déjà reçu, mannequin de référence → Smith incliné START/END → fiche pilote → série après validation, avec provenance et disponibilité réelles. Préparer les emplacements ne prouve pas qu'un asset final soit livré. Le BodyMap fonctionnel reste distinct des illustrations.
+- Intégration scientifique : contrats et fixtures versionnés, audit de compatibilité, tests consommateurs, puis alimentation des composants par le moteur. Le premier plan reste ouvert tant que son contrat manque.
+
+Le croquis des deux pages de préférences est accepté : « Valider ce parcours ciblé ». Le profil complet web reste accessible en lien secondaire de cet éditeur afin de conserver le parcours existant ; ce détail est signalé dans le rendu de revue. Aucun nouvel écran P1/P2 ou nouvel asset n'est réalisé par ce seul relevé.

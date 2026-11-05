@@ -1,0 +1,66 @@
+{
+  "contract_version": 1,
+  "declarations": {
+    "sessions_per_week": null,
+    "focus_priorities": null,
+    "available_equipment": null
+  },
+  "options": {
+    "sessions_per_week": {
+      "min": 1,
+      "max": 7
+    },
+    "focus_priorities": [
+      {
+        "value": "pecs",
+        "label": "Pectoraux"
+      },
+      {
+        "value": "shoulders",
+        "label": "Épaules"
+      },
+      {
+        "value": "back_width",
+        "label": "Dos largeur"
+      },
+      {
+        "value": "back_thickness",
+        "label": "Dos épaisseur"
+      },
+      {
+        "value": "arms",
+        "label": "Bras"
+      },
+      {
+        "value": "lower",
+        "label": "Bas du corps"
+      }
+    ],
+    "available_equipment": [
+      {
+        "value": "barbell",
+        "label": "Barre libre"
+      },
+      {
+        "value": "bodyweight",
+        "label": "Poids du corps"
+      },
+      {
+        "value": "cable",
+        "label": "Poulie"
+      },
+      {
+        "value": "dumbbell",
+        "label": "Haltères"
+      },
+      {
+        "value": "machine",
+        "label": "Machine guidée"
+      },
+      {
+        "value": "smith",
+        "label": "Smith machine"
+      }
+    ]
+  }
+}

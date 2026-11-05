@@ -87,3 +87,50 @@ Décision opérateur : « je préfère […] la V1 […] juste retire ton espace
 ```
 
 Rétablir la composition V1 sur la planche, retirer le filigrane géant et les mots-clés V2. Sur l'entrée uniquement : supprimer le titre « Ton espace d'entraînement », centrer les libellés et valeurs des deux champs, présenter « AUREN AI » comme variante éditoriale demandée. L'accroche reste une seule fois. Pas de renommage global, de logo redessiné ou de nouvelle capacité IA introduite. Les comportements de compte restent inchangés.
+
+
+## Extension ciblée — préférences réellement enregistrables, croquis à valider
+
+Accès : Profil → ligne actuelle « Profil d'entraînement » remplacée par « Préférences d'entraînement », destination native. La création de compte continue d'ouvrir la MISSION existante ; ce parcours ne se présente pas comme le Blueprint complet. Aucun champ sans API collecté.
+
+```text
+DISPONIBILITÉ · 1/2                 PRIORITÉS · 2/2
+Retour           AUREN            Retour           AUREN
+Ta disponibilité                  Tes priorités
+Séances par semaine               Zones dans ton ordre de priorité
+[Non déclaré] [1]...[7]*           [Non déclaré] [Sans priorité]
+Familles de matériel              [Zone canonique : rang si choisie]*
+[Non déclaré] [Aucun matériel]     Une sélection ajoute en fin de liste ;
+[Barre][Haltères][Poulie]...*       un second appui la retire.
+                                  Les autres rangs se recalculent.
+[Continuer]                       [Enregistrer]
+```
+
+`*` : valeurs/libellés/bornes fournis par la ressource serveur existante, pas une taxonomie locale. Même AccountFrame, mêmes primitives et tokens que le compte accepté. Aucune durée, taille, expérience, contrainte médicale ou promesse d'allocation affichée. « Familles » ne devient pas une salle concrète. Les deux pages partagent une saisie en mémoire et n'envoient qu'un remplacement complet, après lecture préalable.
+
+États : chargement avec retour ; lecture impossible → Réessayer, sans formulaire rempli de valeurs par défaut ; sauvegarde → commandes verrouillées ; refus → saisie conservée ; réponse perdue → « Enregistrement à vérifier », pas de répétition, action « Relire sur AUREN » ; résultat confirmé → « Préférences enregistrées sur AUREN » et retour Profil. Une relecture vérifie les valeurs actuelles, jamais l'origine d'une écriture ; la saisie reste disponible si elle diffère. Connexion expirée → reconnecter sans purge du journal. Retour/Android avec modifications non enregistrées : confirmation native de sortie ; aucun faux brouillon persistant.
+
+### Brainstorming / Options / Risques / Choix retenu
+
+Une longue page unique réduirait le nombre d'étapes mais mélangerait rythme et ordre des priorités. Reprendre les quatre moments Blueprint forcerait des champs sans contrats. Proposition ciblée : deux pages de préférences canoniques, indépendantes du premier plan. Coût : Blueprint complet reste à raccorder après contrats scientifiques ; bénéfice immédiat : une vraie déclaration native et reprenable après confirmation. Le modèle de formulaire/réseau peut être préparé sans code de composition pendant la revue de ce croquis.
+
+
+Acceptation du croquis ciblé le 5 novembre : « Valider ce parcours ciblé ». Autorise la composition des deux pages décrites et leurs états ; le rendu réel reste à exposer avant commit UI.
+
+
+## Ajustement des priorités — demande opérateur et validation visuelle déléguée
+
+L'opérateur accepte le rendu puis demande de remplacer la liste verticale de grandes lignes par de petits blocs : « Tu le fais sans me demander, tu le valides. » Cette instruction précise vaut croquis pour ce seul ajustement et délègue sa revue visuelle à l'agent. Elle ne constitue pas une dispense générale de validation des autres écrans.
+
+```text
+Tes priorités
+Les zones que tu souhaites privilégier.
+[Non déclaré] [Sans priorité]
+[Pectoraux]      [Épaules]
+[Dos largeur]    [Dos épaisseur]
+[1 · Bras]       [Bas du corps]
+Choix facultatifs ; second appui pour retirer.
+[Enregistrer]
+```
+
+La grille lit toujours les valeurs/libellés canoniques et affiche le rang déclaré. L'ordre ne devient pas un diagnostic de points forts/faibles ni un coefficient scientifique. La place de cette préférence parmi les observations/historiques sera définie par les futurs contrats du moteur, sans changer ici les règles existantes.

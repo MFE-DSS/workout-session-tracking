@@ -21,6 +21,7 @@ import { AppState, BackHandler, Linking, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ApiFailure, createTransport } from './src/api/http';
+import { TrainingPreferencesClient } from './src/api/trainingPreferences';
 import { ExecutionPlan, isStartable, ServerMission, SessionHistoryRead, TrainingPreferencesRead } from './src/api/types';
 import { AuthSession, type AccountOutcome, type Registration, type PasswordChange } from './src/auth/authSession';
 import { credentialStore } from './src/auth/credentialStore';
@@ -60,6 +61,7 @@ import { LabSheet } from './src/ui/LabSheet';
 import { LoginScreen } from './src/ui/LoginScreen';
 import { SignupScreen, PasswordScreen } from './src/ui/account/AccountForms';
 import { AccountResultScreen, AccountSettingsScreen, JournalOwnershipScreen } from './src/ui/account/AccountPages';
+import { TrainingPreferencesScreen } from './src/ui/account/TrainingPreferencesScreen';
 import { MissionScreen } from './src/ui/MissionScreen';
 import { QuietScreen } from './src/ui/QuietScreen';
 import { ResumePosition, ResumeScreen } from './src/ui/ResumeScreen';
@@ -131,7 +133,9 @@ export default function ConnectedApp() {
   const [account, setAccount] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<'invalid' | 'network' | null>(null);
   const [busy, setBusy] = useState(false);
-  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | null>(null);
+  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | 'preferences' | null>(null);
+  const preferencesExit = useRef<(() => void) | null>(null);
+  const registerPreferencesExit = useCallback((handler: (() => void) | null) => { preferencesExit.current = handler; }, []);
   const [accountOutcome, setAccountOutcome] = useState<AccountOutcome | null>(null);
   const accountFlight = useRef(false);
   const ownershipFlight = useRef<Promise<void> | null>(null);
@@ -167,6 +171,7 @@ export default function ConnectedApp() {
     }),
     [],
   );
+  const preferencesClient = useMemo(() => new TrainingPreferencesClient(auth, transport), [auth]);
 
   const apply = useCallback((event: Event): WorkoutState => {
     const n = reduce(stateRef.current, event);
@@ -783,6 +788,7 @@ export default function ConnectedApp() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (accountView) {
+        if (accountView === 'preferences') { preferencesExit.current?.(); return true; }
         if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); }
         return true;
       }
@@ -879,22 +885,27 @@ export default function ConnectedApp() {
   const openWeb = (path: string) => { if (API_URL) void Linking.openURL(`${API_URL.replace(/\/+$/, '')}${path}`); };
   const privacy = PRIVACY_URL?.startsWith('https://') ? () => { void Linking.openURL(PRIVACY_URL); } : undefined;
   const leaveAccountView = () => { if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); } };
+  const reconnectAccount = () => {
+    if (accountFlight.current) return;
+    // Keep owned pending workout facts in their partition during reauthentication.
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null);
+    apply({ type: 'RESET' }); setAccount(null); setMission(null); setNext(null); setBilanContext(null); setServerSets({});
+    setAccountView(null); setAccountOutcome(null); setScreen('LOGIN');
+  };
   const accountSettings = <AccountSettingsScreen username={account} onPassword={() => { setAccountOutcome(null); setAccountView('password'); }}
+    onPreferences={() => setAccountView('preferences')}
     onExport={API_URL ? () => openWeb('/export') : undefined} onPrivacy={privacy}
     onWebProfile={API_URL ? () => openWeb('/profile') : undefined} onSignOut={() => void signOut()} />;
-  if (accountView === 'created' || accountView === 'password-done') {
+  if (accountView === 'preferences' && screen === 'APP') {
+    body = <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={leaveAccountView}
+      onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />;
+  } else if (accountView === 'created' || accountView === 'password-done') {
     body = <AccountResultScreen kind={accountView === 'created' ? 'created' : 'password'} onContinue={leaveAccountView} />;
   } else if (accountView === 'signup' && screen === 'LOGIN') {
     body = <SignupScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void register(input)} onBack={leaveAccountView} onLogin={leaveAccountView} />;
   } else if (accountView === 'password' && screen === 'APP') {
     body = <PasswordScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void changePassword(input)} onBack={leaveAccountView}
-      onLogin={() => {
-        if (accountFlight.current) return;
-        // Reauthentication is not a destructive sign-out. Keep owned unsent facts in their partition.
-        engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null);
-        apply({ type: 'RESET' }); setAccount(null); setMission(null); setNext(null); setBilanContext(null); setServerSets({});
-        setAccountView(null); setAccountOutcome(null); setScreen('LOGIN');
-      }} />;
+      onLogin={reconnectAccount} />;
   } else if (screen === 'BOOT') {
     body = <BootScreen />;
   } else if (screen === 'OWNERSHIP') {

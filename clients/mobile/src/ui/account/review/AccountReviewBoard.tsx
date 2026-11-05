@@ -7,6 +7,7 @@ import { LoginScreen } from '../../LoginScreen';
 import { SignupScreen, PasswordScreen } from '../AccountForms';
 import { AccountResultScreen, AccountSettingsScreen, JournalOwnershipScreen } from '../AccountPages';
 import { BlueprintCandidate } from './BlueprintCandidate';
+import { TrainingPreferencesReview, type PreferencesReviewMode } from './TrainingPreferencesReview';
 import { MissionScreenFixture } from '../../contract/MissionScreenFixture';
 import { color, type } from '../../theme';
 
@@ -31,11 +32,21 @@ export const REVIEW_CASES = [
   ['expired', '17 · Accès expiré', 'Reconnexion · faits locaux conservés'],
   ['entry-loading', '18 · Connexion en cours', 'Action occupée et clavier accessible'],
   ['no-plan', '19 · Information manquante', 'Candidat de sortie · manque exact fourni par le domaine'],
+  ['preferences-availability', '20 · Préférences / disponibilité', 'Nouveau candidat · vrai formulaire, données de démonstration'],
+  ['preferences-priorities', '21 · Préférences / priorités', 'Choix issus du contrat serveur canonique, démonstration'],
+  ['preferences-unknown', '22 · Enregistrement à vérifier', 'Relecture explicite, aucune répétition automatique'],
+  ['preferences-offline', '23 · Lecture impossible', 'Aucun formulaire rempli de défauts'],
+  ['preferences-saving', '24 · Enregistrement en cours', 'Commandes verrouillées'],
+  ['preferences-loading', '25 · Lecture en cours', 'Aucune déclaration encore connue'],
+  ['preferences-saved', '26 · Préférences enregistrées', 'Projection d’une confirmation serveur simulée'],
+  ['preferences-expired', '27 · Préférences / accès expiré', 'Reconnexion sans purge des faits locaux'],
+  ['preferences-refused', '28 · Préférences refusées', 'Saisie conservée, correction possible'],
 ] as const;
 type CaseId = typeof REVIEW_CASES[number][0];
 const nextOf = (id: string): CaseId => REVIEW_CASES[(REVIEW_CASES.findIndex((c) => c[0] === id) + 1) % REVIEW_CASES.length][0];
 function Candidate(p: { id: CaseId; go: (id: CaseId) => void; width: number; height: number }) {
   const back = () => p.go('entry'); const next = () => p.go(nextOf(p.id));
+  if (p.id.startsWith('preferences-')) return <TrainingPreferencesReview mode={p.id.slice('preferences-'.length) as PreferencesReviewMode} onClose={() => p.go('settings')} />;
   if (p.id.startsWith('entry')) return <LoginScreen error={p.id === 'entry-error' ? 'invalid' : null} busy={p.id === 'entry-loading'} onSubmit={() => p.go('entry-error')} onCreateAccount={() => p.go('signup')} onRecover={() => p.go('expired')} onPrivacy={() => p.go('settings')} />;
   if (p.id.startsWith('signup')) return <SignupScreen busy={false} outcome={p.id === 'signup-unknown' ? { state: 'unknown' } : p.id === 'signup-error' ? { state: 'rejected', code: 'username_unavailable' } : null} onSubmit={() => p.go('created')} onBack={back} onLogin={back} />;
   if (p.id === 'password-done') return <AccountResultScreen kind="password" onContinue={() => p.go('settings')} />;
@@ -43,7 +54,7 @@ function Candidate(p: { id: CaseId; go: (id: CaseId) => void; width: number; hei
   if (p.id === 'created') return <AccountResultScreen kind="created" onContinue={() => p.go('point')} />;
   if (['point','availability','priorities','first-plan','no-plan'].includes(p.id)) return <BlueprintCandidate step={p.id === 'point' ? 1 : p.id === 'availability' ? 2 : p.id === 'priorities' ? 3 : 4} missing={p.id === 'no-plan'} onBack={back} onNext={p.id === 'first-plan' ? () => p.go('mission-reference') : next} />;
   if (p.id === 'mission-reference') return <MissionScreenFixture width={p.width} height={p.height} source="main" />;
-  if (p.id === 'settings') return <AccountSettingsScreen username="Compte de démonstration" onPassword={() => p.go('password')} onExport={() => p.go('expired')} onPrivacy={() => p.go('owner-offline')} onSignOut={back} />;
+  if (p.id === 'settings') return <AccountSettingsScreen username="Compte de démonstration" onPassword={() => p.go('password')} onPreferences={() => p.go('preferences-availability')} onExport={() => p.go('expired')} onPrivacy={() => p.go('owner-offline')} onSignOut={back} />;
   if (p.id === 'owner-offline' || p.id === 'owner-checking' || p.id === 'expired') return <JournalOwnershipScreen state={p.id === 'expired' ? 'expired' : p.id === 'owner-checking' ? 'checking' : 'offline'} onVerify={() => p.go('owner-checking')} onChangeAccount={back} />;
   return null;
 }

@@ -25,7 +25,7 @@ Statut courant : mandat PRODUCT DELIVERY du 5 novembre, rendu V1 ajustée accept
 ## 4. Déclarations, objectifs, unités et préférences
 
 - [ ] 4.1 Après D-MOB03-1 accepté, réaliser seulement les usages/champs/vocabulaires approuvés ; preuve : tests du domaine/stockage et du consommateur, conversions réversibles selon précision du contrat, absence de recopie du profil LAB ONLY.
-- [ ] 4.2 Raccorder la lecture/écriture des préférences au service canonique ; preuve : tests training_preferences et API ownership, non-déclaré distinct de vide, absence de défaut ou d’inférence.
+- [x] 4.2 Raccorder la lecture/écriture des préférences au service canonique ; preuve : tests training_preferences et API ownership, non-déclaré distinct de vide, absence de défaut ou d’inférence.
 - [ ] 4.3 Raccorder l’environnement concret existant sans créer l’éditeur MOB-09 ; preuve : tests equipment_model/environment_activation/resolution concernés, identifiants valides et faisabilité inchangée ; contrat documenté.
 
 ## 5. Poids, consentement et effacement
@@ -58,3 +58,8 @@ Parties serveur de 2.1/2.2 implémentées : inscription et changement de mot de 
 ## Reprise native et validation visuelle — 5 novembre
 
 L'opérateur accepte la V1 ajustée après le comparatif et demande la poursuite du critical path. Les consommateurs compte et la partition propriétaire sont testés ; les acquisitions 4.x/5.x ne sont pas déduites de cette acceptation. L'adaptateur des déclarations existantes est testé côté serveur/client, sans raccordement du formulaire Blueprint (4.2 reste partielle). Vérification du diff : 531 tests mobiles, TypeScript, 274 tests backend/broad et gardes UI, Ruff264/548, Bandit ciblé, OpenSpec5/5 ; revue indépendante sans défaut bloquant. Un constat mineur d'en-tête no-store sur erreurs génériques reste différé, sans déclaration exposée. Publication en draft et vérifications CI consignées séparément ; aucune recette physique, suppression, archive ou disponibilité de premier plan déclarée complète.
+
+
+## Consommateur des préférences — preuve ciblée
+
+4.2 est réalisée : lecture des faits canoniques puis saisie et PUT complet depuis Profil, priorités ordonnées facultatives, familles et fréquence absentes distinctes de valeurs vides. Le vrai ConnectedApp et le modèle couvrent double appui, réponse inconnue/relecture, refus, changement de propriétaire et retour Android. Croquis/rendu acceptés ; compactage en blocs demandé avec revue visuelle déléguée. La recette physique 6.5, l'environnement concret 4.3 et les acquisitions Blueprint non contractualisées restent ouverts.

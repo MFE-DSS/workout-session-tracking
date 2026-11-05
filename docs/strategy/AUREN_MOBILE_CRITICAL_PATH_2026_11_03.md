@@ -79,3 +79,7 @@ sont requis après vérification API ; OpenSpec strict/scope/protocole et sécur
 Référence : `SONAR_TEMPORARY_MVP_POLICY.md`. Revue sécurité/qualité avant bêta externe élargie,paiements,
 photos/mesures sensibles ou production. Aucun build MOB-02 ouvert par ces clôtures ;préflight final après
 intégration documentaire et rebase de la proposition existante.
+
+## Direction opérateur — composants visuels puis alimentation scientifique, 5 novembre
+
+Après le socle du critical path, enrichir les tranches successives par les composants consommateurs, leurs états inconnus et les emplacements d'assets, en suivant le manifeste et les baselines. Les prompts du workstream scientifique seront fournis par l'opérateur. Cette préparation n'autorise ni moteur fictif, ni donnée physiologique inventée, ni nouvelle identité. L'ouverture de chaque tranche et les validations de composition/rendu restent applicables ; le premier plan garde sa dépendance SCI-P01/P02. Priorité immédiate indépendante : préférences existantes natives (MOB-03 4.2), croquis ciblé accepté, rendu et preuves encore à obtenir.

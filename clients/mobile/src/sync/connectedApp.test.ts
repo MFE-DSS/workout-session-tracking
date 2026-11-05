@@ -741,6 +741,50 @@ test('native password page submits the authenticated canonical mutation and conf
   expect(mockCredential).toBe('rt1.changed-device.secret');
 });
 
+test('Profile opens the real native preferences editor and saves one canonical replacement without touching the workout journal', async () => {
+  const fallback = mockTransport.getMockImplementation()!;
+  const projection = require('../ui/account/review/trainingDeclarations.fixture.json');
+  mockTransport.mockImplementation(async (path: string, init: any) => {
+    if (path === '/mission') return readyMission();
+    if (path === '/me/training-preferences/declarations') return init?.method === 'PUT'
+      ? { ...projection, declarations: init.body } : projection;
+    return fallback(path, init);
+  });
+  await boot(); const before = await mockJournal.restore();
+  await act(async () => screen('AccountSettings').onPreferences());
+  const click = async (id: string) => { await act(async () => {
+    const target = root.container.queryAll((n) => n.props.testID === id)[0];
+    expect(target).toBeDefined(); target.props.onClick({ nativeEvent: {}, stopPropagation() {}, currentTarget: 1, target: 1 });
+  }); };
+  await click('preferences-frequency-4'); await click('preferences-next'); await click('preferences-focus-arms');
+  await click('preferences-save');
+  const calls = mockTransport.mock.calls.filter(([p, i]) => p === '/me/training-preferences/declarations' && i?.method === 'PUT');
+  expect(calls).toHaveLength(1);
+  expect(calls[0][1].body).toEqual({ sessions_per_week: 4, focus_priorities: ['arms'], available_equipment: null });
+  expect(await mockJournal.restore()).toEqual(before);
+  await click('preferences-done'); expect(screen('AccountSettings')).toBeDefined();
+});
+
+test('Android back delegates to the preference page before closing the account route', async () => {
+  const { BackHandler } = jest.requireActual('react-native');
+  let back: (() => boolean) | null = null;
+  jest.spyOn(BackHandler, 'addEventListener').mockImplementation((_event: unknown, handler: unknown) => {
+    back = handler as () => boolean; return { remove() {} };
+  });
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation(async (path: string, init: any) => {
+    if (path === '/mission') return readyMission();
+    if (path === '/me/training-preferences/declarations') return require('../ui/account/review/trainingDeclarations.fixture.json');
+    return fallback(path, init);
+  });
+  await boot(); await act(async () => screen('AccountSettings').onPreferences());
+  const press = async (id: string) => { await act(async () => root.container.queryAll((n) => n.props.testID === id)[0].props.onClick({ nativeEvent: {}, stopPropagation() {}, currentTarget: 1, target: 1 })); };
+  await press('preferences-frequency-4'); await press('preferences-next');
+  act(() => { expect(back?.()).toBe(true); });
+  expect(root.container.queryAll((n) => n.props.testID === 'preferences-frequency-4')[0].props.accessibilityState.selected).toBe(true);
+  expect(root.container.queryAll((n) => n.type === 'AccountSettings')).toHaveLength(0);
+});
+
 test('Android back closes signup through the current account route, rather than leaving the app', async () => {
   const { BackHandler } = jest.requireActual('react-native');
   let back: (() => boolean) | null = null;

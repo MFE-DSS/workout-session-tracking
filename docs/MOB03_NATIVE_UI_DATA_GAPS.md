@@ -23,3 +23,8 @@ La garde propriétaire et les mutations de compte peuvent avancer indépendammen
 ## Avancée du sous-ensemble déclarations — 5 novembre
 
 [Adaptateur versionné des déclarations](MOB03_TRAINING_DECLARATIONS_API_CONTRACT.md) implémenté localement : fréquence, priorités par axes et familles d'équipement existantes, sans nouvelle règle. UI_DATA_GAP-02/03 sont partiellement réduits, pas clôturés : durée et limitations restent absentes, le choix d'environnement concret garde son contrat séparé, et le formulaire Blueprint n'est pas raccordé. Ce sous-ensemble n'établit pas la suffisance d'un premier plan (UI_DATA_GAP-04).
+
+
+## Consommateur des déclarations raccordé — 5 novembre
+
+L'éditeur natif depuis Profil consomme maintenant fréquence, familles et priorités ordonnées existantes ; lecture préalable, remplacement complet et états inconnus testés. Croquis et rendu acceptés, puis grille compacte de priorités demandée avec revue visuelle déléguée. UI_DATA_GAP-02/03 restent partiellement ouverts pour durée, environnement concret et contraintes non contractualisées. La préférence est facultative, distincte de l'analyse des points forts/faibles attendue du moteur. Le Blueprint complet et UI_DATA_GAP-04 ne sont pas clos par ce parcours de paramètres.

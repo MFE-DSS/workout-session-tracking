@@ -184,3 +184,60 @@ Options : réécrire l'historique publié (interdit), exclure tout le document (
 
 
 Correction vérifiée localement : le scan historique passe de 1 détection/exit2 à 0/exit0 ; une nouvelle occurrence synthétique dans le même nom de document et à la même ligne reste détectée/exit2. Valeur synthétique détruite avec son répertoire temporaire, jamais imprimée ni versionnée. check_scope classe ce delta ISOLATED ; aucun code Python/TypeScript changé, budget264/548 et protocole verts. L'exception ne couvre que l'empreinte de révision documentée. Validation CI réelle du commit correctif encore requise.
+
+
+## Suite du critical path — consommateur natif des préférences existantes
+
+### Brainstorming / Options / Risques / Choix retenu
+
+L'opérateur demande la poursuite du critical path, puis une préparation des composants/visuels/assets à alimenter plus tard par le moteur scientifique. Le consommateur des déclarations existantes est le prochain sous-ensemble utile et autorisé MOB-03 4.2. Une longue page unique mélangerait rythme et priorités ; reprendre les quatre moments Blueprint introduirait des champs non contractualisés. Proposition : deux pages depuis Profil, avec un remplacement serveur complet après lecture, sans premier plan nouveau. Croquis précis dans MOB03_REVIEW_BOARD_SKETCH.md, soumis via question asynchrone ; aucune composition nouvelle codée avant réponse.
+
+Le modèle réseau peut avancer séparément : scope par client, lecture avant saisie, null/[] conservés, verrou synchrone, saisie conservée après refus/inconnu, vérification par lecture explicite sans replay, réponses tardives neutralisées. Aucun nouveau stockage, champ corporel, vocabulaire ou calcul scientifique. Pas de modification backend prévue. Le retour avec saisie non enregistrée doit être explicite et recetté, jamais présenté comme sauvegardé.
+
+### Croquis validé
+
+Réponse opérateur reçue : « Valider ce parcours ciblé ». Deux pages depuis la ligne Profil, un seul PUT complet après lecture. Les titres, rythme et liste ordonnée de priorités suivent le croquis ajouté. Le lien du profil web complet est conservé en action secondaire de l'éditeur afin de ne pas retirer l'accès existant pendant la migration ; ce détail est explicitement signalé dans la planche de rendu. Champs non supportés absents.
+
+### Inventaire — une information, une seule fois
+
+| Élément | Source | Doublon |
+|---|---|---|
+| Fréquence sélectionnée ou non déclarée | declarations.sessions_per_week ; bornes options.sessions_per_week | non |
+| Familles sélectionnées, absentes ou vides | declarations.available_equipment ; valeurs/libellés options.available_equipment | non |
+| Priorités et leur rang | declarations.focus_priorities ; libellés options.focus_priorities ; ordre déclaré seulement | non |
+| Saisie non confirmée | brouillon mémoire du consommateur, séparé du snapshot serveur | non |
+| Enregistré / refus / inconnu | résultat réel du client GET/PUT ; relecture explicite ne prouve pas l'origine d'une mutation | non |
+| Lien profil web | destination existante /profile, aucune transmission de Bearer | non |
+
+### Comparaison avec la référence validée
+
+http://127.0.0.1:8093/comparatif-preferences.html expose les deux nouvelles pages et neuf états, plus la ligne Profil avant/après. Les primitives AccountFrame/SecondaryButton/PrimaryAction et tokens sont repris du compte V1 accepté. Captures de revue locales dans review-preferences/, distinctes des baselines. MISSION, instruments et assets LOCKED inchangés. Données du banc explicitement de démonstration ; choix de la fixture générés depuis la projection serveur canonique, pas depuis le profil LAB ONLY.
+
+### Changement unique de l'itération
+
+Remplacer la destination de préférences web par un vrai éditeur natif en deux pages, tout en conservant le lien du profil complet web. Aucune création de plan ni modification de prescription. Le rendu reste soumis à acceptation avant commit UI ; le croquis validé ne s'y substitue pas.
+
+### Consommateur et preuves
+
+Le vrai ConnectedApp ouvre les pages depuis Profil, lit les valeurs serveur, envoie une seule déclaration complète et revient au compte après confirmation. Le journal de séance reste inchangé dans ce test. Le retour Android délègue à la page : page 2 revient à la première en conservant la saisie ; page 1 modifiée exige un choix de sortie. Une confirmation native retenue d'un ancien propriétaire ne ferme pas le nouvel éditeur (échec reproduit puis corrigé). Le profil web reste accessible même si la lecture native échoue (échec reproduit puis corrigé).
+
+La revue indépendante de Task 6 ne trouve aucun Critical/Important/Minor ; elle exclut explicitement les pixels, le comportement physique et la readiness de merge. Son premier lancement groupé a rencontré un timeout de démarrage de 5 s, sans échec d'assertion ; le rejeu isolé passe. La suite mobile complète passe également. Aucun audit exhaustif du reste de la branche n'est revendiqué par cette revue.
+
+Le contrôle navigateur a révélé que React Native Web ne projette pas accessibilityState.selected sur le DOM. Alias aria-selected ajouté au contrôle secondaire ; la sélection native reste conservée, les contrôles sans cette prop gardent leur rendu. La vérification web passe ensuite : parcours nominal, sélection, neuf états, largeurs 320/360/430, aucune erreur JS ni requête externe. Cibles de sélection au moins 44 pt. Aucune preuve de clavier/gestes physiques ou de grandes tailles de texte native déduite de ces previews.
+
+Le correctif de déplacement des captures publié au HEAD 0da26ff passe les neuf jobs de CI du run 42047178810. Cette preuve concerne le HEAD publié ; le nouveau consommateur demeure local tant que son rendu n'est pas accepté.
+
+
+### Acceptation du rendu et correction ciblée des priorités
+
+L'opérateur valide le rendu, demande des « petits blocs » plutôt que la liste verticale et précise : « Tu le fais sans me demander, tu le valides. » Le croquis ciblé est consigné ; l'agent prend en charge la revue visuelle de ce seul ajustement sans nouvelle question. Grille de deux colonnes, choix canoniques et rang conservés, contrôle d'au moins 44 pt. Les choix restent facultatifs ; aucun effet scientifique nouveau. Le lien du profil web complet et les autres états acceptés sont conservés.
+
+Le rappel produit est intégré au handoff : les priorités déclarées sont un souhait de l'utilisateur. Les futurs points forts/faibles et adaptations doivent provenir de faits, d'historique et du contrat scientifique ; le rang ne devient pas une évaluation corporelle ni la détermination unique du plan. Aucune formule ni pondération n'est modifiée dans cette correction visuelle.
+
+
+### Revue finale de la grille déléguée
+
+Comparaison agent réalisée entre la liste conservée et la grille deux colonnes à 390×844 ; cibles au moins 44 pt, sélection et rang lisibles, aucune nouvelle palette ou bordure englobante. Vérification navigateur répétée sur 320/360/430, parcours et neuf états passants, zéro erreur JS et zéro requête externe. Les [reçus visuels](../clients/mobile/visual-contract/review-receipts/mob03-preferences-v1/README.md) conservent les images et empreintes sources ; aucune baseline LOCKED promue. Cette revue satisfait la délégation explicite de l'opérateur pour cet ajustement uniquement.
+
+
+Vérification du diff final du consommateur : **44 suites / 547 tests mobiles, TypeScript, 33 tests de politique/gouvernance UI, protocole et OpenSpec strict 5/5 verts**, budget Ruff264/548. Deux avertissements de dépendances dans les tests Python. Tier script ISOLATED ; broad scoped constitué par toute la suite mobile, aucun full sweep Python redondant. Compilation iOS Release du banc avec la grille compacte réussie ; aucune installation ou nouvelle interaction physique revendiquée. Le constat mineur d'en-tête no-store des erreurs génériques du serveur reste différé, sans valeur de déclaration exposée.

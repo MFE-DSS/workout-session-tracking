@@ -70,3 +70,15 @@ Sous-ensemble indépendant des champs Blueprint non contractualisés. Aucune nou
 - [x] Implémenter un adaptateur étroit du service existant et classer les deux routes dans profile-training-preferences ; aucune écriture du service partagé.
 - [x] Client `TrainingPreferencesClient.read/save` : résultat confirmé/refusé/inconnu/annulé ; lecture pour réconciliation explicite, PUT envoyé une fois, fence après changement de compte, double soumission refusée tant que la précédente est en cours.
 - [x] Tests transport/auth réels et vérifications ciblées/broad ; contrat et gaps mis à jour avec preuves, sans prétendre le Blueprint branché.
+
+
+### Task 6: Vrai consommateur des déclarations disponibles
+
+Sous-ensemble de 4.2 ; pas le Blueprint complet, aucune règle de recommandation.
+
+**Interfaces :** `useTrainingPreferencesEditor(client)` garde `snapshot`, `draft`, `phase`, `dirty` et expose `edit`, `reload`, `save`. Le client existant reste l'unique frontière API ; aucune persistance locale parallèle, aucun secret ni journal dans ce modèle. L'effet est remis à zéro lors d'un changement de client/identité et ignore les réponses après démontage. Initialement aucune saisie tant que la lecture n'a pas confirmé les faits. Enregistrement impossible après résultat inconnu tant qu'une lecture explicite n'a pas réconcilié l'état. Une relecture garde la saisie déjà modifiée, sans confirmer l'origine d'une ancienne mutation.
+
+- [x] Tests rouges du modèle : lecture initiale sans défaut, sauvegarde complète/canonique, double appui, refus/saisie conservée, résultat inconnu sans replay, relecture avec saisie conservée, nouveau compte/réponse tardive, démontage.
+- [x] Implémenter le hook sans composition nouvelle ; vérifier les frontières avec le vrai AuthSession/client et transport contrôlé.
+- [x] Après validation du croquis d'extension : réaliser les deux pages avec primitives existantes, connecter la ligne Profil et le retour Android ; aucun champ hypothétique.
+- [x] Tester le vrai ConnectedApp, produire le rendu comparé, obtenir son acceptation avant commit UI ; vérifier les commandes de séance préservées.

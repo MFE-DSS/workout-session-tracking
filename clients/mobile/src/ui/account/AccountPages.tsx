@@ -12,7 +12,7 @@ export function AccountResultScreen(p: { kind: 'created' | 'password'; onContinu
     <Text style={type.eyebrow}>{p.kind === 'created' ? 'Comprendre · Planifier · Exécuter' : 'Compte sécurisé'}</Text>
   </AccountFrame>;
 }
-export function AccountSettingsScreen(p: { username: string | null; onPassword: () => void; onExport?: () => void; onPrivacy?: () => void; onWebProfile?: () => void; onSignOut: () => void }) {
+export function AccountSettingsScreen(p: { username: string | null; onPassword: () => void; onExport?: () => void; onPrivacy?: () => void; onPreferences?: () => void; onWebProfile?: () => void; onSignOut: () => void }) {
   return <AccountFrame title="Ton compte" lead={p.username ?? 'Compte lié à cet appareil'} footer={<AccountLink label="Se déconnecter" onPress={p.onSignOut} testID="settings-signout" />}>
     <SheetRow title="Changer le mot de passe" onPress={p.onPassword} />
     {p.onExport ? <SheetRow title="Exporter mes données" detail="Sur le site · une connexion web peut être nécessaire" onPress={p.onExport} /> : null}
@@ -21,7 +21,8 @@ export function AccountSettingsScreen(p: { username: string | null; onPassword: 
       <Text style={type.eyebrow}>Suppression du compte</Text>
       <AccountMessage text="La suppression du compte n’est pas disponible dans cette version." />
     </View>
-    {p.onWebProfile ? <SheetRow title="Profil d’entraînement" detail="Sur le site, pour l’instant" onPress={p.onWebProfile} /> : null}
+    {p.onPreferences ? <SheetRow title="Préférences d’entraînement" onPress={p.onPreferences} />
+      : p.onWebProfile ? <SheetRow title="Profil d’entraînement" detail="Sur le site, pour l’instant" onPress={p.onWebProfile} /> : null}
   </AccountFrame>;
 }
 export function JournalOwnershipScreen(p: { state: 'checking' | 'offline' | 'expired'; busy?: boolean; onVerify: () => void; onChangeAccount: () => void }) {
