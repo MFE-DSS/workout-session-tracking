@@ -26,7 +26,7 @@ Statut courant : mandat PRODUCT DELIVERY du 5 novembre, rendu V1 ajustée accept
 
 - [ ] 4.1 Après D-MOB03-1 accepté, réaliser seulement les usages/champs/vocabulaires approuvés ; preuve : tests du domaine/stockage et du consommateur, conversions réversibles selon précision du contrat, absence de recopie du profil LAB ONLY.
 - [x] 4.2 Raccorder la lecture/écriture des préférences au service canonique ; preuve : tests training_preferences et API ownership, non-déclaré distinct de vide, absence de défaut ou d’inférence.
-- [ ] 4.3 Raccorder l’environnement concret existant sans créer l’éditeur MOB-09 ; preuve : tests equipment_model/environment_activation/resolution concernés, identifiants valides et faisabilité inchangée ; contrat documenté.
+- [ ] 4.3 Contractualiser le contexte matériel via propositions/substitutions sans inventaire manuel, après recadrage opérateur ci-dessous ; preuve : résolution canonique et états inconnus explicités, aucune disponibilité de salle inventée, faisabilité et historique préservés. Pas de nouvel algorithme dans ce raccordement.
 
 ## 5. Poids, consentement et effacement
 
@@ -63,3 +63,7 @@ L'opérateur accepte la V1 ajustée après le comparatif et demande la poursuite
 ## Consommateur des préférences — preuve ciblée
 
 4.2 est réalisée : lecture des faits canoniques puis saisie et PUT complet depuis Profil, priorités ordonnées facultatives, familles et fréquence absentes distinctes de valeurs vides. Le vrai ConnectedApp et le modèle couvrent double appui, réponse inconnue/relecture, refus, changement de propriétaire et retour Android. Croquis/rendu acceptés ; compactage en blocs demandé avec revue visuelle déléguée. La recette physique 6.5, l'environnement concret 4.3 et les acquisitions Blueprint non contractualisées restent ouverts.
+
+## Recadrage opérateur après rendu du matériel — 5 novembre
+
+L'opérateur refuse la gestion manuelle de matériel : « Quelqu'un ne va pas commencer à manager la liste de son matériel ». La proposition 4.3 d'inventaire initial est retirée explicitement, non déclarée achevée ; le prototype API/client/UI non committé a été retiré. Partir du profil et proposer exercices/séances, puis permettre les substitutions selon les possibilités réelles, est la direction retenue. Le contrat de compatibilité et de résolution de l'inconnu reste à fournir ; ni une chaîne de salles ni un profil générique ne prouvent les équipements présents. Les familles ne sont plus demandées dans l'éditeur natif ; le PUT existant préserve leurs valeurs confirmées. Le domaine et les déclarations historiques restent inchangés.

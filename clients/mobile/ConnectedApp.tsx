@@ -896,16 +896,17 @@ export default function ConnectedApp() {
     onPreferences={() => setAccountView('preferences')}
     onExport={API_URL ? () => openWeb('/export') : undefined} onPrivacy={privacy}
     onWebProfile={API_URL ? () => openWeb('/profile') : undefined} onSignOut={() => void signOut()} />;
-  if (accountView === 'preferences' && screen === 'APP') {
-    body = <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={leaveAccountView}
-      onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />;
-  } else if (accountView === 'created' || accountView === 'password-done') {
-    body = <AccountResultScreen kind={accountView === 'created' ? 'created' : 'password'} onContinue={leaveAccountView} />;
+  const accountOverlay = screen !== 'APP' ? null : accountView === 'preferences'
+    ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={leaveAccountView}
+      onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />
+    : accountView === 'password'
+      ? <PasswordScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void changePassword(input)} onBack={leaveAccountView} onLogin={reconnectAccount} />
+      : accountView === 'password-done'
+        ? <AccountResultScreen kind="password" onContinue={leaveAccountView} /> : null;
+  if (accountView === 'created') {
+    body = <AccountResultScreen kind="created" onContinue={leaveAccountView} />;
   } else if (accountView === 'signup' && screen === 'LOGIN') {
     body = <SignupScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void register(input)} onBack={leaveAccountView} onLogin={leaveAccountView} />;
-  } else if (accountView === 'password' && screen === 'APP') {
-    body = <PasswordScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void changePassword(input)} onBack={leaveAccountView}
-      onLogin={reconnectAccount} />;
   } else if (screen === 'BOOT') {
     body = <BootScreen />;
   } else if (screen === 'OWNERSHIP') {
@@ -1042,7 +1043,12 @@ export default function ConnectedApp() {
     <SafeAreaProvider>
       <StatusBar style="light" />
       <View style={styles.root}>
-        {body}
+        <View testID="connected-content" pointerEvents={accountOverlay ? 'none' : 'auto'}
+          accessibilityElementsHidden={!!accountOverlay} importantForAccessibility={accountOverlay ? 'no-hide-descendants' : 'auto'}
+          style={{ flex: 1, display: accountOverlay ? 'none' : 'flex' }}>
+          {body}
+        </View>
+        {accountOverlay}
         <Sheet visible={signOutBlocked !== null} title="Déconnexion en attente" onClose={() => setSignOutBlocked(null)}>
           <SheetRow
             title={`${signOutBlocked ?? 0} enregistrement${(signOutBlocked ?? 0) > 1 ? 's' : ''} pas encore envoyé${(signOutBlocked ?? 0) > 1 ? 's' : ''} à AUREN`}

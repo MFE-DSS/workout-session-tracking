@@ -134,3 +134,27 @@ Choix facultatifs ; second appui pour retirer.
 ```
 
 La grille lit toujours les valeurs/libellés canoniques et affiche le rang déclaré. L'ordre ne devient pas un diagnostic de points forts/faibles ni un coefficient scientifique. La place de cette préférence parmi les observations/historiques sera définie par les futurs contrats du moteur, sans changer ici les règles existantes.
+
+## Environnement concret initial — croquis proposé pour MOB-03 4.3
+
+Entrée depuis Profil : une ligne « Mon matériel », distincte des préférences et de leurs familles. Pas de salle nommée, d'éditeur de pièces, de photo ou d'illustration nouvelle ; les 29 objets et cinq groupes viennent du registre canonique existant.
+
+```text
+Retour                  AUREN
+Mon matériel
+Ce que tu peux utiliser pour tes séances.
+[Non déclaré] [Sans matériel]
+[Charges libres et appuis · ouvrir]
+   [Barre et disques] [Banc inclinable] ...
+[Poulies et accessoires · ouvrir]
+[Machines haut du corps · ouvrir]
+[Machines bas du corps · ouvrir]
+[Autre · ouvrir]
+[Enregistrer] ou [Terminer si inchangé]
+```
+
+Une section ouverte à la fois ; sélection par petits blocs, sans image nécessaire. Aucun objet déduit des familles déjà choisies. `Non déclaré` reste null, `Sans matériel` est une liste explicitement vide. Chargement, lecture impossible, refus, résultat inconnu/relecture et confirmation reprennent les compositions de préférences déjà acceptées. Retour avec saisie non enregistrée : confirmation native ; commandes bloquées pendant l'enregistrement. Les trois préférences héritées ne sont jamais modifiées par cette page.
+
+## Décision après rendu — croquis matériel retiré
+
+Le croquis « Mon matériel » accepté plus haut a été rejeté lors du rendu : « Quelqu'un ne va pas commencer à manager la liste de son matériel ». Il ne doit plus être implémenté. La correction conserve la disponibilité en une page de fréquence uniquement (puis priorités compactes inchangées) ; aucune famille ou liste d'objets n'est à saisir. Les données existantes restent préservées. Ce delta répond à la suppression demandée, sans nouvelle composition de formulaire ni nouvelle promesse de compatibilité.

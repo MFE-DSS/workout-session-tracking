@@ -32,3 +32,5 @@ Refus métier : 400 `invalid_training_preferences`, sans valeur soumise dans le 
 Authentification renouvelable avant envoi ; **aucun replay du PUT** après 401 ou réponse incertaine. Après timeout/5xx, état inconnu ; une lecture explicite permet de comparer les faits actuels, sans affirmer qu'elle prouve l'origine d'une écriture. Aucun retry automatique ne remplace les déclarations d'un autre appareil.
 
 Le client est raccordé à l'éditeur natif de préférences depuis Profil, en deux pages. Le Blueprint de premier usage complet reste distinct et non raccordé. Durée, expérience, taille, poids daté/consentement et limitations ne sont pas introduits par cette ressource. SCI-P01/P02 et la politique d'effacement restent ouverts.
+
+Après recadrage produit, les familles ne sont plus éditées dans le natif : le client conserve les valeurs confirmées dans le remplacement complet lors d'une modification de cadence/priorités. Le contrat API existant et les données historiques ne sont pas supprimés. Aucun inventaire d'objets concret nouveau n'est livré.

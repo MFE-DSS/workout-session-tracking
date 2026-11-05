@@ -4,6 +4,8 @@ Date : 5 novembre 2026. Base canonique observée : 90da846. Document de travail 
 
 **Actualisation — recadrage opérateur reçu :** [relevé produit/science/artistique](strategy/AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md). Le tableau ci-dessous conserve les questions initiales ; ses statuts sont à lire avec ce relevé : D1/D4 reçoivent une cible Blueprint en quatre moments, pas encore un contrat de champs supportés ; D2 reçoit le principe de mesure datée et d'héritage séparé ; D3 reste ouvert. L'entrée composée est la direction retenue, sans acceptation visuelle. [Handoff des besoins scientifiques](strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md), notamment SCI-P01/P02 pour le premier parcours.
 
+**Point de reprise courant :** [CR PO/architecte](MOB03_CR_PO_ARCHITECT_2026_11_05.md). Compte/préférences acceptés, correction sans inventaire acceptée ; les constats de socle ci-dessous sont historiques. D2/D3 restent ouverts. D4 reçoit désormais le refus explicite d'un inventaire manuel : contexte de matériel via proposition/substitution à contractualiser, aucune disponibilité de salle inventée.
+
 ## Travail indépendant réalisé localement
 
 Le socle API de compte est implémenté : inscription JSON, changement authentifié du mot de passe, validation partagée avec le web, contraintes uniques, quotas partagés et révocation d'époque. Aucune UI native nouvelle, aucune suppression, donnée corporelle, migration ou publication. Le vrai consommateur compte/onboarding reste à raccorder après les décisions ci-dessous et la revue visuelle.

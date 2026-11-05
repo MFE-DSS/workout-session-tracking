@@ -28,3 +28,7 @@ La garde propriétaire et les mutations de compte peuvent avancer indépendammen
 ## Consommateur des déclarations raccordé — 5 novembre
 
 L'éditeur natif depuis Profil consomme maintenant fréquence, familles et priorités ordonnées existantes ; lecture préalable, remplacement complet et états inconnus testés. Croquis et rendu acceptés, puis grille compacte de priorités demandée avec revue visuelle déléguée. UI_DATA_GAP-02/03 restent partiellement ouverts pour durée, environnement concret et contraintes non contractualisées. La préférence est facultative, distincte de l'analyse des points forts/faibles attendue du moteur. Le Blueprint complet et UI_DATA_GAP-04 ne sont pas clos par ce parcours de paramètres.
+
+## Recadrage matériel après revue
+
+Pas d'inventaire manuel dans le natif. La page expérimentale, son API et son client non committés ont été retirés. L'éditeur de disponibilité n'affiche que la fréquence ; il préserve les familles déjà confirmées au remplacement complet. UI_DATA_GAP-02 doit être résolu via contexte/proposition/substitution avec une règle explicite pour disponibilité inconnue ; aucune salle complète supposée et aucune gestion d'objets imposée. Ce n'est pas une clôture scientifique de compatibilité. [CR courant](MOB03_CR_PO_ARCHITECT_2026_11_05.md).

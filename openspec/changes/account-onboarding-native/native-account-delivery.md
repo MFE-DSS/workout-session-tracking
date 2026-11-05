@@ -82,3 +82,18 @@ Sous-ensemble de 4.2 ; pas le Blueprint complet, aucune règle de recommandation
 - [x] Implémenter le hook sans composition nouvelle ; vérifier les frontières avec le vrai AuthSession/client et transport contrôlé.
 - [x] Après validation du croquis d'extension : réaliser les deux pages avec primitives existantes, connecter la ligne Profil et le retour Android ; aucun champ hypothétique.
 - [x] Tester le vrai ConnectedApp, produire le rendu comparé, obtenir son acceptation avant commit UI ; vérifier les commandes de séance préservées.
+
+### Task 7: Déclaration manuelle du matériel — RETIRÉE après revue produit
+
+Le croquis avait été accepté, puis le rendu a révélé un désaccord sur le besoin : l'opérateur ne veut pas de gestion manuelle d'un inventaire. L'API, son client et la page expérimentale non committés ont été retirés. Les tests intermédiaires ne constituent aucune capacité livrée. Le domaine d'environnement existant reste intact.
+
+Direction reçue : partir du profil, proposer exercices/séances et permettre la substitution selon les possibilités réelles. Cela ne signifie ni qu'une salle générique contient tout, ni que le moteur possède déjà une détection de compatibilité. La doctrine de résolution et de substitutions reste à contractualiser avec la science et l'architecte. L'ancien critère 4.3 doit être révisé explicitement dans le change ; il n'est pas coché comme réalisé.
+
+### Task 8: Correction acceptée sans inventaire et retour Profil
+
+- [x] Retirer l'expérimentation non livrée Task7 et consigner le recadrage dans le change ; domaine historique préservé.
+- [x] Test RED des contrôles matériels encore présents ; supprimer leur saisie native et prouver la conservation des familles confirmées au PUT complet.
+- [x] Défaut P2 de revue : test RED sur le remontage ExpoRoot, correction minimale par coque conservée/masquée et formulaire plein écran ; préférences et mot de passe gardent le montage.
+- [x] Produire l'avant/après sans inventaire, obtenir « Valider la correction », conserver reçu et captures hors docs/baselines.
+- [x] Vérifier547tests mobiles, TypeScript,35gardes ciblées, protocole/OpenSpec et build iOS du banc ; CR PO/architecte, décisions et roadmap actualisés.
+- [ ] Publier la correction sur la PR draft353 et relever les contrôles du nouveau HEAD ; aucun merge complet, archivage ou déploiement déduit de cette passe.

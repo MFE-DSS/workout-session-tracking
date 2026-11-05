@@ -32,7 +32,7 @@ export function TrainingPreferencesForm(p: FormProps) {
   const choice = (id: string, label: string, selected: boolean, onPress: () => void) => <SecondaryButton key={id}
     testID={id} label={label} selected={selected} disabled={locked} onPress={onPress}
     style={{ minWidth: 44, minHeight: 44, backgroundColor: selected ? color.line : color.plate }} />;
-  const toggle = (key: 'focus_priorities' | 'available_equipment', value: string) => {
+  const toggle = (key: 'focus_priorities', value: string) => {
     const previous = draft[key] ?? [];
     e.edit({ [key]: previous.includes(value) ? previous.filter((v) => v !== value) : [...previous, value] });
   };
@@ -52,12 +52,6 @@ export function TrainingPreferencesForm(p: FormProps) {
         {choice('preferences-frequency-null', 'Non déclaré', draft.sessions_per_week === null, () => e.edit({ sessions_per_week: null }))}
         {Array.from({ length: options.sessions_per_week.max - options.sessions_per_week.min + 1 }, (_, i) => i + options.sessions_per_week.min)
           .map((n) => choice(`preferences-frequency-${n}`, String(n), draft.sessions_per_week === n, () => e.edit({ sessions_per_week: n })))}
-      </View>
-      <Text style={[type.eyebrow, { marginTop: 8 }]}>Familles de matériel</Text>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-        {choice('preferences-equipment-null', 'Non déclaré', draft.available_equipment === null, () => e.edit({ available_equipment: null }))}
-        {choice('preferences-equipment-empty', 'Aucun matériel', draft.available_equipment?.length === 0, () => e.edit({ available_equipment: [] }))}
-        {options.available_equipment.map((c) => choice(`preferences-equipment-${c.value}`, c.label, draft.available_equipment?.includes(c.value) ?? false, () => toggle('available_equipment', c.value)))}
       </View>
     </> : <>
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>

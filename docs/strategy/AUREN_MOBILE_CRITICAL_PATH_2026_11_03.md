@@ -23,7 +23,7 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 | 7 | MOB-06 | Bibliothèque de programmes |
 | 8 | MOB-07 | Constructeur |
 | 9 | MOB-08 | Exercices |
-| 10 | MOB-09 | Salle / équipement |
+| 10 | MOB-09 | Contexte salle / équipement à réévaluer selon le recadrage : aucun inventaire manuel natif imposé |
 | 11 | MOB-10 | Substitutions |
 | 12 | UX-LAB-PROFILE | Exploration du profil avant sa réalisation |
 | 13 | MOB-11 | Profil / octogone |
@@ -82,4 +82,4 @@ intégration documentaire et rebase de la proposition existante.
 
 ## Direction opérateur — composants visuels puis alimentation scientifique, 5 novembre
 
-Après le socle du critical path, enrichir les tranches successives par les composants consommateurs, leurs états inconnus et les emplacements d'assets, en suivant le manifeste et les baselines. Les prompts du workstream scientifique seront fournis par l'opérateur. Cette préparation n'autorise ni moteur fictif, ni donnée physiologique inventée, ni nouvelle identité. L'ouverture de chaque tranche et les validations de composition/rendu restent applicables ; le premier plan garde sa dépendance SCI-P01/P02. Priorité immédiate indépendante : préférences existantes natives (MOB-03 4.2), croquis ciblé accepté, rendu et preuves encore à obtenir.
+Après le socle du critical path, enrichir les tranches successives par les composants consommateurs, leurs états inconnus et les emplacements d'assets, en suivant le manifeste et les baselines. Les prompts du workstream scientifique seront fournis par l'opérateur. Cette préparation n'autorise ni moteur fictif, ni donnée physiologique inventée, ni nouvelle identité. L'ouverture de chaque tranche et les validations de composition/rendu restent applicables ; le premier plan garde sa dépendance SCI-P01/P02. Préférences natives MOB-03 4.2 réalisées et acceptées ; correction sans inventaire acceptée. [CR courant PO/architecte](../MOB03_CR_PO_ARCHITECT_2026_11_05.md) : données/effacement, contrats du premier plan et preuves appareil restent ouverts. Le contexte matériel devra servir les propositions/substitutions ; aucune disponibilité complète ne se déduit d’une salle générique.

@@ -46,3 +46,7 @@ Pas de code produit dans cette préparation ; pas de MISSION (MOB-04), journal/p
 ## Exécution partielle autorisée — 5 novembre 2026
 
 Le nouveau mandat opérateur autorise l'avancement sur le chemin critique pendant son absence. La préparation initiale évolue vers le socle API indépendant : inscription JSON avec validations/quota canoniques, changement authentifié du mot de passe et révocation. Aucun objectif/unité, poids, consentement, effacement ou écran nouveau n'est implémenté sans ses décisions. D-MOB03-1 à 4 restent ouverts. Les mentions de « préparation seulement » ci-dessus décrivent l'étape initiale, pas une approbation implicite de ces quatre décisions. Le plan et les résultats sont dans implementation-account-core.md et docs/SPRINT_MOB03_REPORT.md.
+
+## Décision produit ultérieure — pas d'inventaire manuel
+
+Le 5 novembre, après exposition du prototype, l'opérateur rejette la gestion d'une liste de matériel. Cette décision remplace la proposition d'acquisition manuelle initiale, sans supprimer le domaine d'environnement. Le mobile part du profil, présente les propositions du domaine et laisse substituer les exercices ; la résolution de compatibilité et de disponibilité inconnue doit être contractualisée avant intégration. Aucun catalogue manuel, éditeur de salles ou équipement complet supposé n'est autorisé par MOB-03. Les capacités web existantes restent conservées, sans être promues en exigence UX native. Voir le CR MOB-03 PO/architecte du 5 novembre.

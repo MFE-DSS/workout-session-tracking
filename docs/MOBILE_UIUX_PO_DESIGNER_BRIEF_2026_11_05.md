@@ -2,6 +2,8 @@
 
 Date : 5 novembre 2026. Auteur : agent de réalisation. Destinataires : opérateur, Product Owner designer, architecte.
 
+**Point de reprise :** [CR courant PO/architecte](MOB03_CR_PO_ARCHITECT_2026_11_05.md), incluant le refus d’un inventaire manuel et la correction acceptée de disponibilité.
+
 **Statut courant : compte V1 ajustée accepté ; extension des préférences acceptée, grille compacte revue par délégation ; Blueprint complet et autres surfaces encore à arbitrer.**
 **Actualisation après recadrage opérateur du 5 novembre :** lire le [recalage produit/science/artistique](strategy/AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md) et le [registre des dépendances scientifiques](strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md). Ils précisent les orientations reçues et les besoins encore ouverts. L'entrée composée est désormais la direction retenue ; le Blueprint en quatre moments est une cible à confronter au domaine, pas une maquette acceptée. Le [manifeste canonique v1.0](strategy/AUREN_MANIFESTO_V1.md) est désormais reçu et conservé intégralement ; il est distinct du mandat scientifique S0.
 Le mandat PRODUCT DELIVERY reçu ensuite ouvre l'exécution MOB-03 dans son change existant, avec approbations visuelles et contrats de domaine applicables. Les autres tranches ne sont pas ouvertes par ce brief.
@@ -192,3 +194,7 @@ L'opérateur confirme le 5 novembre : poursuivre le critical path, puis enrichir
 - Intégration scientifique : contrats et fixtures versionnés, audit de compatibilité, tests consommateurs, puis alimentation des composants par le moteur. Le premier plan reste ouvert tant que son contrat manque.
 
 Le croquis des deux pages de préférences est accepté : « Valider ce parcours ciblé ». Le profil complet web reste accessible en lien secondaire de cet éditeur afin de conserver le parcours existant ; ce détail est signalé dans le rendu de revue. Aucun nouvel écran P1/P2 ou nouvel asset n'est réalisé par ce seul relevé.
+
+## Correction produit après exposition du matériel
+
+L'opérateur refuse la gestion d'une liste de matériel ; le prototype non livré est retiré. La disponibilité native conserve la fréquence uniquement et les priorités restent compactes/facultatives ; les données historiques de matériel sont préservées. Rendu corrigé exposé et accepté : « Valider la correction ». La direction est profil → propositions → substitutions, sans déduire la compatibilité d'une salle générique. Le contrat métier de cette résolution reste à fournir ; il ne sera pas inventé côté UI. U05/U13 et l'ancienne proposition MOB-03 4.3 sont donc à relire avec ce recadrage, pas comme une obligation d'éditeur matériel. Voir le CR courant et le delta OpenSpec explicite.

@@ -40,7 +40,8 @@ jest.mock('../auth/credentialStore', () => ({ credentialStore: {
 let mockOperationSequence = 0;
 jest.mock('expo-crypto', () => ({ randomUUID: () => `test-op-${++mockOperationSequence}` }));
 jest.mock('../shell/routeContext', () => ({ shellRoutes: {} }));
-jest.mock('expo-router', () => ({ ExpoRoot: () => { const s = require('../shell/ShellContext').useShell(); return require('react').createElement(require('react').Fragment, null, s.today, s.account); } }));
+let mockShellMounts = 0;
+jest.mock('expo-router', () => ({ ExpoRoot: () => { require('react').useEffect(() => { mockShellMounts++; }, []); const s = require('../shell/ShellContext').useShell(); return require('react').createElement(require('react').Fragment, null, s.today, s.account); } }));
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 47, bottom: 34, left: 0, right: 0 }),
   useSafeAreaFrame: () => ({ width: 390, height: 844 }),
@@ -88,7 +89,7 @@ let root: Root;
 beforeAll(() => { ConnectedApp = require('../../ConnectedApp').default; });
 
 beforeEach(async () => {
-  mockRealSummary = false;
+  mockRealSummary = false; mockShellMounts = 0;
   mockCredential = 'rt1.test-device.secret';
   mockOwners.clear(); mockOwners.set('test-device', 7);
   mockJournalNames.clear(); mockJournalNames.set(7, 'auren.db');
@@ -738,6 +739,8 @@ test('native password page submits the authenticated canonical mutation and conf
   const calls = mockTransport.mock.calls.filter(([p]) => p === '/auth/password');
   expect(calls).toHaveLength(1); expect(calls[0][1].body).toEqual(input);
   expect(screen('AccountResult').kind).toBe('password');
+  await act(async () => screen('AccountResult').onContinue());
+  expect(mockShellMounts).toBe(1); expect(screen('AccountSettings')).toBeDefined();
   expect(mockCredential).toBe('rt1.changed-device.secret');
 });
 
@@ -752,6 +755,8 @@ test('Profile opens the real native preferences editor and saves one canonical r
   });
   await boot(); const before = await mockJournal.restore();
   await act(async () => screen('AccountSettings').onPreferences());
+  const hidden = root.container.queryAll((n) => n.props.testID === 'connected-content')[0].props;
+  expect(hidden.accessibilityElementsHidden).toBe(true); expect(hidden.pointerEvents).toBe('none');
   const click = async (id: string) => { await act(async () => {
     const target = root.container.queryAll((n) => n.props.testID === id)[0];
     expect(target).toBeDefined(); target.props.onClick({ nativeEvent: {}, stopPropagation() {}, currentTarget: 1, target: 1 });
@@ -763,6 +768,7 @@ test('Profile opens the real native preferences editor and saves one canonical r
   expect(calls[0][1].body).toEqual({ sessions_per_week: 4, focus_priorities: ['arms'], available_equipment: null });
   expect(await mockJournal.restore()).toEqual(before);
   await click('preferences-done'); expect(screen('AccountSettings')).toBeDefined();
+  expect(mockShellMounts).toBe(1);
 });
 
 test('Android back delegates to the preference page before closing the account route', async () => {
@@ -782,7 +788,7 @@ test('Android back delegates to the preference page before closing the account r
   await press('preferences-frequency-4'); await press('preferences-next');
   act(() => { expect(back?.()).toBe(true); });
   expect(root.container.queryAll((n) => n.props.testID === 'preferences-frequency-4')[0].props.accessibilityState.selected).toBe(true);
-  expect(root.container.queryAll((n) => n.type === 'AccountSettings')).toHaveLength(0);
+  expect(root.container.queryAll((n) => n.props.testID === 'connected-content')[0].props.accessibilityElementsHidden).toBe(true);
 });
 
 test('Android back closes signup through the current account route, rather than leaving the app', async () => {

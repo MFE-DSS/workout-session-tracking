@@ -1,6 +1,6 @@
 # MOB-03 — planche native de compte et premier usage
 
-5 novembre 2026. Statut : **candidat rendu, acceptation visuelle en attente**. Worktree isolé `sb/mob-03-account-core-build`, HEAD publié toujours `da9b6a3` / PR draft #353 ; modifications de cette passe non committées. Aucun déploiement ni remplacement du client QA MOB-02.
+5 novembre 2026. **Statut courant : compte et préférences acceptés ; correction sans inventaire acceptée ; Blueprint complet, données et recettes encore ouverts.** [CR courant PO/architecte](MOB03_CR_PO_ARCHITECT_2026_11_05.md). PR draft #353, aucun déploiement ni remplacement du client QA MOB-02. Les passes ci-dessous conservent leurs états historiques ; les derniers résultats sont à la fin du rapport.
 
 ## Brainstorming / Options / Risques / Choix retenu
 
@@ -241,3 +241,36 @@ Comparaison agent réalisée entre la liste conservée et la grille deux colonne
 
 
 Vérification du diff final du consommateur : **44 suites / 547 tests mobiles, TypeScript, 33 tests de politique/gouvernance UI, protocole et OpenSpec strict 5/5 verts**, budget Ruff264/548. Deux avertissements de dépendances dans les tests Python. Tier script ISOLATED ; broad scoped constitué par toute la suite mobile, aucun full sweep Python redondant. Compilation iOS Release du banc avec la grille compacte réussie ; aucune installation ou nouvelle interaction physique revendiquée. Le constat mineur d'en-tête no-store des erreurs génériques du serveur reste différé, sans valeur de déclaration exposée.
+
+## Reprise MOB-03 4.3 — matériel concret
+
+### Brainstorming / Options / Risques / Choix retenu
+
+Les familles déjà déclarées ne prouvent pas les objets physiques disponibles. Le writer web séparé existe, ainsi que 29 objets regroupés en cinq ensembles d'affichage. L'option de déduire le matériel à partir des familles est écartée : elle inventerait une disponibilité. Ouvrir l'éditeur avancé de salles MOB-09 dépasse la tranche. Choix technique : adaptateur JSON et page initiale facultative qui réutilisent strictement le catalogue et le writer existants, avec null distinct de vide.
+
+Préflight : fichiers d'adaptateurs mobiles et tests dédiés, inventaire MOB-00 et client TypeScript ; services training_preferences/equipment_model et données du registre inchangés. Anciennes préférences préservées, aucun nouveau calcul ou stockage. Les capacités internes restent côté domaine. Le croquis de la seule composition nouvelle est proposé dans MOB03_REVIEW_BOARD_SKETCH.md ; aucune composition de matériel codée avant réponse. Le socle API/client peut avancer indépendamment selon le mandat MOB-03 4.3.
+
+### Task 7 — croquis accepté et orchestration commune
+
+Réponse opérateur : « Valider ce parcours minimal ». La composition « Mon matériel » est autorisée ; son rendu réel reste à soumettre avant commit UI.
+Préflight complémentaire : les deux éditeurs ont la même frontière confirmé/brouillon et les mêmes états réseau. Extraction limitée de l'orchestration de `useTrainingPreferencesEditor` vers `useDeclaredResourceEditor`, avec politiques de copie/égalité propres à chaque déclaration. Les neuf tests existants restent les gardes du premier consommateur ; nouveaux tests sur null/vide, réconciliation et changement de compte pour le matériel. Aucune nouvelle dépendance (`@expo/ui` absent), réutilisation des primitives AUREN autoritaires ; aucun changement des tokens, du moteur ou du stockage. Risque de collision : le hook existant et ConnectedApp sont partagés, diff strictement borné à l'éditeur de déclarations et à sa route.
+
+### Recadrage matériel après exposition — changement de direction
+
+L'opérateur refuse la gestion d'inventaire : « Quelqu'un ne va pas commencer à manager la liste de son matériel ». Le rendu n'est pas accepté. Le prototype, ses API/client et leurs tests non committés sont retirés ; aucune capacité de matériel issue de cette passe ne sera livrée. Les résultats de 241 tests backend et 563 tests mobiles de cette expérimentation sont historiques, pas les preuves du diff final.
+
+Brainstorming / Options / Risques / Choix retenu : garder l'inventaire sous un autre nom contredirait la demande. Retirer la page et retirer les familles de matériel de « Ta disponibilité » répond au besoin ; conserver les déclarations existantes sans les exposer évite toute mutation de faits historiques. L'écran garde la fréquence et les priorités facultatives. La recommandation/substitution sera guidée par les contrats du domaine, sans supposer l'équipement d'une salle ou créer un moteur de compatibilité.
+
+Préflight de correction de navigation : la revue indépendante constate que le formulaire remplace `ExpoRoot`, puis le recrée à Aujourd'hui en sortie, malgré « Revenir au profil ». Le test existant ne conservait pas d'état de montage. Choix : garder la coque montée derrière le formulaire, masquée aux gestes et à l’accessibilité ; même traitement pour mot de passe/résultat depuis Profil. Aucun routeur, onglet, token ou journal nouveau. Les tests doivent constater le défaut avant correction et prouver que la coque n'est pas remontée. Composition des formulaires inchangée.
+
+## Correction sans inventaire — rendu accepté et vérification finale
+
+Réponse opérateur : **« Valider la correction »**, après exposition de `comparatif-sans-inventaire.html`. Le formulaire « Ta disponibilité » ne collecte plus de matériel ; les familles confirmées restent dans le payload complet sans être altérées. Aucune API/client/page de l'inventaire rejeté ne reste dans le diff. La garde de navigation conserve ExpoRoot monté, masqué aux gestes et à l'accessibilité pendant les formulaires compte ; les onglets ne réapparaissent pas derrière eux.
+
+Relecture décision par décision : AurenMark/entrée V1 respectés (inchangés) ; palette et primitives respectées (aucun token nouveau) ; priorités en blocs respectées (inchangées, facultatives) ; nouvelle direction sans inventaire respectée ; MISSION/exécution/bilan LOCKED non concernés ; poids et premier plan non implémentés. Inventaire d'information : seule la fréquence est affichée sur la disponibilité, issue du snapshot serveur ou du brouillon ; aucune info matériel dupliquée ou masquée sous un autre formulaire. Avant/après dans [le reçu de revue](../clients/mobile/visual-contract/review-receipts/mob03-preferences-without-inventory/receipt.json), distinct des baselines.
+
+Vérifications du diff final : **44 suites / 547 tests mobiles passants**, TypeScript passant ; **35 tests protocole/source policy/inventaire passants**, deux avertissements de dépréciation ; budget Ruff264/548, protocole passant et OpenSpec strict5/5. Export web et neuf états/largeurs320/360/430 : zéro erreur JS, zéro requête externe et CTA atteignable. Xcode Release du banc iOS séparé : BUILD SUCCEEDED, sans nouvelle installation ou recette physique. Régression de navigation P2 observée rouge (deux montages au lieu d'un) puis corrigée ; les tests mot de passe/retour et préférences gardent un seul montage. Aucun verdict de navigation physique déduit de ce test.
+
+CI du HEAD publié précédent5d73596 : neuf jobs Actions réussis, mais check externe **SonarCloud Code Analysis = failure**, titre exact « Quality Gate failed », condition « Code smells with severity Major found (required < Major) ». Consultatif selon GOV-SONAR-01, aucune règle/seuil/issue altéré pour le passer. La CI du nouveau HEAD est consignée dans le reçu de publication, sans réutiliser ce vert historique.
+
+CR de passage de relais : [MOB03_CR_PO_ARCHITECT_2026_11_05.md](MOB03_CR_PO_ARCHITECT_2026_11_05.md). Ni critical path complet, ni readiness de merge du change, ni déploiement/recettes/Blueprint complet revendiqués.

@@ -91,3 +91,14 @@ La ressource mobile de déclarations MUST déléguer au service training_prefere
 #### Scenario: Réponse après changement de compte
 - **WHEN** une réponse de lecture ou d'écriture arrive après le départ du compte émetteur
 - **THEN** le client l'annule sans exposer ces préférences au nouveau compte
+
+### Requirement: Aucun inventaire matériel à gérer dans le parcours natif
+Le recadrage opérateur du 5 novembre MUST primer sur la proposition d'acquisition manuelle. Le mobile MUST NOT demander une liste de matériel ni déduire un équipement complet d'une salle générique. Il MUST préserver les déclarations historiques lors d'une modification de fréquence ou de priorités. La proposition d'exercices et leur substitution MUST utiliser les règles canoniques ; un nouveau traitement de disponibilité inconnue requiert un contrat de domaine avant implémentation.
+
+#### Scenario: Modification de fréquence sans inventaire
+- **WHEN** l'utilisateur change sa fréquence depuis Profil
+- **THEN** aucune famille ni liste d'objets ne lui est demandée et les déclarations de matériel existantes sont conservées
+
+#### Scenario: Disponibilité non connue
+- **WHEN** aucune preuve ne décrit la disponibilité d'un équipement
+- **THEN** le mobile ne fabrique pas une compatibilité et ne remplace pas la décision de domaine par une liste de matériel obligatoire

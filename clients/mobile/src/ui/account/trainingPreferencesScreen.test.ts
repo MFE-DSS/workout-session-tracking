@@ -15,15 +15,16 @@ const snapshot = fixture as TrainingDeclarationsSnapshot;
 function node(id: string) { const nodes = root.container.queryAll((n) => n.props.testID === id); expect(nodes.length).toBeGreaterThan(0); return nodes[0].props; }
 const click = async (id: string) => { await act(async () => node(id).onClick({ nativeEvent: {}, stopPropagation() {}, currentTarget: 1, target: 1 })); };
 
-test('both pages select canonical choices and send one full replacement with explicit null/empty', async () => {
+test('availability asks only cadence and preserves existing equipment facts in its full replacement', async () => {
   const saved: any[] = [];
-  const client = { read: async () => ({ state: 'confirmed' as const, value: snapshot }),
+  const client = { read: async () => ({ state: 'confirmed' as const, value: { ...snapshot, declarations: { ...snapshot.declarations, available_equipment: ['machine'] } } }),
     save: async (d: any) => { saved.push(d); return { state: 'confirmed' as const, value: { ...snapshot, declarations: d } }; } };
   await act(async () => root.render(React.createElement(TrainingPreferencesScreen, { client, onClose() {}, onReconnect() {} })));
-  await click('preferences-frequency-4'); await click('preferences-equipment-empty');
+  expect(root.container.queryAll((n) => String(n.props.testID ?? '').startsWith('preferences-equipment-'))).toHaveLength(0);
+  await click('preferences-frequency-4');
   expect(node('preferences-frequency-4').accessibilityState.selected).toBe(true);
   await click('preferences-next'); await click('preferences-focus-arms'); await click('preferences-save');
-  expect(saved).toEqual([{ sessions_per_week: 4, available_equipment: [], focus_priorities: ['arms'] }]);
+  expect(saved).toEqual([{ sessions_per_week: 4, available_equipment: ['machine'], focus_priorities: ['arms'] }]);
   expect(root.container.queryAll((n) => n.props.children === 'Préférences enregistrées.').length).toBeGreaterThan(0);
 });
 
