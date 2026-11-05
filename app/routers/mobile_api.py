@@ -21,12 +21,15 @@ from __future__ import annotations
 
 import functools
 import secrets
+from collections.abc import Callable, Coroutine
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
-from pydantic import BaseModel, Field
+from fastapi.exceptions import RequestValidationError
+from fastapi.routing import APIRoute
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
@@ -37,6 +40,7 @@ from app.models.session import WorkoutSession
 from app.models.user import User
 from app.routers import sessions as web_sessions
 from app.services import device_auth
+from app.services.account_lifecycle import AccountRejected, change_password, register_account
 from app.services.auth import verify_password
 from app.services.environment_activation import ADAPTABLE, REFUSE, preparer_demarrage
 from app.services.feedback import compute_success_score
@@ -115,6 +119,57 @@ def _me(user: User) -> dict[str, Any]:
     return {"id": user.id, "username": user.username}
 
 
+class _PrivateValidationRoute(APIRoute):
+    """Account validation must not echo raw password-bearing input dictionaries."""
+
+    def get_route_handler(self) -> Callable[[Request], Coroutine[Any, Any, Response]]:
+        original = super().get_route_handler()
+
+        async def handle(request: Request) -> Response:
+            try:
+                return await original(request)
+            except RequestValidationError as error:
+                public = [
+                    {key: item[key] for key in ("type", "loc", "msg") if key in item}
+                    for item in error.errors()
+                ]
+                raise HTTPException(
+                    status_code=422, detail=public, headers={"Cache-Control": "no-store"},
+                ) from None
+
+        return handle
+
+
+class RegisterBody(BaseModel):
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
+
+    username: str
+    password: SecretStr
+    password_confirm: SecretStr
+    email: str = ""
+    device_label: str | None = Field(default=None, max_length=128)
+
+
+def register(body: RegisterBody, db: DbSession) -> dict[str, Any]:
+    try:
+        user = register_account(
+            db, username=body.username, password=body.password.get_secret_value(),
+            password_confirm=body.password_confirm.get_secret_value(), email=body.email,
+        )
+    except AccountRejected as error:
+        status = 409 if error.code in {"username_unavailable", "email_unavailable"} else 400
+        raise _err(status, error.code, message=error.message) from None
+    issued = device_auth.open_device_session(db, user, device_label=body.device_label)
+    db.commit()
+    return {**_tokens(issued), "user": _me(user)}
+
+
+router.add_api_route(
+    "/auth/register", register, methods=["POST"], status_code=201,
+    route_class_override=_PrivateValidationRoute,
+)
+
+
 @router.post("/auth/login")
 def login(body: LoginBody, db: DbSession) -> dict[str, Any]:
     if is_password_too_long(body.password):
@@ -128,6 +183,39 @@ def login(body: LoginBody, db: DbSession) -> dict[str, Any]:
     issued = device_auth.open_device_session(db, user, device_label=body.device_label)
     db.commit()
     return {**_tokens(issued), "user": _me(user)}
+
+
+class PasswordChangeBody(BaseModel):
+    model_config = ConfigDict(extra="forbid", hide_input_in_errors=True)
+
+    current_password: SecretStr
+    new_password: SecretStr
+    new_password_confirm: SecretStr
+
+
+def password_change(
+    body: PasswordChangeBody, request: Request, user: ApiUser, db: DbSession,
+) -> dict[str, Any]:
+    try:
+        change_password(
+            db, user, current_password=body.current_password.get_secret_value(),
+            new_password=body.new_password.get_secret_value(),
+            new_password_confirm=body.new_password_confirm.get_secret_value(),
+        )
+    except AccountRejected as error:
+        status = 409 if error.code == "credentials_changed" else 400
+        raise _err(status, error.code, message=error.message) from None
+    issued = device_auth.open_device_session(
+        db, user, device_label=request.state.device_session.device_label,
+    )
+    db.commit()
+    return {**_tokens(issued), "user": _me(user)}
+
+
+router.add_api_route(
+    "/auth/password", password_change, methods=["POST"],
+    route_class_override=_PrivateValidationRoute,
+)
 
 
 @router.post("/auth/refresh")

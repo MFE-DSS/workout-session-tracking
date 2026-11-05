@@ -118,10 +118,10 @@ features:
   - id: auth-register
     feature: Créer un compte
     family: compte
-    routes: [GET /welcome, GET /register, POST /register]
+    routes: [GET /welcome, GET /register, POST /register, POST /api/mobile/v1/auth/register]
     legacy_location: "auth_routes.register → welcome.html, register.html"
     domain_owner: [auth, password_policy]
-    api: "à créer (inscription mobile)"
+    api: "POST /api/mobile/v1/auth/register (socle JSON MOB-03)"
     data: [users]
     user_actions: [créer un compte]
     native_destination: Compte — entrée de l'onboarding
@@ -148,10 +148,10 @@ features:
   - id: account-password-change
     feature: Changer son mot de passe
     family: compte
-    routes: [GET /profile/password, POST /profile/password]
+    routes: [GET /profile/password, POST /profile/password, POST /api/mobile/v1/auth/password]
     legacy_location: "auth_routes → password_change.html"
     domain_owner: [auth, password_policy]
-    api: "à créer"
+    api: "POST /api/mobile/v1/auth/password (Bearer)"
     data: [users]
     user_actions: [changer son mot de passe]
     native_destination: Compte

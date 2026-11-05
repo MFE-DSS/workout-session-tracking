@@ -42,3 +42,7 @@ Pas de code produit dans cette préparation ; pas de MISSION (MOB-04), journal/p
 - **D-MOB03-3 — suppression :** pas d’API de suppression de compte observée. Valider l’inventaire d’effacement/rétention, la réauthentification et les commandes locales en attente avant toute action destructive ; ne pas transposer automatiquement la suppression d’une mesure à tout le compte.
 - **D-MOB03-4 — UX :** acquisitions vraiment utiles, ordre reprenable et surfaces à accepter. L’équipement concret réutilise le domaine existant ; ses nouvelles surfaces riches et assets restent à MOB-09.
 - Revue sécurité/qualité avant introduction des mesures sensibles selon GOV-SONAR-01 ; consentement existant `SPIGNOS_BODY_PRIVACY_AND_CONSENT_SPEC` à appliquer sans étendre aux photos.
+
+## Exécution partielle autorisée — 5 novembre 2026
+
+Le nouveau mandat opérateur autorise l'avancement sur le chemin critique pendant son absence. La préparation initiale évolue vers le socle API indépendant : inscription JSON avec validations/quota canoniques, changement authentifié du mot de passe et révocation. Aucun objectif/unité, poids, consentement, effacement ou écran nouveau n'est implémenté sans ses décisions. D-MOB03-1 à 4 restent ouverts. Les mentions de « préparation seulement » ci-dessus décrivent l'étape initiale, pas une approbation implicite de ces quatre décisions. Le plan et les résultats sont dans implementation-account-core.md et docs/SPRINT_MOB03_REPORT.md.

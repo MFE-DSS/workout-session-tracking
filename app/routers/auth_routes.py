@@ -15,6 +15,15 @@ from sqlalchemy import select
 from app.config import get_settings
 from app.deps import CurrentUser, DbSession
 from app.models.user import User
+from app.services.account_lifecycle import (
+    AccountRejected,
+    EMAIL_REGEX as EMAIL_REGEX,
+    MAX_USERNAME_LENGTH as MAX_USERNAME_LENGTH,
+    MIN_USERNAME_LENGTH as MIN_USERNAME_LENGTH,
+    USERNAME_REGEX as USERNAME_REGEX,
+    change_password,
+    register_account,
+)
 from app.services.auth import (
     clear_session_cookie,
     create_reset_token,
@@ -40,27 +49,11 @@ router = APIRouter(tags=["auth"])
 # Existing accounts unaffected — the threshold only applies to
 # registration and password-change flows.
 MIN_PASSWORD_LENGTH = 8
-MIN_USERNAME_LENGTH = 3
-MAX_USERNAME_LENGTH = 64
 
 # Sb_AUTH_PASSWORD_LENGTH_01 — the login view is rendered from three branches
 # (over-long password, bad credentials, and the GET page). Naming it once keeps
 # them from drifting apart.
 LOGIN_TEMPLATE = "login.html"
-
-# Sb_20.3 — username regex: alphanumeric + underscore + dash only.
-# Mirrors the path-param regex on /users/{username} so the public
-# profile route never has to deal with surprising characters.
-import re as _re
-
-USERNAME_REGEX = _re.compile(r"^[a-zA-Z0-9_-]+$")
-
-# Sb_20.3 — email regex (basic but strict). Replaces the prior loose
-# check `"@" in email` + dot in domain. Not RFC 5322 — production
-# email validation should ride on real send (DNS, SMTP) — but this
-# rejects obviously invalid inputs at registration time.
-EMAIL_REGEX = _re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
-
 
 # ---------------------------------------------------------------------------
 # Public
@@ -281,56 +274,18 @@ async def register_submit(
     email: Annotated[str, Form()] = "",
     db: DbSession = None,
 ):
-    error = None
-    username_clean = username.strip()
-    # Sb_AUTH_PASSWORD_LENGTH_01 — one call, evaluated before the chain so the
-    # policy cannot be reached twice or skipped by a reordering.
-    password_error = validate_password_policy(password)
-    if len(username_clean) < MIN_USERNAME_LENGTH:
-        error = f"Le nom d'utilisateur doit faire au moins {MIN_USERNAME_LENGTH} caractères."
-    elif len(username_clean) > MAX_USERNAME_LENGTH:
-        error = f"Le nom d'utilisateur dépasse {MAX_USERNAME_LENGTH} caractères."
-    elif not USERNAME_REGEX.match(username_clean):
-        # Sb_20.3 — explicit allowlist (CWE-20). Rejects unicode,
-        # punctuation, spaces — only [a-zA-Z0-9_-] survive.
-        error = "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, _ et -."
-    elif password_error is not None:
-        error = password_error
-    elif password != password_confirm:
-        error = "Les mots de passe ne correspondent pas."
-    else:
-        existing = db.execute(
-            select(User).where(User.username == username_clean)
-        ).scalar_one_or_none()
-        if existing is not None:
-            error = "Ce nom d'utilisateur est déjà pris."
-
-    # Email validation (only if provided) — Sb_20.3 strict regex.
-    email_clean = email.strip().lower() if email.strip() else None
-    if error is None and email_clean:
-        if not EMAIL_REGEX.match(email_clean):
-            error = "Adresse email invalide."
-        else:
-            email_exists = db.execute(
-                select(User).where(User.email == email_clean)
-            ).scalar_one_or_none()
-            if email_exists is not None:
-                error = "Cet email est déjà associé à un compte."
-
-    if error:
+    try:
+        user = register_account(
+            db, username=username, password=password,
+            password_confirm=password_confirm, email=email,
+        )
+        db.commit()
+    except AccountRejected as error:
         return templates.TemplateResponse(
             request, "register.html",
-            {"page_title": "Inscription", "error": error},
+            {"page_title": "Inscription", "error": error.message},
             status_code=400,
         )
-
-    user = User(
-        username=username_clean,
-        password_hash=hash_password(password),
-        email=email_clean,
-    )
-    db.add(user)
-    db.commit()
 
     # Auto-login after registration.
     response = RedirectResponse(url="/", status_code=303)
@@ -793,35 +748,18 @@ async def password_change_submit(
     db: DbSession,
     user: CurrentUser,
 ):
-    error = None
-    # Sb_AUTH_PASSWORD_LENGTH_01 — the CURRENT password is checked against the
-    # maximum too: it reaches bcrypt.verify, which under bcrypt 5 raises past
-    # 72 bytes. Its minimum is NOT re-checked — an account created before the
-    # floor was raised must still be able to authenticate to change it.
-    current_error = validate_password_policy(current_password, check_minimum=False)
-    new_error = validate_password_policy(
-        new_password, field_label="Le nouveau mot de passe"
-    )
-    if current_error is not None:
-        error = current_error
-    elif not verify_password(current_password, user.password_hash):
-        error = "Le mot de passe actuel est incorrect."
-    elif new_error is not None:
-        error = new_error
-    elif new_password != new_password_confirm:
-        error = "Les nouveaux mots de passe ne correspondent pas."
-
-    if error:
+    try:
+        change_password(
+            db, user, current_password=current_password, new_password=new_password,
+            new_password_confirm=new_password_confirm,
+        )
+    except AccountRejected as error:
         return templates.TemplateResponse(
             request, "password_change.html",
-            {"page_title": "Changer le mot de passe", "error": error, "success": False},
+            {"page_title": "Changer le mot de passe", "error": error.message, "success": False},
             status_code=400,
         )
 
-    user.password_hash = hash_password(new_password)
-    # A0 I5 — toute session émise avant est révoquée ; celle de l'utilisateur qui vient de
-    # changer son mot de passe est ré-émise à la nouvelle époque.
-    revoke_sessions(user)
     db.commit()
 
     response = templates.TemplateResponse(

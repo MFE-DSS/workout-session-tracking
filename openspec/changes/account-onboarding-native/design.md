@@ -65,3 +65,15 @@ Même domaine et mêmes garanties de données. Credentials et feuilles/clavier/r
 ## Questions opérationnelles différables
 
 Identifiant du compte de recette et disponibilité du téléphone lors de la passe ; ces détails ne changent ni le domaine ni les décisions de produit. Aucun secret dans les artefacts.
+
+## Mandat de build partiel — 5 novembre 2026
+
+L'opérateur demande explicitement d'avancer sur les fonctionnalités du chemin critique pendant son absence. L'agent borne ce build au socle non destructif du compte : inscription JSON, changement authentifié du mot de passe et révocation canoniques, mutualisation des validations web et preuves de routes réelles. D-MOB03-1 à 4 restent OPEN ; leurs sémantiques et compositions ne sont pas implémentées. Aucun choix d'effacement, d'unité ou de donnée corporelle n'est accepté implicitement. Plan technique : implementation-account-core.md ; compte rendu : docs/SPRINT_MOB03_REPORT.md. Pas de nouveau contrat visuel, de migration ou de déploiement.
+
+### Contrat technique de la partie indépendante
+
+POST /api/mobile/v1/auth/register : mêmes champs et validations que /register ; 201 avec paire Bearer et identité, aucun cookie web. Nom/email déjà utilisés : 409 ; données invalides : 400 avec code et message canonique. La contrainte unique existante reste le garde de concurrence. Aucun secret ni clé d'idempotence persisté ; si la réponse est inconnue, le consommateur doit proposer une vérification par login au lieu d'affirmer le succès ou de créer un autre compte. Quota register partagé avec le web.
+
+POST /api/mobile/v1/auth/password : Bearer propriétaire, mot de passe actuel et nouvelle confirmation ; même politique de mot de passe et incrément de session_epoch que le web. La nouvelle paire est émise dans la même transaction pour l'appelant ; tous les anciens credentials sont invalides. Quota login partagé pour la vérification du secret actuel. Les surfaces et la gestion du journal propriétaire restent des tâches non livrées de MOB-03.
+
+Protection technique supplémentaire validée par test concurrent : le changement de mot de passe compare l'époque et le hash courants dans l'UPDATE atomique. Une demande devenue obsolète reçoit 409 credentials_changed et n'émet pas de credentials. Cela conserve le contrat session_epoch tout en empêchant deux nouveaux jeux de jetons au même numéro d'époque après des changements concurrents. Aucune migration ou nouvelle politique de révocation.
