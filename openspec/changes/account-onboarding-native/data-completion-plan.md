@@ -27,21 +27,21 @@ Adding a body screen or activating deletion/science would cross explicit boundar
 
 Files: api/weightHistoryResource.ts + integration tests; body_profile.py; existing weight backend tests.
 Interfaces: WeightHistoryResource(auth,client).state/.refresh()/.loadNext(); values only confirmed, no persistence, identity-generation and request sequence guards. Existing WeightHistoryClient and GET remain read-only unchanged.
-- [ ] RED real AuthSession+transport consent/revoked/empty/pagination/invalid cursor/network/expiry/owner/latest-response cases.
-- [ ] Implement headless state/pagination with no UI and no prefetch; pending/error states clear readable private data, duplicate pages fail closed.
-- [ ] Refactor weight_history_page into UTC/date, quality and row helpers, no output change. Characterize complete JSON against edge cases, then run canonical/HTTP body tests.
+- [x] RED real AuthSession+transport consent/revoked/empty/pagination/invalid cursor/network/expiry/owner/latest-response cases.
+- [x] Implement headless state/pagination with no UI and no prefetch; pending/error states clear readable private data, duplicate pages fail closed.
+- [x] Refactor weight_history_page into UTC/date, quality and row helpers, no output change. Characterize complete JSON against edge cases, then run canonical/HTTP body tests.
 
 ## Task2 — durable deletion integration and producer preparation
 
 Files: accountDeletion.ts/tests, ownershipStore.ts factory, real SQLite integration tests; docs/MOB03_DELETION_PRODUCER_DESIGN.md and isolated synthetic test receipts.
 Interfaces: createOwnershipBook(db) reuses the existing actual book initializer; AccountDeletionClient remains producer=null by default. Unauthenticated terminal rejection becomes unknown rather than an authoritative refusal.
-- [ ] RED unverified refusal and real SQLite lost-response/reopen/pending/concurrent/cross-owner retirement tests.
-- [ ] Complete bounded orchestration/factory seams, prove owner7 retired persists across restart while owner8 stays accessible; no actual purge/producer.
-- [ ] Specify server idempotency/CAS/reauth/revocation/authoritative status and post-revocation receipt recovery; no route/table implementation. Concise policy-only decision table tied to existing inventory/graph.
+- [x] RED unverified refusal and real SQLite lost-response/reopen/pending/concurrent/cross-owner retirement tests.
+- [x] Complete bounded orchestration/factory seams, prove owner7 retired persists across restart while owner8 stays accessible; no actual purge/producer.
+- [x] Specify server idempotency/CAS/reauth/revocation/authoritative status and post-revocation receipt recovery; no route/table implementation. Concise policy-only decision table tied to existing inventory/graph.
 
 ## Task3 — first-plan runtime-boundary checks and delivery
 
 Files: firstPlan integration test only; canonical real blocked producer fixtures and existing SYNTHETIC_TEST_ONLY_NOT_SERVED protocol fixture, no production adapter.
-- [ ] Exercise real AuthSession/createTransport/client for READY protocol only, insufficiency, NOT_SERVED, stale version, wrong owner/fingerprint, unknown equipment,403consent and late account responses.
-- [ ] check_scope then targeted+broad consumer/backend checks, full mobile/TypeScript, Ruff/budget/spec/OpenSpec; fresh review, one Important fix pass.
+- [x] Exercise real AuthSession/createTransport/client for READY protocol only, insufficiency, NOT_SERVED, stale version, wrong owner/fingerprint, unknown equipment,403consent and late account responses.
+- [x] check_scope then targeted+broad consumer/backend checks, full mobile/TypeScript, Ruff/budget/spec/OpenSpec; fresh review, one Important fix pass.
 - [ ] Publish in existing353, actual final CI/Sonar; compact receipt of new code/tests, exact blockers and COMPLETE MOB03 status. No merge/deploy/archive while global mandatory gates remain open.

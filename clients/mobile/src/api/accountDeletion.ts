@@ -78,7 +78,7 @@ export class AccountDeletionClient {
       if (!current()) return { state: 'cancelled' };
       if (!intent || intent.ownerId !== owner.id) return { state: 'unavailable' };
       if (password !== undefined && !(await this.store.claim(intent, current))) {
-        return { state: intent.phase.startsWith('rejected') ? 'rejected' : 'unknown' };
+        return { state: intent.phase === 'rejected_confirmed' ? 'rejected' : 'unknown' };
       }
       if (!current()) return { state: 'cancelled' };
       const captured = { ...intent };

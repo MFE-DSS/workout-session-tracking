@@ -175,3 +175,14 @@ test('an unverified terminal refusal is unknown rather than an authoritative rej
   expect(s.rows.get(7).phase).toBe('unknown');
   expect(s.calls).not.toContain('/auth/logout');
 });
+
+test.each([['rejected', 'unknown'], ['rejected_confirmed', 'rejected']])(
+  'resumed %s intent returns %s without replay or unsupported authority', async (phase, state) => {
+    const s = await setup();
+    s.rows.set(7, { ownerId: 7, requestId: 'stable-request', phase });
+    expect(await s.make().submit('fixture-only')).toEqual({ state });
+    expect(s.submitted).toEqual([]);
+    expect(s.retired.size).toBe(0);
+    expect(s.calls).not.toContain('/auth/logout');
+  },
+);
