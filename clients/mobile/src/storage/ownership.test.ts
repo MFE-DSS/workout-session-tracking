@@ -8,6 +8,7 @@ function book() {
   const names = new Map<number, string>();
   let legacy: number | null = null;
   const value: OwnershipBook = {
+    isRetiredOwner: async () => false,
     ownerOfDevice: async (id) => devices.get(id) ?? null,
     journalOf: async (id) => names.get(id) ?? null,
     legacyOwner: async () => legacy,
@@ -108,4 +109,19 @@ test.each([
   const result = await resolveJournal(request(b.value, { ...empty, snapshot: snapshot as never }));
   expect(result.state === 'ready' && result.quarantined).toBe(true);
   expect(b.legacy()).toBeNull();
+});
+
+test.each([true, false])('retired owner cannot reopen a journal online=%s', async (online) => {
+  const b = book();
+  b.devices.set('device-a', 7); b.names.set(7, 'auren.db');
+  const value = { ...b.value, isRetiredOwner: async () => true };
+  expect(await resolveJournal({ ...request(value), online })).toEqual({ state: 'needs-connection' });
+  expect(b.names.get(7)).toBe('auren.db');
+});
+
+test('retirement during an offline metadata read cannot return a ready journal', async () => {
+  const b = book(); b.devices.set('device-a',7); b.names.set(7,'auren.db'); let retired = false;
+  const value = { ...b.value, isRetiredOwner: async () => retired,
+    journalOf: async () => { retired = true; return 'auren.db'; } };
+  expect(await resolveJournal({ ...request(value), online: false })).toEqual({ state: 'needs-connection' });
 });

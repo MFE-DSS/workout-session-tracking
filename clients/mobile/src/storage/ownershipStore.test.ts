@@ -4,7 +4,7 @@ let mockAfterWrite: () => Promise<void>;
 jest.mock('expo-sqlite', () => ({ openDatabaseAsync: async () => ({
   execAsync: async () => undefined,
   withExclusiveTransactionAsync: async (fn: (tx: unknown) => Promise<void>) => {
-    await fn({ runAsync: async () => mockAfterWrite(), getFirstAsync: async (sql: string) => sql.includes('legacy_owner') ? { user_id: 7 } : { name: 'auren.db' } });
+    await fn({ runAsync: async () => mockAfterWrite(), getFirstAsync: async (sql: string) => sql.includes('owner_retirements') ? null : sql.includes('legacy_owner') ? { user_id: 7 } : { name: 'auren.db' } });
     mockCommit();
   },
 }) }));

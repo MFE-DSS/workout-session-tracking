@@ -21,6 +21,7 @@ let mockLegacyOwner: number | null = 7;
 const mockOpened: string[] = [];
 const mockInspectLegacy = jest.fn();
 jest.mock('../storage/ownershipStore', () => ({ openOwnershipBook: async () => ({
+  isRetiredOwner: async () => false,
   ownerOfDevice: async (d: string) => mockOwners.get(d) ?? null,
   journalOf: async (u: number) => mockJournalNames.get(u) ?? null,
   legacyOwner: async () => mockLegacyOwner,

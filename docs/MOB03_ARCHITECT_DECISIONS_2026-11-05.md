@@ -59,3 +59,8 @@ Les liens réinitialisation et export gardent leur parcours web MOB-00 ; aucun t
 | MOB-08 à MOB-12 | Exercices, salle, substitutions, profil après UX-LAB-PROFILE, récupération/cardio | Ouvrir chaque change dans l'ordre adopté, avec ses décisions et ses preuves |
 
 Les lignes suivantes sont un ordre de pilotage, pas une acceptation anticipée de leur design. Photos, octogone et abonnement gardent leurs workstreams et dépendances. Les validations appareil MOB-02 en cours restent distinctes de la future recette MOB-03.
+
+
+## D2 — lecture seule approuvée dans la continuation
+
+L’opérateur accepte « Valider le GET de poids proposé » : BodyMeasurement via body_profile, kg, dates/provenance explicites, consentement actif et flag existants, sans writer ni nouvel écran. [Contrat réalisé](MOB03_WEIGHT_HISTORY_CONTRACT.md). User.weight_kg hérité sans date est exclu, sans migration ni double-write. Les unités impériales, nouvelles acquisitions et politique/texte de consentement ne sont pas décidés par cette acceptation.

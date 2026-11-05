@@ -39,6 +39,7 @@ from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import WorkoutSession
 from app.models.user import User
 from app.routers import sessions as web_sessions
+from app.routers.mobile_body import router as body_router
 from app.routers.mobile_training_preferences import read_declarations, replace_declarations
 from app.services import device_auth
 from app.services.account_lifecycle import AccountRejected, change_password, register_account
@@ -560,3 +561,7 @@ def abandon(session_id: int, body: CloseBody, user: ApiUser, db: DbSession) -> d
     db.refresh(s)
     return _closure(s, applied=True)
 
+
+
+# MOB-03 read-only body history; no new measurement writer or deletion route.
+router.include_router(body_router)

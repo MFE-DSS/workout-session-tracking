@@ -1,0 +1,561 @@
+{
+  "schema_version": 1,
+  "source": "ORM metadata only; no database query or deployed schema guarantee",
+  "tables": [
+    {
+      "table": "body_consents",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "consent_type",
+        "granted",
+        "consent_version",
+        "granted_at",
+        "withdrawn_at",
+        "created_at"
+      ]
+    },
+    {
+      "table": "body_measurements",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "measured_at",
+        "weight_kg",
+        "chest_cm",
+        "arm_cm_left",
+        "arm_cm_right",
+        "waist_cm",
+        "thigh_cm_left",
+        "thigh_cm_right",
+        "hip_cm",
+        "neck_cm",
+        "calf_cm",
+        "shoulder_width_cm",
+        "calf_cm_left",
+        "calf_cm_right",
+        "wingspan_cm",
+        "created_at"
+      ]
+    },
+    {
+      "table": "decision_traces",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "decision_id",
+        "trace_group_id",
+        "user_id",
+        "decision_type",
+        "policy_version",
+        "decision_fingerprint",
+        "upstream_decision_ids",
+        "constraint_sources",
+        "preference_sources",
+        "morphology_sources",
+        "recovery_sources",
+        "selected_output",
+        "rejected_alternatives",
+        "basis",
+        "confidence",
+        "plan_fingerprint",
+        "program_id",
+        "program_version",
+        "created_at"
+      ]
+    },
+    {
+      "table": "device_sessions",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "refresh_hash",
+        "session_epoch",
+        "device_label",
+        "created_at",
+        "last_used_at",
+        "revoked_at"
+      ]
+    },
+    {
+      "table": "plan_adaptation_dismissals",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "decision_id",
+        "user_id",
+        "dismissed_at"
+      ]
+    },
+    {
+      "table": "readiness_entries",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "recorded_on",
+        "sleep_quality",
+        "fatigue_level",
+        "soreness_level",
+        "stress_level",
+        "motivation_level",
+        "resting_hr",
+        "note",
+        "created_at"
+      ]
+    },
+    {
+      "table": "recommendation_episodes",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "context_fingerprint",
+        "policy_version",
+        "decided_at",
+        "resolved_at",
+        "proposed_top_slug",
+        "proposed_alt_slugs",
+        "outcome",
+        "chosen_slug",
+        "session_id"
+      ]
+    },
+    {
+      "table": "session_exercises",
+      "foreign_keys": [
+        {
+          "column": "session_id",
+          "target": "workout_sessions.id",
+          "ondelete": "CASCADE"
+        },
+        {
+          "column": "template_exercise_id",
+          "target": "template_exercises.id",
+          "ondelete": "SET NULL"
+        }
+      ],
+      "columns": [
+        "id",
+        "session_id",
+        "template_exercise_id",
+        "exercise_code_snapshot",
+        "exercise_name_snapshot",
+        "position",
+        "success_score",
+        "muscle_sensation",
+        "free_note",
+        "substituted_name",
+        "implicit_label",
+        "implicit_label_computed_at"
+      ]
+    },
+    {
+      "table": "set_logs",
+      "foreign_keys": [
+        {
+          "column": "session_exercise_id",
+          "target": "session_exercises.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "session_exercise_id",
+        "kind",
+        "set_index",
+        "weight_kg",
+        "reps",
+        "technique",
+        "execution_quality",
+        "reps_target",
+        "completed",
+        "completed_at",
+        "rest_dismissed_at"
+      ]
+    },
+    {
+      "table": "squad_challenges",
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "target": "users.id",
+          "ondelete": null
+        },
+        {
+          "column": "squad_id",
+          "target": "squads.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "squad_id",
+        "created_by",
+        "title",
+        "metric",
+        "starts_at",
+        "ends_at",
+        "created_at"
+      ]
+    },
+    {
+      "table": "squad_invite_codes",
+      "foreign_keys": [
+        {
+          "column": "created_by",
+          "target": "users.id",
+          "ondelete": null
+        },
+        {
+          "column": "squad_id",
+          "target": "squads.id",
+          "ondelete": "CASCADE"
+        },
+        {
+          "column": "used_by",
+          "target": "users.id",
+          "ondelete": null
+        }
+      ],
+      "columns": [
+        "id",
+        "squad_id",
+        "code",
+        "created_by",
+        "expires_at",
+        "used_by",
+        "used_at"
+      ]
+    },
+    {
+      "table": "squad_memberships",
+      "foreign_keys": [
+        {
+          "column": "squad_id",
+          "target": "squads.id",
+          "ondelete": "CASCADE"
+        },
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "squad_id",
+        "user_id",
+        "role",
+        "joined_at"
+      ]
+    },
+    {
+      "table": "squad_shared_sessions",
+      "foreign_keys": [
+        {
+          "column": "session_id",
+          "target": "workout_sessions.id",
+          "ondelete": null
+        },
+        {
+          "column": "squad_id",
+          "target": "squads.id",
+          "ondelete": "CASCADE"
+        },
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": null
+        }
+      ],
+      "columns": [
+        "id",
+        "squad_id",
+        "user_id",
+        "session_id",
+        "created_at"
+      ]
+    },
+    {
+      "table": "squad_template_recommendations",
+      "foreign_keys": [
+        {
+          "column": "squad_id",
+          "target": "squads.id",
+          "ondelete": "CASCADE"
+        },
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": null
+        }
+      ],
+      "columns": [
+        "id",
+        "squad_id",
+        "user_id",
+        "template_slug",
+        "template_name",
+        "note",
+        "created_at"
+      ]
+    },
+    {
+      "table": "squads",
+      "foreign_keys": [
+        {
+          "column": "owner_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "name",
+        "owner_id",
+        "created_at"
+      ]
+    },
+    {
+      "table": "training_preferences",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "sessions_per_week",
+        "focus_priorities",
+        "available_equipment",
+        "available_equipment_items",
+        "created_at",
+        "updated_at"
+      ]
+    },
+    {
+      "table": "user_program_exercises",
+      "foreign_keys": [
+        {
+          "column": "user_program_session_id",
+          "target": "user_program_sessions.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_program_session_id",
+        "position",
+        "exercise_name",
+        "variant_key",
+        "variant_group",
+        "equipment_family",
+        "movement_pattern",
+        "set_scheme",
+        "notes",
+        "source_reason"
+      ]
+    },
+    {
+      "table": "user_program_quality_reviews",
+      "foreign_keys": [
+        {
+          "column": "user_program_id",
+          "target": "user_programs.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_program_id",
+        "version",
+        "grade",
+        "global_score",
+        "subscores_json",
+        "alerts_json",
+        "suggestions_json",
+        "assumptions_json",
+        "missing_data_json",
+        "scoring_version",
+        "ekb_version",
+        "confidence",
+        "coverage_ratio",
+        "grade_cap_reason",
+        "computed_at"
+      ]
+    },
+    {
+      "table": "user_program_rep_targets",
+      "foreign_keys": [
+        {
+          "column": "user_program_exercise_id",
+          "target": "user_program_exercises.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_program_exercise_id",
+        "set_index",
+        "min_reps",
+        "max_reps",
+        "technique",
+        "is_warmup"
+      ]
+    },
+    {
+      "table": "user_program_sessions",
+      "foreign_keys": [
+        {
+          "column": "published_template_id",
+          "target": "workout_templates.id",
+          "ondelete": "SET NULL"
+        },
+        {
+          "column": "user_program_id",
+          "target": "user_programs.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_program_id",
+        "position",
+        "name",
+        "kind",
+        "focus",
+        "duration_target_minutes",
+        "notes",
+        "published_template_id",
+        "template_slug_snapshot"
+      ]
+    },
+    {
+      "table": "user_programs",
+      "foreign_keys": [
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "title",
+        "slug_base",
+        "status",
+        "current_version",
+        "created_at",
+        "updated_at",
+        "archived_at"
+      ]
+    },
+    {
+      "table": "users",
+      "foreign_keys": [],
+      "columns": [
+        "id",
+        "username",
+        "password_hash",
+        "is_active",
+        "created_at",
+        "email",
+        "session_epoch",
+        "height_cm",
+        "weight_kg",
+        "resting_hr",
+        "waist_cm",
+        "bp_systolic",
+        "bp_diastolic"
+      ]
+    },
+    {
+      "table": "workout_sessions",
+      "foreign_keys": [
+        {
+          "column": "template_id",
+          "target": "workout_templates.id",
+          "ondelete": "SET NULL"
+        },
+        {
+          "column": "user_id",
+          "target": "users.id",
+          "ondelete": "CASCADE"
+        }
+      ],
+      "columns": [
+        "id",
+        "user_id",
+        "template_id",
+        "template_slug_snapshot",
+        "template_name_snapshot",
+        "started_at",
+        "ended_at",
+        "status",
+        "excluded_from_stats",
+        "concentration",
+        "global_state",
+        "bodyweight_kg",
+        "cardio_duration_min",
+        "cardio_bpm_avg",
+        "cardio_machine_calories",
+        "cardio_machine_type",
+        "free_note",
+        "creation_source",
+        "scoring_version",
+        "overload_engine_version",
+        "created_at"
+      ]
+    }
+  ]
+}

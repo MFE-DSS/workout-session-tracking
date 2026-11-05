@@ -102,3 +102,30 @@ Le recadrage opérateur du 5 novembre MUST primer sur la proposition d'acquisiti
 #### Scenario: Disponibilité non connue
 - **WHEN** aucune preuve ne décrit la disponibilité d'un équipement
 - **THEN** le mobile ne fabrique pas une compatibilité et ne remplace pas la décision de domaine par une liste de matériel obligatoire
+
+
+### Requirement: Lecture JSON propriétaire de poids existant
+La lecture mobile de poids MUST réutiliser BodyMeasurement via body_profile, conserver kg et dates, laisser la provenance historique inconnue et exclure User.weight_kg sans date. Elle MUST exiger Bearer, flag corporel existant et consentement actif, fournir une pagination stable et ne déclencher aucune écriture. Les réponses et erreurs MUST être no-store.
+
+#### Scenario: Consentement retiré
+- **WHEN** un propriétaire sans consentement actif consulte le GET de poids
+- **THEN** aucune mesure n'est exposée et aucun consentement n'est créé implicitement
+
+#### Scenario: Curseur et dates identiques
+- **WHEN** plusieurs mesures partagent leur date ou un curseur représente le même instant avec un autre décalage
+- **THEN** l'ordre measured_at/id normalisé UTC conserve la frontière sans répétition ni perte
+
+#### Scenario: Poids historique atypique
+- **WHEN** une ligne possède un poids hors des bornes actuelles ou non fini
+- **THEN** sa qualité est explicitée sans modification, suppression ou remplacement de sa valeur en base
+
+### Requirement: Consommateur du premier plan sans recommandation de repli
+Le consommateur MUST distinguer états de transport et six statuts SCI-P01/P02, vérifier versions/structure/empreinte/propriétaire et neutraliser les réponses obsolètes. Sans producteur approuvé, il MUST rester indisponible. Les fixtures de test MUST NOT constituer une politique scientifique ou un premier plan réellement servi.
+
+#### Scenario: Contrats reçus mais moteur absent
+- **WHEN** le mobile possède les schémas SCI v1 sans producteur approuvé
+- **THEN** il indique NOT_SERVED et ne consulte pas la recommandation historique comme repli
+
+#### Scenario: Compte ou requête remplacés
+- **WHEN** une réponse arrive pour une génération ou empreinte différente
+- **THEN** elle ne remplace pas les données personnelles courantes

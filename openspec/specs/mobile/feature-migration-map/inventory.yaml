@@ -251,9 +251,10 @@ features:
       - POST /body/measurements/{measurement_id}/edit
       - POST /body/measurements/{measurement_id}/delete
       - GET /body/export.json
+      - GET /api/mobile/v1/me/body/weight-history
     legacy_location: "body.* → body_assessment/body_overview.html, measurement_form.html"
     domain_owner: [measurements, body_ledger, body_profile]
-    api: "à créer (lecture + écriture JSON)"
+    api: "GET /api/mobile/v1/me/body/weight-history (poids seul, consentement/flag) ; écriture JSON non livrée"
     data: ["body_measurements (measured_at, weight_kg, tours)"]
     user_actions: [saisir son poids, saisir des mesures, corriger, supprimer, exporter]
     native_destination: PROFIL (BODY_LEDGER)

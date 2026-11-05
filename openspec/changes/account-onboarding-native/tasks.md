@@ -67,3 +67,13 @@ L'opérateur accepte la V1 ajustée après le comparatif et demande la poursuite
 ## Recadrage opérateur après rendu du matériel — 5 novembre
 
 L'opérateur refuse la gestion manuelle de matériel : « Quelqu'un ne va pas commencer à manager la liste de son matériel ». La proposition 4.3 d'inventaire initial est retirée explicitement, non déclarée achevée ; le prototype API/client/UI non committé a été retiré. Partir du profil et proposer exercices/séances, puis permettre les substitutions selon les possibilités réelles, est la direction retenue. Le contrat de compatibilité et de résolution de l'inconnu reste à fournir ; ni une chaîne de salles ni un profil générique ne prouvent les équipements présents. Les familles ne sont plus demandées dans l'éditeur natif ; le PUT existant préserve leurs valeurs confirmées. Le domaine et les déclarations historiques restent inchangés.
+
+
+## Continuation DATA & FIRST PLAN — état courant
+
+- [x] Matrice complète et graphe des données, sans durée arbitraire ; mécanismes destructifs non autorisés conservés ouverts.
+- [x] Fondations réauthentification/révocation, intentions clientes durables, réponses incertaines et marques de retrait ; aucune API d'effacement ou purge serveur prétendue livrée.
+- [x] Delta GET poids accepté (« Valider le GET de poids proposé »), lecteur canonique/route/SDK, consentement/flag/propriété et revue de sécurité ciblée ; aucune UI/saisie corporelle.
+- [x] SCI v1 reçus, consommateur et fixtures de statuts réalisés ; aucun moteur ou vrai premier plan READY servi.
+- [ ] CI du HEAD final de continuation et reçu de publication dans #353.
+- [ ] Politique d'effacement et producteurs requis ; déploiement/recettes physiques puis critères globaux. Les tâches globales non acquises ci-dessus restent ouvertes.

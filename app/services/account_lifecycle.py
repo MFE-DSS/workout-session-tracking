@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import re
 
 from sqlalchemy import select, update
@@ -138,3 +139,44 @@ def change_password(
         db.rollback()
         raise AccountRejected("credentials_changed", "Le mot de passe actuel est incorrect.")
     db.refresh(user)
+
+
+def reauthenticate_account(db: Session, user: User, *, current_password: str) -> User:
+    """Re-read the authenticated identity and verify its current credential.
+
+    This is not a reusable grant or deletion receipt. A following mutation
+    must also guard epoch/hash atomically, as revoke_account_sessions does.
+    No password or hash is returned in a public payload or logged here.
+    """
+    expected_epoch, expected_hash = user.session_epoch or 0, user.password_hash
+    with db.no_autoflush:
+        current = db.execute(
+            select(User).where(User.id == user.id)
+            .execution_options(populate_existing=True)
+        ).scalar_one_or_none()
+    valid = (
+        current is not None and current.is_active
+        and (current.session_epoch or 0) == expected_epoch
+        and hmac.compare_digest(current.password_hash, expected_hash)
+        and validate_password_policy(current_password, check_minimum=False) is None
+    )
+    if not valid or not verify_password(current_password, current.password_hash):
+        raise AccountRejected("reauthentication_required", "Réauthentification nécessaire.")
+    return current
+
+
+def revoke_account_sessions(db: Session, user: User, *, current_password: str) -> None:
+    """Non-destructive global revocation. Caller commits; no deletion is implied."""
+    current = reauthenticate_account(db, user, current_password=current_password)
+    epoch, hashed = current.session_epoch or 0, current.password_hash
+    changed = db.execute(
+        update(User).where(
+            User.id == current.id, User.is_active.is_(True),
+            User.session_epoch == epoch, User.password_hash == hashed,
+        ).values(session_epoch=epoch + 1),
+        execution_options={"synchronize_session": False},
+    )
+    if changed.rowcount != 1:
+        db.rollback()
+        raise AccountRejected("credentials_changed", "Réauthentification nécessaire.")
+    db.refresh(current)

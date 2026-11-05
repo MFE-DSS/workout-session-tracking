@@ -1,3 +1,7 @@
+# État de continuation DATA & FIRST PLAN
+
+Les schémas SCI-P01/P02 v1 sont reçus via canonique5fd18c3 ; leur consommateur est préparé, sans producteur ni politique réelle de premier plan. Le GET de poids a été explicitement accepté et réutilise BodyMeasurement ; aucun écran nouveau. Voir [rapport courant](MOB03_DATA_FIRST_PLAN_CONTINUATION_REPORT.md), [contrat poids](MOB03_WEIGHT_HISTORY_CONTRACT.md) et [handoff science](science/sci-p01-p02/HANDOFF.md). Les gaps de producteur/persistance des autres acquisitions et de politique d’effacement demeurent ouverts. Le contenu ci-dessous conserve son état historique.
+
 # MOB-03 — contrats manquants du consommateur natif
 
 5 novembre 2026, après mandat PRODUCT DELIVERY et lecture du manifeste v1.0 reçu. Ce registre borne la première planche et le premier raccordement ; un champ présent en base ne prouve pas une API mobile utilisable ni un effet scientifique.

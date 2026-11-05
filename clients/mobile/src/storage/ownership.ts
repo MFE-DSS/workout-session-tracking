@@ -2,6 +2,7 @@ import { ApiFailure } from '../api/http';
 import { isRestorableSnapshot } from './snapshotShape';
 import type { Restored } from './journalTypes';
 export type OwnershipBook = {
+  isRetiredOwner(userId: number): Promise<boolean>;
   ownerOfDevice(device: string): Promise<number | null>;
   journalOf(userId: number): Promise<string | null>;
   legacyOwner(): Promise<number | null>;
@@ -37,7 +38,9 @@ export async function resolveJournal(r: OwnershipRequest): Promise<OwnedJournal>
   check();
   const cachedId = r.deviceId ? await step(() => r.book.ownerOfDevice(r.deviceId!)) : null;
   const offline = async (): Promise<OwnedJournal> => {
+    if (validId(cachedId) && await step(() => r.book.isRetiredOwner(cachedId))) return { state: 'needs-connection' };
     const name = validId(cachedId) ? await step(() => r.book.journalOf(cachedId)) : null;
+    if (validId(cachedId) && await step(() => r.book.isRetiredOwner(cachedId))) return { state: 'needs-connection' };
     return name && validId(cachedId) ? { state: 'ready', userId: cachedId, name, quarantined: false } : { state: 'needs-connection' };
   };
   if (!r.online) return offline();
@@ -48,9 +51,11 @@ export async function resolveJournal(r: OwnershipRequest): Promise<OwnedJournal>
     throw e;
   }
   if (!validId(id) || !r.deviceId) return { state: 'needs-connection' };
+  if (await step(() => r.book.isRetiredOwner(id))) return { state: 'needs-connection' };
   const existing = await step(() => r.book.journalOf(id));
   if (existing) {
     await step(() => r.book.bindDevice(r.deviceId!, id, isCurrent));
+    if (await step(() => r.book.isRetiredOwner(id))) return { state: 'needs-connection' };
     return { state: 'ready', userId: id, name: existing, quarantined: false };
   }
   let quarantined = false;
@@ -75,5 +80,6 @@ export async function resolveJournal(r: OwnershipRequest): Promise<OwnedJournal>
   }
   await step(() => r.book.assignJournal(id, name, isCurrent));
   await step(() => r.book.bindDevice(r.deviceId!, id, isCurrent));
+  if (await step(() => r.book.isRetiredOwner(id))) return { state: 'needs-connection' };
   return { state: 'ready', userId: id, name, quarantined };
 }

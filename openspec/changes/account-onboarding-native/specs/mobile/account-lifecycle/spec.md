@@ -64,3 +64,19 @@ Les informations de confidentialité et les moyens existants d’accès ou d’e
 #### Scenario: Entrée dans le compte
 - **WHEN** l’utilisateur consulte les informations du compte
 - **THEN** il peut accéder à l’information de confidentialité et aux parcours d’export existants sans activer de consentement corporel
+
+
+### Requirement: Fondations non destructives de demande d'effacement
+Sans politique/producteur approuvés, le système MUST NOT servir d'effacement ou prétendre accepter une demande durable côté serveur. Le consommateur MUST conserver une intention propriétaire idempotente, distinguer demande et résultat, et ne jamais nettoyer sur timeout/401/404. Un résultat structuré seul MUST NOT autoriser le nettoyage ; la retraite locale confirmée MUST précéder un nettoyage ciblé.
+
+#### Scenario: Reprise après réponse perdue
+- **WHEN** une intention envoyée n'a pas de résultat autoritaire
+- **THEN** sa clé persiste et seule la relecture est permise, sans mutation rejouée après relance
+
+#### Scenario: Refus terminal corrigé
+- **WHEN** le propriétaire demande explicitement une nouvelle intention après relecture autoritaire du refus terminal
+- **THEN** elle est atomiquement liée à la précédente ; les intentions inconnues/en attente ne sont pas rouvertes
+
+#### Scenario: Données anciennes après confirmation
+- **WHEN** un nettoyage ciblé est autorisé par le vrai producteur
+- **THEN** la marque de retrait persistante et la génération empêchent réouverture et réponses tardives, sans purge globale ni attribution d'un journal incertain
