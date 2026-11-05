@@ -8,4 +8,4 @@
 - [x] Tests de contrat : suffisant/insuffisant/conflit, inconnu matériel, priorité≠faiblesse, provenance et versions, refus des constances/références invalides ; tests rouges puis verts.
 - [x] check_scope puis contrôles imposés, broad ciblé ; OpenSpec strict ; aucun full sweep local redondant.
 - [x] Handoff producteur/consommateur versionné, table des dépendances, comportement servi/proposé et décisions opérateur concrètes.
-- [ ] Revue indépendante et corrections scopées ; publication/CI ; merge sous GO permanent seulement si proposition approuvée et contrôles du HEAD final satisfaits. Pas de moteur ni déploiement implicites.
+- [x] Revue indépendante et corrections scopées ; publication/CI ; merge sous GO permanent seulement si proposition approuvée et contrôles du HEAD final satisfaits. Pas de moteur ni déploiement implicites.

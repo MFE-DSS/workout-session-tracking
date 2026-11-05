@@ -32,4 +32,6 @@ Aucun changement app/**, clients/**, data/**, migration ou dépendance. Aucun in
 **Files:** docs/science/sci-p01-p02/README.md, CONTRACT.md, HANDOFF.md, AUDIT_AND_EVIDENCE.md, audit_repo.json ; entrée SPEC_REGISTRY.
 - [x] Finaliser contrats humains et table producteur/consommateur/versions/disponibilité, décisions opérateur et premier spike de politique à ouvrir.
 - [x] Revue fraîche code/contrats ; corriger Important/Critical avec tests RED→GREEN ; relever mineurs.
-- [ ] Commit/push/PR puis CI réelle ; merge par commit sous GO permanent après readiness et revue sans blocage ; CI canonique et closeout exacts, sans activation de moteur.
+- [x] Commit/push/PR puis CI réelle ; merge par commit sous GO permanent après readiness et revue sans blocage, sans activation de moteur.
+
+Suivi post-merge : CI canonique 42081554961 en cours lors de la préparation de cette archive ; sa réussite et les preuves de clôture restent des conditions de fusion de la PR documentaire. Les artefacts de contrats et leurs tests sont intégrés via #354 à 9120efc.

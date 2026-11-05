@@ -1,6 +1,6 @@
 # Handoff SCI-P01 / SCI-P02 → produit/mobile/API
 
-**Paquet :1.0.0 — 5 novembre 2026. Producteur : agent science/contrats. Consommateurs : agents MOB-03, MOB-04 et architecte API.**
+**Paquet : 1.0.0 — 5 novembre 2026. Producteur : agent science/contrats. Consommateurs : agents MOB-03, MOB-04 et architecte API.**
 
 | Livrable | Statut de l'artefact | Disponibilité producteur réelle | Avertissement |
 |---|---|---|---|
