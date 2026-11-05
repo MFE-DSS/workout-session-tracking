@@ -65,3 +65,12 @@ test('only an authoritatively rejected current intent can be atomically renewed'
   expect(attempts.filter(Boolean)).toHaveLength(1);
   expect(await store.read(7)).toMatchObject({ previousRequestId:'request-a', phase:'prepared' });
 });
+
+test.each(['confirmed','rejected_confirmed'] as const)('an authoritative terminal %s cannot regress to an older pending/unknown response',async(phase)=>{
+ const store=await createAccountRequestStore(adapter(connection)),row=await store.reserve(7,'terminal-key',()=>true);
+ await store.write({...row,phase},()=>true);
+ await expect(store.write({...row,phase:'pending'},()=>true)).rejects.toThrow('terminal');
+ await expect(store.write({...row,phase:'unknown'},()=>true)).rejects.toThrow('terminal');
+ expect((await store.read(7))?.phase).toBe(phase);
+ await store.write({...row,phase},()=>true);
+});

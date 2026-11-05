@@ -77,3 +77,13 @@ L'opérateur refuse la gestion manuelle de matériel : « Quelqu'un ne va pas co
 - [x] SCI v1 reçus, consommateur et fixtures de statuts réalisés ; aucun moteur ou vrai premier plan READY servi.
 - [ ] CI du HEAD final de continuation et reçu de publication dans #353.
 - [ ] Politique d'effacement et producteurs requis ; déploiement/recettes physiques puis critères globaux. Les tâches globales non acquises ci-dessus restent ouvertes.
+
+## DATA COMPLETION — sous-ensemble technique
+
+- [x] Consommateur poids sans UI, révocation/vides/pages/cycles/auth/réseau/comptes ; chronologie et GET acceptés inchangés.
+- [x] Orchestration durable native/web, refus non autoritaire inconnu, états terminaux monotones et tests de reprise/ancien propriétaire sur vrai SQLite.
+- [x] Design/fixtures du producteur de suppression, sans route/migration/effacement ; tableau limité aux politiques légales ouvertes.
+- [x] Refactor limité de weight_history_page, tests fonctionnels/sécurité conservés.
+- [x] Tests runtime du port FirstPlanClient, READY uniquement de protocole non servi ; producteur scientifique non admis conservé indisponible.
+- [ ] Revue/CI finale du nouveau HEAD, puis compléter le reçu #353.
+- [ ] Gates COMPLETE antérieures : politique/effacement effectif, science et acquisitions/consentement, compatibilité et appareils. Aucune fusion partielle ne les lève.

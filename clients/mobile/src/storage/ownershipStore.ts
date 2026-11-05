@@ -13,6 +13,9 @@ export function openOwnershipBook(): Promise<OwnershipBook> {
 }
 async function open(): Promise<OwnershipBook> {
   const db = await SQLite.openDatabaseAsync('auren-owners-v1.db');
+  return createOwnershipBook(db);
+}
+export async function createOwnershipBook(db: SQLite.SQLiteDatabase): Promise<OwnershipBook> {
   await db.execAsync(`PRAGMA journal_mode = WAL;
     PRAGMA busy_timeout = 2000;
     CREATE TABLE IF NOT EXISTS owner_retirements (user_id INTEGER PRIMARY KEY NOT NULL, request_id TEXT NOT NULL);

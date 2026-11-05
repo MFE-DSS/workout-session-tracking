@@ -70,6 +70,7 @@ export async function createAccountRequestStore(db: DB): Promise<DeletionStore> 
       if (!phases.has(row.phase)) throw Error('invalid-request-phase');
       const saved = await read(row.ownerId, tx);
       if (!saved || saved.requestId !== row.requestId) throw Error('request-conflict');
+      if (['confirmed','rejected_confirmed'].includes(saved.phase) && row.phase !== saved.phase) throw Error('terminal-request-state');
       await tx.runAsync('UPDATE account_request_intents SET phase = ? WHERE user_id = ? AND request_id = ?', row.phase, row.ownerId, row.requestId);
     }),
     retire: (row, current) => write(current, async (tx) => {

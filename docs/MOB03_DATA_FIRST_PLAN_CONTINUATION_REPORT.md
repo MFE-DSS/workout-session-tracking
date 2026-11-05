@@ -1,5 +1,7 @@
 # MOB-03 — continuation DATA & FIRST PLAN
 
+
+**Suite courante :** [DATA COMPLETION — reçu technique](MOB03_DATA_COMPLETION_RECEIPT.md). Consommateur poids, cycle durable et tests runtime complétés sans nouvelle UI ; ce rapport conserve la passe précédente et ses preuves historiques.
 5 novembre 2026. Change unique `account-onboarding-native`, PR #353. Point de reprise : ce rapport complète le CR PO/architecte. **MOB-03 complet reste ouvert.** Canonique incorporé : 5fd18c3 ; ancien HEAD 2ba9fd4 préservé par merge, sans conflit. Aucun déploiement.
 
 ## Brainstorming / Options / Risques / Choix retenu

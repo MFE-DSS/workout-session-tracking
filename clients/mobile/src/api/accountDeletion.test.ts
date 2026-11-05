@@ -154,7 +154,7 @@ test('unknown or unauthenticated rejection cannot be renewed', async () => {
   const s = await setup(); s.setReply(s.receipt('REJECTED')); s.denyVerification();
   const client = s.make(s.producer, () => 'request-2');
   await s.make().submit('bad');
-  expect((await client.retryRejected('correct')).state).toBe('rejected');
+  expect((await client.retryRejected('correct')).state).toBe('unknown');
   expect(s.rows.get(7).requestId).toBe('stable-request');
   s.rows.set(7, { ownerId: 7, requestId: 'stable-request', phase: 'unknown' });
   expect((await client.retryRejected('correct')).state).toBe('unknown');
@@ -166,4 +166,12 @@ test('concurrent explicit renewals still send one new request', async () => {
   s.producer.submit = async (_t, row) => { sends++; return { ...s.receipt(), request_id: row.requestId }; };
   await Promise.all([s.make(s.producer,()=> 'request-2').retryRejected('correct'), s.make(s.producer,()=> 'request-3').retryRejected('correct')]);
   expect(sends).toBe(1);
+});
+
+test('an unverified terminal refusal is unknown rather than an authoritative rejection', async () => {
+  const s = await setup(); s.setReply(s.receipt('REJECTED')); s.denyVerification();
+  const result = await s.make().submit('fixture-only');
+  expect(result.state).toBe('unknown');
+  expect(s.rows.get(7).phase).toBe('unknown');
+  expect(s.calls).not.toContain('/auth/logout');
 });

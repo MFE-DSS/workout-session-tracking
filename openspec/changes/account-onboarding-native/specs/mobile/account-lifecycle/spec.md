@@ -80,3 +80,11 @@ Sans politique/producteur approuvés, le système MUST NOT servir d'effacement o
 #### Scenario: Données anciennes après confirmation
 - **WHEN** un nettoyage ciblé est autorisé par le vrai producteur
 - **THEN** la marque de retrait persistante et la génération empêchent réouverture et réponses tardives, sans purge globale ni attribution d'un journal incertain
+
+### Requirement: Durable authoritative deletion outcomes do not regress
+
+The request consumer MUST treat unverified terminal refusal as unknown and MUST NOT regress a verified confirmed/rejected terminal request to an older pending/unknown poll. Owner retirement MUST survive metadata restart and deny the removed owner journal while preserving other owners. Server execution remains blocked pending retention policy.
+
+#### Scenario: Older pending poll after confirmed completion
+- **WHEN** another consumer has persisted the verified terminal result for the same request
+- **THEN** an older response cannot overwrite that terminal state or authorize another account cleanup.

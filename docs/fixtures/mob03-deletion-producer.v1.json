@@ -1,0 +1,109 @@
+{
+  "authority": "SYNTHETIC_TEST_ONLY_NOT_SERVED",
+  "producer_availability": "NOT_SERVED",
+  "cases": [
+    {
+      "scenario": "pending",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "PENDING"
+      },
+      "simulated_authority": false,
+      "expected": "pending"
+    },
+    {
+      "scenario": "policy_required",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "POLICY_REQUIRED"
+      },
+      "simulated_authority": false,
+      "expected": "unavailable"
+    },
+    {
+      "scenario": "verified_refusal",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "REJECTED"
+      },
+      "simulated_authority": true,
+      "expected": "rejected"
+    },
+    {
+      "scenario": "unverified_refusal",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "REJECTED"
+      },
+      "simulated_authority": false,
+      "expected": "unknown"
+    },
+    {
+      "scenario": "unknown",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "UNKNOWN"
+      },
+      "simulated_authority": false,
+      "expected": "unknown"
+    },
+    {
+      "scenario": "deletion_incomplete",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "DELETED",
+        "policy_ref": "SYNTHETIC_TEST_ONLY_NOT_SERVED",
+        "confirmed_at": "2026-11-05T12:00:00Z",
+        "revocation": "CONFIRMED",
+        "data_erasure": "CONFIRMED",
+        "restore_protection": "PENDING"
+      },
+      "simulated_authority": true,
+      "expected": "unknown"
+    },
+    {
+      "scenario": "verified_completion_protocol_only",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "DELETED",
+        "policy_ref": "SYNTHETIC_TEST_ONLY_NOT_SERVED",
+        "confirmed_at": "2026-11-05T12:00:00Z",
+        "revocation": "CONFIRMED",
+        "data_erasure": "CONFIRMED",
+        "restore_protection": "CONFIRMED"
+      },
+      "simulated_authority": true,
+      "expected": "confirmed"
+    },
+    {
+      "scenario": "unverified_completion",
+      "reply": {
+        "contract_version": "account-deletion/1.0.0",
+        "owner_id": 7,
+        "request_id": "test-deletion-request",
+        "state": "DELETED",
+        "policy_ref": "SYNTHETIC_TEST_ONLY_NOT_SERVED",
+        "confirmed_at": "2026-11-05T12:00:00Z",
+        "revocation": "CONFIRMED",
+        "data_erasure": "CONFIRMED",
+        "restore_protection": "CONFIRMED"
+      },
+      "simulated_authority": false,
+      "expected": "unknown"
+    }
+  ]
+}

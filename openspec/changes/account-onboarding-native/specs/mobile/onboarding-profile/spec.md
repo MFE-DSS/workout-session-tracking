@@ -129,3 +129,15 @@ Le consommateur MUST distinguer états de transport et six statuts SCI-P01/P02, 
 #### Scenario: Compte ou requête remplacés
 - **WHEN** une réponse arrive pour une génération ou empreinte différente
 - **THEN** elle ne remplace pas les données personnelles courantes
+
+### Requirement: Headless weight consumer preserves chronology and consent
+
+The native read consumer MUST preserve the canonical GET and unique BodyMeasurement chronology without adding UI or writers. It MUST invalidate private state on owner/consent failure and reject duplicate/cyclic pagination rather than fabricate complete history.
+
+#### Scenario: Departed owner response
+- **WHEN** a page resolves after account switching
+- **THEN** its promise returns cancellation without carrying the new or old owner history; current owner state remains independent.
+
+#### Scenario: Consent revoked or unreadable page
+- **WHEN** an authoritative consent refusal, invalid cursor or network failure interrupts loading
+- **THEN** the consumer exposes the explicit failure state without a readable stale confirmed history or synthetic measurement.

@@ -66,7 +66,7 @@ export class AccountDeletionClient {
             && await this.producer!.verify(token, raw, previous);
         }, { retryUnauthorized: false });
         if (!current()) return { state: 'cancelled' };
-        if (!terminal) return { state: 'rejected' };
+        if (!terminal) return { state: 'unknown' };
         await this.store.write({ ...previous, phase: 'rejected_confirmed' }, current);
         intent = await this.store.renewRejected(previous, this.requestId(), current);
         if (!intent) return { state: 'unknown' };
@@ -109,7 +109,7 @@ export class AccountDeletionClient {
       && value.owner_id === intent.ownerId && value.request_id === intent.requestId) {
       if (value.state === 'PENDING') { state = 'pending'; phase = 'pending'; }
       if (value.state === 'POLICY_REQUIRED') { state = 'unavailable'; phase = 'pending'; }
-      if (value.state === 'REJECTED') { state = 'rejected'; phase = await this.producer!.verify(token, raw, intent) ? 'rejected_confirmed' : 'rejected'; }
+      if (value.state === 'REJECTED' && await this.producer!.verify(token, raw, intent)) { state = 'rejected'; phase = 'rejected_confirmed'; }
       if (value.state === 'DELETED' && nonempty(value.policy_ref)
         && typeof value.confirmed_at === 'string' && /(?:Z|[+-]\d{2}:\d{2})$/.test(value.confirmed_at)
         && Number.isFinite(Date.parse(value.confirmed_at))

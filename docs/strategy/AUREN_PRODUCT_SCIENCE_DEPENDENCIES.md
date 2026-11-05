@@ -1,7 +1,7 @@
 # AUREN — registre produit / science
 
 
-**État courant — continuation MOB-03 DATA & FIRST PLAN :** SCI-P01/P02 v1 sont reçus sur le canonique 5fd18c3 ; FirstPlanClient contrôle leurs schémas et états avec AuthSession. Producteur absent = NOT_SERVED ; SCI-P02-INITIAL-POLICY, producteur et vrai READY restent requis. Voir le [rapport courant](../MOB03_DATA_FIRST_PLAN_CONTINUATION_REPORT.md). Les formulations de besoin initial ci-dessous conservent le contexte historique ; elles ne signifient pas que les contrats sont encore absents.
+**État courant — continuation MOB-03 DATA & FIRST PLAN :** SCI-P01/P02 v1 sont reçus sur le canonique 5fd18c3 ; FirstPlanClient contrôle leurs schémas et états avec AuthSession. Moteur isolé initial-policy-producer/1.0.0 reçu via #357 et son reçu #358, mais non servi/non admis ; politiques dose/temps/candidats, vrai READY et adaptateur runtime restent requis. Le producteur absent du port mobile reste NOT_SERVED. Voir le [rapport courant](../MOB03_DATA_FIRST_PLAN_CONTINUATION_REPORT.md). Les formulations de besoin initial ci-dessous conservent le contexte historique ; elles ne signifient pas que les contrats sont encore absents.
 Version du registre : `0.1.0` — 5 novembre 2026. Responsable de cette première saisie : agent produit/mobile.
 Référence : [recadrage opérateur](AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md). Ce document exprime des besoins consommateurs, **pas un schéma API accepté ni un verdict scientifique S0**.
 

@@ -28,7 +28,9 @@ const store: DeletionStore = {
     if (retiredOwners.has(row.ownerId) || value.phase !== 'prepared') return false;
     rows.set(row.ownerId, { ...value, phase: 'submitted' }); return true;
   },
-  write: async (row, current) => { check(current); saved(row); rows.set(row.ownerId, { ...row }); },
+  write: async (row, current) => { check(current); const prior=saved(row);
+    if (['confirmed','rejected_confirmed'].includes(prior.phase) && row.phase!==prior.phase) throw Error('terminal-request-state');
+    rows.set(row.ownerId, { ...row }); },
   retire: async (row, current) => {
     check(current); if (saved(row).phase !== 'confirmed') throw Error('unconfirmed-erasure');
     retiredOwners.add(row.ownerId);

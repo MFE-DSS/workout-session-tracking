@@ -62,3 +62,7 @@ Mandat opérateur reçu après livraison SCI-P01/P02 : poursuivre dans #353, pr�
 - **Gates conservées :** revue de ce delta avant la route nouvelle ; revue sécurité/qualité avant exposition corporelle ; aucune nouvelle UI sans sa revue applicable. Le change complet reste ouvert sur politique d'effacement, producteur scientifique et preuves appareil. Aucune politique de merge partiel nouvelle n'est déduite du mandat.
 
 Design et plan bornés : `data-first-plan-continuation.md`. Le poids est facultatif pour le premier plan ; les souhaits de priorités restent des préférences.
+
+## MOB-03 DATA COMPLETION — authorized continuation
+
+Operator mandate5Nov2026 authorizes headless weight consumer integration/negative paths, durable deletion lifecycle tests and safe corrections, weight_history_page complexity refactor and runtime first-plan boundary tests. No new body UI/endpoint or destructive producer is authorized. Server producer is prepared as design/fixtures; policy-only choices remain open. Scientific isolated engine is now received but NOT_SERVED/non-admitted; no real READY wiring. COMPLETE change gates still govern PR353 merge. Plan: data-completion-plan.md.

@@ -24,12 +24,12 @@ export class FirstPlanClient {
   private generation:number;
   private sequence=0;
   constructor(private readonly auth:AuthSession,private readonly call:Transport,private readonly producer:FirstPlanProducer|null=null){this.generation=auth.revision;}
-  get state():FirstPlanOutcome{return this.generation===this.auth.revision?this.value:{state:'unknown'};}
+  get state():FirstPlanOutcome{return this.generation===this.auth.revision?clone(this.value):{state:'unknown'};}
   async load(input:FirstPlanInput):Promise<FirstPlanOutcome>{
     const revision=this.auth.revision, sequence=++this.sequence;
     this.generation=revision;
     const current=()=>revision===this.auth.revision&&sequence===this.sequence;
-    const finish=(value:FirstPlanOutcome):FirstPlanOutcome=>{if(!current())return{state:'unknown'};this.value=value;return value;};
+    const finish=(value:FirstPlanOutcome):FirstPlanOutcome=>{if(!current())return{state:'unknown'};this.value=clone(value);return clone(value);};
     if(!this.producer)return finish({state:'unavailable',reason:'NOT_SERVED'});
     this.value={state:'pending'};
     if(!/^[a-f0-9]{64}$/.test(input.fingerprint)||!scienceSchemaMatches(input.request,schemas.request))return finish({state:'unknown'});

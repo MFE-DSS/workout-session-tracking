@@ -438,6 +438,34 @@ def list_weight_measurements(
     ).limit(limit)).scalars().all())
 
 
+def _weight_history_instant(value: datetime | None) -> str | None:
+    if value is None:
+        return None
+    aware = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+    return aware.isoformat()
+
+
+def _weight_history_entry(row: BodyMeasurement) -> dict:
+    finite = math.isfinite(row.weight_kg)
+    spec = _FIELD_BY_KEY["weight_kg"]
+    if not finite:
+        quality = "INVALID_NONFINITE"
+    elif not spec.min <= row.weight_kg <= spec.max:
+        quality = "LEGACY_OUTSIDE_CURRENT_BOUNDS"
+    else:
+        quality = "KNOWN"
+    return {
+        "measurement_id": row.id,
+        "value": row.weight_kg if finite else None,
+        "raw_value_repr": None if finite else str(row.weight_kg),
+        "measured_at": _weight_history_instant(row.measured_at),
+        "recorded_at": _weight_history_instant(row.created_at),
+        "quality": quality,
+        "provenance": {"origin": "UNKNOWN", "acquisition": "UNKNOWN",
+                       "source_ref": f"body_measurements/{row.id}/weight_kg"},
+    }
+
+
 def weight_history_page(
     db: Session, user_id: int, *, limit: int = 50,
     before: tuple[datetime, int] | None = None,
@@ -461,28 +489,10 @@ def weight_history_page(
         return result
     rows = list_weight_measurements(db, user_id, limit=limit + 1, before=before)
     result["state"] = "AVAILABLE" if rows else "EMPTY"
-    spec = _FIELD_BY_KEY["weight_kg"]
-    def iso(value: datetime | None) -> str | None:
-        if value is None:
-            return None
-        aware = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
-        return aware.isoformat()
-    for row in rows[:limit]:
-        finite = math.isfinite(row.weight_kg)
-        result["entries"].append({
-            "measurement_id": row.id, "value": row.weight_kg if finite else None,
-            "raw_value_repr": None if finite else str(row.weight_kg),
-            "measured_at": iso(row.measured_at), "recorded_at": iso(row.created_at),
-            "quality": (
-                "INVALID_NONFINITE" if not finite else
-                "LEGACY_OUTSIDE_CURRENT_BOUNDS" if not spec.min <= row.weight_kg <= spec.max else "KNOWN"
-            ),
-            "provenance": {"origin": "UNKNOWN", "acquisition": "UNKNOWN",
-                           "source_ref": f"body_measurements/{row.id}/weight_kg"},
-        })
+    result["entries"] = [_weight_history_entry(row) for row in rows[:limit]]
     if len(rows) > limit:
         last = rows[limit - 1]
-        result["next_cursor"] = [iso(last.measured_at), last.id]
+        result["next_cursor"] = [_weight_history_instant(last.measured_at), last.id]
     return result
 
 def update_measurement(
