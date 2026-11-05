@@ -24,10 +24,27 @@ La revue indépendante finale a relevé deux problèmes importants, sans critiqu
 
 Le diff hors manifeste est sans erreur d’espacement. Les doubles espaces du manifeste sont ses sauts de ligne Markdown d’origine, conservés pour maintenir une copie byte-identique à la source opérateur. Les empreintes du manifest ont été vérifiées.
 
-Publication et CI du HEAD final encore à consigner avant livraison. Aucun test mobile/visuel nouveau requis localement puisqu'aucune surface ni consommateur produit ne change ; la CI existante reste applicable selon son déclenchement.
+Publication réalisée via la [PR #354](https://github.com/MFE-DSS/workout-session-tracking/pull/354), HEAD `da3986617699296744aee9bb986da6f05393c6ea`, merge par commit `9120efc44cd14f7a14c955499780a1bc14aae71f`. Le relevé détaillé ci-dessous distingue validation de PR et suivi canonique. Aucun test mobile/visuel nouveau requis localement puisqu'aucune surface ni consommateur produit ne change ; la CI existante reste applicable selon son déclenchement.
 
 ## État servi et limites
 
 Les contrats sont proposés et vérifiables, non servis. Pas de snapshot Blueprint persistant, de premier plan produit, d'estimation de durée validée ou de fixture READY issue d'un vrai moteur. Le module n'authentifie pas et ne certifie pas la vérité scientifique des données qu'un producteur de confiance lui fournit. Aucune mutation de app/, clients/, data/, schémas backend partagés, DB ou tokens.
 
 Le handoff donne versions, champs, inconnus, table de dépendances, producteurs/consommateurs, compatibilité et breaking changes. Les prochaines tâches nécessitent un change scientifique/API dédié ; aucun GO BUILD de moteur ou déploiement ne se déduit du présent paquet.
+
+## Publication et reçu post-merge
+
+- [CI du HEAD final de #354](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42079203279) : **9 jobs réussis**, dont les quatre contrôles requis ; trois shards totalisant **7 200 passants / 3 ignorés**. Aucun dispatch récupéré ni rebase. PR MERGEABLE, aucun thread/revue bloquant, base restée 90da846. `mergeStateStatus` brut **UNSTABLE**, dû seulement au check Sonar consultatif ci-dessous ; aucun bypass.
+- Sonar PR : job Actions réussi et check « SonarCloud Code Analysis » **failure**, gate **ERROR**. **7 code smells MAJOR dans les tests** : S9073 (assertion composite) et six S5778 (préparation/plusieurs appels dans une assertion d'exception). Aucun nouveau bug, vulnérabilité ou hotspot ; coverage exposée **93,8 %**, `new_coverage` absent pour cette PR. Ces sept remarques restent ouvertes ; ni faux vert ni résolution automatique. GOV-SONAR-01 les rend consultatives.
+- Référence Sonar avant merge, révision exacte 90da846 : coverage 93,8 %, new_coverage 93,95215767305095 %, 440 smells, 8 bugs, 6 vulnérabilités, 0 hotspot, gate ERROR. Ce relevé ne constitue pas une nouvelle confirmation de faille ni un audit de ces constats historiques. Les nombres de branche et de PR n'ont pas le même périmètre ; ils ne sont pas soustraits pour fabriquer un delta.
+- [CI canonique du merge 9120efc](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42081554961) : en cours **au moment de la préparation du présent reçu**. Attestation WOULD_REUSE de l'arbre `239c11916add`, mais mécanisme en SHADOW MODE : les shards sont réellement rejoués. Le verdict final et le relevé Sonar canonique doivent être vérifiés avant fusion de la PR de clôture et consignés dans son reçu de livraison.
+- Contrôles locaux de clôture : check_scope DOCS, check_spec_protocol passant, OpenSpec strict 5/5, diff sans erreur ; aucun sweep local relancé.
+- Archive préparée **après** le merge principal : `openspec/changes/archive/2026-11-05-science-blueprint-first-plan/`, trois exigences synchronisées sans changement dans `openspec/specs/science/blueprint-first-plan/spec.md`. Le Purpose précise le périmètre non servi ; aucune règle de prescription ajoutée. Cette clôture documentaire passe par sa propre PR et les gates réellement déclenchées, sans les élargir ni les affaiblir.
+
+Les travaux mobiles (#353), worktrees étrangers, preuves appareil et identifiants QA sont préservés. Le nettoyage concerne uniquement les branches/worktree de cette tranche sans travail unique, après clôture vérifiée. Aucun moteur, endpoint, déploiement ou nouveau GO BUILD n'est déduit de l'archive.
+
+## Rulings et suites
+
+Trois précisions de construction sont retenues : politique nullable/statuts ordonnés ; profil d'inputs versionné séparé de la dose ; impossibilité démontrée distincte de l'inconnu. La revue finale ajoute la provenance contextuelle stricte et la résolution obligatoire d'un refus contradictoire. Aucun mineur issu de la revue indépendante n'est différé ; les sept remarques Sonar sur la structure des tests restent explicitement ouvertes.
+
+Le prochain livrable recommandé reste **SCI-P02-INITIAL-POLICY** (HANDOFF.md, D02/D03/D04) : admission d'archétypes, dose/effort initial et modèle de temps, avec incertitude matérielle et vraie fixture READY du producteur. L'intégration API/mobile et la politique des données ont leurs propres décisions et périmètres. Le critical path mobile complet reste ouvert.

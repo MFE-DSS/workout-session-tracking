@@ -1,3 +1,7 @@
+## Purpose
+
+Formalise les échanges scientifiques versionnés du Blueprint et du premier plan, avec provenance, suffisance et inconnus explicites, sans activer de moteur de prescription.
+
 ## ADDED Requirements
 
 ### Requirement: Blueprint progressif et traçable
