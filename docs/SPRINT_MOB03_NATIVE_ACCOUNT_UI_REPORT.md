@@ -175,3 +175,12 @@ Le rendu compte accepté et les artefacts sont prêts pour la PR draft #353. Les
 
 
 Le manifeste est conservé octet pour octet depuis la pièce fournie : les fins de ligne à deux espaces sont les sauts Markdown du texte canonique, pas une réécriture. `git diff --cached --check` signale ces espaces intentionnels ; contrôle du reste du diff propre, exception limitée à ce document et empreinte d'origine vérifiée.
+
+## Arrêt CI et correction minimale du faux positif documentaire
+
+Run 42042184665, job `lint (ruff budget + bandit + actionlint + shellcheck)`, étape `gitleaks scan (required — Sb_26.4)` : `leaks found: 1`, règle `generic-api-key`, brief UI/UX ligne 8 dans le commit publié. Inspection du fichier : référence de révision Git, dont l'objet est vérifié par `git cat-file`, aucun credential. Reproduction locale avec le même intervalle Git : une seule détection, même fichier/ligne/empreinte. Scanner local 8.30.1, CI 8.24.3 : versions consignées, résultat CI réel requis après correction.
+
+Options : réécrire l'historique publié (interdit), exclure tout le document (trop large), ou qualifier cette seule occurrence. Choix : une empreinte historique exacte dans `.gitleaksignore`, sans changement de règle, de workflow ou de scan. Aucun faux secret dans un test versionné ; un signal synthétique temporaire vérifie que le scanner continue de détecter d'autres occurrences. Pas de correction produit en cascade pendant cet arrêt.
+
+
+Correction vérifiée localement : le scan historique passe de 1 détection/exit2 à 0/exit0 ; une nouvelle occurrence synthétique dans le même nom de document et à la même ligne reste détectée/exit2. Valeur synthétique détruite avec son répertoire temporaire, jamais imprimée ni versionnée. check_scope classe ce delta ISOLATED ; aucun code Python/TypeScript changé, budget264/548 et protocole verts. L'exception ne couvre que l'empreinte de révision documentée. Validation CI réelle du commit correctif encore requise.
