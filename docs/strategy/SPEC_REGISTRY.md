@@ -302,6 +302,7 @@
 
 | Change / sprint | Domaine | Statut | Rapport | Notes |
 |---|---|---|---|---|
+| `science-blueprint-first-plan` (SCI-P01/P02) | Contrats scientifiques du Blueprint et du premier plan | Contrats intégrés via #354 (9120efc), archive #355 (ed61683) ; reçu final `science/sci-p01-p02/DELIVERY_RECEIPT.md` | `science/sci-p01-p02/REPORT.md` | Archive `2026-11-05-science-blueprint-first-plan` ; DTO/schemas/fixtures/tests non servis ; aucun moteur, UI, donnée ou schéma backend partagé modifié ; politiques de dose/temps encore bloquantes |
 | `sonar-advisory-mvp` (GOV-SONAR-01) | Gouvernance qualité temporaire MVP | MERGÉE #348, `cc80ddd` ; ARCHIVÉE, 8/8 tâches ; protection finale appliquée et relue | `SPRINT_GOV_SONAR_01_REPORT.md` | TEMPORARY — MVP DEVELOPMENT ; Sonar ERROR consultatif ; QA/lint/visuel/mobile requis ; revue avant bêta élargie,paiements,données sensibles ou production |
 | `codex-openspec-adapter` (CODX-00) | Adaptateur officiel Codex et reprise OpenSpec | MERGÉE #346, `60bea5d` ; ARCHIVÉE dans la clôture du 2026-11-03, 7/7 tâches | `SPRINT_CODX_00_REPORT.md` | six skills officielles ; aucun Spec Kit/AGENTS versionné ; Sonar consultatif selon GOV-SONAR-01 |
 | `mobile-ci-checks` (CI-01) | Jest et typecheck mobiles dans un job CI dédié | MERGÉE #347, `edd7351` ; contrôles canoniques obligatoires verts (41711441173) ; ARCHIVÉE, 8/8 tâches | `SPRINT_CI_01_REPORT.md` | sweep final 8ff2808/cc80ddd : 7147 tests ; 422 mobiles,77 visuels,typecheck ; mobile requis confirmé |

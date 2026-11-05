@@ -1,0 +1,15 @@
+{
+  "package_version": "1.0.0",
+  "runtime_availability": "NOT_SERVED",
+  "base_commit": "90da8461803e87897c3d8f48627c4b704b3cfcd6",
+  "manifesto_received_from": "PR353:2ba9fd48d8b266e439d7afdbecd574ec2e2cee3c",
+  "files_sha256": {
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
+    "docs/strategy/AUREN_MANIFESTO_V1.md": "dc735ecb97f647d118c920648d4502e30c21275b1fbcbca508e924614a3d37a0",
+    "docs/science/sci-p01-p02/audit_repo.json": "1b5e4abd8a9dd4bc07c14db9dccd8704f9f886414b9f36d1b4a5edcf00b5ba64",
+    "docs/science/sci-p01-p02/v1/body_training_blueprint.v1.schema.json": "f62feedad5ace1835b5bce2beceab1b76f7c71b5d6320344bd9afde1c1471ed2",
+    "docs/science/sci-p01-p02/v1/first_plan_recommendation.v1.schema.json": "f2a7ffbbb0bc0aa3d53e8f55e5df85bfd6721d005c3906cff334fb6c6339ec62",
+    "docs/science/sci-p01-p02/v1/first_plan_request.v1.schema.json": "99911951d52c80649dfaa1f36c5f835c623eda89f6a41c8a2676298a422bd0a1",
+    "docs/science/sci-p01-p02/v1/fixtures.json": "3e281a77b649403bad381d1bc27c72698520c4780a8b18dfcc4f883a28e1d272"
+  }
+}
