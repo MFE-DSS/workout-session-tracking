@@ -1,0 +1,98 @@
+{
+  "policy_version": "initial-hypertrophy-policy/0.1.0-proposed",
+  "admission_state": "PROPOSED",
+  "runtime_availability": "NOT_SERVED",
+  "admission": {
+    "dose": "PROPOSED",
+    "time": "UNAVAILABLE",
+    "selection": "PROPOSED",
+    "taxonomy_projection": "PROPOSED"
+  },
+  "archetype_ref": "initial-full-body-seven-intents-v1-proposed",
+  "cadences": [
+    2,
+    3
+  ],
+  "work_sets": 2,
+  "rep_range": [
+    8,
+    12
+  ],
+  "rir_target": 2.0,
+  "rest_seconds": {
+    "multi_joint": 120,
+    "single_joint": 90
+  },
+  "time_model": null,
+  "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL_ASSUMED",
+  "intents": [
+    {
+      "intent_id": "initial_quad_v1",
+      "primary_zone": "quads",
+      "patterns": [
+        "squat",
+        "lunge",
+        "knee_extension"
+      ]
+    },
+    {
+      "intent_id": "initial_press_v1",
+      "primary_zone": "pecs",
+      "patterns": [
+        "horizontal_push"
+      ]
+    },
+    {
+      "intent_id": "initial_row_v1",
+      "primary_zone": "upper_back",
+      "patterns": [
+        "horizontal_pull"
+      ]
+    },
+    {
+      "intent_id": "initial_hinge_v1",
+      "primary_zone": "hamstrings",
+      "patterns": [
+        "hinge"
+      ]
+    },
+    {
+      "intent_id": "initial_vertical_pull_v1",
+      "primary_zone": "lats",
+      "patterns": [
+        "vertical_pull"
+      ]
+    },
+    {
+      "intent_id": "initial_lateral_delt_v1",
+      "primary_zone": "lateral_delts",
+      "patterns": [
+        "shoulder_abduction"
+      ]
+    },
+    {
+      "intent_id": "initial_calf_v1",
+      "primary_zone": "calves",
+      "patterns": [
+        "plantar_flexion"
+      ]
+    }
+  ],
+  "evidence_refs": [
+    "IP-E01",
+    "IP-E02",
+    "IP-E03",
+    "IP-E04",
+    "IP-E05",
+    "IP-E06",
+    "IP-E07",
+    "IP-E08"
+  ],
+  "source_hashes": {
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "data/sci/evidence_registry.json": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+    "data/equipment_registry.json": "cb4abfabd38cc0317de566680315423da2d0851e642339aac9a46bdcd49def9d",
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa"
+  }
+}

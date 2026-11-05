@@ -1,0 +1,509 @@
+{
+  "audit_version": "sci-p02-initial-policy-audit/0.1.0",
+  "base_sha": "5fd18c3291cd93533cf7b1f7ab50862c85a7a205",
+  "method": "Static sources and pure functions only; no database or private account; not a policy producer",
+  "source_sha256": {
+    "data/reference_split.json": "3c41f44d1c17c5b74fa4b90c9f6f850c5931c1694bcd1b338430ab3608f79eae",
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "app/services/slot_intent.py": "ecf7c88f35891f0c805c933ba19faa58dfb014794959dc1b54a156f99333e71d",
+    "app/services/user_program_generator.py": "181092368eac8e66693ff4e51e82dae0f3eb8fd1d794fc4e31aed3abdd040d30",
+    "app/services/weekly_volume_budget.py": "b1100ed5a6342168bede8902de1c1d7fdcc6767427127bdae5c245c268126f99",
+    "app/services/weekly_capacity_allocator.py": "deeeda45113c53f0da9b158137d24dad2d4fd63d302e4b2f87812c993a7c07d1",
+    "app/services/weekly_set_allocation.py": "d43d2034984dc263f511d264adb8c637d744514664e357003df5f685b1ddda6d",
+    "app/services/weekly_planner.py": "10c93a6fc964b7807de235d5b146b0d376c198c5c0656a650d009b0da0a7a290",
+    "app/services/morpho_program_generator.py": "cf2492056afc577114b8f0d358a5f5e24b64c815d3a2833df5da5d5ead8d1cdd",
+    "app/services/recommendation_v3.py": "17283c0872ff47eda4c16b3c171b4780a2ef6e299922bccb698ce97a318bd10f",
+    "app/services/mobile_read_models.py": "582d79b8e2a2bb8691d263a2509d21bbca3912f58926e2b61e029d9e48635871",
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa"
+  },
+  "catalogue_version": "auren-exercise-catalogue-v2-closure-2",
+  "catalogue_records": 107,
+  "canonical_records": 84,
+  "global_notes": [
+    "30 min d'escalier après chaque séance de musculation",
+    "Phase excentrique fluide 2-3s, concentrique explosive mais contrôlée",
+    "Repos différencié selon l'effort : mouvements lourds multiarticulaires (hack squat, leg press, RDL, presses inclinées, rowings lourds, shoulder press) 2-3 minutes minimum ; isolation et accessoires (curls, extensions, élévations latérales, mollets) 60-90 secondes ; séries très près de l'échec ou techniques RP/DS 90-120 secondes",
+    "Surcharge progressive: charge OU reps, sans sacrifier l'exécution"
+  ],
+  "archetypes": [
+    {
+      "slug": "push-a",
+      "exercise_count": 7,
+      "physical_work_sets": 21
+    },
+    {
+      "slug": "push-b",
+      "exercise_count": 7,
+      "physical_work_sets": 22
+    },
+    {
+      "slug": "pull-a",
+      "exercise_count": 7,
+      "physical_work_sets": 20
+    },
+    {
+      "slug": "pull-b",
+      "exercise_count": 7,
+      "physical_work_sets": 20
+    },
+    {
+      "slug": "legs-a",
+      "exercise_count": 7,
+      "physical_work_sets": 22
+    },
+    {
+      "slug": "legs-b",
+      "exercise_count": 7,
+      "physical_work_sets": 22
+    },
+    {
+      "slug": "upper-pecs-delts",
+      "exercise_count": 7,
+      "physical_work_sets": 22
+    },
+    {
+      "slug": "upper-back-arms",
+      "exercise_count": 7,
+      "physical_work_sets": 21
+    },
+    {
+      "slug": "lower-quad-bias",
+      "exercise_count": 6,
+      "physical_work_sets": 19
+    },
+    {
+      "slug": "lower-posterior-bias",
+      "exercise_count": 6,
+      "physical_work_sets": 19
+    },
+    {
+      "slug": "liss-only",
+      "exercise_count": 0,
+      "physical_work_sets": 0
+    },
+    {
+      "slug": "liss-abs",
+      "exercise_count": 4,
+      "physical_work_sets": 12
+    },
+    {
+      "slug": "short-upper",
+      "exercise_count": 7,
+      "physical_work_sets": 18
+    },
+    {
+      "slug": "catch-up-shoulders",
+      "exercise_count": 6,
+      "physical_work_sets": 19
+    },
+    {
+      "slug": "catch-up-arms",
+      "exercise_count": 7,
+      "physical_work_sets": 20
+    },
+    {
+      "slug": "catch-up-back-width",
+      "exercise_count": 6,
+      "physical_work_sets": 18
+    },
+    {
+      "slug": "full-body-morphotype-priority-v1",
+      "exercise_count": 8,
+      "physical_work_sets": 24
+    },
+    {
+      "slug": "no-equipment-full-body",
+      "exercise_count": 4,
+      "physical_work_sets": 12
+    }
+  ],
+  "registered_intents": [
+    "upper_chest_primary_press",
+    "upper_back_depth_row",
+    "quad_minimum_effective_dose",
+    "posterior_chain_hinge",
+    "lateral_delt_priority",
+    "rear_delt_upper_back_accessory",
+    "calves_gastrocnemius_priority",
+    "calves_soleus_priority",
+    "lats_width_vertical_pull",
+    "elbow_flexor_direct",
+    "elbow_extensor_direct",
+    "trunk_core_direct"
+  ],
+  "legacy_split_probes": {
+    "ppl": {
+      "one_session_names": [
+        "Push A — Pecs épaisseur + Delts + Triceps"
+      ]
+    },
+    "upper_lower": {
+      "one_session_names": [
+        "Upper — Biais pecs + épaules"
+      ]
+    }
+  },
+  "legacy_weekly_probes": [
+    {
+      "requested_sessions": null,
+      "sessions": 0,
+      "physical_work_sets": 0,
+      "fingerprint": "475356b849d26477",
+      "equipment_declared": null
+    },
+    {
+      "requested_sessions": 1,
+      "sessions": 1,
+      "physical_work_sets": 24,
+      "fingerprint": "46a7764096e8a5b5",
+      "equipment_declared": null
+    },
+    {
+      "requested_sessions": 2,
+      "sessions": 2,
+      "physical_work_sets": 48,
+      "fingerprint": "930f2ab5b670c922",
+      "equipment_declared": null
+    },
+    {
+      "requested_sessions": 3,
+      "sessions": 3,
+      "physical_work_sets": 72,
+      "fingerprint": "edf742dc0464fea5",
+      "equipment_declared": null
+    },
+    {
+      "requested_sessions": 4,
+      "sessions": 4,
+      "physical_work_sets": 96,
+      "fingerprint": "f852d61310696f1e",
+      "equipment_declared": null
+    }
+  ],
+  "legacy_ranked_candidates": {
+    "upper_chest_primary_press": [
+      {
+        "name": "Chest Press machine",
+        "legacy_score": 80,
+        "canonical_id": "chest-press-machine"
+      },
+      {
+        "name": "Dips pectoraux (buste penché)",
+        "legacy_score": 80,
+        "canonical_id": "dips-pectoraux-paren-buste-penche"
+      },
+      {
+        "name": "Développé couché haltères",
+        "legacy_score": 80,
+        "canonical_id": "developpe-couche-halteres"
+      },
+      {
+        "name": "Développé incliné haltères 30°",
+        "legacy_score": 80,
+        "canonical_id": "developpe-incline-halteres-30"
+      },
+      {
+        "name": "Incline DB Press 30°",
+        "legacy_score": 80,
+        "canonical_id": "developpe-incline-halteres-30"
+      },
+      {
+        "name": "Incline Dumbbell Press",
+        "legacy_score": 80,
+        "canonical_id": "developpe-incline-halteres-30"
+      },
+      {
+        "name": "Incline Smith Press",
+        "legacy_score": 80,
+        "canonical_id": "incline-smith-press"
+      }
+    ],
+    "upper_back_depth_row": [
+      {
+        "name": "Rowing chest-supported",
+        "legacy_score": 80,
+        "canonical_id": "rowing-chest-supported"
+      },
+      {
+        "name": "Rowing câble assis prise large",
+        "legacy_score": 80,
+        "canonical_id": "rowing-cable-assis-prise-large"
+      },
+      {
+        "name": "Rowing câble assis prise neutre",
+        "legacy_score": 80,
+        "canonical_id": "rowing-cable-assis-prise-neutre"
+      },
+      {
+        "name": "Rowing câble assis prise serrée",
+        "legacy_score": 80,
+        "canonical_id": "rowing-cable-assis-prise-serree"
+      },
+      {
+        "name": "Rowing haltère un bras",
+        "legacy_score": 80,
+        "canonical_id": "rowing-haltere-un-bras-paren-banc"
+      },
+      {
+        "name": "Rowing haltère un bras (banc)",
+        "legacy_score": 80,
+        "canonical_id": "rowing-haltere-un-bras-paren-banc"
+      },
+      {
+        "name": "Rowing machine chest-supported",
+        "legacy_score": 80,
+        "canonical_id": "rowing-chest-supported"
+      }
+    ],
+    "quad_minimum_effective_dose": [
+      {
+        "name": "Leg extension câble unilatéral",
+        "legacy_score": 60,
+        "canonical_id": "leg-extension-cable-unilateral"
+      },
+      {
+        "name": "Leg extensions assises",
+        "legacy_score": 60,
+        "canonical_id": "leg-extensions-assises"
+      },
+      {
+        "name": "Reverse Nordic",
+        "legacy_score": 60,
+        "canonical_id": "reverse-nordic"
+      }
+    ],
+    "posterior_chain_hinge": [
+      {
+        "name": "Back extension 45° (bias ischios)",
+        "legacy_score": 90,
+        "canonical_id": "back-extension-45-paren-bias-ischios"
+      },
+      {
+        "name": "Romanian Deadlift barre",
+        "legacy_score": 90,
+        "canonical_id": "romanian-deadlift-barre"
+      },
+      {
+        "name": "Romanian Deadlift haltères",
+        "legacy_score": 90,
+        "canonical_id": "romanian-deadlift-halteres"
+      }
+    ],
+    "lateral_delt_priority": [
+      {
+        "name": "Élévations latérales câble",
+        "legacy_score": 80,
+        "canonical_id": "elevations-laterales-cable-paren-derriere-le-dos"
+      },
+      {
+        "name": "Élévations latérales câble (derrière le dos)",
+        "legacy_score": 80,
+        "canonical_id": "elevations-laterales-cable-paren-derriere-le-dos"
+      },
+      {
+        "name": "Élévations latérales haltères",
+        "legacy_score": 80,
+        "canonical_id": "elevations-laterales-halteres"
+      },
+      {
+        "name": "Élévations latérales machine",
+        "legacy_score": 80,
+        "canonical_id": "elevations-laterales-machine"
+      }
+    ],
+    "rear_delt_upper_back_accessory": [
+      {
+        "name": "Face pull câble",
+        "legacy_score": 80,
+        "canonical_id": "face-pull-cable-paren-corde"
+      },
+      {
+        "name": "Face pull câble (corde)",
+        "legacy_score": 80,
+        "canonical_id": "face-pull-cable-paren-corde"
+      },
+      {
+        "name": "Reverse fly machine",
+        "legacy_score": 80,
+        "canonical_id": "rear-delt-fly-machine"
+      },
+      {
+        "name": "Écarté arrière d'épaule câble",
+        "legacy_score": 80,
+        "canonical_id": "ecarte-arriere-d-epaule-cable"
+      }
+    ],
+    "calves_gastrocnemius_priority": [
+      {
+        "name": "Calf press leg press",
+        "legacy_score": 80,
+        "canonical_id": "calf-press-leg-press"
+      },
+      {
+        "name": "Mollets assis machine",
+        "legacy_score": 80,
+        "canonical_id": "mollets-assis-machine"
+      },
+      {
+        "name": "Relevés mollets debout",
+        "legacy_score": 80,
+        "canonical_id": "releves-mollets-debout"
+      },
+      {
+        "name": "Relevés mollets debout machine",
+        "legacy_score": 80,
+        "canonical_id": "releves-mollets-debout-machine"
+      }
+    ],
+    "calves_soleus_priority": [
+      {
+        "name": "Calf press leg press",
+        "legacy_score": 80,
+        "canonical_id": "calf-press-leg-press"
+      },
+      {
+        "name": "Mollets assis machine",
+        "legacy_score": 80,
+        "canonical_id": "mollets-assis-machine"
+      },
+      {
+        "name": "Relevés mollets debout",
+        "legacy_score": 80,
+        "canonical_id": "releves-mollets-debout"
+      },
+      {
+        "name": "Relevés mollets debout machine",
+        "legacy_score": 80,
+        "canonical_id": "releves-mollets-debout-machine"
+      }
+    ],
+    "lats_width_vertical_pull": [
+      {
+        "name": "Lat pulldown prise large",
+        "legacy_score": 80,
+        "canonical_id": "tirage-poulie-haute-prise-large"
+      },
+      {
+        "name": "Lat pulldown prise neutre",
+        "legacy_score": 80,
+        "canonical_id": "tirage-poulie-haute-prise-neutre"
+      },
+      {
+        "name": "Tirage poulie haute prise large",
+        "legacy_score": 80,
+        "canonical_id": "tirage-poulie-haute-prise-large"
+      },
+      {
+        "name": "Tirage poulie haute prise neutre",
+        "legacy_score": 80,
+        "canonical_id": "tirage-poulie-haute-prise-neutre"
+      },
+      {
+        "name": "Tirage vertical unilatéral câble",
+        "legacy_score": 80,
+        "canonical_id": "tirage-vertical-unilateral-cable"
+      },
+      {
+        "name": "Traction assistée machine",
+        "legacy_score": 80,
+        "canonical_id": "traction-assistee-machine"
+      },
+      {
+        "name": "Traction assistée unilatérale",
+        "legacy_score": 80,
+        "canonical_id": "traction-assistee-unilaterale"
+      }
+    ],
+    "elbow_flexor_direct": [
+      {
+        "name": "Curl EZ-bar debout",
+        "legacy_score": 80,
+        "canonical_id": "curl-ez-bar-debout"
+      },
+      {
+        "name": "Curl câble basse",
+        "legacy_score": 80,
+        "canonical_id": "curl-poulie-basse-paren-barre"
+      },
+      {
+        "name": "Curl debout haltères",
+        "legacy_score": 80,
+        "canonical_id": "curl-debout-halteres"
+      },
+      {
+        "name": "Curl incliné haltères",
+        "legacy_score": 80,
+        "canonical_id": "curl-incline-halteres-paren-banc-45"
+      },
+      {
+        "name": "Curl incliné haltères (banc 45°)",
+        "legacy_score": 80,
+        "canonical_id": "curl-incline-halteres-paren-banc-45"
+      },
+      {
+        "name": "Curl marteau câble (corde)",
+        "legacy_score": 80,
+        "canonical_id": "curl-marteau-cable-paren-corde"
+      },
+      {
+        "name": "Curl marteau câble corde",
+        "legacy_score": 80,
+        "canonical_id": "curl-marteau-cable-paren-corde"
+      },
+      {
+        "name": "Curl marteau haltères",
+        "legacy_score": 80,
+        "canonical_id": "curl-marteau-halteres"
+      },
+      {
+        "name": "Curl poulie basse",
+        "legacy_score": 80,
+        "canonical_id": "curl-poulie-basse-paren-barre"
+      },
+      {
+        "name": "Curl poulie basse (barre)",
+        "legacy_score": 80,
+        "canonical_id": "curl-poulie-basse-paren-barre"
+      },
+      {
+        "name": "Curl prise neutre câble",
+        "legacy_score": 80,
+        "canonical_id": "curl-marteau-cable-paren-corde"
+      },
+      {
+        "name": "Preacher curl",
+        "legacy_score": 80,
+        "canonical_id": "preacher-curl"
+      }
+    ],
+    "elbow_extensor_direct": [
+      {
+        "name": "Extension overhead câble (corde)",
+        "legacy_score": 80,
+        "canonical_id": "extension-overhead-cable-paren-corde"
+      },
+      {
+        "name": "Kickback câble",
+        "legacy_score": 80,
+        "canonical_id": "kickback-cable"
+      },
+      {
+        "name": "Triceps extension poulie haute (corde)",
+        "legacy_score": 80,
+        "canonical_id": "triceps-pushdown-corde"
+      },
+      {
+        "name": "Triceps pushdown barre",
+        "legacy_score": 80,
+        "canonical_id": "triceps-pushdown-barre"
+      },
+      {
+        "name": "Triceps pushdown corde",
+        "legacy_score": 80,
+        "canonical_id": "triceps-pushdown-corde"
+      }
+    ],
+    "trunk_core_direct": []
+  }
+}
