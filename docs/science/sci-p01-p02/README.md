@@ -7,6 +7,7 @@ Paquet de contrats isolés pour le Blueprint et le premier plan d'hypertrophie. 
 - [Audit et preuves](AUDIT_AND_EVIDENCE.md) — comportements réellement servis et limites scientifiques.
 - [Relevé des18 gabarits et probes](audit_repo.json) — résultats déterministes et versions épinglées, aucune donnée privée.
 - [Schemas et 8 fixtures](v1/) — structure proposée, distincte des invariants sémantiques inter-objets.
+- [Reçu final de livraison](DELIVERY_RECEIPT.md) — révisions, CI canonique, Sonar et conditions de clôture.
 - [Rapport de validation/livraison](REPORT.md) — commandes, résultats, review, publication et limites.
 - [Manifeste canonique](../../strategy/AUREN_MANIFESTO_V1.md) et [change OpenSpec](../../../openspec/changes/archive/2026-11-05-science-blueprint-first-plan/proposal.md).
 

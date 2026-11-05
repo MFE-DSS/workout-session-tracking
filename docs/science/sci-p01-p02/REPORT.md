@@ -1,5 +1,7 @@
 # Rapport SCI-P01 / SCI-P02 — contrats isolés
 
+**Point de reprise courant : [reçu final de livraison](DELIVERY_RECEIPT.md).** Les états « en cours au moment de la préparation » ci-dessous sont historiques ; le reçu final porte les vérifications postérieures.
+
 5 novembre 2026. Branche `spec/sci-p01-p02-blueprint-first-plan`, base 90da846. Réalisation autorisée après revue du design : « Valider les contrats et tests isolés ». Pas de moteur servi, de nouvelle règle de prescription, d'UI ou de migration.
 
 ## Brainstorming / Options / Risques / Choix retenu
