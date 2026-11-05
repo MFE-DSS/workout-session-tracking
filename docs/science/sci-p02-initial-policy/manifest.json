@@ -1,0 +1,25 @@
+{
+  "package_version": "initial-policy-producer/1.0.0",
+  "policy_version": "initial-hypertrophy-policy/0.1.0-proposed",
+  "runtime_availability": "NOT_SERVED",
+  "scientific_admission": "NOT_ADMITTED",
+  "base_sha": "5fd18c3291cd93533cf7b1f7ab50862c85a7a205",
+  "mobile_consumer_sha": "0ee7ba3b38d70fcdb1db4af829a89de885632529",
+  "build_approval": "Valider le build isol\u00e9 propos\u00e9",
+  "ready_fixture": "NOT_PRODUCED_UNSUPPORTED_POLICY_AND_TIME",
+  "files_sha256": {
+    "docs/science/sci-p02-initial-policy/AUDIT.json": "66bc5b9ffc4097aee7427b0e75c9a7b5d8fdebe15e74fc6f6cab47ce0be3ec84",
+    "docs/science/sci-p02-initial-policy/DECISIONS_AND_HANDOFF.md": "0e8986b1d2a6d4f7e031b1dad65dc1118e04b48d4dacb5a378e9da3bea3f36b1",
+    "docs/science/sci-p02-initial-policy/EVIDENCE_AND_AUDIT.md": "c4920c2e73beab53dab260054094f7745315e916f9c8a97728b148d6446bf77a",
+    "docs/science/sci-p02-initial-policy/README.md": "9d6d3865e368ab5daa7575ca37a29f2db8e17b7c5ae02d6d8bf2ac4cad231980",
+    "docs/science/sci-p02-initial-policy/REPORT.md": "d225f0d2f5df4a39fb7b7140b05fbfdefe110e60fd1e34102a6b15df8f986f1d",
+    "docs/science/sci-p02-initial-policy/v1/policy.json": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
+    "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
+    "tests/test_science_initial_plan_policy.py": "9b2c6409f004fdc278e10b845a6d9c55c2e993f5f56b32d20765419a04412d68",
+    "tools/science_initial_policy/__init__.py": "8484f7ce9c7206478b1a7000ae5a4095c615315341f641b4f176340b417ae731",
+    "tools/science_initial_policy/fixtures.py": "e171301265267d5f1ccff5e7b067d2b972c29be1b1f1ad2431770fe193a5a811",
+    "tools/science_initial_policy/planning.py": "42bfe157158f00a482218b334918919e76bad3645d4f6c9ce61bb09f3c33a8ae",
+    "tools/science_initial_policy/producer.py": "c50bfab2c41bfbc12e00038aaf6db94deaf7ceaddf3050c4ff12b16b48835c67",
+    "tools/science_initial_policy/registry.py": "b693e527b83561099e5b5bf8c3eee85ab27fd49387cf66e3abadf5c8fee4924d"
+  }
+}

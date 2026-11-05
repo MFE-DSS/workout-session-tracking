@@ -1,0 +1,2981 @@
+[
+  {
+    "scenario": "sufficient",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "COMPATIBILITY_UNKNOWN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "insufficient",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "fc484b3b7341604d79d17e138c6892d2ea99b9668deee890c22cd488da0b26ea",
+      "status": "INSUFFICIENT_DATA",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "INSUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [
+          "sessions_per_week"
+        ],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "REQUIRED_INPUT_MISSING",
+          "blocking": true,
+          "field_refs": [
+            "sessions_per_week"
+          ],
+          "explanation": "Required operational inputs are explicitly missing."
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "conflicting",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "CONFLICT",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": [
+            {
+              "value": 2,
+              "source_ref": "fixture:a"
+            },
+            {
+              "value": 3,
+              "source_ref": "fixture:b"
+            }
+          ]
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "6ff3eeccd9276ee0418de0e805390bec787160d292b31ff5b124188b3cc99b83",
+      "status": "CONFLICTING_DATA",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "CONFLICTING",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": [
+          "sessions_per_week"
+        ]
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "INPUT_CONFLICT",
+          "blocking": true,
+          "field_refs": [
+            "sessions_per_week"
+          ],
+          "explanation": "Resolve sourced input conflicts before prescription."
+        },
+        {
+          "code": "INPUT_CONFLICT",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: INPUT_CONFLICT"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "unknown_gym",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Une salle commerciale, équipement non confirmé",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "d2b93d445e7cb179a00403650af61de2cd98ed64f9c3fdb03fc09fee82f200a6",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "COMPATIBILITY_UNKNOWN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "optional_conflict",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "CONFLICT",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": [
+            {
+              "value": 170.0,
+              "source_ref": "fixture:a"
+            },
+            {
+              "value": 180.0,
+              "source_ref": "fixture:b"
+            }
+          ]
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "6b4d97cfb432dfbc485d2e3c38cc4dd5f96d3574c829481ab29ca08adde8cc18",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "INPUT_CONFLICT",
+          "blocking": false,
+          "field_refs": [
+            "height_cm"
+          ],
+          "explanation": "Optional conflicting input is not used for personalisation."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "COMPATIBILITY_UNKNOWN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "withheld_required_input",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "WITHHELD",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "c6bf80f897e601887541f18a254a14730e9b50108628dad22f7556889de1e84d",
+      "status": "INSUFFICIENT_DATA",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "INSUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [
+          "limitations"
+        ],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "REQUIRED_INPUT_MISSING",
+          "blocking": true,
+          "field_refs": [
+            "limitations"
+          ],
+          "explanation": "Required operational inputs are explicitly missing."
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "undated_legacy_weight",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "KNOWN",
+          "value": 80.0,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "users.weight_kg",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "c66866d5defe0e713fa638214d249f1195ae4ad619e795e931c0c11380f137c0",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "COMPATIBILITY_UNKNOWN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "legacy_candidate_requires_policies_and_review",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "COMPATIBILITY_UNKNOWN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "confirmed_exercises_no_inventory",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "back-extension-45-paren-bias-ischios",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "fente-avant",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "pompes",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "releves-mollets-debout",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-large",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-large",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            }
+          ]
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "02561ca3659e71cb20bbc6b9731e999237c3dfe62968e2d0f000b011a51eba7c",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "forged_policy_approval",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "APPROVED",
+        "dose_id": "unadmitted",
+        "time_id": "unadmitted",
+        "selection_id": "unadmitted",
+        "taxonomy_projection_id": "unadmitted",
+        "review_ref": "untrusted-client-approval"
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "658d2943c3e0807eb426d840f6860f7f1944d8f549cac6d29b1c2827fc9d0800",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CATALOG_GAP",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+        },
+        {
+          "code": "COMPATIBILITY_UNKNOWN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "known_cadence_outside_initial_subset",
+    "availability": "NOT_SERVED",
+    "input_authority": "SYNTHETIC_INPUT_ACTUAL_PRODUCER_OUTPUT",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 1,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            75
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "response": {
+      "contract_version": "first-plan-recommendation/1.0.0",
+      "request_fingerprint": "4a7a522932c0aceaa6dc50686786813462c2465838984a69a09c8a2b81114a88",
+      "status": "POLICY_UNAVAILABLE",
+      "engine_version": "initial-policy-producer/1.0.0",
+      "assessment": {
+        "state": "SUFFICIENT",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "missing_fields": [],
+        "conflicting_fields": []
+      },
+      "issues": [
+        {
+          "code": "POLICY_UNAVAILABLE",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "The isolated producer exists; scientific policy admission does not."
+        },
+        {
+          "code": "CONSTRAINT_VIOLATION",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: CONSTRAINT_VIOLATION"
+        },
+        {
+          "code": "TIME_UNCERTAIN",
+          "blocking": true,
+          "field_refs": [],
+          "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+        }
+      ],
+      "used_fields": [
+        "objective",
+        "population_scope",
+        "sessions_per_week",
+        "session_budgets_minutes",
+        "limitations",
+        "excluded_exercise_ids",
+        "declared_priorities"
+      ],
+      "candidate_plan": null,
+      "confidence": {
+        "individual_response": "NOT_ESTIMATED",
+        "feasibility": "UNKNOWN",
+        "evidence_refs": [
+          "IP-E01",
+          "IP-E02",
+          "IP-E03",
+          "IP-E04",
+          "IP-E05",
+          "IP-E06",
+          "IP-E07",
+          "IP-E08"
+        ],
+        "limitations": [
+          "Proposed dose is not individually validated.",
+          "No supported time upper bound or admitted runtime policy.",
+          "No runtime/API activation; diagnostics are non-executable."
+        ]
+      }
+    }
+  }
+]
