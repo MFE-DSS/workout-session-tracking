@@ -160,7 +160,7 @@ Registres relus : DESIGN_DECISIONS_HOME_UIV2 et DESIGN_DECISIONS_UIV2_SURFACES a
 | Q4 | Sémantique de série conservée ; aucune géométrie d'instrument changée. |
 | Q5, Q6, Q7, Q8 | Références legacy mobiles selon amendement ; primitives/tokens natifs réutilisés, une action principale par formulaire. |
 
-Preuves web conservées dans [entrée](evidence/mob03-account-v1/entry.png), [inscription](evidence/mob03-account-v1/signup.png) et [confirmation](evidence/mob03-account-v1/created.png). Ces fichiers sont des reçus de revue, pas une promotion de baseline LOCKED ni une preuve physique.
+Preuves web conservées dans [entrée](../clients/mobile/visual-contract/review-receipts/mob03-account-v1/entry.png), [inscription](../clients/mobile/visual-contract/review-receipts/mob03-account-v1/signup.png) et [confirmation](../clients/mobile/visual-contract/review-receipts/mob03-account-v1/created.png). Ces fichiers sont des reçus de revue, pas une promotion de baseline LOCKED ni une preuve physique.
 
 ## Revue indépendante de l'adaptateur des déclarations
 
