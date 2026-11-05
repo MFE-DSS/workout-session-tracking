@@ -11,3 +11,5 @@ API pure : `load_registry()`, `inspect_policy(request,registry)` (diagnostics no
 Pas de READY aujourd'hui : les paramètres de dose et le modèle de temps ne sont pas admis. Le producteur indique correctement POLICY_UNAVAILABLE, INSUFFICIENT_DATA ou CONFLICTING_DATA selon la requête. La proposition de7intentions/cadence2ou3 n'est pas une dose optimale personnelle certifiée. Les diagnostics ne doivent pas servir à démarrer une séance.
 
 Le [manifest](manifest.json) identifie versions, source de base et hashes d'artefacts ; le reçu de PR indiquera le SHA publié et les contrôles distants. Aucun déploiement ni recette mobile déduit de ce producteur isolé.
+
+[Reçu de livraison vérifiée](DELIVERY_RECEIPT.md) : code #357 mergé1313f2f, CI PR/canonique réussies. Politique/READY restent ouverts ; la gate Sonar canonique historique reste consultative et inchangée.

@@ -27,7 +27,7 @@ TDD observé :23tests rouges avant module ; tests additionnels rouges puis verts
 
 Contrôle consommateur réel :11sorties Python passent dans AuthSession/FirstPlanClient du worktree MOB-03 à0ee7ba3 avec vérification canonique via Python. L'absence de producteur garde NOT_SERVED sans requête de recommandation. Aucun fichier mobile modifié ; pas de fausse passe réseau/API ou appareil.
 
-check_scope ISOLATED : Ruff des fichiers neufs, budget264≤548, Bandit ciblé, protocole et OpenSpec strict6/6 passent. Aucun full sweep local ; CI réelle obligatoire avant merge. Revue indépendante et reçu distant du HEAD final à consigner sur la PR de ce change ; aucune réussite distante anticipée ici.
+check_scope ISOLATED : Ruff des fichiers neufs, budget264≤548, Bandit ciblé, protocole et OpenSpec strict6/6 passent. Aucun full sweep local ; CI réelle obligatoire avant merge. Revue indépendante sans Critical/Important ; mineur des priorités différé. CI finale et canonique réussies ; reçu exact dans [DELIVERY_RECEIPT.md](DELIVERY_RECEIPT.md), avec les SHA, runs et distinction Sonar PR OK/canonique ERROR historique.
 
 ## Décisions d'exécution et limites
 
