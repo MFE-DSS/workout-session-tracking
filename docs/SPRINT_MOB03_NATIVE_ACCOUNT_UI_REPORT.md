@@ -274,3 +274,7 @@ Vérifications du diff final : **44 suites / 547 tests mobiles passants**, TypeS
 CI du HEAD publié précédent5d73596 : neuf jobs Actions réussis, mais check externe **SonarCloud Code Analysis = failure**, titre exact « Quality Gate failed », condition « Code smells with severity Major found (required < Major) ». Consultatif selon GOV-SONAR-01, aucune règle/seuil/issue altéré pour le passer. La CI du nouveau HEAD est consignée dans le reçu de publication, sans réutiliser ce vert historique.
 
 CR de passage de relais : [MOB03_CR_PO_ARCHITECT_2026_11_05.md](MOB03_CR_PO_ARCHITECT_2026_11_05.md). Ni critical path complet, ni readiness de merge du change, ni déploiement/recettes/Blueprint complet revendiqués.
+
+### Publication de la correction et passage de relais
+
+Correction publiée : `07b908f7461ae3901b03aba0f57a8ee66d360cf1`. [Run42058469592](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42058469592) terminé avec succès : neuf jobs Actions verts, y compris pytest/QA, lint/sécurité, mobile et visuel. Le check externe SonarCloud Code Analysis du même SHA échoue sur les code smells Major (« Quality Gate failed »), consultatif GOV-SONAR-01 ; aucun seuil/constat effacé. Le [CR courant §8](MOB03_CR_PO_ARCHITECT_2026_11_05.md#8-reçu-de-publication--correction-validée) contient le reçu et l'annexe des données à arbitrer. PR draft conservée, aucun merge/déploiement/archivage complet. La présente trace post-publication est docs-only ; elle ne change pas le code testé.
