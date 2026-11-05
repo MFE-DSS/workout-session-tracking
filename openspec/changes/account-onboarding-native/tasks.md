@@ -1,26 +1,26 @@
 # Tasks — MOB-03
 
-Statut : BUILD PARTIEL autorisé par le mandat opérateur du 5 novembre 2026 : socle API du compte indépendant de D-MOB03-1 à 4. Ces décisions restent ouvertes ; aucune migration, suppression, donnée corporelle ou surface nouvelle implémentée. Voir design.md et implementation-account-core.md.
+Statut courant : mandat PRODUCT DELIVERY du 5 novembre, rendu V1 ajustée accepté. Socle compte natif, garde propriétaire et adaptateur des déclarations existantes réalisés. Les acquisitions Blueprint complètes, effacement/STORE-00 et recettes appareil restent ouverts. Voir native-account-delivery.md et SPRINT_MOB03_NATIVE_ACCOUNT_UI_REPORT.md ; les paragraphes de preuves précédents décrivent leurs passes historiques.
 
 ## 1. Décisions et garde de périmètre
 
 - [ ] 1.1 Faire accepter D-MOB03-1 à 4 (objectifs/unités, poids/compatibilité, effacement/rétention/journal, acquisitions/UX) et consigner les choix ; preuve : décisions écrites revues par l’opérateur, sans valeur de labo promue implicitement.
-- [ ] 1.2 Fixer le contrat d’identité et de partition du journal local, y compris credentials et commandes d’un compte quitté ; preuve : matrice propriétaire avant/après relance et cas interdits documentés.
+- [x] 1.2 Fixer le contrat d’identité et de partition du journal local, y compris credentials et commandes d’un compte quitté ; preuve : matrice propriétaire avant/après relance et cas interdits documentés.
 - [ ] 1.3 Exécuter la revue sécurité/qualité prévue par GOV-SONAR-01 avant la nouvelle exposition de données corporelles ; preuve : outils/vérifications réels, constats et limitations consignés, aucune affirmation d’audit exhaustif sans preuve.
 - [x] 1.4 Exécuter python scripts/check_scope.py avant les vérifications et suivre son tier réel ; preuve : rapport du diff effectif, sans full sweep local redondant.
 
 ## 2. API et cycle de compte
 
-- [ ] 2.1 Spécifier puis implémenter l’inscription JSON avec validations auth/password_policy et protection de débit approuvée ; preuve : tests rouges puis verts de validation, unicité, double appui/réponse perdue et absence de secret dans logs.
-- [ ] 2.2 Câbler restauration, changement de mot de passe et révocation via les frontières canoniques ; preuve : tests auth_scope_isolation, auth_password_policy et d9_mobile_auth concernés, plus route contract et documentation JSON.
+- [x] 2.1 Spécifier puis implémenter l’inscription JSON avec validations auth/password_policy et protection de débit approuvée ; preuve : tests rouges puis verts de validation, unicité, double appui/réponse perdue et absence de secret dans logs.
+- [x] 2.2 Câbler restauration, changement de mot de passe et révocation via les frontières canoniques ; preuve : tests auth_scope_isolation, auth_password_policy et d9_mobile_auth concernés, plus route contract et documentation JSON.
 - [x] 2.3 Classer chaque route ajoutée dans exactement une entrée MOB-00 ; preuve : test_native_feature_migration_map et absence de route fantôme/non inventoriée.
-- [ ] 2.4 Conserver les parcours web de mot de passe oublié/réinitialisation et export ; preuve : liens réels vérifiés, aucune route native concurrente non approuvée.
+- [x] 2.4 Conserver les parcours web de mot de passe oublié/réinitialisation et export ; preuve : liens réels vérifiés, aucune route native concurrente non approuvée.
 
 ## 3. Vrai consommateur et reprise
 
 - [ ] 3.1 Câbler le vrai consommateur du compte/onboarding avec AuthSession et journal propriétaire ; preuve : tests ConnectedApp réels traversant création, connexion, interruption, relance et changement de compte sans fuite ni envoi sous un autre propriétaire.
-- [ ] 3.2 Protéger l’action synchrone et les réponses tardives ; preuve : tests de doubles appuis avant réponse, résultat inconnu, retry contrôlé et commande plus récente non écrasée.
-- [ ] 3.3 Documenter les états d’erreur et récupération du parcours ; preuve : chaque erreur réseau/auth/validation possède un comportement utilisateur reproductible, sans confirmation inventée.
+- [x] 3.2 Protéger l’action synchrone et les réponses tardives ; preuve : tests de doubles appuis avant réponse, résultat inconnu, retry contrôlé et commande plus récente non écrasée.
+- [x] 3.3 Documenter les états d’erreur et récupération du parcours ; preuve : chaque erreur réseau/auth/validation possède un comportement utilisateur reproductible, sans confirmation inventée.
 
 ## 4. Déclarations, objectifs, unités et préférences
 
@@ -53,3 +53,8 @@ Statut : BUILD PARTIEL autorisé par le mandat opérateur du 5 novembre 2026 : s
 ## Preuves locales du socle API — 5 novembre 2026
 
 Parties serveur de 2.1/2.2 implémentées : inscription et changement de mot de passe JSON, garde d'unicité/concurrence, quotas partagés, révocation et erreurs sans reprise de secrets. 241 tests backend ciblés/broad, 478 mobiles, TypeScript, Ruff/budget, Bandit ciblé et OpenSpec strict verts. Ces deux tâches globales ne sont pas cochées : le consommateur natif, la partition propriétaire et les parcours d'incertitude/UI ne sont pas encore raccordés. Pas de CI distante, commit/push bloqués par contrôle automatique ; pas de déploiement. D-MOB03-1 à 4 restent ouverts. Contrat et arbitrages dans les documents MOB03 du dossier docs.
+
+
+## Reprise native et validation visuelle — 5 novembre
+
+L'opérateur accepte la V1 ajustée après le comparatif et demande la poursuite du critical path. Les consommateurs compte et la partition propriétaire sont testés ; les acquisitions 4.x/5.x ne sont pas déduites de cette acceptation. L'adaptateur des déclarations existantes est testé côté serveur/client, sans raccordement du formulaire Blueprint (4.2 reste partielle). Vérification du diff : 531 tests mobiles, TypeScript, 274 tests backend/broad et gardes UI, Ruff264/548, Bandit ciblé, OpenSpec5/5 ; revue indépendante sans défaut bloquant. Un constat mineur d'en-tête no-store sur erreurs génériques reste différé, sans déclaration exposée. Publication en draft et vérifications CI consignées séparément ; aucune recette physique, suppression, archive ou disponibilité de premier plan déclarée complète.

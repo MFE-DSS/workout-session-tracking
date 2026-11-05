@@ -224,10 +224,13 @@ features:
   - id: profile-training-preferences
     feature: Préférences d'entraînement déclarées (objectif, fréquence, durée…)
     family: profil
-    routes: [POST /profile/preferences]
+    routes:
+      - POST /profile/preferences
+      - GET /api/mobile/v1/me/training-preferences/declarations
+      - PUT /api/mobile/v1/me/training-preferences/declarations
     legacy_location: "auth_routes.profile_preferences"
     domain_owner: [training_preferences]
-    api: "à créer"
+    api: "déclarations mobile versionnées via training_preferences ; consommateur natif en cours, durée non supportée"
     data: [training_preferences]
     user_actions: [déclarer objectif, fréquence, durée, environnement]
     native_destination: PROFIL / onboarding

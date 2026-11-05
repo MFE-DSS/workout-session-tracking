@@ -59,3 +59,25 @@ Contrat lisible : MOB03_ACCOUNT_API_CONTRACT.md. Arbitrages et croquis candidats
 ## GO de publication explicite reçu — 5 novembre 2026
 
 L'opérateur confirme exactement « GO BUILD MOB-03 : commit, push et PR draft ». Ce GO couvre le socle API déjà testé et revu, son commit et sa publication en draft. Le refus automatique antérieur est levé par cette nouvelle autorisation explicite ; aucune autre méthode de commit n'a été utilisée entre-temps. Les 14 fichiers ont été comparés par empreinte à la sauvegarde vérifiée, sans écart avant cette seule mise à jour documentaire. Canonique relue sur le remote : toujours 90da846. Les nouvelles compositions, D-MOB03-1 à 4, la recette MOB-02 et le déploiement restent des étapes distinctes.
+
+## Recadrage produit / science / artistique — suite du 5 novembre
+
+L'opérateur transmet un recalage du chemin critique puis le mandat de l'agent scientifique S0. Le [relevé de direction](strategy/AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md) consigne la boucle bodybuilding, l'entrée composée retenue, le Blueprint cible et les responsabilités. Le [registre science→produit](strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md) exprime les besoins consommateurs, versions, inconnues et compatibilité sans adopter un payload hypothétique. Le brief PO designer et le chemin critique sont actualisés ; le texte intégral du manifeste cité restait alors à référencer (reçu et conservé ensuite, voir reprise ci-dessous).
+
+Brainstorming / Options / Risques / Choix retenu : conserver l'ordre technique et expliciter les dépendances, plutôt qu'ouvrir une refonte ou des algorithmes. Les propositions de Blueprint ne sont pas promues en persistance ou prescriptions ; aucune règle scientifique, UI, baseline, asset ou donnée de production changé. MOB-02 n'est pas présenté comme bloqué par le design du bilan ; sa recette physique reste à clôturer. Les livrables S0 appartiennent au volet scientifique, aucun audit S0 complet revendiqué par cette passe produit.
+
+
+## Reprise native — mandat PRODUCT DELIVERY
+
+Le manifeste canonique v1.0 est conservé intégralement dans strategy/AUREN_MANIFESTO_V1.md (empreinte identique à la pièce opérateur). Nouveau périmètre autorisé : consommateurs natifs MOB-03, sous OpenSpec et revue visuelle avant commit UI ; pas de déploiement. Plan : openspec/changes/account-onboarding-native/native-account-delivery.md.
+
+Réalisation locale actuelle : inscription/changement de mot de passe AuthSession, résultat incertain sans retry, génération des opérations et store sérialisé ; partition par propriétaire et inspection sans mutation du journal historique ; restauration ConnectedApp après résolution, neutralisation des retries d'un ancien moteur. Les nouveaux formulaires ne sont pas encore réalisés ; croquis consolidé soumis selon G1. Les six gaps Blueprint/compte sont dans MOB03_NATIVE_UI_DATA_GAPS.md, sans persistance de labo ou faux effacement.
+
+Vérification intermédiaire : 39 suites Jest / 503 tests passants, TypeScript passant, OpenSpec strict 5/5 et spec protocol passants ; budget Ruff 264 ≤ 548. Revue indépendante du sous-ensemble natif en cours, donc aucune readiness finale revendiquée. Pas de nouveau commit/push, planche acceptée, CI de nouveau HEAD, build appareil ou déploiement pour cette reprise.
+
+
+### Revue du socle natif et correction avant livraison
+
+Trois constats Important de la revue indépendante corrigés : résolution propriétaire clôturée par génération jusque dans les transactions de métadonnées ; snapshot d'annulation et timer neutralisés lors du passage de compte avec garde de l'ancien callback ; validation structurelle du snapshot avant attribution, sans réparation des faits. Les scénarios de génération différée, compte A→B via Annuler et snapshot incomplet sont couverts par les vrais consommateurs ; les échecs ont été constatés avant la correction, puis les tests sont verts.
+
+Vérification finale locale du sous-ensemble : **40 suites / 512 tests mobiles verts**, TypeScript vert ; **85 tests backend ciblés verts**, deux avertissements de dépréciation de dépendances. Les mocks de frontière SQLite ne prouvent ni rollback physique ni force-kill : preuve appareil toujours requise. Croquis de la planche toujours soumis ; aucun formulaire nouveau ni Blueprint complet livré, pas de commit/push de cette reprise et pas de CI d'un nouveau HEAD. La suite attend l'acceptation du croquis imposée par G1, puis le rendu réel et les contrats consommateurs manquants.

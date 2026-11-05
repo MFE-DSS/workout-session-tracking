@@ -1,6 +1,7 @@
 import { registerRootComponent } from 'expo';
 
 import App from './App';
+import { AccountReviewBoard } from './src/ui/account/review/AccountReviewBoard';
 import ConnectedApp from './ConnectedApp';
 import { CalibrationGallery } from './src/ui/calibration/CalibrationGallery';
 import { ContractFixtureScreen } from './src/ui/contract/ContractFixture';
@@ -18,6 +19,8 @@ import { SurfaceB1Gallery } from './src/ui/instrument/SurfaceB1Gallery';
 // DA-02.4B.1 — EXPO_PUBLIC_GALLERY=surface-b1 mounts the composed surface's device bench.
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App).
 function root() {
+  // MOB-03 acceptance bench only; never enabled in a product build.
+  if (process.env.EXPO_PUBLIC_GALLERY === 'mob03-account') return AccountReviewBoard;
   if (process.env.EXPO_PUBLIC_GALLERY === 'calibration') return CalibrationGallery;
   if (process.env.EXPO_PUBLIC_GALLERY === 'frame') return InstrumentFrameGallery;
   if (process.env.EXPO_PUBLIC_GALLERY === 'surface-b1') return SurfaceB1Gallery;

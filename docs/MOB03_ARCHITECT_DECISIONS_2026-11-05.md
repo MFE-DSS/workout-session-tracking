@@ -2,6 +2,8 @@
 
 Date : 5 novembre 2026. Base canonique observée : 90da846. Document de travail pour l'opérateur et son architecte ; aucune décision OPEN n'est présentée comme acceptée.
 
+**Actualisation — recadrage opérateur reçu :** [relevé produit/science/artistique](strategy/AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md). Le tableau ci-dessous conserve les questions initiales ; ses statuts sont à lire avec ce relevé : D1/D4 reçoivent une cible Blueprint en quatre moments, pas encore un contrat de champs supportés ; D2 reçoit le principe de mesure datée et d'héritage séparé ; D3 reste ouvert. L'entrée composée est la direction retenue, sans acceptation visuelle. [Handoff des besoins scientifiques](strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md), notamment SCI-P01/P02 pour le premier parcours.
+
 ## Travail indépendant réalisé localement
 
 Le socle API de compte est implémenté : inscription JSON, changement authentifié du mot de passe, validation partagée avec le web, contraintes uniques, quotas partagés et révocation d'époque. Aucune UI native nouvelle, aucune suppression, donnée corporelle, migration ou publication. Le vrai consommateur compte/onboarding reste à raccorder après les décisions ci-dessous et la revue visuelle.
@@ -17,11 +19,15 @@ Le socle API de compte est implémenté : inscription JSON, changement authentif
 
 ## Dépendance technique : propriétaire du journal
 
+**Réponse opérateur du 5 novembre : transition prudente validée.** Ancien journal conservé intact, attribution après vérification serveur, connexion nécessaire une seule fois pour cette attribution initiale. La vérification doit couvrir toutes les séances présentes dans le journal à attribuer ; la partition et ses preuves restent à implémenter. Cette réponse ne clôt pas les décisions D-MOB03-1 à 4.
+
 Le journal connecté actuel utilise auren.db. Avant tout nouveau parcours de changement de compte, il faut un contrat prouvé : identité serveur vérifiée, partition par propriétaire, commandes d'un ancien compte jamais envoyées sous les credentials d'un autre. Proposition technique à revoir : partition explicite par user_id, migration du journal non attribué seulement après preuve d'appartenance d'une séance, conservation isolée en cas d'incertitude et aucun effacement silencieux. Ni le nom du compte ni un simple logout ne prouvent l'appartenance des anciennes lignes.
 
 Les nouvelles API ne changent pas ce journal et aucun nouvel écran d'inscription n'est raccordé avant cette garde. Le retour à l'app QA MOB-02 conserve donc son client actuel.
 
 ## Croquis candidats — aucune acceptation visuelle
+
+**Retour opérateur : croquis à revoir avant code UI.** Attente précisée : DA AUREN avec son logo et qualité d'accueil d'une application aboutie. Le cadrage transversal, l'inventaire des surfaces et les informations attendues du PO designer sont rassemblés dans [le dossier UI/UX](MOBILE_UIUX_PO_DESIGNER_BRIEF_2026_11_05.md). Les croquis ci-dessous restent des propositions non acceptées.
 
 Ces croquis définissent les décisions à revoir ; ils ne sont pas des écrans produits et ne créent aucune baseline.
 

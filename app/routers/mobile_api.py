@@ -39,6 +39,7 @@ from app.models.catalog import TemplateExercise, WorkoutTemplate
 from app.models.session import WorkoutSession
 from app.models.user import User
 from app.routers import sessions as web_sessions
+from app.routers.mobile_training_preferences import read_declarations, replace_declarations
 from app.services import device_auth
 from app.services.account_lifecycle import AccountRejected, change_password, register_account
 from app.services.auth import verify_password
@@ -253,6 +254,14 @@ def training_preferences(user: ApiUser, db: DbSession) -> dict[str, Any]:
 
     declared = get_training_preferences(db, user.id).sessions_per_week
     return {} if declared is None else {"sessions_per_week": declared}
+
+
+# MOB-03: explicit full declarations, without changing the MOB-02 recap projection.
+router.add_api_route("/me/training-preferences/declarations", read_declarations, methods=["GET"])
+router.add_api_route(
+    "/me/training-preferences/declarations", replace_declarations, methods=["PUT"],
+    route_class_override=_PrivateValidationRoute,
+)
 
 
 @router.get("/me/sessions")

@@ -4,6 +4,8 @@ Source : roadmap et artefact de reprise transmis par l'opérateur dans la sessio
 Ce document fixe l'ordre de pilotage ; chaque changement substantiel garde son cycle OpenSpec et sa PR.
 Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisation de merge/publication.
 
+**Recadrage opérateur du 5 novembre :** l'ordre ci-dessous est conservé au service du cockpit personnel de bodybuilding et de la boucle comprendre → planifier → exécuter → mesurer → interpréter → adapter. [Direction et critères par tranche](AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md) ; [dépendances scientifiques et handoff](AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md). MOB-03 est la priorité active : premier véritable parcours utilisateur connecté, pas simple portage des formulaires web. Les futurs sujets nutrition, rapports hebdomadaires et photos ne conditionnent pas MOB-03.
+
 ## Voie produit, dans l'ordre
 
 | Ordre | Tranche | État / objectif |
@@ -54,7 +56,11 @@ l'opérateur, aucune ouverture de compte n'est demandée avant l'alpha ; la diff
 
 ## Voie assets indépendante
 
-`mannequin → Smith → Push A ×7 → équipements → familles → 58 mouvements → MOTION-V2`
+Séquence précisée par le recadrage du 5 novembre :
+
+`master mannequin → Smith incliné START/END → fiche d'exercice native pilote → sept Push A → règles de production série → catalogue restant`
+
+Le catalogue ne part pas en production série avant validation de son composant consommateur. Les équipements suivent leurs besoins MOB-08/09 ; MOTION-V2 reste différé et séparé de toute revendication d'activation musculaire.
 
 Elle progresse sous les contrats d'assets/provenance et les revues visuelles existantes, sans ajouter de seuils
 E7 ni d'anatomie inventés. Un asset validé sur banc n'est pas automatiquement intégré à un écran produit.

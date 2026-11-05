@@ -75,3 +75,19 @@ Les nouvelles compositions d’onboarding MUST être acceptées par l’opérate
 #### Scenario: Rendu non accepté
 - **WHEN** une composition ne possède pas d’acceptation visuelle
 - **THEN** elle reste un candidat et aucune nouvelle baseline n’est auto-approuvée
+
+
+### Requirement: Adaptateur des déclarations canoniques existantes
+La ressource mobile de déclarations MUST déléguer au service training_preferences existant. Son remplacement complet MUST exiger les trois clés héritées, conserver null distinct de [], refuser les champs supplémentaires et préserver l'environnement concret écrit séparément. Elle MUST NOT modifier la lecture minimale MOB-02 ni introduire de durée, objectif de labo ou effet scientifique nouveau.
+
+#### Scenario: Remplacement incomplet
+- **WHEN** le client omet un des trois champs hérités lors du PUT
+- **THEN** la requête est refusée sans effacer de déclaration existante
+
+#### Scenario: Réponse de remplacement perdue
+- **WHEN** le client ne peut confirmer le résultat du PUT
+- **THEN** il conserve un état inconnu, ne rejoue pas automatiquement l'écriture et permet une lecture explicite de l'état serveur
+
+#### Scenario: Réponse après changement de compte
+- **WHEN** une réponse de lecture ou d'écriture arrive après le départ du compte émetteur
+- **THEN** le client l'annule sans exposer ces préférences au nouveau compte

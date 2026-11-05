@@ -41,6 +41,7 @@ export function classify(e: unknown): Outcome {
 export const IDLE: SyncStatus = { pending: 0, attention: 0, syncing: false, offline: false, authRequired: false };
 
 export class SyncEngine {
+  private stopped = false;
   private running: Promise<void> | null = null;
   private again = false;
   private timer: ReturnType<typeof setTimeout> | null = null;
@@ -56,6 +57,7 @@ export class SyncEngine {
 
   /** Drain now. Concurrent kicks coalesce into one more pass, never a parallel one. */
   kick(): Promise<void> {
+    if (this.stopped) return Promise.resolve();
     if (this.running) {
       this.again = true;
       return this.running;
@@ -67,6 +69,8 @@ export class SyncEngine {
   }
 
   stop(): void {
+    this.stopped = true;
+    this.again = false;
     if (this.timer) clearTimeout(this.timer);
     this.timer = null;
   }
@@ -82,21 +86,24 @@ export class SyncEngine {
     do {
       this.again = false;
       await this.drainOnce();
-    } while (this.again);
+    } while (this.again && !this.stopped);
   }
 
   private async drainOnce(): Promise<void> {
     const rows = await this.journal.outboxRows();
     for (const row of rows) {
+      if (this.stopped) break;
       if (row.state === 'failed' || row.state === 'acked') continue;
       await this.publish(true);
+      if (this.stopped) break;
       await this.journal.markOutbox(row.op_id, 'inflight', row.attempts);
       try {
+        if (this.stopped) { await this.journal.markOutbox(row.op_id, 'pending', row.attempts); break; }
         const response = await this.send(row);
         await this.journal.markOutbox(row.op_id, 'acked', row.attempts + 1);
         this.offline = false;
         this.authRequired = false;
-        this.onAck(row, response);
+        if (!this.stopped) this.onAck(row, response);
       } catch (e) {
         const outcome = classify(e);
         if (outcome === 'attention') {
@@ -110,10 +117,11 @@ export class SyncEngine {
         break;
       }
     }
-    await this.publish(false);
+    if (!this.stopped) await this.publish(false);
   }
 
   private schedule(ms: number): void {
+    if (this.stopped) return;
     if (this.timer) clearTimeout(this.timer);
     this.timer = setTimeout(() => {
       this.timer = null;
