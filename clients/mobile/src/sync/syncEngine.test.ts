@@ -114,3 +114,20 @@ test('classification', () => {
   expect(classify(new ApiFailure('http', 422))).toBe('attention');
   expect(classify(new Error('boom'))).toBe('attention');
 });
+
+test('stopping an old account engine prevents later rows and retry timers after an inflight reply', async () => {
+  const j = journal([row('a'), row('b')]);
+  let reject!: (reason: unknown) => void;
+  const pending = new Promise<void>((_resolve, no) => { reject = no; });
+  const sent: string[] = [];
+  const engine = new SyncEngine(j, async (r) => { sent.push(r.op_id); await pending; }, () => undefined);
+  const draining = engine.kick();
+  for (let i = 0; i < 5; i++) await Promise.resolve();
+  engine.stop();
+  reject(new ApiFailure('network'));
+  await draining;
+  await jest.advanceTimersByTimeAsync(10_000);
+  await engine.kick();
+  expect(sent).toEqual(['a']);
+  expect(stateOf(j)).toEqual({ a: 'pending', b: 'pending' });
+});

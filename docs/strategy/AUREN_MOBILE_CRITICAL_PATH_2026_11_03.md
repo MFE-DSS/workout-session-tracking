@@ -2,7 +2,11 @@
 
 Source : roadmap et artefact de reprise transmis par l'opérateur dans la session Codex du 3 novembre.
 Ce document fixe l'ordre de pilotage ; chaque changement substantiel garde son cycle OpenSpec et sa PR.
+**Décision de livraison ultérieure — GOV-MOB03-SPLIT-01 :** socle compte/consommateurs de #353 susceptible de livraison séparée, [scission explicitement approuvée](MOB03_DELIVERY_SPLIT_AUTHORIZATION.md). **MOB03 complet reste ouvert** : propositions DATA/PLAN/RELEASE traçables, pas de premier plan ni effacement ou recette physique prétendus complets. Après socle accepté, MOB04 est préparé seulement ; ses capacités attendent leurs producteurs/gates.
+
 Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisation de merge/publication.
+
+**Recadrage opérateur du 5 novembre :** l'ordre ci-dessous est conservé au service du cockpit personnel de bodybuilding et de la boucle comprendre → planifier → exécuter → mesurer → interpréter → adapter. [Direction et critères par tranche](AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md) ; [dépendances scientifiques et handoff](AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md). MOB-03 est la priorité active : premier véritable parcours utilisateur connecté, pas simple portage des formulaires web. Les futurs sujets nutrition, rapports hebdomadaires et photos ne conditionnent pas MOB-03.
 
 ## Voie produit, dans l'ordre
 
@@ -21,7 +25,7 @@ Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisatio
 | 7 | MOB-06 | Bibliothèque de programmes |
 | 8 | MOB-07 | Constructeur |
 | 9 | MOB-08 | Exercices |
-| 10 | MOB-09 | Salle / équipement |
+| 10 | MOB-09 | Contexte salle / équipement à réévaluer selon le recadrage : aucun inventaire manuel natif imposé |
 | 11 | MOB-10 | Substitutions |
 | 12 | UX-LAB-PROFILE | Exploration du profil avant sa réalisation |
 | 13 | MOB-11 | Profil / octogone |
@@ -54,7 +58,11 @@ l'opérateur, aucune ouverture de compte n'est demandée avant l'alpha ; la diff
 
 ## Voie assets indépendante
 
-`mannequin → Smith → Push A ×7 → équipements → familles → 58 mouvements → MOTION-V2`
+Séquence précisée par le recadrage du 5 novembre :
+
+`master mannequin → Smith incliné START/END → fiche d'exercice native pilote → sept Push A → règles de production série → catalogue restant`
+
+Le catalogue ne part pas en production série avant validation de son composant consommateur. Les équipements suivent leurs besoins MOB-08/09 ; MOTION-V2 reste différé et séparé de toute revendication d'activation musculaire.
 
 Elle progresse sous les contrats d'assets/provenance et les revues visuelles existantes, sans ajouter de seuils
 E7 ni d'anatomie inventés. Un asset validé sur banc n'est pas automatiquement intégré à un écran produit.
@@ -73,3 +81,7 @@ sont requis après vérification API ; OpenSpec strict/scope/protocole et sécur
 Référence : `SONAR_TEMPORARY_MVP_POLICY.md`. Revue sécurité/qualité avant bêta externe élargie,paiements,
 photos/mesures sensibles ou production. Aucun build MOB-02 ouvert par ces clôtures ;préflight final après
 intégration documentaire et rebase de la proposition existante.
+
+## Direction opérateur — composants visuels puis alimentation scientifique, 5 novembre
+
+Après le socle du critical path, enrichir les tranches successives par les composants consommateurs, leurs états inconnus et les emplacements d'assets, en suivant le manifeste et les baselines. Les prompts du workstream scientifique seront fournis par l'opérateur. Cette préparation n'autorise ni moteur fictif, ni donnée physiologique inventée, ni nouvelle identité. L'ouverture de chaque tranche et les validations de composition/rendu restent applicables ; le premier plan garde sa dépendance SCI-P01/P02. Préférences natives MOB-03 4.2 réalisées et acceptées ; correction sans inventaire acceptée. [CR courant PO/architecte](../MOB03_CR_PO_ARCHITECT_2026_11_05.md) : données/effacement, contrats du premier plan et preuves appareil restent ouverts. Le contexte matériel devra servir les propositions/substitutions ; aucune disponibilité complète ne se déduit d’une salle générique.

@@ -13,6 +13,8 @@ export type Shell = {
   openJournal: () => void;
   /** the web app this build talks to (`EXPO_PUBLIC_API_URL`), for the not-yet-migrated spaces */
   siteUrl: string;
+  /** Native MOB-03 account settings, independent from the future full training profile. */
+  account?: React.ReactNode;
 };
 
 const ShellContext = createContext<Shell | null>(null);

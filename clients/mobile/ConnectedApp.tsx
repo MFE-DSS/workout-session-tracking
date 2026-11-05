@@ -17,12 +17,16 @@ import * as Crypto from 'expo-crypto';
 import { ExpoRoot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AppState, BackHandler, StyleSheet, View } from 'react-native';
+import { AppState, BackHandler, Linking, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ApiFailure, createTransport } from './src/api/http';
+import { FirstPlanClient } from './src/api/firstPlan';
+import { FirstUseController } from './src/api/firstUse';
+import { FirstUseScreen } from './src/ui/account/FirstUseScreen';
+import { TrainingPreferencesClient } from './src/api/trainingPreferences';
 import { ExecutionPlan, isStartable, ServerMission, SessionHistoryRead, TrainingPreferencesRead } from './src/api/types';
-import { AuthSession } from './src/auth/authSession';
+import { AuthSession, type AccountOutcome, type Registration, type PasswordChange } from './src/auth/authSession';
 import { credentialStore } from './src/auth/credentialStore';
 import { performedAt, TimeAnchor } from './src/domain/performedAt';
 import type { DoneSession } from './src/domain/adherence';
@@ -42,6 +46,9 @@ import { initialSpace } from './src/native/shellNav';
 import { ShellProvider } from './src/shell/ShellContext';
 import { shellRoutes } from './src/shell/routeContext';
 import { openJournal } from './src/storage/journal';
+import { resolveJournal } from './src/storage/ownership';
+import { openOwnershipBook } from './src/storage/ownershipStore';
+import { inspectLegacyJournal } from './src/storage/legacyInspection';
 import type { Journal } from './src/storage/journalTypes';
 import { closeCommand, OutboxRow, restoreState, retryDelayMs, setCommand, substituteCommand } from './src/storage/outbox';
 import { stateFromServer } from './src/sync/reconcile';
@@ -55,6 +62,9 @@ import { Sheet, SheetRow } from './src/ui/components';
 import { ExecutionScreen } from './src/ui/ExecutionScreen';
 import { LabSheet } from './src/ui/LabSheet';
 import { LoginScreen } from './src/ui/LoginScreen';
+import { SignupScreen, PasswordScreen } from './src/ui/account/AccountForms';
+import { AccountResultScreen, AccountSettingsScreen, JournalOwnershipScreen } from './src/ui/account/AccountPages';
+import { TrainingPreferencesScreen } from './src/ui/account/TrainingPreferencesScreen';
 import { MissionScreen } from './src/ui/MissionScreen';
 import { QuietScreen } from './src/ui/QuietScreen';
 import { ResumePosition, ResumeScreen } from './src/ui/ResumeScreen';
@@ -62,13 +72,14 @@ import { color } from './src/ui/theme';
 import { BootScreen } from './src/ui/BootScreen';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
+const PRIVACY_URL = process.env.EXPO_PUBLIC_PRIVACY_URL;
 const PROCESS_ID = Crypto.randomUUID();
 const transport = createTransport(API_URL);
 /** Before any server contact there is no anchor: every time claim is `estimated`. */
 const NO_ANCHOR: TimeAnchor = { serverMs: 0, monoMs: 0, processId: 'none' };
 const SUBSTITUTION_REFUSED = 'Le remplacement n’a pas été accepté.';
 
-type Screen = 'BOOT' | 'LOGIN' | 'APP';
+type Screen = 'BOOT' | 'LOGIN' | 'APP' | 'OWNERSHIP';
 
 function useNow(active: boolean): number {
   const [now, setNow] = useState(Date.now());
@@ -125,6 +136,13 @@ export default function ConnectedApp() {
   const [account, setAccount] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<'invalid' | 'network' | null>(null);
   const [busy, setBusy] = useState(false);
+  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | 'preferences' | 'first-use' | 'first-use-preferences' | null>(null);
+  const preferencesExit = useRef<(() => void) | null>(null);
+  const registerPreferencesExit = useCallback((handler: (() => void) | null) => { preferencesExit.current = handler; }, []);
+  const [accountOutcome, setAccountOutcome] = useState<AccountOutcome | null>(null);
+  const accountFlight = useRef(false);
+  const ownershipFlight = useRef<Promise<void> | null>(null);
+  const [ownershipChecking, setOwnershipChecking] = useState(false);
   const sessionActionInFlight = useRef(false);
   const [mission, setMission] = useState<ServerMission | null>(null);
   const [offline, setOffline] = useState(false);
@@ -147,7 +165,7 @@ export default function ConnectedApp() {
   const [serverSets, setServerSets] = useState<ReturnType<typeof serverStateFromOutbox>>({});
   const [signOutBlocked, setSignOutBlocked] = useState<number | null>(null);
   /** R10 / R12 — a skip can be taken back for a few seconds; nothing was written. */
-  const [undo, setUndo] = useState<{ text: string; prev: WorkoutState } | null>(null);
+  const [undo, setUndo] = useState<{ text: string; prev: WorkoutState; revision: number } | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const auth = useMemo(
@@ -156,6 +174,8 @@ export default function ConnectedApp() {
     }),
     [],
   );
+  const preferencesClient = useMemo(() => new TrainingPreferencesClient(auth, transport), [auth]);
+  const firstUse = useMemo(() => new FirstUseController(auth, transport, preferencesClient, new FirstPlanClient(auth, transport)), [auth, preferencesClient]);
 
   const apply = useCallback((event: Event): WorkoutState => {
     const n = reduce(stateRef.current, event);
@@ -266,14 +286,17 @@ export default function ConnectedApp() {
 
   // ── canonical state: the mission, and the open session if there is one ────
   const loadMission = useCallback(async () => {
+    const revision = auth.revision;
     try {
       const m = await api<ServerMission>('/mission');
+      if (revision !== auth.revision || !journalRef.current) return;
       setOffline(false);
       setMission(m);
       const local = stateRef.current;
       if (m.state === 'RESUME') {
         const plan = await fetchExecution(m.session.id);
         const restored = journalRef.current ? await journalRef.current.restore() : { sets: [], outbox: [] };
+        if (revision !== auth.revision) return;
         const latest = stateRef.current;
         apply({ type: 'RESTORE', state: reconcileSubstitutions(stateFromServer(plan, latest.phase === 'MISSION' ? null : latest, restored.sets, Date.now()), restored.outbox) });
         setPaused(true);
@@ -284,13 +307,14 @@ export default function ConnectedApp() {
         setPaused(false);
       }
     } catch (e) {
+      if (revision !== auth.revision) return;
       if (e instanceof ApiFailure && e.kind === 'http' && e.status === 401) {
         setScreen('LOGIN');
         return;
       }
       setOffline(true);
     }
-  }, [api, apply, fetchExecution]);
+  }, [api, apply, auth, fetchExecution]);
 
   const onAck = useCallback((row: OutboxRow, response: unknown) => {
     metric('SYNC-ACK');
@@ -308,60 +332,102 @@ export default function ConnectedApp() {
     }
   }, [api, metric, refreshServerSets]);
 
-  // ── boot: journal first (the workout survives anything), then the server ──
+  const attachJournal = useCallback(async (online: boolean): Promise<boolean> => {
+    const revision = auth.revision;
+    const current = () => appAlive.current && revision === auth.revision;
+    const ownedApi = async <T,>(path: string): Promise<T> => {
+      if (!current()) throw new ApiFailure('http', 401, 'stale_identity');
+      const value = await api<T>(path);
+      if (!current()) throw new ApiFailure('http', 401, 'stale_identity');
+      return value;
+    };
+    const owned = await resolveJournal({
+      isCurrent: current,
+      book: await openOwnershipBook(), deviceId: await auth.deviceSessionId(), online,
+      identity: async () => {
+        const identity = await ownedApi<{ id: number; username: string }>('/auth/me');
+        if (revision === auth.revision) setAccount(identity.username);
+        return identity;
+      },
+      inspectLegacy: inspectLegacyJournal,
+      verifySession: (id) => ownedApi<{ session_id: number }>(`/sessions/${id}/execution`),
+    });
+    if (!appAlive.current || revision !== auth.revision) return false;
+    if (owned.state !== 'ready') { setScreen('OWNERSHIP'); return false; }
+    const j = await openJournal(owned.name);
+    if (!appAlive.current || revision !== auth.revision) return false;
+    engineRef.current?.stop();
+    journalRef.current = j;
+    setJournal(j);
+    const active = () => appAlive.current && revision === auth.revision && journalRef.current === j;
+    engineRef.current = new SyncEngine(j, (row) => {
+      if (!active()) return Promise.reject(new ApiFailure('http', 401, 'auth'));
+      const r = routeFor(row);
+      return api(r.path, { method: r.method, body: r.body });
+    }, (status) => { if (active()) onStatus(status); }, (row, response) => { if (active()) onAck(row, response); });
+    const r = await j.restore();
+    if (!active()) return false;
+    setServerSets(serverStateFromOutbox(r.outbox));
+    const statuses = substitutionStates(r.outbox, r.snapshot?.plan?.session_id);
+    setSubstitutions(statuses);
+    setSubstitutionNotice(Object.values(statuses).some((status) => status.state === 'failed') ? SUBSTITUTION_REFUSED : null);
+    if (r.snapshot && r.snapshot.phase !== 'MISSION') {
+      const restored = reconcileSubstitutions(restoreState(r.snapshot, r.sets), r.outbox);
+      apply({ type: 'RESTORE', state: restored });
+      setPaused(restored.phase !== 'COMPLETE');
+      await j.recordMetric('RELAUNCH-RESTORED-SETS', Object.values(restored.done).filter((d) => d.local === 'saved_local').length);
+    } else { apply({ type: 'RESET' }); setPaused(false); }
+    if (!active()) return false;
+    if (owned.quarantined) setNotice('Un ancien journal reste conservé séparément, sans être attribué à ce compte.');
+    setScreen('APP');
+    setOffline(!online);
+    return true;
+  }, [api, apply, auth, onAck, onStatus]);
+
+  const verifyOwnership = useCallback(() => {
+    if (ownershipFlight.current) return ownershipFlight.current;
+    const revision = auth.revision;
+    setOwnershipChecking(true);
+    const task = (async () => {
+      try {
+        const ready = await attachJournal(true);
+        if (ready && revision === auth.revision && appAlive.current) {
+          await engineRef.current?.kick(); await loadMission();
+        }
+      } catch {
+        if (appAlive.current && revision === auth.revision) setScreen('LOGIN');
+      }
+    })();
+    ownershipFlight.current = task;
+    void task.finally(() => {
+      if (ownershipFlight.current !== task) return;
+      ownershipFlight.current = null;
+      if (appAlive.current && revision === auth.revision) setOwnershipChecking(false);
+    });
+    return task;
+  }, [attachJournal, auth, loadMission]);
+
+  // Resolve identity BEFORE a journal can be restored, displayed or synchronized.
   useEffect(() => {
-    let alive = true;
     appAlive.current = true;
     const boot = async () => {
-      const j = await openJournal('auren.db');
-      if (!alive) return;
-      journalRef.current = j;
-      setJournal(j);
-      const send = (row: OutboxRow) => {
-        const r = routeFor(row);
-        return api(r.path, { method: r.method, body: r.body });
-      };
-      engineRef.current = new SyncEngine(j, send, onStatus, onAck);
-      const r = await j.restore();
-      setServerSets(serverStateFromOutbox(r.outbox));
-      const statuses = substitutionStates(r.outbox, r.snapshot?.plan?.session_id);
-      setSubstitutions(statuses);
-      if (Object.values(statuses).some((status) => status.state === 'failed')) setSubstitutionNotice(SUBSTITUTION_REFUSED);
-      if (r.snapshot && r.snapshot.phase !== 'MISSION') {
-        const restored = reconcileSubstitutions(restoreState(r.snapshot, r.sets), r.outbox);
-        apply({ type: 'RESTORE', state: restored });
-        if (restored.phase !== 'COMPLETE') setPaused(true);
-        await j.recordMetric('RELAUNCH-RESTORED-SETS', Object.values(restored.done).filter((d) => d.local === 'saved_local').length);
-      }
-      if (!(await auth.hasCredential())) {
-        setScreen('LOGIN');
-        return;
-      }
+      if (!(await auth.hasCredential())) { if (appAlive.current) setScreen('LOGIN'); return; }
       const outcome = await auth.refresh();
-      if (outcome === 'invalid') {
-        setScreen('LOGIN');
-        return;
-      }
-      setScreen('APP');
-      if (outcome === 'network') {
-        setOffline(true);
-        return;
-      }
-      await engineRef.current.kick();
+      if (!appAlive.current) return;
+      if (outcome === 'invalid') { setScreen('LOGIN'); return; }
+      if (!(await attachJournal(outcome === 'ok'))) return;
+      if (outcome === 'network') return;
+      await engineRef.current?.kick();
       await loadMission();
     };
-    boot().catch(() => setScreen('LOGIN'));
+    void boot().catch(() => { if (appAlive.current) setScreen('LOGIN'); });
     const stop = restNotification.onDelivery((late) => metric('NOTIF-LATENESS', late));
     return () => {
-      alive = false;
       appAlive.current = false;
       if (substitutionRetryTimer.current) clearTimeout(substitutionRetryTimer.current);
       substitutionRetryTimer.current = null;
-      stop();
-      engineRef.current?.stop();
+      stop(); engineRef.current?.stop();
     };
-    // boot runs once; the callbacks it captures are stable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // back in the foreground: drain, and re-read the canonical state between workouts
@@ -369,7 +435,7 @@ export default function ConnectedApp() {
     const sub = AppState.addEventListener('change', (s) => {
       if (s !== 'active') return;
       resumedRef.current = true;
-      if (!auth.signedIn && screen !== 'APP') return;
+      if (screen !== 'APP') return;
       void engineRef.current?.kick();
       if (stateRef.current.phase === 'MISSION') void loadMission();
     });
@@ -377,9 +443,13 @@ export default function ConnectedApp() {
   }, [auth, loadMission, screen]);
 
   useEffect(() => {
-    const t = setTimeout(() => journalRef.current?.saveSnapshot(state).catch(() => undefined), 250);
+    const target = journalRef.current;
+    const revision = auth.revision;
+    const t = setTimeout(() => {
+      if (target && target === journalRef.current && revision === auth.revision) void target.saveSnapshot(state).catch(() => undefined);
+    }, 250);
     return () => clearTimeout(t);
-  }, [state]);
+  }, [auth, state]);
 
   useEffect(() => {
     if ((state.phase === 'SET' || state.phase === 'REST') && !paused) keepAwake.enable();
@@ -446,19 +516,69 @@ export default function ConnectedApp() {
 
   // ── handlers ───────────────────────────────────────────────────────────────
   const login = useCallback(async (username: string, password: string) => {
-    setBusy(true);
-    setLoginError(null);
-    const outcome = await auth.login(username, password, deviceLabel(deviceIdentity()));
-    setBusy(false);
-    if (outcome !== 'ok') {
-      setLoginError(outcome);
-      return;
+    if (busy || accountFlight.current) return;
+    accountFlight.current = true;
+    ownershipFlight.current = null; setOwnershipChecking(false);
+    if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null);
+    apply({ type: 'RESET' }); setServerSets({}); setMission(null); setNext(null); setBilanContext(null);
+    setBusy(true); setLoginError(null);
+    const pending = auth.login(username, password, deviceLabel(deviceIdentity()));
+    const revision = auth.revision;
+    try {
+      const outcome = await pending;
+      if (revision !== auth.revision || !appAlive.current) return;
+      if (outcome !== 'ok') { setLoginError(outcome); return; }
+      setAccountView(null); setAccountOutcome(null);
+      if (!(await attachJournal(true))) return;
+      await (engineRef.current as SyncEngine | null)?.kick();
+      await loadMission();
+    } catch {
+      if (revision === auth.revision && appAlive.current) setLoginError('network');
+    } finally {
+      if (revision === auth.revision && appAlive.current) { setBusy(false); accountFlight.current = false; }
     }
-    setAccount(username);
-    setScreen('APP');
-    await engineRef.current?.kick();
-    await loadMission();
-  }, [auth, loadMission]);
+  }, [apply, attachJournal, auth, busy, loadMission]);
+
+  const register = useCallback(async (input: Registration) => {
+    if (accountFlight.current) return;
+    accountFlight.current = true; setBusy(true); setAccountOutcome(null);
+    const pending = auth.register(input, deviceLabel(deviceIdentity()));
+    const revision = auth.revision;
+    try {
+      const outcome = await pending;
+      if (revision !== auth.revision || !appAlive.current || outcome.state === 'cancelled') return;
+      setAccountOutcome(outcome);
+      if (outcome.state !== 'confirmed') return;
+      const attached = await attachJournal(true);
+      if (attached) await loadMission();
+      if (revision === auth.revision && appAlive.current) setAccountView('created');
+    } catch {
+      if (revision === auth.revision && appAlive.current) { setScreen('OWNERSHIP'); setAccountView('created'); }
+    } finally {
+      if (revision === auth.revision && appAlive.current) { setBusy(false); accountFlight.current = false; }
+    }
+  }, [attachJournal, auth, loadMission]);
+
+  const changePassword = useCallback(async (input: PasswordChange) => {
+    if (accountFlight.current) return;
+    accountFlight.current = true; setBusy(true); setAccountOutcome(null);
+    const revision = auth.revision;
+    try {
+      const outcome = await auth.changePassword(input);
+      if (revision !== auth.revision || !appAlive.current || outcome.state === 'cancelled') return;
+      setAccountOutcome(outcome);
+      if (outcome.state === 'confirmed') {
+        // The new device session must be bound before its first offline restart.
+        await attachJournal(true);
+        if (revision === auth.revision && appAlive.current) setAccountView('password-done');
+      }
+    } catch {
+      if (revision === auth.revision && appAlive.current) { setScreen('OWNERSHIP'); setAccountView('password-done'); }
+    } finally {
+      if (revision === auth.revision && appAlive.current) { setBusy(false); accountFlight.current = false; }
+    }
+  }, [attachJournal, auth]);
 
   const reschedule = useCallback((s: WorkoutState, nowMs: number) => {
     if (!s.rest || !s.plan) return;
@@ -621,17 +741,17 @@ export default function ConnectedApp() {
     feedback.step();
     metric(event.type);
     if (undoTimer.current) clearTimeout(undoTimer.current);
-    setUndo({ text, prev: before });
+    setUndo({ text, prev: before, revision: auth.revision });
     undoTimer.current = setTimeout(() => setUndo(null), UNDO_MS);
-  }, [apply, metric]);
+  }, [apply, auth, metric]);
 
   const takeBack = useCallback(() => {
-    if (!undo) return;
+    if (!undo || undo.revision !== auth.revision || undo.prev.plan?.session_id !== stateRef.current.plan?.session_id) return;
     if (undoTimer.current) clearTimeout(undoTimer.current);
     apply({ type: 'RESTORE', state: undo.prev });
     setUndo(null);
     metric('SKIP-UNDONE');
-  }, [apply, metric, undo]);
+  }, [apply, auth, metric, undo]);
 
   // ── R16 — TERMINER / PAUSE / ABANDONNER / ANNULER ─────────────────────────
   const onExitChoice = useCallback((choice: ExitChoice) => {
@@ -671,9 +791,14 @@ export default function ConnectedApp() {
   // ── PLAT-01 — Android hardware back: never leaves the app during a workout ──
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (accountView) {
+        if (accountView === 'preferences' || accountView === 'first-use-preferences') { preferencesExit.current?.(); return true; }
+        if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); }
+        return true;
+      }
       const s = stateRef.current;
       const action = backAction({
-        screen,
+        screen: screen === 'OWNERSHIP' ? 'LOGIN' : screen,
         inWorkout: s.phase === 'SET' || s.phase === 'REST',
         paused,
         sheetOpen: exitOpen || lab || signOutBlocked !== null,
@@ -687,7 +812,7 @@ export default function ConnectedApp() {
       return action !== 'system';
     });
     return () => sub.remove();
-  }, [screen, paused, exitOpen, lab, signOutBlocked, requestExit, onExitChoice]);
+  }, [accountView, screen, paused, exitOpen, lab, signOutBlocked, requestExit, onExitChoice]);
 
   const resume = useCallback(() => {
     setPaused(false);
@@ -718,7 +843,9 @@ export default function ConnectedApp() {
     // §8.4 — no set may disappear as a side effect of signing out: while a
     // command is still unsent, the sign-out waits. (A REFUSED command stays in
     // the journal, never sent again automatically, so it does not block.)
+    const revision = auth.revision;
     const unsent = ((await journalRef.current?.outboxRows()) ?? []).filter((r) => r.state !== 'failed').length;
+    if (revision !== auth.revision || !appAlive.current) return;
     if (unsent > 0) {
       setLab(false);
       setNotice(null);
@@ -728,11 +855,20 @@ export default function ConnectedApp() {
     }
     setLab(false);
     cancelRestNotification();
-    await auth.logout();
+    if (undoTimer.current) clearTimeout(undoTimer.current); undoTimer.current = null; setUndo(null);
+    engineRef.current?.stop(); engineRef.current = null;
+    journalRef.current = null; setJournal(null);
+    apply({ type: 'RESET' }); setServerSets({}); setSubstitutions({}); setBilanContext(null); setNext(null);
+    const signingOut = auth.logout();
+    const logoutRevision = auth.revision;
+    await signingOut;
+    if (logoutRevision !== auth.revision || !appAlive.current) return;
+    ownershipFlight.current = null; setOwnershipChecking(false);
+    accountFlight.current = false; setBusy(false); setAccountView(null); setAccountOutcome(null);
     setAccount(null);
     setMission(null);
     setScreen('LOGIN');
-  }, [auth, cancelRestNotification]);
+  }, [apply, auth, cancelRestNotification]);
 
   const closeBilan = useCallback(() => {
     apply({ type: 'RESET' });
@@ -750,10 +886,45 @@ export default function ConnectedApp() {
   let body: React.ReactNode = null;
   // MOB-01 — login, resume priority and first space go through the tested rule (spec `mobile/navigation-shell`)
   const opening = initialSpace({ authPending: screen === 'BOOT', signedIn: screen === 'APP', openWorkout: mission?.state === 'RESUME' });
-  if (screen === 'BOOT') {
+  const openWeb = (path: string) => { if (API_URL) void Linking.openURL(`${API_URL.replace(/\/+$/, '')}${path}`); };
+  const privacy = PRIVACY_URL?.startsWith('https://') ? () => { void Linking.openURL(PRIVACY_URL); } : undefined;
+  const leaveAccountView = () => { if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); } };
+  const reconnectAccount = () => {
+    if (accountFlight.current) return;
+    // Keep owned pending workout facts in their partition during reauthentication.
+    engineRef.current?.stop(); engineRef.current = null; journalRef.current = null; setJournal(null);
+    apply({ type: 'RESET' }); setAccount(null); setMission(null); setNext(null); setBilanContext(null); setServerSets({});
+    setAccountView(null); setAccountOutcome(null); setScreen('LOGIN');
+  };
+  const accountSettings = <AccountSettingsScreen username={account} onPassword={() => { setAccountOutcome(null); setAccountView('password'); }}
+    onPreferences={() => setAccountView('preferences')}
+    onExport={API_URL ? () => openWeb('/export') : undefined} onPrivacy={privacy}
+    onWebProfile={API_URL ? () => openWeb('/profile') : undefined} onSignOut={() => void signOut()} />;
+  const continueAfterCreated = () => {
+    const resume = state.phase === 'SET' || state.phase === 'REST' || mission?.state === 'RESUME';
+    if (!accountFlight.current) setAccountView(screen === 'APP' && !resume ? 'first-use' : null);
+  };
+  const accountOverlay = screen !== 'APP' ? null : accountView === 'first-use'
+    ? <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
+    : accountView === 'preferences' || accountView === 'first-use-preferences'
+    ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={accountView === 'first-use-preferences' ? () => setAccountView('first-use') : leaveAccountView}
+      onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />
+    : accountView === 'password'
+      ? <PasswordScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void changePassword(input)} onBack={leaveAccountView} onLogin={reconnectAccount} />
+      : accountView === 'password-done'
+        ? <AccountResultScreen kind="password" onContinue={leaveAccountView} /> : null;
+  if (accountView === 'created') {
+    body = <AccountResultScreen kind="created" onContinue={continueAfterCreated} />;
+  } else if (accountView === 'signup' && screen === 'LOGIN') {
+    body = <SignupScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void register(input)} onBack={leaveAccountView} onLogin={leaveAccountView} />;
+  } else if (screen === 'BOOT') {
     body = <BootScreen />;
+  } else if (screen === 'OWNERSHIP') {
+    body = <JournalOwnershipScreen state={ownershipChecking ? 'checking' : 'offline'} onVerify={() => void verifyOwnership()} onChangeAccount={() => void signOut()} />;
   } else if (opening === 'login') {
-    body = <LoginScreen error={loginError} busy={busy} onSubmit={(u, p) => void login(u, p)} />;
+    body = <LoginScreen error={loginError} busy={busy} onSubmit={(u, p) => void login(u, p)}
+      onCreateAccount={() => { setAccountOutcome(null); setAccountView('signup'); }}
+      onRecover={API_URL ? () => openWeb('/forgot-password') : undefined} onPrivacy={privacy} />;
   } else if (screen === 'APP') {
     const inWorkout = state.phase === 'SET' || state.phase === 'REST';
     if (inWorkout && paused && state.plan) {
@@ -871,7 +1042,7 @@ export default function ConnectedApp() {
         );
       }
       body = (
-        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL }}>
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: accountSettings }}>
           <ExpoRoot context={shellRoutes} />
         </ShellProvider>
       );
@@ -882,7 +1053,12 @@ export default function ConnectedApp() {
     <SafeAreaProvider>
       <StatusBar style="light" />
       <View style={styles.root}>
-        {body}
+        <View testID="connected-content" pointerEvents={accountOverlay ? 'none' : 'auto'}
+          accessibilityElementsHidden={!!accountOverlay} importantForAccessibility={accountOverlay ? 'no-hide-descendants' : 'auto'}
+          style={{ flex: 1, display: accountOverlay ? 'none' : 'flex' }}>
+          {body}
+        </View>
+        {accountOverlay}
         <Sheet visible={signOutBlocked !== null} title="Déconnexion en attente" onClose={() => setSignOutBlocked(null)}>
           <SheetRow
             title={`${signOutBlocked ?? 0} enregistrement${(signOutBlocked ?? 0) > 1 ? 's' : ''} pas encore envoyé${(signOutBlocked ?? 0) > 1 ? 's' : ''} à AUREN`}

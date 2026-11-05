@@ -1,0 +1,408 @@
+{
+  "authority": "SYNTHETIC_TEST_ONLY_NOT_SERVED",
+  "source": "Canonical science test future_protocol_example; not a product recommendation",
+  "request": {
+    "contract_version": "first-plan-request/1.0.0",
+    "as_of": "2026-11-05T12:00:00Z",
+    "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+    "blueprint": {
+      "contract_version": "body-training-blueprint/1.0.0",
+      "snapshot_id": "fixture-blueprint-v1",
+      "objective": {
+        "state": "KNOWN",
+        "value": "HYPERTROPHY",
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "population_scope": {
+        "state": "KNOWN",
+        "value": "ADULT_NON_CLINICAL",
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "sessions_per_week": {
+        "state": "KNOWN",
+        "value": 1,
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "session_budgets_minutes": {
+        "state": "KNOWN",
+        "value": [
+          60
+        ],
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "experience": {
+        "state": "UNKNOWN",
+        "value": null,
+        "provenance": {
+          "origin": "UNKNOWN",
+          "acquisition": "UNKNOWN",
+          "source_ref": null,
+          "recorded_at": null,
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "limitations": {
+        "state": "KNOWN",
+        "value": [],
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "excluded_exercise_ids": {
+        "state": "KNOWN",
+        "value": [],
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "declared_priorities": {
+        "state": "KNOWN",
+        "value": [
+          "shoulders"
+        ],
+        "provenance": {
+          "origin": "USER_REPORTED",
+          "acquisition": "DECLARED",
+          "source_ref": "fixture:user-declaration",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "height_cm": {
+        "state": "UNKNOWN",
+        "value": null,
+        "provenance": {
+          "origin": "UNKNOWN",
+          "acquisition": "UNKNOWN",
+          "source_ref": null,
+          "recorded_at": null,
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "weight_kg": {
+        "state": "UNKNOWN",
+        "value": null,
+        "provenance": {
+          "origin": "UNKNOWN",
+          "acquisition": "UNKNOWN",
+          "source_ref": null,
+          "recorded_at": null,
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "legacy_weight_kg": {
+        "state": "UNKNOWN",
+        "value": null,
+        "provenance": {
+          "origin": "UNKNOWN",
+          "acquisition": "UNKNOWN",
+          "source_ref": null,
+          "recorded_at": null,
+          "measured_at": null
+        },
+        "conflicts": []
+      },
+      "observations": [],
+      "environment": {
+        "context_ref": "fixture-context",
+        "description": {
+          "state": "KNOWN",
+          "value": "Salle de sport",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "equipment_items": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "exercise_confirmations": [
+          {
+            "canonical_exercise_id": "incline-smith-press",
+            "context_ref": "fixture-context",
+            "state": "AVAILABLE",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:in-context-confirmation",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            }
+          }
+        ]
+      }
+    },
+    "policies": {
+      "state": "APPROVED",
+      "dose_id": "TEST_ONLY_DOSE",
+      "time_id": "TEST_ONLY_TIME",
+      "selection_id": "TEST_ONLY_SELECTION",
+      "taxonomy_projection_id": "TEST_ONLY_PROJECTION",
+      "review_ref": "UNIT_TEST_AUTHORITY_NOT_REAL_APPROVAL"
+    },
+    "versions": {
+      "catalogue": "auren-exercise-catalogue-v2-closure-2",
+      "zones": "zones-15-v1",
+      "credit": "sci-exposure-credit-v1",
+      "engine": "UNIT_TEST_ENGINE_NOT_SERVED"
+    }
+  },
+  "response": {
+    "contract_version": "first-plan-recommendation/1.0.0",
+    "request_fingerprint": "aba95dbf01d1abc1247e570eac6e9e54cbb3aa8395f627b7840c5b0549e9d287",
+    "status": "READY",
+    "engine_version": "UNIT_TEST_ENGINE_NOT_SERVED",
+    "assessment": {
+      "state": "SUFFICIENT",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "missing_fields": [],
+      "conflicting_fields": []
+    },
+    "issues": [],
+    "used_fields": [
+      "objective",
+      "population_scope",
+      "sessions_per_week",
+      "session_budgets_minutes",
+      "limitations"
+    ],
+    "candidate_plan": {
+      "archetype_ref": "reference_split:2026-09-28.v15:push-a:E1",
+      "review_state": "REVIEWED",
+      "sessions": [
+        {
+          "session_id": "illustrative-partial-session",
+          "slots": [
+            {
+              "slot_id": "legacy-push-a-E1",
+              "intent_id": "upper_chest_primary_press",
+              "selected": {
+                "canonical_exercise_id": "incline-smith-press",
+                "compatibility": "CONFIRMED",
+                "compatibility_source_ref": "fixture:in-context-confirmation",
+                "context_ref": "fixture-context"
+              },
+              "alternatives": [],
+              "substitution_rule_ref": "app/services/substitution.py:existing-intent-and-equivalence-contract",
+              "prescription": {
+                "work_sets": 3,
+                "min_reps": 6,
+                "max_reps": 10,
+                "rir_target": 2.0,
+                "rest_seconds": 90,
+                "load_kg": null,
+                "load_mode": "CALIBRATION_REQUIRED",
+                "source_kind": "LEGACY_TEMPLATE",
+                "source_ref": "data/reference_split.json:2026-09-28.v15:push-a:E1",
+                "dose_policy_ref": "TEST_ONLY_DOSE",
+                "evidence_refs": []
+              },
+              "rationale": "Extrait historique sans approbation de dose, de temps ou de faisabilité ; pas une semaine complète."
+            }
+          ],
+          "duration": {
+            "budget_minutes": 60,
+            "state": "ESTIMATED",
+            "lower_minutes": 30.0,
+            "upper_minutes": 45.0,
+            "model_ref": "TEST_ONLY_TIME",
+            "basis_refs": [
+              "unit-test:time-model-not-science"
+            ]
+          }
+        }
+      ],
+      "physical_work_sets_total": 3,
+      "zone_model_version": "zones-15-v1",
+      "credit_policy_version": "sci-exposure-credit-v1",
+      "exposure_complete": true,
+      "zone_exposure": [
+        {
+          "zone": "pecs",
+          "raw_primary_sets": 3,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 3.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "lats",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "upper_back",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "anterior_delts",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 3,
+          "unknown_role_sets": 0,
+          "credited_sets": 1.5,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "lateral_delts",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "rear_delts",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "biceps",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "triceps",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 3,
+          "unknown_role_sets": 0,
+          "credited_sets": 1.5,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "quads",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "hamstrings",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "glutes",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "adductors",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "calves",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "abs",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        },
+        {
+          "zone": "hip_flexors",
+          "raw_primary_sets": 0,
+          "raw_secondary_sets": 0,
+          "unknown_role_sets": 0,
+          "credited_sets": 0.0,
+          "bound": "EXACT"
+        }
+      ]
+    },
+    "confidence": {
+      "individual_response": "NOT_ESTIMATED",
+      "feasibility": "CONFIRMED",
+      "evidence_refs": [
+        "EV-04"
+      ],
+      "limitations": [
+        "Aucune dose individuelle validée."
+      ]
+    }
+  }
+}

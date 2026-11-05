@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "renderer": "web",
+  "widths": [
+    320,
+    360,
+    430
+  ],
+  "frames": [
+    "availability",
+    "priorities",
+    "unknown",
+    "offline",
+    "saving",
+    "loading",
+    "saved",
+    "expired",
+    "refused"
+  ],
+  "externalRequests": 0,
+  "errors": [],
+  "physicalDevice": false,
+  "date": "2026-11-05",
+  "human_acceptance": "Valider la correction",
+  "change": "No manual equipment inventory, cadence only; preserves historical equipment facts",
+  "source_files_sha256": {
+    "ConnectedApp.tsx": "85fd4cac3ded87ea5c19f0654dfcc2aaf743d89eec9845c35b10b6316db3daf5",
+    "src/ui/account/TrainingPreferencesScreen.tsx": "ae7b9a4999ced676d2f7bd3f6985329ce132f901936a55fa98a850bf7b8c1370",
+    "src/ui/account/useTrainingPreferencesEditor.ts": "f84a98bc99433cae13b6a47fbcda600abcb4f9dae641b32a225df37b4368596f",
+    "src/ui/account/review/trainingDeclarations.fixture.json": "117b7d618556b176b9958089378f09de6df272ea37a23b31d3fc22c2bf858d43"
+  },
+  "ios_release_build": "BUILD SUCCEEDED, separate simulator review app; not physical QA",
+  "new_locked_baseline": false
+}

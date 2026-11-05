@@ -1,113 +1,38 @@
 import React, { useRef, useState } from 'react';
-import { KeyboardAvoidingView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { keyboardAvoidance } from '../native/platformUi';
+import { View, type TextInput } from 'react-native';
 import { PrimaryAction } from './components';
-import { color, space, type } from './theme';
+import { AccountField, AccountFrame, AccountLink, AccountMessage } from './account/AccountFrame';
 
-/**
- * D9 — the one sign-in of the device. Username and password, nothing else: no
- * social login, no Apple Sign In (out of scope). The password field is the
- * system's secure field, so iOS offers its password manager.
- */
+/** One branded entry. Returning users are routed past it by ConnectedApp, never by a local fixture. */
 export function LoginScreen(props: {
   error: 'invalid' | 'network' | null;
   busy: boolean;
   onSubmit: (username: string, password: string) => void;
+  onCreateAccount?: () => void;
+  onRecover?: () => void;
+  onPrivacy?: () => void;
 }) {
-  const insets = useSafeAreaInsets();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const passwordRef = useRef<React.ComponentRef<typeof TextInput>>(null);
-  // `busy` arrives one render late: the keyboard's « go » and the button could
-  // both submit before it does. A ref closes that window (seen on device: 2 POST per tap).
-  const sentAtRef = useRef(0);
+  const sentAt = useRef<number | null>(null);
   const ready = username.trim().length > 0 && password.length > 0 && !props.busy;
   const submit = () => {
     const now = Date.now();
-    if (!ready || now - sentAtRef.current < 1500) return;
-    sentAtRef.current = now;
+    if (!ready || (sentAt.current !== null && now - sentAt.current < 1500)) return;
+    sentAt.current = now;
     props.onSubmit(username.trim(), password);
   };
-
-  return (
-    // the avoider's own padding replaces any paddingBottom set on it: the screen's margins live one view inside
-    <KeyboardAvoidingView behavior={keyboardAvoidance.behavior} style={styles.avoider}>
-      <View style={[styles.root, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 12 }]}>
-        <Text style={[type.eyebrow, styles.centered]}>AUREN</Text>
-        <Text style={styles.title} accessibilityRole="header">Connexion</Text>
-        <Text style={[type.body, styles.centered, { marginTop: 6 }]}>Ton compte AUREN, le même que sur le site.</Text>
-
-        <View style={styles.fields}>
-          <Text style={type.eyebrow}>Identifiant</Text>
-          <TextInput
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            autoComplete="username"
-            textContentType="username"
-            returnKeyType="next"
-            onSubmitEditing={() => passwordRef.current?.focus()}
-            accessibilityLabel="Identifiant"
-            style={styles.input}
-            selectionColor={color.signal}
-          />
-          <Text style={[type.eyebrow, { marginTop: space.m }]}>Mot de passe</Text>
-          <TextInput
-            ref={passwordRef}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            autoCapitalize="none"
-            autoCorrect={false}
-            spellCheck={false}
-            autoComplete="current-password"
-            textContentType="password"
-            returnKeyType="go"
-            onSubmitEditing={submit}
-            accessibilityLabel="Mot de passe"
-            style={styles.input}
-            selectionColor={color.signal}
-          />
-          {props.error ? (
-            <Text style={styles.error} accessibilityLiveRegion="polite">
-              {props.error === 'invalid' ? 'Identifiant ou mot de passe incorrect.' : 'AUREN est injoignable. Vérifie la connexion, puis réessaie.'}
-            </Text>
-          ) : null}
-        </View>
-
-        <View style={{ flex: 1 }} />
-        <PrimaryAction
-          testID="login"
-          tone={ready ? 'signal' : 'quiet'}
-          label={props.busy ? 'Connexion…' : 'Se connecter'}
-          onPress={submit}
-        />
-      </View>
-    </KeyboardAvoidingView>
-  );
+  return <AccountFrame entry entryName="AUREN AI" footer={<>
+    <PrimaryAction testID="login" tone={ready ? 'signal' : 'quiet'} busy={props.busy} label={props.busy ? 'Connexion…' : 'Se connecter'} onPress={submit} />
+    {props.onCreateAccount ? <AccountLink testID="entry-signup" disabled={props.busy} label="Créer mon compte" onPress={props.onCreateAccount} /> : null}
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 24 }}>
+      {props.onRecover ? <AccountLink label="Récupération du compte" onPress={props.onRecover} /> : null}
+      {props.onPrivacy ? <AccountLink label="Confidentialité" onPress={props.onPrivacy} /> : null}
+    </View>
+  </>}>
+    <AccountField centered label="Identifiant" value={username} onChangeText={setUsername} editable={!props.busy} autoComplete="username" textContentType="username" returnKeyType="next" onSubmitEditing={() => passwordRef.current?.focus()} />
+    <AccountField centered label="Mot de passe" inputRef={passwordRef} editable={!props.busy} value={password} onChangeText={setPassword} secureTextEntry autoComplete="current-password" textContentType="password" returnKeyType="go" onSubmitEditing={submit} />
+    {props.error ? <AccountMessage alert text={props.error === 'invalid' ? 'Identifiant ou mot de passe incorrect.' : 'AUREN est injoignable. Vérifie la connexion, puis réessaie.'} /> : null}
+  </AccountFrame>;
 }
-
-const styles = StyleSheet.create({
-  avoider: { flex: 1, backgroundColor: color.field },
-  root: { flex: 1, backgroundColor: color.field, paddingHorizontal: space.gutter },
-  centered: { textAlign: 'center' },
-  title: { ...type.title, fontSize: 40, lineHeight: 46, marginTop: 28, textAlign: 'center' },
-  fields: { marginTop: 36 },
-  input: {
-    color: color.ink,
-    fontSize: 20,
-    fontWeight: '600',
-    marginTop: 6,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: color.line,
-    backgroundColor: color.plate,
-  },
-  error: { marginTop: space.m, color: color.alert, fontSize: 15, fontWeight: '600' },
-});

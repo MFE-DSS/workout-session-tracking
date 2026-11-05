@@ -118,10 +118,10 @@ features:
   - id: auth-register
     feature: Créer un compte
     family: compte
-    routes: [GET /welcome, GET /register, POST /register]
+    routes: [GET /welcome, GET /register, POST /register, POST /api/mobile/v1/auth/register]
     legacy_location: "auth_routes.register → welcome.html, register.html"
     domain_owner: [auth, password_policy]
-    api: "à créer (inscription mobile)"
+    api: "POST /api/mobile/v1/auth/register (socle JSON MOB-03)"
     data: [users]
     user_actions: [créer un compte]
     native_destination: Compte — entrée de l'onboarding
@@ -148,10 +148,10 @@ features:
   - id: account-password-change
     feature: Changer son mot de passe
     family: compte
-    routes: [GET /profile/password, POST /profile/password]
+    routes: [GET /profile/password, POST /profile/password, POST /api/mobile/v1/auth/password]
     legacy_location: "auth_routes → password_change.html"
     domain_owner: [auth, password_policy]
-    api: "à créer"
+    api: "POST /api/mobile/v1/auth/password (Bearer)"
     data: [users]
     user_actions: [changer son mot de passe]
     native_destination: Compte
@@ -224,10 +224,13 @@ features:
   - id: profile-training-preferences
     feature: Préférences d'entraînement déclarées (objectif, fréquence, durée…)
     family: profil
-    routes: [POST /profile/preferences]
+    routes:
+      - POST /profile/preferences
+      - GET /api/mobile/v1/me/training-preferences/declarations
+      - PUT /api/mobile/v1/me/training-preferences/declarations
     legacy_location: "auth_routes.profile_preferences"
     domain_owner: [training_preferences]
-    api: "à créer"
+    api: "déclarations mobile versionnées via training_preferences ; consommateur natif en cours, durée non supportée"
     data: [training_preferences]
     user_actions: [déclarer objectif, fréquence, durée, environnement]
     native_destination: PROFIL / onboarding
@@ -248,9 +251,10 @@ features:
       - POST /body/measurements/{measurement_id}/edit
       - POST /body/measurements/{measurement_id}/delete
       - GET /body/export.json
+      - GET /api/mobile/v1/me/body/weight-history
     legacy_location: "body.* → body_assessment/body_overview.html, measurement_form.html"
     domain_owner: [measurements, body_ledger, body_profile]
-    api: "à créer (lecture + écriture JSON)"
+    api: "GET /api/mobile/v1/me/body/weight-history (poids seul, consentement/flag) ; écriture JSON non livrée"
     data: ["body_measurements (measured_at, weight_kg, tours)"]
     user_actions: [saisir son poids, saisir des mesures, corriger, supprimer, exporter]
     native_destination: PROFIL (BODY_LEDGER)

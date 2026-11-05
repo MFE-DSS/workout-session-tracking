@@ -14,15 +14,35 @@ import type { Restored } from '../storage/journalTypes';
 // Réseau et SQLite sont les frontières externes ; AuthSession, SyncEngine et le reducer restent réels.
 const mockTransport = jest.fn();
 let mockJournal: Journal;
+let mockCredential: string | null = 'rt1.test-device.secret';
+const mockOwners = new Map<string, number>();
+const mockJournalNames = new Map<number, string>();
+let mockLegacyOwner: number | null = 7;
+const mockOpened: string[] = [];
+const mockInspectLegacy = jest.fn();
+jest.mock('../storage/ownershipStore', () => ({ openOwnershipBook: async () => ({
+  isRetiredOwner: async () => false,
+  ownerOfDevice: async (d: string) => mockOwners.get(d) ?? null,
+  journalOf: async (u: number) => mockJournalNames.get(u) ?? null,
+  legacyOwner: async () => mockLegacyOwner,
+  claimLegacy: async (u: number) => { if (mockLegacyOwner !== null && mockLegacyOwner !== u) return false; mockLegacyOwner = u; mockJournalNames.set(u, 'auren.db'); return true; },
+  assignJournal: async (u: number, n: string) => { mockJournalNames.set(u, n); },
+  bindDevice: async (d: string, u: number) => { mockOwners.set(d, u); },
+}) }));
+jest.mock('../storage/legacyInspection', () => ({ inspectLegacyJournal: () => mockInspectLegacy() }));
 jest.mock('../api/http', () => ({ ...jest.requireActual('../api/http'), createTransport: () => mockTransport }));
-jest.mock('../storage/journal', () => ({ openJournal: () => Promise.resolve(mockJournal) }));
+jest.mock('../storage/journal', () => ({ openJournal: async (name: string) => {
+  mockOpened.push(name);
+  return name === 'auren.db' ? mockJournal : jest.requireActual('../storage/journal.web').openJournal(name);
+} }));
 jest.mock('../auth/credentialStore', () => ({ credentialStore: {
-  read: async () => 'test-refresh', write: async () => undefined, clear: async () => undefined,
+  read: async () => mockCredential, write: async (v: string) => { mockCredential = v; }, clear: async () => { mockCredential = null; },
 } }));
 let mockOperationSequence = 0;
 jest.mock('expo-crypto', () => ({ randomUUID: () => `test-op-${++mockOperationSequence}` }));
 jest.mock('../shell/routeContext', () => ({ shellRoutes: {} }));
-jest.mock('expo-router', () => ({ ExpoRoot: () => require('../shell/ShellContext').useShell().today }));
+let mockShellMounts = 0;
+jest.mock('expo-router', () => ({ ExpoRoot: () => { require('react').useEffect(() => { mockShellMounts++; }, []); const s = require('../shell/ShellContext').useShell(); return require('react').createElement(require('react').Fragment, null, s.today, s.account); } }));
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 47, bottom: 34, left: 0, right: 0 }),
   useSafeAreaFrame: () => ({ width: 390, height: 844 }),
@@ -46,7 +66,17 @@ jest.mock('../ui/bodymap/BodyMapTriptych', () => ({ SessionBodyMap: () => null }
 jest.mock('../ui/MissionScreen', () => ({ MissionScreen: (p: object) => require('react').createElement('Mission', p) }));
 jest.mock('../ui/QuietScreen', () => ({ QuietScreen: (p: object) => require('react').createElement('Quiet', p) }));
 jest.mock('../ui/LoginScreen', () => ({ LoginScreen: (p: object) => require('react').createElement('Login', p) }));
-jest.mock('../ui/LabSheet', () => ({ LabSheet: () => null }));
+jest.mock('../ui/account/AccountForms', () => ({
+  SignupScreen: (p: object) => require('react').createElement('Signup', p),
+  PasswordScreen: (p: object) => require('react').createElement('Password', p),
+}));
+jest.mock('../ui/account/FirstUseScreen', () => ({ FirstUseScreen: (p: object) => require('react').createElement('FirstUse', p) }));
+jest.mock('../ui/account/AccountPages', () => ({
+  AccountResultScreen: (p: object) => require('react').createElement('AccountResult', p),
+  AccountSettingsScreen: (p: object) => require('react').createElement('AccountSettings', p),
+  JournalOwnershipScreen: (p: object) => require('react').createElement('JournalOwnership', p),
+}));
+jest.mock('../ui/LabSheet', () => ({ LabSheet: (p: object) => require('react').createElement('JournalControls', p) }));
 jest.mock('../ui/components', () => ({ ...jest.requireActual('../ui/components'),
   Sheet: ({ visible, children }: { visible: boolean; children: React.ReactNode }) => visible
     ? require('react').createElement('NativeSheetBoundary', null, children) : null,
@@ -61,13 +91,18 @@ let root: Root;
 beforeAll(() => { ConnectedApp = require('../../ConnectedApp').default; });
 
 beforeEach(async () => {
-  mockRealSummary = false;
+  mockRealSummary = false; mockShellMounts = 0;
+  mockCredential = 'rt1.test-device.secret';
+  mockOwners.clear(); mockOwners.set('test-device', 7);
+  mockJournalNames.clear(); mockJournalNames.set(7, 'auren.db');
+  mockLegacyOwner = 7; mockOpened.length = 0;
   mockOperationSequence = 0;
   jest.useFakeTimers();
   mockJournal = await openMemoryJournal();
+  mockInspectLegacy.mockReset().mockImplementation(() => mockJournal.restore());
   mockTransport.mockReset().mockImplementation(async (path: string) => {
     if (path === '/auth/refresh') return {
-      access_token: 'test-access', refresh_token: 'test-next-refresh', access_expires_in: 900,
+      access_token: 'test-access', refresh_token: 'rt1.test-device.next-secret', access_expires_in: 900,
       token_type: 'Bearer', server_now: new Date().toISOString(),
     };
     throw new ApiFailure('network');
@@ -551,4 +586,308 @@ test('un ancien refus lu avant une nouvelle demande identique ne retire pas son 
   await act(async () => { write.resolve(); });
   expect(screen('Execution').state.plan.exercises[0].executed_name).toBe(name);
   expect(screen('Execution').state.requiresSync[exercise.se_id]).toBeUndefined();
+});
+
+
+test('an unbound device cannot restore or sync the old journal while identity is unreachable', async () => {
+  await saved('acked');
+  mockOwners.clear(); mockJournalNames.clear(); mockLegacyOwner = null;
+  await boot();
+  expect(root.container.queryAll((n) => n.type === 'Resume' || n.type === 'Execution')).toHaveLength(0);
+  expect(mockOpened).toEqual([]);
+  expect(screen('JournalOwnership').state).toBe('offline');
+});
+
+test('server identity B selects a new partition without exposing the previous account A sets', async () => {
+  await saved('acked');
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => path === '/auth/me'
+    ? Promise.resolve({ id: 8, username: 'account-b' }) : fallback(path));
+  await boot();
+  expect(mockOpened).toEqual(['auren-user-8.db']);
+  expect(root.container.queryAll((n) => n.type === 'Resume' || n.type === 'Execution')).toHaveLength(0);
+  expect((await mockJournal.restore()).sets).toHaveLength(1);
+  expect(mockTransport.mock.calls.filter(([path]) => String(path).includes('/sets/'))).toHaveLength(0);
+});
+
+test('legacy attachment waits for ownership proof of every recorded session', async () => {
+  await saved('acked');
+  mockOwners.clear(); mockJournalNames.clear(); mockLegacyOwner = null;
+  const proof = deferred<unknown>();
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/me') return Promise.resolve({ id: 7, username: 'verified-a' });
+    if (path === `/sessions/${plan.session_id}/execution`) return proof.promise;
+    return fallback(path);
+  });
+  await boot();
+  expect(mockOpened).toEqual([]);
+  await act(async () => proof.resolve({ ...plan, session_id: plan.session_id }));
+  expect(mockOpened).toEqual(['auren.db']);
+  expect(screen('Resume').position.setsDone).toBe(1);
+});
+
+
+test('account B cannot restore account A through an undo button or its retained callback', async () => {
+  await saved('acked'); await boot();
+  await act(async () => screen('Resume').onResume());
+  await act(async () => screen('Execution').onSkip());
+  await act(async () => screen('Execution').onSkipSet(screen('Execution').state.cursorSetId));
+  const oldUndo = screen('Execution').undo.onUndo;
+  await act(async () => screen('JournalControls').onSignOut());
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/login') return Promise.resolve({ access_token: 'access-b', refresh_token: 'rt1.device-b.secret', access_expires_in: 900, token_type: 'Bearer', server_now: new Date().toISOString() });
+    if (path === '/auth/me') return Promise.resolve({ id: 8, username: 'b' });
+    if (path === '/mission') return Promise.resolve(readyMission());
+    if (path === '/sessions') return Promise.resolve({ ...plan, session_id: 999 });
+    return fallback(path);
+  });
+  await act(async () => screen('Login').onSubmit('b', 'test-only'));
+  await act(async () => screen('Mission').onStart(plan.template_slug));
+  expect(screen('Execution').state.plan.session_id).toBe(999);
+  expect(screen('Execution').undo).toBeNull();
+  await act(async () => oldUndo());
+  expect(screen('Execution').state.plan.session_id).toBe(999);
+});
+
+
+test('logout during a deferred ownership resolution cannot bind A from B proofs or replace B screen', async () => {
+  await saved('acked');
+  mockOwners.clear(); mockJournalNames.clear(); mockLegacyOwner = null;
+  await boot();
+  const delayed = deferred<Restored>();
+  const legacy = await mockJournal.restore();
+  mockInspectLegacy.mockImplementationOnce(() => delayed.promise);
+  const fallback = mockTransport.getMockImplementation()!;
+  let user = 7;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/me') return Promise.resolve({ id: user, username: `u${user}` });
+    if (path === '/auth/login') return Promise.resolve({ access_token: 'access-b', refresh_token: 'rt1.device-b.secret', access_expires_in: 900, token_type: 'Bearer', server_now: new Date().toISOString() });
+    if (path === `/sessions/${plan.session_id}/execution`) return user === 7 ? Promise.resolve(plan) : Promise.reject(new ApiFailure('http', 404));
+    if (path === '/mission') return Promise.resolve(readyMission());
+    return fallback(path);
+  });
+  await act(async () => screen('JournalOwnership').onVerify());
+  await act(async () => screen('JournalOwnership').onChangeAccount());
+  user = 8;
+  await act(async () => screen('Login').onSubmit('u8', 'test-only'));
+  expect(screen('Mission')).toBeDefined();
+  await act(async () => delayed.resolve(legacy));
+  expect(mockLegacyOwner).toBeNull();
+  expect(mockJournalNames.get(7)).toBeUndefined();
+  expect(mockJournalNames.get(8)).toBe('auren-user-8.db');
+  expect(screen('Mission')).toBeDefined();
+});
+
+test('malformed legacy snapshot is preserved apart before a renderable journal is opened', async () => {
+  mockOwners.clear(); mockJournalNames.clear(); mockLegacyOwner = null;
+  await mockJournal.saveSnapshot({ phase: 'SET', plan: { session_id: 11 } } as never);
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => path === '/auth/me' ? Promise.resolve({ id: 7, username: 'a' }) : fallback(path));
+  await boot();
+  expect(mockLegacyOwner).toBeNull();
+  expect(mockOpened).toEqual(['auren-user-7.db']);
+  expect((await mockJournal.restore()).snapshot).toEqual({ phase: 'SET', plan: { session_id: 11 } });
+});
+
+
+test('native signup uses the account API once, verifies identity, and reaches the real MISSION after confirmation', async () => {
+  mockCredential = null; mockOwners.clear(); mockJournalNames.clear();
+  await boot();
+  await act(async () => screen('Login').onCreateAccount());
+  const created = deferred<unknown>();
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/register') return created.promise;
+    if (path === '/auth/me') return Promise.resolve({ id: 8, username: 'new-athlete' });
+    if (path === '/mission') return Promise.resolve(readyMission());
+    return fallback(path);
+  });
+  const input = { username: 'new-athlete', password: 'test-only-password', password_confirm: 'test-only-password', email: '' };
+  await act(async () => { screen('Signup').onSubmit(input); screen('Signup').onSubmit(input); });
+  expect(screen('Signup').busy).toBe(true);
+  await act(async () => created.resolve({ access_token: 'new-access', refresh_token: 'rt1.new-device.secret', access_expires_in: 900, token_type: 'Bearer', server_now: new Date().toISOString() }));
+  expect(mockTransport.mock.calls.filter(([p]) => p === '/auth/register')).toHaveLength(1);
+  expect(mockOpened).toEqual(['auren-user-8.db']);
+  expect(screen('AccountResult').kind).toBe('created');
+  await act(async () => screen('AccountResult').onContinue());
+  expect(screen('FirstUse')).toBeDefined();
+  const mounts = mockShellMounts;
+  await act(async () => screen('FirstUse').onToday());
+  expect(screen('Mission')).toBeDefined();
+  expect(mockShellMounts).toBe(mounts);
+});
+
+test('lost native signup stays on an explicit unknown result without an invented profile or retry', async () => {
+  mockCredential = null; await boot();
+  await act(async () => screen('Login').onCreateAccount());
+  await act(async () => screen('Signup').onSubmit({ username: 'new-athlete', password: 'test-only', password_confirm: 'test-only' }));
+  expect(screen('Signup').outcome).toEqual({ state: 'unknown' });
+  expect(mockOpened).toEqual([]);
+  expect(mockTransport.mock.calls.filter(([p]) => p === '/auth/register')).toHaveLength(1);
+  await act(async () => screen('Signup').onLogin());
+  expect(screen('Login')).toBeDefined();
+});
+
+test('native password page submits the authenticated canonical mutation and confirms its result', async () => {
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/me') return Promise.resolve({ id: 7, username: 'a' });
+    if (path === '/mission') return Promise.resolve(readyMission());
+    if (path === '/auth/password') return Promise.resolve({ access_token: 'changed-access', refresh_token: 'rt1.changed-device.secret', access_expires_in: 900, token_type: 'Bearer', server_now: new Date().toISOString() });
+    return fallback(path);
+  });
+  await boot();
+  await act(async () => screen('AccountSettings').onPassword());
+  const input = { current_password: 'old-test', new_password: 'new-test-password', new_password_confirm: 'new-test-password' };
+  await act(async () => screen('Password').onSubmit(input));
+  const calls = mockTransport.mock.calls.filter(([p]) => p === '/auth/password');
+  expect(calls).toHaveLength(1); expect(calls[0][1].body).toEqual(input);
+  expect(screen('AccountResult').kind).toBe('password');
+  await act(async () => screen('AccountResult').onContinue());
+  expect(mockShellMounts).toBe(1); expect(screen('AccountSettings')).toBeDefined();
+  expect(mockCredential).toBe('rt1.changed-device.secret');
+});
+
+test('Profile opens the real native preferences editor and saves one canonical replacement without touching the workout journal', async () => {
+  const fallback = mockTransport.getMockImplementation()!;
+  const projection = require('../ui/account/review/trainingDeclarations.fixture.json');
+  mockTransport.mockImplementation(async (path: string, init: any) => {
+    if (path === '/mission') return readyMission();
+    if (path === '/me/training-preferences/declarations') return init?.method === 'PUT'
+      ? { ...projection, declarations: init.body } : projection;
+    return fallback(path, init);
+  });
+  await boot(); const before = await mockJournal.restore();
+  await act(async () => screen('AccountSettings').onPreferences());
+  const hidden = root.container.queryAll((n) => n.props.testID === 'connected-content')[0].props;
+  expect(hidden.accessibilityElementsHidden).toBe(true); expect(hidden.pointerEvents).toBe('none');
+  const click = async (id: string) => { await act(async () => {
+    const target = root.container.queryAll((n) => n.props.testID === id)[0];
+    expect(target).toBeDefined(); target.props.onClick({ nativeEvent: {}, stopPropagation() {}, currentTarget: 1, target: 1 });
+  }); };
+  await click('preferences-frequency-4'); await click('preferences-next'); await click('preferences-focus-arms');
+  await click('preferences-save');
+  const calls = mockTransport.mock.calls.filter(([p, i]) => p === '/me/training-preferences/declarations' && i?.method === 'PUT');
+  expect(calls).toHaveLength(1);
+  expect(calls[0][1].body).toEqual({ sessions_per_week: 4, focus_priorities: ['arms'], available_equipment: null });
+  expect(await mockJournal.restore()).toEqual(before);
+  await click('preferences-done'); expect(screen('AccountSettings')).toBeDefined();
+  expect(mockShellMounts).toBe(1);
+});
+
+test('Android back delegates to the preference page before closing the account route', async () => {
+  const { BackHandler } = jest.requireActual('react-native');
+  let back: (() => boolean) | null = null;
+  jest.spyOn(BackHandler, 'addEventListener').mockImplementation((_event: unknown, handler: unknown) => {
+    back = handler as () => boolean; return { remove() {} };
+  });
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation(async (path: string, init: any) => {
+    if (path === '/mission') return readyMission();
+    if (path === '/me/training-preferences/declarations') return require('../ui/account/review/trainingDeclarations.fixture.json');
+    return fallback(path, init);
+  });
+  await boot(); await act(async () => screen('AccountSettings').onPreferences());
+  const press = async (id: string) => { await act(async () => root.container.queryAll((n) => n.props.testID === id)[0].props.onClick({ nativeEvent: {}, stopPropagation() {}, currentTarget: 1, target: 1 })); };
+  await press('preferences-frequency-4'); await press('preferences-next');
+  act(() => { expect(back?.()).toBe(true); });
+  expect(root.container.queryAll((n) => n.props.testID === 'preferences-frequency-4')[0].props.accessibilityState.selected).toBe(true);
+  expect(root.container.queryAll((n) => n.props.testID === 'connected-content')[0].props.accessibilityElementsHidden).toBe(true);
+});
+
+test('Android back closes signup through the current account route, rather than leaving the app', async () => {
+  const { BackHandler } = jest.requireActual('react-native');
+  let back: (() => boolean) | null = null;
+  jest.spyOn(BackHandler, 'addEventListener').mockImplementation((_event: unknown, handler: unknown) => {
+    back = handler as () => boolean; return { remove: () => undefined };
+  });
+  mockCredential = null; await boot();
+  await act(async () => screen('Login').onCreateAccount());
+  expect(screen('Signup')).toBeDefined();
+  let handled = false;
+  await act(async () => { handled = back!(); });
+  expect(handled).toBe(true);
+  expect(screen('Login')).toBeDefined();
+});
+
+test('uncertain password result can reauthenticate while owned commands remain pending', async () => {
+  await mockJournal.enqueue({ op_id: 'kept-finish', kind: 'SESSION_FINISH', target: `session/${plan.session_id}`,
+    payload: { session_id: plan.session_id, at: new Date().toISOString() } }, initialState);
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/me') return Promise.resolve({ id: 7, username: 'a' });
+    if (path === '/mission') return Promise.resolve(readyMission());
+    return fallback(path);
+  });
+  await boot(); await act(async () => screen('AccountSettings').onPassword());
+  await act(async () => screen('Password').onSubmit({ current_password: 'old', new_password: 'new-test-only', new_password_confirm: 'new-test-only' }));
+  expect(screen('Password').outcome.state).toBe('unknown');
+  await act(async () => screen('Password').onLogin());
+  expect(screen('Login')).toBeDefined();
+  expect((await mockJournal.outboxRows()).map((r) => r.op_id)).toContain('kept-finish');
+});
+
+test('two immediate ownership checks share one verification and a late attempt cannot replace success', async () => {
+  mockOwners.clear(); mockJournalNames.clear(); mockLegacyOwner = 7;
+  await boot();
+  const slow = deferred<unknown>(); const fast = deferred<unknown>();
+  let verifications = 0;
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation((path: string) => {
+    if (path === '/auth/me') return ++verifications === 1 ? slow.promise : fast.promise;
+    if (path === '/mission') return Promise.resolve(readyMission());
+    return fallback(path);
+  });
+  const verify = screen('JournalOwnership').onVerify;
+  await act(async () => { verify(); verify(); });
+  expect(screen('JournalOwnership').state).toBe('checking');
+  expect(verifications).toBe(1);
+  await act(async () => fast.resolve({ id: 8, username: 'b' }));
+  await act(async () => slow.resolve({ id: 8, username: 'b' }));
+  expect(mockOpened).toEqual(['auren-user-8.db']);
+  expect(screen('Mission')).toBeDefined();
+});
+
+
+test('first-use preferences return to the same journey, preserve the shell, and remain editable later', async () => {
+  mockCredential = null; mockOwners.clear(); mockJournalNames.clear(); await boot();
+  await act(async () => screen('Login').onCreateAccount());
+  const projection = require('../ui/account/review/trainingDeclarations.fixture.json');
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation(async (path: string, init: any) => {
+    if (path === '/auth/register') return { access_token:'new-access', refresh_token:'rt1.new-device.secret',access_expires_in:900,token_type:'Bearer',server_now:new Date().toISOString() };
+    if (path === '/auth/me') return {id:8,username:'new-athlete'};
+    if (path === '/mission') return readyMission();
+    if (path === '/me/training-preferences/declarations') return projection;
+    return fallback(path,init);
+  });
+  await act(async () => screen('Signup').onSubmit({username:'new-athlete',password:'test-only',password_confirm:'test-only'}));
+  await act(async () => screen('AccountResult').onContinue());
+  const mounts=mockShellMounts;
+  expect(await screen('FirstUse').controller.load()).toEqual({state:'no_plan_producer'});
+  await act(async () => screen('FirstUse').onPreferences());
+  await act(async () => root.container.queryAll((n) => n.props.testID === 'account-back')[0].props.onClick({nativeEvent:{},stopPropagation(){}}));
+  expect(screen('FirstUse')).toBeDefined();expect(mockShellMounts).toBe(mounts);
+  await act(async () => screen('FirstUse').onToday());
+  await act(async () => screen('AccountSettings').onPreferences());
+  expect(root.container.queryAll((n) => n.props.testID === 'preferences-frequency-4').length).toBeGreaterThan(0);
+  expect(mockTransport.mock.calls.filter(([p,i])=>p==='/me/training-preferences/declarations'&&i?.method==='PUT')).toHaveLength(0);
+});
+
+test('an existing server resume remains prior to first-use after registration confirmation', async () => {
+  mockCredential=null;mockOwners.clear();mockJournalNames.clear();await boot();
+  await act(async()=>screen('Login').onCreateAccount());
+  const fallback=mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation(async(path:string,init:any)=>{
+    if(path==='/auth/register')return{access_token:'new-access',refresh_token:'rt1.new-device.secret',access_expires_in:900,token_type:'Bearer',server_now:new Date().toISOString()};
+    if(path==='/auth/me')return{id:8,username:'new-athlete'};
+    if(path==='/mission')return{state:'RESUME',primary_action:'RESUME',position:null,session:{id:plan.session_id,name:'Push A',subtitle:null,template_slug:plan.template_slug,started_at:new Date().toISOString()}};
+    return fallback(path,init);
+  });
+  await act(async()=>screen('Signup').onSubmit({username:'new-athlete',password:'test-only',password_confirm:'test-only'}));
+  await act(async()=>screen('AccountResult').onContinue());
+  expect(root.container.queryAll(n=>n.type==='FirstUse')).toHaveLength(0);
+  expect(mockTransport.mock.calls.filter(([p])=>String(p).includes('first-plan'))).toHaveLength(0);
 });

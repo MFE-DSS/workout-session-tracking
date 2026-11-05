@@ -191,6 +191,8 @@ _RATE_LIMIT_ROUTES: dict[tuple[str, str], str] = {
     ("POST", "/forgot-password"): "forgot",
     # `D9` — la connexion mobile devine les mêmes mots de passe : même quota.
     ("POST", "/api/mobile/v1/auth/login"): "login",
+    ("POST", "/api/mobile/v1/auth/register"): "register",
+    ("POST", "/api/mobile/v1/auth/password"): "login",
 }
 
 

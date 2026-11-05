@@ -17,6 +17,7 @@ Scope guardrails (cf. docs/strategy/SPIGNOS_BODY_SIGNAL_MODEL_SPEC.md):
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from datetime import UTC, datetime
 
@@ -396,6 +397,103 @@ def list_measurements(
         ).scalars().all()
     )
 
+
+
+def list_weight_measurements(
+    db: Session,
+    user_id: int,
+    limit: int = 50,
+    before: tuple[datetime, int] | None = None,
+) -> list[BodyMeasurement]:
+    """Owner-scoped keyset read of the ONE canonical measurement timeline.
+
+    No conversion, correction, backfill or User.weight_kg fallback. Atypical
+    legacy values are retained for an adapter to label explicitly. The extra
+    row (101) allows a 100-row transport page to report whether more exist.
+    """
+    if type(limit) is not int or not 1 <= limit <= 101:
+        raise ValueError("invalid weight history limit")
+    if type(user_id) is not int or user_id <= 0:
+        raise ValueError("invalid owner")
+    query = select(BodyMeasurement).where(
+        BodyMeasurement.user_id == user_id,
+        BodyMeasurement.weight_kg.is_not(None),
+    )
+    if before is not None:
+        if (
+            not isinstance(before, tuple) or len(before) != 2
+            or not isinstance(before[0], datetime)
+            or type(before[1]) is not int or before[1] <= 0
+        ):
+            raise ValueError("invalid weight history cursor")
+        when, row_id = before
+        if when.tzinfo is not None:
+            when = when.astimezone(UTC)
+        query = query.where(
+            (BodyMeasurement.measured_at < when)
+            | ((BodyMeasurement.measured_at == when) & (BodyMeasurement.id < row_id))
+        )
+    return list(db.execute(query.order_by(
+        BodyMeasurement.measured_at.desc(), BodyMeasurement.id.desc(),
+    ).limit(limit)).scalars().all())
+
+
+def _weight_history_instant(value: datetime | None) -> str | None:
+    if value is None:
+        return None
+    aware = value.replace(tzinfo=UTC) if value.tzinfo is None else value.astimezone(UTC)
+    return aware.isoformat()
+
+
+def _weight_history_entry(row: BodyMeasurement) -> dict:
+    finite = math.isfinite(row.weight_kg)
+    spec = _FIELD_BY_KEY["weight_kg"]
+    if not finite:
+        quality = "INVALID_NONFINITE"
+    elif not spec.min <= row.weight_kg <= spec.max:
+        quality = "LEGACY_OUTSIDE_CURRENT_BOUNDS"
+    else:
+        quality = "KNOWN"
+    return {
+        "measurement_id": row.id,
+        "value": row.weight_kg if finite else None,
+        "raw_value_repr": None if finite else str(row.weight_kg),
+        "measured_at": _weight_history_instant(row.measured_at),
+        "recorded_at": _weight_history_instant(row.created_at),
+        "quality": quality,
+        "provenance": {"origin": "UNKNOWN", "acquisition": "UNKNOWN",
+                       "source_ref": f"body_measurements/{row.id}/weight_kg"},
+    }
+
+
+def weight_history_page(
+    db: Session, user_id: int, *, limit: int = 50,
+    before: tuple[datetime, int] | None = None,
+) -> dict:
+    """Consent-scoped read projection; no new writer, provenance or date invented.
+
+    SQLite-naive timestamps follow the existing database UTC convention.
+    Unknown historical acquisition stays UNKNOWN. Non-finite values cannot
+    be JSON numbers: retain a labelled textual representation, never mutate
+    the source or silently omit its record.
+    """
+    if type(limit) is not int or not 1 <= limit <= 100:
+        raise ValueError("invalid weight history limit")
+    result = {
+        "contract_version": "weight-history/1.0.0", "owner_id": user_id,
+        "unit": "kg", "legacy_profile_included": False,
+        "state": "CONSENT_REQUIRED", "entries": [], "next_cursor": None,
+        "timezone_basis": "DATABASE_UTC_CONVENTION",
+    }
+    if not has_active_consent(db, user_id):
+        return result
+    rows = list_weight_measurements(db, user_id, limit=limit + 1, before=before)
+    result["state"] = "AVAILABLE" if rows else "EMPTY"
+    result["entries"] = [_weight_history_entry(row) for row in rows[:limit]]
+    if len(rows) > limit:
+        last = rows[limit - 1]
+        result["next_cursor"] = [_weight_history_instant(last.measured_at), last.id]
+    return result
 
 def update_measurement(
     db: Session,

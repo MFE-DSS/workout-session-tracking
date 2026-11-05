@@ -173,3 +173,130 @@ test('only the auth layer ever touches the refresh token', () => {
     .sort();
   expect(touching).toEqual(['src/api/types.ts', 'src/auth/authSession.ts']);
 });
+
+function deferredValue<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (error: unknown) => void;
+  const promise = new Promise<T>((yes, no) => { resolve = yes; reject = no; });
+  return { promise, resolve, reject };
+}
+
+test('register sends canonical fields once for concurrent submits and adopts the confirmed pair', async () => {
+  const pending = deferredValue<ReturnType<typeof pair>>();
+  const server = fakeServer(() => pending.promise);
+  const store = memoryStore();
+  const auth = new AuthSession(server.call, store);
+  const input = { username: 'athlete', password: 'test-only-password', password_confirm: 'test-only-password', email: '' };
+  const first = auth.register(input, 'iPhone');
+  const duplicate = auth.register(input, 'iPhone');
+  await Promise.resolve();
+  pending.resolve(pair(2));
+  expect(await first).toEqual({ state: 'confirmed' });
+  expect(await duplicate).toEqual({ state: 'confirmed' });
+  expect(server.calls).toEqual([{ path: '/auth/register', init: { method: 'POST', body: { ...input, device_label: 'iPhone' } } }]);
+  expect(store.value).toBe(pair(2).refresh_token);
+});
+
+test('lost registration result stays unknown, is not retried, and does not claim authentication', async () => {
+  const server = fakeServer(() => { throw new ApiFailure('network'); });
+  const auth = new AuthSession(server.call, memoryStore());
+  expect(await auth.register({ username: 'athlete', password: 'p', password_confirm: 'p' }, null)).toEqual({ state: 'unknown' });
+  expect(server.calls).toHaveLength(1);
+  expect(auth.signedIn).toBe(false);
+});
+
+test('registration returns only the canonical rejection code', async () => {
+  const auth = new AuthSession(fakeServer(() => { throw new ApiFailure('http', 409, 'username_taken'); }).call, memoryStore());
+  expect(await auth.register({ username: 'athlete', password: 'p', password_confirm: 'p' }, null)).toEqual({ state: 'rejected', code: 'username_taken' });
+});
+
+test('password mutation adopts its pair but never retries the mutation after a refusal', async () => {
+  const store = memoryStore();
+  const server = fakeServer(({ path }) => path === '/auth/password' ? pair(2) : pair(1));
+  const auth = new AuthSession(server.call, store);
+  await auth.login('u', 'p', null);
+  const input = { current_password: 'old', new_password: 'new-test-only', new_password_confirm: 'new-test-only' };
+  expect(await auth.changePassword(input)).toEqual({ state: 'confirmed' });
+  expect(server.calls.at(-1)).toEqual({ path: '/auth/password', init: { method: 'POST', token: 'access-1', body: input } });
+  expect(store.value).toBe(pair(2).refresh_token);
+  const refused = fakeServer(({ path }) => { if (path === '/auth/password') throw new ApiFailure('http', 401, 'invalid_current_password'); return pair(1); });
+  const b = new AuthSession(refused.call, memoryStore());
+  await b.login('u', 'p', null);
+  expect(await b.changePassword(input)).toEqual({ state: 'rejected', code: 'invalid_current_password' });
+  expect(refused.calls.filter((x) => x.path === '/auth/password')).toHaveLength(1);
+});
+
+test('logout fences a late login response and prevents credential resurrection', async () => {
+  const pending = deferredValue<ReturnType<typeof pair>>();
+  const store = memoryStore();
+  const auth = new AuthSession(fakeServer(() => pending.promise).call, store);
+  const login = auth.login('u', 'p', null);
+  await auth.logout();
+  pending.resolve(pair(1));
+  expect(await login).not.toBe('ok');
+  expect(store.value).toBeNull();
+  expect(auth.signedIn).toBe(false);
+});
+
+test('a late refused refresh cannot erase a newer login credential', async () => {
+  const pending = deferredValue<ReturnType<typeof pair>>();
+  const store = memoryStore('rt1.dev.old');
+  const started = deferredValue<void>();
+  const auth = new AuthSession(fakeServer(({ path }) => {
+    if (path === '/auth/refresh') { started.resolve(); return pending.promise; }
+    return pair(2);
+  }).call, store);
+  const refreshing = auth.refresh();
+  await started.promise;
+  await auth.login('new-user', 'p', null);
+  pending.reject(new ApiFailure('http', 401, 'invalid_refresh'));
+  await refreshing;
+  expect(store.value).toBe(pair(2).refresh_token);
+  expect(await auth.authorized(async (token) => token)).toBe('access-2');
+});
+
+test('logout queues behind an already started credential write', async () => {
+  const gate = deferredValue<void>();
+  const started = deferredValue<void>();
+  const store = memoryStore();
+  const originalWrite = store.write;
+  store.write = async (value) => { started.resolve(); await gate.promise; await originalWrite(value); };
+  const auth = new AuthSession(fakeServer(() => pair(1)).call, store);
+  const login = auth.login('u', 'p', null);
+  await started.promise;
+  const logout = auth.logout();
+  gate.resolve();
+  await Promise.all([login, logout]);
+  expect(store.value).toBeNull();
+  expect(auth.signedIn).toBe(false);
+});
+
+test('device session identity is read inside auth without exposing the credential', async () => {
+  const auth = new AuthSession(fakeServer(() => pair(1)).call, memoryStore('rt1.known-device.private-secret'));
+  expect(await auth.deviceSessionId()).toBe('known-device');
+  const malformed = new AuthSession(fakeServer(() => pair(1)).call, memoryStore('not-a-refresh'));
+  expect(await malformed.deviceSessionId()).toBeNull();
+});
+
+test('refresh during password change waits for its new credential rather than overwriting it', async () => {
+  const pending = deferredValue<ReturnType<typeof pair>>();
+  const started = deferredValue<void>();
+  const store = memoryStore();
+  const server = fakeServer(({ path, init }) => {
+    if (path === '/auth/password') { started.resolve(); return pending.promise; }
+    if (path === '/auth/refresh') {
+      expect(init?.body).toEqual({ refresh_token: pair(2).refresh_token }); return pair(3);
+    }
+    return pair(1);
+  });
+  const auth = new AuthSession(server.call, store);
+  await auth.login('u', 'p', null);
+  const updating = auth.changePassword({ current_password: 'old', new_password: 'new', new_password_confirm: 'new' });
+  await started.promise;
+  const renewing = auth.refresh();
+  await Promise.resolve();
+  expect(server.calls.filter((x) => x.path === '/auth/refresh')).toHaveLength(0);
+  pending.resolve(pair(2));
+  await updating; await renewing;
+  expect(store.value).toBe(pair(3).refresh_token);
+});
