@@ -6,12 +6,20 @@ import { SafeAreaProvider, SafeAreaFrameContext, SafeAreaInsetsContext } from 'r
 import { LoginScreen } from '../../LoginScreen';
 import { SignupScreen, PasswordScreen } from '../AccountForms';
 import { AccountResultScreen, AccountSettingsScreen, JournalOwnershipScreen } from '../AccountPages';
+import { FirstUseContent } from '../FirstUseScreen';
+import type { FirstUseState } from '../../../api/firstUse';
 import { BlueprintCandidate } from './BlueprintCandidate';
 import { TrainingPreferencesReview, type PreferencesReviewMode } from './TrainingPreferencesReview';
 import { MissionScreenFixture } from '../../contract/MissionScreenFixture';
 import { color, type } from '../../theme';
 
 export const REVIEW_CASES = [
+  ['firstuse-none', 'Premier entraînement', 'Aucun producteur admis · état réel par défaut'],
+  ['firstuse-loading', 'Vérification', 'Lecture en cours'],
+  ['firstuse-missing', 'Informations manquantes', 'Assessment de démonstration, pas une règle locale'],
+  ['firstuse-consent', 'Consentement requis', 'Refus corporel simulé, aucun octroi implicite'],
+  ['firstuse-unknown', 'Réponse incertaine', 'Relecture seulement'],
+  ['firstuse-unavailable', 'Plan indisponible', 'Aucun premier plan fabriqué'],
   ['entry', '01 · Entrée', 'Composition candidate · consommateur natif'],
   ['signup', '02 · Inscription', 'Composition candidate · API de compte existante'],
   ['created', '03 · Compte créé', 'Confirmation serveur uniquement'],
@@ -46,12 +54,18 @@ type CaseId = typeof REVIEW_CASES[number][0];
 const nextOf = (id: string): CaseId => REVIEW_CASES[(REVIEW_CASES.findIndex((c) => c[0] === id) + 1) % REVIEW_CASES.length][0];
 function Candidate(p: { id: CaseId; go: (id: CaseId) => void; width: number; height: number }) {
   const back = () => p.go('entry'); const next = () => p.go(nextOf(p.id));
+  if (p.id.startsWith('firstuse-')) {
+    const state: FirstUseState = p.id === 'firstuse-none' ? {state:'no_plan_producer'}
+      :p.id === 'firstuse-loading'?{state:'loading'}:p.id === 'firstuse-missing'?{state:'missing_information',missing:['sessions_per_week']}
+      :p.id === 'firstuse-consent'?{state:'required_consent'}:p.id === 'firstuse-unknown'?{state:'unknown'}:{state:'unavailable',reason:'POLICY_UNAVAILABLE'};
+    return <FirstUseContent state={state} onBack={() => p.go('created')} onToday={() => p.go('mission-reference')} onPreferences={() => p.go('preferences-availability')} onReload={() => p.go('firstuse-none')}/>;
+  }
   if (p.id.startsWith('preferences-')) return <TrainingPreferencesReview mode={p.id.slice('preferences-'.length) as PreferencesReviewMode} onClose={() => p.go('settings')} />;
   if (p.id.startsWith('entry')) return <LoginScreen error={p.id === 'entry-error' ? 'invalid' : null} busy={p.id === 'entry-loading'} onSubmit={() => p.go('entry-error')} onCreateAccount={() => p.go('signup')} onRecover={() => p.go('expired')} onPrivacy={() => p.go('settings')} />;
   if (p.id.startsWith('signup')) return <SignupScreen busy={false} outcome={p.id === 'signup-unknown' ? { state: 'unknown' } : p.id === 'signup-error' ? { state: 'rejected', code: 'username_unavailable' } : null} onSubmit={() => p.go('created')} onBack={back} onLogin={back} />;
   if (p.id === 'password-done') return <AccountResultScreen kind="password" onContinue={() => p.go('settings')} />;
   if (p.id.startsWith('password')) return <PasswordScreen busy={false} outcome={p.id === 'password-unknown' ? { state: 'unknown' } : null} onSubmit={() => p.go('password-done')} onBack={() => p.go('settings')} onLogin={back} />;
-  if (p.id === 'created') return <AccountResultScreen kind="created" onContinue={() => p.go('point')} />;
+  if (p.id === 'created') return <AccountResultScreen kind="created" onContinue={() => p.go('firstuse-none')} />;
   if (['point','availability','priorities','first-plan','no-plan'].includes(p.id)) return <BlueprintCandidate step={p.id === 'point' ? 1 : p.id === 'availability' ? 2 : p.id === 'priorities' ? 3 : 4} missing={p.id === 'no-plan'} onBack={back} onNext={p.id === 'first-plan' ? () => p.go('mission-reference') : next} />;
   if (p.id === 'mission-reference') return <MissionScreenFixture width={p.width} height={p.height} source="main" />;
   if (p.id === 'settings') return <AccountSettingsScreen username="Compte de démonstration" onPassword={() => p.go('password')} onPreferences={() => p.go('preferences-availability')} onExport={() => p.go('expired')} onPrivacy={() => p.go('owner-offline')} onSignOut={back} />;

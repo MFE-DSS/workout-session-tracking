@@ -6,6 +6,14 @@ Définit le cycle du compte mobile et les garanties visibles de sécurité et de
 
 ## ADDED Requirements
 
+### Requirement: Delivered foundation and explicit deferred acceptance
+Under approved GOV-MOB03-SPLIT-01 the foundation MUST keep absent producers fail-closed and distinguish its delivery from complete MOB03. It MUST NOT claim deferred body acquisition, deletion execution, scientific session integration or physical release acceptance.
+
+#### Scenario: Foundation archived independently
+- **WHEN** the authorized account foundation passes its final tests, reviews and canonical merge checks
+- **THEN** its archive does not close DATA01–07, PLAN01–07 or RELEASE01–06, retained in docs/strategy/MOB03_DELIVERY_SPLIT_AUTHORIZATION.md and its reserved proposals; policies, science, physical release and deployment gates remain open.
+
+
 ### Requirement: Inscription conforme au contrat canonique
 Le mobile MUST créer un compte au moyen d’une API JSON validant les règles canoniques de nom, mot de passe et email, sans affaiblir les protections d’authentification existantes. Une réponse perdue MUST NOT être présentée comme une création confirmée.
 
@@ -59,11 +67,11 @@ La suppression MUST dépendre d’une politique d’effacement/rétention approu
 - **THEN** le client indique que le résultat doit être vérifié et ne rejoue pas une opération destructive sans le protocole approuvé
 
 ### Requirement: Information de confidentialité accessible
-Les informations de confidentialité et les moyens existants d’accès ou d’export MUST rester accessibles depuis le parcours de compte, sans devenir un consentement implicite à des traitements corporels, photos ou fournisseurs externes.
+Le socle MUST conserver les moyens existants d’accès/export et exposer les destinations de confidentialité lorsqu’une URL réelle est configurée, sans lien fictif ni consentement implicite à des traitements corporels, photos ou fournisseurs externes. La publication du responsable, des URL et des textes définitifs reste DATA01/RELEASE06, explicitement ouverte après GOV-MOB03-SPLIT-01.
 
 #### Scenario: Entrée dans le compte
-- **WHEN** l’utilisateur consulte les informations du compte
-- **THEN** il peut accéder à l’information de confidentialité et aux parcours d’export existants sans activer de consentement corporel
+- **WHEN** l’utilisateur consulte les informations du compte et une destination réelle est configurée
+- **THEN** il peut y accéder et conserver les parcours d’export existants sans activer de consentement corporel ; sinon aucun lien fictif ou conformité Store n’est prétendu fourni
 
 
 ### Requirement: Fondations non destructives de demande d'effacement
@@ -88,3 +96,15 @@ The request consumer MUST treat unverified terminal refusal as unknown and MUST 
 #### Scenario: Older pending poll after confirmed completion
 - **WHEN** another consumer has persisted the verified terminal result for the same request
 - **THEN** an older response cannot overwrite that terminal state or authorize another account cleanup.
+
+
+### Requirement: Isolated policy-gated request service
+The foundation MUST provide transactional request lifecycle code without registering or creating its proposed workflow table at application startup. No route, worker, irreversible revocation or deletion MUST be activated without the approved controller policy, future migration and adapters. Admission and confirmation authority MUST come from trusted server composition, never request JSON.
+
+#### Scenario: Controller policy absent
+- **WHEN** the default service receives an attempted request
+- **THEN** no request is accepted or stored, no token is revoked and no deletion is performed.
+
+#### Scenario: Scoped status after irreversible transition
+- **WHEN** a future admitted executor has started irreversible processing
+- **THEN** active-account identity alone cannot recover that request; only its previously issued, unexpired, scoped capability can read its status, without granting other access.

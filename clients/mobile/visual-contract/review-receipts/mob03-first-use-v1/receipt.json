@@ -1,0 +1,23 @@
+{
+  "approval": "Valider ce rendu",
+  "date": "2026-11-05",
+  "scope": "One first-use state page, accepted account/result/preferences/MISSION preserved",
+  "kind": "web-render-review-not-native-acceptance",
+  "width": 390,
+  "height": 844,
+  "checked_widths": [
+    320,
+    390,
+    430
+  ],
+  "fixtures": "Review-only states; no served READY",
+  "images": {
+    "created.png": "7a55ec9df96f2b8626dc9f8480b974ecbe15ac5fe2b21d26bc6bc5076efe15a9",
+    "firstuse-none.png": "832415095977f63a94746d0c5f0abb564293d680320350a1b79d86a4020d9e14",
+    "firstuse-loading.png": "e3ad61118de116c38d5d916f6d8993a7d000070d38d48ee9ee23ad88566a0400",
+    "firstuse-missing.png": "fa537a063da95d8e3a883ab54955ca7ce2f686565a3c6ed249590f7f57360c2a",
+    "firstuse-consent.png": "e98c671a85d71d353a9e7d6066d7e6810f0b5e2828fbe0c2ee491d4cf8638afb",
+    "firstuse-unknown.png": "ba875bc160c673a879a06c07007cc704afb776c03169cb6a331793ce7c8adf57",
+    "firstuse-unavailable.png": "4bacbcd9a2930007ea0f58e49058f0ea61130fc335462b11c9d2a52de0e3aa36"
+  }
+}

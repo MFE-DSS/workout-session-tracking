@@ -1,5 +1,7 @@
 # MOB-03 DATA COMPLETION — reçu technique
 
+**Historique du HEAD d41eb2f.** La [continuation DELIVERY ACCELERATION](MOB03_DELIVERY_ACCELERATION_RECEIPT.md) et la [scission approuvée](strategy/MOB03_DELIVERY_SPLIT_AUTHORIZATION.md) sont les références courantes ; les statuts draft/COMPLETE de ce reçu décrivent son état de publication antérieur.
+
 5 novembre 2026. **PR #353 conservée draft ; acceptation COMPLETE MOB-03 non acquise.** Base canonique bf847c7 incorporée par merge, sans conflit. Ce reçu décrit le nouveau delta, sans remplacer le code par un nouvel audit.
 
 ## Code et preuves nouvelles

@@ -70,6 +70,7 @@ jest.mock('../ui/account/AccountForms', () => ({
   SignupScreen: (p: object) => require('react').createElement('Signup', p),
   PasswordScreen: (p: object) => require('react').createElement('Password', p),
 }));
+jest.mock('../ui/account/FirstUseScreen', () => ({ FirstUseScreen: (p: object) => require('react').createElement('FirstUse', p) }));
 jest.mock('../ui/account/AccountPages', () => ({
   AccountResultScreen: (p: object) => require('react').createElement('AccountResult', p),
   AccountSettingsScreen: (p: object) => require('react').createElement('AccountSettings', p),
@@ -711,7 +712,11 @@ test('native signup uses the account API once, verifies identity, and reaches th
   expect(mockOpened).toEqual(['auren-user-8.db']);
   expect(screen('AccountResult').kind).toBe('created');
   await act(async () => screen('AccountResult').onContinue());
+  expect(screen('FirstUse')).toBeDefined();
+  const mounts = mockShellMounts;
+  await act(async () => screen('FirstUse').onToday());
   expect(screen('Mission')).toBeDefined();
+  expect(mockShellMounts).toBe(mounts);
 });
 
 test('lost native signup stays on an explicit unknown result without an invented profile or retry', async () => {
@@ -843,4 +848,46 @@ test('two immediate ownership checks share one verification and a late attempt c
   await act(async () => slow.resolve({ id: 8, username: 'b' }));
   expect(mockOpened).toEqual(['auren-user-8.db']);
   expect(screen('Mission')).toBeDefined();
+});
+
+
+test('first-use preferences return to the same journey, preserve the shell, and remain editable later', async () => {
+  mockCredential = null; mockOwners.clear(); mockJournalNames.clear(); await boot();
+  await act(async () => screen('Login').onCreateAccount());
+  const projection = require('../ui/account/review/trainingDeclarations.fixture.json');
+  const fallback = mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation(async (path: string, init: any) => {
+    if (path === '/auth/register') return { access_token:'new-access', refresh_token:'rt1.new-device.secret',access_expires_in:900,token_type:'Bearer',server_now:new Date().toISOString() };
+    if (path === '/auth/me') return {id:8,username:'new-athlete'};
+    if (path === '/mission') return readyMission();
+    if (path === '/me/training-preferences/declarations') return projection;
+    return fallback(path,init);
+  });
+  await act(async () => screen('Signup').onSubmit({username:'new-athlete',password:'test-only',password_confirm:'test-only'}));
+  await act(async () => screen('AccountResult').onContinue());
+  const mounts=mockShellMounts;
+  expect(await screen('FirstUse').controller.load()).toEqual({state:'no_plan_producer'});
+  await act(async () => screen('FirstUse').onPreferences());
+  await act(async () => root.container.queryAll((n) => n.props.testID === 'account-back')[0].props.onClick({nativeEvent:{},stopPropagation(){}}));
+  expect(screen('FirstUse')).toBeDefined();expect(mockShellMounts).toBe(mounts);
+  await act(async () => screen('FirstUse').onToday());
+  await act(async () => screen('AccountSettings').onPreferences());
+  expect(root.container.queryAll((n) => n.props.testID === 'preferences-frequency-4').length).toBeGreaterThan(0);
+  expect(mockTransport.mock.calls.filter(([p,i])=>p==='/me/training-preferences/declarations'&&i?.method==='PUT')).toHaveLength(0);
+});
+
+test('an existing server resume remains prior to first-use after registration confirmation', async () => {
+  mockCredential=null;mockOwners.clear();mockJournalNames.clear();await boot();
+  await act(async()=>screen('Login').onCreateAccount());
+  const fallback=mockTransport.getMockImplementation()!;
+  mockTransport.mockImplementation(async(path:string,init:any)=>{
+    if(path==='/auth/register')return{access_token:'new-access',refresh_token:'rt1.new-device.secret',access_expires_in:900,token_type:'Bearer',server_now:new Date().toISOString()};
+    if(path==='/auth/me')return{id:8,username:'new-athlete'};
+    if(path==='/mission')return{state:'RESUME',primary_action:'RESUME',position:null,session:{id:plan.session_id,name:'Push A',subtitle:null,template_slug:plan.template_slug,started_at:new Date().toISOString()}};
+    return fallback(path,init);
+  });
+  await act(async()=>screen('Signup').onSubmit({username:'new-athlete',password:'test-only',password_confirm:'test-only'}));
+  await act(async()=>screen('AccountResult').onContinue());
+  expect(root.container.queryAll(n=>n.type==='FirstUse')).toHaveLength(0);
+  expect(mockTransport.mock.calls.filter(([p])=>String(p).includes('first-plan'))).toHaveLength(0);
 });

@@ -1,5 +1,7 @@
 # Proposal — account-onboarding-native (MOB-03)
 
+**Périmètre courant après décision GOV-MOB03-SPLIT-01 : socle compte natif et consommateurs non servis.** La scission est explicitement approuvée (« Approuver cette scission traçable »). [Traçabilité exhaustive](scope-split-traceability.md) ; les critères DATA/PLAN/RELEASE restent ouverts dans leurs propositions réservées. Les sections antérieures ci-dessous conservent leur contexte historique ; elles ne constituent plus les critères COMPLETE du socle. Aucun déploiement ou MOB03 complet revendiqué.
+
 ## Why
 
 MOB-02 est mergé : la prochaine dépendance du chemin critique est l’entrée d’un utilisateur réel, sans création de compte sur le web ni préférences de labo présentées comme des faits. L’inventaire MOB-00 décrit déjà les domaines à conserver et les capacités qui restent bloquées.

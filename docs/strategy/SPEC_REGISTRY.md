@@ -312,7 +312,7 @@
 | `native-feature-migration-map` (MOB-00) | Inventaire exhaustif du web (110 routes) classé KEEP_DOMAIN / REWRITE_NATIVE / WEB_ONLY / DEPRECATE / BLOCKED — devient le backlog produit | ✅ MERGÉE (PR #339, `bab0914`, CI canonique `41239923542` verte) — archivé ; spec vivante et inventaire sous `openspec/specs/mobile/feature-migration-map/` | `SPRINT_Sb_MOB_00_FEATURE_MIGRATION_MAP_REPORT.md` | arbitré (2026-10-31) : réinitialisation, contact, export, administration restent web ; le social migre dans l'app |
 | `native-navigation-shell` (MOB-01) | La coque native : Expo Router + NativeTabs sous l'entrée actuelle, quatre espaces (D1 AUJOURD'HUI · PROGRAMMES · PROGRÈS · PROFIL), la séance en parcours plein écran au-dessus ; icônes D4 (la marque + trois utilitaires, Lucide ISC normalisé) | ✅ MERGÉE (PR #343, `8a21657`, CI canonique `41643223779` verte) — D1/D2 tranchées, D3 rejetée, D4 jeu A accepté (« go »), coque acceptée (« oui go »), amendement « pause » accepté ; archive après la passe iPhone (4.1b) | `SPRINT_Sb_MOB_01_NATIVE_NAVIGATION_SHELL_REPORT.md` | passe émulateur Android 16 sur la production : 9 scénarios de la spec verts ; jest 422/422 ; gate visuelle 77/77 identique |
 | `session-native-integration` (MOB-02) | Les trois écrans de séance verrouillés sur les vraies données, hors chemin heureux compris | 🚧 BUILD — client complet local, revue visuelle finale en attente ; non déployé/non recetté | `openspec/changes/session-native-integration/proposal.md` | Mobile 478 tests + TypeScript ; GET/inventaire 24/24, broad backend 219 historique ; détail bilan implémenté et accepté ; CI complète/déploiement/appareils à vérifier |
-| `account-onboarding-native` (MOB-03) | Compte natif, onboarding et frontières propriétaires | PRODUCT DELIVERY autorisé le 5 novembre ; rendu V1 ajustée accepté ; Blueprint complet et effacement encore ouverts | `SPRINT_MOB03_NATIVE_ACCOUNT_UI_REPORT.md` | Compte natif, garde propriétaire et adaptateur de déclarations réalisés ; publication draft, aucune donnée corporelle nouvelle ni déploiement ; recettes appareil restantes |
+| `account-onboarding-native` (MOB-03 socle) | Compte natif et consommateurs non servis | GOV-MOB03-SPLIT-01 : scission approuvée ; nouveau rendu accepté ; revue/CI finale avant merge | `MOB03_DELIVERY_ACCELERATION_RECEIPT.md` | Socle distinct de MOB03 complet ; DATA01–07, PLAN01–07, RELEASE01–06 restent ouverts dans les propositions réservées, aucun déploiement |
 
 ## 1quater. Cycle Body Intelligence — Manual Body Profile → providers later (actif)
 
@@ -627,3 +627,13 @@ La mise à jour est faite par l'agent **dans le même commit** que le sprint rep
 - Reconstitution historique partielle pour Sb_02 → Sb_19 (pas tous les sprints associés à une spec formelle)
 - Pas de lien direct commit ↔ ligne du registry (Sb_26.next.spec-traceability-1 candidat)
 - Pas de validation automatique que tout sprint mergé est dans le registry (vérifié humainement à la GO/NO-GO review)
+
+## Suites MOB03 réservées après scission approuvée
+
+[GOV-MOB03-SPLIT-01](MOB03_DELIVERY_SPLIT_AUTHORIZATION.md) distingue livraison du socle et MOB03 complet. Documents de proposition uniquement, sans nouveaux changes actifs, PR concurrentes ou GO BUILD :
+
+| ID réservé | Proposition | Statut |
+|---|---|---|
+| account-data-activation | [DATA01–07](../proposals/account-data-activation.md) | OPEN, non implémenté/activé |
+| blueprint-first-session-runtime | [PLAN01–07](../proposals/blueprint-first-session-runtime.md) | OPEN, dépend admission SCI et handoff |
+| account-native-release-acceptance | [RELEASE01–06](../proposals/account-native-release-acceptance.md) | OPEN, aucune recette physique/déploiement déduits |

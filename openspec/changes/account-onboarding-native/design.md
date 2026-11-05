@@ -1,5 +1,7 @@
 # Design — account-onboarding-native (MOB-03)
 
+**Périmètre courant après décision GOV-MOB03-SPLIT-01 : socle compte natif et consommateurs non servis.** La scission est explicitement approuvée (« Approuver cette scission traçable »). [Traçabilité exhaustive](scope-split-traceability.md) ; les critères DATA/PLAN/RELEASE restent ouverts dans leurs propositions réservées. Les sections antérieures ci-dessous conservent leur contexte historique ; elles ne constituent plus les critères COMPLETE du socle. Aucun déploiement ou MOB03 complet revendiqué.
+
 ## Context
 
 Base : merge MOB-02 `90da8461803e87897c3d8f48627c4b704b3cfcd6`. La proposition explique le besoin ; les deux deltas décrivent les garanties attendues. Préparation autorisée seulement : aucun GO BUILD de sémantique ou surface nouvelle.

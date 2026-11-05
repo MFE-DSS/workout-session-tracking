@@ -2,6 +2,8 @@
 
 Source : roadmap et artefact de reprise transmis par l'opérateur dans la session Codex du 3 novembre.
 Ce document fixe l'ordre de pilotage ; chaque changement substantiel garde son cycle OpenSpec et sa PR.
+**Décision de livraison ultérieure — GOV-MOB03-SPLIT-01 :** socle compte/consommateurs de #353 susceptible de livraison séparée, [scission explicitement approuvée](MOB03_DELIVERY_SPLIT_AUTHORIZATION.md). **MOB03 complet reste ouvert** : propositions DATA/PLAN/RELEASE traçables, pas de premier plan ni effacement ou recette physique prétendus complets. Après socle accepté, MOB04 est préparé seulement ; ses capacités attendent leurs producteurs/gates.
+
 Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisation de merge/publication.
 
 **Recadrage opérateur du 5 novembre :** l'ordre ci-dessous est conservé au service du cockpit personnel de bodybuilding et de la boucle comprendre → planifier → exécuter → mesurer → interpréter → adapter. [Direction et critères par tranche](AUREN_PRODUCT_SCIENCE_REALIGNMENT_2026_11_05.md) ; [dépendances scientifiques et handoff](AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md). MOB-03 est la priorité active : premier véritable parcours utilisateur connecté, pas simple portage des formulaires web. Les futurs sujets nutrition, rapports hebdomadaires et photos ne conditionnent pas MOB-03.

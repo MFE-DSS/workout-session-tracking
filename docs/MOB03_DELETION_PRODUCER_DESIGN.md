@@ -1,5 +1,7 @@
 # MOB-03 — producteur d'effacement : design et arbitrages restants
 
+**Actualisation DELIVERY ACCELERATION :** modèle de workflow SQLAlchemy et service isolés acceptés puis réalisés dans `app/services/account_deletion_requests.py`, avec registre de politique/vérificateur absents par défaut, sans import de démarrage/route/migration appliquée/worker. Le texte ci-dessous décrit le design préalable ; la table proposée est séparée des 23 tables métier, non créée sur une base déployée. [Reçu courant](MOB03_DELIVERY_ACCELERATION_RECEIPT.md). Les politiques et l’activation restent DATA01–07.
+
 5 novembre 2026. **Proposé, NOT_SERVED : aucune route/table serveur ou suppression ajoutée.** Inventaire d'implémentation : [matrice](MOB03_DATA_RETENTION_MATRIX.md), [graphe des23tables](MOB03_ACCOUNT_DATA_GRAPH.json). Le mandat DATA COMPLETION autorise préparation du producteur et fixtures, pas un effacement destructif sans politique. Les choix techniques ci-dessous sont des contraintes de réalisation, pas des questions à rouvrir.
 
 ## Autorité et cycle proposé

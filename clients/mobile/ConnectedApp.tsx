@@ -21,6 +21,9 @@ import { AppState, BackHandler, Linking, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ApiFailure, createTransport } from './src/api/http';
+import { FirstPlanClient } from './src/api/firstPlan';
+import { FirstUseController } from './src/api/firstUse';
+import { FirstUseScreen } from './src/ui/account/FirstUseScreen';
 import { TrainingPreferencesClient } from './src/api/trainingPreferences';
 import { ExecutionPlan, isStartable, ServerMission, SessionHistoryRead, TrainingPreferencesRead } from './src/api/types';
 import { AuthSession, type AccountOutcome, type Registration, type PasswordChange } from './src/auth/authSession';
@@ -133,7 +136,7 @@ export default function ConnectedApp() {
   const [account, setAccount] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<'invalid' | 'network' | null>(null);
   const [busy, setBusy] = useState(false);
-  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | 'preferences' | null>(null);
+  const [accountView, setAccountView] = useState<'signup' | 'password' | 'created' | 'password-done' | 'preferences' | 'first-use' | 'first-use-preferences' | null>(null);
   const preferencesExit = useRef<(() => void) | null>(null);
   const registerPreferencesExit = useCallback((handler: (() => void) | null) => { preferencesExit.current = handler; }, []);
   const [accountOutcome, setAccountOutcome] = useState<AccountOutcome | null>(null);
@@ -172,6 +175,7 @@ export default function ConnectedApp() {
     [],
   );
   const preferencesClient = useMemo(() => new TrainingPreferencesClient(auth, transport), [auth]);
+  const firstUse = useMemo(() => new FirstUseController(auth, transport, preferencesClient, new FirstPlanClient(auth, transport)), [auth, preferencesClient]);
 
   const apply = useCallback((event: Event): WorkoutState => {
     const n = reduce(stateRef.current, event);
@@ -788,7 +792,7 @@ export default function ConnectedApp() {
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', () => {
       if (accountView) {
-        if (accountView === 'preferences') { preferencesExit.current?.(); return true; }
+        if (accountView === 'preferences' || accountView === 'first-use-preferences') { preferencesExit.current?.(); return true; }
         if (!accountFlight.current) { setAccountView(null); setAccountOutcome(null); }
         return true;
       }
@@ -896,15 +900,21 @@ export default function ConnectedApp() {
     onPreferences={() => setAccountView('preferences')}
     onExport={API_URL ? () => openWeb('/export') : undefined} onPrivacy={privacy}
     onWebProfile={API_URL ? () => openWeb('/profile') : undefined} onSignOut={() => void signOut()} />;
-  const accountOverlay = screen !== 'APP' ? null : accountView === 'preferences'
-    ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={leaveAccountView}
+  const continueAfterCreated = () => {
+    const resume = state.phase === 'SET' || state.phase === 'REST' || mission?.state === 'RESUME';
+    if (!accountFlight.current) setAccountView(screen === 'APP' && !resume ? 'first-use' : null);
+  };
+  const accountOverlay = screen !== 'APP' ? null : accountView === 'first-use'
+    ? <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
+    : accountView === 'preferences' || accountView === 'first-use-preferences'
+    ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={accountView === 'first-use-preferences' ? () => setAccountView('first-use') : leaveAccountView}
       onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />
     : accountView === 'password'
       ? <PasswordScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void changePassword(input)} onBack={leaveAccountView} onLogin={reconnectAccount} />
       : accountView === 'password-done'
         ? <AccountResultScreen kind="password" onContinue={leaveAccountView} /> : null;
   if (accountView === 'created') {
-    body = <AccountResultScreen kind="created" onContinue={leaveAccountView} />;
+    body = <AccountResultScreen kind="created" onContinue={continueAfterCreated} />;
   } else if (accountView === 'signup' && screen === 'LOGIN') {
     body = <SignupScreen busy={busy} outcome={accountOutcome} onSubmit={(input) => void register(input)} onBack={leaveAccountView} onLogin={leaveAccountView} />;
   } else if (screen === 'BOOT') {

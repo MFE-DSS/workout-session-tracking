@@ -6,6 +6,14 @@ Définit l’acquisition progressive des déclarations utiles au compte mobile, 
 
 ## ADDED Requirements
 
+### Requirement: Delivered foundation and explicit deferred acceptance
+Under approved GOV-MOB03-SPLIT-01 the foundation MUST keep absent producers fail-closed and distinguish its delivery from complete MOB03. It MUST NOT claim deferred body acquisition, deletion execution, scientific session integration or physical release acceptance.
+
+#### Scenario: Foundation archived independently
+- **WHEN** the authorized account foundation passes its final tests, reviews and canonical merge checks
+- **THEN** its archive does not close DATA01–07, PLAN01–07 or RELEASE01–06, retained in docs/strategy/MOB03_DELIVERY_SPLIT_AUTHORIZATION.md and its reserved proposals; policies, science, physical release and deployment gates remain open.
+
+
 ### Requirement: Déclarations minimales et reprenables
 L’onboarding MUST distinguer les données nécessaires au compte des déclarations facultatives et annoncer l’usage de chaque donnée demandée. Les déclarations enregistrées MUST survivre à la relance et une soumission répétée MUST NOT créer de doublons.
 
@@ -141,3 +149,15 @@ The native read consumer MUST preserve the canonical GET and unique BodyMeasurem
 #### Scenario: Consent revoked or unreadable page
 - **WHEN** an authoritative consent refusal, invalid cursor or network failure interrupts loading
 - **THEN** the consumer exposes the explicit failure state without a readable stale confirmed history or synthetic measurement.
+
+
+### Requirement: Honest native first-use passage
+After account creation confirmation the foundation MUST provide the approved first-use state page while preserving account ownership and open-workout resume priority. It MUST allow returning to existing preferences and to Today without representing this navigation as a scientific first plan. Body inputs and equipment inventory MUST NOT be local prerequisites.
+
+#### Scenario: Canonical snapshot or admitted producer absent
+- **WHEN** a new account continues into first use
+- **THEN** it sees no-producer or actual read uncertainty, can access preferences/Today, and no Blueprint or READY is synthesized.
+
+#### Scenario: Scientific result without executable handoff
+- **WHEN** a result passes the SCI consumer but no canonical first-session handoff is served
+- **THEN** first use remains unavailable rather than claiming a usable session; full runtime integration remains PLAN05/06.
