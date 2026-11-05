@@ -177,8 +177,9 @@ def test_foreign_context_is_rejected_instead_of_silently_normalized():
     req["blueprint"]["environment"]["exercise_confirmations"] = [
         confirmation(req, "incline-smith-press", context="another-gym")
     ]
+    registry = load()
     with pytest.raises(ValueError, match="context"):
-        produce(req, load())
+        produce(req, registry)
 
 
 def test_hard_exclusion_removes_candidates_without_claiming_unknown_is_empty():
@@ -231,7 +232,10 @@ def test_determinism_input_immutability_and_optional_priority_not_weakness():
     original = copy.deepcopy(req)
     a, b = inspect(req, load()), inspect(copy.deepcopy(req), load())
     assert a == b
-    assert produce(req, load()).model_dump() == produce(req, load()).model_dump()
+    first_response = produce(req, load()).model_dump()
+    equivalent_input = dict(reversed(list(copy.deepcopy(req).items())))
+    repeated_response = produce(equivalent_input, load()).model_dump()
+    assert repeated_response == first_response
     assert req == original
     assert "weakness" not in a
     assert all(
@@ -278,8 +282,9 @@ def test_engine_and_reference_versions_cannot_be_silently_relabelled():
     load, _, produce = api()
     req = request()
     req["versions"]["engine"] = "invented-engine"
+    registry = load()
     with pytest.raises(ValueError, match="engine"):
-        produce(req, load())
+        produce(req, registry)
 
 
 def test_every_public_producer_fixture_is_generated_and_canonical_valid():
