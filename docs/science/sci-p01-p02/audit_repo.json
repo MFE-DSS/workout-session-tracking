@@ -1,0 +1,2830 @@
+{
+  "audit_version": "sci-p01-p02-audit-v1",
+  "base_commit": "90da8461803e87897c3d8f48627c4b704b3cfcd6",
+  "generated_from": "repository files + pure functions; no user DB access",
+  "reference_version": "2026-09-28.v15",
+  "catalogue_version": "auren-exercise-catalogue-v2-closure-2",
+  "template_count": 18,
+  "legacy_zone_baselines": {
+    "pecs": 16,
+    "delt_lat": 18,
+    "delt_post": 10,
+    "lats": 16,
+    "upper_back": 16,
+    "biceps": 10,
+    "triceps": 10,
+    "quads": 16,
+    "posterior": 16,
+    "calves": 10,
+    "core": 10
+  },
+  "baseline_sum": 148,
+  "conflicting_rep_ranges": {
+    "Élévations latérales haltères assis": [
+      [
+        12,
+        15
+      ],
+      [
+        12,
+        20
+      ]
+    ],
+    "Tirage poulie haute prise neutre": [
+      [
+        6,
+        10
+      ],
+      [
+        8,
+        12
+      ]
+    ],
+    "Tirage vertical unilatéral câble": [
+      [
+        8,
+        12
+      ],
+      [
+        10,
+        12
+      ]
+    ],
+    "Rowing machine chest-supported": [
+      [
+        6,
+        10
+      ],
+      [
+        8,
+        12
+      ]
+    ],
+    "Relevés mollets debout machine": [
+      [
+        8,
+        12
+      ],
+      [
+        12,
+        20
+      ]
+    ],
+    "Mollets assis machine": [
+      [
+        12,
+        20
+      ],
+      [
+        15,
+        20
+      ]
+    ],
+    "Tirage poulie haute prise large": [
+      [
+        6,
+        10
+      ],
+      [
+        8,
+        12
+      ]
+    ],
+    "Curl EZ-bar debout": [
+      [
+        8,
+        12
+      ],
+      [
+        10,
+        12
+      ]
+    ],
+    "Extension overhead câble (corde)": [
+      [
+        8,
+        12
+      ],
+      [
+        10,
+        15
+      ]
+    ]
+  },
+  "source_sha256": {
+    "data/reference_split.json": "3c41f44d1c17c5b74fa4b90c9f6f850c5931c1694bcd1b338430ab3608f79eae",
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/evidence_registry.json": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "app/services/weekly_planner.py": "10c93a6fc964b7807de235d5b146b0d376c198c5c0656a650d009b0da0a7a290",
+    "app/services/weekly_volume_budget.py": "b1100ed5a6342168bede8902de1c1d7fdcc6767427127bdae5c245c268126f99",
+    "app/services/weekly_capacity_allocator.py": "deeeda45113c53f0da9b158137d24dad2d4fd63d302e4b2f87812c993a7c07d1",
+    "app/services/weekly_set_allocation.py": "d43d2034984dc263f511d264adb8c637d744514664e357003df5f685b1ddda6d",
+    "app/services/weekly_plan_materialization.py": "174091c5bdc0aff7095ea441197ec5c839029e17bacfe0d72c40879cf40cd54e",
+    "app/services/user_program_generator.py": "181092368eac8e66693ff4e51e82dae0f3eb8fd1d794fc4e31aed3abdd040d30"
+  },
+  "templates": [
+    {
+      "slug": "push-a",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 21,
+      "primary_set_exposures": {
+        "pecs": 9,
+        "anterior_delts": 3,
+        "triceps": 3,
+        "upper_back": 0,
+        "lats": 0,
+        "lateral_delts": 3,
+        "rear_delts": 3
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Incline Smith Press",
+          "canonical_exercise_id": "incline-smith-press",
+          "scientific_identity_id": "smith_incline_press_30",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Chest Press machine",
+          "canonical_exercise_id": "chest-press-machine",
+          "scientific_identity_id": "machine_chest_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Dips pectoraux (buste penché)",
+          "canonical_exercise_id": "dips-pectoraux-paren-buste-penche",
+          "scientific_identity_id": "forward_lean_chest_dip",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Neutral Grip Shoulder Press machine",
+          "canonical_exercise_id": "neutral-grip-shoulder-press-machine",
+          "scientific_identity_id": "neutral_grip_machine_overhead_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales câble (derrière le dos)",
+          "canonical_exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+          "scientific_identity_id": "behind_back_cable_lateral_raise",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            }
+          ]
+        },
+        {
+          "legacy_name": "Écarté arrière d'épaule câble",
+          "canonical_exercise_id": "ecarte-arriere-d-epaule-cable",
+          "scientific_identity_id": "cable_rear_delt_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Triceps extension poulie haute (corde)",
+          "canonical_exercise_id": "triceps-pushdown-corde",
+          "scientific_identity_id": "cable_rope_triceps_pushdown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "push-b",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 22,
+      "primary_set_exposures": {
+        "pecs": 9,
+        "anterior_delts": 0,
+        "triceps": 3,
+        "upper_back": 0,
+        "lateral_delts": 7,
+        "biceps": 0,
+        "rear_delts": 3,
+        "lats": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Écarté pec aux câbles (incliné bas→haut)",
+          "canonical_exercise_id": "cable-cross-over-paren-bashaut",
+          "scientific_identity_id": "low_to_high_cable_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Développé couché haltères",
+          "canonical_exercise_id": "developpe-couche-halteres",
+          "scientific_identity_id": "flat_dumbbell_bench_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Butterfly pec machine",
+          "canonical_exercise_id": "butterfly-pec-machine",
+          "scientific_identity_id": "pec_deck_fly_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales haltères assis",
+          "canonical_exercise_id": "elevations-laterales-halteres-assis",
+          "scientific_identity_id": "seated_dumbbell_lateral_raise",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Tirage front câble (prise large)",
+          "canonical_exercise_id": "tirage-front-cable-paren-prise-large",
+          "scientific_identity_id": "wide_grip_cable_upright_row",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Face pull câble (corde)",
+          "canonical_exercise_id": "face-pull-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_face_pull",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Triceps pushdown barre",
+          "canonical_exercise_id": "triceps-pushdown-barre",
+          "scientific_identity_id": "cable_straight_bar_triceps_pushdown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "pull-a",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 20,
+      "primary_set_exposures": {
+        "lats": 14,
+        "biceps": 0,
+        "upper_back": 0,
+        "rear_delts": 6,
+        "abs": 0,
+        "lateral_delts": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Tirage poulie haute prise neutre",
+          "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+          "scientific_identity_id": "neutral_grip_lat_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Tirage vertical unilatéral câble",
+          "canonical_exercise_id": "tirage-vertical-unilateral-cable",
+          "scientific_identity_id": "unilateral_cable_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Pullover câble (bras tendus, poulie haute)",
+          "canonical_exercise_id": "pullover-cable-paren-bras-tendus-poulie-haute",
+          "scientific_identity_id": "straight_arm_cable_pullover",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rear delt fly machine (pec deck inversé)",
+          "canonical_exercise_id": "rear-delt-fly-machine",
+          "scientific_identity_id": "reverse_pec_deck_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Face pull câble",
+          "canonical_exercise_id": "face-pull-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_face_pull",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Pullover machine",
+          "canonical_exercise_id": "pullover-machine",
+          "scientific_identity_id": "machine_pullover",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Straight-arm pulldown câble",
+          "canonical_exercise_id": "pullover-cable-paren-bras-tendus-poulie-haute",
+          "scientific_identity_id": "straight_arm_cable_pullover",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "pull-b",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 20,
+      "primary_set_exposures": {
+        "upper_back": 12,
+        "lats": 6,
+        "rear_delts": 0,
+        "biceps": 8,
+        "abs": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Rowing machine chest-supported",
+          "canonical_exercise_id": "rowing-chest-supported",
+          "scientific_identity_id": "chest_supported_row",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rowing câble assis prise neutre",
+          "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+          "scientific_identity_id": "seated_cable_row_neutral_grip",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rowing haltère un bras (banc)",
+          "canonical_exercise_id": "rowing-haltere-un-bras-paren-banc",
+          "scientific_identity_id": "bench_supported_one_arm_dumbbell_row",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Shrugs haltères",
+          "canonical_exercise_id": "shrugs-halteres",
+          "scientific_identity_id": "dumbbell_shrug",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl incliné haltères (banc 45°)",
+          "canonical_exercise_id": "curl-incline-halteres-paren-banc-45",
+          "scientific_identity_id": "incline_dumbbell_curl_45",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl poulie basse (barre)",
+          "canonical_exercise_id": "curl-poulie-basse-paren-barre",
+          "scientific_identity_id": "low_cable_straight_bar_curl",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl marteau haltères",
+          "canonical_exercise_id": "curl-marteau-halteres",
+          "scientific_identity_id": "dumbbell_hammer_curl",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "legs-a",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 22,
+      "primary_set_exposures": {
+        "quads": 9,
+        "glutes": 0,
+        "adductors": 3,
+        "hamstrings": 3,
+        "calves": 4,
+        "hip_flexors": 0,
+        "abs": 3,
+        "lats": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Hack Squat machine",
+          "canonical_exercise_id": "hack-squat-machine",
+          "scientific_identity_id": "machine_hack_squat",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg Press (pieds bas, serrés)",
+          "canonical_exercise_id": "leg-press-paren-pieds-bas",
+          "scientific_identity_id": "leg_press_low_feet",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg extensions assises",
+          "canonical_exercise_id": "leg-extensions-assises",
+          "scientific_identity_id": "seated_leg_extension_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg curls assis",
+          "canonical_exercise_id": "leg-curls-assis",
+          "scientific_identity_id": "seated_leg_curl_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Adduction assise",
+          "canonical_exercise_id": "adduction-assise",
+          "scientific_identity_id": "seated_hip_adduction_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Relevés mollets debout machine",
+          "canonical_exercise_id": "releves-mollets-debout-machine",
+          "scientific_identity_id": "standing_calf_raise_machine",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Roulette abdominale",
+          "canonical_exercise_id": "roulette-abdominale",
+          "scientific_identity_id": "kneeling_ab_wheel_rollout",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "legs-b",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 22,
+      "primary_set_exposures": {
+        "hamstrings": 6,
+        "glutes": 6,
+        "adductors": 0,
+        "upper_back": 0,
+        "lats": 0,
+        "abs": 3,
+        "calves": 4,
+        "hip_flexors": 0,
+        "quads": 6
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Romanian Deadlift haltères",
+          "canonical_exercise_id": "romanian-deadlift-halteres",
+          "scientific_identity_id": "dumbbell_romanian_deadlift",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg curls allongé",
+          "canonical_exercise_id": "leg-curls-allonge",
+          "scientific_identity_id": "lying_leg_curl_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg Press (pieds hauts, écartés)",
+          "canonical_exercise_id": "leg-press-paren-pieds-hauts-ecartes",
+          "scientific_identity_id": "leg_press_high_wide_feet",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Hip thrust Smith machine",
+          "canonical_exercise_id": "hip-thrust-smith",
+          "scientific_identity_id": "smith_hip_thrust",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg extensions assises",
+          "canonical_exercise_id": "leg-extensions-assises",
+          "scientific_identity_id": "seated_leg_extension_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Mollets assis machine",
+          "canonical_exercise_id": "mollets-assis-machine",
+          "scientific_identity_id": "seated_calf_raise_machine",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Crunch câble à genoux",
+          "canonical_exercise_id": "crunch-cable-a-genoux",
+          "scientific_identity_id": "kneeling_cable_crunch",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "upper-pecs-delts",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 22,
+      "primary_set_exposures": {
+        "pecs": 9,
+        "anterior_delts": 3,
+        "triceps": 3,
+        "upper_back": 0,
+        "lateral_delts": 4,
+        "rear_delts": 3,
+        "lats": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Développé incliné haltères 30°",
+          "canonical_exercise_id": "developpe-incline-halteres-30",
+          "scientific_identity_id": "incline_dumbbell_press_30",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Chest Press machine",
+          "canonical_exercise_id": "chest-press-machine",
+          "scientific_identity_id": "machine_chest_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Cable cross-over (bas→haut)",
+          "canonical_exercise_id": "cable-cross-over-paren-bashaut",
+          "scientific_identity_id": "low_to_high_cable_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Machine shoulder press",
+          "canonical_exercise_id": "machine-shoulder-press",
+          "scientific_identity_id": "machine_overhead_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales câble",
+          "canonical_exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+          "scientific_identity_id": "behind_back_cable_lateral_raise",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rear delt fly machine",
+          "canonical_exercise_id": "rear-delt-fly-machine",
+          "scientific_identity_id": "reverse_pec_deck_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Triceps pushdown corde",
+          "canonical_exercise_id": "triceps-pushdown-corde",
+          "scientific_identity_id": "cable_rope_triceps_pushdown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "upper-back-arms",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 21,
+      "primary_set_exposures": {
+        "lats": 6,
+        "biceps": 6,
+        "upper_back": 6,
+        "rear_delts": 0,
+        "triceps": 6
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Tirage poulie haute prise large",
+          "canonical_exercise_id": "tirage-poulie-haute-prise-large",
+          "scientific_identity_id": "wide_grip_lat_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rowing machine chest-supported",
+          "canonical_exercise_id": "rowing-chest-supported",
+          "scientific_identity_id": "chest_supported_row",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rowing câble assis prise serrée",
+          "canonical_exercise_id": "rowing-cable-assis-prise-serree",
+          "scientific_identity_id": "seated_cable_row_close_grip",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl incliné haltères",
+          "canonical_exercise_id": "curl-incline-halteres-paren-banc-45",
+          "scientific_identity_id": "incline_dumbbell_curl_45",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl EZ-bar debout",
+          "canonical_exercise_id": "curl-ez-bar-debout",
+          "scientific_identity_id": "standing_ez_bar_curl",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Extension overhead câble (corde)",
+          "canonical_exercise_id": "extension-overhead-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_overhead_triceps_extension",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Triceps pushdown barre",
+          "canonical_exercise_id": "triceps-pushdown-barre",
+          "scientific_identity_id": "cable_straight_bar_triceps_pushdown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "lower-quad-bias",
+      "kind": "strength",
+      "exercise_count": 6,
+      "physical_work_sets": 19,
+      "primary_set_exposures": {
+        "quads": 9,
+        "glutes": 0,
+        "adductors": 0,
+        "hamstrings": 3,
+        "calves": 4,
+        "abs": 3,
+        "hip_flexors": 0,
+        "lats": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Squat Smith machine (pieds avancés)",
+          "canonical_exercise_id": "squat-smith-machine-paren-pieds-avances",
+          "scientific_identity_id": "smith_squat_feet_forward",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg Press (pieds bas)",
+          "canonical_exercise_id": "leg-press-paren-pieds-bas",
+          "scientific_identity_id": "leg_press_low_feet",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg extensions assises",
+          "canonical_exercise_id": "leg-extensions-assises",
+          "scientific_identity_id": "seated_leg_extension_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg curls assis",
+          "canonical_exercise_id": "leg-curls-assis",
+          "scientific_identity_id": "seated_leg_curl_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Relevés mollets debout",
+          "canonical_exercise_id": "releves-mollets-debout",
+          "scientific_identity_id": "bodyweight_standing_calf_raise",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Roulette abdominale",
+          "canonical_exercise_id": "roulette-abdominale",
+          "scientific_identity_id": "kneeling_ab_wheel_rollout",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "lower-posterior-bias",
+      "kind": "strength",
+      "exercise_count": 6,
+      "physical_work_sets": 19,
+      "primary_set_exposures": {
+        "hamstrings": 6,
+        "glutes": 3,
+        "adductors": 0,
+        "upper_back": 0,
+        "lats": 0,
+        "abs": 3,
+        "calves": 4,
+        "hip_flexors": 0,
+        "quads": 3
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Romanian Deadlift haltères",
+          "canonical_exercise_id": "romanian-deadlift-halteres",
+          "scientific_identity_id": "dumbbell_romanian_deadlift",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg curls allongé",
+          "canonical_exercise_id": "leg-curls-allonge",
+          "scientific_identity_id": "lying_leg_curl_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Hip thrust Smith",
+          "canonical_exercise_id": "hip-thrust-smith",
+          "scientific_identity_id": "smith_hip_thrust",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Leg extensions assises",
+          "canonical_exercise_id": "leg-extensions-assises",
+          "scientific_identity_id": "seated_leg_extension_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Mollets assis machine",
+          "canonical_exercise_id": "mollets-assis-machine",
+          "scientific_identity_id": "seated_calf_raise_machine",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 15,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Crunch câble à genoux",
+          "canonical_exercise_id": "crunch-cable-a-genoux",
+          "scientific_identity_id": "kneeling_cable_crunch",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "liss-only",
+      "kind": "cardio",
+      "exercise_count": 0,
+      "physical_work_sets": 0,
+      "primary_set_exposures": {},
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": []
+    },
+    {
+      "slug": "liss-abs",
+      "kind": "cardio",
+      "exercise_count": 4,
+      "physical_work_sets": 12,
+      "primary_set_exposures": {
+        "abs": 9,
+        "lats": 0,
+        "hip_flexors": 3,
+        "quads": 0,
+        "pecs": 0,
+        "anterior_delts": 0,
+        "rear_delts": 0,
+        "glutes": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Roulette abdominale (ab wheel rollout)",
+          "canonical_exercise_id": "roulette-abdominale",
+          "scientific_identity_id": "kneeling_ab_wheel_rollout",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Crunch câble à genoux",
+          "canonical_exercise_id": "crunch-cable-a-genoux",
+          "scientific_identity_id": "kneeling_cable_crunch",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Relevé de jambes suspendu",
+          "canonical_exercise_id": "releve-de-jambes-suspendu",
+          "scientific_identity_id": "hanging_straight_leg_raise",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Pallof press câble",
+          "canonical_exercise_id": "pallof-press-cable",
+          "scientific_identity_id": "cable_pallof_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "short-upper",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 18,
+      "primary_set_exposures": {
+        "pecs": 3,
+        "anterior_delts": 3,
+        "triceps": 2,
+        "upper_back": 0,
+        "lats": 3,
+        "biceps": 2,
+        "rear_delts": 2,
+        "lateral_delts": 3
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Chest Press machine",
+          "canonical_exercise_id": "chest-press-machine",
+          "scientific_identity_id": "machine_chest_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Tirage poulie haute prise neutre",
+          "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+          "scientific_identity_id": "neutral_grip_lat_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Machine shoulder press",
+          "canonical_exercise_id": "machine-shoulder-press",
+          "scientific_identity_id": "machine_overhead_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales câble",
+          "canonical_exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+          "scientific_identity_id": "behind_back_cable_lateral_raise",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl poulie basse",
+          "canonical_exercise_id": "curl-poulie-basse-paren-barre",
+          "scientific_identity_id": "low_cable_straight_bar_curl",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Triceps pushdown corde",
+          "canonical_exercise_id": "triceps-pushdown-corde",
+          "scientific_identity_id": "cable_rope_triceps_pushdown",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Face pull câble",
+          "canonical_exercise_id": "face-pull-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_face_pull",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "catch-up-shoulders",
+      "kind": "strength",
+      "exercise_count": 6,
+      "physical_work_sets": 19,
+      "primary_set_exposures": {
+        "anterior_delts": 3,
+        "lateral_delts": 10,
+        "triceps": 0,
+        "upper_back": 0,
+        "pecs": 0,
+        "biceps": 0,
+        "rear_delts": 6
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Machine shoulder press",
+          "canonical_exercise_id": "machine-shoulder-press",
+          "scientific_identity_id": "machine_overhead_press",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales câble (derrière le dos)",
+          "canonical_exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+          "scientific_identity_id": "behind_back_cable_lateral_raise",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20,
+              "technique": "RP"
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales haltères assis",
+          "canonical_exercise_id": "elevations-laterales-halteres-assis",
+          "scientific_identity_id": "seated_dumbbell_lateral_raise",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Tirage front câble (prise large)",
+          "canonical_exercise_id": "tirage-front-cable-paren-prise-large",
+          "scientific_identity_id": "wide_grip_cable_upright_row",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rear delt fly machine",
+          "canonical_exercise_id": "rear-delt-fly-machine",
+          "scientific_identity_id": "reverse_pec_deck_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Face pull câble",
+          "canonical_exercise_id": "face-pull-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_face_pull",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "catch-up-arms",
+      "kind": "strength",
+      "exercise_count": 7,
+      "physical_work_sets": 20,
+      "primary_set_exposures": {
+        "biceps": 9,
+        "triceps": 11,
+        "lats": 0,
+        "rear_delts": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Curl incliné haltères (banc 45°)",
+          "canonical_exercise_id": "curl-incline-halteres-paren-banc-45",
+          "scientific_identity_id": "incline_dumbbell_curl_45",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl EZ-bar debout",
+          "canonical_exercise_id": "curl-ez-bar-debout",
+          "scientific_identity_id": "standing_ez_bar_curl",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Curl marteau câble (corde)",
+          "canonical_exercise_id": "curl-marteau-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_hammer_curl",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Extension overhead câble (corde)",
+          "canonical_exercise_id": "extension-overhead-cable-paren-corde",
+          "scientific_identity_id": "cable_rope_overhead_triceps_extension",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Skull crushers EZ-bar",
+          "canonical_exercise_id": "skull-crushers-ez-bar",
+          "scientific_identity_id": "ez_bar_skull_crusher",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Triceps pushdown barre",
+          "canonical_exercise_id": "triceps-pushdown-barre",
+          "scientific_identity_id": "cable_straight_bar_triceps_pushdown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Kickback câble",
+          "canonical_exercise_id": "kickback-cable",
+          "scientific_identity_id": "cable_triceps_kickback",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "catch-up-back-width",
+      "kind": "strength",
+      "exercise_count": 6,
+      "physical_work_sets": 18,
+      "primary_set_exposures": {
+        "lats": 15,
+        "biceps": 0,
+        "upper_back": 3,
+        "rear_delts": 3,
+        "abs": 0,
+        "lateral_delts": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Tirage poulie haute prise neutre",
+          "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+          "scientific_identity_id": "neutral_grip_lat_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Tirage poulie haute prise large",
+          "canonical_exercise_id": "tirage-poulie-haute-prise-large",
+          "scientific_identity_id": "wide_grip_lat_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Tirage vertical unilatéral câble",
+          "canonical_exercise_id": "tirage-vertical-unilateral-cable",
+          "scientific_identity_id": "unilateral_cable_pulldown",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Pullover câble (bras tendus)",
+          "canonical_exercise_id": "pullover-cable-paren-bras-tendus-poulie-haute",
+          "scientific_identity_id": "straight_arm_cable_pullover",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rowing câble assis prise large",
+          "canonical_exercise_id": "rowing-cable-assis-prise-large",
+          "scientific_identity_id": "seated_cable_row_wide_grip",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Straight-arm pulldown câble",
+          "canonical_exercise_id": "pullover-cable-paren-bras-tendus-poulie-haute",
+          "scientific_identity_id": "straight_arm_cable_pullover",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "full-body-morphotype-priority-v1",
+      "kind": "strength",
+      "exercise_count": 8,
+      "physical_work_sets": 24,
+      "primary_set_exposures": {
+        "pecs": 3,
+        "anterior_delts": 0,
+        "triceps": 0,
+        "upper_back": 3,
+        "lats": 0,
+        "rear_delts": 3,
+        "biceps": 0,
+        "quads": 2,
+        "glutes": 0,
+        "adductors": 0,
+        "hamstrings": 2,
+        "calves": 7,
+        "abs": 0,
+        "lateral_delts": 4
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Développé incliné haltères 30°",
+          "canonical_exercise_id": "developpe-incline-halteres-30",
+          "scientific_identity_id": "incline_dumbbell_press_30",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Rowing chest-supported",
+          "canonical_exercise_id": "rowing-chest-supported",
+          "scientific_identity_id": "chest_supported_row",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Hack Squat machine",
+          "canonical_exercise_id": "hack-squat-machine",
+          "scientific_identity_id": "machine_hack_squat",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Romanian Deadlift barre",
+          "canonical_exercise_id": "romanian-deadlift-barre",
+          "scientific_identity_id": "barbell_romanian_deadlift",
+          "work_sets": 2,
+          "rep_targets": [
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            },
+            {
+              "min_reps": 6,
+              "max_reps": 10
+            }
+          ]
+        },
+        {
+          "legacy_name": "Élévations latérales câble",
+          "canonical_exercise_id": "elevations-laterales-cable-paren-derriere-le-dos",
+          "scientific_identity_id": "behind_back_cable_lateral_raise",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Reverse fly machine",
+          "canonical_exercise_id": "rear-delt-fly-machine",
+          "scientific_identity_id": "reverse_pec_deck_fly",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Relevés mollets debout machine",
+          "canonical_exercise_id": "releves-mollets-debout-machine",
+          "scientific_identity_id": "standing_calf_raise_machine",
+          "work_sets": 4,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Mollets assis machine",
+          "canonical_exercise_id": "mollets-assis-machine",
+          "scientific_identity_id": "seated_calf_raise_machine",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "no-equipment-full-body",
+      "kind": "strength",
+      "exercise_count": 4,
+      "physical_work_sets": 12,
+      "primary_set_exposures": {
+        "pecs": 3,
+        "anterior_delts": 0,
+        "triceps": 0,
+        "abs": 0,
+        "quads": 6,
+        "glutes": 3,
+        "adductors": 0,
+        "hamstrings": 0,
+        "calves": 0
+      },
+      "unresolved_identities": [],
+      "review_status": "NOT_VALIDATED_FOR_FIRST_PLAN",
+      "exercises": [
+        {
+          "legacy_name": "Pompes",
+          "canonical_exercise_id": "pompes",
+          "scientific_identity_id": "push_up",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 8,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 15
+            },
+            {
+              "min_reps": 8,
+              "max_reps": 15
+            }
+          ]
+        },
+        {
+          "legacy_name": "Squat au poids du corps",
+          "canonical_exercise_id": "squat-au-poids-du-corps",
+          "scientific_identity_id": "bodyweight_squat",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        },
+        {
+          "legacy_name": "Fente avant",
+          "canonical_exercise_id": "fente-avant",
+          "scientific_identity_id": "bodyweight_forward_lunge",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            },
+            {
+              "min_reps": 10,
+              "max_reps": 12
+            }
+          ]
+        },
+        {
+          "legacy_name": "Pont fessier",
+          "canonical_exercise_id": "pont-fessier",
+          "scientific_identity_id": "bodyweight_glute_bridge",
+          "work_sets": 3,
+          "rep_targets": [
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            },
+            {
+              "min_reps": 12,
+              "max_reps": 20
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "weekly_probes": [
+    {
+      "cadence": null,
+      "equipment_families": null,
+      "sessions": 0,
+      "physical_sets": 0,
+      "legacy_status": "blocked",
+      "unmet_constraints": [
+        "no_declared_cadence_to_distribute_into"
+      ],
+      "unmet_zones": [
+        "pecs",
+        "delt_lat",
+        "delt_post",
+        "lats",
+        "upper_back",
+        "biceps",
+        "triceps",
+        "quads",
+        "posterior",
+        "calves",
+        "core"
+      ],
+      "fingerprint": "475356b849d26477",
+      "repeat_identical": true,
+      "time_budget_input_supported": false,
+      "scientific_first_plan_validation": "NOT_ESTABLISHED"
+    },
+    {
+      "cadence": 1,
+      "equipment_families": null,
+      "sessions": 1,
+      "physical_sets": 24,
+      "legacy_status": "partial",
+      "unmet_constraints": [],
+      "unmet_zones": [
+        "pecs",
+        "delt_lat",
+        "delt_post",
+        "lats",
+        "upper_back",
+        "biceps",
+        "triceps",
+        "quads",
+        "posterior",
+        "calves",
+        "core"
+      ],
+      "fingerprint": "46a7764096e8a5b5",
+      "repeat_identical": true,
+      "time_budget_input_supported": false,
+      "scientific_first_plan_validation": "NOT_ESTABLISHED"
+    },
+    {
+      "cadence": 2,
+      "equipment_families": null,
+      "sessions": 2,
+      "physical_sets": 48,
+      "legacy_status": "partial",
+      "unmet_constraints": [],
+      "unmet_zones": [
+        "pecs",
+        "delt_lat",
+        "delt_post",
+        "lats",
+        "upper_back",
+        "triceps",
+        "quads",
+        "posterior",
+        "calves",
+        "core"
+      ],
+      "fingerprint": "930f2ab5b670c922",
+      "repeat_identical": true,
+      "time_budget_input_supported": false,
+      "scientific_first_plan_validation": "NOT_ESTABLISHED"
+    },
+    {
+      "cadence": 3,
+      "equipment_families": null,
+      "sessions": 3,
+      "physical_sets": 72,
+      "legacy_status": "partial",
+      "unmet_constraints": [],
+      "unmet_zones": [
+        "pecs",
+        "delt_lat",
+        "delt_post",
+        "lats",
+        "upper_back",
+        "quads",
+        "posterior",
+        "core"
+      ],
+      "fingerprint": "edf742dc0464fea5",
+      "repeat_identical": true,
+      "time_budget_input_supported": false,
+      "scientific_first_plan_validation": "NOT_ESTABLISHED"
+    },
+    {
+      "cadence": 4,
+      "equipment_families": null,
+      "sessions": 4,
+      "physical_sets": 96,
+      "legacy_status": "partial",
+      "unmet_constraints": [],
+      "unmet_zones": [
+        "pecs",
+        "delt_lat",
+        "lats",
+        "upper_back",
+        "quads",
+        "posterior"
+      ],
+      "fingerprint": "f852d61310696f1e",
+      "repeat_identical": true,
+      "time_budget_input_supported": false,
+      "scientific_first_plan_validation": "NOT_ESTABLISHED"
+    },
+    {
+      "cadence": 3,
+      "equipment_families": [],
+      "sessions": 0,
+      "physical_sets": 0,
+      "legacy_status": "blocked",
+      "unmet_constraints": [],
+      "unmet_zones": [
+        "pecs",
+        "delt_lat",
+        "delt_post",
+        "lats",
+        "upper_back",
+        "biceps",
+        "triceps",
+        "quads",
+        "posterior",
+        "calves",
+        "core"
+      ],
+      "fingerprint": "f1a15765ffa3be74",
+      "repeat_identical": true,
+      "time_budget_input_supported": false,
+      "scientific_first_plan_validation": "NOT_ESTABLISHED"
+    }
+  ]
+}
