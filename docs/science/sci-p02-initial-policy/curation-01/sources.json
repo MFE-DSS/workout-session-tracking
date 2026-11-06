@@ -1,0 +1,18 @@
+{
+  "base_sha": "7e295c0e00aa6d00595efe4078e8d212ca61c869",
+  "review_date": "2026-11-06",
+  "source_sha256": {
+    "docs/strategy/AUREN_MANIFESTO_V1.md": "dc735ecb97f647d118c920648d4502e30c21275b1fbcbca508e924614a3d37a0",
+    "docs/strategy/AUREN_PRODUCT_SCIENCE_DEPENDENCIES.md": "0e2d44f967eea72b968f1f2dd47b99cf7ad01daad54b4374e5a8599447d8f869",
+    "docs/science/sci-p02-initial-policy/admission-01/audit.json": "2b9f0cd1a9cfbf8cc2b0b816099e41af7385b1bfa335ff122c94b529b88732da",
+    "docs/science/sci-p02-initial-policy/admission-01/policy.json": "333e37d1642aa813bc76798caa7a36580d22c50964a9697dcb035e463054056a",
+    "docs/science/sci-p02-initial-policy/v1/policy.json": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
+    "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/exercise_catalogue.schema.json": "17d6fef7163cc5d0c9f185d5fa989a9f99cd8491ca01abfa1a9d83f3bcb4fe77",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "data/sci/evidence_registry.json": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+    "data/equipment_registry.json": "cb4abfabd38cc0317de566680315423da2d0851e642339aac9a46bdcd49def9d",
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa"
+  }
+}

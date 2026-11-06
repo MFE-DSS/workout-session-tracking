@@ -1,0 +1,4707 @@
+{
+  "version": "initial-candidate-curation-fixtures/1.0.0",
+  "runtime": "NOT_SERVED",
+  "coverage_semantics": "SOURCE_ACCOUNTING_NOT_AESTHETIC_SCORE; NONE_KNOWN is no listed role, not zero physiology",
+  "effective_role_changes": [],
+  "evidence_basis_corrections": [
+    {
+      "candidate_id": "leg-press-paren-pieds-bas",
+      "zones": [
+        "quads",
+        "glutes",
+        "adductors"
+      ],
+      "before": "longitudinal_trial",
+      "after": "joint_action_anatomy",
+      "authority": [
+        "EV-62",
+        "EV-64",
+        "EV-71"
+      ],
+      "reason": "Trial configuration differs; role categories preserved, high-wide variant held."
+    },
+    {
+      "candidate_id": "leg-press-paren-pieds-hauts-ecartes",
+      "zones": [
+        "quads",
+        "glutes",
+        "adductors"
+      ],
+      "before": "longitudinal_trial",
+      "after": "joint_action_anatomy",
+      "authority": [
+        "EV-62",
+        "EV-64",
+        "EV-71"
+      ],
+      "reason": "Trial configuration differs; role categories preserved, high-wide variant held."
+    }
+  ],
+  "unknown_role_count": 14,
+  "coverage": [
+    {
+      "intent_id": "initial_calf_v1",
+      "admissible_candidate_count": 4,
+      "status": "CANDIDATES_AVAILABLE",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "lats": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "quads": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "calves": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "DIRECT",
+            "mollets-assis-machine": "DIRECT",
+            "releves-mollets-debout": "DIRECT",
+            "releves-mollets-debout-machine": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "DIRECT",
+            "mollets-assis-machine": "DIRECT",
+            "releves-mollets-debout": "DIRECT",
+            "releves-mollets-debout-machine": "DIRECT"
+          }
+        },
+        "abs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "calf-press-leg-press": "NONE_KNOWN",
+            "mollets-assis-machine": "NONE_KNOWN",
+            "releves-mollets-debout": "NONE_KNOWN",
+            "releves-mollets-debout-machine": "NONE_KNOWN"
+          }
+        }
+      }
+    },
+    {
+      "intent_id": "initial_hinge_v1",
+      "admissible_candidate_count": 3,
+      "status": "CANDIDATES_AVAILABLE",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "lats": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "MINOR_KNOWN",
+            "romanian-deadlift-halteres": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "MINOR_KNOWN",
+            "romanian-deadlift-halteres": "MINOR_KNOWN"
+          }
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN",
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "UNKNOWN",
+            "romanian-deadlift-barre": "MINOR_KNOWN",
+            "romanian-deadlift-halteres": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "MINOR_KNOWN",
+            "romanian-deadlift-halteres": "MINOR_KNOWN"
+          }
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "quads": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "DIRECT",
+            "good-morning-halteres": "DIRECT",
+            "romanian-deadlift-barre": "DIRECT",
+            "romanian-deadlift-halteres": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "DIRECT",
+            "romanian-deadlift-barre": "DIRECT",
+            "romanian-deadlift-halteres": "DIRECT"
+          }
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "INDIRECT_KNOWN",
+            "good-morning-halteres": "INDIRECT_KNOWN",
+            "romanian-deadlift-barre": "INDIRECT_KNOWN",
+            "romanian-deadlift-halteres": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "INDIRECT_KNOWN",
+            "romanian-deadlift-barre": "INDIRECT_KNOWN",
+            "romanian-deadlift-halteres": "INDIRECT_KNOWN"
+          }
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "INDIRECT_KNOWN",
+            "good-morning-halteres": "INDIRECT_KNOWN",
+            "romanian-deadlift-barre": "INDIRECT_KNOWN",
+            "romanian-deadlift-halteres": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "INDIRECT_KNOWN",
+            "romanian-deadlift-barre": "INDIRECT_KNOWN",
+            "romanian-deadlift-halteres": "INDIRECT_KNOWN"
+          }
+        },
+        "calves": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        },
+        "abs": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "MINOR_KNOWN",
+            "romanian-deadlift-barre": "MINOR_KNOWN",
+            "romanian-deadlift-halteres": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "MINOR_KNOWN",
+            "romanian-deadlift-halteres": "MINOR_KNOWN"
+          }
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "good-morning-halteres": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "back-extension-45-paren-bias-ischios": "NONE_KNOWN",
+            "romanian-deadlift-barre": "NONE_KNOWN",
+            "romanian-deadlift-halteres": "NONE_KNOWN"
+          }
+        }
+      }
+    },
+    {
+      "intent_id": "initial_lateral_delt_v1",
+      "admissible_candidate_count": 5,
+      "status": "CANDIDATES_AVAILABLE",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "lats": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN",
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "INDIRECT_KNOWN",
+            "elevations-laterales-halteres": "INDIRECT_KNOWN",
+            "elevations-laterales-halteres-assis": "INDIRECT_KNOWN",
+            "elevations-laterales-machine": "INDIRECT_KNOWN",
+            "tirage-front-cable-paren-prise-large": "INDIRECT_KNOWN",
+            "upright-row-halteres": "UNKNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "INDIRECT_KNOWN",
+            "elevations-laterales-halteres": "INDIRECT_KNOWN",
+            "elevations-laterales-halteres-assis": "INDIRECT_KNOWN",
+            "elevations-laterales-machine": "INDIRECT_KNOWN",
+            "tirage-front-cable-paren-prise-large": "INDIRECT_KNOWN"
+          }
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "MINOR_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "MINOR_KNOWN",
+            "elevations-laterales-halteres": "MINOR_KNOWN",
+            "elevations-laterales-halteres-assis": "MINOR_KNOWN",
+            "elevations-laterales-machine": "MINOR_KNOWN",
+            "tirage-front-cable-paren-prise-large": "MINOR_KNOWN",
+            "upright-row-halteres": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "MINOR_KNOWN",
+            "elevations-laterales-halteres": "MINOR_KNOWN",
+            "elevations-laterales-halteres-assis": "MINOR_KNOWN",
+            "elevations-laterales-machine": "MINOR_KNOWN",
+            "tirage-front-cable-paren-prise-large": "MINOR_KNOWN"
+          }
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "DIRECT",
+            "elevations-laterales-halteres": "DIRECT",
+            "elevations-laterales-halteres-assis": "DIRECT",
+            "elevations-laterales-machine": "DIRECT",
+            "tirage-front-cable-paren-prise-large": "DIRECT",
+            "upright-row-halteres": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "DIRECT",
+            "elevations-laterales-halteres": "DIRECT",
+            "elevations-laterales-halteres-assis": "DIRECT",
+            "elevations-laterales-machine": "DIRECT",
+            "tirage-front-cable-paren-prise-large": "DIRECT"
+          }
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "INDIRECT_KNOWN",
+            "upright-row-halteres": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "INDIRECT_KNOWN"
+          }
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "quads": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "calves": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "abs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN",
+            "upright-row-halteres": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "elevations-laterales-cable-paren-derriere-le-dos": "NONE_KNOWN",
+            "elevations-laterales-halteres": "NONE_KNOWN",
+            "elevations-laterales-halteres-assis": "NONE_KNOWN",
+            "elevations-laterales-machine": "NONE_KNOWN",
+            "tirage-front-cable-paren-prise-large": "NONE_KNOWN"
+          }
+        }
+      }
+    },
+    {
+      "intent_id": "initial_press_v1",
+      "admissible_candidate_count": 6,
+      "status": "CANDIDATES_AVAILABLE",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "DIRECT",
+            "developpe-couche-halteres": "DIRECT",
+            "developpe-incline-halteres-30": "DIRECT",
+            "dips-pectoraux-paren-buste-penche": "DIRECT",
+            "incline-smith-press": "DIRECT",
+            "pompes": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "DIRECT",
+            "developpe-couche-halteres": "DIRECT",
+            "developpe-incline-halteres-30": "DIRECT",
+            "dips-pectoraux-paren-buste-penche": "DIRECT",
+            "incline-smith-press": "DIRECT",
+            "pompes": "DIRECT"
+          }
+        },
+        "lats": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "MINOR_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "MINOR_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "MINOR_KNOWN",
+            "developpe-couche-halteres": "MINOR_KNOWN",
+            "developpe-incline-halteres-30": "MINOR_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "MINOR_KNOWN",
+            "incline-smith-press": "MINOR_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "MINOR_KNOWN",
+            "developpe-couche-halteres": "MINOR_KNOWN",
+            "developpe-incline-halteres-30": "MINOR_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "MINOR_KNOWN",
+            "incline-smith-press": "MINOR_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "INDIRECT_KNOWN",
+            "developpe-couche-halteres": "INDIRECT_KNOWN",
+            "developpe-incline-halteres-30": "INDIRECT_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "INDIRECT_KNOWN",
+            "incline-smith-press": "INDIRECT_KNOWN",
+            "pompes": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "INDIRECT_KNOWN",
+            "developpe-couche-halteres": "INDIRECT_KNOWN",
+            "developpe-incline-halteres-30": "INDIRECT_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "INDIRECT_KNOWN",
+            "incline-smith-press": "INDIRECT_KNOWN",
+            "pompes": "INDIRECT_KNOWN"
+          }
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "INDIRECT_KNOWN",
+            "developpe-couche-halteres": "INDIRECT_KNOWN",
+            "developpe-incline-halteres-30": "INDIRECT_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "INDIRECT_KNOWN",
+            "incline-smith-press": "INDIRECT_KNOWN",
+            "pompes": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "INDIRECT_KNOWN",
+            "developpe-couche-halteres": "INDIRECT_KNOWN",
+            "developpe-incline-halteres-30": "INDIRECT_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "INDIRECT_KNOWN",
+            "incline-smith-press": "INDIRECT_KNOWN",
+            "pompes": "INDIRECT_KNOWN"
+          }
+        },
+        "quads": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "calves": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        },
+        "abs": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "MINOR_KNOWN"
+          }
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "chest-press-machine": "NONE_KNOWN",
+            "developpe-couche-halteres": "NONE_KNOWN",
+            "developpe-incline-halteres-30": "NONE_KNOWN",
+            "dips-pectoraux-paren-buste-penche": "NONE_KNOWN",
+            "incline-smith-press": "NONE_KNOWN",
+            "pompes": "NONE_KNOWN"
+          }
+        }
+      }
+    },
+    {
+      "intent_id": "initial_quad_v1",
+      "admissible_candidate_count": 7,
+      "status": "CANDIDATES_AVAILABLE",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "lats": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        },
+        "quads": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "fente-avant": "DIRECT",
+            "hack-squat-machine": "DIRECT",
+            "leg-extension-cable-unilateral": "DIRECT",
+            "leg-extensions-assises": "DIRECT",
+            "leg-press-paren-pieds-bas": "DIRECT",
+            "leg-press-paren-pieds-hauts-ecartes": "DIRECT",
+            "reverse-nordic": "DIRECT",
+            "sissy-squat-machine": "DIRECT",
+            "squat-au-poids-du-corps": "DIRECT",
+            "squat-smith-machine-paren-pieds-avances": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "DIRECT",
+            "hack-squat-machine": "DIRECT",
+            "leg-extensions-assises": "DIRECT",
+            "leg-press-paren-pieds-bas": "DIRECT",
+            "reverse-nordic": "DIRECT",
+            "squat-au-poids-du-corps": "DIRECT",
+            "squat-smith-machine-paren-pieds-avances": "DIRECT"
+          }
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN",
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "MINOR_KNOWN",
+            "hack-squat-machine": "MINOR_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "MINOR_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "UNKNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "MINOR_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "MINOR_KNOWN",
+            "hack-squat-machine": "MINOR_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "MINOR_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "MINOR_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "MINOR_KNOWN"
+          }
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "DIRECT",
+            "INDIRECT_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "INDIRECT_KNOWN",
+            "hack-squat-machine": "INDIRECT_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "INDIRECT_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "DIRECT",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "INDIRECT_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "INDIRECT_KNOWN",
+            "hack-squat-machine": "INDIRECT_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "INDIRECT_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "INDIRECT_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "INDIRECT_KNOWN"
+          }
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "INDIRECT_KNOWN",
+            "hack-squat-machine": "INDIRECT_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "INDIRECT_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "INDIRECT_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "INDIRECT_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "INDIRECT_KNOWN",
+            "hack-squat-machine": "INDIRECT_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "INDIRECT_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "INDIRECT_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "INDIRECT_KNOWN"
+          }
+        },
+        "calves": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "MINOR_KNOWN",
+            "hack-squat-machine": "MINOR_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "MINOR_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "MINOR_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "sissy-squat-machine": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "MINOR_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "MINOR_KNOWN",
+            "hack-squat-machine": "MINOR_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "MINOR_KNOWN",
+            "reverse-nordic": "NONE_KNOWN",
+            "squat-au-poids-du-corps": "MINOR_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "MINOR_KNOWN"
+          }
+        },
+        "abs": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "MINOR_KNOWN",
+            "sissy-squat-machine": "MINOR_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "MINOR_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "MINOR_KNOWN"
+          }
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN",
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extension-cable-unilateral": "UNKNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "leg-press-paren-pieds-hauts-ecartes": "NONE_KNOWN",
+            "reverse-nordic": "MINOR_KNOWN",
+            "sissy-squat-machine": "MINOR_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "fente-avant": "NONE_KNOWN",
+            "hack-squat-machine": "NONE_KNOWN",
+            "leg-extensions-assises": "NONE_KNOWN",
+            "leg-press-paren-pieds-bas": "NONE_KNOWN",
+            "reverse-nordic": "MINOR_KNOWN",
+            "squat-au-poids-du-corps": "NONE_KNOWN",
+            "squat-smith-machine-paren-pieds-avances": "NONE_KNOWN"
+          }
+        }
+      }
+    },
+    {
+      "intent_id": "initial_row_v1",
+      "admissible_candidate_count": 4,
+      "status": "CANDIDATES_AVAILABLE",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "lats": {
+          "candidate_role_states": [
+            "DIRECT",
+            "INDIRECT_KNOWN",
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "UNKNOWN",
+            "rowing-cable-assis-prise-neutre": "DIRECT",
+            "rowing-cable-assis-prise-serree": "DIRECT",
+            "rowing-chest-supported": "INDIRECT_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT",
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "DIRECT",
+            "rowing-cable-assis-prise-serree": "DIRECT",
+            "rowing-chest-supported": "INDIRECT_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "DIRECT"
+          }
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "DIRECT",
+            "rowing-cable-assis-prise-neutre": "DIRECT",
+            "rowing-cable-assis-prise-serree": "DIRECT",
+            "rowing-chest-supported": "DIRECT",
+            "rowing-haltere-un-bras-paren-banc": "DIRECT"
+          },
+          "admissible_role_states": [
+            "DIRECT"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "DIRECT",
+            "rowing-cable-assis-prise-serree": "DIRECT",
+            "rowing-chest-supported": "DIRECT",
+            "rowing-haltere-un-bras-paren-banc": "DIRECT"
+          }
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "MINOR_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "DIRECT",
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "DIRECT",
+            "rowing-cable-assis-prise-neutre": "INDIRECT_KNOWN",
+            "rowing-cable-assis-prise-serree": "INDIRECT_KNOWN",
+            "rowing-chest-supported": "INDIRECT_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "INDIRECT_KNOWN",
+            "rowing-cable-assis-prise-serree": "INDIRECT_KNOWN",
+            "rowing-chest-supported": "INDIRECT_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "INDIRECT_KNOWN"
+          }
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "INDIRECT_KNOWN",
+            "rowing-cable-assis-prise-neutre": "INDIRECT_KNOWN",
+            "rowing-cable-assis-prise-serree": "INDIRECT_KNOWN",
+            "rowing-chest-supported": "INDIRECT_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "INDIRECT_KNOWN",
+            "rowing-cable-assis-prise-serree": "INDIRECT_KNOWN",
+            "rowing-chest-supported": "INDIRECT_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "INDIRECT_KNOWN"
+          }
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "quads": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "calves": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        },
+        "abs": {
+          "candidate_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "MINOR_KNOWN"
+          },
+          "admissible_role_states": [
+            "MINOR_KNOWN",
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "MINOR_KNOWN"
+          }
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "rowing-cable-assis-prise-large": "NONE_KNOWN",
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          },
+          "admissible_role_states": [
+            "NONE_KNOWN"
+          ],
+          "admissible_by_candidate": {
+            "rowing-cable-assis-prise-neutre": "NONE_KNOWN",
+            "rowing-cable-assis-prise-serree": "NONE_KNOWN",
+            "rowing-chest-supported": "NONE_KNOWN",
+            "rowing-haltere-un-bras-paren-banc": "NONE_KNOWN"
+          }
+        }
+      }
+    },
+    {
+      "intent_id": "initial_vertical_pull_v1",
+      "admissible_candidate_count": 0,
+      "status": "CATALOG_GAP",
+      "zones": {
+        "pecs": {
+          "candidate_role_states": [
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "UNKNOWN",
+            "tirage-poulie-haute-prise-neutre": "UNKNOWN",
+            "tirage-vertical-unilateral-cable": "UNKNOWN",
+            "traction-assistee-machine": "UNKNOWN",
+            "traction-assistee-unilaterale": "UNKNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "lats": {
+          "candidate_role_states": [
+            "DIRECT"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "DIRECT",
+            "tirage-poulie-haute-prise-neutre": "DIRECT",
+            "tirage-vertical-unilateral-cable": "DIRECT",
+            "traction-assistee-machine": "DIRECT",
+            "traction-assistee-unilaterale": "DIRECT"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "upper_back": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "INDIRECT_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "INDIRECT_KNOWN",
+            "tirage-vertical-unilateral-cable": "INDIRECT_KNOWN",
+            "traction-assistee-machine": "INDIRECT_KNOWN",
+            "traction-assistee-unilaterale": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "anterior_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "lateral_delts": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "rear_delts": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN",
+            "UNKNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "UNKNOWN",
+            "tirage-poulie-haute-prise-neutre": "INDIRECT_KNOWN",
+            "tirage-vertical-unilateral-cable": "UNKNOWN",
+            "traction-assistee-machine": "UNKNOWN",
+            "traction-assistee-unilaterale": "UNKNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "biceps": {
+          "candidate_role_states": [
+            "INDIRECT_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "INDIRECT_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "INDIRECT_KNOWN",
+            "tirage-vertical-unilateral-cable": "INDIRECT_KNOWN",
+            "traction-assistee-machine": "INDIRECT_KNOWN",
+            "traction-assistee-unilaterale": "INDIRECT_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "triceps": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "quads": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "hamstrings": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "glutes": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "adductors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "calves": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "abs": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        },
+        "hip_flexors": {
+          "candidate_role_states": [
+            "NONE_KNOWN"
+          ],
+          "by_candidate": {
+            "tirage-poulie-haute-prise-large": "NONE_KNOWN",
+            "tirage-poulie-haute-prise-neutre": "NONE_KNOWN",
+            "tirage-vertical-unilateral-cable": "NONE_KNOWN",
+            "traction-assistee-machine": "NONE_KNOWN",
+            "traction-assistee-unilaterale": "NONE_KNOWN"
+          },
+          "admissible_role_states": [],
+          "admissible_by_candidate": {}
+        }
+      }
+    }
+  ],
+  "cases": [
+    {
+      "scenario": "unconfirmed_context",
+      "input": {
+        "contract_version": "first-plan-request/1.0.0",
+        "as_of": "2026-11-05T12:00:00Z",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "blueprint": {
+          "contract_version": "body-training-blueprint/1.0.0",
+          "snapshot_id": "fixture-blueprint-v1",
+          "objective": {
+            "state": "KNOWN",
+            "value": "HYPERTROPHY",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "population_scope": {
+            "state": "KNOWN",
+            "value": "ADULT_NON_CLINICAL",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "sessions_per_week": {
+            "state": "KNOWN",
+            "value": 3,
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "session_budgets_minutes": {
+            "state": "KNOWN",
+            "value": [
+              60,
+              60,
+              60
+            ],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "experience": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "limitations": {
+            "state": "KNOWN",
+            "value": [],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "excluded_exercise_ids": {
+            "state": "KNOWN",
+            "value": [],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "declared_priorities": {
+            "state": "KNOWN",
+            "value": [
+              "shoulders"
+            ],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "height_cm": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "weight_kg": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "legacy_weight_kg": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "observations": [],
+          "environment": {
+            "context_ref": "fixture-context",
+            "description": {
+              "state": "KNOWN",
+              "value": "Salle de sport",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              },
+              "conflicts": []
+            },
+            "equipment_items": {
+              "state": "UNKNOWN",
+              "value": null,
+              "provenance": {
+                "origin": "UNKNOWN",
+                "acquisition": "UNKNOWN",
+                "source_ref": null,
+                "recorded_at": null,
+                "measured_at": null
+              },
+              "conflicts": []
+            },
+            "exercise_confirmations": []
+          }
+        },
+        "policies": {
+          "state": "UNAVAILABLE",
+          "dose_id": null,
+          "time_id": null,
+          "selection_id": null,
+          "taxonomy_projection_id": null,
+          "review_ref": null
+        },
+        "versions": {
+          "catalogue": "auren-exercise-catalogue-v2-closure-2",
+          "zones": "zones-15-v1",
+          "credit": "sci-exposure-credit-v1",
+          "engine": "initial-policy-producer/1.0.0"
+        }
+      },
+      "results": [
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_calf_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "calf-press-leg-press",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "mollets-assis-machine",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "releves-mollets-debout",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "releves-mollets-debout-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_hinge_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "back-extension-45-paren-bias-ischios",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "romanian-deadlift-barre",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_BARBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "romanian-deadlift-halteres",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "good-morning-halteres",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "upper_back"
+              ],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Upper_back remains UNKNOWN because hold position unspecified. No claim anatomically shorter glute moment arm predicts inferior hypertrophy."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_lateral_delt_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "elevations-laterales-cable-paren-derriere-le-dos",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": true,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "elevations-laterales-halteres",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "elevations-laterales-halteres-assis",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "elevations-laterales-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "tirage-front-cable-paren-prise-large",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "upright-row-halteres",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "upper_back"
+              ],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_press_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "chest-press-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "developpe-couche-halteres",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "developpe-incline-halteres-30",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "dips-pectoraux-paren-buste-penche",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "incline-smith-press",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "SMITH_RESISTANCE",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "pompes",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_quad_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "fente-avant",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": true,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "hack-squat-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "leg-extensions-assises",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "leg-press-paren-pieds-bas",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "reverse-nordic",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "squat-au-poids-du-corps",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "squat-smith-machine-paren-pieds-avances",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "SMITH_RESISTANCE",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "leg-extension-cable-unilateral",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "hip_flexors"
+              ],
+              "unilateral": true,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Hip_flexors remains UNKNOWN because standing raised-thigh versus seated support changes demand. No side-load inference."
+            },
+            {
+              "candidate_id": "leg-press-paren-pieds-hauts-ecartes",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "hamstrings"
+              ],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Hamstrings UNKNOWN remains; high-wide hip-ROM and longitudinal glute-PRIMARY inference is not established. Preserve historical category for audit only; this variant is held, not admitted. No conservative categorical downgrade is fabricated."
+            },
+            {
+              "candidate_id": "sissy-squat-machine",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Name does not settle resistance mode. No assumption that machine means stack or plates; no exact transfer from leg extension."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_row_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "rowing-cable-assis-prise-neutre",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "rowing-cable-assis-prise-serree",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "rowing-chest-supported",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "rowing-haltere-un-bras-paren-banc",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": true,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "rowing-cable-assis-prise-large",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "lats"
+              ],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_vertical_pull_v1",
+          "status": "CATALOG_GAP",
+          "reason": "NO_ADMISSIBLE_REALISATION",
+          "candidates": [],
+          "held_candidates": [
+            {
+              "candidate_id": "tirage-poulie-haute-prise-large",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "tirage-poulie-haute-prise-neutre",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "pecs"
+              ],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "tirage-vertical-unilateral-cable",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": true,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "traction-assistee-machine",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": false,
+              "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "traction-assistee-unilaterale",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": true,
+              "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        }
+      ]
+    },
+    {
+      "scenario": "current_synthetic_context",
+      "input": {
+        "contract_version": "first-plan-request/1.0.0",
+        "as_of": "2026-11-05T12:00:00Z",
+        "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+        "blueprint": {
+          "contract_version": "body-training-blueprint/1.0.0",
+          "snapshot_id": "fixture-blueprint-v1",
+          "objective": {
+            "state": "KNOWN",
+            "value": "HYPERTROPHY",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "population_scope": {
+            "state": "KNOWN",
+            "value": "ADULT_NON_CLINICAL",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "sessions_per_week": {
+            "state": "KNOWN",
+            "value": 3,
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "session_budgets_minutes": {
+            "state": "KNOWN",
+            "value": [
+              60,
+              60,
+              60
+            ],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "experience": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "limitations": {
+            "state": "KNOWN",
+            "value": [],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "excluded_exercise_ids": {
+            "state": "KNOWN",
+            "value": [],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "declared_priorities": {
+            "state": "KNOWN",
+            "value": [
+              "shoulders"
+            ],
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "height_cm": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "weight_kg": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "legacy_weight_kg": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "observations": [],
+          "environment": {
+            "context_ref": "fixture-context",
+            "description": {
+              "state": "KNOWN",
+              "value": "Salle de sport",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              },
+              "conflicts": []
+            },
+            "equipment_items": {
+              "state": "UNKNOWN",
+              "value": null,
+              "provenance": {
+                "origin": "UNKNOWN",
+                "acquisition": "UNKNOWN",
+                "source_ref": null,
+                "recorded_at": null,
+                "measured_at": null
+              },
+              "conflicts": []
+            },
+            "exercise_confirmations": []
+          }
+        },
+        "policies": {
+          "state": "UNAVAILABLE",
+          "dose_id": null,
+          "time_id": null,
+          "selection_id": null,
+          "taxonomy_projection_id": null,
+          "review_ref": null
+        },
+        "versions": {
+          "catalogue": "auren-exercise-catalogue-v2-closure-2",
+          "zones": "zones-15-v1",
+          "credit": "sci-exposure-credit-v1",
+          "engine": "initial-policy-producer/1.0.0"
+        }
+      },
+      "results": [
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_calf_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "calf-press-leg-press",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "mollets-assis-machine",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "releves-mollets-debout",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "releves-mollets-debout-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_hinge_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "back-extension-45-paren-bias-ischios",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "romanian-deadlift-barre",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_BARBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "romanian-deadlift-halteres",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "good-morning-halteres",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "upper_back"
+              ],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Upper_back remains UNKNOWN because hold position unspecified. No claim anatomically shorter glute moment arm predicts inferior hypertrophy."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_lateral_delt_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "elevations-laterales-cable-paren-derriere-le-dos",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": true,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "elevations-laterales-halteres",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "elevations-laterales-halteres-assis",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "elevations-laterales-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "tirage-front-cable-paren-prise-large",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "upright-row-halteres",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "upper_back"
+              ],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_press_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "chest-press-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "developpe-couche-halteres",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "developpe-incline-halteres-30",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "dips-pectoraux-paren-buste-penche",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "incline-smith-press",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "SMITH_RESISTANCE",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "pompes",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_quad_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "fente-avant",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": true,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "hack-squat-machine",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "leg-extensions-assises",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "leg-press-paren-pieds-bas",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "reverse-nordic",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "squat-au-poids-du-corps",
+              "admission": "ADMITTED_AS_ALTERNATIVE",
+              "compatibility": "NOT_REQUIRED",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "BODYWEIGHT_REALISATION",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "squat-smith-machine-paren-pieds-avances",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "SMITH_RESISTANCE",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "leg-extension-cable-unilateral",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "hip_flexors"
+              ],
+              "unilateral": true,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Hip_flexors remains UNKNOWN because standing raised-thigh versus seated support changes demand. No side-load inference."
+            },
+            {
+              "candidate_id": "leg-press-paren-pieds-hauts-ecartes",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "hamstrings"
+              ],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Hamstrings UNKNOWN remains; high-wide hip-ROM and longitudinal glute-PRIMARY inference is not established. Preserve historical category for audit only; this variant is held, not admitted. No conservative categorical downgrade is fabricated."
+            },
+            {
+              "candidate_id": "sissy-squat-machine",
+              "admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Name does not settle resistance mode. No assumption that machine means stack or plates; no exact transfer from leg extension."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_row_v1",
+          "status": "CANDIDATES_AVAILABLE",
+          "reason": null,
+          "candidates": [
+            {
+              "candidate_id": "rowing-cable-assis-prise-neutre",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "rowing-cable-assis-prise-serree",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "rowing-chest-supported",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": false,
+              "calibration_mode": "MACHINE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            },
+            {
+              "candidate_id": "rowing-haltere-un-bras-paren-banc",
+              "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [],
+              "unilateral": true,
+              "calibration_mode": "FREE_DUMBBELL",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED"
+            }
+          ],
+          "held_candidates": [
+            {
+              "candidate_id": "rowing-cable-assis-prise-large",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "lats"
+              ],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        },
+        {
+          "curation_version": "initial-candidate-curation/1.0.0",
+          "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+          "intent_id": "initial_vertical_pull_v1",
+          "status": "CATALOG_GAP",
+          "reason": "NO_ADMISSIBLE_REALISATION",
+          "candidates": [],
+          "held_candidates": [
+            {
+              "candidate_id": "tirage-poulie-haute-prise-large",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "tirage-poulie-haute-prise-neutre",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "pecs"
+              ],
+              "unilateral": false,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "tirage-vertical-unilateral-cable",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": true,
+              "calibration_mode": "CABLE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "traction-assistee-machine",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": false,
+              "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            },
+            {
+              "candidate_id": "traction-assistee-unilaterale",
+              "admission": "INSUFFICIENT_EVIDENCE",
+              "compatibility": "UNKNOWN",
+              "unknown_roles": [
+                "rear_delts",
+                "pecs"
+              ],
+              "unilateral": true,
+              "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+              "calibration_facts": [
+                "DEVICE_OR_REALISATION_SPECIFIC",
+                "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+                "NO_GENERIC_LOAD_TRANSFER",
+                "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+                "EACH_SIDE_NO_LOAD_TRANSFER"
+              ],
+              "preparation_class": "CONTEXT_DEPENDENT",
+              "preparation_requirements": [
+                "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+                "CALIBRATION_REQUIRED",
+                "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+              ],
+              "rep_range_achievability": "UNCONFIRMED",
+              "hold_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles."
+            }
+          ],
+          "selected": null,
+          "execution_ready": false,
+          "ready_fixture": "NOT_PRODUCED"
+        }
+      ]
+    }
+  ]
+}
