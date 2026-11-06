@@ -1,0 +1,4001 @@
+{
+  "curation_version": "initial-candidate-curation/1.0.0",
+  "review_date": "2026-11-06",
+  "base_sha": "7e295c0e00aa6d00595efe4078e8d212ca61c869",
+  "runtime_availability": "NOT_SERVED",
+  "producer_binding": null,
+  "ready_fixture": "NOT_PRODUCED",
+  "source_sha256": {
+    "docs/science/sci-p02-initial-policy/admission-01/audit.json": "2b9f0cd1a9cfbf8cc2b0b816099e41af7385b1bfa335ff122c94b529b88732da",
+    "docs/science/sci-p02-initial-policy/admission-01/policy.json": "333e37d1642aa813bc76798caa7a36580d22c50964a9697dcb035e463054056a",
+    "docs/science/sci-p02-initial-policy/v1/policy.json": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
+    "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/exercise_catalogue.schema.json": "17d6fef7163cc5d0c9f185d5fa989a9f99cd8491ca01abfa1a9d83f3bcb4fe77",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "data/sci/evidence_registry.json": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+    "data/equipment_registry.json": "cb4abfabd38cc0317de566680315423da2d0851e642339aac9a46bdcd49def9d",
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa"
+  },
+  "regional_claims": {
+    "QUAD_EXTENSION_CONTEXT": {
+      "applies_to": [
+        "leg-extensions-assises",
+        "leg-extension-cable-unilateral",
+        "reverse-nordic",
+        "sissy-squat-machine"
+      ],
+      "statement": "Knee-extension realization and hip position matter to regional quadriceps interpretation. No exact cable/bodyweight/sissy outcome is inferred from a seated-machine trial.",
+      "evidence_refs": [
+        "EV-62",
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:34743671",
+        "PMID:41630124"
+      ],
+      "scope_limit": "Longitudinal result limited to tested machine/execution; other realizations use loaded-action anatomy only."
+    },
+    "QUAD_PRESS_CONTEXT": {
+      "applies_to": [
+        "leg-press-paren-pieds-bas",
+        "leg-press-paren-pieds-hauts-ecartes"
+      ],
+      "statement": "The verified press trial did not compare the two canonical foot-position variants. Glute/adductor/RF outcomes cannot be transferred a fortiori to a high-wide position.",
+      "evidence_refs": [
+        "EV-62",
+        "EV-64",
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:41630124"
+      ],
+      "scope_limit": "Hip-width/top-edge foot placement in trial; neither high-wide versus low-foot comparative effect established."
+    },
+    "HAMSTRING_HIP_EXTENSION_ONLY": {
+      "applies_to": [
+        "back-extension-45-paren-bias-ischios",
+        "good-morning-halteres",
+        "romanian-deadlift-barre",
+        "romanian-deadlift-halteres"
+      ],
+      "statement": "Hip-extension hamstring work does not establish knee-flexion or short-head completeness. No eighth slot added.",
+      "evidence_refs": [
+        "EV-66",
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:33009197",
+        "PMID:38857522"
+      ],
+      "scope_limit": "Curl and exercise-specific trials do not establish a single hinge as complete hamstring training."
+    },
+    "CALF_KNEE_POSITION": {
+      "applies_to": [
+        "calf-press-leg-press",
+        "mollets-assis-machine",
+        "releves-mollets-debout",
+        "releves-mollets-debout-machine"
+      ],
+      "statement": "Preserve knee-extended versus knee-flexed context: gastrocnemius responses can differ; seated soleus superiority is not established.",
+      "evidence_refs": [
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:38156065",
+        "DOI:10.1007/s42978-024-00299-4"
+      ],
+      "scope_limit": "Standing/seated study conditions; toe-press interpretation conditional on verified knee position. No universal calf ranking or equal regional response."
+    },
+    "LATERAL_RAISE_COMPARATOR": {
+      "applies_to": [
+        "elevations-laterales-cable-paren-derriere-le-dos",
+        "elevations-laterales-halteres",
+        "elevations-laterales-halteres-assis"
+      ],
+      "statement": "Cable/dumbbell comparison does not prove a profile-based hierarchy or directly validate behind-back low cable or seated bilateral variants.",
+      "evidence_refs": [
+        "EV-60",
+        "EV-65",
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:40692697"
+      ],
+      "scope_limit": "Trial unilateral cable around hand height and matched ROM; exact canonical variants not all tested."
+    },
+    "PRESS_ANGLE_LIMIT": {
+      "applies_to": [
+        "chest-press-machine",
+        "developpe-couche-halteres",
+        "developpe-incline-halteres-30",
+        "dips-pectoraux-paren-buste-penche",
+        "incline-smith-press",
+        "pompes"
+      ],
+      "statement": "Record press angle/context without assigning a regional hypertrophy percentage or inferring outcomes from acute EMG.",
+      "evidence_refs": [
+        "EV-70",
+        "EV-71"
+      ],
+      "bibliography_refs": [],
+      "scope_limit": "No universal angle ranking or exact DB30/Smith outcome extrapolation."
+    },
+    "ROW_TRAJECTORY": {
+      "applies_to": [
+        "rowing-cable-assis-prise-large",
+        "rowing-cable-assis-prise-neutre",
+        "rowing-cable-assis-prise-serree",
+        "rowing-chest-supported",
+        "rowing-haltere-un-bras-paren-banc"
+      ],
+      "statement": "Upper-back intent preserved; lat/rear-delt attribution depends on loaded action and actual elbow trajectory, not a back-thickness score.",
+      "evidence_refs": [
+        "EV-63",
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:18691376",
+        "PMID:30411350"
+      ],
+      "scope_limit": "Anatomy supports capacity, not an unspecified trajectory or exact force-sharing classification."
+    },
+    "VERTICAL_ROLE_GAP": {
+      "applies_to": [
+        "tirage-poulie-haute-prise-large",
+        "tirage-poulie-haute-prise-neutre",
+        "tirage-vertical-unilateral-cable",
+        "traction-assistee-machine",
+        "traction-assistee-unilaterale"
+      ],
+      "statement": "Lat-primary movement is defensible, but named pec/rear-delt roles remain unresolved under exact-exposure admission.",
+      "evidence_refs": [
+        "EV-70",
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "PMID:18691376",
+        "PMID:30411350"
+      ],
+      "scope_limit": "Moment arms/EMG do not settle categorical exposure of an unspecified grip/trajectory."
+    }
+  },
+  "candidates": [
+    {
+      "candidate_id": "fente-avant",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "lunge",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "knee_extension",
+        "hip_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "hamstrings",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "calves",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": true,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Free split stance; no external support stated.",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm each-side execution, balance, tolerance and target-range/effort feasibility before realization.",
+      "limitations": [
+        "Bodyweight only canonical identity; no automatic added load/assistance. Unilateral doubles side realizations, not work-set prescription.",
+        "Loaded front-leg knee extension supports quad intent; glute/adductor synergist exposure. No direct RF-specific outcome claim.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm each-side execution, balance, tolerance and target-range/effort feasibility before realization."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "hack-squat-machine",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "squat",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "knee_extension",
+        "hip_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-64"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-64"
+          ]
+        },
+        {
+          "zone": "hamstrings",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "calves",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_hack_squat"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Guided machine; back support described in catalogue notes, not a measured stability ranking.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm actual hack apparatus, load mechanism, support fit, ROM, stops and tolerance.",
+      "limitations": [
+        "EV-64 squat/press evidence corroborates hip extensors, not exact hack-variant outcomes; machine does not establish superior hypertrophy.",
+        "Quad primary; glute/adductor secondary by loaded knee/hip extension.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm actual hack apparatus, load mechanism, support fit, ROM, stops and tolerance."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-64",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "leg-extension-cable-unilateral",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "knee_extension",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "knee_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ],
+          "sub_regions": [
+            {
+              "id": "quads.rectus_femoris",
+              "basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-62",
+                "EV-71"
+              ]
+            }
+          ]
+        },
+        {
+          "zone": "hip_flexors",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": true,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "cable_anchor_low",
+        "cable_attachment_ankle_cuff"
+      ],
+      "support_setup": [
+        "REQUIRED_SUPPORT_UNSPECIFIED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Support and hip position UNKNOWN.",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+      "admission_reason": "Hip_flexors remains UNKNOWN because standing raised-thigh versus seated support changes demand. No side-load inference.",
+      "limitations": [
+        "Hip_flexors remains UNKNOWN because standing raised-thigh versus seated support changes demand. No side-load inference.",
+        "Quad primary and RF implication on anatomy; machine-extension trial is not cable trial.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Current-context low anchor and cuff confirmation; specify seated versus standing and thigh support without rewriting identity."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-62",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "QUAD_EXTENSION_CONTEXT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "leg-extensions-assises",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "knee_extension",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "knee_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "longitudinal_trial",
+          "evidence_refs": [
+            "EV-62",
+            "EV-71"
+          ],
+          "sub_regions": [
+            {
+              "id": "quads.rectus_femoris",
+              "basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-62"
+              ]
+            }
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_leg_extension"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Seated machine support; stack versus plates UNKNOWN.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm leg-extension apparatus, load mechanism, seat/axis/pad fit, tolerable ROM.",
+      "limitations": [
+        "No guarantee complete quad hypertrophy; hip angle, machine geometry and individual response matter.",
+        "RF-relevant knee extension; EV-62 direct machine evidence distinguishes RF from leg press.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm leg-extension apparatus, load mechanism, seat/axis/pad fit, tolerable ROM."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-62",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "QUAD_EXTENSION_CONTEXT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "leg-press-paren-pieds-bas",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "squat",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "knee_extension",
+        "hip_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-62",
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-64",
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-64",
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "hamstrings",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "calves",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_leg_press"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Back-supported press; machine mechanism unspecified.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm actual press, low-foot comfortable stance, ROM, stops and return procedure.",
+      "limitations": [
+        "Trial foot placement was hip-width at top edge; low-foot identity is not directly trialled. Use anatomy basis with longitudinal family corroboration.",
+        "Quad primary; meaningful glute/adductor synergy; no RF-equivalence claim.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm actual press, low-foot comfortable stance, ROM, stops and return procedure."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-62",
+        "EV-64",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "QUAD_PRESS_CONTEXT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "leg-press-paren-pieds-hauts-ecartes",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "squat",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "knee_extension",
+        "hip_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-62",
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-64",
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-64",
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "hamstrings",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "calves",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_leg_press"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Back-supported machine; stance does not prove hip ROM.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+      "admission_reason": "Hamstrings UNKNOWN remains; high-wide hip-ROM and longitudinal glute-PRIMARY inference is not established. Preserve historical category for audit only; this variant is held, not admitted. No conservative categorical downgrade is fabricated.",
+      "limitations": [
+        "Hamstrings UNKNOWN remains; high-wide hip-ROM and longitudinal glute-PRIMARY inference is not established. Preserve historical category for audit only; this variant is held, not admitted. No conservative categorical downgrade is fabricated.",
+        "Knee/hip extension supports quad and hip-extensor work; high-wide superiority and RF-equivalence unsupported.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm actual press and tolerable high-wide stance; require exposure uncertainty handling before initial realization."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-62",
+        "EV-64",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "QUAD_PRESS_CONTEXT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "reverse-nordic",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "knee_extension",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "knee_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ],
+          "sub_regions": [
+            {
+              "id": "quads.rectus_femoris",
+              "basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-62",
+                "EV-71"
+              ]
+            }
+          ]
+        },
+        {
+          "zone": "hip_flexors",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Kneeling bodyweight; free backward lean; mat optional comfort.",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm controlled kneeling lean with hip extension, tolerance, return and target-range/effort feasibility.",
+      "limitations": [
+        "No superiority ranking. New eccentric-only RF study is corroborative, not direct evidence for canonical concentric/eccentric execution; no silent assistance/loading variant.",
+        "Loaded knee extension and extended hip make RF anatomically relevant.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm controlled kneeling lean with hip extension, tolerance, return and target-range/effort feasibility."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-62",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "QUAD_EXTENSION_CONTEXT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "sissy-squat-machine",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "knee_extension",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "knee_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ],
+          "sub_regions": [
+            {
+              "id": "quads.rectus_femoris",
+              "basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-62",
+                "EV-71"
+              ]
+            }
+          ]
+        },
+        {
+          "zone": "hip_flexors",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_sissy_squat"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Feet/shins supported in catalogue notes; apparatus/load mechanism unresolved.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+      "admission_reason": "Name does not settle resistance mode. No assumption that machine means stack or plates; no exact transfer from leg extension.",
+      "limitations": [
+        "Name does not settle resistance mode. No assumption that machine means stack or plates; no exact transfer from leg extension.",
+        "Knee extension with maintained hip extension supports RF-relevant quad work by anatomy.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm exact apparatus and whether it is a support frame or loaded lever before deriving calibration class."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-62",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "QUAD_EXTENSION_CONTEXT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "squat-au-poids-du-corps",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "squat",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "knee_extension",
+        "hip_extension"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-64"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-64"
+          ]
+        },
+        {
+          "zone": "hamstrings",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "calves",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Unsupported bodyweight squat.",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm controlled tolerable squat and target-range/effort feasibility.",
+      "limitations": [
+        "No assumption bodyweight reaches inherited prescription; no silent external loading or invented progression.",
+        "Quad primary with glute/adductor secondary; no direct RF-equivalence claim.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm controlled tolerable squat and target-range/effort feasibility."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-64",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "squat-smith-machine-paren-pieds-avances",
+      "intent_id": "initial_quad_v1",
+      "movement_pattern": "squat",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "knee_extension",
+        "hip_extension",
+        "isometric_trunk_bracing"
+      ],
+      "roles": [
+        {
+          "zone": "quads",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-64"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-64"
+          ]
+        },
+        {
+          "zone": "hamstrings",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "calves",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "smith",
+      "equipment_requirements": [
+        "smith_rack"
+      ],
+      "support_setup": [
+        "SMITH_GUIDANCE"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Guided bar, back-loaded; support guidance does not remove trunk bracing.",
+      "calibration_mode": "SMITH_RESISTANCE",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm Smith instance including counterbalance, bar reference, foot placement, stops and controlled ROM.",
+      "limitations": [
+        "Smith-standard-squat regional trials do not establish feet-forward variant regional outcomes. No free-bar load transfer.",
+        "Knee/hip extension supports quad primary and hip-extensor secondary; RF differs from knee-extension work.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm Smith instance including counterbalance, bar reference, foot placement, stops and controlled ROM."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-61",
+        "EV-64",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "chest-press-machine",
+      "intent_id": "initial_press_v1",
+      "movement_pattern": "horizontal_push",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_horizontal_adduction",
+        "elbow_extension"
+      ],
+      "roles": [
+        {
+          "zone": "pecs",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "triceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_chest_press"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; externally constrained machine path; seat/back/handle geometry must be confirmed",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Horizontal adduction supports pec-primary; no machine hypertrophy advantage or regional allocation established."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm machine load mechanism, minimum load, increments, seat/handle adjustment, usable ROM and release."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "PRESS_ANGLE_LIMIT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "developpe-couche-halteres",
+      "intent_id": "initial_press_v1",
+      "movement_pattern": "horizontal_push",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_horizontal_adduction",
+        "elbow_extension"
+      ],
+      "roles": [
+        {
+          "zone": "pecs",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "triceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells",
+        "flat_bench_support"
+      ],
+      "support_setup": [
+        "BENCH_SUPPORT"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; bench-supported torso with independently controlled dumbbells",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Flat press pec-primary; no regional percentage or hypertrophy superiority inferred."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm flat bench, dumbbell pair, loading convention per hand, entry/exit handling and usable ROM."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "PRESS_ANGLE_LIMIT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "developpe-incline-halteres-30",
+      "intent_id": "initial_press_v1",
+      "movement_pattern": "horizontal_push",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_horizontal_adduction",
+        "shoulder_flexion",
+        "elbow_extension"
+      ],
+      "roles": [
+        {
+          "zone": "pecs",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "triceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells",
+        "incline_bench_support"
+      ],
+      "support_setup": [
+        "BENCH_SUPPORT"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; incline-bench-supported torso; independently controlled dumbbells",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "30-degree identity must remain explicit. Regional pec response may differ by angle; Chaves 44-degree barbell study is indirect and does not validate this exact angle/modality."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm 30-degree support/configuration, dumbbell pair, loading per hand and entry/exit handling."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "PRESS_ANGLE_LIMIT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "dips-pectoraux-paren-buste-penche",
+      "intent_id": "initial_press_v1",
+      "movement_pattern": "horizontal_push",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_flexion",
+        "shoulder_horizontal_adduction",
+        "elbow_extension"
+      ],
+      "roles": [
+        {
+          "zone": "pecs",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "triceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [
+        "dip_support"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; body suspended on dip supports; forward-lean configuration",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Pec-primary defensible for stated forward lean; does not establish inferior-pec hypertrophy superiority."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm dip supports and forward-lean execution; observe capacity to satisfy prescribed reps/RIR without assuming achievable load or adding assistance to this identity."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "PRESS_ANGLE_LIMIT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "incline-smith-press",
+      "intent_id": "initial_press_v1",
+      "movement_pattern": "horizontal_push",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_horizontal_adduction",
+        "shoulder_flexion",
+        "elbow_extension"
+      ],
+      "roles": [
+        {
+          "zone": "pecs",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "triceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "smith",
+      "equipment_requirements": [
+        "incline_bench_support",
+        "smith_rack"
+      ],
+      "support_setup": [
+        "SMITH_GUIDANCE",
+        "BENCH_SUPPORT"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; incline-bench torso support; bar constrained by Smith rails",
+      "calibration_mode": "SMITH_RESISTANCE",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Canonical notes describe 30-degree incline; preserve angle. Barbell44-degree regional study does not validate exact Smith30-degree effect."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm incline setup, rail geometry, stops/unrack, bar/counterweight conventions and load increments; no free-bar load transfer."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "PRESS_ANGLE_LIMIT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "pompes",
+      "intent_id": "initial_press_v1",
+      "movement_pattern": "horizontal_push",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_horizontal_adduction",
+        "elbow_extension",
+        "isometric_trunk_bracing"
+      ],
+      "roles": [
+        {
+          "zone": "pecs",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "triceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; bodyweight closed-chain press; self-supported trunk",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Pec-primary with indirect triceps/anterior-delts and minor trunk role; no universal bodyweight-to-load conversion."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Observe actual push-up capacity and tolerance at prescribed reps/RIR. Changed hand/body/assistance geometry requires an explicit variant rather than automatic identity substitution."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "PRESS_ANGLE_LIMIT"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "rowing-cable-assis-prise-large",
+      "intent_id": "initial_row_v1",
+      "movement_pattern": "horizontal_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_horizontal_abduction",
+        "scapular_retraction",
+        "elbow_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "upper_back",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "lateral_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "row_seated_station"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; seated cable resistance; wide grip; torso support not specified",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Wide row targets scapular retractors/rear delts. Lat role remains UNKNOWN because elbow angle/extension component is unspecified; do not manufacture interchangeability with close rows."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm actual wide handle, cable unit, torso movement, elbow trajectory and ROM; trajectory observation alone is not a validated role-threshold policy."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "ROW_TRAJECTORY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "rowing-cable-assis-prise-neutre",
+      "intent_id": "initial_row_v1",
+      "movement_pattern": "horizontal_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_extension",
+        "scapular_retraction",
+        "elbow_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "upper_back",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "row_seated_station",
+        "cable_attachment_close_neutral_row_handle"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; seated cable resistance; close neutral handle; torso support not specified",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Loaded shoulder extension supports lat overlap alongside upper-back target; no back-thickness or regional hypertrophy ranking."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm seated row station, close neutral handle, cable calibration convention and controlled shoulder-extension/scapular-retraction path."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "ROW_TRAJECTORY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "rowing-cable-assis-prise-serree",
+      "intent_id": "initial_row_v1",
+      "movement_pattern": "horizontal_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_extension",
+        "scapular_retraction",
+        "elbow_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "upper_back",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "row_seated_station",
+        "cable_attachment_close_neutral_row_handle"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; seated cable resistance; close neutral handle encoded in requirements",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Same encoded actions as neutral row; retain historical identity without deciding substitution equivalence."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm seated row station, encoded close neutral handle, cable calibration convention and intended close-row realization."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "ROW_TRAJECTORY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "rowing-chest-supported",
+      "intent_id": "initial_row_v1",
+      "movement_pattern": "horizontal_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_extension",
+        "shoulder_horizontal_abduction",
+        "scapular_retraction",
+        "elbow_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "upper_back",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_chest_supported_row"
+      ],
+      "support_setup": [
+        "CHEST_SUPPORT",
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; torso externally supported at chest on dedicated row machine",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Support describes setup only. Lat/rear-delt overlap depends loaded actions; no support-derived hypertrophy advantage."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm chest-pad/handle geometry, ROM, load mechanism/minimum/increments and release; do not assume selectorized stack."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "ROW_TRAJECTORY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "rowing-haltere-un-bras-paren-banc",
+      "intent_id": "initial_row_v1",
+      "movement_pattern": "horizontal_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_extension",
+        "scapular_retraction",
+        "elbow_flexion",
+        "isometric_trunk_bracing"
+      ],
+      "roles": [
+        {
+          "zone": "upper_back",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": true,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells",
+        "flat_bench_support"
+      ],
+      "support_setup": [
+        "BENCH_SUPPORT"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; one-arm dumbbell row with bench support and trunk bracing",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lat co-primary and elbow-flexor overlap anatomically defensible. Side-specific load/execution must be retained."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm dumbbell, bench support, shoulder-extension/retraction path; calibrate each side and specify whether prescribed sets apply per side."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "ROW_TRAJECTORY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "back-extension-45-paren-bias-ischios",
+      "intent_id": "initial_hinge_v1",
+      "movement_pattern": "hinge",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "hip_extension"
+      ],
+      "roles": [
+        {
+          "zone": "hamstrings",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [
+        "back_extension_45_support"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; 45-degree support required despite bodyweight resistance.",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm 45-degree support, hip-pad placement, knee-extended hip hinge, neutral-spine execution and target-range feasibility.",
+      "limitations": [
+        "Does not replace knee-flexion training; no RF/whole-hamstring completeness claim. Canonical bodyweight identity does not imply added plate.",
+        "Biarticular hamstrings load in hip extension; glute/adductor secondary. BF short head does not cross hip.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm 45-degree support, hip-pad placement, knee-extended hip hinge, neutral-spine execution and target-range feasibility."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-66",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "HAMSTRING_HIP_EXTENSION_ONLY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "good-morning-halteres",
+      "intent_id": "initial_hinge_v1",
+      "movement_pattern": "hinge",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "hip_extension",
+        "isometric_trunk_bracing"
+      ],
+      "roles": [
+        {
+          "zone": "hamstrings",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Standing unsupported hinge; dumbbell hold position UNKNOWN.",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "NOT_ADMITTED_FOR_INITIAL_SCOPE",
+      "admission_reason": "Upper_back remains UNKNOWN because hold position unspecified. No claim anatomically shorter glute moment arm predicts inferior hypertrophy.",
+      "limitations": [
+        "Upper_back remains UNKNOWN because hold position unspecified. No claim anatomically shorter glute moment arm predicts inferior hypertrophy.",
+        "Hip-extension hamstring work, not complete hamstring/knee-flexion coverage.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm dumbbell hold position and repeatable load reference before execution."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-66",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "HAMSTRING_HIP_EXTENSION_ONLY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "romanian-deadlift-barre",
+      "intent_id": "initial_hinge_v1",
+      "movement_pattern": "hinge",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "hip_extension",
+        "isometric_trunk_bracing"
+      ],
+      "roles": [
+        {
+          "zone": "hamstrings",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_barbell",
+      "equipment_requirements": [
+        "barbell"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Standing unsupported hinge with bar held close.",
+      "calibration_mode": "FREE_BARBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm implement, consistent load reference, hinge with slightly flexed stable knees, control and tolerance.",
+      "limitations": [
+        "No direct RDL trial in reused E0. Knee-flexion comparator trials do not prove RDL superiority/equivalence or complete head-specific hypertrophy. No bar/dumbbell load transfer.",
+        "Biarticular hip-extensor hamstring work; glute/adductor secondary; does not directly load BF short-head hip extension.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm implement, consistent load reference, hinge with slightly flexed stable knees, control and tolerance."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-66",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "HAMSTRING_HIP_EXTENSION_ONLY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "romanian-deadlift-halteres",
+      "intent_id": "initial_hinge_v1",
+      "movement_pattern": "hinge",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "hip_extension",
+        "isometric_trunk_bracing"
+      ],
+      "roles": [
+        {
+          "zone": "hamstrings",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "glutes",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "adductors",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "lats",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "abs",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Standing unsupported hinge with dumbbells along thighs.",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm implement, consistent load reference, hinge with slightly flexed stable knees, control and tolerance.",
+      "limitations": [
+        "No direct RDL trial in reused E0. Knee-flexion comparator trials do not prove RDL superiority/equivalence or complete head-specific hypertrophy. No bar/dumbbell load transfer.",
+        "Biarticular hip-extensor hamstring work; glute/adductor secondary; does not directly load BF short-head hip extension.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm implement, consistent load reference, hinge with slightly flexed stable knees, control and tolerance."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-66",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "HAMSTRING_HIP_EXTENSION_ONLY"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "tirage-poulie-haute-prise-large",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "pulldown_seated_station"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; seated overhead cable station with wide grip",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lat-primary defensible. Rear_delts and pecs remain UNKNOWN: generic anatomy establishes capacity, not categorical contribution at unspecified execution."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm station/handle, seat/thigh restraint, front-of-body path, grip, ROM and device-specific loading."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "VERTICAL_ROLE_GAP"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "tirage-poulie-haute-prise-neutre",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "pulldown_seated_station",
+        "cable_attachment_neutral_grip"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; seated overhead cable station with neutral grip",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Canonical shoulder-extension path supports rear-delt SECONDARY; pecs UNKNOWN remains. No lat-region superiority established by grip."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm neutral attachment, seat/restraint, sagittal shoulder-extension path and device-specific loading."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "VERTICAL_ROLE_GAP"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "tirage-vertical-unilateral-cable",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": true,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "pulldown_seated_station",
+        "cable_attachment_single_handle"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; one-arm overhead cable pull; seat/support and detailed trajectory to confirm",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain because relative role is unresolved across permitted paths."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm single handle, station/support, intended trajectory, side-specific calibration and per-side set semantics."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "VERTICAL_ROLE_GAP"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "traction-assistee-machine",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_assisted_pull_up"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; bodyweight plus externally provided machine assistance; support mechanism to confirm",
+      "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain. Assistance amount is not transferable cable load or known effective bodyweight."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm actual assistance mechanism/direction, setting units, support interface, grip, entry/exit and capacity at reps/RIR."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "VERTICAL_ROLE_GAP"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "traction-assistee-unilaterale",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "unilateral": true,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_assisted_pull_up"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; one-arm bodyweight pull plus machine assistance; apparatus must permit this realization",
+      "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain. Catalogue failure_safe is not a scientific safety guarantee for an unverified one-arm device."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm device explicitly permits unilateral assisted operation, controlled support/entry/exit, actual assistance units, each side capacity and per-side sets."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-63",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [
+        "VERTICAL_ROLE_GAP"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "elevations-laterales-cable-paren-derriere-le-dos",
+      "intent_id": "initial_lateral_delt_v1",
+      "movement_pattern": "shoulder_abduction",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "shoulder_abduction",
+        "scapular_upward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lateral_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": true,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "cable_anchor_low"
+      ],
+      "support_setup": [
+        "REQUIRED_SUPPORT_UNSPECIFIED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; unilateral low-cable raise with behind-body start; self-controlled path",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Abduction supports lateral-delt PRIMARY. Larsen2025 cable setup was not this low/behind-back variant; no exact longitudinal equivalence or superiority claim."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm low anchor, usable grip/attachment despite absence of mandatory handle token, behind-body start, cable alignment/ROM and each-side load."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "LATERAL_RAISE_COMPARATOR"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "elevations-laterales-halteres",
+      "intent_id": "initial_lateral_delt_v1",
+      "movement_pattern": "shoulder_abduction",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "shoulder_abduction",
+        "scapular_upward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lateral_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; standing independently controlled dumbbell raise",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Larsen2025 directly supports DB lateral-raise-family hypertrophy; unilateral controlled study is not exact bilateral equivalence. No superiority versus cables."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm dumbbells, per-hand load, arm plane/ROM and controlled repetitions without changing identity."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "LATERAL_RAISE_COMPARATOR"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "elevations-laterales-halteres-assis",
+      "intent_id": "initial_lateral_delt_v1",
+      "movement_pattern": "shoulder_abduction",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "shoulder_abduction",
+        "scapular_upward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lateral_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells",
+        "seated_support"
+      ],
+      "support_setup": [
+        "SEATED_SUPPORT"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; seated torso support; independently controlled dumbbells",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Abduction anatomy supports target. Standing unilateral trial supports exercise family only; no seated superiority or regional advantage established."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm seated support, per-hand load, arm plane/ROM and handle clearance."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "LATERAL_RAISE_COMPARATOR"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "elevations-laterales-machine",
+      "intent_id": "initial_lateral_delt_v1",
+      "movement_pattern": "shoulder_abduction",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "shoulder_abduction",
+        "scapular_upward_rotation"
+      ],
+      "roles": [
+        {
+          "zone": "lateral_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_lateral_raise"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; externally constrained shoulder-abduction device; pad and torso support design to confirm",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Anatomy supports lateral-delt target; cable-vs-DB trial does not validate machine equivalence. No machine superiority inferred."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm machine support/pad adjustment, available ROM, load mechanism/minimum/increments and release."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "tirage-front-cable-paren-prise-large",
+      "intent_id": "initial_lateral_delt_v1",
+      "movement_pattern": "shoulder_abduction",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_abduction",
+        "scapular_elevation",
+        "scapular_upward_rotation",
+        "elbow_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "lateral_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "cable_anchor_low",
+        "cable_attachment_straight_bar"
+      ],
+      "support_setup": [
+        "REQUIRED_SUPPORT_UNSPECIFIED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; wide-grip cable upright row with elbows leading; self-supported torso",
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Defensible intended loaded action and roles; context and personal calibration required before any future use.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Canonical wide-grip upright row, not face pull. Abduction supports lateral-delt target; upper-back and biceps overlap known anatomically. No direct hypertrophy advantage established."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance."
+      ],
+      "context_confirmation_kind": [
+        "Confirm actual wide straight-bar grip, low anchor, elbows-leading trajectory, tolerated ROM and cable load; review any reported shoulder intolerance."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "upright-row-halteres",
+      "intent_id": "initial_lateral_delt_v1",
+      "movement_pattern": "shoulder_abduction",
+      "joint_type": "multi_joint",
+      "loaded_joint_actions": [
+        "shoulder_abduction",
+        "scapular_elevation",
+        "elbow_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "lateral_delts",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "anterior_delts",
+          "role": "MINOR",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "free_weight_dumbbell",
+      "equipment_requirements": [
+        "dumbbells"
+      ],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; standing dumbbell upright row; grip width/trajectory unspecified",
+      "calibration_mode": "FREE_DUMBBELL",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "Target movement is defensible, but exact exposure remains blocked by unresolved named roles.",
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lateral-delt target defensible; upper_back remains UNKNOWN because canonical notes allow PRIMARY versus SECONDARY by configuration. Anatomy does not settle categorical magnitude."
+      ],
+      "invalidation_conditions": [
+        "Required current equipment/context cannot be confirmed.",
+        "User-reported incompatibility/intolerance prevents intended execution or requires review.",
+        "Actual candidate cannot satisfy inherited rep/RIR target with available load/assistance.",
+        "Exact-zone consumer still requires resolution of UNKNOWN roles."
+      ],
+      "context_confirmation_kind": [
+        "Confirm dumbbells, grip/trajectory and tolerated ROM; a future execution-specific role rule needs evidence/admission rather than default SECONDARY."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-60",
+        "EV-68",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "INSUFFICIENT",
+      "regional_claim_refs": [],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "calf-press-leg-press",
+      "intent_id": "initial_calf_v1",
+      "movement_pattern": "plantar_flexion",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "plantar_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "calves",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_leg_press"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Back-supported press with forefoot contact; return and foot-slip conditions matter.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm leg-press capability for forefoot plantar flexion, knee-extended execution, safe stop/exit and tolerance.",
+      "limitations": [
+        "Standing-machine outcome cannot transfer unchanged to press. Burke straight-leg toe press provides more direct medial-gastrocnemius corroboration. Catalogue failure_safe false requires setup review.",
+        "Knee-extended triceps surae work; gastrocnemius length differs from seated; soleus also acts.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm leg-press capability for forefoot plantar flexion, knee-extended execution, safe stop/exit and tolerance."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "CALF_KNEE_POSITION"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "mollets-assis-machine",
+      "intent_id": "initial_calf_v1",
+      "movement_pattern": "plantar_flexion",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "plantar_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "calves",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_seated_calf_raise"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Seated knee-pad machine; stack versus plates UNKNOWN.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm seated-calf apparatus, knee pad, resistance mechanism and knee-flexed execution.",
+      "limitations": [
+        "Do not claim soleus hypertrophy superiority; Kinoshita soleus similar and Burke equivocal. Not an interchangeable sole option when gastrocnemius exposure is required.",
+        "Soleus-relevant plantar flexion; knee flexion shortens gastrocnemius and limits equivalence to knee-extended whole-calf work.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm seated-calf apparatus, knee pad, resistance mechanism and knee-flexed execution."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "CALF_KNEE_POSITION"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "releves-mollets-debout",
+      "intent_id": "initial_calf_v1",
+      "movement_pattern": "plantar_flexion",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "plantar_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "calves",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "bodyweight",
+      "equipment_requirements": [],
+      "support_setup": [
+        "SELF_STABILISED"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Standing bodyweight, no required equipment.",
+      "calibration_mode": "BODYWEIGHT_REALISATION",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "NO_SILENT_LOAD_ASSISTANCE_OR_VARIANT_CHANGE"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_AS_ALTERNATIVE",
+      "admission_reason": "Confirm balanced knee-extended plantar flexion, tolerable ROM and target-range/effort feasibility.",
+      "limitations": [
+        "Canonical bilateral record; do not silently turn into unilateral, assisted or weighted version. Step optional by operator ruling; no full-stretch assumption.",
+        "Knee-extended plantar flexion loads calf group; exact loaded-machine response is not established for bilateral bodyweight.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm balanced knee-extended plantar flexion, tolerable ROM and target-range/effort feasibility."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "CALF_KNEE_POSITION"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    },
+    {
+      "candidate_id": "releves-mollets-debout-machine",
+      "intent_id": "initial_calf_v1",
+      "movement_pattern": "plantar_flexion",
+      "joint_type": "single_joint",
+      "loaded_joint_actions": [
+        "plantar_flexion"
+      ],
+      "roles": [
+        {
+          "zone": "calves",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "unilateral": false,
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_standing_calf_raise"
+      ],
+      "support_setup": [
+        "DEDICATED_STATION"
+      ],
+      "support_basis": "Catalogue item/name/execution description only; Standing shoulder-pad machine; mechanism unspecified.",
+      "calibration_mode": "MACHINE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Confirm standing-calf machine, shoulder-pad fit, knee-extended plantar flexion, stops and tolerable ROM.",
+      "limitations": [
+        "Kinoshita trained one leg per machine; bilateral canonical realization has no exact effect-size guarantee. No superiority claim independent of context.",
+        "Direct machine-family support for gastrocnemius/whole triceps surae distinction from seated; soleus also trained.",
+        "No default rank; conditional admission is not permission to execute."
+      ],
+      "invalidation_conditions": [
+        "USER_EXCLUDED",
+        "USER_REPORTED_INCOMPATIBILITY",
+        "CURRENT_CONTEXT_UNAVAILABLE",
+        "TARGET_RANGE_NOT_ESTABLISHED"
+      ],
+      "context_confirmation_kind": [
+        "Confirm standing-calf machine, shoulder-pad fit, knee-extended plantar flexion, stops and tolerable ROM."
+      ],
+      "confirmation_validity": "CURRENT_CONTEXT_ONLY_NO_TTL",
+      "evidence_refs": [
+        "EV-58",
+        "EV-70",
+        "EV-71"
+      ],
+      "evidence_certainty": "LOW_MODERATE",
+      "regional_claim_refs": [
+        "CALF_KNEE_POSITION"
+      ],
+      "role_review": "Canonical role categories retained. UNKNOWN remains unresolved; no claim of exact exposure or complete aesthetic coverage. Foot-specific press longitudinal bases corrected to joint_action_anatomy; high-wide disputed primary glute category not readmitted because candidate is held."
+    }
+  ]
+}

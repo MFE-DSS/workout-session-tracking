@@ -30,3 +30,15 @@ Mandat et plan : [admission-01.md](admission-01.md). Les cases précédentes sur
 - [x] Broad scientifique422/1ignoré, contrôles locaux, revue scientifique indépendante et appréciation code séparée sans Critical/Important.
 - [x] Publier la tranche d'admission : PR360, HEAD9ce991a, merge d5df6c6 ; CI PR42201392096 réussie. Les gates ouvertes du change restent conservées ; preuve canonique dans le reçu de clôture.
 - [ ] Curation admise, temps positif soutenu et binding complet avant une vraie fixture READY (suite non livrée).
+
+## SCI-P02-CANDIDATE-CURATION-01 — tranche de curation,6novembre2026
+
+Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résultat partiel ne ferme pas les gates globales de sélection/temps/READY.
+
+- [x] Conserver les hashes canoniques avant analyse et vérifier les primaires/réutilisation E0.
+- [x] Curer40candidats/sept intentions : dispositions, contexte, support, calibration et préparation sans chiffres inventés.
+- [x] Versionner matrice7×15 et delta :14UNKNOWN inchangés, deux corrections de base de preuve, aucun classement.
+- [x] Résolveur pur/strict et fixtures sans READY, TDD frontières et conflit à trois états.
+- [x] Broad scientifique445/1ignoré, contrôles et revues scientifique/code distinctes sans Critical/Important.
+- [ ] Publication, CI du HEAD final, merge et vérification canonique de cette seule opération.
+- [ ] Clôture traçable du spike ; préserver CATALOG_GAP et prochain besoin, aucun archivage global.
