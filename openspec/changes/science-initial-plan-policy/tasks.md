@@ -40,5 +40,5 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Versionner matrice7×15 et delta :14UNKNOWN inchangés, deux corrections de base de preuve, aucun classement.
 - [x] Résolveur pur/strict et fixtures sans READY, TDD frontières et conflit à trois états.
 - [x] Broad scientifique446/1ignoré, contrôles et revues scientifique/code distinctes sans Critical/Important.
-- [ ] Publication, CI du HEAD final, merge et vérification canonique de cette seule opération.
-- [ ] Clôture traçable du spike ; préserver CATALOG_GAP et prochain besoin, aucun archivage global.
+- [x] Publication PR362, HEADae01691, merge1c48301 ; CI PR42220266909 et canonique42222587746 réussies. Cette seule opération est livrée, sans admission complète ou READY.
+- [x] Documenter la clôture traçable du spike dans curation-01/VERIFICATION.md ; préserver CATALOG_GAP et prochain besoin, aucun archivage global. Publication du reçu suivie dans sa PR de closeout.
