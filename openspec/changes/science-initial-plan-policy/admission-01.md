@@ -23,7 +23,7 @@ Sortie isolée : borne des seuls repos connus, composantes manquantes, feasibili
 - [x] Tests RED du diagnostic pur `tools/science_initial_policy/time_feasibility.py::assess_time`, puis implémentation GREEN. Égalité, repos manquant, un seul set, structure appariée, entrées invalides ; gros budget ne donne jamais READY.
 - [x] Artefact de décision0.2.0 et audit reproductible des candidats/15zones via les vrais diagnostics1.0.0 ; tests des références, conventions/preuves et conservation des empreintes historiques.
 - [x] Fixtures de diagnostic, schémas/fixtures historiques inchangés ; broad scientifique, lint/budget/sécurité/protocole/OpenSpec selon check_scope.
-- [ ] Revue scientifique indépendante et jugement code séparé ; corrections démontrées, publication/CI sous GO permanent. Garder le change global ouvert tant que READY/runtime restent bloqués.
+- [x] Revue scientifique indépendante et jugement code séparé ; corrections démontrées, publication/CI sous GO permanent. Garder le change global ouvert tant que READY/runtime restent bloqués.
 
 ## Focus de revue
 
