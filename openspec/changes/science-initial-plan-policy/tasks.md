@@ -53,5 +53,5 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] TDD pure pinned loader/resolver and seven non-served fixtures;28targeted and474broad/1skip passed.
 - [x] Ruff/Bandit/budget264<=548/protocol/OpenSpec8/8 and historical fixture reproduction.
 - [x] Separate code review:0Critical/Important,2Minor deferred transparently; no scientific approval inferred from code/tests.
-- [ ] Publish final scoped HEAD, verify CI, merge under standing authorization and verify canonical.
-- [ ] Record this spike closeout only; no global science/PLAN/MOB03 closure or activation.
+- [x] Publish scoped PR364 HEADbf396b0, merge4bf5943 under standing authorization; CI42238025856 and canonical42249419776 succeeded,7411backend/3skip and676mobile+TS; PR Sonar OK, canonical ERROR advisory recorded.
+- [x] Record this spike closeout in pull-exposure-01/VERIFICATION.md; its publication/cleanup receipt is tracked in the closeout PR. No global science/PLAN/MOB03 closure or activation.

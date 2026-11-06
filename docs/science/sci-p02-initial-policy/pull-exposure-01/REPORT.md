@@ -1,6 +1,6 @@
 # SCI-P02-PULL-EXPOSURE-RESOLUTION-01
 
-6 November 2026. **PULL_EXPOSURE_PARTIALLY_RESOLVED / NOT_SERVED / READY_NOT_PRODUCED.** Scientific role admission reviewed; publication/CI results are recorded only after execution in VERIFICATION.md and the PR receipt.
+6 November 2026. **PULL_EXPOSURE_PARTIALLY_RESOLVED / NOT_SERVED / READY_NOT_PRODUCED.** This scoped spike is merged: PR364, HEADbf396b0, merge4bf5943; PR and canonical CI passed. Actual counts, advisory canonical Sonar ERROR and the separate closeout receipt are recorded in [VERIFICATION.md](VERIFICATION.md). Global science/PLAN/MOB03 gates remain open.
 
 ## Canonical state
 
