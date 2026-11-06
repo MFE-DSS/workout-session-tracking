@@ -42,3 +42,16 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Broad scientifique446/1ignoré, contrôles et revues scientifique/code distinctes sans Critical/Important.
 - [x] Publication PR362, HEADae01691, merge1c48301 ; CI PR42220266909 et canonique42222587746 réussies. Cette seule opération est livrée, sans admission complète ou READY.
 - [x] Documenter la clôture traçable du spike dans curation-01/VERIFICATION.md ; préserver CATALOG_GAP et prochain besoin, aucun archivage global. Publication du reçu suivie dans sa PR de closeout.
+
+## SCI-P02-PULL-EXPOSURE-RESOLUTION-01 -6November2026
+
+[Design/plan](pull-exposure-01.md). Prior curation is closed; additive overlay only. No shared-schema or READY gate amended.
+
+- [x] Verify five identities, nine vertical UNKNOWNs, actual G17 definition and current canonical source hashes.
+- [x] Fresh primary search, evidence types separated and existing E0/credit/consumer audit.
+- [x] Fresh scientific review: neutral/pecs qualified DERIVED SECONDARY approved; four candidates held, no other conversion.
+- [x] TDD pure pinned loader/resolver and seven non-served fixtures;28targeted and474broad/1skip passed.
+- [x] Ruff/Bandit/budget264<=548/protocol/OpenSpec8/8 and historical fixture reproduction.
+- [ ] Separate code review with no Critical/Important remaining.
+- [ ] Publish final scoped HEAD, verify CI, merge under standing authorization and verify canonical.
+- [ ] Record this spike closeout only; no global science/PLAN/MOB03 closure or activation.

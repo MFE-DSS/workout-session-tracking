@@ -1,0 +1,951 @@
+{
+  "overlay_version": "vertical-pull-exposure/1.0.0",
+  "parent_curation_version": "initial-candidate-curation/1.0.0",
+  "base_sha": "37d39bac4ff826daea1c21e97245e5720e58506c",
+  "review_date": "2026-11-06",
+  "scientific_review": "ACCEPTED",
+  "runtime_availability": "NOT_SERVED",
+  "producer_binding": null,
+  "ready_fixture": "NOT_PRODUCED",
+  "source_sha256": {
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/exercise_catalogue.schema.json": "17d6fef7163cc5d0c9f185d5fa989a9f99cd8491ca01abfa1a9d83f3bcb4fe77",
+    "data/sci/evidence_registry.json": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "data/sci/sources/identity_map.json": "82a8cac6e06356d7d0b2a578bf3c0169ec51294bc74c3227ed27803d50ddaec4",
+    "data/sci/sources/curation_reviewed.json": "aa14a6ec2adcb8b57a15d8252d8b7107e8bbb6d39147ab7ec5f9385eefb11354",
+    "data/exercise_knowledge_base.json": "0879fd2233c029c41bc169a78295ba0a9bbe6dbb39eb410194ffec66494707a3",
+    "data/reference_split.json": "3c41f44d1c17c5b74fa4b90c9f6f850c5931c1694bcd1b338430ab3608f79eae",
+    "scripts/generate_sci_catalogue.py": "5085ca2cd3b43e057db87f4033842fbddb3f65db087fb0fa06cabfe0c44326f0",
+    "docs/strategy/Sx_AUREN_SCIENTIFIC_ENGINE_V2_SPEC.md": "500c825dbdd906d0bc43a9e3f4413e5c0c174e32c267d8c0866b9c135c6e40b3",
+    "docs/strategy/Sx_SCI_V2_CATALOGUE_INTEGRATION_01_SPEC.md": "bc2a38d8b98db5c1a8fc8e6e38f785e3d9d5520574d2fe0ee033e2f181ca2d0b",
+    "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json": "d1a3f26268bcb33d3614ce3b4841a2dc42562541b39134646caabf9f37f37803",
+    "docs/science/sci-p02-initial-policy/curation-01/coverage-and-fixtures.v1.json": "e444c65b9ebbfbcf5e9658dda98668986ef2343ff292ef5c44e6d9924916ca6f",
+    "docs/science/sci-p02-initial-policy/v1/policy.json": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
+    "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
+    "docs/science/sci-p02-initial-policy/admission-01/policy.json": "333e37d1642aa813bc76798caa7a36580d22c50964a9697dcb035e463054056a",
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
+    "tools/science_initial_policy/curation.py": "341ba18ac6adeb178b0c0cf90d5a69a1783a77521f7ca24df4a6c1a0093453a5",
+    "tools/science_initial_policy/registry.py": "b693e527b83561099e5b5bf8c3eee85ab27fd49387cf66e3abadf5c8fee4924d",
+    "tools/science_initial_policy/producer.py": "c50bfab2c41bfbc12e00038aaf6db94deaf7ceaddf3050c4ff12b16b48835c67",
+    "app/services/sci_exposure.py": "05b81260f14f04e6ecd758a2e9f336090fc6c7b521a8b9b318459e5391180e6e"
+  },
+  "contract_decision": "CURRENT_CONTRACT_SUFFICIENT",
+  "credit_policy_ref": "sci-exposure-credit-v1",
+  "credit_interpretation": "CONVENTION_NOT_MEASURED_PHYSIOLOGICAL_FRACTION",
+  "role_delta": [
+    {
+      "candidate_id": "tirage-poulie-haute-prise-neutre",
+      "zone": "pecs",
+      "before": "UNKNOWN",
+      "after": "SECONDARY",
+      "claim": "In the defined G17 front neutral loaded-extension realization, the inferior/lower-costal portion of pectoralis can act as an extension synergist. Aggregating that contributing subregion to pecs SECONDARY is a qualitative EV-71 curation inference, not uniform regional action, whole-ROM agonism or a measured hypertrophy magnitude.",
+      "authority_type": "LOADED_JOINT_ACTION_FUNCTIONAL_ANATOMY",
+      "role_basis": "joint_action_anatomy",
+      "evidence_refs": [
+        "EV-71"
+      ],
+      "bibliography_refs": [
+        "ACKLAND2008",
+        "SPERANDEI2009"
+      ],
+      "limitations": [
+        "The same Ackland anatomical capacity was already documented in curation1.0 and judged insufficient. Reusing it without explaining the additional execution-specific reasoning would merely relabel prior uncertainty. New acute corroboration does not independently observe contract-level function.",
+        "Ackland tests elevation only to120degrees and represents subregions. Inferior PM has extensor leverage, while clavicular and middle PM differ; assigning the aggregated pecs zone SECONDARY requires a declared interpretation that a contributing subregion makes the zone a loaded synergist.",
+        "The closest bent-elbow V-bar result is abstract-only. Exact handle width, bar trajectory, torso angle, range, electrode region, and cable geometry cannot be asserted identical to the canonical G17 realization.",
+        "Positive extensor moment capacity plus surface EMG does not directly measure positive agonist mechanical work. Co-contraction/stabilization is possible. However, demanding direct force measurement from every synergist would exceed the present anatomy-based doctrine; the reviewer must judge whether the functional inference is sufficiently specific here.",
+        "Pectoralis is not the principal force generator of the canonical lat-primary task; secondary is an inference from loaded extension, not a claim of known meaningful chest hypertrophy dose or comparable growth to direct chest exercise.",
+        "The specific inference must be invalidated if current execution substitutes a substantially different plane, path, range, attachment, or loading configuration. Neither the name neutral nor a vague front pull licenses all possible executions."
+      ],
+      "reviewer_decision": "ACCEPTED",
+      "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+      "reassessment": "Targeted qualitative reassessment under existing EV-71 since curation1; no new longitudinal result or canonical G17 definition."
+    }
+  ],
+  "candidates": [
+    {
+      "candidate_id": "tirage-poulie-haute-prise-large",
+      "scientific_identity_id": "wide_grip_lat_pulldown",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "canonical_execution": null,
+      "execution_source": "CANONICAL_FIELDS_AND_SOURCE_CUES_INCOMPLETE",
+      "identity_assessment": "Wide pronated bilateral seated overhead cable; loaded shoulder adduction. Canonical_execution field does not fix front bar path; curation requires current front-of-body confirmation.",
+      "source_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "effective_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "zone_assessments": {
+        "pecs": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Middle/inferior PM adduction leverage is relevant.",
+            "ACUTE_RECRUITMENT": "Related front/wide-anterior bent-elbow pulldowns show PM activity. Exact width, torso angle and path are not automatically identical.",
+            "PLAUSIBLE_HYPERTROPHY": "Agonist tension plausible; no isolated longitudinal growth attribution identified.",
+            "ORDINAL_AUREN_ROLE": "Keep UNKNOWN in this bounded proposal. A future qualified SECONDARY argument could use loaded adduction, but cannot cure rear-delt/execution uncertainties by generalization."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008",
+            "SPERANDEI2009"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        },
+        "rear_delts": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Angle- and plane-dependent; do not state that posterior deltoid categorically cannot adduct.",
+            "ACUTE_RECRUITMENT": "Observed in pulldowns; bar path and trunk inclination change amplitude.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional on actual loaded function.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained: actual agonist versus stabilizing function insufficiently fixed across permitted execution."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008",
+            "SPERANDEI2009",
+            "BUONSENSO2025"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        }
+      },
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "HELD; execution qualification required. No behind-neck realization admitted implicitly. Lat PRIMARY interpretation stable for the intended adduction.",
+      "execution_requirements": [
+        "Actual front/behind path, humeral plane and device realization must not be invented.",
+        "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+      ],
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "pulldown_seated_station"
+      ],
+      "unilateral": false,
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "evidence_refs": [
+        "EV-71",
+        "EV-70"
+      ],
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lat-primary defensible. Rear_delts and pecs remain UNKNOWN: generic anatomy establishes capacity, not categorical contribution at unspecified execution.",
+        "HELD; execution qualification required. No behind-neck realization admitted implicitly. Lat PRIMARY interpretation stable for the intended adduction.",
+        "Anatomical capacity and acute activity do not measure hypertrophy amount or actual force sharing. No new credit coefficient."
+      ],
+      "reviewer_decision": "ACCEPTED",
+      "source_limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lat-primary defensible. Rear_delts and pecs remain UNKNOWN: generic anatomy establishes capacity, not categorical contribution at unspecified execution."
+      ],
+      "role_scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY"
+    },
+    {
+      "candidate_id": "tirage-poulie-haute-prise-neutre",
+      "scientific_identity_id": "neutral_grip_lat_pulldown",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "loaded_joint_actions": [
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "canonical_execution": "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+      "execution_source": "CANONICAL_CATALOGUE_OPERATOR_RULING",
+      "identity_assessment": "G17 explicitly defines front path, parallel neutral handle near shoulder width; canonical loaded shoulder extension. Historical identity ambiguity is resolved for this candidate.",
+      "source_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "effective_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "pecs",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        }
+      ],
+      "zone_assessments": {
+        "pecs": {
+          "source_role": "UNKNOWN",
+          "effective_role": "SECONDARY",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Inferior/lower-costal pectoralis can contribute an extensor moment to a flexed humerus; clavicular and other sternocostal subregions differ. This is not whole-ROM or whole-muscle equivalence.",
+            "ACUTE_RECRUITMENT": "Sperandei V-bar is related-family corroboration; exact geometry equivalence not established.",
+            "PLAUSIBLE_HYPERTROPHY": "Plausible loaded agonist tension; measured growth amount unavailable.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN to SECONDARY reviewed as a qualitative EV-71 loaded-extension synergist inference for the inferior/lower-costal contribution aggregated to pecs; no measured fraction or uniform regional growth."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008",
+            "SPERANDEI2009"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "REVIEWED_DERIVED_SYNERGIST",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        },
+        "rear_delts": {
+          "source_role": "SECONDARY",
+          "effective_role": "SECONDARY",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Clear extension leverage matches the canonical loaded action.",
+            "ACUTE_RECRUITMENT": "Buonsenso narrow-neutral condition records posterior-deltoid activity.",
+            "PLAUSIBLE_HYPERTROPHY": "Loaded extension makes contribution plausible; no measured growth magnitude.",
+            "ORDINAL_AUREN_ROLE": "Existing SECONDARY is defensible under anatomy doctrine; no role change proposed."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008",
+            "SPERANDEI2009",
+            "BUONSENSO2025"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "EXISTING_DERIVED_SYNERGIST",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        }
+      },
+      "initial_scope_admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+      "admission_reason": "Under the explicit G17 front neutral execution and verified loaded shoulder extension, inferior/lower-costal pectoralis can act as an extension synergist. The aggregate-zone SECONDARY is an explicit derived EV-71 curation judgment, not an EMG threshold, measured fraction, or homogeneous growth claim.",
+      "execution_requirements": [
+        "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+        "Actual loaded shoulder-extension realization, not a different path or a rowing substitution.",
+        "Current context, attachment and individual execution/calibration remain to confirm.",
+        "The role inference applies only when actual loaded humeral extension from flexion matches the canonical realization; equipment availability alone is insufficient."
+      ],
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "pulldown_seated_station",
+        "cable_attachment_neutral_grip"
+      ],
+      "unilateral": false,
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "evidence_refs": [
+        "EV-71",
+        "EV-70"
+      ],
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Anatomical capacity and acute activity do not measure hypertrophy amount or actual force sharing. No new credit coefficient.",
+        "Inferior/lower-costal pectoralis supplies the extensor inference; not all sternocostal fibres, not homogeneous regional growth or positive agonist work across the entire ROM.",
+        "The pecs aggregate denotes a contributing subregion under EV-71, not a known whole-muscle magnitude.",
+        "This is a targeted qualitative reassessment since curation1, not a new longitudinal result or a new G17 identity.",
+        "Effective roles are conditional scientific projections only: no observed user execution, current historical exposure or runtime credit is certified."
+      ],
+      "reviewer_decision": "ACCEPTED",
+      "source_limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Canonical shoulder-extension path supports rear-delt SECONDARY; pecs UNKNOWN remains. No lat-region superiority established by grip."
+      ],
+      "role_scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY"
+    },
+    {
+      "candidate_id": "tirage-vertical-unilateral-cable",
+      "scientific_identity_id": "unilateral_cable_pulldown",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "canonical_execution": "Tirage vertical à un bras, poignée simple (poignée D) ; coude tiré vers la hanche.",
+      "execution_source": "CANONICAL_CATALOGUE_OPERATOR_RULING",
+      "identity_assessment": "One-arm D-handle overhead cable pull, elbow toward hip. Detailed humeral plane and torso/cable geometry remain unfixed.",
+      "source_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "effective_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "zone_assessments": {
+        "pecs": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "One-shoulder adduction/extension capacity applies.",
+            "ACUTE_RECRUITMENT": "No direct canonical unilateral measurement identified; bilateral evidence is transfer only.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional on actual loaded trajectory.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained; no automatic category transfer."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        },
+        "rear_delts": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Extension capacity relevant where the realized path uses extension; plane dependent.",
+            "ACUTE_RECRUITMENT": "No direct canonical unilateral measurement identified.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional on actual loaded function.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained pending execution qualification."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        }
+      },
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "HELD. Preserve each-side calibration and per-side set semantics; no bilateral load equivalence.",
+      "execution_requirements": [
+        "Actual front/behind path, humeral plane and device realization must not be invented.",
+        "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+      ],
+      "equipment_mode": "cable",
+      "equipment_requirements": [
+        "pulldown_seated_station",
+        "cable_attachment_single_handle"
+      ],
+      "unilateral": true,
+      "calibration_mode": "CABLE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "evidence_refs": [
+        "EV-71",
+        "EV-70"
+      ],
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain because relative role is unresolved across permitted paths.",
+        "HELD. Preserve each-side calibration and per-side set semantics; no bilateral load equivalence.",
+        "Anatomical capacity and acute activity do not measure hypertrophy amount or actual force sharing. No new credit coefficient."
+      ],
+      "reviewer_decision": "ACCEPTED",
+      "source_limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain because relative role is unresolved across permitted paths."
+      ],
+      "role_scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY"
+    },
+    {
+      "candidate_id": "traction-assistee-machine",
+      "scientific_identity_id": "assisted_pull_up_machine",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "canonical_execution": null,
+      "execution_source": "CANONICAL_FIELDS_AND_SOURCE_CUES_INCOMPLETE",
+      "identity_assessment": "Bilateral bodyweight pull plus machine assistance; grip, support interface and assistance mechanism remain unspecified. Do not assume a stack.",
+      "source_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "effective_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "zone_assessments": {
+        "pecs": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Adduction/extension capacity is relevant to the intended movement.",
+            "ACUTE_RECRUITMENT": "Youdas and Urbanczyk studied unassisted bilateral variants; assistance changes demand and constraints.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional plausibility if actual assisted vertical pull remains loaded.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained; no unconditional conversion from unassisted recruitment."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008",
+            "YOUDAS2010",
+            "URBANCZYK2020",
+            "SNARR2017"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        },
+        "rear_delts": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Possible extension/depression contribution depends on trajectory.",
+            "ACUTE_RECRUITMENT": "Snarr and model are unassisted, not direct validation of the machine realization.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional on actual loaded function.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained pending actual execution/assistance confirmation."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008",
+            "YOUDAS2010",
+            "URBANCZYK2020",
+            "SNARR2017"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        }
+      },
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "HELD. Confirm assistance direction, mechanism, setting units, support and actual capacity. No effective-bodyweight calculation from an unverified setting.",
+      "execution_requirements": [
+        "Actual front/behind path, humeral plane and device realization must not be invented.",
+        "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+      ],
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_assisted_pull_up"
+      ],
+      "unilateral": false,
+      "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "evidence_refs": [
+        "EV-71",
+        "EV-70"
+      ],
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain. Assistance amount is not transferable cable load or known effective bodyweight.",
+        "HELD. Confirm assistance direction, mechanism, setting units, support and actual capacity. No effective-bodyweight calculation from an unverified setting.",
+        "Anatomical capacity and acute activity do not measure hypertrophy amount or actual force sharing. No new credit coefficient."
+      ],
+      "reviewer_decision": "ACCEPTED",
+      "source_limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain. Assistance amount is not transferable cable load or known effective bodyweight."
+      ],
+      "role_scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY"
+    },
+    {
+      "candidate_id": "traction-assistee-unilaterale",
+      "scientific_identity_id": "unilateral_assisted_pull_up",
+      "intent_id": "initial_vertical_pull_v1",
+      "movement_pattern": "vertical_pull",
+      "loaded_joint_actions": [
+        "shoulder_adduction",
+        "shoulder_extension",
+        "elbow_flexion",
+        "scapular_downward_rotation"
+      ],
+      "canonical_execution": null,
+      "execution_source": "CANONICAL_FIELDS_AND_SOURCE_CUES_INCOMPLETE",
+      "identity_assessment": "Canonical machine-assisted one-arm bodyweight pull; apparatus must explicitly permit this realization. Not half a bilateral pull.",
+      "source_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "effective_roles": [
+        {
+          "zone": "lats",
+          "role": "PRIMARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "biceps",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71",
+            "EV-63"
+          ]
+        },
+        {
+          "zone": "upper_back",
+          "role": "SECONDARY",
+          "role_basis": "joint_action_anatomy",
+          "evidence_refs": [
+            "EV-71"
+          ]
+        },
+        {
+          "zone": "rear_delts",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        },
+        {
+          "zone": "pecs",
+          "role": "UNKNOWN",
+          "role_basis": "unresolved",
+          "evidence_refs": []
+        }
+      ],
+      "zone_assessments": {
+        "pecs": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "One-shoulder capacity, with possible altered trunk rotation and assistance direction.",
+            "ACUTE_RECRUITMENT": "No direct canonical unilateral-assisted study identified.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional only; no matched growth evidence.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained; no bilateral unassisted category transfer."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        },
+        "rear_delts": {
+          "source_role": "UNKNOWN",
+          "effective_role": "UNKNOWN",
+          "levels": {
+            "ANATOMICAL_CAPACITY": "Plane-dependent capacity.",
+            "ACUTE_RECRUITMENT": "No direct canonical unilateral-assisted measurement identified.",
+            "PLAUSIBLE_HYPERTROPHY": "Conditional on actual loaded function.",
+            "ORDINAL_AUREN_ROLE": "UNKNOWN retained pending execution qualification."
+          },
+          "bibliography_refs": [
+            "ACKLAND2008"
+          ],
+          "longitudinal_hypertrophy": "UNAVAILABLE_FOR_CANDIDATE_ZONE",
+          "ordinal_decision": "CATEGORY_UNRESOLVED",
+          "credit_authority": "EXISTING_POLICY_ONLY_NOT_CALCULATED_HERE"
+        }
+      },
+      "initial_scope_admission": "INSUFFICIENT_EVIDENCE",
+      "admission_reason": "HELD; strongest transfer limitation. Device permission/support, controlled entry/exit and per-side calibration remain unresolved. Lat PRIMARY only interprets the intended loaded vertical-pull identity.",
+      "execution_requirements": [
+        "Actual front/behind path, humeral plane and device realization must not be invented.",
+        "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+      ],
+      "equipment_mode": "machine_unspecified",
+      "equipment_requirements": [
+        "machine_assisted_pull_up"
+      ],
+      "unilateral": true,
+      "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+      "calibration_facts": [
+        "DEVICE_OR_REALISATION_SPECIFIC",
+        "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+        "NO_GENERIC_LOAD_TRANSFER",
+        "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+        "EACH_SIDE_NO_LOAD_TRANSFER"
+      ],
+      "preparation_class": "CONTEXT_DEPENDENT",
+      "preparation_requirements": [
+        "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+        "CALIBRATION_REQUIRED",
+        "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+      ],
+      "rep_range_achievability": "UNCONFIRMED",
+      "evidence_refs": [
+        "EV-71",
+        "EV-70"
+      ],
+      "limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain. Catalogue failure_safe is not a scientific safety guarantee for an unverified one-arm device.",
+        "HELD; strongest transfer limitation. Device permission/support, controlled entry/exit and per-side calibration remain unresolved. Lat PRIMARY only interprets the intended loaded vertical-pull identity.",
+        "Anatomical capacity and acute activity do not measure hypertrophy amount or actual force sharing. No new credit coefficient."
+      ],
+      "reviewer_decision": "ACCEPTED",
+      "source_limitations": [
+        "No default selection order; admission does not imply best exercise.",
+        "No equipment availability, generic load transfer, exact load, minutes, medical screening, or READY inferred.",
+        "Support/setup descriptors do not establish hypertrophy outcomes.",
+        "Lats-primary supported; rear_delts/pecs UNKNOWN remain. Catalogue failure_safe is not a scientific safety guarantee for an unverified one-arm device."
+      ],
+      "role_scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY"
+    }
+  ]
+}
