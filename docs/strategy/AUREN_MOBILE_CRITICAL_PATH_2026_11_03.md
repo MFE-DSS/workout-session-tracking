@@ -2,7 +2,7 @@
 
 Source : roadmap et artefact de reprise transmis par l'opérateur dans la session Codex du 3 novembre.
 Ce document fixe l'ordre de pilotage ; chaque changement substantiel garde son cycle OpenSpec et sa PR.
-**Décision de livraison ultérieure — GOV-MOB03-SPLIT-01 :** socle compte/consommateurs de #353 susceptible de livraison séparée, [scission explicitement approuvée](MOB03_DELIVERY_SPLIT_AUTHORIZATION.md). **MOB03 complet reste ouvert** : propositions DATA/PLAN/RELEASE traçables, pas de premier plan ni effacement ou recette physique prétendus complets. Après socle accepté, MOB04 est préparé seulement ; ses capacités attendent leurs producteurs/gates.
+**Décision de livraison ultérieure — GOV-MOB03-SPLIT-01 :** socle compte/consommateurs de #353 livré au merge db37b76, CI PR et canonique réussies, [scission explicitement approuvée](MOB03_DELIVERY_SPLIT_AUTHORIZATION.md). **MOB03 complet reste ouvert** : propositions DATA/PLAN/RELEASE traçables, pas de premier plan ni effacement ou recette physique prétendus complets. Après socle accepté, MOB04 est préparé seulement ; ses capacités attendent leurs producteurs/gates.
 
 Il ne remplace aucun contrat visuel ou de domaine et ne crée aucune autorisation de merge/publication.
 
@@ -85,3 +85,7 @@ intégration documentaire et rebase de la proposition existante.
 ## Direction opérateur — composants visuels puis alimentation scientifique, 5 novembre
 
 Après le socle du critical path, enrichir les tranches successives par les composants consommateurs, leurs états inconnus et les emplacements d'assets, en suivant le manifeste et les baselines. Les prompts du workstream scientifique seront fournis par l'opérateur. Cette préparation n'autorise ni moteur fictif, ni donnée physiologique inventée, ni nouvelle identité. L'ouverture de chaque tranche et les validations de composition/rendu restent applicables ; le premier plan garde sa dépendance SCI-P01/P02. Préférences natives MOB-03 4.2 réalisées et acceptées ; correction sans inventaire acceptée. [CR courant PO/architecte](../MOB03_CR_PO_ARCHITECT_2026_11_05.md) : données/effacement, contrats du premier plan et preuves appareil restent ouverts. Le contexte matériel devra servir les propositions/substitutions ; aucune disponibilité complète ne se déduit d’une salle générique.
+
+## Préparation MOB04 après livraison du socle
+
+[Proposition MISSION](../proposals/mob04-mission.md) et [10fixtures non servies](../fixtures/mob04-mission.preparation.v1.json) préparées sans GO BUILD. Le socle est archivé séparément ; MOB03 complet conserve les gates DATA/PLAN/RELEASE, dont vrai premier READY et séance exécutable. Aucun déploiement ni recette physique déduits.

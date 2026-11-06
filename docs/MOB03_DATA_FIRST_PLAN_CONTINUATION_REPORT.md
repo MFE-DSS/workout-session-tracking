@@ -6,7 +6,7 @@
 
 ## Brainstorming / Options / Risques / Choix retenu
 
-Le [plan avant code](../openspec/changes/account-onboarding-native/data-first-plan-continuation.md) écarte DELETE users + confiance aveugle dans CASCADE et une table serveur de reçus sans politique. Approche retenue : domaine corporel existant, gardes non destructives, intentions clientes durables et consommateurs fermés sans producteur. Nouveau GET de poids proposé puis accepté explicitement (« Valider le GET de poids proposé »), sans writer ni écran.
+Le [plan avant code](../openspec/changes/archive/2026-11-06-account-onboarding-native/data-first-plan-continuation.md) écarte DELETE users + confiance aveugle dans CASCADE et une table serveur de reçus sans politique. Approche retenue : domaine corporel existant, gardes non destructives, intentions clientes durables et consommateurs fermés sans producteur. Nouveau GET de poids proposé puis accepté explicitement (« Valider le GET de poids proposé »), sans writer ni écran.
 
 ## Implémenté dans cette continuation
 

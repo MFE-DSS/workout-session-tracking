@@ -25,11 +25,11 @@ Ancien état immuable : commit `d41eb2f49257d233b8b0adac94af6299d4c0e3ad`, `open
 |6.5| RELEASE02–06| Recettes physiques, force-kill/clavier/accessibilité intégralement ouvertes |
 |Rapports/itérations supplémentaires historiques| Socle pour code/preuves acquis ; mêmes DATA/PLAN/RELEASE pour leurs réserves | Les anciennes cases globales ouvertes ne sont pas converties en succès par scission |
 
-Propositions réservées, sans nouveaux changes/PR actifs : [DATA](../../../docs/proposals/account-data-activation.md), [PLAN](../../../docs/proposals/blueprint-first-session-runtime.md), [RELEASE](../../../docs/proposals/account-native-release-acceptance.md). Elles deviendront chacune un OpenSpec/revue/PR distinct avant leur futur apply. Leur stockage comme documents de proposition dans #353 conserve un seul change actif/PR de code, et ne fait pas chevaucher les implémentations.
+Propositions réservées, sans nouveaux changes/PR actifs : [DATA](../../../../docs/proposals/account-data-activation.md), [PLAN](../../../../docs/proposals/blueprint-first-session-runtime.md), [RELEASE](../../../../docs/proposals/account-native-release-acceptance.md). Elles deviendront chacune un OpenSpec/revue/PR distinct avant leur futur apply. Leur stockage comme documents de proposition dans #353 conserve un seul change actif/PR de code, et ne fait pas chevaucher les implémentations.
 
 ## Statuts distincts
 
-- **Socle account-onboarding-native** : susceptible de clôture uniquement après revue/CI finale et merge canonique vérifiés.
+- **Socle account-onboarding-native** : clos après revue/CI finale, merge db37b76 et CI canonique42129145012 réussis ; seules les suites explicitement listées restent ouvertes.
 - **MOB03 complet** : toujours ouvert sur DATA/PLAN/RELEASE ; aucune première séance personnalisée ou suppression réellement disponible déduite.
 - **Release/Store/déploiement** : non autorisés/non acceptés par cette décision.
 - **MOB04** : préparation de specs/fixtures après livraison autorisée du socle ; pas de GO BUILD implicite.
