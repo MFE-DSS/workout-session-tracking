@@ -36,11 +36,11 @@
 
 **Interfaces:** ContextKey, Setting, CalibrationEvent, CalibrationEpisode are strict frozen Pydantic records. `context_digest(context: ContextKey) -> str`; `calibrate(episode: CalibrationEpisode | dict, *, min_reps: int, max_reps: int) -> dict`. Result has state, observed_setting, reference_event_id/source_ref, load_kg/load_mode projection, effort_sufficiency UNKNOWN, confidence/limitations/reasons, automatic_next_action, version. No load increase/decrease.
 
-- [ ] Write RED tests for C01–C06 and L01–L15 with independent literal observations, including file roundtrip and no source mutation. Example: known context/no history => NEEDS_CALIBRATION/load_kg null; accepted40kg×10 trial with explicit familiarization/no concerns => CALIBRATED/reference exact40kg, not a calculated target.
-- [ ] Run `python -m pytest -q tests/test_science_load_calibration.py`; Expected: behavioral failures for absent API, not collection errors.
-- [ ] Implement strict finite/unit/context/event validation, dedupe and replay; current sourced confirmations required; pending/unknown safety signals stay nonpositive; blocked predecessor never revived by a string restart ref.
-- [ ] Run targeted plus broad `python -m pytest -q tests/test_science_load_calibration.py tests/test_science_blueprint_first_plan_contracts.py tests/test_science_initial_plan_policy.py`. Expected: all pass, only existing dependency warnings.
-- [ ] Required local static checks on new files, then commit scoped task with tests. task-done records the final broad command/result.
+- [x] Write RED tests for C01–C06 and L01–L15 with independent literal observations, including file roundtrip and no source mutation. Example: known context/no history => NEEDS_CALIBRATION/load_kg null; accepted40kg×10 trial with explicit familiarization/no concerns => CALIBRATED/reference exact40kg, not a calculated target.
+- [x] Run `python -m pytest -q tests/test_science_load_calibration.py`; Expected: behavioral failures for absent API, not collection errors.
+- [x] Implement strict finite/unit/context/event validation, dedupe and replay; current sourced confirmations required; pending/unknown safety signals stay nonpositive; blocked predecessor never revived by a string restart ref.
+- [x] Run targeted plus broad `python -m pytest -q tests/test_science_load_calibration.py tests/test_science_blueprint_first_plan_contracts.py tests/test_science_initial_plan_policy.py`. Expected: all pass, only existing dependency warnings.
+- [x] Required local static checks on new files, then commit scoped task with tests. task-done records the final broad command/result.
 
 ### Task 2: Component timing and structured configuration constraints
 
