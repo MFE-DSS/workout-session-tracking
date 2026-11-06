@@ -1,0 +1,169 @@
+{
+  "policy_version": "initial-hypertrophy-policy/0.2.0-partially-admitted",
+  "supersedes_for_review": "initial-hypertrophy-policy/0.1.0-proposed",
+  "review_date": "2026-11-06",
+  "admission_state": "PARTIALLY_ADMITTED",
+  "runtime_availability": "NOT_SERVED",
+  "artifact_role": "SCIENTIFIC_DECISIONS_NOT_EXECUTABLE_POLICY",
+  "ready_eligible": false,
+  "engine_binding": null,
+  "admission": {
+    "scope": "ADMITTED_WITH_LIMITS",
+    "dose": "ADMITTED_AS_CONSERVATIVE_DEFAULT",
+    "selection": "NOT_ADMITTED",
+    "taxonomy_projection": "ADMITTED_WITH_LIMITS",
+    "time": "STRUCTURAL_BOUND_ONLY"
+  },
+  "evidence_mechanism": "data/sci/evidence_registry.json",
+  "new_bibliography": "EVIDENCE.md; unpromoted sources are not runtime evidence authority",
+  "rules": [
+    {
+      "rule_id": "scope",
+      "value": {
+        "cadences": [
+          2,
+          3
+        ],
+        "structure": "FULL_BODY",
+        "intentions": 7
+      },
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_WITH_LIMITS",
+      "basis": "PRODUCT_SCOPE",
+      "evidence_refs": [
+        "EV-04",
+        "EV-11"
+      ],
+      "general_evidence_certainty": "MODERATE",
+      "exact_value_certainty": "NOT_APPLICABLE",
+      "limitations": "Permissible restricted scope, not comparative superiority or comprehensive direct training of every zone. Two versus three repeats changes weekly volume, not only frequency.",
+      "review_trigger": "Different cadence/population, clinical need or unresolved limitation; coverage amendment."
+    },
+    {
+      "rule_id": "work_sets",
+      "value": 2,
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_AS_CONSERVATIVE_DEFAULT",
+      "basis": "CONVENTION",
+      "evidence_refs": [
+        "EV-01",
+        "EV-04",
+        "EV-10"
+      ],
+      "general_evidence_certainty": "MODERATE",
+      "exact_value_certainty": "INSUFFICIENT",
+      "limitations": "Per-intention bootstrap only, not individual minimum/optimum or proof whole session is conservative. 14 physical work sets/session, 28 or 42/week; overlapping exposure counted separately.",
+      "review_trigger": "Tolerance, adherence, observed performance/effort or poor response; no automatic adaptation rule admitted."
+    },
+    {
+      "rule_id": "repetitions",
+      "value": [
+        8,
+        12
+      ],
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_AS_CONSERVATIVE_DEFAULT",
+      "basis": "CONVENTION",
+      "evidence_refs": [
+        "EV-80"
+      ],
+      "general_evidence_certainty": "MODERATE",
+      "exact_value_certainty": "INSUFFICIENT",
+      "limitations": "Convenient moderate repetition range, not universal optimum, not inferred 8–12RM or known starting load. Bodyweight/unilateral realization needs calibration.",
+      "review_trigger": "Cannot achieve range with acceptable execution; calibrated equipment/load range unavailable."
+    },
+    {
+      "rule_id": "effort",
+      "value": {
+        "rir_target": 2.0
+      },
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_AS_CONSERVATIVE_DEFAULT",
+      "basis": "CONVENTION",
+      "evidence_refs": [
+        "EV-14",
+        "EV-15",
+        "EV-16"
+      ],
+      "general_evidence_certainty": "MODERATE",
+      "exact_value_certainty": "INSUFFICIENT",
+      "limitations": "Behavioral non-failure target, not measured actual RIR; exact optimum unsupported, experience unknown reduces interpretability. No requirement to reach failure to calibrate.",
+      "review_trigger": "RIR misunderstanding, form degradation, repeated range/effort mismatch; review instruction/calibration."
+    },
+    {
+      "rule_id": "rest",
+      "value": {
+        "multi_joint": 120,
+        "single_joint": 90
+      },
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_AS_CONSERVATIVE_DEFAULT",
+      "basis": "CONVENTION",
+      "evidence_refs": [
+        "EV-54",
+        "EV-55"
+      ],
+      "general_evidence_certainty": "LOW_MODERATE",
+      "exact_value_certainty": "INSUFFICIENT",
+      "limitations": "Initial prescribed defaults, not class-specific biological optima; may need longer. Never shorten to force time fit. Structural calculation is conditional on respecting the prescription.",
+      "review_trigger": "Insufficient recovery/work quality or infeasible budget; reassess, do not silently compress."
+    },
+    {
+      "rule_id": "load",
+      "value": {
+        "mode": "CALIBRATION_REQUIRED",
+        "load_kg": null
+      },
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_WITH_LIMITS",
+      "basis": "EPISTEMIC_CONSTRAINT",
+      "evidence_refs": [
+        "EV-58",
+        "EV-80"
+      ],
+      "general_evidence_certainty": "NOT_APPLICABLE",
+      "exact_value_certainty": "NOT_APPLICABLE",
+      "limitations": "No mass/height/sex formula or generic exercise transfer; a concrete calibration/execution protocol remains necessary. Missing anthropometry is not a plan blocker by itself.",
+      "review_trigger": "Exercise/equipment/context change, limitations, inability to perform target range."
+    },
+    {
+      "rule_id": "candidates",
+      "value": "PRIMARY + pattern + canonical identity + distinct assignment + context",
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "NOT_ADMITTED",
+      "basis": "CATALOGUE_AUDIT",
+      "evidence_refs": [
+        "EV-10",
+        "EV-60",
+        "EV-62",
+        "EV-70",
+        "EV-71"
+      ],
+      "general_evidence_certainty": "LOW",
+      "exact_value_certainty": "NOT_APPLICABLE",
+      "limitations": "Current filters do not establish stability, individual suitability, knee/hip regional coverage or complete exposure. All vertical-pull options carry UNKNOWN roles; no arbitrary replacement.",
+      "review_trigger": "Curated candidate-specific roles/constraints/stability and context protocol reviewed."
+    },
+    {
+      "rule_id": "time",
+      "value": "REST_ONLY_STRUCTURAL_FLOOR",
+      "population": "ADULT_NON_CLINICAL, hypertrophy, 2 or 3 sessions/week; limitations explicitly answered, no unresolved limitation supported here",
+      "decision": "ADMITTED_WITH_LIMITS",
+      "basis": "DERIVED",
+      "evidence_refs": [
+        "EV-54"
+      ],
+      "general_evidence_certainty": "NOT_APPLICABLE",
+      "exact_value_certainty": "NOT_APPLICABLE",
+      "limitations": "Arithmetic bound only for sequential nonoverlapping sets; no full duration or positive fit prediction, no READY from this method. Work/warmup/operations/person timing unknown.",
+      "review_trigger": "Superset, changed prescription or new supported contextual timing observations."
+    }
+  ],
+  "blocking": [
+    "CANDIDATE_CONTEXT_AND_COVERAGE_REVIEW",
+    "CATALOGUE_UNKNOWN_ROLES",
+    "NO_SUPPORTED_POSITIVE_TIME_FEASIBILITY",
+    "NO_ADMITTED_EXECUTABLE_POLICY_BINDING"
+  ],
+  "individual_response": "NOT_ESTIMATED"
+}
