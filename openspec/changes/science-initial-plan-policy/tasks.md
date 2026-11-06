@@ -28,5 +28,5 @@ Mandat et plan : [admission-01.md](admission-01.md). Les cases précédentes sur
 - [x] Implémenter en TDD un diagnostic de borne des repos ; UNKNOWN au-delà, aucun READY.
 - [x] Conserver0.1.0 et ses onze sorties à l'octet ; versionner les décisions0.2.0 partielles et la compatibilité v1.
 - [x] Broad scientifique422/1ignoré, contrôles locaux, revue scientifique indépendante et appréciation code séparée sans Critical/Important.
-- [ ] Publier la tranche d'admission et vérifier sa CI réelle sans fermer les gates ouvertes du change.
+- [x] Publier la tranche d'admission : PR360, HEAD9ce991a, merge d5df6c6 ; CI PR42201392096 réussie. Les gates ouvertes du change restent conservées ; preuve canonique dans le reçu de clôture.
 - [ ] Curation admise, temps positif soutenu et binding complet avant une vraie fixture READY (suite non livrée).
