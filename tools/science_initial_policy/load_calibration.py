@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
-from tools.science_initial_policy.calibration_time_contracts import CalibrationEpisode
+from tools.science_initial_policy.calibration_time_contracts import (
+    CalibrationEpisode,
+    normalized_record,
+)
 
 PROTOCOL_VERSION = "initial-load-calibration/1.0.0"
 
@@ -103,8 +106,7 @@ def calibrate(episode: CalibrationEpisode | dict, *, min_reps: int, max_reps: in
             raise ValueError("prescribed repetition bounds must be positive integers")
     if min_reps > max_reps:
         raise ValueError("repetition bounds reversed")
-    data = episode.model_dump(mode="json") if isinstance(episode, CalibrationEpisode) else episode
-    ep = CalibrationEpisode.model_validate(data)
+    ep = CalibrationEpisode.model_validate(normalized_record(episode))
     events = sorted({e.event_id: e for e in ep.events}.values(), key=lambda e: e.sequence)
     if ep.availability == "UNAVAILABLE" or any(e.kind == "EQUIPMENT_UNAVAILABLE" for e in events):
         return _result(ep, "UNAVAILABLE", "EXERCISE_UNAVAILABLE_IN_CONTEXT")

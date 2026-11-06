@@ -494,3 +494,45 @@ def test_changed_equipment_context_invalidates_timing_even_for_same_kg_and_event
         event["context_fingerprint"] = digest(ep["context"])
     out = produce(raw, reg)
     assert all("SCOPE_MISMATCH" in t["uncertainty"] for t in out["time_by_session"])
+
+
+@pytest.mark.parametrize("mutation", ["derived_acquisition", "context_missing", "equipment_missing", "load_unknown", "availability_unknown", "availability_unavailable"])
+def test_incomplete_or_derived_context_does_not_qualify_g17_overlay(mutation):
+    load, produce, _, _ = api()
+    reg = load()
+    raw = add_observations(evaluation(reg), reg)
+    ep = raw["episodes"][4]
+    if mutation == "derived_acquisition":
+        ep["context_provenance"]["acquisition"] = "DERIVED"
+    elif mutation == "context_missing":
+        ep["context"]["context_ref"] = None
+    elif mutation == "equipment_missing":
+        ep["context"]["equipment_ref"] = None
+    elif mutation == "load_unknown":
+        ep["context"]["load_semantics"] = "UNKNOWN"
+    else:
+        ep["availability"] = "UNKNOWN" if mutation.endswith("unknown") else "UNAVAILABLE"
+    for event in ep["events"]:
+        event["context_fingerprint"] = digest(ep["context"])
+    slot = slot_for(produce(raw, reg), "initial_vertical_pull_v1")
+    assert next(r["role"] for r in slot["roles"] if r["zone"] == "pecs") == "UNKNOWN"
+    assert slot["role_application"] == "SOURCE_ROLE_QUALIFICATION_UNCONFIRMED"
+
+
+def test_qualified_realization_does_not_require_completed_load_calibration():
+    load, produce, _, _ = api()
+    reg = load()
+    raw = add_observations(evaluation(reg), reg)
+    raw["episodes"][4]["events"] = []
+    slot = slot_for(produce(raw, reg), "initial_vertical_pull_v1")
+    assert slot["calibration"]["state"] == "NEEDS_CALIBRATION"
+    assert next(r["role"] for r in slot["roles"] if r["zone"] == "pecs") == "SECONDARY"
+
+
+def test_generated_schema_and_fixture_bytes_are_versioned_without_drift():
+    generator = importlib.import_module("tools.science_initial_policy.v2_fixtures")
+    directory = ROOT / generator.DIRECTORY
+    files = generator.artifacts()
+    assert all((directory / name).read_bytes() == content for name, content in files.items())
+    manifest = json.loads((directory / "ARTIFACT_MANIFEST.json").read_text())
+    assert manifest["sha256"] == {name: hashlib.sha256(content).hexdigest() for name, content in files.items()}

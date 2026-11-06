@@ -28,3 +28,15 @@ Le [paquet d'admission](INITIAL_POLICY_ADMISSION.md) distingue preuves disponibl
 ## Vérification et livraison
 
 Les preuves locales, revues distinctes, SHA de publication, CI du HEAD, merge et contrôle canonique seront consignés après exécution dans le reçu de PR et le closeout ; aucune réussite distante n'est anticipée ici.
+
+## Revues et décisions de réalisation
+
+Revues fraîches distinctes : scientifique et code, sans réécriture par leurs agents. Trois Important acceptés puis corrigés en un passage RED→GREEN : G17 depuis contexte complet/direct/disponible, ordre repos entre séries en horloge commune, validation récursive de modèles imbriqués (charge négative/unité non supportée/non-fini). Le rejeu temporel invalide aussi les snapshots d'appareil/préparation périmés. Pas de nouvelle admission scientifique déduite de ces corrections.
+
+Trois Minor différés : ancien historique seul étiqueté en cours plutôt qu'à calibrer (sans charge fournie) ; égalité booléen/nombre tolérée par la comparaison de résultats (le vérificateur retourne néanmoins la décision canonique recalculée) ; borne basse de composante inutilisée quand sa borne haute manque (UNKNOWN conservateur). Aucun de ces constats n'autorise READY ; ils restent des conditions de durcissement du futur adaptateur/admission, pas des réussites maquillées.
+
+Arbitrages de l'agent, avec coût explicite : consommer les enregistrements curation/pull validés sans réécrire l'engine v2 en v1 (risque de divergence d'éligibilité, couvert en tests) ; privilégier confirmation actuelle puis absence de matériel requise puis inconnu (ordre opérationnel à réadmettre, pas supériorité scientifique) ; publier rôles qualitatifs et séries physiques sans crédit d'hypertrophie G17 chiffré (projection future toujours à admettre).
+
+Les limites écartées par les deux reviewers restent assumées comme ouvertes : optimalité/sécurité clinique globale (aucune promesse), validité prédictive du temps (READY bloqué), autorité de reprise après préoccupation (registre vide), authentification/consentement/complétude des sources externes (adaptateur futur), UI/API/persistance/rail/déploiement (hors scope), nouvelles conclusions musculaires/admission des candidats retenus (non rouvertes). Chaque coût est un travail futur explicite. La vérification du HEAD/CI/merge est une responsabilité de livraison de l'agent, pas une approbation implicite des reviewers.
+
+Vérification locale finale après corrections : **431tests backend ciblés/broad passants** (14modules, deux avertissements de dépendances), dont129nouveaux cas de calibration/temps/intégration ; pas de full sweep local ISOLATED. Ruff fichiers neufs, budget264≤548, Bandit ciblé, protocole documentaire et OpenSpec strict8/8 passants. Douze fixtures et deux schémas reproduits,37sources pinées et11sorties v1 préservées ; Gitleaks du diff sans fuite. Les contrôles distants restent à vérifier sur le HEAD publié, pas déduits de ces preuves locales.

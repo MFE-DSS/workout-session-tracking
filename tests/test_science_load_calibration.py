@@ -271,3 +271,21 @@ def test_unknown_context_acquisition_does_not_prove_availability():
     raw = calibrated_episode()
     raw["context_provenance"]["acquisition"] = "UNKNOWN"
     assert api()(raw, min_reps=8, max_reps=12)["state"] == "INSUFFICIENT_DATA"
+
+
+@pytest.mark.filterwarnings("ignore:Pydantic serializer warnings:UserWarning")
+@pytest.mark.parametrize("updates", [{"value": -40.0}, {"unit": "lb"}, {"value": float("nan")}])
+@pytest.mark.parametrize("construct", [False, True])
+def test_nested_model_copies_in_raw_dict_cannot_bypass_setting_validation(updates, construct):
+    from tools.science_initial_policy.calibration_time_contracts import CalibrationEpisode
+    model = CalibrationEpisode.model_validate(calibrated_episode())
+    data = calibrated_episode()
+    original = model.events[2].setting
+    forged_setting = original.model_copy(update=updates)
+    if construct:
+        forged_setting = type(original).model_construct(**(original.model_dump() | updates))
+    data["events"][0] = model.events[0].model_copy(update={"setting": forged_setting})
+    data["events"][2] = model.events[2].model_copy(update={"setting": forged_setting})
+    run = api()
+    with pytest.raises(ValueError):
+        run(data, min_reps=8, max_reps=12)

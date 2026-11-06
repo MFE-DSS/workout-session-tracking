@@ -36,6 +36,16 @@ def content_digest(value: object) -> str:
     return hashlib.sha256(encoded.encode()).hexdigest()
 
 
+def normalized_record(value):
+    """Revalidate nested typed instances too, including unchecked model_copy edits."""
+    def encode(item):
+        if isinstance(item, BaseModel):
+            return item.model_dump(mode="json")
+        raise TypeError("observation records must be JSON values or Pydantic records")
+
+    return json.loads(json.dumps(value, default=encode, allow_nan=False))
+
+
 def context_digest(context: ContextKey) -> str:
     return content_digest(context.model_dump(mode="json"))
 

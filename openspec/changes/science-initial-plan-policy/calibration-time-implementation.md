@@ -66,7 +66,7 @@
 - [x] Implement strict complete-input/result verification, real per-session calibration/time and canonical status precedence. None of policy labels, operational calibration, experimental fits or large budgets creates READY. Generate cases from the actual producer, not expected JSON stubs.
 - [x] Run three new modules, existing scientific contracts/producer/admission/curation/pull and slot/exposure/planner consumers (scoped broad). Expected: all pass, source/fixture hashes stable. Run Ruff/Bandit/budget/protocol/OpenSpec per check_scope, fixture generation check and secret scan of new artefacts.
 - [x] Record exact scientific NOT_ADMITTED or actual earned admission, narrow remaining blocker and preparation for SCI-P02-INITIAL-POLICY-ADMISSION. Commit task and task-done evidence.
-- [ ] Independent scientific review separate from whole-branch code review, fix in-scope Critical/Important with RED→GREEN and scoped suites. Record rulings/minors without claiming global safety/biology review.
+- [x] Independent scientific review separate from whole-branch code review, fix in-scope Critical/Important with RED→GREEN and scoped suites. Record rulings/minors without claiming global safety/biology review.
 - [ ] Push single scoped PR, verify final HEAD/base/mandatory CI/Sonar, merge commit with expected SHA under standing GO; canonical verification, scoped closeout PR and cleanup of owned integrated work only. Keep global science/MOB03 open. No deployment.
 
 ## Self-review

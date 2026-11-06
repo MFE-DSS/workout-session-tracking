@@ -312,6 +312,28 @@ def _pending_calibration():
     }
 
 
+def _qualified_realization(ep):
+    """Direct complete context is necessary; completing load calibration is not."""
+    p, c = ep.context_provenance, ep.context
+    return (
+        ep.availability == "AVAILABLE"
+        and all(
+            getattr(c, key) is not None
+            for key in (
+                "canonical_exercise_id",
+                "context_ref",
+                "equipment_ref",
+                "realization_ref",
+            )
+        )
+        and c.load_semantics != "UNKNOWN"
+        and c.side != "UNKNOWN"
+        and p.origin in {"USER_REPORTED", "USER_OBSERVED"}
+        and p.source_ref is not None
+        and p.acquisition in {"DECLARED", "DEVICE_MEASURED", "EXECUTION_LOG"}
+    )
+
+
 def _draft_slot(value, bundle, intent, selected, alternatives, slot_id, calibrations, blockers):
     calibration, roles, row, qualified, ep = _pending_calibration(), [], None, False, None
     if selected is not None:
@@ -320,12 +342,7 @@ def _draft_slot(value, bundle, intent, selected, alternatives, slot_id, calibrat
         ep = _episode_for(identity, value, bundle)
         if ep is not None:
             calibration = calibrations[context_digest(ep.context)]
-            p = ep.context_provenance
-            qualified = (
-                p.origin in {"USER_REPORTED", "USER_OBSERVED"}
-                and p.source_ref is not None
-                and p.acquisition != "UNKNOWN"
-            )
+            qualified = _qualified_realization(ep)
         roles = thaw(row["effective_roles"] if qualified else row["source_roles"])
         if selected["compatibility"] == "UNKNOWN":
             blockers.append(
@@ -348,11 +365,13 @@ def _draft_slot(value, bundle, intent, selected, alternatives, slot_id, calibrat
         "source_kind": "PROPOSED_NOT_EXECUTABLE",
         "dose_source_ref": bundle.dose["source_version"],
         "calibration_fingerprint": content_digest(calibration),
-        "execution_scope_fingerprint": content_digest({
-            "selected": selected,
-            "realization_ref": row["realization_ref"] if row else None,
-            "episode_context": ep.context.model_dump(mode="json") if ep else None,
-        }),
+        "execution_scope_fingerprint": content_digest(
+            {
+                "selected": selected,
+                "realization_ref": row["realization_ref"] if row else None,
+                "episode_context": ep.context.model_dump(mode="json") if ep else None,
+            }
+        ),
     }
     return {
         "slot_id": slot_id,

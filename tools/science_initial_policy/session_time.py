@@ -14,6 +14,7 @@ from tools.science_initial_policy.calibration_time_contracts import (
     Record,
     _check_time,
     content_digest,
+    normalized_record,
 )
 from tools.science_initial_policy.time_feasibility import assess_time
 
@@ -146,12 +147,34 @@ def _validate_components(session, raw_components, expected, rests, scope):
     return sorted(components, key=lambda c: c.coverage_key), issues
 
 
-def _clock_sum(components):
+def _clock_order(session, components):
+    """Preserve the prescribed traditional work/rest sequence on a common clock."""
+    rows = {c.coverage_key: c for c in components}
+    previous_work_end = rows["session/prep"].end_seconds
+    for slot in session.slots:
+        prefix = slot.slot_id
+        sets = slot.prescription["work_sets"]
+        first = rows[f"{prefix}/work/1"]
+        if rows[f"{prefix}/prep"].end_seconds > first.start_seconds or previous_work_end > first.start_seconds:
+            return False
+        for n in range(1, sets):
+            work, rest, following = (rows[f"{prefix}/{key}"] for key in (
+                f"work/{n}", f"rest/{n}", f"work/{n + 1}",
+            ))
+            if work.end_seconds > rest.start_seconds or rest.end_seconds > following.start_seconds:
+                return False
+        previous_work_end = rows[f"{prefix}/work/{sets}"].end_seconds
+    return True
+
+
+def _clock_sum(session, components):
     if not components or any(
         c.clock_ref is None or c.start_seconds is None or c.end_seconds is None
         or c.lower_seconds is None or c.upper_seconds != c.lower_seconds for c in components
     ) or len({c.clock_ref for c in components}) != 1:
         return None, None, ["CLOCK_SCOPE_UNKNOWN"]
+    if not _clock_order(session, components):
+        return None, None, ["PRESCRIBED_CLOCK_ORDER_CONFLICT"]
     spans = [(_decimal(c.start_seconds), _decimal(c.end_seconds), c.kind) for c in components]
     if any(
         min(a[1], b[1]) > max(a[0], b[0])
@@ -173,9 +196,9 @@ def _clock_sum(components):
     return total, overlap, []
 
 
-def _total(components, layout):
+def _total(session, components, layout):
     if layout == "COMMON_CLOCK":
-        seconds, overlap, issues = _clock_sum(components)
+        seconds, overlap, issues = _clock_sum(session, components)
         return seconds, seconds, overlap, issues
     if layout != "DISJOINT_SEQUENTIAL":
         return None, None, None, ["OVERLAP_NOT_SPECIFIED"]
@@ -204,8 +227,7 @@ def assess_session_time(
     Arithmetic positives are experimental/product-conditional diagnostics, never
     Duration ESTIMATED or a scientific claim of individual completion probability.
     """
-    raw = session.model_dump(mode="json") if isinstance(session, TimeSession) else session
-    s = TimeSession.model_validate(raw)
+    s = TimeSession.model_validate(normalized_record(session))
     normalized = s.model_dump(mode="json")
     floor_result = assess_time(normalized, budget_minutes, structure)
     scope = content_digest({"session": normalized, "structure": structure})
@@ -221,7 +243,7 @@ def assess_session_time(
         issues.append("UNILATERAL_TIME_SCOPE_UNRESOLVED")
     low, high, overlap = None, None, None
     if not issues:
-        low, high, overlap, layout_issues = _total(rows, layout)
+        low, high, overlap, layout_issues = _total(s, rows, layout)
         issues.extend(layout_issues)
     floor = floor_result["known_rest_floor_seconds"]
     if "UNILATERAL_TIME_SCOPE_UNRESOLVED" in issues:

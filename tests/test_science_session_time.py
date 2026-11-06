@@ -295,3 +295,31 @@ def test_two_prescribed_rest_periods_cannot_overlap_to_shrink_the_total():
         p.update(clock_ref="clock", start_seconds=float(start), end_seconds=float(end))
     out = api()(s, budget_minutes=3, components=pieces, layout="COMMON_CLOCK")
     assert out["ordinal"] == "UNKNOWN"
+
+
+@pytest.mark.parametrize("placement", ["rest_before_work", "rest_after_work", "work_reversed", "preparation_after_work"])
+def test_common_clock_preserves_between_set_rest_and_work_preparation_order(placement):
+    pieces = time_components()
+    spans = {
+        "rest_before_work": [(0, 0), (0, 10), (70, 80), (10, 70), (80, 90), (90, 100)],
+        "rest_after_work": [(0, 0), (0, 10), (10, 20), (30, 90), (20, 30), (90, 100)],
+        "work_reversed": [(0, 0), (0, 10), (80, 90), (20, 80), (10, 20), (30, 40)],
+        "preparation_after_work": [(0, 0), (80, 90), (0, 10), (10, 70), (70, 80), (20, 30)],
+    }[placement]
+    for p, (start, end) in zip(pieces, spans, strict=True):
+        p.update(clock_ref="synthetic:clock", start_seconds=float(start), end_seconds=float(end))
+    out = api()(time_session(), budget_minutes=2, components=pieces, layout="COMMON_CLOCK")
+    assert out["ordinal"] == "UNKNOWN"
+    assert out["upper_seconds"] is None
+    assert "PRESCRIBED_CLOCK_ORDER_CONFLICT" in out["uncertainty"]
+
+
+@pytest.mark.filterwarnings("ignore:Pydantic serializer warnings:UserWarning")
+def test_nested_typed_slot_is_revalidated_at_dict_boundary():
+    from tools.science_initial_policy.session_time import TimeSlot
+    s = time_session()
+    slot = TimeSlot.model_validate(s["slots"][0]).model_copy(update={"unilateral": "false"})
+    s["slots"] = [slot]
+    run = api()
+    with pytest.raises(ValueError):
+        run(s, budget_minutes=2, components=[])
