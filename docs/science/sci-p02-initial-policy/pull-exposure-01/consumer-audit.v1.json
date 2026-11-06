@@ -1,0 +1,1129 @@
+{
+  "audit": "SCI-P02-PULL-EXPOSURE-RESOLUTION-01 contract/consumer audit",
+  "kind": "READ_ONLY_AUDIT_NOT_SCIENTIFIC_OR_CODE_REVIEW",
+  "base_sha": "37d39bac4ff826daea1c21e97245e5720e58506c",
+  "worktree": "/private/tmp/auren-sci-p02-pull-exposure-01",
+  "scope": {
+    "repository_edits": false,
+    "code_or_tests_written": false,
+    "tests_executed": false,
+    "reason": "Parent delegated source/consumer audit only; no local verification suite or scientific source research owned here.",
+    "qa_secrets_read": false,
+    "rtk": "RTK.md absent from supplied worktree; no inferred instructions from another worktree."
+  },
+  "decision": {
+    "existing_partial_unknown_support": true,
+    "catalogue_contract_sufficient_for_scoped_primary_use": true,
+    "current_initial_curation_contract_sufficient_for_admission_with_unknown_ancillaries": false,
+    "first_plan_v1_ready_with_unknown_ancillaries_allowed": false,
+    "minimal_option": "Additive versioned non-served epistemic/primary-intent diagnostic, preserving role UNKNOWN and all old hashes. Separate scientifically supported primary intent from unresolved ancillary accounting. Do not claim this grants old-v1 admission or removes old-v1 CATALOG_GAP.",
+    "amendment_boundary": "Accepting nonblocking ancillary UNKNOWN into the initial admissible set requires an explicit versioned curation/admission-gate decision; it does not itself require changing the catalogue enum. Allowing an executable READY with partial exposure additionally requires an explicit FirstPlan version/semantics amendment. Neither binding nor READY is owned by the present spike."
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "claim": "Catalogue publication already admits incomplete exposure vectors: reviewed + at least one resolved PRIMARY suffices; UNKNOWN blocks use of that zone as PRIMARY and marks vector incomplete, rather than invalidating other primary zones.",
+      "refs": [
+        "data/sci/exercise_catalogue.schema.json:595-645",
+        "data/sci/exercise_catalogue.schema.json:803-830",
+        "scripts/validate_sci_catalogue.py:430-449"
+      ]
+    },
+    {
+      "id": "F2",
+      "claim": "Scientific historical exposure already supports partial accounting: known roles accumulate resolved_credit, UNKNOWN increments unknown_sets; affected zone MINIMUM. Unknown identity makes every zone MINIMUM. Execution uncertainty remains a separate exact_evidence guard. These are non-served read-only modules.",
+      "refs": [
+        "app/services/sci_exposure.py:18-26",
+        "app/services/sci_exposure.py:136-185",
+        "tests/test_sci_exposure.py:188-228",
+        "tests/test_sci_exposure.py:259-286"
+      ]
+    },
+    {
+      "id": "F3",
+      "claim": "The exact-exposure INITIAL admission blocker is narrower and stricter: curation1.0.0 refuses any eligible candidate with any UNKNOWN; resolver admits only ELIGIBLE reviewed dispositions. All five vertical candidates remain held, so old curation CATALOG_GAP is correct under its own contract.",
+      "refs": [
+        "tools/science_initial_policy/curation.py:180-181",
+        "tools/science_initial_policy/curation.py:212-273",
+        "tests/test_science_candidate_curation.py:129-135"
+      ]
+    },
+    {
+      "id": "F4",
+      "claim": "Initial producer planning already selects by primary zone + pattern, independent of ancillary-role completeness, but its non-executable diagnostics null credit/mark UNKNOWN for each unknown exposure and append CATALOG_GAP. This diagnostic choice is not catalogue-wide biology and is independent of the later curation overlay, which the producer does not import.",
+      "refs": [
+        "tools/science_initial_policy/planning.py:61-115",
+        "tools/science_initial_policy/planning.py:131-200",
+        "tools/science_initial_policy/producer.py:101-123"
+      ]
+    },
+    {
+      "id": "F5",
+      "claim": "FirstPlan v1 can structurally represent incomplete exposure, with exposure_complete=false and bounds LOWER_BOUND or UNKNOWN. UNKNOWN requires null credited_sets; EXACT rejects unknown_role_sets. LOWER_BOUND currently has no strong extra model invariant: do not treat mere DTO acceptance as scientifically validated accounting. READY additionally requires exposure_complete=true, which requires all 15 EXACT zones.",
+      "refs": [
+        "tools/science_contracts/blueprint_first_plan_v1.py:391-439",
+        "tools/science_contracts/blueprint_first_plan_v1.py:675-709",
+        "docs/science/sci-p01-p02/CONTRACT.md:85-103"
+      ]
+    },
+    {
+      "id": "F6",
+      "claim": "validate_exchange validates fingerprint, versioned references, input assessment, policy authority/status precedence, canonical identity/context, exclusions, cadence, time, prescribed totals and READY. It does not recompute all source muscle roles/credits: this remains producer responsibility. A new overlay must not exploit this responsibility boundary to claim false exact exposure.",
+      "refs": [
+        "tools/science_contracts/blueprint_first_plan_v1.py:493-554",
+        "tools/science_contracts/blueprint_first_plan_v1.py:618-733",
+        "docs/science/sci-p01-p02/CONTRACT.md:91-103"
+      ]
+    },
+    {
+      "id": "F7",
+      "claim": "Producer1.0.0 always emits candidate_plan=null and POLICY_UNAVAILABLE unless required input precedence changes status; registry approved_policy_refs is empty. Source/policy hashes are pinned. New science artefact cannot make this producer READY or silently update its source snapshots.",
+      "refs": [
+        "tools/science_initial_policy/producer.py:17-26",
+        "tools/science_initial_policy/producer.py:71-98",
+        "tools/science_initial_policy/registry.py:38-80"
+      ]
+    },
+    {
+      "id": "F8",
+      "claim": "Coverage matrix distinguishes DIRECT, INDIRECT_KNOWN, MINOR_KNOWN, UNKNOWN, NONE_KNOWN; NONE_KNOWN means no listed role rather than zero physiology. Admissible counts are based on old eligible dispositions. Do not drop UNKNOWN or compute a false completeness score from absence.",
+      "refs": [
+        "tools/science_initial_policy/curation_fixtures.py:12-47",
+        "tools/science_initial_policy/curation_fixtures.py:71-95",
+        "tests/test_science_candidate_curation.py:258-273"
+      ]
+    },
+    {
+      "id": "F9",
+      "claim": "Legacy slot/coverage/product modules use 11-zone body_zone_source and exercise_properties taxonomy, rather than SCI 15-zone catalogue. SlotIntent identifies programming target, not exact recruitment. Legacy set-contribution-v1 gives unclassified/no-role no credit, whereas SCI UNKNOWN remains explicitly unknown. Do not transfer this older accounting convention into SCI.",
+      "refs": [
+        "app/services/slot_intent.py:198-214",
+        "app/services/morpho_program_generator.py:169-202",
+        "app/services/set_contribution.py:14-27",
+        "app/services/set_contribution.py:132-147",
+        "app/services/zone_exposure.py:22-32",
+        "tests/test_sci_exposure.py:259-286"
+      ]
+    },
+    {
+      "id": "F10",
+      "claim": "SCI credit coefficients PRIMARY1/SECONDARY0.5/MINOR0/UNKNOWN sentinel are accounting policy, not per-muscle physiology, hypertrophic percentages or a valid mapping from acute EMG. E0 EV-08/09/10 distinguishes measured comparison and conventional mapping; EV-70/71 forbids EMG-only PRIMARY and specifies role authority. No coefficient change is needed for an epistemic annotation.",
+      "refs": [
+        "data/sci/exposure_credit_policy.json:1-12",
+        "data/sci/evidence_registry.json:30-40",
+        "data/sci/evidence_registry.json:266-272",
+        "app/services/sci_catalogue.py:137-167",
+        "docs/strategy/Sx_SCI_V2_CATALOGUE_INTEGRATION_01_SPEC.md:203-228"
+      ]
+    },
+    {
+      "id": "F11",
+      "claim": "Mobile FirstPlanClient has no default producer/endpoint and fails NOT_SERVED by default. It checks pinned structural schemas and fingerprint/engine then delegates scientific validity to trusted producer.verify(validate_exchange). Its READY guard alone checks approved request/reviewed plan, not all 15 exact bounds; schema alone cannot certify the semantics. Future v2 integration must preserve this trusted verification and fail closed on unsupported versions/keywords.",
+      "refs": [
+        "clients/mobile/src/api/firstPlan.ts:1-20",
+        "clients/mobile/src/api/firstPlan.ts:28-58",
+        "clients/mobile/src/api/scienceSchema.ts:1-24",
+        "clients/mobile/src/api/firstPlan.test.ts:75-95"
+      ]
+    }
+  ],
+  "canonical_five": [
+    {
+      "candidate_id": "tirage-poulie-haute-prise-large",
+      "source_file": "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json",
+      "line": 2659,
+      "primary_zones": [
+        "lats"
+      ],
+      "unknown_zones": [
+        "rear_delts",
+        "pecs"
+      ],
+      "old_disposition": "INSUFFICIENT_EVIDENCE",
+      "calibration_mode": "CABLE_UNSPECIFIED"
+    },
+    {
+      "candidate_id": "tirage-poulie-haute-prise-neutre",
+      "source_file": "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json",
+      "line": 2763,
+      "primary_zones": [
+        "lats"
+      ],
+      "unknown_zones": [
+        "pecs"
+      ],
+      "old_disposition": "INSUFFICIENT_EVIDENCE",
+      "calibration_mode": "CABLE_UNSPECIFIED"
+    },
+    {
+      "candidate_id": "tirage-vertical-unilateral-cable",
+      "source_file": "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json",
+      "line": 2870,
+      "primary_zones": [
+        "lats"
+      ],
+      "unknown_zones": [
+        "rear_delts",
+        "pecs"
+      ],
+      "old_disposition": "INSUFFICIENT_EVIDENCE",
+      "calibration_mode": "CABLE_UNSPECIFIED"
+    },
+    {
+      "candidate_id": "traction-assistee-machine",
+      "source_file": "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json",
+      "line": 2977,
+      "primary_zones": [
+        "lats"
+      ],
+      "unknown_zones": [
+        "rear_delts",
+        "pecs"
+      ],
+      "old_disposition": "INSUFFICIENT_EVIDENCE",
+      "calibration_mode": "ASSISTANCE_UNSPECIFIED"
+    },
+    {
+      "candidate_id": "traction-assistee-unilaterale",
+      "source_file": "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json",
+      "line": 3082,
+      "primary_zones": [
+        "lats"
+      ],
+      "unknown_zones": [
+        "rear_delts",
+        "pecs"
+      ],
+      "old_disposition": "INSUFFICIENT_EVIDENCE",
+      "calibration_mode": "ASSISTANCE_UNSPECIFIED"
+    }
+  ],
+  "unknown_preservation": {
+    "old_curation_total_unknown_occurrences": 14,
+    "vertical_unknown_occurrences": 9,
+    "conversions_authorized_by_this_audit": []
+  },
+  "minimal_additive_artifact_design": {
+    "status": "PROPOSED_FOR_SCIENTIFIC_REVIEW_ONLY",
+    "inputs": "Pinned old curation/model/catalogue/schema/credit/E0/producer fixture hashes; exact canonical five IDs only.",
+    "per_candidate_zone_fields": [
+      "candidate_id",
+      "zone",
+      "source_role=UNKNOWN",
+      "participation_state (unknown versus evidence-supported participation)",
+      "separate functional_anatomy/acute_emg/biomechanics/longitudinal claims and refs",
+      "execution qualification/unsupported assumptions",
+      "ordinal_role=UNRESOLVED",
+      "numeric_credit=UNRESOLVED (never 0 or 0.5)",
+      "primary_intent_assessment",
+      "reviewer_decision",
+      "limitations"
+    ],
+    "vocabulary": "Use local fields/closed values in a dedicated versioned overlay; conceptual CONTRIBUTION_PRESENT_ROLE_UNRESOLVED is epistemic annotation, never a new canonical contributions[].role enum in this spike.",
+    "resolver": "Optional isolated deterministic audit resolver validates exact candidate pool/source hashes and primary lats + vertical pattern + required execution/context predicates. It emits an unranked scientific result, separate from old-v1 exact-exposure admission. Blocking primary uncertainty, missing execution facts or unreviewed evidence fails closed. It must not call old eligibility validator with modified bundle or manufacture a trusted old fingerprint.",
+    "output_invariants": [
+      "runtime NOT_SERVED",
+      "producer_binding null",
+      "execution_ready false",
+      "READY NOT_PRODUCED",
+      "old_v1_catalog_gap preserved",
+      "no selected/default/rank",
+      "unknown rows retained",
+      "no numeric ancillary credit",
+      "no diagnosis/load/time inference",
+      "no mobile/MISSION payload"
+    ],
+    "compatibility": "Keep curation1.0.0 byte-identical; keep catalogue/schema/E0 policy and producer1.0.0 pins and 11 outputs unchanged. New version owns only new assessments; existing consumers reject/ignore overlay unless explicitly bound later. Canonical E0 promotion is a separate coordinated review when shared hashes would change."
+  },
+  "actual_contract_amendment_impact": {
+    "curation_admission_only": [
+      "New versioned admission decision and overlay/resolver; old tools/science_initial_policy/curation.py and curation-01 remain reproducible. Update/new successor to curation_fixtures.py and coverage-and-fixtures.v1.json semantics; tests/test_science_candidate_curation.py preserves old expectations and new version gets dedicated tests. Record compatibility in OpenSpec science-initial-plan-policy and spec registry."
+    ],
+    "first_plan_ready_with_partial_exposure": [
+      "New version of tools/science_contracts/blueprint_first_plan_v1.py rather than silent change in v1; versioned successor CONTRACT.md and generated first_plan_request/first_plan_recommendation schemas (Blueprint only if its facts change); versions/policies/approved reference snapshot and fingerprints; successor policy/planning/producer/registry/fixture generation with explicit binding; Python contract/initial policy/admission/curation tests; mobile firstPlan.contract.json, FirstPlanClient version dispatch, scienceSchema.ts if keyword set changes, firstPlan.test.ts, firstPlan.integration.test.ts, firstUse.ts/tests, protocol-only fixtures and handoff documentation. Existing v1 stays strict and existing READY semantics stay reproducible."
+    ],
+    "if_canonical_role_enum_or_credit_policy_changed": [
+      "data/sci/exercise_catalogue.schema.json AND its generated authority data/sci/sources/schema_arbitrated.json; catalogue producer scripts/generate_sci_catalogue.py; scripts/validate_sci_catalogue.py; role/credit source files and E0 review; data/sci/exercise_catalogue.json + validation_report + sources_digest/version; app/services/sci_catalogue.py closed ROLES/policy loader and app/services/sci_exposure.py role counter/bounds; sci_identity source-version/hash behavior; pinned policy source_hashes in registry/current curation plus generated audits/fixtures; role/category/catalogue generation/validator/loader/exposure tests. No in-place repinning to erase historical reproducibility."
+    ],
+    "legacy_surfaces_do_not_change_automatically": [
+      "app/services/slot_intent.py",
+      "app/services/morpho_program_generator.py",
+      "app/services/body_zone_source.py",
+      "app/services/set_contribution.py",
+      "app/services/weekly_volume_budget.py",
+      "app/services/muscle_scoring.py",
+      "app/services/zone_exposure.py"
+    ],
+    "legacy_boundary": "These are downstream audit targets only if a later migration binds SCI into served volume/coverage. Current spike must not edit them or equate their units/taxonomies; audit their served consumers/templates/API then as a separate authorized migration."
+  },
+  "tests_safety_gates_for_parent": {
+    "existing_relevant_suites": [
+      "tests/test_science_candidate_curation.py",
+      "tests/test_science_initial_plan_policy.py",
+      "tests/test_science_initial_policy_admission.py",
+      "tests/test_science_blueprint_first_plan_contracts.py",
+      "tests/test_sci_catalogue_loader.py",
+      "tests/test_sci_catalogue_validator.py",
+      "tests/test_sci_catalogue_generation.py",
+      "tests/test_sci_exposure.py"
+    ],
+    "future_overlay_invariants": [
+      "EMG alone never PRIMARY or percentage",
+      "anatomical participation never silently quantitative credit",
+      "ROLE_UNKNOWN distinct from participation-present-role-unresolved",
+      "unresolved ancillary role never secondary/minor credit",
+      "primary uncertainty remains blocking",
+      "exact canonical five, no rowing/pullover/new intent",
+      "no default/ranking",
+      "source hashes and deterministic order enforced",
+      "old curation bytes/model fingerprint + old producer11 outputs identical",
+      "no runtime import/API/mobile/MISSION/READY/time/calibration activation"
+    ],
+    "execution_policy": "Before parent runs code checks: python scripts/check_scope.py; then its required tier only, targeted tests + broad sweep where required. No local full sweep for isolated/docs by default. Real required final-HEAD CI is authoritative; audits here run no suite."
+  },
+  "review_boundary": {
+    "independent_scientific_review": "Required fresh reviewer separate from code reviewer. Must assess lat-primary, participation and ordinal category separately, execution specificity, evidence hierarchy/no EMG overclaim, pull-up-to-pulldown transfer, E0 claim strength, preserved uncertainty and whether any new-gap removal is earned. Audit makes no scientific admission.",
+    "independent_code_review": "Required separately: deterministic hashes/pool/versioning, fail-safe resolver, all old fixtures reproducible, no numeric credit fabrication, no runtime imports or activation. No Critical/Important left.",
+    "explicit_governance": "Versioned gate amendment must be explicit and compatible with canonical contracts/OpenSpec; cannot silently weaken curation or FirstPlan. Parent mandate authorizes bounded uncertainty-contract evaluation, not producer binding, runtime activation, enum migration or future broadened work. Standing merge authorization applies only after scoped readiness, CI and applicable human review."
+  },
+  "files": {
+    "CLAUDE.md": {
+      "sha256": "0a355d0624fb7579cb9c733f5a973daed09a8415fa5015d1841090fa0b290df6",
+      "line_count": 305,
+      "line_ranges": [
+        [
+          130,
+          204
+        ],
+        [
+          251,
+          270
+        ]
+      ]
+    },
+    "docs/strategy/STANDING_MERGE_AUTHORIZATION.md": {
+      "sha256": "d94483866c4aba88768579d08dcb63a4bea1434211d33a11a9ed4e521f2e46ee",
+      "line_count": 52,
+      "line_ranges": [
+        [
+          1,
+          52
+        ]
+      ]
+    },
+    "data/sci/exposure_credit_policy.json": {
+      "sha256": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+      "line_count": 11,
+      "line_ranges": [
+        [
+          1,
+          12
+        ]
+      ]
+    },
+    "data/sci/exercise_catalogue.schema.json": {
+      "sha256": "17d6fef7163cc5d0c9f185d5fa989a9f99cd8491ca01abfa1a9d83f3bcb4fe77",
+      "line_count": 1111,
+      "line_ranges": [
+        [
+          595,
+          645
+        ],
+        [
+          790,
+          890
+        ],
+        [
+          937,
+          979
+        ]
+      ]
+    },
+    "data/sci/sources/schema_arbitrated.json": {
+      "sha256": "42732723bedfd992a82c17776020a660e7ef7166721766ebaae543123bd80253",
+      "line_count": 865,
+      "line_ranges": [
+        [
+          562,
+          595
+        ],
+        [
+          708,
+          734
+        ]
+      ]
+    },
+    "data/sci/evidence_registry.json": {
+      "sha256": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+      "line_count": 386,
+      "line_ranges": [
+        [
+          30,
+          40
+        ],
+        [
+          266,
+          272
+        ]
+      ]
+    },
+    "app/services/sci_catalogue.py": {
+      "sha256": "a5c954270332cfc18afaf8c2f0714b9f0acd4df2507f0bec9fad3d2f4b9e2094",
+      "line_count": 167,
+      "line_ranges": [
+        [
+          11,
+          17
+        ],
+        [
+          33,
+          55
+        ],
+        [
+          137,
+          167
+        ]
+      ]
+    },
+    "app/services/sci_exposure.py": {
+      "sha256": "05b81260f14f04e6ecd758a2e9f336090fc6c7b521a8b9b318459e5391180e6e",
+      "line_count": 186,
+      "line_ranges": [
+        [
+          18,
+          26
+        ],
+        [
+          85,
+          99
+        ],
+        [
+          136,
+          185
+        ]
+      ]
+    },
+    "app/services/sci_identity.py": {
+      "sha256": "a13bf39923ad51c4c9b13e83c8b95eca931984d8e91c3d8307ea10db4b4fbb4e",
+      "line_count": 185,
+      "line_ranges": [
+        [
+          1,
+          47
+        ]
+      ]
+    },
+    "scripts/validate_sci_catalogue.py": {
+      "sha256": "0ea3bfaac3b947af58a8b238e617eca78489b93f9f492005e3eb69c4c87c7d69",
+      "line_count": 531,
+      "line_ranges": [
+        [
+          329,
+          339
+        ],
+        [
+          430,
+          449
+        ]
+      ]
+    },
+    "scripts/generate_sci_catalogue.py": {
+      "sha256": "5085ca2cd3b43e057db87f4033842fbddb3f65db087fb0fa06cabfe0c44326f0",
+      "line_count": 677,
+      "line_ranges": [
+        [
+          627,
+          655
+        ]
+      ]
+    },
+    "app/services/slot_intent.py": {
+      "sha256": "ecf7c88f35891f0c805c933ba19faa58dfb014794959dc1b54a156f99333e71d",
+      "line_count": 349,
+      "line_ranges": [
+        [
+          16,
+          18
+        ],
+        [
+          198,
+          214
+        ],
+        [
+          326,
+          349
+        ]
+      ]
+    },
+    "app/services/morpho_program_generator.py": {
+      "sha256": "cf2492056afc577114b8f0d358a5f5e24b64c815d3a2833df5da5d5ead8d1cdd",
+      "line_count": 469,
+      "line_ranges": [
+        [
+          25,
+          38
+        ],
+        [
+          169,
+          202
+        ]
+      ]
+    },
+    "app/services/body_zone_source.py": {
+      "sha256": "4a4d645b41fa35fc553b0da0660872ae83d4c32ec4cc85fe9427ede626b97ca5",
+      "line_count": 307,
+      "line_ranges": [
+        [
+          140,
+          159
+        ],
+        [
+          165,
+          202
+        ]
+      ]
+    },
+    "app/services/zone_exposure.py": {
+      "sha256": "01274a02c65415f3a47530222faccfd62af81b21e2b78532cb7ecf832d67f679",
+      "line_count": 426,
+      "line_ranges": [
+        [
+          22,
+          32
+        ],
+        [
+          124,
+          127
+        ],
+        [
+          274,
+          290
+        ]
+      ]
+    },
+    "app/services/weekly_volume_budget.py": {
+      "sha256": "b1100ed5a6342168bede8902de1c1d7fdcc6767427127bdae5c245c268126f99",
+      "line_count": 262,
+      "line_ranges": [
+        [
+          44,
+          47
+        ],
+        [
+          85,
+          92
+        ]
+      ]
+    },
+    "app/services/set_contribution.py": {
+      "sha256": "9e35ea266c8ff78b11b035fda6055772e737c1fd36c11ba72e001b42f6cae89a",
+      "line_count": 198,
+      "line_ranges": [
+        [
+          14,
+          27
+        ],
+        [
+          43,
+          60
+        ],
+        [
+          132,
+          147
+        ]
+      ]
+    },
+    "app/services/muscle_scoring.py": {
+      "sha256": "6c69d3b42b90e7d015ce680a6e202f1dde77e4dbcb766a5370192d11c2af3a2d",
+      "line_count": 427,
+      "line_ranges": [
+        [
+          139,
+          167
+        ]
+      ]
+    },
+    "tools/science_contracts/blueprint_first_plan_v1.py": {
+      "sha256": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
+      "line_count": 749,
+      "line_ranges": [
+        [
+          214,
+          240
+        ],
+        [
+          391,
+          439
+        ],
+        [
+          493,
+          554
+        ],
+        [
+          591,
+          615
+        ],
+        [
+          618,
+          733
+        ],
+        [
+          736,
+          749
+        ]
+      ]
+    },
+    "tools/science_initial_policy/planning.py": {
+      "sha256": "42bfe157158f00a482218b334918919e76bad3645d4f6c9ce61bb09f3c33a8ae",
+      "line_count": 202,
+      "line_ranges": [
+        [
+          61,
+          115
+        ],
+        [
+          131,
+          200
+        ]
+      ]
+    },
+    "tools/science_initial_policy/registry.py": {
+      "sha256": "b693e527b83561099e5b5bf8c3eee85ab27fd49387cf66e3abadf5c8fee4924d",
+      "line_count": 80,
+      "line_ranges": [
+        [
+          15,
+          18
+        ],
+        [
+          38,
+          80
+        ]
+      ]
+    },
+    "tools/science_initial_policy/producer.py": {
+      "sha256": "c50bfab2c41bfbc12e00038aaf6db94deaf7ceaddf3050c4ff12b16b48835c67",
+      "line_count": 123,
+      "line_ranges": [
+        [
+          17,
+          26
+        ],
+        [
+          71,
+          98
+        ],
+        [
+          101,
+          123
+        ]
+      ]
+    },
+    "tools/science_initial_policy/curation.py": {
+      "sha256": "341ba18ac6adeb178b0c0cf90d5a69a1783a77521f7ca24df4a6c1a0093453a5",
+      "line_count": 285,
+      "line_ranges": [
+        [
+          20,
+          36
+        ],
+        [
+          105,
+          114
+        ],
+        [
+          123,
+          181
+        ],
+        [
+          189,
+          193
+        ],
+        [
+          212,
+          273
+        ]
+      ]
+    },
+    "tools/science_initial_policy/curation_fixtures.py": {
+      "sha256": "7c1d2d1c18b547a7bf64d80a1bc0032e78759fa815d827927f5e4fab70961d22",
+      "line_count": 112,
+      "line_ranges": [
+        [
+          12,
+          47
+        ],
+        [
+          71,
+          95
+        ]
+      ]
+    },
+    "tools/science_initial_policy/admission.py": {
+      "sha256": "bf8b3c4da6f66cc2d25c6e4f765205765b9822e1a66b8fa95c2b1f9eb55441c4",
+      "line_count": 101,
+      "line_ranges": [
+        [
+          1,
+          82
+        ]
+      ]
+    },
+    "docs/science/sci-p01-p02/CONTRACT.md": {
+      "sha256": "cfea59a95982c26e9335e4eba4b21bcf51f8f82914dad0495d733e98d372e9ec",
+      "line_count": 105,
+      "line_ranges": [
+        [
+          46,
+          50
+        ],
+        [
+          66,
+          103
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/admission-01/REPORT.md": {
+      "sha256": "70f62f1836b9447d7a258e81ecd0e7493357dbf2726b673d9b053d1416e34a4b",
+      "line_count": 79,
+      "line_ranges": [
+        [
+          27,
+          45
+        ],
+        [
+          53,
+          69
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/curation-01/REPORT.md": {
+      "sha256": "5ddc1397c270a304e71e693683de69ecd2def4682a92bdd6db62f2e3c170199f",
+      "line_count": 77,
+      "line_ranges": [
+        [
+          3,
+          15
+        ],
+        [
+          43,
+          47
+        ],
+        [
+          59,
+          73
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/curation-01/ROLE_RESOLUTION.md": {
+      "sha256": "b0ba4d9e2dfe56bda0e786f2fc0b6df92173bc70b70e005d99de7fddfccb20db",
+      "line_count": 20,
+      "line_ranges": [
+        [
+          1,
+          20
+        ]
+      ]
+    },
+    "docs/strategy/Sx_SCI_V2_CATALOGUE_INTEGRATION_01_SPEC.md": {
+      "sha256": "bc2a38d8b98db5c1a8fc8e6e38f785e3d9d5520574d2fe0ee033e2f181ca2d0b",
+      "line_count": 481,
+      "line_ranges": [
+        [
+          194,
+          228
+        ]
+      ]
+    },
+    "openspec/specs/science/blueprint-first-plan/spec.md": {
+      "sha256": "dbedbc0661aa60f489c22779232cf54cad2cdb27249b60f37b77f082d89bef73",
+      "line_count": 35,
+      "line_ranges": [
+        [
+          1,
+          36
+        ]
+      ]
+    },
+    "clients/mobile/src/api/firstPlan.ts": {
+      "sha256": "c1d80535237b266e823c69486ecfe24390f4ad727af02d434eb62bb60faeb069",
+      "line_count": 67,
+      "line_ranges": [
+        [
+          1,
+          20
+        ],
+        [
+          28,
+          58
+        ]
+      ]
+    },
+    "clients/mobile/src/api/scienceSchema.ts": {
+      "sha256": "18edde5bea733396a24ea0e7e3f4fe9fc40ba592185ad472083c5b6332486a81",
+      "line_count": 63,
+      "line_ranges": [
+        [
+          1,
+          24
+        ],
+        [
+          45,
+          62
+        ]
+      ]
+    },
+    "clients/mobile/src/api/firstPlan.test.ts": {
+      "sha256": "03faa108373e36ab0b2b1c08e58a97713d7557314bd5b74505d991015c076972",
+      "line_count": 106,
+      "line_ranges": [
+        [
+          75,
+          95
+        ]
+      ]
+    },
+    "clients/mobile/src/api/firstPlan.integration.test.ts": {
+      "sha256": "2691bfff150f685fe0b1a4c436b5785ca266fb7aea2285308d6ee51648d50f8d",
+      "line_count": 50,
+      "line_ranges": [
+        [
+          1,
+          30
+        ]
+      ]
+    },
+    "tests/test_science_candidate_curation.py": {
+      "sha256": "cd3d53478c148eeb19d0a6c0bf03ac3ef9467e5d2e6b27aa05fec5d6506a6793",
+      "line_count": 288,
+      "line_ranges": [
+        [
+          48,
+          68
+        ],
+        [
+          129,
+          135
+        ],
+        [
+          187,
+          210
+        ],
+        [
+          258,
+          273
+        ]
+      ]
+    },
+    "tests/test_science_initial_plan_policy.py": {
+      "sha256": "e5814967aba2bb8084db0ba555a8ff68395ddba7939dbcc9c7c5b27f263b21bd",
+      "line_count": 359,
+      "line_ranges": [
+        [
+          47,
+          70
+        ],
+        [
+          248,
+          305
+        ],
+        [
+          315,
+          320
+        ]
+      ]
+    },
+    "tests/test_science_initial_policy_admission.py": {
+      "sha256": "6d5820410e9adb9ab2fde0495fcfda41666187c163da219c0a0924f2d473d5c1",
+      "line_count": 188,
+      "line_ranges": [
+        [
+          116,
+          145
+        ],
+        [
+          172,
+          188
+        ]
+      ]
+    },
+    "tests/test_science_blueprint_first_plan_contracts.py": {
+      "sha256": "9a390de79a00cb0d56aaaa72edf69b08036ebbe55f5719b12df1d85ee742c501",
+      "line_count": 712,
+      "line_ranges": [
+        [
+          285,
+          320
+        ],
+        [
+          370,
+          389
+        ],
+        [
+          474,
+          478
+        ],
+        [
+          604,
+          628
+        ]
+      ]
+    },
+    "tests/test_sci_exposure.py": {
+      "sha256": "ba5ffa32d84eeaff24d8e7d07210a3ad919d0fd0c3f30274fb06d475bed4556f",
+      "line_count": 286,
+      "line_ranges": [
+        [
+          188,
+          228
+        ],
+        [
+          259,
+          286
+        ]
+      ]
+    },
+    "tests/test_sci_catalogue_loader.py": {
+      "sha256": "554a93675ec93fe79d232836463cb3ae38c376311c73226b870b83e3279e3bc6",
+      "line_count": 181,
+      "line_ranges": [
+        [
+          103,
+          148
+        ]
+      ]
+    },
+    "tests/test_sci_catalogue_validator.py": {
+      "sha256": "77aa2f47b781a7589b6b0eab7356e5e005e545eaf23d647826ab3b7058ab9d19",
+      "line_count": 237,
+      "line_ranges": [
+        [
+          50,
+          57
+        ],
+        [
+          193,
+          226
+        ]
+      ]
+    },
+    "tests/test_sci_catalogue_rulings.py": {
+      "sha256": "e60881f07a6b5b406382d89c3f0eba881dc252e733f7cf4da35a138f4f9c8550",
+      "line_count": 218,
+      "line_ranges": [
+        [
+          1,
+          20
+        ]
+      ]
+    },
+    "tests/test_sci_catalogue_generation.py": {
+      "sha256": "7465ab93f07cce1344cd03255cc4b0fc1ca6343a501020e491f18d3b1425e80f",
+      "line_count": 104,
+      "line_ranges": [
+        [
+          1,
+          20
+        ],
+        [
+          83,
+          88
+        ]
+      ]
+    },
+    "tests/test_slot_intent_coverage.py": {
+      "sha256": "36c1a7730cdd667deff1c16ce8cb02b7cfb4b1ba6deacb7f144aaa70b80236a4",
+      "line_count": 414,
+      "line_ranges": [
+        [
+          69,
+          76
+        ],
+        [
+          200,
+          210
+        ]
+      ]
+    },
+    "data/sci/exercise_catalogue.json": {
+      "sha256": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+      "line_count": 7244,
+      "line_ranges": [
+        [
+          1,
+          7244
+        ]
+      ]
+    },
+    "data/sci/exercise_catalogue.validation_report.json": {
+      "sha256": "3bf22a98e62071447fe5da968508e186010eee5927486487013452ee3fe4c03e",
+      "line_count": 1728,
+      "line_ranges": [
+        [
+          1,
+          1728
+        ]
+      ]
+    },
+    "data/sci/sources/curation_reviewed.json": {
+      "sha256": "aa14a6ec2adcb8b57a15d8252d8b7107e8bbb6d39147ab7ec5f9385eefb11354",
+      "line_count": 7408,
+      "line_ranges": [
+        [
+          1,
+          7408
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/v1/policy.json": {
+      "sha256": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
+      "line_count": 98,
+      "line_ranges": [
+        [
+          1,
+          98
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": {
+      "sha256": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
+      "line_count": 2981,
+      "line_ranges": [
+        [
+          1,
+          2981
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/admission-01/policy.json": {
+      "sha256": "333e37d1642aa813bc76798caa7a36580d22c50964a9697dcb035e463054056a",
+      "line_count": 169,
+      "line_ranges": [
+        [
+          1,
+          169
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/admission-01/audit.json": {
+      "sha256": "2b9f0cd1a9cfbf8cc2b0b816099e41af7385b1bfa335ff122c94b529b88732da",
+      "line_count": 3320,
+      "line_ranges": [
+        [
+          1,
+          3320
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json": {
+      "sha256": "d1a3f26268bcb33d3614ce3b4841a2dc42562541b39134646caabf9f37f37803",
+      "line_count": 4001,
+      "line_ranges": [
+        [
+          1,
+          4001
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/curation-01/coverage-and-fixtures.v1.json": {
+      "sha256": "e444c65b9ebbfbcf5e9658dda98668986ef2343ff292ef5c44e6d9924916ca6f",
+      "line_count": 4707,
+      "line_ranges": [
+        [
+          1,
+          4707
+        ]
+      ]
+    },
+    "docs/science/sci-p02-initial-policy/curation-01/sources.json": {
+      "sha256": "b5a447d2798a4b5f4dde736d43c4bb10c7694700743b384c21b1a617b3f75b60",
+      "line_count": 18,
+      "line_ranges": [
+        [
+          1,
+          18
+        ]
+      ]
+    },
+    "docs/science/sci-p01-p02/v1/body_training_blueprint.v1.schema.json": {
+      "sha256": "f62feedad5ace1835b5bce2beceab1b76f7c71b5d6320344bd9afde1c1471ed2",
+      "line_count": 898,
+      "line_ranges": [
+        [
+          1,
+          898
+        ]
+      ]
+    },
+    "docs/science/sci-p01-p02/v1/first_plan_request.v1.schema.json": {
+      "sha256": "99911951d52c80649dfaa1f36c5f835c623eda89f6a41c8a2676298a422bd0a1",
+      "line_count": 1061,
+      "line_ranges": [
+        [
+          1,
+          1061
+        ]
+      ]
+    },
+    "docs/science/sci-p01-p02/v1/first_plan_recommendation.v1.schema.json": {
+      "sha256": "f2a7ffbbb0bc0aa3d53e8f55e5df85bfd6721d005c3906cff334fb6c6339ec62",
+      "line_count": 669,
+      "line_ranges": [
+        [
+          1,
+          669
+        ]
+      ]
+    },
+    "docs/science/sci-p01-p02/v1/fixtures.json": {
+      "sha256": "3e281a77b649403bad381d1bc27c72698520c4780a8b18dfcc4f883a28e1d272",
+      "line_count": 1981,
+      "line_ranges": [
+        [
+          1,
+          1981
+        ]
+      ]
+    },
+    "clients/mobile/src/api/firstPlan.contract.json": {
+      "sha256": "883d9830f12ca59864390c7b6c1ceb69f56b4be0f421250542cc92a9f8d02230",
+      "line_count": 1732,
+      "line_ranges": [
+        [
+          1,
+          1732
+        ]
+      ]
+    },
+    "clients/mobile/src/api/__fixtures__/firstPlan.protocol-test-only.json": {
+      "sha256": "de5f559810ae67fddfa8949d62a21eff42387dd957973c47edf3300f06ec8a80",
+      "line_count": 408,
+      "line_ranges": [
+        [
+          1,
+          408
+        ]
+      ]
+    },
+    "clients/mobile/src/api/firstUse.ts": {
+      "sha256": "f033a97d187115fc61a6ee653645fb387dd9028d96971e0cf6dff5fae56e8b57",
+      "line_count": 60,
+      "line_ranges": [
+        [
+          1,
+          60
+        ]
+      ]
+    },
+    "clients/mobile/src/api/firstUse.test.ts": {
+      "sha256": "c010ea4325bcbc4713032b4f27b885e6127785524d506fbb84f396f56ecb3d17",
+      "line_count": 57,
+      "line_ranges": [
+        [
+          1,
+          57
+        ]
+      ]
+    }
+  }
+}

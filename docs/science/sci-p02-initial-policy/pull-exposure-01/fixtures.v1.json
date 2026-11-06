@@ -1,0 +1,2416 @@
+[
+  {
+    "case_id": "unconfirmed_context",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+      "parent_curation_status": "CATALOG_GAP",
+      "status": "CANDIDATES_AVAILABLE",
+      "reason": null,
+      "candidates": [
+        {
+          "candidate_id": "tirage-poulie-haute-prise-neutre",
+          "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "pecs"
+            ],
+            "unknown_roles": [],
+            "secondary_roles": [
+              "biceps",
+              "upper_back",
+              "rear_delts",
+              "pecs"
+            ]
+          },
+          "canonical_execution": "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+            "Actual loaded shoulder-extension realization, not a different path or a rowing substitution.",
+            "Current context, attachment and individual execution/calibration remain to confirm.",
+            "The role inference applies only when actual loaded humeral extension from flexion matches the canonical realization; equipment availability alone is insufficient."
+          ]
+        }
+      ],
+      "held_candidates": [
+        {
+          "candidate_id": "tirage-poulie-haute-prise-large",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; execution qualification required. No behind-neck realization admitted implicitly. Lat PRIMARY interpretation stable for the intended adduction.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "tirage-vertical-unilateral-cable",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Preserve each-side calibration and per-side set semantics; no bilateral load equivalence.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": "Tirage vertical à un bras, poignée simple (poignée D) ; coude tiré vers la hanche.",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-machine",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Confirm assistance direction, mechanism, setting units, support and actual capacity. No effective-bodyweight calculation from an unverified setting.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-unilaterale",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; strongest transfer limitation. Device permission/support, controlled entry/exit and per-side calibration remain unresolved. Lat PRIMARY only interprets the intended loaded vertical-pull identity.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        }
+      ],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  },
+  {
+    "case_id": "equipment_available_execution_not_observed",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            }
+          ]
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "a929043aaa91482b11ea90591fe1b44e0b3168d5538ac5072f4e7b9bef3c8fc1",
+      "parent_curation_status": "CATALOG_GAP",
+      "status": "CANDIDATES_AVAILABLE",
+      "reason": null,
+      "candidates": [
+        {
+          "candidate_id": "tirage-poulie-haute-prise-neutre",
+          "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+          "compatibility": "CONFIRMED",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "pecs"
+            ],
+            "unknown_roles": [],
+            "secondary_roles": [
+              "biceps",
+              "upper_back",
+              "rear_delts",
+              "pecs"
+            ]
+          },
+          "canonical_execution": "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+            "Actual loaded shoulder-extension realization, not a different path or a rowing substitution.",
+            "Current context, attachment and individual execution/calibration remain to confirm.",
+            "The role inference applies only when actual loaded humeral extension from flexion matches the canonical realization; equipment availability alone is insufficient."
+          ]
+        }
+      ],
+      "held_candidates": [
+        {
+          "candidate_id": "tirage-poulie-haute-prise-large",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; execution qualification required. No behind-neck realization admitted implicitly. Lat PRIMARY interpretation stable for the intended adduction.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "tirage-vertical-unilateral-cable",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Preserve each-side calibration and per-side set semantics; no bilateral load equivalence.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": "Tirage vertical à un bras, poignée simple (poignée D) ; coude tiré vers la hanche.",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-machine",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Confirm assistance direction, mechanism, setting units, support and actual capacity. No effective-bodyweight calculation from an unverified setting.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-unilaterale",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; strongest transfer limitation. Device permission/support, controlled entry/exit and per-side calibration remain unresolved. Lat PRIMARY only interprets the intended loaded vertical-pull identity.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        }
+      ],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  },
+  {
+    "case_id": "equipment_unavailable",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "UNAVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            }
+          ]
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "45b42d5064807c342a9cd08906393d1783e3978cf272eac951dff9983875ecd4",
+      "parent_curation_status": "CATALOG_GAP",
+      "status": "CATALOG_GAP",
+      "reason": "NO_ADMISSIBLE_REALISATION",
+      "candidates": [],
+      "held_candidates": [
+        {
+          "candidate_id": "tirage-poulie-haute-prise-large",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; execution qualification required. No behind-neck realization admitted implicitly. Lat PRIMARY interpretation stable for the intended adduction.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "tirage-poulie-haute-prise-neutre",
+          "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+          "compatibility": "UNAVAILABLE",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "UNAVAILABLE",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "pecs"
+            ],
+            "unknown_roles": [],
+            "secondary_roles": [
+              "biceps",
+              "upper_back",
+              "rear_delts",
+              "pecs"
+            ]
+          },
+          "canonical_execution": "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+            "Actual loaded shoulder-extension realization, not a different path or a rowing substitution.",
+            "Current context, attachment and individual execution/calibration remain to confirm.",
+            "The role inference applies only when actual loaded humeral extension from flexion matches the canonical realization; equipment availability alone is insufficient."
+          ]
+        },
+        {
+          "candidate_id": "tirage-vertical-unilateral-cable",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Preserve each-side calibration and per-side set semantics; no bilateral load equivalence.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": "Tirage vertical à un bras, poignée simple (poignée D) ; coude tiré vers la hanche.",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-machine",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Confirm assistance direction, mechanism, setting units, support and actual capacity. No effective-bodyweight calculation from an unverified setting.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-unilaterale",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; strongest transfer limitation. Device permission/support, controlled entry/exit and per-side calibration remain unresolved. Lat PRIMARY only interprets the intended loaded vertical-pull identity.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        }
+      ],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  },
+  {
+    "case_id": "three_state_context_conflict",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "UNAVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "UNKNOWN",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            }
+          ]
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "03c90522570f6a7f802115aad7b4914b2bd82be81fce849a36488e89946cf637",
+      "parent_curation_status": "REVIEW_REQUIRED",
+      "status": "REVIEW_REQUIRED",
+      "reason": "CURRENT_CONTEXT_CONFLICT",
+      "candidates": [],
+      "held_candidates": [],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  },
+  {
+    "case_id": "explicit_exclusion_no_fallback",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [
+            "tirage-poulie-haute-prise-neutre"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            }
+          ]
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "e67d80d0913c3d0255f40857fb3774945bb04348687a6592fd54e4db16f45812",
+      "parent_curation_status": "CATALOG_GAP",
+      "status": "CATALOG_GAP",
+      "reason": "NO_ADMISSIBLE_REALISATION",
+      "candidates": [],
+      "held_candidates": [
+        {
+          "candidate_id": "tirage-poulie-haute-prise-large",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; execution qualification required. No behind-neck realization admitted implicitly. Lat PRIMARY interpretation stable for the intended adduction.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "tirage-poulie-haute-prise-neutre",
+          "admission": "ADMITTED_WITH_CONTEXT_CONFIRMATION",
+          "compatibility": "CONFIRMED",
+          "unilateral": false,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "USER_EXCLUDED",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "pecs"
+            ],
+            "unknown_roles": [],
+            "secondary_roles": [
+              "biceps",
+              "upper_back",
+              "rear_delts",
+              "pecs"
+            ]
+          },
+          "canonical_execution": "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Tirage vertical devant, poignée parallèle en prise neutre, écartement proche de la largeur d'épaules (neutre serrée).",
+            "Actual loaded shoulder-extension realization, not a different path or a rowing substitution.",
+            "Current context, attachment and individual execution/calibration remain to confirm.",
+            "The role inference applies only when actual loaded humeral extension from flexion matches the canonical realization; equipment availability alone is insufficient."
+          ]
+        },
+        {
+          "candidate_id": "tirage-vertical-unilateral-cable",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "CABLE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Preserve each-side calibration and per-side set semantics; no bilateral load equivalence.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": "Tirage vertical à un bras, poignée simple (poignée D) ; coude tiré vers la hanche.",
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-machine",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": false,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD. Confirm assistance direction, mechanism, setting units, support and actual capacity. No effective-bodyweight calculation from an unverified setting.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        },
+        {
+          "candidate_id": "traction-assistee-unilaterale",
+          "admission": "INSUFFICIENT_EVIDENCE",
+          "compatibility": "UNKNOWN",
+          "unilateral": true,
+          "calibration_mode": "ASSISTANCE_UNSPECIFIED",
+          "calibration_facts": [
+            "DEVICE_OR_REALISATION_SPECIFIC",
+            "TARGET_REPS_AND_EFFORT_OBSERVED_NOT_ASSUMED",
+            "NO_GENERIC_LOAD_TRANSFER",
+            "RESISTANCE_MECHANISM_UNITS_INCREMENTS_OFFSET_TO_CONFIRM",
+            "EACH_SIDE_NO_LOAD_TRANSFER"
+          ],
+          "preparation_class": "CONTEXT_DEPENDENT",
+          "preparation_requirements": [
+            "SETUP_AND_CURRENT_CONTEXT_CONFIRMATION",
+            "CALIBRATION_REQUIRED",
+            "FAMILIARISATION_REQUIRED_IF_UNFAMILIAR"
+          ],
+          "rep_range_achievability": "UNCONFIRMED",
+          "hold_reason": "HELD; strongest transfer limitation. Device permission/support, controlled entry/exit and per-side calibration remain unresolved. Lat PRIMARY only interprets the intended loaded vertical-pull identity.",
+          "role_projection": {
+            "scope": "QUALIFIED_CANONICAL_EXECUTION_ONLY",
+            "application": "NOT_APPLIED_TO_EXECUTED_HISTORY",
+            "source_unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "unknown_roles": [
+              "rear_delts",
+              "pecs"
+            ],
+            "secondary_roles": [
+              "biceps",
+              "upper_back"
+            ]
+          },
+          "canonical_execution": null,
+          "execution_confirmation_required": true,
+          "execution_requirements": [
+            "Actual front/behind path, humeral plane and device realization must not be invented.",
+            "Ancillary role uncertainty remains; no entry into the new initial admissible set."
+          ]
+        }
+      ],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  },
+  {
+    "case_id": "reported_limitation_review",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "KNOWN",
+          "value": [
+            "reported discomfort"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "fixture-context",
+              "state": "AVAILABLE",
+              "provenance": {
+                "origin": "USER_REPORTED",
+                "acquisition": "DECLARED",
+                "source_ref": "fixture:user-declaration",
+                "recorded_at": "2026-11-05T12:00:00Z",
+                "measured_at": null
+              }
+            }
+          ]
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "6b8f1a3805fc7732ad405dddb3083f8d0fd0d4b4e0e28e45d97a9fabf7b68042",
+      "parent_curation_status": "REVIEW_REQUIRED",
+      "status": "REVIEW_REQUIRED",
+      "reason": "USER_REPORTED_LIMITATION",
+      "candidates": [],
+      "held_candidates": [],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  },
+  {
+    "case_id": "missing_required_context",
+    "fixture_role": "SYNTHETIC_INPUT_NON_SERVED_DIAGNOSTIC",
+    "request": {
+      "contract_version": "first-plan-request/1.0.0",
+      "as_of": "2026-11-05T12:00:00Z",
+      "requirement_profile_id": "first-bodybuilding-inputs-v1-proposed",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "snapshot_id": "fixture-blueprint-v1",
+        "objective": {
+          "state": "KNOWN",
+          "value": "HYPERTROPHY",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "population_scope": {
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL",
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "sessions_per_week": {
+          "state": "KNOWN",
+          "value": 3,
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "session_budgets_minutes": {
+          "state": "KNOWN",
+          "value": [
+            60,
+            60,
+            60
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "experience": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "limitations": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "excluded_exercise_ids": {
+          "state": "KNOWN",
+          "value": [],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "declared_priorities": {
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ],
+          "provenance": {
+            "origin": "USER_REPORTED",
+            "acquisition": "DECLARED",
+            "source_ref": "fixture:user-declaration",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "height_cm": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "legacy_weight_kg": {
+          "state": "UNKNOWN",
+          "value": null,
+          "provenance": {
+            "origin": "UNKNOWN",
+            "acquisition": "UNKNOWN",
+            "source_ref": null,
+            "recorded_at": null,
+            "measured_at": null
+          },
+          "conflicts": []
+        },
+        "observations": [],
+        "environment": {
+          "context_ref": "fixture-context",
+          "description": {
+            "state": "KNOWN",
+            "value": "Salle de sport",
+            "provenance": {
+              "origin": "USER_REPORTED",
+              "acquisition": "DECLARED",
+              "source_ref": "fixture:user-declaration",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "equipment_items": {
+            "state": "UNKNOWN",
+            "value": null,
+            "provenance": {
+              "origin": "UNKNOWN",
+              "acquisition": "UNKNOWN",
+              "source_ref": null,
+              "recorded_at": null,
+              "measured_at": null
+            },
+            "conflicts": []
+          },
+          "exercise_confirmations": []
+        }
+      },
+      "policies": {
+        "state": "UNAVAILABLE",
+        "dose_id": null,
+        "time_id": null,
+        "selection_id": null,
+        "taxonomy_projection_id": null,
+        "review_ref": null
+      },
+      "versions": {
+        "catalogue": "auren-exercise-catalogue-v2-closure-2",
+        "zones": "zones-15-v1",
+        "credit": "sci-exposure-credit-v1",
+        "engine": "initial-policy-producer/1.0.0"
+      }
+    },
+    "result": {
+      "overlay_version": "vertical-pull-exposure/1.0.0",
+      "input_fingerprint": "2f7605d5ae4744ddd88e4e1090f7dde9ab4222d12a0ba7a3fe78db7224035933",
+      "parent_curation_status": "REVIEW_REQUIRED",
+      "status": "REVIEW_REQUIRED",
+      "reason": "REQUIRED_CONTEXT_UNKNOWN_OR_CONFLICTING",
+      "candidates": [],
+      "held_candidates": [],
+      "selected": null,
+      "execution_ready": false,
+      "runtime_availability": "NOT_SERVED",
+      "ready_fixture": "NOT_PRODUCED"
+    }
+  }
+]
