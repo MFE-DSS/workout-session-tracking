@@ -1,0 +1,3320 @@
+{
+  "audit_version": "initial-policy-admission-audit/1.0.0",
+  "availability": "NOT_SERVED",
+  "ready_fixture": "READY_NOT_PRODUCED",
+  "proposed_policy": {
+    "path": "docs/science/sci-p02-initial-policy/v1/policy.json",
+    "sha256": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4"
+  },
+  "decision_artifact_sha256": "333e37d1642aa813bc76798caa7a36580d22c50964a9697dcb035e463054056a",
+  "sources": {
+    "data/sci/exercise_catalogue.json": "7d1ae5d3c05c4b76c540789e9e07d0c2c0d96c9a4aa03a28c0b4f964441981fd",
+    "data/sci/exposure_credit_policy.json": "9f6b686a980e41707e9f14ce61abe9f7f09115238dc325d75deef6a3932de51a",
+    "data/sci/evidence_registry.json": "fa82f50fd0d8b577f761fc991ed449e3fb716401e9e4c167c302410952459460",
+    "data/equipment_registry.json": "cb4abfabd38cc0317de566680315423da2d0851e642339aac9a46bdcd49def9d",
+    "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa"
+  },
+  "intent_audit": [
+    {
+      "intent_id": "initial_quad_v1",
+      "candidates": [
+        {
+          "id": "fente-avant",
+          "pattern": "lunge",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "knee_extension",
+            "hip_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "hamstrings",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "calves",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": true,
+          "stability": "UNKNOWN",
+          "context_compatibility": "NOT_REQUIRED",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "hack-squat-machine",
+          "pattern": "squat",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "knee_extension",
+            "hip_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-64"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-64"
+              ]
+            },
+            {
+              "zone": "hamstrings",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "calves",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_hack_squat"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "leg-extension-cable-unilateral",
+          "pattern": "knee_extension",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "knee_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ],
+              "sub_regions": [
+                {
+                  "id": "quads.rectus_femoris",
+                  "basis": "joint_action_anatomy",
+                  "evidence_refs": [
+                    "EV-62",
+                    "EV-71"
+                  ]
+                }
+              ]
+            },
+            {
+              "zone": "hip_flexors",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "hip_flexors"
+          ],
+          "equipment_requirements": [
+            "cable_anchor_low",
+            "cable_attachment_ankle_cuff"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": true,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "leg-extensions-assises",
+          "pattern": "knee_extension",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "knee_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-62",
+                "EV-71"
+              ],
+              "sub_regions": [
+                {
+                  "id": "quads.rectus_femoris",
+                  "basis": "longitudinal_trial",
+                  "evidence_refs": [
+                    "EV-62"
+                  ]
+                }
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_leg_extension"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "leg-press-paren-pieds-bas",
+          "pattern": "squat",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "knee_extension",
+            "hip_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-62",
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-64",
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-64",
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "hamstrings",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "calves",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_leg_press"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "leg-press-paren-pieds-hauts-ecartes",
+          "pattern": "squat",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "knee_extension",
+            "hip_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-62",
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "PRIMARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-64",
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "longitudinal_trial",
+              "evidence_refs": [
+                "EV-64",
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "hamstrings",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "calves",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [
+            "hamstrings"
+          ],
+          "equipment_requirements": [
+            "machine_leg_press"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "reverse-nordic",
+          "pattern": "knee_extension",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "knee_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ],
+              "sub_regions": [
+                {
+                  "id": "quads.rectus_femoris",
+                  "basis": "joint_action_anatomy",
+                  "evidence_refs": [
+                    "EV-62",
+                    "EV-71"
+                  ]
+                }
+              ]
+            },
+            {
+              "zone": "hip_flexors",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "NOT_REQUIRED",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "sissy-squat-machine",
+          "pattern": "knee_extension",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "knee_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ],
+              "sub_regions": [
+                {
+                  "id": "quads.rectus_femoris",
+                  "basis": "joint_action_anatomy",
+                  "evidence_refs": [
+                    "EV-62",
+                    "EV-71"
+                  ]
+                }
+              ]
+            },
+            {
+              "zone": "hip_flexors",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_sissy_squat"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "squat-au-poids-du-corps",
+          "pattern": "squat",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "knee_extension",
+            "hip_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-64"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-64"
+              ]
+            },
+            {
+              "zone": "hamstrings",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "calves",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "NOT_REQUIRED",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "squat-smith-machine-paren-pieds-avances",
+          "pattern": "squat",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "knee_extension",
+            "hip_extension",
+            "isometric_trunk_bracing"
+          ],
+          "raw_roles": [
+            {
+              "zone": "quads",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-64"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-64"
+              ]
+            },
+            {
+              "zone": "hamstrings",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "calves",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "smith_rack"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    },
+    {
+      "intent_id": "initial_press_v1",
+      "candidates": [
+        {
+          "id": "chest-press-machine",
+          "pattern": "horizontal_push",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_horizontal_adduction",
+            "elbow_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "pecs",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "triceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_chest_press"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "developpe-couche-halteres",
+          "pattern": "horizontal_push",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_horizontal_adduction",
+            "elbow_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "pecs",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "triceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dumbbells",
+            "flat_bench_support"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "developpe-incline-halteres-30",
+          "pattern": "horizontal_push",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_horizontal_adduction",
+            "shoulder_flexion",
+            "elbow_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "pecs",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "triceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dumbbells",
+            "incline_bench_support"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "dips-pectoraux-paren-buste-penche",
+          "pattern": "horizontal_push",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_flexion",
+            "shoulder_horizontal_adduction",
+            "elbow_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "pecs",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "triceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dip_support"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "incline-smith-press",
+          "pattern": "horizontal_push",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_horizontal_adduction",
+            "shoulder_flexion",
+            "elbow_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "pecs",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "triceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "incline_bench_support",
+            "smith_rack"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "pompes",
+          "pattern": "horizontal_push",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_horizontal_adduction",
+            "elbow_extension",
+            "isometric_trunk_bracing"
+          ],
+          "raw_roles": [
+            {
+              "zone": "pecs",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "triceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "NOT_REQUIRED",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    },
+    {
+      "intent_id": "initial_row_v1",
+      "candidates": [
+        {
+          "id": "rowing-cable-assis-prise-large",
+          "pattern": "horizontal_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_horizontal_abduction",
+            "scapular_retraction",
+            "elbow_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "upper_back",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "lateral_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [
+            "lats"
+          ],
+          "equipment_requirements": [
+            "row_seated_station"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "rowing-cable-assis-prise-neutre",
+          "pattern": "horizontal_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_extension",
+            "scapular_retraction",
+            "elbow_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "upper_back",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "row_seated_station",
+            "cable_attachment_close_neutral_row_handle"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "rowing-cable-assis-prise-serree",
+          "pattern": "horizontal_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_extension",
+            "scapular_retraction",
+            "elbow_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "upper_back",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "row_seated_station",
+            "cable_attachment_close_neutral_row_handle"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "rowing-chest-supported",
+          "pattern": "horizontal_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_extension",
+            "shoulder_horizontal_abduction",
+            "scapular_retraction",
+            "elbow_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "upper_back",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_chest_supported_row"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "rowing-haltere-un-bras-paren-banc",
+          "pattern": "horizontal_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_extension",
+            "scapular_retraction",
+            "elbow_flexion",
+            "isometric_trunk_bracing"
+          ],
+          "raw_roles": [
+            {
+              "zone": "upper_back",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dumbbells",
+            "flat_bench_support"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": true,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    },
+    {
+      "intent_id": "initial_hinge_v1",
+      "candidates": [
+        {
+          "id": "back-extension-45-paren-bias-ischios",
+          "pattern": "hinge",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "hip_extension"
+          ],
+          "raw_roles": [
+            {
+              "zone": "hamstrings",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "back_extension_45_support"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "good-morning-halteres",
+          "pattern": "hinge",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "hip_extension",
+            "isometric_trunk_bracing"
+          ],
+          "raw_roles": [
+            {
+              "zone": "hamstrings",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "upper_back"
+          ],
+          "equipment_requirements": [
+            "dumbbells"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "romanian-deadlift-barre",
+          "pattern": "hinge",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "hip_extension",
+            "isometric_trunk_bracing"
+          ],
+          "raw_roles": [
+            {
+              "zone": "hamstrings",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "barbell"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "romanian-deadlift-halteres",
+          "pattern": "hinge",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "hip_extension",
+            "isometric_trunk_bracing"
+          ],
+          "raw_roles": [
+            {
+              "zone": "hamstrings",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "glutes",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "adductors",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "lats",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "abs",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dumbbells"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    },
+    {
+      "intent_id": "initial_vertical_pull_v1",
+      "candidates": [
+        {
+          "id": "tirage-poulie-haute-prise-large",
+          "pattern": "vertical_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_adduction",
+            "elbow_flexion",
+            "scapular_downward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "pecs",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "rear_delts",
+            "pecs"
+          ],
+          "equipment_requirements": [
+            "pulldown_seated_station"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "tirage-poulie-haute-prise-neutre",
+          "pattern": "vertical_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_extension",
+            "elbow_flexion",
+            "scapular_downward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "pecs",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "pecs"
+          ],
+          "equipment_requirements": [
+            "pulldown_seated_station",
+            "cable_attachment_neutral_grip"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "tirage-vertical-unilateral-cable",
+          "pattern": "vertical_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_adduction",
+            "shoulder_extension",
+            "elbow_flexion",
+            "scapular_downward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "pecs",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "rear_delts",
+            "pecs"
+          ],
+          "equipment_requirements": [
+            "pulldown_seated_station",
+            "cable_attachment_single_handle"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": true,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "traction-assistee-machine",
+          "pattern": "vertical_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_adduction",
+            "shoulder_extension",
+            "elbow_flexion",
+            "scapular_downward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "pecs",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "rear_delts",
+            "pecs"
+          ],
+          "equipment_requirements": [
+            "machine_assisted_pull_up"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "traction-assistee-unilaterale",
+          "pattern": "vertical_pull",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_adduction",
+            "shoulder_extension",
+            "elbow_flexion",
+            "scapular_downward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lats",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71",
+                "EV-63"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "rear_delts",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "pecs",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            }
+          ],
+          "unknown_role_zones": [
+            "rear_delts",
+            "pecs"
+          ],
+          "equipment_requirements": [
+            "machine_assisted_pull_up"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": true,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    },
+    {
+      "intent_id": "initial_lateral_delt_v1",
+      "candidates": [
+        {
+          "id": "elevations-laterales-cable-paren-derriere-le-dos",
+          "pattern": "shoulder_abduction",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "shoulder_abduction",
+            "scapular_upward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lateral_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "cable_anchor_low"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": true,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "elevations-laterales-halteres",
+          "pattern": "shoulder_abduction",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "shoulder_abduction",
+            "scapular_upward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lateral_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dumbbells"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "elevations-laterales-halteres-assis",
+          "pattern": "shoulder_abduction",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "shoulder_abduction",
+            "scapular_upward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lateral_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "dumbbells",
+            "seated_support"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "elevations-laterales-machine",
+          "pattern": "shoulder_abduction",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "shoulder_abduction",
+            "scapular_upward_rotation"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lateral_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_lateral_raise"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "tirage-front-cable-paren-prise-large",
+          "pattern": "shoulder_abduction",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_abduction",
+            "scapular_elevation",
+            "scapular_upward_rotation",
+            "elbow_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lateral_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "cable_anchor_low",
+            "cable_attachment_straight_bar"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "upright-row-halteres",
+          "pattern": "shoulder_abduction",
+          "joint_type": "multi_joint",
+          "loaded_joint_actions": [
+            "shoulder_abduction",
+            "scapular_elevation",
+            "elbow_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "lateral_delts",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "upper_back",
+              "role": "UNKNOWN",
+              "role_basis": "unresolved",
+              "evidence_refs": []
+            },
+            {
+              "zone": "biceps",
+              "role": "SECONDARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            },
+            {
+              "zone": "anterior_delts",
+              "role": "MINOR",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [
+            "upper_back"
+          ],
+          "equipment_requirements": [
+            "dumbbells"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    },
+    {
+      "intent_id": "initial_calf_v1",
+      "candidates": [
+        {
+          "id": "calf-press-leg-press",
+          "pattern": "plantar_flexion",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "plantar_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "calves",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_leg_press"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "mollets-assis-machine",
+          "pattern": "plantar_flexion",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "plantar_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "calves",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_seated_calf_raise"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "releves-mollets-debout",
+          "pattern": "plantar_flexion",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "plantar_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "calves",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "NOT_REQUIRED",
+          "admitted_for_initial_scope": false
+        },
+        {
+          "id": "releves-mollets-debout-machine",
+          "pattern": "plantar_flexion",
+          "joint_type": "single_joint",
+          "loaded_joint_actions": [
+            "plantar_flexion"
+          ],
+          "raw_roles": [
+            {
+              "zone": "calves",
+              "role": "PRIMARY",
+              "role_basis": "joint_action_anatomy",
+              "evidence_refs": [
+                "EV-71"
+              ]
+            }
+          ],
+          "unknown_role_zones": [],
+          "equipment_requirements": [
+            "machine_standing_calf_raise"
+          ],
+          "equipment_requirement_status": "RESOLVED",
+          "unilateral": false,
+          "stability": "UNKNOWN",
+          "context_compatibility": "UNKNOWN",
+          "admitted_for_initial_scope": false
+        }
+      ]
+    }
+  ],
+  "example_zone_exposure": [
+    {
+      "zone": "pecs",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 6,
+      "credited_sets": null,
+      "bound": "UNKNOWN"
+    },
+    {
+      "zone": "lats",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 6,
+      "credited_sets": null,
+      "bound": "UNKNOWN"
+    },
+    {
+      "zone": "upper_back",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 12,
+      "unknown_role_sets": 0,
+      "credited_sets": 12.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "anterior_delts",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 6,
+      "unknown_role_sets": 0,
+      "credited_sets": 3.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "lateral_delts",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "rear_delts",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 6,
+      "credited_sets": null,
+      "bound": "UNKNOWN"
+    },
+    {
+      "zone": "biceps",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 12,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "triceps",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 6,
+      "unknown_role_sets": 0,
+      "credited_sets": 3.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "quads",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "hamstrings",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "glutes",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 12,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "adductors",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 12,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "calves",
+      "raw_primary_sets": 6,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 0,
+      "credited_sets": 6.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "abs",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 0,
+      "credited_sets": 0.0,
+      "bound": "EXACT"
+    },
+    {
+      "zone": "hip_flexors",
+      "raw_primary_sets": 0,
+      "raw_secondary_sets": 0,
+      "unknown_role_sets": 0,
+      "credited_sets": 0.0,
+      "bound": "EXACT"
+    }
+  ],
+  "cases": [
+    {
+      "scenario": "sufficient",
+      "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "COMPATIBILITY_UNKNOWN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "insufficient",
+      "input_fingerprint": "fc484b3b7341604d79d17e138c6892d2ea99b9668deee890c22cd488da0b26ea",
+      "response": {
+        "status": "INSUFFICIENT_DATA",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "REQUIRED_INPUT_MISSING",
+            "blocking": true,
+            "field_refs": [
+              "sessions_per_week"
+            ],
+            "explanation": "Required operational inputs are explicitly missing."
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": []
+    },
+    {
+      "scenario": "conflicting",
+      "input_fingerprint": "6ff3eeccd9276ee0418de0e805390bec787160d292b31ff5b124188b3cc99b83",
+      "response": {
+        "status": "CONFLICTING_DATA",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "INPUT_CONFLICT",
+            "blocking": true,
+            "field_refs": [
+              "sessions_per_week"
+            ],
+            "explanation": "Resolve sourced input conflicts before prescription."
+          },
+          {
+            "code": "INPUT_CONFLICT",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: INPUT_CONFLICT"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": []
+    },
+    {
+      "scenario": "unknown_gym",
+      "input_fingerprint": "d2b93d445e7cb179a00403650af61de2cd98ed64f9c3fdb03fc09fee82f200a6",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "COMPATIBILITY_UNKNOWN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "optional_conflict",
+      "input_fingerprint": "6b4d97cfb432dfbc485d2e3c38cc4dd5f96d3574c829481ab29ca08adde8cc18",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "INPUT_CONFLICT",
+            "blocking": false,
+            "field_refs": [
+              "height_cm"
+            ],
+            "explanation": "Optional conflicting input is not used for personalisation."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "COMPATIBILITY_UNKNOWN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "withheld_required_input",
+      "input_fingerprint": "c6bf80f897e601887541f18a254a14730e9b50108628dad22f7556889de1e84d",
+      "response": {
+        "status": "INSUFFICIENT_DATA",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "REQUIRED_INPUT_MISSING",
+            "blocking": true,
+            "field_refs": [
+              "limitations"
+            ],
+            "explanation": "Required operational inputs are explicitly missing."
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": []
+    },
+    {
+      "scenario": "undated_legacy_weight",
+      "input_fingerprint": "c66866d5defe0e713fa638214d249f1195ae4ad619e795e931c0c11380f137c0",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "COMPATIBILITY_UNKNOWN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "legacy_candidate_requires_policies_and_review",
+      "input_fingerprint": "bfbccd2fd460908927db248c33ea94bec94c5e94a7e841397213a85b8d9d2235",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "COMPATIBILITY_UNKNOWN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "confirmed_exercises_no_inventory",
+      "input_fingerprint": "02561ca3659e71cb20bbc6b9731e999237c3dfe62968e2d0f000b011a51eba7c",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "forged_policy_approval",
+      "input_fingerprint": "658d2943c3e0807eb426d840f6860f7f1944d8f549cac6d29b1c2827fc9d0800",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CATALOG_GAP",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CATALOG_GAP"
+          },
+          {
+            "code": "COMPATIBILITY_UNKNOWN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: COMPATIBILITY_UNKNOWN"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": [
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        },
+        {
+          "model_version": "initial-rest-floor/1.0.0",
+          "scope": "THIS_CONFIGURATION_ONLY",
+          "budget_minutes": 60,
+          "known_rest_floor_seconds": 750,
+          "rest_floor_complete": true,
+          "unknown_components": [
+            "WORK_DURATION",
+            "WARM_UP",
+            "OPERATIONAL_OVERHEAD",
+            "PERSONAL_EXECUTION"
+          ],
+          "feasibility": "UNKNOWN",
+          "issue_code": "TIME_UNCERTAIN",
+          "duration": {
+            "state": "UNKNOWN",
+            "lower_minutes": null,
+            "upper_minutes": null,
+            "model_ref": null
+          }
+        }
+      ]
+    },
+    {
+      "scenario": "known_cadence_outside_initial_subset",
+      "input_fingerprint": "4a7a522932c0aceaa6dc50686786813462c2465838984a69a09c8a2b81114a88",
+      "response": {
+        "status": "POLICY_UNAVAILABLE",
+        "confidence": {
+          "individual_response": "NOT_ESTIMATED",
+          "feasibility": "UNKNOWN",
+          "evidence_refs": [
+            "IP-E01",
+            "IP-E02",
+            "IP-E03",
+            "IP-E04",
+            "IP-E05",
+            "IP-E06",
+            "IP-E07",
+            "IP-E08"
+          ],
+          "limitations": [
+            "Proposed dose is not individually validated.",
+            "No supported time upper bound or admitted runtime policy.",
+            "No runtime/API activation; diagnostics are non-executable."
+          ]
+        },
+        "issues": [
+          {
+            "code": "POLICY_UNAVAILABLE",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "The isolated producer exists; scientific policy admission does not."
+          },
+          {
+            "code": "CONSTRAINT_VIOLATION",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: CONSTRAINT_VIOLATION"
+          },
+          {
+            "code": "TIME_UNCERTAIN",
+            "blocking": true,
+            "field_refs": [],
+            "explanation": "Proposed policy diagnostic: TIME_UNCERTAIN"
+          }
+        ]
+      },
+      "sessions_time": []
+    }
+  ]
+}
