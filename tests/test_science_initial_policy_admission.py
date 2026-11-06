@@ -157,7 +157,9 @@ def test_reviewed_artifact_separates_product_default_from_measured_evidence():
     for rule in policy["rules"]:
         assert rule["evidence_refs"]
         assert set(rule["evidence_refs"]) <= evidence.keys()
-        assert rule["population"] and rule["review_trigger"] and rule["limitations"]
+        assert rule["population"]
+        assert rule["review_trigger"]
+        assert rule["limitations"]
     dose = {r["rule_id"]: r for r in policy["rules"]}
     for name in ("work_sets", "repetitions", "effort", "rest"):
         assert dose[name]["decision"] == "ADMITTED_AS_CONSERVATIVE_DEFAULT"
