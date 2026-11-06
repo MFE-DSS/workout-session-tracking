@@ -71,3 +71,7 @@ Le prochain travail peut réutiliser40dispositions,29admissions conditionnelles,
 ## NEXT SCIENCE SPIKE
 
 **SCI-P02-PULL-EXPOSURE-RESOLUTION-01** : résoudre de manière bornée l’exécution et la contribution encore inconnues d’au moins un des cinq candidats verticaux existants, ou proposer explicitement un contrat d’incertitude si la catégorie exacte n’est pas soutenable. Pas d’élargissement du pool, pas de MINOR par défaut. Ce blocage de sélection reste en amont d’un plan complet : la préparation/calibration/temps positif n’est donc pas choisie automatiquement malgré son intérêt ultérieur. Aucun GO BUILD du prochain spike n’est déduit de ce handoff.
+
+## Publication vérifiée
+
+PR[#362](https://github.com/MFE-DSS/workout-session-tracking/pull/362), HEADae0169137da3e5e91075ce9fd9f3b1d556dcb2d6, merge1c48301bb855733a610d376ba6d58219a00fe5c4. CI PR42220266909 et canonique42222587746 : completed/success,9jobs chacune,7383backend/3ignorés,54suites/676mobile+TypeScript. Sonar PR Quality Gate OK/0nouvelle issue ouverte ; canonique ERROR hérité, consultatif selon GOV-SONAR-01. Preuves, corrections de tests et limites dans [VERIFICATION.md](VERIFICATION.md). Opération de curation livrée ; admission scientifique partielle, change global/PLAN/MOB03 ouverts, aucun runtime ou déploiement.
