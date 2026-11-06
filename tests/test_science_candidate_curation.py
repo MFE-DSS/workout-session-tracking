@@ -232,8 +232,9 @@ def test_structural_validation_is_not_authority_for_forged_dispositions():
     other = bundle.model_copy(
         update={"candidates": [forged if r == original else r for r in bundle.candidates]}
     )
+    req = request()
     with pytest.raises(ValueError, match="trusted"):
-        resolve(request(), "initial_quad_v1", other)
+        resolve(req, "initial_quad_v1", other)
 
 
 def test_curation_uses_only_its_context_inputs_without_requiring_anthropometry_or_time():
