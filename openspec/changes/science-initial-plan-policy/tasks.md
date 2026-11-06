@@ -66,6 +66,6 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Revue de construction indépendante : trois ambiguïtés clarifiées, contrôle final « nothing important left » ; pas admission scientifique ou code review d'une implémentation absente.
 - [x] Contrôles documentaires : check_scope DOCS, check_spec_protocol passant ; aucun test fonctionnel nouveau ou résultat CI de build revendiqué.
 - [x] GO BUILD reçu : opérateur « continue » après demande de validation du delta/design ; réalisation isolée seulement, aucune admission/activation implicite.
-- [ ] Après GO : plan d'implémentation, TDD, vrai producteur v2/fixtures, broad ciblé et conservation des sorties v1/pull.
+- [x] Build isolé confirmé « Valider le build isolé proposé » : producteur v2, calibration/temps,12cas réels non servis, schémas et412tests broad passants ; anciennes sources/sorties préservées. Revues et livraison distinctes ci-dessous.
 - [ ] Revues scientifique/code distinctes et éventuelle admission selon preuves réelles ; aucun READY fabriqué.
 - [ ] CI/merge/closeout du seul périmètre terminé ; préparer SCI-P02-INITIAL-POLICY-ADMISSION, global science/MOB03 toujours ouverts.

@@ -1,0 +1,774 @@
+{
+  "$defs": {
+    "Candidate": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "minLength": 1,
+          "title": "Canonical Exercise Id",
+          "type": "string"
+        },
+        "compatibility": {
+          "enum": [
+            "CONFIRMED",
+            "NOT_REQUIRED",
+            "UNKNOWN",
+            "UNAVAILABLE"
+          ],
+          "title": "Compatibility",
+          "type": "string"
+        },
+        "compatibility_source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Compatibility Source Ref"
+        },
+        "context_ref": {
+          "minLength": 1,
+          "title": "Context Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonical_exercise_id",
+        "compatibility",
+        "compatibility_source_ref",
+        "context_ref"
+      ],
+      "title": "Candidate",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "properties": {
+        "individual_response": {
+          "const": "NOT_ESTIMATED",
+          "title": "Individual Response",
+          "type": "string"
+        },
+        "feasibility": {
+          "enum": [
+            "UNKNOWN",
+            "MIXED",
+            "CONFIRMED",
+            "NOT_FEASIBLE"
+          ],
+          "title": "Feasibility",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "individual_response",
+        "feasibility",
+        "evidence_refs",
+        "limitations"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "Duration": {
+      "additionalProperties": false,
+      "properties": {
+        "budget_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Budget Minutes",
+          "type": "integer"
+        },
+        "state": {
+          "enum": [
+            "UNKNOWN",
+            "ESTIMATED"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "lower_minutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower Minutes"
+        },
+        "upper_minutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper Minutes"
+        },
+        "model_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Model Ref"
+        },
+        "basis_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Basis Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "budget_minutes",
+        "state",
+        "lower_minutes",
+        "upper_minutes",
+        "model_ref",
+        "basis_refs"
+      ],
+      "title": "Duration",
+      "type": "object"
+    },
+    "Exposure": {
+      "additionalProperties": false,
+      "properties": {
+        "zone": {
+          "enum": [
+            "pecs",
+            "lats",
+            "upper_back",
+            "anterior_delts",
+            "lateral_delts",
+            "rear_delts",
+            "biceps",
+            "triceps",
+            "quads",
+            "hamstrings",
+            "glutes",
+            "adductors",
+            "calves",
+            "abs",
+            "hip_flexors"
+          ],
+          "title": "Zone",
+          "type": "string"
+        },
+        "raw_primary_sets": {
+          "minimum": 0,
+          "title": "Raw Primary Sets",
+          "type": "integer"
+        },
+        "raw_secondary_sets": {
+          "minimum": 0,
+          "title": "Raw Secondary Sets",
+          "type": "integer"
+        },
+        "unknown_role_sets": {
+          "minimum": 0,
+          "title": "Unknown Role Sets",
+          "type": "integer"
+        },
+        "credited_sets": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Credited Sets"
+        },
+        "bound": {
+          "enum": [
+            "EXACT",
+            "LOWER_BOUND",
+            "UNKNOWN"
+          ],
+          "title": "Bound",
+          "type": "string"
+        }
+      },
+      "required": [
+        "zone",
+        "raw_primary_sets",
+        "raw_secondary_sets",
+        "unknown_role_sets",
+        "credited_sets",
+        "bound"
+      ],
+      "title": "Exposure",
+      "type": "object"
+    },
+    "FirstPlanRecommendation": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "first-plan-recommendation/1.0.0",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "request_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Request Fingerprint",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "INSUFFICIENT_DATA",
+            "CONFLICTING_DATA",
+            "POLICY_UNAVAILABLE",
+            "CONSTRAINT_UNSATISFIABLE",
+            "REVIEW_REQUIRED",
+            "READY"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "engine_version": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Engine Version"
+        },
+        "assessment": {
+          "$ref": "#/$defs/InputAssessment"
+        },
+        "issues": {
+          "items": {
+            "$ref": "#/$defs/Issue"
+          },
+          "title": "Issues",
+          "type": "array"
+        },
+        "used_fields": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Used Fields",
+          "type": "array"
+        },
+        "candidate_plan": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Plan"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence"
+        }
+      },
+      "required": [
+        "contract_version",
+        "request_fingerprint",
+        "status",
+        "engine_version",
+        "assessment",
+        "issues",
+        "used_fields",
+        "candidate_plan",
+        "confidence"
+      ],
+      "title": "FirstPlanRecommendation",
+      "type": "object"
+    },
+    "InputAssessment": {
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "enum": [
+            "SUFFICIENT",
+            "INSUFFICIENT",
+            "CONFLICTING"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "requirement_profile_id": {
+          "const": "first-bodybuilding-inputs-v1-proposed",
+          "title": "Requirement Profile Id",
+          "type": "string"
+        },
+        "missing_fields": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Missing Fields",
+          "type": "array"
+        },
+        "conflicting_fields": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Conflicting Fields",
+          "type": "array"
+        }
+      },
+      "required": [
+        "state",
+        "requirement_profile_id",
+        "missing_fields",
+        "conflicting_fields"
+      ],
+      "title": "InputAssessment",
+      "type": "object"
+    },
+    "Issue": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "INPUT_CONFLICT",
+            "REQUIRED_INPUT_MISSING",
+            "POLICY_UNAVAILABLE",
+            "NO_FEASIBLE_PLAN",
+            "COMPATIBILITY_UNKNOWN",
+            "TIME_UNCERTAIN",
+            "CATALOG_GAP",
+            "CONSTRAINT_VIOLATION"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "field_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Field Refs",
+          "type": "array"
+        },
+        "explanation": {
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "blocking",
+        "field_refs",
+        "explanation"
+      ],
+      "title": "Issue",
+      "type": "object"
+    },
+    "Plan": {
+      "additionalProperties": false,
+      "properties": {
+        "archetype_ref": {
+          "minLength": 1,
+          "title": "Archetype Ref",
+          "type": "string"
+        },
+        "review_state": {
+          "enum": [
+            "LEGACY_UNVALIDATED",
+            "REVIEWED"
+          ],
+          "title": "Review State",
+          "type": "string"
+        },
+        "sessions": {
+          "items": {
+            "$ref": "#/$defs/Session"
+          },
+          "minItems": 1,
+          "title": "Sessions",
+          "type": "array"
+        },
+        "physical_work_sets_total": {
+          "exclusiveMinimum": 0,
+          "title": "Physical Work Sets Total",
+          "type": "integer"
+        },
+        "zone_model_version": {
+          "const": "zones-15-v1",
+          "title": "Zone Model Version",
+          "type": "string"
+        },
+        "credit_policy_version": {
+          "const": "sci-exposure-credit-v1",
+          "title": "Credit Policy Version",
+          "type": "string"
+        },
+        "exposure_complete": {
+          "title": "Exposure Complete",
+          "type": "boolean"
+        },
+        "zone_exposure": {
+          "items": {
+            "$ref": "#/$defs/Exposure"
+          },
+          "title": "Zone Exposure",
+          "type": "array"
+        }
+      },
+      "required": [
+        "archetype_ref",
+        "review_state",
+        "sessions",
+        "physical_work_sets_total",
+        "zone_model_version",
+        "credit_policy_version",
+        "exposure_complete",
+        "zone_exposure"
+      ],
+      "title": "Plan",
+      "type": "object"
+    },
+    "Prescription": {
+      "additionalProperties": false,
+      "properties": {
+        "work_sets": {
+          "exclusiveMinimum": 0,
+          "title": "Work Sets",
+          "type": "integer"
+        },
+        "min_reps": {
+          "exclusiveMinimum": 0,
+          "title": "Min Reps",
+          "type": "integer"
+        },
+        "max_reps": {
+          "exclusiveMinimum": 0,
+          "title": "Max Reps",
+          "type": "integer"
+        },
+        "rir_target": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rir Target"
+        },
+        "rest_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rest Seconds"
+        },
+        "load_kg": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Load Kg"
+        },
+        "load_mode": {
+          "enum": [
+            "CALIBRATION_REQUIRED",
+            "HISTORY_SUPPORTED",
+            "NOT_DEFINED"
+          ],
+          "title": "Load Mode",
+          "type": "string"
+        },
+        "source_kind": {
+          "enum": [
+            "LEGACY_TEMPLATE",
+            "REVIEWED_POLICY",
+            "CONTRACT_EXAMPLE"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "dose_policy_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Dose Policy Ref"
+        },
+        "evidence_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "work_sets",
+        "min_reps",
+        "max_reps",
+        "rir_target",
+        "rest_seconds",
+        "load_kg",
+        "load_mode",
+        "source_kind",
+        "source_ref",
+        "dose_policy_ref",
+        "evidence_refs"
+      ],
+      "title": "Prescription",
+      "type": "object"
+    },
+    "Session": {
+      "additionalProperties": false,
+      "properties": {
+        "session_id": {
+          "minLength": 1,
+          "title": "Session Id",
+          "type": "string"
+        },
+        "slots": {
+          "items": {
+            "$ref": "#/$defs/Slot"
+          },
+          "minItems": 1,
+          "title": "Slots",
+          "type": "array"
+        },
+        "duration": {
+          "$ref": "#/$defs/Duration"
+        }
+      },
+      "required": [
+        "session_id",
+        "slots",
+        "duration"
+      ],
+      "title": "Session",
+      "type": "object"
+    },
+    "Slot": {
+      "additionalProperties": false,
+      "properties": {
+        "slot_id": {
+          "minLength": 1,
+          "title": "Slot Id",
+          "type": "string"
+        },
+        "intent_id": {
+          "minLength": 1,
+          "title": "Intent Id",
+          "type": "string"
+        },
+        "selected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Candidate"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "alternatives": {
+          "items": {
+            "$ref": "#/$defs/Candidate"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "substitution_rule_ref": {
+          "minLength": 1,
+          "title": "Substitution Rule Ref",
+          "type": "string"
+        },
+        "prescription": {
+          "$ref": "#/$defs/Prescription"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "intent_id",
+        "selected",
+        "alternatives",
+        "substitution_rule_ref",
+        "prescription",
+        "rationale"
+      ],
+      "title": "Slot",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Versioned research envelope; diagnostics require full recomputation to trust.\n\nThe embedded canonical recommendation keeps its strict v1 schema. Diagnostic\ndictionaries are not executable plans or a served FirstPlanClient transport.",
+  "properties": {
+    "contract_version": {
+      "const": "initial-plan-evaluation-result/1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "subject_ref": {
+      "minLength": 1,
+      "title": "Subject Ref",
+      "type": "string"
+    },
+    "engine_version": {
+      "const": "initial-policy-producer/2.0.0",
+      "title": "Engine Version",
+      "type": "string"
+    },
+    "bundle_digest": {
+      "minLength": 1,
+      "title": "Bundle Digest",
+      "type": "string"
+    },
+    "effective_science_digest": {
+      "minLength": 1,
+      "title": "Effective Science Digest",
+      "type": "string"
+    },
+    "request_fingerprint": {
+      "minLength": 1,
+      "title": "Request Fingerprint",
+      "type": "string"
+    },
+    "evaluation_fingerprint": {
+      "minLength": 1,
+      "title": "Evaluation Fingerprint",
+      "type": "string"
+    },
+    "recommendation": {
+      "$ref": "#/$defs/FirstPlanRecommendation"
+    },
+    "draft": {
+      "additionalProperties": true,
+      "title": "Draft",
+      "type": "object"
+    },
+    "calibration_by_context": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Calibration By Context",
+      "type": "object"
+    },
+    "time_by_session": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Time By Session",
+      "type": "array"
+    },
+    "blockers": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Blockers",
+      "type": "array"
+    },
+    "scientific_admission": {
+      "const": "NOT_ADMITTED",
+      "title": "Scientific Admission",
+      "type": "string"
+    },
+    "runtime_availability": {
+      "const": "NOT_SERVED",
+      "title": "Runtime Availability",
+      "type": "string"
+    },
+    "ready_fixture": {
+      "const": "NOT_PRODUCED",
+      "title": "Ready Fixture",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "subject_ref",
+    "engine_version",
+    "bundle_digest",
+    "effective_science_digest",
+    "request_fingerprint",
+    "evaluation_fingerprint",
+    "recommendation",
+    "draft",
+    "calibration_by_context",
+    "time_by_session",
+    "blockers",
+    "scientific_admission",
+    "runtime_availability",
+    "ready_fixture"
+  ],
+  "title": "EvaluationResult",
+  "type": "object"
+}

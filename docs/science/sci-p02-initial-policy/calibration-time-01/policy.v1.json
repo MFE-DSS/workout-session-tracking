@@ -1,0 +1,41 @@
+{
+  "policy_version": "initial-hypertrophy-policy/0.3.0-proposed",
+  "engine_version": "initial-policy-producer/2.0.0",
+  "scientific_admission": "NOT_ADMITTED",
+  "runtime_availability": "NOT_SERVED",
+  "ready_fixture": "NOT_PRODUCED",
+  "build_approval": [
+    "continue",
+    "Valider le build isolé proposé"
+  ],
+  "source_manifest_sha256": "d56eb8ab116d18271352dc2cfcceecdcff7b05b320dd863dc37ac759fab2d927",
+  "source_manifest": "docs/science/sci-p02-initial-policy/calibration-time-01/SOURCE_PINS.json",
+  "dose_source": "docs/science/sci-p02-initial-policy/admission-01/policy.json",
+  "curation_version": "initial-candidate-curation/1.0.0",
+  "pull_overlay_version": "vertical-pull-exposure/1.0.0",
+  "calibration_protocol": "initial-load-calibration/1.0.0",
+  "time_model": "initial-session-time/1.0.0",
+  "approved_policy_refs": [],
+  "approved_restart_refs": [],
+  "evidence_refs": [
+    "EV-04",
+    "EV-40",
+    "EV-42",
+    "EV-44",
+    "EV-70",
+    "EV-71"
+  ],
+  "calibrated_meaning": "OBSERVED_SETTING_ACCEPTED_FOR_TRIAL_NOT_TRUE_RIR",
+  "timing_admission": "CONDITIONAL_ARITHMETIC_ONLY_NO_VALIDATED_PERSONAL_FORECAST",
+  "g17_application": "QUALIFIED_CONDITIONAL_PLANNING_ONLY_NO_QUANTIFIED_HYPERTROPHY",
+  "quantitative_exposure_projection": "NOT_COMPUTED_IN_THIS_SUCCESSOR",
+  "selection_order": [
+    "CURRENT_COMPATIBILITY",
+    "CANONICAL_ID_REPRODUCIBILITY_NOT_BIOLOGICAL_RANK"
+  ],
+  "admission_blockers": [
+    "POSITIVE_TIME_BASIS_NOT_ADMITTED",
+    "SELECTION_EFFECTIVE_REFERENCE_NOT_ADMITTED",
+    "BOOTSTRAP_PROTOCOL_REQUIRES_SCIENTIFIC_ADMISSION"
+  ]
+}

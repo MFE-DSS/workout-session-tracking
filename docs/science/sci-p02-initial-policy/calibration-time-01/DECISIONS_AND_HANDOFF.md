@@ -31,3 +31,7 @@ Handoff mobile actuel : FirstPlanClient/v1 restent inchangés, producteur runtim
 Sources canoniques inventoriées/pinées avant toute implémentation ; recherche primaire indépendante réalisée en lecture seule. [Revue de construction](BUILDER_REVIEW.md) : trois ambiguïtés résolues en conventions proposées, contrôle final « nothing important left ». Aucun nouveau test fonctionnel, code review d'implémentation, CI, commit/push/merge ou admission READY de ce spike n'est revendiqué. Base canonique :8e987c6 ; les preuves CI de cette base ne sont pas des tests des fonctions proposées. Contrôles documentaires de cette proposition consignés après leur exécution.
 
 Contrôles réalisés : **check_scope DOCS ; check_spec_protocol passant**. Pas de sweep Python/mobile, Ruff ou autre test de produit pour ce diff documentaire, conformément au verdict local.49cas de construction spécifiés ne sont pas49tests passants. Le worktree et ses dix fichiers de proposition restent disponibles pour la revue ; aucune fusion de build anticipée.
+
+## Actualisation après la décision et réalisation
+
+Les sections précédentes conservent la proposition historique. L'opérateur a confirmé « Valider le build isolé proposé » : le build est autorisé. Voir désormais [DELIVERY.md](DELIVERY.md) et le [paquet d'admission préparé](INITIAL_POLICY_ADMISSION.md) pour le comportement réellement implémenté et ses limites. La proposition documentaire initiale n'est plus le statut courant ; la politique reste distinctement NOT_ADMITTED/NOT_SERVED, sans READY.
