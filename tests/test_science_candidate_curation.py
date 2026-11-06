@@ -2,6 +2,7 @@
 
 import copy
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -269,3 +270,18 @@ def test_coverage_unknown_and_none_known_are_distinct_and_artifacts_reproduce():
     assert "UNKNOWN" in vertical["zones"]["pecs"]["candidate_role_states"]
     assert vertical["admissible_candidate_count"] == 0
     assert out["effective_role_changes"] == []
+
+
+def test_proposed_e0_delta_uses_canonical_evidence_id_syntax_without_overwriting_e0():
+    folder = ROOT / "docs/science/sci-p02-initial-policy/curation-01"
+    delta = json.loads((folder / "evidence-delta.v1.json").read_text())
+    schema = json.loads((ROOT / "data/sci/exercise_catalogue.schema.json").read_text())
+    pattern = schema["$defs"]["contribution"]["properties"]["evidence_refs"]["items"]["pattern"]
+    current = json.loads((ROOT / delta["target"]).read_text())
+    assert delta["status"] == "PROPOSED_NOT_APPLIED"
+    assert delta["runtime_import"] is False
+    assert set(delta["entries"]).isdisjoint(current)
+    for identity, record in delta["entries"].items():
+        assert re.fullmatch(pattern, identity)
+        assert set(record) == {"claim", "row"}
+        assert delta["provenance"][identity]["doi"]

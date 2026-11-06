@@ -39,6 +39,6 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Curer40candidats/sept intentions : dispositions, contexte, support, calibration et préparation sans chiffres inventés.
 - [x] Versionner matrice7×15 et delta :14UNKNOWN inchangés, deux corrections de base de preuve, aucun classement.
 - [x] Résolveur pur/strict et fixtures sans READY, TDD frontières et conflit à trois états.
-- [x] Broad scientifique445/1ignoré, contrôles et revues scientifique/code distinctes sans Critical/Important.
+- [x] Broad scientifique446/1ignoré, contrôles et revues scientifique/code distinctes sans Critical/Important.
 - [ ] Publication, CI du HEAD final, merge et vérification canonique de cette seule opération.
 - [ ] Clôture traçable du spike ; préserver CATALOG_GAP et prochain besoin, aucun archivage global.
