@@ -1,0 +1,156 @@
+{
+  "contract_version": "mob04-preparation/1.0.0",
+  "authority": "SPEC_FIXTURE_NOT_SERVED",
+  "source_commit": "db37b76be1cb18d18675b47788b8e680a1dff752",
+  "scientific_engine": "initial-policy-producer/1.0.0",
+  "scientific_policy": "initial-hypertrophy-policy/0.1.0-proposed",
+  "scientific_runtime": "NOT_SERVED",
+  "cases": [
+    {
+      "id": "resume_owned_server",
+      "context": "mission-read",
+      "payload": {
+        "state": "RESUME",
+        "session": {
+          "id": 11,
+          "template_slug": "push-a",
+          "name": "Push A",
+          "subtitle": "Pecs épaisseur + Delts + Triceps",
+          "started_at": "2026-11-05T12:00:00Z"
+        },
+        "position": null,
+        "primary_action": "RESUME"
+      },
+      "fixture_origin": "existing push-a lab session; fixed synthetic timestamp",
+      "expected": {
+        "primary_action": "RESUME",
+        "first_plan_gate": false
+      }
+    },
+    {
+      "id": "no_mission",
+      "context": "mission-read",
+      "payload": {
+        "state": "NO_MISSION",
+        "primary_action": null
+      },
+      "source": "app/services/mobile_read_models.py::mission_read_model",
+      "expected": {
+        "primary_action": null,
+        "invent_default_plan": false
+      }
+    },
+    {
+      "id": "legacy_ready_locked_reference",
+      "context": "visual-reference-only",
+      "payload": null,
+      "fixture_ref": {
+        "path": "clients/mobile/src/fixtures/lab_fixture.json",
+        "json_pointer": "/mission",
+        "sha256": "73838a693021434f9f5d839b9d66e4babc08d46ffd95a461ca6bfc5b21a81d81"
+      },
+      "visual_contract": "MISSION-SCREEN-V1",
+      "expected": {
+        "can_satisfy_scientific_first_plan_gate": false,
+        "new_prescription": false
+      }
+    },
+    {
+      "id": "loading",
+      "context": "mission-read",
+      "payload": null,
+      "transport": "PENDING",
+      "expected": {
+        "empty": false,
+        "mutation_replay": false
+      }
+    },
+    {
+      "id": "unknown_response",
+      "context": "mission-read",
+      "payload": null,
+      "transport": "UNKNOWN",
+      "expected": {
+        "explicit_read_retry": true,
+        "mutation_replay": false,
+        "private_cache_from_departed_owner": false
+      }
+    },
+    {
+      "id": "first_producer_not_served",
+      "context": "scientific-first-plan",
+      "payload": {
+        "state": "unavailable",
+        "reason": "NOT_SERVED"
+      },
+      "source": "clients/mobile/src/api/firstPlan.ts",
+      "expected": {
+        "call_legacy_mission_as_fallback": false,
+        "usable_first_session": false
+      }
+    },
+    {
+      "id": "relevant_consent_required",
+      "context": "future-scientific-adapter-only",
+      "payload": {
+        "state": "rejected",
+        "code": "body_consent_required"
+      },
+      "expected": {
+        "implicit_consent": false,
+        "universal_body_consent_requirement": false,
+        "usable_first_session": false
+      }
+    },
+    {
+      "id": "first_plan_insufficient",
+      "context": "scientific-protocol-only",
+      "payload": {
+        "state": "insufficient_information",
+        "status": "INSUFFICIENT_DATA",
+        "missing": [
+          "sessions_per_week"
+        ]
+      },
+      "fixture_ref": {
+        "path": "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json",
+        "scenario": "insufficient"
+      },
+      "expected": {
+        "invent_missing_value": false,
+        "mandatory_weight": false
+      }
+    },
+    {
+      "id": "first_plan_conflicting",
+      "context": "scientific-protocol-only",
+      "payload": {
+        "state": "rejected",
+        "status": "CONFLICTING_DATA"
+      },
+      "fixture_ref": {
+        "path": "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json",
+        "scenario": "conflicting"
+      },
+      "expected": {
+        "user_priority_is_analyzed_weakness": false
+      }
+    },
+    {
+      "id": "usable_scientific_first_session",
+      "context": "future-runtime",
+      "payload": null,
+      "status": "BLOCKED",
+      "requires": [
+        "admitted_dose_candidates_time_policy",
+        "canonical_owner_snapshot_and_fingerprint",
+        "real_producer_READY",
+        "owned_first_session_handoff"
+      ],
+      "expected": {
+        "usable_first_session": false,
+        "synthetic_READY_served": false
+      }
+    }
+  ]
+}

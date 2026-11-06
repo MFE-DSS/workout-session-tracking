@@ -1,5 +1,7 @@
 # MOB-03 — reçu DELIVERY ACCELERATION
 
+**Livraison du socle : #353 fusionnée au merge `db37b76` ; CI PR42126920199 et canonique42129145012 réussies.** [Closeout et archive du seul socle](MOB03_FOUNDATION_CLOSEOUT.md). MOB03 complet conserve DATA/PLAN/RELEASE ouverts, aucune activation ou recette physique déduite.
+
 5 novembre 2026. PR unique #353 ; base `bf847c7`, précédent HEAD `d41eb2f`. Nouveau delta réalisé localement, publication/revue/CI finales à consigner dans la PR. **COMPLETE MOB03 non acquis**, aucun déploiement.
 
 ## Brainstorming / Options / Risques / Choix retenu

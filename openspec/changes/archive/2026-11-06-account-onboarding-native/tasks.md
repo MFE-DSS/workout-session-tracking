@@ -13,8 +13,8 @@ Périmètre courant approuvé par « Approuver cette scission traçable » (GOV-
 - [x] CORE-07 : croquis et rendu du nouveau passage acceptés : « Valider ce croquis ciblé », « Valider ce rendu » ; inventaire/avant-après/références et captures consignés.
 - [x] CORE-08 : compatibilité backend/client, plan appareil et rollback préparés ; aucun déploiement ou recette physique prétendus exécutés.
 - [x] CORE-09 : revue indépendante finale, corrections dans le périmètre, check_scope et contrôles ciblés/broad, Jest/TypeScript, sécurité, protocole et OpenSpec strict réussis sur le delta final.
-- [ ] CORE-10 : publier dans #353, vérifier tous les contrôles obligatoires du HEAD final et absence de revue bloquante ; consigner Sonar consultatif réel, merger par commit de merge sous GO permanent sans bypass.
-- [ ] CORE-11 : vérifier CI canonique du merge, closeout et archive du seul socle ; préparer MOB04 specs/fixtures sans intelligence inventée ni GO BUILD ; préserver les propositions DATA/PLAN/RELEASE ouvertes et les preuves QA.
+- [x] CORE-10 : publier dans #353, vérifier tous les contrôles obligatoires du HEAD final et absence de revue bloquante ; consigner Sonar consultatif réel, merger par commit de merge sous GO permanent sans bypass.
+- [x] CORE-11 : vérifier CI canonique du merge, closeout et archive du seul socle ; préparer MOB04 specs/fixtures sans intelligence inventée ni GO BUILD ; préserver les propositions DATA/PLAN/RELEASE ouvertes et les preuves QA.
 
 ## Critères toujours ouverts hors acceptation du socle
 
@@ -23,3 +23,7 @@ Périmètre courant approuvé par « Approuver cette scission traçable » (GOV-
 - RELEASE01–06 : compatibilité réellement déployée, GO distinct, Android/iPhone physiques, force-kill/SQLite/clavier/VoiceOver/TalkBack et acceptation de release.
 
 Aucune case précédente supprimée sans trace : [source/version et correspondances](scope-split-traceability.md). Une case CORE accomplie ne déclare pas DATA/PLAN/RELEASE accomplis.
+
+## Preuve de clôture du socle
+
+#353 fusionnée au merge db37b76be1cb18d18675b47788b8e680a1dff752, HEAD55872ff validé. CI PR42126920199 et canonique42129145012 : completed/success, neuf jobs chacune. MOB04 proposition/10fixtures préparés après merge ; archive du seul socle. CORE terminé ; DATA/PLAN/RELEASE restent ouverts et aucun déploiement. Le reçu de closeout consigne ses propres checks sans les anticiper ici.
