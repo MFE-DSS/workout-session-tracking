@@ -80,3 +80,31 @@ def calibrated_episode(*, ctx=None, load=None):
         event("SETTING_ACCEPTED", 4, ctx=ctx, reference_event_id="e3"),
     ]
     return episode(copy.deepcopy(events), ctx=ctx)
+
+
+def time_session():
+    return {
+        "session_id": "s1", "subject_ref": "subject:A", "context_ref": "gym:test-a",
+        "as_of": "2026-11-06T12:00:00Z",
+        "slots": [{"slot_id": "press", "unilateral": False,
+                   "prescription": {"work_sets": 2, "rest_seconds": 60}}],
+    }
+
+
+def time_components(session=None):
+    session = session or time_session()
+    scope = digest({"session": session, "structure": "TRADITIONAL_SEQUENTIAL"})
+    samples = [
+        ("session/prep", "PREPARATION_CALIBRATION", 0.0),
+        ("press/prep", "PREPARATION_CALIBRATION", 10.0),
+        ("press/work/1", "WORK", 10.0),
+        ("press/rest/1", "REST", 60.0),
+        ("press/work/2", "WORK", 10.0),
+        ("press/operations", "SETUP_TRANSITION", 10.0),
+    ]
+    return [{
+        "component_id": f"c{i}", "coverage_key": key, "kind": kind,
+        "lower_seconds": seconds, "upper_seconds": seconds,
+        "basis_ref": f"synthetic:component-{i}", "basis_kind": "EXPERIMENTAL_INTERVAL",
+        "scope_fingerprint": scope, "provenance": provenance(i + 1, observed=True),
+    } for i, (key, kind, seconds) in enumerate(samples)]

@@ -48,11 +48,11 @@
 
 **Interfaces:** `assess_session_time(session: dict, *, budget_minutes: int | None, components: list[dict], structure: str = 'TRADITIONAL_SEQUENTIAL', layout: str = 'UNSPECIFIED') -> dict`. Input session has actual slot IDs/prescriptions; each component covers explicit work/preparation/operations/session-preparation/rest keys with bounds, context, basis/source, optional exact clock interval. Returns ordinal, duration UNKNOWN unless real admitted authority exists, bounds/coverage/uncertainty, required rest floor and scoped planner constraint; no authority accepted via caller kwargs.
 
-- [ ] Write RED tests T01–T13 with known fixture observations. Literal case2sets with60s rest + work20s + prep10s + operations10s + sessionprep0s =>100s conditional DISJOINT_SEQUENTIAL total, likely fits2minutes but public Duration UNKNOWN because no admitted model. These are synthetic observations, not policy constants.
-- [ ] Run `python -m pytest -q tests/test_science_session_time.py`; Expected: absent-model behavioral failures.
-- [ ] Implement strict bounds/coverage and existing rest-floor reuse. Reject reduced-rest estimates; exact common-clock union counts overlaps once. Mixed/unproved layouts remain UNKNOWN. No automatic minutes/rep or setup filler.
-- [ ] Run `python -m pytest -q tests/test_science_session_time.py tests/test_science_load_calibration.py tests/test_science_initial_policy_admission.py tests/test_duration_ceiling.py`. Expected: all pass; historical floor behavior unchanged.
-- [ ] Static checks per tier, commit; task-done records this broad command/result.
+- [x] Write RED tests T01–T13 with known fixture observations. Literal case2sets with60s rest + work20s + prep10s + operations10s + sessionprep0s =>100s conditional DISJOINT_SEQUENTIAL total, likely fits2minutes but public Duration UNKNOWN because no admitted model. These are synthetic observations, not policy constants.
+- [x] Run `python -m pytest -q tests/test_science_session_time.py`; Expected: absent-model behavioral failures.
+- [x] Implement strict bounds/coverage and existing rest-floor reuse. Reject reduced-rest estimates; exact common-clock union counts overlaps once. Mixed/unproved layouts remain UNKNOWN. No automatic minutes/rep or setup filler.
+- [x] Run `python -m pytest -q tests/test_science_session_time.py tests/test_science_load_calibration.py tests/test_science_initial_policy_admission.py tests/test_duration_ceiling.py`. Expected: all pass; historical floor behavior unchanged.
+- [x] Static checks per tier, commit; task-done records this broad command/result.
 
 ### Task 3: Trusted v2 producer, fixtures and admission handoff
 
