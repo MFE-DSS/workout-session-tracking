@@ -52,6 +52,6 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Fresh scientific review: neutral/pecs qualified DERIVED SECONDARY approved; four candidates held, no other conversion.
 - [x] TDD pure pinned loader/resolver and seven non-served fixtures;28targeted and474broad/1skip passed.
 - [x] Ruff/Bandit/budget264<=548/protocol/OpenSpec8/8 and historical fixture reproduction.
-- [ ] Separate code review with no Critical/Important remaining.
+- [x] Separate code review:0Critical/Important,2Minor deferred transparently; no scientific approval inferred from code/tests.
 - [ ] Publish final scoped HEAD, verify CI, merge under standing authorization and verify canonical.
 - [ ] Record this spike closeout only; no global science/PLAN/MOB03 closure or activation.

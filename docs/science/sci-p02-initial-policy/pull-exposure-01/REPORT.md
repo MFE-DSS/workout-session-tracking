@@ -56,7 +56,7 @@ E0 EV-71/EV-70 and the existing credit doctrine are reused. No new E0 entry or p
 
 TDD:22failures/2successes before modules; four added boundary/generator tests also failed before implementation.28tests passed after implementation. A local Ruff complexity finding was fixed by separating source-fact validation from role validation, with the same28tests and fixture reproduction passing. Full scoped broad/static/CI evidence follows in [VERIFICATION.md](VERIFICATION.md), without a redundant full local sweep.
 
-[Fresh scientific review](SCIENTIFIC_REVIEW.md): ten explicit questions answered, three Important qualifications and bibliographic scope correction applied, final0Critical/Important/Minor. Code review is separate; passing tests do not earn scientific admission.
+[Fresh scientific review](SCIENTIFIC_REVIEW.md): ten explicit questions answered, three Important qualifications and bibliographic scope correction applied, final0Critical/Important/Minor. Code review is separate:0Critical/Important,2Minor deferred (hold-reason precedence for already-held candidates; static import guard spelling coverage). No exclusion bypass or current runtime import; details in VERIFICATION.md. Passing tests do not earn scientific admission.
 
 ## Runtime, READY and handoff
 
