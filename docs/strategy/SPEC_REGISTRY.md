@@ -647,3 +647,8 @@ Préparation après socle : [MOB04 MISSION, proposition sans GO BUILD](../propos
 ## SCI-P02 admission système — étape1 isolée, 7 novembre2026
 
 [science-initial-policy-admission](../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/proposal.md), enfant du parent scientifique encore ouvert. GO opérateur borné : « Valider uniquement ce build SCI isolé » ; [autorisation](../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/BUILD_AUTHORIZATION.md). Code livré PR369/merge5e94cfa, CI PR verte ; suivi canonique/closeout dans docs/science/sci-p02-initial-policy/admission-system-01/CLOSEOUT.md : trois durcissements successeurs, registre vide, évaluateur/tests/fixtures de refus. Aucun contrat READYv1 modifié, aucune admission positive/API/UI/activation/déploiement ; [reçu](../science/sci-p02-initial-policy/admission-system-01/DELIVERY.md). Les quatre autres paquets restent proposés hors de cette PR.
+
+
+## SCI admission positive — continuation de conception après étape1
+
+7 novembre2026, base2cddf5d. [science-initial-policy-positive-admission](../../openspec/changes/science-initial-policy-positive-admission/proposal.md) est PROPOSED / CONTRACT_REVIEW_REQUIRED, issu du « ok go » de continuation après closeout #370. Contrat successeur v2 détaillé, gates d'autorité et de temps conservées ; aucun nouveau module, schéma exécutable, registry positif, API/UI ou collecte/activation réalisés. Les critères SCI-POS01..07 restent ouverts ; proposition de build de contrat seulement après sa revue. Le scope négatif précédent reste archivé, parent scientifique toujours ouvert.
