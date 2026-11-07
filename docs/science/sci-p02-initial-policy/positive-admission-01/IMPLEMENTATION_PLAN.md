@@ -5,7 +5,7 @@
 **Goal:** Livrer les contrats v2 exécutables, leurs schémas/fixtures non servies et validations sans modifier v1 ni admettre une politique.
 **Architecture:** Faits Blueprint/provenance et observations typées réutilisés. Nouveaux modèles v2 purs séparés de leur validation d'échange ; l'autorité disponible reste le registre piné vide existant, donc aucun READY validé/servi. Aucun nouveau producteur scientifique négatif ou positif.
 **Tech Stack:** Python/Pydantic/pytest existants ; JSON/SHA256 ; pas dépendance nouvelle.
-**Spec:** openspec/changes/science-initial-policy-positive-admission/design.md et BUILD_AUTHORIZATION.md.
+**Spec:** openspec/changes/archive/2026-11-07-science-initial-policy-positive-admission/design.md et BUILD_AUTHORIZATION.md.
 
 ## Global Constraints
 - V1, code/artefacts v2 historiques, FirstPlanClient, registres/pins/APP/UI inchangés.

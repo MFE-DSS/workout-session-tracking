@@ -1,6 +1,6 @@
 # AUREN — passation SCI du contrat premier plan v2
 
-7 novembre2026. **Compte rendu du périmètre de contrat explicitement autorisé, pas admission du premier plan.** Ce document sera complété avec les preuves de publication après vérification. Les reçus de PR portent les SHA et verdicts distants effectivement observés.
+7 novembre2026. **Compte rendu du périmètre de contrat explicitement autorisé, pas admission du premier plan.** Code fusionné PR371 au merge114312e ; le reçu CLOSEOUT.md et les reçus vivants des PR portent les SHA et verdicts distants effectivement observés, dont le suivi de clôture.
 
 ## 1. Mandat et point de reprise
 L'opérateur a demandé de terminer le critical path exécutable de l'injection puis de fournir le CR complet à l'agent. Il a ensuite accepté le design par **« Valider le contrat v2 et ce build isolé »**. Cette autorisation porte sur types, schémas, validations, fixtures et tests ; elle conserve explicitement v1/FirstPlanClient, API/UI, registre historique et activation. Ce GO ne fournit pas une admission scientifique positive ni les preuves C3/C6.
@@ -47,7 +47,7 @@ Le profil d'échange actuel accepte seulement CONFLICTING_DATA, INSUFFICIENT_DAT
 Un draft observé peut vérifier la cohérence de ses références et de la convention de dose partielle historique. Il reste DRAFT/POLICY_UNAVAILABLE. Les bases bootstrap, temps positif et projection conditionnelle G17 ne sont pas admises par ce validateur. Aucune borne temporelle synthétique, conversion d'assistance en kg ou contribution inconnue en zéro.
 
 ## 5. Vérifications et revue
-Le reçu final relèvera le HEAD exact, les CI de PR et de merge et le verdict Sonar. Les preuves locales à cette étape couvrent les nouveaux cas et le broad ciblé scientifique/historique conformément au tier ISOLATED ; pas de full sweep local systématique. Les artefacts sont reproductibles depuis le vrai inventaire piné et sont validés par les modèles et la frontière d'échange.
+PR371 : HEAD3fc9a23f3d2b69b2e443a26a0a74196e995658e0, merge114312e8a18b347d6b862a70c081413a1bf611e7 ; CI PR42378325542 verte, 7660backend passants/trois ignorés et54suites/676mobile+TypeScript. SonarPR ERROR consultatif,11S5778 de structure des tests, zéro bug/vulnérabilité/hotspot, couverture app93,8%, nouvelle couverture non fournie. Contrôles canoniques et maintenance de clôture suivis dans CLOSEOUT.md et le reçu vivant, sans anticipation. Les preuves locales à cette étape couvrent les nouveaux cas et le broad ciblé scientifique/historique conformément au tier ISOLATED ; pas de full sweep local systématique. Les artefacts sont reproductibles depuis le vrai inventaire piné et sont validés par les modèles et la frontière d'échange.
 
 Les revues code et cohérence scientifique sont séparées et fraîches. Elles évaluent ce contrat et ses frontières ; elles ne sont ni examen clinique, ni nouvelle preuve biologique, ni validation de temps réel. Les défauts importants sont à corriger avec reproduction RED→GREEN avant merge ; les mineurs seront explicités dans le reçu de clôture.
 
@@ -93,7 +93,7 @@ En parallèle, le responsable complète B/D-POL01–05 ; l'architecte peut faire
 ## 9. Résultat à transmettre
 Le prochain agent doit lire ce CR, le design/autorisation du change, les schémas v2 et leur générateur, le paquet READY_GATE_DECISIONS, le protocole C6 existant et les propositions SCI-POS/DATA/PLAN/RELEASE. Il doit conserver les décisions déjà reçues et traiter les preuves/décisions identifiées avant toute activation positive.
 
-Le présent compte rendu ne contient pas de nouveau GO BUILD ou GO DEPLOY. La livraison finale de ce périmètre sera consignée dans le closeout avec PR/SHA/tests/revues/Sonar/cleanup effectivement observés.
+Le présent compte rendu ne contient pas de nouveau GO BUILD ou GO DEPLOY. La clôture de ce périmètre est suivie dans CLOSEOUT.md et le reçu vivant avec PR/SHA/tests/revues/Sonar/cleanup effectivement observés.
 
 ## 10. Décisions d'exécution et limites de revue conservées
 Ces décisions ont été consignées dans le ledger pendant la réalisation ; elles ne sont pas des admissions scientifiques :
@@ -110,4 +110,6 @@ Ces décisions ont été consignées dans le ledger pendant la réalisation ; el
 | Authentification/consentement/UI/biologie non certifiés | Frontière pure SCI isolée, sources privées non consultées | Aucun runtime sensible avant ses propres gates et son snapshot propriétaire |
 | Readiness distante vérifiée par l'agent de livraison | Les reviewers n'ont pas certifié GitHub/merge | Fusion uniquement après contrôles du HEAD final et base courante |
 
-Les revues fraîches n'ont pas relevé de mineur à différer dans ce contrat. Les dettes antérieures et le verdict Sonar consultatif restent distincts, sans faux effacement ni correction massive hors scope.
+Préparation de closeout en draft pendant la CI canonique du code : choix d’exécution pour éviter deux attentes séquentielles, sans anticiper son verdict. Risque/condition : fusion de maintenance bloquée jusqu’au succès des deux CI, aucun critère scientifique positif coché.
+
+Les revues fraîches n'ont pas relevé de mineur à différer dans ce contrat. SonarPR relève séparément11S5778 de structure des tests, dette consultative enregistrée, sans correction massive ou seuil modifié. Les dettes antérieures et le verdict Sonar consultatif restent distincts, sans faux effacement ni correction massive hors scope.
