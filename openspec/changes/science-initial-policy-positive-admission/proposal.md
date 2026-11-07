@@ -12,7 +12,7 @@ L'étape négative est déjà livrée/archivée (#369/#370, canonique2cddf5da7d8
 ## New Capabilities
 - `science/first-plan-v2-binding` : représentation et conditions d'admission du successeur, côte à côte avec v1.
 ## Modified Capabilities
-- Aucune exigence canonique modifiée à ce stade. Le futur contrat v2 est proposé, pas exporté ni servi. Le sens et les validateurs READY v1 restent inchangés.
+- Aucune exigence canonique modifiée à ce stade. Le contrat v2 est revu et exporté sous GO isolé ; il reste non servi et ne fournit pas d’admission positive. Le sens et les validateurs READY v1 restent inchangés.
 
 # Impact
 Propriétaire SCI : ce change et docs/science/sci-p02-initial-policy/positive-admission-01/. Futur apply à approuver : nouveaux modules/schémas/fixtures versionnés dédiés, puis binding/producteur seulement avec preuves admises. Aucun changement app/mobile, service corporel, catalogue/E0, registre historique ou API. PLAN consommera une version explicitement négociée dans son change distinct.
@@ -22,3 +22,6 @@ Propriétaire SCI : ce change et docs/science/sci-p02-initial-policy/positive-ad
 
 # Completion
 Préparation terminée quand représentation, invariants, compatibilité, tests et décisions bloquantes sont revus. Le futur apply peut livrer un contrat sans positif fictif, mais ne doit pas annoncer cette livraison comme admission positive. Admission positive complète seulement avec SCI-POS01..07 satisfaits ; sinon décision explicite et preuve/protocole manquant identifiés.
+
+# Apply isolé après revue
+Le GO explicite « Valider le contrat v2 et ce build isolé » est enregistré dans BUILD_AUTHORIZATION.md. Cette PR livre uniquement le contrat/types/schémas/validations/tests et leur closeout. Les critères positifs SCI-POS01..07 sont conservés sans réduction dans docs/proposals/science-initial-policy-positive-admission.md et le parent. La fermeture du contrat ne signifie ni admission du bundle ni succès de ces preuves.

@@ -17,7 +17,7 @@ from tools.science_contracts.blueprint_first_plan_v2 import (
     request_fingerprint,
     validated_request,
 )
-from tools.science_initial_policy.admission_calibration import calibrate_for_admission
+from tools.science_initial_policy.admission_calibration import _current, calibrate_for_admission
 from tools.science_initial_policy.admission_registry import assert_trusted_admission_registry
 from tools.science_initial_policy.calibration_time_contracts import normalized_record
 from tools.science_initial_policy.curation import ELIGIBLE
@@ -88,6 +88,14 @@ def _negative_authority(req, out):
     expected = assess_inputs(req.blueprint)
     if out.assessment != expected:
         raise ValueError("assessment differs from canonical required inputs")
+    input_sets = {
+        "INPUT_CONFLICT": set(expected.conflicting_fields),
+        "REQUIRED_INPUT_MISSING": set(expected.missing_fields),
+    }
+    for issue in out.issues:
+        allowed = input_sets.get(issue.code)
+        if allowed is not None and (not issue.field_refs or not set(issue.field_refs) <= allowed):
+            raise ValueError("input blocker contradicts canonical missing/conflicting fields")
     state, code = {
         "CONFLICTING": ("CONFLICTING_DATA", "INPUT_CONFLICT"),
         "INSUFFICIENT": ("INSUFFICIENT_DATA", "REQUIRED_INPUT_MISSING"),
@@ -180,8 +188,12 @@ def _observed(p, selected, req):
     ):
         raise ValueError("setting is not the qualified currently accepted observed reference")
     events = sorted({e.event_id: e for e in ep.events}.values(), key=lambda e: e.sequence)
-    accepted = [e for e in events if e.kind == "SETTING_ACCEPTED"]
-    if not accepted or accepted[-1].event_id != p.acceptance_event_id:
+    accepted = [e for e in events if e.kind == "SETTING_ACCEPTED" and _current(e, ep.started_at)]
+    if (
+        not accepted
+        or accepted[-1].event_id != p.acceptance_event_id
+        or accepted[-1].reference_event_id != p.event_id
+    ):
         raise ValueError("acceptance event is not the current acceptance")
 
 

@@ -737,3 +737,57 @@ def test_v1_consumer_contract_does_not_silently_accept_v2():
         FirstPlanRequest.model_validate(raw)
     with pytest.raises(ValueError):
         FirstPlanRecommendation.model_validate(out)
+
+
+@pytest.mark.parametrize("use_imported_ref", [False, True])
+def test_imported_historical_acceptance_cannot_replace_current_qualification(
+    authority, use_imported_ref
+):
+    raw = request()
+    ep = raw["episodes"][0]
+    current = ep["events"][-1]["event_id"]
+    old = copy.deepcopy(ep["events"][-1])
+    old.update(event_id="imported-old-acceptance", sequence=5)
+    old["provenance"]["measured_at"] = "2026-11-01T10:00:00Z"
+    ep["events"].append(old)
+    out = response(raw)
+    out["candidate_plan"] = observed_plan(raw, authority)
+    p = out["candidate_plan"]["sessions"][0]["slots"][0]["prescription"]
+    p["acceptance_event_id"] = old["event_id"] if use_imported_ref else current
+    if use_imported_ref:
+        with pytest.raises(ValueError, match="acceptance"):
+            exchange_api().validate_exchange(raw, out, **authority)
+    else:
+        assert (
+            exchange_api().validate_exchange(raw, out, **authority).status == "POLICY_UNAVAILABLE"
+        )
+
+
+@pytest.mark.parametrize("code", ["REQUIRED_INPUT_MISSING", "INPUT_CONFLICT"])
+def test_additional_input_blockers_cannot_invent_missing_or_conflicting_anthropometry(
+    authority, code
+):
+    raw = request()
+    out = response(raw)
+    extra = copy.deepcopy(out["issues"][0])
+    extra.update(code=code, field_refs=["weight_kg"])
+    out["issues"].append(extra)
+    with pytest.raises(ValueError, match="input blocker"):
+        exchange_api().validate_exchange(raw, out, **authority)
+
+
+def test_actual_simultaneous_conflict_and_missing_issues_remain_supported(authority):
+    raw = request()
+    raw["blueprint"]["sessions_per_week"].update(
+        state="CONFLICT",
+        value=None,
+        conflicts=[{"value": 2, "source_ref": "a"}, {"value": 3, "source_ref": "b"}],
+    )
+    raw["blueprint"]["limitations"].update(state="UNKNOWN", value=None, conflicts=[])
+    out = response(raw)
+    extra = copy.deepcopy(out["issues"][0])
+    extra.update(code="REQUIRED_INPUT_MISSING", field_refs=["limitations"])
+    out["issues"].append(extra)
+    value = exchange_api().validate_exchange(raw, out, **authority)
+    assert value.status == "CONFLICTING_DATA"
+    assert value.assessment.missing_fields == ("limitations",)

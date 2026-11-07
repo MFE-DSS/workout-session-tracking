@@ -1,8 +1,8 @@
 # Admission positive — décisions qui changent réellement la suite
-7 novembre2026. Base2cddf5d, PROPOSED / NOT_SERVED. Ce dossier n'est pas un autre build négatif : il nomme ce qu'un prochain code peut apporter et ce qui demande encore des preuves.
+7 novembre2026. Base2cddf5d ; contrat v2 approuvé puis réalisé isolément, NOT_ADMITTED / NOT_SERVED. Ce dossier n'est pas un autre build négatif : il nomme ce qu'un prochain code peut apporter et ce qui demande encore des preuves.
 
-## Prochaine décision de contrat
-Proposition : adopter le contrat successeur v2 détaillé dans [design](../../../../openspec/changes/science-initial-policy-positive-admission/design.md), avec quinze déclarations qualitatives, réglage observé/bootstrap typés et mêmes gates temporelles. Le READY v1 reste inchangé. Cela permet de construire le contrat réaliste ; cela ne crée pas à soi seul un premier READY.
+## Décision de contrat reçue
+Décision opérateur : « Valider le contrat v2 et ce build isolé ». Contrat successeur v2 détaillé dans [design](../../../../openspec/changes/science-initial-policy-positive-admission/design.md), avec quinze déclarations qualitatives, réglage observé/bootstrap typés et mêmes gates temporelles. Le READY v1 reste inchangé. Les types/schémas/validateurs/tests sont réalisés sous ce GO ; cela ne crée pas à soi seul un premier READY.
 
 ## C3 et C6 : pièces encore absentes
 | Élément | Pièce concrète requise | Responsable capable | Effet actuel |
@@ -14,10 +14,12 @@ Proposition : adopter le contrat successeur v2 détaillé dans [design](../../..
 
 La route C (« preuve insuffisante avec protocole de collecte défini ») est l'état actuel. Les routes A/B sont des conditions d'admission, pas des valeurs que l'agent peut fabriquer. Le [protocole déjà livré](../admission-system-01/TIME_PROTOCOL.md) reste la base ; pas de nouveau survey musculaire général ou de faux min/max individuel depuis la fixture1060s.
 
-## Scope utile après approbation du contrat
+## Scope isolé réalisé après approbation du contrat
 Types/validateurs/schémas v2 et tests isolés, côte à côte, constituent une livraison de contrat. Pas de nouveau moteur négatif redondant, d'API/SDK ou d'admission positive automatique. Les premiers cas autoritaires READY seront générés seulement par un vrai binding/producteur admis ; tant que la preuve manque, les fixtures publiques restent manquantes/conflit/politique indisponible et faux labels refusés.
 
-## Oracles futurs, pas tests prétendus exécutés
+## Oracles d’acceptation et limites
+Les oracles structurels/de refus sont testés dans le build ; leurs aspects positifs/runtime restent non acquis. Le reçu donne les commandes/résultats réels, pas une admission de tous les cas suivants.
+
 1. V1 toujours reproduit, v2 refusé par client v1 sans négociation.
 2. Quinze zones exactes comme liste, UNKNOWN conservé ; pas de crédit numérique sans sa convention admise.
 3. Même allocation physique, cadence correcte ; pas de double compte physiologique des rôles.

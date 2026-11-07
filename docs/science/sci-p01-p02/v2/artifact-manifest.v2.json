@@ -10,7 +10,7 @@
     "docs/science/sci-p01-p02/v2/FirstPlanRecommendation.v2.schema.json": "2048f3873194df81e0a27e31e01ae14f2d7ec9a482c4f6e38a4a0d79755138e1",
     "docs/science/sci-p01-p02/v2/FirstPlanRequest.v2.schema.json": "ccdf51e76a37aff3a2a7d6ccf48f03b1b631509225aa329f8677241a30d197f8",
     "docs/science/sci-p01-p02/v2/contract-fixtures.v2.json": "5f95663960ef579d2efdf20f1a6da4fad6fc375101a6aec48b8000bb5c22a4e5",
-    "docs/science/sci-p01-p02/v2/source-manifest.v2.json": "0a616e05f1c61f1eb08eef52daac93d3cadd4e77e66f1f8339e9134da7127e42"
+    "docs/science/sci-p01-p02/v2/source-manifest.v2.json": "8c3d121a15f01e38ed796fadaeb85e565b90e15085a3369d28ddb11068e20a25"
   },
   "version": "first-plan-contract-artifacts/2.0.0"
 }
