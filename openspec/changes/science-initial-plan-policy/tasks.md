@@ -68,4 +68,4 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] GO BUILD reçu : opérateur « continue » après demande de validation du delta/design ; réalisation isolée seulement, aucune admission/activation implicite.
 - [x] Build isolé confirmé « Valider le build isolé proposé » : producteur v2, calibration/temps,12cas réels non servis, schémas et412tests broad passants ; anciennes sources/sorties préservées. Revues et livraison distinctes ci-dessous.
 - [x] Revues scientifique/code distinctes : trois Important corrigés RED→GREEN, trois Minor documentés ;431tests broad,0admission/0READY.
-- [ ] CI/merge/closeout du seul périmètre terminé ; préparer SCI-P02-INITIAL-POLICY-ADMISSION, global science/MOB03 toujours ouverts.
+- [x] Code livré PR366 (6044d7b, CI PR/canonique réussies) et correction PR367 (009ee90, CI PR réussie) ; paquet SCI-P02-INITIAL-POLICY-ADMISSION préparé. Le reçu calibration-time-01/VERIFICATION.md et sa PR tracent séparément les vérifications canoniques restantes, la publication du closeout et le nettoyage ; aucun succès anticipé, global science/MOB03 toujours ouverts.
