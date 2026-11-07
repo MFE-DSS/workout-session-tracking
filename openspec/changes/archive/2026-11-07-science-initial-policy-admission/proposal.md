@@ -2,7 +2,7 @@
 
 ## Why
 
-Le mandat C `SCI-P02-INITIAL-POLICY-ADMISSION/1.0.0-MANDATE` du 7 novembre 2026 autorise l'évaluation et le design. Il ne donne pas de GO BUILD fonctionnel distinct. Le canonique `2b52f4984e375faad0a1488feef1bfe3bcab01b0` contient le producteur isolé `initial-policy-producer/2.0.0`, mais aucune politique initiale admise/servie ni aucun vrai READY. Les sorties réelles, et pas seulement les rapports précédents, sont auditées dans le [dossier d'admission](../../../docs/science/sci-p02-initial-policy/admission-system-01/REPORT.md).
+Le mandat C `SCI-P02-INITIAL-POLICY-ADMISSION/1.0.0-MANDATE` du 7 novembre 2026 autorise l'évaluation et le design. Il ne donne pas de GO BUILD fonctionnel distinct. Le canonique `2b52f4984e375faad0a1488feef1bfe3bcab01b0` contient le producteur isolé `initial-policy-producer/2.0.0`, mais aucune politique initiale admise/servie ni aucun vrai READY. Les sorties réelles, et pas seulement les rapports précédents, sont auditées dans le [dossier d'admission](../../../../docs/science/sci-p02-initial-policy/admission-system-01/REPORT.md).
 
 ## What Changes
 

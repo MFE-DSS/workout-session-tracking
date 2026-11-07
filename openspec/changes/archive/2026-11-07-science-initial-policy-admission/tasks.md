@@ -14,9 +14,9 @@ Autorisation : [BUILD_AUTHORIZATION](BUILD_AUTHORIZATION.md), « Valider uniquem
 - [x] Borne basse partielle sûre disjointe réellement consommée, sans Duration/READY.
 - [x] Registre vide piné et évaluateur à six gates négatives, versions/digests/empreintes complets.
 - [x] Dix-huit fixtures issues du vrai évaluateur sur faits synthétiques, refus/invalidations non servis.
-- [ ] Exécuter `python scripts/check_scope.py` et minimum du tier final, broad science, pins historiques, Ruff/budget/Bandit/protocole/OpenSpec.
-- [ ] Revues code et science indépendantes, correction Important avec régression RED→GREEN.
-- [ ] Commit/push/CI exacte, merge commit sous GO permanent si prêt, puis CI canonique/Sonar réel.
+- [x] Exécuter `python scripts/check_scope.py` et minimum du tier final, broad science, pins historiques, Ruff/budget/Bandit/protocole/OpenSpec.
+- [x] Revues code et science indépendantes, correction Important avec régression RED→GREEN.
+- [x] Commit/push/CI PR exacte et merge commit sous GO permanent réalisés ; contrôle canonique/Sonar et closeout tracés dans la PR vivante après exécution.
 - [ ] Reçu, archive de ce seul scope et cleanup sans travail unique ; handoff négatif à PLAN.
 
 ## 3. Critères différés conservés — NON ACQUIS, hors GO étape1

@@ -4,7 +4,7 @@
 
 ## Mandat et autorité
 
-Mandat C du dossier ARCH-PO-PACKS/1.0.0, prochain scope scientifique ; A autorise planning, sans GO BUILD général. Le GO historique du producteur isolé a déjà été consommé par sa livraison ; il n'autorise pas fonctionnellement ce nouvel enfant. CLAUDE.md et STANDING_MERGE_AUTHORIZATION.md lus sur cette base : aucune admission par GO MERGE. L'enfant [science-initial-policy-admission](../../../../openspec/changes/science-initial-policy-admission/proposal.md) possède seul la prochaine admission ; le parent global reste ouvert, sans double écriture.
+Mandat C du dossier ARCH-PO-PACKS/1.0.0, prochain scope scientifique ; A autorise planning, sans GO BUILD général. Le GO historique du producteur isolé a déjà été consommé par sa livraison ; il n'autorise pas fonctionnellement ce nouvel enfant. CLAUDE.md et STANDING_MERGE_AUTHORIZATION.md lus sur cette base : aucune admission par GO MERGE. L'enfant [science-initial-policy-admission](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/proposal.md) possède seul la prochaine admission ; le parent global reste ouvert, sans double écriture.
 
 ## Brainstorming / Options / Risques / Choix retenu
 
@@ -73,7 +73,7 @@ Ce protocole est un **design opérationnel proposé**, pas une procédure scient
 
 `Plan.accounting` exige les quinze zones EXACT si exposure_complete ; `_validate_ready_plan` exige ce flag, REVIEWED, cadence exacte, faisabilité CONFIRMED, durée ESTIMATED référencée/haute≤budget et prescription tracée avec RIR/repos et load_mode≠NOT_DEFINED. Le réglage non massique v2 peut être correctement observé sans représentation v1 ; le draft utilise aussi source_kind PROPOSED_NOT_EXECUTABLE, hors enum Prescription v1. Une simple copie dans candidate_plan échouerait donc à plusieurs niveaux.
 
-Ce constat **ne démontre pas que v1 impose une certitude biologique** : ses crédits peuvent être des conventions exactes de comptabilité. Un futur producteur pourrait explicitement les admettre/calculer sans renommer la croissance mesurée ; ce travail n'existe pas dans v2 actuel. Option proposée : [contrat successeur](../../../../openspec/changes/science-initial-policy-admission/design.md), quinze déclarations avec inconnus honnêtes, prescription de bootstrap/réglage typée et gates d'exécution conservées. Aucun READY ne sera projeté de force sous v1. Aucune exposition nouvelle, coefficient G17 ou hypothèse de durée n'est appliquée ici.
+Ce constat **ne démontre pas que v1 impose une certitude biologique** : ses crédits peuvent être des conventions exactes de comptabilité. Un futur producteur pourrait explicitement les admettre/calculer sans renommer la croissance mesurée ; ce travail n'existe pas dans v2 actuel. Option proposée : [contrat successeur](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/design.md), quinze déclarations avec inconnus honnêtes, prescription de bootstrap/réglage typée et gates d'exécution conservées. Aucun READY ne sera projeté de force sous v1. Aucune exposition nouvelle, coefficient G17 ou hypothèse de durée n'est appliquée ici.
 
 ## Mineurs affectant directement l'admission — racines vérifiées
 
