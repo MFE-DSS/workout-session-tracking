@@ -14,7 +14,7 @@ Une admission indique la doctrine réellement acceptée et ses limites ; elle n�
 
 ## Décision2 — GO BUILD isolé exact
 
-[Design](../../../../openspec/changes/science-initial-policy-v3-producer/design.md). Autoriser le registre successeur, produce_v3, validation canonique du profil admis, tests déterministes/adverses/replay et export positif observé seulement s’il passe l’autorité réelle. Nouveaux modules dédiés, contrat3inchangé, registres/validateurs historiques pinés conservés. Aucun SDK/API/UI/DB/collecte/activation/déploiement.
+[Design](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-v3-producer/design.md). Autoriser le registre successeur, produce_v3, validation canonique du profil admis, tests déterministes/adverses/replay et export positif observé seulement s’il passe l’autorité réelle. Nouveaux modules dédiés, contrat3inchangé, registres/validateurs historiques pinés conservés. Aucun SDK/API/UI/DB/collecte/activation/déploiement.
 
 Ce GO autorise réalisation/tests/revues/CI/corrections/publication et merge sous GOV-MERGE-01 quand COMPLETE. Il ne remplace pas Décision1 et ne promet aucun résultat positif si une condition échoue à la revue. Pas de question routinière de merge ultérieure.
 
