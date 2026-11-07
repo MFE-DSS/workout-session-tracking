@@ -111,3 +111,200 @@ def test_unjustified_component_does_not_raise_the_lower_bound(invalid):
     assert result['lower_seconds'] == (None if invalid == 'unilateral' else 60)
     assert result['ordinal'] == 'UNKNOWN'
     assert result['duration']['state'] == 'UNKNOWN'
+
+
+def _v2_case(name='returning'):
+    import json
+    from pathlib import Path
+
+    cases = json.loads((Path(__file__).resolve().parents[1] /
+        'docs/science/sci-p02-initial-policy/calibration-time-01/producer-fixtures.json').read_text())
+    return deepcopy(next(c for c in cases if c['scenario'] == name))
+
+
+@pytest.mark.parametrize('edit', ['bool_to_int', 'int_to_float'])
+def test_strict_verification_rejects_python_numeric_equivalence(edit):
+    from tools.science_initial_policy.admission_system import verify_evaluation_strict
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    if edit == 'bool_to_int':
+        case['result']['draft']['executable'] = 0
+    else:
+        case['result']['draft']['physical_work_sets_total'] = 28.0
+    with pytest.raises(ValueError):
+        verify_evaluation_strict(case['request'], case['result'], load_v2_registry())
+
+
+def test_real_admission_evaluator_has_no_binding_and_consumes_corrected_diagnostics():
+    from tools.science_initial_policy.admission_registry import load_admission_registry
+    from tools.science_initial_policy.admission_system import evaluate_admission
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    # All accepted observations predate this episode, while the frozen v2
+    # returned IN_PROGRESS. The successor must actually consume its correction.
+    for ep in case['request']['episodes']:
+        ep['started_at'] = '2026-11-06T11:10:00Z'
+    from tools.science_initial_policy.v2_producer import produce_v2
+    bundle = load_v2_registry()
+    old = produce_v2(case['request'], bundle)
+    result = evaluate_admission(case['request'], old, bundle, load_admission_registry())
+    assert result['verdict'] == 'NOT_ADMITTED'
+    assert {g['gate'] for g in result['gates']} == {'C1', 'C2', 'C3', 'C4', 'C5', 'C6'}
+    assert all(g['state'] == 'NOT_ADMITTED' for g in result['gates'])
+    assert all(c['state'] == 'NEEDS_CALIBRATION' for c in result['calibration_by_context'].values())
+    assert result['runtime_availability'] == 'NOT_SERVED'
+    assert 'candidate_plan' not in result
+
+
+def test_empty_registry_cannot_be_promoted_by_dataclass_edit():
+    from dataclasses import replace
+
+    from tools.science_initial_policy.admission_registry import (
+        assert_trusted_admission_registry,
+        load_admission_registry,
+    )
+
+    registry = load_admission_registry()
+    with pytest.raises(ValueError):
+        assert_trusted_admission_registry(replace(registry, registry_digest='0' * 64))
+
+
+@pytest.mark.parametrize('value', [float('nan'), float('inf'), -float('inf'), True])
+def test_strict_verifier_rejects_nonfinite_or_boolean_set_counts(value):
+    from tools.science_initial_policy.admission_system import verify_evaluation_strict
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    case['result']['draft']['physical_work_sets_total'] = value
+    with pytest.raises(ValueError):
+        verify_evaluation_strict(case['request'], case['result'], load_v2_registry())
+
+
+def test_unchecked_result_model_edit_is_revalidated_as_raw_json_types():
+    from tools.science_initial_policy.admission_system import verify_evaluation_strict
+    from tools.science_initial_policy.v2_producer import EvaluationResult
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    model = EvaluationResult.model_validate(case['result'])
+    model.draft['executable'] = 0
+    with pytest.raises(ValueError):
+        verify_evaluation_strict(case['request'], model, load_v2_registry())
+
+
+def test_old_result_cannot_bind_changed_observation_or_subject():
+    from tools.science_initial_policy.admission_system import verify_evaluation_strict
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case('novice')
+    original_fingerprint = case['result']['request_fingerprint']
+    case['request']['subject_ref'] = 'subject:other'
+    with pytest.raises(ValueError):
+        verify_evaluation_strict(case['request'], case['result'], load_v2_registry())
+    assert case['result']['request_fingerprint'] == original_fingerprint
+
+
+def test_successor_time_is_consumed_without_a_duration_or_ready():
+    from tools.science_initial_policy.admission_registry import load_admission_registry
+    from tools.science_initial_policy.admission_system import evaluate_admission
+    from tools.science_initial_policy.v2_producer import produce_v2
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    rows = case['request']['timing_inputs'][0]['components']
+    work = next(c for c in rows if c['kind'] == 'WORK')
+    work.update(lower_seconds=5000.0, upper_seconds=None)
+    bundle = load_v2_registry()
+    historical = produce_v2(case['request'], bundle)
+    result = evaluate_admission(case['request'], historical, bundle, load_admission_registry())
+    timing = result['time_by_session'][0]
+    assert timing['lower_seconds'] > 5000.0
+    assert timing['upper_seconds'] is None
+    assert timing['ordinal'] == 'LIKELY_EXCEEDS'
+    assert timing['duration']['state'] == 'UNKNOWN'
+    assert result['verdict'] == 'NOT_ADMITTED'
+
+
+@pytest.mark.parametrize('case_name,status', [
+    ('novice', 'POLICY_UNAVAILABLE'),
+    ('unknown_equipment', 'POLICY_UNAVAILABLE'),
+    ('missing_inputs', 'INSUFFICIENT_DATA'),
+    ('conflicting_inputs', 'CONFLICTING_DATA'),
+])
+def test_policy_refusal_does_not_mask_historical_input_assessment(case_name, status):
+    from tools.science_initial_policy.admission_registry import load_admission_registry
+    from tools.science_initial_policy.admission_system import evaluate_admission
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case(case_name)
+    before = deepcopy(case)
+    result = evaluate_admission(case['request'], case['result'], load_v2_registry(), load_admission_registry())
+    assert result['historical_status'] == status
+    assert result['verdict'] == 'NOT_ADMITTED'
+    assert case == before
+
+
+def test_permuting_semantically_ordered_facts_keeps_full_admission_fingerprint():
+    from tools.science_initial_policy.admission_registry import load_admission_registry
+    from tools.science_initial_policy.admission_system import evaluate_admission
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    bundle, registry = load_v2_registry(), load_admission_registry()
+    result = evaluate_admission(case['request'], case['result'], bundle, registry)
+    case['request']['episodes'].reverse()
+    for ep in case['request']['episodes']:
+        ep['events'].reverse()
+    case['request']['timing_inputs'].reverse()
+    for timing in case['request']['timing_inputs']:
+        timing['components'].reverse()
+    assert evaluate_admission(case['request'], case['result'], bundle, registry) == result
+
+
+def _copy_pinned_files(tmp_path):
+    import json
+    import shutil
+    from pathlib import Path
+
+    from tools.science_initial_policy.admission_registry import DIRECTORY
+
+    root = Path(__file__).resolve().parents[1]
+    sources = json.loads((root / DIRECTORY / 'registry-manifest.v1.json').read_text())['sha256']
+    for name in [*sources, f'{DIRECTORY}/registry.v1.json', f'{DIRECTORY}/registry-manifest.v1.json']:
+        dest = tmp_path / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(root / name, dest)
+    return tmp_path
+
+
+@pytest.mark.parametrize('tamper', ['registry', 'manifest', 'source', 'binding', 'escape'])
+def test_registry_rejects_disk_drift_and_unadmitted_bindings(tmp_path, tamper):
+    import json
+
+    from tools.science_initial_policy.admission_registry import DIRECTORY, load_admission_registry
+
+    root = _copy_pinned_files(tmp_path)
+    if tamper == 'registry':
+        target = root / DIRECTORY / 'registry.v1.json'
+        target.write_bytes(target.read_bytes() + b' ')
+    elif tamper == 'manifest':
+        target = root / DIRECTORY / 'registry-manifest.v1.json'
+        target.write_bytes(target.read_bytes() + b' ')
+    elif tamper == 'source':
+        target = root / 'tools/science_initial_policy/admission_time.py'
+        target.write_text('pass\n')
+    elif tamper == 'binding':
+        target = root / DIRECTORY / 'registry.v1.json'
+        value = json.loads(target.read_text())
+        value['bindings'] = [{'state': 'APPROVED', 'reviewer': 'fake'}]
+        target.write_text(json.dumps(value))
+    else:
+        target = root / 'tools/science_initial_policy/admission_time.py'
+        outside = tmp_path.parent / 'outside-source.py'
+        outside.write_bytes(target.read_bytes())
+        target.unlink()
+        target.symlink_to(outside)
+    with pytest.raises(ValueError):
+        load_admission_registry(root)
