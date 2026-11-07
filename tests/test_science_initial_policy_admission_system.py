@@ -308,3 +308,28 @@ def test_registry_rejects_disk_drift_and_unadmitted_bindings(tmp_path, tamper):
         target.symlink_to(outside)
     with pytest.raises(ValueError):
         load_admission_registry(root)
+
+
+def test_admission_fixture_artifacts_match_real_producer_without_serving_ready():
+    from pathlib import Path
+
+    from tools.science_initial_policy.admission_system_fixtures import artifacts, generated_cases
+
+    root = Path(__file__).resolve().parents[1]
+    directory = root / 'docs/science/sci-p02-initial-policy/admission-system-01'
+    cases = generated_cases()
+    assert len(cases) == 18
+    assert len({c['scenario'] for c in cases}) == 18
+    assert {c['result']['historical_status'] for c in cases if 'result' in c} >= {
+        'POLICY_UNAVAILABLE', 'INSUFFICIENT_DATA', 'CONFLICTING_DATA',
+    }
+    for case in cases:
+        assert case['fixture_kind'] == 'SYNTHETIC_INPUT_REAL_ADMISSION_EVALUATOR_NOT_SERVED'
+        if 'result' in case:
+            assert case['result']['verdict'] == 'NOT_ADMITTED'
+            assert case['result']['runtime_availability'] == 'NOT_SERVED'
+            assert 'candidate_plan' not in case['result']
+        else:
+            assert case['rejection']['code'] == 'INVALID_EVALUATION'
+    for name, content in artifacts().items():
+        assert (directory / name).read_bytes() == content

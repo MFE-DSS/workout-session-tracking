@@ -37,3 +37,7 @@ Ni recherche musculaire générale, nouvelle curation/pull/calibration-time, ré
 ## Complete and rollback
 
 Préparation complète quand les six gates, sources/SHA, oracles futurs, protocole temps, limites et handoff sont relus sans Important non résolu ; elle n'est pas l'admission complète. Le build ne sera COMPLETE qu'après admission réelle de toutes ses conditions, vérification du vrai producteur et intégrité des rejeux. En cas de retrait : aucune activation, conserver les versions historiques et rendre POLICY_UNAVAILABLE/NOT_SERVED ; invalider le nouveau binding sans réécrire l'historique. Aucun rollback de données n'est nécessaire pour cette préparation.
+
+## Apply autorisé — étape1 seulement
+
+Le 7 novembre, après remise et revue de ce design, l'opérateur a répondu « Valider uniquement ce build SCI isolé ». [BUILD_AUTHORIZATION](BUILD_AUTHORIZATION.md) borne l'apply : trois diagnostics successeurs/intégrité, registre vide, évaluateur et fixtures/tests de refus. Les descriptions DESIGN_ONLY ci-dessus retracent la phase préparatoire ; elles ne constituent pas un GO du contrat successeur, de l'admission positive ou du runtime. La présente PR livre uniquement cette étape1 avec verdict scientifique NOT_ADMITTED. Les gates positives C1..C6 et leur preuve restent explicitement ouvertes dans le parent et le handoff, jamais cochées par réussite technique.

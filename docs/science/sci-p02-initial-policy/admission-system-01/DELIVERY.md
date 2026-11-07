@@ -5,3 +5,11 @@ Périmètre autorisé par « Valider uniquement ce build SCI isolé », voir BUI
 ## Brainstorming / Options / Risques / Choix retenu
 
 Corriger en place les modules historiques changerait leurs rejeux pinés. Copier un nouveau moteur complet créerait une divergence inutile. Choix retenu : wrappers successeurs explicites autour de la validation historique, comparaison stricte du résultat recomputé, puis diagnostics séparés et registre vide figé. Les fonctions nouvelles sont réellement consommées par le nouvel évaluateur ; elles ne sont pas présentées comme corrections rétroactives du producteur2.0.0. Contrat READY inchangé.
+
+## Réalisation locale avant revue finale
+
+Trois durcissements successeurs et un évaluateur purs sont réalisés. Registre livré vide, verrouillé par hashes de fichier/manifeste ; versions initial-policy-admission-evaluator/1.0.0 et initial-policy-admission-result/1.0.0. Types JSON exacts : booléen, entier et décimal restent distincts. La vérification restitue le recalcul canonique, pas l'artefact du caller. La calibration/arithmétique nouvelles sont exposées séparément dans la décision négative ; elles ne réécrivent pas la recommandation historique. Dix-huit fixtures de faits synthétiques produites par les vraies fonctions :14sorties négatives et4artefacts invalides refusés ; aucune n'est READY/servie.
+
+Le loader est le bootstrap de confiance versionné, pas une preuve cryptographique d'admission : son hash figure au manifeste d'artefacts distinct pour éviter autoréférence. Le registre/manifeste pinent les anciennes sources et les modules de calcul nouveaux ; une source dérivante, un binding ajouté ou un registre remplacé est refusé. Les constantes de pins se modifient explicitement après revue de code, jamais par le vérificateur ou un label client.
+
+La proposition initiale d'admission positive n'est pas exécutée : C3/C4/C5/C6 et le binding du bundle restent ouverts, C1/C2 seulement conventions bornées proposées. Les raisons des six gates dans le résultat signifient absence d'autorité liée à ce bundle, pas nouvelle réfutation biologique des sources historiques.

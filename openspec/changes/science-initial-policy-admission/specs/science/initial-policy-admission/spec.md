@@ -62,8 +62,20 @@ Toute autorité future SHALL vérifier policy/engine/bundle/evidence/versions et
 
 ### Requirement: Isolated proposal and PLAN handoff
 
-Cette préparation SHALL modifier seulement ses documents dédiés. Le parent science-initial-plan-policy SHALL rester ouvert, et cet enfant SHALL être seul propriétaire de la prochaine admission. PLAN SHALL recevoir uniquement un binding réellement admis ou des blockers nommés ; aucune API/UI/activation ou séance possédée SHALL être revendiquée par ce dossier.
+La phase de préparation SHALL modifier seulement ses documents dédiés ; son apply borné SHALL suivre BUILD_AUTHORIZATION.md et ne réaliser que l'étape1 isolée explicitement approuvée. Le parent science-initial-plan-policy SHALL rester ouvert, et cet enfant SHALL être seul propriétaire de la prochaine admission. PLAN SHALL recevoir uniquement un binding réellement admis ou des blockers nommés ; aucune API/UI/activation ou séance possédée SHALL être revendiquée par ce dossier.
 
 #### Scenario: No separate functional GO BUILD
 - **WHEN** le mandat autorise assessment/design sans GO fonctionnel distinct
 - **THEN** corrections, tests exécutables, schémas et registre d'admission restent des travaux futurs non appliqués.
+
+### Requirement: Isolated negative admission evaluation
+
+L'étape1 autorisée SHALL recomputer le vrai résultat v2 sous comparaison JSON sensible aux types, puis produire ses diagnostics successeurs de calibration et de borne basse sûre avec six gates NOT_ADMITTED depuis un registre vide piné. Elle SHALL conserver le code et les artefacts historiques. Elle SHALL NOT fournir candidat exécutable, READY, nouveau transport mobile ou admission positive.
+
+#### Scenario: Empty registry and sufficient inputs
+- **WHEN** une évaluation historique valide est fournie avec inputs suffisants et le registre livré sans binding
+- **THEN** le résultat versionné porte NOT_ADMITTED/NOT_SERVED, les empreintes de requête/évaluation/admission et les raisons C1..C6 sans plan.
+
+#### Scenario: Known disjoint lower bound without upper bound
+- **WHEN** une composante valide de même source/périmètre est disjointe et possède seulement une borne basse
+- **THEN** la borne peut réfuter cette configuration sans raccourcir les repos, sans double compte, ni affirmation de fit ou Duration admise.

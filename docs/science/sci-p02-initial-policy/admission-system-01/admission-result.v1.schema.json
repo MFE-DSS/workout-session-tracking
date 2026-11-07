@@ -1,0 +1,167 @@
+{
+  "$defs": {
+    "GateDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "gate": {
+          "enum": [
+            "C1",
+            "C2",
+            "C3",
+            "C4",
+            "C5",
+            "C6"
+          ],
+          "title": "Gate",
+          "type": "string"
+        },
+        "state": {
+          "const": "NOT_ADMITTED",
+          "title": "State",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "gate",
+        "state",
+        "reason"
+      ],
+      "title": "GateDecision",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "initial-policy-admission-result/1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "evaluator_version": {
+      "const": "initial-policy-admission-evaluator/1.0.0",
+      "title": "Evaluator Version",
+      "type": "string"
+    },
+    "evaluated_engine": {
+      "const": "initial-policy-producer/2.0.0",
+      "title": "Evaluated Engine",
+      "type": "string"
+    },
+    "evaluated_policy": {
+      "minLength": 1,
+      "title": "Evaluated Policy",
+      "type": "string"
+    },
+    "subject_ref": {
+      "minLength": 1,
+      "title": "Subject Ref",
+      "type": "string"
+    },
+    "request_fingerprint": {
+      "minLength": 1,
+      "title": "Request Fingerprint",
+      "type": "string"
+    },
+    "evaluation_fingerprint": {
+      "minLength": 1,
+      "title": "Evaluation Fingerprint",
+      "type": "string"
+    },
+    "admission_fingerprint": {
+      "minLength": 1,
+      "title": "Admission Fingerprint",
+      "type": "string"
+    },
+    "registry_digest": {
+      "minLength": 1,
+      "title": "Registry Digest",
+      "type": "string"
+    },
+    "source_manifest_digest": {
+      "minLength": 1,
+      "title": "Source Manifest Digest",
+      "type": "string"
+    },
+    "bundle_digest": {
+      "minLength": 1,
+      "title": "Bundle Digest",
+      "type": "string"
+    },
+    "effective_science_digest": {
+      "minLength": 1,
+      "title": "Effective Science Digest",
+      "type": "string"
+    },
+    "historical_status": {
+      "minLength": 1,
+      "title": "Historical Status",
+      "type": "string"
+    },
+    "gates": {
+      "items": {
+        "$ref": "#/$defs/GateDecision"
+      },
+      "title": "Gates",
+      "type": "array"
+    },
+    "calibration_by_context": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Calibration By Context",
+      "type": "object"
+    },
+    "time_by_session": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Time By Session",
+      "type": "array"
+    },
+    "verdict": {
+      "const": "NOT_ADMITTED",
+      "title": "Verdict",
+      "type": "string"
+    },
+    "runtime_availability": {
+      "const": "NOT_SERVED",
+      "title": "Runtime Availability",
+      "type": "string"
+    },
+    "ready_fixture": {
+      "const": "NOT_PRODUCED",
+      "title": "Ready Fixture",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "evaluator_version",
+    "evaluated_engine",
+    "evaluated_policy",
+    "subject_ref",
+    "request_fingerprint",
+    "evaluation_fingerprint",
+    "admission_fingerprint",
+    "registry_digest",
+    "source_manifest_digest",
+    "bundle_digest",
+    "effective_science_digest",
+    "historical_status",
+    "gates",
+    "calibration_by_context",
+    "time_by_session",
+    "verdict",
+    "runtime_availability",
+    "ready_fixture"
+  ],
+  "title": "AdmissionResult",
+  "type": "object"
+}
