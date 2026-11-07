@@ -1,6 +1,6 @@
 # SCI-P02 STAGE2 — design de l’admission limitée et du vrai producteur v3
 
-**7 novembre2026. PROPOSED, pas de GO BUILD/admission positive reçus.** Base97173680c1474bb906d413c192e6c120b97bfe5d. Décisions préparées : [dossier C1–C6](../../../docs/science/sci-p02-initial-policy/stage2-v3/ADMISSION_CASE.md), [politique candidate](../../../docs/science/sci-p02-initial-policy/stage2-v3/POLICY_CANDIDATE.md), [décision opérateur](../../../docs/science/sci-p02-initial-policy/stage2-v3/DECISION_FOR_OPERATOR.md).
+**7 novembre2026. PROPOSED, pas de GO BUILD/admission positive reçus.** Base97173680c1474bb906d413c192e6c120b97bfe5d. Décisions préparées : [dossier C1–C6](../../../../docs/science/sci-p02-initial-policy/stage2-v3/ADMISSION_CASE.md), [politique candidate](../../../../docs/science/sci-p02-initial-policy/stage2-v3/POLICY_CANDIDATE.md), [décision opérateur](../../../../docs/science/sci-p02-initial-policy/stage2-v3/DECISION_FOR_OPERATOR.md).
 
 ## Brainstorming / Options / Risques / Choix retenu
 

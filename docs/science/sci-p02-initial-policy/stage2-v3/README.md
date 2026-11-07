@@ -4,7 +4,7 @@
 
 - [Cas exact C1–C6](ADMISSION_CASE.md) et [politique candidate](POLICY_CANDIDATE.md).
 - [Sources et limites](EVIDENCE.md), [base et fingerprints préservés](BASELINE.md).
-- [Design OpenSpec](../../../../openspec/changes/science-initial-policy-v3-producer/design.md), [proposal](../../../../openspec/changes/science-initial-policy-v3-producer/proposal.md), [tasks](../../../../openspec/changes/science-initial-policy-v3-producer/tasks.md).
+- [Design OpenSpec](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-v3-producer/design.md), [proposal](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-v3-producer/proposal.md), [tasks](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-v3-producer/tasks.md).
 - [Tests futurs et handoff PLAN](TEST_AND_PLAN_HANDOFF.md).
 - [Deux décisions précises](DECISION_FOR_OPERATOR.md).
 
