@@ -2,7 +2,7 @@
 7 novembre2026. Base2cddf5d ; contrat v2 approuvé puis réalisé isolément, NOT_ADMITTED / NOT_SERVED. Ce dossier n'est pas un autre build négatif : il nomme ce qu'un prochain code peut apporter et ce qui demande encore des preuves.
 
 ## Décision de contrat reçue
-Décision opérateur : « Valider le contrat v2 et ce build isolé ». Contrat successeur v2 détaillé dans [design](../../../../openspec/changes/science-initial-policy-positive-admission/design.md), avec quinze déclarations qualitatives, réglage observé/bootstrap typés et mêmes gates temporelles. Le READY v1 reste inchangé. Les types/schémas/validateurs/tests sont réalisés sous ce GO ; cela ne crée pas à soi seul un premier READY.
+Décision opérateur : « Valider le contrat v2 et ce build isolé ». Contrat successeur v2 détaillé dans [design](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-positive-admission/design.md), avec quinze déclarations qualitatives, réglage observé/bootstrap typés et mêmes gates temporelles. Le READY v1 reste inchangé. Les types/schémas/validateurs/tests sont réalisés sous ce GO ; cela ne crée pas à soi seul un premier READY.
 
 ## C3 et C6 : pièces encore absentes
 | Élément | Pièce concrète requise | Responsable capable | Effet actuel |
