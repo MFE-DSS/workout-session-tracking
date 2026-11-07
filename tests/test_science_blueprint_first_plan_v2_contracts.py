@@ -689,9 +689,51 @@ def test_public_boundary_revalidates_nested_scalars_and_provenance(authority, ch
         out = (
             api()
             .FirstPlanRecommendationV2.model_validate(out)
-            .model_copy(update={"used_fields": ["invented"]})
+            .model_copy(update={"used_fields": ("invented",)})
         )
     else:
         raw["blueprint"]["objective"]["provenance"]["recorded_at"] = "2099-01-01T00:00:00Z"
     with pytest.raises(ValueError):
         exchange_api().validate_exchange(raw, out, **authority)
+
+
+def test_exported_v2_artifacts_reproduce_and_refuse_positive_or_synthetic_authority(authority):
+
+    module = importlib.import_module("tools.science_contracts.first_plan_v2_fixtures")
+    artifacts = module.artifacts()
+    for relative, encoded in artifacts.items():
+        assert (ROOT / relative).read_bytes() == encoded
+    cases = json.loads(artifacts["docs/science/sci-p01-p02/v2/contract-fixtures.v2.json"])
+    assert len(cases) == 9
+    assert {"sufficient", "insufficient", "conflicting", "withheld", "unknown-equipment"} <= {
+        c["scenario"] for c in cases
+    }
+    schemas = api().exported_schemas()
+    assert set(schemas) == {
+        "FirstPlanRequest.v2.schema.json",
+        "FirstPlanRecommendation.v2.schema.json",
+    }
+    for c in cases:
+        assert c["artifact_kind"] == "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED"
+        assert c["response"]["status"] != "READY"
+        api().FirstPlanRequestV2.model_validate(c["request"])
+        api().FirstPlanRecommendationV2.model_validate(c["response"])
+        assert (
+            exchange_api().validate_exchange(c["request"], c["response"], **authority).binding_ref
+            is None
+        )
+    assert artifacts == module.artifacts()
+
+
+def test_v1_consumer_contract_does_not_silently_accept_v2():
+    from tools.science_contracts.blueprint_first_plan_v1 import (
+        FirstPlanRecommendation,
+        FirstPlanRequest,
+    )
+
+    raw = request()
+    out = response(raw)
+    with pytest.raises(ValueError):
+        FirstPlanRequest.model_validate(raw)
+    with pytest.raises(ValueError):
+        FirstPlanRecommendation.model_validate(out)

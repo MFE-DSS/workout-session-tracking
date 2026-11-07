@@ -1,9 +1,9 @@
-# Tasks — proposition de suite, sans apply nouveau
+# Tasks — contrat v2 isolé autorisé, admission positive distincte
 - [x] Vérifier canonique2cddf5d et livraisons #369/#370 ; ne pas refaire l'étape1.
 - [x] Confronter représentation v1 aux vrais drafts et diagnostics v2.
 - [x] Définir contrat v2 proposé, unions, invariants READY, ownership et limites.
 - [x] Revue fraîche de faisabilité du dossier : aucune question importante restante, aucun conflit/pin ou READY relaxé détecté.
-- [ ] Choix/approbation opérateur du delta de contrat et GO BUILD borné.
+- [x] Choix/approbation opérateur du delta de contrat et GO BUILD borné : « Valider le contrat v2 et ce build isolé ».
 - [ ] Après ce GO : réaliser types/schémas/tests isolés v2, préservation v1 ; ne pas annoncer leur succès comme admission positive.
 - [ ] SCI-POS01/02/03 : décisions de population/dose/bootstrap/candidats réellement liées au bundle.
 - [ ] SCI-POS04 : contrat définitif revu et convention de projection effectivement admise.

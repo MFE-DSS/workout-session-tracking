@@ -1,0 +1,1291 @@
+{
+  "$defs": {
+    "AssessmentV2": {
+      "additionalProperties": false,
+      "properties": {
+        "conflicting_fields": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Conflicting Fields",
+          "type": "array"
+        },
+        "missing_fields": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Missing Fields",
+          "type": "array"
+        },
+        "requirement_profile_id": {
+          "const": "first-bodybuilding-inputs/2.0.0",
+          "title": "Requirement Profile Id",
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "SUFFICIENT",
+            "INSUFFICIENT",
+            "CONFLICTING"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state",
+        "requirement_profile_id",
+        "missing_fields",
+        "conflicting_fields"
+      ],
+      "title": "AssessmentV2",
+      "type": "object"
+    },
+    "BlockerV2": {
+      "additionalProperties": false,
+      "properties": {
+        "blocking": {
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "code": {
+          "enum": [
+            "INPUT_CONFLICT",
+            "REQUIRED_INPUT_MISSING",
+            "POLICY_UNAVAILABLE",
+            "NO_FEASIBLE_PLAN",
+            "COMPATIBILITY_UNKNOWN",
+            "TIME_UNCERTAIN",
+            "CATALOG_GAP",
+            "CONSTRAINT_VIOLATION",
+            "CALIBRATION_REQUIRED",
+            "BINDING_UNAVAILABLE"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "explanation": {
+          "minLength": 1,
+          "title": "Explanation",
+          "type": "string"
+        },
+        "field_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Field Refs",
+          "type": "array"
+        },
+        "gate_ref": {
+          "anyOf": [
+            {
+              "enum": [
+                "C1",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Gate Ref"
+        },
+        "source_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "code",
+        "blocking",
+        "gate_ref",
+        "source_refs",
+        "field_refs",
+        "explanation"
+      ],
+      "title": "BlockerV2",
+      "type": "object"
+    },
+    "BootstrapPrescription": {
+      "additionalProperties": false,
+      "properties": {
+        "dose": {
+          "$ref": "#/$defs/Dose"
+        },
+        "mode": {
+          "const": "BOOTSTRAP_PROTOCOL",
+          "title": "Mode",
+          "type": "string"
+        },
+        "protocol_ref": {
+          "minLength": 1,
+          "title": "Protocol Ref",
+          "type": "string"
+        },
+        "retry_rule_ref": {
+          "minLength": 1,
+          "title": "Retry Rule Ref",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/BootstrapStep"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "stop_rule_ref": {
+          "minLength": 1,
+          "title": "Stop Rule Ref",
+          "type": "string"
+        },
+        "timing_scope_ref": {
+          "minLength": 1,
+          "title": "Timing Scope Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "mode",
+        "dose",
+        "protocol_ref",
+        "stop_rule_ref",
+        "retry_rule_ref",
+        "timing_scope_ref",
+        "steps"
+      ],
+      "title": "BootstrapPrescription",
+      "type": "object"
+    },
+    "BootstrapStep": {
+      "additionalProperties": false,
+      "properties": {
+        "instruction_ref": {
+          "minLength": 1,
+          "title": "Instruction Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "FAMILIARIZE",
+            "TRIAL",
+            "OBSERVE",
+            "DECIDE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "step_id": {
+          "minLength": 1,
+          "title": "Step Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_id",
+        "kind",
+        "instruction_ref"
+      ],
+      "title": "BootstrapStep",
+      "type": "object"
+    },
+    "CandidateV2": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "minLength": 1,
+          "title": "Canonical Exercise Id",
+          "type": "string"
+        },
+        "compatibility": {
+          "enum": [
+            "CONFIRMED",
+            "NOT_REQUIRED",
+            "UNKNOWN",
+            "UNAVAILABLE"
+          ],
+          "title": "Compatibility",
+          "type": "string"
+        },
+        "compatibility_source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Compatibility Source Ref"
+        },
+        "context_ref": {
+          "minLength": 1,
+          "title": "Context Ref",
+          "type": "string"
+        },
+        "equipment_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Equipment Ref"
+        },
+        "load_semantics": {
+          "enum": [
+            "TOTAL_EXTERNAL",
+            "PER_IMPLEMENT",
+            "MACHINE_DISPLAY_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Load Semantics",
+          "type": "string"
+        },
+        "realization_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realization Ref"
+        },
+        "realization_source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realization Source Ref"
+        },
+        "side": {
+          "enum": [
+            "BILATERAL",
+            "LEFT",
+            "RIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Side",
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonical_exercise_id",
+        "context_ref",
+        "realization_ref",
+        "equipment_ref",
+        "side",
+        "load_semantics",
+        "compatibility",
+        "compatibility_source_ref",
+        "realization_source_ref"
+      ],
+      "title": "CandidateV2",
+      "type": "object"
+    },
+    "Confidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "feasibility": {
+          "enum": [
+            "UNKNOWN",
+            "MIXED",
+            "CONFIRMED",
+            "NOT_FEASIBLE"
+          ],
+          "title": "Feasibility",
+          "type": "string"
+        },
+        "individual_response": {
+          "const": "NOT_ESTIMATED",
+          "title": "Individual Response",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "individual_response",
+        "feasibility",
+        "evidence_refs",
+        "limitations"
+      ],
+      "title": "Confidence",
+      "type": "object"
+    },
+    "ContextKey": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Canonical Exercise Id"
+        },
+        "context_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Context Ref"
+        },
+        "equipment_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Equipment Ref"
+        },
+        "load_semantics": {
+          "enum": [
+            "TOTAL_EXTERNAL",
+            "PER_IMPLEMENT",
+            "MACHINE_DISPLAY_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Load Semantics",
+          "type": "string"
+        },
+        "realization_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realization Ref"
+        },
+        "side": {
+          "enum": [
+            "BILATERAL",
+            "LEFT",
+            "RIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Side",
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonical_exercise_id",
+        "context_ref",
+        "equipment_ref",
+        "realization_ref",
+        "load_semantics",
+        "side"
+      ],
+      "title": "ContextKey",
+      "type": "object"
+    },
+    "DiagnosticDuration": {
+      "additionalProperties": false,
+      "properties": {
+        "basis_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Basis Refs",
+          "type": "array"
+        },
+        "budget_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Budget Minutes",
+          "type": "integer"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Limitations",
+          "type": "array"
+        },
+        "lower_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Lower Seconds"
+        },
+        "scope_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scope Fingerprint",
+          "type": "string"
+        },
+        "state": {
+          "const": "CONDITIONAL_DIAGNOSTIC",
+          "title": "State",
+          "type": "string"
+        },
+        "upper_seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Upper Seconds"
+        }
+      },
+      "required": [
+        "state",
+        "budget_minutes",
+        "lower_seconds",
+        "upper_seconds",
+        "basis_refs",
+        "scope_fingerprint",
+        "limitations"
+      ],
+      "title": "DiagnosticDuration",
+      "type": "object"
+    },
+    "Dose": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "max_reps": {
+          "exclusiveMinimum": 0,
+          "title": "Max Reps",
+          "type": "integer"
+        },
+        "min_reps": {
+          "exclusiveMinimum": 0,
+          "title": "Min Reps",
+          "type": "integer"
+        },
+        "rest_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Rest Seconds",
+          "type": "integer"
+        },
+        "rir_target": {
+          "minimum": 0,
+          "title": "Rir Target",
+          "type": "number"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "work_sets": {
+          "exclusiveMinimum": 0,
+          "title": "Work Sets",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "work_sets",
+        "min_reps",
+        "max_reps",
+        "rir_target",
+        "rest_seconds",
+        "source_ref",
+        "evidence_refs"
+      ],
+      "title": "Dose",
+      "type": "object"
+    },
+    "ObservedSettingPrescription": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_event_id": {
+          "minLength": 1,
+          "title": "Acceptance Event Id",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/ContextKey"
+        },
+        "dose": {
+          "$ref": "#/$defs/Dose"
+        },
+        "episode_id": {
+          "minLength": 1,
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "mode": {
+          "const": "OBSERVED_SETTING",
+          "title": "Mode",
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/$defs/Setting"
+        }
+      },
+      "required": [
+        "mode",
+        "dose",
+        "episode_id",
+        "event_id",
+        "acceptance_event_id",
+        "context",
+        "setting"
+      ],
+      "title": "ObservedSettingPrescription",
+      "type": "object"
+    },
+    "PlanV2": {
+      "additionalProperties": false,
+      "properties": {
+        "allocation_ref": {
+          "minLength": 1,
+          "title": "Allocation Ref",
+          "type": "string"
+        },
+        "coverage_report_complete": {
+          "title": "Coverage Report Complete",
+          "type": "boolean"
+        },
+        "physical_work_sets_total": {
+          "exclusiveMinimum": 0,
+          "title": "Physical Work Sets Total",
+          "type": "integer"
+        },
+        "review_state": {
+          "enum": [
+            "DRAFT",
+            "REVIEWED"
+          ],
+          "title": "Review State",
+          "type": "string"
+        },
+        "sessions": {
+          "items": {
+            "$ref": "#/$defs/SessionV2"
+          },
+          "minItems": 1,
+          "title": "Sessions",
+          "type": "array"
+        },
+        "zone_model_version": {
+          "const": "zones-15-v1",
+          "title": "Zone Model Version",
+          "type": "string"
+        },
+        "zone_reports": {
+          "items": {
+            "$ref": "#/$defs/ZoneReport"
+          },
+          "title": "Zone Reports",
+          "type": "array"
+        }
+      },
+      "required": [
+        "allocation_ref",
+        "review_state",
+        "sessions",
+        "physical_work_sets_total",
+        "zone_model_version",
+        "coverage_report_complete",
+        "zone_reports"
+      ],
+      "title": "PlanV2",
+      "type": "object"
+    },
+    "RoleContribution": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "minLength": 1,
+          "title": "Canonical Exercise Id",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "realization_ref": {
+          "minLength": 1,
+          "title": "Realization Ref",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "PRIMARY",
+            "SECONDARY",
+            "MINOR"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "slot_id": {
+          "minLength": 1,
+          "title": "Slot Id",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "canonical_exercise_id",
+        "realization_ref",
+        "role",
+        "source_ref",
+        "evidence_refs"
+      ],
+      "title": "RoleContribution",
+      "type": "object"
+    },
+    "SessionV2": {
+      "additionalProperties": false,
+      "properties": {
+        "duration": {
+          "discriminator": {
+            "mapping": {
+              "CONDITIONAL_DIAGNOSTIC": "#/$defs/DiagnosticDuration",
+              "SUPPORTED": "#/$defs/SupportedDuration",
+              "UNKNOWN": "#/$defs/UnknownDuration"
+            },
+            "propertyName": "state"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/UnknownDuration"
+            },
+            {
+              "$ref": "#/$defs/DiagnosticDuration"
+            },
+            {
+              "$ref": "#/$defs/SupportedDuration"
+            }
+          ],
+          "title": "Duration"
+        },
+        "session_id": {
+          "minLength": 1,
+          "title": "Session Id",
+          "type": "string"
+        },
+        "slots": {
+          "items": {
+            "$ref": "#/$defs/SlotV2"
+          },
+          "minItems": 1,
+          "title": "Slots",
+          "type": "array"
+        }
+      },
+      "required": [
+        "session_id",
+        "slots",
+        "duration"
+      ],
+      "title": "SessionV2",
+      "type": "object"
+    },
+    "Setting": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "MASS_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "kg",
+            "setting",
+            "none"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ],
+      "title": "Setting",
+      "type": "object"
+    },
+    "SlotV2": {
+      "additionalProperties": false,
+      "properties": {
+        "alternatives": {
+          "items": {
+            "$ref": "#/$defs/CandidateV2"
+          },
+          "title": "Alternatives",
+          "type": "array"
+        },
+        "intent_id": {
+          "minLength": 1,
+          "title": "Intent Id",
+          "type": "string"
+        },
+        "prescription": {
+          "discriminator": {
+            "mapping": {
+              "BOOTSTRAP_PROTOCOL": "#/$defs/BootstrapPrescription",
+              "OBSERVED_SETTING": "#/$defs/ObservedSettingPrescription"
+            },
+            "propertyName": "mode"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ObservedSettingPrescription"
+            },
+            {
+              "$ref": "#/$defs/BootstrapPrescription"
+            }
+          ],
+          "title": "Prescription"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "selected": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CandidateV2"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "slot_id": {
+          "minLength": 1,
+          "title": "Slot Id",
+          "type": "string"
+        },
+        "substitution_rule_ref": {
+          "minLength": 1,
+          "title": "Substitution Rule Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "slot_id",
+        "intent_id",
+        "selected",
+        "alternatives",
+        "substitution_rule_ref",
+        "prescription",
+        "rationale"
+      ],
+      "title": "SlotV2",
+      "type": "object"
+    },
+    "SupportedDuration": {
+      "additionalProperties": false,
+      "properties": {
+        "applicability_ref": {
+          "minLength": 1,
+          "title": "Applicability Ref",
+          "type": "string"
+        },
+        "basis_kind": {
+          "enum": [
+            "ADMITTED_MODEL",
+            "ADMITTED_PRODUCT_CONVENTION"
+          ],
+          "title": "Basis Kind",
+          "type": "string"
+        },
+        "basis_ref": {
+          "minLength": 1,
+          "title": "Basis Ref",
+          "type": "string"
+        },
+        "basis_version": {
+          "minLength": 1,
+          "title": "Basis Version",
+          "type": "string"
+        },
+        "budget_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Budget Minutes",
+          "type": "integer"
+        },
+        "coverage": {
+          "items": {
+            "enum": [
+              "WORK",
+              "REST",
+              "PREPARATION_CALIBRATION",
+              "SETUP_TRANSITION"
+            ],
+            "type": "string"
+          },
+          "title": "Coverage",
+          "type": "array"
+        },
+        "covers_bootstrap": {
+          "title": "Covers Bootstrap",
+          "type": "boolean"
+        },
+        "evidence_refs": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Limitations",
+          "type": "array"
+        },
+        "lower_seconds": {
+          "minimum": 0,
+          "title": "Lower Seconds",
+          "type": "number"
+        },
+        "scope_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Scope Fingerprint",
+          "type": "string"
+        },
+        "state": {
+          "const": "SUPPORTED",
+          "title": "State",
+          "type": "string"
+        },
+        "unit": {
+          "const": "seconds",
+          "title": "Unit",
+          "type": "string"
+        },
+        "upper_seconds": {
+          "minimum": 0,
+          "title": "Upper Seconds",
+          "type": "number"
+        }
+      },
+      "required": [
+        "state",
+        "budget_minutes",
+        "lower_seconds",
+        "upper_seconds",
+        "unit",
+        "basis_kind",
+        "basis_ref",
+        "basis_version",
+        "scope_fingerprint",
+        "applicability_ref",
+        "covers_bootstrap",
+        "coverage",
+        "evidence_refs",
+        "limitations"
+      ],
+      "title": "SupportedDuration",
+      "type": "object"
+    },
+    "UnknownDuration": {
+      "additionalProperties": false,
+      "properties": {
+        "budget_minutes": {
+          "exclusiveMinimum": 0,
+          "title": "Budget Minutes",
+          "type": "integer"
+        },
+        "state": {
+          "const": "UNKNOWN",
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state",
+        "budget_minutes"
+      ],
+      "title": "UnknownDuration",
+      "type": "object"
+    },
+    "ZoneReport": {
+      "additionalProperties": false,
+      "properties": {
+        "absence_basis_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Absence Basis Ref"
+        },
+        "contributions": {
+          "items": {
+            "$ref": "#/$defs/RoleContribution"
+          },
+          "title": "Contributions",
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Limitations",
+          "type": "array"
+        },
+        "role_status": {
+          "enum": [
+            "SUPPORTED_ROLES",
+            "UNKNOWN",
+            "NO_SUPPORTED_ROLE_IN_SELECTED_SET"
+          ],
+          "title": "Role Status",
+          "type": "string"
+        },
+        "unresolved_slot_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Unresolved Slot Ids",
+          "type": "array"
+        },
+        "zone": {
+          "enum": [
+            "pecs",
+            "lats",
+            "upper_back",
+            "anterior_delts",
+            "lateral_delts",
+            "rear_delts",
+            "biceps",
+            "triceps",
+            "quads",
+            "hamstrings",
+            "glutes",
+            "adductors",
+            "calves",
+            "abs",
+            "hip_flexors"
+          ],
+          "title": "Zone",
+          "type": "string"
+        }
+      },
+      "required": [
+        "zone",
+        "role_status",
+        "contributions",
+        "unresolved_slot_ids",
+        "absence_basis_ref",
+        "limitations"
+      ],
+      "title": "ZoneReport",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "admission_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Admission Refs",
+      "type": "array"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "assessment": {
+      "$ref": "#/$defs/AssessmentV2"
+    },
+    "binding_digest": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Binding Digest"
+    },
+    "binding_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Binding Ref"
+    },
+    "bundle_digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Bundle Digest",
+      "type": "string"
+    },
+    "candidate_plan": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PlanV2"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "confidence": {
+      "$ref": "#/$defs/Confidence"
+    },
+    "contract_version": {
+      "const": "first-plan-recommendation/2.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "effective_science_digest": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Effective Science Digest",
+      "type": "string"
+    },
+    "engine_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Engine Version"
+    },
+    "full_evaluation_fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Full Evaluation Fingerprint",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "issues": {
+      "items": {
+        "$ref": "#/$defs/BlockerV2"
+      },
+      "title": "Issues",
+      "type": "array"
+    },
+    "policy_version": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Policy Version"
+    },
+    "request_fingerprint": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Request Fingerprint",
+      "type": "string"
+    },
+    "revocation_check_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Revocation Check Ref"
+    },
+    "snapshot_ref": {
+      "minLength": 1,
+      "title": "Snapshot Ref",
+      "type": "string"
+    },
+    "source_revision": {
+      "minLength": 1,
+      "title": "Source Revision",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "READY",
+        "INSUFFICIENT_DATA",
+        "CONFLICTING_DATA",
+        "POLICY_UNAVAILABLE",
+        "CONSTRAINT_UNSATISFIABLE",
+        "REVIEW_REQUIRED"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "subject_ref": {
+      "minLength": 1,
+      "title": "Subject Ref",
+      "type": "string"
+    },
+    "used_fields": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Used Fields",
+      "type": "array"
+    }
+  },
+  "required": [
+    "contract_version",
+    "subject_ref",
+    "snapshot_ref",
+    "source_revision",
+    "as_of",
+    "generated_at",
+    "request_fingerprint",
+    "full_evaluation_fingerprint",
+    "bundle_digest",
+    "effective_science_digest",
+    "engine_version",
+    "policy_version",
+    "binding_ref",
+    "binding_digest",
+    "admission_refs",
+    "revocation_check_ref",
+    "assessment",
+    "issues",
+    "used_fields",
+    "status",
+    "candidate_plan",
+    "confidence"
+  ],
+  "title": "FirstPlanRecommendationV2",
+  "type": "object"
+}
