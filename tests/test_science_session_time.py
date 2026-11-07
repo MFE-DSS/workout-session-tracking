@@ -323,3 +323,15 @@ def test_nested_typed_slot_is_revalidated_at_dict_boundary():
     run = api()
     with pytest.raises(ValueError):
         run(s, budget_minutes=2, components=[])
+
+
+@pytest.mark.parametrize("field", ["origin", "acquisition"])
+@pytest.mark.filterwarnings("ignore:Pydantic serializer warnings:UserWarning")
+def test_nested_component_provenance_model_copy_cannot_skip_validation(field):
+    from tools.science_contracts.blueprint_first_plan_v1 import Provenance
+    s, pieces = time_session(), time_components()
+    source = Provenance.model_validate(pieces[-1]["provenance"])
+    pieces[-1]["provenance"] = source.model_copy(update={field: "INVALID_SOURCE_ENUM"})
+    run = api()
+    with pytest.raises(ValueError):
+        run(s, budget_minutes=2, components=pieces, layout="DISJOINT_SEQUENTIAL")

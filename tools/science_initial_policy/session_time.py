@@ -128,8 +128,7 @@ def _basis_issues(component: TimeComponent) -> list[str]:
 def _validate_components(session, raw_components, expected, rests, scope):
     components, seen_ids, seen_keys, issues = [], set(), set(), []
     for raw in raw_components:
-        data = raw.model_dump(mode="json") if isinstance(raw, TimeComponent) else raw
-        c = TimeComponent.model_validate(data)
+        c = TimeComponent.model_validate(normalized_record(raw))
         if c.component_id in seen_ids or c.coverage_key in seen_keys:
             raise ValueError("duplicate timing identity or coverage")
         if expected.get(c.coverage_key) != c.kind:
