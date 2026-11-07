@@ -642,3 +642,8 @@ La mise à jour est faite par l'agent **dans le même commit** que le sprint rep
 | account-native-release-acceptance | [RELEASE01–06](../proposals/account-native-release-acceptance.md) | OPEN, aucune recette physique/déploiement déduits |
 
 Préparation après socle : [MOB04 MISSION, proposition sans GO BUILD](../proposals/mob04-mission.md), [10fixtures versionnées non servies](../fixtures/mob04-mission.preparation.v1.json). Contrat MISSION-SCREEN-V1 LOCKED, aucune UI/baseline ou intelligence nouvelle implémentée.
+
+
+## SCI-P02 admission système — étape1 isolée, 7 novembre2026
+
+[science-initial-policy-admission](../../openspec/changes/science-initial-policy-admission/proposal.md), enfant du parent scientifique encore ouvert. GO opérateur borné : « Valider uniquement ce build SCI isolé » ; [autorisation](../../openspec/changes/science-initial-policy-admission/BUILD_AUTHORIZATION.md). En cours : trois durcissements successeurs, registre vide, évaluateur/tests/fixtures de refus. Aucun contrat READYv1 modifié, aucune admission positive/API/UI/activation/déploiement ; [reçu](../science/sci-p02-initial-policy/admission-system-01/DELIVERY.md). Les quatre autres paquets restent proposés hors de cette PR.

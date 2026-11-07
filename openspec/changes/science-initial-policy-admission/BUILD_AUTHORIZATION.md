@@ -1,0 +1,5 @@
+# SCI admission — étape 1 autorisée
+
+7 novembre 2026. Réponse opérateur : « Valider uniquement ce build SCI isolé ». Autorisation du design §D5 étape1 : trois durcissements successeurs (activité de calibration courante, types stricts, borne basse temporelle sûre), registre initialement vide, évaluateur isolé et tests/fixtures de refus. Préserver les artefacts historiques. Aucun nouveau READY, modification de READY v1, API/UI/activation/déploiement.
+
+Cette étape est le périmètre COMPLETE de la présente PR : mécanismes isolés testés, décision scientifique NOT_ADMITTED versionnée, fixtures réellement générées non servies, revues/CI/merge/closeout. L'admission positive, le contrat successeur et la collecte empirique restent différés explicitement, sans tâches déclarées réussies. Le parent science-initial-plan-policy et MOB03 complet restent ouverts. GO MERGE permanent applicable à ce scope et ses corrections/closeout, sous contrôles obligatoires. Les quatre autres changes du paquet ARCH restent dans le worktree documentaire, non embarqués ici.
