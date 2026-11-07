@@ -6,12 +6,13 @@ Documenter le diagnostic isolé d’admission négative et ses limites ; aucune 
 ## Requirements
 
 ### Requirement: Six-gate assessment of the effective bundle
-
-Le système SHALL évaluer séparément population C1, dose C2, protocole initial C3, sélection/réalisation C4, projection/READY C5 et temps positif C6, sur le bundle/version/SHA effectifs. Une approbation de planning ou un GO BUILD SHALL NOT constituer une admission scientifique. Toute décision documentaire proposée SHALL rester distincte d'une entrée du registre d'admission.
-
+Le système SHALL évaluer séparément C1 population, C2 dose, C3 protocole, C4 sélection/réalisation, C5 représentation et C6 temps/politique sur le bundle/version/SHA effectifs et le profil de readiness nommé. Un GO BUILD SHALL NOT constituer une admission. Les anciennes évaluations v1/v2 et leurs pins SHALL rester inchangés. Le profil v3 exploratoire SHALL distinguer C6 EXPLORATION_POLICY_ADMITTED d’une preuve de durée SUPPORTED ; aucune gate scientifique non acquise SHALL être masquée par un ack.
 #### Scenario: Effective producer remains unadmitted
-- **WHEN** les inputs requis suffisent mais une gate du système effectif reste non acquise
-- **THEN** le verdict conserve NOT_ADMITTED et aucune sortie READY/servie n'est fabriquée.
+- WHEN les inputs suffisent mais une condition requise du profil réellement admis manque
+- THEN aucun résultat scientifique positif n’est admis et le manque précis est conservé.
+#### Scenario: C6 exploration is explicitly admitted for v3
+- WHEN C1–C5 et le protocole sont admis sur le bundle exact, et la politique exploratoire v3 est explicitement admise
+- THEN la sortie peut porter science positive et BUDGET_UNCERTAIN, sans affirmer durée ou fit positifs et sans droit de démarrage avant ack applicable.
 
 ### Requirement: Bounded population and explicit conventions
 
@@ -50,12 +51,13 @@ Les invariants READY v1 SHALL rester intacts : allocation revue, exposition exac
 - **THEN** il ne reçoit pas READY et aucune gate v1 n'est assouplie pour l'accepter.
 
 ### Requirement: Positive time authority
-
-Le système SHALL distinguer borne structurelle, observation passée, arithmétique conditionnelle, convention produit admise et modèle prédictif admis. Sans modèle/convention réellement applicable et borne haute couvrant préparation/calibration/travail/repos/opérations, C6 SHALL rester non acquis avec protocole de collecte. LIKELY_FITS expérimental SHALL NOT devenir Duration admise.
-
+Les profils READYv1/v2 et le mode SUPPORTED v3 SHALL conserver leur exigence de borne haute applicable couvrant travail/repos/préparation/calibration/opérations. Sans preuve applicable, cette durée SHALL rester UNKNOWN. Le profil exploratoire v3 séparément approuvé SHALL admettre seulement la gouvernance de cette incertitude : borne négative applicable, reconnaissance du plan exact, arrêt/limite et faits incomplets préservés. Il SHALL NOT déclarer l’ancienne gate de temps positif satisfaite ou utiliser des secondes fictives.
 #### Scenario: Complete synthetic timing intervals
-- **WHEN** les intervalles synthétiques complets donnent 1060 secondes et LIKELY_FITS
-- **THEN** ils prouvent le calcul, pas une durée future admise, et Duration reste UNKNOWN dans le système actuel.
+- WHEN des intervalles synthétiques donnent un diagnostic conditionnel favorable
+- THEN ils ne constituent pas une preuve de temps futur ou une autorité pour SUPPORTED.
+#### Scenario: Partial rests below budget
+- WHEN la borne de repos sous structure réellement liée au binding est sous le budget mais les autres durées sont inconnues
+- THEN BUDGET_UNCERTAIN demeure, et seule une politique exploratoire admise peut autoriser une reconnaissance pour commencer sans promesse d’achèvement.
 
 ### Requirement: Integrity and invalidation
 
@@ -66,12 +68,14 @@ Toute autorité future SHALL vérifier policy/engine/bundle/evidence/versions et
 - **THEN** le futur vérificateur refuse l'enveloppe malgré l'égalité permissive Python et conserve le résultat canonique recalculé.
 
 ### Requirement: Isolated proposal and PLAN handoff
-
-La phase de préparation SHALL modifier seulement ses documents dédiés ; son apply borné SHALL suivre BUILD_AUTHORIZATION.md et ne réaliser que l'étape1 isolée explicitement approuvée. Le parent science-initial-plan-policy SHALL rester ouvert, et cet enfant SHALL être seul propriétaire de la prochaine admission. PLAN SHALL recevoir uniquement un binding réellement admis ou des blockers nommés ; aucune API/UI/activation ou séance possédée SHALL être revendiquée par ce dossier.
+Le scope historique négatif étape1 SHALL rester livré, piné et rejouable. La présente préparation SHALL rester documentaire ; le change science-initial-policy-v3-producer SHALL être propriétaire unique du prochain apply SCI positif seulement après ses décisions et GO propres. Le parent science-initial-plan-policy SHALL rester ouvert jusqu’à ses critères effectifs. Les autres préparations ARCH ne SHALL NOT être appliquées concurremment sur les mêmes registres. PLAN SHALL recevoir binding/admission réels, sources et limites, sans API/UI/SDK ou séance possédée revendiqués par ce scope.
+#### Scenario: No separate stage2 functional GO
+- WHEN seule une préparation ou une ancienne autorisation étape1 existe
+- THEN aucun registre/binding/producteur positif nouveau n’est implémenté ou publié.
 
 #### Scenario: No separate functional GO BUILD
-- **WHEN** le mandat autorise assessment/design sans GO fonctionnel distinct
-- **THEN** corrections, tests exécutables, schémas et registre d'admission restent des travaux futurs non appliqués.
+- WHEN le mandat autorise assessment/design sans GO fonctionnel distinct
+- THEN corrections, tests exécutables, schémas et registre d’admission restent des travaux futurs non appliqués.
 
 ### Requirement: Isolated negative admission evaluation
 
