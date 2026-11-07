@@ -1,5 +1,5 @@
 # AUREN — registre produit / science
-**SCI-P02-CALIBRATION-TIME-01 —6novembre2026 :** [producteur v2 isolé](../science/sci-p02-initial-policy/calibration-time-01/DELIVERY.md), calibration observée et temps conditionnel intégrés, NOT_ADMITTED/NOT_SERVED/aucun READY. Sources antérieures et FirstPlanClient préservés. Suite préparée : SCI-P02-INITIAL-POLICY-ADMISSION ; base temporelle positive, admission sélection/références et protocole de départ restent nécessaires. Aucun nouveau GO runtime ou déploiement.
+**SCI-P02-CALIBRATION-TIME-01 —6novembre2026 :** [producteur v2 livré et corrigé](../science/sci-p02-initial-policy/calibration-time-01/VERIFICATION.md), PR366/367 fusionnées, calibration observée et temps conditionnel intégrés, NOT_ADMITTED/NOT_SERVED/aucun READY. Sources antérieures et FirstPlanClient préservés. Suite préparée : SCI-P02-INITIAL-POLICY-ADMISSION ; base temporelle positive, admission sélection/références et protocole de départ restent nécessaires. Aucun nouveau GO runtime ou déploiement.
 
 
 
