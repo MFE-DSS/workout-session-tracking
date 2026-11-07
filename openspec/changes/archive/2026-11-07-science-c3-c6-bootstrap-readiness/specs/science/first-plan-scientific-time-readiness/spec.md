@@ -37,7 +37,7 @@ Le futur protocole SHALL conserver les préoccupations, interruptions et faits i
 - THEN le protocole propose la sortie/revue applicable et conserve les faits, sans succès ou durée exacte inventés.
 
 ### Requirement: Reviewed authority before implementation
-Cette préparation SHALL rester documentaire. Tout code successeur, binding, statut positif ou activation SHALL attendre les décisions et périmètres approuvés applicables.
+Seul le build isolé étape1 explicitement approuvé SHALL être réalisé : types/schémas/protocole/validations et exemples négatifs. Tout binding, producteur, statut positif autoritaire ou activation SHALL attendre ses décisions et périmètres approuvés applicables. Un label positif structurel SHALL NOT constituer une autorité.
 #### Scenario: Preparatory packet contains recommended admission labels
 - WHEN un paquet reçu comporte ADMIT et une recommandation RouteB à approuver
 - THEN il est conservé comme source de doctrine, sans ajouter automatiquement des bindings dans un registre ni générer une fixture READY.

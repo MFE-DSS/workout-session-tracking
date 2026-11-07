@@ -21,7 +21,7 @@ L’alternative maintient le droit de démarrage subordonné à une durée compl
 ## Trois pièces de preuve restent distinctes
 
 1. **Réception/source :** paquet1.0.0 reçu, SHA conservé ; références vérifiées avec limites.
-2. **Décision produit et GO étape1 :** choix ci-dessus à recevoir explicitement sur le [design](../../../../openspec/changes/science-c3-c6-bootstrap-readiness/design.md). Le « oui » doit nommer ce périmètre ; il ne certifie ni dose optimale ni durée réelle.
+2. **Décision produit et GO étape1 :** choix ci-dessus à recevoir explicitement sur le [design](../../../../openspec/changes/archive/2026-11-07-science-c3-c6-bootstrap-readiness/design.md). Le « oui » doit nommer ce périmètre ; il ne certifie ni dose optimale ni durée réelle.
 3. **Admission du bundle positif :** auteur/reviewer/version/applicabilité, instructions, preuves et retrait reliés au code/contrat exacts avant l’étape2. Les sources historiques/registre vide restent figés ; aucune signature ou qualification professionnelle inventée.
 
 La préparation se termine avec dossier relu et contrôles documentaires. Le premier build ne peut commencer avant la revue opérateur du nouveau contrat, selon CLAUDE.md§6 : « propose → revue de l’opérateur → apply ». Aucun GO MERGE ponctuel supplémentaire ne sera demandé pour un périmètre ensuite autorisé et prêt. Déploiement et runtime restent séparés.

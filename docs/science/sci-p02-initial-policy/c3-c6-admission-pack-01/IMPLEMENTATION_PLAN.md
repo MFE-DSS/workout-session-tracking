@@ -5,7 +5,7 @@
 **Goal:** Réaliser le contrat v3 et les types C3/C6 sans autorité positive ou runtime.
 **Architecture:** Réutiliser faits/observations/PlanV2 et la borne partielle de repos existante. Nouveaux types purs pour science/temps/permission et protocole ; frontière d’échange sur les vrais bundle/registre vide ; artefacts de refus non servis.
 **Tech Stack:** Python/Pydantic/pytest existants, JSON/SHA256, aucune dépendance nouvelle.
-**Spec:** openspec/changes/science-c3-c6-bootstrap-readiness/design.md et BUILD_AUTHORIZATION.md.
+**Spec:** openspec/changes/archive/2026-11-07-science-c3-c6-bootstrap-readiness/design.md et BUILD_AUTHORIZATION.md.
 
 ## Global Constraints
 - Anciens modèles/registres/hashes/artefacts et FirstPlanClient inchangés ; pas app/API/UI/DB/collecte/activation.
