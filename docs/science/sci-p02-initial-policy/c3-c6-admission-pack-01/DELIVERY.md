@@ -1,6 +1,6 @@
 # C3/C6 — livraison du contrat v3 isolé
 
-7 novembre 2026. **Stage1 implémenté et revu ; CI finale en cours. NOT_ADMITTED / NOT_SERVED.** Autorisation : « Valider v3 et ce build isolé ». Base a5720797f14902bf7ef7248765ae716f107113b0. Aucun READY réel, binding ou producteur positif.
+7 novembre 2026. **Stage1 implémenté, revu et fusionné PR373 ; suivi canonique/closeout en cours. NOT_ADMITTED / NOT_SERVED.** Autorisation : « Valider v3 et ce build isolé ». Base a5720797f14902bf7ef7248765ae716f107113b0. Aucun READY réel, binding ou producteur positif.
 
 ## Brainstorming / Options / Risques / Choix retenu
 
@@ -36,3 +36,11 @@ La PR373 et le closeout consignent HEAD, CI et Sonar après exécution réelle ;
 - CI/Sonar/canonique/cleanup sont vérifiés par l’agent de livraison, pas par les reviewers : coût, arrêt et conservation des preuves si ces conditions échouent.
 
 Aucun mineur de revue différé. Les remarques Sonar éventuelles restent une catégorie de qualité séparée. La revue SCI est une cohérence de contrat, pas une nouvelle revue systématique, validation biologique/personnelle ou borne temporelle réelle.
+
+## Reçu code vérifié
+
+PR373 : HEAD **d56fe2d78078cc80c16f49193dd2bc185ce9d8de**, merge **4694ae9391ecac2622f4d0493818aac1d4a23f2e**. CI PR42393674309 completed/success, neuf jobs : **7 733 backend passants/trois ignorés,54suites/676mobile+TypeScript**. Base a572079 relue avant merge, garde exacte du HEAD, aucun bypass/force-push ; zéro revue/thread bloquant.
+
+Sonar PR : ERROR consultatif/Major, six remarques de structure des tests (4S9073 assertions composites,2S5778 invocation des tests d’exception), zéro bug/vulnérabilité/hotspot sur ce diff ; couverture app93,8%, nouvelle couverture non fournie. Dette qualité séparée, sans seuil/issue modifié. Le seul run d’ancien HEAD42393077099 a été annulé comme obsolète ; le run final a entièrement réussi.
+
+La CI canonique42395374363 et les contrôles du closeout sont suivis dans CLOSEOUT/PR de maintenance ; aucun succès futur n’est anticipé. La maintenance sera fusionnée seulement après succès canonique du code et CI de son propre HEAD.
