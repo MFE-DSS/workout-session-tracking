@@ -647,3 +647,8 @@ Préparation après socle : [MOB04 MISSION, proposition sans GO BUILD](../propos
 ## SCI-P02 admission système — étape1 isolée, 7 novembre2026
 
 [science-initial-policy-admission](../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/proposal.md), enfant du parent scientifique encore ouvert. GO opérateur borné : « Valider uniquement ce build SCI isolé » ; [autorisation](../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/BUILD_AUTHORIZATION.md). Code livré PR369/merge5e94cfa, CI PR verte ; suivi canonique/closeout dans docs/science/sci-p02-initial-policy/admission-system-01/CLOSEOUT.md : trois durcissements successeurs, registre vide, évaluateur/tests/fixtures de refus. Aucun contrat READYv1 modifié, aucune admission positive/API/UI/activation/déploiement ; [reçu](../science/sci-p02-initial-policy/admission-system-01/DELIVERY.md). Les quatre autres paquets restent proposés hors de cette PR.
+
+
+## SCI admission positive — contrat v2 isolé autorisé
+
+7 novembre2026, base2cddf5d. [science-initial-policy-positive-admission](../../openspec/changes/science-initial-policy-positive-admission/proposal.md) : contrat successeur v2 revu puis GO explicite « Valider le contrat v2 et ce build isolé ». Types/schémas/validateurs/tests et exemples de refus côte à côte, sans modifier v1/FirstPlanClient, historique ou registre vide. [Livraison](../science/sci-p02-initial-policy/positive-admission-01/CONTRACT_DELIVERY.md) ; vérifications/publication en cours, aucune réussite distante anticipée. SCI-POS01..07 et parent restent ouverts ; ni admission positive, ni producteur v2 contractuel, ni READY/API/UI/activation/collecte/déploiement. Les quatre autres paquets architecte restent proposés hors scope.
