@@ -1,3 +1,5 @@
+> **Instant historique de préparation avant GO.** La décision ultérieure « Valider v3 et ce build isolé » autorise le stage1 décrit dans BUILD_AUTHORIZATION.md ; les preuves de réalisation sont séparées dans DELIVERY.md. Les mentions « aucun commit / GO manquant » ci-dessous restent celles de la préparation.
+
 # C3/C6 — reçu de préparation et de revue
 
 **7 novembre 2026. PROPOSED / DESIGN_REVIEW_REQUIRED / NO_NEW_GO_BUILD.** Base distante vérifiée après fetch : a5720797f14902bf7ef7248765ae716f107113b0. Worktree `/private/tmp/auren-sci-c3-c6-admission-pack-01`, branche `spec/sci-c3-c6-admission-pack-01`. Aucun commit, push, PR, merge ou CI nouvelle pour ce dossier ; base SHA ne désigne pas un commit de ces fichiers.

@@ -1,0 +1,373 @@
+{
+  "$defs": {
+    "ContextKey": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Canonical Exercise Id"
+        },
+        "context_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Context Ref"
+        },
+        "equipment_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Equipment Ref"
+        },
+        "load_semantics": {
+          "enum": [
+            "TOTAL_EXTERNAL",
+            "PER_IMPLEMENT",
+            "MACHINE_DISPLAY_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Load Semantics",
+          "type": "string"
+        },
+        "realization_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realization Ref"
+        },
+        "side": {
+          "enum": [
+            "BILATERAL",
+            "LEFT",
+            "RIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Side",
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonical_exercise_id",
+        "context_ref",
+        "equipment_ref",
+        "realization_ref",
+        "load_semantics",
+        "side"
+      ],
+      "title": "ContextKey",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "acquisition": {
+          "enum": [
+            "DECLARED",
+            "SELF_MEASURED",
+            "DEVICE_MEASURED",
+            "EXECUTION_LOG",
+            "DERIVED",
+            "UNKNOWN"
+          ],
+          "title": "Acquisition",
+          "type": "string"
+        },
+        "measured_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measured At"
+        },
+        "origin": {
+          "enum": [
+            "USER_REPORTED",
+            "USER_OBSERVED",
+            "DERIVED_FROM_HISTORY",
+            "POPULATION_PRIOR",
+            "PRODUCT_CONTRACT",
+            "UNKNOWN"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "recorded_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Recorded At"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Ref"
+        }
+      },
+      "required": [
+        "origin",
+        "acquisition",
+        "source_ref",
+        "recorded_at",
+        "measured_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Setting": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "MASS_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "kg",
+            "setting",
+            "none"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ],
+      "title": "Setting",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "assessment": {
+      "enum": [
+        "NOT_ASSESSABLE",
+        "WITHIN_PRESCRIBED_REPS",
+        "OUTSIDE_PRESCRIBED_REPS",
+        "REVIEW_REQUIRED"
+      ],
+      "title": "Assessment",
+      "type": "string"
+    },
+    "context": {
+      "$ref": "#/$defs/ContextKey"
+    },
+    "discomfort": {
+      "enum": [
+        "NO_CONCERN",
+        "CONCERN",
+        "UNKNOWN"
+      ],
+      "title": "Discomfort",
+      "type": "string"
+    },
+    "effort_claim": {
+      "enum": [
+        "UNKNOWN",
+        "USER_REPORTED_EASY",
+        "USER_REPORTED_HARD",
+        "USER_REPORTED_TARGET"
+      ],
+      "title": "Effort Claim",
+      "type": "string"
+    },
+    "effort_confidence": {
+      "enum": [
+        "LOW",
+        "UNKNOWN"
+      ],
+      "title": "Effort Confidence",
+      "type": "string"
+    },
+    "effort_source_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Effort Source Ref"
+    },
+    "episode_started_at": {
+      "format": "date-time",
+      "title": "Episode Started At",
+      "type": "string"
+    },
+    "event_id": {
+      "minLength": 1,
+      "title": "Event Id",
+      "type": "string"
+    },
+    "max_reps": {
+      "exclusiveMinimum": 0,
+      "title": "Max Reps",
+      "type": "integer"
+    },
+    "min_reps": {
+      "exclusiveMinimum": 0,
+      "title": "Min Reps",
+      "type": "integer"
+    },
+    "next_action": {
+      "enum": [
+        "NONE",
+        "REVIEW",
+        "RETRY_WITH_CONFIRMED_SETTING"
+      ],
+      "title": "Next Action",
+      "type": "string"
+    },
+    "observed_reps": {
+      "minimum": 0,
+      "title": "Observed Reps",
+      "type": "integer"
+    },
+    "protocol_version": {
+      "const": "initial-calibration-review/2.0.0",
+      "title": "Protocol Version",
+      "type": "string"
+    },
+    "provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "reported_rir": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Reported Rir"
+    },
+    "setting": {
+      "$ref": "#/$defs/Setting"
+    },
+    "stop_reason": {
+      "enum": [
+        "COMPLETED",
+        "INTERRUPTED",
+        "USER_STOPPED",
+        "FAILED",
+        "UNKNOWN"
+      ],
+      "title": "Stop Reason",
+      "type": "string"
+    },
+    "subject_ref": {
+      "minLength": 1,
+      "title": "Subject Ref",
+      "type": "string"
+    },
+    "technique": {
+      "enum": [
+        "ACCEPTABLE",
+        "CONCERN",
+        "UNKNOWN"
+      ],
+      "title": "Technique",
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol_version",
+    "subject_ref",
+    "event_id",
+    "context",
+    "setting",
+    "provenance",
+    "episode_started_at",
+    "as_of",
+    "observed_reps",
+    "min_reps",
+    "max_reps",
+    "stop_reason",
+    "technique",
+    "discomfort",
+    "reported_rir",
+    "effort_claim",
+    "effort_source_ref",
+    "effort_confidence",
+    "assessment",
+    "next_action"
+  ],
+  "title": "TrialReviewV3",
+  "type": "object"
+}

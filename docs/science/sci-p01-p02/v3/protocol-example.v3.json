@@ -1,0 +1,28 @@
+{
+  "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+  "protocol": {
+    "contract_version": "initial-calibration-protocol/2.0.0",
+    "protocol_ref": "initial-calibration-protocol/2.0.0-proposed@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1",
+    "retry_rule_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1#retry",
+    "source_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1",
+    "steps": [
+      {
+        "instruction_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1#familiarize",
+        "kind": "FAMILIARIZE"
+      },
+      {
+        "instruction_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1#trial",
+        "kind": "TRIAL"
+      },
+      {
+        "instruction_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1#observe",
+        "kind": "OBSERVE"
+      },
+      {
+        "instruction_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1#decide",
+        "kind": "DECIDE"
+      }
+    ],
+    "stop_rule_ref": "docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/PROTOCOL_SEMANTICS_V2.md@73cba4243c17a85d4d294a5e7f4fe744dad3c0e8f7d31d19eaff0087319492f1#stop"
+  }
+}

@@ -354,3 +354,28 @@ def test_negative_profile_preserves_canonical_facts_and_revalidates_copies(autho
     if case not in {"missing", "conflict"}:
         with pytest.raises(ValueError):
             fn(raw, out, **authority)
+
+
+def test_v3_artifacts_are_reproducible_and_all_actual_exchange_examples_remain_denied(authority):
+    module = importlib.import_module("tools.science_contracts.first_plan_v3_fixtures")
+    outputs = module.artifacts()
+    assert len(outputs) == 9
+    for name, encoded in outputs.items():
+        assert (ROOT / name).read_bytes() == encoded
+    cases = json.loads(outputs["docs/science/sci-p01-p02/v3/contract-fixtures.v3.json"])
+    assert len(cases) == 9
+    for c in cases:
+        assert c["artifact_kind"] == "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED"
+        result = api().validate_exchange(c["request"], c["response"], **authority)
+        assert (
+            result.scientific_readiness != "SCIENTIFICALLY_READY"
+            and result.start_permission == "DENIED"
+        )
+    protocol = json.loads(outputs["docs/science/sci-p01-p02/v3/protocol-example.v3.json"])
+    from tools.science_contracts.bootstrap_protocol_v3 import CalibrationProtocolV3
+
+    assert (
+        CalibrationProtocolV3.model_validate(protocol["protocol"]).contract_version
+        == "initial-calibration-protocol/2.0.0"
+    )
+    assert outputs == module.artifacts()

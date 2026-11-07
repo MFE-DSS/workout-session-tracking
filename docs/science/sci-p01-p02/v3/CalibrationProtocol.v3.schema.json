@@ -1,0 +1,75 @@
+{
+  "$defs": {
+    "ProtocolStepV3": {
+      "additionalProperties": false,
+      "properties": {
+        "instruction_ref": {
+          "minLength": 1,
+          "title": "Instruction Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "FAMILIARIZE",
+            "TRIAL",
+            "OBSERVE",
+            "DECIDE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "instruction_ref"
+      ],
+      "title": "ProtocolStepV3",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "initial-calibration-protocol/2.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "protocol_ref": {
+      "minLength": 1,
+      "title": "Protocol Ref",
+      "type": "string"
+    },
+    "retry_rule_ref": {
+      "minLength": 1,
+      "title": "Retry Rule Ref",
+      "type": "string"
+    },
+    "source_ref": {
+      "minLength": 1,
+      "title": "Source Ref",
+      "type": "string"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/ProtocolStepV3"
+      },
+      "title": "Steps",
+      "type": "array"
+    },
+    "stop_rule_ref": {
+      "minLength": 1,
+      "title": "Stop Rule Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_version",
+    "protocol_ref",
+    "source_ref",
+    "steps",
+    "stop_rule_ref",
+    "retry_rule_ref"
+  ],
+  "title": "CalibrationProtocolV3",
+  "type": "object"
+}

@@ -1,0 +1,3600 @@
+[
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "SUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "0f9ef4a837ffc7baeda23fdcc5806964d8fdfaa72f6526209d55bd1ebd24689e",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "90f1f53ff06cad61eb96dfd9a556b9e8008b07ba9a001ec09477457aafe76c7d",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "f855c2f2cae600b739a8249927e0029bc91fadf5558a2b5c7183c064c4714560",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "POLICY_UNAVAILABLE",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "POLICY_UNAVAILABLE",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "sufficient"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [
+          "session_budgets_minutes"
+        ],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "INSUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "fc83252f6237dc4239fc704a968d243a3d7f917d42893694552bfe0fb5996642",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "91851c72b1c5bfd3c303823d5f20b45c54161d5117e0cc0b50e6a0cee63226a2",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "ddc398b672eb5acaa96e7b7809557a14440f0e6ff7c24f31915d689e269657b4",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "REQUIRED_INPUT_MISSING",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [
+            "session_budgets_minutes"
+          ],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "INSUFFICIENT_DATA",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "insufficient"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [
+            {
+              "source_ref": "SYNTHETIC:availability-a",
+              "value": 2
+            },
+            {
+              "source_ref": "SYNTHETIC:availability-b",
+              "value": 3
+            }
+          ],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "CONFLICT",
+          "value": null
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [
+          "sessions_per_week"
+        ],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "CONFLICTING"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "28781713d5cccd31ff98a69e94ef098c0f4518481f5e15ac3728bd252fcc5804",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "02f67b7ee0e0a5b182e8c90a6a15c7f5a6c9d6baaf832f0cb0ab34081d4a6c35",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "25691b5b6cfab5544817b79b9a36c16de8053734905e76466d2cd0c9272e8f4e",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "INPUT_CONFLICT",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [
+            "sessions_per_week"
+          ],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "CONFLICTING_DATA",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "conflicting"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "WITHHELD",
+          "value": null
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [
+          "limitations"
+        ],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "INSUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "acf94d049511f72740b75f8dcf7836b0d25c52761b336598ce623d66324fc72d",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "b507cd2a7fd3ff70638d5921855e5e33ea469a1d1e6d435269f7988608e4a3fb",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "db855e4dabd999c2651bb8d505a6df4658ffe6e599e6b4e7de64bc0f7f178975",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "REQUIRED_INPUT_MISSING",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [
+            "limitations"
+          ],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "INSUFFICIENT_DATA",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "withheld"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": []
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "SUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "832468a9beaef7a829082fac5350390e113834f082916868038afff6524d6133",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "fc1d4ad1a85ac77b914b172f3c1b28db47eeb675b5ce61ae24a6f2de09abd599",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "edadaa82b1933e86ac7b2293fa343ee983acb660c3b14c49470bda1474aa0cd5",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "POLICY_UNAVAILABLE",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "POLICY_UNAVAILABLE",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "unknown-equipment"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "SUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "0f9ef4a837ffc7baeda23fdcc5806964d8fdfaa72f6526209d55bd1ebd24689e",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "90f1f53ff06cad61eb96dfd9a556b9e8008b07ba9a001ec09477457aafe76c7d",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "f855c2f2cae600b739a8249927e0029bc91fadf5558a2b5c7183c064c4714560",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "POLICY_UNAVAILABLE",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "POLICY_UNAVAILABLE",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "unknown-anthropometry"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "SUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "2fd3b7cd2c54213d3e61f7d21d5d5b20c9a17f3207f78bbe67e5e0ee9f3e5200",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "ba9b120a3f047222b7da914a1ed797208948a482aef3a1015204fab287875e67",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "f855c2f2cae600b739a8249927e0029bc91fadf5558a2b5c7183c064c4714560",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "POLICY_UNAVAILABLE",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "POLICY_UNAVAILABLE",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "no-observations"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "shoulders"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "rir": null,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "SUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "0f9ef4a837ffc7baeda23fdcc5806964d8fdfaa72f6526209d55bd1ebd24689e",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "90f1f53ff06cad61eb96dfd9a556b9e8008b07ba9a001ec09477457aafe76c7d",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "f855c2f2cae600b739a8249927e0029bc91fadf5558a2b5c7183c064c4714560",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "POLICY_UNAVAILABLE",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "POLICY_UNAVAILABLE",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "unknown-rir"
+  },
+  {
+    "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+    "request": {
+      "acknowledgment": null,
+      "as_of": "2026-11-06T12:00:00Z",
+      "blueprint": {
+        "contract_version": "body-training-blueprint/1.0.0",
+        "declared_priorities": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            "pecs",
+            "arms"
+          ]
+        },
+        "environment": {
+          "context_ref": "gym:synthetic-a",
+          "description": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "DECLARED",
+              "measured_at": null,
+              "origin": "USER_REPORTED",
+              "recorded_at": "2026-11-05T12:00:00Z",
+              "source_ref": "fixture:user-declaration"
+            },
+            "state": "KNOWN",
+            "value": "Salle de sport"
+          },
+          "equipment_items": {
+            "conflicts": [],
+            "provenance": {
+              "acquisition": "UNKNOWN",
+              "measured_at": null,
+              "origin": "UNKNOWN",
+              "recorded_at": null,
+              "source_ref": null
+            },
+            "state": "UNKNOWN",
+            "value": null
+          },
+          "exercise_confirmations": [
+            {
+              "canonical_exercise_id": "hack-squat-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "chest-press-machine",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "rowing-cable-assis-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "romanian-deadlift-barre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "elevations-laterales-halteres",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            },
+            {
+              "canonical_exercise_id": "calf-press-leg-press",
+              "context_ref": "gym:synthetic-a",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:00:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+              },
+              "state": "AVAILABLE"
+            }
+          ]
+        },
+        "excluded_exercise_ids": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "experience": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "height_cm": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "legacy_weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        },
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "objective": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "HYPERTROPHY"
+        },
+        "observations": [],
+        "population_scope": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "session_budgets_minutes": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": [
+            75,
+            75
+          ]
+        },
+        "sessions_per_week": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": 2
+        },
+        "snapshot_id": "fixture-blueprint-v1",
+        "weight_kg": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "UNKNOWN",
+            "measured_at": null,
+            "origin": "UNKNOWN",
+            "recorded_at": null,
+            "source_ref": null
+          },
+          "state": "UNKNOWN",
+          "value": null
+        }
+      },
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "contract_version": "first-plan-request/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "episodes": [
+        {
+          "as_of": "2026-11-06T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "hack-squat-machine",
+            "context_ref": "gym:synthetic-a",
+            "equipment_ref": "equipment:synthetic-observed-setting",
+            "load_semantics": "TOTAL_EXTERNAL",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c306ca30276c2911f109f7b11a2eb29560ac5bf660a822c20fff79927434b655",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-06T11:00:00Z",
+            "source_ref": "SYNTHETIC_NOT_SERVED:event-0"
+          },
+          "episode_id": "synthetic:hack-squat-machine",
+          "events": [
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:01:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-1"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:02:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-2"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "discomfort": "NO_CONCERN",
+              "event_id": "synthetic:hack-squat-machine:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-06T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-06T11:03:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-3"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "25c66ae3048a12cff80eadde35d09abc7a0cabbc3f4e656fba3c3af714f3bc81",
+              "event_id": "synthetic:hack-squat-machine:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-06T11:04:00Z",
+                "source_ref": "SYNTHETIC_NOT_SERVED:event-4"
+              },
+              "reference_event_id": "synthetic:hack-squat-machine:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:complete-event-snapshot",
+          "started_at": "2026-11-06T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "requested_binding_ref": null,
+      "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "subject_ref": "subject:synthetic-a",
+      "timing_inputs": [],
+      "versions": {
+        "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+        "engine": null,
+        "policy": null,
+        "zones": "zones-15-v1"
+      }
+    },
+    "response": {
+      "acknowledgment": null,
+      "admission_refs": [],
+      "as_of": "2026-11-06T12:00:00Z",
+      "assessment": {
+        "conflicting_fields": [],
+        "missing_fields": [],
+        "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+        "state": "SUFFICIENT"
+      },
+      "binding_digest": null,
+      "binding_ref": null,
+      "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+      "candidate_plan": null,
+      "confidence": {
+        "evidence_refs": [],
+        "feasibility": "UNKNOWN",
+        "individual_response": "NOT_ESTIMATED",
+        "limitations": [
+          "No individual response estimate or plan authority from this example."
+        ]
+      },
+      "contract_version": "first-plan-recommendation/3.0.0",
+      "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+      "engine_version": null,
+      "full_evaluation_fingerprint": "d78f5186acd25697e5b0fa5063412d8e997ffb8fa9fecd7caca511e01c76f077",
+      "generated_at": "2026-11-06T12:00:00Z",
+      "observation_fingerprint": "1cc8b60060fd290a8a8be9c62ec4599f1ed8ec16d9680c150acaf50e3018a8ce",
+      "plan_time_fingerprint": null,
+      "policy_version": null,
+      "request_fingerprint": "ea00bb7a90f68469e33911816b6b3ed270db67fb21fc3224fbc2fe70886e926c",
+      "revocation_check_ref": null,
+      "scientific_issues": [
+        {
+          "blocking": true,
+          "code": "POLICY_UNAVAILABLE",
+          "explanation": "Contract example only. No admitted v2 policy producer is served.",
+          "field_refs": [],
+          "gate_ref": null,
+          "source_refs": []
+        }
+      ],
+      "scientific_readiness": "POLICY_UNAVAILABLE",
+      "snapshot_ref": "fixture-blueprint-v1",
+      "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+      "start_permission": "DENIED",
+      "start_policy_ref": null,
+      "subject_ref": "subject:synthetic-a",
+      "time_assessments": [],
+      "used_fields": []
+    },
+    "scenario": "priorities-are-preferences"
+  }
+]
