@@ -333,3 +333,49 @@ def test_admission_fixture_artifacts_match_real_producer_without_serving_ready()
             assert case['rejection']['code'] == 'INVALID_EVALUATION'
     for name, content in artifacts().items():
         assert (directory / name).read_bytes() == content
+
+
+def test_imported_old_confirmations_and_acceptance_do_not_reconfirm_today():
+    raw = calibrated_episode()
+    raw['started_at'] = '2026-11-06T11:10:00Z'
+    for index, e in enumerate(raw['events'], 1):
+        e['provenance']['measured_at'] = f'2026-11-06T11:0{index}:00Z'
+        e['provenance']['recorded_at'] = f'2026-11-06T11:{10 + index}:00Z'
+    result = calibrate_for_admission(raw, min_reps=8, max_reps=12)
+    assert result['state'] == 'NEEDS_CALIBRATION'
+    assert result['load_kg'] is None
+    assert result['reference_event_id'] is None
+
+
+def test_old_trial_with_genuine_current_reconfirmation_remains_usable():
+    raw = calibrated_episode()
+    context_event, familiar, trial, acceptance = raw['events']
+    trial['sequence'] = 1
+    for e, index in ((context_event, 2), (familiar, 3), (acceptance, 4)):
+        e['sequence'] = index
+        e['provenance']['recorded_at'] = f'2026-11-06T11:{10 + index}:00Z'
+    raw.update(started_at='2026-11-06T11:10:00Z', events=[trial, context_event, familiar, acceptance])
+    result = calibrate_for_admission(raw, min_reps=8, max_reps=12)
+    assert result['state'] == 'CALIBRATED'
+    assert result['reference_event_id'] == 'e3'
+    assert result['load_kg'] == 40.0
+    assert result['reported_rir'] is None
+
+
+def test_evaluator_cannot_accept_imported_old_confirmations():
+    from tools.science_initial_policy.admission_registry import load_admission_registry
+    from tools.science_initial_policy.admission_system import evaluate_admission
+    from tools.science_initial_policy.v2_producer import produce_v2
+    from tools.science_initial_policy.v2_registry import load_v2_registry
+
+    case = _v2_case()
+    for ep in case['request']['episodes']:
+        ep['started_at'] = '2026-11-06T11:10:00Z'
+        for index, e in enumerate(ep['events'], 1):
+            e['provenance']['measured_at'] = f'2026-11-06T11:0{index}:00Z'
+            e['provenance']['recorded_at'] = f'2026-11-06T11:{10 + index}:00Z'
+    bundle = load_v2_registry()
+    result = evaluate_admission(case['request'], produce_v2(case['request'], bundle), bundle,
+                                load_admission_registry())
+    assert all(c['state'] == 'NEEDS_CALIBRATION' for c in result['calibration_by_context'].values())
+    assert result['verdict'] == 'NOT_ADMITTED'

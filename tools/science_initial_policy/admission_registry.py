@@ -13,7 +13,7 @@ from tools.science_initial_policy.registry import ROOT
 
 DIRECTORY = "docs/science/sci-p02-initial-policy/admission-system-01"
 REGISTRY_SHA256 = "186bbf84ebd1b1934c67cd4ca88ff15d2a3417cd1ba041b9fa98aed59256ae82"
-MANIFEST_SHA256 = "04b47b03796bd6fa84fc5b24968f10c5809b6ae553cbe5d17336b9cda26a9dd4"
+MANIFEST_SHA256 = "d833446c93e95c0f909f88a6a693537b1b6b1afaf0916e82b2f980c1a4f61aa5"
 
 
 @dataclass(frozen=True, slots=True)

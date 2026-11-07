@@ -31,7 +31,7 @@
     "openspec/changes/science-initial-plan-policy/design.md": "1e4eac00ddc2afc68faf3dfbcaa690bf3d882485a78b75fc7332f0f3c1042e7c",
     "openspec/changes/science-initial-plan-policy/proposal.md": "57ece31709e586c838e5221f8614ed4815fd154fe5e886d62f58ac8010c98506",
     "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
-    "tools/science_initial_policy/admission_calibration.py": "c88f4150d103700ae01109d3a68b58be22cbea59019889c4ceae855fb21c84ed",
+    "tools/science_initial_policy/admission_calibration.py": "6cc2a23c6221623626606ef52924c9ffa8d96b1c6bee9a91a4dbe7c7b07abce8",
     "tools/science_initial_policy/admission_system.py": "263d23d568105f6059e812360b336b127b9428d124b87befd05d0e91aee7a912",
     "tools/science_initial_policy/admission_time.py": "0d4469bd132ae90801a0db508edea216097d0ea4bb4d5eeed6fdb5530b092813",
     "tools/science_initial_policy/calibration_time_contracts.py": "1f50ee65939a1c0f1e6915fc181a7eea8d405150687de84a881493d48e408895",

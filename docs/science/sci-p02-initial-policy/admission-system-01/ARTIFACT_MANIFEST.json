@@ -34,7 +34,7 @@
     "openspec/changes/science-initial-plan-policy/design.md": "1e4eac00ddc2afc68faf3dfbcaa690bf3d882485a78b75fc7332f0f3c1042e7c",
     "openspec/changes/science-initial-plan-policy/proposal.md": "57ece31709e586c838e5221f8614ed4815fd154fe5e886d62f58ac8010c98506",
     "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
-    "tools/science_initial_policy/admission_calibration.py": "c88f4150d103700ae01109d3a68b58be22cbea59019889c4ceae855fb21c84ed",
+    "tools/science_initial_policy/admission_calibration.py": "6cc2a23c6221623626606ef52924c9ffa8d96b1c6bee9a91a4dbe7c7b07abce8",
     "tools/science_initial_policy/admission_system.py": "263d23d568105f6059e812360b336b127b9428d124b87befd05d0e91aee7a912",
     "tools/science_initial_policy/admission_time.py": "0d4469bd132ae90801a0db508edea216097d0ea4bb4d5eeed6fdb5530b092813",
     "tools/science_initial_policy/calibration_time_contracts.py": "1f50ee65939a1c0f1e6915fc181a7eea8d405150687de84a881493d48e408895",
@@ -48,13 +48,13 @@
     "tools/science_initial_policy/time_feasibility.py": "0e5e7344c7fa50a037cd7083b82e20f8bf782cffbd3e28b63a4536ed0e581be6",
     "tools/science_initial_policy/v2_producer.py": "ad8c154feb8b439a25d7b39b37defcf236d6b4f847a058f64d9c1976df70fd02",
     "tools/science_initial_policy/v2_registry.py": "5f9d17f531f28cda18595d0aace9fc8b91340e931bc77d4dedac170cc05ac59b",
-    "tools/science_initial_policy/admission_registry.py": "6d314c182e5913712453e77e605b681d45c02d522b68bc92212463bb11f63581",
+    "tools/science_initial_policy/admission_registry.py": "b723023bc1ef722f3b66f43c40a4087b61f44ecff1597fc536a4aceec3f8a4e4",
     "tools/science_initial_policy/admission_system_fixtures.py": "0571950a44642c0ecfdb22b313095900139eab4271ea7db46b1838e758a60271"
   },
   "sha256": {
     "admission-result.v1.schema.json": "b7295e25d43fcbe261c164c397e9487aa33926fe0fbbf1d43bc4edafe13a5a08",
-    "producer-fixtures.v1.json": "2f72bda5e6c1482541c0368f8f37e711671159b3da3af185e6ea38345e4f326e",
+    "producer-fixtures.v1.json": "c6ae96f12b4ac7533a4401f2c8e00297a692ef7e56b7bf19489237bf19e3943e",
     "registry.v1.json": "186bbf84ebd1b1934c67cd4ca88ff15d2a3417cd1ba041b9fa98aed59256ae82",
-    "registry-manifest.v1.json": "04b47b03796bd6fa84fc5b24968f10c5809b6ae553cbe5d17336b9cda26a9dd4"
+    "registry-manifest.v1.json": "d833446c93e95c0f909f88a6a693537b1b6b1afaf0916e82b2f980c1a4f61aa5"
   }
 }
