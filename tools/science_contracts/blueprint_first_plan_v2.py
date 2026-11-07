@@ -363,10 +363,15 @@ class PlanV2(Record):
             if not set(z.unresolved_slot_ids) <= set(ids):
                 raise ValueError("unresolved zone slot does not belong to this plan")
             for c in z.contributions:
-                slot = next(s for s in slots if s.slot_id == c.slot_id)
-                if slot.selected is None or (c.canonical_exercise_id, c.realization_ref) != (
-                    slot.selected.canonical_exercise_id,
-                    slot.selected.realization_ref,
+                slot = next((s for s in slots if s.slot_id == c.slot_id), None)
+                if (
+                    slot is None
+                    or slot.selected is None
+                    or (c.canonical_exercise_id, c.realization_ref)
+                    != (
+                        slot.selected.canonical_exercise_id,
+                        slot.selected.realization_ref,
+                    )
                 ):
                     raise ValueError("zone contribution does not describe the selected realization")
         return self
