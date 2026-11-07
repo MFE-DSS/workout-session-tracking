@@ -21,7 +21,7 @@ Le [reçu de livraison](DELIVERY.md) conserve SHA/CI/Sonar réels après publica
 
 ## Préparation initiale et travaux positifs restant ouverts
 
-Verdict du système **NOT_ADMITTED**, C1/C2 conventions bornées proposées, C3 procédure/correction à admettre, C4 sept réalisations conditionnelles exactes proposées, C5 contrat successeur soumis à choix, C6 sortie C collecte. [Design](../../../../openspec/changes/science-initial-policy-admission/design.md), [tests futurs](TEST_SPEC.md), [temps](TIME_PROTOCOL.md). Aucun contrat READY successeur exporté ; les trois durcissements de l'étape1 sont maintenant réalisés comme décrit ci-dessus, sans admission positive. Les textes antérieurs, registres et artefacts historiques restent intacts.
+Verdict du système **NOT_ADMITTED**, C1/C2 conventions bornées proposées, C3 procédure/correction à admettre, C4 sept réalisations conditionnelles exactes proposées, C5 contrat successeur soumis à choix, C6 sortie C collecte. [Design](../../../../openspec/changes/archive/2026-11-07-science-initial-policy-admission/design.md), [tests futurs](TEST_SPEC.md), [temps](TIME_PROTOCOL.md). Aucun contrat READY successeur exporté ; les trois durcissements de l'étape1 sont maintenant réalisés comme décrit ci-dessus, sans admission positive. Les textes antérieurs, registres et artefacts historiques restent intacts.
 
 Chaque gate porte PROPOSED_FOR_SCIENTIFIC_REVIEW. Le design §D5 rend reviewable un premier build isolé possible : trois corrections + registre séparé initialement vide + seul consommateur d'admission isolé et fixtures de refus. Ce build négatif est réalisé et conserve NOT_ADMITTED. Le binding exécutable et une fixture READY sont une étape ultérieure conditionnée par preuve réelle, pas une promesse du build négatif.
 

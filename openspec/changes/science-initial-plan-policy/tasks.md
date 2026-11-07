@@ -69,3 +69,8 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Build isolé confirmé « Valider le build isolé proposé » : producteur v2, calibration/temps,12cas réels non servis, schémas et412tests broad passants ; anciennes sources/sorties préservées. Revues et livraison distinctes ci-dessous.
 - [x] Revues scientifique/code distinctes : trois Important corrigés RED→GREEN, trois Minor documentés ;431tests broad,0admission/0READY.
 - [x] Code livré PR366 (6044d7b, CI PR/canonique réussies) et correction PR367 (009ee90, CI PR réussie) ; paquet SCI-P02-INITIAL-POLICY-ADMISSION préparé. Le reçu calibration-time-01/VERIFICATION.md et sa PR tracent séparément les vérifications canoniques restantes, la publication du closeout et le nettoyage ; aucun succès anticipé, global science/MOB03 toujours ouverts.
+
+
+## SCI admission — étape1 isolée seulement
+- [x] Scope négatif distinct livré dans PR369/merge5e94cfa, sans changer ces sources parent : diagnostics successeurs, registre vide, vérification stricte et18fixtures non servies.
+- [ ] Admission positive du bundle/protocole/contrat/temps ; les critères détaillés restent dans docs/proposals/science-initial-policy-positive-admission.md. Aucun READY/runtime ou clôture du parent déduit de l'étape1.

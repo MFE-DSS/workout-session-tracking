@@ -23,3 +23,7 @@ Revue scientifique distincte : aucun Critical/Important identifié sur la livrai
 ## Checks du HEAD candidat corrigé
 
 363tests scientifiques/consommateurs passants sur13modules, dont38nouveaux ; deux avertissements de dépendances. ISOLATED sur l'ensemble du diff depuis la base ; Ruff fichiers neufs et budget264≤548, Bandit ciblé, protocole documentaire, OpenSpec strict9/9, rejeux des18fixtures nouvelles et12v2 historiques, liens et absence d'édition app/mobile/migration/CI vérifiés. Pas de full sweep local. Les35cas avant revue deviennent38après les trois régressions/contrôle positif ; aucun nouvel audit global déduit de ces nombres. CI réelle du HEAD corrigé à vérifier après push.
+
+## Publication du code
+
+PR369 fusionnée : HEAD64c4c0fb0071c8481725c80546c9ccfbdf7b0a79, merge5e94cfa81e6b3a4ec5ceedbcbe90c95de464b854 ; CI PR42366063678 completed/success,7580backend/3ignorés,54suites676mobiles+TS. SonarPRERROR pour5S5778,0bug/vulnérabilité/hotspot,coverageapp93.8%. [Closeout borné et suivi canonique](CLOSEOUT.md). Réussite du code négatif, pas admission du premier plan.

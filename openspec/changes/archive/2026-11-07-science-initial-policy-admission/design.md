@@ -2,7 +2,7 @@
 
 ## Context
 
-Base `2b52f4984e375faad0a1488feef1bfe3bcab01b0`. [REPORT](../../../docs/science/sci-p02-initial-policy/admission-system-01/REPORT.md) distingue lecture du code, rejeu réel et décisions proposées. État effectif immuable pour cette passe : `0.3.0-proposed`, `NOT_ADMITTED`, `NOT_SERVED`, `READY_NOT_PRODUCED`. Le parent `science-initial-plan-policy` reste ouvert pour son histoire globale ; cet enfant possède seul la prochaine admission. Les anciens dossiers ne sont ni corrigés en place ni remplacés.
+Base `2b52f4984e375faad0a1488feef1bfe3bcab01b0`. [REPORT](../../../../docs/science/sci-p02-initial-policy/admission-system-01/REPORT.md) distingue lecture du code, rejeu réel et décisions proposées. État effectif immuable pour cette passe : `0.3.0-proposed`, `NOT_ADMITTED`, `NOT_SERVED`, `READY_NOT_PRODUCED`. Le parent `science-initial-plan-policy` reste ouvert pour son histoire globale ; cet enfant possède seul la prochaine admission. Les anciens dossiers ne sont ni corrigés en place ni remplacés.
 
 ## Goals / Non-Goals
 
@@ -50,7 +50,7 @@ Nom de travail : `first-plan-recommendation/2.0.0` et contrat request/binding su
 
 ### D4 — C6, sortie C retenue comme proposition
 
-Le [protocole temporel](../../../docs/science/sci-p02-initial-policy/admission-system-01/TIME_PROTOCOL.md) définit collecte, segmentation, analyse et règles de promotion. Ni étude existante ni 1060 secondes synthétiques ne soutient la durée personnelle d'une première séance. La collecte nécessite environnement autorisé, participants/consentements et préenregistrement ; aucune de ces ressources n'est présumée disponible.
+Le [protocole temporel](../../../../docs/science/sci-p02-initial-policy/admission-system-01/TIME_PROTOCOL.md) définit collecte, segmentation, analyse et règles de promotion. Ni étude existante ni 1060 secondes synthétiques ne soutient la durée personnelle d'une première séance. La collecte nécessite environnement autorisé, participants/consentements et préenregistrement ; aucune de ces ressources n'est présumée disponible.
 
 ### D5 — Design de build isolé concret, à autoriser séparément
 

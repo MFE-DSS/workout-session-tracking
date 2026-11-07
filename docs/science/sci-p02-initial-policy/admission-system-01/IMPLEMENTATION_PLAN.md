@@ -5,7 +5,7 @@
 **Goal:** Livrer un consommateur scientifique isolé toujours NOT_ADMITTED, avec trois durcissements réellement consommés et fixtures déterministes de refus.
 **Architecture:** Recalculer et vérifier strictement le vrai résultat historique v2, sans changer ses sorties. Évaluer séparément calibration/temps corrigés sous nouvelles versions, puis émettre une décision à six gates depuis un registre vide piné ; aucun résultat historique ou READY n'est fabriqué.
 **Tech Stack:** Python3.11+, Pydantic2, pytest, JSON/SHA256 ; dépendances existantes, aucun backend/mobile.
-**Spec:** openspec/changes/science-initial-policy-admission/design.md §D5 et BUILD_AUTHORIZATION.md.
+**Spec:** openspec/changes/archive/2026-11-07-science-initial-policy-admission/design.md §D5 et BUILD_AUTHORIZATION.md.
 
 ## Global Constraints
 - Préserver code, sources et fixtures historiques ; nouveaux modules/artéfacts dédiés uniquement.
