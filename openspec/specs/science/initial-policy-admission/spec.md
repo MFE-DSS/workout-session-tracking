@@ -6,7 +6,9 @@ Documenter le diagnostic isolé d’admission négative et ses limites ; aucune 
 ## Requirements
 
 ### Requirement: Six-gate assessment of the effective bundle
-Le système SHALL évaluer séparément C1 population, C2 dose, C3 protocole, C4 sélection/réalisation, C5 représentation et C6 temps/politique sur le bundle/version/SHA effectifs et le profil de readiness nommé. Un GO BUILD SHALL NOT constituer une admission. Les anciennes évaluations v1/v2 et leurs pins SHALL rester inchangés. Le profil v3 exploratoire SHALL distinguer C6 EXPLORATION_POLICY_ADMITTED d’une preuve de durée SUPPORTED ; aucune gate scientifique non acquise SHALL être masquée par un ack.
+
+Le système SHALL évaluer C1 population, C2 dose, C3 protocole, C4 sélection/réalisation, C5 représentation et C6 temps/politique pour le bundle/version/SHA et profil nommés. GO BUILD SHALL NOT valoir admission ; évaluations et pins v1/v2 SHALL rester intacts. Le profil v3 SHALL distinguer EXPLORATION_POLICY_ADMITTED de durée SUPPORTED ; un ack SHALL NOT masquer une gate scientifique manquante.
+
 #### Scenario: Effective producer remains unadmitted
 - WHEN les inputs suffisent mais une condition requise du profil réellement admis manque
 - THEN aucun résultat scientifique positif n’est admis et le manque précis est conservé.
@@ -51,7 +53,9 @@ Les invariants READY v1 SHALL rester intacts : allocation revue, exposition exac
 - **THEN** il ne reçoit pas READY et aucune gate v1 n'est assouplie pour l'accepter.
 
 ### Requirement: Positive time authority
-Les profils READYv1/v2 et le mode SUPPORTED v3 SHALL conserver leur exigence de borne haute applicable couvrant travail/repos/préparation/calibration/opérations. Sans preuve applicable, cette durée SHALL rester UNKNOWN. Le profil exploratoire v3 séparément approuvé SHALL admettre seulement la gouvernance de cette incertitude : borne négative applicable, reconnaissance du plan exact, arrêt/limite et faits incomplets préservés. Il SHALL NOT déclarer l’ancienne gate de temps positif satisfaite ou utiliser des secondes fictives.
+
+READYv1/v2 et SUPPORTEDv3 SHALL exiger une borne haute applicable couvrant travail/repos/préparation/calibration/opérations ; sinon durée UNKNOWN. Le profil exploratoire v3 approuvé SHALL gouverner cette incertitude : borne négative applicable, reconnaissance du plan exact, arrêt/limite et faits incomplets préservés. Il SHALL NOT déclarer satisfaite l’ancienne gate temporelle ni inventer des secondes.
+
 #### Scenario: Complete synthetic timing intervals
 - WHEN des intervalles synthétiques donnent un diagnostic conditionnel favorable
 - THEN ils ne constituent pas une preuve de temps futur ou une autorité pour SUPPORTED.
@@ -68,7 +72,9 @@ Toute autorité future SHALL vérifier policy/engine/bundle/evidence/versions et
 - **THEN** le futur vérificateur refuse l'enveloppe malgré l'égalité permissive Python et conserve le résultat canonique recalculé.
 
 ### Requirement: Isolated proposal and PLAN handoff
-Le scope historique négatif étape1 SHALL rester livré, piné et rejouable. La présente préparation SHALL rester documentaire ; le change science-initial-policy-v3-producer SHALL être propriétaire unique du prochain apply SCI positif seulement après ses décisions et GO propres. Le parent science-initial-plan-policy SHALL rester ouvert jusqu’à ses critères effectifs. Les autres préparations ARCH ne SHALL NOT être appliquées concurremment sur les mêmes registres. PLAN SHALL recevoir binding/admission réels, sources et limites, sans API/UI/SDK ou séance possédée revendiqués par ce scope.
+
+Étape1 SHALL rester livrée/pinée/rejouable ; préparations SHALL rester documentaires. science-initial-policy-v3-producer SHALL posséder seul l’apply positif après ses décisions/GO. Le parent science-initial-plan-policy SHALL rester ouvert jusqu’à ses critères ; ARCH SHALL NOT écrire concurremment les mêmes registres. PLAN SHALL recevoir binding/admission/sources/limites réels ; ce scope SHALL NOT revendiquer API/UI/SDK/séance possédée.
+
 #### Scenario: No separate stage2 functional GO
 - WHEN seule une préparation ou une ancienne autorisation étape1 existe
 - THEN aucun registre/binding/producteur positif nouveau n’est implémenté ou publié.
