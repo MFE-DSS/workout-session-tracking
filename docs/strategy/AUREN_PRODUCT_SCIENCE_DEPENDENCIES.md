@@ -1,4 +1,6 @@
 # AUREN — registre produit / science
+**SCI-P02-CALIBRATION-TIME-01 —6novembre2026 :** [producteur v2 isolé](../science/sci-p02-initial-policy/calibration-time-01/DELIVERY.md), calibration observée et temps conditionnel intégrés, NOT_ADMITTED/NOT_SERVED/aucun READY. Sources antérieures et FirstPlanClient préservés. Suite préparée : SCI-P02-INITIAL-POLICY-ADMISSION ; base temporelle positive, admission sélection/références et protocole de départ restent nécessaires. Aucun nouveau GO runtime ou déploiement.
+
 
 
 **État courant — continuation MOB-03 DATA & FIRST PLAN :** SCI-P01/P02 v1 sont reçus sur le canonique 5fd18c3 ; FirstPlanClient contrôle leurs schémas et états avec AuthSession. Moteur isolé initial-policy-producer/1.0.0 reçu via #357 et son reçu #358, mais non servi/non admis ; politiques dose/temps/candidats, vrai READY et adaptateur runtime restent requis. Le producteur absent du port mobile reste NOT_SERVED. Voir le [rapport courant](../MOB03_DATA_FIRST_PLAN_CONTINUATION_REPORT.md). Les formulations de besoin initial ci-dessous conservent le contexte historique ; elles ne signifient pas que les contrats sont encore absents.

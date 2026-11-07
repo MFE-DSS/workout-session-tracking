@@ -1,0 +1,23 @@
+# Calibration/time01 — sources primaires vérifiées et portée
+
+Recherche du6novembre2026, séparée de l'audit du domaine. Vérification des métadonnées et du niveau d'accès ; une lecture de résumé n'est pas annoncée comme lecture du texte intégral. Ces références bibliographiques ne sont pas une nouvelle autorité E0 ou une admission du producteur.
+
+| Source primaire | Population/protocole et résultat utile | Ne justifie pas / accès |
+|---|---|---|
+| Steele et al.2017, PMID[29204323](https://pmc.ncbi.nlm.nih.gov/articles/PMC5712461/), DOI10.7717/peerj.4105 | 141adultes, exercices familiers, prédiction puis série à l'échec ; estimation des répétitions imparfaite | Pas une première charge universelle, correction individuelle ou nécessité d'échec. Texte intégral officiel XML |
+| Wiedenmann et al.2026, PMID[42632893](https://link.springer.com/article/10.1186/s13102-026-01997-y), DOI10.1186/s13102-026-01997-y | 26adultes déjà entraînés, novices au RIR ; familiarisation préalable puis six séances supervisées bench/leg press et vérification par échec | Pas un seuil universel4–6séances ni protocole autonome novice. Texte intégral éditeur ; EV-42 réutilisable sous ces limites |
+| Lovegrove et al.2022, PMID[36135029](https://pubmed.ncbi.nlm.nih.gov/36135029/), DOI10.1519/JSC.0000000000003952 | 15jeunes hommes novices entraînés, charges auto-ajustées pour1RIR après1RM/familiarisation ; répétabilité de sélection | Fiabilité ≠ précision du vrai RIR ; population adolescente, pas tous novices adultes. Résumé publié ; EV-44 |
+| Hughes et al., publication en ligne2020, PMID[33337690](https://pubmed.ncbi.nlm.nih.gov/33337690/), DOI10.1519/JSC.0000000000003865 | 21hommes entraînés, quatre exercices/trois charges relatives ; précision RIR dépendante du contexte | Pas une charge initiale à85%1RM ou équivalence de modalités. Résumé ; pagination finale non affirmée |
+| Glass2008, PMID[18438209](https://pubmed.ncbi.nlm.nih.gov/18438209/), DOI10.1519/JSC.0b013e31816a5b70 | 16novices ; essai d'apprentissage et sélection de charge ; pas de différence significative démontrée | Ne prouve ni équivalence ni calibration acquise après une séance. Résumé publié |
+| Morán-Navarro et al.2017, PMID[28965198](https://pubmed.ncbi.nlm.nih.gov/28965198/), DOI10.1007/s00421-017-3725-7 | 10hommes entraînés ; protocoles avec/sans échec et fatigue/récupération différentes | Aucun seuil douleur/technique, ni règle individuelle de restriction24–48h. Résumé ; réemploi prudent des références récupération existantes |
+| Schoenfeld et al.2019, PMID[30153194](https://pmc.ncbi.nlm.nih.gov/articles/PMC6303131/), DOI10.1249/MSS.0000000000001764 | 34hommes entraînés terminent ; protocoles1/3/5séries et durées approximatives différentes | Pas d'interpolation à2séries, constante de setup ou intervalle prédictif AUREN. Texte intégral ; déjà cité dans admission01 |
+| Andersen et al.2022, PMID[35783742](https://pmc.ncbi.nlm.nih.gov/articles/PMC9243264/), DOI10.3389/fpsyg.2022.912368 | 29adultes entraînés, croisé traditionnel/supersets ; temps observé dépendant de la structure, séances individuelles de laboratoire | Pas de facteur universel, attente de salle publique ou compression automatique de repos. XML officiel EuropePMC ; page PMC parfois challenge navigateur |
+| Chaves et al.2020, PMID[32185108](https://pmc.ncbi.nlm.nih.gov/articles/PMC7061915/), DOI10.7717/peerj.8697 | 20hommes non entraînés ; extension de genou et durée des séries mesurée | Une cadence moyenne locale n'est pas une durée par répétition universelle. Texte intégral XML officiel |
+
+## E0 et séparation des règles
+
+EV-40, synthèse Halperin2022 PMID34542869, reste une base d'incertitude, pas une correction du RIR individuel. EV-42/44 ont les limites explicitées ci-dessus. EV-45/Nuzzo ne fournit pas une équation de charge individuelle. Aucun de ces identifiants n'est modifié/promu dans cette proposition.
+
+Conventions proposées à faire accepter : même contexte/identité et confirmation actuelle pour le réemploi ; CALIBRATED limité à un réglage observé/accepté ; arrêt de suggestion automatique en cas de problème ; quatre ordinaux issus de bornes conditionnelles. Ce sont des choix opérationnels transparents, pas des résultats expérimentaux qui valident la combinaison complète.
+
+L'arithmétique d'intervalles et de repos est DERIVED. Les bornes temporelles personnelles doivent être appuyées par un protocole et une validation applicables ; les études ci-dessus ne livrent ni un intervalle universel ni un seuil d'échantillon. Aucune preuve identifiée n'admet aujourd'hui le modèle temporel complet du premier plan AUREN. Cette conclusion est limitée à cette recherche ciblée, pas une affirmation d'absence exhaustive de littérature.

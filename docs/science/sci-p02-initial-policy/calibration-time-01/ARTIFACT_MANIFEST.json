@@ -1,0 +1,9 @@
+{
+  "fixture_version": "initial-plan-evaluation-fixtures/1.0.0",
+  "runtime_availability": "NOT_SERVED",
+  "sha256": {
+    "evaluation-request.schema.json": "b9a91f1d7de647fec997b5928c62dba69a9702a6ad05eb1ab2bc8db09e972a56",
+    "evaluation-result.schema.json": "63ea33131085c2ff8eea97429001ffbebd4afff8815f9ebb9732cfc41c91fb1d",
+    "producer-fixtures.json": "faa684a328c2017030ded27c965bbf81d31bf953a4f304c4a03a55ffd6357a1b"
+  }
+}

@@ -55,3 +55,17 @@ Mandat et plan : [candidate-curation-01.md](candidate-curation-01.md). Le résul
 - [x] Separate code review:0Critical/Important,2Minor deferred transparently; no scientific approval inferred from code/tests.
 - [x] Publish scoped PR364 HEADbf396b0, merge4bf5943 under standing authorization; CI42238025856 and canonical42249419776 succeeded,7411backend/3skip and676mobile+TS; PR Sonar OK, canonical ERROR advisory recorded.
 - [x] Record this spike closeout in pull-exposure-01/VERIFICATION.md; its publication/cleanup receipt is tracked in the closeout PR. No global science/PLAN/MOB03 closure or activation.
+
+## SCI-P02-CALIBRATION-TIME-01 — proposition avant revue opérateur
+
+[Delta proposé](calibration-time-01.md), base8e987c6. Le mandat courant conserve la frontière GO BUILD ; aucune case ci-dessous ne rouvre les opérations livrées.
+
+- [x] Reconcile manifeste, contrats, producteur, overload/horodatages, borne des repos et dépendance E7 ; sources pinées avant apply.
+- [x] Recherche primaire fraîche en lecture seule, propositions de règles et limites séparées de la preuve.
+- [x] Design du successeur intégré, enveloppe/empreinte complète, transitions de charge et temps par composantes ;49vecteurs de tests spécifiés, pas exécutés.
+- [x] Revue de construction indépendante : trois ambiguïtés clarifiées, contrôle final « nothing important left » ; pas admission scientifique ou code review d'une implémentation absente.
+- [x] Contrôles documentaires : check_scope DOCS, check_spec_protocol passant ; aucun test fonctionnel nouveau ou résultat CI de build revendiqué.
+- [x] GO BUILD reçu : opérateur « continue » après demande de validation du delta/design ; réalisation isolée seulement, aucune admission/activation implicite.
+- [x] Build isolé confirmé « Valider le build isolé proposé » : producteur v2, calibration/temps,12cas réels non servis, schémas et412tests broad passants ; anciennes sources/sorties préservées. Revues et livraison distinctes ci-dessous.
+- [x] Revues scientifique/code distinctes : trois Important corrigés RED→GREEN, trois Minor documentés ;431tests broad,0admission/0READY.
+- [ ] CI/merge/closeout du seul périmètre terminé ; préparer SCI-P02-INITIAL-POLICY-ADMISSION, global science/MOB03 toujours ouverts.
