@@ -1,0 +1,19 @@
+{
+  "admission_registry_digest": "186bbf84ebd1b1934c67cd4ca88ff15d2a3417cd1ba041b9fa98aed59256ae82",
+  "artifact_kind": "CONTRACT_EXAMPLE_NOT_ADMITTED_NOT_SERVED",
+  "bundle_digest": "091cdfe0758db0d96912a94a47034291624f7939bad7b9e10d177958c877c26a",
+  "positive_plan_fixture": "NOT_PRODUCED",
+  "runtime_availability": "NOT_SERVED",
+  "scientific_admission": "NOT_ADMITTED",
+  "sha256": {
+    "docs/science/sci-p01-p02/v3/CalibrationProtocol.v3.schema.json": "417b5038ee258f9d63d778c6552af9f431dc2c52e698b50bf24694e3203e932d",
+    "docs/science/sci-p01-p02/v3/FirstPlanRecommendation.v3.schema.json": "475a1bc3414edf6a6dc255408667241f49c705377c82050893a0dff03a1079a4",
+    "docs/science/sci-p01-p02/v3/FirstPlanRequest.v3.schema.json": "c7f8bd7c74a19667f2c7dc99da90de1c17b775c151cf96daa8967a940b416024",
+    "docs/science/sci-p01-p02/v3/SettingTransition.v3.schema.json": "ae73857f3c76b3576a182c1a85879924fc93e76fe274ad67b096da2fb97f7ffd",
+    "docs/science/sci-p01-p02/v3/TrialReview.v3.schema.json": "6c5b8e7fb6f267525b2226c2d50470caca209250106656fdfafa3e9c405b4b2a",
+    "docs/science/sci-p01-p02/v3/contract-fixtures.v3.json": "c2b7160af73000a621e2d88cb569ae592c214552bdf24a216ed406677d6e4a53",
+    "docs/science/sci-p01-p02/v3/protocol-example.v3.json": "c599d3ce39c9be29e6d97c1db09d5ffbbee0a36272a3c099aa785aa639e91c08",
+    "docs/science/sci-p01-p02/v3/source-manifest.v3.json": "e6cf828a859a378744168d9e58a014a71704d7ea390b9ba3cdd83608725de326"
+  },
+  "version": "first-plan-contract-artifacts/3.0.0"
+}
