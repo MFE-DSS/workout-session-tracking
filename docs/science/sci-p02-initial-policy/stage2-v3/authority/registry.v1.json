@@ -1,0 +1,102 @@
+{
+  "admission": {
+    "decision_ref": "docs/science/sci-p02-initial-policy/stage2-v3/authority/ADMISSION.md",
+    "gates": {
+      "C1": "ADMITTED_WITH_LIMITS",
+      "C2": "ADMITTED_WITH_LIMITS",
+      "C3": "ADMITTED_WITH_LIMITS",
+      "C4": "ADMITTED_WITH_LIMITS",
+      "C5": "ADMITTED_WITH_LIMITS",
+      "C6": "EXPLORATION_POLICY_ADMITTED"
+    },
+    "review_ref": "docs/science/sci-p02-initial-policy/stage2-v3/authority/SCI_REVIEW.md",
+    "state": "ADMITTED"
+  },
+  "binding_ref": "initial-plan-v3-binding/1.0.0",
+  "binding_status": "ACTIVE",
+  "dose": {
+    "evidence_refs": [
+      "EV-01",
+      "EV-04",
+      "EV-11",
+      "EV-14",
+      "EV-15",
+      "EV-16",
+      "EV-54",
+      "EV-55",
+      "EV-80"
+    ],
+    "rep_range": [
+      8,
+      12
+    ],
+    "rest_seconds": {
+      "multi_joint": 120,
+      "single_joint": 90
+    },
+    "rir_target": 2.0,
+    "source_version": "initial-hypertrophy-policy/0.2.0-partially-admitted",
+    "work_sets": 2
+  },
+  "engine_version": "initial-policy-producer/3.0.0",
+  "policy_version": "initial-hypertrophy-policy/1.0.0-limited",
+  "prescription_modes": [
+    "OBSERVED_SETTING"
+  ],
+  "protocol_ref": "initial-observed-qualification/1.0.0",
+  "registry_version": "initial-policy-v3-admission-registry/1.0.0",
+  "runtime_availability": "NOT_SERVED",
+  "scope": {
+    "cadences": [
+      2
+    ],
+    "objective": "HYPERTROPHY",
+    "population": "ADULT_NON_CLINICAL",
+    "requires_empty_limitations": true
+  },
+  "selection": [
+    {
+      "candidate_id": "leg-extensions-assises",
+      "intent_id": "initial_quad_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda"
+    },
+    {
+      "candidate_id": "chest-press-machine",
+      "intent_id": "initial_press_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@477c8e570e9260cdf20a3b6502490d68c7243059d526d0734ae68568f5ef9642"
+    },
+    {
+      "candidate_id": "rowing-chest-supported",
+      "intent_id": "initial_row_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@f65ee15f870e8d6c57dafa5bc9afa359ec2d774272f704a2cfd6884c61a6f773"
+    },
+    {
+      "candidate_id": "romanian-deadlift-halteres",
+      "intent_id": "initial_hinge_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@b857f3bdb563e90e2a84f17403d407d3eb4936fa183bddf05c2d7cd7f15d29f1"
+    },
+    {
+      "candidate_id": "tirage-poulie-haute-prise-neutre",
+      "intent_id": "initial_vertical_pull_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@0e07dc7086decdddf1411bc1821ef3a1dc987b227fa43ef43396c1dd4c50a234"
+    },
+    {
+      "candidate_id": "elevations-laterales-machine",
+      "intent_id": "initial_lateral_delt_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@07e1300036de7f302e8b2c76303f731a9cd050f11658487f215659e0ec8eb5cf"
+    },
+    {
+      "candidate_id": "releves-mollets-debout-machine",
+      "intent_id": "initial_calf_v1",
+      "realization_ref": "initial-candidate-realisation/1.0.0@650be74db4ab9e31eb4fabdf21e99637159e345ebd8be40bd89287dcb94da1cc"
+    }
+  ],
+  "time": {
+    "positive_state": "BUDGET_UNCERTAIN",
+    "requires_plan_ack": true,
+    "start_policy_ref": "initial-plan-exploration/1.0.0",
+    "structure": "TRADITIONAL_SEQUENTIAL",
+    "supported_time": "NOT_ESTABLISHED"
+  },
+  "withdrawal_rule": "RECOMPUTE_AND_REVIEW_NO_AUTOMATIC_RESTART"
+}

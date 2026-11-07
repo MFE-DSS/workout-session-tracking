@@ -1,0 +1,875 @@
+{
+  "acknowledgment": null,
+  "as_of": "2026-11-07T12:00:00Z",
+  "blueprint": {
+    "contract_version": "body-training-blueprint/1.0.0",
+    "declared_priorities": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "UNKNOWN",
+        "measured_at": null,
+        "origin": "UNKNOWN",
+        "recorded_at": null,
+        "source_ref": null
+      },
+      "state": "UNKNOWN",
+      "value": null
+    },
+    "environment": {
+      "context_ref": "gym:test-a",
+      "description": {
+        "conflicts": [],
+        "provenance": {
+          "acquisition": "DECLARED",
+          "measured_at": null,
+          "origin": "USER_REPORTED",
+          "recorded_at": "2026-11-05T12:00:00Z",
+          "source_ref": "fixture:user-declaration"
+        },
+        "state": "KNOWN",
+        "value": "Salle de sport"
+      },
+      "equipment_items": {
+        "conflicts": [],
+        "provenance": {
+          "acquisition": "UNKNOWN",
+          "measured_at": null,
+          "origin": "UNKNOWN",
+          "recorded_at": null,
+          "source_ref": null
+        },
+        "state": "UNKNOWN",
+        "value": null
+      },
+      "exercise_confirmations": []
+    },
+    "excluded_exercise_ids": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-05T12:00:00Z",
+        "source_ref": "fixture:user-declaration"
+      },
+      "state": "KNOWN",
+      "value": []
+    },
+    "experience": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "UNKNOWN",
+        "measured_at": null,
+        "origin": "UNKNOWN",
+        "recorded_at": null,
+        "source_ref": null
+      },
+      "state": "UNKNOWN",
+      "value": null
+    },
+    "height_cm": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "UNKNOWN",
+        "measured_at": null,
+        "origin": "UNKNOWN",
+        "recorded_at": null,
+        "source_ref": null
+      },
+      "state": "UNKNOWN",
+      "value": null
+    },
+    "legacy_weight_kg": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "UNKNOWN",
+        "measured_at": null,
+        "origin": "UNKNOWN",
+        "recorded_at": null,
+        "source_ref": null
+      },
+      "state": "UNKNOWN",
+      "value": null
+    },
+    "limitations": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-05T12:00:00Z",
+        "source_ref": "fixture:user-declaration"
+      },
+      "state": "KNOWN",
+      "value": []
+    },
+    "objective": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-05T12:00:00Z",
+        "source_ref": "fixture:user-declaration"
+      },
+      "state": "KNOWN",
+      "value": "HYPERTROPHY"
+    },
+    "observations": [],
+    "population_scope": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-05T12:00:00Z",
+        "source_ref": "fixture:user-declaration"
+      },
+      "state": "KNOWN",
+      "value": "ADULT_NON_CLINICAL"
+    },
+    "session_budgets_minutes": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-05T12:00:00Z",
+        "source_ref": "fixture:user-declaration"
+      },
+      "state": "KNOWN",
+      "value": [
+        75,
+        75
+      ]
+    },
+    "sessions_per_week": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-05T12:00:00Z",
+        "source_ref": "fixture:user-declaration"
+      },
+      "state": "KNOWN",
+      "value": 2
+    },
+    "snapshot_id": "fixture-blueprint-v1",
+    "weight_kg": {
+      "conflicts": [],
+      "provenance": {
+        "acquisition": "UNKNOWN",
+        "measured_at": null,
+        "origin": "UNKNOWN",
+        "recorded_at": null,
+        "source_ref": null
+      },
+      "state": "UNKNOWN",
+      "value": null
+    }
+  },
+  "bundle_digest": "b05e535b6cb9db821eceab4e198f28beacf58ead9f0682198ba1e3792e134ac6",
+  "contract_version": "first-plan-request/3.0.0",
+  "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+  "episodes": [
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "leg-extensions-assises",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:leg-extensions-assises",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:leg-extensions-assises"
+      },
+      "episode_id": "synthetic:episode:leg-extensions-assises",
+      "events": [
+        {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "event_id": "leg-extensions-assises:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:leg-extensions-assises"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "event_id": "leg-extensions-assises:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:leg-extensions-assises"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "discomfort": "NO_CONCERN",
+          "event_id": "leg-extensions-assises:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:leg-extensions-assises"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "event_id": "leg-extensions-assises:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:leg-extensions-assises"
+          },
+          "reference_event_id": "leg-extensions-assises:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:leg-extensions-assises",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    },
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "chest-press-machine",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:chest-press-machine",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@477c8e570e9260cdf20a3b6502490d68c7243059d526d0734ae68568f5ef9642",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:chest-press-machine"
+      },
+      "episode_id": "synthetic:episode:chest-press-machine",
+      "events": [
+        {
+          "context_fingerprint": "eac78b035ee0417f57e48959ce74e173f280b7dd5655c8200c015773be096d99",
+          "event_id": "chest-press-machine:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:chest-press-machine"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "eac78b035ee0417f57e48959ce74e173f280b7dd5655c8200c015773be096d99",
+          "event_id": "chest-press-machine:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:chest-press-machine"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "eac78b035ee0417f57e48959ce74e173f280b7dd5655c8200c015773be096d99",
+          "discomfort": "NO_CONCERN",
+          "event_id": "chest-press-machine:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:chest-press-machine"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "eac78b035ee0417f57e48959ce74e173f280b7dd5655c8200c015773be096d99",
+          "event_id": "chest-press-machine:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:chest-press-machine"
+          },
+          "reference_event_id": "chest-press-machine:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:chest-press-machine",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    },
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "rowing-chest-supported",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:rowing-chest-supported",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@f65ee15f870e8d6c57dafa5bc9afa359ec2d774272f704a2cfd6884c61a6f773",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:rowing-chest-supported"
+      },
+      "episode_id": "synthetic:episode:rowing-chest-supported",
+      "events": [
+        {
+          "context_fingerprint": "c8e2c3d7898b0e085c2c2eb57c823e560a23f332bf40224228fc002226519a30",
+          "event_id": "rowing-chest-supported:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:rowing-chest-supported"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "c8e2c3d7898b0e085c2c2eb57c823e560a23f332bf40224228fc002226519a30",
+          "event_id": "rowing-chest-supported:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:rowing-chest-supported"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "c8e2c3d7898b0e085c2c2eb57c823e560a23f332bf40224228fc002226519a30",
+          "discomfort": "NO_CONCERN",
+          "event_id": "rowing-chest-supported:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:rowing-chest-supported"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "c8e2c3d7898b0e085c2c2eb57c823e560a23f332bf40224228fc002226519a30",
+          "event_id": "rowing-chest-supported:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:rowing-chest-supported"
+          },
+          "reference_event_id": "rowing-chest-supported:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:rowing-chest-supported",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    },
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "romanian-deadlift-halteres",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:romanian-deadlift-halteres",
+        "load_semantics": "PER_IMPLEMENT",
+        "realization_ref": "initial-candidate-realisation/1.0.0@b857f3bdb563e90e2a84f17403d407d3eb4936fa183bddf05c2d7cd7f15d29f1",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:romanian-deadlift-halteres"
+      },
+      "episode_id": "synthetic:episode:romanian-deadlift-halteres",
+      "events": [
+        {
+          "context_fingerprint": "0d0bc97f2fd968ef4fb4e51ea79cfdee805c6d1b7d1780bf784ab639c8b39657",
+          "event_id": "romanian-deadlift-halteres:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:romanian-deadlift-halteres"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "0d0bc97f2fd968ef4fb4e51ea79cfdee805c6d1b7d1780bf784ab639c8b39657",
+          "event_id": "romanian-deadlift-halteres:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:romanian-deadlift-halteres"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "0d0bc97f2fd968ef4fb4e51ea79cfdee805c6d1b7d1780bf784ab639c8b39657",
+          "discomfort": "NO_CONCERN",
+          "event_id": "romanian-deadlift-halteres:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:romanian-deadlift-halteres"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "0d0bc97f2fd968ef4fb4e51ea79cfdee805c6d1b7d1780bf784ab639c8b39657",
+          "event_id": "romanian-deadlift-halteres:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:romanian-deadlift-halteres"
+          },
+          "reference_event_id": "romanian-deadlift-halteres:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:romanian-deadlift-halteres",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    },
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "tirage-poulie-haute-prise-neutre",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:tirage-poulie-haute-prise-neutre",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@0e07dc7086decdddf1411bc1821ef3a1dc987b227fa43ef43396c1dd4c50a234",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:tirage-poulie-haute-prise-neutre"
+      },
+      "episode_id": "synthetic:episode:tirage-poulie-haute-prise-neutre",
+      "events": [
+        {
+          "context_fingerprint": "800f38866c7bfd24a7b157bbb936829c96c57b93bea5b7a479e852c799383d65",
+          "event_id": "tirage-poulie-haute-prise-neutre:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:tirage-poulie-haute-prise-neutre"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "800f38866c7bfd24a7b157bbb936829c96c57b93bea5b7a479e852c799383d65",
+          "event_id": "tirage-poulie-haute-prise-neutre:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:tirage-poulie-haute-prise-neutre"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "800f38866c7bfd24a7b157bbb936829c96c57b93bea5b7a479e852c799383d65",
+          "discomfort": "NO_CONCERN",
+          "event_id": "tirage-poulie-haute-prise-neutre:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:tirage-poulie-haute-prise-neutre"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "800f38866c7bfd24a7b157bbb936829c96c57b93bea5b7a479e852c799383d65",
+          "event_id": "tirage-poulie-haute-prise-neutre:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:tirage-poulie-haute-prise-neutre"
+          },
+          "reference_event_id": "tirage-poulie-haute-prise-neutre:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:tirage-poulie-haute-prise-neutre",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    },
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "elevations-laterales-machine",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:elevations-laterales-machine",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@07e1300036de7f302e8b2c76303f731a9cd050f11658487f215659e0ec8eb5cf",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:elevations-laterales-machine"
+      },
+      "episode_id": "synthetic:episode:elevations-laterales-machine",
+      "events": [
+        {
+          "context_fingerprint": "dde6caf81e7bbbc46509eddd6eddd1abe68d41af7abfda9fe79527cc0af9fba3",
+          "event_id": "elevations-laterales-machine:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:elevations-laterales-machine"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "dde6caf81e7bbbc46509eddd6eddd1abe68d41af7abfda9fe79527cc0af9fba3",
+          "event_id": "elevations-laterales-machine:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:elevations-laterales-machine"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "dde6caf81e7bbbc46509eddd6eddd1abe68d41af7abfda9fe79527cc0af9fba3",
+          "discomfort": "NO_CONCERN",
+          "event_id": "elevations-laterales-machine:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:elevations-laterales-machine"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "dde6caf81e7bbbc46509eddd6eddd1abe68d41af7abfda9fe79527cc0af9fba3",
+          "event_id": "elevations-laterales-machine:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:elevations-laterales-machine"
+          },
+          "reference_event_id": "elevations-laterales-machine:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:elevations-laterales-machine",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    },
+    {
+      "as_of": "2026-11-07T12:00:00Z",
+      "availability": "AVAILABLE",
+      "context": {
+        "canonical_exercise_id": "releves-mollets-debout-machine",
+        "context_ref": "gym:test-a",
+        "equipment_ref": "synthetic:device:releves-mollets-debout-machine",
+        "load_semantics": "MACHINE_DISPLAY_KG",
+        "realization_ref": "initial-candidate-realisation/1.0.0@650be74db4ab9e31eb4fabdf21e99637159e345ebd8be40bd89287dcb94da1cc",
+        "side": "BILATERAL"
+      },
+      "context_provenance": {
+        "acquisition": "DECLARED",
+        "measured_at": null,
+        "origin": "USER_REPORTED",
+        "recorded_at": "2026-11-07T11:00:00Z",
+        "source_ref": "synthetic:event-0:releves-mollets-debout-machine"
+      },
+      "episode_id": "synthetic:episode:releves-mollets-debout-machine",
+      "events": [
+        {
+          "context_fingerprint": "5047b9b674d2468e0de4a78d66d7cb03c0c7c1e6717e964885f5883f256f2834",
+          "event_id": "releves-mollets-debout-machine:e1",
+          "kind": "CONTEXT_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:releves-mollets-debout-machine"
+          },
+          "sequence": 1,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "context_fingerprint": "5047b9b674d2468e0de4a78d66d7cb03c0c7c1e6717e964885f5883f256f2834",
+          "event_id": "releves-mollets-debout-machine:e2",
+          "kind": "FAMILIARIZATION_CONFIRMED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:02:00Z",
+            "source_ref": "synthetic:event-2:releves-mollets-debout-machine"
+          },
+          "sequence": 2,
+          "subject_ref": "subject:synthetic-a"
+        },
+        {
+          "completed": true,
+          "context_fingerprint": "5047b9b674d2468e0de4a78d66d7cb03c0c7c1e6717e964885f5883f256f2834",
+          "discomfort": "NO_CONCERN",
+          "event_id": "releves-mollets-debout-machine:e3",
+          "kind": "ATTEMPT_OBSERVED",
+          "provenance": {
+            "acquisition": "EXECUTION_LOG",
+            "measured_at": "2026-11-07T11:03:00Z",
+            "origin": "USER_OBSERVED",
+            "recorded_at": "2026-11-07T11:03:00Z",
+            "source_ref": "synthetic:event-3:releves-mollets-debout-machine"
+          },
+          "reps": 10,
+          "sequence": 3,
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          },
+          "subject_ref": "subject:synthetic-a",
+          "successful": true,
+          "technique": "ACCEPTABLE"
+        },
+        {
+          "context_fingerprint": "5047b9b674d2468e0de4a78d66d7cb03c0c7c1e6717e964885f5883f256f2834",
+          "event_id": "releves-mollets-debout-machine:e4",
+          "kind": "SETTING_ACCEPTED",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:04:00Z",
+            "source_ref": "synthetic:event-4:releves-mollets-debout-machine"
+          },
+          "reference_event_id": "releves-mollets-debout-machine:e3",
+          "sequence": 4,
+          "subject_ref": "subject:synthetic-a"
+        }
+      ],
+      "ledger_complete": true,
+      "ledger_source_ref": "synthetic:ledger:releves-mollets-debout-machine",
+      "started_at": "2026-11-07T11:00:00Z",
+      "subject_ref": "subject:synthetic-a"
+    }
+  ],
+  "requested_binding_ref": "initial-plan-v3-binding/1.0.0",
+  "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
+  "snapshot_ref": "fixture-blueprint-v1",
+  "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
+  "subject_ref": "subject:synthetic-a",
+  "timing_inputs": [],
+  "versions": {
+    "catalogue": "initial-plan-effective-catalogue/1.0.0@10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
+    "engine": "initial-policy-producer/3.0.0",
+    "policy": "initial-hypertrophy-policy/1.0.0-limited",
+    "zones": "zones-15-v1"
+  }
+}
