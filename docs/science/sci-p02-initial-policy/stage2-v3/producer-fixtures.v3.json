@@ -172,7 +172,7 @@
           "value": null
         }
       },
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "contract_version": "first-plan-request/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "episodes": [
@@ -889,11 +889,11 @@
         "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
         "state": "SUFFICIENT"
       },
-      "binding_digest": "3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+      "binding_digest": "9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
       "binding_ref": "initial-plan-v3-binding/1.0.0",
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "candidate_plan": {
-        "allocation_ref": "initial-plan-v3-binding/1.0.0@3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+        "allocation_ref": "initial-plan-v3-binding/1.0.0@9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
         "coverage_report_complete": true,
         "physical_work_sets_total": 28,
         "review_state": "REVIEWED",
@@ -2555,12 +2555,12 @@
       "contract_version": "first-plan-recommendation/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "engine_version": "initial-policy-producer/3.0.0",
-      "full_evaluation_fingerprint": "db249b8a4f22a49350f52421741cad26340bd7d266890e3b20fe96d6f0bbb763",
+      "full_evaluation_fingerprint": "22485bdab0494e689b790c5ca3f58555f6263e3f062332d634208743c35864bb",
       "generated_at": "2026-11-07T12:00:00Z",
-      "observation_fingerprint": "ce3ff9d284ba418f42644c0aad79d2794477b998149c408bc449a76d998c37a2",
-      "plan_time_fingerprint": "ad2e941d44c30a1fa7c42f877e4d7b3f4250eaed3d011f7a76b72294b2abf240",
+      "observation_fingerprint": "2bb62ff045c5321dc4d58a304fd4847dc4e2c9069b30e96f16161073a484349b",
+      "plan_time_fingerprint": "7390eff11e8abc99abb6bab14b6ef59d081db1fb591088a35df2e695d26e1a12",
       "policy_version": "initial-hypertrophy-policy/1.0.0-limited",
-      "request_fingerprint": "11375ed83bb7d49f65a16fc2b69c79d7b4592e0725f4c8948f48420a0a42d550",
+      "request_fingerprint": "bd9fa0f347ca7ac7889768ca5f6641d6acef4b9adc7ea2b1e330bb6d1232c1bd",
       "revocation_check_ref": "initial-policy-v3-admission-registry/1.0.0@602ff0d32ebc625b4c9474660b5b36ee9983c4c598f16ae9b1269e67e5cea50f#initial-plan-v3-binding/1.0.0",
       "scientific_issues": [],
       "scientific_readiness": "SCIENTIFICALLY_READY",
@@ -2628,10 +2628,10 @@
       "acknowledgment": {
         "acknowledged_at": "2026-11-07T12:01:00Z",
         "kind": "TIME_UNCERTAINTY_ACK",
-        "observation_fingerprint": "ce3ff9d284ba418f42644c0aad79d2794477b998149c408bc449a76d998c37a2",
-        "plan_time_fingerprint": "ad2e941d44c30a1fa7c42f877e4d7b3f4250eaed3d011f7a76b72294b2abf240",
+        "observation_fingerprint": "2bb62ff045c5321dc4d58a304fd4847dc4e2c9069b30e96f16161073a484349b",
+        "plan_time_fingerprint": "7390eff11e8abc99abb6bab14b6ef59d081db1fb591088a35df2e695d26e1a12",
         "product_policy_ref": "initial-plan-exploration/1.0.0",
-        "request_fingerprint": "11375ed83bb7d49f65a16fc2b69c79d7b4592e0725f4c8948f48420a0a42d550",
+        "request_fingerprint": "bd9fa0f347ca7ac7889768ca5f6641d6acef4b9adc7ea2b1e330bb6d1232c1bd",
         "snapshot_ref": "fixture-blueprint-v1",
         "source_ref": "synthetic:explicit-time-ack",
         "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
@@ -2806,7 +2806,7 @@
           "value": null
         }
       },
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "contract_version": "first-plan-request/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "episodes": [
@@ -3514,10 +3514,10 @@
       "acknowledgment": {
         "acknowledged_at": "2026-11-07T12:01:00Z",
         "kind": "TIME_UNCERTAINTY_ACK",
-        "observation_fingerprint": "ce3ff9d284ba418f42644c0aad79d2794477b998149c408bc449a76d998c37a2",
-        "plan_time_fingerprint": "ad2e941d44c30a1fa7c42f877e4d7b3f4250eaed3d011f7a76b72294b2abf240",
+        "observation_fingerprint": "2bb62ff045c5321dc4d58a304fd4847dc4e2c9069b30e96f16161073a484349b",
+        "plan_time_fingerprint": "7390eff11e8abc99abb6bab14b6ef59d081db1fb591088a35df2e695d26e1a12",
         "product_policy_ref": "initial-plan-exploration/1.0.0",
-        "request_fingerprint": "11375ed83bb7d49f65a16fc2b69c79d7b4592e0725f4c8948f48420a0a42d550",
+        "request_fingerprint": "bd9fa0f347ca7ac7889768ca5f6641d6acef4b9adc7ea2b1e330bb6d1232c1bd",
         "snapshot_ref": "fixture-blueprint-v1",
         "source_ref": "synthetic:explicit-time-ack",
         "source_revision": "CONTRACT_EXAMPLE:historical-fixture",
@@ -3534,11 +3534,11 @@
         "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
         "state": "SUFFICIENT"
       },
-      "binding_digest": "3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+      "binding_digest": "9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
       "binding_ref": "initial-plan-v3-binding/1.0.0",
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "candidate_plan": {
-        "allocation_ref": "initial-plan-v3-binding/1.0.0@3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+        "allocation_ref": "initial-plan-v3-binding/1.0.0@9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
         "coverage_report_complete": true,
         "physical_work_sets_total": 28,
         "review_state": "REVIEWED",
@@ -5200,12 +5200,12 @@
       "contract_version": "first-plan-recommendation/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "engine_version": "initial-policy-producer/3.0.0",
-      "full_evaluation_fingerprint": "d96e5aa69d34edfca4a0376637b4a4e0cae2d63305ce9ad9526128511318f5b3",
+      "full_evaluation_fingerprint": "46ee1915e023b9e71f249c64c34b5e1964563edfba38613804a15c411711f23a",
       "generated_at": "2026-11-07T12:01:00Z",
-      "observation_fingerprint": "ce3ff9d284ba418f42644c0aad79d2794477b998149c408bc449a76d998c37a2",
-      "plan_time_fingerprint": "ad2e941d44c30a1fa7c42f877e4d7b3f4250eaed3d011f7a76b72294b2abf240",
+      "observation_fingerprint": "2bb62ff045c5321dc4d58a304fd4847dc4e2c9069b30e96f16161073a484349b",
+      "plan_time_fingerprint": "7390eff11e8abc99abb6bab14b6ef59d081db1fb591088a35df2e695d26e1a12",
       "policy_version": "initial-hypertrophy-policy/1.0.0-limited",
-      "request_fingerprint": "11375ed83bb7d49f65a16fc2b69c79d7b4592e0725f4c8948f48420a0a42d550",
+      "request_fingerprint": "bd9fa0f347ca7ac7889768ca5f6641d6acef4b9adc7ea2b1e330bb6d1232c1bd",
       "revocation_check_ref": "initial-policy-v3-admission-registry/1.0.0@602ff0d32ebc625b4c9474660b5b36ee9983c4c598f16ae9b1269e67e5cea50f#initial-plan-v3-binding/1.0.0",
       "scientific_issues": [],
       "scientific_readiness": "SCIENTIFICALLY_READY",
@@ -5440,7 +5440,7 @@
           "value": null
         }
       },
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "contract_version": "first-plan-request/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "episodes": [
@@ -6159,9 +6159,9 @@
         "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
         "state": "INSUFFICIENT"
       },
-      "binding_digest": "3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+      "binding_digest": "9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
       "binding_ref": "initial-plan-v3-binding/1.0.0",
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "candidate_plan": null,
       "confidence": {
         "evidence_refs": [
@@ -6186,12 +6186,12 @@
       "contract_version": "first-plan-recommendation/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "engine_version": "initial-policy-producer/3.0.0",
-      "full_evaluation_fingerprint": "5e9298db8d067cdebd1b471be49438f6dfd9d49c26ca48295475894735740525",
+      "full_evaluation_fingerprint": "341a402dca036491fdb469d6db4cca2af0c54095d4886d102c9993830e6c46ef",
       "generated_at": "2026-11-07T12:00:00Z",
-      "observation_fingerprint": "6e7695a352b3ac1038ea36d8f54124e63152b209bdd7c8c89cd40051ec6ac85e",
+      "observation_fingerprint": "e2138395cb5c9c2d2c4457fdbb74e977f0a47cfbabe97e07f1eda1d24c039b29",
       "plan_time_fingerprint": null,
       "policy_version": "initial-hypertrophy-policy/1.0.0-limited",
-      "request_fingerprint": "a05df38ae1f921230e5f9ce90ab8671dd3348e4a61a2e4ea29d25e9b81918acb",
+      "request_fingerprint": "67ae91ecddb426a19a5645ff2a5cd0ed7b1d55a8a7c692f8b760d21b132b634d",
       "revocation_check_ref": "initial-policy-v3-admission-registry/1.0.0@602ff0d32ebc625b4c9474660b5b36ee9983c4c598f16ae9b1269e67e5cea50f#initial-plan-v3-binding/1.0.0",
       "scientific_issues": [
         {
@@ -6396,7 +6396,7 @@
           "value": null
         }
       },
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "contract_version": "first-plan-request/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "episodes": [
@@ -7113,9 +7113,9 @@
         "requirement_profile_id": "first-bodybuilding-inputs/2.0.0",
         "state": "SUFFICIENT"
       },
-      "binding_digest": "3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+      "binding_digest": "9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
       "binding_ref": "initial-plan-v3-binding/1.0.0",
-      "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+      "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
       "candidate_plan": null,
       "confidence": {
         "evidence_refs": [
@@ -7140,12 +7140,12 @@
       "contract_version": "first-plan-recommendation/3.0.0",
       "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
       "engine_version": "initial-policy-producer/3.0.0",
-      "full_evaluation_fingerprint": "18722b3f1755781484f641949af72caa08f4926f00a77f24caf6d13d985fa687",
+      "full_evaluation_fingerprint": "5a05dafac2b0ed5f3005f544ac1edb93806633c3f8d064868b07d1ee385e4390",
       "generated_at": "2026-11-07T12:00:00Z",
-      "observation_fingerprint": "3547ab50e93bab21e7ab2237a3fe9aaa780e01e750c563e04717a196bf82ba02",
+      "observation_fingerprint": "4b347057f11fef11288bd7dceb43a1af781003b0bb29f32f358e9b92609ca055",
       "plan_time_fingerprint": null,
       "policy_version": "initial-hypertrophy-policy/1.0.0-limited",
-      "request_fingerprint": "11375ed83bb7d49f65a16fc2b69c79d7b4592e0725f4c8948f48420a0a42d550",
+      "request_fingerprint": "bd9fa0f347ca7ac7889768ca5f6641d6acef4b9adc7ea2b1e330bb6d1232c1bd",
       "revocation_check_ref": "initial-policy-v3-admission-registry/1.0.0@602ff0d32ebc625b4c9474660b5b36ee9983c4c598f16ae9b1269e67e5cea50f#initial-plan-v3-binding/1.0.0",
       "scientific_issues": [
         {

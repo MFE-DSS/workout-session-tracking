@@ -1,11 +1,11 @@
 {
   "artifact_kind": "REAL_PRODUCER_SYNTHETIC_INPUT_NOT_SERVED",
   "artifact_sha256": {
-    "docs/science/sci-p02-initial-policy/stage2-v3/producer-fixtures.v3.json": "7444409425c42c6e5465460e1baa850ac84cbf49922c7969b2d72721452f8d49"
+    "docs/science/sci-p02-initial-policy/stage2-v3/producer-fixtures.v3.json": "fcd7476ee20738af7191e8b00420432dc70c84512c10c04899ac35bd6218db0b"
   },
-  "binding_digest": "3f8565c135b719ab2460cbc8f35d84a9da37e3a2edd740f54d6dcce54c86c148",
+  "binding_digest": "9ef301da08ec3614c7e2a4fbbb95a2384f1c870bca84b6b69eeb4e20a1897389",
   "binding_ref": "initial-plan-v3-binding/1.0.0",
-  "bundle_digest": "324a633e2d97f082c47b5732fede09ab21d29a52585e2a7b073cd8f245db8817",
+  "bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94",
   "effective_science_digest": "10e92afb04cd1b14036f5c21e4b3f755a7ac58eddd2cb369be99a355de05b5b9",
   "engine_version": "initial-policy-producer/3.0.0",
   "policy_version": "initial-hypertrophy-policy/1.0.0-limited",
@@ -36,7 +36,7 @@
     "docs/science/sci-p02-initial-policy/stage2-v3/authority/PROTOCOL.md": "d333bb6d5fd9f8ae69247ff0dd4bd09fab54bf9f78d0ee5ffd59b736e273a3e8",
     "docs/science/sci-p02-initial-policy/stage2-v3/authority/SCI_REVIEW.md": "2065d9e12262f22d1c4959dd5118ffbdff2f373ced1b7cfd5d0253b170bf8ca1",
     "docs/science/sci-p02-initial-policy/stage2-v3/authority/registry.v1.json": "602ff0d32ebc625b4c9474660b5b36ee9983c4c598f16ae9b1269e67e5cea50f",
-    "docs/science/sci-p02-initial-policy/stage2-v3/authority/sources.v1.json": "ad7bcea900f054ae7e41a323f68b1935dcace3e7ab1f81167819f2ea3ab08b4b",
+    "docs/science/sci-p02-initial-policy/stage2-v3/authority/sources.v1.json": "a90d4868eea9cc75106163bdb35de3512c817577740343a99b2ad5c85b3e8c24",
     "docs/science/sci-p02-initial-policy/v1/policy.json": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
     "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
     "docs/strategy/AUREN_CALIBRATION_SYSTEM.md": "fcf7a3466903685d5a8a886ed64a3e7688ace69e851276099a2160348f69bf1b",
@@ -47,18 +47,29 @@
     "docs/strategy/Sx_AUREN_SCIENTIFIC_ENGINE_V2_SPEC.md": "500c825dbdd906d0bc43a9e3f4413e5c0c174e32c267d8c0866b9c135c6e40b3",
     "openspec/changes/science-initial-plan-policy/design.md": "1e4eac00ddc2afc68faf3dfbcaa690bf3d882485a78b75fc7332f0f3c1042e7c",
     "openspec/changes/science-initial-plan-policy/proposal.md": "57ece31709e586c838e5221f8614ed4815fd154fe5e886d62f58ac8010c98506",
+    "tools/science_contracts/__init__.py": "2fe55ac984fa2b14b40e31e0da46534faf9e333b1aab6ec8772de71365a9040b",
     "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
+    "tools/science_contracts/blueprint_first_plan_v2.py": "19aac61242d0991b289bcd0f1e36571dc8c064f4d8a7262de4de45b2c6ccf51e",
     "tools/science_contracts/blueprint_first_plan_v3.py": "bc65a65d1a05714bdbdfa03fec7dbe9b2d3fb3faed5a0b69b28b71272fe5d14d",
     "tools/science_contracts/bootstrap_protocol_v3.py": "4360918c9722bbef7d9a61ad26ed4c3390b9b5704ad0de0a5318f6c0fdaf0aa3",
+    "tools/science_contracts/first_plan_v2_validation.py": "413be340dd8106ee82cac0c51cf3188254eb6909105a5ce65685c159271b715d",
+    "tools/science_initial_policy/__init__.py": "8484f7ce9c7206478b1a7000ae5a4095c615315341f641b4f176340b417ae731",
+    "tools/science_initial_policy/admission_calibration.py": "6cc2a23c6221623626606ef52924c9ffa8d96b1c6bee9a91a4dbe7c7b07abce8",
+    "tools/science_initial_policy/admission_registry.py": "b723023bc1ef722f3b66f43c40a4087b61f44ecff1597fc536a4aceec3f8a4e4",
+    "tools/science_initial_policy/calibration_time_contracts.py": "1f50ee65939a1c0f1e6915fc181a7eea8d405150687de84a881493d48e408895",
     "tools/science_initial_policy/curation.py": "341ba18ac6adeb178b0c0cf90d5a69a1783a77521f7ca24df4a6c1a0093453a5",
+    "tools/science_initial_policy/load_calibration.py": "f75b03d0a81691a5e2bab94c5bf22cfc8e01e40745f297a0ae9e9bbca6a41b7c",
     "tools/science_initial_policy/planning.py": "42bfe157158f00a482218b334918919e76bad3645d4f6c9ce61bb09f3c33a8ae",
     "tools/science_initial_policy/producer.py": "c50bfab2c41bfbc12e00038aaf6db94deaf7ceaddf3050c4ff12b16b48835c67",
     "tools/science_initial_policy/pull_exposure.py": "5999e3eaf188601e7d115a8c0a9616dbfce0a6711d03e3d19fa565a9f835c5a9",
     "tools/science_initial_policy/registry.py": "b693e527b83561099e5b5bf8c3eee85ab27fd49387cf66e3abadf5c8fee4924d",
+    "tools/science_initial_policy/session_time.py": "4ff7ad6ccf11fb64dea10aaee76a96bc732ce124f493e3d844d691b776490564",
     "tools/science_initial_policy/time_feasibility.py": "0e5e7344c7fa50a037cd7083b82e20f8bf782cffbd3e28b63a4536ed0e581be6",
-    "tools/science_initial_policy/v3_admission.py": "eaa295d855db76c9a8a07245a7f682ce6684355b91d048d2407b27653f7c3ef6",
+    "tools/science_initial_policy/v2_producer.py": "ad8c154feb8b439a25d7b39b37defcf236d6b4f847a058f64d9c1976df70fd02",
+    "tools/science_initial_policy/v2_registry.py": "5f9d17f531f28cda18595d0aace9fc8b91340e931bc77d4dedac170cc05ac59b",
+    "tools/science_initial_policy/v3_admission.py": "57e1a3e8b5aec960192e6886db9256b568a1ee776503d7daefddd077f9864b83",
     "tools/science_initial_policy/v3_fixtures.py": "81461c316b74b2ab3963f5f2f8ff145463bb2ca656fdbd8c51fd0eebfe21f9d8",
-    "tools/science_initial_policy/v3_producer.py": "056b094eebc42dd9aedaaa924df2c0c29b5cef22db805cfefc0cb361b17b3427",
-    "tools/science_initial_policy/v3_validation.py": "b9facc8f6ef9a91b016d584d0143bb6ab4a047597ea04f08ed86280514038ccc"
+    "tools/science_initial_policy/v3_producer.py": "fa7f3ba933ebcc6e39f5915bff44efa623dcd85e329f49ea494e06cc9f10f856",
+    "tools/science_initial_policy/v3_validation.py": "8d1763605087e0934c0bbb339e326872b7f0fc630c9ee81ce31aea597e9f0dcc"
   }
 }

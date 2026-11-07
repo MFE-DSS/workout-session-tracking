@@ -84,21 +84,33 @@ def _assessment(req):
     return assess_inputs(req.blueprint, used), used
 
 
-def _qualified_order(ep, trial):
+def _qualified_order(ep, trial, acceptance):
     current = [e for e in ep.events if _current(e, ep.started_at)]
+
+    def occurred(e):
+        return e.provenance.measured_at or e.provenance.recorded_at
+
+    trial_at = occurred(trial)
+    if occurred(acceptance) < trial_at:
+        return False
     contexts = [
         e
         for e in current
         if e.kind == "CONTEXT_CONFIRMED"
         and e.sequence < trial.sequence
+        and occurred(e) <= trial_at
         and e.setting == trial.setting
     ]
     starts = [e.sequence for e in current if e.kind == "FAMILIARIZATION_STARTED"]
+    if any(e.kind == "FAMILIARIZATION_STARTED" and occurred(e) > trial_at for e in current):
+        return False
     if any(sequence > trial.sequence for sequence in starts):
         return False
     latest_start = max(starts, default=-1)
     familiar = trial.familiarization_confirmed is True or any(
-        e.kind == "FAMILIARIZATION_CONFIRMED" and latest_start < e.sequence < trial.sequence
+        e.kind == "FAMILIARIZATION_CONFIRMED"
+        and latest_start < e.sequence < trial.sequence
+        and occurred(e) <= trial_at
         for e in current
     )
     return bool(contexts) and familiar
@@ -122,6 +134,7 @@ def _prescription(req, spec, registry):
         or not all((ctx.context_ref, ctx.equipment_ref, ctx.realization_ref))
         or ctx.load_semantics == "UNKNOWN"
         or p.origin not in {"USER_REPORTED", "USER_OBSERVED"}
+        or p.recorded_at is None
         or p.recorded_at < ep.started_at
         or (p.measured_at is not None and p.measured_at < ep.started_at)
     ):
@@ -133,7 +146,7 @@ def _prescription(req, spec, registry):
     confirmations = [
         c
         for c in req.blueprint.environment.exercise_confirmations
-        if c.canonical_exercise_id == identity
+        if c.canonical_exercise_id == identity and c.context_ref == ctx.context_ref
     ]
     if any(c.state == "UNAVAILABLE" for c in confirmations):
         return None, _issue(
@@ -154,10 +167,10 @@ def _prescription(req, spec, registry):
         key=lambda e: e.sequence,
     )
     if (
-        not _qualified_order(ep, trial)
+        not accepted
+        or not _qualified_order(ep, trial, accepted[-1])
         or not _current(trial, ep.started_at)
         or trial.provenance.origin != "USER_OBSERVED"
-        or not accepted
     ):
         return None, _issue(
             "CALIBRATION_REQUIRED",

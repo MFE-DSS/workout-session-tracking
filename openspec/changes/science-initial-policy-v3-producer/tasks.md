@@ -19,5 +19,5 @@
 - [x] Positifs observés réels générés puis vérifiés ; bootstrap/charge inconnue refusés comme positif, sans autorité de test ni durées inventées.
 - [x] Cas adverses et rejeu byte-identique des sources/fixtures/validateurs historiques.
 - [x] Handoff PLAN consommable, sans SDK/API/UI ou contrat partagé modifié en parallèle.
-- [ ] check_scope puis ciblés/broad/sécurité/protocole/OpenSpec selon tier ; revues SCI/code séparées et corrections.
+- [x] check_scope puis ciblés/broad/sécurité/protocole/OpenSpec selon tier ; revues SCI/code séparées et corrections.
 - [ ] PR/CI HEAD, merge sous GO permanent, CI canonique, closeout/archive du scope accepté et cleanup propre.

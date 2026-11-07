@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from tools.science_contracts.blueprint_first_plan_v1 import REQUIRED_FIELDS
+from tools.science_contracts.blueprint_first_plan_v2 import assess_inputs
 from tools.science_contracts.blueprint_first_plan_v3 import (
     FirstPlanRecommendationV3,
     evaluation_fingerprint,
@@ -16,15 +18,21 @@ from tools.science_initial_policy.admission_calibration import _current
 from tools.science_initial_policy.v3_admission import assert_trusted_v3, encoded
 
 
-def _check_phase_order(ep, trial):
+def _check_phase_order(ep, trial, acceptance):
     commands = sorted(
         (e for e in ep.events if _current(e, ep.started_at)), key=lambda e: e.sequence
     )
+    trial_at = trial.provenance.measured_at
+    if (acceptance.provenance.measured_at or acceptance.provenance.recorded_at) < trial_at:
+        raise ValueError("acceptance occurred before its observed trial")
     context_ready = False
     familiar_ready = False
     for event in commands:
         if event.sequence >= trial.sequence:
             break
+        occurred = event.provenance.measured_at or event.provenance.recorded_at
+        if occurred > trial_at:
+            continue
         if event.kind == "CONTEXT_CONFIRMED" and event.setting == trial.setting:
             context_ready = True
         elif event.kind == "FAMILIARIZATION_STARTED":
@@ -32,7 +40,12 @@ def _check_phase_order(ep, trial):
         elif event.kind == "FAMILIARIZATION_CONFIRMED":
             familiar_ready = True
     restart_after = any(
-        e.kind == "FAMILIARIZATION_STARTED" and e.sequence > trial.sequence for e in commands
+        e.kind == "FAMILIARIZATION_STARTED"
+        and (
+            e.sequence > trial.sequence
+            or (e.provenance.measured_at or e.provenance.recorded_at) > trial_at
+        )
+        for e in commands
     )
     if (
         not context_ready
@@ -65,11 +78,12 @@ def _observed_slot(req, slot, spec, session_id, position, registry):
     ep = matches[0]
     events = {e.event_id: e for e in ep.events}
     trial = events[slot.prescription.event_id]
-    _check_phase_order(ep, trial)
+    _check_phase_order(ep, trial, events[slot.prescription.acceptance_event_id])
     if (
         ep.availability != "AVAILABLE"
         or not _current(trial, ep.started_at)
         or trial.provenance.origin != "USER_OBSERVED"
+        or ep.context_provenance.recorded_at is None
         or ep.context_provenance.recorded_at < ep.started_at
         or (
             ep.context_provenance.measured_at is not None
@@ -86,7 +100,19 @@ def _observed_slot(req, slot, spec, session_id, position, registry):
         raise ValueError("resistance meaning conflicts with the curated realization")
 
 
+def _check_assessment(req, out):
+    used = tuple(REQUIRED_FIELDS)
+    if req.blueprint.excluded_exercise_ids.state in {"KNOWN", "CONFLICT"}:
+        used += ("excluded_exercise_ids",)
+    assessment = assess_inputs(req.blueprint, used)
+    if assessment.state != "SUFFICIENT" or out.assessment != assessment or out.used_fields != used:
+        raise ValueError(
+            "positive result requires independently sufficient nonconflicting consumed facts"
+        )
+
+
 def _positive_invariants(req, out, registry):
+    _check_assessment(req, out)
     plan = out.candidate_plan
     policy = registry.policy
     dose = policy["dose"]

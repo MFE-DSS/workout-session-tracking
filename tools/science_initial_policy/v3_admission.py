@@ -21,7 +21,7 @@ from tools.science_initial_policy.v2_registry import (
 
 DIRECTORY = "docs/science/sci-p02-initial-policy/stage2-v3/authority"
 REGISTRY_SHA256 = "602ff0d32ebc625b4c9474660b5b36ee9983c4c598f16ae9b1269e67e5cea50f"
-MANIFEST_SHA256 = "ad7bcea900f054ae7e41a323f68b1935dcace3e7ab1f81167819f2ea3ab08b4b"
+MANIFEST_SHA256 = "a90d4868eea9cc75106163bdb35de3512c817577740343a99b2ad5c85b3e8c24"
 ENGINE_VERSION = "initial-policy-producer/3.0.0"
 POLICY_VERSION = "initial-hypertrophy-policy/1.0.0-limited"
 
