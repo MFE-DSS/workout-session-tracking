@@ -16,6 +16,34 @@ from tools.science_initial_policy.admission_calibration import _current
 from tools.science_initial_policy.v3_admission import assert_trusted_v3, encoded
 
 
+def _check_phase_order(ep, trial):
+    commands = sorted(
+        (e for e in ep.events if _current(e, ep.started_at)), key=lambda e: e.sequence
+    )
+    context_ready = False
+    familiar_ready = False
+    for event in commands:
+        if event.sequence >= trial.sequence:
+            break
+        if event.kind == "CONTEXT_CONFIRMED" and event.setting == trial.setting:
+            context_ready = True
+        elif event.kind == "FAMILIARIZATION_STARTED":
+            familiar_ready = False
+        elif event.kind == "FAMILIARIZATION_CONFIRMED":
+            familiar_ready = True
+    restart_after = any(
+        e.kind == "FAMILIARIZATION_STARTED" and e.sequence > trial.sequence for e in commands
+    )
+    if (
+        not context_ready
+        or not (familiar_ready or trial.familiarization_confirmed is True)
+        or restart_after
+    ):
+        raise ValueError(
+            "trial not preceded by applicable context and familiarization, or restarted"
+        )
+
+
 def _observed_slot(req, slot, spec, session_id, position, registry):
     if (
         slot.intent_id != spec["intent_id"]
@@ -37,6 +65,7 @@ def _observed_slot(req, slot, spec, session_id, position, registry):
     ep = matches[0]
     events = {e.event_id: e for e in ep.events}
     trial = events[slot.prescription.event_id]
+    _check_phase_order(ep, trial)
     if (
         ep.availability != "AVAILABLE"
         or not _current(trial, ep.started_at)

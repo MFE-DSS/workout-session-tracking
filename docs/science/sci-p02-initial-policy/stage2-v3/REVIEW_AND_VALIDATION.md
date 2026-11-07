@@ -1,5 +1,7 @@
 # Stage2 — reçu de préparation et de revue
 
+**Instant historique de préparation avant décisions — voir BUILD_AUTHORIZATION et AGENT_HANDOFF pour la réalisation.**
+
 **7 novembre2026. PROPOSED / NOT_ADMITTED / NOT_SERVED ; aucun GO BUILD stage2 reçu.** Canonique97173680c1474bb906d413c192e6c120b97bfe5d après fetch. Branche spec/sci-p02-stage2-admission-v3, worktree /private/tmp/auren-sci-p02-stage2-admission-v3. Aucun nouveau commit/push/PR/merge/CI/Sonar revendiqué dans cette préparation.
 
 ## Travail concret autorisé réalisé

@@ -20,8 +20,9 @@
     "docs/science/sci-p02-initial-policy/curation-01/candidates.v1.json": "d1a3f26268bcb33d3614ce3b4841a2dc42562541b39134646caabf9f37f37803",
     "docs/science/sci-p02-initial-policy/pull-exposure-01/CONTRACT_DECISION.md": "b83f02856ced1bbfe88dd9dda6c1f47d3c9c1761ae290dfec820c2ce59aa021d",
     "docs/science/sci-p02-initial-policy/pull-exposure-01/overlay.v1.json": "7aa247871658d62a00f02836e768d1bdc3ff3aa248f236660ab99efa2dbc75a1",
-    "docs/science/sci-p02-initial-policy/stage2-v3/authority/ADMISSION.md": "868df25e35965d1bc8d67ccc4d5beb27cb175828804c32a8bae252fdda3f8f49",
-    "docs/science/sci-p02-initial-policy/stage2-v3/authority/PROTOCOL.md": "e7fc1ea5d7decf0a4324b1b956b22d77d4a42f123cac8e12e70c61ecc698b0ce",
+    "docs/science/sci-p02-initial-policy/stage2-v3/authority/ADMISSION.md": "5c20255f3b078807e1b950a4036c934a78a360977c14fe3581480b54e50e710e",
+    "docs/science/sci-p02-initial-policy/stage2-v3/authority/PROTOCOL.md": "d333bb6d5fd9f8ae69247ff0dd4bd09fab54bf9f78d0ee5ffd59b736e273a3e8",
+    "docs/science/sci-p02-initial-policy/stage2-v3/authority/SCI_REVIEW.md": "2065d9e12262f22d1c4959dd5118ffbdff2f373ced1b7cfd5d0253b170bf8ca1",
     "docs/science/sci-p02-initial-policy/v1/policy.json": "8aef079da6a15298bfa2ec1bdec1b417588b6f535224c61afb2f50f98612dfb4",
     "docs/science/sci-p02-initial-policy/v1/producer-fixtures.json": "db31e5f0d247f72b54c52d681c04fb2ea319d6a7e68091f5dd905447afb278a1",
     "docs/strategy/AUREN_CALIBRATION_SYSTEM.md": "fcf7a3466903685d5a8a886ed64a3e7688ace69e851276099a2160348f69bf1b",
@@ -40,6 +41,8 @@
     "tools/science_initial_policy/producer.py": "c50bfab2c41bfbc12e00038aaf6db94deaf7ceaddf3050c4ff12b16b48835c67",
     "tools/science_initial_policy/pull_exposure.py": "5999e3eaf188601e7d115a8c0a9616dbfce0a6711d03e3d19fa565a9f835c5a9",
     "tools/science_initial_policy/registry.py": "b693e527b83561099e5b5bf8c3eee85ab27fd49387cf66e3abadf5c8fee4924d",
-    "tools/science_initial_policy/time_feasibility.py": "0e5e7344c7fa50a037cd7083b82e20f8bf782cffbd3e28b63a4536ed0e581be6"
+    "tools/science_initial_policy/time_feasibility.py": "0e5e7344c7fa50a037cd7083b82e20f8bf782cffbd3e28b63a4536ed0e581be6",
+    "tools/science_initial_policy/v3_producer.py": "056b094eebc42dd9aedaaa924df2c0c29b5cef22db805cfefc0cb361b17b3427",
+    "tools/science_initial_policy/v3_validation.py": "b9facc8f6ef9a91b016d584d0143bb6ab4a047597ea04f08ed86280514038ccc"
   }
 }

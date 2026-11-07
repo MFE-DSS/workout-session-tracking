@@ -84,6 +84,26 @@ def _assessment(req):
     return assess_inputs(req.blueprint, used), used
 
 
+def _qualified_order(ep, trial):
+    current = [e for e in ep.events if _current(e, ep.started_at)]
+    contexts = [
+        e
+        for e in current
+        if e.kind == "CONTEXT_CONFIRMED"
+        and e.sequence < trial.sequence
+        and e.setting == trial.setting
+    ]
+    starts = [e.sequence for e in current if e.kind == "FAMILIARIZATION_STARTED"]
+    if any(sequence > trial.sequence for sequence in starts):
+        return False
+    latest_start = max(starts, default=-1)
+    familiar = trial.familiarization_confirmed is True or any(
+        e.kind == "FAMILIARIZATION_CONFIRMED" and latest_start < e.sequence < trial.sequence
+        for e in current
+    )
+    return bool(contexts) and familiar
+
+
 def _prescription(req, spec, registry):
     identity = spec["candidate_id"]
     matches = [e for e in req.episodes if e.context.canonical_exercise_id == identity]
@@ -134,7 +154,8 @@ def _prescription(req, spec, registry):
         key=lambda e: e.sequence,
     )
     if (
-        not _current(trial, ep.started_at)
+        not _qualified_order(ep, trial)
+        or not _current(trial, ep.started_at)
         or trial.provenance.origin != "USER_OBSERVED"
         or not accepted
     ):

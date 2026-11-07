@@ -1,19 +1,19 @@
 {
   "admission": {
-    "decision_ref": null,
+    "decision_ref": "docs/science/sci-p02-initial-policy/stage2-v3/authority/ADMISSION.md",
     "gates": {
-      "C1": "PENDING_REVIEW",
-      "C2": "PENDING_REVIEW",
-      "C3": "PENDING_REVIEW",
-      "C4": "PENDING_REVIEW",
-      "C5": "PENDING_REVIEW",
-      "C6": "PENDING_REVIEW"
+      "C1": "ADMITTED_WITH_LIMITS",
+      "C2": "ADMITTED_WITH_LIMITS",
+      "C3": "ADMITTED_WITH_LIMITS",
+      "C4": "ADMITTED_WITH_LIMITS",
+      "C5": "ADMITTED_WITH_LIMITS",
+      "C6": "EXPLORATION_POLICY_ADMITTED"
     },
-    "review_ref": null,
-    "state": "CANDIDATE"
+    "review_ref": "docs/science/sci-p02-initial-policy/stage2-v3/authority/SCI_REVIEW.md",
+    "state": "ADMITTED"
   },
   "binding_ref": "initial-plan-v3-binding/1.0.0",
-  "binding_status": "CANDIDATE",
+  "binding_status": "ACTIVE",
   "dose": {
     "evidence_refs": [
       "EV-01",

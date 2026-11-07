@@ -213,3 +213,77 @@ def test_candidate_cannot_emit_an_authoritative_positive_or_validate_it():
     validator = importlib.import_module("tools.science_initial_policy.v3_validation")
     with pytest.raises(ValueError):
         validator.validate_admitted_exchange_v3(request(r), {}, r)
+
+
+def bad_phase_order(raw, change):
+    ep = raw["episodes"][0]
+    events = {e["kind"]: e for e in ep["events"]}
+    started = copy.deepcopy(events["FAMILIARIZATION_CONFIRMED"])
+    started.update(event_id="synthetic:late-familiarization-start", kind="FAMILIARIZATION_STARTED")
+    events["FAMILIARIZATION_STARTED"] = started
+    orders = {
+        "late_familiarization": [
+            "CONTEXT_CONFIRMED",
+            "ATTEMPT_OBSERVED",
+            "FAMILIARIZATION_CONFIRMED",
+            "SETTING_ACCEPTED",
+        ],
+        "late_context": [
+            "FAMILIARIZATION_CONFIRMED",
+            "ATTEMPT_OBSERVED",
+            "CONTEXT_CONFIRMED",
+            "SETTING_ACCEPTED",
+        ],
+        "restart_after_trial": [
+            "CONTEXT_CONFIRMED",
+            "FAMILIARIZATION_CONFIRMED",
+            "ATTEMPT_OBSERVED",
+            "FAMILIARIZATION_STARTED",
+            "SETTING_ACCEPTED",
+        ],
+        "restart_before_trial": [
+            "CONTEXT_CONFIRMED",
+            "FAMILIARIZATION_CONFIRMED",
+            "FAMILIARIZATION_STARTED",
+            "ATTEMPT_OBSERVED",
+            "SETTING_ACCEPTED",
+        ],
+    }
+    ep["events"] = [events[kind] for kind in orders[change]]
+    for seq, e in enumerate(ep["events"], 1):
+        e["sequence"] = seq
+        stamp = f"2026-11-07T11:{seq:02}:00Z"
+        e["provenance"]["recorded_at"] = stamp
+        if e["provenance"]["measured_at"] is not None:
+            e["provenance"]["measured_at"] = stamp
+    return raw
+
+
+@pytest.mark.parametrize(
+    "change",
+    ["late_familiarization", "late_context", "restart_after_trial", "restart_before_trial"],
+)
+def test_phase_qualification_cannot_be_retroactive_or_survive_restart(change):
+    r = load_v3_registry()
+    raw = bad_phase_order(request(r), change)
+    result = api().compile_plan_v3(raw, r)
+    assert result.plan is None
+    assert any(issue.gate_ref == "C3" for issue in result.issues)
+
+
+@pytest.mark.parametrize(
+    "change",
+    ["late_familiarization", "late_context", "restart_after_trial", "restart_before_trial"],
+)
+def test_validator_independently_rejects_retroactive_qualification(change):
+    from tools.science_contracts.blueprint_first_plan_v3 import validated_request
+    from tools.science_initial_policy.v3_validation import _observed_slot
+
+    r = load_v3_registry()
+    raw = request(r)
+    good = api().compile_plan_v3(raw, r)
+    req = validated_request(bad_phase_order(raw, change))
+    with pytest.raises(ValueError):
+        _observed_slot(
+            req, good.plan.sessions[0].slots[0], r.policy["selection"][0], "session-1", 0, r
+        )

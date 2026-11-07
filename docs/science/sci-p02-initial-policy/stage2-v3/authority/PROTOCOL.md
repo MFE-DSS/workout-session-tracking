@@ -1,6 +1,6 @@
 # Protocole de qualification observée —1.0.0
 
-Candidat sous décisions reçues, revue SCI effective encore pending. Mode positif OBSERVED_SETTING uniquement.
+Admis avec limites sous les décisions opérateur et la revue SCI_REVIEW.md. Mode positif OBSERVED_SETTING uniquement.
 
 
 **FAMILIARIZE.** Identifier réalisation, dispositif, unités et côté, lire/obtenir les instructions de manipulation spécifiques et établir une position/trajectoire compréhensibles. Le premier réglage est choisi/observé par l’utilisateur dans ce qu’il peut manipuler avec contrôle ; aucune valeur issue du poids, sexe, expérience ou autre exercice. Si les instructions/manipulations sont inconnues, demander assistance/revue/substitution. Le plan bootstrap peut être proposé avant familiarisation ; il ne permet pas de sauter cette phase avant essai ou travail.
