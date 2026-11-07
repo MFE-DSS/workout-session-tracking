@@ -1,6 +1,6 @@
 # C3/C6 — livraison du contrat v3 isolé
 
-7 novembre 2026. **Stage1 implémenté ; publication et revues finales en cours. NOT_ADMITTED / NOT_SERVED.** Autorisation : « Valider v3 et ce build isolé ». Base a5720797f14902bf7ef7248765ae716f107113b0. Aucun READY réel, binding ou producteur positif.
+7 novembre 2026. **Stage1 implémenté et revu ; CI finale en cours. NOT_ADMITTED / NOT_SERVED.** Autorisation : « Valider v3 et ce build isolé ». Base a5720797f14902bf7ef7248765ae716f107113b0. Aucun READY réel, binding ou producteur positif.
 
 ## Brainstorming / Options / Risques / Choix retenu
 
@@ -20,4 +20,19 @@ Les cinq faits minimaux restent objectif/population/cadence/budgets/limitations 
 
 ## Vérification en cours
 
-58 nouveaux cas passants à la réalisation, avec deux avertissements de dépendances. Les résultats finaux, revues, SHA, CI et Sonar sont ajoutés au reçu de publication après leur exécution réelle ; aucune réussite distante anticipée.
+**73 nouveaux cas passants**, broad ciblé **510 tests / 15 modules**, deux avertissements de dépendances. Ruff fichiers neufs/budget264≤548, Bandit ciblé, protocole, OpenSpec strict11/11, artefacts et intégrité historique passants. Gitleaks vérifié sur les commits de livraison. Pas de sweep complet local, tier ISOLATED.
+
+Revues fraîches code et SCI distinctes : quatre Important code dont un commun à SCI, corrigés dans une passe RED→GREEN (14 cas rouges, puis 15 verts incluant un témoin cohérent). Suite73/73 et broad510/510 repassés. Aucun Critical ou mineur de revue. Copies natives revalidées sans coercition JSON des booléens, contexte complet avant transition, borne haute supportée strictement supérieure aux repos connus et structure inconnue conservée sans champ de structure dans PlanV2. V1/v2 inchangés.
+
+La PR373 et le closeout consignent HEAD, CI et Sonar après exécution réelle ; aucun résultat distant anticipé.
+
+## Décisions d’exécution et limites de revue
+
+- Exécuter le design explicitement approuvé et le GO MERGE permanent sans nouvelle question : coût en cas d’erreur, maintenir toute capacité publique inactive et revoir toute extension substantielle.
+- Séparer empreintes faits/observations/évaluation et plan+temps pour éviter une reconnaissance circulaire : coût en cas d’erreur, refus des références incohérentes plutôt qu’autorité inventée.
+- Stage1 représente revue/transition/protocole et diagnostic structurel existant, sans nouvel algorithme d’ajustement ou moteur négatif : coût, admission et vrai producteur restent étape2.
+- Les reviewers ne certifient ni C1–C6 positifs ni authentification/UI/transport ; leur absence est la frontière étape2/PLAN, pas une omission du contrat. Coût, aucun raccordement positif sans preuve/scope ultérieurs.
+- Les validateurs historiques sont des dépendances pinées, sans corrections étrangères au périmètre : coût, tests d’intégration futurs requis avant runtime.
+- CI/Sonar/canonique/cleanup sont vérifiés par l’agent de livraison, pas par les reviewers : coût, arrêt et conservation des preuves si ces conditions échouent.
+
+Aucun mineur de revue différé. Les remarques Sonar éventuelles restent une catégorie de qualité séparée. La revue SCI est une cohérence de contrat, pas une nouvelle revue systématique, validation biologique/personnelle ou borne temporelle réelle.

@@ -379,3 +379,36 @@ def test_v3_artifacts_are_reproducible_and_all_actual_exchange_examples_remain_d
         == "initial-calibration-protocol/2.0.0"
     )
     assert outputs == module.artifacts()
+
+
+@pytest.mark.parametrize("side", ["BILATERAL", "LEFT"])
+def test_real_negative_exchange_keeps_absent_structure_unknown(side, authority):
+    import runpy
+
+    from tools.science_contracts.bootstrap_protocol_v3 import assess_structural_time
+    from tools.science_initial_policy.calibration_time_contracts import ContextKey, context_digest
+
+    old = runpy.run_path(str(ROOT / "tests/test_science_blueprint_first_plan_v2_contracts.py"))
+    raw = request()
+    raw["episodes"][0]["context"]["side"] = side
+    fp = context_digest(ContextKey.model_validate(raw["episodes"][0]["context"]))
+    for event in raw["episodes"][0]["events"]:
+        event["context_fingerprint"] = fp
+    raw["blueprint"]["session_budgets_minutes"]["value"] = [2, 2]
+    plan = old["observed_plan"](raw, authority)
+    session = plan["sessions"][0]
+    session["duration"]["budget_minutes"] = 2
+    source = {
+        "session_id": session["session_id"],
+        "slots": [{"prescription": s["prescription"]["dose"]} for s in session["slots"]],
+    }
+    time = assess_structural_time(source, budget_minutes=2, structure="UNKNOWN_STRUCTURE")
+    out = response(raw)
+    out.update(
+        candidate_plan=plan,
+        time_assessments=[time.model_dump(mode="json")],
+        plan_time_fingerprint=api().plan_time_fingerprint(plan, [time]),
+    )
+    value = api().validate_exchange(raw, out, **authority)
+    assert value.time_assessments[0].state == "BUDGET_UNCERTAIN"
+    assert value.time_assessments[0].known_rest_floor_seconds is None

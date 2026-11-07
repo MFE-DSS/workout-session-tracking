@@ -215,3 +215,86 @@ def test_future_device_order_is_not_an_available_current_transition():
     cls = api().SettingTransitionV3
     with pytest.raises(ValueError):
         cls.model_validate(raw)
+
+
+@pytest.mark.parametrize("case", ["nested_nan", "copied_infinity", "nested_bool", "copied_context"])
+def test_typed_trial_revalidates_unchecked_copied_models(case):
+    cls = api().TrialReviewV3
+    valid = cls.model_validate(trial())
+    raw = trial()
+    if case == "nested_nan":
+        raw["setting"] = valid.setting.model_copy(update={"value": float("nan")})
+    elif case == "copied_infinity":
+        raw = valid.model_copy(update={"reported_rir": float("inf")})
+    elif case == "nested_bool":
+        raw["setting"] = valid.setting.model_copy(update={"value": True})
+    else:
+        raw["context"] = valid.context.model_copy(update={"side": "IMPOSSIBLE"})
+    with pytest.raises(ValueError):
+        cls.model_validate(raw)
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("canonical_exercise_id", None),
+        ("context_ref", None),
+        ("equipment_ref", None),
+        ("realization_ref", None),
+        ("side", "UNKNOWN"),
+    ],
+)
+def test_numeric_transition_requires_exact_identified_context(field, value):
+    raw = transition()
+    raw["context"][field] = value
+    cls = api().SettingTransitionV3
+    with pytest.raises(ValueError):
+        cls.model_validate(raw)
+    raw.update(direction="NONE", chosen_setting=None)
+    assert cls.model_validate(raw).direction == "NONE"
+
+
+@pytest.mark.parametrize("upper", [60.0, 1200.0, 1201.0])
+def test_supported_duration_cannot_contradict_known_rest_floor(upper):
+    raw = dict(
+        session_id="s",
+        state="SUPPORTED",
+        known_rest_floor_seconds=1200.0,
+        duration=dict(
+            state="SUPPORTED",
+            budget_minutes=75,
+            lower_seconds=1.0,
+            upper_seconds=upper,
+            unit="seconds",
+            basis_kind="ADMITTED_PRODUCT_CONVENTION",
+            basis_ref="HYPOTHETICAL_NOT_ADMITTED",
+            basis_version="test-v1",
+            scope_fingerprint="0" * 64,
+            applicability_ref="HYPOTHETICAL_SCOPE",
+            covers_bootstrap=True,
+            coverage=["WORK", "REST", "PREPARATION_CALIBRATION", "SETUP_TRANSITION"],
+            evidence_refs=["EV-71"],
+            limitations=["Shape only."],
+        ),
+        unknown_components=[],
+        policy_ref="HYPOTHETICAL_POLICY",
+        assumption_refs=[],
+        limitations=["Not admitted."],
+    )
+    cls = api().TimeAssessmentV3
+    if upper <= 1200:
+        with pytest.raises(ValueError):
+            cls.model_validate(raw)
+    else:
+        assert cls.model_validate(raw).duration.upper_seconds == upper
+
+
+def test_absent_structure_never_invents_sequential_rest_floor():
+    session = {
+        "session_id": "s",
+        "slots": [{"prescription": {"work_sets": 2, "rest_seconds": 120}}],
+    }
+    value = api().assess_structural_time(session, budget_minutes=2)
+    assert value.state == "BUDGET_UNCERTAIN"
+    assert value.known_rest_floor_seconds is None
+    assert "STRUCTURE_UNSUPPORTED" in value.unknown_components

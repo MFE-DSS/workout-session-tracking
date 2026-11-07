@@ -14,16 +14,15 @@
 ## Après décision, hors préparation actuelle
 - [x] Recevoir approbation du contrat v3, du protocole borné et de la permission produit TIME_UNCERTAIN, avec statut/versions/auteurs explicites.
 - [x] Faire approuver le GO BUILD étape1 avant modèles/schémas/validations/tests successeurs ; v1/v2 et client préservés.
-- [ ] Obtenir admission formelle C1–C6/bundle exact, instructions C3 et règles de retrait avant binding/producteur positif séparément autorisé.
-- [ ] Produire une vraie sortie positive seulement depuis le producteur réel sous toutes gates du nouveau contrat ; aucune fixture synthétique promue.
-- [ ] Livrer négociation/snapshot/handoff dans PLAN après son propre GO ; aucune API/UI ou collecte activée ici.
+Les critères positifs restent ouverts et transférés à [la suite explicite](../../../docs/science/sci-p02-initial-policy/c3-c6-admission-pack-01/NEXT_ADMISSION_BOUNDARY.md), sans GO BUILD.
 
 ## Build étape1 autorisé — « Valider v3 et ce build isolé »
 - [x] Types purs C3 et diagnostic temporel structurel, sans réglage ou durée inventés.
 - [x] Contrat v3 séparant science/temps/permission, empreintes et reconnaissance liée au plan.
 - [x] Frontière d’échange sur le vrai registre vide ; toutes sorties positives refusées.
 - [x] Cinq schémas, neuf exemples négatifs, protocole typé et manifestes reproductibles.
-- [ ] Broad ciblé, revues code/SCI, publication/CI du HEAD final.
+- [x] Broad ciblé et revues code/SCI ; quatre Important corrigés RED→GREEN.
+- [ ] Publication/CI du HEAD final.
 - [ ] Merge, CI canonique, archive/closeout du seul stage1 et nettoyage propre.
 
 Les trois critères positifs ci-dessus sont transférés sans succès à la proposition de suite ; ils ne font pas partie des critères COMPLETE de ce build de contrat.

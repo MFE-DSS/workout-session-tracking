@@ -30,21 +30,21 @@ from tools.science_contracts.bootstrap_protocol_v3 import (
     SettingTransitionV3,
     TimeAssessmentV3,
     TrialReviewV3,
+    V3Record,
     assess_structural_time,
+    strict_record,
 )
 from tools.science_contracts.first_plan_v2_validation import (
     validate_exchange as validate_v2_negative,
 )
 from tools.science_initial_policy.admission_registry import assert_trusted_admission_registry
 from tools.science_initial_policy.calibration_time_contracts import (
-    Record,
     content_digest,
-    normalized_record,
 )
 from tools.science_initial_policy.v2_registry import assert_trusted
 
 
-class TimeAcknowledgmentV3(Record):
+class TimeAcknowledgmentV3(V3Record):
     kind: Literal["TIME_UNCERTAINTY_ACK"]
     subject_ref: Text
     snapshot_ref: Text
@@ -58,7 +58,7 @@ class TimeAcknowledgmentV3(Record):
 
 
 def _legacy_request(raw) -> FirstPlanRequestV2:
-    value = normalized_record(raw)
+    value = strict_record(raw)
     value.pop("acknowledgment", None)
     value["contract_version"] = "first-plan-request/2.0.0"
     return FirstPlanRequestV2.model_validate(value)
@@ -80,6 +80,13 @@ def _observations(legacy) -> str:
 
 
 class FirstPlanRequestV3(FirstPlanRequestV2):
+    model_config = V3Record.model_config
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalized_input(cls, value):
+        return strict_record(value)
+
     contract_version: Literal["first-plan-request/3.0.0"]
     acknowledgment: TimeAcknowledgmentV3 | None
 
@@ -111,7 +118,7 @@ class FirstPlanRequestV3(FirstPlanRequestV2):
 
 
 def validated_request(raw) -> FirstPlanRequestV3:
-    return FirstPlanRequestV3.model_validate(normalized_record(raw))
+    return FirstPlanRequestV3.model_validate(strict_record(raw))
 
 
 def request_fingerprint(raw) -> str:
@@ -136,8 +143,8 @@ def evaluation_fingerprint(raw) -> str:
 
 
 def plan_time_fingerprint(plan, time_assessments) -> str:
-    value = PlanV2.model_validate(normalized_record(plan))
-    times = [TimeAssessmentV3.model_validate(normalized_record(t)) for t in time_assessments]
+    value = PlanV2.model_validate(strict_record(plan))
+    times = [TimeAssessmentV3.model_validate(strict_record(t)) for t in time_assessments]
     ids = [t.session_id for t in times]
     if len(set(ids)) != len(ids) or set(ids) != {s.session_id for s in value.sessions}:
         raise ValueError("time assessments must belong exactly to the plan sessions")
@@ -152,7 +159,7 @@ def plan_time_fingerprint(plan, time_assessments) -> str:
     )
 
 
-class FirstPlanRecommendationV3(Record):
+class FirstPlanRecommendationV3(V3Record):
     contract_version: Literal["first-plan-recommendation/3.0.0"]
     subject_ref: Text
     snapshot_ref: Text
@@ -302,7 +309,7 @@ def validate_exchange(
     assert_trusted(trusted_bundle)
     assert_trusted_admission_registry(admission_registry)
     req = validated_request(request)
-    out = FirstPlanRecommendationV3.model_validate(normalized_record(response))
+    out = FirstPlanRecommendationV3.model_validate(strict_record(response))
     if (out.request_fingerprint, out.observation_fingerprint, out.full_evaluation_fingerprint) != (
         request_fingerprint(req),
         observation_fingerprint(req),

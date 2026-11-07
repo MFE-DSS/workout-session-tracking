@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from math import isfinite
 from typing import Literal, Self
 
-from pydantic import AwareDatetime, model_validator
+from pydantic import AwareDatetime, BaseModel, ConfigDict, model_validator
 
 from tools.science_contracts.blueprint_first_plan_v1 import PositiveInt, Provenance, Text
 from tools.science_contracts.blueprint_first_plan_v2 import DurationV2, UnknownDuration
@@ -17,17 +18,45 @@ from tools.science_initial_policy.calibration_time_contracts import (
     _check_setting_context,
     _check_time,
     content_digest,
-    normalized_record,
 )
 from tools.science_initial_policy.time_feasibility import assess_time
 
 
-class ProtocolStepV3(Record):
+def strict_record(value):
+    """Preserve native scalar types when unpacking unchecked Pydantic copies.
+
+    JSON serialization can coerce a copied bool into a float before validation.
+    """
+    if isinstance(value, BaseModel):
+        value = dict(value)
+    if isinstance(value, dict):
+        return {key: strict_record(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [strict_record(item) for item in value]
+    if isinstance(value, float) and not isfinite(value):
+        raise ValueError("nonfinite values are not observations")
+    return value
+
+
+class V3Record(Record):
+    """Revalidate copied/nested historical records without changing their pins."""
+
+    model_config = ConfigDict(
+        extra="forbid", frozen=True, allow_inf_nan=False, revalidate_instances="always"
+    )
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalized_input(cls, value):
+        return strict_record(value)
+
+
+class ProtocolStepV3(V3Record):
     kind: Literal["FAMILIARIZE", "TRIAL", "OBSERVE", "DECIDE"]
     instruction_ref: Text
 
 
-class CalibrationProtocolV3(Record):
+class CalibrationProtocolV3(V3Record):
     contract_version: Literal["initial-calibration-protocol/2.0.0"]
     protocol_ref: Text
     source_ref: Text
@@ -42,7 +71,7 @@ class CalibrationProtocolV3(Record):
         return self
 
 
-class TrialReviewV3(Record):
+class TrialReviewV3(V3Record):
     protocol_version: Literal["initial-calibration-review/2.0.0"]
     subject_ref: Text
     event_id: Text
@@ -127,7 +156,7 @@ class TrialReviewV3(Record):
         return self
 
 
-class SettingTransitionV3(Record):
+class SettingTransitionV3(V3Record):
     as_of: AwareDatetime
     context: ContextKey
     observed_setting: Setting
@@ -156,7 +185,20 @@ class SettingTransitionV3(Record):
             or p.acquisition not in {"DECLARED", "DEVICE_MEASURED", "EXECUTION_LOG"}
         ):
             raise ValueError("device effort order requires its direct source")
-        if self.context.load_semantics == "UNKNOWN" or self.chosen_setting is None:
+        if (
+            self.context.load_semantics == "UNKNOWN"
+            or self.context.side == "UNKNOWN"
+            or any(
+                getattr(self.context, field) is None
+                for field in (
+                    "canonical_exercise_id",
+                    "context_ref",
+                    "equipment_ref",
+                    "realization_ref",
+                )
+            )
+            or self.chosen_setting is None
+        ):
             raise ValueError("unknown load meaning cannot authorize a numerical transition")
         _check_setting_context(self.chosen_setting, self.context)
         ids = [content_digest(s.model_dump(mode="json")) for s in self.available_in_effort_order]
@@ -181,7 +223,7 @@ class SettingTransitionV3(Record):
         return self
 
 
-class TimeAssessmentV3(Record):
+class TimeAssessmentV3(V3Record):
     session_id: Text
     state: Literal[
         "SUPPORTED",
@@ -208,6 +250,7 @@ class TimeAssessmentV3(Record):
                 self.duration.state != "SUPPORTED"
                 or self.policy_ref is None
                 or self.duration.upper_seconds > self.duration.budget_minutes * 60
+                or (floor is not None and self.duration.upper_seconds <= floor)
                 or self.unknown_components
             ):
                 raise ValueError("supported time requires full applicable evidence within budget")
@@ -227,10 +270,13 @@ class TimeAssessmentV3(Record):
 
 
 def assess_structural_time(
-    session: dict, *, budget_minutes: int, structure: str = "TRADITIONAL_SEQUENTIAL"
+    session: dict, *, budget_minutes: int, structure: str = "UNKNOWN_STRUCTURE"
 ) -> TimeAssessmentV3:
-    """Map the existing partial diagnostic; never derive positive fit or a duration."""
-    raw = normalized_record(session)
+    """Map the partial diagnostic only under explicit structural applicability.
+
+    A plan with no structure field cannot silently become sequential.
+    """
+    raw = strict_record(session)
     result = assess_time(raw, budget_minutes, structure)
     return TimeAssessmentV3(
         session_id=raw["session_id"],

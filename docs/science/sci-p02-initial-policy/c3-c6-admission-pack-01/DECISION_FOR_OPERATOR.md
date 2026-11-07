@@ -1,3 +1,5 @@
+> **Décision reçue : « Valider v3 et ce build isolé ».** Ce tableau conserve les options soumises avant acceptation. V3 et permission temporelle conditionnelle sont acceptés ; le stage1 seul est en réalisation, sans preuve ni admission positive. Voir [livraison](DELIVERY.md).
+
 # C3/C6 — décision concrète avant le prochain build
 
 **PROPOSED / NO_NEW_GO_BUILD — 7 novembre 2026.** Le paquet scientifique est conservé ; ce tableau ne transforme pas ses recommandations en approbations produit ou en preuve scientifique.

@@ -13,7 +13,7 @@
     "docs/science/sci-p01-p02/v3/TrialReview.v3.schema.json": "6c5b8e7fb6f267525b2226c2d50470caca209250106656fdfafa3e9c405b4b2a",
     "docs/science/sci-p01-p02/v3/contract-fixtures.v3.json": "c2b7160af73000a621e2d88cb569ae592c214552bdf24a216ed406677d6e4a53",
     "docs/science/sci-p01-p02/v3/protocol-example.v3.json": "c599d3ce39c9be29e6d97c1db09d5ffbbee0a36272a3c099aa785aa639e91c08",
-    "docs/science/sci-p01-p02/v3/source-manifest.v3.json": "6b5360f40cf474063e26b198b4a7c95ae30b4b7cfa32c96b7b5b5cf3d487108e"
+    "docs/science/sci-p01-p02/v3/source-manifest.v3.json": "e6cf828a859a378744168d9e58a014a71704d7ea390b9ba3cdd83608725de326"
   },
   "version": "first-plan-contract-artifacts/3.0.0"
 }
