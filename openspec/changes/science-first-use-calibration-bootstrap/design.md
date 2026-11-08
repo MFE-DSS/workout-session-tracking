@@ -1,0 +1,53 @@
+# Design — entrée de premier calibrage, sans charge connue
+
+## Context
+Base d7de8aa02248c63d8914fb69f8c4c8a9fd980ee0 ; préparation uniquement. Les décisions/manifeste conjoint et l'admission V3 livrée sont conservés. Sources précises : authority/PROTOCOL.md, registry.v1.json, v3_producer._prescription/_qualified_order, admission_calibration.calibrate_for_admission, load_calibration.calibrate, calibration_time_contracts et bootstrap_protocol_v3. Le diagnostic de calibrage seul est moins strict que la qualification du producteur : on ne doit pas le promouvoir directement.
+
+## Brainstorming / Options / Risques / Choix retenu
+1. Exiger sept observations avant toute interaction : confond plan et acquisition, empêche le premier usage.
+2. Estimer une charge ou adapter automatiquement une rampe : preuve et politique absentes, rejeté.
+3. Rencontre distincte, un contexte à la fois, choix humain réel et qualification existante : retenu comme proposition. Le premier pilote est une seule réalisation bilatérale curée ; coûts assumés : disponibilité/instructions réelles et éventuelle assistance restent nécessaires, six autres accompagnements de premier usage restent à admettre.
+Cette portée est un choix proposé par l'agent, pas une acceptation opérateur ou une garantie médicale.
+
+## Minimal inputs and permission
+L'ouverture de l'aide ou de la collecte n'exige aucun réglage, aucune expérience, ni cadence/budgets complets du futur plan. Sujet opaque fourni par PLAN, encounter_ref, as_of, révision et faits connus/inconnus suffisent pour rendre CALIBRATION_REQUIRED et les manques. Objectif/cadence/budgets restent nécessaires au plan seulement.
+
+Avant une consigne d'exploration physique du pilote : adulte non clinique déclaré, réponse explicite sur limitations (vide dans ce périmètre limité), absence de préoccupation non résolue ou prédécesseur bloqué, contexte actuel disponible et qualifié pour cette réalisation, instructions spécifiques identifiées/obtenues et comprises. Ni déclaration adulte ni absence de limitation n'est un examen médical. Poids/taille/sexe/expérience/historique et inventaire global ne sont pas requis.
+
+Le choix du réglage n'est pas requis pour OUVRIR ni pour expliquer l'installation. Avant essai avec résistance, une action humaine confirme un réglage réellement présent et sa signification. On ne suggère pas zéro, le premier cran, la charge minimale, 1RM ou un kg universel. Si la personne ne sait pas manipuler/choisir/contrôler, l'action est assistance/revue/sortie ; une interface ne remplace pas les instructions du dispositif. Une aide humaine est sourcée comme telle, sans diplôme ou supervision vérifiés inventés.
+
+## State machine and precedence
+Le résultat sépare `state`, `phase`, `allowed_actions` et `missing_or_blocking_reasons` ; tous les états restent CALIBRATION_ACTIVITY, jamais SCIENTIFICALLY_READY ou permission de série de travail.
+
+CALIBRATION_REQUIRED → SUPPORTED_INITIAL_EXPLORATION (installation/familiarisation seulement si préconditions) → OBSERVED (tentative réelle) → QUALIFIED (qualification C3 exacte et acceptation courante). Missing contexte/instructions/setting bloque seulement l'action qui les consomme. Une familiarisation déclarée ne devient pas réussite d'essai. OBSERVED peut contenir une tentative volontairement incomplète/hors plage sans la qualifier. Un arrêt volontaire ou temporel non préoccupant n’est pas successful=False : completed=False et successful=null, avec qualité/gêne explicitement acceptables ; la raison est conservée. successful=False/FAILURE, concern ou qualité/gêne inconnues demandent revue. Aucune donnée préoccupante n’est remplacée par null pour permettre un nouvel essai.
+
+Priorité : autorité non admise/retirée ferme les consignes ; préoccupation/échec ou qualité/gêne inconnues sur tentative impose CONCERN_REVIEW ; retrait utilisateur rend WITHDRAWN ; matériel explicitement indisponible rend UNAVAILABLE ; manques non préoccupants rendent INSUFFICIENT_EVIDENCE/CALIBRATION_REQUIRED selon activité ouverte. Tous faits restent visibles. Un retrait n'efface pas une préoccupation et ne permet pas de la contourner en créant un nouvel encounter.
+
+Phases : IDENTIFY → FAMILIARIZE → TRIAL → OBSERVE → DECIDE. Pas de nouvelle dose de familiarisation : pas de nombre de répétitions/séries/minutes universel, pas de recherche d'échec. Pour une tentative visant la qualification ultérieure, exposer comme convention la fenêtre C3 existante 8–12 et l'effort subjectif avec réserve ; arrêt libre prioritaire, ne jamais pousser à atteindre huit malgré gêne/perte de contrôle. Une tentative plus courte reste un fait utile. Le RIR peut rester inconnu ; réussite dans la fenêtre n'est pas 2RIR mesurés.
+
+Les permissions INITIATE_FAMILIARIZATION/INITIATE_TRIAL sont distinctes de RECORD_TRIAL, qui enregistre seulement le passé. INITIATE_TRIAL exige toutes préconditions et réglage/familiarisation effectifs ; sans réglage, seule la familiarisation applicable peut être initiée. Après OBSERVED, un nouvel essai sans préoccupation exige décision humaine, familiarisation/contexte encore applicables et réglage confirmé ; ni augmentation ni direction numérique ne sont calculées. Repos et reprise sont contextuels, aucune minuterie ou durée supportée universelle. Fatigue/maîtrise insuffisante => pause/sortie/revue, pas règle de progression. Après concern/échec/inconnus de qualité ou gêne : aucun retry autorisé par ce scope, même dans une nouvelle session. Une nouvelle politique de reprise serait nécessaire.
+
+## Candidate and qualification bridge
+Pilote `leg-extensions-assises` : réalisation exacte de registry.v1.json ; confirmer station, mécanisme/affichage/unité, siège/axe/coussin et amplitude manipulable/compréhensible selon instructions réelles. Pas de machine automatiquement adaptée aux débutants, pas de garantie d'absence de risque. Bilatéral uniquement. MACHINE_DISPLAY_KG, NON_MASS_SETTING ou TOTAL_EXTERNAL seulement si leur sémantique est effectivement établie ; jamais convertir l'affichage machine en masse externe totale. Assistance/BODYWEIGHT/PER_IMPLEMENT restent hors pilote.
+
+Les autres six lignes du binding sont inventoriées dans le dossier scientifique, sans nouvelle enquête anatomique. Leur admission musculaire et leur qualification observée restent valides dans leurs limites ; ce delta ne leur accorde pas les nouvelles consignes de premier usage.
+
+Réutiliser les modèles et calibrate_for_admission en lecture seule. Le nouveau validateur vérifie indépendamment et strictement les conditions du producteur V3 applicables au slot : même sujet/contexte/réalisation/appareil/côté/unité, disponibilité courante, ledger propriétaire complet, provenance réelle, CONTEXT_CONFIRMED avec réglage avant essai, familiarisation réellement antérieure à l'essai, tentative USER_OBSERVED actuelle, dernière tentative complète/réussie dans la fenêtre et technique/gêne explicites, acceptation ultérieure exacte, aucune préoccupation/prédécesseur bloqué. Ne pas importer un helper privé comme autorité ; tests de parité et test end-to-end via le vrai producteur détectent la divergence.
+
+Le moteur pur ne peut établir la complétude/authenticité du ledger : PLAN doit fournir le périmètre exhaustif de préoccupations/prédécesseurs et le sujet authentifié. Aucune nouvelle rencontre ne peut supprimer une préoccupation. QUALIFIED signifie réglage provisoire pour réessai, pas charge optimale ou aptitude clinique. Un épisode compatible peut être transmis sans réécriture au V3 actuel ; six autres épisodes synthétiques dans le test de pont sont des données explicites de test et ne prouvent pas leur acquisition réelle ou la capacité universelle de ce pilote.
+
+## Contract and authority
+Contrat autonome `first-calibration-encounter/1.0.0`, protocole candidat `initial-calibration-encounter/1.0.0`, sans modifier les contrats V1/V2/V3. Champs détaillés dans CONTRACT_AND_PLAN. Registre nouveau limité à la politique de rencontre, pinant l'autorité V3 réelle et la curation existante ; pas de second registre de plan. Sans décision opérateur + revue SCI effective, état NOT_ADMITTED et aucune action physique positive autoritaire. GO BUILD seul ne crée pas cette admission.
+
+Empreintes : contexte canonique existant ; nouvel encounter_input_digest couvrant sujet/révision/as_of/faits/contrat/politique/observations/retraits et instructions. Digest des instructions/source n'authentifie pas leur auteur ou leur compréhension. Event/encounter IDs stables ; résultat déterministe, pas d'horloge système ni de génération d'événement par évaluation. Même clé/contenu portable, clé divergente rejetée ; persistance/idempotence HTTP restent PLAN.
+
+## Owned implementation after approval
+Nouveaux fichiers `tools/science_calibration_bootstrap/{__init__,contracts,policy,evaluator,validation,artifacts}.py`, deux tests contrats/parité et trajectoires, exports et dossier d'autorité dans ce dossier. Entrées historiques en lecture seule. Pas de shared SDK/API/app/DB/UI, nouvelle version de plan, copie modifiée du registre historique ou réécriture d'anciens hashes.
+
+Les futurs tests couvrent trajectoire positive d'une rencontre, bridge vers le vrai V3, retraits/contexte/chronologie/adversaires/autorité et rejeu historique. Revues SCI/code séparées, tier selon check_scope, CI HEAD et canonique puis merge/closeout sous GO permanent ; activation/recette humaine/PLAN restent séparées. À défaut de preuve d'admission défendable du pilote, pas de nouveau scaffold de refus : consigner le point exact et son responsable.
+
+## Candidate testing is not admission
+
+Avant revue SCI effective, la même fonction pure peut compiler une trajectoire candidate depuis les instructions/règles proposées : artefact `DRAFT_EVALUATION_SYNTHETIC_NOT_AUTHORITY`, avec diagnostic candidat et aucune permission physique autoritaire. L'entrée publique de l'évaluateur conserve NOT_ADMITTED/aucune INITIATE_* tant que le vrai registre de rencontre n'est pas publié. Pas de registre de test ADMITTED, mock d'approbation, deuxième logique de qualification ou promotion d'un preview en résultat servi.
+
+Séquence : tests de cohérence/parité et trajectoire candidate → revue SCI du bundle effectif et décision sur ses limites → publication de la nouvelle autorité si défendable → tests positifs via vrai loader/évaluateur/validateur et pins publiés → revue code/CI/livraison. Le GO opérateur autorise le scope candidat, pas la conclusion scientifique automatique. B04/B13 préadmission portent ce preview explicitement non autoritaire ; le même corpus après admission réelle doit passer par la frontière publique. Si la revue ne permet pas l'admission, aucun positif autoritaire ou build déclaré scientifiquement admis.

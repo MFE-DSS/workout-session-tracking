@@ -1,0 +1,978 @@
+{
+  "artifact_kind": "REAL_EVALUATOR_SYNTHETIC_INPUT_NOT_SERVED",
+  "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
+  "cases": [
+    {
+      "request": {
+        "as_of": "2026-11-07T12:00:00Z",
+        "availability": "AVAILABLE",
+        "concern_state": "CLEAR",
+        "context": {
+          "canonical_exercise_id": "leg-extensions-assises",
+          "context_ref": "gym:test-a",
+          "equipment_ref": "synthetic:device:leg-extensions-assises",
+          "load_semantics": "MACHINE_DISPLAY_KG",
+          "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+          "side": "BILATERAL"
+        },
+        "context_provenance": {
+          "acquisition": "DECLARED",
+          "measured_at": null,
+          "origin": "USER_REPORTED",
+          "recorded_at": "2026-11-07T11:00:00Z",
+          "source_ref": "synthetic:event-0:leg-extensions-assises"
+        },
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "encounter_ref": "synthetic:encounter-a",
+        "episode": null,
+        "ledger_complete": true,
+        "ledger_source_ref": "synthetic:owner-complete-ledger",
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "population": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "preparation": null,
+        "retry_requested": false,
+        "setting_choice": null,
+        "source_revision": "synthetic:source/1",
+        "started_at": "2026-11-07T11:00:00Z",
+        "stop_reasons": {},
+        "subject_ref": "subject:synthetic-a",
+        "withdrawn": false
+      },
+      "result": {
+        "acceptance_event_id": null,
+        "activity_kind": "CALIBRATION_ACTIVITY",
+        "admission": "ADMITTED_WITH_LIMITS",
+        "allowed_actions": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "RECORD_TRIAL",
+          "PAUSE",
+          "WITHDRAW"
+        ],
+        "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
+        "candidate_actions": [],
+        "confidence": "UNKNOWN",
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "duration": "UNKNOWN",
+        "effort_sufficiency": "UNKNOWN",
+        "encounter_ref": "synthetic:encounter-a",
+        "input_digest": "3c7e9cb85d1baa57947d023373699af576bab7fb57e93c2fae412c170db68203",
+        "instruction_refs": [
+          "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/OPERATIONAL_PROTOCOL.md"
+        ],
+        "phase": "IDENTIFY",
+        "policy_ref": "initial-calibration-encounter/1.0.0",
+        "portable_episode": null,
+        "qualified_setting": null,
+        "reasons": [
+          "ACTUAL_INSTRUCTIONS_AND_SETUP_REQUIRED"
+        ],
+        "reference_event_id": null,
+        "source_revision": "synthetic:source/1",
+        "state": "CALIBRATION_REQUIRED",
+        "subject_ref": "subject:synthetic-a"
+      },
+      "scenario": "open"
+    },
+    {
+      "request": {
+        "as_of": "2026-11-07T12:00:00Z",
+        "availability": "AVAILABLE",
+        "concern_state": "CLEAR",
+        "context": {
+          "canonical_exercise_id": "leg-extensions-assises",
+          "context_ref": "gym:test-a",
+          "equipment_ref": "synthetic:device:leg-extensions-assises",
+          "load_semantics": "MACHINE_DISPLAY_KG",
+          "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+          "side": "BILATERAL"
+        },
+        "context_provenance": {
+          "acquisition": "DECLARED",
+          "measured_at": null,
+          "origin": "USER_REPORTED",
+          "recorded_at": "2026-11-07T11:00:00Z",
+          "source_ref": "synthetic:event-0:leg-extensions-assises"
+        },
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "encounter_ref": "synthetic:encounter-a",
+        "episode": null,
+        "ledger_complete": true,
+        "ledger_source_ref": "synthetic:owner-complete-ledger",
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "population": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "preparation": {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "controlled": true,
+          "instruction_ref": "synthetic:device-instructions",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "setup_ref": "synthetic:seat-axis-pad-fit",
+          "understood": true
+        },
+        "retry_requested": false,
+        "setting_choice": null,
+        "source_revision": "synthetic:source/1",
+        "started_at": "2026-11-07T11:00:00Z",
+        "stop_reasons": {},
+        "subject_ref": "subject:synthetic-a",
+        "withdrawn": false
+      },
+      "result": {
+        "acceptance_event_id": null,
+        "activity_kind": "CALIBRATION_ACTIVITY",
+        "admission": "ADMITTED_WITH_LIMITS",
+        "allowed_actions": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "RECORD_TRIAL",
+          "PAUSE",
+          "WITHDRAW",
+          "INITIATE_FAMILIARIZATION",
+          "CONFIRM_FAMILIARIZATION"
+        ],
+        "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
+        "candidate_actions": [],
+        "confidence": "UNKNOWN",
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "duration": "UNKNOWN",
+        "effort_sufficiency": "UNKNOWN",
+        "encounter_ref": "synthetic:encounter-a",
+        "input_digest": "c19bb9290e930b87478636b2b8c114e0f9c8808a3aff45d919869f85954dde84",
+        "instruction_refs": [
+          "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/OPERATIONAL_PROTOCOL.md",
+          "synthetic:device-instructions",
+          "synthetic:seat-axis-pad-fit"
+        ],
+        "phase": "FAMILIARIZE",
+        "policy_ref": "initial-calibration-encounter/1.0.0",
+        "portable_episode": null,
+        "qualified_setting": null,
+        "reasons": [
+          "SETUP_ONLY_NO_LOADED_TRIAL"
+        ],
+        "reference_event_id": null,
+        "source_revision": "synthetic:source/1",
+        "state": "SUPPORTED_INITIAL_EXPLORATION",
+        "subject_ref": "subject:synthetic-a"
+      },
+      "scenario": "familiarize"
+    },
+    {
+      "request": {
+        "as_of": "2026-11-07T12:00:00Z",
+        "availability": "AVAILABLE",
+        "concern_state": "CLEAR",
+        "context": {
+          "canonical_exercise_id": "leg-extensions-assises",
+          "context_ref": "gym:test-a",
+          "equipment_ref": "synthetic:device:leg-extensions-assises",
+          "load_semantics": "MACHINE_DISPLAY_KG",
+          "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+          "side": "BILATERAL"
+        },
+        "context_provenance": {
+          "acquisition": "DECLARED",
+          "measured_at": null,
+          "origin": "USER_REPORTED",
+          "recorded_at": "2026-11-07T11:00:00Z",
+          "source_ref": "synthetic:event-0:leg-extensions-assises"
+        },
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "encounter_ref": "synthetic:encounter-a",
+        "episode": {
+          "as_of": "2026-11-07T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "leg-extensions-assises",
+            "context_ref": "gym:test-a",
+            "equipment_ref": "synthetic:device:leg-extensions-assises",
+            "load_semantics": "MACHINE_DISPLAY_KG",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "episode_id": "synthetic:episode:leg-extensions-assises",
+          "events": [
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:01:00Z",
+                "source_ref": "synthetic:event-1:leg-extensions-assises"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:02:00Z",
+                "source_ref": "synthetic:event-2:leg-extensions-assises"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:ledger:leg-extensions-assises",
+          "started_at": "2026-11-07T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        },
+        "ledger_complete": true,
+        "ledger_source_ref": "synthetic:owner-complete-ledger",
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "population": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "preparation": {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "controlled": true,
+          "instruction_ref": "synthetic:device-instructions",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "setup_ref": "synthetic:seat-axis-pad-fit",
+          "understood": true
+        },
+        "retry_requested": false,
+        "setting_choice": {
+          "available": true,
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:leg-extensions-assises"
+          },
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          }
+        },
+        "source_revision": "synthetic:source/1",
+        "started_at": "2026-11-07T11:00:00Z",
+        "stop_reasons": {},
+        "subject_ref": "subject:synthetic-a",
+        "withdrawn": false
+      },
+      "result": {
+        "acceptance_event_id": null,
+        "activity_kind": "CALIBRATION_ACTIVITY",
+        "admission": "ADMITTED_WITH_LIMITS",
+        "allowed_actions": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "RECORD_TRIAL",
+          "PAUSE",
+          "WITHDRAW",
+          "INITIATE_FAMILIARIZATION",
+          "CONFIRM_FAMILIARIZATION",
+          "INITIATE_TRIAL"
+        ],
+        "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
+        "candidate_actions": [],
+        "confidence": "UNKNOWN",
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "duration": "UNKNOWN",
+        "effort_sufficiency": "UNKNOWN",
+        "encounter_ref": "synthetic:encounter-a",
+        "input_digest": "9d72e3ad13f8ed6aaa7cfe3c3295f5aae30697cd7dc62019244a9a11e98c3483",
+        "instruction_refs": [
+          "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/OPERATIONAL_PROTOCOL.md",
+          "synthetic:device-instructions",
+          "synthetic:seat-axis-pad-fit"
+        ],
+        "phase": "TRIAL",
+        "policy_ref": "initial-calibration-encounter/1.0.0",
+        "portable_episode": null,
+        "qualified_setting": null,
+        "reasons": [
+          "TRIAL_REQUIRES_CURRENT_SETTING_AND_PRIOR_FAMILIARIZATION"
+        ],
+        "reference_event_id": null,
+        "source_revision": "synthetic:source/1",
+        "state": "SUPPORTED_INITIAL_EXPLORATION",
+        "subject_ref": "subject:synthetic-a"
+      },
+      "scenario": "trial"
+    },
+    {
+      "request": {
+        "as_of": "2026-11-07T12:00:00Z",
+        "availability": "AVAILABLE",
+        "concern_state": "CLEAR",
+        "context": {
+          "canonical_exercise_id": "leg-extensions-assises",
+          "context_ref": "gym:test-a",
+          "equipment_ref": "synthetic:device:leg-extensions-assises",
+          "load_semantics": "MACHINE_DISPLAY_KG",
+          "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+          "side": "BILATERAL"
+        },
+        "context_provenance": {
+          "acquisition": "DECLARED",
+          "measured_at": null,
+          "origin": "USER_REPORTED",
+          "recorded_at": "2026-11-07T11:00:00Z",
+          "source_ref": "synthetic:event-0:leg-extensions-assises"
+        },
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "encounter_ref": "synthetic:encounter-a",
+        "episode": {
+          "as_of": "2026-11-07T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "leg-extensions-assises",
+            "context_ref": "gym:test-a",
+            "equipment_ref": "synthetic:device:leg-extensions-assises",
+            "load_semantics": "MACHINE_DISPLAY_KG",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "episode_id": "synthetic:episode:leg-extensions-assises",
+          "events": [
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:01:00Z",
+                "source_ref": "synthetic:event-1:leg-extensions-assises"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:02:00Z",
+                "source_ref": "synthetic:event-2:leg-extensions-assises"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "discomfort": "NO_CONCERN",
+              "event_id": "leg-extensions-assises:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-07T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-07T11:03:00Z",
+                "source_ref": "synthetic:event-3:leg-extensions-assises"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:ledger:leg-extensions-assises",
+          "started_at": "2026-11-07T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        },
+        "ledger_complete": true,
+        "ledger_source_ref": "synthetic:owner-complete-ledger",
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "population": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "preparation": {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "controlled": true,
+          "instruction_ref": "synthetic:device-instructions",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "setup_ref": "synthetic:seat-axis-pad-fit",
+          "understood": true
+        },
+        "retry_requested": false,
+        "setting_choice": {
+          "available": true,
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:leg-extensions-assises"
+          },
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          }
+        },
+        "source_revision": "synthetic:source/1",
+        "started_at": "2026-11-07T11:00:00Z",
+        "stop_reasons": {
+          "leg-extensions-assises:e3": "COMPLETED"
+        },
+        "subject_ref": "subject:synthetic-a",
+        "withdrawn": false
+      },
+      "result": {
+        "acceptance_event_id": null,
+        "activity_kind": "CALIBRATION_ACTIVITY",
+        "admission": "ADMITTED_WITH_LIMITS",
+        "allowed_actions": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "RECORD_TRIAL",
+          "PAUSE",
+          "WITHDRAW",
+          "INITIATE_FAMILIARIZATION",
+          "CONFIRM_FAMILIARIZATION",
+          "ACCEPT_EXACT_SETTING"
+        ],
+        "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
+        "candidate_actions": [],
+        "confidence": "UNKNOWN",
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "duration": "UNKNOWN",
+        "effort_sufficiency": "UNKNOWN",
+        "encounter_ref": "synthetic:encounter-a",
+        "input_digest": "4970c9912bfb758545fca7b5e5f0082bddee0944d93c9a087c5664b690827781",
+        "instruction_refs": [
+          "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/OPERATIONAL_PROTOCOL.md",
+          "synthetic:device-instructions",
+          "synthetic:seat-axis-pad-fit"
+        ],
+        "phase": "OBSERVE",
+        "policy_ref": "initial-calibration-encounter/1.0.0",
+        "portable_episode": null,
+        "qualified_setting": null,
+        "reasons": [
+          "ACTUAL_OBSERVATION_NOT_YET_QUALIFIED"
+        ],
+        "reference_event_id": null,
+        "source_revision": "synthetic:source/1",
+        "state": "OBSERVED",
+        "subject_ref": "subject:synthetic-a"
+      },
+      "scenario": "observed"
+    },
+    {
+      "request": {
+        "as_of": "2026-11-07T12:00:00Z",
+        "availability": "AVAILABLE",
+        "concern_state": "CLEAR",
+        "context": {
+          "canonical_exercise_id": "leg-extensions-assises",
+          "context_ref": "gym:test-a",
+          "equipment_ref": "synthetic:device:leg-extensions-assises",
+          "load_semantics": "MACHINE_DISPLAY_KG",
+          "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+          "side": "BILATERAL"
+        },
+        "context_provenance": {
+          "acquisition": "DECLARED",
+          "measured_at": null,
+          "origin": "USER_REPORTED",
+          "recorded_at": "2026-11-07T11:00:00Z",
+          "source_ref": "synthetic:event-0:leg-extensions-assises"
+        },
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "encounter_ref": "synthetic:encounter-a",
+        "episode": {
+          "as_of": "2026-11-07T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "leg-extensions-assises",
+            "context_ref": "gym:test-a",
+            "equipment_ref": "synthetic:device:leg-extensions-assises",
+            "load_semantics": "MACHINE_DISPLAY_KG",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "episode_id": "synthetic:episode:leg-extensions-assises",
+          "events": [
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e1",
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:01:00Z",
+                "source_ref": "synthetic:event-1:leg-extensions-assises"
+              },
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e2",
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:02:00Z",
+                "source_ref": "synthetic:event-2:leg-extensions-assises"
+              },
+              "sequence": 2,
+              "subject_ref": "subject:synthetic-a"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "discomfort": "NO_CONCERN",
+              "event_id": "leg-extensions-assises:e3",
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-07T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-07T11:03:00Z",
+                "source_ref": "synthetic:event-3:leg-extensions-assises"
+              },
+              "reps": 10,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "event_id": "leg-extensions-assises:e4",
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:04:00Z",
+                "source_ref": "synthetic:event-4:leg-extensions-assises"
+              },
+              "reference_event_id": "leg-extensions-assises:e3",
+              "sequence": 4,
+              "subject_ref": "subject:synthetic-a"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:ledger:leg-extensions-assises",
+          "started_at": "2026-11-07T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        },
+        "ledger_complete": true,
+        "ledger_source_ref": "synthetic:owner-complete-ledger",
+        "limitations": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": []
+        },
+        "population": {
+          "conflicts": [],
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-05T12:00:00Z",
+            "source_ref": "fixture:user-declaration"
+          },
+          "state": "KNOWN",
+          "value": "ADULT_NON_CLINICAL"
+        },
+        "preparation": {
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "controlled": true,
+          "instruction_ref": "synthetic:device-instructions",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "setup_ref": "synthetic:seat-axis-pad-fit",
+          "understood": true
+        },
+        "retry_requested": false,
+        "setting_choice": {
+          "available": true,
+          "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+          "provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:01:00Z",
+            "source_ref": "synthetic:event-1:leg-extensions-assises"
+          },
+          "setting": {
+            "kind": "MASS_KG",
+            "unit": "kg",
+            "value": 40.0
+          }
+        },
+        "source_revision": "synthetic:source/1",
+        "started_at": "2026-11-07T11:00:00Z",
+        "stop_reasons": {
+          "leg-extensions-assises:e3": "COMPLETED"
+        },
+        "subject_ref": "subject:synthetic-a",
+        "withdrawn": false
+      },
+      "result": {
+        "acceptance_event_id": "leg-extensions-assises:e4",
+        "activity_kind": "CALIBRATION_ACTIVITY",
+        "admission": "ADMITTED_WITH_LIMITS",
+        "allowed_actions": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "RECORD_TRIAL",
+          "PAUSE",
+          "WITHDRAW"
+        ],
+        "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
+        "candidate_actions": [],
+        "confidence": "LOW",
+        "contract_version": "first-calibration-encounter/1.0.0",
+        "duration": "UNKNOWN",
+        "effort_sufficiency": "UNKNOWN",
+        "encounter_ref": "synthetic:encounter-a",
+        "input_digest": "7eabe6d2a5016e32a77d11d864fb7e0d1b8e25a27ead491db33e6c8c8814ee0f",
+        "instruction_refs": [
+          "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/OPERATIONAL_PROTOCOL.md",
+          "synthetic:device-instructions",
+          "synthetic:seat-axis-pad-fit"
+        ],
+        "phase": "DECIDE",
+        "policy_ref": "initial-calibration-encounter/1.0.0",
+        "portable_episode": {
+          "as_of": "2026-11-07T12:00:00Z",
+          "availability": "AVAILABLE",
+          "context": {
+            "canonical_exercise_id": "leg-extensions-assises",
+            "context_ref": "gym:test-a",
+            "equipment_ref": "synthetic:device:leg-extensions-assises",
+            "load_semantics": "MACHINE_DISPLAY_KG",
+            "realization_ref": "initial-candidate-realisation/1.0.0@c05c6596f8f5578bad0b322db8644ebd8f37e319e733d8099a1f4ea18934bdda",
+            "side": "BILATERAL"
+          },
+          "context_provenance": {
+            "acquisition": "DECLARED",
+            "measured_at": null,
+            "origin": "USER_REPORTED",
+            "recorded_at": "2026-11-07T11:00:00Z",
+            "source_ref": "synthetic:event-0:leg-extensions-assises"
+          },
+          "episode_id": "synthetic:episode:leg-extensions-assises",
+          "events": [
+            {
+              "completed": null,
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "discomfort": "UNKNOWN",
+              "event_id": "leg-extensions-assises:e1",
+              "familiarization_confirmed": false,
+              "kind": "CONTEXT_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:01:00Z",
+                "source_ref": "synthetic:event-1:leg-extensions-assises"
+              },
+              "reference_event_id": null,
+              "reps": null,
+              "rir": null,
+              "sequence": 1,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": null,
+              "technique": "UNKNOWN"
+            },
+            {
+              "completed": null,
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "discomfort": "UNKNOWN",
+              "event_id": "leg-extensions-assises:e2",
+              "familiarization_confirmed": false,
+              "kind": "FAMILIARIZATION_CONFIRMED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:02:00Z",
+                "source_ref": "synthetic:event-2:leg-extensions-assises"
+              },
+              "reference_event_id": null,
+              "reps": null,
+              "rir": null,
+              "sequence": 2,
+              "setting": null,
+              "subject_ref": "subject:synthetic-a",
+              "successful": null,
+              "technique": "UNKNOWN"
+            },
+            {
+              "completed": true,
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "discomfort": "NO_CONCERN",
+              "event_id": "leg-extensions-assises:e3",
+              "familiarization_confirmed": false,
+              "kind": "ATTEMPT_OBSERVED",
+              "provenance": {
+                "acquisition": "EXECUTION_LOG",
+                "measured_at": "2026-11-07T11:03:00Z",
+                "origin": "USER_OBSERVED",
+                "recorded_at": "2026-11-07T11:03:00Z",
+                "source_ref": "synthetic:event-3:leg-extensions-assises"
+              },
+              "reference_event_id": null,
+              "reps": 10,
+              "rir": null,
+              "sequence": 3,
+              "setting": {
+                "kind": "MASS_KG",
+                "unit": "kg",
+                "value": 40.0
+              },
+              "subject_ref": "subject:synthetic-a",
+              "successful": true,
+              "technique": "ACCEPTABLE"
+            },
+            {
+              "completed": null,
+              "context_fingerprint": "167390cca72123eaa65fe337a9c9f85374e7edc4dcafbaceae8fa6035ed4b6bb",
+              "discomfort": "UNKNOWN",
+              "event_id": "leg-extensions-assises:e4",
+              "familiarization_confirmed": false,
+              "kind": "SETTING_ACCEPTED",
+              "provenance": {
+                "acquisition": "DECLARED",
+                "measured_at": null,
+                "origin": "USER_REPORTED",
+                "recorded_at": "2026-11-07T11:04:00Z",
+                "source_ref": "synthetic:event-4:leg-extensions-assises"
+              },
+              "reference_event_id": "leg-extensions-assises:e3",
+              "reps": null,
+              "rir": null,
+              "sequence": 4,
+              "setting": null,
+              "subject_ref": "subject:synthetic-a",
+              "successful": null,
+              "technique": "UNKNOWN"
+            }
+          ],
+          "ledger_complete": true,
+          "ledger_source_ref": "synthetic:ledger:leg-extensions-assises",
+          "predecessor_blocked": null,
+          "previous_episode_id": null,
+          "restart_basis_ref": null,
+          "started_at": "2026-11-07T11:00:00Z",
+          "subject_ref": "subject:synthetic-a"
+        },
+        "qualified_setting": {
+          "kind": "MASS_KG",
+          "unit": "kg",
+          "value": 40.0
+        },
+        "reasons": [
+          "OBSERVED_SETTING_PROVISIONALLY_ACCEPTED"
+        ],
+        "reference_event_id": "leg-extensions-assises:e3",
+        "source_revision": "synthetic:source/1",
+        "state": "QUALIFIED",
+        "subject_ref": "subject:synthetic-a"
+      },
+      "scenario": "qualified"
+    }
+  ],
+  "contract_version": "first-calibration-encounter/1.0.0"
+}

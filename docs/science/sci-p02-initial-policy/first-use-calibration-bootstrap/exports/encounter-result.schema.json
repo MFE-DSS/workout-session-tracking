@@ -1,0 +1,715 @@
+{
+  "$defs": {
+    "CalibrationEpisode": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "availability": {
+          "enum": [
+            "AVAILABLE",
+            "UNAVAILABLE",
+            "UNKNOWN"
+          ],
+          "title": "Availability",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/ContextKey"
+        },
+        "context_provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "episode_id": {
+          "minLength": 1,
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/CalibrationEvent"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "ledger_complete": {
+          "title": "Ledger Complete",
+          "type": "boolean"
+        },
+        "ledger_source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ledger Source Ref"
+        },
+        "predecessor_blocked": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Predecessor Blocked"
+        },
+        "previous_episode_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Episode Id"
+        },
+        "restart_basis_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Restart Basis Ref"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "subject_ref": {
+          "minLength": 1,
+          "title": "Subject Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode_id",
+        "subject_ref",
+        "context",
+        "as_of",
+        "started_at",
+        "context_provenance",
+        "availability",
+        "ledger_complete",
+        "ledger_source_ref",
+        "events"
+      ],
+      "title": "CalibrationEpisode",
+      "type": "object"
+    },
+    "CalibrationEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "completed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed"
+        },
+        "context_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Fingerprint",
+          "type": "string"
+        },
+        "discomfort": {
+          "default": "UNKNOWN",
+          "enum": [
+            "NO_CONCERN",
+            "CONCERN",
+            "UNKNOWN"
+          ],
+          "title": "Discomfort",
+          "type": "string"
+        },
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "familiarization_confirmed": {
+          "default": false,
+          "title": "Familiarization Confirmed",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "CONTEXT_CONFIRMED",
+            "FAMILIARIZATION_STARTED",
+            "FAMILIARIZATION_CONFIRMED",
+            "ATTEMPT_OBSERVED",
+            "SETTING_ACCEPTED",
+            "CONCERN_REPORTED",
+            "EQUIPMENT_UNAVAILABLE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "reference_event_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Event Id"
+        },
+        "reps": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reps"
+        },
+        "rir": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rir"
+        },
+        "sequence": {
+          "exclusiveMinimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "setting": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Setting"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "subject_ref": {
+          "minLength": 1,
+          "title": "Subject Ref",
+          "type": "string"
+        },
+        "successful": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Successful"
+        },
+        "technique": {
+          "default": "UNKNOWN",
+          "enum": [
+            "ACCEPTABLE",
+            "CONCERN",
+            "UNKNOWN"
+          ],
+          "title": "Technique",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "sequence",
+        "kind",
+        "subject_ref",
+        "context_fingerprint",
+        "provenance"
+      ],
+      "title": "CalibrationEvent",
+      "type": "object"
+    },
+    "ContextKey": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Canonical Exercise Id"
+        },
+        "context_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Context Ref"
+        },
+        "equipment_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Equipment Ref"
+        },
+        "load_semantics": {
+          "enum": [
+            "TOTAL_EXTERNAL",
+            "PER_IMPLEMENT",
+            "MACHINE_DISPLAY_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Load Semantics",
+          "type": "string"
+        },
+        "realization_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realization Ref"
+        },
+        "side": {
+          "enum": [
+            "BILATERAL",
+            "LEFT",
+            "RIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Side",
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonical_exercise_id",
+        "context_ref",
+        "equipment_ref",
+        "realization_ref",
+        "load_semantics",
+        "side"
+      ],
+      "title": "ContextKey",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "acquisition": {
+          "enum": [
+            "DECLARED",
+            "SELF_MEASURED",
+            "DEVICE_MEASURED",
+            "EXECUTION_LOG",
+            "DERIVED",
+            "UNKNOWN"
+          ],
+          "title": "Acquisition",
+          "type": "string"
+        },
+        "measured_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measured At"
+        },
+        "origin": {
+          "enum": [
+            "USER_REPORTED",
+            "USER_OBSERVED",
+            "DERIVED_FROM_HISTORY",
+            "POPULATION_PRIOR",
+            "PRODUCT_CONTRACT",
+            "UNKNOWN"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "recorded_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Recorded At"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Ref"
+        }
+      },
+      "required": [
+        "origin",
+        "acquisition",
+        "source_ref",
+        "recorded_at",
+        "measured_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Setting": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "MASS_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "kg",
+            "setting",
+            "none"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ],
+      "title": "Setting",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_event_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Acceptance Event Id"
+    },
+    "activity_kind": {
+      "const": "CALIBRATION_ACTIVITY",
+      "default": "CALIBRATION_ACTIVITY",
+      "title": "Activity Kind",
+      "type": "string"
+    },
+    "admission": {
+      "enum": [
+        "NOT_ADMITTED",
+        "ADMITTED_WITH_LIMITS"
+      ],
+      "title": "Admission",
+      "type": "string"
+    },
+    "allowed_actions": {
+      "items": {
+        "enum": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "INITIATE_FAMILIARIZATION",
+          "CONFIRM_FAMILIARIZATION",
+          "INITIATE_TRIAL",
+          "RECORD_TRIAL",
+          "ACCEPT_EXACT_SETTING",
+          "PAUSE",
+          "WITHDRAW"
+        ],
+        "type": "string"
+      },
+      "title": "Allowed Actions",
+      "type": "array"
+    },
+    "artifact_kind": {
+      "enum": [
+        "DRAFT_EVALUATION_SYNTHETIC_NOT_AUTHORITY",
+        "ISOLATED_EVALUATION_NOT_SERVED"
+      ],
+      "title": "Artifact Kind",
+      "type": "string"
+    },
+    "authority_digest": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Authority Digest"
+    },
+    "candidate_actions": {
+      "default": [],
+      "items": {
+        "enum": [
+          "READ_GUIDANCE",
+          "PROVIDE_FACTS",
+          "REQUEST_ASSISTANCE",
+          "CONFIRM_CONTEXT",
+          "INITIATE_FAMILIARIZATION",
+          "CONFIRM_FAMILIARIZATION",
+          "INITIATE_TRIAL",
+          "RECORD_TRIAL",
+          "ACCEPT_EXACT_SETTING",
+          "PAUSE",
+          "WITHDRAW"
+        ],
+        "type": "string"
+      },
+      "title": "Candidate Actions",
+      "type": "array"
+    },
+    "confidence": {
+      "default": "UNKNOWN",
+      "enum": [
+        "LOW",
+        "UNKNOWN"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "first-calibration-encounter/1.0.0",
+      "default": "first-calibration-encounter/1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "duration": {
+      "const": "UNKNOWN",
+      "default": "UNKNOWN",
+      "title": "Duration",
+      "type": "string"
+    },
+    "effort_sufficiency": {
+      "const": "UNKNOWN",
+      "default": "UNKNOWN",
+      "title": "Effort Sufficiency",
+      "type": "string"
+    },
+    "encounter_ref": {
+      "minLength": 1,
+      "title": "Encounter Ref",
+      "type": "string"
+    },
+    "input_digest": {
+      "minLength": 1,
+      "title": "Input Digest",
+      "type": "string"
+    },
+    "instruction_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Instruction Refs",
+      "type": "array"
+    },
+    "phase": {
+      "enum": [
+        "IDENTIFY",
+        "FAMILIARIZE",
+        "TRIAL",
+        "OBSERVE",
+        "DECIDE"
+      ],
+      "title": "Phase",
+      "type": "string"
+    },
+    "policy_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Policy Ref"
+    },
+    "portable_episode": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CalibrationEpisode"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "qualified_setting": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Setting"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "reasons": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "reference_event_id": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reference Event Id"
+    },
+    "source_revision": {
+      "minLength": 1,
+      "title": "Source Revision",
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "CALIBRATION_REQUIRED",
+        "SUPPORTED_INITIAL_EXPLORATION",
+        "OBSERVED",
+        "QUALIFIED",
+        "CONCERN_REVIEW",
+        "UNAVAILABLE",
+        "INSUFFICIENT_EVIDENCE",
+        "WITHDRAWN"
+      ],
+      "title": "State",
+      "type": "string"
+    },
+    "subject_ref": {
+      "minLength": 1,
+      "title": "Subject Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "artifact_kind",
+    "admission",
+    "encounter_ref",
+    "subject_ref",
+    "source_revision",
+    "input_digest",
+    "policy_ref",
+    "authority_digest",
+    "state",
+    "phase",
+    "allowed_actions",
+    "reasons",
+    "instruction_refs"
+  ],
+  "title": "EncounterResult",
+  "type": "object"
+}
