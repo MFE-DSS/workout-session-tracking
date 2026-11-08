@@ -34,7 +34,7 @@ précisions mineures intégrées (ordre5→6et workers réels vérifiés par log
 OpenSpec strict15/15 et spec protocol passants ; ce sont preuves de préparation,
 pas de capacité positive à5/6. Aucun nouveau diagnostic biologique ou moteur.
 
-Ce GO est distinct parce que le [lease PLAN](../blueprint-first-session-runtime/BUILD_SCOPE.md)
+Ce GO est distinct parce que le [lease PLAN](https://github.com/MFE-DSS/workout-session-tracking/blob/31b89f98985044a9ee40d75610d387976ff26d7c/openspec/changes/blueprint-first-session-runtime/BUILD_SCOPE.md)
 exclut ces fichiers d'infrastructure et CLAUDE§6 exige
 «propose → revue de l'opérateur → apply». Le GO MERGE permanent restera applicable
 après ce GO de build ; aucune nouvelle approbation de merge routinière demandée.
