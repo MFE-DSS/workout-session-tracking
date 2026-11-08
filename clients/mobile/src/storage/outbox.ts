@@ -78,7 +78,7 @@ export type OutboxRow = {
   payload: string;
   created_at_ms: number;
   attempts: number;
-  state: 'pending' | 'inflight' | 'acked' | 'failed';
+  state: 'pending' | 'inflight' | 'acked' | 'failed' | 'resolved';
 };
 
 export type JournalRow = {
@@ -122,6 +122,8 @@ export function setCommand(
  * in-flight command is never rewritten (its outcome is not known yet).
  */
 export function compactPending(rows: OutboxRow[]): OutboxRow[] {
+  // V3 corrections are immutable CAS operations: preserve insertion order and every identity.
+  if (rows.some(row => row.kind === 'PLAN_V3_SET')) return [...rows];
   const latestPending = new Map<string, OutboxRow>();
   const kept: OutboxRow[] = [];
   for (const row of rows) {

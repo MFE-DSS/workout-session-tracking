@@ -21,6 +21,13 @@ import { AppState, BackHandler, Linking, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ApiFailure, createTransport } from './src/api/http';
+import {RuntimeV3Client,FirstPlanV3Client,createV3Transport} from './src/api/firstPlanV3';
+import {BlueprintV3Client} from './src/api/blueprintV3';
+import {CalibrationV1Client} from './src/api/calibrationV1';
+import {FirstSessionV3Client} from './src/api/firstSessionV3';
+import {FirstUseV3Controller} from './src/api/firstUseV3';
+import {sendPlanV3Outbox} from './src/sync/planV3Sync';
+import {PlanV3Host} from './src/ui/plan/PlanV3Host';
 import { FirstPlanClient } from './src/api/firstPlan';
 import { FirstUseController } from './src/api/firstUse';
 import { FirstUseScreen } from './src/ui/account/FirstUseScreen';
@@ -72,6 +79,7 @@ import { color } from './src/ui/theme';
 import { BootScreen } from './src/ui/BootScreen';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? '';
+const PLAN_V3_CONTROLLED_TEST = process.env.EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST === '1';
 const PRIVACY_URL = process.env.EXPO_PUBLIC_PRIVACY_URL;
 const PROCESS_ID = Crypto.randomUUID();
 const transport = createTransport(API_URL);
@@ -120,6 +128,9 @@ function statusNote(sync: SyncStatus): { text: string; alert: boolean } | null {
 }
 
 export default function ConnectedApp() {
+  const [planV3,setPlanV3] = useState<FirstUseV3Controller|null>(null);
+  const [planV3Open,setPlanV3Open] = useState(true);
+  const [,setPlanV3Revision] = useState(0);
   const [state, setState] = useState<WorkoutState>(initialState);
   const stateRef = useRef(state);
   const journalRef = useRef<Journal | null>(null);
@@ -293,12 +304,23 @@ export default function ConnectedApp() {
       setOffline(false);
       setMission(m);
       const local = stateRef.current;
+      if (m.state === 'RESUME' && m.session.template_slug === 'science:v3:first-session') {
+        // Existing owned handoff, never a scientific recommendation fallback.
+        setPaused(true);
+        return;
+      }
       if (m.state === 'RESUME') {
         const plan = await fetchExecution(m.session.id);
-        const restored = journalRef.current ? await journalRef.current.restore() : { sets: [], outbox: [] };
-        if (revision !== auth.revision) return;
+        const target=journalRef.current;
+        const current=()=>appAlive.current&&revision===auth.revision&&target===journalRef.current;
+        const restored = target ? await target.restore() : { sets: [], outbox: [] };
+        if (!current()||plan.session_id!==m.session.id) return;
         const latest = stateRef.current;
-        apply({ type: 'RESTORE', state: reconcileSubstitutions(stateFromServer(plan, latest.phase === 'MISSION' ? null : latest, restored.sets, Date.now()), restored.outbox) });
+        const next=reconcileSubstitutions(stateFromServer(plan, latest.phase === 'MISSION' ? null : latest, restored.sets, Date.now()), restored.outbox);
+        await target?.beginLegacy?.(next,current);
+        if(!current())return;
+        setPlanV3Open(false);
+        apply({ type: 'RESTORE', state: next });
         setPaused(true);
       } else if (local.phase === 'SET' || local.phase === 'REST') {
         // the server holds no open session: it was closed elsewhere (web) or by a
@@ -354,14 +376,27 @@ export default function ConnectedApp() {
     });
     if (!appAlive.current || revision !== auth.revision) return false;
     if (owned.state !== 'ready') { setScreen('OWNERSHIP'); return false; }
-    const j = await openJournal(owned.name);
+    const j = await openJournal(owned.name, PLAN_V3_CONTROLLED_TEST ? {planV3OwnerId:owned.userId} : {});
     if (!appAlive.current || revision !== auth.revision) return false;
     engineRef.current?.stop();
     journalRef.current = j;
     setJournal(j);
     const active = () => appAlive.current && revision === auth.revision && journalRef.current === j;
+    const v3Runtime = new RuntimeV3Client(auth,transport,createV3Transport(API_URL));
+    const v3Sessions = new FirstSessionV3Client(v3Runtime);
+    if(PLAN_V3_CONTROLLED_TEST && j.planV3){
+      const controller = new FirstUseV3Controller({ownerId:owned.userId,journal:j.planV3,sessions:v3Sessions,
+        plan:new FirstPlanV3Client(v3Runtime),blueprint:new BlueprintV3Client(v3Runtime),calibration:new CalibrationV1Client(v3Runtime),
+        newId:()=>Crypto.randomUUID(),current:active},()=>{if(active())setPlanV3Revision(value=>value+1);});
+      await controller.restore();if(!active())return false;
+      if(controller.state){setPlanV3(controller);setPlanV3Open(true);void controller.load().catch(()=>undefined);}
+    }else setPlanV3(null);
     engineRef.current = new SyncEngine(j, (row) => {
       if (!active()) return Promise.reject(new ApiFailure('http', 401, 'auth'));
+      if(row.kind === 'PLAN_V3_SET'){
+        if(!j.planV3)return Promise.reject(new ApiFailure('http',409,'typed_journal_unavailable'));
+        return sendPlanV3Outbox(row,v3Sessions,j.planV3,active);
+      }
       const r = routeFor(row);
       return api(r.path, { method: r.method, body: r.body });
     }, (status) => { if (active()) onStatus(status); }, (row, response) => { if (active()) onAck(row, response); });
@@ -601,6 +636,8 @@ export default function ConnectedApp() {
 
   const start = useCallback(async (slug: string) => {
     if (!mission || mission.state !== 'READY' || busy || sessionActionInFlight.current) return;
+    const generation=auth.revision,ownedJournal=journalRef.current;
+    const current=()=>appAlive.current&&auth.revision===generation&&journalRef.current===ownedJournal;
     sessionActionInFlight.current = true;
     setBusy(true);
     setNotice(null);
@@ -613,9 +650,14 @@ export default function ConnectedApp() {
           decision: mission.decision,
         },
       });
+      if(!current())return;
+      const nowMs=Date.now();
+      await ownedJournal?.beginLegacy?.(reduce(stateRef.current,{type:'START',plan,nowMs}),current);
+      if(!current())return;
+      setPlanV3Open(false);
       anchorOn(plan.server_now);
       closedRef.current = null;
-      apply({ type: 'START', plan, nowMs: Date.now() });
+      apply({ type: 'START', plan, nowMs });
       setPaused(false);
       void restNotification.prepare().catch(() => undefined);
     } catch (e) {
@@ -627,7 +669,7 @@ export default function ConnectedApp() {
       sessionActionInFlight.current = false;
       setBusy(false);
     }
-  }, [anchorOn, api, apply, busy, loadMission, mission]);
+  }, [anchorOn, api, apply, auth, busy, loadMission, mission]);
 
   const validate = useCallback((setId: number) => {
     const before = stateRef.current;
@@ -822,13 +864,27 @@ export default function ConnectedApp() {
 
   const resumeFromServer = useCallback(async () => {
     if (mission?.state !== 'RESUME' || sessionActionInFlight.current) return;
+    if(mission.session.template_slug==='science:v3:first-session'){
+      if(!planV3?.active){setNotice('Cette séance demande le contrat d’exécution V3.');return;}
+      await planV3.load();
+      if(planV3.active&&planV3.state?.execution?.session_id===mission.session.id)setPlanV3Open(true);
+      else setNotice('La reprise de cette séance reste à vérifier.');
+      return;
+    }
+    const generation=auth.revision,target=journalRef.current;
+    const current=()=>appAlive.current&&generation===auth.revision&&target===journalRef.current;
     sessionActionInFlight.current = true;
     setBusy(true);
     try {
       const plan = await fetchExecution(mission.session.id);
-      const restored = journalRef.current ? await journalRef.current.restore() : { sets: [], outbox: [] };
+      const restored = target ? await target.restore() : { sets: [], outbox: [] };
+      if(!current()||plan.session_id!==mission.session.id)return;
       const local = stateRef.current;
-      apply({ type: 'RESTORE', state: reconcileSubstitutions(stateFromServer(plan, local.phase === 'MISSION' ? null : local, restored.sets, Date.now()), restored.outbox) });
+      const next=reconcileSubstitutions(stateFromServer(plan, local.phase === 'MISSION' ? null : local, restored.sets, Date.now()), restored.outbox);
+      await target?.beginLegacy?.(next,current);
+      if(!current())return;
+      setPlanV3Open(false);
+      apply({ type: 'RESTORE', state: next });
       setPaused(false);
       setOffline(false);
     } catch {
@@ -837,7 +893,7 @@ export default function ConnectedApp() {
       sessionActionInFlight.current = false;
       setBusy(false);
     }
-  }, [apply, fetchExecution, mission]);
+  }, [apply, auth, fetchExecution, mission, planV3]);
 
   const signOut = useCallback(async () => {
     // §8.4 — no set may disappear as a side effect of signing out: while a
@@ -905,7 +961,7 @@ export default function ConnectedApp() {
     if (!accountFlight.current) setAccountView(screen === 'APP' && !resume ? 'first-use' : null);
   };
   const accountOverlay = screen !== 'APP' ? null : accountView === 'first-use'
-    ? <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
+    ? planV3?.active ? <PlanV3Host controller={planV3} onExit={()=>{setPlanV3Open(false);leaveAccountView();}} onPreferences={()=>setAccountView('first-use-preferences')} onSync={async()=>{await engineRef.current?.kick();}}/> : <FirstUseScreen key={auth.revision} controller={firstUse} onPreferences={() => setAccountView('first-use-preferences')} onToday={leaveAccountView} onBack={leaveAccountView} />
     : accountView === 'preferences' || accountView === 'first-use-preferences'
     ? <TrainingPreferencesScreen key={auth.revision} client={preferencesClient} onClose={accountView === 'first-use-preferences' ? () => setAccountView('first-use') : leaveAccountView}
       onReconnect={reconnectAccount} registerExit={registerPreferencesExit} onWebProfile={API_URL ? () => openWeb('/profile') : undefined} />
@@ -925,6 +981,8 @@ export default function ConnectedApp() {
     body = <LoginScreen error={loginError} busy={busy} onSubmit={(u, p) => void login(u, p)}
       onCreateAccount={() => { setAccountOutcome(null); setAccountView('signup'); }}
       onRecover={API_URL ? () => openWeb('/forgot-password') : undefined} onPrivacy={privacy} />;
+  } else if (screen === 'APP' && planV3?.active && planV3Open && !accountView && state.phase!=='SET' && state.phase!=='REST') {
+    body = <PlanV3Host controller={planV3} onExit={()=>setPlanV3Open(false)} onPreferences={()=>setAccountView('preferences')} onSync={async()=>{await engineRef.current?.kick();}}/>;
   } else if (screen === 'APP') {
     const inWorkout = state.phase === 'SET' || state.phase === 'REST';
     if (inWorkout && paused && state.plan) {
@@ -960,7 +1018,7 @@ export default function ConnectedApp() {
           onSecondaryOpened={() => metric('SECONDARY-OPENED')}
           onExitRequested={requestExit}
           offline={sync.offline || offline}
-          substitutionStateOf={(seId) => substitutions[seId]?.state ?? null}
+          substitutionStateOf={(seId) => substitutions[seId]?.state==='resolved'?null:substitutions[seId]?.state ?? null}
           statusNote={substitutionNotice ? { text: substitutionNotice, alert: true } : statusNote({ ...sync, offline: sync.offline || offline })}
           serverStateOf={(setId) => serverSets[setId] === 'synced' || serverSets[setId] === 'refused' ? serverSets[setId] as 'synced' | 'refused' : null}
           onSkipSet={(setId) => skipWith({ type: 'SKIP_SET', setId, nowMs: Date.now() }, 'Série passée — elle ne sera pas comptée.')}

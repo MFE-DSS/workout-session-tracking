@@ -1,0 +1,87 @@
+{
+  "status": "PIXELS_ACCEPTED",
+  "date": "2026-11-08",
+  "platform": "iOS26.3 simulator / Expo Go58",
+  "logical_size": [
+    393,
+    852
+  ],
+  "physical_acceptance": false,
+  "baseline_changed": false,
+  "source_base": "b4a42420afa1aca384a16bd3966ab85a97cfd724",
+  "captures": [
+    {
+      "id": "first-use",
+      "file": "first-use.png",
+      "sha256": "3ff0ebeb53664db5e790bcd7b030f9e7d899a03601826d450050b995faba1306",
+      "original_capture": "native-v2-first-use-final.png",
+      "reference": "clients/mobile/visual-contract/review-receipts/mob03-first-use-v1/firstuse-none.png",
+      "note": "Référence MOB03 : même cadre compte. Nouveau contenu : calibration ouverte sans sept réglages."
+    },
+    {
+      "id": "discovery",
+      "file": "discovery.png",
+      "sha256": "a0191d8833e39f87bb964ae48723cc3260df5267e7350553e97e5213278c5adf",
+      "original_capture": "native-v2-bootstrap-unknown-setting.png",
+      "reference": "clients/mobile/visual-contract/review-receipts/mob03-first-use-v1/firstuse-missing.png",
+      "note": "Champ numérique vide. Le bouton demande uniquement une familiarisation ; aucun essai ou succès créé."
+    },
+    {
+      "id": "proposal",
+      "file": "proposal.png",
+      "sha256": "12c1df8e5714bb43d80041a10ee901ceab82c5fc9a7ea5e6c7a8663959dc4b16",
+      "original_capture": "native-v2-b-proposal.png",
+      "reference": "clients/mobile/visual-contract/review-receipts/mob03-first-use-v1/firstuse-none.png",
+      "note": "Vrai producteur, entrées synthétiques du compte B. Capture du haut : la séance 1 est détaillée. Le code final masque la séance 2 (D9), sans changer les pixels visibles ici."
+    },
+    {
+      "id": "ack",
+      "file": "ack.png",
+      "sha256": "07d658ec33e0a812a18bddedcf2de381051215a0cad4520cf96bdf4fd683eb57",
+      "original_capture": "native-v2-time-ack-final.png",
+      "reference": "clients/mobile/visual-contract/review-receipts/mob03-first-use-v1/firstuse-consent.png",
+      "note": "Budget déclaré distinct de durée. Cette capture B précède tout clic d’accord de B."
+    },
+    {
+      "id": "execution",
+      "file": "execution.png",
+      "sha256": "cdba5300b9724a2ad15cf2b2c37927edc2f48ce76ca76d88c2d20e3deec324df",
+      "original_capture": "native-v2-execution-set.png",
+      "reference": "clients/mobile/visual-contract/baselines/execution-set-390x844-push-a-e0.png",
+      "note": "Séance A réellement créée. Même instrument existant ; kg affichés par cet appareil, jamais total calculé. Pastille flottante Expo de test présente."
+    },
+    {
+      "id": "setup",
+      "file": "setup.png",
+      "sha256": "444dc956b97cec671bd7d69837d3c57b790ed8a589d2cf7a20b1e21220ab09f5",
+      "original_capture": "native-v2-setup.png",
+      "reference": "clients/mobile/visual-contract/baselines/execution-rest-next-390x844-push-a-e0.png",
+      "note": "Installation suivante : durée non établie. Référence de composition seulement, scénario différent ; aucun repos supplémentaire inventé. Pastille Expo de test présente."
+    },
+    {
+      "id": "rest",
+      "file": "rest.png",
+      "sha256": "0b53d01825a889df979a9eef6a874c0cb3d49c651c94d2bbc62867c11a1f517f",
+      "original_capture": "native-v2-rest.png",
+      "reference": "clients/mobile/visual-contract/baselines/execution-rest-next-390x844-push-a-e0.png",
+      "note": "Repos réel 120 s du binding, capture en cours de décompte. Scénarios distincts, aucune comparaison scientifique des charges. Pastille Expo de test présente."
+    },
+    {
+      "id": "journal",
+      "file": "journal.png",
+      "sha256": "8ebd7c80e0ad7cdcc49b708024904019fea40f7a74334f04b8e57aaad42d341d",
+      "original_capture": "native-v2-journal-final.png",
+      "reference": "clients/mobile/visual-contract/review-receipts/mob03-account-v1/created.png",
+      "note": "Nouvelle surface factuelle dans AccountFrame : serveur 12 reps/version 3 ; ancienne correction 10 refusée conservée séparément. La référence fournit les primitives, pas un journal historique identique."
+    }
+  ],
+  "operator_decision": "Valider ces pixels PLAN contrôlés",
+  "approval_date": "2026-11-08",
+  "renderer_source_sha256": {
+    "clients/mobile/src/ui/plan/PlanV3ExecutionScreen.tsx": "5081a9080169874560e463bbdc3a6afa8b7c6013bc3ee392d91e757169d5a306",
+    "clients/mobile/src/ui/plan/PlanV3FirstUseScreen.tsx": "79fcec7bd8590b2efb968432d29ee351147b0b01b48641b187e902501134d2f7",
+    "clients/mobile/src/ui/plan/PlanV3Host.tsx": "6b824ff88d8b9a5ab5eb2480e8af21805be386ab41a7a3d01d278ff233155f38",
+    "clients/mobile/src/ui/plan/PlanV3JournalScreen.tsx": "578d36312f78dd131d200ff10426ebcc977cb7054169f8284ba74f2550c5cffc",
+    "clients/mobile/src/ui/plan/PlanV3ObservedScreen.tsx": "35bd18cb7a9ff7adcdfd67162294ce4b4b8045e519c7b6f5118b98fa01b8f2ba"
+  }
+}

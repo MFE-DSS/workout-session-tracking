@@ -98,6 +98,14 @@ def restore_from_json_payload(
         result.summary = "; ".join(validation_errors)
         return result
 
+    # Legacy backup has no typed binding/ownership sidecars. Exclusion, not a
+    # lossy restore or race with a controlled PLAN start on the same database.
+    from app.services.plan_v3.transactions import schema_available
+    if schema_available(db):
+        result.errors.append("PLAN database requires its complete typed restore procedure; legacy restore refused")
+        result.summary = "PLAN restore unsupported"
+        return result
+
     # 2. Refuse to run on a non-empty DB
     existing = db.execute(
         select(func.count(WorkoutSession.id))
@@ -108,6 +116,12 @@ def restore_from_json_payload(
             "Wipe the DB or use a fresh file before restoring."
         )
         result.summary = "DB not empty"
+        return result
+
+    if any(s.get('template_slug') == 'science:v3:first-session' or 'first_plan_execution' in s
+           for s in payload['sessions']):
+        result.errors.append('PLAN typed restore is required; legacy import would lose its binding')
+        result.summary = 'PLAN restore unsupported'
         return result
 
     # 3. Insert

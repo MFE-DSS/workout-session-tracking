@@ -1165,6 +1165,11 @@ def user_program_start_session(
     if preparation.etat == REFUSE:
         return _demarrage_bloque(template.slug)
 
+    from app.services.plan_v3.transactions import admit_legacy_start, RuntimeFailure
+    try:
+        admit_legacy_start(db, user.id)
+    except RuntimeFailure as error:
+        raise HTTPException(error.status, detail={"error": error.code}) from None
     session = instantiate_session(db, template, datetime.now(UTC), user_id=user.id)
     if preparation.etat == ADAPTABLE:
         # Partiel = échec, exactement comme sur `POST /sessions`.

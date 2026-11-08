@@ -106,6 +106,8 @@ def compute_leaderboard(db: Session) -> list[LeaderboardEntry]:
                 for sl in se.set_logs if sl.kind == "work" and sl.completed
             )
             quality = compute_session_quality(s)
+            if quality is None:
+                continue
             if last_score is None:
                 last_score = quality
             completion_ratio = done_work / total_work

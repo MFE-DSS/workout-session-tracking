@@ -68,7 +68,7 @@ router = APIRouter(prefix="/api/mobile/v1", tags=["mobile"],
                    dependencies=[Depends(_no_store)])
 
 #: `D11` — marge de l'horloge d'appareil au-delà de la réception serveur.
-PERFORMED_AT_TOLERANCE = timedelta(seconds=120)
+from app.services.plan_v3.journal import PERFORMED_AT_TOLERANCE
 
 #: `§10` — une commande reçue est ACQUITTÉE, qu'elle ait écrit ou trouvé le fait déjà là.
 ACKNOWLEDGED, APPLIED = "ACKNOWLEDGED", "applied"
@@ -331,6 +331,11 @@ def start(body: StartBody, user: ApiUser, db: DbSession) -> dict[str, Any]:
     preparation = preparer_demarrage(db, user.id, tpl)
     if preparation.etat == REFUSE:
         raise _err(409, "start_blocked", reason="equipment")
+    from app.services.plan_v3.transactions import admit_legacy_start, RuntimeFailure
+    try:
+        admit_legacy_start(db, user.id, reject_any_open=True)
+    except RuntimeFailure as error:
+        raise HTTPException(error.status, detail={"error": error.code}) from None
     session = instantiate_session(db, tpl, datetime.now(UTC), user_id=user.id)
     # `G6` — l'adaptation se matérialise AVANT le démarrage ; PARTIEL = ÉCHEC.
     if preparation.etat == ADAPTABLE:
@@ -415,6 +420,8 @@ def complete_set(
     Note, sensation, substitution et autres séries ne sont jamais lues ni écrites.
     """
     s = _open_owned(db, session_id, user)
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(s)
     se, sl = next(((se, x) for se in s.session_exercises for x in se.set_logs
                    if x.id == set_id and x.kind == "work"), (None, None))
     if sl is None:
@@ -470,6 +477,8 @@ def substitute(
     from app.services.substitution import can_substitute, compute_suggestions
 
     s = _open_owned(db, session_id, user)
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(s)
     se = next((x for x in s.session_exercises if x.id == se_id), None)
     if se is None:
         raise _err(404, "unknown_exercise")

@@ -150,17 +150,18 @@ export function ValueDial(props: {
   onPlus: () => void;
   onEdit: () => void;
   stepLabel: string;
+  stepAvailable?: boolean;
   testID?: string;
 }) {
   return (
     <View style={styles.dial} testID={props.testID}>
       <Text style={type.eyebrow}>{props.label}</Text>
       <Pressable
-        accessibilityRole="adjustable"
+        accessibilityRole={props.stepAvailable===false?'button':'adjustable'}
         accessibilityLabel={`${props.label} ${props.value}${props.unit ? ' ' + props.unit : ''}`}
         accessibilityHint="Toucher pour saisir une valeur"
-        accessibilityActions={[{ name: 'increment' }, { name: 'decrement' }]}
-        onAccessibilityAction={(e) => (e.nativeEvent.actionName === 'increment' ? props.onPlus() : props.onMinus())}
+        accessibilityActions={props.stepAvailable===false?undefined:[{ name: 'increment' }, { name: 'decrement' }]}
+        onAccessibilityAction={props.stepAvailable===false?undefined:(e) => (e.nativeEvent.actionName === 'increment' ? props.onPlus() : props.onMinus())}
         onPress={props.onEdit}
         style={styles.dialValueRow}
       >
@@ -175,8 +176,8 @@ export function ValueDial(props: {
         {props.unit ? <Text style={styles.unit}>{props.unit}</Text> : null}
       </Pressable>
       <View style={styles.pads}>
-        <Pad glyph="−" label={`Moins ${props.stepLabel}`} onPress={props.onMinus} />
-        <Pad glyph="+" label={`Plus ${props.stepLabel}`} onPress={props.onPlus} />
+        <Pad glyph="−" label={`Moins ${props.stepLabel}`} onPress={props.onMinus} disabled={props.stepAvailable===false} />
+        <Pad glyph="+" label={`Plus ${props.stepLabel}`} onPress={props.onPlus} disabled={props.stepAvailable===false} />
       </View>
     </View>
   );
@@ -195,13 +196,15 @@ function readoutSize(value: string, withUnit: boolean): number {
   return 36;
 }
 
-function Pad(props: { glyph: string; label: string; onPress: () => void }) {
+function Pad(props: { glyph: string; label: string; onPress: () => void; disabled?:boolean }) {
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={props.label}
+      disabled={props.disabled}
+      accessibilityState={{disabled:props.disabled??false}}
       onPress={props.onPress}
-      style={({ pressed }) => [styles.pad, pressed && styles.padPressed]}
+      style={({ pressed }) => [styles.pad, pressed && styles.padPressed,props.disabled&&{opacity:0.35}]}
     >
       <Text style={styles.padGlyph} maxFontSizeMultiplier={1.2}>
         {props.glyph}

@@ -160,6 +160,8 @@ def _compute_metric(metric: str, sessions: list) -> float:
                 for sl in se.set_logs if sl.kind == "work" and sl.completed
             )
             quality = compute_session_quality(s)
+            if quality is None:
+                continue
             completion_ratio = done_work / total_work
             total += quality * completion_ratio
         return total

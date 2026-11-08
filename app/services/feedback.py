@@ -22,10 +22,9 @@ Algorithm:
 from __future__ import annotations
 
 from statistics import mean
-from typing import Optional
 
 
-def compute_success_score(session_exercise, template_exercise) -> Optional[int]:
+def compute_success_score(session_exercise, template_exercise) -> int | None:
     """Return a snapped success score (100 | 80 | 50) or None.
 
     Parameters
@@ -39,6 +38,9 @@ def compute_success_score(session_exercise, template_exercise) -> Optional[int]:
         iterable of RepTarget objects having `.set_index`, `.min_reps`,
         and `.max_reps` attributes.
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(getattr(session_exercise, 'session', None)):
+        return None
     # Step 1: work sets only
     work_sets = [sl for sl in session_exercise.set_logs if sl.kind == "work"]
 

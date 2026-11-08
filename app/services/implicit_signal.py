@@ -19,10 +19,9 @@ Hard contracts inherited from Sx_24 spec:
 """
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import Enum
-from typing import Sequence
-
 
 # ---------------------------------------------------------------------------
 # Enum — verrouillé, exposé publiquement
@@ -117,6 +116,10 @@ def detect_intra_set_label(work_sets) -> ImplicitLabel | None:
 
     Returns one of :class:`ImplicitLabel` otherwise.
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    work_sets = list(work_sets)
+    if any(is_scientific_session(getattr(getattr(p,'session_exercise',None),'session',None)) for p in work_sets):
+        return None
     points = [_coerce(p) for p in work_sets]
     if len(points) < MIN_WORK_SETS:
         return None

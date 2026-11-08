@@ -1033,10 +1033,10 @@ def progress(request: Request, db: DbSession, user: CurrentUser) -> HTMLResponse
     quality_points = [
         TimelinePoint(
             label=s.started_at.strftime("%d/%m"),
-            value=compute_session_quality(s),
+            value=quality,
             kind=_session_kind(s),
         )
-        for s in eligible
+        for s in eligible if (quality := compute_session_quality(s)) is not None
     ]
     bw_points = [
         TimelinePoint(

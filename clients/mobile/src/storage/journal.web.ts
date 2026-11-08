@@ -7,7 +7,7 @@ import type { WorkoutState } from '../domain/workout';
 import type { Journal, LabKey, Metric, Restored } from './journalTypes';
 import type { Command, JournalRow, OutboxRow, SetCommand } from './outbox';
 
-export async function openJournal(_name?: string): Promise<Journal> {
+export async function openJournal(_name?: string, _options?: {planV3OwnerId?:number}): Promise<Journal> {
   let snapshot: WorkoutState | null = null;
   let sets: JournalRow[] = [];
   let outbox: OutboxRow[] = [];
@@ -41,7 +41,7 @@ export async function openJournal(_name?: string): Promise<Journal> {
       snapshot = s;
     },
     async outboxRows(): Promise<OutboxRow[]> {
-      return outbox.filter((o) => o.state !== 'acked');
+      return outbox.filter((o) => o.state !== 'acked' && o.state !== 'resolved');
     },
     async markOutbox(opId: string, state: OutboxRow['state'], attempts: number): Promise<void> {
       outbox = outbox.map((o) => (o.op_id === opId ? { ...o, state, attempts } : o));

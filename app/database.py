@@ -11,7 +11,7 @@ import sqlite3
 import time
 from collections.abc import Iterator
 
-from sqlalchemy import create_engine, event
+from sqlalchemy import MetaData, create_engine, event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
@@ -109,7 +109,17 @@ def init_db() -> None:
         squad,
     )
 
-    Base.metadata.create_all(bind=engine)
+    # PLAN is migration-only, including its ownership indexes on legacy tables.
+    # Clone instead of mutating mapper metadata used by Alembic and services.
+    startup_metadata = MetaData()
+    for table in Base.metadata.sorted_tables:
+        if not table.info.get("plan_v3"):
+            clone = table.to_metadata(startup_metadata)
+            for index in list(clone.indexes):
+                if any(original.name == index.name and original.info.get("plan_v3")
+                       for original in table.indexes):
+                    clone.indexes.remove(index)
+    startup_metadata.create_all(bind=engine)
 
     # Sb_32.4 — `create_all` above also creates `body_zones` and
     # `exercise_muscle_mappings`, EMPTY, and the Alembic backfills only fire

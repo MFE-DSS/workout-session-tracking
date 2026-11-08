@@ -423,14 +423,14 @@ def discipline_rates(db: Session, user_id: int, days: int = 30) -> DisciplineRat
         1 for s in completed
         if any((se.muscle_sensation or "").strip() for se in s.session_exercises)
     )
-    quality_scores = [compute_session_quality(s) for s in completed]
+    quality_scores = [score for s in completed if (score := compute_session_quality(s)) is not None]
     return DisciplineRates(
         sessions_total=total_started,
         completion_rate=round(100 * n_completed / total_started),
         with_free_note_rate=round(100 * n_note / n_completed),
         with_bodyweight_rate=round(100 * n_bw / n_completed),
         with_sensation_rate=round(100 * n_sens / n_completed),
-        avg_quality_score=round(sum(quality_scores) / len(quality_scores)),
+        avg_quality_score=round(sum(quality_scores) / len(quality_scores)) if quality_scores else None,
     )
 
 

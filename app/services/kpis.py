@@ -115,6 +115,7 @@ def compute_global_kpis(
         .where(WorkoutSession.status == "completed")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(SessionExercise.success_score.is_not(None))
+        .where(WorkoutSession.template_slug_snapshot != "science:v3:first-session")
     ).scalar()
 
     work_sets_total = db.execute(
@@ -263,6 +264,7 @@ def compute_recent_exercise_activity(
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
         .where(_uf)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.template_slug_snapshot != "science:v3:first-session")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(WorkoutSession.started_at >= window_start)
         .order_by(WorkoutSession.started_at.desc())
@@ -380,6 +382,7 @@ def compute_template_kpis(
         )
         .where(WorkoutSession.user_id == user_id if user_id is not None else True)
         .where(WorkoutSession.status == "completed")
+        .where(WorkoutSession.template_slug_snapshot != "science:v3:first-session")
         .where(WorkoutSession.excluded_from_stats.is_(False))
         .where(
             WorkoutSession.started_at < until if until is not None else True

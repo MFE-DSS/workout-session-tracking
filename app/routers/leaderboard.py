@@ -79,6 +79,7 @@ def user_profile(
     # d'autrui pour la jeter.
     sessions_30d = db.execute(
         select(WorkoutSession)
+        .where(WorkoutSession.template_slug_snapshot != 'science:v3:first-session')
         .where(
             WorkoutSession.user_id == target.id,
             WorkoutSession.status == "completed",
@@ -87,12 +88,15 @@ def user_profile(
         .order_by(WorkoutSession.started_at.desc())
     ).scalars().all()
 
+    if not sessions_30d and db.scalar(select(WorkoutSession.id).where(
+        WorkoutSession.user_id == target.id, WorkoutSession.template_slug_snapshot == 'science:v3:first-session').limit(1)):
+        raise HTTPException(409, detail={'error':'execution_profile_required'})
     last_session_score = None
     if sessions_30d:
         last_session_score = compute_session_quality(sessions_30d[0])
 
     avg = (
-        sum(compute_session_quality(s) for s in sessions_30d) / len(sessions_30d)
+        sum(quality for s in sessions_30d if (quality := compute_session_quality(s)) is not None) / len(sessions_30d)
         if sessions_30d else 0.0
     )
     grade = compute_grade(avg, len(sessions_30d))
@@ -147,6 +151,7 @@ def user_profile_preview(
 
     sessions_count = db.execute(
         select(WorkoutSession)
+        .where(WorkoutSession.template_slug_snapshot != 'science:v3:first-session')
         .where(
             WorkoutSession.user_id == target.id,
             WorkoutSession.status == "completed",
@@ -161,6 +166,7 @@ def user_profile_preview(
     # sessions, not just 30d, so the badge stays consistent with leaderboard).
     all_sessions = db.execute(
         select(WorkoutSession)
+        .where(WorkoutSession.template_slug_snapshot != 'science:v3:first-session')
         .where(
             WorkoutSession.user_id == target.id,
             WorkoutSession.status == "completed",
@@ -168,9 +174,12 @@ def user_profile_preview(
         )
     ).scalars().all()
     if all_sessions:
-        avg = sum(compute_session_quality(s) for s in all_sessions) / len(all_sessions)
+        avg = sum(quality for s in all_sessions if (quality := compute_session_quality(s)) is not None) / len(all_sessions)
         grade = compute_grade(avg, len(all_sessions))
     else:
+        if db.scalar(select(WorkoutSession.id).where(WorkoutSession.user_id == target.id,
+            WorkoutSession.template_slug_snapshot == 'science:v3:first-session').limit(1)):
+            raise HTTPException(409,detail={'error':'execution_profile_required'})
         grade = "C"
 
     return templates.TemplateResponse(

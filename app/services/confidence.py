@@ -17,7 +17,6 @@ from __future__ import annotations
 
 from app.services.anomalies import compute_anomalies
 
-
 LEVEL_HIGH = "eleve"
 LEVEL_MID = "moyen"
 LEVEL_LOW = "faible"
@@ -61,8 +60,11 @@ def compute_confidence_score(
     session,
     prior_weight_by_code: dict[str, float | None] | None = None,
     anomalies: list | None = None,
-) -> int:
+) -> int | None:
     """Return 0..100 logging confidence."""
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(session):
+        return None
     points = 0.0
     max_points = 0.0
 

@@ -7,6 +7,7 @@
  * that, per the SDK 58 docs). WAL keeps commits short.
  */
 import * as SQLite from 'expo-sqlite';
+import {attachPlanV3Journal,type PlanSQL} from './planV3Journal';
 
 import type { WorkoutState } from '../domain/workout';
 import type { Journal, LabKey, Metric, Restored } from './journalTypes';
@@ -60,7 +61,7 @@ const UPSERT_SNAPSHOT =
  * `name`: the lab keeps its own file; the connected app (D9) uses another, so a
  * lab command aimed at a fixture session can never reach the real server.
  */
-export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
+export async function openJournal(name = 'auren-n0-lab.db', options: {planV3OwnerId?:number} = {}): Promise<Journal> {
   const db = await SQLite.openDatabaseAsync(name);
   await db.execAsync(SCHEMA);
   // a command caught in flight by a force-kill has an unknown outcome: send it
@@ -69,7 +70,29 @@ export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
   // every write, on any connection, goes through one queue (see serial.ts)
   const serial = createSerialQueue();
 
+  const planV3 = options.planV3OwnerId === undefined ? undefined : await attachPlanV3Journal(db as unknown as PlanSQL, serial, options.planV3OwnerId);
+  const saveLegacySnapshot = async (txn: Pick<SQLite.SQLiteDatabase,'getFirstAsync'|'runAsync'>, snapshot: WorkoutState, at: number) => {
+    const row = await txn.getFirstAsync<{snapshot:string}>('SELECT snapshot FROM active_session WHERE id=1');
+    if (row && JSON.parse(row.snapshot)?.profile === 'PLAN_V3') return;
+    await txn.runAsync(UPSERT_SNAPSHOT, [JSON.stringify(snapshot), at]);
+  };
+  const orderRows = (rows: OutboxRow[]) => rows.some(row => row.kind === 'PLAN_V3_SET') ? rows : rows.sort((a,b)=>a.created_at_ms-b.created_at_ms);
   return {
+    planV3,
+    beginLegacy: (snapshot,current) => serial(async()=>{
+      if(!current())throw Error('stale_identity');
+      await db.withExclusiveTransactionAsync(async tx=>{
+        const row=await tx.getFirstAsync<{snapshot:string}>('SELECT snapshot FROM active_session WHERE id=1');
+        const active=row?JSON.parse(row.snapshot):null;
+        if(active?.profile==='PLAN_V3'){
+          if(active.owner_id!==options.planV3OwnerId||active.phase!=='COMPLETE'||active.execution?.status!=='completed'||!['SET','REST'].includes(snapshot.phase)||!snapshot.plan||snapshot.plan.session_id===active.execution.session_id)throw Error('active_session_conflict');
+          if(await tx.getFirstAsync("SELECT op_id FROM outbox WHERE state NOT IN ('acked','resolved') LIMIT 1"))throw Error('pending_journal_conflict');
+        }
+        if(!current())throw Error('stale_identity');
+        await tx.runAsync(UPSERT_SNAPSHOT,[JSON.stringify(snapshot),Date.now()]);
+        if(!current())throw Error('stale_identity');
+      });
+    }),
     kind: 'sqlite',
 
     async restore(): Promise<Restored> {
@@ -77,8 +100,9 @@ export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
         'SELECT snapshot FROM active_session WHERE id = 1',
       );
       const sets = await db.getAllAsync<JournalRow>('SELECT * FROM journal_sets ORDER BY created_at_ms');
-      const outbox = await db.getAllAsync<OutboxRow>('SELECT * FROM outbox ORDER BY created_at_ms, rowid');
-      return { snapshot: row ? (JSON.parse(row.snapshot) as WorkoutState) : null, sets, outbox };
+      const outbox = await db.getAllAsync<OutboxRow>('SELECT * FROM outbox ORDER BY rowid');
+      const value = row ? JSON.parse(row.snapshot) : null;
+      return { snapshot: value?.profile === 'PLAN_V3' ? null : value, sets, outbox: orderRows(outbox) };
     },
 
     commitValidation: (r: JournalRow, c: SetCommand, snapshot: WorkoutState): Promise<number> =>
@@ -98,14 +122,14 @@ export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
               "VALUES (?, ?, ?, ?, ?, 0, 'pending')",
             [c.op_id, c.kind, c.target, JSON.stringify(c.payload), r.created_at_ms],
           );
-          await txn.runAsync(UPSERT_SNAPSHOT, [JSON.stringify(snapshot), r.created_at_ms]);
+          await saveLegacySnapshot(txn, snapshot, r.created_at_ms);
         });
         return performance.now() - t0;
       })),
 
     saveSnapshot: (snapshot: WorkoutState): Promise<void> =>
       serial(async () => {
-        await db.runAsync(UPSERT_SNAPSHOT, [JSON.stringify(snapshot), Date.now()]);
+        await db.withExclusiveTransactionAsync(async txn => { await saveLegacySnapshot(txn, snapshot, Date.now()); });
       }),
 
     enqueue: (c: Command, snapshot: WorkoutState): Promise<void> =>
@@ -117,14 +141,14 @@ export async function openJournal(name = 'auren-n0-lab.db'): Promise<Journal> {
               "VALUES (?, ?, ?, ?, ?, 0, 'pending')",
             [c.op_id, c.kind, c.target, JSON.stringify(c.payload), now],
           );
-          await txn.runAsync(UPSERT_SNAPSHOT, [JSON.stringify(snapshot), now]);
+          await saveLegacySnapshot(txn, snapshot, now);
         });
       })),
 
     async outboxRows(): Promise<OutboxRow[]> {
-      return db.getAllAsync<OutboxRow>(
-        "SELECT * FROM outbox WHERE state != 'acked' ORDER BY created_at_ms, rowid",
-      );
+      return orderRows(await db.getAllAsync<OutboxRow>(
+        "SELECT * FROM outbox WHERE state NOT IN ('acked','resolved') ORDER BY rowid",
+      ));
     },
 
     markOutbox: (opId: string, state: OutboxRow['state'], attempts: number): Promise<void> =>

@@ -341,13 +341,14 @@ def get_training_preferences(db: Session, user_id: int) -> TrainingPreferencesDa
     )
 
 
-def save_training_preferences(
+def apply_training_preferences_in_transaction(
     db: Session,
     user_id: int,
     *,
     sessions_per_week: Any = None,
     focus_priorities: Any = None,
     available_equipment: Any = None,
+    invalidate_plan: bool = True,
 ) -> TrainingPreferencesData:
     """Crée ou met à jour **la** ligne de cet utilisateur. Atomique.
 
@@ -364,8 +365,11 @@ def save_training_preferences(
     validated_focus = validate_focus_priorities(focus_priorities)
     validated_equipment = validate_available_equipment(available_equipment)
 
+    from app.services.plan_v3.transactions import guard_owner
+    guard_owner(db, user_id)
     row = db.execute(
         select(TrainingPreferences).where(TrainingPreferences.user_id == user_id)
+        .execution_options(populate_existing=True)
     ).scalar_one_or_none()
 
     if row is None:
@@ -376,7 +380,10 @@ def save_training_preferences(
     row.focus_priorities = _dump(validated_focus)
     row.available_equipment = _dump(validated_equipment)
     row.updated_at = datetime.now(UTC)
-    db.commit()
+    if invalidate_plan:
+        from app.services.plan_v3.snapshots import invalidate_preferences
+        invalidate_preferences(db, user_id, ("sessions_per_week", "declared_priorities", "environment"))
+    db.flush()
 
     return TrainingPreferencesData(
         sessions_per_week=validated_sessions,
@@ -386,6 +393,17 @@ def save_training_preferences(
             row.available_equipment_items, "available_equipment_items"
         ),
     )
+
+
+def save_training_preferences(
+    db: Session, user_id: int, *, sessions_per_week: Any = None,
+    focus_priorities: Any = None, available_equipment: Any = None,
+) -> TrainingPreferencesData:
+    result = apply_training_preferences_in_transaction(db, user_id,
+        sessions_per_week=sessions_per_week, focus_priorities=focus_priorities,
+        available_equipment=available_equipment)
+    db.commit()
+    return result
 
 
 def save_available_equipment_items(
@@ -404,6 +422,8 @@ def save_available_equipment_items(
     """
     validated = validate_available_equipment_items(items)
 
+    from app.services.plan_v3.transactions import guard_owner
+    guard_owner(db, user_id)
     row = db.execute(
         select(TrainingPreferences).where(TrainingPreferences.user_id == user_id)
     ).scalar_one_or_none()
@@ -413,6 +433,8 @@ def save_available_equipment_items(
 
     row.available_equipment_items = _dump(validated)
     row.updated_at = datetime.now(UTC)
+    from app.services.plan_v3.snapshots import invalidate_preferences
+    invalidate_preferences(db, user_id, ("environment",))
     db.commit()
 
     return get_training_preferences(db, user_id)

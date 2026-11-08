@@ -395,6 +395,8 @@ def test_alembic_head_unchanged():
     # née vide. Révoquer UN appareil et refuser un jeton de rafraîchissement
     # déjà échangé exigent un état serveur par appareil, que l'époque par
     # compte ne peut pas porter).
+    # puis PLAN V3 (`plan_v3_20261107_01` : sept tables additives de
+    # workflow et indexes propriétaires, sans backfill ni seed ACTIVE).
     # Cette sentinelle suit le head courant.
     #
     # ⚠ ELLE NE SE VÉRIFIE PAS EN ISOLATION DEPUIS UN AUTRE RÉPERTOIRE.
@@ -403,4 +405,4 @@ def test_alembic_head_unchanged():
     # ce test depuis un autre arbre lit les migrations de CET arbre et rend un
     # vert qui ne dit rien. Le sweep, lui, fait `cd` dans son propre arbre —
     # c'est pourquoi lui seul a vu ce head changer.
-    assert script.get_current_head() == "z7a2u8v9x20"
+    assert script.get_current_head() == "plan_v3_20261107_01"
