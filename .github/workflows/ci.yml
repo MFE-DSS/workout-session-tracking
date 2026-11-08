@@ -145,13 +145,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Sb_OPS_CI_SCALE_02 — 2 → 3 shards. GitHub Actions ne peut pas appeler
+        # CI_PLAN_V3_CAPACITY — 3 → 5 shards. GitHub Actions ne peut pas appeler
         # Python pour construire une matrice, donc cette liste est la SEULE
         # copie du nombre de shards que le YAML doit porter en dur. Elle est
         # machine-vérifiée : `tests/test_ci_shard_topology.py` compare cette
         # matrice à `ci_test_shards.DEFAULT_SHARDS` et échoue si elles
         # divergent. Tout le reste du pipeline dérive le nombre.
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4, 5]
     runs-on: ubuntu-latest
     # Sx_UI_07.1 CI headroom — full pytest+coverage can exceed 35 min on slow runners; gates unchanged.
     timeout-minutes: 45
@@ -421,7 +421,8 @@ jobs:
           echo "CANONICAL ATTESTATION — verdict réutilisé."
           echo "  ${{ needs.canonical-attestation.outputs.reason }}"
           echo ""
-          echo "NON exécuté : les 3 shards pytest."
+          shard_count="$(python scripts/ci_test_shards.py --shard-count)"
+          echo "NON exécuté : les ${shard_count} shards pytest."
           echo "Exécuté à l'identique : lint, QA catalogue/atlas/EKB,"
           echo "  drift Alembic, snapshot de schéma, patterns et roundtrip de"
           echo "  migration, perf smoke, et l'analyse SonarCloud de branche"

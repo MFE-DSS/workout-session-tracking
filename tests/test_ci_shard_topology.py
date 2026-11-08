@@ -74,8 +74,8 @@ def test_the_matrix_is_contiguous_and_one_based():
 
 
 def test_the_canonical_shard_count_is_at_least_the_measured_need():
-    """2 shards ont mesuré 3 701 Mo sur le shard B — sous le plancher de 4 Go."""
-    assert _sharder().DEFAULT_SHARDS >= 3
+    """Three-shard PLAN runs exhausted headroom; five is the first candidate."""
+    assert _sharder().DEFAULT_SHARDS >= 5
 
 
 # ── L'agrégateur DÉRIVE le nombre au lieu de le répéter ──────────────────────
@@ -253,7 +253,7 @@ def test_each_shard_runs_only_its_own_slice():
     assert "ci_test_shards.py --shard ${{ matrix.shard }}" in _workflow_text()
 
 
-@pytest.mark.parametrize("count", [1, 2, 3, 4, 5, 8])
+@pytest.mark.parametrize("count", [1, 2, 3, 4, 5, 6, 8])
 def test_the_partition_stays_exact_at_any_shard_count(count):
     """Scaling further must not need a new algorithm."""
     mod = _sharder()

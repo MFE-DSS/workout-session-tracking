@@ -697,3 +697,15 @@ sept tables serveur/une locale, vrais producteurs et séance native testée sur
 base synthétique isolée. Les mentions NO_GO_BUILD précédentes conservent leur
 instant historique. Pixels, full final et CI/merge ne sont pas anticipés.
 DATA réelle/activation/déploiement/RELEASE physique et MOB03 global restent OPEN.
+
+## CI — capacité de la suite PLAN V3
+
+9 novembre 2026. [ci-plan-v3-capacity](../../openspec/changes/ci-plan-v3-capacity/proposal.md),
+[design](../../openspec/changes/ci-plan-v3-capacity/design.md) et
+[GO BUILD](../../openspec/changes/ci-plan-v3-capacity/BUILD_AUTHORIZATION.md).
+Correction de capacité après les shutdowns des canoniques/closeout PLAN,
+cinq shards puis six seulement sur preuve de besoin ; deux workers, ensemble
+de tests et couverture complète/checks requis inchangés. TDD et broad CI
+184 passants ; full local et vraie capacité PR/canonique en vérification.
+Aucun changement app/SCI/SDK/visuel/activation. PLAN#379 code fusionné31b89f9 ;
+#380 reste draft jusqu’aux vérifications canoniques réelles. Aucun CLOSED anticipé.
