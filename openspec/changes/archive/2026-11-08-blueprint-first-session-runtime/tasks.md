@@ -115,7 +115,7 @@
 
 - [x] Exécuter python scripts/check_scope.py puis tous checks du tier effectif : spec protocol, OpenSpec strict, ruff/budget, ciblés+broad, migrations/drift/snapshot et full sweep local si migration. Aucune commande pytest -n auto, aucun sweep CI sur poste.
 - [x] Revue code et SCI indépendantes du HEAD final ; preuve de l’autorité et du mapping, pas nouvelle admission par PLAN. Exécuter T32 dans vraie application native contrôlée et conserver preuve A→J. Préparer/exécuter T25 physiques seulement avec cible/appareils autorisés ; rester OPEN si non disponibles.
-- [ ] CI réelle/contrôles obligatoires du HEAD final ; Sonar réel consigné consultatif, aucune gate affaiblie. Livraison du scope contrôlé uniquement après GO confirmant BUILD_SCOPE, preuve A→J native et visuel applicable, commit de merge sans bypass sous GO permanent.
+- [x] CI réelle/contrôles obligatoires du HEAD final ; Sonar réel consigné consultatif, aucune gate affaiblie. Livraison du scope contrôlé uniquement après GO confirmant BUILD_SCOPE, preuve A→J native et visuel applicable, commit de merge sans bypass sous GO permanent.
 - [ ] Vérifier canonique, conserver vrais SHAs/runs/gates et dépendances ouvertes, puis closeout/cleanup des seuls éléments sans travail unique. Ne cocher PLAN-01..07 qu’après preuves effectives correspondantes, jamais grâce à la préparation.
 
 ## Réconciliation des entités et des gates du nouveau mandat
@@ -148,3 +148,13 @@ reste en cours et ses cases ouvertes jusqu’aux résultats observés.
 - [ ] DATA : auteur/version/finalités/consentements/copies/rétention/effacement autorisés avant données réelles.
 - [ ] Activation/déploiement : autorisation distincte, environnement et rollback effectifs.
 - [ ] Six autres premières rencontres : protocole et admission SCI propres, hors ce scope contrôlé.
+
+## Instant de préparation de l'archive
+
+Code PR379 intégré31b89f9 après CI42523124371 neuf jobs réussis.
+Archive locale et spec canonique préparées en draft sous le périmètre contrôlé
+approuvé ; CI canonique code42526541847 encore en suivi. Les six cases restantes
+sont suivies explicitement : cinq dépendances externes (DATA répétée à ses deux
+points d'entrée, T25, déploiement, six pilotes) et livraison canonique/cleanup.
+Aucune n'est déclarée réussie par l'archivage local ; ce dernier ne devient
+canonique qu'à la fusion de maintenance après les contrôles requis.

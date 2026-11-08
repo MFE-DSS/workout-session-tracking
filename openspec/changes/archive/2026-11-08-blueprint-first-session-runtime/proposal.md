@@ -2,7 +2,7 @@
 
 Le premier usage livré sait lire les préférences et refuser honnêtement l’absence de producteur. Il ne construit aucun Blueprint propriétaire et ne transforme pas un plan scientifique en séance réelle. PLAN prépare ce passage : snapshot serveur, V3 explicitement négocié, commande idempotente et reprise/journal natifs réels.
 
-Base initiale9717368, réconciliée le7novembre2026 au canonique `d7de8aa02248c63d8914fb69f8c4c8a9fd980ee0`. Source : [proposition réservée](../../../docs/proposals/blueprint-first-session-runtime.md), PLAN-01..07, tous encore ouverts. Le paquet D conservé dans `/private/tmp/auren-arch-po-packs-01` reste une préparation antérieure, sans autorité de build ni contrat V2 à recopier.
+Base initiale9717368, réconciliée le7novembre2026 au canonique `d7de8aa02248c63d8914fb69f8c4c8a9fd980ee0`. Source : [proposition réservée](../../../../docs/proposals/blueprint-first-session-runtime.md), PLAN-01..07, tous encore ouverts. Le paquet D conservé dans `/private/tmp/auren-arch-po-packs-01` reste une préparation antérieure, sans autorité de build ni contrat V2 à recopier.
 
 # What Changes
 
