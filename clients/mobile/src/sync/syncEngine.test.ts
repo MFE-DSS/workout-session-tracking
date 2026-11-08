@@ -131,3 +131,15 @@ test('stopping an old account engine prevents later rows and retry timers after 
   expect(sent).toEqual(['a']);
   expect(stateOf(j)).toEqual({ a: 'pending', b: 'pending' });
 });
+
+test('a refused V3 fact blocks its dependent corrections and close, including a later drain',async()=>{
+ const j=journal([row('v3','PLAN_V3_SET'),row('correction','PLAN_V3_SET'),row('close','SESSION_FINISH')]);const sent:string[]=[];
+ const engine=new SyncEngine(j,async r=>{sent.push(r.op_id);throw new ApiFailure('http',409,'set_revision_mismatch');},()=>undefined);
+ await engine.kick();await engine.kick();engine.stop();
+ expect(sent).toEqual(['v3']);expect(stateOf(j)).toEqual({v3:'failed',correction:'pending',close:'pending'});
+});
+test('an explicitly resolved refusal remains resolved while a queued closure can proceed',async()=>{
+ const j=journal([{...row('refused','PLAN_V3_SET'),state:'resolved'},row('finish','SESSION_FINISH')]);
+ const sent:string[]=[];await new SyncEngine(j,async r=>{sent.push(r.op_id);},()=>{}).kick();
+ expect(sent).toEqual(['finish']);expect(stateOf(j)).toEqual({refused:'resolved',finish:'acked'});
+});

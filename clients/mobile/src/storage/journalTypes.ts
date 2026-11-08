@@ -10,6 +10,8 @@ export type Restored = {
 };
 
 export interface Journal {
+  beginLegacy?(snapshot:WorkoutState,current:()=>boolean):Promise<void>;
+  readonly planV3?: import('./planV3Journal').PlanV3Journal;
   readonly kind: 'sqlite' | 'memory';
   restore(): Promise<Restored>;
   /**
@@ -25,7 +27,7 @@ export interface Journal {
    * force-kill together, or not at all.
    */
   enqueue(command: Command, snapshot: WorkoutState): Promise<void>;
-  /** D9 — every command not yet acknowledged, in the order it was decided. */
+  /** D9 — unresolved commands in decision order; resolved refusals stay in history, never as ACKs. */
   outboxRows(): Promise<OutboxRow[]>;
   markOutbox(opId: string, state: OutboxRow['state'], attempts: number): Promise<void>;
   recordMetric(name: string, value: number): Promise<void>;

@@ -68,6 +68,9 @@ def provenance_de(db: Session, session) -> Provenance | None:
     antérieures à `REC-CP4` en sont dépourvues, et une séance démarrée
     hors d'un conseil n'en aura jamais. On ne fabrique rien.
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(session):
+        return None
     episode = db.execute(
         select(RecommendationEpisode)
         .where(RecommendationEpisode.session_id == session.id)

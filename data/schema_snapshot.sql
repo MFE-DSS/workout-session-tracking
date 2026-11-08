@@ -31,6 +31,9 @@ CREATE INDEX ix_exercise_muscle_mapping_zone ON exercise_muscle_mappings (body_z
 -- index: ix_exercises_name
 CREATE INDEX ix_exercises_name ON exercises (name);
 
+-- index: ix_first_plan_evaluation_snapshot
+CREATE INDEX ix_first_plan_evaluation_snapshot ON first_plan_evaluations (owner_id, snapshot_id, created_at);
+
 -- index: ix_plan_adapt_dismissal_user
 CREATE INDEX ix_plan_adapt_dismissal_user ON plan_adaptation_dismissals (user_id);
 
@@ -79,6 +82,21 @@ CREATE INDEX ix_workout_sessions_user_id ON workout_sessions (user_id);
 -- index: ix_ws_user_status_excl_started
 CREATE INDEX ix_ws_user_status_excl_started ON workout_sessions (user_id, status, excluded_from_stats, started_at);
 
+-- index: uq_first_created_handoff_owner
+CREATE UNIQUE INDEX uq_first_created_handoff_owner ON first_session_requests (owner_id) WHERE state = 'CREATED';
+
+-- index: uq_plan_v3_se_session
+CREATE UNIQUE INDEX uq_plan_v3_se_session ON session_exercises (id, session_id);
+
+-- index: uq_plan_v3_set_exercise
+CREATE UNIQUE INDEX uq_plan_v3_set_exercise ON set_logs (id, session_exercise_id);
+
+-- index: uq_plan_v3_ws_owner
+CREATE UNIQUE INDEX uq_plan_v3_ws_owner ON workout_sessions (id, user_id);
+
+-- table: blueprint_source_events
+CREATE TABLE blueprint_source_events ( id VARCHAR(36) NOT NULL, owner_id INTEGER NOT NULL, source_revision INTEGER NOT NULL, request_id VARCHAR(64) NOT NULL, body_digest VARCHAR(64) NOT NULL, kind VARCHAR(32) NOT NULL, payload_json TEXT NOT NULL, recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_blueprint_positive_revision CHECK (source_revision > 0), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT uq_blueprint_source_request UNIQUE (owner_id, request_id), CONSTRAINT uq_blueprint_source_revision UNIQUE (owner_id, source_revision) );
+
 -- table: body_consents
 CREATE TABLE body_consents ( id INTEGER NOT NULL, user_id INTEGER NOT NULL, consent_type VARCHAR(64) NOT NULL, granted BOOLEAN NOT NULL, consent_version INTEGER NOT NULL, granted_at DATETIME, withdrawn_at DATETIME, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_body_consent_user_type UNIQUE (user_id, consent_type), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE );
 
@@ -103,11 +121,29 @@ CREATE TABLE exercise_muscle_mappings ( id INTEGER NOT NULL, exercise_code VARCH
 -- table: exercises
 CREATE TABLE exercises ( id INTEGER NOT NULL, slug VARCHAR(96) NOT NULL, name VARCHAR(255) NOT NULL, source VARCHAR(16) NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT uq_exercises_slug UNIQUE (slug) );
 
+-- table: first_plan_evaluations
+CREATE TABLE first_plan_evaluations ( id VARCHAR(36) NOT NULL, owner_id INTEGER NOT NULL, snapshot_id VARCHAR(36) NOT NULL, parent_evaluation_id VARCHAR(36), operation_kind VARCHAR(16) NOT NULL, request_id VARCHAR(64) NOT NULL, body_digest VARCHAR(64) NOT NULL, source_revision INTEGER NOT NULL, authority_generation INTEGER NOT NULL, request_json TEXT NOT NULL, result_json TEXT NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_evaluation_kind CHECK ((operation_kind = 'EVALUATE' AND parent_evaluation_id IS NULL) OR (operation_kind = 'TIME_ACK' AND parent_evaluation_id IS NOT NULL)), CONSTRAINT ck_evaluation_generation CHECK (source_revision >= 0 AND authority_generation > 0), CONSTRAINT fk_evaluation_parent_owner FOREIGN KEY(owner_id, parent_evaluation_id) REFERENCES first_plan_evaluations (owner_id, id), CONSTRAINT fk_evaluation_snapshot_owner FOREIGN KEY(owner_id, snapshot_id) REFERENCES owned_blueprint_snapshots (owner_id, id), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT uq_first_plan_evaluation_owner UNIQUE (owner_id, id), CONSTRAINT uq_first_plan_evaluation_request UNIQUE (owner_id, operation_kind, request_id) );
+
+-- table: first_plan_execution_bindings
+CREATE TABLE first_plan_execution_bindings ( session_id INTEGER NOT NULL, owner_id INTEGER NOT NULL, evaluation_id VARCHAR(36) NOT NULL, execution_profile_version VARCHAR(64) NOT NULL, scientific_session_id VARCHAR(128) NOT NULL, immutable_payload_json TEXT NOT NULL, binding_digest VARCHAR(64) NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (session_id), CONSTRAINT fk_first_binding_evaluation_owner FOREIGN KEY(owner_id, evaluation_id) REFERENCES first_plan_evaluations (owner_id, id), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT fk_first_binding_session_owner FOREIGN KEY(session_id, owner_id) REFERENCES workout_sessions (id, user_id), CONSTRAINT uq_first_binding_session_owner UNIQUE (session_id, owner_id) );
+
+-- table: first_plan_runtime_authorities
+CREATE TABLE first_plan_runtime_authorities ( profile_key VARCHAR(64) NOT NULL, generation INTEGER NOT NULL, state VARCHAR(16) NOT NULL, publication_json TEXT, packaging_digest VARCHAR(64), approval_ref VARCHAR(255), updated_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (profile_key), CONSTRAINT ck_plan_active_publication CHECK (state != 'ACTIVE' OR (publication_json IS NOT NULL AND packaging_digest IS NOT NULL AND approval_ref IS NOT NULL)), CONSTRAINT ck_plan_authority_state CHECK (state IN ('DISABLED', 'ACTIVE', 'WITHDRAWN')), CONSTRAINT ck_plan_authority_generation CHECK (generation > 0) );
+
+-- table: first_plan_set_observations
+CREATE TABLE first_plan_set_observations ( id VARCHAR(36) NOT NULL, owner_id INTEGER NOT NULL, session_id INTEGER NOT NULL, session_exercise_id INTEGER NOT NULL, set_id INTEGER NOT NULL, op_id VARCHAR(64) NOT NULL, body_digest VARCHAR(64) NOT NULL, expected_revision INTEGER NOT NULL, applied_revision INTEGER NOT NULL, observation_json TEXT NOT NULL, receipt_json TEXT NOT NULL, recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_plan_set_revision CHECK (expected_revision >= 0 AND applied_revision = expected_revision + 1), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT fk_plan_set_exercise_session FOREIGN KEY(session_exercise_id, session_id) REFERENCES session_exercises (id, session_id), CONSTRAINT fk_plan_set_binding_owner FOREIGN KEY(session_id, owner_id) REFERENCES first_plan_execution_bindings (session_id, owner_id), CONSTRAINT fk_plan_set_log_exercise FOREIGN KEY(set_id, session_exercise_id) REFERENCES set_logs (id, session_exercise_id), CONSTRAINT uq_first_plan_set_operation UNIQUE (owner_id, op_id), CONSTRAINT uq_first_plan_set_revision UNIQUE (set_id, applied_revision) );
+
+-- table: first_session_requests
+CREATE TABLE first_session_requests ( id VARCHAR(36) NOT NULL, owner_id INTEGER NOT NULL, request_id VARCHAR(64) NOT NULL, body_digest VARCHAR(64) NOT NULL, body_json TEXT NOT NULL, evaluation_id VARCHAR(36), state VARCHAR(16) NOT NULL, session_id INTEGER, scientific_session_id VARCHAR(128), terminal_code VARCHAR(64), created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_first_session_terminal CHECK ((state = 'CREATED' AND session_id IS NOT NULL AND evaluation_id IS NOT NULL AND scientific_session_id IS NOT NULL) OR (state IN ('DENIED', 'CANCELLED') AND session_id IS NULL)), CONSTRAINT fk_first_request_evaluation_owner FOREIGN KEY(owner_id, evaluation_id) REFERENCES first_plan_evaluations (owner_id, id), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT fk_first_request_session_owner FOREIGN KEY(session_id, owner_id) REFERENCES workout_sessions (id, user_id), CONSTRAINT uq_first_session_request UNIQUE (owner_id, request_id), CONSTRAINT uq_first_session_request_session UNIQUE (session_id) );
+
 -- table: method_rules
 CREATE TABLE method_rules ( id INTEGER NOT NULL, slug VARCHAR(64) NOT NULL, position INTEGER NOT NULL, title VARCHAR(128) NOT NULL, body TEXT NOT NULL, PRIMARY KEY (id), UNIQUE (slug) );
 
 -- table: muscles
 CREATE TABLE muscles ( id INTEGER NOT NULL, code VARCHAR(64) NOT NULL, name VARCHAR(128) NOT NULL, body_zone_code VARCHAR(64), category VARCHAR(32), is_active BOOLEAN DEFAULT '1' NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), UNIQUE (code), FOREIGN KEY(body_zone_code) REFERENCES body_zones (code) ON DELETE SET NULL );
+
+-- table: owned_blueprint_snapshots
+CREATE TABLE owned_blueprint_snapshots ( id VARCHAR(36) NOT NULL, owner_id INTEGER NOT NULL, request_id VARCHAR(64) NOT NULL, body_digest VARCHAR(64) NOT NULL, source_revision INTEGER NOT NULL, as_of DATETIME NOT NULL, snapshot_json TEXT NOT NULL, snapshot_digest VARCHAR(64) NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), CONSTRAINT ck_snapshot_revision CHECK (source_revision >= 0), FOREIGN KEY(owner_id) REFERENCES users (id), CONSTRAINT uq_blueprint_snapshot_owner UNIQUE (owner_id, id), CONSTRAINT uq_blueprint_snapshot_request UNIQUE (owner_id, request_id) );
 
 -- table: plan_adaptation_dismissals
 CREATE TABLE plan_adaptation_dismissals ( id INTEGER NOT NULL, decision_id VARCHAR(64) NOT NULL, user_id INTEGER NOT NULL, dismissed_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, PRIMARY KEY (id), FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE, CONSTRAINT uq_plan_adapt_dismissal_decision_id UNIQUE (decision_id) );

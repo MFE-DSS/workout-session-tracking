@@ -5,8 +5,10 @@
  */
 module.exports = ({ config }) => ({
   ...config,
+  ...(process.env.EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST === '1' ? {name:'AUREN PLAN Test',scheme:'auren-plan-v3-test',android:{...config.android,package:'dev.auren.plan.v3.controlled'}} : {}),
   ios: {
     ...config.ios,
+    ...(process.env.EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST === '1' ? {bundleIdentifier: 'dev.auren.plan.v3.controlled'} : {}),
     ...(process.env.APPLE_TEAM_ID ? { appleTeamId: process.env.APPLE_TEAM_ID } : {}),
   },
 });

@@ -689,3 +689,11 @@ Actualisation PLAN FIRST REAL SESSION DELIVERY (préparation, aucun GO) : [scope
 
 
 Préparation PLAN réconciliée au b4a4242,8novembre2026 : [calibrage/PLAN](../../openspec/changes/blueprint-first-session-runtime/BOOTSTRAP_INTEGRATION.md), [scope de build proposé](../../openspec/changes/blueprint-first-session-runtime/BUILD_SCOPE.md), [croquisG1](../../openspec/changes/blueprint-first-session-runtime/REVIEW_BOARD.md). Pilote scientifique livré, registre79sources, ouverture sans sept réglages ; plan V3 conservant les sept et handshake réel.37preuves spécifiées, relecture ciblée sans Important, OpenSpec14/14 ; préparation seulement, GO BUILD PLAN/croquis/pixels/DATA/runtime non déduits du GO SCI. Aucune modification app/mobile/tools/migration ou nouvelle PR.
+
+Actualisation PLAN8novembre2026 : GO_BUILD_CONTROLLED et G1 reçus
+([autorisation](../../openspec/changes/blueprint-first-session-runtime/BUILD_AUTHORIZATION.md)).
+Implémentation contrôlée en vérification, [livraison](../plan/blueprint-first-session-runtime/DELIVERY.md),
+sept tables serveur/une locale, vrais producteurs et séance native testée sur
+base synthétique isolée. Les mentions NO_GO_BUILD précédentes conservent leur
+instant historique. Pixels, full final et CI/merge ne sont pas anticipés.
+DATA réelle/activation/déploiement/RELEASE physique et MOB03 global restent OPEN.

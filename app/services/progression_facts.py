@@ -183,6 +183,7 @@ def build_progression_facts(
     rows = db.execute(
         select(SessionExercise)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(WorkoutSession.template_slug_snapshot != "science:v3:first-session")
         .where(
             WorkoutSession.user_id == user_id,
             WorkoutSession.status == "completed",

@@ -93,7 +93,8 @@ export class SyncEngine {
     const rows = await this.journal.outboxRows();
     for (const row of rows) {
       if (this.stopped) break;
-      if (row.state === 'failed' || row.state === 'acked') continue;
+      if (row.state === 'failed' && row.kind === 'PLAN_V3_SET') break;
+      if (row.state === 'failed' || row.state === 'acked' || row.state === 'resolved') continue;
       await this.publish(true);
       if (this.stopped) break;
       await this.journal.markOutbox(row.op_id, 'inflight', row.attempts);
@@ -108,6 +109,7 @@ export class SyncEngine {
         const outcome = classify(e);
         if (outcome === 'attention') {
           await this.journal.markOutbox(row.op_id, 'failed', row.attempts + 1);
+          if (row.kind === 'PLAN_V3_SET') break;
           continue;
         }
         await this.journal.markOutbox(row.op_id, 'pending', row.attempts + 1);

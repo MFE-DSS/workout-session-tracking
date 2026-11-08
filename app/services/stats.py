@@ -33,7 +33,7 @@ from sqlalchemy.orm import Session, joinedload, selectinload
 from app.models.session import SessionExercise, WorkoutSession
 
 
-def _fmt_weight(w: Optional[float]) -> str:
+def _fmt_weight(w: float | None) -> str:
     if w is None:
         return "—"
     # Drop .0 tails so "60.0" renders as "60"
@@ -42,7 +42,7 @@ def _fmt_weight(w: Optional[float]) -> str:
     return f"{w:g}"
 
 
-def _fmt_reps(r: Optional[int]) -> str:
+def _fmt_reps(r: int | None) -> str:
     return "—" if r is None else str(r)
 
 
@@ -104,13 +104,16 @@ def _summarise_prior(prior: SessionExercise, now: datetime) -> dict:
     }
 
 
-def summarise_current_exercise(se: SessionExercise) -> Optional[dict]:
+def summarise_current_exercise(se: SessionExercise) -> dict | None:
     """Compact summary of what was actually performed on a
     SessionExercise. Used by the completed-session readability block.
 
     Returns None if no work set has been marked completed — nothing
     to show for an untouched exercise.
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(getattr(se,'session',None)):
+        return None
     work = sorted(
         (sl for sl in se.set_logs if sl.kind == "work"),
         key=lambda s: s.set_index,
@@ -187,6 +190,9 @@ def last_time_by_exercise_code(
     prior whose substitution matches the current SessionExercise's
     substitution (prescribed↔prescribed, substituted↔same substituted_name).
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(current_session):
+        return {}
     # Current substitution per slot (normalized). A code absent here means
     # the slot isn't in the current session → we never surface a prior for it.
     key_cache: dict[str | None, str | None] = {}

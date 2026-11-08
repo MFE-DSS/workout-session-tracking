@@ -19,3 +19,13 @@ Passer du Blueprint canonique suffisant à une première séance possédée et e
 ## Frontières
 
 Aucune politique de rétention, consentement corporel nouveau ou suppression. MISSION visuelle LOCKED et son extension MOB04 ont leur propre proposition ; ni nouveau moteur ni UI scientifique inventée. Futur OpenSpec et GO BUILD avant application ; proposition uniquement.
+
+## Actualisation du8novembre2026 — scope contrôlé autorisé
+
+Le GO_BUILD_CONTROLLED et G1 du change blueprint-first-session-runtime sont reçus ;
+[autorisation](../../openspec/changes/blueprint-first-session-runtime/BUILD_AUTHORIZATION.md)
+et [livraison en vérification](../plan/blueprint-first-session-runtime/DELIVERY.md).
+SCI V3 et le pilote sont livrés/admis dans leurs limites : les versions historiques
+1.0.0/0.1.0 ci-dessus n'identifient pas le successeur courant. Le périmètre contrôlé
+réalise l'ingénierie sur données synthétiques ; il ne coche pas les critères
+hérités de données réelles, disponibilité effective ou recette physique.

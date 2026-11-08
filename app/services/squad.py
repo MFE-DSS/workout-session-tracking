@@ -292,6 +292,8 @@ def compute_squad_leaderboard(db: Session, squad_id: int) -> list[dict]:
                 if sl.kind == "work" and sl.completed
             )
             quality = compute_session_quality(s)
+            if quality is None:
+                continue
             completion_ratio = done_work / total_work
             session_pts = quality * completion_ratio
             total_pts += session_pts

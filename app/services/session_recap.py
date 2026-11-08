@@ -152,6 +152,10 @@ def build_recap(
     prior_weight_by_code: dict[str, float | None] | None = None,
 ) -> dict[str, Any]:
     """Return a dict shaped for the session_done.html template."""
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(session):
+        from app.services.plan_v3.transactions import RuntimeFailure
+        raise RuntimeFailure('execution_profile_required',409)
     kind = _kind(session)
     duration_label = _duration_label(session)
 

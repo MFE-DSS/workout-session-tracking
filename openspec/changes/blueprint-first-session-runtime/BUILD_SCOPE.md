@@ -1,6 +1,6 @@
 # PLAN V3 — décision de réalisation soumise à l'opérateur
 
-8 novembre 2026. **PROPOSED / NO_GO_BUILD / NOT_SERVED.** Base b4a42420afa1aca384a16bd3966ab85a97cfd724 après fetch. [Réconciliation calibrage/PLAN](BOOTSTRAP_INTEGRATION.md). [Mandat reçu](OPERATOR_REQUEST.md), [design](design.md), [schéma justifié](MINIMAL_PERSISTENCE.md), [board de croquis](REVIEW_BOARD.md), [tâches](tasks.md).
+8 novembre 2026. **GO_BUILD_CONTROLLED reçu / production NOT_SERVED.** Décision «Autoriser le build PLAN contrôlé» ; G1 puis pixels acceptés séparément. Le texte de proposition ci-dessous conserve le scope exact revu, non une demande de GO à renouveler. Base b4a42420afa1aca384a16bd3966ab85a97cfd724 après fetch. [Réconciliation calibrage/PLAN](BOOTSTRAP_INTEGRATION.md). [Mandat reçu](OPERATOR_REQUEST.md), [design](design.md), [schéma justifié](MINIMAL_PERSISTENCE.md), [board de croquis](REVIEW_BOARD.md), [tâches](tasks.md).
 
 ## Direction reçue, pas à réarbitrer
 

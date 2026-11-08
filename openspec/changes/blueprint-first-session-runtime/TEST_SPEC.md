@@ -1,6 +1,6 @@
 # Test specification — PLAN V3 runtime
 
-**Tests futurs à écrire après GO BUILD ; aucun test produit ajouté/exécuté par cette préparation.** Les noms et assertions ci-dessous constituent les oracles d’implémentation, pas des résultats obtenus. Un résultat positif vient du vrai producteur/registre/validateur admis livré par SCI ; aucune fixture READY locale ne le remplace. SCI PR375 fournit déjà isolément les deux états positifs et deux négatifs décrits dans son AGENT_HANDOFF/manifeste ; cela ne satisfait aucun des tests runtime futurs ci-dessous et sa livraison canonique est vérifiée sur d7de8aa (quatre CI réussies).
+**Oracles rédigés avant GO BUILD.** La préparation ne les avait pas exécutés ; le GO contrôlé puis les preuves effectives sont désormais consignés dans [TEST_EVIDENCE](../../../docs/plan/blueprint-first-session-runtime/TEST_EVIDENCE.md). Les formulations futures ci-dessous conservent les exigences revues, sans transformer T25/production en PASS. Les noms et assertions ci-dessous constituent les oracles d’implémentation, pas des résultats obtenus. Un résultat positif vient du vrai producteur/registre/validateur admis livré par SCI ; aucune fixture READY locale ne le remplace. SCI PR375 fournit déjà isolément les deux états positifs et deux négatifs décrits dans son AGENT_HANDOFF/manifeste ; cela ne satisfait aucun des tests runtime futurs ci-dessous et sa livraison canonique est vérifiée sur d7de8aa (quatre CI réussies).
 
 ## Harness and evidence
 

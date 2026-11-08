@@ -172,7 +172,9 @@ def compute_behavioral_state(
         ).scalars().all()
     )
 
-    # Performance: composite score of most recent session
+    from app.services.plan_v3.execution import is_scientific_session
+    last_3 = [s for s in last_3 if not is_scientific_session(s)]
+    # Performance: composite score of most recent legacy-evaluable session
     performance = 0.0
     if last_3:
         s = last_3[0]

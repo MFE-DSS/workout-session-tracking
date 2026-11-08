@@ -1,6 +1,6 @@
 # PLAN V3 — board consolidé de croquis proposé
 
-**G1 / croquis non accepté, pas de pixels ni code UI.** Un seul board de revue pour le parcours. Il définit les contenus/actions à comparer ensuite aux références AUREN validées ; il n'autorise aucune nouvelle géométrie. Réutiliser marque/tokens/primitives, aucune illustration nouvelle. MISSION et composition de séance restent LOCKED.
+**G1 accepté le8novembre2026 («Valider ce croquis G1»). Pixels en cours de production, non acceptés ; aucun commit UI.** Un seul board de revue pour le parcours. Il définit les contenus/actions à comparer ensuite aux références AUREN validées ; il n'autorise aucune nouvelle géométrie. Réutiliser marque/tokens/primitives, aucune illustration nouvelle. MISSION et composition de séance restent LOCKED.
 
 ## Autorité visuelle et périmètre
 
@@ -102,3 +102,7 @@ Décisions distinctes : **GO BUILD de scope**, **acceptation du présent croquis
 Sources actuelles b4a4242 et BOOTSTRAP_INTEGRATION. Le nom «pilote» décrit la portée en revue, pas un label scientifique décoratif à afficher. Aucun compteur «exercice1/7» n’impose sept observations pour ouvrir la première rencontre. Une personne déjà qualifiée peut entrer directement par A'/C selon les faits et ses préférences. Aucun écran déjà accepté n’est redessiné par ce croquis.
 
 Le mineur SCI1.0.0 est conservé : le résultat peut redevenir state=SUPPORTED_INITIAL_EXPLORATION et phase=FAMILIARIZE si choix actuel absent alors qu’un essai passé existe. Projection proposée : présenter cet essai comme fait du ledger et la condition courante manquante, sans annoncer «aucune observation», sans transformer state ou ajouter une action. En ledger incomplet, progrès inconnu, pas0. L’accord G1 demandera explicitement cette distinction ; si elle n’est pas rendable, montage du pilote reste fermé jusqu’à correctif SCI versionné.
+
+## Pixels réalisés et décision reçue — 8 novembre2026
+
+Huit captures natives et références côte à côte : [UI_REVIEW](../../../docs/plan/blueprint-first-session-runtime/UI_REVIEW.md). Réponse opérateur «Valider ces pixels PLAN contrôlés», reçue avant commit UI. Les limites de simulateur, dimensions et sources synthétiques sont explicites ; aucune baseline LOCKED modifiée.

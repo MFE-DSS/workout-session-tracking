@@ -111,6 +111,7 @@ def get_exercise_history_by_slug(
     ses = db.execute(
         select(SessionExercise)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(WorkoutSession.template_slug_snapshot != "science:v3:first-session")
         .where(
             WorkoutSession.user_id == user_id if user_id is not None else True,
             WorkoutSession.status == "completed",
@@ -166,6 +167,7 @@ def get_exercise_history(
     stmt = (
         select(SessionExercise)
         .join(WorkoutSession, WorkoutSession.id == SessionExercise.session_id)
+        .where(WorkoutSession.template_slug_snapshot != "science:v3:first-session")
         .where(
             WorkoutSession.template_slug_snapshot == template_slug,
             SessionExercise.exercise_code_snapshot == exercise_code,

@@ -661,3 +661,37 @@ features:
     dependencies: ["exigence Store (Apple, Google)", RGPD, "conception de l'effacement (dur vs exclusion)"]
     visual_assets: []
     migration_risk: "élevé — bloquant pour toute diffusion publique"
+
+
+  - id: blueprint-first-session-v3
+    feature: Blueprint propriétaire, calibrage et première séance scientifique V3
+    family: seance
+    routes:
+      - GET /api/mobile/v3/me/first-plan/capabilities
+      - GET /api/mobile/v3/me/blueprint/declarations
+      - PUT /api/mobile/v3/me/blueprint/declarations
+      - POST /api/mobile/v3/me/blueprint/snapshots
+      - GET /api/mobile/v3/me/blueprint/snapshots/{snapshot_ref}
+      - POST /api/mobile/v3/me/blueprint/observations
+      - POST /api/mobile/v3/me/first-plan/evaluations
+      - GET /api/mobile/v3/me/first-plan/evaluations/{evaluation_ref}
+      - POST /api/mobile/v3/me/first-plan/evaluations/{evaluation_ref}/time-acknowledgments
+      - POST /api/mobile/v3/me/first-session-requests
+      - GET /api/mobile/v3/me/first-session-requests/{request_id}
+      - POST /api/mobile/v3/me/first-session-requests/{request_id}/cancel
+      - GET /api/mobile/v3/me/first-session-handoff
+      - GET /api/mobile/v3/sessions/{session_id}/execution
+      - PUT /api/mobile/v3/sessions/{session_id}/sets/{set_id}
+      - POST /api/mobile/v3/sessions/{session_id}/applicability
+      - POST /api/mobile/v3/me/blueprint/calibration-encounters
+      - GET /api/mobile/v3/me/blueprint/calibration-encounters/{encounter_ref}
+    legacy_location: "mobile_plan_v3 (parallèle au contrat mobile V1, sans fallback MISSION)"
+    domain_owner: [plan_v3, science_initial_policy, session_state]
+    api: "API mobile V3 négociée, test contrôlé seulement ; flags off par défaut"
+    data: [blueprint_source_events, owned_blueprint_snapshots, first_plan_evaluations, first_session_requests, first_plan_execution_bindings, first_plan_set_observations, first_plan_runtime_authorities, workout_sessions, session_exercises, set_logs]
+    user_actions: [déclarer les faits, explorer le pilote admis, enregistrer des observations, reconnaître le temps inconnu, créer une première séance, reprendre et journaliser]
+    native_destination: "Parcours parallèle PLAN V3 contrôlé ; compte et MISSION préservés"
+    status: BLOCKED
+    dependencies: ["DATA avant acquisition réelle", "acceptations visuelles et RELEASE physiques", "déploiement séparé"]
+    visual_assets: ["primitives compte acceptées", "composition séance MOB02", "MISSION-SCREEN-V1 inchangé"]
+    migration_risk: "élevé — copies propriétaires et réglages typés ; aucune activation réelle depuis le GO de test synthétique"

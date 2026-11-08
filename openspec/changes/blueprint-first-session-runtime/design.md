@@ -172,3 +172,40 @@ Garde et FK/indexes sont précisés dans MINIMAL_PERSISTENCE ; la forme SQLite n
 ## Suite canonique du8novembre — calibrage distinct du plan
 
 [BOOTSTRAP_INTEGRATION](BOOTSTRAP_INTEGRATION.md) actualise l’autorité de rencontre, ses79sources, les deux routes supplémentaires et leurs sous-types de ledger. Il fait partie du scope soumis à revue. Les passages d7de8aa/SCI375 ci-dessus conservent la coordination historique du plan ; la base courante est b4a4242 après livraison des PR377/378. Le V3 observé et ses digests sont inchangés. Ouverture du calibrage avec zéro réglage, guidage du seul pilote et faits d’observation séparés des consignes ; pas de nouvelle qualification des six autres. Les7tables serveur/1locale restent le minimum proposé, sans table d’évaluation de rencontre supplémentaire.
+
+## Précision de réalisation contrôlée — lecture des faits et reprise
+
+GO BUILD contrôlé et croquis G1 reçus : BUILD_AUTHORIZATION.md fait autorité.
+GET declarations ajoute subject_ref serveur, reçus idempotents possédés et
+observation_progress issu exclusivement des événements déjà persistés :
+contexte, disponibilité, événements, préparation et choix réellement rapportés.
+GET rencontre expose ces mêmes faits et les essais exacts, séparément de result
+et allowed_actions. Aucun compteur/historique ne vaut qualification ou permission.
+Les types des événements restent ceux du contrat scientifique livré, sans
+nouvelle version SCI, table, route ou admission.
+
+La reprise sélectionne un épisode possédé après lecture du serveur et montre
+réglage/sens/appareil/contexte avant acceptation de sa référence exacte. Si les
+détails ne sont pas lisibles, pas d'acceptation aveugle depuis un ID en cache.
+Le consommateur ne transforme pas l'essai passé en choix de réglage actuel.
+Les reçus de source/capture/évaluation permettent de retrouver une réponse perdue
+par lecture ; une répétition reste explicite, même identité et même corps.
+
+## Résolution native d'un refus de journal — précision de revue finale
+
+Le refus confirmé d'une opération typée reste distinct du résultat inconnu.
+La chaîne attend une action explicite : relecture propriétaire courante puis
+«conserver la version serveur». Dans une transaction SQLite, seule une ligne
+FAILED connue et ses corrections dépendantes encore PENDING, jamais INFLIGHT,
+passent à l'état local RESOLVED. Corps/fait/identité/essais restent immuables ;
+RESOLVED ne signifie jamais ACKED. Une trace de choix et de révision serveur
+reste dans le snapshot local. Les autres faits et la clôture en attente peuvent
+ensuite être traités dans leur ordre. Une nouvelle correction exige un nouvel
+acte utilisateur, une nouvelle identité et la révision serveur relue.
+
+Le journal typé est lisible depuis la séance et après fin, avec version courante,
+sens de réglage, contexte, répétitions/date et état local/serveur. Les refus et
+leurs anciennes saisies restent visibles séparément. Une correction après fin
+ne rouvre pas la séance. Une correction d'un autre appareil plus récente prime
+sur un cache local déjà acquitté ; une commande inconnue n'est pas réécrite.
+Aucune table supplémentaire, modification SCI ou activation réelle n'en découle.

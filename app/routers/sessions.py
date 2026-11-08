@@ -220,6 +220,11 @@ def create_session(
     if preparation.etat == REFUSE:
         return _demarrage_bloque(template_slug)
 
+    from app.services.plan_v3.transactions import admit_legacy_start, RuntimeFailure
+    try:
+        admit_legacy_start(db, user.id)
+    except RuntimeFailure as error:
+        raise HTTPException(error.status, detail={"error": error.code}) from None
     session = instantiate_session(db, tpl, datetime.now(UTC), user_id=user.id)
 
     # `G6` — l'adaptation se matérialise AVANT le démarrage, jamais pendant
@@ -293,6 +298,9 @@ def _persist_implicit_labels_on_completion(session: WorkoutSession) -> None:
         engine evolving (Sb_24.next) never modifies it
       * scoring_version is monotonically increased — never decreased
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(session):
+        return
     from app.services.implicit_signal import detect_intra_set_label
 
     now = datetime.now(UTC)
@@ -327,6 +335,9 @@ def _record_continuity_on_completion(db, session, user_id: int) -> None:
     Le `rollback` est **imbriqué** : il annule ce que cette fonction a tenté,
     pas la clôture, que l'appelant committera derrière.
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(session):
+        return
     try:
         from app.services.plan_adaptation import deferrals_for
         from app.services.plan_adaptation_store import record_adaptation
@@ -668,6 +679,8 @@ def session_detail(
     session = _load_session(db, session_id, user.id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(session)
 
     # ⚠ `UI-CP8D` — UNE SÉANCE TERMINÉE A ENFIN UNE SURFACE À ELLE.
     #
@@ -1018,6 +1031,8 @@ def session_done(
     session = _load_session(db, session_id, user.id)
     if session is None:
         raise HTTPException(status_code=404, detail="Session not found")
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(session)
     if session.status != SessionStatus.COMPLETED:
         return RedirectResponse(
             url=f"/sessions/{session_id}", status_code=303
@@ -1084,6 +1099,8 @@ async def update_session(
     session_id: int, request: Request, db: DbSession, user: CurrentUser
 ) -> RedirectResponse:
     session = get_owned_session_or_404(db, session_id, user.id)
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(session)
 
     form = await request.form()
 
@@ -1138,6 +1155,11 @@ async def update_session(
         # rather than recomputing.
         _persist_implicit_labels_on_completion(session)
     elif action == "reopen" and session.status == SessionStatus.COMPLETED:
+        from app.services.plan_v3.transactions import admit_legacy_start, RuntimeFailure
+        try:
+            admit_legacy_start(db, user.id, ignore_session_id=session.id)
+        except RuntimeFailure as error:
+            raise HTTPException(error.status, detail={"error": error.code}) from None
         session.ended_at = None
         session.status = SessionStatus.IN_PROGRESS
 
@@ -1282,7 +1304,9 @@ async def update_exercise_card(
     db: DbSession, user: CurrentUser,
 ) -> RedirectResponse:
     # Verify the parent session belongs to this user first.
-    get_owned_session_or_404(db, session_id, user.id)
+    owned_session = get_owned_session_or_404(db, session_id, user.id)
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(owned_session)
     stmt = (
         select(SessionExercise)
         .where(

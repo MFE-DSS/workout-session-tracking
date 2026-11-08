@@ -83,7 +83,9 @@ def _quality_avg_30d(sessions: list[WorkoutSession]) -> tuple[float | None, int]
     scores: list[float] = []
     for s in sessions:
         try:
-            scores.append(float(compute_session_quality(s)))
+            value = compute_session_quality(s)
+            if value is not None:
+                scores.append(float(value))
         except Exception:
             continue
     if not scores:
@@ -99,7 +101,9 @@ def _confidence_avg_30d(sessions: list[WorkoutSession]) -> float | None:
     scores: list[float] = []
     for s in sessions:
         try:
-            scores.append(float(compute_confidence_score(s)))
+            value = compute_confidence_score(s)
+            if value is not None:
+                scores.append(float(value))
         except Exception:
             continue
     if not scores:

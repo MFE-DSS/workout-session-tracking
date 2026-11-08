@@ -336,6 +336,8 @@ def create_app() -> FastAPI:
     app.include_router(body_capture.router)
     # `D9` — l'API de l'application mobile (`/api/mobile/v1`), Bearer seul.
     app.include_router(mobile_api.router)
+    from app.routers import mobile_plan_v3
+    app.include_router(mobile_plan_v3.router)
 
     return app
 

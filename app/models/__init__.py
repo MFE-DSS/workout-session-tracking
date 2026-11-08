@@ -12,6 +12,7 @@ from app.models import (  # noqa: F401
     device_session,
     exercise,
     exercise_muscle_mapping,
+    first_plan_runtime,
     measurement,
     muscle,
     plan_adaptation_dismissal,

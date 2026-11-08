@@ -47,7 +47,7 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
     from app.services.quality_score import compute_session_quality
     _quality = compute_session_quality(s) if s.status == "completed" else None
     _confidence = compute_confidence_score(s) if s.status == "completed" else None
-    return {
+    data = {
         "id": s.id,
         "status": s.status,
         "started_at": _iso(s.started_at),
@@ -109,6 +109,15 @@ def serialise_session(s: WorkoutSession) -> dict[str, Any]:
             for se in exercises_sorted
         ],
     }
+    from app.services.plan_v3.execution import is_scientific_session, export_first_plan_session
+    if is_scientific_session(s):
+        from sqlalchemy.orm import object_session
+        db = object_session(s)
+        if db is None:
+            raise ValueError('typed scientific export requires its owned database context')
+        data['first_plan_execution'] = export_first_plan_session(db,s)
+    return data
+
 
 
 def _all_sessions(db: Session, *, user_id: int | None = None) -> list[WorkoutSession]:
@@ -200,6 +209,10 @@ def _opt(value: Any) -> str:
 def build_csv_text(db: Session, *, user_id: int | None = None) -> str:
     """Build the full CSV export as a single text blob."""
     sessions = _all_sessions(db, user_id=user_id)
+    from app.services.plan_v3.execution import is_scientific_session
+    if any(is_scientific_session(s) for s in sessions):
+        from fastapi import HTTPException
+        raise HTTPException(409,detail={'error':'typed_json_export_required'})
     buf = StringIO()
     writer = csv.writer(buf, quoting=csv.QUOTE_MINIMAL)
     writer.writerow(CSV_HEADERS)

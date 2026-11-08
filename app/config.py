@@ -21,6 +21,13 @@ DEFAULT_TIMEZONE = "Europe/Paris"
 
 class Settings(BaseSettings):
     app_env: str = Field(default="dev")
+    # Controlled synthetic engineering only. No DATA or deployment approval.
+    plan_v3_controlled_test_enabled: bool = Field(default=False)
+    plan_v3_acquisition_enabled: bool = Field(default=False)
+    plan_v3_evaluation_enabled: bool = Field(default=False)
+    plan_v3_creation_enabled: bool = Field(default=False)
+    plan_v3_guidance_enabled: bool = Field(default=False)
+    plan_v3_bundle_path: str = Field(default="")
     app_secret_key: str = Field(default="dev-secret-change-me")
     app_base_url: str = Field(default="http://localhost:8000")
 

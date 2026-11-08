@@ -22,11 +22,8 @@ leaderboard, the coach report, the user grade, etc.
 """
 from __future__ import annotations
 
-from typing import Optional
-
 from app.models.session import WorkoutSession
 from app.services.implicit_signal import LABEL_SCORE_CONTRIBUTION, ImplicitLabel
-
 
 # ---------------------------------------------------------------------------
 # Shared subjective points (concentration + global_state)
@@ -58,13 +55,16 @@ def session_kind(session: WorkoutSession) -> str:
 # ---------------------------------------------------------------------------
 
 
-def compute_session_quality(session: WorkoutSession) -> int:
+def compute_session_quality(session: WorkoutSession) -> int | None:
     """Return 0..100 quality score, dispatched by template kind.
 
     Sb_24.5 — Strength sessions are further dispatched by
     ``scoring_version`` so historic V1 sessions stay bit-for-bit
     invariant. Cardio is unaffected (no implicit signal in cardio).
     """
+    from app.services.plan_v3.execution import is_scientific_session
+    if is_scientific_session(session):
+        return None
     if _session_kind(session) == "cardio":
         return compute_session_quality_cardio(session)
     # `or 1` covers the transient-instance case where SQLAlchemy hasn't
@@ -85,7 +85,7 @@ W_IMPLICIT = 0.25
 W_V1 = 1.0 - W_IMPLICIT  # 0.75
 
 
-def _implicit_signal_avg(session: WorkoutSession) -> Optional[float]:
+def _implicit_signal_avg(session: WorkoutSession) -> float | None:
     """Average ``LABEL_SCORE_CONTRIBUTION`` over the exercises of this
     session that carry a non-null ``implicit_label``. Returns None if
     no exercise in the session is labeled (Sx_24 §F.2 — "exclu du
@@ -186,7 +186,7 @@ def compute_session_quality_strength(session: WorkoutSession) -> int:
 # ---------------------------------------------------------------------------
 
 
-def _cardio_duration_component(duration_min: Optional[int]) -> float:
+def _cardio_duration_component(duration_min: int | None) -> float:
     """0..50 points based on session duration."""
     if duration_min is None:
         return 0.0
@@ -201,7 +201,7 @@ def _cardio_duration_component(duration_min: Optional[int]) -> float:
     return 0.0
 
 
-def _cardio_intensity_component(bpm_avg: Optional[int]) -> float:
+def _cardio_intensity_component(bpm_avg: int | None) -> float:
     """0..20 points based on average BPM vs target zone.
 
     If bpm is null (no sensor), baseline of 15 (no penalty).

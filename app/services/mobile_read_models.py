@@ -270,6 +270,8 @@ def transitions(sets: list[dict]) -> dict[str, dict]:
 
 
 def execution_read_model(db: Session, s: WorkoutSession) -> dict[str, Any]:
+    from app.services.plan_v3.execution import require_legacy_http
+    require_legacy_http(s)
     now = datetime.now(UTC)
     last = last_time_by_exercise_code(db, s, now)
     ses = sorted(s.session_exercises, key=lambda se: se.position)
