@@ -1,0 +1,835 @@
+{
+  "$defs": {
+    "CalibrationEpisode": {
+      "additionalProperties": false,
+      "properties": {
+        "as_of": {
+          "format": "date-time",
+          "title": "As Of",
+          "type": "string"
+        },
+        "availability": {
+          "enum": [
+            "AVAILABLE",
+            "UNAVAILABLE",
+            "UNKNOWN"
+          ],
+          "title": "Availability",
+          "type": "string"
+        },
+        "context": {
+          "$ref": "#/$defs/ContextKey"
+        },
+        "context_provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "episode_id": {
+          "minLength": 1,
+          "title": "Episode Id",
+          "type": "string"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/CalibrationEvent"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "ledger_complete": {
+          "title": "Ledger Complete",
+          "type": "boolean"
+        },
+        "ledger_source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Ledger Source Ref"
+        },
+        "predecessor_blocked": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Predecessor Blocked"
+        },
+        "previous_episode_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Previous Episode Id"
+        },
+        "restart_basis_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Restart Basis Ref"
+        },
+        "started_at": {
+          "format": "date-time",
+          "title": "Started At",
+          "type": "string"
+        },
+        "subject_ref": {
+          "minLength": 1,
+          "title": "Subject Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "episode_id",
+        "subject_ref",
+        "context",
+        "as_of",
+        "started_at",
+        "context_provenance",
+        "availability",
+        "ledger_complete",
+        "ledger_source_ref",
+        "events"
+      ],
+      "title": "CalibrationEpisode",
+      "type": "object"
+    },
+    "CalibrationEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "completed": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Completed"
+        },
+        "context_fingerprint": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Context Fingerprint",
+          "type": "string"
+        },
+        "discomfort": {
+          "default": "UNKNOWN",
+          "enum": [
+            "NO_CONCERN",
+            "CONCERN",
+            "UNKNOWN"
+          ],
+          "title": "Discomfort",
+          "type": "string"
+        },
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "familiarization_confirmed": {
+          "default": false,
+          "title": "Familiarization Confirmed",
+          "type": "boolean"
+        },
+        "kind": {
+          "enum": [
+            "CONTEXT_CONFIRMED",
+            "FAMILIARIZATION_STARTED",
+            "FAMILIARIZATION_CONFIRMED",
+            "ATTEMPT_OBSERVED",
+            "SETTING_ACCEPTED",
+            "CONCERN_REPORTED",
+            "EQUIPMENT_UNAVAILABLE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "reference_event_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Event Id"
+        },
+        "reps": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reps"
+        },
+        "rir": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rir"
+        },
+        "sequence": {
+          "exclusiveMinimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "setting": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Setting"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "subject_ref": {
+          "minLength": 1,
+          "title": "Subject Ref",
+          "type": "string"
+        },
+        "successful": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Successful"
+        },
+        "technique": {
+          "default": "UNKNOWN",
+          "enum": [
+            "ACCEPTABLE",
+            "CONCERN",
+            "UNKNOWN"
+          ],
+          "title": "Technique",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "sequence",
+        "kind",
+        "subject_ref",
+        "context_fingerprint",
+        "provenance"
+      ],
+      "title": "CalibrationEvent",
+      "type": "object"
+    },
+    "ConflictingValue_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1_____": {
+      "additionalProperties": false,
+      "properties": {
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value",
+        "source_ref"
+      ],
+      "title": "ConflictingValue[Annotated[str, Strict(strict=True), FieldInfo(annotation=NoneType, required=True, metadata=[MinLen(min_length=1)])]]",
+      "type": "object"
+    },
+    "ConflictingValue_tuple_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1______________": {
+      "additionalProperties": false,
+      "properties": {
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        },
+        "value": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Value",
+          "type": "array"
+        }
+      },
+      "required": [
+        "value",
+        "source_ref"
+      ],
+      "title": "ConflictingValue[tuple[Annotated[str, Strict(strict=True), FieldInfo(annotation=NoneType, required=True, metadata=[MinLen(min_length=1)])], ...]]",
+      "type": "object"
+    },
+    "ContextKey": {
+      "additionalProperties": false,
+      "properties": {
+        "canonical_exercise_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Canonical Exercise Id"
+        },
+        "context_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Context Ref"
+        },
+        "equipment_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Equipment Ref"
+        },
+        "load_semantics": {
+          "enum": [
+            "TOTAL_EXTERNAL",
+            "PER_IMPLEMENT",
+            "MACHINE_DISPLAY_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Load Semantics",
+          "type": "string"
+        },
+        "realization_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realization Ref"
+        },
+        "side": {
+          "enum": [
+            "BILATERAL",
+            "LEFT",
+            "RIGHT",
+            "UNKNOWN"
+          ],
+          "title": "Side",
+          "type": "string"
+        }
+      },
+      "required": [
+        "canonical_exercise_id",
+        "context_ref",
+        "equipment_ref",
+        "realization_ref",
+        "load_semantics",
+        "side"
+      ],
+      "title": "ContextKey",
+      "type": "object"
+    },
+    "Fact_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1_____": {
+      "additionalProperties": false,
+      "properties": {
+        "conflicts": {
+          "items": {
+            "$ref": "#/$defs/ConflictingValue_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1_____"
+          },
+          "title": "Conflicts",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "state": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN",
+            "CONFLICT",
+            "WITHHELD"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "state",
+        "value",
+        "provenance",
+        "conflicts"
+      ],
+      "title": "Fact[Annotated[str, Strict(strict=True), FieldInfo(annotation=NoneType, required=True, metadata=[MinLen(min_length=1)])]]",
+      "type": "object"
+    },
+    "Fact_tuple_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1______________": {
+      "additionalProperties": false,
+      "properties": {
+        "conflicts": {
+          "items": {
+            "$ref": "#/$defs/ConflictingValue_tuple_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1______________"
+          },
+          "title": "Conflicts",
+          "type": "array"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "state": {
+          "enum": [
+            "KNOWN",
+            "UNKNOWN",
+            "CONFLICT",
+            "WITHHELD"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "items": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "state",
+        "value",
+        "provenance",
+        "conflicts"
+      ],
+      "title": "Fact[tuple[Annotated[str, Strict(strict=True), FieldInfo(annotation=NoneType, required=True, metadata=[MinLen(min_length=1)])], ...]]",
+      "type": "object"
+    },
+    "Preparation": {
+      "additionalProperties": false,
+      "properties": {
+        "context_fingerprint": {
+          "minLength": 1,
+          "title": "Context Fingerprint",
+          "type": "string"
+        },
+        "controlled": {
+          "title": "Controlled",
+          "type": "boolean"
+        },
+        "instruction_ref": {
+          "minLength": 1,
+          "title": "Instruction Ref",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "setup_ref": {
+          "minLength": 1,
+          "title": "Setup Ref",
+          "type": "string"
+        },
+        "understood": {
+          "title": "Understood",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "context_fingerprint",
+        "instruction_ref",
+        "setup_ref",
+        "understood",
+        "controlled",
+        "provenance"
+      ],
+      "title": "Preparation",
+      "type": "object"
+    },
+    "Provenance": {
+      "additionalProperties": false,
+      "properties": {
+        "acquisition": {
+          "enum": [
+            "DECLARED",
+            "SELF_MEASURED",
+            "DEVICE_MEASURED",
+            "EXECUTION_LOG",
+            "DERIVED",
+            "UNKNOWN"
+          ],
+          "title": "Acquisition",
+          "type": "string"
+        },
+        "measured_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measured At"
+        },
+        "origin": {
+          "enum": [
+            "USER_REPORTED",
+            "USER_OBSERVED",
+            "DERIVED_FROM_HISTORY",
+            "POPULATION_PRIOR",
+            "PRODUCT_CONTRACT",
+            "UNKNOWN"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "recorded_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Recorded At"
+        },
+        "source_ref": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Source Ref"
+        }
+      },
+      "required": [
+        "origin",
+        "acquisition",
+        "source_ref",
+        "recorded_at",
+        "measured_at"
+      ],
+      "title": "Provenance",
+      "type": "object"
+    },
+    "Setting": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "MASS_KG",
+            "ASSISTANCE_SETTING",
+            "NON_MASS_SETTING",
+            "BODYWEIGHT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "kg",
+            "setting",
+            "none"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit"
+      ],
+      "title": "Setting",
+      "type": "object"
+    },
+    "SettingChoice": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "title": "Available",
+          "type": "boolean"
+        },
+        "context_fingerprint": {
+          "minLength": 1,
+          "title": "Context Fingerprint",
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/Provenance"
+        },
+        "setting": {
+          "$ref": "#/$defs/Setting"
+        }
+      },
+      "required": [
+        "context_fingerprint",
+        "setting",
+        "available",
+        "provenance"
+      ],
+      "title": "SettingChoice",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "availability": {
+      "enum": [
+        "AVAILABLE",
+        "UNAVAILABLE",
+        "UNKNOWN"
+      ],
+      "title": "Availability",
+      "type": "string"
+    },
+    "concern_state": {
+      "enum": [
+        "CLEAR",
+        "REPORTED",
+        "UNKNOWN"
+      ],
+      "title": "Concern State",
+      "type": "string"
+    },
+    "context": {
+      "$ref": "#/$defs/ContextKey"
+    },
+    "context_provenance": {
+      "$ref": "#/$defs/Provenance"
+    },
+    "contract_version": {
+      "const": "first-calibration-encounter/1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "encounter_ref": {
+      "minLength": 1,
+      "title": "Encounter Ref",
+      "type": "string"
+    },
+    "episode": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CalibrationEpisode"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ledger_complete": {
+      "title": "Ledger Complete",
+      "type": "boolean"
+    },
+    "ledger_source_ref": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Ledger Source Ref"
+    },
+    "limitations": {
+      "$ref": "#/$defs/Fact_tuple_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1______________"
+    },
+    "population": {
+      "$ref": "#/$defs/Fact_Annotated_str__Strict_strict_True___FieldInfo_annotation_NoneType__required_True__metadata__MinLen_min_length_1_____"
+    },
+    "preparation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Preparation"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "retry_requested": {
+      "title": "Retry Requested",
+      "type": "boolean"
+    },
+    "setting_choice": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SettingChoice"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_revision": {
+      "minLength": 1,
+      "title": "Source Revision",
+      "type": "string"
+    },
+    "started_at": {
+      "format": "date-time",
+      "title": "Started At",
+      "type": "string"
+    },
+    "stop_reasons": {
+      "additionalProperties": {
+        "enum": [
+          "COMPLETED",
+          "USER_STOPPED",
+          "TIME_LIMIT",
+          "CONCERN",
+          "FAILURE",
+          "UNKNOWN"
+        ],
+        "type": "string"
+      },
+      "title": "Stop Reasons",
+      "type": "object"
+    },
+    "subject_ref": {
+      "minLength": 1,
+      "title": "Subject Ref",
+      "type": "string"
+    },
+    "withdrawn": {
+      "title": "Withdrawn",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "contract_version",
+    "encounter_ref",
+    "subject_ref",
+    "source_revision",
+    "started_at",
+    "as_of",
+    "population",
+    "limitations",
+    "context",
+    "context_provenance",
+    "availability",
+    "ledger_complete",
+    "ledger_source_ref",
+    "concern_state",
+    "withdrawn",
+    "episode",
+    "preparation",
+    "setting_choice",
+    "stop_reasons",
+    "retry_requested"
+  ],
+  "title": "EncounterRequest",
+  "type": "object"
+}

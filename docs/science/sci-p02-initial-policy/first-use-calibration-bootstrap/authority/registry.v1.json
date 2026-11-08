@@ -1,0 +1,22 @@
+{
+  "contract_version": "first-calibration-encounter/1.0.0",
+  "decision_ref": "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/ADMISSION.md",
+  "duration": "UNKNOWN",
+  "policy_ref": "initial-calibration-encounter/1.0.0",
+  "protocol_ref": "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/OPERATIONAL_PROTOCOL.md",
+  "qualification": "EXISTING_C3_CURRENT_OBSERVED_ONLY",
+  "registry_version": "initial-calibration-encounter-registry/1.0.0",
+  "restart": "NOT_ADMITTED_AFTER_CONCERN",
+  "review_ref": "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/SCI_REVIEW.md",
+  "runtime_availability": "NOT_SERVED",
+  "scope": {
+    "candidate_id": "leg-extensions-assises",
+    "empty_limitations": true,
+    "population": "ADULT_NON_CLINICAL",
+    "side": "BILATERAL"
+  },
+  "settings": "USER_CONFIRMED_ACTUAL_DEVICE_ONLY",
+  "state": "ADMITTED_WITH_LIMITS",
+  "status": "ACTIVE",
+  "v3_bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94"
+}

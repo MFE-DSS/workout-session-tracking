@@ -40,3 +40,11 @@ USER_STOPPED/TIME_LIMIT avec completed=False, successful=null et qualité ACCEPT
 ## Prévisualisation de recherche et entrée autoritaire
 
 Une compilation de tests avant admission porte `DRAFT_EVALUATION_SYNTHETIC_NOT_AUTHORITY`, jamais une permission utilisable. L'évaluateur public ne rend INITIATE_* ou QUALIFIED autoritaires qu'après chargement de la vraie politique de rencontre revue/admissible. Réutiliser le noyau pur candidat derrière cette frontière, sans deuxième moteur ni registre de test approuvé. Ces previews ne sont pas des payloads PLAN servis.
+
+## Interfaces livrées après GO et revue SCI
+
+Le statut initial PROPOSED décrit la préparation. Contrat/politique1.0.0 désormais réalisés et admis avec limites, toujours NOT_SERVED ; reçu DELIVERY.md et décision authority/ADMISSION.md.
+
+`load_authority(root=ROOT)` charge la publication réelle ; `evaluate(raw, authority)` rend EncounterResult ; `validate_result(raw,response,authority)` revalide strictement et retourne la décision recomputée. `validated_input(raw)` et `input_digest(raw)` lient toutes observations/preuves/retraits/révision. Sans autorité, evaluate reste NOT_ADMITTED et ne promeut pas une qualification de preview. La source PLAN ne doit jamais appeler compile_candidate pour produire une permission.
+
+Les observations portables restent CalibrationEpisode existant, avec sujet/contexte/événements/références/acceptation exacts ; V3 ne reçoit aucun nouveau champ. Réacquérir/relire les faits sous propriétaire et politique applicables, ne pas transférer une sortie synthétique comme observation. Les4exports sous exports/ sont de recherche/test ; aucun payload ne sert de fallback runtime.
