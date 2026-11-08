@@ -4,7 +4,7 @@
 
 ## Livrable concret
 
-[Proposal](../../../../openspec/changes/science-first-use-calibration-bootstrap/proposal.md), [design](../../../../openspec/changes/science-first-use-calibration-bootstrap/design.md), [tasks](../../../../openspec/changes/science-first-use-calibration-bootstrap/tasks.md) et spec OpenSpec. [Cas d'admission](ADMISSION_CASE.md), [contrat versionné et handoff PLAN](CONTRACT_AND_PLAN.md), [18 cas d'essai spécifiés](TEST_SPEC.md).
+[Proposal](../../../../openspec/changes/archive/2026-11-08-science-first-use-calibration-bootstrap/proposal.md), [design](../../../../openspec/changes/archive/2026-11-08-science-first-use-calibration-bootstrap/design.md), [tasks](../../../../openspec/changes/archive/2026-11-08-science-first-use-calibration-bootstrap/tasks.md) et spec OpenSpec. [Cas d'admission](ADMISSION_CASE.md), [contrat versionné et handoff PLAN](CONTRACT_AND_PLAN.md), [18 cas d'essai spécifiés](TEST_SPEC.md).
 
 Entrée sans historique et sans sept qualifications ; progression réelle installation/familiarisation/essai/observation/acceptation ; pilote leg-extensions-assises bilatéral. Aucun kg/incrément calculé, aucune série de travail fictive. Une observation qualifiée est provisoire et portable vers le V3 existant ; les sept observations restent nécessaires au plan complet. Le pilote n'admet pas l'accompagnement initial des six autres réalisations.
 

@@ -5,7 +5,7 @@
 **Goal:** Livrer le pilote SCI isolé accepté, depuis zéro réglage vers une observation qualifiable, sans modifier le binding V3.
 **Architecture:** Contrat de rencontre autonome et noyau pur déterministe ; frontière publique conditionnée à une nouvelle autorité réelle. Qualification indépendante des conditions C3, puis pont de tests vers vrai V3.
 **Tech Stack:** Python/Pydantic2/pytest existants, JSON SHA256 ; aucune dépendance nouvelle.
-**Spec:** openspec/changes/science-first-use-calibration-bootstrap/design.md et TEST_SPEC.md de ce dossier.
+**Spec:** openspec/changes/archive/2026-11-08-science-first-use-calibration-bootstrap/design.md et TEST_SPEC.md de ce dossier.
 
 ## Global Constraints
 - Pilote leg-extensions-assises bilatéral seulement ; aucune charge/incrément/temps inventé.
