@@ -15,7 +15,7 @@ Le binding V3 admis au canonique d7de8aa exige sept réglages courants qualifié
 Aucune. Le binding `initial-plan-v3-binding/1.0.0`, son protocole, ses sept préconditions et ses validateurs sont conservés octet pour octet.
 
 # Impact
-Nouveaux modules isolés proposés sous tools/science_calibration_bootstrap/, tests dédiés, exports sous docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/, ce change et un append au registre documentaire. Consommateurs PLAN inchangés ; handoff proposé dans [CONTRACT_AND_PLAN.md](../../../docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/CONTRACT_AND_PLAN.md).
+Nouveaux modules isolés proposés sous tools/science_calibration_bootstrap/, tests dédiés, exports sous docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/, ce change et un append au registre documentaire. Consommateurs PLAN inchangés ; handoff proposé dans [CONTRACT_AND_PLAN.md](../../../../docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/CONTRACT_AND_PLAN.md).
 
 # Approval boundary
 PROPOSED / NO_GO_BUILD / NOT_ADMITTED / NOT_SERVED. L'ancien GO observé et le GO de contrat V3 n'autorisent pas ce nouvel accompagnement positif. Demande opérateur : approuver le pilote/protocole proposé et son build isolé, sous revue scientifique du bundle effectif avant publication de toute admission. GO MERGE permanent après ce GO et contrôles ; aucun déploiement.

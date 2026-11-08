@@ -15,5 +15,5 @@
 - [x] Validateur de qualification indépendant, parité C3 et absence de contournement des préoccupations.
 - [x] Tests déterministes positifs de rencontre puis bridge vers vrai V3, étiquetés synthétiques non servis.
 - [x] Exports reproductibles, manifeste de sources, handoff PLAN et dossier d'admission avec auteurs/limites/revue effective.
-- [ ] Revues SCI et code distinctes, corrections et checks selon tier ; CI du HEAD exact.
+- [x] Revues SCI et code distinctes, corrections et checks selon tier ; CI finale42457556728 du HEADaf9f811 réussie.
 - [ ] PR/merge/canonique/closeout/archive/nettoyage du scope autorisé ; aucune activation.
