@@ -14,7 +14,7 @@ from tools.science_initial_policy.v3_admission import load_v3_registry
 
 DIRECTORY = Path("docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority")
 REGISTRY_SHA256 = "f993ff958c6d95d61897b5a0a1543033b45b8e635f321373ed7387d9fd4138a8"
-SOURCES_SHA256 = "d43b923a96e786dc3175af0386927b9d4bb32106f327b71b60222d0d64dd5473"
+SOURCES_SHA256 = "8108b2a8dd341192de30819a95c6b65f9cffe52ae59596e47ca3f34ce27679f4"
 
 
 def encoded(value):

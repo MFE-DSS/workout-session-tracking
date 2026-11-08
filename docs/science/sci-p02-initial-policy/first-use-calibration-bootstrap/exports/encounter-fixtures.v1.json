@@ -1,6 +1,6 @@
 {
   "artifact_kind": "REAL_EVALUATOR_SYNTHETIC_INPUT_NOT_SERVED",
-  "authority_digest": "3d9f3b275b6e8967980959889d665dd9efb259bbf0c8262d2a9de44616fefa1f",
+  "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
   "cases": [
     {
       "request": {
@@ -74,7 +74,7 @@
           "WITHDRAW"
         ],
         "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
-        "authority_digest": "3d9f3b275b6e8967980959889d665dd9efb259bbf0c8262d2a9de44616fefa1f",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
         "candidate_actions": [],
         "confidence": "UNKNOWN",
         "contract_version": "first-calibration-encounter/1.0.0",
@@ -186,7 +186,7 @@
           "CONFIRM_FAMILIARIZATION"
         ],
         "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
-        "authority_digest": "3d9f3b275b6e8967980959889d665dd9efb259bbf0c8262d2a9de44616fefa1f",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
         "candidate_actions": [],
         "confidence": "UNKNOWN",
         "contract_version": "first-calibration-encounter/1.0.0",
@@ -374,7 +374,7 @@
           "INITIATE_TRIAL"
         ],
         "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
-        "authority_digest": "3d9f3b275b6e8967980959889d665dd9efb259bbf0c8262d2a9de44616fefa1f",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
         "candidate_actions": [],
         "confidence": "UNKNOWN",
         "contract_version": "first-calibration-encounter/1.0.0",
@@ -588,7 +588,7 @@
           "ACCEPT_EXACT_SETTING"
         ],
         "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
-        "authority_digest": "3d9f3b275b6e8967980959889d665dd9efb259bbf0c8262d2a9de44616fefa1f",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
         "candidate_actions": [],
         "confidence": "UNKNOWN",
         "contract_version": "first-calibration-encounter/1.0.0",
@@ -814,7 +814,7 @@
           "WITHDRAW"
         ],
         "artifact_kind": "ISOLATED_EVALUATION_NOT_SERVED",
-        "authority_digest": "3d9f3b275b6e8967980959889d665dd9efb259bbf0c8262d2a9de44616fefa1f",
+        "authority_digest": "e840d5edfc2bbe150f077062227a503a6f3a996fb92a3f7e7cbe49972dee72f9",
         "candidate_actions": [],
         "confidence": "LOW",
         "contract_version": "first-calibration-encounter/1.0.0",

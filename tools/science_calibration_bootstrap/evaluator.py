@@ -69,11 +69,13 @@ def _familiar(ep, *, before=None, not_before=None):
     ):
         return False
     last_start = max((e.sequence for e in starts), default=-1)
+    latest_start_at = max((_occurred(e) for e in starts), default=None)
     if before and before.familiarization_confirmed is True:
         return not_before is None or _occurred(before) >= not_before
     return any(
         e.kind == "FAMILIARIZATION_CONFIRMED"
         and e.sequence > last_start
+        and (latest_start_at is None or _occurred(e) >= latest_start_at)
         and (not_before is None or _occurred(e) >= not_before)
         and (before is None or (e.sequence < before.sequence and _occurred(e) <= _occurred(before)))
         for e in current
@@ -146,6 +148,18 @@ def _encounter_block(req, spec):
         or (req.episode and (not req.episode.ledger_complete or not req.episode.ledger_source_ref))
     ):
         return ("INSUFFICIENT_EVIDENCE", "IDENTIFY", "OWNER_LEDGER_INCOMPLETE")
+
+    def personal_declaration(fact):
+        p = fact.provenance
+        return (
+            p.origin in {"USER_REPORTED", "USER_OBSERVED"}
+            and p.acquisition == "DECLARED"
+            and p.source_ref is not None
+            and p.recorded_at is not None
+        )
+
+    if not personal_declaration(req.population) or not personal_declaration(req.limitations):
+        return ("INSUFFICIENT_EVIDENCE", "IDENTIFY", "PERSONAL_DATED_DECLARATIONS_REQUIRED")
     if (
         req.population.state != "KNOWN"
         or req.population.value != "ADULT_NON_CLINICAL"
@@ -244,6 +258,7 @@ def compile_candidate(raw, historical_registry=None) -> EncounterResult:
         ep
         and ep.started_at >= req.started_at
         and last_context
+        and _current(last_context.provenance, ep.started_at)
         and last_context.setting == choice.setting
         and choice_at <= _occurred(last_context)
         and _familiar(ep, not_before=prep_at)
@@ -263,6 +278,9 @@ def compile_candidate(raw, historical_registry=None) -> EncounterResult:
             <= trial.reps
             <= registry.policy["dose"]["rep_range"][1]
             and trial.setting == choice.setting
+            and last_context is not None
+            and _current(last_context.provenance, ep.started_at)
+            and last_context.setting == trial.setting
             and _current(trial.provenance, ep.started_at)
             and any(
                 e.kind == "CONTEXT_CONFIRMED"

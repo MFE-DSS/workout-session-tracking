@@ -1,7 +1,7 @@
 {
   "artifact_kind": "REAL_EVALUATOR_SYNTHETIC_INPUT_NOT_SERVED",
   "artifacts": {
-    "encounter-fixtures.v1.json": "5eefa244990de35f6cb7ebbe26ba11a2216f7c810a2c376ae542b368e00622d2",
+    "encounter-fixtures.v1.json": "38a45d0b1c4109607ce6a24b7eaead8693f9d4be754f376c64398bbe83fefa35",
     "encounter-request.schema.json": "b9a6924373d30332be9796a56f8875bf54f938c932a7342c8ec59d8d608b41e5",
     "encounter-result.schema.json": "9005ea14c2faff47ecab2ff4f904e58d1252528b02422f0e4107b9bad44807bc"
   },
@@ -38,7 +38,7 @@
     "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/ADMISSION.md": "7bd7bb9e2136ad2612ef78e378edaec521cb246561a74cd2cbf75599dc16c494",
     "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/SCI_REVIEW.md": "58255f8842cbaf08d324aad02bb2b3aaa2f025ca422beb8c4fa13a3c83c9390b",
     "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/registry.v1.json": "f993ff958c6d95d61897b5a0a1543033b45b8e635f321373ed7387d9fd4138a8",
-    "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/sources.v1.json": "d43b923a96e786dc3175af0386927b9d4bb32106f327b71b60222d0d64dd5473",
+    "docs/science/sci-p02-initial-policy/first-use-calibration-bootstrap/authority/sources.v1.json": "8108b2a8dd341192de30819a95c6b65f9cffe52ae59596e47ca3f34ce27679f4",
     "docs/science/sci-p02-initial-policy/pull-exposure-01/CONTRACT_DECISION.md": "b83f02856ced1bbfe88dd9dda6c1f47d3c9c1761ae290dfec820c2ce59aa021d",
     "docs/science/sci-p02-initial-policy/pull-exposure-01/overlay.v1.json": "7aa247871658d62a00f02836e768d1bdc3ff3aa248f236660ab99efa2dbc75a1",
     "docs/science/sci-p02-initial-policy/stage2-v3/SYNTHETIC_INPUT.json": "5bf4805481eec0bee82b022b1c021067c230712b98005302cbe23b6be5301263",
@@ -62,8 +62,8 @@
     "tools/science_calibration_bootstrap/__init__.py": "a4be23acbf01bf7fda4319878eceb5608c6d00241d2deb022f25c34754e50e6e",
     "tools/science_calibration_bootstrap/artifacts.py": "029c5bc0dffc40c22421404703e98dba3477f5390d8c279358130c2bdc98cb9c",
     "tools/science_calibration_bootstrap/contracts.py": "63351c44f907c5a72d31ae2ec34e890fbc175edbfd20ab6695e54823dc6bda48",
-    "tools/science_calibration_bootstrap/evaluator.py": "914fcb5227fcd6373709fb7da46702f063faefc41edaabbe50b75e6849418f38",
-    "tools/science_calibration_bootstrap/policy.py": "fcaa7592d5ceccb875b5f7087d5d55241111a81e42095615ac7708ca7a9a0e9a",
+    "tools/science_calibration_bootstrap/evaluator.py": "c3eeee85fad05428159a8411a95ee90b732bab56e1bffe2ca99b4dd2b5324533",
+    "tools/science_calibration_bootstrap/policy.py": "d53bc1132c62a97c7ef55b5a730b5504443ed9e337aba60431e950cbd4d52249",
     "tools/science_calibration_bootstrap/validation.py": "9084f2332aa7d8ccd360c35e4e8ee1fd0067dc8f0ab0109c6ab0992007544ad2",
     "tools/science_contracts/__init__.py": "2fe55ac984fa2b14b40e31e0da46534faf9e333b1aab6ec8772de71365a9040b",
     "tools/science_contracts/blueprint_first_plan_v1.py": "0f467360aaf829c437144486e15610b402a3a54d1ec2544330ce0cfd96fc1bfa",
