@@ -23,9 +23,15 @@ Aucune politique de rétention, consentement corporel nouveau ou suppression. MI
 ## Actualisation du8novembre2026 — scope contrôlé autorisé
 
 Le GO_BUILD_CONTROLLED et G1 du change blueprint-first-session-runtime sont reçus ;
-[autorisation](../../openspec/changes/blueprint-first-session-runtime/BUILD_AUTHORIZATION.md)
+[autorisation](../../openspec/changes/archive/2026-11-08-blueprint-first-session-runtime/BUILD_AUTHORIZATION.md)
 et [livraison en vérification](../plan/blueprint-first-session-runtime/DELIVERY.md).
 SCI V3 et le pilote sont livrés/admis dans leurs limites : les versions historiques
 1.0.0/0.1.0 ci-dessus n'identifient pas le successeur courant. Le périmètre contrôlé
 réalise l'ingénierie sur données synthétiques ; il ne coche pas les critères
 hérités de données réelles, disponibilité effective ou recette physique.
+
+Livraison contrôlée intégrée PR379/31b89f9 après CI neuf jobs réussis.
+[Closeout](../plan/blueprint-first-session-runtime/CLOSEOUT.md) et
+[trace](../../openspec/changes/archive/2026-11-08-blueprint-first-session-runtime/CONTROLLED_CLOSEOUT_TRACEABILITY.md)
+conservent distincts les critères globaux et le scope contrôlé. Les cases globales
+ne sont pas cochées par ce merge ; canonique et maintenance encore en suivi.

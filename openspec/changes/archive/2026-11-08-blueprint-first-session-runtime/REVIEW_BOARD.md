@@ -105,4 +105,4 @@ Le mineur SCI1.0.0 est conservé : le résultat peut redevenir state=SUPPORTED_I
 
 ## Pixels réalisés et décision reçue — 8 novembre2026
 
-Huit captures natives et références côte à côte : [UI_REVIEW](../../../docs/plan/blueprint-first-session-runtime/UI_REVIEW.md). Réponse opérateur «Valider ces pixels PLAN contrôlés», reçue avant commit UI. Les limites de simulateur, dimensions et sources synthétiques sont explicites ; aucune baseline LOCKED modifiée.
+Huit captures natives et références côte à côte : [UI_REVIEW](../../../../docs/plan/blueprint-first-session-runtime/UI_REVIEW.md). Réponse opérateur «Valider ces pixels PLAN contrôlés», reçue avant commit UI. Les limites de simulateur, dimensions et sources synthétiques sont explicites ; aucune baseline LOCKED modifiée.

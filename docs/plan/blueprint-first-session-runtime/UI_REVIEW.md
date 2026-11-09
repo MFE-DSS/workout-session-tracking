@@ -7,7 +7,7 @@ Le reçu porte cette décision et les SHA256 des huit captures effectivement sou
 
 ## Croquis validé
 
-Source : [REVIEW_BOARD](../../../openspec/changes/blueprint-first-session-runtime/REVIEW_BOARD.md),
+Source : [REVIEW_BOARD](../../../openspec/changes/archive/2026-11-08-blueprint-first-session-runtime/REVIEW_BOARD.md),
 réponse opérateur exacte «Valider ce croquis G1» et GO «Autoriser le build PLAN contrôlé».
 
 ```text

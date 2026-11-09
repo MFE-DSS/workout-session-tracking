@@ -2,7 +2,7 @@
 
 8 novembre 2026. **Code et vérifications locales réalisés ; publication distante en cours, aucune activation.**
 Base canonique b4a42420afa1aca384a16bd3966ab85a97cfd724.
-[Autorisation](../../../openspec/changes/blueprint-first-session-runtime/BUILD_AUTHORIZATION.md) :
+[Autorisation](../../../openspec/changes/archive/2026-11-08-blueprint-first-session-runtime/BUILD_AUTHORIZATION.md) :
 «Autoriser le build PLAN contrôlé», «Valider ce croquis G1».
 
 ## Résultat fonctionnel observé
