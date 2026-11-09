@@ -172,3 +172,11 @@ test('lost observation response reconciles its draft to the exact owned event in
  await c.saveCalibrationDraft({encounter_ref:'a',draft_ref:'draft-b',stage:'observation',reps:''});
  expect(c.calibrationDraft('a')).toMatchObject({stage:'observation',draft_ref:'draft-b'});
 });
+
+test('owned controller strips a supplied mismatched encounter permission while retaining its draft and facts',async()=>{
+ const f=fixture(),c=new FirstUseV3Controller(f.ports);await c.restore();await f.journal.save({...c.state,source:{encounter_ref:'owned'}});await c.restore();
+ await c.saveCalibrationDraft({encounter_ref:'owned',draft_ref:'unsent',load:'12'});
+ c.capabilities={owner_id:8,controlled_test_available:true} as any;
+ f.ports.calibration.read=async()=>({state:'confirmed',value:{encounter_ref:'owned',source_revision:1,result:{phase:'TRIAL'},authority:{generation:1},allowed_actions:['INITIATE_TRIAL'],progress:{observation_refs:['past'],ledger_complete:true}}});
+ await c.readCalibration();expect(c.encounter?.allowed_actions).toEqual([]);expect(c.encounter?.progress.observation_refs).toEqual(['past']);expect(c.calibrationDraft('owned')).toMatchObject({load:'12',draft_ref:'unsent'});
+});

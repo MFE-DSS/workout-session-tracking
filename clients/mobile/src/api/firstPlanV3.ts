@@ -3,11 +3,12 @@ import { AuthSession } from '../auth/authSession';
 import type { OwnedEnvelopeV3, RecommendationV3, RuntimeVersionsV3 } from '../domain/planV3Types';
 import { ApiFailure, type Transport } from './http';
 import schemas from './firstPlanV3.contract.json';
+import {compatibleCalibrationInventory,compatibleLegacyCalibrationPilot} from './calibrationProfilesV2';
 
 export const V3_VERSIONS:RuntimeVersionsV3 = Object.freeze({runtime:'first-session-runtime/3.0.0',request:'first-plan-request/3.0.0',
   result:'first-plan-recommendation/3.0.0',execution:'first-plan-execution/3.0.0',calibration:'first-calibration-encounter/1.0.0'});
 export type V3CallInit={method?:'GET'|'POST'|'PUT';body?:unknown;token?:string;timeoutMs?:number;ifMatch?:number};
-export type V3Transport=(path:string,init?:V3CallInit)=>Promise<unknown>;
+export type V3Transport=((path:string,init?:V3CallInit)=>Promise<unknown>)&{readonly calibrationInventory?:typeof CALIBRATION_INVENTORY};
 export type V3Outcome<T>={state:'confirmed';value:T}|{state:'unknown'}|{state:'cancelled'}|{state:'unavailable';reason:string}|{state:'rejected';code:string|null;status:number};
 export const isObject=(x:unknown):x is Record<string,unknown>=> x!==null&&typeof x==='object'&&!Array.isArray(x);
 export const positiveId=(x:unknown):x is number=>typeof x==='number'&&Number.isSafeInteger(x)&&x>0;
@@ -26,7 +27,7 @@ export function jsonCopy<T>(value:T):T {
 export const CALIBRATION_INVENTORY = "plan-calibration-inventory/2.0.0";
 export function createV3Transport(baseUrl:string,fetchImpl:typeof fetch=fetch,options?:{calibrationInventory:typeof CALIBRATION_INVENTORY}):V3Transport {
   const base=baseUrl.replace(/\/+$/,'');
-  return async(path,init={})=>{
+  const call:V3Transport=async(path,init={})=>{
     if(!path.startsWith('/')||path.includes('://')||path.includes('#')||path.includes('?')) throw new ApiFailure('http',422,'invalid_runtime_path');
     if(init.ifMatch!==undefined&&!revision(init.ifMatch))throw Error('invalid_source_revision');
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),init.timeoutMs??10000);
@@ -45,6 +46,8 @@ export function createV3Transport(baseUrl:string,fetchImpl:typeof fetch=fetch,op
     }catch(error){if(error instanceof ApiFailure)throw error;throw new ApiFailure('network');}
     finally{clearTimeout(timer);}
   };
+  if(options)Object.defineProperty(call,'calibrationInventory',{value:options.calibrationInventory});
+  return call;
 }
 export function ownedEnvelope(raw:unknown,owner:number):raw is OwnedEnvelopeV3 {
   if(!isObject(raw)||raw.owner_id!==owner||raw.contract_version!==V3_VERSIONS.runtime||!isObject(raw.versions))return false;
@@ -52,6 +55,7 @@ export function ownedEnvelope(raw:unknown,owner:number):raw is OwnedEnvelopeV3 {
 }
 export class RuntimeV3Client {
   constructor(readonly auth:AuthSession,private readonly identity:Transport,private readonly call:V3Transport){}
+  get calibrationInventory(){return this.call.calibrationInventory;}
   async request<T=OwnedEnvelopeV3>(path:string,init:Omit<V3CallInit,'token'>={},parse?:(value:OwnedEnvelopeV3)=>T|null,
     current:()=>boolean=()=>true):Promise<V3Outcome<T>> {
     const generation=this.auth.revision;const active=()=>generation===this.auth.revision&&current();
@@ -134,7 +138,7 @@ export function decodeRecommendationV3(raw:unknown):RecommendationV3|null {
 export function decodeBlueprintV3(raw:unknown):Record<string,unknown>|null {
   return schemaMatches(raw,schemas.request.properties.blueprint,schemas.request)&&isObject(raw)?raw:null;
 }
-export function capabilityEnvelope(raw:OwnedEnvelopeV3):import('../domain/planV3Types').CapabilitiesV3|null {
+export function capabilityEnvelope(raw:OwnedEnvelopeV3,negotiatedInventory?:typeof CALIBRATION_INVENTORY):import('../domain/planV3Types').CapabilitiesV3|null {
   const x=raw as unknown as Record<string,unknown>;
   if(x.runtime_availability!=='NOT_SERVED'||typeof x.controlled_test_available!=='boolean')return null;
   const authority=x.controlled_authority;
@@ -146,6 +150,8 @@ export function capabilityEnvelope(raw:OwnedEnvelopeV3):import('../domain/planV3
   const realization=(item:unknown)=>isObject(item)&&['candidate_id','realization_ref','display_name'].every(key=>typeof item[key]==='string'&&Boolean(item[key]));
   if(x.supported_realizations!==undefined&&(!Array.isArray(x.supported_realizations)||x.supported_realizations.some(item=>!realization(item)||!isObject(item)||typeof item.intent_id!=='string'||typeof item.initial_guidance_supported!=='boolean')))return null;
   if(x.initial_calibration_pilot!==undefined&&x.initial_calibration_pilot!==null&&!realization(x.initial_calibration_pilot))return null;
+  if(!x.calibration_inventory&&x.initial_calibration_pilot!==undefined&&x.initial_calibration_pilot!==null
+   &&!compatibleLegacyCalibrationPilot(x.initial_calibration_pilot,x.supported_realizations))return null;
   if(x.calibration_protocol_material!==undefined&&x.calibration_protocol_material!==null){
    const material=x.calibration_protocol_material;
    if(!isObject(material)||typeof material.source_ref!=='string'||!hexDigest(material.sha256)||typeof material.text!=='string')return null;
@@ -154,6 +160,7 @@ export function capabilityEnvelope(raw:OwnedEnvelopeV3):import('../domain/planV3
   if(x.calibration_inventory!==undefined&&x.calibration_inventory!==null){
    const inv=x.calibration_inventory;
    if(!isObject(inv)||inv.version!==CALIBRATION_INVENTORY||!hexDigest(inv.bundle_digest)||!Array.isArray(inv.profiles)||inv.profiles.length!==7)return null;
+   if(negotiatedInventory!==CALIBRATION_INVENTORY||!compatibleCalibrationInventory(inv,x.supported_realizations,x.initial_calibration_pilot))return null;
    const ids=new Set<string>();
    for(const p of inv.profiles){
     if(!isObject(p)||typeof p.candidate_id!=='string'||typeof p.realization_ref!=='string'||typeof p.policy_ref!=='string'||ids.has(p.candidate_id))return null;
@@ -166,7 +173,7 @@ export function capabilityEnvelope(raw:OwnedEnvelopeV3):import('../domain/planV3
 }
 export class FirstPlanV3Client {
   constructor(private readonly runtime:RuntimeV3Client){}
-  capabilities(){return this.runtime.request('/me/first-plan/capabilities',{},capabilityEnvelope);}
+  capabilities(){return this.runtime.request('/me/first-plan/capabilities',{},raw=>capabilityEnvelope(raw,this.runtime.calibrationInventory));}
   evaluate(snapshot:import('../domain/planV3Types').BlueprintSnapshotV3,capabilities:import('../domain/planV3Types').CapabilitiesV3,
     requestId:string,current:()=>boolean=()=>true):Promise<V3Outcome<import('../domain/planV3Types').EvaluationV3>> {
     const authority=capabilities.controlled_authority;

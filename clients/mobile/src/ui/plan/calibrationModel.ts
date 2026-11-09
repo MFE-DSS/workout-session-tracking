@@ -26,7 +26,13 @@ export function parseCalibrationOccurrence(day:string,time:string):string|null {
  if(value.getFullYear()!==year||value.getMonth()!==month-1||value.getDate()!==date||value.getHours()!==hours||value.getMinutes()!==minutes)return null;
  return value.toISOString();
 }
-export type CalibrationDraft={draft_ref?:string;committed_event_ref?:string;encounter_ref:string|null;stage:CalibrationStage;candidate:string|null;place:string;device:string;instruction:string;setup:string;load:string;observedLoad:string;reps:string;completed:boolean|null;successful:boolean|null|'UNSET';quality:string|null;discomfort:string|null;stopReason:string|null;trialAt:string;trialDate:string;trialTime:string};
+export type CalibrationDraft={draft_ref?:string;committed_event_ref?:string;observationSection?:'trial'|'feeling';encounter_ref:string|null;stage:CalibrationStage;candidate:string|null;place:string;device:string;instruction:string;setup:string;load:string;observedLoad:string;reps:string;completed:boolean|null;successful:boolean|null|'UNSET';quality:string|null;discomfort:string|null;stopReason:string|null;trialAt:string;trialDate:string;trialTime:string};
+export function calibrationTrialComplete(draft:CalibrationDraft):boolean {
+ return Boolean(parseCalibrationMass(draft.observedLoad??'')&&/^\d+$/.test(draft.reps)&&Number.isSafeInteger(Number(draft.reps))&&draft.completed!==null&&draft.successful!==undefined&&draft.successful!=='UNSET');
+}
+export function calibrationObservationSection(draft:CalibrationDraft):'trial'|'feeling' {
+ return draft.observationSection??(calibrationTrialComplete(draft)?'feeling':'trial');
+}
 export function resumableCalibrationDraft(raw:unknown,encounter:string):CalibrationDraft|null {
  if(!raw||typeof raw!=='object'||(raw as CalibrationDraft).encounter_ref!==encounter)return null;
  return raw as CalibrationDraft;

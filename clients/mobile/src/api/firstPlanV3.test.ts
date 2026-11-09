@@ -109,3 +109,14 @@ test('inventory2 is explicitly negotiated and missing echo never downgrades to p
  await expect(call('/me/first-plan/capabilities')).rejects.toBeInstanceOf(ApiFailure);
  expect(calls[0].headers['X-Auren-Calibration-Inventory']).toBe('plan-calibration-inventory/2.0.0');
 });
+
+test('I3 legacy capabilities check contradictory pilot fields on each served carrier without requiring six profiles',()=>{
+ const pilot=JSON.parse(readFileSync(resolve(__dirname,'../../../../docs/science/sci-p02-initial-policy/stage2-v3/authority/registry.v1.json'),'utf8')).selection[0];
+ const legacy=()=>envelope({runtime_availability:'NOT_SERVED',controlled_test_available:true,controlled_authority:null,
+  initial_calibration_pilot:{...pilot,display_name:'pilot'},supported_realizations:[{...pilot,display_name:'pilot',initial_guidance_supported:true}]}) as any;
+ expect(capabilityEnvelope(legacy())).not.toBeNull();
+ for(const carrier of ['initial_calibration_pilot','supported_realizations'])for(const field of ['intent_id','realization_ref','load_semantics','policy_ref']){
+  const c=legacy(),row=carrier==='initial_calibration_pilot'?c.initial_calibration_pilot:c.supported_realizations[0];row[field]='contradictory';expect(capabilityEnvelope(c)).toBeNull();
+ }
+ const minimal=legacy();delete minimal.initial_calibration_pilot.intent_id;expect(capabilityEnvelope(minimal)).not.toBeNull();
+});

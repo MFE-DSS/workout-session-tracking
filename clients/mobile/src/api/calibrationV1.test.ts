@@ -32,3 +32,13 @@ test('an incomplete ledger cannot be presented as zero actual observations',asyn
    progress:{ledger_complete:false,observed_attempt_count:0,observation_refs:[],acceptance_refs:[]}}}));
  expect((await s.client.read('encounter')).state).toBe('unknown');
 });
+
+test('an unnegotiated client cannot expose inventory2 permission supplied by a valid-looking response',async()=>{
+ const fixture=require('../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/exports/encounter-fixtures.v1.json');
+ const f=fixture.cases[0],result={...f.result,source_revision:'blueprint-source/1'};
+ const history={encounter_ref:result.encounter_ref,source_revision:1,as_of:f.request.as_of,result,selected:true,allowed_actions:result.allowed_actions,
+ authority:{generation:1,encounter_bundle_digest:fixture.authority_digest,inventory_version:'plan-calibration-inventory/2.0.0',packaging_digest:'a'.repeat(64),inventory_bundle_digest:fixture.authority_digest,policy_ref:result.policy_ref,context_fingerprint:'b'.repeat(64),contract_version:V3_VERSIONS.calibration},
+ progress:{context:f.request.context,ledger_complete:true,observed_attempt_count:0,observation_refs:[],acceptance_refs:[]}};
+ const s=await setup(envelope({encounter:history}));const response=await s.client.read(result.encounter_ref);
+ expect(response.state).toBe('confirmed');if(response.state==='confirmed'){expect(response.value.allowed_actions).toEqual([]);expect(response.value.progress.context).toEqual(f.request.context);}
+});
