@@ -94,6 +94,9 @@ def evaluate_owned_snapshot(db, owner_id, *, snapshot_ref, request_id, expected_
         raise RuntimeFailure("calibration_withdrawn")
     if snapshot_data.get("authority_pins") != pins:
         raise RuntimeFailure("snapshot_authority_changed")
+    from app.services.plan_v3.calibration_profiles import assert_snapshot_runtime
+
+    assert_snapshot_runtime(db, snapshot.id, operational, authority)
     request = request_from_snapshot(snapshot, authority)
     try:
         result = execute_science("evaluate", request, expected_digest=operational.packaging_digest)
@@ -131,6 +134,9 @@ def acknowledge_time(db, owner_id, *, evaluation_ref, request_id, expected_conte
     check_revision(db, owner_id, parent.source_revision)
     if parent.authority_generation != operational.generation:
         raise RuntimeFailure("authority_generation_changed")
+    from app.services.plan_v3.calibration_profiles import assert_snapshot_runtime
+
+    assert_snapshot_runtime(db, parent.snapshot_id, operational, authority)
     request = json.loads(parent.request_json)
     try:
         previous = execute_science(

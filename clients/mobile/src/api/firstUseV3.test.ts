@@ -134,3 +134,41 @@ test('backgrounding a closed first session preserves its completed lifecycle for
  await f.journal.save({...c.state,phase:'COMPLETE',execution:{session_id:2,status:'completed',applicability:{state:'UNKNOWN'},allowed_actions:[]}});await c.restore();
  await c.pause();expect(c.state?.phase).toBe('COMPLETE');expect(c.state?.execution?.status).toBe('completed');
 });
+
+test('complete unsent calibration observations remain distinct per owned encounter',async()=>{
+ const f=fixture(),c=new FirstUseV3Controller(f.ports);await c.restore();
+ const a={encounter_ref:'a',stage:'observation',reps:'7',completed:false,successful:null,quality:'UNKNOWN',discomfort:'NO_CONCERN',stopReason:'TIME_LIMIT',trialAt:'2026-11-08T08:17:00Z'};
+ await c.saveCalibrationDraft(a);await c.saveCalibrationDraft({encounter_ref:'b',stage:'setting',load:'8.5'});
+ const restored=new FirstUseV3Controller(f.ports);await restored.restore();
+ expect(restored.calibrationDraft('a')).toEqual(a);expect(restored.calibrationDraft('b')).toMatchObject({load:'8.5'});expect(restored.calibrationDraft('other')).toBeNull();
+});
+
+test('uncertain encounter mutation removes cached physical guidance but preserves facts and request identity',async()=>{
+ const f=fixture(),c=new FirstUseV3Controller(f.ports);await c.restore();
+ c.encounter={encounter_ref:'a',source_revision:1,result:{state:'SUPPORTED_INITIAL_EXPLORATION'},authority:{generation:1},allowed_actions:['INITIATE_TRIAL'],progress:{observation_refs:['past'],ledger_complete:true}} as any;
+ f.ports.calibration.record=async()=>({state:'unknown'});
+ await c.recordCalibration({kind:'CALIBRATION_ACTION_REQUESTED',action:'INITIATE_TRIAL'});
+ expect(c.encounter?.allowed_actions).toEqual([]);expect(c.encounter?.result).toBeNull();expect(c.encounter?.progress.observation_refs).toEqual(['past']);
+ expect(c.state?.source.pending).toMatchObject({request_id:'stable',kind:'calibration-event'});
+});
+test('capability reload cannot leave a cached trial instruction available after authority loss',async()=>{
+ const f=fixture(),c=new FirstUseV3Controller(f.ports);await c.restore();
+ c.encounter={allowed_actions:['INITIATE_TRIAL'],result:{state:'SUPPORTED_INITIAL_EXPLORATION'},progress:{observation_refs:['past']}} as any;
+ await c.load();expect(c.encounter?.allowed_actions).toEqual([]);expect(c.encounter?.progress.observation_refs).toEqual(['past']);
+});
+
+test('lost observation response reconciles its draft to the exact owned event instead of resubmitting it',async()=>{
+ const f=fixture(),c=new FirstUseV3Controller(f.ports);await c.restore();
+ await c.saveCalibrationDraft({encounter_ref:'a',draft_ref:'draft-a',stage:'observation',reps:'10'});
+ c.encounter={encounter_ref:'a',source_revision:1,result:{state:'SUPPORTED_INITIAL_EXPLORATION'},authority:{generation:1},allowed_actions:['RECORD_TRIAL'],progress:{observation_refs:[]}} as any;
+ f.ports.calibration.record=async()=>({state:'unknown'});
+ await c.recordCalibration({kind:'CALIBRATION_EVENT_REPORTED',event:{kind:'ATTEMPT_OBSERVED'}});
+ f.ports.plan.capabilities=async()=>({state:'confirmed',value:{controlled_test_available:true}});
+ f.ports.blueprint.read=async()=>({state:'confirmed',value:{source_revision:2,receipts:{sources:[{request_id:'stable',event_ref:'actual-event',kind:'CALIBRATION_EVENT_REPORTED',source_revision:2}],snapshots:[],evaluations:[]}}});
+ await c.load();expect(c.state?.source.pending).toBeUndefined();
+ expect(c.calibrationDraft('a')).toMatchObject({stage:'decision',committed_event_ref:'actual-event',draft_ref:'draft-a',reps:'10'});
+ await c.saveCalibrationDraft({encounter_ref:'a',draft_ref:'draft-a',stage:'observation',reps:'10'});
+ expect(c.calibrationDraft('a')).toMatchObject({stage:'decision'}); // Delayed local save cannot revive sent form.
+ await c.saveCalibrationDraft({encounter_ref:'a',draft_ref:'draft-b',stage:'observation',reps:''});
+ expect(c.calibrationDraft('a')).toMatchObject({stage:'observation',draft_ref:'draft-b'});
+});

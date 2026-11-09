@@ -15,7 +15,7 @@ PROFILE = "first-session-runtime/3.0.0"
 PIN_FIELDS = ("registry_digest", "binding_digest", "bundle_digest", "effective_science_digest")
 
 
-def lock_authority(db):
+def lock_authority(db, *, lock=True):
     settings = get_settings()
     if (
         settings.app_env != "test"
@@ -23,19 +23,19 @@ def lock_authority(db):
         or not schema_available(db)
     ):
         raise RuntimeFailure("authority_not_served", 503)
-    if db.get_bind().dialect.name == "sqlite":
+    if lock and db.get_bind().dialect.name == "sqlite":
         db.execute(
             update(FirstPlanRuntimeAuthority)
             .where(FirstPlanRuntimeAuthority.profile_key == PROFILE)
             .values(generation=FirstPlanRuntimeAuthority.generation)
             .execution_options(synchronize_session=False)
         )
-    row = db.scalar(
+    statement = (
         select(FirstPlanRuntimeAuthority)
         .where(FirstPlanRuntimeAuthority.profile_key == PROFILE)
-        .with_for_update()
         .execution_options(populate_existing=True)
     )
+    row = db.scalar(statement.with_for_update() if lock else statement)
     if row is None or row.state != "ACTIVE":
         raise RuntimeFailure("authority_not_served", 503)
     try:

@@ -231,11 +231,6 @@ def build_owned_snapshot(
     as_of = datetime.now(UTC)
     episodes = episodes_from_events(rows, owner_id, as_of.isoformat())
     raw_blueprint = blueprint_from_events(rows, identity)
-    if episodes:
-        raw_blueprint["environment"]["context_ref"] = (
-            episodes[-1]["context"]["context_ref"] or "environment:unknown"
-        )
-    bp = execute_science("blueprint", raw_blueprint)
     from app.services.plan_v3.calibration import _history_status
 
     concerns, withdrawals = _history_status(rows)
@@ -259,9 +254,35 @@ def build_owned_snapshot(
             )
         ):
             late_refs.append(event_id)
-    authorities = execute_science("authorities", {})
+    from app.services.plan_v3.authority import lock_authority
+    from app.services.plan_v3.calibration_profiles import project_qualified, projection_context
+
+    # A capture stores facts, not permission. It must remain possible before an
+    # operational authority is published. Never take the authority write lock
+    # after the owner lock: evaluate/start lock and revalidate that generation.
+    try:
+        operational, authorities, _ = lock_authority(db, lock=False)
+    except RuntimeFailure:
+        authorities = execute_science("authorities", {})
+        operational = None
+    if operational is None:
+        runtime = None
+        unqualified = (
+            [ep["episode_id"] for ep in episodes]
+            if authorities.get("calibration_inventory")
+            else []
+        )
+        if unqualified:
+            episodes = []
+    else:
+        episodes, unqualified, runtime = project_qualified(
+            rows, owner_id, as_of.isoformat(), episodes, operational, authorities
+        )
+    raw_blueprint["environment"]["context_ref"] = projection_context(episodes)
+    bp = execute_science("blueprint", raw_blueprint)
     data = {
-        "review_source_refs": concerns + late_refs,
+        "calibration_runtime": runtime,
+        "review_source_refs": concerns + late_refs + unqualified,
         "withdrawal_source_refs": withdrawals,
         "authority_pins": {
             key: authorities["v3"][key]

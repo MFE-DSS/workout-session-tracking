@@ -765,3 +765,18 @@ completed/success onze jobs,8049backend/3skip/749mobile+TS. SonarPR ERROR consul
 5S5778,0bug/vuln/hotspot. Canonique42585473467 en suivi ; archive après merge code,
 spécification science/calibration-encounter-extensions créée. Maintenance closeout
 encore non fusionnée, aucun CLOSED/nettoyage anticipé ; NOT_SERVED conservé.
+
+## PLAN-CAL-01 — raccordement des six rencontres au runtime propriétaire
+
+9novembre2026. Base canonique692d4c8 après SCI386/387 CLOSED+CLEANED.
+[Proposition](../../openspec/changes/plan-cal-01-owned-six-encounters/proposal.md),
+[design](../../openspec/changes/plan-cal-01-owned-six-encounters/design.md),
+[lease](../../openspec/changes/plan-cal-01-owned-six-encounters/BUILD_SCOPE.md),
+[tests spécifiés](../../openspec/changes/plan-cal-01-owned-six-encounters/TEST_SPEC.md),
+[croquis UX-CAL](../../openspec/changes/plan-cal-01-owned-six-encounters/UX_CAL_BOARD.md).
+**PROPOSED / NO_GO_BUILD / G1_PENDING / NOT_ACTIVATED.** Inventaire privé2,
+vrais profils SCI, ledger existant/sélection explicite/projection courante,
+consommateurs HTTP/natifs et vrai handoff V3 contrôlé proposés. Aucune source
+SCI/modèle/migration/CI/UI fonctionnelle changée ; pas nouvelle version SCI,
+activation DATA ou recette physique. Revue fraîche et approbation à obtenir
+avant apply. Les anciens GO et le GO MERGE ne fournissent pas ce nouveau build.

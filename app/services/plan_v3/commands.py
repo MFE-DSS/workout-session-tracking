@@ -115,6 +115,9 @@ def start_owned_first_session(db, owner_id, *, request_id, body, auth=None):
         raise ValueError("evaluation_ref required")
     evaluation = owned_evaluation(db, owner_id, body["evaluation_ref"])
     try:
+        from app.services.plan_v3.calibration_profiles import assert_snapshot_runtime
+
+        assert_snapshot_runtime(db, evaluation.snapshot_id, operational, authority)
         check_revision(db, owner_id, evaluation.source_revision)
         if evaluation.authority_generation != operational.generation:
             raise RuntimeFailure("authority_generation_changed")

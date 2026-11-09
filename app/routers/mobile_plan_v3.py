@@ -70,12 +70,21 @@ class PrivateRoute(APIRoute):
                 ) from None
             response.headers["Cache-Control"] = "no-store"
             response.headers["X-Auren-Contract"] = CONTRACT
+            if request.headers.get("X-Auren-Calibration-Inventory"):
+                response.headers["X-Auren-Calibration-Inventory"] = request.headers[
+                    "X-Auren-Calibration-Inventory"
+                ]
             return response
 
         return handle
 
 
-def negotiate(x_auren_contract: Annotated[str | None, Header()] = None):
+def negotiate(
+    x_auren_contract: Annotated[str | None, Header()] = None,
+    x_auren_calibration_inventory: Annotated[str | None, Header()] = None,
+):
+    if x_auren_calibration_inventory not in (None, "plan-calibration-inventory/2.0.0"):
+        raise RuntimeFailure("calibration_inventory_not_supported", 406)
     if x_auren_contract != CONTRACT:
         raise RuntimeFailure("contract_not_supported", 406)
 
@@ -129,7 +138,11 @@ def envelope(**data):
 
 
 @router.get("/me/first-plan/capabilities")
-def capabilities(user: ApiUser, db: DbSession):
+def capabilities(request: Request, user: ApiUser, db: DbSession):
+    from app.services.plan_v3.calibration_profiles import inventory
+
+    requested = request.headers.get("X-Auren-Calibration-Inventory")
+    calibration_inventory = None
     current = None
     selection = []
     pilot = None
@@ -139,13 +152,26 @@ def capabilities(user: ApiUser, db: DbSession):
 
         try:
             operational, authorities, pins = lock_authority(db)
+            calibration_inventory = inventory(authorities, requested)
             policy = authorities["v3"]["policy"]
             pilot_id = authorities["encounter"]["policy"]["scope"]["candidate_id"]
             selection = [
                 {
                     **spec,
                     "display_name": authorities["v3"]["catalogue_labels"][spec["candidate_id"]],
-                    "initial_guidance_supported": spec["candidate_id"] == pilot_id,
+                    "initial_guidance_supported": spec["candidate_id"] == pilot_id
+                    or bool(calibration_inventory),
+                    **(
+                        {
+                            "load_semantics": next(
+                                p["load_semantics"]
+                                for p in calibration_inventory["profiles"]
+                                if p["candidate_id"] == spec["candidate_id"]
+                            )
+                        }
+                        if calibration_inventory
+                        else {}
+                    ),
                 }
                 for spec in policy["selection"]
             ]
@@ -161,7 +187,9 @@ def capabilities(user: ApiUser, db: DbSession):
                 "start_policy_ref": policy["time"]["start_policy_ref"],
                 "encounter_bundle_digest": authorities["encounter"]["bundle_digest"],
             }
-        except RuntimeFailure:
+        except RuntimeFailure as error:
+            if error.status == 406:
+                raise
             current = None
     return envelope(
         owner_id=user.id,
@@ -171,6 +199,7 @@ def capabilities(user: ApiUser, db: DbSession):
         supported_realizations=selection,
         initial_calibration_pilot=pilot,
         calibration_protocol_material=protocol_material,
+        **({"calibration_inventory": calibration_inventory} if requested else {}),
         controlled_guidance_available=controlled_enabled()
         and get_settings().plan_v3_guidance_enabled,
     )
@@ -285,6 +314,13 @@ def write_observation(body: ObservationBody, request: Request, user: ApiUser, db
         require_calibration_negotiation(request)
         if set(body.event) != {"kind", "encounter_ref", "expected_authority", "observation"}:
             raise ValueError("invalid encounter observation envelope")
+        if (
+            body.event.get("expected_authority", {})
+            and body.event["expected_authority"].get("inventory_version")
+            and request.headers.get("X-Auren-Calibration-Inventory")
+            != "plan-calibration-inventory/2.0.0"
+        ):
+            raise RuntimeFailure("calibration_inventory_required", 406)
         from app.services.plan_v3.calibration import record_encounter_observation
 
         row = record_encounter_observation(
@@ -293,6 +329,25 @@ def write_observation(body: ObservationBody, request: Request, user: ApiUser, db
             request_id=body.request_id,
             expected_revision=body.expected_revision,
             **{key: value for key, value in body.event.items() if key != "kind"},
+            auth=auth_proof(request, user),
+        )
+    elif body.event.get("kind") == "CALIBRATION_ENCOUNTER_SELECTED":
+        require_calibration_negotiation(request)
+        if (
+            request.headers.get("X-Auren-Calibration-Inventory")
+            != "plan-calibration-inventory/2.0.0"
+        ):
+            raise RuntimeFailure("calibration_inventory_required", 406)
+        if set(body.event) != {"kind", "encounter_ref"}:
+            raise ValueError("invalid selection")
+        from app.services.plan_v3.calibration import select_encounter
+
+        row = select_encounter(
+            db,
+            user.id,
+            request_id=body.request_id,
+            expected_revision=body.expected_revision,
+            encounter_ref=body.event["encounter_ref"],
             auth=auth_proof(request, user),
         )
     else:
@@ -513,7 +568,13 @@ def open_calibration(body: EncounterBody, request: Request, user: ApiUser, db: D
 
     require_calibration_negotiation(request)
     require_controlled(db, "plan_v3_acquisition_enabled")
-    row = open_encounter(db, user.id, **body.model_dump(), auth=auth_proof(request, user))
+    row = open_encounter(
+        db,
+        user.id,
+        **body.model_dump(),
+        auth=auth_proof(request, user),
+        inventory_version=request.headers.get("X-Auren-Calibration-Inventory"),
+    )
     db.commit()
     return envelope(owner_id=user.id, encounter_ref=row.id, source_revision=row.source_revision)
 
@@ -527,5 +588,12 @@ def read_calibration(encounter_ref: str, request: Request, user: ApiUser, db: Db
         raise RuntimeFailure("not_found", 404)
     return envelope(
         owner_id=user.id,
-        encounter=read_encounter(db, user.id, encounter_ref, auth=auth_proof(request, user)),
+        encounter=read_encounter(
+            db,
+            user.id,
+            encounter_ref,
+            auth=auth_proof(request, user),
+            inventory_version=request.headers.get("X-Auren-Calibration-Inventory"),
+            strict_negotiation=True,
+        ),
     )
