@@ -798,3 +798,16 @@ six exigences ajoutées au specmobile existant ; seul suivi final de livraison
 reste ouvert dans les tâches archivées, pas un nouveau scope fonctionnel. DATA,
 recettes physiques, réévaluation sécurité avant exposition et GO déploiement
 restent distincts ; MOB03complet non clos par ce build.
+
+## ASSET-CONSUMER-01 — fiche native pilote et readiness des illustrations
+
+9 novembre2026, base`fe9f6e9`. [Proposition](../../openspec/changes/asset-consumer-01/proposal.md),
+[design](../../openspec/changes/asset-consumer-01/design.md), [package](../assets/asset-consumer-01/README.md),
+[matrice](../assets/asset-consumer-01/ASSET_MATRIX.md), [composition unique proposée](../assets/asset-consumer-01/NATIVE_COMPOSITION_PROPOSED.md)
+et [rapport](../assets/asset-consumer-01/REPORT.md).
+**SPEC/readiness uniquement · PROPOSED / NO_GO_BUILD / G1_PENDING / PIXELS_NOT_RECEIVED / NOT_ACTIVATED.**
+Voie indépendante du recadrage5novembre : mannequin→Smith START/END→fiche pilote→sept Push A,
+ces derniers distincts des sept réalisations de calibrage SCI. Cinq vues référence acceptées historiquement,
+vectorisation/master/paires non produits et intégration bloquée ; droits déclarés de référence conservés,
+droits dérivés/matériel non présumés. DA-05.1 historique sans mannequin et DA-01 passé conservés.
+Aucune UI/image/génération/source anatomique/SCI/activation ; G1, pixels et GO BUILD restent à recevoir.
