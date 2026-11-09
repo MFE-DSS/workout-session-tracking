@@ -1,6 +1,6 @@
 # Design proposé — extension isolée des rencontres, échange V1 conservé
 
-> Actualisation9novembre : design et GO BUILD reçus ; voir [autorisation](BUILD_AUTHORIZATION.md) et [livraison effective](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md). Les mentions préparatoires ci-dessous conservent leur instant d’origine.
+> Actualisation9novembre : design et GO BUILD reçus ; voir [autorisation](BUILD_AUTHORIZATION.md) et [livraison effective](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md). Les mentions préparatoires ci-dessous conservent leur instant d’origine.
 
 **PROPOSED / NO_GO_BUILD**, 9 novembre 2026, base ba2dbbc. Sources nécessaires :
 spécification science/first-use-calibration, autorité du pilote1.0.0, contrats

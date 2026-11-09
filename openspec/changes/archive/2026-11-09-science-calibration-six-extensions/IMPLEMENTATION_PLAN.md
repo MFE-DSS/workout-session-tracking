@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python/Pydantic, existing pytest/ruff/Bandit/OpenSpec; no new dependency.
 
-**Spec:** [Approved design](design.md), [test cases](TEST_SPEC.md), [admission case](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md).
+**Spec:** [Approved design](design.md), [test cases](TEST_SPEC.md), [admission case](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md).
 
 ## Global Constraints
 

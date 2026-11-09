@@ -10,8 +10,8 @@ résultat CI nouveau pour ce dossier. PLAN #379/#380 et CI #381/#382 restent clo
 ## Livrable concret
 
 [Design](design.md), [décision proposée](DECISION_FOR_OPERATOR.md), proposal,
-tasks, delta de spec et tests spécifiés ; [cas d'admission par réalisation](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md)
-et [frontière PLAN](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/PLAN_HANDOFF_PROPOSED.md).
+tasks, delta de spec et tests spécifiés ; [cas d'admission par réalisation](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md)
+et [frontière PLAN](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/PLAN_HANDOFF_PROPOSED.md).
 Le registre documentaire reçoit uniquement un ajout de proposition.
 
 Le contrat encounter1.0.0 représente déjà les faits nécessaires. Le nouveau
