@@ -1,11 +1,12 @@
 /** Current pilot permissions and historical facts have separate carriers. */
-import type {CalibrationReadV1,ContextV3,OwnedEnvelopeV3} from '../domain/planV3Types';
+import type {CalibrationReadV1,ContextV3,OwnedEnvelopeV3,CapabilitiesV3} from '../domain/planV3Types';
 import { CALIBRATION_INVENTORY,RuntimeV3Client,isObject,revision,positiveId,hexDigest,runtimeSchemaMatches } from './firstPlanV3';
 import { BlueprintV3Client,type SourceReceiptV3 } from './blueprintV3';
 import {observationProgressV3} from './observationFactsV3';
 import schemas from './calibrationV1.contract.json';
+import {bindCalibrationCapabilities} from './calibrationProfilesV2';
 const strings=(value:unknown):value is string[]=>Array.isArray(value)&&value.every(x=>typeof x==='string');
-export function calibrationEnvelope(raw:OwnedEnvelopeV3):CalibrationReadV1|null {
+export function calibrationEnvelope(raw:OwnedEnvelopeV3,capabilities?:CapabilitiesV3|null):CalibrationReadV1|null {
   const value=(raw as unknown as Record<string,unknown>).encounter;
   if(!isObject(value)||typeof value.encounter_ref!=='string'||!revision(value.source_revision)||typeof value.as_of!=='string'
     ||!Number.isFinite(Date.parse(value.as_of))||!strings(value.allowed_actions)||!isObject(value.progress))return null;
@@ -30,7 +31,8 @@ export function calibrationEnvelope(raw:OwnedEnvelopeV3):CalibrationReadV1|null 
     if(value.authority.contract_version!=='first-calibration-encounter/1.0.0'||!strings(value.result.allowed_actions)
       ||value.allowed_actions.some(action=>!value.result||!isObject(value.result)||!Array.isArray(value.result.allowed_actions)||!value.result.allowed_actions.includes(action)))return null;
   }
-  return value as CalibrationReadV1;
+  const view=value as CalibrationReadV1;
+  return capabilities!==undefined||view.authority?.inventory_version!==undefined?bindCalibrationCapabilities(view,capabilities??null,raw.owner_id):view;
 }
 export class CalibrationV1Client {
   private readonly blueprint:BlueprintV3Client;
@@ -42,9 +44,9 @@ export class CalibrationV1Client {
       return typeof x.encounter_ref==='string'&&revision(x.source_revision)?raw as OwnedEnvelopeV3&{encounter_ref:string;source_revision:number}:null;
     },current);
   }
-  read(encounterRef:string,current?:()=>boolean){
+  read(encounterRef:string,current?:()=>boolean,capabilities?:CapabilitiesV3|null){
     return this.runtime.request(`/me/blueprint/calibration-encounters/${encodeURIComponent(encounterRef)}`,{},raw=>{
-      const value=calibrationEnvelope(raw);return value?.encounter_ref===encounterRef?value:null;
+      const value=calibrationEnvelope(raw,capabilities?.calibration_inventory&&this.runtime.calibrationInventory!==CALIBRATION_INVENTORY?null:capabilities);return value?.encounter_ref===encounterRef?value:null;
     },current);
   }
   select(requestId:string,expectedRevision:number,encounterRef:string,current?:()=>boolean){

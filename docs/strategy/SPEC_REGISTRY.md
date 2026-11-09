@@ -858,3 +858,22 @@ prise en charge personnelle du service à ce stade et formalisation envisagée
 ultérieurement. Identité légale publiable/coordonnées/juridiction/public non
 établis ; D02–D09/C01–C11 OPEN. Aucune politique admise, fondement/durée ou
 activation déduits ; [rapport et portée de la revue indépendante](../data/data-act-01/REVIEW_REPORT.md).
+
+## UX-CAL-02 — densité et hiérarchie du calibrage natif
+
+9 novembre 2026, base canonique vérifiée
+`fe9f6e9beb585a271ae2c2726e338359057b9f58` après clôture388/389, confirmée par
+leurs reçus finaux. [Proposition](../../openspec/changes/ux-cal-02-native-density/proposal.md),
+[design](../../openspec/changes/ux-cal-02-native-density/design.md),
+[scope](../../openspec/changes/ux-cal-02-native-density/BUILD_SCOPE.md),
+[avant/après G1](../../openspec/changes/ux-cal-02-native-density/UX_CAL_BOARD.md).
+**PROPOSED / NO_GO_BUILD / G1_PENDING / NOT_ACTIVATED.** Composition locale
+partagée plus compacte, un CTA dominant, faits et unités conservés, deux
+sous-étapes d'observation sans effet serveur intermédiaire ; décodage croisé
+inventaire/profil/intention/réalisation/sémantique et aide ciblée avant ouverture.
+Contrats/source SCI, inventaire2, compte/préférences/MISSION/exécution/ack et
+baselines restent inchangés. Pas de code produit, tests produit nouveaux, API,
+migration, dépendance, asset ou admission dans cette préparation. Nouveau GO
+BUILD et croquis requis avant apply, pixels natifs ensuite avant commit UI ;
+GOV-MERGE-01 couvre la livraison du seul scope autorisé. DATA, activation réelle,
+appareils physiques et déploiement restent des gates distincts.

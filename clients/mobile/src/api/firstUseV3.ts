@@ -7,6 +7,7 @@ import type {FirstPlanV3Client,V3Outcome} from './firstPlanV3';
 import {jsonCopy} from './firstPlanV3';
 import {commandFromEvaluationV3,type FirstSessionV3Client} from './firstSessionV3';
 import type {CalibrationV1Client} from './calibrationV1';
+import {bindCalibrationCapabilities} from './calibrationProfilesV2';
 type Ports={ownerId:number;journal:PlanV3Journal;sessions:FirstSessionV3Client;plan:FirstPlanV3Client;
  blueprint:BlueprintV3Client;calibration:CalibrationV1Client;newId:()=>string;current:()=>boolean};
 export class FirstUseV3Controller {
@@ -39,7 +40,7 @@ export class FirstUseV3Controller {
  get loading(){return this.busy;}
  private invalidateCalibrationGuidance(){if(this.encounter)this.encounter={...this.encounter,result:null,authority:null,allowed_actions:[],unavailable_reason:'REVALIDATION_REQUIRED'};this.changed();}
  async load(){await this.exclusive(async()=>{
-  this.invalidateCalibrationGuidance();
+  this.invalidateCalibrationGuidance();this.capabilities=null;
   const result=await this.ports.plan.capabilities();if(!this.active)return;
   if(result.state!=='confirmed'){this.notice='Capacité indisponible';return;}
   this.capabilities=result.value;
@@ -90,7 +91,7 @@ export class FirstUseV3Controller {
   else if(pending.kind==='open-calibration')await this.sourceMutation(pending.kind,b,key=>this.ports.calibration.open(key,b.revision,b.context,b.availability,b.concern,()=>this.active));
   else if(pending.kind==='select-calibration')await this.sourceMutation(pending.kind,b,key=>this.ports.calibration.select(key,b.revision,b.encounter,()=>this.active));
   else if(pending.kind==='calibration-event'){
-   const view=await this.ports.calibration.read(b.encounter,()=>this.active);
+   const view=await this.ports.calibration.read(b.encounter,()=>this.active,this.capabilities);
    if(view.state==='confirmed')await this.sourceMutation(pending.kind,b,key=>this.ports.blueprint.observe(key,b.revision,{kind:'ENCOUNTER_OBSERVATION',encounter_ref:b.encounter,expected_authority:b.authority,observation:b.observation},()=>this.active));
   }else if(pending.kind==='evaluate'&&this.capabilities){
    const snapshot=this.state?.source.snapshot as BlueprintSnapshotV3|undefined;
@@ -164,8 +165,8 @@ export class FirstUseV3Controller {
  }
  private async readCalibrationInternal(interaction=this.interactionRevision){const ref=this.state?.source.encounter_ref;if(typeof ref!=='string')return;
   const current=()=>this.active&&interaction===this.interactionRevision;if(!current())return;
-  const result=await this.ports.calibration.read(ref,current);if(!current())return;
-  if(result.state==='confirmed'){this.encounter=result.value;this.notice=result.value.unavailable_reason??null;}
+  const result=await this.ports.calibration.read(ref,current,this.capabilities);if(!current())return;
+  if(result.state==='confirmed'){this.encounter=bindCalibrationCapabilities(result.value,this.capabilities,this.ports.ownerId);this.notice=this.encounter.unavailable_reason??null;}
   else {if(this.encounter)this.encounter={...this.encounter,result:null,authority:null,allowed_actions:[],unavailable_reason:'REVALIDATION_REQUIRED'};this.notice='Rencontre indisponible';}this.changed();
  }
  async selectCalibration(encounter:string){let selected=false;await this.exclusive(async()=>{

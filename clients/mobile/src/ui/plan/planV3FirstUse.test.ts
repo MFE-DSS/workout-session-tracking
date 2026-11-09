@@ -58,6 +58,7 @@ test('proposal exposes only the first admissible session, never a promise of the
  expect(recommendation.candidate_plan.sessions).toHaveLength(2);
  const root=createRoot(),controller:any={saveCalibrationDraft:async()=>{},calibrationDraft:()=>null,newCalibrationDraftRef:()=>"draft-test",loading:false,state:{source:{evaluation:{recommendation}}},capabilities:{controlled_test_available:true},evaluate:async()=>{}};
  await act(async()=>root.render(React.createElement(PlanV3FirstUseScreen,{controller,onExit(){},onPreferences(){}})));
+ await act(async()=>root.container.queryAll(n=>n.props.testID==='calibration-entry-details')[0].props.onClick({nativeEvent:{},stopPropagation(){},currentTarget:1,target:1}));
  await act(async()=>root.container.queryAll(n=>n.props.testID==='plan-v3-open-proposal')[0].props.onClick({nativeEvent:{},stopPropagation(){},currentTarget:1,target:1}));
  expect(root.container.queryAll(n=>typeof n.props.testID==='string'&&n.props.testID.startsWith('plan-v3-slot-'))).toHaveLength(7);
  await act(async()=>root.unmount());
@@ -94,6 +95,7 @@ test('an actual attempt requires an actual setting; a selected value is never si
  expect(root.container.queryAll(n=>n.props.accessibilityLabel==='Enregistrer ces faits')).toHaveLength(0);
  const input=root.container.queryAll(n=>n.props.testID==='calibration-setting-input')[0];expect(input).toBeDefined();expect(input.props.accessibilityLabel).toBe('Réglage réellement utilisé · kg affichés');
  await act(async()=>input.props.onChangeText('18'));
+ await act(async()=>root.container.queryAll(n=>n.props.accessibilityLabel==='Continuer')[0].props.onClick({nativeEvent:{},stopPropagation(){},currentTarget:1,target:1}));
  await act(async()=>root.container.queryAll(n=>n.props.accessibilityLabel==='Enregistrer ces faits')[0].props.onClick({nativeEvent:{},stopPropagation(){},currentTarget:1,target:1}));
  expect(reported[0].event.setting.value).toBe(18);
  await act(async()=>root.unmount());

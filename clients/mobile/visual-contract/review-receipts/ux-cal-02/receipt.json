@@ -1,0 +1,513 @@
+{
+  "status": "PIXELS_ACCEPTED",
+  "canonical_base": "844cbfb6b2f11c656b129e47d9db63b2d117cc04",
+  "backend_product_source": "fe9f6e9beb585a271ae2c2726e338359057b9f58",
+  "native_kind": "Expo Go simulators with actual production components and owner HTTP; not standalone release or physical acceptance",
+  "source_facts": "synthetic explicit testimony/drafts; no SCI fixture served",
+  "current_client_source_sha256": {
+    "clients/mobile/src/api/calibrationV1.test.ts": "f61e78553ecd6f20ae233e1981202f37893e93976dcfdee03201e6f3b1292186",
+    "clients/mobile/src/api/calibrationV1.ts": "c8e785742f164e5e4e7165989c3ced454427b0b7396e5029fce5f99a56f78ef0",
+    "clients/mobile/src/api/firstPlanV3.test.ts": "59a717f148394ccd01cad99ed9a952810d431da4b7fe8de3a44e756130a5fdc6",
+    "clients/mobile/src/api/firstPlanV3.ts": "608793b9ab6b9ca29895326c3bcf40680193f4069a7a5f6e67e45cc11f872d54",
+    "clients/mobile/src/api/firstUseV3.test.ts": "d28ba2da880279a2c3542a20d66d564155d1164a63c14b47a78b63a117e92731",
+    "clients/mobile/src/api/firstUseV3.ts": "f68de160aba875a9a146680c083b44101137c2b7e3981ae30f7419791beef538",
+    "clients/mobile/src/ui/plan/PlanV3FirstUseScreen.tsx": "b1ec0e272164a04ffbafc68e514af7c19525e873cfda3d21a79565ba082fc587",
+    "clients/mobile/src/ui/plan/calibrationEncounterInstrument.tsx": "cad74c8c7d078186676a7ac33b87baaad3c5727e7c3fd36de8bd52a24b370f36",
+    "clients/mobile/src/ui/plan/calibrationInstrument.tsx": "ff12c2d22c0bb42c718d5419d31432bf084c8a6298fb766202acce3ff90bef89",
+    "clients/mobile/src/ui/plan/calibrationModel.ts": "ee256bf83705f9e2660358f5159e43afb02a307a8fffad3fb19343d79ee78adc",
+    "clients/mobile/src/ui/plan/planV3FirstUse.test.ts": "a73c4a145ce076a70532e0eea98a23dc080663e27908b4737c9bc87de4ec92f8",
+    "clients/mobile/src/api/calibrationProfilesV2.test.ts": "22569d34affb9d6af66c6f911cb9a9356bccc0f965486854373819d00a5872d8",
+    "clients/mobile/src/api/calibrationProfilesV2.ts": "6f7387c140a9b81842deee105b5e6a5f5e106d57f51a6db3b89cc6b4e251c7c3",
+    "clients/mobile/src/ui/plan/calibrationControls.tsx": "93d80c5c00fe3ea2a60db32489d379b611a6461510a71f92c130c4d8d8561937",
+    "clients/mobile/src/ui/plan/calibrationHelp.test.ts": "d7c416e3327137735e89de8141430c1ad45ed3e03bf4551da0aa7d4470bfaba0",
+    "clients/mobile/src/ui/plan/calibrationHelp.ts": "4a6d322d32349789711c3a9fff9bb8d19145e4383515184209e42cea8a94c87a",
+    "clients/mobile/src/ui/plan/calibrationLayout.test.ts": "ace03d41d298e22b2a216e235eb3be6c9eaee929953892415a5f8b9837e3d562",
+    "clients/mobile/src/ui/plan/calibrationLayout.tsx": "f0d9f9787b19a655ea4532f632ad2df2c7da1ff134c64b0d8ed26df6658ac135"
+  },
+  "captures": [
+    {
+      "file": "android-360-first-home-before.png",
+      "case": "first-home",
+      "variant": "before",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "first-home~0~ac3563d1ea584b99b9bdc450acc5c0a7",
+        "variant": "before.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "9f5f2d77abb763e13093da5fbb71227edc5e4a7318a627eb448921fbcbe2bf5b"
+    },
+    {
+      "file": "android-360-first-home-after.png",
+      "case": "first-home",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "first-home~0~8ba2598f4d1f4dab97b9f10edeaefaac",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "12cd87013676fca3753152eb1978bdd31715058526cd3ed2690cbc0f99558a10"
+    },
+    {
+      "file": "android-360-machine-setting-before.png",
+      "case": "machine-setting",
+      "variant": "before",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "machine-setting~0~ecd611ff87d542049cf83648842bdc92",
+        "variant": "before.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "8d12bad2f5d1c771ca6d564bd32a7a666f01c0f6a6164beec7a80186641ef550"
+    },
+    {
+      "file": "android-360-machine-setting-after.png",
+      "case": "machine-setting",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "machine-setting~0~8180dcc6ff384a5c8e56de9ed0692cbc",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "8b3adf51b87c7941e9ebca6d9a6d3cdc236af07ed687bc4ab2e58c66e39d0250"
+    },
+    {
+      "file": "android-360-rdl-setting-before.png",
+      "case": "rdl-setting",
+      "variant": "before",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "rdl-setting~0~df783e626e9c4a9cbab933dd7c68c5bd",
+        "variant": "before.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "bbe881c60261805a1d8ccb2a884e7fc4ff137557f77867b8ab80dd66a686c08c"
+    },
+    {
+      "file": "android-360-rdl-setting-after.png",
+      "case": "rdl-setting",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "rdl-setting~0~5346f3b16ea94498aaa002c28f8a0a93",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "c9bddd83c807f78a5b676a5f0c5b8607a389105dd4a93d403b31f71a55da8c27"
+    },
+    {
+      "file": "android-360-familiar-after.png",
+      "case": "familiar",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "familiar~0~766fca70e0bd4b718d45a09659bdd751",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "1ea67c6f3e25573a58400c5549461ee2ab1dae998d2b36f2ab50308c549b101e"
+    },
+    {
+      "file": "android-360-trial-after.png",
+      "case": "trial",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "trial~0~9f1fdef6f58f4127b46fc95dd3fcc4f7",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "3d239a2c43166531d2ee5bf88e29c25058e86c57e0e9a4a007c26f70872190bc"
+    },
+    {
+      "file": "android-360-observation-after.png",
+      "case": "observation",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "observation~0~c93dff4a71814748be95fdf6bb031187",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "bf1641f5478870f6806cd1ec44fbd9a63864fca45b74e5f6873331a33787fc84"
+    },
+    {
+      "file": "android-360-result-after.png",
+      "case": "result",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "result~0~1e39a5d2e6d940deb981e298897934e5",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "4d377daea5ed596873a94512be09515a27819fbc9fff1f16bdc6f3682dae7614"
+    },
+    {
+      "file": "android-360-retry-after.png",
+      "case": "retry",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "retry~0~d292c882244f46f9bf9179c06ebcf2f1",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "78782ca24a570a776da32ddd20252186521ecd64ed8c0932af4b198d7c2dbad0"
+    },
+    {
+      "file": "android-360-concern-after.png",
+      "case": "concern",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1,
+      "ready": {
+        "key": "concern~0~188952607aa74da183600b9f51c863b4",
+        "variant": "after.tsx",
+        "source_revision": 7,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "4cc68e12077668fe0eecb94644d508f5fbb594954e4f2c319c043549bb38c40b"
+    },
+    {
+      "file": "android-480-machine-setting-after.png",
+      "case": "machine-setting",
+      "variant": "after",
+      "width_dp": 480,
+      "font_requested": 1,
+      "ready": {
+        "key": "machine-setting~0~af3f9845c8a941df9b7478e768849c62",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "android"
+      },
+      "sha256": "e90d622f126d7f386b8ff2dde35b0d009325f354a1fed1e5b5fcbdf31cc046c8"
+    },
+    {
+      "file": "android-360-machine-setting-after-font2.png",
+      "case": "machine-setting",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 2,
+      "ready": {
+        "key": "machine-setting~0~a2616b76c12b43569e3a11bb6562df7c",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 2,
+        "platform": "android"
+      },
+      "sha256": "f6cb7cac64efbc2b0f2c9d22048a75501f3687029856bcf78c3ef3942425bdeb"
+    },
+    {
+      "file": "ios-390-first-home-before.png",
+      "case": "first-home",
+      "variant": "before",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "first-home~0~10e75c68d5a54f03af842a7f5589ef6c",
+        "variant": "before.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "64dc1869393c1ff5dc2187259dad0e792069773f90ed0ab3c3d72c1cf36c36a2"
+    },
+    {
+      "file": "ios-390-first-home-after.png",
+      "case": "first-home",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "first-home~0~459718b784d34f5995a3491af3f6f9c6",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "d684cf13a9463dfe9ef21e317a730da0d68a6aa624778f2c927bde79e2b9f619"
+    },
+    {
+      "file": "ios-390-machine-setting-before.png",
+      "case": "machine-setting",
+      "variant": "before",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "machine-setting~0~3b6bceffabf64ca88861d531d9049356",
+        "variant": "before.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "41d032ec1839714aa67e09a116273c8046c0b86cb3141cd8a27f798164c43416"
+    },
+    {
+      "file": "ios-390-machine-setting-after.png",
+      "case": "machine-setting",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "machine-setting~0~7b7e3cb64db8449ea6e4cceadb3d388b",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "8faf114d75269d94589137c68df70adaecf5104c79736f0c2f9256a58d81c053"
+    },
+    {
+      "file": "ios-390-rdl-setting-before.png",
+      "case": "rdl-setting",
+      "variant": "before",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "rdl-setting~0~fddaa4af5a834bb6991e12566ce90f8c",
+        "variant": "before.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "1f84f0c016781b5519c8ae6cca2efaec380d7f74dae415adefcad2328a91fc7f"
+    },
+    {
+      "file": "ios-390-rdl-setting-after.png",
+      "case": "rdl-setting",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "rdl-setting~0~fd79813dceca465ab8096a5def3bddc1",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "6cae50d8474b9e4be4d76ac84723f282ccef11d948b73b31f423415ec0ce9307"
+    },
+    {
+      "file": "ios-390-familiar-after.png",
+      "case": "familiar",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "familiar~0~aedb2f887e6e498582394abc9da93a1d",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "2fc01d5d56f9ce0e272947698729e4a99a1aae9d3444ece83e3c6851823d7c83"
+    },
+    {
+      "file": "ios-390-trial-after.png",
+      "case": "trial",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "trial~0~ffd1f208c6b14daaaeee34383ae3940d",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "d15418eee1021f0f50882e82a9ace60d0bd95f3d1abcc7e469dbea0b3183a411"
+    },
+    {
+      "file": "ios-390-observation-after.png",
+      "case": "observation",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "observation~0~5f875961e8844de7846fd329afe092ad",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "d1fd9cb6e8214113fb809c13d7694736e5da0c0ec259cae9202ff04b015d936e"
+    },
+    {
+      "file": "ios-390-result-after.png",
+      "case": "result",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "result~0~8d617cd285124d2e8967e06caa6c0376",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "50aad31e6b34e745f04e6d688667a1a1ec6a5f07902d2df0686d5a5b53710ec6"
+    },
+    {
+      "file": "ios-390-concern-after.png",
+      "case": "concern",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "concern~0~b31b45e9fb56405490e206cbc028255c",
+        "variant": "after.tsx",
+        "source_revision": 7,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "8ebb694052d326d5a8c29119af59231a86b1070147e9be55088fecfb9ef8425a"
+    },
+    {
+      "file": "ios-390-retry-after.png",
+      "case": "retry",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "retry~0~291bce9629a94b0bb91126245b53dbbf",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "d61e94c90c0066271c2a1091c37df7bcdd7d277617a0b4e241d2721c9c3d0dd4"
+    },
+    {
+      "file": "ios-390-machine-setting-after-extra-extra-extra-large.png",
+      "case": "machine-setting",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "extra-extra-extra-large",
+      "ready": {
+        "key": "machine-setting~0~5bd780c8c2fc472d9b0b4f32ab2041bd",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1.353,
+        "platform": "ios"
+      },
+      "sha256": "c817fbeaea3e223a5c87f9be20bf444912be8de1a43a507ce7aee3af9db66b8e"
+    },
+    {
+      "file": "ios-390-observation-after-accessibility-large.png",
+      "case": "observation",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "accessibility-large",
+      "ready": {
+        "key": "observation~0~f69a0f00d2f44cbea32b3ecb1d47ddf0",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 2.143,
+        "platform": "ios"
+      },
+      "sha256": "5eeba0a1146e7bc730d43990f19d162e614a221dde1df8af7233891add3967cf"
+    },
+    {
+      "file": "ios-390-observation-feeling-after.png",
+      "case": "observation-feeling",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "large",
+      "ready": {
+        "key": "observation-feeling~0~415fa5faa402489ea29dbf446f1bc8ca",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1,
+        "platform": "ios"
+      },
+      "sha256": "d66e5bde8767721b02da13acb2f1597a6ca3cade4800e4d343ddb763b849312b"
+    },
+    {
+      "file": "ios-390-observation-scroll-after-accessibility-large.png",
+      "case": "observation-scroll",
+      "variant": "after",
+      "width_pt": 390,
+      "font_category": "accessibility-large",
+      "ready": {
+        "key": "observation-scroll~600~bdb78e549e2c4bccba18e76abfb0dea5",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 2.143,
+        "platform": "ios"
+      },
+      "sha256": "138c2672ffbd1a527397243add56e756aa84d84d39adaab33d25007c06c39062"
+    },
+    {
+      "file": "android-360-observation-after-font1.3.png",
+      "case": "observation",
+      "variant": "after",
+      "width_dp": 360,
+      "font_requested": 1.3,
+      "ready": {
+        "key": "observation~0~5c7fd7b5883c4b60ba984889077dba7d",
+        "variant": "after.tsx",
+        "source_revision": 43,
+        "fontScale": 1.2999999523162842,
+        "platform": "android"
+      },
+      "sha256": "2fc413076bb0b72572b800dbbf224c424992c1916c46cf123751c7f749f9ed70"
+    }
+  ],
+  "accepted_references": {
+    "ios-home.png": "8d896d78cbf5d185ff470b913c157b5a53671a2dc04f5a8c681a088c5bc2a0d4",
+    "android-360-machine.png": "05555eff8214c400cac1269a23bc15264c7a29b44cb83b4b15e989c981bc9222",
+    "ios-rdl-setting.png": "f3cb8d28fb5ae06279cf360889d4f522653108f63a8f251e3fc5aff06e23f439"
+  },
+  "limitations": [
+    "full ConnectedApp Android blocked on ExpoTopicSubscriptionModule in current host",
+    "native keyboard input automation failed; no keyboard/VO/TalkBack physical acceptance",
+    "banc-only Expo gear overlay and source footer are not AUREN product UI",
+    "large text requires scrolling; 130% Android screenshot may remain pending, actual 200% Android and iOS1.353/2.143 recorded",
+    "no activation/deployment or baseline change"
+  ],
+  "scope_and_g1_decision": "Autoriser le build UX-CAL-02 et valider G1",
+  "capture_base": "844cbfb6b2f11c656b129e47d9db63b2d117cc04",
+  "current_canonical_docs_only": "3bb1f2d20ad87de3312f8784c0101a72484ebfdd",
+  "pixel_decision": "Valider ce delta visuel contr\u00f4l\u00e9",
+  "pixel_gate": "CLAUDE.md \u00a75.1 fulfilled before UI commit; physical/release/activation gates remain separate",
+  "pixel_decision_date": "2026-11-09",
+  "pixel_decision_timezone": "Europe/Paris"
+}
