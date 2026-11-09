@@ -17,6 +17,8 @@ export class FirstUseV3Controller {
  notice:string|null=null;
  private busy=false;
  private interactionRevision=0;
+ private draftPending:Record<string,unknown>|null=null;
+ private draftWriting:Promise<void>|null=null;
  constructor(private readonly ports:Ports,private readonly changed:()=>void=()=>undefined){}
  get active(){return this.ports.current();}
  private async persist(state:PlanV3Stored){if(!this.active)return;await this.ports.journal.save(state,()=>this.active);if(!this.active)return;this.state=await this.ports.journal.read();if(this.active)this.changed();}
@@ -33,9 +35,11 @@ export class FirstUseV3Controller {
   }
   await this.readLocalHistory();this.changed();
  }
- private async exclusive(task:()=>Promise<void>){if(this.busy||!this.active)return;this.busy=true;this.changed();try{await task();}finally{this.busy=false;if(this.active)this.changed();}}
+ private async exclusive(task:()=>Promise<void>){if(this.busy||!this.active)return;this.busy=true;this.changed();try{if(this.draftWriting)await this.draftWriting;await task();}finally{this.busy=false;await this.flushCalibrationDraft();if(this.active)this.changed();}}
  get loading(){return this.busy;}
+ private invalidateCalibrationGuidance(){if(this.encounter)this.encounter={...this.encounter,result:null,authority:null,allowed_actions:[],unavailable_reason:'REVALIDATION_REQUIRED'};this.changed();}
  async load(){await this.exclusive(async()=>{
+  this.invalidateCalibrationGuidance();
   const result=await this.ports.plan.capabilities();if(!this.active)return;
   if(result.state!=='confirmed'){this.notice='Capacité indisponible';return;}
   this.capabilities=result.value;
@@ -52,7 +56,7 @@ export class FirstUseV3Controller {
  });}
  private async recoverPending(declarations:DeclarationsV3){
   if(!this.state||!this.capabilities)return;
-  const pending=this.state.source.pending as {kind:string;request_id:string;body:Record<string,unknown>}|undefined;
+  const pending=this.state.source.pending as {kind:string;request_id:string;body:Record<string,unknown>;calibration_draft_ref?:string}|undefined;
   const receipts=declarations.receipts;if(!pending||!receipts)return;
   const source={...this.state.source};let found=false;
   if(pending.kind==='capture'){
@@ -66,9 +70,11 @@ export class FirstUseV3Controller {
   }else{
    const receipt=receipts.sources.find(r=>r.request_id===pending.request_id);
    if(receipt){
-    found=pending.kind==='declarations'&&receipt.kind==='DECLARATIONS'||pending.kind==='calibration-event'&&receipt.kind!=='DECLARATIONS'||pending.kind==='open-observed'&&receipt.kind==='CONTEXT_OPENED'||pending.kind==='observed-event'&&receipt.kind==='CALIBRATION_EVENT'||pending.kind==='open-calibration'&&receipt.kind==='CALIBRATION_ENCOUNTER_OPENED';
+    found=pending.kind==='declarations'&&receipt.kind==='DECLARATIONS'||pending.kind==='calibration-event'&&receipt.kind!=='DECLARATIONS'||pending.kind==='select-calibration'&&receipt.kind==='CALIBRATION_ENCOUNTER_SELECTED'||pending.kind==='open-observed'&&receipt.kind==='CONTEXT_OPENED'||pending.kind==='observed-event'&&receipt.kind==='CALIBRATION_EVENT'||pending.kind==='open-calibration'&&receipt.kind==='CALIBRATION_ENCOUNTER_OPENED';
     if(found&&pending.kind==='open-calibration')source.encounter_ref=receipt.event_ref;
+    if(found&&pending.kind==='select-calibration')source.encounter_ref=pending.body.encounter;
     if(found&&pending.kind==='open-observed')source.observed_episode_ref=receipt.event_ref;
+    if(found&&pending.kind==='calibration-event'&&receipt.kind==='CALIBRATION_EVENT_REPORTED')this.confirmCalibrationDraft(source,pending,receipt.event_ref);
     if(found&&pending.kind==='observed-event'&&(pending.body.event as {kind:string})?.kind==='ATTEMPT_OBSERVED')source.observed_trial_ref=receipt.event_ref;
    }
   }
@@ -82,6 +88,7 @@ export class FirstUseV3Controller {
   else if(pending.kind==='open-observed')await this.sourceMutation(pending.kind,b,key=>this.ports.blueprint.observe(key,b.revision,{kind:'CONTEXT_OPENED',context:b.context,availability:'AVAILABLE'},()=>this.active));
   else if(pending.kind==='observed-event')await this.sourceMutation(pending.kind,b,key=>this.ports.blueprint.observe(key,b.revision,{kind:'CALIBRATION_EVENT',episode_ref:b.episode,event:b.event},()=>this.active));
   else if(pending.kind==='open-calibration')await this.sourceMutation(pending.kind,b,key=>this.ports.calibration.open(key,b.revision,b.context,b.availability,b.concern,()=>this.active));
+  else if(pending.kind==='select-calibration')await this.sourceMutation(pending.kind,b,key=>this.ports.calibration.select(key,b.revision,b.encounter,()=>this.active));
   else if(pending.kind==='calibration-event'){
    const view=await this.ports.calibration.read(b.encounter,()=>this.active);
    if(view.state==='confirmed')await this.sourceMutation(pending.kind,b,key=>this.ports.blueprint.observe(key,b.revision,{kind:'ENCOUNTER_OBSERVATION',encounter_ref:b.encounter,expected_authority:b.authority,observation:b.observation},()=>this.active));
@@ -96,18 +103,22 @@ export class FirstUseV3Controller {
  /** Persist action/body BEFORE its sole send; only an explicit repeat uses that same identity. */
  private async sourceMutation<T>(kind:string,body:unknown,send:(key:string)=>Promise<V3Outcome<T>>):Promise<T|null>{
   if(!this.state||!this.active)return null;
-  const pending=this.state.source.pending as {kind:string;body:unknown;request_id:string}|undefined;
+  const pending=this.state.source.pending as {kind:string;body:unknown;request_id:string;calibration_draft_ref?:string}|undefined;
   if(pending&&(pending.kind!==kind||JSON.stringify(pending.body)!==JSON.stringify(body))){this.notice='Une action doit être relue ou répétée explicitement avant de modifier ces informations.';return null;}
-  const operation=pending??{kind,body:jsonCopy(body),request_id:this.ports.newId()};
+  const activeDraft=this.calibrationDraft((body as {encounter?:string})?.encounter??'') as {draft_ref?:string}|null;
+  const operation=pending??{kind,body:jsonCopy(body),request_id:this.ports.newId(),...(activeDraft?.draft_ref?{calibration_draft_ref:activeDraft.draft_ref}:{})};
   await this.persist({...this.state,source:{...this.state.source,pending:operation}});if(!this.active)return null;
   const result=await send(operation.request_id);if(!this.active||!this.state)return null;
   if(result.state==='confirmed'){
    const source={...this.state.source};delete source.pending;
+   this.confirmCalibrationDraft(source,operation as any,(result.value as {event_ref?:string}).event_ref);
    if(kind==='capture')source.snapshot=result.value;
    if(kind==='evaluate'||kind==='time-ack')source.evaluation=result.value;
    if(kind==='open-observed')source.observed_episode_ref=(result.value as {episode_ref:string}).episode_ref;
    if(kind==='observed-event'&&(body as {event?:{kind:string}}).event?.kind==='ATTEMPT_OBSERVED')source.observed_trial_ref=(result.value as {event_ref:string}).event_ref;
    if(kind==='open-calibration')source.encounter_ref=(result.value as {encounter_ref:string}).encounter_ref;
+   if(kind==='select-calibration')source.encounter_ref=(body as {encounter:string}).encounter;
+   if(['open-calibration','select-calibration','calibration-event'].includes(kind)){delete source.snapshot;delete source.evaluation;}
    await this.persist({...this.state,source});this.notice=null;return result.value;
   }
   if(result.state==='rejected'){
@@ -146,9 +157,9 @@ export class FirstUseV3Controller {
   if(receipt&&this.state){accepted=true;if(event.kind==='ATTEMPT_OBSERVED')await this.persist({...this.state,source:{...this.state.source,observed_trial_ref:receipt.event_ref}});await this.readSources();}
  });return accepted&&this.active;}
  async openCalibration(context:ContextV3,availability:'AVAILABLE'|'UNAVAILABLE'|'UNKNOWN',concern:'CLEAR'|'REPORTED'|'UNKNOWN'){
-  await this.exclusive(async()=>{if(this.revision===null)return;const revision=this.revision,interaction=this.interactionRevision;
+  await this.exclusive(async()=>{if(this.revision===null)return;const revision=this.revision,interaction=++this.interactionRevision;this.encounter=null;
    const opened=await this.sourceMutation('open-calibration',{context,availability,concern,revision},key=>this.ports.calibration.open(key,revision,context,availability,concern,()=>this.active));
-   if(opened&&this.state){await this.persist({...this.state,source:{...this.state.source,encounter_ref:opened.encounter_ref}});await this.readCalibrationInternal(interaction);}
+   if(opened&&this.state){await this.persist({...this.state,source:{...this.state.source,encounter_ref:opened.encounter_ref}});await this.readSources();await this.readCalibrationInternal(interaction);}
   });
  }
  private async readCalibrationInternal(interaction=this.interactionRevision){const ref=this.state?.source.encounter_ref;if(typeof ref!=='string')return;
@@ -157,9 +168,45 @@ export class FirstUseV3Controller {
   if(result.state==='confirmed'){this.encounter=result.value;this.notice=result.value.unavailable_reason??null;}
   else {if(this.encounter)this.encounter={...this.encounter,result:null,authority:null,allowed_actions:[],unavailable_reason:'REVALIDATION_REQUIRED'};this.notice='Rencontre indisponible';}this.changed();
  }
+ async selectCalibration(encounter:string){let selected=false;await this.exclusive(async()=>{
+  if(this.revision===null)return;const revision=this.revision,interaction=++this.interactionRevision;this.encounter=null;
+  const receipt=await this.sourceMutation('select-calibration',{encounter,revision},key=>this.ports.calibration.select(key,revision,encounter,()=>this.active));
+  if(receipt){selected=true;await this.readSources();await this.readCalibrationInternal(interaction);}
+ });return selected&&this.active;}
+ calibrationDraft(encounter:string):unknown {
+  const drafts=this.state?.source.calibration_drafts as Record<string,unknown>|undefined;
+  if(drafts?.[encounter])return jsonCopy(drafts[encounter]);
+  const previous=this.state?.source.calibration_draft as Record<string,unknown>|undefined;
+  return previous?.encounter_ref===encounter?jsonCopy(previous):null;
+ }
+ newCalibrationDraftRef(){return this.ports.newId();}
+ private confirmCalibrationDraft(source:Record<string,unknown>,operation:{kind:string;body:any;calibration_draft_ref?:string},eventRef:unknown){
+  if(operation.kind!=='calibration-event'||operation.body.observation?.event?.kind!=='ATTEMPT_OBSERVED'||typeof eventRef!=='string')return;
+  const drafts={...(source.calibration_drafts as Record<string,Record<string,unknown>>??{})},ref=operation.body.encounter,draft=drafts[ref];
+  if(draft&&typeof operation.calibration_draft_ref==='string'&&draft.draft_ref===operation.calibration_draft_ref){
+   drafts[ref]={...draft,stage:'decision',committed_event_ref:eventRef};source.calibration_drafts=drafts;
+  }
+ }
+ async saveCalibrationDraft(fields:Record<string,unknown>){
+  if(!this.state||!this.active)return;this.draftPending=jsonCopy(fields);
+  if(!this.busy)await this.flushCalibrationDraft();
+ }
+ private async flushCalibrationDraft():Promise<void>{
+  if(this.draftWriting)return this.draftWriting;
+  this.draftWriting=(async()=>{while(this.draftPending&&this.state&&this.active){
+   const fields=this.draftPending;this.draftPending=null;
+   const drafts={...(this.state.source.calibration_drafts as Record<string,unknown>??{})};
+   if(typeof fields.encounter_ref==='string'){
+    const old=drafts[fields.encounter_ref] as Record<string,unknown>|undefined;
+    drafts[fields.encounter_ref]=old?.committed_event_ref&&old.draft_ref===fields.draft_ref?{...fields,stage:'decision',committed_event_ref:old.committed_event_ref}:fields;
+   }
+   await this.persist({...this.state,source:{...this.state.source,calibration_draft:fields,calibration_drafts:drafts}});
+  }})();
+  try{await this.draftWriting;}finally{this.draftWriting=null;}
+ }
  async readCalibration(){await this.exclusive(()=>this.readCalibrationInternal());}
  async recordCalibration(observation:Record<string,unknown>){let accepted=false;await this.exclusive(async()=>{
-  if(!this.encounter)return;const view=jsonCopy(this.encounter),interaction=this.interactionRevision;
+  if(!this.encounter)return;const view=jsonCopy(this.encounter),interaction=this.interactionRevision;this.invalidateCalibrationGuidance();
   const receipt=await this.sourceMutation('calibration-event',{encounter:view.encounter_ref,revision:view.source_revision,authority:view.authority,observation},key=>this.ports.calibration.record(key,view,observation,()=>this.active));
   if(receipt){accepted=true;await this.readCalibrationInternal(interaction);if(this.state){const d=await this.ports.blueprint.read(()=>this.active);if(this.active&&d.state==='confirmed')await this.persist({...this.state,source:{...this.state.source,declarations:d.value}});}}
  });return accepted&&this.active;}

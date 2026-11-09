@@ -5,9 +5,11 @@ export type ContextV3 = {canonical_exercise_id:string|null;context_ref:string|nu
 export type AuthorityPinsV3 = {registry_digest:string;binding_digest:string;bundle_digest:string;effective_science_digest:string};
 export type RuntimeVersionsV3 = {runtime:string;request:string;result:string;execution:string;calibration:string};
 export type OwnedEnvelopeV3 = {owner_id:number;contract_version:'first-session-runtime/3.0.0';versions:RuntimeVersionsV3};
+export type CalibrationProfileV2={candidate_id:string;realization_ref:string;intent_id:string;load_semantics:"MACHINE_DISPLAY_KG"|"PER_IMPLEMENT";policy_ref:string};
 export type CapabilitiesV3 = OwnedEnvelopeV3 & {runtime_availability:'NOT_SERVED';controlled_test_available:boolean;
   controlled_authority:{generation:number;pins:AuthorityPinsV3;state:'ACTIVE';engine_version:string;policy_version:string;binding_ref:string;start_policy_ref:string;encounter_bundle_digest?:string}|null;
-  supported_realizations?:{candidate_id:string;intent_id:string;realization_ref:string;display_name:string;initial_guidance_supported:boolean}[];
+  calibration_inventory?:{version:"plan-calibration-inventory/2.0.0";bundle_digest:string;profiles:CalibrationProfileV2[];protocol_material:{source_ref:string;sha256:string;text:string}}|null;
+  supported_realizations?:{candidate_id:string;intent_id:string;realization_ref:string;display_name:string;initial_guidance_supported:boolean;load_semantics?:"MACHINE_DISPLAY_KG"|"PER_IMPLEMENT"}[];
   calibration_protocol_material?:{source_ref:string;sha256:string;text:string}|null;
   initial_calibration_pilot?:{candidate_id:string;realization_ref:string;display_name:string}|null;controlled_guidance_available?:boolean};
 export type FactV3 = {state:'KNOWN'|'UNKNOWN'|'WITHHELD'|'CONFLICT';value:unknown;provenance:{source_ref:string|null;recorded_at:string|null;origin:string;acquisition:string;measured_at:string|null};conflicts:unknown[]};
@@ -43,11 +45,11 @@ export type ExecutionV3 = {contract_version:'first-plan-execution/3.0.0';server_
     transition_after_exercise:{kind:'SETUP_NEXT_EXERCISE'|'BILAN';duration_seconds:null};
     sets:{set_id:number;set_index:number;kind:'work';completed:boolean;reps:number|null;completed_at:string|null;observation:SetFactV3|null;revision:number;
       transition_after_set:{kind:'REST_THEN_SET';duration_seconds:number}|null}[]}[]};
-export type CalibrationReadV1 = {encounter_ref:string;source_revision:number;as_of:string;runtime_availability?:'NOT_SERVED';unavailable_reason?:string;
+export type CalibrationReadV1 = {selected?:boolean;encounter_ref:string;source_revision:number;as_of:string;runtime_availability?:'NOT_SERVED';unavailable_reason?:string;
   result:{contract_version:'first-calibration-encounter/1.0.0';state:string;phase:string;allowed_actions:string[];input_digest:string;
     qualified_setting:SettingV3|null;portable_episode:unknown;reasons:string[];instruction_refs:string[];[key:string]:unknown}|null;
-  allowed_actions:string[];authority:{generation:number;encounter_bundle_digest:string;policy_ref:string;context_fingerprint:string;contract_version:string}|null;
-  progress:{ledger_complete:boolean;observed_attempt_count:number|null;observation_refs:string[];acceptance_refs:string[];context?:ContextV3;observations?:CalibrationEventFactV1[];events?:CalibrationEventFactV1[];preparation?:ObservationProgressV3['preparation'];setting_choice?:ObservationProgressV3['setting_choice']}};
+  allowed_actions:string[];authority:{generation:number;encounter_bundle_digest:string;policy_ref:string;context_fingerprint:string;contract_version:string;inventory_version?:string;packaging_digest?:string;inventory_bundle_digest?:string}|null;
+  progress:{reported_stop_reasons?:Record<string,{value:string;source_ref:string;recorded_at:string}>;ledger_complete:boolean;observed_attempt_count:number|null;observation_refs:string[];acceptance_refs:string[];context?:ContextV3;observations?:CalibrationEventFactV1[];events?:CalibrationEventFactV1[];preparation?:ObservationProgressV3['preparation'];setting_choice?:ObservationProgressV3['setting_choice']}};
 
 export type PlanV3Intent = {request_id:string;command:FirstSessionCommandV3;state:'prepared'|'submitted'|'unknown'|'created'|'denied'|'cancelled';receipt:FirstSessionReceiptV3|null};
 export type PlanV3Stored = {profile:'PLAN_V3';local_version:'first-session-local/3.0.0';owner_id:number;
@@ -65,4 +67,4 @@ export type CalibrationEventFactV1={event_id:string;kind:string;sequence:number;
 export type ObservationProgressV3={episode_ref:string;kind:'CONTEXT_OPENED'|'CALIBRATION_ENCOUNTER_OPENED';context:ContextV3;
  availability:'AVAILABLE'|'UNAVAILABLE'|'UNKNOWN';events:CalibrationEventFactV1[];
  preparation:{instruction_ref:string;setup_ref:string;understood:boolean;controlled:boolean;[key:string]:unknown}|null;
- setting_choice:{setting:SettingV3;available:boolean;[key:string]:unknown}|null};
+ setting_choice:{setting:SettingV3;available:boolean;provenance?:{recorded_at:string|null};[key:string]:unknown}|null};

@@ -1,0 +1,26 @@
+{
+  "status": "PIXELS_ACCEPTED",
+  "g1_decision": "Valider ce croquis UX-CAL G1",
+  "build_decision": "Autoriser le build PLAN-CAL-01 contrôlé",
+  "base_sha": "692d4c8e9af2dcdb5f912eff6b9fb2b158089c0c",
+  "board": "index.html",
+  "images_sha256": "captures-sha256.json",
+  "native_candidates": 24,
+  "native_environments": [
+    "iOS 26.3 dedicated simulator 390x844 pt 1170x2532 px",
+    "Android API36 dedicated emulator 1080x1920 px, density480=360dp/density360=480dp, font_scale1.0/1.3"
+  ],
+  "proof_boundary": "Real iOS connected machine acquisition; supplementary identical production presenter with actual owner HTTP; deterministic seven-encounter actual producer/session HTTP tests. Entirely synthetic testimony, no served fixtures, no clinical/physical acceptance.",
+  "pixel_decision": "Valider ces pixels contrôlés",
+  "pixel_decision_date": "2026-11-09",
+  "pixel_decision_timezone": "Europe/Paris",
+  "pixel_scope": "UX-CAL / PLAN-CAL-01 consolidated native board; controlled synthetic environment only",
+  "source_submission_sha256": {
+    "app/services/plan_v3/science_worker_v2.py": "bbfb384bf45ea64cd08f617a6fa473edf79a1e67abb339ee196aee5a2bda06a8",
+    "app/services/plan_v3/calibration_profiles.py": "5ea1c787adf1eddfd829054aeb3282086e5c5547e135cc8966c2361d62cd350a",
+    "clients/mobile/src/ui/plan/PlanV3FirstUseScreen.tsx": "453563514b061f8c8d9896621ba0a689142784835dbef6b66c0f17469314e6fb",
+    "clients/mobile/src/ui/plan/calibrationInstrument.tsx": "0236a88b6a4ef3076941ee0da45ca9003a0ad4974de27e193750701229b0fe9a",
+    "clients/mobile/src/ui/plan/calibrationEncounterInstrument.tsx": "1489ec34e06a87820c11235390c96b4880dadd6c0a1c3b633e3e7b7b4e228c11",
+    "clients/mobile/src/api/firstUseV3.ts": "459c896bc3d07453a1b246b0f5e18c3aa3a678704847a7e2b2e894154117f8dd"
+  }
+}

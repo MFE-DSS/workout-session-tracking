@@ -382,7 +382,7 @@ export default function ConnectedApp() {
     journalRef.current = j;
     setJournal(j);
     const active = () => appAlive.current && revision === auth.revision && journalRef.current === j;
-    const v3Runtime = new RuntimeV3Client(auth,transport,createV3Transport(API_URL));
+    const v3Runtime = new RuntimeV3Client(auth,transport,createV3Transport(API_URL,fetch,{calibrationInventory:"plan-calibration-inventory/2.0.0"}));
     const v3Sessions = new FirstSessionV3Client(v3Runtime);
     if(PLAN_V3_CONTROLLED_TEST && j.planV3){
       const controller = new FirstUseV3Controller({ownerId:owned.userId,journal:j.planV3,sessions:v3Sessions,

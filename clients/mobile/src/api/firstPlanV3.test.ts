@@ -101,3 +101,11 @@ test.each([
  expect(capabilityEnvelope({owner_id:7,contract_version:'first-session-runtime/3.0.0',versions:V3_VERSIONS,
   runtime_availability:'NOT_SERVED',controlled_test_available:false,controlled_authority:null,...extra} as any)).toBeNull();
 });
+
+test('inventory2 is explicitly negotiated and missing echo never downgrades to pilot',async()=>{
+ const calls:any[]=[];
+ const fetcher=async(_url:any,init:any)=>{calls.push(init);return {ok:true,status:200,headers:new Headers(),json:async()=>envelope()} as Response;};
+ const call=createV3Transport('http://127.0.0.1:8990',fetcher as any,{calibrationInventory:'plan-calibration-inventory/2.0.0'});
+ await expect(call('/me/first-plan/capabilities')).rejects.toBeInstanceOf(ApiFailure);
+ expect(calls[0].headers['X-Auren-Calibration-Inventory']).toBe('plan-calibration-inventory/2.0.0');
+});

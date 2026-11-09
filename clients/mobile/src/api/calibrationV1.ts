@@ -1,6 +1,6 @@
 /** Current pilot permissions and historical facts have separate carriers. */
 import type {CalibrationReadV1,ContextV3,OwnedEnvelopeV3} from '../domain/planV3Types';
-import { RuntimeV3Client,isObject,revision,positiveId,hexDigest,runtimeSchemaMatches } from './firstPlanV3';
+import { CALIBRATION_INVENTORY,RuntimeV3Client,isObject,revision,positiveId,hexDigest,runtimeSchemaMatches } from './firstPlanV3';
 import { BlueprintV3Client,type SourceReceiptV3 } from './blueprintV3';
 import {observationProgressV3} from './observationFactsV3';
 import schemas from './calibrationV1.contract.json';
@@ -25,6 +25,7 @@ export function calibrationEnvelope(raw:OwnedEnvelopeV3):CalibrationReadV1|null 
   }else{
     if(!runtimeSchemaMatches(value.result,schemas.response,schemas.response)||!isObject(value.result)||!isObject(value.authority))return null;
     if(value.result.encounter_ref!==value.encounter_ref||value.result.source_revision!==`blueprint-source/${value.source_revision}`)return null;
+    if(value.authority.inventory_version!==undefined&&(value.authority.inventory_version!==CALIBRATION_INVENTORY||!hexDigest(value.authority.packaging_digest)||!hexDigest(value.authority.inventory_bundle_digest)||typeof value.selected!=='boolean'))return null;
     if(!positiveId(value.authority.generation)||!hexDigest(value.authority.encounter_bundle_digest)||!hexDigest(value.authority.context_fingerprint))return null;
     if(value.authority.contract_version!=='first-calibration-encounter/1.0.0'||!strings(value.result.allowed_actions)
       ||value.allowed_actions.some(action=>!value.result||!isObject(value.result)||!Array.isArray(value.result.allowed_actions)||!value.result.allowed_actions.includes(action)))return null;
@@ -45,6 +46,9 @@ export class CalibrationV1Client {
     return this.runtime.request(`/me/blueprint/calibration-encounters/${encodeURIComponent(encounterRef)}`,{},raw=>{
       const value=calibrationEnvelope(raw);return value?.encounter_ref===encounterRef?value:null;
     },current);
+  }
+  select(requestId:string,expectedRevision:number,encounterRef:string,current?:()=>boolean){
+    return this.blueprint.observe(requestId,expectedRevision,{kind:"CALIBRATION_ENCOUNTER_SELECTED",encounter_ref:encounterRef},current);
   }
   record(requestId:string,view:CalibrationReadV1,observation:Record<string,unknown>,current?:()=>boolean){
     return this.blueprint.observe(requestId,view.source_revision,{kind:'ENCOUNTER_OBSERVATION',encounter_ref:view.encounter_ref,

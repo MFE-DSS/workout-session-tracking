@@ -23,13 +23,15 @@ export function jsonCopy<T>(value:T):T {
   };
   check(value);return JSON.parse(JSON.stringify(value));
 }
-export function createV3Transport(baseUrl:string,fetchImpl:typeof fetch=fetch):V3Transport {
+export const CALIBRATION_INVENTORY = "plan-calibration-inventory/2.0.0";
+export function createV3Transport(baseUrl:string,fetchImpl:typeof fetch=fetch,options?:{calibrationInventory:typeof CALIBRATION_INVENTORY}):V3Transport {
   const base=baseUrl.replace(/\/+$/,'');
   return async(path,init={})=>{
     if(!path.startsWith('/')||path.includes('://')||path.includes('#')||path.includes('?')) throw new ApiFailure('http',422,'invalid_runtime_path');
     if(init.ifMatch!==undefined&&!revision(init.ifMatch))throw Error('invalid_source_revision');
     const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),init.timeoutMs??10000);
     const headers:Record<string,string>={Accept:'application/json','X-Auren-Contract':V3_VERSIONS.runtime,'X-Auren-Calibration':V3_VERSIONS.calibration};
+    if(options)headers["X-Auren-Calibration-Inventory"]=options.calibrationInventory;
     if(init.token)headers.Authorization=`Bearer ${init.token}`;
     if(init.ifMatch!==undefined){if(!revision(init.ifMatch))throw Error('invalid_source_revision');headers['If-Match']=String(init.ifMatch);}
     if(init.body!==undefined)headers['Content-Type']='application/json';
@@ -38,6 +40,7 @@ export function createV3Transport(baseUrl:string,fetchImpl:typeof fetch=fetch):V
         body:init.body===undefined?undefined:JSON.stringify(jsonCopy(init.body)),signal:controller.signal});
       let raw:unknown;try{raw=await response.json();}catch{throw new ApiFailure('network');}
       if(!response.ok){const detail=isObject(raw)?raw.detail:null;throw new ApiFailure('http',response.status,isObject(detail)&&typeof detail.error==='string'?detail.error:null);}
+      if(options&&response.headers?.get("X-Auren-Calibration-Inventory")!==options.calibrationInventory)throw new ApiFailure("http",406,"calibration_inventory_not_supported");
       return raw;
     }catch(error){if(error instanceof ApiFailure)throw error;throw new ApiFailure('network');}
     finally{clearTimeout(timer);}
@@ -148,6 +151,17 @@ export function capabilityEnvelope(raw:OwnedEnvelopeV3):import('../domain/planV3
    if(!isObject(material)||typeof material.source_ref!=='string'||!hexDigest(material.sha256)||typeof material.text!=='string')return null;
   }
   if(x.controlled_guidance_available!==undefined&&typeof x.controlled_guidance_available!=='boolean')return null;
+  if(x.calibration_inventory!==undefined&&x.calibration_inventory!==null){
+   const inv=x.calibration_inventory;
+   if(!isObject(inv)||inv.version!==CALIBRATION_INVENTORY||!hexDigest(inv.bundle_digest)||!Array.isArray(inv.profiles)||inv.profiles.length!==7)return null;
+   const ids=new Set<string>();
+   for(const p of inv.profiles){
+    if(!isObject(p)||typeof p.candidate_id!=='string'||typeof p.realization_ref!=='string'||typeof p.policy_ref!=='string'||ids.has(p.candidate_id))return null;
+    if(p.load_semantics!==(p.candidate_id==='romanian-deadlift-halteres'?'PER_IMPLEMENT':'MACHINE_DISPLAY_KG'))return null;
+    ids.add(p.candidate_id);
+   }
+   const m=inv.protocol_material;if(!isObject(m)||typeof m.source_ref!=='string'||!hexDigest(m.sha256)||typeof m.text!=='string')return null;
+  }
   return raw as import('../domain/planV3Types').CapabilitiesV3;
 }
 export class FirstPlanV3Client {

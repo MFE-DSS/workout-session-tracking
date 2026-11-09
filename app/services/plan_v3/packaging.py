@@ -42,7 +42,11 @@ def execute_science(
             raise ValueError("bundle not configured")
         path = path.resolve(strict=True)
         manifest, actual = bundle_manifest(path, expected_digest)
-        worker = path / "app/services/plan_v3/science_worker.py"
+        inventory = manifest.get("calibration_inventory_version")
+        if inventory not in (None, "plan-calibration-inventory/2.0.0"):
+            raise ValueError("unsupported calibration inventory")
+        entry = "science_worker_v2.py" if inventory else "science_worker.py"
+        worker = path / "app/services/plan_v3" / entry
         relative = str(worker.relative_to(path))
         if relative not in manifest["sha256"]:
             raise ValueError("worker not attested")

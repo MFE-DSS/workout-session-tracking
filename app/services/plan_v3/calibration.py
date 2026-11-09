@@ -59,6 +59,7 @@ def open_encounter(
     availability,
     concern_state="UNKNOWN",
     auth=None,
+    inventory_version=None,
 ):
     body_digest = source.digest(
         {
@@ -69,6 +70,10 @@ def open_encounter(
             "concern_state": concern_state,
         }
     )
+    if inventory_version is not None:
+        body_digest = source.digest(
+            {"body_digest": body_digest, "inventory_version": inventory_version}
+        )
     old = source.replay(db, owner_id, request_id, body_digest)
     if old is not None:
         guard_owner(db, owner_id, **(auth or {}))
@@ -86,6 +91,9 @@ def open_encounter(
     }:
         raise ValueError("invalid personal state")
     ctx = execute_science("context", context)
+    from app.services.plan_v3.calibration_profiles import profile
+
+    profile(authority, ctx, inventory_version)
     identity = str(uuid4())
     now = datetime.now(UTC).isoformat()
     return _append(
@@ -95,6 +103,7 @@ def open_encounter(
         body_digest,
         "CALIBRATION_ENCOUNTER_OPENED",
         {
+            **({"inventory_version": inventory_version} if inventory_version else {}),
             "encounter_ref": identity,
             "episode_ref": identity,
             "context": ctx,
@@ -190,7 +199,9 @@ def _request(rows, owner, encounter_ref, as_of):
     }
 
 
-def read_encounter(db, owner_id, encounter_ref, *, auth=None):
+def read_encounter(
+    db, owner_id, encounter_ref, *, auth=None, inventory_version=None, strict_negotiation=False
+):
     try:
         operational, authorities, pins = lock_authority(db)
     except RuntimeFailure as error:
@@ -210,6 +221,15 @@ def read_encounter(db, owner_id, encounter_ref, *, auth=None):
         }
     guard_owner(db, owner_id, **(auth or {}))
     rows = source.events(db, owner_id)
+    from app.services.plan_v3.calibration_profiles import INVENTORY, current_selection, profile
+
+    _, opened_data = _owned_open(rows, encounter_ref)
+    requested = (
+        inventory_version
+        if strict_negotiation
+        else inventory_version or opened_data.get("inventory_version")
+    )
+    matched = profile(authorities, opened_data["context"], requested)
     raw = _request(rows, owner_id, encounter_ref, datetime.now(UTC).isoformat())
     try:
         result = execute_science("calibration", raw, expected_digest=operational.packaging_digest)
@@ -217,6 +237,13 @@ def read_encounter(db, owner_id, encounter_ref, *, auth=None):
         raise RuntimeFailure("calibration_producer_unavailable", 503) from None
 
     allowed = result["allowed_actions"]
+    selected = current_selection(rows, encounter_ref, raw["context"]["canonical_exercise_id"])
+    if not selected:
+        allowed = [
+            action
+            for action in allowed
+            if action not in PHYSICAL_ACTIONS and action != "CONFIRM_CONTEXT"
+        ]
     if not get_settings().plan_v3_guidance_enabled:
         allowed = [action for action in allowed if action not in PHYSICAL_ACTIONS]
     return {
@@ -225,10 +252,28 @@ def read_encounter(db, owner_id, encounter_ref, *, auth=None):
         "as_of": raw["as_of"],
         "result": result,
         "allowed_actions": allowed,
+        "selected": selected,
         "authority": {
+            **(
+                {
+                    "inventory_version": INVENTORY,
+                    "packaging_digest": operational.packaging_digest,
+                    "inventory_bundle_digest": authorities["calibration_inventory"][
+                        "bundle_digest"
+                    ],
+                }
+                if matched
+                else {}
+            ),
             "generation": operational.generation,
-            "encounter_bundle_digest": authorities["encounter"]["bundle_digest"],
-            "policy_ref": authorities["encounter"]["policy"]["policy_ref"],
+            "encounter_bundle_digest": authorities["calibration_inventory"]["bundle_digest"]
+            if matched
+            and matched["candidate_id"]
+            != authorities["encounter"]["policy"]["scope"]["candidate_id"]
+            else authorities["encounter"]["bundle_digest"],
+            "policy_ref": matched["policy_ref"]
+            if matched
+            else authorities["encounter"]["policy"]["policy_ref"],
             "context_fingerprint": source.digest(raw["context"]),
             "contract_version": "first-calibration-encounter/1.0.0",
         },
@@ -243,9 +288,25 @@ def factual_progress(rows, encounter_ref):
     if entry is None:
         raise RuntimeFailure("not_found", 404)
     attempts = [e for e in entry["events"] if e["kind"] == "ATTEMPT_OBSERVED"]
+    reasons = {}
+    for row in rows:
+        payload = json.loads(row.payload_json)
+        event = payload.get("event", {})
+        if (
+            row.kind == "CALIBRATION_EVENT_REPORTED"
+            and payload.get("encounter_ref", payload.get("episode_ref")) == encounter_ref
+            and event.get("kind") == "ATTEMPT_OBSERVED"
+            and "stop_reason" in payload
+        ):
+            reasons[event["event_id"]] = {
+                "value": payload["stop_reason"],
+                "source_ref": row.id,
+                "recorded_at": event["provenance"]["recorded_at"],
+            }
     return {
         "ledger_complete": True,
         "observed_attempt_count": len(attempts),
+        "reported_stop_reasons": reasons,
         "observation_refs": [e["event_id"] for e in attempts],
         "acceptance_refs": [
             e["event_id"] for e in entry["events"] if e["kind"] == "SETTING_ACCEPTED"
@@ -425,4 +486,40 @@ def _record_late_fact(db, owner, request_id, body_digest, encounter_ref, observa
         raise ValueError("stop reason requires trial")
     return _append(
         db, owner, request_id, body_digest, "CALIBRATION_EVENT_REPORTED", payload, identity
+    )
+
+
+def select_encounter(db, owner_id, *, request_id, expected_revision, encounter_ref, auth=None):
+    from app.services.plan_v3.calibration_profiles import INVENTORY, profile
+
+    body_digest = source.digest(
+        {
+            "operation": "CALIBRATION_ENCOUNTER_SELECTED",
+            "expected_revision": expected_revision,
+            "encounter_ref": encounter_ref,
+        }
+    )
+    old = source.replay(db, owner_id, request_id, body_digest)
+    if old is not None:
+        guard_owner(db, owner_id, **(auth or {}))
+        return old
+    _, authorities, _ = lock_authority(db)
+    guard_owner(db, owner_id, **(auth or {}))
+    old = source.replay(db, owner_id, request_id, body_digest)
+    if old is not None:
+        return old
+    source.check_revision(db, owner_id, expected_revision)
+    _, opened = _owned_open(source.events(db, owner_id), encounter_ref)
+    profile(authorities, opened["context"], INVENTORY)
+    return _append(
+        db,
+        owner_id,
+        request_id,
+        body_digest,
+        "CALIBRATION_ENCOUNTER_SELECTED",
+        {
+            "encounter_ref": encounter_ref,
+            "candidate_id": opened["context"]["canonical_exercise_id"],
+            "episode_ref": encounter_ref,
+        },
     )

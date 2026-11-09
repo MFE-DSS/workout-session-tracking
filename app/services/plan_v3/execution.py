@@ -206,8 +206,11 @@ def assess_applicability(db, owner_id, session_id, *, auth=None):
 
     session, binding, payload, evaluation = owned_binding(db, owner_id, session_id)
     try:
-        operational, _, _ = lock_authority(db)
+        operational, authorities, _ = lock_authority(db)
         guard_owner(db, owner_id, **(auth or {}))
+        from app.services.plan_v3.calibration_profiles import assert_snapshot_runtime
+
+        assert_snapshot_runtime(db, evaluation.snapshot_id, operational, authorities)
         check_revision(db, owner_id, evaluation.source_revision)
         if operational.generation != evaluation.authority_generation:
             raise RuntimeFailure("authority_generation_changed")
