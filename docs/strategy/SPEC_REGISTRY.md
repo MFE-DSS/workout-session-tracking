@@ -735,3 +735,27 @@ shards,workers2,min4440MiB. Archive CI PR382 fusionnée ebbf877, son canonique
 42539004312 en suivi. Anciens runs PLAN42526541847 et42527005736 terminés
 cancelled, pas relabellisés verts. Closeout PLAN380 synchronisé sans force-push
 avec ces corrections ; son nouveau HEAD et son canonique restent à vérifier.
+
+## SCI — six premières rencontres de calibrage (préparation)
+
+9 novembre2026, base ba2dbbc. [science-calibration-six-extensions](../../openspec/changes/science-calibration-six-extensions/proposal.md) : **PROPOSED / NO_GO_BUILD / NOT_ADMITTED / NOT_SERVED**.
+[Design](../../openspec/changes/science-calibration-six-extensions/design.md),
+[cas/source par réalisation](../science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md),
+[tests spécifiés](../../openspec/changes/science-calibration-six-extensions/TEST_SPEC.md),
+[handoff proposé](../science/sci-p02-initial-policy/calibration-six-extensions/PLAN_HANDOFF_PROPOSED.md).
+Six profils séparés, cinq MACHINE_DISPLAY_KG et RDL PER_IMPLEMENT ; échange
+encounter1.0.0/C3/V3 et pilote historique préservés. Familiarisation au réglage
+réellement choisi avant essai/qualification ; geste sans haltères séparé des
+faits chargés. Dossier positif et pont sept épisodes proposés, sans prototype
+négatif supplémentaire ni kg/incrément/durée inventés. Revue et GO de politique/
+build encore à recevoir ; aucune app/API/SDK/UI/migration/CI/activation nouvelle.
+PLAN contrôlé #379/#380 et CI #381/#382 restent CLOSED+CLEANED ; DATA, ouverture
+runtime réelle et RELEASE gardent leurs dépendances. Aucun nouveau GO implicite.
+
+Actualisation SCI9novembre : GO « Valider ce design et le build SCI isolé » reçu ;
+[livraison locale](../science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md),
+[admission/revue effectives](../science/sci-p02-initial-policy/calibration-six-extensions/authority/ADMISSION.md)
+et [handoff réel](../science/sci-p02-initial-policy/calibration-six-extensions/HANDOFF.md).
+Six profils ADMITTED_WITH_LIMITS/ACTIVE/NOT_SERVED,125tests nouveaux et747broad,
+source closure90,82sources historiques préservées. Pont vrai V3/ack vérifié ;
+contrats et produit inchangés, CI/merge/canonique/closeout encore à observer.
