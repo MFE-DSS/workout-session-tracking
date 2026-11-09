@@ -798,3 +798,29 @@ six exigences ajoutées au specmobile existant ; seul suivi final de livraison
 reste ouvert dans les tâches archivées, pas un nouveau scope fonctionnel. DATA,
 recettes physiques, réévaluation sécurité avant exposition et GO déploiement
 restent distincts ; MOB03complet non clos par ce build.
+
+## RELEASE-01 — recette contrôlée et préparation des artefacts internes
+
+9 novembre 2026, source testée fe9f6e9beb585a271ae2c2726e338359057b9f58.
+[Change actif](../../openspec/changes/release-01-controlled-plan-acceptance/proposal.md),
+[design](../../openspec/changes/release-01-controlled-plan-acceptance/design.md),
+[tâches](../../openspec/changes/release-01-controlled-plan-acceptance/tasks.md),
+[dossier de recette](../release/release-01/README.md).
+**SYNTHETIC_QA_PARTIAL / NO_INSTALLABLE_QA_ARTIFACT / NOT_DEPLOYED.**
+Mandat DATA/RELEASE : banc neuf loopback, vrais loaders/runtime, données
+synthétiques seulement. Sept rencontres→snapshot/V3→ack exact→création
+idempotente→journal PER_IMPLEMENT et refus A/B observés par HTTP ; retrait
+d'autorité génération3→4 WITHDRAWN→5 ACTIVE de test, lectures/faits conservés
+et applicabilité BLOCKED. Flag configuré distingué de l'autorité servie.
+
+Vrai ConnectedApp iOS/ExpoGo58.0.7 sur simulateur : connexion, séance possédée,
+revalidation et ouverture de saisie machine seulement. Android/ExpoGo58.0.5
+bloqué par ExpoTopicSubscriptionModule absent ; aucun PASS Android. Aucun APK
+AUREN QA produit. iPhone15Plus/iOS27.0.1 détecté avec ancien AURENLab0.0.1(1),
+SHA/backend inconnus ; aucune acceptation physique. Brief de build interne,
+limites de migrations et revue B404/B603 contextualisée documentés ; pas de
+Store imposé pour APK interne, pas de code/SCI/UI/migration/config modifié.
+Politique DATA, sécurité de la cible avant exposition, artefacts compatibles,
+recette native complète/physique et GO déploiement restent ouverts. Les quatre
+checks GitHub et Sonar consultatif restent inchangés. Ce dossier ne clôture
+ni RELEASE-01 ni MOB-03 complet ; publication/CI/revue finale encore à vérifier.
