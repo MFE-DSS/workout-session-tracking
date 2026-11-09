@@ -52,3 +52,12 @@ Deux mineurs explicitement différés : liaison croisée plus stricte entre prof
 ## Dépendances et frontière de clôture
 
 CI exacteHEAD, readiness/revues GitHub puis PR/merge/canonique/Sonar/closeout/cleanup restent à accomplir. DATA/finalités/consentements/copies/effacement, activation et distribution restent séparés. Android/iPhone physiques et GO déploiement distincts. MOB03 complet reste ouvert ; aucun succès de navigation ou de calibrage n'est un premier plan universel.
+
+## Reçu de publication du code
+
+PR388 fusionnée e6bca39387864eac8c1a9e5038d0710d0d365858 depuis HEAD05915e5.
+CI PR42618931040 completed/success11jobs :8068backend/3skip,773mobile+TS et
+77visuels ; les deux fichiers nouveaux passent isolément. SonarPR ERROR
+consultatif,4smells/0bug-vuln-hotspot,coverageapp92,5%/nouveau63,1%.
+Le [CLOSEOUT](CLOSEOUT.md) et le reçu vivant suivent canonique/maintenance/cleanup ;
+la suite de livraison n'est pas encore prétendue terminée à ce point de publication.
