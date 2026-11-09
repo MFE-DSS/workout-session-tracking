@@ -824,3 +824,37 @@ Politique DATA, sécurité de la cible avant exposition, artefacts compatibles,
 recette native complète/physique et GO déploiement restent ouverts. Les quatre
 checks GitHub et Sonar consultatif restent inchangés. Ce dossier ne clôture
 ni RELEASE-01 ni MOB-03 complet ; publication/CI/revue finale encore à vérifier.
+
+## ASSET-CONSUMER-01 — fiche native pilote et readiness des illustrations
+
+9 novembre2026, base`fe9f6e9`. [Proposition](../../openspec/changes/asset-consumer-01/proposal.md),
+[design](../../openspec/changes/asset-consumer-01/design.md), [package](../assets/asset-consumer-01/README.md),
+[matrice](../assets/asset-consumer-01/ASSET_MATRIX.md), [composition unique proposée](../assets/asset-consumer-01/NATIVE_COMPOSITION_PROPOSED.md)
+et [rapport](../assets/asset-consumer-01/REPORT.md).
+**SPEC/readiness uniquement · PROPOSED / NO_GO_BUILD / G1_PENDING / PIXELS_NOT_RECEIVED / NOT_ACTIVATED.**
+Voie indépendante du recadrage5novembre : mannequin→Smith START/END→fiche pilote→sept Push A,
+ces derniers distincts des sept réalisations de calibrage SCI. Cinq vues référence acceptées historiquement,
+vectorisation/master/paires non produits et intégration bloquée ; droits déclarés de référence conservés,
+droits dérivés/matériel non présumés. DA-05.1 historique sans mannequin et DA-01 passé conservés.
+Aucune UI/image/génération/source anatomique/SCI/activation ; G1, pixels et GO BUILD restent à recevoir.
+
+## DATA-ACT-01 — paquet de décisions du responsable (préparation)
+
+9 novembre 2026, base fe9f6e9. Le nom réservé
+[account-data-activation](../proposals/account-data-activation.md) est réutilisé
+par [le delta OpenSpec documentaire](../../openspec/changes/account-data-activation/proposal.md)
+et [le paquet unique](../data/data-act-01/README.md) : D01–D09/C01–C11, inventaire
+historique23tables complété des sept tables PLAN, journal V3, exports, sauvegardes,
+reçus et restauration. Audit statique du socle existant, aucune base/donnée réelle
+consultée ; service de demande/capacité isolé réemployé, pas de duplication.
+**PREPARATION_ONLY / CONTROLLER_DECISIONS_OPEN / NOT_ACTIVATED** ; fondements,
+durées, identité/juridiction et URLs demeurent à fournir par le responsable.
+DATA01–07, build opérationnel, exception destructive, migration/activation et
+déploiement restent distincts et ouverts. [Rapport et contrôles réels](../data/data-act-01/REVIEW_REPORT.md) :
+scope DOCS, spec protocol et OpenSpec strict réussis ; zéro nouveau test produit.
+
+Réponse opérateur du 9 novembre 2026 : [D01 PARTIELLE](../data/data-act-01/CONTROLLER_DECISIONS.md#réponse-partielle-d01--9-novembre-2026),
+prise en charge personnelle du service à ce stade et formalisation envisagée
+ultérieurement. Identité légale publiable/coordonnées/juridiction/public non
+établis ; D02–D09/C01–C11 OPEN. Aucune politique admise, fondement/durée ou
+activation déduits ; [rapport et portée de la revue indépendante](../data/data-act-01/REVIEW_REPORT.md).

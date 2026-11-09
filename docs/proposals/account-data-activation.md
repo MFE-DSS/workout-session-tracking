@@ -1,5 +1,10 @@
 # account-data-activation — proposition réservée, sans GO BUILD
 
+Actualisation documentaire DATA-ACT-01 du 9 novembre 2026 : le nom réservé est
+réutilisé par [le delta OpenSpec de préparation](../../openspec/changes/account-data-activation/proposal.md)
+et [le paquet unique du responsable](../data/data-act-01/README.md).
+Aucun critère DATA01–07 ci-dessous n'est clos ni activé par cette préparation.
+
 5 novembre 2026. Suite distincte de MOB03, créée comme document de proposition par la scission opérateur GOV-MOB03-SPLIT-01. Aucun change/PR concurrent ouvert. Ancien scope et critères : `account-onboarding-native` au HEADd41eb2f, tasks1.1(D2/D3),4.1(unités corporelles),5.1(acquisitions non couvertes),5.2,5.3,5.4 ; données/privacy de6.4/6.5.
 
 ## But et périmètre
