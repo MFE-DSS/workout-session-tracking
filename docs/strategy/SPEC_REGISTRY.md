@@ -905,3 +905,19 @@ Vérification canonique code ultérieure : [42692021095](https://github.com/MFE-
 tentative1 ; 8068backend/3skip,73suites/913mobile+TS,77visuels.
 Sonar exact c721562 : ERROR consultatif ; analyse `887f02a9-747f-4be9-bdc0-241341f1c48b`, révision exacte c721562, 9 novembre20:34:56 UTC : 8bugs / 549smells / 8entrées vulnérabilité externe / 0hotspot ; coverageapp92,5%, nouvelle92,5048%. Même dette que la base3bb1f2d ; aucune mesure TypeScript ni innocuité globale déduite.
 **CODE_CANONICAL_VERIFIED / CLOSEOUT_PENDING / NOT_ACTIVATED.**
+
+### PILOT-PARITY-00 — continuité pilote, préparation documentaire (9 novembre 2026)
+
+Mandat opérateur : créer l'inventaire de parité et préparer les capacités
+manquantes, sans copier la DA de l'outil externe ni rouvrir SCI/calibrage.
+Base2b831411 après UX-CAL-02 #393/#394 CLOSED+CLEANED.
+[Delta documentaire](../../openspec/changes/pilot-parity-00/proposal.md),
+[matrice36 capacités](../pilot/pilot-parity-00/MATRIX.md),
+[reçu et limites](../pilot/pilot-parity-00/PREPARATION_RECEIPT.md).
+**PREPARATION_DOCUMENTAIRE / PARITY_NOT_ESTABLISHED / NO_PRODUCT_GO_BUILD.**
+Captures/export EV-PILOT-00 non reçus ; priorités proposées, pas preuves d'usage.
+Zéro capacité attestée sur un artefact pilote actuel, sans nier les vrais
+consommateurs natifs déjà câblés. Scopes MOB04/05/BODY01/NUT01 préparés séparément,
+GO propres requis ; BODY conserve un conflit normatif correction à arbitrer.
+Aucun code/API/migration/asset/baseline/admission/activation/déploiement livré
+par cet inventaire. DATA/RELEASE physique et parité complète restent ouverts.
