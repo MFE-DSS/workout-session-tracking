@@ -9,5 +9,6 @@
 - [x] Revue SCI du bundle effectif par réalisation ; publication positive seulement si défendable.
 - [x] Six positifs issus des vrais évaluateurs + pilote historique, pont V3 réel et ack, historiques reproduits.
 - [x] Broad/checks locaux selon tier et revue code distincte ; Important corrigé RED→GREEN.
-- [ ] Vraie CI HEAD et corrections éventuelles dans scope.
-- [ ] Merge autonome, canonique, closeout/cleanup et reçu exact sous GO permanent ; aucune activation.
+- [x] Vraie CI HEAD42583836458 completed/success,11jobs ; aucun correctif CI requis.
+- [x] Merge autonome PR386,71e08a2c3157e6120a3383d3c7caa0f750b2818f, sous GO permanent.
+- [ ] Vérification canonique puis closeout/cleanup/reçu exact ; aucune activation.

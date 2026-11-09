@@ -738,10 +738,10 @@ avec ces corrections ; son nouveau HEAD et son canonique restent à vérifier.
 
 ## SCI — six premières rencontres de calibrage (préparation)
 
-9 novembre2026, base ba2dbbc. [science-calibration-six-extensions](../../openspec/changes/science-calibration-six-extensions/proposal.md) : **PROPOSED / NO_GO_BUILD / NOT_ADMITTED / NOT_SERVED**.
-[Design](../../openspec/changes/science-calibration-six-extensions/design.md),
+9 novembre2026, base ba2dbbc. [science-calibration-six-extensions](../../openspec/changes/archive/2026-11-09-science-calibration-six-extensions/proposal.md) : **PROPOSED / NO_GO_BUILD / NOT_ADMITTED / NOT_SERVED**.
+[Design](../../openspec/changes/archive/2026-11-09-science-calibration-six-extensions/design.md),
 [cas/source par réalisation](../science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md),
-[tests spécifiés](../../openspec/changes/science-calibration-six-extensions/TEST_SPEC.md),
+[tests spécifiés](../../openspec/changes/archive/2026-11-09-science-calibration-six-extensions/TEST_SPEC.md),
 [handoff proposé](../science/sci-p02-initial-policy/calibration-six-extensions/PLAN_HANDOFF_PROPOSED.md).
 Six profils séparés, cinq MACHINE_DISPLAY_KG et RDL PER_IMPLEMENT ; échange
 encounter1.0.0/C3/V3 et pilote historique préservés. Familiarisation au réglage
@@ -759,3 +759,9 @@ et [handoff réel](../science/sci-p02-initial-policy/calibration-six-extensions/
 Six profils ADMITTED_WITH_LIMITS/ACTIVE/NOT_SERVED,125tests nouveaux et747broad,
 source closure90,82sources historiques préservées. Pont vrai V3/ack vérifié ;
 contrats et produit inchangés, CI/merge/canonique/closeout encore à observer.
+
+SCI six rencontres : PR386 fusionnée71e08a2, HEAD4672411, CI PR42583836458
+completed/success onze jobs,8049backend/3skip/749mobile+TS. SonarPR ERROR consultatif,
+5S5778,0bug/vuln/hotspot. Canonique42585473467 en suivi ; archive après merge code,
+spécification science/calibration-encounter-extensions créée. Maintenance closeout
+encore non fusionnée, aucun CLOSED/nettoyage anticipé ; NOT_SERVED conservé.

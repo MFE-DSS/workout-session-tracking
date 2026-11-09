@@ -1,6 +1,6 @@
 # SCI — six rencontres manquantes de premier calibrage
 
-> Actualisation9novembre : design et GO BUILD reçus ; voir [autorisation](BUILD_AUTHORIZATION.md) et [livraison effective](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md). Les mentions préparatoires ci-dessous conservent leur instant d’origine.
+> Actualisation9novembre : design et GO BUILD reçus ; voir [autorisation](BUILD_AUTHORIZATION.md) et [livraison effective](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md). Les mentions préparatoires ci-dessous conservent leur instant d’origine.
 
 9 novembre 2026. **PROPOSED / NO_GO_BUILD / NOT_ADMITTED / NOT_SERVED.** Base
 canonique après fetch : ba2dbbc892b47e86c738af1d083e9087a57ff2d9. Le « continue »
@@ -39,5 +39,5 @@ manque précis ; ne pas livrer un sous-ensemble comme fin du parcours complet,
 ni fusionner un autre squelette uniquement négatif. Toute scission éventuelle
 est explicitement revue. PLAN/DATA/RELEASE restent leurs propres scopes.
 
-[Design](design.md), [cas et sources](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md),
+[Design](design.md), [cas et sources](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md),
 [tests à réaliser](TEST_SPEC.md), [décision à recevoir](DECISION_FOR_OPERATOR.md).

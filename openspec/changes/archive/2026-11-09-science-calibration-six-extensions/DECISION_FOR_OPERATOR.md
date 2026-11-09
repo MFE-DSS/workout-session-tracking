@@ -1,10 +1,10 @@
 # Décision à recevoir — build scientifique isolé des six rencontres
 
-> Actualisation9novembre : design et GO BUILD reçus ; voir [autorisation](BUILD_AUTHORIZATION.md) et [livraison effective](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md). Les mentions préparatoires ci-dessous conservent leur instant d’origine.
+> Actualisation9novembre : design et GO BUILD reçus ; voir [autorisation](BUILD_AUTHORIZATION.md) et [livraison effective](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/DELIVERY.md). Les mentions préparatoires ci-dessous conservent leur instant d’origine.
 
 9 novembre2026. **Dossier local proposé, aucune implémentation/admission nouvelle.**
-[Design](design.md), [cas par réalisation](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md),
-[tests](TEST_SPEC.md), [handoff PLAN](../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/PLAN_HANDOFF_PROPOSED.md).
+[Design](design.md), [cas par réalisation](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/ADMISSION_CASE.md),
+[tests](TEST_SPEC.md), [handoff PLAN](../../../../docs/science/sci-p02-initial-policy/calibration-six-extensions/PLAN_HANDOFF_PROPOSED.md).
 
 ## Autorisation concrète proposée
 
