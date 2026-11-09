@@ -19,11 +19,11 @@ inapplicable. Les invariants et scénarios adverses sont inscrits au design/spec
 
 ## Livrables préparés et observations
 
-[Proposition](../../../openspec/changes/ux-cal-02-native-density/proposal.md),
-[design](../../../openspec/changes/ux-cal-02-native-density/design.md),
-[scope](../../../openspec/changes/ux-cal-02-native-density/BUILD_SCOPE.md),
-[tâches](../../../openspec/changes/ux-cal-02-native-density/tasks.md),
-[delta](../../../openspec/changes/ux-cal-02-native-density/specs/mobile/blueprint-first-session-runtime/spec.md)
+[Proposition](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/proposal.md),
+[design](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/design.md),
+[scope](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/BUILD_SCOPE.md),
+[tâches](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/tasks.md),
+[delta](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/specs/mobile/blueprint-first-session-runtime/spec.md)
 et append de SPEC_REGISTRY. Lectures ciblées des trois modules partagés, écran
 et contrôleur réels, décodeurs/capacités/ledger et matériaux de protocole.
 Le texte SCI complet et les commandes globales68 sont constatés dans le code,
@@ -39,7 +39,7 @@ serveur nouveau et UNKNOWN collecte préservé. Verdict après précision :
 
 ## Croquis validé
 
-**Pas encore validé : G1_PENDING.** [Composition avant/après proposée](../../../openspec/changes/ux-cal-02-native-density/UX_CAL_BOARD.md).
+**Pas encore validé : G1_PENDING.** [Composition avant/après proposée](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/UX_CAL_BOARD.md).
 L'entrée donne une priorité courante ; cadre partagé avec contexte, une valeur
 et unité, action compacte locale et détails. Les sous-étapes d'observation ne
 font aucune mutation avant Enregistrer. Cibles proposées48contre68 et fenêtre
@@ -48,7 +48,7 @@ Ce croquis ASCII n'est pas un rendu iOS/Android nouveau.
 
 ## Inventaire — une information, une seule fois
 
-L'[inventaire détaillé](../../../openspec/changes/ux-cal-02-native-density/UX_CAL_BOARD.md)
+L'[inventaire détaillé](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/UX_CAL_BOARD.md)
 lie chaque élément à un champ effectivement servi ou à un état de formulaire.
 
 | Élément | Information | Source (contrat de données) | Doublon ? |

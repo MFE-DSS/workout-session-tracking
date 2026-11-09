@@ -863,10 +863,10 @@ activation déduits ; [rapport et portée de la revue indépendante](../data/dat
 
 9 novembre 2026, base canonique vérifiée
 `fe9f6e9beb585a271ae2c2726e338359057b9f58` après clôture388/389, confirmée par
-leurs reçus finaux. [Proposition](../../openspec/changes/ux-cal-02-native-density/proposal.md),
-[design](../../openspec/changes/ux-cal-02-native-density/design.md),
-[scope](../../openspec/changes/ux-cal-02-native-density/BUILD_SCOPE.md),
-[avant/après G1](../../openspec/changes/ux-cal-02-native-density/UX_CAL_BOARD.md).
+leurs reçus finaux. [Proposition](../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/proposal.md),
+[design](../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/design.md),
+[scope](../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/BUILD_SCOPE.md),
+[avant/après G1](../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/UX_CAL_BOARD.md).
 **PROPOSED / NO_GO_BUILD / G1_PENDING / NOT_ACTIVATED.** Composition locale
 partagée plus compacte, un CTA dominant, faits et unités conservés, deux
 sous-étapes d'observation sans effet serveur intermédiaire ; décodage croisé
@@ -877,3 +877,31 @@ migration, dépendance, asset ou admission dans cette préparation. Nouveau GO
 BUILD et croquis requis avant apply, pixels natifs ensuite avant commit UI ;
 GOV-MERGE-01 couvre la livraison du seul scope autorisé. DATA, activation réelle,
 appareils physiques et déploiement restent des gates distincts.
+
+### UX-CAL-02 — décision et livraison contrôlée (9 novembre 2026)
+
+Le statut PROPOSED ci-dessus décrit la préparation initiale. GO reçu :
+« Autoriser le build UX-CAL-02 et valider G1 » ; pixels réels acceptés avant
+commit UI : « Valider ce delta visuel contrôlé ». Premier commit
+`6d46e3ed07086204688f5351839d6a1826e6e2f6`,
+[PR393](https://github.com/MFE-DSS/workout-session-tracking/pull/393).
+**IMPLEMENTED / PIXELS_ACCEPTED / DELIVERY_IN_PROGRESS / NOT_ACTIVATED.**
+[Livraison](../plan/ux-cal-02/DELIVERY.md), [passation](../plan/ux-cal-02/AGENT_HANDOFF.md),
+[closeout](../plan/ux-cal-02/CLOSEOUT.md) et [gates natives](../plan/ux-cal-02/DEVICE_GATES.md).
+Décodage croisé et aide applicable (deux mineurs PLAN-CAL-01) traités ; science et
+baselines inchangées. CI/merge/canonique/Sonar/archive/cleanup PENDING à cette
+préparation ; 3.2/3.3 partielles OPEN, DATA/RELEASE/MOB03 complets OPEN.
+
+Actualisation après merge code : PR393, HEAD6d46e3e, merge gardé
+`c7215623e9806a8a7ce12590f5b5e7c099fc3128` ; CI42689201348 SUCCESS11jobs
+sans retry, aucune revue/thread bloquant ; SonarPR OK/0issue/coverageapp92,5%
+(pas mesure TypeScript). [Archive CLI validante](../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/proposal.md)
+après merge : quatre exigences ajoutées au spec mobile existant.
+**CODE_MERGED / ARCHIVED / CANONICAL_PENDING / NOT_ACTIVATED.** CI/Sonar
+canoniques, closeout publié et cleanup PENDING ;3.2/3.3 et DATA/RELEASE/MOB03
+complets restent OPEN.
+
+Vérification canonique code ultérieure : [42692021095](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42692021095), HEADc721562, SUCCESS11jobs
+tentative1 ; 8068backend/3skip,73suites/913mobile+TS,77visuels.
+Sonar exact c721562 : ERROR consultatif ; analyse `887f02a9-747f-4be9-bdc0-241341f1c48b`, révision exacte c721562, 9 novembre20:34:56 UTC : 8bugs / 549smells / 8entrées vulnérabilité externe / 0hotspot ; coverageapp92,5%, nouvelle92,5048%. Même dette que la base3bb1f2d ; aucune mesure TypeScript ni innocuité globale déduite.
+**CODE_CANONICAL_VERIFIED / CLOSEOUT_PENDING / NOT_ACTIVATED.**
