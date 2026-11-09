@@ -769,14 +769,32 @@ encore non fusionnée, aucun CLOSED/nettoyage anticipé ; NOT_SERVED conservé.
 ## PLAN-CAL-01 — raccordement des six rencontres au runtime propriétaire
 
 9novembre2026. Base canonique692d4c8 après SCI386/387 CLOSED+CLEANED.
-[Proposition](../../openspec/changes/plan-cal-01-owned-six-encounters/proposal.md),
-[design](../../openspec/changes/plan-cal-01-owned-six-encounters/design.md),
-[lease](../../openspec/changes/plan-cal-01-owned-six-encounters/BUILD_SCOPE.md),
-[tests spécifiés](../../openspec/changes/plan-cal-01-owned-six-encounters/TEST_SPEC.md),
-[croquis UX-CAL](../../openspec/changes/plan-cal-01-owned-six-encounters/UX_CAL_BOARD.md).
+[Proposition](../../openspec/changes/archive/2026-11-09-plan-cal-01-owned-six-encounters/proposal.md),
+[design](../../openspec/changes/archive/2026-11-09-plan-cal-01-owned-six-encounters/design.md),
+[lease](../../openspec/changes/archive/2026-11-09-plan-cal-01-owned-six-encounters/BUILD_SCOPE.md),
+[tests spécifiés](../../openspec/changes/archive/2026-11-09-plan-cal-01-owned-six-encounters/TEST_SPEC.md),
+[croquis UX-CAL](../../openspec/changes/archive/2026-11-09-plan-cal-01-owned-six-encounters/UX_CAL_BOARD.md).
 **PROPOSED / NO_GO_BUILD / G1_PENDING / NOT_ACTIVATED.** Inventaire privé2,
 vrais profils SCI, ledger existant/sélection explicite/projection courante,
 consommateurs HTTP/natifs et vrai handoff V3 contrôlé proposés. Aucune source
 SCI/modèle/migration/CI/UI fonctionnelle changée ; pas nouvelle version SCI,
 activation DATA ou recette physique. Revue fraîche et approbation à obtenir
 avant apply. Les anciens GO et le GO MERGE ne fournissent pas ce nouveau build.
+
+PLAN-CAL-01 / UX-CAL-01 — actualisation de livraison9novembre2026 : GO BUILD, G1
+et pixels contrôlés explicitement reçus (BUILD_AUTHORIZATION archivé). PR388
+HEAD05915e59be20b39a41e39685a5a880c5b42e9d61, merge e6bca39387864eac8c1a9e5038d0710d0d365858.
+CI PR42618931040 completed/success11jobs,8068backend/3skip,70suites/773mobile+TS
+et77visuels. Inventaire2, vrais SCI et parcours sept rencontres→snapshot→V3→ack
+exact→même séance/journal typé livrés en environnement contrôlé. Sources SCI/V1,
+sept tables et baselines préservés ; aucune migration/activation réelle/déploiement.
+[Livraison](../plan/plan-cal-01/DELIVERY.md),
+[handoff](../plan/plan-cal-01/AGENT_HANDOFF.md) et
+[closeout](../plan/plan-cal-01/CLOSEOUT.md) suivent le canonique et la maintenance ;
+CI canonique code42622191356 encore en cours au moment de ce texte.
+SonarPR ERROR consultatif : nouveau coverage63,1%,4smells (3S3776,1S1192),
+0bug/vuln/hotspot. Aucun seuil/issue/gate modifié. Archive du delta après mergecode,
+six exigences ajoutées au specmobile existant ; seul suivi final de livraison
+reste ouvert dans les tâches archivées, pas un nouveau scope fonctionnel. DATA,
+recettes physiques, réévaluation sécurité avant exposition et GO déploiement
+restent distincts ; MOB03complet non clos par ce build.
