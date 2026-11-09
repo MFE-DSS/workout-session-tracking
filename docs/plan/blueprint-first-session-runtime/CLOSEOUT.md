@@ -1,9 +1,42 @@
 # PLAN V3 — closeout du seul runtime contrôlé
 
-8 novembre2026. **CODE MERGED / CODE CANONICAL CI PENDING / CLOSEOUT DRAFT.**
-Cette maintenance est préparée pendant la CI canonique du code ; sa fusion
-attendra les deux verdicts. Les résultats finaux/cleanup sont portés par le reçu
-vivant de la PR de closeout, sans anticipation dans ce document daté.
+9 novembre2026. **CODE MERGED / SUCCESSOR CANONICAL VERIFIED / CLOSEOUT HEAD PENDING.**
+La CI de capacité a été corrigée dans son scope distinct et vérifiée ; ce
+closeout synchronisé attend les contrôles de son nouveau HEAD et le canonique
+final. Les documents gardent leur instant de publication ; le reçu vivant porte
+les résultats et cleanup ultérieurs réellement observés.
+
+## Reprise après l’incident CI
+
+Les runs42526541847 (canonique code31b89f9) et42527005736 (ancien HEADd6b902f
+de ce closeout) terminent **cancelled**, après shutdowns répétés du shard2.
+Leur état n’est pas réécrit comme PASS. Les premières traces indiquaient20/46MiB
+disponibles,swap0 ; la cause kernel/service exacte reste non certifiée. Les
+diagnostics bornés n’ont pas établi de fuite monotone de démarrage applicatif.
+
+Correctif CI autorisé séparément : PR381 HEAD48ec5ec939e4a11aaef6cb4f95804bdf817c7387,
+merge3fcf0911da816cd1158aecb9cff14dc810eb0afe. Cinq shards, deux workers,
+tests/exclusion/couverture/checks identiques ; seul cas supplémentaire : test
+de partition six. CI PR42536619908 et canonique42537647816 réussies, onze jobs
+chacune,7924backend/3skip et749mobile+TS. Tous les shards ont une série réelle,
+workers2 et minima>=4096MiB ; plus bas4439PR/4440canonique. Aucun six nécessaire.
+[Closeout CI](../../ops/ci-plan-v3-capacity/CLOSEOUT.md), archive fusionnée
+PR382/ebbf877c725263e9d51f3b4e5cfa59e8f70c7502, canonique42539004312 en suivi.
+
+Le canonique successeur vérifie réellement le code PLAN inchangé avec la CI
+corrigée. L’attestation WOULD_FULL est en SHADOW MODE, pas de réutilisation
+activée. Couverture PR : mêmes186fichiers/15826lignes/14687couvertes que379 ;
+canonique14686couvertes,92,8% arrondi. Unique ligne de différence : commands.py:110,
+seconde relecture idempotente après verrou ; variation compatible avec un autre
+ordonnancement de concurrence, pas une cause certifiée ni un fichier omis.
+Tous les tests passent, aucun seuil ajusté ou code app réécrit pour la mesure.
+
+Sonar canonique exact3fcf091 : ERROR consultatif,8bugs/542smells/8entrées de
+vulnérabilité/0hotspot,couverture92,8%/nouvelle92,85%. Les huit entrées sont six
+imports Bandit historiques et les deux B404/B603 du worker PLAN analysées plus
+bas ; aucun état/seuil modifié, pas d’audit sécurité global. SonarPR381/382 OK,
+zéro nouvelle issue sur leurs diffs. Les contrôles de ce HEAD final et du
+canonique final sont encore requis ; ce relevé n’en anticipe pas les résultats.
 
 ## Livraison acquise
 
@@ -15,7 +48,7 @@ completed/success, neuf jobs : **7923backend passants, trois ignorés,
 69suites/749tests mobiles+TypeScript**, QA/migrations/perf/sécurité/visuel et
 15fichiers de tests modifiés joués seuls passants. Canonique code
 [42526541847](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42526541847)
-en cours sur31b89f9 à la rédaction, pas PASS anticipé.
+cancelled sur31b89f9 ; le successeur corrigé ci-dessus est la preuve canonique, sans faux PASS de cet ancien run.
 
 Huit rendus natifs bruts comparés aux références ; G1 et pixels acceptés avant
 commit. La vraie app de test isolée a créé/repris/journalisé/clôturé une séance

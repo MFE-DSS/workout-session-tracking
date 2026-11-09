@@ -54,7 +54,11 @@ EXCLUDED = {"test_v1_acceptance.py"}
 #: 3 701 sur quatre tranches. Le goulet est la mémoire par machine, pas la
 #: correction ni la couverture : moins de tests par machine, mêmes tests au
 #: total.
-DEFAULT_SHARDS = 3
+#: CI_PLAN_V3_CAPACITY — 2026-11-09, 3 → 5. Canonical/closeout PLAN shard 2
+#: runners shut down with 20/46 MiB available and zero swap. Five is the
+#: approved first candidate; real PR/canonical headroom must still prove it.
+#: Same file partition and tests, two workers per runner, complete coverage.
+DEFAULT_SHARDS = 5
 
 
 def repo_root() -> pathlib.Path:
