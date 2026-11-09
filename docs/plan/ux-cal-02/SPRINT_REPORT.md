@@ -17,10 +17,10 @@ dépendance, couleur ou composant global ajouté/modifié.
 
 ## Croquis validé
 
-[Design](../../../openspec/changes/ux-cal-02-native-density/design.md),
-[scope](../../../openspec/changes/ux-cal-02-native-density/BUILD_SCOPE.md),
-[croquis G1](../../../openspec/changes/ux-cal-02-native-density/UX_CAL_BOARD.md)
-et [autorisation](../../../openspec/changes/ux-cal-02-native-density/BUILD_AUTHORIZATION.md).
+[Design](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/design.md),
+[scope](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/BUILD_SCOPE.md),
+[croquis G1](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/UX_CAL_BOARD.md)
+et [autorisation](../../../openspec/changes/archive/2026-11-09-ux-cal-02-native-density/BUILD_AUTHORIZATION.md).
 Les mentions PROPOSED/G1_PENDING des premières pièces décrivent leur instant
 initial ; l'autorisation reçue les complète, sans réécrire l'histoire.
 
@@ -155,3 +155,38 @@ PASS, protocole PASS, budget260≤548 et OpenSpec20/20 PASS. Le premier lancemen
 budget n'a pas trouvé ruff dans PATH ; relance avec le PATH du venv existant
 réussie, aucun changement de dépendance ou de seuil. Aucun full sweep backend
 local. Le résultat CI du commit reste à produire et n'est pas anticipé.
+
+## Reçu de publication et closeout en préparation
+
+Premier commit UI `6d46e3ed07086204688f5351839d6a1826e6e2f6`, après acceptation
+explicite ; [PR393](https://github.com/MFE-DSS/workout-session-tracking/pull/393)
+ouverte. Broad frais25suites/387tests, TypeScript/protocole/budget260≤548,
+OpenSpec strict20/20, Gitleaks staged et diff-check PASS. [DELIVERY](DELIVERY.md)
+porte les champs distants PENDING à remplacer seulement après observation.
+[DEVICE_GATES](DEVICE_GATES.md) suit3.2/3.3 partielles sans les cocher ;
+[AGENT_HANDOFF](AGENT_HANDOFF.md) conserve décisions, rulings et limites.
+Archive/closeout/cleanup suivent merge code et CI canonique vérifiée.
+
+## Reçu de merge code et archive
+
+PR393 fusionnée par commit gardé `c7215623e9806a8a7ce12590f5b5e7c099fc3128`,
+HEAD6d46e3e/base3bb1f2d relus. CI [42689201348](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42689201348)
+SUCCESS11jobs sans retry ; quatre requis, Sonar/Gitar success, aucune revue/thread
+bloquant. SonarPR OK/0issue/coverageapp92,5% (aucune mesure TypeScript déduite).
+Après merge, archive CLI avec validation : quatre exigences ajoutées au spec
+mobile existant, liens déplacés réparés, tâches3.2/3.3 laissées ouvertes avec
+responsables RELEASE/QA. CI/Sonar canoniques et maintenance/cleanup PENDING.
+
+Comptes observés dans les logs CI PR393 :8068backend/3skip,
+73suites/913mobile+TypeScript,77visuels. CI canonique code
+[42692021095](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42692021095)
+sur HEADc721562 active à ce point ; verdict non anticipé.
+
+## Vérification canonique code observée
+
+[42692021095](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42692021095), révision exacte c721562, completed/success11jobs, tentative1.
+Les logs donnent 8068backend/3skip, 73suites/913mobile+TypeScript,77visuels.
+Sonar : ERROR consultatif ; analyse `887f02a9-747f-4be9-bdc0-241341f1c48b`, révision exacte c721562, 9 novembre20:34:56 UTC : 8bugs / 549smells / 8entrées vulnérabilité externe / 0hotspot ; coverageapp92,5%, nouvelle92,5048%. Même dette que la base3bb1f2d ; aucune mesure TypeScript ni innocuité globale déduite.
+Revue indépendante du closeout documentaire : conformité et qualité PASS,
+0Critical/Important/Minor ; contrôle des liens et des quatre exigences ajoutées.
+Closeout publié, sa CI canonique et cleanup encore PENDING à cette publication.

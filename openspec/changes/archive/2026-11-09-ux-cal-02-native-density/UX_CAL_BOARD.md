@@ -3,9 +3,9 @@
 **G1_PENDING, aucun code produit nouveau.** Cette planche ASCII décrit le
 changement de composition. Elle n'est ni un rendu natif après, ni la validation
 des pixels à venir. Les références avant restent intactes :
-[entrée388](../../../clients/mobile/visual-contract/review-receipts/plan-cal-01/native/ios-home.png),
-[machine388](../../../clients/mobile/visual-contract/review-receipts/plan-cal-01/native/ios-final-machine.png),
-[haltères388](../../../clients/mobile/visual-contract/review-receipts/plan-cal-01/native/ios-rdl-setting.png).
+[entrée388](../../../../clients/mobile/visual-contract/review-receipts/plan-cal-01/native/ios-home.png),
+[machine388](../../../../clients/mobile/visual-contract/review-receipts/plan-cal-01/native/ios-final-machine.png),
+[haltères388](../../../../clients/mobile/visual-contract/review-receipts/plan-cal-01/native/ios-rdl-setting.png).
 
 ## Croquis validé
 

@@ -26,9 +26,21 @@
 
 ## 4. Delivery under standing authorization
 
-- [ ] 4.1 Scope et relecture décisions, commit/push/PR, contrôles obligatoires réels du HEAD exact et readiness sans blocage.
-- [ ] 4.2 Merge avec garde SHA sous GOV-MERGE-01, CI canonique et Sonar réel consigné.
+- [x] 4.1 Scope et relecture décisions, commit/push/PR, contrôles obligatoires réels du HEAD exact et readiness sans blocage.
+- [x] 4.2 Merge avec garde SHA sous GOV-MERGE-01, CI canonique et Sonar réel consigné.
 - [ ] 4.3 Archive OpenSpec, closeout/CR avec appareils/gates encore ouverts, maintenance via PR si requise, sans boucle de résultats anticipés.
 - [ ] 4.4 Nettoyer seuls branches/worktree possédés après preuve d'intégration/zéro travail unique ; conserver preuves et travaux d'autrui. Aucun déploiement.
 
-Preuves et limites réelles : [rapport de build](../../../docs/plan/ux-cal-02/SPRINT_REPORT.md). 3.2/3.3 partiels : preuve HTTP et consommateurs distincts des recettes natives/physiques ; 3.7 est accepté le9novembre ; livraison sous GOV en cours.
+Preuves et limites réelles : [rapport de build](../../../../docs/plan/ux-cal-02/SPRINT_REPORT.md). 3.2/3.3 partiels : preuve HTTP et consommateurs distincts des recettes natives/physiques ; 3.7 est accepté le9novembre ; livraison sous GOV en cours.
+
+Archive après merge code c721562 (PR393, HEAD6d46e3e, CI42689201348 SUCCESS11jobs,
+readiness sans revue/thread bloquant). SonarPR OK/0issue/coverageapp92,5%, pas
+mesure TypeScript. CI et Sonar canoniques, maintenance/cleanup encore PENDING.
+3.2/3.3 restent ouvertes : critères/preuves et responsables RELEASE/QA dans
+[DEVICE_GATES](../../../../docs/plan/ux-cal-02/DEVICE_GATES.md). L'archive du delta
+contrôlé accepté n'assouplit pas ces exigences et ne ferme pas RELEASE/MOB03/DATA.
+
+CI canonique code observée : [42692021095](https://github.com/MFE-DSS/workout-session-tracking/actions/runs/42692021095) SUCCESS11jobs, HEADc721562,
+8068backend/3skip,73suites/913mobile+TS,77visuels ; Sonar exactc721562 ERROR
+consultatif,8bugs/549smells/8entrées/0hotspot,coverageapp92,5%.
+4.2 désormais vérifiée ; publication du closeout et cleanup4.3/4.4 encore en cours.
