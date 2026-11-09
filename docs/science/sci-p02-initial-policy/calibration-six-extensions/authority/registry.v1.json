@@ -1,0 +1,85 @@
+{
+  "contract_version": "first-calibration-encounter/1.0.0",
+  "decision_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/ADMISSION.md",
+  "duration": "UNKNOWN",
+  "empty_limitations": true,
+  "engine_version": "calibration-extension-evaluator/1.0.0",
+  "policy_ref": "initial-calibration-extension/1.0.0",
+  "population": "ADULT_NON_CLINICAL",
+  "profiles": [
+    {
+      "candidate_id": "chest-press-machine",
+      "intent_id": "initial_press_v1",
+      "load_semantics": "MACHINE_DISPLAY_KG",
+      "protocol_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#chest-press-machine",
+      "realization_ref": "initial-candidate-realisation/1.0.0@477c8e570e9260cdf20a3b6502490d68c7243059d526d0734ae68568f5ef9642",
+      "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md#chest-press-machine",
+      "state": "ADMITTED_WITH_LIMITS",
+      "status": "ACTIVE",
+      "withdrawal_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#arrêt-réessai-et-retrait"
+    },
+    {
+      "candidate_id": "rowing-chest-supported",
+      "intent_id": "initial_row_v1",
+      "load_semantics": "MACHINE_DISPLAY_KG",
+      "protocol_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#rowing-chest-supported",
+      "realization_ref": "initial-candidate-realisation/1.0.0@f65ee15f870e8d6c57dafa5bc9afa359ec2d774272f704a2cfd6884c61a6f773",
+      "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md#rowing-chest-supported",
+      "state": "ADMITTED_WITH_LIMITS",
+      "status": "ACTIVE",
+      "withdrawal_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#arrêt-réessai-et-retrait"
+    },
+    {
+      "candidate_id": "romanian-deadlift-halteres",
+      "intent_id": "initial_hinge_v1",
+      "load_semantics": "PER_IMPLEMENT",
+      "protocol_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#romanian-deadlift-halteres",
+      "realization_ref": "initial-candidate-realisation/1.0.0@b857f3bdb563e90e2a84f17403d407d3eb4936fa183bddf05c2d7cd7f15d29f1",
+      "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md#romanian-deadlift-halteres",
+      "state": "ADMITTED_WITH_LIMITS",
+      "status": "ACTIVE",
+      "withdrawal_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#arrêt-réessai-et-retrait"
+    },
+    {
+      "candidate_id": "tirage-poulie-haute-prise-neutre",
+      "intent_id": "initial_vertical_pull_v1",
+      "load_semantics": "MACHINE_DISPLAY_KG",
+      "protocol_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#tirage-poulie-haute-prise-neutre",
+      "realization_ref": "initial-candidate-realisation/1.0.0@0e07dc7086decdddf1411bc1821ef3a1dc987b227fa43ef43396c1dd4c50a234",
+      "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md#tirage-poulie-haute-prise-neutre",
+      "state": "ADMITTED_WITH_LIMITS",
+      "status": "ACTIVE",
+      "withdrawal_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#arrêt-réessai-et-retrait"
+    },
+    {
+      "candidate_id": "elevations-laterales-machine",
+      "intent_id": "initial_lateral_delt_v1",
+      "load_semantics": "MACHINE_DISPLAY_KG",
+      "protocol_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#elevations-laterales-machine",
+      "realization_ref": "initial-candidate-realisation/1.0.0@07e1300036de7f302e8b2c76303f731a9cd050f11658487f215659e0ec8eb5cf",
+      "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md#elevations-laterales-machine",
+      "state": "ADMITTED_WITH_LIMITS",
+      "status": "ACTIVE",
+      "withdrawal_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#arrêt-réessai-et-retrait"
+    },
+    {
+      "candidate_id": "releves-mollets-debout-machine",
+      "intent_id": "initial_calf_v1",
+      "load_semantics": "MACHINE_DISPLAY_KG",
+      "protocol_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#releves-mollets-debout-machine",
+      "realization_ref": "initial-candidate-realisation/1.0.0@650be74db4ab9e31eb4fabdf21e99637159e345ebd8be40bd89287dcb94da1cc",
+      "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md#releves-mollets-debout-machine",
+      "state": "ADMITTED_WITH_LIMITS",
+      "status": "ACTIVE",
+      "withdrawal_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/OPERATIONAL_PROTOCOL.md#arrêt-réessai-et-retrait"
+    }
+  ],
+  "registry_version": "initial-calibration-extension-registry/1.0.0",
+  "restart": "NOT_ADMITTED_AFTER_CONCERN",
+  "review_ref": "docs/science/sci-p02-initial-policy/calibration-six-extensions/authority/SCI_REVIEW.md",
+  "runtime_availability": "NOT_SERVED",
+  "side": "BILATERAL",
+  "state": "ADMITTED_WITH_LIMITS",
+  "status": "ACTIVE",
+  "v3_bundle_digest": "78b3e5d99fe05093d6141678fd40f16e744b88d3d87405f14b0f8be357724d94"
+}
