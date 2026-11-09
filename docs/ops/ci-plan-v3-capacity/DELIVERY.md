@@ -2,8 +2,8 @@
 
 9 novembre 2026. **CANDIDATE / validation en cours, pas CLOSED.**
 Base canonique `31b89f98985044a9ee40d75610d387976ff26d7c`.
-[Design](../../../openspec/changes/ci-plan-v3-capacity/design.md),
-[autorisation](../../../openspec/changes/ci-plan-v3-capacity/BUILD_AUTHORIZATION.md).
+[Design](../../../openspec/changes/archive/2026-11-09-ci-plan-v3-capacity/design.md),
+[autorisation](../../../openspec/changes/archive/2026-11-09-ci-plan-v3-capacity/BUILD_AUTHORIZATION.md).
 
 ## Brainstorming / Options / Risques / Choix retenu
 

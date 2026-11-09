@@ -700,12 +700,19 @@ DATA réelle/activation/déploiement/RELEASE physique et MOB03 global restent OP
 
 ## CI — capacité de la suite PLAN V3
 
-9 novembre 2026. [ci-plan-v3-capacity](../../openspec/changes/ci-plan-v3-capacity/proposal.md),
-[design](../../openspec/changes/ci-plan-v3-capacity/design.md) et
-[GO BUILD](../../openspec/changes/ci-plan-v3-capacity/BUILD_AUTHORIZATION.md).
+9 novembre 2026. [ci-plan-v3-capacity](../../openspec/changes/archive/2026-11-09-ci-plan-v3-capacity/proposal.md),
+[design](../../openspec/changes/archive/2026-11-09-ci-plan-v3-capacity/design.md) et
+[GO BUILD](../../openspec/changes/archive/2026-11-09-ci-plan-v3-capacity/BUILD_AUTHORIZATION.md).
 Correction de capacité après les shutdowns des canoniques/closeout PLAN,
 cinq shards puis six seulement sur preuve de besoin ; deux workers, ensemble
 de tests et couverture complète/checks requis inchangés. TDD et broad CI
 184 passants ; full local et vraie capacité PR/canonique en vérification.
 Aucun changement app/SCI/SDK/visuel/activation. PLAN#379 code fusionné31b89f9 ;
 #380 reste draft jusqu’aux vérifications canoniques réelles. Aucun CLOSED anticipé.
+
+CI capacité code livré : PR381 HEAD48ec5ec939e4a11aaef6cb4f95804bdf817c7387,
+merge3fcf0911da816cd1158aecb9cff14dc810eb0afe. CI PR42536619908 onze jobs
+réussis,7924backend/3skip et749mobile+TS ; cinq séries numériques, workers2,
+minimum4439MiB, couverture combinée strictement égale au code PLAN précédent.
+SonarPR OK/zéro nouvelle issue. Archive préparée et [closeout](../ops/ci-plan-v3-capacity/CLOSEOUT.md)
+en suivi ; canonique42537647816 encore en vérification, pas CLOSED anticipé.
