@@ -4,7 +4,8 @@
  * No personal identifier is ever written to the repository.
  */
 const {applyQA} = require('./qa.config');
-module.exports = ({ config }) => applyQA({
+const {applyQADelivery} = require('./qa-delivery.config');
+module.exports = ({ config }) => applyQADelivery(applyQA({
   ...config,
   ...(process.env.EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST === '1' ? {name:'AUREN PLAN Test',scheme:'auren-plan-v3-test',android:{...config.android,package:'dev.auren.plan.v3.controlled'}} : {}),
   ios: {
@@ -12,4 +13,4 @@ module.exports = ({ config }) => applyQA({
     ...(process.env.EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST === '1' ? {bundleIdentifier: 'dev.auren.plan.v3.controlled'} : {}),
     ...(process.env.APPLE_TEAM_ID ? { appleTeamId: process.env.APPLE_TEAM_ID } : {}),
   },
-});
+}));
