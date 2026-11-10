@@ -256,3 +256,45 @@ def test_restore_cli_refuses_logically_modified_backup_despite_valid_sqlite(qa_d
     assert result.returncode != 0
     assert not target.exists()
     assert "private-" not in result.stderr
+
+
+@pytest.mark.parametrize("mutation", ["refresh", "plan", "header"])
+def test_restore_interphase_source_write_cannot_replace_validated_manifest_identity(
+    qa_database, tmp_path, monkeypatch, capsys, mutation
+):
+    import tools.qa_delivery.database as module
+
+    snapshot = tmp_path / "validated-backup.db"
+    target = tmp_path / "must-not-publish.db"
+    module.backup_database(qa_database, snapshot)
+    original_source = qa_database.read_bytes()
+    verify = module._verify_backup
+    changed = {}
+
+    def verify_then_write(path):
+        validated = verify(path)
+        with sqlite3.connect(path) as writer:
+            writer.execute(
+                {
+                    "refresh": "UPDATE device_sessions SET refresh_hash='private-interphase-refresh'",
+                    "plan": "UPDATE first_plan_set_observations SET observation_json='{}'",
+                    "header": "PRAGMA user_version=17",
+                }[mutation]
+            )
+        changed["bytes"] = path.read_bytes()
+        changed["rows"] = rows(path)
+        return validated
+
+    monkeypatch.setattr(module, "_verify_backup", verify_then_write)
+    monkeypatch.setattr(sys, "argv", ["qa-database", "restore", str(snapshot), str(target)])
+    with pytest.raises(SystemExit) as refused:
+        module.main()
+    assert refused.value.code == 1
+    assert not target.exists()
+    assert not target.with_name(target.name + ".manifest.json").exists()
+    assert not list(tmp_path.glob(".qa-*"))
+    assert snapshot.read_bytes() == changed["bytes"]
+    assert rows(snapshot) == changed["rows"]
+    assert qa_database.read_bytes() == original_source
+    output = capsys.readouterr()
+    assert output.out == "" and "private-" not in output.err

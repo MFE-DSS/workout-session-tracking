@@ -100,7 +100,9 @@ def _copy_pages(source, target):
     source.backup(target, pages=128, progress=progress, sleep=0.05)
 
 
-def backup_database(source: Path, destination: Path) -> dict:
+def backup_database(
+    source: Path, destination: Path, *, expected_backup: dict | None = None
+) -> dict:
     """Publish a verified private snapshot exclusively; restore uses the same path."""
     destination = destination.absolute()
     manifest_path = destination.with_name(destination.name + ".manifest.json")
@@ -112,6 +114,16 @@ def backup_database(source: Path, destination: Path) -> dict:
     ):
         raise ValueError("qa_destination_exists")
     before = verify_database(source)
+    expected_logical = before
+    expected_source_sha = None
+    if expected_backup is not None:
+        expected_logical = {k: v for k, v in expected_backup.items() if k != "database_sha256"}
+        expected_source_sha = expected_backup["database_sha256"]
+        if (
+            before != expected_logical
+            or hashlib.sha256(source.read_bytes()).hexdigest() != expected_source_sha
+        ):
+            raise ValueError("qa_backup_manifest_changed")
     temporary = None
     published = []
     manifest_tmp = None
@@ -124,8 +136,15 @@ def backup_database(source: Path, destination: Path) -> dict:
             # WAL source frames are merged into a standalone, journal-free snapshot.
             dst.execute("PRAGMA journal_mode=DELETE")
         receipt = verify_database(temporary)
-        if receipt != before or verify_database(source) != before:
+        if receipt != expected_logical or verify_database(source) != expected_logical:
             raise ValueError("qa_source_changed_during_capture")
+        if (
+            expected_source_sha is not None
+            and hashlib.sha256(source.read_bytes()).hexdigest() != expected_source_sha
+        ):
+            raise ValueError("qa_backup_manifest_changed")
+        # SQLite may legitimately change physical header bytes in the new copy.
+        # Its logical schema/tables must match the originally validated manifest.
         receipt["database_sha256"] = hashlib.sha256(temporary.read_bytes()).hexdigest()
         fd, name = tempfile.mkstemp(prefix=".qa-manifest-", dir=destination.parent)
         manifest_tmp = Path(name)
@@ -175,9 +194,10 @@ def main():
         elif args.destination is None:
             parser.error("a new destination is required")
         else:
-            if args.operation == "restore":
-                _verify_backup(args.source)
-            receipt = backup_database(args.source, args.destination)
+            expected_backup = _verify_backup(args.source) if args.operation == "restore" else None
+            receipt = backup_database(
+                args.source, args.destination, expected_backup=expected_backup
+            )
         print(json.dumps(receipt, sort_keys=True))
     except (OSError, ValueError, sqlite3.Error):
         parser.exit(1, "qa_database_operation_refused\n")
