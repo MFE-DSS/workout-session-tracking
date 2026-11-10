@@ -1,0 +1,174 @@
+name: Manual QA candidate release
+run-name: QA ${{ inputs.operation }} source ${{ inputs.source_sha }}
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Prepare is non-distributable; other operations need qa-release review
+        type: choice
+        options: [PREPARE, BUILD_APK, UPDATE, ROLLBACK]
+        default: PREPARE
+      source_sha:
+        description: Exact approved merged Git SHA; dispatch ref must point to this SHA
+        type: string
+        required: true
+      expected_proof_sha256:
+        description: Operator staging receipt proof hash; DECLARED_NOT_VERIFIED before approval
+        type: string
+        default: ''
+      proof_asset_id:
+        description: Immutable encrypted release asset ID in configured private proof repository
+        type: string
+        default: ''
+      proof_cipher_sha256:
+        description: Ciphertext checksum from operator staging/upload receipt
+        type: string
+        default: ''
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: qa-release
+  cancel-in-progress: false
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      candidate_sha256: ${{ steps.summary.outputs.candidate_sha256 }}
+      proof_sha256: ${{ steps.summary.outputs.proof_sha256 }}
+      artifact_url: ${{ steps.package.outputs.artifact-url }}
+    steps:
+      - name: Require exact dispatch source and declared transport reference
+        env:
+          SOURCE: ${{ inputs.source_sha }}
+          OPERATION: ${{ inputs.operation }}
+          EXPECTED: ${{ inputs.expected_proof_sha256 }}
+          ASSET: ${{ inputs.proof_asset_id }}
+          CIPHER: ${{ inputs.proof_cipher_sha256 }}
+        run: |
+          [[ "$SOURCE" =~ ^[a-f0-9]{40}$ ]] && [[ "$SOURCE" == "$GITHUB_SHA" ]]
+          if [[ "$OPERATION" != PREPARE || -n "$EXPECTED$ASSET$CIPHER" ]]; then
+            [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]
+            [[ "$ASSET" =~ ^[1-9][0-9]*$ ]]
+            [[ "$CIPHER" =~ ^[a-f0-9]{64}$ ]]
+          fi
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - run: pip install httpx==0.28.1
+      - name: Refuse missing or unprotected environment before GitHub can create it
+        if: inputs.operation != 'PREPARE'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -c 'from tools.qa_delivery.pipeline import protected_environment; protected_environment()'
+      - name: Prepare frozen non-distributable candidate without private credentials
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OPERATION: ${{ inputs.operation }}
+          EXPECTED: ${{ inputs.expected_proof_sha256 }}
+          ASSET: ${{ inputs.proof_asset_id }}
+          CIPHER: ${{ inputs.proof_cipher_sha256 }}
+        run: |
+          operation="$OPERATION"
+          [[ "$operation" != PREPARE ]] || operation=BUILD_APK
+          args=()
+          if [[ -n "$EXPECTED$ASSET$CIPHER" ]]; then
+            args+=(--expected-proof-sha256 "$EXPECTED" --proof-asset-id "$ASSET" --proof-cipher-sha256 "$CIPHER")
+          fi
+          python -m tools.qa_delivery.pipeline prepare --candidate docs/release/rel-03/candidate.json --operation "$operation" --output "$RUNNER_TEMP/qa-prepared.json" "${args[@]}"
+      - uses: actions/upload-artifact@v6
+        id: package
+        with:
+          name: qa-prepared-candidate
+          path: ${{ runner.temp }}/qa-prepared.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Expose exact package for the single protected candidate review
+        id: summary
+        env:
+          ARTIFACT_URL: ${{ steps.package.outputs.artifact-url }}
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p=json.loads((Path(os.environ['RUNNER_TEMP'])/'qa-prepared.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:
+              out.write(f"candidate_sha256={p['candidate_sha256']}\nproof_sha256={p['proof_sha256'] or ''}\n")
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+              out.write(f"PREPARED / NON_DISTRIBUTABLE / DECLARED_NOT_VERIFIED\n\nReview {os.environ['ARTIFACT_URL']} including source, current canonical, target and expected proof hash against the local staging receipt. Private proof is verified only after approval.\n\nSingle qa-release approval comment (deployment authorization only): `APPROVE_QA {p['candidate_sha256']} {p['proof_sha256']}`\n")
+          PY
+  release:
+    if: inputs.operation != 'PREPARE'
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: qa-release
+      url: ${{ needs.prepare.outputs.artifact_url }}
+    permissions:
+      contents: read
+      actions: read
+      checks: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22.20.0'
+      - run: pip install -r requirements-lock.txt httpx==0.28.1
+      - uses: actions/download-artifact@v7
+        with:
+          name: qa-prepared-candidate
+          path: ${{ runner.temp }}/qa-package
+      - name: Verify actual private repository and immutable ciphertext then decrypt approved proof
+        env:
+          GH_TOKEN: ${{ secrets.QA_PROOF_READ_TOKEN }}
+          PROOF_KEY_HEX: ${{ secrets.QA_PROOF_AES256_KEY_HEX }}
+        run: |
+          python - <<'PY'
+          import os, re
+          from pathlib import Path
+          key=os.environ['PROOF_KEY_HEX']
+          if not re.fullmatch('[a-f0-9]{64}',key):
+              raise SystemExit('qa_proof_key_configuration_invalid')
+          private=Path(os.environ['RUNNER_TEMP'])/'qa-proof-private'
+          private.mkdir(mode=0o700)
+          fd=os.open(private/'key',os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600)
+          with os.fdopen(fd,'wb') as out:
+              out.write(bytes.fromhex(key))
+          PY
+          python -m tools.qa_delivery.proofs import --package "$RUNNER_TEMP/qa-package/qa-prepared.json" --key "$RUNNER_TEMP/qa-proof-private/key" --output "$RUNNER_TEMP/qa-proof-private/proof"
+          rm -- "$RUNNER_TEMP/qa-proof-private/key"
+      - run: npm ci
+        working-directory: clients/mobile
+      - run: npm install --global eas-cli@27.2.0
+      - name: Acquire all gates then publish only to fixed QA project/channel
+        env:
+          # Optional read-only audit token needs Administration:read to inspect
+          # branch protection when the managed token cannot. Never used to write.
+          GH_TOKEN: ${{ secrets.QA_RELEASE_AUDIT_TOKEN || github.token }}
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: python -m tools.qa_delivery.pipeline publish --candidate "$RUNNER_TEMP/qa-package/qa-prepared.json" --proof "$RUNNER_TEMP/qa-proof-private/proof" --output "$RUNNER_TEMP/qa-submitted.json"
+      - name: Remove runner private proof and AES key
+        if: always()
+        run: rm -rf -- "$RUNNER_TEMP/qa-proof-private"
+      - uses: actions/upload-artifact@v6
+        if: success()
+        with:
+          name: qa-submission-verification-pending
+          path: ${{ runner.temp }}/qa-submitted.json
+          retention-days: 7

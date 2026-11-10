@@ -933,3 +933,33 @@ par cet inventaire. DATA/RELEASE physique et parité complète restent ouverts.
 
 10novembre2026, base canonique b8f5ffc. [Change](../../openspec/changes/release-qa-02-android-pilot/proposal.md), [design et direction distante](../../openspec/changes/release-qa-02-android-pilot/design.md), [GO reçu](../../openspec/changes/release-qa-02-android-pilot/BUILD_AUTHORIZATION.md), [checklist testeur](../release/release-qa-02/TESTER_CHECKLIST.md).
 **GO_BUILD_CONTROLLED / APK_PENDING / PHYSICAL_ACCEPTANCE_OPEN.** Profil EAS interne distinct, module notifications conservé, cible HTTPS temporaire vers seul banc synthétique et identités attribuées. Aucun serveur partagé/production, Store/OTA, donnée réelle, nouveau produit ou baseline modifiés. Vraie migration base→head et vrais SCI ; corps/délais/admission de passerelle testés, révision/artefact/signature à attester après construction. Absence d'Android personnel précisée par l'opérateur ; retour physique du bêta-testeur requis, jamais déduit de HTTP/émulateur. Les reçus de livraison porteront les résultats effectivement observés.
+
+
+## REL-03 — livraison Android QA continue (préparation)
+
+10 novembre 2026, base canonique b9a334d. [Proposition](../../openspec/changes/rel-03-continuous-android-qa/proposal.md), [design](../../openspec/changes/rel-03-continuous-android-qa/design.md), [scope](../../openspec/changes/rel-03-continuous-android-qa/BUILD_SCOPE.md), [décision externe préparatoire](../../openspec/changes/rel-03-continuous-android-qa/HOSTING_DECISION.md). **PROPOSED / NO_GO_BUILD_REL03 / NO_HOSTING_OR_SPEND_OR_RELEASE_APPROVAL.** Cible gérée stable proposée, continuité du seul banc synthétique QA02, identité native/JS/serveur distincte, Expo Updates QA et pipeline manuel protégé. Aucun changement produit/CI/SDK/backend actif, instance, secret, publication ou coût engagé dans cette préparation. QA02 demeure non-OTA et sa recette physique ouverte ; nouveau GO de scope puis autorisations de connexion/coût/cutover/diffusion séparées. GOV-MERGE-01 s'applique aux seules livraisons autorisées, jamais comme GO déploiement. DATA, appareils physiques et production restent ouverts.
+
+### REL-03 — GO BUILD contrôlé reçu (10 novembre 2026)
+
+Décision opérateur : « Autoriser le build contrôlé REL-03 » sur le design et le
+scope ci-dessus. [Reçu](../../openspec/changes/rel-03-continuous-android-qa/BUILD_AUTHORIZATION.md),
+[plan](../../openspec/changes/rel-03-continuous-android-qa/IMPLEMENTATION_PLAN.md).
+**GO_BUILD_CONTROLLED / IMPLEMENTATION_IN_PROGRESS / NO_EXTERNAL_PUBLICATION.**
+Le code préparatoire serveur/backup/identité, profil/canal QA et Expo Updates,
+workflow manuel protégé et leurs tests/livraison sont autorisés. Hébergement,
+paiement, cutover du banc actif, cloudbuild et publication APK/OTA exclus ; paquet
+externe concret après préparation indépendante. Le banc QA02 reste disponible,
+recette physique et DATA ouvertes. Ce GO n'autorise pas les scopes MOB04/MOB05A,
+BODY01 ou NUT01 en préparation séparée. Leases ConnectedApp séquencés sans PR
+chevauchante ; aucune activation de recommandations ou donnée personnelle.
+
+### REL-03 — code préparatoire implémenté, opérations non servies
+
+10novembre2026, après GO exact. [État et preuves de code](../release/rel-03/CODE_PREPARATION.md),
+[protocole manuel](../release/rel-03/README.md). Serveur/backup/identités, inventaire
+QA/Updates58 et workflow protégé implémentés ; transport de preuves chiffrées privé
+corrige l'hypothèse de repo privé (le dépôt produit est public). **NON_DISTRIBUTABLE /
+BLOCKED_EXTERNAL**, revue globale et CI finale encore en cours à cette publication.
+Aucun hosting/spend/cutover/cloudbuild/APK/OTA ni store/clé de preuves créé ; QA02,
+DATA, physique et MOB03 complet restent ouverts. Ce reçu ne ferme ni n'archive le
+change opérationnel. Les anciennes lignes gardent leurs instants de préparation.

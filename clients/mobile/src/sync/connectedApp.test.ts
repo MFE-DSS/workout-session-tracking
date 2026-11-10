@@ -891,3 +891,38 @@ test('an existing server resume remains prior to first-use after registration co
   expect(root.container.queryAll(n=>n.type==='FirstUse')).toHaveLength(0);
   expect(mockTransport.mock.calls.filter(([p])=>String(p).includes('first-plan'))).toHaveLength(0);
 });
+
+test('ordinary ConnectedApp never reads QA native modules or emits QA observation', async () => {
+  const previous=process.env.EXPO_PUBLIC_QA_DELIVERY;
+  delete process.env.EXPO_PUBLIC_QA_DELIVERY;
+  const output=jest.spyOn(console,'info').mockImplementation(()=>{});
+  try {
+    await boot();
+    expect(output.mock.calls.filter(args=>args[0]==='AUREN_QA_DELIVERY')).toHaveLength(0);
+  } finally {
+    if(previous===undefined) delete process.env.EXPO_PUBLIC_QA_DELIVERY;
+    else process.env.EXPO_PUBLIC_QA_DELIVERY=previous;
+  }
+});
+
+test('real ConnectedApp mounts the QA provenance observer without exposing training data', async () => {
+  const prior={selector:process.env.EXPO_PUBLIC_QA_DELIVERY,native:process.env.EXPO_PUBLIC_QA_NATIVE_SHA,js:process.env.EXPO_PUBLIC_QA_JS_SHA};
+  process.env.EXPO_PUBLIC_QA_DELIVERY='1';process.env.EXPO_PUBLIC_QA_NATIVE_SHA='a'.repeat(40);
+  process.env.EXPO_PUBLIC_QA_JS_SHA='b'.repeat(40);
+  // Native bridges are I/O boundaries; actual ConnectedApp effect and observer remain real.
+  jest.doMock('expo-application',()=>({nativeApplicationVersion:'0.0.2',nativeBuildVersion:'3'}));
+  jest.doMock('expo-updates',()=>({runtimeVersion:'runtime-A',updateId:'update-B',isEmbeddedLaunch:false}));
+  const output=jest.spyOn(console,'info').mockImplementation(()=>{});
+  try {
+    await boot();
+    const events=output.mock.calls.filter(args=>args[0]==='AUREN_QA_DELIVERY');
+    expect(events).toHaveLength(1);
+    expect(JSON.parse(events[0][1])).toEqual({schemaVersion:'qa-client-observation/1.0.0',
+      nativeApplicationVersion:'0.0.2',nativeBuildVersion:'3',runtimeVersion:'runtime-A',
+      updateId:'update-B',isEmbeddedLaunch:false,nativeSourceSHA:'a'.repeat(40),currentJSSHA:'b'.repeat(40)});
+  } finally {
+    for(const [key,value] of Object.entries({EXPO_PUBLIC_QA_DELIVERY:prior.selector,EXPO_PUBLIC_QA_NATIVE_SHA:prior.native,EXPO_PUBLIC_QA_JS_SHA:prior.js})) {
+      if(value===undefined) delete process.env[key];else process.env[key]=value;
+    }
+  }
+});

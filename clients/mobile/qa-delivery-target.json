@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "qa-delivery-target/1.0.0",
+  "state": "UNPROVISIONED",
+  "environmentId": "qa-rel03",
+  "apiUrl": null,
+  "dataScope": "SYNTHETIC_ONLY",
+  "availability": null,
+  "deploymentReference": null,
+  "continuityReference": null,
+  "backupReference": null,
+  "apiContract": "first-session-runtime/3.0.0",
+  "localSchema": "first-session-local/3.0.0"
+}

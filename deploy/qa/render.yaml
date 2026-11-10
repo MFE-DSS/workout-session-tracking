@@ -1,0 +1,25 @@
+# PREPARATION ONLY: no service/account/cost/region/cutover is approved by this file.
+# Name and Frankfurt are proposed; operator must verify a NEW resource before creation.
+services:
+  - type: web
+    name: auren-qa-rel03-unprovisioned
+    runtime: docker
+    repo: https://github.com/MFE-DSS/workout-session-tracking
+    branch: claude/sprint-reporting-fitness-app-V7Qr6
+    plan: 0.5c-512mb
+    region: frankfurt
+    numInstances: 1
+    autoDeployTrigger: 'off'
+    dockerfilePath: ./deploy/qa/Dockerfile
+    dockerContext: .
+    healthCheckPath: /__qa_liveness
+    maxShutdownDelaySeconds: 30
+    envVars:
+      # Public exact approved source SHA; translated by Render to a build arg.
+      # Supplied during future approved creation/deployment, never a secret.
+      - key: SOURCE_SHA
+        sync: false
+    disk:
+      name: qa-continuity
+      mountPath: /var/lib/qa
+      sizeGB: 1

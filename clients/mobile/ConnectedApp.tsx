@@ -43,6 +43,7 @@ import { isElapsed, remainingMs } from './src/domain/timer';
 import { Event, exerciseById, initialState, progress, reduce, setById, WorkoutState } from './src/domain/workout';
 import { backAction } from './src/native/backAction';
 import { deviceIdentity } from './src/native/deviceInfo';
+import { observeQADelivery } from './src/native/qaDelivery';
 import { deviceLabel } from './src/native/deviceLabel';
 import { exitMessage, ExitChoice, EXIT_OPTIONS, showNativeExitSheet } from './src/native/exitSheet';
 import { feedback } from './src/native/feedback';
@@ -128,6 +129,7 @@ function statusNote(sync: SyncStatus): { text: string; alert: boolean } | null {
 }
 
 export default function ConnectedApp() {
+  useEffect(() => { observeQADelivery(); }, []);
   const [planV3,setPlanV3] = useState<FirstUseV3Controller|null>(null);
   const [planV3Open,setPlanV3Open] = useState(true);
   const [,setPlanV3Revision] = useState(0);
