@@ -13,12 +13,15 @@ test('actual auth reads the requested explicit period and preserves facts instea
  expect(s.calls.at(-1)?.path).toBe('/me/training-history?period=4w&time_zone=UTC&limit=50');
  expect(s.calls.at(-1)?.body).toBeNull();
 });
-test.each(['owner','version','window','date','count','planned','profile','mapping','empty','cursor'])('invalid history %s cannot become confirmed progress',async(kind)=>{
+test.each(['owner','version','window','date','count','planned','profile','mapping','empty','cursor','links_missing','links_duplicate','links_foreign'])('invalid history %s cannot become confirmed progress',async(kind)=>{
  const s=await setup(),raw:any=historyPage();
  if(kind==='owner')raw.owner_id=8;if(kind==='version')raw.contract_version='unknown';if(kind==='window')raw.window={...raw.window,time_zone:'Europe/Paris'};
  if(kind==='date')raw.entries[0].started_at='2026-02-30T12:00:00Z';if(kind==='count')raw.counts.recorded=true;if(kind==='planned')raw.planned_calendar.count=8;
  if(kind==='profile')raw.entries[0].execution_profile='SCI_V3';if(kind==='mapping')raw.entries[0].descriptor.mapping[0].se_id=false;
  if(kind==='empty')raw.state='EMPTY';if(kind==='cursor'){raw.completeness='MORE_AVAILABLE';raw.next_cursor=null;}
+ if(kind==='links_missing')delete raw.entries[0].exercise_links;
+ if(kind==='links_duplicate')raw.entries[0].exercise_links.push(raw.entries[0].exercise_links[0]);
+ if(kind==='links_foreign')raw.entries[0].exercise_links[0].se_id=999;
  s.handle(async()=>reply(raw));expect(await s.client.sessions({period:'4w',timeZone:'UTC'})).toEqual({state:'unknown'});
 });
 test('raw legacy detail keeps captured facts and unknown context, with no current catalogue dose',async()=>{

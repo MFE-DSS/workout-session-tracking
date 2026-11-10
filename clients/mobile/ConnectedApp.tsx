@@ -56,6 +56,7 @@ import { announce, useReducedMotion } from './src/native/motion';
 import { restNotification } from './src/native/restNotification';
 import { initialSpace } from './src/native/shellNav';
 import { ShellProvider } from './src/shell/ShellContext';
+import {TrainingHistoryHost} from './src/ui/history/TrainingHistoryHost';
 import { shellRoutes } from './src/shell/routeContext';
 import { openJournal } from './src/storage/journal';
 import { resolveJournal } from './src/storage/ownership';
@@ -201,6 +202,7 @@ export default function ConnectedApp() {
   const firstUse = useMemo(() => new FirstUseController(auth, transport, preferencesClient, new FirstPlanClient(auth, transport)), [auth, preferencesClient]);
 
   const missionResource=useMemo(()=>new MissionActionResource(auth,new MissionActionClient(auth,transport,createMissionActionTransport(API_URL))),[auth]);
+  const historicalSessions=useMemo(()=>new FirstSessionV3Client(new RuntimeV3Client(auth,transport,createV3Transport(API_URL,fetch,{calibrationInventory:'plan-calibration-inventory/2.0.0'}))),[auth]);
   const currentOpening=()=>localOpeningState({legacyStartUnknown:legacyStartUnknownRef.current,closePending:closePendingRef.current,v3:planV3Ref.current?.state??null});
 
   const apply = useCallback((event: Event): WorkoutState => {
@@ -1109,7 +1111,7 @@ export default function ConnectedApp() {
         onAction={openMissionAction} onVerify={verifyMission} onSelectPath={path=>{setMissionRefusal(null);missionResource.selectPath(path);setMission(null);void loadMission();}}
         onOpenJournal={openJournalSheet} historical={historical}/>;
       body = (
-        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: accountSettings }}>
+        <ShellProvider value={{ today, openJournal: openJournalSheet, siteUrl: API_URL, account: accountSettings, progress:<TrainingHistoryHost auth={auth} call={transport} typed={historicalSessions}/> }}>
           <ExpoRoot context={shellRoutes} />
         </ShellProvider>
       );

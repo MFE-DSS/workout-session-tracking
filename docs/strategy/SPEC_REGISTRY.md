@@ -977,3 +977,18 @@ GO_BUILD_CONTROLLED / G1_ACCEPTED / PIXELS_ACCEPTED_CONTROLLED (réponse opérat
 Les résultats finaux et limites seront consignés après gates, pas anticipés ici.
 
 **Closeout MOB-04 —10novembre :** code[PR401](https://github.com/MFE-DSS/workout-session-tracking/pull/401), merge205bf203, CI PR42880760921 et canonique42883519546 réussies11jobs,8427backend/3ignorés,81suites1038mobile+TS,77visuels. Pixels acceptés explicitement avantUIcommit. [Clôture contrôlée](../pilot/mob04-mission/CLOSEOUT.md), [spec canonique](../../openspec/specs/mobile/mission-projection/spec.md). Archive aprèsmerge ; une tâche de suivi publicationcanonique/nettoyage demeure ouverte à cet instant et sera résolue par reçu vivant. M1/physique/DATA/RELEASE/MOB03 ouverts selonhand-off, aucun déploiement.
+
+
+## MOB-05A — Progress Core propriétaire, build contrôlé du10novembre
+
+[Delta](../../openspec/changes/mob05-owned-training-history/proposal.md),
+[design](../../openspec/changes/mob05-owned-training-history/design.md),
+[GO/G1](../../openspec/changes/mob05-owned-training-history/BUILD_AUTHORIZATION.md).
+Base205bf203 puis intégration documentaire du closeout4f793981, après libération
+des leases MOB04 ; aucun chantier MOB06/Maltin touché. Quatre GET read-only
+possédés, route native Progrès, clients stricts et chronologie BodyMeasurement
+existante. GO_BUILD_CONTROLLED / G1_ACCEPTED / PIXELS_ACCEPTED_CONTROLLED ; pas de nouvelle
+mesure, cible ou score, pas de writer corporel/nutrition. Revue complète unique
+5Important corrigés,2mineurs conservés ; CI/merge/recette physique non anticipés.
+[État de réalisation](../pilot/mob05a-progress/DELIVERY.md),
+[parité contrôlée et APK du testeur](../pilot/mob05a-progress/PARITY.md).

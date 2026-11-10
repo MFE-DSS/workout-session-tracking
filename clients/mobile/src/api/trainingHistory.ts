@@ -11,7 +11,8 @@ export type HistoryContext={owner_id:number;read_id:string;read_context:string;w
 type LegacyDescriptor={execution_profile:'LEGACY_V1';prescription:'UNKNOWN_NOT_CAPTURED';equipment_context:'UNKNOWN_NOT_CAPTURED';mapping:{se_id:number;position:number;code:string;name:string}[]};
 type ScienceDescriptor={execution_profile:'SCI_V3';binding_digest:string;execution_profile_version:'first-plan-execution/3.0.0';mapping:{se_id:number;slot_id:string;intent_id:string;canonical_exercise_id:string;set_ids:number[]}[]};
 type UnknownDescriptor={execution_profile:'UNKNOWN';reason:'SCHEMA_UNAVAILABLE'|'BINDING_UNAVAILABLE'};
-export type HistoryEntry={session_id:number;started_at:string;ended_at:string|null;status:string;excluded_from_stats:boolean;template_slug:string;name:string;entry_ref:string;execution_profile:'LEGACY_V1'|'SCI_V3'|'UNKNOWN';descriptor:LegacyDescriptor|ScienceDescriptor|UnknownDescriptor};
+export type HistoryExerciseLink={se_id:number;name:string;exercise_ref:string|null};
+export type HistoryEntry={exercise_links:HistoryExerciseLink[];session_id:number;started_at:string;ended_at:string|null;status:string;excluded_from_stats:boolean;template_slug:string;name:string;entry_ref:string;execution_profile:'LEGACY_V1'|'SCI_V3'|'UNKNOWN';descriptor:LegacyDescriptor|ScienceDescriptor|UnknownDescriptor};
 export type HistoryPage=HistoryContext&{contract_version:'training-history/1.0.0';state:'AVAILABLE'|'EMPTY';membership:'LIVE_BOUNDED_MEMBERSHIP';counts_read_at:string;rows_read_at:string;
  counts:{state:'AVAILABLE';recorded:number;completed:number;open:number;excluded:number;completed_with_work:number};weekly_counts:{week_from:string;week_until:string;completed_with_work:number;partial_current_week:boolean}[];
  planned_calendar:{state:'NOT_PERSISTED';count:null};completeness:'COMPLETE'|'MORE_AVAILABLE';next_cursor:string|null;entries:HistoryEntry[]};
@@ -27,7 +28,7 @@ export type LegacySessionFacts={contract_version:'training-session-facts/1.0.0';
 type HistoricalSet=Omit<ExecutionV3['exercises'][number]['sets'][number],'transition_after_set'>;
 type HistoricalExercise=Omit<ExecutionV3['exercises'][number],'transition_after_exercise'|'sets'>&{sets:HistoricalSet[]};
 export type HistoricalScienceExecution=Omit<ExecutionV3,'allowed_actions'|'applicability'|'observation_only'|'cursor'|'exercises'>&{exercises:HistoricalExercise[]};
-export type HistoricalDetail={kind:'LEGACY';facts:LegacySessionFacts}|{kind:'SCI';execution:HistoricalScienceExecution};
+export type HistoricalDetail=({kind:'LEGACY';facts:LegacySessionFacts}|{kind:'SCI';execution:HistoricalScienceExecution})&{exercise_links?:HistoryExerciseLink[];selected_se_id?:number};
 export type HistoryOutcome<T>={state:'confirmed';value:T}|{state:'unknown'|'cancelled'|'changed'|'unavailable'}|{state:'rejected';status:number;code:string|null};
 
 const root='/me/training-history';
@@ -47,7 +48,7 @@ const scienceMapping=object({se_id:id,slot_id:nonempty,intent_id:nonempty,canoni
 const descriptorSchema={oneOf:[object({execution_profile:constant('LEGACY_V1'),prescription:constant('UNKNOWN_NOT_CAPTURED'),equipment_context:constant('UNKNOWN_NOT_CAPTURED'),mapping:array(legacyMapping)}),
  object({execution_profile:constant('SCI_V3'),binding_digest:hash,execution_profile_version:constant('first-plan-execution/3.0.0'),mapping:{...array(scienceMapping),minItems:1}}),
  object({execution_profile:constant('UNKNOWN'),reason:{enum:['SCHEMA_UNAVAILABLE','BINDING_UNAVAILABLE']}})]};
-const entryProperties={session_id:id,started_at:instant,status:nonempty,excluded_from_stats:bool,name:text,entry_ref:ref,execution_profile:{enum:['LEGACY_V1','SCI_V3','UNKNOWN']},descriptor:descriptorSchema};
+const entryProperties={session_id:id,started_at:instant,status:nonempty,excluded_from_stats:bool,name:text,entry_ref:ref,execution_profile:{enum:['LEGACY_V1','SCI_V3','UNKNOWN']},descriptor:descriptorSchema,exercise_links:array(object({se_id:id,name:text,exercise_ref:nullable(ref)}))};
 const entrySchema=object({...entryProperties,ended_at:nullable(instant),template_slug:text});
 const identitySchema=object({namespace:{enum:['LEGACY_EXERCISE','SCI_CANONICAL_EXERCISE']},id:nonempty});
 const occurrenceSchema=object({...entryProperties,se_id:id,position:signedInteger,identity:identitySchema,occurrence_ref:ref,comparison:constant('NON_COMPARABLE')});
@@ -67,7 +68,8 @@ const sameTime=(a:string,b:string)=>a.replace(/\+00:00$/,'Z')===b.replace(/\+00:
 const unique=(values:unknown[])=>new Set(values).size===values.length;
 function coherentEntry(entry:HistoryEntry|HistoryOccurrence){
  if(entry.execution_profile!==entry.descriptor.execution_profile)return false;
- const d=entry.descriptor;if(d.execution_profile==='UNKNOWN')return true;
+ const d=entry.descriptor;if(d.execution_profile==='UNKNOWN')return entry.exercise_links.length===0;
+ if(!unique(entry.exercise_links.map(l=>l.se_id))||entry.exercise_links.length!==d.mapping.length||entry.exercise_links.some(l=>!d.mapping.some(m=>m.se_id===l.se_id)))return false;
  if(!unique(d.mapping.map(m=>m.se_id)))return false;
  if(d.execution_profile==='SCI_V3')return unique(d.mapping.map(m=>m.slot_id))&&unique(d.mapping.flatMap(m=>m.set_ids));
  return unique(d.mapping.map(m=>m.position));
@@ -111,6 +113,7 @@ const contextKeys=['canonical_exercise_id','context_ref','realization_ref','equi
 const sameContext=(a:unknown,b:unknown)=>contextKnown(a)&&contextKnown(b)&&contextKeys.every(k=>(a as any)[k]===(b as any)[k]);
 function historicalScience(value:ExecutionV3,entry:HistoryEntry|HistoryOccurrence):HistoricalScienceExecution|null{
  const descriptor=entry.descriptor;
+ if('se_id' in entry&&!value.exercises.some(e=>e.se_id===entry.se_id))return null;
  if(descriptor.execution_profile!=='SCI_V3'||value.session_id!==entry.session_id||value.binding_digest!==descriptor.binding_digest||!matches(value.started_at,instant)||!sameTime(value.started_at,entry.started_at)||!matches(value.server_now,instant)||!matches(value.ended_at,nullable(instant))||value.exercises.length!==descriptor.mapping.length)return null;
  for(let i=0;i<value.exercises.length;i++){
   const e=value.exercises[i],m=descriptor.mapping[i];
@@ -120,7 +123,7 @@ function historicalScience(value:ExecutionV3,entry:HistoryEntry|HistoryOccurrenc
    if(s.set_id!==m.set_ids[j]||s.set_index!==j+1||!matches(s.completed_at,nullable(instant)))return null;
    if(o!==null){
     if(!matches(o,observationSchema)||s.revision<1||o.reps!==s.reps||o.completed!==s.completed||(o.completed&&o.reps===null)||!sameContext(o.context,e.prescription.context))return null;
-   }else if(s.revision!==0)return null;
+   }else if(s.revision!==0||s.completed||s.reps!==null||s.completed_at!==null)return null;
   }
  }
  const {allowed_actions:_actions,applicability:_applicability,observation_only:_observation,cursor:_cursor,exercises,...facts}=value;
@@ -145,7 +148,8 @@ export class TrainingHistoryClient{
    if(!active())return{state:'cancelled'};
    if(error instanceof ApiFailure&&error.kind==='http'){
     if(error.status===409&&error.code==='READ_CHANGED'||error.status===404&&error.code==='history_entry_not_found')return{state:'changed'};
-    if(error.status===404||error.status===406||error.status>=500)return{state:'unavailable'};
+    if(error.status>=500)return{state:'unknown'};
+    if(error.status===404||error.status===406)return{state:'unavailable'};
     if(error.status>=400&&error.status<500&&![408,429].includes(error.status))return{state:'rejected',status:error.status,code:error.code};
    }
    return{state:'unknown'};
@@ -175,13 +179,13 @@ export class TrainingHistoryClient{
    try{
     const raw=await this.get(`${root}/sessions/${e.session_id}?entry_ref=${encodeURIComponent(e.entry_ref)}${'occurrence_ref' in e?`&occurrence_ref=${encodeURIComponent(e.occurrence_ref)}`:''}`);
     if(e.execution_profile!=='LEGACY_V1')return{state:'unknown'};
-    const facts=parseLegacy(raw,owner,c,e);return facts?{state:'confirmed',value:{kind:'LEGACY',facts}}:{state:'unknown'};
+    const facts=parseLegacy(raw,owner,c,e);return facts?{state:'confirmed',value:{kind:'LEGACY',facts,exercise_links:e.exercise_links,...('se_id' in e?{selected_se_id:e.se_id}:{})}}:{state:'unknown'};
    }catch(error){
     if(!(error instanceof ApiFailure&&error.kind==='http'&&error.status===409&&error.code==='execution_profile_required'))throw error;
     if(e.execution_profile!=='SCI_V3'||!this.typed)return{state:'unknown'};
     const result=await this.typed.execution(e.session_id,current);
     if(result.state!=='confirmed')return result.state==='cancelled'?{state:'cancelled'}:{state:'unknown'};
-    const execution=historicalScience(result.value,e);return execution?{state:'confirmed',value:{kind:'SCI',execution}}:{state:'unknown'};
+    const execution=historicalScience(result.value,e);return execution?{state:'confirmed',value:{kind:'SCI',execution,exercise_links:e.exercise_links,...('se_id' in e?{selected_se_id:e.se_id}:{})}}:{state:'unknown'};
    }
   },current);
  }

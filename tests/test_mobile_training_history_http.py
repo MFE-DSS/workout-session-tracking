@@ -1,4 +1,4 @@
-"""Actual Bearer consumers; global mounting waits the sequential composition lease."""
+"""Actual Bearer consumers through the global app router after the composition lease."""
 
 from datetime import UTC, datetime, timedelta
 
@@ -10,10 +10,8 @@ ROOT = "/api/mobile/v1/me/training-history"
 def mounted(client):
     from app.database import SessionLocal
     from app.models.user import User
-    from app.routers.mobile_training_history import router
     from app.services.device_auth import open_device_session
 
-    client.app.include_router(router, prefix="/api/mobile/v1")
     with SessionLocal() as db:
         user = db.query(User).one()
         issued = open_device_session(db, user)
@@ -163,4 +161,10 @@ def test_database_error_is_unavailable_without_serializing_private_values(client
     response = client.get(ROOT, params={"period": "all", "time_zone": "UTC"}, headers=headers)
     assert response.status_code == 503
     assert response.json() == {"detail": {"error": "training_history_unavailable"}}
+    assert response.headers["cache-control"] == "no-store"
+
+
+def test_history_is_mounted_by_real_mobile_api_before_local_fixture(client):
+    response = client.get(ROOT, params={"period": "4w", "time_zone": "UTC"})
+    assert response.status_code == 401
     assert response.headers["cache-control"] == "no-store"

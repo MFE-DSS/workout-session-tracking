@@ -44,7 +44,8 @@ let mockOperationSequence = 0;
 jest.mock('expo-crypto', () => ({ randomUUID: () => `test-op-${++mockOperationSequence}` }));
 jest.mock('../shell/routeContext', () => ({ shellRoutes: {} }));
 let mockShellMounts = 0;
-jest.mock('expo-router', () => ({ ExpoRoot: () => { require('react').useEffect(() => { mockShellMounts++; }, []); const s = require('../shell/ShellContext').useShell(); return require('react').createElement(require('react').Fragment, null, s.today, s.account); } }));
+let mockProgressTab=false;
+jest.mock('expo-router', () => ({ useFocusEffect:(callback:()=>void)=>require('react').useEffect(callback,[callback]), ExpoRoot: () => { require('react').useEffect(() => { mockShellMounts++; }, []); const s = require('../shell/ShellContext').useShell(); if(mockProgressTab)return require('react').createElement(require('../routes/progres').default); return require('react').createElement(require('react').Fragment, null, s.today, s.account); } }));
 jest.mock('react-native-safe-area-context', () => ({
   useSafeAreaInsets: () => ({ top: 47, bottom: 34, left: 0, right: 0 }),
   useSafeAreaFrame: () => ({ width: 390, height: 844 }),
@@ -93,7 +94,7 @@ let root: Root;
 beforeAll(() => { ConnectedApp = require('../../ConnectedApp').default; });
 
 beforeEach(async () => {
-  mockRealSummary = false; mockShellMounts = 0;mockMissionOwner=7;
+  mockRealSummary = false; mockShellMounts = 0;mockMissionOwner=7;mockProgressTab=false;
   mockCredential = 'rt1.test-device.secret';
   mockOwners.clear(); mockOwners.set('test-device', 7);
   mockJournalNames.clear(); mockJournalNames.set(7, 'auren.db');
@@ -1087,4 +1088,21 @@ test('MOB04 a confirmed closed local session remains excluded after offline cold
  await saved('acked');exactMissionRPC(()=>({...mockFirstUse(),state:'UNAVAILABLE',source:'OWNED_FIRST_USE',primary_action:{kind:'REFRESH'},payload:null,reason:'RUNTIME_NOT_SERVED'}));await boot(false);
  await act(async()=>root.unmount());root=createRoot();const fallback=mockTransport.getMockImplementation()!;mockTransport.mockImplementation(async(p:string)=>p==='/auth/refresh'?Promise.reject(new ApiFailure('network')):fallback(p));
  await boot(false);await act(async()=>screen('Resume').onResume());expect(root.container.queryAll(n=>n.type==='Execution')).toHaveLength(0);
+});
+
+
+test('MOB05 real ConnectedApp Progress route consumes owned history and BodyMeasurement reads',async()=>{
+ const {historyPage}=require('../../test/trainingHistoryHarness'),{weightPage}=require('../../test/accountDataHarness');mockProgressTab=true;
+ mockTransport.mockImplementation(async(path:string)=>{
+  if(path==='/auth/refresh')return{access_token:'test-access',refresh_token:'rt1.test-device.next-secret',access_expires_in:900,token_type:'Bearer',server_now:new Date().toISOString()};
+  if(path==='/auth/me')return{id:7};
+  if(path==='/mission')return{state:'NO_MISSION'};
+  if(path.startsWith('/me/training-history?')){const p=historyPage();p.window.time_zone=new URL('https://qa.invalid'+path).searchParams.get('time_zone');return p;}
+  if(path.startsWith('/me/body/weight-history')){const p=weightPage();p.entries[0].measured_at='2026-11-05T00:00:00Z';return p;}
+  throw new ApiFailure('network');
+ });
+ await boot(false);await act(async()=>{for(let i=0;i<80;i++)await Promise.resolve();});
+ expect(root.container.queryAll(n=>n.props.testID==='progress-frequency')[0]?.props.children).toBe('1');
+ expect(mockTransport.mock.calls.some(([p])=>String(p).startsWith('/me/body/weight-history'))).toBe(true);
+ expect(mockTransport.mock.calls.some(([p,init])=>String(p).startsWith('/sessions')&&init?.method==='POST')).toBe(false);
 });

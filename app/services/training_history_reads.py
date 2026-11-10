@@ -250,8 +250,23 @@ def _metadata(session, descriptor):
     }
 
 
+def _exercise_links(db, session, descriptor, context):
+    if descriptor["execution_profile"] == "UNKNOWN":
+        return []
+    cache = {("SCI_DESCRIPTOR", session.id): descriptor}
+    rows = db.scalars(select(SessionExercise).where(SessionExercise.session_id == session.id)
+                      .order_by(SessionExercise.position, SessionExercise.id))
+    links = []
+    for row in rows:
+        identity = _exercise_identity(db, row, session, cache)
+        links.append({"se_id": row.id, "name": row.substituted_name or row.exercise_name_snapshot or "",
+                      "exercise_ref": _exercise_reference(context, identity) if identity else None})
+    return links
+
+
 def _entry(db, session, context):
     descriptor = _descriptor(db, session)
+    links = _exercise_links(db, session, descriptor, context)
     return {
         "session_id": session.id,
         "started_at": _iso(session.started_at),
@@ -262,12 +277,14 @@ def _entry(db, session, context):
         "name": session.template_name_snapshot,
         "execution_profile": descriptor["execution_profile"],
         "descriptor": descriptor,
+        "exercise_links": links,
         "entry_ref": _sign(
             "ENTRY",
             {
                 "context": context,
                 "session_id": session.id,
                 "metadata_digest": _digest(_metadata(session, descriptor)),
+                "exercise_links_digest": _digest(links),
             },
         ),
     }
@@ -389,6 +406,8 @@ def _selected(db, owner, session_id, entry_ref):
         raise HistoryReadError("history_entry_not_found", 404) from None
     descriptor = _descriptor(db, session)
     if reference.get("metadata_digest") != _digest(_metadata(session, descriptor)):
+        raise HistoryReadError("READ_CHANGED", 409)
+    if reference.get("exercise_links_digest") != _digest(_exercise_links(db, session, descriptor, context)):
         raise HistoryReadError("READ_CHANGED", 409)
     return session, descriptor, context
 
@@ -632,6 +651,7 @@ def _occurrence(db, row, session, context, identity):
         "entry_ref": entry["entry_ref"],
         "execution_profile": entry["execution_profile"],
         "descriptor": entry["descriptor"],
+        "exercise_links": entry["exercise_links"],
         "comparison": "NON_COMPARABLE",
         "occurrence_ref": _sign(
             "OCCURRENCE", _occurrence_metadata(row, session, entry["descriptor"], context, identity)

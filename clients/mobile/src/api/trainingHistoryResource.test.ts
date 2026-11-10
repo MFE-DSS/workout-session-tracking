@@ -54,6 +54,26 @@ test('old weight response cannot survive an account switch',async()=>{
  const s=await weights(),late=deferred<Response>();s.handle(async()=>late.promise);const old=s.r.refresh(window4);await flush();await s.auth.logout();s.setOwner(8);await s.auth.login('b','test-only',null);
  expect(s.r.state.entries).toEqual([]);late.resolve(reply(weight(14,'2026-11-09T00:00:00Z')));await old;expect(s.r.state.entries).toEqual([]);
 });
+test('confirmed session links open the exact owned exercise, preserve back navigation and reject invented links',async()=>{
+ const s=await setup();s.handle(async()=>reply(historyPage()));await s.resource.refresh('4w','UTC');
+ s.handle(async()=>reply(legacyFacts()));await s.resource.selectEntry(summary());
+ const count=s.calls.length;await s.resource.openExerciseFromDetail(22,ref('exercise'));await s.resource.openExerciseFromDetail(21,ref('foreign'));
+ expect(s.calls).toHaveLength(count);expect(s.resource.state.selectedEntry).toBe(11);
+ s.handle(async()=>reply(occurrencesPage()));await s.resource.openExerciseFromDetail(21,ref('exercise'));
+ expect(s.calls.at(-1)?.path).toContain(`/exercises/${encodeURIComponent(ref('exercise'))}`);
+ expect(s.resource.state).toMatchObject({selectedEntry:null,selectedExercise:ref('exercise'),selectedExerciseLabel:'Captured exercise',occurrences:{status:'confirmed'}});
+ s.handle(async()=>reply({...legacyFacts(),selected_se_id:21}));await s.resource.selectOccurrence(occurrencesPage().entries[0]);
+ expect(s.resource.state.detail.value?.selected_se_id).toBe(21);s.resource.back();expect(s.resource.state.selectedExercise).toBe(ref('exercise'));
+ s.resource.back();expect(s.resource.state.selectedExercise).toBeNull();
+});
+test('late exercise navigation response after account change cannot restore previous owner history',async()=>{
+ const s=await setup();s.handle(async()=>reply(historyPage()));await s.resource.refresh('4w','UTC');
+ s.handle(async()=>reply(legacyFacts()));await s.resource.selectEntry(summary());
+ const late=deferred<Response>();s.handle(async()=>late.promise);const task=s.resource.openExerciseFromDetail(21,ref('exercise'));await flush();
+ await s.auth.logout();s.setOwner(8);await s.auth.login('b','test-only',null);
+ late.resolve(reply(occurrencesPage()));await task;
+ expect(s.resource.state).toMatchObject({selectedExercise:null,occurrences:{status:'idle'}});
+});
 test('duplicate exercise pages merge identities rather than duplicating historical points',async()=>{
  const s=await setup();s.handle(async()=>reply(historyPage()));await s.resource.refresh('4w','UTC');s.handle(async()=>reply({...exercisePage(),scan:'PARTIAL_SCAN',coverage_complete:false,next_cursor:ref('next')}));await s.resource.loadExercises();
  s.handle(async()=>reply(exercisePage()));await s.resource.nextExercises();expect(s.resource.state.exercises.value?.entries).toHaveLength(1);expect(s.resource.state.exercises.value?.coverage_complete).toBe(true);

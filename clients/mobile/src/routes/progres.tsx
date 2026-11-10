@@ -1,9 +1,14 @@
-/** MOB-01 — PROGRÈS, not migrated yet (MOB-05): session history, exercise history, measured progress. */
-import React from 'react';
+/** MOB-05A — focused owned history; retains the shell fallback without a consumer. */
+import React,{useCallback,useState} from 'react';
+import {useFocusEffect} from 'expo-router';
+import {useShell} from '../shell/ShellContext';
 
 import { PendingSpace } from '../shell/PendingSpace';
 
 export default function Progress() {
+  const shell=useShell(),[focused,setFocused]=useState(false);
+  useFocusEffect(useCallback(()=>{setFocused(true);return()=>setFocused(false);},[]));
+  if(shell.progress)return focused?<>{shell.progress}</>:null;
   return (
     <PendingSpace
       eyebrow="AUREN · Progrès"

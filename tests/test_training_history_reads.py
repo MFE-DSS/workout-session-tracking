@@ -563,8 +563,14 @@ def test_occurrence_reference_detects_executed_identity_change_without_hiding_se
                 occurrence_ref=occurrence["occurrence_ref"],
             )
         assert (error.value.status, error.value.code) == (409, "READ_CHANGED")
+        # Session links now seal the executed identity too; refresh obtains the
+        # changed facts without reusing a stale exercise link.
+        with pytest.raises(HistoryReadError) as old_entry:
+            read_session_facts(db, owner, session.id, occurrence["entry_ref"])
+        assert (old_entry.value.status, old_entry.value.code) == (409, "READ_CHANGED")
+        fresh = read_sessions(db, owner, period="all", time_zone="UTC", now=NOW)["entries"][0]
         assert (
-            read_session_facts(db, owner, session.id, occurrence["entry_ref"])["exercises"][0][
+            read_session_facts(db, owner, session.id, fresh["entry_ref"])["exercises"][0][
                 "executed_name"
             ]
             == "Different actual movement"
@@ -676,3 +682,46 @@ def test_actual_v3_history_keeps_typed_facts_after_withdrawal_without_legacy_pro
         assert historical["applicability"]["state"] != "CURRENT"
         assert historical["exercises"][0]["sets"][0]["observation"]["setting"]["value"] == 17.5
         assert all(db.get(SetLog, row["sets"][0]["set_id"]).weight_kg is None for row in chosen)
+
+
+def test_session_exercise_links_reuse_the_exact_owned_index_reference(client):
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.services.exercise_identity import ensure_exercise
+    from app.services.training_history_reads import read_exercises, read_occurrences, read_sessions
+
+    with SessionLocal() as db:
+        owner = db.query(User).one().id
+        ensure_exercise(db, "Captured exercise")
+        session = add_session(db, owner, started=NOW-timedelta(minutes=1), reps=9, weight=17.5)
+        page = read_sessions(db, owner, period="4w", time_zone="UTC", now=NOW)
+        entry = page["entries"][0]
+        link = entry["exercise_links"][0]
+        index = read_exercises(db, owner, read_context=page["read_context"])
+        assert link["exercise_ref"] == index["entries"][0]["exercise_ref"]
+        occurrences = read_occurrences(db, owner, link["exercise_ref"], read_context=page["read_context"])
+        assert occurrences["entries"][0]["session_id"] == session.id
+        assert occurrences["entries"][0]["se_id"] == link["se_id"]
+
+
+def test_unknown_exercise_link_is_not_guessed_and_new_identity_invalidates_old_read(client):
+    from app.database import SessionLocal
+    from app.models.user import User
+    from app.services.exercise_identity import ensure_exercise
+    from app.services.training_history_reads import (
+        HistoryReadError,
+        read_session_facts,
+        read_sessions,
+    )
+
+    with SessionLocal() as db:
+        owner = db.query(User).one().id
+        session = add_session(db, owner, started=NOW-timedelta(minutes=1), reps=9)
+        entry = read_sessions(db, owner, period="4w", time_zone="UTC", now=NOW)["entries"][0]
+        assert entry["exercise_links"][0]["exercise_ref"] is None
+        assert read_session_facts(db, owner, session.id, entry["entry_ref"])["session"]["session_id"] == session.id
+        ensure_exercise(db, "Captured exercise")
+        db.commit()
+        with pytest.raises(HistoryReadError) as changed:
+            read_session_facts(db, owner, session.id, entry["entry_ref"])
+        assert (changed.value.status, changed.value.code) == (409, "READ_CHANGED")
