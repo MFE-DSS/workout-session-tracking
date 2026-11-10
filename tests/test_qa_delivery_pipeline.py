@@ -1171,12 +1171,32 @@ def test_fresh_release_backup_differs_from_cutover_and_has_verified_export(relea
     assert calls[-1][0] == "build"
 
 
+@pytest.mark.parametrize("ci_mode", [False, True])
 def test_prepare_cli_freezes_declared_proof_without_private_credentials(
-    checkout, tmp_path, monkeypatch
+    checkout, tmp_path, monkeypatch, ci_mode
 ):
     import sys
 
     from tools.qa_delivery import pipeline, proofs
+
+    # The CLI really takes the Actions branch on CI. Simulate that read-only
+    # external boundary rather than inheriting a runner's credentials/network.
+    if ci_mode:
+        monkeypatch.setenv("GITHUB_ACTIONS", "true")
+    else:
+        monkeypatch.delenv("GITHUB_ACTIONS", raising=False)
+    head = subprocess.check_output(
+        ["git", "-C", str(checkout), "rev-parse", "HEAD"], text=True
+    ).strip()
+    calls = []
+
+    def github_read(path):
+        calls.append(path)
+        return {"": {"default_branch": "fixture"}, "branches/fixture": {"commit": {"sha": head}}}[
+            path
+        ]
+
+    monkeypatch.setattr(pipeline, "gh_get", github_read)
 
     config = tmp_path / "configured-store.json"
     config.write_text(
@@ -1220,6 +1240,8 @@ def test_prepare_cli_freezes_declared_proof_without_private_credentials(
     assert package["proof_transport"]["verification"] == "DECLARED_NOT_VERIFIED"
     assert package["proof_transport"]["asset_id"] == 321
     assert package["distributable"] is False
+    assert package["canonical_sha"] == (head if ci_mode else None)
+    assert calls == (["", "branches/fixture"] if ci_mode else [])
 
 
 def test_real_import_cli_to_real_publisher_consumes_decrypted_databases(

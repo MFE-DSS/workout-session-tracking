@@ -130,3 +130,13 @@ ce rouge réel. Patch minimal : versions déjà utilisées dans la CI canonique
 checkout5/python6/node6/upload6/download7, sans autre changement de workflow.
 Vérification avec le vrai linter1.17.1 téléchargé et checksum vérifié,164tests
 pipeline/transport passants ; nouveau HEAD/CI réel requis avant merge.
+
+CI suivante42840016015/HEAD77773c9 : lint/mobile/visuel passants, shard4
+**1échec/1800PASS** sur test_prepare_cli_freezes_declared_proof_without_private_credentials.
+Le test héritait GITHUB_ACTIONS=true et appelait réellement gh_get sans jeton du
+job pytest ; l'échec n'est pas reclassé en annulation infra. Correctif uniquement
+dans ce test : deux modes local/Actions explicites, frontière GitHub read-only
+simulée, assertion du SHA canonique acquis et des deux appels attendus. Aucune
+garde production, permission ou configuration CI n'est supprimée. Nouveau HEAD
+et CI réelle requis. Le premier run42839224842 a fini cancelled après le push
+correctif, avec lint réellement rouge ; aucune annulation manuelle ni faux PASS.
