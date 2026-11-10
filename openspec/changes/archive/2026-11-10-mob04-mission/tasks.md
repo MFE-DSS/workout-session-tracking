@@ -13,9 +13,10 @@
 - [x] Une planche de vrais rendus iOS/Android, références intactes et acceptation avant commit UI.
 - [x] Nommer les limites appareils sans faux PASS ; revue indépendante et corrections.
 ## 4. Delivery
-- [ ] Commit/push/PR unique après gates, CI exacte/base fraîche, merge gardé sous GOV.
-- [ ] CI canonique/Sonar réels, archive après merge, closeout et cleanup des seuls éléments sans travail unique.
-- [ ] Aucun GO activation/déploiement ou parité pilote complète déduit.
+- [x] Commit/push/PR401 après gates, CI42880760921 exacte/base fraîche, merge205bf203 gardé sous GOV.
+- [x] CI canonique code42883519546 sur205bf203 réussie ; Sonar réel consigné au reçu.
+- [ ] Archive après merge et closeout documentaire ; publication/final canonique et cleanup suivis par reçu vivant.
+- [x] Aucun GO activation/déploiement ou parité pilote complète déduit.
 
 
 Réconciliation du mandat PILOT VALUE DELIVERY du10novembre : [PILOT_VALUE_SCOPE](PILOT_VALUE_SCOPE.md) précise base canonique, option de navigation B, commandes locales et leases séquencés. Statuts historiques NO_GO_BUILD/G1_PENDING levés par BUILD_AUTHORIZATION ; pixels acceptés le10novembre, livraison CI/merge encore en cours.

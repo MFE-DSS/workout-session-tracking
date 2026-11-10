@@ -967,11 +967,13 @@ change opérationnel. Les anciennes lignes gardent leurs instants de préparatio
 
 ## MOB04 — Today propriétaire, réalisation contrôlée du10novembre
 
-[Delta mob04-mission](../../openspec/changes/mob04-mission/proposal.md),
-[scope réconcilié](../../openspec/changes/mob04-mission/PILOT_VALUE_SCOPE.md) et
-[GO/G1 reçus](../../openspec/changes/mob04-mission/BUILD_AUTHORIZATION.md).
+[Delta mob04-mission](../../openspec/changes/archive/2026-11-10-mob04-mission/proposal.md),
+[scope réconcilié](../../openspec/changes/archive/2026-11-10-mob04-mission/PILOT_VALUE_SCOPE.md) et
+[GO/G1 reçus](../../openspec/changes/archive/2026-11-10-mob04-mission/BUILD_AUTHORIZATION.md).
 Base d67f12a après REL03, réservation MOB06/Maltin préservée. Projection GET
 owner/path/profil, priorité reprise/commande à vérifier, premier parcours réel
 et recommandation historique choisie explicitement ; MISSION/SCI/journal intacts.
 GO_BUILD_CONTROLLED / G1_ACCEPTED / PIXELS_ACCEPTED_CONTROLLED (réponse opérateur du10novembre) ; aucun déploiement.
 Les résultats finaux et limites seront consignés après gates, pas anticipés ici.
+
+**Closeout MOB-04 —10novembre :** code[PR401](https://github.com/MFE-DSS/workout-session-tracking/pull/401), merge205bf203, CI PR42880760921 et canonique42883519546 réussies11jobs,8427backend/3ignorés,81suites1038mobile+TS,77visuels. Pixels acceptés explicitement avantUIcommit. [Clôture contrôlée](../pilot/mob04-mission/CLOSEOUT.md), [spec canonique](../../openspec/specs/mobile/mission-projection/spec.md). Archive aprèsmerge ; une tâche de suivi publicationcanonique/nettoyage demeure ouverte à cet instant et sera résolue par reçu vivant. M1/physique/DATA/RELEASE/MOB03 ouverts selonhand-off, aucun déploiement.

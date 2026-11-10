@@ -19,3 +19,7 @@ Android360/480dp et texte130% : présentateur de production/AuthSession/SQLite/H
 ## Limite différée et frontières
 **M1 différé :** quitter PLAN après création peut laisser l'orientation Today antérieure jusqu'à refresh/foreground ; le contrôleur empêche une deuxième création. Ne pas transformer une CI verte ou l'acceptation du board en recette physique.
 MISSION-SCREEN-V1, primitives/tokens/marque, SCI et hashes historiques, journal/outbox/schéma séance et source de calibrage conservés. Aucun catalogue/programme/MOB-06 réservé Maltin, nouvelle recommandation, charge, score ou permission offline. DATA, QA opérationnelle/OVH, diffusion et MOB03 complet restent ouverts.
+
+
+## Suite après publication du code
+PR401 fusionnée205bf203, CI PR et canonique code vérifiées réussies. [CLOSEOUT](CLOSEOUT.md) précise résultats/Sonar/limites et suivi de sa propre publication. Les formulations de préparation ci-dessus conservent leur instant.
