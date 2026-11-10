@@ -4,6 +4,19 @@
     "appVersionSource": "local"
   },
   "build": {
+    "qa-android": {
+      "distribution": "internal",
+      "developmentClient": false,
+      "environment": "preview",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "AUREN_QA_BUILD": "1",
+        "EXPO_PUBLIC_PLAN_V3_CONTROLLED_TEST": "1",
+        "EXPO_PUBLIC_API_URL": "https://decorating-friendship-suggestions-current.trycloudflare.com"
+      }
+    },
     "pilot": {
       "distribution": "internal",
       "developmentClient": false,
