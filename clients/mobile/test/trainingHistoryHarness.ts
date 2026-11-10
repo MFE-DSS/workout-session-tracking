@@ -1,7 +1,7 @@
 /** Contract testimony for unit RPC boundaries, not a served fixture or personal evidence. */
 import {readFileSync} from 'node:fs';
 import {resolve} from 'node:path';
-import type {HistoryEntry,HistoryPage,HistoryOccurrence,ExercisePage,ExerciseIndexEntry} from '../src/api/trainingHistory';
+import type {LegacySessionFacts,HistoryEntry,HistoryPage,HistoryOccurrence,ExercisePage,ExerciseIndexEntry} from '../src/api/trainingHistory';
 export const ref=(name:string)=>`${name}.${'a'.repeat(64)}`;
 export const window4={period:'4w' as const,time_zone:'UTC',from:'2026-10-19T00:00:00Z',until:'2026-11-10T12:00:00Z'};
 export const readId='c'.repeat(32);
@@ -10,7 +10,7 @@ export function summary(id=11):HistoryEntry{return{session_id:id,started_at:'202
 export function historyPage(owner=7):HistoryPage{return{contract_version:'training-history/1.0.0',owner_id:owner,state:'AVAILABLE',read_id:readId,read_context:ref('context'),window:window4,membership:'LIVE_BOUNDED_MEMBERSHIP',
  counts_read_at:'2026-11-10T12:00:00Z',rows_read_at:'2026-11-10T12:00:00Z',counts:{state:'AVAILABLE',recorded:1,completed:1,open:0,excluded:0,completed_with_work:1},weekly_counts:[['2026-10-19','2026-10-26'],['2026-10-26','2026-11-02'],['2026-11-02','2026-11-09'],['2026-11-09','2026-11-16']].map(([start,end],i)=>({week_from:start+'T00:00:00Z',week_until:end+'T00:00:00Z',completed_with_work:i===3?1:0,partial_current_week:i===3})),
  planned_calendar:{state:'NOT_PERSISTED',count:null},completeness:'COMPLETE',next_cursor:null,entries:[summary()]};}
-export function legacyFacts(){return{contract_version:'training-session-facts/1.0.0',owner_id:7,read_id:readId,window:window4,rows_read_at:'2026-11-10T12:00:00Z',execution_profile:'LEGACY_V1',prescription:'UNKNOWN_NOT_CAPTURED',timezone_basis:'DATABASE_UTC_CONVENTION',
+export function legacyFacts():LegacySessionFacts{return{contract_version:'training-session-facts/1.0.0',owner_id:7,read_id:readId,window:window4,rows_read_at:'2026-11-10T12:00:00Z',execution_profile:'LEGACY_V1',prescription:'UNKNOWN_NOT_CAPTURED',timezone_basis:'DATABASE_UTC_CONVENTION',
  session:{session_id:11,name:'Captured session',template_slug:'captured-template',started_at:'2026-11-09T10:00:00Z',ended_at:'2026-11-09T11:00:00Z',status:'completed',excluded_from_stats:false},
  cardio:{duration_min:null,bpm_avg:null,machine_calories:null,machine_type:null},exercises:[{se_id:21,position:0,code:'A1',prescribed_name:'Captured exercise',executed_name:'Captured exercise',substituted_name:null,prescription:'UNKNOWN_NOT_CAPTURED',equipment_context:'UNKNOWN_NOT_CAPTURED',load_semantics:'UNKNOWN',sets:[{set_id:31,kind:'work',set_index:1,completed:true,reps:9,weight_kg:17.5,raw_weight_repr:null,completed_at:'2026-11-09T10:05:00Z'}]}]};}
 export function exercisePage():ExercisePage<ExerciseIndexEntry>{return{contract_version:'training-exercise-index/1.0.0',owner_id:7,read_id:readId,window:window4,rows_read_at:'2026-11-10T12:00:00Z',state:'AVAILABLE',entries:[{exercise_ref:ref('exercise'),identity:{namespace:'LEGACY_EXERCISE',id:'captured-exercise'},name:'Captured exercise'}],scan:'EXHAUSTED',source_inspected:1,unresolved_count:0,coverage_complete:true,next_cursor:null};}
