@@ -1164,3 +1164,161 @@ def test_fresh_release_backup_differs_from_cutover_and_has_verified_export(relea
     with client:
         assert publish(package, root, proof, gate, eas, client)["distributable"] is False
     assert calls[-1][0] == "build"
+
+
+def test_prepare_cli_freezes_declared_proof_without_private_credentials(
+    checkout, tmp_path, monkeypatch
+):
+    import sys
+
+    from tools.qa_delivery import pipeline, proofs
+
+    config = tmp_path / "configured-store.json"
+    config.write_text(
+        json.dumps(
+            {
+                "schema_version": "qa-proof-store/1.0.0",
+                "state": "CONFIGURED",
+                "repository": "MFE-DSS/qa-proof-private",
+            }
+        )
+    )
+    # Configuration is source-controlled; only redirect its location for this fixture.
+    original = proofs.configured_repository
+    monkeypatch.setattr(proofs, "configured_repository", lambda: original(config))
+    raw = tmp_path / "candidate.json"
+    raw.write_text(json.dumps(candidate()))
+    output = tmp_path / "declared.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "pipeline",
+            "prepare",
+            "--candidate",
+            str(raw),
+            "--checkout",
+            str(checkout),
+            "--output",
+            str(output),
+            "--expected-proof-sha256",
+            "a" * 64,
+            "--proof-asset-id",
+            "321",
+            "--proof-cipher-sha256",
+            "b" * 64,
+        ],
+    )
+    pipeline.main()
+    package = json.loads(output.read_text())
+    assert package["proof_sha256"] == "a" * 64
+    assert package["proof_transport"]["verification"] == "DECLARED_NOT_VERIFIED"
+    assert package["proof_transport"]["asset_id"] == 321
+    assert package["distributable"] is False
+
+
+def test_real_import_cli_to_real_publisher_consumes_decrypted_databases(
+    release_case, tmp_path, monkeypatch
+):
+    import os
+    import sys
+
+    from tests.test_qa_delivery_proofs import GitHubBoundary
+    from tools.qa_delivery import pipeline, proofs
+
+    package, checkout, source, gate, eas, calls, client, _ = release_case
+    private = tmp_path / "transport"
+    private.mkdir(mode=0o700)
+    key = private / "key"
+    key.write_bytes(os.urandom(32))
+    key.chmod(0o600)
+    blob = private / "qa-proof.aqp"
+    staging = proofs.pack(source, key, blob)
+    config = private / "store.json"
+    config.write_text(
+        json.dumps(
+            {
+                "schema_version": "qa-proof-store/1.0.0",
+                "state": "CONFIGURED",
+                "repository": GitHubBoundary.repository,
+            }
+        )
+    )
+    boundary = GitHubBoundary(blob.read_bytes())
+    store = proofs.GitHubStore(GitHubBoundary.repository, config=config, command=boundary)
+    package["proof_transport"] = proofs.declared_transport(
+        321, staging["cipher_sha256"], staging["proof_sha256"], config
+    )
+    package_file = private / "package.json"
+    package_file.write_text(json.dumps(package))
+    imported = private / "imported"
+    monkeypatch.setattr(proofs, "GitHubStore", lambda repository: store)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "proofs",
+            "import",
+            "--package",
+            str(package_file),
+            "--key",
+            str(key),
+            "--output",
+            str(imported),
+        ],
+    )
+    proofs.main()
+    assert pipeline.proof_digest(imported) == package["proof_sha256"]
+    # Both SQLite/manifest validators and every publisher gate really execute;
+    # only external GitHub/Render/EAS boundaries come from the established fixture.
+    original_publish = pipeline.publish
+    monkeypatch.setattr(
+        pipeline,
+        "publish",
+        lambda raw, root, proof: original_publish(raw, root, proof, gate, eas, client),
+    )
+    output = private / "submitted.json"
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "pipeline",
+            "publish",
+            "--candidate",
+            str(package_file),
+            "--checkout",
+            str(checkout),
+            "--proof",
+            str(imported),
+            "--output",
+            str(output),
+        ],
+    )
+    with client:
+        pipeline.main()
+    assert json.loads(output.read_text())["state"] == "SUBMITTED_NOT_DISTRIBUTABLE"
+    assert any(call[0] == "build" for call in calls)
+
+
+def test_workflow_never_reads_or_uploads_plaintext_proof_in_public_artifacts():
+    import yaml
+
+    workflow = yaml.safe_load(
+        (Path(__file__).resolve().parents[1] / ".github/workflows/qa-release.yml").read_text()
+    )
+    prepare = workflow["jobs"]["prepare"]
+    release = workflow["jobs"]["release"]
+    assert "qa-continuity-proof" not in json.dumps(workflow)
+    assert "QA_PROOF_READ_TOKEN" not in json.dumps(prepare)
+    assert "QA_PROOF_AES256_KEY_HEX" not in json.dumps(prepare)
+    steps = release["steps"]
+    importer = next(i for i, step in enumerate(steps) if "proofs import" in step.get("run", ""))
+    sdk = next(i for i, step in enumerate(steps) if "npm ci" in step.get("run", ""))
+    publisher = next(i for i, step in enumerate(steps) if "pipeline publish" in step.get("run", ""))
+    assert importer < sdk < publisher
+    assert steps[importer]["env"]["GH_TOKEN"] == "${{ secrets.QA_PROOF_READ_TOKEN }}"
+    assert all(
+        "qa-proof-private" not in json.dumps(s.get("with", {}))
+        for s in steps
+        if "upload-artifact" in s.get("uses", "")
+    )

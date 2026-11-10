@@ -987,6 +987,9 @@ def main():
     parser.add_argument("--checkout", type=Path, default=Path.cwd())
     parser.add_argument("--proof", type=Path)
     parser.add_argument("--operation", choices=["BUILD_APK", "UPDATE", "ROLLBACK"])
+    parser.add_argument("--expected-proof-sha256")
+    parser.add_argument("--proof-asset-id", type=int)
+    parser.add_argument("--proof-cipher-sha256")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     try:
@@ -1011,12 +1014,27 @@ def main():
             if os.environ.get("GITHUB_ACTIONS") == "true":
                 branch = quote(gh_get("")["default_branch"], safe="")
                 canonical = gh_get(f"branches/{branch}")["commit"]["sha"]
+            from tools.qa_delivery.proofs import declared_transport
+
+            declared = None
+            if any((args.expected_proof_sha256, args.proof_asset_id, args.proof_cipher_sha256)):
+                require(args.proof is None, "qa_pipeline_declared_and_local_proof_conflict")
+                declared = declared_transport(
+                    args.proof_asset_id, args.proof_cipher_sha256, args.expected_proof_sha256
+                )
             package = {
                 "schema_version": "qa-prepared-package/1.0.0",
                 "candidate": c,
                 "candidate_sha256": digest(c),
                 "canonical_sha": canonical,
-                "proof_sha256": proof_digest(args.proof) if args.proof else None,
+                "proof_sha256": (
+                    args.expected_proof_sha256
+                    if declared
+                    else proof_digest(args.proof)
+                    if args.proof
+                    else None
+                ),
+                "proof_transport": declared,
                 "distributable": False,
             }
         else:
