@@ -643,6 +643,12 @@ La mise à jour est faite par l'agent **dans le même commit** que le sprint rep
 
 Préparation après socle : [MOB04 MISSION, proposition sans GO BUILD](../proposals/mob04-mission.md), [10fixtures versionnées non servies](../fixtures/mob04-mission.preparation.v1.json). Contrat MISSION-SCREEN-V1 LOCKED, aucune UI/baseline ou intelligence nouvelle implémentée.
 
+## MOB-06 réservée — gouvernée par Maltin (10 novembre 2026)
+
+| ID réservé | Gouvernance | Statut |
+|---|---|---|
+| MOB-06 bibliothèque de séances (tranche 1) | Maltin, décisions avant code ; [réservation](AUREN_MOBILE_CRITICAL_PATH_2026_11_03.md#réservation-maltin--mob-06-bibliothèque-de-séances) | RÉSERVÉE, NOT_STARTED ; branche vide `feature/bibliotheque-seances` sur `b9a334d` ; aucun change OpenSpec ni GO BUILD |
+
 
 ## SCI-P02 admission système — étape1 isolée, 7 novembre2026
 
